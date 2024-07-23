@@ -81,7 +81,6 @@ int32_t RunningLockImpl::Hold(const RunningLockInfo &info, PowerHdfState state,
 int32_t RunningLockImpl::Unhold(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
-    HDF_LOGI("Runninglock name is %{public}s, enter unhold", info.name.c_str());
     std::lock_guard<std::mutex> lock(mutex_);
     if (info.name.empty()) {
         HDF_LOGW("Runninglock unhold failed, name is empty");

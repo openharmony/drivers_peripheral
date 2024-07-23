@@ -87,7 +87,7 @@ void DStreamOperatorTest::SetUp(void)
 {
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
     dMetadataProcessor->InitDCameraAbility(TEST_ABILITY_VALUE);
-    dstreamOperator_ =  new (std::nothrow) DStreamOperator(dMetadataProcessor);
+    dstreamOperator_ = sptr<DStreamOperator>(new (std::nothrow) DStreamOperator(dMetadataProcessor));
 }
 
 void DStreamOperatorTest::TearDown(void)
@@ -132,7 +132,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_002, TestSize.Level1)
     streamInfo.dataspace_ = TEST_DATASPACE;
     streamInfo.intent_ = StreamIntent::PREVIEW;
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable();
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
     streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_H264;
     StreamSupportType pType;
     std::vector<StreamInfo> stre;
@@ -188,7 +188,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_004, TestSize.Level1)
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
     std::shared_ptr<StreamConsumer> streamConsumer = std::make_shared<StreamConsumer>();
     sptr<OHOS::IBufferProducer> producer = streamConsumer->CreateProducer();
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable(producer));
     streamInfo.bufferQueue_->producer_->SetQueueSize(TEST_DATASPACE);
     streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_NULL;
     std::vector<StreamInfo> streamInfos;
@@ -222,7 +222,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_005, TestSize.Level1)
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
     std::shared_ptr<StreamConsumer> streamConsumer = std::make_shared<StreamConsumer>();
     sptr<OHOS::IBufferProducer> producer = streamConsumer->CreateProducer();
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable(producer));
     streamInfo.bufferQueue_->producer_->SetQueueSize(TEST_DATASPACE);
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);
@@ -293,7 +293,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_007, TestSize.Level1)
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
     std::shared_ptr<StreamConsumer> streamConsumer = std::make_shared<StreamConsumer>();
     sptr<OHOS::IBufferProducer> producer = streamConsumer->CreateProducer();
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable(producer));
     streamInfo.bufferQueue_->producer_->SetQueueSize(TEST_DATASPACE);
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);
@@ -334,7 +334,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_008, TestSize.Level1)
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
     std::shared_ptr<StreamConsumer> streamConsumer = std::make_shared<StreamConsumer>();
     sptr<OHOS::IBufferProducer> producer = streamConsumer->CreateProducer();
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable(producer));
     streamInfo.bufferQueue_->producer_->SetQueueSize(TEST_DATASPACE);
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);

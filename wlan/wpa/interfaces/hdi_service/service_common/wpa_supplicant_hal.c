@@ -242,7 +242,7 @@ static int WpaCliCmdSetNetwork(WifiWpaStaInterface *this, const struct WpaSetNet
         return -1;
     }
     int pos = -1;
-    for (unsigned i = 0; i < sizeof(g_wpaHalSsidFields) / sizeof(g_wpaHalSsidFields[0]); ++i) {
+    for (int i = 0; i < sizeof(g_wpaHalSsidFields) / sizeof(g_wpaHalSsidFields[0]); ++i) {
         if (g_wpaHalSsidFields[i].field == argv->param) {
             pos = i;
             break;

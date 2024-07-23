@@ -50,13 +50,7 @@ if (drivers_peripheral_input_feature_udriver) {
       chipset_base_dir,
       updater_base_dir,
     ]
-    innerapi_tags = [ "passthrough" ]
     install_enable = true
-    subsystem_name = "hdf"
-    part_name = "drivers_peripheral_input"
-  }
-} else if (is_standard_system) {
-  ohos_shared_library("hdi_input_udriver") {
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_input"
   }

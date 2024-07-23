@@ -16,6 +16,7 @@
 #include "allocator_service.h"
 
 #include <sys/ioctl.h>
+#include <linux/types.h>
 #include <linux/dma-buf.h>
 #include <securec.h>
 #include <dlfcn.h>
@@ -115,6 +116,15 @@ int32_t AllocatorService::LoadVdi()
     return HDF_SUCCESS;
 }
 
+void AllocatorService::WriteAllocPidToDma(int32_t fd)
+{
+    pid_t remotePid = HdfRemoteGetCallingPid();
+    char pidStr[BUFF_SIZE] = { 0 };
+    if (sprintf_s(pidStr, BUFF_SIZE, "%d", remotePid) >= 0) {
+        ioctl(fd, DMA_BUF_SET_NAME_A, pidStr);
+    }
+}
+
 void AllocatorService::TimeBegin(struct timeval *firstTimeStamp)
 {
     gettimeofday(firstTimeStamp, nullptr);
@@ -127,15 +137,6 @@ int32_t AllocatorService::TimeEnd(struct timeval &firstTimeStamp)
     gettimeofday(&secondTimeStamp, nullptr);
     return (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
         (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
-}
-
-void AllocatorService::WriteAllocPidToDma(int32_t fd)
-{
-    pid_t remotePid = HdfRemoteGetCallingPid();
-    char pidStr[BUFF_SIZE] = { 0 };
-    if (sprintf_s(pidStr, BUFF_SIZE, "%d", remotePid) >= 0) {
-        ioctl(fd, DMA_BUF_SET_NAME_A, pidStr);
-    }
 }
 
 void AllocatorService::FreeMemVdi(BufferHandle* handle)

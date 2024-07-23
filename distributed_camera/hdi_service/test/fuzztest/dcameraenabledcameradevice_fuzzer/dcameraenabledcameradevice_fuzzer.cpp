@@ -81,7 +81,7 @@ void DcameraEnableDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-    sptr<IDCameraProviderCallback> callback = new MockDCameraProviderCallbackImpl(deviceId, dhId);
+    sptr<IDCameraProviderCallback> callback(new MockDCameraProviderCallbackImpl(deviceId, dhId));
 
     DCameraProvider::GetInstance()->EnableDCameraDevice(dhBase, abilityInfo, callback);
 }

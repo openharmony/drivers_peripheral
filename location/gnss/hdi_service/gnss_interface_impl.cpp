@@ -149,9 +149,9 @@ static void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnss
     std::unique_lock<std::mutex> lock(g_mutex);
     OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo gnssMeasurementInfoNew;
     SetGnssClock(&gnssMeasurementInfoNew, gnssMeasurementInfo);
-    gnssMeasurementInfoNew.elapsedRealtime = gnssMeasurementInfo->elapsedRealtime;
-    gnssMeasurementInfoNew.uncertainty = gnssMeasurementInfo->uncertainty;
-    gnssMeasurementInfoNew.measurementCount = gnssMeasurementInfo->measurementCount;
+    gnssMeasurementInfoNew.elapsedRealtime = static_cast<long>(gnssMeasurementInfo->elapsedRealtime);
+    gnssMeasurementInfoNew.uncertainty = static_cast<long>(gnssMeasurementInfo->uncertainty);
+    gnssMeasurementInfoNew.measurementCount = static_cast<int>(gnssMeasurementInfo->measurementCount);
 
     std::vector<OHOS::HDI::Location::Gnss::V2_0::GnssMeasurement> gnssMeasurements;
     for (OHOS::HDI::Location::GnssMeasurement infoItem : gnssMeasurementInfo->measurements) {

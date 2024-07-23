@@ -75,6 +75,8 @@ public:
     int32_t GetHDRCapabilityInfos(uint32_t devId, HDRCapability& info) override;
     int32_t RegRefreshCallback(const sptr<IRefreshCallback>& cb) override;
     int32_t RegDisplayVBlankIdleCallback (const sptr<IVBlankIdleCallback>& cb) override;
+    int32_t ClearClientBuffer(uint32_t devId) override;
+    int32_t ClearLayerBuffer(uint32_t devId, uint32_t layerId) override;
 
 private:
     void HidumperInit();
@@ -101,11 +103,7 @@ private:
     /* V1_0, which is the version of vdi */
     IDisplayComposerVdi* vdiImpl_;
     DestroyComposerVdiFunc destroyVdiFunc_;
-#ifdef DISPLAY_COMMUNITY
     std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponser_;
-#else
-    std::unique_ptr<V1_0::HdiDisplayCmdResponser> cmdResponser_;
-#endif
 
     /* V1_1, which is the version of vdi */
     IDisplayComposerVdiV1_1* vdiImplV1_1_;

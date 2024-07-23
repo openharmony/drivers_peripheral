@@ -48,6 +48,7 @@ using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRX_4444;
 using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGR_565;
 using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRA_5551;
 using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRX_5551;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGBA_1010102;
 #ifndef DISPLAY_TEST_CHK_RETURN
 #define DISPLAY_TEST_CHK_RETURN(val, ret, ...) \
     do {                                       \
@@ -99,7 +100,6 @@ const AllocInfo DISPLAY_BUFFER_TEST_SETS[] = {
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_BGRA_8888
     },
-    
     // num5
     {
         .width = ALLOC_SIZE_1080,

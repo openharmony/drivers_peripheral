@@ -47,6 +47,13 @@ if (!defined(global_parts_info) ||
 }
 
 if (!defined(global_parts_info) ||
+    defined(global_parts_info.hiviewdfx_hicollie)) {
+  has_power_xcollie_part = true
+} else {
+  has_power_xcollie_part = false
+}
+
+if (!defined(global_parts_info) ||
     defined(global_parts_info.hiviewdfx_hisysevent)) {
   has_power_hisysevent_part = true
   cflags_cc += [ "-DHAS_POWER_HISYSEVENT_PART" ]

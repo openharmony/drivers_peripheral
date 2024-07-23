@@ -20,12 +20,14 @@ ohos_shared_library("libbattery_interface_service_2.0") {
     "../../utils/include",
   ]
   sources = [
+    "../../utils/battery_xcollie.cpp",
     "src/battery_config.cpp",
     "src/battery_interface_impl.cpp",
     "src/battery_thread.cpp",
     "src/power_supply_provider.cpp",
   ]
 
+  defines = []
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_battery:libbattery_stub_2.0",
@@ -39,6 +41,10 @@ ohos_shared_library("libbattery_interface_service_2.0") {
     }
     if (has_battery_c_utils_part) {
       external_deps += [ "c_utils:utils" ]
+    }
+    if (has_battery_xcollie_part) {
+      external_deps += [ "hicollie:libhicollie" ]
+      defines += [ "HICOLLIE_ENABLE" ]
     }
   } else {
     external_deps = [

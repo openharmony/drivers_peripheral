@@ -17,6 +17,7 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <vector>
+#include <iproxy_broker.h>
 
 #ifdef SE_VENDOR_ADAPTION_USE_CA
 #include "secure_element_ca_proxy.h"
@@ -44,9 +45,16 @@ uint16_t g_openedChannelCount = 0;
 bool g_openedChannels[MAX_CHANNEL_NUM] = {false, false, false, false};
 #endif
 
-SeVendorAdaptions::SeVendorAdaptions() {}
+SeVendorAdaptions::SeVendorAdaptions()
+{
+    remoteDeathRecipient_ =
+        new RemoteDeathRecipient(std::bind(&SeVendorAdaptions::OnRemoteDied, this, std::placeholders::_1));
+}
 
-SeVendorAdaptions::~SeVendorAdaptions() {}
+SeVendorAdaptions::~SeVendorAdaptions()
+{
+    RemoveSecureElementDeathRecipient(g_callbackV1_0);
+}
 
 int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallback, SecureElementStatus& status)
 {
@@ -67,6 +75,7 @@ int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallba
 #endif
     g_callbackV1_0 = clientCallback;
     g_callbackV1_0->OnSeStateChanged(true);
+    AddSecureElementDeathRecipient(g_callbackV1_0);
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
@@ -248,6 +257,45 @@ SecureElementStatus SeVendorAdaptions::getStatusBySW(uint8_t sw1, uint8_t sw2) c
     }
     HDF_LOGE("getStatusBySW fail, SW:0x%{public}02x%{public}02x", sw1, sw2);
     return SecureElementStatus::SE_GENERAL_ERROR;
+}
+
+void SeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    HDF_LOGI("OnRemoteDied");
+    SecureElementStatus status = SecureElementStatus::SE_GENERAL_ERROR;
+    for (size_t i = 0; i < MAX_CHANNEL_NUM; i++) {
+        if (g_openedChannels[i]) {
+            closeChannel(i, status);
+            HDF_LOGI("OnRemoteDied, close channel [%{public}zu], status = %{public}d", i, status);
+        }
+    }
+    g_callbackV1_0 = nullptr;
+}
+
+int32_t SeVendorAdaptions::AddSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj)
+{
+    if (callbackObj == nullptr) {
+        HDF_LOGE("SeVendorAdaptions AddSecureElementDeathRecipient callbackObj is nullptr");
+        return HDF_FAILURE;
+    }
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
+    bool result = remote->AddDeathRecipient(remoteDeathRecipient_);
+    if (!result) {
+        HDF_LOGE("SeVendorAdaptions AddDeathRecipient failed!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t SeVendorAdaptions::RemoveSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj)
+{
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
+    bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
+    if (!result) {
+        HDF_LOGE("SeVendorAdaptions RemoveDeathRecipient failed!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 } // SecureElement
 } // HDI

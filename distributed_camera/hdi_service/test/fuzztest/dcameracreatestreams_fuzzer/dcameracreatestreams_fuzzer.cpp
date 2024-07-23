@@ -50,7 +50,7 @@ void DcameraCreateStreamsFuzzTest(const uint8_t* data, size_t size)
     info.dataspace_ = *(reinterpret_cast<const int*>(data));
     info.intent_ = streamIntentType[data[0] % DC_STREAMINTENT_SIZE];
     info.tunneledMode_ = *(reinterpret_cast<const int*>(data)) % 2;
-    info.bufferQueue_ = new BufferProducerSequenceable();
+    info.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
     info.encodeType_ = encodeType[data[0] % DC_ENCODE_SIZE];
     infos.push_back(info);
 
