@@ -1047,6 +1047,7 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
     WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
     if (pWpaInterface == NULL) {
         HDF_LOGE("%{public}s: Get wpa global interface failed!", __func__);
+        return;
     }
     int ret = pWpaInterface->wpaCliTerminate();
     if (ret != 0) {
