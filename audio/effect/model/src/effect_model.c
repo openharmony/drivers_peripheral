@@ -296,7 +296,7 @@ void ModelInit(void)
     (void)fclose(file);
     HDF_LOGI("%{public}s: %{public}s", __func__, filename);
     struct ConfigDescriptor *cfgDesc = NULL;
-    if (AudioEffectGetConfigDescriptor(AUDIO_EFFECT_CONFIG, &cfgDesc) != HDF_SUCCESS) {
+    if (AudioEffectGetConfigDescriptor(filename, &cfgDesc) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AudioEffectGetConfigDescriptor fail!", __func__);
         return;
     }
