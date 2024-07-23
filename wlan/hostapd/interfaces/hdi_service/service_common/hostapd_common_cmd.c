@@ -731,6 +731,7 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         HDF_LOGE("hostapdHalDevice is NULL");
+        return;
     }
 
     if (hostapdHalDevice->stopAp(id) != 0) {
