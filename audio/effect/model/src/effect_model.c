@@ -288,15 +288,16 @@ ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", (*libCfgDescs)
 void ModelInit(void)
 {
     FILE *file;
-    char *filename = AUDIO_EFFECT_PRODUCT_CONFIG;
-    file = fopen(filename, "r");
+    struct ConfigDescriptor *cfgDesc = NULL;
+    int32_t ret;
+    file = fopen(AUDIO_EFFECT_PRODUCT_CONFIG, "r");
     if (file == NULL) {
-        filename = AUDIO_EFFECT_PLAFORM_CONFIG;
+        ret = AudioEffectGetConfigDescriptor(AUDIO_EFFECT_PLAFORM_CONFIG, &cfgDesc);
+    } else {
+        ret = AudioEffectGetConfigDescriptor(AUDIO_EFFECT_PRODUCT_CONFIG, &cfgDesc);
     }
     (void)fclose(file);
-    HDF_LOGI("%{public}s: %{public}s", __func__, filename);
-    struct ConfigDescriptor *cfgDesc = NULL;
-    if (AudioEffectGetConfigDescriptor(filename, &cfgDesc) != HDF_SUCCESS) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AudioEffectGetConfigDescriptor fail!", __func__);
         return;
     }
