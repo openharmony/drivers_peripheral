@@ -360,6 +360,11 @@ int32_t WlanInterfaceGetFeatureByIfName(struct IWlanInterface *self, const char 
     }
     ifeature->type = baseFeature->type;
     ifeature->ifName = strdup(baseFeature->ifName);
+    if (!ifeature->ifName) {
+        HDF_LOGE("ifName is NULL!");
+        return HDF_FAILURE;
+    }
+
     return ret;
 }
 
