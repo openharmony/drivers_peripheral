@@ -50,6 +50,7 @@ ohos_systemtest("test_battery_sys_test") {
 
   external_deps = [
     "config_policy:configpolicy_util",
+    "hdf_core:libpub_utils",
     "hilog:libhilog",
   ]
   if (has_battery_c_utils_part) {
