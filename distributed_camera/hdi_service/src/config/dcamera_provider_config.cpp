@@ -31,6 +31,10 @@ struct HdfDCameraProviderHost {
 static int32_t DCameraProviderDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
+    if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
+        HDF_LOGE("%{public}s: client or client.device or service is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     auto *hdfDCameraProviderHost = CONTAINER_OF(client->device->service, struct HdfDCameraProviderHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;

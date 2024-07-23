@@ -11,10 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-
-declare_args() {
-  drivers_peripheral_motion_feature_model = false
-}
+import("../motion.gni")
 
 group("hdf_test_motion") {
   deps = []
