@@ -352,7 +352,7 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
 
 static int32_t ProcessEvent(struct nl_msg *msg, void *arg)
 {
-    HILOG_LOGD(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
     struct nlattr *attr[NL80211_ATTR_MAX + 1];
     struct NetworkInfoResult networkInfo;
@@ -375,14 +375,14 @@ static int32_t ProcessEvent(struct nl_msg *msg, void *arg)
     }
 
     for (i = 0; i < networkInfo.nums; i++) {
-        HILOG_LOGD(LOG_CORE, "name=%{public}s index=%{public}d mode=%{public}s",
+        HILOG_DEBUG(LOG_CORE, "name=%{public}s index=%{public}d mode=%{public}s",
             networkInfo.infos[i].name, if_nametoindex(networkInfo.infos[i].name), networkInfo.infos[i].supportMode);
         if (ifidx == if_nametoindex(networkInfo.infos[i].name)) {
             DoProcessEvent(networkInfo.infos[i].name, hdr->cmd, attr);
             return NL_SKIP;
         }
     }
-    HILOG_LOGD(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return NL_SKIP;
 }
 
@@ -404,7 +404,7 @@ static struct nl_cb *CreateCb(void)
 
 static int HandleEvent(struct nl_sock *sock)
 {
-    HILOG_LOGD(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int ret;
     struct nl_cb *cb = CreateCb();
     if (cb == NULL) {
@@ -416,7 +416,7 @@ static int HandleEvent(struct nl_sock *sock)
     HILOG_INFO(LOG_CORE, "nl_recvmsgs ret:%{public}d, errno:%{public}d %{public}s", ret, errno, strerror(errno));
     nl_cb_put(cb);
     cb = NULL;
-    HILOG_LOGD(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return ret;
 }
 

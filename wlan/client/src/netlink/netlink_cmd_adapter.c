@@ -452,7 +452,7 @@ static int32_t WaitStartActionLock(void)
 
 int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
 {
-    HILOG_LOGD(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int32_t rc = RET_CODE_FAILURE;
     struct nl_cb *cb = NULL;
 
@@ -480,7 +480,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
 
     do {
         rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg);
-        HILOG_LOGD(LOG_CORE, "nl_send_auto cmdSock, rc=%{public}d", rc);
+        HILOG_DEBUG(LOG_CORE, "nl_send_auto cmdSock, rc=%{public}d", rc);
         if (rc < 0) {
             HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
             break;
@@ -536,7 +536,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
     } while (0);
 
     pthread_mutex_unlock(&g_wifiHalInfo.mutex);
-    HILOG_LOGD(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return rc;
 }
 
@@ -3219,7 +3219,7 @@ void WifiEventTxStatus(const char *ifName, struct nlattr **attr)
         HILOG_ERROR(LOG_CORE, "%{public}s: is null", __FUNCTION__);
         return;
     }
-    if (WaitStartActionLock() == RET_CODE_FAILURE) {
+    if (WaitStartActionLock() == 0) {
         HILOG_ERROR(LOG_CORE, "%{public}s: WaitStartActionLock error", __FUNCTION__);
         return;
     }
@@ -3270,7 +3270,6 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
     int32_t ret = RET_CODE_FAILURE;
     struct nl_msg *msg = NULL;
     uint32_t interfaceId;
-    uint64_t cookie;
     if (ifName == NULL || freq == 0 || frameData == NULL || frameDataLen == 0) {
         HILOG_ERROR(LOG_CORE, "%{public}s: param is NULL.", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -3306,7 +3305,7 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
             HILOG_ERROR(LOG_CORE, "%{public}s: nla_put_u32 frameData failed", __FUNCTION__);
             break;
         }
-        g_cookieStart = RET_CODE_FAILURE;
+        g_cookieStart = 0;
         ret = NetlinkSendCmdSync(msg, WifiSendActionFrameHandler, NULL);
         if (ret != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%{public}s: send action failed", __FUNCTION__);

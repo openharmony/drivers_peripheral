@@ -655,8 +655,8 @@ const char *macToStr(const u8 *addr)
     const int macAddrIndexFive = 4;
     const int macAddrIndexSix = 5;
     static char macToStr[WIFI_BSSID_LENGTH];
-    if (os_snprintf(macToStr, sizeof(macToStr), "%02x:%02x:%02x:%02x:%02x:%02x", addr[macAddrIndexOne],
-        addr[macAddrIndexTwo], addr[macAddrIndexThree], addr[macAddrIndexFour],
+    if (snprintf_s(macToStr, sizeof(macToStr), sizeof(macToStr)-1, "%02x:%02x:%02x:%02x:%02x:%02x",
+        addr[macAddrIndexOne], addr[macAddrIndexTwo], addr[macAddrIndexThree], addr[macAddrIndexFour],
         addr[macAddrIndexFive], addr[macAddrIndexSix]) < 0) {
         return NULL;
     }
