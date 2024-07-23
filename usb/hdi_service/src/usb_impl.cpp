@@ -1199,6 +1199,8 @@ int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
     ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
     if (ret != HDF_SUCCESS || configIndex != configIdNew) {
         HDF_LOGE("%{public}s:getConfiguration failed ret:%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s:getConfiguration failed configIndex:%{public}d, configIdNew:%{public}d,
+            configIdOld:%{public}d", __func__, configIndex, configIdNew, configIdOld);
         return HDF_ERR_IO;
     }
     if (configIndex != 0) {
