@@ -1398,9 +1398,9 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
     }
 
     ret = UsbReleaseInterface(interface);
-    if (ret != 0) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:ReleaseInterface failed, ret = %{public}d", __func__, ret);
-        return HDF_ERR_INVALID_PARAM;
+        return ret;
     }
     return ret;
 }
