@@ -350,7 +350,7 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
 
     pthread_mutex_lock(&g_managerMutex);
     struct IAudioAdapterVdi *vdiAdapter = NULL;
-	HdfAudioStartTrace("Hdi:AudioManagerVendorLoadAdapter", 0);
+    HdfAudioStartTrace("Hdi:AudioManagerVendorLoadAdapter", 0);
     ret = priv->vdiManager->LoadAdapter(priv->vdiManager, &vdiDesc, &vdiAdapter);
     HdfAudioFinishTrace();
 
