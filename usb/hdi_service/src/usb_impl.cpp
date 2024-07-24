@@ -1379,12 +1379,31 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    if (interfaceId >= USB_MAX_INTERFACES) {
-        HDF_LOGE("%{public}s:ReleaseInterface failed.", __func__);
-        return HDF_ERR_INVALID_PARAM;
+    UsbInterfaceHandle *interfaceHandle = InterfaceIdToHandle(port, interfaceId);
+    if (interfaceHandle == nullptr || interfaceId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
+            port->busNum, port->devAddr, interfaceId);
+        return HDF_FAILURE;
     }
-    port->initFlag = false;
-    return HDF_SUCCESS;
+    
+    struct UsbInterface *interface = nullptr;
+    int32_t ret = GetInterfaceByHandle(interfaceHandle, &interface);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get interface failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    ret = UsbCloseInterface(interfaceHandle, false);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s close interface failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    ret = UsbReleaseInterface(interface);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:ReleaseInterface failed, ret = %{public}d", __func__, ret);
+    }
+    return ret;
 }
 
 int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex)
