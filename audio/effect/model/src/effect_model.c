@@ -293,10 +293,12 @@ void ModelInit(void)
     file = fopen(AUDIO_EFFECT_PRODUCT_CONFIG, "r");
     if (file == NULL) {
         ret = AudioEffectGetConfigDescriptor(AUDIO_EFFECT_PLAFORM_CONFIG, &cfgDesc);
+        HDF_LOGI("%{public}s: %{public}s!", __func__, AUDIO_EFFECT_PLAFORM_CONFIG);
     } else {
         ret = AudioEffectGetConfigDescriptor(AUDIO_EFFECT_PRODUCT_CONFIG, &cfgDesc);
+        HDF_LOGI("%{public}s: %{public}s!", __func__, AUDIO_EFFECT_PRODUCT_CONFIG);
+        (void)fclose(file);
     }
-    (void)fclose(file);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AudioEffectGetConfigDescriptor fail!", __func__);
         return;
