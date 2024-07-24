@@ -1377,14 +1377,14 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    if (interfaceId >= USB_MAX_INTERFACES) {
-        HDF_LOGE("%{public}s:ReleaseInterface failed.", __func__);
-        return HDF_ERR_INVALID_PARAM;
+    struct UsbInterface *interface = nullptr;
+    UsbInterfaceHandle *interfaceHandle = InterfaceIdToHandle(port, interfaceId);
+    if (interfaceHandle == nullptr || interfaceId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
+            port->busNum, port->devAddr, interfaceId);
+        return HDF_FAILURE;
     }
 
-    struct UsbInterface *interface = nullptr;
-    UsbInterfaceHandleEntity *handle = reinterpret_cast<UsbInterfaceHandleEntity *>(port->ctrDevHandle);
-    const UsbInterfaceHandle *interfaceHandle = (const UsbInterfaceHandle *)handle;
     int32_t ret = GetInterfaceByHandle(interfaceHandle, &interface);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s get interface failed %{public}d", __func__, ret);
