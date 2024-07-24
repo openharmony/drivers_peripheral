@@ -506,8 +506,7 @@ struct IAudioManager *AudioManagerCreateIfInstance(void)
 
     priv->interface.GetAllAdapters = AudioManagerVendorGetAllAdapters;
     priv->interface.LoadAdapter = AudioManagerVendorLoadAdapter;
-    priv->interface.UnloadAdapter = AudioManagerVendorUnloadAdapter;
-    
+    priv->interface.UnloadAdapter = AudioManagerVendorUnloadAdapter;    
     priv->interface.ReleaseAudioManagerObject = ReleaseAudioManagerVendorObject;
 
     return &(priv->interface);
