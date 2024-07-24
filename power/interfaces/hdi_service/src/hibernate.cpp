@@ -112,7 +112,7 @@ int32_t Hibernate::GetResumeInfo(std::string &resumeInfo)
     while ((me = getmntent(fp))) {
         if (strcmp(me->mnt_dir, "/data") == 0) {
             char resolvedPath[PATH_MAX] = {0};
-            if (realpath(me->mnt_fsname, resolvedPath) == NULL) {
+            if (realpath(me->mnt_fsname, resolvedPath) == nullptr) {
                 HDF_LOGE("realpath error, errno = %{public}d", errno);
                 break;
             }
