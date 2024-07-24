@@ -256,7 +256,7 @@ enum OmxIndexCodecExType {
     OMX_IndexParamEncOutLTR,
     /** CodecTemperalLayerParam */
     OMX_IndexParamTemperalLayer,
-    /** OMX_BOOL */
+    /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamEncParamsFeedback,
     /** OMX_S32 */
     OMX_IndexParamEncOutFrameLayer,
