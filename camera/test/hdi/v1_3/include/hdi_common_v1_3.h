@@ -263,6 +263,8 @@ public:
         virtual ~TestStreamOperatorCallbackV1_3() = default;
         int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override;
         int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos) override;
+        int32_t OnCaptureEndedExt(int32_t captureId,
+            const std::vector<HDI::Camera::V1_3::CaptureEndedInfoExt> &infos) override;
         int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos) override;
         int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
         int32_t OnCaptureStarted_V1_2(int32_t captureId,
