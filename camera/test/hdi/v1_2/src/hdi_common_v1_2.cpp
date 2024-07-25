@@ -684,6 +684,7 @@ int32_t Test::TestImageProcessCallback::OnProcessDone(const std::string& imageId
     coutProcessDone_++;
     curImageId_ = imageId;
     curImageBufferInfo_ = buffer;
+    isDone_ = true;
     return 0;
 }
 
