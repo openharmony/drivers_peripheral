@@ -42,6 +42,9 @@ ohos_shared_library("libbattery_interface_service_2.0") {
     if (has_battery_c_utils_part) {
       external_deps += [ "c_utils:utils" ]
     }
+
+    # xcollie has a bug, disable it
+    has_battery_xcollie_part = false
     if (has_battery_xcollie_part) {
       external_deps += [ "hicollie:libhicollie" ]
       defines += [ "HICOLLIE_ENABLE" ]
