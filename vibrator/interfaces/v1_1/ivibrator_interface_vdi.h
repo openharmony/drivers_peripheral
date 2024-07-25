@@ -21,6 +21,7 @@
 #include <hdf_base.h>
 #include "hdf_load_vdi.h"
 #include "ivibrator_type_vdi.h"
+#include "v1_3/ivibrator_interface.h"
 
 namespace OHOS {
 namespace HDI {
@@ -45,6 +46,10 @@ public:
     virtual int32_t GetHapticCapacity(HapticCapacityVdi& hapticCapacity) = 0;
     virtual int32_t GetHapticStartUpTime(int32_t mode, int32_t& startUpTime) = 0;
     virtual int32_t StartByIntensity(const std::string& effectType, uint16_t intensity) {return HDF_SUCCESS;};
+    virtual int32_t GetAllWaveInfo(int32_t vibratorId, std::vector<V1_3::HdfWaveInformation> &info)
+    {
+        return HDF_SUCCESS;
+    };
 };
 struct VdiWrapperVibrator {
     struct HdfVdiBase base;
