@@ -128,10 +128,8 @@ void AllocatorService::FreeMemVdi(BufferHandle* handle)
     DisplayBufferDfx dfxIns("HDI:Display:FreeMemVdi:FreeMem");
     dfxIns.SetTimer();
     dfxIns.StartTimeStamp();
-    {
-        HdfTrace traceTwo("FreeMem", "HDI:VDI:");
-        vdiImpl_->FreeMem(*handle);
-    }
+    HdfTrace traceTwo("FreeMem", "HDI:VDI:");
+    vdiImpl_->FreeMem(*handle);
 }
 
 int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
