@@ -32,14 +32,14 @@ public:
     ~DisplayBufferDfx();
     void SetTimer();
     void CancelTimer();
-    void TimeBegin();
-    void TimeEnd();
+    void StartTimeStamp();
+    void StopTimeStamp();
 private:
     std::string dfxName_;
     int32_t timeId_;
     bool flag_;
-    struct timeval beginTimeStamp;
-    struct timeval endTimeStamp;
+    struct timeval startTimeStamp;
+    struct timeval stopTimeStamp;
 };
 } // namespace V1_0
 } // namespace Buffer
