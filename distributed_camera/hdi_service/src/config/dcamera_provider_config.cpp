@@ -21,7 +21,12 @@
 #include "dcamera_provider.h"
 #include "v1_1/dcamera_provider_stub.h"
 
+#include <shared_mutex>
 using namespace OHOS::HDI::DistributedCamera::V1_1;
+
+namespace {
+    std::shared_mutex mutex_;
+}
 
 struct HdfDCameraProviderHost {
     struct IDeviceIoService ioService;
@@ -31,12 +36,6 @@ struct HdfDCameraProviderHost {
 static int32_t DCameraProviderDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
-        HDF_LOGE("%{public}s: client or client.device or service is nullptr", __func__);
-        return HDF_FAILURE;
-    }
-    auto *hdfDCameraProviderHost = CONTAINER_OF(client->device->service, struct HdfDCameraProviderHost, ioService);
-
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
@@ -50,6 +49,16 @@ static int32_t DCameraProviderDriverDispatch(struct HdfDeviceIoClient *client, i
         return HDF_ERR_INVALID_PARAM;
     }
 
+    std::shared_lock lock(mutex_);
+    if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
+        HDF_LOGE("%{public}s: client or client.device or service is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    auto *hdfDCameraProviderHost = CONTAINER_OF(client->device->service, struct HdfDCameraProviderHost, ioService);
+    if (hdfDCameraProviderHost == NULL || hdfDCameraProviderHost->stub == NULL) {
+        HDF_LOGE("%{public}s:invalid hdfDCameraProviderHost", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return hdfDCameraProviderHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
@@ -108,8 +117,17 @@ static void HdfDCameraProviderDriverRelease(struct HdfDeviceObject *deviceObject
         HDF_LOGE("%{public}s: params invalid.", __func__);
         return;
     }
+
+    std::unique_lock lock(mutex_);
     auto *hdfDCameraProviderHost = CONTAINER_OF(deviceObject->service, struct HdfDCameraProviderHost, ioService);
+    if (hdfDCameraProviderHost != nullptr) {
+        hdfDCameraProviderHost->stub = nullptr;
+    }
     delete hdfDCameraProviderHost;
+    hdfDCameraProviderHost = nullptr;
+    if (deviceObject != nullptr) {
+        deviceObject->service = nullptr;
+    }
 }
 
 static struct HdfDriverEntry g_dcameraproviderDriverEntry = {
