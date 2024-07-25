@@ -46,6 +46,9 @@ public:
     int32_t GetDisplayBacklight(uint32_t devId, uint32_t& level) override;
     int32_t SetDisplayBacklight(uint32_t devId, uint32_t level) override;
     int32_t GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t& value) override;
+    int32_t SetHardwareCursorPosition(uint32_t devId, int32_t x, int32_t y) override;
+    int32_t EnableHardwareCursorStats(uint32_t devId, bool enable) override;
+    int32_t GetHardwareCursorStats(uint32_t devId, uint32_t& frameCount, uint32_t& vsyncCount) override;
     int32_t SetDisplayClientCrop(uint32_t devId, const IRect& rect) override;
     int32_t SetDisplayVsyncEnabled(uint32_t devId, bool enabled) override;
     int32_t RegDisplayVBlankCallback(uint32_t devId, const sptr<IVBlankCallback>& cb) override;
