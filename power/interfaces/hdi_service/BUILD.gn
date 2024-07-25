@@ -40,6 +40,9 @@ ohos_shared_library("libpower_interface_service_1.2") {
   if (has_power_hisysevent_part) {
     external_deps += [ "hisysevent:libhisysevent" ]
   }
+
+  # xcollie has a bug, disable it
+  has_power_xcollie_part = false
   if (has_power_xcollie_part) {
     external_deps += [ "hicollie:libhicollie" ]
     defines += [ "HICOLLIE_ENABLE" ]
