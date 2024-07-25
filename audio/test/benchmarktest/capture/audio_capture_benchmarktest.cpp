@@ -61,7 +61,7 @@ uint64_t AudioCaptureBenchmarkTest::GetCaptureBufferSize()
     uint64_t frameSize = 0;
     uint64_t frameCount = 0;
     uint64_t bufferSize = 0;
-    
+
     if (capture_ == nullptr) {
         return DEFAULT_BUFFER_SIZE;
     }
