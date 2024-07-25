@@ -48,7 +48,7 @@ extern "C" IAudioManager *AudioManagerImplGetInstance(void)
 AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 {
     DHLOGD("Distributed audio manager constructed.");
-    audioManagerRecipient_ = new AudioManagerRecipient();
+    audioManagerRecipient_ = sptr<AudioManagerRecipient>(new AudioManagerRecipient());
 }
 
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
