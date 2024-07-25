@@ -706,10 +706,12 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
 
     if (hostapdHalDevice->stopAp(id) != 0) {
         HDF_LOGE("stopAp failed");
+        return;
     }
 
     if (StopHostapdHal(id) != HDF_SUCCESS) {
         HDF_LOGE("StopHostapdHal failed");
+        return;
     }
     HDF_LOGI("%{public}s: hostapd stop successfully", __func__);
 }
