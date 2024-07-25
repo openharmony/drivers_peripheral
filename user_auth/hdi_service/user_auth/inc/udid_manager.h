@@ -13,21 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef USERIAM_AUTH_TOKEN_SIGNER_H
-#define USERIAM_AUTH_TOKEN_SIGNER_H
+#ifndef UDID_MANAGER_H
+#define UDID_MANAGER_H
 
-#include "context_manager.h"
-#include "user_sign_centre.h"
+#include <stdint.h>
+
+#include "buffer.h"
+#include "c_array.h"
+#include "defines.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-ResultCode GetAuthTokenDataAndSign(
-    const UserAuthContext *context, uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken);
+bool SetLocalUdid(const char* udid);
+bool GetLocalUdid(Uint8Array *udid);
+Buffer GetLocalUdidTmpBuffer();
+bool IsLocalUdid(Uint8Array udid);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // USERIAM_AUTH_TOKEN_SIGNER_H
+#endif // UDID_MANAGER_H

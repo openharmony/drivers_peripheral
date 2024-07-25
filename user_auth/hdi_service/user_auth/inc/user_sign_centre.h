@@ -20,6 +20,7 @@
 
 #include "adaptor_algorithm.h"
 #include "buffer.h"
+#include "context_manager.h"
 #include "defines.h"
 
 #ifdef __cplusplus
@@ -65,7 +66,8 @@ typedef struct {
     TokenDataToEncrypt tokenDataToEncrypt;
 } __attribute__((__packed__)) UserAuthTokenPlain;
 
-ResultCode UserAuthTokenSign(UserAuthTokenPlain *tokenPlain, UserAuthTokenHal *authToken);
+ResultCode GetTokenDataAndSign(UserAuthContext *context,
+    uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken);
 ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
 ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *reuseToken);
 

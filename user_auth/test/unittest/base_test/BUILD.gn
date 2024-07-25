@@ -32,12 +32,12 @@ ohos_unittest("UserAuthBaseTest") {
     "inc",
     "../../../hdi_service/adaptor/inc",
     "../../../hdi_service/coauth/inc",
+    "../../../hdi_service/common/inc",
     "../../../hdi_service/database/inc",
     "../../../hdi_service/idm/inc",
     "../../../hdi_service/interface/inc",
     "../../../hdi_service/key_mgr/inc",
     "../../../hdi_service/user_auth/inc",
-    "../../../hdi_service/utils/inc",
     "../../../common/logs",
     "../../../common/utils",
   ]
