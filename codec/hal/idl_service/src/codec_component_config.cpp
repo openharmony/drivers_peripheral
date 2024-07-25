@@ -154,7 +154,8 @@ int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
     const struct DeviceResourceNode *codecGroupNode = nullptr;
     struct DeviceResourceNode *childNode = nullptr;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if ((iface == nullptr) || (iface->GetUint32 == nullptr) || (iface->GetBool == nullptr) || (iface->GetString == nullptr)) {
+    if ((iface == nullptr) || (iface->GetUint32 == nullptr) ||
+        (iface->GetBool == nullptr) || (iface->GetString == nullptr)) {
         CODEC_LOGE(" failed, iface or its GetUint32 or GetBool or GetString is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -182,7 +183,8 @@ int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
 }
 
 int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface &iface,
-                                               const struct DeviceResourceNode &childNode, CodecCompCapability &cap, bool isVideoGroup)
+                                               const struct DeviceResourceNode &childNode,
+                                               CodecCompCapability &cap, bool isVideoGroup)
 {
     if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_ROLE, reinterpret_cast<uint32_t *>(&cap.role),
                         MEDIA_ROLETYPE_INVALID) != HDF_SUCCESS) {
