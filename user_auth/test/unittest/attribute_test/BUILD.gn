@@ -29,15 +29,15 @@ ohos_unittest("UserAuthAttributeTest") {
 
   include_dirs = [
     "../../../hdi_service/adaptor/inc",
-    "../../../hdi_service/utils/inc",
+    "../../../hdi_service/common/inc",
     "../../../common/logs",
     "../../../common/utils",
     "../mocks/inc",
   ]
 
   sources = [
-    "../../../hdi_service/utils/src/attribute.c",
-    "../../../hdi_service/utils/src/c_array.c",
+    "../../../hdi_service/common/src/attribute.c",
+    "../../../hdi_service/common/src/c_array.c",
     "../mocks/src/mock_adaptor_memory.cpp",
     "attribute_test.cpp",
   ]

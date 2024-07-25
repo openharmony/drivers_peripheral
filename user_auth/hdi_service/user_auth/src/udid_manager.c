@@ -64,6 +64,11 @@ bool GetLocalUdid(Uint8Array *udid)
     return true;
 }
 
+Buffer GetLocalUdidTmpBuffer()
+{
+    return GetTmpBuffer(g_localUdidBuffer, UDID_LEN, UDID_LEN);
+}
+
 bool IsLocalUdid(Uint8Array udid)
 {
     IF_TRUE_LOGE_AND_RETURN_VAL(IS_ARRAY_NULL(udid), false);

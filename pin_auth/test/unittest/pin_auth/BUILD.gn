@@ -44,7 +44,7 @@ ohos_unittest("PinAuthHdiUtTest") {
     "adaptor/src/adaptor_file_test.cpp",
     "adaptor/src/adaptor_memory_test.cpp",
     "adaptor/src/adaptor_time_test.cpp",
-    "adaptor/src/buffer_test.cpp",
+    "common/src/buffer_test.cpp",
     "common/src/common_impl.c",
     "database/src/pin_db_ops_base_test.cpp",
     "database/src/pin_db_ops_test.cpp",
