@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 
 #include "adaptor_log.h"
 #include "auth_level.h"
+#include "auth_token_signer.h"
 #include "context_manager.h"
 #include "executor_message.h"
 #include "idm_database.h"
@@ -80,7 +81,7 @@ ResultCode DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, in
         LOG_ERROR("FillInContext fail");
         goto EXIT;
     }
-    ret = GetTokenDataAndSign(identifyContext, credentialId, SCHEDULE_MODE_IDENTIFY, token);
+    ret = GetAuthTokenDataAndSign(identifyContext, credentialId, SCHEDULE_MODE_IDENTIFY, token);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get token failed");
         goto EXIT;
