@@ -104,7 +104,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_003, TestSize.Level1)
     std::vector<int8_t> frame;
     uint64_t replyBytes = 0;
     audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
-    audioRenderInterfaceImpl_->audioExtCallback_ = new MockRevertIDAudioCallback();
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
     EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
 }
 
@@ -245,7 +245,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_002, TestSize.Level1)
     audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
         callback_, renderId_);
     audioRenderInterfaceImpl_->firstOpenFlag_ = false;
-    audioRenderInterfaceImpl_->audioExtCallback_ = new MockIDAudioCallback();
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
 }
 
@@ -260,7 +260,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_003, TestSize.Level1)
     audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
         callback_, renderId_);
     audioRenderInterfaceImpl_->firstOpenFlag_ = false;
-    audioRenderInterfaceImpl_->audioExtCallback_ = new MockRevertIDAudioCallback();
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
 }
 
@@ -275,7 +275,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, Stop_001, TestSize.Level1)
     audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
         callback_, renderId_);
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Stop());
-    audioRenderInterfaceImpl_->audioExtCallback_ = new MockRevertIDAudioCallback();
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Stop());
 }
 
@@ -813,9 +813,12 @@ HWTEST_F(AudioRenderInterfaceImplTest, FadeInProcess_001, TestSize.Level1)
         callback_, renderId_);
     const uint32_t durationFrame = 10;
     const size_t frameLength = 4096;
+    const size_t errLength = 5000;
     int8_t* frameData = new int8_t[frameLength];
 
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->FadeInProcess(durationFrame, frameData, frameLength));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, audioRenderInterfaceImpl_->FadeInProcess(durationFrame, frameData, errLength));
+    delete[] frameData;
 }
 } // V1_0
 } // Audio

@@ -75,6 +75,7 @@ constexpr uint32_t AUDIO_FORMAT_DEFAULT = 16;
 
 constexpr int32_t MILLISECOND_PER_SECOND = 1000;
 constexpr uint32_t DEFAULT_AUDIO_DATA_SIZE = 3840;
+constexpr size_t RENDER_MAX_FRAME_SIZE = 4096;
 constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
 constexpr int64_t MAX_TIME_INTERVAL_US = 23000;
 

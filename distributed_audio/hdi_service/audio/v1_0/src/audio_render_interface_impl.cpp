@@ -74,6 +74,10 @@ float AudioRenderInterfaceImpl::GetFadeRate(uint32_t currentIndex, const uint32_
 int32_t AudioRenderInterfaceImpl::FadeInProcess(const uint32_t durationFrame,
     int8_t *frameData, const size_t frameLength)
 {
+    if (frameLength > RENDER_MAX_FRAME_SIZE) {
+        DHLOGE("The frameLength is over max length.");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int16_t* frame = reinterpret_cast<int16_t *>(frameData);
     const size_t newFrameLength = frameLength / 2;
 
