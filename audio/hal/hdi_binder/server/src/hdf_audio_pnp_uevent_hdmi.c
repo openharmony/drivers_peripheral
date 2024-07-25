@@ -122,7 +122,7 @@ static int32_t AudioHdmiOpenEventPoll(int32_t *sockFd, int *fdEpoll)
         return HDF_FAILURE;
     }
 
-    OsalMSleep(60); // Wait 60ms to resolve the conflict with the pnp uevent "address already in use"
+    OsalMSleep(30); // Wait 30ms to resolve the conflict with the pnp uevent "address already in use"
     *sockFd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
     if (*sockFd < 0) {
         AUDIO_FUNC_LOGE("new socket failed, %{public}d", errno);
