@@ -38,7 +38,7 @@ DisplayBufferDfx::~DisplayBufferDfx()
         CancelTimer();
     }
     if (flag_) {
-        TimeEnd();
+        StopTimeStamp();
     }
 }
 
