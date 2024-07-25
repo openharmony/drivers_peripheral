@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hmac_key.h"
+#include "ed25519_key.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -27,24 +27,22 @@
 
 static Buffer *GenerateHmacKey(const Buffer *peerUdid)
 {
-    if (!CheckBufferWithSize(peerUdid, UDID_LEN)) {
+    if (!IsBufferValid(peerUdid) || peerUdid->contentSize != UDID_LEN) {
         LOG_ERROR("param is invalid");
         return NULL;
     }
 
-    uint8_t udid[UDID_LEN] = {};
-    Uint8Array localUdidArray = { .data = udid, .len = UDID_LEN };
-    if (!GetLocalUdid(&localUdidArray)) {
-        LOG_ERROR("GetLocalUdid fail");
+    Buffer localUdid = GetLocalUdidTmpBuffer();
+    if (!IsBufferValid(&localUdid) || localUdid.contentSize != UDID_LEN) {
+        LOG_ERROR("GetLocalUdidTmpBuffer failed");
         return NULL;
     }
-    Buffer localUdidBuf = GetTmpBuffer(localUdidArray.data, localUdidArray.len, localUdidArray.len);
 
     Buffer *salt = NULL;
-    if (memcmp(localUdidBuf.buf, peerUdid->buf, UDID_LEN) < 0) {
-        salt = MergeBuffers(&localUdidBuf, peerUdid);
+    if (memcmp(localUdid.buf, peerUdid->buf, UDID_LEN) < 0) {
+        salt = MergeBuffers(&localUdid, peerUdid);
     } else {
-        salt = MergeBuffers(peerUdid, &localUdidBuf);
+        salt = MergeBuffers(peerUdid, &localUdid);
     }
     if (!IsBufferValid(salt)) {
         LOG_ERROR("generate salt failed");
@@ -72,8 +70,13 @@ Buffer *HmacSign(const Buffer *data, SignParam signParam)
         return NULL;
     }
 
-    Buffer peerUdidBuf = GetTmpBuffer(signParam.peerUdid.data, signParam.peerUdid.len, signParam.peerUdid.len);
-    Buffer *key = GenerateHmacKey(&peerUdidBuf);
+    Buffer peerUdid = GetTmpBuffer(signParam.peerUdid.data, signParam.peerUdid.len, signParam.peerUdid.len);
+    if (!IsBufferValid(&peerUdid)) {
+        LOG_ERROR("peerUdid is invalid");
+        return NULL;
+    }
+
+    Buffer *key = GenerateHmacKey(&peerUdid);
     if (!IsBufferValid(key)) {
         LOG_ERROR("GenerateHmacKey failed");
         return NULL;
@@ -104,8 +107,13 @@ ResultCode HmacVerify(const Buffer *data, const Buffer *sign, SignParam signPara
         return RESULT_BAD_PARAM;
     }
 
-    Buffer peerUdidBuf = GetTmpBuffer(signParam.peerUdid.data, signParam.peerUdid.len, signParam.peerUdid.len);
-    Buffer *key = GenerateHmacKey(&peerUdidBuf);
+    Buffer peerUdid = GetTmpBuffer(signParam.peerUdid.data, signParam.peerUdid.len, signParam.peerUdid.len);
+    if (!IsBufferValid(&peerUdid)) {
+        LOG_ERROR("peerUdid is invalid");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    Buffer *key = GenerateHmacKey(&peerUdid);
     if (!IsBufferValid(key)) {
         LOG_ERROR("GenerateHmacKey failed");
         return RESULT_GENERAL_ERROR;
