@@ -83,6 +83,7 @@ static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject * const deviceObject
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfUsbInterfaceHost;
+        hdfUsbInterfaceHost = nullptr;
         return HDF_FAILURE;
     }
 
@@ -92,6 +93,7 @@ static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject * const deviceObject
     if (hdfUsbInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfUsbInterfaceHost;
+        hdfUsbInterfaceHost = nullptr;
         return HDF_FAILURE;
     }
     deviceObject->service = &hdfUsbInterfaceHost->ioService;
@@ -101,6 +103,8 @@ static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject * const deviceObject
     int32_t ret = UsbImpl::UsbdEventHandle(impl);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbdEventHandle failed", __func__);
+        delete hdfUsbInterfaceHost;
+        hdfUsbInterfaceHost = nullptr;
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
