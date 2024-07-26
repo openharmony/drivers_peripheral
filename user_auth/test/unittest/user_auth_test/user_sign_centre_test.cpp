@@ -26,7 +26,7 @@
 
 extern "C" {
     extern bool IsTimeValid(const UserAuthTokenHal *userAuthToken);
-    extern ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *authTokenKey);
+    extern ResultCode UserAuthTokenHmac(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *authTokenKey);
     extern ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken,
         const HksAuthTokenKey *tokenKey);
     extern ResultCode DecryptTokenCipher(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain,
@@ -71,11 +71,11 @@ HWTEST_F(UserAuthSignTest, TestIsTimeValid, TestSize.Level0)
     EXPECT_TRUE(IsTimeValid(&token));
 }
 
-HWTEST_F(UserAuthSignTest, TestUserAuthTokenSign, TestSize.Level0)
+HWTEST_F(UserAuthSignTest, TestUserAuthTokenHmac, TestSize.Level0)
 {
     UserAuthTokenHal token = {};
     HksAuthTokenKey userAuthTokenKey = {};
-    EXPECT_EQ(UserAuthTokenSign(&token, &userAuthTokenKey), RESULT_SUCCESS);
+    EXPECT_EQ(UserAuthTokenHmac(&token, &userAuthTokenKey), RESULT_SUCCESS);
 }
 
 HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
@@ -113,7 +113,7 @@ HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
     HksAuthTokenKey userAuthTokenKey = {};
     EXPECT_EQ(GetTokenKey(&userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(GetTokenDataCipherResult(&data, &token, &userAuthTokenKey), RESULT_SUCCESS);
-    EXPECT_EQ(UserAuthTokenSign(&token, &userAuthTokenKey), RESULT_SUCCESS);
+    EXPECT_EQ(UserAuthTokenHmac(&token, &userAuthTokenKey), RESULT_SUCCESS);
     UserAuthTokenPlain userAuthTokenPlain = {};
     EXPECT_EQ(UserAuthTokenVerify(&token, &userAuthTokenPlain), RESULT_SUCCESS);
     EXPECT_EQ(memcmp(&(userAuthTokenPlain.tokenDataPlain), &(token.tokenDataPlain),
@@ -149,7 +149,7 @@ HWTEST_F(UserAuthSignTest, TestUserAuthTokenVerify, TestSize.Level0)
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_TOKEN_TIMEOUT);
     userAuthToken.tokenDataPlain.time = GetSystemTime();
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_BAD_SIGN);
-    EXPECT_EQ(UserAuthTokenSign(&userAuthToken, &userAuthTokenKey), RESULT_SUCCESS);
+    EXPECT_EQ(UserAuthTokenHmac(&userAuthToken, &userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_GENERAL_ERROR);
 }
 

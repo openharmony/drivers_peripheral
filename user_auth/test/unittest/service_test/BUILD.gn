@@ -36,6 +36,7 @@ ohos_unittest("UserAuthHdiTest") {
     "../../../hdi_service/interface",
     "../../../hdi_service/key_mgr/inc",
     "../../../hdi_service/user_auth/inc",
+    "../../../hdi_service/utils/inc",
     "../../../common/logs",
     "../../../common/utils",
   ]
