@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <string.h>
+#include "hdi_wpa_common.h"
 
 #define BUF_SIZE 512
 
@@ -2021,6 +2022,14 @@ int32_t WpaInterfaceRemoveWpaIface(struct IWpaInterface *self, const char *ifNam
     }
     ret = pWpaInterface->wpaCliRemoveIface(pWpaInterface, ifName);
     HDF_LOGI("%{public}s Remove wpa iface finish, ifName: %{public}s ret = %{public}d", __func__, ifName, ret);
+    if (ret == 0) {
+        if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+            ReleaseWpaCtrl(&(pWpaInterface->p2pCtrl));
+        }
+        if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
+            ReleaseWpaCtrl(&(pWpaInterface->staCtrl));
+        }
+    }
     return (ret == 0 ? HDF_SUCCESS : HDF_FAILURE);
 }
 

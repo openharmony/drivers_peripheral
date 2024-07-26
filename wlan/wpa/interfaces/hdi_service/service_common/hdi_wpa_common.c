@@ -267,7 +267,7 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
     } else if (strncmp(cmd, "INTERFACE_REMOVE ", strlen("INTERFACE_REMOVE ")) == 0) {
         ifName = (char *)cmd + strlen("INTERFACE_REMOVE ");
     } else {
-        ifName = "wlan0";
+        ifName = "common";
     }
 
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
