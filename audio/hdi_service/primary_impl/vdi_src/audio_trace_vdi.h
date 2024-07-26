@@ -21,7 +21,7 @@ extern "C" {
 #endif
 
 void HdfAudioStartTrace(const char* value, int valueLen);
-void HdfAudioFinshTrace(void);
+void HdfAudioFinishTrace(void);
 
 #ifdef __cplusplus
 }
