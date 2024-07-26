@@ -22,13 +22,13 @@
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "adaptor_time.h"
+#include "auth_token_signer.h"
 #include "context_manager.h"
 #include "executor_message.h"
 #include "hmac_key.h"
 #include "idm_database.h"
 #include "idm_session.h"
 #include "udid_manager.h"
-#include "user_sign_centre.h"
 
 #ifdef IAM_TEST_ENABLE
 #define IAM_STATIC
@@ -280,7 +280,7 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
     }
 
     if (executorResultInfo->result == RESULT_SUCCESS) {
-        ret = GetTokenDataAndSign(userAuthContext, credentialId, SCHEDULE_MODE_AUTH, authToken);
+        ret = GetAuthTokenDataAndSign(userAuthContext, credentialId, SCHEDULE_MODE_AUTH, authToken);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("sign token failed");
             goto EXIT;
