@@ -56,7 +56,7 @@ uint64_t AudioUtCaptureTest::GetCaptureBufferSize()
     uint64_t frameSize = 0;
     uint64_t frameCount = 0;
     uint64_t bufferSize = 0;
-    
+
     if (capture_ == nullptr) {
         return DEFAULT_BUFFER_SIZE;
     }
@@ -781,7 +781,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetExtraParams001, TestSize.Level1)
 
     int32_t ret = capture_->SetExtraParams(capture_, kvList);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
-    
+
     ret = capture_->GetExtraParams(capture_, keyValueListReply, listLenth);
     // the vendor can not supply this method，one it not supply returns HDF_ERR_INVALID_PARAM
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);

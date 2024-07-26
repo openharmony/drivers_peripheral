@@ -736,6 +736,7 @@ static void* UpdateUsbHeadset(void *arg)
         AUDIO_FUNC_LOGE("update audio status info failed!");
         return NULL;
     }
+    return NULL;
 }
 #endif
 
