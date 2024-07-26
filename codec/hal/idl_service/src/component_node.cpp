@@ -233,6 +233,9 @@ int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<i
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("OMX_SetParameter err = %{public}x ", err);
     }
+    if (mapper != nullptr) {
+        mapper->Unmap(inBuffer.bufferhandle);
+    }
     return err;
 }
 
