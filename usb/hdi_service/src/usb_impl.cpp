@@ -1620,6 +1620,49 @@ int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &
     return ret;
 }
 
+int32_t UsbImpl::ControlTransferReadwithLength(
+    const UsbDev &dev, const UsbCtrlTransferParams &ctrlParams, std::vector<uint8_t> &data)
+{
+    if ((static_cast<uint32_t>(ctrlParams.requestType) & USB_ENDPOINT_DIR_MASK) == USB_ENDPOINT_DIR_OUT) {
+        HDF_LOGE("%{public}s: this function is read, not write", __func__);
+        return HDF_FAILURE;
+    }
+
+    HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr || port->ctrDevHandle == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+
+    UsbControlParams controlParams;
+    if (memset_s(&controlParams, sizeof(controlParams), 0, sizeof(controlParams)) != EOK) {
+        HDF_LOGE("%{public}s:memset_s failed ", __func__);
+        return HDF_FAILURE;
+    }
+    controlParams.request = static_cast<uint8_t>(ctrlParams.requestCmd);
+    controlParams.value = ctrlParams.value;
+    controlParams.index = ctrlParams.index;
+    controlParams.target = (UsbRequestTargetType)(static_cast<uint32_t>(ctrlParams.requestType) & USB_RECIP_MASK);
+    controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrlParams.requestType)) 
+        >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
+    controlParams.reqType = static_cast<uint32_t>(ctrlParams.requestType);
+    controlParams.size = ctrlParams.length;
+    controlParams.data = static_cast<void *>(OsalMemCalloc(controlParams.size));
+    if (controlParams.data == nullptr) {
+        HDF_LOGE("%{public}s:OsalMemCalloc failed", __func__);
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    int32_t ret = UsbControlTransferEx(port, &controlParams, ctrlParams.timeout);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d UsbControlTransfer failed ret:%{public}d", __func__, __LINE__, ret);
+    }
+
+    uint8_t *dataValue = static_cast<uint8_t *>(controlParams.data);
+    data.assign(dataValue, dataValue + controlParams.size);
+    OsalMemFree(controlParams.data);
+    return ret;
+}
+
 int32_t UsbImpl::InterruptTransferRead(
     const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data)
 {
