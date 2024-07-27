@@ -296,7 +296,8 @@ ResultCode AddCredentialFunc(
     const CoAuthSchedule *schedule = GetCoAuthSchedule(executorResultInfo->scheduleId);
     if (schedule == NULL) {
         LOG_ERROR("schedule is null");
-        return RESULT_GENERAL_ERROR;
+        ret = RESULT_GENERAL_ERROR;
+        goto EXIT;
     }
     CredentialInfoHal credentialInfo;
     ret = GetCredentialInfoFromSchedule(executorResultInfo, &credentialInfo, schedule);
