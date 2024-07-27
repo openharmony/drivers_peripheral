@@ -1369,56 +1369,50 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
-    for (uint8_t i = 0; i < entry.count; i++) {
-        cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
-        cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(
-            cameraTest->streamOperatorCallbackV1_3, cameraTest->streamOperator_V1_3);
-        EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(
+        cameraTest->streamOperatorCallbackV1_3, cameraTest->streamOperator_V1_3);
+    EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
 
-        cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-        cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
-        cameraTest->streamInfoV1_1->v1_0.width_ = 1280;
-        cameraTest->streamInfoV1_1->v1_0.height_ = 960;
-        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfoV1_1->v1_0.width_ = 1280;
+    cameraTest->streamInfoV1_1->v1_0.height_ = 960;
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
-        cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-        cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
-        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+    cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
 
-        cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
-        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-        cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
-            static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_3::LIGHT_PAINTING),
-            cameraTest->abilityVec);
-        EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_3::LIGHT_PAINTING),
+        cameraTest->abilityVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 
-        std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-        uint8_t lightPainting = entry.data.u8[i];
-        if (lightPainting == OHOS_CAMERA_LIGHT_PAINTING_LIGHT) {
-            uint8_t lightFlush = 1;
-            modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_FLASH, &lightFlush, 1);
-        } else {
-            CAMERA_LOGI("Light painting can not support lighting");
-        }
-        modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_TYPE, &lightPainting, 1);
-        std::vector<uint8_t> metaVec;
-        MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
-        cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
+    std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t lightPainting = OHOS_CAMERA_LIGHT_PAINTING_LIGHT;
+    uint8_t lightFlush = 1;
+    modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_FLASH, &lightFlush, 1);
+    modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_TYPE, &lightPainting, 1);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
+    cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
 
-        cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-        cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
 
-        sleep(UT_SLEEP_TIME);
-        EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
-        cameraTest->streamOperator_V1_3->ConfirmCapture(cameraTest->captureIdCapture);
-        sleep(UT_SLEEP_TIME);
+    sleep(UT_SLEEP_TIME);
+    EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
+    cameraTest->streamOperator_V1_3->ConfirmCapture(cameraTest->captureIdCapture);
+    sleep(UT_SLEEP_TIME);
 
-        cameraTest->captureIds = {cameraTest->captureIdPreview};
-        cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
-        cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
-        sleep(UT_SLEEP_TIME);
-        cameraTest->streamInfosV1_1.clear();
-    }
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    sleep(UT_SLEEP_TIME);
+    cameraTest->streamInfosV1_1.clear();
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
 
@@ -1545,16 +1539,11 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_039, TestSize.Level1)
  */
 HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_040, TestSize.Level1)
 {
-    if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::LIGHT_PAINTING)) {
-        cout << "skip this test, because LIGHT_PAINTING not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
-    }
-    CAMERA_LOGI("test Camera_Device_Hdi_V1_3_040 start.");
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_CONTROL_SUPPORTED_COLOR_MODES, &entry);
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_SUPPORTED_COLOR_MODES, &entry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
