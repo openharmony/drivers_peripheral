@@ -66,6 +66,8 @@ public:
     int32_t ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data) override;
     int32_t ControlTransferWrite(
         const UsbDev &dev, const UsbCtrlTransfer &ctrl, const std::vector<uint8_t> &data) override;
+    int32_t ControlTransferReadwithLength(
+        const UsbDev &dev, const UsbCtrlTransferParams &ctrlParams, std::vector<uint8_t> &data) override;
     int32_t InterruptTransferRead(
         const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data) override;
     int32_t InterruptTransferWrite(
