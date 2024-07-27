@@ -126,6 +126,18 @@ static int32_t WpaCallbackWpsTimeout(struct IWpaCallback *self, const char *ifNa
     return HDF_SUCCESS;
 }
 
+static int32_t WpaCallbackAuthTimeout(struct IWpaCallback *self, const char *ifName)
+{
+    (void)self;
+    if (ifName == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+ 
+    HDF_LOGE("WpaCallbackAuthTimeout: input successfully");
+    return HDF_SUCCESS;
+}
+
 static int32_t WpaCallbackScanResult(struct IWpaCallback *self,
     const struct HdiWpaRecvScanResultParam *recvScanResultParamconst, const char *ifName)
 {
@@ -170,6 +182,7 @@ struct IWpaCallback *WpaCallbackServiceGet(void)
     service->interface.OnEventAssociateReject = WpaCallbackAssociateReject;
     service->interface.OnEventWpsOverlap = WpaCallbackWpsOverlap;
     service->interface.OnEventWpsTimeout = WpaCallbackWpsTimeout;
+    service->interface.OnEventAuthTimeout = WpaCallbackAuthTimeout;
     service->interface.OnEventScanResult = WpaCallbackScanResult;
     service->interface.OnEventAuthReject = WpaCallbackAuthReject;
     return &service->interface;
