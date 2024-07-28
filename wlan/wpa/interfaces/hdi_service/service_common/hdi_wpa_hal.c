@@ -263,7 +263,7 @@ WpaCtrl *GetStaCtrl(void)
     }
     return &g_wpaInterface->staCtrl;
 }
- 
+
 WpaCtrl *GetP2pCtrl(void)
 {
     HDF_LOGI("enter GetP2pCtrl");
@@ -273,7 +273,7 @@ WpaCtrl *GetP2pCtrl(void)
     }
     return &g_wpaInterface->p2pCtrl;
 }
- 
+
 WpaCtrl *GetChbaCtrl(void)
 {
     HDF_LOGI("enter GetChbaCtrl");
@@ -283,7 +283,7 @@ WpaCtrl *GetChbaCtrl(void)
     }
     return &g_wpaInterface->chbaCtrl;
 }
- 
+
 WpaCtrl *GetCommonCtrl(void)
 {
     HDF_LOGI("enter GetCommonCtrl");

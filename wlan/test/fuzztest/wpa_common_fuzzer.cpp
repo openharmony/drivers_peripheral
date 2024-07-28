@@ -630,6 +630,7 @@ void FuzzWpaInterfaceP2pAddService(struct IWpaInterface *interface, const uint8_
     info.query = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
     info.resp = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
     if (info.name == nullptr || info.query == nullptr || info.resp == nullptr) {
+        HDF_LOGI("%{public}s: OsalMemCalloc fail", __FUNCTION__);
         return;
     }
     strcpy_s((char *)info.name, sizeof(info.name), "p2p0");
@@ -657,6 +658,7 @@ void FuzzWpaInterfaceP2pRemoveService(struct IWpaInterface *interface, const uin
     info.query = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
     info.resp = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
     if (info.name == nullptr || info.query == nullptr || info.resp == nullptr) {
+        HDF_LOGI("%{public}s: OsalMemCalloc fail", __FUNCTION__);
         return;
     }
     strcpy_s((char *)info.name, sizeof(info.name), "p2p0");
