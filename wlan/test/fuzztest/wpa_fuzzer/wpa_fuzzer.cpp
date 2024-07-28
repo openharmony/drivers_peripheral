@@ -28,7 +28,7 @@ namespace WIFI {
 constexpr size_t THRESHOLD = 10;
 const char *g_wpaServiceName = "wpa_interface_service";
 struct IWpaInterface *g_wpaObj = nullptr;
-static struct HDIDeviceManager *g_devMgr = NULL;
+static struct HDIDeviceManager *g_devMgr = nullptr;
 
 void FuzzWpaStart(struct IWpaInterface *gWpaObj, uint8_t *tmpRawData)
 {

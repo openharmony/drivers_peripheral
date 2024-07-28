@@ -1566,9 +1566,14 @@ WifiWpaStaInterface *GetWifiStaInterface(const char *name)
     if (p == NULL) {
         return NULL;
     }
-    strcpy_s(p->ifname, sizeof(p->ifname), name);
-    if(strncpy_s(staNo, sizeof(staNo), name + strlen("wlan"), STA_NO_LEN) != EOK) {
-        HDF_LOGE("GetWifiStaInterface, strncpy_s err");
+    if (strncpy_s(p->ifname, sizeof(p->ifname), name, sizeof(p->ifname)) != EOK) {
+        HDF_LOGE("GetWifiStaInterface, strncpy ifname err");
+        free(p);
+        p = NULL;
+        return NULL;
+    }
+    if (strncpy_s(staNo, sizeof(staNo), name + strlen("wlan"), STA_NO_LEN) != EOK) {
+        HDF_LOGE("GetWifiStaInterface, strncpy stano err");
         free(p);
         p = NULL;
         return NULL;
