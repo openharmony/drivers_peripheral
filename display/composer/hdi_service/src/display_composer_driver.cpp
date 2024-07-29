@@ -27,7 +27,7 @@
 #define LOG_TAG "COMPOSER_DRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
-#define HICOLLIE_TIMEOUT 5
+#define HICOLLIE_TIMEOUT 10
 
 struct HdfDisplayComposerHost {
     struct IDeviceIoService ioService;
