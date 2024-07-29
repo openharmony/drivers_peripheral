@@ -392,6 +392,10 @@ int32_t SimSeVendorAdaptions::AddSecureElementDeathRecipient(const sptr<ISecureE
 
 int32_t SimSeVendorAdaptions::RemoveSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj)
 {
+    if (callbackObj == nullptr) {
+        HDF_LOGE("SimSeVendorAdaptions remote is nullptr!");
+        return HDF_FAILURE;
+    }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
     bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
     if (!result) {
