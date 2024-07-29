@@ -1376,12 +1376,14 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
 
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.width_ = 1280;
-    cameraTest->streamInfoV1_1->v1_0.height_ = 960;
+    cameraTest->streamInfoV1_1->v1_0.width_ = 4096;
+    cameraTest->streamInfoV1_1->v1_0.height_ = 3072;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
     cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->streamInfoCapture->v1_0.width_ = 4096;
+    cameraTest->streamInfoCapture->v1_0.height_ = 3072;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
 
     cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
@@ -1444,11 +1446,14 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_038, TestSize.Level1)
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.width_ = 1280;
-    cameraTest->streamInfoV1_1->v1_0.height_ = 960;
+    cameraTest->streamInfoV1_1->v1_0.width_ = 4096;
+    cameraTest->streamInfoV1_1->v1_0.height_ = 3072;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
     cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->streamInfoCapture->v1_0.width_ = 4096;
+    cameraTest->streamInfoCapture->v1_0.height_ = 3072;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
 
     cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
@@ -1494,11 +1499,14 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_039, TestSize.Level1)
     // Preview streamInfo
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.width_ = 1280;
-    cameraTest->streamInfoV1_1->v1_0.height_ = 960;
+    cameraTest->streamInfoV1_1->v1_0.width_ = 4096;
+    cameraTest->streamInfoV1_1->v1_0.height_ = 3072;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
     cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->streamInfoCapture->v1_0.width_ = 4096;
+    cameraTest->streamInfoCapture->v1_0.height_ = 3072;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
     // Create and commitStream
     cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
@@ -1557,12 +1565,14 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_040, TestSize.Level1)
         // Preview streamInfo
         cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
         cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
-        cameraTest->streamInfoV1_1->v1_0.width_ = 1280;
-        cameraTest->streamInfoV1_1->v1_0.height_ = 960;
+        cameraTest->streamInfoV1_1->v1_0.width_ = 4096;
+        cameraTest->streamInfoV1_1->v1_0.height_ = 3072;
         cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
         cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
         cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+        cameraTest->streamInfoCapture->v1_0.width_ = 4096;
+        cameraTest->streamInfoCapture->v1_0.height_ = 3072;
         cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
         // Create and commitStream
         cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
