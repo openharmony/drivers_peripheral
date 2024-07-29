@@ -19,7 +19,9 @@
 
 #include "adaptor_time.h"
 #include "buffer.h"
+#include "coauth.h"
 #include "defines.h"
+#include "executor_message.h"
 #include "idm_database.h"
 #include "idm_session.h"
 #include "pool.h"
