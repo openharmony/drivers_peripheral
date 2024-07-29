@@ -18,7 +18,7 @@
 
 #define TIME_1000 1000
 #define TIME_10 10
-#define HICOLLIE_TIMEOUT 5
+#define HICOLLIE_TIMEOUT 10
 
 namespace OHOS {
 namespace HDI {
