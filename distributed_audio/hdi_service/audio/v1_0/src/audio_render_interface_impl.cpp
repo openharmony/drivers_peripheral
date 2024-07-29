@@ -114,7 +114,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
         SaveFile(HDF_RENDER_FILENAME, reinterpret_cast<uint8_t*>(data.data.data()), frame.size());
     }
 #endif
-    if (currentFrame_ < DURATION_FRAMES_MINUS) {
+    if (enableFade_ && (currentFrame_ < DURATION_FRAMES_MINUS)) {
         FadeInProcess(DURATION_FRAMES, data.data.data(), frame.size());
     }
     if (audioExtCallback_ == nullptr) {
