@@ -1357,11 +1357,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_036, TestSize.Level1)
 */
 HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
 {
-    if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::LIGHT_PAINTING)) {
-        cout << "skip this test, because LIGHT_PAINTING not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
-    }
-
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
@@ -1597,7 +1592,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_040, TestSize.Level1)
         sleep(UT_SLEEP_TIME);
         EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
         cameraTest->streamOperator_V1_3->ConfirmCapture(cameraTest->captureIdCapture);
-        sleep(UT_SLEEP_TIME);
 
         cameraTest->captureIds = {cameraTest->captureIdPreview};
         cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
