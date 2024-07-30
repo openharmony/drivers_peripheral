@@ -38,7 +38,7 @@ extern "C" {
     extern LinkedList *g_userInfoList;
     extern UserInfo *g_currentUser;
     extern ResultCode GenerateChallenge(uint8_t *challenge, uint32_t challengeLen);
-    extern ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey);
+    extern ResultCode UserAuthTokenHmac(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey);
     extern ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken,
         const HksAuthTokenKey *tokenKey);
 }
@@ -63,7 +63,7 @@ public:
 #define GENERATE_TOKEN(dataToEncrypt, userAuthTokenHal, tokenKey) \
 { \
     EXPECT_EQ(GetTokenDataCipherResult(&(dataToEncrypt), &(userAuthTokenHal), &(tokenKey)), RESULT_SUCCESS); \
-    EXPECT_EQ(UserAuthTokenSign(&(userAuthTokenHal), &(tokenKey)), RESULT_SUCCESS); \
+    EXPECT_EQ(UserAuthTokenHmac(&(userAuthTokenHal), &(tokenKey)), RESULT_SUCCESS); \
 }
 
 HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_001, TestSize.Level0)

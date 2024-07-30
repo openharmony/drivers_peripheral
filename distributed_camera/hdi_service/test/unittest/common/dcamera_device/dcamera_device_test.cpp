@@ -76,7 +76,7 @@ void DCameraDeviceTest::TearDownTestCase(void)
 void DCameraDeviceTest::SetUp(void)
 {
     DHBase dhBase = {TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
-    dcameraDevice_ = new (std::nothrow) DCameraDevice(dhBase, TEST_ABILITY, TEST_ABILITY);
+    dcameraDevice_ = sptr<DCameraDevice>(new (std::nothrow) DCameraDevice(dhBase, TEST_ABILITY, TEST_ABILITY));
 }
 
 void DCameraDeviceTest::TearDown(void)

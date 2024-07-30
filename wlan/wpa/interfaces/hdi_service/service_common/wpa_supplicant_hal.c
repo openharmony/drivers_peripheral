@@ -654,7 +654,7 @@ static int WpaCliCmdWepKey(WifiWpaStaInterface *this, int keyIdx, unsigned char 
         }
         key = strtok_r(NULL, "=", &savedPtr);
     }
-    HDF_LOGI("WpaCliCmdWepKey wepKey =%s", wepKey);
+    HDF_LOGI("WpaCliCmdWepKey wepKey =%{private}s", wepKey);
     return 0;
 }
 
@@ -687,7 +687,7 @@ static int WpaCliCmdGetPsk(WifiWpaStaInterface *this, unsigned char *psk, unsign
         }
         key = strtok_r(NULL, "=", &savedPtr);
     }
-    HDF_LOGI("WpaCliCmdGetPsk psk =%s", psk);
+    HDF_LOGI("WpaCliCmdGetPsk psk =%{private}s", psk);
     return 0;
 }
 
@@ -719,7 +719,7 @@ static int WpaCliCmdGetPskPassphrase(WifiWpaStaInterface *this, char *psk, unsig
         }
         key = strtok_r(NULL, "=", &savedPtr);
     }
-    HDF_LOGI("WpaCliCmdGetPskPassphrase psk = %s", psk);
+    HDF_LOGI("WpaCliCmdGetPskPassphrase psk = %{private}s", psk);
     return 0;
 }
 
@@ -1566,9 +1566,14 @@ WifiWpaStaInterface *GetWifiStaInterface(const char *name)
     if (p == NULL) {
         return NULL;
     }
-    strcpy_s(p->ifname, sizeof(p->ifname), name);
-    if(strncpy_s(staNo, sizeof(staNo), name + strlen("wlan"), STA_NO_LEN) != EOK) {
-        HDF_LOGE("GetWifiStaInterface, strncpy_s err");
+    if (strncpy_s(p->ifname, sizeof(p->ifname), name, sizeof(p->ifname)) != EOK) {
+        HDF_LOGE("GetWifiStaInterface, strncpy ifname err");
+        free(p);
+        p = NULL;
+        return NULL;
+    }
+    if (strncpy_s(staNo, sizeof(staNo), name + strlen("wlan"), STA_NO_LEN) != EOK) {
+        HDF_LOGE("GetWifiStaInterface, strncpy stano err");
         free(p);
         p = NULL;
         return NULL;

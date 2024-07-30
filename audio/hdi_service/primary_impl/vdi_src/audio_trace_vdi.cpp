@@ -22,7 +22,7 @@ void HdfAudioStartTrace(const char* value, int valueLen)
     StartTrace(HITRACE_TAG_HDF, value);
 }
 
-void HdfAudioFinshTrace(void)
+void HdfAudioFinishTrace(void)
 {
     FinishTrace(HITRACE_TAG_HDF);
 }

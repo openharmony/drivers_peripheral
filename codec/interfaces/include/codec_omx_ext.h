@@ -41,6 +41,7 @@ enum CodecAVCProfileExt {
 enum CodecVideoExType {
     CODEC_OMX_VIDEO_CodingVP9  = 10, /** VP9 Index in Codec HDI */
     CODEC_OMX_VIDEO_CodingHEVC = 11, /** HEVC Index in Codec HDI */
+    CODEC_OMX_VIDEO_CodingVVC = 12, /** VVC Index in Codec HDI */
 };
 
 /**
@@ -255,6 +256,14 @@ enum OmxIndexCodecExType {
     OMX_IndexParamEncOutLTR,
     /** CodecTemperalLayerParam */
     OMX_IndexParamTemperalLayer,
+    /** OMX_CONFIG_BOOLEANTYPE */
+    OMX_IndexParamEncParamsFeedback,
+    /** OMX_S32 */
+    OMX_IndexParamEncOutFrameLayer,
+    /** OMX_S32 */
+    OMX_IndexParamQPStsart,
+    /** OMX_BOOL */
+    OMX_IndexParamSkipFrame,
 };
 
 /**

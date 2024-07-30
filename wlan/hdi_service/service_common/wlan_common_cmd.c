@@ -130,11 +130,11 @@ int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, st
             ifeature->type = g_p2pFeature->baseFeature.type;
             ifeature->ifName = strdup((g_p2pFeature->baseFeature).ifName);
         }
-    } else {
-        HDF_LOGE("%{public}s: wlan type is Invalid", __func__);
     }
-    HDF_LOGI("hal exit %{public}s, apFeatureCount:%{public}u staFeatureCount:%{public}u p2pFeatureCount:%{public}u",
-        __FUNCTION__, g_apFeatureCount, g_staFeatureCount, g_p2pFeatureCount);
+    if (ifeature->ifName == NULL) {
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("ap:%{public}u sta:%{public}u p2p:%{public}u", g_apFeatureCount, g_staFeatureCount, g_p2pFeatureCount);
     return ret;
 }
 
@@ -360,6 +360,11 @@ int32_t WlanInterfaceGetFeatureByIfName(struct IWlanInterface *self, const char 
     }
     ifeature->type = baseFeature->type;
     ifeature->ifName = strdup(baseFeature->ifName);
+    if (!ifeature->ifName) {
+        HDF_LOGE("ifName is NULL!");
+        return HDF_FAILURE;
+    }
+
     return ret;
 }
 
@@ -746,7 +751,7 @@ static int32_t ProcessEventScanResults(struct HdfWlanRemoteNode *node, uint32_t 
         ret = node->callbackObj->ScanResults(node->callbackObj, event, scanResults, ifName);
     }
     HdfWifiScanResultsFree(scanResults, true);
-    HDF_LOGI("%{public}s, wifiScanResults num:%{public}u", __FUNCTION__, wifiScanResults->num);
+    HDF_LOGD("hal exit %{public}s, wifiScanResults num:%{public}u", __FUNCTION__, wifiScanResults->num);
     return ret;
 }
 

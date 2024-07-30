@@ -21,7 +21,12 @@
 #include "dcamera_host.h"
 #include "v1_0/camera_host_stub.h"
 
+#include <shared_mutex>
 using namespace OHOS::HDI::Camera::V1_0;
+
+namespace {
+    std::shared_mutex mutex_;
+}
 
 struct HdfCameraHostHost {
     struct IDeviceIoService ioService;
@@ -31,8 +36,6 @@ struct HdfCameraHostHost {
 static int32_t CameraHostDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    auto *hdfCameraHostHost = CONTAINER_OF(client->device->service, struct HdfCameraHostHost, ioService);
-
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
@@ -46,6 +49,16 @@ static int32_t CameraHostDriverDispatch(struct HdfDeviceIoClient *client, int cm
         return HDF_ERR_INVALID_PARAM;
     }
 
+    std::shared_lock lock(mutex_);
+    if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
+        HDF_LOGE("%{public}s: client or client.device or service is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    auto *hdfCameraHostHost = CONTAINER_OF(client->device->service, struct HdfCameraHostHost, ioService);
+    if (hdfCameraHostHost == NULL || hdfCameraHostHost->stub == NULL) {
+        HDF_LOGE("%{public}s:invalid hdfCameraHostHost", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return hdfCameraHostHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
@@ -104,8 +117,17 @@ static void HdfCameraHostDriverRelease(struct HdfDeviceObject *deviceObject)
         HDF_LOGE("HdfCameraHostDriverRelease not initted");
         return;
     }
+
+    std::unique_lock lock(mutex_);
     auto *hdfCameraHostHost = CONTAINER_OF(deviceObject->service, struct HdfCameraHostHost, ioService);
+    if (hdfCameraHostHost != nullptr) {
+        hdfCameraHostHost->stub = nullptr;
+    }
     delete hdfCameraHostHost;
+    hdfCameraHostHost = nullptr;
+    if (deviceObject != nullptr) {
+        deviceObject->service = nullptr;
+    }
 }
 
 static struct HdfDriverEntry g_camerahostDriverEntry = {

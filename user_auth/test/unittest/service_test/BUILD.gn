@@ -36,6 +36,7 @@ ohos_unittest("UserAuthHdiTest") {
     "../../../hdi_service/interface",
     "../../../hdi_service/key_mgr/inc",
     "../../../hdi_service/user_auth/inc",
+    "../../../hdi_service/utils/inc",
     "../../../common/logs",
     "../../../common/utils",
   ]
@@ -45,16 +46,14 @@ ohos_unittest("UserAuthHdiTest") {
     "src/user_auth_interface_service_test.cpp",
   ]
 
-  deps = [
-    "../../../hdi_service:libuser_auth_interface_service_2.0",
-    "//third_party/googletest:gmock",
-  ]
+  deps = [ "../../../hdi_service:libuser_auth_interface_service_2.0" ]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_user_auth:libuser_auth_proxy_2.0",
+    "googletest:gmock",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",

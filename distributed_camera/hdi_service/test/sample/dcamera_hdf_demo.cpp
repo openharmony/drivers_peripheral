@@ -72,7 +72,7 @@ void DcameraHdfDemo::SetStreamInfo(StreamInfo& streamInfo,
     streamInfo.intent_ = intent;
     streamInfo.tunneledMode_ = tunneledMode;
  
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable(producer));
     streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
 }
 
@@ -287,7 +287,7 @@ RetCode DcameraHdfDemo::InitSensors()
         return RC_ERROR;
     }
 
-    hostCallback_ = new DemoCameraHostCallback();
+    hostCallback_ = sptr<DemoCameraHostCallback>(new DemoCameraHostCallback());
     rc = demoCameraHost_->SetCallback(hostCallback_);
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
         DHLOGE("demo test: demoCameraHost_->SetCallback(hostCallback_) error");

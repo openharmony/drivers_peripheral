@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 
 #include "adaptor_log.h"
 #include "adaptor_memory.h"
+#include "adaptor_time.h"
 #include "coauth.h"
 #include "enroll_specification_check.h"
 #include "executor_message.h"
@@ -220,20 +221,59 @@ IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *ex
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC Buffer *GetAuthTokenForPinEnroll(const CredentialInfoHal *credentialInfo, int32_t userId)
+IAM_STATIC ResultCode GetEnrollTokenDataPlain(const CredentialInfoHal *credentialInfo, TokenDataPlain *dataPlain)
 {
-    UserAuthContext context = {};
-    context.userId = userId;
-    context.authType = credentialInfo->authType;
-    context.authTrustLevel = ATL4;
-    ResultCode ret = GetChallenge(context.challenge, CHALLENGE_LEN);
+    ResultCode ret = GetChallenge(dataPlain->challenge, CHALLENGE_LEN);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get challenge fail");
+        return ret;
+    }
+
+    dataPlain->time = GetSystemTime();
+    dataPlain->authTrustLevel = ATL3;
+    dataPlain->authType = credentialInfo->authType;
+    dataPlain->authMode = SCHEDULE_MODE_ENROLL;
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode GetEnrollTokenDataToEncrypt(const CredentialInfoHal *credentialInfo, int32_t userId,
+    TokenDataToEncrypt *data)
+{
+    data->userId = userId;
+    uint64_t secureUid;
+    ResultCode ret = GetSecureUid(userId, &secureUid);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get secure uid failed");
+        return ret;
+    }
+    data->secureUid = secureUid;
+    EnrolledInfoHal enrolledInfo = {};
+    ret = GetEnrolledInfoAuthType(userId, credentialInfo->authType, &enrolledInfo);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get enrolled info failed");
+        return ret;
+    }
+    data->enrolledId = enrolledInfo.enrolledId;
+    data->credentialId = credentialInfo->credentialId;
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC Buffer *GetAuthTokenForPinEnroll(const CredentialInfoHal *credentialInfo, int32_t userId)
+{
+    UserAuthTokenPlain tokenPlain = {};
+    ResultCode ret = GetEnrollTokenDataPlain(credentialInfo, &(tokenPlain.tokenDataPlain));
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetEnrollTokenDataPlain fail");
+        return NULL;
+    }
+    ret = GetEnrollTokenDataToEncrypt(credentialInfo, userId, &(tokenPlain.tokenDataToEncrypt));
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetEnrollTokenDataToEncrypt fail");
         return NULL;
     }
 
     UserAuthTokenHal authTokenHal = {};
-    ret = GetTokenDataAndSign(&context, credentialInfo->credentialId, SCHEDULE_MODE_ENROLL, &authTokenHal);
+    ret = UserAuthTokenSign(&tokenPlain, &authTokenHal);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("generate pin enroll authToken fail");
         return NULL;
@@ -292,7 +332,8 @@ ResultCode AddCredentialFunc(
     const CoAuthSchedule *schedule = GetCoAuthSchedule(executorResultInfo->scheduleId);
     if (schedule == NULL) {
         LOG_ERROR("schedule is null");
-        return RESULT_GENERAL_ERROR;
+        ret = RESULT_GENERAL_ERROR;
+        goto EXIT;
     }
     CredentialInfoHal credentialInfo;
     ret = GetCredentialInfoFromSchedule(executorResultInfo, &credentialInfo, schedule);
@@ -433,22 +474,42 @@ IAM_STATIC ResultCode CheckResultValid(uint64_t scheduleId, int32_t userId)
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetUpdateCredentialOutputRootSecret(
-    UpdateCredentialOutput *output, int32_t userId, const Buffer *rootSecret)
+IAM_STATIC ResultCode GetUpdateCredentialOutput(int32_t userId, const Buffer *rootSecret,
+    const CredentialInfoHal *credentialInfo, UpdateCredentialOutput *output)
 {
+    if (credentialInfo->authType != PIN_AUTH && credentialInfo->authType != DEFAULT_AUTH_TYPE) {
+        LOG_ERROR("bad authType");
+        return RESULT_GENERAL_ERROR;
+    }
+    CredentialInfoHal credInfo = (*credentialInfo);
+    credInfo.authType = PIN_AUTH;
+
+    output->credentialId = credInfo.credentialId;
     output->rootSecret = CopyBuffer(rootSecret);
-    if (output->rootSecret == NULL) {
+    if (!IsBufferValid(output->rootSecret)) {
         LOG_ERROR("copy rootSecret fail");
-        return RESULT_NO_MEMORY;
+        goto ERROR;
     }
     output->oldRootSecret = GetCacheRootSecret(userId);
-    if (output->oldRootSecret == NULL) {
+    if (!IsBufferValid(output->oldRootSecret)) {
         LOG_ERROR("GetCacheRootSecret fail");
-        DestoryBuffer(output->rootSecret);
-        output->rootSecret = NULL;
-        return RESULT_NO_MEMORY;
+        goto ERROR;
+    }
+    output->authToken = GetAuthTokenForPinEnroll(&credInfo, userId);
+    if (!IsBufferValid(output->authToken)) {
+        LOG_ERROR("authToken is invalid");
+        goto ERROR;
     }
     return RESULT_SUCCESS;
+
+ERROR:
+    DestoryBuffer(output->rootSecret);
+    output->rootSecret = NULL;
+    DestoryBuffer(output->oldRootSecret);
+    output->oldRootSecret = NULL;
+    DestoryBuffer(output->authToken);
+    output->authToken = NULL;
+    return RESULT_NO_MEMORY;
 }
 
 ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, UpdateCredentialOutput *output)
@@ -485,8 +546,7 @@ ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, Up
         LOG_ERROR("failed to add credential");
         goto EXIT;
     }
-    output->credentialId = credentialInfo.credentialId;
-    ret = GetUpdateCredentialOutputRootSecret(output, userId, executorResultInfo->rootSecret);
+    ret = GetUpdateCredentialOutput(userId, executorResultInfo->rootSecret, &credentialInfo, output);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetUpdateCredentialOutputRootSecret fail");
         goto EXIT;
