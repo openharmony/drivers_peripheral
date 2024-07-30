@@ -113,7 +113,6 @@ def get_mem_smaps_excel(p_name):
             mem_index = fields.index("Pss")
             continue
         if len(fields) == 10:
-            print(fields)
             mem_data = int(fields[mem_index])
             result_map["总和"] = mem_data
             continue
