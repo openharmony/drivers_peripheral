@@ -1474,7 +1474,6 @@ static int32_t UsbSerialAlloc(struct UsbAcmDevice *acm)
 
     if (OsalMutexInit(&port->lock) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: init lock fail!", __func__);
-        OsalMemFree(port);
         return HDF_FAILURE;
     }
 
