@@ -71,9 +71,9 @@ def get_pid_list():
     else:
         print(f"{__func__}: pid_list.txt not exists, get mem for sensor_host,vibrator_host,audio_host,allocator_host")
         pid_list.append('sensor_host')
-        # pid_list.append('vibrator_host')
-        # pid_list.append('audio_host')
-        # pid_list.append('allocator_host')
+        pid_list.append('vibrator_host')
+        pid_list.append('audio_host')
+        pid_list.append('allocator_host')
 
 
 # Grab simple memory information for a process
