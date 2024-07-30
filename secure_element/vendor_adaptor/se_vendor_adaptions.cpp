@@ -35,6 +35,7 @@ namespace OHOS {
 namespace HDI {
 namespace SecureElement {
 static sptr<ISecureElementCallback> g_callbackV1_0 = nullptr;
+static std::mutex g_mutex {};
 #ifdef SE_VENDOR_ADAPTION_USE_CA
 static const int RES_BUFFER_MAX_LENGTH = 512;
 static const uint16_t SW1_OFFSET = 2;
@@ -58,7 +59,8 @@ SeVendorAdaptions::~SeVendorAdaptions()
 
 int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallback, SecureElementStatus& status)
 {
-    HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    std::lock_guard<std::mutex> lock(g_mutex);
     if (clientCallback == nullptr) {
         HDF_LOGE("init failed, clientCallback is null");
         status = SecureElementStatus::SE_NULL_POINTER_ERROR;
@@ -82,7 +84,7 @@ int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallba
 
 int32_t SeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
 {
-    HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
@@ -99,7 +101,8 @@ int32_t SeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
 
 int32_t SeVendorAdaptions::isSecureElementPresent(bool& present)
 {
-    HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptDons:%{public}s!", __func__);
+    std::lock_guard<std::mutex> lock(g_mutex);
     if (g_callbackV1_0 == nullptr) {
         present = false;
     } else {
@@ -111,7 +114,8 @@ int32_t SeVendorAdaptions::isSecureElementPresent(bool& present)
 int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, uint8_t p2,
     std::vector<uint8_t>& response, uint8_t& channelNumber, SecureElementStatus& status)
 {
-    HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    std::lock_guard<std::mutex> lock(g_mutex);
     if (aid.empty()) {
         HDF_LOGE("aid is null");
         status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
@@ -142,6 +146,8 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
             g_openedChannelCount++;
         }
     }
+    HDF_LOGI("openLogicalChannel [%{public}d] succ, now has %{public}d channel inuse",
+        channelNumber, g_openedChannelCount);
 #endif
     return HDF_SUCCESS;
 }
@@ -149,7 +155,8 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
 int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uint8_t p2, std::vector<uint8_t>& response,
     SecureElementStatus& status)
 {
-    HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    std::lock_guard<std::mutex> lock(g_mutex);
     if (aid.empty()) {
         HDF_LOGE("aid is null");
         status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
@@ -179,13 +186,15 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
             g_openedChannelCount++;
         }
     }
+    HDF_LOGI("openBasicChannel [0] succ, now has %{public}d channel inuse", g_openedChannelCount);
 #endif
     return HDF_SUCCESS;
 }
 
 int32_t SeVendorAdaptions::closeChannel(uint8_t channelNumber, SecureElementStatus& status)
 {
-    HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    std::lock_guard<std::mutex> lock(g_mutex);
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaCloseChannel(channelNumber);
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
@@ -202,6 +211,8 @@ int32_t SeVendorAdaptions::closeChannel(uint8_t channelNumber, SecureElementStat
         HDF_LOGI("closeChannel: g_openedChannelCount = %{public}d, Uninit", g_openedChannelCount);
         SecureElementCaProxy::GetInstance().VendorSecureElementCaUninit();
     }
+    HDF_LOGI("closeChannel [%{public}d] succ, now has %{public}d channel inuse",
+        channelNumber, g_openedChannelCount);
 #endif
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
@@ -210,7 +221,8 @@ int32_t SeVendorAdaptions::closeChannel(uint8_t channelNumber, SecureElementStat
 int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::vector<uint8_t>& response,
     SecureElementStatus& status)
 {
-    HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    std::lock_guard<std::mutex> lock(g_mutex);
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
@@ -262,6 +274,7 @@ SecureElementStatus SeVendorAdaptions::getStatusBySW(uint8_t sw1, uint8_t sw2) c
 void SeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
     HDF_LOGI("OnRemoteDied");
+    // don't lock here, lock in closeChannel
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     SecureElementStatus status = SecureElementStatus::SE_GENERAL_ERROR;
     for (size_t i = 0; i < MAX_CHANNEL_NUM; i++) {
@@ -271,6 +284,7 @@ void SeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
         }
     }
 #endif
+    std::lock_guard<std::mutex> lock(g_mutex);
     g_callbackV1_0 = nullptr;
 }
 
@@ -292,7 +306,7 @@ int32_t SeVendorAdaptions::AddSecureElementDeathRecipient(const sptr<ISecureElem
 int32_t SeVendorAdaptions::RemoveSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj)
 {
     if (callbackObj == nullptr) {
-        HDF_LOGE("SeVendorAdaptions remote is nullptr!");
+        HDF_LOGE("SeVendorAdaptions callbackObj is nullptr!");
         return HDF_FAILURE;
     }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
