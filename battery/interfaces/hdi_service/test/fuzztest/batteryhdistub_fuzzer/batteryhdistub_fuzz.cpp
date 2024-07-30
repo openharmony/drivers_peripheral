@@ -35,7 +35,7 @@ namespace V2_0 {
 namespace {
 const int32_t REWIND_READ_DATA = 0;
 shared_ptr<BatteryInterfaceStub> g_fuzzService = nullptr;
-const uint32_t BATTERY_INTERFACE_STUB_FUNC_MAX_SIZE = 32;
+const uint32_t BATTERY_INTERFACE_STUB_FUNC_MAX_SIZE = 22;
 } // namespace
 
 static void BatteryStubFuzzTest(const uint8_t *data, size_t size)
@@ -47,7 +47,6 @@ static void BatteryStubFuzzTest(const uint8_t *data, size_t size)
     if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
         return;
     }
-    code %= BATTERY_INTERFACE_STUB_FUNC_MAX_SIZE;
 
     MessageParcel datas;
     datas.WriteInterfaceToken(IBatteryInterface::GetDescriptor());
@@ -60,7 +59,9 @@ static void BatteryStubFuzzTest(const uint8_t *data, size_t size)
         impl->Init();
         g_fuzzService = make_shared<BatteryInterfaceStub>(impl);
     }
-    g_fuzzService->OnRemoteRequest(code, datas, reply, option);
+    for (code = CMD_BATTERY_INTERFACE_GET_VERSION; code < BATTERY_INTERFACE_STUB_FUNC_MAX_SIZE; code++) {
+        g_fuzzService->OnRemoteRequest(code, datas, reply, option);
+    }
 }
 } // namespace V2_0
 } // namespace Battery
