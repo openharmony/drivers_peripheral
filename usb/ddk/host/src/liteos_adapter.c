@@ -647,6 +647,7 @@ static int32_t OsSubmitBulkRequestHandle(
             request->reqStatus = USB_REQUEST_ERROR;
         }
         OsDiscardUrbs(request, 0, i);
+        RawUsbMemFree(pas);
         OsalMutexUnlock(&request->lock);
         return HDF_SUCCESS;
     }
@@ -1134,6 +1135,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
     ret = OsInitDevice(dev, busNum, usbAddr);
     if (ret) {
         DPRINTFN(0, "%s: OsInitDevice failed ret=%d\n", __func__, ret);
+        RawUsbMemFree(dev->privateData);
         RawUsbMemFree(dev);
         goto ERR;
     }

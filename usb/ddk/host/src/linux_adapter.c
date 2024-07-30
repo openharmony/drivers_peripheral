@@ -459,6 +459,7 @@ static int32_t OsSubmitControlRequest(struct UsbHostRequest *request)
         }
         return HDF_ERR_IO;
     }
+    RawUsbMemFree(urb);
     return HDF_SUCCESS;
 }
 
@@ -1301,6 +1302,9 @@ static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *
     request->bulkUrb = RawUsbMemCalloc(sizeof(struct UsbAdapterUrb));
     if (request->bulkUrb == NULL) {
         HDF_LOGE("%{public}s RawUsbMemAlloc fail", __func__);
+#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+        RawUsbMemFree(memBuf);
+#endif
         return NULL;
     }
     request->urbs = request->bulkUrb;
