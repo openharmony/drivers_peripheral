@@ -88,6 +88,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             break;
         }
 
+        RawUsbMemFree(submitRequest->urbs);
         if (i >= USB_IO_SUBMIT_RETRY_TIME_CNT) {
             HDF_LOGE("%{public}s:%{public}d submit request failed", __func__, __LINE__);
             submitRequest->status = USB_REQUEST_ERROR;
