@@ -1053,7 +1053,11 @@ static P2pSupplicantErrCode WpaP2pCliCmdGetGroupConfig(WifiWpaP2pInterface *this
         free(buf);
         return P2P_SUP_ERRCODE_FAILED;
     }
-    strcpy_s(argv->value, sizeof(argv->value), buf);
+    if (strcpy_s(argv->value, sizeof(argv->value), buf) != EOK) {
+        HDF_LOGE("strcpy_s P2pWpaGroupConfigArgv failed!");
+        free(buf);
+        return P2P_SUP_ERRCODE_FAILED;
+    }
     free(buf);
     if (argv->param == GROUP_CONFIG_SSID) {
         TrimQuotationMark(argv->value, '\"');
@@ -1152,12 +1156,19 @@ WifiWpaP2pInterface *GetWifiWapP2pInterface(const char *ifName)
     if (g_wpaP2pInterface != NULL) {
         return g_wpaP2pInterface;
     }
+    if (ifName == NULL) {
+        HDF_LOGE("Input ifName invalid!");
+        return NULL;
+    }
     g_wpaP2pInterface = (WifiWpaP2pInterface *)calloc(1, sizeof(WifiWpaP2pInterface));
     if (g_wpaP2pInterface == NULL) {
         HDF_LOGE("alloc memory for p2p interface failed!");
         return NULL;
     }
-    strcpy_s(g_wpaP2pInterface->ifName, sizeof(g_wpaP2pInterface->ifName), ifName);
+    if (strcpy_s(g_wpaP2pInterface->ifName, sizeof(g_wpaP2pInterface->ifName), ifName) != 0) {
+        HDF_LOGE("failed to copy the ifName(%{public}s)!", ifName);
+        return NULL;
+    }
     InitGlobalWpaP2pFunc();
     return g_wpaP2pInterface;
 }

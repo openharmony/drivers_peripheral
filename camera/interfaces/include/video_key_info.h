@@ -88,11 +88,11 @@ const std::string imageScore = "imageScore";
 const int32_t VIDEO_KEY_IMAGE_SCORE = 0x09;
 
 /**
- * @brief Indicates the continuous shooting effect score. The value type is int32_t.
-   0 rgba; 1:jpg; 2:heif
+ * @brief Indicates the continuous fromat of image. The value type is int32_t.
+ * 0 rgba; 1:jpg; 2:heif
  */
-const std::string deferredImageFormat = "deferredImageForamt";
-const int32_t VIDEO_KEY_DEFERRED_IMAGE_FORAMT = 0x0A;
+const std::string deferredImageFormat = "deferredImageFormat";
+const int32_t VIDEO_KEY_DEFERRED_IMAGE_FORMAT = 0x0A;
 
 } // end namespace OHOS::Camera
 #endif

@@ -20,11 +20,4 @@ group("hdf_unittest_codec") {
     "hdi_omx:codec_hdi_2.0_test",
     "idl_omx:codec_idl_2.0_test",
   ]
-
-  if (drivers_peripheral_codec_feature_support_hdi_v1) {
-    deps += [
-      "hdi_adapter:codec_hdi_adapter_test",
-      "hdi_v1.0:codec_client_test",
-    ]
-  }
 }

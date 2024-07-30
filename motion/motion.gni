@@ -1,15 +1,10 @@
 declare_args() {
   drivers_peripheral_motion_feature_community = true
+  drivers_peripheral_motion_feature_model = false
 
   motion_c_utils_enable = true
   if (defined(global_parts_info) &&
       !defined(global_parts_info.commonlibrary_c_utils)) {
     motion_c_utils_enable = false
-  }
-
-  motion_hilog_enable = true
-  if (defined(global_parts_info) &&
-      !defined(global_parts_info.hiviewdfx_hilog)) {
-    motion_hilog_enable = false
   }
 }

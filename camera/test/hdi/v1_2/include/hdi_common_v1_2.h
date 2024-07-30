@@ -45,6 +45,7 @@ enum CameraUtConstants {
     UT_TUNNEL_MODE = 5,
     UT_DATA_SIZE = 8,
     UT_PREVIEW_SIZE = 3112960,
+    UT_MICROSECOND_TIMES = 500000,
 };
 
 enum Numbers {
@@ -59,6 +60,7 @@ enum Numbers {
     EIGHT,
     NINE,
     TEN,
+    SIXTEEN = 16,
 };
 
 enum ImageDataSaveSwitch {
@@ -302,6 +304,7 @@ public:
         int32_t countError_ = 0;
         std::string curImageId_;
         int32_t curErrorCode_ = 0;
+        bool isDone_ = false;
         OHOS::HDI::Camera::V1_2::ImageBufferInfo curImageBufferInfo_;
         OHOS::HDI::Camera::V1_2::SessionStatus curStatus_;
         TestImageProcessCallback() = default;

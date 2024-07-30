@@ -369,6 +369,36 @@ int32_t DisplayComposerService::GetDisplayProperty(uint32_t devId, uint32_t id, 
     return ret;
 }
 
+int32_t DisplayComposerService::SetHardwareCursorPosition(uint32_t devId, int32_t x, int32_t y)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_FAILURE);
+    int32_t ret = vdiImplV1_1_->SetHardwareCursorPosition(devId, x, y);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+int32_t DisplayComposerService::EnableHardwareCursorStats(uint32_t devId, bool enable)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_FAILURE);
+    int32_t ret = vdiImplV1_1_->EnableHardwareCursorStats(devId, enable);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+int32_t DisplayComposerService::GetHardwareCursorStats(uint32_t devId, uint32_t& frameCount, uint32_t& vsyncCount)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_FAILURE);
+    int32_t ret = vdiImplV1_1_->GetHardwareCursorStats(devId, frameCount, vsyncCount);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
 int32_t DisplayComposerService::SetDisplayClientCrop(uint32_t devId, const IRect& rect)
 {
     DISPLAY_TRACE;
@@ -716,6 +746,28 @@ int32_t DisplayComposerService::RegDisplayVBlankIdleCallback(const sptr<IVBlankI
     int32_t ret = vdiImplV1_1_->RegDisplayVBlankIdleCallback(OnVBlankIdleCallback, this);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
+}
+
+int32_t DisplayComposerService::ClearClientBuffer(uint32_t devId)
+{
+    DISPLAY_LOGI("enter, devId %{public}u", devId);
+    CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
+    std::lock_guard<std::mutex> lock(cacheMgr_->GetCacheMgrMutex());
+    DeviceCache* devCache = cacheMgr_->DeviceCacheInstance(devId);
+    DISPLAY_CHK_RETURN(devCache == nullptr, HDF_FAILURE, DISPLAY_LOGE("fail"));
+
+    return devCache->ClearClientCache();
+}
+
+int32_t DisplayComposerService::ClearLayerBuffer(uint32_t devId, uint32_t layerId)
+{
+    DISPLAY_LOGI("enter, devId %{public}u, layerId %{public}u", devId, layerId);
+    CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
+    std::lock_guard<std::mutex> lock(cacheMgr_->GetCacheMgrMutex());
+    DeviceCache* devCache = cacheMgr_->DeviceCacheInstance(devId);
+    DISPLAY_CHK_RETURN(devCache == nullptr, HDF_FAILURE, DISPLAY_LOGE("fail"));
+
+    return devCache->ClearLayerBuffer(layerId);
 }
 
 } // namespace Composer

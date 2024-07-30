@@ -17,6 +17,8 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <vector>
+#include <iproxy_broker.h>
+
 #include "securec.h"
 
 #define HDF_LOG_TAG hdf_sim_se
@@ -44,6 +46,8 @@ bool g_initFuncFlag = false;
 SimSeVendorAdaptions::SimSeVendorAdaptions()
 {
     HDF_LOGE("SimSeVendorAdaptions enter");
+    remoteDeathRecipient_ =
+        new RemoteDeathRecipient(std::bind(&SimSeVendorAdaptions::OnRemoteDied, this, std::placeholders::_1));
     InitFunc();
 }
 
@@ -128,6 +132,7 @@ int SimSeVendorAdaptions::VendorSimSecureElementInit()
 
 int SimSeVendorAdaptions::VendorSimSecureElementUninit()
 {
+    RemoveSecureElementDeathRecipient(g_callbackV1_0);
     SIM_FUNCTION_INVOKE_RETURN(vendorSimSecureElementUninitFunc_);
 }
 
@@ -205,6 +210,7 @@ int32_t SimSeVendorAdaptions::init(
     }
     g_callbackV1_0 = clientCallback;
     g_callbackV1_0->OnSeStateChanged(true);
+    AddSecureElementDeathRecipient(g_callbackV1_0);
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
@@ -353,6 +359,49 @@ int32_t SimSeVendorAdaptions::reset(SecureElementStatus& status)
     HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
     HDF_LOGE("reset is not support");
     status = SecureElementStatus::SE_SUCCESS;
+    return HDF_SUCCESS;
+}
+
+void SimSeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    HDF_LOGI("OnRemoteDied");
+    SecureElementStatus status = SecureElementStatus::SE_GENERAL_ERROR;
+    for (size_t i = 0; i < MAX_CHANNEL_NUM; i++) {
+        if (g_openedChannels[i]) {
+            closeChannel(i, status);
+            HDF_LOGI("OnRemoteDied, close channel [%{public}zu], status = %{public}d", i, status);
+        }
+    }
+    g_callbackV1_0 = nullptr;
+}
+
+int32_t SimSeVendorAdaptions::AddSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj)
+{
+    if (callbackObj == nullptr) {
+        HDF_LOGE("SimSeVendorAdaptions AddSecureElementDeathRecipient callbackObj is nullptr");
+        return HDF_FAILURE;
+    }
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
+    bool result = remote->AddDeathRecipient(remoteDeathRecipient_);
+    if (!result) {
+        HDF_LOGE("SimSeVendorAdaptions AddDeathRecipient failed!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t SimSeVendorAdaptions::RemoveSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj)
+{
+    if (callbackObj == nullptr) {
+        HDF_LOGE("SimSeVendorAdaptions remote is nullptr!");
+        return HDF_FAILURE;
+    }
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
+    bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
+    if (!result) {
+        HDF_LOGE("SimSeVendorAdaptions RemoveDeathRecipient failed!");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 }

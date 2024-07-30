@@ -901,7 +901,7 @@ static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
     uint32_t *rendrId)
 {
-    if (attrs.type == AUDIO_MMAP_NOIRQ) {
+    if (attrs->type == AUDIO_MMAP_NOIRQ) {
         AUDIO_FUNC_LOGI("render type is mmap");
         return NULL;
     }

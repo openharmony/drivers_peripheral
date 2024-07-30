@@ -354,7 +354,7 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
         return HDF_FAILURE;
     }
 
-    if (strcasecmp(cJsonObj->string, MIC) == 0 || strcasecmp(cJsonObj->string, HS_MIC) == 0 || 
+    if (strcasecmp(cJsonObj->string, MIC) == 0 || strcasecmp(cJsonObj->string, HS_MIC) == 0 ||
         strcasecmp(cJsonObj->string, BLUETOOTH_SCO_HEADSET) == 0) {
         return HDF_SUCCESS;
     }
