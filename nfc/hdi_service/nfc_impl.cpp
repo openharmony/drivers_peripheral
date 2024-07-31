@@ -251,6 +251,10 @@ void NfcImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
 
 int32_t NfcImpl::AddNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)
 {
+    if (callbackObj == nullptr) {
+        HDF_LOGE("AddNfcDeathRecipient callbackobj nullptr");
+        return HDF_FAILURE;
+    } 
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<INfcCallback>(callbackObj);
     bool result = remote->AddDeathRecipient(remoteDeathRecipient_);
     if (!result) {
@@ -262,6 +266,10 @@ int32_t NfcImpl::AddNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)
 
 int32_t NfcImpl::RemoveNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)
 {
+    if (callbackObj == nullptr) {
+        HDF_LOGE("RemoveNfcDeathRecipient callbackobj nullptr");
+        return HDF_FAILURE;
+    } 
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<INfcCallback>(callbackObj);
     bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
     if (!result) {
