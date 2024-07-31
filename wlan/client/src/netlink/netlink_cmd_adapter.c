@@ -2684,12 +2684,18 @@ static void ClearSsidsList(struct DListHead *ssidsList)
     }
     DListHeadInit(ssidsList);
 }
+
 static int32_t SsidToMsg(struct nl_msg *msg, struct DListHead *scanSsids)
 {
     struct SsidListNode *ssidListNode = NULL;
     uint32_t index = 0;
     struct nlattr *nestedSsid = NULL;
 
+    if (!scanSsids) {
+        HILOG_ERROR(LOG_CORE, "%s: scanSsids is null.", __FUNCTION__);
+        ClearSsidsList(scanSsids);
+        return RET_CODE_FAILURE;
+    }
     if (!DListIsEmpty(scanSsids)) {
         nestedSsid = nla_nest_start(msg, NL80211_ATTR_SCAN_SSIDS);
         if (nestedSsid == NULL) {
@@ -2710,6 +2716,7 @@ static int32_t SsidToMsg(struct nl_msg *msg, struct DListHead *scanSsids)
     ClearSsidsList(scanSsids);
     return RET_CODE_SUCCESS;
 }
+
 static int32_t ProcessSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, const WifiPnoSettings *pnoSettings)
 {
     uint8_t scanSsidsCount = 0;
