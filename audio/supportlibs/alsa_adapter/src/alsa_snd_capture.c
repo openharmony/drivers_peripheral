@@ -45,10 +45,8 @@ CapturePriData CaptureGetPriData(struct AlsaCapture *captureIns)
 
 static int32_t CaptureFreeMemory(void)
 {
-    int32_t i;
-
     if (g_alsaCaptureList != NULL) {
-        for (i = 0; i < MAX_CARD_NUM; i++) {
+        for (int32_t i = 0; i < MAX_CARD_NUM; i++) {
             if (g_alsaCaptureList[i].soundCard.cardStatus != 0) {
                 AUDIO_FUNC_LOGE("refCount is not zero, Sound card in use!");
                 return HDF_ERR_DEVICE_BUSY;
@@ -242,7 +240,7 @@ static int32_t SetHWParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t acces
     }
 
     cardIns->canPause = snd_pcm_hw_params_can_pause(hwParams);
-    AUDIO_FUNC_LOGI("hardware driver %{public}s support pause",cardIns->canPause ? "is" : "is not");
+    AUDIO_FUNC_LOGI("hardware driver %{public}s support pause", cardIns->canPause ? "is" : "is not");
 
     return HDF_SUCCESS;
 }
@@ -547,8 +545,6 @@ static int32_t CheckPcmStatus(snd_pcm_t *capturePcmHandle)
 
 static int32_t CapturePcmReadi(snd_pcm_t *pcm, uint64_t *frameCnt, char *dataBuf, snd_pcm_uframes_t bufSize)
 {
-    int32_t ret;
-    long frames;
     int32_t tryNum = AUDIO_ALSALIB_RETYR;
     CHECK_NULL_PTR_RETURN_DEFAULT(pcm);
     CHECK_NULL_PTR_RETURN_DEFAULT(frameCnt);
@@ -559,8 +555,9 @@ static int32_t CapturePcmReadi(snd_pcm_t *pcm, uint64_t *frameCnt, char *dataBuf
     }
 
     do {
+        int32_t ret;
         /* Read interleaved frames to a PCM. */
-        frames = snd_pcm_readi(pcm, dataBuf, bufSize);
+        long frames = snd_pcm_readi(pcm, dataBuf, bufSize);
         if (frames > 0) {
             *frameCnt = (uint64_t)frames;
             return HDF_SUCCESS;
@@ -674,11 +671,10 @@ static int32_t CaptureCloseImpl(struct AlsaCapture *captureIns)
 
 static int32_t CaptureCheckMmapMode(struct AlsaSoundCard *cardIns)
 {
-    int32_t ret;
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
 
     if (!cardIns->mmapFlag) {
-        ret = ResetCaptureParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
+        int32_t ret = ResetCaptureParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("AudioSetParamsMmap failed!");
             return ret;
@@ -917,6 +913,7 @@ static void RegisterCaptureImpl(struct AlsaCapture *captureIns)
 {
     if (captureIns == NULL) {
         AUDIO_FUNC_LOGE("captureIns is NULL!");
+        return;
     }
 
     captureIns->Init = CaptureInitImpl;

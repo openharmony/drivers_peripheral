@@ -835,13 +835,12 @@ int32_t AudioRenderRenderFrame(
     struct IAudioRender *render, const int8_t *frame, uint32_t frameLen, uint64_t *replyBytes)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
-    pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
     if (hwRender == NULL || frame == NULL || replyBytes == NULL ||
         hwRender->renderParam.frameRenderMode.buffer == NULL) {
-        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("Render Frame Paras is NULL!");
         return AUDIO_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
     if (frameLen > FRAME_DATA) {
         pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("Out of FRAME_DATA size!");

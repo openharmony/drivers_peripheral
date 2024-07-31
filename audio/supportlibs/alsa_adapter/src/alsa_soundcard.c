@@ -228,7 +228,7 @@ static int32_t CfgSaveAdapterStruct(cJSON *adapter, struct AlsaAdapterCfgInfo *i
 
 static int32_t CfgParseAdapterItems(cJSON *adapterObj)
 {
-    int32_t ret, adapterNum;
+    int32_t adapterNum;
     cJSON *adapterItems = NULL;
 
     adapterItems = cJSON_GetObjectItem(adapterObj, "adapters");
@@ -253,7 +253,7 @@ static int32_t CfgParseAdapterItems(cJSON *adapterObj)
             AUDIO_FUNC_LOGE("Get adapter item from array failed!");
         }
 
-        ret = CfgSaveAdapterStruct(adapter, &info);
+        int32_t ret = CfgSaveAdapterStruct(adapter, &info);
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("CfgSaveAdapterStruct failed!");
             return HDF_FAILURE;
@@ -330,7 +330,6 @@ static struct AlsaDevInfo *DevGetInfoByPcmInfoId(const char * name)
 
 static int32_t DevSaveCardPcmInfo(snd_ctl_t *handle, snd_pcm_stream_t stream, int card, const char *deviceName)
 {
-    int32_t ret;
     int pcmDev = -1;
     snd_ctl_card_info_t *info = NULL;
     snd_pcm_info_t *pcminfo = NULL;
@@ -349,7 +348,7 @@ static int32_t DevSaveCardPcmInfo(snd_ctl_t *handle, snd_pcm_stream_t stream, in
         snd_pcm_info_set_device(pcminfo, pcmDev);
         snd_pcm_info_set_subdevice(pcminfo, 0);
         snd_pcm_info_set_stream(pcminfo, stream);
-        ret = snd_ctl_pcm_info(handle, pcminfo);
+        int32_t ret = snd_ctl_pcm_info(handle, pcminfo);
         if (ret < 0) {
             if (ret != -ENOENT) {
                 AUDIO_FUNC_LOGE("control digital audio info (%{public}d)", pcmDev);
@@ -644,7 +643,6 @@ snd_pcm_state_t SndGetRunState(struct AlsaSoundCard * cardIns)
 
 void SndCloseHandle(struct AlsaSoundCard *cardIns)
 {
-    int32_t ret;
     if (cardIns == NULL) {
         AUDIO_FUNC_LOGE("cardIns is NULL");
         return;
@@ -653,6 +651,7 @@ void SndCloseHandle(struct AlsaSoundCard *cardIns)
         cardIns->cardStatus -= 1;
     }
     if (cardIns->cardStatus == 0) {
+        int32_t ret;
         if (cardIns->pcmHandle != NULL) {
             ret = snd_pcm_close(cardIns->pcmHandle);
             if (ret < 0) {
@@ -1202,7 +1201,6 @@ int32_t SndElementWriteSwitch(
     struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, bool on)
 {
     int ret;
-    int value;
     snd_ctl_t *alsaHandle = NULL;
     snd_ctl_elem_id_t *elem_id;
     snd_ctl_elem_info_t *elem_info;
@@ -1235,7 +1233,7 @@ int32_t SndElementWriteSwitch(
     snd_ctl_elem_value_set_id(elem_value, elem_id);
     type = snd_ctl_elem_info_get_type(elem_info);
     if (type == SND_CTL_ELEM_TYPE_BOOLEAN) {
-        value = on ? 1 : 0;
+        int value = on ? 1 : 0;
         snd_ctl_elem_value_set_boolean(elem_value, 0, value);
     } else {
         AUDIO_FUNC_LOGE("Element value is not boolean type!\n");
@@ -1301,11 +1299,10 @@ int32_t SndElementWrite(
 int32_t SndElementGroupWrite(
     struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement* elemGroup, int32_t groupSize)
 {
-    int err;
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
 
     for (int i = 0; i < groupSize; ++i) {
-        err = SndElementWrite(cardIns, &elemGroup[i]);
+        int err = SndElementWrite(cardIns, &elemGroup[i]);
         if (err < 0) {
             AUDIO_FUNC_LOGE("Cant't set element %{public}s", elemGroup[i].name);
         }

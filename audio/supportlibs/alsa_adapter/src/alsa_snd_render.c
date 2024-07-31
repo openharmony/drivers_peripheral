@@ -64,10 +64,8 @@ static int32_t CreateRenderIns(void)
 
 static int32_t RenderFreeMemory(void)
 {
-    int32_t i;
-
     if (g_alsaRenderList != NULL) {
-        for (i = 0; i < MAX_CARD_NUM; i++) {
+        for (int32_t i = 0; i < MAX_CARD_NUM; i++) {
             if (g_alsaRenderList[i].soundCard.cardStatus != 0) {
                 AUDIO_FUNC_LOGE("refCount is not zero, Sound card in use!");
                 return HDF_ERR_DEVICE_BUSY;
@@ -214,7 +212,6 @@ static int32_t SetHWParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t acces
 static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
 {
     int32_t ret;
-    int32_t val = 1; /* val 0 = disable period event, 1 = enable period event */
     snd_pcm_sw_params_t *swParams = NULL;
     snd_pcm_t *handle = cardIns->pcmHandle;
     struct AlsaRender *renderIns = (struct AlsaRender *)cardIns;
@@ -251,6 +248,7 @@ static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
 
     /* enable period events when requested */
     if (renderIns->periodEvent) {
+        int32_t val = 1; /* val 0 = disable period event, 1 = enable period event */
         ret = snd_pcm_sw_params_set_period_event(handle, swParams, val);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("Unable to set period event: %{public}s", snd_strerror(ret));
@@ -568,7 +566,6 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
     const struct AudioPcmHwParams *hwParams)
 {
     int32_t ret, offset;
-    long frames;
     char *dataBuf;
     size_t sbufFrameSize;
     snd_pcm_state_t state;
@@ -588,7 +585,7 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
     dataBuf = handleData->frameRenderMode.buffer;
     offset = hwParams->bitsPerFrame / BIT_COUNT_OF_BYTE;
     while (sbufFrameSize > 0) {
-        frames = snd_pcm_writei(pcm, dataBuf, sbufFrameSize);
+        long frames = snd_pcm_writei(pcm, dataBuf, sbufFrameSize);
         if (frames > 0) {
             sbufFrameSize -= frames;
             dataBuf += frames * offset;
@@ -627,7 +624,6 @@ static int32_t RenderWriteiMmap(struct AlsaSoundCard *cardIns, const struct Audi
     uint32_t lastBuffSize;
     uint32_t loopTimes;
     uint32_t looper = 0;
-    uint32_t copyLen;
     int32_t count = 0;
     struct AudioMmapBufferDescriptor *mmapBufDesc = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
@@ -650,7 +646,7 @@ static int32_t RenderWriteiMmap(struct AlsaSoundCard *cardIns, const struct Audi
     lastBuffSize = ((totalSize % MIN_PERIOD_SIZE) == 0) ? MIN_PERIOD_SIZE : (totalSize % MIN_PERIOD_SIZE);
     loopTimes = (lastBuffSize == MIN_PERIOD_SIZE) ? (totalSize / MIN_PERIOD_SIZE) : (totalSize / MIN_PERIOD_SIZE + 1);
     while (looper < loopTimes) {
-        copyLen = (looper < (loopTimes - 1)) ? MIN_PERIOD_SIZE : lastBuffSize;
+        uint32_t copyLen = (looper < (loopTimes - 1)) ? MIN_PERIOD_SIZE : lastBuffSize;
         snd_pcm_uframes_t frames = (snd_pcm_uframes_t)(copyLen / frameSize);
         ret = snd_pcm_mmap_writei(
             cardIns->pcmHandle, (char *)mmapBufDesc->memoryAddress + mmapBufDesc->offset, frames);
@@ -860,12 +856,11 @@ static int32_t RenderSetMuteImpl(struct AlsaRender *renderIns, bool muteFlag)
 
 static int32_t RenderSetPauseStateImpl(struct AlsaRender *renderIns, bool pauseFlag)
 {
-    int32_t ret;
     int enable = pauseFlag ? AUDIO_ALSALIB_IOCTRL_PAUSE : AUDIO_ALSALIB_IOCTRL_RESUME;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
 
     if (cardIns->canPause) {
-        ret = snd_pcm_pause(cardIns->pcmHandle, enable);
+        int32_t ret = snd_pcm_pause(cardIns->pcmHandle, enable);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("snd_pcm_pause failed!");
             return HDF_FAILURE;
@@ -898,6 +893,7 @@ static void RegisterRenderImpl(struct AlsaRender *renderIns)
 {
     if (renderIns == NULL) {
         AUDIO_FUNC_LOGE("renderIns is NULL!");
+        return;
     }
 
     renderIns->Init = RenderInitImpl;
