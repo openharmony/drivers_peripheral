@@ -2684,13 +2684,35 @@ static void ClearSsidsList(struct DListHead *ssidsList)
     }
     DListHeadInit(ssidsList);
 }
+static int32_t SsidToMsg(struct nl_msg *msg, struct DListHead *scanSsids)
+{
+    struct SsidListNode *ssidListNode = NULL;
+    uint32_t index = 0;
+    struct nlattr *nestedSsid = NULL;
 
+    if (!DListIsEmpty(scanSsids)) {
+        nestedSsid = nla_nest_start(msg, NL80211_ATTR_SCAN_SSIDS);
+        if (nestedSsid == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
+            ClearSsidsList(scanSsids);
+            return RET_CODE_FAILURE;
+        }
+        DLIST_FOR_EACH_ENTRY(ssidListNode, scanSsids, struct SsidListNode, entry) {
+            if (nla_put(msg, index, ssidListNode->ssidInfo.ssidLen, ssidListNode->ssidInfo.ssid) != RET_CODE_SUCCESS) {
+                HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed.", __FUNCTION__);
+                ClearSsidsList(scanSsids);
+                return RET_CODE_FAILURE;
+            }
+            index++;
+        }
+        nla_nest_end(msg, nestedSsid);
+    }
+    ClearSsidsList(scanSsids);
+    return RET_CODE_SUCCESS;
+}
 static int32_t ProcessSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, const WifiPnoSettings *pnoSettings)
 {
     uint8_t scanSsidsCount = 0;
-    struct SsidListNode *ssidListNode = NULL;
-    struct nlattr *nestedSsid = NULL;
-    uint32_t index = 0;
     struct DListHead scanSsids = {0};
 
     DListHeadInit(&scanSsids);
@@ -2720,25 +2742,7 @@ static int32_t ProcessSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, 
         DListInsertTail(&ssidNode->entry, &scanSsids);
         scanSsidsCount++;
     }
-    if (!DListIsEmpty(&scanSsids)) {
-        nestedSsid = nla_nest_start(msg, NL80211_ATTR_SCAN_SSIDS);
-        if (nestedSsid == NULL) {
-            HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
-            ClearSsidsList(&scanSsids);
-            return RET_CODE_FAILURE;
-        }
-        DLIST_FOR_EACH_ENTRY(ssidListNode, &scanSsids, struct SsidListNode, entry) {
-            if (nla_put(msg, index, ssidListNode->ssidInfo.ssidLen, ssidListNode->ssidInfo.ssid) != RET_CODE_SUCCESS) {
-                HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed.", __FUNCTION__);
-                ClearSsidsList(&scanSsids);
-                return RET_CODE_FAILURE;
-            }
-            index++;
-        }
-        nla_nest_end(msg, nestedSsid);
-    }
-    ClearSsidsList(&scanSsids);
-    return RET_CODE_SUCCESS;
+    return SsidToMsg(msg, &scanSsids);
 }
 
 static int32_t ProcessScanPlanToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, const WifiPnoSettings *pnoSettings)
