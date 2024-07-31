@@ -44,7 +44,7 @@ mem_smaps_file_name = ""
 def run_cmd(cmd):
     __func__ = inspect.currentframe().f_code.co_name
     print(f"{__func__}: {cmd}")
-    output = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True,
+    output = subprocess.run(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True,
                             check=True).stdout
     print(f"{__func__}: result:{str(output)}")
     return output
