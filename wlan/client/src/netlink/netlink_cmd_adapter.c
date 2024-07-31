@@ -2712,6 +2712,8 @@ static int32_t ProcessSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, 
         if (memcpy_s(ssidNode->ssidInfo.ssid, MAX_SSID_LEN, pnoSettings->pnoNetworks[i].ssid.ssid,
                 pnoSettings->pnoNetworks[i].ssid.ssidLen) != EOK) {
             HILOG_ERROR(LOG_CORE, "%s: memcpy_s failed.", __FUNCTION__);
+            free(ssidNode);
+            ssidNode = NULL;
             ClearSsidsList(&scanSsids);
             return RET_CODE_FAILURE;
         }
