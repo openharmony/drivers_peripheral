@@ -74,6 +74,12 @@ public:
         return HDF_SUCCESS;
     }
 
+    int32_t ClearUserWakeupData(const std::string &wakeupPhrase) override
+    {
+        INTELLIGENT_VOICE_LOGD("enter");
+        return HDF_SUCCESS;
+    }
+
     static IntellVoiceEngineManager *GetInstance()
     {
         static IntellVoiceEngineManager manager;
