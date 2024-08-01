@@ -27,14 +27,19 @@
 
 #include "cJSON.h"
 #include "v1_0/istream_operator.h"
+#include "v1_1/istream_operator.h"
+#include "v1_2/istream_operator.h"
 #include "v1_0/types.h"
+#include "v1_1/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace std;
 using namespace OHOS::HDI::Camera::V1_0;
+using HDI::Camera::V1_1::OperationMode_V1_1;
+using HDI::Camera::V1_1::StreamInfo_V1_1;
 class DCameraProvider;
-class DStreamOperator : public IStreamOperator {
+class DStreamOperator : public HDI::Camera::V1_2::IStreamOperator {
 public:
     explicit DStreamOperator(std::shared_ptr<DMetadataProcessor> &dMetadataProcessor);
     DStreamOperator() = default;
@@ -45,6 +50,14 @@ public:
     DStreamOperator& operator=(DStreamOperator &&other) = delete;
 
 public:
+    int32_t UpdateStreams(const std::vector<StreamInfo_V1_1> &streamInfos) override;
+    int32_t ConfirmCapture(int32_t cId) override;
+
+    int32_t IsStreamsSupported_V1_1(OperationMode_V1_1 mode, const std::vector<uint8_t> &modeSetting,
+        const std::vector<StreamInfo_V1_1> &infos, StreamSupportType &type) override;
+    int32_t CreateStreams_V1_1(const std::vector<StreamInfo_V1_1> &streamInfos) override;
+    int32_t CommitStreams_V1_1(OperationMode_V1_1 mode, const std::vector<uint8_t> &modeSetting) override;
+
     int32_t IsStreamsSupported(OperationMode mode, const std::vector<uint8_t> &modeSetting,
         const std::vector<StreamInfo> &infos, StreamSupportType &type) override;
     int32_t CreateStreams(const std::vector<StreamInfo> &streamInfos) override;
@@ -71,6 +84,8 @@ public:
         function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> &resultCbk);
     void Release();
     std::vector<int> GetStreamIds();
+    DCamRetCode SetOutputVal(const DHBase &dhBase, const std::string &sinkAbilityInfo,
+        const std::string &sourceCodecInfo);
 
 private:
     bool IsCapturing();
@@ -130,6 +145,7 @@ private:
     int32_t DoCapture(int32_t captureId, const CaptureInfo &info, bool isStreaming);
     void InsertNotifyCaptureMap(int32_t captureId);
     void EraseNotifyCaptureMap(int32_t captureId);
+    bool CheckInputInfo();
 
 private:
     constexpr static uint32_t JSON_ARRAY_MAX_SIZE = 1000;
@@ -138,6 +154,8 @@ private:
     function<void(ErrorType, int)> errorCallback_;
 
     DHBase dhBase_;
+    std::string sinkAbilityInfo_;
+    std::string sourceCodecInfo_;
     std::vector<DCEncodeType> dcSupportedCodecType_;
     std::vector<DCEncodeType> sourceEncodeTypes_;
 
@@ -157,7 +175,7 @@ private:
     std::mutex halStreamLock_;
     bool isCapturing_ = false;
     std::mutex isCapturingLock_;
-    OperationMode currentOperMode_ = OperationMode::NORMAL;
+    OperationMode_V1_1 currentOperMode_ = OperationMode_V1_1::NORMAL;
     std::shared_ptr<OHOS::Camera::CameraMetadata> latestStreamSetting_;
     std::map<int, bool> notifyCaptureStartedMap_;
 };
