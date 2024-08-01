@@ -41,8 +41,6 @@
     },
     "build": {
       "sub_component": [
-        "//drivers/peripheral/codec/hdi_service:codec_client",
-        "//drivers/peripheral/codec/hdi_service:codec_service",
         "//drivers/peripheral/codec:hdf_media_codec"
       ],
       "test": [
@@ -61,24 +59,8 @@
               ],
               "header_base": "//drivers/peripheral/codec/interfaces/include"
           }
-        },
-        {
-          "name": "//drivers/peripheral/codec/hal/passthrough:libcodec_hdi_passthrough_impl",
-            "header": {
-              "header_files": [
-              ],
-              "header_base": "//drivers/peripheral/codec/interfaces/include"
-          }
-        },
-        {
-          "name": "//drivers/peripheral/codec/hdi_service:libcodec_client",
-            "header": {
-              "header_files": [
-              ],
-              "header_base": "//drivers/peripheral/codec/interfaces/include"
-          }
         }
-    ]
+      ]
     }
   }
 }

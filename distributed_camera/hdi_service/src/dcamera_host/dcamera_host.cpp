@@ -38,7 +38,7 @@ extern "C" ICameraHost *CameraHostImplGetInstance(void)
 OHOS::sptr<DCameraHost> DCameraHost::GetInstance()
 {
     if (instance_ == nullptr) {
-        instance_ = new DCameraHost();
+        instance_ = sptr<DCameraHost>(new DCameraHost());
         if (instance_ == nullptr) {
             DHLOGE("Get distributed camera host instance failed.");
             return nullptr;
@@ -54,7 +54,7 @@ int32_t DCameraHost::SetCallback(const sptr<HDI::Camera::V1_0::ICameraHostCallba
         return CamRetCode::INVALID_ARGUMENT;
     }
     dCameraHostCallback_ = callbackObj;
-    dCameraHostRecipient_ = new DCameraHostRecipient();
+    dCameraHostRecipient_ = sptr<DCameraHostRecipient>(new DCameraHostRecipient());
     return CamRetCode::NO_ERROR;
 }
 

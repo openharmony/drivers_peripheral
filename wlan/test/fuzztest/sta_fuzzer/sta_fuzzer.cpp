@@ -89,6 +89,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     if (rawData == nullptr || size == 0) {
         return false;
     }
+
     uint32_t cmdId = Convert2Uint32(rawData) % ((sizeof(g_fuzzWlanFuncs) / sizeof(g_fuzzWlanFuncs[0])));
     g_wlanObj = IWlanInterfaceGetInstance(g_wlanServiceName, false);
     if (g_wlanObj == nullptr) {

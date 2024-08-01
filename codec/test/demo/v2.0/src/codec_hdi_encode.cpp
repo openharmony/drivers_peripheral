@@ -645,7 +645,7 @@ int32_t CodecHdiEncode::OnFillBufferDone(const struct OmxCodecBuffer &buffer)
     ioOut_.write(static_cast<char *>(addr), buffer.filledLen);
     ioOut_.flush();
     count_++;
-    if (buffer.flag == OMX_BUFFERFLAG_EOS) {
+    if ((buffer.flag & static_cast<uint32_t>(OMX_BUFFERFLAG_EOS)) != 0) {
         exit_ = true;
         HDF_LOGI("OnFillBufferDone the END coming");
         return HDF_SUCCESS;

@@ -20,11 +20,4 @@ group("hdf_media_codec") {
     "hal/idl_service:codec_idl_omx_service",
     "image:codec_image_service",
   ]
-
-  if (drivers_peripheral_codec_feature_support_hdi_v1) {
-    deps += [
-      "hal/passthrough:codec_hdi_passthrough",
-      "hal/v1.0/buffer_manager:codec_buffer_manager",
-    ]
-  }
 }

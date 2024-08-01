@@ -495,6 +495,7 @@ int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const VdiCaptureInfo &
                                          info.enableShutterCallback_, isStreaming);
     request->SetFirstRequest(!isStreaming);
     for (auto id : info.streamIds_) {
+        std::lock_guard<std::mutex> l(streamLock_);
         RetCode rc = streamMap_[id]->AddRequest(request);
         if (rc != RC_OK) {
             return DEVICE_ERROR;

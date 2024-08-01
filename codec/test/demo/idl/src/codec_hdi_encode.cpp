@@ -517,19 +517,18 @@ void CodecHdiEncode::FreeBuffers()
     unUsedOutBuffers_.clear();
 
     CodecStateType status = CODEC_STATE_INVALID;
-    int32_t tryCount = 3;
-    do {
-        int32_t err = client_->GetState(status);
-        if (err != HDF_SUCCESS) {
-            HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
-            break;
-        }
-        if (status != CODEC_STATE_LOADED) {
-            HDF_LOGI("Wait for OMX_StateLoaded status");
-            this->WaitForStatusChanged();
-        }
-        tryCount--;
-    } while ((status != CODEC_STATE_LOADED) && (tryCount > 0));
+    auto err = client_->GetState(status);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
+        return;
+    }
+    // wait
+    if (status != CODEC_STATE_LOADED) {
+        HDF_LOGI("Wait for CODEC_STATE_LOADED status");
+        this->WaitForStatusChanged();
+    } else {
+        HDF_LOGI("status is %{public}d", status);
+    }
 }
 
 void CodecHdiEncode::Release()

@@ -30,6 +30,7 @@
 #define BUFF_SIZE 256
 
 #define WPA_HOSTAPD_NAME "hostapd"
+#define HOSTAPD_START_CMD "hostapd -g /data/service/el1/public/wifi/sockets/wpa/hostapd"
 #define WPA_SLEEP_TIME (100 * 1000) /* 100ms */
 
 int32_t HostapdInterfaceStartAp(struct IHostapdInterface *self);

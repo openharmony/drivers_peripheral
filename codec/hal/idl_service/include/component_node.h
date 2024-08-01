@@ -44,6 +44,8 @@ public:
     int32_t SendCommand(HDI::Codec::V3_0::CodecCommandType cmd, uint32_t param, int8_t *cmdData);
     int32_t GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param);
     int32_t SetParameter(OMX_INDEXTYPE paramIndex, const int8_t *param);
+    int32_t SetParameterWithBuffer(int32_t index, const std::vector<int8_t>& paramStruct,
+            const OmxCodecBuffer& inBuffer);
     int32_t GetConfig(OMX_INDEXTYPE index, int8_t *config);
     int32_t SetConfig(OMX_INDEXTYPE index, const int8_t *config);
     int32_t GetExtensionIndex(const char *parameterName, uint32_t& index);

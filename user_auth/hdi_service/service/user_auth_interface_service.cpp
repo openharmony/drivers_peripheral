@@ -936,22 +936,38 @@ static int32_t GetUpdateResult(int32_t userId, HdiEnrollResultInfo &info, Buffer
         info.rootSecret.resize(ROOT_SECRET_LEN);
         if (memcpy_s(info.rootSecret.data(), ROOT_SECRET_LEN, output.rootSecret->buf, ROOT_SECRET_LEN) != EOK) {
             IAM_LOGE("failed to copy rootSecret");
-            info.rootSecret.clear();
-            return RESULT_BAD_COPY;
+            ret = RESULT_BAD_COPY;
+            goto ERROR;
         }
         info.oldRootSecret.resize(ROOT_SECRET_LEN);
         if (memcpy_s(info.oldRootSecret.data(), ROOT_SECRET_LEN, output.oldRootSecret->buf, ROOT_SECRET_LEN) != EOK) {
             IAM_LOGE("failed to copy oldRootSecret");
-            info.oldRootSecret.clear();
-            DestoryBuffer(output.rootSecret);
-            return RESULT_BAD_COPY;
+            ret = RESULT_BAD_COPY;
+            goto ERROR;
+        }
+        info.authToken.resize(AUTH_TOKEN_LEN);
+        if (memcpy_s(info.authToken.data(), AUTH_TOKEN_LEN, output.authToken->buf, AUTH_TOKEN_LEN) != EOK) {
+            IAM_LOGE("failed to copy authToken");
+            ret = RESULT_BAD_COPY;
+            goto ERROR;
         }
         info.credentialId = output.credentialId;
         CopyCredentialInfo(output.deletedCredential, info.oldInfo);
-        DestoryBuffer(output.rootSecret);
-        DestoryBuffer(output.oldRootSecret);
+        goto EXIT;
     }
 
+ERROR:
+    (void)memset_s(info.rootSecret.data(), info.rootSecret.size(), 0, info.rootSecret.size());
+    info.rootSecret.clear();
+    (void)memset_s(info.oldRootSecret.data(), info.oldRootSecret.size(), 0, info.oldRootSecret.size());
+    info.oldRootSecret.clear();
+    (void)memset_s(info.authToken.data(), info.authToken.size(), 0, info.authToken.size());
+    info.authToken.clear();
+
+EXIT:
+    DestoryBuffer(output.rootSecret);
+    DestoryBuffer(output.oldRootSecret);
+    DestoryBuffer(output.authToken);
     return ret;
 }
 

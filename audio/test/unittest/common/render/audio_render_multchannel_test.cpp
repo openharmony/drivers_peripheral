@@ -29,7 +29,6 @@ const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4 * 1024;
 const int32_t AUDIO_RENDER_CHANNELCOUNT = 6;
 const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
 const int32_t MAX_AUDIO_ADAPTER_DESC = 5;
-const int32_t MULTCHANNEL_SUGGEST_BUFFER_SIZE = 1920;
 
 class AudioUtRenderMultchannelTest : public testing::Test {
 public:
@@ -136,6 +135,7 @@ void AudioUtRenderMultchannelTest::TearDown()
 {
     ASSERT_NE(devDescriptorName_, nullptr);
     free(devDescriptorName_);
+    devDescriptorName_ = nullptr;
 
     if (adapter_ != nullptr) {
         adapter_->DestroyRender(adapter_, renderId_);
@@ -150,4 +150,4 @@ void AudioUtRenderMultchannelTest::TearDown()
     }
 }
 
-}// end of namespace
+} // end of namespace
