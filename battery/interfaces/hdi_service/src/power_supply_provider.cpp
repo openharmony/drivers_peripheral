@@ -80,8 +80,9 @@ PowerSupplyProvider::~PowerSupplyProvider()
     for (auto it = nodeCacheFiles_.begin(); it != nodeCacheFiles_.end();) {
         int32_t fd = it->second;
         close(fd);
-        nodeCacheFiles_.erase(it++);
+        it++;
     }
+    nodeCacheFiles_.clear();
 }
 
 inline int32_t PowerSupplyProvider::ParseInt(const char* str)
