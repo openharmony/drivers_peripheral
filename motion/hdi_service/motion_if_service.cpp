@@ -67,14 +67,14 @@ int32_t MotionIfService::Init()
 {
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s get motion vdi  version failed!", __func__);
-        return HDF_FAILURE;    
+        return HDF_FAILURE;
     }
 
     int32_t ret = motionVdiImpl_->InitMotion();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s impl init failed,error code is %{public}d", __func__, ret);
     }
-    
+
     return ret;
 }
 

@@ -112,7 +112,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, LoadAdapter_002, TestSize.Level1)
     descriptor.ports.push_back(audioPort);
     sptr<IAudioAdapter> adapter = nullptr;
     AudioAdapterDescriptor desc;
-    sptr<AudioAdapterInterfaceImpl> AudioAdapter = new AudioAdapterInterfaceImpl(desc);
+    sptr<AudioAdapterInterfaceImpl> AudioAdapter = sptr<AudioAdapterInterfaceImpl>(new AudioAdapterInterfaceImpl(desc));
     audioManagerInterfaceImpl_->mapAudioAdapter_.insert(std::make_pair(adpName, AudioAdapter));
     EXPECT_EQ(HDF_SUCCESS, audioManagerInterfaceImpl_->LoadAdapter(descriptor, adapter));
     EXPECT_EQ(HDF_SUCCESS, audioManagerInterfaceImpl_->UnloadAdapter(adpName));
@@ -165,7 +165,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, Notify_002, TestSize.Level1)
     uint32_t streamId = 0;
     DAudioEvent event;
     AudioAdapterDescriptor desc;
-    sptr<AudioAdapterInterfaceImpl> AudioAdapter = new AudioAdapterInterfaceImpl(desc);
+    sptr<AudioAdapterInterfaceImpl> AudioAdapter = sptr<AudioAdapterInterfaceImpl>(new AudioAdapterInterfaceImpl(desc));
     audioManagerInterfaceImpl_->mapAudioAdapter_.insert(std::make_pair(adpName, AudioAdapter));
     EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->Notify(adpName, devId, streamId, event));
 }
@@ -209,7 +209,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, CreateAdapter_002, TestSize.Level1)
     audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     std::string adpName = "adpName";
     uint32_t devId = static_cast<uint32_t>(DEFAULT_RENDER_ID);
-    sptr<IDAudioCallback> callback = new MockIDAudioCallback();
+    sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(DH_SUCCESS, audioManagerInterfaceImpl_->CreateAdapter(adpName, devId, callback));
 }
 

@@ -42,6 +42,7 @@ public:
     int32_t GetHapticCapacity(HapticCapacity& hapticCapacity) override;
     int32_t GetHapticStartUpTime(int32_t mode, int32_t& startUpTime) override;
     int32_t StartByIntensity(const std::string& effectType, uint16_t intensity) override;
+    int32_t GetAllWaveInfo(int32_t vibratorId, std::vector<HdfWaveInformation> &info) override;
     int32_t GetVibratorVdiImpl();
 
 private:

@@ -350,7 +350,10 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
 
     pthread_mutex_lock(&g_managerMutex);
     struct IAudioAdapterVdi *vdiAdapter = NULL;
+    HdfAudioStartTrace("Hdi:AudioManagerVendorLoadAdapter", 0);
     ret = priv->vdiManager->LoadAdapter(priv->vdiManager, &vdiDesc, &vdiAdapter);
+    HdfAudioFinishTrace();
+
     AudioManagerReleaseVdiDesc(&vdiDesc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager call LoadAdapter fail, ret=%{public}d", ret);
@@ -401,8 +404,9 @@ static int32_t AudioManagerVendorUnloadAdapter(struct IAudioManager *manager, co
         pthread_mutex_unlock(&g_managerMutex);
         return HDF_SUCCESS;
     }
-
+    HdfAudioStartTrace("Hdi:AudioManagerVendorUnloadAdapter", 0);
     priv->vdiManager->UnloadAdapter(priv->vdiManager, vdiAdapter);
+    HdfAudioFinishTrace();
 
     AudioReleaseAdapterVdi(descIndex);
     pthread_mutex_unlock(&g_managerMutex);

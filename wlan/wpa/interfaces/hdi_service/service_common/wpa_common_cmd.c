@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <string.h>
+#include "hdi_wpa_common.h"
 
 #define BUF_SIZE 512
 
@@ -274,7 +275,7 @@ int32_t WpaInterfaceSetNetwork(struct IWpaInterface *self, const char *ifName,
     }
     conf.id = networkId;
     int pos = -1;
-    for (unsigned int i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
+    for (int i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
         if (strcmp(g_wpaSsidFields[i].fieldName, name) == 0) {
             pos = i;
             conf.param = g_wpaSsidFields[i].field;
@@ -372,6 +373,7 @@ int32_t WpaInterfaceListNetworks(struct IWpaInterface *self, const char *ifName,
         free(infos);
         return HDF_FAILURE;
     }
+    WifiNetworkInfo *infosTmp = infos;
     HDF_LOGI("%{public}s: wpaCliCmdListNetworks success size = %{public}d", __func__, size);
     for (int i = 0; i < ((size > MAX_NETWORKS_NUM) ? MAX_NETWORKS_NUM : size); i++) {
         WpaFillWpaListNetworkParam(infos, networkInfo);
@@ -379,7 +381,7 @@ int32_t WpaInterfaceListNetworks(struct IWpaInterface *self, const char *ifName,
         networkInfo++;
     }
     *networkInfoLen = size;
-    free(infos);
+    free(infosTmp);
     return HDF_SUCCESS;
 }
 
@@ -654,8 +656,8 @@ const char *macToStr(const u8 *addr)
     const int macAddrIndexFive = 4;
     const int macAddrIndexSix = 5;
     static char macToStr[WIFI_BSSID_LENGTH];
-    if (os_snprintf(macToStr, sizeof(macToStr), "%02x:%02x:%02x:%02x:%02x:%02x", addr[macAddrIndexOne],
-        addr[macAddrIndexTwo], addr[macAddrIndexThree], addr[macAddrIndexFour],
+    if (snprintf_s(macToStr, sizeof(macToStr), sizeof(macToStr)-1, "%02x:%02x:%02x:%02x:%02x:%02x",
+        addr[macAddrIndexOne], addr[macAddrIndexTwo], addr[macAddrIndexThree], addr[macAddrIndexFour],
         addr[macAddrIndexFive], addr[macAddrIndexSix]) < 0) {
         return NULL;
     }
@@ -1046,6 +1048,7 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
     WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
     if (pWpaInterface == NULL) {
         HDF_LOGE("%{public}s: Get wpa global interface failed!", __func__);
+        return;
     }
     int ret = pWpaInterface->wpaCliTerminate();
     if (ret != 0) {
@@ -1512,6 +1515,17 @@ static int32_t ProcessEventWpaWpsTimeout(struct HdfWpaRemoteNode *node,
     return ret;
 }
 
+static int32_t ProcessEventWpaAuthTimeout(struct HdfWpaRemoteNode *node, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+    if (node == NULL || node->callbackObj == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = node->callbackObj->OnEventAuthTimeout(node->callbackObj, ifName);
+    return ret;
+}
+
 static int32_t ProcessEventWpaRecvScanResult(struct HdfWpaRemoteNode *node,
     struct WpaRecvScanResultParam *recvScanResultParam, const char *ifName)
 {
@@ -1686,6 +1700,9 @@ static int32_t HdfStaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
             break;
         case WPA_EVENT_WPS_TIMEMOUT:
             ret = ProcessEventWpaWpsTimeout(pos, ifName);
+            break;
+        case WPA_EVENT_AUTH_TIMEOUT:
+            ProcessEventWpaAuthTimeout(pos, ifName);
             break;
         case WPA_EVENT_RECV_SCAN_RESULT:
             ret = ProcessEventWpaRecvScanResult(pos, (struct WpaRecvScanResultParam *)data, ifName);
@@ -2019,6 +2036,14 @@ int32_t WpaInterfaceRemoveWpaIface(struct IWpaInterface *self, const char *ifNam
     }
     ret = pWpaInterface->wpaCliRemoveIface(pWpaInterface, ifName);
     HDF_LOGI("%{public}s Remove wpa iface finish, ifName: %{public}s ret = %{public}d", __func__, ifName, ret);
+    if (ret == 0) {
+        if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+            ReleaseWpaCtrl(&(pWpaInterface->p2pCtrl));
+        }
+        if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
+            ReleaseWpaCtrl(&(pWpaInterface->staCtrl));
+        }
+    }
     return (ret == 0 ? HDF_SUCCESS : HDF_FAILURE);
 }
 

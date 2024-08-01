@@ -22,6 +22,8 @@
 #include <memory>
 #include <string>
 
+#include "remote_death_recipient.h"
+
 enum SIM_SECURE_ELEMENT_RET {
     SIM_SECURE_ELEMENT_RET_OK = 0,
     SIM_SECURE_ELEMENT_RET_CONTEXT_FAIL = 1,
@@ -62,6 +64,12 @@ public:
         OHOS::HDI::SecureElement::SimSecureElement::V1_0::SecureElementStatus& status);
 
     int32_t reset(OHOS::HDI::SecureElement::SimSecureElement::V1_0::SecureElementStatus& status);
+private:
+    void OnRemoteDied(const wptr<IRemoteObject> &object);
+    int32_t AddSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj);
+    int32_t RemoveSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj);
+
+    sptr<RemoteDeathRecipient> remoteDeathRecipient_ = nullptr;
 private:
     class DynamicLoad {
     public:

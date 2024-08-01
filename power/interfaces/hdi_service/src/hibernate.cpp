@@ -32,6 +32,7 @@
 #include <linux/fiemap.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <mntent.h>
 
 #include <unique_fd.h>
 #include <hdf_base.h>
@@ -77,9 +78,6 @@ constexpr const char * const SYS_POWER_RESUME_OFFSET = "/sys/power/resume_offset
 constexpr const char * const HIBERNATE_STATE_PATH = "/sys/power/state";
 constexpr const char * const HIBERNATE_STATE = "disk";
 
-// Partition the swap file is located, which can be configured in subsequent version.
-constexpr const char * const RESUME = "/dev/nvme0n1p61";
-
 struct SwapfileCfg {
     unsigned long long len;
 };
@@ -100,6 +98,39 @@ void Hibernate::Init()
     HDF_LOGI("hibernate init begin.");
     auto myThread = std::thread([this] { this->InitSwap(); });
     myThread.detach();
+}
+
+int32_t Hibernate::GetResumeInfo(std::string &resumeInfo)
+{
+    FILE *fp;
+    struct mntent *me;
+    int32_t ret = HDF_FAILURE;
+    if (!(fp = setmntent("/proc/mounts", "r"))) {
+        HDF_LOGE("open file failed, errno = %{public}d", errno);
+        return ret;
+    }
+    while ((me = getmntent(fp))) {
+        if (strcmp(me->mnt_dir, "/data") == 0) {
+            char resolvedPath[PATH_MAX] = {0};
+            if (realpath(me->mnt_fsname, resolvedPath) == nullptr) {
+                HDF_LOGE("realpath error, errno = %{public}d", errno);
+                break;
+            }
+            std::string fileSystemInfo = resolvedPath;
+            auto index = fileSystemInfo.find_last_of('/');
+            if (index == std::string::npos) {
+                HDF_LOGE("file system info error");
+                break;
+            }
+            auto partitionNum = fileSystemInfo.substr(index + 1);
+            HDF_LOGI("partition num: %{public}s", partitionNum.c_str());
+            resumeInfo = "/dev/" + partitionNum;
+            ret = HDF_SUCCESS;
+            break;
+        }
+    }
+    endmntent(fp);
+    return ret;
 }
 
 void Hibernate::InitSwap()
@@ -302,9 +333,11 @@ int32_t Hibernate::WriteOffsetAndResume()
         HDF_LOGE("write offset and resume error, fd < 0, errno=%{public}d", errno);
         return HDF_FAILURE;
     }
-
-    std::string offsetResume = std::to_string(resumeOffset) + ":" + RESUME;
-    HDF_LOGI("offsetResume=%{public}s", offsetResume.c_str());
+    std::string resumeInfo;
+    if (GetResumeInfo(resumeInfo) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    std::string offsetResume = std::to_string(resumeOffset) + ":" + resumeInfo;
 
     bool ret = SaveStringToFd(fd, offsetResume.c_str());
     if (!ret) {
@@ -347,7 +380,12 @@ int32_t Hibernate::WriteResume()
         return HDF_FAILURE;
     }
 
-    bool ret = SaveStringToFd(fd, RESUME);
+    std::string resumeInfo;
+    if (GetResumeInfo(resumeInfo) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+
+    bool ret = SaveStringToFd(fd, resumeInfo);
     if (!ret) {
         HDF_LOGE("WriteResume fail");
         return HDF_FAILURE;

@@ -34,4 +34,4 @@ public:
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPER_SERVICE_H
+#endif // OHOS_HDI_DISPLAY_BUFFER_V1_2_MAPPER_SERVICE_H

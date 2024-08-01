@@ -34,7 +34,7 @@ extern "C" IDCameraProvider *HdiImplGetInstance(void)
 OHOS::sptr<DCameraProvider> DCameraProvider::GetInstance()
 {
     if (instance_ == nullptr) {
-        instance_ = new DCameraProvider();
+        instance_ = sptr<DCameraProvider>(new DCameraProvider());
         if (instance_ == nullptr) {
             DHLOGE("Get distributed camera provider instance failed.");
             return nullptr;

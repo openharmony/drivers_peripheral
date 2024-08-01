@@ -22,7 +22,8 @@
 #include "parse_effect_config.h"
 #include "audio_uhdf_log.h"
 
-#define AUDIO_EFFECT_CONFIG  HDF_CONFIG_DIR"/audio_effect.json"
+#define AUDIO_EFFECT_PLAFORM_CONFIG HDF_CONFIG_DIR"/audio_effect.json"
+#define AUDIO_EFFECT_PRODUCT_CONFIG HDF_CHIP_PROD_CONFIG_DIR"/audio_effect.json"
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 struct ConfigDescriptor *g_cfgDescs = NULL;
 
@@ -286,8 +287,19 @@ ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", (*libCfgDescs)
 
 void ModelInit(void)
 {
+    FILE *file;
     struct ConfigDescriptor *cfgDesc = NULL;
-    if (AudioEffectGetConfigDescriptor(AUDIO_EFFECT_CONFIG, &cfgDesc) != HDF_SUCCESS) {
+    int32_t ret;
+    file = fopen(AUDIO_EFFECT_PRODUCT_CONFIG, "r");
+    if (file == NULL) {
+        ret = AudioEffectGetConfigDescriptor(AUDIO_EFFECT_PLAFORM_CONFIG, &cfgDesc);
+        HDF_LOGI("%{public}s: %{public}s!", __func__, AUDIO_EFFECT_PLAFORM_CONFIG);
+    } else {
+        ret = AudioEffectGetConfigDescriptor(AUDIO_EFFECT_PRODUCT_CONFIG, &cfgDesc);
+        HDF_LOGI("%{public}s: %{public}s!", __func__, AUDIO_EFFECT_PRODUCT_CONFIG);
+        (void)fclose(file);
+    }
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AudioEffectGetConfigDescriptor fail!", __func__);
         return;
     }

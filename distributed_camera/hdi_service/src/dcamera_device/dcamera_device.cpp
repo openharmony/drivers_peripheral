@@ -53,7 +53,7 @@ void DCameraDevice::Init(const std::string &sinkAbilityInfo)
 DCamRetCode DCameraDevice::CreateDStreamOperator()
 {
     if (dCameraStreamOperator_ == nullptr) {
-        dCameraStreamOperator_ = new (std::nothrow) DStreamOperator(dMetadataProcessor_);
+        dCameraStreamOperator_ = sptr<DStreamOperator>(new (std::nothrow) DStreamOperator(dMetadataProcessor_));
         if (dCameraStreamOperator_ == nullptr) {
             DHLOGE("Create distributed camera stream operator failed.");
             return DEVICE_NOT_INIT;

@@ -410,6 +410,24 @@ int32_t VibratorIfService::StartByIntensity(const std::string& effectType, uint1
     return ret;
 }
 
+int32_t VibratorIfService::GetAllWaveInfo(int32_t vibratorId, std::vector<HdfWaveInformation> &info)
+{
+    HDF_LOGD("%{public}s: Enter the GetAllWaveInfo function", __func__);
+    if (vibratorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    StartTrace(HITRACE_TAG_HDF, "GetAllWaveInfo");
+    int32_t ret = vibratorVdiImpl_->GetAllWaveInfo(vibratorId, info);
+    FinishTrace(HITRACE_TAG_HDF);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s GetAllWaveInfo failed, error code is %{public}d", __func__, ret);
+    }
+
+    return ret;
+}
+
 extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
 {
     VibratorIfService *impl = new (std::nothrow) VibratorIfService();

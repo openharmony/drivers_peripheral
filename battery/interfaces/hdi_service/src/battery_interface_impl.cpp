@@ -14,9 +14,9 @@
  */
 
 #include "battery_interface_impl.h"
-#include "hdf_base.h"
 #include "battery_config.h"
 #include "battery_log.h"
+#include "battery_xcollie.h"
 
 namespace OHOS {
 namespace HDI {
@@ -247,6 +247,7 @@ int32_t BatteryInterfaceImpl::GetChargeType(ChargeType& chargeType)
 
 int32_t BatteryInterfaceImpl::SetBatteryConfig(const std::string& sceneName, const std::string& value)
 {
+    Battery::BatteryXCollie batteryXcollie("Battery_SetBatteryConfig");
     auto& batteryConfig = BatteryConfig::GetInstance();
     std::map<std::string, BatteryConfig::ChargeSceneConfig>
         chargeSceneConfigMap = batteryConfig.GetChargeSceneConfigMap();
@@ -267,6 +268,7 @@ int32_t BatteryInterfaceImpl::SetBatteryConfig(const std::string& sceneName, con
 
 int32_t BatteryInterfaceImpl::GetBatteryConfig(const std::string& sceneName, std::string& value)
 {
+    Battery::BatteryXCollie batteryXcollie("Battery_GetBatteryConfig");
     auto& batteryConfig = BatteryConfig::GetInstance();
     std::map<std::string, BatteryConfig::ChargeSceneConfig>
         chargeSceneConfigMap = batteryConfig.GetChargeSceneConfigMap();
@@ -289,6 +291,7 @@ int32_t BatteryInterfaceImpl::GetBatteryConfig(const std::string& sceneName, std
 
 int32_t BatteryInterfaceImpl::IsBatteryConfigSupported(const std::string& sceneName, bool& value)
 {
+    Battery::BatteryXCollie batteryXcollie("Battery_IsBatteryConfigSupported");
     auto& batteryConfig = BatteryConfig::GetInstance();
     std::map<std::string, BatteryConfig::ChargeSceneConfig>
         chargeSceneConfigMap = batteryConfig.GetChargeSceneConfigMap();

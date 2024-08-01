@@ -15,7 +15,6 @@
 
 #include "codec_component_manager_service.h"
 #include <hdf_base.h>
-#include <atomic>
 #include <hitrace_meter.h>
 #include "codec_component_config.h"
 #include "codec_component_service.h"
@@ -27,7 +26,7 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace V3_0 {
-sptr<CodecComponentManagerService> g_codecManagerService = nullptr;
+sptr<CodecComponentManagerService> g_codecManagerService = sptr<CodecComponentManagerService>();
 std::once_flag m_serviceFlag;
 using OHOS::Codec::Omx::ComponentNode;
 extern "C" ICodecComponentManager *CodecComponentManagerImplGetInstance(void)

@@ -158,7 +158,7 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureReqMmapBuffer001, TestSize.Level
     struct AudioMmapBufferDescriptor desc = {0};
 
     int32_t ret = mmapCapture_->ReqMmapBuffer(mmapCapture_, MMAP_SUGGUEST_REQ_SIZE, &desc);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || HDF_ERR_INVALID_PARAM);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
     if (ret == HDF_SUCCESS) {
         ASSERT_NE(desc.memoryFd, MMAP_INVALID_FD);
     }
@@ -180,7 +180,7 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureControl001, TestSize.Level1)
     struct AudioMmapBufferDescriptor desc = {0};
 
     int32_t ret = mmapCapture_->ReqMmapBuffer(mmapCapture_, MMAP_SUGGUEST_REQ_SIZE, &desc);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || HDF_ERR_INVALID_PARAM);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
     if (ret == HDF_SUCCESS) {
         ASSERT_NE(desc.memoryFd, MMAP_INVALID_FD);
     }
@@ -197,7 +197,7 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureControlException001, TestSize.Le
     struct AudioMmapBufferDescriptor desc = {0};
 
     int32_t ret = mmapCapture_->ReqMmapBuffer(mmapCapture_, MMAP_SUGGUEST_REQ_SIZE, &desc);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || HDF_ERR_INVALID_PARAM);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
     if (ret == HDF_SUCCESS) {
         ASSERT_NE(desc.memoryFd, MMAP_INVALID_FD);
     }
@@ -222,7 +222,7 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPosition001, TestSize.Lev
     struct AudioTimeStamp time = {0};
 
     int32_t ret = mmapCapture_->ReqMmapBuffer(mmapCapture_, MMAP_SUGGUEST_REQ_SIZE, &desc);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || HDF_ERR_INVALID_PARAM);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
     if (ret == HDF_SUCCESS) {
         ASSERT_NE(desc.memoryFd, MMAP_INVALID_FD);
     }
@@ -244,7 +244,7 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPositionException001, Tes
     struct AudioTimeStamp time = {0};
 
     int32_t ret = mmapCapture_->ReqMmapBuffer(mmapCapture_, MMAP_SUGGUEST_REQ_SIZE, &desc);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || HDF_ERR_INVALID_PARAM);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
     if (ret == HDF_SUCCESS) {
         ASSERT_NE(desc.memoryFd, MMAP_INVALID_FD);
     }

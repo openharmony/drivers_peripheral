@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <osal_mem.h>
 #include "wifi_driver_client.h"
- #ifdef OHOS_ARCH_LITE
+#ifdef OHOS_ARCH_LITE
 #include "hostapd_client.h"
 #include "wpa_client.h"
 #endif
@@ -58,14 +58,6 @@ static int32_t Hid2dFunCb(const uint8_t *recvMsg, uint32_t recvMsgLen)
 {
     (void)recvMsg;
     (void)recvMsgLen;
-    return RET_CODE_SUCCESS;
-}
-
-static int32_t Hid2dFunCb2(uint32_t event, void *data, const char *ifName)
-{
-    (void)event;
-    (void)data;
-    (void)ifName;
     return RET_CODE_SUCCESS;
 }
 
@@ -1043,74 +1035,82 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
  * @tc.require:
  */
 #ifdef OHOS_ARCH_LITE
-HWTEST_F(WifiClientTest, WpaEventReport, TestSize.Level1)
+static int32_t WpaEventCb(uint32_t event, void *respData, const char *ifName)
 {
-    int32_t dstAddr = 0;
-    void *data = NULL;
-    const char *ifNameInvalid = "wlanTest";
-    WpaEventReport(ifNameInvalid, dstAddr, data);
+    (void)event;
+    (void)respData;
+    (void)ifName;
+    return RET_CODE_SUCCESS;
 }
-/**
- * @tc.name: WpaEventReport
- * @tc.desc: set rx remain On channel test
+
+ /**
+ * @tc.name: WpaRegisterEventCallback01
+ * @tc.desc: wpa register event callback function test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiClientTest, WpaRegisterEventCallback, TestSize.Level1)
+HWTEST_F(WifiClientTest, WpaRegisterEventCallback01, TestSize.Level1)
 {
-    int32_t dstAddr = 0;
-    const char *ifNameInvalid = "wlanTest";
-    WpaRegisterEventCallback(Hid2dFunCb2, dstAddr, ifNameInvalid);
+    int32_t ret;
+
+    ret = WpaRegisterEventCallback(nullptr, WIFI_WPA_TO_HAL_CLIENT, WLAN_IFNAME);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WpaRegisterEventCallback(WpaEventCb, WIFI_WPA_TO_HAL_CLIENT, nullptr);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    WpaRegisterEventCallback(WpaEventCb, WIFI_WPA_TO_HAL_CLIENT, WLAN_IFNAME);
+    WpaUnregisterEventCallback(WpaEventCb, WIFI_WPA_TO_HAL_CLIENT, WLAN_IFNAME);
+    WpaUnregisterEventCallback(nullptr, WIFI_WPA_TO_HAL_CLIENT, WLAN_IFNAME);
+    WpaUnregisterEventCallback(WpaEventCb, WIFI_WPA_TO_HAL_CLIENT, nullptr);
 }
+
 /**
- * @tc.name: WpaUnregisterEventCallback
- * @tc.desc: set rx remain On channel test
+ * @tc.name: WpaEventReport02
+ * @tc.desc: wpa cb interface test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiClientTest, WpaUnregisterEventCallback, TestSize.Level1)
+HWTEST_F(WifiClientTest, WpaEventReport02, TestSize.Level1)
 {
-    int32_t dstAddr = 0;
-    const char *ifNameInvalid = "wlanTest";
-    WpaUnregisterEventCallback(Hid2dFunCb2, dstAddr, ifNameInvalid);
+    struct WpaStateChangedParam wpaStateChangedParma = {0};
+    WpaEventReport(WLAN_IFNAME, WPA_EVENT_STATE_CHANGED, (void *) &wpaStateChangedParma);
+    WpaEventReport(WLAN_IFNAME, WPA_EVENT_STATE_CHANGED, nullptr);
+    WpaEventReport(nullptr, WPA_EVENT_STATE_CHANGED, (void *) &wpaStateChangedParma);
 }
+
 /**
- * @tc.name: HostapdEventReport
- * @tc.desc: set rx remain On channel test
+ * @tc.name: HostapdRegisterEventCallback03
+ * @tc.desc: hostapd register event callback function test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiClientTest, HostapdEventReport, TestSize.Level1)
+HWTEST_F(WifiClientTest, HostapdRegisterEventCallback03, TestSize.Level1)
 {
-    int32_t dstAddr = 0;
-    void *data = NULL;
-    const char *ifNameInvalid = "wlanTest";
-    HostapdEventReport(ifNameInvalid, dstAddr, data);
+    int32_t ret;
+
+    ret = HostapdRegisterEventCallback(nullptr, WIFI_HOSTAPD_TO_HAL_CLIENT, WLAN_IFNAME);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = HostapdRegisterEventCallback(WpaEventCb, WIFI_HOSTAPD_TO_HAL_CLIENT, nullptr);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    HostapdRegisterEventCallback(WpaEventCb, WIFI_HOSTAPD_TO_HAL_CLIENT, WLAN_IFNAME);
+    HostapdUnregisterEventCallback(WpaEventCb, WIFI_HOSTAPD_TO_HAL_CLIENT, WLAN_IFNAME);
+    HostapdUnregisterEventCallback(nullptr, WIFI_HOSTAPD_TO_HAL_CLIENT, WLAN_IFNAME);
+    HostapdUnregisterEventCallback(WpaEventCb, WIFI_HOSTAPD_TO_HAL_CLIENT, nullptr);
 }
+
 /**
- * @tc.name: HostapdRegisterEventCallback
- * @tc.desc: set rx remain On channel test
+ * @tc.name: HostapdEventReport04
+ * @tc.desc: hostapd cb interface test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiClientTest, HostapdRegisterEventCallback, TestSize.Level1)
+HWTEST_F(WifiClientTest, HostapdEventReport04, TestSize.Level1)
 {
-    int32_t dstAddr = 0;
-    const char *ifNameInvalid = "wlanTest";
-    HostapdRegisterEventCallback(Hid2dFunCb2, dstAddr, ifNameInvalid);
+    struct HostapdApCbParm hostapdApCbParm = {};
+    HostapdEventReport(WLAN_IFNAME, HOSTAPD_EVENT_AP_STATE, (void *) &hostapdApCbParm);
+    HostapdEventReport(WLAN_IFNAME, HOSTAPD_EVENT_AP_STATE, nullptr);
+    HostapdEventReport(nullptr, HOSTAPD_EVENT_AP_STATE, (void *) &hostapdApCbParm);
 }
-/**
- * @tc.name: HostapdUnregisterEventCallback
- * @tc.desc: set rx remain On channel test
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(WifiClientTest, HostapdUnregisterEventCallback, TestSize.Level1)
-{
-    int32_t dstAddr = 0;
-    const char *ifNameInvalid = "wlanTest";
-    HostapdUnregisterEventCallback(Hid2dFunCb2, dstAddr, ifNameInvalid);
-}
+
 /**
  * @tc.name: WifiSetPowerSaveMode029
  * @tc.desc: set rx remain On channel test

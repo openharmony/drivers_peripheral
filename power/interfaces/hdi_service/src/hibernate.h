@@ -52,6 +52,7 @@ private:
     int32_t RemoveSwapFile();
     int32_t EnableSwap();
     int32_t GetResumeOffset(uint64_t &resumeOffset);
+    int32_t GetResumeInfo(std::string &resumeInfo);
     int32_t WriteOffsetAndResume();
     int32_t WriteOffset();
     int32_t WriteResume();

@@ -633,6 +633,15 @@ int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureEnded(int32_t captureId,
     return instanceImpl.OnCaptureEnded(captureId, infos);
 }
 
+int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureEndedExt(int32_t captureId,
+    const std::vector<HDI::Camera::V1_3::CaptureEndedInfoExt> &infos)
+{
+    for (auto it : infos) {
+        CAMERA_LOGI("OnCaptureEndedExt captureId: %{public}d, streamId: %{public}d", captureId, it.streamId_);
+    }
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
 int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureError(int32_t captureId,
     const std::vector<CaptureErrorInfo> &infos)
 {

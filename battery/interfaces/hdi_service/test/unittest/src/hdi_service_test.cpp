@@ -16,7 +16,6 @@
 #include "hdi_service_test.h"
 #include "battery_log.h"
 #include "battery_thread_test.h"
-#include "hdf_base.h"
 #include "power_supply_provider.h"
 #include <chrono>
 #include <condition_variable>

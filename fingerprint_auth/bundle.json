@@ -13,6 +13,7 @@
       "name": "drivers_peripheral_fingerprint_auth",
       "subsystem": "hdf",
       "adapted_system_type": ["standard"],
+      "features": ["drivers_peripheral_fingerprint_auth_enabled"],
       "rom": "1000KB",
       "ram": "1000KB",
       "deps": {

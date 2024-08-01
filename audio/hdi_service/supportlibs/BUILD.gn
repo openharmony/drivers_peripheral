@@ -77,9 +77,15 @@ if (defined(ohos_lite)) {
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_capture.c",
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_snd_capture.c",
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_soundcard.c",
-        "//device/board/${product_company}/${device_name}/audio_alsa/vendor_capture.c",
         "//third_party/cJSON/cJSON.c",
       ]
+      if (defined(is_emulator) && is_emulator) {
+        sources += [
+          "//device/hmos_emulator/hardware/audio/audio_alsa/vendor_capture.c",
+        ]
+      } else {
+        sources += [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_capture.c" ]
+      }
     } else {
       sources += [
         "$hdf_audio_path/supportlibs/adm_adapter/src/audio_interface_lib_capture.c",
@@ -98,8 +104,13 @@ if (defined(ohos_lite)) {
         "//third_party/cJSON",
         "//third_party/alsa-lib/include",
         "$hdf_audio_path/supportlibs/alsa_adapter/include",
-        "//device/board/${product_company}/${device_name}/audio_alsa",
       ]
+      if (defined(is_emulator) && is_emulator) {
+        include_dirs += [ "//device/hmos_emulator/hardware/audio/audio_alsa" ]
+      } else {
+        include_dirs +=
+            [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
+      }
       public_deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
       include_dirs += [ "$hdf_audio_path/supportlibs/adm_adapter/include" ]
@@ -109,6 +120,10 @@ if (defined(ohos_lite)) {
 
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HDF_LOG" ]
+    }
+
+    if (defined(is_emulator) && is_emulator) {
+      defines += [ "EMULATOR_ENABLED" ]
     }
 
     if (is_standard_system) {
@@ -142,6 +157,13 @@ if (defined(ohos_lite)) {
         "//device/board/${product_company}/${device_name}/audio_alsa/vendor_render.c",
         "//third_party/cJSON/cJSON.c",
       ]
+      if (defined(is_emulator) && is_emulator) {
+        sources += [
+          "//device/hmos_emulator/hardware/audio/audio_alsa/vendor_render.c",
+        ]
+      } else {
+        sources += [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_render.c" ]
+      }
     } else {
       sources += [
         "$hdf_audio_path/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
@@ -161,8 +183,13 @@ if (defined(ohos_lite)) {
         "//third_party/cJSON",
         "//third_party/alsa-lib/include",
         "$hdf_audio_path/supportlibs/alsa_adapter/include",
-        "//device/board/${product_company}/${device_name}/audio_alsa",
       ]
+      if (defined(is_emulator) && is_emulator) {
+        include_dirs += [ "//device/hmos_emulator/hardware/audio/audio_alsa" ]
+      } else {
+        include_dirs +=
+            [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
+      }
       public_deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
       include_dirs += [ "$hdf_audio_path/supportlibs/adm_adapter/include" ]
@@ -172,6 +199,10 @@ if (defined(ohos_lite)) {
 
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HDF_LOG" ]
+    }
+
+    if (defined(is_emulator) && is_emulator) {
+      defines += [ "EMULATOR_ENABLED" ]
     }
 
     if (is_standard_system) {

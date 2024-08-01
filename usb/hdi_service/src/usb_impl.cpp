@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include "parameter.h"
+#include "parameters.h"
 #include "ddk_pnp_listener_mgr.h"
 #include "ddk_device_manager.h"
 #include "device_resource_if.h"
@@ -80,6 +81,9 @@ UsbImpl::UsbImpl() : session_(nullptr), device_(nullptr)
 {
     HdfSListInit(&devList_);
     OsalMutexInit(&lock_);
+    if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
+        loadUsbService_.LoadService();
+    }
 }
 
 UsbImpl::~UsbImpl()
@@ -1240,7 +1244,7 @@ int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
     }
     if (!port->initFlag) {
         HDF_LOGE("%{public}s: openPort failed", __func__);
-        return HDF_DEV_ERR_NO_DEVICE;
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
 
     uint8_t configIdOld = 0;
@@ -1272,6 +1276,8 @@ int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
     ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
     if (ret != HDF_SUCCESS || configIndex != configIdNew) {
         HDF_LOGE("%{public}s:getConfiguration failed ret:%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s:setConfiguration failed, IdSet:%{public}d,IdOld:%{public}d,IdNew:%{public}d",
+            __func__, configIndex, configIdOld, configIdNew);
         return HDF_ERR_IO;
     }
     if (configIndex != 0) {
@@ -1312,7 +1318,7 @@ int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t 
     }
     if (!port->initFlag) {
         HDF_LOGE("%{public}s: openPort failed", __func__);
-        return HDF_DEV_ERR_NO_DEVICE;
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     if (interfaceId >= USB_MAX_INTERFACES) {
         HDF_LOGE("%{public}s:interfaceId larger then max num", __func__);
@@ -1373,12 +1379,31 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    if (interfaceId >= USB_MAX_INTERFACES) {
-        HDF_LOGE("%{public}s:ReleaseInterface failed.", __func__);
-        return HDF_ERR_INVALID_PARAM;
+    UsbInterfaceHandle *interfaceHandle = InterfaceIdToHandle(port, interfaceId);
+    if (interfaceHandle == nullptr || interfaceId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
+            port->busNum, port->devAddr, interfaceId);
+        return HDF_FAILURE;
     }
-    port->initFlag = false;
-    return HDF_SUCCESS;
+    
+    struct UsbInterface *interface = nullptr;
+    int32_t ret = GetInterfaceByHandle(interfaceHandle, &interface);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get interface failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    ret = UsbCloseInterface(interfaceHandle, false);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s close interface failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    ret = UsbReleaseInterface(interface);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:ReleaseInterface failed, ret = %{public}d", __func__, ret);
+    }
+    return ret;
 }
 
 int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex)
@@ -1390,7 +1415,7 @@ int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t al
     }
     if (!port->initFlag) {
         HDF_LOGE("%{public}s: openPort failed", __func__);
-        return HDF_DEV_ERR_NO_DEVICE;
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
 
     UsbInterfaceHandle *interfaceHandle = InterfaceIdToHandle(port, interfaceId);
@@ -1833,10 +1858,6 @@ int32_t UsbImpl::GetCurrentFunctions(int32_t &funcs)
 
 int32_t UsbImpl::SetCurrentFunctions(int32_t funcs)
 {
-    if ((!isGadgetConnected_) && (!DdkDevMgrGetGadgetLinkStatus())) {
-        HDF_LOGE("%{public}s:gadget is not connected", __func__);
-        return HDF_DEV_ERR_NO_DEVICE;
-    }
     OsalMutexLock(&lock_);
     int32_t ret = UsbdFunction::UsbdSetFunction(funcs);
     if (ret != HDF_SUCCESS) {

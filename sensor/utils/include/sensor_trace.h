@@ -18,7 +18,7 @@
 
 #include "hitrace_meter.h"
 
-#define SENSOR_TRACE_TAG HITRACE_TAG_OHOS
+#define SENSOR_TRACE_TAG HITRACE_TAG_HDF
 #define SENSOR_TRACE HITRACE_METER_NAME(SENSOR_TRACE_TAG, __func__)
 
 #define SENSOR_TRACE_PID HITRACE_METER_NAME(SENSOR_TRACE_TAG, (std::string(__func__) + ":pid " + \
