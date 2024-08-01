@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -65,6 +65,7 @@ const std::string ENCODE_TYPE_STR_MPEG4_ES = "video/mp4v-es";
 const std::string DC_LOG_TITLE_TAG = "DCAMERA";
 const std::string FULL_DATA_KEY = "ProtocolVer";
 const std::string META_DATA_KEY = "MetaData";
+const std::string CAMERA_SUPPORT_MODE = "Mode";
 constexpr int32_t LOG_MAX_LEN = 4096;
 constexpr uint64_t SEC_TO_NSEC_TIMES = 1000000000;
 
