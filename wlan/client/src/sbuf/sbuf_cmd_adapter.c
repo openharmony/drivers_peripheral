@@ -1188,6 +1188,14 @@ int32_t WifiSetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
     return RET_CODE_NOT_SUPPORT;
 }
 
+int32_t WifiInstallWlanExtParam(const char *ifName, const InstallWlanParam *param)
+{
+    (void)ifName;
+    (void)param;
+
+    return RET_CODE_NOT_SUPPORT;
+}
+
 #ifdef __cplusplus
 #if __cplusplus
 }
