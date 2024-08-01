@@ -1029,6 +1029,23 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
     WifiSetDpiMarkRule(srcAddr, dstAddr, buf);
 }
 /**
+ * @tc.name: WifiInstallWlanExtParam029
+ * @tc.desc: install wlan ext param
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, WifiInstallWlanExtParam029, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifNameInvalid = "wlanTest";
+    InstallWlanParam param;
+    param.id = 0;
+    param.suite = 0;
+    param.len = 0;
+    ret = WifiInstallWlanExtParam(ifNameInvalid, &param);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+}
+/**
  * @tc.name: WpaEventReport
  * @tc.desc: set rx remain On channel test
  * @tc.type: FUNC
