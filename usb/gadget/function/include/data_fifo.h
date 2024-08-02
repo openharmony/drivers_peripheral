@@ -85,7 +85,7 @@ static inline uint32_t DataFifoWrite(struct DataFifo *fifo, uint8_t *data, uint3
 {
     if (fifo->size == 0) {
         HDF_LOGE("%{public}s: Fifo size is zero", __func__);
-        return false;
+        return HDF_FAILURE;
     }
     uint32_t mask = fifo->size - 1;
     uint8_t *buf = (uint8_t *)fifo->data;
@@ -103,7 +103,7 @@ static inline uint32_t DataFifoRead(struct DataFifo *fifo, uint8_t *data, uint32
 {
     if (fifo->size == 0) {
         HDF_LOGE("%{public}s: Fifo size is zero", __func__);
-        return false;
+        return HDF_FAILURE;
     }
     uint32_t mask = fifo->size - 1;
     uint8_t *buf = (uint8_t *)fifo->data;
