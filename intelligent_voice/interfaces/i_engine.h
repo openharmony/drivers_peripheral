@@ -84,6 +84,7 @@ public:
     virtual int32_t GetCloneFilesList(std::vector<std::string> &cloneFiles) = 0;
     virtual int32_t GetCloneFile(const std::string &filePath, std::shared_ptr<uint8_t> &buffer, uint32_t &size) = 0;
     virtual int32_t SendCloneFile(const std::string &filePath, const uint8_t *buffer, uint32_t size) = 0;
+    virtual int32_t ClearUserWakeupData(const std::string &wakeupPhrase) = 0;
 };
 }
 }

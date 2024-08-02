@@ -33,6 +33,16 @@ extern "C" IIntellVoiceTriggerManager *IntellVoiceTriggerManagerImplGetInstance(
     return new (std::nothrow) IntellVoiceTriggerManagerImpl();
 }
 
+extern "C" void IntellVoiceTriggerManagerImplRelease(IIntellVoiceTriggerManager *mgr)
+{
+    INTELLIGENT_VOICE_LOGI("enter");
+    if (mgr == nullptr) {
+        INTELLIGENT_VOICE_LOGE("mgr is nullptr");
+        return;
+    }
+    delete mgr;
+}
+
 int32_t IntellVoiceTriggerManagerImpl::LoadVendorLib()
 {
     std::string error;
