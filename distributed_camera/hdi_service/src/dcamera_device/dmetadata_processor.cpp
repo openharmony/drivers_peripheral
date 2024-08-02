@@ -819,7 +819,7 @@ void DMetadataProcessor::ParsePhotoFormats(cJSON* rootValue,
     std::map<int, std::vector<DCResolution>>& supportedFormats)
 {
     cJSON *photoObj = cJSON_GetObjectItemCaseSensitive(rootValue, "Photo");
-    if (photoObj == nullptr) {
+    if (photoObj == nullptr || !cJSON_IsObject(photoObj)) {
         DHLOGE("Input Photo info is null.");
         return;
     }
