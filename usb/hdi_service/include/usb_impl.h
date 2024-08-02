@@ -110,7 +110,6 @@ private:
     void MakeGetActiveUsbControlParams(
         UsbControlParams *controlParams, uint8_t *buffer, uint16_t length, uint16_t value, uint16_t index);
     int32_t UsbControlTransferEx(HostDevice *dev, UsbControlParams *ctrParams, int32_t timeout);
-    int32_t CheckInput(HostDevice *dev, UsbControlParams *ctrParams);
     void MakeSetActiveUsbControlParams(
         UsbControlParams *controlParams, uint8_t *buffer, uint16_t length, uint16_t value, uint16_t index);
     static int32_t ReOpenDevice(HostDevice *port);
