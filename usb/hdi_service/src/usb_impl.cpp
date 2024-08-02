@@ -152,6 +152,16 @@ void UsbImpl::MakeGetActiveUsbControlParams(
     controlParams->size = length;
 }
 
+int32_t UsbImpl::CheckInput(HostDevice *dev, UsbControlParams *ctrParams)
+{
+    if (dev == nullptr || dev->ctrDevHandle == nullptr || ctrParams == nullptr ||
+        (ctrParams->data == nullptr && ctrParams->size != 0)) {
+        HDF_LOGE("%{public}s:invalid params", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbImpl::UsbControlTransferEx(HostDevice *dev, UsbControlParams *ctrParams, int32_t timeout)
 {
     UsbRequestParams params;
@@ -160,11 +170,10 @@ int32_t UsbImpl::UsbControlTransferEx(HostDevice *dev, UsbControlParams *ctrPara
         return HDF_FAILURE;
     }
 
-    if (dev == nullptr || dev->ctrDevHandle == nullptr || ctrParams == nullptr || ctrParams->data == nullptr) {
-        HDF_LOGE("%{public}s:invalid params", __func__);
-        return HDF_ERR_INVALID_PARAM;
+    if (CheckInput(dev, ctrParams) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:UsbControlTransfer input invalid", __func__);
     }
-
+    
     UsbRequest *request = nullptr;
     if (dev->ctrlReq == nullptr) {
         request = UsbAllocRequest(dev->ctrDevHandle, 0, MAX_CONTROL_BUFF_SIZE);
