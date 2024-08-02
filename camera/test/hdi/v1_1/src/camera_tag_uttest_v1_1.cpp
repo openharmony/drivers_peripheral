@@ -44,12 +44,11 @@ bool isTagValueExistsU8(std::shared_ptr<CameraMetadata> ability, uint32_t tag, u
                 return true;
             }
         }
-        return false;
     } else {
         printf("Find CameraMetadata fail!\n");
         CAMERA_LOGE("Find CameraMetadata fail!");
-        return false;
     }
+    return false;
 }
 
 void invalidParmTestU8(int tag, uint8_t value)
@@ -88,7 +87,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_001, TestSize.Level1)
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
-    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         CAMERA_LOGI("get OHOS_ABILITY_CAMERA_MODES success");
         EXPECT_EQ(META_TYPE_BYTE, entry.data_type);
         for (int i = 0; i < entry.count; i++) {
@@ -126,11 +125,11 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_002, TestSize.Level1)
         printf("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES value count is 0 ...\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES value count is 0 ...");
         return;
-    } else if (entry.data.u8 != nullptr) {
+    } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES data is NULL!");
         return;
-    } else if {
+    } else {
         for (size_t i = 0; i < entry.count; i++)
         {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
@@ -174,11 +173,11 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_003, TestSize.Level1)
         printf("OHOS_ABILITY_SCENE_FILTER_TYPES value count is 0 ...\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_FILTER_TYPES value count is 0 ...");
         return;
-    } else if (entry.data.u8 != nullptr) {
+    } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_SCENE_FILTER_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_FILTER_TYPES data is NULL!");
         return;
-    } else if {
+    } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
             printf("OHOS_ABILITY_SCENE_FILTER_VALUES : %d\n", entry.data.u8[i]);
@@ -227,7 +226,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_005, TestSize.Level1)
         printf("OHOS_ABILITY_BEAUTY_AUTO_VALUES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_AUTO_VALUES data is NULL!");
         return;
-    } else if {
+    } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
             printf("OHOS_ABILITY_BEAUTY_AUTO_VALUES : %d\n", entry.data.u8[i]);
@@ -270,7 +269,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_009, TestSize.Level1)
         printf("OHOS_ABILITY_CUSTOM_VIDEO_FPS data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_CUSTOM_VIDEO_FPS data is NULL!");
         return;
-    } else if {
+    } else {
         std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
         int32_t tagValue[2] = {entry.data.i32[0], entry.data.i32[0]};
         meta->addEntry(OHOS_CONTROL_FPS_RANGES, &tagValue, 2);
