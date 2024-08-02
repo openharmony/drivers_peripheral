@@ -164,7 +164,7 @@ int32_t UsbImpl::UsbControlTransferEx(HostDevice *dev, UsbControlParams *ctrPara
         HDF_LOGE("%{public}s:invalid params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    
+
     UsbRequest *request = nullptr;
     if (dev->ctrlReq == nullptr) {
         request = UsbAllocRequest(dev->ctrDevHandle, 0, MAX_CONTROL_BUFF_SIZE);
