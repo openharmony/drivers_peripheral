@@ -144,10 +144,6 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
-    vdiRender->AddAudioEffect = NULL;
-    vdiRender->RemoveAudioEffect = NULL;
-    vdiRender->GetFrameBufferSize = NULL;
-    vdiRender->IsSupportsPauseAndResume = NULL;
     *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc);
     if (*render == NULL) {
         (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
