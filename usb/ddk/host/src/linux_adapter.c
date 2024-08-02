@@ -459,7 +459,6 @@ static int32_t OsSubmitControlRequest(struct UsbHostRequest *request)
         }
         return HDF_ERR_IO;
     }
-    RawUsbMemFree(urb);
     return HDF_SUCCESS;
 }
 
