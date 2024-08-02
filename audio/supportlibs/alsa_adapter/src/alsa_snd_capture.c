@@ -539,7 +539,7 @@ static int32_t CapturePcmReadi(snd_pcm_t *pcm, uint64_t *frameCnt, char *dataBuf
     }
 
     do {
-        int32_t ret;
+        int32_t ret = HDF_SUCCESS;
         /* Read interleaved frames to a PCM. */
         long frames = snd_pcm_readi(pcm, dataBuf, bufSize);
         if (frames > 0) {
