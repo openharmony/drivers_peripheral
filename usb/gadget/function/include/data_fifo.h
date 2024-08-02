@@ -64,6 +64,10 @@ static inline bool DataFifoIsEmpty(struct DataFifo *fifo)
 
 static inline bool DataFifoIsFull(struct DataFifo *fifo)
 {
+    if (fifo->size == 0) {
+        HDF_LOGE("%{public}s: Fifo size is zero", __func__);
+        return false;
+    }
     return DataFifoLen(fifo) > (fifo->size - 1);
 }
 
@@ -79,6 +83,10 @@ static inline void DataFifoSkip(struct DataFifo *fifo, uint32_t size)
 
 static inline uint32_t DataFifoWrite(struct DataFifo *fifo, uint8_t *data, uint32_t size)
 {
+    if (fifo->size == 0) {
+        HDF_LOGE("%{public}s: Fifo size is zero", __func__);
+        return false;
+    }
     uint32_t mask = fifo->size - 1;
     uint8_t *buf = (uint8_t *)fifo->data;
     uint8_t *end;
@@ -93,6 +101,10 @@ static inline uint32_t DataFifoWrite(struct DataFifo *fifo, uint8_t *data, uint3
 
 static inline uint32_t DataFifoRead(struct DataFifo *fifo, uint8_t *data, uint32_t size)
 {
+    if (fifo->size == 0) {
+        HDF_LOGE("%{public}s: Fifo size is zero", __func__);
+        return false;
+    }
     uint32_t mask = fifo->size - 1;
     uint8_t *buf = (uint8_t *)fifo->data;
     uint8_t *end;
