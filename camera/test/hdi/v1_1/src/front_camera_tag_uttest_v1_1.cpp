@@ -44,12 +44,11 @@ bool g_isFrontTagValueExistsU8(std::shared_ptr<CameraMetadata> ability, uint32_t
                 return true;
             }
         }
-        return false;
     } else {
         printf("Find CameraMetadata fail!\n");
         CAMERA_LOGE("Find CameraMetadata fail!");
-        return false;
     }
+    return false;
 }
 
 /**
@@ -75,7 +74,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_004, TestSize.Level1)
         printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES value count is 0\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES value count is 0");
         return;
-    } else if (entry.data.u8 != nullptr) {
+    } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!");
         return;
@@ -123,7 +122,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_006, TestSize.Level1)
         printf("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES value count is 0\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES value count is 0");
         return;
-    } else if (entry.data.u8 != nullptr) {
+    } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES data is NULL!");
         return;
@@ -172,7 +171,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_007, TestSize.Level1)
         printf("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES value count is 0\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES value count is 0");
         return;
-    } else if (entry.data.u8 != nullptr) {
+    } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!");
         return;
@@ -221,7 +220,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_008, TestSize.Level1)
         printf("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES value count is 0\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES value count is 0");
         return;
-    } else if (entry.data.u8 != nullptr) {
+    } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES data is NULL!");
         return;
