@@ -17,6 +17,7 @@
 #define HDF_USB_DATA_FIFO_H
 
 #include "hdf_base.h"
+#include "hdf_log.h"
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
