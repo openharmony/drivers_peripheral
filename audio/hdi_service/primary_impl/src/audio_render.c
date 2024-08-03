@@ -839,16 +839,15 @@ int32_t AudioRenderRenderFrame(
         AUDIO_FUNC_LOGE("Render Frame Paras is NULL!");
         return AUDIO_ERR_INVALID_PARAM;
     }
+    if (frameLen > FRAME_DATA) {
+        AUDIO_FUNC_LOGE("Out of FRAME_DATA size!");
+        return AUDIO_ERR_INTERNAL;
+    }
     pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
     if (hwRender->renderParam.frameRenderMode.buffer == NULL) {
         pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("Render Frame buffer is NULL!");
         return AUDIO_ERR_INVALID_PARAM;
-    }
-    if (frameLen > FRAME_DATA) {
-        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
-        AUDIO_FUNC_LOGE("Out of FRAME_DATA size!");
-        return AUDIO_ERR_INTERNAL;
     }
 
     int32_t ret = memcpy_s(hwRender->renderParam.frameRenderMode.buffer, FRAME_DATA, frame, frameLen);
@@ -860,11 +859,10 @@ int32_t AudioRenderRenderFrame(
 
     hwRender->renderParam.frameRenderMode.bufferSize = (uint64_t)frameLen;
     uint32_t frameCount = 0;
-    ret = PcmBytesToFrames(&hwRender->renderParam.frameRenderMode, (uint64_t)frameLen, &frameCount);
-    if (ret != AUDIO_SUCCESS) {
+    if (PcmBytesToFrames(&hwRender->renderParam.frameRenderMode, (uint64_t)frameLen, &frameCount) != AUDIO_SUCCESS) {
         pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("PcmBytesToFrames error!");
-        return ret;
+        return AUDIO_ERR_INTERNAL;
     }
 
     hwRender->renderParam.frameRenderMode.bufferFrameSize = (uint64_t)frameCount;
