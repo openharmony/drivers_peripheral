@@ -626,7 +626,8 @@ static int32_t RenderWriteiMmap(struct AlsaSoundCard *cardIns, const struct Audi
     mmapBufDesc = (struct AudioMmapBufferDescriptor *)&(handleData->frameRenderMode.mmapBufDesc);
     uint32_t totalSize = (uint32_t)mmapBufDesc->totalBufferFrames * frameSize;
     uint32_t lastBuffSize = ((totalSize % MIN_PERIOD_SIZE) == 0) ? MIN_PERIOD_SIZE : (totalSize % MIN_PERIOD_SIZE);
-    uint32_t loopTimes = (lastBuffSize == MIN_PERIOD_SIZE) ? (totalSize / MIN_PERIOD_SIZE) : (totalSize / MIN_PERIOD_SIZE + 1);
+    uint32_t loopTimes = (lastBuffSize == MIN_PERIOD_SIZE) ?
+        (totalSize / MIN_PERIOD_SIZE) : (totalSize / MIN_PERIOD_SIZE + 1);
     while (looper < loopTimes) {
         uint32_t copyLen = (looper < (loopTimes - 1)) ? MIN_PERIOD_SIZE : lastBuffSize;
         snd_pcm_uframes_t frames = (snd_pcm_uframes_t)(copyLen / frameSize);
