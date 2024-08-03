@@ -1853,6 +1853,11 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    int nameLen = strlen(ifName);
+    if (IsSockRemoved(ifName, nameLen) == 0) {
+        HDF_LOGE("invalid opt");
+        return HDF_FAILURE;
+    }
     (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     do {
         HDF_LOGE("%{public}s: call HdfWpaAddRemoteObj", __func__);
@@ -1969,6 +1974,15 @@ static int32_t StartWpaSupplicant(const char *moduleName, const char *startCmd)
     pthread_setname_np(g_tid, "WpaMainThread");
     HDF_LOGI("%{public}s: pthread_create successfully.", __func__);
     usleep(WPA_SLEEP_TIME);
+    WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
+    if (pWpaInterface == NULL) {
+        HDF_LOGE("Get wpa interface failed!");
+        return HDF_FAILURE;
+    }
+    if (pWpaInterface->wpaCliConnect(pWpaInterface) < 0) {
+        HDF_LOGE("Failed to connect to wpa!");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, const char *confName)
@@ -1983,10 +1997,6 @@ int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, 
     WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
     if (pWpaInterface == NULL) {
         HDF_LOGE("Get wpa interface failed!");
-        return HDF_FAILURE;
-    }
-    if (pWpaInterface->wpaCliConnect(pWpaInterface) < 0) {
-        HDF_LOGE("Failed to connect to wpa!");
         return HDF_FAILURE;
     }
     AddInterfaceArgv addInterface = {0};
@@ -2036,14 +2046,6 @@ int32_t WpaInterfaceRemoveWpaIface(struct IWpaInterface *self, const char *ifNam
     }
     ret = pWpaInterface->wpaCliRemoveIface(pWpaInterface, ifName);
     HDF_LOGI("%{public}s Remove wpa iface finish, ifName: %{public}s ret = %{public}d", __func__, ifName, ret);
-    if (ret == 0) {
-        if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
-            ReleaseWpaCtrl(&(pWpaInterface->p2pCtrl));
-        }
-        if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
-            ReleaseWpaCtrl(&(pWpaInterface->staCtrl));
-        }
-    }
     return (ret == 0 ? HDF_SUCCESS : HDF_FAILURE);
 }
 
