@@ -647,7 +647,6 @@ static int32_t OsSubmitBulkRequestHandle(
             request->reqStatus = USB_REQUEST_ERROR;
         }
         OsDiscardUrbs(request, 0, i);
-        RawUsbMemFree(pas);
         OsalMutexUnlock(&request->lock);
         return HDF_SUCCESS;
     }
