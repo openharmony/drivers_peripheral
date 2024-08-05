@@ -222,7 +222,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_005, TestSize.Level1)
         printf("OHOS_ABILITY_BEAUTY_AUTO_VALUES value count is 0 ...\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_AUTO_VALUES value count is 0 ...");
         return;
-    } else if (entry.data.u8 != nullptr) {
+    } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_BEAUTY_AUTO_VALUES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_AUTO_VALUES data is NULL!");
         return;
@@ -265,7 +265,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_009, TestSize.Level1)
         printf("OHOS_ABILITY_CUSTOM_VIDEO_FPS value count is 0 ...\n");
         CAMERA_LOGI("OHOS_ABILITY_CUSTOM_VIDEO_FPS value count is 0 ...");
         return;
-    } else if (entry.data.u8 != nullptr) {
+    } else if (entry.data.i32 == nullptr) {
         printf("OHOS_ABILITY_CUSTOM_VIDEO_FPS data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_CUSTOM_VIDEO_FPS data is NULL!");
         return;
