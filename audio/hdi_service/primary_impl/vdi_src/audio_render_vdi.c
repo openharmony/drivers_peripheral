@@ -901,7 +901,17 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
 
     for (index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
         if ((renderPriv->renderInfos[index] != NULL) &&
+            (attrs->type == AUDIO_IN_MEDIA || attrs->type == AUDIO_MULTI_CHANNEL) &&
             (renderPriv->renderInfos[index]->streamType == attrs->type)) {
+            *rendrId = renderPriv->renderInfos[index]->renderId;
+            renderPriv->renderInfos[index]->usrCount++;
+            return &renderPriv->renderInfos[index]->render;
+        }
+        if ((renderPriv->renderInfos[index] != NULL) &&
+            (renderPriv->renderInfos[index]->desc.pins == pin) &&
+            (renderPriv->renderInfos[index]->streamType == attrs->type) &&
+            (renderPriv->renderInfos[index]->sampleRate == attrs->sampleRate) &&
+            (renderPriv->renderInfos[index]->channelCount == attrs->channelCount)) {
             *rendrId = renderPriv->renderInfos[index]->renderId;
             renderPriv->renderInfos[index]->usrCount++;
             return &renderPriv->renderInfos[index]->render;
