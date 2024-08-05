@@ -17,7 +17,7 @@
 #define HDI_TEST_DISPLAY_H
 #include <cinttypes>
 #include "v1_0/include/idisplay_buffer.h"
-#include "v1_1/include/idisplay_composer_interface.h"
+#include "v1_2/include/idisplay_composer_interface.h"
 #include "v1_1/display_composer_type.h"
 #include "display_test.h"
 #include "hdi_test_device_common.h"
