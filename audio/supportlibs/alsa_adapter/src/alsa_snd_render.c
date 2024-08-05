@@ -64,10 +64,8 @@ static int32_t CreateRenderIns(void)
 
 static int32_t RenderFreeMemory(void)
 {
-    int32_t i;
-
     if (g_alsaRenderList != NULL) {
-        for (i = 0; i < MAX_CARD_NUM; i++) {
+        for (int32_t i = 0; i < MAX_CARD_NUM; i++) {
             if (g_alsaRenderList[i].soundCard.cardStatus != 0) {
                 AUDIO_FUNC_LOGE("refCount is not zero, Sound card in use!");
                 return HDF_ERR_DEVICE_BUSY;
@@ -88,13 +86,12 @@ static int32_t RenderFreeMemory(void)
 static int32_t SetHWParamsSub(
     snd_pcm_t *handle, snd_pcm_hw_params_t *params, const struct AudioPcmHwParams *hwParams, snd_pcm_access_t access)
 {
-    int32_t ret;
     snd_pcm_format_t pcmFormat = SND_PCM_FORMAT_S16_LE;
     CHECK_NULL_PTR_RETURN_DEFAULT(handle);
     CHECK_NULL_PTR_RETURN_DEFAULT(params);
 
     /* set hardware resampling,enable alsa-lib resampling */
-    ret = snd_pcm_hw_params_set_rate_resample(handle, params, 1);
+    int32_t ret = snd_pcm_hw_params_set_rate_resample(handle, params, 1);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Resampling setup failed for playback: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
@@ -130,16 +127,14 @@ static int32_t SetHWParamsSub(
 
 static int32_t SetHWRate(snd_pcm_t *handle, snd_pcm_hw_params_t *params, uint32_t *rate)
 {
-    int32_t ret;
-    uint32_t rRate;
     int dir = 0; /* dir Value range (-1,0,1) */
     CHECK_NULL_PTR_RETURN_DEFAULT(handle);
     CHECK_NULL_PTR_RETURN_DEFAULT(params);
     CHECK_NULL_PTR_RETURN_DEFAULT(rate);
 
     /* set the stream rate */
-    rRate = *rate;
-    ret = snd_pcm_hw_params_set_rate_near(handle, params, &rRate, &dir);
+    uint32_t rRate = *rate;
+    int32_t ret = snd_pcm_hw_params_set_rate_near(handle, params, &rRate, &dir);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Rate %{public}uHz not available for playback: %{public}s.", *rate, snd_strerror(ret));
         return HDF_FAILURE;
@@ -213,8 +208,6 @@ static int32_t SetHWParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t acces
 
 static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
 {
-    int32_t ret;
-    int32_t val = 1; /* val 0 = disable period event, 1 = enable period event */
     snd_pcm_sw_params_t *swParams = NULL;
     snd_pcm_t *handle = cardIns->pcmHandle;
     struct AlsaRender *renderIns = (struct AlsaRender *)cardIns;
@@ -223,7 +216,7 @@ static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
     snd_pcm_sw_params_alloca(&swParams);
 
     /* get the current swparams */
-    ret = snd_pcm_sw_params_current(handle, swParams);
+    int32_t ret = snd_pcm_sw_params_current(handle, swParams);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Unable to determine current swparams for playback: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
@@ -251,6 +244,7 @@ static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
 
     /* enable period events when requested */
     if (renderIns->periodEvent) {
+        int32_t val = 1; /* val 0 = disable period event, 1 = enable period event */
         ret = snd_pcm_sw_params_set_period_event(handle, swParams, val);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("Unable to set period event: %{public}s", snd_strerror(ret));
@@ -270,10 +264,9 @@ static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
 
 static int32_t ResetRenderParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t access)
 {
-    int32_t ret;
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
 
-    ret = SetHWParams(cardIns, access);
+    int32_t ret = SetHWParams(cardIns, access);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Setting of hwparams failed.");
         return ret;
@@ -290,15 +283,14 @@ static int32_t ResetRenderParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t
 
 static struct AlsaRender *GetRenderInsByName(const char *adapterName)
 {
-    int32_t ret;
-    int32_t i;
+    int32_t ret = HDF_SUCCESS;
     struct AlsaRender *renderIns = NULL;
     struct AlsaSoundCard *alsaSnd = NULL;
 
     /*
     fine the instance with the corresponding adapter name, or create one if none.
     */
-    for (i = 0; i < MAX_CARD_NUM; i++) {
+    for (int32_t i = 0; i < MAX_CARD_NUM; i++) {
         alsaSnd = (struct AlsaSoundCard *)&g_alsaRenderList[i];
         if (alsaSnd->cardStatus) {
             if (0 == strcmp(alsaSnd->adapterName, adapterName)) {
@@ -307,7 +299,7 @@ static struct AlsaRender *GetRenderInsByName(const char *adapterName)
         }
     }
 
-    for (i = 0; i < MAX_CARD_NUM; i++) {
+    for (int32_t i = 0; i < MAX_CARD_NUM; i++) {
         renderIns = &g_alsaRenderList[i];
         alsaSnd = (struct AlsaSoundCard *)&g_alsaRenderList[i];
         if (alsaSnd->cardStatus == 0) {
@@ -332,14 +324,13 @@ static struct AlsaRender *GetRenderInsByName(const char *adapterName)
 
 struct AlsaRender *RenderCreateInstance(const char* adapterName)
 {
-    int32_t ret;
     struct AlsaRender *renderIns = NULL;
     if (adapterName == NULL || strlen(adapterName) == 0) {
         AUDIO_FUNC_LOGE("Invalid adapterName!");
         return NULL;
     }
 
-    ret = CreateRenderIns();
+    int32_t ret = CreateRenderIns();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to create render instance.");
         return NULL;
@@ -371,8 +362,6 @@ struct AlsaRender *RenderCreateInstance(const char* adapterName)
 
 struct AlsaRender *RenderGetInstance(const char *adapterName)
 {
-    int32_t i;
-
     if (adapterName == NULL || strlen(adapterName) == 0) {
         AUDIO_FUNC_LOGE("Invalid adapterName!");
         return NULL;
@@ -383,7 +372,7 @@ struct AlsaRender *RenderGetInstance(const char *adapterName)
         return NULL;
     }
 
-    for (i = 0; i < MAX_CARD_NUM; i++) {
+    for (int32_t i = 0; i < MAX_CARD_NUM; i++) {
         if (strcmp(g_alsaRenderList[i].soundCard.adapterName, adapterName) == 0) {
             return &(g_alsaRenderList[i]);
         }
@@ -530,15 +519,12 @@ static int32_t RenderHwParamsChmaps(struct AlsaSoundCard *cardIns)
 
 int32_t RenderSetParams(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData)
 {
-    int32_t ret;
-    int bitsPerSample;
-    snd_pcm_format_t fmt;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 
     SaveHwParams(&renderIns->soundCard, handleData);
-    ret = SetHWParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
+    int32_t ret = SetHWParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Setting of hwparams failed.");
         return HDF_FAILURE;
@@ -556,9 +542,9 @@ int32_t RenderSetParams(struct AlsaRender *renderIns, const struct AudioHwRender
         AUDIO_FUNC_LOGE("Setting of chmaps failed.");
     }
 #endif
-
+    snd_pcm_format_t fmt;
     SndConverAlsaPcmFormat(&cardIns->hwParams, &fmt);
-    bitsPerSample = snd_pcm_format_physical_width(fmt);
+    int bitsPerSample = snd_pcm_format_physical_width(fmt);
     cardIns->hwParams.bitsPerFrame = bitsPerSample * cardIns->hwParams.channels;
 
     return HDF_SUCCESS;
@@ -567,15 +553,12 @@ int32_t RenderSetParams(struct AlsaRender *renderIns, const struct AudioHwRender
 static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *handleData,
     const struct AudioPcmHwParams *hwParams)
 {
-    int32_t ret, offset;
-    long frames;
-    char *dataBuf;
-    size_t sbufFrameSize;
+    int32_t ret = HDF_SUCCESS;
     snd_pcm_state_t state;
     int32_t tryNum = AUDIO_ALSALIB_RETYR;
 
     /* Check whether the PCM status is normal */
-    state = snd_pcm_state(pcm);
+    snd_pcm_state_t state = snd_pcm_state(pcm);
     if (state == SND_PCM_STATE_SETUP) {
         ret = snd_pcm_prepare(pcm);
         if (ret < 0) {
@@ -584,11 +567,11 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
         }
     }
 
-    sbufFrameSize = (size_t)handleData->frameRenderMode.bufferFrameSize;
-    dataBuf = handleData->frameRenderMode.buffer;
-    offset = hwParams->bitsPerFrame / BIT_COUNT_OF_BYTE;
+    size_t sbufFrameSize = (size_t)handleData->frameRenderMode.bufferFrameSize;
+    char *dataBuf = handleData->frameRenderMode.buffer;
+    int32_t offset = hwParams->bitsPerFrame / BIT_COUNT_OF_BYTE;
     while (sbufFrameSize > 0) {
-        frames = snd_pcm_writei(pcm, dataBuf, sbufFrameSize);
+        long frames = snd_pcm_writei(pcm, dataBuf, sbufFrameSize);
         if (frames > 0) {
             sbufFrameSize -= frames;
             dataBuf += frames * offset;
@@ -622,12 +605,7 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
 
 static int32_t RenderWriteiMmap(struct AlsaSoundCard *cardIns, const struct AudioHwRenderParam *handleData)
 {
-    uint32_t frameSize;
-    uint32_t totalSize;
-    uint32_t lastBuffSize;
-    uint32_t loopTimes;
     uint32_t looper = 0;
-    uint32_t copyLen;
     int32_t count = 0;
     struct AudioMmapBufferDescriptor *mmapBufDesc = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
@@ -640,17 +618,18 @@ static int32_t RenderWriteiMmap(struct AlsaSoundCard *cardIns, const struct Audi
         return HDF_FAILURE;
     }
 
-    frameSize = cardIns->hwParams.channels * cardIns->hwParams.format;
+    uint32_t frameSize = cardIns->hwParams.channels * cardIns->hwParams.format;
     if (frameSize == 0) {
         AUDIO_FUNC_LOGE("frame size = 0!");
         return HDF_FAILURE;
     }
     mmapBufDesc = (struct AudioMmapBufferDescriptor *)&(handleData->frameRenderMode.mmapBufDesc);
-    totalSize = (uint32_t)mmapBufDesc->totalBufferFrames * frameSize;
-    lastBuffSize = ((totalSize % MIN_PERIOD_SIZE) == 0) ? MIN_PERIOD_SIZE : (totalSize % MIN_PERIOD_SIZE);
-    loopTimes = (lastBuffSize == MIN_PERIOD_SIZE) ? (totalSize / MIN_PERIOD_SIZE) : (totalSize / MIN_PERIOD_SIZE + 1);
+    uint32_t totalSize = (uint32_t)mmapBufDesc->totalBufferFrames * frameSize;
+    uint32_t lastBuffSize = ((totalSize % MIN_PERIOD_SIZE) == 0) ? MIN_PERIOD_SIZE : (totalSize % MIN_PERIOD_SIZE);
+    uint32_t loopTimes = (lastBuffSize == MIN_PERIOD_SIZE) ?
+        (totalSize / MIN_PERIOD_SIZE) : (totalSize / MIN_PERIOD_SIZE + 1);
     while (looper < loopTimes) {
-        copyLen = (looper < (loopTimes - 1)) ? MIN_PERIOD_SIZE : lastBuffSize;
+        uint32_t copyLen = (looper < (loopTimes - 1)) ? MIN_PERIOD_SIZE : lastBuffSize;
         snd_pcm_uframes_t frames = (snd_pcm_uframes_t)(copyLen / frameSize);
         ret = snd_pcm_mmap_writei(
             cardIns->pcmHandle, (char *)mmapBufDesc->memoryAddress + mmapBufDesc->offset, frames);
@@ -677,7 +656,6 @@ static int32_t RenderWriteiMmap(struct AlsaSoundCard *cardIns, const struct Audi
 
 static int32_t RenderOpenImpl(struct AlsaRender *renderIns)
 {
-    int32_t ret;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
@@ -686,7 +664,7 @@ static int32_t RenderOpenImpl(struct AlsaRender *renderIns)
         return HDF_ERR_DEVICE_BUSY;
     }
 
-    ret = snd_pcm_open(&cardIns->pcmHandle, cardIns->devName,
+    int32_t ret = snd_pcm_open(&cardIns->pcmHandle, cardIns->devName,
         SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("snd_pcm_open fail: %{public}s!", snd_strerror(ret));
@@ -726,7 +704,7 @@ static int32_t RenderCloseImpl(struct AlsaRender *renderIns)
 
 int32_t RenderWriteImpl(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData)
 {
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard*)renderIns;
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
@@ -760,7 +738,6 @@ int32_t RenderGetMmapPositionImpl(struct AlsaRender *renderIns)
 
 int32_t RenderMmapWriteImpl(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData)
 {
-    int32_t ret;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
@@ -771,7 +748,7 @@ int32_t RenderMmapWriteImpl(struct AlsaRender *renderIns, const struct AudioHwRe
     }
 
     cardIns->mmapFlag = false;
-    ret = ResetRenderParams(cardIns, SND_PCM_ACCESS_MMAP_INTERLEAVED);
+    int32_t ret = ResetRenderParams(cardIns, SND_PCM_ACCESS_MMAP_INTERLEAVED);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("ResetRenderParams failed!");
         return HDF_FAILURE;
@@ -860,12 +837,11 @@ static int32_t RenderSetMuteImpl(struct AlsaRender *renderIns, bool muteFlag)
 
 static int32_t RenderSetPauseStateImpl(struct AlsaRender *renderIns, bool pauseFlag)
 {
-    int32_t ret;
     int enable = pauseFlag ? AUDIO_ALSALIB_IOCTRL_PAUSE : AUDIO_ALSALIB_IOCTRL_RESUME;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
 
     if (cardIns->canPause) {
-        ret = snd_pcm_pause(cardIns->pcmHandle, enable);
+        int32_t ret = snd_pcm_pause(cardIns->pcmHandle, enable);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("snd_pcm_pause failed!");
             return HDF_FAILURE;
@@ -898,6 +874,7 @@ static void RegisterRenderImpl(struct AlsaRender *renderIns)
 {
     if (renderIns == NULL) {
         AUDIO_FUNC_LOGE("renderIns is NULL!");
+        return;
     }
 
     renderIns->Init = RenderInitImpl;

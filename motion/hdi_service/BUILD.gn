@@ -39,14 +39,12 @@ ohos_shared_library("libmotion_interface_service_1.1") {
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
+      "hilog:libhilog",
       "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
     if (motion_c_utils_enable) {
       external_deps += [ "c_utils:utils" ]
-    }
-    if (motion_hilog_enable) {
-      external_deps += [ "hilog:libhilog" ]
     }
   }
 
@@ -75,13 +73,11 @@ ohos_shared_library("libmotion_driver") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
     if (motion_c_utils_enable) {
       external_deps += [ "c_utils:utils" ]
-    }
-    if (motion_hilog_enable) {
-      external_deps += [ "hilog:libhilog" ]
     }
   }
 

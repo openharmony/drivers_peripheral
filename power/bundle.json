@@ -15,8 +15,8 @@
       "features": [
         "drivers_peripheral_power_wakeup_cause_path",
         "drivers_peripheral_power_suspend_with_tag",
+	"drivers_peripheral_power_faster_retry_of_sleep",
         "drivers_peripheral_power_enable_s4",
-        "drivers_peripheral_power_faster_retry_of_sleep",
         "drivers_peripheral_power_slower_retry_of_sleep"
       ],
       "adapted_system_type": ["standard", "small"],
@@ -28,6 +28,7 @@
           "config_policy",
           "drivers_interface_power",
           "hdf_core",
+          "hicollie",
           "hilog", 
           "hisysevent",
           "libxml2",

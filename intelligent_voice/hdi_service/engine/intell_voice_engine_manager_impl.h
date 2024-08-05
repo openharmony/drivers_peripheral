@@ -71,6 +71,7 @@ public:
     int32_t GetCloneFilesList(std::vector<std::string> &cloneFiles) override;
     int32_t GetCloneFile(const std::string &filePath, std::vector<uint8_t> &buffer) override;
     int32_t SendCloneFile(const std::string &filePath, const std::vector<uint8_t> &buffer) override;
+    int32_t ClearUserWakeupData(const std::string &wakeupPhrase) override;
 
 private:
     int32_t LoadVendorLib();

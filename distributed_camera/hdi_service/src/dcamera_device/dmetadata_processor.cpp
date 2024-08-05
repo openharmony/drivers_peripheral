@@ -228,22 +228,87 @@ DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string 
     return SUCCESS;
 }
 
-DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &sinkAbilityInfo)
+void DMetadataProcessor::InitOutputAbilityWithoutMode(const std::string &sinkAbilityInfo)
 {
+    DHLOGI("InitOutputAbilityWithoutMode enter.");
     std::map<int, std::vector<DCResolution>> supportedFormats = GetDCameraSupportedFormats(sinkAbilityInfo);
 
     std::vector<int32_t> streamConfigs;
-    InitBasicConfigTag(supportedFormats, streamConfigs);
     std::vector<int32_t> extendStreamConfigs;
-    camera_metadata_item_t item;
-    int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(),
-        OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &item);
-    if (ret == CAM_META_SUCCESS && item.count != 0) {
-        extendStreamConfigs.push_back(item.data.i32[0]);
+    for (int32_t i = 0; i < ADD_MODE; i++) { // Compatible camera framework modification
+        camera_metadata_item_t item;
+        int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(),
+            OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &item);
+        if (ret == CAM_META_SUCCESS && item.count != 0) {
+            extendStreamConfigs.push_back(i);
+        }
+        InitBasicConfigTag(supportedFormats, streamConfigs);
+        InitExtendConfigTag(supportedFormats, extendStreamConfigs);
+        extendStreamConfigs.push_back(EXTEND_EOF); // mode eof
     }
-    InitExtendConfigTag(supportedFormats, extendStreamConfigs);
-    extendStreamConfigs.push_back(EXTEND_EOF); // mode eof
 
+    UpdateAbilityTag(streamConfigs, extendStreamConfigs);
+}
+
+DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &sinkAbilityInfo)
+{
+    cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
+    CHECK_AND_RETURN_RET_LOG(rootValue == nullptr || !cJSON_IsObject(rootValue), FAILED,
+        "sinkAbilityInfo parse error.");
+
+    cJSON *modeArray = cJSON_GetObjectItemCaseSensitive(rootValue, CAMERA_SUPPORT_MODE.c_str());
+    if (modeArray == nullptr || !cJSON_IsArray(modeArray)) {
+        InitOutputAbilityWithoutMode(sinkAbilityInfo);
+        cJSON_Delete(rootValue);
+        return SUCCESS;
+    }
+    CHECK_AND_FREE_RETURN_RET_LOG(cJSON_GetArraySize(modeArray) == 0 || static_cast<uint32_t>(
+        cJSON_GetArraySize(modeArray)) > JSON_ARRAY_MAX_SIZE, FAILED, rootValue, "modeArray create error.");
+
+    std::vector<std::string> keys;
+    int32_t arraySize = cJSON_GetArraySize(modeArray);
+    for (int32_t i = 0; i < arraySize; ++i) {
+        cJSON *number = cJSON_GetArrayItem(modeArray, i);
+        if (number != nullptr && cJSON_IsNumber(number)) {
+            keys.push_back(std::to_string(number->valueint));
+        }
+    }
+    std::vector<int32_t> streamConfigs;
+    std::vector<int32_t> extendStreamConfigs;
+    for (std::string key : keys) {
+        cJSON *value = cJSON_GetObjectItem(rootValue, key.c_str());
+        CHECK_AND_FREE_RETURN_RET_LOG(value == nullptr || !cJSON_IsObject(value), FAILED, rootValue, "mode get error.");
+
+        char *jsonValue = cJSON_Print(value);
+        std::string format(jsonValue);
+        DHLOGI("the current mode :%{public}s. value :%{public}s", key.c_str(), format.c_str());
+        std::map<int, std::vector<DCResolution>> supportedFormats = GetDCameraSupportedFormats(format);
+
+        camera_metadata_item_t item;
+        int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(),
+            OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &item);
+        if (ret == CAM_META_SUCCESS && item.count != 0) {
+            extendStreamConfigs.push_back(std::stoi(key)); // mode
+        }
+
+        InitBasicConfigTag(supportedFormats, streamConfigs);
+        InitExtendConfigTag(supportedFormats, extendStreamConfigs);
+        extendStreamConfigs.push_back(EXTEND_EOF); // mode eof
+
+        cJSON_free(jsonValue);
+        sinkPhotoProfiles_.clear();
+        sinkPreviewProfiles_.clear();
+        sinkVideoProfiles_.clear();
+    }
+    UpdateAbilityTag(streamConfigs, extendStreamConfigs);
+
+    cJSON_Delete(rootValue);
+    return SUCCESS;
+}
+
+void DMetadataProcessor::UpdateAbilityTag(std::vector<int32_t> &streamConfigs,
+    std::vector<int32_t> &extendStreamConfigs)
+{
     UpdateAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, streamConfigs.data(),
         streamConfigs.size());
 
@@ -257,8 +322,6 @@ DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &
 
     const uint8_t connectionType = OHOS_CAMERA_CONNECTION_TYPE_REMOTE;
     UpdateAbilityEntry(OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connectionType, 1);
-
-    return SUCCESS;
 }
 
 void DMetadataProcessor::InitBasicConfigTag(std::map<int, std::vector<DCResolution>> &supportedFormats,
@@ -271,27 +334,6 @@ void DMetadataProcessor::InitBasicConfigTag(std::map<int, std::vector<DCResoluti
             DHLOGI("DMetadataProcessor::sink supported formats: { format=%{public}d, width=%{public}d, height="
                 "%{public}d }", iter->first, resolution.width_, resolution.height_);
             streamConfigs.push_back(iter->first);
-            streamConfigs.push_back(resolution.width_);
-            streamConfigs.push_back(resolution.height_);
-        }
-    }
-
-    AddSrcConfigToSinkOfBasicTag(supportedFormats, streamConfigs);
-}
-
-void DMetadataProcessor::AddSrcConfigToSinkOfBasicTag(std::map<int, std::vector<DCResolution>> &supportedFormats,
-    std::vector<int32_t> &streamConfigs)
-{
-    for (const auto &format : supportedFormats) {
-        if (find(sinkPhotoFormats_.begin(), sinkPhotoFormats_.end(), format.first) != sinkPhotoFormats_.end()) {
-            continue;
-        }
-        for (const auto &resolution : supportedFormats[format.first]) {
-            std::vector<DCResolution> resolutionList = supportedFormats[format.first];
-            if (find(resolutionList.begin(), resolutionList.end(), resolution) != resolutionList.end()) {
-                continue;
-            }
-            streamConfigs.push_back(format.first);
             streamConfigs.push_back(resolution.width_);
             streamConfigs.push_back(resolution.height_);
         }
@@ -325,66 +367,18 @@ void DMetadataProcessor::InitExtendConfigTag(std::map<int, std::vector<DCResolut
     }
     extendStreamConfigs.push_back(EXTEND_EOF); // video eof
 
-    extendStreamConfigs.push_back(EXTEND_PHOTO); // photo
-    std::map<int, std::vector<DCResolution>>::iterator photoIter;
-    for (photoIter = sinkPhotoProfiles_.begin(); photoIter != sinkPhotoProfiles_.end(); ++photoIter) {
-        std::vector<DCResolution> resolutionList = photoIter->second;
-        for (auto resolution : resolutionList) {
-            DHLOGI("sink extend supported photo formats: { format=%{public}d, width=%{public}d, height=%{public}d }",
-                photoIter->first, resolution.width_, resolution.height_);
-            AddConfigs(extendStreamConfigs, photoIter->first, resolution.width_, resolution.height_, PHOTO_FPS);
-        }
-    }
-    extendStreamConfigs.push_back(EXTEND_EOF); // photo eof
-
-    for (const auto &format : supportedFormats) {
-        if (find(sinkPhotoFormats_.begin(), sinkPhotoFormats_.end(), format.first) != sinkPhotoFormats_.end()) {
-            continue;
-        }
-        AddSrcConfigsToSinkOfExtendTag(extendStreamConfigs, format.first);
-    }
-}
-
-void DMetadataProcessor::AddSrcConfigsToSinkOfExtendTag(std::vector<int32_t> &sinkExtendStreamConfigs, int32_t format)
-{
-    if (srcPreviewProfiles_.count(format) > 0) {
-        sinkExtendStreamConfigs.push_back(EXTEND_PREVIEW); // preview
-        size_t originSize = sinkExtendStreamConfigs.size();
-        for (const auto &resolution : srcPreviewProfiles_[format]) {
-            std::vector<DCResolution> resolutionList;
-            if (sinkPreviewProfiles_.count(format) > 0) {
-                resolutionList = sinkPreviewProfiles_[format];
+    if (!sinkPhotoProfiles_.empty()) {
+        extendStreamConfigs.push_back(EXTEND_PHOTO); // photo
+        std::map<int, std::vector<DCResolution>>::iterator photoIter;
+        for (photoIter = sinkPhotoProfiles_.begin(); photoIter != sinkPhotoProfiles_.end(); ++photoIter) {
+            std::vector<DCResolution> resolutionList = photoIter->second;
+            for (auto resolution : resolutionList) {
+                DHLOGI("sink extend supported photo formats: {format=%{public}d, width=%{public}d, height=%{public}d}",
+                    photoIter->first, resolution.width_, resolution.height_);
+                AddConfigs(extendStreamConfigs, photoIter->first, resolution.width_, resolution.height_, PHOTO_FPS);
             }
-            if (find(resolutionList.begin(), resolutionList.end(), resolution) != resolutionList.end()) {
-                continue;
-            }
-            AddConfigs(sinkExtendStreamConfigs, format, resolution.width_, resolution.height_, PREVIEW_FPS);
         }
-        if (originSize == sinkExtendStreamConfigs.size()) {
-            sinkExtendStreamConfigs.pop_back();
-            DHLOGD("the sink contains all resolutions on the source in this format.");
-            return;
-        }
-        sinkExtendStreamConfigs.push_back(EXTEND_EOF); // preview eof
-    } else if (srcVideoProfiles_.count(format) > 0) {
-        sinkExtendStreamConfigs.push_back(EXTEND_VIDEO); // video
-        size_t originSize = sinkExtendStreamConfigs.size();
-        for (const auto &resolution : srcVideoProfiles_[format]) {
-            std::vector<DCResolution> resolutionList;
-            if (sinkVideoProfiles_.count(format) > 0) {
-                resolutionList = sinkVideoProfiles_[format];
-            }
-            if (find(resolutionList.begin(), resolutionList.end(), resolution) != resolutionList.end()) {
-                continue;
-            }
-            AddConfigs(sinkExtendStreamConfigs, format, resolution.width_, resolution.height_, VIDEO_FPS);
-        }
-        if (originSize == sinkExtendStreamConfigs.size()) {
-            sinkExtendStreamConfigs.pop_back();
-            DHLOGD("the sink contains all resolutions on the source in this format.");
-            return;
-        }
-        sinkExtendStreamConfigs.push_back(EXTEND_EOF); // video eof
+        extendStreamConfigs.push_back(EXTEND_EOF); // photo eof
     }
 }
 

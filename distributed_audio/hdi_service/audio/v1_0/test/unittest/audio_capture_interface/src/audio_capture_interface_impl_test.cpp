@@ -82,7 +82,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, CaptureFrame_002, TestSize.Level1)
     audioCaptureInterfaceImpl_->captureStatus_ = CAPTURE_STATUS_START;
     audioCaptureInterfaceImpl_->audioExtCallback_ = nullptr;
     EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->CaptureFrame(frame, requestBytes));
-    audioCaptureInterfaceImpl_->audioExtCallback_ = new MockIDAudioCallback();
+    audioCaptureInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_NE(HDF_SUCCESS, audioCaptureInterfaceImpl_->CaptureFrame(frame, requestBytes));
 }
 
@@ -98,7 +98,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, CaptureFrame_003, TestSize.Level1)
     vector<int8_t> frame;
     uint64_t requestBytes = 0;
     audioCaptureInterfaceImpl_->captureStatus_ = CAPTURE_STATUS_START;
-    audioCaptureInterfaceImpl_->audioExtCallback_ = new MockRevertIDAudioCallback();
+    audioCaptureInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
     EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->CaptureFrame(frame, requestBytes));
 }
 

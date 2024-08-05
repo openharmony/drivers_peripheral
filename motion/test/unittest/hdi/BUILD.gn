@@ -41,13 +41,11 @@ ohos_unittest("hdi_unittest_motion") {
     external_deps = [
       "drivers_interface_motion:libmotion_proxy_1.1",
       "hdf_core:libhdf_utils",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
     if (motion_c_utils_enable) {
       external_deps += [ "c_utils:utils" ]
-    }
-    if (motion_hilog_enable) {
-      external_deps += [ "hilog:libhilog" ]
     }
   }
   external_deps += [ "ipc:ipc_single" ]

@@ -28,14 +28,13 @@ namespace WIFI {
 constexpr size_t THRESHOLD = 10;
 const char *g_wpaServiceName = "hostapd_interface_service";
 struct IHostapdInterface *g_wpaObj = nullptr;
-static struct HDIDeviceManager *g_devMgr = NULL;
+static struct HDIDeviceManager *g_devMgr = nullptr;
 
 void FuzzHostapdStart(struct IHostapdInterface *gWpaObj, uint8_t *tmpRawData)
 {
     HDF_LOGI("%{public}s : is starting", __FUNCTION__);
     FuzzHostapdInterfaceSetApPasswd(gWpaObj, tmpRawData);
     FuzzHostapdInterfaceSetApName(gWpaObj, tmpRawData);
-    FuzzHostapdInterfaceSetApWpaValue(gWpaObj, tmpRawData);
     FuzzHostapdInterfaceSetApBand(gWpaObj, tmpRawData);
     FuzzHostapdInterfaceSetApChannel(gWpaObj, tmpRawData);
     FuzzHostapdInterfaceSetApMaxConn(gWpaObj, tmpRawData);

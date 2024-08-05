@@ -155,7 +155,7 @@ RetCode DBufferManager::DImageBufferToDCameraBuffer(const std::shared_ptr<DImage
     }
     buffer.index_ = imageBuffer->GetIndex();
     buffer.size_ = imageBuffer->GetSize();
-    buffer.bufferHandle_ = new NativeBuffer();
+    buffer.bufferHandle_ = sptr<NativeBuffer>(new NativeBuffer());
     buffer.bufferHandle_->SetBufferHandle(bufHandle);
     return RC_OK;
 }

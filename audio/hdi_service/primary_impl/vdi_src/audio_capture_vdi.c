@@ -75,10 +75,6 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     HdfAudioStartTrace("Hdi:AudioCaptureFrameVdi", 0);
     int32_t ret = vdiCapture->CaptureFrame(vdiCapture, frame, frameLen, replyBytes);
     HdfAudioFinishTrace();
-    if (replyBytes == 0) {
-        AUDIO_FUNC_LOGE("no data received");
-    }
-
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture frame fail, ret=%{public}d", ret);
         return ret;

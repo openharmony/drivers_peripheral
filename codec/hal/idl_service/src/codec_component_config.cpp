@@ -61,6 +61,7 @@ namespace {
     constexpr char CODEC_CONFIG_KEY_MESURED_FRAME_RATE[] = "measuredFrameRate";
     constexpr char CODEC_CONFIG_KEY_CAN_SWAP_WIDTH_HEIGHT[] = "canSwapWidthHeight";
 
+    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_PASSTHROUGH[] = "isSupportPassthrough";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY[] = "isSupportLowLatency";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_TSVC[] = "isSupportTSVC";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LTR[] = "isSupportLTR";
@@ -153,7 +154,8 @@ int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
     const struct DeviceResourceNode *codecGroupNode = nullptr;
     struct DeviceResourceNode *childNode = nullptr;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if ((iface == nullptr) || (iface->GetUint32 == nullptr) || (iface->GetBool == nullptr) || (iface->GetString == nullptr)) {
+    if ((iface == nullptr) || (iface->GetUint32 == nullptr) ||
+        (iface->GetBool == nullptr) || (iface->GetString == nullptr)) {
         CODEC_LOGE(" failed, iface or its GetUint32 or GetBool or GetString is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -181,7 +183,8 @@ int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
 }
 
 int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface &iface,
-                                               const struct DeviceResourceNode &childNode, CodecCompCapability &cap, bool isVideoGroup)
+                                               const struct DeviceResourceNode &childNode,
+                                               CodecCompCapability &cap, bool isVideoGroup)
 {
     if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_ROLE, reinterpret_cast<uint32_t *>(&cap.role),
                         MEDIA_ROLETYPE_INVALID) != HDF_SUCCESS) {
@@ -358,6 +361,7 @@ int32_t CodecComponentConfig::GetVideoPortCapability(const struct DeviceResource
             return HDF_FAILURE;
         }
     }
+    cap.port.video.isSupportPassthrough = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_PASSTHROUGH);
     cap.port.video.isSupportLowLatency = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY);
     cap.port.video.isSupportTSVC = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_TSVC);
     cap.port.video.isSupportLTR = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LTR);

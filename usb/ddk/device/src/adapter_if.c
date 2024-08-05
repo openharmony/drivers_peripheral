@@ -75,7 +75,7 @@ static void GetFilePath(const char *path, const char *fileName, char *filePath)
         return;
     }
 
-    if (filePath[strlen(path) - 1] != '/') {
+    if (strlen(path) > 0 && filePath[strlen(path) - 1] != '/') {
         if (strlen(path) + 1 >= MAX_PATHLEN - strlen(fileName)) {
             HDF_LOGE("%{public}s: file path too long", __func__);
             return;
@@ -375,11 +375,13 @@ static int32_t UsbFnAdapterDelInterface(const char *interfaceName, int32_t nameL
     ret = snprintf_s(fnnew.name, MAX_NAMELEN, MAX_NAMELEN - 1, "%s", interfaceName);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        UsbFnAdapterClosefn(fd);
         return HDF_ERR_IO;
     }
     ret = ioctl(fd, FUNCTIONFS_DELFN, &fnnew);
     if (ret != 0) {
         HDF_LOGE("%{public}s: FUNCTIONFS_DELFN failed", __func__);
+        UsbFnAdapterClosefn(fd);
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterClosefn(fd);
