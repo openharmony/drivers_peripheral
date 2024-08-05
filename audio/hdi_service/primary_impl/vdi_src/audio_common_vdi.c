@@ -178,6 +178,8 @@ static int32_t AudioSubPortsToSubPortsVdi(const struct AudioSubPortCapabilityVdi
         subPortsTmp[i].mask = (enum AudioPortPassthroughMode)vdiSubPorts[i].mask;
         subPortsTmp[i].desc = strdup(vdiSubPorts[i].desc);
         if (subPortsTmp[i].desc == NULL) {
+            *subPorts = subPortsTmp;
+            *subPortsLen = size;
             AUDIO_FUNC_LOGE("strdup fail, vdiSubPorts[%{public}d].desc = %{public}s", i, vdiSubPorts[i].desc);
             return HDF_FAILURE;
         }

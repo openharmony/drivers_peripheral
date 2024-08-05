@@ -23,6 +23,8 @@
 #include "component_mgr.h"
 #include "icodec_buffer.h"
 #include "sys/mman.h"
+#include "v3_0/codec_ext_types.h"
+#include "codec_component_service.h"
 
 #define AUDIO_CODEC_NAME "OMX.audio"
 
@@ -193,6 +195,50 @@ int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, const int8_t *para
     return err;
 }
 
+int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<int8_t>& paramStruct,
+    const OmxCodecBuffer& inBuffer)
+{
+    CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
+    if (index != HDI::Codec::V3_0::Codec_IndexParamOverlayBuffer) {
+        return OMX_ErrorNotImplemented;
+    }
+    if (paramStruct.size() != sizeof(HDI::Codec::V3_0::CodecParamOverlay)) {
+        return OMX_ErrorBadParameter;
+    }
+    if (inBuffer.bufferhandle == nullptr) {
+        CODEC_LOGE("null bufferhandle");
+        return OMX_ErrorBadParameter;
+    }
+    BufferHandle* handle = inBuffer.bufferhandle->GetBufferHandle();
+    if (handle == nullptr) {
+        CODEC_LOGE("null bufferhandle");
+        return OMX_ErrorBadParameter;
+    }
+    sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> mapper = HDI::Codec::V3_0::GetMapperService();
+    if (mapper != nullptr) {
+        mapper->Mmap(inBuffer.bufferhandle);
+    }
+    auto paramSrc = reinterpret_cast<const HDI::Codec::V3_0::CodecParamOverlay *>(paramStruct.data());
+    CodecParamOverlayBuffer paramDst {
+        .size = sizeof(CodecParamOverlayBuffer),
+        .enable = paramSrc->enable,
+        .dstX = paramSrc->dstX,
+        .dstY = paramSrc->dstY,
+        .dstW = paramSrc->dstW,
+        .dstH = paramSrc->dstH,
+        .bufferHandle = handle,
+    };
+    auto err = OMX_SetParameter(comp_, static_cast<OMX_INDEXTYPE>(OMX_IndexParamOverlayBuffer),
+        reinterpret_cast<int8_t *>(&paramDst));
+    if (err != OMX_ErrorNone) {
+        CODEC_LOGE("OMX_SetParameter err = %{public}x ", err);
+    }
+    if (mapper != nullptr) {
+        mapper->Unmap(inBuffer.bufferhandle);
+    }
+    return err;
+}
+
 int32_t ComponentNode::GetConfig(OMX_INDEXTYPE index, int8_t *config)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
@@ -283,6 +329,10 @@ int32_t ComponentNode::ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t in
     CHECK_AND_RETURN_RET_LOG(index < ROLE_MAX_LEN, HDF_ERR_INVALID_PARAM, "index is too large");
     uint8_t omxRole[ROLE_MAX_LEN] = {0};
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
+    if (comType->ComponentRoleEnum == nullptr) {
+        CODEC_LOGE("The requested function is not implemented.");
+        return OMX_ErrorNotImplemented;
+    }
     int32_t err = comType->ComponentRoleEnum(comp_, omxRole, index);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("ComponentRoleEnum ret err [0x%{public}x] ", err);
@@ -683,7 +733,6 @@ int32_t ComponentNode::ReleaseAllBuffer()
     HDF_LOGI("Release OMXBuffer and CodecBuffer success!");
     return HDF_SUCCESS;
 }
-
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS

@@ -54,7 +54,7 @@ namespace {
 const int32_t REWIND_READ_DATA = 0;
 shared_ptr<PowerInterfaceStub> g_fuzzService = nullptr;
 shared_ptr<PowerFuzzTest> g_fuzzTest = nullptr;
-const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = 32;
+const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = 15;
 } // namespace
 
 static void PowerStubFuzzTest(const uint8_t *data, size_t size)
@@ -66,7 +66,6 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
     if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
         return;
     }
-    code %= POWER_INTERFACE_STUB_FUNC_MAX_SIZE;
 
     MessageParcel datas;
     datas.WriteInterfaceToken(IPowerInterface::GetDescriptor());
@@ -78,11 +77,13 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
         g_fuzzTest = make_shared<PowerFuzzTest>();
         g_fuzzService = make_shared<PowerInterfaceStub>(g_fuzzTest->GetImpl());
     }
-    // Filter force sleep calls
-    if (CMD_POWER_INTERFACE_FORCE_SUSPEND == code) {
-        return;
+    for (code = CMD_POWER_INTERFACE_GET_VERSION; code < POWER_INTERFACE_STUB_FUNC_MAX_SIZE; code++) {
+        // Filter force sleep calls
+        if (CMD_POWER_INTERFACE_FORCE_SUSPEND == code) {
+            continue;
+        }
+        g_fuzzService->OnRemoteRequest(code, datas, reply, option);
     }
-    g_fuzzService->OnRemoteRequest(code, datas, reply, option);
 }
 } // namespace V1_2
 } // namespace Power

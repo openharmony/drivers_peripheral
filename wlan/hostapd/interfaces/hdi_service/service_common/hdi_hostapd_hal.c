@@ -60,12 +60,9 @@ WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
 #else
 #define AP_IFNAME "wlan0"
 #define AP_IFNAME_COEX "wlan1"
-#define WIFI_DEFAULT_CFG "hostapd.conf"
-#define WIFI_COEX_CFG "hostapd_coex.conf"
-#define HOSTAPD_CTRL_INTERFACE CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
-#define HOSTAPD_CTRL_INTERFACE_COEX CONFIG_ROOR_DIR"/sockets/wpa/wlan1"
-#define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_DEFAULT_CFG
-#define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_COEX_CFG
+#define HOSTAPD_DEFAULT_CFG "hostapd.conf"
+#define HOSTAPD_CTRL_GLOBAL_INTERFACE CONFIG_ROOR_DIR"/sockets/wpa/hostapd"
+#define HOSTAPD_DEFAULT_CFG_PATH CONFIG_ROOR_DIR"/wpa_supplicant/"HOSTAPD_DEFAULT_CFG
 #define HOSTAPD_DEFAULT_UDPPORT ""
 #define AP_SET_CFG_DELAY 500000
 #define SOFTAP_MAX_BUFFER_SIZE 4096
@@ -73,7 +70,7 @@ WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
 #define ADDITIONAL_SPACE_FOR_FORMATTING 3
 
 WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
-    {AP_2G_MAIN_INSTANCE, NULL, WIFI_COEX_CFG, HOSTAPD_DEFAULT_CFG_COEX, HOSTAPD_DEFAULT_UDPPORT}
+    {AP_2G_MAIN_INSTANCE, NULL, HOSTAPD_DEFAULT_CFG, HOSTAPD_DEFAULT_CFG_PATH, HOSTAPD_DEFAULT_UDPPORT}
 };
 static char g_ctrlInterfacel[CTRL_LEN];
 static char g_hostapdCfg[CTRL_LEN];
@@ -85,44 +82,23 @@ static pthread_mutex_t g_mutex;
 
 int InitCfg(const char *ifaceName)
 {
-    if (strncmp(ifaceName, AP_IFNAME_COEX, IFACENAME_LEN - 1) == 0) {
-        if (memcpy_s(g_apCfgName, CFGNAME_LEN, WIFI_COEX_CFG, sizeof(WIFI_COEX_CFG)) != EOK) {
-            HDF_LOGE("memcpy cfg fail");
-            return -1;
-        }
-        if (memcpy_s(g_apIfaceName, IFACENAME_LEN, AP_IFNAME_COEX, sizeof(AP_IFNAME_COEX)) != EOK) {
-            HDF_LOGE("memcpy ap name fail");
-            return -1;
-        }
-        if (memcpy_s(g_hostapdCfg, CTRL_LEN, HOSTAPD_DEFAULT_CFG_COEX,
-            sizeof(HOSTAPD_DEFAULT_CFG_COEX)) != EOK) {
-            HDF_LOGE("memcpy hostapd fail");
-            return -1;
-        }
-        if (memcpy_s(g_ctrlInterfacel, CTRL_LEN, HOSTAPD_CTRL_INTERFACE_COEX,
-            sizeof(HOSTAPD_CTRL_INTERFACE_COEX)) != EOK) {
-            HDF_LOGE("memcpy ctrl fail");
-            return -1;
-        }
-    } else {
-        if (memcpy_s(g_apCfgName, CFGNAME_LEN, WIFI_DEFAULT_CFG, sizeof(WIFI_DEFAULT_CFG)) != EOK) {
-            HDF_LOGE("memcpy cfg fail");
-            return -1;
-        }
-        if (memcpy_s(g_apIfaceName, IFACENAME_LEN, AP_IFNAME, sizeof(AP_IFNAME)) != EOK) {
-            HDF_LOGE("memcpy ap name fail");
-            return -1;
-        }
-        if (memcpy_s(g_hostapdCfg, CTRL_LEN, HOSTAPD_DEFAULT_CFG,
-            sizeof(HOSTAPD_DEFAULT_CFG)) != EOK) {
-            HDF_LOGE("memcpy hostapd fail");
-            return -1;
-        }
-        if (memcpy_s(g_ctrlInterfacel, CTRL_LEN, HOSTAPD_CTRL_INTERFACE,
-            sizeof(HOSTAPD_CTRL_INTERFACE)) != EOK) {
-            HDF_LOGE("memcpy ctrl fail");
-            return -1;
-        }
+    if (memcpy_s(g_apCfgName, CFGNAME_LEN, HOSTAPD_DEFAULT_CFG, sizeof(HOSTAPD_DEFAULT_CFG)) != EOK) {
+        HDF_LOGE("memcpy cfg fail");
+        return -1;
+    }
+    if (memcpy_s(g_apIfaceName, IFACENAME_LEN, ifaceName, strlen(ifaceName)) != EOK) {
+        HDF_LOGE("memcpy ap name fail");
+        return -1;
+    }
+    if (memcpy_s(g_hostapdCfg, CTRL_LEN, HOSTAPD_DEFAULT_CFG_PATH,
+        sizeof(HOSTAPD_DEFAULT_CFG_PATH)) != EOK) {
+        HDF_LOGE("memcpy hostapd fail");
+        return -1;
+    }
+    if (memcpy_s(g_ctrlInterfacel, CTRL_LEN, HOSTAPD_CTRL_GLOBAL_INTERFACE,
+        sizeof(HOSTAPD_CTRL_GLOBAL_INTERFACE)) != EOK) {
+        HDF_LOGE("memcpy ctrl fail");
+        return -1;
     }
     g_hostapdHalDevInfo[0].cfgName = g_apCfgName;
     g_hostapdHalDevInfo[0].config = g_hostapdCfg;
@@ -150,15 +126,15 @@ static void ReleaseHostapdCtrl(int id)
     }
 }
 
-static int InitHostapdCtrl(const char *ifname, int id)
+static int InitHostapdCtrl(const char *ctrlPath, int id)
 {
-    if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL || ifname == NULL) {
+    if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL || ctrlPath == NULL) {
         HDF_LOGE("InitHostapdCtrl id %{public}d hostapdHalDev or ifname is null", id);
         return -1;
     }
     int flag = 0;
     do {
-        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv = wpa_ctrl_open(ifname);
+        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv = wpa_ctrl_open(ctrlPath);
         if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv == NULL) {
             HDF_LOGE("open hostapd control interface ctrlRecv failed");
             break;
@@ -167,7 +143,7 @@ static int InitHostapdCtrl(const char *ifname, int id)
             HDF_LOGE("attach hostapd monitor interface failed");
             break;
         }
-        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn = wpa_ctrl_open(ifname);
+        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn = wpa_ctrl_open(ctrlPath);
         if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn == NULL) {
             HDF_LOGE("open hostapd control interface ctrlConn failed");
             break;
@@ -206,11 +182,11 @@ static int HostapdCliConnect(int id)
         return 0;
     }
     int retryCount = MAX_RETRY_COUNT;
-    char ifname[BUFFER_SIZE_128] = {0};
-    GetCtrlInterface(ifname, sizeof(ifname), id);
-    HDF_LOGI("HostapdCliConnect Ifname is: %{public}s", ifname);
+    char ctrlPath[BUFFER_SIZE_128] = {0};
+    GetCtrlInterface(ctrlPath, sizeof(ctrlPath), id);
+    HDF_LOGI("HostapdCliConnect Ifname is: %{public}s", ctrlPath);
     while (retryCount-- > 0) {
-        if (InitHostapdCtrl(ifname, id) == 0) {
+        if (InitHostapdCtrl(ctrlPath, id) == 0) {
             HDF_LOGI("Global hostapd interface connect successfully");
             break;
         } else {
@@ -320,15 +296,37 @@ static int InitHostapdHal(int id)
 
 static int EnableAp(int id)
 {
+    char cmdAdd[BUFSIZE_CMD] = {0};
+    char cmdEnable[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
-    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "ENABLE", buf, sizeof(buf));
+    if (sprintf_s(cmdAdd, sizeof(cmdAdd), "ADD %s config=%s", g_apIfaceName, g_hostapdCfg) < 0) {
+        HDF_LOGE("add config sprintf_s fail");
+        return -1;
+    }
+    HDF_LOGD("cmdAdd is %{public}s", cmdAdd);
+    if (WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmdAdd, buf, sizeof(buf)) < 0) {
+        HDF_LOGE("add ap failed");
+        return -1;
+    }
+    if (sprintf_s(cmdEnable, sizeof(cmdEnable), "IFNAME=%s ENABLE", g_apIfaceName) < 0) {
+        HDF_LOGE("enableAp sprintf_s fail");
+        return -1;
+    }
+    HDF_LOGD("enable ap cmd is %{public}s", cmdEnable);
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmdEnable, buf, sizeof(buf));
 }
 
 static int DisableAp(int id)
 {
+    char cmd[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
+    if (sprintf_s(cmd, sizeof(cmd), "REMOVE %s", g_apIfaceName) < 0) {
+        HDF_LOGE("remove ap sprintf_s fail");
+        return -1;
+    }
+    HDF_LOGD("remove ap cmd is %{public}s", cmd);
     g_hostapdHalDevInfo[id].hostapdHalDev->execDisable = 1;
-    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "DISABLE", buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
 static int StopAp(int id)

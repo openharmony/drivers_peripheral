@@ -25,7 +25,6 @@
 #include "v1_0/icamera_device_vdi_callback.h"
 #include "v1_0/icamera_host_vdi_callback.h"
 #include "hdf_load_vdi.h"
-#include "iproxy_broker.h"
 #include "camera.h"
 
 

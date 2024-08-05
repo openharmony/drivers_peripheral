@@ -53,7 +53,8 @@ DAudioManagerInterfaceImpl::~DAudioManagerInterfaceImpl()
 int32_t DAudioManagerInterfaceImpl::RegisterAudioDevice(const std::string &adpName, int32_t devId,
     const std::string &capability, const sptr<IDAudioCallback> &callbackObj)
 {
-    DHLOGI("Register audio device, name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), devId);
+    DHLOGI("Register audio device, name: %{public}s, device: %{public}s.", GetAnonyString(adpName).c_str(),
+        GetChangeDevIdMap(devId).c_str());
     if (audioMgr_ == nullptr) {
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;
@@ -71,7 +72,8 @@ int32_t DAudioManagerInterfaceImpl::RegisterAudioDevice(const std::string &adpNa
 
 int32_t DAudioManagerInterfaceImpl::UnRegisterAudioDevice(const std::string &adpName, int32_t devId)
 {
-    DHLOGI("UnRegister audio device, name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), devId);
+    DHLOGI("UnRegister audio device, name: %{public}s, device: %{public}s.", GetAnonyString(adpName).c_str(),
+        GetChangeDevIdMap(devId).c_str());
     if (audioMgr_ == nullptr) {
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;

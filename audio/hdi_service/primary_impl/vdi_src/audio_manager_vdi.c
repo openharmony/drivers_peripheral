@@ -127,6 +127,8 @@ static int32_t AudioManagerPortToVdiPort(const struct AudioAdapterDescriptor *de
     for (uint32_t i = 0; i < desc->portsLen; i++) {
         vdiPorts[i].portName = strdup(desc->ports[i].portName);
         if (vdiPorts[i].portName == NULL) {
+            vdiDesc->ports = vdiPorts;
+            vdiDesc->portsLen = desc->portsLen;
             AUDIO_FUNC_LOGE("strdup fail, desc->ports[%{public}d].portName = %{public}s", i, desc->ports[i].portName);
             return HDF_FAILURE;
         }
@@ -157,6 +159,8 @@ static int32_t AudioManagerVdiPortToPort(struct AudioAdapterDescriptorVdi *vdiDe
     for (uint32_t i = 0; i < vdiDesc->portsLen; i++) {
         ports[i].portName = strdup(vdiDesc->ports[i].portName);
         if (ports[i].portName == NULL) {
+            desc->ports = ports;
+            desc->portsLen = vdiDesc->portsLen;
             AUDIO_FUNC_LOGE("strdup fail, vdiDesc->ports[%{public}d].portName = %{public}s",
                 i, vdiDesc->ports[i].portName);
             return HDF_FAILURE;
@@ -350,7 +354,10 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
 
     pthread_mutex_lock(&g_managerMutex);
     struct IAudioAdapterVdi *vdiAdapter = NULL;
+    HdfAudioStartTrace("Hdi:AudioManagerVendorLoadAdapter", 0);
     ret = priv->vdiManager->LoadAdapter(priv->vdiManager, &vdiDesc, &vdiAdapter);
+    HdfAudioFinishTrace();
+
     AudioManagerReleaseVdiDesc(&vdiDesc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager call LoadAdapter fail, ret=%{public}d", ret);
@@ -401,8 +408,9 @@ static int32_t AudioManagerVendorUnloadAdapter(struct IAudioManager *manager, co
         pthread_mutex_unlock(&g_managerMutex);
         return HDF_SUCCESS;
     }
-
+    HdfAudioStartTrace("Hdi:AudioManagerVendorUnloadAdapter", 0);
     priv->vdiManager->UnloadAdapter(priv->vdiManager, vdiAdapter);
+    HdfAudioFinishTrace();
 
     AudioReleaseAdapterVdi(descIndex);
     pthread_mutex_unlock(&g_managerMutex);

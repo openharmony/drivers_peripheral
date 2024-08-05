@@ -43,6 +43,7 @@ typedef struct {
     CredentialInfoHal deletedCredential;
     Buffer *oldRootSecret;
     Buffer *rootSecret;
+    Buffer *authToken;
 } UpdateCredentialOutput;
 
 ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId);

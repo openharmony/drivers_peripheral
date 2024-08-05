@@ -86,6 +86,7 @@ enum WifiIfType {
     WIFI_IFTYPE_P2P_CLIENT,
     WIFI_IFTYPE_P2P_GO,
     WIFI_IFTYPE_P2P_DEVICE,
+    WIFI_IFTYPE_CHBA,
     WIFI_IFTYPE_MAX,
 };
 
@@ -364,6 +365,7 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t txChannel, const uint8_
 int32_t WifiRegisterActionFrameReceiver(const char *ifName, const uint8_t *match, uint32_t matchLen);
 int32_t WifiSetPowerSaveMode(const char *ifName, int32_t frequency, int32_t mode);
 int32_t WifiSetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable);
+int32_t WifiInstallWlanExtParam(const char *ifName, const InstallWlanParam *param);
 
 /* wpa related interface */
 #define MAX_NR_CIPHER_SUITES 5

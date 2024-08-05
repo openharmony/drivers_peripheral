@@ -58,6 +58,7 @@
 #define STR_WLAN1     "wlan1"
 #define STR_P2P0      "p2p0"
 #define STR_P2P0_X    "p2p0-"
+#define STR_CHBA      "chba0"
 #define NET_DEVICE_INFO_PATH "/sys/class/net"
 
 #define PRIMARY_ID_POWER_MODE   0x8bfd
@@ -115,6 +116,7 @@ static inline uint32_t BIT(uint8_t x)
 
 #define WLAN_IFACE_LENGTH 4
 #define P2P_IFACE_LENGTH 3
+#define CHBA_IFACE_LENGTH 4
 #ifndef KERNEL_VERSION
 #define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + ((c) > 255 ? 255 : (c)))
 #endif
@@ -452,7 +454,7 @@ static int32_t WaitStartActionLock(void)
 
 int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
 {
-    HILOG_LOGD(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int32_t rc = RET_CODE_FAILURE;
     struct nl_cb *cb = NULL;
 
@@ -480,7 +482,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
 
     do {
         rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg);
-        HILOG_LOGD(LOG_CORE, "nl_send_auto cmdSock, rc=%{public}d", rc);
+        HILOG_DEBUG(LOG_CORE, "nl_send_auto cmdSock, rc=%{public}d", rc);
         if (rc < 0) {
             HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
             break;
@@ -536,7 +538,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
     } while (0);
 
     pthread_mutex_unlock(&g_wifiHalInfo.mutex);
-    HILOG_LOGD(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return rc;
 }
 
@@ -1001,7 +1003,8 @@ static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
 
 static bool IsWifiIface(const char *name)
 {
-    if (strncmp(name, "wlan", WLAN_IFACE_LENGTH) != 0 && strncmp(name, "p2p", P2P_IFACE_LENGTH) != 0) {
+    if (strncmp(name, "wlan", WLAN_IFACE_LENGTH) != 0 && strncmp(name, "p2p", P2P_IFACE_LENGTH) != 0 &&
+        strncmp(name, "chba", CHBA_IFACE_LENGTH) != 0) {
         /* not a wifi interface; ignore it */
         return false;
     } else {
@@ -1082,6 +1085,8 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
         } else if (strncmp(result->infos[i].name, STR_P2P0_X, strlen(STR_P2P0_X)) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_P2P_CLIENT] = 1;
             result->infos[i].supportMode[WIFI_IFTYPE_P2P_GO] = 1;
+        } else if (strncmp(result->infos[i].name, STR_CHBA, strlen(STR_CHBA)) == 0) {
+            result->infos[i].supportMode[WIFI_IFTYPE_CHBA] = 1;
         }
     }
     return RET_CODE_SUCCESS;
@@ -2169,7 +2174,7 @@ static int32_t InstallParam(struct nl_msg *msg, struct nl_msg *keyMsg)
     }
     struct nlmsghdr *hdr = nlmsg_hdr(keyMsg);
     void *data = nlmsg_data(hdr);
-    int len = hdr->nlmsg_len - NLMSG_HDRLEN;
+    int len = (int)hdr->nlmsg_len - NLMSG_HDRLEN;
     if (memset_s(data, len, 0, len) != 0) {
         HILOG_ERROR(LOG_CORE, "%s: memset_s failed", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -2244,8 +2249,17 @@ err:
 
 static int32_t InstallWlanExtParam(const char *ifName, const int8_t *data, uint32_t dataLen)
 {
+    if (dataLen > sizeof(InstallWlanParam) || dataLen < sizeof(InstallWlanParam) - MAX_BUF_LEN) {
+        HILOG_ERROR(LOG_CORE, "%s: dataLen error", __FUNCTION__);
+        return HDF_FAILURE;
+    }
     uint8_t newData[dataLen];
-    for (int i = 0; i < dataLen; i++) {
+    int32_t ret = memset_s(newData, dataLen, 0, dataLen);
+    if (ret != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: memset_s failed", __FUNCTION__);
+        return HDF_FAILURE;
+    }
+    for (uint32_t i = 0; i < dataLen; i++) {
         newData[i] = (uint8_t)(data[i]);
     }
 
@@ -2676,12 +2690,41 @@ static void ClearSsidsList(struct DListHead *ssidsList)
     DListHeadInit(ssidsList);
 }
 
+static int32_t SsidToMsg(struct nl_msg *msg, struct DListHead *scanSsids)
+{
+    struct SsidListNode *ssidListNode = NULL;
+    uint32_t index = 0;
+    struct nlattr *nestedSsid = NULL;
+
+    if (!scanSsids) {
+        HILOG_ERROR(LOG_CORE, "%s: scanSsids is null.", __FUNCTION__);
+        ClearSsidsList(scanSsids);
+        return RET_CODE_FAILURE;
+    }
+    if (!DListIsEmpty(scanSsids)) {
+        nestedSsid = nla_nest_start(msg, NL80211_ATTR_SCAN_SSIDS);
+        if (nestedSsid == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
+            ClearSsidsList(scanSsids);
+            return RET_CODE_FAILURE;
+        }
+        DLIST_FOR_EACH_ENTRY(ssidListNode, scanSsids, struct SsidListNode, entry) {
+            if (nla_put(msg, index, ssidListNode->ssidInfo.ssidLen, ssidListNode->ssidInfo.ssid) != RET_CODE_SUCCESS) {
+                HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed.", __FUNCTION__);
+                ClearSsidsList(scanSsids);
+                return RET_CODE_FAILURE;
+            }
+            index++;
+        }
+        nla_nest_end(msg, nestedSsid);
+    }
+    ClearSsidsList(scanSsids);
+    return RET_CODE_SUCCESS;
+}
+
 static int32_t ProcessSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, const WifiPnoSettings *pnoSettings)
 {
     uint8_t scanSsidsCount = 0;
-    struct SsidListNode *ssidListNode = NULL;
-    struct nlattr *nestedSsid = NULL;
-    uint32_t index = 0;
     struct DListHead scanSsids = {0};
 
     DListHeadInit(&scanSsids);
@@ -2703,31 +2746,15 @@ static int32_t ProcessSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, 
         if (memcpy_s(ssidNode->ssidInfo.ssid, MAX_SSID_LEN, pnoSettings->pnoNetworks[i].ssid.ssid,
                 pnoSettings->pnoNetworks[i].ssid.ssidLen) != EOK) {
             HILOG_ERROR(LOG_CORE, "%s: memcpy_s failed.", __FUNCTION__);
+            free(ssidNode);
+            ssidNode = NULL;
             ClearSsidsList(&scanSsids);
             return RET_CODE_FAILURE;
         }
         DListInsertTail(&ssidNode->entry, &scanSsids);
         scanSsidsCount++;
     }
-    if (!DListIsEmpty(&scanSsids)) {
-        nestedSsid = nla_nest_start(msg, NL80211_ATTR_SCAN_SSIDS);
-        if (nestedSsid == NULL) {
-            HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
-            ClearSsidsList(&scanSsids);
-            return RET_CODE_FAILURE;
-        }
-        DLIST_FOR_EACH_ENTRY(ssidListNode, &scanSsids, struct SsidListNode, entry) {
-            if (nla_put(msg, index, ssidListNode->ssidInfo.ssidLen, ssidListNode->ssidInfo.ssid) != RET_CODE_SUCCESS) {
-                HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed.", __FUNCTION__);
-                ClearSsidsList(&scanSsids);
-                return RET_CODE_FAILURE;
-            }
-            index++;
-        }
-        nla_nest_end(msg, nestedSsid);
-    }
-    ClearSsidsList(&scanSsids);
-    return RET_CODE_SUCCESS;
+    return SsidToMsg(msg, &scanSsids);
 }
 
 static int32_t ProcessScanPlanToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, const WifiPnoSettings *pnoSettings)
@@ -3219,7 +3246,7 @@ void WifiEventTxStatus(const char *ifName, struct nlattr **attr)
         HILOG_ERROR(LOG_CORE, "%{public}s: is null", __FUNCTION__);
         return;
     }
-    if (WaitStartActionLock() == RET_CODE_FAILURE) {
+    if (WaitStartActionLock() == 0) {
         HILOG_ERROR(LOG_CORE, "%{public}s: WaitStartActionLock error", __FUNCTION__);
         return;
     }
@@ -3270,7 +3297,6 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
     int32_t ret = RET_CODE_FAILURE;
     struct nl_msg *msg = NULL;
     uint32_t interfaceId;
-    uint64_t cookie;
     if (ifName == NULL || freq == 0 || frameData == NULL || frameDataLen == 0) {
         HILOG_ERROR(LOG_CORE, "%{public}s: param is NULL.", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -3306,7 +3332,7 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
             HILOG_ERROR(LOG_CORE, "%{public}s: nla_put_u32 frameData failed", __FUNCTION__);
             break;
         }
-        g_cookieStart = RET_CODE_FAILURE;
+        g_cookieStart = 0;
         ret = NetlinkSendCmdSync(msg, WifiSendActionFrameHandler, NULL);
         if (ret != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%{public}s: send action failed", __FUNCTION__);

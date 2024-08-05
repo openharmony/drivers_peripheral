@@ -28,7 +28,7 @@ void DAudioManagerInterfaceImplTest::TearDownTestCase(void) {}
 
 void DAudioManagerInterfaceImplTest::SetUp(void)
 {
-    callbackObj_ = new MockIDAudioCallback;
+    callbackObj_ = sptr<IDAudioCallback>(new MockIDAudioCallback);
 }
 
 void DAudioManagerInterfaceImplTest::TearDown(void) {}

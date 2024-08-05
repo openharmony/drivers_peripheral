@@ -18,6 +18,7 @@
 #include "../hostapd_impl.h"
 #include "hdi_hostapd_hal.h"
 #include <pthread.h>
+#include <hdf_remote_service.h>
 
 #define WIFI_MULTI_CMD_MAX_LEN 1024
 #define BUFFSIZE_REQUEST 4096
@@ -29,6 +30,7 @@
 #define BUFF_SIZE 256
 
 #define WPA_HOSTAPD_NAME "hostapd"
+#define HOSTAPD_START_CMD "hostapd -g /data/service/el1/public/wifi/sockets/wpa/hostapd"
 #define WPA_SLEEP_TIME (100 * 1000) /* 100ms */
 
 int32_t HostapdInterfaceStartAp(struct IHostapdInterface *self);
@@ -95,5 +97,9 @@ int32_t HostApdInterfaceShellCmd(struct IHostapdInterface *self, const char *ifN
 struct StApMainParam {
     int argc;
     char argv[MAX_WPA_MAIN_ARGC_NUM][MAX_WPA_MAIN_ARGV_LEN];
+};
+
+struct RemoteServiceDeathRecipient {
+    struct HdfDeathRecipient recipient;
 };
 #endif

@@ -510,6 +510,7 @@ static int32_t UsbSerialDeviceAlloc(struct AcmDevice *acm)
     }
     if (OsalMutexInit(&port->lock) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: init lock fail!", __func__);
+        OsalMemFree(port);
         return HDF_FAILURE;
     }
     port->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);

@@ -51,6 +51,18 @@ int32_t DStreamOperator::IsStreamsSupported(OperationMode mode, const std::vecto
     return CamRetCode::NO_ERROR;
 }
 
+int32_t DStreamOperator::IsStreamsSupported_V1_1(OperationMode_V1_1 mode, const std::vector<uint8_t> &modeSetting,
+    const std::vector<StreamInfo_V1_1> &infos, StreamSupportType &type)
+{
+    DHLOGI("IsStreamsSupported_V1_1 start.");
+    std::vector<StreamInfo> streamInfos_v1_0;
+    for (auto info_v1_1 : infos) {
+        streamInfos_v1_0.push_back(info_v1_1.v1_0);
+    }
+    OperationMode modeV0 = static_cast<OperationMode>(mode);
+    return IsStreamsSupported(modeV0, modeSetting, streamInfos_v1_0, type);
+}
+
 int32_t DStreamOperator::CreateStreams(const std::vector<StreamInfo> &streamInfos)
 {
     if (IsStreamInfosInvalid(streamInfos)) {
@@ -91,6 +103,16 @@ int32_t DStreamOperator::CreateStreams(const std::vector<StreamInfo> &streamInfo
     return CamRetCode::NO_ERROR;
 }
 
+int32_t DStreamOperator::CreateStreams_V1_1(const std::vector<StreamInfo_V1_1> &streamInfos)
+{
+    DHLOGI("CreateStreams_V1_1 start.");
+    std::vector<StreamInfo> streamInfos_v1_0;
+    for (auto info_v1_1 : streamInfos) {
+        streamInfos_v1_0.push_back(info_v1_1.v1_0);
+    }
+    return CreateStreams(streamInfos_v1_0);
+}
+
 int32_t DStreamOperator::ReleaseStreams(const std::vector<int32_t> &streamIds)
 {
     if (streamIds.empty() || streamIds.size() > CONTAINER_CAPACITY_MAX_SIZE) {
@@ -126,7 +148,7 @@ int32_t DStreamOperator::ReleaseStreams(const std::vector<int32_t> &streamIds)
 
     OHOS::sptr<DCameraProvider> provider = DCameraProvider::GetInstance();
     if (provider == nullptr) {
-        DHLOGE("Distributed camera provider not init.");
+        DHLOGE("DCameraProvider not init.");
         return CamRetCode::DEVICE_ERROR;
     }
     int32_t ret = provider->ReleaseStreams(dhBase_, streamIds);
@@ -156,12 +178,31 @@ int32_t DStreamOperator::ExtractStreamInfo(std::vector<DCStreamInfo>& dCameraStr
         dstStreamInfo.dataspace_ = streamInfo.second->dataspace_;
         dstStreamInfo.encodeType_ = streamInfo.second->encodeType_;
         dstStreamInfo.type_ = streamInfo.second->type_;
+        dstStreamInfo.mode_ = currentOperMode_;
         dCameraStreams.push_back(dstStreamInfo);
     }
     return CamRetCode::NO_ERROR;
 }
 
+int32_t DStreamOperator::UpdateStreams(const std::vector<StreamInfo_V1_1> &streamInfos)
+{
+    (void)streamInfos;
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DStreamOperator::ConfirmCapture(int32_t cId)
+{
+    (void)cId;
+    return CamRetCode::NO_ERROR;
+}
+
 int32_t DStreamOperator::CommitStreams(OperationMode mode, const std::vector<uint8_t> &modeSetting)
+{
+    OperationMode_V1_1 modeV1 = static_cast<OperationMode_V1_1>(mode);
+    return CommitStreams_V1_1(modeV1, modeSetting);
+}
+
+int32_t DStreamOperator::CommitStreams_V1_1(OperationMode_V1_1 mode, const std::vector<uint8_t> &modeSetting)
 {
     DHLOGI("DStreamOperator::CommitStreams, input operation mode=%{public}d.", mode);
 
@@ -192,12 +233,12 @@ int32_t DStreamOperator::CommitStreams(OperationMode mode, const std::vector<uin
         return ret;
     }
 
-    OHOS::sptr<DCameraProvider> provider = DCameraProvider::GetInstance();
-    if (provider == nullptr) {
-        DHLOGE("Distributed camera provider not init.");
+    OHOS::sptr<DCameraProvider> dProvider = DCameraProvider::GetInstance();
+    if (dProvider == nullptr) {
+        DHLOGE("DCameraProvider not init.");
         return CamRetCode::DEVICE_ERROR;
     }
-    ret = provider->ConfigureStreams(dhBase_, dCameraStreams);
+    ret = dProvider->ConfigureStreams(dhBase_, dCameraStreams);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("Commit distributed camera streams failed.");
         return MapToExternalRetCode(static_cast<DCamRetCode>(ret));
@@ -348,6 +389,12 @@ int32_t DStreamOperator::Capture(int32_t captureId, const CaptureInfo &info, boo
     if (captureId < 0 || FindCaptureInfoById(captureId) != nullptr) {
         DHLOGE("Input captureId %{public}d is exist.", captureId);
         return CamRetCode::INVALID_ARGUMENT;
+    }
+    DHLOGI("get currentOperMode_ %{public}d", currentOperMode_);
+    DCamRetCode ret = InitOutputConfigurations(dhBase_, sinkAbilityInfo_, sourceCodecInfo_);
+    if (ret != SUCCESS) {
+        DHLOGE("Init distributed camera output configurations failed, ret=%{public}d.", ret);
+        return ret;
     }
     return DoCapture(captureId, info, isStreaming);
 }
@@ -530,7 +577,7 @@ void DStreamOperator::GetCameraAttr(cJSON *rootValue, std::string formatStr, con
     for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
         if (item == nullptr || !cJSON_IsString(item)) {
-            DHLOGE("Resolution %s %d ,is not string.", formatStr.c_str(), i);
+            DHLOGE("Resolution %s %d, is not string.", formatStr.c_str(), i);
             continue;
         }
         std::string resoStr = std::string(item->valuestring);
@@ -563,17 +610,24 @@ void DStreamOperator::GetCameraAttr(cJSON *rootValue, std::string formatStr, con
     }
 }
 
-DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, const std::string &sinkAbilityInfo,
+DCamRetCode DStreamOperator::SetOutputVal(const DHBase &dhBase, const std::string &sinkAbilityInfo,
     const std::string &sourceCodecInfo)
 {
     dhBase_ = dhBase;
+    sinkAbilityInfo_ = sinkAbilityInfo;
+    sourceCodecInfo_ = sourceCodecInfo;
+    return SUCCESS;
+}
+
+DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, const std::string &sinkAbilityInfo,
+    const std::string &sourceCodecInfo)
+{
     cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
     CHECK_NULL_RETURN_LOG(rootValue, DCamRetCode::INVALID_ARGUMENT, "The sinkAbilityInfo is null.");
     CHECK_OBJECT_FREE_RETURN(rootValue, DCamRetCode::INVALID_ARGUMENT, "The sinkAbilityInfo is not object.");
 
     cJSON *srcRootValue = cJSON_Parse(sourceCodecInfo.c_str());
     CHECK_NULL_FREE_RETURN(srcRootValue, DCamRetCode::INVALID_ARGUMENT, rootValue);
-    
     if (!cJSON_IsObject(srcRootValue)) {
         cJSON_Delete(srcRootValue);
         cJSON_Delete(rootValue);
@@ -589,13 +643,40 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    if (ParsePhotoFormats(rootValue) != SUCCESS || ParsePreviewFormats(rootValue) != SUCCESS ||
-        ParseVideoFormats(rootValue) != SUCCESS) {
-        cJSON_Delete(rootValue);
-        cJSON_Delete(srcRootValue);
-        return DCamRetCode::INVALID_ARGUMENT;
+    if (currentOperMode_ == 0) {
+        if (ParsePhotoFormats(rootValue) != SUCCESS || ParsePreviewFormats(rootValue) != SUCCESS ||
+            ParseVideoFormats(rootValue) != SUCCESS) {
+            cJSON_Delete(rootValue);
+            cJSON_Delete(srcRootValue);
+            return DCamRetCode::INVALID_ARGUMENT;
+        }
+    } else {
+        cJSON *modeValue = cJSON_GetObjectItemCaseSensitive(rootValue, std::to_string(currentOperMode_).c_str());
+        if (modeValue == nullptr || !cJSON_IsObject(modeValue)) {
+            cJSON_Delete(rootValue);
+            cJSON_Delete(srcRootValue);
+            return DCamRetCode::INVALID_ARGUMENT;
+        }
+        if (ParsePhotoFormats(modeValue) != SUCCESS || ParsePreviewFormats(modeValue) != SUCCESS ||
+            ParseVideoFormats(modeValue) != SUCCESS) {
+            cJSON_Delete(rootValue);
+            cJSON_Delete(srcRootValue);
+            return DCamRetCode::INVALID_ARGUMENT;
+        }
     }
 
+    if (!CheckInputInfo()) {
+        cJSON_Delete(rootValue);
+        cJSON_Delete(srcRootValue);
+        return DEVICE_NOT_INIT;
+    }
+    cJSON_Delete(rootValue);
+    cJSON_Delete(srcRootValue);
+    return SUCCESS;
+}
+
+bool DStreamOperator::CheckInputInfo()
+{
     bool resolutionMap = false;
     if (!dcSupportedPhotoResolutionMap_.empty() || !dcSupportedPreviewResolutionMap_.empty() ||
         !dcSupportedVideoResolutionMap_.empty()) {
@@ -604,13 +685,9 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
 
     if (dcSupportedCodecType_.empty() || dcSupportedFormatMap_.empty() || !resolutionMap) {
         DHLOGE("Input ablity info is invalid.");
-        cJSON_Delete(rootValue);
-        cJSON_Delete(srcRootValue);
-        return DEVICE_NOT_INIT;
+        return false;
     }
-    cJSON_Delete(rootValue);
-    cJSON_Delete(srcRootValue);
-    return SUCCESS;
+    return true;
 }
 
 std::vector<DCEncodeType> DStreamOperator::ParseEncoderTypes(cJSON* rootValue)

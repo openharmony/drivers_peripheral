@@ -137,32 +137,10 @@ static int32_t StartHostapdHal(int id)
 static int32_t StartHostapd(void)
 {
     char startCmd[WIFI_MULTI_CMD_MAX_LEN] = {0};
-    char *p = startCmd;
-    int onceMove = 0;
-    int sumMove = 0;
-    onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
-        WIFI_MULTI_CMD_MAX_LEN - sumMove - 1, "%s", WPA_HOSTAPD_NAME);
-    if (onceMove < 0) {
-        HDF_LOGE("%{public}s:snprintf_s WPA_HOSTAPD_NAME fail", __func__);
+    if (memcpy_s(startCmd, WIFI_MULTI_CMD_MAX_LEN, HOSTAPD_START_CMD,
+        strlen(HOSTAPD_START_CMD)) != EOK) {
+        HDF_LOGI("memcpy start cmd failed");
         return HDF_FAILURE;
-    }
-    p = p + onceMove;
-    sumMove = sumMove + onceMove;
-    int num;
-    const WifiHostapdHalDeviceInfo *cfg = GetWifiCfg(&num);
-    if (cfg == NULL) {
-        HDF_LOGE("%{public}s:cfg is NULL", __func__);
-        return HDF_FAILURE;
-    }
-    for (int i = 0; i < num; i++) {
-        onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
-            WIFI_MULTI_CMD_MAX_LEN - sumMove - 1, " %s", cfg[i].config);
-        if (onceMove < 0) {
-            HDF_LOGE("%{public}s:snprintf_s config fail", __func__);
-            return HDF_FAILURE;
-        }
-        p = p + onceMove;
-        sumMove = sumMove + onceMove;
     }
     HDF_LOGI("Cmd is %{public}s", startCmd);
     int32_t ret = StartApMain(WPA_HOSTAPD_NAME, startCmd);
@@ -252,14 +230,6 @@ int32_t HostapdInterfaceStartApWithCmd(struct IHostapdInterface *self, const cha
     if (hostapdHalDevice == NULL) {
         HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
-    }
-
-    if (GetIfaceState(ifName) == 0) {
-        ret = hostapdHalDevice->enableAp(id);
-        if (ret != 0) {
-            HDF_LOGE("enableAp failed, ret = %{public}d", ret);
-            return HDF_FAILURE;
-        }
     }
     HDF_LOGI("%{public}s: hostapd start successfully", __func__);
     return HDF_SUCCESS;
@@ -724,6 +694,48 @@ static int32_t HdfHostapdCallbackFun(uint32_t event, void *data, const char *ifN
     return ret;
 }
 
+static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
+{
+    HDF_LOGI("enter %{public}s ", __func__);
+    int id = 0;
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
+        return;
+    }
+
+    if (hostapdHalDevice->stopAp(id) != 0) {
+        HDF_LOGE("stopAp failed");
+        return;
+    }
+
+    if (StopHostapdHal(id) != HDF_SUCCESS) {
+        HDF_LOGE("StopHostapdHal failed");
+        return;
+    }
+    HDF_LOGI("%{public}s: hostapd stop successfully", __func__);
+}
+
+static struct RemoteServiceDeathRecipient g_deathRecipient = {
+    .recipient = {
+        .OnRemoteDied = OnRemoteServiceDied,
+    }
+};
+
+static void AddDeathRecipientForService(struct IHostapdCallback *cbFunc)
+{
+    HDF_LOGI("enter %{public}s ", __func__);
+    if (cbFunc == NULL) {
+        HDF_LOGE("invalid parameter");
+        return;
+    }
+    struct HdfRemoteService *remote = cbFunc->AsObject(cbFunc);
+    if (remote == NULL) {
+        HDF_LOGE("remote is NULL");
+        return;
+    }
+    HdfRemoteServiceAddDeathRecipient(remote, &g_deathRecipient.recipient);
+}
 static int32_t HdfHostapdAddRemoteObj(struct IHostapdCallback *self)
 {
     struct HdfHostapdRemoteNode *pos = NULL;
@@ -750,6 +762,7 @@ static int32_t HdfHostapdAddRemoteObj(struct IHostapdCallback *self)
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
     DListInsertTail(&newRemoteNode->node, head);
+    AddDeathRecipientForService(self);
     return HDF_SUCCESS;
 }
 

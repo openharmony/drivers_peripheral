@@ -145,6 +145,7 @@ bool VendorInterface::Initialize(
 void VendorInterface::CleanUp()
 {
     std::lock_guard<std::mutex> lock(initAndCleanupProcessMutex_);
+    HDF_LOGE("vendorInterface clean up.");
     if (vendorInterface_ == nullptr) {
         HDF_LOGE("VendorInterface::CleanUp, vendorInterface_ is nullptr.");
         return;
@@ -181,6 +182,10 @@ size_t VendorInterface::SendPacket(Hci::HciPacketType type, const std::vector<ui
         }
     }
 
+    if (hci_ == nullptr) {
+        HDF_LOGE("VendorInterface::SendPacket, hci_ is nullptr.");
+        return BT_VENDOR_INVALID_DATA_LEN;
+    }
     return hci_->SendPacket(type, packet);
 }
 

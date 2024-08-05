@@ -503,7 +503,7 @@ static int32_t RecordingAudioInitFile(void)
 }
 
 #ifndef AUDIO_FEATURE_COMMUNITY
-static int32_t UpdateAudioRoute()
+static int32_t UpdateAudioRoute(void)
 {
     struct AudioRouteNode source = {
         .ext.device.type = PIN_IN_MIC,

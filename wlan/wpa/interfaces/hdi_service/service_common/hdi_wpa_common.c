@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "hdi_wpa_common.h"
 #include <hdf_log.h>
 #include <string.h>
@@ -31,6 +31,7 @@ static pthread_mutex_t g_mutexSta;
 static pthread_mutex_t g_mutexP2p;
 static pthread_mutex_t g_mutexChba;
 static pthread_mutex_t g_mutexCommon;
+static pthread_mutex_t g_mutexWpa;
 
 int Hex2Dec(const char *str)
 {
@@ -254,12 +255,14 @@ static int CommonCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen
 
 int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
 {
+    int ret = -1;
     HDF_LOGI("enter WpaCliCmd");
     if (cmd == NULL || buf == NULL || bufLen == 0) {
         HDF_LOGE("WpaCliCmd, invalid parameters!");
-        return -1;
+        return ret;
     }
     char *ifName = NULL;
+    pthread_mutex_lock(&g_mutexWpa);
     if (strncmp(cmd, "IFNAME=", strlen("IFNAME=")) == 0) {
         ifName = (char *)cmd + strlen("IFNAME=");
     } else if (strncmp(cmd, "INTERFACE_ADD ", strlen("INTERFACE_ADD ")) == 0) {
@@ -267,19 +270,50 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
     } else if (strncmp(cmd, "INTERFACE_REMOVE ", strlen("INTERFACE_REMOVE ")) == 0) {
         ifName = (char *)cmd + strlen("INTERFACE_REMOVE ");
     } else {
-        ifName = "wlan0";
+        ifName = "common";
     }
 
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
-        return StaCliCmd(GetStaCtrl(), cmd, buf, bufLen);
+        ret = StaCliCmd(GetStaCtrl(), cmd, buf, bufLen);
     } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
-        return P2pCliCmd(GetP2pCtrl(), cmd, buf, bufLen);
+        ret = P2pCliCmd(GetP2pCtrl(), cmd, buf, bufLen);
     } else if (strncmp(ifName, "chba", strlen("chba")) == 0) {
-        return ChbaCliCmd(GetChbaCtrl(), cmd, buf, bufLen);
+        ret = ChbaCliCmd(GetChbaCtrl(), cmd, buf, bufLen);
     } else if (strncmp(ifName, "common", strlen("common")) == 0) {
-        return CommonCliCmd(GetCommonCtrl(), cmd, buf, bufLen);
+        ret = CommonCliCmd(GetCommonCtrl(), cmd, buf, bufLen);
     } else {
         HDF_LOGE("WpaCliCmd, ifName is unknow!");
-        return -1;
     }
+    if (ret == 0 && ifName != NULL &&
+        strncmp(cmd, "INTERFACE_REMOVE ", strlen("INTERFACE_REMOVE ")) == 0) {
+        int nameLen = strlen(ifName);
+        ReleaseIfaceCtrl(ifName, nameLen);
+    }
+    pthread_mutex_unlock(&g_mutexWpa);
+    return ret;
+}
+
+int IsSockRemoved(const char *ifName, int len)
+{
+    int ret = -1;
+    if (len < IFNAME_LEN_MIN || len > IFNAME_LEN_MAX) {
+        HDF_LOGE("ifname is invalid");
+        return ret;
+    }
+    pthread_mutex_lock(&g_mutexWpa);
+    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
+        if (GetStaCtrl() == NULL) {
+            ret = 0;
+        }
+    } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+        if (GetP2pCtrl() == NULL) {
+            ret = 0;
+        }
+    } else if (strncmp(ifName, "chba", strlen("chba")) == 0) {
+        if (GetChbaCtrl() == NULL) {
+            ret = 0;
+        }
+    }
+    pthread_mutex_unlock(&g_mutexWpa);
+    return ret;
 }

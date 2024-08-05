@@ -73,11 +73,12 @@ typedef enum {
     WPA_EVENT_STA_AUTH_REJECT,
     WPA_EVENT_STA_NOTIFY,
     WPA_EVENT_VENDOR_EXT,
+    WPA_EVENT_AUTH_TIMEOUT,
 } WpaCallBackEventType;
 
 enum WpaClientType {
-    /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 ... | 1<<28 */
-    WIFI_WPA_TO_HAL_CLIENT = (1 << 28) - 1,
+    /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 ... | 1<<29 */
+    WIFI_WPA_TO_HAL_CLIENT = (1 << 29) - 1,
     WIFI_WPA_CLIENT_BUTT
 };
 
@@ -243,5 +244,5 @@ struct WpaVendorExtInfo {
 void WpaEventReport(const char *ifName, uint32_t event, void *data);
 int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
 int32_t WpaUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
-
+void ReleaseEventCallback(void);
 #endif

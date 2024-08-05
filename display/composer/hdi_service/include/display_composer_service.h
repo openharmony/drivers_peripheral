@@ -46,6 +46,9 @@ public:
     int32_t GetDisplayBacklight(uint32_t devId, uint32_t& level) override;
     int32_t SetDisplayBacklight(uint32_t devId, uint32_t level) override;
     int32_t GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t& value) override;
+    int32_t SetHardwareCursorPosition(uint32_t devId, int32_t x, int32_t y) override;
+    int32_t EnableHardwareCursorStats(uint32_t devId, bool enable) override;
+    int32_t GetHardwareCursorStats(uint32_t devId, uint32_t& frameCount, uint32_t& vsyncCount) override;
     int32_t SetDisplayClientCrop(uint32_t devId, const IRect& rect) override;
     int32_t SetDisplayVsyncEnabled(uint32_t devId, bool enabled) override;
     int32_t RegDisplayVBlankCallback(uint32_t devId, const sptr<IVBlankCallback>& cb) override;
@@ -75,6 +78,8 @@ public:
     int32_t GetHDRCapabilityInfos(uint32_t devId, HDRCapability& info) override;
     int32_t RegRefreshCallback(const sptr<IRefreshCallback>& cb) override;
     int32_t RegDisplayVBlankIdleCallback (const sptr<IVBlankIdleCallback>& cb) override;
+    int32_t ClearClientBuffer(uint32_t devId) override;
+    int32_t ClearLayerBuffer(uint32_t devId, uint32_t layerId) override;
 
 private:
     void HidumperInit();
@@ -101,11 +106,7 @@ private:
     /* V1_0, which is the version of vdi */
     IDisplayComposerVdi* vdiImpl_;
     DestroyComposerVdiFunc destroyVdiFunc_;
-#ifdef DISPLAY_COMMUNITY
     std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponser_;
-#else
-    std::unique_ptr<V1_0::HdiDisplayCmdResponser> cmdResponser_;
-#endif
 
     /* V1_1, which is the version of vdi */
     IDisplayComposerVdiV1_1* vdiImplV1_1_;

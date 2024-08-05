@@ -107,7 +107,7 @@ sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::CreateRenderImpl(c
     if (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP) {
         DHLOGI("Try to mmap mode.");
         renderFlags_ = Audioext::V2_0::MMAP_MODE;
-        audioRender = new AudioRenderExtImpl();
+        audioRender = sptr<AudioRenderInterfaceImplBase>(new AudioRenderExtImpl());
         if (audioRender == nullptr) {
             DHLOGE("audioRender is null.");
             return audioRender;
@@ -116,11 +116,13 @@ sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::CreateRenderImpl(c
     } else {
         DHLOGI("Try to normal mode.");
         renderFlags_ = Audioext::V2_0::NORMAL_MODE;
-        audioRender = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback, renderId);
+        audioRender = sptr<AudioRenderInterfaceImplBase>(new AudioRenderInterfaceImpl(adpDescriptor_.adapterName,
+            desc, attrs, extSpkCallback, renderId));
     }
 #else
     renderFlags_ = Audioext::V2_0::NORMAL_MODE;
-    audioRender = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback, renderId);
+    audioRender = sptr<AudioRenderInterfaceImplBase>(new AudioRenderInterfaceImpl(adpDescriptor_.adapterName,
+        desc, attrs, extSpkCallback, renderId));
 #endif
     return audioRender;
 }
@@ -259,10 +261,8 @@ bool AudioAdapterInterfaceImpl::CheckDevCapability(const AudioDeviceDescriptor &
 int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &desc,
     const AudioSampleAttributes &attrs, sptr<IAudioCapture> &capture, uint32_t &captureId)
 {
-    int32_t sampleRate = static_cast<int32_t>(attrs.sampleRate);
-    int32_t channelCount = static_cast<int32_t>(attrs.channelCount);
-    DHLOGI("Create distributed audio capture, {pin: %{public}d, sampleRate: %d, channel: %d, formats: %{public}d}.",
-        desc.pins, sampleRate, channelCount, attrs.format);
+    DHLOGI("Create daudio capture, {pin: %{public}d, sampleRate: %{public}" PRIu32", channel: %{public}" PRIu32
+        ", formats: %{public}d}.", desc.pins, attrs.sampleRate, attrs.channelCount, attrs.format);
     capture = nullptr;
     sptr<AudioCaptureInterfaceImplBase> audioCapture(nullptr);
     if (!CheckDevCapability(desc)) {
@@ -279,7 +279,7 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
     if (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP) {
         DHLOGI("Try to mmap mode.");
         capturerFlags_ = Audioext::V2_0::MMAP_MODE;
-        audioCapture = new AudioCaptureExtImpl();
+        audioCapture = sptr<AudioCaptureInterfaceImplBase>(new AudioCaptureExtImpl());
         if (audioCapture == nullptr) {
             DHLOGE("audioCapture is null.");
             return HDF_FAILURE;
@@ -288,11 +288,13 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
     } else {
         DHLOGI("Try to normal mode.");
         capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
-        audioCapture = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback);
+        audioCapture = sptr<AudioCaptureInterfaceImplBase>(new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName,
+            desc, attrs, extMicCallback));
     }
 #else
     capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
-    audioCapture = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback);
+    audioCapture = sptr<AudioCaptureInterfaceImplBase>(new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName,
+        desc, attrs, extMicCallback));
 #endif
     int32_t ret = OpenCaptureDevice(desc, attrs, extMicCallback, capPinId);
     if (ret != DH_SUCCESS) {
@@ -543,7 +545,7 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t s
 
 int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const std::string &caps)
 {
-    DHLOGI("Add distributed audio device %{public}d.", devId);
+    DHLOGI("Add distributed audio device %{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto dev = mapAudioDevice_.find(devId);
     if (dev != mapAudioDevice_.end()) {
@@ -559,7 +561,7 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
 
 int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
 {
-    DHLOGI("Remove distributed audio device %{public}d.", devId);
+    DHLOGI("Remove distributed audio device %{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
     {
         std::lock_guard<std::mutex> devLck(devMapMtx_);
         if (mapAudioDevice_.find(devId) == mapAudioDevice_.end()) {
@@ -745,7 +747,7 @@ uint32_t AudioAdapterInterfaceImpl::GetVolumeGroup(const uint32_t devId)
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto caps = mapAudioDevice_.find(devId);
     if (caps == mapAudioDevice_.end()) {
-        DHLOGE("Can not find caps of dev:%{public}u.", devId);
+        DHLOGE("Can not find caps of dev:%{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
         return volGroup;
     }
 
@@ -762,7 +764,7 @@ uint32_t AudioAdapterInterfaceImpl::GetInterruptGroup(const uint32_t devId)
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto caps = mapAudioDevice_.find(devId);
     if (caps == mapAudioDevice_.end()) {
-        DHLOGE("Can not find caps of dev:%{public}u.", devId);
+        DHLOGE("Can not find caps of devType: %{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
         return iptGroup;
     }
 

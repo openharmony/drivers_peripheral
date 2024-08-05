@@ -50,8 +50,8 @@ static int32_t AudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int 
     }
 
     std::shared_lock lock(mutex_);
-    if (client == nullptr || client->device == nullptr) {
-        HDF_LOGE("%{public}s: client or client.device is nullptr", __func__);
+    if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
+        HDF_LOGE("%{public}s: client or client.device or service is nullptr", __func__);
         return HDF_FAILURE;
     }
     auto *hdfAudioManagerHost = CONTAINER_OF(client->device->service, struct HdfAudioManagerHost, ioService);
@@ -111,13 +111,20 @@ int HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 void HdfAudioManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("Hdf audio manager driver release.");
-    if (deviceObject == nullptr) {
-        HDF_LOGE("%{public}s: deviceObject is nullptr", __func__);
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
+        HDF_LOGE("%{public}s: deviceObject or service is nullptr", __func__);
         return;
     }
     std::unique_lock lock(mutex_);
     auto *hdfAudioManagerHost = CONTAINER_OF(deviceObject->service, struct HdfAudioManagerHost, ioService);
+    if (hdfAudioManagerHost != nullptr) {
+        hdfAudioManagerHost->stub = nullptr;
+    }
     delete hdfAudioManagerHost;
+    hdfAudioManagerHost = nullptr;
+    if (deviceObject != nullptr) {
+        deviceObject->service = nullptr;
+    }
 }
 
 struct HdfDriverEntry g_audiomanagerDriverEntry = {

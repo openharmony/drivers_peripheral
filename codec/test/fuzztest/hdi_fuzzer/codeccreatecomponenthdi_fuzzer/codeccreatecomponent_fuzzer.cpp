@@ -31,7 +31,7 @@ namespace Codec {
         OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecComponentManager> omxMgr_ = nullptr;
         uint32_t g_componentId = 0;
         
-        omxMgr_ = ICodecComponentManager::Get(false);
+        omxMgr_ = ICodecComponentManager::Get(true);
         if (omxMgr_ == nullptr) {
             HDF_LOGE("%{public}s: ICodecComponentManager failed\n", __func__);
             return false;
@@ -51,6 +51,7 @@ namespace Codec {
             return false;
         }
 
+        callback_ = new CodecCallbackFuzz();
         int32_t ret = omxMgr_->CreateComponent(client_, g_componentId, caps[0].compName,
             static_cast<int64_t >(*data), callback_);
         if (ret != HDF_SUCCESS) {

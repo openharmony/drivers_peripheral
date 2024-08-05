@@ -17,6 +17,7 @@
 #define OHOS_DAUDIO_CONSTANTS_H
 
 #include <string>
+#include <map>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -53,6 +54,10 @@ const std::string HDF_EVENT_RESULT_FAILED = "DH_FAILED";
 const std::string HDF_EVENT_RESTART = "restart";
 const std::string HDF_EVENT_PAUSE = "pause";
 
+const std::string PRINT_SPK = "spk";
+const std::string PRINT_MIC = "mic";
+const std::string PRINT_NONE = "none";
+
 constexpr int32_t AUDIO_DEVICE_TYPE_UNKNOWN = 0;
 constexpr int32_t AUDIO_DEVICE_TYPE_SPEAKER = 1;
 constexpr int32_t AUDIO_DEVICE_TYPE_MIC = 2;
@@ -70,6 +75,7 @@ constexpr uint32_t AUDIO_FORMAT_DEFAULT = 16;
 
 constexpr int32_t MILLISECOND_PER_SECOND = 1000;
 constexpr uint32_t DEFAULT_AUDIO_DATA_SIZE = 3840;
+constexpr size_t RENDER_MAX_FRAME_SIZE = 4096;
 constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
 constexpr int64_t MAX_TIME_INTERVAL_US = 23000;
 

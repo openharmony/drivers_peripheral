@@ -21,6 +21,9 @@
 #include "hdi_wpa_hal.h"
 #include "hdi_wpa_common.h"
 #include "wpa_common_cmd.h"
+#ifndef OHOS_EUPDATER
+#include "wpa_client.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "HdiWpaHal"
@@ -263,7 +266,7 @@ WpaCtrl *GetStaCtrl(void)
     }
     return &g_wpaInterface->staCtrl;
 }
- 
+
 WpaCtrl *GetP2pCtrl(void)
 {
     HDF_LOGI("enter GetP2pCtrl");
@@ -273,7 +276,7 @@ WpaCtrl *GetP2pCtrl(void)
     }
     return &g_wpaInterface->p2pCtrl;
 }
- 
+
 WpaCtrl *GetChbaCtrl(void)
 {
     HDF_LOGI("enter GetChbaCtrl");
@@ -283,7 +286,7 @@ WpaCtrl *GetChbaCtrl(void)
     }
     return &g_wpaInterface->chbaCtrl;
 }
- 
+
 WpaCtrl *GetCommonCtrl(void)
 {
     HDF_LOGI("enter GetCommonCtrl");
@@ -292,4 +295,25 @@ WpaCtrl *GetCommonCtrl(void)
         return NULL;
     }
     return &g_wpaInterface->commonCtrl;
+}
+
+void ReleaseIfaceCtrl(char *ifName, int len)
+{
+    if (g_wpaInterface == NULL) {
+        return;
+    }
+    if (len < IFNAME_LEN_MIN || len > IFNAME_LEN_MAX) {
+        HDF_LOGE("ifname is invalid");
+        return;
+    }
+    if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+        ReleaseWpaCtrl(&(g_wpaInterface->p2pCtrl));
+    }
+    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
+        ReleaseWpaCtrl(&(g_wpaInterface->staCtrl));
+        ReleaseWpaCtrl(&(g_wpaInterface->chbaCtrl));
+#ifndef OHOS_EUPDATER
+        ReleaseEventCallback();
+#endif
+    }
 }

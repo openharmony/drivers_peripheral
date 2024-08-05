@@ -19,7 +19,12 @@
 #include <hdf_sbuf_ipc.h>
 #include <v2_0/daudio_manager_stub.h>
 
+#include <shared_mutex>
 using namespace OHOS::HDI::DistributedAudio::Audioext::V2_0;
+
+namespace {
+    std::shared_mutex mutex_;
+}
 
 struct HdfDAudioManagerHost {
     struct IDeviceIoService ioService;
@@ -29,16 +34,6 @@ struct HdfDAudioManagerHost {
 static int32_t DAudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    if (client == nullptr || client->device == nullptr) {
-        HDF_LOGE("%{public}s: client or client.device is nullptr", __func__);
-        return HDF_FAILURE;
-    }
-    auto *hdfDAudioManagerHost = CONTAINER_OF(client->device->service, struct HdfDAudioManagerHost, ioService);
-    if (hdfDAudioManagerHost == NULL || hdfDAudioManagerHost->stub == NULL) {
-        HDF_LOGE("%{public}s:invalid hdfAudioManagerHost", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
@@ -52,6 +47,16 @@ static int32_t DAudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int
         return HDF_ERR_INVALID_PARAM;
     }
 
+    std::shared_lock lock(mutex_);
+    if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
+        HDF_LOGE("%{public}s: client or client.device or service is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    auto *hdfDAudioManagerHost = CONTAINER_OF(client->device->service, struct HdfDAudioManagerHost, ioService);
+    if (hdfDAudioManagerHost == NULL || hdfDAudioManagerHost->stub == NULL) {
+        HDF_LOGE("%{public}s:invalid hdfAudioManagerHost", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return hdfDAudioManagerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
@@ -107,8 +112,16 @@ void HdfDAudioManagerDriverRelease(struct HdfDeviceObject *deviceObject)
         return;
     }
 
+    std::unique_lock lock(mutex_);
     auto *hdfDAudioManagerHost = CONTAINER_OF(deviceObject->service, struct HdfDAudioManagerHost, ioService);
+    if (hdfDAudioManagerHost != nullptr) {
+        hdfDAudioManagerHost->stub = nullptr;
+    }
     delete hdfDAudioManagerHost;
+    hdfDAudioManagerHost = nullptr;
+    if (deviceObject != nullptr) {
+        deviceObject->service = nullptr;
+    }
 }
 
 struct HdfDriverEntry g_daudiomanagerDriverEntry = {

@@ -48,7 +48,7 @@ extern "C" IAudioManager *AudioManagerImplGetInstance(void)
 AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 {
     DHLOGD("Distributed audio manager constructed.");
-    audioManagerRecipient_ = new AudioManagerRecipient();
+    audioManagerRecipient_ = sptr<AudioManagerRecipient>(new AudioManagerRecipient());
 }
 
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
@@ -266,7 +266,7 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
 int32_t AudioManagerInterfaceImpl::CreateAdapter(const std::string &adpName, const uint32_t devId,
     const sptr<IDAudioCallback> &callback)
 {
-    DHLOGI("Create adapter, pin id: %{public}d.", devId);
+    DHLOGI("Create adapter, pin id: %{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
     if (callback == nullptr) {
         DHLOGE("Adapter callback is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
