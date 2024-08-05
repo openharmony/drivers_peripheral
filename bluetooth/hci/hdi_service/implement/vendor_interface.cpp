@@ -56,12 +56,14 @@ VendorInterface::~VendorInterface()
 
 bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
 {
+    HDF_LOGI("VendorInterface BT_OP_HCI_CHANNEL_OPEN begin");
     int channel[HCI_MAX_CHANNEL] = {0};
     int channelCount = vendorInterface_->op(BtOpcodeT::BT_OP_HCI_CHANNEL_OPEN, channel);
     if (channelCount < 1 || channelCount > HCI_MAX_CHANNEL) {
         HDF_LOGE("vendorInterface_->op BT_OP_HCI_CHANNEL_OPEN failed ret:%d.", channelCount);
         return false;
     }
+    HDF_LOGI("VendorInterface BT_OP_HCI_CHANNEL_OPEN end");
 
     if (channelCount == 1) {
         auto h4 = std::make_shared<Hci::H4Protocol>(channel[0],
@@ -93,6 +95,7 @@ bool VendorInterface::Initialize(
     initializeCompleteCallback_ = initializeCompleteCallback;
     eventDataCallback_ = receiveCallback.onEventReceive;
 
+    HDF_LOGI("VendorInterface dlopen");
     vendorHandle_ = dlopen(BT_VENDOR_NAME, RTLD_NOW);
     if (vendorHandle_ == nullptr) {
         HDF_LOGE("VendorInterface dlopen %{public}s failed, error code: %{public}s", BT_VENDOR_NAME, dlerror());
@@ -112,6 +115,8 @@ bool VendorInterface::Initialize(
         HDF_LOGE("VendorInterface dlsym %{public}s failed.", BT_VENDOR_INTERFACE_SYMBOL_NAME);
         return false;
     }
+
+    HDF_LOGI("VendorInterface init");
     int result = vendorInterface_->init(&vendorCallbacks_, address.data());
     if (result != 0) {
         HDF_LOGE("vendorInterface_->init failed.");
@@ -137,8 +142,11 @@ bool VendorInterface::Initialize(
         HDF_LOGE("vendorInterface_ is nullptr");
         return false;
     }
+
+    HDF_LOGI("VendorInterface BT_OP_INIT");
     vendorInterface_->op(BtOpcodeT::BT_OP_INIT, nullptr);
 
+    HDF_LOGI("VendorInterface Initialize end");
     return true;
 }
 
