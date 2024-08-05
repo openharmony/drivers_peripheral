@@ -17,7 +17,7 @@
 #define DISPLAY_COMMON_FUZZER_H
 
 #include "v1_0/include/idisplay_buffer.h"
-#include "v1_1/include/idisplay_composer_interface.h"
+#include "v1_2/include/idisplay_composer_interface.h"
 #include "v1_1/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "buffer_handle.h"
