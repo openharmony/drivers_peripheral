@@ -64,6 +64,8 @@ WpaCtrl *GetStaCtrl(void);
 WpaCtrl *GetP2pCtrl(void);
 WpaCtrl *GetChbaCtrl(void);
 WpaCtrl *GetCommonCtrl(void);
+void ReleaseIfaceCtrl(char *ifName, int len);
+
 #ifdef __cplusplus
 }
 #endif

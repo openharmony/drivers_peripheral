@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,6 +25,8 @@ extern "C" {
 
 #define WPA_MESSAGE_KEY_LENGTH 64
 #define WPA_MESSAGE_VALUE_LENGTH 256
+#define IFNAME_LEN_MIN 3
+#define IFNAME_LEN_MAX 15
 
 typedef struct StWpaCtrl {
     struct wpa_ctrl *pSend;
@@ -42,6 +45,7 @@ void ReleaseWpaCtrl(WpaCtrl *pCtrl);
 int WpaCliCmd(const char *cmd, char *buf, size_t bufLen);
 int Hex2Dec(const char *str);
 void TrimQuotationMark(char *str, char c);
+int IsSockRemoved(const char *ifName, int len);
 
 #ifdef __cplusplus
 }
