@@ -1643,7 +1643,7 @@ int32_t UsbImpl::ControlTransferReadwithLength(
     controlParams.value = ctrlParams.value;
     controlParams.index = ctrlParams.index;
     controlParams.target = (UsbRequestTargetType)(static_cast<uint32_t>(ctrlParams.requestType) & USB_RECIP_MASK);
-    controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrlParams.requestType)) 
+    controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrlParams.requestType))
         >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
     controlParams.reqType = static_cast<uint32_t>(ctrlParams.requestType);
     controlParams.size = ctrlParams.length;
