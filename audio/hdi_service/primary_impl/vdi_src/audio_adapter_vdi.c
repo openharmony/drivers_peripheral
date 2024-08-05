@@ -118,6 +118,12 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
 
+    if (desc->pins == PIN_OUT_LINEOUT || desc->pins == PIN_OUT_HDMI ||
+        desc->pins == PIN_NONE || desc->pins >= PIN_IN_MIC) {
+        AUDIO_FUNC_LOGE("invalid pin [%{public}d]", desc->pins);
+        return HDF_FAILURE;
+    }
+
     pthread_mutex_lock(&g_adapterMutex);
     *render = FindRenderCreated(desc->pins, attrs, renderId);
     if (*render != NULL) {
@@ -138,10 +144,6 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
-    vdiRender->AddAudioEffect = NULL;
-    vdiRender->RemoveAudioEffect = NULL;
-    vdiRender->GetFrameBufferSize = NULL;
-    vdiRender->IsSupportsPauseAndResume = NULL;
     *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc);
     if (*render == NULL) {
         (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
