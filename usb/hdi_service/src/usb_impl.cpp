@@ -160,7 +160,7 @@ int32_t UsbImpl::UsbControlTransferEx(HostDevice *dev, UsbControlParams *ctrPara
         return HDF_FAILURE;
     }
 
-    if (dev == nullptr || dev->ctrDevHandle == nullptr || ctrParams == nullptr || ctrParams->data == nullptr) {
+    if (dev == nullptr || dev->ctrDevHandle == nullptr || ctrParams == nullptr) {
         HDF_LOGE("%{public}s:invalid params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
