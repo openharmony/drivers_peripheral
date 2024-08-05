@@ -1146,7 +1146,7 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
     Buffer *oldRootSecret = GetCacheRootSecret(userId);
     if (!IsBufferValid(oldRootSecret)) {
         IAM_LOGE("get GetCacheRootSecret failed");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_SUCCESS;
     }
     if (memcpy_s(rootSecret.data(), rootSecret.size(), oldRootSecret->buf, oldRootSecret->contentSize) != EOK) {
         IAM_LOGE("rootSecret copy failed");
