@@ -117,6 +117,8 @@ int32_t UsbDdkService::Init()
         g_pnpListener->callBack = UsbdPnpEventHandler;
         if (DdkListenerMgrAdd(g_pnpListener) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: add listener failed", __func__);
+            delete g_pnpListener;
+            g_pnpListener = nullptr;
             return HDF_FAILURE;
         }
     }
