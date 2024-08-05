@@ -171,7 +171,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_007, TestSize.Level1)
         printf("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES value count is 0\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES value count is 0");
         return;
-    } else if (entry.data.u8 == nullptr) {
+    } else if (entry.data.i32 == nullptr) {
         printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!");
         return;
