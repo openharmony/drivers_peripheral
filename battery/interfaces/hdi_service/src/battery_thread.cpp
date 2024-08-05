@@ -38,6 +38,15 @@ const std::string POWER_SUPPLY = "SUBSYSTEM=power_supply";
 }
 static sptr<IBatteryCallback> g_callback;
 
+BatteryThread::~BatteryThread()
+{
+    BATTERY_HILOGW(COMP_HDI, "enter %{public}s", __func__);
+    isRunning_ = false;
+    if (batteryThread_ != nullptr && batteryThread_->joinable()) {
+        batteryThread_->join();
+    }
+}
+
 void BatteryThread::InitCallback(const sptr<IBatteryCallback>& callback)
 {
     g_callback = callback;
@@ -242,13 +251,13 @@ bool BatteryThread::CheckPowerUevent(const char* msg, std::string& powerUevent)
     return false;
 }
 
-int32_t BatteryThread::LoopingThreadEntry(void* arg)
+void BatteryThread::LoopingThreadEntry(void* arg)
 {
     int32_t nevents = 0;
     size_t size = callbacks_.size();
     struct epoll_event events[size];
 
-    while (true) {
+    while (isRunning_) {
         if (!nevents) {
             CycleMatters();
         }
@@ -283,9 +292,8 @@ void BatteryThread::StartThread(void* service)
 
 void BatteryThread::Run(void* service)
 {
-    std::thread batteryThread([this, service] { this->LoopingThreadEntry(service); });
-    pthread_setname_np(batteryThread.native_handle(), "battery_thread");
-    batteryThread.detach();
+    batteryThread_ = std::make_unique<std::thread>([this, service] { this->LoopingThreadEntry(service); });
+    pthread_setname_np(batteryThread_->native_handle(), "battery_thread");
 }
 } // namespace V2_0
 } // namespace Battery
