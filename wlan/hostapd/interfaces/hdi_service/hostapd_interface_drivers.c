@@ -118,6 +118,7 @@ static void HdfHostapdInterfaceDriverRelease(struct HdfDeviceObject *deviceObjec
     struct HdfHostapdStubData *stubData = HdfHostapdStubDriver();
     if (stubData == NULL) {
         HDF_LOGE("%{public}s: stubData is NUll!", __func__);
+        pthread_rwlock_unlock(&g_rwLock);
         return;
     }
 
