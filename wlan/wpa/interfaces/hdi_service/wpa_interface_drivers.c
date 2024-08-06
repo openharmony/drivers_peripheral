@@ -18,6 +18,7 @@
 #include <hdf_device_object.h>
 #include <hdf_log.h>
 #include <sys/ioctl.h>
+#include <pthread.h>
 #include <sys/stat.h>
 #include <osal_mem.h>
 #include <stub_collector.h>
@@ -30,24 +31,30 @@ struct HdfWpaInterfaceHost {
     struct HdfRemoteService **stubObject;
 };
 
+static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
+static int g_stop = 0;
 
 static int32_t WpaInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     HDF_LOGI("WpaInterfaceDriverDispatch enter.");
+    pthread_rwlock_rdlock(&g_rwLock);
     struct HdfWpaInterfaceHost *wpainterfaceHost = CONTAINER_OF(
         client->device->service, struct HdfWpaInterfaceHost, ioService);
-    if (wpainterfaceHost->service == NULL || wpainterfaceHost->stubObject == NULL) {
+    if (g_stop == 1 || wpainterfaceHost->service == NULL || wpainterfaceHost->stubObject == NULL) {
         HDF_LOGE("%{public}s: invalid service obj", __func__);
+        pthread_rwlock_unlock(&g_rwLock);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     struct HdfRemoteService *stubObj = *wpainterfaceHost->stubObject;
     if (stubObj == NULL || stubObj->dispatcher == NULL || stubObj->dispatcher->Dispatch == NULL) {
+        pthread_rwlock_unlock(&g_rwLock);
         return HDF_ERR_INVALID_OBJECT;
     }
-
-    return stubObj->dispatcher->Dispatch((struct HdfRemoteService *)stubObj->target, cmdId, data, reply);
+    int ret = stubObj->dispatcher->Dispatch((struct HdfRemoteService *)stubObj->target, cmdId, data, reply);
+    pthread_rwlock_unlock(&g_rwLock);
+    return ret;
 }
 
 static int HdfWpaInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
@@ -104,9 +111,12 @@ static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     HDF_LOGI("HdfWpaInterfaceDriverRelease enter.");
     struct HdfWpaRemoteNode *pos = NULL;
     struct HdfWpaRemoteNode *tmp = NULL;
+    pthread_rwlock_wrlock(&g_rwLock);
+    g_stop = 1;
     struct HdfWpaStubData *stubData = HdfWpaStubDriver();
     if (stubData == NULL) {
         HDF_LOGE("%{public}s: stubData is NUll!", __func__);
+        pthread_rwlock_unlock(&g_rwLock);
         return;
     }
 
@@ -122,6 +132,7 @@ static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     IWpaInterfaceRelease(wpainterfaceHost->service, true);
     OsalMemFree(wpainterfaceHost);
     wpainterfaceHost = NULL;
+    pthread_rwlock_unlock(&g_rwLock);
 }
 
 struct HdfDriverEntry g_wpainterfaceDriverEntry = {
