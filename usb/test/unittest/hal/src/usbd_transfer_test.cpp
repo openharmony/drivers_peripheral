@@ -92,7 +92,7 @@ int32_t SwitchErrCode(int32_t ret)
 
 void UsbdTransferTest::SetUpTestCase(void)
 {
-    g_usbInterface = IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
     if (g_usbInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
         exit(0);
