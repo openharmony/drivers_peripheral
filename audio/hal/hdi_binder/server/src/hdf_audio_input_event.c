@@ -173,7 +173,7 @@ int32_t AudioHeadsetPnpInputStartThread(void)
     g_bRunThread = true;
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-    if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, (void *)&thread)) != 0) {
+    if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, (void *)&thread) != 0) {
         AUDIO_FUNC_LOGE("[pthread_create] failed!");
         g_bRunThread = false;
         return HDF_FAILURE;
