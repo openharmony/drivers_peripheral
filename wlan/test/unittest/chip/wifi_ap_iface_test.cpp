@@ -21,6 +21,7 @@
 using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
 
+
 namespace WifiApIfaceTest {
 const std::string AP_IFNAME = "wlan1";
 const std::string TEST_MAC = "000000";

@@ -25,6 +25,7 @@
 #include "v1_0/ihostapd_interface.h"
 #include "hostapd_impl.h"
 
+
 struct HdfHostapdInterfaceHost {
     struct IDeviceIoService ioService;
     struct IHostapdInterface *service;
