@@ -35,12 +35,12 @@ enum EventType {
 
 class BatteryThread {
 public:
-    virtual ~BatteryThread() = default;
+    virtual ~BatteryThread();
 
     void StartThread(void* service);
     void InitCallback(const sptr<OHOS::HDI::Battery::V1_2::IBatteryCallback>& callback);
 protected:
-    int32_t LoopingThreadEntry(void* arg);
+    void LoopingThreadEntry(void* arg);
     virtual void Run(void* service);
     virtual void UpdateBatteryInfo(void* service);
     virtual void HandleStates() {}
@@ -62,6 +62,8 @@ private:
     using Callback = std::function<void(BatteryThread*, void*)>;
     std::map<int32_t, Callback> callbacks_;
     std::unique_ptr<PowerSupplyProvider> provider_ = nullptr;
+    std::unique_ptr<std::thread> batteryThread_ {nullptr};
+    std::atomic_bool isRunning_ {true};
 };
 }  // namespace V1_2
 }  // namespace Battery
