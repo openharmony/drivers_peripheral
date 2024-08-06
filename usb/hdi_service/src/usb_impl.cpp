@@ -474,6 +474,7 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
     ret = UsbFillRequest(requestSync->request, requestSync->ifHandle, &requestSync->params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFillRequest failed, ret=%{public}d ", __func__, ret);
+        OsalMutexUnlock(&requestSync->lock);
         return HDF_FAILURE;
     }
     requestSync->params.timeout = static_cast<uint32_t>(timeout);
@@ -487,6 +488,7 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
             requestSync->request->compInfo.actualLength);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: memcpy_s failed, ret = %{public}d", __func__, ret);
+            OsalMutexUnlock(&requestSync->lock);
             return HDF_FAILURE;
         }
         tcur += requestSync->request->compInfo.actualLength;
