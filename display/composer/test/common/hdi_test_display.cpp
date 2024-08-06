@@ -22,7 +22,7 @@ namespace HDI {
 namespace Display {
 namespace TEST {
 using namespace OHOS::HDI::Display::Composer::V1_1;
-HdiTestDisplay::HdiTestDisplay(uint32_t id, sptr<Composer::V1_1::IDisplayComposerInterface> device)
+HdiTestDisplay::HdiTestDisplay(uint32_t id, sptr<Composer::V1_2::IDisplayComposerInterface> device)
     : id_(id), device_(device), currentFb_(nullptr)
 {
 }

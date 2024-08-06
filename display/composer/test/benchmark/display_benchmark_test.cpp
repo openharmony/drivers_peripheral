@@ -36,7 +36,7 @@ using namespace OHOS::HDI::Display::Composer::V1_1;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-static sptr<Composer::V1_1::IDisplayComposerInterface> g_composerDevice = nullptr;
+static sptr<Composer::V1_2::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
 

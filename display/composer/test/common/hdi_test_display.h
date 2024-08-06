@@ -30,7 +30,7 @@ namespace TEST {
 using namespace OHOS::HDI::Display::Composer::V1_1;
 class HdiTestDisplay {
 public:
-    HdiTestDisplay(uint32_t id, sptr<Composer::V1_1::IDisplayComposerInterface> device);
+    HdiTestDisplay(uint32_t id, sptr<Composer::V1_2::IDisplayComposerInterface> device);
     virtual ~HdiTestDisplay() {}
     int32_t Init();
     int32_t GetModeInfoFromId(int32_t id, DisplayModeInfo& modeInfo) const;
@@ -65,7 +65,7 @@ private:
     uint32_t activeModeId_ = 0;
     DisplayModeInfo currentMode_ = { 0 };
     uint32_t id_;
-    sptr<Composer::V1_1::IDisplayComposerInterface> device_;
+    sptr<Composer::V1_2::IDisplayComposerInterface> device_;
 
     DisplayCapability cap_;
     std::vector<DisplayModeInfo> modes_;
