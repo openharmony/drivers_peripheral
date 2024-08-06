@@ -872,12 +872,13 @@ static int32_t UsbEcmAlloc(struct UsbEcmDevice *ecm)
 
 static void UsbEcmFree(struct UsbEcmDevice *ecm)
 {
-    if (ecm->port != NULL) {
+    if (ecm != NULL && ecm->port != NULL) {
         OsalMutexDestroy(&ecm->port->lock);
         OsalMutexDestroy(&ecm->port->lockRW);
         OsalMutexDestroy(&ecm->port->lockReadFifo);
         OsalMutexDestroy(&ecm->port->lockWriteFifo);
         OsalMemFree(ecm->port);
+        ecm->port = NULL;
     }
 }
 
@@ -1027,6 +1028,7 @@ static void EcmDriverRelease(struct HdfDeviceObject *device)
     UsbEcmFree(ecm);
     (void)OsalMutexDestroy(&ecm->lock);
     OsalMemFree(ecm);
+    ecm = NULL;
 }
 
 struct HdfDriverEntry g_ecmDriverEntry = {
