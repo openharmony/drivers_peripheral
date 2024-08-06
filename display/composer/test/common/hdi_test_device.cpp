@@ -43,7 +43,7 @@ void HdiTestDevice::HotPlug(uint32_t outputId, bool connected, void* data)
 
 int32_t HdiTestDevice::InitDevice()
 {
-    displayDevice_ = Composer::V1_1::IDisplayComposerInterface::Get();
+    displayDevice_ = Composer::V1_2::IDisplayComposerInterface::Get();
     DISPLAY_TEST_CHK_RETURN((displayDevice_ == nullptr), DISPLAY_FAILURE,
         DISPLAY_TEST_LOGE("get IDisplayComposerInterface failed"));
 
