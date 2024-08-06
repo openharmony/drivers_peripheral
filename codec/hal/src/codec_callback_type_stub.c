@@ -267,6 +267,7 @@ struct CodecCallbackType *CodecCallbackTypeStubGetInstance(void)
 
     if (!HdfRemoteServiceSetInterfaceDesc(stub->service.remote, "ohos.hdi.codec_service")) {
         CODEC_LOGE("failed to init interface desc");
+        OsalMemFree(stub);
         return NULL;
     }
 
