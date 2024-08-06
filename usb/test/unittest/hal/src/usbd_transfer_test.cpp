@@ -1317,7 +1317,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferReadwithLength020, TestSize.Level1
 /**
  * @tc.name: UsbdControlTransferReadwithLength021
  * @tc.desc: Test functions to ControlTransferReadwithLength
- * @tc.desc: int32_t ControlTransferReadwithLength(const UsbDev &dev, UsbCtrlTransferParams &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: int32_t ControlTransferReadwithLength(const UsbDev &dev, UsbCtrlTransferParams &ctrl,
+ * @tc.desc: std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error, standard request: sync frame
  * @tc.type: FUNC
  */
@@ -1325,8 +1326,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferReadwithLength021, TestSize.Level1
 {
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
     std::vector<uint8_t> bufferData(MAX_BUFFER_LENGTH);
-    struct UsbCtrlTransferParams ctrlparmas = {USB_ENDPOINT_DIR_IN | USB_REQUEST_TARGET_ENDPOINT, USB_DDK_REQ_SYNCH_FRAME,
-        0, 0, TRANSFER_TIME_OUT};
+    struct UsbCtrlTransferParams ctrlparmas = {USB_ENDPOINT_DIR_IN | USB_REQUEST_TARGET_ENDPOINT,
+        USB_DDK_REQ_SYNCH_FRAME, 0, 0, TRANSFER_TIME_OUT};
     auto ret = g_usbInterface->ControlTransferReadwithLength(dev, ctrlparmas, bufferData);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransferReadwithLength021 ret=%{public}d", ret);
     ASSERT_NE(ret, 0);
