@@ -416,8 +416,7 @@ int32_t UsbImpl::UsbdFindRequestSyncAndCreatwithLength(HostDevice *port, uint8_t
             *request = requestSync;
             return HDF_SUCCESS;
         } else {
-            HdfSListRemove(&port->reqASyncList, &requestSync->node);
-            UsbdDispatcher::UsbdRequestSyncRelease(requestSync);
+            UsbdRequestSyncReleaseList(port);
             HDF_LOGD("%{public}s:ifId:%{public}u, epId:%{public}u,realloc reqeustsync.",
                 __func__, interfaceId, pipeAddr);
         }
@@ -1379,18 +1378,20 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    if (interfaceId == MAX_INTERFACEID) {
-        if (port->ctrIface != nullptr) {
-            UsbReleaseInterface(port->ctrIface);
-            port->ctrIface = nullptr;
+    if (interfaceId < USB_MAX_INTERFACES) {
+        if (HdfSListCount(&port->reqSyncList) > 0) {
+            UsbdRequestSyncReleaseList(port);
+            HDF_LOGD("%{public}s:release sync list", __func__);
+        }
+        if (HdfSListCount(&port->reqASyncList) > 0) {
+            UsbdRequestASyncReleaseList(port);
+            HDF_LOGD("%{public}s:release async list", __func__);
         }
 
-        if (port->ctrDevHandle != nullptr) {
-            UsbCloseInterface(port->ctrDevHandle, false);
-            port->ctrDevHandle = nullptr;
+        int32_t ret = UsbdBulkASyncListReleasePort(port);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s:release bulk async list failed", __func__);
         }
-        return HDF_SUCCESS;
-    } else if (interfaceId < USB_MAX_INTERFACES) {
         if (port->iface[interfaceId] != nullptr) {
             UsbReleaseInterface(port->iface[interfaceId]);
             port->iface[interfaceId] = nullptr;
