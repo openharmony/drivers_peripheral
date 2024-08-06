@@ -30,6 +30,7 @@ struct HdfWpaInterfaceHost {
     struct HdfRemoteService **stubObject;
 };
 
+
 static int32_t WpaInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {

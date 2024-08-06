@@ -24,6 +24,7 @@ namespace WifiP2pIfaceTest {
 const std::string P2P_IFNAME = "P2P0";
 const std::string TEST_MAC = "000000";
 
+
 class WifiP2pIfaceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
