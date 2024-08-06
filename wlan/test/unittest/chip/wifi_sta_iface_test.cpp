@@ -26,7 +26,6 @@ const std::string WLAN_IFNAME = "wlan0";
 const std::string AP_IFNAME = "wlan1";
 const std::string TEST_MAC = "000000";
 
-
 class WifiStaIfaceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -47,14 +46,6 @@ public:
         wifiVendorHalTest.reset();
         ifaceTool.reset();
         ifaceUtil.reset();
-        delete staIface;
-        if (staIface != nullptr) {
-            staIface = nullptr;
-        }
-        delete testIface;
-        if (testIface != nullptr) {
-            testIface = nullptr;
-        }
     }
 
 public:
