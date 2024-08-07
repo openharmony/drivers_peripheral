@@ -74,6 +74,7 @@ enum AudioEffectHDICommandVdi {
     EFFECT_ROOM_MODE = 3,
     EFFECT_BLUETOOTH_MODE = 4,
     EFFECT_DESTROY = 5,
+    EFFECT_SPATIAL_DEVICE_TYPE = 6,
 };
 
 #ifdef __cplusplus
