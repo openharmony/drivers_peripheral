@@ -46,7 +46,7 @@ bool UsbIsoTransferReadFuzzTest(const uint8_t *data, size_t size)
 
     int32_t timeout = *(reinterpret_cast<int32_t *>(*(data + OFFSET)));
     ret = usbInterface->IsoTransferRead(
-        dev, pipe, timeout, reinterpret_cast<std::vector<uint8_t> &>(data + OFFSET_BYTE));
+        dev, pipe, timeout, reinterpret_cast<std::vector<uint8_t> &>(std::move(data + OFFSET_BYTE)));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: iso transfer read succeed", __func__);
     }

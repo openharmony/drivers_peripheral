@@ -23,17 +23,18 @@
 #include "usbd_port.h"
 #include "usbd_function.h"
 #include "UsbSubscriberTest.h"
-#include "v1_0/iusb_interface.h"
-#include "v1_0/usb_types.h"
+#include "v1_1/iusb_interface.h"
+#include "v1_1/usb_types.h"
 
 using namespace benchmark::internal;
 using namespace OHOS;
 using namespace std;
 using namespace OHOS::USB;
 using namespace OHOS::HDI::Usb::V1_0;
+using namespace OHOS::HDI::Usb::V1_1;
 
 namespace {
-sptr<IUsbInterface> g_usbInterface = nullptr;
+sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> g_usbInterface = nullptr;
 struct UsbDev g_dev = {0, 0};
 const int SLEEP_TIME = 3;
 const uint8_t INTERFACEID_OK = 1;
@@ -107,7 +108,7 @@ int32_t SwitchErrCode(int32_t ret)
 
 void HdfUsbdBenchmarkTransferTest::SetUp(const ::benchmark::State& state)
 {
-    g_usbInterface = IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
     ASSERT_NE(g_usbInterface, nullptr);
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SOURCE, DATA_ROLE_HOST);
     sleep(SLEEP_TIME);
@@ -193,6 +194,34 @@ BENCHMARK_F(HdfUsbdBenchmarkTransferTest, ControlTransferWrite)(benchmark::State
 }
 BENCHMARK_REGISTER_F(HdfUsbdBenchmarkTransferTest, ControlTransferWrite)->
     Iterations(ITERATION_WRITE_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+ * @tc.name: ControlTransferReadwithLengh
+ * @tc.desc: Benchmark test
+ * @tc.desc: Test functions to ControlTransferReadwithLengh(const UsbDev &dev, UsbCtrlTransferParams &ctrl,
+ * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly, standard request: get configuration
+ * @tc.type: FUNC
+ */
+BENCHMARK_F(HdfUsbdBenchmarkTransferTest, ControlTransferReadwithLengh)(benchmark::State& state)
+{
+    ASSERT_TRUE(g_usbInterface != nullptr);
+    int32_t ret;
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    ASSERT_TRUE(subscriber != nullptr);
+    InitPara(subscriber);
+    std::vector<uint8_t> bufferData(MAX_BUFFER_LENGTH);
+    struct UsbCtrlTransferParams ctrlparmas = {
+        USB_ENDPOINT_DIR_IN, USB_DDK_REQ_GET_CONFIGURATION, 0, 0, 0, TRANSFER_TIME_OUT};
+    for (auto _ : state) {
+        ret = g_usbInterface->ControlTransferReadwithLength(g_dev, ctrlparmas, bufferData);
+    }
+    EXPECT_EQ(0, ret);
+    ReleasePara(subscriber);
+}
+
+BENCHMARK_REGISTER_F(HdfUsbdBenchmarkTransferTest, ControlTransferReadwithLengh)->
+    Iterations(ITERATION_READ_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
  * @tc.name: BulkTransferRead
