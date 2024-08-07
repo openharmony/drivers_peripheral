@@ -93,6 +93,7 @@ public:
 
     static int32_t UsbdRequestSyncReleaseList(HostDevice *port);
     static int32_t UsbdRequestASyncReleaseList(HostDevice *port);
+
     static int32_t UsbdBulkASyncListReleasePort(HostDevice *port);
     static int32_t UsbdRequestASyncReleaseData(UsbdRequestASync *request);
     static UsbInterfaceHandle *InterfaceIdToHandle(const HostDevice *dev, uint8_t id);
