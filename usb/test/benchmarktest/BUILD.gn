@@ -131,7 +131,7 @@ ohos_benchmarktest("hdf_usb_benchmark_transfer_test") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_proxy_1.0",
+      "drivers_interface_usb:libusb_proxy_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
