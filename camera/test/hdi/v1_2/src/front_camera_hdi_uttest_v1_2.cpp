@@ -104,7 +104,7 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_002, TestSize.Le
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_VIRTUAL_APERTURE_RANGE, &entry);
 
-    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         for (size_t i = 0; i < entry.count; i++) {
             // Get Stream Operator
             cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
