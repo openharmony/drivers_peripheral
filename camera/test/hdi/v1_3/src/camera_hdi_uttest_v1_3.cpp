@@ -1570,8 +1570,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_040, TestSize.Level1)
         for (uint8_t i = 0; i < entry.count; i++) {
             // Get stream operator
             cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
-            cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
-                cameraTest->streamOperator_V1_3);
+            cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(
+                cameraTest->streamOperatorCallbackV1_3, cameraTest->streamOperator_V1_3);
             EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
             // Preview streamInfo

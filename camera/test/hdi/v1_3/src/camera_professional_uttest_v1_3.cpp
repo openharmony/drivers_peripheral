@@ -65,7 +65,7 @@ bool g_isModeExists(std::shared_ptr<CameraMetadata> ability, uint32_t tag, uint8
     return false;
 }
 
-void GetSupportedPhysicalApertureValues(std::shared_ptr<CameraMetadata> ability)
+bool GetSupportedPhysicalApertureValues(std::shared_ptr<CameraMetadata> ability)
 {
     supportedPhysicalApertureValues_.clear();
     EXPECT_NE(ability, nullptr);
@@ -73,12 +73,17 @@ void GetSupportedPhysicalApertureValues(std::shared_ptr<CameraMetadata> ability)
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     int rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE, &entry);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
-    EXPECT_TRUE(entry.data.f != nullptr);
-    float entryValues[] = {entry.data.f[3], entry.data.f[7], entry.data.f[8], entry.data.f[9], entry.data.f[10],
-        entry.data.f[14], entry.data.f[18]};
-    for (size_t i = 0; i < sizeof(entryValues) / sizeof(float); i++) {
-        supportedPhysicalApertureValues_.push_back(entryValues[i]);
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+        float entryValues[] = {entry.data.f[3], entry.data.f[7], entry.data.f[8], entry.data.f[9], entry.data.f[10],
+            entry.data.f[14], entry.data.f[18]};
+        for (size_t i = 0; i < sizeof(entryValues) / sizeof(float); i++) {
+            supportedPhysicalApertureValues_.push_back(entryValues[i]);
+        }
+        return true;
+    } else {
+        printf("get tag<OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE> failed.\n");
+        CAMERA_LOGE("get tag<OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE> failed.");
+        return false;
     }
 }
 
