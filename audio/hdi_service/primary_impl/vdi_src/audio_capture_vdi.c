@@ -136,7 +136,6 @@ int32_t AudioGetCapturePositionVdi(struct IAudioCapture *capture, uint64_t *fram
     HdfAudioStartTrace("Hdi:AudioGetCapturePositionVdi", 0);
     int32_t ret = vdiCapture->GetCapturePosition(vdiCapture, frames, (struct AudioTimeStampVdi *)time);
     HdfAudioFinishTrace();
-
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture get position fail, ret=%{public}d", ret);
         return ret;
