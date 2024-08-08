@@ -745,6 +745,7 @@ int32_t HdiServiceRenderGetRenderPosition(const struct HdfDeviceIoClient *client
     (void)OsalMutexLock(&g_renderLock);
     if (render == NULL || render->GetRenderPosition == NULL) {
         AUDIO_FUNC_LOGE("render or GetRenderPosition is NULL");
+        (void)OsalMutexUnlock(&g_renderLock);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->GetRenderPosition((AudioHandle)render, &frames, &time);
