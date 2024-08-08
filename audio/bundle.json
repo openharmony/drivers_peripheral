@@ -47,6 +47,17 @@
                 "//drivers/peripheral/audio:hdi_audio",
                 "//drivers/peripheral/audio/effect:effect_model"
             ],
+            "inner_kits": [
+                {
+                    "type": "so",
+                    "name": "//drivers/peripheral/audio/hdi_service/primary_impl:audio_primary_impl_vendor",
+                    "header": {
+                        "header_base": "//drivers/peripheral/audio/interfaces/sound",
+                        "header_files": [
+                        ]
+                    }
+                }
+            ],
             "test": [
                 "//drivers/peripheral/audio/test:audio_test_entry",
                 "//drivers/peripheral/audio/test/sample:idl_audio_sample",
