@@ -716,6 +716,7 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
     (void)OsalMutexLock(&g_renderLock);
     if (render == NULL || render->RenderFrame == NULL) {
         AUDIO_FUNC_LOGE("render or RenderFrame is NULL");
+        (void)OsalMutexUnlock(&g_renderLock);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->RenderFrame((AudioHandle)render, (const void *)frame, (uint64_t)requestBytes, &replyBytes);
