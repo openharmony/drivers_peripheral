@@ -12,38 +12,16 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//build/test.gni")
 
-ohos_unittest("codec_hdi_jpeg_test") {
-  module_out_path = "drivers_peripheral_codec/codec"
+ohos_executable("codec_heif_encode") {
+  include_dirs = [ "./include" ]
 
-  sources = [ "codec_hdi_jpeg_test.cpp" ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "c_utils:utils",
-      "drivers_interface_codec:libimage_proxy_2.0",
-      "drivers_interface_display:libdisplay_buffer_hdi_impl",
-      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
-      "drivers_interface_display:libdisplay_composer_hdi_impl",
-      "drivers_interface_display:libdisplay_composer_proxy_1.0",
-      "graphic_surface:buffer_handle",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
-      "hilog:libhilog",
-      "ipc:ipc_single",
-    ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
-}
-
-ohos_unittest("codec_hdi_heif_encode_test") {
-  module_out_path = "drivers_peripheral_codec/codec"
-
-  sources = [ "codec_hdi_heif_encode_test.cpp" ]
+  sources = [
+    "src/buffer_helper.cpp",
+    "src/codec_heif_helper.cpp",
+    "src/command_parser.cpp",
+    "src/heif_encoder.cpp",
+  ]
 
   if (is_standard_system) {
     external_deps = [
@@ -63,12 +41,12 @@ ohos_unittest("codec_hdi_heif_encode_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  install_enable = false
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
 }
 
-group("codec_hdi_image_test") {
-  testonly = true
-  deps = [
-    ":codec_hdi_heif_encode_test",
-    ":codec_hdi_jpeg_test",
-  ]
+group("codec_hdi_heif_demo") {
+  deps = [ ":codec_heif_encode" ]
 }
