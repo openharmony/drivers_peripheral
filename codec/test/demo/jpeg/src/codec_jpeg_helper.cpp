@@ -30,7 +30,7 @@ static int8_t UnZigZagTable[64] = {
     21, 34, 37, 47, 50, 56, 59, 61,
     35, 36, 48, 49, 57, 58, 62, 63};
 
-using namespace OHOS::HDI::Codec::Image::V1_0;
+using namespace OHOS::HDI::Codec::Image::V2_0;
 int32_t CodecJpegHelper::JpegAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t fd)
 {
     HDF_LOGI("enter");

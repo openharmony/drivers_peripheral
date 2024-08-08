@@ -13,10 +13,11 @@
 
 import("../../../codec.gni")
 
-group("hdf_jpeg_fuzz_test") {
+group("hdf_image_fuzz_test") {
   testonly = true
   deps = [
     "imageallocateinbuffer_fuzzer:fuzztest",
+    "imagedoheifencode_fuzzer:fuzztest",
     "imagedojpegdecode_fuzzer:fuzztest",
     "imagefreeinbuffer_fuzzer:fuzztest",
     "imagegetcapability_fuzzer:fuzztest",
