@@ -22,13 +22,13 @@ ohos_fuzztest("ImageAllocateInBufferFuzzTest") {
       "${codec_root}/test/fuzztest/image_fuzzer/imageallocateinbuffer_fuzzer"
 
   include_dirs = [
-    "../common",
+    "../common/include",
     "${codec_root}/test/fuzztest/image_fuzzer/imageallocateinbuffer_fuzzer",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_codec:libimage_proxy_1.0",
+    "drivers_interface_codec:libimage_proxy_2.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
