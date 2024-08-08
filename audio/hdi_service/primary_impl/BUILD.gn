@@ -44,9 +44,9 @@ ohos_shared_library("audio_primary_impl_vendor") {
       "vdi_src/audio_adapter_vdi.c",
       "vdi_src/audio_capture_vdi.c",
       "vdi_src/audio_common_vdi.c",
+      "vdi_src/audio_dfx_vdi.cpp",
       "vdi_src/audio_manager_vdi.c",
       "vdi_src/audio_render_vdi.c",
-      "vdi_src/audio_trace_vdi.cpp",
     ]
 
     include_dirs = [
@@ -84,6 +84,11 @@ ohos_shared_library("audio_primary_impl_vendor") {
     "bounds_checking_function:libsec_shared",
     "hitrace:hitrace_meter",
   ]
+
+  if (drivers_peripheral_audio_feature_hicollie_enable) {
+    external_deps += [ "hicollie:libhicollie" ]
+    defines += [ "AUDIO_HICOLLIE_ENABLE" ]
+  }
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
