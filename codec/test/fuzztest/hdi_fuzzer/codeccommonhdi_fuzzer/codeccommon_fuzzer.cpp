@@ -84,7 +84,7 @@ namespace Codec {
         if (err != HDF_SUCCESS || count <= 0) {
             HDF_LOGE("%{public}s GetComponentNum return %{public}d, count = %{public}d", __func__, err, count);
             Release();
-            return HDF_FAILURE;
+            return false;
         }
 
         std::vector<CodecCompCapability> caps;
@@ -92,7 +92,7 @@ namespace Codec {
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s GetComponentCapabilityList return %{public}d", __func__, err);
             Release();
-            return err;
+            return false;
         }
 
         int32_t ret = g_manager->CreateComponent(g_component, g_componentId, caps[0].compName, g_appData, g_callback);
