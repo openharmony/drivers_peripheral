@@ -15,7 +15,7 @@
 
 #include "codeccommon_fuzzer.h"
 #include "codec_omx_ext.h"
-#include<cstdlib>
+#include <cstdlib>
 
 extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
 {
