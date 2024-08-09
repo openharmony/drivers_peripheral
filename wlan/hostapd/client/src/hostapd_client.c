@@ -34,7 +34,7 @@ extern "C" {
 
 #define MAX_CALL_BACK_COUNT 10
 static struct HostapdCallbackEvent *g_hostapdCallbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
-static pthread_mutex_t g_hostapdCallbackMutex =;
+static pthread_mutex_t g_hostapdCallbackMutex = PTHREAD_MUTEX_INITIALIZER;
 
 int32_t HostapdRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
 {
