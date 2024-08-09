@@ -52,6 +52,7 @@ typedef struct {
     LinkedList *credentialInfoList;
     LinkedList *enrolledInfoList;
     int32_t userType;
+    bool hasSuccessPinAuth;
 } UserInfo;
 
 typedef struct {
