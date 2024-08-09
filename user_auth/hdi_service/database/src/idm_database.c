@@ -745,6 +745,9 @@ ResultCode DeleteCredentialInfo(int32_t userId, uint64_t credentialId, Credentia
         LOG_ERROR("remove credential failed");
         return ret;
     }
+    if (credentialInfo->authType == DEFAULT_AUTH_TYPE) {
+        return UpdateFileInfo(g_userInfoList);
+    }
     credentialQuery = QueryCredentialByAuthType(credentialInfo->authType, credentialList);
     if (credentialQuery != NULL) {
         return UpdateFileInfo(g_userInfoList);
