@@ -27,8 +27,8 @@
 #define DEC_MAX_SCOPE 10
 #define WPA_CMD_RETURN_TIMEOUT (-2)
 
-static pthread_mutex_t g_mutexSta;
-static pthread_mutex_t g_mutexP2p;
+static pthread_mutex_t g_mutexSta =;
+static pthread_mutex_t g_mutexP2p =;
 static pthread_mutex_t g_mutexChba;
 static pthread_mutex_t g_mutexCommon;
 static pthread_mutex_t g_mutexWpa;
