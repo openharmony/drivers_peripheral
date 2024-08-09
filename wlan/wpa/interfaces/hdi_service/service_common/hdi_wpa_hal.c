@@ -62,7 +62,7 @@ static const int MAX_IFACE_LEN = 6;
 #define WPA_CTRL_OPEN_IFNAME "@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
 
 static WifiWpaInterface *g_wpaInterface = NULL;
-static pthread_mutex_t g_mutex;
+static pthread_mutex_t g_mutex =;
 
 static int WpaCliConnect(WifiWpaInterface *p)
 {
