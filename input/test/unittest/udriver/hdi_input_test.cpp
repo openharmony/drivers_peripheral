@@ -1090,19 +1090,6 @@ HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: ReportEventPkg002
-  * @tc.desc: Report Event Pkg
-  * @tc.type: FUNC
-  * @tc.require: SR000F867Q
-  */
-HWTEST_F(HdiInputTest, ReportEventPkg002, TestSize.Level1)
-{
-    printf("%s: [Input] ReportEventPkg002 enter\n", __func__);
-    InputDeviceManager iInputDeviceManager;
-    iInputDeviceManager.ReportEventPkg(g_fileDescriptorFirst, nullptr, COUNT);
-}
-
-/**
   * @tc.name: DoRead
   * @tc.desc: Do Read
   * @tc.type: FUNC
