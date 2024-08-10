@@ -113,6 +113,7 @@ struct UsbIfRequest {
     bool isSyncReq;
 }__attribute__((aligned(4)));
 
+UsbInterfaceHandle *UsbResetDevice(const struct UsbInterface *interfaceObj);
 int32_t UsbIfCreatPipeObj(const struct UsbSdkInterface *interfaceObj, struct UsbPipe **pipeObj);
 int32_t UsbIfCreatInterfaceObj(const struct UsbInterfacePool *interfacePool, struct UsbSdkInterface **interfaceObj);
 HDF_STATUS UsbIfDestroyInterfaceObj(

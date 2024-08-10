@@ -1268,8 +1268,7 @@ static int32_t AdapterResetDevice(struct UsbDeviceHandle *handle)
     }
 
     for (i = 0;i < USB_MAXINTERFACES; i++) {
-        if (!(handle->claimedInterfaces & (1UL << i)))
-        {
+        if (!(handle->claimedInterfaces & (1UL << i))) {
             continue;
         }
         ret = AdapterDetachKernelDriverAndClaim(handle, i);
