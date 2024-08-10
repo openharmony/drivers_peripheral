@@ -1456,7 +1456,9 @@ int32_t RawResetDevice(const struct UsbDeviceHandle *devHandle)
         return HDF_ERR_NOT_SUPPORT;
     }
 
-    return osAdapterOps->resetDevice(devHandle);
+    struct UsbDeviceHandle *constDevHandle = (struct UsbDeviceHandle *)devHandle;
+
+    return osAdapterOps->resetDevice(constDevHandle);
 }
 
 int32_t RawSubmitRequest(const struct UsbHostRequest *request)
