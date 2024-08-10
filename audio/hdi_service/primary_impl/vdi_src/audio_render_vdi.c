@@ -36,6 +36,7 @@ struct AudioRenderInfo {
     unsigned int usrCount;
     struct IAudioCallback *callback;
     bool isRegCb;
+    char *adapterName;
 };
 
 struct AudioRenderPrivVdi {
@@ -885,7 +886,7 @@ static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
 }
 
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    uint32_t *rendrId)
+    uint32_t *rendrId, const char *adapterName)
 {
     if (attrs->type == AUDIO_MMAP_NOIRQ) {
         AUDIO_FUNC_LOGI("render type is mmap");
@@ -906,7 +907,8 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
     for (index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
         if ((renderPriv->renderInfos[index] != NULL) &&
             (attrs->type == AUDIO_IN_MEDIA || attrs->type == AUDIO_MULTI_CHANNEL) &&
-            (renderPriv->renderInfos[index]->streamType == attrs->type)) {
+            (renderPriv->renderInfos[index]->streamType == attrs->type) &&
+            (renderPriv->renderInfos[index]->adapterName == adapterName)) {
             *rendrId = renderPriv->renderInfos[index]->renderId;
             renderPriv->renderInfos[index]->usrCount++;
             return &renderPriv->renderInfos[index]->render;
@@ -949,7 +951,7 @@ static uint32_t GetAvailableRenderId(struct AudioRenderPrivVdi *renderPriv)
 }
 
 struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
-    struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc)
+    struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc, char *adapterName)
 {
     struct IAudioRender *render = NULL;
     if (attrs == NULL || renderId == NULL || vdiRender == NULL || desc == NULL) {
@@ -989,6 +991,7 @@ struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes
     priv->renderInfos[*renderId]->usrCount = 1;
     priv->renderInfos[*renderId]->callback = NULL;
     priv->renderInfos[*renderId]->isRegCb = false;
+    priv->renderInfos[*renderId]->adapterName = adapterName;
     render = &(priv->renderInfos[*renderId]->render);
     AudioInitRenderInstanceVdi(render);
 

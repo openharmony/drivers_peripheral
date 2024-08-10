@@ -20,7 +20,8 @@
 #include "v4_0/iaudio_adapter.h"
 #include <pthread.h>
 
-struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter);
+struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter,
+    char *adapterName);
 void AudioReleaseAdapterVdi(uint32_t descIndex);
 struct IAudioAdapterVdi *AudioGetVdiAdapterByDescIndexVdi(uint32_t descIndex);
 int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **adapter);
