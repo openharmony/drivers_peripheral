@@ -2195,6 +2195,24 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
     return HDF_SUCCESS;
 }
 
+int32_t UsbImpl::ClearHalt(const UsbDev &dev, const UsbPipe &pipe)
+{
+    HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    if (pipe.intfId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s:interfaceId larger then max num", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int32_t ret = UsbClearInterfaceHalt(port->devHandle[pipe.intfId], pipe.endpointId);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:ClearHalt error ret:%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 int32_t UsbImpl::GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId, bool &unactivated)
 {
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
