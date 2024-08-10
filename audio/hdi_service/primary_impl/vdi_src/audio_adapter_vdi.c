@@ -25,6 +25,7 @@
 #include "audio_render_vdi.h"
 #include "audio_dfx_vdi.h"
 #include "v4_0/iaudio_callback.h"
+#include "hdf_dlist.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 static pthread_mutex_t g_adapterMutex;
@@ -33,6 +34,7 @@ struct AudioAdapterInfo {
     struct IAudioAdapterVdi *vdiAdapter;
     struct IAudioAdapter *adapter;
     uint32_t refCnt;
+    char *adapterName;
 };
 
 struct AudioAdapterPrivVdi {
@@ -135,9 +137,10 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
+    struct AudioAdapterInfo *adapterInfo = CONTAINER_OF(adapter, struct AudioAdapterInfo, adapter);
 
     pthread_mutex_lock(&g_adapterMutex);
-    *render = FindRenderCreated(desc->pins, attrs, renderId);
+    *render = FindRenderCreated(desc->pins, attrs, renderId, adapterInfo->adapterName);
     if (*render != NULL) {
         AUDIO_FUNC_LOGE("already created");
         pthread_mutex_unlock(&g_adapterMutex);
@@ -158,7 +161,7 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
-    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc);
+    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterInfo->adapterName);
     if (*render == NULL) {
         (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
         AUDIO_FUNC_LOGE("Create audio render failed");
@@ -624,7 +627,8 @@ void AudioEnforceClearAdapterRefCntVdi(uint32_t descIndex)
     AUDIO_FUNC_LOGI("clear adapter ref count zero");
 }
 
-struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter)
+struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter,
+    char *adapterName)
 {
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("create adapter error, descIndex=%{public}d", descIndex);
@@ -652,6 +656,7 @@ struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAda
     priv->adapterInfo[descIndex].vdiAdapter = vdiAdapter;
     priv->adapterInfo[descIndex].adapter = adapter;
     priv->adapterInfo[descIndex].refCnt = 1;
+    priv->adapterInfo[descIndex].adapterName = adapterName;
 
     AUDIO_FUNC_LOGD(" audio vdiAdapter create adapter success, refcount[1]");
     return adapter;
