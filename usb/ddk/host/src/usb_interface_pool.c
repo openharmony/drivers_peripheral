@@ -1315,7 +1315,7 @@ UsbInterfaceHandle *UsbResetDevice(const struct UsbInterface *interfaceObj)
     struct UsbSdkInterface *interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
     if (interfaceSdk->session == NULL || interfaceSdk->status == USB_INTERFACE_STATUS_REMOVE) {
         HDF_LOGE("%{public}s:%{public}d interface->status = %{public}d is error",
-	        __func__, __LINE__, interfaceSdk->status);
+            __func__, __LINE__, interfaceSdk->status);
 	    return NULL;
     }
 
@@ -1331,7 +1331,7 @@ UsbInterfaceHandle *UsbResetDevice(const struct UsbInterface *interfaceObj)
     ret = RawResetDevice(interfacePool->device->devHandle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{piblic}s:%{public}d RawResetDevice failed, ret = %{public}d", __func__, __LINE__, ret);
-	    return NULL;
+        return NULL;
     }
 
     struct UsbInterfaceHandleEntity *ifaceHdl = RawUsbMemCalloc(sizeof(struct UsbInterfaceHandleEntity));
