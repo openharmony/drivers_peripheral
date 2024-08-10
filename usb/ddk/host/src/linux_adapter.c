@@ -1269,14 +1269,15 @@ static int32_t AdapterResetDevice(struct UsbDeviceHandle *handle)
 
     for (i = 0;i < USB_MAXINTERFACES; i++) {
         if (!(handle->claimedInterfaces & (1UL << i)))
-	{
+        {
             continue;
         }
         ret = AdapterDetachKernelDriverAndClaim(handle, i);
         if (ret) {
-            HDF_LOGE("%{public}s:%{public}d failed to re-claim interface %{public}u after reset errno=%{public}d", __func__, __LINE__, i , errno);
+            HDF_LOGE("%{public}s:%{public}d failed to re-claim interface %{public}u after reset errno=%{public}d",
+                __func__, __LINE__, i, errno);
             handle->claimedInterfaces &= ~(1UL << i);
-	    break;
+            break;
         }
     }
 
