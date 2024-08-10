@@ -231,7 +231,11 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     pthread_mutex_lock(&g_managerMutex);
     priv->vdiDescs = (struct AudioAdapterDescriptorVdi *)OsalMemCalloc(
         sizeof(struct AudioAdapterDescriptorVdi) * (*descsLen));
-    CHECK_NULL_PTR_RETURN_VALUE(priv->vdiDescs, HDF_ERR_NOT_SUPPORT);
+    if (priv->vdiDescs == NULL) {
+        AUDIO_FUNC_LOGE("null point");
+        pthread_mutex_unlock(&g_managerMutex);
+        return HDF_ERR_NOT_SUPPORT;
+    }
 
     priv->vdiDescsCount = *descsLen;
     int32_t id = SetTimer("Hdi:GetAllAdapters");
