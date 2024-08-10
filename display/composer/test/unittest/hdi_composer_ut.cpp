@@ -18,8 +18,8 @@
 #include <cinttypes>
 #include <algorithm>
 #include "v1_0/include/idisplay_composer_interface.h"
-#include "v1_1/include/idisplay_composer_interface.h"
-#include "v1_1/display_composer_type.h"
+#include "v1_2/include/idisplay_composer_interface.h"
+#include "v1_2/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
 #include "display_test_utils.h"
@@ -33,11 +33,11 @@
 #include <thread>
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-static sptr<Composer::V1_1::IDisplayComposerInterface> g_composerDevice = nullptr;
+static sptr<Composer::V1_2::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
 const int SLEEP_CONT_10 = 10;
@@ -321,6 +321,38 @@ HWTEST_F(DeviceTest, test_GetDisplayProperty, TestSize.Level1)
         result = DISPLAY_SUCCESS;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, result);
+}
+
+HWTEST_F(DeviceTest, test_SetHardwareCursorPosition, TestSize.Level1)
+{
+    int32_t x = 1;
+    int32_t y = 1;
+    auto ret = g_composerDevice->SetHardwareCursorPosition(g_displayIds[0], x, y);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_EnableHardwareCursorStats, TestSize.Level1)
+{
+    bool enable = true;
+    auto ret = g_composerDevice->EnableHardwareCursorStats(g_displayIds[0], enable);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_GetHardwareCursorStats, TestSize.Level1)
+{
+    uint32_t frameCount = 0;
+    uint32_t vsyncCount = 0;
+    auto ret = g_composerDevice->GetHardwareCursorStats(g_displayIds[0], frameCount, vsyncCount);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
 HWTEST_F(DeviceTest, test_GetDisplayCompChange, TestSize.Level1)
