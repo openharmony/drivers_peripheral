@@ -271,8 +271,11 @@ int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t captureId
 
     pthread_mutex_lock(&g_adapterMutex);
     struct IAudioCaptureVdi *vdiCapture = AudioGetVdiCaptureByIdVdi(captureId);
-    CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyCapture, HDF_ERR_INVALID_PARAM);
+    if (vdiCapture == NULL || vdiAdapter->DestroyCapture == NULL) {
+        AUDIO_FUNC_LOGE("invalid parameter");
+        pthread_mutex_unlock(&g_adapterMutex);
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyCapture fail, ret=%{public}d", ret);
