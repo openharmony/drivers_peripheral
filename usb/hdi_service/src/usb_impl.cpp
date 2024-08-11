@@ -1117,6 +1117,25 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
     return HDF_SUCCESS;
 }
 
+int32_t UsbImpl::ResetDevice(const UsbDev &dev)
+{
+    HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    if (port->ctrDevHandle == nullptr && port->ctrIface != nullptr) {
+        HDF_LOGD("%{public}s:start resetDevice, busNum: %{public}d, devAddr: %{public}d ",
+            __func__, dev.busNum, dev.devAddr);
+        port->ctrDevHandle = UsbResetDevice(port->ctrIface);
+        if (port->ctrDevHandle == nullptr) {
+            HDF_LOGE("%{public}s:UsbResetDevice failed", __func__);
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
 {
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);

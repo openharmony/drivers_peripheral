@@ -45,6 +45,7 @@ public:
     ~UsbImpl() override;
     int32_t OpenDevice(const UsbDev &dev) override;
     int32_t CloseDevice(const UsbDev &dev) override;
+    int32_t ResetDevice(const UsbDev &dev) override;
     int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor) override;
     int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor) override;
     int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor) override;
