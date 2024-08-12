@@ -25,7 +25,6 @@
 #include "audio_render_vdi.h"
 #include "audio_dfx_vdi.h"
 #include "v4_0/iaudio_callback.h"
-#include "hdf_dlist.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 static pthread_mutex_t g_adapterMutex;
@@ -78,6 +77,25 @@ static struct IAudioAdapterVdi *AudioGetVdiAdapterVdi(const struct IAudioAdapter
     }
 
     AUDIO_FUNC_LOGE("audio get vdiadapter fail");
+    return NULL;
+}
+
+static char *AudioGetAdapterNameVdi(const struct IAudioAdapter *adapter)
+{
+    struct AudioAdapterPrivVdi *priv = AudioAdapterGetPrivVdi();
+
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("get AdapterName error");
+        return NULL;
+    }
+
+    for (uint32_t i = 0; i < AUDIO_VDI_ADAPTER_NUM_MAX; i++) {
+        if (adapter == priv->adapterInfo[i].adapter) {
+            return priv->adapterInfo[i].adapterName;
+        }
+    }
+
+    AUDIO_FUNC_LOGE("audio get adapterName fail");
     return NULL;
 }
 
@@ -137,10 +155,10 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
-    struct AudioAdapterInfo *adapterInfo = CONTAINER_OF(adapter, struct AudioAdapterInfo, adapter);
 
     pthread_mutex_lock(&g_adapterMutex);
-    *render = FindRenderCreated(desc->pins, attrs, renderId, adapterInfo->adapterName);
+    char *adapterName = AudioGetAdapterNameVdi(adapter);
+    *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName);
     if (*render != NULL) {
         AUDIO_FUNC_LOGE("already created");
         pthread_mutex_unlock(&g_adapterMutex);
