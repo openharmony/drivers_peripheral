@@ -73,7 +73,7 @@ bool GetSupportedPhysicalApertureValues(std::shared_ptr<CameraMetadata> ability)
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     int rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE, &entry);
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+    if (rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         float entryValues[] = {entry.data.f[3], entry.data.f[7], entry.data.f[8], entry.data.f[9], entry.data.f[10],
             entry.data.f[14], entry.data.f[18]};
         for (size_t i = 0; i < sizeof(entryValues) / sizeof(float); i++) {
@@ -721,7 +721,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_014, TestSiz
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_LENS_INFO_MINIMUM_FOCUS_DISTANCE, &entry);
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
-        for (uint8_t i = 0;i < entry.count;i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             cameraTest->intents = {PREVIEW, STILL_CAPTURE};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO);
 
@@ -766,7 +766,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_015, TestSiz
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_AVAILABLE_MODES, &entry);
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
-        for (size_t i = 0;i < entry.count;i++) {
+        for (uint32_t i = 0;i < entry.count;i++) {
             if (entry.data.u8[i] == OHOS_CAMERA_AWB_MODE_OFF) {
                 CAMERA_LOGI("OHOS_CAMERA_AWB_MODE_OFF mode is supported!");
             } else if (entry.data.u8[i] == OHOS_CAMERA_AWB_MODE_AUTO) {
@@ -882,7 +882,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_017, TestSiz
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_SENSOR_WB_VALUES, &entry);
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
-        for (uint8_t i = 0;i < entry.count;i++) {
+        for (uint32_t i = 0;i < entry.count;i++) {
             cameraTest->intents = {PREVIEW, STILL_CAPTURE};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO);
 
@@ -922,7 +922,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_018, TestSiz
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     //0:close, 1:open, 2:auto, 3:always_open
-    for (uint8_t i = 0;i < 4;i++) {
+    for (uint32_t i = 0;i < 4;i++) {
         cameraTest->intents = {PREVIEW, VIDEO};
         cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
@@ -965,7 +965,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_019, TestSiz
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     //0:normal, 1:bright, 2:soft
-    for (uint8_t i = 0;i < 3;i++) {
+    for (uint32_t i = 0;i < 3;i++) {
         cameraTest->intents = {PREVIEW, VIDEO};
         cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
@@ -1040,7 +1040,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_021, TestSiz
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_METER_MODES, &entry);
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
 
-        for (uint8_t i = 0;i < entry.count;i++) {
+        for (uint32_t i = 0;i < entry.count;i++) {
             cameraTest->intents = {PREVIEW, VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
@@ -1122,7 +1122,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_023, TestSiz
     EXPECT_NE(cameraTest->ability, nullptr);
     GetSupportedPhysicalApertureValues(cameraTest->ability);
 
-    for (uint8_t i = 0;i < supportedPhysicalApertureValues_.size();i++) {
+    for (uint32_t i = 0;i < supportedPhysicalApertureValues_.size();i++) {
         cameraTest->intents = {PREVIEW, VIDEO};
         cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
@@ -1171,7 +1171,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_024, TestSiz
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_SENSOR_EXPOSURE_TIME_RANGE, &entry);
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.r != nullptr && entry.count > 0) {
-        for (uint8_t i = 0;i < entry.count;i++) {
+        for (uint32_t i = 0;i < entry.count;i++) {
             cameraTest->intents = {PREVIEW, VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
@@ -1259,7 +1259,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_026, TestSiz
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_FOCUS_MODES, &entry);
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
-        for (uint8_t i = 0;i < entry.count;i++) {
+        for (uint32_t i = 0;i < entry.count;i++) {
             cameraTest->intents = {PREVIEW, VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
@@ -1309,7 +1309,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_027, TestSiz
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_LENS_INFO_MINIMUM_FOCUS_DISTANCE, &entry);
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
-        for (uint8_t i = 0;i < entry.count;i++) {
+        for (uint32_t i = 0;i < entry.count;i++) {
             cameraTest->intents = {PREVIEW, VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
@@ -1355,7 +1355,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_028, TestSiz
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_AVAILABLE_MODES, &entry);
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
-        for (uint8_t i = 0;i < entry.count;i++) {
+        for (uint32_t i = 0;i < entry.count;i++) {
             cameraTest->intents = {PREVIEW, VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
@@ -1401,7 +1401,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_029, TestSiz
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_SENSOR_WB_VALUES, &entry);
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
-        for (uint8_t i = 0;i < entry.count;i++) {
+        for (uint32_t i = 0;i < entry.count;i++) {
             cameraTest->intents = {PREVIEW, VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
@@ -1442,7 +1442,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_030, TestSiz
     FillCaptureSetting(cameraTest);
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     
-    for (uint8_t i = 0; i < RESOLUTION_COUNT; i++) {
+    for (uint32_t i = 0; i < RESOLUTION_COUNT; i++) {
         // Preview streamInfo
         cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
         cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);

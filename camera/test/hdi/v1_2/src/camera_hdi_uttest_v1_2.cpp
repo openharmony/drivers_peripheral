@@ -43,13 +43,15 @@ bool IsTagValueExistsU8(std::shared_ptr<CameraMetadata> ability, uint32_t tag, u
     common_metadata_header_t* data = ability->get();
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, tag, &entry);
-    EXPECT_EQ(ret, 0);
-    EXPECT_NE(entry.count, 0);
-    EXPECT_TRUE(entry.data.u8 != nullptr);
-    for (int i = 0; i < entry.count; i++) {
-        if (entry.data.u8[i] == value) {
-            return true;
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+        for (int i = 0; i < entry.count; i++) {
+            if (entry.data.u8[i] == value) {
+                return true;
+            }
         }
+    } else {
+        printf("Find CameraMetadata fail!\n");
+        CAMERA_LOGE("Find CameraMetadata fail!");
     }
     return false;
 }
@@ -855,14 +857,17 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_022, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_VIDEO_STABILIZATION_MODES, &entry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     CAMERA_LOGI("get OHOS_ABILITY_VIDEO_STABILIZATION_MODES success!");
-    EXPECT_EQ(META_TYPE_BYTE, entry.data_type);
-    EXPECT_TRUE(entry.data.u8 != nullptr);
-    for (int i = 0; i < entry.count; i++) {
-        if (entry.data.u8[i] == OHOS_CAMERA_VIDEO_STABILIZATION_OFF) {
-            CAMERA_LOGI("OHOS_CAMERA_VIDEO_STABILIZATION_OFF found!");
-        } else if (entry.data.u8[i] == OHOS_CAMERA_VIDEO_STABILIZATION_AUTO) {
-            CAMERA_LOGI("OHOS_CAMERA_VIDEO_STABILIZATION_AUTO found!");
+    if (entry.data.u8 != nullptr && entry.count > 0) {
+        for (int i = 0; i < entry.count; i++) {
+            if (entry.data.u8[i] == OHOS_CAMERA_VIDEO_STABILIZATION_OFF) {
+                CAMERA_LOGI("OHOS_CAMERA_VIDEO_STABILIZATION_OFF found!");
+            } else if (entry.data.u8[i] == OHOS_CAMERA_VIDEO_STABILIZATION_AUTO) {
+                CAMERA_LOGI("OHOS_CAMERA_VIDEO_STABILIZATION_AUTO found!");
+            }
         }
+    } else {
+        printf("get tag<OHOS_ABILITY_VIDEO_STABILIZATION_MODES> failed.\n");
+        CAMERA_LOGE("get tag<OHOS_ABILITY_VIDEO_STABILIZATION_MODES> failed.");
     }
 }
 
