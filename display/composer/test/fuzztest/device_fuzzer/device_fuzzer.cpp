@@ -24,9 +24,9 @@
 
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 
-static sptr<Composer::V1_1::IDisplayComposerInterface> g_composerInterface = nullptr;
+static sptr<Composer::V1_2::IDisplayComposerInterface> g_composerInterface = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_bufferInterface = nullptr;
 
 static bool g_isInit = false;
@@ -206,6 +206,41 @@ int32_t TestGetDisplayProperty(uint32_t devId)
         return DISPLAY_FAILURE;
     }
     return ret;
+}
+
+int32_t TestSetHardwareCursorPosition(uint32_t devId)
+{
+    int32_t x = GetData<uint32_t>();
+    int32_t y = GetData<uint32_t>();
+    int32_t ret = g_composerInterface->SetHardwareCursorPosition(devId, x, y);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: function SetHardwareCursorPosition failed, %{public}d", __func__, ret);
+        return DISPLAY_FAILURE;
+    }
+    return DISPLAY_SUCCESS;
+}
+
+int32_t TestEnableHardwareCursorStats(uint32_t devId)
+{
+    bool enable = GetRandBoolValue(GetData<uint32_t>());
+    int32_t ret = g_composerInterface->EnableHardwareCursorStats(devId, enable);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: function EnableHardwareCursorStats failed, %{public}d", __func__, ret);
+        return DISPLAY_FAILURE;
+    }
+    return DISPLAY_SUCCESS;
+}
+
+int32_t TestGetHardwareCursorStats(uint32_t devId)
+{
+    uint32_t frameCount = GetData<uint32_t>();
+    uint32_t vsyncCount = GetData<uint32_t>();
+    int32_t ret = g_composerInterface->GetHardwareCursorStats(devId, frameCount, vsyncCount);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: function GetHardwareCursorStats failed, %{public}d", __func__, ret);
+        return DISPLAY_FAILURE;
+    }
+    return DISPLAY_SUCCESS;
 }
 
 int32_t TestGetDisplayCompChange(uint32_t devId)
@@ -456,6 +491,9 @@ TestFuncs g_testFuncs = {
     TestPrepareDisplayLayers,
     TestSetGetDisplayBacklight,
     TestGetDisplayProperty,
+    TestSetHardwareCursorPosition,
+    TestEnableHardwareCursorStats,
+    TestGetHardwareCursorStats,
     TestGetDisplayCompChange,
     TestSetDisplayClientCrop,
     TestSetDisplayClientDamage,
@@ -485,7 +523,7 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
     // initialize service
     if (!g_isInit) {
         g_isInit = true;
-        g_composerInterface = Composer::V1_1::IDisplayComposerInterface::Get();
+        g_composerInterface = Composer::V1_2::IDisplayComposerInterface::Get();
         if (g_composerInterface == nullptr) {
             HDF_LOGE("%{public}s: get IDisplayComposerInterface failed", __func__);
             return false;
