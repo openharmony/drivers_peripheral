@@ -87,6 +87,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "c_utils:utils",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
+    "hitrace:hitrace_meter",
   ]
 
   public_configs = [ ":hdi_audio_config" ]
