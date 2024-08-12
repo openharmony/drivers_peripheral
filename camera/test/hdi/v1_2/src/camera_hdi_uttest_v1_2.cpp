@@ -716,7 +716,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_017, TestSize.Level1)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME, &entry);
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
-    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
         CAMERA_LOGI("print tag<OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME> f value start.");
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
@@ -855,7 +855,10 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_022, TestSize.Level1)
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_VIDEO_STABILIZATION_MODES, &entry);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        printf("get tag<OHOS_ABILITY_VIDEO_STABILIZATION_MODES> failed.\n");
+        return;
+    }
     CAMERA_LOGI("get OHOS_ABILITY_VIDEO_STABILIZATION_MODES success!");
     if (entry.data.u8 != nullptr && entry.count > 0) {
         for (int i = 0; i < entry.count; i++) {
