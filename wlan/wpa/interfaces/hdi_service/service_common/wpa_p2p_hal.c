@@ -987,7 +987,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetChba0Freq(WifiWpaP2pInterface *thi
 static int CheckValidGroupConfigField(const P2pWpaGroupConfigArgv *argv)
 {
     int pos = -1;
-    for (int i = 0; i < sizeof(P2P_WPA_NETWORK_FIELDS) / sizeof(P2P_WPA_NETWORK_FIELDS[0]); ++i) {
+    for (int i = 0; i < (int)(sizeof(P2P_WPA_NETWORK_FIELDS) / sizeof(P2P_WPA_NETWORK_FIELDS[0])); ++i) {
         if (P2P_WPA_NETWORK_FIELDS[i].field == argv->param) {
             pos = i;
             break;

@@ -18,6 +18,9 @@
 
 namespace OHOS {
 namespace Codec {
+
+    static const uint32_t OMX_MAX_PORT_INDEX = 2;
+
     bool CodecAllocateBuffer(const uint8_t *data, size_t size)
     {
         if (data == nullptr) {
@@ -32,8 +35,12 @@ namespace Codec {
 
         struct OmxCodecBuffer inbuffer, outBuffer;
         FillDataOmxCodecBuffer(&inbuffer);
-
-        int32_t ret = g_component->AllocateBuffer(static_cast<uint32_t>(*(const_cast<uint8_t *>(data))),
+        int32_t ret = g_component->SendCommand(HDI::Codec::V3_0::CODEC_COMMAND_STATE_SET,
+                                               HDI::Codec::V3_0::CODEC_STATE_IDLE, {});
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: Set LOADED failed, ret is [%{public}x]\n", __func__, ret);
+        }
+        ret = g_component->AllocateBuffer(static_cast<uint32_t>((*(const_cast<uint8_t *>(data)) % OMX_MAX_PORT_INDEX)),
             inbuffer, outBuffer);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: AllocateBuffer failed, ret is [%{public}x]\n", __func__, ret);
