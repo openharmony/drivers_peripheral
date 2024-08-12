@@ -31,8 +31,6 @@ config("module_private_config") {
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/device",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/host",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/operator",
-    "${camera_hdf_path}/camera/interfaces/include",
-    "${camera_hdf_path}/camera/interfaces/hdi_ipc",
   ]
 }
 
