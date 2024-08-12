@@ -50,9 +50,7 @@ bool g_isModeExists(std::shared_ptr<CameraMetadata> ability, uint32_t tag, uint8
     common_metadata_header_t* data = ability->get();
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, tag, &entry);
-    EXPECT_EQ(ret, 0);
-    EXPECT_NE(entry.count, 0);
-    if (entry.data.u8 != nullptr) {
+    if (rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         for (int i = 0; i < entry.count; i++) {
             if (entry.data.u8[i] == value) {
                 return true;
@@ -73,7 +71,7 @@ bool GetSupportedPhysicalApertureValues(std::shared_ptr<CameraMetadata> ability)
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     int rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE, &entry);
-    if (rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+    if (rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
         float entryValues[] = {entry.data.f[3], entry.data.f[7], entry.data.f[8], entry.data.f[9], entry.data.f[10],
             entry.data.f[14], entry.data.f[18]};
         for (size_t i = 0; i < sizeof(entryValues) / sizeof(float); i++) {

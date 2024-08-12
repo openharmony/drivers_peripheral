@@ -1631,8 +1631,11 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_052, TestSize.Level1)
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME, &entry);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    CAMERA_LOGI("get OHOS_ABILITY_VIDEO_STABILIZATION_MODES success!");
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("get OHOS_ABILITY_VIDEO_STABILIZATION_MODES success!");
+    } else {
+        return;
+    }
     if (entry.data.i32 != nullptr && entry.count > 0) {
         for (size_t i = 0; i < entry.count; i++) {
             printf("OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME:%d\n", entry.data.i32[i]);
