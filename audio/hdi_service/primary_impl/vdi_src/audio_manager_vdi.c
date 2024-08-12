@@ -20,6 +20,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
+#include "audio_dfx_vdi.h"
 #include "v4_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -230,10 +231,16 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     pthread_mutex_lock(&g_managerMutex);
     priv->vdiDescs = (struct AudioAdapterDescriptorVdi *)OsalMemCalloc(
         sizeof(struct AudioAdapterDescriptorVdi) * (*descsLen));
-    CHECK_NULL_PTR_RETURN_VALUE(priv->vdiDescs, HDF_ERR_NOT_SUPPORT);
+    if (priv->vdiDescs == NULL) {
+        AUDIO_FUNC_LOGE("null point");
+        pthread_mutex_unlock(&g_managerMutex);
+        return HDF_ERR_NOT_SUPPORT;
+    }
 
     priv->vdiDescsCount = *descsLen;
+    int32_t id = SetTimer("Hdi:GetAllAdapters");
     ret = priv->vdiManager->GetAllAdapters(priv->vdiManager, priv->vdiDescs, &priv->vdiDescsCount);
+    CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager call GetAllAdapters fail, ret=%{public}d", ret);
         free(priv->vdiDescs);
@@ -354,9 +361,11 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
 
     pthread_mutex_lock(&g_managerMutex);
     struct IAudioAdapterVdi *vdiAdapter = NULL;
+    int32_t id = SetTimer("Hdi:LoadAdapter");
     HdfAudioStartTrace("Hdi:AudioManagerVendorLoadAdapter", 0);
     ret = priv->vdiManager->LoadAdapter(priv->vdiManager, &vdiDesc, &vdiAdapter);
     HdfAudioFinishTrace();
+    CancelTimer(id);
 
     AudioManagerReleaseVdiDesc(&vdiDesc);
     if (ret != HDF_SUCCESS) {

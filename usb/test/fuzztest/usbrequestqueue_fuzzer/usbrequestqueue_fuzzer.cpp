@@ -44,8 +44,9 @@ bool UsbRequestQueueFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    ret = usbInterface->RequestQueue(dev, pipe, reinterpret_cast<const std::vector<uint8_t> &>(data + OFFSET),
-        reinterpret_cast<const std::vector<uint8_t> &>(data + OFFSET_BYTE));
+    ret = usbInterface->RequestQueue(
+        dev, pipe, reinterpret_cast<const std::vector<uint8_t> &>(std::move(data + OFFSET)),
+        reinterpret_cast<const std::vector<uint8_t> &>(std::move(data + OFFSET_BYTE)));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: reg bulk callback succeed", __func__);
     }
