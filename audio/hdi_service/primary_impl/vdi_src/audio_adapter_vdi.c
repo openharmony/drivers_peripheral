@@ -675,6 +675,11 @@ struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAda
     priv->adapterInfo[descIndex].adapter = adapter;
     priv->adapterInfo[descIndex].refCnt = 1;
     priv->adapterInfo[descIndex].adapterName = strdup(adapterName);
+    if (priv->adapterInfo[descIndex]->adapterName == NULL) {
+        OsalMemFree((void *)priv->adapterInfo[descIndex].adapter);
+        priv->adapterInfo[descIndex].adapter = NULL;
+        return NULL;
+    }
 
     AUDIO_FUNC_LOGD(" audio vdiAdapter create adapter success, refcount[1]");
     return adapter;
