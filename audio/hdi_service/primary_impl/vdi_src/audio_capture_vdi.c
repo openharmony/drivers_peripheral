@@ -21,7 +21,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_common_vdi.h"
-#include "audio_trace_vdi.h"
+#include "audio_dfx_vdi.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
@@ -72,9 +72,11 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->CaptureFrame, HDF_ERR_INVALID_PARAM);
 
+    int32_t id = SetTimer("Hdi:CaptureFrame");
     HdfAudioStartTrace("Hdi:AudioCaptureFrameVdi", 0);
     int32_t ret = vdiCapture->CaptureFrame(vdiCapture, frame, frameLen, replyBytes);
     HdfAudioFinishTrace();
+    CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture frame fail, ret=%{public}d", ret);
         return ret;

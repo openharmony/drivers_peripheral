@@ -23,6 +23,7 @@
 #include "audio_capture_vdi.h"
 #include "audio_common_vdi.h"
 #include "audio_render_vdi.h"
+#include "audio_dfx_vdi.h"
 #include "v4_0/iaudio_callback.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -98,6 +99,25 @@ int32_t AudioInitAllPortsVdi(struct IAudioAdapter *adapter)
     return HDF_SUCCESS;
 }
 
+static int32_t VerifyParamsOfAudioCreateRenderVdi(struct IAudioAdapter *adapter,
+    const struct AudioDeviceDescriptor *desc, const struct AudioSampleAttributes *attrs,
+    struct IAudioRender **render, uint32_t *renderId)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(renderId, HDF_ERR_INVALID_PARAM);
+    CHECK_VALID_RANGE_RETURN(*renderId, 0, AUDIO_VDI_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
+
+    if (desc->pins == PIN_OUT_LINEOUT || desc->pins == PIN_OUT_HDMI ||
+        desc->pins == PIN_NONE || desc->pins >= PIN_IN_MIC) {
+        AUDIO_FUNC_LOGE("invalid pin [%{public}d]", desc->pins);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
@@ -106,23 +126,15 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     struct AudioSampleAttributesVdi vdiAttrs;
     struct IAudioRenderVdi *vdiRender = NULL;
 
-    CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(renderId, HDF_ERR_INVALID_PARAM);
-    CHECK_VALID_RANGE_RETURN(*renderId, 0, AUDIO_VDI_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
+    int32_t ret = VerifyParamsOfAudioCreateRenderVdi(adapter, desc, attrs, render, renderId);
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
-
-    if (desc->pins == PIN_OUT_LINEOUT || desc->pins == PIN_OUT_HDMI ||
-        desc->pins == PIN_NONE || desc->pins >= PIN_IN_MIC) {
-        AUDIO_FUNC_LOGE("invalid pin [%{public}d]", desc->pins);
-        return HDF_FAILURE;
-    }
 
     pthread_mutex_lock(&g_adapterMutex);
     *render = FindRenderCreated(desc->pins, attrs, renderId);
@@ -137,7 +149,9 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     }
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
 
-    int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiRender);
+    int32_t id = SetTimer("Hdi:CreateRender");
+    ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiRender);
+    CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateRender fail, ret=%{public}d", ret);
@@ -217,7 +231,9 @@ int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct AudioD
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyCapture, HDF_ERR_INVALID_PARAM);
     pthread_mutex_lock(&g_adapterMutex);
+    int32_t id = SetTimer("Hdi:CreateCapture");
     int32_t ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
+    CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateCapture fail, ret=%{public}d", ret);
@@ -255,8 +271,11 @@ int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t captureId
 
     pthread_mutex_lock(&g_adapterMutex);
     struct IAudioCaptureVdi *vdiCapture = AudioGetVdiCaptureByIdVdi(captureId);
-    CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyCapture, HDF_ERR_INVALID_PARAM);
+    if (vdiCapture == NULL || vdiAdapter->DestroyCapture == NULL) {
+        AUDIO_FUNC_LOGE("invalid parameter");
+        pthread_mutex_unlock(&g_adapterMutex);
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyCapture fail, ret=%{public}d", ret);

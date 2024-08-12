@@ -14,15 +14,20 @@
  */
 
 #include "codeccommon_fuzzer.h"
+#include <cstdlib>
 
 using namespace OHOS::HDI::Codec::V3_0;
+
+extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
+{
+    return 0;
+}
 
 namespace OHOS {
 namespace Codec {
     static const int32_t DATA_BUFFERID = 10;
     static const int32_t DATA_SIZE = 20;
     static const int32_t DATA_VERSION_NVERSION = 30;
-    static const int32_t DATA_BUFFERTYPE = 40;
     static const int32_t DATA_ALLOCLEN = 60;
     static const int32_t DATA_FILLEDLEN = 70;
     static const int32_t DATA_OFFSET = 80;
@@ -47,7 +52,7 @@ namespace Codec {
         dataFuzz->bufferId = DATA_BUFFERID;
         dataFuzz->size = DATA_SIZE;
         dataFuzz->version.nVersion = DATA_VERSION_NVERSION;
-        dataFuzz->bufferType = static_cast<enum CodecBufferType>(DATA_BUFFERTYPE);
+        dataFuzz->bufferType = CODEC_BUFFER_TYPE_DMA_MEM_FD;
         dataFuzz->bufferhandle = nullptr;
         dataFuzz->fd = -1;
         dataFuzz->allocLen = DATA_ALLOCLEN;

@@ -405,6 +405,16 @@ UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj);
 int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle, bool isCtrInterface);
 
 /**
+ * @brief Reset a USB interface object.
+ *
+ * @param interfaceObj Indicates the pointer to the USB interface object to reset.
+ *
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
+ */
+UsbInterfaceHandle *UsbResetDevice(const struct UsbInterface *interfaceObj);
+
+/**
  * @brief Sets the optional configuration.
  *
  * @param interfaceHandle Indicates the pointer to the USB interface handle.

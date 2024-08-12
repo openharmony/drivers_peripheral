@@ -21,6 +21,11 @@
 #include <osal_mem.h>
 #include <hdf_log.h>
 
+extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
+{
+    return 0;
+}
+
 namespace OHOS {
 namespace Codec {
     bool CodecGetComponentCapabilityList(const uint8_t* data, size_t size)
