@@ -1450,11 +1450,6 @@ int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t al
             port->busNum, port->devAddr, interfaceId);
         return HDF_FAILURE;
     }
-    if (port->iface[interfaceId] && port->iface[interfaceId]->info.curAltSetting == altIndex) {
-        HDF_LOGE("%{public}s:bus:%{public}d devAddr:%{public}d interfaceId:%{public}d cur:%{public}d", __func__,
-            port->busNum, port->devAddr, interfaceId, altIndex);
-        return HDF_SUCCESS;
-    }
 
     int32_t ret = UsbSelectInterfaceSetting(interfaceHandle, altIndex, &port->iface[interfaceId]);
     if (ret == HDF_SUCCESS) {
