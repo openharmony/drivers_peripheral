@@ -881,7 +881,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_017, TestSiz
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_SENSOR_WB_VALUES, &entry);
 
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
         for (uint32_t i = 0;i < entry.count;i++) {
             cameraTest->intents = {PREVIEW, STILL_CAPTURE};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO);
