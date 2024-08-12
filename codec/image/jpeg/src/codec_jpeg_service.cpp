@@ -28,7 +28,7 @@ CodecJpegService::CodecJpegService()
 
 int32_t CodecJpegService::JpegInit()
 {
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     CHECK_AND_RETURN_RET_LOG(core_ != nullptr, HDF_FAILURE, "core_ is null");
     std::lock_guard<std::mutex> lk(initMutex_);
     int32_t ret = core_->JpegInit();
@@ -40,7 +40,7 @@ int32_t CodecJpegService::JpegInit()
 
 int32_t CodecJpegService::JpegDeInit()
 {
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     CHECK_AND_RETURN_RET_LOG(core_ != nullptr, HDF_FAILURE, "core_ is null");
 
     int32_t ret = core_->JpegDeInit();
@@ -53,7 +53,7 @@ int32_t CodecJpegService::JpegDeInit()
 int32_t CodecJpegService::DoJpegDecode(const CodecImageBuffer& inBuffer, const CodecImageBuffer& outBuffer,
     const CodecJpegDecInfo& decInfo)
 {
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     CHECK_AND_RETURN_RET_LOG(core_ != nullptr, HDF_FAILURE, "core_ is null");
     CHECK_AND_RETURN_RET_LOG(inBuffer.buffer != nullptr, HDF_FAILURE, "inBuffer.buffer is null");
     CHECK_AND_RETURN_RET_LOG(outBuffer.buffer != nullptr, HDF_FAILURE, "outBuffer.buffer is null");
@@ -72,7 +72,7 @@ int32_t CodecJpegService::DoJpegDecode(const CodecImageBuffer& inBuffer, const C
 
 int32_t CodecJpegService::AllocateJpegInBuffer(CodecImageBuffer& inBuffer, uint32_t size)
 {
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     CHECK_AND_RETURN_RET_LOG(core_ != nullptr, HDF_FAILURE, "core_ is null");
     
     BufferHandle *bufferHandle;
