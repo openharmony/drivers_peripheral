@@ -379,7 +379,7 @@ int StopPlaying()
 
 int GetLatency(uint32_t &latency)
 {
-    HDF_LOGI("%{public}s", __func__);
+    HDF_LOGD("%{public}s", __func__);
 #ifdef A2DP_HDI_SERVICE
     return (getLatencyFunc(latency) ? HDF_SUCCESS : HDF_FAILURE);
 #else

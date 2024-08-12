@@ -24,7 +24,8 @@
         "ipc",
         "samgr",
         "drivers_interface_bluetooth",
-        "bluetooth_service"
+        "bluetooth_service",
+        "hitrace"
       ]
     },
     "build": {
