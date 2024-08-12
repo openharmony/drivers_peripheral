@@ -179,7 +179,7 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
-    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterInfo->adapterName);
+    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterName);
     if (*render == NULL) {
         (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
         AUDIO_FUNC_LOGE("Create audio render failed");
