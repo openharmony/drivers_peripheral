@@ -1450,11 +1450,6 @@ int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t al
             port->busNum, port->devAddr, interfaceId);
         return HDF_FAILURE;
     }
-    if (port->iface[interfaceId] && port->iface[interfaceId]->info.curAltSetting == altIndex) {
-        HDF_LOGE("%{public}s:bus:%{public}d devAddr:%{public}d interfaceId:%{public}d cur:%{public}d", __func__,
-            port->busNum, port->devAddr, interfaceId, altIndex);
-        return HDF_SUCCESS;
-    }
 
     int32_t ret = UsbSelectInterfaceSetting(interfaceHandle, altIndex, &port->iface[interfaceId]);
     if (ret == HDF_SUCCESS) {
@@ -1672,7 +1667,8 @@ int32_t UsbImpl::ControlTransferReadwithLength(
     controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrlParams.requestType))
         >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
     controlParams.reqType = static_cast<uint32_t>(ctrlParams.requestType);
-    controlParams.size = ctrlParams.length == 0 ? MAX_CONTROL_BUFF_SIZE : ctrlParams.length;
+    controlParams.size = (ctrlParams.length <= 0 || ctrlParams.length > MAX_CONTROL_BUFF_SIZE)
+        ? MAX_CONTROL_BUFF_SIZE : ctrlParams.length;
     controlParams.data = static_cast<void *>(OsalMemCalloc(controlParams.size));
     if (controlParams.data == nullptr) {
         HDF_LOGE("%{public}s:OsalMemCalloc failed", __func__);
