@@ -78,7 +78,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_004, TestSize.Level1)
         printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!");
         return;
-    } else if {
+    } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
             printf("OHOS_ABILITY_SCENE_BEAUTY_VALUES : %d\n", entry.data.u8[i]);
@@ -126,7 +126,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_006, TestSize.Level1)
         printf("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES data is NULL!");
         return;
-    } else if {
+    } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
             printf("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES : %d\n", entry.data.u8[i]);
@@ -175,7 +175,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_007, TestSize.Level1)
         printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!");
         return;
-    } else if {
+    } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
             printf("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES : %d\n", entry.data.i32[i]);
@@ -224,7 +224,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_008, TestSize.Level1)
         printf("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES data is NULL!");
         return;
-    } else if {
+    } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
             printf("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES : %d\n", entry.data.u8[i]);
