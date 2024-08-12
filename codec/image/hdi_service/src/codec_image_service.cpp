@@ -22,7 +22,7 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V1_0 {
+namespace V2_0 {
 extern "C" ICodecImage *CodecImageImplGetInstance(void)
 {
     return new (std::nothrow) CodecImageService();
@@ -31,6 +31,7 @@ extern "C" ICodecImage *CodecImageImplGetInstance(void)
 CodecImageService::CodecImageService()
 {
     jpegImpl_ = std::make_unique<CodecJpegService>();
+    heifEncodeImpl_ = std::make_unique<CodecHeifEncodeService>();
 }
 
 int32_t CodecImageService::GetImageCapability(std::vector<CodecImageCapability>& capList)
@@ -105,7 +106,18 @@ int32_t CodecImageService::FreeInBuffer(const CodecImageBuffer& inBuffer)
         return HDF_ERR_NOT_SUPPORT;
     }
 }
-} // V1_0
+
+int32_t CodecImageService::DoHeifEncode(const std::vector<ImageItem>& inputImgs,
+                                        const std::vector<MetaItem>& inputMetas,
+                                        const std::vector<ItemRef>& refs,
+                                        const SharedBuffer& output, uint32_t& filledLen)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDoHeifEncode");
+    CODEC_LOGI("servcie impl!");
+    CHECK_AND_RETURN_RET_LOG(heifEncodeImpl_ != nullptr, HDF_FAILURE, "heifEncodeImpl_ is null");
+    return heifEncodeImpl_->DoHeifEncode(inputImgs, inputMetas, refs, output, filledLen);
+}
+} // V2_0
 } // Image
 } // Codec
 } // HDI

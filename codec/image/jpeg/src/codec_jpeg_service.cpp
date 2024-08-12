@@ -19,7 +19,7 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V1_0 {
+namespace V2_0 {
 CodecJpegService::CodecJpegService()
 {
     core_ = std::make_unique<CodecJpegCore>();
@@ -110,7 +110,7 @@ uint32_t CodecJpegService::GetNextBufferId(void)
     return bufferId_;
 }
 
-} // V1_0
+} // V2_0
 } // Image
 } // Codec
 } // HDI
