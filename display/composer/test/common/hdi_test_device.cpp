@@ -16,7 +16,7 @@
 #include "hdi_test_device.h"
 #include <mutex>
 #include "v1_0/include/idisplay_buffer.h"
-#include "v1_1/display_composer_type.h"
+#include "v1_2/display_composer_type.h"
 #include "hdi_test_device_common.h"
 
 namespace OHOS {
@@ -43,7 +43,7 @@ void HdiTestDevice::HotPlug(uint32_t outputId, bool connected, void* data)
 
 int32_t HdiTestDevice::InitDevice()
 {
-    displayDevice_ = Composer::V1_1::IDisplayComposerInterface::Get();
+    displayDevice_ = Composer::V1_2::IDisplayComposerInterface::Get();
     DISPLAY_TEST_CHK_RETURN((displayDevice_ == nullptr), DISPLAY_FAILURE,
         DISPLAY_TEST_LOGE("get IDisplayComposerInterface failed"));
 
