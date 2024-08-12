@@ -991,7 +991,13 @@ struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes
     priv->renderInfos[*renderId]->usrCount = 1;
     priv->renderInfos[*renderId]->callback = NULL;
     priv->renderInfos[*renderId]->isRegCb = false;
-    priv->renderInfos[*renderId]->adapterName = adapterName;
+    priv->renderInfos[*renderId]->adapterName = strdup(adapterName);
+    if (priv->renderInfos[*renderId]->adapterName == NULL) {
+        OsalMemFree(priv->renderInfos[*renderId]->desc.desc);
+        OsalMemFree(priv->renderInfos[*renderId]);
+        priv->renderInfos[*renderId] = NULL;
+        return NULL;
+    }
     render = &(priv->renderInfos[*renderId]->render);
     AudioInitRenderInstanceVdi(render);
 
@@ -1029,6 +1035,8 @@ void AudioDestroyRenderByIdVdi(uint32_t renderId)
         return;
     }
 
+    OsalMemFree((void *)priv->renderInfos[renderId]->adapterName);
+    priv->renderInfos[renderId]->adapterName = NULL;
     OsalMemFree((void *)priv->renderInfos[renderId]->desc.desc);
     priv->renderInfos[renderId]->vdiRender = NULL;
     priv->renderInfos[renderId]->desc.desc = NULL;
