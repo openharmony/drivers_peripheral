@@ -55,6 +55,8 @@ ResultCode GetSecureUid(int32_t userId, uint64_t *secUid);
 ResultCode GetEnrolledInfo(int32_t userId, EnrolledInfoHal **enrolledInfos, uint32_t *num);
 ResultCode GetEnrolledInfoAuthType(int32_t userId, uint32_t authType, EnrolledInfoHal *enrolledInfo);
 ResultCode DeleteUserInfo(int32_t userId, LinkedList **creds);
+ResultCode SetHasSuccessPinAuth(int32_t userId, bool hasSuccessPinAuth);
+ResultCode GetHasSuccessPinAuth(int32_t userId, bool *hasSuccessPinAuth);
 
 LinkedList *QueryCredentialLimit(const CredentialCondition *limit);
 ResultCode QueryCredentialUserId(uint64_t credentialId, int32_t *userId);

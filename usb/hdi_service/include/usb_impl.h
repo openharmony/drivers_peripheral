@@ -45,6 +45,7 @@ public:
     ~UsbImpl() override;
     int32_t OpenDevice(const UsbDev &dev) override;
     int32_t CloseDevice(const UsbDev &dev) override;
+    int32_t ResetDevice(const UsbDev &dev) override;
     int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor) override;
     int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor) override;
     int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor) override;
@@ -66,6 +67,8 @@ public:
     int32_t ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data) override;
     int32_t ControlTransferWrite(
         const UsbDev &dev, const UsbCtrlTransfer &ctrl, const std::vector<uint8_t> &data) override;
+    int32_t ControlTransferReadwithLength(
+        const UsbDev &dev, const UsbCtrlTransferParams &ctrlParams, std::vector<uint8_t> &data) override;
     int32_t InterruptTransferRead(
         const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data) override;
     int32_t InterruptTransferWrite(
@@ -90,6 +93,7 @@ public:
     int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem) override;
     int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem) override;
     int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe) override;
+    int32_t ClearHalt(const UsbDev &dev, const UsbPipe &pipe) override;
 
     static int32_t UsbdRequestSyncReleaseList(HostDevice *port);
     static int32_t UsbdRequestASyncReleaseList(HostDevice *port);

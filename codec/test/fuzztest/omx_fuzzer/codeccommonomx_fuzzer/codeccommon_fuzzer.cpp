@@ -15,6 +15,13 @@
 
 #include "codeccommon_fuzzer.h"
 #include "codec_omx_ext.h"
+#include <cstdlib>
+
+extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
+{
+    return 0;
+}
+
 namespace OHOS {
 namespace Codec {
     static const int32_t DATA_BUFFERID = 10;
@@ -84,14 +91,37 @@ namespace Codec {
             return false;
         }
 
-        std::string compName("OMX.rk.video_encoder.avc");
-        int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, compName.data(), g_appData, g_callback);
+        int32_t count = g_manager->GetComponentNum();
+        if (count <= 0) {
+            CodecCallbackTypeRelease(g_callback);
+            HDF_LOGE("%{public}s GetComponentNum count = %{public}d", __func__, count);
+            return false;
+        }
+
+        CodecCompCapability *capList = reinterpret_cast<CodecCompCapability *>(OsalMemAlloc(sizeof(CodecCompCapability)
+            * count));
+        if (capList == nullptr) {
+            CodecCallbackTypeRelease(g_callback);
+            HDF_LOGE("%{public}s: OsalMemAlloc CodecCompCapability failed\n", __func__);
+            return false;
+        }
+
+        int32_t ret = g_manager->GetComponentCapabilityList(capList, count);
         if (ret != HDF_SUCCESS) {
+            OsalMemFree(capList);
+            CodecCallbackTypeRelease(g_callback);
+            HDF_LOGI("%{public}s: GetComponentCapabilityList succeed\n", __func__);
+            return false;
+        }
+
+        ret = g_manager->CreateComponent(&g_component, &g_componentId, capList[0].compName, g_appData, g_callback);
+        if (ret != HDF_SUCCESS) {
+            OsalMemFree(capList);
             CodecCallbackTypeRelease(g_callback);
             HDF_LOGE("%{public}s: CreateComponent failed\n", __func__);
             return false;
         }
-
+        OsalMemFree(capList);
         return true;
     }
 

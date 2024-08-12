@@ -1304,6 +1304,47 @@ OUT:
     return NULL;
 }
 
+UsbInterfaceHandle *UsbResetDevice(const struct UsbInterface *interfaceObj)
+{
+    HDF_STATUS ret;
+    if (interfaceObj == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfaceObj is null", __func__, __LINE__);
+        return NULL;
+    }
+
+    struct UsbSdkInterface *interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
+    if (interfaceSdk->session == NULL || interfaceSdk->status == USB_INTERFACE_STATUS_REMOVE) {
+        HDF_LOGE("%{public}s:%{public}d interface->status = %{public}d is error",
+            __func__, __LINE__, interfaceSdk->status);
+        return NULL;
+    }
+
+    struct UsbPoolQueryPara poolQueryPara;
+    poolQueryPara.type = USB_POOL_OBJECT_ID_TYPE;
+    poolQueryPara.objectId = interfaceSdk->parentObjectId;
+    struct UsbInterfacePool *interfacePool = IfFindInterfacePool(interfaceSdk->session, poolQueryPara, false);
+    if (interfacePool == NULL || interfacePool->device == NULL || interfacePool->device->devHandle == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null", __func__, __LINE__);
+        return NULL;
+    }
+    
+    ret = RawResetDevice(interfacePool->device->devHandle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{piblic}s:%{public}d RawResetDevice failed, ret = %{public}d", __func__, __LINE__, ret);
+        return NULL;
+    }
+
+    struct UsbInterfaceHandleEntity *ifaceHdl = RawUsbMemCalloc(sizeof(struct UsbInterfaceHandleEntity));
+    if (ifaceHdl == NULL) {
+        HDF_LOGE("%{public}s:%{public}d RawUsbMemCalloc failed", __func__, __LINE__);
+        return NULL;
+    }
+    ifaceHdl->devHandle = interfacePool->device->devHandle;
+    ifaceHdl->interfaceIndex = interfaceSdk->interface.info.interfaceIndex;
+
+    return (UsbInterfaceHandle *)ifaceHdl;
+}
+
 int32_t GetInterfaceByHandle(const UsbInterfaceHandle *interfaceHandle, struct UsbInterface **interface)
 {
     if (interfaceHandle == NULL) {
@@ -1365,6 +1406,7 @@ int32_t UsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle)
         ret = UsbIoRecvProcessStop(interfacePool);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbIoStop failed, ret = %{public}d", __func__, __LINE__, ret);
+            OsalMutexUnlock(&interfacePool->interfaceLock);
             return ret;
         }
     }

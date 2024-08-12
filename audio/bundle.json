@@ -25,7 +25,8 @@
             "drivers_peripheral_audio_feature_effect",
             "drivers_peripheral_audio_feature_double_pnp_detect",
             "drivers_peripheral_audio_feature_offload",
-            "drivers_peripheral_audio_feature_multichannel"
+            "drivers_peripheral_audio_feature_multichannel",
+            "drivers_peripheral_audio_feature_hicollie_enable"
         ],
         "adapted_system_type": ["standard", "small"],
         "rom": "1035KB",
@@ -38,7 +39,8 @@
                 "hdf_core",
                 "drivers_interface_audio",
                 "bounds_checking_function",
-                "hitrace"
+                "hitrace",
+                "hicollie"
             ],
             "third_party": [ "alsa-lib" ]
         },
