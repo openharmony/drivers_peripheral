@@ -2065,7 +2065,6 @@ static int32_t StopWpaSupplicant(void)
     } else {
         HDF_LOGI("%{public}s: wpaCliTerminate suc!", __func__);
     }
-    HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
     return HDF_SUCCESS;
 }
 

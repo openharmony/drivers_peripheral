@@ -289,9 +289,9 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         int nameLen = strlen(ifName);
         ReleaseIfaceCtrl(ifName, nameLen);
     }
-    if (ret == 0 && ifName != NULL &&
-        strncmp(cmd, "TERMINATE ", strlen("TERMINATE ")) == 0) {
+    if (strncmp(cmd, "TERMINATE ", strlen("TERMINATE ")) == 0) {
         ReleaseWpaGlobalInterface();
+        HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
     }
     pthread_mutex_unlock(&g_mutexWpa);
     return ret;
