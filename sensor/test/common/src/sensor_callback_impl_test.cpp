@@ -22,12 +22,10 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V2_0 {
-namespace {
 int32_t SensorCallbackImplTest::OnDataEvent(const HdfSensorEvents& event)
 {
     PrintData(event);
     return HDF_FAILURE;
-}
 }
 } // V2_0
 } // Sensor
