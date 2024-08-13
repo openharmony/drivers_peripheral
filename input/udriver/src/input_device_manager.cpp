@@ -275,7 +275,6 @@ uint32_t GetInputDeviceTypeInfo(const string &devName)
 
 void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     inputDevList_.clear();
     std::vector<std::string> flist = GetFiles(devPath_);
     std::shared_ptr<InputDeviceInfo> detailInfo;
@@ -572,7 +571,6 @@ int32_t InputDeviceManager::FindIndexFromDevName(string devName, uint32_t *index
 // InputManager
 RetStatus InputDeviceManager::ScanDevice(InputDevDesc *staArr, uint32_t arrLen)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     if (staArr == nullptr) {
         HDF_LOGE("%{public}s: param is null", __func__);
         return INPUT_NULL_PTR;
