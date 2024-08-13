@@ -44,7 +44,9 @@ constexpr uint32_t DEV_INDEX_MAX = 32;
 void InputDeviceManager::Init()
 {
     inputDevList_.clear();
+    reportEventPkgCallBackLock_.lock();
     reportEventPkgCallback_.clear();
+    reportEventPkgCallBackLock_.unlock();
     GetInputDeviceInfoList();
     std::thread t1([this] {this->WorkerThread();});
     std::string wholeName1 = std::to_string(getpid()) + "_" + std::to_string(gettid());
@@ -100,6 +102,8 @@ void InputDeviceManager::ReportEventPkg(int32_t iFd, InputEventPackage **iEvtPkg
         HDF_LOGE("%{public}s: param invalid, line: %{public}d", __func__, __LINE__);
         return;
     }
+
+    std::lock_guard<std::mutex> guard(reportEventPkgCallBackLock_);
     for (auto &callbackFunc : reportEventPkgCallback_) {
         uint32_t index {0};
         auto ret = FindIndexFromFd(iFd, &index);
@@ -271,7 +275,7 @@ uint32_t GetInputDeviceTypeInfo(const string &devName)
 
 void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
 {
-    std::lock_guard<std::mutex> guard(inputDevListLock_);
+    std::lock_guard<std::mutex> guard(lock_);
     inputDevList_.clear();
     std::vector<std::string> flist = GetFiles(devPath_);
     std::shared_ptr<InputDeviceInfo> detailInfo;
@@ -351,7 +355,6 @@ int32_t InputDeviceManager::DoInputDeviceAction(void)
 
 void InputDeviceManager::DeleteDevListNode(int index)
 {
-    std::lock_guard<std::mutex> guard(inputDevListLock_);
     for (auto it = inputDevList_.begin(); it != inputDevList_.end();) {
         if (it->first == (uint32_t)index) {
             it = inputDevList_.erase(it);
@@ -369,7 +372,6 @@ void InputDeviceManager::DeleteDevListNode(int index)
 int32_t InputDeviceManager::AddDeviceNodeToList(
     int32_t &epollFd, int32_t &fd, string devPath, std::shared_ptr<InputDeviceInfo> &detailInfo)
 {
-    std::lock_guard<std::mutex> guard(inputDevListLock_);
     if (epollFd < 0 || fd < 0) {
         HDF_LOGE("%{public}s: param invalid, %{public}d", __func__, __LINE__);
         return INPUT_FAILURE;
@@ -401,7 +403,6 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
     uint32_t type {};
     uint32_t index {};
     uint32_t status {};
-
     std::shared_ptr<InputDeviceInfo> detailInfo = std::make_shared<InputDeviceInfo>();
     (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
     (void)GetInputDeviceInfo(fd, detailInfo.get());
@@ -464,7 +465,7 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t &epollFd, uint32_t &index)
 
     HDF_LOGD("%{public}s: index: %{public}d fd: %{public}d devName: %{public}s", __func__,
              index, inputDevList_[index].fd, inputDevList_[index].detailInfo.attrSet.devName);
-
+    
     // hot plug evnets happened
     auto sDevName = string(inputDevList_[index].detailInfo.attrSet.devName);
     if (sDevName.find("Keyboard") != std::string::npos) {
@@ -571,6 +572,7 @@ int32_t InputDeviceManager::FindIndexFromDevName(string devName, uint32_t *index
 // InputManager
 RetStatus InputDeviceManager::ScanDevice(InputDevDesc *staArr, uint32_t arrLen)
 {
+    std::lock_guard<std::mutex> guard(lock_);
     if (staArr == nullptr) {
         HDF_LOGE("%{public}s: param is null", __func__);
         return INPUT_NULL_PTR;
@@ -822,32 +824,31 @@ RetStatus InputDeviceManager::RunExtraCommand(uint32_t devIndex, InputExtraCmd *
 // InputReporter
 RetStatus InputDeviceManager::RegisterReportCallback(uint32_t devIndex, InputEventCb *callback)
 {
-    std::lock_guard<std::mutex> guard(reportEventPkgCallBackLock_);
     RetStatus rc = INPUT_SUCCESS;
     if ((devIndex >= inputDevList_.size()) || (callback == nullptr) || (callback->EventPkgCallback == nullptr)) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
         return INPUT_FAILURE;
     }
+    std::lock_guard<std::mutex> guard(reportEventPkgCallBackLock_);
     reportEventPkgCallback_[devIndex] = callback;
     return rc;
 }
 
 RetStatus InputDeviceManager::UnregisterReportCallback(uint32_t devIndex)
 {
-    std::lock_guard<std::mutex> guard(reportEventPkgCallBackLock_);
     HDF_LOGI("%{public}s: %{public}d dev is unregister", __func__, devIndex);
     RetStatus rc = INPUT_SUCCESS;
     if (devIndex >= inputDevList_.size()) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
         return INPUT_FAILURE;
     }
+    std::lock_guard<std::mutex> guard(reportEventPkgCallBackLock_);
     reportEventPkgCallback_[devIndex] = nullptr;
     return rc;
 }
 
 RetStatus InputDeviceManager::RegisterHotPlugCallback(InputHostCb *callback)
 {
-    std::lock_guard<std::mutex> guard(reportHotPlugEventCallBackLock_);
     RetStatus rc = INPUT_SUCCESS;
     reportHotPlugEventCallback_ = callback;
     HDF_LOGI("%{public}s: called line %{public}d ret %{public}d", __func__, __LINE__, rc);
@@ -856,7 +857,6 @@ RetStatus InputDeviceManager::RegisterHotPlugCallback(InputHostCb *callback)
 
 RetStatus InputDeviceManager::UnregisterHotPlugCallback(void)
 {
-    std::lock_guard<std::mutex> guard(reportHotPlugEventCallBackLock_);
     RetStatus rc = INPUT_SUCCESS;
     reportHotPlugEventCallback_ = nullptr;
     HDF_LOGI("%{public}s: called line %{public}d ret:%{public}d", __func__, __LINE__, rc);

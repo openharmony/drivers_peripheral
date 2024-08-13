@@ -137,8 +137,6 @@ private:
 
     mutable std::mutex lock_;
     std::mutex reportEventPkgCallBackLock_;
-    std::mutex reportHotPlugEventCallBackLock_;
-    std::mutex inputDevListLock_;
     std::map<uint32_t, InputDevListNode> inputDevList_;
     struct epoll_event epollEventList_[EPOLL_MAX_EVENTS] {};
     std::string devPath_ {"/dev/input"};
