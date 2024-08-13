@@ -228,7 +228,7 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         ret = g_sensorInterface->Enable(iter.sensorId);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
-        OsalSleep(SENSOR_POLL_TIME);
+        OsalMSleep(SENSOR_WAIT_TIME);
         ret = g_sensorInterface->Disable(iter.sensorId);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
@@ -652,6 +652,13 @@ HWTEST_F(HdfSensorHdiTest, EnableButUnregisterTest, TestSize.Level1)
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
         int32_t ret = g_sensorInterface->Enable(iter.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    OsalMSleep(SENSOR_WAIT_TIME2);
+    for (auto iter : g_info) {
+        int32_t ret = g_sensorInterface->Disable(iter.sensorId);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
