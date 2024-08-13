@@ -19,14 +19,18 @@
 #include <hdf_base.h>
 #include "v2_0/isensor_callback.h"
 #include "hdf_log.h"
+#include "osal_mem.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V2_0 {
+
+constexpr int32_t DATA_LEN = 256;
+
 class SensorCallbackImplTest : public ISensorCallback {
 public:
-    virtual ~SensorCallbackImpl() {}
+    virtual ~SensorCallbackImplTest() {}
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override;
 
