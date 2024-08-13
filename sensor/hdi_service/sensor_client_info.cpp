@@ -36,6 +36,7 @@ SensorClientInfo::~SensorClientInfo()
 
 void SensorClientInfo::SetReportDataCb(const sptr<ISensorCallback> &callbackObj)
 {
+    SENSOR_TRACE_PID;
     pollCallback_ = callbackObj;
 }
 
