@@ -85,6 +85,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
   }
   external_deps += [
     "c_utils:utils",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
