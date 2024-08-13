@@ -18,7 +18,7 @@
 
 #include <hdf_base.h>
 #include "v2_0/isensor_callback.h"
-#include "hdf_log.h"
+#include "sensor_uhdf_log.h"
 #include "osal_mem.h"
 
 namespace OHOS {
