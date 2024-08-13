@@ -682,9 +682,9 @@ HWTEST_F(HdfVibratorHdiTest, StopTest, TestSize.Level1)
     OsalMSleep(g_sleepTime1);
 
 
-    int32_t startRet = g_vibratorInterface->Start(g_effect1);
+    startRet = g_vibratorInterface->Start(g_effect1);
     EXPECT_EQ(startRet, HDF_SUCCESS);
-    int32_t endRet = g_vibratorInterface->Stop(HdfVibratorMode::HDF_VIBRATOR_MODE_BUTT);
+    endRet = g_vibratorInterface->Stop(HdfVibratorMode::HDF_VIBRATOR_MODE_BUTT);
     EXPECT_EQ(endRet, HDF_ERR_INVALID_PARAM);
     OsalMSleep(g_sleepTime1);
 }
@@ -701,6 +701,6 @@ HWTEST_F(HdfVibratorHdiTest, GetAllWaveInfoTest, TestSize.Level1)
     HDF_LOGI("StartByIntensityTest in");
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    int32_t endRet = g_vibratorInterface->GetAllWaveInfo(g_vibratorId, g_info);
+    int32_t startRet = g_vibratorInterface->GetAllWaveInfo(g_vibratorId, g_info);
     EXPECT_EQ(startRet, HDF_SUCCESS);
 }
