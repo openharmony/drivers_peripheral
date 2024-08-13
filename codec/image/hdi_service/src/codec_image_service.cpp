@@ -43,7 +43,7 @@ int32_t CodecImageService::GetImageCapability(std::vector<CodecImageCapability>&
 int32_t CodecImageService::Init(enum CodecImageRole role)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecInit");
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     if (role == CODEC_IMAGE_JPEG) {
         CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE, "jpegImpl_ is null");
         return jpegImpl_->JpegInit();
@@ -55,7 +55,7 @@ int32_t CodecImageService::Init(enum CodecImageRole role)
 int32_t CodecImageService::DeInit(enum CodecImageRole role)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDeInit");
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     if (role == CODEC_IMAGE_JPEG) {
         CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE, "jpegImpl_ is null");
         return jpegImpl_->JpegDeInit();
@@ -68,7 +68,7 @@ int32_t CodecImageService::DoJpegDecode(const CodecImageBuffer& inBuffer, const 
     const CodecJpegDecInfo& decInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDoJpegDecode");
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     if (inBuffer.fenceFd >= 0) {
         close(inBuffer.fenceFd);
     }
@@ -79,7 +79,7 @@ int32_t CodecImageService::DoJpegDecode(const CodecImageBuffer& inBuffer, const 
 int32_t CodecImageService::AllocateInBuffer(CodecImageBuffer& inBuffer, uint32_t size, CodecImageRole role)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecAllocateInBuffer");
-    CODEC_LOGI("servcie impl, size [%{public}d]", size);
+    CODEC_LOGD("servcie impl, size [%{public}d]", size);
     CHECK_AND_RETURN_RET_LOG(size != 0, HDF_ERR_INVALID_PARAM, "buffer size is 0");
     CHECK_AND_RETURN_RET_LOG(size <= CODEC_IMAGE_MAX_BUFFER_SIZE, HDF_ERR_INVALID_PARAM, "buffer size is too large");
     inBuffer.bufferRole = role;
