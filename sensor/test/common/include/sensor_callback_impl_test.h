@@ -18,6 +18,7 @@
 
 #include <hdf_base.h>
 #include "v2_0/isensor_callback.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
