@@ -623,12 +623,12 @@ HWTEST_F(HdfSensorHdiTest, SetSdcSensor_001, TestSize.Level1)
 {
     SENSOR_TRACE;
     ASSERT_NE(nullptr, g_sensorInterface);
-
+    int32_t ret;
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        int32_t ret = g_sensorInterface->SetSdcSensor(iter.sensorId, true, RATE_LEVEL);
+        ret = g_sensorInterface->SetSdcSensor(iter.sensorId, true, RATE_LEVEL);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
-        int32_t ret = g_sensorInterface->Disable(iter.sensorId);
+        ret = g_sensorInterface->Disable(iter.sensorId);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         ret = g_sensorInterface->SetSdcSensor(iter.sensorId, false, RATE_LEVEL);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
