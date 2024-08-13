@@ -25,7 +25,7 @@ namespace V2_0 {
 int32_t SensorCallbackImplTest::OnDataEvent(const HdfSensorEvents& event)
 {
     HDF_LOGI("%{public}s sensorId=%{public}d", __func__, event.sensorId);
-    PrintData(event);
+    (void)event;
     return HDF_FAILURE;
 }
 } // V2_0
