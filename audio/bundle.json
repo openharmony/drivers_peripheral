@@ -47,16 +47,15 @@
         "build": {
             "sub_component": [
                 "//drivers/peripheral/audio:hdi_audio",
-                "//drivers/peripheral/audio/effect:effect_model"
+                "//drivers/peripheral/audio/effect:effect_model",
+                "//drivers/peripheral/audio:libaudio_header_static"
             ],
             "inner_kits": [
                 {
-                    "type": "so",
-                    "name": "//drivers/peripheral/audio/hdi_service/primary_impl:audio_primary_impl_vendor",
+                    "name": "//drivers/peripheral/audio:libaudio_header_static",
                     "header": {
                         "header_base": "//drivers/peripheral/audio/interfaces/sound",
-                        "header_files": [
-                        ]
+                        "header_files": []
                     }
                 }
             ],
