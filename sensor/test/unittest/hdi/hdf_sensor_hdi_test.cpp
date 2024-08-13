@@ -614,12 +614,12 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0003, TestSize.Level1)
 }
 
 /**
-  * @tc.name: SetSdcSensor
+  * @tc.name: SetSdcSensor_001
   * @tc.desc: Read event data for the specified sensor.
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
   */
-HWTEST_F(HdfSensorHdiTest, SetSdcSensor, TestSize.Level1)
+HWTEST_F(HdfSensorHdiTest, SetSdcSensor_001, TestSize.Level1)
 {
     SENSOR_TRACE;
     ASSERT_NE(nullptr, g_sensorInterface);
