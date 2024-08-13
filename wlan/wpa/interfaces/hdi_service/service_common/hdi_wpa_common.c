@@ -289,6 +289,11 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         int nameLen = strlen(ifName);
         ReleaseIfaceCtrl(ifName, nameLen);
     }
+    if (ret == 0 && ifName != NULL &&
+        strncmp(cmd, "INTERFACE_REMOVE ", strlen("INTERFACE_REMOVE ")) == 0) {
+        int nameLen = strlen(ifName);
+        ReleaseIfaceCtrl(ifName, nameLen);
+    }
     pthread_mutex_unlock(&g_mutexWpa);
     return ret;
 }
