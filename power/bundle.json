@@ -32,7 +32,8 @@
           "hilog", 
           "hisysevent",
           "libxml2",
-          "ipc"
+          "ipc",
+          "jsoncpp"
         ],
         "third_party": [
           "jsoncpp"
