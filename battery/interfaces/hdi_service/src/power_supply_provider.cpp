@@ -77,6 +77,7 @@ PowerSupplyProvider::PowerSupplyProvider()
 
 PowerSupplyProvider::~PowerSupplyProvider()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto it = nodeCacheFiles_.begin(); it != nodeCacheFiles_.end();) {
         int32_t fd = it->second;
         close(fd);
@@ -280,9 +281,12 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
 {
     int32_t fd = -1;
 
-    auto item = nodeCacheFiles_.find(path);
-    if (item != nodeCacheFiles_.end()) {
-        fd = item->second;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        auto item = nodeCacheFiles_.find(path);
+        if (item != nodeCacheFiles_.end()) {
+            fd = item->second;
+        }
     }
 
     if (fd != -1) {
@@ -301,7 +305,10 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
     size_t readSize = read(fd, buf, size - 1);
     buf[readSize] = '\0';
     Trim(buf);
-    nodeCacheFiles_.insert(std::make_pair(path, fd));
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        nodeCacheFiles_.insert(std::make_pair(path, fd));
+    }
 
     return HDF_SUCCESS;
 }
