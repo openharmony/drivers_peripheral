@@ -17,6 +17,7 @@
 #define OHOS_HDI_SENSOR_V2_0_SENSORCALLBACKIMPLTEST_H
 
 #include <hdf_base.h>
+#include <securec.h>
 #include "v2_0/isensor_callback.h"
 #include "sensor_uhdf_log.h"
 #include "osal_mem.h"
@@ -33,45 +34,6 @@ public:
     virtual ~SensorCallbackImplTest() {}
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override;
-
-    void PrintData(const HdfSensorEvents &event)
-    {
-        std::string st = {0};
-        DataToStr(st, event);
-        HDF_LOGI("%{public}s: %{public}s", __func__, st.c_str());
-    }
-
-    void DataToStr(std::string &str, const HdfSensorEvents &event)
-    {
-        void *origin = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
-        if (origin == nullptr) {
-            HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
-            return;
-        }
-
-        uint8_t *eventData = static_cast<uint8_t*>(origin);
-        std::copy(event.data.begin(), event.data.end(), eventData);
-        float *data = reinterpret_cast<float*>(eventData);
-        int32_t dataLen = event.dataLen;
-        int32_t dataDimension = static_cast<int32_t>(dataLen / sizeof(float));
-        std::string dataStr = {0};
-        char arrayStr[DATA_LEN] = {0};
-
-        for (int32_t i = 0; i < dataDimension; i++) {
-            if (snprintf(arrayStr + strlen(arrayStr), DATA_LEN, "[%f]", data[i]) < 0) {
-                HDF_LOGE("%{public}s: sprintf_s failed", __func__);
-                OsalMemFree(origin);
-                return;
-            }
-        }
-
-        dataStr = arrayStr;
-        str = "sensorId: " + std::to_string(event.sensorId) + ", ts: " +
-              std::to_string(event.timestamp) + ", data: " + dataStr;
-
-        OsalMemFree(origin);
-        return;
-    }
 };
 } // V2_0
 } // Sensor
