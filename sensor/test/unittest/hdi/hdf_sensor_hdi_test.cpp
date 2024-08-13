@@ -23,6 +23,7 @@
 #include "v2_0/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
+#include "sensor_callback_impl_test.h"
 #include "sensor_uhdf_log.h"
 #include "sensor_trace.h"
 
@@ -32,6 +33,7 @@ using namespace testing::ext;
 namespace {
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
     sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
+    sptr<ISensorCallback> g_traditionalCallbackTest = new SensorCallbackImplTest();
     sptr<ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
     std::vector<HdfSensorEvents> g_events;
@@ -661,4 +663,32 @@ HWTEST_F(HdfSensorHdiTest, EnableButUnregisterTest, TestSize.Level1)
         int32_t ret = g_sensorInterface->Disable(iter.sensorId);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
+}
+
+/**
+  * @tc.name: SensorCallbackImplFailureTest
+  * @tc.desc: Read event data for the specified sensor.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, SensorCallbackImplFailureTest, TestSize.Level1)
+{
+    SENSOR_TRACE;
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallbackTest);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info) {
+        int32_t ret = g_sensorInterface->Enable(iter.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+    OsalMSleep(SENSOR_WAIT_TIME2);
+    for (auto iter : g_info) {
+        int32_t ret = g_sensorInterface->Disable(iter.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
