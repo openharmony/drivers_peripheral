@@ -21,9 +21,9 @@ namespace OHOS {
 namespace HDI {
 namespace Input {
 namespace V1_0 {
-InputCallbackImpl::InputCallbackImpl(const wptr<IInputInterfaces> &inputInterfaces_,
-    const wptr<InputCallbackImpl> &reportCallback_) : inputInterfaces_(inputInterfaces_),
-    reportCallback_(reportCallback_)
+InputCallbackImpl::InputCallbackImpl(const wptr<IInputInterfaces> &inputInterfaces,
+    const wptr<InputCallbackImpl> &otherCallback) : inputInterfaces_(inputInterfaces),
+    reportCallback_(otherCallback)
 {}
 
 int32_t InputCallbackImpl::EventPkgCallback(const std::vector<EventPackage> &pkgs, uint32_t devIndex)
