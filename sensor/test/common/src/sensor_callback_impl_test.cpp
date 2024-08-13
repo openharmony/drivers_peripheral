@@ -17,7 +17,6 @@
 #include "osal_mem.h"
 #include "sensor_callback_impl.h"
 #include "sensor_type.h"
-#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
