@@ -403,6 +403,7 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
     uint32_t index {};
     uint32_t status {};
     std::shared_ptr<InputDeviceInfo> detailInfo = std::make_shared<InputDeviceInfo>();
+
     (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
     (void)GetInputDeviceInfo(fd, detailInfo.get());
     auto sDevName = string(detailInfo->attrSet.devName);
@@ -464,7 +465,7 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t &epollFd, uint32_t &index)
 
     HDF_LOGD("%{public}s: index: %{public}d fd: %{public}d devName: %{public}s", __func__,
              index, inputDevList_[index].fd, inputDevList_[index].detailInfo.attrSet.devName);
-    
+
     // hot plug evnets happened
     auto sDevName = string(inputDevList_[index].detailInfo.attrSet.devName);
     if (sDevName.find("Keyboard") != std::string::npos) {
