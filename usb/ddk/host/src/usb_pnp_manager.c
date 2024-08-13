@@ -161,6 +161,16 @@ static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
 #endif
+
+#ifdef USB_EMULATOR_MODE
+    ret = UsbDdkPnpLoaderEventHandle();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGW("%{public}s: emulator, UsbDdkPnpLoaderEventHandle failed", __func__);
+    }
+    if (DdkListenerMgrAdd(&usbPnpListener) != HDF_SUCCESS) {
+        HDF_LOGW("%{public}s: emulator, add listener failed", __func__);
+    }
+#else
     ret = UsbDdkPnpLoaderEventHandle();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbDdkPnpLoaderEventHandle failed", __func__);
@@ -170,6 +180,7 @@ static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
         HDF_LOGE("%{public}s: add listener failed", __func__);
         return HDF_FAILURE;
     }
+#endif
     HDF_LOGI("UsbPnpManagerInit done");
     return HDF_SUCCESS;
 }
