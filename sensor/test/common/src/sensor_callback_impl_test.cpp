@@ -24,6 +24,7 @@ namespace Sensor {
 namespace V2_0 {
 int32_t SensorCallbackImplTest::OnDataEvent(const HdfSensorEvents& event)
 {
+    HDF_LOGD("%{public}s sensorId=%{public}d", __func__, event.sensorId);
     PrintData(event);
     return HDF_FAILURE;
 }
