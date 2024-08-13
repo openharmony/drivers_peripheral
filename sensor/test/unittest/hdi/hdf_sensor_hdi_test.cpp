@@ -24,6 +24,7 @@
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
 #include "sensor_uhdf_log.h"
+#include "sensor_trace.h"
 
 using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
@@ -82,7 +83,7 @@ namespace {
     constexpr int64_t SENSOR_INTERVAL4 = 20000000;
     constexpr int32_t SENSOR_POLL_TIME = 1;
     constexpr int32_t SENSOR_WAIT_TIME = 100;
-    constexpr int32_t SENSOR_WAIT_TIME2 = 20000;
+    constexpr int32_t SENSOR_WAIT_TIME2 = 1000;
     constexpr int32_t ABNORMAL_SENSORID = -1;
     constexpr int32_t RATE_LEVEL = 50;
 }
@@ -610,4 +611,47 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0003, TestSize.Level1)
 
     EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
     SensorCallbackImpl::sensorDataFlag = 1;
+}
+
+/**
+  * @tc.name: SetSdcSensor
+  * @tc.desc: Read event data for the specified sensor.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, SetSdcSensor, TestSize.Level1)
+{
+    SENSOR_TRACE;
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info) {
+        int32_t ret = g_sensorInterface->SetSdcSensor(iter.sensorId, true, RATE_LEVEL);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        int32_t ret = g_sensorInterface->Disable(iter.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        ret = g_sensorInterface->SetSdcSensor(iter.sensorId, false, RATE_LEVEL);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+}
+
+/**
+  * @tc.name: EnableButUnregisterTest
+  * @tc.desc: Read event data for the specified sensor.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, EnableButUnregisterTest, TestSize.Level1)
+{
+    SENSOR_TRACE;
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info) {
+        int32_t ret = g_sensorInterface->Enable(iter.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }
