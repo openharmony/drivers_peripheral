@@ -624,6 +624,7 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0003, TestSize.Level1)
 HWTEST_F(HdfSensorHdiTest, SetSdcSensor_001, TestSize.Level1)
 {
     SENSOR_TRACE;
+    HDF_LOGI("enter the SetSdcSensor_001 function");
     ASSERT_NE(nullptr, g_sensorInterface);
     int32_t ret;
     EXPECT_GT(g_info.size(), 0);
@@ -647,7 +648,7 @@ HWTEST_F(HdfSensorHdiTest, EnableButUnregisterTest, TestSize.Level1)
 {
     SENSOR_TRACE;
     ASSERT_NE(nullptr, g_sensorInterface);
-
+    HDF_LOGI("enter the EnableButUnregisterTest function");
 
     int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
@@ -675,7 +676,7 @@ HWTEST_F(HdfSensorHdiTest, SensorCallbackImplFailureTest, TestSize.Level1)
 {
     SENSOR_TRACE;
     ASSERT_NE(nullptr, g_sensorInterface);
-
+    HDF_LOGI("enter the SensorCallbackImplFailureTest function");
 
     int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallbackTest);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
