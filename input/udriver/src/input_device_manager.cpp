@@ -402,8 +402,8 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
     uint32_t type {};
     uint32_t index {};
     uint32_t status {};
-    std::shared_ptr<InputDeviceInfo> detailInfo = std::make_shared<InputDeviceInfo>();
 
+    std::shared_ptr<InputDeviceInfo> detailInfo = std::make_shared<InputDeviceInfo>();
     (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
     (void)GetInputDeviceInfo(fd, detailInfo.get());
     auto sDevName = string(detailInfo->attrSet.devName);
