@@ -16,10 +16,6 @@ hdf_hdi_service_path = "./.."
 import("//build/ohos.gni")
 import("$hdf_audio_path/audio.gni")
 
-config("drivers_peripheral_audio_header") {
-  include_dirs = [ "//drivers/peripheral/audio/interfaces/sound" ]
-}
-
 ohos_shared_library("audio_primary_impl_vendor") {
   defines = []
   if (drivers_peripheral_audio_feature_community) {
@@ -94,7 +90,6 @@ ohos_shared_library("audio_primary_impl_vendor") {
     defines += [ "AUDIO_HICOLLIE_ENABLE" ]
   }
 
-  public_configs = [ ":drivers_peripheral_audio_header" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_audio"
