@@ -26,7 +26,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
-const std::string VENDOR_HAL_PATH = "/vendor/lib64/libwifi_hal_hw.z.so";
+const std::string VENDOR_HAL_PATH = "/libwifi_hal_hw.z.so";
 
 WifiVendorHalList::WifiVendorHalList(
     const std::weak_ptr<IfaceTool> ifaceTool)
