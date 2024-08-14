@@ -25,3 +25,14 @@ group("hdi_audio") {
     deps += [ "hdi_service:idl_audio" ]
   }
 }
+
+config("drivers_peripheral_audio_header") {
+  include_dirs = [ "interfaces/sound" ]
+}
+
+ohos_static_library("libaudio_header_static") {
+  public_configs = [ ":drivers_peripheral_audio_header" ]
+
+  part_name = "drivers_peripheral_audio"
+  subsystem_name = "hdf"
+}
