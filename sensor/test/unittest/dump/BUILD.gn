@@ -17,11 +17,12 @@ import("../../../sensor.gni")
 
 module_output_path = "drivers_peripheral_sensor/sensor"
 
-ohos_unittest("hdi_unittest_sensor") {
+ohos_unittest("dump_unittest_sensor") {
   module_out_path = module_output_path
 
   include_dirs = [
     "../../../interfaces/include",
+    "../../../interfaces/v1_0",
     "../../common/include",
     "../../../utils/include",
   ]
@@ -40,10 +41,13 @@ ohos_unittest("hdi_unittest_sensor") {
   ]
 
   if (is_standard_system) {
+    deps = [ "../../../hdi_service:libsensor_interface_service_2.0" ]
     external_deps = [
       "drivers_interface_sensor:libsensor_proxy_2.0",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
+      "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
     if (c_utils_enable) {
