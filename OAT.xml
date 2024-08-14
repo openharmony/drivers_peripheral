@@ -58,6 +58,7 @@ Note:If the text contains special characters, please escape them according to th
                 <policyitem type="copyright" name="Chipsea Technologies (Shenzhen) Corp., Ltd." path=".*" rule="may" group="defaultGroup"/>
                 <policyitem type="copyright" name="Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Xiaoxiongpai"/>
                 <policyitem type="copyright" name="Archermind Technology (Nanjing) Co. Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed by Nanjing Archermind"/>
+                <policyitem type="copyright" name="Bosch Sensortec GmbH. All rights reserved." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed by Bosch"/>
             </policy>
         </policylist>
         <filefilterlist>
