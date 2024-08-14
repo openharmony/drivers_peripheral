@@ -37,6 +37,7 @@ if (defined(ohos_lite)) {
         "benchmarktest:hdf_sensor_benchmark_test",
         "fuzztest:hdf_sensor_fuzztest",
         "unittest/hdi:hdi_unittest_sensor",
+        "unittest/dump:dump_unittest_sensor",
       ]
     }
   }
