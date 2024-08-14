@@ -114,9 +114,11 @@ int32_t AudioGetRenderPositionVdi(struct IAudioRender *render, uint64_t *frames,
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->GetRenderPosition, HDF_ERR_INVALID_PARAM);
-
+    
     int32_t id = SetTimer("Hdi:GetRenderPosition");
+    HdfAudioStartTrace("Hdi:AudioGetRenderPositionVdi", 0);
     int32_t ret = vdiRender->GetRenderPosition(vdiRender, frames, (struct AudioTimeStampVdi *)time);
+    HdfAudioFinishTrace();
     CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render, get position fail, ret=%{public}d", ret);
