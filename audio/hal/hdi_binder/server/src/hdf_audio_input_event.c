@@ -142,6 +142,7 @@ static void *AudioPnpInputStart(void *useless)
     (void)useless;
     const char *threadName = "pnp_headset";
     pthread_t threadInstance = pthread_self();
+    AUDIO_FUNC_LOGI("threadInstance:%{public}lu", threadInstance);
 
     if (pthread_setname_np(threadInstance, threadName) != 0) {
         AUDIO_FUNC_LOGE("Setname failed!");
