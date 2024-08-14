@@ -33,6 +33,7 @@ struct AudioAdapterInfo {
     struct IAudioAdapterVdi *vdiAdapter;
     struct IAudioAdapter *adapter;
     uint32_t refCnt;
+    char *adapterName;
 };
 
 struct AudioAdapterPrivVdi {
@@ -76,6 +77,25 @@ static struct IAudioAdapterVdi *AudioGetVdiAdapterVdi(const struct IAudioAdapter
     }
 
     AUDIO_FUNC_LOGE("audio get vdiadapter fail");
+    return NULL;
+}
+
+static char *AudioGetAdapterNameVdi(const struct IAudioAdapter *adapter)
+{
+    struct AudioAdapterPrivVdi *priv = AudioAdapterGetPrivVdi();
+
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("get AdapterName error");
+        return NULL;
+    }
+
+    for (uint32_t i = 0; i < AUDIO_VDI_ADAPTER_NUM_MAX; i++) {
+        if (adapter == priv->adapterInfo[i].adapter) {
+            return priv->adapterInfo[i].adapterName;
+        }
+    }
+
+    AUDIO_FUNC_LOGE("audio get adapterName fail");
     return NULL;
 }
 
@@ -137,7 +157,8 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
 
     pthread_mutex_lock(&g_adapterMutex);
-    *render = FindRenderCreated(desc->pins, attrs, renderId);
+    char *adapterName = AudioGetAdapterNameVdi(adapter);
+    *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName);
     if (*render != NULL) {
         AUDIO_FUNC_LOGE("already created");
         pthread_mutex_unlock(&g_adapterMutex);
@@ -158,7 +179,7 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
-    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc);
+    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterName);
     if (*render == NULL) {
         (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
         AUDIO_FUNC_LOGE("Create audio render failed");
@@ -624,7 +645,8 @@ void AudioEnforceClearAdapterRefCntVdi(uint32_t descIndex)
     AUDIO_FUNC_LOGI("clear adapter ref count zero");
 }
 
-struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter)
+struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter,
+    char *adapterName)
 {
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("create adapter error, descIndex=%{public}d", descIndex);
@@ -652,6 +674,12 @@ struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAda
     priv->adapterInfo[descIndex].vdiAdapter = vdiAdapter;
     priv->adapterInfo[descIndex].adapter = adapter;
     priv->adapterInfo[descIndex].refCnt = 1;
+    priv->adapterInfo[descIndex].adapterName = strdup(adapterName);
+    if (priv->adapterInfo[descIndex].adapterName == NULL) {
+        OsalMemFree((void *)priv->adapterInfo[descIndex].adapter);
+        priv->adapterInfo[descIndex].adapter = NULL;
+        return NULL;
+    }
 
     AUDIO_FUNC_LOGD(" audio vdiAdapter create adapter success, refcount[1]");
     return adapter;
@@ -670,6 +698,8 @@ void AudioReleaseAdapterVdi(uint32_t descIndex)
     priv->adapterInfo[descIndex].adapter = NULL;
     priv->adapterInfo[descIndex].vdiAdapter = NULL;
     priv->adapterInfo[descIndex].refCnt = UINT_MAX;
+    OsalMemFree((void *)priv->adapterInfo[descIndex].adapterName);
+    priv->adapterInfo[descIndex].adapterName = NULL;
 
     priv->isRegCb = false;
     priv->callback = NULL;
