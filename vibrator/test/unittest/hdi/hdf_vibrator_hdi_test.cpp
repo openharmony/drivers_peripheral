@@ -506,12 +506,12 @@ HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern, TestSize.Level1)
 }
 
 /**
-  * @tc.name: PlayHapticPattern
+  * @tc.name: PlayHapticPattern_001
   * @tc.desc: HD vibration data packet delivery.
   * @tc.type: FUNC
   * @tc.require:#I8BZ5H
   */
-HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern, TestSize.Level1)
+HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
