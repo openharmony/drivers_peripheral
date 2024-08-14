@@ -15,6 +15,7 @@
 
 #include "audio_render_vdi.h"
 
+#include <string.h>
 #include <limits.h>
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
@@ -908,7 +909,7 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
         if ((renderPriv->renderInfos[index] != NULL) &&
             (attrs->type == AUDIO_IN_MEDIA || attrs->type == AUDIO_MULTI_CHANNEL) &&
             (renderPriv->renderInfos[index]->streamType == attrs->type) &&
-            (renderPriv->renderInfos[index]->adapterName == adapterName)) {
+            (strcmp(renderPriv->renderInfos[index]->adapterName, adapterName) == 0)) {
             *rendrId = renderPriv->renderInfos[index]->renderId;
             renderPriv->renderInfos[index]->usrCount++;
             return &renderPriv->renderInfos[index]->render;
