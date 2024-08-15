@@ -93,8 +93,9 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
     SENSOR_TRACE;
     ASSERT_NE(g_sensorInterface, nullptr);
     int32_t ret = g_sensorInterface->GetAllSensorInfo(g_info);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
