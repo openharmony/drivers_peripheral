@@ -44,6 +44,7 @@ namespace {
     constexpr int32_t g_power = 1;
     constexpr int32_t g_minDelay = 10;
     constexpr int32_t g_maxDelay = 1000000000;
+    constexpr int32_t g_fifoMaxEventCount = 4;
     constexpr int32_t g_copyFlag = 1;
     constexpr uint32_t g_initDataNum = 1u;
     constexpr std::string g_sensorName = "test_accelerometer";
