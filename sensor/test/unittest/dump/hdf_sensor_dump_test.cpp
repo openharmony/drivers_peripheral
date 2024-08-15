@@ -37,6 +37,16 @@ namespace {
     constexpr int64_t g_samplingInterval = 10000000;
     constexpr int64_t g_reportInterval = 1;
     constexpr int32_t g_serviceId = 1314;
+    constexpr int32_t g_sensorIdStart = 1;
+    constexpr int32_t g_sensorIdEnd = 10;
+    constexpr int32_t g_maxRange = 1000;
+    constexpr int32_t g_accuracy = 100;
+    constexpr int32_t g_power = 1;
+    constexpr int32_t g_minDelay = 10;
+    constexpr int32_t g_maxDelay = 1000000000;
+    constexpr int32_t g_copyFlag = 1;
+    constexpr uint32_t g_initDataNum = 1u;
+    constexpr std::string g_sensorName = "test_accelerometer";
 }
 
 class HdfSensorDumpTest : public testing::Test {
@@ -53,6 +63,7 @@ public:
     void Disable(int32_t sensorId);
     void OnDataEvent(const V2_0::HdfSensorEvents& event);
     void PrintDumpResult(struct HdfSBuf* reply);
+    V2_0::HdfSensorEvents g_event = {1, 1, 100000000, 1, 1, {1, 2, 3, 4}, 4};
 };
 
 void HdfSensorDumpTest::SetUpTestCase()
@@ -74,21 +85,21 @@ void HdfSensorDumpTest::TearDown()
 void HdfSensorDumpTest::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
 {
     struct HdfSensorInformation sensorInfo = {};
-    for (int32_t sensorId = 1; sensorId < 10; sensorId++) {
-        sensorInfo.sensorName = "test_accelerometer" + std::to_string(sensorId);
-        sensorInfo.vendorName = "test_accelerometer" + std::to_string(sensorId);
-        sensorInfo.firmwareVersion = "test_accelerometer" + std::to_string(sensorId);
-        sensorInfo.hardwareVersion = "test_accelerometer" + std::to_string(sensorId);
+    for (int32_t sensorId = g_sensorIdStart; sensorId <= g_sensorIdEnd; sensorId++) {
+        sensorInfo.sensorName = g_sensorName + std::to_string(sensorId);
+        sensorInfo.vendorName = g_sensorName + std::to_string(sensorId);
+        sensorInfo.firmwareVersion = g_sensorName + std::to_string(sensorId);
+        sensorInfo.hardwareVersion = g_sensorName + std::to_string(sensorId);
         sensorInfo.sensorTypeId = sensorId;
         sensorInfo.sensorId = sensorId;
-        sensorInfo.maxRange = 1000 + sensorId;
-        sensorInfo.accuracy = 100 + sensorId;
-        sensorInfo.power = 1 + sensorId;
-        sensorInfo.minDelay = 10 + sensorId;
-        sensorInfo.maxDelay = 1000000000 + sensorId;
-        sensorInfo.fifoMaxEventCount = 10 + sensorId;
+        sensorInfo.maxRange = g_maxRange + sensorId;
+        sensorInfo.accuracy = g_accuracy + sensorId;
+        sensorInfo.power = g_power + sensorId;
+        sensorInfo.minDelay = g_minDelay + sensorId;
+        sensorInfo.maxDelay = g_maxDelay + sensorId;
+        sensorInfo.fifoMaxEventCount = g_fifoMaxEventCount + sensorId;
         info.push_back(std::move(sensorInfo));
-        SensorClientsManager::GetInstance()->CopySensorInfo(info, 1);
+        SensorClientsManager::GetInstance()->CopySensorInfo(info, g_copyFlag);
     }
 }
 
@@ -146,7 +157,7 @@ HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
     SENSOR_TRACE;
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
-    HdfSbufWriteUint32(data, 1u);
+    HdfSbufWriteUint32(data, g_initDataNum);
     HdfSbufWriteString(data, "-h");
     GetSensorDump(data, reply);
     PrintDumpResult(reply);
@@ -170,7 +181,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
 
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
-    HdfSbufWriteUint32(data, 1u);
+    HdfSbufWriteUint32(data, g_initDataNum);
     HdfSbufWriteString(data, "-c");
     GetSensorDump(data, reply);
 
@@ -192,22 +203,13 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
 
     V2_0::HdfSensorEvents event;
     for (auto it : g_info) {
-        event.sensorId = it.sensorId;
-        event.version = 1;
-        event.timestamp = 100000000;
-        event.option = 1;
-        event.mode = 1;
-        event.data.push_back(1);
-        event.data.push_back(2);
-        event.data.push_back(3);
-        event.data.push_back(4);
-        event.dataLen = 4;
-        OnDataEvent(event);
+        g_event.sensorId = it.sensorId;
+        OnDataEvent(g_event);
     }
 
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
-    HdfSbufWriteUint32(data, 1u);
+    HdfSbufWriteUint32(data, g_initDataNum);
     HdfSbufWriteString(data, "-d");
     GetSensorDump(data, reply);
     PrintDumpResult(reply);
@@ -226,7 +228,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowListTest, TestSize.Level1)
     SENSOR_TRACE;
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
-    HdfSbufWriteUint32(data, 1u);
+    HdfSbufWriteUint32(data, g_initDataNum);
     HdfSbufWriteString(data, "-l");
     GetSensorDump(data, reply);
     PrintDumpResult(reply);
