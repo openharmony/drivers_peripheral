@@ -27,6 +27,7 @@
 #include "sensor_hdi_dump.h"
 #include "sensor_clients_manager.h"
 
+using namespace OHOS::HDI::Sensor;
 using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
 
@@ -35,6 +36,7 @@ namespace {
     constexpr int64_t g_samplingInterval = 10000000;
     constexpr int64_t g_reportInterval = 1;
     constexpr int32_t g_waitTime = 2;
+    constexpr int32_t g_serviceId = getpid();
 }
 
 class HdfSensorDumpTest : public testing::Test {
@@ -59,7 +61,7 @@ public:
         sensorInfo.maxDelay = 1000000000;
         sensorInfo.fifoMaxEventCount = 10;
         info.push_back(std::move(sensorInfo));
-        SensorClientsManager::GetInstance()->CopySensorInfo(info, COPY_SENSORINFO);
+        SensorClientsManager::GetInstance()->CopySensorInfo(info, 1);
     }
     void Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
     {
@@ -67,21 +69,21 @@ public:
     }
     void UnRegister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
     {
-        SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, serviceId, callbackObj);
+        SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, g_serviceId, callbackObj);
     }
     void SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
     {
-        SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
+        SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, g_serviceId, samplingInterval, reportInterval);
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, saSamplingInterval, saReportInterval);
         SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
     }
     void Enable(int32_t sensorId)
     {
-        SensorClientsManager::GetInstance()->OpenSensor(sensorId, serviceId);
+        SensorClientsManager::GetInstance()->OpenSensor(sensorId, g_serviceId);
     }
     void Disable(int32_t sensorId)
     {
-        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR);
+        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, g_serviceId, DISABLE_SENSOR);
     }
     void OnDataEvent(const V2_0::HdfSensorEvents& event)
     {
