@@ -85,6 +85,7 @@ void HdfSensorDumpTest::TearDown()
 
 void HdfSensorDumpTest::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
 {
+    SENSOR_TRACE;
     struct HdfSensorInformation sensorInfo = {};
     for (int32_t sensorId = g_sensorIdStart; sensorId <= g_sensorIdEnd; sensorId++) {
         sensorInfo.sensorName = g_sensorName + std::to_string(sensorId);
@@ -106,16 +107,19 @@ void HdfSensorDumpTest::GetAllSensorInfo(std::vector<HdfSensorInformation> &info
 
 void HdfSensorDumpTest::Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
+    SENSOR_TRACE;
     SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, getpid(), callbackObj);
 }
 
 void HdfSensorDumpTest::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
+    SENSOR_TRACE;
     SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, g_serviceId, callbackObj);
 }
 
 void HdfSensorDumpTest::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
+    SENSOR_TRACE;
     SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, g_serviceId, samplingInterval, reportInterval);
     SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, samplingInterval, reportInterval);
     SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, samplingInterval, reportInterval);
@@ -123,21 +127,25 @@ void HdfSensorDumpTest::SetBatch(int32_t sensorId, int64_t samplingInterval, int
 
 void HdfSensorDumpTest::Enable(int32_t sensorId)
 {
+    SENSOR_TRACE;
     SensorClientsManager::GetInstance()->OpenSensor(sensorId, g_serviceId);
 }
 
 void HdfSensorDumpTest::Disable(int32_t sensorId)
 {
+    SENSOR_TRACE;
     SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, g_serviceId, 0);
 }
 
 void HdfSensorDumpTest::OnDataEvent(const V2_0::HdfSensorEvents& event)
 {
+    SENSOR_TRACE;
     SensorClientsManager::GetInstance()->CopyEventData(event);
 }
 
 void HdfSensorDumpTest::PrintDumpResult(struct HdfSBuf* reply)
 {
+    SENSOR_TRACE;
     while (true) {
         const char* value = HdfSbufReadString(reply);
         if (value == nullptr) {
