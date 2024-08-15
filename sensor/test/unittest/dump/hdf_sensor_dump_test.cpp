@@ -45,60 +45,14 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-    void GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
-    {
-        struct HdfSensorInformation sensorInfo = {};
-        sensorInfo.sensorName = "test_accelerometer";
-        sensorInfo.vendorName = "test_accelerometer";
-        sensorInfo.firmwareVersion = "test_accelerometer";
-        sensorInfo.hardwareVersion = "test_accelerometer";
-        sensorInfo.sensorTypeId = 1;
-        sensorInfo.sensorId = 1;
-        sensorInfo.maxRange = 999;
-        sensorInfo.accuracy = 100;
-        sensorInfo.power = 1;
-        sensorInfo.minDelay = 10;
-        sensorInfo.maxDelay = 1000000000;
-        sensorInfo.fifoMaxEventCount = 10;
-        info.push_back(std::move(sensorInfo));
-        SensorClientsManager::GetInstance()->CopySensorInfo(info, 1);
-    }
-    void Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
-    {
-        SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, getpid(), callbackObj);
-    }
-    void Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
-    {
-        SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, g_serviceId, callbackObj);
-    }
-    void SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
-    {
-        SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, g_serviceId, samplingInterval, reportInterval);
-        SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, samplingInterval, reportInterval);
-        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, samplingInterval, reportInterval);
-    }
-    void Enable(int32_t sensorId)
-    {
-        SensorClientsManager::GetInstance()->OpenSensor(sensorId, g_serviceId);
-    }
-    void Disable(int32_t sensorId)
-    {
-        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, g_serviceId, 0);
-    }
-    void OnDataEvent(const V2_0::HdfSensorEvents& event)
-    {
-        SensorClientsManager::GetInstance()->CopyEventData(event);
-    }
-    void PrintDumpResult(struct HdfSBuf* reply)
-    {
-        while (true) {
-            const char* value = HdfSbufReadString(reply);
-            if (value == nullptr) {
-                return;
-            }
-            printf("%s", value);
-        }
-    }
+    void GetAllSensorInfo(std::vector<HdfSensorInformation> &info);
+    void Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj);
+    void Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj);
+    void SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval);
+    void Enable(int32_t sensorId);
+    void Disable(int32_t sensorId);
+    void OnDataEvent(const V2_0::HdfSensorEvents& event);
+    void PrintDumpResult(struct HdfSBuf* reply);
 };
 
 void HdfSensorDumpTest::SetUpTestCase()
@@ -115,6 +69,70 @@ void HdfSensorDumpTest::SetUp()
 
 void HdfSensorDumpTest::TearDown()
 {
+}
+
+void HdfSensorDumpTest::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
+{
+    struct HdfSensorInformation sensorInfo = {};
+    for (int32_t sensorId = 1; sensorId < 10; sensorId++) {
+        sensorInfo.sensorName = "test_accelerometer" + std::to_string(sensorId);
+        sensorInfo.vendorName = "test_accelerometer" + std::to_string(sensorId);
+        sensorInfo.firmwareVersion = "test_accelerometer" + std::to_string(sensorId);
+        sensorInfo.hardwareVersion = "test_accelerometer" + std::to_string(sensorId);
+        sensorInfo.sensorTypeId = sensorId;
+        sensorInfo.sensorId = sensorId;
+        sensorInfo.maxRange = 1000 + sensorId;
+        sensorInfo.accuracy = 100 + sensorId;
+        sensorInfo.power = 1 + sensorId;
+        sensorInfo.minDelay = 10 + sensorId;
+        sensorInfo.maxDelay = 1000000000 + sensorId;
+        sensorInfo.fifoMaxEventCount = 10 + sensorId;
+        info.push_back(std::move(sensorInfo));
+        SensorClientsManager::GetInstance()->CopySensorInfo(info, 1);
+    }
+}
+
+void HdfSensorDumpTest::Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+{
+    SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, getpid(), callbackObj);
+}
+
+void HdfSensorDumpTest::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+{
+    SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, g_serviceId, callbackObj);
+}
+
+void HdfSensorDumpTest::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
+{
+    SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, g_serviceId, samplingInterval, reportInterval);
+    SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, samplingInterval, reportInterval);
+    SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, samplingInterval, reportInterval);
+}
+
+void HdfSensorDumpTest::Enable(int32_t sensorId)
+{
+    SensorClientsManager::GetInstance()->OpenSensor(sensorId, g_serviceId);
+}
+
+void HdfSensorDumpTest::Disable(int32_t sensorId)
+{
+    SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, g_serviceId, 0);
+}
+
+void HdfSensorDumpTest::OnDataEvent(const V2_0::HdfSensorEvents& event)
+{
+    SensorClientsManager::GetInstance()->CopyEventData(event);
+}
+
+void HdfSensorDumpTest::PrintDumpResult(struct HdfSBuf* reply)
+{
+    while (true) {
+        const char* value = HdfSbufReadString(reply);
+        if (value == nullptr) {
+            return;
+        }
+        printf("%s", value);
+    }
 }
 
 /**
