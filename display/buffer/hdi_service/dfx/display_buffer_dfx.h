@@ -28,7 +28,7 @@ namespace Buffer {
 namespace V1_0 {
 class DisplayBufferDfx {
 public:
-    explicit DisplayBufferDfx(const std::string name);
+    explicit DisplayBufferDfx(const std::string& name);
     ~DisplayBufferDfx();
     void SetTimer();
     void CancelTimer();
