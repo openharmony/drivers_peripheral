@@ -31,6 +31,7 @@ using namespace testing::ext;
 
 namespace {
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
+    sptr<SensorIfService>  g_sensorIfService = nullptr;
     sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
     constexpr int64_t g_samplingInterval = 10000000;
@@ -49,6 +50,7 @@ public:
 void HdfSensorDumpTest::SetUpTestCase()
 {
     g_sensorInterface = ISensorInterface::Get();
+    g_sensorIfService = SensorInterfaceImplGetInstance();
 }
 
 void HdfSensorDumpTest::TearDownTestCase()
@@ -91,11 +93,11 @@ HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
 HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
 {
     SENSOR_TRACE;
-    ASSERT_NE(g_sensorInterface, nullptr);
-    int32_t ret = g_sensorInterface->GetAllSensorInfo(g_info);
+    ASSERT_NE(g_sensorIfService, nullptr);
+    int32_t ret = g_sensorIfService->GetAllSensorInfo(g_info);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-    ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    ret = g_sensorIfService->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
@@ -107,7 +109,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
     ASSERT_NE(value, nullptr);
     printf("-h value is %s", value);
 
-    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    ret = g_sensorIfService->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
 
@@ -120,20 +122,20 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
 HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
 {
     SENSOR_TRACE;
-    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    int32_t ret = g_sensorIfService->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
     for (auto it : g_info) {
-        ret = g_sensorInterface->SetBatch(it.sensorId, g_reportInterval, g_samplingInterval);
+        ret = g_sensorIfService->SetBatch(it.sensorId, g_reportInterval, g_samplingInterval);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
-        ret = g_sensorInterface->Enable(it.sensorId);
+        ret = g_sensorIfService->Enable(it.sensorId);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
     OsalSleep(g_waitTime);
 
     for (auto it : g_info) {
-        ret = g_sensorInterface->Disable(it.sensorId);
+        ret = g_sensorIfService->Disable(it.sensorId);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -146,7 +148,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
     ASSERT_NE(value, nullptr);
     printf("-h value is %s", value);
 
-    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    ret = g_sensorIfService->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
 
