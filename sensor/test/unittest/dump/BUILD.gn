@@ -46,6 +46,7 @@ ohos_unittest("dump_unittest_sensor") {
     external_deps = [
       "drivers_interface_sensor:libsensor_proxy_2.0",
       "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "hitrace:hitrace_meter",
