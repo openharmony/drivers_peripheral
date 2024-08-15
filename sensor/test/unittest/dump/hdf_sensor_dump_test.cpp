@@ -30,7 +30,6 @@ using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
 
 namespace {
-    sptr<ISensorInterface>  g_sensorInterface = nullptr;
     sptr<SensorIfService>  g_sensorIfService = nullptr;
     sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
@@ -49,8 +48,12 @@ public:
 
 void HdfSensorDumpTest::SetUpTestCase()
 {
-    g_sensorInterface = ISensorInterface::Get();
-    g_sensorIfService = SensorInterfaceImplGetInstance();
+    g_sensorIfService = new SensorIfService();
+    int32_t ret = g_sensorIfService->Init();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: service init failed, error code is %{public}d", __func__, ret);
+        delete impl;
+    }
 }
 
 void HdfSensorDumpTest::TearDownTestCase()
