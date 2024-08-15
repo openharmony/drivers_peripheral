@@ -149,7 +149,7 @@ void HdfSensorDumpTest::PrintDumpResult(struct HdfSBuf* reply)
 
 /**
   * @tc.name: SensorDumpHelpTest
-  * @tc.desc: Get a client and check whether the client is empty.
+  * @tc.desc: hdc shell "hidumper -s 5100 -a '-host sensor_host -h'"
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
   */
@@ -166,7 +166,7 @@ HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
 
 /**
   * @tc.name: SensorShowClientTest
-  * @tc.desc: Get a client and check whether the client is empty.
+  * @tc.desc: hdc shell "hidumper -s 5100 -a '-host sensor_host -c'"
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
   */
@@ -193,7 +193,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
 
 /**
   * @tc.name: SensorShowDataTest
-  * @tc.desc: Get a client and check whether the client is empty.
+  * @tc.desc: hdc shell "hidumper -s 5100 -a '-host sensor_host -d'"
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
   */
@@ -220,7 +220,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
 
 /**
   * @tc.name: SensorShowListTest
-  * @tc.desc: Get a client and check whether the client is empty.
+  * @tc.desc: hdc shell "hidumper -s 5100 -a '-host sensor_host -l'"
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
   */
