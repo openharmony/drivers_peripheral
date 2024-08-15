@@ -67,6 +67,6 @@ HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
 {
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
-    HdfsbufWriteString(data, "-h");
+    HdfSbufWriteString(data, "-h");
     GetSensorDump(data, reply)
 }
