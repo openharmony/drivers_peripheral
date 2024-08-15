@@ -25,13 +25,12 @@
 #include "sensor_callback_impl.h"
 #include "sensor_uhdf_log.h"
 #include "sensor_hdi_dump.h"
+#include "sensor_clients_manager.h"
 
 using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
 
 namespace {
-    sptr<SensorIfService>  g_sensorIfService = nullptr;
-    sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
     constexpr int64_t g_samplingInterval = 10000000;
     constexpr int64_t g_reportInterval = 1;
@@ -44,16 +43,54 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    void GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
+    {
+        struct HdfSensorInformation sensorInfo = {};
+        sensorInfo.sensorName = "test_accelerometer";
+        sensorInfo.vendorName = "test_accelerometer";
+        sensorInfo.firmwareVersion = "test_accelerometer";
+        sensorInfo.hardwareVersion = "test_accelerometer";
+        sensorInfo.sensorTypeId = 1;
+        sensorInfo.sensorId = 1;
+        sensorInfo.maxRange = 999;
+        sensorInfo.accuracy = 100;
+        sensorInfo.power = 1;
+        sensorInfo.minDelay = 10;
+        sensorInfo.maxDelay = 1000000000;
+        sensorInfo.fifoMaxEventCount = 10;
+        info.push_back(std::move(sensorInfo));
+        SensorClientsManager::GetInstance()->CopySensorInfo(info, COPY_SENSORINFO);
+    }
+    void Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+    {
+        SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, getpid(), callbackObj);
+    }
+    void UnRegister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+    {
+        SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, serviceId, callbackObj);
+    }
+    void SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
+    {
+        SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
+        SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, saSamplingInterval, saReportInterval);
+        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
+    }
+    void Enable(int32_t sensorId)
+    {
+        SensorClientsManager::GetInstance()->OpenSensor(sensorId, serviceId);
+    }
+    void Disable(int32_t sensorId)
+    {
+        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)
+    }
+    void OnDataEvent(const V2_0::HdfSensorEvents& event)
+    {
+        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)
+    }
 };
 
 void HdfSensorDumpTest::SetUpTestCase()
 {
-    g_sensorIfService = new SensorIfService();
-    int32_t ret = g_sensorIfService->Init();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: service init failed, error code is %{public}d", __func__, ret);
-        delete impl;
-    }
 }
 
 void HdfSensorDumpTest::TearDownTestCase()
@@ -96,12 +133,14 @@ HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
 HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
 {
     SENSOR_TRACE;
-    ASSERT_NE(g_sensorIfService, nullptr);
-    int32_t ret = g_sensorIfService->GetAllSensorInfo(g_info);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-
-    ret = g_sensorIfService->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    GetAllSensorInfo(g_info);
+    Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    for (auto it : g_info) {
+        SetBatch(it.sensorId, g_reportInterval, g_samplingInterval);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        Enable(it.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
@@ -112,7 +151,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
     ASSERT_NE(value, nullptr);
     printf("-h value is %s", value);
 
-    ret = g_sensorIfService->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
 
@@ -125,21 +164,13 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
 HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
 {
     SENSOR_TRACE;
-    int32_t ret = g_sensorIfService->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
+    V2_0::HdfSensorEvents event;
     for (auto it : g_info) {
-        ret = g_sensorIfService->SetBatch(it.sensorId, g_reportInterval, g_samplingInterval);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        ret = g_sensorIfService->Enable(it.sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-    }
-
-    OsalSleep(g_waitTime);
-
-    for (auto it : g_info) {
-        ret = g_sensorIfService->Disable(it.sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        event.sensorId = it.sensorId;
+        OnDataEvent(event)
     }
 
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
@@ -151,7 +182,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
     ASSERT_NE(value, nullptr);
     printf("-h value is %s", value);
 
-    ret = g_sensorIfService->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
 
