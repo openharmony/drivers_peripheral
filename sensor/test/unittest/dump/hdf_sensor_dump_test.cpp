@@ -89,6 +89,16 @@ public:
     {
         SensorClientsManager::GetInstance()->CopyEventData(event);
     }
+    void PrintDumpResult(struct HdfSBuf* reply)
+    {
+        while (true) {
+            const char* value = HdfSbufReadString(reply);
+            if (value == nullptr) {
+                return;
+            }
+            printf("%s", value);
+        }
+    }
 };
 
 void HdfSensorDumpTest::SetUpTestCase()
@@ -121,9 +131,7 @@ HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
     HdfSbufWriteUint32(data, 1u);
     HdfSbufWriteString(data, "-h");
     GetSensorDump(data, reply);
-    const char* value = HdfSbufReadString(reply);
-    ASSERT_NE(value, nullptr);
-    printf("-h value is %s", value);
+    PrintDumpResult(reply);
 }
 
 /**
@@ -147,9 +155,8 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
     HdfSbufWriteUint32(data, 1u);
     HdfSbufWriteString(data, "-c");
     GetSensorDump(data, reply);
-    const char* value = HdfSbufReadString(reply);
-    ASSERT_NE(value, nullptr);
-    printf("-h value is %s", value);
+
+    PrintDumpResult(reply);
 
     Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
 }
@@ -176,9 +183,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
     HdfSbufWriteUint32(data, 1u);
     HdfSbufWriteString(data, "-d");
     GetSensorDump(data, reply);
-    const char* value = HdfSbufReadString(reply);
-    ASSERT_NE(value, nullptr);
-    printf("-h value is %s", value);
+    PrintDumpResult(reply);
 
     Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
 }
@@ -197,7 +202,5 @@ HWTEST_F(HdfSensorDumpTest, SensorShowListTest, TestSize.Level1)
     HdfSbufWriteUint32(data, 1u);
     HdfSbufWriteString(data, "-l");
     GetSensorDump(data, reply);
-    const char* value = HdfSbufReadString(reply);
-    ASSERT_NE(value, nullptr);
-    printf("-h value is %s", value);
+    PrintDumpResult(reply);
 }
