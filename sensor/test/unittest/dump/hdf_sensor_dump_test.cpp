@@ -65,8 +65,13 @@ void HdfSensorDumpTest::TearDown()
   */
 HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
 {
+    SENSOR_TRACE;
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
+    HdfSbufWriteUint32(data, 1u);
     HdfSbufWriteString(data, "-h");
-    GetSensorDump(data, reply)
+    GetSensorDump(data, reply);
+    const char* value = HdfSbufReadString(reply);
+    ASSERT_NE(value, nullptr);
+    printf("-h value is %s", value);
 }
