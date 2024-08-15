@@ -30,7 +30,12 @@ using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
 
 namespace {
-
+    sptr<ISensorInterface>  g_sensorInterface = nullptr;
+    sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
+    std::vector<HdfSensorInformation> g_info;
+    constexpr int64_t g_samplingInterval = 10000000;
+    constexpr int64_t g_reportInterval = 1;
+    constexpr int32_t g_waitTime = 2;
 }
 
 class HdfSensorDumpTest : public testing::Test {
@@ -43,6 +48,7 @@ public:
 
 void HdfSensorDumpTest::SetUpTestCase()
 {
+    g_sensorInterface = ISensorInterface::Get();
 }
 
 void HdfSensorDumpTest::TearDownTestCase()
@@ -70,6 +76,92 @@ HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
     HdfSbufWriteUint32(data, 1u);
     HdfSbufWriteString(data, "-h");
+    GetSensorDump(data, reply);
+    const char* value = HdfSbufReadString(reply);
+    ASSERT_NE(value, nullptr);
+    printf("-h value is %s", value);
+}
+
+/**
+  * @tc.name: SensorShowClientTest
+  * @tc.desc: Get a client and check whether the client is empty.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
+{
+    SENSOR_TRACE;
+    ASSERT_NE(g_sensorInterface, nullptr);
+    int32_t ret = g_sensorInterface->GetAllSensorInfo(g_info);
+
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
+    HdfSbufWriteUint32(data, 1u);
+    HdfSbufWriteString(data, "-c");
+    GetSensorDump(data, reply);
+    const char* value = HdfSbufReadString(reply);
+    ASSERT_NE(value, nullptr);
+    printf("-h value is %s", value);
+
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: SensorShowDataTest
+  * @tc.desc: Get a client and check whether the client is empty.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
+{
+    SENSOR_TRACE;
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    for (auto it : g_info) {
+        ret = g_sensorInterface->SetBatch(it.sensorId, g_reportInterval, g_samplingInterval);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        ret = g_sensorInterface->Enable(it.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    OsalSleep(g_waitTime);
+
+    for (auto it : g_info) {
+        ret = g_sensorInterface->Disable(it.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
+    HdfSbufWriteUint32(data, 1u);
+    HdfSbufWriteString(data, "-d");
+    GetSensorDump(data, reply);
+    const char* value = HdfSbufReadString(reply);
+    ASSERT_NE(value, nullptr);
+    printf("-h value is %s", value);
+
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: SensorShowListTest
+  * @tc.desc: Get a client and check whether the client is empty.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorDumpTest, SensorShowListTest, TestSize.Level1)
+{
+    SENSOR_TRACE;
+    struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
+    HdfSbufWriteUint32(data, 1u);
+    HdfSbufWriteString(data, "-l");
     GetSensorDump(data, reply);
     const char* value = HdfSbufReadString(reply);
     ASSERT_NE(value, nullptr);
