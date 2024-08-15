@@ -32,11 +32,12 @@ using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
 
 namespace {
+    sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
     constexpr int64_t g_samplingInterval = 10000000;
     constexpr int64_t g_reportInterval = 1;
     constexpr int32_t g_waitTime = 2;
-    constexpr int32_t g_serviceId = getpid();
+    constexpr int32_t g_serviceId = 1314;
 }
 
 class HdfSensorDumpTest : public testing::Test {
@@ -67,15 +68,15 @@ public:
     {
         SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, getpid(), callbackObj);
     }
-    void UnRegister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+    void Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
     {
         SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, g_serviceId, callbackObj);
     }
     void SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
     {
         SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, g_serviceId, samplingInterval, reportInterval);
-        SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, saSamplingInterval, saReportInterval);
-        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
+        SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, samplingInterval, reportInterval);
+        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, samplingInterval, reportInterval);
     }
     void Enable(int32_t sensorId)
     {
@@ -83,7 +84,7 @@ public:
     }
     void Disable(int32_t sensorId)
     {
-        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, g_serviceId, DISABLE_SENSOR);
+        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, g_serviceId, 0);
     }
     void OnDataEvent(const V2_0::HdfSensorEvents& event)
     {
@@ -139,9 +140,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
     Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     for (auto it : g_info) {
         SetBatch(it.sensorId, g_reportInterval, g_samplingInterval);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
         Enable(it.sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
@@ -154,7 +153,6 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
     printf("-h value is %s", value);
 
     Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
 
 /**
@@ -167,12 +165,11 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
 {
     SENSOR_TRACE;
     Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
 
     V2_0::HdfSensorEvents event;
     for (auto it : g_info) {
         event.sensorId = it.sensorId;
-        OnDataEvent(event)
+        OnDataEvent(event);
     }
 
     struct HdfSBuf* reply = HdfSbufTypedObtain(SBUF_IPC);
@@ -185,7 +182,6 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
     printf("-h value is %s", value);
 
     Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
 
 /**
