@@ -29,6 +29,7 @@ ohos_unittest("dump_unittest_sensor") {
   ]
 
   sources = [
+    "../../common/src/sensor_callback_impl.cpp",
     "hdf_sensor_dump_test.cpp",
   ]
   cflags = [
