@@ -81,11 +81,11 @@ public:
     }
     void Disable(int32_t sensorId)
     {
-        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)
+        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR);
     }
     void OnDataEvent(const V2_0::HdfSensorEvents& event)
     {
-        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)
+        SensorClientsManager::GetInstance()->CopyEventData(event);
     }
 };
 
