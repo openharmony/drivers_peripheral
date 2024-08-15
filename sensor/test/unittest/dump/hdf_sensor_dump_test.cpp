@@ -179,7 +179,9 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
         event.timestamp = 100000000;
         event.option = 1;
         event.mode = 1;
-        event.data = [1, 2, 3];
+        event.data.push_back(1);
+        event.data.push_back(2);
+        event.data.push_back(3);
         event.dataLen = 3;
         OnDataEvent(event);
     }
