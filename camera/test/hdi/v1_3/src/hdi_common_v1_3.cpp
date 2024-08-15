@@ -282,7 +282,7 @@ void Test::DefaultInfosAnalyze(
         camera_metadata_item_t entry = {};
 
         int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_IDS, &entry);
-        if (ret == 0) {
+        if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
             for (size_t i = 0; i < entry.count; i++) {
                 int id = entry.data.i32[i];
                 CAMERA_LOGI("Face ids : %{public}d", id);
@@ -290,7 +290,7 @@ void Test::DefaultInfosAnalyze(
         }
 
         ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_RECTANGLES, &entry);
-        if (ret == 0) {
+        if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
             for (size_t i = 0; i < entry.count; i++) {
                 int id = entry.data.i32[i];
                 CAMERA_LOGI("Face rectangles : %{public}d", id);
