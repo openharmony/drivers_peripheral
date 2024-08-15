@@ -175,6 +175,12 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
     V2_0::HdfSensorEvents event;
     for (auto it : g_info) {
         event.sensorId = it.sensorId;
+        event.version = 1;
+        event.timestamp = 100000000;
+        event.option = 1;
+        event.mode = 1;
+        event.data = [1, 2, 3];
+        event.dataLen = 3;
         OnDataEvent(event);
     }
 
