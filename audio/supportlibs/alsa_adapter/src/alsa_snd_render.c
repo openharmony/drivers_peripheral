@@ -283,7 +283,6 @@ static int32_t ResetRenderParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t
 
 static struct AlsaRender *GetRenderInsByName(const char *adapterName)
 {
-    int32_t ret = HDF_SUCCESS;
     struct AlsaRender *renderIns = NULL;
     struct AlsaSoundCard *alsaSnd = NULL;
 
@@ -304,7 +303,7 @@ static struct AlsaRender *GetRenderInsByName(const char *adapterName)
         alsaSnd = (struct AlsaSoundCard *)&g_alsaRenderList[i];
         if (alsaSnd->cardStatus == 0) {
             (void)memset_s(renderIns, sizeof(struct AlsaRender), 0, sizeof(struct AlsaRender));
-            ret = strncpy_s(alsaSnd->adapterName, MAX_CARD_NAME_LEN + 1, adapterName, strlen(adapterName));
+            int32_t ret = strncpy_s(alsaSnd->adapterName, MAX_CARD_NAME_LEN + 1, adapterName, strlen(adapterName));
             if (ret != 0) {
                 AUDIO_FUNC_LOGE("strncpy_s failed!");
                 return NULL;
