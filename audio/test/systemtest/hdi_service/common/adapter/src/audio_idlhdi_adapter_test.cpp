@@ -810,9 +810,10 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_004, TestSize.Level1)
     attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render, &renderId_);
     ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_SUCCESS);
+    InitAttrs(attrs);
     attrs.type = AUDIO_IN_COMMUNICATION;
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render, &renderId_);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     IAudioAdapterRelease(adapter, IS_STUB);
