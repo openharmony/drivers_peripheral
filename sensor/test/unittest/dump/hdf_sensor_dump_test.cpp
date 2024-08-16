@@ -147,7 +147,7 @@ void HdfSensorDumpTest::PrintDumpResult(struct HdfSBuf* reply)
 {
     SENSOR_TRACE;
     const char* value = nullptr;
-    while ((value = HdfSbufReadString(reply)) != nullptr)) {
+    while ((value = HdfSbufReadString(reply)) != nullptr) {
         printf("%s", value);
     }
 }
