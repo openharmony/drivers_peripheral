@@ -139,8 +139,9 @@ int32_t CollectorImpl::SendMessage(uint64_t scheduleId, int32_t srcRole, const s
             IAM_LOGE("Hdi SendMessageToCollector fail");
             return;
         }
-        if (callback_->OnGetData(pinAlgoParam.algoParameter, pinAlgoParam.subType,
-            pinAlgoParam.algoVersion, pinAlgoParam.challenge) != SUCCESS) {
+        std::string pinComplexityReg = "";
+        if (callback_->OnGetData(pinAlgoParam.algoParameter, pinAlgoParam.subType, pinAlgoParam.algoVersion,
+            pinAlgoParam.challenge, pinComplexityReg) != SUCCESS) {
             IAM_LOGE("Hdi callback OnGetData fail");
             CancelCurrentCollect();
         }

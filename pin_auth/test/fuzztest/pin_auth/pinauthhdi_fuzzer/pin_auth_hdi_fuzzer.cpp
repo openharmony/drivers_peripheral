@@ -52,7 +52,7 @@ public:
     }
 
     int32_t OnGetData(const std::vector<uint8_t>& algoParameter, uint64_t authSubType, uint32_t algoVersion,
-         const std::vector<uint8_t>& challenge) override
+         const std::vector<uint8_t>& challenge, const std::string &pinComplexityReg) override
     {
         return onGetDataResult_;
     }
