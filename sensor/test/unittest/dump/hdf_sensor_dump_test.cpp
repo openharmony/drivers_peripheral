@@ -69,6 +69,7 @@ public:
 
 void HdfSensorDumpTest::SetUpTestCase()
 {
+    g_serviceId = getpid();
 }
 
 void HdfSensorDumpTest::TearDownTestCase()
@@ -108,7 +109,7 @@ void HdfSensorDumpTest::GetAllSensorInfo(std::vector<HdfSensorInformation> &info
 void HdfSensorDumpTest::Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE;
-    SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, getpid(), callbackObj);
+    SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, g_serviceId, callbackObj);
 }
 
 void HdfSensorDumpTest::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
