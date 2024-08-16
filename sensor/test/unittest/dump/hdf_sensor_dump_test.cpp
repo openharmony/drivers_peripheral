@@ -36,7 +36,7 @@ namespace {
     std::vector<HdfSensorInformation> g_info;
     constexpr int64_t g_samplingInterval = 10000000;
     constexpr int64_t g_reportInterval = 1;
-    constexpr int32_t g_serviceId = 1314;
+    int32_t g_serviceId = 1314;
     constexpr int32_t g_sensorIdStart = 1;
     constexpr int32_t g_sensorIdEnd = 10;
     constexpr int32_t g_maxRange = 1000;
