@@ -3324,8 +3324,7 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
             HILOG_ERROR(LOG_CORE, "%{public}s: nla_put_u32 freq failed", __FUNCTION__);
             break;
         }
-        if (strncmp(ifName, STR_CHBA, strlen(STR_CHBA)) != 0 &&
-            nla_put_flag(msg, NL80211_ATTR_OFFCHANNEL_TX_OK) != RET_CODE_SUCCESS) {
+        if (nla_put_flag(msg, NL80211_ATTR_OFFCHANNEL_TX_OK) != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%{public}s: nla_put_u32 offchannel failed", __FUNCTION__);
             break;
         }
