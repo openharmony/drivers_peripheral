@@ -49,9 +49,6 @@ static void BatteryStubFuzzTest(const uint8_t *data, size_t size)
     }
 
     MessageParcel datas;
-    datas.WriteInterfaceToken(IBatteryInterface::GetDescriptor());
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(REWIND_READ_DATA);
     MessageParcel reply;
     MessageOption option;
     if (g_fuzzService == nullptr) {
@@ -60,6 +57,9 @@ static void BatteryStubFuzzTest(const uint8_t *data, size_t size)
         g_fuzzService = make_shared<BatteryInterfaceStub>(impl);
     }
     for (code = CMD_BATTERY_INTERFACE_GET_VERSION; code < BATTERY_INTERFACE_STUB_FUNC_MAX_SIZE; code++) {
+        datas.WriteInterfaceToken(IBatteryInterface::GetDescriptor());
+        datas.WriteBuffer(data, size);
+        datas.RewindRead(REWIND_READ_DATA);
         g_fuzzService->OnRemoteRequest(code, datas, reply, option);
     }
 }

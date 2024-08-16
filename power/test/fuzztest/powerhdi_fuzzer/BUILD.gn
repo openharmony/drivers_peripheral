@@ -1,0 +1,51 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("../../../power.gni")
+
+ohos_fuzztest("PowerHdiFuzzTest") {
+  module_out_path = "drivers_peripheral_power/drivers_peripheral_power"
+  fuzz_config_file = "."
+  include_dirs = [
+    "../../../interfaces/hdi_service/src",
+    "../../../utils/include",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "powerhdi_fuzz.cpp" ]
+  deps = [ "../../../interfaces/hdi_service:libpower_interface_service_1.2" ]
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_power:libpower_stub_1.2",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+  if (has_power_c_utils_part) {
+    external_deps += [ "c_utils:utils" ]
+  }
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_power"
+}
+
+group("hdf_power_hdi_fuzztest") {
+  testonly = true
+  deps = [ ":PowerHdiFuzzTest" ]
+}
