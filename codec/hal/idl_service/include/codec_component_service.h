@@ -57,6 +57,7 @@ public:
 
     const std::string &GetComponentCompName() const;
     void GetComponentNode(std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode_);
+    bool ReWrapNativeBufferInOmxBuffer(const OmxCodecBuffer &inBuffer);
 private:
     void SetComponentRole();
     void ReleaseCache();
