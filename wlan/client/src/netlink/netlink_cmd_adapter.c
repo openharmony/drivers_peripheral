@@ -58,6 +58,7 @@
 #define STR_WLAN1     "wlan1"
 #define STR_P2P0      "p2p0"
 #define STR_P2P0_X    "p2p0-"
+#define STR_CHBA      "chba0"
 #define NET_DEVICE_INFO_PATH "/sys/class/net"
 
 #define PRIMARY_ID_POWER_MODE   0x8bfd
@@ -115,6 +116,7 @@ static inline uint32_t BIT(uint8_t x)
 
 #define WLAN_IFACE_LENGTH 4
 #define P2P_IFACE_LENGTH 3
+#define CHBA_IFACE_LENGTH 4
 #ifndef KERNEL_VERSION
 #define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + ((c) > 255 ? 255 : (c)))
 #endif
@@ -1001,7 +1003,8 @@ static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
 
 static bool IsWifiIface(const char *name)
 {
-    if (strncmp(name, "wlan", WLAN_IFACE_LENGTH) != 0 && strncmp(name, "p2p", P2P_IFACE_LENGTH) != 0) {
+    if (strncmp(name, "wlan", WLAN_IFACE_LENGTH) != 0 && strncmp(name, "p2p", P2P_IFACE_LENGTH) != 0 &&
+        strncmp(name, "chba", CHBA_IFACE_LENGTH) != 0) {
         /* not a wifi interface; ignore it */
         return false;
     } else {
@@ -1082,6 +1085,8 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
         } else if (strncmp(result->infos[i].name, STR_P2P0_X, strlen(STR_P2P0_X)) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_P2P_CLIENT] = 1;
             result->infos[i].supportMode[WIFI_IFTYPE_P2P_GO] = 1;
+        } else if (strncmp(result->infos[i].name, STR_CHBA, strlen(STR_CHBA)) == 0) {
+            result->infos[i].supportMode[WIFI_IFTYPE_CHBA] = 1;
         }
     }
     return RET_CODE_SUCCESS;
