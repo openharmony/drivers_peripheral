@@ -20,6 +20,8 @@
 #include <malloc.h>
 #include <unistd.h>
 #include <hitrace_meter.h>
+#include "v1_0/display_composer_type.h"
+#include "v1_1/imetadata.h"
 #include "codec_log_wrapper.h"
 
 #define AUDIO_CODEC_NAME "OMX.audio"
@@ -45,6 +47,69 @@ sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> GetMapperService()
     }
     CODEC_LOGE("get IMapper failed");
     return nullptr;
+}
+
+std::mutex g_metaMtx;
+sptr<OHOS::HDI::Display::Buffer::V1_1::IMetadata> g_metaService;
+
+sptr<OHOS::HDI::Display::Buffer::V1_1::IMetadata> GetMetaService()
+{
+    std::lock_guard<std::mutex> lk(g_metaMtx);
+    if (g_metaService) {
+        return g_metaService;
+    }
+    g_metaService = OHOS::HDI::Display::Buffer::V1_1::IMetadata::Get(true);
+    if (g_metaService) {
+        CODEC_LOGI("get IMetadata succ");
+        return g_metaService;
+    }
+    CODEC_LOGE("get IMetadata failed");
+    return nullptr;
+}
+
+void BufferDestructor(BufferHandle* handle)
+{
+    if (handle == nullptr) {
+        return;
+    }
+    sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> mapper = GetMapperService();
+    if (mapper == nullptr) {
+        return;
+    }
+    sptr<NativeBuffer> buffer = new NativeBuffer();
+    buffer->SetBufferHandle(handle, true);
+    mapper->FreeMem(buffer);
+}
+
+bool ReWrapNativeBuffer(sptr<NativeBuffer>& buffer)
+{
+    if (buffer == nullptr) {
+        return true;
+    }
+    BufferHandle* handle = buffer->Move();
+    if (handle == nullptr) {
+        return true;
+    }
+    buffer->SetBufferHandle(handle, true, BufferDestructor);
+    sptr<OHOS::HDI::Display::Buffer::V1_1::IMetadata> meta = GetMetaService();
+    if (meta == nullptr) {
+        return false;
+    }
+    int32_t ret = meta->RegisterBuffer(buffer);
+    if (ret != Display::Composer::V1_0::DISPLAY_SUCCESS &&
+        ret != Display::Composer::V1_0::DISPLAY_NOT_SUPPORT) {
+        CODEC_LOGE("RegisterBuffer failed, ret = %{public}d", ret);
+        return false;
+    }
+    return true;
+}
+
+bool CodecComponentService::ReWrapNativeBufferInOmxBuffer(const OmxCodecBuffer &inBuffer)
+{
+    if (!isIPCMode_) {
+        return true;
+    }
+    return ReWrapNativeBuffer(const_cast<OmxCodecBuffer &>(inBuffer).bufferhandle);
 }
 
 CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node,
@@ -152,6 +217,9 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecUseBuffer");
     CODEC_LOGD("portIndex: [%{public}d]", portIndex);
+    if (!ReWrapNativeBufferInOmxBuffer(inBuffer)) {
+        return HDF_FAILURE;
+    }
     outBuffer = const_cast<OmxCodecBuffer &>(inBuffer);
 
     if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD &&
@@ -195,6 +263,9 @@ int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuff
 int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecEmptyThisBuffer");
+    if (!ReWrapNativeBufferInOmxBuffer(buffer)) {
+        return HDF_FAILURE;
+    }
     OmxCodecBuffer &bufferTemp = const_cast<OmxCodecBuffer &>(buffer);
     int32_t ret = node_->EmptyThisBuffer(bufferTemp);
     if (isIPCMode_ && bufferTemp.fd >= 0) {
@@ -208,6 +279,9 @@ int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecFillThisBuffer");
+    if (!ReWrapNativeBufferInOmxBuffer(buffer)) {
+        return HDF_FAILURE;
+    }
     OmxCodecBuffer &bufferTemp = const_cast<OmxCodecBuffer &>(buffer);
     int32_t ret = node_->FillThisBuffer(bufferTemp);
     if (isIPCMode_ && bufferTemp.fd >= 0) {

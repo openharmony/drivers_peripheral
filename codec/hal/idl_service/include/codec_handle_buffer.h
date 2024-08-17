@@ -33,14 +33,10 @@ public:
     uint8_t *GetBuffer() override;
 
 protected:
-    CodecHandleBuffer(struct OmxCodecBuffer &codecBuffer, BufferHandle *bufferHandle);
-    bool CheckInvalid(struct OmxCodecBuffer &codecBuffer) override;
+    CodecHandleBuffer(struct OmxCodecBuffer &codecBuffer);
 
 private:
-    void ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
-
-private:
-    BufferHandle *bufferHandle_;
+    sptr<HDI::Base::NativeBuffer> buffer_;
 };
 }  // namespace Omx
 }  // namespace Codec
