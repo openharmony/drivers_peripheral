@@ -23,7 +23,7 @@
 #include "hdi_test_device_common.h"
 #include "hdi_test_display.h"
 
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 

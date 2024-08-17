@@ -21,7 +21,7 @@
 #include <mutex>
 #include <vector>
 
-#include "v1_0/display_composer_type.h"
+#include "v1_2/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "v1_2/include/idisplay_composer_interface.h"
 #include "display_test_utils.h"
@@ -32,11 +32,11 @@ namespace HDI {
 namespace Display {
 namespace TEST {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 
 class DeathTest : public ::testing::Test {
 public:
-    sptr<IDisplayComposerInterface> displayComposer_;
+    sptr<Composer::V1_2::IDisplayComposerInterface> displayComposer_;
 };
 } // namespace SYSTEMTEST
 } // namespace Display

@@ -34,7 +34,10 @@ if (defined(ohos_lite)) {
     deps = [ "benchmarktest:hdf_input_benchmark_test" ]
 
     if (drivers_peripheral_input_feature_model) {
-      deps += [ "unittest/hdi:hdi_unittest_input" ]
+      deps += [
+        "unittest/hdi:hdi_unittest_input",
+        "unittest/hdi_passthrough_additional:InputPassthroughAdditionalTest",
+      ]
     }
     if (drivers_peripheral_input_feature_udriver) {
       deps += [ "unittest/udriver:input_udriver_unittest" ]

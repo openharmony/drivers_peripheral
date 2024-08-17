@@ -1245,7 +1245,7 @@ static int32_t AdapterClearHalt(const struct UsbDeviceHandle *handle, unsigned i
     return HDF_SUCCESS;
 }
 
-static int32_t AdapterResetDevice(const struct UsbDeviceHandle *handle)
+static int32_t AdapterResetDevice(struct UsbDeviceHandle *handle)
 {
     int32_t ret;
     uint8_t i;
@@ -1267,7 +1267,20 @@ static int32_t AdapterResetDevice(const struct UsbDeviceHandle *handle)
         return HDF_FAILURE;
     }
 
-    return HDF_SUCCESS;
+    for (i = 0;i < USB_MAXINTERFACES; i++) {
+        if (!(handle->claimedInterfaces & (1UL << i))) {
+            continue;
+        }
+        ret = AdapterDetachKernelDriverAndClaim(handle, i);
+        if (ret) {
+            HDF_LOGE("%{public}s:%{public}d failed to re-claim interface %{public}u after reset errno=%{public}d",
+                __func__, __LINE__, i, errno);
+            handle->claimedInterfaces &= ~(1UL << i);
+            break;
+        }
+    }
+
+    return ret;
 }
 
 static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *handle, int32_t isoPackets, size_t len)

@@ -498,6 +498,21 @@ static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
     return RESULT_SUCCESS;
 }
 
+static int32_t CheckFirstAuthType(int32_t userId, uint32_t authType)
+{
+    bool hasSuccessPinAuth = false;
+    ResultCode ret = GetHasSuccessPinAuth(userId, &hasSuccessPinAuth);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetHasSuccessPinAuth failed");
+        return ret;
+    }
+    if (hasSuccessPinAuth == false && authType != PIN_AUTH) {
+        LOG_ERROR("first auth type must be pinAuth");
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
+    return RESULT_SUCCESS;
+}
+
 int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const HdiAuthParam &param,
     std::vector<HdiScheduleInfo> &infos)
 {
@@ -519,6 +534,11 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     if (schedulesGet == nullptr) {
         IAM_LOGE("get null schedule");
         return RESULT_GENERAL_ERROR;
+    }
+    ret = CheckFirstAuthType(paramHal.userId, paramHal.authType);
+    if (ret != RESULT_SUCCESS) {
+        DestroyLinkedList(schedulesGet);
+        return ret;
     }
     LinkedListNode *tempNode = schedulesGet->head;
     while (tempNode != nullptr) {
@@ -804,7 +824,9 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
     uint32_t authTrustLevel, std::vector<int32_t> &validTypes)
 {
     IAM_LOGI("start userId:%{public}d authTrustLevel:%{public}u", userId, authTrustLevel);
-    int32_t result = RESULT_TYPE_NOT_SUPPORT;
+    static int32_t resultPriority[] = {RESULT_GENERAL_ERROR, RESULT_TYPE_NOT_SUPPORT, RESULT_TRUST_LEVEL_NOT_SUPPORT,
+        RESULT_NOT_ENROLLED, RESULT_PIN_EXPIRED};
+    int32_t result = RESULT_GENERAL_ERROR;
     validTypes.clear();
     std::lock_guard<std::mutex> lock(g_mutex);
     for (auto &authType : authTypes) {
@@ -814,21 +836,16 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
             validTypes.push_back(authType);
             continue;
         }
-        switch (checkRet) {
-            case RESULT_PIN_EXPIRED:
-                LOG_ERROR("pin is expired");
-                return RESULT_PIN_EXPIRED;
-            case RESULT_TYPE_NOT_SUPPORT:
-                IAM_LOGE("authType is not surport, authType: %{public}d", authType);
-                continue;
-            case RESULT_TRUST_LEVEL_NOT_SUPPORT:
-                IAM_LOGE("GetAvailableStatus authType: %{public}d", authType);
+        bool isResultFound = false;
+        for (uint32_t i = 0; i < sizeof(resultPriority) / sizeof(int32_t); i++) {
+            if (resultPriority[i] == result) {
+                isResultFound = true;
+            }
+            if (resultPriority[i] == checkRet && isResultFound) {
+                IAM_LOGI("checkRet:%{public}d higher priority than result:%{public}d", checkRet, result);
                 result = checkRet;
-                continue;
-            default:
-                IAM_LOGE("authType does not support, authType:%{public}d, ret:%{public}d", authType, checkRet);
-                result = RESULT_NOT_ENROLLED;
-                continue;
+                break;
+            }
         }
     }
     if (validTypes.empty()) {
@@ -1146,7 +1163,7 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
     Buffer *oldRootSecret = GetCacheRootSecret(userId);
     if (!IsBufferValid(oldRootSecret)) {
         IAM_LOGE("get GetCacheRootSecret failed");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_SUCCESS;
     }
     if (memcpy_s(rootSecret.data(), rootSecret.size(), oldRootSecret->buf, oldRootSecret->contentSize) != EOK) {
         IAM_LOGE("rootSecret copy failed");

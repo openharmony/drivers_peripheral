@@ -1,0 +1,58 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+module_output_path = "drivers_peripheral_input/input"
+INPUT_ROOT_DIR = "./../../.."
+
+ohos_unittest("InputPassthroughAdditionalTest") {
+  module_out_path = module_output_path
+  configs = [ ":hdf_input_through_additional" ]
+
+  sources = [
+    "hdf_input_hdi_test.cpp",
+    "input_callback_impl.cpp",
+  ]
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_input:libinput_proxy_1.0",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [ "ipc:ipc_single" ]
+}
+
+config("hdf_input_through_additional") {
+  include_dirs = [
+    "$INPUT_ROOT_DIR/interfaces/include",
+    "$INPUT_ROOT_DIR/interfaces",
+    "//third_party/FreeBSD/sys/dev/evdev",
+    "$INPUT_ROOT_DIR/hdi_service",
+  ]
+}

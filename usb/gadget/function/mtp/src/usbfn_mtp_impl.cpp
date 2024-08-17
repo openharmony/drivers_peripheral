@@ -922,6 +922,8 @@ int32_t UsbfnMtpImpl::Init()
     int32_t ret = UsbfnMtpImpl::UsbMtpDeviceCreateFuncDevice();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbMtpDeviceCreateFuncDevice failed", __func__);
+        (void)OsalMemFree(mtpDev_);
+        mtpDev_ = nullptr;
         return ret;
     }
     /* init mtpPort */
@@ -1331,6 +1333,8 @@ int32_t UsbfnMtpImpl::ReceiveFileEx()
     int32_t ret = UsbMtpPortStartRxAsync(mtpPort_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: start async tx failed: %{public}d", __func__, ret);
+        (void)OsalMemFree(mtpDev_->asyncRecvWriteTempContent);
+        mtpDev_->asyncRecvWriteTempContent = nullptr;
         return HDF_ERR_IO;
     }
     HDF_LOGV("%{public}s: wait async rx", __func__);

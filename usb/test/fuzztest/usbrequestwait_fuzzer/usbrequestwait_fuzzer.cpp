@@ -38,7 +38,8 @@ bool UsbRequestWaitFuzzTest(const uint8_t *data, size_t size)
     }
 
     ret = usbInterface->RequestWait(dev, reinterpret_cast<std::vector<uint8_t> &>(data),
-        reinterpret_cast<std::vector<uint8_t> &>(data + OFFSET), *(reinterpret_cast<int32_t *>(*(data + OFFSET_BYTE))));
+        reinterpret_cast<std::vector<uint8_t> &>(std::move(data + OFFSET)),
+        *(reinterpret_cast<int32_t *>(*(data + OFFSET_BYTE))));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: request wait succeed", __func__);
     }

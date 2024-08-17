@@ -13,17 +13,19 @@
 
 import("//build/ohos.gni")
 
-ohos_shared_library("libcodec_image_service_1.0") {
+ohos_shared_library("libcodec_image_service_2.0") {
   include_dirs = [
     "../utils/include",
     "config/",
-    "vdi",
-    "jpeg/include",
     "hdi_service/include",
+    "heif/include",
+    "jpeg/include",
+    "vdi",
   ]
   sources = [
     "config/codec_image_config.cpp",
     "hdi_service/src/codec_image_service.cpp",
+    "heif/src/codec_heif_encode_service.cpp",
     "jpeg/src/codec_jpeg_core.cpp",
     "jpeg/src/codec_jpeg_service.cpp",
   ]
@@ -31,7 +33,7 @@ ohos_shared_library("libcodec_image_service_1.0") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libimage_proxy_1.0",
+      "drivers_interface_codec:libimage_proxy_2.0",
       "graphic_surface:buffer_handle",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
@@ -57,14 +59,14 @@ ohos_shared_library("libcodec_image_driver") {
 
   sources = [ "hdi_service/src/codec_image_driver.cpp" ]
 
-  deps = [ ":libcodec_image_service_1.0" ]
+  deps = [ ":libcodec_image_service_2.0" ]
 
   defines = [ "LOG_TAG_IMAGE" ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libimage_stub_1.0",
+      "drivers_interface_codec:libimage_stub_2.0",
       "graphic_surface:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -86,6 +88,6 @@ ohos_shared_library("libcodec_image_driver") {
 group("codec_image_service") {
   deps = [
     ":libcodec_image_driver",
-    ":libcodec_image_service_1.0",
+    ":libcodec_image_service_2.0",
   ]
 }

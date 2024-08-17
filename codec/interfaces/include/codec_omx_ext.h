@@ -16,6 +16,7 @@
 #ifndef CODEC_OMX_EXT_H
 #define CODEC_OMX_EXT_H
 #include <OMX_IVCommon.h>
+#include <OMX_Video.h>
 #include <stdbool.h>
 #ifdef __cplusplus
 #if __cplusplus
@@ -264,7 +265,23 @@ enum OmxIndexCodecExType {
     OMX_IndexParamQPStsart,
     /** OMX_BOOL */
     OMX_IndexParamSkipFrame,
+    /** OMX_S32 */
+    OMX_IndexParamEncOutRealBitrate,
+    /** CodecEncOutMadParam */
+    OMX_IndexParamEncOutMad,
+    /** OMX_S32 */
+    OMX_IndexParamEncOutIRatio,
+    /** OMX_S32 */
+    OMX_IndexParamEncOutFrameQp,
 };
+
+/**
+ * @brief Enumerates the Other Control Rate Type.
+ */
+typedef enum OmxVideoControlRateVendorExtType {
+    /** constant bit rate mode with Rlambda */
+    OMX_Video_ControlRateConstantWithRlambda = OMX_Video_ControlRateVendorStartUnused + 0x1,
+} OmxVideoControlRateVendorExtType;
 
 /**
  * @brief Enumerates the Other extended codec indexes.
@@ -378,6 +395,12 @@ struct CodecParamOverlayBuffer {
     uint32_t dstW;
     uint32_t dstH;
     void* bufferHandle;
+};
+
+struct CodecEncOutMadParam {
+    int32_t frameMadi;
+    int32_t frameMadp;
+    int32_t sumMadi;
 };
 
 #ifdef __cplusplus

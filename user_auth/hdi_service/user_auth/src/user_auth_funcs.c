@@ -132,6 +132,18 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
         result->credentialDigest = enrolledState.credentialDigest;
         result->credentialCount = enrolledState.credentialCount;
     }
+    if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH) {
+        bool hasSuccessPinAuth = false;
+        ResultCode ret = GetHasSuccessPinAuth(context->userId, &hasSuccessPinAuth);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("GetHasSuccessPinAuth failed");
+            return ret;
+        }
+        if (hasSuccessPinAuth == false) {
+            LOG_INFO("hasSuccessPinAuth: %d", hasSuccessPinAuth);
+            SetHasSuccessPinAuth(context->userId, true);
+        }
+    }
     if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH &&
         memcmp(context->localUdid, context->collectorUdid, sizeof(context->localUdid)) == 0) {
         result->rootSecret = CopyBuffer(info->rootSecret);

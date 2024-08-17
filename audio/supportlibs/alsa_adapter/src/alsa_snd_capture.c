@@ -381,7 +381,6 @@ int32_t CaptureSetParams(struct AlsaCapture *captureIns, const struct AudioHwCap
 
 static struct AlsaCapture *GetCaptureInsByName(const char *adapterName)
 {
-    int32_t ret = HDF_SUCCESS;
     struct AlsaCapture *captureIns = NULL;
     struct AlsaSoundCard *alsaSnd = NULL;
 
@@ -402,7 +401,7 @@ static struct AlsaCapture *GetCaptureInsByName(const char *adapterName)
         alsaSnd = (struct AlsaSoundCard *)&g_alsaCaptureList[i];
         if (alsaSnd->cardStatus == 0) {
             (void)memset_s(captureIns, sizeof(struct AlsaCapture), 0, sizeof(struct AlsaCapture));
-            ret = strncpy_s(alsaSnd->adapterName, MAX_CARD_NAME_LEN + 1, adapterName, strlen(adapterName));
+            int32_t ret = strncpy_s(alsaSnd->adapterName, MAX_CARD_NAME_LEN + 1, adapterName, strlen(adapterName));
             if (ret != 0) {
                 AUDIO_FUNC_LOGE("strncpy_s failed!");
                 return NULL;
@@ -880,7 +879,7 @@ static int32_t CaptureSetPauseStateImpl(struct AlsaCapture *captureIns, bool pau
     }
     cardIns->pauseState = pauseFlag;
 
-    return HDF_SUCCESS;
+    return ret;
 }
 
 static void RegisterCaptureImpl(struct AlsaCapture *captureIns)
