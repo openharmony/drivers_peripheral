@@ -16,7 +16,6 @@ camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "drivers_peripheral_camera/camera"
 
@@ -51,18 +50,15 @@ ohos_unittest("camera_test_hdi_V1_1") {
   include_dirs = [
     # common includes
     "$camera_test_path/v1_1/include",
-    "//third_party/googletest/googletest/include",
-    "$camera_path/../../../display/interfaces/include",
-    "$camera_path/../../../display/hdi_service/gralloc/include",
     "$camera_path/../../interfaces/include",
     "$camera_path/include",
   ]
 
-  deps = [
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest",
-    "//third_party/googletest:gtest_main",
-  ]
+  # deps = [
+  #  "//third_party/googletest:gmock_main",
+  #  "//third_party/googletest:gtest",
+  #  "//third_party/googletest:gtest_main",
+  # ]
 
   if (is_standard_system) {
     external_deps = [
