@@ -260,7 +260,7 @@ HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_012, TestSize.Level1)
  */
 HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_013, TestSize.Level1)
 {
-    printf("CameraMetadataInfoTest Camera_Metedate_Info_013 start...");
+    printf("CameraMetadataInfoTest Camera_Metedate_Info_014 start...");
 
     int32_t ret;
     int32_t value = 0;
