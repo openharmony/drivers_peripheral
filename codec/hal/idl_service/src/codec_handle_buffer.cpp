@@ -23,27 +23,29 @@ using namespace OHOS::HDI::Codec::V3_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-CodecHandleBuffer::CodecHandleBuffer(struct OmxCodecBuffer &codecBuffer, BufferHandle *bufferHandle)
-    : ICodecBuffer(codecBuffer), bufferHandle_(bufferHandle)
-{}
+CodecHandleBuffer::CodecHandleBuffer(struct OmxCodecBuffer &codecBuffer)
+    : ICodecBuffer(codecBuffer)
+{
+    buffer_ = codecBuffer.bufferhandle;
+}
 
 CodecHandleBuffer::~CodecHandleBuffer()
 {
-    if (bufferHandle_ != nullptr) {
-        FreeBufferHandle(bufferHandle_);
-        bufferHandle_ = nullptr;
-    }
 }
 
 sptr<ICodecBuffer> CodecHandleBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 {
     if (codecBuffer.bufferhandle == nullptr) {
+        CODEC_LOGE("nativebuffer is null");
+        return nullptr;
+    }
+    BufferHandle *bufferHandle = codecBuffer.bufferhandle->GetBufferHandle();
+    if (bufferHandle == nullptr) {
         CODEC_LOGE("bufferHandle is null");
         return nullptr;
     }
-    BufferHandle *bufferHandle = codecBuffer.bufferhandle->Move();
+    CodecHandleBuffer *buffer = new CodecHandleBuffer(codecBuffer);
     codecBuffer.bufferhandle = nullptr;
-    CodecHandleBuffer *buffer = new CodecHandleBuffer(codecBuffer, bufferHandle);
     return sptr<ICodecBuffer>(buffer);
 }
 
@@ -53,7 +55,6 @@ int32_t CodecHandleBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX
         CODEC_LOGE("CheckInvalid return false or mem has no right to write ");
         return HDF_ERR_INVALID_PARAM;
     }
-    ResetBuffer(codecBuffer, omxBuffer);
 
     int fenceFd = codecBuffer.fenceFd;
     if (fenceFd >= 0) {
@@ -82,10 +83,7 @@ int32_t CodecHandleBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
         return HDF_ERR_INVALID_PARAM;
     }
     codecBuffer.bufferhandle = nullptr;
-    if (bufferHandle_ != nullptr) {
-        FreeBufferHandle(bufferHandle_);
-        bufferHandle_ = nullptr;
-    }
+    buffer_ = nullptr;
 
     return HDF_SUCCESS;
 }
@@ -104,35 +102,12 @@ int32_t CodecHandleBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 
 uint8_t *CodecHandleBuffer::GetBuffer()
 {
-    return reinterpret_cast<uint8_t *>(bufferHandle_);
+    if (buffer_ == nullptr) {
+        return nullptr;
+    }
+    return reinterpret_cast<uint8_t *>(buffer_->GetBufferHandle());
 }
 
-bool CodecHandleBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
-{
-    if (!ICodecBuffer::CheckInvalid(codecBuffer) || bufferHandle_ == nullptr) {
-        CODEC_LOGE("bufferHandle_ is null or CheckInvalid return false");
-        return false;
-    }
-    return true;
-}
-
-void CodecHandleBuffer::ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    if (codecBuffer.bufferhandle == nullptr) {
-        return;
-    }
-    auto bufferHandle = codecBuffer.bufferhandle->Move();
-    codecBuffer.bufferhandle = nullptr;
-    // if recv new BufferHandle, save it, and save the new bufferhandle to omxbuffer
-    if (bufferHandle == nullptr) {
-        return;
-    }
-    if (bufferHandle_ != nullptr) {
-        FreeBufferHandle(bufferHandle_);
-    }
-    bufferHandle_ = bufferHandle;
-    omxBuffer.pBuffer = reinterpret_cast<uint8_t *>(bufferHandle_);
-}
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS
