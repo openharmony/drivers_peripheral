@@ -630,7 +630,6 @@ void GnssInterfaceImpl::ResetGnss()
     ResetGnssDeathRecipient();
     StopGnss(GNSS_START_TYPE_NORMAL);
     DisableGnssMeasurement();
-    DisableGnss();
 }
 } // V2_0
 } // Gnss
