@@ -47,6 +47,18 @@ ohos_shared_library("audio_primary_driver") {
 ohos_shared_library("audio_manager_service_4.0") {
   sources = [ "audio_manager_service.c" ]
 
+  cflags = [
+    "-fstack-protector-strong",
+    "-D_FORTIFY_SOURCE=2",
+    "-O2",
+  ]
+
+  cflags_cc = [
+    "-fstack-protector-strong",
+    "-D_FORTIFY_SOURCE=2",
+    "-O2",
+  ]
+
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_host",
