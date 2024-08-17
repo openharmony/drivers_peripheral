@@ -16,8 +16,6 @@ import("//build/ohos.gni")
 import("../../../camera.gni")
 
 # NOSORT
-import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
-import("$hdf_framework_path/tools/hc-gen/hc_gen.gni")
 import("../camera_usb.gni")
 hc_gen_c("generate_source") {
   sources = [

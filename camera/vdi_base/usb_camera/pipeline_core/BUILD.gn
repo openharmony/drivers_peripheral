@@ -16,7 +16,6 @@ import("//build/ohos.gni")
 import("../../../camera.gni")
 
 # NOSORT
-import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
 import("../camera_usb.gni")
 config("pipe_config") {
   visibility = [ ":*" ]
