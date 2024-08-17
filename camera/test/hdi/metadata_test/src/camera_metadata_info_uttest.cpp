@@ -238,7 +238,7 @@ HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_012, TestSize.Level1)
     auto metaData = make_shared<CameraMetadata>(100, 200);
     int8_t cameraType[] = {10, 30};
     int32_t cameraFpsRange[] = {10, 30};
-    camera_metadata_item_item_t *item = new camera_metadata_item_item_t;
+    camera_metadata_item_t *item = new camera_metadata_item_t;
 
     ret = metaData->addEntry(OHOS_ABILITY_FPS_RANGES, cameraFpsRange, 2);
     EXPECT_EQ(ret, true);
@@ -246,7 +246,7 @@ HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_012, TestSize.Level1)
     EXPECT_EQ(ret, true);
     common_metadata_header_t *header1 = metaData->get();
 
-    ret = GetCamereaMetadataItem(header1, 50, item);
+    ret = GetCameraMetadataItem(header1, 50, item);
     EXPECT_EQ(ret, 2);
     ret = metaData->FindCameraMetadataItemIndex(header1, 0, &index, true);
     EXPECT_EQ(ret, 3);
