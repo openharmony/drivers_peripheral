@@ -19,7 +19,7 @@
 #include <memory>
 #include "v1_0/include/idisplay_buffer.h"
 #include "v1_2/include/idisplay_composer_interface.h"
-#include "v1_1/display_composer_type.h"
+#include "v1_2/display_composer_type.h"
 #include "hdi_test_device_common.h"
 #include "hdi_test_display.h"
 #include "hdi_test_layer.h"
@@ -29,7 +29,7 @@ namespace HDI {
 namespace Display {
 namespace TEST {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 class HdiTestDevice {
 public:
     static HdiTestDevice& GetInstance();

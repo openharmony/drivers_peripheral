@@ -59,6 +59,9 @@ int32_t HciInterfaceImpl::Init(const sptr<IHciCallback>& callbackObj)
         return HDF_FAILURE;
     }
 
+    AddHciDeathRecipient(callbackObj);
+    callbacks_ = callbackObj;
+
     VendorInterface::ReceiveCallback callback = {
         .onAclReceive =
             [callbackObj](
@@ -74,9 +77,9 @@ int32_t HciInterfaceImpl::Init(const sptr<IHciCallback>& callbackObj)
     bool result = VendorInterface::GetInstance()->Initialize(
         [callbackObj](bool status) { callbackObj->OnInited(status ? BtStatus::SUCCESS : BtStatus::INITIAL_ERROR); },
         callback);
-    if (result) {
-        callbacks_ = callbackObj;
-        AddHciDeathRecipient(callbacks_);
+    if (!result) {
+        RemoveHciDeathRecipient(callbackObj);
+        callbacks_ = nullptr;
     }
     return result ? HDF_SUCCESS : HDF_FAILURE;
 }

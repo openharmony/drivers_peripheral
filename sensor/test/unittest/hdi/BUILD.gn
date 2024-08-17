@@ -28,6 +28,7 @@ ohos_unittest("hdi_unittest_sensor") {
 
   sources = [
     "../../common/src/sensor_callback_impl.cpp",
+    "../../common/src/sensor_callback_impl_test.cpp",
     "hdf_sensor_hdi_test.cpp",
   ]
   cflags = [
@@ -44,6 +45,7 @@ ohos_unittest("hdi_unittest_sensor") {
       "drivers_interface_sensor:libsensor_proxy_2.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
+      "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
     if (c_utils_enable) {

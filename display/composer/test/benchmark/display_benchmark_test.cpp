@@ -32,7 +32,7 @@
 #include "hdi_test_render_utils.h"
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
@@ -589,6 +589,68 @@ BENCHMARK_F(DisplayBenchmarkTest, SetDisplayClientCropTest)(benchmark::State &st
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayClientCropTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetHardwareCursorPositionTest
+  * @tc.desc: Benchmarktest for interface SetHardwareCursorPositionTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetHardwareCursorPositionTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    int32_t x = 1;
+    int32_t y = 1;
+    for (auto _ : state) {
+        ret = g_composerDevice->SetHardwareCursorPosition(g_displayIds[0], x, y);
+    }
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetHardwareCursorPositionTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: EnableHardwareCursorStatsTest
+  * @tc.desc: Benchmarktest for interface EnableHardwareCursorStatsTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, EnableHardwareCursorStatsTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    bool enable = true;
+    for (auto _ : state) {
+        ret = g_composerDevice->EnableHardwareCursorStats(g_displayIds[0], enable);
+    }
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, EnableHardwareCursorStatsTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetHardwareCursorStatsTest
+  * @tc.desc: Benchmarktest for interface GetHardwareCursorStatsTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetHardwareCursorStatsTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    uint32_t frameCount = 0;
+    uint32_t vsyncCount = 0;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetHardwareCursorStats(g_displayIds[0], frameCount, vsyncCount);
+    }
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetHardwareCursorStatsTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 
 } // namespace

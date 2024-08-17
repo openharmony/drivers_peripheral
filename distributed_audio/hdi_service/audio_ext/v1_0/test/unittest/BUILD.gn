@@ -38,16 +38,14 @@ ohos_unittest("HDIServiceDaudioExtTest") {
 
   configs = [ ":module_private_config" ]
 
-  public_deps = [
-    "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.0",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-  ]
+  public_deps =
+      [ "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.0" ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
     "drivers_interface_distributed_audio:libdaudioext_stub_2.0",
+    "googletest:gmock",
     "hdf_core:libhdf_host",
     "ipc:ipc_core",
   ]

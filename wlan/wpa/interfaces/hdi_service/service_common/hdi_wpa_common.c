@@ -27,11 +27,11 @@
 #define DEC_MAX_SCOPE 10
 #define WPA_CMD_RETURN_TIMEOUT (-2)
 
-static pthread_mutex_t g_mutexSta;
-static pthread_mutex_t g_mutexP2p;
-static pthread_mutex_t g_mutexChba;
-static pthread_mutex_t g_mutexCommon;
-static pthread_mutex_t g_mutexWpa;
+static pthread_mutex_t g_mutexSta = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t g_mutexP2p = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t g_mutexChba = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t g_mutexCommon = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t g_mutexWpa = PTHREAD_MUTEX_INITIALIZER;
 
 int Hex2Dec(const char *str)
 {
@@ -288,6 +288,10 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         strncmp(cmd, "INTERFACE_REMOVE ", strlen("INTERFACE_REMOVE ")) == 0) {
         int nameLen = strlen(ifName);
         ReleaseIfaceCtrl(ifName, nameLen);
+    }
+    if (strncmp(cmd, "TERMINATE", strlen("TERMINATE")) == 0) {
+        ReleaseWpaGlobalInterface();
+        HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
     }
     pthread_mutex_unlock(&g_mutexWpa);
     return ret;

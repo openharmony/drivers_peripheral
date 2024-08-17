@@ -31,13 +31,11 @@ ohos_fuzztest("BatteryHdiStubFuzzTest") {
   ]
   sources = [ "batteryhdistub_fuzz.cpp" ]
 
-  deps = [
-    "../../../:libbattery_interface_service_2.0",
-    "../../../../../../../interface/battery/v2_0:libbattery_stub_2.0",
-  ]
+  deps = [ "../../../:libbattery_interface_service_2.0" ]
 
   external_deps = [
     "drivers_interface_battery:libbattery_proxy_2.0",
+    "drivers_interface_battery:libbattery_stub_2.0",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",

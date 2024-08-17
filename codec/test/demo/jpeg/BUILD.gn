@@ -25,7 +25,7 @@ ohos_executable("codec_jpeg_decode") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libimage_proxy_1.0",
+      "drivers_interface_codec:libimage_proxy_2.0",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_buffer_proxy_1.0",
       "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",

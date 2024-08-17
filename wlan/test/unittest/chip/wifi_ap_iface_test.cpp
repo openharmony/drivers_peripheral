@@ -47,10 +47,6 @@ public:
         wifiVendorHalTest.reset();
         ifaceTool.reset();
         ifaceUtil.reset();
-        delete apIface;
-        if (apIface != nullptr) {
-            apIface = nullptr;
-        }
     }
 
 public:
@@ -186,7 +182,7 @@ HWTEST_F(WifiApIfaceTest, GetSupportFreqsTest, TestSize.Level1)
     }
     std::vector<uint32_t> freqs;
     EXPECT_TRUE(apIface->GetSupportFreqs(0, freqs) == HDF_SUCCESS);
-    EXPECT_TRUE(apIface->SetMacAddress(TEST_MAC) != HDF_SUCCESS);
+    EXPECT_TRUE(apIface->SetMacAddress(TEST_MAC) == HDF_SUCCESS);
     EXPECT_TRUE(apIface->SetCountryCode("cn") == HDF_SUCCESS);
     EXPECT_TRUE(apIface->SetPowerMode(0) == HDF_SUCCESS);
     int32_t mode;

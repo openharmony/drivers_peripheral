@@ -13,17 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_TRACE_VDI_H
-#define AUDIO_TRACE_VDI_H
+#ifndef USBCONTROLTRANSFERREADWITHLENGTH_FUZZER_H
+#define USBCONTROLTRANSFERREADWITHLENGTH_FUZZER_H
 
-#ifdef __cplusplus
-extern "C" {
+#define FUZZ_PROJECT_NAME "usbcontroltransferreadwithlength_fuzzer"
+
 #endif
-
-void HdfAudioStartTrace(const char* value, int valueLen);
-void HdfAudioFinishTrace(void);
-
-#ifdef __cplusplus
-}
-#endif
-#endif /* AUDIO_TRACE_VDI_H */

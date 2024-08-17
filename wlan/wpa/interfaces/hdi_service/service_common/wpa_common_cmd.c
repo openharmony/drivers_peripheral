@@ -275,7 +275,7 @@ int32_t WpaInterfaceSetNetwork(struct IWpaInterface *self, const char *ifName,
     }
     conf.id = networkId;
     int pos = -1;
-    for (int i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
+    for (int i = 0; i < (int)(sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0])); ++i) {
         if (strcmp(g_wpaSsidFields[i].fieldName, name) == 0) {
             pos = i;
             conf.param = g_wpaSsidFields[i].field;
@@ -1081,7 +1081,7 @@ static void AddDeathRecipientForService(struct IWpaCallback *cbFunc)
     HdfRemoteServiceAddDeathRecipient(remote, &g_deathRecipient.recipient);
 }
 
-static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self)
+static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
 {
     struct HdfWpaRemoteNode *pos = NULL;
     struct DListHead *head = &HdfWpaStubDriver()->remoteListHead;
@@ -1106,7 +1106,9 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self)
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
     DListInsertTail(&newRemoteNode->node, head);
-    AddDeathRecipientForService(self);
+    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
+        AddDeathRecipientForService(self);
+    }
     return HDF_SUCCESS;
 }
 
@@ -1861,7 +1863,7 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
     (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     do {
         HDF_LOGE("%{public}s: call HdfWpaAddRemoteObj", __func__);
-        ret = HdfWpaAddRemoteObj(cbFunc);
+        ret = HdfWpaAddRemoteObj(cbFunc, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: HdfSensorAddRemoteObj false", __func__);
             break;
@@ -2063,8 +2065,6 @@ static int32_t StopWpaSupplicant(void)
     } else {
         HDF_LOGI("%{public}s: wpaCliTerminate suc!", __func__);
     }
-    ReleaseWpaGlobalInterface();
-    HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
     return HDF_SUCCESS;
 }
 

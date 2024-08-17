@@ -68,12 +68,6 @@ int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallba
     }
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     g_openedChannelCount = 0;
-    int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaInit();
-    if (ret != SECURE_ELEMENT_CA_RET_OK) {
-        HDF_LOGE("VendorSecureElementCaInit failed ret %{public}u", ret);
-        status = SecureElementStatus::SE_GENERAL_ERROR;
-        return HDF_ERR_INVALID_PARAM;
-    }
 #endif
     g_callbackV1_0 = clientCallback;
     g_callbackV1_0->OnSeStateChanged(true);
@@ -283,6 +277,7 @@ void SeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
             HDF_LOGI("OnRemoteDied, close channel [%{public}zu], status = %{public}d", i, status);
         }
     }
+    SecureElementCaProxy::GetInstance().VendorSecureElementCaUninit();
 #endif
     std::lock_guard<std::mutex> lock(g_mutex);
     g_callbackV1_0 = nullptr;

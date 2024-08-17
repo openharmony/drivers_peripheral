@@ -32,7 +32,7 @@
 #include <thread>
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
@@ -320,6 +320,38 @@ HWTEST_F(DeviceTest, test_GetDisplayProperty, TestSize.Level1)
         result = DISPLAY_SUCCESS;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, result);
+}
+
+HWTEST_F(DeviceTest, test_SetHardwareCursorPosition, TestSize.Level1)
+{
+    int32_t x = 1;
+    int32_t y = 1;
+    auto ret = g_composerDevice->SetHardwareCursorPosition(g_displayIds[0], x, y);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_EnableHardwareCursorStats, TestSize.Level1)
+{
+    bool enable = true;
+    auto ret = g_composerDevice->EnableHardwareCursorStats(g_displayIds[0], enable);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_GetHardwareCursorStats, TestSize.Level1)
+{
+    uint32_t frameCount = 0;
+    uint32_t vsyncCount = 0;
+    auto ret = g_composerDevice->GetHardwareCursorStats(g_displayIds[0], frameCount, vsyncCount);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
 HWTEST_F(DeviceTest, test_GetDisplayCompChange, TestSize.Level1)
