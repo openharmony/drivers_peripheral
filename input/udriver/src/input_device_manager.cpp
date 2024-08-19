@@ -44,9 +44,7 @@ constexpr uint32_t DEV_INDEX_MAX = 32;
 void InputDeviceManager::Init()
 {
     inputDevList_.clear();
-    reportEventPkgCallBackLock_.lock();
     reportEventPkgCallback_.clear();
-    reportEventPkgCallBackLock_.unlock();
     GetInputDeviceInfoList();
     std::thread t1([this] {this->WorkerThread();});
     std::string wholeName1 = std::to_string(getpid()) + "_" + std::to_string(gettid());
@@ -102,8 +100,6 @@ void InputDeviceManager::ReportEventPkg(int32_t iFd, InputEventPackage **iEvtPkg
         HDF_LOGE("%{public}s: param invalid, line: %{public}d", __func__, __LINE__);
         return;
     }
-
-    std::lock_guard<std::mutex> guard(reportEventPkgCallBackLock_);
     for (auto &callbackFunc : reportEventPkgCallback_) {
         uint32_t index {0};
         auto ret = FindIndexFromFd(iFd, &index);
@@ -828,7 +824,6 @@ RetStatus InputDeviceManager::RegisterReportCallback(uint32_t devIndex, InputEve
         HDF_LOGE("%{public}s: param is wrong", __func__);
         return INPUT_FAILURE;
     }
-    std::lock_guard<std::mutex> guard(reportEventPkgCallBackLock_);
     reportEventPkgCallback_[devIndex] = callback;
     return rc;
 }
@@ -841,7 +836,6 @@ RetStatus InputDeviceManager::UnregisterReportCallback(uint32_t devIndex)
         HDF_LOGE("%{public}s: param is wrong", __func__);
         return INPUT_FAILURE;
     }
-    std::lock_guard<std::mutex> guard(reportEventPkgCallBackLock_);
     reportEventPkgCallback_[devIndex] = nullptr;
     return rc;
 }
