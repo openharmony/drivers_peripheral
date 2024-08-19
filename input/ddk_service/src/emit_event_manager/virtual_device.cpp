@@ -14,6 +14,7 @@
  */
 
 #include "virtual_device.h"
+#include <cstring>
 #include <map>
 #include <fcntl.h>
 #include <securec.h>
@@ -97,7 +98,11 @@ bool VirtualDevice::SetUp()
         return false;
     }
 
-    errno_t ret = strncpy_s(uinputDev_.name, MAX_NAME_LENGTH, deviceName_, sizeof(uinputDev_.name));
+    if (strlen(deviceName_) == 0 || strlen(deviceName_) > MAX_NAME_LENGTH - 1) {
+        HDF_LOGE("%{public}s Length of deviceName_ is out of range", __func__);
+        return false;
+    }
+    errno_t ret = strncpy_s(uinputDev_.name, MAX_NAME_LENGTH, deviceName_, MAX_NAME_LENGTH - 1);
     if (ret != EOK) {
         HDF_LOGE("%{public}s Failed to copy deviceName", __func__);
         return false;
