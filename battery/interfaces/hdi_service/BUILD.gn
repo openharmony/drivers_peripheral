@@ -32,7 +32,6 @@ ohos_shared_library("libbattery_interface_service_2.0") {
       "c_utils:utils",
       "config_policy:configpolicy_util",
       "drivers_interface_battery:battery_idl_headers",
-      "drivers_interface_light:liblight_proxy_1.0",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
