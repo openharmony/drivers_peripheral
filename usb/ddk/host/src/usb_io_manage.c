@@ -95,7 +95,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             continue;
         }
     }
-    HDF_LOGE("%{public}s, stop. ", __func__);
+    HDF_LOGD("%{public}s, stop. ", __func__);
     return 0;
 }
 
@@ -140,7 +140,7 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
             continue;
         }
     }
-    HDF_LOGE("%{public}s, recv thread end. ", __func__);
+    HDF_LOGD("%{public}s, recv thread end. ", __func__);
     OsalMutexLock(&interfacePool->ioStopLock);
     interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_STOPED;
     interfacePool->ioRecvProcessStopStatus = USB_POOL_PROCESS_STOPED;
