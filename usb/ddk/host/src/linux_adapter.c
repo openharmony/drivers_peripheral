@@ -1522,9 +1522,9 @@ static struct UsbOsAdapterOps g_usbAdapter = {
     .detachKernelDriverAndClaim = AdapterDetachKernelDriverAndClaim,
     .attachKernelDriver = AdapterAttachKernelDriver,
     .detachKernelDriver = AdapterDetachKernelDriver,
+    .usbControlMsg = AdapterUsbControlMsg,
     .getUsbSpeed = AdapterGetUsbSpeed,
     .getInterfaceActiveStatus = AdapterGetInterfaceActiveStatus,
-    .usbControlMsg = AdapterUsbControlMsg,
 };
 
 static void OsSignalHandler(int32_t signo)
