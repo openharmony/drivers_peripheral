@@ -120,11 +120,7 @@ if (defined(ohos_lite)) {
       "$camera_path/include",
     ]
 
-    # deps = [
-    #   "//third_party/googletest:gmock_main",
-    #   "//third_party/googletest:gtest",
-    #   "//third_party/googletest:gtest_main",
-    # ]
+    deps = []
 
     if (is_standard_system) {
       external_deps = [

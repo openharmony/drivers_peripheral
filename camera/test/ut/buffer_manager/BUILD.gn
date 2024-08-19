@@ -156,9 +156,6 @@ if (defined(ohos_lite)) {
     deps = [
       "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0_static",
       "$camera_path/buffer_manager:peripheral_camera_buffer_manager",
-    #   "//third_party/googletest:gmock_main",
-    #   "//third_party/googletest:gtest",
-    #   "//third_party/googletest:gtest_main",
     ]
 
     if (is_standard_system) {

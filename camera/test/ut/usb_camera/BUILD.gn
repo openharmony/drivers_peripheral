@@ -92,9 +92,6 @@ ohos_unittest("camera_usb_test_ut") {
     "$camera_path_usb/device_manager:usb_camera_device_manager",
     "$camera_path_usb/pipeline_core:usb_camera_pipeline_core",
     "$camera_path_usb/vdi_impl:camera_daemon_static",
-    # "$third_path/googletest:gmock_main",
-    # "$third_path/googletest:gtest",
-    # "$third_path/googletest:gtest_main",
   ]
 
   external_deps = [
