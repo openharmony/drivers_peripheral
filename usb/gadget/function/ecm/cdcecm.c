@@ -1028,7 +1028,7 @@ static void EcmDriverRelease(struct HdfDeviceObject *device)
     UsbEcmFree(ecm);
     (void)OsalMutexDestroy(&ecm->lock);
     OsalMemFree(ecm);
-    ecm = NULL;
+    device->service = NULL;
 }
 
 struct HdfDriverEntry g_ecmDriverEntry = {
