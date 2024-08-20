@@ -89,7 +89,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdWpsPbc(WifiWpaP2pGroupInterface *this, c
 
 static P2pSupplicantErrCode WpaP2pCliCmdWpsPin(WifiWpaP2pGroupInterface *this, P2pWpsPinDisplayArgv *argv)
 {
-    if (this == NULL || argv == NULL) {
+    if (this == NULL || argv == NULL || argv->pinCode) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     if ((argv->mode != P2P_PIN_KEYPAD && argv->mode != P2P_PIN_DISPLAY) ||
@@ -434,7 +434,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdSetWfdEnable(WifiWpaP2pInterface *this, 
 
 static P2pSupplicantErrCode WpaP2pCliCmdSetWfdDeviceInfo(WifiWpaP2pInterface *this, const char *conf)
 {
-    if (this == NULL || conf == NULL) {
+    if (this == NULL || conf == NULL || this->ifName) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     unsigned len = strlen(conf);
@@ -532,7 +532,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdCancelConnect(WifiWpaP2pInterface *this)
 
 static P2pSupplicantErrCode WpaP2pCliCmdInvite(WifiWpaP2pInterface *this, const P2pHalInviteArgv *argv)
 {
-    if (this == NULL || argv == NULL) {
+    if (this == NULL || argv == NULL || argv->peerbssid == NULL || argv->gobssid == NULL || argv->ifname == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     if (strlen(argv->peerbssid) <= 0 || strlen(argv->gobssid) <= 0 || strlen(argv->ifname) <= 0) {
@@ -557,7 +557,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdReInvite(WifiWpaP2pInterface *this, cons
     if (this == NULL || argv == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    if (strlen(argv->peerbssid) <= 0) {
+    if (argv->peerbssid == NULL || strlen(argv->peerbssid) <= 0) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
@@ -579,10 +579,12 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
     if (this == NULL || argv == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    unsigned nameLen = strlen((char *) argv->name);
-    unsigned queryLen = strlen((char *) argv->query);
-    unsigned respLen = strlen((char *) argv->resp);
-    if ((argv->mode == 0 && nameLen == 0) || (argv->mode != 0 && (queryLen == 0 || respLen == 0))) {
+    unsigned nameLen = 0;
+    unsigned queryLen = 0;
+    unsigned respLen = 0;
+    if ((argv->mode == 0 && (argv->name == NULL || (nameLen = strlen((char *) argv->name)) == 0)) ||
+        (argv->mode != 0 && ((argv->query == NULL || (queryLen = strlen((char *) argv->query)) == 0) ||
+        (argv->resp == NULL || (respLen = strlen((char *) argv->resp)) == 0)))) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     unsigned cmdLen;
@@ -722,7 +724,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdProvisionDiscovery(
     if (this == NULL || argv == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    if (strlen(argv->peerbssid) <= 0) {
+    if (argv->peerbssid == NULL || strlen(argv->peerbssid) <= 0) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
