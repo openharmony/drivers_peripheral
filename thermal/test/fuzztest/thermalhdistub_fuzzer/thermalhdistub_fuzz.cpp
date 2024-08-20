@@ -49,15 +49,15 @@ static void ThermalStubFuzzTest(const uint8_t *data, size_t size)
     }
 
     MessageParcel datas;
-    datas.WriteInterfaceToken(IThermalInterface::GetDescriptor());
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(REWIND_READ_DATA);
     MessageParcel reply;
     MessageOption option;
     if (g_fuzzService == nullptr) {
         g_fuzzService = make_shared<ThermalInterfaceStub>(new ThermalInterfaceImpl());
     }
     for (code = CMD_THERMAL_INTERFACE_GET_VERSION; code < THERMAL_INTERFACE_STUB_FUNC_MAX_SIZE; code++) {
+        datas.WriteInterfaceToken(IThermalInterface::GetDescriptor());
+        datas.WriteBuffer(data, size);
+        datas.RewindRead(REWIND_READ_DATA);
         g_fuzzService->OnRemoteRequest(code, datas, reply, option);
     }
 }
