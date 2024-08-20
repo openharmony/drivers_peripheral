@@ -576,15 +576,13 @@ static P2pSupplicantErrCode WpaP2pCliCmdReInvite(WifiWpaP2pInterface *this, cons
 
 static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, const struct HdiP2pServiceInfo *argv)
 {
-    if (this == NULL || argv == NULL) {
+    if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL || argv->resp == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    unsigned nameLen = 0;
-    unsigned queryLen = 0;
-    unsigned respLen = 0;
-    if ((argv->mode == 0 && (argv->name == NULL || (nameLen = strlen((char *) argv->name)) == 0)) ||
-        (argv->mode != 0 && ((argv->query == NULL || (queryLen = strlen((char *) argv->query)) == 0) ||
-        (argv->resp == NULL || (respLen = strlen((char *) argv->resp)) == 0)))) {
+    unsigned nameLen = strlen((char *) argv->name);
+    unsigned queryLen = strlen((char *) argv->query);
+    unsigned respLen = strlen((char *) argv->resp);
+    if ((argv->mode == 0 && nameLen == 0) || (argv->mode != 0 && (queryLen == 0 || respLen == 0))) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     unsigned cmdLen;
@@ -623,13 +621,12 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
 
 static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, const struct HdiP2pServiceInfo *argv)
 {
-    if (this == NULL || argv == NULL) {
+    if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    unsigned nameLen = 0;
-    unsigned queryLen = 0;
-    if ((argv->mode == 0 && (argv->name == NULL || (nameLen = strlen((char *) argv->name)) == 0)) ||
-        (argv->mode != 0 && (argv->query == NULL || (queryLen = strlen((char *) argv->query)) == 0))) {
+    unsigned nameLen = strlen((char *) argv->name);
+    unsigned queryLen = strlen((char *) argv->query);
+    if ((argv->mode == 0 && nameLen == 0) || (argv->mode == 1 && queryLen == 0)) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     unsigned cmdLen;
