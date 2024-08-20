@@ -624,9 +624,10 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, co
     if (this == NULL || argv == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    unsigned nameLen = strlen((char *) argv->name);
-    unsigned queryLen = strlen((char *) argv->query);
-    if ((argv->mode == 0 && nameLen == 0) || (argv->mode == 1 && queryLen == 0)) {
+    unsigned nameLen = 0;
+    unsigned queryLen = 0;
+    if ((argv->mode == 0 && (argv->name == NULL || (nameLen = strlen((char *) argv->name))== 0)) ||
+        (argv->mode != 0 && (argv->query == NULL || (queryLen = strlen((char *) argv->query))== 0))) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     unsigned cmdLen;
