@@ -1939,3 +1939,47 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_047, TestSize.Level1)
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_3_048
+ * @tc.desc: OHOS_CONTROL_FOCUS_ASSIST_FLASH_SUPPORTED_MODE, OHOS_CONTROL_ZOOM_RATIO, PROFESSIONAL_PHOTO
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_048, TestSize.Level1)
+{
+    // 查询是否支持脚架检测
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_TRIPOD_DETECTION, &entry);
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+        if (*entry.data.i32 == 1) {
+            cameraTest->imageDataSaveSwitch = SWITCH_ON;
+            cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+            cameraTest->StartStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::CAPTURE);
+            std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+            // 修改Zoom大于15x
+            float zoomRatio = 15.0f;
+            meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
+            // 使能脚架检测
+            uint8_t tripoDetection = 1;
+            meta->addEntry(OHOS_CONTROL_TRIPOD_DETECTION, &tripoDetection, DATA_COUNT);
+            // 使能脚架检测算法
+            uint8_t tripodStablitationAlgorithm = 1;
+            meta->addEntry(OHOS_CONTROL_TRIPOD_STABLITATION, &tripodStablitationAlgorithm, DATA_COUNT);
+            std::vector<uint8_t> setting;
+            MetadataUtils::ConvertMetadataToVec(meta, setting);
+            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+            cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+            sleep(3);
+            // 进行拍照
+            cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+            cameraTest->captureIds = {cameraTest->captureIdPreview};
+            cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+            cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+        }
+    }
+}
