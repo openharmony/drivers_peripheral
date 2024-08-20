@@ -43,7 +43,8 @@ bool UsbControlTransferWriteFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    ret = usbInterface->ControlTransferWrite(dev, ctrl, reinterpret_cast<const std::vector<uint8_t> &>(data + OFFSET));
+    ret = usbInterface->ControlTransferWrite(
+        dev, ctrl, reinterpret_cast<const std::vector<uint8_t> &>(std::move(data + OFFSET)));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: control transfer write succeed", __func__);
     }
