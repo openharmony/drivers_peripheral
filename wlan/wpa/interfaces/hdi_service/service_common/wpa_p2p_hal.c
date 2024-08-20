@@ -582,16 +582,9 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
     unsigned nameLen = 0;
     unsigned queryLen = 0;
     unsigned respLen = 0;
-    if (argv->name != NULL) {
-        nameLen = strlen((char *) argv->name);
-    }
-    if (argv->query != NULL) {
-        queryLen = strlen((char *) argv->query);
-    }
-    if (argv->resp != NULL) {
-        respLen = strlen((char *) argv->resp);
-    }
-    if ((argv->mode == 0 && nameLen == 0) || (argv->mode != 0 && (queryLen == 0 || respLen == 0))) {
+    if ((argv->mode == 0 && (argv->name == NULL || (nameLen = strlen((char *) argv->name)) == 0)) ||
+        (argv->mode != 0 && ((argv->query == NULL || (queryLen = strlen((char *) argv->query)) == 0) ||
+        (argv->resp == NULL || (respLen = strlen((char *) argv->resp)) == 0)))) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     unsigned cmdLen;
@@ -635,13 +628,8 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, co
     }
     unsigned nameLen = 0;
     unsigned queryLen = 0;
-    if (argv->name != NULL) {
-        nameLen = strlen((char *) argv->name);
-    }
-    if (argv->query != NULL) {
-        queryLen = strlen((char *) argv->query);
-    }
-    if ((argv->mode == 0 && nameLen == 0) || (argv->mode == 1 && queryLen == 0)) {
+    if ((argv->mode == 0 && (argv->name == NULL || (nameLen = strlen((char *) argv->name)) == 0)) ||
+        (argv->mode != 0 && (argv->query == NULL || (queryLen = strlen((char *) argv->query)) == 0))) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     unsigned cmdLen;
