@@ -22,7 +22,6 @@ ohos_benchmarktest("hdf_input_benchmark_test") {
     "$INPUT_ROOT_DIR/hdi_service",
     "$INPUT_ROOT_DIR/interfaces/include",
     "$INPUT_ROOT_DIR/test/common/include",
-    "//third_party/FreeBSD/sys/dev/evdev",
   ]
 
   sources = [
