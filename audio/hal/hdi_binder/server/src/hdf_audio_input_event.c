@@ -140,6 +140,14 @@ static void *AudioPnpInputStart(void *useless)
 {
     int ret;
     (void)useless;
+    const char *threadName = "pnp_headset";
+    pthread_t threadInstance = pthread_self();
+    AUDIO_FUNC_LOGI("threadInstance:%{public}llu", (uint64_t)threadInstance);
+
+    if (pthread_setname_np(threadInstance, threadName) != 0) {
+        AUDIO_FUNC_LOGE("Setname failed!");
+        return NULL;
+    }
 
     AUDIO_FUNC_LOGI("audio input start.");
     if (AudioPnpInputOpen() != HDF_SUCCESS) {
@@ -161,7 +169,6 @@ int32_t AudioHeadsetPnpInputStartThread(void)
 {
     pthread_t thread;
     pthread_attr_t tidsAttr;
-    const char *threadName = "pnp_headset";
 
     AUDIO_FUNC_LOGI("create audio headset pnp uevent thread");
     g_bRunThread = true;
@@ -170,11 +177,6 @@ int32_t AudioHeadsetPnpInputStartThread(void)
     if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, NULL) != 0) {
         AUDIO_FUNC_LOGE("[pthread_create] failed!");
         g_bRunThread = false;
-        return HDF_FAILURE;
-    }
-
-    if (pthread_setname_np(thread, threadName) != 0) {
-        AUDIO_FUNC_LOGE("Setname failed!");
         return HDF_FAILURE;
     }
 
