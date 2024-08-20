@@ -44,7 +44,8 @@ bool UsbRegBulkCallbackFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    ret = usbInterface->RegBulkCallback(dev, pipe, reinterpret_cast<const sptr<IUsbdBulkCallback> &>(data + OFFSET));
+    ret = usbInterface->RegBulkCallback(
+        dev, pipe, reinterpret_cast<const sptr<IUsbdBulkCallback> &>(std::move(data + OFFSET)));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: reg bulk callback succeed", __func__);
     }
