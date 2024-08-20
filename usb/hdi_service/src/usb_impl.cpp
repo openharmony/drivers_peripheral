@@ -1646,7 +1646,7 @@ int32_t UsbImpl::ControlTransferReadwithLength(
     controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrlParams.requestType))
         >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
     controlParams.reqType = static_cast<uint32_t>(ctrlParams.requestType);
-    controlParams.size = (ctrlParams.length <= 0 || (ctrlParams.length > MAX_CONTROL_BUFF_SIZE)
+    controlParams.size = (ctrlParams.length <= 0 || ctrlParams.length > MAX_CONTROL_BUFF_SIZE)
         ? MAX_CONTROL_BUFF_SIZE : ctrlParams.length;
     controlParams.data = static_cast<void *>(OsalMemCalloc(controlParams.size));
     if (controlParams.data == nullptr) {
