@@ -18,7 +18,7 @@
 #include <cinttypes>
 #include <algorithm>
 #include "v1_2/include/idisplay_composer_interface.h"
-#include "v1_1/display_composer_type.h"
+#include "v1_2/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
 #include "display_test_utils.h"
