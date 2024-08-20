@@ -140,6 +140,9 @@ if (defined(ohos_lite)) {
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:libcamera_proxy_1.0",
       "drivers_interface_camera:metadata",
+      "googletest:gmock_main",
+      "googletest:gtest",
+      "googletest:gtest_main",
       "graphic_surface:surface",
       "samgr:samgr_proxy",
     ]

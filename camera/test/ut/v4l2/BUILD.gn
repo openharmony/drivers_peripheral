@@ -189,6 +189,9 @@ if (defined(ohos_lite)) {
     external_deps += [
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:metadata",
+      "googletest:gmock_main",
+      "googletest:gtest",
+      "googletest:gtest_main",
       "graphic_surface:surface",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
