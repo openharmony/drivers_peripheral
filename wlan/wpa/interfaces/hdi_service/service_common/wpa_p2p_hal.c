@@ -89,7 +89,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdWpsPbc(WifiWpaP2pGroupInterface *this, c
 
 static P2pSupplicantErrCode WpaP2pCliCmdWpsPin(WifiWpaP2pGroupInterface *this, P2pWpsPinDisplayArgv *argv)
 {
-    if (this == NULL || argv == NULL || argv->pinCode == NULL) {
+    if (this == NULL || argv == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     if ((argv->mode != P2P_PIN_KEYPAD && argv->mode != P2P_PIN_DISPLAY) ||
@@ -434,7 +434,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdSetWfdEnable(WifiWpaP2pInterface *this, 
 
 static P2pSupplicantErrCode WpaP2pCliCmdSetWfdDeviceInfo(WifiWpaP2pInterface *this, const char *conf)
 {
-    if (this == NULL || conf == NULL || this->ifName == NULL) {
+    if (this == NULL || conf == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     unsigned len = strlen(conf);
