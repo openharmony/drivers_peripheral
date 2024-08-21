@@ -46,7 +46,8 @@ unit_test_external_deps = [
   "ipc:ipc_single",
 ]
 
-test_out_path = "hdf_se/service"
+test_out_path =
+    "drivers_peripheral_secure_element/drivers_peripheral_secure_element"
 
 ohos_unittest("se_impl_test") {
   module_out_path = test_out_path
