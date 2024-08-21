@@ -273,6 +273,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamEncOutIRatio,
     /** OMX_S32 */
     OMX_IndexParamEncOutFrameQp,
+    /** OMX_CONFIG_BOOLEANTYPE */
+    OMX_IndexParamSupportPackInput,
 };
 
 /**
