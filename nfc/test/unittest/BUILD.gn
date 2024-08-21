@@ -20,6 +20,7 @@ config("hdf_nfc_unit_test_config") {
   include_dirs = [
     "$NFC_DIR/hdi_service",
     "$NFC_DIR/vendor_adaptor",
+    "$NFC_DIR/test/unittest/mock",
   ]
 
   cflags_cc = [ "-fexceptions" ]
@@ -44,12 +45,45 @@ unit_test_external_deps = [
   "ipc:ipc_single",
 ]
 
-test_out_path = "hdf_nfc/service"
+test_out_path = "drivers_peripheral_nfc/drivers_peripheral_nfc"
 
 ohos_unittest("nfc_impl_test") {
   module_out_path = test_out_path
 
-  sources = [ "nfc_impl_test/nfc_impl_test.cpp" ]
+  sources = [
+    "$NFC_DIR/test/unittest/mock/mock.cpp",
+    "nfc_impl_test/nfc_impl_test.cpp",
+  ]
+
+  configs = [ ":hdf_nfc_unit_test_config" ]
+
+  deps = unit_test_deps
+
+  external_deps = unit_test_external_deps
+
+  part_name = "drivers_peripheral_nfc"
+  subsystem_name = "hdf"
+}
+
+ohos_unittest("nfc_impl_mock_test") {
+  module_out_path = test_out_path
+
+  sources = [ "nfc_impl_mock_test/nfc_impl_mock_test.cpp" ]
+
+  configs = [ ":hdf_nfc_unit_test_config" ]
+
+  deps = unit_test_deps
+
+  external_deps = unit_test_external_deps
+
+  part_name = "drivers_peripheral_nfc"
+  subsystem_name = "hdf"
+}
+
+ohos_unittest("nfc_vendor_adaptions_test") {
+  module_out_path = test_out_path
+
+  sources = [ "nfc_vendor_adaptions_test/nfc_vendor_adaptions_test.cpp" ]
 
   configs = [ ":hdf_nfc_unit_test_config" ]
 
@@ -64,5 +98,9 @@ ohos_unittest("nfc_impl_test") {
 group("hdf_nfc_unittest") {
   testonly = true
 
-  deps = [ ":nfc_impl_test" ]
+  deps = [
+    ":nfc_impl_mock_test",
+    ":nfc_impl_test",
+    ":nfc_vendor_adaptions_test",
+  ]
 }
