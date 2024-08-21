@@ -31,6 +31,7 @@ extern "C" {
 #define EOK 0
 #endif
 
+
 #define MAX_CALL_BACK_COUNT 10
 static struct WpaCallbackEvent *g_wpaCallbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 static pthread_mutex_t g_wpaCallbackMutex = PTHREAD_MUTEX_INITIALIZER;

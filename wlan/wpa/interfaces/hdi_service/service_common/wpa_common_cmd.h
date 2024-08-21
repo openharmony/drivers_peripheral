@@ -52,6 +52,7 @@
 #define WIFI_NETWORK_CONFIG_VALUE_LENGTH 2048
 #define CMD_LEN 6
 
+
 int32_t WpaInterfaceStart(struct IWpaInterface *self);
 int32_t WpaInterfaceStop(struct IWpaInterface *self);
 int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, const char *confName) ;
