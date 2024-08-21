@@ -291,6 +291,7 @@ void ReleaseIfaceCtrl(char *ifName, int len)
     }
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
         ReleaseWpaCtrl(&(g_wpaInterface->staCtrl));
+        ReleaseWpaCtrl(&(g_wpaInterface->p2pCtrl));
         ReleaseWpaCtrl(&(g_wpaInterface->chbaCtrl));
 #ifndef OHOS_EUPDATER
         ReleaseEventCallback();
