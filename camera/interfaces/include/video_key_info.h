@@ -95,6 +95,13 @@ const std::string deferredImageFormat = "deferredImageFormat";
 const int32_t VIDEO_KEY_DEFERRED_IMAGE_FORMAT = 0x0A;
 
 /**
+ * @brief Indicates the count of image. The value type is int32_t.
+ * include main image and extend images
+ */
+const std::string imageCount = "imageCount";
+const int32_t VIDEO_KEY_DEFEREED_COUNT = 0x0B;
+
+/**
  * @brief Indicates the quality level of depth data. The value type is int32_t.
  */
 const std::string depthDataQualityLevel = "depthDataQualityLevel";
