@@ -40,6 +40,7 @@
 
 #define BUF_SIZE 512
 
+
 pthread_t g_tid;
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;

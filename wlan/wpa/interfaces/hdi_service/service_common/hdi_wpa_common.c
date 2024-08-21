@@ -33,6 +33,7 @@ static pthread_mutex_t g_mutexChba = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t g_mutexCommon = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t g_mutexWpa = PTHREAD_MUTEX_INITIALIZER;
 
+
 int Hex2Dec(const char *str)
 {
     if (str == NULL || strncasecmp(str, "0x", strlen("0x")) != 0) {

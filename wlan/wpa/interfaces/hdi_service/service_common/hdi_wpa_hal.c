@@ -28,6 +28,7 @@
 #undef LOG_TAG
 #define LOG_TAG "HdiWpaHal"
 
+
 #define WPA_TRY_CONNECT_TIMES 20
 #define WPA_TRY_CONNECT_SLEEP_TIME (100 * 1000) /* 100ms */
 #define WPA_CMD_BUF_LEN 256
