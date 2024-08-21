@@ -33,7 +33,6 @@ typedef struct StWpaCtrl {
     struct wpa_ctrl *pRecv;
 } WpaCtrl;
 
-
 typedef struct StWpaKeyValue {
     char key[WPA_MESSAGE_KEY_LENGTH];
     char value[WPA_MESSAGE_VALUE_LENGTH];
