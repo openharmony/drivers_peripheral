@@ -52,7 +52,6 @@
 #define WIFI_NETWORK_CONFIG_VALUE_LENGTH 2048
 #define CMD_LEN 6
 
-
 int32_t WpaInterfaceStart(struct IWpaInterface *self);
 int32_t WpaInterfaceStop(struct IWpaInterface *self);
 int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, const char *confName) ;
@@ -110,6 +109,8 @@ int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName);
 int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd);
 
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);
+pthread_mutex_t *GetInterfaceLock();
+
 const char *macToStr(const u8 *addr);
 struct StWpaMainParam {
     int argc;
