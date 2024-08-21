@@ -94,5 +94,11 @@ const int32_t VIDEO_KEY_IMAGE_SCORE = 0x09;
 const std::string deferredImageFormat = "deferredImageFormat";
 const int32_t VIDEO_KEY_DEFERRED_IMAGE_FORMAT = 0x0A;
 
+/**
+ * @brief Indicates the quality level of depth data. The value type is int32_t.
+ */
+const std::string depthDataQualityLevel = "depthDataQualityLevel";
+const int32_t VIDEO_KEY_DEPTH_DATA_QUALITY_LEVEL = 0x0C;
+
 } // end namespace OHOS::Camera
 #endif
