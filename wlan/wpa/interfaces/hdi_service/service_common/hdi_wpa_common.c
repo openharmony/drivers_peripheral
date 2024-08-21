@@ -27,13 +27,6 @@
 #define DEC_MAX_SCOPE 10
 #define WPA_CMD_RETURN_TIMEOUT (-2)
 
-static pthread_mutex_t g_mutexSta = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t g_mutexP2p = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t g_mutexChba = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t g_mutexCommon = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t g_mutexWpa = PTHREAD_MUTEX_INITIALIZER;
-
-
 int Hex2Dec(const char *str)
 {
     if (str == NULL || strncasecmp(str, "0x", strlen("0x")) != 0) {
@@ -119,12 +112,9 @@ int InitWpaCtrl(WpaCtrl *pCtrl, const char *ifname)
 
 static int StaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
 {
-    pthread_mutex_lock(&g_mutexSta);
-
     HDF_LOGI("enter StaCliCmd");
     if (ctrl == NULL || ctrl->pSend == NULL || cmd == NULL || buf == NULL || bufLen == 0) {
         HDF_LOGE("StaCliCmd, invalid parameters!");
-        pthread_mutex_unlock(&g_mutexSta);
         return -1;
     }
     size_t len = bufLen - 1;
@@ -132,11 +122,9 @@ static int StaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret == WPA_CMD_RETURN_TIMEOUT) {
         HDF_LOGE("[%{private}s] command timed out.", cmd);
-        pthread_mutex_unlock(&g_mutexSta);
         return WPA_CMD_RETURN_TIMEOUT;
     } else if (ret < 0) {
         HDF_LOGE("[%{private}s] command failed.", cmd);
-        pthread_mutex_unlock(&g_mutexSta);
         return -1;
     }
     buf[len] = '\0';
@@ -144,21 +132,16 @@ static int StaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
     if (strncmp(buf, "FAIL\n", strlen("FAIL\n")) == 0 ||
         strncmp(buf, "UNKNOWN COMMAND\n", strlen("UNKNOWN COMMAND\n")) == 0) {
         HDF_LOGE("%{private}s request success, but response %{public}s", cmd, buf);
-        pthread_mutex_unlock(&g_mutexSta);
         return -1;
     }
-    pthread_mutex_unlock(&g_mutexSta);
     return 0;
 }
 
 static int P2pCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
 {
-    pthread_mutex_lock(&g_mutexP2p);
-
     HDF_LOGI("enter P2pCliCmd");
     if (ctrl == NULL || ctrl->pSend == NULL || cmd == NULL || buf == NULL || bufLen == 0) {
         HDF_LOGE("P2pCliCmd, invalid parameters!");
-        pthread_mutex_unlock(&g_mutexP2p);
         return -1;
     }
     size_t len = bufLen - 1;
@@ -166,11 +149,9 @@ static int P2pCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret == WPA_CMD_RETURN_TIMEOUT) {
         HDF_LOGE("[%{private}s] command timed out.", cmd);
-        pthread_mutex_unlock(&g_mutexP2p);
         return WPA_CMD_RETURN_TIMEOUT;
     } else if (ret < 0) {
         HDF_LOGE("[%{private}s] command failed.", cmd);
-        pthread_mutex_unlock(&g_mutexP2p);
         return -1;
     }
     buf[len] = '\0';
@@ -178,21 +159,16 @@ static int P2pCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
     if (strncmp(buf, "FAIL\n", strlen("FAIL\n")) == 0 ||
         strncmp(buf, "UNKNOWN COMMAND\n", strlen("UNKNOWN COMMAND\n")) == 0) {
         HDF_LOGE("%{private}s request success, but response %{public}s", cmd, buf);
-        pthread_mutex_unlock(&g_mutexP2p);
         return -1;
     }
-    pthread_mutex_unlock(&g_mutexP2p);
     return 0;
 }
 
 static int ChbaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
 {
-    pthread_mutex_lock(&g_mutexChba);
-
     HDF_LOGI("enter ChbaCliCmd");
     if (ctrl == NULL || ctrl->pSend == NULL || cmd == NULL || buf == NULL || bufLen == 0) {
         HDF_LOGE("ChbaCliCmd, invalid parameters!");
-        pthread_mutex_unlock(&g_mutexChba);
         return -1;
     }
     size_t len = bufLen - 1;
@@ -200,11 +176,9 @@ static int ChbaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret == WPA_CMD_RETURN_TIMEOUT) {
         HDF_LOGE("[%{private}s] command timed out.", cmd);
-        pthread_mutex_unlock(&g_mutexChba);
         return WPA_CMD_RETURN_TIMEOUT;
     } else if (ret < 0) {
         HDF_LOGE("[%{private}s] command failed.", cmd);
-        pthread_mutex_unlock(&g_mutexChba);
         return -1;
     }
     buf[len] = '\0';
@@ -212,21 +186,16 @@ static int ChbaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
     if (strncmp(buf, "FAIL\n", strlen("FAIL\n")) == 0 ||
         strncmp(buf, "UNKNOWN COMMAND\n", strlen("UNKNOWN COMMAND\n")) == 0) {
         HDF_LOGE("%{private}s request success, but response %{public}s", cmd, buf);
-        pthread_mutex_unlock(&g_mutexChba);
         return -1;
     }
-    pthread_mutex_unlock(&g_mutexChba);
     return 0;
 }
 
 static int CommonCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
 {
-    pthread_mutex_lock(&g_mutexCommon);
-
     HDF_LOGI("enter CommonCliCmd");
     if (ctrl == NULL || ctrl->pSend == NULL || cmd == NULL || buf == NULL || bufLen == 0) {
         HDF_LOGE("CommonCliCmd, invalid parameters!");
-        pthread_mutex_unlock(&g_mutexCommon);
         return -1;
     }
     size_t len = bufLen - 1;
@@ -234,11 +203,9 @@ static int CommonCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret == WPA_CMD_RETURN_TIMEOUT) {
         HDF_LOGE("[%{private}s] command timed out.", cmd);
-        pthread_mutex_unlock(&g_mutexCommon);
         return WPA_CMD_RETURN_TIMEOUT;
     } else if (ret < 0) {
         HDF_LOGE("[%{private}s] command failed.", cmd);
-        pthread_mutex_unlock(&g_mutexCommon);
         return -1;
     }
     buf[len] = '\0';
@@ -246,10 +213,8 @@ static int CommonCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen
     if (strncmp(buf, "FAIL\n", strlen("FAIL\n")) == 0 ||
         strncmp(buf, "UNKNOWN COMMAND\n", strlen("UNKNOWN COMMAND\n")) == 0) {
         HDF_LOGE("%{private}s request success, but response %{public}s", cmd, buf);
-        pthread_mutex_unlock(&g_mutexCommon);
         return -1;
     }
-    pthread_mutex_unlock(&g_mutexCommon);
     return 0;
 }
 
@@ -263,7 +228,6 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         return ret;
     }
     char *ifName = NULL;
-    pthread_mutex_lock(&g_mutexWpa);
     if (strncmp(cmd, "IFNAME=", strlen("IFNAME=")) == 0) {
         ifName = (char *)cmd + strlen("IFNAME=");
     } else if (strncmp(cmd, "INTERFACE_ADD ", strlen("INTERFACE_ADD ")) == 0) {
@@ -294,7 +258,6 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         ReleaseWpaGlobalInterface();
         HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
     }
-    pthread_mutex_unlock(&g_mutexWpa);
     return ret;
 }
 
@@ -305,7 +268,6 @@ int IsSockRemoved(const char *ifName, int len)
         HDF_LOGE("ifname is invalid");
         return ret;
     }
-    pthread_mutex_lock(&g_mutexWpa);
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
         if (GetStaCtrl() == NULL) {
             ret = 0;
@@ -319,6 +281,5 @@ int IsSockRemoved(const char *ifName, int len)
             ret = 0;
         }
     }
-    pthread_mutex_unlock(&g_mutexWpa);
     return ret;
 }
