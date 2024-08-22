@@ -112,14 +112,9 @@ int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, 
 int32_t WpaFillWpaListNetworkParam(struct WifiNetworkInfo  *wifiWpaNetworkInfo,
     struct HdiWifiWpaNetworkInfo *hdiWifiWpaNetworkInfo);
 void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWpaCmdStatus *status);
-void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote);
-void AddDeathRecipientForService(struct IWpaCallback *cbFunc);
-int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName);
 void HdfWpaDelRemoteObj(struct IWpaCallback *self);
 int32_t WpaFillWpaDisconnectParam(struct WpaDisconnectParam *disconnectParam,
     struct HdiWpaDisconnectParam *hdiWpaDisconnectParam);
-int32_t WpaFillWpaConnectParam(struct WpaConnectParam *connectParam,
-    struct HdiWpaConnectParam *hdiWpaConnectParam);
 int32_t WpaFillWpaBssidChangedParam(struct WpaBssidChangedParam *bssidChangedParam,
     struct HdiWpaBssidChangedParam *hdiWpaBssidChangedParam);
 
