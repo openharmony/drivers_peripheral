@@ -315,6 +315,11 @@ WifiError WifiVendorHal::SetPowerMode(const std::string& ifaceName, int mode)
     return globalFuncTable_.setPowerMode(ifaceName.c_str(), mode);
 }
 
+WifiError WifiVendorHal::GetChipModes(bool isPrimary, std::vector<UsableMode>& modes)
+{
+    return globalFuncTable_.GetChipModes(isPrimary, modes);
+}
+
 WifiError WifiVendorHal::EnablePowerMode(const std::string& ifaceName, int mode)
 {
     return globalFuncTable_.enablePowerMode(ifaceName.c_str(), mode);
