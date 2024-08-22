@@ -498,21 +498,6 @@ static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
     return RESULT_SUCCESS;
 }
 
-static int32_t CheckFirstAuthType(int32_t userId, uint32_t authType)
-{
-    bool hasSuccessPinAuth = false;
-    ResultCode ret = GetHasSuccessPinAuth(userId, &hasSuccessPinAuth);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetHasSuccessPinAuth failed");
-        return ret;
-    }
-    if (hasSuccessPinAuth == false && authType != PIN_AUTH) {
-        LOG_ERROR("first auth type must be pinAuth");
-        return RESULT_TYPE_NOT_SUPPORT;
-    }
-    return RESULT_SUCCESS;
-}
-
 int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const HdiAuthParam &param,
     std::vector<HdiScheduleInfo> &infos)
 {
@@ -534,11 +519,6 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     if (schedulesGet == nullptr) {
         IAM_LOGE("get null schedule");
         return RESULT_GENERAL_ERROR;
-    }
-    ret = CheckFirstAuthType(paramHal.userId, paramHal.authType);
-    if (ret != RESULT_SUCCESS) {
-        DestroyLinkedList(schedulesGet);
-        return ret;
     }
     LinkedListNode *tempNode = schedulesGet->head;
     while (tempNode != nullptr) {
