@@ -36,6 +36,10 @@ struct HdfUsbInterfaceHost {
 static int32_t UsbInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
+        HDF_LOGE("%{public}s:invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
@@ -46,11 +50,6 @@ static int32_t UsbInterfaceDriverDispatch(
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
-        HDF_LOGE("%{public}s:invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
