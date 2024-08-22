@@ -39,6 +39,7 @@
 #include "hdi_wpa_common.h"
 
 #define BUF_SIZE 512
+#define MAX_WPA_WAIT_TIMES 30
 
 pthread_t g_tid;
 const int QUOTATION_MARKS_FLAG_YES = 0;
@@ -1058,6 +1059,8 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
     }
     ReleaseWpaGlobalInterface();
     HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
+    ReleaseWifiStaInterface(0);
+    HDF_LOGI("%{public}s: call ReleaseWifiStaInterface finish", __func__);
 }
 
 static struct RemoteServiceDeathRecipient g_deathRecipient = {
@@ -1957,16 +1960,26 @@ static void *WpaThreadMain(void *p)
     }
     int ret = wpa_main(param.argc, tmpArgv);
     HDF_LOGI("%{public}s: run wpa_main ret:%{public}d.", __func__, ret);
+    g_tid = 0;
     return NULL;
 }
 
 static int32_t StartWpaSupplicant(const char *moduleName, const char *startCmd)
 {
     int32_t ret;
+    int32_t times = 0;
 
     if (moduleName == NULL || startCmd == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM ;
+    }
+    while (g_tid != 0) {
+        HDF_LOGE("%{public}s: wpa_supplicant is already running!", __func__);
+        usleep(WPA_SLEEP_TIME);
+        times++;
+        if (times > MAX_WPA_WAIT_TIMES) {
+            return HDF_FAILURE;
+        }
     }
     ret = pthread_create(&g_tid, NULL, WpaThreadMain, (void *)startCmd);
     if (ret != HDF_SUCCESS) {
