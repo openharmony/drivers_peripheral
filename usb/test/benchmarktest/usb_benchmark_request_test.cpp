@@ -28,9 +28,10 @@ using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
+using namespace OHOS::HDI::Usb::V1_1;
 
 namespace {
-sptr<IUsbInterface> g_usbInterface = nullptr;
+sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> g_usbInterface = nullptr;
 struct UsbDev g_dev = {0, 0};
 
 const int SLEEP_TIME = 3;
@@ -76,7 +77,7 @@ int32_t SwitchErrCode(int32_t ret)
 
 void HdfUsbdBenchmarkRequestTest::SetUp(const ::benchmark::State& state)
 {
-    g_usbInterface = IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
     ASSERT_TRUE(g_usbInterface != nullptr);
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SOURCE, DATA_ROLE_HOST);
     sleep(SLEEP_TIME);
@@ -481,6 +482,58 @@ BENCHMARK_F(HdfUsbdBenchmarkRequestTest, BulkCancel)(benchmark::State& state)
 }
 
 BENCHMARK_REGISTER_F(HdfUsbdBenchmarkRequestTest, BulkCancel)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+ * @tc.name: ClearHalt
+ * @tc.desc: Test functions to ClearHalt benchmark test
+ * @tc.desc: int32_t ClearHalt(const UsbDev &dev, const UsbPipe &pipe);
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+BENCHMARK_F(HdfUsbdBenchmarkRequestTest, ClearHalt)(benchmark::State& state)
+{
+    ASSERT_TRUE(g_usbInterface != nullptr);
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    ASSERT_TRUE(subscriber != nullptr);
+    InitPara(subscriber);
+    uint8_t interfaceId = INTERFACEID_OK;
+    auto ret = g_usbInterface->ClaimInterface(g_dev, interfaceId, 1);
+    EXPECT_EQ(ret, 0);
+    uint8_t pointId = POINTID_DIR_IN;
+    OHOS::HDI::Usb::V1_0::UsbPipe pipe = {interfaceId, pointId};
+    EXPECT_EQ(0, ret);
+    for (auto _ : state) {
+        ret = g_usbInterface->ClearHalt(g_dev, pipe);
+    }
+    ReleasePara(subscriber);
+}
+
+BENCHMARK_REGISTER_F(HdfUsbdBenchmarkRequestTest, ClearHalt)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+ * @tc.name: ResetDevice
+ * @tc.desc: Test functions to ResetDevice benchmark test
+ * @tc.desc: int32_t ResetDevice(const UsbDev &dev);
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+BENCHMARK_F(HdfUsbdBenchmarkRequestTest, ResetDevice)(benchmark::State& state)
+{
+    ASSERT_TRUE(g_usbInterface != nullptr);
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    ASSERT_TRUE(subscriber != nullptr);
+    InitPara(subscriber);
+    auto ret = 0;
+    for (auto _ : state) {
+        ret = g_usbInterface->ResetDevice(g_dev);
+    }
+    EXPECT_EQ(0, ret);
+    ReleasePara(subscriber);
+}
+
+BENCHMARK_REGISTER_F(HdfUsbdBenchmarkRequestTest, ResetDevice)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 } // namespace
 
