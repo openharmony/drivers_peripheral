@@ -514,7 +514,7 @@ static int32_t OsSubmitBulkRequestHandle(
         }
 
         if (i == 0) {
-            HDF_LOGE("submitUrb: ret=%{public}d errno=%{public}d length=%{public}d endPoint=%{public}d type=%{public}d",
+            HDF_LOGD("submitUrb: ret=%{public}d errno=%{public}d length=%{public}d endPoint=%{public}d type=%{public}d",
                 ret, errno, urb->bufferLength, urb->endPoint, urb->type);
             return HDF_ERR_IO;
         }
