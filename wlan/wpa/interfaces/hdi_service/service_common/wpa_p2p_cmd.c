@@ -1035,7 +1035,7 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
     char persistent[CMD_SIZE] = {0};
     if (info->peerDevAddr && strlen(peerDevAddr) >= MIN_MAC_LEN) {
         ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_CONNECT %s %s%s%s%s", ifName,
-            macToStr(info->peerDevAddr), pin, mode, persistent, join);
+            MacToStr(info->peerDevAddr), pin, mode, persistent, join);
     }
     if (ret < 0) {
         pthread_mutex_unlock(GetInterfaceLock());
@@ -1091,7 +1091,7 @@ int32_t WpaInterfaceP2pHid2dConnect(struct IWpaInterface *self, const char *ifNa
     }
     HDF_LOGI("hid2dconnect freq=%{public}d, isLegacyGo=%{public}d", freq, isLegacyGo);
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s MAGICLINK \"%s\"\n%s\n\"%s\"\n%d\n%d", ifName,
-            (char *)info->ssid, macToStr(info->bssid), (char *)info->passphrase, freq, isLegacyGo) < 0) {
+            (char *)info->ssid, MacToStr(info->bssid), (char *)info->passphrase, freq, isLegacyGo) < 0) {
         pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s.", __func__, cmd);
         return HDF_FAILURE;
