@@ -1621,13 +1621,10 @@ int32_t WpaInterfaceVendorExtProcessCmd(struct IWpaInterface *self, const char *
         free(reply);
         return HDF_FAILURE;
     }
-<<<<<<< HEAD
 
     HDF_LOGI("%{public}s reply %{public}s !", __func__, reply);
-=======
     pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s cmd %{public}s reply %{public}s !", __func__, newCmd, reply);
->>>>>>> da9bf65ec (TicketNo:DTS2024081411562)
     ret = atoi(reply);
     free(reply);
     return ret;

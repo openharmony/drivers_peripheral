@@ -209,6 +209,7 @@ void InitWifiWpaGlobalInterface(void)
     }
     g_wpaInterface->wpaCliConnect = WpaCliConnect;
     g_wpaInterface->wpaCliClose = WpaCliClose;
+    g_wpaInterface->wpaCliAddIface = WpaCliAddIface;
     g_wpaInterface->wpaCliRemoveIface = WpaCliRemoveIface;
     g_wpaInterface->wpaCliTerminate = WpaCliWpaTerminate;
     g_wpaInterface->ifaces = NULL;
