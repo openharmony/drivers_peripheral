@@ -245,32 +245,6 @@ IAM_STATIC UserInfo *QueryUserInfo(int32_t userId)
     return NULL;
 }
 
-ResultCode SetHasSuccessPinAuth(int32_t userId, bool hasSuccessPinAuth)
-{
-    UserInfo *user = QueryUserInfo(userId);
-    if (user == NULL) {
-        LOG_ERROR("can't find this user");
-        return RESULT_NOT_FOUND;
-    }
-    user->hasSuccessPinAuth = hasSuccessPinAuth;
-    return RESULT_SUCCESS;
-}
-
-ResultCode GetHasSuccessPinAuth(int32_t userId, bool *hasSuccessPinAuth)
-{
-    if (hasSuccessPinAuth == NULL) {
-        LOG_ERROR("bad param");
-        return RESULT_BAD_PARAM;
-    }
-    UserInfo *user = QueryUserInfo(userId);
-    if (user == NULL) {
-        LOG_ERROR("can't find this user");
-        return RESULT_NOT_FOUND;
-    }
-    *hasSuccessPinAuth = user->hasSuccessPinAuth;
-    return RESULT_SUCCESS;
-}
-
 IAM_STATIC ResultCode GetAllEnrolledInfoFromUser(UserInfo *userInfo, EnrolledInfoHal **enrolledInfos, uint32_t *num)
 {
     LinkedList *enrolledInfoList = userInfo->enrolledInfoList;
