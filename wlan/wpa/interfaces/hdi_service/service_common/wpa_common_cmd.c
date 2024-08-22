@@ -1974,10 +1974,11 @@ static int32_t StartWpaSupplicant(const char *moduleName, const char *startCmd)
         return HDF_ERR_INVALID_PARAM ;
     }
     while (g_tid != 0) {
-        HDF_LOGE("%{public}s: wpa_supplicant is already running!", __func__);
+        HDF_LOGI("%{public}s: wpa_supplicant is already running!", __func__);
         usleep(WPA_SLEEP_TIME);
         times++;
         if (times > MAX_WPA_WAIT_TIMES) {
+            HDF_LOGE("%{public}s: wait supplicant time out!", __func__);
             return HDF_FAILURE;
         }
     }
