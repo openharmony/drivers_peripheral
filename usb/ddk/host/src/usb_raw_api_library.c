@@ -1477,7 +1477,7 @@ int32_t RawSubmitRequest(const struct UsbHostRequest *request)
 
     ret = osAdapterOps->submitRequest((struct UsbHostRequest *)request);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d ret = %{public}d", __func__, __LINE__, ret);
+        HDF_LOGD("%{public}s:%{public}d ret = %{public}d", __func__, __LINE__, ret);
     }
 
     return ret;
