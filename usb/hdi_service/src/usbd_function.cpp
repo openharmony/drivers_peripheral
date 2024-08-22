@@ -17,6 +17,7 @@
 
 #include <dlfcn.h>
 #include <unistd.h>
+#include <cerrno>
 
 #include "devmgr_hdi.h"
 #include "hdf_log.h"
@@ -48,6 +49,7 @@ using GetMtpImplFunc = void*(*)();
 constexpr uint32_t UDC_NAME_MAX_LEN = 32;
 constexpr int32_t WAIT_UDC_MAX_LOOP = 30;
 constexpr uint32_t WAIT_UDC_TIME = 100000;
+constexpr int32_t WRITE_UDC_MAX_RETRY = 5;
 /* mtp and ptp use same driver and same service */
 static std::string MTP_PTP_SERVICE_NAME {"usbfn_mtp_interface_service"};
 #define UDC_PATH "/config/usb_gadget/g1/UDC"
@@ -275,9 +277,9 @@ int32_t UsbdFunction::SetFunctionToNone()
                 HDF_LOGE("%{public}s: release mtp failed", __func__);
             }
         }
-        UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
-        UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
     }
+    UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
+    UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
     int32_t ret = RemoveHdc();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: RemoveHdc error, ret = %{public}d", __func__, ret);
@@ -313,27 +315,103 @@ int32_t UsbdFunction::SetDDKFunction(uint32_t funcs)
     return HDF_SUCCESS;
 }
 
-int32_t UsbdFunction::UsbdEnableDevice()
+int32_t UsbdFunction::UsbdWriteUdc(char* udcName, size_t len)
 {
-    FILE *fp = fopen(UDC_PATH, "w");
-    if (fp == NULL) {
+    FILE *fpWrite = fopen(UDC_PATH, "w");
+    if (fpWrite == NULL) {
         HDF_LOGE("%{public}s: fopen failed", __func__);
         return HDF_ERR_BAD_FD;
     }
 
+    size_t count = fwrite(udcName, len, 1, fpWrite);
+    if (count != 1) {
+        HDF_LOGE("%{public}s: fwrite failed, errno: %{public}d", __func__, errno);
+        (void)fclose(fpWrite);
+        return HDF_FAILURE;
+    }
+
+    if (ferror(fpWrite)) {
+        HDF_LOGW("%{public}s: fwrite failed, errno: %{public}d", __func__, errno);
+    }
+    if (fclose(fpWrite) == EOF) {
+        HDF_LOGE("%{public}s: flcose failed, errno: %{public}d", __func__, errno);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+int32_t UsbdFunction::UsbdReadUdc(char* udcName, size_t len)
+{
+    FILE *fpRead = fopen(UDC_PATH, "r");
+    if (fpRead == NULL) {
+        HDF_LOGE("%{public}s: fopen failed", __func__);
+        return HDF_ERR_BAD_FD;
+    }
+
+    size_t count = fread(udcName, len, 1, fpRead);
+    if (count != 1) {
+        if (feof(fpRead)) {
+            HDF_LOGI("%{public}s: fread end of file reached.", __func__);
+        } else if (ferror(fpRead)) {
+            HDF_LOGE("%{public}s: fread failed, errno: %{public}d", __func__, errno);
+        } else {
+            HDF_LOGW("%{public}s: fread len than expected", __func__);
+        }
+        return HDF_FAILURE;
+    }
+
+    if (fclose(fpRead) == EOF) {
+        HDF_LOGW("%{public}s: flcose failed, errno: %{public}d", __func__, errno);
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::UsbdEnableDevice(int32_t funcs)
+{
     // get udc name
     char udcName[UDC_NAME_MAX_LEN] = {0};
     int32_t ret = GetParameter("sys.usb.controller", "invalid", udcName, UDC_NAME_MAX_LEN);
     if (ret <= 0) {
         HDF_LOGE("%{public}s: GetParameter failed", __func__);
-        (void)fclose(fp);
         return HDF_FAILURE;
     }
 
-    size_t count = fwrite(udcName, strlen(udcName), 1, fp);
-    (void)fclose(fp);
-    if (count != 1) {
-        HDF_LOGE("%{public}s: fwrite failed", __func__);
+    char tmpName[UDC_NAME_MAX_LEN] = {0};
+    for (int32_t i = 0; i < WRITE_UDC_MAX_RETRY; i++) {
+        if (i != 0) {
+            ret = SetDDKFunction(funcs);
+            if (ret != HDF_SUCCESS) {
+                UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
+                UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
+            }
+            usleep(WAIT_UDC_TIME);
+            continue;
+        }
+        ret = UsbdWriteUdc(udcName, strlen(udcName));
+        if (ret != HDF_SUCCESS) {
+            UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
+            UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
+            usleep(WAIT_UDC_TIME);
+            continue;
+        }
+
+        (void)memset_s(tmpName, UDC_NAME_MAX_LEN, 0, UDC_NAME_MAX_LEN);
+        ret = UsbdReadUdc(tmpName, strlen(udcName));
+        if (ret != HDF_SUCCESS) {
+            UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
+            UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
+            usleep(WAIT_UDC_TIME);
+            continue;
+        }
+
+        if (strcmp(udcName, tmpName) == 0) {
+            return HDF_SUCCESS;
+        }
+        HDF_LOGI("%{public}s:  tmpName: %{public}s", __func__, tmpName);
+        usleep(WAIT_UDC_TIME);
+    }
+
+    if (strcmp(udcName, tmpName) != 0) {
+        HDF_LOGE("%{public}s: strcmp failed", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -351,20 +429,17 @@ int32_t UsbdFunction::UsbdWaitUdc()
 
     char tmpName[UDC_NAME_MAX_LEN] = {0};
     for (int32_t i = 0; i < WAIT_UDC_MAX_LOOP; i++) {
-        FILE *fp = fopen(UDC_PATH, "r");
-        if (fp == NULL) {
-            HDF_LOGE("%{public}s: fopen failed", __func__);
-            return HDF_ERR_BAD_FD;
-        }
-
         (void)memset_s(tmpName, UDC_NAME_MAX_LEN, 0, UDC_NAME_MAX_LEN);
-        if (fread(tmpName, strlen(udcName), 1, fp) != 1) {
-            HDF_LOGE("%{public}s: fread failed", __func__);
+        ret = UsbdReadUdc(tmpName, strlen(udcName));
+        if (ret != HDF_SUCCESS) {
+            usleep(WAIT_UDC_TIME);
+            continue;
         }
-        (void)fclose(fp);
+ 
         if (strcmp(udcName, tmpName) == 0) {
             return HDF_SUCCESS;
         }
+        HDF_LOGE("%{public}s: read UDC_PATH: %{public}s", __func__, tmpName);
         usleep(WAIT_UDC_TIME);
     }
 
@@ -439,7 +514,7 @@ int32_t UsbdFunction::UsbdInitDDKFunction(uint32_t funcs)
     return HDF_SUCCESS;
 }
 
-int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns)
+int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
 {
     switch (kfuns) {
         case USB_FUNCTION_HDC:
@@ -462,7 +537,7 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns)
             return UsbdFunction::SetFunctionToManufactureHdc();
         default:
             HDF_LOGI("%{public}s: enable device", __func__);
-            return UsbdEnableDevice();
+            return UsbdEnableDevice(funcs);
     }
 }
 
@@ -479,12 +554,17 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
         HDF_LOGW("%{public}s: setFunctionToNone error", __func__);
     }
 
+    if (funcs == USB_FUNCTION_NONE) {
+        HDF_LOGW("%{public}s: setFunctionToNone", __func__);
+        return HDF_SUCCESS;
+    }
+
     if (UsbdFunction::SetDDKFunction(funcs)) {
         HDF_LOGE("%{public}s:SetDDKFunction error", __func__);
         return HDF_FAILURE;
     }
 
-    int32_t ret = UsbdSetKernelFunction(kfuns);
+    int32_t ret = UsbdSetKernelFunction(kfuns, funcs);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, set kernel func failed", __func__);
         return HDF_FAILURE;
