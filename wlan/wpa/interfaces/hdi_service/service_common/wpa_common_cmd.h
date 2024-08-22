@@ -20,6 +20,7 @@
 #include <hdf_remote_service.h>
 #include "utils/common.h"
 #include "wpa_supplicant_hal.h"
+#include "wpa_client.h"
 
 #define WIFI_SSID_LENGTH 132
 #define WIFI_BSSID_LENGTH 18
@@ -107,6 +108,20 @@ int32_t WpaInterfaceGetRequirePmf(struct IWpaInterface *self, const char *ifName
 int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifName, const char *countryCode);
 int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName);
 int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd);
+
+int32_t WpaFillWpaListNetworkParam(struct WifiNetworkInfo  *wifiWpaNetworkInfo,
+    struct HdiWifiWpaNetworkInfo *hdiWifiWpaNetworkInfo);
+void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWpaCmdStatus *status);
+void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote);
+void AddDeathRecipientForService(struct IWpaCallback *cbFunc);
+int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName);
+void HdfWpaDelRemoteObj(struct IWpaCallback *self);
+int32_t WpaFillWpaDisconnectParam(struct WpaDisconnectParam *disconnectParam,
+    struct HdiWpaDisconnectParam *hdiWpaDisconnectParam);
+int32_t WpaFillWpaConnectParam(struct WpaConnectParam *connectParam,
+    struct HdiWpaConnectParam *hdiWpaConnectParam);
+int32_t WpaFillWpaBssidChangedParam(struct WpaBssidChangedParam *bssidChangedParam,
+    struct HdiWpaBssidChangedParam *hdiWpaBssidChangedParam);
 
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);
 pthread_mutex_t *GetInterfaceLock();
