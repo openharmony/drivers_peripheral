@@ -428,6 +428,9 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_008, TestSiz
                 CAMERA_LOGI("OHOS_CAMERA_CENTER_WEIGHTED_METERING mode is supported!");
             }
         }
+    } else {
+        printf("get tag<OHOS_ABILITY_METER_MODES> failed.\n");
+        return;
     }
 
     for (uint8_t i = 0;i < entry.count;i++) {
