@@ -17,7 +17,7 @@
 #define HDI_TEST_DISPLAY_H
 #include <cinttypes>
 #include "v1_0/include/idisplay_buffer.h"
-#include "v1_1/include/idisplay_composer_interface.h"
+#include "v1_2/include/idisplay_composer_interface.h"
 #include "v1_1/display_composer_type.h"
 #include "display_test.h"
 #include "hdi_test_device_common.h"
@@ -30,7 +30,7 @@ namespace TEST {
 using namespace OHOS::HDI::Display::Composer::V1_1;
 class HdiTestDisplay {
 public:
-    HdiTestDisplay(uint32_t id, sptr<Composer::V1_1::IDisplayComposerInterface> device);
+    HdiTestDisplay(uint32_t id, sptr<Composer::V1_2::IDisplayComposerInterface> device);
     virtual ~HdiTestDisplay() {}
     int32_t Init();
     int32_t GetModeInfoFromId(int32_t id, DisplayModeInfo& modeInfo) const;
@@ -65,7 +65,7 @@ private:
     uint32_t activeModeId_ = 0;
     DisplayModeInfo currentMode_ = { 0 };
     uint32_t id_;
-    sptr<Composer::V1_1::IDisplayComposerInterface> device_;
+    sptr<Composer::V1_2::IDisplayComposerInterface> device_;
 
     DisplayCapability cap_;
     std::vector<DisplayModeInfo> modes_;
