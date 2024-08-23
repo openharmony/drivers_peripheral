@@ -1057,6 +1057,8 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
     }
     ReleaseWpaGlobalInterface();
     HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
+    ReleaseWifiStaInterface(0);
+    HDF_LOGI("%{public}s: call ReleaseWifiStaInterface finish", __func__);
 }
 
 static struct RemoteServiceDeathRecipient g_deathRecipient = {

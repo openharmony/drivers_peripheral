@@ -42,12 +42,40 @@
 #include <stdbool.h>
 #include <sys/time.h>
 
-#ifndef _UAPI_INPUT_H
-#include <input-event-codes.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef _UAPI_INPUT_H
+#define	INPUT_PROP_MAX    0x1f
+#define	INPUT_PROP_CNT    (INPUT_PROP_MAX + 1)
+#define	EV_SYN    0x00
+#define	EV_KEY    0x01
+#define	EV_REL    0x02
+#define	EV_ABS    0x03
+#define	EV_MAX    0x1f
+#define	EV_CNT    (EV_MAX + 1)
+#define	ABS_X    0x00
+#define	ABS_Y    0x01
+#define	ABS_MAX    0x3f
+#define	ABS_CNT    (ABS_MAX + 1)
+#define	REL_X    0x00
+#define	REL_Y    0x01
+#define	REL_MAX    0x0f
+#define	REL_CNT    (REL_MAX + 1)
+#define	KEY_MAX    0x2ff
+#define	KEY_CNT    (KEY_MAX + 1)
+#define	LED_MAX    0x0f
+#define	LED_CNT    (LED_MAX + 1)
+#define	MSC_MAX    0x07
+#define	MSC_CNT    (MSC_MAX + 1)
+#define	SND_MAX    0x07
+#define	SND_CNT    (SND_MAX + 1)
+#define	SW_MAX    0x0f
+#define	SW_CNT    (SW_MAX + 1)
+#define	BTN_MOUSE    0x110
+#define	BTN_TOUCH    0x14a
+#define	SYN_REPORT    0
 #endif
 
 /** Maximum number of input devices */
