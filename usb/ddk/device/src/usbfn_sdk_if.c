@@ -314,3 +314,8 @@ int32_t UsbFnSubmitRequestSync(struct UsbFnRequest *req, uint32_t timeout)
     }
     return UsbFnIoMgrRequestSubmitSync(req, timeout);
 }
+
+int32_t UsbFnMemTestTrigger(bool enable)
+{
+    return UsbFnAdpMemTestTrigger(enable);
+}
