@@ -477,11 +477,11 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest012, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
-
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
-
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
