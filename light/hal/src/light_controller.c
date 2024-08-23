@@ -293,7 +293,6 @@ static int32_t OnMultiLights(uint32_t lightId, const struct LightColor *colors, 
 
     sbuf = HdfSbufObtain(sizeof(struct LightColor) * count);
     if (sbuf == NULL) {
-        HDF_LOGE("%{public}s: sbuf malloc failed", __func__);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_DEV_ERR_NO_MEMORY;
     }
