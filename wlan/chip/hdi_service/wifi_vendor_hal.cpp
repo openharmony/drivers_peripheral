@@ -104,7 +104,7 @@ WifiError WifiVendorHal::Start()
 
 void WifiVendorHal::RunEventLoop()
 {
-    pthread_setname_np(pthread_self(), "VendorHalEventThread");
+    pthread_setname_np(pthread_self(), "VenEventThread");
     HDF_LOGD("Starting vendor HAL event loop");
     globalFuncTable_.startHalLoop(globalHandle_);
     const auto lock = AcquireGlobalLock();
