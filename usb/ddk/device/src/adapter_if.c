@@ -1289,6 +1289,12 @@ void UsbFnMemFree(const void *mem)
     }
 }
 
+int32_t UsbFnAdpMemTestTrigger(bool enable)
+{
+    g_usbRamTestFlag = enable;
+    return HDF_SUCCESS;
+}
+
 static struct UsbFnAdapterOps g_usbFnAdapter = {
     .createDevice = UsbFnAdapterCreateDevice,
     .delDevice = UsbFnAdapterDelDevice,
