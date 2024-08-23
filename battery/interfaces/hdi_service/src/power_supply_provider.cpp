@@ -290,7 +290,7 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
     }
 
     if (fd != -1) {
-        size_t readSize = pread(fd, buf, size - 1, 0);
+        ssize_t readSize = pread(fd, buf, size - 1, 0);
         buf[readSize] = '\0';
         Trim(buf);
         return HDF_SUCCESS;
@@ -302,7 +302,7 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
         return HDF_ERR_IO;
     }
 
-    size_t readSize = read(fd, buf, size - 1);
+    ssize_t readSize = read(fd, buf, size - 1);
     buf[readSize] = '\0';
     Trim(buf);
     {
