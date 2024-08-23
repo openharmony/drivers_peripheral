@@ -1633,6 +1633,12 @@ void RawRequestListInit(struct UsbDevice *deviceObj)
     HdfSListInit(&deviceObj->requestList);
 }
 
+int32_t RawUsbMemTestTrigger(bool enable)
+{
+    g_usbRamTestFlag = enable;
+    return HDF_SUCCESS;
+}
+
 void *RawUsbMemAlloc(size_t size)
 {
     return RawUsbMemCalloc(size);
