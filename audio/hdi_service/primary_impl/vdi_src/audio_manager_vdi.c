@@ -396,6 +396,10 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
     }
 
     *adapter = VendorLoadAdapter(priv->vdiManager, descIndex, vdiDesc);
+    if (*adapter == NULL) {
+        pthread_mutex_unlock(&g_managerMutex);
+        return HDF_FAILURE;
+    }
     pthread_mutex_unlock(&g_managerMutex);
     AUDIO_FUNC_LOGD("audio vdiManager load vdiAdapter success");
     return HDF_SUCCESS;
