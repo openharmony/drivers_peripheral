@@ -387,7 +387,7 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
     }
 
     struct AudioAdapterDescriptorVdi vdiDesc = {0};
-    int32_t ret = AudioManagerDescToVdiDesc(desc, &vdiDesc);
+    ret = AudioManagerDescToVdiDesc(desc, &vdiDesc);
     if (ret != HDF_SUCCESS) {
         AudioManagerReleaseVdiDesc(&vdiDesc);
         AUDIO_FUNC_LOGE("audio vdiManager desc To vdiDesc fail, ret=%{public}d", ret);
