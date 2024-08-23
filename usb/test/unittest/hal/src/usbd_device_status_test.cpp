@@ -332,7 +332,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt001, TestSize.Level1)
     ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointId};
     ret = g_usbInterface->ClearHalt(dev, pipe);
-    HDF_LOGI("UsbdClearHalt001 %{public}d ClearHalt=%{public}d",__LINE__, ret);
+    HDF_LOGI("UsbdClearHalt001 %{public}d ClearHalt=%{public}d", __LINE__, ret);
 }
 
 /**
@@ -354,7 +354,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt002, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointId};
     dev.busNum = BUS_NUM_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
-    HDF_LOGI("UsbdClearHalt002 %{public}d ClearHalt=%{public}d",__LINE__, ret);
+    HDF_LOGI("UsbdClearHalt002 %{public}d ClearHalt=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
 }
 
@@ -377,7 +377,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt003, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointId};
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
-    HDF_LOGI("UsbdClearHalt003 %{public}d ClearHalt=%{public}d",__LINE__, ret);
+    HDF_LOGI("UsbdClearHalt003 %{public}d ClearHalt=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
 }
 
@@ -399,7 +399,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt004, TestSize.Level1)
     ASSERT_NE(0, ret);
     struct UsbPipe pipe = {interfaceId, pointId};
     ret = g_usbInterface->ClearHalt(dev, pipe);
-    HDF_LOGI("UsbdClearHalt004 %{public}d ClearHalt=%{public}d",__LINE__, ret);
+    HDF_LOGI("UsbdClearHalt004 %{public}d ClearHalt=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
 }
 
@@ -423,7 +423,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt005, TestSize.Level1)
     dev.busNum = BUS_NUM_INVALID;
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
-    HDF_LOGI("UsbdClearHalt005 %{public}d ClearHalt=%{public}d",__LINE__, ret);
+    HDF_LOGI("UsbdClearHalt005 %{public}d ClearHalt=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
 }
 
@@ -446,7 +446,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt006, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointId};
     dev.busNum = BUS_NUM_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
-    HDF_LOGI("UsbdClearHalt006 %{public}d ClearHalt=%{public}d",__LINE__, ret);
+    HDF_LOGI("UsbdClearHalt006 %{public}d ClearHalt=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
 }
 
@@ -469,7 +469,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt007, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointId};
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
-    HDF_LOGI("UsbdClearHalt005 %{public}d ClearHalt=%{public}d",__LINE__, ret);
+    HDF_LOGI("UsbdClearHalt005 %{public}d ClearHalt=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
 }
 
@@ -493,7 +493,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt008, TestSize.Level1)
     dev.busNum = BUS_NUM_INVALID;
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
-    HDF_LOGI("UsbdClearHalt008 %{public}d ClearHalt=%{public}d",__LINE__, ret);
+    HDF_LOGI("UsbdClearHalt008 %{public}d ClearHalt=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
 }
 } // USB
