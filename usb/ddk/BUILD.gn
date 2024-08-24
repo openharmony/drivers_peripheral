@@ -80,7 +80,7 @@ ohos_shared_library("libusb_ddk_host") {
 }
 
 config("public_headers") {
-    include_dirs = [ "$hdf_framework_path/model/usb/include" ]
+   include_dirs = [ "$hdf_framework_path/model/usb/include" ]
 }
 
 ohos_shared_library("libusb_pnp_manager") {
