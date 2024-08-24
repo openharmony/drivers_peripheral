@@ -1956,11 +1956,6 @@ OUT:
     return ret;
 }
 
-int32_t UsbMemTestTrigger(bool enable)
-{
-    return RawUsbMemTestTrigger(enable);
-}
-
 bool UsbGetInterfaceActiveStatus(
     const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
 {
