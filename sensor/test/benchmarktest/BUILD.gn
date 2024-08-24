@@ -42,9 +42,9 @@ ohos_benchmarktest("hdf_sensor_benchmark_test") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_sensor:libsensor_proxy_2.0",
+      "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
-      "googletest:gtest_main",
       "ipc:ipc_single",
     ]
     if (c_utils_enable) {
