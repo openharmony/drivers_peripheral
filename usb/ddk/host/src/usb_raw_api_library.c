@@ -21,7 +21,6 @@
 #define HDF_LOG_TAG USB_RAW_API_LIBRARY
 
 struct UsbSession *g_usbRawDefaultSession = NULL;
-static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
 
 static void SyncRequestCallback(const void *requestArg)
 {
