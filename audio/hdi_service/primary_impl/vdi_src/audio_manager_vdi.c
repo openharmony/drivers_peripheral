@@ -224,7 +224,7 @@ static int32_t AudioManagerVdiDescsToDescs(struct AudioAdapterDescriptorVdi *vdi
     return HDF_SUCCESS;
 }
 
-int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
+static int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     struct AudioAdapterDescriptor *descs, uint32_t *descsLen)
 {
     int32_t ret;
