@@ -29,7 +29,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 constexpr int IFACE_TYPE_STA = 2;
-constexpr int PROP_BOOL_VALUE_LEN = 6;
+
 constexpr char K_ACTIVE_WLAN_IFACE_NAME_PROPERTY[] = "wifi.active.interface";
 constexpr char K_NO_ACTIVE_WLAN_IFACE_NAME_PROPERTY_VALUE[] = "";
 constexpr unsigned K_MAX_WLAN_IFACES = 5;

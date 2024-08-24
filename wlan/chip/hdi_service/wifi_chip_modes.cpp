@@ -26,8 +26,6 @@ namespace V1_0 {
 #define AP IfaceType::AP
 #define P2P IfaceType::P2P
 
-constexpr int PROP_BOOL_VALUE_LEN = 6;
-
 WifiChipModes::WifiChipModes() {}
 
 UsableMode WifiChipModes::MakeComModes(int staNum, int apNum, int p2pNum, int modeId)
