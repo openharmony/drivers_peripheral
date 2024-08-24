@@ -1428,6 +1428,7 @@ static void UsbSerialDriverRelease(struct HdfDeviceObject *device)
     OsalMutexDestroy(&acm->lock);
     OsalMemFree(acm);
     acm = NULL;
+    device->service = NULL;
     HDF_LOGD("%{public}s:%{public}d exit", __func__, __LINE__);
 }
 
