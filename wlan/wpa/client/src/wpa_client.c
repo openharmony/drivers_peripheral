@@ -111,8 +111,7 @@ void ReleaseEventCallback(void)
 {
     pthread_mutex_lock(&g_wpaCallbackMutex);
     for (uint32_t i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_wpaCallbackEventMap[i] != NULL &&
-            (strncmp(g_wpaCallbackEventMap[i]->ifName, "chba", strlen("chba")) == 0)) {
+        if (g_wpaCallbackEventMap[i] != NULL) {
             g_wpaCallbackEventMap[i]->onRecFunc = NULL;
             free(g_wpaCallbackEventMap[i]);
             g_wpaCallbackEventMap[i] = NULL;
