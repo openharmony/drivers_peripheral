@@ -41,11 +41,12 @@ ohos_shared_library("libusbhost_acm") {
     "include",
     "${usb_driver_path}/utils/include",
   ]
+  
+  deps = [ "./../ddk:libusb_ddk_host" ]
 
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_host",
-      "hdf_core:libhdf_usb",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
@@ -87,10 +88,11 @@ ohos_shared_library("libusbhost_acm_rawapi") {
     "${usb_driver_path}/utils/include",
   ]
 
+  deps = [ "./../ddk:libusb_ddk_host" ]
+
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_host",
-      "hdf_core:libhdf_usb",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
