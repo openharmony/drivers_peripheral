@@ -36,8 +36,6 @@
 #define SLEEP_DELAY 100000
 #define OPEN_CNT    30
 
-static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
-
 static bool IsDirExist(const char *path)
 {
     DIR *dir = NULL;
