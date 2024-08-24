@@ -685,7 +685,8 @@ void ComponentNode::WaitStateChange(CodecStateType objState, CodecStateType &sta
     }
 }
 
-void ComponentNode::GetBuffCount(uint32_t &inputBuffCount, uint32_t &outputBuffCount) {
+void ComponentNode::GetBuffCount(uint32_t &inputBuffCount, uint32_t &outputBuffCount)
+{
     std::unique_lock<std::shared_mutex> lk(mapMutex_);
     auto iter = portIndexMap_.begin();
     while (iter != portIndexMap_.end()) {
