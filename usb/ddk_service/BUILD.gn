@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
 import("//build/config/components/hdi/hdi.gni")
+import("//build/ohos.gni")
 import("./../usb.gni")
 
 config("ddk_public_config") {
@@ -43,7 +43,7 @@ ohos_shared_library("libusb_ddk_service_1.0") {
     "${usb_driver_path}/interfaces/ddk/host",
     "${usb_driver_path}/interfaces/ddk/common",
     "${usb_driver_path}/ddk/host/include",
-    "${hdf_framework_path}/model/usb/include",
+    "//drivers/hdf_core/framework/model/usb/include",
     "${usb_driver_path}/utils/include",
   ]
 

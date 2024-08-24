@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
 import("//build/config/components/hdi/hdi.gni")
+import("//build/ohos.gni")
 import("./../usb.gni")
 
 group("libusb_core") {
@@ -36,7 +36,7 @@ ohos_shared_library("libusb_ddk_host") {
 
   include_dirs = [
     "device/include",
-    "$hdf_framework_path/model/usb/include",
+    "//drivers/hdf_core/framework/model/usb/include",
     "host/include",
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/device",
@@ -80,7 +80,7 @@ ohos_shared_library("libusb_ddk_host") {
 }
 
 config("public_headers") {
-  include_dirs = [ "$hdf_framework_path/model/usb/include" ]
+  include_dirs = [ "//drivers/hdf_core/framework/model/usb/include" ]
 }
 
 ohos_shared_library("libusb_pnp_manager") {
@@ -101,8 +101,8 @@ ohos_shared_library("libusb_pnp_manager") {
   ]
   public_configs = [ ":public_headers" ]
   sources = [
-    "$hdf_framework_path/model/usb/src/usb_ddk_pnp_loader.c",
-    "$hdf_framework_path/model/usb/src/usb_wrapper.cpp",
+    "//drivers/hdf_core/framework/model/usb/src/usb_ddk_pnp_loader.c",
+    "//drivers/hdf_core/framework/model/usb/src/usb_wrapper.cpp",
     "device/src/usbfn_uevent_handle.c",
     "host/src/ddk_device_manager.c",
     "host/src/ddk_pnp_listener_mgr.c",
