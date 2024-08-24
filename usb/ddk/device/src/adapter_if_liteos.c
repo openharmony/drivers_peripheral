@@ -34,8 +34,6 @@
 #define SLEEP_TIME  100000
 #define OPEN_CNT    30
 
-static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
-
 static int32_t UsbFnAdapterOpenFn(void)
 {
     int32_t i;
