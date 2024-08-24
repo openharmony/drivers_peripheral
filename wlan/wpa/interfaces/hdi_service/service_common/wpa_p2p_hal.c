@@ -576,7 +576,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdReInvite(WifiWpaP2pInterface *this, cons
 
 static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, const struct HdiP2pServiceInfo *argv)
 {
-    if (this == NULL || argv == NULL) {
+    if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL || argv->resp == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     unsigned nameLen = strlen((char *) argv->name);
@@ -621,7 +621,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
 
 static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, const struct HdiP2pServiceInfo *argv)
 {
-    if (this == NULL || argv == NULL) {
+    if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     unsigned nameLen = strlen((char *) argv->name);
