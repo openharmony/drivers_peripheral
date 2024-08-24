@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("//build/config/components/hdi/hdi.gni")
 import("./../usb.gni")
 group("usbhost_acm") {
   deps = [ ":libusbhost_acm" ]
@@ -37,7 +37,6 @@ ohos_shared_library("libusbhost_acm") {
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
     "./../gadget/function/include",
-    "./../../../hdf_core/framework/model/usb/include",
     "include",
     "${usb_driver_path}/utils/include",
   ]
@@ -47,6 +46,7 @@ ohos_shared_library("libusbhost_acm") {
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_host",
+      "hdf_core:libhdf_usb",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
@@ -83,7 +83,6 @@ ohos_shared_library("libusbhost_acm_rawapi") {
     "./../gadget/function/include",
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
-    "./../../../hdf_core/framework/model/usb/include",
     "include",
     "${usb_driver_path}/utils/include",
   ]
@@ -93,6 +92,7 @@ ohos_shared_library("libusbhost_acm_rawapi") {
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_host",
+      "hdf_core:libhdf_usb",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]

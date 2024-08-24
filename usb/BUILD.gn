@@ -17,7 +17,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/ohos.gni")
-  import("./../../hdf_core/adapter/uhdf2/uhdf.gni")
+  import("//build/config/components/hdi/hdi.gni")
 
   group("usb_entry") {
     deps = [
