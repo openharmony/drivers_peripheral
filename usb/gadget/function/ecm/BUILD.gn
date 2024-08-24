@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("./../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("//build/config/components/hdi/hdi.gni")
 import("./../../../usb.gni")
 
 group("usbfn_cdcecm") {

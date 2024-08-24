@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("//build/config/components/hdi/hdi.gni")
 import("./../usb.gni")
 
 group("libusb_core") {
@@ -36,13 +36,13 @@ ohos_shared_library("libusb_ddk_host") {
 
   include_dirs = [
     "device/include",
-    "$hdf_framework_path/model/usb/include",
     "host/include",
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/device",
     "./../interfaces/ddk/host",
     "./../utils/include",
   ]
+  public_external_deps = [ "hdf_core:libhdf_usb" ]
   sources = [
     "host/src/linux_adapter.c",
     "host/src/usb_interface_pool.c",
@@ -80,7 +80,7 @@ ohos_shared_library("libusb_ddk_host") {
 }
 
 config("public_headers") {
-  include_dirs = [ "$hdf_framework_path/model/usb/include" ]
+  public_external_deps = [ "hdf_core:libhdf_usb" ]
 }
 
 ohos_shared_library("libusb_pnp_manager") {
