@@ -61,7 +61,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/ohos.gni")
-  import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   config("camhdi_impl_config") {
     visibility = [ ":*" ]

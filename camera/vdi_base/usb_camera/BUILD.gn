@@ -11,8 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
-
 group("usb_camera_vdi_impl") {
   deps = [
     "buffer_manager:usb_camera_buffer_manager",
