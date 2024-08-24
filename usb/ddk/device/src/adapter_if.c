@@ -37,7 +37,6 @@
 #define OPEN_CNT    30
 
 static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
-static bool g_usbRamTestFlag = false;
 
 static bool IsDirExist(const char *path)
 {
@@ -1231,25 +1230,6 @@ void UsbFnMemFree(const void *mem)
     if (mem == NULL) {
         HDF_LOGE("%{public}s:%{public}d invalid param mem.", __func__, __LINE__);
         return;
-    }
-
-    if (g_usbRamTestFlag && g_usbRamTestHead != NULL) {
-        struct RawUsbRamTestList *pos = NULL;
-        struct RawUsbRamTestList *tmp = NULL;
-        uint32_t totalSize = 0;
-        uint32_t size = 0;
-        OsalMutexLock(&g_usbRamTestHead->lock);
-        DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if (pos->address == (uintptr_t)mem) {
-                size = pos->size;
-                DListRemove(&pos->list);
-                OsalMemFree(pos);
-                continue;
-            }
-            totalSize += pos->size;
-        }
-        OsalMutexUnlock(&g_usbRamTestHead->lock);
-        HDF_LOGI("%{public}s:rm size = %{public}u, totalSize = %{public}u", __func__, size, totalSize);
     }
 
     if (mem != NULL) {
