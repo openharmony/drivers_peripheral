@@ -73,9 +73,6 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
         CODEC_LOGE("CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
-    buffer_ = nullptr;
-    dynaBuffer_.bufferHandle = nullptr;
-    codecBuffer.filledLen = 0;
     if (codecBuffer.bufferhandle != nullptr) {
         BufferHandle* handle = codecBuffer.bufferhandle->GetBufferHandle();
         if (handle != nullptr) {
