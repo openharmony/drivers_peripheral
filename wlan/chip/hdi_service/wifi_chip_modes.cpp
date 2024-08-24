@@ -64,16 +64,6 @@ UsableMode WifiChipModes::MakeComModes(int staNum, int apNum, int p2pNum, int mo
 std::vector<UsableMode> WifiChipModes::GetChipModesForPrimary()
 {
     std::vector<UsableMode> modes = {};
-    char propValue[PROP_MAX_LEN] = {0};
-    int errCode = GetParameter(SAPCOEXIST_PROP, 0, propValue, PROP_BOOL_VALUE_LEN);
-    if (errCode > 0) {
-        if (strncmp(propValue, "true", strlen("true")) == 0) {
-            HDF_LOGI("select sap and sta coexist");
-            UsableMode mode = MakeComModes(3, 1, 1, 0);
-            modes.push_back(mode);
-            return modes;
-        }
-    }
     UsableMode mode = MakeComModes(3, 0, 1, 0);
     modes.push_back(mode);
     UsableMode modeAp = MakeComModes(0, 1, 0, 1);
