@@ -23,8 +23,6 @@
 #define SUBCHIP_PROP "ohos.boot.odm.conn.schiptype"
 #define PROP_SUBCHIPTYPE_LEN 10
 #define SUPPORT_COEXCHIP "bisheng"
-#define TRIPLE_MODE_PROP "vendor.hw_mc.wifi.triplemodes"
-#define SAPCOEXIST_PROP "hw_mc.wifi.support_sapcoexist"
 #define PROP_MAX_LEN 128
 
 namespace OHOS {
@@ -34,7 +32,6 @@ namespace Chip {
 namespace V1_0 {
 
 namespace chip_mode_ids {
-    
 constexpr int32_t K_INVALID = UINT32_MAX;
 constexpr int32_t K_V1_STA = 0;
 constexpr int32_t K_V1_AP = 1;
