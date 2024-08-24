@@ -37,11 +37,10 @@ ohos_shared_library("libusbhost_acm") {
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
     "./../gadget/function/include",
+    "./../../../hdf_core/framework/model/usb/include",
     "include",
     "${usb_driver_path}/utils/include",
   ]
-
-  deps = [ "./../ddk:libusb_ddk_host" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -83,11 +82,10 @@ ohos_shared_library("libusbhost_acm_rawapi") {
     "./../gadget/function/include",
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
+    "./../../../hdf_core/framework/model/usb/include",
     "include",
     "${usb_driver_path}/utils/include",
   ]
-
-  deps = [ "./../ddk:libusb_ddk_host" ]
 
   if (is_standard_system) {
     external_deps = [
