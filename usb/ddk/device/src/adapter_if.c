@@ -1223,37 +1223,6 @@ void *UsbFnMemCalloc(size_t size)
         HDF_LOGE("%{public}s: %{public}d, OsalMemCalloc failed", __func__, __LINE__);
         return NULL;
     }
-
-    if (g_usbRamTestFlag) {
-        if (g_usbRamTestHead == NULL) {
-            g_usbRamTestHead = OsalMemCalloc(sizeof(struct RawUsbRamTestList));
-            if (g_usbRamTestHead == NULL) {
-                HDF_LOGE("%{public}s: %{public}d, OsalMemCalloc failed", __func__, __LINE__);
-                OsalMemFree(buf);
-                return NULL;
-            }
-            OsalMutexInit(&g_usbRamTestHead->lock);
-            DListHeadInit(&g_usbRamTestHead->list);
-        }
-        struct RawUsbRamTestList *testEntry = OsalMemCalloc(sizeof(struct RawUsbRamTestList));
-        if (testEntry == NULL) {
-            HDF_LOGE("%{public}s: %{public}d, OsalMemCalloc failed", __func__, __LINE__);
-            OsalMemFree(buf);
-            return NULL;
-        }
-        testEntry->address = (uintptr_t)buf;
-        testEntry->size = size;
-
-        struct RawUsbRamTestList *pos = NULL;
-        uint32_t totalSize = 0;
-        OsalMutexLock(&g_usbRamTestHead->lock);
-        DListInsertTail(&testEntry->list, &g_usbRamTestHead->list);
-        DLIST_FOR_EACH_ENTRY(pos, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            totalSize += pos->size;
-        }
-        OsalMutexUnlock(&g_usbRamTestHead->lock);
-        HDF_LOGI("%{public}s:add size = %{public}zu, totalSize = %{public}u", __func__, size, totalSize);
-    }
     return buf;
 }
 
