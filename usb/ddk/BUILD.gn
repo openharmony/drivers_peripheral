@@ -37,12 +37,12 @@ ohos_shared_library("libusb_ddk_host") {
   include_dirs = [
     "device/include",
     "host/include",
+    "$hdf_framework_path/model/usb/include",
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/device",
     "./../interfaces/ddk/host",
     "./../utils/include",
   ]
-  public_external_deps = [ "hdf_core:libhdf_usb" ]
   sources = [
     "host/src/linux_adapter.c",
     "host/src/usb_interface_pool.c",
