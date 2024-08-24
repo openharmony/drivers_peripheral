@@ -612,7 +612,7 @@ int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffe
 
 uint32_t ComponentNode::GenerateBufferId()
 {
-    std::shared_lock<std::shared_mutex> lk(mapMutex_);
+    std::unique_lock<std::shared_mutex> lk(mapMutex_);
     uint32_t bufferId = 0;
     do {
         if (++bufferIdCount_ == 0) {
@@ -685,9 +685,17 @@ void ComponentNode::WaitStateChange(CodecStateType objState, CodecStateType &sta
     }
 }
 
-const std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &ComponentNode::GetBufferMapCount()
-{
-    return portIndexMap_;
+void ComponentNode::GetBuffCount(uint32_t &inputBuffCount, uint32_t &outputBuffCount) {
+    std::unique_lock<std::shared_mutex> lk(mapMutex_);
+    auto iter = portIndexMap_.begin();
+    while (iter != portIndexMap_.end()) {
+        if (iter->second == 0) {
+            inputBuffCount++;
+        } else {
+            outputBuffCount++;
+        }
+        iter++;
+    }
 }
 
 void ComponentNode::ReleaseOMXResource()
