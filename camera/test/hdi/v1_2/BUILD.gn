@@ -16,7 +16,6 @@ camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "drivers_peripheral_camera/camera"
 
