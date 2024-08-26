@@ -25,19 +25,6 @@ namespace V3_0 {
 #define OUTPUT_PORT_INDEX 1
 CodecDfxService CodecDfxService::dfxInstance_;
 HdfSBuf *CodecDfxService::reply_;
-void CodecDfxService::GetBuffCount(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode,
-                                   uint32_t &inputBuffCount, uint32_t &outputBuffCount)
-{
-    auto iter = dumpNode->GetBufferMapCount().begin();
-    while (iter != dumpNode->GetBufferMapCount().end()) {
-        if (iter->second == INPUT_PORT_INDEX) {
-            inputBuffCount++;
-        } else {
-            outputBuffCount++;
-        }
-        iter++;
-    }
-}
 
 int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
 {
@@ -66,7 +53,7 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
         }
         dumpNode->GetState(state);
         dump.append(std::to_string(state));
-        GetInstance().GetBuffCount(dumpNode, inputBuffCount, outputBuffCount);
+        dumpNode->GetBuffCount(inputBuffCount, outputBuffCount);
         dump.append(", inputPortIndex = ")
             .append(std::to_string(INPUT_PORT_INDEX))
             .append(", inputBuffCount = ")
