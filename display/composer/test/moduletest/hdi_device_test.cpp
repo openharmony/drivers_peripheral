@@ -385,7 +385,9 @@ void DeviceTest::TearDown()
 void DeviceLayerDisplay::TearDown()
 {
     HdiTestDevice::GetInstance().Clear();
+#if !defined(DISPLAY_COMMUNITY)
     HdiTestDevice::GetInstance().GetFirstDisplay()->ResetClientLayer();
+#endif
 }
 
 void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, const void* data)
