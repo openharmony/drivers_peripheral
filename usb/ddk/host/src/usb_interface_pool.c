@@ -176,11 +176,11 @@ static HDF_STATUS IfFreeInterfacePool(struct UsbInterfacePool *interfacePool)
         return ret;
     }
     OsalMutexDestroy(&interfacePool->interfaceLock);
+    OsalMutexDestroy(&interfacePool->ioStopLock);
     interfacePool->busNum = 0;
     interfacePool->devAddr = 0;
 
     RawUsbMemFree(interfacePool);
-    OsalMutexDestroy(&interfacePool->ioStopLock);
     return ret;
 }
 
