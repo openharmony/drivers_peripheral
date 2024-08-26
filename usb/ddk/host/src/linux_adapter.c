@@ -487,7 +487,7 @@ static int32_t OsSubmitBulkRequestHandleUrb(
     urb->buffer = request->buffer + (number * bulkBufferLen);
     if (number == request->numUrbs - 1) {
         uint32_t len = request->length % (uint32_t)(bulkBufferLen);
-        urb->bufferLength = (int32_t)(len == 0) ? bulkBufferLen : len;
+        urb->bufferLength = (int32_t)(len == 0) ? bulkBufferLen : (int32_t)len;
     } else {
         urb->bufferLength = bulkBufferLen;
     }
@@ -551,7 +551,7 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
 
     if (request->devHandle->caps & USB_ADAPTER_CAP_BULK_SCATTER_GATHER) {
         // The 1 is to prevent division by zero errors
-        bulkBufferLen = (int32_t)request->length ? request->length : 1;
+        bulkBufferLen = (int32_t)request->length ? (int32_t)request->length : 1;
     } else if (request->devHandle->caps & USB_ADAPTER_CAP_BULK_CONTINUATION) {
         bulkBufferLen = MAX_BULK_DATA_BUFFER_LENGTH;
     } else if (request->devHandle->caps & USB_ADAPTER_CAP_NO_PACKET_SIZE_LIM) {
@@ -560,7 +560,7 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
     } else {
         bulkBufferLen = MAX_BULK_DATA_BUFFER_LENGTH;
     }
-    numUrbs = request->length / bulkBufferLen;
+    numUrbs = (int32_t)request->length / bulkBufferLen;
     if ((request->length % bulkBufferLen) > 0) {
         numUrbs++;
     }
