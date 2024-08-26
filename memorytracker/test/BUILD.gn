@@ -24,14 +24,11 @@ memorytracker_external_deps = [
   "ipc:ipc_core",
 ]
 
-memmgr_public_deps = [ "//third_party/googletest:gtest_main" ]
-
 ohos_unittest("memorytracker_test") {
   module_out_path = module_output_path
   sources = [ "unittest/phone/hdf_memorytracker_test.cpp" ]
   if (is_standard_system) {
     external_deps = memorytracker_external_deps
-    public_deps = memmgr_public_deps
   }
 }
 group("memorytracker_unittest") {
