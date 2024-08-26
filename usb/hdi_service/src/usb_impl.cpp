@@ -416,8 +416,7 @@ int32_t UsbImpl::UsbdFindRequestSyncAndCreatwithLength(HostDevice *port, uint8_t
             *request = requestSync;
             return HDF_SUCCESS;
         } else {
-            HdfSListRemove(&port->reqASyncList, &requestSync->node);
-            UsbdDispatcher::UsbdRequestSyncRelease(requestSync);
+            UsbdRequestSyncReleaseList(port);
             HDF_LOGD("%{public}s:ifId:%{public}u, epId:%{public}u,realloc reqeustsync.",
                 __func__, interfaceId, pipeAddr);
         }
@@ -1379,31 +1378,37 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    UsbInterfaceHandle *interfaceHandle = InterfaceIdToHandle(port, interfaceId);
-    if (interfaceHandle == nullptr || interfaceId >= USB_MAX_INTERFACES) {
+    if (interfaceId < USB_MAX_INTERFACES) {
+        if (HdfSListCount(&port->reqSyncList) > 0) {
+            UsbdRequestSyncReleaseList(port);
+            HDF_LOGD("%{public}s:release sync list", __func__);
+        }
+        if (HdfSListCount(&port->reqASyncList) > 0) {
+            UsbdRequestASyncReleaseList(port);
+            HDF_LOGD("%{public}s:release async list", __func__);
+        }
+
+        int32_t ret = UsbdBulkASyncListReleasePort(port);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s:release bulk async list failed", __func__);
+        }
+        if (port->iface[interfaceId] != nullptr) {
+            UsbReleaseInterface(port->iface[interfaceId]);
+            port->iface[interfaceId] = nullptr;
+        }
+
+        if (port->devHandle[interfaceId] != nullptr) {
+            UsbCloseInterface(port->devHandle[interfaceId], false);
+            port->devHandle[interfaceId] = nullptr;
+        }
+        return HDF_SUCCESS;
+    } else {
         HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
             port->busNum, port->devAddr, interfaceId);
         return HDF_FAILURE;
     }
-    
-    struct UsbInterface *interface = nullptr;
-    int32_t ret = GetInterfaceByHandle(interfaceHandle, &interface);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s get interface failed %{public}d", __func__, ret);
-        return ret;
-    }
 
-    ret = UsbCloseInterface(interfaceHandle, false);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s close interface failed %{public}d", __func__, ret);
-        return ret;
-    }
-
-    ret = UsbReleaseInterface(interface);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:ReleaseInterface failed, ret = %{public}d", __func__, ret);
-    }
-    return ret;
+    return HDF_SUCCESS;
 }
 
 int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex)
