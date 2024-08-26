@@ -349,6 +349,7 @@ static int32_t UsbFnAdapterCreatInterface(const char *interfaceName, int32_t nam
     ret = ioctl(fd, FUNCTIONFS_NEWFN, &fnnew);
     if (ret != 0) {
         HDF_LOGE("%{public}s: FUNCTIONFS_NEWFN failed", __func__);
+        UsbFnAdapterClosefn(fd);
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterClosefn(fd);
