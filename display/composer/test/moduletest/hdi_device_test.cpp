@@ -385,7 +385,7 @@ void DeviceTest::TearDown()
 void DeviceLayerDisplay::TearDown()
 {
     HdiTestDevice::GetInstance().Clear();
-#if !defined(DISPLAY_COMMUNITY)
+#ifndef DISPLAY_COMMUNITY
     HdiTestDevice::GetInstance().GetFirstDisplay()->ResetClientLayer();
 #endif
 }
