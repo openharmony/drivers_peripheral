@@ -40,9 +40,10 @@
                 "drivers_interface_audio",
                 "bounds_checking_function",
                 "hitrace",
-                "hicollie"
+                "hicollie",
+                "alsa-lib"
             ],
-            "third_party": [ "alsa-lib" ]
+            "third_party": []
         },
         "build": {
             "sub_component": [
