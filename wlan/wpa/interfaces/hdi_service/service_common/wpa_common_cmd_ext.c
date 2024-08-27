@@ -249,6 +249,7 @@ static int32_t StopWpaSupplicant(void)
 int32_t WpaInterfaceStop(struct IWpaInterface *self)
 {
     int32_t ret;
+    int32_t times = 0;
 
     (void)self;
     pthread_mutex_lock(GetInterfaceLock());
@@ -258,6 +259,15 @@ int32_t WpaInterfaceStop(struct IWpaInterface *self)
         HDF_LOGE("%{public}s: Wifi stop failed, error code: %{public}d", __func__, ret);
         pthread_mutex_unlock(GetInterfaceLock());
         return HDF_FAILURE;
+    }
+    while (g_tid != 0) {
+        HDF_LOGI("%{public}s: wpa_supplicant is not stop!", __func__);
+        usleep(WPA_SLEEP_TIME);
+        times++;
+        if (times > MAX_WPA_WAIT_TIMES) {
+            HDF_LOGE("%{public}s: wait supplicant stop time out!", __func__);
+            break;
+        }
     }
     ReleaseWifiStaInterface(0);
     pthread_mutex_unlock(GetInterfaceLock());
