@@ -1014,7 +1014,7 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev, uint8_t c
     struct UsbDeviceConfigDescriptor *config = NULL;
     uint8_t i;
 
-    if (dev == NULL || buffer == NULL || (configIndex > dev->deviceDescriptor.bNumConfigurations)) {
+    if (dev == NULL || buffer == NULL) {
         HDF_LOGE("%{public}s:%{public}d Invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
