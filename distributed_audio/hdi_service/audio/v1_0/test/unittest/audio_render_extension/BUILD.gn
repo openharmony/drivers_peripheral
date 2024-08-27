@@ -1,0 +1,68 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/hdi/hdi.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("../../../../../../distributedaudio.gni")
+
+module_out_path = "distributed_audio/hdf_service/hdi_service/audio"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "include",
+    "${hdf_ser_aud_path}/include",
+    "${hdf_ser_aud_path}/test/unittest/audio_test_utils",
+    "${hdf_service_path}/hdi_service/common/include",
+    "${hdf_service_path}/hdi_service/common/log/include",
+    "${hdf_service_path}/hdi_service/common/utils/include",
+  ]
+}
+
+## UnitTest hdi_service_audio_v1_0_test
+ohos_unittest("HDIServiceAudioRenderExtTest") {
+  module_out_path = module_out_path
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "${hdf_ser_aud_path}/test/unittest/audio_render_extension/src/audio_render_ext_impl_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  public_deps =
+      [ "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0" ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "drivers_interface_distributed_audio:libdaudio_stub_1.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_2.0",
+    "googletest:gmock",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+group("hdi_service_audio_Render_ext_test") {
+  testonly = true
+  deps = [ ":HDIServiceAudioRenderExtTest" ]
+}

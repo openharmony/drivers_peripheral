@@ -22,24 +22,14 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
     "${hdf_service_path}/hdi_service/common/utils/include",
   ]
 
-  if (drivers_peripheral_distributed_audio_extension) {
-    include_dirs +=
-        [ "${distributedaudio_ext_path}/hdf_service_extension/include/" ]
-  }
-
   sources = [
     "./src/audio_adapter_interface_impl.cpp",
+    "./src/audio_capture_ext_impl.cpp",
     "./src/audio_capture_interface_impl.cpp",
     "./src/audio_manager_interface_impl.cpp",
+    "./src/audio_render_ext_impl.cpp",
     "./src/audio_render_interface_impl.cpp",
   ]
-
-  if (drivers_peripheral_distributed_audio_extension) {
-    sources += [
-      "${distributedaudio_ext_path}/hdf_service_extension/src/audio_capture_ext_impl.cpp",
-      "${distributedaudio_ext_path}/hdf_service_extension/src/audio_render_ext_impl.cpp",
-    ]
-  }
 
   public_deps = [ "${hdf_service_path}/hdi_service/common:libdaudio_hdf_utils" ]
 
