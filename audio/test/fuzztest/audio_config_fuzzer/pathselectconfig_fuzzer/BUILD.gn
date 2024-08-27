@@ -31,12 +31,12 @@ ohos_fuzztest("PathSelectConfigFuzzTest") {
     "$hdf_audio_path/hal/pathselect/include",
     "$hdf_audio_path/hal/hdi_passthrough/include",
     "$hdf_audio_path/interfaces/include",
-    "//third_party/cJSON/",
   ]
 
-  deps = [ "//third_party/cJSON:cjson" ]
-
-  external_deps = [ "hdf_core:libhdf_utils" ]
+  external_deps = [
+    "cJSON:cjson",
+    "hdf_core:libhdf_utils",
+  ]
   if (defined(ohos_lite)) {
     external_deps += [ "hilog_lite:hilog_share" ]
   } else {
