@@ -58,20 +58,20 @@ static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, enum AudioPor
 static int32_t RenderGetVolThresholdImpl(struct AlsaRender *renderIns, long *volMin, long *volMax)
 {
     int32_t ret;
-    long _volMin = 0;
-    long _volMax = 0;
+    long volMin = 0;
+    long volMax = 0;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
     RenderData *priData = RenderGetPriData(renderIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(priData);
 
-    ret = SndElementReadRange(cardIns, &priData->ctrlLeftVolume, &_volMin, &_volMax);
+    ret = SndElementReadRange(cardIns, &priData->ctrlLeftVolume, &volMin, &volMax);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("SndElementReadRange fail!");
         return HDF_FAILURE;
     }
-    *volMin = _volMin;
-    *volMax = _volMax;
+    *volMin = volMin;
+    *volMax = volMax;
     
     return HDF_SUCCESS;
 }
