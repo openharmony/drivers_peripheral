@@ -79,9 +79,8 @@ if (defined(ohos_lite)) {
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_soundcard.c",
       ]
       if (defined(is_emulator) && is_emulator) {
-        sources += [
-          "$hdf_audio_path/supportlibs/alsa_adapter/src/vendor_capture.c",
-        ]
+        sources +=
+            [ "$hdf_audio_path/supportlibs/alsa_adapter/src/vendor_capture.c" ]
       } else {
         sources += [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_capture.c" ]
       }
@@ -154,9 +153,8 @@ if (defined(ohos_lite)) {
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_soundcard.c",
       ]
       if (defined(is_emulator) && is_emulator) {
-        sources += [
-          "$hdf_audio_path/supportlibs/alsa_adapter/src/vendor_render.c",
-        ]
+        sources +=
+            [ "$hdf_audio_path/supportlibs/alsa_adapter/src/vendor_render.c" ]
       } else {
         sources += [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_render.c" ]
       }
