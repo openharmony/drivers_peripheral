@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2024 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,10 +13,13 @@
  * limitations under the License.
  */
 
-#include "imageallocateinbuffer_fuzzer.h"
+#include "imagedoheifencode_fuzzer.h"
 #include <hdf_log.h>
 #include <image_auto_initer.h>
+#include <securec.h>
 #include <vector>
+#include "image_common.h"
+#include "encode_heif_helper.h"
 #include "v2_0/icodec_image.h"
 using namespace OHOS::HDI::Codec::Image::V2_0;
 using namespace OHOS;
@@ -24,10 +27,11 @@ using namespace std;
 namespace OHOS {
 namespace Codec {
 namespace Image {
-bool AllocateInBuffer(const uint8_t *data, size_t size)
+
+
+bool DoHeifEncode(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size < sizeof(unsigned int)) {
-        HDF_LOGE("%{public}s: data %p, size %zu\n", __func__, data, size);
         return false;
     }
 
@@ -38,19 +42,38 @@ bool AllocateInBuffer(const uint8_t *data, size_t size)
     }
     CodecImageRole role = CodecImageRole(*data);
     ImageAutoIniter autoIniter(image, role);
+    
+    uint8_t *rawData = const_cast<uint8_t *>(data);
+    uint8_t decision = (*rawData) % 2;
+    rawData += sizeof(decision);
 
-    CodecImageBuffer inBuffer;
-    auto srcData = const_cast<uint8_t *>(data);
-    unsigned int bufferSize = *reinterpret_cast<unsigned int *>(srcData);
-    auto err = image->AllocateInBuffer(inBuffer, bufferSize, role);
-    if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s AllocateInBuffer return %{public}d", __func__, err);
+    OHOS::VDI::HEIF::HeifEncodeHelper heifHelper;
+    heifHelper.Reset();
+
+    if (decision) {
+        if (!heifHelper.AssembleParamForTmap(rawData, size)) {
+            HDF_LOGE("%{public}s: AssembleParamForTmap failed\n", __func__);
+            return false;
+        }
+    } else {
+        if (!heifHelper.AssembleParamForPrimaryImg(rawData, size)) {
+            HDF_LOGE("%{public}s: AssembleParamForPrimaryImg failed\n", __func__);
+            return false;
+        }
+    }
+
+    SharedBuffer output;
+    if (!heifHelper.AllocOutputBuffer(output)) {
+        HDF_LOGE("%{public}s: AllocOutputBuffer failed\n", __func__);
         return false;
     }
-    err = image->FreeInBuffer(inBuffer);
+    uint32_t filledLen = 0;
+
+    auto err = image->DoHeifEncode(heifHelper.inputImgs_, heifHelper.inputMetas_, heifHelper.refs_, output, filledLen);
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s FreeInBuffer return %{public}d", __func__, err);
+        HDF_LOGE("%{public}s: DOHeifEncode return %{public}d", __func__, err);
     }
+
     return true;
 }
 }  // namespace Image
@@ -59,6 +82,6 @@ bool AllocateInBuffer(const uint8_t *data, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    OHOS::Codec::Image::AllocateInBuffer(data, size);
+    OHOS::Codec::Image::DoHeifEncode(data, size);
     return 0;
 }

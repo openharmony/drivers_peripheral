@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V1_0_CODECJPEGSERVICE_H
-#define OHOS_HDI_CODEC_V1_0_CODECJPEGSERVICE_H
+#ifndef OHOS_HDI_CODEC_V2_0_CODECJPEGSERVICE_H
+#define OHOS_HDI_CODEC_V2_0_CODECJPEGSERVICE_H
 
 #include <map>
 #include <mutex>
@@ -26,7 +26,7 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V1_0 {
+namespace V2_0 {
 class CodecJpegService {
 public:
     explicit CodecJpegService();
@@ -53,10 +53,10 @@ private:
     std::mutex initMutex_;
     std::unique_ptr<CodecJpegCore> core_;
 };
-} // V1_0
+} // V2_0
 } // Image
 } // Codec
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_CODEC_V1_0_CODECJPEGSERVICE_H
+#endif // OHOS_HDI_CODEC_V2_0_CODECJPEGSERVICE_H
