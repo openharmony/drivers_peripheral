@@ -36,9 +36,6 @@
 #define SLEEP_DELAY 100000
 #define OPEN_CNT    30
 
-static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
-static bool g_usbRamTestFlag = false;
-
 static bool IsDirExist(const char *path)
 {
     DIR *dir = NULL;
@@ -346,11 +343,13 @@ static int32_t UsbFnAdapterCreatInterface(const char *interfaceName, int32_t nam
     ret = snprintf_s(fnnew.name, MAX_NAMELEN, MAX_NAMELEN - 1, "%s", interfaceName);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        UsbFnAdapterClosefn(fd);
         return HDF_ERR_IO;
     }
     ret = ioctl(fd, FUNCTIONFS_NEWFN, &fnnew);
     if (ret != 0) {
         HDF_LOGE("%{public}s: FUNCTIONFS_NEWFN failed", __func__);
+        UsbFnAdapterClosefn(fd);
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterClosefn(fd);
@@ -1221,36 +1220,6 @@ void *UsbFnMemCalloc(size_t size)
         return NULL;
     }
 
-    if (g_usbRamTestFlag) {
-        if (g_usbRamTestHead == NULL) {
-            g_usbRamTestHead = OsalMemCalloc(sizeof(struct RawUsbRamTestList));
-            if (g_usbRamTestHead == NULL) {
-                HDF_LOGE("%{public}s: %{public}d, OsalMemCalloc failed", __func__, __LINE__);
-                OsalMemFree(buf);
-                return NULL;
-            }
-            OsalMutexInit(&g_usbRamTestHead->lock);
-            DListHeadInit(&g_usbRamTestHead->list);
-        }
-        struct RawUsbRamTestList *testEntry = OsalMemCalloc(sizeof(struct RawUsbRamTestList));
-        if (testEntry == NULL) {
-            HDF_LOGE("%{public}s: %{public}d, OsalMemCalloc failed", __func__, __LINE__);
-            OsalMemFree(buf);
-            return NULL;
-        }
-        testEntry->address = (uintptr_t)buf;
-        testEntry->size = size;
-
-        struct RawUsbRamTestList *pos = NULL;
-        uint32_t totalSize = 0;
-        OsalMutexLock(&g_usbRamTestHead->lock);
-        DListInsertTail(&testEntry->list, &g_usbRamTestHead->list);
-        DLIST_FOR_EACH_ENTRY(pos, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            totalSize += pos->size;
-        }
-        OsalMutexUnlock(&g_usbRamTestHead->lock);
-        HDF_LOGI("%{public}s:add size = %{public}zu, totalSize = %{public}u", __func__, size, totalSize);
-    }
     return buf;
 }
 
@@ -1261,35 +1230,10 @@ void UsbFnMemFree(const void *mem)
         return;
     }
 
-    if (g_usbRamTestFlag && g_usbRamTestHead != NULL) {
-        struct RawUsbRamTestList *pos = NULL;
-        struct RawUsbRamTestList *tmp = NULL;
-        uint32_t totalSize = 0;
-        uint32_t size = 0;
-        OsalMutexLock(&g_usbRamTestHead->lock);
-        DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if (pos->address == (uintptr_t)mem) {
-                size = pos->size;
-                DListRemove(&pos->list);
-                OsalMemFree(pos);
-                continue;
-            }
-            totalSize += pos->size;
-        }
-        OsalMutexUnlock(&g_usbRamTestHead->lock);
-        HDF_LOGI("%{public}s:rm size = %{public}u, totalSize = %{public}u", __func__, size, totalSize);
-    }
-
     if (mem != NULL) {
         OsalMemFree((void *)mem);
         mem = NULL;
     }
-}
-
-int32_t UsbFnAdpMemTestTrigger(bool enable)
-{
-    g_usbRamTestFlag = enable;
-    return HDF_SUCCESS;
 }
 
 static struct UsbFnAdapterOps g_usbFnAdapter = {
