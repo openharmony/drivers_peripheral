@@ -238,6 +238,5 @@ struct UsbFnAdapterOps *UsbFnAdapterGetOps(void);
 void *UsbFnMemAlloc(size_t size);
 void *UsbFnMemCalloc(size_t size);
 void UsbFnMemFree(const void *mem);
-int32_t UsbFnAdpMemTestTrigger(bool enable);
 
 #endif /* USBFN_ADAPTER_H */

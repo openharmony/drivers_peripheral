@@ -136,7 +136,6 @@ void RawRequestListInit(struct UsbDevice *deviceObj);
 void *RawUsbMemAlloc(size_t size);
 void *RawUsbMemCalloc(size_t size);
 void RawUsbMemFree(void *mem);
-int32_t RawUsbMemTestTrigger(bool enable);
 int32_t RawClaimInterfaceForce(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
 void RawAttachKernelDriver(struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
 int32_t RawAttachInterface(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
