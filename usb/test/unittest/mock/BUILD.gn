@@ -24,7 +24,6 @@ config("module_private_config") {
     "./../../../hdi_service/include",
     "./../../../ddk/host/include",
     "./../../../gadget/function/include",
-    "//third_party/googletest/googlemock/include",
     "${usb_driver_path}/test/UsbSubscriberTest",
     "${usb_driver_path}/utils/include",
   ]
@@ -41,14 +40,14 @@ ohos_unittest("transfer_auto_test") {
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
     "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_usb:libusb_proxy_1.0",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -75,14 +74,14 @@ ohos_unittest("device_auto_test") {
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
     "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_usb:libusb_proxy_1.0",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -103,14 +102,14 @@ ohos_unittest("request_auto_test") {
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
     "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_usb:libusb_proxy_1.0",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -128,14 +127,14 @@ ohos_unittest("function_auto_test") {
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
     "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_usb:libusb_proxy_1.0",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",

@@ -30,10 +30,7 @@ config("module_private_config") {
 ohos_unittest("composer_ut") {
   module_out_path = module_output_path
   sources = [ "hdi_composer_ut.cpp" ]
-  include_dirs = [
-    "../common",
-    "//commonlibrary/c_utils/base/include",
-  ]
+  include_dirs = [ "../common" ]
   deps = [ "../common:disp_dev_hdi_test_common" ]
   external_deps = [
     "c_utils:utils",

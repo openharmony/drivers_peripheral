@@ -21,6 +21,6 @@
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN
 #endif
-#define LOG_DOMAIN 0xD002511
+#define LOG_DOMAIN 0xD002555
 
 #endif //MOTION_UHDF_LOG_H

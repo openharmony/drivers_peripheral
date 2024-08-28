@@ -31,10 +31,8 @@
 #include "wifi_display.h"
 #include "bssid_ignore.h"
 #include "config.h"
-
 #include "v1_1/iwpa_callback.h"
 #include "v1_1/iwpa_interface.h"
-
 #include "wpa_p2p_hal.h"
 
 #define HEX_TO_DEC_MOVING 4
@@ -119,16 +117,20 @@ int32_t WpaInterfaceP2pSetSsidPostfixName(struct IWpaInterface *self, const char
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetSsidPostfixName(pMainIfc, name);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -141,16 +143,20 @@ int32_t WpaInterfaceP2pSetWpsDeviceType(struct IWpaInterface *self, const char *
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetWpsDeviceType(pMainIfc, type);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -163,16 +169,20 @@ int32_t WpaInterfaceP2pSetWpsConfigMethods(struct IWpaInterface *self, const cha
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetWpsConfigMethods(pMainIfc, methods);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -185,21 +195,26 @@ int32_t WpaInterfaceP2pSetGroupMaxIdle(struct IWpaInterface *self, const char *i
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     WifiWpaP2pGroupInterface *pGroupIfc = GetWifiWpaP2pGroupInterface(ifName);
     if (pGroupIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pGroupIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pGroupIfc->wpaP2pCliCmdSetGroupIdle(pGroupIfc, time);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -209,16 +224,20 @@ int32_t WpaInterfaceP2pSetWfdEnable(struct IWpaInterface *self, const char *ifNa
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetWfdEnable(pMainIfc, enable);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -228,16 +247,20 @@ int32_t WpaInterfaceP2pSetPersistentReconnect(struct IWpaInterface *self, const 
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetPersistentReconnect(pMainIfc, status);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -250,16 +273,20 @@ int32_t WpaInterfaceP2pSetWpsSecondaryDeviceType(struct IWpaInterface *self, con
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetWpsSecDeviceType(pMainIfc, type);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -272,21 +299,26 @@ int32_t WpaInterfaceP2pSetupWpsPbc(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     WifiWpaP2pGroupInterface *pGroupIfc = GetWifiWpaP2pGroupInterface(ifName);
     if (pGroupIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pGroupIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pGroupIfc->wpaP2pCliCmdWpsPbc(pGroupIfc, address);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -301,8 +333,16 @@ int32_t WpaInterfaceP2pSetupWpsPin(struct IWpaInterface *self, const char *ifNam
         return HDF_FAILURE;
     }
 
-    P2pWpsPinDisplayArgv p2pWpsPinDisplay;
-    if (memset_s(&p2pWpsPinDisplay, sizeof(p2pWpsPinDisplay), 0, sizeof(p2pWpsPinDisplay)) != EOK) {
+    P2pWpsPinDisplayArgv p2pWpsPinDisplay = {0};
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
+    WifiWpaP2pGroupInterface *pGroupIfc = GetWifiWpaP2pGroupInterface(ifName);
+    if (pMainIfc == NULL || pGroupIfc == NULL) {
+        HDF_LOGE("%{public}s: pMainIfc or pGroupIfc is null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    P2pSupplicantErrCode ret = pGroupIfc->wpaP2pCliCmdWpsPin(pGroupIfc, &p2pWpsPinDisplay);
+    if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        HDF_LOGE("WpaP2pCliCmdWpsPin fail, ret = %{public}d", ret);
         return HDF_FAILURE;
     }
     if (strlen(pin) > 0) {
@@ -313,29 +353,9 @@ int32_t WpaInterfaceP2pSetupWpsPin(struct IWpaInterface *self, const char *ifNam
         }
     } else {
         p2pWpsPinDisplay.mode = P2P_PIN_DISPLAY;
-        if (strncpy_s(p2pWpsPinDisplay.bssid, sizeof(p2pWpsPinDisplay.bssid), address, strlen(address)) != EOK) {
+        if ((strncpy_s(p2pWpsPinDisplay.bssid, sizeof(p2pWpsPinDisplay.bssid), address, strlen(address)) != EOK) ||
+            (strncpy_s(result, resultLen, p2pWpsPinDisplay.pinCode, strlen(p2pWpsPinDisplay.pinCode)) != EOK)) {
             HDF_LOGE("%{public}s: Failed to init request message, the input message may be invalid!", __func__);
-            return HDF_FAILURE;
-        }
-    }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
-    if (pMainIfc == NULL) {
-        HDF_LOGE("%{public}s: pMainIfc is null", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    WifiWpaP2pGroupInterface *pGroupIfc = GetWifiWpaP2pGroupInterface(ifName);
-    if (pGroupIfc == NULL) {
-        HDF_LOGE("%{public}s: pGroupIfc is null", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    P2pSupplicantErrCode ret = pGroupIfc->wpaP2pCliCmdWpsPin(pGroupIfc, &p2pWpsPinDisplay);
-    if (ret != P2P_SUP_ERRCODE_SUCCESS) {
-        HDF_LOGE("WpaP2pCliCmdWpsPin fail, ret = %{public}d", ret);
-        return HDF_FAILURE;
-    }
-    if (p2pWpsPinDisplay.mode == P2P_PIN_DISPLAY) {
-        if (strncpy_s(result, resultLen, p2pWpsPinDisplay.pinCode, strlen(p2pWpsPinDisplay.pinCode)) != EOK) {
-            HDF_LOGE("%{public}s: Failed to return pin code!", __func__);
             return HDF_FAILURE;
         }
     }
@@ -351,21 +371,26 @@ int32_t WpaInterfaceP2pSetPowerSave(struct IWpaInterface *self, const char *ifNa
         HDF_LOGE("P2pSetPowerSave, groupIfc is NULL");
         return HDF_FAILURE;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     WifiWpaP2pGroupInterface *pGroupIfc = GetWifiWpaP2pGroupInterface(ifName);
     if (pGroupIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pGroupIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pGroupIfc->wpaP2pCliCmdSetPowerSave(pGroupIfc, enable);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -378,16 +403,20 @@ int32_t WpaInterfaceP2pSetDeviceName(struct IWpaInterface *self, const char *ifN
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetWpsName(pMainIfc, name);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -400,16 +429,20 @@ int32_t WpaInterfaceP2pSetWfdDeviceConfig(struct IWpaInterface *self, const char
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetWfdDeviceInfo(pMainIfc, config);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -419,16 +452,20 @@ int32_t WpaInterfaceP2pSetRandomMac(struct IWpaInterface *self, const char *ifNa
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetRandomMac(pMainIfc, networkId);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -438,16 +475,20 @@ int32_t WpaInterfaceP2pStartFind(struct IWpaInterface *self, const char *ifName,
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdP2pFound(pMainIfc, timeout);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -458,16 +499,20 @@ int32_t WpaInterfaceP2pSetExtListen(struct IWpaInterface *self, const char *ifNa
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdExtListen(pMainIfc, enable, period, interval);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -478,16 +523,20 @@ int32_t WpaInterfaceP2pSetListenChannel(struct IWpaInterface *self, const char *
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetListenChannel(pMainIfc, channel, regClass);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -501,23 +550,28 @@ int32_t WpaInterfaceP2pProvisionDiscovery(struct IWpaInterface *self, const char
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     P2pProvisionDiscoveryArgv p2pProvision;
     if (memset_s(&p2pProvision, sizeof(p2pProvision), 0, sizeof(p2pProvision)) != EOK ||
         strncpy_s(p2pProvision.peerbssid, sizeof(p2pProvision.peerbssid), peerBssid, strlen(peerBssid)) != EOK) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("Failed to init request message, the input message may be invalid!");
         return HDF_FAILURE;
     }
     p2pProvision.mode = mode;
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdProvisionDiscovery(pMainIfc, &p2pProvision);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -528,16 +582,20 @@ int32_t WpaInterfaceP2pAddGroup(struct IWpaInterface *self, const char *ifName, 
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdGroupAdd(pMainIfc, isPersistent, networkId, freq);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -551,16 +609,20 @@ int32_t WpaInterfaceP2pAddService(struct IWpaInterface *self, const char *ifName
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdServiceAdd(pMainIfc, info);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -574,16 +636,20 @@ int32_t WpaInterfaceP2pRemoveService(struct IWpaInterface *self, const char *ifN
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdServiceDel(pMainIfc, info);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -593,16 +659,20 @@ int32_t WpaInterfaceP2pStopFind(struct IWpaInterface *self, const char *ifName)
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdP2pStopFind(pMainIfc);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -612,16 +682,20 @@ int32_t WpaInterfaceP2pFlush(struct IWpaInterface *self, const char *ifName)
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdFlush(pMainIfc);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -631,16 +705,20 @@ int32_t WpaInterfaceP2pFlushService(struct IWpaInterface *self, const char *ifNa
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdFlushService(pMainIfc);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -650,16 +728,20 @@ int32_t WpaInterfaceP2pRemoveNetwork(struct IWpaInterface *self, const char *ifN
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdRemoveNetwork(pMainIfc, networkId);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -676,16 +758,20 @@ int32_t WpaInterfaceP2pSetGroupConfig(struct IWpaInterface *self, const char *if
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s SET_NETWORK %d %s %s",
         ifName, networkId, name, value);
     if (ret < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
         return HDF_FAILURE;
     }
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s command failed!", __func__);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -699,25 +785,30 @@ int32_t WpaInterfaceP2pInvite(struct IWpaInterface *self, const char *ifName,
         HDF_LOGE("%{public}s: peerBssid, goBssid and ifname have NULL", __func__);
         return HDF_FAILURE;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     P2pHalInviteArgv p2pHalInvite;
     if (memset_s(&p2pHalInvite, sizeof(p2pHalInvite), 0, sizeof(p2pHalInvite)) != EOK ||
         strncpy_s(p2pHalInvite.peerbssid, sizeof(p2pHalInvite.peerbssid), peerBssid, strlen(peerBssid)) != EOK ||
         strncpy_s(p2pHalInvite.gobssid, sizeof(p2pHalInvite.gobssid), goBssid, strlen(goBssid)) != EOK ||
         strncpy_s(p2pHalInvite.ifname, sizeof(p2pHalInvite.ifname), ifName, strlen(ifName)) != EOK) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("Failed to init request message, the input message may be invalid!");
         return HDF_FAILURE;
     }
     p2pHalInvite.persistent = 0;
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdInvite(pMainIfc, &p2pHalInvite);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -731,23 +822,28 @@ int32_t WpaInterfaceP2pReinvoke(struct IWpaInterface *self, const char *ifName, 
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     P2pHalReInviteArgv p2pHalReInvite;
     if (memset_s(&p2pHalReInvite, sizeof(p2pHalReInvite), 0, sizeof(p2pHalReInvite)) != EOK ||
         strncpy_s(p2pHalReInvite.peerbssid, sizeof(p2pHalReInvite.peerbssid), bssid, strlen(bssid)) != EOK) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("Failed to init request message, the input message may be invalid!");
         return HDF_FAILURE;
     }
     p2pHalReInvite.networkId = networkId;
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdReInvite(pMainIfc, &p2pHalReInvite);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -761,16 +857,20 @@ int32_t WpaInterfaceP2pGetDeviceAddress(struct IWpaInterface *self, const char *
         return HDF_ERR_INVALID_PARAM;
     }
     (void)self;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdGetDeviceAddress(pMainIfc, deviceAddress, deviceAddressLen);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -785,21 +885,26 @@ int32_t WpaInterfaceP2pReqServiceDiscovery(struct IWpaInterface *self, const cha
     }
     (void)self;
     char seq[WIFI_P2P_SERVER_DISCOVERY_SEQUENCE_LENGTH] = {0};
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdServDiscReq(pMainIfc, (char *)reqService->bssid,
         (char *)reqService->msg, seq, sizeof(seq));
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
     if (strncpy_s(replyDisc, replyDiscLen, seq, strlen(seq)) != EOK) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail", __func__);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -812,16 +917,20 @@ int32_t WpaInterfaceP2pCancelServiceDiscovery(struct IWpaInterface *self, const 
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdServDiscCancelReq(pMainIfc, id);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -835,16 +944,20 @@ int32_t WpaInterfaceP2pRespServerDiscovery(struct IWpaInterface *self, const cha
         return HDF_ERR_INVALID_PARAM;
     }
     (void)self;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdRespServerDiscovery(pMainIfc, info);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("WpaP2pCliCmdRespServerDiscovery fail, ret = %{public}d", ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -857,6 +970,7 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     char *reply;
     const int replySize = REPLY_SIZE;
     char cmd[CMD_SIZE] = {0};
@@ -865,17 +979,20 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
     char pin[CMD_SIZE] = {0};
     char peerDevAddr[CMD_SIZE] = {0};
     if (memcpy_s(pin, CMD_SIZE, info->pin, CMD_SIZE) != EOK) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s strcpy failed", __func__);
         return HDF_FAILURE;
     }
 
     if (memcpy_s(peerDevAddr, CMD_SIZE, info->peerDevAddr, CMD_SIZE) != EOK) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s strcpy failed", __func__);
         return HDF_FAILURE;
     }
 
     reply = (char *)malloc(replySize);
     if (reply == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s reply is NULL!", __func__);
         return HDF_FAILURE;
     }
@@ -889,6 +1006,7 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
         }
     } else {
         if (snprintf_s(join, sizeof(join), sizeof(join) - 1, " go_intent=%d", info->goIntent) < 0) {
+            pthread_mutex_unlock(GetInterfaceLock());
             HDF_LOGE("%{public}s input parameter invalid!", __func__);
             free(reply);
             return HDF_ERR_INVALID_PARAM;
@@ -908,6 +1026,7 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
             HDF_LOGE("%{public}s strcpy failed", __func__);
         }
     } else {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s Mode value is invalid %{public}d!", __func__, info->provdisc);
         free(reply);
         return HDF_ERR_INVALID_PARAM;
@@ -916,33 +1035,37 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
     char persistent[CMD_SIZE] = {0};
     if (info->peerDevAddr && strlen(peerDevAddr) >= MIN_MAC_LEN) {
         ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_CONNECT %s %s%s%s%s", ifName,
-            macToStr(info->peerDevAddr), pin, mode, persistent, join);
+            MacToStr(info->peerDevAddr), pin, mode, persistent, join);
     }
     if (ret < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
         free(reply);
         return HDF_FAILURE;
     }
 
     if (WpaCliCmd(cmd, reply, REPLY_SIZE) != 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("P2P_CONNECT command failed!");
         free(reply);
         return HDF_FAILURE;
     }
 
     if (strncmp(reply, "FAIL", strlen("FAIL")) == 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s P2p connect return %{public}s", __func__, reply);
         free(reply);
         return HDF_FAILURE;
     }
     if (info->provdisc == P2P_WPS_METHOD_DISPLAY && strcmp((char *)info->pin, "pin") == 0) {
         if (strncpy_s(replyPin, replyPinLen, reply, strlen(reply)) != 0) {
+            pthread_mutex_unlock(GetInterfaceLock());
             HDF_LOGE("%{public}s Failed to copy response pin code info!", __func__);
             free(reply);
             return HDF_FAILURE;
         }
     }
-
+    pthread_mutex_unlock(GetInterfaceLock());
     free(reply);
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
@@ -956,7 +1079,7 @@ int32_t WpaInterfaceP2pHid2dConnect(struct IWpaInterface *self, const char *ifNa
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(GetInterfaceLock());
     char cmd[CMD_SIZE];
     char buf[CMD_SIZE];
     (void)self;
@@ -968,19 +1091,22 @@ int32_t WpaInterfaceP2pHid2dConnect(struct IWpaInterface *self, const char *ifNa
     }
     HDF_LOGI("hid2dconnect freq=%{public}d, isLegacyGo=%{public}d", freq, isLegacyGo);
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s MAGICLINK \"%s\"\n%s\n\"%s\"\n%d\n%d", ifName,
-            (char *)info->ssid, macToStr(info->bssid), (char *)info->passphrase, freq, isLegacyGo) < 0) {
+            (char *)info->ssid, MacToStr(info->bssid), (char *)info->passphrase, freq, isLegacyGo) < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s.", __func__, cmd);
         return HDF_FAILURE;
     }
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("hid2d_connect command failed!");
         return HDF_FAILURE;
     }
     if (strncmp(buf, "FAIL", strlen("FAIL")) == 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: return %{public}s", __func__, buf);
         return HDF_FAILURE;
     }
-
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -990,16 +1116,20 @@ int32_t WpaInterfaceP2pSetServDiscExternal(struct IWpaInterface *self, const cha
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdSetServDiscExternal(pMainIfc, mode);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("WpaP2pCliCmdSetServDiscExternal fail, ret = %{public}d", ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -1012,16 +1142,20 @@ int32_t WpaInterfaceP2pRemoveGroup(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdP2pRemoveGroup(pMainIfc, groupName);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -1031,16 +1165,20 @@ int32_t WpaInterfaceP2pCancelConnect(struct IWpaInterface *self, const char *ifN
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdCancelConnect(pMainIfc);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -1057,16 +1195,19 @@ int32_t WpaInterfaceP2pGetGroupConfig(struct IWpaInterface *self, const char *if
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(GetInterfaceLock());
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s GET_NETWORK %d %s", ifName, networkId, param);
     if (ret < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
         return HDF_FAILURE;
     }
     if (WpaCliCmd(cmd, value, valueLen) != 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("GET_NETWORK command failed!");
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -1079,16 +1220,20 @@ int32_t WpaInterfaceP2pAddNetwork(struct IWpaInterface *self, const char *ifName
         return HDF_ERR_INVALID_PARAM;
     }
     (void)self;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdAddNetwork(pMainIfc, networkId);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("WpaP2pCliCmdAddNetwork fail, ret = %{public}d", ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -1101,12 +1246,14 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     char *reply;
     const int replySize = REPLY_SIZE;
     char cmd[CMD_SIZE];
 
     reply = (char *)malloc(replySize);
     if (reply == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s reply is NULL!", __func__);
         return HDF_FAILURE;
     }
@@ -1116,18 +1263,21 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
 
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_PEER %s", ifName, bssid);
     if (ret < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
         free(reply);
         return HDF_FAILURE;
     }
 
     if (WpaCliCmd(cmd, reply, REPLY_SIZE) != 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("P2P_PEER command failed!");
         free(reply);
         return HDF_FAILURE;
     }
 
     if (strstr(reply, "\n") == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s reply is error", __func__);
         free(reply);
         return HDF_FAILURE;
@@ -1136,6 +1286,7 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
     char *token = strtok_r(reply, "\n", &savedPtr);
     info->srcAddress = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
     if (info->srcAddress == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("malloc srcAddress failed!");
         free(reply);
         HdiP2pDeviceInfoFree(info, false);
@@ -1143,6 +1294,7 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
     }
     info->p2pDeviceAddress = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
     if (info->p2pDeviceAddress == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("malloc p2pDeviceAddress failed!");
         free(reply);
         HdiP2pDeviceInfoFree(info, false);
@@ -1150,6 +1302,7 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
     }
     info->primaryDeviceType = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_TYPE_LENGTH);
     if (info->primaryDeviceType == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("malloc primaryDeviceType failed!");
         free(reply);
         HdiP2pDeviceInfoFree(info, false);
@@ -1157,6 +1310,7 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
     }
     info->deviceName = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_NAME_LENGTH);
     if (info->deviceName == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("malloc deviceName failed!");
         free(reply);
         HdiP2pDeviceInfoFree(info, false);
@@ -1164,6 +1318,7 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
     }
     info->wfdDeviceInfo = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_P2P_WFD_DEVICE_INFO_LENGTH);
     if (info->wfdDeviceInfo == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("malloc wfdDeviceInfo failed!");
         free(reply);
         HdiP2pDeviceInfoFree(info, false);
@@ -1171,6 +1326,7 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
     }
     info->operSsid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_NAME_LENGTH);
     if (info->operSsid == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("malloc operSsid failed!");
         free(reply);
         HdiP2pDeviceInfoFree(info, false);
@@ -1211,6 +1367,7 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
         }
         token = strtok_r(NULL, "\n", &savedPtr);
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     free(reply);
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
@@ -1224,12 +1381,14 @@ int32_t WpaInterfaceP2pGetGroupCapability(struct IWpaInterface *self, const char
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     char *reply;
     const int replySize = REPLY_SIZE;
     char cmd[CMD_SIZE];
 
     reply = (char *)malloc(replySize);
     if (reply == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s reply is NULL!", __func__);
         return HDF_FAILURE;
     }
@@ -1239,18 +1398,21 @@ int32_t WpaInterfaceP2pGetGroupCapability(struct IWpaInterface *self, const char
 
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_PEER %s", ifName, bssid);
     if (ret < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
         free(reply);
         return HDF_FAILURE;
     }
 
     if (WpaCliCmd(cmd, reply, REPLY_SIZE) != 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("P2P_PEER command failed!");
         free(reply);
         return HDF_FAILURE;
     }
 
     if (strstr(reply, "\n") == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s reply is error", __func__);
         free(reply);
         return HDF_FAILURE;
@@ -1266,6 +1428,7 @@ int32_t WpaInterfaceP2pGetGroupCapability(struct IWpaInterface *self, const char
         }
         token = strtok_r(NULL, "\n", &savedPtr);
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     free(reply);
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
@@ -1279,22 +1442,26 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(GetInterfaceLock());
     char *reply;
     const int replySize = REPLY_SIZE;
     char cmd[CMD_SIZE];
     reply = (char *)malloc(replySize);
     if (reply == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s reply is NULL!", __func__);
         return HDF_FAILURE;
     }
 
     (void)self;
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s LIST_NETWORKS", ifName) < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("snprintf err");
         free(reply);
         return HDF_FAILURE;
     }
     if (WpaCliCmd(cmd, reply, REPLY_SIZE) != 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("LIST_NETWORKS command failed!");
         free(reply);
         return HDF_FAILURE;
@@ -1302,6 +1469,7 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
 
     char *token = strstr(reply, "\n");
     if (token == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s token is NULL!", __func__);
         free(reply);
         return HDF_FAILURE;
@@ -1312,12 +1480,14 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
         ++tmpPos;
     }
     if (infoList->infoNum <= 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s infoList->infoNum <= 0", __func__);
         free(reply);
         return HDF_FAILURE;
     }
     infoList->infos = (struct HdiP2pNetworkInfo *)OsalMemCalloc(sizeof(struct HdiP2pNetworkInfo) * infoList->infoNum);
     if (infoList->infos == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("malloc infos failed!");
         free(reply);
         return HDF_FAILURE;
@@ -1356,7 +1526,7 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
         index++;
         token = strtok_r(NULL, "\n", &savedPtr);
     }
-
+    pthread_mutex_unlock(GetInterfaceLock());
     free(reply);
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
@@ -1367,16 +1537,20 @@ int32_t WpaInterfaceP2pSaveConfig(struct IWpaInterface *self, const char *ifName
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
+    pthread_mutex_lock(GetInterfaceLock());
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdStoreConfig(pMainIfc);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: fail, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -1395,17 +1569,20 @@ int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(GetInterfaceLock());
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
         "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s", ifName, cmdType, dataType, carryData);
     if (ret < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
         return HDF_FAILURE;
     }
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s command failed!", __func__);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(GetInterfaceLock());
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -1420,29 +1597,34 @@ int32_t WpaInterfaceVendorExtProcessCmd(struct IWpaInterface *self, const char *
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM ;
     }
-
+    pthread_mutex_lock(GetInterfaceLock());
     char *reply;
     const int replySize = REPLY_SIZE;
     reply = (char *)malloc(replySize);
     if (reply == NULL) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s reply is NULL!", __func__);
         return HDF_FAILURE;
     }
 
     char newCmd[NEW_CMD_MAX_LEN] = {0};
     if (snprintf_s(newCmd, sizeof(newCmd), sizeof(newCmd) - 1, "IFNAME=%s %s", ifName, cmd) < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s: snprintf_s is failed, error code: %{public}d", __func__, ret);
         free(reply);
         return HDF_FAILURE;
     }
  
     if (WpaCliCmd(newCmd, reply, replySize) < 0) {
+        pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s WpaCliCmd failed!", __func__);
         free(reply);
         return HDF_FAILURE;
     }
 
     HDF_LOGI("%{public}s reply %{public}s !", __func__, reply);
+    pthread_mutex_unlock(GetInterfaceLock());
+    HDF_LOGI("%{public}s cmd %{public}s reply %{public}s !", __func__, newCmd, reply);
     ret = atoi(reply);
     free(reply);
     return ret;
