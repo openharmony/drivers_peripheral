@@ -2036,7 +2036,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_049, TestSize.Level1)
                     meta->addEntry(OHOS_CONTROL_LCD_FLASH, &lcdFlash, DATA_COUNT);
                     std::vector<uint8_t> setting;
                     MetadataUtils::ConvertMetadataToVec(meta, setting);
-                    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdataSettings(setting);
+                    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
                     ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
                 }
             }
@@ -2080,7 +2080,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_050, TestSize.Level1)
             // meta extended streamInfo
             OHOS::HDI::Camera::V1_1::ExtendedStreamInfo extendedStreamInfo {
                 .type = static_cast<OHOS::HDI::Camera::V1_1::ExtendedStreamInfoType>(
-                    OHOS::HDI::Camera::V1_2::EXTENDED_STREAM_INFO_META),
+                    OHOS::HDI::Camera::V1_3::EXTENDED_STREAM_INFO_META),
 	            .width = 0,
    	            .height = 0,
    	            .format = 0,
@@ -2092,11 +2092,11 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_050, TestSize.Level1)
             cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoMeta);
 
             std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-            uint8_t movingPhoto = static<uint8_t>(OHOS_CAMERA_MOVING_PHOTO_ON);
-            modeSetting->addEntry(OHOS_CAMERA_MOVING_PHOTO, &movingPhoto, 1);
+            uint8_t movingPhoto = static_cast<uint8_t>(OHOS_CAMERA_MOVING_PHOTO_ON);
+            modeSetting->addEntry(OHOS_CONTROL_MOVING_PHOTO, &movingPhoto, 1);
             std::vector<uint8_t> metaVec;
             MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
-            cameraTest->cameraDeviceV1_1->UpdateSettings(metaVec);
+            cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
 
             // capture streamInfo
             cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
@@ -2112,8 +2112,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_050, TestSize.Level1)
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
             cameraTest->StartCapture(cameraTest->streamIdMeta, cameraTest->captureIdMeta, false, true);
             cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
-            cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdSketch};
-            cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdSketch};
+            cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdMeta};
+            cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdMeta};
             cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
         }
     }
@@ -2127,19 +2127,18 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_050, TestSize.Level1)
  */
 HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_051, TestSize.Level1)
 {
-    EXPECT_NE(cameraTest->ability, nullptr);
+    ASSERT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
-    EXPECT_NE(data, nullptr);
+    ASSERT_NE(data, nullptr);
     camera_metadata_item_t entry;
 
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_DEPTH_DATA_PROFILES, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
-        printf("OHOS_ABILITY_DEPTH_DATA_PROFILES is not support");
+        CAMERA_LOGI("OHOS_ABILITY_DEPTH_DATA_PROFILES is not support.");
         return;
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
         CAMERA_LOGI("print tag<OHOS_ABILITY_DEPTH_DATA_PROFILES> i32 value start.");
-        printf("OHOS_ABILITY_DEPTH_DATA_PROFILES i32 value count %d\n", entry.count);
         constexpr size_t step = 10;
         std::stringstream ss;
         for (size_t i = 0; i < entry.count; i++) {
@@ -2167,7 +2166,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_052, TestSize.Level1)
     cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
     cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(
         cameraTest->streamOperatorCallbackV1_3, cameraTest->streamOperator_V1_3);
-    EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
+    ASSERT_NE(cameraTest->streamOperator_V1_3, nullptr);
 
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
