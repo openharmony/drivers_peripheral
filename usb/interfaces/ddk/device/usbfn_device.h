@@ -194,7 +194,6 @@ int32_t UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devS
  * returns <b>NULL</b> otherwise.
  */
 const struct UsbFnInterface *UsbFnGetInterface(struct UsbFnDevice *fnDevice, uint8_t interfaceIndex);
-int32_t UsbFnMemTestTrigger(bool enable);
 
 #ifdef __cplusplus
 }

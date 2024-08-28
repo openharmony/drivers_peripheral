@@ -1402,15 +1402,18 @@ int32_t UsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle)
     }
 
     OsalMutexLock(&interfacePool->interfaceLock);
-    if (OsalAtomicRead(&interfacePool->ioRefCount) == 1) {
+    int32_t refCnt = OsalAtomicRead(&interfacePool->ioRefCount);
+    if (refCnt == 1) {
         ret = UsbIoRecvProcessStop(interfacePool);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbIoStop failed, ret = %{public}d", __func__, __LINE__, ret);
             OsalMutexUnlock(&interfacePool->interfaceLock);
             return ret;
         }
+    } else {
+        HDF_LOGD("%{public}s:%{public}d UsbIoStop ref count = %{public}d", __func__, __LINE__, refCnt);
     }
-    
+
     OsalMutexUnlock(&interfacePool->interfaceLock);
     return HDF_SUCCESS;
 }
@@ -1954,11 +1957,6 @@ int32_t UsbSubmitRequestSync(const struct UsbRequest *request)
 OUT:
     OsalSemDestroy(&requestObj->hostRequest->sem);
     return ret;
-}
-
-int32_t UsbMemTestTrigger(bool enable)
-{
-    return RawUsbMemTestTrigger(enable);
 }
 
 bool UsbGetInterfaceActiveStatus(

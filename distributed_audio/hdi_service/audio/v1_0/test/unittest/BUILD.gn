@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,8 +18,10 @@ group("hdi_service_audio_test") {
   testonly = true
   deps = [
     "${hdf_ser_aud_path}/test/unittest/audio_adapter_interface:hdi_service_audio_adapter_test",
+    "${hdf_ser_aud_path}/test/unittest/audio_capture_extension:hdi_service_audio_capture_ext_test",
     "${hdf_ser_aud_path}/test/unittest/audio_capture_interface:hdi_service_audio_capture_test",
     "${hdf_ser_aud_path}/test/unittest/audio_manager_interface:hdi_service_audio_manager_test",
+    "${hdf_ser_aud_path}/test/unittest/audio_render_extension:hdi_service_audio_Render_ext_test",
     "${hdf_ser_aud_path}/test/unittest/audio_render_interface:hdi_service_audio_render_test",
   ]
 }

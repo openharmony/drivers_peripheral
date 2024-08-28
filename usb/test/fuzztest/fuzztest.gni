@@ -16,7 +16,7 @@ usb_test_fuzzer_external_deps = []
 
 if (is_standard_system) {
   usb_test_fuzzer_external_deps = [
-    "drivers_interface_usb:libusb_proxy_1.0",
+    "drivers_interface_usb:libusb_proxy_1.1",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",

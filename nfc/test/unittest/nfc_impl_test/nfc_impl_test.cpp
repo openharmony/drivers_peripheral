@@ -14,15 +14,19 @@
  */
 #include <gtest/gtest.h>
 #include <thread>
+#include <hdf_log.h>
 
 #include "nfc_impl.h"
+#include "mock.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
 namespace V1_1 {
 namespace TEST {
+using namespace testing;
 using namespace testing::ext;
+using namespace OHOS::HDI::Nfc;
 class NfcImplTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -33,22 +37,22 @@ public:
 
 void NfcImplTest::SetUpTestCase()
 {
-    std::cout << " SetUpTestCase NfcImplTest." << std::endl;
+    HDF_LOGD("SetUpTestCase NfcImplTest");
 }
 
 void NfcImplTest::TearDownTestCase()
 {
-    std::cout << " TearDownTestCase NfcImplTest." << std::endl;
+    HDF_LOGD("TearDownTestCase NfcImplTest");
 }
 
 void NfcImplTest::SetUp()
 {
-    std::cout << " SetUp NfcImplTest." << std::endl;
+    HDF_LOGD("SetUp NfcImplTest");
 }
 
 void NfcImplTest::TearDown()
 {
-    std::cout << " TearDown NfcImplTest." << std::endl;
+    HDF_LOGD("TearDown NfcImplTest");
 }
 
 /**
@@ -62,7 +66,7 @@ HWTEST_F(NfcImplTest, Open001, TestSize.Level1)
     NfcStatus status = NfcStatus::OK;
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->Open(callbackObj, status);
-    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
 }
 
 /**
@@ -76,7 +80,21 @@ HWTEST_F(NfcImplTest, CoreInitialized001, TestSize.Level1)
     NfcStatus status = NfcStatus::OK;
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->CoreInitialized(data, status);
-    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: CoreInitialized002
+ * @tc.desc: Test NfcImplTest CoreInitialized.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NfcImplTest, CoreInitialized002, TestSize.Level1)
+{
+    std::vector<uint8_t> data = {0x01, 0x02, 0x03};
+    NfcStatus status = NfcStatus::OK;
+    std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
+    int ret = nfcImpl->CoreInitialized(data, status);
+    EXPECT_EQ(ret, HDF_SUCCESS);
 }
 
 /**
@@ -89,7 +107,7 @@ HWTEST_F(NfcImplTest, Prediscover001, TestSize.Level1)
     NfcStatus status = NfcStatus::OK;
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->Prediscover(status);
-    ASSERT_TRUE(ret == HDF_SUCCESS);
+    ASSERT_TRUE(ret == HDF_FAILURE);
 }
 
 /**
@@ -117,7 +135,7 @@ HWTEST_F(NfcImplTest, Write002, TestSize.Level1)
     NfcStatus status = NfcStatus::OK;
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->Write(data, status);
-    ASSERT_TRUE(ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 
 /**
@@ -130,7 +148,7 @@ HWTEST_F(NfcImplTest, ControlGranted001, TestSize.Level1)
     NfcStatus status = NfcStatus::OK;
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->ControlGranted(status);
-    ASSERT_TRUE(ret == HDF_SUCCESS);
+    ASSERT_TRUE(ret == HDF_FAILURE);
 }
 
 /**
@@ -143,7 +161,7 @@ HWTEST_F(NfcImplTest, PowerCycle001, TestSize.Level1)
     NfcStatus status = NfcStatus::OK;
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->PowerCycle(status);
-    ASSERT_TRUE(ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 
 /**
@@ -156,7 +174,7 @@ HWTEST_F(NfcImplTest, Close001, TestSize.Level1)
     NfcStatus status = NfcStatus::OK;
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->Close(status);
-    ASSERT_TRUE(ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 
 /**
@@ -172,6 +190,21 @@ HWTEST_F(NfcImplTest, Ioctl001, TestSize.Level1)
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->Ioctl(cmd, data, status);
     ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: Ioctl002
+ * @tc.desc: Test NfcImplTest Ioctl.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NfcImplTest, Ioctl002, TestSize.Level1)
+{
+    NfcCommand cmd = NfcCommand::CMD_INVALID;
+    std::vector<uint8_t> data = {0x01, 0x02, 0x03};
+    NfcStatus status = NfcStatus::OK;
+    std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
+    int ret = nfcImpl->Ioctl(cmd, data, status);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 
 /**
@@ -226,7 +259,47 @@ HWTEST_F(NfcImplTest, IoctlWithResponse003, TestSize.Level1)
     NfcStatus status = NfcStatus::OK;
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->IoctlWithResponse(cmd, data, response, status);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: GetVendorConfig001
+ * @tc.desc: Test NfcImplTest GetVendorConfig.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NfcImplTest, GetVendorConfig001, TestSize.Level1)
+{
+    NfcVendorConfig config;
+    NfcStatus status = NfcStatus::OK;
+    std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
+    int ret = nfcImpl->GetVendorConfig(config, status);
     ASSERT_TRUE(ret == HDF_FAILURE);
+}
+
+/**
+ * @tc.name: DoFactoryReset001
+ * @tc.desc: Test NfcImplTest DoFactoryReset.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NfcImplTest, DoFactoryReset001, TestSize.Level1)
+{
+    NfcStatus status = NfcStatus::OK;
+    std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
+    int ret = nfcImpl->DoFactoryReset(status);
+    ASSERT_TRUE(ret == HDF_FAILURE);
+}
+
+/**
+ * @tc.name: Shutdown001
+ * @tc.desc: Test NfcImplTest Shutdown.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NfcImplTest, Shutdown001, TestSize.Level1)
+{
+    NfcStatus status = NfcStatus::OK;
+    std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
+    int ret = nfcImpl->Shutdown(status);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 }
 }

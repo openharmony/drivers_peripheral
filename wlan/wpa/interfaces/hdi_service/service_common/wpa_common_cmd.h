@@ -20,6 +20,8 @@
 #include <hdf_remote_service.h>
 #include "utils/common.h"
 #include "wpa_supplicant_hal.h"
+#include "wpa_client.h"
+#include "wpa_common_cmd_ext.h"
 
 #define WIFI_SSID_LENGTH 132
 #define WIFI_BSSID_LENGTH 18
@@ -52,13 +54,6 @@
 #define WIFI_NETWORK_CONFIG_VALUE_LENGTH 2048
 #define CMD_LEN 6
 
-int32_t WpaInterfaceStart(struct IWpaInterface *self);
-int32_t WpaInterfaceStop(struct IWpaInterface *self);
-int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, const char *confName) ;
-int32_t WpaInterfaceRemoveWpaIface(struct IWpaInterface *self, const char *ifName);
-int32_t WpaInterfaceScan(struct IWpaInterface *self, const char *ifName);
-int32_t WpaInterfaceScanResult(struct IWpaInterface *self, const char *ifName, unsigned char *resultBuf,
-    uint32_t *resultBufLen);
 int32_t WpaInterfaceAddNetwork(struct IWpaInterface *self, const char *ifName, int32_t *networkId);
 int32_t WpaInterfaceRemoveNetwork(struct IWpaInterface *self, const char *ifName, int32_t networkId);
 int32_t WpaInterfaceDisableNetwork(struct IWpaInterface *self, const char *ifName, const int32_t networkId);
@@ -108,8 +103,10 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
 int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName);
 int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd);
 
+void HdfWpaDelRemoteObj(struct IWpaCallback *self);
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);
-const char *macToStr(const u8 *addr);
+pthread_mutex_t *GetInterfaceLock();
+
 struct StWpaMainParam {
     int argc;
     char argv[MAX_WPA_MAIN_ARGC_NUM][MAX_WPA_MAIN_ARGV_LEN];
