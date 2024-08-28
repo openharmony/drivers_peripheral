@@ -86,6 +86,7 @@ public:
     void DefaultPreview(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultCapture(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultSketch(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultMeta(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosPreview(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosPreviewV1_2(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosCapture(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
@@ -93,6 +94,7 @@ public:
     void DefaultInfosAnalyze(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosVideo(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosSketch(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosMeta(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t professionalMode);
     void StartStream(std::vector<StreamIntent> intents,
         OHOS::HDI::Camera::V1_3::OperationMode mode = OHOS::HDI::Camera::V1_3::NORMAL);
@@ -120,6 +122,7 @@ public:
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoPre = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoVideo = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoSketch = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoMeta = nullptr;
     std::shared_ptr<CaptureInfo> captureInfo = nullptr;
     int previewFormat = PIXEL_FMT_YCRCB_420_SP;
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
@@ -128,12 +131,16 @@ public:
     int streamIdPreview = 100;
     int streamIdCapture = 101;
     int streamIdSketch = 105;
+    int streamIdMeta = 106;
     int captureWidth = 1280;
     int captureHeight = 960;
     int sketchWidth = 640;
+    int metaWidth = 640;
     int sketchHeight = 480;
+    int metaHeight = 480;
     int captureIdPreview = 2000;
     int captureIdSketch = 2050;
+    int captureIdMeta = 2060;
     int previewWidth = 1920;
     int previewHeight = 1080;
     int captureIdCapture = 2010;
