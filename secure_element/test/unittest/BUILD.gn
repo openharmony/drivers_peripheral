@@ -22,6 +22,7 @@ config("se_unit_test_config") {
     "$SE_DIR/hdi_service",
     "$SE_DIR/secure_element_ca_proxy",
     "$SE_DIR/vendor_adaptor",
+    "$SE_DIR/test/unittest/mock",
   ]
 
   cflags_cc = [ "-fexceptions" ]
@@ -32,9 +33,10 @@ config("se_unit_test_config") {
 unit_test_deps = [
   "$SE_DIR/hdi_service:libsecure_element_interface_service_1.0",
   "$SE_DIR/hdi_service:se_hdi_driver",
-  "$SE_DIR/secure_element_ca_proxy:secure_element_ca_proxy",
   "$SE_DIR/vendor_adaptor:se_vendor_adaptor",
   "../../../../interface/secure_element/v1_0:libsecure_element_proxy_1.0",
+  "//third_party/googletest:gmock_main",
+  "//third_party/googletest:gtest_main",
 ]
 
 unit_test_external_deps = [
@@ -64,8 +66,45 @@ ohos_unittest("se_impl_test") {
   subsystem_name = "hdf"
 }
 
+ohos_unittest("se_vendor_adaptions_test") {
+  module_out_path = test_out_path
+
+  sources = [ "se_vendor_adaptions_test/se_vendor_adaptions_test.cpp" ]
+
+  configs = [ ":se_unit_test_config" ]
+
+  deps = unit_test_deps
+
+  external_deps = unit_test_external_deps
+
+  part_name = "drivers_peripheral_secure_element"
+  subsystem_name = "hdf"
+}
+
+ohos_unittest("se_vendor_adaptions_mock_test") {
+  module_out_path = test_out_path
+
+  sources = [
+    "$SE_DIR/test/unittest/mock/mock.cpp",
+    "se_vendor_adaptions_mock_test/se_vendor_adaptions_mock_test.cpp",
+  ]
+
+  configs = [ ":se_unit_test_config" ]
+
+  deps = unit_test_deps
+
+  external_deps = unit_test_external_deps
+
+  part_name = "drivers_peripheral_secure_element"
+  subsystem_name = "hdf"
+}
+
 group("hdf_se_unittest") {
   testonly = true
 
-  deps = [ ":se_impl_test" ]
+  deps = [
+    ":se_impl_test",
+    ":se_vendor_adaptions_mock_test",
+    ":se_vendor_adaptions_test",
+  ]
 }
