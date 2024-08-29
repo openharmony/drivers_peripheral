@@ -2001,7 +2001,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_049, TestSize.Level1)
     ASSERT_NE(data, nullptr);
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_LCD_FLASH, &entry);
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0 && *entry.data.i32 == 1) {
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+        if (*entry.data.i32 != 1) return;
         cameraTest->intents = {PREVIEW, STILL_CAPTURE};
         cameraTest->StartStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::CAPTURE);
         // 开启预览流
@@ -2027,7 +2028,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_049, TestSize.Level1)
         }
         camera_metadata_item_t entry;
         cameraTest->rc = FindCameraMetadataItem(data, OHOS_STATUS_LCD_FLASH_STATUS, &entry);
-        if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0 && entry.data.i32[0] == 1) {
+        if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+            if (entry.data.i32[0] != 1) return;
             // 使能环形补光
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
             uint8_t lcdFlash = 1;
