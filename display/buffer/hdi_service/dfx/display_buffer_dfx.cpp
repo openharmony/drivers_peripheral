@@ -28,7 +28,9 @@ namespace V1_0 {
 DisplayBufferDfx::DisplayBufferDfx(std::string name)
     : dfxName_(name),
     timeId_(0),
-    flag_(false)
+    flag_(false)，
+    startTimeStamp({0, 0}),
+    stopTimeStamp({0, 0})
 {
 }
 
