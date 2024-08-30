@@ -28,6 +28,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
+
 class WifiApIface : public IChipIface {
 public:
     WifiApIface(const std::string& ifname, const std::vector<std::string>& instances,
