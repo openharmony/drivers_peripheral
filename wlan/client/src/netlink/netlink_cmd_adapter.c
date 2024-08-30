@@ -711,6 +711,7 @@ static int32_t WifiMsgRegisterEventListener(void)
         g_wifiHalInfo.status = THREAD_STOP;
         return RET_CODE_FAILURE;
     }
+    pthread_setname_np(g_wifiHalInfo.thread, "WifiHalThread");
 
     // waiting for thread start running
     while (g_wifiHalInfo.status != THREAD_RUN) {
