@@ -633,10 +633,8 @@ static int32_t SerStubSetCallbacks(struct CodecComponentType *serviceImpl, struc
     ret = serviceImpl->SetCallbacks(serviceImpl, callback, appData);
     if (ret != HDF_SUCCESS) {
         CODEC_LOGE("call SetCallbacks function failed!");
-        CodecCallbackTypeRelease(callback);
         return ret;
     }
-    CodecCallbackTypeRelease(callback);
     return ret;
 }
 
