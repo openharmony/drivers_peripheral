@@ -20,6 +20,7 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
+    
 WifiP2pIface::WifiP2pIface(
     const std::string& ifname, const std::weak_ptr<WifiVendorHal> vendorHal,
     const std::weak_ptr<IfaceUtil> ifaceUtil)

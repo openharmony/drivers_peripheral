@@ -22,6 +22,7 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
+    
 #define STA IfaceType::STA
 #define AP IfaceType::AP
 #define P2P IfaceType::P2P
