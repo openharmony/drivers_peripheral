@@ -55,6 +55,7 @@ public:
     int32_t EnablePowerMode(int32_t mode) override;
     int32_t SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable) override;
     int32_t SetTxPower(int32_t power) override;
+    int32_t SetIfaceState(bool state) override;
 
 private:
     std::set<sptr<IChipIfaceCallback>> GetEventCallbacks();
