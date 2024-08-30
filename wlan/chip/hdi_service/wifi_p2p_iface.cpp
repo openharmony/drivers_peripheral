@@ -20,7 +20,6 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
-    
 WifiP2pIface::WifiP2pIface(
     const std::string& ifname, const std::weak_ptr<WifiVendorHal> vendorHal,
     const std::weak_ptr<IfaceUtil> ifaceUtil)
@@ -137,6 +136,10 @@ int32_t WifiP2pIface::SetTxPower(int32_t power)
     return HDF_ERR_NOT_SUPPORT;
 }
 
+int32_t WifiP2pIface::SetIfaceState(bool state)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
 }
 }
 }
