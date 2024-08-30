@@ -21,7 +21,6 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
-    
 WifiApIface::WifiApIface(
     const std::string& ifname, const std::vector<std::string>& instances,
     const std::weak_ptr<WifiVendorHal> vendorHal,
@@ -173,6 +172,13 @@ int32_t WifiApIface::SetTxPower(int32_t power)
     return HDF_ERR_NOT_SUPPORT;
 }
 
+int32_t WifiApIface::SetIfaceState(bool state)
+{
+    if (ifaceUtil_.lock()->SetUpState(ifname_, state)) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
+}
 }
 }
 }
