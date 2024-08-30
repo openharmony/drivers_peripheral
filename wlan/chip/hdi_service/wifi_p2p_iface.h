@@ -28,7 +28,6 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
-
 class WifiP2pIface : public IChipIface {
 public:
     WifiP2pIface(const std::string& ifname, const std::weak_ptr<WifiVendorHal> vendorHal,
@@ -54,6 +53,7 @@ public:
     int32_t EnablePowerMode(int32_t mode) override;
     int32_t SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable) override;
     int32_t SetTxPower(int32_t power) override;
+    int32_t SetIfaceState(bool state) override;
 
 private:
     std::string ifname_;
