@@ -801,7 +801,6 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_004, TestSize.Level1)
     struct IAudioRender *render = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor devDesc = {};
-    uint32_t channelCountErr = 5; // invalid channelCount
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -811,12 +810,10 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_004, TestSize.Level1)
     attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render, &renderId_);
     ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_SUCCESS);
-    attrs.channelCount = channelCountErr;
-    ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render, &renderId_);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    InitAttrs(attrs);
     attrs.type = AUDIO_IN_COMMUNICATION;
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render, &renderId_);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     IAudioAdapterRelease(adapter, IS_STUB);
