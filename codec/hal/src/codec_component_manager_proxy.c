@@ -102,6 +102,7 @@ static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t 
 
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
         CODEC_LOGE("write interface token failed");
+        ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
 

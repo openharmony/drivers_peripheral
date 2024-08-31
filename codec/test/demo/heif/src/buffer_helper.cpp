@@ -218,11 +218,11 @@ void BufferHelper::DumpBuffer(const string& filePath, const SharedBuffer& buffer
     if (addr != nullptr) {
         ofs.write(static_cast<char*>(addr), static_cast<streamsize>(buffer.filledLen));
         ofs.close();
+        if (munmap(addr, buffer.filledLen) != 0) {
+            HDF_LOGW("failed to unmap addr for dump buffer");
+        }
     } else {
         HDF_LOGE("failed to map addr for dump buffer");
-    }
-    if (munmap(addr, buffer.filledLen) != 0) {
-        HDF_LOGW("failed to unmap addr for dump buffer");
     }
 }
 
