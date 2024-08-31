@@ -490,8 +490,7 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
                 it = sensorReportCountMap_[sensorId].find(serviceId);
             }
             it->second++;
-            result += std::to_string(serviceId) + "-" +
-                    std::to_string(it->second) + " ";
+            result += std::to_string(serviceId) + "-" + std::to_string(it->second) + " ";
         }
     }
     return result;
