@@ -1141,7 +1141,7 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
     IAM_LOGI("start");
     if (authToken.size() != sizeof(UserAuthTokenHal)) {
         IAM_LOGE("authToken is invalid");
-        return RESULT_BAD_PARAM;
+        return RESULT_VERIFY_TOKEN_FAIL;
     }
     UserAuthTokenHal authTokenStruct = {};
     if (memcpy_s(&authTokenStruct, sizeof(UserAuthTokenHal), &authToken[0], authToken.size()) != EOK) {
