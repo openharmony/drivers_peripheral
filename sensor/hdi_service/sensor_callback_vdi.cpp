@@ -29,7 +29,6 @@ namespace {
     constexpr int64_t REPOPRT_TIME = 60000000000;
     static std::unordered_map<int32_t, int64_t> firstTimestampMap_;
     static std::unordered_map<int32_t, int64_t> lastTimestampMap_;
-    static std::unordered_map<int32_t, int64_t> sensorDataCountMap_;
 }
 
 int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
@@ -61,6 +60,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
 {
     SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
+    static std::unordered_map<int32_t, int64_t> sensorDataCountMap_;
     sensorDataCountMap_[event.sensorId]++;
     bool result = false;
     if (firstTimestampMap_[event.sensorId] == 0) {
