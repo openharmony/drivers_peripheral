@@ -356,6 +356,7 @@ int32_t UsbdFunction::UsbdReadUdc(char* udcName, size_t len)
         } else {
             HDF_LOGW("%{public}s: fread len than expected", __func__);
         }
+        (void)fclose(fpRead);
         return HDF_FAILURE;
     }
 
@@ -377,14 +378,14 @@ int32_t UsbdFunction::UsbdEnableDevice(int32_t funcs)
 
     char tmpName[UDC_NAME_MAX_LEN] = {0};
     for (int32_t i = 0; i < WRITE_UDC_MAX_RETRY; i++) {
-        if (i != 0) {
+        if (i != 0 && ret != HDF_SUCCESS) {
             ret = SetDDKFunction(funcs);
             if (ret != HDF_SUCCESS) {
                 UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
                 UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
+                usleep(WAIT_UDC_TIME);
+                continue;
             }
-            usleep(WAIT_UDC_TIME);
-            continue;
         }
         ret = UsbdWriteUdc(udcName, strlen(udcName));
         if (ret != HDF_SUCCESS) {
