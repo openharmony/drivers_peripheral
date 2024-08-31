@@ -38,6 +38,7 @@ namespace {
     constexpr int64_t ERROR_INTERVAL = 0;
     constexpr int64_t STOP_INTERVAL = 0;
     constexpr int32_t INIT_CUR_COUNT = 0;
+    constexpr int32_t INIT_REPORT_COUNT = 1;
 }
 
 std::mutex SensorClientsManager::instanceMutex_;
@@ -485,12 +486,14 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
         } else {
             static std::unordered_map<int32_t, std::unordered_map<int32_t, int64_t>> sensorReportCountMap;
             auto it = sensorReportCountMap[sensorId].find(serviceId);
+            int32_t reportCount = INIT_REPORT_COUNT;
             if (it == sensorReportCountMap[sensorId].end()) {
                 sensorReportCountMap[sensorId][serviceId] = 1;
             } else {
                 it->second++;
+                reportCount = it->second;
             }
-            result += std::to_string(serviceId) + "-" + std::to_string(it->second) + " ";
+            result += std::to_string(serviceId) + "-" + std::to_string(reportCount) + " ";
         }
     }
     return result;
