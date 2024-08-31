@@ -15,6 +15,7 @@
 
 #include "audio_render_vdi.h"
 
+#include <string.h>
 #include <limits.h>
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
@@ -36,6 +37,7 @@ struct AudioRenderInfo {
     unsigned int usrCount;
     struct IAudioCallback *callback;
     bool isRegCb;
+    char *adapterName;
 };
 
 struct AudioRenderPrivVdi {
@@ -899,7 +901,7 @@ static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
 }
 
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    uint32_t *rendrId)
+    uint32_t *rendrId, const char *adapterName)
 {
     if (attrs->type == AUDIO_MMAP_NOIRQ) {
         AUDIO_FUNC_LOGI("render type is mmap");
@@ -918,6 +920,14 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
     }
 
     for (index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
+        if ((renderPriv->renderInfos[index] != NULL) &&
+            (attrs->type == AUDIO_IN_MEDIA || attrs->type == AUDIO_MULTI_CHANNEL) &&
+            (renderPriv->renderInfos[index]->streamType == attrs->type) &&
+            (strcmp(renderPriv->renderInfos[index]->adapterName, adapterName) == 0)) {
+            *rendrId = renderPriv->renderInfos[index]->renderId;
+            renderPriv->renderInfos[index]->usrCount++;
+            return &renderPriv->renderInfos[index]->render;
+        }
         if ((renderPriv->renderInfos[index] != NULL) &&
             (renderPriv->renderInfos[index]->desc.pins == pin) &&
             (renderPriv->renderInfos[index]->streamType == attrs->type) &&
@@ -956,7 +966,7 @@ static uint32_t GetAvailableRenderId(struct AudioRenderPrivVdi *renderPriv)
 }
 
 struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
-    struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc)
+    struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc, char *adapterName)
 {
     struct IAudioRender *render = NULL;
     if (attrs == NULL || renderId == NULL || vdiRender == NULL || desc == NULL) {
@@ -996,6 +1006,13 @@ struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes
     priv->renderInfos[*renderId]->usrCount = 1;
     priv->renderInfos[*renderId]->callback = NULL;
     priv->renderInfos[*renderId]->isRegCb = false;
+    priv->renderInfos[*renderId]->adapterName = strdup(adapterName);
+    if (priv->renderInfos[*renderId]->adapterName == NULL) {
+        OsalMemFree(priv->renderInfos[*renderId]->desc.desc);
+        OsalMemFree(priv->renderInfos[*renderId]);
+        priv->renderInfos[*renderId] = NULL;
+        return NULL;
+    }
     render = &(priv->renderInfos[*renderId]->render);
     AudioInitRenderInstanceVdi(render);
 
@@ -1033,6 +1050,8 @@ void AudioDestroyRenderByIdVdi(uint32_t renderId)
         return;
     }
 
+    OsalMemFree((void *)priv->renderInfos[renderId]->adapterName);
+    priv->renderInfos[renderId]->adapterName = NULL;
     OsalMemFree((void *)priv->renderInfos[renderId]->desc.desc);
     priv->renderInfos[renderId]->vdiRender = NULL;
     priv->renderInfos[renderId]->desc.desc = NULL;
