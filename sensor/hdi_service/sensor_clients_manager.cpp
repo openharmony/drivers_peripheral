@@ -486,10 +486,10 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
             static std::unordered_map<int32_t, std::unordered_map<int32_t, int64_t>> sensorReportCountMap_;
             auto it = sensorReportCountMap_[sensorId].find(serviceId);
             if (it == sensorReportCountMap_[sensorId].end()) {
-                sensorReportCountMap_[sensorId][serviceId] = 0;
-                it = sensorReportCountMap_[sensorId].find(serviceId);
+                sensorReportCountMap_[sensorId][serviceId] = 1;
+            } else {
+                it->second++;
             }
-            it->second++;
             result += std::to_string(serviceId) + "-" + std::to_string(it->second) + " ";
         }
     }
