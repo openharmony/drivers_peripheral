@@ -478,22 +478,21 @@ int32_t WpaInterfaceAutoConnect(struct IWpaInterface *self, const char *ifName, 
     return HDF_SUCCESS;
 }
 
-static void GetWpaCmdStatus(uint8_t* dst, uint32_t* dstLen, char* src)
+static bool GetWpaCmdStatus(uint8_t** dst, uint32_t* dstLen, char* src)
 {
     if (strcmp(src, "") != 0) {
-        dst = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (strlen(src) + 1));
-        if (dst == NULL) {
+        *dst = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (strlen(src) + 1));
+        if (*dst == NULL) {
             HDF_LOGE("%{public}s OsalMemCalloc is NULL", __func__);
             *dstLen = 0;
-            return;
+            return false;
         }
         *dstLen = strlen(src);
-        if (strcpy_s((char*)dst, strlen(src) + 1, src) != EOK) {
+        if (strcpy_s((char*)(*dst), strlen(src) + 1, src) != EOK) {
             HDF_LOGE("%{public}s strcpy failed", __func__);
-            return;
         }
     }
-    return;
+    return true;
 }
 
 static void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWpaCmdStatus *status)
@@ -504,8 +503,10 @@ static void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWp
     }
     status->id = halStatus->id;
     status->freq = halStatus->freq;
-    GetWpaCmdStatus(status->keyMgmt, &(status->keyMgmtLen), halStatus->keyMgmt);
-    GetWpaCmdStatus(status->ssid, &(status->ssidLen), halStatus->ssid);
+    if (GetWpaCmdStatus(&(status->keyMgmt), &(status->keyMgmtLen), halStatus->keyMgmt) == false ||
+        GetWpaCmdStatus(&(status->ssid), &(status->ssidLen), halStatus->ssid) == false) {
+        return;
+    }
     if (strcmp(halStatus->address, "") != 0) {
         HDF_LOGI("%{public}s key include address value=%{private}s", __func__, halStatus->address);
         uint8_t tmpAddress[ETH_ADDR_LEN + 1] = {0};
