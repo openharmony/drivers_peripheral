@@ -1943,48 +1943,74 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_047, TestSize.Level1)
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
 
+void UpdateMetadata(std::shared_ptr<OHOS::Camera::Test> cameraTest)
+{
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    // 修改Zoom大于15x
+    float zoomRatio = 16.0f;
+    meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
+    // 使能脚架检测
+    uint8_t tripoDetection = 1;
+    meta->addEntry(OHOS_CONTROL_TRIPOD_DETECTION, &tripoDetection, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+}
+
 /**
  * @tc.name: Camera_Device_Hdi_V1_3_048
- * @tc.desc: OHOS_CONTROL_FOCUS_ASSIST_FLASH_SUPPORTED_MODE, OHOS_CONTROL_ZOOM_RATIO, PROFESSIONAL_PHOTO
+ * @tc.desc: OHOS_ABILITY_TRIPOD_DETECTION
  * @tc.size: MediumTest
  * @tc.type: Function
  */
 HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_048, TestSize.Level1)
 {
+    CAMERA_LOGI("CameraHdiUtTestV1_3 Camera_Device_Hdi_V1_3_048 start.");
     // 查询是否支持脚架检测
-    EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
-    EXPECT_NE(data, nullptr);
+    ASSERT_NE(data, nullptr);
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_TRIPOD_DETECTION, &entry);
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
-        if (*entry.data.i32 == 1) {
-            cameraTest->imageDataSaveSwitch = SWITCH_ON;
-            cameraTest->intents = {PREVIEW, STILL_CAPTURE};
-            cameraTest->StartStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::CAPTURE);
-            std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-            // 修改Zoom大于15x
-            float zoomRatio = 15.0f;
-            meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
-            // 使能脚架检测
-            uint8_t tripoDetection = 1;
-            meta->addEntry(OHOS_CONTROL_TRIPOD_DETECTION, &tripoDetection, DATA_COUNT);
-            // 使能脚架检测算法
-            uint8_t tripodStablitationAlgorithm = 1;
-            meta->addEntry(OHOS_CONTROL_TRIPOD_STABLITATION, &tripodStablitationAlgorithm, DATA_COUNT);
-            std::vector<uint8_t> setting;
-            MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
-            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-            cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-            sleep(3);
-            // 进行拍照
-            cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
-            cameraTest->captureIds = {cameraTest->captureIdPreview};
-            cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
-            cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
-        }
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || entry.data.i32 == nullptr
+        || entry.count <= 0 || entry.data.i32[0] != 1) {
+        CAMERA_LOGI("OHOS_ABILITY_TRIPOD_DETECTION value error");
+        return;
     }
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::CAPTURE);
+    UpdateMetadata(cameraTest);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    sleep(3);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        CAMERA_LOGI("Camera_Device_Hdi_V1_3_048 onresult not be invoked.");
+        return;
+    }
+    common_metadata_header_t* resultData = cameraTest->deviceCallback->resultMeta->get();
+    if (resultData == nullptr) {
+        CAMERA_LOGI("Camera_Device_Hdi_V1_3_048 onresult be invoked but data was nullptr.");
+        return;
+    }
+    camera_metadata_item_t statusEntry;
+    cameraTest->rc = FindCameraMetadataItem(resultData, OHOS_STATUS_TRIPOD_DETECTION_STATUS, &statusEntry);
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && statusEntry.data.u8 != nullptr && statusEntry.count > 0) {
+        CAMERA_LOGI("OHOS_STATUS_TRIPOD_DETECTION_STATUS value:%{public}d", statusEntry.data.u8[0]);
+        // 使能脚架检测算法
+        meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+        uint8_t tripodStablitationAlgorithm = 1;
+        meta->addEntry(OHOS_CONTROL_TRIPOD_STABLITATION, &tripodStablitationAlgorithm, DATA_COUNT);
+        std::vector<uint8_t> pointData;
+        MetadataUtils::ConvertMetadataToVec(meta, pointData);
+        cameraTest->cameraDeviceV1_3->UpdateSettings(pointData);
+    }
+    camera_metadata_item_t pointEntry;
+    cameraTest->rc = FindCameraMetadataItem(resultData, OHOS_STATUS_SKETCH_POINT, &pointEntry);
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && pointEntry.data.f != nullptr && pointEntry.count > 0) {
+        CAMERA_LOGI("OHOS_STATUS_SKETCH_POINT x:%{public}f y:%{public}f", pointEntry.data.f[0], pointEntry.data.f[1]);
+    }
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdCapture, cameraTest->streamIdPreview};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
 
 /**
