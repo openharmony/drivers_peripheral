@@ -85,6 +85,7 @@ static int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObj
     }
     int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, COMPONENT_MANAGER_SERVICE_DESC);
     if (ret != HDF_SUCCESS) {
+        OsalMemFree(omxcomponenttypeHost);
         HDF_LOGE("Failed to set interface desc");
         return ret;
     }
