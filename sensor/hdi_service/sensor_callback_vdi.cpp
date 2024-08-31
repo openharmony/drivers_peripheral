@@ -60,10 +60,10 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
 {
     SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
-    static std::unordered_map<int32_t, int64_t> sensorDataCountMap_;
+    static std::unordered_map<int32_t, int64_t> sensorDataCountMap;
     auto it = sensorDataCountMap_.find(event.sensorId);
-    if (it == sensorDataCountMap_.end()) {
-        sensorDataCountMap_[event.sensorId] = 1;
+    if (it == sensorDataCountMap.end()) {
+        sensorDataCountMap[event.sensorId] = 1;
     } else {
         it->second++;
     }
