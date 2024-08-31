@@ -65,7 +65,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
     auto it = sensorDataCountMap.find(event.sensorId);
     int32_t dataCount = INIT_DATA_COUNT;
     if (it == sensorDataCountMap.end()) {
-        sensorDataCountMap[event.sensorId] = 1;
+        sensorDataCountMap[event.sensorId] = INIT_DATA_COUNT;
     } else {
         it->second++;
         dataCount = it->second;

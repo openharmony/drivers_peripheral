@@ -488,7 +488,7 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
             auto it = sensorReportCountMap[sensorId].find(serviceId);
             int32_t reportCount = INIT_REPORT_COUNT;
             if (it == sensorReportCountMap[sensorId].end()) {
-                sensorReportCountMap[sensorId][serviceId] = 1;
+                sensorReportCountMap[sensorId][serviceId] = INIT_REPORT_COUNT;
             } else {
                 it->second++;
                 reportCount = it->second;
