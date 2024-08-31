@@ -18,48 +18,48 @@
         <preparer>
             <option name="target" value="mount"/>
             <option name="shell" value="service_control stop render_service"/>
-            <option name="shell" value="kill -9 'pidof composer_host'"/>
+            <option name="shell" value="kill -9 `pidof composer_host`"/>
         </preparer>
         <cleaner>
             <option name="shell" value="service_control start render_service"/>
-            <option name="shell" value="kill -9 'pidof render_service'"/>
-            <option name="shell" value="sleep 121"/>
+            <option name="shell" value="kill -9 `pidof render_service`"/>
+            <option name="shell" value="sleep 1"/>
         </cleaner>
     </target>
     <target name="composer_mt">
         <preparer>
             <option name="target" value="mount"/>
             <option name="shell" value="service_control stop render_service"/>
-            <option name="shell" value="kill -9 'pidof composer_host'"/>
+            <option name="shell" value="kill -9 `pidof composer_host`"/>
         </preparer>
         <cleaner>
             <option name="shell" value="service_control start render_service"/>
-            <option name="shell" value="kill -9 'pidof render_service'"/>
-            <option name="shell" value="sleep 121"/>
+            <option name="shell" value="kill -9 `pidof render_service`"/>
+            <option name="shell" value="sleep 1"/>
         </cleaner>
     </target>
     <target name="composer_death_test">
         <preparer>
             <option name="target" value="mount"/>
             <option name="shell" value="service_control stop render_service"/>
-            <option name="shell" value="kill -9 'pidof composer_host'"/>
+            <option name="shell" value="kill -9 pidof composer_host`"/>
         </preparer>
         <cleaner>
             <option name="shell" value="service_control start render_service"/>
-            <option name="shell" value="kill -9 'pidof render_service'"/>
-            <option name="shell" value="sleep 121"/>
+            <option name="shell" value="kill -9 `pidof render_service`"/>
+            <option name="shell" value="sleep 1"/>
         </cleaner>
     </target>
     <target name="hdf_display_benchmark_test">
         <preparer>
             <option name="target" value="mount"/>
             <option name="shell" value="service_control stop render_service"/>
-            <option name="shell" value="kill -9 'pidof composer_host'"/>
+            <option name="shell" value="kill -9 `pidof composer_host`"/>
         </preparer>
         <cleaner>
             <option name="shell" value="service_control start render_service"/>
-            <option name="shell" value="kill -9 'pidof render_service'"/>
-            <option name="shell" value="sleep 121"/>
+            <option name="shell" value="kill -9 `pidof render_service`"/>
+            <option name="shell" value="sleep 1"/>
         </cleaner>
     </target>
 </configuration>
