@@ -485,7 +485,8 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
         } else {
             static std::unordered_map<int32_t, std::unordered_map<int32_t, int64_t>> sensorReportCountMap_;
             sensorReportCountMap_[sensorId][serviceId]++;
-            result += std::to_string(serviceId) + "-" + sensorReportCountMap_[sensorId][serviceId] + " ";
+            result += std::to_string(serviceId) + "-" + std::to_string(sensorReportCountMap_[sensorId][serviceId]) +
+                    " ";
         }
     }
     return result;
