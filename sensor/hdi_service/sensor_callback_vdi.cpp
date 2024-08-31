@@ -61,10 +61,12 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
     SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
     static std::unordered_map<int32_t, int64_t> sensorDataCountMap_;
-    if (sensorDataCountMap_.find(event.sensorId) == sensorDataCountMap_.end()) {
+    auto it = sensorDataCountMap_.find(event.sensorId);
+    if (it == sensorDataCountMap_.end()) {
         sensorDataCountMap_[event.sensorId] = 0;
+        it = sensorDataCountMap_.find(event.sensorId);
     }
-    sensorDataCountMap_[event.sensorId]++;
+    it->second++;
     bool result = false;
     if (firstTimestampMap_[event.sensorId] == 0) {
         firstTimestampMap_[event.sensorId] = event.timestamp;
@@ -81,7 +83,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
     if (result) {
         std::string st = {0};
         DataToStr(st, event);
-        st += "sensorDataCount=" + std::to_string(sensorDataCountMap_[event.sensorId]);
+        st += "sensorDataCount=" + std::to_string(it->second);
         st += reportResult;
         HDF_LOGI("%{public}s: %{public}s", __func__, st.c_str());
     }

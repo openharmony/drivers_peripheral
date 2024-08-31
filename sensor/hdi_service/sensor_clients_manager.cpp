@@ -484,12 +484,14 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
             HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
         } else {
             static std::unordered_map<int32_t, std::unordered_map<int32_t, int64_t>> sensorReportCountMap_;
-            if (sensorReportCountMap_[sensorId].find(serviceId) == sensorReportCountMap_[sensorId].end()) {
+            auto it = sensorReportCountMap_[sensorId].find(serviceId);
+            if (it == sensorReportCountMap_[sensorId].end()) {
                 sensorReportCountMap_[sensorId][serviceId] = 0;
+                it = sensorReportCountMap_[sensorId].find(serviceId);
             }
-            sensorReportCountMap_[sensorId][serviceId]++;
+            it->second++;
             result += std::to_string(serviceId) + "-" +
-                    std::to_string(sensorReportCountMap_[sensorId][serviceId]) + " ";
+                    std::to_string(it->second) + " ";
         }
     }
     return result;
