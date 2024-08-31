@@ -81,7 +81,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
     if (result) {
         std::string st = {0};
         DataToStr(st, event);
-        st += "sensorDataCount=" + std::to_string(sensorDataCountMap_[event.sensorId]);
+        st += "sensorDataCount=" + std::to_string(sensorReportCountMap_[sensorId].find(serviceId)->second);
         st += reportResult;
         HDF_LOGI("%{public}s: %{public}s", __func__, st.c_str());
     }
