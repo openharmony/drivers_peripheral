@@ -140,7 +140,7 @@ void Test::GetCameraMetadata(int cameraId)
         CAMERA_LOGE("GetCameraAbility failed, rc = %{public}d", rc);
     }
     MetadataUtils::ConvertVecToMetadata(abilityVec, ability);
-    EXPECT_NE(ability, nullptr);
+    ASSERT_NE(ability, nullptr);
 }
 
 void Test::Close()
