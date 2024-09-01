@@ -89,12 +89,16 @@ HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_001, TestSize.Level1)
 HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_002, TestSize.Level1)
 {
     CAMERA_LOGI("CameraHdiTagTestV1_3 Camera_Hdi_TAG_TEST_V1_3_002 start ...");
-    EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
-    EXPECT_NE(data, nullptr);
+    ASSERT_NE(data, nullptr);
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_TRIPOD_DETECTION, &entry);
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+        if (entry.count == 1) {
+            CAMERA_LOGI("OHOS_ABILITY_TRIPOD_DETECTION %{public}d\n", entry.data.i32[0]);
+            printf("OHOS_ABILITY_TRIPOD_DETECTION %d\n", entry.data.i32[0]);
+            return
+        }
         constexpr size_t step = 10;
         std::stringstream ss;
         for (size_t i = 0; i < entry.count; i++) {
