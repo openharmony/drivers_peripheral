@@ -213,6 +213,13 @@ int32_t WifiStaIface::SetTxPower(int32_t power)
     return HDF_FAILURE;
 }
 
+int32_t WifiStaIface::SetIfaceState(bool state)
+{
+    if (ifaceUtil_.lock()->SetUpState(ifname_, state)) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
+}
 }
 }
 }

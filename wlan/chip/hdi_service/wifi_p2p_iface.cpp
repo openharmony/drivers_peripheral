@@ -136,6 +136,10 @@ int32_t WifiP2pIface::SetTxPower(int32_t power)
     return HDF_ERR_NOT_SUPPORT;
 }
 
+int32_t WifiP2pIface::SetIfaceState(bool state)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
 }
 }
 }
