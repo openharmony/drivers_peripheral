@@ -365,7 +365,7 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
         return HDF_FAILURE;
     }
 
-    *adapter = AudioCreateAdapterVdi(descIndex, vdiAdapter);
+    *adapter = AudioCreateAdapterVdi(descIndex, vdiAdapter, desc->adapterName);
     if (*adapter == NULL) {
         AUDIO_FUNC_LOGE("audio vdiManager create adapter fail");
         priv->vdiManager->UnloadAdapter(priv->vdiManager, vdiAdapter);
