@@ -16,7 +16,7 @@ import("../audio.gni")
 
 group("idl_audio") {
   deps = [
-    "primary:audio_manager_service_4.0",
+    "primary:audio_manager_service_3.0",
     "primary:audio_primary_driver",
     "primary_impl:audio_primary_impl_vendor",
   ]

@@ -29,7 +29,6 @@ extern "C" {
 
 struct IAudioCaptureVdi {
     int32_t (*CaptureFrame)(struct IAudioCaptureVdi *self, int8_t *frame, uint32_t *frameLen, uint64_t *replyBytes);
-    int32_t (*CaptureFrameEc)(struct IAudioCaptureVdi *self, struct AudioCaptureFrameInfoVdi *info);
     int32_t (*GetCapturePosition)(struct IAudioCaptureVdi *self, uint64_t *frames, struct AudioTimeStampVdi *time);
     int32_t (*CheckSceneCapability)(struct IAudioCaptureVdi *self, const struct AudioSceneDescriptorVdi *scene,
         bool *supported);
