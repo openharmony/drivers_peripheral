@@ -45,7 +45,6 @@ ohos_fuzztest("AudioCardConfigFuzzTest") {
     external_deps += [ "c_utils:utils" ]
   }
   external_deps += [
-    "alsa-lib:libasound",
     "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
   ]
