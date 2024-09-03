@@ -13,13 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef WIFI_STA_IFACE_H
-#define WIFI_STA_IFACE_H
+#ifndef WIFI_EXT_IFACE_H
+#define WIFI_EXT_IFACE_H
 
 #include "v1_0/ichip_iface.h"
 #include "v1_0/chip_types.h"
 #include "wifi_vendor_hal.h"
-#include "callback_handler.h"
 #include "v1_0/ichip_iface_callback.h"
 #include "iface_util.h"
 
@@ -29,9 +28,9 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
-class WifiStaIface : public IChipIface {
+class WifiExtIface : public IChipIface {
 public:
-    WifiStaIface(const std::string& ifname, const std::weak_ptr<WifiVendorHal> vendorHal,
+    WifiExtIface(const std::string& ifName, const std::weak_ptr<WifiVendorHal> vendorHal,
         const std::weak_ptr<IfaceUtil> ifaceUtil);
     void Invalidate();
     bool IsValid();
@@ -61,14 +60,12 @@ public:
     int32_t GetCoexictenceChannelList(const std::string& ifName, std::vector<uint8_t>& paramBuf) override;
 
 private:
-    std::set<sptr<IChipIfaceCallback>> GetEventCallbacks();
-    CallbackHandler<IChipIfaceCallback> staCbHandler_;
-    std::string ifname_;
-    std::vector<std::string> instances_;
+    std::string ifName_;
     std::weak_ptr<WifiVendorHal> vendorHal_;
     std::weak_ptr<IfaceUtil> ifaceUtil_;
     bool isValid_;
 };
+
 }
 }
 }
