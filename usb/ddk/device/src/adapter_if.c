@@ -1232,7 +1232,6 @@ void UsbFnMemFree(const void *mem)
     }
     OsalMemFree((void *)mem);
     mem = NULL;
-
 }
 
 static struct UsbFnAdapterOps g_usbFnAdapter = {
