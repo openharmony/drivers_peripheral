@@ -21,6 +21,8 @@ using namespace testing::ext;
 using namespace OHOS::Camera;
 using namespace OHOS::HDI::Camera;
 constexpr uint32_t DATA_COUNT = 1;
+constexpr uint32_t ITEM_CAPACITY = 100;
+constexpr uint32_t DATA_CAPACITY = 2000;
 void CameraFrontUtTestV1_3::SetUpTestCase(void) {}
 void CameraFrontUtTestV1_3::TearDownTestCase(void) {}
 void CameraFrontUtTestV1_3::SetUp(void)
@@ -121,5 +123,82 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_002, TestSize.Level1)
                 CAMERA_LOGI("Capture Mirror is not supported, tag is: %{public}d", captureMirror);
             }
         }
+    }
+}
+
+/**
+ * @tc.name: Camera_Front_Hdi_V1_3_003
+ * @tc.desc: OHOS_ABILITY_DEPTH_DATA_PROFILES
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_003, TestSize.Level1)
+{
+    ASSERT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    ASSERT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_DEPTH_DATA_PROFILES, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("OHOS_ABILITY_DEPTH_DATA_PROFILES is not support.");
+        return;
+    }
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+        CAMERA_LOGI("print tag<OHOS_ABILITY_DEPTH_DATA_PROFILES> i32 value start.");
+        constexpr size_t step = 10;
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.i32[i] << " ";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                printf("OHOS_ABILITY_DEPTH_DATA_PROFILES %s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+        CAMERA_LOGI("print tag<OHOS_ABILITY_DEPTH_DATA_PROFILES> i32 value end.");
+    }
+}
+
+/**
+ * @tc.name: Camera_Front_Hdi_V1_3_004
+ * @tc.desc: OHOS_CONTROL_DEPTH_DATA_ACCURACY
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_004, TestSize.Level1)
+{
+    ASSERT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    ASSERT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    
+    std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t depthDataAccuracy = static_cast<uint8_t>(OHOS_DEPTH_DATA_ACCURACY_RELATIVE);
+    modeSetting->addEntry(OHOS_CONTROL_DEPTH_DATA_ACCURACY, &depthDataAccuracy, 1);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
+    cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
+    
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_DEPTH_DATA_PROFILES, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("OHOS_ABILITY_DEPTH_DATA_PROFILES is not support.");
+        return;
+    }
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+        CAMERA_LOGI("print tag<OHOS_ABILITY_DEPTH_DATA_PROFILES> i32 value start.");
+        constexpr size_t step = 10;
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.i32[i] << " ";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                printf("OHOS_ABILITY_DEPTH_DATA_PROFILES %s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+        CAMERA_LOGI("print tag<OHOS_ABILITY_DEPTH_DATA_PROFILES> i32 value end.");
     }
 }
