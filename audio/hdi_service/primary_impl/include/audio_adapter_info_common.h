@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include "audio_internal.h"
-#include "v4_0/audio_types.h"
+#include "v3_0/audio_types.h"
 
 #define AUDIO_PRIMARY_ID_MIN 0
 #define AUDIO_PRIMARY_ID_MAX 10

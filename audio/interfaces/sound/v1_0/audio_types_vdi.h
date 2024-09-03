@@ -293,8 +293,6 @@ enum AudioInputTypeVdi {
     AUDIO_VDI_INPUT_VOICE_DOWNLINK_TYPE      = 1 << 5,
     AUDIO_VDI_INPUT_VOICE_CALL_TYPE          = 1 << 6,
     AUDIO_VDI_INPUT_CAMCORDER_TYPE           = 1 << 7,
-    AUDIO_VDI_INPUT_EC_TYPE                  = 1 << 8,
-    AUDIO_VDI_INPUT_NOISE_REDUCTION_TYPE     = 1 << 9,
 };
 
 struct AudioOffloadInfoVdi {
@@ -306,30 +304,6 @@ struct AudioOffloadInfoVdi {
     enum AudioFormatVdi format;
     uint32_t offloadBufferSize;
     uint64_t duration;
-};
-
-struct EcSampleAttributesVdi {
-    bool ecInterleaved;
-    enum AudioFormatVdi ecFormat;
-    uint32_t ecSampleRate;
-    uint32_t ecChannelCount;
-    uint64_t ecChannelLayout;
-    uint32_t ecPeriod;
-    uint32_t ecFrameSize;
-    bool ecIsBigEndian;
-    bool ecIsSignedData;
-    uint32_t ecStartThreshold;
-    uint32_t ecStopThreshold;
-    uint32_t ecSilenceThreshold;
-};
-
-struct AudioCaptureFrameInfoVdi {
-    int8_t* frame;
-    uint32_t frameLen;
-    uint64_t replyBytes;
-    int8_t* frameEc;
-    uint32_t frameEcLen;
-    uint64_t replyBytesEc;
 };
 
 struct AudioSampleAttributesVdi {
@@ -349,7 +323,6 @@ struct AudioSampleAttributesVdi {
     int32_t streamId;
     int32_t sourceType;
     struct AudioOffloadInfoVdi offloadInfo;
-    struct EcSampleAttributesVdi ecSampleAttributes;
 } __attribute__ ((aligned(8)));
 
 struct AudioTimeStampVdi {
@@ -399,7 +372,6 @@ struct AudioDevExtInfoVdi {
 struct AudioMixExtInfoVdi {
     int32_t moduleId;
     int32_t streamId;
-    int32_t source;
 } __attribute__ ((aligned(8)));
 
 struct AudioSessionExtInfoVdi {
