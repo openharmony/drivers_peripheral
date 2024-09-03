@@ -1461,7 +1461,8 @@ int32_t UsbImpl::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_
         HDF_LOGE("%{public}s:UsbdFindRequestSyncAndCreat failed.", __func__);
         return ret;
     }
-    if (requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_IN || requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK) {
+    if (requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_IN ||
+        (requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK && requestSync->pipe.pipeType != USB_PIPE_TYPE_INTERRUPT)) {
         HDF_LOGE("%{public}s:invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1506,7 +1507,8 @@ int32_t UsbImpl::BulkTransferReadwithLength(const UsbDev &dev,
         tbuf = nullptr;
         return ret;
     }
-    if (requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_IN || requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK) {
+    if (requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_IN ||
+        (requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK && requestSync->pipe.pipeType != USB_PIPE_TYPE_INTERRUPT)) {
         HDF_LOGE("%{public}s:invalid param", __func__);
         free(tbuf);
         tbuf = nullptr;
@@ -1541,7 +1543,8 @@ int32_t UsbImpl::BulkTransferWrite(
         HDF_LOGE("%{public}s:read timeout error", __func__);
         return ret;
     }
-    if (requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_OUT || requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK) {
+    if (requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_OUT ||
+        (requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK && requestSync->pipe.pipeType != USB_PIPE_TYPE_INTERRUPT)) {
         HDF_LOGE("%{public}s:invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
