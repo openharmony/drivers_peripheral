@@ -29,6 +29,7 @@
 #include "wifi_ap_iface.h"
 #include "wifi_sta_iface.h"
 #include "wifi_p2p_iface.h"
+#include "wifi_ext_iface.h"
 #include "iface_util.h"
 
 namespace OHOS {
@@ -64,6 +65,9 @@ public:
     int32_t GetStaServiceIfNames(std::vector<std::string>& ifnames) override;
     int32_t GetStaService(const std::string& ifname, sptr<IChipIface>& iface) override;
     int32_t RemoveStaService(const std::string& ifname) override;
+    int32_t CreateExtService(const std::string& ifName, sptr<IChipIface>& iface) override;
+    int32_t GetExtService(const std::string& ifName, sptr<IChipIface>& iface) override;
+    int32_t RemoveExtService(const std::string& ifName) override;
 
 private:
     std::string GetIfaceName(IfaceType type, unsigned idx);
@@ -97,6 +101,7 @@ private:
     std::vector<sptr<WifiApIface>> apIfaces_;
     std::vector<sptr<WifiP2pIface>> p2pIfaces_;
     std::vector<sptr<WifiStaIface>> staIfaces_;
+    std::vector<sptr<WifiExtIface>> extIfaces_;
     bool isValid_;
     uint32_t currentModeId_;
     std::shared_ptr<IfaceUtil> ifaceUtil_;
