@@ -71,6 +71,11 @@ bool InitHalFuncTableWithStubs(WifiHalFn* halFn)
     PopulateStubFor(&halFn->setDpiMarkRule);
     PopulateStubFor(&halFn->registerIfaceCallBack);
     PopulateStubFor(&halFn->setTxPower);
+    PopulateStubFor(&halFn->registerExtIfaceCallBack);
+    PopulateStubFor(&halFn->sendCmdToDriver);
+    PopulateStubFor(&halFn->sendActionFrame);
+    PopulateStubFor(&halFn->registerActionFrameReceiver);
+    PopulateStubFor(&halFn->getCoexictenceChannelList);
     return true;
 }
     

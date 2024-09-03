@@ -57,6 +57,14 @@ void InvalidateAndClearP2pIface(std::vector<sptr<WifiP2pIface>>& ifaces)
     ifaces.clear();
 }
 
+void InvalidateAndClearExtIface(std::vector<sptr<WifiExtIface>>& ifaces)
+{
+    for (const auto& iface : ifaces) {
+        iface->Invalidate();
+    }
+    ifaces.clear();
+}
+
 WifiChip::WifiChip(
     int32_t chipId, bool isPrimary,
     const std::weak_ptr<WifiVendorHal> vendorHal,
@@ -80,6 +88,7 @@ void WifiChip::Invalidate()
     InvalidateAndClearApIface(apIfaces_);
     InvalidateAndClearP2pIface(p2pIfaces_);
     InvalidateAndClearStaIface(staIfaces_);
+    InvalidateAndClearExtIface(extIfaces_);
     SetParameter(K_ACTIVE_WLAN_IFACE_NAME_PROPERTY, K_NO_ACTIVE_WLAN_IFACE_NAME_PROPERTY_VALUE);
     vendorHal_.reset();
     cbHandler_.Invalidate();
@@ -190,6 +199,7 @@ int32_t WifiChip::HandleChipConfiguration(int32_t modeId)
         InvalidateAndClearApIface(apIfaces_);
         InvalidateAndClearP2pIface(p2pIfaces_);
         InvalidateAndClearStaIface(staIfaces_);
+        InvalidateAndClearExtIface(extIfaces_);
         WifiError status = vendorHal_.lock()->Stop(&lock, []() {});
         if (status != HAL_SUCCESS) {
             HDF_LOGE("Failed to stop vendor HAL: %{public}d", status);
@@ -347,6 +357,17 @@ std::vector<std::string> GetStaNames(std::vector<sptr<WifiStaIface>>& ifaces)
 }
 
 sptr<WifiStaIface> FindStaUsingName(std::vector<sptr<WifiStaIface>>& ifaces, const std::string& name)
+{
+    std::vector<std::string> names;
+    for (const auto& iface : ifaces) {
+        if (name == iface->GetName()) {
+            return iface;
+        }
+    }
+    return nullptr;
+}
+
+sptr<WifiExtIface> FindExtUsingName(std::vector<sptr<WifiExtIface>>& ifaces, const std::string& name)
 {
     std::vector<std::string> names;
     for (const auto& iface : ifaces) {
@@ -617,6 +638,43 @@ int32_t WifiChip::RemoveStaService(const std::string& ifname)
     }
     InvalidateAndClearStaIface(staIfaces_);
     SetUsedIfaceNameProperty(GetUsedIfaceName());
+    return HDF_SUCCESS;
+}
+
+int32_t WifiChip::CreateExtService(const std::string& ifName, sptr<IChipIface>& iface)
+{
+    HDF_LOGI("enter CreateExtService");
+    WifiError status = vendorHal_.lock()->CreateVirtualInterface(ifName, HalIfaceType::HAL_TYPE_P2P);
+    if (status != WifiError::HAL_SUCCESS) {
+        HDF_LOGE("Failed to add interface: %{public}s, error: %{public}d", ifName.c_str(), status);
+        return HDF_FAILURE;
+    }
+    sptr<WifiExtIface> ifa = new WifiExtIface(ifName, vendorHal_, ifaceUtil_);
+    extIfaces_.push_back(ifa);
+    iface = ifa;
+    return HDF_SUCCESS;
+}
+
+int32_t WifiChip::GetExtService(const std::string& ifName, sptr<IChipIface>& iface)
+{
+    iface = FindExtUsingName(extIfaces_, ifName);
+    if (iface == nullptr) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t WifiChip::RemoveExtService(const std::string& ifName)
+{
+    const auto iface = FindExtUsingName(extIfaces_, ifName);
+    if (iface == nullptr) {
+        return HDF_FAILURE;
+    }
+    WifiError status = vendorHal_.lock()->DeleteVirtualInterface(ifName);
+    if (status != WifiError::HAL_SUCCESS) {
+        HDF_LOGE("Failed to remove interface: %{public}s, error: %{public}d", ifName.c_str(), status);
+    }
+    InvalidateAndClearExtIface(extIfaces_);
     return HDF_SUCCESS;
 }
 
