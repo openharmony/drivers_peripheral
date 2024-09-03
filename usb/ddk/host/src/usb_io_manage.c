@@ -19,6 +19,8 @@
 
 #define HDF_LOG_TAG USB_IO_MANAGE
 
+static const int MAX_ERROR_TIMES = 20;
+
 static bool IoCancelRequest(struct UsbInterfacePool *interfacePool, const struct UsbHostRequest *hostRequest)
 {
     struct UsbIfRequest *requestObj = NULL;
@@ -52,8 +54,9 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
     struct UsbHostRequest *submitRequest = NULL;
     int32_t ret;
     int32_t i;
+    int32_t errorTimes = 0;
 
-    while (true) {
+    while (errorTimes < MAX_ERROR_TIMES) {
         submitRequest = NULL;
         /* Get a request from curretn submit queue */
         ret = UsbIoGetRequest(&interfacePool->submitRequestQueue, &submitRequest);
@@ -66,14 +69,12 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             break;
         }
 
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbIoGetRequest failed, ret=%{public}d ", __func__, __LINE__, ret);
+        if (ret != HDF_SUCCESS || submitRequest == NULL) {
+            ++errorTimes;
+            HDF_LOGE("%{public}s:%{public}d ret=%{public}d errtimes=%{public}d", __func__, __LINE__, ret, errorTimes);
             continue;
         }
-
-        if (submitRequest == NULL) {
-            continue;
-        }
+        errorTimes = 0;
 
         if (IoCancelRequest(interfacePool, submitRequest)) {
             continue;
@@ -96,7 +97,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             continue;
         }
     }
-    HDF_LOGE("%{public}s, stop. ", __func__);
+    HDF_LOGE("%{public}s, stop. errorTimes=%{public}d", __func__, errorTimes);
     return 0;
 }
 
