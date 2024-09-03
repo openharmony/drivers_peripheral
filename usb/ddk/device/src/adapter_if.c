@@ -1230,11 +1230,9 @@ void UsbFnMemFree(const void *mem)
         HDF_LOGE("%{public}s:%{public}d invalid param mem.", __func__, __LINE__);
         return;
     }
+    OsalMemFree((void *)mem);
+    mem = NULL;
 
-    if (mem != NULL) {
-        OsalMemFree((void *)mem);
-        mem = NULL;
-    }
 }
 
 static struct UsbFnAdapterOps g_usbFnAdapter = {
