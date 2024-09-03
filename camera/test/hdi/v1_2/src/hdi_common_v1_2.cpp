@@ -111,6 +111,12 @@ int32_t Test::DefferredImageTestInit()
         printf("CreateImageProcessSession Fail, imageProcessSession is nullptr: %d\r\n", ret);
         return -1;
     }
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(itemCapacity, dataCapacity);
+    int32_t cameraUserId = 100;
+    meta->addEntry(OHOS_CAMERA_USER_ID, &cameraUserId, dataCount);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraDevice->UpdateSettings(metaVec);
     return 0;
 }
 
