@@ -32,10 +32,16 @@ const int CHIP_ID_AP = 3;
 #endif
 
 static constexpr int32_t K_PRIMARY_CHIP_ID = 0;
+static std::mutex g_chipMutex;
 
 extern "C" IChipController *ChipControllerImplGetInstance(void)
 {
-    return new (std::nothrow) Wifi();
+    static IChipController *gWifiService = NULL;
+    std::unique_lock<std::mutex> lock(g_chipMutex);
+    if (gWifiService == NULL) {
+        gWifiService = new (std::nothrow) Wifi();
+    }
+    return gWifiService;
 }
 
 Wifi::Wifi()
