@@ -469,8 +469,10 @@ BENCHMARK_F(HdfUsbdBenchmarkRequestTest, BulkCancel)(benchmark::State& state)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     OHOS::HDI::Usb::V1_0::UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(g_dev, interfaceId, 1);
+    EXPECT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(g_dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(g_dev, pipe, usbdBulkCallback);
     EXPECT_EQ(ret, 0);
     for (auto _ : state) {
         ret = g_usbInterface->BulkCancel(g_dev, pipe);
