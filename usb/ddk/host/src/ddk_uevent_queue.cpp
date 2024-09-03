@@ -233,6 +233,7 @@ int32_t DdkUeventAddTask(const struct DdkUeventInfo *info)
     };
     if (!DdkUeventCopyTask(task, info)) {
         HDF_LOGW("%{public}s: copy task failed", __func__);
+        return HDF_FAILURE;
     }
     return g_taskQueue.AddTask(task);
 }
