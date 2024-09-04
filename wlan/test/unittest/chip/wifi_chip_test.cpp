@@ -40,7 +40,7 @@ public:
         InitWifiHalFuncTable(&fn);
         const std::shared_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(
             ifaceTool, fn, isPrimary);
-        std::shared_ptr<WifiChipModes> chipModes = std::make_shared<WifiChipModes>();
+        std::shared_ptr<WifiChipModes> chipModes = std::make_shared<WifiChipModes>(vendorHal);
         wifiChip = new WifiChip(chipId, isPrimary, vendorHal,
             std::make_shared<IfaceUtil>(ifaceTool), chipModes, HandlerMock);
     }
