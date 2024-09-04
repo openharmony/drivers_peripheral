@@ -20,7 +20,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
-#include "v4_0/iaudio_adapter.h"
+#include "v3_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 static pthread_mutex_t g_managerMutex;

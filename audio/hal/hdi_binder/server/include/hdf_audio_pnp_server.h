@@ -16,7 +16,7 @@
 #ifndef HDF_AUDIO_PNP_SERVER_H
 #define HDF_AUDIO_PNP_SERVER_H
 
-#include "v4_0/audio_types.h"
+#include "v3_0/audio_types.h"
 #include "hdf_types.h"
 
 #define FFRT_TASK_ATTR_STORAGE_SIZE 128
