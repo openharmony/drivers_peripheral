@@ -97,7 +97,7 @@ HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_002, TestSize.Level1)
         if (entry.count == 1) {
             CAMERA_LOGI("OHOS_ABILITY_TRIPOD_DETECTION %{public}d\n", entry.data.i32[0]);
             printf("OHOS_ABILITY_TRIPOD_DETECTION %d\n", entry.data.i32[0]);
-            return
+            return;
         }
         constexpr size_t step = 10;
         std::stringstream ss;
