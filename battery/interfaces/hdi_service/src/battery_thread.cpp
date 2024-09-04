@@ -21,6 +21,7 @@
 #include <sys/timerfd.h>
 #include <unistd.h>
 #include <linux/netlink.h>
+#include "hdf_base.h"
 #include "battery_config.h"
 #include "battery_log.h"
 
