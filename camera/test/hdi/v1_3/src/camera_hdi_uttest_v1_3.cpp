@@ -1943,9 +1943,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_047, TestSize.Level1)
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
 
-void UpdateMetadata(std::shared_ptr<OHOS::Camera::Test> cameraTest)
+void UpdateMetadata(std::shared_ptr<OHOS::Camera::Test> cameraTest, std::shared_ptr<CameraSetting> meta)
 {
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
     // 修改Zoom大于15x
     float zoomRatio = 16.0f;
     meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
@@ -1978,7 +1977,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_048, TestSize.Level1)
     }
     cameraTest->intents = {PREVIEW, STILL_CAPTURE};
     cameraTest->StartStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::CAPTURE);
-    UpdateMetadata(cameraTest);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    UpdateMetadata(cameraTest, meta);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     sleep(3);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
