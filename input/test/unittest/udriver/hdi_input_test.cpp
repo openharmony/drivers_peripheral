@@ -152,7 +152,7 @@ HWTEST_F(HdiInputTest, ScanInputDevice001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: OpenInputDev001
+  * @tc.name: OpenInputDevice001
   * @tc.desc: open input device test
   * @tc.type: FUNC
   * @tc.require: AR000F867R
@@ -391,9 +391,10 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
 HWTEST_F(HdiInputTest, RegisterReportCallback001, TestSize.Level1)
 {
     printf("%s: [Input] RegisterReportCallback001 enter\n", __func__);
-    InputDeviceManager iInputDeviceManager;
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
     int32_t ret;
-    ret = iInputDeviceManager.RegisterReportCallback(0, nullptr);
+    ret = g_inputInterface->iInputReporter->RegisterReportCallback(0, nullptr);
     if (ret != INPUT_SUCCESS) {
         printf("%s: register report callback failed, ret %d\n", __func__, ret);
     }
@@ -436,8 +437,9 @@ HWTEST_F(HdiInputTest, UnRegisterReportCallback001, TestSize.Level1)
 {
     printf("%s: [Input] UnRegisterReportCallback001 enter\n", __func__);
     int32_t ret;
-    InputDeviceManager iInputDeviceManager;
-    ret = iInputDeviceManager.UnregisterReportCallback(INVALID_DEV_INDEX);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
+    ret = g_inputInterface->iInputReporter->UnregisterReportCallback(INVALID_DEV_INDEX);
     if (ret != INPUT_SUCCESS) {
         printf("%s: unregister report callback failed, ret %d\n", __func__, ret);
     }
