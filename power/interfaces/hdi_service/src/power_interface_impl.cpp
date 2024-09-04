@@ -24,7 +24,6 @@
 #include "securec.h"
 #include "unique_fd.h"
 #include "power_hdf_log.h"
-#include "power_xcollie.h"
 #include "v1_2/power_types.h"
 #include <atomic>
 #include <chrono>
@@ -452,14 +451,12 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
-    Power::PowerXCollie powerXcollie("Power_HoldRunningLockExt");
     return RunningLockImpl::HoldLock(info, g_powerState, lockid, bundleName);
 }
 
 int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
-    Power::PowerXCollie powerXcollie("Power_UnholdRunningLockExt");
     return RunningLockImpl::UnholdLock(info, lockid, bundleName);
 }
 
