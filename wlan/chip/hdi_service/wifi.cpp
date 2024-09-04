@@ -41,7 +41,6 @@ extern "C" IChipController *ChipControllerImplGetInstance(void)
 Wifi::Wifi()
     :ifaceTool_(std::make_shared<IfaceTool>()),
     vendorHalList_(std::make_shared<WifiVendorHalList>(ifaceTool_)),
-    chipModes_(std::make_shared<WifiChipModes>()),
     runState_(RunState::STOPPED) {
     remoteDeathRecipient_ =
         new RemoteDeathRecipient(std::bind(&Wifi::OnRemoteDied, this, std::placeholders::_1));
@@ -95,6 +94,7 @@ int32_t Wifi::Init()
 
         int32_t chipId = K_PRIMARY_CHIP_ID;
         for (auto& hal : vendorHals_) {
+            chipModes_ = std::make_shared<WifiChipModes>(hal);
             chips_.push_back(new WifiChip(
                 chipId, chipId == K_PRIMARY_CHIP_ID, hal,
                 std::make_shared<IfaceUtil>(ifaceTool_),

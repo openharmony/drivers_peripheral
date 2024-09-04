@@ -17,6 +17,8 @@
 #include <hdf_log.h>
 #include "../../../chip/hdi_service/wifi_chip.h"
 #include "../../../chip/hdi_service/wifi_chip_modes.h"
+#include "../../../chip/hdi_service/iface_tool.h"
+#include "wifi_hal_fn.h"
 
 using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
@@ -28,7 +30,13 @@ public:
     static void TearDownTestCase() {}
     void SetUp()
     {
-        wifiChipModes = std::make_shared<WifiChipModes>();
+        bool isPrimary = true;
+        std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
+        WifiHalFn fn;
+        InitWifiHalFuncTable(&fn);
+        const std::shared_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(
+            ifaceTool, fn, isPrimary);
+        wifiChipModes = std::make_shared<WifiChipModes>(vendorHal);
     }
     void TearDown()
     {
