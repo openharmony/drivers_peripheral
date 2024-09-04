@@ -55,8 +55,8 @@ bool EncodeBufferHelper::InitialRgbaData(BufferHandle* handle, PixelFileInfo& pi
     errno_t ret = EOK;
     uint8_t* dataEnd = data + size -1;
     if (dataEnd < data + pixelInfo.alignedWidth * BYTES_PER_PIXEL_RBGA * pixelInfo.displayHeight) {
-        return false;
         HDF_LOGI("Input Data length Not Enough");
+        return false;
     }
     for (uint32_t i = 0; i < pixelInfo.displayHeight; i++) {
         ret = memcpy_s(dst, pixelInfo.alignedWidth * BYTES_PER_PIXEL_RBGA, data,
@@ -139,11 +139,13 @@ SharedBuffer EncodeBufferHelper::CreateSharedBuffer(uint8_t* data, size_t size)
         return buffer;
     }
     if (dataEnd < data + totalSize) {
+        close(fd);
         return buffer;
     }
     errno_t ret = EOK;
     ret = memcpy_s(reinterpret_cast<char*>(addr), totalSize, data, totalSize);
     if (ret != EOK) {
+        close(fd);
         return buffer;
     }
     data += totalSize;
