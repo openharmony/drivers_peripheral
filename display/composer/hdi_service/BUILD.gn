@@ -71,6 +71,8 @@ ohos_shared_library("libdisplay_composer_service_1.2") {
 }
 
 ohos_shared_library("libdisplay_composer_driver_1.0") {
+  defines = []
+  defines += display_defines
   include_dirs = []
   sources = [ "src/display_composer_driver.cpp" ]
 
