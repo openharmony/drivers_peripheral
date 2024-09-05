@@ -15,7 +15,6 @@
 
 #include "wifi_chip_modes.h"
 #include <hdf_log.h>
-#include "parameter.h"
 
 namespace OHOS {
 namespace HDI {
