@@ -64,7 +64,6 @@ private:
     std::shared_ptr<IfaceTool> ifaceTool_;
     std::shared_ptr<WifiVendorHalList> vendorHalList_;
     std::vector<std::shared_ptr<WifiVendorHal>> vendorHals_;
-    std::shared_ptr<WifiChipModes> chipModes_;
     RunState runState_;
     std::vector<sptr<WifiChip>> chips_;
     CallbackHandler<IChipControllerCallback> cbHandler_;
