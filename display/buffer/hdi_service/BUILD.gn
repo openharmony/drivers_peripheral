@@ -27,6 +27,8 @@ group("hdf_display_buffer_service") {
 }
 
 ohos_shared_library("liballocator_service_1.0") {
+  defines = []
+  defines += display_defines
   include_dirs = [
     "dfx",
     "include",
