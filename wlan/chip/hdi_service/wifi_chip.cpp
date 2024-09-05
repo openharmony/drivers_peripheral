@@ -137,18 +137,16 @@ int32_t WifiChip::GetChipCaps(uint32_t& capabilities)
 
 int32_t WifiChip::GetChipModes(std::vector<UsableMode>& modes)
 {
-    bool isPrimary = true;
     auto chipModes = std::make_shared<WifiChipModes>(vendorHal_);
-    modes = chipModes->GetChipModes(isPrimary);
+    modes = chipModes->GetChipModes(true);
     return HDF_SUCCESS;
 }
 
 bool WifiChip::IsValidModeId(uint32_t modeId)
 {
     std::vector<UsableMode> modes;
-    bool isPrimary = true;
     auto chipModes = std::make_shared<WifiChipModes>(vendorHal_);
-    modes = chipModes->GetChipModes(isPrimary);
+    modes = chipModes->GetChipModes(true);
     for (const auto& mode : modes) {
         if (mode.modeId == modeId) {
             return true;
@@ -257,9 +255,8 @@ std::vector<ComboIface> WifiChip::GetCurrentCombinations()
         return {};
     }
     std::vector<UsableMode> modes;
-    bool isPrimary = true;
     auto chipModes = std::make_shared<WifiChipModes>(vendorHal_);
-    modes = chipModes->GetChipModes(isPrimary);
+    modes = chipModes->GetChipModes(true);
     for (const auto& mode : modes) {
         if (mode.modeId == currentModeId_) {
             return mode.usableCombo;
