@@ -182,7 +182,11 @@ int32_t WifiApIface::SetIfaceState(bool state)
 
 int32_t WifiApIface::SendCmdToDriver(const std::string& ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf)
 {
-    return HDF_ERR_NOT_SUPPORT;
+    WifiError status = vendorHal_.lock()->SendCmdToDriver(ifName, cmdId, paramBuf);
+    if (status == HAL_SUCCESS) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
 }
 
 int32_t WifiApIface::SendActionFrame(const std::string& ifName, uint32_t freq, const std::vector<uint8_t>& frameData)
