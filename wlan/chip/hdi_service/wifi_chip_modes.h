@@ -41,7 +41,7 @@ constexpr int32_t K_V3 = 3;
 
 class WifiChipModes {
 public:
-    WifiChipModes(const std::weak_ptr<WifiVendorHal> vendorHal);
+    explicit WifiChipModes(const std::weak_ptr<WifiVendorHal> vendorHal);
     virtual ~WifiChipModes() = default;
     virtual std::vector<UsableMode> GetChipModes(
         bool isPrimary);
