@@ -67,11 +67,10 @@ WifiChip::WifiChip(
     vendorHal_(vendorHal),
     isValid_(true),
     currentModeId_(chip_mode_ids::K_INVALID),
-    ifaceUtil_(ifaceUtil),  
+    ifaceUtil_(ifaceUtil),
+    modes_(chipModes.lock()->GetChipModes(isPrimary)),
     subsystemCallbackHandler_(handler)
-{
-    vendorHal_.lock()->GetChipModes(isPrimary, modes_);
-}
+{}
 
 WifiChip::~WifiChip()
 {}
