@@ -94,11 +94,10 @@ int32_t Wifi::Init()
 
         int32_t chipId = K_PRIMARY_CHIP_ID;
         for (auto& hal : vendorHals_) {
-            chipModes_ = std::make_shared<WifiChipModes>(hal);
             chips_.push_back(new WifiChip(
                 chipId, chipId == K_PRIMARY_CHIP_ID, hal,
                 std::make_shared<IfaceUtil>(ifaceTool_),
-                chipModes_, onVendorHalRestartCallback));
+                onVendorHalRestartCallback));
             chipId++;
         }
         runState_ = RunState::STARTED;

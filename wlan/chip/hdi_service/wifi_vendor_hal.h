@@ -56,7 +56,7 @@ public:
     std::pair<WifiError, int> GetPowerMode(const std::string& ifaceName);
     WifiError SetPowerMode(const std::string& ifaceName, int mode);
     WifiError StartScan(const std::string& ifaceName, const ScanParams& params);
-    WifiError GetChipModes(bool& isPrimary);
+    WifiError IsSupportCoex(bool& isCoex);
     WifiError StartPnoScan(const std::string& ifaceName, const PnoScanParams& pnoParams);
     WifiError StopPnoScan(const std::string& ifaceName);
     WifiError GetScanInfos(const std::string& ifaceName,

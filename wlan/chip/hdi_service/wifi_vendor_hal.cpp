@@ -315,9 +315,9 @@ WifiError WifiVendorHal::SetPowerMode(const std::string& ifaceName, int mode)
     return globalFuncTable_.setPowerMode(ifaceName.c_str(), mode);
 }
 
-WifiError WifiVendorHal::GetChipModes(bool& isPrimary)
+WifiError WifiVendorHal::IsSupportCoex(bool& isCoex)
 {
-    return globalFuncTable_.GetChipModes(isPrimary);
+    return globalFuncTable_.IsSupportCoex(isCoex);
 }
 
 WifiError WifiVendorHal::EnablePowerMode(const std::string& ifaceName, int mode)
