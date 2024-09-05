@@ -27,7 +27,7 @@
 #define LOG_TAG "COMPOSER_DRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
-#define HICOLLIE_TIMEOUT 10
+#define HICOLLIE_TIMEOUT 8
 
 struct HdfDisplayComposerHost {
     struct IDeviceIoService ioService;
@@ -66,12 +66,12 @@ static int32_t DisplayComposerDriverDispatch(
         return HDF_FAILURE;
     }
 #ifdef DISPLAY_HICOLLIE_ENABLE
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer("HDI::Display::Composer::SendRequest",
-        HICOLLIE_TIMEOUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+    int32_t id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer("HDI::Display::Composer::SendRequest",
+        HICOLLIE_TIMEOUT, nullptr, nullptr, OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
 #endif
     int32_t ret = hdfDisplayComposerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 #ifdef DISPLAY_HICOLLIE_ENABLE
-    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+    OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 #endif
     pthread_rwlock_unlock(&g_rwLock);
     return ret;
