@@ -85,7 +85,7 @@ std::vector<UsableMode> WifiChipModes::GetChipModes(bool isPrimary)
 {
     bool isCoex;
     vendorHal_.lock()->IsSupportCoex(isCoex);
-    if (isCoex == true) {
+    if (isCoex) {
         return GetChipModesForTriple();
     } else {
         return GetChipModesForPrimary();
