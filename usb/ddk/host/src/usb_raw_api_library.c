@@ -1653,10 +1653,8 @@ void RawUsbMemFree(void *mem)
         return;
     }
 
-    if (mem != NULL) {
-        OsalMemFree(mem);
-        mem = NULL;
-    }
+    OsalMemFree(mem);
+    mem = NULL;
 }
 
 bool RawGetInterfaceActiveStatus(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber)
