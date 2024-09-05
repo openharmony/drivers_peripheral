@@ -25,10 +25,3 @@ if (!defined(global_parts_info) ||
 } else {
   has_battery_c_utils_part = false
 }
-
-if (!defined(global_parts_info) ||
-    defined(global_parts_info.hiviewdfx_hicollie)) {
-  has_battery_xcollie_part = true
-} else {
-  has_battery_xcollie_part = false
-}
