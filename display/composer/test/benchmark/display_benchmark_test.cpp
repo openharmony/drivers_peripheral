@@ -663,10 +663,10 @@ BENCHMARK_F(DisplayBenchmarkTest, ClearClientBufferTest)(benchmark::State &state
     for (auto _ : state) {
         ret = g_composerDevice->ClearClientBuffer(g_displayIds[0]);
     }
-    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
-        ret = DISPLAY_SUCCESS;
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
     }
-    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearClientBufferTest)->
@@ -683,10 +683,10 @@ BENCHMARK_F(DisplayBenchmarkTest, ClearLayerBufferTest)(benchmark::State &state)
     for (auto _ : state) {
         ret = g_composerDevice->ClearLayerBuffer(g_displayIds[0], layerId);
     }
-    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
-        ret = DISPLAY_SUCCESS;
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
     }
-    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearLayerBufferTest)->
