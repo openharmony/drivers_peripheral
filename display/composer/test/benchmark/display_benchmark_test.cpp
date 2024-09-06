@@ -666,7 +666,7 @@ BENCHMARK_F(DisplayBenchmarkTest, ClearClientBufferTest)(benchmark::State &state
     if (ret == DISPLAY_NOT_SUPPORT) {
         return;
     }
-    EXPECT_EQ(DISPLAY_FAILURE, ret);
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearClientBufferTest)->
