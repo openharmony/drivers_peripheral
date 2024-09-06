@@ -679,7 +679,7 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearClientBufferTest)->
 BENCHMARK_F(DisplayBenchmarkTest, ClearLayerBufferTest)(benchmark::State &state)
 {
     int32_t ret = 0;
-    uint32_t layerId = 0;
+    uint32_t layerId = 1;
     for (auto _ : state) {
         ret = g_composerDevice->ClearLayerBuffer(g_displayIds[0], layerId);
     }
