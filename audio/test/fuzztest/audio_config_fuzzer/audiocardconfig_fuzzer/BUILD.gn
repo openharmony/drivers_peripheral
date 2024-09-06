@@ -48,4 +48,5 @@ ohos_fuzztest("AudioCardConfigFuzzTest") {
     "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
   ]
+  include_dirs += [ "//third_party/alsa-lib/include" ]
 }
