@@ -333,6 +333,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt001, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointId};
     ret = g_usbInterface->ClearHalt(dev, pipe);
     HDF_LOGI("UsbdClearHalt001 %{public}d ClearHalt=%{public}d", __LINE__, ret);
+    EXPECT_TRUE(ret == 0);
 }
 
 /**
