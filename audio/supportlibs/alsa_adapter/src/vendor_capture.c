@@ -22,7 +22,7 @@ typedef struct _CAPTURE_DATA_ {
     struct AlsaMixerCtlElement ctrlLeftVolume;
     struct AlsaMixerCtlElement ctrlRightVolume;
     long tempVolume;
-}CaptureData;
+} CaptureData;
 
 static int32_t CaptureInitImpl(struct AlsaCapture* captureIns)
 {
@@ -57,7 +57,7 @@ static int32_t CaptureSelectSceneImpl(struct AlsaCapture *captureIns, enum Audio
 
 static int32_t CaptureGetVolThresholdImpl(struct AlsaCapture *captureIns, long *volMin, long *volMax)
 {
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     long volMin = 0;
     long volMax = 0;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)captureIns;
@@ -78,7 +78,7 @@ static int32_t CaptureGetVolThresholdImpl(struct AlsaCapture *captureIns, long *
 
 static int32_t CaptureGetVolumeImpl(struct AlsaCapture *captureIns, long *volume)
 {
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     long volLeft = 0;
     long volRight = 0;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)captureIns;
@@ -103,7 +103,7 @@ static int32_t CaptureGetVolumeImpl(struct AlsaCapture *captureIns, long *volume
 
 static int32_t CaptureSetVolumeImpl(struct AlsaCapture *captureIns, long volume)
 {
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)captureIns;
     CaptureData *priData = CaptureGetPriData(captureIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
@@ -124,8 +124,9 @@ static int32_t CaptureSetVolumeImpl(struct AlsaCapture *captureIns, long volume)
 
 static int32_t CaptureSetMuteImpl(struct AlsaCapture *captureIns, bool muteFlag)
 {
-    int32_t ret;
-    long vol, setVol;
+    int32_t ret = HDF_SUCCESS;
+    long vol = 0;
+    long setVol = 0;
     CaptureData *priData = CaptureGetPriData(captureIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(priData);
