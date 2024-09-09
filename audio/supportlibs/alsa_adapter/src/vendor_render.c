@@ -22,7 +22,7 @@ typedef struct _RENDER_DATA_ {
     struct AlsaMixerCtlElement ctrlLeftVolume;
     struct AlsaMixerCtlElement ctrlRightVolume;
     long tempVolume;
-}RenderData;
+} RenderData;
 
 static int32_t RenderInitImpl(struct AlsaRender *renderIns)
 {
@@ -57,7 +57,7 @@ static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, enum AudioPor
 
 static int32_t RenderGetVolThresholdImpl(struct AlsaRender *renderIns, long *volMin, long *volMax)
 {
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     long volMin = 0;
     long volMax = 0;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
@@ -78,7 +78,7 @@ static int32_t RenderGetVolThresholdImpl(struct AlsaRender *renderIns, long *vol
 
 static int32_t RenderGetVolumeImpl(struct AlsaRender *renderIns, long *volume)
 {
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     long volLeft = 0;
     long volRight = 0;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
@@ -103,7 +103,7 @@ static int32_t RenderGetVolumeImpl(struct AlsaRender *renderIns, long *volume)
 
 static int32_t RenderSetVolumeImpl(struct AlsaRender *renderIns, long volume)
 {
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
     RenderData *priData = RenderGetPriData(renderIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
@@ -130,8 +130,9 @@ static bool RenderGetMuteImpl(struct AlsaRender *renderIns)
 
 static int32_t RenderSetMuteImpl(struct AlsaRender *renderIns, bool muteFlag)
 {
-    int32_t ret;
-    long vol, setVol;
+    int32_t ret = HDF_SUCCESS;
+    long vol = 0;
+    long setVol = 0;
     RenderData *priData = RenderGetPriData(renderIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(priData);
