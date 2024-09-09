@@ -1045,9 +1045,11 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
 static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
 {
     HDF_LOGI("enter %{public}s ", __func__);
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
     if (pWpaInterface == NULL) {
         HDF_LOGE("%{public}s: Get wpa global interface failed!", __func__);
+        pthread_mutex_unlock(&g_interfaceLock);
         return;
     }
     int ret = pWpaInterface->wpaCliTerminate();
@@ -1060,6 +1062,7 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
     HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
     ReleaseWifiStaInterface(0);
     HDF_LOGI("%{public}s: call ReleaseWifiStaInterface finish", __func__);
+    pthread_mutex_unlock(&g_interfaceLock);
 }
 
 static struct RemoteServiceDeathRecipient g_deathRecipient = {
