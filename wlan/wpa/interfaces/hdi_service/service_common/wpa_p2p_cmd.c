@@ -1032,10 +1032,9 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
         return HDF_ERR_INVALID_PARAM;
     }
 
-    char persistent[CMD_SIZE] = {0};
-    if (info->peerDevAddr && strlen(peerDevAddr) >= MIN_MAC_LEN) {
-        ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_CONNECT %s %s%s%s%s", ifName,
-            MacToStr(info->peerDevAddr), pin, mode, persistent, join);
+    if (info->peerDevAddr) {
+        ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_CONNECT %s %s%s persistent=%d %s", ifName,
+            MacToStr(info->peerDevAddr), pin, mode, info->persistent, join);
     }
     if (ret < 0) {
         pthread_mutex_unlock(GetInterfaceLock());
