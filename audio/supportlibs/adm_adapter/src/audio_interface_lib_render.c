@@ -438,7 +438,7 @@ int32_t AudioCtlRenderSceneSelectSBuf(struct HdfSBuf *sBuf, const struct AudioHw
     elemValue.id.itemName =
         handleData->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].deviceSwitch;
     elemValue.value[0] =
-        handleData->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value;
+        handleData->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value - '0';
 
     return AudioSetElemValue(sBuf, &elemValue, true);
 }

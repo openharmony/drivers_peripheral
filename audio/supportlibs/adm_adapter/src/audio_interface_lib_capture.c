@@ -503,7 +503,7 @@ int32_t AudioCtlCaptureSceneSelectSBuf(struct HdfSBuf *sBuf,
     elemCaptureValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER;
     elemCaptureValue.id.itemName =
         handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].deviceSwitch;
-    elemCaptureValue.value[0] = handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value;
+    elemCaptureValue.value[0] = handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value - '0';
 
     return AudioSetElemValue(sBuf, &elemCaptureValue, true);
 }
