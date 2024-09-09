@@ -18,18 +18,18 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_RENDER
 
-typedef struct _RENDER_DATA_ {
+struct RenderData {
     struct AlsaMixerCtlElement ctrlLeftVolume;
     struct AlsaMixerCtlElement ctrlRightVolume;
     long tempVolume;
-} RenderData;
+};
 
 static int32_t RenderInitImpl(struct AlsaRender *renderIns)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     if (renderIns->priData != NULL) {
         return HDF_SUCCESS;
     }
-    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
     RenderData *priData = (RenderData *)OsalMemCalloc(sizeof(RenderData));
     if (priData == NULL) {
@@ -51,33 +51,39 @@ static int32_t RenderInitImpl(struct AlsaRender *renderIns)
 static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, enum AudioPortPin descPins,
     const struct PathDeviceInfo *deviceInfo)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     renderIns->descPins = descPins;
     return HDF_SUCCESS;
 }
 
 static int32_t RenderGetVolThresholdImpl(struct AlsaRender *renderIns, long *volMin, long *volMax)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
+    CHECK_NULL_PTR_RETURN_DEFAULT(volMin);
+    CHECK_NULL_PTR_RETURN_DEFAULT(volMax);
     int32_t ret = HDF_SUCCESS;
-    long volMin = 0;
-    long volMax = 0;
+    long volMinTmp = 0;
+    long volMaxTmp = 0;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
     RenderData *priData = RenderGetPriData(renderIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(priData);
 
-    ret = SndElementReadRange(cardIns, &priData->ctrlLeftVolume, &volMin, &volMax);
+    ret = SndElementReadRange(cardIns, &priData->ctrlLeftVolume, &volMinTmp, &volMaxTmp);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("SndElementReadRange fail!");
         return HDF_FAILURE;
     }
-    *volMin = volMin;
-    *volMax = volMax;
+    *volMin = volMinTmp;
+    *volMax = volMaxTmp;
     
     return HDF_SUCCESS;
 }
 
 static int32_t RenderGetVolumeImpl(struct AlsaRender *renderIns, long *volume)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
+    CHECK_NULL_PTR_RETURN_DEFAULT(volume);
     int32_t ret = HDF_SUCCESS;
     long volLeft = 0;
     long volRight = 0;
@@ -103,6 +109,7 @@ static int32_t RenderGetVolumeImpl(struct AlsaRender *renderIns, long *volume)
 
 static int32_t RenderSetVolumeImpl(struct AlsaRender *renderIns, long volume)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     int32_t ret = HDF_SUCCESS;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
     RenderData *priData = RenderGetPriData(renderIns);
@@ -125,11 +132,13 @@ static int32_t RenderSetVolumeImpl(struct AlsaRender *renderIns, long volume)
 
 static bool RenderGetMuteImpl(struct AlsaRender *renderIns)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     return renderIns->muteState;
 }
 
 static int32_t RenderSetMuteImpl(struct AlsaRender *renderIns, bool muteFlag)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     int32_t ret = HDF_SUCCESS;
     long vol = 0;
     long setVol = 0;
@@ -167,6 +176,7 @@ static int32_t RenderStartImpl(struct AlsaRender *renderIns)
 
 static int32_t RenderStopImpl(struct AlsaRender *renderIns)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     snd_pcm_drain(renderIns->soundCard.pcmHandle);
     return HDF_SUCCESS;
 }
@@ -201,6 +211,7 @@ static int32_t RenderSetChannelModeImpl(struct AlsaRender *renderIns, enum Audio
 
 int32_t RenderOverrideFunc(struct AlsaRender *renderIns)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
 
     if (cardIns->cardType == SND_CARD_PRIMARY) {
