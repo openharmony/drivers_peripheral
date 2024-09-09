@@ -15,6 +15,7 @@
 
 #include "audio_pathselect.h"
 #include "audio_uhdf_log.h"
+#include "audio_common.h"
 #include "cJSON.h"
 #include "osal_mem.h"
 #include "securec.h"
@@ -27,11 +28,14 @@
 
 #define SPEAKER                   "Speaker"
 #define HEADPHONES                "Headphones"
-#define MIC                       "MIC"
-#define HS_MIC                    "micHs"
-#define EARPIECE                  "earpiece"
+#define MIC                       "Mic"
+#define HS_MIC                    "MicHs"
+#define EARPIECE                  "Earpiece"
 #define BLUETOOTH_SCO             "Bluetooth"
 #define BLUETOOTH_SCO_HEADSET     "Bluetooth_SCO_Headset"
+#define HEADSET                   "Headset"
+#define DAUDIO_DEFAULT            "Default"
+
 #define JSON_UNPRINT 1
 
 #define OUTPUT_MASK   0xFFF
@@ -42,7 +46,8 @@
 #define AUDIO_DEV_ON  1
 #define AUDIO_DEV_OFF 0
 
-#define HDF_PATH_NUM_MAX 32
+#define HDF_PATH_NUM_MAX (32 * 4)
+#define ADM_VALUE_SIZE 2
 
 static cJSON *g_cJsonObj = NULL;
 
@@ -106,7 +111,7 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
         case PIN_OUT_BLUETOOTH_A2DP:
             return SPEAKER;
         case PIN_OUT_HEADSET:
-            return HEADPHONES;
+            return HEADSET;
         case PIN_IN_MIC:
             return MIC;
         case PIN_IN_HS_MIC:
@@ -117,6 +122,10 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
             return BLUETOOTH_SCO;
         case PIN_IN_BLUETOOTH_SCO_HEADSET:
             return BLUETOOTH_SCO_HEADSET;
+        case PIN_OUT_DAUDIO_DEFAULT:
+            return DAUDIO_DEFAULT;
+        case PIN_OUT_HEADPHONE:
+            return HEADPHONES;    
         default:
             AUDIO_FUNC_LOGE("UseCase not support!");
             break;
@@ -170,12 +179,24 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
         int32_t ret =
             strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].deviceSwitch,
                 PATHPLAN_COUNT, devKey, strlen(devKey) + 1);
-        if (ret != 0) {
+        if (ret < 0) {
             AUDIO_FUNC_LOGE("strcpy_s failed!");
             return HDF_FAILURE;
         }
 
-        renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].value = renderSwVal->valueint;
+        int32_t len = strlen(renderSwVal->valuestring) + 1;
+        renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].value =
+                            (char *)OsalMemCalloc(sizeof(char) * len);
+        if (renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].value == NULL) {
+            AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
+            return HDF_FAILURE;
+        }
+        ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].value,
+            len, renderSwVal->valuestring, len - 1);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("strncpy_s failed!");
+            return HDF_FAILURE;
+        }
         renderDevNum++;
     }
     renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = renderDevNum;
@@ -211,11 +232,24 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
         int32_t ret =
             strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
                 PATHPLAN_COUNT, devKey, strlen(devKey) + 1);
-        if (ret != 0) {
+        if (ret < 0) {
             AUDIO_FUNC_LOGE("strcpy_s failed!");
             return HDF_FAILURE;
         }
-        captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = captureSwVal->valueint;
+
+        int32_t len = strlen(captureSwVal->valuestring) + 1;
+        captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value =
+                            (char *)OsalMemCalloc(sizeof(char) * len);
+        if (captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value == NULL) {
+            AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
+            return HDF_FAILURE;
+        }
+        ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value,
+            len, captureSwVal->valuestring, len - 1);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("strncpy_s failed!");
+            return HDF_FAILURE;
+        }
 
         devNum++;
     }
@@ -245,10 +279,10 @@ static int32_t SetRenderPathValue(
             AUDIO_FUNC_LOGE("pathNum is invalid!");
             return HDF_FAILURE;
         }
+        AUDIO_FUNC_LOGI("SetRenderPathValue pathNum: %{public}d.",pathNum);
         for (int32_t i = 0; i < pathNum; i++) {
             cJSON *tmpValue = cJSON_GetArrayItem(renderObj, i);
             cJSON *swName = tmpValue->child;
-            cJSON *swVal = swName->next;
             if (swName->valuestring == NULL) {
                 AUDIO_FUNC_LOGE("ValueString is null!");
                 return HDF_FAILURE;
@@ -260,16 +294,41 @@ static int32_t SetRenderPathValue(
             int32_t ret =
                 strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
                     PATHPLAN_COUNT, devKey, strlen(devKey) + 1);
-            if (ret != 0) {
+            if (ret < 0) {
                 AUDIO_FUNC_LOGE("strcpy_s failed!");
                 return HDF_FAILURE;
             }
-            if (swVal->valueint > AUDIO_DEV_ON) {
-                /* alsa Adaptation */
-                renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = swVal->valueint;
-            } else {
-                renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = value;
+
+#ifdef ALSA_LIB_MODE
+            cJSON *swVal = swName->next;
+            /* alsa Adaptation */
+            int32_t len = strlen(swVal->valuestring) + 1;
+            renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value =
+                              (char *)OsalMemCalloc(sizeof(char) * len);
+            if (renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value == NULL) {
+                AUDIO_FUNC_LOGE("OsalMemCalloc failed");
+                return HDF_FAILURE;
             }
+            ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value,
+                    len, swVal->valuestring, len - 1);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("strncpy_s failed!");
+                return HDF_FAILURE;
+            }
+#else 
+            renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value =
+                              (char *)OsalMemCalloc(ADM_VALUE_SIZE);
+            if (renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value == NULL) {
+                AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
+                return HDF_FAILURE;
+            }
+            ret = sprintf_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value,
+                    ADM_VALUE_SIZE - 1, "%d", value);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("sprintf_s failed ret:%{public}d!", ret);
+                return HDF_FAILURE;
+            }
+#endif
             devNum++;
         }
         renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = devNum;
@@ -349,6 +408,7 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
     uint32_t pins = renderParam->renderMode.hwInfo.deviceDescript.pins;
 
     int32_t tpins = pins & OUTPUT_MASK;
+    AUDIO_FUNC_LOGI("AudioRenderParseDevice pins: %{public}ud, tpins: %{public}ud", pins, tpins);
     if ((pins >> OUTPUT_OFFSET) != 0) {
         AUDIO_FUNC_LOGE("pins: %d, error!\n", pins);
         return HDF_FAILURE;
@@ -490,18 +550,42 @@ static int32_t SetCapturePathValue(
             int32_t ret =
                 strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
                     PATHPLAN_COUNT, swName->valuestring, strlen(swName->valuestring) + 1);
-            if (ret != 0) {
+            if (ret < 0) {
                 AUDIO_FUNC_LOGE("strcpy_s failed!");
                 return HDF_FAILURE;
             }
-            if (swVal->valueint > AUDIO_DEV_ON) {
-                /* alsa Adaptation */
-                captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = swVal->valueint;
-            } else {
-                captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = value;
+        
+#ifdef ALSA_LIB_MODE
+            cJSON *swVal = swName->next;
+            /* alsa Adaptation */
+            int32_t len = strlen(swVal->valuestring) + 1;
+            captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value =
+                              (char *)OsalMemCalloc(sizeof(char) * len);
+            if (captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value == NULL) {
+                AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
+                return HDF_FAILURE;
             }
-
-            devNum++;
+            ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value,
+                    len, swVal->valuestring, len - 1);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("strncpy_s failed!");
+                return HDF_FAILURE;
+            }
+#else
+            captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value =
+                              (char *)OsalMemCalloc(ADM_VALUE_SIZE);
+            if (captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value == NULL) {
+                AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
+                return HDF_FAILURE;
+            }
+            ret = sprintf_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value,
+                    ADM_VALUE_SIZE - 1, "%d", value);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("sprintf_s failedret:%{public}d!", ret);
+                return HDF_FAILURE;
+            }
+#endif
+        devNum++;
         }
         captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum = devNum;
     }
@@ -617,6 +701,12 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
         case PIN_IN_BLUETOOTH_SCO_HEADSET:
             /* 1、open bluetooth sco headset mic */
             ret = SetMatchCaptureDevicePath(captureParam, cJsonObj, tpins, BLUETOOTH_SCO_HEADSET, AUDIO_DEV_ON);
+#ifndef ALSA_LIB_MODE
+            /* 2、close main mic */
+            ret |= SetMatchCaptureDevicePath(captureParam, cJsonObj, PIN_IN_MIC, MIC, AUDIO_DEV_OFF);
+            /* 3.close headset mic */
+            ret |= SetMatchCaptureDevicePath(captureParam, cJsonObj, PIN_IN_HS_MIC, HS_MIC, AUDIO_DEV_OFF);
+#endif
             break;
         default:
             ret = SetMatchCaptureOtherDevicePath(captureParam, cJsonObj, tpins, AUDIO_DEV_ON);
@@ -707,7 +797,7 @@ static int32_t AudioPathSelCaptureChkScene(struct AudioHwCaptureParam *captureSc
 
 int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType)
 {
-    AUDIO_FUNC_LOGI();
+    AUDIO_FUNC_LOGI("AudioPathSelAnalysisJson enter");
     if (adaptType < 0 || adapterParam == NULL) {
         AUDIO_FUNC_LOGE("Param Invaild!");
         return HDF_ERR_INVALID_PARAM;
@@ -723,12 +813,18 @@ int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdapt
                 strcasecmp(renderParam->renderMode.hwInfo.adapterName, HDMI) == 0) {
                 return HDF_SUCCESS;
             }
+            for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
+                AudioMemFree((void **)&renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
+            }
             return (AudioPathSelGetPlanRender(renderParam));
         case CAPTURE_PATH_SELECT:
             captureParam = (struct AudioHwCaptureParam *)adapterParam;
             if (strcasecmp(captureParam->captureMode.hwInfo.adapterName, USB) == 0 ||
                 strcasecmp(captureParam->captureMode.hwInfo.adapterName, HDMI) == 0) {
                 return HDF_SUCCESS;
+            }
+            for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
+                AudioMemFree((void **)&captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
             }
             return (AudioPathSelGetPlanCapture(captureParam));
         /* Scene is supported */
@@ -738,12 +834,18 @@ int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdapt
                 strcasecmp(renderSceneCheck->renderMode.hwInfo.adapterName, HDMI) == 0) {
                 return HDF_SUCCESS;
             }
+            for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
+                AudioMemFree((void **)&renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
+            }
             return (AudioPathSelRenderChkScene(renderSceneCheck));
         case CHECKSCENE_PATH_SELECT_CAPTURE:
             captureScenceCheck = (struct AudioHwCaptureParam *)adapterParam;
             if (strcasecmp(captureScenceCheck->captureMode.hwInfo.adapterName, USB) == 0 ||
                 strcasecmp(captureScenceCheck->captureMode.hwInfo.adapterName, HDMI) == 0) {
                 return HDF_SUCCESS;
+            }
+            for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
+                AudioMemFree((void **)&captureScenceCheck->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
             }
             return (AudioPathSelCaptureChkScene(captureScenceCheck));
         default:
