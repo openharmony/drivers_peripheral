@@ -111,7 +111,7 @@ typedef struct {
     WifiError (*wifiSetCountryCode)(wifiInterfaceHandle handle, const char *);
     WifiError (*getPowerMode)(const char *, int *);
     WifiError (*setPowerMode)(const char *, int);
-    WifiError (*IsSupportCoex)(bool&);
+    WifiError (*isSupportCoex)(bool&);
     WifiError (*wifiStartScan)(wifiInterfaceHandle handle,
         const OHOS::HDI::Wlan::Chip::V1_0::ScanParams& scanParam);
     WifiError (*wifiStartPnoScan)(wifiInterfaceHandle handle,
