@@ -290,7 +290,7 @@ void ReleaseIfaceCtrl(char *ifName, int len)
     if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
         ReleaseWpaCtrl(&(g_wpaInterface->p2pCtrl));
     }
-    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
+    if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0) {
         ReleaseWpaCtrl(&(g_wpaInterface->staCtrl));
         ReleaseWpaCtrl(&(g_wpaInterface->p2pCtrl));
         ReleaseWpaCtrl(&(g_wpaInterface->chbaCtrl));
