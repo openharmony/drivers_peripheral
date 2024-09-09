@@ -653,6 +653,45 @@ BENCHMARK_F(DisplayBenchmarkTest, GetHardwareCursorStatsTest)(benchmark::State &
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetHardwareCursorStatsTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 
+/**
+  * @tc.name: ClearClientBufferTest
+  * @tc.desc: Benchmarktest for interface ClearClientBufferTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, ClearClientBufferTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    for (auto _ : state) {
+        ret = g_composerDevice->ClearClientBuffer(g_displayIds[0]);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearClientBufferTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: ClearLayerBufferTest
+  * @tc.desc: Benchmarktest for interface ClearLayerBufferTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, ClearLayerBufferTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    uint32_t layerId = 1;
+    for (auto _ : state) {
+        ret = g_composerDevice->ClearLayerBuffer(g_displayIds[0], layerId);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearLayerBufferTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
 } // namespace
 
 int main(int argc, char** argv)
