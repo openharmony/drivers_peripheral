@@ -107,5 +107,11 @@ const int32_t VIDEO_KEY_DEFEREED_COUNT = 0x0B;
 const std::string depthDataQualityLevel = "depthDataQualityLevel";
 const int32_t VIDEO_KEY_DEPTH_DATA_QUALITY_LEVEL = 0x0C;
 
+/**
+ * @brief Indicates the sequenceId of capture. The value type is int32_t.
+ */
+const std::string burstSequenceId = "burstSequenceId";
+const int32_t VIDEO_KEY_BURST_SEQUENCE_ID = 0x0D;
+
 } // end namespace OHOS::Camera
 #endif
