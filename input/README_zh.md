@@ -4,6 +4,7 @@
 -   [目录](#section161941989596)
     -   [接口说明](#section1551164914237)
     -   [使用说明](#section129654513264)
+    -   [用例说明](#section129654513265)
 
 -   [相关仓](#section1371113476307)
 
@@ -229,6 +230,16 @@ int InputServiceSample(void)
     return 0;
 }
 ```
+
+### 用例说明<a name="section129654513265"></a>
+
+执行input相关用例，需要提前插入一个hid设备。
+
+相关用例说明：
+
+* drivers/peripheral/input/test中的用例
+
+* test/xts/hats/hdf/input中的用例
 
 ## 相关仓<a name="section1371113476307"></a>
 
