@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("../../../codec.gni")
 
 ohos_unittest("codec_hdi_jpeg_test") {
   module_out_path = "drivers_peripheral_codec/codec"
@@ -62,6 +63,10 @@ ohos_unittest("codec_hdi_heif_encode_test") {
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
+  }
+  defines = []
+  if (drivers_peripheral_codec_feature_support_heif_test) {
+    defines += [ "SUPPORT_HEIF" ]
   }
 }
 
