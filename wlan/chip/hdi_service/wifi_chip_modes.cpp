@@ -24,6 +24,7 @@ namespace V1_0 {
 #define STA IfaceType::STA
 #define AP IfaceType::AP
 #define P2P IfaceType::P2P
+constexpr int STA_MAX_NUM = 3;
 
 WifiChipModes::WifiChipModes(
     const std::weak_ptr<WifiVendorHal> vendorHal)
@@ -76,7 +77,7 @@ std::vector<UsableMode> WifiChipModes::GetChipModesForPrimary()
 std::vector<UsableMode> WifiChipModes::GetChipModesForTriple()
 {
     std::vector<UsableMode> modes = {};
-    UsableMode mode = MakeComModes(1, 1, 1, 0);
+    UsableMode mode = MakeComModes(STA_MAX_NUM, 1, 1, 0);
     modes.push_back(mode);
     return modes;
 }
