@@ -159,7 +159,7 @@ HWTEST_F(HdfAudioUtAdapterMultiTest, HdfAudioAdapterMultchannelCreateRenderIsval
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
     EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
     ret = adapter_->DestroyRender(adapter_, renderId_);
-    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret = HDF_ERR_INVALID_PARAM);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
 }
 
 }
