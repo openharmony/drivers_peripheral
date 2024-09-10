@@ -32,7 +32,7 @@ constexpr int IFACE_TYPE_STA = 2;
 constexpr char K_ACTIVE_WLAN_IFACE_NAME_PROPERTY[] = "wifi.active.interface";
 constexpr char K_NO_ACTIVE_WLAN_IFACE_NAME_PROPERTY_VALUE[] = "";
 constexpr unsigned K_MAX_WLAN_IFACES = 5;
-const std::string IFACENAME = "wlan1";
+const std::string AP_CODEX_DEFAULT_IFACENAME = "wlan1";
 
 void InvalidateAndClearApIface(std::vector<sptr<WifiApIface>>& ifaces)
 {
@@ -448,7 +448,7 @@ std::string WifiChip::AllocateApIfaceName()
     bool isCoex;
     vendorHal_.lock()->IsSupportCoex(isCoex);
     if (isCoex) {
-        return IFACENAME;
+        return AP_CODEX_DEFAULT_IFACENAME;
     }
     return AllocIfaceName(IfaceType::AP, IdxOfApIface());
 }
