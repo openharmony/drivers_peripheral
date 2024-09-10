@@ -55,7 +55,10 @@
                 {
                     "name": "//drivers/peripheral/audio:libaudio_header_static",
                     "header": {
-                        "header_base": "//drivers/peripheral/audio/interfaces/sound",
+                        "header_base": [
+                            "//drivers/peripheral/audio/interfaces/sound",
+                            "//drivers/peripheral/audio/interfaces/effect"
+                        ],
                         "header_files": []
                     }
                 }
