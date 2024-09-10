@@ -501,6 +501,7 @@ int32_t GnssInterfaceImpl::AddGnssDeathRecipient(const sptr<IGnssCallback>& call
     return HDF_SUCCESS;
 }
 
+__attribute__((no_sanitize("cfi")))
 int32_t GnssInterfaceImpl::RemoveGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj)
 {
     std::unique_lock<std::mutex> lock(g_deathMutex);
