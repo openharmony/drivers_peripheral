@@ -17,7 +17,7 @@
 #define OHOS_HDI_DISPLAY_BUFFER_DFX_H
 #include <string>
 #include <sys/time.h>
-#ifdef DISPLAY_HICOLLIE_ENABLE
+#ifndef DISPLAY_COMMUNITY
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 #endif
