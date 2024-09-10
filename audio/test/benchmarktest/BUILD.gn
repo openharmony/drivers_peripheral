@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("//build/config/components/hdi/hdi.gni")
 import("./../../audio.gni")
 
 module_output_path = "drivers_peripheral_audio/audio"

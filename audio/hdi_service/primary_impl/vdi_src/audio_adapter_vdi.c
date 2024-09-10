@@ -180,6 +180,10 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         return HDF_FAILURE;
     }
     *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterName);
+    vdiRender->AddAudioEffect = NULL;
+    vdiRender->RemoveAudioEffect = NULL;
+    vdiRender->GetFrameBufferSize = NULL;
+    vdiRender->IsSupportsPauseAndResume = NULL;
     if (*render == NULL) {
         (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
         AUDIO_FUNC_LOGE("Create audio render failed");

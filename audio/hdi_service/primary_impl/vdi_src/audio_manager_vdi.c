@@ -331,29 +331,29 @@ static uint32_t AudioManagerVendorFindAdapterPos(struct IAudioManager *manager, 
     return AUDIO_VDI_ADAPTER_NUM_MAX;
 }
 
-static struct IAudioAdapter* VendorLoadAdapter(struct IAudioManagerVdi *vdiManager, uint32_t &descIndex,
-    struct AudioAdapterDescriptorVdi &vdiDesc)
+static struct IAudioAdapter* VendorLoadAdapter(struct IAudioManagerVdi *vdiManager,
+    struct AudioAdapterDescriptorVdi *vdiDesc, uint32_t descIndex)
 {
     int32_t ret = HDF_SUCCESS;
     struct IAudioAdapterVdi *vdiAdapter = NULL;
     int32_t id = SetTimer("Hdi:LoadAdapter");
     HdfAudioStartTrace("Hdi:AudioManagerVendorLoadAdapter", 0);
-    ret = vdiManager->LoadAdapter(vdiManager, &vdiDesc, &vdiAdapter);
+    ret = vdiManager->LoadAdapter(vdiManager, vdiDesc, &vdiAdapter);
     HdfAudioFinishTrace();
     CancelTimer(id);
 
-    AudioManagerReleaseVdiDesc(&vdiDesc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager call LoadAdapter fail, ret=%{public}d", ret);
         return NULL;
     }
 
-    struct IAudioAdapter *adapter = AudioCreateAdapterVdi(descIndex, vdiAdapter, desc->adapterName);
-    if (*adapter == NULL) {
+    struct IAudioAdapter *adapter = AudioCreateAdapterVdi(descIndex, vdiAdapter, vdiDesc->adapterName);
+    if (adapter == NULL) {
         AUDIO_FUNC_LOGE("audio vdiManager create adapter fail");
         vdiManager->UnloadAdapter(vdiManager, vdiAdapter);
         return NULL;
     }
+    AudioManagerReleaseVdiDesc(&vdiDesc);
     return adapter;
 }
 

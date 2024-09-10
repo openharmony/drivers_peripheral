@@ -121,6 +121,7 @@ void AudioUtRenderMultchannelTest::SetUp()
     ASSERT_EQ(HDF_SUCCESS, manager_->LoadAdapter(manager_, desc_, &adapter_));
     ASSERT_NE(adapter_, nullptr);
     InitRenderDevDesc(devDescRender_);
+    attrsRender_.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     InitRenderAttrs(attrsRender_);
 
     int32_t ret = adapter_->CreateRender(adapter_, &devDescRender_, &attrsRender_, &render_, &renderId_);

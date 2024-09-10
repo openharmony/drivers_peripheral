@@ -15,9 +15,11 @@ group("fuzztest") {
   testonly = true
   deps = []
 
-  deps += [
-    "effectconfig_fuzzer:EffectConfigFuzzTest",
-    "effectcontrol_fuzzer:EffectControlFuzzTest",
-    "effectmodel_fuzzer:EffectModelFuzzTest",
-  ]
+  deps += [ "effectconfig_fuzzer:EffectConfigFuzzTest" ]
+  if (drivers_peripheral_audio_feature_community) {
+    deps += [
+      "effectcontrol_fuzzer:EffectControlFuzzTest",
+      "effectmodel_fuzzer:EffectModelFuzzTest",
+    ]
+  }
 }

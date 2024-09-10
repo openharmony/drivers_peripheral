@@ -35,21 +35,23 @@ void HdfAudioFinishTrace(void)
 
 int32_t SetTimer(const char* name)
 {
-    (void)name;
     int32_t id = 0;
 #ifdef AUDIO_HICOLLIE_ENABLE
-    id = HiviewDFX::XCollie::GetInstance().SetTimer(name, HICOLLIE_TIMEOUT, nullptr, nullptr,
-        HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+    id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer(name, HICOLLIE_TIMEOUT, nullptr, nullptr,
+        OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+#else
+    (void)name;
 #endif
     return id;
 }
 
 void CancelTimer(int32_t id)
 {
-    (void)id;
 #ifdef AUDIO_HICOLLIE_ENABLE
     if (id != 0) {
-        HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+        OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
     }
+#else
+    (void)id;
 #endif
 }
