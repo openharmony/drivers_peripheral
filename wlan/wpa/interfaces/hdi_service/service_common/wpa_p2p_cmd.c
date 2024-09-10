@@ -1624,7 +1624,6 @@ int32_t WpaInterfaceVendorExtProcessCmd(struct IWpaInterface *self, const char *
 
     HDF_LOGI("%{public}s reply %{public}s !", __func__, reply);
     pthread_mutex_unlock(GetInterfaceLock());
-    HDF_LOGI("%{public}s cmd %{public}s reply %{public}s !", __func__, newCmd, reply);
     ret = atoi(reply);
     free(reply);
     return ret;
