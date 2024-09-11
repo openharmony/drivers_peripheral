@@ -122,7 +122,7 @@ static inline uint32_t BIT(uint8_t x)
 #endif
 
 #define SUBCHIP_WIFI_PROP "ohos.boot.odm.conn.schiptype"
-#define SUPPORT_COEXCHIP "bisheng"
+#define SUPPORT_COEXCHIP ""
 #define SUBCHIP_WIFI_PROP_LEN 10
 #define SUPPORT_COEXCHIP_LEN 7
 
