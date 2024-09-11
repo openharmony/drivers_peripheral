@@ -32,6 +32,7 @@ constexpr int IFACE_TYPE_STA = 2;
 constexpr char K_ACTIVE_WLAN_IFACE_NAME_PROPERTY[] = "wifi.active.interface";
 constexpr char K_NO_ACTIVE_WLAN_IFACE_NAME_PROPERTY_VALUE[] = "";
 constexpr unsigned K_MAX_WLAN_IFACES = 5;
+const std::string AP_CODEX_DEFAULT_IFACENAME = "wlan1";
 
 void InvalidateAndClearApIface(std::vector<sptr<WifiApIface>>& ifaces)
 {
@@ -69,14 +70,12 @@ WifiChip::WifiChip(
     int32_t chipId, bool isPrimary,
     const std::weak_ptr<WifiVendorHal> vendorHal,
     const std::shared_ptr<IfaceUtil> ifaceUtil,
-    const std::weak_ptr<WifiChipModes> chipModes,
     const std::function<void(const std::string&)>& handler)
     : chipId_(chipId),
     vendorHal_(vendorHal),
     isValid_(true),
     currentModeId_(chip_mode_ids::K_INVALID),
     ifaceUtil_(ifaceUtil),
-    modes_(chipModes.lock()->GetChipModes(isPrimary)),
     subsystemCallbackHandler_(handler)
 {}
 
@@ -148,13 +147,17 @@ int32_t WifiChip::GetChipCaps(uint32_t& capabilities)
 
 int32_t WifiChip::GetChipModes(std::vector<UsableMode>& modes)
 {
-    modes = modes_;
+    auto chipModes = std::make_shared<WifiChipModes>(vendorHal_);
+    modes = chipModes->GetChipModes(true);
     return HDF_SUCCESS;
 }
 
 bool WifiChip::IsValidModeId(uint32_t modeId)
 {
-    for (const auto& mode : modes_) {
+    std::vector<UsableMode> modes;
+    auto chipModes = std::make_shared<WifiChipModes>(vendorHal_);
+    modes = chipModes->GetChipModes(true);
+    for (const auto& mode : modes) {
         if (mode.modeId == modeId) {
             return true;
         }
@@ -262,7 +265,10 @@ std::vector<ComboIface> WifiChip::GetCurrentCombinations()
         HDF_LOGE("Chip not configured in a mode yet");
         return {};
     }
-    for (const auto& mode : modes_) {
+    std::vector<UsableMode> modes;
+    auto chipModes = std::make_shared<WifiChipModes>(vendorHal_);
+    modes = chipModes->GetChipModes(true);
+    for (const auto& mode : modes) {
         if (mode.modeId == currentModeId_) {
             return mode.usableCombo;
         }
@@ -460,6 +466,11 @@ uint32_t WifiChip::IdxOfApIface()
 
 std::string WifiChip::AllocateApIfaceName()
 {
+    bool isCoex;
+    vendorHal_.lock()->IsSupportCoex(isCoex);
+    if (isCoex) {
+        return AP_CODEX_DEFAULT_IFACENAME;
+    }
     return AllocIfaceName(IfaceType::AP, IdxOfApIface());
 }
 
