@@ -28,8 +28,8 @@ group("hdi_audio") {
 
 config("drivers_peripheral_audio_header") {
   include_dirs = [
-    "interfaces/sound",
-    "interfaces/effect"
+    "interfaces/effect",
+    "interfaces/sound"
   ]
 }
 
