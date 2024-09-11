@@ -61,7 +61,7 @@ static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count
 #ifdef FASTER_RETRY_OF_SLEEP
 static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(100); // 100ms for phone and tablet
 #elif defined(SLOWER_RETRY_OF_SLEEP)
-static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(2000); // 2000ms for PC
+static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(500); // 500ms for PC
 #else
 static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(1000); // 1000ms
 #endif
@@ -182,7 +182,6 @@ void AutoSuspendLoop()
     auto suspendLock = std::unique_lock(g_suspendMutex);
     while (true) {
         std::this_thread::sleep_for(waitTime_);
-
         const std::string wakeupCount = ReadWakeCount();
         if (wakeupCount.empty()) {
             continue;
