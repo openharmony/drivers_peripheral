@@ -26,7 +26,7 @@ void AudioReleaseAdapterVdi(uint32_t descIndex);
 struct IAudioAdapterVdi *AudioGetVdiAdapterByDescIndexVdi(uint32_t descIndex);
 int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **adapter);
 void AudioDecreaseAdapterRefVdi(uint32_t descIndex);
-uint32_t AudioGetAdapterRefCntVdi(uint32_t  );
+uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex);
 void AudioEnforceClearAdapterRefCntVdi(uint32_t descIndex);
 int32_t InitAdapterMutex(void);
 void DeinitAdapterMutex(void);
