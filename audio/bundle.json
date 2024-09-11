@@ -37,8 +37,8 @@
                 "hilog",
                 "hdf_core",
                 "drivers_interface_audio",
-                "bounds_checking_function",
-                "hitrace"
+                "hitrace",
+                "bounds_checking_function"
             ],
             "third_party": [ "alsa-lib" ]
         },
