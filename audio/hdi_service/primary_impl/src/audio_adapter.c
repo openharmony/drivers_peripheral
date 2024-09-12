@@ -697,6 +697,9 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
         AudioMemFree((void **)&hwRender->errorLog.errorDump[i].reason);
         AudioMemFree((void **)&hwRender->errorLog.errorDump[i].currentTime);
     }
+    for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
+        AudioMemFree((void **)&hwRender->renderParam.renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
+    }
     AudioMemFree((void **)&render);
     hwAdapter->infos.renderServicePtr[renderId] = NULL;
     return AUDIO_SUCCESS;
@@ -1063,6 +1066,9 @@ int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, uint32_t captu
     for (int i = 0; i < ERROR_LOG_MAX_NUM; i++) {
         AudioMemFree((void **)&hwCapture->errorLog.errorDump[i].reason);
         AudioMemFree((void **)&hwCapture->errorLog.errorDump[i].currentTime);
+    }
+    for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
+        AudioMemFree((void **)&hwCapture->captureParam.captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
     }
     AudioMemFree((void **)&capture);
     hwAdapter->infos.captureServicePtr[captureId] = NULL;
