@@ -705,7 +705,7 @@ static int32_t AudioInitPorts(struct AudioAdapterDescriptor *desc, enum SndCardT
 #endif
     if (portNum == 0) {
         AUDIO_FUNC_LOGE("portNum is zero");
-        return HDF_ERR_MALLOC_FAIL;
+        return HDF_FAILURE;
     }
     desc->ports = (struct AudioPort *)OsalMemCalloc(sizeof(struct AudioPort) * portNum);
     if (desc->ports == NULL) {
