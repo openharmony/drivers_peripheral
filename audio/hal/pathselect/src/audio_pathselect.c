@@ -301,7 +301,7 @@ static int32_t SetRenderPathValue(
         return HDF_FAILURE;
     }
     int32_t devNum = renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum;
-    AUDIO_FUNC_LOGI("SetRenderPathValue devNum: %{public}d, renderDeviceType: %{public}s.",devNum, renderDeviceType);
+    AUDIO_FUNC_LOGI("SetRenderPathValue devNum: %{public}d, renderDeviceType: %{public}s.", devNum, renderDeviceType);
     /* pins = 0, parse default value */
     if (strcasecmp(renderDeviceType, renderObj->string) == 0) {
         int32_t pathNum = cJSON_GetArraySize(renderObj);
@@ -327,10 +327,9 @@ static int32_t SetRenderPathValue(
                 AUDIO_FUNC_LOGE("strcpy_s failed!");
                 return HDF_FAILURE;
             }
-            char **deviceSwitchsValue = 
-                &renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value;
+            char **switchsValue = &renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value;
             cJSON *swVal = swName->next;
-            ret = InitDeviceSwitchValue(deviceSwitchsValue, swVal, value);
+            ret = InitDeviceSwitchValue(switchsValue, swVal, value);
             if (ret < 0) {
                 AUDIO_FUNC_LOGE("InitDeviceSwitchValue failed!");
                 return HDF_FAILURE;
@@ -552,17 +551,16 @@ static int32_t SetCapturePathValue(
 
             (void)memset_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
                 PATHPLAN_LEN, 0, PATHPLAN_LEN);
-            int32_t ret = strncpy_s(
-                    captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
+            int32_t ret = 
+                strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
                     PATHPLAN_COUNT, swName->valuestring, strlen(swName->valuestring) + 1);
             if (ret < 0) {
                 AUDIO_FUNC_LOGE("strcpy_s failed!");
                 return HDF_FAILURE;
             }
-            char **deviceSwitchsValue =
-                &captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value;
+            char **switchsValue = &captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value;
             cJSON *swVal = swName->next;
-            ret = InitDeviceSwitchValue(deviceSwitchsValue, swVal, value);
+            ret = InitDeviceSwitchValue(switchsValue, swVal, value);
             if (ret < 0) {
                 AUDIO_FUNC_LOGE("InitDeviceSwitchValue failed!");
                 return HDF_FAILURE;
@@ -777,7 +775,8 @@ static int32_t AudioPathSelCaptureChkScene(struct AudioHwCaptureParam *captureSc
     return AudioPathSelGetPlanCapture(captureSceneParam);
 }
 
-static void  FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo) {
+static void  FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo)
+{
     for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
         AudioMemFree((void **)&(deviceInfo->deviceSwitchs[i].value));
     }
