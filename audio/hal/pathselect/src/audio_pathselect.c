@@ -551,7 +551,7 @@ static int32_t SetCapturePathValue(
 
             (void)memset_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
                 PATHPLAN_LEN, 0, PATHPLAN_LEN);
-            int32_t ret = 
+            int32_t ret =
                 strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
                     PATHPLAN_COUNT, swName->valuestring, strlen(swName->valuestring) + 1);
             if (ret < 0) {
