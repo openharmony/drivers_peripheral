@@ -333,7 +333,7 @@ static int32_t AudioCommonRouteNodeToVdiRouteNodeVdi(struct AudioRouteNode *rout
 static int32_t AudioCommonSinkToVdiSinkVdi(const struct AudioRoute *route, struct AudioRouteVdi *vdiRoute)
 {
     struct AudioRouteNodeVdi *nodes = NULL;
-    if (route->sinksLen > AUDIO_ROUTE_NUM_MAX) {
+    if (route->sinksLen == 0 || route->sinksLen > AUDIO_ROUTE_NUM_MAX) {
         AUDIO_FUNC_LOGE("sinksLen para err");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -361,7 +361,7 @@ static int32_t AudioCommonSinkToVdiSinkVdi(const struct AudioRoute *route, struc
 static int32_t AudioCommonSourceToVdiSourceVdi(const struct AudioRoute *route, struct AudioRouteVdi *vdiRoute)
 {
     struct AudioRouteNodeVdi *nodes = NULL;
-    if (route->sourcesLen > AUDIO_ROUTE_NUM_MAX) {
+    if (route->sourcesLen == 0 || route->sourcesLen > AUDIO_ROUTE_NUM_MAX) {
         AUDIO_FUNC_LOGE("sinksLen para err");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -518,6 +518,10 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
     CHECK_NULL_PTR_RETURN_VALUE(frameInfo, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frameInfoVdi, HDF_ERR_INVALID_PARAM);
 
+    if (frameLen->frameLen <= 0 || frameLen->frameEcLen <= 0) {
+        AUDIO_FUNC_LOGE("frameLen len err");
+        return HDF_ERR_INVALID_PARAM;
+    }
     frameInfo->frameLen = frameInfoVdi->frameLen;
     frameInfo->frameEcLen = frameInfoVdi->frameEcLen;
     frameInfo->frame = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (frameInfo->frameLen));

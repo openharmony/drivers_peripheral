@@ -227,7 +227,10 @@ static int32_t AudioManagerVdiDescsToDescs(struct AudioAdapterDescriptorVdi *vdi
 static int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     struct AudioAdapterDescriptor *descs, uint32_t *descsLen)
 {
-    int32_t ret;
+    if (*descsLen == 0) {
+        AUDIO_FUNC_LOGE("descsLen is zero");
+        return HDF_FAILURE;
+    }
     priv->vdiDescs = (struct AudioAdapterDescriptorVdi *)OsalMemCalloc(
         sizeof(struct AudioAdapterDescriptorVdi) * (*descsLen));
     if (priv->vdiDescs == NULL) {
@@ -237,7 +240,7 @@ static int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *pri
 
     priv->vdiDescsCount = *descsLen;
     int32_t id = SetTimer("Hdi:GetAllAdapters");
-    ret = priv->vdiManager->GetAllAdapters(priv->vdiManager, priv->vdiDescs, &priv->vdiDescsCount);
+    int32_t ret = priv->vdiManager->GetAllAdapters(priv->vdiManager, priv->vdiDescs, &priv->vdiDescsCount);
     CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager call GetAllAdapters fail, ret=%{public}d", ret);
