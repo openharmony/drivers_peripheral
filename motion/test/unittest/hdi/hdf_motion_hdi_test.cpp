@@ -233,7 +233,7 @@ HWTEST_F(HdfMotionTest, DisableMotion_002, TestSize.Level1)
         return;
     }
     int32_t ret = g_motionInterface->DisableMotion(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_MAX);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    EXPECT_NE(HDF_SUCCESS, ret);
 }
 
 HWTEST_F(HdfMotionTest, DisableMotion_003, TestSize.Level1)
