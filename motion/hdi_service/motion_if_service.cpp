@@ -86,10 +86,6 @@ int32_t MotionIfService::EnableMotion(int32_t motionType)
         return HDF_FAILURE;
     }
 
-    if ((motionType < HDF_MOTION_TYPE_PICKUP) || (motionType >= HDF_MOTION_TYPE_MAX)) {
-        return HDF_ERR_INVALID_PARAM;
-    }
-
     StartTrace(HITRACE_TAG_HDF, "EnableMotion");
     int32_t ret = motionVdiImpl_->EnableMotion(motionType);
     if (ret != HDF_SUCCESS) {
@@ -106,10 +102,6 @@ int32_t MotionIfService::DisableMotion(int32_t motionType)
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
-    }
-
-    if ((motionType < HDF_MOTION_TYPE_PICKUP) || (motionType >= HDF_MOTION_TYPE_MAX)) {
-        return HDF_ERR_INVALID_PARAM;
     }
 
     StartTrace(HITRACE_TAG_HDF, "DisableMotion");
