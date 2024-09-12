@@ -553,7 +553,6 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
     const struct AudioPcmHwParams *hwParams)
 {
     int32_t ret = HDF_SUCCESS;
-    snd_pcm_state_t state;
     int32_t tryNum = AUDIO_ALSALIB_RETYR;
 
     /* Check whether the PCM status is normal */

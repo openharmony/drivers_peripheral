@@ -18,11 +18,11 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_CAPTURE
 
-struct CaptureData {
+typedef stuct CaptureData {
     struct AlsaMixerCtlElement ctrlLeftVolume;
     struct AlsaMixerCtlElement ctrlRightVolume;
     long tempVolume;
-};
+} CaptureData;
 
 static int32_t CaptureInitImpl(struct AlsaCapture* captureIns)
 {
