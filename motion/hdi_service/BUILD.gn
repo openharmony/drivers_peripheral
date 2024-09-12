@@ -14,7 +14,13 @@
 import("//build/ohos.gni")
 import("../motion.gni")
 
+config("libvdi_config") {
+  include_dirs = [ "../interfaces/v1_0" ]
+}
+
 ohos_shared_library("libmotion_interface_service_1.1") {
+  public_configs = [ ":libvdi_config" ]
+
   include_dirs = [
     ".",
     "../interfaces/v1_0",

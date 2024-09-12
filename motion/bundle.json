@@ -38,6 +38,16 @@
         "//drivers/peripheral/motion/test:hdf_test_motion"
       ],
       "inner_kits": [
+          {
+          "name": "//drivers/peripheral/motion/hdi_service:libmotion_interface_service_1.1",
+          "header": {
+            "header_files": [
+              "imotion_callback_vdi.h",
+              "imotion_interface_vdi.h"
+            ],
+            "header_base": "//drivers/peripheral/motion/interfaces/v1_0"
+          }
+        }
       ]
     }
   }

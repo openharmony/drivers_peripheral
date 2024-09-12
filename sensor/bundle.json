@@ -54,7 +54,7 @@
           }
         },
         {
-          "name": "//drivers/peripheral/sensor/hdi_service:libhdi_sensor_impl_config",
+          "name": "//drivers/peripheral/sensor/hdi_service:libsensor_interface_service_2.0",
           "header": {
             "header_files": [
               "isensor_callback_vdi.h",

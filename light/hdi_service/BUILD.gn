@@ -14,7 +14,13 @@
 import("//build/ohos.gni")
 import("../light.gni")
 
+config("libvdi_config") {
+  include_dirs = [ "../interfaces/v1_0" ]
+}
+
 ohos_shared_library("liblight_interface_service_1.0") {
+  public_configs = [ ":libvdi_config" ]
+
   include_dirs = [
     "../interfaces/include/",
     ".",
