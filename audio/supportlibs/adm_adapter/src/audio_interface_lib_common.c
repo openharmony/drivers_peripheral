@@ -419,7 +419,7 @@ static int32_t AudioReadCardInfoToDesc(struct HdfSBuf *reply, struct AudioAdapte
         return HDF_FAILURE;
     }
 
-    if (*descs == NULL || *sndCardNum > 0) {
+    if (*descs == NULL && *sndCardNum > 0) {
         AUDIO_FUNC_LOGI("*descs is NULL");
         *descs = (struct AudioAdapterDescriptor *)OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) * (*sndCardNum));
         if (*descs == NULL) {
