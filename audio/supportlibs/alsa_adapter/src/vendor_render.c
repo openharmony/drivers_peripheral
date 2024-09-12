@@ -18,11 +18,11 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_RENDER
 
-struct RenderData {
+typedef struct RenderData {
     struct AlsaMixerCtlElement ctrlLeftVolume;
     struct AlsaMixerCtlElement ctrlRightVolume;
     long tempVolume;
-};
+} RenderData;
 
 static int32_t RenderInitImpl(struct AlsaRender *renderIns)
 {

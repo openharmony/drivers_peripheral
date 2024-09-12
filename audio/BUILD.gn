@@ -27,7 +27,10 @@ group("hdi_audio") {
 }
 
 config("drivers_peripheral_audio_header") {
-  include_dirs = [ "interfaces/sound" ]
+  include_dirs = [
+    "interfaces/effect",
+    "interfaces/sound",
+  ]
 }
 
 ohos_static_library("libaudio_header_static") {
