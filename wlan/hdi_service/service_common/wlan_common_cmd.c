@@ -786,12 +786,62 @@ static int32_t ProcessEventActionReceived(struct HdfWlanRemoteNode *node, uint32
     return ret;
 }
 
+static int32_t ProcessEventDataFrameReceived(struct HdfWlanRemoteNode *node, uint32_t event,
+    WifiDataFrame *dataFrame, const char *ifName)
+{
+    HDF_LOGI("hal enter %{public}s, event:%{public}u ifName:%{public}s", __FUNCTION__, event, ifName);
+    int32_t ret = HDF_FAILURE;
+
+    if ((node == NULL) || (dataFrame == NULL) || (ifName == NULL) || (node->callbackObj == NULL) ||
+        (node->callbackObj->WifiNetlinkMessage == NULL)) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = node->callbackObj->WifiNetlinkMessage(node->callbackObj, dataFrame->data, dataFrame->dataLen);
+    HDF_LOGI("hal exit %{public}s, WifiNetlinkMessage ret:%{public}d", __FUNCTION__, ret);
+    return ret;
+}
+
+static int32_t HandleWifiEvent(uint32_t event, void *data, const char *ifName, struct HdfWlanRemoteNode *pos)
+{
+    int ret = HDF_FAILURE;
+    int32_t *code = NULL;
+    if (data == NULL || ifName == NULL || pos == NULL) {
+        HDF_LOGE("%{public}s: invalid input", __func__);
+        return ret;
+    }
+    switch (event) {
+        case WIFI_EVENT_RESET_DRIVER:
+            code = (int32_t *)data;
+            ret = pos->callbackObj->ResetDriverResult(pos->callbackObj, event, *code, ifName);
+            break;
+        case WIFI_EVENT_SCAN_RESULT:
+            ret = ProcessEventScanResult(pos, event, (WifiScanResult *)data, ifName);
+            break;
+        case WIFI_EVENT_SCAN_RESULTS:
+            ret = ProcessEventScanResults(pos, event, (WifiScanResults *)data, ifName);
+            break;
+        case WIFI_EVENT_SCAN_ABORTED:
+            ret = ProcessEventScanAborted(pos, event, ifName);
+            break;
+        case WIFI_EVENT_ACTION_RECEIVED:
+            ret = ProcessEventActionReceived(pos, event, (WifiActionData *)data, ifName);
+            break;
+        case WIFI_EVENT_DATA_FRAME_RECEIVED:
+            ret = ProcessEventDataFrameReceived(pos, event, (WifiDataFrame *)data, ifName);
+            break;
+        default:
+            HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
+            break;
+    }
+    return ret;
+}
+
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
     HDF_LOGD("%{public}s, event:%{public}u ifName:%{public}s", __FUNCTION__, event, ifName);
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = NULL;
-    int32_t *code = NULL;
     int32_t ret = HDF_FAILURE;
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
     head = &HdfStubDriver()->remoteListHead;
@@ -810,27 +860,7 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
             HDF_LOGW("%{public}s: pos->service or pos->callbackObj NULL", __func__);
             continue;
         }
-        switch (event) {
-            case WIFI_EVENT_RESET_DRIVER:
-                code = (int32_t *)data;
-                ret = pos->callbackObj->ResetDriverResult(pos->callbackObj, event, *code, ifName);
-                break;
-            case WIFI_EVENT_SCAN_RESULT:
-                ret = ProcessEventScanResult(pos, event, (WifiScanResult *)data, ifName);
-                break;
-            case WIFI_EVENT_SCAN_RESULTS:
-                ret = ProcessEventScanResults(pos, event, (WifiScanResults *)data, ifName);
-                break;
-            case WIFI_EVENT_SCAN_ABORTED:
-                ret = ProcessEventScanAborted(pos, event, ifName);
-                break;
-            case WIFI_EVENT_ACTION_RECEIVED:
-                ret = ProcessEventActionReceived(pos, event, (WifiActionData *)data, ifName);
-                break;
-            default:
-                HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
-                break;
-        }
+        ret = HandleWifiEvent(event, data, ifName, pos);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
