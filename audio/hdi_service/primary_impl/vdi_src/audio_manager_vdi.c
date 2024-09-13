@@ -227,8 +227,8 @@ static int32_t AudioManagerVdiDescsToDescs(struct AudioAdapterDescriptorVdi *vdi
 static int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     struct AudioAdapterDescriptor *descs, uint32_t *descsLen)
 {
-    if (*descsLen == 0) {
-        AUDIO_FUNC_LOGE("descsLen is zero");
+    if (*descsLen == 0 || *descsLen > AUDIO_VDI_ADAPTER_NUM_MAX) {
+        AUDIO_FUNC_LOGE("descsLen is invalid");
         return HDF_FAILURE;
     }
     priv->vdiDescs = (struct AudioAdapterDescriptorVdi *)OsalMemCalloc(
