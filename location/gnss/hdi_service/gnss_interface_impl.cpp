@@ -192,6 +192,7 @@ static void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnss
 }
 #endif
 
+__attribute__((no_sanitize("cfi")))
 static void GnssWorkingStatusUpdate(uint16_t* status)
 {
     if (status == nullptr) {
@@ -208,6 +209,7 @@ static void GnssWorkingStatusUpdate(uint16_t* status)
     }
 }
 
+__attribute__((no_sanitize("cfi")))
 static void SvStatusCallback(GnssSatelliteStatus* svInfo)
 {
     if (svInfo == nullptr) {
@@ -501,6 +503,7 @@ int32_t GnssInterfaceImpl::AddGnssDeathRecipient(const sptr<IGnssCallback>& call
     return HDF_SUCCESS;
 }
 
+__attribute__((no_sanitize("cfi")))
 int32_t GnssInterfaceImpl::RemoveGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj)
 {
     std::unique_lock<std::mutex> lock(g_deathMutex);
