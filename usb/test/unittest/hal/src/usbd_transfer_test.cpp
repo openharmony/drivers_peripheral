@@ -1468,6 +1468,120 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead005, TestSize.Level1)
 }
 
 /**
+ * @tc.name: UsbdBulkTransferReadwithLength001
+ * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
+ * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UsbdBulkTransferReadwithLength001, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    uint8_t interfaceId = INTERFACEID_OK;
+    uint8_t pointid = POINTID_BULK_IN;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    OHOS::HDI::Usb::V1_0::UsbPipe pipe = {interfaceId, pointid};
+    std::vector<uint8_t> bufferData(MAX_BUFFER_LENGTH);
+    ret = g_usbInterface->BulkTransferReadwithLength(dev, pipe, TRANSFER_TIME_OUT, bufferData.size(), bufferData);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength001 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdBulkTransferReadwithLength002
+ * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
+ * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UsbdBulkTransferReadwithLength002, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    uint8_t interfaceId = INTERFACEID_OK;
+    uint8_t pointid = POINTID_BULK_IN;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    dev.busNum = BUS_NUM_INVALID;
+    OHOS::HDI::Usb::V1_0::UsbPipe pipe = {interfaceId, pointid};
+    std::vector<uint8_t> bufferData(MAX_BUFFER_LENGTH);
+    ret = g_usbInterface->BulkTransferReadwithLength(dev, pipe, TRANSFER_TIME_OUT, bufferData.size(), bufferData);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength002 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdBulkTransferReadwithLength003
+ * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
+ * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UsbdBulkTransferReadwithLength003, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    uint8_t interfaceId = INTERFACEID_OK;
+    uint8_t pointid = POINTID_BULK_IN;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    dev.devAddr = DEV_ADDR_INVALID;
+    OHOS::HDI::Usb::V1_0::UsbPipe pipe = {interfaceId, pointid};
+    std::vector<uint8_t> bufferData(MAX_BUFFER_LENGTH);
+    ret = g_usbInterface->BulkTransferReadwithLength(dev, pipe, TRANSFER_TIME_OUT, bufferData.size(), bufferData);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength003 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdBulkTransferReadwithLength004
+ * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
+ * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, intfId error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UsbdBulkTransferReadwithLength004, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    uint8_t interfaceId = INTERFACEID_OK;
+    uint8_t pointid = POINTID_BULK_IN;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    OHOS::HDI::Usb::V1_0::UsbPipe pipe = {interfaceId, pointid};
+    pipe.intfId = PIPE_INTERFACEID_INVALID;
+    std::vector<uint8_t> bufferData(MAX_BUFFER_LENGTH);
+    ret = g_usbInterface->BulkTransferReadwithLength(dev, pipe, TRANSFER_TIME_OUT, bufferData.size(), bufferData);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength004 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdBulkTransferReadwithLength005
+ * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
+ * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, endpointId error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UsbdBulkTransferReadwithLength005, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    uint8_t interfaceId = INTERFACEID_OK;
+    uint8_t pointid = POINTID_BULK_IN;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    OHOS::HDI::Usb::V1_0::UsbPipe pipe = {interfaceId, pointid};
+    pipe.endpointId = PIPE_ENDPOINTID_INVALID;
+    std::vector<uint8_t> bufferData(MAX_BUFFER_LENGTH);
+    ret = g_usbInterface->BulkTransferReadwithLength(dev, pipe, TRANSFER_TIME_OUT, bufferData.size(), bufferData);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferReadwithLength005 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
  * @tc.name: UsbdBulkTransferWrite001
  * @tc.desc: Test functions to BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
