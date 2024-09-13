@@ -915,7 +915,7 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
 
     if (info->peerDevAddr) {
         ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_CONNECT %s %s%s persistent=%d %s", ifName,
-            MacToStr(info->peerDevAddr), pin, mode, info->persistent, join);
+            macToStr(info->peerDevAddr), pin, mode, info->persistent, join);
     }
     if (ret < 0) {
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
