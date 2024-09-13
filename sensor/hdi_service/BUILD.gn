@@ -15,7 +15,10 @@ import("//build/ohos.gni")
 import("../sensor.gni")
 
 config("libvdi_config") {
-  include_dirs = [ "../interfaces/v1_0" ]
+  include_dirs = [
+    "../interfaces/include",
+    "../interfaces/v1_0",
+  ]
 }
 
 ohos_shared_library("libsensor_interface_service_2.0") {

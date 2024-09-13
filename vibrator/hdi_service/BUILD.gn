@@ -21,7 +21,10 @@ if (defined(ohos_lite)) {
   }
 } else {
   config("libvdi_config") {
-    include_dirs = [ "../interfaces/v1_1" ]
+    include_dirs = [
+      "../interfaces/include",
+      "../interfaces/v1_1",
+    ]
   }
 
   ohos_shared_library("libvibrator_interface_service_1.3") {
