@@ -23,6 +23,7 @@
 #define ALSA_CONFIG_FILE_MAX  (2 * 1024) // 2KB
 #define SUPPORT_CAPTURE_OR_RENDER  1
 #define SUPPORT_CAPTURE_AND_RENDER 2
+#define MALLOC_MAX 100
 
 /* Define structure description alsa_adapter.hson information  */
 struct AlsaAdapterCfgInfo {
@@ -741,7 +742,7 @@ int32_t AudioGetAllCardInfo(struct AudioAdapterDescriptor **descs, int32_t *sndC
     }
 
     int32_t adapterNum = CfgGetAdapterCount();
-    if (*descs == NULL && adapterNum > 0) {
+    if (*descs == NULL && adapterNum > 0 && adapterNum < MALLOC_MAX) {
         AUDIO_FUNC_LOGW("*descs is null, need memcalloc.");
         *descs = (struct AudioAdapterDescriptor *)OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) * adapterNum);
         if (*descs == NULL) {
