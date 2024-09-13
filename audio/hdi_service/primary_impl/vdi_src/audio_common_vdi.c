@@ -24,6 +24,7 @@
 #define AUDIO_ROUTE_NUM_MAX 2
 #define AUDIO_SAMPLE_FORMAT_NUM_MAX 30
 #define AUDIO_SUB_PORT_NUM_MAX 10
+#define AUDIO_FRAME_LEN_MAX 50000
 
 int32_t AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
     struct AudioDeviceDescriptorVdi *vdiDesc)
@@ -518,7 +519,8 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
     CHECK_NULL_PTR_RETURN_VALUE(frameInfo, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frameInfoVdi, HDF_ERR_INVALID_PARAM);
 
-    if (frameLen->frameLen <= 0 || frameLen->frameEcLen <= 0) {
+    if (frameInfoVdi->frameLen <= 0 || frameInfoVdi->frameEcLen <= 0 ||
+        frameInfoVdi->frameLen > AUDIO_FRAME_LEN_MAX || frameInfoVdi->frameEcLen > AUDIO_FRAME_LEN_MAX) {
         AUDIO_FUNC_LOGE("frameLen len err");
         return HDF_ERR_INVALID_PARAM;
     }
