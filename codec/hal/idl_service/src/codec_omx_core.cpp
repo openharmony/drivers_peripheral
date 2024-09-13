@@ -43,7 +43,7 @@ int32_t CodecOMXCore::Init(const std::string &libName)
     }
 
     init_ = reinterpret_cast<InitFunc>(dlsym(libHandle_, "OMX_Init"));
-    deInit_ = reinterpret_cast<DeinitFunc>(dlsym(libHandle_, "OMX_DeInit"));
+    deInit_ = reinterpret_cast<DeinitFunc>(dlsym(libHandle_, "OMX_Deinit"));
     getHandle_ = reinterpret_cast<GetHandleFunc>(dlsym(libHandle_, "OMX_GetHandle"));
     freeHandle_ = reinterpret_cast<FreeHandleFunc>(dlsym(libHandle_, "OMX_FreeHandle"));
     getRoles_ = reinterpret_cast<GetRolesOfComponentFunc>(dlsym(libHandle_, "OMX_GetRolesOfComponent"));
