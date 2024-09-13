@@ -333,7 +333,7 @@ static int32_t AudioCommonRouteNodeToVdiRouteNodeVdi(struct AudioRouteNode *rout
 static int32_t AudioCommonSinkToVdiSinkVdi(const struct AudioRoute *route, struct AudioRouteVdi *vdiRoute)
 {
     struct AudioRouteNodeVdi *nodes = NULL;
-    if (route->sinksLen == 0 || route->sinksLen > AUDIO_ROUTE_NUM_MAX) {
+    if (route->sinksLen > AUDIO_ROUTE_NUM_MAX) {
         AUDIO_FUNC_LOGE("sinksLen para err");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -361,7 +361,7 @@ static int32_t AudioCommonSinkToVdiSinkVdi(const struct AudioRoute *route, struc
 static int32_t AudioCommonSourceToVdiSourceVdi(const struct AudioRoute *route, struct AudioRouteVdi *vdiRoute)
 {
     struct AudioRouteNodeVdi *nodes = NULL;
-    if (route->sourcesLen == 0 || route->sourcesLen > AUDIO_ROUTE_NUM_MAX) {
+    if (route->sourcesLen > AUDIO_ROUTE_NUM_MAX) {
         AUDIO_FUNC_LOGE("sinksLen para err");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -394,14 +394,14 @@ int32_t AudioCommonRouteToVdiRouteVdi(const struct AudioRoute *route, struct Aud
     CHECK_NULL_PTR_RETURN_VALUE(route, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRoute, HDF_ERR_INVALID_PARAM);
 
-    if (route->sinks != NULL) {
+    if (route->sinks != NULL && route->sinksLen > 0) {
         sinkRet = AudioCommonSinkToVdiSinkVdi(route, vdiRoute);
         if (sinkRet != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE(" sink routeNode to vdiRouteNode fail");
         }
     }
 
-    if (route->sources != NULL) {
+    if (route->sources != NULL && route->sourcesLen > 0) {
         sourcesRet = AudioCommonSourceToVdiSourceVdi(route, vdiRoute);
         if (sourcesRet != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE(" source routeNode to vdiRouteNode fail");
