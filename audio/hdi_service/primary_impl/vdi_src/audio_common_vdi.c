@@ -24,7 +24,7 @@
 #define AUDIO_ROUTE_NUM_MAX 2
 #define AUDIO_SAMPLE_FORMAT_NUM_MAX 30
 #define AUDIO_SUB_PORT_NUM_MAX 10
-#define AUDIO_FRAME_LEN_MAX 50000
+#define AUDIO_FRAME_LEN_MAX 100*1024*1024
 
 int32_t AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
     struct AudioDeviceDescriptorVdi *vdiDesc)
