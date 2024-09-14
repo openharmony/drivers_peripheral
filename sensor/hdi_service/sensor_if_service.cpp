@@ -30,6 +30,7 @@ constexpr int REGISTER_SENSOR = 1;
 constexpr int ENABLE_SENSOR = 1;
 constexpr int COMMON_REPORT_FREQUENCY = 1000000000;
 constexpr int COPY_SENSORINFO = 1;
+static constexpr unsigned int REDUCE_COUNT = 50;
 
 enum BatchSeniorMode {
         SA = 0,
@@ -188,7 +189,19 @@ int32_t SensorIfService::Enable(int32_t sensorId)
 {
     SENSOR_TRACE_PID_MSG("sensorId " + std::to_string(sensorId));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: sensorId %{public}d, serviceId = %{public}d", __func__, sensorId, serviceId);
+    static unsigned int count = 0;
+    static int32_t oldSensorId = 0;
+    static uint32_t oldServiceId = 0;
+    if (sensorId != oldSensorId || serviceId != oldServiceId || count >= REDUCE_COUNT) {
+        count = 0;
+        oldSensorId = sensorId;
+        oldServiceId = serviceId;
+    } else {
+        count++;
+    }
+    if (count == 0) {
+        HDF_LOGI("%{public}s: sensorId %{public}d, serviceId = %{public}d", __func__, sensorId, serviceId);
+    }
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, ENABLE_SENSOR)) {
         return HDF_SUCCESS;
@@ -216,7 +229,19 @@ int32_t SensorIfService::Disable(int32_t sensorId)
 {
     SENSOR_TRACE_PID_MSG("sensorId " + std::to_string(sensorId));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: sensorId %{public}d, serviceId = %{public}d", __func__, sensorId, serviceId);
+    static unsigned int count = 0;
+    static int32_t oldSensorId = 0;
+    static uint32_t oldServiceId = 0;
+    if (sensorId != oldSensorId || serviceId != oldServiceId || count >= REDUCE_COUNT) {
+        count = 0;
+        oldSensorId = sensorId;
+        oldServiceId = serviceId;
+    } else {
+        count++;
+    }
+    if (count == 0) {
+        HDF_LOGI("%{public}s: sensorId %{public}d, serviceId = %{public}d", __func__, sensorId, serviceId);
+    }
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
         HDF_LOGE("%{public}s There are still some services enable", __func__);

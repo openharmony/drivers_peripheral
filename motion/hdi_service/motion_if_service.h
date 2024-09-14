@@ -38,6 +38,7 @@ public:
 
     int32_t GetMotionVdiImpl();
 private:
+    int32_t CheckMotionType(int32_t motionType);
     IMotionInterfaceVdi *motionVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
 };

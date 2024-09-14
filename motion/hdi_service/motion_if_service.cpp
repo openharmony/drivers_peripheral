@@ -86,6 +86,11 @@ int32_t MotionIfService::EnableMotion(int32_t motionType)
         return HDF_FAILURE;
     }
 
+    int32_t checkResult = CheckMotionType(motionType);
+    if (checkResult != HDF_SUCCESS) {
+        return checkResult;
+    }
+
     StartTrace(HITRACE_TAG_HDF, "EnableMotion");
     int32_t ret = motionVdiImpl_->EnableMotion(motionType);
     if (ret != HDF_SUCCESS) {
@@ -102,6 +107,11 @@ int32_t MotionIfService::DisableMotion(int32_t motionType)
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
+    }
+
+    int32_t checkResult = CheckMotionType(motionType);
+    if (checkResult != HDF_SUCCESS) {
+        return checkResult;
     }
 
     StartTrace(HITRACE_TAG_HDF, "DisableMotion");
@@ -160,6 +170,11 @@ int32_t MotionIfService::SetMotionConfig(int32_t motionType, const std::vector<u
         return HDF_FAILURE;
     }
 
+    int32_t checkResult = CheckMotionType(motionType);
+    if (checkResult != HDF_SUCCESS) {
+        return checkResult;
+    }
+
     StartTrace(HITRACE_TAG_HDF, "SetMotionConfig");
     int32_t ret = motionVdiImpl_->SetMotionConfig(motionType, data);
     if (ret != HDF_SUCCESS) {
@@ -168,6 +183,17 @@ int32_t MotionIfService::SetMotionConfig(int32_t motionType, const std::vector<u
     FinishTrace(HITRACE_TAG_HDF);
 
     return ret;
+}
+
+int32_t MotionIfService::CheckMotionType(int32_t motionType)
+{
+    if ((motionType > HDF_MOTION_TYPE_PICKUP)) {
+        return HDF_SUCCESS;
+    }
+    if (motionType >= HDF_MOTION_TYPE_PICKUP && motionType < HDF_MOTION_TYPE_MAX {
+        return HDF_SUCCESS;
+    }
+    return HDF_ERR_INVALID_PARAM;
 }
 
 extern "C" IMotionInterface *MotionInterfaceImplGetInstance(void)
