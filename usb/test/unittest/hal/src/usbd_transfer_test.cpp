@@ -530,7 +530,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite001, TestSize.Level1)
     bufferData.push_back(SAMPLE_DATA_1);
     bufferData.push_back(SAMPLE_DATA_2);
     bufferData.push_back(SAMPLE_DATA_3);
-    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT,
+    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT | USB_REQUEST_TARGET_INTERFACE,
         USB_DDK_REQ_GET_CONFIGURATION, 0, 0, TRANSFER_TIME_OUT};
     auto ret = g_usbInterface->ControlTransferWrite(dev, ctrlparmas, bufferData);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransferWrite001 %{public}d ret=%{public}d", __LINE__, ret);
@@ -593,7 +593,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite004, TestSize.Level1)
     bufferData.push_back(SAMPLE_DATA_1);
     bufferData.push_back(SAMPLE_DATA_2);
     bufferData.push_back(SAMPLE_DATA_3);
-    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT,
+    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT | USB_REQUEST_TARGET_INTERFACE,
         USB_DDK_REQ_GET_DESCRIPTOR, CTL_VALUE, 0, TRANSFER_TIME_OUT};
     auto ret = g_usbInterface->ControlTransferWrite(dev, ctrlparmas, bufferData);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransferWrite004 %{public}d ret=%{public}d", __LINE__, ret);
@@ -719,7 +719,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite010, TestSize.Level1)
     bufferData.push_back(SAMPLE_DATA_1);
     bufferData.push_back(SAMPLE_DATA_2);
     bufferData.push_back(SAMPLE_DATA_3);
-    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT, USB_DDK_REQ_GET_DESCRIPTOR, 0, 0,
+    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT | USB_REQUEST_TARGET_INTERFACE, 0, 0, 0,
         TRANSFER_TIME_OUT};
     auto ret = g_usbInterface->ControlTransferWrite(dev, ctrlparmas, bufferData);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransferWrite010 %{public}d ret=%{public}d", __LINE__, ret);
@@ -782,7 +782,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite013, TestSize.Level1)
     bufferData.push_back(SAMPLE_DATA_1);
     bufferData.push_back(SAMPLE_DATA_2);
     bufferData.push_back(SAMPLE_DATA_3);
-    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT, USB_DDK_REQ_GET_INTERFACE, 0, 0, TRANSFER_TIME_OUT};
+    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT, 0, 0, 0, TRANSFER_TIME_OUT};
     auto ret = g_usbInterface->ControlTransferWrite(dev, ctrlparmas, bufferData);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransferWrite013 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -842,7 +842,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite016, TestSize.Level1)
     bufferData.push_back(SAMPLE_DATA_1);
     bufferData.push_back(SAMPLE_DATA_2);
     bufferData.push_back(SAMPLE_DATA_3);
-    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT, USB_DDK_REQ_GET_CONFIGURATION, 0, 0,
+    struct UsbCtrlTransfer ctrlparmas = {USB_ENDPOINT_DIR_OUT | USB_REQUEST_TARGET_ENDPOINT, 0, 0, 0,
         TRANSFER_TIME_OUT};
     auto ret = g_usbInterface->ControlTransferWrite(dev, ctrlparmas, bufferData);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransferWrite016 %{public}d ret=%{public}d", __LINE__, ret);
