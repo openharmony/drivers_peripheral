@@ -191,7 +191,7 @@ int32_t MotionIfService::CheckMotionType(int32_t motionType)
     if ((motionType > HDF_MOTION_TYPE_SECTION)) {
         return HDF_SUCCESS;
     }
-    if (motionType >= HDF_MOTION_TYPE_PICKUP && motionType < HDF_MOTION_TYPE_MAX {
+    if (motionType >= HDF_MOTION_TYPE_PICKUP && motionType < HDF_MOTION_TYPE_MAX) {
         return HDF_SUCCESS;
     }
     return HDF_ERR_INVALID_PARAM;
