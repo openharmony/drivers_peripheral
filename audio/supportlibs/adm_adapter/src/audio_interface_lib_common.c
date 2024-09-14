@@ -317,10 +317,7 @@ static int32_t AudioReadCardPortToDesc(struct HdfSBuf *reply, struct AudioAdapte
 {
     uint8_t portNum = 0;
 
-    if (desc == NULL) {
-        AUDIO_FUNC_LOGE("descs is null!");
-        return HDF_ERR_INVALID_PARAM;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
 
     if (!HdfSbufReadUint8(reply, &portNum)) {
         AUDIO_FUNC_LOGE("read portNum failed!");
@@ -341,12 +338,12 @@ static int32_t AudioReadCardPortToDesc(struct HdfSBuf *reply, struct AudioAdapte
 #else
     desc->portsLen = portNum;
 #endif
-
-    desc->ports = (struct AudioPort *)OsalMemCalloc(sizeof(struct AudioPort) * portNum);
-    if (desc->ports == NULL) {
-        AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
+    if (portNum == 0) {
+        AUDIO_FUNC_LOGE("portNum is zero");
         return HDF_FAILURE;
     }
+    desc->ports = (struct AudioPort *)OsalMemCalloc(sizeof(struct AudioPort) * portNum);
+    CHECK_NULL_PTR_RETURN_VALUE(desc->ports, HDF_FAILURE);
 
     for (uint32_t i = 0; i < portNum; i++) {
         if (!HdfSbufReadUint8(reply, (uint8_t *)&desc->ports[i].dir)) {
@@ -416,7 +413,7 @@ static int32_t AudioReadCardInfoToDesc(struct HdfSBuf *reply, struct AudioAdapte
         return HDF_FAILURE;
     }
 
-    if (*descs == NULL) {
+    if (*descs == NULL && *sndCardNum > 0) {
         AUDIO_FUNC_LOGI("*descs is NULL");
         *descs = (struct AudioAdapterDescriptor *)OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) * (*sndCardNum));
         if (*descs == NULL) {
@@ -491,7 +488,10 @@ static int32_t AudioCtlElemRealDataSpace(struct AudioCtlElemList *eList)
 {
     int32_t ret;
     size_t dataSize = eList->count * sizeof(struct AudioHwCtlElemId);
-
+    if (dataSize <= 0) {
+        AUDIO_FUNC_LOGE("dataSize is zero");
+        return HDF_FAILURE;
+    }
     struct AudioHwCtlElemId *ctlElemListAddr = OsalMemCalloc(dataSize);
     if (ctlElemListAddr == NULL) {
         AUDIO_FUNC_LOGE("Out of memory!");
