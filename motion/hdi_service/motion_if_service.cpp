@@ -18,6 +18,7 @@
 #include "hitrace_meter.h"
 
 #define HDF_LOG_TAG "uhdf_motion_service"
+#define HDF_MOTION_TYPE_SECTION 1000
 
 namespace OHOS {
 namespace HDI {
@@ -187,7 +188,7 @@ int32_t MotionIfService::SetMotionConfig(int32_t motionType, const std::vector<u
 
 int32_t MotionIfService::CheckMotionType(int32_t motionType)
 {
-    if ((motionType > HDF_MOTION_TYPE_PICKUP)) {
+    if ((motionType > HDF_MOTION_TYPE_SECTION)) {
         return HDF_SUCCESS;
     }
     if (motionType >= HDF_MOTION_TYPE_PICKUP && motionType < HDF_MOTION_TYPE_MAX {
