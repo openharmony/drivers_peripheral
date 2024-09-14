@@ -12,6 +12,7 @@
 # limitations under the License..
 
 declare_args() {
+  drivers_peripheral_codec_feature_support_heif_test = false
   drivers_peripheral_codec_feature_support_omx_extend_test = false
   drivers_peripheral_codec_feature_set_omx_role = false
   drivers_peripheral_codec_feature_support_dma_buffer = false
