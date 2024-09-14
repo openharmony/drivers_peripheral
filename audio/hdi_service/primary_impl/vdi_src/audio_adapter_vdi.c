@@ -433,6 +433,11 @@ int32_t AudioUpdateAudioRouteVdi(struct IAudioAdapter *adapter, const struct Aud
     CHECK_NULL_PTR_RETURN_VALUE(route, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(routeHandle, HDF_ERR_INVALID_PARAM);
 
+    if (route->sinksLen == 0 && route->sourcesLen == 0) {
+        AUDIO_FUNC_LOGE("invalid route value");
+        return HDF_FAILURE;
+    }
+
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->UpdateAudioRoute, HDF_ERR_INVALID_PARAM);
