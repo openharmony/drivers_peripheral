@@ -14,16 +14,18 @@
 import("//build/ohos.gni")
 import("../sensor.gni")
 
-config("libvdi_config") {
+config("vdi_config") {
   include_dirs = [
     "../interfaces/include",
     "../interfaces/v1_0",
   ]
 }
 
-ohos_shared_library("libsensor_interface_service_2.0") {
-  public_configs = [ ":libvdi_config" ]
+ohos_static_library("libvdi_config") {
+  public_configs = [ ":vdi_config" ]
+}
 
+ohos_shared_library("libsensor_interface_service_2.0") {
   defines = []
   if (build_variant == "root") {
     defines += [ "SENSOR_DEBUG" ]

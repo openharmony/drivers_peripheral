@@ -54,7 +54,7 @@
           }
         },
         {
-          "name": "//drivers/peripheral/light/hdi_service:liblight_interface_service_1.0",
+          "name": "//drivers/peripheral/light/hdi_service:libvdi_config",
           "header": {
             "header_files": [ "ilight_interface_vdi.h" ],
             "header_base": "//drivers/peripheral/light/interfaces/v1_0"
