@@ -16,7 +16,6 @@ import("../motion.gni")
 
 config("vdi_config") {
   include_dirs = [
-    "../interfaces/include",
     "../interfaces/v1_0",
   ]
 }

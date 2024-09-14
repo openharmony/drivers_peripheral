@@ -20,11 +20,10 @@ if (defined(ohos_lite)) {
     public_configs = []
   }
 } else {
-
   config("vdi_config") {
     include_dirs = [
       "../interfaces/include",
-      "../interfaces/v1_0",
+      "../interfaces/v1_1",
     ]
   }
 
