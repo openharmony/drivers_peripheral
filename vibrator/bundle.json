@@ -54,11 +54,7 @@
           }
         },
         {
-          "name": "//drivers/peripheral/vibrator/hdi_service:libvdi_config",
-          "header": {
-            "header_files": [ "ivibrator_interface_vdi.h" ],
-            "header_base": "//drivers/peripheral/vibrator/interfaces/v1_1"
-          }
+          "name": "//drivers/peripheral/vibrator/hdi_service:libvdi_config"
         }
       ]
     }

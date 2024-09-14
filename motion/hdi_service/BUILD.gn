@@ -15,9 +15,7 @@ import("//build/ohos.gni")
 import("../motion.gni")
 
 config("vdi_config") {
-  include_dirs = [
-    "../interfaces/v1_0",
-  ]
+  include_dirs = [ "../interfaces/v1_0" ]
 }
 
 ohos_static_library("libvdi_config") {
