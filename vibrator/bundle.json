@@ -54,7 +54,7 @@
           }
         },
         {
-          "name": "//drivers/peripheral/vibrator/hdi_service:libvdi_config"
+          "name": "//drivers/peripheral/vibrator/hdi_service:libvibrator_vdi_config"
         }
       ]
     }
