@@ -13,18 +13,17 @@
 
 import("//build/ohos.gni")
 
-config("vdi_config") {
+config("composer_vdi_config") {
   include_dirs = [
     "./buffer/hdi_service/include",
-    "./buffer/vdi_base/include",
     "./composer/hdi_service/include",
     "./interfaces/include",
     "./utils/include",
   ]
 }
 
-ohos_static_library("libvdi_config") {
-  public_configs = [ ":vdi_config" ]
+ohos_static_library("display_composer_vdi_config") {
+  public_configs = [ ":composer_vdi_config" ]
 }
 
 if (defined(ohos_lite)) {
