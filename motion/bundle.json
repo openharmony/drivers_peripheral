@@ -38,7 +38,7 @@
         "//drivers/peripheral/motion/test:hdf_test_motion"
       ],
       "inner_kits": [
-          {
+        {
           "name": "//drivers/peripheral/motion/hdi_service:libvdi_config"
         }
       ]
