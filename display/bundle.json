@@ -54,7 +54,10 @@
           }
         },
         {
-          "name": "//drivers/peripheral/display:libvdi_config"
+          "name": "//drivers/peripheral/display:display_composer_vdi_config"
+        },
+        {
+          "name": "//drivers/peripheral/display:display_buffer_vdi_config"
         }
       ]
     }
