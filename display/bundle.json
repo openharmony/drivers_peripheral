@@ -52,6 +52,12 @@
               ],
               "header_base": "//drivers/peripheral/display/hdi_service/gralloc/include"
           }
+        },
+        {
+          "name": "//drivers/peripheral/display:display_composer_vdi_config"
+        },
+        {
+          "name": "//drivers/peripheral/display:display_buffer_vdi_config"
         }
       ]
     }
