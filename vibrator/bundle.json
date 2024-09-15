@@ -52,6 +52,9 @@
             ],
             "header_base": "//drivers/peripheral/vibrator/interfaces/include"
           }
+        },
+        {
+          "name": "//drivers/peripheral/vibrator/hdi_service:libvibrator_vdi_config"
         }
       ]
     }
