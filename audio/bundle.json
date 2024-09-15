@@ -26,7 +26,8 @@
             "drivers_peripheral_audio_feature_double_pnp_detect",
             "drivers_peripheral_audio_feature_offload",
             "drivers_peripheral_audio_feature_multichannel",
-            "drivers_peripheral_audio_feature_hicollie_enable"
+            "drivers_peripheral_audio_feature_hicollie_enable",
+            "drivers_peripheral_audio_feature_hitrace_enable"
         ],
         "adapted_system_type": ["standard", "small"],
         "rom": "1035KB",

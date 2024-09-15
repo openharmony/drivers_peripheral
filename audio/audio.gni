@@ -21,6 +21,7 @@ declare_args() {
   drivers_peripheral_audio_feature_offload = false
   drivers_peripheral_audio_feature_multichannel = false
   drivers_peripheral_audio_feature_hicollie_enable = false
+  drivers_peripheral_audio_feature_hitrace_enable = false
 }
 
 if (defined(ohos_lite)) {
@@ -57,4 +58,9 @@ if (defined(global_parts_info) &&
 if (defined(global_parts_info) &&
     defined(global_parts_info.hiviewdfx_hicollie)) {
   drivers_peripheral_audio_feature_hicollie_enable = true
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.hiviewdfx_hitrace)) {
+  drivers_peripheral_audio_feature_hitrace_enable = true
 }
