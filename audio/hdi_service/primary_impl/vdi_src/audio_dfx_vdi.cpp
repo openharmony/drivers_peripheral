@@ -14,7 +14,9 @@
  */
 
 #include "audio_dfx_vdi.h"
+#ifdef AUDIO_HITRACE_ENABLE
 #include <hitrace_meter.h>
+#endif
 #ifdef AUDIO_HICOLLIE_ENABLE
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
@@ -25,12 +27,18 @@
 void HdfAudioStartTrace(const char* value, int valueLen)
 {
     (void) valueLen;
+#ifdef AUDIO_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_HDF, value);
+#else
+    (void) value;
+#endif
 }
 
 void HdfAudioFinishTrace(void)
 {
+#ifdef AUDIO_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_HDF);
+#endif
 }
 
 int32_t SetTimer(const char* name)
