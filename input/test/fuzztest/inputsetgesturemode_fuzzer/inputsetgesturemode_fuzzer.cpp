@@ -71,7 +71,7 @@ namespace OHOS {
             }
         }
 
-        ReleaseInputInterface(g_inputInterface);
+        ReleaseInputInterface(&g_inputInterface);
         return result;
     }
 }
