@@ -52,6 +52,9 @@
             ],
             "header_base": "//drivers/peripheral/sensor/interfaces/include"
           }
+        },
+        {
+          "name": "//drivers/peripheral/sensor/hdi_service:libsensor_vdi_config"
         }
       ]
     }
