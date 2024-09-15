@@ -33,4 +33,18 @@ if (defined(ohos_lite)) {
       "composer/test:display_composer_test",
     ]
   }
+
+  config("vdi_config") {
+    include_dirs = [
+      "./buffer/hdi_service/include",
+      "./buffer/vdi_base/include",
+      "./composer/hdi_service/include",
+      "./interfaces/include",
+      "./utils/include",
+    ]
+  }
+
+  ohos_static_library("libvdi_config") {
+    public_configs = [ ":vdi_config" ]
+  }
 }

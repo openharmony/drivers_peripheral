@@ -52,6 +52,9 @@
               ],
               "header_base": "//drivers/peripheral/display/hdi_service/gralloc/include"
           }
+        },
+        {
+          "name": "//drivers/peripheral/display:libvdi_config"
         }
       ]
     }
