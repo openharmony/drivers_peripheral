@@ -309,11 +309,56 @@ struct CodecEnableNativeBufferParams {
     bool enable;                    /** Enable NativeBuffer */
 };
 
+enum RangeType {
+    RANGE_UNSPECIFIED,
+    RANGE_FULL,
+    RANGE_LIMITED,
+    RANGE_MAX = 0xff,
+};
+
+enum Primaries {
+    PRIMARIES_UNSPECIFIED,
+    PRIMARIES_BT709,                //Rec. ITU-R BT.709-6
+    PRIMARIES_BT470_6M,             //Rec. ITU-R BT.470-6 System M
+    PRIMARIES_BT601_625,            //Rec. ITU-R BT.601-7 625 or Rec. ITU-R BT.470-6 System B,G
+    PRIMARIES_BT601_525,            //Rec. ITU-R BT.601-7 525 or SMPTE ST 170 or SMPTE ST 240
+    PRIMARIES_GENERICFILM,          //Generic Film
+    PRIMARIES_BT2020,               //Rec. ITU-R BT.2020-2 or Rec. ITU-R BT.2100-2
+    PRIMARIES_MAX = 0xff,
+};
+
+enum Transfer {
+    TRANSFER_UNSPECIFIED,
+    TRANSFER_LINEAR,                //Linear transfer characteristics
+    TRANSFER_SRGB,                  //IEC 61966-2-1 sRGB
+    TRANSFER_SMPTE170,              //SMPTE ST 170 or Rec. ITU-R BT.709-6 or BT.601-7 or BT.2020-2
+    TRANSFER_GAMMA22,               //Rec. ITU-R BT.470-6 System M
+    TRANSFER_GAMMA28,               //Rec. ITU-R BT.470-6 System B,G
+    TRANSFER_PQ,                    //Rec. ITU-R BT.2100-2 perceptual quantization (PQ) system
+    TRANSFER_HLG,                   //Rec. ITU-R BT.2100-2 hybrid log gamma (HLG) system
+    TRANSFER_SMPTE240 = 0x40,       //SMPTE ST 240
+    TRANSFER_XVYCC,                 //IEC 61966-2-4
+    TRANSFER_BT1361,                //Rec. ITU-R BT.1361-0 extended colour gamut system
+    TRANSFER_ST428,                 //SMPTE ST 428-1
+    TRANSFER_MAX = 0xff,
+};
+
+enum MatrixCoeffs {
+    MATRIX_UNSPECIFED,
+    MATRIX_BT709,                   //Rec. ITU-R BT.709-6
+    MATRIX_FCC,                     //United States Federal Communications Commission
+    MATRIX_BT601,                   //Rec. ITU-R BT.601-7 or Rec. ITU-R BT.470-6 System B,G
+    MATRIX_SMPTE240,                //SMPTE ST 240
+    MATRIX_BT2020,                  //Rec. ITU-R BT.2100-2 (non-constant luminance)
+    MATRIX_BT2020CONSTANT,          //Rec. ITU-R BT.2100-2 (constant luminance)
+    MATRIX_MAX = 0xff,
+};
+
 struct ColorAspects {
-    bool range;
-    uint8_t primaries;
-    uint8_t transfer;
-    uint8_t matrixCoeffs;
+    enum RangeType range;
+    enum Primaries primaries;
+    enum Transfer transfer;
+    enum MatrixCoeffs matrixCoeffs;
 };
 
 /**
