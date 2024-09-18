@@ -143,10 +143,9 @@ struct UsbOsAdapterOps {
     int32_t (*detachKernelDriverAndClaim)(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber);
     int32_t (*attachKernelDriver)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
     int32_t (*detachKernelDriver)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
+    bool (*getInterfaceActiveStatus)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
     int32_t (*usbControlMsg)(const struct UsbDeviceHandle *devHandle, struct UsbControlRequestData *ctrlData);
     int32_t (*getUsbSpeed)(const struct UsbDeviceHandle *handle);
-    bool (*getInterfaceActiveStatus)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
-    int32_t (*getDeviceSpeed)(const struct UsbDeviceHandle *devHandle);
 };
 #ifdef __cplusplus
 extern "C" {
