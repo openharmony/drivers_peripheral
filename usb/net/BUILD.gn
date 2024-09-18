@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//build/config/components/hdi/hdi.gni")
+import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("./../usb.gni")
 group("usbhost_ecm") {
   deps = [ ":libusbhost_ecm" ]
@@ -37,7 +37,7 @@ ohos_shared_library("libusbhost_ecm") {
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
     "./../gadget/function/include",
-    "//drivers/hdfcore/framework/model/usb/include",
+    "${hdf_framework_path}/model/usb/include",
     "include",
     "${usb_driver_path}/utils/include",
   ]
