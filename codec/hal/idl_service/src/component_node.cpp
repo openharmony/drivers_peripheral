@@ -23,8 +23,6 @@
 #include "component_mgr.h"
 #include "icodec_buffer.h"
 #include "sys/mman.h"
-#include "v3_0/codec_ext_types.h"
-#include "codec_component_service.h"
 
 #define AUDIO_CODEC_NAME "OMX.audio"
 
@@ -191,50 +189,6 @@ int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, const int8_t *para
     auto err = OMX_SetParameter(comp_, paramIndex, const_cast<int8_t *>(param));
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("OMX_SetParameter err = %{public}x ", err);
-    }
-    return err;
-}
-
-int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<int8_t>& paramStruct,
-    const OmxCodecBuffer& inBuffer)
-{
-    CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
-    if (index != HDI::Codec::V3_0::Codec_IndexParamOverlayBuffer) {
-        return OMX_ErrorNotImplemented;
-    }
-    if (paramStruct.size() != sizeof(HDI::Codec::V3_0::CodecParamOverlay)) {
-        return OMX_ErrorBadParameter;
-    }
-    if (inBuffer.bufferhandle == nullptr) {
-        CODEC_LOGE("null bufferhandle");
-        return OMX_ErrorBadParameter;
-    }
-    BufferHandle* handle = inBuffer.bufferhandle->GetBufferHandle();
-    if (handle == nullptr) {
-        CODEC_LOGE("null bufferhandle");
-        return OMX_ErrorBadParameter;
-    }
-    sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> mapper = HDI::Codec::V3_0::GetMapperService();
-    if (mapper != nullptr) {
-        mapper->Mmap(inBuffer.bufferhandle);
-    }
-    auto paramSrc = reinterpret_cast<const HDI::Codec::V3_0::CodecParamOverlay *>(paramStruct.data());
-    CodecParamOverlayBuffer paramDst {
-        .size = sizeof(CodecParamOverlayBuffer),
-        .enable = paramSrc->enable,
-        .dstX = paramSrc->dstX,
-        .dstY = paramSrc->dstY,
-        .dstW = paramSrc->dstW,
-        .dstH = paramSrc->dstH,
-        .bufferHandle = handle,
-    };
-    auto err = OMX_SetParameter(comp_, static_cast<OMX_INDEXTYPE>(OMX_IndexParamOverlayBuffer),
-        reinterpret_cast<int8_t *>(&paramDst));
-    if (err != OMX_ErrorNone) {
-        CODEC_LOGE("OMX_SetParameter err = %{public}x ", err);
-    }
-    if (mapper != nullptr) {
-        mapper->Unmap(inBuffer.bufferhandle);
     }
     return err;
 }
