@@ -1095,6 +1095,10 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
+    if (!port->initFlag) {
+        HDF_LOGE("%{public}s: openPort failed", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
     int32_t ret = 0;
     if (port->ctrDevHandle != nullptr) {
         RawUsbCloseCtlProcess(port->ctrDevHandle);
