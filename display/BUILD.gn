@@ -11,6 +11,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+
+config("buffer_vdi_config") {
+  include_dirs = [ "./buffer/hdi_service/include" ]
+}
+
+config("composer_vdi_config") {
+  include_dirs = [ "./composer/hdi_service/include" ]
+}
+
+ohos_static_library("display_buffer_vdi_config") {
+  public_configs = [ ":buffer_vdi_config" ]
+}
+
+ohos_static_library("display_composer_vdi_config") {
+  public_configs = [ ":composer_vdi_config" ]
+}
+
 if (defined(ohos_lite)) {
   group("display_entry") {
     deps = [ "hal:hdi_display" ]

@@ -535,12 +535,12 @@ int32_t DStreamOperator::ChangeToOfflineStream(const std::vector<int32_t> &strea
 }
 
 
-int32_t EnableResult(int32_t streamId, const std::vector<uint8_t> &results)
+int32_t DStreamOperator::EnableResult(int32_t streamId, const std::vector<uint8_t> &results)
 {
     return CamRetCode::NO_ERROR;
 }
 
-int32_t DisableResult(int32_t streamId, const std::vector<uint8_t> &results)
+int32_t DStreamOperator::DisableResult(int32_t streamId, const std::vector<uint8_t> &results)
 {
     return CamRetCode::NO_ERROR;
 }

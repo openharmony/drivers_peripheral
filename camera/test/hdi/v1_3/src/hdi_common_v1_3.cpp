@@ -328,8 +328,7 @@ void Test::DefaultInfosAnalyze(
 
 void Test::StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t professionalMode)
 {
-    streamOperatorCallbackV1_3 =
-        OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (new TestStreamOperatorCallbackV1_3);
+    streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
     uint32_t mainVersion = 1;
     uint32_t minVersion = 0;
     rc = cameraDeviceV1_3->GetStreamOperator_V1_3(streamOperatorCallbackV1_3, streamOperator_V1_3);
@@ -378,8 +377,7 @@ void Test::StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t pr
 
 void Test::StartStream(std::vector<StreamIntent> intents, OHOS::HDI::Camera::V1_3::OperationMode mode)
 {
-    streamOperatorCallbackV1_3 =
-        OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (new TestStreamOperatorCallbackV1_3);
+    streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
     uint32_t mainVersion = 1;
     uint32_t minVersion = 0;
     rc = cameraDeviceV1_3->GetStreamOperator_V1_3(streamOperatorCallbackV1_3, streamOperator_V1_3);
@@ -711,9 +709,9 @@ int32_t Test::TestStreamOperatorCallbackV1_3::OnFrameShutterEnd(int32_t captureI
 
 int32_t Test::TestStreamOperatorCallbackV1_3::OnResult(int32_t streamId, const std::vector<uint8_t> &result)
 {
-    MetadataUtils::ConvertVecToMetadata(result, stramResultMeta);
+    MetadataUtils::ConvertVecToMetadata(result, streamResultMeta);
     if (Test::streamResultCallback_) {
-        Test::streamResultCallback_(streamId, stramResultMeta);
+        Test::streamResultCallback_(streamId, streamResultMeta);
     }
     return HDI::Camera::V1_0::NO_ERROR;
 }
