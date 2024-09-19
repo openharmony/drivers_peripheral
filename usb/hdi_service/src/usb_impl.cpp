@@ -1390,7 +1390,10 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
-
+    if (!port->initFlag || port->devHandle[interfaceId] == nullptr) {
+        HDF_LOGE("%{public}s: openPort or claimInterface failed", __func__);
+        return HDF_DEV_ERR_OP;
+    }
     if (interfaceId < USB_MAX_INTERFACES) {
         if (HdfSListCount(&port->reqSyncList) > 0) {
             UsbdRequestSyncReleaseList(port);
