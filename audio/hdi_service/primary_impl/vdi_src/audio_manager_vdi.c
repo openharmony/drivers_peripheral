@@ -340,7 +340,7 @@ static struct IAudioAdapter* VendorLoadAdapter(struct IAudioManagerVdi *vdiManag
         return NULL;
     }
 
-    struct IAudioAdapter *adapter = AudioCreateAdapterVdi(descIndex, vdiAdapter, desc->adapterName);
+    struct IAudioAdapter *adapter = AudioCreateAdapterVdi(descIndex, vdiAdapter, vdiDesc->adapterName);
     if (adapter == NULL) {
         AUDIO_FUNC_LOGE("audio vdiManager create adapter fail");
         vdiManager->UnloadAdapter(vdiManager, vdiAdapter);
