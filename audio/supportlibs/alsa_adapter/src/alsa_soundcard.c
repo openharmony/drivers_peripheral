@@ -23,6 +23,7 @@
 #define ALSA_CONFIG_FILE_MAX  (2 * 1024) // 2KB
 #define SUPPORT_CAPTURE_OR_RENDER  1
 #define SUPPORT_CAPTURE_AND_RENDER 2
+#define MALLOC_MAX 100
 
 /* Define structure description alsa_adapter.hson information  */
 struct AlsaAdapterCfgInfo {
@@ -703,7 +704,10 @@ static int32_t AudioInitPorts(struct AudioAdapterDescriptor *desc, enum SndCardT
 #else
         desc->portsLen = portNum;
 #endif
-
+    if (portNum == 0) {
+        AUDIO_FUNC_LOGE("portNum is zero");
+        return HDF_FAILURE;
+    }
     desc->ports = (struct AudioPort *)OsalMemCalloc(sizeof(struct AudioPort) * portNum);
     if (desc->ports == NULL) {
         AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
@@ -738,7 +742,7 @@ int32_t AudioGetAllCardInfo(struct AudioAdapterDescriptor **descs, int32_t *sndC
     }
 
     int32_t adapterNum = CfgGetAdapterCount();
-    if (*descs == NULL) {
+    if (*descs == NULL && adapterNum > 0 && adapterNum < MALLOC_MAX) {
         AUDIO_FUNC_LOGW("*descs is null, need memcalloc.");
         *descs = (struct AudioAdapterDescriptor *)OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) * adapterNum);
         if (*descs == NULL) {

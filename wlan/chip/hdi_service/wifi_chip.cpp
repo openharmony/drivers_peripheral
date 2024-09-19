@@ -647,7 +647,9 @@ int32_t WifiChip::RemoveStaService(const std::string& ifname)
     if (status != WifiError::HAL_SUCCESS) {
         HDF_LOGE("Failed to remove interface: %{public}s, error: %{public}d", ifname.c_str(), status);
     }
-    InvalidateAndClearStaIface(staIfaces_);
+    HDF_LOGI("RemoveStaService Invalidate and erase iface:%{public}s", ifname.c_str());
+    iface->Invalidate();
+    staIfaces_.erase(std::remove(staIfaces_.begin(), staIfaces_.end(), iface), staIfaces_.end());
     SetUsedIfaceNameProperty(GetUsedIfaceName());
     return HDF_SUCCESS;
 }
