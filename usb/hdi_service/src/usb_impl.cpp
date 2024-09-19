@@ -1401,7 +1401,7 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
 
     if (interfaceId < USB_MAX_INTERFACES) {
         if (port->devHandle[interfaceId] == nullptr || port->iface[interfaceId] == nullptr) {
-            HDF_LOGE("%{public}s: UsbOpenInterface or UsbManageInterface failed", __func__);
+            HDF_LOGE("%{public}s: UsbOpenInterface or UsbClaimInterface failed", __func__);
             return HDF_DEV_ERR_OP;
         }
         if (HdfSListCount(&port->reqSyncList) > 0) {
