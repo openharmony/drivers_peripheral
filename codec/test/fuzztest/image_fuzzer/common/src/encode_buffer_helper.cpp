@@ -48,7 +48,7 @@ EncodeBufferHelper::~EncodeBufferHelper()
 }
 
 
-bool EncodeBufferHelper::InitialRgbaData(BufferHandle* handle, PixelFileInfo& pixelInfo, uint8_t* data, size_t size)
+bool EncodeBufferHelper::InitialRgbaData(BufferHandle* handle, PixelFileInfo& pixelInfo, uint8_t* data, size_t &size)
 {
     char* dst = reinterpret_cast<char*>(handle->virAddr);
     static constexpr uint32_t BYTES_PER_PIXEL_RBGA = 4;
@@ -64,10 +64,11 @@ bool EncodeBufferHelper::InitialRgbaData(BufferHandle* handle, PixelFileInfo& pi
         dst += handle->stride;
     }
     data += pixelInfo.alignedWidth * BYTES_PER_PIXEL_RBGA * pixelInfo.displayHeight;
+    size -= pixelInfo.alignedWidth * BYTES_PER_PIXEL_RBGA * pixelInfo.displayHeight;
     return (ret == EOK);
 }
 
-sptr<NativeBuffer> EncodeBufferHelper::CreateImgBuffer(uint8_t* data, size_t size)
+sptr<NativeBuffer> EncodeBufferHelper::CreateImgBuffer(uint8_t* data, size_t &size)
 {
     PixelFileInfo pixelInfo;
     uint8_t* dataEnd = data + size -1;
@@ -78,6 +79,7 @@ sptr<NativeBuffer> EncodeBufferHelper::CreateImgBuffer(uint8_t* data, size_t siz
     pixelInfo.displayWidth = (ToUint32(data) >> SHIFT_CNT); //Max 1024
     pixelInfo.alignedWidth = pixelInfo.displayWidth;
     data += sizeof(pixelInfo.displayWidth);
+    size -= sizeof(pixelInfo.displayWidth);
 
     if (dataEnd < data + sizeof(pixelInfo.displayHeight)) {
         return nullptr;
@@ -85,6 +87,7 @@ sptr<NativeBuffer> EncodeBufferHelper::CreateImgBuffer(uint8_t* data, size_t siz
     pixelInfo.displayHeight = (ToUint32(data) >> SHIFT_CNT);
     pixelInfo.alignedHeight = pixelInfo.displayHeight;
     data += sizeof(pixelInfo.displayHeight);
+    size -= sizeof(pixelInfo.displayHeight);
 
     pixelInfo.pixFmt = OHOS::HDI::Display::Composer::V1_2::PIXEL_FMT_RGBA_8888;
     uint64_t usage = OHOS::HDI::Display::Composer::V1_2::HBM_USE_CPU_READ |
@@ -116,7 +119,7 @@ sptr<NativeBuffer> EncodeBufferHelper::CreateImgBuffer(uint8_t* data, size_t siz
     return imgBuffer;
 }
 
-SharedBuffer EncodeBufferHelper::CreateSharedBuffer(uint8_t* data, size_t size)
+SharedBuffer EncodeBufferHelper::CreateSharedBuffer(uint8_t* data, size_t &size)
 {
     SharedBuffer buffer = {
         .fd = -1,
@@ -130,6 +133,7 @@ SharedBuffer EncodeBufferHelper::CreateSharedBuffer(uint8_t* data, size_t size)
     }
     uint8_t totalSize = *data;
     data += sizeof(totalSize);
+    size -= sizeof(totalSize);
     int fd = AshmemCreate("ForMetaData", (size_t)totalSize);
     IF_TRUE_RETURN_VAL_WITH_MSG(fd < 0, buffer, "cannot create ashmem for meta data");
     void *addr = mmap(nullptr, (size_t)totalSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
@@ -149,6 +153,7 @@ SharedBuffer EncodeBufferHelper::CreateSharedBuffer(uint8_t* data, size_t size)
         return buffer;
     }
     data += totalSize;
+    size -= totalSize;
     if (munmap(addr, totalSize) != 0) {
         HDF_LOGW("failed to unmap addr for meta buffer");
     }
