@@ -3,7 +3,7 @@
         {
             "deep-buffer-playback": [
                 {
-                    "headphones": [
+                    "Headphones": [
                         {
                             "name": "Playback Path",
                             "value": "2"
@@ -15,7 +15,7 @@
                             "value": "3"
                         }
                     ],
-                    "mic": [
+                    "Mic": [
                         {
                             "name": "Capture MIC Path",
                             "value": "1"
@@ -31,13 +31,13 @@
                             "value": "2"
                         }
                     ],
-                    "headphones": [
+                    "Headphones": [
                         {
                             "name": "Playback Path",
                             "value": "3"
                         }
                     ],
-                    "mic": [
+                    "Mic": [
                         {
                             "name": "Capture MIC Path",
                             "value": "1"
@@ -69,7 +69,7 @@
                             "value": "8"
                         }
                     ],
-                    "MIC": [
+                    "Mic": [
                         {
                             "name": "Capture MIC Path",
                             "value": "1"

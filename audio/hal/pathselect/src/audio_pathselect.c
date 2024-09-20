@@ -47,7 +47,7 @@
 #define AUDIO_DEV_OFF 0
 
 #define HDF_PATH_NUM_MAX (32 * 4)
-#define ADM_VALUE_SIZE 2
+#define ADM_VALUE_SIZE 4
 
 static cJSON *g_cJsonObj = NULL;
 
