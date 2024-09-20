@@ -565,7 +565,7 @@ static int32_t SetCapturePathValue(
                 AUDIO_FUNC_LOGE("InitDeviceSwitchValue failed!");
                 return HDF_FAILURE;
             }
-        devNum++;
+            devNum++;
         }
         captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum = devNum;
     }
@@ -775,10 +775,12 @@ static int32_t AudioPathSelCaptureChkScene(struct AudioHwCaptureParam *captureSc
     return AudioPathSelGetPlanCapture(captureSceneParam);
 }
 
-static void  FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo)
+static void FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo)
 {
     for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
-        AudioMemFree((void **)&(deviceInfo->deviceSwitchs[i].value));
+        if (deviceInfo != NULL) {
+            AudioMemFree((void **)&(deviceInfo->deviceSwitchs[i].value));
+        }
     }
 }
 
