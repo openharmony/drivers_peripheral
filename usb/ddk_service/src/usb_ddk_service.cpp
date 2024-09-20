@@ -46,7 +46,7 @@ namespace V1_0 {
 #define MAX_CONTROL_BUFF_SIZE 1024
 
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
-
+static std::mutex g_infMutex;
 extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
 {
     return new (std::nothrow) UsbDdkService();
@@ -54,6 +54,7 @@ extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
 
 int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
 {
+    std::lock_guard<std::mutex> lock(g_infMutex);
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -398,6 +399,7 @@ int32_t UsbDdkService::SendPipeRequest(
         return HDF_ERR_NOPERM;
     }
 
+    std::lock_guard<std::mutex> lock(g_infMutex);
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -446,6 +448,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
         return HDF_ERR_NOPERM;
     }
 
+    std::lock_guard<std::mutex> lock(g_infMutex);
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
