@@ -116,6 +116,7 @@ sptr<NativeBuffer> EncodeBufferHelper::CreateImgBuffer(uint8_t* data, size_t &si
     }
     HDF_LOGI("Fill Image RGB Data Succesfully");
     sptr<NativeBuffer> imgBuffer = new NativeBuffer(handle);
+    bufferMgr_->FreeMem(*handle);
     return imgBuffer;
 }
 
