@@ -19,6 +19,13 @@ namespace OHOS::VDI::HEIF {
 using namespace OHOS::HDI::Codec::Image::V2_0;
 using namespace std;
 
+enum ValueOption : uint8_t {
+    OPTION_0 = 0,
+    OPTION_1,
+    OPTION_2,
+    OPTION_3,
+    OPTION_BUTT
+};
 
 bool HeifEncodeHelper::AllocOutputBuffer(SharedBuffer& output)
 {
@@ -52,13 +59,7 @@ ItemRef HeifEncodeHelper::FillRefItem(ItemRef item, uint8_t *data, size_t &size)
     if (dataEnd < (data + sizeof(uint8_t))) {
         return item;
     }
-    enum ValueOption : uint8_t {
-        OPTION_0 = 0,
-        OPTION_1,
-        OPTION_2,
-        OPTION_3,
-        OPTION_BUTT
-    };
+
     switch ((*data) % OPTION_BUTT) {
         case OPTION_0:
             item.type = DIMG;
