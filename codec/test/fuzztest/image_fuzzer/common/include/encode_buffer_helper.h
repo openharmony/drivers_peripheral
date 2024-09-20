@@ -33,8 +33,8 @@ class EncodeBufferHelper {
 public:
     EncodeBufferHelper();
     ~EncodeBufferHelper();
-    OHOS::sptr<OHOS::HDI::Base::NativeBuffer> CreateImgBuffer(uint8_t* data, size_t size);
-    OHOS::HDI::Codec::Image::V2_0::SharedBuffer CreateSharedBuffer(uint8_t* data, size_t size);
+    OHOS::sptr<OHOS::HDI::Base::NativeBuffer> CreateImgBuffer(uint8_t* data, size_t &size);
+    OHOS::HDI::Codec::Image::V2_0::SharedBuffer CreateSharedBuffer(uint8_t* data, size_t &size);
 private:
     struct PixelFileInfo {
         uint32_t displayWidth;
@@ -44,7 +44,7 @@ private:
         int32_t pixFmt;
     };
 private:
-    bool InitialRgbaData(BufferHandle* handle, PixelFileInfo& pixelInfo, uint8_t* data, size_t size);
+    bool InitialRgbaData(BufferHandle* handle, PixelFileInfo& pixelInfo, uint8_t* data, size_t &size);
 private:
     OHOS::HDI::Display::Buffer::V1_2::IDisplayBuffer* bufferMgr_;
     std::set<int> allocatedFd_;
