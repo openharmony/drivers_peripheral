@@ -104,6 +104,8 @@ sptr<NativeBuffer> EncodeBufferHelper::CreateImgBuffer(uint8_t* data, size_t &si
     int32_t ret = bufferMgr_->AllocMem(alloc, handle);
     IF_TRUE_RETURN_VAL_WITH_MSG(ret != HDF_SUCCESS, nullptr,
                                 "failed to alloc output buffer, err [%{public}d] !", ret);
+    sptr<NativeBuffer> imgBuffer = new NativeBuffer();
+    imgBuffer->SetBufferHandle(handle, true);
     bufferMgr_->Mmap(*handle);
 
     HDF_LOGI("Fill Image RGB Data");
@@ -111,12 +113,9 @@ sptr<NativeBuffer> EncodeBufferHelper::CreateImgBuffer(uint8_t* data, size_t &si
 
     (void)bufferMgr_->Unmap(*handle);
     if (!flag) {
-        bufferMgr_->FreeMem(*handle);
         return nullptr;
     }
     HDF_LOGI("Fill Image RGB Data Succesfully");
-    sptr<NativeBuffer> imgBuffer = new NativeBuffer(handle);
-    bufferMgr_->FreeMem(*handle);
     return imgBuffer;
 }
 
