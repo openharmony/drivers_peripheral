@@ -105,7 +105,7 @@ bool HeifEncodeHelper::FillImageItem(ImgType type, ImageItem& item, uint8_t *dat
 {
     uint8_t *dataEnd = data + size - 1;
     item.itemName = "";
-    if (dataEnd < data + sizeof(item.id)) {
+    if (dataEnd < data + sizeof(item.id) + sizeof(item.quality) + sizeof(uint8_t)) {
         return false;
     }
     item.id = ToUint32(data);
@@ -118,17 +118,11 @@ bool HeifEncodeHelper::FillImageItem(ImgType type, ImageItem& item, uint8_t *dat
     item.isHidden = (type != PRIMARY_IMG);
     item.compressType = (type == T_MAP ? "none" : "hevc");
 
-    if (dataEnd < (data + sizeof(item.quality))) {
-        return false;
-    }
     item.quality = ToUint32(data);
     data += sizeof(item.quality);
     size -= sizeof(item.quality);
 
     item.liteProperties = {};
-    if (dataEnd < (data + sizeof(uint8_t))) {
-        return false;
-    }
     uint8_t liteProSize = *data;
     data += sizeof(liteProSize);
     size -= sizeof(liteProSize);
