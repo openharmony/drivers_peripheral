@@ -59,10 +59,13 @@ void FuncUpdateSettings(const uint8_t *rawData, size_t size)
     if (size >= RAW_DATA_SIZE_MAX) {
         return;
     }
-    std::vector<uint8_t> abilityVec = {};
-    uint8_t *data = const_cast<uint8_t *>(rawData);
-    abilityVec.push_back(*data);
-    cameraTest->cameraDeviceV1_1->UpdateSettings(abilityVec);
+    float *data = const_cast<float *>(reinterpret_cast<const float *>(rawData));
+    std::shared_ptr<Camera::CameraMetadata> meta = std::make_shared<Camera::CameraMetadata>(
+        cameraTest->itemCapacity, cameraTest->dataCapacity);
+    meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &data[0], cameraTest->dataCount);
+    std::vector<uint8_t> metaVec;
+    Camera::MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraTest->cameraDeviceV1_1->UpdateSettings(metaVec);
 }
 
 void FuncSetResultMode(const uint8_t *rawData, size_t size)
@@ -102,15 +105,17 @@ void FuncDisableResult(const uint8_t *rawData, size_t size)
 void FuncGetStatus(const uint8_t *rawData, size_t size)
 {
     (void)size;
-    std::vector<uint8_t> result = {};
     std::vector<uint8_t> resultOut = {};
-    uint8_t *data = const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(rawData));
-    result.push_back(*data);
-
+    float *data = const_cast<float *>(reinterpret_cast<const float *>(rawData));
+    std::shared_ptr<Camera::CameraMetadata> meta = std::make_shared<Camera::CameraMetadata>(
+        cameraTest->itemCapacity, cameraTest->dataCapacity);
+    meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &data[0], cameraTest->dataCount);
+    std::vector<uint8_t> metaVec;
+    Camera::MetadataUtils::ConvertMetadataToVec(meta, metaVec);
     if (nullptr == cameraTest->cameraDeviceV1_2) {
         return;
     }
-    cameraTest->cameraDeviceV1_2->GetStatus(result, resultOut);
+    cameraTest->cameraDeviceV1_2->GetStatus(metaVec, resultOut);
 }
 
 void FuncGetSecureCameraSeq(const uint8_t *rawData, size_t size)

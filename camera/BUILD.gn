@@ -62,14 +62,9 @@ if (defined(ohos_lite)) {
           # acceptance unit test
           "test/hdi/metadata_test:camera_metadata_operator_ut",
           "test/hdi/v1_0:camera_test_at",
-          "test/hdi/v1_1:camera_test_hdi_V1_1",
-          "test/hdi/v1_2:camera_test_hdi_V1_2",
-          "test/hdi/v1_3:camera_test_hdi_V1_3",
 
           # benchmark test
           "test/benchmarktest/v1_0:hdf_camera_benchmark_test",
-          "test/benchmarktest/v1_1:hdf_camera_benchmark_test_v1_1",
-          "test/benchmarktest/v1_2:hdf_camera_benchmark_test_v1_2",
 
           # v4l2 unit test
           "test/ut/v4l2:camera_test_v4l2_ut",

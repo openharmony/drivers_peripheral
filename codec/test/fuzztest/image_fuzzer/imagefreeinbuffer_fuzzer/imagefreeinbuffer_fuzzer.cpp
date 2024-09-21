@@ -18,10 +18,16 @@
 #include <image_auto_initer.h>
 #include <vector>
 #include "image_common.h"
-#include "v1_0/icodec_image.h"
-using namespace OHOS::HDI::Codec::Image::V1_0;
+#include "v2_0/icodec_image.h"
+using namespace OHOS::HDI::Codec::Image::V2_0;
 using namespace OHOS;
 using namespace std;
+
+extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
+{
+    return 0;
+}
+
 namespace OHOS {
 namespace Codec {
 namespace Image {

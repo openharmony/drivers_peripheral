@@ -29,18 +29,16 @@ config("module_private_config") {
 
 ohos_unittest("composer_ut") {
   module_out_path = module_output_path
+  resource_config_file = "./../resource/ohos_test.xml"
   sources = [ "hdi_composer_ut.cpp" ]
-  include_dirs = [
-    "../common",
-    "//commonlibrary/c_utils/base/include",
-  ]
+  include_dirs = [ "../common" ]
   deps = [ "../common:disp_dev_hdi_test_common" ]
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
-    "drivers_interface_display:libdisplay_composer_hdi_impl_1.1",
-    "drivers_interface_display:libdisplay_composer_stub_1.1",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_stub_1.2",
     "googletest:gtest",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",
@@ -54,6 +52,7 @@ ohos_unittest("composer_ut") {
 
 ohos_unittest("composer_death_test") {
   module_out_path = module_output_path
+  resource_config_file = "./../resource/ohos_test.xml"
   sources = [ "hdi_death_test.cpp" ]
   include_dirs = [ "../common" ]
   deps = [ "../common:disp_dev_hdi_test_common" ]
@@ -61,7 +60,7 @@ ohos_unittest("composer_death_test") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
-    "drivers_interface_display:libdisplay_composer_hdi_impl",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
     "googletest:gtest",
     "graphic_surface:buffer_handle",

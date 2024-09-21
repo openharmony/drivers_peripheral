@@ -15,13 +15,14 @@
 
 #include "audio_render_vdi.h"
 
+#include <string.h>
 #include <limits.h>
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "osal_mem.h"
 #include "securec.h"
 #include "audio_common_vdi.h"
-#include "audio_trace_vdi.h"
+#include "audio_dfx_vdi.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
@@ -36,6 +37,7 @@ struct AudioRenderInfo {
     unsigned int usrCount;
     struct IAudioCallback *callback;
     bool isRegCb;
+    char *adapterName;
 };
 
 struct AudioRenderPrivVdi {
@@ -91,9 +93,11 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->RenderFrame, HDF_ERR_INVALID_PARAM);
 
+    int32_t id = SetTimer("Hdi:RenderFrame");
     HdfAudioStartTrace("Hdi:AudioRenderFrameVdi", 0);
     int32_t ret = vdiRender->RenderFrame(vdiRender, frame, frameLen, replyBytes);
     HdfAudioFinishTrace();
+    CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render frame fail, ret=%{public}d", ret);
         return ret;
@@ -113,7 +117,11 @@ int32_t AudioGetRenderPositionVdi(struct IAudioRender *render, uint64_t *frames,
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->GetRenderPosition, HDF_ERR_INVALID_PARAM);
 
+    int32_t id = SetTimer("Hdi:GetRenderPosition");
+    HdfAudioStartTrace("Hdi:AudioGetRenderPositionVdi", 0);
     int32_t ret = vdiRender->GetRenderPosition(vdiRender, frames, (struct AudioTimeStampVdi *)time);
+    HdfAudioFinishTrace();
+    CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render, get position fail, ret=%{public}d", ret);
         return ret;
@@ -899,7 +907,7 @@ static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
 }
 
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    uint32_t *rendrId)
+    uint32_t *rendrId, const char *adapterName)
 {
     if (attrs->type == AUDIO_MMAP_NOIRQ) {
         AUDIO_FUNC_LOGI("render type is mmap");
@@ -918,6 +926,14 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
     }
 
     for (index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
+        if ((renderPriv->renderInfos[index] != NULL) &&
+            (attrs->type == AUDIO_IN_MEDIA || attrs->type == AUDIO_MULTI_CHANNEL) &&
+            (renderPriv->renderInfos[index]->streamType == attrs->type) &&
+            (strcmp(renderPriv->renderInfos[index]->adapterName, adapterName) == 0)) {
+            *rendrId = renderPriv->renderInfos[index]->renderId;
+            renderPriv->renderInfos[index]->usrCount++;
+            return &renderPriv->renderInfos[index]->render;
+        }
         if ((renderPriv->renderInfos[index] != NULL) &&
             (renderPriv->renderInfos[index]->desc.pins == pin) &&
             (renderPriv->renderInfos[index]->streamType == attrs->type) &&
@@ -956,7 +972,7 @@ static uint32_t GetAvailableRenderId(struct AudioRenderPrivVdi *renderPriv)
 }
 
 struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
-    struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc)
+    struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc, char *adapterName)
 {
     struct IAudioRender *render = NULL;
     if (attrs == NULL || renderId == NULL || vdiRender == NULL || desc == NULL) {
@@ -996,6 +1012,13 @@ struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes
     priv->renderInfos[*renderId]->usrCount = 1;
     priv->renderInfos[*renderId]->callback = NULL;
     priv->renderInfos[*renderId]->isRegCb = false;
+    priv->renderInfos[*renderId]->adapterName = strdup(adapterName);
+    if (priv->renderInfos[*renderId]->adapterName == NULL) {
+        OsalMemFree(priv->renderInfos[*renderId]->desc.desc);
+        OsalMemFree(priv->renderInfos[*renderId]);
+        priv->renderInfos[*renderId] = NULL;
+        return NULL;
+    }
     render = &(priv->renderInfos[*renderId]->render);
     AudioInitRenderInstanceVdi(render);
 
@@ -1033,6 +1056,8 @@ void AudioDestroyRenderByIdVdi(uint32_t renderId)
         return;
     }
 
+    OsalMemFree((void *)priv->renderInfos[renderId]->adapterName);
+    priv->renderInfos[renderId]->adapterName = NULL;
     OsalMemFree((void *)priv->renderInfos[renderId]->desc.desc);
     priv->renderInfos[renderId]->vdiRender = NULL;
     priv->renderInfos[renderId]->desc.desc = NULL;

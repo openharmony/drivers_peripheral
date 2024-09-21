@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_TRACE_VDI_H
-#define AUDIO_TRACE_VDI_H
+#ifndef AUDIO_DFX_VDI_H
+#define AUDIO_DFX_VDI_H
+#include "audio_types_vdi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,8 +23,10 @@ extern "C" {
 
 void HdfAudioStartTrace(const char* value, int valueLen);
 void HdfAudioFinishTrace(void);
+int32_t SetTimer(const char* name);
+void CancelTimer(int32_t id);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* AUDIO_TRACE_VDI_H */
+#endif /* AUDIO_DFX_VDI_H */

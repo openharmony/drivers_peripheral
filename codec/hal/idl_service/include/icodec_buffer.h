@@ -30,24 +30,8 @@ namespace OHOS {
 namespace Codec {
 namespace Omx {
 struct DynamicBuffer {
-    int32_t type;
-    BufferHandle *bufferHandle;
-
-    DynamicBuffer() : type(0), bufferHandle(nullptr)
-    {}
-    ~DynamicBuffer()
-    {
-        type = 0;
-        if (bufferHandle != nullptr) {
-            FreeBufferHandle(bufferHandle);
-        }
-        bufferHandle = nullptr;
-    }
-
-    DynamicBuffer(const DynamicBuffer& other) = delete;
-    DynamicBuffer(DynamicBuffer&& other) = delete;
-    DynamicBuffer& operator=(const DynamicBuffer& other) = delete;
-    DynamicBuffer& operator=(DynamicBuffer&& other) = delete;
+    int32_t type = 0;
+    BufferHandle *bufferHandle = nullptr;
 };
 
 class ICodecBuffer : public RefBase {

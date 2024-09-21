@@ -510,6 +510,7 @@ static int32_t UsbSerialDeviceAlloc(struct AcmDevice *acm)
     }
     if (OsalMutexInit(&port->lock) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: init lock fail!", __func__);
+        OsalMemFree(port);
         return HDF_FAILURE;
     }
     port->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
@@ -1198,6 +1199,10 @@ static void UsbFreeReadRequests(struct AcmDevice *acm)
 static int32_t UsbAllocNotifyRequest(struct AcmDevice *acm)
 {
     struct UsbRawFillRequestData fillRequestData;
+    if ((acm == NULL) || (acm->notifyEp == NULL)) {
+        HDF_LOGE("%{public}s: acm or notifyEp is NULL", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
     uint32_t size = acm->notifyEp->maxPacketSize;
     int32_t ret;
 
@@ -1423,6 +1428,7 @@ static void UsbSerialDriverRelease(struct HdfDeviceObject *device)
     OsalMutexDestroy(&acm->lock);
     OsalMemFree(acm);
     acm = NULL;
+    device->service = NULL;
     HDF_LOGD("%{public}s:%{public}d exit", __func__, __LINE__);
 }
 

@@ -20,14 +20,15 @@
 
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
-#include "v1_0/iusb_interface.h"
-#include "v1_0/usb_types.h"
+#include "v1_1/iusb_interface.h"
+#include "v1_1/usb_types.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
+using namespace OHOS::HDI::Usb::V1_1;
 
 const int SLEEP_TIME = 3;
 const uint8_t BUS_NUM_INVALID = 255;
@@ -36,7 +37,7 @@ UsbDev UsbdDeviceTest::dev_ = {0, 0};
 sptr<UsbSubscriberTest> UsbdDeviceTest::subscriber_ = nullptr;
 
 namespace {
-sptr<IUsbInterface> g_usbInterface = nullptr;
+sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> g_usbInterface = nullptr;
 
 int32_t SwitchErrCode(int32_t ret)
 {
@@ -45,7 +46,7 @@ int32_t SwitchErrCode(int32_t ret)
 
 void UsbdDeviceTest::SetUpTestCase(void)
 {
-    g_usbInterface = IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
     if (g_usbInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
         exit(0);
@@ -222,5 +223,219 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice004, TestSize.Level1)
     ASSERT_NE(ret, 0);
     dev = dev_;
     g_usbInterface->CloseDevice(dev);
+}
+
+/**
+ * @tc.name: UsbdResetDevice001
+ * @tc.desc: Test functions to ResetDevice
+ * @tc.desc: int32_t ResetDevice(const UsbDev &dev);
+ * @tc.desc: 正向测试：参数正确
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdDeviceTest, UsbdResetDevice001, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->OpenDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->ResetDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d ResetDevice result=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->CloseDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdResetDevice002
+ * @tc.desc: Test functions to ResetDevice
+ * @tc.desc: int32_t ResetDevice(const UsbDev &dev);
+ * @tc.desc:
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdDeviceTest, UsbdResetDevice002, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->OpenDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    dev.busNum = BUS_NUM_INVALID;
+    ret = g_usbInterface->ResetDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d ResetDevice result=%{public}d", __LINE__, ret);
+    ASSERT_NE(0, ret);
+    ret = g_usbInterface->CloseDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+    dev = dev_;
+    g_usbInterface->CloseDevice(dev);
+}
+
+/**
+ * @tc.name: UsbdResetDevice003
+ * @tc.desc: Test functions to ResetDevice
+ * @tc.desc: int32_t ResetDevice(const UsbDev &dev);
+ * @tc.desc:
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdDeviceTest, UsbdResetDevice003, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->OpenDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    dev.devAddr = DEV_ADDR_INVALID;
+    ret = g_usbInterface->ResetDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d ResetDevice result=%{public}d", __LINE__, ret);
+    ASSERT_NE(0, ret);
+    ret = g_usbInterface->CloseDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+    dev = dev_;
+    g_usbInterface->CloseDevice(dev);
+}
+
+/**
+ * @tc.name: UsbdResetDevice004
+ * @tc.desc: Test functions to ResetDevice
+ * @tc.desc: int32_t ResetDevice(const UsbDev &dev);
+ * @tc.desc:
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdDeviceTest, UsbdResetDevice004, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->OpenDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    dev.busNum = BUS_NUM_INVALID;
+    dev.devAddr = DEV_ADDR_INVALID;
+    ret = g_usbInterface->ResetDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d ResetDevice result=%{public}d", __LINE__, ret);
+    ASSERT_NE(0, ret);
+    ret = g_usbInterface->CloseDevice(dev);
+    HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+    dev = dev_;
+    g_usbInterface->CloseDevice(dev);
+}
+
+/**
+ * @tc.number: SUB_USB_DeviceManager_HDI_CompatDeviceTest_0100
+ * @tc.name: testHdiUsbDeviceTestOpenDevice001
+ * @tc.desc: Opens a USB device to set up a connection. dev ={1, 255}.
+ */
+HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestOpenDevice001, Function | MediumTest | Level2)
+{
+    struct UsbDev dev = {1, 255};
+    auto ret = g_usbInterface->OpenDevice(dev);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.number: SUB_USB_DeviceManager_HDI_CompatDeviceTest_0200
+ * @tc.name: testHdiUsbDeviceTestOpenDevice002
+ * @tc.desc: Opens a USB device to set up a connection. dev ={255, 1}.
+ */
+HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestOpenDevice002, Function | MediumTest | Level2)
+{
+    struct UsbDev dev = {255, 1};
+    auto ret = g_usbInterface->OpenDevice(dev);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.number: SUB_USB_DeviceManager_HDI_CompatDeviceTest_0300
+ * @tc.name: testHdiUsbDeviceTestOpenDevice003
+ * @tc.desc: Opens a USB device to set up a connection. dev ={255, 100}.
+ */
+HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestOpenDevice003, Function | MediumTest | Level2)
+{
+    struct UsbDev dev = {255, 100};
+    auto ret = g_usbInterface->OpenDevice(dev);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.number: SUB_USB_DeviceManager_HDI_CompatDeviceTest_0400
+ * @tc.name: testHdiUsbDeviceTestOpenDevice004
+ * @tc.desc: Opens a USB device to set up a connection. dev ={100, 255}.
+ */
+HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestOpenDevice004, Function | MediumTest | Level2)
+{
+    struct UsbDev dev = {100, 255};
+    auto ret = g_usbInterface->OpenDevice(dev);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.number: SUB_USB_DeviceManager_HDI_CompatDeviceTest_0500
+ * @tc.name: testHdiUsbDeviceTestCloseDevice001
+ * @tc.desc: Closes a USB device to release all system resources related to the device. dev ={1, 255}.
+ */
+HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestCloseDevice001, Function | MediumTest | Level2)
+{
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->OpenDevice(dev);
+    ASSERT_EQ(0, ret);
+    dev = {1, 255};
+    ret = g_usbInterface->CloseDevice(dev);
+    ASSERT_NE(ret, 0);
+    dev = dev_;
+    ret = g_usbInterface->CloseDevice(dev);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.number: SUB_USB_DeviceManager_HDI_CompatDeviceTest_0600
+ * @tc.name: testHdiUsbDeviceTestCloseDevice002
+ * @tc.desc: Closes a USB device to release all system resources related to the device. dev ={255, 1}.
+ */
+HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestCloseDevice002, Function | MediumTest | Level2)
+{
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->OpenDevice(dev);
+    ASSERT_EQ(0, ret);
+    dev = {255, 1};
+    ret = g_usbInterface->CloseDevice(dev);
+    ASSERT_NE(ret, 0);
+    dev = dev_;
+    ret = g_usbInterface->CloseDevice(dev);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.number: SUB_USB_DeviceManager_HDI_CompatDeviceTest_0700
+ * @tc.name: testHdiUsbDeviceTestCloseDevice003
+ * @tc.desc: Closes a USB device to release all system resources related to the device. dev ={255, 100}.
+ */
+HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestCloseDevice003, Function | MediumTest | Level2)
+{
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->OpenDevice(dev);
+    ASSERT_EQ(0, ret);
+    dev = {255, 100};
+    ret = g_usbInterface->CloseDevice(dev);
+    ASSERT_NE(ret, 0);
+    dev = dev_;
+    ret = g_usbInterface->CloseDevice(dev);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.number: SUB_USB_DeviceManager_HDI_CompatDeviceTest_0800
+ * @tc.name: testHdiUsbDeviceTestCloseDevice004
+ * @tc.desc: Closes a USB device to release all system resources related to the device. dev ={100, 255}.
+ */
+HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestCloseDevice004, Function | MediumTest | Level2)
+{
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->OpenDevice(dev);
+    ASSERT_EQ(0, ret);
+    dev = {100, 255};
+    ret = g_usbInterface->CloseDevice(dev);
+    ASSERT_NE(ret, 0);
+    dev = dev_;
+    ret = g_usbInterface->CloseDevice(dev);
+    ASSERT_EQ(ret, 0);
 }
 } // namespace

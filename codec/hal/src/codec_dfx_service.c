@@ -29,6 +29,10 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
         return HDF_SUCCESS;
     }
     const char *para = HdfSbufReadString(data);
+    if (para == NULL) {
+        CODEC_LOGE("para is NULL");
+        return HDF_FAILURE;
+    }
     if (strcmp(para, "-h") == 0) {
         HdfSbufWriteString(reply, "-h: codec dump help ! \n");
         HdfSbufWriteString(reply, "-l: dump codec components info list ! \n");

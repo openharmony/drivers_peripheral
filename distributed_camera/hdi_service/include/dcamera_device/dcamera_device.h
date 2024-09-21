@@ -24,14 +24,21 @@
 #include "dstream_operator.h"
 
 #include "v1_0/icamera_device.h"
+#include "v1_3/icamera_device.h"
 #include "v1_0/icamera_device_callback.h"
 #include "v1_1/id_camera_provider_callback.h"
 #include "v1_0/types.h"
+#include "v1_1/types.h"
+#include "v1_0/istream_operator_callback.h"
+#include "v1_2/istream_operator_callback.h"
+#include "v1_3/istream_operator_callback.h"
+#include "v1_1/istream_operator.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::Camera::V1_0;
-class DCameraDevice : public ICameraDevice {
+using HDI::Camera::V1_2::IStreamOperator;
+using HDI::Camera::V1_0::ICameraDeviceCallback;
+class DCameraDevice : public HDI::Camera::V1_3::ICameraDevice {
 public:
     DCameraDevice(const DHBase &dhBase, const std::string& sinkAbilityInfo, const std::string& sourceCodecInfo);
     DCameraDevice() = default;
@@ -42,16 +49,29 @@ public:
     DCameraDevice& operator=(DCameraDevice &&other) = delete;
 
 public:
-    int32_t GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
+    int32_t GetStreamOperator_V1_3(const sptr<HDI::Camera::V1_3::IStreamOperatorCallback> &callbackObj,
         sptr<IStreamOperator> &streamOperator) override;
+    int32_t GetSecureCameraSeq(uint64_t &seqId) override;
+
+    int32_t GetStreamOperator_V1_2(const sptr<HDI::Camera::V1_2::IStreamOperatorCallback> &callbackObj,
+        sptr<IStreamOperator> &streamOperator) override;
+    int32_t GetStatus(const std::vector<uint8_t> &metaIn, std::vector<uint8_t> &metaOut) override;
+    int32_t Reset() override;
+
+    int32_t GetStreamOperator_V1_1(const sptr<HDI::Camera::V1_0::IStreamOperatorCallback> &callbackObj,
+        sptr<HDI::Camera::V1_1::IStreamOperator> &streamOperator) override;
+    int32_t GetDefaultSettings(std::vector<uint8_t> &settings) override;
+
+    int32_t GetStreamOperator(const sptr<HDI::Camera::V1_0::IStreamOperatorCallback> &callbackObj,
+        sptr<HDI::Camera::V1_0::IStreamOperator> &streamOperator) override;
     int32_t UpdateSettings(const std::vector<uint8_t> &settings) override;
-    int32_t GetSettings(std::vector<uint8_t> &settings);
     int32_t SetResultMode(ResultCallbackMode mode) override;
     int32_t GetEnabledResults(std::vector<int32_t> &results) override;
     int32_t EnableResult(const std::vector<int32_t> &results) override;
     int32_t DisableResult(const std::vector<int32_t> &results) override;
     int32_t Close() override;
 
+    int32_t GetSettings(std::vector<uint8_t> &settings);
     CamRetCode OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &callback);
     CamRetCode GetDCameraAbility(std::shared_ptr<CameraAbility> &ability);
     DCamRetCode AcquireBuffer(int streamId, DCameraBuffer &buffer);

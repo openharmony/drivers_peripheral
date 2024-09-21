@@ -48,7 +48,6 @@ if (defined(ohos_lite)) {
       # buffer manager includes
       "$camera_path/buffer_manager/include",
       "$camera_path/buffer_manager/src/buffer_adapter/lite",
-      "//third_party/googletest/googletest/include",
       "$camera_path/../../base",
       "$camera_path/../../display/interfaces/include",
 
@@ -84,7 +83,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/test.gni")
-  import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   module_output_path = "drivers_peripheral_camera/camera"
 
@@ -107,11 +105,6 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      # common includes
-      "//third_party/googletest/googletest/include",
-      "$camera_path/../../display/interfaces/include",
-      "$camera_path/../../display/hdi_service/gralloc/include",
-
       # camera common includes
       "$camera_path/include",
       "$camera_path/../../interfaces/include",
@@ -163,9 +156,6 @@ if (defined(ohos_lite)) {
     deps = [
       "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0_static",
       "$camera_path/buffer_manager:peripheral_camera_buffer_manager",
-      "//third_party/googletest:gmock_main",
-      "//third_party/googletest:gtest",
-      "//third_party/googletest:gtest_main",
     ]
 
     if (is_standard_system) {
@@ -184,6 +174,9 @@ if (defined(ohos_lite)) {
     external_deps += [
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:metadata",
+      "googletest:gmock_main",
+      "googletest:gtest",
+      "googletest:gtest_main",
       "graphic_surface:surface",
       "ipc:ipc_single",
       "samgr:samgr_proxy",

@@ -93,6 +93,10 @@ typedef struct {
 } WifiCallbackHandler;
 
 typedef struct {
+    void (*onWifiNetlinkMessage) (const std::vector<uint8_t>& recvMsg);
+} WifiExtCallbackHandler;
+
+typedef struct {
     WifiError (*vendorHalInit)(wifiHandle *);
     WifiError (*waitDriverStart)(void);
     void (*vendorHalExit)(wifiHandle, VendorHalExitHandler);
@@ -111,6 +115,7 @@ typedef struct {
     WifiError (*wifiSetCountryCode)(wifiInterfaceHandle handle, const char *);
     WifiError (*getPowerMode)(const char *, int *);
     WifiError (*setPowerMode)(const char *, int);
+    WifiError (*isSupportCoex)(bool&);
     WifiError (*wifiStartScan)(wifiInterfaceHandle handle,
         const OHOS::HDI::Wlan::Chip::V1_0::ScanParams& scanParam);
     WifiError (*wifiStartPnoScan)(wifiInterfaceHandle handle,
@@ -124,6 +129,11 @@ typedef struct {
     WifiError (*setDpiMarkRule)(int32_t, int32_t, int32_t);
     WifiError (*registerIfaceCallBack)(const char *, WifiCallbackHandler);
     WifiError (*setTxPower)(const char *, int);
+    WifiError (*registerExtIfaceCallBack)(const char* ifName, WifiExtCallbackHandler handler);
+    WifiError (*sendCmdToDriver)(const char* ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf);
+    WifiError (*sendActionFrame)(wifiInterfaceHandle handle, uint32_t freq, const std::vector<uint8_t>& frameData);
+    WifiError (*registerActionFrameReceiver)(wifiInterfaceHandle handle, const std::vector<uint8_t>& match);
+    WifiError (*getCoexictenceChannelList)(const std::string& ifName, std::vector<uint8_t>& paramBuf);
 } WifiHalFn;
 
 WifiError InitWifiVendorHalFuncTable(WifiHalFn *fn);

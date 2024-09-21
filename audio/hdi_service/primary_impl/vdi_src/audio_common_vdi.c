@@ -24,6 +24,7 @@
 #define AUDIO_ROUTE_NUM_MAX 2
 #define AUDIO_SAMPLE_FORMAT_NUM_MAX 30
 #define AUDIO_SUB_PORT_NUM_MAX 10
+#define AUDIO_FRAME_LEN_MAX (100 * 1024 * 1024)
 
 int32_t AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
     struct AudioDeviceDescriptorVdi *vdiDesc)
@@ -178,6 +179,8 @@ static int32_t AudioSubPortsToSubPortsVdi(const struct AudioSubPortCapabilityVdi
         subPortsTmp[i].mask = (enum AudioPortPassthroughMode)vdiSubPorts[i].mask;
         subPortsTmp[i].desc = strdup(vdiSubPorts[i].desc);
         if (subPortsTmp[i].desc == NULL) {
+            *subPorts = subPortsTmp;
+            *subPortsLen = size;
             AUDIO_FUNC_LOGE("strdup fail, vdiSubPorts[%{public}d].desc = %{public}s", i, vdiSubPorts[i].desc);
             return HDF_FAILURE;
         }
@@ -392,14 +395,14 @@ int32_t AudioCommonRouteToVdiRouteVdi(const struct AudioRoute *route, struct Aud
     CHECK_NULL_PTR_RETURN_VALUE(route, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRoute, HDF_ERR_INVALID_PARAM);
 
-    if (route->sinks != NULL) {
+    if (route->sinks != NULL && route->sinksLen > 0) {
         sinkRet = AudioCommonSinkToVdiSinkVdi(route, vdiRoute);
         if (sinkRet != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE(" sink routeNode to vdiRouteNode fail");
         }
     }
 
-    if (route->sources != NULL) {
+    if (route->sources != NULL && route->sourcesLen > 0) {
         sourcesRet = AudioCommonSourceToVdiSourceVdi(route, vdiRoute);
         if (sourcesRet != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE(" source routeNode to vdiRouteNode fail");
@@ -516,6 +519,11 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
     CHECK_NULL_PTR_RETURN_VALUE(frameInfo, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frameInfoVdi, HDF_ERR_INVALID_PARAM);
 
+    if (frameInfoVdi->frameLen <= 0 || frameInfoVdi->frameEcLen <= 0 ||
+        frameInfoVdi->frameLen > AUDIO_FRAME_LEN_MAX || frameInfoVdi->frameEcLen > AUDIO_FRAME_LEN_MAX) {
+        AUDIO_FUNC_LOGE("frameLen len err");
+        return HDF_ERR_INVALID_PARAM;
+    }
     frameInfo->frameLen = frameInfoVdi->frameLen;
     frameInfo->frameEcLen = frameInfoVdi->frameEcLen;
     frameInfo->frame = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (frameInfo->frameLen));

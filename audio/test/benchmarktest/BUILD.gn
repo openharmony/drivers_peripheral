@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/hdi/hdi.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("./../../audio.gni")
@@ -47,11 +48,6 @@ ohos_benchmarktest("hdf_audio_benchmark_test") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [
-    "//third_party/benchmark",
-    "//third_party/googletest:gtest_main",
-  ]
-
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_audio:libaudio_proxy_4.0",
@@ -68,7 +64,9 @@ ohos_benchmarktest("hdf_audio_benchmark_test") {
     external_deps = [ "hilog:libhilog" ]
   }
   external_deps += [
+    "benchmark:benchmark",
     "bounds_checking_function:libsec_shared",
+    "googletest:gtest_main",
     "ipc:ipc_single",
   ]
 }

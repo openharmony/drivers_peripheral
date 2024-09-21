@@ -176,11 +176,11 @@ static HDF_STATUS IfFreeInterfacePool(struct UsbInterfacePool *interfacePool)
         return ret;
     }
     OsalMutexDestroy(&interfacePool->interfaceLock);
+    OsalMutexDestroy(&interfacePool->ioStopLock);
     interfacePool->busNum = 0;
     interfacePool->devAddr = 0;
 
     RawUsbMemFree(interfacePool);
-    OsalMutexDestroy(&interfacePool->ioStopLock);
     return ret;
 }
 
@@ -1304,6 +1304,47 @@ OUT:
     return NULL;
 }
 
+UsbInterfaceHandle *UsbResetDevice(const struct UsbInterface *interfaceObj)
+{
+    HDF_STATUS ret;
+    if (interfaceObj == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfaceObj is null", __func__, __LINE__);
+        return NULL;
+    }
+
+    struct UsbSdkInterface *interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
+    if (interfaceSdk->session == NULL || interfaceSdk->status == USB_INTERFACE_STATUS_REMOVE) {
+        HDF_LOGE("%{public}s:%{public}d interface->status = %{public}d is error",
+            __func__, __LINE__, interfaceSdk->status);
+        return NULL;
+    }
+
+    struct UsbPoolQueryPara poolQueryPara;
+    poolQueryPara.type = USB_POOL_OBJECT_ID_TYPE;
+    poolQueryPara.objectId = interfaceSdk->parentObjectId;
+    struct UsbInterfacePool *interfacePool = IfFindInterfacePool(interfaceSdk->session, poolQueryPara, false);
+    if (interfacePool == NULL || interfacePool->device == NULL || interfacePool->device->devHandle == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null", __func__, __LINE__);
+        return NULL;
+    }
+    
+    ret = RawResetDevice(interfacePool->device->devHandle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{piblic}s:%{public}d RawResetDevice failed, ret = %{public}d", __func__, __LINE__, ret);
+        return NULL;
+    }
+
+    struct UsbInterfaceHandleEntity *ifaceHdl = RawUsbMemCalloc(sizeof(struct UsbInterfaceHandleEntity));
+    if (ifaceHdl == NULL) {
+        HDF_LOGE("%{public}s:%{public}d RawUsbMemCalloc failed", __func__, __LINE__);
+        return NULL;
+    }
+    ifaceHdl->devHandle = interfacePool->device->devHandle;
+    ifaceHdl->interfaceIndex = interfaceSdk->interface.info.interfaceIndex;
+
+    return (UsbInterfaceHandle *)ifaceHdl;
+}
+
 int32_t GetInterfaceByHandle(const UsbInterfaceHandle *interfaceHandle, struct UsbInterface **interface)
 {
     if (interfaceHandle == NULL) {
@@ -1361,14 +1402,18 @@ int32_t UsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle)
     }
 
     OsalMutexLock(&interfacePool->interfaceLock);
-    if (OsalAtomicRead(&interfacePool->ioRefCount) == 1) {
+    int32_t refCnt = OsalAtomicRead(&interfacePool->ioRefCount);
+    if (refCnt == 1) {
         ret = UsbIoRecvProcessStop(interfacePool);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbIoStop failed, ret = %{public}d", __func__, __LINE__, ret);
+            OsalMutexUnlock(&interfacePool->interfaceLock);
             return ret;
         }
+    } else {
+        HDF_LOGD("%{public}s:%{public}d UsbIoStop ref count = %{public}d", __func__, __LINE__, refCnt);
     }
-    
+
     OsalMutexUnlock(&interfacePool->interfaceLock);
     return HDF_SUCCESS;
 }
@@ -1912,11 +1957,6 @@ int32_t UsbSubmitRequestSync(const struct UsbRequest *request)
 OUT:
     OsalSemDestroy(&requestObj->hostRequest->sem);
     return ret;
-}
-
-int32_t UsbMemTestTrigger(bool enable)
-{
-    return RawUsbMemTestTrigger(enable);
 }
 
 bool UsbGetInterfaceActiveStatus(

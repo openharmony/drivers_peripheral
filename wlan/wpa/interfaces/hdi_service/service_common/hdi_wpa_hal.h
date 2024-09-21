@@ -50,7 +50,6 @@ struct StWifiWpaInterface {
     pthread_t tid;
     int threadRunFlag;
     WpaIfaceInfo *ifaces;
-
     int (*wpaCliConnect)(WifiWpaInterface *p);
     void (*wpaCliClose)(WifiWpaInterface *p);
     int (*wpaCliAddIface)(WifiWpaInterface *p, const AddInterfaceArgv *argv, bool isWpaAdd);
@@ -64,6 +63,9 @@ WpaCtrl *GetStaCtrl(void);
 WpaCtrl *GetP2pCtrl(void);
 WpaCtrl *GetChbaCtrl(void);
 WpaCtrl *GetCommonCtrl(void);
+void ReleaseIfaceCtrl(char *ifName, int len);
+void InitWifiWpaGlobalInterface(void);
+
 #ifdef __cplusplus
 }
 #endif

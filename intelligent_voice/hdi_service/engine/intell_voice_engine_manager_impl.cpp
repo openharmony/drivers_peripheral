@@ -37,6 +37,16 @@ extern "C" IIntellVoiceEngineManager *IntellVoiceEngineManagerImplGetInstance(vo
     return new (std::nothrow) IntellVoiceEngineManagerImpl();
 }
 
+extern "C" void IntellVoiceEngineManagerImplRelease(IIntellVoiceEngineManager *mgr)
+{
+    INTELLIGENT_VOICE_LOGI("enter");
+    if (mgr == nullptr) {
+        INTELLIGENT_VOICE_LOGE("mgr is nullptr");
+        return;
+    }
+    delete mgr;
+}
+
 int32_t IntellVoiceEngineManagerImpl::LoadVendorLib()
 {
     std::string error;
@@ -375,6 +385,16 @@ int32_t IntellVoiceEngineManagerImpl::SendCloneFile(const std::string &filePath,
     }
 
     return inst_->SendCloneFile(filePath, buffer.data(), buffer.size());
+}
+
+int32_t IntellVoiceEngineManagerImpl::ClearUserWakeupData(const std::string &wakeupPhrase)
+{
+    if (inst_ == nullptr) {
+        INTELLIGENT_VOICE_LOGE("inst is nullptr, failed to clear user wakup data");
+        return HDF_FAILURE;
+    }
+
+    return inst_->ClearUserWakeupData(wakeupPhrase);
 }
 }
 }

@@ -16,7 +16,7 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 declare_args() {
-  bluetooth_a2dp_hdi = false
+  drivers_peripheral_bluetooth_a2dp_hdi = false
 }
 
 config("hdi_audio_config") {
@@ -45,7 +45,7 @@ config("hdi_audio_config") {
 }
 
 ohos_shared_library("hdi_audio_bluetooth") {
-  if (bluetooth_a2dp_hdi) {
+  if (drivers_peripheral_bluetooth_a2dp_hdi) {
     defines = [ "A2DP_HDI_SERVICE" ]
   }
 
@@ -85,6 +85,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
   }
   external_deps += [
     "c_utils:utils",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]

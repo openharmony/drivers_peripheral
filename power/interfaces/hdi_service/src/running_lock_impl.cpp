@@ -150,7 +150,7 @@ void RunningLockImpl::Clean()
 uint32_t RunningLockImpl::GetCount(RunningLockType type)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t count = 0;
+    uint32_t count = 0;
     auto iterator = lockCounters_.find(type);
     if (iterator != lockCounters_.end()) {
         count = iterator->second->GetCount();
@@ -170,10 +170,7 @@ bool RunningLockImpl::IsValidType(RunningLockType type, PowerHdfState state)
 {
     switch (state) {
         case PowerHdfState::SLEEP:
-            return type == RUNNINGLOCK_BACKGROUND_AUDIO;
         case PowerHdfState::INACTIVE:
-            return type == RUNNINGLOCK_BACKGROUND_PHONE || type == RUNNINGLOCK_BACKGROUND_NOTIFICATION ||
-                type == RUNNINGLOCK_BACKGROUND_AUDIO || type == RUNNINGLOCK_BACKGROUND_TASK;
         case PowerHdfState::AWAKE:
             return type == RUNNINGLOCK_BACKGROUND_PHONE || type == RUNNINGLOCK_BACKGROUND_NOTIFICATION ||
                 type == RUNNINGLOCK_BACKGROUND_AUDIO || type == RUNNINGLOCK_BACKGROUND_SPORT ||

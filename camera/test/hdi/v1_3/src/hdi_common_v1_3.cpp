@@ -140,7 +140,7 @@ void Test::GetCameraMetadata(int cameraId)
         CAMERA_LOGE("GetCameraAbility failed, rc = %{public}d", rc);
     }
     MetadataUtils::ConvertVecToMetadata(abilityVec, ability);
-    EXPECT_NE(ability, nullptr);
+    ASSERT_NE(ability, nullptr);
 }
 
 void Test::Close()
@@ -187,6 +187,18 @@ void Test::DefaultSketch(
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
 }
 
+void Test::DefaultMeta(
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
+{
+    infos->v1_0.streamId_ = streamIdMeta;
+    infos->v1_0.width_ = metaWidth;
+    infos->v1_0.height_ = metaHeight;
+    infos->v1_0.format_ = previewFormat;
+    infos->v1_0.dataspace_ = UT_DATA_SIZE;
+    infos->v1_0.intent_ = StreamIntent::PREVIEW;
+    infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
+}
+
 void Test::DefaultInfosSketch(
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
 {
@@ -194,6 +206,18 @@ void Test::DefaultInfosSketch(
     std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
     infos->v1_0.bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
         DumpImageFile(streamIdSketch, "yuv", addr, size);
+    });
+    infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
+    consumerMap_[StreamIntent::PREVIEW] = consumer_pre;
+}
+
+void Test::DefaultInfosMeta(
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
+{
+    DefaultMeta(infos);
+    std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
+    infos->v1_0.bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
+        DumpImageFile(streamIdMeta, "yuv", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
     consumerMap_[StreamIntent::PREVIEW] = consumer_pre;
@@ -282,7 +306,7 @@ void Test::DefaultInfosAnalyze(
         camera_metadata_item_t entry = {};
 
         int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_IDS, &entry);
-        if (ret == 0) {
+        if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
             for (size_t i = 0; i < entry.count; i++) {
                 int id = entry.data.i32[i];
                 CAMERA_LOGI("Face ids : %{public}d", id);
@@ -290,7 +314,7 @@ void Test::DefaultInfosAnalyze(
         }
 
         ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_RECTANGLES, &entry);
-        if (ret == 0) {
+        if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
             for (size_t i = 0; i < entry.count; i++) {
                 int id = entry.data.i32[i];
                 CAMERA_LOGI("Face rectangles : %{public}d", id);

@@ -20,7 +20,7 @@
 #include <condition_variable>
 #include <benchmark/benchmark.h>
 #include "gtest/gtest.h"
-#include "v1_1/include/idisplay_composer_interface.h"
+#include "v1_2/include/idisplay_composer_interface.h"
 #include "v1_1/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
@@ -32,11 +32,11 @@
 #include "hdi_test_render_utils.h"
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-static sptr<Composer::V1_1::IDisplayComposerInterface> g_composerDevice = nullptr;
+static sptr<Composer::V1_2::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
 
@@ -589,6 +589,107 @@ BENCHMARK_F(DisplayBenchmarkTest, SetDisplayClientCropTest)(benchmark::State &st
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayClientCropTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetHardwareCursorPositionTest
+  * @tc.desc: Benchmarktest for interface SetHardwareCursorPositionTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetHardwareCursorPositionTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    int32_t x = 1;
+    int32_t y = 1;
+    for (auto _ : state) {
+        ret = g_composerDevice->SetHardwareCursorPosition(g_displayIds[0], x, y);
+    }
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetHardwareCursorPositionTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: EnableHardwareCursorStatsTest
+  * @tc.desc: Benchmarktest for interface EnableHardwareCursorStatsTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, EnableHardwareCursorStatsTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    bool enable = true;
+    for (auto _ : state) {
+        ret = g_composerDevice->EnableHardwareCursorStats(g_displayIds[0], enable);
+    }
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, EnableHardwareCursorStatsTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetHardwareCursorStatsTest
+  * @tc.desc: Benchmarktest for interface GetHardwareCursorStatsTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetHardwareCursorStatsTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    uint32_t frameCount = 0;
+    uint32_t vsyncCount = 0;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetHardwareCursorStats(g_displayIds[0], frameCount, vsyncCount);
+    }
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        ret = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetHardwareCursorStatsTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: ClearClientBufferTest
+  * @tc.desc: Benchmarktest for interface ClearClientBufferTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, ClearClientBufferTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    for (auto _ : state) {
+        ret = g_composerDevice->ClearClientBuffer(g_displayIds[0]);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearClientBufferTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: ClearLayerBufferTest
+  * @tc.desc: Benchmarktest for interface ClearLayerBufferTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, ClearLayerBufferTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    uint32_t layerId = 1;
+    for (auto _ : state) {
+        ret = g_composerDevice->ClearLayerBuffer(g_displayIds[0], layerId);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearLayerBufferTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 
 } // namespace

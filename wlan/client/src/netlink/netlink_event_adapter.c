@@ -57,6 +57,8 @@ static inline uint32_t BitLeftShift(uint8_t x)
 #define WLAN_ATTR_SCAN_MAX 11
 #define SCAN_STATUS_MAX 2
 #define NL80211_SCAN_DONE 107
+#define WLAN_CMD_VDR_COMMON 0xCB
+#define DATA_FRAME_MAX_SIZE 1400
 
 typedef struct {
     WifiScanResults *scanResults;
@@ -310,6 +312,27 @@ static void WifiEventScanAbortedProcess(const char *ifName)
     WifiEventReport(ifName, WIFI_EVENT_SCAN_ABORTED, &scanResults);
 }
 
+static void WifiEventDataFrameProcess(const char *ifName, struct nlattr **attr)
+{
+    WifiDataFrame dataFrame;
+    /* The outer function can ensure that attr is not empty */
+    if (ifName == NULL || attr[NL80211_ATTR_FRAME] == NULL) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: ifName is invalid or failed to get frame data", __FUNCTION__);
+        return;
+    }
+
+    (void)memset_s(&dataFrame, sizeof(WifiDataFrame), 0, sizeof(WifiDataFrame));
+
+    dataFrame.data = nla_data(attr[NL80211_ATTR_FRAME]);
+    dataFrame.dataLen = (uint32_t)nla_len(attr[NL80211_ATTR_FRAME]);
+    HILOG_INFO(LOG_CORE, "%{public}s: receive data frame len %{public}u", __FUNCTION__, dataFrame.dataLen);
+    if (dataFrame.dataLen > DATA_FRAME_MAX_SIZE) {
+        return;
+    }
+
+    WifiEventReport(ifName, WIFI_EVENT_DATA_FRAME_RECEIVED, &dataFrame);
+}
+
 static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
 {
     HILOG_DEBUG(LOG_CORE, "hal enter %{public}s cmd=%{public}d ifName=%{public}s", __FUNCTION__, cmd, ifName);
@@ -342,6 +365,10 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
         case NL80211_CMD_FRAME_TX_STATUS:
             HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_FRAME_TX_STATUS");
             WifiEventTxStatus(ifName, attr);
+            break;
+        case WLAN_CMD_VDR_COMMON:
+            HILOG_INFO(LOG_CORE, "receive cmd WLAN_CMD_VDR_COMMON");
+            WifiEventDataFrameProcess(ifName, attr);
             break;
         default:
             HILOG_INFO(LOG_CORE, "not supported cmd");

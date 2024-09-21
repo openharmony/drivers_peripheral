@@ -41,15 +41,14 @@ ohos_unittest("test_hdisrv") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "../../../../../../interface/battery/v2_0:libbattery_stub_2.0",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = []
 
   external_deps = [
+    "cJSON:cjson",
     "config_policy:configpolicy_util",
+    "drivers_interface_battery:libbattery_stub_2.0",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",

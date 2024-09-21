@@ -23,7 +23,7 @@
 #include "hdi_test_device_common.h"
 #include "hdi_test_display.h"
 
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
@@ -39,7 +39,7 @@ void ComposerDiedRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 
 HWTEST_F(DeathTest, test_AddDeathRecipient, TestSize.Level1)
 {
-    displayComposer_ = Composer::V1_1::IDisplayComposerInterface::Get();
+    displayComposer_ = Composer::V1_2::IDisplayComposerInterface::Get();
     ASSERT_TRUE(displayComposer_ != nullptr);
     sptr<IRemoteObject::DeathRecipient> recipient = new ComposerDiedRecipient();
     ASSERT_TRUE(recipient != nullptr);
@@ -51,7 +51,7 @@ HWTEST_F(DeathTest, test_AddDeathRecipient, TestSize.Level1)
 
 HWTEST_F(DeathTest, test_RemoveDeathRecipient, TestSize.Level1)
 {
-    displayComposer_ = Composer::V1_1::IDisplayComposerInterface::Get();
+    displayComposer_ = Composer::V1_2::IDisplayComposerInterface::Get();
     ASSERT_TRUE(displayComposer_ != nullptr);
     sptr<IRemoteObject::DeathRecipient> recipient = new ComposerDiedRecipient();
     ASSERT_TRUE(recipient != nullptr);
