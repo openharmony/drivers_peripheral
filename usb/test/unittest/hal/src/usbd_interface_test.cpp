@@ -96,7 +96,7 @@ void UsbdInterfaceTest::TearDownTestCase(void)
     dev_ = {subscriber_->busNum_, subscriber_->devAddr_};
     auto ret = g_usbInterface->CloseDevice(dev_);
     HDF_LOGI("UsbdInterfaceTest:: %{public}d Close=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -113,7 +113,7 @@ HWTEST_F(UsbdInterfaceTest, UsbdSetInterface001, TestSize.Level1)
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdInterfaceTest::UsbdSetInterface001 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -132,7 +132,7 @@ HWTEST_F(UsbdInterfaceTest, UsbdSetInterface002, TestSize.Level1)
     dev.busNum = BUS_NUM_INVALID;
     auto ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdInterfaceTest::UsbdSetInterface002 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -150,7 +150,7 @@ HWTEST_F(UsbdInterfaceTest, UsbdSetInterface003, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     auto ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdInterfaceTest::UsbdSetInterface003 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -167,7 +167,7 @@ HWTEST_F(UsbdInterfaceTest, UsbdSetInterface004, TestSize.Level1)
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdInterfaceTest::UsbdSetInterface004 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -186,7 +186,7 @@ HWTEST_F(UsbdInterfaceTest, UsbdSetInterface005, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     auto ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdInterfaceTest::UsbdSetInterface005 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -204,7 +204,7 @@ HWTEST_F(UsbdInterfaceTest, UsbdSetInterface006, TestSize.Level1)
     dev.busNum = BUS_NUM_INVALID;
     auto ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdInterfaceTest::UsbdSetInterface006 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -222,7 +222,7 @@ HWTEST_F(UsbdInterfaceTest, UsbdSetInterface007, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     auto ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdInterfaceTest::UsbdSetInterface007 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -241,6 +241,6 @@ HWTEST_F(UsbdInterfaceTest, UsbdSetInterface008, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     auto ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdInterfaceTest::UsbdSetInterface008 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 } // namespace

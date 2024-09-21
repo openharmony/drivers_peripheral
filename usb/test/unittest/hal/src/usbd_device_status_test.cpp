@@ -106,7 +106,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetDeviceSpeed001, TestSize.Level1)
     uint8_t speed = 0;
     ret = g_usbInterface->GetDeviceSpeed(dev, speed);
     HDF_LOGI("UsbdGetDeviceSpeed001 %{public}d GetDeviceSpeed=%{public}d, speed=%{public}d", __LINE__, ret, speed);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -123,7 +123,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetDeviceSpeed002, TestSize.Level1)
     uint8_t speed = 0;
     auto ret = g_usbInterface->GetDeviceSpeed(dev, speed);
     HDF_LOGI("UsbdGetDeviceSpeed002 %{public}d ret=%{public}d, speed=%{public}d", __LINE__, ret, speed);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 
@@ -140,7 +140,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetDeviceSpeed003, TestSize.Level1)
     uint8_t speed = 0;
     auto ret = g_usbInterface->GetDeviceSpeed(dev, speed);
     HDF_LOGI("UsbdGetDeviceSpeed003 %{public}d, ret=%{public}d, speed=%{public}d", __LINE__, ret, speed);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -156,7 +156,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetDeviceSpeed004, TestSize.Level1)
     struct UsbDev dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
     auto ret = g_usbInterface->GetDeviceSpeed(dev, speed);
     HDF_LOGI("UsbdGetDeviceSpeed004 %{public}d, ret=%{public}d, speed=%{public}d", __LINE__, ret, speed);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -183,7 +183,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus001, TestSize.Level1)
     }
     HDF_LOGI("UsbdGetInterfaceActiveStatus001 %{public}d GetInterfaceActiveStatus=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -202,7 +202,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus002, TestSize.Level1)
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus002 %{public}d ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
-    ASSERT_NE(ret, 0);
+   EXPECT_NE(ret, 0);
 }
 
 /**
@@ -220,7 +220,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus003, TestSize.Level1)
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus003 %{public}d, ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -239,7 +239,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus004, TestSize.Level1)
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus004 %{public}d, ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -257,7 +257,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus005, TestSize.Level1)
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus005 %{public}d, ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -275,7 +275,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus006, TestSize.Level1)
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus006 %{public}d, ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -293,7 +293,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus007, TestSize.Level1)
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus007 %{public}d, ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -311,7 +311,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus008, TestSize.Level1)
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus008 %{public}d, ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -356,7 +356,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt002, TestSize.Level1)
     dev.busNum = BUS_NUM_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
     HDF_LOGI("UsbdClearHalt002 %{public}d ClearHalt=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
 }
 
 /**
@@ -379,7 +379,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt003, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
     HDF_LOGI("UsbdClearHalt003 %{public}d ClearHalt=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
 }
 
 /**
@@ -401,7 +401,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt004, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointId};
     ret = g_usbInterface->ClearHalt(dev, pipe);
     HDF_LOGI("UsbdClearHalt004 %{public}d ClearHalt=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
 }
 
 /**
@@ -425,7 +425,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt005, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
     HDF_LOGI("UsbdClearHalt005 %{public}d ClearHalt=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
 }
 
 /**
@@ -448,7 +448,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt006, TestSize.Level1)
     dev.busNum = BUS_NUM_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
     HDF_LOGI("UsbdClearHalt006 %{public}d ClearHalt=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
 }
 
 /**
@@ -471,7 +471,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt007, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
     HDF_LOGI("UsbdClearHalt005 %{public}d ClearHalt=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
 }
 
 /**
@@ -495,7 +495,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdClearHalt008, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ClearHalt(dev, pipe);
     HDF_LOGI("UsbdClearHalt008 %{public}d ClearHalt=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
 }
 } // USB
 } // OHOS
