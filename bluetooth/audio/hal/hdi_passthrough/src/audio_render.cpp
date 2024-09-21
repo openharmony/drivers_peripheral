@@ -17,6 +17,7 @@
 #include "audio_adapter_info_common.h"
 #include "audio_bluetooth_manager.h"
 #include "audio_render.h"
+#include "hitrace_meter.h"
 namespace OHOS::HDI::Audio_Bluetooth {
 /* 1 buffer: 8000(8kHz sample rate) * 2(bytes, PCM_16_BIT) * 1(channel) */
 /* 1 frame: 1024(sample) * 2(bytes, PCM_16_BIT) * 1(channel) */
@@ -284,6 +285,7 @@ int32_t AudioRenderSetGain(AudioHandle handle, float gain)
 
 int32_t AudioRenderGetLatency(struct AudioRender *render, uint32_t *ms)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_BLUETOOTH, "BtAudioRenderGetLatency");
     struct AudioHwRender *impl = reinterpret_cast<struct AudioHwRender *>(render);
     if (impl == NULL || ms == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -312,6 +314,7 @@ int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
 int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
                                uint64_t requestBytes, uint64_t *replyBytes)
 {
+    HITRACE_METER_FMT(HITRACE_TAG_BLUETOOTH, "renderFrame:%d", requestBytes);
     HDF_LOGD("AudioRenderRenderFrame");
     struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(render);
     if (hwRender == NULL || frame == NULL || replyBytes == NULL ||

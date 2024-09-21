@@ -33,10 +33,7 @@ ohos_fuzztest("AudioCardConfigFuzzTest") {
     "$hdf_audio_path/supportlibs/alsa_adapter/include",
     "$hdf_audio_path/supportlibs/interfaces/include",
     "$hdf_audio_path/interfaces/include",
-    "//third_party/cJSON/",
   ]
-
-  deps = [ "//third_party/cJSON:cjson" ]
 
   external_deps = [ "hdf_core:libhdf_utils" ]
   if (defined(ohos_lite)) {
@@ -47,7 +44,9 @@ ohos_fuzztest("AudioCardConfigFuzzTest") {
   if (enable_c_utils) {
     external_deps += [ "c_utils:utils" ]
   }
-  external_deps += [ "bounds_checking_function:libsec_shared" ]
-
+  external_deps += [
+    "bounds_checking_function:libsec_shared",
+    "cJSON:cjson",
+  ]
   include_dirs += [ "//third_party/alsa-lib/include" ]
 }

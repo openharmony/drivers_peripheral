@@ -43,7 +43,8 @@ bool UsbControlTransferReadFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    ret = usbInterface->ControlTransferRead(dev, ctrl, reinterpret_cast<std::vector<uint8_t> &>(data + OFFSET));
+    ret = usbInterface->ControlTransferRead(
+        dev, ctrl, reinterpret_cast<std::vector<uint8_t> &>(std::move(data + OFFSET)));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: control transfer read succeed", __func__);
     }

@@ -576,7 +576,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdReInvite(WifiWpaP2pInterface *this, cons
 
 static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, const struct HdiP2pServiceInfo *argv)
 {
-    if (this == NULL || argv == NULL) {
+    if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL || argv->resp == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     unsigned nameLen = strlen((char *) argv->name);
@@ -621,7 +621,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
 
 static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, const struct HdiP2pServiceInfo *argv)
 {
-    if (this == NULL || argv == NULL) {
+    if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     unsigned nameLen = strlen((char *) argv->name);
@@ -987,7 +987,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetChba0Freq(WifiWpaP2pInterface *thi
 static int CheckValidGroupConfigField(const P2pWpaGroupConfigArgv *argv)
 {
     int pos = -1;
-    for (int i = 0; i < sizeof(P2P_WPA_NETWORK_FIELDS) / sizeof(P2P_WPA_NETWORK_FIELDS[0]); ++i) {
+    for (int i = 0; i < (int)(sizeof(P2P_WPA_NETWORK_FIELDS) / sizeof(P2P_WPA_NETWORK_FIELDS[0])); ++i) {
         if (P2P_WPA_NETWORK_FIELDS[i].field == argv->param) {
             pos = i;
             break;

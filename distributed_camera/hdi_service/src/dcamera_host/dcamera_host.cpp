@@ -47,13 +47,24 @@ OHOS::sptr<DCameraHost> DCameraHost::GetInstance()
     return instance_;
 }
 
-int32_t DCameraHost::SetCallback(const sptr<ICameraHostCallback> &callbackObj)
+int32_t DCameraHost::SetCallback(const sptr<HDI::Camera::V1_0::ICameraHostCallback> &callbackObj)
 {
     if (callbackObj == nullptr) {
         DHLOGE("DCameraHost::SetCallback, input camera host callback is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
     dCameraHostCallback_ = callbackObj;
+    dCameraHostRecipient_ = sptr<DCameraHostRecipient>(new DCameraHostRecipient());
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraHost::SetCallback_V1_2(const sptr<HDI::Camera::V1_2::ICameraHostCallback> &callbackObj)
+{
+    if (callbackObj == nullptr) {
+        DHLOGE("DCameraHost::SetCallback_V1_2, input camera host callback is null.");
+        return CamRetCode::INVALID_ARGUMENT;
+    }
+    dCameraHostCallback_V1_2_ = callbackObj;
     dCameraHostRecipient_ = sptr<DCameraHostRecipient>(new DCameraHostRecipient());
     return CamRetCode::NO_ERROR;
 }
@@ -136,46 +147,93 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
     return CamRetCode::NO_ERROR;
 }
 
-int32_t DCameraHost::OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
-    sptr<ICameraDevice> &device)
+template<typename Callback, typename Device>
+int32_t DCameraHost::OpenCameraImpl(const std::string &cameraId, const Callback &callbackObj, Device &device)
 {
     if (IsCameraIdInvalid(cameraId) || callbackObj == nullptr) {
-        DHLOGE("DCameraHost::OpenCamera, open camera id is invalid or camera device callback is null.");
+        DHLOGE("OpenCameraImpl, open camera id is invalid or camera device callback is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    DHLOGI("DCameraHost::OpenCamera for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
+    DHLOGI("OpenCameraImpl for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
 
     OHOS::sptr<DCameraDevice> dcameraDevice = nullptr;
     {
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         auto iter = dCameraDeviceMap_.find(cameraId);
         if (iter == dCameraDeviceMap_.end()) {
-            DHLOGE("DCameraHost::OpenCamera, dcamera device not found.");
+            DHLOGE("OpenCameraImpl, dcamera device not found.");
             return CamRetCode::INSUFFICIENT_RESOURCES;
         }
 
         dcameraDevice = iter->second;
         if (dcameraDevice == nullptr) {
-            DHLOGE("DCameraHost::OpenCamera, dcamera device is null.");
+            DHLOGE("OpenCameraImpl, dcamera device is null.");
             return INSUFFICIENT_RESOURCES;
         }
     }
 
     if (dcameraDevice->IsOpened()) {
-        DHLOGE("DCameraHost::OpenCamera, dcamera device %{public}s already opened.", GetAnonyString(cameraId).c_str());
+        DHLOGE("OpenCameraImpl, dcamera device %{public}s already opened.", GetAnonyString(cameraId).c_str());
         return CamRetCode::CAMERA_BUSY;
     }
 
     CamRetCode ret = dcameraDevice->OpenDCamera(callbackObj);
     if (ret != CamRetCode::NO_ERROR) {
-        DHLOGE("DCameraHost::OpenCamera, open camera failed.");
+        DHLOGE("OpenCameraImpl, open camera failed.");
         return ret;
     }
     device = dcameraDevice;
 
-    DHLOGI("DCameraHost::OpenCamera, open camera %{public}s success.", GetAnonyString(cameraId).c_str());
+    DHLOGI("OpenCameraImpl, open camera %{public}s success.", GetAnonyString(cameraId).c_str());
     return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraHost::OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+    sptr<HDI::Camera::V1_0::ICameraDevice> &device)
+{
+    return OpenCameraImpl(cameraId, callbackObj, device);
+}
+
+int32_t DCameraHost::OpenCamera_V1_1(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+    sptr<HDI::Camera::V1_1::ICameraDevice> &device)
+{
+    return OpenCameraImpl(cameraId, callbackObj, device);
+}
+
+int32_t DCameraHost::OpenCamera_V1_2(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+    sptr<HDI::Camera::V1_2::ICameraDevice> &device)
+{
+    return OpenCameraImpl(cameraId, callbackObj, device);
+}
+
+int32_t DCameraHost::OpenCamera_V1_3(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+    sptr<ICameraDevice> &device)
+{
+    return OpenCameraImpl(cameraId, callbackObj, device);
+}
+
+int32_t DCameraHost::OpenSecureCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+    sptr<ICameraDevice> &device)
+{
+    return OpenCameraImpl(cameraId, callbackObj, device);
+}
+
+int32_t DCameraHost::GetResourceCost(const std::string &cameraId,
+    OHOS::HDI::Camera::V1_3::CameraDeviceResourceCost &resourceCost)
+{
+    (void)cameraId;
+    (void)resourceCost;
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraHost::NotifyDeviceStateChangeInfo(int notifyType, int deviceState)
+{
+    (void)notifyType;
+    (void)deviceState;
+    DHLOGI("DCameraHost::NotifyDeviceStateChangeInfo, distributed camera not support.");
+
+    return CamRetCode::METHOD_NOT_SUPPORTED;
 }
 
 int32_t DCameraHost::SetFlashlight(const std::string &cameraId, bool isEnable)
@@ -183,6 +241,39 @@ int32_t DCameraHost::SetFlashlight(const std::string &cameraId, bool isEnable)
     (void)cameraId;
     (void)isEnable;
     DHLOGI("DCameraHost::SetFlashlight, distributed camera not support.");
+
+    return CamRetCode::METHOD_NOT_SUPPORTED;
+}
+
+int32_t DCameraHost::SetFlashlight_V1_2(float level)
+{
+    (void)level;
+    DHLOGI("DCameraHost::SetFlashlight_V1_2, distributed camera not support.");
+
+    return CamRetCode::METHOD_NOT_SUPPORTED;
+}
+
+int32_t DCameraHost::PreCameraSwitch(const std::string &cameraId)
+{
+    (void)cameraId;
+    DHLOGI("DCameraHost::PreCameraSwitch, distributed camera not support.");
+
+    return CamRetCode::METHOD_NOT_SUPPORTED;
+}
+
+int32_t DCameraHost::PrelaunchWithOpMode(const PrelaunchConfig &config, int32_t operationMode)
+{
+    (void)config;
+    (void)operationMode;
+    DHLOGI("DCameraHost::PrelaunchWithOpMode, distributed camera not support.");
+
+    return CamRetCode::METHOD_NOT_SUPPORTED;
+}
+
+int32_t DCameraHost::Prelaunch(const PrelaunchConfig &config)
+{
+    (void)config;
+    DHLOGI("DCameraHost::Prelaunch, distributed camera not support.");
 
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }
@@ -251,6 +342,9 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
     if (dCameraHostCallback_ != nullptr) {
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
     }
+    if (dCameraHostCallback_V1_2_ != nullptr) {
+        dCameraHostCallback_V1_2_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
+    }
     sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
     if (remote != nullptr) {
         remote->AddDeathRecipient(dCameraHostRecipient_);
@@ -297,6 +391,10 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
 
     if (dCameraHostCallback_ != nullptr) {
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
+    }
+
+    if (dCameraHostCallback_V1_2_ != nullptr) {
+        dCameraHostCallback_V1_2_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
 
     DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %{public}s",
@@ -353,6 +451,9 @@ void DCameraHost::NotifyDCameraStatus(const DHBase &dhBase, int32_t result)
     }
     if (dCameraHostCallback_ != nullptr) {
         dCameraHostCallback_->OnCameraStatus(dCameraId, CameraStatus::UN_AVAILABLE);
+    }
+    if (dCameraHostCallback_V1_2_ != nullptr) {
+        dCameraHostCallback_V1_2_->OnCameraStatus(dCameraId, CameraStatus::UN_AVAILABLE);
     }
 }
 

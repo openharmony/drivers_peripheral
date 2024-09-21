@@ -33,7 +33,7 @@ extern "C" {
 
 #define MAX_CALL_BACK_COUNT 10
 static struct WpaCallbackEvent *g_wpaCallbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
-static pthread_mutex_t g_wpaCallbackMutex;
+static pthread_mutex_t g_wpaCallbackMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
@@ -105,6 +105,20 @@ int32_t WpaUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, 
     }
     pthread_mutex_unlock(&g_wpaCallbackMutex);
     return HDF_FAILURE;
+}
+
+void ReleaseEventCallback(void)
+{
+    pthread_mutex_lock(&g_wpaCallbackMutex);
+    for (uint32_t i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_wpaCallbackEventMap[i] != NULL) {
+            g_wpaCallbackEventMap[i]->onRecFunc = NULL;
+            free(g_wpaCallbackEventMap[i]);
+            g_wpaCallbackEventMap[i] = NULL;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&g_wpaCallbackMutex);
 }
 
 void WpaEventReport(const char *ifName, uint32_t event, void *data)

@@ -19,6 +19,8 @@
 
 #define HDF_LOG_TAG USB_IO_MANAGE
 
+static const int MAX_ERROR_TIMES = 20;
+
 static bool IoCancelRequest(struct UsbInterfacePool *interfacePool, const struct UsbHostRequest *hostRequest)
 {
     struct UsbIfRequest *requestObj = NULL;
@@ -52,8 +54,9 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
     struct UsbHostRequest *submitRequest = NULL;
     int32_t ret;
     int32_t i;
+    int32_t errorTimes = 0;
 
-    while (true) {
+    while (errorTimes < MAX_ERROR_TIMES) {
         submitRequest = NULL;
         /* Get a request from curretn submit queue */
         ret = UsbIoGetRequest(&interfacePool->submitRequestQueue, &submitRequest);
@@ -66,14 +69,12 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             break;
         }
 
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbIoGetRequest failed, ret=%{public}d ", __func__, __LINE__, ret);
+        if (ret != HDF_SUCCESS || submitRequest == NULL) {
+            ++errorTimes;
+            HDF_LOGE("%{public}s:%{public}d ret=%{public}d errtimes=%{public}d", __func__, __LINE__, ret, errorTimes);
             continue;
         }
-
-        if (submitRequest == NULL) {
-            continue;
-        }
+        errorTimes = 0;
 
         if (IoCancelRequest(interfacePool, submitRequest)) {
             continue;
@@ -85,6 +86,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
                 continue;
             }
             /* Submit success */
+            OsalSemPost(&interfacePool->ioSem);
             break;
         }
 
@@ -95,7 +97,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             continue;
         }
     }
-    HDF_LOGE("%{public}s, stop. ", __func__);
+    HDF_LOGE("%{public}s, stop. errorTimes=%{public}d", __func__, errorTimes);
     return 0;
 }
 
@@ -111,6 +113,7 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
         HDF_LOGE("%{public}s:%{public}d RawRegisterSignal error", __func__, __LINE__);
     }
 
+    HDF_LOGD("%{public}s, enter recv thread", __func__);
     while (true) {
         if (!interfacePool->ioProcessTid) {
             interfacePool->ioProcessTid = RawGetTid();
@@ -128,12 +131,17 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
             continue;
         }
 
+        int32_t ret = OsalSemWait(&interfacePool->ioSem, HDF_WAIT_FOREVER);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("sem wait failed: %{public}d", ret);
+        }
+
         if (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING ||
             interfacePool->ioRecvProcessStopStatus != USB_POOL_PROCESS_RUNNING) {
             break;
         }
 
-        int32_t ret = RawHandleRequest(interfacePool->device->devHandle);
+        ret = RawHandleRequest(interfacePool->device->devHandle);
         if (ret < 0) {
             HDF_LOGE("%{public}s RawHandleRequest failed ret: %{public}d", __func__, ret);
             OsalMSleep(USB_IO_SLEEP_MS_TIME);
@@ -255,6 +263,7 @@ HDF_STATUS UsbIoStart(struct UsbInterfacePool *interfacePool)
     OsalMutexLock(&interfacePool->ioStopLock);
     interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_RUNNING;
     interfacePool->ioRecvProcessStopStatus = USB_POOL_PROCESS_RUNNING;
+    OsalSemInit(&interfacePool->ioSem, 0);
     OsalMutexUnlock(&interfacePool->ioStopLock);
 
     /* create IoSendProcess thread */
@@ -285,8 +294,7 @@ HDF_STATUS UsbIoStart(struct UsbInterfacePool *interfacePool)
     threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = USB_IO_RECEIVE_PROCESS_STACK_SIZE;
 
-    ret = OsalThreadCreate(
-        &interfacePool->ioAsyncReceiveProcess, (OsalThreadEntry)IoAsyncReceiveProcess, (void *)interfacePool);
+    ret = OsalThreadCreate(&interfacePool->ioAsyncReceiveProcess, (void *)IoAsyncReceiveProcess, (void *)interfacePool);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadCreate failed, ret=%{public}d ", __func__, __LINE__, ret);
         goto ERR_DESTROY_SEND;
@@ -332,6 +340,7 @@ HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool)
     if ((interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_STOPED)) {
         OsalMutexLock(&interfacePool->ioStopLock);
         interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_STOP;
+        OsalSemPost(&interfacePool->ioSem);
         OsalSemPost(&interfacePool->submitRequestQueue.sem);
         OsalMutexUnlock(&interfacePool->ioStopLock);
 
@@ -359,6 +368,8 @@ HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool)
     ret = OsalThreadDestroy(&interfacePool->ioAsyncReceiveProcess);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy failed, ret=%{public}d ", __func__, __LINE__, ret);
+    } else {
+        OsalSemDestroy(&interfacePool->ioSem);
     }
     return ret;
 }

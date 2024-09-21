@@ -60,10 +60,10 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
         }
     }
 
-    DCamRetCode ret = dCameraStreamOperator_->InitOutputConfigurations(dhBase_, dCameraAbilityInfo_,
+    DCamRetCode ret = dCameraStreamOperator_->SetOutputVal(dhBase_, dCameraAbilityInfo_,
         sourceCodecInfo_);
     if (ret != SUCCESS) {
-        DHLOGE("Init distributed camera stream operator failed, ret=%{public}d.", ret);
+        DHLOGE("set output value failed, ret=%{public}d.", ret);
         return ret;
     }
 
@@ -88,8 +88,8 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
     return ret;
 }
 
-int32_t DCameraDevice::GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
-    sptr<IStreamOperator> &streamOperator)
+int32_t DCameraDevice::GetStreamOperator(const sptr<HDI::Camera::V1_0::IStreamOperatorCallback> &callbackObj,
+    sptr<HDI::Camera::V1_0::IStreamOperator> &streamOperator)
 {
     if (callbackObj == nullptr) {
         DHLOGE("DCameraDevice::GetStreamOperator, input stream operator callback is null.");
@@ -108,6 +108,99 @@ int32_t DCameraDevice::GetStreamOperator(const sptr<IStreamOperatorCallback> &ca
     }
 
     streamOperator = dCameraStreamOperator_;
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraDevice::GetStreamOperator_V1_1(const sptr<HDI::Camera::V1_0::IStreamOperatorCallback> &callbackObj,
+    sptr<HDI::Camera::V1_1::IStreamOperator> &streamOperator)
+{
+    if (callbackObj == nullptr) {
+        DHLOGE("DCameraDevice::GetStreamOperator_V1_1, input stream operator callback is null.");
+        return CamRetCode::INVALID_ARGUMENT;
+    }
+
+    if (dCameraStreamOperator_ == nullptr) {
+        DHLOGE("DCameraDevice::GetStreamOperator_V1_1, input distributed camera stream operator is null.");
+        return CamRetCode::DEVICE_ERROR;
+    }
+
+    DCamRetCode ret = dCameraStreamOperator_->SetCallBack(callbackObj);
+    if (ret != SUCCESS) {
+        DHLOGE("Set stream operator callbackObj failed, ret=%{public}d.", ret);
+        return MapToExternalRetCode(ret);
+    }
+
+    streamOperator = dCameraStreamOperator_;
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraDevice::GetStreamOperator_V1_2(const sptr<HDI::Camera::V1_2::IStreamOperatorCallback> &callbackObj,
+    sptr<IStreamOperator> &streamOperator)
+{
+    if (callbackObj == nullptr) {
+        DHLOGE("DCameraDevice::GetStreamOperator_V1_2, input stream operator callback is null.");
+        return CamRetCode::INVALID_ARGUMENT;
+    }
+
+    if (dCameraStreamOperator_ == nullptr) {
+        DHLOGE("DCameraDevice::GetStreamOperator_V1_2, input distributed camera stream operator is null.");
+        return CamRetCode::DEVICE_ERROR;
+    }
+
+    DCamRetCode ret = dCameraStreamOperator_->SetCallBack(callbackObj);
+    if (ret != SUCCESS) {
+        DHLOGE("Set stream operator callbackObj failed, ret=%{public}d.", ret);
+        return MapToExternalRetCode(ret);
+    }
+
+    streamOperator = dCameraStreamOperator_;
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraDevice::GetStreamOperator_V1_3(const sptr<HDI::Camera::V1_3::IStreamOperatorCallback> &callbackObj,
+    sptr<IStreamOperator> &streamOperator)
+{
+    if (callbackObj == nullptr) {
+        DHLOGE("DCameraDevice::GetStreamOperator_V1_3, input stream operator callback is null.");
+        return CamRetCode::INVALID_ARGUMENT;
+    }
+
+    if (dCameraStreamOperator_ == nullptr) {
+        DHLOGE("DCameraDevice::GetStreamOperator_V1_3, input distributed camera stream operator is null.");
+        return CamRetCode::DEVICE_ERROR;
+    }
+
+    DCamRetCode ret = dCameraStreamOperator_->SetCallBack(callbackObj);
+    if (ret != SUCCESS) {
+        DHLOGE("Set stream operator callbackObj failed, ret=%{public}d.", ret);
+        return MapToExternalRetCode(ret);
+    }
+
+    streamOperator = dCameraStreamOperator_;
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraDevice::GetSecureCameraSeq(uint64_t &seqId)
+{
+    (void)seqId;
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraDevice::GetStatus(const std::vector<uint8_t> &metaIn, std::vector<uint8_t> &metaOut)
+{
+    (void)metaIn;
+    (void)metaOut;
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraDevice::Reset()
+{
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DCameraDevice::GetDefaultSettings(std::vector<uint8_t> &settings)
+{
+    (void)settings;
     return CamRetCode::NO_ERROR;
 }
 

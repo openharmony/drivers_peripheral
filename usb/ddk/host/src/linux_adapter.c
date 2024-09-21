@@ -487,7 +487,7 @@ static int32_t OsSubmitBulkRequestHandleUrb(
     urb->buffer = request->buffer + (number * bulkBufferLen);
     if (number == request->numUrbs - 1) {
         uint32_t len = request->length % (uint32_t)(bulkBufferLen);
-        urb->bufferLength = (int32_t)(len == 0) ? bulkBufferLen : len;
+        urb->bufferLength = (int32_t)(len == 0) ? bulkBufferLen : (int32_t)len;
     } else {
         urb->bufferLength = bulkBufferLen;
     }
@@ -514,7 +514,7 @@ static int32_t OsSubmitBulkRequestHandle(
         }
 
         if (i == 0) {
-            HDF_LOGE("submitUrb: ret=%{public}d errno=%{public}d length=%{public}d endPoint=%{public}d type=%{public}d",
+            HDF_LOGD("submitUrb: ret=%{public}d errno=%{public}d length=%{public}d endPoint=%{public}d type=%{public}d",
                 ret, errno, urb->bufferLength, urb->endPoint, urb->type);
             return HDF_ERR_IO;
         }
@@ -551,7 +551,7 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
 
     if (request->devHandle->caps & USB_ADAPTER_CAP_BULK_SCATTER_GATHER) {
         // The 1 is to prevent division by zero errors
-        bulkBufferLen = (int32_t)request->length ? request->length : 1;
+        bulkBufferLen = (int32_t)request->length ? (int32_t)request->length : 1;
     } else if (request->devHandle->caps & USB_ADAPTER_CAP_BULK_CONTINUATION) {
         bulkBufferLen = MAX_BULK_DATA_BUFFER_LENGTH;
     } else if (request->devHandle->caps & USB_ADAPTER_CAP_NO_PACKET_SIZE_LIM) {
@@ -560,7 +560,7 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
     } else {
         bulkBufferLen = MAX_BULK_DATA_BUFFER_LENGTH;
     }
-    numUrbs = request->length / bulkBufferLen;
+    numUrbs = (int32_t)request->length / bulkBufferLen;
     if ((request->length % bulkBufferLen) > 0) {
         numUrbs++;
     }
@@ -1014,7 +1014,7 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev, uint8_t c
     struct UsbDeviceConfigDescriptor *config = NULL;
     uint8_t i;
 
-    if (dev == NULL || buffer == NULL || (configIndex > dev->deviceDescriptor.bNumConfigurations)) {
+    if (dev == NULL || buffer == NULL) {
         HDF_LOGE("%{public}s:%{public}d Invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1245,7 +1245,7 @@ static int32_t AdapterClearHalt(const struct UsbDeviceHandle *handle, unsigned i
     return HDF_SUCCESS;
 }
 
-static int32_t AdapterResetDevice(const struct UsbDeviceHandle *handle)
+static int32_t AdapterResetDevice(struct UsbDeviceHandle *handle)
 {
     int32_t ret;
     uint8_t i;
@@ -1267,7 +1267,20 @@ static int32_t AdapterResetDevice(const struct UsbDeviceHandle *handle)
         return HDF_FAILURE;
     }
 
-    return HDF_SUCCESS;
+    for (i = 0;i < USB_MAXINTERFACES; i++) {
+        if (!(handle->claimedInterfaces & (1UL << i))) {
+            continue;
+        }
+        ret = AdapterDetachKernelDriverAndClaim(handle, i);
+        if (ret) {
+            HDF_LOGE("%{public}s:%{public}d failed to re-claim interface %{public}u after reset errno=%{public}d",
+                __func__, __LINE__, i, errno);
+            handle->claimedInterfaces &= ~(1UL << i);
+            break;
+        }
+    }
+
+    return ret;
 }
 
 static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *handle, int32_t isoPackets, size_t len)
@@ -1301,6 +1314,9 @@ static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *
     request->bulkUrb = RawUsbMemCalloc(sizeof(struct UsbAdapterUrb));
     if (request->bulkUrb == NULL) {
         HDF_LOGE("%{public}s RawUsbMemAlloc fail", __func__);
+#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+        RawUsbMemFree(memBuf);
+#endif
         return NULL;
     }
     request->urbs = request->bulkUrb;

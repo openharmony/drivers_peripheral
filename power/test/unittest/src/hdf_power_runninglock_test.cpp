@@ -469,19 +469,22 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest012, TestSize.Level1)
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
-
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
-
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 }
 
 /**
@@ -500,10 +503,14 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level1)
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
+    runinglockInfo.name = setLockName + "sport.13";
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
+    runinglockInfo.name = setLockName + "navigation.13";
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     runinglockInfo.name = setLockName + "task.13";
@@ -963,7 +970,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest022, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo2));
 
     powerState = PowerHdfState::SLEEP;
-    EXPECT_NE(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1, powerState));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo1));
 }
 }

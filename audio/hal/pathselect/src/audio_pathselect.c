@@ -587,7 +587,7 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
         return HDF_FAILURE;
     }
 
-    if (strcasecmp(cJsonObj->string, SPEAKER) == 0 || strcasecmp(cJsonObj->string, HEADPHONES) == 0 || 
+    if (strcasecmp(cJsonObj->string, SPEAKER) == 0 || strcasecmp(cJsonObj->string, HEADPHONES) == 0 ||
         strcasecmp(cJsonObj->string, EARPIECE) == 0  || strcasecmp(cJsonObj->string, BLUETOOTH_SCO) == 0) {
         return HDF_SUCCESS;
     }

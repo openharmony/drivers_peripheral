@@ -68,9 +68,6 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
     }
 
     MessageParcel datas;
-    datas.WriteInterfaceToken(IPowerInterface::GetDescriptor());
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(REWIND_READ_DATA);
     MessageParcel reply;
     MessageOption option;
     if (g_fuzzService == nullptr) {
@@ -82,6 +79,9 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
         if (CMD_POWER_INTERFACE_FORCE_SUSPEND == code) {
             continue;
         }
+        datas.WriteInterfaceToken(IPowerInterface::GetDescriptor());
+        datas.WriteBuffer(data, size);
+        datas.RewindRead(REWIND_READ_DATA);
         g_fuzzService->OnRemoteRequest(code, datas, reply, option);
     }
 }

@@ -23,27 +23,20 @@ using namespace OHOS::HDI::Codec::V3_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-CodecDynaBuffer::CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer, BufferHandle *bufferHandle)
+CodecDynaBuffer::CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer)
     : ICodecBuffer(codecBuffer)
 {
-    dynaBuffer_ = std::make_shared<DynamicBuffer>();
-    dynaBuffer_->bufferHandle = bufferHandle;
 }
 
 CodecDynaBuffer::~CodecDynaBuffer()
 {
-    dynaBuffer_ = nullptr;
 }
 
 sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 {
-    BufferHandle *bufferHandle = nullptr;
-    if (codecBuffer.bufferhandle) {
-        bufferHandle = codecBuffer.bufferhandle->Move();
-        codecBuffer.bufferhandle = nullptr;
-    }
+    codecBuffer.bufferhandle = nullptr;
     codecBuffer.allocLen = sizeof(DynamicBuffer);
-    CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer, bufferHandle);
+    CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer);
     return sptr<ICodecBuffer>(buffer);
 }
 
@@ -54,8 +47,12 @@ int32_t CodecDynaBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_B
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (dynaBuffer_->bufferHandle == nullptr) {
-        dynaBuffer_->bufferHandle = codecBuffer.bufferhandle->Move();
+    if (buffer_ == nullptr && codecBuffer.bufferhandle != nullptr) {
+        BufferHandle* handle = codecBuffer.bufferhandle->GetBufferHandle();
+        if (handle != nullptr) {
+            buffer_ = codecBuffer.bufferhandle;
+            dynaBuffer_.bufferHandle = handle;
+        }
     }
 
     int fenceFd = codecBuffer.fenceFd;
@@ -76,7 +73,14 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
         CODEC_LOGE("CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
-    ResetBuffer(codecBuffer, omxBuffer);
+    if (codecBuffer.bufferhandle != nullptr) {
+        BufferHandle* handle = codecBuffer.bufferhandle->GetBufferHandle();
+        if (handle != nullptr) {
+            buffer_ = codecBuffer.bufferhandle;
+            dynaBuffer_.bufferHandle = handle;
+            codecBuffer.filledLen = sizeof(DynamicBuffer);
+        }
+    }
 
     int fence = codecBuffer.fenceFd;
     if (fence >= 0) {
@@ -98,9 +102,7 @@ int32_t CodecDynaBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    codecBuffer.bufferhandle = nullptr;
-    dynaBuffer_ = nullptr;
-
+    buffer_ = nullptr;
     return HDF_SUCCESS;
 }
 
@@ -116,34 +118,9 @@ int32_t CodecDynaBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 
 uint8_t *CodecDynaBuffer::GetBuffer()
 {
-    return reinterpret_cast<uint8_t *>(dynaBuffer_.get());
+    return reinterpret_cast<uint8_t *>(&dynaBuffer_);
 }
 
-bool CodecDynaBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
-{
-    if (!ICodecBuffer::CheckInvalid(codecBuffer) || dynaBuffer_ == nullptr) {
-        CODEC_LOGE("dynaBuffer_ is null or CheckInvalid return false");
-        return false;
-    }
-    return true;
-}
-
-void CodecDynaBuffer::ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    (void)omxBuffer;
-    if (codecBuffer.bufferhandle == nullptr) {
-        return;
-    }
-    auto bufferHandle = codecBuffer.bufferhandle->Move();
-    codecBuffer.bufferhandle = nullptr;
-
-    // if recv new BufferHandle, save it, but do not need to save to omxBuffer
-    if (dynaBuffer_->bufferHandle != nullptr) {
-        FreeBufferHandle(dynaBuffer_->bufferHandle);
-    }
-    dynaBuffer_->bufferHandle = bufferHandle;
-    codecBuffer.filledLen = sizeof(DynamicBuffer);
-}
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS

@@ -21,6 +21,9 @@
 #include "hdi_wpa_hal.h"
 #include "hdi_wpa_common.h"
 #include "wpa_common_cmd.h"
+#ifndef OHOS_EUPDATER
+#include "wpa_client.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "HdiWpaHal"
@@ -59,7 +62,6 @@ static const int MAX_IFACE_LEN = 6;
 #define WPA_CTRL_OPEN_IFNAME "@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
 
 static WifiWpaInterface *g_wpaInterface = NULL;
-static pthread_mutex_t g_mutex;
 
 static int WpaCliConnect(WifiWpaInterface *p)
 {
@@ -109,31 +111,25 @@ static void WpaCliClose(WifiWpaInterface *p)
 
 static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, bool isWpaAdd)
 {
-    pthread_mutex_lock(&g_mutex);
-
     HDF_LOGI("enter WpaCliAddIface");
     if (p == NULL || argv == NULL) {
-        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     WpaIfaceInfo *info = p->ifaces;
     while (info != NULL) {
         if (strncmp(info->name, argv->name, MAX_IFACE_LEN) == 0) {
-            pthread_mutex_unlock(&g_mutex);
             return 0;
         }
         info = info->next;
     }
     info = (WpaIfaceInfo *)calloc(1, sizeof(WpaIfaceInfo));
     if (info == NULL) {
-        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     if (strcpy_s(info->name, sizeof(info->name), argv->name) != 0) {
         HDF_LOGI("WpaCliAddIface strcpy_s fail");
         free(info);
         info = NULL;
-        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     char cmd[WPA_CMD_BUF_LEN] = {0};
@@ -144,23 +140,18 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
         free(info);
         info = NULL;
         HDF_LOGI("WpaCliAddIface failed, cmd: %{public}s, buf: %{public}s", cmd, buf);
-        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     HDF_LOGI("Add interface finish, cmd: %{public}s, buf: %{public}s", cmd, buf);
     info->next = p->ifaces;
     p->ifaces = info;
-    pthread_mutex_unlock(&g_mutex);
     return 0;
 }
 
 static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
 {
-    pthread_mutex_lock(&g_mutex);
-
     HDF_LOGI("enter WpaCliRemoveIface.");
     if (p == NULL || name == NULL) {
-        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     WpaIfaceInfo *prev = NULL;
@@ -174,14 +165,12 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     }
     if (info == NULL) {
         HDF_LOGI("the WpaInterface info is null");
-        pthread_mutex_unlock(&g_mutex);
         return 0;
     }
     char cmd[WPA_CMD_BUF_LEN] = {0};
     char buf[WPA_CMD_REPLY_BUF_SMALL_LEN] = {0};
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "INTERFACE_REMOVE %s", name) < 0 ||
         WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
-        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     if (prev == NULL) {
@@ -192,7 +181,6 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     HDF_LOGI("Remove interface finish, cmd: %{public}s, buf: %{public}s", cmd, buf);
     free(info);
     info = NULL;
-    pthread_mutex_unlock(&g_mutex);
     return 0;
 }
 
@@ -208,20 +196,16 @@ static int WpaCliWpaTerminate(void)
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
-WifiWpaInterface *GetWifiWpaGlobalInterface(void)
+void InitWifiWpaGlobalInterface(void)
 {
-    pthread_mutex_lock(&g_mutex);
-
-    HDF_LOGI("enter GetWifiWpaGlobalInterface.");
+    HDF_LOGI("enter InitWifiWpaGlobalInterface.");
     if (g_wpaInterface != NULL) {
-        pthread_mutex_unlock(&g_mutex);
-        return g_wpaInterface;
+        return;
     }
     g_wpaInterface = (WifiWpaInterface *)calloc(1, sizeof(WifiWpaInterface));
     if (g_wpaInterface == NULL) {
-        pthread_mutex_unlock(&g_mutex);
         HDF_LOGE("Failed to create wpa interface!");
-        return NULL;
+        return;
     }
     g_wpaInterface->wpaCliConnect = WpaCliConnect;
     g_wpaInterface->wpaCliClose = WpaCliClose;
@@ -229,17 +213,18 @@ WifiWpaInterface *GetWifiWpaGlobalInterface(void)
     g_wpaInterface->wpaCliRemoveIface = WpaCliRemoveIface;
     g_wpaInterface->wpaCliTerminate = WpaCliWpaTerminate;
     g_wpaInterface->ifaces = NULL;
-    pthread_mutex_unlock(&g_mutex);
+}
+ 
+WifiWpaInterface *GetWifiWpaGlobalInterface(void)
+{
+    HDF_LOGI("enter GetWifiWpaGlobalInterface.");
     return g_wpaInterface;
 }
 
 void ReleaseWpaGlobalInterface(void)
 {
-    pthread_mutex_lock(&g_mutex);
-
     HDF_LOGI("enter ReleaseWpaGlobalInterface.");
     if (g_wpaInterface == NULL) {
-        pthread_mutex_unlock(&g_mutex);
         return;
     }
     WpaIfaceInfo *p = g_wpaInterface->ifaces;
@@ -251,7 +236,6 @@ void ReleaseWpaGlobalInterface(void)
     WpaCliClose(g_wpaInterface);
     free(g_wpaInterface);
     g_wpaInterface = NULL;
-    pthread_mutex_unlock(&g_mutex);
 }
 
 WpaCtrl *GetStaCtrl(void)
@@ -292,4 +276,26 @@ WpaCtrl *GetCommonCtrl(void)
         return NULL;
     }
     return &g_wpaInterface->commonCtrl;
+}
+
+void ReleaseIfaceCtrl(char *ifName, int len)
+{
+    if (g_wpaInterface == NULL) {
+        return;
+    }
+    if (len < IFNAME_LEN_MIN || len > IFNAME_LEN_MAX) {
+        HDF_LOGE("ifname is invalid");
+        return;
+    }
+    if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+        ReleaseWpaCtrl(&(g_wpaInterface->p2pCtrl));
+    }
+    if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0) {
+        ReleaseWpaCtrl(&(g_wpaInterface->staCtrl));
+        ReleaseWpaCtrl(&(g_wpaInterface->p2pCtrl));
+        ReleaseWpaCtrl(&(g_wpaInterface->chbaCtrl));
+#ifndef OHOS_EUPDATER
+        ReleaseEventCallback();
+#endif
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,14 +15,14 @@
 
 #ifndef IMAGE_AUTO_INITER
 #define IMAGE_AUTO_INITER
-#include "v1_0/icodec_image.h"
+#include "v2_0/icodec_image.h"
 namespace OHOS {
 namespace Codec {
 namespace Image {
 class ImageAutoIniter {
 public:
-    ImageAutoIniter(OHOS::sptr<OHOS::HDI::Codec::Image::V1_0::ICodecImage> imageClient,
-        OHOS::HDI::Codec::Image::V1_0::CodecImageRole role) : client_(imageClient), role_(role)
+    ImageAutoIniter(OHOS::sptr<OHOS::HDI::Codec::Image::V2_0::ICodecImage> imageClient,
+        OHOS::HDI::Codec::Image::V2_0::CodecImageRole role) : client_(imageClient), role_(role)
     {
         if (client_) {
             client_->Init(role_);
@@ -38,8 +38,8 @@ public:
     }
 
 private:
-    OHOS::sptr<OHOS::HDI::Codec::Image::V1_0::ICodecImage> client_;
-    OHOS::HDI::Codec::Image::V1_0::CodecImageRole role_;
+    OHOS::sptr<OHOS::HDI::Codec::Image::V2_0::ICodecImage> client_;
+    OHOS::HDI::Codec::Image::V2_0::CodecImageRole role_;
 };
 }  // namespace Image
 }  // namespace Codec

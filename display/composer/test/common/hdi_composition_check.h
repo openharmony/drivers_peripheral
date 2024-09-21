@@ -15,7 +15,7 @@
 
 #ifndef HDI_COMPOSITION_CHECK_H
 #define HDI_COMPOSITION_CHECK_H
-#include "v1_1/display_composer_type.h"
+#include "v1_2/display_composer_type.h"
 #include "display_test_utils.h"
 
 namespace OHOS {

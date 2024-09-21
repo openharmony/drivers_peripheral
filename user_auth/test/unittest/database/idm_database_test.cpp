@@ -409,7 +409,7 @@ HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_003, TestSize.Level0)
     userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     CredentialInfoHal info = {};
-    EXPECT_EQ(DeleteCredentialInfo(userId, credentialId, &info), 10006);
+    EXPECT_EQ(DeleteCredentialInfo(userId, credentialId, &info), RESULT_SUCCESS);
 }
 
 HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_004, TestSize.Level0)

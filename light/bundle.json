@@ -52,6 +52,9 @@
             ],
             "header_base": "//drivers/peripheral/light/interfaces/include"
           }
+        },
+        {
+          "name": "//drivers/peripheral/light/hdi_service:liblight_vdi_config"
         }
       ]
     }

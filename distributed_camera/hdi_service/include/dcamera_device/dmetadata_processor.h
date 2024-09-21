@@ -80,12 +80,11 @@ private:
         std::vector<int32_t> &extendStreamConfigs);
     void AddConfigs(std::vector<int32_t> &sinkExtendStreamConfigs, int32_t format,
         int32_t width, int32_t height, int32_t fps);
-    void AddSrcConfigsToSinkOfExtendTag(std::vector<int32_t> &sinkExtendStreamConfigs, int32_t format);
     void StoreSinkAndSrcConfig(int format, const std::string rootNode, std::vector<DCResolution> &resolutionVec);
-    void AddSrcConfigToSinkOfBasicTag(std::map<int, std::vector<DCResolution>> &supportedFormats,
-        std::vector<int32_t> &streamConfigs);
     cJSON* GetFormatObj(const std::string rootNode, cJSON* rootValue, std::string& formatStr);
     bool GetInfoFromJson(const std::string& sinkAbilityInfo);
+    void InitOutputAbilityWithoutMode(const std::string &sinkAbilityInfo);
+    void UpdateAbilityTag(std::vector<int32_t> &streamConfigs, std::vector<int32_t> &extendStreamConfigs);
 
 private:
     constexpr static uint32_t JSON_ARRAY_MAX_SIZE = 1000;
@@ -95,7 +94,8 @@ private:
     constexpr static uint32_t EXTEND_PREVIEW = 0;
     constexpr static uint32_t EXTEND_VIDEO = 1;
     constexpr static uint32_t EXTEND_PHOTO = 2;
-    constexpr static uint32_t EXTEND_EOF = -1;
+    constexpr static int32_t EXTEND_EOF = -1;
+    constexpr static uint32_t ADD_MODE = 3;
     std::function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> resultCallback_;
     std::shared_ptr<CameraAbility> dCameraAbility_;
     std::string protocolVersion_;
@@ -110,9 +110,6 @@ private:
     std::map<int, std::vector<DCResolution>> sinkPhotoProfiles_;
     std::map<int, std::vector<DCResolution>> sinkPreviewProfiles_;
     std::map<int, std::vector<DCResolution>> sinkVideoProfiles_;
-    std::map<int, std::vector<DCResolution>> srcPhotoProfiles_;
-    std::map<int, std::vector<DCResolution>> srcPreviewProfiles_;
-    std::map<int, std::vector<DCResolution>> srcVideoProfiles_;
 
     // The latest result metadata that received from the sink device.
     std::shared_ptr<OHOS::Camera::CameraMetadata> latestProducerMetadataResult_;

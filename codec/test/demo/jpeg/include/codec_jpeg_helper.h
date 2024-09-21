@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_IMAGE_V1_0_CODECJPEGHELPER_H
-#define OHOS_HDI_CODEC_IMAGE_V1_0_CODECJPEGHELPER_H
+#ifndef OHOS_HDI_CODEC_IMAGE_V2_0_CODECJPEGHELPER_H
+#define OHOS_HDI_CODEC_IMAGE_V2_0_CODECJPEGHELPER_H
 #include <cinttypes>
-#include "v1_0/icodec_image.h"
+#include "v2_0/icodec_image.h"
 #include <memory>
 namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V1_0 {
+namespace V2_0 {
 class CodecJpegHelper {
 public:
     enum JpegMarker : int16_t {
@@ -68,4 +68,4 @@ private:
 }
 }
 }
-#endif // OHOS_HDI_CODEC_IMAGE_V1_0_CODECJPEGHELPER_H
+#endif // OHOS_HDI_CODEC_IMAGE_V2_0_CODECJPEGHELPER_H

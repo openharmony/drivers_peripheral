@@ -20,6 +20,17 @@ if (defined(ohos_lite)) {
     public_configs = []
   }
 } else {
+  config("vibrator_vdi_config") {
+    include_dirs = [
+      "../interfaces/include",
+      "../interfaces/v1_1",
+    ]
+  }
+
+  ohos_static_library("libvibrator_vdi_config") {
+    public_configs = [ ":vibrator_vdi_config" ]
+  }
+
   ohos_shared_library("libvibrator_interface_service_1.3") {
     include_dirs = [
       "../interfaces/include/",

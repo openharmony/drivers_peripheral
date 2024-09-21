@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libmemory_tracker_interface_service_1.0") {
   visibility = [ ":*" ]

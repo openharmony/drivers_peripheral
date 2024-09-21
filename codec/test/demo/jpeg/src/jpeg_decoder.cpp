@@ -22,7 +22,7 @@
 #include "jpeg_decoder.h"
 #define HDF_LOG_TAG codec_jpeg_decoder
 
-using namespace OHOS::HDI::Codec::Image::V1_0;
+using namespace OHOS::HDI::Codec::Image::V2_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 

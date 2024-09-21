@@ -17,7 +17,7 @@
 #include <chrono>
 #include <cinttypes>
 #include <algorithm>
-#include "v1_1/include/idisplay_composer_interface.h"
+#include "v1_2/include/idisplay_composer_interface.h"
 #include "v1_1/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
@@ -385,6 +385,9 @@ void DeviceTest::TearDown()
 void DeviceLayerDisplay::TearDown()
 {
     HdiTestDevice::GetInstance().Clear();
+#ifndef DISPLAY_COMMUNITY
+    HdiTestDevice::GetInstance().GetFirstDisplay()->ResetClientLayer();
+#endif
 }
 
 void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, const void* data)

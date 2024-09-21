@@ -42,10 +42,7 @@ public:
     }
     void TearDown()
     {
-        delete p2pIface;
-        if (p2pIface != nullptr) {
-            p2pIface = nullptr;
-        }
+        HDF_LOGE("iface teardown");
     }
 
 public:

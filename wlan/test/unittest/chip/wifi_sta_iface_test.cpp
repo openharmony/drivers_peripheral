@@ -46,14 +46,6 @@ public:
         wifiVendorHalTest.reset();
         ifaceTool.reset();
         ifaceUtil.reset();
-        delete staIface;
-        if (staIface != nullptr) {
-            staIface = nullptr;
-        }
-        delete testIface;
-        if (testIface != nullptr) {
-            testIface = nullptr;
-        }
     }
 
 public:

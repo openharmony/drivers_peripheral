@@ -20,17 +20,10 @@ group("camera_hal_test") {
   } else {
     deps = [
       "$test_path/benchmarktest/v1_0:hdf_camera_benchmark_test",
-      "$test_path/benchmarktest/v1_1:hdf_camera_benchmark_test_v1_1",
-      "$test_path/benchmarktest/v1_2:hdf_camera_benchmark_test_v1_2",
       "$test_path/demo_3A:ohos_camera_3a_demo",
-      "$test_path/fuzztest/metadata_operator:metadata_operator_fuzztest",
-      "$test_path/fuzztest/metadata_utils:metadata_utils_fuzztest",
       "$test_path/hdi/metadata_test:camera_metadata_operator_ut",
       "$test_path/hdi/sequenceable_test:camera_hdi_sequenceable_ut",
       "$test_path/hdi/v1_0:camera_test_at",
-      "$test_path/hdi/v1_1:camera_test_hdi_V1_1",
-      "$test_path/hdi/v1_2:camera_test_hdi_V1_2",
-      "$test_path/hdi/v1_3:camera_test_hdi_V1_3",
       "$test_path/ut/buffer_manager:camera_buffer_manager_ut",
       "$test_path/ut/usb_camera:camera_usb_test_ut",
       "$test_path/ut/v4l2:camera_test_v4l2_ut",

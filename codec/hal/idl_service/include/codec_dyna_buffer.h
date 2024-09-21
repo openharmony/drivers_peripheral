@@ -32,14 +32,11 @@ public:
     uint8_t *GetBuffer() override;
 
 protected:
-    CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer, BufferHandle *bufferHandle);
-    bool CheckInvalid(struct OmxCodecBuffer &codecBuffer) override;
+    CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer);
 
 private:
-    void ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
-
-private:
-    std::shared_ptr<DynamicBuffer> dynaBuffer_;
+    DynamicBuffer dynaBuffer_{};
+    sptr<HDI::Base::NativeBuffer> buffer_;
 };
 }  // namespace Omx
 }  // namespace Codec

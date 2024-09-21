@@ -18,6 +18,7 @@ module_output_path = "drivers_peripheral_display/display"
 
 ohos_benchmarktest("hdf_display_benchmark_test") {
   module_out_path = module_output_path
+  resource_config_file = "./../resource/ohos_test.xml"
   sources = [ "display_benchmark_test.cpp" ]
   deps = [ "../common:disp_dev_hdi_test_common" ]
   include_dirs = [
@@ -37,8 +38,8 @@ ohos_benchmarktest("hdf_display_benchmark_test") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
-    "drivers_interface_display:libdisplay_composer_hdi_impl_1.1",
-    "drivers_interface_display:libdisplay_composer_stub_1.1",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_stub_1.2",
     "googletest:gtest",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

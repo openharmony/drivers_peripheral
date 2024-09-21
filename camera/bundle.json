@@ -33,7 +33,8 @@
         "bounds_checking_function",
         "libexif",
         "libjpeg-turbo",
-        "ffmpeg"
+        "ffmpeg",
+        "googletest"
       ],
       "third_party": []
     },

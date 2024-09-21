@@ -46,7 +46,6 @@ ohos_fuzztest("AudioAdmDispatcherControlCmdidFuzzTest") {
     "$hdf_fuzztest_path/common/include",
     "$hdf_test_path/systemtest/common/hdi_common/include",
     "$hdf_test_path/systemtest/common/adm_common/include",
-    "//third_party/googletest/googletest/include",
   ]
   external_deps = [ "hdf_core:libhdf_utils" ]
   if (defined(ohos_lite)) {
@@ -57,7 +56,10 @@ ohos_fuzztest("AudioAdmDispatcherControlCmdidFuzzTest") {
   if (enable_c_utils) {
     external_deps += [ "c_utils:utils" ]
   }
-  external_deps += [ "bounds_checking_function:libsec_shared" ]
+  external_deps += [
+    "bounds_checking_function:libsec_shared",
+    "googletest:gtest",
+  ]
   defines = []
   if (enable_audio_adm_passthrough) {
     defines += [ "AUDIO_ADM_SO" ]

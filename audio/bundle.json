@@ -25,7 +25,9 @@
             "drivers_peripheral_audio_feature_effect",
             "drivers_peripheral_audio_feature_double_pnp_detect",
             "drivers_peripheral_audio_feature_offload",
-            "drivers_peripheral_audio_feature_multichannel"
+            "drivers_peripheral_audio_feature_multichannel",
+            "drivers_peripheral_audio_feature_hicollie_enable",
+            "drivers_peripheral_audio_feature_hitrace_enable"
         ],
         "adapted_system_type": ["standard", "small"],
         "rom": "1035KB",
@@ -38,14 +40,29 @@
                 "hdf_core",
                 "drivers_interface_audio",
                 "bounds_checking_function",
-                "hitrace"
+                "hitrace",
+                "hicollie",
+                "alsa-lib"
             ],
-            "third_party": [ "alsa-lib" ]
+            "third_party": []
         },
         "build": {
             "sub_component": [
                 "//drivers/peripheral/audio:hdi_audio",
-                "//drivers/peripheral/audio/effect:effect_model"
+                "//drivers/peripheral/audio/effect:effect_model",
+                "//drivers/peripheral/audio:libaudio_header_static"
+            ],
+            "inner_kits": [
+                {
+                    "name": "//drivers/peripheral/audio:libaudio_header_static",
+                    "header": {
+                        "header_base": [
+                            "//drivers/peripheral/audio/interfaces/sound",
+                            "//drivers/peripheral/audio/interfaces/effect"
+                        ],
+                        "header_files": []
+                    }
+                }
             ],
             "test": [
                 "//drivers/peripheral/audio/test:audio_test_entry",

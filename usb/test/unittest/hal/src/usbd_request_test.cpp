@@ -21,8 +21,8 @@
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
 #include "usbd_type.h"
-#include "v1_0/iusb_interface.h"
-#include "v1_0/usb_types.h"
+#include "v1_1/iusb_interface.h"
+#include "v1_1/usb_types.h"
 
 const int SLEEP_TIME = 3;
 const uint8_t INDEX_1 = 1;
@@ -48,11 +48,12 @@ using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
+using namespace OHOS::HDI::Usb::V1_1;
 
 UsbDev UsbdRequestTest::dev_ = {0, 0};
 sptr<UsbSubscriberTest> UsbdRequestTest::subscriber_ = nullptr;
 namespace {
-sptr<IUsbInterface> g_usbInterface = nullptr;
+sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> g_usbInterface = nullptr;
 
 int32_t SwitchErrCode(int32_t ret)
 {
@@ -61,7 +62,7 @@ int32_t SwitchErrCode(int32_t ret)
 
 void UsbdRequestTest::SetUpTestCase(void)
 {
-    g_usbInterface = IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
     if (g_usbInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
         exit(0);
@@ -982,6 +983,70 @@ HWTEST_F(UsbdRequestTest, GetFileDescriptor004, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GetDeviceFileDescriptor001
+ * @tc.desc: Test functions to GetDeviceFileDescriptor
+ * @tc.desc: int32_t GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd);
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, GetDeviceFileDescriptor001, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    int32_t fd = 0;
+    auto ret = g_usbInterface->GetDeviceFileDescriptor(dev, fd);
+    HDF_LOGI("UsbdRequestTest::GetDeviceFileDescriptor001 %{public}d fd=%{public}d ret=%{public}d", __LINE__, fd, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: GetDeviceFileDescriptor002
+ * @tc.desc: Test functions to GetDeviceFileDescriptor
+ * @tc.desc: int32_t GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd);
+ * @tc.desc: Negative test: parameters exception, busNum error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, GetDeviceFileDescriptor002, TestSize.Level1)
+{
+    struct UsbDev dev = {BUS_NUM_INVALID, dev_.devAddr};
+    int32_t fd = 0;
+    auto ret = g_usbInterface->GetDeviceFileDescriptor(dev, fd);
+    HDF_LOGI("UsbdRequestTest::GetDeviceFileDescriptor002 %{public}d fd=%{public}d ret=%{public}d", __LINE__, fd, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: GetDeviceFileDescriptor003
+ * @tc.desc: Test functions to GetDeviceFileDescriptor
+ * @tc.desc: int32_t GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd);
+ * @tc.desc: Negative test: parameters exception, devAddr error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, GetDeviceFileDescriptor003, TestSize.Level1)
+{
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
+    int32_t fd = 0;
+    auto ret = g_usbInterface->GetDeviceFileDescriptor(dev, fd);
+    HDF_LOGI("UsbdRequestTest::GetDeviceFileDescriptor003 %{public}d fd=%{public}d ret=%{public}d", __LINE__, fd, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: GetDeviceFileDescriptor004
+ * @tc.desc: Test functions to GetDeviceFileDescriptor
+ * @tc.desc: int32_t GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd);
+ * @tc.desc: Negative test: parameters exception, fd error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, GetDeviceFileDescriptor004, TestSize.Level1)
+{
+    struct UsbDev dev = dev_;
+    int32_t fd = MAX_BUFFER_LENGTH;
+    auto ret = g_usbInterface->GetDeviceFileDescriptor(dev, fd);
+    HDF_LOGI("UsbdRequestTest::GetDeviceFileDescriptor004 %{public}d fd=%{public}d ret=%{public}d", __LINE__, fd, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
  * @tc.name: UsbdRequest001
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uint8_t> &clientData
@@ -1750,8 +1815,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel001, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel001 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     ret = g_usbInterface->BulkCancel(dev, pipe);
@@ -1775,8 +1843,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel002, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel002 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     dev.busNum = BUS_NUM_INVALID;
@@ -1802,8 +1873,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel003, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel003 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     dev.devAddr = DEV_ADDR_INVALID;
@@ -1829,8 +1903,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel004, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     dev.busNum = BUS_NUM_INVALID;
@@ -1859,8 +1936,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel005, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     pipe.intfId = POINTID_INVALID;

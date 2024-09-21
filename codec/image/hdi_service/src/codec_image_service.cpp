@@ -22,7 +22,7 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V1_0 {
+namespace V2_0 {
 extern "C" ICodecImage *CodecImageImplGetInstance(void)
 {
     return new (std::nothrow) CodecImageService();
@@ -31,6 +31,7 @@ extern "C" ICodecImage *CodecImageImplGetInstance(void)
 CodecImageService::CodecImageService()
 {
     jpegImpl_ = std::make_unique<CodecJpegService>();
+    heifEncodeImpl_ = std::make_unique<CodecHeifEncodeService>();
 }
 
 int32_t CodecImageService::GetImageCapability(std::vector<CodecImageCapability>& capList)
@@ -42,7 +43,7 @@ int32_t CodecImageService::GetImageCapability(std::vector<CodecImageCapability>&
 int32_t CodecImageService::Init(enum CodecImageRole role)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecInit");
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     if (role == CODEC_IMAGE_JPEG) {
         CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE, "jpegImpl_ is null");
         return jpegImpl_->JpegInit();
@@ -54,7 +55,7 @@ int32_t CodecImageService::Init(enum CodecImageRole role)
 int32_t CodecImageService::DeInit(enum CodecImageRole role)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDeInit");
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     if (role == CODEC_IMAGE_JPEG) {
         CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE, "jpegImpl_ is null");
         return jpegImpl_->JpegDeInit();
@@ -67,7 +68,7 @@ int32_t CodecImageService::DoJpegDecode(const CodecImageBuffer& inBuffer, const 
     const CodecJpegDecInfo& decInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDoJpegDecode");
-    CODEC_LOGI("servcie impl!");
+    CODEC_LOGD("servcie impl!");
     if (inBuffer.fenceFd >= 0) {
         close(inBuffer.fenceFd);
     }
@@ -78,7 +79,7 @@ int32_t CodecImageService::DoJpegDecode(const CodecImageBuffer& inBuffer, const 
 int32_t CodecImageService::AllocateInBuffer(CodecImageBuffer& inBuffer, uint32_t size, CodecImageRole role)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecAllocateInBuffer");
-    CODEC_LOGI("servcie impl, size [%{public}d]", size);
+    CODEC_LOGD("servcie impl, size [%{public}d]", size);
     CHECK_AND_RETURN_RET_LOG(size != 0, HDF_ERR_INVALID_PARAM, "buffer size is 0");
     CHECK_AND_RETURN_RET_LOG(size <= CODEC_IMAGE_MAX_BUFFER_SIZE, HDF_ERR_INVALID_PARAM, "buffer size is too large");
     inBuffer.bufferRole = role;
@@ -105,7 +106,18 @@ int32_t CodecImageService::FreeInBuffer(const CodecImageBuffer& inBuffer)
         return HDF_ERR_NOT_SUPPORT;
     }
 }
-} // V1_0
+
+int32_t CodecImageService::DoHeifEncode(const std::vector<ImageItem>& inputImgs,
+                                        const std::vector<MetaItem>& inputMetas,
+                                        const std::vector<ItemRef>& refs,
+                                        const SharedBuffer& output, uint32_t& filledLen)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDoHeifEncode");
+    CODEC_LOGI("servcie impl!");
+    CHECK_AND_RETURN_RET_LOG(heifEncodeImpl_ != nullptr, HDF_FAILURE, "heifEncodeImpl_ is null");
+    return heifEncodeImpl_->DoHeifEncode(inputImgs, inputMetas, refs, output, filledLen);
+}
+} // V2_0
 } // Image
 } // Codec
 } // HDI

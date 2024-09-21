@@ -29,6 +29,7 @@ ohos_moduletest("composer_mt") {
   defines = []
   defines += display_defines
   module_out_path = module_output_path
+  resource_config_file = "./../resource/ohos_test.xml"
   sources = [ "hdi_device_test.cpp" ]
   include_dirs = [ "../common" ]
   deps = [ "../common:disp_dev_hdi_test_common" ]
@@ -36,7 +37,7 @@ ohos_moduletest("composer_mt") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
-    "drivers_interface_display:libdisplay_composer_hdi_impl",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
     "googletest:gtest",
     "graphic_surface:buffer_handle",

@@ -21,6 +21,7 @@
 #include <climits>
 #include <map>
 #include <vector>
+#include <mutex>
 #include "batteryd_api.h"
 #include "v2_0/ibattery_interface.h"
 
@@ -161,6 +162,7 @@ private:
     std::map<std::string, int32_t> nodeCacheFiles_;
     std::string path_;
     int32_t index_;
+    std::mutex mutex_;
 };
 }  // namespace V2_0
 }  // namespace Battery

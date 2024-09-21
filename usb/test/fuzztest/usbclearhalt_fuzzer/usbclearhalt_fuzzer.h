@@ -13,16 +13,9 @@
  * limitations under the License.
  */
 
-#include "audio_trace_vdi.h"
-#include <hitrace_meter.h>
+#ifndef USBCLEARHALT_FUZZER_H
+#define USBCLEARHALT_FUZZER_H
 
-void HdfAudioStartTrace(const char* value, int valueLen)
-{
-    (void) valueLen;
-    StartTrace(HITRACE_TAG_HDF, value);
-}
+#define FUZZ_PROJECT_NAME "usbclearhalt_fuzzer"
 
-void HdfAudioFinishTrace(void)
-{
-    FinishTrace(HITRACE_TAG_HDF);
-}
+#endif
