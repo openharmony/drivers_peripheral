@@ -22,6 +22,7 @@
 namespace {
 constexpr uint32_t REQUEST_TIMEOUT = 0;
 constexpr uint32_t STRIDE_ALIGNMENT = 8;
+constexpr int32_t JPEG_ENCODE_TYPE = 3;
 } // namespace
 
 namespace OHOS::Camera {
@@ -115,6 +116,12 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
             extraData->ExtraSet(OHOS::Camera::timeStamp, esInfo.timestamp);
             extraData->ExtraSet(OHOS::Camera::streamId, buffer->GetStreamId());
             extraData->ExtraSet(OHOS::Camera::captureId, buffer->GetCaptureId());
+            extraData->ExtraSet(OHOS::Camera::dataWidth, static_cast<int32_t>(buffer->GetWidth()));
+            extraData->ExtraSet(OHOS::Camera::dataHeight, static_cast<int32_t>(buffer->GetHeight()));
+            // 拍照上报Format为1
+            if (buffer->GetEncodeType() == JPEG_ENCODE_TYPE) {
+                extraData->ExtraSet(OHOS::Camera::deferredImageFormat, 1);
+            }
         }
     }
     if (!buffer->GetIsValidDataInSurfaceBuffer()) {
