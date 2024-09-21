@@ -202,7 +202,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus002, TestSize.Level1)
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus002 %{public}d ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
-   EXPECT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
