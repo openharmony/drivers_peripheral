@@ -18,7 +18,7 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include "v1_2/display_composer_stub.h"
-#ifndef DISPLAY_COMMUNITY
+#ifdef DISPLAY_HICOLLIE_ENABLE
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 #endif
@@ -65,12 +65,12 @@ static int32_t DisplayComposerDriverDispatch(
         HDF_LOGE("%{public}s:hdfDisplayComposerHost nullptr, stop: %{public}d", __func__, g_stop);
         return HDF_FAILURE;
     }
-#ifndef DISPLAY_COMMUNITY
+#ifdef DISPLAY_HICOLLIE_ENABLE
     int32_t id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer("HDI::Display::Composer::SendRequest",
         HICOLLIE_TIMEOUT, nullptr, nullptr, OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
 #endif
     int32_t ret = hdfDisplayComposerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
-#ifndef DISPLAY_COMMUNITY
+#ifdef DISPLAY_HICOLLIE_ENABLE
     OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 #endif
     pthread_rwlock_unlock(&g_rwLock);
