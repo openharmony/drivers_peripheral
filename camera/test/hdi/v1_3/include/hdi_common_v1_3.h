@@ -30,7 +30,7 @@
 #include "metadata_utils.h"
 #include "v1_3/icamera_host.h"
 #include "v1_3/icamera_device.h"
-#include "v1_2/istream_operator.h"
+#include "v1_3/istream_operator.h"
 #include "v1_3/camera_host_proxy.h"
 #include "v1_0/ioffline_stream_operator.h"
 #include "display_format.h"
@@ -104,11 +104,11 @@ public:
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
     OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraHost> serviceV1_3 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraDevice> cameraDeviceV1_3 = nullptr;
-
-    OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> streamOperatorCallbackV1_3 = nullptr;
+    class TestStreamOperatorCallbackV1_3;
+    OHOS::sptr<TestStreamOperatorCallbackV1_3> streamOperatorCallbackV1_3 = nullptr;
     OHOS::sptr<ICameraHostCallback> hostCallback = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHostCallback> hostCallbackV1_2 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperator> streamOperator_V1_3 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperator> streamOperator_V1_3 = nullptr;
     class DemoCameraDeviceCallback;
     OHOS::sptr<DemoCameraDeviceCallback> deviceCallback = nullptr;
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfos;
@@ -155,7 +155,10 @@ public:
     int streamIdAnalyze = 103;
     std::vector<int> captureIds;
     std::vector<int> streamIds;
-    int32_t imageDataSaveSwitch = SWITCH_OFF;
+    int32_t imageDataSaveSwitch = SWITCH_ON;
+    uint32_t itemCapacity = 100;
+    uint32_t dataCapacity = 2000;
+    uint32_t dataCount = 1;
 
     int32_t rc;
     bool status;
@@ -266,6 +269,7 @@ public:
     class TestStreamOperatorCallbackV1_3 : public OHOS::HDI::Camera::V1_3::IStreamOperatorCallback {
         TestStreamOperatorCallbackV1_2 instanceImpl;
     public:
+        std::shared_ptr<CameraMetadata> streamResultMeta = nullptr;
         TestStreamOperatorCallbackV1_3() = default;
         virtual ~TestStreamOperatorCallbackV1_3() = default;
         int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override;
@@ -279,8 +283,11 @@ public:
         int32_t OnCaptureReady(int32_t captureId, const std::vector<int32_t>& streamIds, uint64_t timestamp) override;
         int32_t OnFrameShutterEnd(int32_t captureId, const std::vector<int32_t>& streamIds,
             uint64_t timestamp) override;
-
+        int32_t OnResult(int32_t streamId, const std::vector<uint8_t>& result) override;
     };
+
+    using StreamResultCallback = std::function<void (int32_t, const std::shared_ptr<CameraMetadata>)>;
+    static StreamResultCallback streamResultCallback_;
 
     class TestCameraHostCallback : public ICameraHostCallback {
     public:

@@ -29,6 +29,7 @@
 #include "v1_0/istream_operator.h"
 #include "v1_1/istream_operator.h"
 #include "v1_2/istream_operator.h"
+#include "v1_3/istream_operator.h"
 #include "v1_0/types.h"
 #include "v1_1/types.h"
 
@@ -39,7 +40,7 @@ using namespace OHOS::HDI::Camera::V1_0;
 using HDI::Camera::V1_1::OperationMode_V1_1;
 using HDI::Camera::V1_1::StreamInfo_V1_1;
 class DCameraProvider;
-class DStreamOperator : public HDI::Camera::V1_2::IStreamOperator {
+class DStreamOperator : public HDI::Camera::V1_3::IStreamOperator {
 public:
     explicit DStreamOperator(std::shared_ptr<DMetadataProcessor> &dMetadataProcessor);
     DStreamOperator() = default;
@@ -70,6 +71,8 @@ public:
     int32_t CancelCapture(int32_t captureId) override;
     int32_t ChangeToOfflineStream(const std::vector<int32_t> &streamIds,
         const sptr<IStreamOperatorCallback> &callbackObj, sptr<IOfflineStreamOperator> &offlineOperator) override;
+    int32_t EnableResult(int32_t streamId, const std::vector<uint8_t> &results) override;
+    int32_t DisableResult(int32_t streamId, const std::vector<uint8_t> &results) override;
 
     DCamRetCode InitOutputConfigurations(const DHBase &dhBase, const std::string &sinkAbilityInfo,
         const std::string &sourceCodecInfo);
