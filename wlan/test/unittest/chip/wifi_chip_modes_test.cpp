@@ -28,7 +28,13 @@ public:
     static void TearDownTestCase() {}
     void SetUp()
     {
-        wifiChipModes = std::make_shared<WifiChipModes>();
+        bool isPrimary = true;
+        std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
+        WifiHalFn fn;
+        InitWifiHalFuncTable(&fn);
+        const std::shared_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(
+            ifaceTool, fn, isPrimary);
+        wifiChipModes = std::make_shared<WifiChipModes>(vendorHal);
     }
     void TearDown()
     {
