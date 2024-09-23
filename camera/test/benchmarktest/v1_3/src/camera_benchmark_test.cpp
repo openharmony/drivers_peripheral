@@ -49,3 +49,59 @@ BENCHMARK_F(CameraBenchmarkTest, NULL_benchmark_001)(
 }
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, NULL_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
     Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: EnableResult_benchmark_001
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, EnableResult_benchmark_001)(
+    benchmark::State &st)
+{
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
+        cameraTest->streamOperator_V1_3);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
+        cameraTest->itemCapacity, cameraTest->dataCapacity);
+    std::vector<uint8_t> detectTypes;
+    detectTypes.push_back(static_cast<uint8_t>(OHOS_CAMERA_HUMAN_FACE_DETECT));
+    uint8_t* typesToEnable = detectTypes.data();
+    meta->addEntry(OHOS_CONTROL_STATISTICS_DETECT_SETTING, typesToEnable, detectTypes.size());
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    for (auto _ : st) {
+        cameraTest->streamOperator_V1_3->EnableResult(cameraTest->streamIdVideo, setting);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, EnableResult_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: EnableResult_benchmark_001
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, DisableResult_benchmark_001)(
+    benchmark::State &st)
+{
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
+        cameraTest->streamOperator_V1_3);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
+        cameraTest->itemCapacity, cameraTest->dataCapacity);
+    std::vector<uint8_t> detectTypes;
+    detectTypes.push_back(static_cast<uint8_t>(OHOS_CAMERA_HUMAN_FACE_DETECT));
+    uint8_t* typesToEnable = detectTypes.data();
+    meta->addEntry(OHOS_CONTROL_STATISTICS_DETECT_SETTING, typesToEnable, detectTypes.size());
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    for (auto _ : st) {
+        cameraTest->streamOperator_V1_3->DisableResult(cameraTest->streamIdVideo, setting);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, DisableResult_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
