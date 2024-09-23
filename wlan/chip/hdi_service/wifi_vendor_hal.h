@@ -55,6 +55,7 @@ public:
         const OnVendorHalRestartCallback& onRestartCallback);
     std::pair<WifiError, int> GetPowerMode(const std::string& ifaceName);
     WifiError SetPowerMode(const std::string& ifaceName, int mode);
+    WifiError IsSupportCoex(bool& isCoex);
     WifiError StartScan(const std::string& ifaceName, const ScanParams& params);
     WifiError StartPnoScan(const std::string& ifaceName, const PnoScanParams& pnoParams);
     WifiError StopPnoScan(const std::string& ifaceName);
