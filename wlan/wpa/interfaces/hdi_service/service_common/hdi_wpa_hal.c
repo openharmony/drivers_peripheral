@@ -287,9 +287,6 @@ void ReleaseIfaceCtrl(char *ifName, int len)
         HDF_LOGE("ifname is invalid");
         return;
     }
-    if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
-        ReleaseWpaCtrl(&(g_wpaInterface->p2pCtrl));
-    }
     if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0) {
         ReleaseWpaCtrl(&(g_wpaInterface->staCtrl));
         ReleaseWpaCtrl(&(g_wpaInterface->p2pCtrl));
