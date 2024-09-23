@@ -17,15 +17,6 @@ WPA_ROOT_DIR = "//third_party/wpa_supplicant"
 
 if (is_standard_system) {
   ohos_shared_library("libwpa_interface_service_1.1") {
-    branch_protector_ret = "pac_ret"
-    sanitize = {
-      cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
-      cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
-      debug = false
-    }
     include_dirs = [
       "./service_common",
       "../../client/include",
@@ -80,15 +71,6 @@ if (is_standard_system) {
   }
 
   ohos_shared_library("libwpa_hdi_c_device") {
-    branch_protector_ret = "pac_ret"
-    sanitize = {
-      cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
-      cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
-      debug = false
-    }
     include_dirs = [ "./service_common" ]
 
     sources = [ "wpa_interface_drivers.c" ]
@@ -121,15 +103,6 @@ if (is_standard_system) {
   }
 
   ohos_shared_library("hdi_wpa_base_mini") {
-    branch_protector_ret = "pac_ret"
-    sanitize = {
-      cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
-      cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
-      debug = false
-    }
     include_dirs = [
       "./service_common",
       "../../client/include",
@@ -174,15 +147,6 @@ if (is_standard_system) {
   }
 } else {
   ohos_shared_library("libwpa_interface_service_1.1") {
-    branch_protector_ret = "pac_ret"
-    sanitize = {
-      cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
-      cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
-      debug = false
-    }
     include_dirs = []
     sources = []
 
@@ -192,15 +156,6 @@ if (is_standard_system) {
   }
 
   ohos_shared_library("libwpa_hdi_c_device") {
-    branch_protector_ret = "pac_ret"
-    sanitize = {
-      cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
-      cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
-      debug = false
-    }
     include_dirs = []
     sources = []
 

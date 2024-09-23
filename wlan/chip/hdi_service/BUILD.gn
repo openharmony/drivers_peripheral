@@ -15,15 +15,6 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
-    cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
-    debug = false
-  }
   include_dirs = []
 
   sources = [
@@ -60,15 +51,6 @@ ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
 }
 
 ohos_shared_library("libchip_hdi_driver") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
-    cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
-    debug = false
-  }
   include_dirs = []
 
   sources = [ "chip_controller_driver.cpp" ]
