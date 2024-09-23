@@ -14,15 +14,6 @@
 import("//build/ohos.gni")
 
 ohos_shared_library("libwlan_interface_service_1.3") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
-    cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
-    debug = false
-  }
   include_dirs = [
     "../interfaces/include",
     "../client/include",
@@ -69,15 +60,6 @@ ohos_shared_library("libwlan_interface_service_1.3") {
 }
 
 ohos_shared_library("libwifi_hdi_c_device") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
-    cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
-    debug = false
-  }
   include_dirs = [
     "../interfaces/include",
     "../client/include",

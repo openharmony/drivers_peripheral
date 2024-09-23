@@ -44,15 +44,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("hostapd_hdi_client") {
-    branch_protector_ret = "pac_ret"
-    sanitize = {
-      cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
-      cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
-      debug = false
-    }
     include_dirs = [ "include" ]
     sources = [ "src/hostapd_client.c" ]
     public_configs = [ ":hostapd_hdi_client_public_config" ]
