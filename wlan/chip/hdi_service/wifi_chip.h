@@ -41,7 +41,6 @@ public:
     WifiChip(int32_t chipId, bool isPrimary,
              const std::weak_ptr<WifiVendorHal> vendorHal,
              const std::shared_ptr<IfaceUtil> ifaceUtil,
-             const std::weak_ptr<WifiChipModes> chipModes,
              const std::function<void(const std::string&)> &subsystemCallbackHandler);
     ~WifiChip();
     void Invalidate();
@@ -100,7 +99,6 @@ private:
     bool isValid_;
     uint32_t currentModeId_;
     std::shared_ptr<IfaceUtil> ifaceUtil_;
-    std::vector<UsableMode> modes_;
     CallbackHandler<IConcreteChipCallback> cbHandler_;
     const std::function<void(const std::string&)> subsystemCallbackHandler_;
 };
