@@ -28,15 +28,23 @@ public:
     static void TearDownTestCase() {}
     void SetUp()
     {
-        wifiChipModes = std::make_shared<WifiChipModes>();
+        ifaceTool = std::make_shared<IfaceTool>();
+        WifiHalFn fn;
+        InitWifiHalFuncTable(&fn);
+        wifiVendorHalTest = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
+        wifiChipModes = std::make_shared<WifiChipModes>(wifiVendorHalTest);
     }
     void TearDown()
     {
+        wifiVendorHalTest.reset();
         wifiChipModes.reset();
+        ifaceTool.reset();
     }
 
 public:
+    std::shared_ptr<WifiVendorHal> wifiVendorHalTest;
     std::shared_ptr<WifiChipModes> wifiChipModes;
+    std::shared_ptr<IfaceTool> ifaceTool;
 };
 
 /**
