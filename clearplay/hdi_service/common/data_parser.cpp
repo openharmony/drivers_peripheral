@@ -103,14 +103,11 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
         int32_t ret = HDF_FAILURE;
         ret = memcpy_s(&keyIdCount, sizeof(keyIdCount), &initData[readPosition], sizeof(keyIdCount));
         if(ret != 0) {
-            HDF_LOGD("%{public}s: memcpy_s faild", __func__);
+            HDF_LOGE("%{public}s: memcpy_s faild", __func__);
             return HDF_ERR_INVALID_PARAM;
         }
         keyIdCount = ntohl(keyIdCount);
         readPosition += sizeof(keyIdCount);
-        if (readPosition + ((uint64_t)keyIdCount * KEY_ID_SIZE) != initData.size() - sizeof(uint32_t)) {
-            return HDF_ERR_INVALID_PARAM;
-        }
 
         // Calculate the key ID offsets
         for (uint32_t i = 0; i < keyIdCount; ++i) {
