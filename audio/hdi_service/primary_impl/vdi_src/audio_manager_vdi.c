@@ -415,7 +415,7 @@ static int32_t AudioManagerVendorUnloadAdapter(struct IAudioManager *manager, co
 
     pthread_mutex_lock(&g_managerMutex);
     struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)manager;
-    if (priv == NULL || priv->vdiManager == NULL || priv->vdiManager->LoadAdapter == NULL) {
+    if (priv == NULL || priv->vdiManager == NULL || priv->vdiManager->UnLoadAdapter == NULL) {
         pthread_mutex_unlock(&g_managerMutex);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -458,7 +458,7 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
         AUDIO_FUNC_LOGI("auido manager had released");
         return HDF_SUCCESS;
     }
-
+    pthread_mutex_lock(&g_managerMutex);
     struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)manager;
     if (priv->handle != NULL) {
         dlclose(priv->handle);
@@ -467,7 +467,10 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
 
     for (descIndex = 0; descIndex < priv->descsCount; descIndex++) {
         AudioEnforceClearAdapterRefCntVdi(descIndex);
-        int32_t ret = AudioManagerVendorUnloadAdapter(manager, priv->descs[descIndex].adapterName);
+        const char *adapterName = priv->descs[descIndex].adapterName;
+        pthread_mutex_unlock(&g_managerMutex);
+        int32_t ret = AudioManagerVendorUnloadAdapter(manager, adapterName);
+        pthread_mutex_lock(&g_managerMutex);
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGW("audio unload adapter error, ret=%{pulbic}d, adaptername=%{pulbic}s", ret,
                 priv->descs[descIndex].adapterName);
@@ -476,6 +479,7 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
 
     AudioManagerReleaseDescs(priv->descs, priv->descsCount);
     OsalMemFree((void *)priv);
+    pthread_mutex_unlock(&g_managerMutex);
     return HDF_SUCCESS;
 }
 
