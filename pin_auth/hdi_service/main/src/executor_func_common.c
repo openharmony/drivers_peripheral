@@ -414,7 +414,7 @@ bool SetResultDataInfo(Attribute *attribute, int32_t resultCode, uint64_t templa
     int32_t setAcl = SetAttributeUint32(attribute, ATTR_ACL, PIN_CAPABILITY_LEVEL);
     IF_TRUE_LOGE_AND_RETURN_VAL(setAcl != RESULT_SUCCESS, false);
 
-    if (rootSecret != NULL) {
+    if (rootSecret != NULL && resultCode == SUCCESS) {
         int32_t setRootSecret = SetBufferToAttribute(attribute, ATTR_ROOT_SECRET, rootSecret);
         IF_TRUE_LOGE_AND_RETURN_VAL(setRootSecret != RESULT_SUCCESS, false);
     }
