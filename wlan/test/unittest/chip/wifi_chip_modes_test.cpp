@@ -28,21 +28,23 @@ public:
     static void TearDownTestCase() {}
     void SetUp()
     {
-        bool isPrimary = true;
-        std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
+        ifaceTool = std::make_shared<IfaceTool>();
         WifiHalFn fn;
         InitWifiHalFuncTable(&fn);
-        const std::shared_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(
-            ifaceTool, fn, isPrimary);
-        wifiChipModes = std::make_shared<WifiChipModes>(vendorHal);
+        wifiVendorHalTest = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
+        wifiChipModes = std::make_shared<WifiChipModes>(wifiVendorHalTest);
     }
     void TearDown()
     {
+        wifiVendorHalTest.reset();
         wifiChipModes.reset();
+        ifaceTool.reset();
     }
 
 public:
+    std::shared_ptr<WifiVendorHal> wifiVendorHalTest;
     std::shared_ptr<WifiChipModes> wifiChipModes;
+    std::shared_ptr<IfaceTool> ifaceTool;
 };
 
 /**
