@@ -18,8 +18,6 @@
 
 #include "component_node.h"
 #include "v3_0/icodec_component.h"
-#include "v1_0/imapper.h"
-
 namespace OHOS {
 namespace HDI {
 namespace Codec {
@@ -65,9 +63,6 @@ private:
     std::shared_ptr<OHOS::Codec::Omx::ComponentNode> node_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
 };
-
-sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> GetMapperService();
-
 }  // namespace V3_0
 }  // namespace Codec
 }  // namespace HDI
