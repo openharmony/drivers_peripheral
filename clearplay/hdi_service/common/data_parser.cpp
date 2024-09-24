@@ -32,7 +32,7 @@ namespace Drm {
 namespace V1_0 {
 int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<uint8_t>> &keyIds)
 {
-    HDF_LOGE("%{public}s: start", __func__);
+    HDF_LOGD("%{public}s: start", __func__);
     size_t readPosition = 0;
 
     // Validate size field
