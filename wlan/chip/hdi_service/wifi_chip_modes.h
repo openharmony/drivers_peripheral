@@ -19,10 +19,11 @@
 #include "v1_0/ichip_controller.h"
 #include "v1_0/chip_types.h"
 #include <string>
+#include "wifi_vendor_hal.h"
 
 #define SUBCHIP_PROP "ohos.boot.odm.conn.schiptype"
 #define PROP_SUBCHIPTYPE_LEN 10
-#define SUPPORT_COEXCHIP "bisheng"
+#define SUPPORT_COEXCHIP ""
 #define TRIPLE_MODE_PROP "vendor.hw_mc.wifi.triplemodes"
 #define SAPCOEXIST_PROP "hw_mc.wifi.support_sapcoexist"
 #define PROP_MAX_LEN 128
@@ -42,7 +43,7 @@ constexpr int32_t K_V3 = 3;
 
 class WifiChipModes {
 public:
-    WifiChipModes();
+    explicit WifiChipModes(const std::weak_ptr<WifiVendorHal> vendorHal);
     virtual ~WifiChipModes() = default;
     virtual std::vector<UsableMode> GetChipModes(
         bool isPrimary);
@@ -51,6 +52,7 @@ private:
     std::vector<UsableMode> GetChipModesForPrimary();
     std::vector<UsableMode> GetChipModesForTriple();
     UsableMode MakeComModes(int staNum, int apNum, int p2pNum, int modeId);
+    std::weak_ptr<WifiVendorHal> vendorHal_;
 };
 }
 }

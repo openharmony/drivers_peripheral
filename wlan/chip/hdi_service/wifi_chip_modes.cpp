@@ -25,10 +25,14 @@ namespace V1_0 {
 #define STA IfaceType::STA
 #define AP IfaceType::AP
 #define P2P IfaceType::P2P
+constexpr int STA_MAX_NUM = 3;
 
 constexpr int PROP_BOOL_VALUE_LEN = 6;
 
-WifiChipModes::WifiChipModes() {}
+WifiChipModes::WifiChipModes(
+    const std::weak_ptr<WifiVendorHal> vendorHal)
+    : vendorHal_(vendorHal)
+{}
 
 UsableMode WifiChipModes::MakeComModes(int staNum, int apNum, int p2pNum, int modeId)
 {
@@ -86,22 +90,20 @@ std::vector<UsableMode> WifiChipModes::GetChipModesForPrimary()
 std::vector<UsableMode> WifiChipModes::GetChipModesForTriple()
 {
     std::vector<UsableMode> modes = {};
-    UsableMode mode = MakeComModes(1, 1, 1, 0);
+    UsableMode mode = MakeComModes(STA_MAX_NUM, 1, 1, 0);
     modes.push_back(mode);
     return modes;
 }
 
 std::vector<UsableMode> WifiChipModes::GetChipModes(bool isPrimary)
 {
-    char propValue[PROP_MAX_LEN] = {0};
-    int errCode = GetParameter(SUBCHIP_PROP, 0, propValue, PROP_SUBCHIPTYPE_LEN);
-    if (errCode > 0) {
-        if (strncmp(propValue, SUPPORT_COEXCHIP, strlen(SUPPORT_COEXCHIP)) == 0) {
-            HDF_LOGI("select tripleModes for wifi");
-            return GetChipModesForTriple();
-        }
+    bool isCoex;
+    vendorHal_.lock()->IsSupportCoex(isCoex);
+    if (isCoex) {
+        return GetChipModesForTriple();
+    } else {
+        return GetChipModesForPrimary();
     }
-    return GetChipModesForPrimary();
 }
 }
 }

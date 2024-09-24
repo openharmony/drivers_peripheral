@@ -35,14 +35,12 @@ public:
     {
         int32_t chipId = 0;
         bool isPrimary = true;
-        std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
+        ifaceTool = std::make_shared<IfaceTool>();
         WifiHalFn fn;
         InitWifiHalFuncTable(&fn);
-        const std::shared_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(
-            ifaceTool, fn, isPrimary);
-        std::shared_ptr<WifiChipModes> chipModes = std::make_shared<WifiChipModes>();
-        wifiChip = new WifiChip(chipId, isPrimary, vendorHal,
-            std::make_shared<IfaceUtil>(ifaceTool), chipModes, HandlerMock);
+        wifiVendorHalTest = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
+        wifiChip = new WifiChip(chipId, isPrimary, wifiVendorHalTest,
+            std::make_shared<IfaceUtil>(ifaceTool), HandlerMock);
     }
     void TearDown() {}
 
@@ -52,6 +50,8 @@ public:
     }
 
 public:
+    std::shared_ptr<WifiVendorHal> wifiVendorHalTest;
+    std::shared_ptr<IfaceTool> ifaceTool;
     sptr<WifiChip> wifiChip;
 };
 
