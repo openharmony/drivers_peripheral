@@ -39,16 +39,14 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
     uint32_t expectedSize = initData.size();
     expectedSize = htonl(expectedSize);
     if (memcmp(&initData[readPosition], &expectedSize, sizeof(expectedSize)) != 0) {
-        HDF_LOGE("%{public}s: memcmp(&initData[readPosition], &expectedSize, sizeof(expectedSize)) != 0", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGD("%{public}s: memcmp(&initData[readPosition], &expectedSize, sizeof(expectedSize)) != 0", __func__);
     }
     readPosition += sizeof(expectedSize);
 
     // Validate PSSH box identifier
     const char psshIdentifier[4] = {'p', 's', 's', 'h'};
     if (memcmp(&initData[readPosition], psshIdentifier, sizeof(psshIdentifier)) != 0) {
-        HDF_LOGE("%{public}s: without \"pssh\"", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGD("%{public}s: without \"pssh\"", __func__);
     }
     readPosition += sizeof(psshIdentifier);
 
@@ -58,8 +56,7 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
     int psshVersionId = 0;
     if (memcmp(&initData[readPosition], psshVersion0, sizeof(psshVersion0)) != 0) {
         if (memcmp(&initData[readPosition], psshVersion1, sizeof(psshVersion1)) != 0) {
-            HDF_LOGE("%{public}s: psshVersion error", __func__);
-            return HDF_ERR_INVALID_PARAM;
+            HDF_LOGD("%{public}s: psshVersion error", __func__);
         }
         psshVersionId = 1;
     }
@@ -68,8 +65,7 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
     // Validate system ID
     std::string uuid((reinterpret_cast<const char*>(initData.data())) + readPosition, CLEARPLAY_NAME.size());
     if (IsClearPlayUuid(uuid)) {
-        HDF_LOGE("%{public}s: uuid error", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGD("%{public}s: uuid error", __func__);
     }
     readPosition += SYSTEM_ID_SIZE;
 
@@ -77,8 +73,7 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
         std::vector<uint8_t> keyIdString = { 'k', 'i', 'd', 's' };
         int32_t keyIdPos = findSubVector(initData, keyIdString);
         if (keyIdPos == -1) {
-            HDF_LOGE("%{public}s: without \"kids\"", __func__);
-            return HDF_ERR_INVALID_PARAM;
+            HDF_LOGD("%{public}s: without \"kids\"", __func__);
         }
         while (keyIdPos < initData.size() && initData[keyIdPos] != '[') {
             ++keyIdPos;
@@ -100,8 +95,7 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
             ++keyIdPos;
         }
         if (keyIdPos == initData.size()) {
-            HDF_LOGE("%{public}s: kids parse error", __func__);
-            return HDF_ERR_INVALID_PARAM;
+            HDF_LOGD("%{public}s: kids parse error", __func__);
         }
     } else if (psshVersionId == 1) {
         // Read key ID count
@@ -109,8 +103,8 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
         int32_t ret = HDF_FAILURE;
         ret = memcpy_s(&keyIdCount, sizeof(keyIdCount), &initData[readPosition], sizeof(keyIdCount));
         if(ret != 0) {
-            HDF_LOGE("%{public}s: memcpy_s faild", __func__);
-            return ret;
+            HDF_LOGD("%{public}s: memcpy_s faild", __func__);
+            return HDF_ERR_INVALID_PARAM;
         }
         keyIdCount = ntohl(keyIdCount);
         readPosition += sizeof(keyIdCount);
@@ -126,9 +120,6 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
             }
             keyIds.push_back(keyId);
         }
-    } else {
-        HDF_LOGE("%{public}s: psshVersionId is invalid", __func__);
-        return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
 }
