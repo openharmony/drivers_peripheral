@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 #include "audiomanager_fuzzer.h"
-#include "v3_0/iaudio_manager.h"
-#include "v3_0/audio_types.h"
+#include "v4_0/iaudio_manager.h"
+#include "v4_0/audio_types.h"
 using namespace std;
 namespace OHOS {
 namespace Audio {

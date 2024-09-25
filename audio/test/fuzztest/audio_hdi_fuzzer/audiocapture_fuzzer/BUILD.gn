@@ -34,7 +34,7 @@ ohos_fuzztest("AudioCaptureFuzzTest") {
   ]
 
   external_deps = [
-    "drivers_interface_audio:libaudio_proxy_3.0",
+    "drivers_interface_audio:libaudio_proxy_4.0",
     "hdf_core:libhdf_utils",
   ]
   if (defined(ohos_lite)) {
