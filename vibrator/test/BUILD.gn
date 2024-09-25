@@ -31,13 +31,13 @@ if (defined(ohos_lite)) {
 
   group("hdf_test_vibrator") {
     deps = []
+    testonly = true
+    deps += [
+      "benchmarktest:hdf_vibrator_benchmark_test",
+      "fuzztest:hdf_vibrator_fuzztest",
+    ]
     if (drivers_peripheral_vibrator_feature_model) {
-      testonly = true
-      deps += [
-        "benchmarktest:hdf_vibrator_benchmark_test",
-        "fuzztest:hdf_vibrator_fuzztest",
-        "unittest/hdi:hdf_unittest_hdi_vibrator",
-      ]
+      deps += [ "unittest/hdi:hdf_unittest_hdi_vibrator" ]
     }
   }
 }
