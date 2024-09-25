@@ -55,3 +55,43 @@ ohos_benchmarktest("hdf_sensor_benchmark_test") {
   }
   external_deps += [ "ipc:ipc_single" ]
 }
+
+ohos_benchmarktest("hdf_sensor_single_interface_benchmark_test") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "../../interfaces/include",
+    "../../utils/include",
+    "../common/include",
+  ]
+
+  sources = [
+    "../common/src/sensor_callback_impl.cpp",
+    "sensor_single_interface_benchmark_test.cpp",
+  ]
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_sensor:libsensor_proxy_2.0",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [ "ipc:ipc_single" ]
+}
+
