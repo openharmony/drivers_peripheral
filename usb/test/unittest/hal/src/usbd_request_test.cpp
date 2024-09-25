@@ -1685,7 +1685,10 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface001, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_OK;
-    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);;
+    ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface001 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_EQ(0, ret);
 }
@@ -1699,9 +1702,13 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface001, TestSize.Level1)
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface002, TestSize.Level1)
 {
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_OK;
-    struct UsbDev dev = {BUS_NUM_INVALID, dev_.devAddr};
-    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    dev = {BUS_NUM_INVALID, dev_.devAddr};
+    ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface002 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_NE(ret, 0);
 }
@@ -1715,9 +1722,13 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface002, TestSize.Level1)
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface003, TestSize.Level1)
 {
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_OK;
-    struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
-    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    dev = {dev_.busNum, DEV_ADDR_INVALID};
+    ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface003 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_NE(ret, 0);
 }
@@ -1731,9 +1742,13 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface003, TestSize.Level1)
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface004, TestSize.Level1)
 {
-    uint8_t interfaceId = INTERFACEID_INVALID;
     struct UsbDev dev = dev_;
-    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
+    uint8_t interfaceId = INTERFACEID_OK;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    interfaceId = INTERFACEID_INVALID;
+    ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface004 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_NE(ret, 0);
 }
@@ -1747,9 +1762,13 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface004, TestSize.Level1)
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface005, TestSize.Level1)
 {
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_OK;
-    struct UsbDev dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
-    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
+    ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface005 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_NE(ret, 0);
 }
@@ -1763,9 +1782,14 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface005, TestSize.Level1)
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface006, TestSize.Level1)
 {
-    int32_t interfaceId = INTERFACEID_INVALID;
-    struct UsbDev dev = {DEV_ADDR_INVALID, dev_.devAddr};
-    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
+    struct UsbDev dev = dev_;
+    uint8_t interfaceId = INTERFACEID_OK;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface006 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    interfaceId = INTERFACEID_INVALID;
+    dev = {DEV_ADDR_INVALID, dev_.devAddr};
+    ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface006 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_NE(ret, 0);
 }
@@ -1779,9 +1803,14 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface006, TestSize.Level1)
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface007, TestSize.Level1)
 {
-    int32_t interfaceId = INTERFACEID_INVALID;
-    struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
-    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
+    struct UsbDev dev = dev_;
+    uint8_t interfaceId = INTERFACEID_OK;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface007 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    interfaceId = INTERFACEID_INVALID;
+    dev = {dev_.busNum, DEV_ADDR_INVALID};
+    ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface007 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_NE(ret, 0);
 }
@@ -1795,9 +1824,14 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface007, TestSize.Level1)
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface008, TestSize.Level1)
 {
-    int32_t interfaceId = INTERFACEID_INVALID;
-    struct UsbDev dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
-    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
+    struct UsbDev dev = dev_;
+    uint8_t interfaceId = INTERFACEID_OK;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface008 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    interfaceId = INTERFACEID_INVALID;
+    dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
+    ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface008 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_NE(ret, 0);
 }
