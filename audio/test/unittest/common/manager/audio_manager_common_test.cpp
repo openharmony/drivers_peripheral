@@ -18,7 +18,7 @@
 
 #include "hdf_dlist.h"
 #include "osal_mem.h"
-#include "v3_0/iaudio_manager.h"
+#include "v4_0/iaudio_manager.h"
 
 using namespace std;
 using namespace testing::ext;
