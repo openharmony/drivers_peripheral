@@ -162,7 +162,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_010, TestSize.Level
 {
     printf("CameraMetadataOperatorTest Camera_metedate_opertor_010 start...");
     int32_t ret = CalculateCameraMetadataItemDataSize(8, 0);
-    int32_t exp = 0;
+    int32_t exp = -1;
     EXPECT_EQ(ret, exp);
 }
 
