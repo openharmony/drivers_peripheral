@@ -213,13 +213,12 @@ int32_t MediaKeySystemService::GetOfflineMediaKeyStatus(const std::vector<uint8_
     int32_t ret = GetOfflineKeyFromFile();
     if (ret != HDF_SUCCESS) {
         offlineKeyMutex_.unlock();
-        return ret;
+        return HDF_FAILURE;
     }
     keyIdBase64.erase(std::remove(keyIdBase64.begin(), keyIdBase64.end(), '\0'), keyIdBase64.end());
     if (offlineKeyIdAndKeyValueBase64_.find(keyIdBase64) == offlineKeyIdAndKeyValueBase64_.end()) {
-        licenseStatus = OFFLINE_MEDIA_KEY_STATUS_UNKNOWN;
         offlineKeyMutex_.unlock();
-        return HDF_SUCCESS;
+        return HDF_FAILURE;
     }
     for (auto it = mediaKeySessionMap_.begin(); it != mediaKeySessionMap_.end(); ++it) {
         if (it->second == false) {
