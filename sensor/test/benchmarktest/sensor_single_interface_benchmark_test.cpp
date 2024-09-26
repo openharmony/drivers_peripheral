@@ -67,8 +67,10 @@ void SensorBenchmarkTest::TearDown(const ::benchmark::State &state)
   */
 BENCHMARK_F(SensorBenchmarkTest, GetAllSensorInfo)(benchmark::State &state)
 {
-    int32_t ret = g_sensorInterface->GetAllSensorInfo(g_info);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->GetAllSensorInfo(g_info);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetAllSensorInfo)->
@@ -82,8 +84,10 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetAllSensorInfo)->
   */
 BENCHMARK_F(SensorBenchmarkTest, Register)(benchmark::State &state)
 {
-    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, Register)->
@@ -97,8 +101,10 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, Register)->
   */
 BENCHMARK_F(SensorBenchmarkTest, SetBatch)(benchmark::State &state)
 {
-    int32_t ret = g_sensorInterface->SetBatch(g_sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->SetBatch(g_sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetBatch)->
@@ -112,8 +118,10 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetBatch)->
   */
 BENCHMARK_F(SensorBenchmarkTest, SetMode)(benchmark::State &state)
 {
-    int32_t ret = g_sensorInterface->SetMode(g_sensorId, SENSOR_MODE_ON_CHANGE);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->SetMode(g_sensorId, SENSOR_MODE_ON_CHANGE);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetMode)->
@@ -127,8 +135,10 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetMode)->
   */
 BENCHMARK_F(SensorBenchmarkTest, SetOption)(benchmark::State &state)
 {
-    int32_t ret = g_sensorInterface->SetOption(g_sensorId, OPTION);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->SetOption(g_sensorId, OPTION);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetOption)->
@@ -142,8 +152,10 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetOption)->
   */
 BENCHMARK_F(SensorBenchmarkTest, Unregister)(benchmark::State &state)
 {
-    int32_t ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, Unregister)->
@@ -157,10 +169,12 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, Unregister)->
   */
 BENCHMARK_F(SensorBenchmarkTest, EnableAndDisable)(benchmark::State &state)
 {
-    int32_t ret = g_sensorInterface->Enable(g_sensorId);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-    ret = g_sensorInterface->Disable(g_sensorId);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->Enable(g_sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        ret = g_sensorInterface->Disable(g_sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, EnableAndDisable)->
