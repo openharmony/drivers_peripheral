@@ -32,11 +32,11 @@
 #include "v1_0/istream_operator_callback.h"
 #include "v1_2/istream_operator_callback.h"
 #include "v1_3/istream_operator_callback.h"
-#include "v1_1/istream_operator.h"
+#include "v1_3/istream_operator.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using HDI::Camera::V1_2::IStreamOperator;
+using HDI::Camera::V1_3::IStreamOperator;
 using HDI::Camera::V1_0::ICameraDeviceCallback;
 class DCameraDevice : public HDI::Camera::V1_3::ICameraDevice {
 public:
@@ -50,11 +50,11 @@ public:
 
 public:
     int32_t GetStreamOperator_V1_3(const sptr<HDI::Camera::V1_3::IStreamOperatorCallback> &callbackObj,
-        sptr<IStreamOperator> &streamOperator) override;
+        sptr<HDI::Camera::V1_3::IStreamOperator> &streamOperator) override;
     int32_t GetSecureCameraSeq(uint64_t &seqId) override;
 
     int32_t GetStreamOperator_V1_2(const sptr<HDI::Camera::V1_2::IStreamOperatorCallback> &callbackObj,
-        sptr<IStreamOperator> &streamOperator) override;
+        sptr<HDI::Camera::V1_2::IStreamOperator> &streamOperator) override;
     int32_t GetStatus(const std::vector<uint8_t> &metaIn, std::vector<uint8_t> &metaOut) override;
     int32_t Reset() override;
 

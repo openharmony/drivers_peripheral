@@ -292,8 +292,7 @@ void Test::DefaultInfosAnalyze(
 
 void Test::StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t professionalMode)
 {
-    streamOperatorCallbackV1_3 =
-        OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (new TestStreamOperatorCallbackV1_3);
+    streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
     uint32_t mainVersion = 1;
     uint32_t minVersion = 0;
     rc = cameraDeviceV1_3->GetStreamOperator_V1_3(streamOperatorCallbackV1_3, streamOperator_V1_3);
@@ -342,8 +341,7 @@ void Test::StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t pr
 
 void Test::StartStream(std::vector<StreamIntent> intents, OHOS::HDI::Camera::V1_3::OperationMode mode)
 {
-    streamOperatorCallbackV1_3 =
-        OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (new TestStreamOperatorCallbackV1_3);
+    streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
     uint32_t mainVersion = 1;
     uint32_t minVersion = 0;
     rc = cameraDeviceV1_3->GetStreamOperator_V1_3(streamOperatorCallbackV1_3, streamOperator_V1_3);
@@ -661,6 +659,21 @@ int32_t Test::TestStreamOperatorCallbackV1_3::OnFrameShutterEnd(int32_t captureI
     for (auto it : streamIds) {
         CAMERA_LOGI("OnFrameShutterEnd captureId: %{public}d, streamId: %{public}d", captureId, it);
     }
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureEndedExt(int32_t captureId,
+    const std::vector<HDI::Camera::V1_3::CaptureEndedInfoExt> &infos)
+{
+    for (auto it : infos) {
+        CAMERA_LOGI("OnCaptureEndedExt captureId: %{public}d, streamId: %{public}d", captureId, it.streamId_);
+    }
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestStreamOperatorCallbackV1_3::OnResult(int32_t streamId, const std::vector<uint8_t> &result)
+{
+    CAMERA_LOGI("OnResult streamId: %{public}d", streamId);
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
