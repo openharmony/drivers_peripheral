@@ -1442,7 +1442,6 @@ int32_t WpaInterfaceVendorExtProcessCmd(struct IWpaInterface *self, const char *
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%{public}s cmd %{public}s reply %{public}s !", __func__, newCmd, reply);
     ret = atoi(reply);
     free(reply);
     return ret;
