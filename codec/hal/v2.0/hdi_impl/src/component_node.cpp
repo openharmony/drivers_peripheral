@@ -191,6 +191,7 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
 int32_t ComponentNode::SetCallbacks(struct CodecCallbackType *omxCallback, int64_t appData)
 {
     // release this->omxCallback_
+    std::unique_lock<std::shared_mutex> lk(callbackMutex_);
     if (this->omxCallback_ != nullptr) {
         CodecCallbackTypeRelease(this->omxCallback_);
         this->omxCallback_ = nullptr;

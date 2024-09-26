@@ -54,6 +54,10 @@ static int32_t SerStubGetComponentCapablityList(struct CodecComponentManager *se
         CODEC_LOGE("read count failed!");
         return HDF_ERR_INVALID_PARAM;
     }
+    if (count > serviceImpl->GetComponentNum()) {
+        CODEC_LOGE("count exceed compomentNum");
+        return HDF_ERR_INVALID_PARAM;
+    }
     caps = (CodecCompCapability *)OsalMemCalloc(sizeof(CodecCompCapability) * (count));
     if (caps == NULL) {
         CODEC_LOGE("alloc caps failed!");

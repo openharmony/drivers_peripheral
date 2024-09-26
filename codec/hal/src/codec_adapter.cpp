@@ -292,6 +292,10 @@ int32_t OmxAdapterSetComponentRole(struct CodecComponentNode *codecNode, char *c
         CODEC_LOGE("GetRoleOfComponent return err [%{public}d]", ret);
         return ret;
     }
+    if (roles.empty()) {
+        CODEC_LOGE("role of component is empty");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t roleIndex = 0;
     CODEC_LOGI("RoleName = [%{public}s]", roles[roleIndex].c_str());
 
