@@ -38,12 +38,12 @@ ohos_shared_library("def_display_gralloc") {
 
   output_name = "display_gralloc"
   cflags = [ "-Wno-macro-redefined" ]
-  deps = [ "//third_party/libdrm:libdrm" ]
 
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "libdrm:libdrm",
     "memory_utils:libdmabufheap",
   ]
 
@@ -105,7 +105,6 @@ ohos_shared_library("def_display_device") {
   deps = [
     ":def_display_layer_video",
     "../:hdi_display_gralloc",
-    "//third_party/libdrm:libdrm",
   ]
 
   cflags = [ "-Wno-unused-function" ]
@@ -115,6 +114,7 @@ ohos_shared_library("def_display_device") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
+    "libdrm:libdrm",
   ]
 
   symlink_target_name = [ "libdisplay_layer.z.so" ]
