@@ -26,12 +26,10 @@ ohos_fuzztest("ThermalHdiStubFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "thermalhdistub_fuzz.cpp" ]
-  deps = [
-    "../../../../../interface/thermal/v1_1:libthermal_stub_1.1",
-    "../../../interfaces/hdi_service:libthermal_interface_service_1.1",
-  ]
+  deps = [ "../../../interfaces/hdi_service:libthermal_interface_service_1.1" ]
   external_deps = [
     "drivers_interface_thermal:libthermal_proxy_1.1",
+    "drivers_interface_thermal:libthermal_stub_1.1",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",

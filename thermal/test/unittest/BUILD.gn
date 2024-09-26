@@ -36,10 +36,7 @@ ohos_unittest("hdi_unittest_thermal") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [
-    "../../interfaces/hdi_service:libthermal_interface_service_1.1",
-    "//third_party/libxml2:xml2",
-  ]
+  deps = [ "../../interfaces/hdi_service:libthermal_interface_service_1.1" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -47,6 +44,7 @@ ohos_unittest("hdi_unittest_thermal") {
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
+      "libxml2:libxml2",
     ]
     if (has_thermal_c_utils_part) {
       external_deps += [ "c_utils:utils" ]
