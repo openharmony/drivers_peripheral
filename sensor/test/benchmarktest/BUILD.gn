@@ -94,4 +94,3 @@ ohos_benchmarktest("hdf_sensor_single_interface_benchmark_test") {
   }
   external_deps += [ "ipc:ipc_single" ]
 }
-
