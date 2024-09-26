@@ -135,9 +135,9 @@ public:
     int captureWidth = 1280;
     int captureHeight = 960;
     int sketchWidth = 640;
-    int metaWidth = 640;
+    int metaWidth = 1280;
     int sketchHeight = 480;
-    int metaHeight = 480;
+    int metaHeight = 960;
     int captureIdPreview = 2000;
     int captureIdSketch = 2050;
     int captureIdMeta = 2060;
