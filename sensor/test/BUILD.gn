@@ -35,6 +35,7 @@ if (defined(ohos_lite)) {
       testonly = true
       deps += [
         "benchmarktest:hdf_sensor_benchmark_test",
+        "benchmarktest:hdf_sensor_single_interface_benchmark_test",
         "fuzztest:hdf_sensor_fuzztest",
         "unittest/dump:dump_unittest_sensor",
         "unittest/hdi:hdi_unittest_sensor",
