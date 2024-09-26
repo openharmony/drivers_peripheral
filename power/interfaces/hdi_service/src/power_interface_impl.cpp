@@ -440,11 +440,13 @@ int32_t PowerInterfaceImpl::PowerDump(std::string &info)
 
 int32_t PowerInterfaceImpl::HoldRunningLock(const RunningLockInfo &info)
 {
+    Power::PowerXCollie powerXcollie("Power_HoldRunningLock");
     return RunningLockImpl::Hold(info, g_powerState);
 }
 
 int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 {
+    Power::PowerXCollie powerXcollie("Power_UnholdRunningLock");
     return RunningLockImpl::Unhold(info);
 }
 
