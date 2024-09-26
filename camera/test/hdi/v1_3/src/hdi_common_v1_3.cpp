@@ -194,9 +194,9 @@ void Test::DefaultMeta(
     infos->v1_0.streamId_ = streamIdMeta;
     infos->v1_0.width_ = metaWidth;
     infos->v1_0.height_ = metaHeight;
-    infos->v1_0.format_ = previewFormat;
+    infos->v1_0.format_ = snapshotFormat;
     infos->v1_0.dataspace_ = UT_DATA_SIZE;
-    infos->v1_0.intent_ = StreamIntent::PREVIEW;
+    infos->v1_0.intent_ = StreamIntent::STILL_CAPTURE;
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
 }
 
@@ -216,12 +216,12 @@ void Test::DefaultInfosMeta(
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
 {
     DefaultMeta(infos);
-    std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
-    infos->v1_0.bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
+    std::shared_ptr<StreamConsumer> consumer_capture = std::make_shared<StreamConsumer>();
+    infos->v1_0.bufferQueue_ = consumer_capture->CreateProducerSeq([this](void* addr, uint32_t size) {
         DumpImageFile(streamIdMeta, "yuv", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-    consumerMap_[StreamIntent::PREVIEW] = consumer_pre;
+    consumerMap_[StreamIntent::STILL_CAPTURE] = consumer_capture;
 }
 
 void Test::DefaultInfosPreviewV1_2(
@@ -253,7 +253,7 @@ void Test::DefaultInfosCapture(
     DefaultCapture(infos);
     std::shared_ptr<StreamConsumer> consumer_capture = std::make_shared<StreamConsumer>();
     infos->v1_0.bufferQueue_ = consumer_capture->CreateProducerSeq([this](void* addr, uint32_t size) {
-        DumpImageFile(streamIdCapture, "jpeg", addr, size);
+        DumpImageFile(streamIdCapture, "yuv", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
     consumerMap_[StreamIntent::STILL_CAPTURE] = consumer_capture;
