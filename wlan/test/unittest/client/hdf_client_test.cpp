@@ -1141,6 +1141,17 @@ HWTEST_F(WifiClientTest, WifiSetPowerSaveMode029, TestSize.Level1)
     const char *ifName = "wlanTest";
     WifiSetPowerSaveMode(ifName, frequency, mode);
 }
+
+/**
+ * @tc.name: ReleaseEventCallback01
+ * @tc.desc: Release Event Callback test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, ReleaseEventCallback01, TestSize.Level1)
+{
+    ReleaseEventCallback();
+}
 }
 }
 #endif
