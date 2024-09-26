@@ -343,6 +343,10 @@ void CodecComponentService::SetComponentRole()
         CODEC_LOGE("GetRoleOfComponent return err [%{public}d]", ret);
         return;
     }
+    if (roles.empty()) {
+        CODEC_LOGE("role of component is empty");
+        return;
+    }
     uint32_t roleIndex = 0;
     CODEC_LOGI("RoleName = [%{public}s]", roles[roleIndex].c_str());
 

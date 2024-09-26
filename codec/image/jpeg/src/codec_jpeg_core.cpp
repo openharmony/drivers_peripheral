@@ -29,6 +29,7 @@ CodecJpegCore::~CodecJpegCore()
 {
     if (libHandle_ != nullptr) {
         dlclose(libHandle_);
+        libHandle_ = nullptr;
     }
 }
 
@@ -45,6 +46,7 @@ void CodecJpegCore::AddVendorLib()
     if (getCodecJpegHwi_ == NULL) {
         CODEC_LOGE("Failed to dlsym GetCodecJpegHwi");
         dlclose(libHandle_);
+        libHandle_ = nullptr;
         return;
     }
 
@@ -52,6 +54,7 @@ void CodecJpegCore::AddVendorLib()
     if (JpegHwi_ == nullptr) {
         CODEC_LOGE("run GetCodecJpegHwi error!");
         dlclose(libHandle_);
+        libHandle_ = nullptr;
         return;
     }
     CODEC_LOGI("load dependency library success!");
