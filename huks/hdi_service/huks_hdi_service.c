@@ -211,16 +211,6 @@ static int32_t HuksUpgradeKey(struct IHuks *self, const struct HuksBlob *encOldK
     return ret;
 }
 
-static int32_t HuksExportChipsetPlatformPublicKey(struct IHuks *self, const struct HuksBlob *salt,
-    enum HuksChipsetPlatformDecryptScene scene, struct HuksBlob *publicKey)
-{
-    (void)self;
-    int32_t ret = HUKS_FAILURE;
-    HDI_CONVERTER_FUNC_EXPORTCHIPSETPLATFORMPUBLICKEY(salt, scene, publicKey, ret,
-        HuksHdiAdapterExportChipsetPlatformPublicKey)
-    return ret;
-}
-
 static int32_t HuksGetVersion(struct IHuks *self, uint32_t *majorVer, uint32_t *minorVer)
 {
     *majorVer = IHUKS_MAJOR_VERSION;
@@ -256,7 +246,6 @@ struct IHuks *HuksImplGetInstance(void)
     service->interface.DeriveKey = HuksDeriveKey;
     service->interface.Mac = HuksMac;
     service->interface.UpgradeKey = HuksUpgradeKey;
-    service->interface.ExportChipsetPlatformPublicKey = HuksExportChipsetPlatformPublicKey;
     service->interface.GetVersion = HuksGetVersion;
     return &service->interface;
 }

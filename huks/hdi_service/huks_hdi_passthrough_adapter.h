@@ -82,9 +82,6 @@ int32_t HuksHdiAdapterAttestKey(const struct HksBlob *key, const  struct HksPara
 int32_t HuksHdiAdapterUpgradeKey(const struct HksBlob *oldKey, const struct HksParamSet *paramSet,
     struct HksBlob *newKey);
 
-int32_t HuksHdiAdapterExportChipsetPlatformPublicKey(const struct HksBlob *salt,
-    enum HksChipsetPlatformDecryptScene scene, struct HksBlob *publicKey);
-
 int32_t HuksInitHuksCoreEngine(void);
 
 int32_t HuksReleaseCoreEngine(void);
