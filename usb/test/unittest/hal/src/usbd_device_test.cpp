@@ -93,7 +93,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice001, TestSize.Level1)
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result =%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -108,7 +108,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice002, TestSize.Level1)
     struct UsbDev dev = {BUS_NUM_INVALID, dev_.devAddr};
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -123,7 +123,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice003, TestSize.Level1)
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -138,7 +138,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice004, TestSize.Level1)
     struct UsbDev dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**********************************************************************************************************/
@@ -158,7 +158,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice001, TestSize.Level1)
     ASSERT_EQ(0, ret);
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -177,7 +177,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice002, TestSize.Level1)
     dev.busNum = BUS_NUM_INVALID;
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     g_usbInterface->CloseDevice(dev);
 }
@@ -198,7 +198,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice003, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     g_usbInterface->CloseDevice(dev);
 }
@@ -220,7 +220,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice004, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     g_usbInterface->CloseDevice(dev);
 }
@@ -240,10 +240,10 @@ HWTEST_F(UsbdDeviceTest, UsbdResetDevice001, TestSize.Level1)
     ASSERT_EQ(0, ret);
     ret = g_usbInterface->ResetDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d ResetDevice result=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -262,10 +262,10 @@ HWTEST_F(UsbdDeviceTest, UsbdResetDevice002, TestSize.Level1)
     dev.busNum = BUS_NUM_INVALID;
     ret = g_usbInterface->ResetDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d ResetDevice result=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     g_usbInterface->CloseDevice(dev);
 }
@@ -286,10 +286,10 @@ HWTEST_F(UsbdDeviceTest, UsbdResetDevice003, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ResetDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d ResetDevice result=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     g_usbInterface->CloseDevice(dev);
 }
@@ -311,10 +311,10 @@ HWTEST_F(UsbdDeviceTest, UsbdResetDevice004, TestSize.Level1)
     dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->ResetDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d ResetDevice result=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     g_usbInterface->CloseDevice(dev);
 }
@@ -328,7 +328,7 @@ HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestOpenDevice001, Function | MediumTes
 {
     struct UsbDev dev = {1, 255};
     auto ret = g_usbInterface->OpenDevice(dev);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -340,7 +340,7 @@ HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestOpenDevice002, Function | MediumTes
 {
     struct UsbDev dev = {255, 1};
     auto ret = g_usbInterface->OpenDevice(dev);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -352,7 +352,7 @@ HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestOpenDevice003, Function | MediumTes
 {
     struct UsbDev dev = {255, 100};
     auto ret = g_usbInterface->OpenDevice(dev);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -364,7 +364,7 @@ HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestOpenDevice004, Function | MediumTes
 {
     struct UsbDev dev = {100, 255};
     auto ret = g_usbInterface->OpenDevice(dev);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -379,10 +379,10 @@ HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestCloseDevice001, Function | MediumTe
     ASSERT_EQ(0, ret);
     dev = {1, 255};
     ret = g_usbInterface->CloseDevice(dev);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     ret = g_usbInterface->CloseDevice(dev);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -397,10 +397,10 @@ HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestCloseDevice002, Function | MediumTe
     ASSERT_EQ(0, ret);
     dev = {255, 1};
     ret = g_usbInterface->CloseDevice(dev);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     ret = g_usbInterface->CloseDevice(dev);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -415,10 +415,10 @@ HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestCloseDevice003, Function | MediumTe
     ASSERT_EQ(0, ret);
     dev = {255, 100};
     ret = g_usbInterface->CloseDevice(dev);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     ret = g_usbInterface->CloseDevice(dev);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -433,9 +433,9 @@ HWTEST_F(UsbdDeviceTest, testHdiUsbDeviceTestCloseDevice004, Function | MediumTe
     ASSERT_EQ(0, ret);
     dev = {100, 255};
     ret = g_usbInterface->CloseDevice(dev);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
     dev = dev_;
     ret = g_usbInterface->CloseDevice(dev);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 } // namespace
