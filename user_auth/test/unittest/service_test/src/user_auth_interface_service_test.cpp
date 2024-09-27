@@ -23,7 +23,6 @@
 #include "executor_message.h"
 #include "user_auth_hdi.h"
 #include "user_sign_centre.h"
-#include "idm_common.h"
 #include "signature_operation.h"
 
 namespace OHOS {
@@ -1330,44 +1329,6 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCheckReuseUnlockResult_001, TestSize.
     EXPECT_EQ(service->CheckReuseUnlockResult(param, info), RESULT_BAD_PARAM);
     param.reuseUnlockResultMode = 1;
     EXPECT_EQ(service->CheckReuseUnlockResult(param, info), RESULT_GENERAL_ERROR);
-}
-
-HWTEST_F(UserAuthInterfaceServiceTest, TestSetGlobalConfigParam_001, TestSize.Level0)
-{
-    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
-    EXPECT_NE(service, nullptr);
-
-    const std::string deviceUdid = std::string(64, ' ');
-    EXPECT_EQ(service->Init(deviceUdid), 0);
-
-    HdiGlobalConfigParam param = {};
-    param.type = 0;
-    param.value.pinExpiredPeriod = 0;
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
-
-    param.type = PIN_EXPIRED_PERIOD;
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
-    param.authTypes.push_back(1);
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_SUCCESS);
-    param.value.pinExpiredPeriod = 1;
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_SUCCESS);
-
-    param.authTypes.clear();
-    param.type = ENABLE_STATUS;
-    param.value.enableStatus = true;
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
-    param.authTypes.push_back(1);
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_SUCCESS);
-    param.authTypes.push_back(2);
-    param.authTypes.push_back(4);
-    param.authTypes.push_back(4);
-    param.authTypes.push_back(8);
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
-
-    for (uint32_t i = 0; i <= MAX_USER; i++) {
-        param.userIds.push_back(i);
-    }
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
 }
 } // namespace UserAuth
 } // namespace HDI

@@ -30,10 +30,6 @@ ResultCode DoIdentify(const IdentifyParam param, LinkedList **schedule)
         LOG_ERROR("schedule is null");
         return RESULT_BAD_PARAM;
     }
-    if (!GetEnableStatus(INVALID_USER_ID, param.authType)) {
-        LOG_ERROR("authType is not support %{public}d", param.authType);
-        return RESULT_TYPE_NOT_SUPPORT;
-    }
     UserAuthContext *identifyContext = GenerateIdentifyContext(param);
     if (identifyContext == NULL) {
         LOG_ERROR("authContext is null");

@@ -793,7 +793,7 @@ int32_t UserAuthInterfaceService::GetAvailableStatus(int32_t userId, int32_t aut
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(g_mutex);
-    checkResult = GetAvailableStatusFunc(userId, authType, authTrustLevel);
+    GetAvailableStatusFunc(userId, authType, authTrustLevel, &checkResult);
     if (checkResult != RESULT_SUCCESS) {
         IAM_LOGE("GetAvailableStatusFunc failed");
     }
@@ -808,28 +808,24 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
     validTypes.clear();
     std::lock_guard<std::mutex> lock(g_mutex);
     for (auto &authType : authTypes) {
-        int32_t checkRet = GetAvailableStatusFunc(userId, authType, authTrustLevel);
-        if (checkRet == RESULT_SUCCESS) {
-            IAM_LOGI("get valid authType:%{public}d", authType);
-            validTypes.push_back(authType);
+        int32_t checkRet = RESULT_GENERAL_ERROR;
+        GetAvailableStatusFunc(userId, authType, authTrustLevel, &checkRet);
+        if (checkRet == RESULT_PIN_EXPIRED) {
+            LOG_ERROR("pin is expired");
+            return RESULT_PIN_EXPIRED;
+        }
+        if (checkRet == RESULT_TRUST_LEVEL_NOT_SUPPORT) {
+            IAM_LOGE("GetAvailableStatus checkRet: %{public}d", checkRet);
+            result = checkRet;
             continue;
         }
-        switch (checkRet) {
-            case RESULT_PIN_EXPIRED:
-                LOG_ERROR("pin is expired");
-                return RESULT_PIN_EXPIRED;
-            case RESULT_TYPE_NOT_SUPPORT:
-                IAM_LOGE("authType is not surport, authType: %{public}d", authType);
-                continue;
-            case RESULT_TRUST_LEVEL_NOT_SUPPORT:
-                IAM_LOGE("GetAvailableStatus authType: %{public}d", authType);
-                result = checkRet;
-                continue;
-            default:
-                IAM_LOGE("authType does not support, authType:%{public}d, ret:%{public}d", authType, checkRet);
-                result = RESULT_NOT_ENROLLED;
-                continue;
+        if (checkRet != RESULT_SUCCESS) {
+            IAM_LOGE("authType does not support, authType:%{public}d, ret:%{public}d", authType, checkRet);
+            result = RESULT_NOT_ENROLLED;
+            continue;
         }
+        IAM_LOGI("get valid authType:%{public}d", authType);
+        validTypes.push_back(authType);
     }
     if (validTypes.empty()) {
         IAM_LOGE("no auth type valid");
@@ -1146,7 +1142,7 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
     Buffer *oldRootSecret = GetCacheRootSecret(userId);
     if (!IsBufferValid(oldRootSecret)) {
         IAM_LOGE("get GetCacheRootSecret failed");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_SUCCESS;
     }
     if (memcpy_s(rootSecret.data(), rootSecret.size(), oldRootSecret->buf, oldRootSecret->contentSize) != EOK) {
         IAM_LOGE("rootSecret copy failed");
@@ -1517,7 +1513,7 @@ FAIL:
 
 static void DestroyExecutorInfo(void *data)
 {
-    if (data == NULL) {
+    if (data == nullptr) {
         IAM_LOGE("data is null");
         return;
     }
@@ -1669,52 +1665,21 @@ FAIL:
     return ret;
 }
 
-static int32_t CopyGlobalConfigParam(const HdiGlobalConfigParam &param, GlobalConfigParamHal &paramHal)
-{
-    switch (param.type) {
-        case PIN_EXPIRED_PERIOD:
-            paramHal.value.pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
-            if (param.value.pinExpiredPeriod > 0) {
-                paramHal.value.pinExpiredPeriod = param.value.pinExpiredPeriod;
-            }
-            break;
-        case ENABLE_STATUS:
-            paramHal.value.enableStatus = param.value.enableStatus;
-            break;
-        default:
-            IAM_LOGE("bad global config type");
-            return RESULT_BAD_PARAM;
-    }
-    paramHal.type = static_cast<GlobalConfigTypeHal>(param.type);
-
-    for (uint32_t i = 0; i < param.userIds.size(); i++) {
-        paramHal.userIds[i] = param.userIds[i];
-    }
-    paramHal.userIdNum = param.userIds.size();
-    for (uint32_t i = 0; i < param.authTypes.size(); i++) {
-        paramHal.authTypes[i] = static_cast<uint32_t>(param.authTypes[i]);
-    }
-    paramHal.authTypeNum = param.authTypes.size();
-    return RESULT_SUCCESS;
-}
-
 int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigParam &param)
 {
-    IAM_LOGI("start, global config type is %{public}d, userIds size %{public}zu, authTypes size %{public}zu",
-        param.type, param.userIds.size(), param.authTypes.size());
-    if (param.authTypes.size() > MAX_AUTH_TYPE_LEN || param.authTypes.size() == 0 ||
-        param.userIds.size() > MAX_USER) {
-        IAM_LOGE("SetGlobalConfigParam bad param");
+    IAM_LOGI("start");
+    if (param.type != PIN_EXPIRED_PERIOD) {
+        IAM_LOGE("bad global config type");
         return RESULT_BAD_PARAM;
     }
     GlobalConfigParamHal paramHal = {};
-    int32_t ret = CopyGlobalConfigParam(param, paramHal);
-    if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("CopyGlobalConfigParam failed");
-        return ret;
+    paramHal.type = PIN_EXPIRED_PERIOD;
+    paramHal.value.pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
+    if (param.value.pinExpiredPeriod > 0) {
+        paramHal.value.pinExpiredPeriod = param.value.pinExpiredPeriod;
     }
 
-    ret = SetGlobalConfigParamFunc(&paramHal);
+    uint32_t ret = SetGlobalConfigParamFunc(&paramHal);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetGlobalConfigParamFunc failed");
     }

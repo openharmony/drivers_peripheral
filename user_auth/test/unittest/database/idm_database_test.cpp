@@ -16,14 +16,13 @@
 #include <gtest/gtest.h>
 
 #include "idm_database.h"
-#include "securec.h"
 
 typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 
 extern "C" {
     extern LinkedList *g_userInfoList;
     extern UserInfo *g_currentUser;
-    extern GlobalConfigInfo g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
+    extern GlobalConfigParamHal g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
     extern bool MatchUserInfo(const void *data, const void *condition);
     extern bool IsUserInfoValid(UserInfo *userInfo);
     extern UserInfo *QueryUserInfo(int32_t userId);
@@ -409,7 +408,7 @@ HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_003, TestSize.Level0)
     userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     CredentialInfoHal info = {};
-    EXPECT_EQ(DeleteCredentialInfo(userId, credentialId, &info), 10006);
+    EXPECT_EQ(DeleteCredentialInfo(userId, credentialId, &info), RESULT_SUCCESS);
 }
 
 HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_004, TestSize.Level0)
@@ -776,31 +775,13 @@ HWTEST_F(IdmDatabaseTest, TestRemoveCachePin_001, TestSize.Level0)
 
 HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
 {
-    memset_s(g_globalConfigArray, sizeof(GlobalConfigInfo) * MAX_GLOBAL_CONFIG_NUM, 0,
-        sizeof(GlobalConfigInfo) * MAX_GLOBAL_CONFIG_NUM);
     EXPECT_EQ(SaveGlobalConfigParam(nullptr), RESULT_BAD_PARAM);
 
     GlobalConfigParamHal param = {};
-    param.type = ENABLE_STATUS;
-    param.value.enableStatus = true;
-    param.userIdNum = 1;
-    param.userIds[0] = 1;
-    param.authTypeNum = 1;
-    param.authTypes[0] = 1;
-    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
-    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
-    param.authTypeNum = MAX_AUTH_TYPE_LEN + 1;
-    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_BAD_PARAM);
-    param.userIdNum = MAX_USER + 1;
-    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_BAD_PARAM);
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_GENERAL_ERROR);
 
-    GlobalConfigParamHal param1 = {};
-    param1.type = PIN_EXPIRED_PERIOD;
-    param1.value.pinExpiredPeriod = 1;
-    EXPECT_EQ(SaveGlobalConfigParam(&param1), RESULT_BAD_PARAM);
-
-    GlobalConfigParamHal param2 = {};
-    EXPECT_EQ(SaveGlobalConfigParam(&param2), RESULT_BAD_PARAM);
+    param.type = PIN_EXPIRED_PERIOD;
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
 }
 
 HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)
@@ -823,26 +804,6 @@ HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)
     userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo1));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_SUCCESS);
-}
-
-HWTEST_F(IdmDatabaseTest, TestGetEnableStatus, TestSize.Level0)
-{
-    int32_t userId = 1;
-    uint32_t authType = 1;
-    EXPECT_EQ(GetEnableStatus(userId, authType), true);
-
-    g_globalConfigArray[0].type = PIN_EXPIRED_PERIOD;
-    g_globalConfigArray[0].value.pinExpiredPeriod = 1;
-    EXPECT_EQ(GetEnableStatus(userId, authType), true);
-
-    g_globalConfigArray[0].type = ENABLE_STATUS;
-    g_globalConfigArray[0].value.enableStatus = false;
-    g_globalConfigArray[0].authType = 0;
-    g_globalConfigArray[0].userIds[0] = 0;
-    EXPECT_EQ(GetEnableStatus(userId, authType), true);
-
-    g_globalConfigArray[0].authType = 1;
-    EXPECT_EQ(GetEnableStatus(userId, authType), false);
 }
 } // namespace UserAuth
 } // namespace UserIam
