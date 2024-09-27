@@ -23,7 +23,7 @@
 #include "parameters.h"
 #include "v1_3/ivibrator_interface.h"
 
-#define HDF_LOG_TAG "vibrator_impl_test"
+#define HDF_LOG_TAG "hdi_unittest_vibrator"
 
 using namespace std;
 using namespace testing::ext;
@@ -76,10 +76,11 @@ void HdiUnitTestVibrator::TearDown()
   * @tc.name: CheckVibratorInstanceIsEmpty
   * @tc.desc: Create a Vibrator instance. The instance is not empty.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, CheckVibratorInstanceIsEmpty001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 }
 
@@ -87,11 +88,11 @@ HWTEST_F(HdiUnitTestVibrator, CheckVibratorInstanceIsEmpty001, TestSize.Level1)
   * @tc.name: VibratorStartOnceTest001
   * @tc.desc: Start one-shot vibration with given duration.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, VibratorStartOnceTest001, TestSize.Level1)
 {
-    HDF_LOGI("VibratorStartOnceTest001 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t ret = g_vibratorInterface->StartOnce(2000);
@@ -104,11 +105,11 @@ HWTEST_F(HdiUnitTestVibrator, VibratorStartOnceTest001, TestSize.Level1)
   * @tc.name: VibratorStartTest001
   * @tc.desc: Start periodic vibration with preset effect.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, VibratorStartTest001, TestSize.Level1)
 {
-    HDF_LOGI("VibratorStartTest001 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t ret = g_vibratorInterface->Start("haptic.pattern.type1");
@@ -121,10 +122,11 @@ HWTEST_F(HdiUnitTestVibrator, VibratorStartTest001, TestSize.Level1)
   * @tc.name: GetHapticCapacity
   * @tc.desc: Obtains the vibration capability of the motor.
   * @tc.type: FUNC
-  * @tc.require:#I8BZ5H
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, GetHapticCapacity, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->GetHapticCapacity(g_hapticCapacity);
@@ -138,11 +140,11 @@ HWTEST_F(HdiUnitTestVibrator, GetHapticCapacity, TestSize.Level1)
   * @tc.name: EnableCompositeEffectTest001
   * @tc.desc: Start periodic vibration with custom composite effect.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, EnableCompositeEffectTest001, TestSize.Level1)
 {
-    HDF_LOGI("EnableCompositeEffectTest001 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     if (g_hapticCapacity.isSupportPresetMapping) {
@@ -177,11 +179,11 @@ HWTEST_F(HdiUnitTestVibrator, EnableCompositeEffectTest001, TestSize.Level1)
   * @tc.name: EnableCompositeEffectTest002
   * @tc.desc: Start periodic vibration with custom composite effect.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, EnableCompositeEffectTest002, TestSize.Level1)
 {
-    HDF_LOGI("EnableCompositeEffectTest002 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     if (g_hapticCapacity.isSupportPresetMapping) {
@@ -220,11 +222,11 @@ HWTEST_F(HdiUnitTestVibrator, EnableCompositeEffectTest002, TestSize.Level1)
   * @tc.name: GetEffectInfoTest001
   * @tc.desc: Get effect information with the given effect type.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, GetEffectInfoTest001, TestSize.Level1)
 {
-    HDF_LOGI("GetEffectInfoTest001 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     HdfEffectInfo effectInfo;
@@ -239,11 +241,11 @@ HWTEST_F(HdiUnitTestVibrator, GetEffectInfoTest001, TestSize.Level1)
   * @tc.name: GetEffectInfoTest002
   * @tc.desc: Get effect information with the given effect type.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, GetEffectInfoTest002, TestSize.Level1)
 {
-    HDF_LOGI("GetEffectInfoTest002 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     HdfEffectInfo effectInfo;
@@ -258,11 +260,11 @@ HWTEST_F(HdiUnitTestVibrator, GetEffectInfoTest002, TestSize.Level1)
   * @tc.name: VibratorStopTest001
   * @tc.desc: Stop vibration.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, VibratorStopTest001, TestSize.Level1)
 {
-    HDF_LOGI("VibratorStopTest001 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t ret = g_vibratorInterface->StartOnce(2000);
@@ -279,38 +281,36 @@ HWTEST_F(HdiUnitTestVibrator, VibratorStopTest001, TestSize.Level1)
   * @tc.name: IsVibratorRunningTest001
   * @tc.desc: Get vibration status.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest001, TestSize.Level1)
 {
-    HDF_LOGI("IsVibratorRunningTest001 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
+    PrimitiveEffect primitiveEffect1 { 0, 60007, 0 };
+    PrimitiveEffect primitiveEffect2 { 1000, 60007, 0 };
+    PrimitiveEffect primitiveEffect3 { 1000, 60007, 0 };
+    CompositeEffect effect1 = {
+        .primitiveEffect = primitiveEffect1,
+    };
+    CompositeEffect effect2 = {
+        .primitiveEffect = primitiveEffect2,
+    };
+    CompositeEffect effect3 = {
+        .primitiveEffect = primitiveEffect3,
+    };
+    std::vector<CompositeEffect> vec;
+    vec.push_back(effect1);
+    vec.push_back(effect2);
+    vec.push_back(effect3);
+    HdfCompositeEffect effect;
+    effect.type = HDF_EFFECT_TYPE_PRIMITIVE;
+    effect.compositeEffects = vec;
+    int32_t ret = g_vibratorInterface->EnableCompositeEffect(effect);
+    HDF_LOGD("ret:%{public}d", ret);
     if (g_hapticCapacity.isSupportPresetMapping) {
-        HDF_LOGI("IsVibratorRunningTest001 phone in");
-        PrimitiveEffect primitiveEffect1 { 0, 60007, 0 };
-        PrimitiveEffect primitiveEffect2 { 1000, 60007, 0 };
-        PrimitiveEffect primitiveEffect3 { 1000, 60007, 0 };
-        CompositeEffect effect1 = {
-            .primitiveEffect = primitiveEffect1,
-        };
-        CompositeEffect effect2 = {
-            .primitiveEffect = primitiveEffect2,
-        };
-        CompositeEffect effect3 = {
-            .primitiveEffect = primitiveEffect3,
-        };
-        std::vector<CompositeEffect> vec;
-        vec.push_back(effect1);
-        vec.push_back(effect2);
-        vec.push_back(effect3);
-        HdfCompositeEffect effect;
-        effect.type = HDF_EFFECT_TYPE_PRIMITIVE;
-        effect.compositeEffects = vec;
-        int32_t ret = g_vibratorInterface->EnableCompositeEffect(effect);
-        HDF_LOGD("ret:%{public}d", ret);
         EXPECT_EQ(HDF_SUCCESS, ret);
-
         bool state {false};
         g_vibratorInterface->IsVibratorRunning(state);
         HDF_LOGD("Vibrating state:%{public}s", state ? "is vibrating ..." : "vibrate stopped");
@@ -320,6 +320,8 @@ HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest001, TestSize.Level1)
         g_vibratorInterface->IsVibratorRunning(state);
         HDF_LOGD("Stoped state:%{public}s", state ? "is vibrating ..." : "vibrate stopped");
         EXPECT_EQ(state, false);
+    } else {
+        ASSERT_NE(HDF_SUCCESS, ret);
     }
 }
 
@@ -327,11 +329,11 @@ HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest001, TestSize.Level1)
   * @tc.name: IsVibratorRunningTest002
   * @tc.desc: Get vibration status.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest002, TestSize.Level1)
 {
-    HDF_LOGI("IsVibratorRunningTest002 in");
+    HDF_LOGI("%{public}s in", __func__ );
     bool state {false};
     g_vibratorInterface->IsVibratorRunning(state);
     HDF_LOGD("No vibrate state:%{public}s", state ? "is vibrating ..." : "vibrate stopped");
@@ -342,11 +344,11 @@ HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest002, TestSize.Level1)
   * @tc.name: GetVibratorInfo001
   * @tc.desc: Get vibrator information.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, GetVibratorInfo001, TestSize.Level1)
 {
-    HDF_LOGI("GetVibratorInfo001 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
     std::vector<HdfVibratorInfo> info;
     int32_t ret = g_vibratorInterface->GetVibratorInfo(info);
@@ -363,10 +365,11 @@ HWTEST_F(HdiUnitTestVibrator, GetVibratorInfo001, TestSize.Level1)
   * @tc.name: EnableVibratorModulation_001
   * @tc.desc: Start vibrator based on the setting vibration effect.
   * @tc.type: FUNC
-  * @tc.require: #I4NN4Z
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
     std::vector<HdfVibratorInfo> info;
 
@@ -391,10 +394,11 @@ HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_001, TestSize.Level1)
   * @tc.desc: Start vibrator based on the setting vibration effect.
   * Validity check of input parameters.
   * @tc.type: FUNC
-  * @tc.require: #I4NN4Z
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_002, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
     std::vector<HdfVibratorInfo> info;
 
@@ -414,11 +418,11 @@ HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_002, TestSize.Level1)
   * @tc.name: VibratorStartTest011
   * @tc.desc: Start periodic vibration with preset effect.
   * @tc.type: FUNC
-  * @tc.require: AR000HQ6N2
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, VibratorStartTest011, TestSize.Level1)
 {
-    HDF_LOGI("VibratorStartTest011 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     HdfEffectInfo effectInfo;
@@ -438,10 +442,11 @@ HWTEST_F(HdiUnitTestVibrator, VibratorStartTest011, TestSize.Level1)
   * @tc.name: PlayHapticPattern
   * @tc.desc: HD vibration data packet delivery.
   * @tc.type: FUNC
-  * @tc.require:#I8BZ5H
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, PlayHapticPattern, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_pkg);
@@ -455,10 +460,11 @@ HWTEST_F(HdiUnitTestVibrator, PlayHapticPattern, TestSize.Level1)
   * @tc.name: PlayHapticPattern_001
   * @tc.desc: HD vibration data packet delivery.
   * @tc.type: FUNC
-  * @tc.require:#I8BZ5H
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, PlayHapticPattern_001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_pkg1);
@@ -472,10 +478,11 @@ HWTEST_F(HdiUnitTestVibrator, PlayHapticPattern_001, TestSize.Level1)
   * @tc.name: GetHapticStartUpTime
   * @tc.desc: Indicates the time from command is issued to the time the motor starts.
   * @tc.type: FUNC
-  * @tc.require:#I8BZ5H
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, GetHapticStartUpTime, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startUpTime = 0;
@@ -492,11 +499,11 @@ HWTEST_F(HdiUnitTestVibrator, GetHapticStartUpTime, TestSize.Level1)
   * @tc.name: StopV1_2Test_001
   * @tc.desc: Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
-  * @tc.require:#I8BZ5H
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_001, TestSize.Level1)
 {
-    HDF_LOGI("StopV1_2Test_001 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->StartOnce(g_duration);
@@ -510,11 +517,11 @@ HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_001, TestSize.Level1)
   * @tc.name: StopV1_2Test_002
   * @tc.desc: Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
-  * @tc.require:#I8BZ5H
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_002, TestSize.Level1)
 {
-    HDF_LOGI("StopV1_2Test_002 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->Start(g_effect1);
@@ -528,11 +535,11 @@ HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_002, TestSize.Level1)
   * @tc.name: StopV1_2Test_003
   * @tc.desc: Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
-  * @tc.require:#I8BZ5H
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_003, TestSize.Level1)
 {
-    HDF_LOGI("StopV1_2Test_003 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_pkg);
@@ -546,11 +553,11 @@ HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_003, TestSize.Level1)
   * @tc.name: StopV1_2Test_004
   * @tc.desc: Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
-  * @tc.require:#I8BZ5H
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_004, TestSize.Level1)
 {
-    HDF_LOGI("StopV1_2Test_004 in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->Start(g_effect1);
@@ -565,11 +572,11 @@ HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_004, TestSize.Level1)
   * @tc.desc: Controls this Performing Time Series Vibrator Effects.
   * Controls this vibrator to stop the vibrator
   * @tc.type: FUNC
-  * @tc.require:#I96NNZ
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, StartByIntensityTest, TestSize.Level1)
 {
-    HDF_LOGI("StartByIntensityTest in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->StartByIntensity(g_effect1, g_intensity);
@@ -584,11 +591,11 @@ HWTEST_F(HdiUnitTestVibrator, StartByIntensityTest, TestSize.Level1)
   * @tc.desc: Controls this Performing Time Series Vibrator Effects.
   * Controls this vibrator to stop the vibrator
   * @tc.type: FUNC
-  * @tc.require:#I96NNZ
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, StopTest, TestSize.Level1)
 {
-    HDF_LOGI("StopTest in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->StartOnce(g_duration);
@@ -616,11 +623,11 @@ HWTEST_F(HdiUnitTestVibrator, StopTest, TestSize.Level1)
   * @tc.desc: Controls this Performing Time Series Vibrator Effects.
   * Controls this vibrator to stop the vibrator
   * @tc.type: FUNC
-  * @tc.require:#I96NNZ
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestVibrator, GetAllWaveInfoTest, TestSize.Level1)
 {
-    HDF_LOGI("StartByIntensityTest in");
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->GetAllWaveInfo(g_vibratorId, g_info);
