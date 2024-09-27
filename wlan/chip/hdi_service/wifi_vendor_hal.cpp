@@ -141,13 +141,13 @@ void WifiVendorHal::OnAsyncRssiReport(int32_t index, int32_t c0Rssi, int32_t c1R
     }
 }
 
-void WifiVendorHal::OnAsyncWifiNetlinkMsgReport(const std::vector<uint8_t>& recvMsg)
+void WifiVendorHal::OnAsyncWifiNetlinkMsgReport(uint32_t type, const std::vector<uint8_t>& recvMsg)
 {
     const auto lock = AcquireGlobalLock();
     HDF_LOGD("OnAsyncWifiNetlinkMsgReport::OnWifiNetlinkMessage");
     for (const auto& callback : vendorHalExtCbHandler_.GetCallbacks()) {
         if (callback) {
-            callback->OnWifiNetlinkMessage(recvMsg);
+            callback->OnWifiNetlinkMessage(type, recvMsg);
         }
     }
 }
