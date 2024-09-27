@@ -71,7 +71,9 @@ HWTEST_F(CameraHdiUtTestSecureStreamV1_3, Camera_Hdi_SecureStream_V1_3_003, Test
     // PREVIEW stream
     cameraTest->intents = {PREVIEW};
 
-    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->streamOperatorCallbackV1_3 =
+        OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (
+			new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3);
 
     cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
         cameraTest->streamOperator_V1_3);
