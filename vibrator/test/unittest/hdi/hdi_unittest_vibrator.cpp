@@ -80,7 +80,7 @@ void HdiUnitTestVibrator::TearDown()
   */
 HWTEST_F(HdiUnitTestVibrator, CheckVibratorInstanceIsEmpty001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 }
 
@@ -92,7 +92,7 @@ HWTEST_F(HdiUnitTestVibrator, CheckVibratorInstanceIsEmpty001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, VibratorStartOnceTest001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t ret = g_vibratorInterface->StartOnce(2000);
@@ -109,7 +109,7 @@ HWTEST_F(HdiUnitTestVibrator, VibratorStartOnceTest001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, VibratorStartTest001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t ret = g_vibratorInterface->Start("haptic.pattern.type1");
@@ -126,7 +126,7 @@ HWTEST_F(HdiUnitTestVibrator, VibratorStartTest001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, GetHapticCapacity, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->GetHapticCapacity(g_hapticCapacity);
@@ -144,7 +144,7 @@ HWTEST_F(HdiUnitTestVibrator, GetHapticCapacity, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, EnableCompositeEffectTest001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     if (g_hapticCapacity.isSupportPresetMapping) {
@@ -183,7 +183,7 @@ HWTEST_F(HdiUnitTestVibrator, EnableCompositeEffectTest001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, EnableCompositeEffectTest002, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     if (g_hapticCapacity.isSupportPresetMapping) {
@@ -226,7 +226,7 @@ HWTEST_F(HdiUnitTestVibrator, EnableCompositeEffectTest002, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, GetEffectInfoTest001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     HdfEffectInfo effectInfo;
@@ -245,7 +245,7 @@ HWTEST_F(HdiUnitTestVibrator, GetEffectInfoTest001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, GetEffectInfoTest002, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     HdfEffectInfo effectInfo;
@@ -264,7 +264,7 @@ HWTEST_F(HdiUnitTestVibrator, GetEffectInfoTest002, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, VibratorStopTest001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t ret = g_vibratorInterface->StartOnce(2000);
@@ -285,7 +285,7 @@ HWTEST_F(HdiUnitTestVibrator, VibratorStopTest001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     PrimitiveEffect primitiveEffect1 { 0, 60007, 0 };
@@ -333,7 +333,7 @@ HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest002, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     bool state {false};
     g_vibratorInterface->IsVibratorRunning(state);
     HDF_LOGD("No vibrate state:%{public}s", state ? "is vibrating ..." : "vibrate stopped");
@@ -348,7 +348,7 @@ HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest002, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, GetVibratorInfo001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
     std::vector<HdfVibratorInfo> info;
     int32_t ret = g_vibratorInterface->GetVibratorInfo(info);
@@ -369,7 +369,7 @@ HWTEST_F(HdiUnitTestVibrator, GetVibratorInfo001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
     std::vector<HdfVibratorInfo> info;
 
@@ -398,7 +398,7 @@ HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_002, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
     std::vector<HdfVibratorInfo> info;
 
@@ -422,7 +422,7 @@ HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_002, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, VibratorStartTest011, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     HdfEffectInfo effectInfo;
@@ -446,7 +446,7 @@ HWTEST_F(HdiUnitTestVibrator, VibratorStartTest011, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, PlayHapticPattern, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_pkg);
@@ -464,7 +464,7 @@ HWTEST_F(HdiUnitTestVibrator, PlayHapticPattern, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, PlayHapticPattern_001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_pkg1);
@@ -482,7 +482,7 @@ HWTEST_F(HdiUnitTestVibrator, PlayHapticPattern_001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, GetHapticStartUpTime, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startUpTime = 0;
@@ -503,7 +503,7 @@ HWTEST_F(HdiUnitTestVibrator, GetHapticStartUpTime, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->StartOnce(g_duration);
@@ -521,7 +521,7 @@ HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_002, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->Start(g_effect1);
@@ -539,7 +539,7 @@ HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_002, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_003, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_pkg);
@@ -557,7 +557,7 @@ HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_003, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_004, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->Start(g_effect1);
@@ -576,7 +576,7 @@ HWTEST_F(HdiUnitTestVibrator, StopV1_2Test_004, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, StartByIntensityTest, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->StartByIntensity(g_effect1, g_intensity);
@@ -595,7 +595,7 @@ HWTEST_F(HdiUnitTestVibrator, StartByIntensityTest, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, StopTest, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->StartOnce(g_duration);
@@ -627,7 +627,7 @@ HWTEST_F(HdiUnitTestVibrator, StopTest, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestVibrator, GetAllWaveInfoTest, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->GetAllWaveInfo(g_vibratorId, g_info);
