@@ -83,6 +83,16 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     return HDF_SUCCESS;
 }
 
+int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct AudioFrameLen *frameLen,
+    struct AudioCaptureFrameInfo *frameInfo)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(frameInfo, HDF_ERR_INVALID_PARAM);
+
+    return HDF_ERR_NOT_SUPPORT;
+}
+
 int32_t AudioGetCapturePositionVdi(struct IAudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
@@ -707,6 +717,7 @@ int32_t AudioCaptureIsSupportsPauseAndResumeVdi(struct IAudioCapture *capture, b
 static void AudioInitCaptureInstanceVdi(struct IAudioCapture *capture)
 {
     capture->CaptureFrame = AudioCaptureFrameVdi;
+    capture->CaptureFrameEc = AudioCaptureFrameEcVdi;
     capture->GetCapturePosition = AudioGetCapturePositionVdi;
     capture->CheckSceneCapability = AudioCaptureCheckSceneCapabilityVdi;
     capture->SelectScene = AudioCaptureSelectSceneVdi;

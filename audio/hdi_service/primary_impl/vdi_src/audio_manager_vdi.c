@@ -20,7 +20,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
-#include "v3_0/iaudio_adapter.h"
+#include "v4_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 static pthread_mutex_t g_managerMutex;
@@ -406,7 +406,7 @@ static int32_t AudioManagerVendorUnloadAdapter(struct IAudioManager *manager, co
 
     pthread_mutex_lock(&g_managerMutex);
     struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)manager;
-    if (priv == NULL || priv->vdiManager == NULL || priv->vdiManager->LoadAdapter == NULL) {
+    if (priv == NULL || priv->vdiManager == NULL || priv->vdiManager->UnloadAdapter == NULL) {
         pthread_mutex_unlock(&g_managerMutex);
         return HDF_ERR_INVALID_PARAM;
     }
