@@ -117,11 +117,12 @@ static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     HDF_LOGI("HdfWpaInterfaceDriverRelease enter.");
     struct HdfWpaRemoteNode *pos = NULL;
     struct HdfWpaRemoteNode *tmp = NULL;
+    pthread_rwlock_wrlock(&g_rwLock);
     if (deviceObject == NULL) {
         HDF_LOGI("deviceObject is NULL.");
+        pthread_rwlock_unlock(&g_rwLock);
         return;
     }
-    pthread_rwlock_wrlock(&g_rwLock);
     g_stop = 1;
     struct HdfWpaStubData *stubData = HdfWpaStubDriver();
     if (stubData == NULL) {
