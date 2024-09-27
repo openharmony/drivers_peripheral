@@ -1108,7 +1108,7 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
     }
     g_usbOpenCount--;
     int32_t ret = 0;
-    if (port->ctrDevHandle != nullptr && usbOpenCount == 0) {
+    if (port->ctrDevHandle != nullptr && g_usbOpenCount == 0) {
         RawUsbCloseCtlProcess(port->ctrDevHandle);
         ret = UsbCloseInterface(port->ctrDevHandle, true);
         if (ret != HDF_SUCCESS) {
