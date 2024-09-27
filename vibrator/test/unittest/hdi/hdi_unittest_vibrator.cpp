@@ -636,6 +636,6 @@ HWTEST_F(HdiUnitTestVibrator, GetAllWaveInfoTest, TestSize.Level1)
     if (g_hapticCapacity.isSupportPresetMapping) {
         EXPECT_EQ(startRet, HDF_SUCCESS);
     } else {
-        HDF_LOGI("%{public}s device is not SupportPresetMapping", __func__ );
+        HDF_LOGI("device is not support preset mapping");
     }
 }
