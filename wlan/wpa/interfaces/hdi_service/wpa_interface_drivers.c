@@ -31,7 +31,6 @@ struct HdfWpaInterfaceHost {
     struct HdfRemoteService **stubObject;
 };
 
-
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 static int g_stop = 0;
 
@@ -40,9 +39,15 @@ static int32_t WpaInterfaceDriverDispatch(
 {
     HDF_LOGI("WpaInterfaceDriverDispatch enter.");
     pthread_rwlock_rdlock(&g_rwLock);
+    if (g_stop == 1 || client == NULL || client->device == NULL ||
+        client->device->service == NULL) {
+        pthread_rwlock_unlock(&g_rwLock);
+        HDF_LOGE("%{public}s: client or client.device or service is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     struct HdfWpaInterfaceHost *wpainterfaceHost = CONTAINER_OF(
         client->device->service, struct HdfWpaInterfaceHost, ioService);
-    if (g_stop == 1 || wpainterfaceHost->service == NULL || wpainterfaceHost->stubObject == NULL) {
+    if (wpainterfaceHost == NULL || wpainterfaceHost->service == NULL || wpainterfaceHost->stubObject == NULL) {
         HDF_LOGE("%{public}s: invalid service obj", __func__);
         pthread_rwlock_unlock(&g_rwLock);
         return HDF_ERR_INVALID_OBJECT;
@@ -112,6 +117,10 @@ static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     HDF_LOGI("HdfWpaInterfaceDriverRelease enter.");
     struct HdfWpaRemoteNode *pos = NULL;
     struct HdfWpaRemoteNode *tmp = NULL;
+    if (deviceObject == NULL) {
+        HDF_LOGI("deviceObject is NULL.");
+        return;
+    }
     pthread_rwlock_wrlock(&g_rwLock);
     g_stop = 1;
     struct HdfWpaStubData *stubData = HdfWpaStubDriver();
@@ -130,9 +139,16 @@ static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     struct HdfWpaInterfaceHost *wpainterfaceHost = CONTAINER_OF(
         deviceObject->service, struct HdfWpaInterfaceHost, ioService);
     StubCollectorRemoveObject(IWPAINTERFACE_INTERFACE_DESC, wpainterfaceHost->service);
+    if (wpainterfaceHost->stubObject != NULL) {
+        *(wpainterfaceHost->stubObject) = NULL;
+    }
+    wpainterfaceHost->stubObject = NULL;
     IWpaInterfaceRelease(wpainterfaceHost->service, true);
     OsalMemFree(wpainterfaceHost);
     wpainterfaceHost = NULL;
+    if (deviceObject->service != NULL) {
+        deviceObject->service = NULL;
+    }
     pthread_rwlock_unlock(&g_rwLock);
 }
 
