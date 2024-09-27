@@ -43,7 +43,7 @@ namespace {
     const std::vector<std::string> g_effect{"haptic.long_press.light", "haptic.slide.light", \
         "haptic.threshold", "haptic.long_press.medium", "haptic.fail", "haptic.common.notice1", \
         "haptic.common.success", "haptic.charging", "haptic.long_press.heavy"};
-    HapticCapacity g_hapticCapacity;
+    HapticCapacity g_hapticCapacity;-
     sptr<V1_3::IVibratorInterface> g_vibratorInterface = nullptr;
 } // namespace
 
