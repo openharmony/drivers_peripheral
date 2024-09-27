@@ -169,10 +169,10 @@ static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, 
     pthread_mutex_lock(&g_service->listMute);
     *componentId = GetNextComponentId();
     CodecComponentTypeServiceSetCodecNode(comp, codecNode);
-    node->componentId = *componentId;
-    node->service = comp;
     DListInsertTail(&node->node, &g_service->head);
     pthread_mutex_unlock(&g_service->listMute);
+    node->componentId = *componentId;
+    node->service = comp;
 #ifdef SUPPORT_ROLE
     err = OmxAdapterSetComponentRole(codecNode, compName);
     if (err != HDF_SUCCESS) {
