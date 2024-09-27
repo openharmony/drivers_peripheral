@@ -80,7 +80,7 @@ HWTEST_F(UsbdFunctionTest, UsbdGetCurrentFunctions001, TestSize.Level1)
     int32_t func = USB_FUNCTION_NONE;
     auto ret = g_usbInterface->GetCurrentFunctions(func);
     HDF_LOGI("UsbdFunctionTest::UsbdGetCurrentFunctions001 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -98,7 +98,7 @@ HWTEST_F(UsbdFunctionTest, UsbdGetCurrentFunctions002, TestSize.Level1)
     int32_t func = USB_FUNCTION_NONE;
     ret = g_usbInterface->GetCurrentFunctions(func);
     HDF_LOGI("UsbdFunctionTest::UsbdFunction001 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**********************************************************************************************************/
@@ -114,7 +114,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions001, TestSize.Level1)
 {
     auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_ACM);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions001 %{public}d SetCurrentFunctions=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -128,7 +128,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions002, TestSize.Level1)
 {
     auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_INVALID);
     HDF_LOGI("UsbdFunctionTest::UsbdFunction002 %{public}d, ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 /**
  * @tc.name: UsbdSetCurrentFunctions003
@@ -141,7 +141,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions003, TestSize.Level1)
 {
     auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_ECM);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions003 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -156,7 +156,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions004, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_ACM | USB_FUNCTION_ECM;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions004 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -170,7 +170,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions005, TestSize.Level1)
 {
     auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_HDC);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions005 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -185,7 +185,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions006, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_ACM | USB_FUNCTION_HDC;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions006 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -200,7 +200,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions007, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_ECM | USB_FUNCTION_HDC;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions007 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -214,7 +214,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions008, TestSize.Level1)
 {
     auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_RNDIS);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions008 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -228,7 +228,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions009, TestSize.Level1)
 {
     auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_STORAGE);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions009 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -243,7 +243,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions010, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_RNDIS | USB_FUNCTION_HDC;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions010 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -258,7 +258,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions011, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_STORAGE | USB_FUNCTION_HDC;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions011 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -273,7 +273,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions012, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_MTP;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions012 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -288,7 +288,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions013, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_PTP;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions013 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -303,7 +303,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions014, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_MTP | USB_FUNCTION_HDC;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions014 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -318,7 +318,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions015, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_PTP | USB_FUNCTION_HDC;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions015 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -333,7 +333,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions016, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_MTP | USB_FUNCTION_RNDIS;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions016 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -348,7 +348,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions017, TestSize.Level1)
     int32_t funcs = USB_FUNCTION_PTP | USB_FUNCTION_RNDIS;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions017 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -362,7 +362,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions018, TestSize.Level1)
 {
     auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_UNSUPPORTED);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions018 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -379,7 +379,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions019, TestSize.Level1)
     ASSERT_EQ(0, ret);
     HDF_LOGI("UsbdFunctionTest::the function was set to none successfully");
     ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_HDC);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -394,7 +394,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole001, TestSize.Level1)
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SOURCE, DATA_ROLE_HOST);
     HDF_LOGI("UsbdFunctionTest::UsbdSetPortRole001 %{public}d ret=%{public}d", __LINE__, ret);
     ret = SwitchErrCode(ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -409,7 +409,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole002, TestSize.Level1)
     auto ret = g_usbInterface->SetPortRole(USB_PORT_ID_INVALID, POWER_ROLE_SOURCE, DATA_ROLE_HOST);
     HDF_LOGI("UsbdFunctionTest::UsbdSetPortRole002 %{public}d ret=%{public}d", __LINE__, ret);
     ret = SwitchErrCode(ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -424,7 +424,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole003, TestSize.Level1)
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, USB_POWER_ROLE_INVALID, DATA_ROLE_DEVICE);
     HDF_LOGI("UsbdFunctionTest::UsbdSetPortRole003 %{public}d ret=%{public}d", __LINE__, ret);
     ret = SwitchErrCode(ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -439,7 +439,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole004, TestSize.Level1)
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SOURCE, USB_DATA_ROLE_INVALID);
     HDF_LOGI("UsbdFunctionTest::UsbdSetPortRole004 %{public}d ret=%{public}d", __LINE__, ret);
     ret = SwitchErrCode(ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -454,7 +454,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole005, TestSize.Level1)
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, USB_POWER_ROLE_INVALID, DATA_ROLE_HOST);
     HDF_LOGI("UsbdFunctionTest::UsbdSetPortRole005 %{public}d ret=%{public}d", __LINE__, ret);
     ret = SwitchErrCode(ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -469,7 +469,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole006, TestSize.Level1)
     auto ret = g_usbInterface->SetPortRole(USB_PORT_ID_INVALID, POWER_ROLE_SOURCE, USB_DATA_ROLE_INVALID);
     HDF_LOGI("UsbdFunctionTest::UsbdSetPortRole006 %{public}d ret=%{public}d", __LINE__, ret);
     ret = SwitchErrCode(ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -484,7 +484,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole007, TestSize.Level1)
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, USB_POWER_ROLE_INVALID, USB_DATA_ROLE_INVALID);
     HDF_LOGI("UsbdFunctionTest::UsbdSetPortRole007 %{public}d ret=%{public}d", __LINE__, ret);
     ret = SwitchErrCode(ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -499,7 +499,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole008, TestSize.Level1)
     auto ret = g_usbInterface->SetPortRole(USB_PORT_ID_INVALID, USB_POWER_ROLE_INVALID, USB_DATA_ROLE_INVALID);
     HDF_LOGI("UsbdFunctionTest::UsbdSetPortRole008 %{public}d ret=%{public}d", __LINE__, ret);
     ret = SwitchErrCode(ret);
-    ASSERT_NE(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -514,7 +514,7 @@ HWTEST_F(UsbdFunctionTest, SetPortRole09, TestSize.Level1)
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE);
     HDF_LOGI("UsbdFunctionTest::SetPortRole09 %{public}d ret=%{public}d", __LINE__, ret);
     ret = SwitchErrCode(ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -532,6 +532,6 @@ HWTEST_F(UsbdFunctionTest, QueryPort001, TestSize.Level1)
     int32_t mode = PORT_MODE_NONE;
     auto ret = g_usbInterface->QueryPort(portId, powerRole, dataRole, mode);
     HDF_LOGI("UsbdFunctionTest::QueryPort001 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 } // namespace

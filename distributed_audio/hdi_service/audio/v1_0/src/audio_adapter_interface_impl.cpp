@@ -867,7 +867,7 @@ int32_t AudioAdapterInterfaceImpl::getEventTypeFromCondition(const std::string &
         DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return ERR_DH_AUDIO_HDF_FAIL;
     }
-    int32_t type = std::stoi(val);
+    int32_t type = std::atoi(val.c_str());
     return static_cast<VolumeEventType>(type);
 }
 
@@ -902,7 +902,7 @@ int32_t AudioAdapterInterfaceImpl::ConvertString2Int(std::string val)
         DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return -1;
     }
-    return std::stoi(val);
+    return std::atoi(val.c_str());
 }
 
 sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::GetRenderImpl(const std::string &content)
@@ -1007,7 +1007,7 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_HDF_FAIL;
     }
-    vol = std::stoi(val);
+    vol = std::atoi(val.c_str());
     cJSON_Delete(jParam);
     return DH_SUCCESS;
 }

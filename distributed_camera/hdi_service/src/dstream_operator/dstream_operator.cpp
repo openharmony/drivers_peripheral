@@ -534,6 +534,17 @@ int32_t DStreamOperator::ChangeToOfflineStream(const std::vector<int32_t> &strea
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }
 
+
+int32_t DStreamOperator::EnableResult(int32_t streamId, const std::vector<uint8_t> &results)
+{
+    return CamRetCode::NO_ERROR;
+}
+
+int32_t DStreamOperator::DisableResult(int32_t streamId, const std::vector<uint8_t> &results)
+{
+    return CamRetCode::NO_ERROR;
+}
+
 cJSON* DStreamOperator::GetFormatObj(const std::string rootNode, cJSON* rootValue, std::string& formatStr)
 {
     cJSON* nodeObj = cJSON_GetObjectItemCaseSensitive(rootValue, rootNode.c_str());

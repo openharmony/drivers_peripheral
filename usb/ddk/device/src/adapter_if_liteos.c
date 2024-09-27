@@ -67,6 +67,10 @@ static int32_t UsbFnAdapterCreateFconfigString(struct FconfigString * const conf
     }
 
     size_t strLen = strlen(name);
+    if (strLen >= SIZE_MAX) {
+        HDF_LOGE("%{public}s: name length is too long", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     configString->len = (uint32_t)strLen;
     configString->s = UsbFnMemCalloc(strLen + 1);
     if (configString->s == NULL) {
