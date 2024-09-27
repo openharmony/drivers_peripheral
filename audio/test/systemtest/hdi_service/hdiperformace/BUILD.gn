@@ -30,7 +30,7 @@ ohos_systemtest("hdf_audio_idlhdi_performace_test") {
   ]
   include_dirs = [ "./../../common/hdi_service_common/include" ]
   external_deps = [
-    "drivers_interface_audio:libaudio_proxy_3.0",
+    "drivers_interface_audio:libaudio_proxy_4.0",
     "hdf_core:libhdf_utils",
   ]
   if (defined(ohos_lite)) {

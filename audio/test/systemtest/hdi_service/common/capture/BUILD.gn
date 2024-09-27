@@ -34,7 +34,7 @@ if (!defined(ohos_lite)) {
 
     external_deps = [
       "bounds_checking_function:libsec_shared",
-      "drivers_interface_audio:libaudio_proxy_3.0",
+      "drivers_interface_audio:libaudio_proxy_4.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
