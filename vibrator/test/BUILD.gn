@@ -38,6 +38,8 @@ if (defined(ohos_lite)) {
     ]
     if (drivers_peripheral_vibrator_feature_model) {
       deps += [ "unittest/hdi:hdf_unittest_hdi_vibrator" ]
+    } else {
+      deps += [ "unittest/hdi:hdi_unittest_vibrator" ]
     }
   }
 }
