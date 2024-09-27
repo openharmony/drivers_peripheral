@@ -45,6 +45,8 @@ if (defined(ohos_lite)) {
         "unittest/hdi:hdf_unittest_hdi_light",
         "unittest/hdi:hdf_unittest_hdi_light_common",
       ]
+    } else {
+      deps += [ "unittest/hdi:hdi_unittest_light" ]
     }
   }
 }
