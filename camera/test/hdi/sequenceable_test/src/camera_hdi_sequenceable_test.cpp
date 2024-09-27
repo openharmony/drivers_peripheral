@@ -171,7 +171,8 @@ HWTEST_F(CameraHdiSequenceableTest, BufferHandleSequenceTest_03, TestSize.Level1
     bufferHandleSequenceble01.operator = (bufferHandleSequenceble02);
     Parcel parcel;
     bufferHandleSequenceble01.Marshalling(parcel);
-    BufferHandleSequenceable::Unmarshalling(parcel);
+    auto bufferHandle = BufferHandleSequenceable::Unmarshalling(parcel);
+    ASSERT_EQ(true, bufferHandle != nullptr);
 }
 
 /**
@@ -187,5 +188,6 @@ HWTEST_F(CameraHdiSequenceableTest, BufferProducerSequenceTest_01, TestSize.Leve
     bufferProducerSequenceble01 = bufferProducerSequenceble02;
     Parcel parcel;
     bufferProducerSequenceble01.Marshalling(parcel);
-    BufferProducerSequenceable::Unmarshalling(parcel);
+    auto bufferProducer = BufferProducerSequenceable::Unmarshalling(parcel);
+    ASSERT_EQ(bufferProducer, nullptr);
 }

@@ -341,8 +341,7 @@ void Test::StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t pr
 
 void Test::StartStream(std::vector<StreamIntent> intents, OHOS::HDI::Camera::V1_3::OperationMode mode)
 {
-    streamOperatorCallbackV1_3 =
-        OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (new TestStreamOperatorCallbackV1_3);
+    streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
     uint32_t mainVersion = 1;
     uint32_t minVersion = 0;
     rc = cameraDeviceV1_3->GetStreamOperator_V1_3(streamOperatorCallbackV1_3, streamOperator_V1_3);

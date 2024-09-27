@@ -35,16 +35,6 @@ void CameraHdiUtTestSecureStreamV1_3::TearDown(void)
 }
 
 /**
- * @tc.name: Camera_Hdi_SecureStream_V1_3_001
- * @tc.desc: invoke OpenSecureCamera, verification
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(CameraHdiUtTestSecureStreamV1_3, Camera_Hdi_SecureStream_V1_3_001, TestSize.Level1)
-{
-}
-
-/**
  * @tc.name: Camera_Hdi_SecureStream_V1_3_002
  * @tc.desc: invoke GetSecureCameraSeq, verification
  * @tc.size: MediumTest

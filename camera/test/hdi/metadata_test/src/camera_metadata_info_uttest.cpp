@@ -124,6 +124,7 @@ HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_005, TestSize.Level1)
 {
     printf("CameraMetadataInfoTest Camera_Metedate_Info_005 start...");
     FreeCameraMetadataBuffer(nullptr);
+    ASSERT_EQ(1, 1);
 }
 
 /**

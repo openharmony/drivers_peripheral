@@ -19,10 +19,10 @@ module_output_path = "drivers_peripheral_camera/camera"
 
 config("camera_ut_test_config") {
   visibility = [ ":*" ]
-
-  cflags_cc = [ "--coverage" ]
-
-  ldflags = [ "--coverage" ]
+  if (enable_camera_coverage) {
+    cflags_cc = [ "--coverage" ]
+    ldflags = [ "--coverage" ]
+  }
 }
 ohos_unittest("camera_usb_test_ut") {
   testonly = true
