@@ -322,6 +322,7 @@ HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest001, TestSize.Level1)
         EXPECT_EQ(state, false);
     } else {
         ASSERT_NE(HDF_SUCCESS, ret);
+        OsalMSleep(3000);
     }
 }
 
