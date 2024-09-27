@@ -251,8 +251,8 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpRead001, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     int32_t ret = g_usbfnMtpInterface->Read(devData);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(devData.size(), static_cast<size_t>(BULK_OUT_LESS_THEN_ONCE));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(devData.size(), static_cast<size_t>(BULK_OUT_LESS_THEN_ONCE));
 }
 
 /**
@@ -274,8 +274,8 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpRead002, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     int32_t ret = g_usbfnMtpInterface->Read(devData);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(devData.size(), static_cast<size_t>(BULK_OUT_ONCE_MAX_SIZE));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(devData.size(), static_cast<size_t>(BULK_OUT_ONCE_MAX_SIZE));
 }
 
 /**
@@ -297,12 +297,12 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpRead003, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     int32_t ret = g_usbfnMtpInterface->Read(devData);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(devData.size(), static_cast<size_t>(BULK_OUT_ONCE_MAX_SIZE));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(devData.size(), static_cast<size_t>(BULK_OUT_ONCE_MAX_SIZE));
     devData.clear();
     ret = g_usbfnMtpInterface->Read(devData);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(devData.size(), static_cast<size_t>(BULK_OUT_MORE_THEN_ONCE - BULK_OUT_ONCE_MAX_SIZE));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(devData.size(), static_cast<size_t>(BULK_OUT_MORE_THEN_ONCE - BULK_OUT_ONCE_MAX_SIZE));
 }
 
 /**
@@ -325,8 +325,8 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpRead004, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     auto ret = g_usbfnMtpInterface->Read(devData);
-    ASSERT_EQ(ret, 0);
-    ASSERT_GE(devData.size(), 0);
+    EXPECT_EQ(ret, 0);
+    EXPECT_GE(devData.size(), 0);
 }
 
 /**
@@ -350,8 +350,8 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpRead005, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     auto ret = g_usbfnMtpInterface->Read(devData);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(devData, expectData);
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(devData, expectData);
     PrintVector("read005", devData, true);
 }
 
@@ -376,7 +376,7 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpWrite001, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     auto ret = g_usbfnMtpInterface->Write(devData);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -399,7 +399,7 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpWrite002, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     auto ret = g_usbfnMtpInterface->Write(devData);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -422,7 +422,7 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpWrite003, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     auto ret = g_usbfnMtpInterface->Write(devData);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -438,7 +438,7 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpWrite004, TestSize.Level1)
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpWrite004 Case Start");
     std::vector<uint8_t> devData;
     auto ret = g_usbfnMtpInterface->Write(devData);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -461,7 +461,7 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpWrite005, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     auto ret = g_usbfnMtpInterface->Write(devData);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
     PrintVector("write005", devData, true);
 }
 
@@ -484,7 +484,7 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpSendEvent001, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     auto ret = g_usbfnMtpInterface->SendEvent(devData);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -505,7 +505,7 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpSendEvent002, TestSize.Level1)
     int32_t c;
     while ((c = getchar()) != '\n' && c != EOF) {}
     auto ret = g_usbfnMtpInterface->SendEvent(devData);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -528,7 +528,7 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpSendEvent003, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     auto ret = g_usbfnMtpInterface->SendEvent(devData);
-    ASSERT_NE(0, ret);
+    EXPECT_NE(0, ret);
     std::cout << "UsbfnMtpSendEvent003===>make sure transfer timeout in PC, then start next test " << std::endl;
 }
 
@@ -551,7 +551,7 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpSendEvent004, TestSize.Level1)
     int32_t c;
     while ((c = getchar()) != '\n' && c != EOF) {}
     auto ret = g_usbfnMtpInterface->SendEvent(devData);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
     PrintVector("event004", devData, true);
 }
 
@@ -577,11 +577,11 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive001, TestSize.Level1)
 
     std::string filePathName = MTP_TEST_RECV_FILE;
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->ReceiveFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
 }
 
 /**
@@ -601,11 +601,11 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive002, TestSize.Level1)
     mfs.length = 0;
     std::string filePathName = MTP_TEST_RECV_FILE;
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->ReceiveFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
 }
 
 /**
@@ -630,11 +630,11 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive003, TestSize.Level1)
 
     std::string filePathName = MTP_TEST_RECV_FILE;
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->ReceiveFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
 }
 
 /**
@@ -659,11 +659,11 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive004, TestSize.Level1)
 
     std::string filePathName = MTP_TEST_RECV_FILE;
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->ReceiveFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
 }
 
 /**
@@ -690,11 +690,11 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive005, TestSize.Level1)
 
     std::string filePathName = MTP_TEST_RECV_FILE;
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->ReceiveFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
 }
 
 /**
@@ -720,11 +720,11 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive006, TestSize.Level1)
 
     std::string filePathName = MTP_TEST_RECV_FILE;
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->ReceiveFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
-    ASSERT_GE(GetFileSize(filePathName), 0);
+    EXPECT_EQ(ret, 0);
+    EXPECT_GE(GetFileSize(filePathName), 0);
 }
 
 /**
@@ -749,11 +749,11 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive007, TestSize.Level1)
 
     std::string filePathName = MTP_TEST_RECV_FILE;
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->ReceiveFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
 }
 
 /**
@@ -778,11 +778,11 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive008, TestSize.Level1)
 
     std::string filePathName = MTP_TEST_RECV_FILE;
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->ReceiveFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
 }
 
 /**
@@ -807,11 +807,11 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive009, TestSize.Level1)
 
     std::string filePathName = MTP_TEST_RECV_FILE;
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->ReceiveFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
-    ASSERT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(GetFileSize(filePathName), static_cast<uint64_t>(mfs.length));
 }
 
 /**
@@ -837,10 +837,10 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend001, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDONLY);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->SendFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -867,10 +867,10 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend002, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDONLY);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->SendFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -891,10 +891,10 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend003, TestSize.Level1)
     std::string filePathName = MTP_TEST_SEND_FILE;
     EXPECT_TRUE(GenerateFile(filePathName, mfs.length));
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDONLY);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->SendFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -921,10 +921,10 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend004, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDONLY);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->SendFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -950,10 +950,10 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend005, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDONLY);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->SendFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -979,10 +979,10 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend006, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDONLY);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->SendFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -1008,10 +1008,10 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend007, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDONLY);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->SendFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -1037,10 +1037,10 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend008, TestSize.Level1)
     while ((c = getchar()) != '\n' && c != EOF) {}
 
     mfs.fd = open(filePathName.c_str(), O_CREAT | O_RDONLY);
-    ASSERT_GT(mfs.fd, 0);
+    EXPECT_GT(mfs.fd, 0);
     auto ret = g_usbfnMtpInterface->SendFile(mfs);
     close(mfs.fd);
-    ASSERT_EQ(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 } // namespace

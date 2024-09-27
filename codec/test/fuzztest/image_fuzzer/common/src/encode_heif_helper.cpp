@@ -19,6 +19,13 @@ namespace OHOS::VDI::HEIF {
 using namespace OHOS::HDI::Codec::Image::V2_0;
 using namespace std;
 
+enum ValueOption : uint8_t {
+    OPTION_0 = 0,
+    OPTION_1,
+    OPTION_2,
+    OPTION_3,
+    OPTION_BUTT
+};
 
 bool HeifEncodeHelper::AllocOutputBuffer(SharedBuffer& output)
 {
@@ -46,19 +53,13 @@ void HeifEncodeHelper::Reset()
     refs_.clear();
 }
 
-ItemRef HeifEncodeHelper::FillRefItem(ItemRef item, uint8_t *data, size_t size)
+ItemRef HeifEncodeHelper::FillRefItem(ItemRef item, uint8_t *data, size_t &size)
 {
     uint8_t *dataEnd = data + size - 1;
     if (dataEnd < (data + sizeof(uint8_t))) {
         return item;
     }
-    enum ValueOption : uint8_t {
-        OPTION_0 = 0,
-        OPTION_1,
-        OPTION_2,
-        OPTION_3,
-        OPTION_BUTT
-    };
+
     switch ((*data) % OPTION_BUTT) {
         case OPTION_0:
             item.type = DIMG;
@@ -74,38 +75,43 @@ ItemRef HeifEncodeHelper::FillRefItem(ItemRef item, uint8_t *data, size_t size)
             break;
     }
     data += sizeof(uint8_t);
+    size -= sizeof(uint8_t);
 
     if (dataEnd < data + sizeof(item.from)) {
         return item;
     }
     item.from = ToUint32(data);
     data += sizeof(item.from);
+    size -= sizeof(item.from);
 
     if (dataEnd < data + sizeof(uint8_t)) {
         return item;
     }
     uint8_t vecSize = (*data) % 2 + 1;
     data += sizeof(vecSize);
+    size -= sizeof(vecSize);
     if (dataEnd < (data + vecSize * sizeof(item.from))) {
         return item;
     } else {
         while (vecSize--) {
             item.to.emplace_back(ToUint32(data));
             data += sizeof(item.from);
+            size -= sizeof(item.from);
         }
     }
     return item;
 }
 
-bool HeifEncodeHelper::FillImageItem(ImgType type, ImageItem& item, uint8_t *data, size_t size)
+bool HeifEncodeHelper::FillImageItem(ImgType type, ImageItem& item, uint8_t *data, size_t &size)
 {
     uint8_t *dataEnd = data + size - 1;
     item.itemName = "";
-    if (dataEnd < data + sizeof(item.id)) {
+    if (dataEnd < data + sizeof(item.id) + sizeof(item.quality) + sizeof(uint8_t)) {
         return false;
     }
     item.id = ToUint32(data);
     data += sizeof(item.id);
+    size -= sizeof(item.id);
 
     item.pixelBuffer = bufferHelper_.CreateImgBuffer(data, size);
     IF_TRUE_RETURN_VAL((type != T_MAP && item.pixelBuffer == nullptr), false);
@@ -113,18 +119,14 @@ bool HeifEncodeHelper::FillImageItem(ImgType type, ImageItem& item, uint8_t *dat
     item.isHidden = (type != PRIMARY_IMG);
     item.compressType = (type == T_MAP ? "none" : "hevc");
 
-    if (dataEnd < (data + sizeof(item.quality))) {
-        return false;
-    }
     item.quality = ToUint32(data);
     data += sizeof(item.quality);
+    size -= sizeof(item.quality);
 
     item.liteProperties = {};
-    if (dataEnd < (data + sizeof(uint8_t))) {
-        return false;
-    }
     uint8_t liteProSize = *data;
     data += sizeof(liteProSize);
+    size -= sizeof(liteProSize);
 
     if (dataEnd < data + liteProSize) {
         return false;
@@ -134,6 +136,7 @@ bool HeifEncodeHelper::FillImageItem(ImgType type, ImageItem& item, uint8_t *dat
     while (liteProSize--) {
         item.liteProperties.push_back(*data);
         data += sizeof(uint8_t);
+        size -= sizeof(uint8_t);
     }
 
     item.sharedProperties = {
@@ -147,6 +150,7 @@ bool HeifEncodeHelper::FillImageItem(ImgType type, ImageItem& item, uint8_t *dat
     }
     uint8_t decision = (*data) % 2;
     data += sizeof(decision);
+    size -= sizeof(decision);
     if (decision) {
         HDF_LOGI("Fill Image SharedProperties");
         item.sharedProperties = bufferHelper_.CreateSharedBuffer(data, size);
@@ -154,7 +158,7 @@ bool HeifEncodeHelper::FillImageItem(ImgType type, ImageItem& item, uint8_t *dat
     return true;
 }
 
-bool HeifEncodeHelper::AssembleParamForOtherImg(uint32_t primaryImgId, uint8_t *data, size_t size)
+bool HeifEncodeHelper::AssembleParamForOtherImg(uint32_t primaryImgId, uint8_t *data, size_t &size)
 {
     uint8_t *dataEnd = data + size - 1;
     if (dataEnd < data + sizeof(uint8_t)) {
@@ -162,6 +166,7 @@ bool HeifEncodeHelper::AssembleParamForOtherImg(uint32_t primaryImgId, uint8_t *
     }
     uint8_t decision = (*data) % 2;
     data += sizeof(uint8_t);
+    size -= sizeof(uint8_t);
 
     if (decision == 1) {
         ImageItem itemAuxlImg;
@@ -202,7 +207,7 @@ bool HeifEncodeHelper::AssembleParamForOtherImg(uint32_t primaryImgId, uint8_t *
     return true;
 }
 
-bool HeifEncodeHelper::AssembleParamForTmap(uint8_t *data, size_t size)
+bool HeifEncodeHelper::AssembleParamForTmap(uint8_t *data, size_t &size)
 {
     ImageItem itemTmap;
     ImageItem itemPrimaryImg;
@@ -245,7 +250,7 @@ bool HeifEncodeHelper::AssembleParamForTmap(uint8_t *data, size_t size)
     return false;
 }
 
-bool HeifEncodeHelper::AssembleParamForPrimaryImg(uint8_t *data, size_t size)
+bool HeifEncodeHelper::AssembleParamForPrimaryImg(uint8_t *data, size_t &size)
 {
     ImageItem itemPrimaryImg;
     HDF_LOGI("AssembleParamForPrimaryImg: Fill ImageItem");
@@ -262,7 +267,7 @@ bool HeifEncodeHelper::AssembleParamForPrimaryImg(uint8_t *data, size_t size)
     return true;
 }
 
-bool HeifEncodeHelper::FillMetaItem(MetaType type, MetaItem& item, uint8_t *data, size_t size)
+bool HeifEncodeHelper::FillMetaItem(MetaType type, MetaItem& item, uint8_t *data, size_t &size)
 {
     uint8_t *dataEnd = data + size - 1;
     item.itemName = "";
@@ -271,6 +276,7 @@ bool HeifEncodeHelper::FillMetaItem(MetaType type, MetaItem& item, uint8_t *data
     }
     item.id = ToUint32(data);
     data += sizeof(item.id);
+    size -= sizeof(item.id);
     item.properties = {};
 
     if (type == USER_DATA) {
@@ -282,6 +288,7 @@ bool HeifEncodeHelper::FillMetaItem(MetaType type, MetaItem& item, uint8_t *data
         }
         uint8_t propertiesSize = *data;
         data += sizeof(propertiesSize);
+        size -= sizeof(propertiesSize);
 
         if (dataEnd < data + propertiesSize) {
             return false;
@@ -290,6 +297,7 @@ bool HeifEncodeHelper::FillMetaItem(MetaType type, MetaItem& item, uint8_t *data
         while (propertiesSize--) {
             item.properties.emplace_back(*data);
             data += sizeof(uint8_t);
+            size -= sizeof(uint8_t);
         }
     } else if (type == EXIF_DATA) {
         static constexpr char EXIF_LABEL[] = "exif";
@@ -299,7 +307,7 @@ bool HeifEncodeHelper::FillMetaItem(MetaType type, MetaItem& item, uint8_t *data
     return (item.data.fd >= 0);
 }
 
-bool HeifEncodeHelper::AssembleParamForMetaData(uint32_t primaryImgId, uint8_t *data, size_t size)
+bool HeifEncodeHelper::AssembleParamForMetaData(uint32_t primaryImgId, uint8_t *data, size_t &size)
 {
     HDF_LOGI("AssembleParamForMetaData");
     uint8_t* dataEnd = data + size - 1;
@@ -308,6 +316,7 @@ bool HeifEncodeHelper::AssembleParamForMetaData(uint32_t primaryImgId, uint8_t *
     }
     uint8_t decision = (*data) % 2;
     data += sizeof(decision);
+    size -= sizeof(decision);
     if (decision) {
         HDF_LOGI("add exif");
         MetaItem metaExifData;

@@ -42,10 +42,9 @@ bool DoHeifEncode(const uint8_t *data, size_t size)
     }
     CodecImageRole role = CodecImageRole(*data);
     ImageAutoIniter autoIniter(image, role);
-    
+
     uint8_t *rawData = const_cast<uint8_t *>(data);
     uint8_t decision = (*rawData) % 2;
-    rawData += sizeof(decision);
 
     OHOS::VDI::HEIF::HeifEncodeHelper heifHelper;
     heifHelper.Reset();

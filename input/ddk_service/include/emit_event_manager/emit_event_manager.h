@@ -30,7 +30,7 @@ public:
     int32_t CreateDevice(const Hid_Device &hidDevice, const Hid_EventProperties &hidEventProperties);
     int32_t EmitEvent(uint32_t deviceId, const std::vector<Hid_EmitItem> &items);
     int32_t DestroyDevice(uint32_t deviceId);
-    int32_t GetCurDeviceId(void);
+    bool GetCurDeviceId(int32_t &id);
     void ClearDeviceMap(void);
 
 private:
