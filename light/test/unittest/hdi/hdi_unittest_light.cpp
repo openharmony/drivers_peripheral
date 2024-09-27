@@ -22,6 +22,8 @@
 #include "v1_0/ilight_interface.h"
 #include "light_type.h"
 
+#define HDF_LOG_TAG "hdi_unittest_light"
+
 using namespace OHOS::HDI::Light::V1_0;
 using namespace testing::ext;
 
@@ -60,6 +62,7 @@ void HdiUnitTestLight::TearDown()
 
 static int32_t IsSupportedLightId(int32_t lightId)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     EXPECT_GT(g_info.size(), 0);
 
     bool result = std::any_of(g_info.begin(), g_info.end(),
@@ -73,6 +76,7 @@ static int32_t IsSupportedLightId(int32_t lightId)
 
 static void LightTest(int32_t lightId, int32_t lightFlashMode, HdfLightEffect &effect)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     if (lightFlashMode != HDF_LIGHT_FLASH_NONE) {
         effect.flashEffect.onTime = ON_TIME;
         effect.flashEffect.offTime = OFF_TIME;
@@ -93,10 +97,11 @@ static void LightTest(int32_t lightId, int32_t lightFlashMode, HdfLightEffect &e
   * @tc.name: CheckLightInstanceIsEmpty
   * @tc.desc: Create a light instance. The instance is not empty.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, CheckLightInstanceIsEmpty001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 }
 
@@ -104,10 +109,11 @@ HWTEST_F(HdiUnitTestLight, CheckLightInstanceIsEmpty001, TestSize.Level1)
   * @tc.name: GetLightInfo001
   * @tc.desc: Get light info.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, GetLightInfo001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t ret = g_lightInterface->GetLightInfo(g_info);
@@ -125,10 +131,11 @@ HWTEST_F(HdiUnitTestLight, GetLightInfo001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryAlwaysOnRed001
   * @tc.desc: The power indicator is steady red.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnRed001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -144,10 +151,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnRed001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryAlwaysOnGreen001
   * @tc.desc: The power indicator is steady green.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnGreen001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -163,10 +171,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnGreen001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryAlwaysOnBlue001
   * @tc.desc: The power indicator is steady blue.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnBlue001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -182,10 +191,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnBlue001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryAlwaysOnWhite001
   * @tc.desc: The power indicator is steady white.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnWhite001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -201,10 +211,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnWhite001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryBlinkRed001
   * @tc.desc: The power indicator is blinking red.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkRed001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -220,10 +231,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkRed001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryBlinkGreen001
   * @tc.desc: The power indicator is blinking green.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkGreen001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -239,10 +251,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkGreen001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryBlinkBlue001
   * @tc.desc: The power indicator is blinking blue.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkBlue001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -258,10 +271,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkBlue001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryBlinkWhite001
   * @tc.desc: The power indicator is blinking white.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkWhite001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -277,10 +291,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkWhite001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryGradientRed001
   * @tc.desc: The power indicator red light gradients.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientRed001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -296,10 +311,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientRed001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryGradientGreen001
   * @tc.desc: The power indicator green light gradients.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientGreen001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -315,10 +331,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientGreen001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryGradientBlue001
   * @tc.desc: The power indicator blue light gradients.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientBlue001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -334,10 +351,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientBlue001, TestSize.Level1)
   * @tc.name: TurnOnLightBatteryGradientWhite001
   * @tc.desc: The power indicator white light gradients.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientWhite001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -353,10 +371,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientWhite001, TestSize.Level1)
   * @tc.name: TurnOnLightNotificationsAlwaysOnRed001
   * @tc.desc: The notification light is steady red.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnRed001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -372,10 +391,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnRed001, TestSize.Leve
   * @tc.name: TurnOnLightNotificationsAlwaysOnGreen001
   * @tc.desc: The notification light is steady green.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnGreen001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -391,10 +411,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnGreen001, TestSize.Le
   * @tc.name: TurnOnLightNotificationsAlwaysOnBlue001
   * @tc.desc: The notification light is steady blue.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnBlue001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -410,10 +431,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnBlue001, TestSize.Lev
   * @tc.name: TurnOnLightNotificationsAlwaysOnWhite001
   * @tc.desc: The notification light is steady white.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnWhite001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -429,10 +451,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnWhite001, TestSize.Le
   * @tc.name: TurnOnLightNotificationsBlinkRed001
   * @tc.desc: Notification light blinking red.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkRed001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -448,10 +471,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkRed001, TestSize.Level1)
   * @tc.name: TurnOnLightNotificationsBlinkGreen001
   * @tc.desc: Notification light blinking green.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkGreen001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -467,10 +491,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkGreen001, TestSize.Level
   * @tc.name: TurnOnLightNotificationsBlinkBlue001
   * @tc.desc: Notification light blinking blue.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkBlue001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -486,10 +511,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkBlue001, TestSize.Level1
   * @tc.name: TurnOnLightNotificationsBlinkWhite001
   * @tc.desc: Notification light blinking white.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkWhite001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -505,10 +531,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkWhite001, TestSize.Level
   * @tc.name: TurnOnLightNotificationsGradientRed001
   * @tc.desc: Notification light gradient red.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientRed001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -524,10 +551,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientRed001, TestSize.Leve
   * @tc.name: TurnOnLightNotificationsGradientGreen001
   * @tc.desc: Notification light gradient green.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientGreen001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -543,10 +571,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientGreen001, TestSize.Le
   * @tc.name: TurnOnLightNotificationsGradientBlue001
   * @tc.desc: Notification light gradient blue.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientBlue001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -562,10 +591,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientBlue001, TestSize.Lev
   * @tc.name: TurnOnLightNotificationsGradientWhite001
   * @tc.desc: Notification light gradient white.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientWhite001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -581,10 +611,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientWhite001, TestSize.Le
   * @tc.name: TurnOnLightAttention001
   * @tc.desc: The reserved indicator is not supported currently.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightAttention001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -600,10 +631,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightAttention001, TestSize.Level1)
   * @tc.name: TurnOnMultiLights001
   * @tc.desc: Turn on multiple lights.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnMultiLights001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
@@ -631,10 +663,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnMultiLights001, TestSize.Level1)
   * @tc.name: TurnOnMultiLights002
   * @tc.desc: Turn on multiple lights.
   * @tc.type: FUNC
-  * @tc.require: AR000I02QU
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnMultiLights002, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_BATTERY;
@@ -668,10 +701,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnMultiLights002, TestSize.Level1)
   * @tc.name: TurnOnLightBlinkException001
   * @tc.desc: The ontime setting is abnormal in blinking mode.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
@@ -700,10 +734,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException001, TestSize.Level1)
   * @tc.name: TurnOnLightBlinkException002
   * @tc.desc: The offtime setting is abnormal in blinking mode.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException002, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
@@ -732,10 +767,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException002, TestSize.Level1)
   * @tc.name: TurnOnLightGradientException001
   * @tc.desc: The ontime setting is abnormal in gradient mode.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightGradientException001, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
@@ -764,10 +800,11 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightGradientException001, TestSize.Level1)
   * @tc.name: TurnOnLightGradientException002
   * @tc.desc: The offtime setting is abnormal in gradient mode.
   * @tc.type: FUNC
-  * @tc.require: AR000HHMA4
+  * @tc.require: #IAU5KS
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightGradientException002, TestSize.Level1)
 {
+    HDF_LOGI("%{public}s in", __func__ );
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
