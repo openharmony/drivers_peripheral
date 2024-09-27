@@ -169,6 +169,8 @@ static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, 
     pthread_mutex_lock(&g_service->listMute);
     *componentId = GetNextComponentId();
     CodecComponentTypeServiceSetCodecNode(comp, codecNode);
+    node->componentId = *componentId;
+    node->service = comp;
     DListInsertTail(&node->node, &g_service->head);
     pthread_mutex_unlock(&g_service->listMute);
 #ifdef SUPPORT_ROLE
@@ -181,8 +183,6 @@ static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, 
         return HDF_ERR_INVALID_PARAM;
     }
 #endif
-    node->componentId = *componentId;
-    node->service = comp;
     CODEC_LOGI("componentId:%{public}d", node->componentId);
     AddDeathRecipientForService(callbacks, *componentId, codecNode);
     return err;
