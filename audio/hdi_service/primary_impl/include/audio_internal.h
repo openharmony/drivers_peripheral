@@ -21,12 +21,12 @@
 #include "hdf_base.h"
 #include "hdf_remote_service.h"
 #include "hdf_sbuf.h"
-#include "v3_0/iaudio_adapter.h"
-#include "v3_0/iaudio_callback.h"
-#include "v3_0/iaudio_capture.h"
-#include "v3_0/iaudio_manager.h"
-#include "v3_0/iaudio_render.h"
-#include "v3_0/audio_types.h"
+#include "v4_0/iaudio_adapter.h"
+#include "v4_0/iaudio_callback.h"
+#include "v4_0/iaudio_capture.h"
+#include "v4_0/iaudio_manager.h"
+#include "v4_0/iaudio_render.h"
+#include "v4_0/audio_types.h"
 
 #ifdef __cplusplus
 extern "C" {

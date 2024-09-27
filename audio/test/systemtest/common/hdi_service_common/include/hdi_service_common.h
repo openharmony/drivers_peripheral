@@ -27,8 +27,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "hdf_base.h"
-#include "v3_0/iaudio_manager.h"
-#include "v3_0/audio_types.h"
+#include "v4_0/iaudio_manager.h"
+#include "v4_0/audio_types.h"
 
 namespace OHOS {
 namespace Audio {
