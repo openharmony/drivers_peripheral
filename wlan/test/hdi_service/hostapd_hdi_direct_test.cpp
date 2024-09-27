@@ -122,16 +122,6 @@ HWTEST_F(HdfHostapdHostDirectTest, SetApNameTest_004, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetApWpaValueTest_005
- * @tc.desc: Hostapd hdi set ap WpaValue feature function test
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(HdfHostapdHostDirectTest, SetApWpaValueTest_005, TestSize.Level1)
-{
-}
-
-/**
  * @tc.name: SetApBandTest_006
  * @tc.desc: Hostapd hdi set ap band feature function test
  * @tc.type: FUNC
