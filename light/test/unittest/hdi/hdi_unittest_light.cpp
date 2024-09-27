@@ -63,7 +63,7 @@ void HdiUnitTestLight::TearDown()
 
 static int32_t IsSupportedLightId(int32_t lightId)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     EXPECT_GT(g_info.size(), 0);
 
     bool result = std::any_of(g_info.begin(), g_info.end(),
@@ -77,7 +77,7 @@ static int32_t IsSupportedLightId(int32_t lightId)
 
 static void LightTest(int32_t lightId, int32_t lightFlashMode, HdfLightEffect &effect)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     if (lightFlashMode != HDF_LIGHT_FLASH_NONE) {
         effect.flashEffect.onTime = ON_TIME;
         effect.flashEffect.offTime = OFF_TIME;
@@ -102,7 +102,7 @@ static void LightTest(int32_t lightId, int32_t lightFlashMode, HdfLightEffect &e
   */
 HWTEST_F(HdiUnitTestLight, CheckLightInstanceIsEmpty001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 }
 
@@ -114,7 +114,7 @@ HWTEST_F(HdiUnitTestLight, CheckLightInstanceIsEmpty001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, GetLightInfo001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t ret = g_lightInterface->GetLightInfo(g_info);
@@ -136,7 +136,7 @@ HWTEST_F(HdiUnitTestLight, GetLightInfo001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnRed001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -156,7 +156,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnRed001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnGreen001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -176,7 +176,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnGreen001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnBlue001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -196,7 +196,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnBlue001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnWhite001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -216,7 +216,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryAlwaysOnWhite001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkRed001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -236,7 +236,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkRed001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkGreen001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -256,7 +256,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkGreen001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkBlue001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -276,7 +276,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkBlue001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkWhite001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -296,7 +296,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryBlinkWhite001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientRed001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -316,7 +316,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientRed001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientGreen001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -336,7 +336,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientGreen001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientBlue001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -356,7 +356,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientBlue001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientWhite001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -376,7 +376,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBatteryGradientWhite001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnRed001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -396,7 +396,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnRed001, TestSize.Leve
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnGreen001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -416,7 +416,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnGreen001, TestSize.Le
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnBlue001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -436,7 +436,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnBlue001, TestSize.Lev
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnWhite001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -456,7 +456,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsAlwaysOnWhite001, TestSize.Le
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkRed001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -476,7 +476,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkRed001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkGreen001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -496,7 +496,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkGreen001, TestSize.Level
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkBlue001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -516,7 +516,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkBlue001, TestSize.Level1
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkWhite001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -536,7 +536,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlinkWhite001, TestSize.Level
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientRed001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -556,7 +556,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientRed001, TestSize.Leve
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientGreen001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -576,7 +576,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientGreen001, TestSize.Le
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientBlue001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -596,7 +596,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientBlue001, TestSize.Lev
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientWhite001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -616,7 +616,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientWhite001, TestSize.Le
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightAttention001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     HdfLightEffect effect = {
@@ -636,7 +636,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightAttention001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnMultiLights001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
@@ -668,7 +668,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnMultiLights001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnMultiLights002, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_BATTERY;
@@ -706,7 +706,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnMultiLights002, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
@@ -739,7 +739,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException002, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
@@ -772,7 +772,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException002, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightGradientException001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
@@ -805,7 +805,7 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightGradientException001, TestSize.Level1)
   */
 HWTEST_F(HdiUnitTestLight, TurnOnLightGradientException002, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s in", __func__ );
+    HDF_LOGI("%{public}s in", __func__);
     ASSERT_NE(nullptr, g_lightInterface);
 
     int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
