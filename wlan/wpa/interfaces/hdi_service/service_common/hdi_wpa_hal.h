@@ -54,7 +54,7 @@ struct StWifiWpaInterface {
     void (*wpaCliClose)(WifiWpaInterface *p);
     int (*wpaCliAddIface)(WifiWpaInterface *p, const AddInterfaceArgv *argv, bool isWpaAdd);
     int (*wpaCliRemoveIface)(WifiWpaInterface *p, const char *name);
-    int (*wpaCliTerminate)();
+    int (*wpaCliTerminate)(void);
 };
 
 WifiWpaInterface *GetWifiWpaGlobalInterface(void);
