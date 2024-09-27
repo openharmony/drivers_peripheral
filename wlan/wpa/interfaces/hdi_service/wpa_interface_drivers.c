@@ -31,6 +31,7 @@ struct HdfWpaInterfaceHost {
     struct HdfRemoteService **stubObject;
 };
 
+
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 static int g_stop = 0;
 
