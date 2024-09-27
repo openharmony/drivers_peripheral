@@ -33,7 +33,7 @@ extern "C" {
 
 #define MAX_CALL_BACK_COUNT 10
 static struct WpaCallbackEvent *g_wpaCallbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
-static pthread_mutex_t g_wpaCallbackMutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_rwlock_t g_wpaCallbackMutex = PTHREAD_RWLOCK_INITIALIZER;
 
 
 int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
@@ -45,39 +45,39 @@ int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, co
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return -1;
     }
-    pthread_mutex_lock(&g_wpaCallbackMutex);
+    pthread_rwlock_wrlock(&g_wpaCallbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_wpaCallbackEventMap[i] != NULL  &&(strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0)
             && g_wpaCallbackEventMap[i]->onRecFunc == onRecFunc) {
             HDF_LOGI("%s the onRecFunc has been registered!", __FUNCTION__);
-            pthread_mutex_unlock(&g_wpaCallbackMutex);
+            pthread_rwlock_unlock(&g_wpaCallbackMutex);
             return 0;
         }
     }
-    pthread_mutex_unlock(&g_wpaCallbackMutex);
     callbackEvent = (struct WpaCallbackEvent *)malloc(sizeof(struct WpaCallbackEvent));
     if (callbackEvent == NULL) {
         HDF_LOGE("%s fail: malloc fail!", __FUNCTION__);
+        pthread_rwlock_unlock(&g_wpaCallbackMutex);
         return -1;
     }
     callbackEvent->eventType = eventType;
     if (strcpy_s(callbackEvent->ifName, IFNAMSIZ, ifName) != 0) {
         free(callbackEvent);
         HDF_LOGE("%s: ifName strcpy_s fail", __FUNCTION__);
+        pthread_rwlock_unlock(&g_wpaCallbackMutex);
         return -1;
     }
     callbackEvent->onRecFunc = onRecFunc;
-    pthread_mutex_lock(&g_wpaCallbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_wpaCallbackEventMap[i] == NULL) {
             g_wpaCallbackEventMap[i] = callbackEvent;
             HDF_LOGD("%s: WifiRegisterEventCallback successful", __FUNCTION__);
             HDF_LOGD("%s: callbackEvent->eventType =%d ", __FUNCTION__, callbackEvent->eventType);
-            pthread_mutex_unlock(&g_wpaCallbackMutex);
+            pthread_rwlock_unlock(&g_wpaCallbackMutex);
             return 0;
         }
     }
-    pthread_mutex_unlock(&g_wpaCallbackMutex);
+    pthread_rwlock_unlock(&g_wpaCallbackMutex);
     free(callbackEvent);
     HDF_LOGE("%s fail: register onRecFunc num more than %d!", __FUNCTION__, MAX_CALL_BACK_COUNT);
     return -1;
@@ -91,7 +91,7 @@ int32_t WpaUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, 
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
-    pthread_mutex_lock(&g_wpaCallbackMutex);
+    pthread_rwlock_wrlock(&g_wpaCallbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_wpaCallbackEventMap[i] != NULL && g_wpaCallbackEventMap[i]->eventType == eventType &&
             (strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0) &&
@@ -99,17 +99,17 @@ int32_t WpaUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, 
             g_wpaCallbackEventMap[i]->onRecFunc = NULL;
             free(g_wpaCallbackEventMap[i]);
             g_wpaCallbackEventMap[i] = NULL;
-            pthread_mutex_unlock(&g_wpaCallbackMutex);
+            pthread_rwlock_unlock(&g_wpaCallbackMutex);
             return HDF_SUCCESS;
         }
     }
-    pthread_mutex_unlock(&g_wpaCallbackMutex);
+    pthread_rwlock_unlock(&g_wpaCallbackMutex);
     return HDF_FAILURE;
 }
 
 void ReleaseEventCallback(void)
 {
-    pthread_mutex_lock(&g_wpaCallbackMutex);
+    pthread_rwlock_wrlock(&g_wpaCallbackMutex);
     for (uint32_t i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_wpaCallbackEventMap[i] != NULL) {
             g_wpaCallbackEventMap[i]->onRecFunc = NULL;
@@ -118,15 +118,15 @@ void ReleaseEventCallback(void)
             break;
         }
     }
-    pthread_mutex_unlock(&g_wpaCallbackMutex);
+    pthread_rwlock_unlock(&g_wpaCallbackMutex);
 }
 
 void WpaEventReport(const char *ifName, uint32_t event, void *data)
 {
     uint32_t i;
     OnReceiveFunc callbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
-    pthread_mutex_lock(&g_wpaCallbackMutex);
 
+    pthread_rwlock_rdlock(&g_wpaCallbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_wpaCallbackEventMap[i] != NULL && ((strstr(ifName, g_wpaCallbackEventMap[i]->ifName))
             || (strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0)) &&
@@ -135,11 +135,11 @@ void WpaEventReport(const char *ifName, uint32_t event, void *data)
             callbackEventMap[i] = g_wpaCallbackEventMap[i]->onRecFunc;
         }
     }
-    pthread_mutex_unlock(&g_wpaCallbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (callbackEventMap[i] != NULL) {
             HDF_LOGI("%s: call event = %u, ifName = %s", __FUNCTION__, event, ifName);
             callbackEventMap[i](event, data, ifName);
         }
     }
+    pthread_rwlock_unlock(&g_wpaCallbackMutex);
 }

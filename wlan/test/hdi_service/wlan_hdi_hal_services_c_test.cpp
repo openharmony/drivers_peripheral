@@ -514,7 +514,7 @@ HWTEST_F(HdfWifiServiceCTest, SetCountryCodeTest_020, TestSize.Level1)
         bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_TIMEOUT || rc == HDF_FAILURE);
         ASSERT_TRUE(flag);
         rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, code, size);
-        ASSERT_EQ(rc, HDF_ERR_TIMEOUT);
+        ASSERT_EQ(rc, HDF_SUCCESS);
         rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
         ASSERT_EQ(rc, HDF_SUCCESS);
     }

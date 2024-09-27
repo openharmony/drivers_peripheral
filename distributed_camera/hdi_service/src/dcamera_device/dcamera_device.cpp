@@ -135,7 +135,7 @@ int32_t DCameraDevice::GetStreamOperator_V1_1(const sptr<HDI::Camera::V1_0::IStr
 }
 
 int32_t DCameraDevice::GetStreamOperator_V1_2(const sptr<HDI::Camera::V1_2::IStreamOperatorCallback> &callbackObj,
-    sptr<IStreamOperator> &streamOperator)
+    sptr<HDI::Camera::V1_2::IStreamOperator> &streamOperator)
 {
     if (callbackObj == nullptr) {
         DHLOGE("DCameraDevice::GetStreamOperator_V1_2, input stream operator callback is null.");
@@ -158,7 +158,7 @@ int32_t DCameraDevice::GetStreamOperator_V1_2(const sptr<HDI::Camera::V1_2::IStr
 }
 
 int32_t DCameraDevice::GetStreamOperator_V1_3(const sptr<HDI::Camera::V1_3::IStreamOperatorCallback> &callbackObj,
-    sptr<IStreamOperator> &streamOperator)
+    sptr<HDI::Camera::V1_3::IStreamOperator> &streamOperator)
 {
     if (callbackObj == nullptr) {
         DHLOGE("DCameraDevice::GetStreamOperator_V1_3, input stream operator callback is null.");

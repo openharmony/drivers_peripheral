@@ -35,14 +35,14 @@ public:
     HeifEncodeHelper() {};
     ~HeifEncodeHelper() {};
     void Reset();
-    bool AssembleParamForTmap(uint8_t *data, size_t size);
-    bool AssembleParamForPrimaryImg(uint8_t *data, size_t size);
-    bool AssembleParamForOtherImg(uint32_t primaryImgId, uint8_t *data, size_t size);
-    bool AssembleParamForMetaData(uint32_t primaryImgId, uint8_t *data, size_t size);
-    bool FillImageItem(ImgType type, OHOS::HDI::Codec::Image::V2_0::ImageItem& item, uint8_t *data, size_t size);
+    bool AssembleParamForTmap(uint8_t *data, size_t &size);
+    bool AssembleParamForPrimaryImg(uint8_t *data, size_t &size);
+    bool AssembleParamForOtherImg(uint32_t primaryImgId, uint8_t *data, size_t &size);
+    bool AssembleParamForMetaData(uint32_t primaryImgId, uint8_t *data, size_t &size);
+    bool FillImageItem(ImgType type, OHOS::HDI::Codec::Image::V2_0::ImageItem& item, uint8_t *data, size_t &size);
     OHOS::HDI::Codec::Image::V2_0::ItemRef FillRefItem(OHOS::HDI::Codec::Image::V2_0::ItemRef item,
-                                                       uint8_t *data, size_t size);
-    bool FillMetaItem(MetaType type, OHOS::HDI::Codec::Image::V2_0::MetaItem& item, uint8_t *data, size_t size);
+                                                       uint8_t *data, size_t &size);
+    bool FillMetaItem(MetaType type, OHOS::HDI::Codec::Image::V2_0::MetaItem& item, uint8_t *data, size_t &size);
     bool AllocOutputBuffer(OHOS::HDI::Codec::Image::V2_0::SharedBuffer& output);
 public:
     std::vector<OHOS::HDI::Codec::Image::V2_0::ImageItem> inputImgs_;
