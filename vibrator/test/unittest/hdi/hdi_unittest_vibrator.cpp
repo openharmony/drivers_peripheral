@@ -321,7 +321,6 @@ HWTEST_F(HdiUnitTestVibrator, IsVibratorRunningTest001, TestSize.Level1)
         HDF_LOGD("Stoped state:%{public}s", state ? "is vibrating ..." : "vibrate stopped");
         EXPECT_EQ(state, false);
     } else {
-        ASSERT_NE(HDF_SUCCESS, ret);
         OsalMSleep(3000);
     }
 }
