@@ -22,6 +22,7 @@ usb_hal_test_path = "//drivers/peripheral/camera/test"
 third_path = "//third_party"
 drivers_path = "//drivers"
 enable_camera_device_utest = false
+enable_camera_coverage = false
 
 declare_args() {
   device_usb_camera_ffmpeg_enable = true

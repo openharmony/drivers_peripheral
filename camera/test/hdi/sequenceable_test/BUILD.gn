@@ -24,10 +24,12 @@ config("camhdi_sequenceable_ut_config") {
     "-DGST_DISABLE_DEPRECATED",
     "-DHAVE_CONFIG_H",
     "-DCOLORSPACE=\"videoconvert\"",
-    "--coverage",
   ]
-  cflags = [ "--coverage" ]
-  ldflags = [ "--coverage" ]
+  if (enable_camera_coverage) {
+    cflags_cc += [ "--coverage" ]
+    cflags = [ "--coverage" ]
+    ldflags = [ "--coverage" ]
+  }
 }
 
 ohos_unittest("camera_hdi_sequenceable_ut") {

@@ -155,7 +155,7 @@ public:
     int streamIdAnalyze = 103;
     std::vector<int> captureIds;
     std::vector<int> streamIds;
-    int32_t imageDataSaveSwitch = SWITCH_ON;
+    int32_t imageDataSaveSwitch = SWITCH_OFF;
     uint32_t itemCapacity = 100;
     uint32_t dataCapacity = 2000;
     uint32_t dataCount = 1;
