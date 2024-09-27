@@ -21,6 +21,7 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <climits>
 
 #include "parameter.h"
 #include "parameters.h"
@@ -44,6 +45,7 @@ constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 constexpr uint8_t  USB_PARAM_REQTYPE = 128;
 constexpr uint8_t  USB_PARAM_STAND_REQTYPE = 0;
+int32_t usbOpenCount = 0;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -1075,6 +1077,11 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
+    if (usbOpenCount >= INT_MAX) {
+        HDF_LOGE("%{public}s: OpenDevice too many times ", __func__);
+        return HDF_FAILURE；
+    }
+    usbOpenCount++;
     port->initFlag = true;
     if (port->ctrDevHandle == nullptr && port->ctrIface != nullptr) {
         HDF_LOGD("%{public}s:start openInterface, busNum: %{public}d, devAddr: %{public}d ",
@@ -1099,8 +1106,9 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: openPort failed", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
+    usbOpenCount--;
     int32_t ret = 0;
-    if (port->ctrDevHandle != nullptr) {
+    if (port->ctrDevHandle != nullptr && usbOpenCount == 0) {
         RawUsbCloseCtlProcess(port->ctrDevHandle);
         ret = UsbCloseInterface(port->ctrDevHandle, true);
         if (ret != HDF_SUCCESS) {
@@ -1108,8 +1116,8 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
             return HDF_FAILURE;
         }
         port->ctrDevHandle = nullptr;
+        port->initFlag = false;
     }
-    port->initFlag = false;
     return HDF_SUCCESS;
 }
 
