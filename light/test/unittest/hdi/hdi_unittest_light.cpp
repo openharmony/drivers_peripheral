@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <securec.h>
 #include "hdf_base.h"
+#include "hdf_log.h"
 #include "osal_time.h"
 #include "v1_0/ilight_interface.h"
 #include "light_type.h"
