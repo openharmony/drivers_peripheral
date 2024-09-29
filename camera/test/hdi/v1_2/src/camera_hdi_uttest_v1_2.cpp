@@ -44,7 +44,7 @@ bool IsTagValueExistsU8(std::shared_ptr<CameraMetadata> ability, uint32_t tag, u
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, tag, &entry);
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
-        for (int i = 0;i < entry.count; i++) {
+        for (int i = 0; i < entry.count; i++) {
             if (entry.data.u8[i] == value) {
                 return true;
             }
@@ -861,7 +861,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_022, TestSize.Level1)
     }
     CAMERA_LOGI("get OHOS_ABILITY_VIDEO_STABILIZATION_MODES success!");
     if (entry.data.u8 != nullptr && entry.count > 0) {
-        for (int i = 0;i < entry.count;i++) {
+        for (int i = 0; i < entry.count; i++) {
             if (entry.data.u8[i] == OHOS_CAMERA_VIDEO_STABILIZATION_OFF) {
                 CAMERA_LOGI("OHOS_CAMERA_VIDEO_STABILIZATION_OFF found!");
             } else if (entry.data.u8[i] == OHOS_CAMERA_VIDEO_STABILIZATION_AUTO) {
