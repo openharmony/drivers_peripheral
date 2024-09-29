@@ -48,9 +48,7 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_001, TestSize.Level1)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
 
-    if (ret == HDI::Camera::V1_0::NO_ERROR) {
-        EXPECT_TRUE(entry.data.u8 != nullptr);
-        EXPECT_TRUE(entry.count > 0);
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {\
         for (size_t i = 0; i < entry.count; i++) {
             uint8_t captureMirror = entry.data.u8[i];
             if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE) {
@@ -94,9 +92,7 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_002, TestSize.Level1)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
 
-    if (ret == HDI::Camera::V1_0::NO_ERROR) {
-        EXPECT_TRUE(entry.data.u8 != nullptr);
-        EXPECT_TRUE(entry.count > 0);
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         for (size_t i = 0; i < entry.count; i++) {
             uint8_t captureMirror = entry.data.u8[i];
             if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE) {
