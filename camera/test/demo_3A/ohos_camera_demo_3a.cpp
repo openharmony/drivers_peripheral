@@ -922,7 +922,7 @@ RetCode OhosCameraDemo::GetExposureCompensationRange(std::shared_ptr<CameraAbili
     std::vector<int32_t>  exposureCompensationRange;
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_COMPENSATION_RANGE, &entry);
-    if (ret != 0 || entry.data.i32 == nullptr || entry.count <= 0) {
+    if (ret != 0 || entry.data.u8 == nullptr || entry.count <= 0) {
         CAMERA_LOGE("demo test: get OHOS_CONTROL_AE_COMPENSATION_RANGE error");
         return RC_ERROR;
     }
