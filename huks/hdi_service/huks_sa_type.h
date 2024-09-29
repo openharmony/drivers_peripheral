@@ -67,6 +67,7 @@ enum HuksErrorCode {
     HUKS_FAILURE = -1,
     HUKS_ERROR_NULL_POINTER = -14,
     HUKS_ERROR_MALLOC_FAIL = -21,
+    HUKS_ERROR_API_NOT_SUPPORTED = -45,
 };
 
 #endif

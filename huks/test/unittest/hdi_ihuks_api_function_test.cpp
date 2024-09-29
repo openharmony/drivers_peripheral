@@ -251,7 +251,6 @@ HWTEST_F(HuksHdiApiTest, HdiFuncPointerTest001, TestSize.Level0)
     ASSERT_NE(g_huksHdiProxy->DeriveKey, nullptr);
     ASSERT_NE(g_huksHdiProxy->Mac, nullptr);
     ASSERT_NE(g_huksHdiProxy->UpgradeKey, nullptr);
-    ASSERT_NE(g_huksHdiProxy->ExportChipsetPlatformPublicKey, nullptr);
     ASSERT_NE(g_huksHdiProxy->GetVersion, nullptr);
 }
 
