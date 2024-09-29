@@ -40,7 +40,7 @@ void CameraMetadataOperatorTest::TearDown(void)
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_001, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_001 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_001 start...\n");
     uint8_t *ret = GetMetadataData(nullptr);
     EXPECT_EQ(ret, nullptr);
 }
@@ -53,7 +53,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_001, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_002, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_002 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_002 start...\n");
     common_metadata_header_t *ret = FillCameraMetadata(nullptr, 0, 0, 0);
     EXPECT_EQ(ret, nullptr);
 }
@@ -66,7 +66,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_002, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_003, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_003 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_003 start...\n");
     int32_t ret = GetMetadataSection(1000000000, 0);
     EXPECT_EQ(ret, -1);
 }
@@ -79,7 +79,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_003, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_004, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_004 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_004 start...\n");
     uint32_t section = 10;
     int32_t ret = GetMetadataSection(16384, &section);
     EXPECT_EQ(ret, 0);
@@ -93,7 +93,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_004, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_005, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_005 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_005 start...\n");
     uint32_t section = 10;
     int32_t ret = GetMetadataSection(20480, &section);
     EXPECT_EQ(ret, 0);
@@ -107,7 +107,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_005, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_006, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_006 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_006 start...\n");
     uint32_t section = 10;
     int32_t ret = GetMetadataSection(1, &section);
     EXPECT_EQ(ret, -1);
@@ -121,7 +121,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_006, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_007, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_007 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_007 start...\n");
     int32_t ret = GetCameraMetadataItemType(0, nullptr);
     EXPECT_EQ(ret, 2);
 }
@@ -134,9 +134,11 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_007, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_008, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_008 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_008 start...\n");
     uint32_t data = 0;
-    GetCameraMetadataItemType(131071, &data);
+    int32_t ret = GetCameraMetadataItemType(131071, &data);
+    printf("Camera_metedate_opertor_008 ret %d\n", ret);
+    ASSERT_EQ(ret, -1);
 }
 
 /**
@@ -147,7 +149,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_008, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_009, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_009 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_009 start...\n");
     const char *ret = GetCameraMetadataItemName(131071);
     EXPECT_EQ(ret, nullptr);
 }
@@ -160,7 +162,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_009, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_010, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_010 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_010 start...\n");
     int32_t ret = CalculateCameraMetadataItemDataSize(8, 0);
     int32_t exp = -1;
     EXPECT_EQ(ret, exp);
@@ -174,7 +176,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_010, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_011, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_011 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_011 start...\n");
     int ret = AddCameraMetadataItem(nullptr, 131071, nullptr, 0);
     EXPECT_EQ(ret, 2);
 }
@@ -187,7 +189,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_011, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_012, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_012 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_012 start...\n");
     common_metadata_header_t *dst = new common_metadata_header_t;
     dst->data_count = 1;
     int ret = AddCameraMetadataItem(dst, 131071, nullptr, 0);
@@ -202,7 +204,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_012, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_013, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_013 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_013 start...\n");
     int ret = GetCameraMetadataItem(nullptr, 0, nullptr);
     EXPECT_EQ(ret, 2);
 }
@@ -215,7 +217,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_013, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_014, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_014 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_014 start...\n");
     int ret = FindCameraMetadataItemIndex(nullptr, 0, 0);
     EXPECT_EQ(ret, 2);
 }
@@ -228,7 +230,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_014, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_015, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_015 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_015 start...\n");
     int ret = MetadataExpandItemMem(nullptr, nullptr, 0);
     EXPECT_EQ(ret, 2);
 }
@@ -241,7 +243,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_015, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_016, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_016 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_016 start...\n");
     int ret = UpdateCameraMetadataItemByIndex(nullptr, 0, nullptr, 0, nullptr);
     EXPECT_EQ(ret, 2);
 }
@@ -254,7 +256,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_016, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_017, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_017 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_017 start...\n");
     common_metadata_header_t *dst = new common_metadata_header_t;
     dst->item_count = 1;
     int ret = UpdateCameraMetadataItemByIndex(dst, 0, nullptr, 0, nullptr);
@@ -269,7 +271,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_017, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_018, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_018 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_018 start...\n");
     common_metadata_header_t *dst = new common_metadata_header_t;
     dst->item_count = 1;
     int ret = UpdateCameraMetadataItem(dst, -131071, nullptr, 0, nullptr);
@@ -284,7 +286,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_018, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_019, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_019 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_019 start...\n");
     common_metadata_header_t *dst = new common_metadata_header_t;
     dst->item_count = 1;
     int ret = DeleteCameraMetadataItemByIndex(nullptr, 0);
@@ -299,7 +301,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_019, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_020, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_020 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_020 start...\n");
     common_metadata_header_t *dst = new common_metadata_header_t;
     dst->item_count = 1;
     int ret = DeleteCameraMetadataItemByIndex(dst, 2);
@@ -314,8 +316,10 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_020, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_021, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_021 start...");
-    DeleteCameraMetadataItem(nullptr, -131071);
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_021 start...\n");
+    int ret = DeleteCameraMetadataItem(nullptr, -131071);
+    printf("Camera_metedate_opertor_021 ret %d\n", ret);
+    ASSERT_EQ(ret, 2);
 }
 
 /**
@@ -326,8 +330,10 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_021, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_022, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_022 start...");
-    GetCameraMetadataItemCount(nullptr);
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_022 start...\n");
+    uint32_t ret = GetCameraMetadataItemCount(nullptr);
+    printf("Camera_metedate_opertor_022 ret %d\n", ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
@@ -338,8 +344,10 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_022, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_023, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_023 start...");
-    GetCameraMetadataItemCapacity(nullptr);
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_023 start...\n");
+    uint32_t ret = GetCameraMetadataItemCapacity(nullptr);
+    printf("Camera_metedate_opertor_022 ret %d\n", ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
@@ -350,8 +358,10 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_023, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_024, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_024 start...");
-    GetCameraMetadataDataSize(nullptr);
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_024 start...\n");
+    uint32_t ret = GetCameraMetadataDataSize(nullptr);
+    printf("Camera_metedate_opertor_022 ret %d\n", ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
@@ -362,8 +372,10 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_024, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_025, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_025 start...");
-    CopyCameraMetadataItems(nullptr, nullptr);
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_025 start...\n");
+    int32_t ret = CopyCameraMetadataItems(nullptr, nullptr);
+    printf("Camera_metedate_opertor_022 ret %d\n", ret);
+    ASSERT_EQ(ret, 2);
 }
 
 /**
@@ -374,8 +386,9 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_025, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_026, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_026 start...");
-    FormatCameraMetadataToString(nullptr);
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_026 start...\n");
+    std::string ret = FormatCameraMetadataToString(nullptr);
+    ASSERT_EQ(true, ret.empty());
 }
 
 /**
@@ -464,9 +477,11 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_DeleteCameraMetadat
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_027, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_027 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_027 start...\n");
     std::vector<vendorTag_t>tagVec;
-    GetAllVendorTags(tagVec);
+    int32_t ret = GetAllVendorTags(tagVec);
+    printf("Camera_metedate_opertor_022 ret %d\n", ret);
+    ASSERT_EQ(ret, -1);
 }
 
 /**
@@ -477,7 +492,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_027, TestSize.Level
  */
 HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_028, TestSize.Level1)
 {
-    printf("CameraMetadataOperatorTest Camera_metedate_opertor_028 start...");
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_028 start...\n");
     int ret = IsCameraMetadataItemExist(nullptr, 0);
     EXPECT_EQ(ret, false);
 }
