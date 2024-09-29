@@ -212,6 +212,15 @@ struct AudioCodecParam {
 };
 
 /**
+ * @brief Defines the <b>IsMvUploadParam</b>.
+ */
+struct IsMvUploadParam {
+    uint32_t size;                 /** Size of the structure */
+    union OMX_VERSIONTYPE version; /** Component version */
+    bool isMvUpload;
+};
+
+/**
  * @brief Enumerates the extended codec indexes.
  */
 enum OmxIndexCodecExType {
@@ -275,6 +284,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamEncOutFrameQp,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamSupportPackInput,
+    /** OMX_CONFIG_BOOLEANTYPE */
+    OMX_IndexParamIsMvUpload,
 };
 
 /**
