@@ -39,7 +39,7 @@ int32_t EmitEventManager::CreateDevice(const Hid_Device &hidDevice, const Hid_Ev
     }
     // get device id
     int32_t id = 0;
-    if (GetCurDeviceId(id) == false) {
+    if (!GetCurDeviceId(id)) {
         HDF_LOGE("%{public}s faild to generate device id", __func__);
         return HID_DDK_FAILURE;
     }
@@ -101,7 +101,7 @@ bool EmitEventManager::GetCurDeviceId(int32_t &id)
         return false;
     }
     if (virtualDeviceMap_.count(lastDeviceId_) == 0) {
-        id = lastDeviceId_;
+        id = static_cast<int32_t>(lastDeviceId_);
         return true;
     }
     uint32_t newId = virtualDeviceMap_.size();
