@@ -43,7 +43,7 @@ bool IsTagValueExistsU8(std::shared_ptr<CameraMetadata> ability, uint32_t tag, u
     common_metadata_header_t* data = ability->get();
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, tag, &entry);
-    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.count.u8 != nullptr && entry.count > 0) {
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         for (int i = 0;i < entry.count; i++) {
             if (entry.data.u8[i] == value) {
                 return true;
@@ -732,7 +732,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_017, TestSize.Level1)
         }
         CAMERA_LOGI("print tag<OHOS_CONTROL_MANUAL_EXPOSURE_TIME> f value end.");
     } else {
-        CAMERA_LOGI("OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME value count is 0");
+        CAMERA_LOGE("OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME not supported");
     }
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
@@ -870,7 +870,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_022, TestSize.Level1)
         }
     } else {
         printf("get tag<OHOS_ABILITY_VIDEO_STABILIZATION_MODES> failed.\n");
-        CAMERA_LOGI("get tag<OHOS_ABILITY_VIDEO_STABILIZATION_MODES> failed.");
+        CAMERA_LOGE("get tag<OHOS_ABILITY_VIDEO_STABILIZATION_MODES> failed.");
     }
 }
 
