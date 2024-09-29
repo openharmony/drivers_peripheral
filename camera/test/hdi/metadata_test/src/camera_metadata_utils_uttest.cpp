@@ -243,4 +243,5 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_006, TestSize.Level1)
     //DecodeFromString::totalLen < ((decodeData - &setting[0]) + itemLen)
     str = "CameraMetadataUtilsTest.Metadata_Utils_006";
     metaData = MetadataUtils::DecodeFromString(str);
+    ASSERT_EQ(metaData, nullptr);
 }

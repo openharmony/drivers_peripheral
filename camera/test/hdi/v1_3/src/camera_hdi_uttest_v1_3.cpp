@@ -2093,7 +2093,7 @@ void FindHumanDetectResult(common_metadata_header_t* streamData)
 void FindOtherDetectResult(common_metadata_header_t* streamData)
 {
     camera_metadata_item_t catFaceEntry;
-    rc = FindCameraMetadataItem(streamData, OHOS_STATISTICS_DETECT_CAT_FACE_INFOS, &catFaceEntry);
+    int32_t rc = FindCameraMetadataItem(streamData, OHOS_STATISTICS_DETECT_CAT_FACE_INFOS, &catFaceEntry);
     if (rc == HDI::Camera::V1_0::NO_ERROR) {
         if (catFaceEntry.data.i32 != nullptr && catFaceEntry.count > 0) {
             CAMERA_LOGI("FindDetectResult cat face result");

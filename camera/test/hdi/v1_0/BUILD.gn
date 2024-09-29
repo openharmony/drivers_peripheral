@@ -24,9 +24,11 @@ if (defined(ohos_lite)) {
       "-DGST_DISABLE_DEPRECATED",
       "-DHAVE_CONFIG_H",
       "-DCOLORSPACE=\"videoconvert\"",
-      "--coverage",
     ]
-    ldflags = [ "--coverage" ]
+    if (enable_camera_coverage) {
+      cflags_cc += [ "--coverage" ]
+      ldflags = [ "--coverage" ]
+    }
     cflags_cc += [ "-std=c++17" ]
   }
 
@@ -95,9 +97,11 @@ if (defined(ohos_lite)) {
       "-DGST_DISABLE_DEPRECATED",
       "-DHAVE_CONFIG_H",
       "-DCOLORSPACE=\"videoconvert\"",
-      "--coverage",
     ]
-    ldflags = [ "--coverage" ]
+    if (enable_camera_coverage) {
+      cflags_cc += [ "--coverage" ]
+      ldflags = [ "--coverage" ]
+    }
   }
 
   ohos_unittest("camera_test_at") {

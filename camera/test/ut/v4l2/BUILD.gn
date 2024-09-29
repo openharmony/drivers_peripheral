@@ -21,10 +21,11 @@ if (defined(ohos_lite)) {
 
   config("camera_ut_test_config") {
     visibility = [ ":*" ]
-
-    cflags_cc = [ "--coverage" ]
-    cflags_cc += [ "-std=c++17" ]
-    ldflags = [ "--coverage" ]
+    cflags_cc = [ "-std=c++17" ]
+    if (enable_camera_coverage) {
+      cflags_cc += [ "--coverage" ]
+      ldflags = [ "--coverage" ]
+    }
   }
 
   unittest("camera_test_v4l2_ut") {
@@ -93,8 +94,9 @@ if (defined(ohos_lite)) {
       "-Wno-error",
       "-std=c++17",
     ]
-
-    ldflags = [ "--coverage" ]
+    if (enable_camera_coverage) {
+      ldflags = [ "--coverage" ]
+    }
   }
   ohos_unittest("camera_test_v4l2_ut") {
     testonly = true
