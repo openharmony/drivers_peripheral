@@ -275,6 +275,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamEncOutFrameQp,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamSupportPackInput,
+    /** OMX_CONFIG_BOOLEANTYPE */
+    OMX_IndexParamIsMvUpload,
 };
 
 /**
