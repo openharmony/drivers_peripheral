@@ -3431,7 +3431,11 @@ static int32_t NtlLinkInit()
         return RET_CODE_FAILURE;
     }
 
-    memset_s(&ntlAddr, sizeof(ntlAddr), 0, sizeof(ntlAddr));
+    if (memset_s(&ntlAddr, sizeof(ntlAddr), 0, sizeof(ntlAddr)) != EOK) {
+        HILOG_ERROR(LOG_CORE, "NtlLinkInit: memset_s is failed");
+        close(fd);
+        return RET_CODE_FAILURE;
+    }
     ntlAddr.nl_family = AF_NETLINK;
     ntlAddr.nl_pid = getpid();
     ntlAddr.nl_groups = 0;
@@ -3460,12 +3464,22 @@ static int32_t SendMsgToKernel(unsigned short nlmsgType, int opt, char *data, in
         return RET_CODE_FAILURE;
     }
 
-    memset_s(&ntlAddr, sizeof(ntlAddr), 0, sizeof(ntlAddr));
+    if (memset_s(&ntlAddr, sizeof(ntlAddr), 0, sizeof(ntlAddr)) != EOK) {
+        HILOG_ERROR(LOG_CORE, "ntlAddr memset_s is failed");
+        free(ntlMsg);
+        ntlMsg = NULL;
+        return RET_CODE_FAILURE;
+    }
     ntlAddr.nl_family = AF_NETLINK;
     ntlAddr.nl_pid = 0;
     ntlAddr.nl_groups = 0;
 
-    memset_s(ntlMsg, len, 0, len);
+    if (memset_s(ntlMsg, len, 0, len) != EOK) {
+        HILOG_ERROR(LOG_CORE, "ntlMsg memset_s is failed");
+        free(ntlMsg);
+        ntlMsg = NULL;
+        return RET_CODE_FAILURE;
+    }
     ntlMsg->hdr.nlmsg_len = NLMSG_LENGTH(DPI_MSG_LEN + datalen + 1);
     ntlMsg->hdr.nlmsg_flags = 0;
     ntlMsg->hdr.nlmsg_type = nlmsgType;
@@ -3473,10 +3487,16 @@ static int32_t SendMsgToKernel(unsigned short nlmsgType, int opt, char *data, in
     ntlMsg->opt = opt;
 
     if (data != NULL && datalen != 0) {
-        memcpy_s(ntlMsg->data, datalen, data, datalen);
+        if (memcpy_s(ntlMsg->data, datalen, data, datalen) != EOK) {
+            HILOG_ERROR(LOG_CORE, "memcpy_s is failed");
+            free(ntlMsg);
+            ntlMsg = NULL;
+            return RET_CODE_FAILURE;
+        }
     }
     ret = sendto(skfd, ntlMsg, ntlMsg->hdr.nlmsg_len, 0, (struct sockaddr*)&ntlAddr, sizeof(ntlAddr));
     free(ntlMsg);
+    ntlMsg = NULL;
     return ret;
 }
 
