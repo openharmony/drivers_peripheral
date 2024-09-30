@@ -109,7 +109,6 @@ if (defined(ohos_lite)) {
     module_out_path = module_output_path
     sources = [
       "$camera_test_path/v1_0/src/camera_3a_uttest.cpp",
-      "$camera_test_path/v1_0/src/camera_hal_hisysevent_test.cpp",
       "$camera_test_path/v1_0/src/device_ability_uttest.cpp",
       "$camera_test_path/v1_0/src/hdi_device_uttest.cpp",
       "$camera_test_path/v1_0/src/hdi_host_uttest.cpp",
