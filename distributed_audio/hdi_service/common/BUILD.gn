@@ -30,6 +30,7 @@ ohos_shared_library("libdaudio_hdf_utils") {
     "c_utils:utils",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "init:libbegetutil",
   ]
 
   defines = [

@@ -17,6 +17,7 @@
 #define OHOS_DAUDIO_UTILS_H
 
 #include <fstream>
+#include <map>
 #include <string>
 
 #include "cJSON.h"
@@ -29,6 +30,8 @@
 #define AUDIO_NORMAL_INTERVAL     20
 namespace OHOS {
 namespace DistributedHardware {
+const std::string DUMP_SERVER_PARA = "sys.daudio_host.dump.write.enable";
+const std::string DUMP_SERVICE_DIR = "/data/local/tmp/";
 std::string GetAnonyString(const std::string &value);
 
 std::string GetChangeDevIdMap(int32_t devId);
@@ -71,6 +74,23 @@ bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::stri
 std::string ParseStringFromArgs(const std::string &args, const char *key);
 
 bool CheckIsNum(const std::string &jsonString);
+
+template <typename T>
+bool GetSysPara(const char *key, T &value);
+bool IsParamEnabled(const std::string &key, bool &isEnabled);
+
+class DumpFileUtil {
+public:
+    static void OpenDumpFile(const std::string &para, const std::string &fileName, FILE **file);
+    static void CloseDumpFile(FILE **dumpFile);
+    static void WriteDumpFile(FILE *dumpFile, void *buffer, size_t bufferSize);
+
+    static std::map<std::string, std::string> g_lastPara;
+
+private:
+    static FILE *OpenDumpFileInner(const std::string &para, const std::string &fileName);
+    static void ChangeDumpFileState(const std::string &para, FILE **dumpFile, const std::string &fileName);
+};
 } // DistributedHardware
 } // OHOS
 #endif

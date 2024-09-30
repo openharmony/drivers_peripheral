@@ -54,6 +54,22 @@ void DHLog(DHLogLevel logLevel, const char *fmt, ...);
             return (ret);                       \
         }                                       \
     } while (0)
+
+#define CHECK_AND_RETURN_RET_LOG(cond, ret, fmt, ...)   \
+    do {                                                \
+        if ((cond)) {                                   \
+            DHLOGE(fmt, ##__VA_ARGS__);                 \
+            return (ret);                               \
+        }                                               \
+    } while (0)
+
+#define CHECK_AND_RETURN_LOG(cond, fmt, ...)   \
+    do {                                       \
+        if ((cond)) {                          \
+            DHLOGE(fmt, ##__VA_ARGS__);        \
+            return;                            \
+        }                                      \
+    } while (0)
 } // Distributedaudio
 } // OHOS
 #endif
