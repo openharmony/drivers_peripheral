@@ -102,7 +102,7 @@ private:
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
-    const std::string HDF_RENDER_FILENAME = "/data/data/daudio/hdf_render_to_sa.pcm";
+    const std::string DUMP_HDF_RENDER_To_SA = "hdf_render_to_sa.pcm";
 
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
@@ -125,6 +125,7 @@ private:
     AudioRenderStatus renderStatus_ = RENDER_STATUS_CLOSE;
     sptr<IDAudioCallback> audioExtCallback_ = nullptr;
     sptr<IAudioCallback> renderCallback_ = nullptr;
+    FILE *dumpFile_ = nullptr;
 };
 } // V1_0
 } // Audio
