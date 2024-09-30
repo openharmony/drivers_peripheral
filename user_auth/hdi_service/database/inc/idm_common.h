@@ -27,7 +27,7 @@ extern "C" {
 #define MAX_CREDENTIAL 100
 #define ROOT_SECRET_LEN 32
 #define NO_CHECK_PIN_EXPIRED_PERIOD 0
-#define MAX_GLOBAL_CONFIG_NUM (1 + MAX_AUTH_TYPE_LEN * 1)
+#define MAX_GLOBAL_CONFIG_NUM 1
 
 typedef struct {
     uint64_t credentialId;
@@ -69,30 +69,16 @@ typedef struct {
 
 enum GlobalConfigTypeHal : int32_t {
     PIN_EXPIRED_PERIOD = 1,
-    ENABLE_STATUS = 2,
 };
 
 union GlobalConfigValueHal {
     int64_t pinExpiredPeriod;
-    bool enableStatus;
 };
 
 typedef struct {
     int32_t type;
     union GlobalConfigValueHal value;
-    int32_t userIds[MAX_USER];
-    uint32_t userIdNum;
-    uint32_t authTypes[MAX_AUTH_TYPE_LEN];
-    uint32_t authTypeNum;
 } GlobalConfigParamHal;
-
-typedef struct {
-    int32_t type;
-    union GlobalConfigValueHal value;
-    int32_t userIds[MAX_USER];
-    uint32_t userIdNum;
-    uint32_t authType;
-} GlobalConfigInfo;
 
 typedef struct {
     uint64_t pinEnrolledSysTime;

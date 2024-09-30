@@ -701,7 +701,8 @@ IAM_STATIC ResultCode GetRemoteExecutorInfoInner(Attribute *attribute, Uint8Arra
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetRemoteExecutorInfo(const Buffer *msg, Uint8Array peerUdid, Uint8Array *subMsgs, int *subMsgSize)
+IAM_STATIC ResultCode GetRemoteExecutorInfo(const Buffer *msg, Uint8Array peerUdid, Uint8Array *subMsgs,
+    int *subMsgSize)
 {
     Uint8Array msgArray = { msg->buf, msg->contentSize };
     SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_CROSS_DEVICE, .peerUdid = peerUdid};
@@ -766,7 +767,8 @@ bool CheckRemoteExecutorInfo(const Buffer *msg, ExecutorInfoHal *infoToCheck)
     return checkPass;
 }
 
-IAM_STATIC ResultCode SetExecutorCollectMsgToAttribute(ScheduleInfoParam *scheduleInfo, const Uint8Array *publicKey, const Uint8Array challenge, Attribute *attribute)
+IAM_STATIC ResultCode SetExecutorCollectMsgToAttribute(ScheduleInfoParam *scheduleInfo, const Uint8Array *publicKey,
+    const Uint8Array challenge, Attribute *attribute)
 {
     Uint8Array localUdid = { scheduleInfo->localUdid, sizeof(scheduleInfo->localUdid) };
     Uint8Array remoteUdid = { scheduleInfo->remoteUdid, sizeof(scheduleInfo->remoteUdid) };
