@@ -93,7 +93,7 @@ typedef struct {
 } WifiCallbackHandler;
 
 typedef struct {
-    void (*onWifiNetlinkMessage) (const std::vector<uint8_t>& recvMsg);
+    void (*onWifiNetlinkMessage) (uint32_t type, const std::vector<uint8_t>& recvMsg);
 } WifiExtCallbackHandler;
 
 typedef struct {
