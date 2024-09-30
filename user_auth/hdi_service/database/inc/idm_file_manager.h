@@ -16,7 +16,10 @@
 #ifndef IDM_FILE_MANAGER_H
 #define IDM_FILE_MANAGER_H
 
+#include <stdint.h>
+
 #include "defines.h"
+#include "idm_common.h"
 #include "linked_list.h"
 
 #ifdef __cplusplus
@@ -26,6 +29,8 @@ extern "C" {
 LinkedList *LoadFileInfo(void);
 ResultCode UpdateFileInfo(LinkedList *userInfoList);
 ResultCode DeleteFile(void);
+ResultCode LoadGlobalConfigInfo(GlobalConfigParamHal *globalConfigInfo, uint32_t len, uint32_t *configInfoNum);
+ResultCode UpdateGlobalConfigFile(GlobalConfigParamHal *globalConfigInfo, uint32_t configInfoNum);
 
 #ifdef __cplusplus
 }

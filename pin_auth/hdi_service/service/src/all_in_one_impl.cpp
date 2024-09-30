@@ -146,7 +146,8 @@ int32_t AllInOneImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
     }
 
     std::vector<uint8_t> challenge;
-    result = callbackObj->OnGetData(algoParameter, 0, algoVersion, challenge);
+    std::string pinComplexityReg = "";
+    result = callbackObj->OnGetData(algoParameter, 0, algoVersion, challenge, pinComplexityReg);
     if (result != SUCCESS) {
         IAM_LOGE("Enroll Pin failed, fail code : %{public}d", result);
         CallError(callbackObj, GENERAL_ERROR);
@@ -218,9 +219,9 @@ int32_t AllInOneImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64
         return HDF_SUCCESS;
     }
 
-    std::vector<uint8_t> challenge;
-    result = callbackObj->OnGetData(
-        pinAlgoParam.algoParameter, pinAlgoParam.subType, pinAlgoParam.algoVersion, pinAlgoParam.challenge);
+    std::string pinComplexityReg = "";
+    result = callbackObj->OnGetData(pinAlgoParam.algoParameter, pinAlgoParam.subType, pinAlgoParam.algoVersion,
+        pinAlgoParam.challenge, pinComplexityReg);
     if (result != SUCCESS) {
         IAM_LOGE("Authenticate Pin failed, fail code : %{public}d", result);
         CallError(callbackObj, GENERAL_ERROR);
