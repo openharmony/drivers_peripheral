@@ -60,7 +60,7 @@ constexpr int32_t SWAP_HEADER_BUF_LEN = 1024;
 constexpr int32_t FILE_MAP_BUF_LEN = 2048;
 // The swap file size, which can be configured in subsequent version.
 constexpr uint64_t SWAP_FILE_SIZE = 17179869184; // 16G
-constexpr uint32_t SWAP_FILE_MODE = 0660;
+constexpr uint32_t SWAP_FILE_MODE = 0600;
 
 constexpr int32_t UUID_VERSION_OFFSET = 6;
 constexpr int32_t UUID_CLOCK_OFFSET = 8;
@@ -179,7 +179,7 @@ int32_t Hibernate::MkSwap()
         if (pagesize == 0) {
             break;
         }
-        unsigned int pages = (SWAP_FILE_SIZE / pagesize) - 1;
+        unsigned int pages = (SWAP_FILE_SIZE / static_cast<unsigned int>(pagesize)) - 1;
         char buff[SWAP_HEADER_BUF_LEN];
         uint32_t *swap = reinterpret_cast<uint32_t *>(buff);
 
@@ -460,7 +460,7 @@ int32_t Hibernate::GetResumeOffset(uint64_t &resumeOffset)
     unsigned long flags = 0;
     struct fiemap *swapFileFiemap = reinterpret_cast<struct fiemap *>(buf);
     struct fiemap_extent *swapFileFmExt = &swapFileFiemap->fm_extents[0];
-    int count = (sizeof(buf) - sizeof(*swapFileFiemap)) / sizeof(struct fiemap_extent);
+    unsigned int count = (sizeof(buf) - sizeof(*swapFileFiemap)) / sizeof(struct fiemap_extent);
 
     if (memset_s(swapFileFiemap, sizeof(buf), 0, sizeof(struct fiemap)) != EOK) {
         close(fd);
