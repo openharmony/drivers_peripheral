@@ -89,11 +89,7 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
         DHLOGE("Read stream data failed.");
         return HDF_FAILURE;
     }
-#ifdef DUMP_CAPTURE_FILE
-    if (dumpFlag_) {
-        SaveFile(HDF_CAPTURE_FILENAME, reinterpret_cast<uint8_t*>(audioData.data.data()), audioData.data.size());
-    }
-#endif
+    DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(audioData.data.data()), audioData.data.size());
     frame.clear();
     frame.resize(devAttrs_.frameSize, 0);
     if (!muteState_.load() && memcpy_s(frame.data(), frame.size(), audioData.data.data(), audioData.data.size()) !=
@@ -144,6 +140,7 @@ int32_t AudioCaptureInterfaceImpl::Start()
     captureStatus_ = CAPTURE_STATUS_START;
     frameIndex_ = 0;
     startTime_ = 0;
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, HDF_CAPTURE_FROM_SA, &dumpFile_);
     return HDF_SUCCESS;
 }
 
@@ -176,6 +173,7 @@ int32_t AudioCaptureInterfaceImpl::Stop()
     }
     std::lock_guard<std::mutex> captureLck(captureMtx_);
     captureStatus_ = CAPTURE_STATUS_STOP;
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
     return HDF_SUCCESS;
 }
 

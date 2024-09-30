@@ -109,11 +109,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     AudioParameter param = { devAttrs_.format, devAttrs_.channelCount, devAttrs_.sampleRate, 0,
         devAttrs_.frameSize, devAttrs_.type};
     AudioData data = { param, frame };
-#ifdef DUMP_RENDER_FILE
-    if (dumpFlag_) {
-        SaveFile(HDF_RENDER_FILENAME, reinterpret_cast<uint8_t*>(data.data.data()), frame.size());
-    }
-#endif
+    DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(data.data.data()), frame.size());
     if (enableFade_ && (currentFrame_ < DURATION_FRAMES_MINUS)) {
         FadeInProcess(DURATION_FRAMES, data.data.data(), frame.size());
     }
@@ -232,6 +228,7 @@ int32_t AudioRenderInterfaceImpl::Start()
     renderStatus_ = RENDER_STATUS_START;
     currentFrame_ = CUR_FRAME_INIT_VALUE;
     frameIndex_ = 0;
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_HDF_RENDER_To_SA, &dumpFile_);
     return HDF_SUCCESS;
 }
 
@@ -265,6 +262,7 @@ int32_t AudioRenderInterfaceImpl::Stop()
     }
     std::lock_guard<std::mutex> renderLck(renderMtx_);
     renderStatus_ = RENDER_STATUS_STOP;
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
     return HDF_SUCCESS;
 }
 
