@@ -23,6 +23,7 @@
 #include "audio_capture_vdi.h"
 #include "audio_common_vdi.h"
 #include "audio_render_vdi.h"
+#include "audio_dfx_vdi.h"
 #include "v4_0/iaudio_callback.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -169,7 +170,9 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     }
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
 
+    int32_t id = SetTimer("Hdi:CreateRender");
     ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiRender);
+    CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateRender fail, ret=%{public}d", ret);
@@ -253,7 +256,9 @@ int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct AudioD
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyCapture, HDF_ERR_INVALID_PARAM);
     pthread_mutex_lock(&g_adapterMutex);
+    int32_t id = SetTimer("Hdi:CreateCapture");
     int32_t ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
+    CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateCapture fail, ret=%{public}d", ret);
@@ -291,8 +296,11 @@ int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t captureId
 
     pthread_mutex_lock(&g_adapterMutex);
     struct IAudioCaptureVdi *vdiCapture = AudioGetVdiCaptureByIdVdi(captureId);
-    CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyCapture, HDF_ERR_INVALID_PARAM);
+    if (vdiCapture == NULL || vdiAdapter->DestroyCapture == NULL) {
+        AUDIO_FUNC_LOGE("invalid parameter");
+        pthread_mutex_unlock(&g_adapterMutex);
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyCapture fail, ret=%{public}d", ret);
@@ -424,6 +432,11 @@ int32_t AudioUpdateAudioRouteVdi(struct IAudioAdapter *adapter, const struct Aud
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(route, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(routeHandle, HDF_ERR_INVALID_PARAM);
+
+    if (route->sinksLen == 0 && route->sourcesLen == 0) {
+        AUDIO_FUNC_LOGE("invalid route value");
+        return HDF_FAILURE;
+    }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
