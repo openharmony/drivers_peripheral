@@ -1172,9 +1172,9 @@ int32_t SndElementWriteSwitch(
     struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, bool on)
 {
     snd_ctl_t *alsaHandle = NULL;
-    snd_ctl_elem_id_t *elem_id = NULL;
-    snd_ctl_elem_info_t *elem_info = NULL;
-    snd_ctl_elem_value_t *elem_value = NULL;
+    snd_ctl_elem_id_t *elem_id;
+    snd_ctl_elem_info_t *elem_info;
+    snd_ctl_elem_value_t *elem_value;
 
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(ctlElem);
