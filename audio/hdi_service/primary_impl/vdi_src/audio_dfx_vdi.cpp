@@ -35,7 +35,7 @@ void HdfAudioFinishTrace(void)
 
 int32_t SetTimer(const char* name)
 {
-    int32_t id =0;
+    int32_t id = 0;
 #ifdef AUDIO_HICOLLIE_ENABLE
     id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer(name, HICOLLIE_TIMEOUT, nullptr, nullptr,
         OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
@@ -49,7 +49,7 @@ void CancelTimer(int32_t id)
 {
 #ifdef AUDIO_HICOLLIE_ENABLE
     if (id != 0) {
-        OHOS::DFX::XCollie::GetInstance().CancelTimer(id);
+        OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
     }
 #else
     (void)id;

@@ -29,4 +29,4 @@ void CancelTimer(int32_t id);
 #ifdef __cplusplus
 }
 #endif
-#endif /* AUDIO_TRACE_VDI_H */
+#endif /* AUDIO_DFX_VDI_H */
