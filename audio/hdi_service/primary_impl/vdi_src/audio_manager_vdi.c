@@ -472,8 +472,7 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
 
     for (descIndex = 0; descIndex < priv->descsCount; descIndex++) {
         AudioEnforceClearAdapterRefCntVdi(descIndex);
-        const char *adapterName = priv->descs[descIndex].adapterName;
-        int32_t ret = VendorUnloadAdapter(manager, adapterName);
+        int32_t ret = VendorUnloadAdapter(manager, priv->descs[descIndex].adapterName);
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGW("audio unload adapter error, ret=%{pulbic}d, adaptername=%{pulbic}s", ret,
                 priv->descs[descIndex].adapterName);
