@@ -154,7 +154,6 @@ if (defined(ohos_lite)) {
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_render.c",
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_snd_render.c",
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_soundcard.c",
-        "//device/board/${product_company}/${device_name}/audio_alsa/vendor_render.c",
         "//third_party/cJSON/cJSON.c",
       ]
       if (defined(is_emulator) && is_emulator) {
