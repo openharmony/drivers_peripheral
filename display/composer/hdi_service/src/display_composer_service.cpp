@@ -373,9 +373,9 @@ int32_t DisplayComposerService::SetHardwareCursorPosition(uint32_t devId, int32_
 {
     DISPLAY_TRACE;
 
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->SetHardwareCursorPosition(devId, x, y);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
 
@@ -383,9 +383,9 @@ int32_t DisplayComposerService::EnableHardwareCursorStats(uint32_t devId, bool e
 {
     DISPLAY_TRACE;
 
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->EnableHardwareCursorStats(devId, enable);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
 
@@ -393,9 +393,9 @@ int32_t DisplayComposerService::GetHardwareCursorStats(uint32_t devId, uint32_t&
 {
     DISPLAY_TRACE;
 
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->GetHardwareCursorStats(devId, frameCount, vsyncCount);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
 
