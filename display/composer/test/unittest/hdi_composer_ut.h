@@ -15,7 +15,7 @@
 
 #ifndef HDI_COMPOSER_UT_H
 #define HDI_COMPOSER_UT_H
-#include "v1_1/display_composer_type.h"
+#include "v1_2/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test_utils.h"
 #include "gtest/gtest.h"
@@ -28,7 +28,7 @@ namespace HDI {
 namespace Display {
 namespace TEST {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 
 class DeviceTest : public ::testing::Test {
 protected:

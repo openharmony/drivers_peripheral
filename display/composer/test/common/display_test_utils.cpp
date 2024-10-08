@@ -20,7 +20,7 @@
 #include "display_test.h"
 #include "buffer_handle.h"
 
-#include "v1_1/display_composer_type.h"
+#include "v1_2/display_composer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
 
 namespace OHOS {
