@@ -16,6 +16,7 @@
 
 #include <hdf_log.h>
 #include <dlfcn.h>
+#include <mutex>
 
 #include "ipc_skeleton.h"
 
@@ -30,6 +31,8 @@ static constexpr int PERMISSION_GRANTED = 0;
 
 static void *g_libHandle = nullptr;
 static VerifyAccessTokenFunc g_verifyAccessToken = nullptr;
+
+static std::mutex g_mutex;
 
 static void InitVerifyAccessToken()
 {
@@ -56,6 +59,7 @@ static void InitVerifyAccessToken()
 
 void DdkPermissionManager::Reset()
 {
+    std::lock_guard<std::mutex> lock(g_mutex);
     g_verifyAccessToken = nullptr;
     if (g_libHandle != nullptr) {
         dlclose(g_libHandle);
@@ -65,6 +69,7 @@ void DdkPermissionManager::Reset()
 
 bool DdkPermissionManager::VerifyPermission(const std::string &permissionName)
 {
+    std::lock_guard<std::mutex> lock(g_mutex);
     InitVerifyAccessToken();
     if (g_verifyAccessToken == nullptr) {
         return false;
