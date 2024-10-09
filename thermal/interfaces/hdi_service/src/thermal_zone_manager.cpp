@@ -167,9 +167,9 @@ int32_t ThermalZoneManager::GetIntervalCommonDivisor(std::vector<int32_t> interv
         return NUM_ZERO;
     }
 
-    int32_t count = intervalList.size();
+    uint32_t count = intervalList.size();
     int32_t commonDivisor = intervalList[0];
-    for (int32_t i = 1; i < count; i++) {
+    for (uint32_t i = 1; i < count; i++) {
         commonDivisor = ThermalHdfUtils::GetMaxCommonDivisor(commonDivisor, intervalList[i]);
     }
     return commonDivisor;
