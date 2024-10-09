@@ -121,7 +121,7 @@ HWTEST_F(NfcVendorAdaptionsTest, VendorIoctlWithResponse001, TestSize.Level1)
     void *pData = nullptr;
     std::vector<uint8_t> pRetVal;
     std::shared_ptr<NfcVendorAdaptions> nfcVendorAdaptions = std::make_shared<NfcVendorAdaptions>();
-    int ret = nfcVendorAdaptions->VendorIoctlWithResponse(arg, pData, pRetVal);
+    int ret = nfcVendorAdaptions->VendorIoctlWithResponse(arg, pData, 0, pRetVal);
     EXPECT_EQ(ret, HDF_FAILURE);
 }
 

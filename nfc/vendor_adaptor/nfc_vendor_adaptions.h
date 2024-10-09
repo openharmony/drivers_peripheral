@@ -52,6 +52,12 @@ const unsigned int VENDOR_IOCTL_INPUT_LEN_INDEX = 0;
 const unsigned int VENDOR_IOCTL_INPUT_START_INDEX = 1;
 const unsigned int VENDOR_IOCTL_INPUT_MIN_LEN = 128;
 
+const unsigned int VENDOR_IOCTL_INPUT_DATA_LEN = 288;
+const unsigned int VENDOR_IOCTL_OUTPUT_DATA_START_INDEX = 288;
+const unsigned int VENDOR_IOCTL_OUTPUT_DATA_LEN = 4128;
+const unsigned int VENDOR_IOCTL_TOTAL_LENGTH = VENDOR_IOCTL_INPUT_DATA_LEN + VENDOR_IOCTL_OUTPUT_DATA_LEN;
+const long VENDOR_GET_HISTORY_NCI_CMD = 112;
+
 struct NfcHalInterface {
     int (*nfcHalOpen)(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback);
     int (*nfcHalWrite)(uint16_t dataLen, const uint8_t *pData);
@@ -85,7 +91,7 @@ public:
     int VendorControlGranted(void) override;
     int VendorPowerCycle(void) override;
     int VendorIoctl(long arg, void *pData) override;
-    int VendorIoctlWithResponse(long arg, void *pData, std::vector<uint8_t> &pRetVal) override;
+    int VendorIoctlWithResponse(long arg, void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal) override;
     int VendorGetConfig(V1_1::NfcVendorConfig &config) override;
     int VendorFactoryReset(void) override;
     int VendorShutdownCase(void) override;
@@ -96,6 +102,7 @@ private:
     void ResetNfcInterface(void);
     int8_t InitNfcHalInterfaces(std::string nfcHalSoName, std::string suffix);
     void CheckFirmwareUpdate(void);
+    int VendorGetHistoryNci(void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal);
 
     void *nfcHalHandle; // handle of nfc hal so
     NfcHalInterface nfcHalInf;

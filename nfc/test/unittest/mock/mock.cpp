@@ -78,7 +78,7 @@ int NfcVendorAdaptions::VendorIoctl(long arg, void *pData)
     return 0;
 }
 
-int NfcVendorAdaptions::VendorIoctlWithResponse(long arg, void *pData, std::vector<uint8_t> &pRetVal)
+int NfcVendorAdaptions::VendorIoctlWithResponse(long arg, void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal)
 {
     return 0;
 }

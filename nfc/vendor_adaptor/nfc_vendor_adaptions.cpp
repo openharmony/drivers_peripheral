@@ -283,7 +283,7 @@ int NfcVendorAdaptions::VendorIoctl(long arg, void *pData)
     return ret;
 }
 
-int NfcVendorAdaptions::VendorIoctlWithResponse(long arg, void *pData, std::vector<uint8_t> &pRetVal)
+int NfcVendorAdaptions::VendorIoctlWithResponse(long arg, void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal)
 {
     if (nfcHalInf.nfcHalIoctl == nullptr) {
         HDF_LOGE("%{public}s: Function null.", __func__);
@@ -292,6 +292,14 @@ int NfcVendorAdaptions::VendorIoctlWithResponse(long arg, void *pData, std::vect
     if (pData == nullptr) {
         HDF_LOGE("%{public}s: input param null.", __func__);
         return HDF_FAILURE;
+    }
+    if (arg == VENDOR_GET_HISTORY_NCI_CMD) {
+        HDF_LOGI("%{public}s: getting history nci from vendor!", __func__);
+        return VendorGetHistoryNci(pData, dataLen, pRetVal);
+    }
+    if (dataLen < VENDOR_IOCTL_INPUT_MIN_LEN || dataLen > VENDOR_IOCTL_TOTAL_LEN) {
+        HDF_LOGE("%{public}s: dataLen is invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
     }
     uint8_t inOutData[VENDOR_IOCTL_TOTAL_LEN] = { 0 };
     if (memcpy_s(inOutData, VENDOR_IOCTL_TOTAL_LEN, pData, VENDOR_IOCTL_INOUT_DATA_LEN) != EOK) {
@@ -304,6 +312,26 @@ int NfcVendorAdaptions::VendorIoctlWithResponse(long arg, void *pData, std::vect
         int i;
         for (i = 0; i <= pTmp[VENDOR_IOCTL_OUTPUT_LEN_INDEX]; i++) {
             pRetVal.push_back(pTmp[VENDOR_IOCTL_OUTPUT_LEN_INDEX + i]);
+        }
+    }
+    return ret;
+}
+
+int NfcVendorAdaptions::VendorGetHistoryNci(void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal)
+{
+    if (dataLen != VENDOR_IOCTL_INPUT_DATA_LEN) {
+        HDF_LOGE("%{public}s: input param data len err.", __func__);
+        return HDF_FAILURE;
+    }
+    std::vector<uint8_t> inOutData(VENDOR_IOCTL_TOTAL_LENGTH, 0);
+    if (memcpy_s(&inOutData[0], inOutData.size(), pData, dataLen) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s pData failed.", __func__);
+        return HDF_FAILURE;
+    }
+    int ret = nfcHalInf.nfcHalIoctl(VENDOR_GET_HISTORY_NCI_CMD, &inOutData[0]);
+    if (ret == HDF_SUCCESS) {
+        for (uint16_t i = 0; i < VENDOR_IOCTL_OUTPUT_DATA_LEN; i++) {
+            pRetVal.push_back(inOutData[VENDOR_IOCTL_OUTPUT_DATA_START_INDEX + i]);
         }
     }
     return ret;
