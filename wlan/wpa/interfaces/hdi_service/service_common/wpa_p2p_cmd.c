@@ -864,12 +864,12 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
     char mode[CMD_SIZE] = {0};
     char pin[CMD_SIZE] = {0};
     char peerDevAddr[CMD_SIZE] = {0};
-    if (memcpy_s(pin, CMD_SIZE, info->pin, CMD_SIZE) != EOK) {
+    if (memcpy_s(pin, CMD_SIZE, info->pin, info->pinLen) != EOK) {
         HDF_LOGE("%{public}s strcpy failed", __func__);
         return HDF_FAILURE;
     }
 
-    if (memcpy_s(peerDevAddr, CMD_SIZE, info->peerDevAddr, CMD_SIZE) != EOK) {
+    if (memcpy_s(peerDevAddr, CMD_SIZE, info->peerDevAddr, info->peerDevAddrLen) != EOK) {
         HDF_LOGE("%{public}s strcpy failed", __func__);
         return HDF_FAILURE;
     }
