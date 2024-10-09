@@ -80,8 +80,9 @@ PowerSupplyProvider::~PowerSupplyProvider()
     for (auto it = nodeCacheFiles_.begin(); it != nodeCacheFiles_.end();) {
         int32_t fd = it->second;
         close(fd);
-        nodeCacheFiles_.erase(it++);
+        it++;
     }
+    nodeCacheFiles_.clear();
 }
 
 inline int32_t PowerSupplyProvider::ParseInt(const char* str)
@@ -285,7 +286,7 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
     }
 
     if (fd != -1) {
-        size_t readSize = pread(fd, buf, size - 1, 0);
+        ssize_t readSize = pread(fd, buf, size - 1, 0);
         buf[readSize] = '\0';
         Trim(buf);
         return HDF_SUCCESS;
@@ -297,7 +298,7 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
         return HDF_ERR_IO;
     }
 
-    size_t readSize = read(fd, buf, size - 1);
+    ssize_t readSize = read(fd, buf, size - 1);
     buf[readSize] = '\0';
     Trim(buf);
     nodeCacheFiles_.insert(std::make_pair(path, fd));
