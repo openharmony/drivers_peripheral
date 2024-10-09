@@ -187,7 +187,7 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_009, TestSize.Level1)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry);
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
-        CAMERA_LOGE("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value start.");
+        CAMERA_LOGI("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value start.");
         constexpr size_t step = 10; // print step
         std::stringstream ss;
         for (size_t i = 0; i < entry.count; i++) {
@@ -198,7 +198,7 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_009, TestSize.Level1)
                 ss.str("");
             }
         }
-        CAMERA_LOGE("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value end.");
+        CAMERA_LOGI("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value end.");
     }
 }
 
