@@ -194,7 +194,9 @@ int32_t AudioCaptureSelectSceneVdi(struct IAudioCapture *capture, const struct A
         return HDF_FAILURE;
     }
 
+    int32_t id = SetTimer("Hdi:SelectScene");
     ret = vdiCapture->SelectScene(vdiCapture, &vdiScene);
+    CancelTimer(id);
     OsalMemFree((void *)vdiScene.desc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture select scene fail, ret=%{public}d", ret);
