@@ -864,7 +864,7 @@ struct UsbFnDeviceDesc *UsbFnCfgMgrGetInstanceFromHCS(const struct DeviceResourc
     ret = UsbFnCfgMgrParseUsbFnDevDesc(node, usbDevDesc);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: parse device descriptor failed", __func__);
-        return NULL;
+        goto FAIL_DEV_STRING;
     }
     ret = UsbFnCfgMgrParseUsbFnDevStrings(node, usbDevDesc);
     if (ret != HDF_SUCCESS) {
@@ -1272,11 +1272,13 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct 
     int32_t ret = snprintf_s(fnCfgPropMgr->name, MAX_LEN, MAX_LEN - 1, "%s", registInfo->name);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        UsbFnMemFree(fnCfgPropMgr);
         return HDF_FAILURE;
     }
     ret = snprintf_s(fnCfgPropMgr->value, MAX_LEN, MAX_LEN - 1, "%s", registInfo->value);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        UsbFnMemFree(fnCfgPropMgr);
         return HDF_FAILURE;
     }
     fnCfgPropMgr->getPropCallback = registInfo->getProp;
