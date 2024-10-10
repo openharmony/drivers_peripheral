@@ -326,7 +326,9 @@ int32_t AudioRenderSelectSceneVdi(struct IAudioRender *render, const struct Audi
         return HDF_FAILURE;
     }
 
+    int32_t id = SetTimer("Hdi:SelectScene");
     ret = vdiRender->SelectScene(vdiRender, &vdiScene);
+    CancelTimer(id);
     OsalMemFree((void *)vdiScene.desc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render select scene fail, ret=%{public}d", ret);
