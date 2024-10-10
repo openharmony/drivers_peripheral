@@ -257,24 +257,6 @@ int32_t WrapCJsonItem(const std::initializer_list<std::pair<std::string, std::st
     return DH_SUCCESS;
 }
 
-static bool IsString(const cJSON *jsonObj, const std::string &key)
-{
-    if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
-        DHLOGE("JSON parameter is invalid.");
-        return false;
-    }
-    cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, key.c_str());
-    if (paramValue == nullptr) {
-        DHLOGE("paramValue is null");
-        return false;
-    }
-
-    if (cJSON_IsString(paramValue)) {
-        return true;
-    }
-    return false;
-}
-
 bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys)
 {
     if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
@@ -286,11 +268,6 @@ bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::stri
         cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, (*it).c_str());
         if (paramValue == nullptr) {
             DHLOGE("JSON parameter does not contain key: %{public}s", (*it).c_str());
-            return false;
-        }
-        bool res = IsString(jsonObj, *it);
-        if (!res) {
-            DHLOGE("The key %{public}s value format in JSON is illegal.", (*it).c_str());
             return false;
         }
     }
