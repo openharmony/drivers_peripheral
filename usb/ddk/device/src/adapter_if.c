@@ -578,7 +578,6 @@ static int32_t UsbFnAdapterCreatPipes(int32_t ep0, const struct UsbFnFunction *f
 {
     uint8_t *dec = NULL;
     uint8_t *whereDec = NULL;
-    int32_t ret;
     uint32_t fsCount;
     uint32_t hsCount;
     uint32_t ssCount;
@@ -593,7 +592,7 @@ static int32_t UsbFnAdapterCreatPipes(int32_t ep0, const struct UsbFnFunction *f
     }
     whereDec = dec;
 
-    ret = memcpy_s(whereDec, header.length, &header, sizeof(struct UsbFunctionfsDescsHeadV2));
+    int32_t ret = memcpy_s(whereDec, header.length, &header, sizeof(struct UsbFunctionfsDescsHeadV2));
     if (ret != EOK) {
         UsbFnMemFree(dec);
         return HDF_FAILURE;
