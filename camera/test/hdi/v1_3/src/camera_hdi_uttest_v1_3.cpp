@@ -2045,7 +2045,9 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_049, TestSize.Level1)
         .height = 0,
         .format = 0,
         .dataspace = 0,
-        .bufferQueue = nullptr
+        .bufferQueue = consumer2->CreateProducerSeq([this](void *addr, uint32_t size) {
+            cameraTest->DumpImageFile(107, "yuv", addr, size);
+        }),
     };
     cameraTest->streamInfoMeta->extendedStreamInfos = {extendedStreamInfo};
     cameraTest->DefaultInfosMeta(cameraTest->streamInfoMeta);
@@ -2054,13 +2056,21 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_049, TestSize.Level1)
     cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
-        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_3::VIDEO),
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_3::CAPTURE),
         cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t movingPhoto = static_cast<uint8_t>(OHOS_CAMERA_MOVING_PHOTO_ON);
+    modeSetting->addEntry(OHOS_CONTROL_MOVING_PHOTO, &movingPhoto, 1);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
+    cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
+
     sleep(UT_SECOND_TIMES);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-    cameraTest->StartCapture(cameraTest->streamIdMeta, cameraTest->captureIdMeta, false, true);
-    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdMeta};
+    cameraTest->StartCapture(cameraTest->streamIdMeta, cameraTest->captureIdMeta, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdMeta};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
