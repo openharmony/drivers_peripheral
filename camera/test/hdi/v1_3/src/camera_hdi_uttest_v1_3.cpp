@@ -2038,6 +2038,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_049, TestSize.Level1)
     // meta streamInfo
     cameraTest->streamInfoMeta = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     // meta extended streamInfo
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer2 =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     OHOS::HDI::Camera::V1_1::ExtendedStreamInfo extendedStreamInfo {
         .type = static_cast<OHOS::HDI::Camera::V1_1::ExtendedStreamInfoType>(
             OHOS::HDI::Camera::V1_3::EXTENDED_STREAM_INFO_META),
