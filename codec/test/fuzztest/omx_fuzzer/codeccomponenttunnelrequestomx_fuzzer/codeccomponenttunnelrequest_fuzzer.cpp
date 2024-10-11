@@ -23,7 +23,7 @@ namespace {
         uint32_t port;
         int32_t tunneledComp;
         uint32_t tunneledPort;
-        struct OMX_TUNNELSETUPTYPE *tunnelSetup;
+        struct OMX_TUNNELSETUPTYPE tunnelSetup;
     };
 }
 
@@ -48,7 +48,7 @@ namespace Codec {
         }
 
         int32_t ret = g_component->ComponentTunnelRequest(g_component, params.port, params.tunneledComp,
-            params.tunneledPort, params.tunnelSetup);
+            params.tunneledPort, &(params.tunnelSetup));
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: ComponentTunnelRequest failed, ret is [%{public}x]\n", __func__, ret);
         }
