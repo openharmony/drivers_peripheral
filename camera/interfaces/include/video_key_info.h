@@ -88,11 +88,18 @@ const std::string imageScore = "imageScore";
 const int32_t VIDEO_KEY_IMAGE_SCORE = 0x09;
 
 /**
- * @brief Indicates the continuous fromat of image. The value type is int32_t.
+ * @brief Indicates the continuous format of image. The value type is int32_t.
  * 0 rgba; 1:jpg; 2:heif
  */
 const std::string deferredImageFormat = "deferredImageFormat";
 const int32_t VIDEO_KEY_DEFERRED_IMAGE_FORMAT = 0x0A;
+
+/**
+ * @brief Indicates the count of image. The value type is int32_t.
+ * include main image and extend images
+ */
+const std::string imageCount = "imageCount";
+const int32_t VIDEO_KEY_DEFEREED_COUNT = 0x0B;
 
 /**
  * @brief Indicates the quality level of depth data. The value type is int32_t.
@@ -101,7 +108,7 @@ const std::string depthDataQualityLevel = "depthDataQualityLevel";
 const int32_t VIDEO_KEY_DEPTH_DATA_QUALITY_LEVEL = 0x0C;
 
 /**
- * @brief Indicates the sequenceId of capture. The value type is int32_t.
+ * @brief Indicates the sequenceId of burst capture. The value type is int32_t.
  */
 const std::string burstSequenceId = "burstSequenceId";
 const int32_t VIDEO_KEY_BURST_SEQUENCE_ID = 0x0D;
