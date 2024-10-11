@@ -37,7 +37,7 @@ public:
     virtual int VendorControlGranted(void);
     virtual int VendorPowerCycle(void);
     virtual int VendorIoctl(long arg, void *pData);
-    virtual int VendorIoctlWithResponse(long arg, void *pData, std::vector<uint8_t> &pRetVal);
+    virtual int VendorIoctlWithResponse(long arg, void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal);
     virtual int VendorGetConfig(V1_1::NfcVendorConfig &config);
     virtual int VendorFactoryReset(void);
     virtual int VendorShutdownCase(void);
