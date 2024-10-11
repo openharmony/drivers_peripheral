@@ -18,25 +18,11 @@
 
 #include <securec.h>
 
-namespace {
-    struct AllParameters {
-        uint32_t paramIndex;
-        int8_t *paramStruct;
-        uint32_t paramStructLen;
-    };
-}
-
 namespace OHOS {
 namespace Codec {
     bool CodecGetParameter(const uint8_t *data, size_t size)
     {
-        struct AllParameters params;
-        if (data == nullptr || size < sizeof(params)) {
-            return false;
-        }
-
-        if (memcpy_s(reinterpret_cast<void *>(&params), sizeof(params), data, sizeof(params)) != 0) {
-            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+        if (data == nullptr) {
             return false;
         }
 
@@ -45,9 +31,10 @@ namespace Codec {
             HDF_LOGE("%{public}s: Preconditions failed\n", __func__);
             return false;
         }
- 
-        int32_t ret = g_component->GetParameter(g_component, params.paramIndex, params.paramStruct,
-            params.paramStructLen);
+
+        int32_t ret = g_component->GetParameter(g_component, static_cast<uint32_t>(data[0]),
+                                                reinterpret_cast<int8_t *>(const_cast<uint8_t*>(data)),
+                                                size);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetParameter failed, ret is [%{public}x]\n", __func__, ret);
         }

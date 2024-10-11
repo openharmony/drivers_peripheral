@@ -42,11 +42,6 @@ namespace Codec {
         }
 
         std::vector<CodecCompCapability> caps;
-        if (count != (static_cast<uint32_t>(*(const_cast<uint8_t *>(data))))) {
-            HDF_LOGE("%{public}s: The length does not match!\n", __func__);
-            return false;
-        }
-
         err = omxMgr_->GetComponentCapabilityList(caps,
             static_cast<uint32_t>(*(const_cast<uint8_t *>(data))));
         if (err != HDF_SUCCESS) {
