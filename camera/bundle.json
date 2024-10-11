@@ -35,7 +35,7 @@
         "ffmpeg"
       ],
       "third_party": [
-        "libjpeg-turbo",
+        "libjpeg-turbo"
       ]
     },
     "build": {
