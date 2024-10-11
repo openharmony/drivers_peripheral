@@ -44,7 +44,6 @@ constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 constexpr uint8_t  USB_PARAM_REQTYPE = 128;
 constexpr uint8_t  USB_PARAM_STAND_REQTYPE = 0;
-constexpr int32_t  USB_TRANSFER_TIMEOUT = 1000;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -160,7 +159,7 @@ int32_t UsbImpl::UsbControlTransferEx(HostDevice *dev, UsbControlParams *ctrPara
         return HDF_FAILURE;
     }
 
-    if (dev == nullptr || dev->ctrDevHandle == nullptr || ctrParams == nullptr || ctrParams->data == nullptr) {
+    if (dev == nullptr || dev->ctrDevHandle == nullptr || ctrParams == nullptr) {
         HDF_LOGE("%{public}s:invalid params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1097,13 +1096,6 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
     int32_t ret = 0;
     if (port->ctrDevHandle != nullptr) {
         RawUsbCloseCtlProcess(port->ctrDevHandle);
-        uint8_t activeConfig = 0;
-        uint16_t length = 1;
-        UsbControlParams controlParams;
-        MakeGetActiveUsbControlParams(&controlParams, &activeConfig, length, 0, 0);
-        UsbControlTransferEx(port, &controlParams, USB_TRANSFER_TIMEOUT);
-        HDF_LOGD("%{public}s:start closeInterface,busNum: %{public}d, devAddr: %{public}d ",
-            __func__, dev.busNum, dev.devAddr);
         ret = UsbCloseInterface(port->ctrDevHandle, true);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:usbCloseInterface ctrDevHandle failed.", __func__);

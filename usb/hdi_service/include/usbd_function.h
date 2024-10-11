@@ -93,11 +93,13 @@ private:
     static int32_t SetFunctionToStorageHdc();
     static int32_t SetFunctionToManufactureHdc();
     static int32_t SetDDKFunction(uint32_t funcs);
-    static int32_t UsbdEnableDevice();
+    static int32_t UsbdEnableDevice(int32_t funcs);
     static int32_t UsbdWaitUdc();
     static int32_t UsbdWaitToNone();
     static int32_t UsbdInitDDKFunction(uint32_t funcs);
-    static int32_t UsbdSetKernelFunction(int32_t kfuns);
+    static int32_t UsbdSetKernelFunction(int32_t kfuns, int32_t funcs);
+    static int32_t UsbdReadUdc(char* udcName, size_t len);
+    static int32_t UsbdWriteUdc(char* udcName, size_t len);
     static void UsbdUnregisterDevice(const std::string &serviceName);
     static int32_t UsbdRegisterDevice(const std::string &serviceName);
     static int32_t InitMtp();

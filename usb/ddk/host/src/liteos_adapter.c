@@ -1134,6 +1134,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
     ret = OsInitDevice(dev, busNum, usbAddr);
     if (ret) {
         DPRINTFN(0, "%s: OsInitDevice failed ret=%d\n", __func__, ret);
+        RawUsbMemFree(dev->privateData);
         RawUsbMemFree(dev);
         goto ERR;
     }
