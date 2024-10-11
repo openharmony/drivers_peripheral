@@ -14,7 +14,7 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 
-ohos_shared_library("libpin_auth_interface_service_2.0_fuzzer") {
+ohos_source_set("libpin_auth_interface_service_2.0_fuzzer") {
   branch_protector_ret = "pac_ret"
   include_dirs = [
     "../../../../hdi_service/service/inc",
@@ -60,7 +60,6 @@ ohos_shared_library("libpin_auth_interface_service_2.0_fuzzer") {
     "openssl:libcrypto_shared",
   ]
 
-  install_images = [ chipset_base_dir ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_pin_auth"
