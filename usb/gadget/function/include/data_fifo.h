@@ -17,6 +17,7 @@
 #define HDF_USB_DATA_FIFO_H
 
 #include "hdf_base.h"
+#include "hdf_log.h"
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -36,6 +37,10 @@ struct DataFifo {
 /* DataFifo Helper function */
 static inline void DataFifoInit(struct DataFifo *fifo, uint32_t size, void *data)
 {
+    if (size == 0) {
+        HDF_LOGE("%{public}s: Fifo size is zero", __func__);
+        return;
+    }
     fifo->rdIdx = 0;
     fifo->wrIdx = 0;
     fifo->size = size;
