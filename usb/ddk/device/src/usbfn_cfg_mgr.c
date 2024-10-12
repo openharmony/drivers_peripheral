@@ -1273,10 +1273,14 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct 
     struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
     uint8_t isDevProp = (uint8_t)IsDevDescProp(registInfo->name);
     int32_t isRegist = IsPropRegisted(intf, registInfo->name);
-    UsbFnCfgMgrCheckRegist(intf, registInfo, isDevProp, isRegist, fnCfgPropMgr);
+    int32_t ret = UsbFnCfgMgrCheckRegist(intf, registInfo, isDevProp, isRegist, fnCfgPropMgr);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: UsbFnCfgMgrCheckRegist failed", __func__);
+        return HDF_FAILURE;
+    }
     fnCfgPropMgr->isDevProp = isDevProp;
     fnCfgPropMgr->intf = intf;
-    int32_t ret = snprintf_s(fnCfgPropMgr->name, MAX_LEN, MAX_LEN - 1, "%s", registInfo->name);
+    ret = snprintf_s(fnCfgPropMgr->name, MAX_LEN, MAX_LEN - 1, "%s", registInfo->name);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
         if (isRegist == 0) {
