@@ -196,7 +196,8 @@ void Test::DefaultMeta(
     infos->v1_0.height_ = metaHeight;
     infos->v1_0.format_ = snapshotFormat;
     infos->v1_0.dataspace_ = UT_DATA_SIZE;
-    infos->v1_0.intent_ = StreamIntent::STILL_CAPTURE;
+    infos->v1_0.intent_ = StreamIntent::VIDEO;
+    infos->v1_0.encodeType_ = ENCODE_TYPE_H265;
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
 }
 
