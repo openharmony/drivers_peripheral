@@ -22,6 +22,12 @@
 using namespace OHOS::HDI::Codec::Image::V2_0;
 using namespace OHOS;
 using namespace std;
+
+extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
+{
+    return 0;
+}
+
 namespace OHOS {
 namespace Codec {
 namespace Image {

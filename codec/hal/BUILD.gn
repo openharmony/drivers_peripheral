@@ -201,7 +201,6 @@ ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
   external_deps += [ "openmax:libopenmax_static" ]
   defines = [ "LOG_TAG_HDI_CLIENT" ]
   install_images = [ chipset_base_dir ]
-  innerapi_tags = [ "passthrough" ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
 }
