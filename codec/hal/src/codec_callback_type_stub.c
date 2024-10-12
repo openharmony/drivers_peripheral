@@ -25,7 +25,7 @@
 #include "codec_log_wrapper.h"
 #include "codec_types.h"
 
-#define CODEC_CALLBACK_SO_PATH "libcodec_hdi_omx_callback_type_service_impl.z.so"
+#define OMX_CALLBACK_IMPLEMENT  "libcodec_hdi_omx_callback_type_service_impl"
 
 typedef void (*SERVICE_CONSTRUCT_FUNC)(struct CodecCallbackType *);
 
@@ -237,8 +237,17 @@ static int32_t CodecCallbackTypeServiceOnRemoteRequest(struct HdfRemoteService *
 
 static void *LoadServiceHandler(void)
 {
+    char *libPath = NULL;
     void *handler = NULL;
-    handler = dlopen(CODEC_CALLBACK_SO_PATH, RTLD_LAZY);
+
+    char pathBuf[PATH_MAX] = {'\0'};
+    libPath = HDF_LIBRARY_FULL_PATH(OMX_CALLBACK_IMPLEMENT);
+    if (realpath(libPath, pathBuf) == NULL) {
+        CODEC_LOGE("realpath failed!");
+        return NULL;
+    }
+
+    handler = dlopen(pathBuf, RTLD_LAZY);
     if (handler == NULL) {
         CODEC_LOGE("dlopen failed %{public}s", dlerror());
         return NULL;
@@ -267,6 +276,7 @@ struct CodecCallbackType *CodecCallbackTypeStubGetInstance(void)
 
     if (!HdfRemoteServiceSetInterfaceDesc(stub->service.remote, "ohos.hdi.codec_service")) {
         CODEC_LOGE("failed to init interface desc");
+        OsalMemFree(stub);
         return NULL;
     }
 

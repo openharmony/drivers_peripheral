@@ -41,8 +41,6 @@ protected:
     CodecDfxService() = default;
 
 private:
-    void GetBuffCount(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode,
-                      uint32_t &inputBuffCount, uint32_t &outputBuffCount);
     sptr<CodecComponentManagerService> managerService_;
     static CodecDfxService dfxInstance_;
     static HdfSBuf *reply_;

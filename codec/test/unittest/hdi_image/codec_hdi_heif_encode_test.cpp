@@ -270,6 +270,57 @@ public:
     uint32_t filledLen_;
 };
 
+// [OK] primary image
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_001, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtNv12_);
+    inputImgs_.emplace_back(primaryImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(filledLen_ > 0);
+}
+
+// [OK] primary image + auxl image + thumnail + userdata
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_002, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtRgba_);
+    ASSERT_TRUE(SetValidNclxColor(primaryImageItem));
+    ImageItem auxlImageItem = CreateImageItem(AUXILIARY_IMG, pixelFmtRgba_);
+    ASSERT_TRUE(SetValidNclxColor(auxlImageItem));
+    ImageItem thumImageItem = CreateImageItem(THUMBNAIL_IMG, pixelFmtRgba_);
+    ASSERT_TRUE(SetValidNclxColor(thumImageItem));
+    refs_.emplace_back(ItemRef {
+        .type = AUXL,
+        .auxType = "",
+        .from = auxlImageItem.id,
+        .to = { primaryImageItem.id }
+    });
+    refs_.emplace_back(ItemRef {
+        .type = THMB,
+        .auxType = "",
+        .from = thumImageItem.id,
+        .to = { primaryImageItem.id }
+    });
+    inputImgs_.emplace_back(primaryImageItem);
+    inputImgs_.emplace_back(auxlImageItem);
+    inputImgs_.emplace_back(thumImageItem);
+    MetaItem metaUserData = CreateMetaItem(USER_DATA);
+    refs_.emplace_back(ItemRef {
+        .type = CDSC,
+        .auxType = "",
+        .from = metaUserData.id,
+        .to = { primaryImageItem.id }
+    });
+    inputMetas_.emplace_back(metaUserData);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(filledLen_ > 0);
+}
+
 // [FAIL] auxl image only
 HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_003, TestSize.Level1)
 {
@@ -586,6 +637,31 @@ HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_019, TestSize.Level
     int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, errOurput, filledLen_);
     ASSERT_NE(ret, HDF_SUCCESS);
     ASSERT_EQ(filledLen_, 0);
+}
+
+// [OK] primary image + gainmap image
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_020, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem tmapImageItem = CreateImageItem(T_MAP, pixelFmtNv12_);
+    ASSERT_TRUE(SetPropeForTmap(tmapImageItem));
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtNv12_);
+    ASSERT_TRUE(SetValidNclxColor(primaryImageItem));
+    ImageItem gainMapImageItem = CreateImageItem(GAIN_MAP, pixelFmtNv12_);
+    ASSERT_TRUE(SetValidNclxColor(gainMapImageItem));
+    refs_.emplace_back(ItemRef {
+        .type = DIMG,
+        .auxType = "",
+        .from = tmapImageItem.id,
+        .to = { primaryImageItem.id, gainMapImageItem.id }
+    });
+    inputImgs_.emplace_back(tmapImageItem);
+    inputImgs_.emplace_back(primaryImageItem);
+    inputImgs_.emplace_back(gainMapImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(filledLen_ > 0);
 }
 
 // [FAIL] Tmap image is configured in refs, but not included in inputImgs
