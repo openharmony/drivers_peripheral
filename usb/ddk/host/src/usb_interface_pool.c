@@ -1367,6 +1367,7 @@ int32_t UsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle)
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbIoStop failed, ret = %{public}d", __func__, __LINE__, ret);
             return ret;
+        }
     } else {
         HDF_LOGD("%{public}s:%{public}d UsbIoStop ref count = %{public}d", __func__, __LINE__, refCnt);
     }
