@@ -297,7 +297,8 @@ int32_t UsbDdkService::SendControlReadRequest(
     }
 
     const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
-    struct UsbRequest *request = UsbAllocRequest(handleConvert, 0, MAX_CONTROL_BUFF_SIZE);
+    uint32_t length = setup.length > MAX_CONTROL_BUFF_SIZE ? MAX_CONTROL_BUFF_SIZE : setup.length;
+    struct UsbRequest *request = UsbAllocRequest(handleConvert, 0, static_cast<int32_t>(length));
     if (request == nullptr) {
         HDF_LOGE("%{public}s alloc request failed", __func__);
         return HDF_DEV_ERR_NO_MEMORY;
@@ -314,7 +315,7 @@ int32_t UsbDdkService::SendControlReadRequest(
     params.ctrlReq.request = setup.requestCmd;
     params.ctrlReq.value = setup.value;
     params.ctrlReq.index = setup.index;
-    params.ctrlReq.length = MAX_CONTROL_BUFF_SIZE;
+    params.ctrlReq.length = length;
 
     ret = UsbFillRequest(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
