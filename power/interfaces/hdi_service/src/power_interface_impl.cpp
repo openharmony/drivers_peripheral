@@ -203,16 +203,18 @@ void AutoSuspendLoop()
     g_suspendRetry = false;
 }
 
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+static constexpr const int32_t MAX_RETRY_COUNT = 5;
+static int32_t g_ulsr_loop = 0;
 static std::string g_suspendTag;
 int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag)
 {
     HDF_LOGI("Set suspend tag: %{public}s", tag.c_str());
     g_suspendTag = tag;
+    g_ulsr_loop = 0;
     return HDF_SUCCESS;
 }
 
-#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
-static constexpr const int32_t MAX_RETRY_COUNT = 5;
 int32_t DoSuspendWithTag()
 {
     UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
@@ -220,21 +222,26 @@ int32_t DoSuspendWithTag()
         return HDF_FAILURE;
     }
 
-    int loop;
-    for (loop = 0; loop < MAX_RETRY_COUNT; loop++) {
-        bool ret = SaveStringToFd(suspendStateFd, g_suspendTag);
-        if (ret) {
-            break;
+    g_ulsr_loop++;
+    bool ret = SaveStringToFd(suspendStateFd, g_suspendTag);
+    if (!ret) {
+        waitTime_ = std::min(waitTime_ * WAIT_TIME_FACTOR, MAX_WAIT_TIME);
+        HDF_LOGE("SaveStringToFd fail, tag:%{public}s loop:%{public}d", g_suspendTag.c_str(), g_ulsr_loop);
+        if (g_ulsr_loop >= MAX_RETRY_COUNT) {
+            HDF_LOGE("DoSuspendWithTag fail: %{public}s", g_suspendTag.c_str());
+            g_suspendTag.clear();
+            waitTime_ = DEFAULT_WAIT_TIME;
+            return HDF_FAILURE;
         }
-        HDF_LOGE("SaveStringToFd fail, tag:%{public}s loop:%{public}d", g_suspendTag.c_str(), loop);
+        return HDF_SUCCESS;
     }
-    HDF_LOGI("Do suspend %{public}d: echo %{public}s > /sys/power/state", loop, g_suspendTag.c_str());
-    if (loop == MAX_RETRY_COUNT) {
-        HDF_LOGE("DoSuspendWithTag fail: %s", g_suspendTag.c_str());
-        g_suspendTag.clear();
-        return HDF_FAILURE;
-    }
+    HDF_LOGI("Do Suspend %{public}d: echo %{public}s > /sys/power/state", g_ulsr_loop, g_suspendTag.c_str());
     g_suspendTag.clear();
+    waitTime_ = DEFAULT_WAIT_TIME;
+    return HDF_SUCCESS;
+}
+#else
+int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag) {
     return HDF_SUCCESS;
 }
 #endif
