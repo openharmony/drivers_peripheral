@@ -369,6 +369,7 @@ HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool)
         HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy failed, ret=%{public}d ", __func__, __LINE__, ret);
     } else {
         OsalSemDestroy(&interfacePool->ioSem);
+    }
     return ret;
 }
 
