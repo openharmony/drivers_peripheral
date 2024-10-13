@@ -241,7 +241,8 @@ int32_t DoSuspendWithTag()
     return HDF_SUCCESS;
 }
 #else
-int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag) {
+int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag)
+{
     return HDF_SUCCESS;
 }
 #endif
