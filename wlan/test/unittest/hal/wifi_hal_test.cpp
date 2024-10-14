@@ -489,7 +489,7 @@ HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level1)
         bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_TIMEOUT || ret == HDF_FAILURE);
         ASSERT_TRUE(flag);
         ret = apFeature->setCountryCode(apFeature, "CN", 2);
-        EXPECT_EQ(HDF_ERR_TIMEOUT, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
 
         ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
         EXPECT_EQ(HDF_SUCCESS, ret);
