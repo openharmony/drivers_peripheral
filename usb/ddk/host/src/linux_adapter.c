@@ -1332,6 +1332,7 @@ static struct UsbHostRequest *AdapterAllocRequestByMmap(
     if (memBuf == MAP_FAILED) {
         HDF_LOGE("%{public}s fd:%{public}d mmap failed, errno=%{public}d, len=%{public}zu",
             __func__, fd, errno, len);
+        RawUsbMemFree(request);
         return NULL;
     }
 
