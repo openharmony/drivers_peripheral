@@ -119,17 +119,36 @@ public:
      */
     virtual int32_t IsSupportedAlloc(
         const std::vector<VerifyAllocInfo>& infos, std::vector<bool>& supporteds) const = 0;
-    virtual int32_t RegisterBuffer(const BufferHandle& handle) = 0;
 
-    virtual int32_t SetMetadata(const BufferHandle& handle, uint32_t key, const std::vector<uint8_t>& value) = 0;
+    virtual int32_t RegisterBuffer(const BufferHandle& handle)
+    {
+        return 0;
+    }
 
-    virtual int32_t GetMetadata(const BufferHandle& handle, uint32_t key, std::vector<uint8_t>& value) = 0;
+    virtual int32_t SetMetadata(const BufferHandle& handle, uint32_t key, const std::vector<uint8_t>& value)
+    {
+        return 0;
+    }
 
-    virtual int32_t ListMetadataKeys(const BufferHandle& handle, std::vector<uint32_t>& keys) = 0;
+    virtual int32_t GetMetadata(const BufferHandle& handle, uint32_t key, std::vector<uint8_t>& value)
+    {
+        return 0;
+    }
 
-    virtual int32_t EraseMetadataKey(const BufferHandle& handle, uint32_t key) = 0;
+    virtual int32_t ListMetadataKeys(const BufferHandle& handle, std::vector<uint32_t>& keys)
+    {
+        return 0;
+    }
 
-    virtual int32_t GetImageLayout(const BufferHandle& handle, V1_2::ImageLayout& layout) const = 0;
+    virtual int32_t EraseMetadataKey(const BufferHandle& handle, uint32_t key)
+    {
+        return 0;
+    }
+
+    virtual int32_t GetImageLayout(const BufferHandle& handle, V1_2::ImageLayout& layout) const
+    {
+        return 0;
+    }
 };
 
 using CreateDisplayBufferVdiFunc = IDisplayBufferVdi* (*)();
