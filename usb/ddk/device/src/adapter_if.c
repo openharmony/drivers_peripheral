@@ -578,7 +578,6 @@ static int32_t UsbFnAdapterCreatPipes(int32_t ep0, const struct UsbFnFunction *f
 {
     uint8_t *dec = NULL;
     uint8_t *whereDec = NULL;
-    int32_t ret;
     uint32_t fsCount;
     uint32_t hsCount;
     uint32_t ssCount;
@@ -593,29 +592,34 @@ static int32_t UsbFnAdapterCreatPipes(int32_t ep0, const struct UsbFnFunction *f
     }
     whereDec = dec;
 
-    ret = memcpy_s(whereDec, header.length, &header, sizeof(struct UsbFunctionfsDescsHeadV2));
+    int32_t ret = memcpy_s(whereDec, header.length, &header, sizeof(struct UsbFunctionfsDescsHeadV2));
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
     whereDec += sizeof(struct UsbFunctionfsDescsHeadV2);
 
     ret = CopyCount(&whereDec, fsCount, hsCount, ssCount);
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
 
     ret = WriteFuncDescriptors(&whereDec, func->fsDescriptors);
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
 
     ret = WriteFuncDescriptors(&whereDec, func->hsDescriptors);
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
 
     ret = WriteFuncDescriptors(&whereDec, func->ssDescriptors);
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
 
@@ -819,6 +823,7 @@ static int32_t CreatFunc(const char *devName, const struct UsbFnFunction *functi
     ret = UsbFnAdapterCreatPipes(fd, functions);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFnAdapterCreatPipes failed", __func__);
+        UsbFnAdapterClosePipe(fd);
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterClosePipe(fd);

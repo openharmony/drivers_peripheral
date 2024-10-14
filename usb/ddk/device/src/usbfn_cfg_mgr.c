@@ -864,6 +864,7 @@ struct UsbFnDeviceDesc *UsbFnCfgMgrGetInstanceFromHCS(const struct DeviceResourc
     ret = UsbFnCfgMgrParseUsbFnDevDesc(node, usbDevDesc);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: parse device descriptor failed", __func__);
+        UsbFnMemFree(usbDevDesc);
         return NULL;
     }
     ret = UsbFnCfgMgrParseUsbFnDevStrings(node, usbDevDesc);
@@ -1237,18 +1238,9 @@ static struct UsbFnCfgPropMgr *UsbfnCfgMgrFindPropMgr(const struct UsbFnInterfac
     return NULL;
 }
 
-int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct UsbFnRegistInfo *registInfo)
+static int32_t UsbFnCfgMgrCheckRegist(const struct UsbFnInterface *intf, const struct UsbFnRegistInfo *registInfo,
+    uint8_t isDevProp, int32_t isRegist, struct UsbFnCfgPropMgr *fnCfgPropMgr)
 {
-    if (intf == NULL || registInfo == NULL || registInfo->name == NULL) {
-        return HDF_FAILURE;
-    }
-    if (g_cfgEntry.next == 0) {
-        DListHeadInit(&g_cfgEntry);
-    }
-
-    struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
-    uint8_t isDevProp = (uint8_t)IsDevDescProp(registInfo->name);
-    int32_t isRegist = IsPropRegisted(intf, registInfo->name);
     if (isRegist != 0) {
         if (isDevProp == 0) {
             return HDF_FAILURE;
@@ -1266,17 +1258,42 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct 
             return HDF_FAILURE;
         }
     }
+    return HDF_SUCCESS;
+}
 
+int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct UsbFnRegistInfo *registInfo)
+{
+    if (intf == NULL || registInfo == NULL || registInfo->name == NULL) {
+        return HDF_FAILURE;
+    }
+    if (g_cfgEntry.next == 0) {
+        DListHeadInit(&g_cfgEntry);
+    }
+
+    struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
+    uint8_t isDevProp = (uint8_t)IsDevDescProp(registInfo->name);
+    int32_t isRegist = IsPropRegisted(intf, registInfo->name);
+    int32_t ret = UsbFnCfgMgrCheckRegist(intf, registInfo, isDevProp, isRegist, fnCfgPropMgr);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: UsbFnCfgMgrCheckRegist failed", __func__);
+        return HDF_FAILURE;
+    }
     fnCfgPropMgr->isDevProp = isDevProp;
     fnCfgPropMgr->intf = intf;
-    int32_t ret = snprintf_s(fnCfgPropMgr->name, MAX_LEN, MAX_LEN - 1, "%s", registInfo->name);
+    ret = snprintf_s(fnCfgPropMgr->name, MAX_LEN, MAX_LEN - 1, "%s", registInfo->name);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        if (isRegist == 0) {
+            UsbFnMemFree(fnCfgPropMgr);
+        }
         return HDF_FAILURE;
     }
     ret = snprintf_s(fnCfgPropMgr->value, MAX_LEN, MAX_LEN - 1, "%s", registInfo->value);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        if (isRegist == 0) {
+            UsbFnMemFree(fnCfgPropMgr);
+        }
         return HDF_FAILURE;
     }
     fnCfgPropMgr->getPropCallback = registInfo->getProp;
