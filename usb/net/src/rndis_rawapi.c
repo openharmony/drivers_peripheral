@@ -435,7 +435,7 @@ static void HostRndisUpdateMtu(struct UsbnetHost **ppUsbNet, int32_t *retval)
         (*ppUsbNet)->net.mtu = (*ppUsbNet)->net.hardMtu - (*ppUsbNet)->net.hardHeaderLen;
     }
     HARCH_INFO_PRINT("hard mtu %{public}u (%{public}u from usbNet), rx buflen %{public}u,　align %{public}d\n",
-        (*ppUsbNet)->net.hardMtu, tmp, 1 << CPU_TO_LE32(g_u.initC->packetAlignment));
+        (*ppUsbNet)->net.hardMtu, tmp, (*ppUsbNet)->net.rxUrbSize, 1 << CPU_TO_LE32(g_u.initC->packetAlignment));
 }
 
 static void HostRndisSetmacAddrByBp(struct UsbnetHost **ppUsbNet, int32_t *retval)
