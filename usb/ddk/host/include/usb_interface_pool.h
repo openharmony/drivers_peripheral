@@ -80,6 +80,7 @@ struct UsbInterfacePool {
     UsbPoolProcessStatusType ioRecvProcessStopStatus;
     struct OsalMutex ioStopLock;
     struct UsbDevice *device;
+    struct OsalSem ioSem;
 };
 
 struct UsbPipeQueryPara {

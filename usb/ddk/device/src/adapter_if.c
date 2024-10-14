@@ -72,7 +72,7 @@ static void GetFilePath(const char *path, const char *fileName, char *filePath)
         return;
     }
 
-    if (filePath[strlen(path) - 1] != '/') {
+    if (strlen(path) > 0 && filePath[strlen(path) - 1] != '/') {
         if (strlen(path) + 1 >= MAX_PATHLEN - strlen(fileName)) {
             HDF_LOGE("%{public}s: file path too long", __func__);
             return;
