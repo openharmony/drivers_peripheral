@@ -225,7 +225,7 @@ static int32_t UsbnetHostHandleMsg(struct UsbnetHost *usbNet, struct RndisMsgHdr
     uint32_t msgType = CPU_TO_LE32(buf->msgType);
     uint32_t msgLen = CPU_TO_LE32(buf->msgLen);
     uint32_t status = CPU_TO_LE32(buf->status);
-    uint32_t requestId =  (__force uint32_t)buf->requestId;
+    uint32_t requestId =  (uint32_t)buf->requestId;
     uint32_t rsp = CPU_TO_LE32(buf->msgType) | RNDIS_MSG_COMPLETION;
     HARCH_INFO_PRINT("rndis reply msgType = %{public}x, msgLen = %{public}x,"
         "status = %{public}x, requestId = %{public}x",
@@ -276,7 +276,7 @@ static int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct RndisMsgHdr *b
         if (!xid) {
             xid = usbNet->xid++;
         }
-        buf->requestId = (__force __le32) xid;
+        buf->requestId = (__le32) xid;
     }
     HARCH_INFO_PRINT("msgType= %{public}d, xid = %{public}d", msgType, xid);
     struct UsbnetHostCmdParam cmdParam = {};
@@ -365,6 +365,7 @@ static int32_t HostRndisQuery(struct UsbnetHost *usbNet, struct RndisQueryParam 
     uint32_t len = CPU_TO_LE32(uq.getC->len);
 
     HARCH_INFO_PRINT("off = %{public}d, len = %{public}d, retval = %{public}d", off, len, retval);
+    // CONTROL_BUFFER_SIZE_-UNION_OFFSET_LENGTH is　valid　memory　range
     if ((off > CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH) || (len > CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH - off)) {
         goto response_error;
     }
@@ -433,7 +434,7 @@ static void HostRndisUpdateMtu(struct UsbnetHost **ppUsbNet, int32_t *retval)
         (*ppUsbNet)->net.hardMtu = tmp;
         (*ppUsbNet)->net.mtu = (*ppUsbNet)->net.hardMtu - (*ppUsbNet)->net.hardHeaderLen;
     }
-    HARCH_INFO_PRINT("hard mtu %{public}u (%{public}u from usbNet), align %{public}d\n",
+    HARCH_INFO_PRINT("hard mtu %{public}u (%{public}u from usbNet), rx buflen %{public}u,　align %{public}d\n",
         (*ppUsbNet)->net.hardMtu, tmp, 1 << CPU_TO_LE32(g_u.initC->packetAlignment));
 }
 
@@ -459,7 +460,10 @@ static void HostRndisSetmacAddrByBp(struct UsbnetHost **ppUsbNet, int32_t *retva
         HARCH_INFO_PRINT("not GetmacAddr");
         (*ppUsbNet)->net.isGetmacAddr = 0;
         size_t macAddrLen = sizeof((*ppUsbNet)->net.macAddr) / sizeof((*ppUsbNet)->net.macAddr[0]);
-        memset_s((*ppUsbNet)->net.macAddr, macAddrLen, 0, macAddrLen);
+        if (memset_s((*ppUsbNet)->net.macAddr, macAddrLen, 0, macAddrLen) !=EOK) {
+            HARCH_INFO_PRINT("HostRndisSetmacAddrByBp memset_s fail!");
+            return;
+        }
     } else {
         HARCH_INFO_PRINT("GetmacAddr");
         (*ppUsbNet)->net.isGetmacAddr = 1;
@@ -475,7 +479,7 @@ static void HostRndisSetmacAddr(struct UsbnetHost **ppUsbNet, int32_t *retval)
     /* Check physical medium */
     struct RndisQueryParam queryParam = {g_u.buf, RNDIS_OID_GEN_PHYSICAL_MEDIUM, replyLen};
     *retval = HostRndisQuery(*ppUsbNet, queryParam, (void **)&phym, &replyLen);
-    if (*retval != 0 || !phym) {
+    if ((retval != NULL && *retval != 0) || !phym) {
         /* OID is optional so don't fail here. */
         phym_unspec = CPU_TO_LE32(RNDIS_PHYSICAL_MEDIUM_UNSPECIFIED);
         phym = &phym_unspec;
