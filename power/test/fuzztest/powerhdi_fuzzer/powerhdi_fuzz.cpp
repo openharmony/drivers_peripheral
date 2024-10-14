@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,8 @@
 #include "power_interface_impl.h"
 #include "v1_2/ipower_interface.h"
 #include "v1_2/power_interface_stub.h"
-#include "v1_2/power_types.h"
+#include "running_lock_impl.h"
+#include "refbase.h"
 
 using namespace OHOS::HDI;
 using namespace OHOS::HDI::Power::V1_2;
@@ -31,11 +32,13 @@ namespace OHOS {
 namespace HDI {
 namespace Power {
 namespace V1_2 {
+constexpr int32_t DEFAULT_TIMEOUT_FOR_TEST_MS = 100;
+
 class PowerFuzzTest {
 public:
     PowerFuzzTest()
     {
-        impl_ = new PowerInterfaceImpl();
+        impl_ = sptr<PowerInterfaceImpl>::MakeSptr();
         impl_->SuspendBlock("PowerStubFuzzTest"); // Prevent device sleep
     }
     ~PowerFuzzTest()
@@ -51,13 +54,12 @@ private:
     sptr<PowerInterfaceImpl> impl_ = nullptr;
 };
 namespace {
-const int32_t REWIND_READ_DATA = 0;
 shared_ptr<PowerInterfaceStub> g_fuzzService = nullptr;
 shared_ptr<PowerFuzzTest> g_fuzzTest = nullptr;
-const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = 15;
+const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = 18;
 } // namespace
 
-static void PowerStubFuzzTest(const uint8_t *data, size_t size)
+static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
 {
     uint32_t code;
     if (size < sizeof(code)) {
@@ -66,6 +68,7 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
     if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
         return;
     }
+    OHOS::HDI::Power::V1_2::IPowerInterface::Get(true);
 
     MessageParcel datas;
     MessageParcel reply;
@@ -75,15 +78,24 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
         g_fuzzService = make_shared<PowerInterfaceStub>(g_fuzzTest->GetImpl());
     }
     for (code = CMD_POWER_INTERFACE_GET_VERSION; code < POWER_INTERFACE_STUB_FUNC_MAX_SIZE; code++) {
-        // Filter force sleep calls
-        if (CMD_POWER_INTERFACE_FORCE_SUSPEND == code) {
-            continue;
-        }
-        datas.WriteInterfaceToken(IPowerInterface::GetDescriptor());
-        datas.WriteBuffer(data, size);
-        datas.RewindRead(REWIND_READ_DATA);
         g_fuzzService->OnRemoteRequest(code, datas, reply, option);
     }
+    RunningLockImpl::SetDefaultTimeOutMs(DEFAULT_TIMEOUT_FOR_TEST_MS);
+    RunningLockImpl::GetCount(RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+    RunningLockImpl::GetRunningLockTag(RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+    RunningLockImpl::GetRunningLockTag(RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION);
+    RunningLockImpl::GetRunningLockTag(RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO);
+    RunningLockImpl::GetRunningLockTag(RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT);
+    RunningLockImpl::GetRunningLockTag(RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION);
+    RunningLockImpl::GetRunningLockTag(RunningLockType::RUNNINGLOCK_BUTT);
+    RunningLockImpl::GetRunningLockTagInner(RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+    RunningLockImpl::GetRunningLockTagInner(RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION);
+    RunningLockImpl::GetRunningLockTagInner(RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO);
+    RunningLockImpl::GetRunningLockTagInner(RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT);
+    RunningLockImpl::GetRunningLockTagInner(RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION);
+    RunningLockImpl::GetRunningLockTagInner(RunningLockType::RUNNINGLOCK_BACKGROUND_TASK);
+    RunningLockImpl::GetRunningLockTagInner(RunningLockType::RUNNINGLOCK_BUTT);
+    RunningLockImpl::Clean();
 }
 } // namespace V1_2
 } // namespace Power
@@ -94,6 +106,6 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::Power::V1_2::PowerStubFuzzTest(data, size);
+    OHOS::HDI::Power::V1_2::PowerHdiFuzzTest(data, size);
     return 0;
 }
