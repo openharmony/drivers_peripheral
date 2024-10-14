@@ -1111,7 +1111,7 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
     DListInsertTail(&newRemoteNode->node, head);
-    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
+    if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0) {
         AddDeathRecipientForService(self);
     }
     return HDF_SUCCESS;
