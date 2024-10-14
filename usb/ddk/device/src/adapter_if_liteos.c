@@ -424,27 +424,32 @@ static int32_t UsbFnAdapterCreatPipes(int32_t ep0, const struct UsbFnFunction *f
 
     ret = memcpy_s(whereDec, header.length, &header, sizeof(struct UsbFunctionfsDescsHeadV2));
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
     whereDec += sizeof(struct UsbFunctionfsDescsHeadV2);
 
     ret = CopyCount(&whereDec, fsCount, hsCount, ssCount);
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
 
     ret = WriteFuncDescriptors(&whereDec, func->fsDescriptors);
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
 
     ret = WriteFuncDescriptors(&whereDec, func->hsDescriptors);
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
 
     ret = WriteFuncDescriptors(&whereDec, func->ssDescriptors);
     if (ret != EOK) {
+        UsbFnMemFree(dec);
         return HDF_FAILURE;
     }
 

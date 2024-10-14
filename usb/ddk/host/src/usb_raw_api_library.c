@@ -1235,11 +1235,6 @@ int32_t RawGetConfigDescriptor(
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (configIndex > dev->deviceDescriptor.bNumConfigurations) {
-        HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
-        return HDF_ERR_BAD_FD;
-    }
-
     ret = GetConfigDescriptor(dev, configIndex, tmpConfig.buf, sizeof(tmpConfig.buf));
     if (ret < HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d ret=%{public}d", __func__, __LINE__, ret);
