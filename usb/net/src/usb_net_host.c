@@ -88,7 +88,7 @@ void UsbnetWriteLog(char *buff, int size, int tag)
     HARCH_INFO_PRINT("end");
 }
 
-//net process
+// net process
 static int32_t UsbnetHostSendBufToNet(struct HdfIoService *serv,  uint32_t id,
     const void *buf,  uint32_t length,  int32_t *replyData)
 {
@@ -277,6 +277,7 @@ static int32_t UsbnetHostSnedbufToUrb(struct UsbnetHost *usbNet,  struct HdfSBuf
         size = (size > usbNet->dataOutEp->maxPacketSize) ? usbNet->dataOutEp->maxPacketSize : size;
         if (memcpy_s(wb->buf, usbNet->dataOutEp->maxPacketSize, buf, size) != EOK) {
             HDF_LOGE("%{public}s: memcpy_s fail", __func__);
+            return HDF_FAILURE;
         }
     }
 
@@ -819,6 +820,10 @@ ERR_ALLOC_READ_REQS:
 
 static void UsbnetHostFreeRequests(struct UsbnetHost *usbNet)
 {
+    if (usbNet == NULL) {
+        HDF_LOGI("UsbnetHostFreeRequests usbNet is null");
+        return;
+    }
     //FIFO
     OsalMutexLock(&usbNet->readLock);
     UsbnetHostFreeFifo(&usbNet->readFifo);
