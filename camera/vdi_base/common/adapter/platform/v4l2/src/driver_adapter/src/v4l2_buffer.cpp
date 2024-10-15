@@ -28,6 +28,28 @@
 #define NOLOG
 #include "TimeOutExecutor.h"
 
+#ifdef V4L2_EMULATOR
+#include <sys/ioctl.h>
+
+#define PARAM_MANAGER_DEBUG_LOG
+#include "device/hmos_emulator/hardware/dcodec/include/ParamManager.h"
+
+#define IOC_GET_CAMERA_ID _IOR('V', 105, int)
+#define IOC_QUEUE_BUFFER _IOWR('V', 106, uint64_t)
+#define IOC_DEQUEUE_BUFFER _IOW('V', 107, int)
+#define IOC_REQUEST_BUFFER _IOR('V', 108, int)
+
+#define CAMERA_FUN_GET_CAMERA_COUNT 1
+#define CAMERA_FUN_START_STREAM 2
+#define CAMERA_FUN_STOP_STREAM 3
+#define CAMERA_FUN_QUEUE_BUFFER 4
+#define CAMERA_FUN_QUEUE_BUFFER_HW 5
+#define CAMERA_FUN_GET_PROP 6
+#define CAMERA_FUN_MAXID CAMERA_FUN_GET_PROP
+
+#define EXPRESS_CAMERA_DEVICE_ID ((uint64_t)80)
+#endif
+
 using namespace OHOS::TIMEOUTEXECUTOR;
 
 namespace OHOS::Camera {
@@ -44,6 +66,12 @@ RetCode ioctlWrapper(int fd, uint32_t buffCont, uint32_t buffType, uint32_t memo
     req.type = buffType;
     req.memory = memoryType;
 
+#ifdef V4L2_EMULATOR
+    if (req.count != buffCont) {
+        CAMERA_LOGE("error Insufficient buffer memory on \n");
+        return RC_ERROR;
+    }
+#else
     if (ioctl(fd, VIDIOC_REQBUFS, &req) < 0) {
         CAMERA_LOGE("does not support memory mapping %{public}s\n", strerror(errno));
         return RC_ERROR;
@@ -63,14 +91,21 @@ RetCode ioctlWrapper(int fd, uint32_t buffCont, uint32_t buffType, uint32_t memo
         }
         return RC_ERROR;
     }
+#endif
     return RC_OK;
 }
 
+#ifdef V4L2_EMULATOR
+HosV4L2Buffers::HosV4L2Buffers(enum v4l2_memory memType, enum v4l2_buf_type bufferType)
+    : memoryType_(memType), bufferType_(bufferType), availableBuffers_(0)
+{
+}
+#else
 HosV4L2Buffers::HosV4L2Buffers(enum v4l2_memory memType, enum v4l2_buf_type bufferType)
     : memoryType_(memType), bufferType_(bufferType)
 {
 }
-
+#endif
 HosV4L2Buffers::~HosV4L2Buffers() {}
 
 RetCode HosV4L2Buffers::V4L2ReqBuffers(int fd, int unsigned buffCont)
@@ -88,6 +123,43 @@ RetCode HosV4L2Buffers::V4L2ReqBuffers(int fd, int unsigned buffCont)
     return result;
 }
 
+#ifdef V4L2_EMULATOR
+RetCode HosV4L2Buffers::SetAndPushBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec, v4l2_buffer buf)
+{
+    uint64_t id = (uint64_t)buf.index;
+    void *addr = frameSpec->buffer_->GetVirAddress();
+    uint32_t len = frameSpec->buffer_->GetSize();
+    frameSpec->buffer_->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
+
+    CAMERA_LOGI("express_camera queue buffer id %" PRIx64
+    " addr %p len %d framespec %p streamId %d, status %d, format %d, curformat %d",
+    id, addr, len, frameSpec.get(), frameSpec->buffer_->GetStreamId(), frameSpec->buffer_->GetBufferStatus(),
+    frameSpec->buffer_->GetFormat(),  frameSpec->buffer_->GetCurFormat());
+
+    if (addr == NULL || len == 0) {
+        return RC_ERROR;
+    }
+ 
+    ParamManager mgr(EXPRESS_CAMERA_DEVICE_ID, CAMERA_FUN_QUEUE_BUFFER, false);
+    mgr.addParam64(id);
+    mgr.addPtr(addr, len);
+
+    constexpr int CaptureStreamId = 2;
+    if (frameSpec->buffer_->GetStreamId() == CaptureStreamId) {
+        constexpr int SleepTimeUs = 50000;
+        usleep(SleepTimeUs); // 50ms delay
+    }
+    int ret = mgr.ioctl(fd, IOC_QUEUE_BUFFER);
+    if (ret < 0) {
+        CAMERA_LOGE("HosV4L2Buffers::V4L2QueueBuffer: IOC_QUEUE_BUFFER Failed: %d", ret);
+        return RC_ERROR;
+    }
+    std::lock_guard<std::mutex> l(bufferLock_);
+    queuedBuffers_.push(buf.index);
+    return RC_OK;
+}
+#endif
+
 RetCode HosV4L2Buffers::V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec)
 {
     struct v4l2_buffer buf = {};
@@ -103,12 +175,19 @@ RetCode HosV4L2Buffers::V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>
 
     MakeInqueueBuffer(buf, frameSpec);
 
+#ifdef V4L2_EMULATOR
+    RetCode rc = SetAndPushBuffer(fd, frameSpec, buf);
+    if (rc == RC_ERROR) {
+        return RC_ERROR;
+    }
+#else
     std::lock_guard<std::mutex> l(bufferLock_);
     int rc = ioctl(fd, VIDIOC_QBUF, &buf);
     if (rc < 0) {
         CAMERA_LOGE("ioctl VIDIOC_QBUF failed: %{public}s\n", strerror(errno));
         return RC_ERROR;
     }
+#endif
 
     auto itr = queueBuffers_.find(fd);
     if (itr != queueBuffers_.end()) {
@@ -197,21 +276,49 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
 {
     struct v4l2_buffer buf = {};
     struct v4l2_plane planes[1] = {};
-
     buf.type = bufferType_;
     buf.memory = memoryType_;
-
     if (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
         buf.m.planes = planes;
         buf.length = 1;
     }
+#ifdef V4L2_EMULATOR
+    constexpr int SleepTimeUs = 10000;
+    usleep(SleepTimeUs); // 10ms delay
+    int buf_cnt = 0;
+    int err = ioctl(fd, IOC_REQUEST_BUFFER, &buf_cnt);
+    if (err < 0) {
+        CAMERA_LOGE("IOC_REQUEST_BUFFER failed: %d\n", err);
+        return RC_ERROR;
+    }
+ 
+    availableBuffers_ += buf_cnt;
+    if (availableBuffers_ <= 0) {
+        // host did not finish drawing the previous frame:
+        // either the host is very busy, or the host camera framerate is low
+        CAMERA_LOGD("no buffer to display.");
+        return RC_OK;
+    }
+
+    availableBuffers_ -= 1;
+    if (queuedBuffers_.size() == 0) {
+        CAMERA_LOGE("error! received buffer not in queued buffer list!");
+        return RC_ERROR;
+    } else {
+        std::lock_guard<std::mutex> l(bufferLock_);
+        buf.index = (uint32_t)queuedBuffers_.front();
+        queuedBuffers_.pop();
+    }
+    CAMERA_LOGI("express_camera request buffer idx %d queue size %lu buf_cnt %d",
+        buf.index, queuedBuffers_.size(), buf_cnt);
+#else
     CAMERA_LOGI("ioctl VIDIOC_DQBUF fd: %{public}d\n", fd);
     int rc = ioctl(fd, VIDIOC_DQBUF, &buf);
     if (rc < 0) {
         CAMERA_LOGE("ioctl VIDIOC_DQBUF failed: %{public}s\n", strerror(errno));
         return RC_ERROR;
     }
-
+#endif
     if (memoryType_ == V4L2_MEMORY_MMAP || memoryType_ == V4L2_MEMORY_DMABUF) {
         if (adapterBufferMap_[buf.index].userBufPtr && adapterBufferMap_[buf.index].start) {
             if (adapterBufferMap_[buf.index].length > buffLong_) {
@@ -239,10 +346,8 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
         bufferMap.erase(Iter);
         return RC_ERROR;
     }
-
     CameraDumper& dumper = CameraDumper::GetInstance();
     dumper.DumpBuffer("DQBuffer", ENABLE_DQ_BUFFER_DUMP, Iter->second->buffer_);
-
     dequeueBuffer_(Iter->second);
     bufferMap.erase(Iter);
     return RC_OK;
@@ -266,12 +371,12 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
         buf.m.planes = planes;
         buf.length = 1;
     }
-
+#ifndef V4L2_EMULATOR
     if (ioctl(fd, VIDIOC_QUERYBUF, &buf) < 0) {
         CAMERA_LOGE("error: ioctl VIDIOC_QUERYBUF failed: %{public}s\n", strerror(errno));
         return RC_ERROR;
     }
-
+#endif
     CAMERA_LOGI("buf.length = %{public}d frameSpec->buffer_->GetSize() = %{public}d buf.index = %{public}d\n",
         buf.length, frameSpec->buffer_->GetSize(), buf.index);
     if (buf.length > frameSpec->buffer_->GetSize()) {

@@ -312,10 +312,14 @@ int HosFileFormat::V4L2OpenDevice(const std::string& deviceName)
     }
 
     int rc = 0;
+#ifdef V4L2_EMULATOR
+    const char* devName = "/dev/video0";
+#else
     char* devName = nullptr;
     char absPath[PATH_MAX] = {0};
 
     devName = realpath(deviceName.c_str(), absPath);
+#endif
     if (devName == nullptr) {
         CAMERA_LOGE("V4L2OpenDevice realpath error\n");
         return RCERRORFD;
