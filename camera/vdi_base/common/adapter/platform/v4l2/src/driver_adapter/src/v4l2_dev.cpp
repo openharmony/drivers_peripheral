@@ -21,8 +21,9 @@ std::map<std::string, std::string> HosV4L2Dev::deviceMatch = HosV4L2Dev::CreateD
 std::map<std::string, int> HosV4L2Dev::fdMatch = HosV4L2Dev::CreateFdMap();
 std::mutex HosV4L2Dev::deviceFdLock_ = {};
 
-static constexpr uint32_t WATING_TIME = 1000 * 100;
-
+#ifndef V4L2_EMULATOR
+  static constexpr uint32_t WATING_TIME = 1000 * 100;
+#endif
 HosV4L2Dev::HosV4L2Dev() {}
 HosV4L2Dev::~HosV4L2Dev() {}
 
@@ -230,6 +231,7 @@ RetCode HosV4L2Dev::ReleaseBuffers(const std::string& cameraID)
     return RC_OK;
 }
 
+#ifndef V4L2_EMULATOR
 void HosV4L2Dev::dequeueBuffers()
 {
     int nfds;
@@ -252,10 +254,18 @@ void HosV4L2Dev::dequeueBuffers()
         }
     }
 }
+#endif
 
 void HosV4L2Dev::loopBuffers()
 {
+#ifndef V4L2_EMULATOR
     CAMERA_LOGI("!!! loopBuffers enter, streamNumber_=%{public}d\n", streamNumber_);
+#else
+    int rc;
+    int fd = deviceFd_;
+
+    CAMERA_LOGI("!!! loopBuffers enter, streamNumber_=%{public}d, fd = %d", streamNumber_, fd);
+#endif
     prctl(PR_SET_NAME, "v4l2_loopbuffer");
 
     while (true) {
@@ -265,7 +275,17 @@ void HosV4L2Dev::loopBuffers()
                 break;
             }
         }
+#ifndef V4L2_EMULATOR
         dequeueBuffers();
+#else
+        CHECK_IF_PTR_NULL_RETURN_VOID(myBuffers_);
+        rc = myBuffers_->V4L2DequeueBuffer(fd);
+        if (rc == RC_ERROR) {
+            CAMERA_LOGE("loopBuffers: myBuffers_->V4L2DequeueBuffer return error %d", rc);
+        }
+        constexpr int SleepTimeUs = 1000;
+        usleep(SleepTimeUs);
+#endif
     }
     CAMERA_LOGI("!!! loopBuffers exit, streamNumber_=%{public}d\n", streamNumber_);
 }
@@ -348,6 +368,9 @@ RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
         CAMERA_LOGE("error: ReqBuffers: GetCurrentFd error\n");
         return RC_ERROR;
     }
+#ifdef V4L2_EMULATOR
+    deviceFd_ = fd;
+#endif
 
     if (myStreams_ == nullptr) {
         myStreams_ = std::make_shared<HosV4L2Streams>(bufferType_);

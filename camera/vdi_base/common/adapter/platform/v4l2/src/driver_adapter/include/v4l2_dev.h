@@ -88,7 +88,11 @@ public:
     static std::map<std::string, std::string> CreateDevMap()
     {
         std::map<std::string, std::string> tmp_map;
+#ifdef V4L2_EMULATOR
+        tmp_map.insert(std::pair<std::string, std::string>("express_camera", "/dev/video0 "));
+#else
         tmp_map.insert(std::pair<std::string, std::string>("INVALID", "INVALID"));
+#endif
         return tmp_map;
     }
 
@@ -107,6 +111,9 @@ private:
     void EraseEpoll(int fd);
     RetCode ConfigFps(const int fd, DeviceFormat& format, V4l2FmtCmd command);
 
+#ifdef V4L2_EMULATOR
+    int deviceFd_ = 0;
+#endif
     int eventFd_ = 0;
     std::thread* streamThread_ = nullptr;
     unsigned int streamNumber_ = 0;
@@ -121,7 +128,11 @@ private:
     std::shared_ptr<HosFileFormat> myFileFormat_ = nullptr;
     std::shared_ptr<HosV4L2Control> myControl_ = nullptr;
 
+#ifdef V4L2_EMULATOR
+    enum v4l2_memory memoryType_ = V4L2_MEMORY_USERPTR;
+#else
     enum v4l2_memory memoryType_ = V4L2_MEMORY_MMAP;
+#endif
     enum v4l2_buf_type bufferType_ = V4L2_BUF_TYPE_PRIVATE;
 };
 } // namespace OHOS::Camera
