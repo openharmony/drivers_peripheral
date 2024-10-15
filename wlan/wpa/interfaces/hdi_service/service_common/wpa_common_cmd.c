@@ -1883,13 +1883,13 @@ int32_t WpaInterfaceUnregisterEventCallback(struct IWpaInterface *self, struct I
         HDF_LOGE("invalid opt");
         return HDF_FAILURE;
     }
-    HdfWpaDelRemoteObj(cbFunc);
     if (DListIsEmpty(&HdfWpaStubDriver()->remoteListHead)) {
         int32_t ret = WpaUnregisterEventCallback(HdfWpaCallbackFun, WIFI_WPA_TO_HAL_CLIENT, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
         }
     }
+    HdfWpaDelRemoteObj(cbFunc);
     pthread_mutex_unlock(&g_interfaceLock);
     return HDF_SUCCESS;
 }
