@@ -25,7 +25,7 @@
 #include "codec_log_wrapper.h"
 #include "codec_types.h"
 
-#define OMX_CALLBACK_IMPLEMENT  "libcodec_hdi_omx_callback_type_service_impl"
+#define CODEC_CALLBACK_SO_PATH "libcodec_hdi_omx_callback_type_service_impl.z.so"
 
 typedef void (*SERVICE_CONSTRUCT_FUNC)(struct CodecCallbackType *);
 
