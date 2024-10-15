@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/hdi/hdi.gni")
 import("//build/ohos.gni")
-import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("./../usb.gni")
 
 group("libusb_core") {
@@ -36,7 +36,7 @@ ohos_shared_library("libusb_ddk_host") {
 
   include_dirs = [
     "device/include",
-    "$hdf_framework_path/model/usb/include",
+    "//drivers/hdf_core/framework/model/usb/include",
     "host/include",
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/device",
