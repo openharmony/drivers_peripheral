@@ -237,17 +237,8 @@ static int32_t CodecCallbackTypeServiceOnRemoteRequest(struct HdfRemoteService *
 
 static void *LoadServiceHandler(void)
 {
-    char *libPath = NULL;
     void *handler = NULL;
-
-    char pathBuf[PATH_MAX] = {'\0'};
-    libPath = HDF_LIBRARY_FULL_PATH(OMX_CALLBACK_IMPLEMENT);
-    if (realpath(libPath, pathBuf) == NULL) {
-        CODEC_LOGE("realpath failed!");
-        return NULL;
-    }
-
-    handler = dlopen(pathBuf, RTLD_LAZY);
+    handler = dlopen(CODEC_CALLBACK_SO_PATH, RTLD_LAZY);
     if (handler == NULL) {
         CODEC_LOGE("dlopen failed %{public}s", dlerror());
         return NULL;
