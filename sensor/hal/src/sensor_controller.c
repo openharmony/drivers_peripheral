@@ -266,7 +266,9 @@ static int32_t EnableSensor(int32_t sensorId)
     }
     HdfSbufRecycle(msg);
 
-    sensorStatusList[sensorId] = SENSOR_STATUS_ENABLE;
+    if (sensorId < SENSOR_TYPE_MAX && sensorId >= 0) {
+        sensorStatusList[sensorId] = SENSOR_STATUS_ENABLE;
+    }
 
     return ret;
 }
@@ -297,7 +299,9 @@ static int32_t DisableSensor(int32_t sensorId)
     }
     HdfSbufRecycle(msg);
 
-    sensorStatusList[sensorId] = SENSOR_STATUS_DISENABLE;
+    if (sensorId < SENSOR_TYPE_MAX && sensorId >= 0) {
+        sensorStatusList[sensorId] = SENSOR_STATUS_DISENABLE;
+    }
 
     return ret;
 }
