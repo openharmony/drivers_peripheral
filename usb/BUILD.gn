@@ -16,8 +16,8 @@ if (defined(ohos_lite)) {
     deps = []
   }
 } else {
+  import("//build/config/components/hdi/hdi.gni")
   import("//build/ohos.gni")
-  import("./../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   group("usb_entry") {
     deps = [
@@ -30,7 +30,6 @@ if (defined(ohos_lite)) {
       "./gadget/function/usbfn:libusbfn",
       "./hdi_service:hdi_usb_service",
       "./net:libusbhost_ecm",
-      "./net:libusbhost_rndis_rawapi",
       "./serial:libusbhost_acm",
       "./serial:libusbhost_acm_rawapi",
     ]

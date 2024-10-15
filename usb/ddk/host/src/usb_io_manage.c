@@ -129,12 +129,12 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
             OsalMSleep(USB_IO_SLEEP_MS_TIME);
             continue;
         }
-    
+
         int32_t ret = OsalSemWait(&interfacePool->ioSem, HDF_WAIT_FOREVER);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("sem wait failed: %{public}d", ret);
         }
-    
+
         if (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING ||
             interfacePool->ioRecvProcessStopStatus != USB_POOL_PROCESS_RUNNING) {
             break;
