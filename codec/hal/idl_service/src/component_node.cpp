@@ -588,9 +588,7 @@ int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffe
                 CHECK_AND_RETURN_RET_LOG(addr != nullptr, OMX_ErrorBadParameter, "addr is null");
                 err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
                     reinterpret_cast<uint8_t *>(addr));
-                if (::munmap(addr, static_cast<size_t>(buffer.allocLen)) != 0) {
-                    CODEC_LOGW("Error munmap");
-                }
+                audioBuffer_.push_back({addr, buffer.allocLen}});
                 break;
             }
             err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0,
@@ -742,6 +740,15 @@ int32_t ComponentNode::ReleaseAllBuffer()
             return ret;
         }
     }
+    for (auto it = audioBuffer_.begin(); it != audioBuffer_.end(); it++) {
+        if (it->first == nullptr) {
+            continue;
+        }
+        if (::munmap(it->first, static_cast<size_t>(it->second)) != 0) {
+            CODEC_LOGW("Error munmap");
+        }
+    }
+    
     HDF_LOGI("Release OMXBuffer and CodecBuffer success!");
     return HDF_SUCCESS;
 }
