@@ -91,6 +91,7 @@ private:
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> portIndexMap_;
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderMap_;  // Key is omx buffer header type
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderPortMap_;
+    std::vector<void *> audioBuffer_;
     uint32_t bufferIdCount_;
     std::shared_ptr<ComponentMgr> mgr_;
     uint32_t maxStateWaitTime = 10000;
