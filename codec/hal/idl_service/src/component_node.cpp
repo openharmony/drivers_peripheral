@@ -524,6 +524,14 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buff
 
     (void)codecBufer->FreeBuffer(const_cast<OmxCodecBuffer &>(buffer));
 
+    for (auto it = audioBuffer_.begin(); it != audioBuffer_.end(); it++) {
+        if (it->first == nullptr) {
+            continue;
+        }
+        if (::munmap(it->first, static_cast<size_t>(it->second)) != 0) {
+            CODEC_LOGW("Error munmap");
+        }
+    }
     return err;
 }
 
@@ -740,15 +748,6 @@ int32_t ComponentNode::ReleaseAllBuffer()
             return ret;
         }
     }
-    for (auto it = audioBuffer_.begin(); it != audioBuffer_.end(); it++) {
-        if (it->first == nullptr) {
-            continue;
-        }
-        if (::munmap(it->first, static_cast<size_t>(it->second)) != 0) {
-            CODEC_LOGW("Error munmap");
-        }
-    }
-    
     HDF_LOGI("Release OMXBuffer and CodecBuffer success!");
     return HDF_SUCCESS;
 }
