@@ -1213,6 +1213,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncPutAsmData(UsbdBufferHandle *handle, uint8_
             ret = memcpy_s(handle->starAddr + handle->rcur, tlen, buffer, len);
             if (ret != EOK) {
                 HDF_LOGE("%{public}s:%{public}d memcpy_s failed", __func__, ret);
+                OsalMutexUnlock(&handle->lock);
                 return ret;
             }
 

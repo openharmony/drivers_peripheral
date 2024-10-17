@@ -31,7 +31,6 @@
                 "ipc",
                 "hdf_core",
                 "hilog",
-                "hilog_lite",
                 "samgr",
                 "init",
                 "hitrace",

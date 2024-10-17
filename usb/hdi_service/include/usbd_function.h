@@ -44,13 +44,7 @@
 #define HDC_CONFIG_HDC                  "hdc"
 #define HDC_CONFIG_ON                   "hdc_debug"
 #define HDC_CONFIG_RNDIS                "rndis"
-
-#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-#define HDC_CONFIG_STORAGE              "hisuite_mass_storage"
-#else
 #define HDC_CONFIG_STORAGE              "storage"
-#endif
-
 #define HDC_CONFIG_RNDIS_HDC            "rndis_hdc"
 #define HDC_CONFIG_STORAGE_HDC          "storage_hdc"
 #define HDC_CONFIG_MANUFACTURE_HDC      "manufacture_hdc"
