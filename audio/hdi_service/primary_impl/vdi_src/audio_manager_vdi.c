@@ -461,8 +461,8 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
 
     struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)manager;
     CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_ERR_INVALID_PARAM);
-	
-	for (descIndex = 0; descIndex < priv->descsCount; descIndex++) {
+
+    for (descIndex = 0; descIndex < priv->descsCount; descIndex++) {
         AudioEnforceClearAdapterRefCntVdi(descIndex);
         int32_t ret = AudioManagerVendorUnloadAdapter(manager, priv->descs[descIndex].adapterName);
         if (ret != HDF_SUCCESS) {
@@ -475,8 +475,8 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
         dlclose(priv->handle);
         priv->handle = NULL;
     }
-    
-	AudioManagerReleaseDescs(priv->descs, priv->descsCount);
+
+    AudioManagerReleaseDescs(priv->descs, priv->descsCount);
     OsalMemFree((void *)priv);
     return HDF_SUCCESS;
 }
