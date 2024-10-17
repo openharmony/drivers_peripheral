@@ -113,8 +113,6 @@ static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject * const deviceObject
         hdfUsbInterfaceHost->stub = nullptr;
         delete hdfUsbInterfaceHost;
         hdfUsbInterfaceHost = nullptr;
-        delete hdfUsbInterfaceHost;
-        hdfUsbInterfaceHost = nullptr;
         return HDF_FAILURE;
     }
 
