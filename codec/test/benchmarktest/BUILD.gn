@@ -27,11 +27,6 @@ ohos_benchmarktest("hdf_codec_benchmark_test") {
     "codec_callback_service.cpp",
   ]
 
-  deps = [
-    "//third_party/benchmark",
-    "//third_party/googletest:gtest_main",
-  ]
-
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
@@ -51,7 +46,10 @@ ohos_benchmarktest("hdf_codec_benchmark_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "openmax:libopenmax_static" ]
+  external_deps += [
+    "googletest:gtest_main",
+    "openmax:libopenmax_static",
+  ]
   defines = []
   if (drivers_peripheral_codec_feature_support_omx_extend_test) {
     defines += [ "SUPPORT_OMX_EXTEND" ]
