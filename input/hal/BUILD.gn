@@ -21,7 +21,6 @@ if (defined(ohos_lite)) {
       "include",
       "$INPUT_ROOT_DIR/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "//third_party/FreeBSD/sys/dev/evdev",
     ]
   }
 
@@ -63,10 +62,7 @@ if (defined(ohos_lite)) {
 } else {
   config("input_hdi_public_config") {
     visibility = [ ":*" ]
-    include_dirs = [
-      "$INPUT_ROOT_DIR/interfaces/include",
-      "//third_party/FreeBSD/sys/dev/evdev",
-    ]
+    include_dirs = [ "$INPUT_ROOT_DIR/interfaces/include" ]
   }
 
   ohos_shared_library("hdi_input") {
