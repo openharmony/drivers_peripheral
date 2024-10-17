@@ -21,6 +21,11 @@
 
 using namespace OHOS::HDI::Codec::V3_0;
 
+extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
+{
+    return 0;
+}
+
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;

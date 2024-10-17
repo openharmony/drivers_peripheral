@@ -626,6 +626,7 @@ static int32_t SerStubSetCallbacks(struct CodecComponentType *serviceImpl, struc
 
     if (!HdfSbufReadInt64(data, &appData)) {
         CODEC_LOGE("read appData size failed!");
+        CodecCallbackTypeRelease(callback);
         return HDF_ERR_INVALID_PARAM;
     }
 
