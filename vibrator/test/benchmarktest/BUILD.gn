@@ -31,11 +31,6 @@ ohos_benchmarktest("hdf_vibrator_benchmark_test") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [
-    "//third_party/benchmark",
-    "//third_party/googletest:gtest_main",
-  ]
-
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_vibrator:libvibrator_proxy_1.1",
@@ -47,4 +42,5 @@ ohos_benchmarktest("hdf_vibrator_benchmark_test") {
       external_deps += [ "c_utils:utils" ]
     }
   }
+  external_deps += [ "googletest:gtest_main" ]
 }
