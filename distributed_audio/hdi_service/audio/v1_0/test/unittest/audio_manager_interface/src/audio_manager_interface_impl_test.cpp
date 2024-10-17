@@ -222,8 +222,8 @@ HWTEST_F(AudioManagerInterfaceImplTest, CreateAdapter_002, TestSize.Level1)
 HWTEST_F(AudioManagerInterfaceImplTest, SetDeviceObject_002, TestSize.Level1)
 {
     audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
-    struct HdfDeviceObject deviceObject;
-    audioManagerInterfaceImpl_->SetDeviceObject(&deviceObject);
+    struct HdfDeviceObject *deviceObject = nullptr;
+    audioManagerInterfaceImpl_->SetDeviceObject(deviceObject);
     DAudioDevEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
 }
