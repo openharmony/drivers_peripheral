@@ -21,6 +21,7 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <climits>
 
 #include "parameter.h"
 #include "parameters.h"
@@ -55,6 +56,7 @@ UsbdSubscriber UsbImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbImpl::isGadgetConnected_ = false;
 uint32_t UsbImpl::attachCount_ = 0;
 uint32_t UsbImpl::attachFailedCount_ = 0;
+int32_t UsbImpl::usbOpenCount_ = 0;
 static const std::map<std::string, uint32_t> configMap = {
     {HDC_CONFIG_OFF, USB_FUNCTION_NONE},
     {HDC_CONFIG_HDC, USB_FUNCTION_HDC},
@@ -1073,6 +1075,7 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
+    usbOpenCount_++;
     port->initFlag = true;
     if (port->ctrDevHandle == nullptr && port->ctrIface != nullptr) {
         HDF_LOGD("%{public}s:start openInterface, busNum: %{public}d, devAddr: %{public}d ",
@@ -1093,8 +1096,13 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
+    if (!port->initFlag) {
+        HDF_LOGE("%{public}s:openPort failed.", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
+    usbOpenCount_--;
     int32_t ret = 0;
-    if (port->ctrDevHandle != nullptr) {
+    if (port->ctrDevHandle != nullptr && usbOpenCount_ == 0) {
         RawUsbCloseCtlProcess(port->ctrDevHandle);
         ret = UsbCloseInterface(port->ctrDevHandle, true);
         if (ret != HDF_SUCCESS) {
@@ -1102,8 +1110,8 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
             return HDF_FAILURE;
         }
         port->ctrDevHandle = nullptr;
+        port->initFlag = false;
     }
-    port->initFlag = false;
     return HDF_SUCCESS;
 }
 
