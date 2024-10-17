@@ -532,6 +532,7 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buff
             CODEC_LOGW("Error munmap");
         }
     }
+    audioBuffer_.clear();
     return err;
 }
 
