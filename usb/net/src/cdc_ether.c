@@ -795,6 +795,8 @@ static void EcmCtrlIrq(struct UsbRequest *req)
             &ecm->notificationBuffer[ecm->nbIndex], ecm->nbSize - ecm->nbIndex, req->compInfo.buffer, copySize);
         if (ret != EOK) {
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+            OsalMemFree(ecm->notificationBuffer);
+            ecm->notificationBuffer = NULL;
             return;
         }
         ecm->nbIndex += copySize;

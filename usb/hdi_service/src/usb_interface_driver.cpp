@@ -52,6 +52,7 @@ static int32_t UsbInterfaceDriverDispatch(
         HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+
     auto *hdfUsbInterfaceHost = CONTAINER_OF(client->device->service, struct HdfUsbInterfaceHost, ioService);
     if (hdfUsbInterfaceHost == nullptr || hdfUsbInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s:host or stub are nullptr", __func__);
@@ -89,6 +90,7 @@ static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject * const deviceObject
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfUsbInterfaceHost;
+        hdfUsbInterfaceHost = nullptr;
         return HDF_FAILURE;
     }
 
@@ -98,6 +100,7 @@ static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject * const deviceObject
     if (hdfUsbInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfUsbInterfaceHost;
+        hdfUsbInterfaceHost = nullptr;
         return HDF_FAILURE;
     }
     deviceObject->service = &hdfUsbInterfaceHost->ioService;
@@ -107,24 +110,37 @@ static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject * const deviceObject
     int32_t ret = UsbImpl::UsbdEventHandle(impl);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbdEventHandle failed", __func__);
+        hdfUsbInterfaceHost->stub = nullptr;
+        delete hdfUsbInterfaceHost;
+        hdfUsbInterfaceHost = nullptr;
         return HDF_FAILURE;
     }
+
+    deviceObject->service = &hdfUsbInterfaceHost->ioService;
     return HDF_SUCCESS;
 }
 
-static void HdfUsbInterfaceDriverRelease(struct HdfDeviceObject * const deviceObject)
+static void HdfUsbInterfaceDriverRelease(struct HdfDeviceObject *const deviceObject)
 {
-    if (deviceObject->service == nullptr) {
+    int32_t ret = UsbImpl::UsbdEventHandleRelease();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGW("%{public}s:UsbdEventHandleRelease ret=%{public}d", __func__, ret);
+    }
+
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
         HDF_LOGE("HdfUsbInterfaceDriverRelease not initted");
         return;
     }
 
-    int32_t ret = UsbImpl::UsbdEventHandleRelease();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:UsbdEventHandleRelease ret=%{public}d", __func__, ret);
-    }
     auto *hdfUsbInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfUsbInterfaceHost, ioService);
+    if (hdfUsbInterfaceHost == nullptr) {
+        HDF_LOGE("%{public}s:invalid param", __func__);
+        return;
+    }
     delete hdfUsbInterfaceHost;
+    hdfUsbInterfaceHost = nullptr;
+    deviceObject->service = nullptr;
+    return;
 }
 
 static struct HdfDriverEntry g_usbInterfaceDriverEntry = {
