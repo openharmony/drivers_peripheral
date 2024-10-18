@@ -23,7 +23,7 @@ void CameraPrelaunchUtTestV1_2::SetUpTestCase(void) {}
 void CameraPrelaunchUtTestV1_2::TearDownTestCase(void) {}
 void CameraPrelaunchUtTestV1_2::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_2>();
     cameraTest->Init(); // assert inside
 }
 

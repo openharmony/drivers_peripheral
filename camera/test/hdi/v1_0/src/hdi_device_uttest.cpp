@@ -23,7 +23,7 @@ void HdiDeviceUtTest::SetUpTestCase(void) {}
 void HdiDeviceUtTest::TearDownTestCase(void) {}
 void HdiDeviceUtTest::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommon>();
     cameraTest->Init();
 }
 
@@ -41,7 +41,7 @@ void HdiDeviceUtTest::TearDown(void)
 HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_001, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);

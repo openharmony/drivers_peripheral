@@ -17,7 +17,7 @@
 #include "camera.h"
 #include "v1_1/icamera_device.h"
 
-namespace OHOS {
+namespace OHOS::Camera {
 const size_t RAW_DATA_SIZE_MAX = 256;
 const size_t THRESHOLD = 10;
 
@@ -42,16 +42,16 @@ void FuncGetDefaultSettings(const uint8_t *rawData, size_t size)
     std::vector<uint8_t> abilityVec = {};
     uint8_t *data = const_cast<uint8_t *>(rawData);
     abilityVec.push_back(*data);
-    cameraTest->cameraDeviceV1_1->GetDefaultSettings(abilityVec);
+    cameraTest->cameraDeviceV1_3->GetDefaultSettings(abilityVec);
 }
 
 void FuncGetStreamOperator_V1_1(const uint8_t *rawData, size_t size)
 {
     (void)size;
     sptr<HDI::Camera::V1_0::IStreamOperatorCallback> g_callback =
-        new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+        new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     sptr<HDI::Camera::V1_1::IStreamOperator> g_StreamOperator = nullptr;
-    cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(g_callback, g_StreamOperator);
+    cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_1(g_callback, g_StreamOperator);
 }
 
 void FuncUpdateSettings(const uint8_t *rawData, size_t size)
@@ -60,18 +60,18 @@ void FuncUpdateSettings(const uint8_t *rawData, size_t size)
         return;
     }
     float *data = const_cast<float *>(reinterpret_cast<const float *>(rawData));
-    std::shared_ptr<Camera::CameraMetadata> meta = std::make_shared<Camera::CameraMetadata>(
+    std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(
         cameraTest->itemCapacity, cameraTest->dataCapacity);
     meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &data[0], cameraTest->dataCount);
     std::vector<uint8_t> metaVec;
-    Camera::MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDeviceV1_1->UpdateSettings(metaVec);
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
 }
 
 void FuncSetResultMode(const uint8_t *rawData, size_t size)
 {
     (void)size;
-    cameraTest->cameraDeviceV1_1->SetResultMode(
+    cameraTest->cameraDeviceV1_3->SetResultMode(
         *reinterpret_cast<const HDI::Camera::V1_0::ResultCallbackMode *>(rawData));
 }
 
@@ -81,7 +81,7 @@ void FuncGetEnabledResults(const uint8_t *rawData, size_t size)
     std::vector<int32_t> result = {};
     int32_t *data = const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
     result.push_back(*data);
-    cameraTest->cameraDeviceV1_1->GetEnabledResults(result);
+    cameraTest->cameraDeviceV1_3->GetEnabledResults(result);
 }
 
 void FuncEnableResult(const uint8_t *rawData, size_t size)
@@ -90,7 +90,7 @@ void FuncEnableResult(const uint8_t *rawData, size_t size)
     std::vector<int32_t> result = {};
     int32_t *data = const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
     result.push_back(*data);
-    cameraTest->cameraDeviceV1_1->EnableResult(result);
+    cameraTest->cameraDeviceV1_3->EnableResult(result);
 }
 
 void FuncDisableResult(const uint8_t *rawData, size_t size)
@@ -99,7 +99,7 @@ void FuncDisableResult(const uint8_t *rawData, size_t size)
     std::vector<int32_t> result = {};
     int32_t *data = const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
     result.push_back(*data);
-    cameraTest->cameraDeviceV1_1->DisableResult(result);
+    cameraTest->cameraDeviceV1_3->DisableResult(result);
 }
 
 void FuncGetStatus(const uint8_t *rawData, size_t size)
@@ -107,15 +107,15 @@ void FuncGetStatus(const uint8_t *rawData, size_t size)
     (void)size;
     std::vector<uint8_t> resultOut = {};
     float *data = const_cast<float *>(reinterpret_cast<const float *>(rawData));
-    std::shared_ptr<Camera::CameraMetadata> meta = std::make_shared<Camera::CameraMetadata>(
+    std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(
         cameraTest->itemCapacity, cameraTest->dataCapacity);
     meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &data[0], cameraTest->dataCount);
     std::vector<uint8_t> metaVec;
-    Camera::MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    if (nullptr == cameraTest->cameraDeviceV1_2) {
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    if (nullptr == cameraTest->cameraDeviceV1_3) {
         return;
     }
-    cameraTest->cameraDeviceV1_2->GetStatus(metaVec, resultOut);
+    cameraTest->cameraDeviceV1_3->GetStatus(metaVec, resultOut);
 }
 
 void FuncGetSecureCameraSeq(const uint8_t *rawData, size_t size)
@@ -186,13 +186,13 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     uint32_t cmd = 0;
     rawData += sizeof(cmd);
 
-    cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest->InitV1_3();
-    if (cameraTest->serviceV1_1 == nullptr) {
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_3>();
+    cameraTest->Init();
+    if (cameraTest->serviceV1_3 == nullptr) {
         return false;
     }
-    cameraTest->OpenV1_3();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    cameraTest->Open(DEVICE_0);
+    if (cameraTest->cameraDeviceV1_3 == nullptr) {
         return false;
     }
 
@@ -205,12 +205,12 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (size < OHOS::THRESHOLD) {
-        CAMERA_LOGW("Fuzz test input is invalid. The size is smaller than %{public}zu", OHOS::THRESHOLD);
+    if (size < THRESHOLD) {
+        CAMERA_LOGW("Fuzz test input is invalid. The size is smaller than %{public}zu", THRESHOLD);
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyApi(data, size);
+    DoSomethingInterestingWithMyApi(data, size);
     return 0;
 }
 } // namespace OHOS

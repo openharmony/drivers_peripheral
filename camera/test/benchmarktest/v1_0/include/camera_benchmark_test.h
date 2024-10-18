@@ -18,14 +18,12 @@
 
 #include <benchmark/benchmark.h>
 #include <gtest/gtest.h>
-#include <string>
-#include <vector>
-#include "ut_common.h"
+#include "hdi_common.h"
 
 class CameraBenchmarkTest : public benchmark::Fixture {
 public:
     void SetUp(const ::benchmark::State &state);
     void TearDown(const ::benchmark::State &state);
-    std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
+    std::shared_ptr<OHOS::Camera::HdiCommon> cameraTest = nullptr;
 };
 #endif

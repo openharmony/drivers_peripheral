@@ -26,7 +26,7 @@ void FrontCameraHdiUtTestV1_2::SetUpTestCase(void) {}
 void FrontCameraHdiUtTestV1_2::TearDownTestCase(void) {}
 void FrontCameraHdiUtTestV1_2::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_2>();
     cameraTest->Init(); // assert inside
     cameraTest->Open(DEVICE_1); // assert inside
 }
@@ -46,7 +46,7 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_001, TestSize.Le
 {
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get Stream Operator
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -76,7 +76,7 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_001, TestSize.Le
     meta->addEntry(OHOS_CONTROL_CAMERA_VIRTUAL_APERTURE_VALUE, &virtualApertureValue, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     // start capture
@@ -107,7 +107,7 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_002, TestSize.Le
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
         for (size_t i = 0; i < entry.count; i++) {
             // Get Stream Operator
-            cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+            cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
             cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
                 cameraTest->streamOperator_V1_1);
             EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -137,7 +137,7 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_002, TestSize.Le
             meta->addEntry(OHOS_CONTROL_CAMERA_VIRTUAL_APERTURE_VALUE, &virtualApertureValue, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             // start capture

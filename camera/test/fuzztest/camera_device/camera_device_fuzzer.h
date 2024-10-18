@@ -16,9 +16,8 @@
 #ifndef CAMERA_DEVICE_FUZZER_H
 #define CAMERA_DEVICE_FUZZER_H
 #define FUZZ_PROJECT_NAME "cameradevice_fuzzer"
-#include "common.h"
-#include "v1_0/istream_operator_callback.h"
-namespace OHOS {
-    std::shared_ptr<OHOS::Camera::CameraManager> cameraTest = nullptr;
+#include "hdi_common_v1_3.h"
+namespace OHOS::Camera {
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest = nullptr;
 }
 #endif

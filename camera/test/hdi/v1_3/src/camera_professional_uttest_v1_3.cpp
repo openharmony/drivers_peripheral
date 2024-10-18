@@ -35,7 +35,7 @@ void CameraProfessionalUtTestV1_3::SetUpTestCase(void) {}
 void CameraProfessionalUtTestV1_3::TearDownTestCase(void) {}
 void CameraProfessionalUtTestV1_3::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_3>();
     cameraTest->Init(); // assert inside
     cameraTest->Open(DEVICE_0); // assert inside
 }
@@ -85,7 +85,7 @@ bool GetSupportedPhysicalApertureValues(std::shared_ptr<CameraMetadata> ability)
     }
 }
 
-void FillCaptureSetting(std::shared_ptr<OHOS::Camera::Test> cameraTest)
+void FillCaptureSetting(std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest)
 {
     // Fill capture setting
     std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -183,7 +183,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_003, TestSiz
         meta->addEntry(OHOS_CONTROL_FLASH_MODE, &flashMode, DATA_COUNT);
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -196,6 +196,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_003, TestSiz
         cameraTest->Close();
     }
     sleep(UT_SECOND_TIMES);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        printf("Camera_Professional_Hdi_V1_3_003 PROFESSIONAL_PHOTO resultMeta nullptr\n");
+        return;
+    }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
@@ -219,7 +223,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_004, TestSiz
     FillCaptureSetting(cameraTest);
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get stream operator
-    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::HdiCommonV1_3::TestStreamOperatorCallbackV1_3();
     cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
         cameraTest->streamOperator_V1_3);
     EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
@@ -234,8 +238,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_004, TestSiz
     OHOS::HDI::Camera::V1_1::ExtendedStreamInfo extendedStreamInfo;
     extendedStreamInfo.type =
         static_cast<OHOS::HDI::Camera::V1_1::ExtendedStreamInfoType>(OHOS::HDI::Camera::V1_3::EXTENDED_STREAM_INFO_RAW);
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer2 =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_1::StreamConsumer> consumer2 =
+        std::make_shared<OHOS::Camera::HdiCommonV1_1::StreamConsumer>();
     extendedStreamInfo.bufferQueue = consumer2->CreateProducerSeq([this](void *addr, uint32_t size) {
         cameraTest->DumpImageFile(105, "dng", addr, size);
     });
@@ -295,7 +299,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_005, TestSiz
         meta->addEntry(OHOS_CONTROL_SUPPORTED_COLOR_MODES, &colorMode, DATA_COUNT);
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -350,7 +354,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_006, TestSiz
         meta->addEntry(OHOS_CONTROL_FOCUS_ASSIST_FLASH_SUPPORTED_MODE, &focusAssistFlashMode, DATA_COUNT);
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -385,7 +389,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_007, TestSiz
     meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -442,7 +446,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_008, TestSiz
         meta->addEntry(OHOS_CONTROL_METER_MODE, &meteringMode, DATA_COUNT);
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -484,7 +488,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_009, TestSiz
     meta->addEntry(OHOS_CONTROL_ISO_VALUE, &isoValue, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -495,6 +499,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_009, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 
     sleep(UT_SECOND_TIMES);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        printf("Camera_Professional_Hdi_V1_3_009 PROFESSIONAL_PHOTO resultMeta nullptr\n");
+        return;
+    }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
@@ -529,7 +537,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_010, TestSiz
         meta->addEntry(OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_VALUE, &physicalApertureValue, DATA_COUNT);
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -541,6 +549,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_010, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 
     sleep(UT_SECOND_TIMES);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        printf("Camera_Professional_Hdi_V1_3_010 PROFESSIONAL_PHOTO resultMeta nullptr\n");
+        return;
+    }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
@@ -578,7 +590,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_011, TestSiz
     meta->addEntry(OHOS_CONTROL_SENSOR_EXPOSURE_TIME, &sensorExposureTime, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -590,6 +602,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_011, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 
     sleep(UT_SECOND_TIMES);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        printf("Camera_Professional_Hdi_V1_3_011 PROFESSIONAL_PHOTO resultMeta nullptr\n");
+        return;
+    }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
@@ -630,7 +646,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_012, TestSiz
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &aeExposureCompensation, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -688,7 +704,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_013, TestSiz
         }
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -731,7 +747,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_014, TestSiz
             meta->addEntry(OHOS_CONTROL_LENS_FOCUS_DISTANCE, &lensFocusDistance, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -796,7 +813,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_015, TestSiz
             meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -843,7 +861,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_016, TestSiz
     meta->addEntry(OHOS_CONTROL_EXPOSURE_HINT_MODE, &exposureHintMode, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -854,6 +872,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_016, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 
     sleep(UT_SECOND_TIMES);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        printf("Camera_Professional_Hdi_V1_3_016 PROFESSIONAL_PHOTO resultMeta nullptr\n");
+        return;
+    }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
@@ -892,7 +914,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_017, TestSiz
             meta->addEntry(OHOS_CONTROL_SENSOR_WB_VALUE, &wbMode, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -924,7 +947,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_018, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     //0:close, 1:open, 2:auto, 3:always_open
     for (uint32_t i = 0;i < 4;i++) {
-        cameraTest->intents = {PREVIEW, VIDEO};
+        cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
         cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
         std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -932,7 +955,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_018, TestSiz
         meta->addEntry(OHOS_CONTROL_FLASH_MODE, &flashMode, DATA_COUNT);
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -944,6 +967,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_018, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 
     sleep(UT_SECOND_TIMES);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        printf("Camera_Professional_Hdi_V1_3_018 PROFESSIONAL_VIDEO resultMeta nullptr\n");
+        return;
+    }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
@@ -967,7 +994,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_019, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     //0:normal, 1:bright, 2:soft
     for (uint32_t i = 0;i < 3;i++) {
-        cameraTest->intents = {PREVIEW, VIDEO};
+        cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
         cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
         std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -975,7 +1002,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_019, TestSiz
         meta->addEntry(OHOS_CONTROL_SUPPORTED_COLOR_MODES, &colorMode, DATA_COUNT);
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1001,7 +1028,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_020, TestSiz
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
-    cameraTest->intents = {PREVIEW, VIDEO};
+    cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
     cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1009,7 +1036,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_020, TestSiz
     meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1042,7 +1069,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_021, TestSiz
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
 
         for (uint32_t i = 0;i < entry.count;i++) {
-            cameraTest->intents = {PREVIEW, VIDEO};
+            cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1050,7 +1077,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_021, TestSiz
             meta->addEntry(OHOS_CONTROL_METER_MODE, &meteringMode, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1080,7 +1108,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_022, TestSiz
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
-    cameraTest->intents = {PREVIEW, VIDEO};
+    cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
     cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1088,7 +1116,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_022, TestSiz
     meta->addEntry(OHOS_CONTROL_ISO_VALUE, &isoValue, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1099,6 +1127,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_022, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 
     sleep(UT_SECOND_TIMES);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        printf("Camera_Professional_Hdi_V1_3_022 PROFESSIONAL_VIDEO resultMeta nullptr\n");
+        return;
+    }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
@@ -1124,7 +1156,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_023, TestSiz
     GetSupportedPhysicalApertureValues(cameraTest->ability);
 
     for (uint32_t i = 0;i < supportedPhysicalApertureValues_.size();i++) {
-        cameraTest->intents = {PREVIEW, VIDEO};
+        cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
         cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
         std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1132,7 +1164,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_023, TestSiz
         meta->addEntry(OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_VALUE, &physicalApertureValue, DATA_COUNT);
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1144,6 +1176,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_023, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
     
     sleep(UT_SECOND_TIMES);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        printf("Camera_Professional_Hdi_V1_3_023 PROFESSIONAL_VIDEO resultMeta nullptr\n");
+        return;
+    }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
@@ -1173,7 +1209,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_024, TestSiz
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.r != nullptr && entry.count > 0) {
         for (uint32_t i = 0;i < entry.count;i++) {
-            cameraTest->intents = {PREVIEW, VIDEO};
+            cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1181,7 +1217,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_024, TestSiz
             meta->addEntry(OHOS_CONTROL_SENSOR_EXPOSURE_TIME, &sensorExposureTime, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1197,6 +1234,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_024, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
     
     sleep(UT_SECOND_TIMES);
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        printf("Camera_Professional_Hdi_V1_3_024 PROFESSIONAL_VIDEO resultMeta nullptr\n");
+        return;
+    }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
@@ -1220,7 +1261,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_025, TestSiz
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
-    cameraTest->intents = {PREVIEW, VIDEO};
+    cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
     cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1228,7 +1269,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_025, TestSiz
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &aeExposureCompensation, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1261,7 +1302,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_026, TestSiz
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         for (uint32_t i = 0;i < entry.count;i++) {
-            cameraTest->intents = {PREVIEW, VIDEO};
+            cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1273,7 +1314,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_026, TestSiz
             }
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1311,7 +1353,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_027, TestSiz
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
         for (uint32_t i = 0;i < entry.count;i++) {
-            cameraTest->intents = {PREVIEW, VIDEO};
+            cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1319,7 +1361,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_027, TestSiz
             meta->addEntry(OHOS_CONTROL_LENS_FOCUS_DISTANCE, &lensFocusDistance, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1357,7 +1400,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_028, TestSiz
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         for (uint32_t i = 0;i < entry.count;i++) {
-            cameraTest->intents = {PREVIEW, VIDEO};
+            cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1365,7 +1408,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_028, TestSiz
             meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1403,7 +1447,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_029, TestSiz
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
         for (uint32_t i = 0;i < entry.count;i++) {
-            cameraTest->intents = {PREVIEW, VIDEO};
+            cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
             cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO);
 
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1411,7 +1455,8 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_029, TestSiz
             meta->addEntry(OHOS_CONTROL_SENSOR_WB_VALUE, &wbMode, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1436,7 +1481,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_029, TestSiz
 HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_030, TestSize.Level1)
 {
     // Get stream operator
-    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::HdiCommonV1_3::TestStreamOperatorCallbackV1_3();
     cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
         cameraTest->streamOperator_V1_3);
     EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
@@ -1505,7 +1550,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_031, TestSiz
     meta->addEntry(OHOS_CONTROL_SUPPORTED_COLOR_MODES, &colorMode, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1541,7 +1586,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_032, TestSiz
     meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1577,7 +1622,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_033, TestSiz
     meta->addEntry(OHOS_CONTROL_ISO_VALUE, &isoValue, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1614,7 +1659,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_034, TestSiz
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &aeExposureCompensation, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1650,7 +1695,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_035, TestSiz
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);

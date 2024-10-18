@@ -16,7 +16,7 @@
 #include "defferred_delivery_image_fuzzer.h"
 #include "camera.h"
 
-namespace OHOS {
+namespace OHOS::Camera {
 const size_t THRESHOLD = 10;
 enum BitOperat {
     INDEX_0 = 0,
@@ -40,14 +40,14 @@ static uint32_t ConvertUint32(const uint8_t *bitOperat)
 bool GetConcurrencyApi(const uint8_t *rawData)
 {
     int taskCount;
-    imageProcessSession_->GetCoucurrency(
+    cameraTest_->imageProcessSession_->GetCoucurrency(
         static_cast<OHOS::HDI::Camera::V1_2::ExecutionMode>(ConvertUint32(rawData)), taskCount);
     return true;
 }
 
 bool SetExecutionModeApi(const uint8_t *rawData)
 {
-    imageProcessSession_->SetExecutionMode(
+    cameraTest_->imageProcessSession_->SetExecutionMode(
         static_cast<OHOS::HDI::Camera::V1_2::ExecutionMode>(ConvertUint32(rawData)));
     return true;
 }
@@ -55,36 +55,36 @@ bool SetExecutionModeApi(const uint8_t *rawData)
 bool GetPendingImagesApi(const uint8_t *rawData)
 {
     (void) rawData;
-    imageProcessSession_->GetPendingImages(pendingImageIds_);
+    cameraTest_->imageProcessSession_->GetPendingImages(cameraTest_->pendingImageIds_);
     return true;
 }
 
 bool ProcessImageApi(const uint8_t *rawData)
 {
-    int imagesCount = pendingImageIds_.size();
+    int imagesCount = cameraTest_->pendingImageIds_.size();
     std::string imageId;
     if (imagesCount != 0) {
-        imageId = pendingImageIds_[rawData[0] % imagesCount];
+        imageId = cameraTest_->pendingImageIds_[rawData[0] % imagesCount];
     }
-    imageProcessSession_->ProcessImage(imageId);
+    cameraTest_->imageProcessSession_->ProcessImage(imageId);
     return true;
 }
 
 bool RemoveImageApi(const uint8_t *rawData)
 {
-    int imagesCount = pendingImageIds_.size();
+    int imagesCount = cameraTest_->pendingImageIds_.size();
     std::string imageId;
     if (imagesCount != 0) {
-        imageId = pendingImageIds_[rawData[0] % imagesCount];
+        imageId = cameraTest_->pendingImageIds_[rawData[0] % imagesCount];
     }
-    imageProcessSession_->RemoveImage(imageId);
+    cameraTest_->imageProcessSession_->RemoveImage(imageId);
     return true;
 }
 
 bool InterruptApi(const uint8_t *rawData)
 {
     (void) rawData;
-    imageProcessSession_->Interrupt();
+    cameraTest_->imageProcessSession_->Interrupt();
     return true;
 }
 
@@ -108,7 +108,6 @@ static void TestFuncSwitch(uint32_t cmd, const uint8_t *rawData)
 
 bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 {
-    constexpr const int userId = 100;
     (void)size;
     if (rawData == nullptr) {
         return false;
@@ -117,25 +116,19 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     uint32_t cmd = ConvertUint32(rawData);
     rawData += sizeof(cmd);
 
-    cameraTest_ = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest_->InitV1_2();
-    if (cameraTest_->serviceV1_1 == nullptr) {
+    cameraTest_ = std::make_shared<OHOS::Camera::HdiCommonV1_2>();
+    cameraTest_->Init();
+    if (cameraTest_->serviceV1_2 == nullptr) {
         return false;
     }
-    cameraTest_->OpenCameraV1_2();
-    if (cameraTest_->cameraDeviceV1_1 == nullptr) {
+    cameraTest_->OpenCameraV1_2(DEVICE_0);
+    if (cameraTest_->cameraDeviceV1_2 == nullptr) {
         return false;
     }
-    imageProcessService_ = OHOS::HDI::Camera::V1_2::ImageProcessServiceProxy::Get();
-    if (imageProcessService_ == nullptr) {
+    cameraTest_->rc = cameraTest_->DefferredImageTestInit();
+    if (cameraTest_->rc != 0) {
         return false;
     }
-    imageProcessCallback_ = new TestImageProcessCallback();
-    imageProcessService_->CreateImageProcessSession(userId, imageProcessCallback_, imageProcessSession_);
-    if (imageProcessSession_ == nullptr) {
-        return false;
-    }
-
     TestFuncSwitch(cmd, rawData);
     cameraTest_->Close();
     return true;
@@ -143,11 +136,11 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (size < OHOS::THRESHOLD) {
+    if (size < THRESHOLD) {
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyApi(data, size);
+    DoSomethingInterestingWithMyApi(data, size);
     return 0;
 }
 } // namespace OHOS

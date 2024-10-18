@@ -16,7 +16,7 @@
 #include "camera_host_fuzzer.h"
 #include "camera.h"
 
-namespace OHOS {
+namespace OHOS::Camera {
 const size_t THRESHOLD = 10;
 
 enum HostCmdId {
@@ -42,12 +42,12 @@ void FuncPrelaunch(const uint8_t *rawData, size_t size)
     cameraTest->prelaunchConfig->cameraId = const_cast<char*>(reinterpret_cast<const char*>(rawData));
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting.push_back(*rawData);
-    cameraTest->serviceV1_2->Prelaunch(*cameraTest->prelaunchConfig);
+    cameraTest->serviceV1_3->Prelaunch(*cameraTest->prelaunchConfig);
 }
 
 void FuncGetCameraAbility(const uint8_t *rawData, size_t size)
 {
-    cameraTest->serviceV1_2->GetCameraAbility(const_cast<char*>(reinterpret_cast<const char*>(rawData)),
+    cameraTest->serviceV1_3->GetCameraAbility(const_cast<char*>(reinterpret_cast<const char*>(rawData)),
         cameraTest->abilityVec);
 }
 
@@ -55,8 +55,8 @@ void FuncOpenCamera(const uint8_t *rawData, size_t size)
 {
     sptr<HDI::Camera::V1_0::ICameraDevice> g_CameraDevice = nullptr;
     const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
-        new Camera::CameraManager::DemoCameraDeviceCallback();
-    cameraTest->serviceV1_2->OpenCamera(
+        new HdiCommon::DemoCameraDeviceCallback();
+    cameraTest->serviceV1_3->OpenCamera(
         const_cast<char*>(reinterpret_cast<const char*>(rawData)), callback, g_CameraDevice);
 }
 
@@ -64,33 +64,33 @@ void FuncOpenCamera_V1_1(const uint8_t *rawData, size_t size)
 {
     sptr<HDI::Camera::V1_1::ICameraDevice> g_CameraDevice = nullptr;
     const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
-        new Camera::CameraManager::DemoCameraDeviceCallback();
-    cameraTest->serviceV1_2->OpenCamera_V1_1(
+        new HdiCommon::DemoCameraDeviceCallback();
+    cameraTest->serviceV1_3->OpenCamera_V1_1(
         const_cast<char*>(reinterpret_cast<const char*>(rawData)), callback, g_CameraDevice);
 }
 
 void FuncSetFlashlight(const uint8_t *rawData, size_t size)
 {
-    cameraTest->serviceV1_2->SetFlashlight(
+    cameraTest->serviceV1_3->SetFlashlight(
         const_cast<char*>(reinterpret_cast<const char*>(rawData)), true);
 }
 
 void FuncSetFlashlightV1_2(const uint8_t *rawData, size_t size)
 {
     uint8_t *data = const_cast<uint8_t *>(rawData);
-    cameraTest->serviceV1_2->SetFlashlight_V1_2(*(reinterpret_cast<float *>(data)));
+    cameraTest->serviceV1_3->SetFlashlight_V1_2(*(reinterpret_cast<float *>(data)));
 }
 
 void FuncNotifyDeviceStateChangeInfo(const uint8_t *rawData, size_t size)
 {
     int *data = const_cast<int *>(reinterpret_cast<const int *>(rawData));
-    cameraTest->serviceV1_2->NotifyDeviceStateChangeInfo(data[0], data[1]);
+    cameraTest->serviceV1_3->NotifyDeviceStateChangeInfo(data[0], data[1]);
 }
 
 void FuncPreCameraSwitch(const uint8_t *rawData, size_t size)
 {
     std::string cameraId = reinterpret_cast<const char*>(rawData);
-    cameraTest->serviceV1_2->PreCameraSwitch(cameraId);
+    cameraTest->serviceV1_3->PreCameraSwitch(cameraId);
 }
 
 void FuncPrelaunchWithOpMode(const uint8_t *rawData, size_t size)
@@ -103,14 +103,14 @@ void FuncPrelaunchWithOpMode(const uint8_t *rawData, size_t size)
 
     int *data = const_cast<int *>(reinterpret_cast<const int *>(rawData));
 
-    cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, data[0]);
+    cameraTest->serviceV1_3->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, data[0]);
 }
 
 void FuncOpenSecureCamera(const uint8_t *rawData, size_t size)
 {
     sptr<HDI::Camera::V1_3::ICameraDevice> g_CameraDevice = nullptr;
     const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
-        new Camera::CameraManager::DemoCameraDeviceCallback();
+        new HdiCommon::DemoCameraDeviceCallback();
     cameraTest->serviceV1_3->OpenSecureCamera(
         const_cast<char*>(reinterpret_cast<const char*>(rawData)), callback, g_CameraDevice);
 }
@@ -172,12 +172,12 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     uint32_t cmd = 0;
     rawData += sizeof(cmd);
 
-    cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest->InitV1_3();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_3>();
+    cameraTest->Init();
     if (cameraTest->serviceV1_3 == nullptr) {
         return false;
     }
-    cameraTest->OpenV1_3();
+    cameraTest->Open(DEVICE_0);
     if (cameraTest->cameraDeviceV1_3 == nullptr) {
         return false;
     }
@@ -191,11 +191,11 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (size < OHOS::THRESHOLD) {
+    if (size < THRESHOLD) {
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyApi(data, size);
+    DoSomethingInterestingWithMyApi(data, size);
     return 0;
 }
 } // namespace OHOS

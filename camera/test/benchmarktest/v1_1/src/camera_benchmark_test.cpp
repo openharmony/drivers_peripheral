@@ -25,7 +25,7 @@ constexpr int32_t REPETITION_FREQUENCY = 3;
 
 void CameraBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_1>();
     cameraTest->Init();
     cameraTest->Open(DEVICE_0);
 }
@@ -68,7 +68,7 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_GetStreamOperator_V1_1_benchmark_002)(
     benchmark::State &st)
 {
     EXPECT_EQ(false, cameraTest->cameraDeviceV1_1 == nullptr);
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     for (auto _ : st) {
         cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
             cameraTest->streamOperator_V1_1);
@@ -89,7 +89,7 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_GetDefaultSettings_benchmark_003)(
     benchmark::State &st)
 {
     EXPECT_EQ(false, cameraTest->cameraDeviceV1_1 == nullptr);
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     for (auto _ : st) {
         cameraTest->rc = cameraTest->cameraDeviceV1_1->GetDefaultSettings(cameraTest->abilityVec);
     }

@@ -44,11 +44,7 @@ ohos_unittest("camera_hdi_sequenceable_ut") {
     "$camera_test_path/sequenceable_test/include",
   ]
 
-  deps = [
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = []
 
   if (is_standard_system) {
     external_deps = [
@@ -70,6 +66,9 @@ ohos_unittest("camera_hdi_sequenceable_ut") {
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:libmap_data_sequenceable_1.0",
     "drivers_interface_camera:metadata",
+    "googletest:gmock_main",
+    "googletest:gtest",
+    "googletest:gtest_main",
     "graphic_surface:surface",
     "samgr:samgr_proxy",
   ]
