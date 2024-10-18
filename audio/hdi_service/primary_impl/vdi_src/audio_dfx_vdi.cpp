@@ -22,7 +22,7 @@
 #include "xcollie/xcollie_define.h"
 #endif
 
-#define HICOLLIE_TIMEOUT 10
+#define HICOLLIE_TIMEOUT 8
 
 void HdfAudioStartTrace(const char* value, int valueLen)
 {

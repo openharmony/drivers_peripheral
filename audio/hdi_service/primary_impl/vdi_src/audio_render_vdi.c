@@ -318,6 +318,9 @@ int32_t AudioRenderSelectSceneVdi(struct IAudioRender *render, const struct Audi
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->SelectScene, HDF_ERR_INVALID_PARAM);
 
+    AUDIO_FUNC_LOGI("portId = [%{public}u], pin = [%{public}d], desc = [%{public}s]",
+        scene->desc.portId, scene->desc.pins, scene->desc.desc);
+
     struct AudioSceneDescriptorVdi vdiScene;
     (void)memset_s((void *)&vdiScene, sizeof(vdiScene), 0, sizeof(vdiScene));
     int32_t ret = AudioCommonSceneToVdiSceneVdi(scene, &vdiScene);
