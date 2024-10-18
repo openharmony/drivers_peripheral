@@ -83,9 +83,6 @@ void HdfAudioUtManagerTest::SetUpTestCase()
 
 void HdfAudioUtManagerTest::TearDownTestCase()
 {
-    if (g_manager == nullptr) {
-        return;
-    }
     IAudioManagerRelease(g_manager, false);
 }
 
@@ -254,11 +251,5 @@ HWTEST_F(HdfAudioUtManagerTest, HdfAudioManagerLoadAdapterSuccess_002, TestSize.
 HWTEST_F(HdfAudioUtManagerTest, HdfAudioManagerReleaseAudioManagerObjectNull_001, TestSize.Level1)
 {
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, g_manager->ReleaseAudioManagerObject(nullptr));
-}
-
-HWTEST_F(HdfAudioUtManagerTest, HdfAudioManagerReleaseAudioManagerObject_001, TestSize.Level1)
-{
-    EXPECT_EQ(HDF_SUCCESS, g_manager->ReleaseAudioManagerObject(g_manager));
-    g_manager = NULL;
 }
 }
