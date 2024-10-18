@@ -50,6 +50,7 @@ static const uint32_t INIT_DEFAULT_VALUE = 255;
 static const uint32_t STATUS = INPUT_DEVICE_STATUS_CLOSED;
 static const string NODE_PATH = "dev/input/";
 static const size_t COUNT = 1;
+static const size_t INVALID_DEV_INDEX = 33;
 
 
 class HdiInputTest : public testing::Test {
@@ -382,6 +383,24 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
 }
 
 /**
+  * @tc.name: RegisterReportCallback001
+  * @tc.desc: register report callback fail
+  * @tc.type: FUNC
+  * @tc.require: AR000F8682, AR000F8QNL
+  */
+HWTEST_F(HdiInputTest, RegisterReportCallback001, TestSize.Level1)
+{
+    printf("%s: [Input] RegisterReportCallback001 enter\n", __func__);
+    InputDeviceManager iInputDeviceManager;
+    int32_t ret;
+    ret = iInputDeviceManager.RegisterReportCallback(0, nullptr);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: register report callback failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
   * @tc.name: UnregisterReportCallback001
   * @tc.desc: get input device chip info test
   * @tc.type: FUNC
@@ -406,6 +425,25 @@ HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level1)
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
+
+/**
+  * @tc.name: UnRegisterReportCallback001
+  * @tc.desc: unregister report callback fail
+  * @tc.type: FUNC
+  * @tc.require: AR000F8682, AR000F8QNL
+  */
+HWTEST_F(HdiInputTest, UnRegisterReportCallback001, TestSize.Level1)
+{
+    printf("%s: [Input] UnRegisterReportCallback001 enter\n", __func__);
+    int32_t ret;
+    InputDeviceManager iInputDeviceManager;
+    ret = iInputDeviceManager.UnregisterReportCallback(INVALID_DEV_INDEX);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: unregister report callback failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
 
 /**
   * @tc.name: FindIndexFromFd
@@ -890,6 +928,28 @@ HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level1)
 }
 
 /**
+  * @tc.name: RunCapacitanceTest002
+  * @tc.desc: run capacitance test test002
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, RunCapacitanceTest002, TestSize.Level1)
+{
+    printf("%s: [Input] RunCapacitanceTest002 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char result[TEST_RESULT_LEN] = {0};
+    uint32_t testType = TEST_TYPE;
+    ret = g_inputInterface->iInputController->RunCapacitanceTest(g_touchIndex, testType, nullptr, TEST_RESULT_LEN);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: run capacitance test002 failed, ret %d", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
   * @tc.name: RunExtraCommand
   * @tc.desc: run extra command test
   * @tc.type: FUNC
@@ -1015,7 +1075,7 @@ HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: ReportEventPkg
+  * @tc.name: ReportEventPkg001
   * @tc.desc: Report Event Pkg
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
@@ -1060,4 +1120,40 @@ HWTEST_F(HdiInputTest, InotifyEventHandler001, TestSize.Level1)
         printf("%s: Inotify Event Handler failed, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: ScanDevice
+  * @tc.desc: Scan Device Fail
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, ScanDevice001, TestSize.Level1)
+{
+    printf("%s: [Input] ScanDevice001 enter\n", __func__);
+    int32_t ret;
+    InputDeviceManager iInputDeviceManager;
+    ret = iInputDeviceManager.ScanDevice(nullptr, 0);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: Scan Device failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetDeviceList
+  * @tc.desc: Get Device List Fail
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetDeviceList001, TestSize.Level1)
+{
+    printf("%s: [Input] GetDeviceList001 enter\n", __func__);
+    int32_t ret;
+    InputDeviceManager iInputDeviceManager;
+    ret = iInputDeviceManager.GetDeviceList(nullptr, nullptr, 0);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: Get Device List Failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
 }

@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,20 +17,13 @@ import("//build/test.gni")
 module_output_path = "drivers_peripheral_input/input"
 INPUT_ROOT_DIR = "./../../.."
 
-ohos_unittest("hdi_unittest_input") {
+ohos_unittest("InputPassthroughAdditionalTest") {
   module_out_path = module_output_path
-
-  include_dirs = [
-    "$INPUT_ROOT_DIR/hdi_service",
-    "$INPUT_ROOT_DIR/interfaces/include",
-    "$INPUT_ROOT_DIR/interfaces",
-    "$INPUT_ROOT_DIR/utils/include",
-    "$INPUT_ROOT_DIR/test/common/include",
-  ]
+  configs = [ ":hdf_input_through_additional" ]
 
   sources = [
-    "$INPUT_ROOT_DIR/test/common/src/input_callback_impl.cpp",
     "hdf_input_hdi_test.cpp",
+    "input_callback_impl.cpp",
   ]
   cflags = [
     "-Wall",
@@ -53,4 +46,12 @@ ohos_unittest("hdi_unittest_input") {
     external_deps = [ "hilog:libhilog" ]
   }
   external_deps += [ "ipc:ipc_single" ]
+}
+
+config("hdf_input_through_additional") {
+  include_dirs = [
+    "$INPUT_ROOT_DIR/interfaces/include",
+    "$INPUT_ROOT_DIR/interfaces",
+    "$INPUT_ROOT_DIR/hdi_service",
+  ]
 }
