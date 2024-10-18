@@ -24,7 +24,7 @@ constexpr int32_t REPETITION_FREQUENCY = 3;
 
 void CameraBenchmarkSecureStreamTest::SetUp(const ::benchmark::State &state)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_3>();
     cameraTest->Init();
     cameraTest->OpenSecureCamera(DEVICE_0);
 }
@@ -80,7 +80,7 @@ BENCHMARK_REGISTER_F(CameraBenchmarkSecureStreamTest, GetSecureCameraSeq_benchma
 BENCHMARK_F(CameraBenchmarkSecureStreamTest, EnableResult_benchmark_001)(
     benchmark::State &st)
 {
-    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::HdiCommonV1_3::TestStreamOperatorCallbackV1_3();
     cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
         cameraTest->streamOperator_V1_3);
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
@@ -108,7 +108,7 @@ BENCHMARK_REGISTER_F(CameraBenchmarkSecureStreamTest, EnableResult_benchmark_001
 BENCHMARK_F(CameraBenchmarkSecureStreamTest, DisableResult_benchmark_001)(
     benchmark::State &st)
 {
-    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::HdiCommonV1_3::TestStreamOperatorCallbackV1_3();
     cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
         cameraTest->streamOperator_V1_3);
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(

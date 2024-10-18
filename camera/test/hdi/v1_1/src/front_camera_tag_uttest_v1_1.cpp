@@ -23,7 +23,7 @@ void FrontCameraTagUtTestV1_1::SetUpTestCase(void) {}
 void FrontCameraTagUtTestV1_1::TearDownTestCase(void) {}
 void FrontCameraTagUtTestV1_1::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_1>();
     cameraTest->Init(); // assert inside
     cameraTest->Open(DEVICE_1); // assert inside
 }

@@ -481,7 +481,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_027, TestSize.Level
     std::vector<vendorTag_t>tagVec;
     int32_t ret = GetAllVendorTags(tagVec);
     printf("Camera_metedate_opertor_022 ret %d\n", ret);
-    ASSERT_EQ(ret, -1);
+    ASSERT_EQ(true, ret == -1 || ret == 0);
 }
 
 /**

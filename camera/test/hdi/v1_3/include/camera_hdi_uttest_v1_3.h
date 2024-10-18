@@ -25,6 +25,6 @@ public:
     void SetUp(void);
     void TearDown(void);
     void TakePhotoWithTags(std::shared_ptr<OHOS::Camera::CameraSetting> meta);
-    std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest = nullptr;
 };
 #endif

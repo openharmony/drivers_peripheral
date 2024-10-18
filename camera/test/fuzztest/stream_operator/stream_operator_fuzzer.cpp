@@ -15,7 +15,7 @@
 
 #include "stream_operator_fuzzer.h"
 
-namespace OHOS {
+namespace OHOS::Camera {
 const size_t THRESHOLD = 10;
 
 enum HostCmdId {
@@ -84,9 +84,9 @@ void UpdateStreams(const uint8_t *rawData)
     cameraTest->streamInfoV1_1->v1_0.streamId_ = data[0];
     cameraTest->streamInfoV1_1->v1_0.width_ = data[0];
     cameraTest->streamInfoV1_1->v1_0.height_ = data[0];
-    cameraTest->streamInfoV1_1->v1_0.format_ = Camera::PIXEL_FMT_YCRCB_420_SP;
+    cameraTest->streamInfoV1_1->v1_0.format_ = PIXEL_FMT_YCRCB_420_SP;
     cameraTest->streamInfoV1_1->v1_0.tunneledMode_ = data[0];
-    cameraTest->streamInfoV1_1->v1_0.dataspace_ = Camera::OHOS_CAMERA_SRGB_FULL;
+    cameraTest->streamInfoV1_1->v1_0.dataspace_ = OHOS_CAMERA_SRGB_FULL;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
     cameraTest->rc = cameraTest->streamOperator_V1_3->UpdateStreams(cameraTest->streamInfosV1_1);
 }
@@ -98,7 +98,7 @@ void funcConfirmCapture(const uint8_t *rawData)
 
 void funcEnableResult(const uint8_t *rawData)
 {
-    std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
         cameraTest->itemCapacity, cameraTest->dataCapacity);
     std::vector<uint8_t> detectTypes;
     uint8_t *data = const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(rawData));
@@ -106,13 +106,13 @@ void funcEnableResult(const uint8_t *rawData)
     uint8_t* typesToEnable = detectTypes.data();
     meta->addEntry(OHOS_CONTROL_STATISTICS_DETECT_SETTING, typesToEnable, detectTypes.size());
     std::vector<uint8_t> setting;
-    Camera::MetadataUtils::ConvertMetadataToVec(meta, setting);
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
     cameraTest->streamOperator_V1_3->EnableResult(cameraTest->streamIdVideo, setting);
 }
 
 void funcDisableResult(const uint8_t *rawData)
 {
-    std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
         cameraTest->itemCapacity, cameraTest->dataCapacity);
     std::vector<uint8_t> detectTypes;
     uint8_t *data = const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(rawData));
@@ -120,7 +120,7 @@ void funcDisableResult(const uint8_t *rawData)
     uint8_t* typesToEnable = detectTypes.data();
     meta->addEntry(OHOS_CONTROL_STATISTICS_DETECT_SETTING, typesToEnable, detectTypes.size());
     std::vector<uint8_t> setting;
-    Camera::MetadataUtils::ConvertMetadataToVec(meta, setting);
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
     cameraTest->streamOperator_V1_3->DisableResult(cameraTest->streamIdVideo, setting);
 }
 
@@ -132,14 +132,10 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
             break;
         }
         case STREAM_OPERATOR_COMMITSTREAM_V1_1: {
-            cameraTest->streamOperatorCallbackV1_2 =
-                new OHOS::Camera::CameraManager::TestStreamOperatorCallbackV1_2();
-            cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(
-                cameraTest->streamOperatorCallbackV1_2, cameraTest->streamOperator_V1_2);
             std::vector<uint8_t> abilityVec = {};
             uint8_t *data = const_cast<uint8_t *>(rawData);
             abilityVec.push_back(*data);
-            cameraTest->streamOperator_V1_2->CommitStreams_V1_1(
+            cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
                 *reinterpret_cast<const HDI::Camera::V1_1::OperationMode_V1_1 *>(rawData), abilityVec);
             break;
         }
@@ -170,16 +166,16 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     uint32_t cmd = ConvertUint32(rawData);
     rawData += sizeof(cmd);
 
-    cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest->InitV1_3();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_3>();
+    cameraTest->Init();
     if (cameraTest->serviceV1_3 == nullptr) {
         return false;
     }
-    cameraTest->OpenV1_3();
+    cameraTest->Open(DEVICE_0);
     if (cameraTest->cameraDeviceV1_3 == nullptr) {
         return false;
     }
-    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::CameraManager::TestStreamOperatorCallbackV1_3();
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::HdiCommonV1_3::TestStreamOperatorCallbackV1_3();
     cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
         cameraTest->streamOperator_V1_3);
     for (cmd = 0; cmd < STREAM_OPERATOR_END; cmd++) {
@@ -191,11 +187,11 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (size < OHOS::THRESHOLD) {
+    if (size < THRESHOLD) {
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyApi(data, size);
+    DoSomethingInterestingWithMyApi(data, size);
     return 0;
 }
 }

@@ -23,6 +23,8 @@ test_path = "//drivers/peripheral/camera/test"
 hdf_core_path = "//drivers/hdf_core"
 enable_camera_device_utest = false
 enable_camera_coverage = false
+camera_test_path = "//drivers/peripheral/camera/test/hdi/"
+camera_common_path = "//drivers/peripheral/camera/test/common/"
 
 use_hitrace = true
 

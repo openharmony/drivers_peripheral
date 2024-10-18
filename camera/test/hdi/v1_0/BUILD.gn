@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("../../../camera.gni")
-camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
@@ -108,22 +107,24 @@ if (defined(ohos_lite)) {
     testonly = true
     module_out_path = module_output_path
     sources = [
+      "$camera_common_path/v1_0/src/hdi_common.cpp",
       "$camera_test_path/v1_0/src/camera_3a_uttest.cpp",
       "$camera_test_path/v1_0/src/device_ability_uttest.cpp",
       "$camera_test_path/v1_0/src/hdi_device_uttest.cpp",
       "$camera_test_path/v1_0/src/hdi_host_uttest.cpp",
       "$camera_test_path/v1_0/src/hdi_stream_uttest.cpp",
-      "$camera_test_path/v1_0/src/ut_common.cpp",
     ]
 
     include_dirs = [
       # common includes
+      "$camera_common_path/v1_0/include",
       "$camera_test_path/v1_0/include",
       "$camera_path/../../interfaces/include",
       "$camera_path/include",
     ]
 
     deps = []
+    defines = [ "CAMERA_UT_TEST" ]
 
     if (is_standard_system) {
       external_deps = [

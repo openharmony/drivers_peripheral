@@ -23,7 +23,7 @@ void HdiHostUtTest::SetUpTestCase(void) {}
 void HdiHostUtTest::TearDownTestCase(void) {}
 void HdiHostUtTest::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommon>();
     cameraTest->Init();
 }
 
@@ -92,7 +92,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_004, TestSize.Level1)
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
         cameraTest->service->GetCameraIds(cameraTest->cameraIds);
-        cameraTest->deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
+        cameraTest->deviceCallback = new OHOS::Camera::HdiCommon::DemoCameraDeviceCallback();
         cameraTest->rc = cameraTest->service->OpenCamera(cameraTest->cameraIds.front(), cameraTest->deviceCallback,
             cameraTest->cameraDevice);
         EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -114,7 +114,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_005, TestSize.Level1)
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
         std::string testCameraId = "qwerty";
-        cameraTest->deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
+        cameraTest->deviceCallback = new OHOS::Camera::HdiCommon::DemoCameraDeviceCallback();
         cameraTest->rc = cameraTest->service->OpenCamera(testCameraId, cameraTest->deviceCallback,
             cameraTest->cameraDevice);
         EXPECT_EQ(true, cameraTest->rc == INVALID_ARGUMENT);
@@ -132,7 +132,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_006, TestSize.Level1)
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
         std::string testCameraId = "1";
-        cameraTest->deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
+        cameraTest->deviceCallback = new OHOS::Camera::HdiCommon::DemoCameraDeviceCallback();
         cameraTest->rc = cameraTest->service->OpenCamera(testCameraId, cameraTest->deviceCallback,
             cameraTest->cameraDevice);
         EXPECT_EQ(true, cameraTest->rc == INVALID_ARGUMENT);
@@ -168,7 +168,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_008, TestSize.Level1)
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
         std::string testCameraId = "";
-        cameraTest->deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
+        cameraTest->deviceCallback = new OHOS::Camera::HdiCommon::DemoCameraDeviceCallback();
         cameraTest->rc = cameraTest->service->OpenCamera(testCameraId, cameraTest->deviceCallback,
             cameraTest->cameraDevice);
         EXPECT_EQ(true, cameraTest->rc == INVALID_ARGUMENT);

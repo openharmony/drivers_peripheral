@@ -24,7 +24,7 @@ void CameraHdiTagTestV1_3::SetUpTestCase(void) {}
 void CameraHdiTagTestV1_3::TearDownTestCase(void) {}
 void CameraHdiTagTestV1_3::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_3>();
     cameraTest->Init(); // assert inside
     cameraTest->Open(DEVICE_0); // assert inside
 }
@@ -56,7 +56,7 @@ void CameraHdiTagTestV1_3::PrintAllTagDataU8(std::shared_ptr<OHOS::Camera::Camer
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, tag, &entry);
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
-        cout << "----tag = " << tag << "count = " << entry.count << endl;
+        cout << "----tag = " << tag << " count = " << entry.count << endl;
         for (int i = 0; i < entry.count; i++) {
             int v = entry.data.u8[i];
             cout << "tag[" << tag << "][" << i << "] = " << v << endl;

@@ -17,9 +17,8 @@
 #define STREAM_OPERATOR_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "streamoperator_fuzzer"
-#include "common.h"
-#include "v1_2/istream_operator.h"
-namespace OHOS {
-    std::shared_ptr<OHOS::Camera::CameraManager> cameraTest = nullptr;
+#include "hdi_common_v1_3.h"
+namespace OHOS::Camera {
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest = nullptr;
 }
 #endif

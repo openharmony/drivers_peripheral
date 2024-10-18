@@ -17,10 +17,8 @@
 #define CAMERA_DEVICE_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "camerahost_fuzzer"
-#include "common.h"
-#include "v1_2/icamera_host.h"
-#include "v1_3/icamera_host.h"
-namespace OHOS {
-    std::shared_ptr<OHOS::Camera::CameraManager> cameraTest = nullptr;
+#include "hdi_common_v1_3.h"
+namespace OHOS::Camera {
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest = nullptr;
 }
 #endif

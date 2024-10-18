@@ -27,7 +27,7 @@ void CameraFrontUtTestV1_3::SetUpTestCase(void) {}
 void CameraFrontUtTestV1_3::TearDownTestCase(void) {}
 void CameraFrontUtTestV1_3::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_3>();
     cameraTest->Init(); // assert inside
     cameraTest->Open(DEVICE_1); // assert inside
 }
@@ -37,7 +37,7 @@ void CameraFrontUtTestV1_3::TearDown(void)
     cameraTest->Close();
 }
 
-void FillFrontCaptureSetting(std::shared_ptr<OHOS::Camera::Test> cameraTest)
+void FillFrontCaptureSetting(std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest)
 {
     // Fill capture setting
     std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -183,7 +183,7 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_003, TestSize.Level1)
 HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_004, TestSize.Level1)
 {
     CAMERA_LOGI("test Camera_Front_Hdi_V1_3_004 start.");
-    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::HdiCommonV1_3::TestStreamOperatorCallbackV1_3();
     cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(
         cameraTest->streamOperatorCallbackV1_3, cameraTest->streamOperator_V1_3);
     ASSERT_NE(cameraTest->streamOperator_V1_3, nullptr);
@@ -206,7 +206,8 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_004, TestSize.Level1)
 
     cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams(OperationMode::NORMAL, cameraTest->abilityVec);
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams(
+        OHOS::HDI::Camera::V1_0::OperationMode::NORMAL, cameraTest->abilityVec);
     ASSERT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -231,7 +232,7 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_005, TestSize.Level1)
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_LCD_FLASH, &entry);
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
-        if (*entry.data.i32 != 1) return;
+        if (entry.data.i32[0] != 1) return;
         FillFrontCaptureSetting(cameraTest);
         cameraTest->intents = {PREVIEW, STILL_CAPTURE};
         cameraTest->StartStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::CAPTURE);
@@ -243,7 +244,7 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_005, TestSize.Level1)
         meta->addEntry(OHOS_CONTROL_LCD_FLASH_DETECTION, &lcdFlashDetection, DATA_COUNT);
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
         ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
         sleep(3);
         if (cameraTest->deviceCallback->resultMeta == nullptr) {
@@ -266,7 +267,8 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_005, TestSize.Level1)
             meta->addEntry(OHOS_CONTROL_LCD_FLASH, &lcdFlash, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_0::CamRetCode)cameraTest->
+                cameraDeviceV1_3->UpdateSettings(setting);
             ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
         }
         // 进行拍照
