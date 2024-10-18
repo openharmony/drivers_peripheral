@@ -1307,6 +1307,11 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct 
 
 void UsbFnCfgMgrUnRegisterAllProp(void)
 {
+    struct UsbFnCfgPropMgr *obj = NULL;
+    struct UsbFnCfgPropMgr *temp = NULL;
+    DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, struct UsbFnCfgPropMgr, entry) {
+        UsbFnMemFree(obj);
+    }
     DListHeadInit(&g_cfgEntry);
     g_cfgEntry.next = 0;
 }
