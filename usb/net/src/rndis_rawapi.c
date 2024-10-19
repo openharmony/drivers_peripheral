@@ -350,7 +350,7 @@ static int32_t HostRndisQuery(struct UsbnetHost *usbNet, struct RndisQueryParam 
     uint32_t len = CPU_TO_LE32(uq.getC->len);
 
     HARCH_INFO_PRINT("off = %{public}d, len = %{public}d, retval = %{public}d", off, len, retval);
-    // CONTROL_BUFFER_SIZE_-UNION_OFFSET_LENGTH is　valid　memory　range
+    // CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH is valid memory range
     if ((off > CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH) || (len > CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH - off)) {
         goto response_error;
     }

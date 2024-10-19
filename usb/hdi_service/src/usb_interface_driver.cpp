@@ -103,7 +103,6 @@ static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject * const deviceObject
         hdfUsbInterfaceHost = nullptr;
         return HDF_FAILURE;
     }
-    deviceObject->service = &hdfUsbInterfaceHost->ioService;
 
     sptr<UsbImpl> impl = static_cast<UsbImpl *>(serviceImpl.GetRefPtr());
     impl->device_ = deviceObject;
