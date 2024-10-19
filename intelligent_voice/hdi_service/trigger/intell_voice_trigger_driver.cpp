@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <shared_mutex>
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include "intell_voice_log.h"
@@ -24,6 +24,10 @@
 
 using namespace OHOS::HDI::IntelligentVoice::Trigger::V1_1;
 
+namespace {
+    static std::shared_mutex g_triggerMgrMutex;
+}
+
 struct HdfIntellVoiceTriggerManagerHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
@@ -32,9 +36,6 @@ struct HdfIntellVoiceTriggerManagerHost {
 static int32_t IntellVoiceTriggerManagerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    auto *hdfIntellVoiceTriggerManagerHost = CONTAINER_OF(client->device->service,
-        struct HdfIntellVoiceTriggerManagerHost, ioService);
-
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
@@ -48,6 +49,19 @@ static int32_t IntellVoiceTriggerManagerDriverDispatch(struct HdfDeviceIoClient 
         return HDF_ERR_INVALID_PARAM;
     }
 
+    std::shared_lock lock(g_triggerMgrMutex);
+    if ((client == nullptr) || (client->device == nullptr) || (client->device->service == nullptr)) {
+        INTELLIGENT_VOICE_LOGE("client or device or service is nullptr");
+        return HDF_FAILURE;
+    }
+
+    auto *hdfIntellVoiceTriggerManagerHost = CONTAINER_OF(client->device->service,
+        struct HdfIntellVoiceTriggerManagerHost, ioService);
+    if ((hdfIntellVoiceTriggerManagerHost == nullptr) || (hdfIntellVoiceTriggerManagerHost->stub == nullptr)) {
+        INTELLIGENT_VOICE_LOGE("invalid hdfIntellVoiceTriggerManagerHost");
+        return HDF_FAILURE;
+    }
+
     return hdfIntellVoiceTriggerManagerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
@@ -59,7 +73,12 @@ static int HdfIntellVoiceTriggerManagerDriverInit(struct HdfDeviceObject *device
 
 static int HdfIntellVoiceTriggerManagerDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    INTELLIGENT_VOICE_LOGD("driver bind start");
+    INTELLIGENT_VOICE_LOGI("enter");
+    if (deviceObject == nullptr) {
+        INTELLIGENT_VOICE_LOGE("deviceObject is nullptr");
+        return HDF_FAILURE;
+    }
+
     auto *hdfIntellVoiceTriggerManagerHost = new (std::nothrow) HdfIntellVoiceTriggerManagerHost;
     if (hdfIntellVoiceTriggerManagerHost == nullptr) {
         INTELLIGENT_VOICE_LOGE("failed to create create HdfIntellVoiceTriggerManagerHost object");
@@ -91,16 +110,20 @@ static int HdfIntellVoiceTriggerManagerDriverBind(struct HdfDeviceObject *device
 
 static void HdfIntellVoiceTriggerManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    INTELLIGENT_VOICE_LOGD("driver release start");
-    if (deviceObject->service == nullptr) {
+    INTELLIGENT_VOICE_LOGI("enetr");
+    if ((deviceObject == nullptr) || (deviceObject->service == nullptr)) {
+        INTELLIGENT_VOICE_LOGE("deviceObject is nullptr or service is nullptr");
         return;
     }
 
+    std::unique_lock lock(g_triggerMgrMutex);
     auto *hdfIntellVoiceTriggerManagerHost = CONTAINER_OF(deviceObject->service,
         struct HdfIntellVoiceTriggerManagerHost, ioService);
     if (hdfIntellVoiceTriggerManagerHost != nullptr) {
+        hdfIntellVoiceTriggerManagerHost->stub = nullptr;
         delete hdfIntellVoiceTriggerManagerHost;
     }
+    deviceObject->service = nullptr;
 }
 
 static struct HdfDriverEntry g_intellvoiceTriggerManagerDriverEntry = {
