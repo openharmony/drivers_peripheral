@@ -1366,6 +1366,7 @@ int32_t UsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle)
         ret = UsbIoRecvProcessStop(interfacePool);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbIoStop failed, ret = %{public}d", __func__, __LINE__, ret);
+            OsalMutexUnlock(&interfacePool->interfaceLock);
             return ret;
         }
     } else {
