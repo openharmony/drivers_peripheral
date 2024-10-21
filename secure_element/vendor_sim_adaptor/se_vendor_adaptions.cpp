@@ -35,6 +35,7 @@ namespace SecureElement {
 namespace SimSecureElement {
 namespace V1_0 {
 static sptr<ISecureElementCallback> g_callbackV1_0 = nullptr;
+static std::mutex g_callbackV1_mutex {};
 static const int RES_BUFFER_MAX_LENGTH = 512;
 static const uint16_t SW1_OFFSET = 2;
 static const uint16_t SW2_OFFSET = 1;
@@ -132,6 +133,8 @@ int SimSeVendorAdaptions::VendorSimSecureElementInit()
 
 int SimSeVendorAdaptions::VendorSimSecureElementUninit()
 {
+    HDF_LOGI("SimSeVendorAdaptions::VendorSimSecureElementUninit");
+    std::lock_guard<std::mutex> guard(g_callbackV1_mutex);
     RemoveSecureElementDeathRecipient(g_callbackV1_0);
     SIM_FUNCTION_INVOKE_RETURN(vendorSimSecureElementUninitFunc_);
 }
@@ -196,6 +199,7 @@ int32_t SimSeVendorAdaptions::init(
     OHOS::HDI::SecureElement::SimSecureElement::V1_0::SecureElementStatus& status)
 {
     HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    std::lock_guard<std::mutex> guard(g_callbackV1_mutex);
     if (clientCallback == nullptr) {
         HDF_LOGE("init failed, clientCallback is null");
         status = SecureElementStatus::SE_NULL_POINTER_ERROR;
@@ -364,7 +368,8 @@ int32_t SimSeVendorAdaptions::reset(SecureElementStatus& status)
 
 void SimSeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
-    HDF_LOGI("OnRemoteDied");
+    HDF_LOGI("SimSeVendorAdaptions::OnRemoteDied");
+    std::lock_guard<std::mutex> guard(g_callbackV1_mutex);
     SecureElementStatus status = SecureElementStatus::SE_GENERAL_ERROR;
     for (size_t i = 0; i < MAX_CHANNEL_NUM; i++) {
         if (g_openedChannels[i]) {
