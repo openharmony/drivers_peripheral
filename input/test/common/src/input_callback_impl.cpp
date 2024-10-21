@@ -16,6 +16,7 @@
 #include "input_callback_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include "input_uhdf_log.h"
 
 namespace OHOS {
 namespace HDI {

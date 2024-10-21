@@ -53,5 +53,6 @@ config("hdf_input_through_additional") {
     "$INPUT_ROOT_DIR/interfaces/include",
     "$INPUT_ROOT_DIR/interfaces",
     "$INPUT_ROOT_DIR/hdi_service",
+    "$INPUT_ROOT_DIR/utils/include",
   ]
 }
