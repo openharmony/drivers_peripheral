@@ -199,7 +199,6 @@ int32_t SimSeVendorAdaptions::init(
     OHOS::HDI::SecureElement::SimSecureElement::V1_0::SecureElementStatus& status)
 {
     HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
-    std::lock_guard<std::mutex> guard(g_callbackMutex);
     if (clientCallback == nullptr) {
         HDF_LOGE("init failed, clientCallback is null");
         status = SecureElementStatus::SE_NULL_POINTER_ERROR;
@@ -212,6 +211,7 @@ int32_t SimSeVendorAdaptions::init(
         status = SecureElementStatus::SE_GENERAL_ERROR;
         return HDF_ERR_INVALID_PARAM;
     }
+    std::lock_guard<std::mutex> guard(g_callbackMutex);
     g_callbackV1_0 = clientCallback;
     g_callbackV1_0->OnSeStateChanged(true);
     AddSecureElementDeathRecipient(g_callbackV1_0);
@@ -369,7 +369,6 @@ int32_t SimSeVendorAdaptions::reset(SecureElementStatus& status)
 void SimSeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
     HDF_LOGI("SimSeVendorAdaptions::OnRemoteDied");
-    std::lock_guard<std::mutex> guard(g_callbackMutex);
     SecureElementStatus status = SecureElementStatus::SE_GENERAL_ERROR;
     for (size_t i = 0; i < MAX_CHANNEL_NUM; i++) {
         if (g_openedChannels[i]) {
@@ -377,6 +376,7 @@ void SimSeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
             HDF_LOGI("OnRemoteDied, close channel [%{public}zu], status = %{public}d", i, status);
         }
     }
+    std::lock_guard<std::mutex> guard(g_callbackMutex);
     g_callbackV1_0 = nullptr;
 }
 
