@@ -23,7 +23,7 @@ void Camera3AUtTest::SetUpTestCase(void) {}
 void Camera3AUtTest::TearDownTestCase(void) {}
 void Camera3AUtTest::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommon>();
     cameraTest->Init();
     cameraTest->Open();
 }
@@ -295,7 +295,7 @@ HWTEST_F(Camera3AUtTest, Camera_3a_011, TestSize.Level1)
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     cameraTest->cameraDevice->Close();
     cameraTest->consumerMap_.clear();
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommon>();
     cameraTest->Init();
     cameraTest->Open();
     cameraTest->intents = {PREVIEW};

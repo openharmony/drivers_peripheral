@@ -16,7 +16,7 @@
 #ifndef CAMERA_3A_UTTEST_H
 #define CAMERA_3A_UTTEST_H
 
-#include "ut_common.h"
+#include "hdi_common.h"
 
 class Camera3AUtTest : public testing::Test {
 public:
@@ -24,6 +24,6 @@ public:
     static void TearDownTestCase(void);
     void SetUp(void);
     void TearDown(void);
-    std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
+    std::shared_ptr<OHOS::Camera::HdiCommon> cameraTest = nullptr;
 };
 #endif

@@ -24,7 +24,7 @@ void CameraHdiUtTestSecureStreamV1_3::SetUpTestCase(void) {}
 void CameraHdiUtTestSecureStreamV1_3::TearDownTestCase(void) {}
 void CameraHdiUtTestSecureStreamV1_3::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_3>();
     cameraTest->Init(); // assert inside
     cameraTest->OpenSecureCamera(DEVICE_1); // assert inside
 }
@@ -61,15 +61,15 @@ HWTEST_F(CameraHdiUtTestSecureStreamV1_3, Camera_Hdi_SecureStream_V1_3_003, Test
     // PREVIEW stream
     cameraTest->intents = {PREVIEW};
 
-    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::HdiCommonV1_3::TestStreamOperatorCallbackV1_3();
 
     cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
         cameraTest->streamOperator_V1_3);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR);
     cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_pre =
-		std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_1::StreamConsumer> consumer_pre =
+		std::make_shared<OHOS::Camera::HdiCommonV1_1::StreamConsumer>();
     OHOS::HDI::Camera::V1_1::ExtendedStreamInfo extendedStreamInfo =
     {
         .type = static_cast<OHOS::HDI::Camera::V1_1::ExtendedStreamInfoType>(

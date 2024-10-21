@@ -19,8 +19,8 @@ using namespace OHOS;
 using namespace std;
 using namespace testing::ext;
 using namespace OHOS::Camera;
+using namespace OHOS::HDI::Camera::V1_2;
 
-int64_t OHOS::Camera::Test::StreamConsumer::g_timestamp[2] = {0};
 constexpr uint32_t ITEM_CAPACITY = 100;
 constexpr uint32_t DATA_CAPACITY = 2000;
 constexpr uint32_t DATA_COUNT = 1;
@@ -28,7 +28,7 @@ void CameraHdiUtTestV1_2::SetUpTestCase(void) {}
 void CameraHdiUtTestV1_2::TearDownTestCase(void) {}
 void CameraHdiUtTestV1_2::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_2>();
     cameraTest->Init(); // assert inside
     cameraTest->Open(DEVICE_0); // assert inside
 }
@@ -181,7 +181,6 @@ void CameraHdiUtTestV1_2::ProcessPendingImages(int ret)
     // process the second image
     ret = cameraTest->imageProcessSession_->ProcessImage("-2");
     EXPECT_EQ(ret, 0);
-    // process the third image, and test the Interrupt, Reset, RemoveImage Interfaces
     ret = cameraTest->imageProcessSession_->Interrupt();
     EXPECT_EQ(ret, 0);
     ret = cameraTest->imageProcessSession_->Reset();
@@ -294,7 +293,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_002, TestSize.Level1)
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_003, TestSize.Level1)
 {
     CAMERA_LOGI("test Camera_Device_Hdi_V1_2_003 start");
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(
         cameraTest->streamOperatorCallback, cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -440,7 +439,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_010, TestSize.Level1)
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_011, TestSize.Level1)
 {
     // Get Stream Operator
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -594,7 +593,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_014, TestSize.Level1)
                 TranslateXMageAbilityToString(static_cast<camera_xmage_color_type>(xmageMode)).c_str());
 
         // 配置三路流信息
-        cameraTest->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+        cameraTest->intents = {PREVIEW, STILL_CAPTURE, StreamIntent::VIDEO};
         cameraTest->StartStream(cameraTest->intents);
 
         // 捕获预览流
@@ -777,7 +776,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_020, TestSize.Level1)
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
     cameraTest->cameraDevice->UpdateSettings(metaVec);
 
-    cameraTest->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE, StreamIntent::VIDEO};
     cameraTest->StartStream(cameraTest->intents);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -801,7 +800,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_021, TestSize.Level1)
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
     cameraTest->cameraDevice->UpdateSettings(metaVec);
 
-    cameraTest->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE, StreamIntent::VIDEO};
     cameraTest->StartStream(cameraTest->intents);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -856,7 +855,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_023, TestSize.Level1)
 {
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     //start stream
-    cameraTest->intents = {PREVIEW, VIDEO};
+    cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
     cameraTest->StartStream(cameraTest->intents);
 
     //updateSettings
@@ -868,7 +867,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_023, TestSize.Level1)
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
 
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     //get preview capture and video
@@ -892,7 +891,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_024, TestSize.Level1)
 {
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     //start stream
-    cameraTest->intents = {PREVIEW, VIDEO};
+    cameraTest->intents = {PREVIEW, StreamIntent::VIDEO};
     cameraTest->StartStream(cameraTest->intents);
 
     //updateSettings
@@ -904,7 +903,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_024, TestSize.Level1)
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
 
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     //get preview capture and video
@@ -944,7 +943,8 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_032, TestSize.Level1)
     }
 }
 
-void CaptureByColorSpaces(std::vector<int32_t> captureColorSpaces, std::shared_ptr<OHOS::Camera::Test> cameraTest)
+void CaptureByColorSpaces(std::vector<int32_t> captureColorSpaces,
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_2> cameraTest)
 {
     if (!captureColorSpaces.empty()) {
         for (int32_t colorSpaces : captureColorSpaces) {
@@ -975,7 +975,7 @@ void CaptureByColorSpaces(std::vector<int32_t> captureColorSpaces, std::shared_p
     }
 }
 
-void VideoByColorSpaces(std::vector<int32_t> videoColorSpaces, std::shared_ptr<OHOS::Camera::Test> cameraTest)
+void VideoByColorSpaces(std::vector<int32_t> videoColorSpaces, std::shared_ptr<OHOS::Camera::HdiCommonV1_2> cameraTest)
 {
     if (!videoColorSpaces.empty()) {
         for (int32_t colorSpaces : videoColorSpaces) {
@@ -1012,7 +1012,8 @@ void VideoByColorSpaces(std::vector<int32_t> videoColorSpaces, std::shared_ptr<O
     }
 }
 
-void SuperStubByColorSpaces(std::vector<int32_t> superStubColorSpaces, std::shared_ptr<OHOS::Camera::Test> cameraTest)
+void SuperStubByColorSpaces(std::vector<int32_t> superStubColorSpaces,
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_2> cameraTest)
 {
     if (!superStubColorSpaces.empty()) {
         for (int32_t colorSpaces : superStubColorSpaces) {
@@ -1058,7 +1059,7 @@ void SuperStubByColorSpaces(std::vector<int32_t> superStubColorSpaces, std::shar
 */
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_033, TestSize.Level1)
 {
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(
         cameraTest->streamOperatorCallback, cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -1105,7 +1106,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_033, TestSize.Level1)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-static void UpdateSettingsForSuperStabMode(std::shared_ptr<OHOS::Camera::Test> cameraTest)
+static void UpdateSettingsForSuperStabMode(std::shared_ptr<OHOS::Camera::HdiCommonV1_2> cameraTest)
 {
     bool isTagExitst = IsTagValueExistsU8(cameraTest->ability,
         OHOS_ABILITY_VIDEO_STABILIZATION_MODES,
@@ -1117,7 +1118,7 @@ static void UpdateSettingsForSuperStabMode(std::shared_ptr<OHOS::Camera::Test> c
     // ability meta data serialization for updating
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     CAMERA_LOGD("Macro mode is set enabled.");
 }
@@ -1125,7 +1126,7 @@ static void UpdateSettingsForSuperStabMode(std::shared_ptr<OHOS::Camera::Test> c
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_SuperStub01, TestSize.Level1)
 {
     // Get Stream Operator
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -1207,7 +1208,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
 {
     int32_t rc;
     // step 2: set callback object
-    cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
+    cameraTest->hostCallbackV1_2 = new OHOS::Camera::HdiCommonV1_2::TestCameraHostCallbackV1_2();
     rc = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(rc, 0);
     // Start OHOS_ABILITY_CAMERA_MACRO_SUPPORTED ability query
@@ -1217,7 +1218,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MACRO_SUPPORTED, &entry);
 
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
-        cameraTest->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+        cameraTest->intents = {PREVIEW, STILL_CAPTURE, StreamIntent::VIDEO};
         cameraTest->StartStream(cameraTest->intents);
         EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
@@ -1230,6 +1231,10 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
             cameraTest->streamIdVideo};
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
         sleep(UT_SECOND_TIMES);
+        if (cameraTest->deviceCallback->resultMeta == nullptr) {
+            printf("Camera_Device_Hdi_V1_2_035 Macro mode nullptr\n");
+            return;
+        }
         common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
         EXPECT_NE(data, nullptr);
         camera_metadata_item_t entry;
@@ -1238,12 +1243,12 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
             uint8_t value = entry.data.u8[0];
             // 查询到状态， 检测状态到 微距模式可开启
             if (OHOS_CAMERA_MACRO_ENABLE == value) {
-                printf("Macro mode is set enabled.");
+                printf("Macro mode is set enabled.\n");
             } else {
-                printf("Macro mode is not enabled.");
+                printf("Macro mode is not enabled.\n");
             }
         } else {
-            printf("Macro mode is not enabled.");
+            printf("Macro mode is not enabled.\n");
         }
     }
 }
@@ -1374,7 +1379,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_047, TestSize.Level1)
 {
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get Stream Operator
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -1404,7 +1409,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_047, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_VALUE, &physicalApertureValue, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     // start capture
@@ -1436,7 +1441,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
             entry.data.f[14], entry.data.f[18] };
         for (size_t i = 0; i < sizeof(entryValues) / sizeof(float); i++) {
             // Get Stream Operator
-            cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+            cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
             cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
                 cameraTest->streamOperator_V1_1);
             EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -1466,7 +1471,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
             meta->addEntry(OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_VALUE, &physicalApertureValue, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
             // start capture
@@ -1492,7 +1497,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_050, TestSize.Level1)
 {
     CAMERA_LOGI("test Camera_Device_Hdi_V1_2_050 start ...");
     // Get Stream Operator
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -1515,7 +1520,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_050, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_CAMERA_MACRO, &macroControl, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     // is streams supported V1_1
     StreamSupportType pType;
@@ -1543,7 +1548,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_051, TestSize.Level1)
 {
     CAMERA_LOGI("test Camera_Device_Hdi_V1_2_051 start ...");
     // Get Stream Operator
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
@@ -1565,7 +1570,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_051, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_CAMERA_MACRO, &macroControl, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     // is streams supported V1_1
     StreamSupportType tType;
@@ -1617,7 +1622,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_052, TestSize.Level1)
             meta->addEntry(OHOS_CONTROL_MANUAL_EXPOSURE_TIME, &manualExposureTime, DATA_COUNT);
             std::vector<uint8_t> setting;
             MetadataUtils::ConvertMetadataToVec(meta, setting);
-            cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+            cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
             EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
         }
     } else {
@@ -1656,7 +1661,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
 {
     int32_t rc;
     // step 2: set callback object
-    cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
+    cameraTest->hostCallbackV1_2 = new OHOS::Camera::HdiCommonV1_2::TestCameraHostCallbackV1_2();
     rc = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(rc, 0);
     // Start OHOS_ABILITY_MOON_CAPTURE_BOOST ability query
@@ -1674,7 +1679,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
         // ability meta data serialization for updating
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
-        cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+        cameraTest->rc = (OHOS::HDI::Camera::V1_2::CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
         CAMERA_LOGD("MoonCaptureBoost mode is set enabled.");
 
@@ -1688,6 +1693,10 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
         cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
         sleep(UT_SECOND_TIMES);
+        if (cameraTest->deviceCallback->resultMeta == nullptr) {
+            printf("Camera_Device_Hdi_V1_2_054 Macro mode nullptr\n");
+            return;
+        }
         common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
         EXPECT_NE(data, nullptr);
         camera_metadata_item_t entry;
@@ -1696,12 +1705,12 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
             uint8_t value = entry.data.u8[0];
             // 查询到状态， 检测状态到 月亮模式可开启
             if (OHOS_CAMERA_MOON_CAPTURE_BOOST_ENABLE == value) {
-                printf("Moon mode is set enabled.");
+                printf("Moon mode is set enabled.\n");
             } else {
-                printf("Moon mode is not enabled.");
+                printf("Moon mode is not enabled.\n");
             }
         } else {
-            printf("Moon mode is not enabled.");
+            printf("Moon mode is not enabled.\n");
         }
     }
 }

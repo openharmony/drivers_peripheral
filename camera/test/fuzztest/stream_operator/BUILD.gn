@@ -17,7 +17,6 @@ import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../../camera.gni")
 
 module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
-camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
 config("stream_operator_config") {
   visibility = [ ":*" ]
@@ -33,13 +32,19 @@ ohos_fuzztest("stream_operator_fuzztest") {
   module_out_path = module_output_path
   fuzz_config_file = "$camera_path/../../test/fuzztest/stream_operator"
   sources = [
-    "../common/src/common.cpp",
+    "$camera_common_path/v1_0/src/hdi_common.cpp",
+    "$camera_common_path/v1_1/src/hdi_common_v1_1.cpp",
+    "$camera_common_path/v1_2/src/hdi_common_v1_2.cpp",
+    "$camera_common_path/v1_3/src/hdi_common_v1_3.cpp",
     "./stream_operator_fuzzer.cpp",
   ]
 
   include_dirs = [
     # common includes
-    "../common/include",
+    "$camera_common_path/v1_0/include",
+    "$camera_common_path/v1_1/include",
+    "$camera_common_path/v1_2/include",
+    "$camera_common_path/v1_3/include",
     "$camera_test_path/v1_3/include",
     "$camera_path/../../../display/interfaces/include",
     "$camera_path/../../../display/hdi_service/gralloc/include",

@@ -23,7 +23,7 @@ void CameraPrelaunchUtTestV1_1::SetUpTestCase(void) {}
 void CameraPrelaunchUtTestV1_1::TearDownTestCase(void) {}
 void CameraPrelaunchUtTestV1_1::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_1>();
     cameraTest->Init(); // assert inside
 }
 
@@ -40,7 +40,7 @@ void CameraPrelaunchUtTestV1_1::TearDown(void)
  */
 HWTEST_F(CameraPrelaunchUtTestV1_1, Camera_Device_Hdi_V1_1_001, TestSize.Level1)
 {
-    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig = std::make_shared<PrelaunchConfig>();
     cameraTest->prelaunchConfig->cameraId = "device/0";
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting = {};
@@ -59,7 +59,7 @@ HWTEST_F(CameraPrelaunchUtTestV1_1, Camera_Device_Hdi_V1_1_001, TestSize.Level1)
  */
 HWTEST_F(CameraPrelaunchUtTestV1_1, Camera_Device_Hdi_V1_1_002, TestSize.Level1)
 {
-    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig = std::make_shared<PrelaunchConfig>();
     cameraTest->prelaunchConfig->cameraId = "device/1";
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting = {};
@@ -78,7 +78,7 @@ HWTEST_F(CameraPrelaunchUtTestV1_1, Camera_Device_Hdi_V1_1_002, TestSize.Level1)
  */
 HWTEST_F(CameraPrelaunchUtTestV1_1, Camera_Device_Hdi_V1_1_003, TestSize.Level1)
 {
-    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig = std::make_shared<PrelaunchConfig>();
     cameraTest->prelaunchConfig->cameraId = "device/10";
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting = {};
@@ -97,7 +97,7 @@ HWTEST_F(CameraPrelaunchUtTestV1_1, Camera_Device_Hdi_V1_1_003, TestSize.Level1)
  */
 HWTEST_F(CameraPrelaunchUtTestV1_1, Camera_Device_Hdi_V1_1_004, TestSize.Level1)
 {
-    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig = std::make_shared<PrelaunchConfig>();
     cameraTest->prelaunchConfig->cameraId = "ABC";
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting = {};

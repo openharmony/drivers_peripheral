@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("../../../camera.gni")
-camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -34,13 +33,17 @@ ohos_fuzztest("defferred_delivery_image_fuzztest") {
   module_out_path = module_output_path
   fuzz_config_file = "$camera_path/../../test/fuzztest/defferred_delivery_image"
   sources = [
-    "../common/src/common.cpp",
+    "$camera_common_path/v1_0/src/hdi_common.cpp",
+    "$camera_common_path/v1_1/src/hdi_common_v1_1.cpp",
+    "$camera_common_path/v1_2/src/hdi_common_v1_2.cpp",
     "./defferred_delivery_image_fuzzer.cpp",
   ]
 
   include_dirs = [
     # common includes
-    "../common/include",
+    "$camera_common_path/v1_0/include",
+    "$camera_common_path/v1_1/include",
+    "$camera_common_path/v1_2/include",
     "$camera_test_path/v1_1/include",
     "$camera_path/../../../display/interfaces/include",
     "$camera_path/../../../display/hdi_service/gralloc/include",

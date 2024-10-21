@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("../../../camera.gni")
-camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -36,16 +35,21 @@ ohos_unittest("camera_test_hdi_V1_2") {
   testonly = true
   module_out_path = module_output_path
   sources = [
+    "$camera_common_path/v1_0/src/hdi_common.cpp",
+    "$camera_common_path/v1_1/src/hdi_common_v1_1.cpp",
+    "$camera_common_path/v1_2/src/hdi_common_v1_2.cpp",
     "$camera_test_path/v1_2/src/camera_flashlight_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/camera_hdi_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/camera_prelaunch_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/camera_stream_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/front_camera_hdi_uttest_v1_2.cpp",
-    "$camera_test_path/v1_2/src/hdi_common_v1_2.cpp",
   ]
 
   include_dirs = [
     # common includes
+    "$camera_common_path/v1_0/include",
+    "$camera_common_path/v1_1/include",
+    "$camera_common_path/v1_2/include",
     "$camera_test_path/v1_2/include",
     "//third_party/googletest/googletest/include",
     "$camera_path/../../../display/interfaces/include",
@@ -59,6 +63,7 @@ ohos_unittest("camera_test_hdi_V1_2") {
     "//third_party/googletest:gtest",
     "//third_party/googletest:gtest_main",
   ]
+  defines = [ "CAMERA_UT_TEST" ]
 
   if (is_standard_system) {
     external_deps = [

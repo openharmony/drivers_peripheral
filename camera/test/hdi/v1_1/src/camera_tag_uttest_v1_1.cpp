@@ -23,7 +23,7 @@ void CameraTagUtTestV1_1::SetUpTestCase(void) {}
 void CameraTagUtTestV1_1::TearDownTestCase(void) {}
 void CameraTagUtTestV1_1::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_1>();
     cameraTest->Init(); // assert inside
     cameraTest->Open(DEVICE_0); // assert inside
 }
@@ -93,7 +93,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_001, TestSize.Level1)
         for (int i = 0; i < entry.count; i++) {
             if (entry.data.u8[i] == HDI::Camera::V1_0::OperationMode::NORMAL) {
                 CAMERA_LOGE("OperationMode::NORMAL found!");
-            } else if (entry.data.u8[i] == OHOS::HDI::Camera::V1_1::PORTRAIT) {
+            } else if (entry.data.u8[i] == PORTRAIT) {
                 CAMERA_LOGI("OperationMode::PORTRAIT found!");
             }
         }
@@ -114,7 +114,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_002, TestSize.Level1)
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES, &entry);
     if (ret != 0) {
         bool portraitFlag = isTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES,
-            OHOS::HDI::Camera::V1_1::PORTRAIT);
+            PORTRAIT);
         EXPECT_EQ(portraitFlag, false);
         CAMERA_LOGI("OHOS::HDI::Camera::V1_1::PORTRAIT found!");
         return;
@@ -145,50 +145,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_002, TestSize.Level1)
             cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
             EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
             CAMERA_LOGI("addEntry for OHOS_CONTROL_PORTRAIT_EFFECT_TYPE success!");
-            TakePhotoWithTags(meta, OHOS::HDI::Camera::V1_1::PORTRAIT);
-        }
-    }
-}
-
-/**
- * @tc.name: OHOS_ABILITY_SCENE_FILTER_TYPES, OHOS_CONTROL_FILTER_TYPE
- * @tc.desc: OHOS_ABILITY_SCENE_FILTER_TYPES, OHOS_CONTROL_FILTER_TYPE
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_003, TestSize.Level1)
-{
-    // real test
-    common_metadata_header_t* data = cameraTest->ability->get();
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_SCENE_FILTER_TYPES, &entry);
-    if (ret != 0) {
-        CAMERA_LOGI("OHOS_ABILITY_SCENE_FILTER_TYPES not found");
-        return;
-    }
-    CAMERA_LOGI("OHOS_ABILITY_SCENE_FILTER_TYPES found");
-    printf("OHOS_ABILITY_SCENE_FILTER_TYPES value count is %d\n", entry.count);
-    // Take a photo using the blurring effect TakePhotoWithTags()
-    if (entry.count == 0) {
-        printf("OHOS_ABILITY_SCENE_FILTER_TYPES value count is 0 ...\n");
-        CAMERA_LOGI("OHOS_ABILITY_SCENE_FILTER_TYPES value count is 0 ...");
-        return;
-    } else if (entry.data.u8 == nullptr) {
-        printf("OHOS_ABILITY_SCENE_FILTER_TYPES data is NULL!\n");
-        CAMERA_LOGI("OHOS_ABILITY_SCENE_FILTER_TYPES data is NULL!");
-        return;
-    } else {
-        for (size_t i = 0; i < entry.count; i++) {
-            std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
-            printf("OHOS_ABILITY_SCENE_FILTER_VALUES : %d\n", entry.data.u8[i]);
-            uint8_t value = entry.data.u8[i];
-            meta->addEntry(OHOS_CONTROL_FILTER_TYPE, &value, 1);
-            std::vector<uint8_t> metaVec;
-            MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-            cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
-            EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
-            CAMERA_LOGI("addEntry for OHOS_CONTROL_FILTER_TYPE success!");
-            TakePhotoWithTags(meta);
+            TakePhotoWithTags(meta, PORTRAIT);
         }
     }
 }
@@ -289,7 +246,7 @@ void CameraTagUtTestV1_1::TakePhotoWithTags(std::shared_ptr<OHOS::Camera::Camera
 }
 
 void CameraTagUtTestV1_1::TakePhotoWithTags(std::shared_ptr<OHOS::Camera::CameraSetting> meta,
-                                            OHOS::HDI::Camera::V1_1::OperationMode_V1_1 mode)
+                                            OperationMode_V1_1 mode)
 {
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
