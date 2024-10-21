@@ -163,6 +163,7 @@ private:
     static bool isGadgetConnected_;
     static uint32_t attachCount_;
     static uint32_t attachFailedCount_;
+    static int32_t usbOpenCount_;
     static UsbdLoadService loadUsbService_;
     static UsbdLoadService loadHdfEdm_;
 };
