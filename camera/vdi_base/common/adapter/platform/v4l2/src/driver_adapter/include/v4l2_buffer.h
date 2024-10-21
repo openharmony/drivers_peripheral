@@ -19,6 +19,9 @@
 #include <mutex>
 #include <map>
 #include <cstring>
+#ifdef V4L2_EMULATOR
+#include <queue>
+#endif
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 #include <memory>
@@ -91,6 +94,11 @@ private:
     enum v4l2_buf_type bufferType_;
 
     uint32_t buffLong_;
+#ifdef V4L2_EMULATOR
+    RetCode SetAndPushBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec, v4l2_buffer buf);
+    std::queue<uint64_t> queuedBuffers_;
+    int availableBuffers_;
+#endif
 };
 } // namespace OHOS::Camera
 #endif // HOS_CAMERA_V4L2_BUFFER_H
