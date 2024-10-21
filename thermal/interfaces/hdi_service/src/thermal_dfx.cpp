@@ -31,6 +31,7 @@
 #include "string_ex.h"
 #include "sysparam_errno.h"
 #include "thermal_hdf_utils.h"
+#include "thermal_hitrace.h"
 #include "thermal_log.h"
 #include "thermal_zone_manager.h"
 #include "zlib.h"
@@ -199,9 +200,9 @@ bool ThermalDfx::Compress(const std::string& dataFile, const std::string& destFi
 
 void ThermalDfx::CompressFile()
 {
-    unsigned long size;
-    std::string unCompressFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
-        "." + g_logTime;
+    ThermalHitrace trace("ThermalDfx_CompressFile");
+    THERMAL_HILOGI(COMP_HDI, "CompressFile start");
+    std::string unCompressFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) + "." + g_logTime;
 
     FILE* fp = fopen(unCompressFile.c_str(), "rb");
     if (fp == nullptr) {
@@ -215,20 +216,20 @@ void ThermalDfx::CompressFile()
         return;
     }
 
-    size = ftell(fp);
+    unsigned long size = ftell(fp);
     if (size < MAX_FILE_SIZE) {
         if (fclose(fp) < 0) {
             THERMAL_HILOGW(COMP_HDI, "fclose() failed");
         }
-        THERMAL_HILOGD(COMP_HDI, "file is not enough for compress");
+        THERMAL_HILOGI(COMP_HDI, "file is not enough for compress");
         return;
     }
     if (fclose(fp) < 0) {
         THERMAL_HILOGW(COMP_HDI, "fclose() failed");
     }
 
-    std::string compressFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
-        "." + g_logTime + ".gz";
+    std::string compressFile =
+        g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) + "." + g_logTime + ".gz";
     if (!Compress(unCompressFile, compressFile)) {
         THERMAL_HILOGE(COMP_HDI, "CompressFile fail");
         return;
@@ -247,6 +248,7 @@ void ThermalDfx::CompressFile()
     g_saveLogFile.push_back(compressFile);
     g_currentLogIndex++;
     g_logTime = GetCurrentTime(TIME_FORMAT_1);
+    THERMAL_HILOGI(COMP_HDI, "CompressFile done");
 }
 
 bool ThermalDfx::PrepareWriteDfxLog()
@@ -256,7 +258,7 @@ bool ThermalDfx::PrepareWriteDfxLog()
         return false;
     }
     if (!enable_) {
-        THERMAL_HILOGD(COMP_HDI, "param does not start recording");
+        THERMAL_HILOGI(COMP_HDI, "param does not start recording");
         return false;
     }
 
@@ -265,6 +267,8 @@ bool ThermalDfx::PrepareWriteDfxLog()
 
 void ThermalDfx::CreateLogFile()
 {
+    ThermalHitrace trace("ThermalDfx_CreateLogFile");
+    THERMAL_HILOGI(COMP_HDI, "CreateLogFile start");
     if (!PrepareWriteDfxLog()) {
         THERMAL_HILOGD(COMP_HDI, "prepare write dfx log failed");
         return;
@@ -294,8 +298,7 @@ void ThermalDfx::CreateLogFile()
     file.close();
 
     ProcessLogInfo(logFile, isEmpty);
-
-    return;
+    THERMAL_HILOGI(COMP_HDI, "CreateLogFile done");
 }
 
 void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)
@@ -319,9 +322,8 @@ void ThermalDfx::WriteToEmptyFile(std::ofstream& wStream, std::string& currentTi
     for (uint8_t i = 0; i < width_; ++i) {
         wStream << " ";
     }
-
     std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInstance().GetTracingInfo();
-    for (auto info : logInfo) {
+    for (const auto& info : logInfo) {
         wStream << info.title;
         if (info.valuePath == logInfo.back().valuePath && info.title == logInfo.back().title) {
             break;
@@ -344,8 +346,10 @@ void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime)
     }
     std::vector<DfxTraceInfo>& logInfo = ThermalHdfConfig::GetInstance().GetTracingInfo();
     std::string value;
-    for (auto info : logInfo) {
-        ThermalHdfUtils::ReadNode(info.valuePath, value);
+    for (const auto& info : logInfo) {
+        if (!ThermalHdfUtils::ReadNode(info.valuePath, value)) {
+            THERMAL_HILOGW(COMP_HDI, "Read node failed, title = %{public}s", info.title.c_str());
+        }
         wStream << value;
         if (info.valuePath == logInfo.back().valuePath && info.title == logInfo.back().title) {
             break;
