@@ -276,6 +276,12 @@ void SourceNode::PortHandler::CollectBuffers()
         if (bufferAddr != nullptr) {
             buffer->SetVirAddress(bufferAddr);
             buffer->SetSize(bufferSize);
+#ifdef V4L2_EMULATOR
+            buffer->SetCurWidth(buffer->GetWidth());
+            buffer->SetCurHeight(buffer->GetHeight());
+            constexpr uint32_t CaptureFormatInit = 27;
+            buffer->SetCurFormat(CaptureFormatInit);
+#endif
         } else {
             CAMERA_LOGE("CollectBuffers malloc buffer fail");
         }

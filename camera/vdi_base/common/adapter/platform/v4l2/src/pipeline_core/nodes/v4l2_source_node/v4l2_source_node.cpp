@@ -70,8 +70,17 @@ RetCode V4L2SourceNode::Start(const int32_t streamId)
     std::vector<std::shared_ptr<IPort>> outPorts = GetOutPorts();
     for (const auto& it : outPorts) {
         DeviceFormat format;
+#ifdef V4L2_EMULATOR
+        constexpr int CaptureStreamId = 2;
+        if (streamId == CaptureStreamId) {
+            format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUV420;
+        } else {
+#endif
         format.fmtdesc.pixelformat = V4L2Utils::ConvertPixfmtHal2V4l2(
             static_cast<OHOS::Camera::CameraBufferFormat>(it->format_.format_));
+#ifdef V4L2_EMULATOR
+        }
+#endif
         format.fmtdesc.width = wide_;
         format.fmtdesc.height = high_;
         int bufCnt = it->format_.bufferCount_;

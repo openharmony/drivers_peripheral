@@ -53,7 +53,11 @@ config("pipe_config") {
 
 # weak dependency of ffmpeg
 config("weak_ffmpeg") {
-  defines = [ "DEVICE_USAGE_FFMPEG_ENABLE" ]
+  if (is_emulator) {
+    defines += [ "DEVICE_USAGE_FFMPEG_ENABLE" ]
+  } else {
+    defines = [ "DEVICE_USAGE_FFMPEG_ENABLE" ]
+  }
 }
 
 ohos_shared_library("usb_camera_pipeline_core") {
