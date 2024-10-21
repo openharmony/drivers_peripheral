@@ -20,7 +20,6 @@ import("../../../camera.gni")
 # NOSORT
 import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
 module_output_path = "drivers_peripheral_camera/camera"
-camera_include_path = "//drivers/peripheral/camera/test/hdi/"
 
 config("hdf_camera_benchmark_test_config") {
   visibility = [ ":*" ]
@@ -36,13 +35,17 @@ ohos_benchmarktest("hdf_camera_benchmark_test_v1_2") {
   module_out_path = module_output_path
 
   sources = [
-    "./src/benchmark_common.cpp",
+    "$camera_common_path/v1_0/src/hdi_common.cpp",
+    "$camera_common_path/v1_1/src/hdi_common_v1_1.cpp",
+    "$camera_common_path/v1_2/src/hdi_common_v1_2.cpp",
     "./src/camera_benchmark_test.cpp",
   ]
 
   include_dirs = [
     "./include/",
-    "$camera_include_path/v1_2/include/",
+    "$camera_common_path/v1_0/include",
+    "$camera_common_path/v1_1/include",
+    "$camera_common_path/v1_2/include",
     "//third_party/googletest/googletest/include",
     "$camera_path/../../../display/interfaces/include",
     "$camera_path/../../../display/hdi_service/gralloc/include",

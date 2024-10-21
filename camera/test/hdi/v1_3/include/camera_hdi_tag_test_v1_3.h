@@ -26,6 +26,6 @@ public:
     void TearDown(void);
     bool IsTagValueExistsU8(std::shared_ptr<OHOS::Camera::CameraMetadata> ability, uint32_t tag, uint8_t value);
     void PrintAllTagDataU8(std::shared_ptr<OHOS::Camera::CameraMetadata> ability, uint32_t tag);
-    std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest = nullptr;
 };
 #endif

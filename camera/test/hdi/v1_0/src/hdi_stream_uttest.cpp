@@ -23,7 +23,7 @@ void HdiStreamUtTest::SetUpTestCase(void) {}
 void HdiStreamUtTest::TearDownTestCase(void) {}
 void HdiStreamUtTest::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommon>();
     cameraTest->Init();
 }
 
@@ -42,7 +42,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_001, TestSize.Level1)
 {
     cameraTest->Open();
     EXPECT_EQ(false, cameraTest->cameraDevice == nullptr);
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -59,8 +59,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_001, TestSize.Level1)
     cameraTest->streamInfo->width_ = 640;
     cameraTest->streamInfo->dataspace_ = 8;
 
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    std::shared_ptr<OHOS::Camera::HdiCommon::StreamConsumer> consumer =
+        std::make_shared<OHOS::Camera::HdiCommon::StreamConsumer>();
     cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
         cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
     });
@@ -88,7 +88,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_001, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_002, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -114,7 +114,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_002, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_003, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -136,7 +136,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_003, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_005, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -158,7 +158,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_005, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_006, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -183,7 +183,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_006, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_007, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -205,7 +205,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_007, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_008, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -230,7 +230,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_008, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_009, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -255,7 +255,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_009, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_010, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -280,7 +280,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_010, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_011, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -304,7 +304,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_011, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_012, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -328,7 +328,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_012, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_013, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -352,7 +352,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_013, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_014, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -377,7 +377,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_014, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_015, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -401,7 +401,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_015, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_016, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -565,7 +565,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_026, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_028, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
 
@@ -580,8 +580,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_028, TestSize.Level1)
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    std::shared_ptr<OHOS::Camera::HdiCommon::StreamConsumer> preview_consumer =
+        std::make_shared<OHOS::Camera::HdiCommon::StreamConsumer>();
     OHOS::sptr<OHOS::IBufferProducer> producerTemp = preview_consumer->CreateProducer([this](void* addr,
         uint32_t size) {
         cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
@@ -609,7 +609,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_028, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_029, TestSize.Level1)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
@@ -648,7 +648,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_030, TestSize.Level1)
 HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_031, TestSize.Level0)
 {
     cameraTest->Open();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
 
@@ -676,7 +676,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_031, TestSize.Level0)
     cameraTest->rc = (CamRetCode)cameraTest->streamOperator->Capture(captureId, *cameraTest->captureInfo, isStreaming);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     sleep(UT_SECOND_TIMES);
-    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback =
+        new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 
     cameraTest->rc = (CamRetCode)cameraTest->streamOperator->ChangeToOfflineStream(

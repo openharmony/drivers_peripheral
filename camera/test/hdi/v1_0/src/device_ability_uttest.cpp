@@ -24,7 +24,7 @@ void DeviceAbilityUtTest::SetUpTestCase(void) {}
 void DeviceAbilityUtTest::TearDownTestCase(void) {}
 void DeviceAbilityUtTest::SetUp(void)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommon>();
     cameraTest->Init();
     cameraTest->Open();
 }

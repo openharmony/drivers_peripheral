@@ -28,6 +28,6 @@ public:
     void TakePhoteWithDefferredImage(int PhotoCount);
     void RemovePendingImages(void);
     void ProcessPendingImages(int ret);
-    std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
+    std::shared_ptr<OHOS::Camera::HdiCommonV1_2> cameraTest = nullptr;
 };
 #endif

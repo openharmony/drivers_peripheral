@@ -13,26 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef UT_COMMON_H
-#define UT_COMMON_H
+#ifndef HDI_COMMON_H
+#define HDI_COMMON_H
 
 #include <stdlib.h>
 #include <thread>
 #include <iostream>
 #include <unistd.h>
-#include <gtest/gtest.h>
+#ifdef CAMERA_UT_TEST
+    #include <gtest/gtest.h>
+#endif
 #include <sys/time.h>
 #include <map>
+#include <string>
 #include <vector>
 #include <fcntl.h>
 #include "camera.h"
-#include "v1_2/types.h"
+#include "v1_0/types.h"
 #include "metadata_utils.h"
-#include "v1_2/icamera_host.h"
-#include "v1_2/icamera_device.h"
-#include "v1_2/istream_operator.h"
-#include "v1_2/camera_host_proxy.h"
-#include "v1_2/image_process_service_proxy.h"
+#include "v1_0/icamera_host.h"
+#include "v1_0/icamera_device.h"
+#include "v1_0/istream_operator.h"
+#include "v1_0/camera_host_proxy.h"
 #include "v1_0/ioffline_stream_operator.h"
 #include "display_format.h"
 #include "iconsumer_surface.h"
@@ -48,113 +50,53 @@ enum CameraUtConstants {
     UT_MICROSECOND_TIMES = 500000,
 };
 
-enum Numbers {
-    ZERO,
-    ONE,
-    TWO,
-    THREE,
-    FOUR,
-    FIVE,
-    SIX,
-    SEVEN,
-    EIGHT,
-    NINE,
-    TEN,
-    SIXTEEN = 16,
-};
-
 enum ImageDataSaveSwitch {
     SWITCH_OFF,
     SWITCH_ON,
 };
-
-enum CameraIds {
-    DEVICE_0, // rear camera
-    DEVICE_1, // front camera
-    DEVICE_2,
-    DEVICE_3,
-    DEVICE_4,
-    DEVICE_5,
-    DEVICE_6,
-};
-
 using namespace OHOS::HDI::Camera::V1_0;
-class Test {
+class HdiCommon {
 public:
     void Init();
-    int32_t DefferredImageTestInit();
-    void Open(int cameraId);
-    void OpenCameraV1_2(int cameraId);
+    void Open();
     void Close();
-    void GetCameraMetadata(int cameraId);
-    void DefaultPreview(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultCapture(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultSketch(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosPreview(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosPreviewV1_2(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosCapture(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosAnalyze(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosVideo(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosSketch(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void GetCameraMetadata();
     void StartStream(std::vector<StreamIntent> intents);
+    void DefaultPreview(std::shared_ptr<StreamInfo> &infos);
+    void DefaultCapture(std::shared_ptr<StreamInfo> &infos);
+    void DefaultInfosPreview(std::shared_ptr<StreamInfo> &infos);
+    void DefaultInfosCapture(std::shared_ptr<StreamInfo> &infos);
+    void DefaultInfosVideo(std::shared_ptr<StreamInfo> &infos);
+    void DefaultInfosAnalyze(std::shared_ptr<StreamInfo> &infos);
     uint64_t GetCurrentLocalTimeStamp();
     int32_t DumpImageFile(int streamId, std::string suffix, const void* buffer, int32_t size);
     void StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming);
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
     OHOS::sptr<OHOS::Camera::ICameraHost> service = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraHost> serviceV1_1 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHost> serviceV1_2 = nullptr;
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraDevice> cameraDeviceV1_1 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraDevice> cameraDeviceV1_2 = nullptr;
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV1_2 = nullptr;
     OHOS::sptr<ICameraHostCallback> hostCallback = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHostCallback> hostCallbackV1_2 = nullptr;
     OHOS::sptr<IStreamOperator> streamOperator = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_1::IStreamOperator> streamOperator_V1_1 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperator> streamOperator_V1_2 = nullptr;
     class DemoCameraDeviceCallback;
     OHOS::sptr<DemoCameraDeviceCallback> deviceCallback = nullptr;
-    std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfos;
-    std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfosV1_1;
-    std::shared_ptr<OHOS::HDI::Camera::V1_1::PrelaunchConfig> prelaunchConfig = nullptr;
-    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoV1_1 = nullptr;
-    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfo = nullptr;
-    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoSnapshot = nullptr;
-    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoCapture = nullptr;
-    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoAnalyze = nullptr;
-    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoPre = nullptr;
-    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoVideo = nullptr;
-    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoSketch = nullptr;
+    std::vector<StreamInfo> streamInfos;
+    std::shared_ptr<StreamInfo> streamInfo = nullptr;
+    std::shared_ptr<StreamInfo> streamInfoSnapshot = nullptr;
+    std::shared_ptr<StreamInfo> streamInfoCapture = nullptr;
+    std::shared_ptr<StreamInfo> streamInfoAnalyze = nullptr;
+    std::shared_ptr<StreamInfo> streamInfoPre = nullptr;
+    std::shared_ptr<StreamInfo> streamInfoVideo = nullptr;
     std::shared_ptr<CaptureInfo> captureInfo = nullptr;
-    sptr<OHOS::HDI::Camera::V1_2::IImageProcessSession> imageProcessSession_ = nullptr;
-    sptr<OHOS::HDI::Camera::V1_2::IImageProcessService> imageProcessService_ = nullptr;
-    class TestImageProcessCallback;
-    sptr<TestImageProcessCallback> imageProcessCallback_ = nullptr;
-    std::vector<std::string> pendingImageIds_;
     int previewFormat = PIXEL_FMT_YCRCB_420_SP;
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
     int snapshotFormat = PIXEL_FMT_YCRCB_420_SP;
     int analyzeFormat = PIXEL_FMT_YCRCB_420_SP;
+    int videoEncodeType = ENCODE_TYPE_H265;
     int streamIdPreview = 100;
     int streamIdCapture = 101;
-    int streamIdSketch = 105;
     int captureWidth = 1280;
     int captureHeight = 960;
-    int sketchWidth = 640;
-    int sketchHeight = 480;
     int captureIdPreview = 2000;
-    int captureIdSketch = 2050;
     int previewWidth = 1920;
     int previewHeight = 1080;
     int captureIdCapture = 2010;
@@ -167,6 +109,19 @@ public:
     int snapshotWidth = 4160;
     int snapshotHeight = 3120;
     int streamIdAnalyze = 103;
+    int usbCamera_previewWidth = 640;
+    int usbCamera_previewHeight = 480;
+    int usbCamera_videoWidth = 1280;
+    int usbCamera_videoHeight = 960;
+    int usbCamera_captureWidth = 1280;
+    int usbCamera_captureHeight = 960;
+    int usbCamera_analyzeWidth = 640;
+    int usbCamera_analyzeHeight = 480;
+    int usbCamera_previewFormat = PIXEL_FMT_RGBA_8888;
+    int usbCamera_videoFormat = PIXEL_FMT_YCRCB_420_SP;
+    int usbCamera_snapshotFormat = PIXEL_FMT_RGBA_8888;
+    int usbCamera_analyzeFormat = PIXEL_FMT_RGBA_8888;
+    int usbCamera_videoEncodeType = ENCODE_TYPE_H264;
     std::vector<int> captureIds;
     std::vector<int> streamIds;
     int32_t imageDataSaveSwitch = SWITCH_OFF;
@@ -176,14 +131,13 @@ public:
 
     int32_t rc;
     bool status;
-    float statusV1_2;
-    static FlashlightStatus statusCallback;
     std::vector<std::string> cameraIds;
     std::vector<uint8_t> abilityVec = {};
     std::shared_ptr<CameraMetadata> ability = nullptr;
     std::vector<StreamIntent> intents;
     class StreamConsumer;
     std::map<OHOS::Camera::StreamIntent, std::shared_ptr<StreamConsumer>> consumerMap_ = {};
+
     class TestBufferConsumerListener : public OHOS::IBufferConsumerListener {
     public:
         TestBufferConsumerListener() {}
@@ -207,7 +161,6 @@ public:
     class StreamConsumer {
     public:
         void CalculateFps(int64_t timestamp, int32_t streamId);
-        void GetTimeStamp(int64_t *g_timestamp, uint32_t lenght, int64_t timestamp, int32_t gotSize);
         OHOS::sptr<OHOS::IBufferProducer> CreateProducer(std::function<void(void*, uint32_t)> callback);
         OHOS::sptr<BufferProducerSequenceable> CreateProducerSeq(std::function<void(void*, uint32_t)> callback);
         void TakeSnapshoe()
@@ -238,7 +191,6 @@ public:
         std::function<void(void*, uint32_t)> callback_ = nullptr;
         bool isFirstCalculateFps_ = false;
         int timestampCount_ = 0;
-        static int64_t g_timestamp[2];
         int64_t intervalTimestamp_ = 0;
         const int64_t ONESECOND_OF_MICROSECOND_UNIT = 1000000000;
         int64_t interval_ = ONESECOND_OF_MICROSECOND_UNIT;
@@ -267,18 +219,6 @@ public:
         int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
     };
 
-    class TestStreamOperatorCallbackV1_2 : public OHOS::HDI::Camera::V1_2::IStreamOperatorCallback {
-    public:
-        TestStreamOperatorCallbackV1_2() = default;
-        virtual ~TestStreamOperatorCallbackV1_2() = default;
-        int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override;
-        int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos) override;
-        int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos) override;
-        int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
-        int32_t OnCaptureStarted_V1_2(int32_t captureId,
-            const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos) override;
-    };
-
     class TestCameraHostCallback : public ICameraHostCallback {
     public:
         TestCameraHostCallback() = default;
@@ -287,35 +227,6 @@ public:
         int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status) override;
         int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
         int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
-    };
-
-    class TestCameraHostCallbackV1_2 : public OHOS::HDI::Camera::V1_2::ICameraHostCallback {
-    public:
-        TestCameraHostCallbackV1_2() = default;
-        virtual ~TestCameraHostCallbackV1_2() = default;
-
-        int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status) override;
-        int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
-        int32_t OnFlashlightStatus_V1_2(FlashlightStatus status) override;
-        int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
-    };
-
-    class TestImageProcessCallback : public OHOS::HDI::Camera::V1_2::IImageProcessCallback {
-    public:
-        int32_t coutProcessDone_ = 0;
-        int32_t coutStatusChanged_ = 0;
-        int32_t countError_ = 0;
-        std::string curImageId_;
-        int32_t curErrorCode_ = 0;
-        bool isDone_ = false;
-        OHOS::HDI::Camera::V1_2::ImageBufferInfo curImageBufferInfo_;
-        OHOS::HDI::Camera::V1_2::SessionStatus curStatus_;
-        TestImageProcessCallback() = default;
-        virtual ~TestImageProcessCallback() = default;
-        int32_t OnProcessDone(const std::string& imageId,
-            const OHOS::HDI::Camera::V1_2::ImageBufferInfo& buffer) override;
-        int32_t OnStatusChanged(OHOS::HDI::Camera::V1_2::SessionStatus status) override;
-        int32_t OnError(const std::string& imageId, OHOS::HDI::Camera::V1_2::ErrorCode errorCode) override;
     };
 };
 }

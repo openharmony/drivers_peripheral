@@ -17,7 +17,7 @@
 
 using namespace OHOS::Camera;
 
-namespace OHOS {
+namespace OHOS::Camera {
 const size_t THRESHOLD = 10;
 
 enum HostCmdId {
@@ -63,7 +63,10 @@ void FuncCancelCapture(const uint8_t *rawData)
         CAMERA_LOGI("%{public}s rawData is null", __FUNCTION__);
         return;
     }
-    cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
+    cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
+        cameraTest->streamOperator);
+    cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_0::StreamInfo>();
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
     cameraTest->captureInfo = std::make_shared<CaptureInfo>();
@@ -71,14 +74,14 @@ void FuncCancelCapture(const uint8_t *rawData)
     cameraTest->captureInfo->captureSetting_ = cameraTest->abilityVec;
     cameraTest->captureInfo->enableShutterCallback_ = true;
     bool isStreaming = true;
-    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->Capture(*rawData, *cameraTest->captureInfo, isStreaming);
-    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback =
-        new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    cameraTest->rc = cameraTest->streamOperator->Capture(*rawData, *cameraTest->captureInfo, isStreaming);
+    OHOS::sptr<OHOS::HDI::Camera::V1_0::IStreamOperatorCallback> streamOperatorCallback =
+        new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 
-    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->ChangeToOfflineStream(
-        {cameraTest->streamInfoSnapshot->v1_0.streamId_}, streamOperatorCallback, offlineStreamOperator);
-    cameraTest->rc = (CamRetCode)offlineStreamOperator->CancelCapture(*rawData);
+    cameraTest->rc = cameraTest->streamOperator->ChangeToOfflineStream(
+        {cameraTest->streamInfoSnapshot->streamId_}, streamOperatorCallback, offlineStreamOperator);
+    cameraTest->rc = offlineStreamOperator->CancelCapture(*rawData);
 }
 
 void FuncReleaseStreams(const uint8_t *rawData)
@@ -87,36 +90,32 @@ void FuncReleaseStreams(const uint8_t *rawData)
         CAMERA_LOGI("%{public}s rawData is null", __FUNCTION__);
         return;
     }
-    cameraTest->streamOperatorCallback = new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
 
     int32_t data = static_cast<int32_t>(ConvertInt32(rawData));
-    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback =
-        new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    OHOS::sptr<OHOS::HDI::Camera::V1_0::IStreamOperatorCallback> streamOperatorCallback =
+        new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 
-    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->ChangeToOfflineStream(
+    cameraTest->rc = cameraTest->streamOperator->ChangeToOfflineStream(
         {data}, streamOperatorCallback, offlineStreamOperator);
-    cameraTest->rc = (CamRetCode)offlineStreamOperator->ReleaseStreams({data});
+    cameraTest->rc = offlineStreamOperator->ReleaseStreams({data});
 }
 
 void FuncRelease()
 {
-    cameraTest->streamOperatorCallback = new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
-    cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
-        cameraTest->streamOperator);
-
-    cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_0::StreamInfo>();
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
-    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback =
-        new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    OHOS::sptr<OHOS::HDI::Camera::V1_0::IStreamOperatorCallback> streamOperatorCallback =
+        new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 
-    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->ChangeToOfflineStream(
-        {cameraTest->streamInfoSnapshot->v1_0.streamId_}, streamOperatorCallback, offlineStreamOperator);
-    cameraTest->rc = (CamRetCode)offlineStreamOperator->Release();
+    cameraTest->rc = cameraTest->streamOperator->ChangeToOfflineStream(
+        {cameraTest->streamInfoSnapshot->streamId_}, streamOperatorCallback, offlineStreamOperator);
+    cameraTest->rc = offlineStreamOperator->Release();
 }
 
 static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
@@ -148,18 +147,15 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     uint32_t cmd = ConvertUint32(rawData);
     rawData += sizeof(cmd);
 
-    cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest->intents = {STILL_CAPTURE};
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommon>();
     cameraTest->Init();
-    if (cameraTest->serviceV1_2 == nullptr) {
+    if (cameraTest->service == nullptr) {
         return false;
     }
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_2 == nullptr) {
+    if (cameraTest->cameraDevice == nullptr) {
         return false;
     }
-    cameraTest->StartStream(cameraTest->intents);
-    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     for (cmd = 0; cmd < OFFLINE_STREAM_OPERATOR_END; cmd++) {
         HostFuncSwitch(cmd, rawData);
     }
@@ -169,11 +165,11 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (size < OHOS::THRESHOLD) {
+    if (size < THRESHOLD) {
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyApi(data, size);
+    DoSomethingInterestingWithMyApi(data, size);
     return 0;
 }
 } // namespace OHOS

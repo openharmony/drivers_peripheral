@@ -29,7 +29,7 @@ constexpr uint32_t DATA_COUNT = 1;
 
 void CameraBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
-    cameraTest = std::make_shared<OHOS::Camera::Test>();
+    cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_2>();
     cameraTest->Init();
     cameraTest->OpenCameraV1_2(DEVICE_0);
 }
@@ -113,7 +113,7 @@ BENCHMARK_REGISTER_F(CameraBenchmarkTest, PrelaunchWithOpMode_benchmark_001)->It
 BENCHMARK_F(CameraBenchmarkTest, UpdateStreams_benchmark_001)(
     benchmark::State &st)
 {
-    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::HdiCommonV1_2::TestStreamOperatorCallbackV1_2();
     cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
         cameraTest->streamOperator_V1_2);
     EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
@@ -154,7 +154,7 @@ BENCHMARK_REGISTER_F(CameraBenchmarkTest, UpdateStreams_benchmark_001)->Iteratio
 BENCHMARK_F(CameraBenchmarkTest, ConfirmCapture_benchmark_001)(
     benchmark::State &st)
 {
-    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::HdiCommonV1_2::TestStreamOperatorCallbackV1_2();
     cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
         cameraTest->streamOperator_V1_2);
     for (auto _ : st) {
