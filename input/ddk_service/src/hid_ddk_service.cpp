@@ -55,7 +55,7 @@ int32_t HidDdkService::CreateDevice(const Hid_Device &hidDevice,
 
 int32_t HidDdkService::EmitEvent(uint32_t deviceId, const std::vector<Hid_EmitItem> &items)
 {
-    HDF_LOGI("%{public}s emit event enter, deviceId=%{public}d", __func__, deviceId);
+    HDF_LOGI("%{public}s emit event enter, the id of device = %{public}d", __func__, deviceId);
     if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
@@ -66,7 +66,7 @@ int32_t HidDdkService::EmitEvent(uint32_t deviceId, const std::vector<Hid_EmitIt
 
 int32_t HidDdkService::DestroyDevice(uint32_t deviceId)
 {
-    HDF_LOGI("%{public}s destroy device enter, deviceId=%{public}d", __func__, deviceId);
+    HDF_LOGI("%{public}s destroy device enter, the id of device = %{public}d", __func__, deviceId);
     if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
