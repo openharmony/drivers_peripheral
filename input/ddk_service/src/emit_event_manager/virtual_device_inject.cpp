@@ -14,7 +14,7 @@
  */
 
 #include "virtual_device_inject.h"
-#include <hdf_log.h>
+#include "input_uhdf_log.h"
 
 #define HDF_LOG_TAG virtual_device_inject
 

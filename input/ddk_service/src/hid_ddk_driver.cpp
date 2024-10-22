@@ -15,10 +15,10 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/hid_ddk_stub.h"
 #include "emit_event_manager.h"
+#include "input_uhdf_log.h"
 
 #define HDF_LOG_TAG hid_ddk_driver
 
