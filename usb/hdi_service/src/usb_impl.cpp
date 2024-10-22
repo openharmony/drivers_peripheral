@@ -1099,7 +1099,7 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         return HDF_DEV_ERR_NO_DEVICE;
     }
     if (!port->initFlag) {
-        HDF_LOGE("%{public}s:openPort failed.", __func__);
+        HDF_LOGE("%{public}s: openPort failed", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     usbOpenCount_--;
@@ -1322,7 +1322,7 @@ int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t 
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     if (interfaceId >= USB_MAX_INTERFACES) {
-        HDF_LOGE("%{public}s:interfaceId larger then max num", __func__);
+        HDF_LOGE("%{public}s:interfaceId larger than max num", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1430,11 +1430,6 @@ int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t al
         HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
             port->busNum, port->devAddr, interfaceId);
         return HDF_FAILURE;
-    }
-    if (port->iface[interfaceId] && port->iface[interfaceId]->info.curAltSetting == altIndex) {
-        HDF_LOGE("%{public}s:bus:%{public}d devAddr:%{public}d interfaceId:%{public}d cur:%{public}d", __func__,
-            port->busNum, port->devAddr, interfaceId, altIndex);
-        return HDF_SUCCESS;
     }
 
     int32_t ret = UsbSelectInterfaceSetting(interfaceHandle, altIndex, &port->iface[interfaceId]);
