@@ -15,7 +15,7 @@
 
 #include "inject_thread.h"
 #include <sys/prctl.h>
-#include <hdf_log.h>
+#include "input_uhdf_log.h"
 
 #define HDF_LOG_TAG inject_thread
 

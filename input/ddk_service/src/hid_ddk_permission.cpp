@@ -12,12 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "hid_ddk_permission.h"
-
-#include <hdf_log.h>
-
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
+#include "input_uhdf_log.h"
 
 namespace OHOS {
 namespace HDI {

@@ -15,8 +15,8 @@
 
 #include "emit_event_manager.h"
 #include "ipc_skeleton.h"
-#include <hdf_log.h>
 #include "ipc_skeleton.h"
+#include "input_uhdf_log.h"
 
 #define HDF_LOG_TAG emit_event_manager
 
