@@ -21,9 +21,9 @@
 #include <hdf_base.h>
 #include "osal_time.h"
 #include "v1_0/iinput_interfaces.h"
-#include "input_uhdf_log.h"
 #include "input_type.h"
 #include "input_callback_impl.h"
+#include "input_uhdf_log.h"
 
 using namespace OHOS::HDI::Input::V1_0;
 using namespace testing::ext;

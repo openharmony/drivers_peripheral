@@ -20,11 +20,11 @@
 #include <securec.h>
 #include <string>
 #include <unistd.h>
-#include "input_uhdf_log.h"
 #include "input_device_manager.h"
 #include "input_manager.h"
 #include "osal_time.h"
 #include "osal_mem.h"
+#include "input_uhdf_log.h"
 
 using namespace testing::ext;
 using namespace OHOS::Input;
