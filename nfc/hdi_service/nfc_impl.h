@@ -49,6 +49,7 @@ private:
     NfcVendorAdaptions adaptor_;
     sptr<INfcCallback> callbacks_ = nullptr;
     sptr<RemoteDeathRecipient> remoteDeathRecipient_ = nullptr;
+    std::mutex callbacksMutex_ {};
 };
 } // V1_1
 } // Nfc
