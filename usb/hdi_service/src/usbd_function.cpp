@@ -356,6 +356,7 @@ int32_t UsbdFunction::UsbdReadUdc(char* udcName, size_t len)
         } else {
             HDF_LOGW("%{public}s: fread len than expected", __func__);
         }
+        (void)fclose(fpRead);
         return HDF_FAILURE;
     }
 

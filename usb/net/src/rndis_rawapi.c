@@ -350,7 +350,7 @@ static int32_t HostRndisQuery(struct UsbnetHost *usbNet, struct RndisQueryParam 
     uint32_t len = CPU_TO_LE32(uq.getC->len);
 
     HARCH_INFO_PRINT("off = %{public}d, len = %{public}d, retval = %{public}d", off, len, retval);
-    // CONTROL_BUFFER_SIZE_-UNION_OFFSET_LENGTH is　valid　memory　range
+    // CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH is valid memory range
     if ((off > CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH) || (len > CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH - off)) {
         goto response_error;
     }
@@ -419,7 +419,7 @@ static void HostRndisUpdateMtu(struct UsbnetHost **ppUsbNet, int32_t *retval)
         (*ppUsbNet)->net.hardMtu = tmp;
         (*ppUsbNet)->net.mtu = (*ppUsbNet)->net.hardMtu - (*ppUsbNet)->net.hardHeaderLen;
     }
-    HARCH_INFO_PRINT("hard mtu %{public}u (%{public}u from usbNet), rx buflen %{public}u,　align %{public}d\n",
+    HARCH_INFO_PRINT("hard mtu %{public}u (%{public}u from usbNet), rx buflen %{public}u, align %{public}d\n",
         (*ppUsbNet)->net.hardMtu, tmp, (*ppUsbNet)->net.rxUrbSize, 1 << CPU_TO_LE32(g_u.initC->packetAlignment));
 }
 
