@@ -15,9 +15,9 @@
 
 #include "v1_0/hid_ddk_service.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include "emit_event_manager.h"
 #include "hid_ddk_permission.h"
+#include "input_uhdf_log.h"
 
 #define HDF_LOG_TAG hid_ddk_service
 

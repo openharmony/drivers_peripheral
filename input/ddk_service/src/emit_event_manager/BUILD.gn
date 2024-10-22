@@ -22,8 +22,10 @@ ohos_shared_library("emit_event_manager") {
     "virtual_device_inject.cpp",
   ]
 
-  include_dirs =
-      [ "${input_driver_path}/ddk_service/include/emit_event_manager" ]
+  include_dirs = [
+    "${input_driver_path}/ddk_service/include/emit_event_manager",
+    "${input_driver_path}/utils/include",
+  ]
 
   external_deps = [
     "c_utils:utils",
