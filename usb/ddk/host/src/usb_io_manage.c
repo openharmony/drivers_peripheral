@@ -227,7 +227,8 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
     }
 
     OsalMutexLock((struct OsalMutex *)&msgQueue->mutex);
-    if (msgQueue->entry.next == NULL || msgQueue->entry.next->prev == NULL || msgQueue->entry.prev == NULL || msgQueue->entry.prev->next == NULL) {
+    if (msgQueue->entry.next == NULL || msgQueue->entry.next->prev == NULL ||
+        msgQueue->entry.prev == NULL || msgQueue->entry.prev->next == NULL) {
         ret = HDF_ERR_INVALID_OBJECT;
         OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
         goto ERROR;
