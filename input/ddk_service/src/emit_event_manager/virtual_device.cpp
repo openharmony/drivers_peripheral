@@ -19,8 +19,8 @@
 #include <fcntl.h>
 #include <securec.h>
 #include <unistd.h>
-#include <hdf_log.h>
 #include <cerrno>
+#include "input_uhdf_log.h"
 
 #define HDF_LOG_TAG virtual_device
 
