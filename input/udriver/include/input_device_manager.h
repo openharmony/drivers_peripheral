@@ -27,7 +27,6 @@
 #include <unistd.h>
 #include <vector>
 #include "input_manager.h"
-#include "input_uhdf_log.h"
 
 namespace OHOS {
 namespace Input {
@@ -108,28 +107,8 @@ public:
     RetStatus UnregisterReportCallback(uint32_t devIndex);
     RetStatus RegisterHotPlugCallback(InputHostCb *callback);
     RetStatus UnregisterHotPlugCallback(void);
-    void dumpInfoList(InputDevListNode in)
-    {
-        HDF_LOGD("%{public}s index: %{public}u state:%{public}u fd:%{public}d devPathNode:%{public}s", __func__,
-                 in.index, in.status, in.fd, in.devPathNode);
-        HDF_LOGD("devIndex: %{public}u devType:%{public}u chipInfo:%{public}s "
-                 "vendorName: %{public}s chipName: %{public}s attrSet.devName: %s "
-                 "attrSet.id.busType: %{public}u attrSet.id.vendor: %{public}u "
-                 "attrSet.id.product: %{public}u attrSet.id.version: %{public}u ",
-                 in.detailInfo.devIndex, in.detailInfo.devType,
-                 in.detailInfo.chipInfo, in.detailInfo.vendorName,
-                 in.detailInfo.chipName, in.detailInfo.attrSet.devName,
-                 in.detailInfo.attrSet.id.busType, in.detailInfo.attrSet.id.vendor,
-                 in.detailInfo.attrSet.id.product, in.detailInfo.attrSet.id.version);
-        for (int32_t i = 0; i < ABS_CNT; i++) {
-            HDF_LOGD("attrSet.axisInfo.axis: %{public}d attrSet.axisInfo.min: %{public}d "
-                     "attrSet.axisInfo.max: %{public}d attrSet.axisInfo.fuzz: %{public}d "
-                     "attrSet.axisInfo.flat: %{public}d attrSet.axisInfo.range: %{public}d ",
-                     in.detailInfo.attrSet.axisInfo[i].axis, in.detailInfo.attrSet.axisInfo[i].flat,
-                     in.detailInfo.attrSet.axisInfo[i].fuzz, in.detailInfo.attrSet.axisInfo[i].max,
-                     in.detailInfo.attrSet.axisInfo[i].min, in.detailInfo.attrSet.axisInfo[i].range);
-        }
-    }
+    void dumpInfoList(InputDevListNode in);
+
 private:
     void DeleteDevListNode(int index);
     int32_t AddDeviceNodeToList(

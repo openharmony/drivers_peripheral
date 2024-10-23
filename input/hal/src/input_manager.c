@@ -24,6 +24,7 @@
 #include "hdf_io_service_if.h"
 #include "osal_time.h"
 #include "input_common.h"
+#include "input_uhdf_log.h"
 
 #define TOUCH_INDEX 1
 #define PLACEHOLDER_LENGTH 2
