@@ -33,7 +33,7 @@ if (defined(ohos_lite)) {
     ]
 
     public_configs = [ ":input_hdi_public_config" ]
-    include_dirs = []
+    include_dirs = [ "$INPUT_ROOT_DIR/utils/include" ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [
@@ -73,7 +73,10 @@ if (defined(ohos_lite)) {
     ]
 
     public_configs = [ ":input_hdi_public_config" ]
-    include_dirs = [ "$INPUT_ROOT_DIR/hal/include" ]
+    include_dirs = [
+      "$INPUT_ROOT_DIR/hal/include",
+      "$INPUT_ROOT_DIR/utils/include",
+    ]
 
     defines = [ "__OHOS__USER__" ]
 
