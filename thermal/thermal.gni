@@ -26,3 +26,10 @@ if (!defined(global_parts_info) ||
 } else {
   has_thermal_config_policy_part = false
 }
+
+if (!defined(global_parts_info) ||
+    defined(global_parts_info.hiviewdfx_hitrace)) {
+  has_thermal_hitrace_part = true
+} else {
+  has_thermal_hitrace_part = false
+}

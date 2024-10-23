@@ -13,27 +13,37 @@
  * limitations under the License.
  */
 
-#include "hid_ddk_permission.h"
-#include "accesstoken_kit.h"
-#include "ipc_skeleton.h"
-#include "input_uhdf_log.h"
+#ifndef THERMAL_THERMAL_HITRACE_H
+#define THERMAL_THERMAL_HITRACE_H
+
+#ifdef THERMAL_HITRACE_ENABLE
+#include "hitrace_meter.h"
+#endif
 
 namespace OHOS {
 namespace HDI {
-namespace Input {
-namespace Ddk {
-namespace V1_0 {
-using namespace OHOS::Security::AccessToken;
+namespace Thermal {
+class ThermalHitrace {
+public:
+    explicit ThermalHitrace(const std::string& trace) : trace_(trace)
+    {
+#ifdef THERMAL_HITRACE_ENABLE
+        StartTrace(HITRACE_TAG_POWER, trace_.c_str());
+#endif
+    }
 
-bool DdkPermissionManager::VerifyPermission(std::string permissionName)
-{
-    AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
-    int result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
-    HDF_LOGI("%{public}s VerifyAccessToken: %{public}d", __func__, result);
-    return result == PERMISSION_GRANTED;
-}
-} // namespace V1_0
-} // namespace Ddk
-} // namespace Input
+    ~ThermalHitrace()
+    {
+#ifdef THERMAL_HITRACE_ENABLE
+        FinishTrace(HITRACE_TAG_POWER);
+#endif
+    }
+
+private:
+    std::string trace_;
+};
+
+} // namespace Thermal
 } // namespace HDI
 } // namespace OHOS
+#endif // THERMAL_THERMAL_HITRACE_H

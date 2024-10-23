@@ -1307,13 +1307,17 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct 
 
 void UsbFnCfgMgrUnRegisterAllProp(void)
 {
+    if (g_cfgEntry.next == NULL) {
+        return;
+    }
+
     struct UsbFnCfgPropMgr *obj = NULL;
     struct UsbFnCfgPropMgr *temp = NULL;
     DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, struct UsbFnCfgPropMgr, entry) {
+        DListRemove(&obj->entry);
         UsbFnMemFree(obj);
     }
     DListHeadInit(&g_cfgEntry);
-    g_cfgEntry.next = 0;
 }
 
 int32_t UsbFnCfgMgrGetProp(const struct UsbFnInterface *intf, const char *name, char *value)

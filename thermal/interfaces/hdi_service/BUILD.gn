@@ -47,6 +47,10 @@ ohos_shared_library("libthermal_interface_service_1.1") {
       defines = [ "HAS_THERMAL_CONFIG_POLICY_PART" ]
       external_deps += [ "config_policy:configpolicy_util" ]
     }
+    if (has_thermal_hitrace_part) {
+      external_deps += [ "hitrace:hitrace_meter" ]
+      defines += [ "THERMAL_HITRACE_ENABLE" ]
+    }
   } else {
     external_deps = [
       "hilog:libhilog",

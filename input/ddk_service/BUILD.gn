@@ -23,6 +23,7 @@ ohos_shared_library("libhid_ddk_service_1.0") {
   include_dirs = [
     "include/",
     "include/emit_event_manager/",
+    "${input_driver_path}/utils/include",
   ]
 
   deps = [ "${input_driver_path}/ddk_service/src/emit_event_manager:emit_event_manager" ]
@@ -47,6 +48,7 @@ ohos_shared_library("libhid_ddk_driver") {
   include_dirs = [
     "include/",
     "include/emit_event_manager/",
+    "${input_driver_path}/utils/include",
   ]
 
   deps = [ "${input_driver_path}/ddk_service/src/emit_event_manager:emit_event_manager" ]
