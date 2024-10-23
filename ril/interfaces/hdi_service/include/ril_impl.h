@@ -190,15 +190,15 @@ public:
     template<typename FuncType, typename... ParamTypes>
     inline int32_t TaskSchedule(FuncType &&_func, int32_t slotId, ParamTypes &&... _args) const
     {
-        if (_func == nullptr || Telephony::HRilManager::manager_ == nullptr) {
+        if (_func == nullptr) {
             HDF_LOGE("manager or func is null pointer");
             return RIL_ERR_NULL_POINT;
         }
-        if (slotId >= Telephony::HRilManager::manager_->GetMaxSimSlotCount()) {
+        if (slotId >= Telephony::HRilManager::GetInstance().GetMaxSimSlotCount()) {
             HDF_LOGE("slotId is inValid");
             return RIL_ERR_INVALID_PARAMETER;
         }
-        auto ret = (Telephony::HRilManager::manager_.get()->*(_func))(slotId, std::forward<ParamTypes>(_args)...);
+        auto ret = (Telephony::HRilManager::GetInstance().*(_func))(slotId, std::forward<ParamTypes>(_args)...);
         return ret;
     }
 
