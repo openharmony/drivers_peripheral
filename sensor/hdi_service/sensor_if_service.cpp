@@ -218,7 +218,7 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGI("%{public}s: sensorId %{public}d, serviceId = %{public}d", __func__, sensorId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
-    return DisableSensor(sensorId);
+    return DisableSensor(sensorId, DisableSensor);
 }
 
 int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
@@ -650,11 +650,9 @@ int32_t SensorIfService::ReadData(int32_t sensorId, std::vector<HdfSensorEvents>
     return HDF_SUCCESS;
 }
 
-int32_t SensorIfService::DisableSensor(int32_t sensorId)
+int32_t SensorIfService::DisableSensor(int32_t sensorId, uint32_t serviceId)
 {
     SENSOR_TRACE_PID_MSG("sensorId " + std::to_string(sensorId));
-    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: sensorId %{public}d, serviceId = %{public}d", __func__, sensorId, serviceId);
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
         HDF_LOGE("%{public}s There are still some services enable", __func__);
         return HDF_SUCCESS;
@@ -701,7 +699,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret;
+    int32_t ret = SENSOR_SUCCESS;
     if (rateLevel < REPORT_INTERVAL) {
         HDF_LOGE("%{public}s: rateLevel cannot less than zero", __func__);
         return HDF_FAILURE;
@@ -723,7 +721,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
         }
     } else {
         SensorClientsManager::GetInstance()->EraseSdcSensorBestConfig(sensorId);
-        ret = DisableSensor(sensorId);
+        ret = DisableSensor(sensorId, serviceId);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s Disable failed, error code is %{public}d", __func__, ret);
             return ret;
