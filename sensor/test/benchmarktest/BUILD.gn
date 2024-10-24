@@ -39,14 +39,10 @@ ohos_benchmarktest("hdf_sensor_benchmark_test") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [
-    "//third_party/benchmark",
-    "//third_party/googletest:gtest_main",
-  ]
-
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_sensor:libsensor_proxy_2.0",
+      "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
