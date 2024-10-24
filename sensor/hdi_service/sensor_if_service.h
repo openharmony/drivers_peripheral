@@ -38,7 +38,7 @@ public:
     int32_t GetAllSensorInfo(std::vector<HdfSensorInformation> &info) override;
     int32_t Enable(int32_t sensorId) override;
     int32_t Disable(int32_t sensorId) override;
-    int32_t DisableSensor(int32_t sensorId);
+    int32_t DisableSensor(int32_t sensorId, uint32_t serviceId);
     int32_t SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval) override;
     int32_t SetBatchSenior(int32_t serviceId, int32_t sensorId, int32_t mode, int64_t samplingInterval,
                            int64_t reportInterval);
