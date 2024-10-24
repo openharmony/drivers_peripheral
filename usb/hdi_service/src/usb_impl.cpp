@@ -1424,10 +1424,10 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         if (ret != HDF_SUCCESS) {
             HDF_LOGW("%{public}s:release bulk async list failed", __func__);
         }
-        UsbReleaseInterface(port->iface[interfaceId]);
-        port->iface[interfaceId] = nullptr;
         UsbCloseInterface(port->devHandle[interfaceId], false);
         port->devHandle[interfaceId] = nullptr;
+        UsbReleaseInterface(port->iface[interfaceId]);
+        port->iface[interfaceId] = nullptr;
         return HDF_SUCCESS;
     } else {
         HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
