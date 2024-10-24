@@ -27,6 +27,7 @@ CameraDeviceService::CameraDeviceService(OHOS::sptr<ICameraDeviceVdi> cameraDevi
 int32_t CameraDeviceService::GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
     sptr<IStreamOperator> &streamOperator)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:GetStreamOperator");
     OHOS::sptr<IStreamOperatorVdi> streamOperatorVdi = nullptr;
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDeviceServiceVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     OHOS::sptr<IStreamOperatorVdiCallback> vdiCallbackObj = new StreamOperatorServiceCallback(callbackObj);
@@ -54,36 +55,42 @@ int32_t CameraDeviceService::GetStreamOperator(const sptr<IStreamOperatorCallbac
 
 int32_t CameraDeviceService::UpdateSettings(const std::vector<uint8_t> &settings)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:UpdateSettings");
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDeviceServiceVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return cameraDeviceServiceVdi_->UpdateSettings(settings);
 }
 
 int32_t CameraDeviceService::SetResultMode(ResultCallbackMode mode)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:SetResultMode");
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDeviceServiceVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return cameraDeviceServiceVdi_->SetResultMode(static_cast<VdiResultCallbackMode>(mode));
 }
 
 int32_t CameraDeviceService::GetEnabledResults(std::vector<int32_t> &results)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:GetEnabledResults");
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDeviceServiceVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return cameraDeviceServiceVdi_->GetEnabledResults(results);
 }
 
 int32_t CameraDeviceService::EnableResult(const std::vector<int32_t> &results)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:EnableResult");
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDeviceServiceVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return cameraDeviceServiceVdi_->EnableResult(results);
 }
 
 int32_t CameraDeviceService::DisableResult(const std::vector<int32_t> &results)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:DisableResult");
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDeviceServiceVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return cameraDeviceServiceVdi_->DisableResult(results);
 }
 
 int32_t CameraDeviceService::Close()
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:Close");
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDeviceServiceVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return cameraDeviceServiceVdi_->Close();
 }
