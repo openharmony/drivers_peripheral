@@ -663,7 +663,7 @@ int32_t SensorIfService::DisableSensor(int32_t sensorId, uint32_t serviceId)
         return HDF_FAILURE;
     }
 
-    int32_t ret;
+    int32_t ret = SENSOR_SUCCESS;
     if (SensorClientsManager::GetInstance()->IsExistSdcSensorEnable(sensorId)) {
         SENSOR_TRACE_START("sensorVdiImpl_->SetSaBatch");
         ret = sensorVdiImpl_->SetSaBatch(sensorId, REPORT_INTERVAL, REPORT_INTERVAL);
