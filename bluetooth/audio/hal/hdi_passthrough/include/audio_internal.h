@@ -187,6 +187,7 @@ struct AudioHwAdapter {
     struct AudioPortAndCapability *portCapabilitys;
     struct HdfRemoteService *proxyRemoteHandle; // proxyRemoteHandle
     int32_t adapterMgrRenderFlag;
+    int32_t adapterMgrCaptureFlag;
 };
 
 struct AudioFrameRenderMode {
@@ -207,6 +208,15 @@ struct AudioFrameRenderMode {
     RenderCallback callback;
     void* cookie;
     struct AudioMmapBufferDescriptor mmapBufDesc;
+};
+
+struct AudioFrameCaptureMode {
+    uint64_t frames;
+    struct AudioTimeStamp time;
+    struct AudioSampleAttributes attrs;
+    uint32_t byteRate;
+    uint32_t periodSize;
+    uint32_t periodCount;
 };
 
 struct AudioGain {

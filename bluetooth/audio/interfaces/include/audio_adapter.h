@@ -77,6 +77,21 @@ struct AudioAdapter {
                             const struct AudioSampleAttributes *attrs, struct AudioRender **render);
 
     /**
+     * @brief Creates an <b>AudioCapture</b> object.
+     *
+     * @param adapter Indicates the pointer to the audio adapter to operate.
+     * @param desc Indicates the pointer to the descriptor of the audio adapter to start.
+     * @param attrs Indicates the pointer to the audio sampling attributes to open.
+     * @param capture Indicates the double pointer to the <b>AudioCapture</b> object.
+     * @return Returns <b>0</b> if the <b>AudioCapture</b> object is created successfully;
+     * returns a negative value otherwise.
+     * @see GetPortCapability
+     * @see DestroyCapture
+     */
+    int32_t (*CreateCapture)(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
+                            const struct AudioSampleAttributes *attrs, struct AudioCapture **capture);
+
+    /**
      * @brief Destroys an <b>AudioRender</b> object.
      *
      * @attention Do not destroy the object during audio rendering.
@@ -87,6 +102,18 @@ struct AudioAdapter {
      * @see CreateRender
      */
     int32_t (*DestroyRender)(struct AudioAdapter *adapter, struct AudioRender *render);
+
+    /**
+     * @brief Destroys an <b>AudioCapture</b> object.
+     *
+     * @attention Do not destroy the object during audio capturing.
+     *
+     * @param adapter Indicates the pointer to the audio adapter to operate.
+     * @param capture Indicates the pointer to the <b>AudioCapture</b> object to operate.
+     * @return Returns <b>0</b> if the <b>AudioCapture</b> object is destroyed; returns a negative value otherwise.
+     * @see CreateCapture
+     */
+    int32_t (*DestroyCapture)(struct AudioAdapter *adapter, struct AudioCapture *capture);
 
     /**
      * @brief Obtains the capability set of the port driver for the audio adapter.

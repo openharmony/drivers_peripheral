@@ -145,6 +145,22 @@ int32_t GetAudioProxyRenderFunc(struct AudioHwRender *hwRender)
     return HDF_SUCCESS;
 }
 
+int32_t GetAudioProxyCaptureFunc(struct AudioHwCapture *hwCapture)
+{
+    if (hwCapture == nullptr) {
+        return HDF_FAILURE;
+    }
+    hwCapture->common.control.Start = AudioProxyCaptureStart;
+    hwCapture->common.control.Stop = AudioProxyCaptureStop;
+    hwCapture->common.control.Pause = AudioProxyCapturePause;
+    hwCapture->common.control.Resume = AudioProxyCaptureResume;
+    hwCapture->common.control.Flush = AudioProxyCaptureFlush;
+    hwCapture->common.volume.SetMute = AudioProxyCaptureSetMute;
+    hwCapture->common.volume.GetMute = AudioProxyCaptureGetMute;
+    hwCapture->common.CaptureFrame = AudioProxyCaptureCaptureFrame;
+    return HDF_SUCCESS;
+}
+
 int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
                           const struct AudioSampleAttributes *attrs)
 {
@@ -154,6 +170,18 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     }
     hwRender->renderParam.renderMode.hwInfo.deviceDescript = *desc;
     hwRender->renderParam.frameRenderMode.attrs = *attrs;
+    return HDF_SUCCESS;
+}
+
+int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
+                          const struct AudioSampleAttributes *attrs)
+{
+    if (hwCapture == nullptr || desc == nullptr || attrs == nullptr) {
+        HDF_LOGE("InitHwCaptureParam param Is NULL");
+        return HDF_FAILURE;
+    }
+    hwCapture->captureParam.captureMode.hwInfo.deviceDescript = *desc;
+    hwCapture->captureParam.frameCaptureMode.attrs = *attrs;
     return HDF_SUCCESS;
 }
 
@@ -301,6 +329,24 @@ int32_t AudioProxyAdapterCreateRenderSplit(const struct AudioHwAdapter *hwAdapte
     return HDF_SUCCESS;
 }
 
+int32_t AudioProxyAdapterCreateCaptureSplit(const struct AudioHwAdapter *hwAdapter, struct AudioHwCapture *hwCapture)
+{
+    if (hwAdapter == nullptr || hwCapture == nullptr) {
+        return HDF_FAILURE;
+    }
+    if (hwAdapter->adapterDescriptor.adapterName == nullptr) {
+        return HDF_FAILURE;
+    }
+    uint32_t adapterNameLen = strlen(hwAdapter->adapterDescriptor.adapterName);
+    /* Get Adapter name */
+    int32_t ret = strncpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN - 1,
+        hwAdapter->adapterDescriptor.adapterName, adapterNameLen);
+    if (ret != EOK) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                       const struct AudioSampleAttributes *attrs, struct AudioRender **render)
 {
@@ -357,6 +403,63 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
     return AUDIO_HAL_SUCCESS;
 }
 
+int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
+                                      const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
+{
+    HDF_LOGI("%{public}s", __func__);
+    struct HdfSBuf *data = nullptr;
+    struct HdfSBuf *reply = nullptr;
+    struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
+    if (hwAdapter == nullptr || hwAdapter->proxyRemoteHandle == nullptr || desc == nullptr 
+        || attrs == nullptr || capture == nullptr) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    struct AudioHwCapture *hwCapture = reinterpret_cast<struct AudioHwCapture *>(calloc(1, sizeof(*hwCapture)));
+    if (hwCapture == nullptr) {
+        HDF_LOGE("hwCapture is NULL!");
+        return AUDIO_HAL_ERR_MALLOC_FAIL;
+    }
+    hwCapture->proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
+    if (GetAudioProxyCaptureFunc(hwCapture) < 0) {
+        AudioMemFree(reinterpret_cast<void **>(&hwCapture));
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    /* Fill hwCapture para */
+    if (InitHwCaptureParam(hwCapture, desc, attrs) < 0) {
+        AudioMemFree(reinterpret_cast<void **>(&hwCapture));
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
+        AudioMemFree(reinterpret_cast<void **>(&hwCapture));
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        AudioMemFree(reinterpret_cast<void **>(&hwCapture));
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (AudioProxyCommonInitCreateData(data, hwAdapter, desc, attrs) < 0) {
+        HDF_LOGE("Failed to obtain reply");
+        AudioProxyBufReplyRecycle(data, reply);
+        AudioMemFree(reinterpret_cast<void **>(&hwCapture));
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_CAPTURE_CREATE_CAPTURE, data, reply);
+    if (ret < 0) {
+        HDF_LOGE("Send Server fail!");
+        AudioProxyBufReplyRecycle(data, reply);
+        AudioMemFree(reinterpret_cast<void **>(&hwCapture));
+        return ret;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    if (AudioProxyAdapterCreateCaptureSplit(hwAdapter, hwCapture) < 0) {
+        AudioMemFree(reinterpret_cast<void **>(&hwCapture));
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    *capture = &hwCapture->common;
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRender *render)
 {
     struct HdfSBuf *data = NULL;
@@ -381,6 +484,34 @@ int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct Audi
     }
     AudioMemFree(reinterpret_cast<void **>(&hwRender->renderParam.frameRenderMode.buffer));
     AudioMemFree(reinterpret_cast<void **>(&render));
+    AudioProxyBufReplyRecycle(data, reply);
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioProxyAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCapture *capture)
+{
+    struct HdfSBuf *data = nullptr;
+    struct HdfSBuf *reply = nullptr;
+    if (adapter == nullptr || capture == nullptr) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    struct AudioHwCapture *hwCapture = reinterpret_cast<struct AudioHwCapture *>(capture);
+    if (hwCapture == nullptr || hwCapture->proxyRemoteHandle == nullptr) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (AudioProxyPreprocessCapture(reinterpret_cast<AudioHwCapture *>(capture), &data, &reply) < 0) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwCapture->proxyRemoteHandle, AUDIO_HDI_CAPTURE_DESTROY, data, reply);
+    if (ret < 0) {
+        if (ret != HDF_ERR_INVALID_OBJECT) {
+            HDF_LOGE("AudioDestroyCapture FAIL");
+        }
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+    AudioMemFree(reinterpret_cast<void **>(&hwCapture->captureParam.frameCaptureMode.buffer));
+    AudioMemFree(reinterpret_cast<void **>(&capture));
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
 }
