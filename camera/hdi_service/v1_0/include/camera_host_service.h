@@ -22,6 +22,7 @@
 #include "v1_0/icamera_device.h"
 #include "v1_0/icamera_host.h"
 #include "v1_0/icamera_host_vdi.h"
+#include "camera_hal_hicollie.h"
 
 namespace OHOS::Camera {
 #ifdef CHIP_PROD_CAMERA_HOST_CONFIG
