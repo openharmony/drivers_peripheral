@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,19 +17,20 @@ import("../../../sensor.gni")
 
 module_output_path = "drivers_peripheral_sensor/sensor"
 
-ohos_unittest("hdi_unittest_sensor") {
+ohos_unittest("dump_unittest_sensor") {
   module_out_path = module_output_path
 
   include_dirs = [
     "../../../interfaces/include",
+    "../../../hdi_service",
+    "../../../interfaces/v1_0",
     "../../common/include",
     "../../../utils/include",
   ]
 
   sources = [
     "../../common/src/sensor_callback_impl.cpp",
-    "../../common/src/sensor_callback_impl_test.cpp",
-    "hdf_sensor_hdi_test.cpp",
+    "hdf_sensor_dump_test.cpp",
   ]
   cflags = [
     "-Wall",
@@ -41,8 +42,10 @@ ohos_unittest("hdi_unittest_sensor") {
   ]
 
   if (is_standard_system) {
+    deps = [ "../../../hdi_service:libsensor_interface_service_2.0" ]
     external_deps = [
       "drivers_interface_sensor:libsensor_proxy_2.0",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "hitrace:hitrace_meter",
