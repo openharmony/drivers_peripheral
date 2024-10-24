@@ -133,8 +133,13 @@ void H4Protocol::PacketCallback()
                 onEventReceive_(hciPacket_);
             }
             break;
+        case HCI_PACKET_TYPE_ISO_DATA:
+            if (onIsoReceive_) {
+                onIsoReceive_(hciPacket_);
+            }
+            break;
         default:
-            HDF_LOGE("PacketCallback type[%d] error.", packetType_);
+            HDF_LOGE("PacketCallback type[%{public}d] error.", packetType_);
             break;
     }
 }

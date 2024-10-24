@@ -56,6 +56,14 @@ StopPlayingFunc fastStopPlayingFunc;
 ReqMmapBufferFunc fastReqMmapBufferFunc;
 ReadMmapPositionFunc fastReadMmapPositionFunc;
 GetLatencyFunc fastGetLatencyFunc;
+
+SetUpFunc setUpCaptureFunc;
+TearDownFunc tearDownCaptureFunc;
+GetStateFunc getCaptureStateFunc;
+StartCaptureFunc startCaptureFunc;
+SuspendPlayingFunc suspendCaptureFunc;
+StopPlayingFunc stopCaptureFunc;
+ReadFrameFunc readFrameFunc;
 #endif
 
 sptr<IBluetoothA2dpSrc> g_proxy_ = nullptr;
@@ -230,6 +238,14 @@ static bool InitAudioDeviceSoHandle(const char *path)
         GET_SYM_ERRPR_RET(
             g_ptrAudioDeviceHandle, ReadMmapPositionFunc, fastReadMmapPositionFunc, "FastReadMmapPosition");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetLatencyFunc, fastGetLatencyFunc, "FastGetLatency");
+
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SetUpFunc, setUpCaptureFunc, "SetUpCapture");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, TearDownFunc, tearDownCaptureFunc, "TearDownCapture");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetStateFunc, getCaptureStateFunc, "GetCaptureState");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StartCaptureFunc, startCaptureFunc, "StartCapture");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, suspendCaptureFunc, "suspendCapture");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, stopCaptureFunc, "stopCapture");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, ReadFrameFunc, readFrameFunc, "ReadFrame");
     }
     return true;
 }
@@ -247,9 +263,27 @@ bool SetUp()
     return ret;
 }
 
+bool SetUpCapture()
+{
+    bool ret = false;
+    ret = InitAudioDeviceSoHandle(g_bluetoothAudioDeviceSoPath);
+    if (ret == true) {
+        ret = setUpCaptureFunc();
+    }
+    if (ret == false) {
+        HDF_LOGE("%{public}s failed!", __func__);
+    }
+    return ret;
+}
+
 void TearDown()
 {
     tearDownFunc();
+}
+
+void TearDownCapture()
+{
+    tearDownCaptureFunc();
 }
 
 bool FastSetUp()
@@ -318,6 +352,48 @@ int FastGetLatency(uint32_t &latency)
 {
     return (fastGetLatencyFunc(latency) ? HDF_SUCCESS : HDF_FAILURE);
 }
+
+int StartCapture()
+{
+    BTAudioStreamState state = getCaptureStateFunc();
+    if (state != BTAudioStreamState::STARTED) {
+        HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
+        if (!startCaptureFunc()) {
+            HDF_LOGE("%{public}s: fail to startPlaying", __func__);
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
+int SuspendCapture()
+{
+    int ret = 0;
+    BTAudioStreamState state = getCaptureStateFunc();
+    if (state != BTAudioStreamState::STARTED) {
+        ret = suspendCaptureFunc() ? HDF_SUCCESS : HDF_FAILURE;
+    } else {
+        HDF_LOGE("%{public}s: state=%{public}hhu is bad state", __func__, state);
+    }
+    return ret;
+}
+
+int StopCapture()
+{
+    BTAudioStreamState state = getCaptureStateFunc();
+    HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
+    if (state != BTAudioStreamState::INVALID) {
+        stopCaptureFunc();
+    }
+    return HDF_SUCCESS;
+}
+
+int ReadFrame(uint8_t *data, uint64_t size)
+{
+    HDF_LOGE("%{public}s", __func__);
+    return readFrameFunc(data, size);
+}
+
 #endif
 
 int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs)

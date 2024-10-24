@@ -70,6 +70,7 @@ ohos_shared_library("audio_bluetooth_hdi_proxy_server") {
     "src/audio_proxy_common.cpp",
     "src/audio_proxy_manager.cpp",
     "src/audio_proxy_render.cpp",
+    "src/audio_proxy_capture.cpp",
   ]
 
   deps = []
