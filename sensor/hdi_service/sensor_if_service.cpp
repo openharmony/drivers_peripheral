@@ -218,7 +218,7 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGI("%{public}s: sensorId %{public}d, serviceId = %{public}d", __func__, sensorId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
-    return DisableSensor(sensorId, DisableSensor);
+    return DisableSensor(sensorId, serviceId);
 }
 
 int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
