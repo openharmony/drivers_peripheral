@@ -1750,8 +1750,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel001, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel001 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     ret = g_usbInterface->BulkCancel(dev, pipe);
@@ -1759,7 +1762,7 @@ HWTEST_F(UsbdRequestTest, BulkCancel001, TestSize.Level1)
     ASSERT_EQ(0, ret);
     ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::BulkCancel001 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -1775,8 +1778,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel002, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel002 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     dev.busNum = BUS_NUM_INVALID;
@@ -1786,7 +1792,7 @@ HWTEST_F(UsbdRequestTest, BulkCancel002, TestSize.Level1)
     dev = dev_;
     ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::BulkCancel002 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -1802,8 +1808,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel003, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel003 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     dev.devAddr = DEV_ADDR_INVALID;
@@ -1813,7 +1822,7 @@ HWTEST_F(UsbdRequestTest, BulkCancel003, TestSize.Level1)
     dev = dev_;
     ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::BulkCancel003 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -1829,8 +1838,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel004, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     dev.busNum = BUS_NUM_INVALID;
@@ -1843,7 +1855,7 @@ HWTEST_F(UsbdRequestTest, BulkCancel004, TestSize.Level1)
     pipe = {interfaceId, pointId};
     ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -1859,8 +1871,11 @@ HWTEST_F(UsbdRequestTest, BulkCancel005, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_OK;
     uint8_t pointId = POINTID_DIR_IN;
     struct UsbPipe pipe = {interfaceId, pointId};
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::BulkCancel005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
     pipe.intfId = POINTID_INVALID;
@@ -1870,6 +1885,6 @@ HWTEST_F(UsbdRequestTest, BulkCancel005, TestSize.Level1)
     pipe = {interfaceId, pointId};
     ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
-    ASSERT_EQ(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 } // namespace
