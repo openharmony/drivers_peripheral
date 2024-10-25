@@ -692,7 +692,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0023)
     StreamInfo streamInfoCapture = {};
     streamInfoCapture.streamId_ = cameraBase_->STREAM_ID_CAPTURE;
     streamInfoCapture.width_ = 1280; // 1280:picture width
-    streamInfoCapture.height_ = 960; // 960:picture height
+    streamInfoCapture.height_ = 720; // 720:picture height
     streamInfoCapture.format_ = PIXEL_FMT_RGBA_8888;
     streamInfoCapture.dataspace_ = 8; // 8:picture dataspace
     streamInfoCapture.intent_ = STILL_CAPTURE;
@@ -847,7 +847,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0027)
     StreamInfo streamInfoVideo = {};
     streamInfoVideo.streamId_ = cameraBase_->STREAM_ID_VIDEO;
     streamInfoVideo.width_ = 1280; // 1280:picture width
-    streamInfoVideo.height_ = 960; // 960:picture height
+    streamInfoVideo.height_ = 720; // 720:picture height
     streamInfoVideo.format_ = PIXEL_FMT_RGBA_8888;
     streamInfoVideo.dataspace_ = 8; // 8:picture dataspace
     streamInfoVideo.intent_ = VIDEO;

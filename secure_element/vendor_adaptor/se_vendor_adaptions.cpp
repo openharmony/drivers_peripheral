@@ -41,6 +41,7 @@ static const int RES_BUFFER_MAX_LENGTH = 512;
 static const uint16_t SW1_OFFSET = 2;
 static const uint16_t SW2_OFFSET = 1;
 static const uint16_t MAX_CHANNEL_NUM = 4;
+static const uint16_t MAX_CHANNEL_SIZE = 0xFF;
 static const uint16_t MIN_RES_LEN = 2;
 uint16_t g_openedChannelCount = 0;
 bool g_openedChannels[MAX_CHANNEL_NUM] = {false, false, false, false};
@@ -118,8 +119,9 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
+    uint32_t channelCreated = MAX_CHANNEL_SIZE + 1;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaOpenLogicalChannel(
-        (uint8_t *)&aid[0], aid.size(), p2, res, &resLen, (uint32_t *)&channelNumber);
+        (uint8_t *)&aid[0], aid.size(), p2, res, &resLen, &channelCreated);
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
@@ -134,11 +136,16 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
     }
     if (ret == SECURE_ELEMENT_CA_RET_OK && resLen >= MIN_RES_LEN) {
         status = getStatusBySW(res[resLen - SW1_OFFSET], res[resLen - SW2_OFFSET]);
-        if (channelNumber < MAX_CHANNEL_NUM - 1 && !g_openedChannels[channelNumber] &&
+        if (channelCreated < MAX_CHANNEL_NUM - 1 && !g_openedChannels[channelCreated] &&
             status == SecureElementStatus::SE_SUCCESS) {
-            g_openedChannels[channelNumber] = true;
+            g_openedChannels[channelCreated] = true;
             g_openedChannelCount++;
         }
+    }
+    if (channelCreated <= MAX_CHANNEL_SIZE) {
+        channelNumber = static_cast<uint8_t>(channelCreated);
+    } else {
+        HDF_LOGE("openLogicalChannel err, channelCreated = %{public}d", channelCreated);
     }
     HDF_LOGI("openLogicalChannel [%{public}d] succ, now has %{public}d channel inuse",
         channelNumber, g_openedChannelCount);
