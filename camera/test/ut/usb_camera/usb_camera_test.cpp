@@ -1949,9 +1949,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0056)
     streamInfoVideo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
     streamInfos.push_back(streamInfoVideo);
     cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
-    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
     cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
-    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
     cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
     cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
