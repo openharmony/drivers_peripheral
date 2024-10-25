@@ -265,12 +265,11 @@ bool SetUp()
 
 bool SetUpCapture()
 {
-    bool ret = false;
-    ret = InitAudioDeviceSoHandle(g_bluetoothAudioDeviceSoPath);
-    if (ret == true) {
+    bool ret = InitAudioDeviceSoHandle(g_bluetoothAudioDeviceSoPath);
+    if (ret) {
         ret = setUpCaptureFunc();
     }
-    if (ret == false) {
+    if (!ret) {
         HDF_LOGE("%{public}s failed!", __func__);
     }
     return ret;
