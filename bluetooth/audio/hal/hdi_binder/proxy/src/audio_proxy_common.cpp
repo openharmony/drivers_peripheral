@@ -124,7 +124,7 @@ int32_t AudioProxyPreprocessCapture(struct AudioHwCapture *capture, struct HdfSB
         AudioProxyBufReplyRecycle(*data, *reply);
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(*data, renderPid)) {
+    if (!HdfSbufWriteUint32(*data, capturePid)) {
         AudioProxyBufReplyRecycle(*data, *reply);
         return HDF_FAILURE;
     }

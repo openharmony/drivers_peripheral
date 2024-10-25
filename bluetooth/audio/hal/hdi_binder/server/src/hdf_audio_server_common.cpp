@@ -311,11 +311,11 @@ int32_t AudioDestroyFormerCapture(struct AudioInfoInAdapter *captureManage)
         return HDF_FAILURE;
     }
     int count = 0;
-    captureManage->captureDestory = true;
+    captureManage->captureDestroy = true;
     while (captureManage->captureBusy) {
         if (count > 1000) { // Less than 1000
             HDF_LOGE("%{public}s: , count = %{public}d", __func__, count);
-            captureManage->captureDestory = false;
+            captureManage->captureDestroy = false;
             return AUDIO_HAL_ERR_AO_BUSY; // render is busy now
         }
         usleep(500); // sleep 500us
@@ -323,13 +323,13 @@ int32_t AudioDestroyFormerCapture(struct AudioInfoInAdapter *captureManage)
     }
     captureManage->capturePid = 0;
     if (captureManage->adapter->DestroyCapture(captureManage->adapter, captureManage->capture)) {
-        captureManage->captureDestory = false;
+        captureManage->captureDestroy = false;
         return HDF_FAILURE;
     }
     captureManage->capture = nullptr;
     captureManage->captureStatus = 0;
     captureManage->captureBusy = false;
-    captureManage->captureDestory = false;
+    captureManage->captureDestroy = false;
     captureManage->capturePriority = -1;
     return HDF_SUCCESS;
 }
@@ -968,5 +968,12 @@ int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescriptor *desc, struct H
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
+}
+
+void AudioSetCaptureBusy(uint32_t index, bool captureStatus)
+{
+    if (index = MAX_AUDIO_ADAPTER_NUM_SERVER) {
+        g_renderAndCaptureManage[index].captureBusy = captureStatus;
+    }
 }
 }

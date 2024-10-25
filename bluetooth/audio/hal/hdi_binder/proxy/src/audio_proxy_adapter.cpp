@@ -444,7 +444,7 @@ int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struc
         AudioMemFree(reinterpret_cast<void **>(&hwCapture));
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_CAPTURE_CREATE_CAPTURE, data, reply);
+    int32_t ret = AudioProxyDispatchCall(hwCapture->proxyRemoteHandle, AUDIO_HDI_CAPTURE_CREATE_CAPTURE, data, reply);
     if (ret < 0) {
         HDF_LOGE("Send Server fail!");
         AudioProxyBufReplyRecycle(data, reply);
@@ -510,7 +510,6 @@ int32_t AudioProxyAdapterDestroyCapture(struct AudioAdapter *adapter, struct Aud
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
-    AudioMemFree(reinterpret_cast<void **>(&hwCapture->captureParam.frameCaptureMode.buffer));
     AudioMemFree(reinterpret_cast<void **>(&capture));
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;

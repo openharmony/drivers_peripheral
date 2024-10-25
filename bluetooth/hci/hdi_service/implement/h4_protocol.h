@@ -39,7 +39,7 @@ private:
     HciDataCallback onAclReceive_;
     HciDataCallback onScoReceive_;
     HciDataCallback onEventReceive_;
-    HciDataCallback onIsoReceive_
+    HciDataCallback onIsoReceive_;
 
     uint8_t packetType_ = 0;
     std::vector<uint8_t> hciPacket_;

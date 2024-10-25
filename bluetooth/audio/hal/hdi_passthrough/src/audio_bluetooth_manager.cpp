@@ -390,7 +390,7 @@ int StopCapture()
 
 int ReadFrame(uint8_t *data, uint64_t size)
 {
-    HDF_LOGE("%{public}s", __func__);
+    HDF_LOGD("%{public}s", __func__);
     return readFrameFunc(data, size);
 }
 

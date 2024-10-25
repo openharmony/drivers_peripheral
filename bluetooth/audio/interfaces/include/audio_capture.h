@@ -48,7 +48,7 @@ namespace OHOS::HDI::Audio_Bluetooth {
  * @since 1.0
  * @version 1.0
  */
-struct AudioRender {
+struct AudioCapture {
     /**
      * @brief Defines the audio control. For details, see {@link AudioControl}.
      */
@@ -68,5 +68,6 @@ struct AudioRender {
      * @return Returns <b>0</b> if the data is read successfully; returns a negative value otherwise.
      */
     int32_t (*CaptureFrame)(struct AudioCapture *capture, void *frame, uint64_t requestBytes, uint64_t *replyBytes);
+};
 }
 #endif

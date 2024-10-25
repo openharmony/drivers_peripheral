@@ -134,7 +134,7 @@ int32_t GetAudioCaptureFunc(struct AudioHwCapture *hwCapture, const char *adapte
     if (hwCapture == nullptr || adapterName == nullptr) {
         return HDF_FAILURE;
     }
-    GetAudioRenderFunc(hwCapture);
+    GetCaptureFunc(hwCapture);
     return HDF_SUCCESS;
 }
 
@@ -518,7 +518,7 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
                                  const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
 {
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
-    if (hwAdapter == nullptr || desc == nullptr || attrs == nullptr || render == nullptr) {
+    if (hwAdapter == nullptr || desc == nullptr || attrs == nullptr || capture == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwAdapter->adapterMgrCaptureFlag > 0) {
@@ -537,7 +537,7 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
         return AUDIO_HAL_ERR_INTERNAL;
     }
     hwAdapter->adapterMgrCaptureFlag++;
-    *capture = &hwRender->common;
+    *capture = &hwcapture->common;
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -583,15 +583,7 @@ int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCap
     if (hwCapture == nullptr) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
-        HDF_LOGI("capture not stop, first stop it.");
-        int ret = capture->control.Stop((AudioHandle)capture);
-        if (ret < 0) {
-            HDF_LOGE("capture Stop failed");
-        }
-    }
-    AudioReleaseRenderHandle(hwCapture);
-    AudioMemFree(reinterpret_cast<void **>(&hwCapture->captureParam.frameCaptureMode.buffer));
+    AudioReleaseCaptureHandle(hwCapture);
     AudioMemFree(reinterpret_cast<void **>(&capture));
     HDF_LOGI("AudioAdapterDestroyCapture cleaned.");
     return AUDIO_HAL_SUCCESS;
