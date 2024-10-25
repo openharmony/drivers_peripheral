@@ -32,9 +32,9 @@ int32_t HdiServiceCaptureResume(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceCaptureFlush(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetMute(const struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetMute(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderSetMute(const struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureSetMute(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);

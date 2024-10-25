@@ -87,7 +87,7 @@ int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescriptor *d
         return HDF_FAILURE;
     }
     attrs->interleaved = (bool)tempCapturePara;
-    if (GetInitRenderParaAttrs(data, attrs) < 0) {
+    if (GetInitCaptureParaAttrs(data, attrs) < 0) {
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
@@ -148,7 +148,7 @@ int32_t HdiServiceCreateCapture(const struct HdfDeviceIoClient *client,
         return ret;
     }
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
-    if (render == nullptr || ret < 0) {
+    if (capture == nullptr || ret < 0) {
         HDF_LOGE("%{public}s: Failed to CreateCapture", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }

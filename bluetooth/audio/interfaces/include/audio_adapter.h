@@ -38,6 +38,7 @@
 
 #include "audio_types.h"
 #include "audio_render.h"
+#include "audio_capture.h"
 namespace OHOS::HDI::Audio_Bluetooth {
 /**
  * @brief Provides audio adapter capabilities, including initializing ports, creating rendering and capturing tasks,

@@ -38,7 +38,7 @@ struct AudioInfoInAdapter {
     int capturePriority;
     struct AudioCapture *capture;
     bool captureBusy;
-    bool captureDestory;
+    bool captureDestroy;
     uint32_t capturePid;
 };
 

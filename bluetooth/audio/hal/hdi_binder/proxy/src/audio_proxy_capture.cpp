@@ -149,14 +149,14 @@ int32_t AudioProxyCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
-    if (!HdfSBufReadUint64(reply, replyBytes)) {
+    if (!HdfSbufReadUint64(reply, replyBytes)) {
         AudioProxyBufReplyRecycle(data, reply);
         HDF_LOGE("HdfSbufReadUint64 FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     const void *rBuf = nullptr;
     uint32_t rLen;
-    if (!HdfBufReadBuffer(reply, &rBuf, &rLen)) {
+    if (!HdfSbufReadBuffer(reply, &rBuf, &rLen)) {
         AudioProxyBufReplyRecycle(data, reply);
         HDF_LOGE("HdfSbufReadBuffer FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
