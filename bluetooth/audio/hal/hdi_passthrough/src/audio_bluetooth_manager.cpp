@@ -243,8 +243,8 @@ static bool InitAudioDeviceSoHandle(const char *path)
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, TearDownFunc, tearDownCaptureFunc, "TearDownCapture");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetStateFunc, getCaptureStateFunc, "GetCaptureState");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StartCaptureFunc, startCaptureFunc, "StartCapture");
-        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, suspendCaptureFunc, "suspendCapture");
-        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, stopCaptureFunc, "stopCapture");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, suspendCaptureFunc, "SuspendCapture");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, stopCaptureFunc, "StopCapture");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, ReadFrameFunc, readFrameFunc, "ReadFrame");
     }
     return true;
@@ -370,7 +370,7 @@ int SuspendCapture()
 {
     int ret = 0;
     BTAudioStreamState state = getCaptureStateFunc();
-    if (state != BTAudioStreamState::STARTED) {
+    if (state == BTAudioStreamState::STARTED) {
         ret = suspendCaptureFunc() ? HDF_SUCCESS : HDF_FAILURE;
     } else {
         HDF_LOGE("%{public}s: state=%{public}hhu is bad state", __func__, state);
