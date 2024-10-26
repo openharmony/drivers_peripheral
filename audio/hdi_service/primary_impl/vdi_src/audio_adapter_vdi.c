@@ -713,7 +713,7 @@ void AudioReleaseAdapterVdi(uint32_t descIndex)
     priv->isRegCb = false;
     priv->callback = NULL;
 
-    AUDIO_FUNC_LOGD(" audio vdiAdapter release adapter success");
+    AUDIO_FUNC_LOGI(" audio vdiAdapter release adapter success");
 }
 
 int32_t InitAdapterMutex(void)
