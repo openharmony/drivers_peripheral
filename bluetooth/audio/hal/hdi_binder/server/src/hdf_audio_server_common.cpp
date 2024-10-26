@@ -360,7 +360,9 @@ int32_t AudioJudgeRenderPriority(const int32_t priority, int which)
 
 int32_t AudioJudgeCapturePriority(const int32_t priority, int which)
 {
-    int32_t num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : g_serverAdapterNum;
+    int32_t num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) 
+        ? MAX_AUDIO_ADAPTER_NUM_SERVER
+        : g_serverAdapterNum;
     if (which < 0 || which >= num) {
         HDF_LOGE("%{public}s: invalid value! ", __func__);
         return HDF_FAILURE;
@@ -389,8 +391,9 @@ int32_t AudioCreatRenderCheck(const char *adapterName, const int32_t priority)
         return HDF_FAILURE;
     }
 
-    int32_t num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ?
-        MAX_AUDIO_ADAPTER_NUM_SERVER : g_serverAdapterNum;
+    int32_t num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER)
+        ? MAX_AUDIO_ADAPTER_NUM_SERVER
+        : g_serverAdapterNum;
     for (i = 0; i < num; i++) {
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
@@ -414,8 +417,9 @@ int32_t AudioCreateCaptureCheck(const char *adapterName, const int32_t priority)
     if (adapterName == NULL || g_renderAndCaptureManage == NULL) {
         return HDF_FAILURE;
     }
-    int32_t num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ?
-        MAX_AUDIO_ADAPTER_NUM_SERVER : g_serverAdapterNum;
+    int32_t num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER)
+        ? MAX_AUDIO_ADAPTER_NUM_SERVER
+        : g_serverAdapterNum;
     for (i = 0; i < num; i++) {
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
@@ -663,7 +667,7 @@ int32_t AudioAdapterListGetAdapterRender(const char *adapterName,
 int32_t AudioAdapterListGetAdapterCapture(const char *adapterName,
     struct AudioAdapter **adapter, struct AudioCapture **capture)
 {
-    int32_t i; 
+    int32_t i;
     int32_t num;
     LOG_FUN_INFO();
     if (g_renderAndCaptureManage == nullptr) {
@@ -754,7 +758,8 @@ int32_t AudioAdapterFrameGetCapture(const char *adapterName, struct AudioCapture
         HDF_LOGE("adapterName or capture or index is null");
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER 
+    int32_t num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER)
+        ? MAX_AUDIO_ADAPTER_NUM_SERVER 
         : g_serverAdapterNum;
     *index = MAX_AUDIO_ADAPTER_NUM_SERVER;
     for (int32_t i = 0; i < num; i++) {
