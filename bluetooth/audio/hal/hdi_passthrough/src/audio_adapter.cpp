@@ -134,7 +134,7 @@ int32_t GetAudioCaptureFunc(struct AudioHwCapture *hwCapture, const char *adapte
     if (hwCapture == nullptr || adapterName == nullptr) {
         return HDF_FAILURE;
     }
-    GetCaptureFunc(hwCapture);
+    GetCaptureFuncs(hwCapture);
     return HDF_SUCCESS;
 }
 
@@ -537,7 +537,7 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
         return AUDIO_HAL_ERR_INTERNAL;
     }
     hwAdapter->adapterMgrCaptureFlag++;
-    *capture = &hwcapture->common;
+    *capture = &hwCapture->common;
     return AUDIO_HAL_SUCCESS;
 }
 
