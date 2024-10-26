@@ -977,7 +977,7 @@ int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescriptor *desc, struct H
 
 void AudioSetCaptureBusy(uint32_t index, bool captureStatus)
 {
-    if (index = MAX_AUDIO_ADAPTER_NUM_SERVER) {
+    if (index == MAX_AUDIO_ADAPTER_NUM_SERVER) {
         g_renderAndCaptureManage[index].captureBusy = captureStatus;
     }
 }
