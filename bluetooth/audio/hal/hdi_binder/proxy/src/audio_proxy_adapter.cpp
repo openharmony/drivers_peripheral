@@ -403,6 +403,19 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
     return AUDIO_HAL_SUCCESS;
 }
 
+bool InitializeHwCapture(struct AudioHwCapture *hwCapture, struct AudioHwAdapter *hwAdapter,
+    const struct AudioDeviceDescriptor *desc, const struct AudioSampleAttributes *attrs)
+{
+    hwCapture->proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
+    if (GetAudioProxyCaptureFunc(hwCapture) < 0) {
+        return false;
+    }
+    if (InitHwCaptureParam(hwCapture, desc, attrs) < 0) {
+        return false;
+    }
+    return true;
+}
+
 int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
 {
@@ -419,13 +432,7 @@ int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struc
         HDF_LOGE("hwCapture is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
-    hwCapture->proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
-    if (GetAudioProxyCaptureFunc(hwCapture) < 0) {
-        AudioMemFree(reinterpret_cast<void **>(&hwCapture));
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    /* Fill hwCapture para */
-    if (InitHwCaptureParam(hwCapture, desc, attrs) < 0) {
+    if (!InitializeHwCapture(hwCapture, hwAdapter, desc, attrs)) {
         AudioMemFree(reinterpret_cast<void **>(&hwCapture));
         return AUDIO_HAL_ERR_INTERNAL;
     }

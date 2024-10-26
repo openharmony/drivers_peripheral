@@ -35,6 +35,22 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
     return AUDIO_HAL_SUCCESS;
 }
 
+bool SetupBluetoothInterface(struct AudioHwAdapter *hwAdapter, const struct AudioAdapterDescriptor *desc)
+{
+    bool ret = false;
+    if (strcmp(desc->adapterName, "bt_a2dp_fast") == 0) {
+        HDF_LOGI("%{public}s, fast set up", __func__);
+        ret = OHOS::Bluetooth::FastSetUp();
+    } else if (strcmp(desc->adapterName, "bt_hdap") == 0) {
+        HDF_LOGI("%{public}s, hdap set up", __func__);
+        ret = OHOS::Bluetooth::SetUpCapture();
+    } else {
+        HDF_LOGI("%{public}s, normal set up", __func__);
+        ret = OHOS::Bluetooth::SetUp();
+    }
+    return ret;
+}
+
 int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
                                 struct AudioAdapter **adapter)
 {
@@ -66,28 +82,15 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     hwAdapter->adapterDescriptor = *desc;
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
     hwAdapter->adapterMgrCaptureFlag = 0;
-
     HDF_LOGI("%s call bluetooth RegisterObserver interface", __func__);
 #ifndef A2DP_HDI_SERVICE
     OHOS::Bluetooth::GetProxy();
     OHOS::Bluetooth::RegisterObserver();
 #else
-    bool ret = false;
-    if (strcmp(desc->adapterName, "bt_a2dp_fast") == 0) {
-        HDF_LOGI("%{public}s, fast set up", __func__);
-        ret = OHOS::Bluetooth::FastSetUp();
-    } else if (strcmp(desc->adapterName, "bt_hdap") == 0) {
-        HDF_LOGI("%{public}s, hdap set up", __func__);
-        ret = OHOS::Bluetooth::SetUpCapture();
-    } else {
-        HDF_LOGI("%{public}s, normal set up", __func__);
-        ret = OHOS::Bluetooth::SetUp();
-    }
-    if (!ret) {
+    if (!SetupBluetoothInterface(hwAdapter, desc)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
 #endif
-    
     return AUDIO_HAL_SUCCESS;
 }
 
