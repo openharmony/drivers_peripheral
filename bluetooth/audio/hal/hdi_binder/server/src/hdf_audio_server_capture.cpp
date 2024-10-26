@@ -357,7 +357,7 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
         AudioMemFree((void **)&frame);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    AudioMemFree((void **)&frame);
+    AudioMemFree(reinterpret_cast<void **>(&frame));
     return AUDIO_HAL_SUCCESS;
 }
 
