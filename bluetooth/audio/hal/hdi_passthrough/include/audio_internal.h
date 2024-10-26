@@ -301,7 +301,7 @@ struct AudioHwCaptureMode {
 
 struct AudioHwCaptureParam {
     struct AudioHwCaptureMode captureMode;
-    struct AudioFrameCaptureMode captureMode;
+    struct AudioFrameCaptureMode frameCaptureMode;
 };
 
 struct ErrorDump {

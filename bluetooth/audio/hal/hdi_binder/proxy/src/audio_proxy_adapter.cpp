@@ -410,8 +410,8 @@ int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struc
     struct HdfSBuf *data = nullptr;
     struct HdfSBuf *reply = nullptr;
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
-    if (hwAdapter == nullptr || hwAdapter->proxyRemoteHandle == nullptr || desc == nullptr
-        || attrs == nullptr || capture == nullptr) {
+    if (hwAdapter == nullptr || hwAdapter->proxyRemoteHandle == nullptr || desc == nullptr ||
+        attrs == nullptr || capture == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioHwCapture *hwCapture = reinterpret_cast<struct AudioHwCapture *>(calloc(1, sizeof(*hwCapture)));
