@@ -117,6 +117,18 @@ int32_t AudioProxyCaptureGetMute(const AudioHandle handle, bool *mute)
     return ret;
 }
 
+bool ReadReplyBuffer(struct HdfSBuf *reply, uint64_t replyBytes, void *frame, uint64_t requestBytes)
+{
+    const void *rBuf = nullptr;
+    uint32_t rLen;
+    if (HdfSbufReadBuffer(reply, &rBuf, &rLen) && rLen == replyBytes) {
+        if (memcpy_s(frame, requestBytes, rBuf, rLen) != EOK) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int32_t AudioProxyCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
     uint64_t requestBytes, uint64_t *replyBytes)
 {
@@ -154,19 +166,7 @@ int32_t AudioProxyCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
         HDF_LOGE("HdfSbufReadUint64 FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    const void *rBuf = nullptr;
-    uint32_t rLen;
-    if (!HdfSbufReadBuffer(reply, &rBuf, &rLen)) {
-        AudioProxyBufReplyRecycle(data, reply);
-        HDF_LOGE("HdfSbufReadBuffer FAIL");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (*replyBytes != rLen) {
-        AudioProxyBufReplyRecycle(data, reply);
-        HDF_LOGE("%{public}s: read error, size %{public}" PRIu64 ",rLen %{public}u", __func__, *replyBytes, rLen);
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (memcpy_s(frame, requestBytes, rBuf, rLen) != EOK) {
+    if (!ReadReplyBuffer(reply, *replyBytes, frame, requestBytes)) {
         AudioProxyBufReplyRecycle(data, reply);
         HDF_LOGE("memcpy rBuf failed");
         return AUDIO_HAL_ERR_INTERNAL;
