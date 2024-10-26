@@ -340,21 +340,21 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     AudioSetCaptureBusy(index, true);
     if (capture == nullptr || capture->CaptureFrame == nullptr) {
         HDF_LOGE("capture or capureFrame in NULL");
-        AudioMemFree((void **)&frame);
+        AudioMemFree(reinterpret_cast<void **>(&frame));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = capture->CaptureFrame(capture, (void *)frame, requestBytes, &replyBytes);
     AudioSetCaptureBusy(index, false);
     if (ret < 0) {
-        AudioMemFree((void **)&frame);
+        AudioMemFree(reinterpret_cast<void **>(&frame));
         return ret;
     }
     if (!HdfSbufWriteUint64(reply, replyBytes)) {
-        AudioMemFree((void **)&frame);
+    AudioMemFree(reinterpret_cast<void **>(&frame));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (!HdfSbufWriteBuffer(reply, (const void *)frame, replyBytes)) {
-        AudioMemFree((void **)&frame);
+        AudioMemFree(reinterpret_cast<void **>(&frame));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     AudioMemFree(reinterpret_cast<void **>(&frame));
