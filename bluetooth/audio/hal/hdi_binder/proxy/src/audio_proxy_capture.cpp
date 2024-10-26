@@ -118,7 +118,7 @@ int32_t AudioProxyCaptureGetMute(const AudioHandle handle, bool *mute)
 }
 
 int32_t AudioProxyCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
-                                    uint64_t requestBytes, uint64_t *replyBytes)
+    uint64_t requestBytes, uint64_t *replyBytes)
 {
     HDF_LOGD("%{public}s", __func__);
     if (frame == nullptr || replyBytes == nullptr) {

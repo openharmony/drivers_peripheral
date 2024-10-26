@@ -254,7 +254,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
 }
 
 int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
-                          const struct AudioSampleAttributes *attrs)
+    const struct AudioSampleAttributes *attrs)
 {
     if (hwCapture == nullptr || desc == nullptr || attrs == nullptr) {
         HDF_LOGE("InitHwCaptureParam param Is NULL");
@@ -456,7 +456,7 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
 }
 
 int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
-                                    const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter)
+    const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter)
 {
     HDF_LOGD("%s", __func__);
     if (hwAdapter == nullptr || hwCapture == nullptr || desc == nullptr || attrs == nullptr) {
@@ -515,7 +515,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
 }
 
 int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-                                 const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
+    const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
 {
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
     if (hwAdapter == nullptr || desc == nullptr || attrs == nullptr || capture == nullptr) {

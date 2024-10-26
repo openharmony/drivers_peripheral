@@ -174,7 +174,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
 }
 
 int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
-                          const struct AudioSampleAttributes *attrs)
+    const struct AudioSampleAttributes *attrs)
 {
     if (hwCapture == nullptr || desc == nullptr || attrs == nullptr) {
         HDF_LOGE("InitHwCaptureParam param Is NULL");
@@ -404,13 +404,13 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
 }
 
 int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-                                      const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
+    const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
 {
     HDF_LOGI("%{public}s", __func__);
     struct HdfSBuf *data = nullptr;
     struct HdfSBuf *reply = nullptr;
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
-    if (hwAdapter == nullptr || hwAdapter->proxyRemoteHandle == nullptr || desc == nullptr 
+    if (hwAdapter == nullptr || hwAdapter->proxyRemoteHandle == nullptr || desc == nullptr
         || attrs == nullptr || capture == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
