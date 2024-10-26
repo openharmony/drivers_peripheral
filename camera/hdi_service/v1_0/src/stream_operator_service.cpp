@@ -36,6 +36,7 @@ StreamOperatorService::~StreamOperatorService()
 int32_t StreamOperatorService::IsStreamsSupported(OperationMode mode, const std::vector<uint8_t> &modeSetting,
     const std::vector<StreamInfo> &infos, StreamSupportType &type)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:IsStreamsSupported");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     std::vector<VdiStreamInfo> vdiInfos;
     for (auto info : infos) {
@@ -52,6 +53,7 @@ int32_t StreamOperatorService::IsStreamsSupported(OperationMode mode, const std:
 
 int32_t StreamOperatorService::CreateStreams(const std::vector<StreamInfo> &streamInfos)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:CreateStreams");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     std::vector<VdiStreamInfo> vdiStreamInfos;
     for (auto info : streamInfos) {
@@ -64,18 +66,21 @@ int32_t StreamOperatorService::CreateStreams(const std::vector<StreamInfo> &stre
 
 int32_t StreamOperatorService::ReleaseStreams(const std::vector<int32_t> &streamIds)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:ReleaseStreams");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return streamOperatorVdi_->ReleaseStreams(streamIds);
 }
 
 int32_t StreamOperatorService::CommitStreams(OperationMode mode, const std::vector<uint8_t> &modeSetting)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:CommitStreams");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return streamOperatorVdi_->CommitStreams(static_cast<VdiOperationMode>(mode), modeSetting);
 }
 
 int32_t StreamOperatorService::GetStreamAttributes(std::vector<StreamAttribute> &attributes)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:GetStreamAttributes");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     std::vector<VdiStreamAttribute> vdiAttributes;
     for (auto attribute : attributes) {
@@ -96,18 +101,21 @@ int32_t StreamOperatorService::GetStreamAttributes(std::vector<StreamAttribute> 
 int32_t StreamOperatorService::AttachBufferQueue(int32_t streamId,
     const sptr<BufferProducerSequenceable> &bufferProducer)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:AttachBufferQueue");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return streamOperatorVdi_->AttachBufferQueue(streamId, bufferProducer);
 }
 
 int32_t StreamOperatorService::DetachBufferQueue(int32_t streamId)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:DetachBufferQueue");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return streamOperatorVdi_->DetachBufferQueue(streamId);
 }
 
 int32_t StreamOperatorService::Capture(int32_t captureId, const CaptureInfo &info, bool isStreaming)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:Capture");
     CAMERAHALPERFSYSEVENT(TIME_FOR_CAPTURE);
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     VdiCaptureInfo vdiInfo;
@@ -117,6 +125,7 @@ int32_t StreamOperatorService::Capture(int32_t captureId, const CaptureInfo &inf
 
 int32_t StreamOperatorService::CancelCapture(int32_t captureId)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:CancelCapture");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return streamOperatorVdi_->CancelCapture(captureId);
 }
