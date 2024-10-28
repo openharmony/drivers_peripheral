@@ -55,7 +55,7 @@ static struct EffectFactory* GetLibraryByName(const char *libName)
 static int32_t LoadLibraryByName(const char *libName, uint8_t **libHandle, struct EffectFactory **factLib)
 {
     int32_t ret = 0;
-    struct EffectFactory *(*GetFactoryLib)(void);
+    struct EffectFactory *(*getFactoryLib)(void);
     char path[PATH_MAX];
     char pathBuf[PATH_MAX];
 
@@ -80,8 +80,8 @@ static int32_t LoadLibraryByName(const char *libName, uint8_t **libHandle, struc
         return HDF_FAILURE;
     }
 
-    GetFactoryLib = dlsym(handle, "GetEffectoyFactoryLib");
-    *factLib = GetFactoryLib();
+    getFactoryLib = dlsym(handle, "GetEffectoyFactoryLib");
+    *factLib = getFactoryLib();
     if (*factLib == NULL) {
         HDF_LOGE("%{public}s: get fact lib failed %{public}s", __func__, dlerror());
         dlclose(handle);
