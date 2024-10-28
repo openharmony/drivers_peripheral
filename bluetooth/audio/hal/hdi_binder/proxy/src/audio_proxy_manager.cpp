@@ -103,6 +103,8 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
     hwAdapter->common.InitAllPorts = AudioProxyAdapterInitAllPorts;
     hwAdapter->common.CreateRender = AudioProxyAdapterCreateRender;
     hwAdapter->common.DestroyRender = AudioProxyAdapterDestroyRender;
+    hwAdapter->common.CreateCapture = AudioProxyAdapterCreateCapture;
+    hwAdapter->common.DestroyCapture = AudioProxyAdapterDestroyCapture;
     hwAdapter->common.GetPortCapability = AudioProxyAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioProxyAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioProxyAdapterGetPassthroughMode;

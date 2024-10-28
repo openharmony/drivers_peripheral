@@ -39,6 +39,7 @@ public:
         ReceiveDataCallback onAclReceive;
         ReceiveDataCallback onScoReceive;
         ReceiveDataCallback onEventReceive;
+        ReceiveDataCallback onIsoReceive;
     };
 
     bool Initialize(InitializeCompleteCallback initializeCompleteCallback, const ReceiveCallback &receiveCallback);

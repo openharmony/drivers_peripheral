@@ -37,6 +37,7 @@ const PacketHeader HciProtocol::header_[HCI_PACKET_TYPE_MAX] = {
     {.headerSize = 4, .dataLengthOffset = 2, .dataLengthSize = 2}, /* HCI_PACKET_TYPE_ACL_DATA */
     {.headerSize = 3, .dataLengthOffset = 2, .dataLengthSize = 1}, /* HCI_PACKET_TYPE_SCO_DATA */
     {.headerSize = 2, .dataLengthOffset = 1, .dataLengthSize = 1}, /* HCI_PACKET_TYPE_EVENT */
+    {.headerSize = 4, .dataLengthOffset = 2, .dataLengthSize = 2}, /* HCI_PACKET_TYPE_ISO_DATA */
 };
 
 const PacketHeader &HciProtocol::GetPacketHeaderInfo(HciPacketType packetType)

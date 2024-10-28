@@ -24,7 +24,8 @@ namespace Bluetooth {
 namespace Hci {
 class H4Protocol : public HciProtocol {
 public:
-    H4Protocol(int fd, HciDataCallback onAclReceive, HciDataCallback onScoReceive, HciDataCallback onEventReceive);
+    H4Protocol(int fd, HciDataCallback onAclReceive, HciDataCallback onScoReceive, HciDataCallback onEventReceive,
+        HciDataCallback onIsoReceive);
 
     ssize_t SendPacket(HciPacketType packetType, const std::vector<uint8_t> &packetData) override;
     void ReadData(int fd);
@@ -38,6 +39,7 @@ private:
     HciDataCallback onAclReceive_;
     HciDataCallback onScoReceive_;
     HciDataCallback onEventReceive_;
+    HciDataCallback onIsoReceive_;
 
     uint8_t packetType_ = 0;
     std::vector<uint8_t> hciPacket_;
