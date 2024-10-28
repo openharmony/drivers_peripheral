@@ -30,7 +30,6 @@ if (defined(ohos_lite)) {
       "./gadget/function/usbfn:libusbfn",
       "./hdi_service:hdi_usb_service",
       "./net:libusbhost_ecm",
-      "./net:libusbhost_rndis_rawapi",
       "./serial:libusbhost_acm",
       "./serial:libusbhost_acm_rawapi",
     ]
