@@ -95,11 +95,11 @@ ohos_shared_library("libusb_pnp_manager") {
   branch_protector_ret = "pac_ret"
 
   include_dirs = [
+    "//drivers/hdf_core/framework/model/usb/include",
     "host/include",
     "device/include",
     "./../utils/include",
   ]
-  public_configs = [ ":public_headers" ]
   sources = [
     "//drivers/hdf_core/framework/model/usb/src/usb_ddk_pnp_loader.c",
     "//drivers/hdf_core/framework/model/usb/src/usb_wrapper.cpp",
