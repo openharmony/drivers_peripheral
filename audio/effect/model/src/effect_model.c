@@ -37,7 +37,7 @@ struct AudioEffectLibInfo *g_libInfos[AUDIO_EFFECT_NUM_MAX] = { NULL };
 
 static struct EffectFactory* GetLibraryByName(const char *libName)
 {
-    EffectFactory *libEffect = NULL;
+    struct EffectFactory *libEffect = NULL;
     for (int i = 0; i <= AUDIO_EFFECT_NUM_MAX; i++) {
         if (i == AUDIO_EFFECT_NUM_MAX) {
             HDF_LOGE("%{public}s: can not find %{public}s", __func__, libName);
@@ -55,6 +55,7 @@ static struct EffectFactory* GetLibraryByName(const char *libName)
 static int32_t LoadLibraryByName(const char *libName, uint8_t **libHandle, struct EffectFactory **factLib)
 {
     int32_t ret = 0;
+    struct EffectFactory *(*GetFactoryLib)(void);
     char path[PATH_MAX];
     char pathBuf[PATH_MAX];
 
@@ -96,7 +97,7 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
     uint8_t *libHandle = NULL; 
     struct AudioEffectLibInfo **libInfo = NULL;
     for (int i = 0; i <= AUDIO_EFFECT_NUM_MAX; i++) {
-        if ( i == AUDIO_EFFECT_NUM_MAX) {
+        if (i == AUDIO_EFFECT_NUM_MAX) {
             HDF_LOGE("%{public}s: over effect max num", __func__);
             return HDF_FAILURE;
         }
@@ -228,7 +229,7 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
             continue;
         }
 
-        ret = LoadEffectLibrary(g_cfgDescs->effectCfgDescs[i].library, &factLib);
+        LoadEffectLibrary(g_cfgDescs->effectCfgDescs[i].library, &factLib);
         if (factLib == NULL) {
             HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
             return HDF_FAILURE;
@@ -259,7 +260,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     struct ControllerManager *ctrlMgr = NULL;
     struct IEffectControlVdi *ctrlOps = NULL;
 
-    ret = LoadEffectLibrary(info->libName, &lib);
+    LoadEffectLibrary(info->libName, &lib);
     CHECK_NULL_PTR_RETURN_VALUE(lib, HDF_FAILURE);
     CHECK_NULL_PTR_RETURN_VALUE(lib->CreateController, HDF_FAILURE);
     
