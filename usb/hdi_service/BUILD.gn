@@ -50,6 +50,7 @@ ohos_shared_library("libusb_interface_service_1.1") {
 
   sources = [
     "src/usb_impl.cpp",
+    "src/usbd_accessory.cpp",
     "src/usbd_dispatcher.cpp",
     "src/usbd_function.cpp",
     "src/usbd_load_usb_service.cpp",
