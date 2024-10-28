@@ -72,6 +72,9 @@ int32_t HciInterfaceImpl::Init(const sptr<IHciCallback>& callbackObj)
         .onEventReceive =
             [callbackObj](
                 const std::vector<uint8_t> &packet) { callbackObj->OnReceivedHciPacket(BtType::HCI_EVENT, packet); },
+        .onIsoReceive =
+            [callbackObj](
+                const std::vector<uint8_t> &packet) { callbackObj->OnReceivedHciPacket(BtType::ISO_DATA, packet); },
     };
 
     bool result = VendorInterface::GetInstance()->Initialize(

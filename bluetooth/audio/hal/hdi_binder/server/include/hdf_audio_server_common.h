@@ -34,6 +34,12 @@ struct AudioInfoInAdapter {
     bool renderBusy;
     bool renderDestory;
     uint32_t renderPid;
+    int captureStatus;
+    int capturePriority;
+    struct AudioCapture *capture;
+    bool captureBusy;
+    bool captureDestroy;
+    uint32_t capturePid;
 };
 
 int32_t AudioAdapterListGetAdapter(const char *adapterName, struct AudioAdapter **adapter);
@@ -67,5 +73,17 @@ int32_t AdaptersServerManageInit(const struct AudioAdapterDescriptor *descs, int
 int32_t HdiServicePositionWrite(struct HdfSBuf *reply,
     uint64_t frames, struct AudioTimeStamp time);
 int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescriptor *desc, struct HdfSBuf *data);
+int32_t AudioAdapterListGetCapture(const char *adapterName, struct AudioCapture **capture,
+    uint32_t pid);
+int32_t AudioAdapterListGetAdapterCapture(const char *adapterName, struct AudioAdapter **adapter,
+    struct AudioCapture **capture);
+int32_t AudioDestroyCaptureInfoInAdapter(const char *adapterName);
+int32_t AudioAddCaptureInfoInAdapter(const char *adapterName, struct AudioCapture *capture,
+    const struct AudioAdapter *adapter, const int32_t priority, uint32_t capturePid);
+int32_t AudioAdapterListCheckAndGetCapture(struct AudioCapture **capture, struct HdfSBuf *data);
+int32_t AudioCreateCaptureCheck(const char *adapterName, const int32_t priority);
+int32_t AudioAdapterFrameGetCapture(const char *adapterName, struct AudioCapture **capture, uint32_t pid,
+    uint32_t *index);
+void AudioSetCaptureBusy(uint32_t index, bool captureStatus);
 }
 #endif
