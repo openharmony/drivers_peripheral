@@ -71,5 +71,17 @@ int32_t AudioProxyRenderTurnStandbyMode(AudioHandle render);
 int32_t AudioProxyRenderAudioDevDump(AudioHandle render, int32_t range, int32_t fd);
 int32_t AudioProxyRenderRegCallback(struct AudioRender *render, RenderCallback callback, void *cookie);
 int32_t AudioProxyRenderDrainBuffer(struct AudioRender *render, AudioDrainNotifyType *type);
+int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs, struct AudioCapture **capture);
+int32_t AudioProxyAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCapture *capture);
+int32_t AudioProxyCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
+    uint64_t requestBytes, uint64_t *replyBytes);
+int32_t AudioProxyCaptureStart(AudioHandle handle);
+int32_t AudioProxyCaptureStop(AudioHandle handle);
+int32_t AudioProxyCapturePause(AudioHandle handle);
+int32_t AudioProxyCaptureResume(AudioHandle handle);
+int32_t AudioProxyCaptureFlush(AudioHandle handle);
+int32_t AudioProxyCaptureSetMute(const AudioHandle handle, bool mute);
+int32_t AudioProxyCaptureGetMute(const AudioHandle handle, bool *mute);
 }
 #endif
