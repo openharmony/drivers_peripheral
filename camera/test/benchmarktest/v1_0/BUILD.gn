@@ -18,7 +18,6 @@ import("//build/test.gni")
 import("../../../camera.gni")
 
 # NOSORT
-import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
 module_output_path = "drivers_peripheral_camera/camera"
 
 config("hdf_camera_benchmark_test_config") {
@@ -42,19 +41,11 @@ ohos_benchmarktest("hdf_camera_benchmark_test") {
   include_dirs = [
     "./include/",
     "$camera_common_path/v1_0/include/",
-    "//third_party/googletest/googletest/include",
-    "$camera_path/../../../display/interfaces/include",
-    "$camera_path/../../../display/hdi_service/gralloc/include",
     "$camera_path/../../interfaces/include",
     "$camera_path/include",
   ]
 
-  deps = [
-    "//third_party/benchmark",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = []
 
   if (is_standard_system) {
     external_deps = [
@@ -68,8 +59,12 @@ ohos_benchmarktest("hdf_camera_benchmark_test") {
     external_deps = [ "hilog:libhilog" ]
   }
   external_deps += [
+    "benchmark:benchmark"
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
+    "googletest:gmock_main",
+    "googletest:gtest",
+    "googletest:gtest_main",
     "graphic_surface:surface",
     "samgr:samgr_proxy",
   ]
