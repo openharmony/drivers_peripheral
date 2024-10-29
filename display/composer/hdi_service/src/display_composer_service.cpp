@@ -254,6 +254,10 @@ int32_t DisplayComposerService::DisplayComposerService::CreateResponser()
     cacheMgr_ = DeviceCacheManager::GetInstance();
     CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    if (vdiAdapter_->RegDisplayVBlankIdleCallback != nullptr) {
+        DISPLAY_LOGI("%{public}s Enable Map", __func__);
+        cacheMgr_->SetNeedMap(true);
+    }
     cmdResponser_ = V1_2::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
     CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     DISPLAY_LOGI("%{public}s out", __func__);
