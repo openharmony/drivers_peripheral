@@ -255,6 +255,7 @@ struct CodecCallbackType *CodecCallbackTypeGet(struct HdfRemoteService *remote)
     }
 
     if (!HdfRemoteServiceSetInterfaceDesc(remote, "ohos.hdi.codec_service")) {
+        OsalMemFree(instance);
         CODEC_LOGE("failed to init interface desc");
         return NULL;
     }
