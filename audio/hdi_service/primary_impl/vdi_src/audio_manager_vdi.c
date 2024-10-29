@@ -474,6 +474,7 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
     }
 
     AudioManagerReleaseDescs(priv->descs, priv->descsCount);
+    AUDIO_FUNC_LOGI("audio release vendor lib success");
     OsalMemFree((void *)priv);
     return HDF_SUCCESS;
 }
