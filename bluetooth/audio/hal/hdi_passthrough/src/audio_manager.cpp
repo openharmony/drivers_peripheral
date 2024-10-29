@@ -35,6 +35,28 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
     return AUDIO_HAL_SUCCESS;
 }
 
+bool SetupBluetoothInterface(struct AudioHwAdapter *hwAdapter, const struct AudioAdapterDescriptor *desc)
+{
+#ifndef A2DP_HDI_SERVICE
+    OHOS::Bluetooth::GetProxy();
+    OHOS::Bluetooth::RegisterObserver();
+    return true;
+#else
+    bool ret = false;
+    if (strcmp(desc->adapterName, "bt_a2dp_fast") == 0) {
+        HDF_LOGI("%{public}s, fast set up", __func__);
+        ret = OHOS::Bluetooth::FastSetUp();
+    } else if (strcmp(desc->adapterName, "bt_hdap") == 0) {
+        HDF_LOGI("%{public}s, hdap set up", __func__);
+        ret = OHOS::Bluetooth::SetUpCapture();
+    } else {
+        HDF_LOGI("%{public}s, normal set up", __func__);
+        ret = OHOS::Bluetooth::SetUp();
+    }
+    return ret;
+#endif
+}
+
 int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
                                 struct AudioAdapter **adapter)
 {
@@ -55,6 +77,8 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
     hwAdapter->common.CreateRender = AudioAdapterCreateRender;
     hwAdapter->common.DestroyRender = AudioAdapterDestroyRender;
+    hwAdapter->common.CreateCapture = AudioAdapterCreateCapture;
+    hwAdapter->common.DestroyCapture = AudioAdapterDestroyCapture;
     hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
@@ -63,25 +87,11 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     *adapter = &hwAdapter->common;
     hwAdapter->adapterDescriptor = *desc;
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
-
+    hwAdapter->adapterMgrCaptureFlag = 0;
     HDF_LOGI("%s call bluetooth RegisterObserver interface", __func__);
-#ifndef A2DP_HDI_SERVICE
-    OHOS::Bluetooth::GetProxy();
-    OHOS::Bluetooth::RegisterObserver();
-#else
-    bool ret = false;
-    if (strcmp(desc->adapterName, "bt_a2dp_fast") == 0) {
-        HDF_LOGI("%{public}s, fast set up", __func__);
-        ret = OHOS::Bluetooth::FastSetUp();
-    } else {
-        HDF_LOGI("%{public}s, normal set up", __func__);
-        ret = OHOS::Bluetooth::SetUp();
-    }
-    if (!ret) {
+    if (!SetupBluetoothInterface(hwAdapter, desc)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-#endif
-    
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -93,6 +103,7 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
     }
 #ifdef A2DP_HDI_SERVICE
     bool isFastAdapter = (strcmp(hwAdapter->adapterDescriptor.adapterName, "bt_a2dp_fast") == 0);
+    bool isHdapAdapter = (strcmp(hwAdapter->adapterDescriptor.adapterName, "bt_hdap") == 0);
 #endif
     if (hwAdapter->portCapabilitys != NULL) {
         int32_t portNum = hwAdapter->adapterDescriptor.portNum;
@@ -113,6 +124,8 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
 #else
     if (isFastAdapter) {
         OHOS::Bluetooth::FastTearDown();
+    } else if (isHdapAdapter) {
+        OHOS::Bluetooth::TearDownCapture();
     } else {
         OHOS::Bluetooth::TearDown();
     }

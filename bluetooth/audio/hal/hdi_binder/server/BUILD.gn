@@ -51,6 +51,7 @@ ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
     "src/hdf_audio_server.cpp",
     "src/hdf_audio_server_common.cpp",
     "src/hdf_audio_server_render.cpp",
+    "src/hdf_audio_server_capture.cpp",
   ]
 
   deps = [ "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough:hdi_audio_bluetooth" ]

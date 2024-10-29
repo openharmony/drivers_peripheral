@@ -187,6 +187,7 @@ struct AudioHwAdapter {
     struct AudioPortAndCapability *portCapabilitys;
     struct HdfRemoteService *proxyRemoteHandle; // proxyRemoteHandle
     int32_t adapterMgrRenderFlag;
+    int32_t adapterMgrCaptureFlag;
 };
 
 struct AudioFrameRenderMode {
@@ -207,6 +208,15 @@ struct AudioFrameRenderMode {
     RenderCallback callback;
     void* cookie;
     struct AudioMmapBufferDescriptor mmapBufDesc;
+};
+
+struct AudioFrameCaptureMode {
+    uint64_t frames;
+    struct AudioTimeStamp time;
+    struct AudioSampleAttributes attrs;
+    uint32_t byteRate;
+    uint32_t periodSize;
+    uint32_t periodCount;
 };
 
 struct AudioGain {
@@ -284,6 +294,16 @@ struct AudioHwRenderParam {
     struct AudioFrameRenderMode frameRenderMode;
 };
 
+struct AudioHwCaptureMode {
+    struct AudioCtlParam ctlParam;
+    struct HwInfo hwInfo;
+};
+
+struct AudioHwCaptureParam {
+    struct AudioHwCaptureMode captureMode;
+    struct AudioFrameCaptureMode frameCaptureMode;
+};
+
 struct ErrorDump {
     int32_t errorCode;
     int32_t count;
@@ -301,6 +321,13 @@ struct ErrorLog {
 struct AudioHwRender {
     struct AudioRender common;
     struct AudioHwRenderParam renderParam;
+    struct HdfRemoteService *proxyRemoteHandle; // proxyRemoteHandle
+    struct ErrorLog errorLog;
+};
+
+struct AudioHwCapture {
+    struct AudioCapture common;
+    struct AudioHwCaptureParam captureParam;
     struct HdfRemoteService *proxyRemoteHandle; // proxyRemoteHandle
     struct ErrorLog errorLog;
 };
@@ -395,6 +422,22 @@ int32_t AudioRenderTurnStandbyMode(AudioHandle handle);
 int32_t AudioRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);
 int32_t AudioRenderRegCallback(struct AudioRender *render, RenderCallback callback, void* cookie);
 int32_t AudioRenderDrainBuffer(struct AudioRender *render, AudioDrainNotifyType *type);
+int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs);
+int32_t GetAudioCaptureFunc(struct AudioHwCapture *hwCapture, const char *adapterName);
+int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs, struct AudioCapture **capture);
+int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCapture *capture);
+int32_t AudioCaptureStart(AudioHandle handle);
+int32_t AudioCaptureStop(AudioHandle handle);
+int32_t AudioCapturePause(AudioHandle handle);
+int32_t AudioCaptureResume(AudioHandle handle);
+int32_t AudioCaptureFlush(AudioHandle handle);
+int32_t AudioCaptureSetMute(AudioHandle handle, bool mute);
+int32_t AudioCaptureGetMute(AudioHandle handle, bool *mute);
+int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, void *frame, uint64_t requestBytes,
+    uint64_t *replyBytes);
+void AudioReleaseCaptureHandle(struct AudioHwCapture *hwCapture);
 
 #ifdef __cplusplus
 }

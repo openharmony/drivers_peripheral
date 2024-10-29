@@ -69,7 +69,8 @@ bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
         auto h4 = std::make_shared<Hci::H4Protocol>(channel[0],
             receiveCallback.onAclReceive,
             receiveCallback.onScoReceive,
-            std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1));
+            std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1),
+            receiveCallback.onIsoReceive);
         watcher_.AddFdToWatcher(channel[0], std::bind(&Hci::H4Protocol::ReadData, h4, std::placeholders::_1));
         hci_ = h4;
     } else {

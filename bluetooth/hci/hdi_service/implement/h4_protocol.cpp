@@ -30,8 +30,9 @@ namespace HDI {
 namespace Bluetooth {
 namespace Hci {
 H4Protocol::H4Protocol(
-    int fd, HciDataCallback onAclReceive, HciDataCallback onScoReceive, HciDataCallback onEventReceive)
-    : hciFd_(fd), onAclReceive_(onAclReceive), onScoReceive_(onScoReceive), onEventReceive_(onEventReceive)
+    int fd, HciDataCallback onAclReceive, HciDataCallback onScoReceive, HciDataCallback onEventReceive,
+    HciDataCallback onIsoReceive) : hciFd_(fd), onAclReceive_(onAclReceive), onScoReceive_(onScoReceive),
+    onEventReceive_(onEventReceive), onIsoReceive_(onIsoReceive)
 {}
 
 ssize_t H4Protocol::SendPacket(HciPacketType packetType, const std::vector<uint8_t> &packetData)
@@ -133,8 +134,13 @@ void H4Protocol::PacketCallback()
                 onEventReceive_(hciPacket_);
             }
             break;
+        case HCI_PACKET_TYPE_ISO_DATA:
+            if (onIsoReceive_) {
+                onIsoReceive_(hciPacket_);
+            }
+            break;
         default:
-            HDF_LOGE("PacketCallback type[%d] error.", packetType_);
+            HDF_LOGE("PacketCallback type[%{public}d] error.", packetType_);
             break;
     }
 }

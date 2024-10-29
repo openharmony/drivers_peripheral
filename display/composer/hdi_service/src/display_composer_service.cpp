@@ -253,9 +253,46 @@ int32_t DisplayComposerService::DisplayComposerService::CreateResponser()
 {
     cacheMgr_ = DeviceCacheManager::GetInstance();
     CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     cmdResponser_ = V1_2::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
     CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     DISPLAY_LOGI("%{public}s out", __func__);
+    return HDF_SUCCESS;
+}
+
+int32_t DisplayComposerService::LoadVdiV1_1()
+{
+    CreateComposerVdiFuncV1_1 createVdiFunc = nullptr;
+    const char* errStr = nullptr;
+
+    createVdiFunc = reinterpret_cast<CreateComposerVdiFuncV1_1>(dlsym(libHandle_, "CreateComposerVdiV1_1"));
+    if (createVdiFunc == nullptr) {
+        errStr = dlerror();
+        if (errStr != nullptr) {
+            DISPLAY_LOGE("CreateVdiFuncV1_1 dlsym error: %{public}s", errStr);
+        }
+        return HDF_FAILURE;
+    }
+
+    destroyVdiFuncV1_1_ = reinterpret_cast<DestroyComposerVdiFuncV1_1>(dlsym(libHandle_, "DestroyComposerVdiV1_1"));
+    if (destroyVdiFuncV1_1_ == nullptr) {
+        errStr = dlerror();
+        if (errStr != nullptr) {
+            DISPLAY_LOGE("DestroyVdiFuncV1_1 dlsym error: %{public}s", errStr);
+        }
+        return HDF_FAILURE;
+    }
+
+    vdiImplV1_1_ = createVdiFunc();
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_FAILURE);
+    vdiImpl_ = dynamic_cast<IDisplayComposerVdi*>(vdiImplV1_1_);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    cacheMgr_ = DeviceCacheManager::GetInstance();
+    CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
+    cacheMgr_->SetNeedMap(true);
+    cmdResponserV1_1_ = V1_2::HdiDisplayCmdResponser_1_1::CreateV1_1(vdiImplV1_1_, cacheMgr_);
+    CHECK_NULLPOINTER_RETURN_VALUE(cmdResponserV1_1_, HDF_FAILURE);
+>>>>>>> master
     return HDF_SUCCESS;
 }
 
