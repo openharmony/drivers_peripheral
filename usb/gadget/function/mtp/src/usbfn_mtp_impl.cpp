@@ -910,6 +910,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceFree()
 int32_t UsbfnMtpImpl::Init()
 {
     HDF_LOGI("%{public}s: Init", __func__);
+    std::lock_guard<std::mutex> guard(mtpRunning_);
     mtpDev_ = static_cast<struct UsbMtpDevice *>(OsalMemCalloc(sizeof(struct UsbMtpDevice)));
     if (mtpDev_ == nullptr) {
         HDF_LOGE("%{public}s: Alloc usb mtpDev device failed", __func__);
@@ -961,6 +962,7 @@ ERR:
 int32_t UsbfnMtpImpl::Release()
 {
     HDF_LOGI("%{public}s: Release", __func__);
+    std::lock_guard<std::mutex> guard(mtpRunning_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
@@ -1034,7 +1036,7 @@ int32_t UsbfnMtpImpl::Read(std::vector<uint8_t> &data)
     }
     std::lock_guard<std::mutex> guard(mtpRunning_);
 
-    if (mtpDev_->mtpState == MTP_STATE_OFFLINE) {
+    if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         HDF_LOGE("%{public}s: device disconnect, no-operation", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
@@ -1123,7 +1125,7 @@ int32_t UsbfnMtpImpl::Write(const std::vector<uint8_t> &data)
     }
     std::lock_guard<std::mutex> guard(mtpRunning_);
 
-    if (mtpDev_->mtpState == MTP_STATE_OFFLINE) {
+    if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         HDF_LOGE("%{public}s: device disconnect", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
@@ -1363,7 +1365,7 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
     HDF_LOGV("%{public}s: info: cmd=%{public}d, transid=%{public}d, len=%{public}" PRId64 " offset=%{public}" PRId64
         ", state=%{public}hhu", __func__, mfs.command, mfs.transactionId, mfs.length, mfs.offset, mtpDev_->mtpState);
 
-    if (mtpDev_->mtpState == MTP_STATE_OFFLINE) {
+    if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         HDF_LOGE("%{public}s: device disconnect", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
@@ -1496,7 +1498,7 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
         HDF_LOGW("%{public}s: no data need to send", __func__);
         return HDF_SUCCESS;
     }
-    if (mtpDev_->mtpState == MTP_STATE_OFFLINE) {
+    if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         HDF_LOGE("%{public}s: device disconnect", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
@@ -1523,7 +1525,7 @@ int32_t UsbfnMtpImpl::SendEvent(const std::vector<uint8_t> &eventData)
         HDF_LOGE("%{public}s: length is invald: %{public}zu", __func__, eventData.size());
         return HDF_FAILURE;
     }
-    if (mtpDev_->mtpState == MTP_STATE_OFFLINE) {
+    if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         HDF_LOGE("%{public}s: device disconnect", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
