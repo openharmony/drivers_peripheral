@@ -40,6 +40,13 @@ namespace OHOS {
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    if (data == nullptr) {
+        return 0;
+    }
+
+    if (size < sizeof(int32_t)) {
+        return 0;
+    }
     OHOS::VibratorStartByIntensityFuzzTest(data, size);
     return 0;
 }
