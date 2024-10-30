@@ -103,7 +103,6 @@ ohos_shared_library("libusb_pnp_manager") {
   sources = [
     "//drivers/hdf_core/framework/model/usb/src/usb_ddk_pnp_loader.c",
     "//drivers/hdf_core/framework/model/usb/src/usb_wrapper.cpp",
-    "device/src/usbfn_uevent_handle.c",
     "host/src/ddk_device_manager.c",
     "host/src/ddk_pnp_listener_mgr.c",
     "host/src/ddk_sysfs_device.c",
