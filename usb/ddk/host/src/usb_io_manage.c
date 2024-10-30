@@ -142,6 +142,9 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
         }
 
         ret = RawHandleRequest(interfacePool->device->devHandle);
+        if (ret == HDF_DEV_ERR_NO_DEVICE) {
+            HDF_LOGE("%{public}s dev is not found ret: %{public}d", __func__, ret);
+        }
         if (ret < 0) {
             HDF_LOGE("%{public}s RawHandleRequest failed ret: %{public}d", __func__, ret);
             OsalMSleep(USB_IO_SLEEP_MS_TIME);
