@@ -77,6 +77,7 @@ DisplayComposerService::DisplayComposerService()
 
 DisplayComposerService::~DisplayComposerService()
 {
+    std::lock_guard<std::mutex> lck(mutex_);
     ExitService();
 }
 
