@@ -67,6 +67,7 @@ enum AudioCategoryVdi {
     AUDIO_VDI_MMAP_VOIP = 8,
     AUDIO_VDI_IN_NAVIGATION = 9,
     AUDIO_VDI_DIRECT = 10,
+    AUDIO_VDI_RAW = 11,
     AUDIO_VDI_CATEGORY_BUTT,
 };
 
