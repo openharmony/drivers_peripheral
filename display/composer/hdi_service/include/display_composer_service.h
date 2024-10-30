@@ -89,8 +89,6 @@ private:
     void LoadVdiFuncV1_1();
     void ExitService();
     int32_t CreateResponser();
-    int32_t LoadCreateAndDestroyFuncVdi1_0();
-    int32_t LoadCreateAndDestroyFuncVdi1_1();
     static void OnHotPlug(uint32_t outputId, bool connected, void* data);
     static void OnVBlank(unsigned int sequence, uint64_t ns, void* data);
     static void OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data);
