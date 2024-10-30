@@ -46,6 +46,9 @@ enum UsbdDeviceAction {
     ACT_DEVDOWN,
     ACT_UPDEVICE,
     ACT_DOWNDEVICE,
+    ACT_ACCESSORYUP,
+    ACT_ACCESSORYDOWN,
+    ACT_ACCESSORYSEND
 };
 
 enum UsbdCmd {
