@@ -42,7 +42,7 @@ enum CodecAVCProfileExt {
 enum CodecVideoExType {
     CODEC_OMX_VIDEO_CodingVP9  = 10, /** VP9 Index in Codec HDI */
     CODEC_OMX_VIDEO_CodingHEVC = 11, /** HEVC Index in Codec HDI */
-    CODEC_OMX_VIDEO_CodingVVC = 12, /** VVC Index in Codec HDI */
+    CODEC_OMX_VIDEO_CodingVVC = 0x7F000007, /** VVC Index in Codec HDI */
 };
 
 /**
