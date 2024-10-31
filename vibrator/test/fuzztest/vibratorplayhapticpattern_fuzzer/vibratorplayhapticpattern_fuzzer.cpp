@@ -47,7 +47,7 @@ namespace OHOS {
         }
         OHOS::HDI::Vibrator::V1_2::HapticPaket pkg;
 
-        if (size < sizeof(pkg)) {
+        if (size < sizeof(params)) {
             return false;
         }
 
