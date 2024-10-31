@@ -1514,7 +1514,7 @@ FAIL:
 
 static void DestroyExecutorInfo(void *data)
 {
-    if (data == NULL) {
+    if (data == nullptr) {
         IAM_LOGE("data is null");
         return;
     }
