@@ -97,7 +97,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             continue;
         }
     }
-    HDF_LOGE("%{public}s, stop. errorTimes=%{public}d", __func__, errorTimes);
+    HDF_LOGD("%{public}s, stop. errorTimes=%{public}d", __func__, errorTimes);
     return 0;
 }
 
@@ -148,7 +148,7 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
             continue;
         }
     }
-    HDF_LOGE("%{public}s, recv thread end. ", __func__);
+    HDF_LOGD("%{public}s, recv thread end. ", __func__);
     OsalMutexLock(&interfacePool->ioStopLock);
     interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_STOPED;
     interfacePool->ioRecvProcessStopStatus = USB_POOL_PROCESS_STOPED;
@@ -228,7 +228,8 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
     }
 
     OsalMutexLock((struct OsalMutex *)&msgQueue->mutex);
-    if (msgQueue->entry.next == NULL || msgQueue->entry.next->prev == NULL || msgQueue->entry.prev == NULL || msgQueue->entry.prev->next == NULL) {
+    if (msgQueue->entry.next == NULL || msgQueue->entry.next->prev == NULL ||
+        msgQueue->entry.prev == NULL || msgQueue->entry.prev->next == NULL) {
         ret = HDF_ERR_INVALID_OBJECT;
         OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
         goto ERROR;

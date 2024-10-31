@@ -1,31 +1,16 @@
 /*
- * Copyright (c) 2024 Archermind Technology (Nanjing) Co. Ltd. All rights reserved.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice, this list of
- *    conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice, this list
- *    of conditions and the following disclaimer in the documentation and/or other materials
- *    provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors may be used
- *    to endorse or promote products derived from this software without specific prior written
- *    permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include <stdio.h>
@@ -35,9 +20,9 @@
 
 #include <fcntl.h>
 
-#include "usb_net_host.h"
 #include "hdf_usb_pnp_manage.h"
 #include "cdc_ether.h"
+#include "usb_net_host.h"
 
 #define HDF_LOG_TAG             usb_net_host
 #define USB_NET_SERVICE_NAME    "hdf_usb_net_service"
@@ -524,7 +509,7 @@ static void UsbnetHostReadBulkCallback(const void *requestArg)
     printf_char_buffer((char *)req->buffer, CPU_TO_LE32(size), true);
     HARCH_INFO_PRINT("Bulk status: %{public}d+size:%{public}zu", req->status, size);
 
-    //send readBuf to net begin
+    // send readBuf to net begin
     int32_t reply = 0;
     OsalMutexLock(&usbNet->sendNetLock);
     int32_t ret = UsbnetHostSendBufToNet(usbNet->hdfNetIoServ, USB_NET_RECIVE_DATA_FROM_USB,
@@ -535,7 +520,7 @@ static void UsbnetHostReadBulkCallback(const void *requestArg)
     }
     OsalMutexUnlock(&usbNet->sendNetLock);
 
-    //send readBuf to net end
+    // send readBuf to net end
     if (size == 0) {
         HARCH_INFO_PRINT("DataFifoWrite");
         uint8_t *data = req->buffer;
@@ -729,7 +714,7 @@ static void UsbStopIo(struct UsbnetHost *usbNet)
 
 static int32_t UsbnetHostAlloc(struct UsbnetHost *usbNet)
 {
-    //1.write request
+    // 1.write request
     int ret = UsbnetHostWriteBufAlloc(usbNet);
     if (ret < 0) {
         HDF_LOGE("%{public}s:%{public}d usbNetWriteBufAlloc failed", __func__, __LINE__);
@@ -743,7 +728,7 @@ static int32_t UsbnetHostAlloc(struct UsbnetHost *usbNet)
         return ret;
     }
 
-    //2.status request
+    // 2.status request
     ret = UsbnetHostAllocStatusRequests(usbNet);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbRawAllocRequest failed", __func__);
@@ -763,6 +748,11 @@ static int32_t UsbnetHostAlloc(struct UsbnetHost *usbNet)
 
 static int32_t UsbnetHostAllocRequests(struct UsbnetHost *usbNet)
 {
+    if (usbNet == NULL) {
+        HDF_LOGI("UsbnetHostAllocRequests usbNet is NULL");
+        return HDF_FAILURE;
+    }
+
     if (usbNet->allocFlag == true) {
         HDF_LOGI("UsbnetHostAllocRequests has been alloced");
         return HDF_SUCCESS;
@@ -780,14 +770,14 @@ static int32_t UsbnetHostAllocRequests(struct UsbnetHost *usbNet)
         goto ERR_ALLOC_READ_REQS;
     }
 
-    //status begin
+    // status begin
     ret = UsbRawSubmitRequest(usbNet->statusReq);
     if (ret) {
         HDF_LOGE("%{public}s:%{public}d UsbRawSubmitRequest failed", __func__, __LINE__);
         goto ERR_SUBMIT_REQ;
     }
 
-    //read begin
+    // read begin
     ret = UsbnetHostAllocFifo(&usbNet->readFifo, READ_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbnetHostAllocFifo failed", __func__);
@@ -824,22 +814,22 @@ static void UsbnetHostFreeRequests(struct UsbnetHost *usbNet)
         HDF_LOGI("UsbnetHostFreeRequests usbNet is null");
         return;
     }
-    //FIFO
+    // FIFO
     OsalMutexLock(&usbNet->readLock);
     UsbnetHostFreeFifo(&usbNet->readFifo);
     OsalMutexUnlock(&usbNet->readLock);
-    //read
+    // read
     UsbnetHostFreeReadRequests(usbNet);
-    //status
+    // status
     UsbnetHostFreesSatusReqeust(usbNet);
-    //write
+    // write
     UsbnetHostFreeWriteRequests(usbNet);
     UsbnetHostWriteBufFree(usbNet);
 
     return ;
 }
 
-//--------------------------usb get config--------------
+// --------------------------usb get config--------------
 static void UsbnetHostPrintConfigDescriptor(struct UsbRawConfigDescriptor *tmpConfig)
 {
     HARCH_INFO_PRINT("bLength = %{public}d", tmpConfig->configDescriptor.bLength);
@@ -946,11 +936,11 @@ static void UsbnetHostUpdateMaxQlen(struct UsbnetHost *usbNet)
 static int32_t UsbnetHostInitObject(struct UsbnetHost *usbNet)
 {
     int ret = HDF_SUCCESS;
-     //net init
+     // net init
     usbNet->net.mtu = DEFAULT_MTU;
     usbNet->net.hardHeaderLen = DEFAULT_NET_HEAD_LEN;
     usbNet->net.hardMtu = usbNet->net.mtu + usbNet->net.hardHeaderLen;
-    //falgs of usb device
+    // falgs of usb device
     if (usbNet->driverInfo->flags) {
         usbNet->net.usbFlags = usbNet->driverInfo->flags;
     }
@@ -1008,14 +998,14 @@ static int32_t UsbnetHostUsbRawInit(struct UsbnetHost *usbNet)
     }
 
     HARCH_INFO_PRINT("busNum:%{public}d, devAddr:%{public}#x", usbNet->busNum, usbNet->devAddr);
-    //1.session
+    // 1.session
     ret = UsbRawInit(&session);
     if (ret) {
         HDF_LOGE("%{public}s:%{public}d UsbRawInit failed", __func__, __LINE__);
         return HDF_ERR_IO;
     }
     usbNet->session = session;
-    //2.handle
+    // 2.handle
     UsbRawHandle *devHandle = UsbRawOpenDevice(session, usbNet->busNum, usbNet->devAddr);
     if (devHandle == NULL) {
         HDF_LOGE("%{public}s:%{public}d UsbRawOpenDevice failed", __func__, __LINE__);
@@ -1023,7 +1013,7 @@ static int32_t UsbnetHostUsbRawInit(struct UsbnetHost *usbNet)
         goto ERR_OPEN_DEVICE;
     }
     usbNet->devHandle = devHandle;
-    //3.get para
+    // 3.get para
     HARCH_INFO_PRINT();
     ret = UsbnetHostGetConfigDescriptor(devHandle, &usbNet->config);
     if (ret) {
@@ -1198,7 +1188,7 @@ static int32_t UsbnetHostRegisterNet(struct UsbnetHost *usbNet)
         return HDF_FAILURE;
     }
 
-    //send msg to net register net
+    // send msg to net register net
     int32_t reply = 0;
     int32_t ret = UsbnetHostSendBufToNet(serv, USB_NET_REGISTER_NET,
         (unsigned char *)&(usbNet->net), sizeof(struct UsbnetTransInfo), &reply);
@@ -1221,14 +1211,14 @@ int32_t UsbnetHostProbe(struct UsbnetHost *usbNet)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    //usb init
+    // usb init
     status = UsbnetHostUsbRawInit(usbNet);
     if (status != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbnetHostUsbRawInit failed", __func__);
         return HDF_FAILURE;
     }
 
-    //register net
+    // register net
     status = UsbnetHostRegisterNet(usbNet);
     if (status != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbnetHostRegisterNet failed", __func__);
@@ -1280,7 +1270,7 @@ static void UsbReleaseInterfaces(struct UsbnetHost *usbNet)
 static void UsbnetHostUnRegisterNet(struct UsbnetHost *usbNet)
 {
     HARCH_INFO_PRINT("begin");
-    //send msg to net unregister net
+    // send msg to net unregister net
     int32_t reply = 0;
     int32_t ret = UsbnetHostSendBufToNet(usbNet->hdfNetIoServ, USB_NET_CLOSE_NET,
         (unsigned char *)&(usbNet->net), sizeof(struct UsbnetTransInfo), &reply);
@@ -1300,7 +1290,7 @@ static void UsbnetHostUnRegisterNet(struct UsbnetHost *usbNet)
     return;
 }
 
-//Sync write cmd
+// Sync write cmd
 int32_t UsbnetHostWriteCmdSync(struct UsbnetHost *usbNet, struct UsbnetHostCmdParam cmdParam)
 {
     uint8_t cmd = cmdParam.cmd;
@@ -1360,14 +1350,14 @@ void UsbnetHostRelease(struct UsbnetHost *usbNet)
         return;
     }
     HARCH_INFO_PRINT("bus:%{public}d+dev:%{public}d", usbNet->busNum, usbNet->devAddr);
-    //net release
+    // net release
     UsbnetHostUnRegisterNet(usbNet);
 
-    //usb io stop
+    // usb io stop
     UsbStopIo(usbNet);
-    //usb release
+    // usb release
     UsbnetHostFreeRequests(usbNet);
-    //cmd release
+    // cmd release
     UsbnetHostReadCmdSyncFree(usbNet);
     UsbnetHostWriteCmdAsyncFree(usbNet);
     UsbReleaseInterfaces(usbNet);
