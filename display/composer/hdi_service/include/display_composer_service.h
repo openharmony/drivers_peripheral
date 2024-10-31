@@ -16,13 +16,13 @@
 #ifndef OHOS_HDI_DISPLAY_COMPOSER_SERVICE_H
 #define OHOS_HDI_DISPLAY_COMPOSER_SERVICE_H
 
-#include "idisplay_composer_vdi_v1_1.h"
 #include "cache_manager/device_cache_manager.h"
 #include "v1_1/display_command/display_cmd_responser.h"
 #include "v1_1/idisplay_composer.h"
 #include "v1_2/display_command/display_cmd_responser.h"
 #include "v1_2/idisplay_composer.h"
 #include "v1_2/display_composer_type.h"
+#include "common/include/display_vdi_adapter_interface.h"
 #include <mutex>
 
 namespace OHOS {
@@ -84,8 +84,11 @@ public:
 private:
     void HidumperInit();
     int32_t LoadVdiSo();
-    int32_t LoadVdiV1_0();
-    int32_t LoadVdiV1_1();
+    int32_t LoadVdiAdapter();
+    void LoadVdiFuncV1_0();
+    void LoadVdiFuncV1_1();
+    void ExitService();
+    int32_t CreateResponser();
     static void OnHotPlug(uint32_t outputId, bool connected, void* data);
     static void OnVBlank(unsigned int sequence, uint64_t ns, void* data);
     static void OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data);
@@ -95,6 +98,7 @@ private:
 private:
     /* Common */
     void* libHandle_;
+    DisplayComposerVdiAdapter* vdiAdapter_;
     std::mutex mutex_;
     std::shared_ptr<DeviceCacheManager> cacheMgr_;
     uint32_t currentBacklightLevel_;
@@ -102,16 +106,7 @@ private:
     sptr<IVBlankCallback> vBlankCb_;
     sptr<IModeCallback> modeCb_;
     sptr<ISeamlessChangeCallback> seamlessChangeCb_;
-
-    /* V1_0, which is the version of vdi */
-    IDisplayComposerVdi* vdiImpl_;
-    DestroyComposerVdiFunc destroyVdiFunc_;
     std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponser_;
-
-    /* V1_1, which is the version of vdi */
-    IDisplayComposerVdiV1_1* vdiImplV1_1_;
-    DestroyComposerVdiFuncV1_1 destroyVdiFuncV1_1_;
-    std::unique_ptr<V1_2::HdiDisplayCmdResponser_1_1> cmdResponserV1_1_;
     sptr<IRefreshCallback> refreshCb_;
     sptr<IVBlankIdleCallback> VBlankIdleCb_;
 };
