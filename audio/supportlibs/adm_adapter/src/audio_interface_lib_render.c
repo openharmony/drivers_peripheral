@@ -26,6 +26,7 @@
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 #define AUDIO_SBUF_EXTEND 64
 #define TIME_COUNT_MS_TO_US 1000
+#define NUMBER_BASE 10
 
 /* Out Put Render */
 static struct AudioPcmHwParams g_hwParams;
@@ -437,8 +438,13 @@ int32_t AudioCtlRenderSceneSelectSBuf(struct HdfSBuf *sBuf, const struct AudioHw
     elemValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER;
     elemValue.id.itemName =
         handleData->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].deviceSwitch;
-    elemValue.value[0] =
-        handleData->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value;
+    if (handleData->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value != NULL) {
+        char *endPtr = NULL;
+        long result = 0;
+        result = strtol(handleData->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value,
+            &endPtr, NUMBER_BASE);
+        elemValue.value[0] = (int32_t)result;
+    }
 
     return AudioSetElemValue(sBuf, &elemValue, true);
 }

@@ -42,7 +42,7 @@ extern "C" {
 #define PERIOD_COUNT          2
 #define FRAME_DATA            (8192 * 2)
 #define PATHPLAN_LEN          64
-#define PATHPLAN_COUNT        32
+#define PATHPLAN_COUNT        (32 * 4)
 #define PATH_NAME_LEN         128
 #define VOLUME_CHANGE         100
 #define SEC_TO_NSEC           1000000000
@@ -50,6 +50,7 @@ extern "C" {
 #define FORMAT_ONE            "%-5d  %-10d  %-20" PRIu64 " %-15s  %s\n"
 #define FORMAT_TWO            "%-5d  %-10d  %s\n"
 #define ERROR_LOG_MAX_NUM     8
+#define HDF_PATH_NUM_MAX      (32 * 4)
 #define ERROR_REASON_DESC_LEN 64
 #define RANGE_MAX             5
 #define RANGE_MIN             4
@@ -202,7 +203,7 @@ struct PathPlan {
 
 struct PathDeviceSwitch {
     char deviceSwitch[PATHPLAN_LEN];
-    int32_t value;
+    char *value;
 };
 
 struct PathDeviceInfo {
