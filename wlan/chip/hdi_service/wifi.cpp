@@ -65,7 +65,6 @@ Wifi::~Wifi()
 int32_t Wifi::RegisterWifiEventCallback(const sptr<IChipControllerCallback>& eventCallback)
 {
     if (cbHandler_.GetCallbacks().empty()) {
-        HDF_LOGI("Wifi HAL start enter");
         AddWifiDeathRecipient(eventCallback);
     }
 
