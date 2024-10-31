@@ -25,7 +25,6 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
-    
 #ifdef FEATURE_ANCO_WIFI
 const int CHIP_ID_STA = 1;
 const int CHIP_ID_P2P = 2;
@@ -65,8 +64,9 @@ Wifi::~Wifi()
 
 int32_t Wifi::RegisterWifiEventCallback(const sptr<IChipControllerCallback>& eventCallback)
 {
-    if (AddWifiDeathRecipient(eventCallback) != HDF_SUCCESS) {
-        return HDF_FAILURE;
+    if (cbHandler_.GetCallbacks().empty()) {
+        HDF_LOGI("Wifi HAL start enter");
+        AddWifiDeathRecipient(eventCallback);
     }
 
     if (!cbHandler_.AddCallback(eventCallback)) {
@@ -242,6 +242,7 @@ void Wifi::OnRemoteDied(const wptr<IRemoteObject> &object)
     chips_.clear();
     auto lock = AcquireGlobalLock();
     StopVendorHal(&lock);
+    cbHandler_.Invalidate();
     runState_ = RunState::STOPPED;
 }
 
