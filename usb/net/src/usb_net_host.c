@@ -752,6 +752,7 @@ static int32_t UsbnetHostAllocRequests(struct UsbnetHost *usbNet)
         HDF_LOGI("UsbnetHostAllocRequests usbNet is NULL");
         return HDF_FAILURE;
     }
+
     if (usbNet->allocFlag == true) {
         HDF_LOGI("UsbnetHostAllocRequests has been alloced");
         return HDF_SUCCESS;
