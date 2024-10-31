@@ -42,7 +42,7 @@ extern "C" {
 #define PERIOD_COUNT 2
 #define FRAME_DATA (8192 * 2)
 #define PATHPLAN_LEN 64
-#define PATHPLAN_COUNT 32
+#define PATHPLAN_COUNT (32 * 4)
 #define PATH_NAME_LEN 128
 #define VOLUME_CHANGE 100
 #define SEC_TO_NSEC 1000000000
@@ -208,7 +208,7 @@ struct PathPlan {
 
 struct PathDeviceSwitch {
     char deviceSwitch[PATHPLAN_LEN];
-    int32_t value;
+    char *value;
 };
 
 struct PathDeviceInfo {
