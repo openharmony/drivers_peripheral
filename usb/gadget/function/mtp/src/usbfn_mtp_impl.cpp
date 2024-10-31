@@ -26,6 +26,8 @@
 
 #define HDF_LOG_TAG usbfn_mtp_impl
 #define UDC_NAME "invalid_udc_name"
+#undef  LOG_DOMAIN
+#define LOG_DOMAIN 0xD002518
 
 /* Compatible: Microsoft MTP OS String */
 static uint8_t g_mtpOsString[] = {18, /* sizeof(mtp_os_string) */
@@ -909,8 +911,8 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceFree()
 
 int32_t UsbfnMtpImpl::Init()
 {
-    HDF_LOGI("%{public}s: Init", __func__);
     std::lock_guard<std::mutex> guard(mtpRunning_);
+    HDF_LOGI("%{public}s: Init", __func__);
     mtpDev_ = static_cast<struct UsbMtpDevice *>(OsalMemCalloc(sizeof(struct UsbMtpDevice)));
     if (mtpDev_ == nullptr) {
         HDF_LOGE("%{public}s: Alloc usb mtpDev device failed", __func__);
@@ -961,8 +963,8 @@ ERR:
 
 int32_t UsbfnMtpImpl::Release()
 {
-    HDF_LOGI("%{public}s: Release", __func__);
     std::lock_guard<std::mutex> guard(mtpRunning_);
+    HDF_LOGI("%{public}s: Release", __func__);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
@@ -985,11 +987,11 @@ int32_t UsbfnMtpImpl::Release()
 
 int32_t UsbfnMtpImpl::Start()
 {
+    std::lock_guard<std::mutex> guard(mtpRunning_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || mtpDev_->initFlag == false) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    std::lock_guard<std::mutex> guard(mtpRunning_);
 
     mtpDev_->mtpState = MTP_STATE_READY;
     mtpPort_->startDelayed = true;
@@ -998,11 +1000,11 @@ int32_t UsbfnMtpImpl::Start()
 
 int32_t UsbfnMtpImpl::Stop()
 {
+    std::lock_guard<std::mutex> guard(mtpRunning_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || mtpDev_->initFlag == false) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    std::lock_guard<std::mutex> guard(mtpRunning_);
 
     (void)UsbMtpPortReleaseIo();
     mtpPort_->startDelayed = false;
@@ -1030,11 +1032,11 @@ uint32_t UsbfnMtpImpl::BufCopyFromVector(
 
 int32_t UsbfnMtpImpl::Read(std::vector<uint8_t> &data)
 {
+    std::lock_guard<std::mutex> guard(mtpRunning_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || mtpDev_->initFlag == false) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    std::lock_guard<std::mutex> guard(mtpRunning_);
 
     if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         HDF_LOGE("%{public}s: device disconnect, no-operation", __func__);
@@ -1119,11 +1121,11 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
 
 int32_t UsbfnMtpImpl::Write(const std::vector<uint8_t> &data)
 {
+    std::lock_guard<std::mutex> guard(mtpRunning_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || mtpDev_->initFlag == false) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    std::lock_guard<std::mutex> guard(mtpRunning_);
 
     if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         HDF_LOGE("%{public}s: device disconnect", __func__);
@@ -1357,11 +1359,11 @@ int32_t UsbfnMtpImpl::ReceiveFileEx()
 
 int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
 {
+    std::lock_guard<std::mutex> guard(mtpRunning_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || mtpDev_->initFlag == false) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    std::lock_guard<std::mutex> guard(mtpRunning_);
     HDF_LOGV("%{public}s: info: cmd=%{public}d, transid=%{public}d, len=%{public}" PRId64 " offset=%{public}" PRId64
         ", state=%{public}hhu", __func__, mfs.command, mfs.transactionId, mfs.length, mfs.offset, mtpDev_->mtpState);
 
@@ -1475,11 +1477,11 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileLeftAsync(uint64_t oneReqLeft)
 
 int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
 {
+    std::lock_guard<std::mutex> guard(mtpRunning_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || mtpDev_->initFlag == false) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    std::lock_guard<std::mutex> guard(mtpRunning_);
 
     mtpDev_->xferFd = mfs.fd;
     mtpDev_->xferFileOffset = static_cast<uint64_t>(mfs.offset);
@@ -1515,11 +1517,11 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
 
 int32_t UsbfnMtpImpl::SendEvent(const std::vector<uint8_t> &eventData)
 {
+    std::lock_guard<std::mutex> guard(mtpRunning_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || mtpDev_->initFlag == false) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    std::lock_guard<std::mutex> guard(mtpRunning_);
 
     if (eventData.size() > MTP_EVENT_PACKET_MAX_BYTES || eventData.size() == 0) {
         HDF_LOGE("%{public}s: length is invald: %{public}zu", __func__, eventData.size());
