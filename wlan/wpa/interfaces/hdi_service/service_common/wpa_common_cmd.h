@@ -23,6 +23,7 @@
 #include "wpa_client.h"
 #include "wpa_common_cmd_ext.h"
 
+
 #define WIFI_SSID_LENGTH 132
 #define WIFI_BSSID_LENGTH 18
 #define KEY_MGMT_LENG 20
