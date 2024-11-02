@@ -37,7 +37,6 @@
 #include <string.h>
 #include "hdi_wpa_common.h"
 
-
 #define BUF_SIZE 512
 
 const int QUOTATION_MARKS_FLAG_YES = 0;
@@ -1947,4 +1946,20 @@ int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, 
     pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: success", __func__);
     return HDF_SUCCESS;
+}
+
+void ClearHdfWpaRemoteObj(void)
+{
+    struct HdfWpaRemoteNode *pos = NULL;
+    struct HdfWpaRemoteNode *tmp = NULL;
+    struct DListHead *head = &HdfWpaStubDriver()->remoteListHead;
+ 
+    (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
+    DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, head, struct HdfWpaRemoteNode, node) {
+        DListRemove(&(pos->node));
+        IWpaCallbackRelease(pos->callbackObj);
+        OsalMemFree(pos);
+        pos = NULL;
+    }
+    (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
 }
