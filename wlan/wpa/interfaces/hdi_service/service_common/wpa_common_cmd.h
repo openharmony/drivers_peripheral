@@ -23,7 +23,6 @@
 #include "wpa_client.h"
 #include "wpa_common_cmd_ext.h"
 
-
 #define WIFI_SSID_LENGTH 132
 #define WIFI_BSSID_LENGTH 18
 #define KEY_MGMT_LENG 20
@@ -107,6 +106,7 @@ int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName);
 int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd);
 
 void HdfWpaDelRemoteObj(struct IWpaCallback *self);
+void ClearHdfWpaRemoteObj(void);
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);
 pthread_mutex_t *GetInterfaceLock();
 
