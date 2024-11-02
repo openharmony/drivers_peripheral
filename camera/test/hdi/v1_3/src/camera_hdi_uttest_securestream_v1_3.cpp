@@ -24,6 +24,7 @@ void CameraHdiUtTestSecureStreamV1_3::SetUpTestCase(void) {}
 void CameraHdiUtTestSecureStreamV1_3::TearDownTestCase(void) {}
 void CameraHdiUtTestSecureStreamV1_3::SetUp(void)
 {
+    sleep(1);
     cameraTest = std::make_shared<OHOS::Camera::HdiCommonV1_3>();
     cameraTest->Init(); // assert inside
     cameraTest->OpenSecureCamera(DEVICE_1); // assert inside
