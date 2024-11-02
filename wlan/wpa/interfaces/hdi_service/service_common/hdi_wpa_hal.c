@@ -25,7 +25,6 @@
 #include "wpa_client.h"
 #endif
 
-
 #undef LOG_TAG
 #define LOG_TAG "HdiWpaHal"
 
@@ -294,6 +293,7 @@ void ReleaseIfaceCtrl(char *ifName, int len)
         ReleaseWpaCtrl(&(g_wpaInterface->chbaCtrl));
 #ifndef OHOS_EUPDATER
         ReleaseEventCallback();
+        ClearHdfWpaRemoteObj();
 #endif
     }
 }
