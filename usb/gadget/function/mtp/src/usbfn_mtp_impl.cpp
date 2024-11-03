@@ -1084,6 +1084,7 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
             return HDF_DEV_ERR_DEV_INIT_FAIL;
         }
         DListRemove(&req->list);
+        req->actual = 0;
         uint32_t reqMax = static_cast<uint32_t>(mtpDev_->dataInPipe.maxPacketSize);
         req->length = reqMax > needXferCount ? needXferCount : reqMax;
         if (needXferCount == 0) {
