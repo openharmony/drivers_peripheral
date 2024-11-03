@@ -17,6 +17,7 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
+#include <pthread.h>
 
 #include "usbfn_mtp_impl.h"
 #include "v1_0/usbfn_mtp_interface_stub.h"
@@ -30,11 +31,12 @@ struct HdfUsbfnMtpInterfaceHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
+static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
+static bool g_stop = true;
+
 static int32_t UsbfnMtpInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    auto *hdfUsbfnMtpInterfaceHost = CONTAINER_OF(client->device->service, struct HdfUsbfnMtpInterfaceHost, ioService);
-
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
@@ -48,7 +50,17 @@ static int32_t UsbfnMtpInterfaceDriverDispatch(
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return hdfUsbfnMtpInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
+    pthread_rwlock_rdlock(&g_rwLock);
+    auto *hdfUsbfnMtpInterfaceHost = CONTAINER_OF(client->device->service, struct HdfUsbfnMtpInterfaceHost, ioService);
+    if (hdfUsbfnMtpInterfaceHost == nullptr || g_stop) {
+        HDF_LOGE("%{public}s: hdfUsbfnMtpInterfaceHost is nullptr, %{public}d", __func__, g_stop);
+        pthread_rwlock_unlock(&g_rwLock);
+        return HDF_FAILURE;
+    }
+
+    int ret = hdfUsbfnMtpInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
+    pthread_rwlock_unlock(&g_rwLock);
+    return ret;
 }
 
 static int HdfUsbfnMtpInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
@@ -97,7 +109,7 @@ static int HdfUsbfnMtpInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     sptr<UsbfnMtpImpl> impl = static_cast<UsbfnMtpImpl *>(serviceImpl.GetRefPtr());
     impl->deviceObject_ = deviceObject;
-
+    g_stop = false;
     return HDF_SUCCESS;
 }
 
@@ -109,10 +121,13 @@ static void HdfUsbfnMtpInterfaceDriverRelease(struct HdfDeviceObject *deviceObje
         return;
     }
 
+    pthread_rwlock_wrlock(&g_rwLock);
+    g_stop = true;
     auto *hdfUsbfnMtpInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfUsbfnMtpInterfaceHost, ioService);
     if (hdfUsbfnMtpInterfaceHost != nullptr) {
         delete hdfUsbfnMtpInterfaceHost;
     }
+    pthread_rwlock_unlock(&g_rwLock);
 }
 
 static struct HdfDriverEntry g_usbfnmtpinterfaceDriverEntry = {
