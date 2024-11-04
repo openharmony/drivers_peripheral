@@ -1184,10 +1184,13 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxCheckReq(struct UsbMtpPort *mtpPort, struct Us
         writeToFile = true;
     }
     if (mtpDev->asyncRecvFileActual + static_cast<uint64_t>(req->actual) == mtpDev->xferFileLength) {
-        mtpDev->asyncXferFile = ASYNC_XFER_FILE_DONE;
+        if (mtpDev->needZLP != ZLP_NEED) {
+            mtpDev->asyncXferFile = ASYNC_XFER_FILE_DONE;
+        }
         HDF_LOGV("%{public}s: last packet: req(%{public}d/%{public}d)%{public}u/%{public}u, recv %{public}" PRIu64
-            "/%{public}" PRIu64 "/%{public}" PRIu64 "", __func__, mtpPort->readStarted, mtpPort->readAllocated,
-            req->actual, req->length, mtpDev->asyncRecvFileExpect, mtpDev->asyncRecvFileActual, mtpDev->xferFileLength);
+            "/%{public}" PRIu64 "/%{public}" PRIu64 ",need zlp:%{public}d", __func__, mtpPort->readStarted,
+            mtpPort->readAllocated, req->actual, req->length, mtpDev->asyncRecvFileExpect, mtpDev->asyncRecvFileActual,
+            mtpDev->xferFileLength, mtpDev->needZLP);
     }
     return HDF_SUCCESS;
 }
