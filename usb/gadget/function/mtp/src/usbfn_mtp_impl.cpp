@@ -141,9 +141,7 @@ void UsbfnMtpImpl::UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *r
         return;
     }
     struct UsbMtpPort *mtpPort = static_cast<struct UsbMtpPort *>(req->context);
-    DListRemove(&req->list);
-    DListInsertTail(&req->list, &mtpPort->readPool);
-    mtpPort->readStarted--;
+    UsbMtpPortReleaseRxReq(mtpPort, req);
     if (mtpPort->mtpDev == nullptr) {
         HDF_LOGE("%{public}s: invalid content", __func__);
         return;
@@ -153,9 +151,23 @@ void UsbfnMtpImpl::UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *r
         HDF_LOGW("%{public}s: rx push failed(%{%{public}d/%{public}d}): %{public}d, state=%{public}hhu", __func__,
             mtpPort->readStarted, mtpPort->readAllocated, ret, mtpPort->mtpDev->mtpState);
     }
+    std::lock_guard<std::mutex> guard(asyncMutex_);
     if (mtpPort->readStarted == 0 && mtpPort->writeStarted == 0 && mtpPort->mtpDev->mtpState == MTP_STATE_CANCELED) {
         mtpPort->mtpDev->mtpState = MTP_STATE_READY;
     }
+}
+
+void UsbfnMtpImpl::UsbMtpPortReleaseRxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req)
+{
+    std::lock_guard<std::mutex> guard(asyncMutex_);
+
+    if (mtpPort == nullptr || req == nullptr) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return;
+    }
+    DListRemove(&req->list);
+    DListInsertTail(&req->list, &mtpPort->readPool);
+    mtpPort->readStarted--;
 }
 
 void UsbfnMtpImpl::UsbFnRequestWriteComplete(uint8_t pipe, struct UsbFnRequest *req)
@@ -1300,10 +1312,10 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartSubmitRxReq(struct UsbMtpPort *mtpPort, boo
 
 int32_t UsbfnMtpImpl::UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort)
 {
+    std::lock_guard<std::mutex> guard(asyncMutex_);
     struct DListHead *pool = &mtpPort->readPool;
     struct UsbMtpDevice *mtpDev = mtpPort->mtpDev;
     int32_t ret = HDF_SUCCESS;
-    std::lock_guard<std::mutex> guard(asyncMutex_);
     while (!DListIsEmpty(pool)) {
         if (mtpPort->readStarted >= mtpPort->readAllocated) {
             HDF_LOGW("%{public}s no idle read req(BULK-OUT): %{public}d/%{public}d", __func__, mtpPort->readStarted,
