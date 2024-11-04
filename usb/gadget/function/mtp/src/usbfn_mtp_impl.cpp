@@ -112,9 +112,9 @@ std::mutex UsbfnMtpImpl::mtpRunning_;
 std::mutex UsbfnMtpImpl::asyncMutex_;
 sem_t UsbfnMtpImpl::asyncReq_ {0};
 
-constexpr uint32_t BULK_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means wait forever */
-constexpr uint32_t BULK_OUT_TIMEOUT_JIFFIES = 0; /* sync timeout, set to 0 means wait forever */
-constexpr uint32_t INTR_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means wait forever */
+constexpr uint32_t BULK_IN_TIMEOUT_JIFFIES = 2 * 1000;  /* sync timeout, set to 0 means wait forever */
+constexpr uint32_t BULK_OUT_TIMEOUT_JIFFIES = 2 * 1000; /* sync timeout, set to 0 means wait forever */
+constexpr uint32_t INTR_IN_TIMEOUT_JIFFIES = 2 * 1000;  /* sync timeout, set to 0 means wait forever */
 constexpr uint64_t MTP_MAX_FILE_SIZE = 0xFFFFFFFFULL;
 constexpr uint32_t WRITE_FILE_TEMP_SLICE = 100 * 1024; /* 100KB */
 static constexpr int32_t WAIT_UDC_MAX_LOOP = 3;
