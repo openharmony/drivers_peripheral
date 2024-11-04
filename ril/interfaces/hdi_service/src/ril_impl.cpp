@@ -467,11 +467,7 @@ int32_t RilImpl::SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback)
         return HDF_FAILURE;
     }
     AddRilDeathRecipient(callback_);
-    if (Telephony::HRilManager::manager_ == nullptr) {
-        HDF_LOGE("SetCallback1_3 fail manager_ is null");
-        return HDF_FAILURE;
-    }
-    Telephony::HRilManager::manager_->SetRilCallback(callback_);
+    Telephony::HRilManager::GetInstance().SetRilCallback(callback_);
     return HDF_SUCCESS;
 }
 
@@ -678,11 +674,7 @@ int32_t RilImpl::SendSmsAck(int32_t slotId, int32_t serialId, const ModeData &mo
 
 int32_t RilImpl::SendRilAck()
 {
-    if (Telephony::HRilManager::manager_ == nullptr) {
-        HDF_LOGE("manager or func is null pointer");
-        return RIL_ERR_NULL_POINT;
-    }
-    return Telephony::HRilManager::manager_->SendRilAck();
+    return Telephony::HRilManager::GetInstance().SendRilAck();
 }
 
 int32_t RilImpl::AddRilDeathRecipient(const sptr<IRilCallback> &callback)
@@ -722,20 +714,12 @@ int32_t RilImpl::UnRegister()
     HDF_LOGI("UnRegister");
     RemoveRilDeathRecipient(callback_);
     callback_ = nullptr;
-    if (Telephony::HRilManager::manager_ == nullptr) {
-        HDF_LOGE("RilImpl::UnRegister fail manager_ is null");
-        return HDF_FAILURE;
-    }
-    Telephony::HRilManager::manager_->SetRilCallback(nullptr);
+    Telephony::HRilManager::GetInstance().SetRilCallback(nullptr);
     return HDF_SUCCESS;
 }
 
 int32_t RilImpl::Init()
 {
-    if (Telephony::HRilManager::manager_ == nullptr) {
-        HDF_LOGE("RilImpl::Init is manager_ is null");
-        return HDF_FAILURE;
-    }
     return HDF_SUCCESS;
 }
 } // namespace V1_3
