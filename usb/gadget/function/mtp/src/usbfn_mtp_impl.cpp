@@ -1184,10 +1184,13 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxCheckReq(struct UsbMtpPort *mtpPort, struct Us
         writeToFile = true;
     }
     if (mtpDev->asyncRecvFileActual + static_cast<uint64_t>(req->actual) == mtpDev->xferFileLength) {
-        mtpDev->asyncXferFile = ASYNC_XFER_FILE_DONE;
+        if (mtpDev->needZLP != ZLP_NEED) {
+            mtpDev->asyncXferFile = ASYNC_XFER_FILE_DONE;
+        }
         HDF_LOGV("%{public}s: last packet: req(%{public}d/%{public}d)%{public}u/%{public}u, recv %{public}" PRIu64
-            "/%{public}" PRIu64 "/%{public}" PRIu64 "", __func__, mtpPort->readStarted, mtpPort->readAllocated,
-            req->actual, req->length, mtpDev->asyncRecvFileExpect, mtpDev->asyncRecvFileActual, mtpDev->xferFileLength);
+            "/%{public}" PRIu64 "/%{public}" PRIu64 ",need zlp:%{public}d", __func__, mtpPort->readStarted,
+            mtpPort->readAllocated, req->actual, req->length, mtpDev->asyncRecvFileExpect, mtpDev->asyncRecvFileActual,
+            mtpDev->xferFileLength, mtpDev->needZLP);
     }
     return HDF_SUCCESS;
 }
@@ -1257,7 +1260,8 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxPush(struct UsbMtpPort *mtpPort, struct UsbFnR
         }
         return UsbMtpPortProcessAsyncRxDone(mtpPort);
     }
-    if (mtpDev->xferFileLength != MTP_MAX_FILE_SIZE && mtpDev->asyncRecvFileExpect != mtpDev->xferFileLength) {
+    if ((mtpDev->asyncRecvFileActual == mtpDev->xferFileLength) ||
+        (mtpDev->xferFileLength != MTP_MAX_FILE_SIZE && mtpDev->asyncRecvFileExpect != mtpDev->xferFileLength)) {
         ret = UsbMtpPortStartRxAsync(mtpPort);
     }
     return ret;
@@ -1311,6 +1315,10 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort)
             HDF_LOGE("%{public}s: device disconnect, stop rx", __func__);
             ret = HDF_DEV_ERR_NO_DEVICE;
             break;
+        }
+        if (mtpDev->asyncRecvFileActual == mtpDev->xferFileLength) {
+            HDF_LOGD("%{public}s: recv a zlp", __func__);
+            return UsbMtpPortStartSubmitRxReq(mtpPort, true);
         }
         if ((mtpDev->xferFileLength != MTP_MAX_FILE_SIZE && mtpDev->asyncRecvFileExpect >= mtpDev->xferFileLength) ||
             mtpDev->asyncXferFile == ASYNC_XFER_FILE_DONE) {
