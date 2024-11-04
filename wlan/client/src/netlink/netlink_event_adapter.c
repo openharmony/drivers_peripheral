@@ -263,6 +263,7 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
             (void *)scanResults->scanResult, sizeof(WifiScanResult) * (scanResults->num)) != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s fail",  __FUNCTION__);
         }
+        FreeScanResult(scanResults->scanResult);
         OsalMemFree(scanResults->scanResult);
         scanResults->scanResult = newScanResult;
         newScanResult = NULL;
