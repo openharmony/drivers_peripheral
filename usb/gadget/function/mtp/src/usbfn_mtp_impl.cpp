@@ -1312,6 +1312,10 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort)
             ret = HDF_DEV_ERR_NO_DEVICE;
             break;
         }
+        if (mtpDev->asyncRecvFileActual == mtpDev->xferFileLength) {
+            HDF_LOGD("%{public}s: recv a zlp", __func__);
+            return UsbMtpPortStartSubmitRxReq(mtpPort, true);
+        }
         if ((mtpDev->xferFileLength != MTP_MAX_FILE_SIZE && mtpDev->asyncRecvFileExpect >= mtpDev->xferFileLength) ||
             mtpDev->asyncXferFile == ASYNC_XFER_FILE_DONE) {
             HDF_LOGV("%{public}s: no need rx req[%{public}d/%{public}d]:%{public}" PRIu64 "/%{public}" PRIu64
