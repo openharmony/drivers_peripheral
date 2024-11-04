@@ -75,6 +75,7 @@ private:
     int32_t NotifyFwk(const DAudioDevEvent &event);
     int32_t CreateAdapter(const std::string &adpName, const uint32_t devId, const sptr<IDAudioCallback> &callback);
     sptr<IRemoteObject> GetRemote(const std::string &adpName);
+    sptr<AudioAdapterInterfaceImpl> GetAdapterFromMap(const std::string &adpName);
 
 private:
     class Deletor {

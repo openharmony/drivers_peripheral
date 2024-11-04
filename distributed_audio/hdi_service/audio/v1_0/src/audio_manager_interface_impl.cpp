@@ -183,14 +183,10 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
 int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName, const uint32_t dhId)
 {
     DHLOGI("Remove audio device name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), dhId);
-    std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
-    auto adp = mapAudioAdapter_.find(adpName);
-    if (adp == mapAudioAdapter_.end() || adp->second == nullptr) {
-        DHLOGE("Audio device has not been created  or is null ptr.");
-        return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
-    }
+    auto adapter = GetAdapterFromMap(adpName);
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDF_INVALID_OPERATION);
 
-    int32_t ret = adp->second->RemoveAudioDevice(dhId);
+    int32_t ret = adapter->RemoveAudioDevice(dhId);
     if (ret != DH_SUCCESS) {
         DHLOGE("Remove audio device failed, adapter return: %{public}d.", ret);
         return ret;
@@ -201,16 +197,30 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
         DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
     }
     mapAddFlags_.erase(adpName + std::to_string(dhId));
-    if (adp->second->IsPortsNoReg()) {
-        mapAudioAdapter_.erase(adpName);
-        sptr<IRemoteObject> remote = GetRemote(adpName);
-        if (remote != nullptr) {
-            remote->RemoveDeathRecipient(audioManagerRecipient_);
+    {
+        std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
+        if (adapter->IsPortsNoReg()) {
+            mapAudioAdapter_.erase(adpName);
+            sptr<IRemoteObject> remote = GetRemote(adpName);
+            if (remote != nullptr) {
+                remote->RemoveDeathRecipient(audioManagerRecipient_);
+            }
+            mapAudioCallback_.erase(adpName);
         }
-        mapAudioCallback_.erase(adpName);
+        DHLOGI("Remove audio device success, mapAudioAdapter size() is : %zu .", mapAudioAdapter_.size());
     }
-    DHLOGI("Remove audio device success, mapAudioAdapter size() is : %zu .", mapAudioAdapter_.size());
     return DH_SUCCESS;
+}
+
+sptr<AudioAdapterInterfaceImpl> AudioManagerInterfaceImpl::GetAdapterFromMap(const std::string &adpName)
+{
+    std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
+    auto adp = mapAudioAdapter_.find(adpName);
+    if (adp == mapAudioAdapter_.end()) {
+        DHLOGE("Audio device is not found.");
+        return nullptr;
+    }
+    return adp->second;
 }
 
 int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint32_t devId,
