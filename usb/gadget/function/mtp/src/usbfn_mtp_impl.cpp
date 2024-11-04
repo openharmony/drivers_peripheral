@@ -1260,6 +1260,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxPush(struct UsbMtpPort *mtpPort, struct UsbFnR
         }
         return UsbMtpPortProcessAsyncRxDone(mtpPort);
     }
+    ret = UsbMtpPortStartRxAsync(mtpPort);
     return ret;
 }
 
