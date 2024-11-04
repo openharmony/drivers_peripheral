@@ -1260,7 +1260,10 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxPush(struct UsbMtpPort *mtpPort, struct UsbFnR
         }
         return UsbMtpPortProcessAsyncRxDone(mtpPort);
     }
-    ret = UsbMtpPortStartRxAsync(mtpPort);
+    if ((mtpDev->asyncRecvFileActual == mtpDev->xferFileLength) ||
+        (mtpDev->xferFileLength != MTP_MAX_FILE_SIZE && mtpDev->asyncRecvFileExpect != mtpDev->xferFileLength)) {
+        ret = UsbMtpPortStartRxAsync(mtpPort);
+    }
     return ret;
 }
 
