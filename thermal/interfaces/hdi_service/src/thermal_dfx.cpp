@@ -43,7 +43,7 @@ namespace V1_1 {
 namespace {
 constexpr uint8_t LOG_INDEX_LEN = 4;
 constexpr int32_t MAX_FILE_NUM = 10;
-constexpr int32_t MAX_FILE_SIZE = 10 * 1024 * 1024;
+constexpr long int MAX_FILE_SIZE = 10 * 1024 * 1024;
 constexpr int32_t MAX_TIME_LEN = 20;
 constexpr int32_t TIME_FORMAT_1 = 1;
 constexpr int32_t TIME_FORMAT_2 = 2;
@@ -216,7 +216,7 @@ void ThermalDfx::CompressFile()
         return;
     }
 
-    unsigned long size = ftell(fp);
+    long int size = ftell(fp);
     if (size < MAX_FILE_SIZE) {
         if (fclose(fp) < 0) {
             THERMAL_HILOGW(COMP_HDI, "fclose() failed");
