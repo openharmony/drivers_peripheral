@@ -501,6 +501,46 @@ void TestCameraBase::OpenCamera()
     }
 }
 
+void TestCameraBase::DefaultInfosPreview()
+{
+    if (streamCustomerPreview_ == nullptr) {
+        streamCustomerPreview_ = std::make_shared<StreamCustomer>();
+    }
+    streamInfoPre.streamId_ = STREAM_ID_PREVIEW;
+    streamInfoPre.width_ = PREVIEW_WIDTH; // 640:picture width
+    streamInfoPre.height_ = PREVIEW_HEIGHT; // 480:picture height
+    streamInfoPre.format_ = PIXEL_FMT_RGBA_8888;
+    streamInfoPre.dataspace_ = 8; // 8:picture dataspace
+    streamInfoPre.intent_ = PREVIEW;
+    streamInfoPre.tunneledMode_ = 5; // 5:tunnel mode
+    streamInfoPre.bufferQueue_ = new BufferProducerSequenceable(streamCustomerPreview_->CreateProducer());
+    ASSERT_NE(streamInfoPre.bufferQueue_, nullptr);
+    streamInfoPre.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
+    std::cout << "preview success1." << std::endl;
+    std::vector<StreamInfo>().swap(streamInfos);
+    streamInfos.push_back(streamInfoPre);
+}
+
+void TestCameraBase::DefaultInfosCapture()
+{
+    if (streamCustomerCapture_ == nullptr) {
+        streamCustomerCapture_ = std::make_shared<StreamCustomer>();
+    }
+    streamInfoCapture.streamId_ = STREAM_ID_CAPTURE;
+    streamInfoCapture.width_ = CAPTURE_WIDTH; // 1280:picture width
+    streamInfoCapture.height_ = CAPTURE_HEIGHT; // 960:picture height
+    streamInfoCapture.format_ = PIXEL_FMT_RGBA_8888;
+    streamInfoCapture.dataspace_ = 8; // 8:picture dataspace
+    streamInfoCapture.intent_ = STILL_CAPTURE;
+    streamInfoCapture.encodeType_ = ENCODE_TYPE_JPEG;
+    streamInfoCapture.tunneledMode_ = 5; // 5:tunnel mode
+    streamInfoCapture.bufferQueue_ = new BufferProducerSequenceable(streamCustomerCapture_->CreateProducer());
+    ASSERT_NE(streamInfoCapture.bufferQueue_, nullptr);
+    streamInfoCapture.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
+    std::cout << "capture success1." << std::endl;
+    streamInfos.push_back(streamInfoCapture);
+}
+
 float TestCameraBase::CalTime(struct timeval start, struct timeval end)
 {
     float timeUse = 0;
