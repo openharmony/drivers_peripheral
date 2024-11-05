@@ -101,6 +101,7 @@ struct UsbMtpPort {
     struct UsbMtpDevice *mtpDev;
     struct DListHead readPool;  /* ready/idle read(bulk-out) req */
     struct DListHead readQueue; /* working async read(bulk-out) req */
+    struct UsbFnRequest *standbyReq;
     int32_t readStarted;
     int32_t readAllocated;
     struct DataFifo readFifo;
@@ -215,7 +216,7 @@ private:
     static int32_t UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev);
     static int32_t UsbMtpDeviceDisable(struct UsbMtpDevice *mtpDev);
     static void UsbMtpDeviceEp0EventDispatch(struct UsbFnEvent *event);
-
+    static void CopyReqToStandbyReqPool(const struct UsbFnRequest *req, struct UsbFnRequest *standbyReq);
     int32_t UsbMtpDeviceAllocCtrlRequests(int32_t num);
     void UsbMtpDeviceFreeCtrlRequests();
     void UsbMtpPortFreeRequests(struct DListHead *head, int32_t &allocated);
