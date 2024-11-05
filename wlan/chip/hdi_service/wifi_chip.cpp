@@ -29,7 +29,6 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 constexpr int IFACE_TYPE_STA = 2;
-constexpr int PROP_BOOL_VALUE_LEN = 6;
 constexpr char K_ACTIVE_WLAN_IFACE_NAME_PROPERTY[] = "wifi.active.interface";
 constexpr char K_NO_ACTIVE_WLAN_IFACE_NAME_PROPERTY_VALUE[] = "";
 constexpr unsigned K_MAX_WLAN_IFACES = 5;
@@ -375,35 +374,6 @@ std::string WifiChip::AllocIfaceName(IfaceType type, uint32_t startIdx)
     return {};
 }
 
-std::vector<std::string> GetPredefinedApIfaceNames(bool is_bridged)
-{
-    std::vector<std::string> ifnames;
-    char propValue[PROP_MAX_LEN] = {0};
-    int errCode = GetParameter(SAPCOEXIST_PROP, 0, propValue, PROP_BOOL_VALUE_LEN);
-    if (errCode > 0) {
-        if (strncmp(propValue, "true", strlen("true")) == 0) {
-            HDF_LOGI("support sapcoexist default interface wlan1");
-            ifnames.push_back("wlan1");
-            return ifnames;
-        }
-    }
-    std::array<char, PROP_MAX_LEN> buffer;
-    buffer.fill(0);
-    errCode = GetParameter("ro.vendor.wifi.sap.interface", 0, buffer.data(), PROP_BOOL_VALUE_LEN);
-    if (errCode < 0) {
-        return ifnames;
-    }
-    ifnames.push_back(buffer.data());
-    if (is_bridged) {
-        buffer.fill(0);
-        if (GetParameter("ro.vendor.wifi.sap.interface", 0, buffer.data(), PROP_BOOL_VALUE_LEN) < 0) {
-            return ifnames;
-        }
-        ifnames.push_back(buffer.data());
-    }
-    return ifnames;
-}
-
 bool WifiChip::CanExpandedIfaceComboSupportIfaceCombo(
     const std::map<IfaceType, size_t>& expandedCombo,
     const std::map<IfaceType, size_t>& reqCombo)
@@ -469,10 +439,6 @@ uint32_t WifiChip::IdxOfApIface()
 
 std::string WifiChip::AllocateApIfaceName()
 {
-    std::vector<std::string> ifnames = GetPredefinedApIfaceNames(false);
-    if (!ifnames.empty()) {
-        return ifnames[0];
-    }
     return AllocIfaceName(IfaceType::AP, IdxOfApIface());
 }
 
@@ -562,12 +528,7 @@ int32_t WifiChip::CreateP2pService(sptr<IChipIface>& iface)
 
 std::string WifiChip::GetDefaultP2pIfaceName()
 {
-    std::array<char, PROP_MAX_LEN> buffer;
-    int errCode = GetParameter("wifi.direct.interface", 0, buffer.data(), PROP_BOOL_VALUE_LEN);
-    if (errCode < 0) {
-        return "p2p0";
-    }
-    return buffer.data();
+    return "p2p0";
 }
 
 int32_t WifiChip::GetP2pServiceIfNames(std::vector<std::string>& ifnames)
