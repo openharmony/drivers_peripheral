@@ -293,6 +293,7 @@ void ReleaseIfaceCtrl(char *ifName, int len)
         ReleaseWpaCtrl(&(g_wpaInterface->chbaCtrl));
 #ifndef OHOS_EUPDATER
         ReleaseEventCallback();
+        ClearHdfWpaRemoteObj();
 #endif
     }
 }

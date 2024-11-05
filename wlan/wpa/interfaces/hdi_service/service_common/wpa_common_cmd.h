@@ -106,6 +106,7 @@ int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName);
 int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd);
 
 void HdfWpaDelRemoteObj(struct IWpaCallback *self);
+void ClearHdfWpaRemoteObj(void);
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);
 pthread_mutex_t *GetInterfaceLock();
 
