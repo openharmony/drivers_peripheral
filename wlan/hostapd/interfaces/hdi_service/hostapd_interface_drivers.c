@@ -18,6 +18,7 @@
 #include <hdf_device_desc.h>
 #include <hdf_device_object.h>
 #include <hdf_log.h>
+#include <pthread.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <osal_mem.h>
@@ -31,23 +32,30 @@ struct HdfHostapdInterfaceHost {
     struct HdfRemoteService **stubObject;
 };
 
+static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
+static int g_stop = 0;
+
 static int32_t HostapdInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     HDF_LOGI("HostapdInterfaceDriverDispatch enter.");
+    pthread_rwlock_rdlock(&g_rwLock);
     struct HdfHostapdInterfaceHost *hostapdinterfaceHost = CONTAINER_OF(
         client->device->service, struct HdfHostapdInterfaceHost, ioService);
-    if (hostapdinterfaceHost->service == NULL || hostapdinterfaceHost->stubObject == NULL) {
+    if (g_stop == 1 || hostapdinterfaceHost->service == NULL || hostapdinterfaceHost->stubObject == NULL) {
         HDF_LOGE("%{public}s: invalid service obj", __func__);
+        pthread_rwlock_unlock(&g_rwLock);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     struct HdfRemoteService *stubObj = *hostapdinterfaceHost->stubObject;
     if (stubObj == NULL || stubObj->dispatcher == NULL || stubObj->dispatcher->Dispatch == NULL) {
+        pthread_rwlock_unlock(&g_rwLock);
         return HDF_ERR_INVALID_OBJECT;
     }
-
-    return stubObj->dispatcher->Dispatch((struct HdfRemoteService *)stubObj->target, cmdId, data, reply);
+    int ret = stubObj->dispatcher->Dispatch((struct HdfRemoteService *)stubObj->target, cmdId, data, reply);
+    pthread_rwlock_unlock(&g_rwLock);
+    return ret;
 }
 
 static int HdfHostapdInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
@@ -104,9 +112,12 @@ static void HdfHostapdInterfaceDriverRelease(struct HdfDeviceObject *deviceObjec
     HDF_LOGI("HdfHostapdInterfaceDriverRelease enter.");
     struct HdfHostapdRemoteNode *pos = NULL;
     struct HdfHostapdRemoteNode *tmp = NULL;
+    pthread_rwlock_wrlock(&g_rwLock);
+    g_stop = 1;
     struct HdfHostapdStubData *stubData = HdfHostapdStubDriver();
     if (stubData == NULL) {
         HDF_LOGE("%{public}s: stubData is NUll!", __func__);
+        pthread_rwlock_unlock(&g_rwLock);
         return;
     }
 
@@ -119,10 +130,11 @@ static void HdfHostapdInterfaceDriverRelease(struct HdfDeviceObject *deviceObjec
     OsalMutexDestroy(&stubData->mutex);
     struct HdfHostapdInterfaceHost *hostapdinterfaceHost = CONTAINER_OF(
         deviceObject->service, struct HdfHostapdInterfaceHost, ioService);
-        StubCollectorRemoveObject(IHOSTAPDINTERFACE_INTERFACE_DESC, hostapdinterfaceHost->service);
-        IHostapdInterfaceRelease(hostapdinterfaceHost->service, true);
-        OsalMemFree(hostapdinterfaceHost);
-        hostapdinterfaceHost = NULL;
+    StubCollectorRemoveObject(IHOSTAPDINTERFACE_INTERFACE_DESC, hostapdinterfaceHost->service);
+    IHostapdInterfaceRelease(hostapdinterfaceHost->service, true);
+    OsalMemFree(hostapdinterfaceHost);
+    hostapdinterfaceHost = NULL;
+    pthread_rwlock_unlock(&g_rwLock);
 }
 
 struct HdfDriverEntry g_hostapdinterfaceDriverEntry = {

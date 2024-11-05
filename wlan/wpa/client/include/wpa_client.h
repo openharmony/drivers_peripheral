@@ -244,5 +244,5 @@ struct WpaVendorExtInfo {
 void WpaEventReport(const char *ifName, uint32_t event, void *data);
 int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
 int32_t WpaUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
-
+void ReleaseEventCallback(void);
 #endif
