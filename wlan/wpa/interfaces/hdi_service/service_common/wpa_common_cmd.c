@@ -275,7 +275,7 @@ int32_t WpaInterfaceSetNetwork(struct IWpaInterface *self, const char *ifName,
     }
     conf.id = networkId;
     int pos = -1;
-    for (int i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
+    for (int i = 0; i < (int)(sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0])); ++i) {
         if (strcmp(g_wpaSsidFields[i].fieldName, name) == 0) {
             pos = i;
             conf.param = g_wpaSsidFields[i].field;
