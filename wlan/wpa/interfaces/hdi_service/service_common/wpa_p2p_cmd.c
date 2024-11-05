@@ -95,9 +95,10 @@ void GetHalNetworkInfos(char *buf, struct HdiP2pNetworkInfo *info)
         } else if (i == count) {
             uint8_t tmpBssid[ETH_ADDR_LEN] = {0};
             hwaddr_aton(buf + start, tmpBssid);
-            if (strcpy_s((char *)info->bssid, ETH_ADDR_LEN + 1, (char *)tmpBssid) != EOK) {
+            if (memcpy_s((char *)info->bssid, ETH_ADDR_LEN, (char *)tmpBssid, ETH_ADDR_LEN) != EOK) {
                 break;
             }
+            info->bssid[ETH_ADDR_LEN] = '\0';
             start = end + 1;
             if (strcpy_s((char *)info->flags, WIFI_NETWORK_FLAGS_LENGTH + 1, buf + start) != EOK) {
                 break;
@@ -1280,7 +1281,7 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
         return HDF_ERR_INVALID_PARAM;
     }
     char *reply;
-    const int replySize = REPLY_SIZE;
+    const int replySize = P2P_LIST_REPLY_SIZE;
     char cmd[CMD_SIZE];
     reply = (char *)malloc(replySize);
     if (reply == NULL) {
@@ -1294,7 +1295,7 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
         free(reply);
         return HDF_FAILURE;
     }
-    if (WpaCliCmd(cmd, reply, REPLY_SIZE) != 0) {
+    if (WpaCliCmd(cmd, reply, P2P_LIST_REPLY_SIZE) != 0) {
         HDF_LOGE("LIST_NETWORKS command failed!");
         free(reply);
         return HDF_FAILURE;
