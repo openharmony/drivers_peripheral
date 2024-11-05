@@ -47,7 +47,7 @@ HWTEST_F(CameraHalHisyseventTest, Camera_Hal_Hisysevent_001, TestSize.Level1)
     cameraBase_->streamInfoCapture.format_ = 9990;
     cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(cameraBase_->streamInfos);
     EXPECT_EQ(false, cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR);
-    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(OperationMode::NORMAL, cameraBase_->ability_);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
     EXPECT_EQ(false, cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR);
     cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
     sleep(1);
