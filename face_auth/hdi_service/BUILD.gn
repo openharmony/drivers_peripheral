@@ -42,7 +42,7 @@ ohos_shared_library("libface_auth_interface_service_2.0") {
     "ipc:ipc_single",
   ]
 
-  public_external_deps = 
+  public_external_deps =
       [ "drivers_interface_camera:libbuffer_producer_sequenceable_1.0" ]
 
   install_images = [ chipset_base_dir ]
