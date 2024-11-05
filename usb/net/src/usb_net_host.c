@@ -736,7 +736,7 @@ static int32_t UsbnetHostAlloc(struct UsbnetHost *usbNet)
         return ret;
     }
 
-    //3.read request
+    // 3.read request
     ret = UsbnetHostAllocReadRequests(usbNet);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbRawAllocRequest failed", __func__);
