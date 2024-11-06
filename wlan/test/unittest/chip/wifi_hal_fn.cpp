@@ -183,6 +183,12 @@ WifiError SetTxPower(const char *ifName, int mode)
     return HAL_INVALID_ARGS;
 }
 
+WifiError IsSupportCoex(bool& isCoex)
+{
+    isCoex = true;
+    return HAL_SUCCESS;
+}
+
 WifiError InitWifiHalFuncTable(WifiHalFn *fn)
 {
     if (fn == nullptr) {
@@ -213,5 +219,6 @@ WifiError InitWifiHalFuncTable(WifiHalFn *fn)
     fn->wifiGetSupportedFeatureSet = WifiGetSupportedFeatureSet;
     fn->getChipCaps = GetChipCaps;
     fn->setTxPower = SetTxPower;
+    fn->isSupportCoex = IsSupportCoex;
     return HAL_SUCCESS;
 }
