@@ -30,6 +30,7 @@ if (is_standard_system) {
       "service_common/hdi_wpa_common.c",
       "service_common/hdi_wpa_hal.c",
       "service_common/wpa_common_cmd.c",
+      "service_common/wpa_common_cmd_ext.c",
       "service_common/wpa_hdi_util.c",
       "service_common/wpa_p2p_cmd.c",
       "service_common/wpa_p2p_hal.c",
