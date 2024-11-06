@@ -1381,6 +1381,10 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
     }
 
     if (interfaceId < USB_MAX_INTERFACES) {
+        if (port->devHandle[interfaceId] == nullptr || port->iface[interfaceId] == nullptr) {
+            HDF_LOGE("%{public}s: UsbOpenInterface or UsbClaimInterface failed", __func__);
+            return HDF_DEV_ERR_OP;
+        }
         if (HdfSListCount(&port->reqSyncList) > 0) {
             UsbdRequestSyncReleaseList(port);
             HDF_LOGD("%{public}s:release sync list", __func__);
@@ -1389,20 +1393,14 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
             UsbdRequestASyncReleaseList(port);
             HDF_LOGD("%{public}s:release async list", __func__);
         }
-
         int32_t ret = UsbdBulkASyncListReleasePort(port);
         if (ret != HDF_SUCCESS) {
             HDF_LOGW("%{public}s:release bulk async list failed", __func__);
         }
-        if (port->iface[interfaceId] != nullptr) {
-            UsbReleaseInterface(port->iface[interfaceId]);
-            port->iface[interfaceId] = nullptr;
-        }
-
-        if (port->devHandle[interfaceId] != nullptr) {
-            UsbCloseInterface(port->devHandle[interfaceId], false);
-            port->devHandle[interfaceId] = nullptr;
-        }
+        UsbCloseInterface(port->devHandle[interfaceId], false);
+        port->devHandle[interfaceId] = nullptr;
+        UsbReleaseInterface(port->iface[interfaceId]);
+        port->iface[interfaceId] = nullptr;
         return HDF_SUCCESS;
     } else {
         HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
