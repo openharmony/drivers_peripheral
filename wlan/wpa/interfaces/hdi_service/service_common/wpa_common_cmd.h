@@ -32,6 +32,8 @@
 #define COUNTRY_CODE_LENGTH_MAX 2
 #define CMD_SIZE 100
 #define REPLY_SIZE 1024
+/* get more than 100 p2p lists */
+#define P2P_LIST_REPLY_SIZE 7168
 #define HDI_POS_TEN 10
 #define HDI_POS_FOURTH 4
 #define REPLY_SIZE_FACTOR_FIRST 4
