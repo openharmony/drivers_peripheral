@@ -741,7 +741,8 @@ static int ModBlockList(const char *mac, int id)
         HDF_LOGE("ModBlockList fclose error");
         return -1;
     }
-    if (sprintf_s(cmd, sizeof(cmd), "SET deny_mac_file %s/%s", CONFIG_PATH_DIR, CONFIG_DENY_MAC_FILE_NAME) < 0) {
+    if (sprintf_s(cmd, sizeof(cmd), "IFNAME=%s SET deny_mac_file %s/%s", g_apIfaceName,
+        CONFIG_PATH_DIR, CONFIG_DENY_MAC_FILE_NAME) < 0) {
         HDF_LOGE("ModBlockList sprintf_s cmd fail");
         return -1;
     }
@@ -757,7 +758,7 @@ static int AddBlocklist(const char *mac, int id)
     char cmd[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
 
-    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "DENY_ACL ADD_MAC %s", mac) < 0) {
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s DENY_ACL ADD_MAC %s", g_apIfaceName, mac) < 0) {
         HDF_LOGE("AddBlocklist sprintf_s cmd fail");
         return -1;
     }
@@ -784,7 +785,7 @@ static int DelBlocklist(const char *mac, int id)
     char cmd[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
 
-    if (sprintf_s(cmd, sizeof(cmd), "DENY_ACL DEL_MAC %s", mac) < 0) {
+    if (sprintf_s(cmd, sizeof(cmd), "IFNAME=%s DENY_ACL DEL_MAC %s", g_apIfaceName, mac) < 0) {
         HDF_LOGE("DelBlocklist sprintf_s DENY_ACL cmd fail");
         return -1;
     }
@@ -904,7 +905,7 @@ static int DisConnectedDev(const char *mac, int id)
     char cmd[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
 
-    if (sprintf_s(cmd, sizeof(cmd), "DISASSOCIATE %s", mac) < 0) {
+    if (sprintf_s(cmd, sizeof(cmd), "IFNAME=%s DISASSOCIATE %s", g_apIfaceName, mac) < 0) {
         HDF_LOGE("DisConnectedDev sprintf_s fail");
         return -1;
     }
