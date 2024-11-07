@@ -160,6 +160,8 @@ public:
     CamRetCode SelectOpenCamera(std::string cameraId);
     void Close();
     void OpenCamera();
+    void DefaultInfosPreview();
+    void DefaultInfosCapture();
     void AchieveStreamOperator();
     void StartStream(std::vector<StreamIntent> intents);
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
