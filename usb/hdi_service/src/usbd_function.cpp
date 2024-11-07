@@ -576,12 +576,14 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
 
     if (UsbdFunction::SetDDKFunction(funcs)) {
         HDF_LOGE("%{public}s:SetDDKFunction error", __func__);
+        SetFunctionToStorage();
         return HDF_FAILURE;
     }
 
     int32_t ret = UsbdSetKernelFunction(kfuns, funcs);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, set kernel func failed", __func__);
+        SetFunctionToStorage();
         return HDF_FAILURE;
     }
     currentFuncs_ |= kfuns;
@@ -592,12 +594,14 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
 
     if (UsbdWaitUdc() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, wait udc failed", __func__);
+        SetFunctionToStorage();
         return HDF_FAILURE;
     }
     if (UsbdInitDDKFunction(funcs) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, init ddk func failed", __func__);
         UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
         UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
+        SetFunctionToStorage();
         return HDF_FAILURE;
     }
     currentFuncs_ = funcs;
