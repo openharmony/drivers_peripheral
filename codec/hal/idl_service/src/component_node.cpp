@@ -87,7 +87,7 @@ ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appD
 
 ComponentNode::~ComponentNode()
 {
-    std::shared_lock<std::shared_mutex> lk(mapMutex_);
+    std::unique_lock<std::shared_mutex> lk(mapMutex_);
     omxCallback_ = nullptr;
     bufferHeaderPortMap_.clear();
     codecBufferMap_.clear();
