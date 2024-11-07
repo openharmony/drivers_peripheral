@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DCameraGetCameraAbilityFromDevFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if (data == nullptr) {
         return;
     }
     std::string cameraId = "1__2";
@@ -61,7 +61,7 @@ void DCameraAddDeviceParamCheckFuzzTest(const uint8_t* data, size_t size)
 
 void DCameraGetCamDevNumFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if (data == nullptr) {
         return;
     }
     DCameraHost::GetInstance()->GetCamDevNum();
@@ -69,7 +69,7 @@ void DCameraGetCamDevNumFuzzTest(const uint8_t* data, size_t size)
 
 void DCameraIsCameraIdInvalidFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if (data == nullptr) {
         return;
     }
     std::string cameraId = "1__2";
@@ -89,7 +89,7 @@ void DCameraIsCameraIdInvalidFuzzTest(const uint8_t* data, size_t size)
 
 void DCameraGetCameraIdByDHBaseFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if (data == nullptr) {
         return;
     }
     DHBase dhBase;
