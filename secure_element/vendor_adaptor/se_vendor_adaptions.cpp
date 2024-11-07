@@ -129,7 +129,7 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
-    if (ret != SECURE_ELEMENT_CA_RET_OK) {
+    if ((ret != SECURE_ELEMENT_CA_RET_OK) || (resLen < MIN_RES_LEN)) {
         HDF_LOGE("openLogicalChannel failed ret %{public}u", ret);
         status = SecureElementStatus::SE_GENERAL_ERROR;
         if (g_openedChannelCount == 0) {
@@ -138,16 +138,23 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
         }
         return HDF_SUCCESS;
     }
-    if (ret == SECURE_ELEMENT_CA_RET_OK && resLen >= MIN_RES_LEN) {
-        status = getStatusBySW(res[resLen - SW1_OFFSET], res[resLen - SW2_OFFSET]);
-        if (channelNumber < MAX_CHANNEL_NUM - 1 && !g_openedChannels[channelNumber] &&
-            status == SecureElementStatus::SE_SUCCESS) {
-            g_openedChannels[channelNumber] = true;
-            g_openedChannelCount++;
-        }
+    status = getStatusBySW(res[resLen - SW1_OFFSET], res[resLen - SW2_OFFSET]);
+    if ((ret == SECURE_ELEMENT_CA_RET_OK) && (channelCreated < MAX_CHANNEL_NUM - 1) &&
+        !g_openedChannels[channelCreated] && (status == SecureElementStatus::SE_SUCCESS)) {
+        g_openedChannels[channelCreated] = true;
+        g_openedChannelCount++;
+    } else if (g_openedChannelCount == 0) { // If there are no channels remaining close secureElement
+        HDF_LOGI("openLogicalChannel: g_openedChannelCount = %{public}d, Uninit", g_openedChannelCount);
+        SecureElementCaProxy::GetInstance().VendorSecureElementCaUninit();
     }
-    HDF_LOGI("openLogicalChannel [%{public}d] succ, now has %{public}d channel inuse",
-        channelNumber, g_openedChannelCount);
+
+    if (channelCreated <= MAX_CHANNEL_SIZE) {
+        channelNumber = static_cast<uint8_t>(channelCreated);
+    } else {
+        HDF_LOGE("openLogicalChannel err, channelCreated = %{public}d", channelCreated);
+    }
+    HDF_LOGI("openLogicalChannel [%{public}d] status:[%{public}d], now has %{public}d channel inuse",
+        channelNumber, static_cast<uint8_t>(status), g_openedChannelCount);
 #endif
     return HDF_SUCCESS;
 }
@@ -170,7 +177,7 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
-    if (ret != SECURE_ELEMENT_CA_RET_OK) {
+    if ((ret != SECURE_ELEMENT_CA_RET_OK) || (resLen < MIN_RES_LEN)) {
         HDF_LOGE("openBasicChannel failed ret %{public}u", ret);
         status = SecureElementStatus::SE_GENERAL_ERROR;
         if (g_openedChannelCount == 0) {
@@ -179,14 +186,17 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
         }
         return HDF_SUCCESS;
     }
-    if (ret == SECURE_ELEMENT_CA_RET_OK && resLen >= MIN_RES_LEN) {
-        status = getStatusBySW(res[resLen - SW1_OFFSET], res[resLen - SW2_OFFSET]);
-        if (!g_openedChannels[0] && (response[resLen - SW1_OFFSET] == 0x90 && response[resLen - SW2_OFFSET] == 0x00)) {
-            g_openedChannels[0] = true;
-            g_openedChannelCount++;
-        }
+    status = getStatusBySW(res[resLen - SW1_OFFSET], res[resLen - SW2_OFFSET]);
+    if ((ret == SECURE_ELEMENT_CA_RET_OK) && !g_openedChannels[0] && (status == SecureElementStatus::SE_SUCCESS)) {
+        g_openedChannels[0] = true;
+        g_openedChannelCount++;
+    } else if (g_openedChannelCount == 0) {
+        HDF_LOGI("openBasicChannel failed: g_openedChannelCount = %{public}d, Uninit", g_openedChannelCount);
+        SecureElementCaProxy::GetInstance().VendorSecureElementCaUninit();
     }
-    HDF_LOGI("openBasicChannel [0] succ, now has %{public}d channel inuse", g_openedChannelCount);
+    HDF_LOGI("openBasicChannel [0] status:[%{public}d], now has %{public}d channel inuse",
+        static_cast<uint8_t>(status),
+        g_openedChannelCount);
 #endif
     return HDF_SUCCESS;
 }
