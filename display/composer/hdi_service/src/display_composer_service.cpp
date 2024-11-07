@@ -242,6 +242,7 @@ void DisplayComposerService::LoadVdiFuncPart2()
         reinterpret_cast<EnableHardwareCursorStatsFunc>(dlsym(libHandle_, "EnableHardwareCursorStats"));
     vdiAdapter_->GetHardwareCursorStats =
         reinterpret_cast<GetHardwareCursorStatsFunc>(dlsym(libHandle_, "GetHardwareCursorStats"));
+    vdiAdapter_->FastPresent = reinterpret_cast<FastPresentFunc>(dlsym(libHandle_, "FastPresent"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -866,6 +867,22 @@ int32_t DisplayComposerService::ClearLayerBuffer(uint32_t devId, uint32_t layerI
     return devCache->ClearLayerBuffer(layerId);
 }
 
+int32_t DisplayComposerService::FastPresent(uint32_t devId, const PresentParam& param,
+    const std::vector<sptr<NativeBuffer>>& inHandles)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->FastPresent, HDF_ERR_NOT_SUPPORT);
+
+    std::vector<BufferHandle*> handles;
+    for (uint32_t i = 0; i < param.sliceNum; i++) {
+        handles.emplace_back(inHandles[i]->GetBufferHandle());
+    }
+
+    int32_t ret = vdiAdapter_->FastPresent(devId, param, handles);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
 } // namespace Composer
 } // namespace Display
 } // namespace HDI
