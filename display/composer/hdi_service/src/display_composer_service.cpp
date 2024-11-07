@@ -98,7 +98,8 @@ int32_t DisplayComposerService::LoadVdiAdapter()
 {
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
 
-    LoadVdiFuncV1_0();
+    LoadVdiFuncPart1();
+    LoadVdiFuncPart2();
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->RegHotPlugCallback, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayCapability, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplaySupportedModes, HDF_FAILURE);
@@ -137,83 +138,110 @@ int32_t DisplayComposerService::LoadVdiAdapter()
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetLayerBlendType, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetLayerMaskInfo, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetLayerColor, HDF_FAILURE);
-    LoadVdiFuncV1_1();
     return HDF_SUCCESS;
 }
 
-void DisplayComposerService::LoadVdiFuncV1_0()
+void DisplayComposerService::LoadVdiFuncPart1()
 {
-    vdiAdapter_->LoadVdiImpl = (LoadVdiImplFunc)(dlsym(libHandle_, "LoadVdiImpl"));
-    vdiAdapter_->DestroyVdiImpl = (DestroyVdiImplFunc)(dlsym(libHandle_, "DestroyVdiImpl"));
-    vdiAdapter_->RegHotPlugCallback = (RegHotPlugCallbackFunc)(dlsym(libHandle_, "RegHotPlugCallback"));
-    vdiAdapter_->GetDisplayCapability = (GetDisplayCapabilityFunc)(dlsym(libHandle_, "GetDisplayCapability"));
+    vdiAdapter_->RegHotPlugCallback =
+        reinterpret_cast<RegHotPlugCallbackFunc>(dlsym(libHandle_, "RegHotPlugCallback"));
+    vdiAdapter_->GetDisplayCapability =
+        reinterpret_cast<GetDisplayCapabilityFunc>(dlsym(libHandle_, "GetDisplayCapability"));
     vdiAdapter_->GetDisplaySupportedModes =
-        (GetDisplaySupportedModesFunc)(dlsym(libHandle_, "GetDisplaySupportedModes"));
-    vdiAdapter_->GetDisplayMode = (GetDisplayModeFunc)(dlsym(libHandle_, "GetDisplayMode"));
-    vdiAdapter_->SetDisplayMode = (SetDisplayModeFunc)(dlsym(libHandle_, "SetDisplayMode"));
-    vdiAdapter_->GetDisplayPowerStatus = (GetDisplayPowerStatusFunc)(dlsym(libHandle_, "GetDisplayPowerStatus"));
-    vdiAdapter_->SetDisplayPowerStatus = (SetDisplayPowerStatusFunc)(dlsym(libHandle_, "SetDisplayPowerStatus"));
-    vdiAdapter_->GetDisplayBacklight = (GetDisplayBacklightFunc)(dlsym(libHandle_, "GetDisplayBacklight"));
-    vdiAdapter_->SetDisplayBacklight = (SetDisplayBacklightFunc)(dlsym(libHandle_, "SetDisplayBacklight"));
-    vdiAdapter_->GetDisplayProperty = (GetDisplayPropertyFunc)(dlsym(libHandle_, "GetDisplayProperty"));
-    vdiAdapter_->GetDisplayCompChange = (GetDisplayCompChangeFunc)(dlsym(libHandle_, "GetDisplayCompChange"));
-    vdiAdapter_->SetDisplayClientCrop = (SetDisplayClientCropFunc)(dlsym(libHandle_, "SetDisplayClientCrop"));
-    vdiAdapter_->SetDisplayClientBuffer = (SetDisplayClientBufferFunc)(dlsym(libHandle_, "SetDisplayClientBuffer"));
-    vdiAdapter_->SetDisplayClientDamage = (SetDisplayClientDamageFunc)(dlsym(libHandle_, "SetDisplayClientDamage"));
-    vdiAdapter_->SetDisplayVsyncEnabled = (SetDisplayVsyncEnabledFunc)(dlsym(libHandle_, "SetDisplayVsyncEnabled"));
+        reinterpret_cast<GetDisplaySupportedModesFunc>(dlsym(libHandle_, "GetDisplaySupportedModes"));
+    vdiAdapter_->GetDisplayMode =
+        reinterpret_cast<GetDisplayModeFunc>(dlsym(libHandle_, "GetDisplayMode"));
+    vdiAdapter_->SetDisplayMode =
+        reinterpret_cast<SetDisplayModeFunc>(dlsym(libHandle_, "SetDisplayMode"));
+    vdiAdapter_->GetDisplayPowerStatus =
+        reinterpret_cast<GetDisplayPowerStatusFunc>(dlsym(libHandle_, "GetDisplayPowerStatus"));
+    vdiAdapter_->SetDisplayPowerStatus =
+        reinterpret_cast<SetDisplayPowerStatusFunc>(dlsym(libHandle_, "SetDisplayPowerStatus"));
+    vdiAdapter_->GetDisplayBacklight =
+        reinterpret_cast<GetDisplayBacklightFunc>(dlsym(libHandle_, "GetDisplayBacklight"));
+    vdiAdapter_->SetDisplayBacklight =
+        reinterpret_cast<SetDisplayBacklightFunc>(dlsym(libHandle_, "SetDisplayBacklight"));
+    vdiAdapter_->GetDisplayProperty =
+        reinterpret_cast<GetDisplayPropertyFunc>(dlsym(libHandle_, "GetDisplayProperty"));
+    vdiAdapter_->GetDisplayCompChange =
+        reinterpret_cast<GetDisplayCompChangeFunc>(dlsym(libHandle_, "GetDisplayCompChange"));
+    vdiAdapter_->SetDisplayClientCrop =
+        reinterpret_cast<SetDisplayClientCropFunc>(dlsym(libHandle_, "SetDisplayClientCrop"));
+    vdiAdapter_->SetDisplayClientBuffer =
+        reinterpret_cast<SetDisplayClientBufferFunc>(dlsym(libHandle_, "SetDisplayClientBuffer"));
+    vdiAdapter_->SetDisplayClientDamage =
+        reinterpret_cast<SetDisplayClientDamageFunc>(dlsym(libHandle_, "SetDisplayClientDamage"));
+    vdiAdapter_->SetDisplayVsyncEnabled =
+        reinterpret_cast<SetDisplayVsyncEnabledFunc>(dlsym(libHandle_, "SetDisplayVsyncEnabled"));
     vdiAdapter_->RegDisplayVBlankCallback =
-        (RegDisplayVBlankCallbackFunc)(dlsym(libHandle_, "RegDisplayVBlankCallback"));
-    vdiAdapter_->GetDisplayReleaseFence = (GetDisplayReleaseFenceFunc)(dlsym(libHandle_, "GetDisplayReleaseFence"));
-    vdiAdapter_->CreateVirtualDisplay = (CreateVirtualDisplayFunc)(dlsym(libHandle_, "CreateVirtualDisplay"));
-    vdiAdapter_->DestroyVirtualDisplay = (DestroyVirtualDisplayFunc)(dlsym(libHandle_, "DestroyVirtualDisplay"));
-    vdiAdapter_->SetVirtualDisplayBuffer = (SetVirtualDisplayBufferFunc)(dlsym(libHandle_, "SetVirtualDisplayBuffer"));
-    vdiAdapter_->SetDisplayProperty = (SetDisplayPropertyFunc)(dlsym(libHandle_, "SetDisplayProperty"));
-    vdiAdapter_->Commit = (CommitFunc)(dlsym(libHandle_, "Commit"));
-    vdiAdapter_->CreateLayer = (CreateLayerFunc)(dlsym(libHandle_, "CreateLayer"));
-    vdiAdapter_->DestroyLayer = (DestroyLayerFunc)(dlsym(libHandle_, "DestroyLayer"));
-    vdiAdapter_->PrepareDisplayLayers = (PrepareDisplayLayersFunc)(dlsym(libHandle_, "PrepareDisplayLayers"));
-    vdiAdapter_->SetLayerAlpha = (SetLayerAlphaFunc)(dlsym(libHandle_, "SetLayerAlpha"));
-    vdiAdapter_->SetLayerRegion = (SetLayerRegionFunc)(dlsym(libHandle_, "SetLayerRegion"));
-    vdiAdapter_->SetLayerCrop = (SetLayerCropFunc)(dlsym(libHandle_, "SetLayerCrop"));
-    vdiAdapter_->SetLayerZorder = (SetLayerZorderFunc)(dlsym(libHandle_, "SetLayerZorder"));
-    vdiAdapter_->SetLayerPreMulti = (SetLayerPreMultiFunc)(dlsym(libHandle_, "SetLayerPreMulti"));
-    vdiAdapter_->SetLayerTransformMode = (SetLayerTransformModeFunc)(dlsym(libHandle_, "SetLayerTransformMode"));
-    vdiAdapter_->SetLayerDirtyRegion = (SetLayerDirtyRegionFunc)(dlsym(libHandle_, "SetLayerDirtyRegion"));
-    vdiAdapter_->SetLayerVisibleRegion = (SetLayerVisibleRegionFunc)(dlsym(libHandle_, "SetLayerVisibleRegion"));
-    vdiAdapter_->SetLayerBuffer = (SetLayerBufferFunc)(dlsym(libHandle_, "SetLayerBuffer"));
-    vdiAdapter_->SetLayerCompositionType = (SetLayerCompositionTypeFunc)(dlsym(libHandle_, "SetLayerCompositionType"));
-    vdiAdapter_->SetLayerBlendType = (SetLayerBlendTypeFunc)(dlsym(libHandle_, "SetLayerBlendType"));
-    vdiAdapter_->SetLayerMaskInfo = (SetLayerMaskInfoFunc)(dlsym(libHandle_, "SetLayerMaskInfo"));
-    vdiAdapter_->SetLayerColor = (SetLayerColorFunc)(dlsym(libHandle_, "SetLayerColor"));
+        reinterpret_cast<RegDisplayVBlankCallbackFunc>(dlsym(libHandle_, "RegDisplayVBlankCallback"));
+    vdiAdapter_->GetDisplayReleaseFence =
+        reinterpret_cast<GetDisplayReleaseFenceFunc>(dlsym(libHandle_, "GetDisplayReleaseFence"));
+    vdiAdapter_->CreateVirtualDisplay =
+        reinterpret_cast<CreateVirtualDisplayFunc>(dlsym(libHandle_, "CreateVirtualDisplay"));
+    vdiAdapter_->DestroyVirtualDisplay =
+        reinterpret_cast<DestroyVirtualDisplayFunc>(dlsym(libHandle_, "DestroyVirtualDisplay"));
+    vdiAdapter_->SetVirtualDisplayBuffer =
+        reinterpret_cast<SetVirtualDisplayBufferFunc>(dlsym(libHandle_, "SetVirtualDisplayBuffer"));
+    vdiAdapter_->SetDisplayProperty =
+        reinterpret_cast<SetDisplayPropertyFunc>(dlsym(libHandle_, "SetDisplayProperty"));
+    vdiAdapter_->Commit = reinterpret_cast<CommitFunc>(dlsym(libHandle_, "Commit"));
+    vdiAdapter_->CreateLayer = reinterpret_cast<CreateLayerFunc>(dlsym(libHandle_, "CreateLayer"));
+    vdiAdapter_->DestroyLayer = reinterpret_cast<DestroyLayerFunc>(dlsym(libHandle_, "DestroyLayer"));
 }
 
-void DisplayComposerService::LoadVdiFuncV1_1()
+void DisplayComposerService::LoadVdiFuncPart2()
 {
+    vdiAdapter_->PrepareDisplayLayers =
+        reinterpret_cast<PrepareDisplayLayersFunc>(dlsym(libHandle_, "PrepareDisplayLayers"));
+    vdiAdapter_->SetLayerAlpha = reinterpret_cast<SetLayerAlphaFunc>(dlsym(libHandle_, "SetLayerAlpha"));
+    vdiAdapter_->SetLayerRegion = reinterpret_cast<SetLayerRegionFunc>(dlsym(libHandle_, "SetLayerRegion"));
+    vdiAdapter_->SetLayerCrop = reinterpret_cast<SetLayerCropFunc>(dlsym(libHandle_, "SetLayerCrop"));
+    vdiAdapter_->SetLayerZorder = reinterpret_cast<SetLayerZorderFunc>(dlsym(libHandle_, "SetLayerZorder"));
+    vdiAdapter_->SetLayerPreMulti = reinterpret_cast<SetLayerPreMultiFunc>(dlsym(libHandle_, "SetLayerPreMulti"));
+    vdiAdapter_->SetLayerTransformMode =
+        reinterpret_cast<SetLayerTransformModeFunc>(dlsym(libHandle_, "SetLayerTransformMode"));
+    vdiAdapter_->SetLayerDirtyRegion =
+        reinterpret_cast<SetLayerDirtyRegionFunc>(dlsym(libHandle_, "SetLayerDirtyRegion"));
+    vdiAdapter_->SetLayerVisibleRegion =
+        reinterpret_cast<SetLayerVisibleRegionFunc>(dlsym(libHandle_, "SetLayerVisibleRegion"));
+    vdiAdapter_->SetLayerBuffer = reinterpret_cast<SetLayerBufferFunc>(dlsym(libHandle_, "SetLayerBuffer"));
+    vdiAdapter_->SetLayerCompositionType =
+        reinterpret_cast<SetLayerCompositionTypeFunc>(dlsym(libHandle_, "SetLayerCompositionType"));
+    vdiAdapter_->SetLayerBlendType =
+        reinterpret_cast<SetLayerBlendTypeFunc>(dlsym(libHandle_, "SetLayerBlendType"));
+    vdiAdapter_->SetLayerMaskInfo = reinterpret_cast<SetLayerMaskInfoFunc>(dlsym(libHandle_, "SetLayerMaskInfo"));
+    vdiAdapter_->SetLayerColor = reinterpret_cast<SetLayerColorFunc>(dlsym(libHandle_, "SetLayerColor"));
     vdiAdapter_->RegSeamlessChangeCallback =
-        (RegSeamlessChangeCallbackFunc)(dlsym(libHandle_, "RegSeamlessChangeCallback"));
+        reinterpret_cast<RegSeamlessChangeCallbackFunc>(dlsym(libHandle_, "RegSeamlessChangeCallback"));
     vdiAdapter_->GetDisplaySupportedModesExt =
-        (GetDisplaySupportedModesExtFunc)(dlsym(libHandle_, "GetDisplaySupportedModesExt"));
-    vdiAdapter_->SetDisplayModeAsync = (SetDisplayModeAsyncFunc)(dlsym(libHandle_, "SetDisplayModeAsync"));
+        reinterpret_cast<GetDisplaySupportedModesExtFunc>(dlsym(libHandle_, "GetDisplaySupportedModesExt"));
+    vdiAdapter_->SetDisplayModeAsync =
+        reinterpret_cast<SetDisplayModeAsyncFunc>(dlsym(libHandle_, "SetDisplayModeAsync"));
     vdiAdapter_->GetDisplayVBlankPeriod =
-        (GetDisplayVBlankPeriodFunc)(dlsym(libHandle_, "GetDisplayVBlankPeriod"));
+        reinterpret_cast<GetDisplayVBlankPeriodFunc>(dlsym(libHandle_, "GetDisplayVBlankPeriod"));
     vdiAdapter_->SetLayerPerFrameParameter =
-        (SetLayerPerFrameParameterFunc)(dlsym(libHandle_, "SetLayerPerFrameParameter"));
-    vdiAdapter_->GetSupportedLayerPerFrameParameterKey =
-        (GetSupportedLayerPerFrameParameterKeyFunc)(dlsym(libHandle_, "GetSupportedLayerPerFrameParameterKey"));
+        reinterpret_cast<SetLayerPerFrameParameterFunc>(dlsym(libHandle_, "SetLayerPerFrameParameter"));
+    vdiAdapter_->GetSupportedLayerPerFrameParameterKey = reinterpret_cast<GetSupportedLayerPerFrameParameterKeyFunc>(
+        dlsym(libHandle_, "GetSupportedLayerPerFrameParameterKey"));
     vdiAdapter_->SetDisplayOverlayResolution =
-        (SetDisplayOverlayResolutionFunc)(dlsym(libHandle_, "SetDisplayOverlayResolution"));
-    vdiAdapter_->RegRefreshCallback = (RegRefreshCallbackFunc)(dlsym(libHandle_, "RegRefreshCallback"));
+        reinterpret_cast<SetDisplayOverlayResolutionFunc>(dlsym(libHandle_, "SetDisplayOverlayResolution"));
+    vdiAdapter_->RegRefreshCallback =
+        reinterpret_cast<RegRefreshCallbackFunc>(dlsym(libHandle_, "RegRefreshCallback"));
     vdiAdapter_->GetDisplaySupportedColorGamuts =
-        (GetDisplaySupportedColorGamutsFunc)(dlsym(libHandle_, "GetDisplaySupportedColorGamuts"));
-    vdiAdapter_->GetHDRCapabilityInfos = (GetHDRCapabilityInfosFunc)(dlsym(libHandle_, "GetHDRCapabilityInfos"));
+        reinterpret_cast<GetDisplaySupportedColorGamutsFunc>(dlsym(libHandle_, "GetDisplaySupportedColorGamuts"));
+    vdiAdapter_->GetHDRCapabilityInfos =
+        reinterpret_cast<GetHDRCapabilityInfosFunc>(dlsym(libHandle_, "GetHDRCapabilityInfos"));
     vdiAdapter_->RegDisplayVBlankIdleCallback =
-        (RegDisplayVBlankIdleCallbackFunc)(dlsym(libHandle_, "RegDisplayVBlankIdleCallback"));
-    vdiAdapter_->SetDisplayConstraint = (SetDisplayConstraintFunc)(dlsym(libHandle_, "SetDisplayConstraint"));
+        reinterpret_cast<RegDisplayVBlankIdleCallbackFunc>(dlsym(libHandle_, "RegDisplayVBlankIdleCallback"));
+    vdiAdapter_->SetDisplayConstraint =
+        reinterpret_cast<SetDisplayConstraintFunc>(dlsym(libHandle_, "SetDisplayConstraint"));
     vdiAdapter_->SetHardwareCursorPosition =
-        (SetHardwareCursorPositionFunc)(dlsym(libHandle_, "SetHardwareCursorPosition"));
+        reinterpret_cast<SetHardwareCursorPositionFunc>(dlsym(libHandle_, "SetHardwareCursorPosition"));
     vdiAdapter_->EnableHardwareCursorStats =
-        (EnableHardwareCursorStatsFunc)(dlsym(libHandle_, "EnableHardwareCursorStats"));
-    vdiAdapter_->GetHardwareCursorStats = (GetHardwareCursorStatsFunc)(dlsym(libHandle_, "GetHardwareCursorStats"));
+        reinterpret_cast<EnableHardwareCursorStatsFunc>(dlsym(libHandle_, "EnableHardwareCursorStats"));
+    vdiAdapter_->GetHardwareCursorStats =
+        reinterpret_cast<GetHardwareCursorStatsFunc>(dlsym(libHandle_, "GetHardwareCursorStats"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -455,7 +483,7 @@ int32_t DisplayComposerService::GetHardwareCursorStats(uint32_t devId, uint32_t&
 {
     DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->EnableHardwareCursorStats, HDF_ERR_NOT_SUPPORT);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetHardwareCursorStats, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiAdapter_->GetHardwareCursorStats(devId, frameCount, vsyncCount);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;

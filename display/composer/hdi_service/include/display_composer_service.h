@@ -85,8 +85,8 @@ private:
     void HidumperInit();
     int32_t LoadVdiSo();
     int32_t LoadVdiAdapter();
-    void LoadVdiFuncV1_0();
-    void LoadVdiFuncV1_1();
+    void LoadVdiFuncPart1();
+    void LoadVdiFuncPart2();
     void ExitService();
     int32_t CreateResponser();
     static void OnHotPlug(uint32_t outputId, bool connected, void* data);
