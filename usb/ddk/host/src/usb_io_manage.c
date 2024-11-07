@@ -100,6 +100,13 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
     return 0;
 }
 
+static void InitializeIoProcess(struct UsbInterfacePool *interfacePool)
+{
+    if (!interfacePool->ioProcessTid) {
+        interfacePool->ioProcessTid = RawGetTid();
+    }
+}
+
 static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
 {
     if (interfacePoolArg == NULL) {
@@ -114,10 +121,7 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
 
     HDF_LOGD("%{public}s, enter recv thread", __func__);
     while (true) {
-        if (!interfacePool->ioProcessTid) {
-            interfacePool->ioProcessTid = RawGetTid();
-        }
-
+        InitializeIoProcess(interfacePool);
         if (interfacePool->device == NULL) {
             HDF_LOGE("%{public}s:%{public}d interfacePool->device is NULL!", __func__, __LINE__);
             OsalMSleep(USB_IO_SLEEP_MS_TIME);
@@ -141,6 +145,11 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
         }
 
         ret = RawHandleRequest(interfacePool->device->devHandle);
+        if (ret == HDF_DEV_ERR_NO_DEVICE) {
+            HDF_LOGE("%{public}s dev is not found ret: %{public}d", __func__, ret);
+            break;
+        }
+
         if (ret < 0) {
             HDF_LOGE("%{public}s RawHandleRequest failed ret: %{public}d", __func__, ret);
             OsalMSleep(USB_IO_SLEEP_MS_TIME);
