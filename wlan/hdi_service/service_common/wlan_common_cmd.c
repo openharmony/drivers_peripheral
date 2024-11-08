@@ -449,6 +449,7 @@ int32_t WlanInterfaceGetIfNamesByChipId(struct IWlanInterface *self, uint8_t chi
 
     if (name != NULL) {
         if (strcpy_s(ifName, ifNameLen, name) != EOK) {
+            free(name);
             HDF_LOGE("%{public}s: copy ifName failed!", __func__);
             return HDF_FAILURE;
         }
