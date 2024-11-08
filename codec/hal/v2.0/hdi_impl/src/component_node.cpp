@@ -183,6 +183,10 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
         return OMX_ErrorInvalidComponent;
     }
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
+    if (comType->ComponentTunnelRequest == nullptr) {
+        CODEC_LOGE("The requested function is not implemented.");
+        return OMX_ErrorNotImplemented;
+    }
     unsigned long tunneledComp = static_cast<unsigned long>(omxHandleTypeTunneledComp);
     return comType->ComponentTunnelRequest(comp_, port, reinterpret_cast<OMX_HANDLETYPE>(tunneledComp),
         tunneledPort, tunnelSetup);
@@ -223,6 +227,10 @@ int32_t ComponentNode::ComponentRoleEnum(uint8_t *role, uint32_t roleLen, uint32
     }
     uint8_t omxRole[ROLE_MAX_LEN] = {0};
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
+    if (comType->ComponentRoleEnum == nullptr) {
+        CODEC_LOGE("The requested function is not implemented.");
+        return OMX_ErrorNotImplemented;
+    }
     int32_t err = comType->ComponentRoleEnum(comp_, omxRole, index);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("ComponentRoleEnum ret err [0x%{public}x]", err);
