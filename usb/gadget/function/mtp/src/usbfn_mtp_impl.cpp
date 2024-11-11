@@ -179,7 +179,7 @@ void UsbfnMtpImpl::UsbMtpPortReleaseRxReq(struct UsbMtpPort *mtpPort, struct Usb
 {
     std::lock_guard<std::mutex> guard(asyncMutex_);
 
-    if (mtpPort->suspended == true) {
+    if (mtpPort->suspended) {
         return;
     }
     DListRemove(&req->list);
@@ -191,7 +191,7 @@ void UsbfnMtpImpl::UsbMtpPortReleaseTxReq(struct UsbMtpPort *mtpPort, struct Usb
 {
     std::lock_guard<std::mutex> guard(asyncMutex_);
 
-    if (mtpPort->suspended == true) {
+    if (mtpPort->suspended) {
         return;
     }
     DListRemove(&req->list);
@@ -1171,7 +1171,7 @@ int32_t UsbfnMtpImpl::Read(std::vector<uint8_t> &data)
     int32_t ret = ReadImpl(data);
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
         HDF_LOGE("%{public}s: running, states is ecanceled", __func__);
-        ret = HDF_DEV_ERR_NO_DEVICE;
+        ret = HDF_ERROR_ECANCEL;
     } else if (mtpDev_->mtpState != MTP_STATE_OFFLINE) {
         mtpDev_->mtpState = MTP_STATE_READY;
     }
@@ -1300,13 +1300,13 @@ int32_t UsbfnMtpImpl::Write(const std::vector<uint8_t> &data)
     }
     if (DListIsEmpty(&mtpPort_->writePool)) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
-        HDF_LOGE("%{public}s: yu_test, is empty.", __func__);
+        HDF_LOGE("%{public}s: writePool is empty.", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
     int32_t ret = WriteEx(data, needZLP, xferActual);
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
         HDF_LOGE("%{public}s: running, states is ecanceled", __func__);
-        ret = HDF_DEV_ERR_NO_DEVICE;
+        ret = HDF_ERROR_ECANCEL;
     } else if (mtpDev_->mtpState != MTP_STATE_OFFLINE) {
         mtpDev_->mtpState = MTP_STATE_READY;
     }
@@ -1532,11 +1532,6 @@ int32_t UsbfnMtpImpl::ReceiveFileEx()
         mtpDev_->mtpState = MTP_STATE_READY;
         return mtpDev_->asyncXferFile == ASYNC_XFER_FILE_DONE ? HDF_SUCCESS : HDF_ERR_IO;
     }
-    if (mtpDev_->asyncRecvFileActual != mtpDev_->xferFileLength && mtpDev_->mtpState == MTP_STATE_CANCELED) {
-        HDF_LOGD("%{public}s: user canceled", __func__);
-        mtpDev_->mtpState = MTP_STATE_READY;
-        return HDF_ERROR_ECANCEL;
-    }
     return mtpDev_->asyncRecvFileActual == mtpDev_->xferFileLength ? HDF_SUCCESS : HDF_ERR_IO;
 }
 
@@ -1548,8 +1543,6 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    HDF_LOGD("%{public}s: info: cmd=%{public}d, transid=%{public}d, len=%{public}" PRId64 " offset=%{public}" PRId64
-        ", state=%{public}hhu", __func__, mfs.command, mfs.transactionId, mfs.length, mfs.offset, mtpDev_->mtpState);
 
     if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
@@ -1585,7 +1578,8 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
     }
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
         HDF_LOGE("%{public}s: running, states is ecanceled", __func__);
-        ret = HDF_DEV_ERR_NO_DEVICE;
+        mtpDev_->mtpState = MTP_STATE_READY;
+        ret = HDF_ERROR_ECANCEL;
     } else if (mtpDev_->mtpState != MTP_STATE_OFFLINE) {
         mtpDev_->mtpState = MTP_STATE_READY;
     }
@@ -1623,7 +1617,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, u
 int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
 {
     if (DListIsEmpty(&mtpPort_->writePool)) {
-        HDF_LOGE("%{public}s: yu_test, is empty.", __func__);
+        HDF_LOGE("%{public}s: writePool is empty.", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
     struct DListHead *pool = &mtpPort_->writePool;
@@ -1724,7 +1718,8 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
     int32_t ret = UsbMtpPortSendFileEx();
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
         HDF_LOGE("%{public}s: running, states is ecanceled", __func__);
-        ret = HDF_DEV_ERR_NO_DEVICE;
+        ret = HDF_ERROR_ECANCEL;
+        mtpDev_->mtpState = MTP_STATE_READY;
     } else if (mtpDev_->mtpState != MTP_STATE_OFFLINE) {
         mtpDev_->mtpState = MTP_STATE_READY;
     }
