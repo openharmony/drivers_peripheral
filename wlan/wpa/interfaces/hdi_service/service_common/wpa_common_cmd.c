@@ -31,7 +31,6 @@
 #include "common/defs.h"
 #include "v1_1/iwpa_callback.h"
 #include "v1_1/iwpa_interface.h"
-#include "wpa_client.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <dlfcn.h>
@@ -40,10 +39,10 @@
 
 #define BUF_SIZE 512
 
-pthread_t g_tid;
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;
 const int MAX_NETWORKS_NUM = 100;
+pthread_mutex_t g_interfaceLock = PTHREAD_MUTEX_INITIALIZER;
 
 static WpaSsidField g_wpaSsidFields[] = {
     {DEVICE_CONFIG_SSID, "ssid", QUOTATION_MARKS_FLAG_YES},
@@ -99,85 +98,9 @@ int CalcQuotationMarksFlag(int pos, const char value[WIFI_NETWORK_CONFIG_VALUE_L
     return flag;
 }
 
-int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen)
+pthread_mutex_t *GetInterfaceLock()
 {
-    if (src == NULL || dst == NULL || dstLen == NULL) {
-        HDF_LOGE("%{public}s: Invalid parameter!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    HDF_LOGD("%{public}s: srcLen =%{public}d ", __func__, srcLen);
-    if (srcLen > 0) {
-        *dst = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * srcLen);
-        if (*dst == NULL) {
-            HDF_LOGE("%{public}s: OsalMemCalloc fail!", __func__);
-            return HDF_FAILURE;
-        }
-        if (memcpy_s(*dst, srcLen, src, srcLen) != EOK) {
-            HDF_LOGE("%{public}s: memcpy_s fail!", __func__);
-            OsalMemFree(*dst);
-            *dst = NULL;
-            return HDF_FAILURE;
-        }
-    }
-    *dstLen = srcLen;
-    return HDF_SUCCESS;
-}
-
-struct HdfWpaStubData *HdfWpaStubDriver(void)
-{
-    static struct HdfWpaStubData registerManager;
-    return &registerManager;
-}
-
-int32_t WpaInterfaceScan(struct IWpaInterface *self, const char *ifName)
-{
-    (void)self;
-    HDF_LOGI("enter %{public}s", __func__);
-    if (ifName == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
-    if (pStaIfc == NULL) {
-        HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
-        return HDF_FAILURE;
-    }
-    ScanSettings settings = {0};
-    settings.scanStyle = SCAN_TYPE_LOW_SPAN;
-    int ret = pStaIfc->wpaCliCmdScan(pStaIfc, &settings);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: StartScan fail! ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-    if (ret == WIFI_HAL_SCAN_BUSY) {
-        HDF_LOGE("%{public}s: StartScan return scan busy", __func__);
-        return HDF_FAILURE;
-    }
-    HDF_LOGI("%{public}s: StartScan successfully!", __func__);
-    return HDF_SUCCESS;
-}
-
-int32_t WpaInterfaceScanResult(struct IWpaInterface *self, const char *ifName, unsigned char *resultBuf,
-     uint32_t *resultBufLen)
-{
-    HDF_LOGI("enter %{public}s", __func__);
-    (void)self;
-    if (ifName == NULL || resultBuf == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
-    if (pStaIfc == NULL) {
-        HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
-        return HDF_FAILURE;
-    }
-    int ret = pStaIfc->wpaCliCmdScanInfo(pStaIfc, resultBuf, resultBufLen);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: WpaCliCmdScanInfo2 fail! ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-    HDF_LOGI("%{public}s: Get scan result successfully!", __func__);
-    return HDF_SUCCESS;
+    return &g_interfaceLock;
 }
 
 int32_t WpaInterfaceAddNetwork(struct IWpaInterface *self, const char *ifName, int32_t *networkId)
@@ -188,17 +111,21 @@ int32_t WpaInterfaceAddNetwork(struct IWpaInterface *self, const char *ifName, i
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdAddNetworks(pStaIfc);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: WpaInterfaceAddNetwork fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
     *networkId = ret;
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: add network success networkId = %{public}d", __func__, *networkId);
     return HDF_SUCCESS;
 }
@@ -211,17 +138,20 @@ int32_t WpaInterfaceRemoveNetwork(struct IWpaInterface *self, const char *ifName
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdRemoveNetwork(pStaIfc, networkId);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: WpaInterfaceRemoveNetwork fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: remove network success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -234,16 +164,20 @@ int32_t WpaInterfaceDisableNetwork(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdDisableNetwork(pStaIfc, networkId);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: WpaInterfaceDisableNetwork fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: WpaInterfaceDisableNetwork success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -256,23 +190,16 @@ int32_t WpaInterfaceSetNetwork(struct IWpaInterface *self, const char *ifName,
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    HDF_LOGI("enter %{public}s networkId = %{public}d", __func__, networkId);
-    if (name != NULL) {
-        HDF_LOGI("%{public}s name = %{private}s", __func__, name);
-    }
-    if (value != NULL) {
-        HDF_LOGI("%{public}s value = %{private}s", __func__, value);
-    }
+    HDF_LOGI("enter %{public}s networkId = %{public}d name = %{private}s value = %{private}s", __func__, networkId,
+        name, value);
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
-    struct WpaSetNetworkArgv conf;
-    if (memset_s(&conf, sizeof(conf), 0, sizeof(conf)) != 0) {
-        HDF_LOGE("%{public}s: memset_s conf fail", __func__);
-        return HDF_FAILURE;
-    }
+    struct WpaSetNetworkArgv conf = {0};
     conf.id = networkId;
     int pos = -1;
     for (int i = 0; i < (int)(sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0])); ++i) {
@@ -283,18 +210,22 @@ int32_t WpaInterfaceSetNetwork(struct IWpaInterface *self, const char *ifName,
         }
     }
     if (pos < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s SetNetwork: unsupported name  %{public}s", __func__, name);
         return HDF_FAILURE;
     }
     if (strncpy_s(conf.value, sizeof(conf.value), value, strlen(value)) != 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s strncpy_s conf.value fail", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdSetNetwork(pStaIfc, &conf);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdSetNetwork fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdSetNetwork sucess ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -303,7 +234,7 @@ static int32_t WpaFillWpaListNetworkParam(struct WifiNetworkInfo  *wifiWpaNetwor
     struct HdiWifiWpaNetworkInfo *hdiWifiWpaNetworkInfo)
 {
     int32_t ret = HDF_SUCCESS;
-
+ 
     if (wifiWpaNetworkInfo == NULL || hdiWifiWpaNetworkInfo == NULL) {
         HDF_LOGE("%{public}s: wifiWpaNetworkInfo or hdiWifiWpaNetworkInfo is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -355,20 +286,24 @@ int32_t WpaInterfaceListNetworks(struct IWpaInterface *self, const char *ifName,
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     int size = MAX_NETWORKS_NUM;
     WifiNetworkInfo *infos = (WifiNetworkInfo *)calloc(size, sizeof(WifiNetworkInfo));
     if (infos == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: info = NULL", __func__);
         return HDF_FAILURE;
     }
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         free(infos);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdListNetworks(pStaIfc, infos, &size);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdListNetworks fail! ret = %{public}d", __func__, ret);
         free(infos);
         return HDF_FAILURE;
@@ -382,6 +317,7 @@ int32_t WpaInterfaceListNetworks(struct IWpaInterface *self, const char *ifName,
     }
     *networkInfoLen = size;
     free(infosTmp);
+    pthread_mutex_unlock(&g_interfaceLock);
     return HDF_SUCCESS;
 }
 
@@ -394,17 +330,20 @@ int32_t WpaInterfaceSelectNetwork(struct IWpaInterface *self, const char *ifName
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdSelectNetwork(pStaIfc, networkId);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdSelectNetwork fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdSelectNetwork success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -417,17 +356,20 @@ int32_t WpaInterfaceEnableNetwork(struct IWpaInterface *self, const char *ifName
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdEnableNetwork(pStaIfc, networkId);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdEnableNetwork fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdEnableNetwork success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -440,16 +382,20 @@ int32_t WpaInterfaceReconnect(struct IWpaInterface *self, const char *ifName)
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdReconnect(pStaIfc);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdReconnect fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdReconnect success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -462,17 +408,20 @@ int32_t WpaInterfaceDisconnect(struct IWpaInterface *self, const char *ifName)
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdDisconnect(pStaIfc);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdDisconnect fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdDisconnect success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -485,22 +434,25 @@ int32_t WpaInterfaceSetPowerSave(struct IWpaInterface *self, const char *ifName,
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdPowerSave(pStaIfc, enable);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdPowerSave fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdPowerSave success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
 
-int32_t  WpaInterfaceAutoConnect(struct IWpaInterface *self, const char *ifName, const int32_t enable)
+int32_t WpaInterfaceAutoConnect(struct IWpaInterface *self, const char *ifName, const int32_t enable)
 {
     (void)self;
     HDF_LOGI("enter %{public}s enable = %{public}d", __func__, enable);
@@ -508,19 +460,39 @@ int32_t  WpaInterfaceAutoConnect(struct IWpaInterface *self, const char *ifName,
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdSetAutoConnect(pStaIfc, enable);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdSetAutoConnect fail! ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdSetAutoConnect success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
+}
+
+static bool GetWpaCmdStatus(uint8_t** dst, uint32_t* dstLen, char* src)
+{
+    if (strcmp(src, "") != 0) {
+        *dst = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (strlen(src) + 1));
+        if (*dst == NULL) {
+            HDF_LOGE("%{public}s OsalMemCalloc is NULL", __func__);
+            *dstLen = 0;
+            return false;
+        }
+        *dstLen = strlen(src);
+        if (strcpy_s((char*)(*dst), strlen(src) + 1, src) != EOK) {
+            HDF_LOGE("%{public}s strcpy failed", __func__);
+        }
+    }
+    return true;
 }
 
 static void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWpaCmdStatus *status)
@@ -531,31 +503,9 @@ static void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWp
     }
     status->id = halStatus->id;
     status->freq = halStatus->freq;
-    if (strcmp(halStatus->keyMgmt, "") != 0) {
-        HDF_LOGI("%{public}s key include key_mgmt value=%{private}s", __func__, halStatus->keyMgmt);
-        status->keyMgmt = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (strlen(halStatus->keyMgmt) + 1));
-        if (status->keyMgmt == NULL) {
-            HDF_LOGE("%{public}s status->keyMgmt is NULL", __func__);
-            status->keyMgmtLen = 0;
-            return;
-        }
-        status->keyMgmtLen = strlen(halStatus->keyMgmt);
-        if (strcpy_s((char *)status->keyMgmt, strlen(halStatus->keyMgmt) + 1, halStatus->keyMgmt) != EOK) {
-            HDF_LOGE("%{public}s strcpy failed", __func__);
-        }
-    }
-    if (strcmp(halStatus->ssid, "") != 0) {
-        HDF_LOGI("%{public}s key include ssid value=%{private}s", __func__, halStatus->ssid);
-        status->ssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (strlen(halStatus->ssid) + 1));
-        if (status->ssid == NULL) {
-            HDF_LOGE("%{public}s status->ssid is NULL", __func__);
-            status->ssidLen = 0;
-            return;
-        }
-        status->ssidLen = strlen(halStatus->ssid);
-        if (strcpy_s((char *)status->ssid, strlen(halStatus->ssid) + 1, halStatus->ssid) != EOK) {
-            HDF_LOGE("%{public}s strcpy failed", __func__);
-        }
+    if (GetWpaCmdStatus(&(status->keyMgmt), &(status->keyMgmtLen), halStatus->keyMgmt) == false ||
+        GetWpaCmdStatus(&(status->ssid), &(status->ssidLen), halStatus->ssid) == false) {
+        return;
     }
     if (strcmp(halStatus->address, "") != 0) {
         HDF_LOGI("%{public}s key include address value=%{private}s", __func__, halStatus->address);
@@ -596,17 +546,21 @@ int32_t WpaInterfaceWifiStatus(struct IWpaInterface *self, const char *ifName, s
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     struct WpaHalCmdStatus halStatus;
     if (memset_s(&halStatus, sizeof(halStatus), 0, sizeof(halStatus)) != EOK) {
+        pthread_mutex_unlock(&g_interfaceLock);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdStatus(pStaIfc, ifName, &halStatus);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdStatus fail! ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
@@ -621,6 +575,7 @@ int32_t WpaInterfaceWifiStatus(struct IWpaInterface *self, const char *ifName, s
     if (status->bssidLen == 0) {
         HDF_LOGE("%{public}s key not include bssid", __func__);
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: WpaInterfaceWifiStatus success ", __func__);
     return HDF_SUCCESS;
 }
@@ -633,35 +588,22 @@ int32_t WpaInterfaceSaveConfig(struct IWpaInterface *self, const char *ifName)
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdSaveConfig(pStaIfc);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdSaveConfig fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdSaveConfig success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
-}
-
-const char *macToStr(const u8 *addr)
-{
-    const int macAddrIndexOne = 0;
-    const int macAddrIndexTwo = 1;
-    const int macAddrIndexThree = 2;
-    const int macAddrIndexFour = 3;
-    const int macAddrIndexFive = 4;
-    const int macAddrIndexSix = 5;
-    static char macToStr[WIFI_BSSID_LENGTH];
-    if (snprintf_s(macToStr, sizeof(macToStr), sizeof(macToStr)-1, "%02x:%02x:%02x:%02x:%02x:%02x",
-        addr[macAddrIndexOne], addr[macAddrIndexTwo], addr[macAddrIndexThree], addr[macAddrIndexFour],
-        addr[macAddrIndexFive], addr[macAddrIndexSix]) < 0) {
-        return NULL;
-    }
-    return macToStr;
 }
 
 int32_t WpaInterfaceWpsPbcMode(struct IWpaInterface *self, const char *ifName, const struct HdiWifiWpsParam *wpaParam)
@@ -672,8 +614,10 @@ int32_t WpaInterfaceWpsPbcMode(struct IWpaInterface *self, const char *ifName, c
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
@@ -685,8 +629,9 @@ int32_t WpaInterfaceWpsPbcMode(struct IWpaInterface *self, const char *ifName, c
         config.anyFlag = wpaParam->anyFlag;
         config.multiAp = wpaParam->multiAp;
         if (wpaParam->bssidLen > 0) {
-            if (strncpy_s(config.bssid, sizeof(config.bssid),(const char *)wpaParam->bssid,
+            if (strncpy_s(config.bssid, sizeof(config.bssid), (const char *)wpaParam->bssid,
                 wpaParam->bssidLen) != 0) {
+                pthread_mutex_unlock(&g_interfaceLock);
                 HDF_LOGE("%{public}s: strncpy_s bssid fail", __func__);
                 return HDF_FAILURE;
             }
@@ -694,12 +639,15 @@ int32_t WpaInterfaceWpsPbcMode(struct IWpaInterface *self, const char *ifName, c
         ret = pStaIfc->wpaCliCmdWpsPbc(pStaIfc, &config);
     }
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdWpsPbc fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     } else if (ret == WIFI_HAL_PBC_OVERLAP) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdWpsPbc fail PBC_OVERLAP ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdWpsPbc success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -714,22 +662,27 @@ int32_t WpaInterfaceWpsPinMode(struct IWpaInterface *self, const char *ifName,
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     struct WpaWpsPinArgv config = {{0}, {0}};
-    if (strncpy_s(config.bssid, sizeof(config.bssid), macToStr(wpaParam->bssid),
-        strlen(macToStr(wpaParam->bssid))) != 0) {
+    if (strncpy_s(config.bssid, sizeof(config.bssid), MacToStr(wpaParam->bssid),
+        strlen(MacToStr(wpaParam->bssid))) != 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: strncpy_s bssid fail", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdWpsPin(pStaIfc, &config, pinCode);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdWpsPin fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdWpsPin success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -742,18 +695,21 @@ int32_t WpaInterfaceWpsCancel(struct IWpaInterface *self, const char *ifName)
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
 
     int ret = pStaIfc->wpaCliCmdWpsCancel(pStaIfc);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdWpsCancel fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdWpsCancel success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -768,16 +724,20 @@ int32_t WpaInterfaceGetCountryCode(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdGetCountryCode(pStaIfc, countryCode, countryCodeLen);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdGetCountryCode fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdGetCountryCode success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -792,22 +752,27 @@ int32_t WpaInterfaceGetNetwork(struct IWpaInterface *self, const char *ifName,
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     struct WpaGetNetworkArgv getNetwork = {0};
     getNetwork.id = networkId;
     if (strncpy_s(getNetwork.param, sizeof(getNetwork.param), param, strlen(param)) != 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: strncpy_s param fail", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdGetNetwork(pStaIfc, &getNetwork, value, valueLen);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdGetNetwork fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdGetNetwork success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -820,16 +785,20 @@ int32_t WpaInterfaceBlocklistClear(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdWpaBlockListClear(pStaIfc);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdWpaBlockListClear fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdWpaBlockListClear success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -842,16 +811,20 @@ int32_t WpaInterfaceSetSuspendMode(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdWpaSetSuspendMode(pStaIfc, mode);
     if (ret != 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdWpaSetSuspendMode failed!, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdWpaSetSuspendMode success, ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -865,17 +838,20 @@ int32_t WpaInterfaceGetConnectionCapabilities(struct IWpaInterface *self, const 
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdGetConnectionCapabilities(pStaIfc, connectionCap);
     if (ret != 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdGetConnectionCapabilities failed!, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdGetConnectionCapabilities success, ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -888,19 +864,22 @@ int32_t WpaInterfaceGetScanSsid(struct IWpaInterface *self, const char *ifName, 
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int scanSsid = 0;
     int ret = pStaIfc->wpaCliCmdGetScanSsid(pStaIfc, &scanSsid);
     if (ret != 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdGetScanSsid failed!, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
     *enable = (scanSsid == 1);
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdGetScanSsid success, scanSsid = %{public}d ", __func__, scanSsid);
     return HDF_SUCCESS;
 }
@@ -914,17 +893,20 @@ int32_t WpaInterfaceGetPskPassphrase(struct IWpaInterface *self, const char *ifN
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdGetPskPassphrase(pStaIfc, psk, pskLen);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdGetPskPassphrase failed!,ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdGetPskPassphrase success!,ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -937,17 +919,20 @@ int32_t WpaInterfaceGetPsk(struct IWpaInterface *self, const char *ifName, uint8
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-	
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdGetPsk(pStaIfc, psk, pskLen);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdGetPsk failed!,ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdGetPsk success!,ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -961,16 +946,20 @@ int32_t WpaInterfaceGetWepKey(struct IWpaInterface *self, const char *ifName, in
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdWepKey(pStaIfc, keyIdx, wepKey, wepKeyLen);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdWepKey failed!,ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdWepKey success!,ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -983,17 +972,20 @@ int32_t WpaInterfaceGetWepTxKeyIdx(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdWepKeyTxKeyIdx(pStaIfc, keyIdx);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdWepKeyTxKeyIdx failed!,ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdWepKeyTxKeyIdx success!,*keyIdx = %{public}d", __func__, *keyIdx);
     return HDF_SUCCESS;
 }
@@ -1006,16 +998,20 @@ int32_t WpaInterfaceGetRequirePmf(struct IWpaInterface *self, const char *ifName
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdGetRequirePmf(pStaIfc, enable);
     if (ret != 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdGetRequirePmf failed!, ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdGetRequirePmf success, ret=%{public}d  enable=%{public}d ", __func__, ret, *enable);
     return HDF_SUCCESS;
 }
@@ -1028,16 +1024,20 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdSetCountryCode(pStaIfc, countryCode);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdSetCountryCode failed!, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdSetCountryCode success, ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -1045,9 +1045,11 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
 static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
 {
     HDF_LOGI("enter %{public}s ", __func__);
+    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
     if (pWpaInterface == NULL) {
         HDF_LOGE("%{public}s: Get wpa global interface failed!", __func__);
+        pthread_mutex_unlock(&g_interfaceLock);
         return;
     }
     int ret = pWpaInterface->wpaCliTerminate();
@@ -1058,6 +1060,9 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
     }
     ReleaseWpaGlobalInterface();
     HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
+    ReleaseWifiStaInterface(0);
+    HDF_LOGI("%{public}s: call ReleaseWifiStaInterface finish", __func__);
+    pthread_mutex_unlock(&g_interfaceLock);
 }
 
 static struct RemoteServiceDeathRecipient g_deathRecipient = {
@@ -1081,11 +1086,11 @@ static void AddDeathRecipientForService(struct IWpaCallback *cbFunc)
     HdfRemoteServiceAddDeathRecipient(remote, &g_deathRecipient.recipient);
 }
 
-static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self)
+static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
 {
     struct HdfWpaRemoteNode *pos = NULL;
     struct DListHead *head = &HdfWpaStubDriver()->remoteListHead;
-
+ 
     if (self == NULL) {
         HDF_LOGE("%{public}s:self == NULL", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1106,33 +1111,17 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self)
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
     DListInsertTail(&newRemoteNode->node, head);
-    AddDeathRecipientForService(self);
-    return HDF_SUCCESS;
-}
-
-static void HdfWpaDelRemoteObj(struct IWpaCallback *self)
-{
-    struct HdfWpaRemoteNode *pos = NULL;
-    struct HdfWpaRemoteNode *tmp = NULL;
-    struct DListHead *head = &HdfWpaStubDriver()->remoteListHead;
-
-    DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, head, struct HdfWpaRemoteNode, node) {
-        if (pos->service->index == self->AsObject(self)->index) {
-            DListRemove(&(pos->node));
-            IWpaCallbackRelease(pos->callbackObj);
-            OsalMemFree(pos);
-            pos = NULL;
-            break;
-        }
+    if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0) {
+        AddDeathRecipientForService(self);
     }
-    IWpaCallbackRelease(self);
+    return HDF_SUCCESS;
 }
 
 static int32_t WpaFillWpaDisconnectParam(struct WpaDisconnectParam *disconnectParam,
     struct HdiWpaDisconnectParam *hdiWpaDisconnectParam)
 {
     int32_t ret = HDF_SUCCESS;
-
+ 
     if (disconnectParam == NULL || hdiWpaDisconnectParam == NULL) {
         HDF_LOGE("%{public}s: disconnectParam or hdiWpaDisconnectParam is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1157,7 +1146,7 @@ static int32_t WpaFillWpaConnectParam(struct WpaConnectParam *connectParam,
     struct HdiWpaConnectParam *hdiWpaConnectParam)
 {
     int32_t ret = HDF_SUCCESS;
-
+ 
     if (connectParam == NULL || hdiWpaConnectParam == NULL) {
         HDF_LOGE("%{public}s: connectParam or hdiWpaConnectParam is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1181,7 +1170,7 @@ static int32_t WpaFillWpaBssidChangedParam(struct WpaBssidChangedParam *bssidCha
     struct HdiWpaBssidChangedParam *hdiWpaBssidChangedParam)
 {
     int32_t ret = HDF_SUCCESS;
-
+ 
     if (bssidChangedParam == NULL || hdiWpaBssidChangedParam == NULL) {
         HDF_LOGE("%{public}s: bssidChangedParam or hdiWpaBssidChangedParam is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1609,7 +1598,6 @@ static int32_t WpaFillWpaVendorExtInfo(struct WpaVendorExtInfo *wpaVendorExtInfo
         HDF_LOGE("%{public}s: wpaVendorExtInfo or wpaVendorInfo is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
     wpaVendorInfo->data = NULL;
     wpaVendorInfo->type = wpaVendorExtInfo->type;
     wpaVendorInfo->freq = wpaVendorExtInfo->freq;
@@ -1849,19 +1837,21 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
     int32_t ret = HDF_FAILURE;
 
     (void)self;
+    pthread_mutex_lock(&g_interfaceLock);
     if (cbFunc == NULL || ifName == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     int nameLen = strlen(ifName);
     if (IsSockRemoved(ifName, nameLen) == 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("invalid opt");
         return HDF_FAILURE;
     }
-    (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     do {
         HDF_LOGE("%{public}s: call HdfWpaAddRemoteObj", __func__);
-        ret = HdfWpaAddRemoteObj(cbFunc);
+        ret = HdfWpaAddRemoteObj(cbFunc, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: HdfSensorAddRemoteObj false", __func__);
             break;
@@ -1873,7 +1863,7 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
             break;
         }
     } while (0);
-    (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
+    pthread_mutex_unlock(&g_interfaceLock);
     return ret;
 }
 
@@ -1881,221 +1871,26 @@ int32_t WpaInterfaceUnregisterEventCallback(struct IWpaInterface *self, struct I
     const char *ifName)
 {
     (void)self;
+    pthread_mutex_lock(&g_interfaceLock);
     if (cbFunc == NULL || ifName == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
-    HdfWpaDelRemoteObj(cbFunc);
+    int nameLen = strlen(ifName);
+    if (IsSockRemoved(ifName, nameLen) == 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
+        HDF_LOGE("invalid opt");
+        return HDF_FAILURE;
+    }
     if (DListIsEmpty(&HdfWpaStubDriver()->remoteListHead)) {
         int32_t ret = WpaUnregisterEventCallback(HdfWpaCallbackFun, WIFI_WPA_TO_HAL_CLIENT, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
         }
     }
-    (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
-    return HDF_SUCCESS;
-}
-
-static void SplitCmdString(const char *startCmd, struct StWpaMainParam *pParam)
-{
-    if (pParam == NULL) {
-        return;
-    }
-    if (startCmd == NULL) {
-        pParam->argc = 0;
-        return;
-    }
-    const char *p = startCmd;
-    int i = 0;
-    int j = 0;
-    while (*p != '\0') {
-        if (*p == ' ') {
-            if (j <= MAX_WPA_MAIN_ARGV_LEN - 1) {
-                pParam->argv[i][j] = '\0';
-            } else {
-                pParam->argv[i][MAX_WPA_MAIN_ARGV_LEN - 1] = '\0';
-            }
-            ++i;
-            j = 0;
-            if (i >= MAX_WPA_MAIN_ARGC_NUM) {
-                break;
-            }
-        } else {
-            if (j < MAX_WPA_MAIN_ARGV_LEN - 1) {
-                pParam->argv[i][j] = *p;
-                ++j;
-            }
-        }
-        ++p;
-    }
-    if (i >= MAX_WPA_MAIN_ARGC_NUM) {
-        pParam->argc = MAX_WPA_MAIN_ARGC_NUM;
-    } else {
-        pParam->argc = i + 1;
-    }
-    return;
-}
-
-
-static void *WpaThreadMain(void *p)
-{
-    const char *startCmd;
-    struct StWpaMainParam param = {0};
-    char *tmpArgv[MAX_WPA_MAIN_ARGC_NUM] = {0};
-
-    if (p == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
-        return NULL;
-    }
-    startCmd = (const char *)p;
-    SplitCmdString(startCmd, &param);
-    for (int i = 0; i < param.argc; i++) {
-        tmpArgv[i] = param.argv[i];
-    }
-    int ret = wpa_main(param.argc, tmpArgv);
-    HDF_LOGI("%{public}s: run wpa_main ret:%{public}d.", __func__, ret);
-    return NULL;
-}
-
-static int32_t StartWpaSupplicant(const char *moduleName, const char *startCmd)
-{
-    int32_t ret;
-
-    if (moduleName == NULL || startCmd == NULL) {
-        HDF_LOGE("%{public}s input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM ;
-    }
-    ret = pthread_create(&g_tid, NULL, WpaThreadMain, (void *)startCmd);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Create wpa thread failed, error code: %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-    pthread_setname_np(g_tid, "WpaMainThread");
-    HDF_LOGI("%{public}s: pthread_create successfully.", __func__);
-    usleep(WPA_SLEEP_TIME);
-    WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
-    if (pWpaInterface == NULL) {
-        HDF_LOGE("Get wpa interface failed!");
-        return HDF_FAILURE;
-    }
-    if (pWpaInterface->wpaCliConnect(pWpaInterface) < 0) {
-        HDF_LOGE("Failed to connect to wpa!");
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, const char *confName)
-{
-    (void)self;
-    if (ifName == NULL || confName == NULL) {
-        HDF_LOGE("%{public}s input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM ;
-    }
-    HDF_LOGI("enter %{public}s Ready to add iface, ifName: %{public}s, confName: %{public}s",
-        __func__, ifName, confName);
-    WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
-    if (pWpaInterface == NULL) {
-        HDF_LOGE("Get wpa interface failed!");
-        return HDF_FAILURE;
-    }
-    AddInterfaceArgv addInterface = {0};
-    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
-        if (strcpy_s(addInterface.name, sizeof(addInterface.name) - 1, ifName) != EOK ||
-            strcpy_s(addInterface.confName, sizeof(addInterface.confName) - 1,
-            CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != EOK) {
-            return HDF_FAILURE;
-        }
-    } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
-        if (strcpy_s(addInterface.name, sizeof(addInterface.name) - 1, ifName) != EOK ||
-            strcpy_s(addInterface.confName, sizeof(addInterface.confName) - 1,
-            CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
-            return HDF_FAILURE;
-        }
-    } else if (strncmp(ifName, "chba0", strlen("chba0")) == 0) {
-        if (strcpy_s(addInterface.name, sizeof(addInterface.name) - 1, ifName) != EOK ||
-            strcpy_s(addInterface.confName, sizeof(addInterface.confName) - 1,
-            CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
-            return HDF_FAILURE;
-        }
-    } else {
-        HDF_LOGE("%{public}s Wrong ifname!", __func__);
-        return HDF_FAILURE;
-    }
-    if (pWpaInterface->wpaCliAddIface(pWpaInterface, &addInterface, true) < 0) {
-        HDF_LOGE("%{public}s Failed to add wpa iface!", __func__);
-        return HDF_FAILURE;
-    }
-    HDF_LOGI("%{public}s Add interface finish", __func__);
-    return HDF_SUCCESS;
-}
-
-int32_t WpaInterfaceRemoveWpaIface(struct IWpaInterface *self, const char *ifName)
-{
-    (void)self;
-    if (ifName == NULL) {
-        HDF_LOGE("%{public}s input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM ;
-    }
-    HDF_LOGI("enter %{public}s Ready to Remove iface, ifName: %{public}s", __func__, ifName);
-    int ret = -1;
-    WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
-    if (pWpaInterface == NULL) {
-        HDF_LOGE("Get wpa interface failed!");
-        return HDF_FAILURE;
-    }
-    ret = pWpaInterface->wpaCliRemoveIface(pWpaInterface, ifName);
-    HDF_LOGI("%{public}s Remove wpa iface finish, ifName: %{public}s ret = %{public}d", __func__, ifName, ret);
-    return (ret == 0 ? HDF_SUCCESS : HDF_FAILURE);
-}
-
-static int32_t StopWpaSupplicant(void)
-{
-    /*Do nothing here,waiting for IWpaInterfaceReleaseInstance to destroy the wpa service. */
-    WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
-    if (pWpaInterface == NULL) {
-        HDF_LOGE("%{public}s: Get wpa global interface failed!", __func__);
-        return HDF_FAILURE;
-    }
-    int ret = pWpaInterface->wpaCliTerminate();
-    if (ret != 0) {
-        HDF_LOGE("%{public}s: wpaCliTerminate failed!", __func__);
-    } else {
-        HDF_LOGI("%{public}s: wpaCliTerminate suc!", __func__);
-    }
-    ReleaseWpaGlobalInterface();
-    HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
-    return HDF_SUCCESS;
-}
-
-int32_t WpaInterfaceStart(struct IWpaInterface *self)
-{
-    int32_t ret;
-
-    (void)self;
-    HDF_LOGI("enter %{public}s: wpa_supplicant begin to start", __func__);
-    ret = StartWpaSupplicant(WPA_SUPPLICANT_NAME, START_CMD);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: StartWpaSupplicant failed, error code: %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-    HDF_LOGI("%{public}s: wpa_supplicant start successfully!", __func__);
-    return HDF_SUCCESS;
-}
-
-int32_t WpaInterfaceStop(struct IWpaInterface *self)
-{
-    int32_t ret;
-
-    (void)self;
-    HDF_LOGI("enter %{public}s: wpa_supplicant begin to stop", __func__);
-    ret = StopWpaSupplicant();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Wifi stop failed, error code: %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-    ReleaseWifiStaInterface(0);
-    HDF_LOGI("%{public}s: wpa_supplicant stop successfully!", __func__);
+    HdfWpaDelRemoteObj(cbFunc);
+    pthread_mutex_unlock(&g_interfaceLock);
     return HDF_SUCCESS;
 }
 
@@ -2103,20 +1898,25 @@ int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName)
 {
     (void)self;
     HDF_LOGI("enter %{public}s ", __func__);
+    pthread_mutex_lock(&g_interfaceLock);
     if (ifName == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdReassociate(pStaIfc);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: wpaCliCmdReassociate fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: wpaCliCmdReassociate success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
@@ -2125,20 +1925,41 @@ int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, 
 {
     (void)self;
     HDF_LOGI("enter %{public}s", __func__);
+    pthread_mutex_lock(&g_interfaceLock);
     if (ifName == NULL || cmd == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
     if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
     int ret = pStaIfc->wpaCliCmdStaShellCmd(pStaIfc, cmd);
     if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("%{public}s: fail ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_interfaceLock);
     HDF_LOGI("%{public}s: success", __func__);
     return HDF_SUCCESS;
+}
+
+void ClearHdfWpaRemoteObj(void)
+{
+    struct HdfWpaRemoteNode *pos = NULL;
+    struct HdfWpaRemoteNode *tmp = NULL;
+    struct DListHead *head = &HdfWpaStubDriver()->remoteListHead;
+ 
+    (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
+    DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, head, struct HdfWpaRemoteNode, node) {
+        DListRemove(&(pos->node));
+        IWpaCallbackRelease(pos->callbackObj);
+        OsalMemFree(pos);
+        pos = NULL;
+    }
+    (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
 }
