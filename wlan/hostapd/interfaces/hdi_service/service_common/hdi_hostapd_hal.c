@@ -78,7 +78,7 @@ static char g_apIfaceName[IFACENAME_LEN];
 static char g_apCfgName[CFGNAME_LEN];
 #endif
 
-static pthread_mutex_t g_mutex;
+static pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int InitCfg(const char *ifaceName)
 {
