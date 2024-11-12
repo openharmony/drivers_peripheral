@@ -1931,8 +1931,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_047, TestSize.Level1)
     // Preview streamInfo
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.width_ = 1280;
-    cameraTest->streamInfoV1_1->v1_0.height_ = 960;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
     cameraTest->streamInfoVideo = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
