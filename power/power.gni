@@ -13,50 +13,12 @@
 
 declare_args() {
   drivers_peripheral_power_wakeup_cause_path = false
-}
-
-declare_args() {
   drivers_peripheral_power_suspend_with_tag = false
-}
-
-declare_args() {
   drivers_peripheral_power_enable_s4 = false
-}
-
-declare_args() {
   drivers_peripheral_power_faster_retry_of_sleep = false
-}
-
-declare_args() {
   drivers_peripheral_power_slower_retry_of_sleep = false
-}
-
-if (!defined(global_parts_info) ||
-    defined(global_parts_info.commonlibrary_c_utils)) {
-  has_power_c_utils_part = true
-} else {
-  has_power_c_utils_part = false
-}
-
-if (!defined(global_parts_info) ||
-    defined(global_parts_info.customization_config_policy)) {
-  has_power_config_policy_part = true
-  cflags_cc = [ "-DHAS_POWER_CONFIG_POLICY_PART" ]
-} else {
-  has_power_config_policy_part = false
-}
-
-if (!defined(global_parts_info) ||
-    defined(global_parts_info.hiviewdfx_hicollie)) {
-  has_power_xcollie_part = true
-} else {
-  has_power_xcollie_part = false
-}
-
-if (!defined(global_parts_info) ||
-    defined(global_parts_info.hiviewdfx_hisysevent)) {
-  has_power_hisysevent_part = true
-  cflags_cc += [ "-DHAS_POWER_HISYSEVENT_PART" ]
-} else {
-  has_power_hisysevent_part = false
+  drivers_peripheral_power_hicollie = false
+  drivers_peripheral_power_config_policy = true
+  drivers_peripheral_power_c_utils = true
+  drivers_peripheral_power_hisysevent = true
 }

@@ -11,24 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (!defined(global_parts_info) ||
-    defined(global_parts_info.customization_config_policy)) {
-  has_battery_config_policy_part = true
-  cflags_cc = [ "-DHAS_BATTERY_CONFIG_POLICY_PART" ]
-} else {
-  has_battery_config_policy_part = false
-}
-
-if (!defined(global_parts_info) ||
-    defined(global_parts_info.commonlibrary_c_utils)) {
-  has_battery_c_utils_part = true
-} else {
-  has_battery_c_utils_part = false
-}
-
-if (!defined(global_parts_info) ||
-    defined(global_parts_info.hiviewdfx_hicollie)) {
-  has_battery_xcollie_part = true
-} else {
-  has_battery_xcollie_part = false
+declare_args() {
+  drivers_peripheral_battery_feature_config_policy = true
+  drivers_peripheral_battery_feature_c_utils = true
+  drivers_peripheral_battery_feature_hicollie = false
 }
