@@ -37,7 +37,7 @@ ohos_fuzztest("PowerHdiStubFuzzTest") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
-  if (has_power_c_utils_part) {
+  if (drivers_peripheral_power_c_utils) {
     external_deps += [ "c_utils:utils" ]
   }
   subsystem_name = "hdf"
