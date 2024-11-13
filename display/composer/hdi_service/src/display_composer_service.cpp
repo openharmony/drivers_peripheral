@@ -869,7 +869,8 @@ int32_t DisplayComposerService::ClearLayerBuffer(uint32_t devId, uint32_t layerI
     return devCache->ClearLayerBuffer(layerId);
 }
 
-int32_t DisplayComposerService::SetDisplayActiveRegion(uint32_t devId, OHOS::HDI::Display::Composer::V1_0::IRect& rect)
+int32_t DisplayComposerService::SetDisplayActiveRegion(uint32_t devId,
+    const OHOS::HDI::Display::Composer::V1_0::IRect& rect)
 {
     HDF_LOGI("%{public}s: devId %{public}u, rect {%{public}u, %{public}u, %{public}u, %{public}u}",
         __func__, devId, rect.x, rect.y, rect.w, rect.h);
