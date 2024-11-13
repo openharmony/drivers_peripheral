@@ -243,6 +243,10 @@ void DisplayComposerService::LoadVdiFuncPart2()
         reinterpret_cast<EnableHardwareCursorStatsFunc>(dlsym(libHandle_, "EnableHardwareCursorStats"));
     vdiAdapter_->GetHardwareCursorStats =
         reinterpret_cast<GetHardwareCursorStatsFunc>(dlsym(libHandle_, "GetHardwareCursorStats"));
+}
+
+void DisplayComposerService::LoadVdiFuncPart2()
+{
     vdiAdapter_->SetDisplayActiveRegion =
         reinterpret_cast<SetDisplayActiveRegionFunc>(dlsym(libHandle_, "SetDisplayActiveRegion"));
 }

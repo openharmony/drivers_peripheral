@@ -88,6 +88,7 @@ private:
     int32_t LoadVdiAdapter();
     void LoadVdiFuncPart1();
     void LoadVdiFuncPart2();
+    void LoadVdiFuncPart3();
     void ExitService();
     int32_t CreateResponser();
     static void OnHotPlug(uint32_t outputId, bool connected, void* data);
