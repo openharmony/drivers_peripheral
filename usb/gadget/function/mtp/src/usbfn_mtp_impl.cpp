@@ -127,6 +127,8 @@ static constexpr uint32_t REQ_ACTUAL_DEFAULT_LENGTH = 0;
 static constexpr uint32_t REQ_ACTUAL_MAX_LENGTH = 128;
 static constexpr uint32_t REQ_ACTUAL_MININUM_LENGTH = 5;
 static constexpr int32_t  HDF_ERROR_ECANCEL = -20;
+static constexpr int32_t  WRITE_SPLIT_MININUM_LENGTH = 81920;
+static constexpr int32_t  MTP_PROTOCOL_PACKET_SIZE = 4;
 enum UsbMtpNeedZeroLengthPacket {
     ZLP_NO_NEED = 0, /* no need send ZLP */
     ZLP_NEED,        /* need send ZLP */
@@ -563,6 +565,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceClassRequest(
             mtpDev->mtpState = MTP_STATE_CANCELED;
             DListHead *queueHead = &(mtpDev->mtpPort->readQueue);
             if (!DListIsEmpty(queueHead)) {
+                HDF_LOGD("%{public}s: readQueue is not empty", __func__);
                 struct UsbFnRequest *queueReq = nullptr;
                 struct UsbFnRequest *queueReqTmp = nullptr;
                 DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, queueHead, struct UsbFnRequest, list) {
@@ -572,6 +575,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceClassRequest(
             }
             DListHead *writeQueue = &(mtpDev->mtpPort->writeQueue);
             if (!DListIsEmpty(writeQueue)) {
+                HDF_LOGD("%{public}s: writeQueue is not empty", __func__);
                 struct UsbFnRequest *queueReq = nullptr;
                 struct UsbFnRequest *queueReqTmp = nullptr;
                 DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, writeQueue, struct UsbFnRequest, list) {
@@ -1175,6 +1179,8 @@ int32_t UsbfnMtpImpl::Read(std::vector<uint8_t> &data)
     } else if (mtpDev_->mtpState != MTP_STATE_OFFLINE) {
         mtpDev_->mtpState = MTP_STATE_READY;
     }
+    writeActualLen_ = 0;
+    vectorSplited_.clear();
     pthread_rwlock_unlock(&mtpRunrwLock_);
     return ret;
 }
@@ -1226,6 +1232,7 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
     struct DListHead *pool = &mtpPort_->writePool;
     struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
     DListRemove(&req->list);
+    DListInsertTail(&req->list, &mtpPort_->writeQueue);
     uint32_t needXferCount = data.size();
     int32_t ret = HDF_SUCCESS;
     while (needXferCount > 0 || needZLP == ZLP_NEED) {
@@ -1242,10 +1249,6 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
             HDF_LOGE("%{public}s: send zero packet done: %{public}d", __func__, ret);
             break;
         }
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: bulk-in req failed: %{public}d", __func__, ret);
-            break;
-        }
         switch (req->status) {
             case USB_REQUEST_COMPLETED:
                 needXferCount -= req->actual;
@@ -1254,14 +1257,83 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
             case USB_REQUEST_NO_DEVICE:
                 HDF_LOGE("%{public}s: device disconnected", __func__);
                 mtpDev_->mtpState = MTP_STATE_OFFLINE;
-                return HDF_DEV_ERR_NO_DEVICE;
+                ret = HDF_DEV_ERR_NO_DEVICE;
+                break;
             default:
                 HDF_LOGE("%{public}s: unexpected status %{public}d", __func__, req->status);
                 mtpDev_->mtpState = MTP_STATE_ERROR;
-                return HDF_ERR_IO;
+                ret = HDF_ERR_IO;
+                break;
+        }
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: bulk-in req failed: %{public}d", __func__, ret);
+            break;
         }
     }
+    DListRemove(&req->list);
     DListInsertTail(&req->list, pool);
+    return ret;
+}
+
+int32_t UsbfnMtpImpl::getActualLength(const std::vector<uint8_t> &data)
+{
+    if (data.size() < MTP_PROTOCOL_PACKET_SIZE) {
+        return data.size();
+    }
+    uint32_t length;
+    std::copy(data.data(), data.data() + MTP_PROTOCOL_PACKET_SIZE,
+	    reinterpret_cast<uint8_t*>(&length));
+    return length;
+}
+
+int32_t UsbfnMtpImpl::WriteSplitPacket(const std::vector<uint8_t> &data)
+{
+    if (data.size() > WRITE_SPLIT_MININUM_LENGTH && writeActualLen_ == 0) {
+        int32_t writeLen = getActualLength(data);
+        if (writeLen > data.size()) {
+            vectorSplited_.resize(writeLen);
+            std::copy(data.begin(), data.end(), vectorSplited_.begin());
+            writeActualLen_ = data.size();
+            return HDF_SUCCESS;
+        }
+    }
+    if (vectorSplited_.size() > WRITE_SPLIT_MININUM_LENGTH &&
+        (data.size() < vectorSplited_.size() - writeActualLen_)) {
+        std::copy(data.begin(), data.end(), vectorSplited_.begin() + writeActualLen_);
+        writeActualLen_ += data.size();
+        return HDF_SUCCESS;
+    } else if (vectorSplited_.size() > WRITE_SPLIT_MININUM_LENGTH &&
+        (data.size() > vectorSplited_.size() - writeActualLen_)) {
+        vectorSplited_.clear();
+        writeActualLen_ = 0;
+        return HDF_ERR_INVALID_PARAM;
+    } else if (vectorSplited_.size() > WRITE_SPLIT_MININUM_LENGTH &&
+        (data.size() == vectorSplited_.size() - writeActualLen_)) {
+        std::copy(data.begin(), data.end(), vectorSplited_.begin() + writeActualLen_);
+        writeActualLen_ += data.size();
+    }
+
+    std::lock_guard<std::mutex> guard(writeMutex_);
+    if (DListIsEmpty(&mtpPort_->writePool)) {
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    mtpDev_->mtpState = MTP_STATE_BUSY;
+    uint32_t xferActual = 0;
+    uint8_t needZLP = ZLP_NO_NEED;
+    uint32_t needXferCount = vectorSplited_.size() > WRITE_SPLIT_MININUM_LENGTH ?
+        vectorSplited_.size() : data.size();
+    if ((needXferCount & (mtpDev_->dataInPipe.maxPacketSize - 1)) == 0) {
+        needZLP = ZLP_NEED;
+    }
+    int32_t ret = HDF_FAILURE;
+    if (writeActualLen_ > WRITE_SPLIT_MININUM_LENGTH &&
+        vectorSplited_.size() == writeActualLen_) {
+        ret = WriteEx(vectorSplited_, needZLP, xferActual);
+        vectorSplited_.clear();
+        writeActualLen_ = 0;
+    } else {
+        ret = WriteEx(data, needZLP, xferActual);
+    }
     return ret;
 }
 
@@ -1290,20 +1362,7 @@ int32_t UsbfnMtpImpl::Write(const std::vector<uint8_t> &data)
         HDF_LOGE("%{public}s: states is ecanceled", __func__);
         return HDF_ERROR_ECANCEL;
     }
-    std::lock_guard<std::mutex> guard(writeMutex_);
-    mtpDev_->mtpState = MTP_STATE_BUSY;
-    uint32_t needXferCount = data.size();
-    uint32_t xferActual = 0;
-    uint8_t needZLP = ZLP_NO_NEED;
-    if ((needXferCount & (mtpDev_->dataInPipe.maxPacketSize - 1)) == 0) {
-        needZLP = ZLP_NEED;
-    }
-    if (DListIsEmpty(&mtpPort_->writePool)) {
-        pthread_rwlock_unlock(&mtpRunrwLock_);
-        HDF_LOGE("%{public}s: writePool is empty.", __func__);
-        return HDF_DEV_ERR_NO_DEVICE;
-    }
-    int32_t ret = WriteEx(data, needZLP, xferActual);
+    int32_t ret = WriteSplitPacket(data);
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
         HDF_LOGE("%{public}s: running, states is ecanceled", __func__);
         ret = HDF_ERROR_ECANCEL;
