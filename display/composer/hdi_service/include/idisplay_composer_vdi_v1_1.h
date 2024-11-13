@@ -47,7 +47,7 @@ class IDisplayComposerVdiV1_1 : public IDisplayComposerVdi {
     virtual int32_t SetHardwareCursorPosition(uint32_t devId, int32_t x, int32_t y) = 0;
     virtual int32_t EnableHardwareCursorStats(uint32_t devId, bool enable) = 0;
     virtual int32_t GetHardwareCursorStats(uint32_t devId, uint32_t& frameCount, uint32_t& vsyncCount) = 0;
-    virtual int32_t SetDisplayActiveRegion(uint32_t devId, const OHOS::HDI::Display::Composer::V1_0::IRect& rect) = 0;
+    virtual int32_t SetDisplayActiveRegion(uint32_t devId, const IRect& rect) = 0;
 };
 
 using CreateComposerVdiFuncV1_1 = IDisplayComposerVdiV1_1* (*)();
