@@ -155,7 +155,6 @@ int32_t CodecComponentService::SendCommand(CodecCommandType cmd, uint32_t param,
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSendCommand");
     CODEC_LOGI("commandType: [%{public}d], command [%{public}d]", cmd, param);
-    CODEC_LOGD("index");
     return node_->SendCommand(cmd, param, const_cast<int8_t *>(cmdData.data()));
 }
 
