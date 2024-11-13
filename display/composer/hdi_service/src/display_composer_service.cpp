@@ -100,6 +100,7 @@ int32_t DisplayComposerService::LoadVdiAdapter()
 
     LoadVdiFuncPart1();
     LoadVdiFuncPart2();
+    LoadVdiFuncPart3();
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->RegHotPlugCallback, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayCapability, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplaySupportedModes, HDF_FAILURE);
