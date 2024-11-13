@@ -81,6 +81,7 @@ public:
     int32_t ClearClientBuffer(uint32_t devId) override;
     int32_t ClearLayerBuffer(uint32_t devId, uint32_t layerId) override;
     int32_t SetDisplayActiveRegion(uint32_t devId, const IRect& rect) override;
+    int32_t SetDisplayActiveRegion(uint32_t devId, OHOS::HDI::Display::Composer::V1_0::IRect& rect) override;
 
 private:
     void HidumperInit();
