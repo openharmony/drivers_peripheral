@@ -164,6 +164,15 @@ int32_t CodecComponentService::GetParameter(uint32_t index, const std::vector<in
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecGetParameter");
     CODEC_LOGD("index [%{public}x]", index);
+    if (inParamStruct.empty() || (inParamStruct.size() < sizeof(uint32_t))) {
+        CODEC_LOGE("GetParamStruct is Invalid");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    uint32_t currentSize = *(reinterpret_cast<const uint32_t*>(inParamStruct.data()));
+    if (inParamStruct.size() != currentSize) {
+        CODEC_LOGE("Invalid GetParams");
+        return HDF_ERR_INVALID_PARAM;
+    }
     outParamStruct = inParamStruct;
     return node_->GetParameter(static_cast<enum OMX_INDEXTYPE>(index), outParamStruct.data());
 }
@@ -172,6 +181,15 @@ int32_t CodecComponentService::SetParameter(uint32_t index, const std::vector<in
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSetParameter");
     CODEC_LOGD("index [%{public}x]", index);
+    if (paramStruct.empty() || (paramStruct.size() < sizeof(uint32_t))) {
+        CODEC_LOGE("SetParamStruct is Invalid");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    uint32_t currentSize = *(reinterpret_cast<const uint32_t*>(paramStruct.data()));
+    if (paramStruct.size() != currentSize) {
+        CODEC_LOGE("Invalid SetParams");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return node_->SetParameter(static_cast<enum OMX_INDEXTYPE>(index), paramStruct.data());
 }
 
@@ -180,6 +198,15 @@ int32_t CodecComponentService::GetConfig(uint32_t index, const std::vector<int8_
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecGetConfig");
     CODEC_LOGD("index [%{public}x]", index);
+    if (inCfgStruct.empty() || (inCfgStruct.size() < sizeof(uint32_t))) {
+        CODEC_LOGE("GetCfgStruct is Invalid");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    uint32_t currentSize = *(reinterpret_cast<const uint32_t*>(inCfgStruct.data()));
+    if (inCfgStruct.size() != currentSize) {
+        CODEC_LOGE("Invalid GetConfig");
+        return HDF_ERR_INVALID_PARAM;
+    }
     outCfgStruct = inCfgStruct;
     return node_->GetConfig(static_cast<enum OMX_INDEXTYPE>(index), outCfgStruct.data());
 }
@@ -188,6 +215,15 @@ int32_t CodecComponentService::SetConfig(uint32_t index, const std::vector<int8_
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSetConfig");
     CODEC_LOGD("index [%{public}x]", index);
+    if (cfgStruct.empty() || ((cfgStruct.size() < sizeof(uint32_t)))) {
+        CODEC_LOGE("SetCfgStruct is Invalid");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    uint32_t currentSize = *(reinterpret_cast<const uint32_t*>(cfgStruct.data()));
+    if (cfgStruct.size() != currentSize) {
+        CODEC_LOGE("Invalid SetConfig");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return node_->SetConfig(static_cast<enum OMX_INDEXTYPE>(index), cfgStruct.data());
 }
 
