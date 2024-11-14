@@ -25,7 +25,6 @@
 #include "wpa_client.h"
 #endif
 
-
 #undef LOG_TAG
 #define LOG_TAG "HdiWpaHal"
 
