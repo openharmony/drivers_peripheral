@@ -24,7 +24,6 @@
 #include "wpa_hal_define.h"
 #include "hdi_wpa_common.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
