@@ -25,7 +25,6 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
-    
 #ifdef FEATURE_ANCO_WIFI
 const int CHIP_ID_STA = 1;
 const int CHIP_ID_P2P = 2;
@@ -33,16 +32,10 @@ const int CHIP_ID_AP = 3;
 #endif
 
 static constexpr int32_t K_PRIMARY_CHIP_ID = 0;
-static std::mutex g_chipMutex;
 
 extern "C" IChipController *ChipControllerImplGetInstance(void)
 {
-    static IChipController *gWifiService = NULL;
-    std::unique_lock<std::mutex> lock(g_chipMutex);
-    if (gWifiService == NULL) {
-        gWifiService = new (std::nothrow) Wifi();
-    }
-    return gWifiService;
+    return new (std::nothrow) Wifi();
 }
 
 Wifi::Wifi()
@@ -111,7 +104,7 @@ int32_t Wifi::Init()
         HDF_LOGI("Wifi HAL started");
         return HDF_SUCCESS;
     } else {
-        HDF_LOGE("Wifi HAL start failed");
+        HDF_LOGE("Wifi HAL start failed.");
         return HDF_FAILURE;
     }
 }
@@ -234,6 +227,7 @@ void Wifi::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
     HDF_LOGI("chip service OnRemoteDied");
     runState_ = RunState::STOPPING;
+    cbHandler_.Invalidate();
     for (auto& chip : chips_) {
         if (chip) {
             chip->Invalidate();
@@ -242,7 +236,6 @@ void Wifi::OnRemoteDied(const wptr<IRemoteObject> &object)
     chips_.clear();
     auto lock = AcquireGlobalLock();
     StopVendorHal(&lock);
-    cbHandler_.Invalidate();
     runState_ = RunState::STOPPED;
 }
 
