@@ -100,6 +100,7 @@ int32_t DisplayComposerService::LoadVdiAdapter()
 
     LoadVdiFuncPart1();
     LoadVdiFuncPart2();
+    LoadVdiFuncPart3();
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->RegHotPlugCallback, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayCapability, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplaySupportedModes, HDF_FAILURE);
@@ -240,6 +241,12 @@ void DisplayComposerService::LoadVdiFuncPart2()
         reinterpret_cast<EnableHardwareCursorStatsFunc>(dlsym(libHandle_, "EnableHardwareCursorStats"));
     vdiAdapter_->GetHardwareCursorStats =
         reinterpret_cast<GetHardwareCursorStatsFunc>(dlsym(libHandle_, "GetHardwareCursorStats"));
+}
+
+void DisplayComposerService::LoadVdiFuncPart3()
+{
+    vdiAdapter_->SetDisplayActiveRegion =
+        reinterpret_cast<SetDisplayActiveRegionFunc>(dlsym(libHandle_, "SetDisplayActiveRegion"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -862,6 +869,25 @@ int32_t DisplayComposerService::ClearLayerBuffer(uint32_t devId, uint32_t layerI
     DISPLAY_CHK_RETURN(devCache == nullptr, HDF_FAILURE, DISPLAY_LOGE("fail"));
 
     return devCache->ClearLayerBuffer(layerId);
+}
+
+int32_t DisplayComposerService::SetDisplayActiveRegion(uint32_t devId, const IRect& rect)
+{
+    HDF_LOGI("%{public}s: devId %{public}u, rect {%{public}u, %{public}u, %{public}u, %{public}u}",
+        __func__, devId, rect.x, rect.y, rect.w, rect.h);
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetDisplayActiveRegion, HDF_ERR_NOT_SUPPORT);
+
+    StartTrace(HITRACE_TAG_HDF, "vdiAdapter_->SetDisplayActiveRegion");
+    int32_t ret = vdiAdapter_->SetDisplayActiveRegion(devId, rect);
+    FinishTrace(HITRACE_TAG_HDF);
+
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: fail, ret %{public}d", __func__, ret);
+    }
+
+    return ret;
 }
 
 } // namespace Composer
