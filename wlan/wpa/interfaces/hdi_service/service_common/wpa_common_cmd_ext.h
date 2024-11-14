@@ -15,7 +15,6 @@
 #ifndef WPA_COMMON_CMD_EXT_H
 #define WPA_COMMON_CMD_EXT_H
 
-
 #include "../wpa_impl.h"
 #include <hdf_remote_service.h>
 #include "utils/common.h"
