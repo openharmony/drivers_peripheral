@@ -35,22 +35,6 @@ void CameraBenchmarkSecureStreamTest::TearDown(const ::benchmark::State &state)
 }
 
 /**
-  * @tc.name: OpenSecureCamera
-  * @tc.desc: benchmark
-  * @tc.level: Level0
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-BENCHMARK_F(CameraBenchmarkSecureStreamTest, OpenSecureCamera_benchmark_001)(
-    benchmark::State &st)
-{
-    for (auto _ : st) {
-    }
-}
-BENCHMARK_REGISTER_F(CameraBenchmarkSecureStreamTest, OpenSecureCamera_benchmark_001)->\
-    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-
-/**
   * @tc.name: GetSecureCameraSeq
   * @tc.desc: benchmark
   * @tc.level: Level0

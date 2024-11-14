@@ -100,6 +100,7 @@ int32_t DisplayComposerService::LoadVdiAdapter()
 
     LoadVdiFuncPart1();
     LoadVdiFuncPart2();
+    LoadVdiFuncPart3();
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->RegHotPlugCallback, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayCapability, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplaySupportedModes, HDF_FAILURE);
@@ -149,10 +150,8 @@ void DisplayComposerService::LoadVdiFuncPart1()
         reinterpret_cast<GetDisplayCapabilityFunc>(dlsym(libHandle_, "GetDisplayCapability"));
     vdiAdapter_->GetDisplaySupportedModes =
         reinterpret_cast<GetDisplaySupportedModesFunc>(dlsym(libHandle_, "GetDisplaySupportedModes"));
-    vdiAdapter_->GetDisplayMode =
-        reinterpret_cast<GetDisplayModeFunc>(dlsym(libHandle_, "GetDisplayMode"));
-    vdiAdapter_->SetDisplayMode =
-        reinterpret_cast<SetDisplayModeFunc>(dlsym(libHandle_, "SetDisplayMode"));
+    vdiAdapter_->GetDisplayMode = reinterpret_cast<GetDisplayModeFunc>(dlsym(libHandle_, "GetDisplayMode"));
+    vdiAdapter_->SetDisplayMode = reinterpret_cast<SetDisplayModeFunc>(dlsym(libHandle_, "SetDisplayMode"));
     vdiAdapter_->GetDisplayPowerStatus =
         reinterpret_cast<GetDisplayPowerStatusFunc>(dlsym(libHandle_, "GetDisplayPowerStatus"));
     vdiAdapter_->SetDisplayPowerStatus =
@@ -188,14 +187,14 @@ void DisplayComposerService::LoadVdiFuncPart1()
     vdiAdapter_->Commit = reinterpret_cast<CommitFunc>(dlsym(libHandle_, "Commit"));
     vdiAdapter_->CreateLayer = reinterpret_cast<CreateLayerFunc>(dlsym(libHandle_, "CreateLayer"));
     vdiAdapter_->DestroyLayer = reinterpret_cast<DestroyLayerFunc>(dlsym(libHandle_, "DestroyLayer"));
-}
-
-void DisplayComposerService::LoadVdiFuncPart2()
-{
     vdiAdapter_->PrepareDisplayLayers =
         reinterpret_cast<PrepareDisplayLayersFunc>(dlsym(libHandle_, "PrepareDisplayLayers"));
     vdiAdapter_->SetLayerAlpha = reinterpret_cast<SetLayerAlphaFunc>(dlsym(libHandle_, "SetLayerAlpha"));
     vdiAdapter_->SetLayerRegion = reinterpret_cast<SetLayerRegionFunc>(dlsym(libHandle_, "SetLayerRegion"));
+}
+
+void DisplayComposerService::LoadVdiFuncPart2()
+{
     vdiAdapter_->SetLayerCrop = reinterpret_cast<SetLayerCropFunc>(dlsym(libHandle_, "SetLayerCrop"));
     vdiAdapter_->SetLayerZorder = reinterpret_cast<SetLayerZorderFunc>(dlsym(libHandle_, "SetLayerZorder"));
     vdiAdapter_->SetLayerPreMulti = reinterpret_cast<SetLayerPreMultiFunc>(dlsym(libHandle_, "SetLayerPreMulti"));
@@ -243,6 +242,12 @@ void DisplayComposerService::LoadVdiFuncPart2()
     vdiAdapter_->GetHardwareCursorStats =
         reinterpret_cast<GetHardwareCursorStatsFunc>(dlsym(libHandle_, "GetHardwareCursorStats"));
     vdiAdapter_->FastPresent = reinterpret_cast<FastPresentFunc>(dlsym(libHandle_, "FastPresent"));
+}
+
+void DisplayComposerService::LoadVdiFuncPart3()
+{
+    vdiAdapter_->SetDisplayActiveRegion =
+        reinterpret_cast<SetDisplayActiveRegionFunc>(dlsym(libHandle_, "SetDisplayActiveRegion"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -865,6 +870,25 @@ int32_t DisplayComposerService::ClearLayerBuffer(uint32_t devId, uint32_t layerI
     DISPLAY_CHK_RETURN(devCache == nullptr, HDF_FAILURE, DISPLAY_LOGE("fail"));
 
     return devCache->ClearLayerBuffer(layerId);
+}
+
+int32_t DisplayComposerService::SetDisplayActiveRegion(uint32_t devId, const IRect& rect)
+{
+    HDF_LOGI("%{public}s: devId %{public}u, rect {%{public}u, %{public}u, %{public}u, %{public}u}",
+        __func__, devId, rect.x, rect.y, rect.w, rect.h);
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetDisplayActiveRegion, HDF_ERR_NOT_SUPPORT);
+
+    StartTrace(HITRACE_TAG_HDF, "vdiAdapter_->SetDisplayActiveRegion");
+    int32_t ret = vdiAdapter_->SetDisplayActiveRegion(devId, rect);
+    FinishTrace(HITRACE_TAG_HDF);
+
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: fail, ret %{public}d", __func__, ret);
+    }
+
+    return ret;
 }
 
 int32_t DisplayComposerService::FastPresent(uint32_t devId, const PresentParam& param,
