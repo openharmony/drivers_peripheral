@@ -880,7 +880,8 @@ int32_t DisplayComposerService::SetDisplayActiveRegion(uint32_t devId, const IRe
 
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetDisplayActiveRegion, HDF_ERR_NOT_SUPPORT);
-    StartTrace(HITRACE_TAG_HDF, "");
+
+    StartTrace(HITRACE_TAG_HDF, "vdiAdapter_->SetDisplayActiveRegion");
     int32_t ret = vdiAdapter_->SetDisplayActiveRegion(devId, rect);
     FinishTrace(HITRACE_TAG_HDF);
 
