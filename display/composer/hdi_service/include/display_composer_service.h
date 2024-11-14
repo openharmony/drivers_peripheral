@@ -80,6 +80,7 @@ public:
     int32_t RegDisplayVBlankIdleCallback (const sptr<IVBlankIdleCallback>& cb) override;
     int32_t ClearClientBuffer(uint32_t devId) override;
     int32_t ClearLayerBuffer(uint32_t devId, uint32_t layerId) override;
+    int32_t SetDisplayActiveRegion(uint32_t devId, const IRect& rect) override;
 
 private:
     void HidumperInit();
@@ -87,6 +88,7 @@ private:
     int32_t LoadVdiAdapter();
     void LoadVdiFuncPart1();
     void LoadVdiFuncPart2();
+    void LoadVdiFuncPart3();
     void ExitService();
     int32_t CreateResponser();
     static void OnHotPlug(uint32_t outputId, bool connected, void* data);
