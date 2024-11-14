@@ -1059,7 +1059,7 @@ HWTEST_F(DeviceTest, test_GetHDRCapabilityInfos, TestSize.Level1)
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
-HWTEST_F(DeviceTest, test_GetHDRCapabilityInfos, TestSize.Level1)
+HWTEST_F(DeviceTest, test_SetDisplayActiveRegion, TestSize.Level1)
 {
     IRect rect = {0, 0, 1920, 540};
     auto ret = g_composerDevice->SetDisplayActiveRegion(g_displayIds[0], rect);
