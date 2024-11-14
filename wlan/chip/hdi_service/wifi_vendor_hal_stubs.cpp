@@ -20,7 +20,6 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
-    
 
 template <typename>
 struct StubFunction;
@@ -72,11 +71,6 @@ bool InitHalFuncTableWithStubs(WifiHalFn* halFn)
     PopulateStubFor(&halFn->setDpiMarkRule);
     PopulateStubFor(&halFn->registerIfaceCallBack);
     PopulateStubFor(&halFn->setTxPower);
-    PopulateStubFor(&halFn->registerExtIfaceCallBack);
-    PopulateStubFor(&halFn->sendCmdToDriver);
-    PopulateStubFor(&halFn->sendActionFrame);
-    PopulateStubFor(&halFn->registerActionFrameReceiver);
-    PopulateStubFor(&halFn->getCoexictenceChannelList);
     return true;
 }
     
