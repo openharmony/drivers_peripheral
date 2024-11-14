@@ -22,6 +22,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
+
 WifiStaIface::WifiStaIface(
     const std::string& ifname,
     const std::weak_ptr<WifiVendorHal> vendorHal,

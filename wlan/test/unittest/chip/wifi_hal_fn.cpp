@@ -19,6 +19,7 @@ const std::string VAILD_IFNAME = "wlan0";
 const std::string INVAILD_IFNAME = "wlan2";
 const int NAME_LEN = 5;
 
+
 WifiError VendorHalInit(wifiHandle *handle)
 {
     return HAL_SUCCESS;

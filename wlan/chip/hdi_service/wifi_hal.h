@@ -26,6 +26,7 @@ extern "C"
 {
 #endif
 
+
 #define IFNAMSIZ_WIFI 16
 #define ETH_ADDR_LEN 6
 #define BSS_STATUS_ASSOCIATED 1

@@ -21,6 +21,7 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
+    
 WifiExtIface::WifiExtIface(
     const std::string& ifName,
     const std::weak_ptr<WifiVendorHal> vendorHal,
