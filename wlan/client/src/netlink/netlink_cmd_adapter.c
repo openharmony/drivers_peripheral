@@ -37,7 +37,6 @@
 #include <linux/version.h>
 #include <osal_mem.h>
 
-
 #include "../wifi_common_cmd.h"
 #include "hilog/log.h"
 #include "netlink_adapter.h"
@@ -435,7 +434,7 @@ static int32_t PthreadMutexLock(void)
 static int32_t WaitStartActionLock(void)
 {
     int32_t count = 0;
-    while (g_cookieStart == RET_CODE_FAILURE) {
+    while (g_cookieStart == 0) {
         if (count < RETRIES) {
             HILOG_DEBUG(LOG_CORE, "%{public}s: wait g_cookieStart %{public}d 5ms",
                 __FUNCTION__, count);
@@ -468,7 +467,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
         HILOG_ERROR(LOG_CORE, "%s: pthread trylock failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    
+
     /* try to set NETLINK_EXT_ACK to 1, ignoring errors */
     int32_t opt = 1;
     if (setsockopt(nl_socket_get_fd(g_wifiHalInfo.cmdSock), SOL_NETLINK, NETLINK_EXT_ACK, &opt, sizeof(opt)) < 0) {
@@ -3247,7 +3246,7 @@ void WifiEventTxStatus(const char *ifName, struct nlattr **attr)
         HILOG_ERROR(LOG_CORE, "%{public}s: is null", __FUNCTION__);
         return;
     }
-    if (WaitStartActionLock() == 0) {
+    if (WaitStartActionLock() == RET_CODE_FAILURE) {
         HILOG_ERROR(LOG_CORE, "%{public}s: WaitStartActionLock error", __FUNCTION__);
         return;
     }
@@ -3460,12 +3459,22 @@ static int32_t SendMsgToKernel(unsigned short nlmsgType, int opt, char *data, in
         return RET_CODE_FAILURE;
     }
 
-    memset_s(&ntlAddr, sizeof(ntlAddr), 0, sizeof(ntlAddr));
+    if (memset_s(&ntlAddr, sizeof(ntlAddr), 0, sizeof(ntlAddr)) != EOK) {
+        HILOG_ERROR(LOG_CORE, "ntlAddr memset_s is failed");
+        OsalMemFree(ntlMsg);
+        ntlMsg = NULL;
+        return RET_CODE_FAILURE;
+    }
     ntlAddr.nl_family = AF_NETLINK;
     ntlAddr.nl_pid = 0;
     ntlAddr.nl_groups = 0;
 
-    memset_s(ntlMsg, len, 0, len);
+    if (memset_s(ntlMsg, len, 0, len) != EOK) {
+        HILOG_ERROR(LOG_CORE, "ntlMsg memset_s is failed");
+        OsalMemFree(ntlMsg);
+        ntlMsg = NULL;
+        return RET_CODE_FAILURE;
+    }
     ntlMsg->hdr.nlmsg_len = NLMSG_LENGTH(DPI_MSG_LEN + datalen + 1);
     ntlMsg->hdr.nlmsg_flags = 0;
     ntlMsg->hdr.nlmsg_type = nlmsgType;
@@ -3473,10 +3482,16 @@ static int32_t SendMsgToKernel(unsigned short nlmsgType, int opt, char *data, in
     ntlMsg->opt = opt;
 
     if (data != NULL && datalen != 0) {
-        memcpy_s(ntlMsg->data, datalen, data, datalen);
+        if (memcpy_s(ntlMsg->data, datalen, data, datalen) != EOK) {
+            HILOG_ERROR(LOG_CORE, "memcpy_s is failed");
+            OsalMemFree(ntlMsg);
+            ntlMsg = NULL;
+            return RET_CODE_FAILURE;
+        }
     }
     ret = sendto(skfd, ntlMsg, ntlMsg->hdr.nlmsg_len, 0, (struct sockaddr*)&ntlAddr, sizeof(ntlAddr));
-    free(ntlMsg);
+    OsalMemFree(ntlMsg);
+    ntlMsg = NULL;
     return ret;
 }
 
