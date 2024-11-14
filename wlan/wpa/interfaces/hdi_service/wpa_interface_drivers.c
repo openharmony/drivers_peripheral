@@ -25,6 +25,7 @@
 #include "v1_1/iwpa_interface.h"
 #include "wpa_impl.h"
 
+
 struct HdfWpaInterfaceHost {
     struct IDeviceIoService ioService;
     struct IWpaInterface *service;

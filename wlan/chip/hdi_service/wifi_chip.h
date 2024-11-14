@@ -37,6 +37,7 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
+    
 class WifiChip : public IConcreteChip {
 public:
     WifiChip(int32_t chipId, bool isPrimary,

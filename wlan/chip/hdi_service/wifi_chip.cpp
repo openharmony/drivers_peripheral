@@ -28,6 +28,7 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
+    
 constexpr int IFACE_TYPE_STA = 2;
 constexpr char K_ACTIVE_WLAN_IFACE_NAME_PROPERTY[] = "wifi.active.interface";
 constexpr char K_NO_ACTIVE_WLAN_IFACE_NAME_PROPERTY_VALUE[] = "";

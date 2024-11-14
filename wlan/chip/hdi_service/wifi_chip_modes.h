@@ -32,6 +32,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
+
 namespace chip_mode_ids {
 constexpr int32_t K_INVALID = UINT32_MAX;
 constexpr int32_t K_V1_STA = 0;

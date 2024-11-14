@@ -30,6 +30,7 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
+    
 std::function<void(wifiHandle handle)> onStopCompleteCallback;
 std::function<void(const char*)> onVendorHalRestartCallback;
 std::function<void(int)> onFullScanResultCallback;

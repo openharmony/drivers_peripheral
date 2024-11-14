@@ -27,6 +27,7 @@ ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
   include_dirs = []
 
   sources = [
+    
     "hdi_sync_util.cpp",
     "iface_tool.cpp",
     "iface_util.cpp",

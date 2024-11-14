@@ -20,6 +20,7 @@
 #include "hdi_wpa_hal.h"
 #include "wpa_common_cmd.h"
 
+
 #undef LOG_TAG
 #define LOG_TAG "HdiHalWpaCommon"
 

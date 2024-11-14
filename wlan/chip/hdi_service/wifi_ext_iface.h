@@ -28,6 +28,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
+
 class WifiExtIface : public IChipIface {
 public:
     WifiExtIface(const std::string& ifName, const std::weak_ptr<WifiVendorHal> vendorHal,

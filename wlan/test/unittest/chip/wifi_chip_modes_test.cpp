@@ -23,6 +23,7 @@
 using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
 
+
 namespace WifiChipModesTest {
 class WifiChipModesTest : public testing::Test {
 public:

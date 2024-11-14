@@ -23,6 +23,7 @@ using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
 
 namespace WifiChipTest {
+    
 const std::string TEST_AP_IFNAME = "wlan1";
 const std::string TEST_STA_IFNAME = "wlan0";
 const std::string TEST_P2P_IFNAME = "p2p0";

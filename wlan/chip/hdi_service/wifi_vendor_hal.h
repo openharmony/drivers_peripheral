@@ -34,6 +34,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
+
 using OnVendorHalRestartCallback = std::function<void(const std::string&)>;
 class WifiVendorHal {
 public:
