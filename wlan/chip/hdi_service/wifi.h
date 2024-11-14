@@ -32,7 +32,6 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
-    
 class Wifi : public IChipController {
 public:
     Wifi();
