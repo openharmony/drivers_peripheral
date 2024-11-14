@@ -35,7 +35,6 @@
 #include "v1_1/iwpa_interface.h"
 #include "wpa_p2p_hal.h"
 
-
 #define HEX_TO_DEC_MOVING 4
 #define DEC_MAX_SCOPE 10
 #define MIN_MAC_LEN 6
