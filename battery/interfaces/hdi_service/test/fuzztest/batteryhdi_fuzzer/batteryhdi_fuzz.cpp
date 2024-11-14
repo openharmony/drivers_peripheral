@@ -18,6 +18,7 @@
 #include "securec.h"
 #include <cstdint>
 #include <cstdlib>
+#include <datetime_ex.h>
 #include <map>
 #include <random>
 #include <vector>
@@ -187,10 +188,7 @@ static std::vector<std::function<void(const uint8_t *, size_t)>> fuzzFunc = {
 
 void BatteryHdiFuzzTest(const uint8_t *data, size_t size)
 {
-    std::random_device rd;
-    std::default_random_engine engine(rd());
-    std::uniform_int_distribution<int32_t> randomNum(0, fuzzFunc.size() - 1);
-    int32_t number = randomNum(engine);
+    int32_t number = GetTickCount() % fuzzFunc.size();
     fuzzFunc[number](data, size);
 }
 } // namespace V2_0
