@@ -27,6 +27,7 @@ namespace V2_0 {
 namespace {
     constexpr int32_t DATA_LEN = 256;
     constexpr int64_t REPOPRT_TIME = 60000000000;
+    constexpr int64_t INIT_DATA_COUNT = 1;
     static std::unordered_map<int32_t, int64_t> firstTimestampMap_;
     static std::unordered_map<int32_t, int64_t> lastTimestampMap_;
 }
@@ -60,6 +61,15 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
 {
     SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
+    static std::unordered_map<int32_t, int64_t> sensorDataCountMap;
+    auto it = sensorDataCountMap.find(event.sensorId);
+    int64_t dataCount = INIT_DATA_COUNT;
+    if (it == sensorDataCountMap.end()) {
+        sensorDataCountMap[event.sensorId] = INIT_DATA_COUNT;
+    } else {
+        it->second++;
+        dataCount = it->second;
+    }
     bool result = false;
     if (firstTimestampMap_[event.sensorId] == 0) {
         firstTimestampMap_[event.sensorId] = event.timestamp;
@@ -76,6 +86,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
     if (result) {
         std::string st = {0};
         DataToStr(st, event);
+        st += "sensorDataCount=" + std::to_string(dataCount);
         st += reportResult;
         HDF_LOGI("%{public}s: %{public}s", __func__, st.c_str());
     }
