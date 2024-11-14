@@ -21,7 +21,6 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
-    
 WifiApIface::WifiApIface(
     const std::string& ifname, const std::vector<std::string>& instances,
     const std::weak_ptr<WifiVendorHal> vendorHal,
@@ -183,31 +182,6 @@ int32_t WifiApIface::SetIfaceState(bool state)
     }
     return HDF_FAILURE;
 }
-
-int32_t WifiApIface::SendCmdToDriver(const std::string& ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf)
-{
-    WifiError status = vendorHal_.lock()->SendCmdToDriver(ifName, cmdId, paramBuf);
-    if (status == HAL_SUCCESS) {
-        return HDF_SUCCESS;
-    }
-    return HDF_FAILURE;
-}
-
-int32_t WifiApIface::SendActionFrame(const std::string& ifName, uint32_t freq, const std::vector<uint8_t>& frameData)
-{
-    return HDF_ERR_NOT_SUPPORT;
-}
-
-int32_t WifiApIface::RegisterActionFrameReceiver(const std::string& ifName, const std::vector<uint8_t>& match)
-{
-    return HDF_ERR_NOT_SUPPORT;
-}
-
-int32_t WifiApIface::GetCoexictenceChannelList(const std::string& ifName, std::vector<uint8_t>& paramBuf)
-{
-    return HDF_ERR_NOT_SUPPORT;
-}
-
 }
 }
 }
