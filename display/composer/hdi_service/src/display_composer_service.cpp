@@ -149,10 +149,8 @@ void DisplayComposerService::LoadVdiFuncPart1()
         reinterpret_cast<GetDisplayCapabilityFunc>(dlsym(libHandle_, "GetDisplayCapability"));
     vdiAdapter_->GetDisplaySupportedModes =
         reinterpret_cast<GetDisplaySupportedModesFunc>(dlsym(libHandle_, "GetDisplaySupportedModes"));
-    vdiAdapter_->GetDisplayMode =
-        reinterpret_cast<GetDisplayModeFunc>(dlsym(libHandle_, "GetDisplayMode"));
-    vdiAdapter_->SetDisplayMode =
-        reinterpret_cast<SetDisplayModeFunc>(dlsym(libHandle_, "SetDisplayMode"));
+    vdiAdapter_->GetDisplayMode = reinterpret_cast<GetDisplayModeFunc>(dlsym(libHandle_, "GetDisplayMode"));
+    vdiAdapter_->SetDisplayMode = reinterpret_cast<SetDisplayModeFunc>(dlsym(libHandle_, "SetDisplayMode"));
     vdiAdapter_->GetDisplayPowerStatus =
         reinterpret_cast<GetDisplayPowerStatusFunc>(dlsym(libHandle_, "GetDisplayPowerStatus"));
     vdiAdapter_->SetDisplayPowerStatus =
@@ -188,14 +186,14 @@ void DisplayComposerService::LoadVdiFuncPart1()
     vdiAdapter_->Commit = reinterpret_cast<CommitFunc>(dlsym(libHandle_, "Commit"));
     vdiAdapter_->CreateLayer = reinterpret_cast<CreateLayerFunc>(dlsym(libHandle_, "CreateLayer"));
     vdiAdapter_->DestroyLayer = reinterpret_cast<DestroyLayerFunc>(dlsym(libHandle_, "DestroyLayer"));
-}
-
-void DisplayComposerService::LoadVdiFuncPart2()
-{
     vdiAdapter_->PrepareDisplayLayers =
         reinterpret_cast<PrepareDisplayLayersFunc>(dlsym(libHandle_, "PrepareDisplayLayers"));
     vdiAdapter_->SetLayerAlpha = reinterpret_cast<SetLayerAlphaFunc>(dlsym(libHandle_, "SetLayerAlpha"));
     vdiAdapter_->SetLayerRegion = reinterpret_cast<SetLayerRegionFunc>(dlsym(libHandle_, "SetLayerRegion"));
+}
+
+void DisplayComposerService::LoadVdiFuncPart2()
+{
     vdiAdapter_->SetLayerCrop = reinterpret_cast<SetLayerCropFunc>(dlsym(libHandle_, "SetLayerCrop"));
     vdiAdapter_->SetLayerZorder = reinterpret_cast<SetLayerZorderFunc>(dlsym(libHandle_, "SetLayerZorder"));
     vdiAdapter_->SetLayerPreMulti = reinterpret_cast<SetLayerPreMultiFunc>(dlsym(libHandle_, "SetLayerPreMulti"));
