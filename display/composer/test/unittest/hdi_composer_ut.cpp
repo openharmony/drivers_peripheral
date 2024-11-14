@@ -1071,3 +1071,15 @@ HWTEST_F(DeviceTest, test_SetDisplayActiveRegion, TestSize.Level1)
     }
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
+
+HWTEST_F(DeviceTest, test_FastPresent, TestSize.Level1)
+{
+    PresentParam param = { 0, 1280, 1, 0x5000280, 0 };
+    std::vector<BufferHandle *> inHandles;
+    auto ret = g_composerDevice->FastPresent(g_displayIds[0], param, inHandles);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("FastPresent not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
