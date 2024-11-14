@@ -200,7 +200,7 @@ private:
     static int32_t UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort);
     static int32_t UsbMtpPortRxCheckReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req, bool &writeToFile);
     static void UsbMtpPortReleaseRxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req);
-
+    static void UsbMtpPortReleaseTxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req);
     static int32_t UsbMtpPortCancelAndFreeReq(
         struct DListHead *queueHead, struct DListHead *poolHead, int32_t &allocated, bool freeReq);
     static int32_t UsbMtpPortCancelPlusFreeIo(struct UsbMtpPort *mtpPort, bool freeReq);

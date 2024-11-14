@@ -117,7 +117,11 @@ int32_t OmxAdapterGetParameter(struct CodecComponentNode *codecNode, OMX_INDEXTY
         CODEC_LOGE("codecNode, node or param is null");
         return HDF_ERR_INVALID_PARAM;
     }
-
+    uint32_t currentSize = *(reinterpret_cast<uint32_t*>(param));
+    if (currentSize < sizeof(uint32_t) || currentSize != paramLen) {
+        CODEC_LOGE("Invalid OmxGetParams");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return codecNode->node->GetParameter(paramIndex, param, paramLen);
 }
 
@@ -126,6 +130,11 @@ int32_t OmxAdapterSetParameter(struct CodecComponentNode *codecNode, OMX_INDEXTY
 {
     if (codecNode == nullptr || codecNode->node == nullptr || param == nullptr) {
         CODEC_LOGE("codecNode, node or param is null");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    uint32_t currentSize = *(reinterpret_cast<uint32_t*>(param));
+    if (currentSize < sizeof(uint32_t) || currentSize != paramLen) {
+        CODEC_LOGE("Invalid OmxSetParams");
         return HDF_ERR_INVALID_PARAM;
     }
     return codecNode->node->SetParameter(index, param, paramLen);
@@ -138,6 +147,11 @@ int32_t OmxAdapterGetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYPE 
         CODEC_LOGE("codecNode, node or config is null");
         return HDF_ERR_INVALID_PARAM;
     }
+    uint32_t currentSize = *(reinterpret_cast<uint32_t*>(config));
+    if (currentSize < sizeof(uint32_t) || currentSize != configLen) {
+        CODEC_LOGE("Invalid OmxGetconfig");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return codecNode->node->GetConfig(index, config, configLen);
 }
 
@@ -146,6 +160,11 @@ int32_t OmxAdapterSetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYPE 
 {
     if (codecNode == nullptr || codecNode->node == nullptr || config == nullptr) {
         CODEC_LOGE("codecNode, node or config is null");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    uint32_t currentSize = *(reinterpret_cast<uint32_t*>(config));
+    if (currentSize < sizeof(uint32_t) || currentSize != configLen) {
+        CODEC_LOGE("Invalid OmxGetconfig");
         return HDF_ERR_INVALID_PARAM;
     }
     return codecNode->node->SetConfig(index, config, configLen);

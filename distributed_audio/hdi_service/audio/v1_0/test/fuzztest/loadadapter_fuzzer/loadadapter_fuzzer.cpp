@@ -35,6 +35,8 @@ void LoadAdapterFuzzTest(const uint8_t* data, size_t size)
 
     AudioAdapterDescriptor descriptor;
     sptr<IAudioAdapter> adapter = nullptr;
+    std::string adpName(reinterpret_cast<const char*>(data), size);
+    descriptor.adapterName = adpName;
     AudioManagerInterfaceImpl::GetAudioManager()->LoadAdapter(descriptor, adapter);
 }
 } // V1_0
