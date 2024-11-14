@@ -32,7 +32,6 @@
 #include "v1_1/iwpa_callback.h"
 #include "v1_1/iwpa_interface.h"
 
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <dlfcn.h>
