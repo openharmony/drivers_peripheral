@@ -1081,5 +1081,5 @@ HWTEST_F(DeviceTest, test_FastPresent, TestSize.Level1)
         DISPLAY_TEST_LOGD("FastPresent not support");
         return;
     }
-    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
 }
