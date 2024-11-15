@@ -15,6 +15,11 @@
     "adapted_system_type": ["standard", "small"],
     "rom": "610KB",
     "ram": "7500KB",
+    "features": [
+      "drivers_peripheral_thermal_feature_config_policy",
+      "drivers_peripheral_thermal_feature_c_utils",
+      "drivers_peripheral_thermal_feature_hitrace"
+    ],
     "deps": {
       "components": [
         "c_utils",
