@@ -193,11 +193,7 @@ int32_t NfcImpl::IoctlWithResponse(NfcCommand cmd, const std::vector<uint8_t> &d
         HDF_LOGE("NfcImpl::IoctlWithResponse, data is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
-    if (data.size() < VENDOR_IOCTL_INPUT_MIN_LEN || data.size() > VENDOR_IOCTL_TOTAL_LEN) {
-        HDF_LOGE("NfcImpl::IoctlWithResponse, dataLen is invalid!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    int ret = adaptor_.VendorIoctlWithResponse(cmd, (void*)&data[0], response);
+    int ret = adaptor_.VendorIoctlWithResponse(cmd, (void*)&data[0], data.size(), response);
     if (ret == 0) {
         status = NfcStatus::OK;
         return HDF_SUCCESS;
@@ -251,7 +247,15 @@ void NfcImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
 
 int32_t NfcImpl::AddNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)
 {
+    if (callbackObj == nullptr) {
+        HDF_LOGE("AddNfcDeathRecipient callbackobj nullptr");
+        return HDF_FAILURE;
+    }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<INfcCallback>(callbackObj);
+    if (remote == nullptr) {
+        HDF_LOGE("AddNfcDeathRecipient remote nullptr");
+        return HDF_FAILURE;
+    }
     bool result = remote->AddDeathRecipient(remoteDeathRecipient_);
     if (!result) {
         HDF_LOGE("NfcImpl AddDeathRecipient failed!");
@@ -262,7 +266,15 @@ int32_t NfcImpl::AddNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)
 
 int32_t NfcImpl::RemoveNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)
 {
+    if (callbackObj == nullptr) {
+        HDF_LOGE("RemoveNfcDeathRecipient callbackobj nullptr");
+        return HDF_FAILURE;
+    }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<INfcCallback>(callbackObj);
+    if (remote == nullptr) {
+        HDF_LOGE("RemoveNfcDeathRecipient remote nullptr");
+        return HDF_FAILURE;
+    }
     bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
     if (!result) {
         HDF_LOGE("NfcImpl RemoveDeathRecipient failed!");
