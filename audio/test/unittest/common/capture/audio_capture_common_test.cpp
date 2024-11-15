@@ -244,10 +244,10 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameExceptions001, TestSize.Level1)
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameEc001, TestSize.Level1)
 {
     uint32_t len = (uint64_t)GetCaptureBufferSize();
-	struct AudioCaptureFrameInfo frameInfo = {};
+    struct AudioCaptureFrameInfo frameInfo = {};
     struct AudioFrameLen frameLen = {};
     frameLen.frameLen = len;
-    frameLen.frameEcLen = len;	
+    frameLen.frameEcLen = len;
     ASSERT_NE(capture_->CaptureFrameEc, nullptr);
 	
     int32_t ret = capture_->Start(capture_);
@@ -268,7 +268,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameEcExceptions001, TestSize.Level
 	struct AudioCaptureFrameInfo frameInfo = {};
     struct AudioFrameLen frameLen = {};
     frameLen.frameLen = invalidLen;
-    frameLen.frameEcLen = invalidLen;	
+    frameLen.frameEcLen = invalidLen;
     ASSERT_NE(capture_->CaptureFrameEc, nullptr);
 	
     int32_t ret = capture_->Start(capture_);
@@ -278,8 +278,8 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameEcExceptions001, TestSize.Level
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, &frameLen, nullptr));
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, &frameLen, &frameInfo));
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(nullptr, nullptr, &frameInfo));
-    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, &frameLen, nullptr));	
-	EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, nullptr, nullptr));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, &frameLen, nullptr));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, nullptr, nullptr));
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, &frameLen, &frameInfo));
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, nullptr, &frameInfo));
 
