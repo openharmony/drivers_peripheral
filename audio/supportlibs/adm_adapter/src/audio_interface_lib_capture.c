@@ -29,7 +29,6 @@
 #define AUDIO_US_TO_MS          1000
 #define AUDIO_TRYNUM_TIME       ((AUDIO_US_TO_MS) * 3)
 #define AUDIO_CAP_WAIT_DELAY    ((AUDIO_US_TO_MS) * 5)
-#define NUMBER_BASE 10
 
 /* Out Put Capture */
 static struct AudioPcmHwParams g_hwParams;
@@ -504,14 +503,8 @@ int32_t AudioCtlCaptureSceneSelectSBuf(struct HdfSBuf *sBuf,
     elemCaptureValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER;
     elemCaptureValue.id.itemName =
         handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].deviceSwitch;
-    if (handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value != NULL) {
-        char *endPtr = NULL;
-        long result = 0;
-        result = strtol(handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value,
-            &endPtr, NUMBER_BASE);
-        elemCaptureValue.value[0] = (int32_t)result;
-    }
-   
+    elemCaptureValue.value[0] = handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value;
+
     return AudioSetElemValue(sBuf, &elemCaptureValue, true);
 }
 
