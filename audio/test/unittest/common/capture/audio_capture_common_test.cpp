@@ -265,7 +265,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameEc001, TestSize.Level1)
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameEcExceptions001, TestSize.Level1)
 {
     uint32_t invalidLen = -1;
-	struct AudioCaptureFrameInfo frameInfo = {};
+    struct AudioCaptureFrameInfo frameInfo = {};
     struct AudioFrameLen frameLen = {};
     frameLen.frameLen = invalidLen;
     frameLen.frameEcLen = invalidLen;
