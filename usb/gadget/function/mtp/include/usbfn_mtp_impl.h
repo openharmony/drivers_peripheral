@@ -236,6 +236,8 @@ private:
     void UsbMtpDeviceFreeNotifyRequest();
     int32_t InitMtpPort();
     int32_t WriteEx(const std::vector<uint8_t> &data, uint8_t sendZLP, uint32_t &xferActual);
+    int32_t WriteSplitPacket(const std::vector<uint8_t> &data);
+    int32_t getActualLength(const std::vector<uint8_t> &data);
     int32_t ReadImpl(std::vector<uint8_t> &data);
     int32_t UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, uint64_t &oneReqLeft);
     int32_t UsbMtpPortSendFileEx();
@@ -255,6 +257,8 @@ private:
     static std::mutex asyncMutex_;
     static sem_t asyncReq_;
     static pthread_rwlock_t mtpRunrwLock_;
+    std::vector<uint8_t> vectorSplited_;
+    int32_t writeActualLen_;
 };
 } // namespace V1_0
 } // namespace Mtp
