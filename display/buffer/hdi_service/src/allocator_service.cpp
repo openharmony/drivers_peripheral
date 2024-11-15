@@ -116,7 +116,6 @@ int32_t AllocatorService::LoadVdi()
 
 void AllocatorService::WriteAllocPidToDma(int32_t fd, pid_t remotePid)
 {
-    HITRACE_METER_FMT(HITRACE_TAG_HDF, "%s: fd %d", __func__, fd);
     char pidStr[BUFF_SIZE] = { 0 };
     if (sprintf_s(pidStr, BUFF_SIZE, "%d", remotePid) >= 0) {
         ioctl(fd, DMA_BUF_SET_NAME_A, pidStr);
