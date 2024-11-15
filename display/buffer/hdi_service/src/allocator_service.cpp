@@ -139,7 +139,7 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     {
-        DisplayBufferDfx dfxIns("HDI:Display:AllocatorService:AllocMem remotePid " + std::to_string(remotePid));
+        DisplayBufferDfx dfxIns("HDI:Display:AllocatorService:remotePid" + std::to_string(remotePid));
         dfxIns.SetTimer();
         dfxIns.StartTimeStamp();
         HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
