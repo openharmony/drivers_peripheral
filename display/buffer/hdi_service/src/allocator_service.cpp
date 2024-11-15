@@ -114,9 +114,9 @@ int32_t AllocatorService::LoadVdi()
     return HDF_SUCCESS;
 }
 
-void AllocatorService::WriteAllocPidToDma(int32_t fd)
+void AllocatorService::WriteAllocPidToDma(int32_t fd, pid_t remotePid)
 {
-    pid_t remotePid = HdfRemoteGetCallingPid();
+    HITRACE_METER_FMT(HITRACE_TAG_HDF, "%s: fd %d", __func__, fd);
     char pidStr[BUFF_SIZE] = { 0 };
     if (sprintf_s(pidStr, BUFF_SIZE, "%d", remotePid) >= 0) {
         ioctl(fd, DMA_BUF_SET_NAME_A, pidStr);
@@ -134,12 +134,13 @@ void AllocatorService::FreeMemVdi(BufferHandle* handle)
 
 int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
 {
-    HdfTrace trace(__func__, "HDI:DISP:");
+    pid_t remotePid = HdfRemoteGetCallingPid();
+    HITRACE_METER_FMT(HITRACE_TAG_HDF, "%s: remotePid %d", __func__, remotePid);
 
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     {
-        DisplayBufferDfx dfxIns("HDI:Display:AllocatorService:AllocMem");
+        DisplayBufferDfx dfxIns("HDI:Display:AllocatorService:AllocMem remotePid " + std::to_string(remotePid));
         dfxIns.SetTimer();
         dfxIns.StartTimeStamp();
         HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
@@ -151,7 +152,7 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
     }
 
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
-    WriteAllocPidToDma(buffer->fd);
+    WriteAllocPidToDma(buffer->fd, remotePid);
 
     handle = new NativeBuffer();
     if (handle == nullptr) {
