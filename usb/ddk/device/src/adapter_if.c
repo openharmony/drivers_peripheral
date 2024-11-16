@@ -240,7 +240,8 @@ static int32_t UsbFnAdapterCreateFunc(const char *configPath, const char *funcPa
 
     ret = mkdir(funcPath, S_IREAD | S_IWRITE);
     if (ret != 0) {
-        HDF_LOGE("%{public}s: mkdir failed %{private}s", __func__, funcPath);
+        HDF_LOGE("%{public}s: mkdir failed", __func__);
+        return HDF_ERR_IO;
     }
 
     ret = symlink(funcPath, configPath);
@@ -868,6 +869,22 @@ static void DelConfigDevice(const char *deviceName)
 
 static void CleanConfigFs(const char *devName, const char *funcName)
 {
+    int32_t ret;
+    char tmp[MAX_PATHLEN];
+
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/configs/b.1/%s", CONFIGFS_DIR, devName, funcName);
+    if (ret < 0) {
+        return;
+    }
+    (void)remove(tmp);
+
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/functions/%s", CONFIGFS_DIR, devName, funcName);
+    if (ret < 0) {
+        return;
+    }
+    (void)remove(tmp);
 }
 
 static void CleanFunction(const char *devName, const char *funcName)
@@ -880,6 +897,31 @@ static void CleanFunction(const char *devName, const char *funcName)
         return;
     }
     CleanConfigFs(devName, funcName);
+}
+
+static void UsbFnAdapterCleanDevice(const char *devName)
+{
+    int32_t ret;
+    char tmp[MAX_PATHLEN];
+    DIR *dir = NULL;
+    struct dirent *ptr = NULL;
+
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/functions/", CONFIGFS_DIR, devName);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        return;
+    }
+    if ((dir = opendir(tmp)) == NULL) {
+        return;
+    }
+    while ((ptr = readdir(dir)) != NULL) {
+        if (strncmp(ptr->d_name, FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
+            continue;
+        }
+        CleanFunction(devName, ptr->d_name);
+    }
+    closedir(dir);
 }
 
 static int32_t UsbFnAdapterDelDevice(const char *deviceName, const char *udcName, struct UsbFnDeviceDesc *des)
@@ -935,6 +977,7 @@ static int32_t UsbFnAdapterCreateDevice(const char *udcName, const char *devName
     int32_t ret;
     uint8_t confVal;
 
+    UsbFnAdapterCleanDevice(devName);
     ret = CreatDeviceDir(devName);
     if (ret != HDF_SUCCESS) {
         return HDF_ERR_IO;
