@@ -26,15 +26,17 @@ namespace Image {
 namespace V2_0 {
 class CodecHeifEncodeService {
 public:
-    CodecHeifEncodeService() = default;
-    ~CodecHeifEncodeService() = default;
+    CodecHeifEncodeService();
+    virtual ~CodecHeifEncodeService();
     int32_t DoHeifEncode(const std::vector<ImageItem>& inputImgs, const std::vector<MetaItem>& inputMetas,
                          const std::vector<ItemRef>& refs, const SharedBuffer& output, uint32_t& filledLen);
 private:
     bool LoadVendorLib();
+    bool ReWrapNativeBufferInImageItem(const std::vector<ImageItem>& inputImgs);
 private:
     std::shared_ptr<void> libHeif_ = nullptr;
     ICodecHeifHwi* heifHwi_ = nullptr;
+    bool isIPCMode_;
 };
 } // V2_0
 } // Image
