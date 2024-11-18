@@ -478,21 +478,22 @@ int32_t WpaInterfaceAutoConnect(struct IWpaInterface *self, const char *ifName, 
     return HDF_SUCCESS;
 }
 
-static bool GetWpaCmdStatus(uint8_t** dst, uint32_t* dstLen, char* src)
+static void GetWpaCmdStatus(uint8_t** dst, uint32_t* dstLen, char* src)
 {
     if (strcmp(src, "") != 0) {
         *dst = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (strlen(src) + 1));
         if (*dst == NULL) {
             HDF_LOGE("%{public}s OsalMemCalloc is NULL", __func__);
             *dstLen = 0;
-            return false;
+            return;
         }
         *dstLen = strlen(src);
         if (strcpy_s((char*)(*dst), strlen(src) + 1, src) != EOK) {
             HDF_LOGE("%{public}s strcpy failed", __func__);
+            return;
         }
     }
-    return true;
+    return;
 }
 
 static void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWpaCmdStatus *status)
@@ -503,10 +504,8 @@ static void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWp
     }
     status->id = halStatus->id;
     status->freq = halStatus->freq;
-    if (GetWpaCmdStatus(&(status->keyMgmt), &(status->keyMgmtLen), halStatus->keyMgmt) == false ||
-        GetWpaCmdStatus(&(status->ssid), &(status->ssidLen), halStatus->ssid) == false) {
-        return;
-    }
+    GetWpaCmdStatus(&(status->keyMgmt), &(status->keyMgmtLen), halStatus->keyMgmt);
+    GetWpaCmdStatus(&(status->ssid), &(status->ssidLen), halStatus->ssid);
     if (strcmp(halStatus->address, "") != 0) {
         HDF_LOGI("%{public}s key include address value=%{private}s", __func__, halStatus->address);
         uint8_t tmpAddress[ETH_ADDR_LEN + 1] = {0};
@@ -1045,11 +1044,9 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
 static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
 {
     HDF_LOGI("enter %{public}s ", __func__);
-    pthread_mutex_lock(&g_interfaceLock);
     WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
     if (pWpaInterface == NULL) {
         HDF_LOGE("%{public}s: Get wpa global interface failed!", __func__);
-        pthread_mutex_unlock(&g_interfaceLock);
         return;
     }
     int ret = pWpaInterface->wpaCliTerminate();
@@ -1062,7 +1059,6 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
     HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
     ReleaseWifiStaInterface(0);
     HDF_LOGI("%{public}s: call ReleaseWifiStaInterface finish", __func__);
-    pthread_mutex_unlock(&g_interfaceLock);
 }
 
 static struct RemoteServiceDeathRecipient g_deathRecipient = {
@@ -1883,13 +1879,13 @@ int32_t WpaInterfaceUnregisterEventCallback(struct IWpaInterface *self, struct I
         HDF_LOGE("invalid opt");
         return HDF_FAILURE;
     }
+    HdfWpaDelRemoteObj(cbFunc);
     if (DListIsEmpty(&HdfWpaStubDriver()->remoteListHead)) {
         int32_t ret = WpaUnregisterEventCallback(HdfWpaCallbackFun, WIFI_WPA_TO_HAL_CLIENT, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
         }
     }
-    HdfWpaDelRemoteObj(cbFunc);
     pthread_mutex_unlock(&g_interfaceLock);
     return HDF_SUCCESS;
 }
@@ -1952,9 +1948,9 @@ void ClearHdfWpaRemoteObj(void)
 {
     struct HdfWpaRemoteNode *pos = NULL;
     struct HdfWpaRemoteNode *tmp = NULL;
-    struct DListHead *head = &HdfWpaStubDriver()->remoteListHead;
- 
+
     (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
+    struct DListHead *head = &HdfWpaStubDriver()->remoteListHead;
     DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, head, struct HdfWpaRemoteNode, node) {
         DListRemove(&(pos->node));
         IWpaCallbackRelease(pos->callbackObj);

@@ -52,7 +52,6 @@ void OnAsyncSubsystemRestart(const char* error)
 }
 
 CallbackHandler<IChipIfaceCallback> WifiVendorHal::vendorHalCbHandler_;
-CallbackHandler<IChipIfaceCallback> WifiVendorHal::vendorHalExtCbHandler_;
 WifiVendorHal::WifiVendorHal(
     const std::weak_ptr<IfaceTool> ifaceTool,
     const WifiHalFn& fn, bool isPrimary)
@@ -105,7 +104,6 @@ WifiError WifiVendorHal::Start()
 
 void WifiVendorHal::RunEventLoop()
 {
-    pthread_setname_np(pthread_self(), "VendorHalThread");
     HDF_LOGD("Starting vendor HAL event loop");
     globalFuncTable_.startHalLoop(globalHandle_);
     const auto lock = AcquireGlobalLock();
@@ -137,17 +135,6 @@ void WifiVendorHal::OnAsyncRssiReport(int32_t index, int32_t c0Rssi, int32_t c1R
     for (const auto& callback : vendorHalCbHandler_.GetCallbacks()) {
         if (callback) {
             callback->OnRssiReport(index, c0Rssi, c1Rssi);
-        }
-    }
-}
-
-void WifiVendorHal::OnAsyncWifiNetlinkMsgReport(uint32_t type, const std::vector<uint8_t>& recvMsg)
-{
-    const auto lock = AcquireGlobalLock();
-    HDF_LOGD("OnAsyncWifiNetlinkMsgReport::OnWifiNetlinkMessage");
-    for (const auto& callback : vendorHalExtCbHandler_.GetCallbacks()) {
-        if (callback) {
-            callback->OnWifiNetlinkMessage(type, recvMsg);
         }
     }
 }
@@ -303,7 +290,6 @@ void WifiVendorHal::Invalidate()
     globalHandle_ = nullptr;
     ifaceNameHandle_.clear();
     vendorHalCbHandler_.Invalidate();
-    vendorHalExtCbHandler_.Invalidate();
 }
 
 WifiError WifiVendorHal::SetCountryCode(const std::string& ifaceName, const std::string& code)
@@ -388,49 +374,9 @@ WifiError WifiVendorHal::UnRegisterIfaceCallBack(const std::string& ifaceName,
     return HAL_SUCCESS;
 }
 
-WifiError WifiVendorHal::RegisterExtIfaceCallBack(const std::string& ifaceName,
-    const sptr<IChipIfaceCallback>& chipIfaceCallback)
-{
-    vendorHalExtCbHandler_.AddCallback(chipIfaceCallback);
-    WifiExtCallbackHandler handler = {OnAsyncWifiNetlinkMsgReport};
-    globalFuncTable_.registerExtIfaceCallBack(ifaceName.c_str(), handler);
-    return HAL_SUCCESS;
-}
-
-WifiError WifiVendorHal::UnRegisterExtIfaceCallBack(const std::string& ifaceName,
-    const sptr<IChipIfaceCallback>& chipIfaceCallback)
-{
-    WifiExtCallbackHandler handler = {};
-    globalFuncTable_.registerExtIfaceCallBack(ifaceName.c_str(), handler);
-    vendorHalExtCbHandler_.Invalidate(); // instead of RemoveCallback temporarily
-    return HAL_SUCCESS;
-}
-
 WifiError WifiVendorHal::SetTxPower(const std::string& ifaceName, int mode)
 {
     return globalFuncTable_.setTxPower(ifaceName.c_str(), mode);
-}
-
-WifiError WifiVendorHal::SendCmdToDriver(const std::string& ifaceName, int32_t cmdId,
-    const std::vector<int8_t>& paramBuf)
-{
-    return globalFuncTable_.sendCmdToDriver(ifaceName.c_str(), cmdId, paramBuf);
-}
-
-WifiError WifiVendorHal::SendActionFrame(const std::string& ifaceName, uint32_t freq,
-    const std::vector<uint8_t>& frameData)
-{
-    return globalFuncTable_.sendActionFrame(GetIfaceHandle(ifaceName), freq, frameData);
-}
-
-WifiError WifiVendorHal::RegisterActionFrameReceiver(const std::string& ifaceName, const std::vector<uint8_t>& match)
-{
-    return globalFuncTable_.registerActionFrameReceiver(GetIfaceHandle(ifaceName), match);
-}
-
-WifiError WifiVendorHal::GetCoexictenceChannelList(const std::string& ifaceName, std::vector<uint8_t>& paramBuf)
-{
-    return globalFuncTable_.getCoexictenceChannelList(ifaceName, paramBuf);
 }
 
 } // namespace v1_0
