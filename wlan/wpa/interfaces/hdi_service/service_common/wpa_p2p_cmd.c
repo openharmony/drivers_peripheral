@@ -1340,8 +1340,8 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
     info->operSsidLen = WIFI_P2P_DEVICE_NAME_LENGTH;
     uint8_t tmpBssid[ETH_ADDR_LEN] = {0};
     hwaddr_aton(token, tmpBssid);
-    if (strcpy_s((char *)info->p2pDeviceAddress, ETH_ADDR_LEN + 1, (char *)tmpBssid) != EOK) {
-        HDF_LOGE("%{public}s strcpy failed", __func__);
+    if (memcpy_s((char *)info->p2pDeviceAddress, ETH_ADDR_LEN, (char *)tmpBssid, ETH_ADDR_LEN) != EOK) {
+        HDF_LOGE("%{public}s memcpy failed", __func__);
     }
     while (token != NULL) {
         struct HdiWpaKeyValue retMsg = {{0}, {0}};
