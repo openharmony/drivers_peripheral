@@ -93,10 +93,6 @@ typedef struct {
 } WifiCallbackHandler;
 
 typedef struct {
-    void (*onWifiNetlinkMessage) (uint32_t type, const std::vector<uint8_t>& recvMsg);
-} WifiExtCallbackHandler;
-
-typedef struct {
     WifiError (*vendorHalInit)(wifiHandle *);
     WifiError (*waitDriverStart)(void);
     void (*vendorHalExit)(wifiHandle, VendorHalExitHandler);
@@ -129,11 +125,6 @@ typedef struct {
     WifiError (*setDpiMarkRule)(int32_t, int32_t, int32_t);
     WifiError (*registerIfaceCallBack)(const char *, WifiCallbackHandler);
     WifiError (*setTxPower)(const char *, int);
-    WifiError (*registerExtIfaceCallBack)(const char* ifName, WifiExtCallbackHandler handler);
-    WifiError (*sendCmdToDriver)(const char* ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf);
-    WifiError (*sendActionFrame)(wifiInterfaceHandle handle, uint32_t freq, const std::vector<uint8_t>& frameData);
-    WifiError (*registerActionFrameReceiver)(wifiInterfaceHandle handle, const std::vector<uint8_t>& match);
-    WifiError (*getCoexictenceChannelList)(const std::string& ifName, std::vector<uint8_t>& paramBuf);
 } WifiHalFn;
 
 WifiError InitWifiVendorHalFuncTable(WifiHalFn *fn);

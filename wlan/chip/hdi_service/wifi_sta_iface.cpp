@@ -220,31 +220,6 @@ int32_t WifiStaIface::SetIfaceState(bool state)
     }
     return HDF_FAILURE;
 }
-
-int32_t WifiStaIface::SendCmdToDriver(const std::string& ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf)
-{
-    WifiError status = vendorHal_.lock()->SendCmdToDriver(ifName, cmdId, paramBuf);
-    if (status == HAL_SUCCESS) {
-        return HDF_SUCCESS;
-    }
-    return HDF_FAILURE;
-}
-
-int32_t WifiStaIface::SendActionFrame(const std::string& ifName, uint32_t freq, const std::vector<uint8_t>& frameData)
-{
-    return HDF_ERR_NOT_SUPPORT;
-}
-
-int32_t WifiStaIface::RegisterActionFrameReceiver(const std::string& ifName, const std::vector<uint8_t>& match)
-{
-    return HDF_ERR_NOT_SUPPORT;
-}
-
-int32_t WifiStaIface::GetCoexictenceChannelList(const std::string& ifName, std::vector<uint8_t>& paramBuf)
-{
-    return HDF_ERR_NOT_SUPPORT;
-}
-
 }
 }
 }
