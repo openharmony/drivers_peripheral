@@ -115,6 +115,7 @@ CodecHeifEncodeService::~CodecHeifEncodeService()
 
 bool CodecHeifEncodeService::LoadVendorLib()
 {
+    std::lock_guard<std::mutex> lk(mutex_);
     if (heifHwi_) {
         return true;
     }
