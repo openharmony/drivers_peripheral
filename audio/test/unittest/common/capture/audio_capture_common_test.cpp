@@ -240,6 +240,52 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameExceptions001, TestSize.Level1)
     }
 }
 
+/* capture frameEc cases */
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameEc001, TestSize.Level1)
+{
+    uint32_t len = (uint64_t)GetCaptureBufferSize();
+    struct AudioCaptureFrameInfo frameInfo = {};
+    struct AudioFrameLen frameLen = {};
+    frameLen.frameLen = len;
+    frameLen.frameEcLen = len;
+    ASSERT_NE(capture_->CaptureFrameEc, nullptr);
+	
+    int32_t ret = capture_->Start(capture_);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+
+    ret = capture_->CaptureFrameEc(capture_, &frameLen, &frameInfo);
+#ifndef AUDIO_FEATURE_COMMUNITY
+    EXPECT_EQ(ret, HDF_SUCCESS);
+#else
+    EXPECT_EQ(ret, HDF_ERR_NOT_SUPPORT);
+#endif
+    capture_->Stop(capture_);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameEcExceptions001, TestSize.Level1)
+{
+    uint32_t invalidLen = -1;
+    struct AudioCaptureFrameInfo frameInfo = {};
+    struct AudioFrameLen frameLen = {};
+    frameLen.frameLen = invalidLen;
+    frameLen.frameEcLen = invalidLen;
+    ASSERT_NE(capture_->CaptureFrameEc, nullptr);
+	
+    int32_t ret = capture_->Start(capture_);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+	
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(nullptr, nullptr, nullptr));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, &frameLen, nullptr));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, &frameLen, &frameInfo));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(nullptr, nullptr, &frameInfo));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, &frameLen, nullptr));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, nullptr, nullptr));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, &frameLen, &frameInfo));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrameEc(capture_, nullptr, &frameInfo));
+
+    capture_->Stop(capture_);
+}
+
 /* capture getposition cases */
 HWTEST_F(AudioUtCaptureTest, HdfAudioGetCapturePosition001, TestSize.Level1)
 {
