@@ -16,6 +16,7 @@
 #ifndef OHOS_HDI_CODEC_V2_0_CODECHEIFENCODESERVICE_H
 #define OHOS_HDI_CODEC_V2_0_CODECHEIFENCODESERVICE_H
 
+#include <mutex>
 #include "codec_heif_vdi.h"
 #include "v2_0/icodec_image.h"
 
@@ -34,6 +35,7 @@ private:
     bool LoadVendorLib();
     bool ReWrapNativeBufferInImageItem(const std::vector<ImageItem>& inputImgs);
 private:
+    std::mutex mutex_;
     std::shared_ptr<void> libHeif_ = nullptr;
     ICodecHeifHwi* heifHwi_ = nullptr;
     bool isIPCMode_;
