@@ -41,6 +41,7 @@ static const int RES_BUFFER_MAX_LENGTH = 512;
 static const uint16_t SW1_OFFSET = 2;
 static const uint16_t SW2_OFFSET = 1;
 static const uint16_t MAX_CHANNEL_NUM = 4;
+static const uint16_t MAX_CHANNEL_SIZE = 0xFF;
 static const uint16_t MIN_RES_LEN = 2;
 uint16_t g_openedChannelCount = 0;
 bool g_openedChannels[MAX_CHANNEL_NUM] = {false, false, false, false};
@@ -124,8 +125,9 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
+    uint32_t channelCreated = MAX_CHANNEL_SIZE + 1;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaOpenLogicalChannel(
-        (uint8_t *)&aid[0], aid.size(), p2, res, &resLen, (uint32_t *)&channelNumber);
+        (uint8_t *)&aid[0], aid.size(), p2, res, &resLen, &channelCreated);
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
