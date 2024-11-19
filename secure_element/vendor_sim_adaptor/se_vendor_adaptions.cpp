@@ -39,6 +39,7 @@ static const int RES_BUFFER_MAX_LENGTH = 512;
 static const uint16_t SW1_OFFSET = 2;
 static const uint16_t SW2_OFFSET = 1;
 static const uint16_t MAX_CHANNEL_NUM = 4;
+static const uint16_t MAX_CHANNEL_SIZE = 0xFF;
 uint16_t g_openedChannelCount = 0;
 bool g_openedChannels[MAX_CHANNEL_NUM] = {false, false, false, false};
 bool g_initFuncFlag = false;
@@ -250,7 +251,8 @@ int32_t SimSeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid
     }
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
-    int ret = VendorSimSecureElementOpenLogicalChannel(aid, p2, response, (uint32_t *)&channelNumber, &tmpStatus);
+    uint32_t channelCreated = MAX_CHANNEL_SIZE + 1;
+    int ret = VendorSimSecureElementOpenLogicalChannel(aid, p2, response, &channelCreated, &tmpStatus);
     HDF_LOGE("VendorSimSecureElementOpenLogicalChannel ret %{public}u, tmpStatus = %{public}d", ret, tmpStatus);
     if (ret != SIM_SECURE_ELEMENT_RET_OK) {
         HDF_LOGE("openLogicalChannel failed ret %{public}u, tmpStatus = %{public}d", ret, tmpStatus);
@@ -266,12 +268,17 @@ int32_t SimSeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid
         response.push_back(res[i]);
     }
     if (ret == SIM_SECURE_ELEMENT_RET_OK && resLen >= SW1_OFFSET &&
-        channelNumber < MAX_CHANNEL_NUM - 1 && !g_openedChannels[channelNumber]) {
+        channelCreated < MAX_CHANNEL_NUM - 1 && !g_openedChannels[channelCreated]) {
         if ((response[resLen - SW1_OFFSET] == 0x90 && response[resLen - SW2_OFFSET] == 0x00)
             || response[resLen - SW2_OFFSET] == 0x62 || response[resLen - SW2_OFFSET] == 0x63) {
-            g_openedChannels[channelNumber] = true;
+            g_openedChannels[channelCreated] = true;
             g_openedChannelCount++;
         }
+    }
+    if (channelCreated <= MAX_CHANNEL_SIZE) {
+        channelNumber = static_cast<uint8_t>(channelCreated);
+    } else {
+        HDF_LOGE("openLogicalChannel err, channelCreated = %{public}d", channelCreated);
     }
     return HDF_SUCCESS;
 }
