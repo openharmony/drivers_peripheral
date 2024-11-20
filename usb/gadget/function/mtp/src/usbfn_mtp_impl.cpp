@@ -1289,7 +1289,7 @@ int32_t UsbfnMtpImpl::getActualLength(const std::vector<uint8_t> &data)
 int32_t UsbfnMtpImpl::WriteSplitPacket(const std::vector<uint8_t> &data)
 {
     if (data.size() > WRITE_SPLIT_MININUM_LENGTH && writeActualLen_ == 0) {
-        int32_t writeLen = getActualLength(data);
+        size_t writeLen = getActualLength(data);
         if (writeLen > data.size()) {
             vectorSplited_.resize(writeLen);
             std::copy(data.begin(), data.end(), vectorSplited_.begin());
