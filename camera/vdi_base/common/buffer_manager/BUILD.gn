@@ -56,6 +56,7 @@ if (defined(ohos_lite)) {
     defines = []
     external_deps = [
       "drivers_peripheral_display:hdi_display",
+      "graphic_surface:buffer_handle",
       "graphic_surface:surface",
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
@@ -121,6 +122,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "graphic_surface:buffer_handle",
         "graphic_surface:surface",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
