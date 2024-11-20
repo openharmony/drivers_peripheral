@@ -1130,13 +1130,14 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const uint32_t streamId, cons
     if (event == EVENT_OPEN_SPK || event == EVENT_CLOSE_SPK) {
         spkNotifyFlag_ = false;
         std::unique_lock<std::mutex> lck(spkWaitMutex_);
-        auto status = spkWaitCond_.wait_for(lck, std::chrono::seconds(WAIT_SECONDS), [this, streamId, event]() {
-            auto isSpkOpened = GetSpkStatus(streamId);
-            return spkNotifyFlag_ ||
-                (event == EVENT_OPEN_SPK && isSpkOpened) || (event == EVENT_CLOSE_SPK && !isSpkOpened);
+        auto status = spkWaitCond_.wait_for(lck, std::chrono::milliseconds(WAIT_MILLISECONDS),
+            [this, streamId, event]() {
+                auto isSpkOpened = GetSpkStatus(streamId);
+                return spkNotifyFlag_ ||
+                    (event == EVENT_OPEN_SPK && isSpkOpened) || (event == EVENT_CLOSE_SPK && !isSpkOpened);
         });
         if (!status) {
-            DHLOGE("Wait spk event: %{public}d timeout(%{public}d)s.", event, WAIT_SECONDS);
+            DHLOGE("Wait spk event: %{public}d timeout(%{public}d)ms.", event, WAIT_MILLISECONDS);
             return ERR_DH_AUDIO_HDF_WAIT_TIMEOUT;
         }
         if (event == EVENT_OPEN_SPK && !GetSpkStatus(streamId)) {
@@ -1152,12 +1153,12 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const uint32_t streamId, cons
     if (event == EVENT_OPEN_MIC || event == EVENT_CLOSE_MIC) {
         micNotifyFlag_ = false;
         std::unique_lock<std::mutex> lck(micWaitMutex_);
-        auto status = micWaitCond_.wait_for(lck, std::chrono::seconds(WAIT_SECONDS), [this, event]() {
+        auto status = micWaitCond_.wait_for(lck, std::chrono::milliseconds(WAIT_MILLISECONDS), [this, event]() {
             return micNotifyFlag_ ||
                 (event == EVENT_OPEN_MIC && isMicOpened_) || (event == EVENT_CLOSE_MIC && !isMicOpened_);
         });
         if (!status) {
-            DHLOGE("Wait mic event: %{public}d timeout(%{public}d)s.", event, WAIT_SECONDS);
+            DHLOGE("Wait mic event: %{public}d timeout(%{public}d)ms.", event, WAIT_MILLISECONDS);
             return ERR_DH_AUDIO_HDF_WAIT_TIMEOUT;
         }
         if (event == EVENT_OPEN_MIC && !isMicOpened_) {
