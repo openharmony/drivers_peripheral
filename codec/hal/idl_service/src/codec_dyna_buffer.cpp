@@ -73,6 +73,7 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
         CODEC_LOGE("CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
+
     if (codecBuffer.bufferhandle != nullptr) {
         BufferHandle* handle = codecBuffer.bufferhandle->GetBufferHandle();
         if (handle != nullptr) {
@@ -81,6 +82,7 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
             codecBuffer.filledLen = sizeof(DynamicBuffer);
         }
     }
+    codecBuffer_.alongParam = std::move(codecBuffer.alongParam);
 
     int fence = codecBuffer.fenceFd;
     if (fence >= 0) {
