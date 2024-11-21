@@ -43,7 +43,7 @@ void HdfHostapdHostCTest::SetUpTestCase()
     g_hostapdCallbackObj = HostapdCallbackServiceGet();
     ASSERT_TRUE(g_hostapdObj != nullptr);
     ASSERT_TRUE(g_hostapdCallbackObj != nullptr);
-    int32_t rc = g_hostapdObj->StartAp(g_hostapdObj);
+    int32_t rc = g_hostapdObj->StartApWithCmd(g_hostapdObj, IFNAME, 1);
     ASSERT_EQ(rc, HDF_SUCCESS);
     printf("hostapd_interface_service start successful.");
 }
@@ -259,4 +259,5 @@ HWTEST_F(HdfHostapdHostCTest, ReloadApConfigInfo_016, TestSize.Level1)
     int32_t rc = g_hostapdObj->ReloadApConfigInfo(g_hostapdObj, IFNAME, 1);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
+
 };
