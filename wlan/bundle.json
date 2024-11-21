@@ -26,10 +26,9 @@
         "hilog",
         "c_utils",
         "drivers_interface_wlan",
-        "ipc",
-        "hilog_lite",
         "wpa_supplicant",
-        "init"
+        "init",
+        "ipc"
       ],
       "third_party": [
         "libnl"
