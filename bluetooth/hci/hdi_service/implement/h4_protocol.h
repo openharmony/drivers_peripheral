@@ -17,6 +17,8 @@
 #define OHOS_HDI_BLUETOOTH_HCI_H4_PROTOCOL_H
 
 #include "hci_protocol.h"
+#include <map>
+#include <mutex>
 
 namespace OHOS {
 namespace HDI {
