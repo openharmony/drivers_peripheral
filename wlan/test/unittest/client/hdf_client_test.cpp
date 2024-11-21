@@ -1030,7 +1030,7 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
 }
 /**
  * @tc.name: WifiInstallWlanExtParam029
- * @tc.desc: install wlan ext parm
+ * @tc.desc: install wlan ext param
  * @tc.type: FUNC
  * @tc.require:
  */
