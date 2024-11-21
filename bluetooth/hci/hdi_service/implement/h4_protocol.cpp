@@ -49,7 +49,6 @@ void H4Protocol::SetRTSchedule()
         struct sched_param rtParams = {.sched_priority = RT_PRIORITY};
         int rc = sched_setscheduler(tid, SCHED_FIFO, &rtParams);
         if (rc != 0) {
-            HDF_LOGE("PacketCallback set tid fail.");
             tidMap_[tid] = false;
         } else {
             tidMap_[tid] = true;
