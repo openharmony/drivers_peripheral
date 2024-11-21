@@ -25,11 +25,11 @@ namespace DistributedHardware {
 
 void DcameraDisableDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
-    std::string deviceId = "1";
-    std::string dhId = "2";
+    std::string deviceId(reinterpret_cast<const char*>(data), size);
+    std::string dhId(reinterpret_cast<const char*>(data), size);
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
