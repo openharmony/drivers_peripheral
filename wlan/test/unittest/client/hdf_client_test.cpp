@@ -25,7 +25,6 @@
 using namespace testing::ext;
 
 namespace ClientTest {
-    
 const uint32_t DEFAULT_COMBO_SIZE = 10;
 const char *WLAN_IFNAME = "wlan0";
 const uint32_t RESET_TIME = 3;
