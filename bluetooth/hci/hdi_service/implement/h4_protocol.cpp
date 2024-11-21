@@ -45,10 +45,11 @@ void H4Protocol::SetRTSchedule()
     std::lock_guard<std::mutex> lock(tidMutex_);
     pid_t tid = gettid();
     auto it = tidMap_.find(tid);
-    if (it == tidMap_.end() || !tidMap_[tid]) {
+    if (it == tidMap_.end()) {
         struct sched_param rtParams = {.sched_priority = RT_PRIORITY};
         int rc = sched_setscheduler(tid, SCHED_FIFO, &rtParams);
         if (rc != 0) {
+            HDF_LOGE("set tid rt fail.");
             tidMap_[tid] = false;
         } else {
             tidMap_[tid] = true;
