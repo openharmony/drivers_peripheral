@@ -19,7 +19,6 @@
 #include "utils.h"
 #include <vector>
 
-
 namespace OHOS::Camera {
 constexpr uint32_t LOOP_MAX_COUNT = 10;
 class SourceNode : virtual public NodeBase {
