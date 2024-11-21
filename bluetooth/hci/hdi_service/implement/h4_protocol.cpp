@@ -32,6 +32,8 @@ namespace OHOS {
 namespace HDI {
 namespace Bluetooth {
 namespace Hci {
+const int32_t RT_PRIORITY = 1;
+
 H4Protocol::H4Protocol(
     int fd, HciDataCallback onAclReceive, HciDataCallback onScoReceive, HciDataCallback onEventReceive,
     HciDataCallback onIsoReceive) : hciFd_(fd), onAclReceive_(onAclReceive), onScoReceive_(onScoReceive),
@@ -45,7 +47,7 @@ void H4Protocol::SetRTSchedule()
     auto it = tidMap_.find(tid);
     if (it == tidMap_.end() || !tidMap_[tid]) {
         struct sched_param rtParams = {.sched_priority = RT_PRIORITY};
-        int rc = sched_setscheduler(gettid(), SCHED_FIFO, &rtParams);
+        int rc = sched_setscheduler(tid, SCHED_FIFO, &rtParams);
         if (rc != 0) {
             HDF_LOGE("PacketCallback set tid fail.");
             tidMap_[tid] = false;
