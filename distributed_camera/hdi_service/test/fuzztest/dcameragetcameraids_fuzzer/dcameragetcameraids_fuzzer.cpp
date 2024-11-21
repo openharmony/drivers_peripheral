@@ -24,15 +24,15 @@ namespace OHOS {
 namespace DistributedHardware {
 void DCameraGetCameraIdsFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
     std::string cameraId = "1__2";
     DHBase dhBase;
     dhBase.deviceId_ = "1";
     dhBase.dhId_ = "2";
-    std::string sinkAbilityInfo = "sink";
-    std::string sourceAbilityInfo = "source";
+    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sourceAbilityInfo(reinterpret_cast<const char*>(data), size);
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
         sourceAbilityInfo));
     if (dcameraDevice == nullptr) {
