@@ -1052,7 +1052,7 @@ HWTEST_F(WifiClientTest, GetChannelMeasResult027, TestSize.Level1)
 HWTEST_F(WifiClientTest, WifiInstallWlanExtParam028, TestSize.Level1)
 {
     int32_t ret;
-    const char *ifNameInvalid = "wlanTest"
+    const char *ifNameInvalid = "wlanTest";
     InstallWlanParam param;
     param.id = 0;
     param.suite = 0;
