@@ -2267,8 +2267,10 @@ int32_t ProcessEventP2pGroupFormationFailure(struct HdfWpaRemoteNode *node, char
     } else {
         ret = node->callbackObj->OnEventGroupFormationFailure(node->callbackObj, hdiReason, ifName);
     }
-    OsalMemFree(hdiReason);
-    hdiReason = NULL;
+    if (hdiReason) {
+        OsalMemFree(hdiReason);
+        hdiReason = NULL;
+    }
     return ret;
 }
 
