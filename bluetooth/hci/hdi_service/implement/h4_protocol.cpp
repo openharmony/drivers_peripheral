@@ -19,6 +19,9 @@
 #include <cstring>
 
 #include <hdf_log.h>
+#include <sys/types.h>
+#include <syscall.h>
+#include <unistd.h>
 
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN
@@ -35,8 +38,26 @@ H4Protocol::H4Protocol(
     onEventReceive_(onEventReceive), onIsoReceive_(onIsoReceive)
 {}
 
+void H4Protocol::SetRTSchedule()
+{
+    std::lock_guard<std::mutex> lock(tidMutex_);
+    pid_t tid = gettid();
+    auto it = tidMap_.find(tid);
+    if (it == tidMap_.end() || !tidMap_[tid]) {
+        struct sched_param rtParams = {.sched_priority = RT_PRIORITY};
+        int rc = sched_setscheduler(gettid(), SCHED_FIFO, &rtParams);
+        if (rc != 0) {
+            HDF_LOGE("PacketCallback set tid fail.");
+            tidMap_[tid] = false;
+        } else {
+            tidMap_[tid] = true;
+        }
+    }
+}
+
 ssize_t H4Protocol::SendPacket(HciPacketType packetType, const std::vector<uint8_t> &packetData)
 {
+    SetRTSchedule();
     uint8_t type = packetType;
     ssize_t writtenNumber = 0;
 
@@ -118,6 +139,7 @@ H4Protocol::~H4Protocol() {}
 
 void H4Protocol::PacketCallback()
 {
+    SetRTSchedule();
     switch (packetType_) {
         case HCI_PACKET_TYPE_ACL_DATA:
             if (onAclReceive_) {
