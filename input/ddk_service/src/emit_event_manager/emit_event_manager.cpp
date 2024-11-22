@@ -56,7 +56,7 @@ int32_t EmitEventManager::EmitEvent(uint32_t deviceId, const std::vector<Hid_Emi
     std::lock_guard<std::mutex> lock(mutex_);
     if (virtualDeviceMap_.count(deviceId) == 0) {
         HDF_LOGE("%{public}s device is not exit", __func__);
-        return HID_DDK_FAILURE;
+        return HID_DDK_NULL_PTR;
     }
 
     if (virtualDeviceMap_[deviceId] == nullptr) {
@@ -79,7 +79,7 @@ int32_t EmitEventManager::DestroyDevice(uint32_t deviceId)
     std::lock_guard<std::mutex> lock(mutex_);
     if (virtualDeviceMap_.count(deviceId) == 0) {
         HDF_LOGE("%{public}s device is not exit", __func__);
-        return HID_DDK_FAILURE;
+        return HID_DDK_NULL_PTR;
     }
 	
     uint32_t callingToken = IPCSkeleton::GetCallingTokenID();
