@@ -516,6 +516,31 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelPlusFreeIo(struct UsbMtpPort *mtpPort, boo
     return HDF_SUCCESS;
 }
 
+int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
+{
+    DListHead *queueHead = &(mtpPort->readQueue);
+    if (!DListIsEmpty(queueHead)) {
+        HDF_LOGD("%{public}s: readQueue is not empty", __func__);
+        struct UsbFnRequest *queueReq = nullptr;
+        struct UsbFnRequest *queueReqTmp = nullptr;
+        DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, queueHead, struct UsbFnRequest, list) {
+            (void)UsbFnCancelRequest(queueReq);
+            HDF_LOGD("%{public}s:cancel read, req:%{public}p", __func__, queueReq);
+        }
+    }
+    DListHead *writeQueue = &(mtpPort->writeQueue);
+    if (!DListIsEmpty(writeQueue)) {
+        HDF_LOGD("%{public}s: writeQueue is not empty", __func__);
+        struct UsbFnRequest *queueReq = nullptr;
+        struct UsbFnRequest *queueReqTmp = nullptr;
+        DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, writeQueue, struct UsbFnRequest, list) {
+            (void)UsbFnCancelRequest(queueReq);
+            HDF_LOGD("%{public}s:cancel write, req:%{public}p", __func__, queueReq);
+        }
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbfnMtpImpl::UsbMtpPortReleaseIo()
 {
     return UsbMtpPortCancelPlusFreeIo(mtpPort_, true);
@@ -681,7 +706,7 @@ void UsbfnMtpImpl::UsbMtpDeviceSuspend(struct UsbMtpDevice *mtpDev)
     }
     std::lock_guard<std::mutex> guard(asyncMutex_);
     mtpPort->suspended = true;
-    (void)UsbMtpPortCancelPlusFreeIo(mtpPort, false);
+    (void)UsbMtpPortCancelRequest(mtpPort);
 }
 
 void UsbfnMtpImpl::UsbMtpDeviceResume(struct UsbMtpDevice *mtpDev)
