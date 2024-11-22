@@ -54,7 +54,7 @@ extern "C" IGnssInterface* GnssInterfaceImplGetInstance(void)
     return new (std::nothrow) GnssInterfaceImpl();
 }
 
-static void NiNotifyCallback(OHOS::HDI::Location::GnssNiNotificationRequest *notification)
+void NiNotifyCallback(OHOS::HDI::Location::GnssNiNotificationRequest *notification)
 {
     if (notification == nullptr) {
         HDF_LOGE("%{public}s:niNotificationRequest is nullptr.", __func__);
@@ -90,7 +90,7 @@ static void NiNotifyCallback(OHOS::HDI::Location::GnssNiNotificationRequest *not
     HDF_LOGI("%{public}s:NiNotifyCallback.", __func__);
 }
 
-static void LocationUpdate(GnssLocation* location)
+void LocationUpdate(GnssLocation* location)
 {
     if (location == nullptr) {
         HDF_LOGE("%{public}s:location is nullptr.", __func__);
@@ -121,7 +121,7 @@ static void LocationUpdate(GnssLocation* location)
 }
 
 #ifndef EMULATOR_ENABLED
-static void SetGnssClock(OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo* gnssMeasurementInfoNew,
+void SetGnssClock(OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo* gnssMeasurementInfoNew,
     OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasurementInfo)
 {
     gnssMeasurementInfoNew->gnssClock.fieldValidFlags = gnssMeasurementInfo->gnssClock.fieldValidFlags;
@@ -140,7 +140,7 @@ static void SetGnssClock(OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo* g
         gnssMeasurementInfo->gnssClock.clockHWFreDriftIndicator;
 }
 
-static void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasurementInfo)
+void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasurementInfo)
 {
     if (gnssMeasurementInfo == nullptr) {
         HDF_LOGE("%{public}s:gnssMeasurementInfo is nullptr.", __func__);
@@ -193,7 +193,7 @@ static void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnss
 #endif
 
 __attribute__((no_sanitize("cfi")))
-static void GnssWorkingStatusUpdate(uint16_t* status)
+void GnssWorkingStatusUpdate(uint16_t* status)
 {
     if (status == nullptr) {
         HDF_LOGE("%{public}s:param is nullptr.", __func__);
@@ -210,7 +210,7 @@ static void GnssWorkingStatusUpdate(uint16_t* status)
 }
 
 __attribute__((no_sanitize("cfi")))
-static void SvStatusCallback(GnssSatelliteStatus* svInfo)
+void SvStatusCallback(GnssSatelliteStatus* svInfo)
 {
     if (svInfo == nullptr) {
         HDF_LOGE("%{public}s:sv_info is null.", __func__);
@@ -237,7 +237,7 @@ static void SvStatusCallback(GnssSatelliteStatus* svInfo)
     }
 }
 
-static void NmeaCallback(int64_t timestamp, const char* nmea, int length)
+void NmeaCallback(int64_t timestamp, const char* nmea, int length)
 {
     if (nmea == nullptr) {
         HDF_LOGE("%{public}s:nmea is nullptr.", __func__);
@@ -252,7 +252,7 @@ static void NmeaCallback(int64_t timestamp, const char* nmea, int length)
     }
 }
 
-static void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces* device)
+void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces* device)
 {
     if (device == nullptr) {
         return;
@@ -267,7 +267,7 @@ static void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces* device)
     device->requestExtendedEphemeris = nullptr;
 }
 
-static void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces* device)
+void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces* device)
 {
     if (device == nullptr) {
         return;
@@ -276,7 +276,7 @@ static void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces* device)
     device->cachedLocationUpdate = nullptr;
 }
 
-static void GetGnssCallbackMethods(GnssCallbackStruct* device)
+void GetGnssCallbackMethods(GnssCallbackStruct* device)
 {
     if (device == nullptr) {
         return;
@@ -291,7 +291,7 @@ static void GetGnssCallbackMethods(GnssCallbackStruct* device)
 }
 
 #ifndef EMULATOR_ENABLED
-static void GetGnssMeasurementCallbackMethods(GnssMeasurementCallbackIfaces* device)
+void GetGnssMeasurementCallbackMethods(GnssMeasurementCallbackIfaces* device)
 {
     if (device == nullptr) {
         return;
