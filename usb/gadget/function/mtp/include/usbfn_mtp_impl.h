@@ -204,6 +204,7 @@ private:
     static int32_t UsbMtpPortCancelAndFreeReq(
         struct DListHead *queueHead, struct DListHead *poolHead, int32_t &allocated, bool freeReq);
     static int32_t UsbMtpPortCancelPlusFreeIo(struct UsbMtpPort *mtpPort, bool freeReq);
+    static int32_t UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort);
     static struct UsbFnRequest *UsbMtpDeviceGetCtrlReq(struct UsbMtpDevice *mtpDev);
     static int32_t UsbMtpDeviceStandardRequest(
         struct UsbMtpDevice *mtpDev, struct UsbFnCtrlRequest *setup, struct UsbFnRequest *req);
