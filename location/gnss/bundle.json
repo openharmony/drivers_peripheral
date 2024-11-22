@@ -31,6 +31,9 @@
         "sub_component": [
           "//drivers/peripheral/location/gnss:location_gnss_entry"
         ],
+        "test": [
+          "//drivers/peripheral/location/gnss/test:hdf_test_gnss"
+        ],
         "inner_kits": [
           {
             "name": "//drivers/peripheral/location/gnss/hdi_service:libgnss_interface_service_2.0",
