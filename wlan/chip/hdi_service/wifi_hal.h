@@ -90,6 +90,7 @@ WifiError VendorHalSetRestartHandler(wifiHandle handle,
 typedef struct {
     void (*onScanEvent) (int event);
     void (*onRssiReport) (int index, int c0Rssi, int c1Rssi);
+    void (*onWifiNetlinkMessage) (uint32_t type, const std::vector<uint8_t>& recvMsg);
 } WifiCallbackHandler;
 
 typedef struct {
