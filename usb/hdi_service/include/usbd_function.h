@@ -92,8 +92,8 @@ private:
     static int32_t SetFunctionToStorageHdc();
     static int32_t SetFunctionToManufactureHdc();
     static int32_t SetFunctionToUsbAccessory();
-    static int32_t SetFunctionToNcm;
-    static int32_t SetFunctionToNcmHdc;
+    static int32_t SetFunctionToNcm();
+    static int32_t SetFunctionToNcmHdc();
     static int32_t SetDDKFunction(uint32_t funcs);
     static int32_t UsbdEnableDevice(int32_t funcs);
     static int32_t UsbdWaitUdc();
