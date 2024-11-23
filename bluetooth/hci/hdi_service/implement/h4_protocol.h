@@ -17,6 +17,8 @@
 #define OHOS_HDI_BLUETOOTH_HCI_H4_PROTOCOL_H
 
 #include "hci_protocol.h"
+#include <map>
+#include <mutex>
 
 namespace OHOS {
 namespace HDI {
@@ -32,12 +34,15 @@ public:
 
 private:
     void PacketCallback();
+    void SetRTSchedule();
 
 private:
     int hciFd_ = 0;
     HciDataCallback onAclReceive_;
     HciDataCallback onScoReceive_;
     HciDataCallback onEventReceive_;
+    std::mutex tidMutex_;
+    std::map<pid_t, bool> tidMap_;
 
     uint8_t packetType_ = 0;
     std::vector<uint8_t> hciPacket_;
