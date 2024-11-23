@@ -112,6 +112,7 @@ void CodecDfxService::GetCodecMemoryInfo()
 int32_t CodecDfxService::DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t argv = 0;
+    std::lock_guard<std::mutex> lk{mtx};
     reply_ = reply;
     (void)HdfSbufReadUint32(data, &argv);
     if (argv != ARGV_FLAG) {
