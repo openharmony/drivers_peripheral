@@ -17,7 +17,7 @@
 #define CAMERA_METADATA_ENUM_H
 
 #include <gtest/gtest.h>
-#include "hdi_common_v1_3.h"
+#include "v1_3/types.h"
 
 class CameraMetadataEnumTest : public testing::Test {
 public:
