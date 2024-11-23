@@ -45,10 +45,6 @@ ohos_unittest("camera_metadata_operator_ut") {
 
   include_dirs = [
     # common includes
-    "$camera_common_path/v1_0/include",
-    "$camera_common_path/v1_1/include",
-    "$camera_common_path/v1_2/include",
-    "$camera_common_path/v1_3/include",
     "$camera_test_path/metadata_test/include",
     "$camera_path/../../interfaces/include",
     "$camera_path/metadata_manager/include",

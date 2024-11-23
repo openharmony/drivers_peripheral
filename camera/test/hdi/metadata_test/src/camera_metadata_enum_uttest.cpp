@@ -17,7 +17,7 @@
 using namespace OHOS;
 using namespace std;
 using namespace testing::ext;
-using namespace OHOS::Camera;
+using namespace OHOS::HDI::Camera;
 
 void CameraMetadataEnumTest::SetUpTestCase(void) {}
 void CameraMetadataEnumTest::TearDownTestCase(void) {}
@@ -41,14 +41,14 @@ void CameraMetadataEnumTest::TearDown(void)
 HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_001, TestSize.Level1)
 {
     printf("CameraMetadataEnumTest Camera_Metedate_Enum_001 start...\n");
-    int32_t operationMode_[] = {
+    std::vector<int32_t> operationMode = {
         OHOS::HDI::Camera::V1_3::OperationMode::QUICK_SHOT_PHOTO,
         OHOS::HDI::Camera::V1_3::OperationMode::TIMELAPSE_PHOTO,
         OHOS::HDI::Camera::V1_3::OperationMode::FLUORESCENCE_PHOTO,
     };
-    int32_t numColors = sizeof(operationMode_) / sizeof(OHOS::HDI::Camera::V1_3::OperationMode::QUICK_SHOT_PHOTO);
-    for (int32_t i = 0; i < numColors; i++) {
-        switch (operationMode_[i]) {
+    ASSERT_EQ(operationMode.empty(), false);
+    for (int32_t i = 0; i < operationMode.size(); i++) {
+        switch (operationMode[i]) {
             case 16 : {
                 printf("OHOS::HDI::Camera::V1_3::OperationMode::CAMERA_CUSTOM_COLOR_NORMAL is here\n");
                 break;
@@ -74,13 +74,13 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_001, TestSize.Level1)
 HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_002, TestSize.Level1)
 {
     printf("CameraMetadataEnumTest Camera_Metedate_Enum_002 start...\n");
-    int32_t DeferredDelivery[] = {
+    std::vector<int> deferredDelivery = {
         OHOS::HDI::Camera::V1_3::DeferredDeliveryImageType::NONE,
         OHOS::HDI::Camera::V1_3::DeferredDeliveryImageType::MOVING_IMAGE,
     };
-    int32_t numColors = sizeof(DeferredDelivery) / sizeof(OHOS::HDI::Camera::V1_3::DeferredDeliveryImageType::NONE);
-    for (int32_t i = 0; i < numColors; i++) {
-        switch (DeferredDelivery[i]) {
+    ASSERT_EQ(deferredDelivery.empty(), false);
+    for (int32_t i = 0; i < deferredDelivery.size(); i++) {
+        switch (deferredDelivery[i]) {
             case 0 : {
                 printf("OHOS::HDI::Camera::V1_3::DeferredDeliveryImageType::NONE is here\n");
                 break;
@@ -102,16 +102,16 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_002, TestSize.Level1)
 HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_003, TestSize.Level1)
 {
     printf("CameraMetadataEnumTest Camera_Metedate_Enum_003 start...\n");
-    int32_t sessionstatus_[] = {
+    std::vector<int> sessionStatus = {
         OHOS::HDI::Camera::V1_3::SessionStatus::SESSION_STATUS_READY,
         OHOS::HDI::Camera::V1_3::SessionStatus::SESSION_STATUS_READY_SPACE_LIMIT_REACHED,
         OHOS::HDI::Camera::V1_3::SessionStatus::SESSSON_STATUS_NOT_READY_TEMPORARILY,
         OHOS::HDI::Camera::V1_3::SessionStatus::SESSION_STATUS_NOT_READY_OVERHEAT,
         OHOS::HDI::Camera::V1_3::SessionStatus::SESSION_STATUS_NOT_READY_PREEMPTED,
     };
-    int32_t numColors = sizeof(sessionstatus_) / sizeof(OHOS::HDI::Camera::V1_3::SessionStatus::SESSION_STATUS_READY);
-    for (int32_t i = 0; i < numColors; i++) {
-        switch (sessionstatus_[i]) {
+    ASSERT_EQ(sessionStatus.empty(), false);
+    for (int32_t i = 0; i < sessionStatus.size(); i++) {
+        switch (sessionStatus[i]) {
             case 0: {
                 printf("OHOS::HDI::Camera::V1_3::SessionStatus::SESSION_STATUS_READY is here\n");
                 break;
@@ -145,7 +145,7 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_003, TestSize.Level1)
 HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_004, TestSize.Level1)
 {
     printf("CameraMetadataEnumTest Camera_Metedate_Enum_004 start...\n");
-    int32_t errorcode_[] = {
+    std::vector<int> errorCode = {
         OHOS::HDI::Camera::V1_3::ErrorCode::ERROR_INVALID_ID,
         OHOS::HDI::Camera::V1_3::ErrorCode::ERROR_PROCESS,
         OHOS::HDI::Camera::V1_3::ErrorCode::ERROR_TIMEOUT,
@@ -153,9 +153,9 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_004, TestSize.Level1)
         OHOS::HDI::Camera::V1_3::ErrorCode::ERROR_ABNORMAL,
         OHOS::HDI::Camera::V1_3::ErrorCode::ERROR_ABORT,
     };
-    int32_t numColors = sizeof(errorcode_) / sizeof(OHOS::HDI::Camera::V1_3::ErrorCode::ERROR_INVALID_ID);
-    for (int32_t i = 0; i < numColors; i++) {
-        switch (errorcode_[i]) {
+    ASSERT_EQ(errorCode.empty(), false);
+    for (int32_t i = 0; i < errorCode.size(); i++) {
+        switch (errorCode[i]) {
             case 0: {
                 printf("OHOS::HDI::Camera::V1_3::ErrorCode::ERROR_INVALID_ID is here\n");
                 break;
@@ -189,7 +189,7 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_004, TestSize.Level1)
 HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Info_005, TestSize.Level1)
 {
     printf("CameraMetadataEnumTest Camera_Metedate_Enum_005 start...\n");
-    int32_t ExtendedStream[] = {
+    std::vector<int> extendedStream = {
         OHOS::HDI::Camera::V1_3::ExtendedStreamInfoType::EXTENDED_STREAM_INFO_DEPTH,
         OHOS::HDI::Camera::V1_3::ExtendedStreamInfoType::EXTENDED_STREAM_INFO_MAKER_INFO,
         OHOS::HDI::Camera::V1_3::ExtendedStreamInfoType::EXTENDED_STREAM_INFO_EXIF,
@@ -198,9 +198,9 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Info_005, TestSize.Level1)
         OHOS::HDI::Camera::V1_3::ExtendedStreamInfoType::EXTENDED_STREAM_INFO_LINEAR,
         OHOS::HDI::Camera::V1_3::ExtendedStreamInfoType::EXTENDED_STREAM_INFO_FRAGMENT,
     };
-    int32_t numColors = sizeof(ExtendedStream) / sizeof(OHOS::HDI::Camera::V1_3::ExtendedStreamInfoType::EXTENDED_STREAM_INFO_DEPTH);
-    for (int32_t i = 0; i < numColors; i++) {
-        switch (ExtendedStream[i]) {
+    ASSERT_EQ(extendedStream.empty(), false);
+    for (int32_t i = 0; i < extendedStream.size(); i++) {
+        switch (extendedStream[i]) {
             case 3: {
                 printf("OHOS::HDI::Camera::V1_3::ExtendedStreamInfoType::EXTENDED_STREAM_INFO_DEPTH is here\n");
                 break;
@@ -242,7 +242,7 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Info_005, TestSize.Level1)
 HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_006, TestSize.Level1)
 {
     printf("CameraMetadataEnumTest Camera_Metedate_Enum_006 start...\n");
-    int32_t streamytype_[] = {
+    std::vector<int> streamyType = {
         OHOS::HDI::Camera::V1_3::StreamType::STREAM_TYPE_PREVIEW,
         OHOS::HDI::Camera::V1_3::StreamType::STREAM_TYPE_VIDEO,
         OHOS::HDI::Camera::V1_3::StreamType::STREAM_TYPE_STILL_CAPTURE,
@@ -250,9 +250,9 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_006, TestSize.Level1)
         OHOS::HDI::Camera::V1_3::StreamType::STREAM_TYPE_ANALYZE,
         OHOS::HDI::Camera::V1_3::StreamType::STREAM_TYPE_CUSTOM,
     };
-    int32_t numColors = sizeof(streamytype_) / sizeof(OHOS::HDI::Camera::V1_3::StreamType::STREAM_TYPE_PREVIEW);
-    for (int32_t i = 0; i < numColors; i++) {
-        switch (streamytype_[i]) {
+    ASSERT_EQ(streamyType.empty(), false);
+    for (int32_t i = 0; i < streamyType.size(); i++) {
+        switch (streamyType[i]) {
             case 0: {
                 printf("OHOS::HDI::Camera::V1_3::StreamType::STREAM_TYPE_PREVIEW is here\n");
                 break;
@@ -290,14 +290,14 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_006, TestSize.Level1)
 HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_007, TestSize.Level1)
 {
     printf("CameraMetadataEnumTest Camera_Metedate_Enum_007 start...\n");
-    int32_t mediastream_[] = {
+    std::vector<int> mediaStream = {
         OHOS::HDI::Camera::V1_3::MediaStreamType::MEDIA_STREAM_TYPE_VIDEO,
         OHOS::HDI::Camera::V1_3::MediaStreamType::MEDIA_STREAM_TYPE_METADATA,
         OHOS::HDI::Camera::V1_3::MediaStreamType::MEDIA_STREAM_TYPE_MAKER,
     };
-    int32_t numColors = sizeof(mediastream_) / sizeof(OHOS::HDI::Camera::V1_3::MediaStreamType::MEDIA_STREAM_TYPE_METADATA);
-    for (int32_t i = 0; i < numColors; i++) {
-        switch (mediastream_[i]) {
+    ASSERT_EQ(mediaStream.empty(), false);
+    for (int32_t i = 0; i < mediaStream.size(); i++) {
+        switch (mediaStream[i]) {
             case 0: {
                 printf("OHOS::HDI::Camera::V1_3::MediaStreamType::MEDIA_STREAM_TYPE_VIDEO is here\n");
                 break;
@@ -324,11 +324,7 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_008, TestSize.Level1)
 {
     printf("CameraMetadataEnumTest Camera_Metedate_Enum_008 start...\n");
     ASSERT_EQ(OHOS::HDI::Camera::V1_3::ExecutionMode::DEFAULT, 3);
-    printf("OHOS::HDI::Camera::V1_3::ExecutionMode::DEFAULT is here\n");
     ASSERT_EQ(OHOS::HDI::Camera::V1_3::ErrorType::SENSOR_DATA_ERROR, 5);
-    printf("OHOS::HDI::Camera::V1_3::ErrorType::SENSOR_DATA_ERROR is here\n");
     ASSERT_EQ(OHOS::HDI::Camera::V1_3::EncodeType::ENCODE_TYPE_HEIC, 4);
-    printf("OHOS::HDI::Camera::V1_3::EncodeType::ENCODE_TYPE_HEIC is here\n");
     ASSERT_EQ(OHOS::HDI::Camera::V1_3::StreamError::HIGH_TEMPERATURE_ERROR, 2);
-    printf("OHOS::HDI::Camera::V1_3::StreamError::HIGH_TEMPERATURE_ERROR is here\n");
 }
