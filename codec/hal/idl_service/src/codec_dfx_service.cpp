@@ -114,7 +114,10 @@ int32_t CodecDfxService::DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *
     uint32_t argv = 0;
     std::lock_guard<std::mutex> lk{mtx};
     reply_ = reply;
-    (void)HdfSbufReadUint32(data, &argv);
+    if (!HdfSbufReadUint32(data, &argv)) {
+        CODEC_LOGE("idl_service read argv failed!");
+        return HDF_FAILURE;
+    }
     if (argv != ARGV_FLAG) {
         if (!HdfSbufWriteString(reply, "please enter -h for help! \n")) {
             CODEC_LOGE("help write Fail!");
