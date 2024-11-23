@@ -575,7 +575,7 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
         case USB_FUNCTION_NCM:
             HDF_LOGI("%{public}s: set ncm", __func__);
             return UsbdFunction::SetFunctionToNcm();
-        case USB_FUNCTION_NCM_HDC:
+        case USB_FUNCTION_NCM | USB_FUNCTION_HDC:
             HDF_LOGI("%{public}s: set ncm hdc", __func__);
             return UsbdFunction::SetFunctionToNcmHdc();
         default:
