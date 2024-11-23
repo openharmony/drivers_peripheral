@@ -1095,6 +1095,7 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: OpenDevice too many times ", __func__);
         return HDF_FAILURE;
     }
+    OsalMutexLock(&lock_);
     g_usbOpenCount++;
     port->initFlag = true;
     if (port->ctrDevHandle == nullptr && port->ctrIface != nullptr) {
@@ -1102,10 +1103,12 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
             __func__, dev.busNum, dev.devAddr);
         port->ctrDevHandle = UsbOpenInterface(port->ctrIface);
         if (port->ctrDevHandle == nullptr) {
+            OsalMutexUnlock(&lock_);
             HDF_LOGE("%{public}s:ctrDevHandle UsbOpenInterface nullptr", __func__);
             return HDF_FAILURE;
         }
     }
+    OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
 }
 
@@ -1120,18 +1123,21 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: openPort failed", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
+    OsalMutexLock(&lock_);
     g_usbOpenCount--;
     int32_t ret = 0;
     if (port->ctrDevHandle != nullptr && g_usbOpenCount == 0) {
         RawUsbCloseCtlProcess(port->ctrDevHandle);
         ret = UsbCloseInterface(port->ctrDevHandle, true);
         if (ret != HDF_SUCCESS) {
+            OsalMutexUnlock(&lock_);
             HDF_LOGE("%{public}s:usbCloseInterface ctrDevHandle failed.", __func__);
             return HDF_FAILURE;
         }
         port->ctrDevHandle = nullptr;
         port->initFlag = false;
     }
+    OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
 }
 
