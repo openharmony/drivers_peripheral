@@ -248,7 +248,7 @@ private:
     uint32_t BufCopyToVector(void *buf, uint32_t bufSize, std::vector<uint8_t> &vectorData);
     uint32_t BufCopyFromVector(
         void *buf, uint32_t bufSize, const std::vector<uint8_t> &vectorData, uint32_t vectorOffset);
-
+    void UsbMtpSendFileParamSet(const UsbFnMtpFileSlice &mfs);
     static struct UsbMtpDevice *mtpDev_;
     static struct UsbMtpPort *mtpPort_;
     static std::mutex startMutex_;
