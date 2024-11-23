@@ -282,7 +282,7 @@ int32_t UsbdFunction::SetFunctionToNcm()
     return HDF_SUCCESS;
 }
 
-int32_t UsbdFunction::SetFunctionToUsbAccessory()
+int32_t UsbdFunction::SetFunctionToNcmHdc()
 {
     HDF_LOGD("%{public}s enter", __func__);
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_NCM_HDC);
