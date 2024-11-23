@@ -24,7 +24,7 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t argv = 0;
     if (!HdfSbufReadUint32(data, &argv)) {
-        CODEC_LOGE("idl_service read argv failed!");
+        CODEC_LOGE("read argv failed!");
         return HDF_FAILURE;
     }
     if (argv != 1) {
