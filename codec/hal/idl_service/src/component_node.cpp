@@ -32,7 +32,6 @@ using OHOS::HDI::Codec::V3_0::EventInfo;
 using OHOS::HDI::Codec::V3_0::CodecEventType;
 using OHOS::HDI::Codec::V3_0::CodecStateType;
 using OHOS::HDI::Codec::V3_0::CodecCommandType;
-using OHOS::HDI::Codec::V3_0::CodecStateType;
 using OHOS::HDI::Codec::V3_0::CODEC_STATE_INVALID;
 using OHOS::HDI::Codec::V3_0::CODEC_STATE_LOADED;
 using OHOS::HDI::Codec::V3_0::CODEC_STATE_IDLE;
