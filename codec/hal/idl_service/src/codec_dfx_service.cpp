@@ -16,6 +16,7 @@
 #include "codec_log_wrapper.h"
 #include "codec_dfx_service.h"
 #include "malloc.h"
+#include <mutex>
 namespace OHOS {
 namespace HDI {
 namespace Codec {
@@ -25,7 +26,7 @@ namespace V3_0 {
 #define OUTPUT_PORT_INDEX 1
 CodecDfxService CodecDfxService::dfxInstance_;
 HdfSBuf *CodecDfxService::reply_;
-
+std::mutex mtx;
 int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
 {
     CodecStateType state;
