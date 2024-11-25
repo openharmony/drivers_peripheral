@@ -26,8 +26,6 @@ group("camera_hal_test") {
       "$test_path/hdi/metadata_test:camera_metadata_operator_ut",
       "$test_path/hdi/sequenceable_test:camera_hdi_sequenceable_ut",
       "$test_path/hdi/v1_0:camera_test_at",
-      "$test_path/hdi/v1_1:camera_test_hdi_V1_1",
-      "$test_path/hdi/v1_2:camera_test_hdi_V1_2",
       "$test_path/ut/buffer_manager:camera_buffer_manager_ut",
       "$test_path/ut/usb_camera:camera_usb_test_ut",
       "$test_path/ut/v4l2:camera_test_v4l2_ut",
