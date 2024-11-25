@@ -13,13 +13,14 @@
 
 import("//build/test.gni")
 import("//build/test.gni")
+import("../../../audio.gni")
 
 group("audio_config_fuzzer") {
   testonly = true
   deps = []
 
-  deps += [
-    "audiocardconfig_fuzzer:AudioCardConfigFuzzTest",
-    "pathselectconfig_fuzzer:PathSelectConfigFuzzTest",
-  ]
+  deps += [ "pathselectconfig_fuzzer:PathSelectConfigFuzzTest" ]
+  if (drivers_peripheral_audio_feature_alsa_lib) {
+    deps += [ "audiocardconfig_fuzzer:AudioCardConfigFuzzTest" ]
+  }
 }
