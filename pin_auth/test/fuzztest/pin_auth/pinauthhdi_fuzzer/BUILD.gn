@@ -35,7 +35,7 @@ ohos_fuzztest("PinAuthHdiFuzzTest") {
     "pin_auth_hdi_fuzzer.cpp",
   ]
 
-  deps = [ "../common_fuzzer:libpin_auth_interface_service_2.0_fuzzer" ]
+  deps = [ "../common_fuzzer:libpin_auth_interface_service_2.1_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",
