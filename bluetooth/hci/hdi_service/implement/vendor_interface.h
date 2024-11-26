@@ -62,7 +62,7 @@ private:
     void* vendorHandle_ = nullptr;
     BtVendorInterfaceT *vendorInterface_ = nullptr;
     static BtVendorCallbacksT vendorCallbacks_;
-    HciWatcher watcher_;
+    std::shared_ptr<HciWatcher> watcher_;
     std::shared_ptr<Hci::HciProtocol> hci_ = nullptr;
     uint16_t vendorSentOpcode_ = 0;
     uint32_t lpmTimer_ = 0;
