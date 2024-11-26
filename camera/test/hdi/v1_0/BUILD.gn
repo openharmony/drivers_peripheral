@@ -124,7 +124,11 @@ if (defined(ohos_lite)) {
     ]
 
     deps = []
-    defines = [ "CAMERA_UT_TEST" ]
+    if (defined(defines)) {
+      defines += [ "CAMERA_UT_TEST" ]
+    } else {
+      defines = [ "CAMERA_UT_TEST" ]
+    }
 
     if (is_standard_system) {
       external_deps = [

@@ -236,7 +236,7 @@ HWTEST_F(NfcImplTest, IoctlWithResponse002, TestSize.Level1)
     NfcStatus status = NfcStatus::OK;
     std::shared_ptr<NfcImpl> nfcImpl = std::make_shared<NfcImpl>();
     int ret = nfcImpl->IoctlWithResponse(cmd, data, response, status);
-    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 
 /**

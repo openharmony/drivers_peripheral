@@ -692,7 +692,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0023)
     StreamInfo streamInfoCapture = {};
     streamInfoCapture.streamId_ = cameraBase_->STREAM_ID_CAPTURE;
     streamInfoCapture.width_ = 1280; // 1280:picture width
-    streamInfoCapture.height_ = 960; // 960:picture height
+    streamInfoCapture.height_ = 720; // 720:picture height
     streamInfoCapture.format_ = PIXEL_FMT_RGBA_8888;
     streamInfoCapture.dataspace_ = 8; // 8:picture dataspace
     streamInfoCapture.intent_ = STILL_CAPTURE;
@@ -847,7 +847,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0027)
     StreamInfo streamInfoVideo = {};
     streamInfoVideo.streamId_ = cameraBase_->STREAM_ID_VIDEO;
     streamInfoVideo.width_ = 1280; // 1280:picture width
-    streamInfoVideo.height_ = 960; // 960:picture height
+    streamInfoVideo.height_ = 720; // 720:picture height
     streamInfoVideo.format_ = PIXEL_FMT_RGBA_8888;
     streamInfoVideo.dataspace_ = 8; // 8:picture dataspace
     streamInfoVideo.intent_ = VIDEO;
@@ -1900,4 +1900,61 @@ TEST_F(UtestUSBCameraTest, camera_usb_0055)
     sleep(1);
     cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->ReleaseStreams({streamIdVideo});
     EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Commit 2 streams together, width = 1280, height = 960, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0056)
+{
+    cameraBase_->OpenUsbCamera();
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    cameraBase_->AchieveStreamOperator();
+    if (cameraBase_->streamCustomerPreview_ == nullptr) {
+        cameraBase_->streamCustomerPreview_ = std::make_shared<StreamCustomer>();
+    }
+    std::vector<StreamInfo> streamInfos;
+    StreamInfo streamInfo = {};
+    streamInfo.streamId_ = cameraBase_->STREAM_ID_PREVIEW;
+    streamInfo.width_ = 1280; // 1280:picture width
+    streamInfo.height_ = 960; // 960:picture height
+    streamInfo.format_ = PIXEL_FMT_RGBA_8888;
+    streamInfo.dataspace_ = 8; // 8:picture dataspace
+    streamInfo.intent_ = PREVIEW;
+    streamInfo.tunneledMode_ = 5; // 5:tunnel mode
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(cameraBase_->streamCustomerPreview_->CreateProducer());
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
+    streamInfos.push_back(streamInfo);
+    if (cameraBase_->streamCustomerVideo_ == nullptr) {
+        cameraBase_->streamCustomerVideo_ = std::make_shared<StreamCustomer>();
+    }
+    StreamInfo streamInfoVideo = {};
+    streamInfoVideo.streamId_ = cameraBase_->STREAM_ID_VIDEO;
+    streamInfoVideo.width_ = 1280; // 1280:picture width
+    streamInfoVideo.height_ = 960; // 960:picture height
+    streamInfoVideo.format_ = PIXEL_FMT_RGBA_8888;
+    streamInfoVideo.dataspace_ = 8; // 8:picture dataspace
+    streamInfoVideo.intent_ = VIDEO;
+    streamInfoVideo.encodeType_ = ENCODE_TYPE_H264;
+    streamInfoVideo.tunneledMode_ = 5; // 5:tunnel mode
+    streamInfoVideo.bufferQueue_ = new BufferProducerSequenceable(cameraBase_->streamCustomerVideo_->CreateProducer());
+    ASSERT_NE(streamInfoVideo.bufferQueue_, nullptr);
+    streamInfoVideo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
+    streamInfos.push_back(streamInfoVideo);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
+    ASSERT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
+    ASSERT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }

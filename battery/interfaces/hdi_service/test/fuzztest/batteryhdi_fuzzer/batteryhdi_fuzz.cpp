@@ -18,6 +18,7 @@
 #include "securec.h"
 #include <cstdint>
 #include <cstdlib>
+#include <datetime_ex.h>
 #include <map>
 #include <random>
 #include <vector>
@@ -46,15 +47,29 @@ public:
 sptr<IBatteryInterface> g_batteryInterface = IBatteryInterface::Get();
 } // namespace
 
-void Register([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void Register(const uint8_t *data, size_t size)
 {
+    uint8_t code;
+    if (size < sizeof(code)) {
+        return;
+    }
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
+        return;
+    }
     sptr<IBatteryCallback> callback = new BatteryCallback();
     g_batteryInterface->Register(callback);
     g_batteryInterface->Register(nullptr);
 }
 
-void UnRegister([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void UnRegister(const uint8_t *data, size_t size)
 {
+    uint8_t code;
+    if (size < sizeof(code)) {
+        return;
+    }
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
+        return;
+    }
     g_batteryInterface->UnRegister();
 }
 
@@ -64,80 +79,164 @@ void ChangePath(const uint8_t *data, size_t size)
     g_batteryInterface->ChangePath(result);
 }
 
-void GetCapacity([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetCapacity(const uint8_t *data, size_t size)
 {
     int32_t out;
+    if (size < sizeof(out)) {
+        return;
+    }
+    if (memcpy_s(&out, sizeof(out), data, sizeof(out)) != EOK) {
+        return;
+    }
     g_batteryInterface->GetCapacity(out);
 }
 
-void GetVoltage([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetVoltage(const uint8_t *data, size_t size)
 {
     int32_t out;
+    if (size < sizeof(out)) {
+        return;
+    }
+    if (memcpy_s(&out, sizeof(out), data, sizeof(out)) != EOK) {
+        return;
+    }
     g_batteryInterface->GetVoltage(out);
 }
 
-void GetTemperature([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetTemperature(const uint8_t *data, size_t size)
 {
     int32_t out;
+    if (size < sizeof(out)) {
+        return;
+    }
+    if (memcpy_s(&out, sizeof(out), data, sizeof(out)) != EOK) {
+        return;
+    }
     g_batteryInterface->GetTemperature(out);
 }
 
-void GetHealthState([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetHealthState(const uint8_t *data, size_t size)
 {
+    uint8_t code;
+    if (size < sizeof(code)) {
+        return;
+    }
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
+        return;
+    }
     BatteryHealthState state;
     g_batteryInterface->GetHealthState(state);
 }
 
-void GetPluggedType([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetPluggedType(const uint8_t *data, size_t size)
 {
+    uint8_t code;
+    if (size < sizeof(code)) {
+        return;
+    }
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
+        return;
+    }
     BatteryPluggedType type;
     g_batteryInterface->GetPluggedType(type);
 }
 
-void GetChargeState([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetChargeState(const uint8_t *data, size_t size)
 {
+    uint8_t code;
+    if (size < sizeof(code)) {
+        return;
+    }
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
+        return;
+    }
     BatteryChargeState state;
     g_batteryInterface->GetChargeState(state);
 }
 
-void GetPresent([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetPresent(const uint8_t *data, size_t size)
 {
+    uint8_t code;
+    if (size < sizeof(code)) {
+        return;
+    }
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
+        return;
+    }
     bool present;
     g_batteryInterface->GetPresent(present);
 }
 
-void GetTechnology([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetTechnology(const uint8_t *data, size_t size)
 {
+    uint8_t code;
+    if (size < sizeof(code)) {
+        return;
+    }
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
+        return;
+    }
     std::string str;
     g_batteryInterface->GetTechnology(str);
 }
 
-void GetTotalEnergy([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetTotalEnergy(const uint8_t *data, size_t size)
 {
     int32_t out;
+    if (size < sizeof(out)) {
+        return;
+    }
+    if (memcpy_s(&out, sizeof(out), data, sizeof(out)) != EOK) {
+        return;
+    }
     g_batteryInterface->GetTotalEnergy(out);
 }
 
-void GetCurrentAverage([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetCurrentAverage(const uint8_t *data, size_t size)
 {
     int32_t out;
+    if (size < sizeof(out)) {
+        return;
+    }
+    if (memcpy_s(&out, sizeof(out), data, sizeof(out)) != EOK) {
+        return;
+    }
     g_batteryInterface->GetCurrentAverage(out);
 }
 
-void GetCurrentNow([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetCurrentNow(const uint8_t *data, size_t size)
 {
     int32_t out;
+    if (size < sizeof(out)) {
+        return;
+    }
+    if (memcpy_s(&out, sizeof(out), data, sizeof(out)) != EOK) {
+        return;
+    }
     g_batteryInterface->GetCurrentNow(out);
 }
 
-void GetRemainEnergy([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetRemainEnergy(const uint8_t *data, size_t size)
 {
     int32_t out;
+    if (size < sizeof(out)) {
+        return;
+    }
+    if (memcpy_s(&out, sizeof(out), data, sizeof(out)) != EOK) {
+        return;
+    }
     g_batteryInterface->GetRemainEnergy(out);
 }
 
-void GetBatteryInfo([[maybe_unused]] const uint8_t *data, [[maybe_unused]] size_t size)
+void GetBatteryInfo(const uint8_t *data, size_t size)
 {
+    uint8_t code;
+    if (size < sizeof(code)) {
+        return;
+    }
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
+        return;
+    }
     BatteryInfo info;
     g_batteryInterface->GetBatteryInfo(info);
 }
@@ -187,10 +286,7 @@ static std::vector<std::function<void(const uint8_t *, size_t)>> fuzzFunc = {
 
 void BatteryHdiFuzzTest(const uint8_t *data, size_t size)
 {
-    std::random_device rd;
-    std::default_random_engine engine(rd());
-    std::uniform_int_distribution<int32_t> randomNum(0, fuzzFunc.size() - 1);
-    int32_t number = randomNum(engine);
+    int32_t number = GetTickCount() % fuzzFunc.size();
     fuzzFunc[number](data, size);
 }
 } // namespace V2_0

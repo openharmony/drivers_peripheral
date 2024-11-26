@@ -41,6 +41,7 @@
             "header_files": [
               "interfaces/include/audio_adapter.h",
               "interfaces/include/audio_attribute.h",
+              "interfaces/include/audio_capture.h",
               "interfaces/include/audio_control.h",
               "interfaces/include/audio_manager.h",
               "interfaces/include/audio_render.h",

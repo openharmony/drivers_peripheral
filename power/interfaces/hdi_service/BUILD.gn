@@ -17,6 +17,7 @@ ohos_shared_library("libpower_interface_service_1.2") {
   include_dirs = [ "../../utils/include" ]
   sources = [
     "../../utils/power_xcollie.cpp",
+    "src/power_config.cpp",
     "src/power_interface_impl.cpp",
     "src/running_lock_counter.cpp",
     "src/running_lock_impl.cpp",
@@ -30,33 +31,30 @@ ohos_shared_library("libpower_interface_service_1.2") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "jsoncpp:jsoncpp",
     "libxml2:libxml2",
   ]
 
   defines = []
-  if (has_power_c_utils_part) {
+  if (drivers_peripheral_power_c_utils) {
     external_deps += [ "c_utils:utils" ]
   }
-  if (has_power_hisysevent_part) {
+  if (drivers_peripheral_power_hisysevent) {
     external_deps += [ "hisysevent:libhisysevent" ]
+    defines += [ "HAS_POWER_HISYSEVENT_PART" ]
   }
 
   # xcollie has a bug, disable it
-  has_power_xcollie_part = false
-  if (has_power_xcollie_part) {
+  if (drivers_peripheral_power_hicollie) {
     external_deps += [ "hicollie:libhicollie" ]
     defines += [ "HICOLLIE_ENABLE" ]
   }
 
+  if (drivers_peripheral_power_config_policy) {
+    external_deps += [ "config_policy:configpolicy_util" ]
+  }
+
   if (drivers_peripheral_power_wakeup_cause_path) {
-    sources += [ "src/power_config.cpp" ]
-
-    external_deps += [ "jsoncpp:jsoncpp" ]
-
-    if (has_power_config_policy_part) {
-      external_deps += [ "config_policy:configpolicy_util" ]
-    }
-
     defines += [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
   }
 
@@ -96,7 +94,7 @@ ohos_shared_library("libpower_driver") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
-  if (has_power_c_utils_part) {
+  if (drivers_peripheral_power_c_utils) {
     external_deps += [ "c_utils:utils" ]
   }
 

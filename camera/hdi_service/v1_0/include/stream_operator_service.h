@@ -24,6 +24,7 @@
 #include "v1_0/ioffline_stream_operator.h"
 #include "v1_0/types.h"
 #include "v1_0/istream_operator_vdi.h"
+#include "camera_hal_hicollie.h"
 
 namespace OHOS::Camera {
 using namespace OHOS::HDI::Camera::V1_0;

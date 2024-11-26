@@ -23,6 +23,7 @@
 #include "v1_0/icamera_device_callback.h"
 #include "v1_0/icamera_device_vdi.h"
 #include "v1_0/icamera_device_vdi_callback.h"
+#include "camera_hal_hicollie.h"
 
 namespace OHOS::Camera {
 using namespace OHOS::HDI::Camera::V1_0;
