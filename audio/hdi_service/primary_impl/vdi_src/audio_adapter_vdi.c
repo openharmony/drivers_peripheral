@@ -109,11 +109,7 @@ static int32_t AudioInitAllPortsVdi(struct IAudioAdapter *adapter)
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
-    if (vdiAdapter == NULL) {
-        ret = HDF_ERR_INVALID_PARAM;
-        goto EXIT;
-    }
-    if (vdiAdapter->InitAllPorts == NULL) {
+    if (vdiAdapter == NULL || vdiAdapter->InitAllPorts == NULL) {
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
