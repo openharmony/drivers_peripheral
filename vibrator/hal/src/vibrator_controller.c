@@ -352,16 +352,18 @@ static int32_t IsVibratorRunning(bool *state)
         return ret;
     }
 
-    if (HdfSbufReadInt32(reply, *state) != HDF_SUCCESS) {
+    int32_t stateNum;
+    if (HdfSbufReadInt32(reply, &stateNum) != HDF_SUCCESS) {
         HdfSbufRecycle(reply);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
 
+    *state = stateNum;
     HdfSbufRecycle(reply);
     (void)OsalMutexUnlock(&priv->mutex);
 
-    HDF_LOGI("%{public}s: *state %{public}s", __func__, *state);
+    HDF_LOGI("%{public}s: *state %{public}d", __func__, *state);
 
     return HDF_SUCCESS;
 }
