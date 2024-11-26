@@ -278,7 +278,7 @@ HWTEST_F(CameraMetadataEnumTest, Camera_Metedate_Enum_006, TestSize.Level1)
                 break;
             }
         }
-    } 
+    }
 }
 
 /**
