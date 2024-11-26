@@ -104,12 +104,14 @@ static int32_t AudioInitAllPortsVdi(struct IAudioAdapter *adapter)
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->InitAllPorts == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -184,11 +186,13 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
 
     int32_t ret = VerifyParamsOfAudioCreateRenderVdi(adapter, desc, attrs, render, renderId);
     if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("invalid param");
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->CreateRender == NULL || vdiAdapter->DestroyRender == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -205,7 +209,7 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         AUDIO_FUNC_LOGE("CreateRenderPre failed");
         goto EXIT;
     }
-    AUDIO_FUNC_LOGI("AudioCreateRenderVdi Success");
+    AUDIO_FUNC_LOGI("AudioCreateRenderVdi Success, renderId = [%{public}u]", *renderId);
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;
@@ -217,12 +221,13 @@ static int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t ren
     AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
     if (renderId < 0 || renderId > AUDIO_VDI_STREAM_NUM_MAX - 1) {
-        ret = HDF_ERR_INVALID_PARAM;
         AUDIO_FUNC_LOGE("renderId is invalid[%{public}u] and return ret=%{public}d", renderId, ret);
+        ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
     if (DecreaseRenderUsrCount(renderId) > 0) {
@@ -232,6 +237,7 @@ static int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t ren
     }
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -243,6 +249,7 @@ static int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t ren
         goto EXIT;
     }
     if (vdiAdapter->DestroyRender == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -266,6 +273,7 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
     int32_t ret = HDF_SUCCESS;
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL || captureId == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -275,12 +283,14 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
     (void)memset_s((void *)&vdiDesc, sizeof(vdiDesc), 0, sizeof(vdiDesc));
     (void)memset_s((void *)&vdiAttrs, sizeof(vdiAttrs), 0, sizeof(vdiAttrs));
     if (AudioCommonDevDescToVdiDevDescVdi(desc, &vdiDesc) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Desc to VdiDesc fail");
         ret = HDF_FAILURE;
         goto EXIT;
     }
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
 
     if (vdiAdapter->CreateCapture == NULL || vdiAdapter->DestroyCapture == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -303,7 +313,7 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
-    AUDIO_FUNC_LOGI("AudioCreateCaptureVdi Success");
+    AUDIO_FUNC_LOGI("AudioCreateCaptureVdi Success, captureId = [%{public}u]", *captureId);
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;
@@ -315,12 +325,13 @@ static int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t ca
     AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
     if (captureId < 0 || captureId > AUDIO_VDI_STREAM_NUM_MAX - 1) {
-        ret = HDF_ERR_INVALID_PARAM;
         AUDIO_FUNC_LOGE("captureId is invalid[%{public}u] and return ret=%{public}d", captureId, ret);
+        ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
     if (DecreaseCaptureUsrCount(captureId) > 0) {
@@ -331,6 +342,7 @@ static int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t ca
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -358,12 +370,14 @@ static int32_t AudioGetPortCapabilityVdi(struct IAudioAdapter *adapter, const st
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL || port == NULL || capability == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->GetPortCapability == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -398,12 +412,14 @@ static int32_t AudioSetPassthroughModeVdi(struct IAudioAdapter *adapter, const s
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL || port == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->SetPassthroughMode == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -435,12 +451,14 @@ static int32_t AudioGetPassthroughModeVdi(struct IAudioAdapter *adapter, const s
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL || port == NULL || mode == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->GetPassthroughMode == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -471,12 +489,14 @@ static int32_t AudioGetDeviceStatusVdi(struct IAudioAdapter *adapter, struct Aud
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL || status == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->GetDeviceStatus == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -501,6 +521,7 @@ static int32_t AudioUpdateAudioRouteVdi(struct IAudioAdapter *adapter,
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL || route == NULL || routeHandle == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -513,6 +534,7 @@ static int32_t AudioUpdateAudioRouteVdi(struct IAudioAdapter *adapter,
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->UpdateAudioRoute == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -543,12 +565,14 @@ static int32_t AudioReleaseAudioRouteVdi(struct IAudioAdapter *adapter, int32_t 
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->ReleaseAudioRoute == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -569,12 +593,14 @@ static int32_t AudioSetMicMuteVdi(struct IAudioAdapter *adapter, bool mute)
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->SetMicMute == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -595,12 +621,14 @@ static int32_t AudioGetMicMuteVdi(struct IAudioAdapter *adapter, bool *mute)
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL || mute == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->GetMicMute == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -621,12 +649,14 @@ static int32_t AudioSetVoiceVolumeVdi(struct IAudioAdapter *adapter, float volum
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->SetVoiceVolume == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -648,12 +678,14 @@ static int32_t AudioSetExtraParamsVdi(struct IAudioAdapter *adapter, enum AudioE
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL || condition == NULL || value == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->SetExtraParams == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -675,12 +707,14 @@ static int32_t AudioGetExtraParamsVdi(struct IAudioAdapter *adapter, enum AudioE
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL || condition == NULL || value == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->GetExtraParams == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -739,6 +773,7 @@ int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **ad
     pthread_rwlock_wrlock(&g_rwAdapterLock);
     int32_t ret = HDF_SUCCESS;
     if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
@@ -770,6 +805,7 @@ void AudioDecreaseAdapterRefVdi(uint32_t descIndex)
     pthread_rwlock_wrlock(&g_rwAdapterLock);
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("decrease adapter ref error, descIndex=%{public}d", descIndex);
+        return;
     }
 
     struct AudioAdapterPrivVdi *priv = AudioAdapterGetPrivVdi();
@@ -790,6 +826,7 @@ void AudioEnforceClearAdapterRefCntVdi(uint32_t descIndex)
     pthread_rwlock_wrlock(&g_rwAdapterLock);
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("decrease adapter descIndex error, descIndex=%{public}d", descIndex);
+        return;
     }
 
     struct AudioAdapterPrivVdi *priv = AudioAdapterGetPrivVdi();
