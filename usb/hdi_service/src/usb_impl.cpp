@@ -1180,7 +1180,7 @@ int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         return ret;
     }
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1205,7 +1205,7 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     }
 
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1229,7 +1229,7 @@ int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     }
 
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
     return HDF_SUCCESS;
 }
 
