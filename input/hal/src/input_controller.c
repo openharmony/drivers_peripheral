@@ -19,7 +19,6 @@
 #include <securec.h>
 #include "hdf_io_service_if.h"
 #include "input_common.h"
-#include "input_uhdf_log.h"
 
 #define ATTR_SBUF_LEN       1700
 #define ABILITY_SBUF_LEN    360
