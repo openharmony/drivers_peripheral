@@ -143,7 +143,7 @@ static int32_t VerifyParamsOfAudioCreateRenderVdi(struct IAudioAdapter *adapter,
 
 static struct IAudioRender* CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
     const struct AudioDeviceDescriptor *desc, const struct AudioSampleAttributes *attrs,
-    uint32_t *renderId, const char *adapterName)
+    uint32_t *renderId, char *adapterName)
 {
     struct AudioDeviceDescriptorVdi vdiDesc;
     struct AudioSampleAttributesVdi vdiAttrs;
@@ -156,7 +156,7 @@ static struct IAudioRender* CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
 
     int32_t id = SetTimer("Hdi:CreateRender");
-    ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiRender);
+    int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiRender);
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
