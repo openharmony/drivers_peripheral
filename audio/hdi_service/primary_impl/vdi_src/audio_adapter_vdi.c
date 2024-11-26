@@ -264,13 +264,8 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
     AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     struct IAudioCaptureVdi *vdiCapture = NULL;
     int32_t ret = HDF_SUCCESS;
-    if (adapter == NULL || desc == NULL || attrs == NULL || capture == NULL || captureId == NULL) {
-        ret = HDF_ERR_INVALID_PARAM;
-        goto EXIT;
-    }
-
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
-    if (vdiAdapter == NULL) {
+    if (vdiAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL || captureId == NULL) {
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
