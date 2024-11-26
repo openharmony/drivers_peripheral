@@ -21,7 +21,6 @@
 #include "hdf_io_service_if.h"
 #include "osal_time.h"
 #include "input_common.h"
-#include "input_uhdf_log.h"
 
 #define POLL_WAIT_MS 100
 #define MOUSE_DATA_LEN 4
