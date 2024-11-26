@@ -56,7 +56,7 @@ private:
 
 private:
     std::vector<std::shared_ptr<CodecOMXCore>> cores_;                    // save all the core
-    std::map<std::string, std::shared_ptr<CodecOMXCore>> compoentsCore_;  // save the compoentname<--> core
+    std::map<std::string, std::shared_ptr<CodecOMXCore>> componentsCore_;  // save the compoentname<--> core
     std::vector<OMXComponent> components_;                                // save the opened compoents
     std::mutex mutex_;
 };
