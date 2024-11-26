@@ -48,8 +48,8 @@ public:
     OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperator> streamOperator_V1_3 = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoMeta = nullptr;
     int streamIdMeta = 106;
-    int metaWidth = 1280;
-    int metaHeight = 960;
+    int metaWidth = 1920;
+    int metaHeight = 1080;
     int captureIdMeta = 2060;
     uint32_t itemCapacity = 100;
     uint32_t dataCapacity = 2000;

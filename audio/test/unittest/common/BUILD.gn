@@ -54,6 +54,11 @@ ohos_unittest("audio_ut_common_test") {
   if (drivers_peripheral_audio_feature_alsa_lib) {
     cflags_cc = [ "-DALSA_SUPPORT_FEATURE" ]
   }
+
+  defines = []
+  if (drivers_peripheral_audio_feature_community) {
+    defines += [ "AUDIO_FEATURE_COMMUNITY" ]
+  }
 }
 
 group("hdi_base_common") {

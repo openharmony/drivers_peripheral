@@ -56,11 +56,13 @@ if (defined(ohos_lite)) {
     sources = [
       "event/camera_hal_hisysevent.cpp",
       "exif/exif_utils.cpp",
+      "hicollie/camera_hal_hicollie.cpp",
       "watchdog/watchdog.cpp",
     ]
     include_dirs = [
       "$camera_path/include",
       "$camera_path/utils/event",
+      "$camera_path/utils/hicollie",
     ]
     libs = []
     defines = []
@@ -69,6 +71,7 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "drivers_interface_camera:metadata",
       "hdf_core:libhdf_utils",
+      "hicollie:libhicollie",
       "hilog:libhilog",
       "hisysevent:libhisysevent",
       "libexif:libexif",

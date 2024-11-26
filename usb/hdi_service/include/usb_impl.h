@@ -108,6 +108,9 @@ public:
     HostDevice *FindDevFromService(uint8_t busNum, uint8_t devAddr);
     int32_t GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId, bool &unactivated) override;
     int32_t GetDeviceSpeed(const UsbDev &dev, uint8_t &speed) override;
+    int32_t GetAccessoryInfo(std::vector<std::string> &accessoryInfo) override;
+    int32_t OpenAccessory(int32_t &fd) override;
+    int32_t CloseAccessory(int32_t fd) override;
 
 private:
     void MakeUsbControlParams(

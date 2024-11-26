@@ -88,9 +88,14 @@ static int32_t GetComponentNum()
 static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
 {
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
-    int32_t num = GetComponentNum();
-    if (data == NULL || count <= 0 || count > num) {
+    if (data == NULL) {
         CODEC_LOGE("Failed to obtain");
+        return HDF_FAILURE;
+    }
+    int32_t num = GetComponentNum();
+    if (count <= 0 || count > num) {
+        CODEC_LOGE("Failed to get component");
+        HdfSbufRecycle(data);
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);

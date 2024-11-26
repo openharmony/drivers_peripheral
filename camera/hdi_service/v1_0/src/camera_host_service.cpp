@@ -38,6 +38,7 @@ extern "C" ICameraHost *CameraHostServiceGetInstance(void)
 
 int32_t CameraHostService::GetVdiLibList(std::vector<std::string> &vdiLibList)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:GetVdiLibList");
     std::vector<std::string>().swap(vdiLibList);
     ReleaseHcsTree();
     const struct DeviceResourceIface *pDevResIns = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
@@ -77,6 +78,7 @@ int32_t CameraHostService::GetVdiLibList(std::vector<std::string> &vdiLibList)
 
 void CameraHostService::HdfCloseVdiLoaderList(std::vector<struct HdfVdiObject *> &cameraHostVdiLoaderList)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:HdfCloseVdiLoaderList");
     for (auto cameraHostVdiLoader : cameraHostVdiLoaderList) {
         if (cameraHostVdiLoader != nullptr) {
             HdfCloseVdi(cameraHostVdiLoader);
@@ -168,6 +170,7 @@ int32_t CameraHostService::SetCallback(const OHOS::sptr<ICameraHostCallback> &ca
 
 int32_t CameraHostService::GetCameraIds(std::vector<std::string> &cameraIds)
 {
+    CameraHalHicollie cameraHalHicollie("CameraHost:GetCameraIds");
     std::vector<std::string>().swap(cameraIds);
     if (cameraIdInfoList_.size() == 0) {
         int32_t ret = UpdateCameraIdMapList();

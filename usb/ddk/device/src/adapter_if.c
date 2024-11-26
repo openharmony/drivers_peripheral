@@ -978,7 +978,6 @@ static int32_t UsbFnAdapterCreateDevice(const char *udcName, const char *devName
     uint8_t confVal;
 
     UsbFnAdapterCleanDevice(devName);
-
     ret = CreatDeviceDir(devName);
     if (ret != HDF_SUCCESS) {
         return HDF_ERR_IO;

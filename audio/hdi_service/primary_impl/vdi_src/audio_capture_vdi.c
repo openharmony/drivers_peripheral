@@ -893,4 +893,5 @@ void AudioDestroyCaptureByIdVdi(uint32_t captureId)
 
     OsalMemFree(priv->captureInfos[captureId]);
     priv->captureInfos[captureId] = NULL;
+    AUDIO_FUNC_LOGI("audio destroy capture success");
 }

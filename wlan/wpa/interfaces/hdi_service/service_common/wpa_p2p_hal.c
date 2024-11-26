@@ -116,7 +116,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdWpsPin(WifiWpaP2pGroupInterface *this, P
         return P2P_SUP_ERRCODE_FAILED;
     }
     if (argv->mode == P2P_PIN_DISPLAY) {
-        if (strncpy_s(argv->pinCode, sizeof(argv->pinCode), buf, P2P_PIN_CODE_LEN) != EOK) {
+        if (strncpy_s(argv->pinCode, sizeof(argv->pinCode), buf, P2P_REPLY_BUF_SMALL_LENGTH) != EOK) {
             HDF_LOGE("Failed to copy return pin code!");
             return P2P_SUP_ERRCODE_FAILED;
         }
