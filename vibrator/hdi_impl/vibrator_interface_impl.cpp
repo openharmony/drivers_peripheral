@@ -192,6 +192,11 @@ int32_t VibratorInterfaceImpl::IsVibratorRunning(bool& state)
         return HDF_FAILURE;
     }
 
+    int32_t ret = vibratorInterface->IsVibratorRunning(&state);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+
     return HDF_SUCCESS;
 }
 
