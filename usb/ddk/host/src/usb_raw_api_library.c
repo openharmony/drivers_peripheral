@@ -249,7 +249,7 @@ static void ParseDescriptor(const void *source, enum UsbRawDescriptorType bDescr
 {
     int32_t ret;
 
-    if (source == NULL) {
+    if (source == NULL || dest == NULL) {
         HDF_LOGE("%{public}s: invalid param", __func__);
         return;
     }
