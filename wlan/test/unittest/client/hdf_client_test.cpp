@@ -1029,12 +1029,12 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
     WifiSetDpiMarkRule(srcAddr, dstAddr, buf);
 }
 /**
- * @tc.name: WifiInstallWlanExtParam028
- * @tc.desc: set rx remain On channel test
+ * @tc.name: WifiInstallWlanExtParam029
+ * @tc.desc: install wlan ext param
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiClientTest, WifiInstallWlanExtParam028, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiInstallWlanExtParam029, TestSize.Level1)
 {
     int32_t ret;
     const char *ifNameInvalid = "wlanTest";
