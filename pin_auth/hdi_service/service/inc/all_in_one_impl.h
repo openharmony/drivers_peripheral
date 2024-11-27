@@ -50,6 +50,7 @@ public:
         HdiProperty &property) override;
     int32_t SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
         const sptr<HdiIExecutorCallback> &callbackObj) override;
+
 private:
     struct ScheduleInfo {
         uint64_t scheduleId{0};
