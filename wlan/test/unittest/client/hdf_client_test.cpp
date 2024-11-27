@@ -1029,12 +1029,27 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
     WifiSetDpiMarkRule(srcAddr, dstAddr, buf);
 }
 /**
- * @tc.name: WifiInstallWlanExtParam029
- * @tc.desc: install wlan ext param
+ * @tc.name: GetChannelMeasResult027
+ * @tc.desc: set rx remain On channel test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiClientTest, WifiInstallWlanExtParam029, TestSize.Level1)
+HWTEST_F(WifiClientTest, GetChannelMeasResult027, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifNameInvalid = "wlanTest";
+    MeasResult measResult;
+    ret = GetChannelMeasResult(NULL, &measResult);
+    EXPECT_EQ(RET_CODE_NOT_SUPPORT, ret);
+    GetChannelMeasResult(ifNameInvalid, &measResult);
+}
+/**
+ * @tc.name: WifiInstallWlanExtParam028
+ * @tc.desc: set rx remain On channel test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, WifiInstallWlanExtParam028, TestSize.Level1)
 {
     int32_t ret;
     const char *ifNameInvalid = "wlanTest";
