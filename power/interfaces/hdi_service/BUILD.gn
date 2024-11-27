@@ -39,10 +39,6 @@ ohos_shared_library("libpower_interface_service_1.2") {
   if (drivers_peripheral_power_c_utils) {
     external_deps += [ "c_utils:utils" ]
   }
-  if (drivers_peripheral_power_hisysevent) {
-    external_deps += [ "hisysevent:libhisysevent" ]
-    defines += [ "HAS_POWER_HISYSEVENT_PART" ]
-  }
 
   # xcollie has a bug, disable it
   if (drivers_peripheral_power_hicollie) {
