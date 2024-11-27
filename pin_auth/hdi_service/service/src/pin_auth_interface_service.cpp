@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v2_0/pin_auth_interface_service.h"
+#include "v2_1/pin_auth_interface_service.h"
 
 #include <hdf_base.h>
 

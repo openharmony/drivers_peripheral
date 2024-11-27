@@ -48,7 +48,8 @@ public:
     int32_t Delete(uint64_t templateId) override;
     int32_t GetProperty(const std::vector<uint64_t> &templateIdList, const std::vector<int32_t> &propertyTypes,
         HdiProperty &property) override;
-
+    int32_t SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
+        const sptr<HdiIExecutorCallback> &callbackObj) override;
 private:
     struct ScheduleInfo {
         uint64_t scheduleId{0};
