@@ -20,3 +20,4 @@ group("wlan_entry") {
     deps += [ "hdi_service:hdi_wlan_service" ]
   }
 }
+
