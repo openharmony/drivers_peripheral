@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v2_0/user_auth_interface_service.h"
+#include "v3_0/user_auth_interface_service.h"
 
 #include <cinttypes>
 #include <mutex>
@@ -1716,6 +1716,17 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
         IAM_LOGE("SetGlobalConfigParamFunc failed");
     }
     return ret;
+}
+
+int32_t UserAuthInterfaceService::VerifyAuthToken(const std::vector<uint8_t>& tokenIn, uint64_t allowableDuration,
+    HdiUserAuthTokenPlain &tokenPlainOut, std::vector<uint8_t>& rootSecret)
+{
+    return RESULT_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::GetCredentialById(uint64_t credentialId, HdiCredentialInfo &info)
+{
+    return RESULT_SUCCESS;
 }
 } // Userauth
 } // HDI
