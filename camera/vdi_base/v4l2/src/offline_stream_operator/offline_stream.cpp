@@ -25,6 +25,9 @@ OfflineStream::OfflineStream(int32_t id, const OHOS::sptr<IStreamOperatorVdiCall
 
 OfflineStream::~OfflineStream()
 {
+    if (!context_) {
+        return;
+    }
     context_->restRequests.clear();
     context_->tunnel->CleanBuffers();
     context_->bufferPool->ClearBuffers();
