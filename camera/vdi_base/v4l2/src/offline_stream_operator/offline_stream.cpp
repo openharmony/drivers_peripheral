@@ -25,7 +25,7 @@ OfflineStream::OfflineStream(int32_t id, const OHOS::sptr<IStreamOperatorVdiCall
 
 OfflineStream::~OfflineStream()
 {
-    if (!context_) {
+    if (context_ == nullptr) {
         return;
     }
     context_->restRequests.clear();
