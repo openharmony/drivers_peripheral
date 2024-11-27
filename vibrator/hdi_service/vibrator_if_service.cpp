@@ -305,6 +305,7 @@ int32_t VibratorIfService::IsVibratorRunning(bool& state)
         HDF_LOGE("%{public}s IsVibratorRunning failed, error code is %{public}d", __func__, ret);
     }
     FinishTrace(HITRACE_TAG_HDF);
+    HDF_LOGI("%{public}s: state %{public}d", __func__, state);
 
     return ret;
 }
