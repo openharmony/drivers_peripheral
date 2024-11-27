@@ -17,8 +17,8 @@
 #include <hdf_device_desc.h>
 #include <hdf_sbuf_ipc.h>
 
-#include "v2_0/user_auth_interface_service.h"
-#include "v2_0/user_auth_interface_stub.h"
+#include "v3_0/user_auth_interface_service.h"
+#include "v3_0/user_auth_interface_stub.h"
 
 #include "iam_logger.h"
 #include "useriam_common.h"
@@ -33,8 +33,8 @@ struct HdfUserAuthInterfaceHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-using UserAuthInterfaceService = OHOS::HDI::UserAuth::V2_0::UserAuthInterfaceService;
-using IUserAuthInterface = OHOS::HDI::UserAuth::V2_0::IUserAuthInterface;
+using UserAuthInterfaceService = OHOS::HDI::UserAuth::V3_0::UserAuthInterfaceService;
+using IUserAuthInterface = OHOS::HDI::UserAuth::V3_0::IUserAuthInterface;
 
 int32_t UserAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
