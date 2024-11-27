@@ -249,15 +249,11 @@ static void ParseDescriptor(const void *source, enum UsbRawDescriptorType bDescr
 {
     int32_t ret;
 
-    if (source == NULL) {
+    if (source == NULL || dest == NULL) {
         HDF_LOGE("%{public}s: invalid param", __func__);
         return;
     }
 
-    if (dest == NULL) {
-        HDF_LOGE("%{public}s: dest is null", __func__);
-        return;
-    }
     switch (bDescriptorType) {
         case USB_RAW_CONFIG_DESCRIPTOR_TYPE: {
             struct UsbConfigDescriptor *desc = (struct UsbConfigDescriptor *)dest;
