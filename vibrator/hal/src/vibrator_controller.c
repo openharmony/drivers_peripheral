@@ -354,6 +354,7 @@ static int32_t IsVibratorRunning(bool *state)
 
     int32_t stateNum;
     if (HdfSbufReadInt32(reply, &stateNum) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: HdfSbufReadInt32 failed", __func__);
         HdfSbufRecycle(reply);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
