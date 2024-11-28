@@ -122,18 +122,6 @@ static void DeleteFile(const char *path)
     }
 }
 
-static bool IsDeviceDirExist(const char *deviceName)
-{
-    char tmp[MAX_PATHLEN] = {0};
-    int32_t ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s", CONFIGFS_DIR, deviceName);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
-        return false;
-    }
-
-    return IsDirExist(tmp);
-}
-
 static int32_t UsbFnWriteFile(const char *path, const char *str)
 {
     size_t ret;
@@ -263,50 +251,8 @@ static int32_t UsbFnAdapterCreateFunc(const char *configPath, const char *funcPa
     return 0;
 }
 
-static int32_t UsbFnReadFile(const char *path, char *str, uint16_t len)
-{
-    FILE *fp = fopen(path, "r");
-    if (fp == NULL) {
-        HDF_LOGE("%{public}s: fopen failed", __func__);
-        return HDF_ERR_BAD_FD;
-    }
-    if (fread(str, len, 1, fp) != 1) {
-        HDF_LOGE("%{public}s: fread failed", __func__);
-        (void)fclose(fp);
-        return HDF_ERR_IO;
-    }
-    (void)fclose(fp);
-    return 0;
-}
-
 static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int32_t enable)
 {
-    char tmp[MAX_PATHLEN] = {0};
-    if (deviceName == NULL || udcName == NULL || IsDeviceDirExist(deviceName) == false) {
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    int32_t ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/UDC", CONFIGFS_DIR, deviceName);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
-        return HDF_ERR_IO;
-    }
-    if (enable != 0) {
-        (void)UsbFnWriteFile(tmp, udcName);
-        char udcTmp[MAX_NAMELEN] = {0};
-        for (int32_t i = 0; i < OPEN_CNT; i++) {
-            (void)UsbFnReadFile(tmp, udcTmp, strlen(udcName));
-            if (!strcmp(udcName, udcTmp)) {
-                return 0;
-            }
-            usleep(SLEEP_DELAY);
-        }
-        if (strcmp(udcName, udcTmp)) {
-            return HDF_ERR_IO;
-        }
-    } else {
-        (void)UsbFnWriteFile(tmp, "\n");
-    }
     return 0;
 }
 
