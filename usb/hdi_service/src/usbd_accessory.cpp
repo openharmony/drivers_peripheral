@@ -40,7 +40,7 @@ const std::string base64_chars =
              "0123456789+/";
 
 static const int BASE64_BITS_PER_CHAR = -6;
-static const int BASE64_VAL_SHIFT = 8;
+static const uint32_t BASE64_VAL_SHIFT = 8;
 static const int BASE64_GROUP_SIZE = 4;
 static const int32_t MIN_LENGTH_REQUIRED = 10;
 static const uint8_t BASE64_CHAR_MASK3F  = 0x3F;
@@ -53,7 +53,7 @@ UsbdAccessory &UsbdAccessory::GetInstance()
 
 void UsbdAccessory::init_base64_char_map()
 {
-    for (size_t i = 0; i < base64_chars.size(); ++i) {
+    for (int32_t i = 0; i < base64_chars.size(); ++i) {
         base64_char_map[base64_chars[i]] = i;
     }
 }
@@ -65,7 +65,7 @@ std::string UsbdAccessory::base64_encode(char *buffer, int32_t len)
         return "";
     }
     std::string encoded_string;
-    int val = 0;
+    uint32_t val = 0;
     int valb = BASE64_BITS_PER_CHAR;
     for (int32_t i = 0; i < len; i++) {
         val = (val << BASE64_VAL_SHIFT) + buffer[i];

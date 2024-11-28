@@ -259,7 +259,7 @@ private:
     static sem_t asyncReq_;
     static pthread_rwlock_t mtpRunrwLock_;
     std::vector<uint8_t> vectorSplited_;
-    size_t writeActualLen_;
+    uint32_t writeActualLen_;
 };
 } // namespace V1_0
 } // namespace Mtp
