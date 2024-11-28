@@ -230,14 +230,12 @@ static int32_t SetRenderPathValue(
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-    char *devKey = NULL;
-    int32_t devNum;
+    int32_t devNum = renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     const char *renderDeviceType = AudioPathSelGetDeviceType(tpins);
     if (renderDeviceType == NULL) {
         AUDIO_FUNC_LOGE("DeviceType not found.");
         return HDF_FAILURE;
     }
-    devNum = renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     /* pins = 0, parse default value */
     if (strcasecmp(renderDeviceType, renderObj->string) == 0) {
         int32_t pathNum = cJSON_GetArraySize(renderObj);
@@ -247,14 +245,19 @@ static int32_t SetRenderPathValue(
         }
         for (int32_t i = 0; i < pathNum; i++) {
             cJSON *tmpValue = cJSON_GetArrayItem(renderObj, i);
+            if (tmpValue == NULL) {
+                AUDIO_FUNC_LOGE("tmpValue is null.");
+                return HDF_FAILURE;
+            }
             cJSON *swName = tmpValue->child;
             cJSON *swVal = swName->next;
+	
             if (swName->valuestring == NULL) {
                 AUDIO_FUNC_LOGE("ValueString is null!");
                 return HDF_FAILURE;
             }
 
-            devKey = swName->valuestring;
+            char *devKey = swName->valuestring;
             (void)memset_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
                 PATHPLAN_LEN, 0, PATHPLAN_LEN);
             int32_t ret =
@@ -478,8 +481,13 @@ static int32_t SetCapturePathValue(
         }
         for (int32_t i = 0; i < pathNum; i++) {
             cJSON *captureTmpValue = cJSON_GetArrayItem(captureSwitchObj, i);
+            if (captureTmpValue == NULL) {
+                AUDIO_FUNC_LOGE("captureTmpValue is null.");
+                return HDF_FAILURE;
+            }
             cJSON *swName = captureTmpValue->child;
             cJSON *swVal = swName->next;
+			
             if (swName->valuestring == NULL) {
                 AUDIO_FUNC_LOGE("ValueString is null!");
                 return HDF_FAILURE;
