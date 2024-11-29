@@ -32,6 +32,7 @@ config("usbd_public_config") {
     "${usb_driver_path}/interfaces/ddk/common/include",
     "${usb_driver_path}/interfaces/ddk/device",
     "${usb_driver_path}/utils/include",
+    "${usb_driver_path}/libusb_adapter/include",
   ]
 }
 
@@ -64,6 +65,7 @@ ohos_shared_library("libusb_interface_service_1.1") {
   deps = [
     "${usb_driver_path}/ddk:libusb_ddk_host",
     "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "${usb_driver_path}/libusb_adapter:libusb_adapter",
     "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
   ]
 
@@ -79,6 +81,7 @@ ohos_shared_library("libusb_interface_service_1.1") {
       "hitrace:hitrace_meter",
       "init:libbegetutil",
       "ipc:ipc_single",
+      "libusb:libusb",
     ]
     if (usb_hisysevent_enable) {
       external_deps += [ "hisysevent:libhisysevent" ]
@@ -88,6 +91,10 @@ ohos_shared_library("libusb_interface_service_1.1") {
       } else {
         defines = [ "USB_ENABLE_HISYSEVENT" ]
       }
+    }
+
+    if (libusb_enable) {
+      defines += [ "LIBUSB_ENABLE" ]
     }
 
     if (usb_samgr_enable) {
