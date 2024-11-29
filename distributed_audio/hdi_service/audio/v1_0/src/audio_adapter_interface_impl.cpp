@@ -624,6 +624,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
     ret = WaitForSANotify(renderId, EVENT_OPEN_SPK);
     if (ret != DH_SUCCESS) {
         DHLOGE("Wait SA notify failed. ret: %{public}d", ret);
+        extSpkCallback->DestroyStream(renderId);
         return ret;
     }
     spkPinInUse_ = static_cast<uint32_t>(dhId);
