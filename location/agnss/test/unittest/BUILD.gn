@@ -31,7 +31,7 @@ ohos_unittest("hdf_agnss_location") {
     "agnss/source/peripheral_agnss_test.cpp",
   ]
 
-   cflags = [
+  cflags = [
     "-Wall",
     "-Wextra",
     "-Werror",
@@ -56,6 +56,7 @@ ohos_unittest("hdf_agnss_location") {
     ]
   }
 
-  external_deps += [ "drivers_peripheral_location_gnss:libgnss_interface_service_2.0" ]
+  external_deps +=
+      [ "drivers_peripheral_location_gnss:libgnss_interface_service_2.0" ]
 }
 
