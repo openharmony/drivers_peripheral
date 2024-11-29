@@ -29,7 +29,6 @@ constexpr size_t MAX_HASH_RECORD = 1000;
 int32_t UsbDdkHash(const InterfaceInfo &info, uint64_t &hashVal)
 {
     std::lock_guard<std::mutex> lock(g_mapMutex);
-
     if (g_hashMap.size() > MAX_HASH_RECORD) {
         return HDF_ERR_OUT_OF_RANGE;
     }
@@ -66,4 +65,15 @@ bool UsbDdkGetRecordByVal(const InterfaceInfo &info, uint64_t &hashVal)
         }
     }
     return false;
+}
+
+int32_t GetInterfaceInfoByVal(const uint64_t hashVal, InterfaceInfo &Info)
+{
+    std::lock_guard<std::mutex> lock(g_mapMutex);
+    auto it = g_hashMap.find(hashVal);
+    if (it == g_hashMap.end()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    Info = it->second;
+    return HDF_SUCCESS;
 }
