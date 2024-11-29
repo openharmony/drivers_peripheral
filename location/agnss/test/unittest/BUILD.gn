@@ -59,4 +59,3 @@ ohos_unittest("hdf_agnss_location") {
   external_deps +=
       [ "drivers_peripheral_location_gnss:libgnss_interface_service_2.0" ]
 }
-
