@@ -2680,6 +2680,9 @@ static int32_t ProcessMatchSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyI
 
 static void ClearSsidsList(struct DListHead *ssidsList)
 {
+    if (!ssidsList) {
+        return;
+    }
     struct SsidListNode *ssidListNode = NULL;
     struct SsidListNode *tmp = NULL;
 
