@@ -14,8 +14,13 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../location.gni")
 
-ohos_shared_library("libgnss_interface_service_2.0") {
+config("libagnss_interface_service_cfg") {
+  visibility = [":*"]
   include_dirs = [ "${location_driver_path}/gnss/hdi_service" ]
+}
+
+ohos_shared_library("libgnss_interface_service_2.0") {
+  public_configs = [":libagnss_interface_service_cfg"]
   sources = [
     "gnss_interface_impl.cpp",
     "location_vendor_interface.cpp",

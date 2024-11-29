@@ -17,14 +17,20 @@
 #define OHOS_HDI_LOCATION_LOCATION_AGNSS_V2_0_AGNSSINTERFACEIMPL_H
 
 #include "v2_0/ia_gnss_interface.h"
-
 #include "iremote_object.h"
+#include "location_vendor_lib.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Agnss {
 namespace V2_0 {
+
+void RequestSetupAgnssDataConnection(const AgnssDataConnectionRequest* status);
+void GetSetidCb(uint16_t type);
+void GetRefLocationidCb(uint32_t type);
+void GetAGnssCallbackMethods(AgnssCallbackIfaces* device);
+
 class AGnssInterfaceImpl : public IAGnssInterface {
 public:
     AGnssInterfaceImpl();
