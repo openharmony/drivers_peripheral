@@ -112,16 +112,16 @@ int32_t AudioGetElemValue(struct HdfSBuf *reply, struct AudioCtrlElemInfo *volTh
     return HDF_SUCCESS;
 }
 
-void AudioFreeHdfSBuf(struct HdfSBuf *sBuf, struct HdfSBuf *reply)
+void AudioFreeHdfSBuf(struct HdfSBuf **sBuf, struct HdfSBuf **reply)
 {
-    if (sBuf != NULL) {
-        HdfSbufRecycle(sBuf);
-        sBuf = NULL;
+    if (sBuf != NULL && *sBuf != NULL) {
+        HdfSbufRecycle(*sBuf);
+        *sBuf = NULL;
     }
 
-    if (reply != NULL) {
-        HdfSbufRecycle(reply);
-        reply = NULL;
+    if (reply != NULL && *reply != NULL) {
+        HdfSbufRecycle(*reply);
+        *reply = NULL;
     }
 }
 
@@ -185,7 +185,7 @@ int32_t AudioAllocHdfSBuf(struct HdfSBuf **reply, struct HdfSBuf **sBuf)
     *reply = HdfSbufObtainDefaultSize();
     if (*reply == NULL) {
         AUDIO_FUNC_LOGE("Failed to obtain reply");
-        AudioFreeHdfSBuf(*sBuf, NULL);
+        AudioFreeHdfSBuf(sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -461,13 +461,13 @@ int32_t AudioGetAllCardInfo(struct AudioAdapterDescriptor **descs, int32_t *sndC
 
     if (AudioServiceDispatch(handle->object, AUDIODRV_CTL_IOCTL_ELEM_CARD - CTRL_NUM, NULL, reply) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("GetAllCardInfo Failed to send service call!");
-        AudioFreeHdfSBuf(reply, NULL);
+        AudioFreeHdfSBuf(&reply, NULL);
         AudioCloseService(handle);
         return HDF_FAILURE;
     }
 
     if (AudioReadCardInfoToDesc(reply, descs, sndCardNum) != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(reply, NULL);
+        AudioFreeHdfSBuf(&reply, NULL);
         AudioCloseService(handle);
         return HDF_FAILURE;
     }
@@ -589,26 +589,26 @@ static int32_t AudioCtlGetElemList(const struct HdfIoService *service, struct Au
 
     if (!HdfSbufWriteString(sBuf, eList->cardSrvName)) {
         AUDIO_FUNC_LOGE("CardServiceName Write Fail!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint32(sBuf, eList->space)) {
         AUDIO_FUNC_LOGE("Elem list space Write Fail!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint64(sBuf, (uint64_t)eList->ctlElemListAddr)) {
         AUDIO_FUNC_LOGE("Elem list addr Write Fail!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     struct HdfSBuf *reply = HdfSbufObtainDefaultSize();
     if (reply == NULL) {
         AUDIO_FUNC_LOGE("Failed to obtain reply!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -617,16 +617,16 @@ static int32_t AudioCtlGetElemList(const struct HdfIoService *service, struct Au
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE(
             "Failed to send service call cmdId: %{public}s!", AudioRenderCtlCmdId2String(cmdId + MIXER_CMD_ID_BASE));
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return ret;
     }
 
     ret = AudioCtlElemParseData(eList, reply);
     if (ret != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return ret;
     }
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
 
     return HDF_SUCCESS;
 }
@@ -796,16 +796,16 @@ static int32_t AudioCtlGetAllCards(const struct HdfIoService *service, int32_t c
     ret = service->dispatcher->Dispatch(srv, cmdId, NULL, reply);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to send service Dispatch!");
-        AudioFreeHdfSBuf(reply, NULL);
+        AudioFreeHdfSBuf(&reply, NULL);
         return ret;
     }
 
     ret = AudioParseAllAdaptersFromBuf(sndCards, reply);
     if (ret != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(reply, NULL);
+        AudioFreeHdfSBuf(&reply, NULL);
         return ret;
     }
-    AudioFreeHdfSBuf(reply, NULL);
+    AudioFreeHdfSBuf(&reply, NULL);
 
     return HDF_SUCCESS;
 }
@@ -1061,30 +1061,30 @@ static int32_t AudioCtlElemGetProp(const struct HdfIoService *srv, int cmdId, st
 
     ret = AudioFillSendDataToBuf(sBuf, data);
     if (ret != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return ret;
     }
 
     reply = HdfSbufObtainDefaultSize();
     if (reply == NULL) {
         AUDIO_FUNC_LOGE("Failed to obtain reply!!!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     struct HdfObject *service = (struct HdfObject *)(&srv->object);
     ret = srv->dispatcher->Dispatch(service, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     ret = AudioParseRecvDataFromBuf(reply, data, cmdId);
     if (ret != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return ret;
     }
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
 
     return HDF_SUCCESS;
 }
@@ -1171,30 +1171,30 @@ static int32_t AudioCtlElemInfoProp(const struct HdfIoService *srv, int cmdId, s
 
     ret = AudioFillInfoDataToBuf(sBuf, data);
     if (ret != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return ret;
     }
 
     reply = HdfSbufObtainDefaultSize();
     if (reply == NULL) {
         AUDIO_FUNC_LOGE("Failed to obtain reply!!!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     struct HdfObject *service = (struct HdfObject *)(&srv->object);
     ret = srv->dispatcher->Dispatch(service, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     ret = AudioParseInfoDataFromBuf(reply, data);
     if (ret != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return ret;
     }
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
 
     return HDF_SUCCESS;
 }
@@ -1242,7 +1242,7 @@ static int32_t AudioCtlElemSetProp(const struct HdfIoService *srv, int cmdId, st
 
     ret = AudioFillSetDataToBuf(sBuf, data);
     if (ret != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return ret;
     }
 
@@ -1250,10 +1250,10 @@ static int32_t AudioCtlElemSetProp(const struct HdfIoService *srv, int cmdId, st
     ret = srv->dispatcher->Dispatch(service, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Dispatch failed!!!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
 
     return HDF_SUCCESS;
 }
