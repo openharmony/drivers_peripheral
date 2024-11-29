@@ -22,7 +22,7 @@
 #include "iam_logger.h"
 
 #include "user_auth_hdi.h"
-#include "v2_0/user_auth_interface_service.h"
+#include "v3_0/user_auth_interface_service.h"
 
 #undef LOG_TAG
 #define LOG_TAG "USER_AUTH_HDI"
@@ -31,7 +31,7 @@
 
 using namespace std;
 using namespace OHOS::UserIam::Common;
-using namespace OHOS::HDI::UserAuth::V2_0;
+using namespace OHOS::HDI::UserAuth::V3_0;
 
 namespace OHOS {
 namespace HDI {

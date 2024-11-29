@@ -350,6 +350,12 @@ int32_t AllInOneImpl::GetProperty(
     return HDF_SUCCESS;
 }
 
+int32_t AllInOneImpl::SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
+    const sptr<HdiIExecutorCallback> &callbackObj)
+{
+    return HDF_SUCCESS;
+}
+
 bool AllInOneImpl::ScheduleList::AddScheduleInfo(const ScheduleInfo &scheduleInfo)
 {
     IAM_LOGI("start");

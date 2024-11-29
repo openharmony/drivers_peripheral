@@ -31,7 +31,7 @@ namespace HDI {
 namespace UserAuth {
 using namespace testing;
 using namespace testing::ext;
-using namespace OHOS::HDI::UserAuth::V2_0;
+using namespace OHOS::HDI::UserAuth::V3_0;
 namespace {
 constexpr int32_t ATL1 = 10000;
 uint64_t g_pinIndex = 0;

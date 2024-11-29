@@ -20,15 +20,15 @@
 
 #include "iam_logger.h"
 
-#include "v2_0/user_auth_interface_service.h"
-#include "v2_0/user_auth_interface_stub.h"
+#include "v3_0/user_auth_interface_service.h"
+#include "v3_0/user_auth_interface_stub.h"
 
 #undef LOG_TAG
 #define LOG_TAG "USER_AUTH_HDI"
 
 #undef private
 
-using namespace OHOS::HDI::UserAuth::V2_0;
+using namespace OHOS::HDI::UserAuth::V3_0;
 
 namespace OHOS {
 namespace UserIam {
@@ -36,7 +36,7 @@ namespace UserAuth {
 namespace {
 constexpr uint32_t USER_AUTH_HDI_CODE_MIN = 0;
 constexpr uint32_t USER_AUTH_HDI_CODE_MAX = 31;
-const std::u16string USER_AUTH_HDI_INTERFACE_TOKEN = u"ohos.hdi.user_auth.v2_0.IUserAuthInterface";
+const std::u16string USER_AUTH_HDI_INTERFACE_TOKEN = u"ohos.hdi.user_auth.v3_0.IUserAuthInterface";
 
 bool UserAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
 {
@@ -45,14 +45,14 @@ bool UserAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
         IAM_LOGE("%{public}s:rawData is null.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::UserAuth::V2_0::IUserAuthInterface> serviceImpl =
-        OHOS::HDI::UserAuth::V2_0::IUserAuthInterface::Get(true);
+    sptr<OHOS::HDI::UserAuth::V3_0::IUserAuthInterface> serviceImpl =
+        OHOS::HDI::UserAuth::V3_0::IUserAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
         IAM_LOGE("%{public}s:IUserAuthInterface::Get() failed.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::UserAuth::V2_0::UserAuthInterfaceStub> userAuthInterfaceStub =
-        new OHOS::HDI::UserAuth::V2_0::UserAuthInterfaceStub(serviceImpl);
+    sptr<OHOS::HDI::UserAuth::V3_0::UserAuthInterfaceStub> userAuthInterfaceStub =
+        new OHOS::HDI::UserAuth::V3_0::UserAuthInterfaceStub(serviceImpl);
     if (userAuthInterfaceStub == nullptr) {
         IAM_LOGE("%{public}s:new UserAuthInterfaceStub failed.", __func__);
         return false;
