@@ -54,10 +54,6 @@
 #define HDC_CONFIG_AOA                  "aoa"
 #define HDC_CONFIG_NCM                  "ncm"
 #define HDC_CONFIG_NCM_HDC              "ncm_hdc"
-#define HDC_CONFIG_MTP                  "mtp"
-#define HDC_CONFIG_PTP                  "ptp"
-#define HDC_CONFIG_MTP_HDC              "mtp_hdc"
-#define HDC_CONFIG_PTP_HDC              "ptp_hdc"
 #define HDC_CONFIGFS_OFF       "0"
 #define HDC_CONFIGFS_ON        "1"
 
@@ -93,10 +89,6 @@ private:
     static int32_t SetFunctionToNone();
     static int32_t SetFunctionToRndis();
     static int32_t SetFunctionToStorage();
-    static int32_t SetFunctionToMtp();
-    static int32_t SetFunctionToPtp();
-    static int32_t SetFunctionToMtpHdc();
-    static int32_t SetFunctionToPtpHdc();
     static int32_t SetFunctionToRndisHdc();
     static int32_t SetFunctionToStorageHdc();
     static int32_t SetFunctionToManufactureHdc();
