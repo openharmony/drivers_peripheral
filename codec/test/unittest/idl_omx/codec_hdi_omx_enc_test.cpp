@@ -569,7 +569,7 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiAllocateBufferTest_006, TestSize.Level1)
 
     struct OmxCodecBuffer allocBuffer;
     func_->InitOmxCodecBuffer(allocBuffer, CODEC_BUFFER_TYPE_AVSHARE_MEM_FD);
-    allocBuffer.type = READ_WRITE_TYPE;
+    allocBuffer.type = OHOS::HDI::Codec::V3_0::READ_WRITE_TYPE;
     struct OmxCodecBuffer outBuffer;
     err = g_component->AllocateBuffer(outputIndex, allocBuffer, outBuffer);
     ASSERT_EQ(err, HDF_SUCCESS);
@@ -917,7 +917,8 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiSetParameterWithBufferTest_001, TestSize
     std::vector<int8_t> inVec(p, p + sizeof(param));
     auto omxBuffer = std::make_shared<struct OmxCodecBuffer>();
     func_->FillCodecBufferWithBufferHandle(omxBuffer);
-    auto ret = g_component->SetParameterWithBuffer(OHOS::HDI::Codec::V3_0::Codec_IndexParamOverlayBuffer, inVec, *omxBuffer.get());
+    auto ret = g_component->SetParameterWithBuffer(OHOS::HDI::Codec::V3_0::Codec_IndexParamOverlayBuffer,
+                                                   inVec, *omxBuffer.get());
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 #endif
