@@ -19,6 +19,7 @@
 #include <vector>
 #include "codec_function_utils.h"
 #include "v3_0/codec_callback_service.h"
+#include "v3_0/codec_ext_types.h"
 
 #define ERR_COUNT (-1)
 
@@ -26,9 +27,27 @@ using namespace std;
 using namespace testing::ext;
 using OHOS::sptr;
 using OHOS::HDI::Base::NativeBuffer;
-using namespace OHOS::HDI::Codec::V3_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
+using OHOS::HDI::Codec::V3_0::CodecType;
+using OHOS::HDI::Codec::V3_0::AvCodecRole;
+using OHOS::HDI::Codec::V3_0::MEDIA_ROLETYPE_VIDEO_AVC;
+using OHOS::HDI::Codec::V3_0::ICodecComponent;
+using OHOS::HDI::Codec::V3_0::ICodecCallback;
+using OHOS::HDI::Codec::V3_0::ICodecComponentManager;
+using OHOS::HDI::Codec::V3_0::FunctionUtil;
+using OHOS::HDI::Codec::V3_0::PortIndex;
+using OHOS::HDI::Codec::V3_0::CodecCompCapability;
+using OHOS::HDI::Codec::V3_0::CodecCallbackService;
+using OHOS::HDI::Codec::V3_0::CodecCommandType;
+using OHOS::HDI::Codec::V3_0::CodecStateType;
+using OHOS::HDI::Codec::V3_0::OmxCodecBuffer;
+using OHOS::HDI::Codec::V3_0::CompVerInfo;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_INVALID;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_LOADED;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_IDLE;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_EXECUTING;
+using OHOS::HDI::Codec::V3_0::CODEC_COMMAND_STATE_SET;
 
 namespace {
 constexpr CodecType TYPE = CodecType::VIDEO_ENCODER;
@@ -294,6 +313,19 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiSetParameterTest_006, TestSize.Level1)
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
+#ifndef SUPPORT_OMX_EXTEND
+HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiSetParameterTest_007, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    OMX_CONFIG_BOOLEANTYPE param {};
+    func_->InitParam(param);
+    param.bEnabled = OMX_TRUE;
+    std::vector<int8_t> paramVec;
+    func_->ObjectToVector(param, paramVec);
+    auto ret = g_component->SetParameter(OMX_IndexParamLowLatency, paramVec);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+}
+#endif
 //Test DMA Buffer
 #ifdef SUPPORT_DMA_BUFFER
 HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiDMABufferTest_001, TestSize.Level1)
@@ -868,6 +900,27 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiEmptyThisBufferTest_001, TestSize.Level1
     auto ret = g_component->EmptyThisBuffer(omxBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
+
+#ifndef SUPPORT_OMX_EXTEND
+HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiSetParameterWithBufferTest_001, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    OHOS::HDI::Codec::V3_0::CodecParamOverlay param;
+    func_->InitExtParam(param);
+    param.size = sizeof(param);
+    param.enable = true;
+    param.dstX = 0;
+    param.dstY = 0;
+    param.dstW = static_cast<uint32_t>(WIDTH);
+    param.dstH = static_cast<uint32_t>(HEIGHT);
+    int8_t* p = reinterpret_cast<int8_t*>(&param);
+    std::vector<int8_t> inVec(p, p + sizeof(param));
+    auto omxBuffer = std::make_shared<struct OmxCodecBuffer>();
+    func_->FillCodecBufferWithBufferHandle(omxBuffer);
+    auto ret = g_component->SetParameterWithBuffer(OHOS::HDI::Codec::V3_0::Codec_IndexParamOverlayBuffer, inVec, *omxBuffer.get());
+    ASSERT_EQ(ret, HDF_SUCCESS);
+}
+#endif
 
 HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiSetCallbackTest_001, TestSize.Level1)
 {
