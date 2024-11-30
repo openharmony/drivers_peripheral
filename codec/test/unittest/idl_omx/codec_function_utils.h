@@ -103,6 +103,7 @@ public:
     void ObjectToVector(T &param, std::vector<int8_t> &vec)
     {
         int8_t *paramPointer = reinterpret_cast<int8_t *>(&param);
+        vec.clear();
         vec.insert(vec.end(), paramPointer, paramPointer + sizeof(param));
     }
 
