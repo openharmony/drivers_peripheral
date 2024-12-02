@@ -1097,6 +1097,24 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: OpenDevice too many times ", __func__);
         return HDF_FAILURE;
     }
+    if (port->ctrIface != nullptr) {
+        HDF_LOGE("%{public}s:ReleaseInterface failed", __func__);
+        if (HdfSListCount(&port->reqSyncList) > 0) {
+            UsbdRequestSyncReleaseList(port);
+            HDF_LOGD("%{public}s:release sync list", __func__);
+        }
+        if (HdfSListCount(&port->reqASyncList) > 0) {
+            UsbdRequestASyncReleaseList(port);
+            HDF_LOGD("%{public}s:release async list", __func__);
+        }
+        int32_t ret = UsbdBulkASyncListReleasePort(port);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s:release bulk async list failed", __func__);
+        }
+        UsbCloseInterface(port->ctrDevHandle, false);
+        UsbReleaseInterface(port->ctrIface);
+        port->ctrIface = nullptr;
+    }
     OsalMutexLock(&lock_);
     g_usbOpenCount++;
     port->initFlag = true;
