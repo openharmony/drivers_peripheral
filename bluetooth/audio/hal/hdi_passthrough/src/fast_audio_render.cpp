@@ -276,7 +276,7 @@ int32_t FastRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
 {
     HDF_LOGI("%{public}s enter", __func__);
     struct AudioHwRender *render = reinterpret_cast<struct AudioHwRender *>(handle);
-    if (render == NULL || keyValueList == NULL) {
+    if (render == nullptr || keyValueList == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t count = 0;
