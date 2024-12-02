@@ -129,6 +129,7 @@ static constexpr uint32_t REQ_ACTUAL_MININUM_LENGTH = 5;
 static constexpr int32_t  HDF_ERROR_ECANCEL = -20;
 static constexpr int32_t  WRITE_SPLIT_MININUM_LENGTH = 81920;
 static constexpr int32_t  MTP_PROTOCOL_PACKET_SIZE = 4;
+static constexpr int32_t  MTP_BUFFER_SIZE = 16384;
 enum UsbMtpNeedZeroLengthPacket {
     ZLP_NO_NEED = 0, /* no need send ZLP */
     ZLP_NEED,        /* need send ZLP */
@@ -434,7 +435,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortAllocReadWriteRequests(int32_t readSize, int32_t
     struct UsbFnRequest *req = nullptr;
     int32_t i = 0;
     for (i = 0; i < readSize; ++i) {
-        req = UsbFnAllocRequest(mtpDev_->dataIface.handle, mtpDev_->dataOutPipe.id, mtpDev_->dataOutPipe.maxPacketSize);
+        req = UsbFnAllocRequest(mtpDev_->dataIface.handle, mtpDev_->dataOutPipe.id, MTP_BUFFER_SIZE);
         if (req == nullptr) {
             if (DListIsEmpty(&mtpPort_->readPool)) {
                 HDF_LOGE("%{public}s: alloc read req failed", __func__);
@@ -448,7 +449,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortAllocReadWriteRequests(int32_t readSize, int32_t
         mtpPort_->readAllocated++;
     }
     mtpPort_->standbyReq = UsbFnAllocRequest(mtpDev_->dataIface.handle,
-        mtpDev_->dataOutPipe.id, mtpDev_->dataOutPipe.maxPacketSize);
+        mtpDev_->dataOutPipe.id, MTP_BUFFER_SIZE);
     if (mtpPort_->standbyReq == nullptr) {
         HDF_LOGE("%{public}s: alloc standbyReq failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
@@ -1243,7 +1244,7 @@ int32_t UsbfnMtpImpl::ReadImpl(std::vector<uint8_t> &data)
         }
         DListRemove(&req->list);
         DListInsertTail(&req->list, &mtpPort_->readQueue);
-        req->length = static_cast<uint32_t>(mtpDev_->dataOutPipe.maxPacketSize);
+        req->length = static_cast<uint32_t>(MTP_BUFFER_SIZE);
         ret = UsbFnSubmitRequestSync(req, BULK_OUT_TIMEOUT_JIFFIES);
         DListRemove(&req->list);
         DListInsertTail(&req->list, pool);
