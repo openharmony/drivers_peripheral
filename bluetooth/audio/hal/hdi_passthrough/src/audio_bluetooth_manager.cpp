@@ -322,7 +322,7 @@ int FastSuspendPlaying()
     if (state == BTAudioStreamState::STARTED) {
         ret = (fastSuspendPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
     } else if (state == BTAudioStreamState::STARTING) {
-        retval = (fastStopPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
+        ret = (fastStopPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
     } else {
         HDF_LOGE("%{public}s, state=%{public}hhu is bad state", __func__, state);
     }
