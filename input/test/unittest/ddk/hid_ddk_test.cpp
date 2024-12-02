@@ -18,8 +18,6 @@
 #include <linux/uinput.h>
 #include "v1_0/ihid_ddk.h"
 #include "accesstoken_kit.h"
-#include "nativetoken_kit.h"
-#include "token_setproc.h"
 
 using namespace OHOS::HDI::Input::Ddk::V1_0;
 using namespace testing::ext;
@@ -32,40 +30,18 @@ class HidDdkTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    static void MockPermission();
     void SetUp() override {};
     void TearDown() override {};
 };
 
 void HidDdkTest::SetUpTestCase()
 {
-    HidDdkTest::MockPermission();
     g_hidDdk = IHidDdk::Get();
 }
 
 void HidDdkTest::TearDownTestCase()
 {
     g_hidDdk = nullptr;
-}
-
-void HidDdkTest::MockPermission()
-{
-    const char *permissions[] = {
-        "ohos.permission.ACCESS_DDK_HID"
-    };
-    NativeTokenInfoParams infoInstance = {
-        .dcapsNum = 0,
-        .permsNum = 1,
-        .aclsNum = 0,
-        .dcaps = nullptr,
-        .perms = permissions,
-        .acls = nullptr,
-        .processName = "hidDdkTestCase",
-        .aplStr = "system_core",
-    };
-    uint64_t tokenId = GetAccessTokenId(&infoInstance);
-    EXPECT_EQ(0, SetSelfTokenID(tokenId));
-    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
 HWTEST_F(HidDdkTest, CheckIHidDdkGet001, TestSize.Level1)
