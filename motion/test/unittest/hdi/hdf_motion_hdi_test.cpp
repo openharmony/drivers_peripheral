@@ -274,7 +274,7 @@ HWTEST_F(HdfMotionTest, EnableMotion_TYPE_WRIST_DOWN, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t motionType = HDF_MOTION_TYPE_WRIST_DOWN;
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_WRIST_DOWN;
     int32_t ret = g_motionInterface->EnableMotion(motionType);
     EXPECT_NE(HDF_SUCCESS, ret);
 
@@ -288,7 +288,7 @@ HWTEST_F(HdfMotionTest, EnableMotion_TYPE_WAVE, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t motionType = HDF_MOTION_TYPE_WAVE;
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_WAVE;
     int32_t ret = g_motionInterface->EnableMotion(motionType);
     EXPECT_NE(HDF_SUCCESS, ret);
 
@@ -302,7 +302,7 @@ HWTEST_F(HdfMotionTest, EnableMotion_TYPE_STEP_COUNTER, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t motionType = HDF_MOTION_TYPE_STEP_COUNTER;
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_STEP_COUNTER;
     int32_t ret = g_motionInterface->EnableMotion(motionType);
     EXPECT_NE(HDF_SUCCESS, ret);
 
@@ -316,7 +316,7 @@ HWTEST_F(HdfMotionTest, EnableMotion_TYPE_TOUCH_LINK, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t motionType = HDF_MOTION_TYPE_TOUCH_LINK;
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_TOUCH_LINK;
     int32_t ret = g_motionInterface->EnableMotion(motionType);
     EXPECT_NE(HDF_SUCCESS, ret);
 
@@ -330,7 +330,7 @@ HWTEST_F(HdfMotionTest, EnableMotion_TYPE_HOVER, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t motionType = HDF_MOTION_TYPE_HOVER;
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_HOVER;
     int32_t ret = g_motionInterface->EnableMotion(motionType);
     EXPECT_NE(HDF_SUCCESS, ret);
 
@@ -344,7 +344,7 @@ HWTEST_F(HdfMotionTest, EnableMotion_TYPE_PUT_IN_POCKET, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t motionType = HDF_MOTION_TYPE_PUT_IN_POCKET;
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_PUT_IN_POCKET;
     int32_t ret = g_motionInterface->EnableMotion(motionType);
     EXPECT_NE(HDF_SUCCESS, ret);
 
@@ -358,7 +358,7 @@ HWTEST_F(HdfMotionTest, EnableMotion_TYPE_RESERVED, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t motionType = HDF_MOTION_TYPE_RESERVED;
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_RESERVED;
     int32_t ret = g_motionInterface->EnableMotion(motionType);
     EXPECT_NE(HDF_SUCCESS, ret);
 
