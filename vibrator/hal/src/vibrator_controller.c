@@ -332,6 +332,9 @@ static int32_t GetHapticStartUpTime(int32_t mode, int32_t *startUpTime)
 static int32_t IsVibratorRunning(bool *state)
 {
     HDF_LOGI("%{public}s: in", __func__);
+    if (state == NULL) {
+        return HDF_FAILURE;
+    }
     int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
