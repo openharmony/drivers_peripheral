@@ -24,7 +24,7 @@
 #define EFFECT_DURATION 2000
 #define VIBRATOR_SERVICE_NAME "hdf_misc_vibrator"
 #define DEFAULT_START_UP_TIME 20
-#define ERROR_STATE -1
+#define ERROR_STATE (-1)
 
 static struct VibratorDevice *GetVibratorDevicePriv(void)
 {
