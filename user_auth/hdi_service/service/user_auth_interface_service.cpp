@@ -917,6 +917,7 @@ int32_t UserAuthInterfaceService::CancelEnrollment(int32_t userId)
 static void CopyCredentialInfo(const CredentialInfoHal &in, HdiCredentialInfo &out)
 {
     out.authType = static_cast<AuthType>(in.authType);
+    out.authSubType = in.credentialType;
     out.credentialId = in.credentialId;
     out.templateId = in.templateId;
     out.executorMatcher = in.executorMatcher;
@@ -1722,6 +1723,22 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
 
 int32_t UserAuthInterfaceService::GetCredentialById(uint64_t credentialId, HdiCredentialInfo &info)
 {
+    IAM_LOGI("start");
+    std::lock_guard<std::mutex> lock(g_mutex);
+    LinkedList *credList = nullptr;
+    int32_t ret = QueryCredentialByIdFunc(credentialId, &credList);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("query credential failed");
+        return ret;
+    }
+    if (credList == NULL || credList->head == NULL || credList->head->data == NULL) {
+        IAM_LOGE("query credential failed");
+        DestroyLinkedList(credList);
+        return RESULT_UNKNOWN;
+    }
+    auto credentialHal = static_cast<CredentialInfoHal *>(credList->head->data);
+    CopyCredentialInfo(*credentialHal, info);
+    DestroyLinkedList(credList);
     return RESULT_SUCCESS;
 }
 } // Userauth
