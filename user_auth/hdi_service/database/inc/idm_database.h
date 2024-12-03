@@ -78,6 +78,7 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
 ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param);
 ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo);
 bool GetEnableStatus(int32_t userId, uint32_t authType);
+ResultCode QueryCredentialByIdFunc(uint64_t credentialId, LinkedList **creds);
 
 #ifdef __cplusplus
 }
