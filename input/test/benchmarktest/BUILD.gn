@@ -55,30 +55,3 @@ ohos_benchmarktest("hdf_input_benchmark_test") {
     "ipc:ipc_single",
   ]
 }
-
-ohos_benchmarktest("hid_ddk_benchmark_test") {
-  module_out_path = "drivers_peripheral_input/input"
-
-  sources = [ "hid_ddk_benchmark_test.cpp" ]
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
-
-  external_deps = [
-    "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
-    "benchmark:benchmark",
-    "c_utils:utils",
-    "drivers_interface_input:libhid_ddk_proxy_1.0",
-    "googletest:gmock_main",
-    "hdf_core:libhdf_utils",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-  ]
-}
