@@ -53,8 +53,8 @@ UsbdAccessory &UsbdAccessory::GetInstance()
 
 void UsbdAccessory::init_base64_char_map()
 {
-    for (int32_t i = 0; i < base64_chars.size(); ++i) {
-        base64_char_map[base64_chars[i]] = i;
+    for (size_t i = 0; i < base64_chars.size(); ++i) {
+        base64_char_map[base64_chars[i]] = static_cast<int>(i);
     }
 }
 
