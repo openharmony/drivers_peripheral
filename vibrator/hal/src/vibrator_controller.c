@@ -333,6 +333,7 @@ static int32_t IsVibratorRunning(bool *state)
 {
     HDF_LOGI("%{public}s: in", __func__);
     if (state == NULL) {
+        HDF_LOGE("%{public}s: state is NULL", __func__);
         return HDF_FAILURE;
     }
     int32_t ret;
