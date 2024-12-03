@@ -1125,12 +1125,12 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: openPort failed", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    OsalMutexLock(&lock_);
     for (int8_t interfaceId = 0; interfaceId < USB_MAX_INTERFACES; ++interfaceId) {
         if (port->iface[interfaceId] != nullptr) {
             ReleaseInterface(dev, interfaceId);
         }
     }
+    OsalMutexLock(&lock_);
     g_usbOpenCount--;
     int32_t ret = 0;
     if (port->ctrDevHandle != nullptr && g_usbOpenCount == 0) {
