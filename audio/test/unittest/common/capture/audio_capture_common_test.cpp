@@ -241,6 +241,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameExceptions001, TestSize.Level1)
 }
 
 /* capture frameEc cases */
+#ifdef AUDIO_FEATURE_FRAME_EC
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameEc001, TestSize.Level1)
 {
     uint32_t len = (uint64_t)GetCaptureBufferSize();
@@ -285,6 +286,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameEcExceptions001, TestSize.Level
 
     capture_->Stop(capture_);
 }
+#endif
 
 /* capture getposition cases */
 HWTEST_F(AudioUtCaptureTest, HdfAudioGetCapturePosition001, TestSize.Level1)
