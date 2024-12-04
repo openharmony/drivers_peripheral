@@ -20,6 +20,7 @@
 #include <securec.h>
 #include <vector>
 #include "hdf_base.h"
+#include "hdf_log.h"
 #include "osal_time.h"
 #include "v1_1/imotion_interface.h"
 #include "motion_callback_impl.h"
