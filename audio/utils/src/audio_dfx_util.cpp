@@ -68,6 +68,10 @@ void CancelTimer(int32_t id)
 
 void CheckOverTime(struct timeval startTimeStamp, int64_t overTime, const char* logStr)
 {
+    if (logStr == NULL) {
+        HDF_LOGE("logStr is NULL");
+        return;
+    }
     struct timeval stopTimeStamp = {0};
     gettimeofday(&stopTimeStamp, nullptr);
     int32_t runTime = (int32_t)((stopTimeStamp.tv_sec - startTimeStamp.tv_sec) * TIME_1000 +

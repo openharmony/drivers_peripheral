@@ -15,7 +15,7 @@ hdf_audio_path = ".."
 import("//build/ohos.gni")
 import("$hdf_audio_path/audio.gni")
 
-ohos_shared_library("audio_primary_impl_utils") {
+ohos_static_library("audio_primary_impl_utils") {
   sources = [ "src/audio_dfx_util.cpp" ]
 
   include_dirs = [
@@ -49,7 +49,6 @@ ohos_shared_library("audio_primary_impl_utils") {
     defines += [ "AUDIO_HITRACE_ENABLE" ]
   }
 
-  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_audio"
 }
