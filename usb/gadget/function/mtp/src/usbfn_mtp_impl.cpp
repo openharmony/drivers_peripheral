@@ -1321,7 +1321,7 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
     return ret;
 }
 
-int32_t UsbfnMtpImpl::getActualLength(const std::vector<uint8_t> &data)
+uint32_t UsbfnMtpImpl::getActualLength(const std::vector<uint8_t> &data)
 {
     if (data.size() < MTP_PROTOCOL_PACKET_SIZE) {
         return data.size();
@@ -1335,7 +1335,7 @@ int32_t UsbfnMtpImpl::getActualLength(const std::vector<uint8_t> &data)
 int32_t UsbfnMtpImpl::WriteSplitPacket(const std::vector<uint8_t> &data)
 {
     if (data.size() > WRITE_SPLIT_MININUM_LENGTH && writeActualLen_ == 0) {
-        size_t writeLen = getActualLength(data);
+        uint32_t writeLen = getActualLength(data);
         if (writeLen > data.size()) {
             vectorSplited_.resize(writeLen);
             std::copy(data.begin(), data.end(), vectorSplited_.begin());
