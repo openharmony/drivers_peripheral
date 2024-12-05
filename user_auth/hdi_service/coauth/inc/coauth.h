@@ -26,7 +26,7 @@ extern "C" {
 
 #define INVALID_SESSION_ID 0
 #define MAX_EXECUTOR_SIZE 2
-#define MAX_SCHEDULE_NUM 51
+#define MAX_SCHEDULE_NUM 50
 
 typedef union AssociateId {
     uint64_t contextId;
