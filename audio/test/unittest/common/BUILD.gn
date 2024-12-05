@@ -59,6 +59,9 @@ ohos_unittest("audio_ut_common_test") {
   if (drivers_peripheral_audio_feature_community) {
     defines += [ "AUDIO_FEATURE_COMMUNITY" ]
   }
+  if (drivers_peripheral_audio_feature_frame_ec) {
+    defines += [ "AUDIO_FEATURE_FRAME_EC" ]
+  }
 }
 
 group("hdi_base_common") {
