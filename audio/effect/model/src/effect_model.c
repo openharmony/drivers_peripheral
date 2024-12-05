@@ -149,7 +149,7 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
         dlclose((void *)libHandle);
         return HDF_FAILURE;
     }
-    HDF_LOGI("%{public}s: %{public}s create, cnt=[%{public}d]", __func__, libName, g_libInfos[i]->effectCnt);
+    HDF_LOGI("%{public}s: %{public}s create, cnt=[%{public}d]", __func__, libName, *libInfo->effectCnt);
     return HDF_SUCCESS;
 }
 
@@ -344,7 +344,7 @@ int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const stru
         return HDF_ERR_INVALID_PARAM;
     }
 
-    struct AudioEffectLibInfo *libInfo = GetEffectLibInfoByName(info->libName);
+    struct AudioEffectLibInfo *libInfo = GetEffectLibInfoByName(contollerId->libName);
     CHECK_NULL_PTR_RETURN_VALUE(libInfo, HDF_FAILURE);
     if (libInfo->effectCnt > 1) {
         libInfo->effectCnt--;
@@ -368,7 +368,7 @@ int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const stru
     /* call the lib destroy method，then free controller manager */
     lib->DestroyController(lib, ctrlMgr->ctrlOps);
     DeleteEffectLibrary(contollerId->libName);
-    HDF_LOGI("%{public}s: destroy effect succeed, libName = %{public}s", __func__, info->libName);
+    HDF_LOGI("%{public}s: destroy effect succeed, libName = %{public}s", __func__, contollerId->libName);
     return HDF_SUCCESS;
 }
 
