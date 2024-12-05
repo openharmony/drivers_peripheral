@@ -322,15 +322,6 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     ctrlMgr->ctrlImpls.GetEffectDescriptor = EffectGetOwnDescriptor;
     ctrlMgr->ctrlImpls.EffectReverse = EffectControlEffectReverse;
     *contoller = &ctrlMgr->ctrlImpls;
-    if (RegisterControllerToList(ctrlMgr) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: register ctroller to list failed.", __func__);
-        DeleteEffectLibrary(info->libName);
-        OsalMemFree(ctrlMgr->libName);
-        OsalMemFree(ctrlMgr);
-        *contoller = NULL;
-        return HDF_FAILURE;
-    }
-
     // free after send reply
     contollerId->libName = strdup(info->libName);
     contollerId->effectId = strdup(info->effectId);
@@ -433,7 +424,6 @@ void EffectModelImplRelease(struct IEffectModel *instance)
     }
 
     AudioEffectReleaseCfgDesc(g_cfgDescs);
-    ReleaseLibFromList();
     struct EffectModelService *service = CONTAINER_OF(instance, struct EffectModelService, interface);
     if (service == NULL) {
         return;
