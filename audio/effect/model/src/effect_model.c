@@ -149,7 +149,7 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
         dlclose((void *)libHandle);
         return HDF_FAILURE;
     }
-    HDF_LOGI("%{public}s: %{public}s create, cnt=[%{public}d]", __func__, libName, *libInfo->effectCnt);
+    HDF_LOGI("%{public}s: %{public}s create, cnt=[%{public}d]", __func__, libName, (*libInfo)->effectCnt);
     return HDF_SUCCESS;
 }
 
