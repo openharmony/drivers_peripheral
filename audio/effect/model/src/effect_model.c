@@ -290,7 +290,7 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
 }
 
 static int32_t CreateEffectController(const struct EffectInfo *info, struct IEffectControl **contoller,
-    struct ControllerId *contollerId)
+    struct ControllerId *contollerId, struct IEffectControlVdi *ctrlOps)
 {
     if (info == NULL || contoller == NULL || contollerId == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
@@ -363,7 +363,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     lib->CreateController(lib, infoVdi, &ctrlOps);
     CHECK_NULL_PTR_RETURN_VALUE(ctrlOps, HDF_FAILURE);
 
-    ret = CreateEffectController(info, contoller, contollerId);
+    ret = CreateEffectController(info, contoller, contollerId, ctrlOps);
     if (ret != HDF_SUCCESS) {
         DeleteEffectLibrary(info->libName);
         return HDF_FAILURE;
