@@ -1102,6 +1102,11 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: openPort failed", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
+    for (uint8_t interfaceId = 0; interfaceId < USB_MAX_INTERFACES; ++interfaceId) {
+        if (port->iface[interfaceId] != nullptr) {
+            ReleaseInterface(dev, interfaceId);
+        }
+    }
     usbOpenCount_--;
     int32_t ret = 0;
     if (port->ctrDevHandle != nullptr && usbOpenCount_ == 0) {
@@ -1379,7 +1384,10 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
-
+    if (!port->initFlag) {
+        HDF_LOGE("%{public}s: openPort failed", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
     if (interfaceId < USB_MAX_INTERFACES) {
         if (port->devHandle[interfaceId] == nullptr || port->iface[interfaceId] == nullptr) {
             HDF_LOGE("%{public}s: UsbOpenInterface or UsbClaimInterface failed", __func__);
