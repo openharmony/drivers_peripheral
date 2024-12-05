@@ -115,7 +115,7 @@ static struct AudioEffectLibInfo* AddEffectLibInfo(const char *libName, uint8_t 
     return libInfo;
 }
 
-static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **factLib
+static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **factLib,
     struct ControllerManager** ctrlMgr)
 {
     uint8_t *libHandle = NULL; 
@@ -147,7 +147,7 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
     if (*libInfo == NULL) {
         HDF_LOGE("%{public}s: AddEffectLibInfo fail", __func__);
         dlclose((void *)libHandle);
-        return HDF_FAILURE
+        return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s: %{public}s create, cnt=[%{public}d]", __func__, libName, g_libInfos[i]->effectCnt);
     return HDF_SUCCESS;
@@ -306,7 +306,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     /* ctrlMgr mark it and using it in release process */
     ctrlMgr = (struct ControllerManager *)OsalMemCalloc(sizeof(struct ControllerManager));
     CHECK_NULL_PTR_RETURN_VALUE(ctrlMgr, HDF_FAILURE);
-    struct AudioEffectLibInfo *libInfo = GetEffectlibInfoByName(info->libName);
+    struct AudioEffectLibInfo *libInfo = GetEffectLibInfoByName(info->libName);
     CHECK_NULL_PTR_RETURN_VALUE(libInfo, HDF_FAILURE);
     libInfo->ctrlMgr = ctrlMgr;
     ctrlMgr->ctrlOps = ctrlOps;
@@ -353,7 +353,7 @@ int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const stru
         return HDF_ERR_INVALID_PARAM;
     }
 
-    struct AudioEffectLibInfo *libInfo = GetEffectlibInfoByName(info->libName);
+    struct AudioEffectLibInfo *libInfo = GetEffectLibInfoByName(info->libName);
     CHECK_NULL_PTR_RETURN_VALUE(libInfo, HDF_FAILURE);
     if (libInfo->effectCnt > 1) {
         libInfo->effectCnt--;
