@@ -1100,6 +1100,10 @@ int32_t UserAuthInterfaceService::GetUserInfo(int32_t userId, uint64_t &secureUi
     uint32_t num = 0;
     uint64_t pinSubTypeGet;
     int32_t ret = GetUserInfoFunc(userId, &secureUid, &pinSubTypeGet, &enrolledInfoHals, &num);
+    if (ret == RESULT_NOT_FOUND) {
+        IAM_LOGE("user not found");
+        return RESULT_SUCCESS;
+    }
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("get user info failed");
         return ret;
