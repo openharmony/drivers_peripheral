@@ -157,7 +157,7 @@ struct VibratorInterface {
      * @since 3.2
      * @version 1.1
      */
-    int32_t (*IsVibratorRunning)(bool state);
+    int32_t (*IsVibratorRunning)(bool *state);
     /**
      * @brief HD vibration data packet delivery.
      *
