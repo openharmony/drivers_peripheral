@@ -327,6 +327,7 @@ static int32_t CreateEffectController(const struct EffectInfo *info, struct IEff
         *contoller = NULL;
         return HDF_FAILURE;
     }
+    return HDF_SUCCESS;
 }
 
 static int32_t EffectModelCreateEffectController(struct IEffectModel *self, const struct EffectInfo *info,
