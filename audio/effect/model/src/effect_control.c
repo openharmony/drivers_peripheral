@@ -36,7 +36,16 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
         HDF_LOGE("%{public}s: controller has no options", __func__);
         return HDF_FAILURE;
     }
-
+    if (strcmp(manager->libName, "liboffline_record_algo") == 0) {
+        output->frameCount = input->frameCount;
+        output->datatag = input->datatag;
+        output->rawDataLen = input->rawDataLen;
+        output->rawData = (int8_t *)OsalMemCalloc(sizeof(int8_t *) * output->rawDataLen);
+        if (output->rawData == NULL) {
+            HDF_LOGE("%{public}s: OsalMemCalloc fail", __func__);
+            return HDF_FAILURE;
+        }
+    }
     struct AudioEffectBufferVdi *inputVdi = (struct AudioEffectBufferVdi *)input;
     struct AudioEffectBufferVdi *outputVdi = (struct AudioEffectBufferVdi *)output; 
     int32_t ret = manager->ctrlOps->EffectProcess(manager->ctrlOps, inputVdi, outputVdi);
