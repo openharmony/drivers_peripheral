@@ -40,10 +40,11 @@ struct ControllerManagerNode {
 
 /* declare the function here */
 bool IsEffectLibExist(void);
+/*
 int32_t RegisterEffectLibToList(void *handle, struct EffectFactory *factLib);
 struct EffectFactory *GetEffectLibFromList(const char *effectLibName);
 void ReleaseLibFromList(void);
 int32_t RegisterControllerToList(struct ControllerManager *ctrlMgr);
 struct ControllerManager *GetControllerFromList(char *effectId);
-
+*/
 #endif
