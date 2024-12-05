@@ -37,6 +37,7 @@ AEM_GET_INITED_DLIST(g_libList);
 AEM_GET_INITED_DLIST(g_controllerList);
 
 /* reist the effect lib */
+/*
 int32_t RegisterEffectLibToList(void *handle, struct EffectFactory *factLib)
 {
     struct EffectFactoryLibListNode *node = NULL;
@@ -98,7 +99,7 @@ struct EffectFactory *GetEffectLibFromList(const char *effectLibName)
     HDF_LOGE("effectLibName %{public}s not exit in list", effectLibName);
     return NULL;
 }
-
+*/
 bool IsEffectLibExist(void)
 {
     bool isSupply = true;
@@ -111,7 +112,7 @@ bool IsEffectLibExist(void)
     return isSupply;
 }
 
-
+/*
 // effect controller；
 int32_t RegisterControllerToList(struct ControllerManager *ctrlMgr)
 {
@@ -163,3 +164,4 @@ struct ControllerManager *GetControllerFromList(char *effectId)
     HDF_LOGE("effectId %s not exit in list", effectId);
     return NULL;
 }
+*/
