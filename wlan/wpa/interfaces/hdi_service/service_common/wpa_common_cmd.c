@@ -1849,10 +1849,11 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
         HDF_LOGE("invalid opt");
         return HDF_FAILURE;
     }
-    (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     do {
         HDF_LOGE("%{public}s: call HdfWpaAddRemoteObj", __func__);
+        (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
         ret = HdfWpaAddRemoteObj(cbFunc, ifName);
+        (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: HdfSensorAddRemoteObj false", __func__);
             break;
@@ -1860,11 +1861,12 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
         ret = WpaRegisterEventCallback(HdfWpaCallbackFun, WIFI_WPA_TO_HAL_CLIENT, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Register failed!, error code: %{public}d", __func__, ret);
+            (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
             HdfWpaDelRemoteObj(cbFunc);
+            (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
             break;
         }
     } while (0);
-    (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
     pthread_mutex_unlock(&g_interfaceLock);
     return ret;
 }
@@ -1885,13 +1887,13 @@ int32_t WpaInterfaceUnregisterEventCallback(struct IWpaInterface *self, struct I
         HDF_LOGE("invalid opt");
         return HDF_FAILURE;
     }
-    (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     if (DListIsEmpty(&HdfWpaStubDriver()->remoteListHead)) {
         int32_t ret = WpaUnregisterEventCallback(HdfWpaCallbackFun, WIFI_WPA_TO_HAL_CLIENT, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
         }
     }
+    (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     HdfWpaDelRemoteObj(cbFunc);
     (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
     pthread_mutex_unlock(&g_interfaceLock);
