@@ -17,6 +17,7 @@
 #include "hdf_audio_server_common.h"
 #include "hdf_audio_server_render.h"
 #include "hdf_audio_server.h"
+#include "hdf_audio_server_capture.h"
 namespace OHOS::HDI::Audio_Bluetooth {
 #define HDF_LOG_TAG hdf_audio_bluetooth_server
 
@@ -403,6 +404,16 @@ struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_RENDER_DEV_DUMP, HdiServiceRenderDevDump},
     {AUDIO_HDI_RENDER_REG_CALLBACK, HdiServiceRenderRegCallback},
     {AUDIO_HDI_RENDER_DRAIN_BUFFER, HdiServiceRenderDrainBuffer},
+    {AUDIO_HDI_CAPTURE_CREATE_CAPTURE, HdiServiceCreateCapture},
+    {AUDIO_HDI_CAPTURE_DESTROY, HdiServiceCaptureDestory},
+    {AUDIO_HDI_CAPTURE_START, HdiServiceCaptureStart},
+    {AUDIO_HDI_CAPTURE_STOP, HdiServiceCaptureStop},
+    {AUDIO_HDI_CAPTURE_PAUSE, HdiServiceCapturePause},
+    {AUDIO_HDI_CAPTURE_RESUME, HdiServiceCaptureResume},
+    {AUDIO_HDI_CAPTURE_FLUSH, HdiServiceCaptureFlush},
+    {AUDIO_HDI_CAPTURE_GET_MUTE, HdiServiceCaptureGetMute},
+    {AUDIO_HDI_CAPTURE_SET_MUTE, HdiServiceCaptureSetMute},
+    {AUDIO_HDI_CAPTURE_CAPTURE_FRAME, HdiServiceCaptureCaptureFrame},
 };
 
 static int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -417,10 +428,10 @@ static int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, s
     if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (cmdId > AUDIO_HDI_RENDER_DRAIN_BUFFER || cmdId < 0) {
+    if (cmdId > AUDIO_HDI_CAPTURE_SET_MUTE || cmdId < 0) {
         HDF_LOGE("ControlDispatch: invalid cmdId = %{public}d", cmdId);
         return AUDIO_HAL_ERR_INTERNAL;
-    } else if (cmdId <= AUDIO_HDI_RENDER_DRAIN_BUFFER) {
+    } else if (cmdId <= AUDIO_HDI_CAPTURE_SET_MUTE) {
         for (i = 0; i < sizeof(g_hdiServiceDispatchCmdHandleList) /
             sizeof(g_hdiServiceDispatchCmdHandleList[0]); ++i) {
             if ((cmdId == (int)(g_hdiServiceDispatchCmdHandleList[i].cmd)) &&

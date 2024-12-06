@@ -16,6 +16,7 @@
 #include "codec_log_wrapper.h"
 #include "codec_dfx_service.h"
 #include "malloc.h"
+#include <mutex>
 namespace OHOS {
 namespace HDI {
 namespace Codec {
@@ -25,7 +26,7 @@ namespace V3_0 {
 #define OUTPUT_PORT_INDEX 1
 CodecDfxService CodecDfxService::dfxInstance_;
 HdfSBuf *CodecDfxService::reply_;
-
+std::mutex g_mtx;
 int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
 {
     CodecStateType state;
@@ -111,8 +112,12 @@ void CodecDfxService::GetCodecMemoryInfo()
 int32_t CodecDfxService::DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t argv = 0;
+    std::lock_guard<std::mutex> lk{g_mtx};
     reply_ = reply;
-    (void)HdfSbufReadUint32(data, &argv);
+    if (!HdfSbufReadUint32(data, &argv)) {
+        CODEC_LOGE("idl_service read argv failed!");
+        return HDF_FAILURE;
+    }
     if (argv != ARGV_FLAG) {
         if (!HdfSbufWriteString(reply, "please enter -h for help! \n")) {
             CODEC_LOGE("help write Fail!");

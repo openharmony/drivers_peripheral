@@ -19,12 +19,27 @@
 #include "v2_0/ignss_interface.h"
 
 #include "iremote_object.h"
-
+#include "location_vendor_interface.h"
+#include "location_vendor_lib.h"
 namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Gnss {
 namespace V2_0 {
+
+void NmeaCallback(int64_t timestamp, const char* nmea, int length);
+void GetGnssCallbackMethods(GnssCallbackStruct* device);
+void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces* device);
+void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces* device);
+void SvStatusCallback(GnssSatelliteStatus* svInfo);
+void GnssWorkingStatusUpdate(uint16_t* status);
+void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasurementInfo);
+void LocationUpdate(GnssLocation* location);
+void SetGnssClock(OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo* gnssMeasurementInfoNew,
+    OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasurementInfo);
+void NiNotifyCallback(OHOS::HDI::Location::GnssNiNotificationRequest *notification);
+void GetGnssMeasurementCallbackMethods(GnssMeasurementCallbackIfaces* device);
+
 class GnssInterfaceImpl : public IGnssInterface {
 public:
     GnssInterfaceImpl();

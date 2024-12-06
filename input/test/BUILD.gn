@@ -43,11 +43,7 @@ if (defined(ohos_lite)) {
       deps += [ "unittest/udriver:input_udriver_unittest" ]
     }
     if (drivers_peripheral_input_feature_support_ddk) {
-      deps += [
-        "benchmarktest:hid_ddk_benchmark_test",
-        "fuzztest/hidddk_fuzzer:fuzztest",
-        "unittest/ddk:hid_ddk_unittest",
-      ]
+      deps += [ "fuzztest/hidddk_fuzzer:fuzztest" ]
     }
   }
 }

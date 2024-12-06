@@ -18,7 +18,7 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_CAPTURE
 
-typedef stuct CaptureData {
+typedef struct CaptureData {
     struct AlsaMixerCtlElement ctrlLeftVolume;
     struct AlsaMixerCtlElement ctrlRightVolume;
     long tempVolume;

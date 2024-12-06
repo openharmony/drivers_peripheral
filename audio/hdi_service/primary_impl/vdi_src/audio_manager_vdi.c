@@ -20,7 +20,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
-#include "audio_dfx_vdi.h"
+#include "audio_dfx_util.h"
 #include "v4_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -356,7 +356,7 @@ static struct IAudioAdapter* VendorLoadAdapter(struct IAudioManagerVdi *vdiManag
         vdiManager->UnloadAdapter(vdiManager, vdiAdapter);
         return NULL;
     }
-    AudioManagerReleaseVdiDesc(&vdiDesc);
+    AudioManagerReleaseVdiDesc(vdiDesc);
     return adapter;
 }
 
@@ -398,7 +398,7 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
         return HDF_FAILURE;
     }
 
-    *adapter = VendorLoadAdapter(priv->vdiManager, descIndex, vdiDesc);
+    *adapter = VendorLoadAdapter(priv->vdiManager, &vdiDesc, descIndex);
     if (*adapter == NULL) {
         pthread_mutex_unlock(&g_managerMutex);
         return HDF_FAILURE;
@@ -414,7 +414,7 @@ static int32_t AudioManagerVendorUnloadAdapterLocked(struct IAudioManager *manag
     CHECK_NULL_PTR_RETURN_VALUE(adapterName, HDF_ERR_INVALID_PARAM);
 
     struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)manager;
-    if (priv == NULL || priv->vdiManager == NULL || priv->vdiManager->UnLoadAdapter == NULL) {
+    if (priv == NULL || priv->vdiManager == NULL || priv->vdiManager->UnloadAdapter == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -435,11 +435,11 @@ static int32_t AudioManagerVendorUnloadAdapterLocked(struct IAudioManager *manag
         AudioDecreaseAdapterRefVdi(descIndex);
         return HDF_SUCCESS;
     }
+    AudioReleaseAdapterVdi(descIndex);
     HdfAudioStartTrace("Hdi:AudioManagerVendorUnloadAdapter", 0);
     priv->vdiManager->UnloadAdapter(priv->vdiManager, vdiAdapter);
     HdfAudioFinishTrace();
 
-    AudioReleaseAdapterVdi(descIndex);
     AUDIO_FUNC_LOGD("audio vdiManager unload vdiAdapter success");
     return HDF_SUCCESS;
 }
@@ -544,11 +544,6 @@ struct IAudioManager *AudioManagerCreateIfInstance(void)
         AUDIO_FUNC_LOGE("init g_managerMutex failed.");
         return NULL;
     }
-    if (InitAdapterMutex() != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("init g_adapterMutex failed.");
-        pthread_mutex_destroy(&g_managerMutex);
-        return NULL;
-    }
 
     priv->interface.GetAllAdapters = AudioManagerVendorGetAllAdapters;
     priv->interface.LoadAdapter = AudioManagerVendorLoadAdapter;
@@ -562,6 +557,5 @@ int32_t AudioManagerDestroyIfInstance(struct IAudioManager *manager)
 {
     int32_t ret = ReleaseAudioManagerVendorObject(manager);
     pthread_mutex_destroy(&g_managerMutex);
-    DeinitAdapterMutex();
     return ret;
 }

@@ -72,7 +72,7 @@ HWTEST_F(CameraHdiSequenceableTest, MapDataSequencebleTest_01, TestSize.Level1)
     EXPECT_EQ(ret, 0);
     ret = mapDataSequenceable->Get("doubleTemp", doubleTemp1);
     EXPECT_EQ(ret, 0);
-    EXPECT_EQ(doubleTemp0, doubleTemp0);
+    EXPECT_EQ(doubleTemp1, doubleTemp0);
 
     string stringTemp0 = "s1234.5678";
     string stringTemp1 = "0";
@@ -80,7 +80,7 @@ HWTEST_F(CameraHdiSequenceableTest, MapDataSequencebleTest_01, TestSize.Level1)
     EXPECT_EQ(ret, 0);
     ret = mapDataSequenceable->Get("stringTemp", stringTemp1);
     EXPECT_EQ(ret, 0);
-    EXPECT_EQ(stringTemp0, stringTemp0);
+    EXPECT_EQ(stringTemp1, stringTemp0);
 
     // Marshalling and Unmarshalling Test
     Parcel parcel;

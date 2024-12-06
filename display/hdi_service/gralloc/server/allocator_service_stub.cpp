@@ -68,11 +68,9 @@ int32_t AllocatorServiceStub::OnRemoteRequest(
 {
     if (cmdId == CMD_ALLOCATOR_ALLOCMEM) {
         return AllocaltorStubAllocMem(data, reply, option);
-    } else {
-        HDF_LOGE("%{public}s: not support cmd", __func__);
-        return HDF_ERR_INVALID_PARAM;
     }
-    return HDF_SUCCESS;
+    HDF_LOGE("%{public}s: not support cmd", __func__);
+    return HDF_ERR_INVALID_PARAM;
 }
 } // namespace V1_0
 } // namespace Display

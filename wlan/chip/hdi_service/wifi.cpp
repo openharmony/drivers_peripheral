@@ -64,8 +64,8 @@ Wifi::~Wifi()
 
 int32_t Wifi::RegisterWifiEventCallback(const sptr<IChipControllerCallback>& eventCallback)
 {
-    if (AddWifiDeathRecipient(eventCallback) != HDF_SUCCESS) {
-        return HDF_FAILURE;
+    if (cbHandler_.GetCallbacks().empty()) {
+        AddWifiDeathRecipient(eventCallback);
     }
 
     if (!cbHandler_.AddCallback(eventCallback)) {
@@ -241,6 +241,7 @@ void Wifi::OnRemoteDied(const wptr<IRemoteObject> &object)
     chips_.clear();
     auto lock = AcquireGlobalLock();
     StopVendorHal(&lock);
+    cbHandler_.Invalidate();
     runState_ = RunState::STOPPED;
 }
 

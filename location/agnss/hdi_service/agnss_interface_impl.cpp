@@ -48,7 +48,7 @@ extern "C" IAGnssInterface* AGnssInterfaceImplGetInstance(void)
     return new (std::nothrow) AGnssInterfaceImpl();
 }
 
-static void RequestSetupAgnssDataConnection(const AgnssDataConnectionRequest* status)
+void RequestSetupAgnssDataConnection(const AgnssDataConnectionRequest* status)
 {
     if (status == nullptr) {
         HDF_LOGE("%{public}s:status is nullptr.", __func__);
@@ -67,7 +67,7 @@ static void RequestSetupAgnssDataConnection(const AgnssDataConnectionRequest* st
     }
 }
 
-static void GetSetidCb(uint16_t type)
+void GetSetidCb(uint16_t type)
 {
     HDF_LOGI("%{public}s.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
@@ -79,7 +79,7 @@ static void GetSetidCb(uint16_t type)
     }
 }
 
-static void GetRefLocationidCb(uint32_t type)
+void GetRefLocationidCb(uint32_t type)
 {
     HDF_LOGI("%{public}s, type=%{public}d", __func__, type);
     std::unique_lock<std::mutex> lock(g_mutex);
@@ -92,7 +92,7 @@ static void GetRefLocationidCb(uint32_t type)
     }
 }
 
-static void GetAGnssCallbackMethods(AgnssCallbackIfaces* device)
+void GetAGnssCallbackMethods(AgnssCallbackIfaces* device)
 {
     if (device == nullptr) {
         return;

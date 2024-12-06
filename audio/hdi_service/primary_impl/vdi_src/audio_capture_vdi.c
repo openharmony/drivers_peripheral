@@ -21,7 +21,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_common_vdi.h"
-#include "audio_dfx_vdi.h"
+#include "audio_dfx_util.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
@@ -893,5 +893,5 @@ void AudioDestroyCaptureByIdVdi(uint32_t captureId)
 
     OsalMemFree(priv->captureInfos[captureId]);
     priv->captureInfos[captureId] = NULL;
-    AUDIO_FUNC_LOGI("audio destroy capture success");
+    AUDIO_FUNC_LOGI("audio destroy capture success, captureId = [%{public}u]", captureId);
 }

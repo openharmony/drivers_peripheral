@@ -249,7 +249,7 @@ static void ParseDescriptor(const void *source, enum UsbRawDescriptorType bDescr
 {
     int32_t ret;
 
-    if (source == NULL) {
+    if (source == NULL || dest == NULL) {
         HDF_LOGE("%{public}s: invalid param", __func__);
         return;
     }
@@ -597,8 +597,7 @@ static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const u
 
     ParseDescriptor(buffer, USB_RAW_CONFIG_DESCRIPTOR_TYPE, config);
     if ((config->configDescriptor.bDescriptorType != USB_DDK_DT_CONFIG) ||
-        (config->configDescriptor.bLength < USB_DDK_DT_CONFIG_SIZE) ||
-        (config->configDescriptor.bLength > (uint8_t)size) ||
+        (config->configDescriptor.bLength != USB_DDK_DT_CONFIG_SIZE) ||
         (config->configDescriptor.bNumInterfaces > USB_MAXINTERFACES)) {
         HDF_LOGE("%{public}s:%{public}d invalid descriptor: type = 0x%{public}x, length = %{public}u",
             __func__, __LINE__, config->configDescriptor.bDescriptorType, config->configDescriptor.bLength);

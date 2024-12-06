@@ -141,7 +141,6 @@ static int32_t UsbFnWriteFile(const char *path, const char *str)
         HDF_LOGE("%{public}s: UsbFnWriteFile failed", __func__);
         return HDF_ERR_BAD_FD;
     }
-
     ret = fwrite(str, strlen(str), 1, fp);
     if (ret != 1) {
         (void)fclose(fp);
@@ -237,7 +236,6 @@ static int32_t UsbFnWriteDesString(
 static int32_t UsbFnAdapterCreateFunc(const char *configPath, const char *funcPath)
 {
     int32_t ret;
-
     ret = mkdir(funcPath, S_IREAD | S_IWRITE);
     if (ret != 0) {
         HDF_LOGE("%{public}s: mkdir failed", __func__);
@@ -978,7 +976,6 @@ static int32_t UsbFnAdapterCreateDevice(const char *udcName, const char *devName
     uint8_t confVal;
 
     UsbFnAdapterCleanDevice(devName);
-
     ret = CreatDeviceDir(devName);
     if (ret != HDF_SUCCESS) {
         return HDF_ERR_IO;

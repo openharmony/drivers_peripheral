@@ -30,13 +30,16 @@
 #include "securec.h"
 #include "usb_ddk_pnp_loader.h"
 #include "usbd_wrapper.h"
+#include "usb_accessory_uevent_handle.h"
 
 #define HDF_LOG_TAG    usb_pnp_manager
 #define MODULENAMESIZE 128
+const char USB_ACCESSORY_UEVENT_PATH[] = "usb_accessory_uevent_path";
+const char USB_ACCESSORY_DEFAULT_PATH[] = "/devices/virtual/misc/usb_accessory";
+#define USB_GADGET_UEVENT_PATH "gadget_uevent_path"
+#define USB_GADGET_STATE_PATH "gadget_state_path"
 
 #ifdef USB_EMULATOR_MODE
-#define USB_GADGET_STATE_PATH "gadget_state_path"
-#define USB_GADGET_UEVENT_PATH "gadget_uevent_path"
 const char USB_EMULATOR_DEFAULT_STATE_PATH[] =  "/sys/class/gadget_usb/gadget0/state";
 const char USB_EMULATOR_DEFAULT_UEVENT_PATH[] = "/devices/virtual/gadget_usb/gadget0";
 #endif
@@ -118,21 +121,47 @@ static const char *UsbPnpMgrGetGadgetPath(struct HdfDeviceObject *device, const 
 
         if (strncmp(attrName, USB_GADGET_STATE_PATH, strlen(USB_GADGET_STATE_PATH)) == 0) {
             path = USB_EMULATOR_DEFAULT_STATE_PATH;
+        } else if (strncmp(attrName, USB_ACCESSORY_UEVENT_PATH, strlen(USB_ACCESSORY_UEVENT_PATH)) == 0) {
+            path = USB_ACCESSORY_DEFAULT_PATH;
         } else {
             path = USB_EMULATOR_DEFAULT_UEVENT_PATH;
         }
     }
 #else
     if (iface->GetString(device->property, attrName, &path, pathDef) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read %{public}s failed", __func__, attrName);
-        return NULL;
+        HDF_LOGW("%{public}s: emulator read %{public}s failed", __func__, attrName);
+        if (strncmp(attrName, USB_ACCESSORY_UEVENT_PATH, strlen(USB_ACCESSORY_UEVENT_PATH)) == 0) {
+            path = USB_ACCESSORY_DEFAULT_PATH;
+        }
     }
 #endif
     return path;
 }
 
+static int32_t DdkUeventAndAccessoryInit(struct HdfDeviceObject *device)
+{
+    if (device == NULL) {
+        HDF_LOGE("%{public}s: device is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret = DdkUeventInit(UsbPnpMgrGetGadgetPath(device, USB_GADGET_UEVENT_PATH));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DdkUeventInit error", __func__);
+        return ret;
+    }
+
+    ret = UsbAccessoryUeventInit(UsbPnpMgrGetGadgetPath(device, USB_ACCESSORY_UEVENT_PATH));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGD("%{public}s: UsbAccessoryUeventInit error, ret=%{public}d", __func__, ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     static struct HdfDevEventlistener usbPnpListener = {
         .callBack = UsbDdkPnpLoaderEventReceived,
     };
@@ -150,11 +179,12 @@ static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
 
-    ret = DdkUeventInit(UsbPnpMgrGetGadgetPath(device, "gadget_uevent_path"));
+    ret = DdkUeventAndAccessoryInit(device);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: DdkUeventInit error", __func__);
+        HDF_LOGE("%{public}s: DdkUeventAndAccessoryInit error, ret=%{public}d", __func__, ret);
         return ret;
     }
+
 #ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
     if (UsbPnpManagerStartUeventThread() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: start uevent thread failed", __func__);

@@ -101,6 +101,36 @@ int32_t AudioProxyPreprocessRender(struct AudioHwRender *render, struct HdfSBuf 
     return HDF_SUCCESS;
 }
 
+int32_t AudioProxyPreprocessCapture(struct AudioHwCapture *capture, struct HdfSBuf **data, struct HdfSBuf **reply)
+{
+    struct AudioHwCapture *hwCapture = capture;
+    if (hwCapture == nullptr || data == nullptr || reply == nullptr) {
+        return HDF_FAILURE;
+    }
+    uint32_t capturePid = (uint32_t)getpid();
+    const char *adapterName = hwCapture->captureParam.captureMode.hwInfo.adapterName;
+    if (adapterName == nullptr) {
+        HDF_LOGE("adapterName is NULL");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessSBuf(data, reply) < 0) {
+        return HDF_FAILURE;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(capture->proxyRemoteHandle, *data)) {
+        AudioProxyBufReplyRecycle(*data, *reply);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(*data, adapterName)) {
+        AudioProxyBufReplyRecycle(*data, *reply);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteUint32(*data, capturePid)) {
+        AudioProxyBufReplyRecycle(*data, *reply);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t AudioProxyWriteSampleAttributes(struct HdfSBuf *data, const struct AudioSampleAttributes *attrs)
 {
     if (data == NULL || attrs == NULL) {

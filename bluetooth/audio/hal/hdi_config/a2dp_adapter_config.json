@@ -1,5 +1,5 @@
 {
-    "adapterNum": 5,
+    "adapterNum": 6,
     "adapters": [{
         "name": "internal",
         "portnum": 2,
@@ -58,6 +58,15 @@
             "dir": "PORT_OUT",
             "id": 0,
             "name": "AOP"
+        }]
+    },
+    {
+        "name": "bt_hdap",
+        "portnum": 1,
+        "port": [{
+            "dir": "PORT_IN",
+            "id": 0,
+            "name": "AIP"
         }]
     }]
 }

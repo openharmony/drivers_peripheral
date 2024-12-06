@@ -37,8 +37,8 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
     int32_t err = HDF_ERR_INVALID_PARAM;
     std::lock_guard<std::mutex> lk(mutex_);
 
-    auto iter = compoentsCore_.find(componentName);
-    if (iter == compoentsCore_.end() || iter->second == nullptr) {
+    auto iter = componentsCore_.find(componentName);
+    if (iter == componentsCore_.end() || iter->second == nullptr) {
         CODEC_LOGE("can not find component[%{public}s] in core", componentName);
         return err;
     }
@@ -103,7 +103,7 @@ void ComponentMgr::AddComponentByLibName(const char *libName)
     uint32_t index = 0;
     while (HDF_SUCCESS == core->ComponentNameEnum(name, index)) {
         ++index;
-        compoentsCore_.emplace(std::make_pair(name, core));
+        componentsCore_.emplace(std::make_pair(name, core));
     }
 }
 
@@ -120,14 +120,14 @@ void ComponentMgr::CleanComponent()
     }
     cores_.clear();
 
-    compoentsCore_.clear();
+    componentsCore_.clear();
 }
 
 int32_t ComponentMgr::GetCoreOfComponent(CodecOMXCore* &core, const char *componentName)
 {
     std::lock_guard<std::mutex> lk(mutex_);
-    auto iter = compoentsCore_.find(componentName);
-    if (iter == compoentsCore_.end() || iter->second == nullptr) {
+    auto iter = componentsCore_.find(componentName);
+    if (iter == componentsCore_.end() || iter->second == nullptr) {
         CODEC_LOGE("can not find component[%{public}s] in core", componentName);
         return HDF_FAILURE;
     }

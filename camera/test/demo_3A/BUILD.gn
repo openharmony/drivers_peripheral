@@ -87,7 +87,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/ohos.gni")
-  import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   config("ohos_camera_demo_config") {
     visibility = [ ":*" ]
