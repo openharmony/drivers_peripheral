@@ -120,7 +120,7 @@ constexpr uint32_t BULK_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means
 constexpr uint32_t BULK_OUT_TIMEOUT_JIFFIES = 0; /* sync timeout, set to 0 means wait forever */
 constexpr uint32_t INTR_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means wait forever */
 constexpr uint64_t MTP_MAX_FILE_SIZE = 0xFFFFFFFFULL;
-constexpr uint32_t WRITE_FILE_TEMP_SLICE = 100 * 1024; /* 100KB */
+constexpr uint32_t WRITE_FILE_TEMP_SLICE = 16 * 100 * 1024; /* 16*100KB */
 static constexpr int32_t WAIT_UDC_MAX_LOOP = 3;
 static constexpr uint32_t WAIT_UDC_TIME = 100000;
 static constexpr uint32_t REQ_ACTUAL_DEFAULT_LENGTH = 0;
@@ -351,7 +351,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartTxAsync(struct UsbMtpPort *mtpPort, bool ca
 
     struct UsbMtpDevice *mtpDev = mtpPort->mtpDev;
     struct DListHead *pool = &mtpPort->writePool;
-    uint64_t reqMax = static_cast<uint64_t>(mtpDev->dataInPipe.maxPacketSize);
+    uint64_t reqMax = static_cast<uint64_t>(MTP_BUFFER_SIZE);
     while (!DListIsEmpty(pool)) {
         if (mtpDev->needZLP == ZLP_NO_NEED) {
             if (mtpDev->asyncSendFileExpect >= mtpDev->xferFileLength) {
@@ -364,7 +364,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartTxAsync(struct UsbMtpPort *mtpPort, bool ca
         }
         struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
         if (mtpDev->asyncSendFileExpect + reqMax < mtpDev->xferFileLength) {
-            req->length = static_cast<uint32_t>(mtpDev->dataInPipe.maxPacketSize);
+            req->length = static_cast<uint32_t>(MTP_BUFFER_SIZE);
         } else {
             req->length = static_cast<uint32_t>(mtpDev->xferFileLength - mtpDev->asyncSendFileExpect);
         }
@@ -456,7 +456,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortAllocReadWriteRequests(int32_t readSize, int32_t
     }
     mtpPort_->standbyReq->actual = REQ_ACTUAL_DEFAULT_LENGTH;
     for (i = 0; i < writeSize; ++i) {
-        req = UsbFnAllocRequest(mtpDev_->dataIface.handle, mtpDev_->dataInPipe.id, mtpDev_->dataInPipe.maxPacketSize);
+        req = UsbFnAllocRequest(mtpDev_->dataIface.handle, mtpDev_->dataInPipe.id, MTP_BUFFER_SIZE);
         if (req == nullptr) {
             HDF_LOGE("%{public}s: alloc write req failed", __func__);
             return HDF_ERR_MALLOC_FAIL;
@@ -1283,7 +1283,7 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
     int32_t ret = HDF_SUCCESS;
     while (needXferCount > 0 || needZLP == ZLP_NEED) {
         req->actual = 0;
-        uint32_t reqMax = static_cast<uint32_t>(mtpDev_->dataInPipe.maxPacketSize);
+        uint32_t reqMax = static_cast<uint32_t>(MTP_BUFFER_SIZE);
         req->length = reqMax > needXferCount ? needXferCount : reqMax;
         if (needXferCount == 0) {
             needZLP = ZLP_TRY;
@@ -1368,7 +1368,7 @@ int32_t UsbfnMtpImpl::WriteSplitPacket(const std::vector<uint8_t> &data)
     uint8_t needZLP = ZLP_NO_NEED;
     uint32_t needXferCount = vectorSplited_.size() > WRITE_SPLIT_MININUM_LENGTH ?
         vectorSplited_.size() : data.size();
-    if ((needXferCount & (mtpDev_->dataInPipe.maxPacketSize - 1)) == 0) {
+    if ((needXferCount & (MTP_BUFFER_SIZE - 1)) == 0) {
         needZLP = ZLP_NEED;
     }
     int32_t ret = HDF_FAILURE;
@@ -1546,11 +1546,11 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartSubmitRxReq(struct UsbMtpPort *mtpPort, boo
     struct DListHead *pool = &mtpPort->readPool;
     struct UsbMtpDevice *mtpDev = mtpPort->mtpDev;
     struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
-    uint64_t reqMax = static_cast<uint64_t>(mtpDev->dataOutPipe.maxPacketSize);
+    uint64_t reqMax = static_cast<uint64_t>(MTP_BUFFER_SIZE);
     if (mtpDev->asyncRecvFileExpect + reqMax < mtpDev->xferFileLength) {
-        req->length = static_cast<uint32_t>(mtpDev->dataOutPipe.maxPacketSize);
+        req->length = static_cast<uint32_t>(MTP_BUFFER_SIZE);
     } else if (mtpDev->xferFileLength == MTP_MAX_FILE_SIZE) {
-        req->length = static_cast<uint32_t>(mtpDev->dataOutPipe.maxPacketSize);
+        req->length = static_cast<uint32_t>(MTP_BUFFER_SIZE);
     } else {
         req->length = static_cast<uint32_t>(mtpDev->xferFileLength - mtpDev->asyncRecvFileExpect);
     }
@@ -1678,7 +1678,7 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
     mtpDev_->asyncRecvFileActual = 0;
     mtpDev_->asyncRecvFileExpect = 0;
     mtpDev_->needZLP = ZLP_NO_NEED;
-    if ((mtpDev_->xferFileLength & (mtpDev_->dataInPipe.maxPacketSize - 1)) == 0) {
+    if ((mtpDev_->xferFileLength & (MTP_BUFFER_SIZE - 1)) == 0) {
         mtpDev_->needZLP = ZLP_NEED;
     }
     int32_t ret = ReceiveFileEx();
@@ -1697,7 +1697,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, u
 {
     uint64_t hdrSize = static_cast<uint64_t>((mtpDev_->xferSendHeader == 1) ? sizeof(struct UsbMtpDataHeader) : 0);
     uint64_t needXferCount = mtpDev_->xferFileLength + hdrSize;
-    uint64_t reqMax = static_cast<uint64_t>(mtpDev_->dataInPipe.maxPacketSize);
+    uint64_t reqMax = static_cast<uint64_t>(MTP_BUFFER_SIZE);
     req->length = (reqMax > needXferCount) ? static_cast<uint32_t>(needXferCount) : static_cast<uint32_t>(reqMax);
     if (hdrSize != 0) {
         /* write MTP header first */
@@ -1829,7 +1829,7 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
     }
     mtpDev_->mtpState = MTP_STATE_BUSY;
     mtpDev_->needZLP = ZLP_NO_NEED;
-    if ((needXferCount & (mtpDev_->dataInPipe.maxPacketSize - 1)) == 0) {
+    if ((needXferCount & (MTP_BUFFER_SIZE - 1)) == 0) {
         mtpDev_->needZLP = ZLP_NEED;
     }
     int32_t ret = UsbMtpPortSendFileEx();
