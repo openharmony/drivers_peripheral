@@ -66,30 +66,24 @@ static int32_t LoadLibraryByName(const char *libName, uint8_t **libHandle, struc
     int32_t ret = 0;
     struct EffectFactory *(*getFactoryLib)(void);
     char path[PATH_MAX];
-    char pathBuf[PATH_MAX];
-
-#if (defined(__aarch64__) || defined(__x86_64__))
-    ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib64/%s.z.so", libName);
-#else
-    ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", libName);
-#endif
+    ret = snprintf_s(path, PATH_MAX, PATH_MAX, "%s.z.so", libName);
     if (ret < 0) {
         HDF_LOGE("%{public}s: get libPath failed", __func__);
         return HDF_FAILURE;
     }
 
-    if (realpath(path, pathBuf) == NULL) {
-        HDF_LOGE("%{public}s: realpath is null! [%{public}d]", __func__, errno);
-        return HDF_FAILURE;
-    }
-
-    void *handle = dlopen(pathBuf, RTLD_LAZY);
+    void *handle = dlopen(path, RTLD_LAZY);
     if (handle == NULL) {
         HDF_LOGE("%{public}s: open so failed, reason:%{public}s", __func__, dlerror());
         return HDF_FAILURE;
     }
 
     getFactoryLib = dlsym(handle, "GetEffectoyFactoryLib");
+    if (getFactoryLib == NULL) {
+        HDF_LOGE("%{public}s: dlsym failed %{public}s", __func__, dlerror());
+        dlclose(handle);
+        return HDF_FAILURE;
+    }
     *factLib = getFactoryLib();
     if (*factLib == NULL) {
         HDF_LOGE("%{public}s: get fact lib failed %{public}s", __func__, dlerror());
@@ -136,13 +130,14 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
     }
     uint8_t *libHandle = NULL; 
     struct AudioEffectLibInfo **libInfo = NULL;
+    int32_t index = 0;
     for (int i = 0; i <= AUDIO_EFFECT_NUM_MAX; i++) {
         if (i == AUDIO_EFFECT_NUM_MAX) {
             HDF_LOGE("%{public}s: over effect max num", __func__);
             return HDF_FAILURE;
         }
         if (g_libInfos[i] == NULL) {
-            libInfo = &g_libInfos[i];
+            index = i;
             break;
         }
         if (strcmp(g_libInfos[i]->libName, libName) != 0) {
@@ -159,13 +154,13 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
         HDF_LOGE("%{public}s: load lib fail, libName:[%{public}s]", __func__, libName);
         return HDF_FAILURE;
     }
-    *libInfo = AddEffectLibInfo(libName, libHandle, *factLib);
-    if (*libInfo == NULL) {
+    g_libInfos[index] = AddEffectLibInfo(libName, libHandle, *factLib);
+    if (g_libInfos[index] == NULL) {
         HDF_LOGE("%{public}s: AddEffectLibInfo fail", __func__);
         dlclose((void *)libHandle);
         return HDF_FAILURE;
     }
-    HDF_LOGI("%{public}s: %{public}s create, cnt=[%{public}d]", __func__, libName, (*libInfo)->effectCnt);
+    HDF_LOGI("%{public}s: %{public}s create, cnt=[%{public}d]", __func__, libName, g_libInfos[index]->effectCnt);
     return HDF_SUCCESS;
 }
 
