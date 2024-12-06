@@ -129,7 +129,6 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
         return HDF_ERR_INVALID_PARAM;
     }
     uint8_t *libHandle = NULL; 
-    struct AudioEffectLibInfo **libInfo = NULL;
     int32_t index = 0;
     for (int i = 0; i <= AUDIO_EFFECT_NUM_MAX; i++) {
         if (i == AUDIO_EFFECT_NUM_MAX) {
