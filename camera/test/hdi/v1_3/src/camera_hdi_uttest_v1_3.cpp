@@ -2202,3 +2202,94 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_053, TestSize.Level1)
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     }
 }
+
+void TakePhoteWithDefferredVideo(std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest)
+{
+    auto meta = std::make_shared<CameraSetting>(cameraTest->itemCapacity, cameraTest->dataCapacity);
+    uint8_t value = OHOS_CAMERA_SUPPORTED;
+    meta->addEntry(OHOS_CONTROL_AUTO_DEFERRED_VIDEO_ENHANCE, &value, cameraTest->dataCount);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraTest->rc = cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+
+    // take photo
+    cameraTest->intents = {StreamIntent::PREVIEW, StreamIntent::VIDEO};
+    cameraTest->StartStream(cameraTest->intents);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+    sleep(UT_SLEEP_TIME);
+    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
+void RemovePendingVideos(std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest)
+{
+    std::vector<std::string> pendingVideos;
+    int ret = cameraTest->videoProcessSession_->GetPendingVideos(pendingVideos);
+    ASSERT_EQ(ret, 0);
+    if (pendingVideos.size() != 0) {
+        for (auto videoId = pendingVideos.begin(); videoId != pendingVideos.end(); ++videoId) {
+            ret = cameraTest->videoProcessSession_->RemoveVideo(*videoId);
+            ASSERT_EQ(ret, 0);
+        }
+    }
+}
+
+void ProcessPendingVideos(std::shared_ptr<OHOS::Camera::HdiCommonV1_3> cameraTest, int ret)
+{
+    std::vector<std::string> pendingVideos;
+    ret = cameraTest->videoProcessSession_->GetPendingVideos(pendingVideos);
+    std::string videoId = pendingVideos.empty() ? "111" : pendingVideos[0];
+    std::vector<StreamDescription> streamDescs;
+    int fd = 111;
+    ret = cameraTest->videoProcessSession_->Prepare(videoId, fd, streamDescs);
+    ASSERT_EQ(ret, OHOS::HDI::Camera::V1_2::INVALID_ARGUMENT);
+    cameraTest->streamInfoV1_1 = std::make_shared<StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+    cameraTest->streamInfoCapture = std::make_shared<StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+    ret = cameraTest->videoProcessSession_->CreateStreams(cameraTest->streamInfosV1_1);
+    ASSERT_EQ(ret, 0);
+    ret = cameraTest->videoProcessSession_->CommitStreams(cameraTest->abilityVec);
+    ASSERT_EQ(ret, 0);
+    ret = cameraTest->videoProcessSession_->ReleaseStreams(cameraTest->streamInfosV1_1);
+    ASSERT_EQ(ret, 0);
+    uint64_t cur = cameraTest->GetCurrentLocalTimeStamp();
+    ret = cameraTest->videoProcessSession_->ProcessVideo(videoId, cur);
+    ASSERT_EQ(ret, 0);
+    ret = cameraTest->videoProcessSession_->RemoveVideo(videoId);
+    ASSERT_EQ(ret, 0);
+    ret = cameraTest->videoProcessSession_->Interrupt();
+    ASSERT_EQ(ret, 0);
+    cameraTest->videoProcessSession_->Reset();
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_054
+ * @tc.desc:Camera_Device_Hdi_V1_3_054
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_054, TestSize.Level1)
+{
+    if (IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_AUTO_DEFERRED_VIDEO_ENHANCE, OHOS_CAMERA_SUPPORTED)) {
+        int ret = cameraTest->DefferredVideoTestInit();
+        if (ret != 0) {
+            CAMERA_LOGE("DefferredImageTestInit Fail");
+            printf("DefferredImageTestInit Fail\r\n");
+        } else {
+            // 如果存在未处理的视频，则删除未处理的视频
+            RemovePendingVideos(cameraTest);
+            TakePhoteWithDefferredVideo(cameraTest);
+            // 二阶段视频处理
+            ProcessPendingVideos(cameraTest, ret);
+        }
+    } else {
+        CAMERA_LOGE("deferred video enhance is not supported");
+        printf("deferred video enhance is not supported\r\n");
+    }
+}
