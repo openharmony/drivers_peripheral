@@ -27,11 +27,14 @@ if (!defined(ohos_lite)) {
     include_dirs = [
       "include",
       "$hdf_audio_path/interfaces/effect",
+      "$hdf_audio_path/utils/include",
       "../config/include/",
       "$hdf_audio_path/hdi_service/vendor_interface/utils",
     ]
 
     defines = []
+
+    deps = [ "../../utils:audio_primary_impl_utils" ]
 
     if (is_standard_system) {
       external_deps = [

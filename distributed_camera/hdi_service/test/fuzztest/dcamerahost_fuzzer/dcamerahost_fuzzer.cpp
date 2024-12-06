@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,8 +31,8 @@ void DCameraGetCameraAbilityFromDevFuzzTest(const uint8_t* data, size_t size)
     DHBase dhBase;
     dhBase.deviceId_ = "1";
     dhBase.dhId_ = "2";
-    std::string sinkAbilityInfo = "sink";
-    std::string sourceAbilityInfo = "source";
+    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sourceAbilityInfo(reinterpret_cast<const char*>(data), size);
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
         sourceAbilityInfo));
     if (dcameraDevice == nullptr) {
@@ -64,6 +64,8 @@ void DCameraGetCamDevNumFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
+    std::string foo(reinterpret_cast<const char*>(data), size);
+    foo = "source";
     DCameraHost::GetInstance()->GetCamDevNum();
 }
 
@@ -76,8 +78,8 @@ void DCameraIsCameraIdInvalidFuzzTest(const uint8_t* data, size_t size)
     DHBase dhBase;
     dhBase.deviceId_ = "1";
     dhBase.dhId_ = "2";
-    std::string sinkAbilityInfo = "sink";
-    std::string sourceAbilityInfo = "source";
+    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sourceAbilityInfo(reinterpret_cast<const char*>(data), size);
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
         sourceAbilityInfo));
     if (dcameraDevice == nullptr) {
@@ -92,9 +94,11 @@ void DCameraGetCameraIdByDHBaseFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
+    std::string deviceId(reinterpret_cast<const char*>(data), size);
+    std::string dhId(reinterpret_cast<const char*>(data), size);
     DHBase dhBase;
-    dhBase.deviceId_ = "1";
-    dhBase.dhId_ = "2";
+    dhBase.deviceId_ = deviceId;
+    dhBase.dhId_ = dhId;
     DCameraHost::GetInstance()->GetCameraIdByDHBase(dhBase);
 }
 }

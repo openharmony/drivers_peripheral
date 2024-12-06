@@ -97,8 +97,15 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             continue;
         }
     }
-    HDF_LOGE("%{public}s, stop. errorTimes=%{public}d", __func__, errorTimes);
+    HDF_LOGD("%{public}s, stop. errorTimes=%{public}d", __func__, errorTimes);
     return 0;
+}
+
+static void InitializeIoProcess(struct UsbInterfacePool *interfacePool)
+{
+    if (!interfacePool->ioProcessTid) {
+        interfacePool->ioProcessTid = RawGetTid();
+    }
 }
 
 static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
@@ -115,10 +122,7 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
 
     HDF_LOGD("%{public}s, enter recv thread", __func__);
     while (true) {
-        if (!interfacePool->ioProcessTid) {
-            interfacePool->ioProcessTid = RawGetTid();
-        }
-
+        InitializeIoProcess(interfacePool);
         if (interfacePool->device == NULL) {
             HDF_LOGE("%{public}s:%{public}d interfacePool->device is NULL!", __func__, __LINE__);
             OsalMSleep(USB_IO_SLEEP_MS_TIME);
@@ -142,13 +146,18 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
         }
 
         ret = RawHandleRequest(interfacePool->device->devHandle);
+        if (ret == HDF_DEV_ERR_NO_DEVICE) {
+            HDF_LOGE("%{public}s dev is not found ret: %{public}d", __func__, ret);
+            break;
+        }
+
         if (ret < 0) {
             HDF_LOGE("%{public}s RawHandleRequest failed ret: %{public}d", __func__, ret);
             OsalMSleep(USB_IO_SLEEP_MS_TIME);
             continue;
         }
     }
-    HDF_LOGE("%{public}s, recv thread end. ", __func__);
+    HDF_LOGD("%{public}s, recv thread end. ", __func__);
     OsalMutexLock(&interfacePool->ioStopLock);
     interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_STOPED;
     interfacePool->ioRecvProcessStopStatus = USB_POOL_PROCESS_STOPED;
@@ -228,7 +237,8 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
     }
 
     OsalMutexLock((struct OsalMutex *)&msgQueue->mutex);
-    if (msgQueue->entry.next == NULL || msgQueue->entry.next->prev == NULL || msgQueue->entry.prev == NULL || msgQueue->entry.prev->next == NULL) {
+    if (msgQueue->entry.next == NULL || msgQueue->entry.next->prev == NULL ||
+        msgQueue->entry.prev == NULL || msgQueue->entry.prev->next == NULL) {
         ret = HDF_ERR_INVALID_OBJECT;
         OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
         goto ERROR;

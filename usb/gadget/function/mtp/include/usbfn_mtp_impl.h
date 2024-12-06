@@ -19,6 +19,7 @@
 #include <semaphore.h>
 #include <mutex>
 #include <semaphore.h>
+#include <pthread.h>
 
 #include "data_fifo.h"
 #include "hdf_base.h"
@@ -101,6 +102,7 @@ struct UsbMtpPort {
     struct UsbMtpDevice *mtpDev;
     struct DListHead readPool;  /* ready/idle read(bulk-out) req */
     struct DListHead readQueue; /* working async read(bulk-out) req */
+    struct UsbFnRequest *standbyReq;
     int32_t readStarted;
     int32_t readAllocated;
     struct DataFifo readFifo;
@@ -197,10 +199,12 @@ private:
     static int32_t UsbMtpPortStartSubmitRxReq(struct UsbMtpPort *mtpPort, bool needZLP);
     static int32_t UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort);
     static int32_t UsbMtpPortRxCheckReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req, bool &writeToFile);
-
+    static void UsbMtpPortReleaseRxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req);
+    static void UsbMtpPortReleaseTxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req);
     static int32_t UsbMtpPortCancelAndFreeReq(
         struct DListHead *queueHead, struct DListHead *poolHead, int32_t &allocated, bool freeReq);
     static int32_t UsbMtpPortCancelPlusFreeIo(struct UsbMtpPort *mtpPort, bool freeReq);
+    static int32_t UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort);
     static struct UsbFnRequest *UsbMtpDeviceGetCtrlReq(struct UsbMtpDevice *mtpDev);
     static int32_t UsbMtpDeviceStandardRequest(
         struct UsbMtpDevice *mtpDev, struct UsbFnCtrlRequest *setup, struct UsbFnRequest *req);
@@ -214,7 +218,7 @@ private:
     static int32_t UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev);
     static int32_t UsbMtpDeviceDisable(struct UsbMtpDevice *mtpDev);
     static void UsbMtpDeviceEp0EventDispatch(struct UsbFnEvent *event);
-
+    static void CopyReqToStandbyReqPool(const struct UsbFnRequest *req, struct UsbFnRequest *standbyReq);
     int32_t UsbMtpDeviceAllocCtrlRequests(int32_t num);
     void UsbMtpDeviceFreeCtrlRequests();
     void UsbMtpPortFreeRequests(struct DListHead *head, int32_t &allocated);
@@ -231,8 +235,11 @@ private:
     int32_t UsbMtpDeviceFree();
     int32_t UsbMtpDeviceAllocNotifyRequest();
     void UsbMtpDeviceFreeNotifyRequest();
-
+    int32_t InitMtpPort();
     int32_t WriteEx(const std::vector<uint8_t> &data, uint8_t sendZLP, uint32_t &xferActual);
+    int32_t WriteSplitPacket(const std::vector<uint8_t> &data);
+    uint32_t getActualLength(const std::vector<uint8_t> &data);
+    int32_t ReadImpl(std::vector<uint8_t> &data);
     int32_t UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, uint64_t &oneReqLeft);
     int32_t UsbMtpPortSendFileEx();
     int32_t UsbMtpPortSendFileLeftAsync(uint64_t oneReqLeft);
@@ -241,12 +248,18 @@ private:
     uint32_t BufCopyToVector(void *buf, uint32_t bufSize, std::vector<uint8_t> &vectorData);
     uint32_t BufCopyFromVector(
         void *buf, uint32_t bufSize, const std::vector<uint8_t> &vectorData, uint32_t vectorOffset);
-
+    void UsbMtpSendFileParamSet(const UsbFnMtpFileSlice &mfs);
     static struct UsbMtpDevice *mtpDev_;
     static struct UsbMtpPort *mtpPort_;
-    static std::mutex mtpRunning_;
+    static std::mutex startMutex_;
+    static std::mutex readMutex_;
+    static std::mutex writeMutex_;
+    static std::mutex eventMutex_;
     static std::mutex asyncMutex_;
     static sem_t asyncReq_;
+    static pthread_rwlock_t mtpRunrwLock_;
+    std::vector<uint8_t> vectorSplited_;
+    uint32_t writeActualLen_;
 };
 } // namespace V1_0
 } // namespace Mtp

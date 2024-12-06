@@ -29,7 +29,7 @@ static int32_t SerStubGetComponentNum(struct CodecComponentManager *serviceImpl,
                                       struct HdfSBuf *reply)
 {
     if (serviceImpl == NULL) {
-        CODEC_LOGE("invalid paramter");
+        CODEC_LOGE("invalid parameter");
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t num = serviceImpl->GetComponentNum();
@@ -44,7 +44,7 @@ static int32_t SerStubGetComponentCapablityList(struct CodecComponentManager *se
                                                 struct HdfSBuf *reply)
 {
     if (serviceImpl == NULL) {
-        CODEC_LOGE("invalid paramter");
+        CODEC_LOGE("invalid parameter");
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t count = 0;
@@ -55,7 +55,7 @@ static int32_t SerStubGetComponentCapablityList(struct CodecComponentManager *se
         return HDF_ERR_INVALID_PARAM;
     }
     if (count > serviceImpl->GetComponentNum()) {
-        CODEC_LOGE("count exceed compomentNum");
+        CODEC_LOGE("count exceed componentNum");
         return HDF_ERR_INVALID_PARAM;
     }
     caps = (CodecCompCapability *)OsalMemCalloc(sizeof(CodecCompCapability) * (count));
@@ -164,7 +164,7 @@ static int32_t SerStubDestroyComponent(struct CodecComponentManager *serviceImpl
                                        struct HdfSBuf *reply)
 {
     if (serviceImpl == NULL) {
-        CODEC_LOGE("invalid paramter");
+        CODEC_LOGE("invalid parameter");
         return HDF_ERR_INVALID_PARAM;
     }
     uint32_t componentId = 0;

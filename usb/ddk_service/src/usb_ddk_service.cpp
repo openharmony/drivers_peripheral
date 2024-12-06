@@ -446,6 +446,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
 {
     if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
+        close(ashmem.ashmemFd);
         return HDF_ERR_NOPERM;
     }
 
@@ -454,6 +455,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        close(ashmem.ashmemFd);
         return ret;
     }
 
@@ -461,6 +463,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     struct UsbRequest *request = UsbAllocRequestByAshmem(handleConvert, 0, ashmem.size, ashmem.ashmemFd);
     if (request == nullptr) {
         HDF_LOGE("%{public}s alloc request failed", __func__);
+        close(ashmem.ashmemFd);
         return HDF_DEV_ERR_NO_MEMORY;
     }
 
@@ -487,6 +490,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     transferredLength = request->compInfo.actualLength;
 FINISHED:
     (void)UsbFreeRequestByMmap(request);
+    close(ashmem.ashmemFd);
     return ret;
 }
 

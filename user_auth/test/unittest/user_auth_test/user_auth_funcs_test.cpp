@@ -25,8 +25,7 @@ extern "C" {
     extern LinkedList *g_userInfoList;
     extern UnlockAuthResultCache g_unlockAuthResult;
     extern ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
-    extern void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
-        const EnrolledStateHal *enrolledState);
+    extern void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken);
     extern void SetAuthResult(uint64_t credentialId,
         const UserAuthContext *context, const ExecutorResultInfo *info, AuthResult *result);
 }
@@ -99,25 +98,25 @@ HWTEST_F(UserAuthFuncsTest, TestGetEnrolledStateFunc, TestSize.Level0)
 HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)
 {
     ReuseUnlockParamHal info;
+    info.reuseUnlockResultMode = AUTH_TYPE_IRRELEVANT;
     ReuseUnlockResult reuseResult;
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
 
     int32_t userIdCached = 0;
     UserAuthTokenHal userAuthTokenCached;
-    EnrolledStateHal enrolledState;
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime() + 600;
     userAuthTokenCached.tokenDataPlain.authType = 1;
     userAuthTokenCached.tokenDataPlain.authTrustLevel = ATL4;
-    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
+    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached);
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_VERIFY_TOKEN_FAIL);
 
     userAuthTokenCached.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
     userAuthTokenCached.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
-    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
+    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached);
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
 
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime();
-    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
+    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached);
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_SUCCESS);
     EXPECT_EQ(reuseResult.enrolledState.credentialCount, 0);
     EXPECT_EQ(reuseResult.enrolledState.credentialDigest, 0);
@@ -145,8 +144,7 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime() + 300;
     userAuthTokenCached.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
     userAuthTokenCached.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
-    EnrolledStateHal enrolledState;
-    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
+    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached);
 
     ReuseUnlockParamHal info;
     ReuseUnlockResult reuseResult;
@@ -158,11 +156,11 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
 
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime();
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
+    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached);
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_TOKEN_TIMEOUT);
 
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime();
-    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
+    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached);
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_GENERAL_ERROR);
 
     info.userId = 0;

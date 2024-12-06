@@ -72,6 +72,9 @@ int32_t HciInterfaceImpl::Init(const sptr<IHciCallback>& callbackObj)
         .onEventReceive =
             [callbackObj](
                 const std::vector<uint8_t> &packet) { callbackObj->OnReceivedHciPacket(BtType::HCI_EVENT, packet); },
+        .onIsoReceive =
+            [callbackObj](
+                const std::vector<uint8_t> &packet) { callbackObj->OnReceivedHciPacket(BtType::ISO_DATA, packet); },
     };
 
     bool result = VendorInterface::GetInstance()->Initialize(
@@ -103,7 +106,6 @@ int32_t HciInterfaceImpl::Close()
         callbacks_ = nullptr;
     }
     VendorInterface::GetInstance()->CleanUp();
-    VendorInterface::DestroyInstance();
     return HDF_SUCCESS;
 }
 
@@ -112,7 +114,6 @@ void HciInterfaceImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
     HDF_LOGI("HciInterfaceImpl %{public}s", __func__);
     callbacks_ = nullptr;
     VendorInterface::GetInstance()->CleanUp();
-    VendorInterface::DestroyInstance();
 }
 
 int32_t HciInterfaceImpl::AddHciDeathRecipient(const sptr<IHciCallback>& callbackObj)

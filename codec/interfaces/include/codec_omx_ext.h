@@ -42,7 +42,7 @@ enum CodecAVCProfileExt {
 enum CodecVideoExType {
     CODEC_OMX_VIDEO_CodingVP9  = 10, /** VP9 Index in Codec HDI */
     CODEC_OMX_VIDEO_CodingHEVC = 11, /** HEVC Index in Codec HDI */
-    CODEC_OMX_VIDEO_CodingVVC = 12, /** VVC Index in Codec HDI */
+    CODEC_OMX_VIDEO_CodingVVC = 0x7F000007, /** VVC Index in Codec HDI */
 };
 
 /**
@@ -91,6 +91,68 @@ enum CodecHevcLevel {
     CODEC_HEVC_MAIN_TIER_LEVEL62 = 0x1000000,
     CODEC_HEVC_HIGH_TIER_LEVEL62 = 0x2000000,
     CODEC_HEVC_HIGH_TIER_MAX = 0x7FFFFFFF
+};
+
+/**
+ * @brief Enumerates the extended VVC profile.
+ */
+enum CodecVvcProfile {
+    CODEC_VVC_PROFILE_INVALID = 0x0,
+    CODEC_VVC_PROFILE_MAIN10 = 0x1,
+    CODEC_VVC_PROFILE_MAIN10_STILL = 0x2,
+    CODEC_VVC_PROFILE_MAIN10_444 = 0x3,
+    CODEC_VVC_PROFILE_MAIN10_444_STILL = 0x4,
+    CODEC_VVC_PROFILE_MULTI_MAIN10 = 0x5,
+    CODEC_VVC_PROFILE_MULTI_MAIN10_444 = 0x6,
+    // Operation range extensions profiles
+    CODEC_VVC_PROFILE_MAIN12 = 0x7,
+    CODEC_VVC_PROFILE_MAIN12_INTRA = 0x8,
+    CODEC_VVC_PROFILE_MAIN12_STILL = 0x9,
+    CODEC_VVC_PROFILE_MAIN12_444 = 0xA,
+    CODEC_VVC_PROFILE_MAIN12_444_INTRA = 0xB,
+    CODEC_VVC_PROFILE_MAIN12_444_STILL = 0xC,
+    CODEC_VVC_PROFILE_MAIN16_444 = 0xD,
+    CODEC_VVC_PROFILE_MAIN16_444_INTRA = 0xE,
+    CODEC_VVC_PROFILE_MAIN16_444_STILL = 0xF,
+    CODEC_VVC_PROFILE_MAX = 0x7FFFFFFF
+};
+
+/**
+ * @brief Enumerates the extended VVC level.
+ */
+enum CodecVvcLevel {
+    CODEC_VVC_LEVEL_INVALID = 0x0,
+    CODEC_VVC_MAIN_TIER_LEVEL1 = 0x1,
+    CODEC_VVC_HIGH_TIER_LEVEL1 = 0x2,
+    CODEC_VVC_MAIN_TIER_LEVEL2 = 0x4,
+    CODEC_VVC_HIGH_TIER_LEVEL2 = 0x8,
+    CODEC_VVC_MAIN_TIER_LEVEL21 = 0x10,
+    CODEC_VVC_HIGH_TIER_LEVEL21 = 0x20,
+    CODEC_VVC_MAIN_TIER_LEVEL3 = 0x40,
+    CODEC_VVC_HIGH_TIER_LEVEL3 = 0x80,
+    CODEC_VVC_MAIN_TIER_LEVEL31 = 0x100,
+    CODEC_VVC_HIGH_TIER_LEVEL31 = 0x200,
+    CODEC_VVC_MAIN_TIER_LEVEL4 = 0x400,
+    CODEC_VVC_HIGH_TIER_LEVEL4 = 0x800,
+    CODEC_VVC_MAIN_TIER_LEVEL41 = 0x1000,
+    CODEC_VVC_HIGH_TIER_LEVEL41 = 0x2000,
+    CODEC_VVC_MAIN_TIER_LEVEL5 = 0x4000,
+    CODEC_VVC_HIGH_TIER_LEVEL5 = 0x8000,
+    CODEC_VVC_MAIN_TIER_LEVEL51 = 0x10000,
+    CODEC_VVC_HIGH_TIER_LEVEL51 = 0x20000,
+    CODEC_VVC_MAIN_TIER_LEVEL52 = 0x40000,
+    CODEC_VVC_HIGH_TIER_LEVEL52 = 0x80000,
+    CODEC_VVC_MAIN_TIER_LEVEL6 = 0x100000,
+    CODEC_VVC_HIGH_TIER_LEVEL6 = 0x200000,
+    CODEC_VVC_MAIN_TIER_LEVEL61 = 0x400000,
+    CODEC_VVC_HIGH_TIER_LEVEL61 = 0x800000,
+    CODEC_VVC_MAIN_TIER_LEVEL62 = 0x1000000,
+    CODEC_VVC_HIGH_TIER_LEVEL62 = 0x2000000,
+    CODEC_VVC_MAIN_TIER_LEVEL63 = 0x4000000,
+    CODEC_VVC_HIGH_TIER_LEVEL63 = 0x8000000,
+    CODEC_VVC_MAIN_TIER_LEVEL155 = 0x10000000,
+    CODEC_VVC_HIGH_TIER_LEVEL155 = 0x20000000,
+    CODEC_VVC_HIGH_TIER_MAX = 0x7FFFFFFF
 };
 
 /**
@@ -255,8 +317,6 @@ enum OmxIndexCodecExType {
     OMX_IndexParamEncOutMse,
     /** CodecEncOutLTRParam */
     OMX_IndexParamEncOutLTR,
-    /** CodecTemperalLayerParam */
-    OMX_IndexParamTemperalLayer,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamEncParamsFeedback,
     /** OMX_S32 */
@@ -265,6 +325,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamQPStsart,
     /** OMX_BOOL */
     OMX_IndexParamSkipFrame,
+    /** CodecTemperalLayerParam */
+    OMX_IndexParamTemperalLayer,
     /** OMX_S32 */
     OMX_IndexParamEncOutRealBitrate,
     /** CodecEncOutMadParam */
@@ -277,6 +339,10 @@ enum OmxIndexCodecExType {
     OMX_IndexParamSupportPackInput,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamIsMvUpload,
+    /** OMX_CONFIG_BOOLEANTYPE */
+    OMX_IndexParamEnableQPMap,
+    /** CodecBlockQpParam */
+    OMX_IndexParamBlockQP,
 };
 
 /**
@@ -405,6 +471,15 @@ struct CodecEncOutMadParam {
     int32_t frameMadi;
     int32_t frameMadp;
     int32_t sumMadi;
+};
+
+struct CodecBlockQpParam {
+    uint32_t size;                               /** Size of the structure */
+    union OMX_VERSIONTYPE version;               /** Component version */
+    void *blockQpAddr;                           /** qp map data address */
+    uint32_t blockQpSize;                        /** qp map data size */
+    uint32_t qpMapReserveInts;                   /**< Number of the qpMap reserved integers */
+    uint8_t qpMapReserve[0];                     /** reserve for qpmap data */
 };
 
 #ifdef __cplusplus

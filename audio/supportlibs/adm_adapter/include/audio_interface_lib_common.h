@@ -56,7 +56,7 @@ int32_t AudioGetElemValue(struct HdfSBuf *reply, struct AudioCtrlElemInfo *volTh
 int32_t AudioSetElemValue(struct HdfSBuf *sBuf, const struct AudioCtlElemValue *elemValue, bool isSendData);
 
 int32_t AudioAllocHdfSBuf(struct HdfSBuf **reply, struct HdfSBuf **sBuf);
-void AudioFreeHdfSBuf(struct HdfSBuf *sBuf, struct HdfSBuf *reply);
+void AudioFreeHdfSBuf(struct HdfSBuf **sBuf, struct HdfSBuf **reply);
 
 struct DevHandle *AudioBindService(const char *name);
 void AudioCloseService(const struct DevHandle *handle);

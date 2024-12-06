@@ -21,8 +21,8 @@
 #include "hdf_usb_pnp_manage.h"
 #include "usb_impl.h"
 #include "usbd_dispatcher.h"
-#include "v1_1/usb_interface_stub.h"
 #include "usbd_wrapper.h"
+#include "v1_1/usb_interface_stub.h"
 
 #define HDF_LOG_TAG Usbd
 

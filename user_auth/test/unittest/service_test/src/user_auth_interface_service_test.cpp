@@ -31,7 +31,7 @@ namespace HDI {
 namespace UserAuth {
 using namespace testing;
 using namespace testing::ext;
-using namespace OHOS::HDI::UserAuth::V2_0;
+using namespace OHOS::HDI::UserAuth::V3_0;
 namespace {
 constexpr int32_t ATL1 = 10000;
 uint64_t g_pinIndex = 0;
@@ -1022,7 +1022,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_001, TestSize.Level0)
     std::vector<uint8_t> authToken;
     std::vector<CredentialInfo> deletedCredInfos;
     std::vector<uint8_t> rootSecret;
-    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 8);
+    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 10017);
 
     authToken.resize(sizeof(UserAuthTokenHal));
     EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 10017);

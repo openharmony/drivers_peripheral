@@ -38,6 +38,8 @@
 
 // Used to cache screenLock auth token plain.
 IAM_STATIC UnlockAuthResultCache g_unlockAuthResult = {false, 0, {}};
+// Used to cache any caller auth token plain.
+IAM_STATIC UnlockAuthResultCache g_anyAuthResult = {false, 0, {}};
 
 ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
 {
@@ -80,6 +82,14 @@ IAM_STATIC void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *un
     g_unlockAuthResult.isCached = true;
     g_unlockAuthResult.userId = userId;
     g_unlockAuthResult.authToken = *unlockToken;
+}
+
+IAM_STATIC void CacheAnyAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken)
+{
+    (void)memset_s(&g_anyAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
+    g_anyAuthResult.isCached = true;
+    g_anyAuthResult.userId = userId;
+    g_anyAuthResult.authToken = *unlockToken;
 }
 
 IAM_STATIC void SetAuthResult(uint64_t credentialId,
@@ -150,6 +160,8 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
         LOG_INFO("cache unlock auth result");
         CacheUnlockAuthResult(context->userId, authToken);
     }
+    LOG_INFO("cache any auth result");
+    CacheAnyAuthResult(context->userId, authToken);
     return RESULT_SUCCESS;
 }
 
@@ -313,43 +325,44 @@ ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledState
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info)
+IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info, UnlockAuthResultCache authResultCache)
 {
-    if (!g_unlockAuthResult.isCached) {
+    if (!authResultCache.isCached) {
         LOG_ERROR("invalid cached unlock token");
         return RESULT_GENERAL_ERROR;
     }
-    if ((g_unlockAuthResult.authToken.tokenDataPlain.authMode != SCHEDULE_MODE_AUTH)
-        || (g_unlockAuthResult.authToken.tokenDataPlain.tokenType != TOKEN_TYPE_LOCAL_AUTH)) {
+    if ((authResultCache.authToken.tokenDataPlain.authMode != SCHEDULE_MODE_AUTH)
+        || (authResultCache.authToken.tokenDataPlain.tokenType != TOKEN_TYPE_LOCAL_AUTH)) {
         LOG_ERROR("need local auth");
         return RESULT_VERIFY_TOKEN_FAIL;
     }
     uint64_t time = GetSystemTime();
-    if (time < g_unlockAuthResult.authToken.tokenDataPlain.time) {
+    if (time < authResultCache.authToken.tokenDataPlain.time) {
         LOG_ERROR("bad system time");
         return RESULT_GENERAL_ERROR;
     }
-    if ((time - g_unlockAuthResult.authToken.tokenDataPlain.time) > REUSED_UNLOCK_TOKEN_PERIOD) {
-        (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
-        g_unlockAuthResult.isCached = false;
+    if ((time - authResultCache.authToken.tokenDataPlain.time) > REUSED_UNLOCK_TOKEN_PERIOD) {
+        (void)memset_s(&authResultCache, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
+        authResultCache.isCached = false;
         LOG_ERROR("cached unlock token is time out");
         return RESULT_TOKEN_TIMEOUT;
     }
-    if ((time - g_unlockAuthResult.authToken.tokenDataPlain.time) > info->reuseUnlockResultDuration) {
+    if ((time - authResultCache.authToken.tokenDataPlain.time) > info->reuseUnlockResultDuration) {
         LOG_ERROR("reuse unlock check reuseUnlockResultDuration fail");
         return RESULT_TOKEN_TIMEOUT;
     }
-    if (info->userId != g_unlockAuthResult.userId) {
+    if (info->userId != authResultCache.userId) {
         LOG_ERROR("reuse unlock check userId fail");
         return RESULT_GENERAL_ERROR;
     }
-    if (info->authTrustLevel > g_unlockAuthResult.authToken.tokenDataPlain.authTrustLevel) {
+    if (info->authTrustLevel > authResultCache.authToken.tokenDataPlain.authTrustLevel) {
         LOG_ERROR("reuse unlock check authTrustLevel fail");
         return RESULT_GENERAL_ERROR;
     }
-    if (info->reuseUnlockResultMode == AUTH_TYPE_RELEVANT) {
+    if (info->reuseUnlockResultMode == AUTH_TYPE_RELEVANT ||
+        info->reuseUnlockResultMode == CALLER_IRRELEVANT_AUTH_TYPE_RELEVANT) {
         for (uint32_t i = 0; i < info->authTypeSize; i++) {
-            if (info->authTypes[i] == g_unlockAuthResult.authToken.tokenDataPlain.authType) {
+            if (info->authTypes[i] == authResultCache.authToken.tokenDataPlain.authType) {
                 return RESULT_SUCCESS;
             }
         }
@@ -361,13 +374,20 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info
 
 IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult)
 {
-    uint32_t ret = CheckReuseUnlockTokenValid(info);
+    UnlockAuthResultCache authResultCache = {};
+    if (info->reuseUnlockResultMode == AUTH_TYPE_RELEVANT || info->reuseUnlockResultMode == AUTH_TYPE_IRRELEVANT) {
+        authResultCache = g_unlockAuthResult;
+    } else if (info->reuseUnlockResultMode == CALLER_IRRELEVANT_AUTH_TYPE_RELEVANT ||
+        info->reuseUnlockResultMode == CALLER_IRRELEVANT_AUTH_TYPE_IRRELEVANT) {
+        authResultCache = g_anyAuthResult;
+    }
+    uint32_t ret = CheckReuseUnlockTokenValid(info, authResultCache);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("check unlock token fail");
         return ret;
     }
-    *((UserAuthTokenHal *)reuseResult->token) = g_unlockAuthResult.authToken;
-    reuseResult->authType = g_unlockAuthResult.authToken.tokenDataPlain.authType;
+    *((UserAuthTokenHal *)reuseResult->token) = authResultCache.authToken;
+    reuseResult->authType = authResultCache.authToken.tokenDataPlain.authType;
     ((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.authMode = SCHEDULE_MODE_REUSE_UNLOCK_AUTH_RESULT;
     ((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_RESIGN;
     if (memcpy_s(((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.challenge, CHALLENGE_LEN, info->challenge,
@@ -388,7 +408,9 @@ ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlo
 {
     if (info == NULL || reuseResult == NULL || info->reuseUnlockResultDuration == 0 ||
         info->reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||
-        (info->reuseUnlockResultMode != AUTH_TYPE_RELEVANT && info->reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
+        (info->reuseUnlockResultMode != AUTH_TYPE_RELEVANT && info->reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT &&
+        info->reuseUnlockResultMode != CALLER_IRRELEVANT_AUTH_TYPE_RELEVANT &&
+        info->reuseUnlockResultMode != CALLER_IRRELEVANT_AUTH_TYPE_IRRELEVANT)) {
         LOG_ERROR("CheckReuseUnlockResultFunc bad param");
         return RESULT_BAD_PARAM;
     }

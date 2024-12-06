@@ -47,7 +47,7 @@ namespace OHOS {
         }
         OHOS::HDI::Vibrator::V1_2::HapticPaket pkg;
 
-        if (size < sizeof(pkg)) {
+        if (size < sizeof(params)) {
             return false;
         }
 
@@ -90,6 +90,13 @@ namespace OHOS {
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    if (data == nullptr) {
+        return 0;
+    }
+
+    if (size < sizeof(int32_t)) {
+        return 0;
+    }
     OHOS::VibratorPlayHapticPatternTest(data, size);
     return 0;
 }

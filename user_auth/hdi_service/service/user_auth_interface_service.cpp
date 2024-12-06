@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v2_0/user_auth_interface_service.h"
+#include "v3_0/user_auth_interface_service.h"
 
 #include <cinttypes>
 #include <mutex>
@@ -1364,7 +1364,9 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockParam&
         param.reuseUnlockResultDuration);
     if (param.authTypes.empty() || param.authTypes.size() > MAX_AUTH_TYPE_LEN ||
         param.reuseUnlockResultDuration == 0 || param.reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||
-        (param.reuseUnlockResultMode != AUTH_TYPE_RELEVANT && param.reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
+        (param.reuseUnlockResultMode != AUTH_TYPE_RELEVANT && param.reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT &&
+        param.reuseUnlockResultMode != CALLER_IRRELEVANT_AUTH_TYPE_RELEVANT &&
+        param.reuseUnlockResultMode != CALLER_IRRELEVANT_AUTH_TYPE_IRRELEVANT)) {
         IAM_LOGE("checkReuseUnlockResult bad param");
         return RESULT_BAD_PARAM;
     }
@@ -1514,7 +1516,7 @@ FAIL:
 
 static void DestroyExecutorInfo(void *data)
 {
-    if (data == NULL) {
+    if (data == nullptr) {
         IAM_LOGE("data is null");
         return;
     }
@@ -1716,6 +1718,11 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
         IAM_LOGE("SetGlobalConfigParamFunc failed");
     }
     return ret;
+}
+
+int32_t UserAuthInterfaceService::GetCredentialById(uint64_t credentialId, HdiCredentialInfo &info)
+{
+    return RESULT_SUCCESS;
 }
 } // Userauth
 } // HDI

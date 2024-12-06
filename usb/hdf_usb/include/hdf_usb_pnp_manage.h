@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  *
  * HDF is dual licensed: you can use it either under the terms of
  * the GPL, or the BSD license, at your option.
@@ -32,6 +32,9 @@ enum UsbPnpNotifyServiceCmd {
     USB_PNP_DRIVER_PORT_HOST = 40,
     USB_PNP_DRIVER_PORT_DEVICE,
     USB_PNP_DRIVER_GET_GADGET_LINK_STATUS,
+    USB_ACCESSORY_START = 50,
+    USB_ACCESSORY_STOP,
+    USB_ACCESSORY_SEND
 };
 
 enum UsbPnpNotifyRemoveType {

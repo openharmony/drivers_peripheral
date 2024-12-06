@@ -26,6 +26,7 @@ enum HciPacketType : uint8_t {
     HCI_PACKET_TYPE_ACL_DATA = 2,
     HCI_PACKET_TYPE_SCO_DATA = 3,
     HCI_PACKET_TYPE_EVENT = 4,
+    HCI_PACKET_TYPE_ISO_DATA = 5,
     HCI_PACKET_TYPE_MAX,
 };
 

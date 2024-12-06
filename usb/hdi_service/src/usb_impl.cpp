@@ -37,6 +37,7 @@
 #include "usb_interface_pool.h"
 #include "usbd_dispatcher.h"
 #include "usbd_function.h"
+#include "usbd_accessory.h"
 #include "usbd_port.h"
 #include "usbd_wrapper.h"
 using namespace OHOS::HiviewDFX;
@@ -65,7 +66,9 @@ static const std::map<std::string, uint32_t> configMap = {
     {HDC_CONFIG_STORAGE, USB_FUNCTION_STORAGE},
     {HDC_CONFIG_RNDIS_HDC, USB_FUNCTION_HDC + USB_FUNCTION_RNDIS},
     {HDC_CONFIG_STORAGE_HDC, USB_FUNCTION_HDC + USB_FUNCTION_STORAGE},
-    {HDC_CONFIG_MANUFACTURE_HDC, USB_FUNCTION_MANUFACTURE}
+    {HDC_CONFIG_MANUFACTURE_HDC, USB_FUNCTION_MANUFACTURE},
+    {HDC_CONFIG_NCM, USB_FUNCTION_NCM},
+    {HDC_CONFIG_NCM_HDC, USB_FUNCTION_HDC + USB_FUNCTION_NCM}
 };
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
@@ -962,7 +965,6 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
     UsbdSubscriber *usbdSubscriber = static_cast<UsbdSubscriber *>(priv);
     const sptr<IUsbdSubscriber> subscriber = usbdSubscriber->subscriber;
 
-    int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_DRIVER_GADGET_ADD) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_GADGET_ADD");
         isGadgetConnected_ = true;
@@ -971,8 +973,7 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
             HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
             return HDF_FAILURE;
         }
-        ret = subscriber->DeviceEvent(info);
-        return ret;
+        return subscriber->DeviceEvent(info);
     } else if (id == USB_PNP_DRIVER_GADGET_REMOVE) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_GADGET_REMOVE");
         isGadgetConnected_ = false;
@@ -981,18 +982,33 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
             HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
             return HDF_FAILURE;
         }
-        ret = subscriber->DeviceEvent(info);
-        return ret;
+        UsbdAccessory::GetInstance().HandleEvent(ACT_DOWNDEVICE);
+        return subscriber->DeviceEvent(info);
     } else if (id == USB_PNP_DRIVER_PORT_HOST) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_HOST");
         return UsbdPort::GetInstance().UpdatePort(PORT_MODE_HOST, subscriber);
     } else if (id == USB_PNP_DRIVER_PORT_DEVICE) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_DEVICE");
         return UsbdPort::GetInstance().UpdatePort(PORT_MODE_DEVICE, subscriber);
+    } else if (id == USB_ACCESSORY_START) {
+        if (subscriber == nullptr) {
+            HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_ACCESSORY_START");
+        USBDeviceInfo info = {ACT_ACCESSORYUP, 0, 0};
+        return subscriber->DeviceEvent(info);
+    } else if (id == USB_ACCESSORY_SEND) {
+        if (subscriber == nullptr) {
+            HDF_LOGE("%{public}s: subsciber is nullptr, %{public}d", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_ACCESSORY_SEND");
+        USBDeviceInfo info = {ACT_ACCESSORYSEND, 0, 0};
+        return subscriber->DeviceEvent(info);
     }
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_NOTIFY_ADD_OR_REMOVE_DEVICE");
-    ret = UsbdPnpNotifyAddAndRemoveDevice(data, usbdSubscriber, id);
-    return ret;
+    return UsbdPnpNotifyAddAndRemoveDevice(data, usbdSubscriber, id);
 }
 
 int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
@@ -1081,6 +1097,7 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: OpenDevice too many times ", __func__);
         return HDF_FAILURE;
     }
+    OsalMutexLock(&lock_);
     g_usbOpenCount++;
     port->initFlag = true;
     if (port->ctrDevHandle == nullptr && port->ctrIface != nullptr) {
@@ -1088,10 +1105,12 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
             __func__, dev.busNum, dev.devAddr);
         port->ctrDevHandle = UsbOpenInterface(port->ctrIface);
         if (port->ctrDevHandle == nullptr) {
+            OsalMutexUnlock(&lock_);
             HDF_LOGE("%{public}s:ctrDevHandle UsbOpenInterface nullptr", __func__);
             return HDF_FAILURE;
         }
     }
+    OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
 }
 
@@ -1106,18 +1125,26 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: openPort failed", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
+    for (uint8_t interfaceId = 0; interfaceId < USB_MAX_INTERFACES; ++interfaceId) {
+        if (port->iface[interfaceId] != nullptr) {
+            ReleaseInterface(dev, interfaceId);
+        }
+    }
+    OsalMutexLock(&lock_);
     g_usbOpenCount--;
     int32_t ret = 0;
     if (port->ctrDevHandle != nullptr && g_usbOpenCount == 0) {
         RawUsbCloseCtlProcess(port->ctrDevHandle);
         ret = UsbCloseInterface(port->ctrDevHandle, true);
         if (ret != HDF_SUCCESS) {
+            OsalMutexUnlock(&lock_);
             HDF_LOGE("%{public}s:usbCloseInterface ctrDevHandle failed.", __func__);
             return HDF_FAILURE;
         }
         port->ctrDevHandle = nullptr;
         port->initFlag = false;
     }
+    OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
 }
 
@@ -1158,7 +1185,7 @@ int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         return ret;
     }
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1183,7 +1210,7 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     }
 
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1207,7 +1234,7 @@ int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     }
 
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -2267,6 +2294,20 @@ int32_t UsbImpl::GetDeviceSpeed(const UsbDev &dev, uint8_t &speed)
     return HDF_SUCCESS;
 }
 
+int32_t UsbImpl::GetAccessoryInfo(std::vector<std::string> &accessoryInfo)
+{
+    return UsbdAccessory::GetInstance().GetAccessoryInfo(accessoryInfo);
+}
+
+int32_t UsbImpl::OpenAccessory(int32_t &fd)
+{
+    return UsbdAccessory::GetInstance().OpenAccessory(fd);
+}
+
+int32_t UsbImpl::CloseAccessory(int32_t fd)
+{
+    return UsbdAccessory::GetInstance().CloseAccessory(fd);
+}
 
 } // namespace V1_1
 } // namespace Usb

@@ -26,11 +26,14 @@
 #define USB_FUNCTION_MTP     (1 << 3)
 #define USB_FUNCTION_PTP     (1 << 4)
 #define USB_FUNCTION_RNDIS   (1 << 5)
+#define USB_FUNCTION_NCM     (1 << 8)
 #define USB_FUNCTION_STORAGE (1 << 9)
 #define USB_FUNCTION_MANUFACTURE (1 << 10)
+#define USB_FUNCTION_ACCESSORY (1 << 11)
 #define USB_FUNCTION_SUPPORT                                                                        \
     (USB_FUNCTION_ACM | USB_FUNCTION_ECM | USB_FUNCTION_HDC | USB_FUNCTION_MTP | USB_FUNCTION_PTP | \
-        USB_FUNCTION_RNDIS | USB_FUNCTION_STORAGE | USB_FUNCTION_MANUFACTURE)
+        USB_FUNCTION_RNDIS | USB_FUNCTION_STORAGE | USB_FUNCTION_MANUFACTURE | USB_FUNCTION_ACCESSORY | \
+        USB_FUNCTION_NCM)
 
 #define DEV_SERVICE_NAME "usbfn"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
@@ -44,16 +47,13 @@
 #define HDC_CONFIG_HDC                  "hdc"
 #define HDC_CONFIG_ON                   "hdc_debug"
 #define HDC_CONFIG_RNDIS                "rndis"
-
-#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-#define HDC_CONFIG_STORAGE              "hisuite_mass_storage"
-#else
 #define HDC_CONFIG_STORAGE              "storage"
-#endif
-
 #define HDC_CONFIG_RNDIS_HDC            "rndis_hdc"
 #define HDC_CONFIG_STORAGE_HDC          "storage_hdc"
 #define HDC_CONFIG_MANUFACTURE_HDC      "manufacture_hdc"
+#define HDC_CONFIG_AOA                  "aoa"
+#define HDC_CONFIG_NCM                  "ncm"
+#define HDC_CONFIG_NCM_HDC              "ncm_hdc"
 #define HDC_CONFIGFS_OFF       "0"
 #define HDC_CONFIGFS_ON        "1"
 
@@ -92,6 +92,9 @@ private:
     static int32_t SetFunctionToRndisHdc();
     static int32_t SetFunctionToStorageHdc();
     static int32_t SetFunctionToManufactureHdc();
+    static int32_t SetFunctionToUsbAccessory();
+    static int32_t SetFunctionToNcm();
+    static int32_t SetFunctionToNcmHdc();
     static int32_t SetDDKFunction(uint32_t funcs);
     static int32_t UsbdEnableDevice(int32_t funcs);
     static int32_t UsbdWaitUdc();
