@@ -27,6 +27,7 @@
 #include "v4_0/iaudio_callback.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
+#define AUDIO_VDI_ADAPTER_REF_CNT_MAX 20
 static pthread_rwlock_t g_rwAdapterLock = PTHREAD_RWLOCK_INITIALIZER;
 
 struct AudioAdapterInfo {
@@ -771,6 +772,7 @@ static void AudioInitAdapterInstanceVdi(struct IAudioAdapter *adapter)
 uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex)
 {
     pthread_rwlock_rdlock(&g_rwAdapterLock);
+    uint32_t refCnt = 0;
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("get adapter ref error, descIndex=%{public}d", descIndex);
         pthread_rwlock_unlock(&g_rwAdapterLock);
@@ -778,6 +780,10 @@ uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex)
     }
 
     struct AudioAdapterPrivVdi *priv = AudioAdapterGetPrivVdi();
+    refCnt = priv->adapterInfo[descIndex].refCnt;
+    if (refCnt > AUDIO_VDI_ADAPTER_REF_CNT_MAX) {
+        priv->adapterInfo[descIndex].refCnt = 1;
+    }
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return priv->adapterInfo[descIndex].refCnt;
 }
@@ -808,7 +814,6 @@ int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **ad
     *adapter = priv->adapterInfo[descIndex].adapter;
     AUDIO_FUNC_LOGI("increase adapternameIndex[%{public}d], refCount[%{public}d]", descIndex,
         priv->adapterInfo[descIndex].refCnt);
-
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;
@@ -893,7 +898,7 @@ struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAda
         return NULL;
     }
 
-    AUDIO_FUNC_LOGD(" audio vdiAdapter create adapter success, refcount[1]");
+    AUDIO_FUNC_LOGI(" audio vdiAdapter create adapter success, refcount[1], adapterName=[%{public}s]", adapterName);
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return adapter;
 }
