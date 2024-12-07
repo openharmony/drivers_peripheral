@@ -20,6 +20,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
+#include "audio_common_vdi.h"
 #include "audio_dfx_util.h"
 #include "v4_0/iaudio_adapter.h"
 
