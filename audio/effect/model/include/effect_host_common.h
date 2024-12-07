@@ -54,8 +54,7 @@ struct EffectModelService {
 struct ControllerManager {
     struct IEffectControl ctrlImpls;
     struct IEffectControlVdi *ctrlOps;
-    char *effectId;
-    char libName[HDF_EFFECT_LIB_NAME_LEN];
+    char *libName;
 };
 
 /* declare functions */
