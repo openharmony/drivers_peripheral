@@ -22,7 +22,7 @@
 #include "osal_mem.h"
 #include "securec.h"
 #include "audio_common_vdi.h"
-#include "audio_dfx_vdi.h"
+#include "audio_dfx_util.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
