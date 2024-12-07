@@ -784,7 +784,7 @@ uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex)
         priv->adapterInfo[descIndex].refCnt = 1;
     }
     pthread_rwlock_unlock(&g_rwAdapterLock);
-    return priv->adapterInfo[descIndex].refCnt;
+    return refCnt;
 }
 
 int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **adapter)
