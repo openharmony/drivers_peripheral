@@ -20,8 +20,6 @@
 #include "v4_0/iaudio_adapter.h"
 #include <pthread.h>
 
-#define AUDIO_VDI_ADAPTER_REF_CNT_MAX 20
-
 struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter,
     char *adapterName);
 void AudioReleaseAdapterVdi(uint32_t descIndex);
