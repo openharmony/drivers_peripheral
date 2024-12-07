@@ -27,7 +27,6 @@
 #include "v4_0/iaudio_callback.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
-#define AUDIO_VDI_ADAPTER_REF_CNT_MAX 20
 static pthread_rwlock_t g_rwAdapterLock = PTHREAD_RWLOCK_INITIALIZER;
 
 struct AudioAdapterInfo {
