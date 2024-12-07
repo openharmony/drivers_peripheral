@@ -997,7 +997,7 @@ int32_t UsbGetDeviceMemMapFd(const struct UsbSession *session, uint8_t busNum, u
     }
     SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
     struct UsbDeviceHandle *devHandle = NULL;
-    struct UsbInterfacePool *interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
+    struct UsbInterfacePool *interfacePool = IfFindInterfacePool(realSession, poolQueryPara, false);
     if (interfacePool == NULL || interfacePool->device == NULL) {
         interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
         if (interfacePool == NULL || interfacePool->device == NULL) {
@@ -1083,7 +1083,7 @@ struct UsbInterface *UsbManageInterface(
         return NULL;
     }
     SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
-    interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
+    interfacePool = IfFindInterfacePool(realSession, poolQueryPara, false);
     if (interfacePool == NULL || interfacePool->device == NULL) {
         interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
         if (interfacePool == NULL || interfacePool->device == NULL) {
@@ -1974,7 +1974,7 @@ bool UsbGetInterfaceActiveStatus(
         return false;
     }
     SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
-    interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
+    interfacePool = IfFindInterfacePool(realSession, poolQueryPara, false);
     if (interfacePool == NULL || interfacePool->device == NULL) {
         interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
         if (interfacePool == NULL || interfacePool->device == NULL) {
