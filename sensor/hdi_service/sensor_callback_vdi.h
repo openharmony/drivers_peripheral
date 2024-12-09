@@ -38,6 +38,7 @@ public:
     int32_t OnDataEvent(const V2_0::HdfSensorEvents& event) override;
     sptr<IRemoteObject> HandleCallbackDeath() override;
 private:
+    bool NeedPrintData(int32_t &sensorId, bool &isPrint);
     void PrintData(const HdfSensorEvents &event, const std::string &reportResult, bool &isPrint);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
     sptr<ISensorCallback> sensorCallback_;
