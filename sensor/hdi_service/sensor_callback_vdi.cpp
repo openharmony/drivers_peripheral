@@ -71,17 +71,19 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
         it->second++;
         dataCount = it->second;
     }
-    bool result = false;
-    if (firstTimestampMap_[event.sensorId] == 0) {
-        firstTimestampMap_[event.sensorId] = event.timestamp;
-        result = true;
-    } else {
-        lastTimestampMap_[event.sensorId] = event.timestamp;
-    }
+    bool result = isPrint;
+    if (!isPrint) {
+        if (firstTimestampMap_[event.sensorId] == 0) {
+            firstTimestampMap_[event.sensorId] = event.timestamp;
+            result = true;
+        } else {
+            lastTimestampMap_[event.sensorId] = event.timestamp;
+        }
 
-    if (lastTimestampMap_[event.sensorId] - firstTimestampMap_[event.sensorId] >= REPOPRT_TIME) {
-        firstTimestampMap_[event.sensorId] = lastTimestampMap_[event.sensorId];
-        result = true;
+        if (lastTimestampMap_[event.sensorId] - firstTimestampMap_[event.sensorId] >= REPOPRT_TIME) {
+            firstTimestampMap_[event.sensorId] = lastTimestampMap_[event.sensorId];
+            result = true;
+        }
     }
 
     if (isPrint || result) {
