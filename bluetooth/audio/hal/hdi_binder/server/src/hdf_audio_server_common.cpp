@@ -367,7 +367,7 @@ int32_t AudioJudgeCapturePriority(const int32_t priority, int which)
         HDF_LOGE("%{public}s: invalid value! ", __func__);
         return HDF_FAILURE;
     }
-    if (g_renderAndCaptureManage == NULL) {
+    if (g_renderAndCaptureManage == nullptr) {
         return HDF_FAILURE;
     }
     if (g_renderAndCaptureManage[which].capturePriority <= priority) {
@@ -414,14 +414,14 @@ int32_t AudioCreateCaptureCheck(const char *adapterName, const int32_t priority)
 {
     int32_t i;
     LOG_FUN_INFO();
-    if (adapterName == NULL || g_renderAndCaptureManage == NULL) {
+    if (adapterName == nullptr || g_renderAndCaptureManage == nullptr) {
         return HDF_FAILURE;
     }
     int32_t num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER)
         ? MAX_AUDIO_ADAPTER_NUM_SERVER
         : g_serverAdapterNum;
     for (i = 0; i < num; i++) {
-        if (g_renderAndCaptureManage[i].adapterName == NULL) {
+        if (g_renderAndCaptureManage[i].adapterName == nullptr) {
             return HDF_FAILURE;
         }
         if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
@@ -827,7 +827,7 @@ int32_t AudioAdapterListCheckAndGetCapture(struct AudioCapture **capture, struct
     if (ret < 0) {
         return ret;
     }
-    if (captureTemp == NULL) {
+    if (captureTemp == nullptr) {
         return HDF_FAILURE;
     }
     *capture = captureTemp;
