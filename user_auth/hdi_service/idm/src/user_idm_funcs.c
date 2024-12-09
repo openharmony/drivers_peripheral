@@ -567,3 +567,20 @@ ResultCode QueryAllExtUserInfoFunc(UserInfoResult *userInfos, uint32_t userInfol
 
     return RESULT_SUCCESS;
 }
+ResultCode QueryCredentialByIdFunc(uint64_t credentialId, LinkedList **creds)
+{
+    if (creds == NULL) {
+        LOG_ERROR("creds is null");
+        return RESULT_BAD_PARAM;
+    }
+    CredentialCondition condition = {};
+    SetCredentialConditionCredentialId(&condition, credentialId);
+    SetCredentiaConditionNeedCachePin(&condition);
+    *creds = QueryCredentialLimit(&condition);
+    if (*creds == NULL) {
+        LOG_ERROR("query credential failed");
+        return RESULT_UNKNOWN;
+    }
+    LOG_INFO("query credential success");
+    return RESULT_SUCCESS;
+}
