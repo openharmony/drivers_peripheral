@@ -194,6 +194,7 @@ int32_t SensorIfService::Enable(int32_t sensorId)
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, ENABLE_SENSOR)) {
         return HDF_SUCCESS;
     }
+
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
