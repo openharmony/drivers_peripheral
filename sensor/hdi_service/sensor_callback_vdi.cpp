@@ -79,7 +79,6 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
         } else {
             lastTimestampMap_[event.sensorId] = event.timestamp;
         }
-
         if (lastTimestampMap_[event.sensorId] - firstTimestampMap_[event.sensorId] >= REPOPRT_TIME) {
             firstTimestampMap_[event.sensorId] = lastTimestampMap_[event.sensorId];
             result = true;
