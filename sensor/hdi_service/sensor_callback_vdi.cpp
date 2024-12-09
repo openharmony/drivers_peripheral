@@ -53,7 +53,7 @@ int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
     SensorClientsManager::GetInstance()->CopyEventData(event);
     const std::string reportResult = SensorClientsManager::GetInstance()->ReportEachClient(event);
     HDF_LOGD("%{public}s sensorId=%{public}d, %{public}s", __func__, event.sensorId, reportResult.c_str());
-    bool isPrint = SensorClientsManager::GetInstance()->IsSensorNeedPrint(sensorId);
+    bool isPrint = SensorClientsManager::GetInstance()->IsSensorNeedPrint(event.sensorId);
     PrintData(event, reportResult, isPrint);
     return HDF_SUCCESS;
 }
