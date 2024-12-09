@@ -50,6 +50,45 @@ void HdiCommonV1_3::Init()
     }
 }
 
+int32_t HdiCommonV1_3::DefferredVideoTestInit()
+{
+    constexpr const char* serviceName = "camera_video_process_service";
+    constexpr const int userId = 100;
+    int ret = 0;
+
+    // get VideoProcessService
+    videoProcessService_ = OHOS::HDI::Camera::V1_3::IVideoProcessService::Get(serviceName, false);
+    if (videoProcessService_ == nullptr) {
+        CAMERA_LOGE("IVideoProcessService::Get Fail, videoProcessService_ is nullptr");
+        printf("IVideoProcessService::Get Fail, videoProcessService_ is nullptr\n");
+        return -1;
+    }
+    videoProcessCallback_ = new OHOS::Camera::HdiCommonV1_3::TestVideoProcessCallback();
+    if (videoProcessCallback_ == nullptr) {
+        CAMERA_LOGE("DefferredVideoTestInit videoProcessCallback_ get failed videoProcessCallback_ nullptr");
+        printf("DefferredVideoTestInit videoProcessCallback_ get failed videoProcessCallback_ nullptr\n");
+        return -1;
+    }
+    ret = videoProcessService_->CreateVideoProcessSession(userId, videoProcessCallback_, videoProcessSession_);
+    if (ret != 0) {
+        CAMERA_LOGE("CreateVideoProcessSession failed, ret = %{public}d", ret);
+        printf("CreateVideoProcessSession failed, ret = %d\n", ret);
+        return -1;
+    }
+    if (videoProcessSession_ == nullptr) {
+        CAMERA_LOGE("CreateVideoProcessSession Fail, videoProcessSession_ is nullptr: %{public}d", ret);
+        printf("CreateVideoProcessSession Fail, videoProcessSession_ is nullptr: %d\r\n", ret);
+        return -1;
+    }
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(itemCapacity, dataCapacity);
+    int32_t cameraUserId = 100;
+    meta->addEntry(OHOS_CAMERA_USER_ID, &cameraUserId, dataCount);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraDeviceV1_3->UpdateSettings(metaVec);
+    return ret;
+}
+
 void HdiCommonV1_3::Open(int cameraId)
 {
     if (cameraDeviceV1_3 == nullptr) {
@@ -406,4 +445,24 @@ int32_t HdiCommonV1_3::TestStreamOperatorCallbackV1_3::OnResult(int32_t streamId
     }
     return HDI::Camera::V1_0::NO_ERROR;
 }
+
+int32_t HdiCommonV1_3::TestVideoProcessCallback::OnStatusChanged(OHOS::HDI::Camera::V1_2::SessionStatus status)
+{
+    CAMERA_LOGE("OnStatusChanged status: %{public}d", static_cast<int>(status));
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t HdiCommonV1_3::TestVideoProcessCallback::OnProcessDone(const std::string& videoId)
+{
+    CAMERA_LOGE("OnProcessDone videoId: %{public}s", videoId.c_str());
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t HdiCommonV1_3::TestVideoProcessCallback::OnError(
+    const std::string& videoId, OHOS::HDI::Camera::V1_2::ErrorCode errorCode)
+{
+    CAMERA_LOGE("OnError videoId: %{public}s errorCode: %{public}d", videoId.c_str(), static_cast<int>(errorCode));
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
 } // OHOS::Camera
