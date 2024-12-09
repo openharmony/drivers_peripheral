@@ -589,7 +589,7 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
     HDF_LOGI("%{public}s: UsbdSetFunction funcs=%{public}d", __func__, funcs);
     if ((funcs | USB_FUNCTION_SUPPORT) != USB_FUNCTION_SUPPORT) {
         HDF_LOGE("%{public}s: funcs invalid", __func__);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
 
     uint32_t kfuns = static_cast<uint32_t>(funcs) & (~USB_DDK_FUNCTION_SUPPORT);
