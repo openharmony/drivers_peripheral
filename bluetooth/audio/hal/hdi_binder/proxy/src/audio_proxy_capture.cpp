@@ -80,7 +80,7 @@ int32_t AudioProxyCaptureSetMute(const AudioHandle handle, bool mute)
     if (AudioProxyPreprocessCapture(hwCapture, &data, &reply) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t tempMute = (uint32_t)mute;
+    auto tempMute = static_cast<uint32_t>(mute);
     if (!HdfSbufWriteUint32(data, tempMute)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -111,7 +111,7 @@ int32_t AudioProxyCaptureGetMute(const AudioHandle handle, bool *mute)
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    *mute = (bool)tempMute;
+    *mute = static_cast<bool>(tempMute);
     AudioProxyBufReplyRecycle(data, reply);
     LOG_PARA_INFO("GetMute SUCCESS!");
     return ret;
@@ -122,7 +122,7 @@ bool ReadReplyBuffer(struct HdfSBuf *reply, uint64_t replyBytes, void *frame, ui
     const void *rBuf = nullptr;
     uint32_t rLen;
     if (HdfSbufReadBuffer(reply, &rBuf, &rLen) && rLen == replyBytes) {
-        if (memcpy_s(frame, requestBytes, rBuf, rLen) != EOK) {
+        if (memcpy_s(frame, requestBytes, rBuf, rLen) == EOK) {
             return true;
         }
     }
