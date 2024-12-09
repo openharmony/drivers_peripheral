@@ -190,10 +190,10 @@ int32_t SensorIfService::Enable(int32_t sensorId)
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGI("%{public}s: sensorId %{public}d, serviceId = %{public}d", __func__, sensorId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+    SensorClientsManager::GetInstance()->ReSetSensorPrintTime(sensorId);
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, ENABLE_SENSOR)) {
         return HDF_SUCCESS;
     }
-
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;

@@ -53,11 +53,12 @@ int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
     SensorClientsManager::GetInstance()->CopyEventData(event);
     const std::string reportResult = SensorClientsManager::GetInstance()->ReportEachClient(event);
     HDF_LOGD("%{public}s sensorId=%{public}d, %{public}s", __func__, event.sensorId, reportResult.c_str());
-    PrintData(event, reportResult);
+    bool isPrint = SensorClientsManager::GetInstance()->IsSensorNeedPrint(sensorId);
+    PrintData(event, reportResult, isPrint);
     return HDF_SUCCESS;
 }
 
-void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::string &reportResult)
+void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::string &reportResult, bool &isPrint)
 {
     SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
@@ -71,18 +72,21 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
         dataCount = it->second;
     }
     bool result = false;
-    if (firstTimestampMap_[event.sensorId] == 0) {
-        firstTimestampMap_[event.sensorId] = event.timestamp;
+    if (isPrint) {
         result = true;
     } else {
-        lastTimestampMap_[event.sensorId] = event.timestamp;
-    }
+        if (firstTimestampMap_[event.sensorId] == 0) {
+            firstTimestampMap_[event.sensorId] = event.timestamp;
+            result = true;
+        } else {
+            lastTimestampMap_[event.sensorId] = event.timestamp;
+        }
 
-    if (lastTimestampMap_[event.sensorId] - firstTimestampMap_[event.sensorId] >= REPOPRT_TIME) {
-        firstTimestampMap_[event.sensorId] = lastTimestampMap_[event.sensorId];
-        result = true;
+        if (lastTimestampMap_[event.sensorId] - firstTimestampMap_[event.sensorId] >= REPOPRT_TIME) {
+            firstTimestampMap_[event.sensorId] = lastTimestampMap_[event.sensorId];
+            result = true;
+        }
     }
-
     if (result) {
         std::string st = {0};
         DataToStr(st, event);
