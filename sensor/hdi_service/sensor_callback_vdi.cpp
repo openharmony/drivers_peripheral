@@ -85,7 +85,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
         }
     }
 
-    if (isPrint || result) {
+    if (result) {
         std::string st = {0};
         DataToStr(st, event);
         st += "sensorDataCount=" + std::to_string(dataCount);
