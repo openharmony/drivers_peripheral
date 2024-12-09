@@ -518,7 +518,7 @@ bool SensorClientsManager::IsSensorNeedPrint(int32_t sensorId)
 {
     SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(sensorPrintTimesMutex_);
-    auto &it = sensorPrintTimes_.find(sensorId);
+    auto it = sensorPrintTimes_.find(sensorId);
     if (it == sensorPrintTimes_.end() || it->second > MAX_PRINT_TIME) {
         return false;
     }
