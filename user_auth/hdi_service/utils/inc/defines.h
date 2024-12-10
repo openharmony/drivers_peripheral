@@ -169,7 +169,7 @@ typedef enum AuthIntent {
 #define CHALLENGE_LEN 32
 #define MAX_CREDENTIAL_OUTPUT 20
 #define MAX_ENROLL_OUTPUT 5
-#define MAX_AUTH_TYPE_LEN 4
+#define MAX_AUTH_TYPE_LEN 5
 #define UDID_LEN 64
 #define INVALID_USER_ID (-1)
 
