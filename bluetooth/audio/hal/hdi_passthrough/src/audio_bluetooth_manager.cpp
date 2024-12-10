@@ -369,8 +369,6 @@ int SuspendPlaying()
     HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
     if (state == BTAudioStreamState::STARTED) {
         retval = (suspendPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
-    } else if (state == BTAudioStreamState::STARTING) {
-        retval = (stopPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
     } else {
         HDF_LOGE("%{public}s: state=%{public}hhu is bad state", __func__, state);
     }
