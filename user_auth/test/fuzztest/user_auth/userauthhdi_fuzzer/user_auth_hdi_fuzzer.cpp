@@ -543,6 +543,33 @@ void FuzzGetSignedExecutorInfo(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzVerifyAuthToken(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    std::vector<uint8_t> tokenIn;
+    FillFuzzUint8Vector(parcel, tokenIn);
+    uint64_t allowableDuration = parcel.ReadUint64();
+    HdiUserAuthTokenPlain tokenPlain = {};
+    tokenPlain.version = parcel.ReadUint32();
+    tokenPlain.userId = parcel.ReadInt32();
+    FillFuzzUint8Vector(parcel, tokenPlain.challenge);
+    tokenPlain.timeInterval = parcel.ReadUint32();
+    tokenPlain.authTrustLevel = parcel.ReadUint32();
+    tokenPlain.authType = parcel.ReadInt32();
+    tokenPlain.authMode = parcel.ReadInt32();
+    tokenPlain.securityLevel = parcel.ReadUint32();
+    tokenPlain.tokenType = parcel.ReadInt32();
+    tokenPlain.secureUid = parcel.ReadUint64();
+    tokenPlain.enrolledId = parcel.ReadUint64();
+    tokenPlain.credentialId = parcel.ReadUint64();
+    tokenPlain.collectorUdid = parcel.ReadString();
+    tokenPlain.verifierUdid = parcel.ReadString();
+    std::vector<uint8_t> rootSecret;
+    FillFuzzUint8Vector(parcel, rootSecret);
+    g_service.VerifyAuthToken(tokenIn, allowableDuration, tokenPlain, rootSecret);
+    IAM_LOGI("end");
+}
+
 void FuzzSetGlobalConfigParam(Parcel &parcel)
 {
     IAM_LOGI("begin");
@@ -559,7 +586,7 @@ FuzzFunc *g_fuzzFuncs[] = {FuzzInit, FuzzAddExecutor, FuzzDeleteExecutor, FuzzOp
     FuzzCancelAuthentication, FuzzBeginIdentification, FuzzUpdateIdentificationResult, FuzzCancelIdentification,
     FuzzGetAvailableStatus, FuzzGetValidSolution, FuzzGetEnrolledState, FuzzCheckReuseUnlockResult,
     FuzzSendMessage, FuzzRegisterMessageCallback, FuzzGetLocalScheduleFromMessage, FuzzGetSignedExecutorInfo,
-    FuzzSetGlobalConfigParam};
+    FuzzSetGlobalConfigParam, FuzzVerifyAuthToken};
 
 void UserAuthHdiFuzzTest(const uint8_t *data, size_t size)
 {
