@@ -1167,6 +1167,7 @@ HWTEST_F(WifiClientTest, ReleaseEventCallback01, TestSize.Level1)
 {
     ReleaseEventCallback();
 }
+
 }
 }
 #endif
