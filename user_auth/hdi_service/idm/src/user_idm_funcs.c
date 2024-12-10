@@ -260,7 +260,7 @@ IAM_STATIC ResultCode GetEnrollTokenDataToEncrypt(const CredentialInfoHal *crede
 
 IAM_STATIC Buffer *GetAuthTokenForPinEnroll(const CredentialInfoHal *credentialInfo, int32_t userId)
 {
-    UserAuthTokenPlain tokenPlain = {};
+    UserAuthTokenPlainHal tokenPlain = {};
     ResultCode ret = GetEnrollTokenDataPlain(credentialInfo, &(tokenPlain.tokenDataPlain));
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetEnrollTokenDataPlain fail");

@@ -41,6 +41,7 @@
 #include "user_auth_hdi.h"
 #include "user_auth_funcs.h"
 #include "user_idm_funcs.h"
+#include "user_sign_centre.h"
 #include "enroll_specification_check.h"
 
 #undef LOG_TAG
@@ -54,6 +55,7 @@ static std::mutex g_mutex;
 static std::string g_localUdid;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
 const std::string SETTRINGS_NAME = "settings";
+constexpr uint32_t MAX_TOKEN_ALLOWABLE_DURATION = 24 * 60 * 60 * 1000;
 
 enum UserAuthCallerType : int32_t {
     TOKEN_INVALID = -1,
@@ -1740,6 +1742,80 @@ int32_t UserAuthInterfaceService::GetCredentialById(uint64_t credentialId, HdiCr
     CopyCredentialInfo(*credentialHal, info);
     DestroyLinkedList(credList);
     return RESULT_SUCCESS;
+}
+
+static bool CopyAuthTokenPlainHal(const UserAuthTokenPlainHal &tokenIn, HdiUserAuthTokenPlain &tokenOut)
+{
+    tokenOut.userId = tokenIn.tokenDataToEncrypt.userId;
+    tokenOut.challenge.resize(CHALLENGE_LEN);
+    if (tokenOut.challenge.size() != 0 && memcpy_s(tokenOut.challenge.data(), CHALLENGE_LEN,
+        tokenIn.tokenDataPlain.challenge, CHALLENGE_LEN) != EOK) {
+        IAM_LOGE("copy challenge fail");
+        return RESULT_BAD_COPY;
+    }
+    uint64_t currentTime = GetSystemTime();
+    if (currentTime < tokenIn.tokenDataPlain.time) {
+        LOG_ERROR("bad time, current:%" PRIu64 ", tokenTime:%" PRIu64, currentTime, tokenIn.tokenDataPlain.time);
+        return RESULT_GENERAL_ERROR;
+    }
+    tokenOut.timeInterval = currentTime - tokenIn.tokenDataPlain.time;
+    tokenOut.authTrustLevel = tokenIn.tokenDataPlain.authTrustLevel;
+    tokenOut.authType = tokenIn.tokenDataPlain.authType;
+    tokenOut.authMode = tokenIn.tokenDataPlain.authMode;
+    tokenOut.securityLevel = tokenIn.tokenDataPlain.securityLevel;
+    tokenOut.tokenType = tokenIn.tokenDataPlain.tokenType;
+    tokenOut.secureUid = tokenIn.tokenDataToEncrypt.secureUid;
+    tokenOut.enrolledId = tokenIn.tokenDataToEncrypt.enrolledId;
+    tokenOut.credentialId = tokenIn.tokenDataToEncrypt.credentialId;
+    tokenOut.collectorUdid.resize(UDID_LEN);
+    if (tokenOut.collectorUdid.length() != 0 && memcpy_s(tokenOut.collectorUdid.data(), UDID_LEN,
+        tokenIn.tokenDataToEncrypt.collectorUdid, UDID_LEN) != EOK) {
+        IAM_LOGE("copy collectorUdid fail");
+        return RESULT_BAD_COPY;
+    }
+    tokenOut.verifierUdid.resize(UDID_LEN);
+    if (tokenOut.verifierUdid.length() != 0 && memcpy_s(tokenOut.verifierUdid.data(), UDID_LEN,
+        tokenIn.tokenDataToEncrypt.verifierUdid, UDID_LEN) != EOK) {
+        IAM_LOGE("copy verifierUdid fail");
+        return RESULT_BAD_COPY;
+    }
+    return RESULT_SUCCESS;
+}
+
+static int32_t ConvertResultCode(const int32_t in)
+{
+    static const std::map<ResultCode, InnerKitResultCode> data = {
+        {ResultCode::RESULT_TOKEN_TIMEOUT, InnerKitResultCode::INNER_RESULT_AUTH_TOKEN_EXPIRED},
+        {ResultCode::RESULT_VERIFY_TOKEN_FAIL, InnerKitResultCode::INNER_RESULT_AUTH_TOKEN_CHECK_FAILED},
+    };
+    auto iter = data.find(static_cast<ResultCode>(in));
+    if (iter != data.end()) {
+        return iter->second;
+    }
+    return in;
+}
+
+int32_t UserAuthInterfaceService::VerifyAuthToken(const std::vector<uint8_t>& tokenIn, uint64_t allowableDuration,
+    HdiUserAuthTokenPlain &tokenPlainOut, std::vector<uint8_t>& rootSecret)
+{
+    IAM_LOGI("start, allowableDuration:%{public}" PRIu64, allowableDuration);
+    if (tokenIn.size() != sizeof(UserAuthTokenHal) || tokenIn.data() == NULL ||
+        allowableDuration > MAX_TOKEN_ALLOWABLE_DURATION) {
+        IAM_LOGE("VerifyAuthToken bad param");
+        return RESULT_BAD_PARAM;
+    }
+    UserAuthTokenPlainHal tokenPlain = {};
+    int32_t result = UserAuthTokenVerify((UserAuthTokenHal *)(&tokenIn), allowableDuration, &tokenPlain);
+    if (result != RESULT_SUCCESS) {
+        IAM_LOGE("UserAuthTokenVerify failed");
+        return ConvertResultCode(result);
+    }
+    result = CopyAuthTokenPlainHal(tokenPlain, tokenPlainOut);
+    if (result != RESULT_SUCCESS) {
+        IAM_LOGE("CopyAuthTokenPlainHal failed");
+        return result;
+    }
+    return result;
 }
 } // Userauth
 } // HDI

@@ -22,8 +22,6 @@
 #include "adaptor_time.h"
 #include "token_key.h"
 
-#define TOKEN_VALIDITY_PERIOD (10 * 60 * 1000)
-
 #define AES_GCM_TOKEN_AAD "OH_authToken"
 #define AES_GCM_TOKEN_AAD_SIZE 12
 
@@ -33,13 +31,13 @@
 #define IAM_STATIC static
 #endif
 
-IAM_STATIC bool IsTimeValid(const UserAuthTokenHal *userAuthToken)
+IAM_STATIC bool IsTimeValid(const UserAuthTokenHal *userAuthToken, uint64_t allowableDuration)
 {
     uint64_t currentTime = GetSystemTime();
     if (currentTime < userAuthToken->tokenDataPlain.time) {
         return false;
     }
-    if (currentTime - userAuthToken->tokenDataPlain.time > TOKEN_VALIDITY_PERIOD) {
+    if (currentTime - userAuthToken->tokenDataPlain.time > allowableDuration) {
         return false;
     }
     return true;
@@ -80,7 +78,7 @@ IAM_STATIC void DeinitAesGcmParam(AesGcmParam *aesGcmParam)
     (void)memset_s(aesGcmParam, sizeof(AesGcmParam), 0, sizeof(AesGcmParam));
 }
 
-IAM_STATIC ResultCode DecryptTokenCipher(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain,
+IAM_STATIC ResultCode DecryptTokenCipher(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlainHal *tokenPlain,
     HksAuthTokenKey *tokenKey)
 {
     AesGcmParam aesGcmParam = {
@@ -142,16 +140,8 @@ EXIT:
     return ret;
 }
 
-ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain)
+IAM_STATIC ResultCode UserAuthTokenVerifyInner(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlainHal *tokenPlain)
 {
-    if (userAuthToken == NULL || tokenPlain == NULL) {
-        LOG_ERROR("userAuthToken is null");
-        return RESULT_BAD_PARAM;
-    }
-    if (!IsTimeValid(userAuthToken)) {
-        LOG_ERROR("token timeout");
-        return RESULT_TOKEN_TIMEOUT;
-    }
     HksAuthTokenKey tokenKey = {};
     ResultCode ret = GetTokenKey(&tokenKey);
     if (ret != RESULT_SUCCESS) {
@@ -172,6 +162,24 @@ ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPla
     }
     (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
     return ret;
+}
+
+ResultCode UserAuthTokenVerify(const UserAuthTokenHal *userAuthToken, uint64_t allowableDuration,
+    UserAuthTokenPlainHal *tokenPlain)
+{
+    if (userAuthToken == NULL || tokenPlain == NULL) {
+        LOG_ERROR("userAuthToken is null");
+        return RESULT_BAD_PARAM;
+    }
+    if (!IsTimeValid(userAuthToken, allowableDuration)) {
+        LOG_ERROR("token timeout");
+        return RESULT_TOKEN_TIMEOUT;
+    }
+    if (UserAuthTokenVerifyInner(userAuthToken, tokenPlain) != RESULT_SUCCESS) {
+        LOG_ERROR("UserAuthTokenVerifyInner failed");
+        return RESULT_VERIFY_TOKEN_FAIL;
+    }
+    return RESULT_SUCCESS;
 }
 
 IAM_STATIC ResultCode InitAesGcmParam(AesGcmParam *aesGcmParam, const HksAuthTokenKey *tokenKey)
@@ -257,7 +265,7 @@ EXIT:
     return ret;
 }
 
-ResultCode UserAuthTokenSign(UserAuthTokenPlain *tokenPlain, UserAuthTokenHal *authToken)
+ResultCode UserAuthTokenSign(UserAuthTokenPlainHal *tokenPlain, UserAuthTokenHal *authToken)
 {
     if (tokenPlain == NULL || authToken == NULL) {
         LOG_ERROR("bad param");
