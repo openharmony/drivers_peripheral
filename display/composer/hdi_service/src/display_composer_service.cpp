@@ -248,6 +248,10 @@ void DisplayComposerService::LoadVdiFuncPart3()
 {
     vdiAdapter_->SetDisplayActiveRegion =
         reinterpret_cast<SetDisplayActiveRegionFunc>(dlsym(libHandle_, "SetDisplayActiveRegion"));
+    vdiAdapter_->ClearDisplayClientBuffer =
+        reinterpret_cast<ClearDisplayClientBufferFunc>(dlsym(libHandle_, "ClearDisplayClientBuffer"));
+    vdiAdapter_->ClearLayerBuffer =
+        reinterpret_cast<ClearLayerBufferFunc>(dlsym(libHandle_, "ClearLayerBuffer"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -316,12 +320,6 @@ void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* 
         // Add new device cache
         if (cacheMgr->AddDeviceCache(outputId) != HDF_SUCCESS) {
             DISPLAY_LOGE("Add device cache failed outputId:%{public}u, connected:%{public}d", outputId, connected);
-        }
-    } else {
-        std::lock_guard<std::mutex> lock(cacheMgr->GetCacheMgrMutex());
-        // Del new device cache
-        if (cacheMgr->RemoveDeviceCache(outputId) != HDF_SUCCESS) {
-            DISPLAY_LOGE("Del device cache failed outputId:%{public}u, connected:%{public}d", outputId, connected);
         }
     }
 
@@ -898,6 +896,9 @@ int32_t DisplayComposerService::ClearClientBuffer(uint32_t devId)
     DISPLAY_CHK_RETURN(devCache == nullptr, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u", __func__, devId));
 
+    if (vdiAdapter_ != nullptr && vdiAdapter_->ClearDisplayClientBuffer != nullptr) {
+        vdiAdapter_->ClearDisplayClientBuffer(devId);
+    }
     return devCache->ClearClientCache();
 }
 
@@ -910,6 +911,9 @@ int32_t DisplayComposerService::ClearLayerBuffer(uint32_t devId, uint32_t layerI
     DISPLAY_CHK_RETURN(devCache == nullptr, HDF_FAILURE, DISPLAY_LOGE(
         "%{public}s fail devId:%{public}u layerId %{public}u", __func__, devId, layerId));
 
+    if (vdiAdapter_ != nullptr && vdiAdapter_->ClearLayerBuffer != nullptr) {
+        vdiAdapter_->ClearLayerBuffer(devId, layerId);
+    }
     return devCache->ClearLayerBuffer(layerId);
 }
 
