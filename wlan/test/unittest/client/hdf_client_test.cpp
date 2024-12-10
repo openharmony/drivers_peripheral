@@ -1167,6 +1167,34 @@ HWTEST_F(WifiClientTest, ReleaseEventCallback01, TestSize.Level1)
 {
     ReleaseEventCallback();
 }
+
+/**
+ * @tc.name: SendCmdIoctl01
+ * @tc.desc: Send Cmd Ioctl test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, SendCmdIoctl01, TestSize.Level1)
+{
+    const char *ifName = "wlanTest";
+    int32_t cmdId = 1;
+    int8_t *paramBuf = nullptr;
+    uint32_t paramBufLen = 1;
+    EXPECT_NE(SendCmdIoctl(ifName, cmdId, paramBuf, paramBufLen), RET_CODE_UNKNOW);
+}
+
+/**
+ * @tc.name: StartChannelMeas01
+ * @tc.desc: Start Channel Meas test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, StartChannelMeas01, TestSize.Level1)
+{
+    const char *ifName = "wlanTest";
+    struct MeasParam measParam = {0};
+    EXPECT_NE(StartChannelMeas(ifName, &measParam), RET_CODE_UNKNOW);
+}
 }
 }
 #endif
