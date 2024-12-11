@@ -31,8 +31,6 @@ public:
     ~BluetoothAddress() = default;
     static std::shared_ptr<BluetoothAddress> GetDeviceAddress(const std::string &path = BT_DEVICE_ADDRESS_PATH);
     static std::shared_ptr<BluetoothAddress> GenerateDeviceAddress(const std::string &prefix = "");
-    static std::shared_ptr<BluetoothAddress> GenerateDeviceAddressFile(
-        const std::string &path = BT_DEVICE_ADDRESS_PATH);
     void ReadAddress(std::vector<uint8_t> &address) const;
     void ReadAddress(std::string &address) const;
 
@@ -41,6 +39,8 @@ private:
     int ParseAddressFromString(const std::string &string) const;
     static bool GetConstantAddress(char *address, int len);
     static bool CheckAddress(char *address);
+    static std::shared_ptr<BluetoothAddress> GenerateDeviceAddressFile(
+        const std::string &path = BT_DEVICE_ADDRESS_PATH);
 
 private:
     std::vector<uint8_t> address_;
