@@ -128,8 +128,8 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    uint8_t *libHandle = NULL; 
-    int32_t index = 0;
+    uint8_t *libHandle = NULL;
+	int32_t index = 0;
     for (int i = 0; i <= AUDIO_EFFECT_NUM_MAX; i++) {
         if (i == AUDIO_EFFECT_NUM_MAX) {
             HDF_LOGE("%{public}s: over effect max num", __func__);
