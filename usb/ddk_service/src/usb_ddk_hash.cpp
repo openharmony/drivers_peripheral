@@ -67,3 +67,14 @@ bool UsbDdkGetRecordByVal(const InterfaceInfo &info, uint64_t &hashVal)
     }
     return false;
 }
+
+bool UsbDdkGetAllRecords(const InterfaceInfo &info, std::vector<uint64_t> &records)
+{
+    std::lock_guard<std::mutex> lock(g_mapMutex);
+    for (auto &it : g_hashMap) {
+        if (it.second.busNum == info.busNum && it.second.devNum == info.devNum) {
+            records.push_back(it.first);
+        }
+    }
+    return true;
+}
