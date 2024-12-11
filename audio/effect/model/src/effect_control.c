@@ -38,7 +38,7 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
         HDF_LOGE("%{public}s: controller has no options", __func__);
         return HDF_FAILURE;
     }
-    if (strcmp(manager->libName, "liboffline_record_algo") == 0) {
+    if (strcmp(manager->libName, "libmock_effect_lib") != 0) {
         output->frameCount = input->frameCount;
         output->datatag = input->datatag;
         output->rawDataLen = input->rawDataLen;
