@@ -188,6 +188,10 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddress(const 
 
 std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddressFile(const std::string &path)
 {
+    if (path.compare(BT_DEVICE_ADDRESS_PATH)) {
+        HDF_LOGE("Address file path error.");
+        return nullptr;
+    }
     const int bufsize = 256;
     char buf[bufsize] = {0};
     char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
