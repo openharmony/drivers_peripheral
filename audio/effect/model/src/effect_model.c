@@ -193,6 +193,20 @@ static int32_t DeleteEffectLibrary(const char *libName)
     return HDF_SUCCESS;
 }
 
+static int32_t IsSupplyEffect(const char *libName)
+{
+    if (g_cfgDescs == NULL) {
+        HDF_LOGE("%{public}s: point is null!", __func__);
+        return HDF_FAILURE;
+    }
+    for (uint32_t i = 0; i < g_cfgDescs->effectNum; i++) {
+        if (strcmp(g_cfgDescs->effectCfgDescs[i].library, libName) == 0) {
+            return HDF_SUCCESS;
+        }
+    }
+    return HDF_FAILURE;
+}
+
 static int32_t EffectModelIsSupplyEffectLibs(struct IEffectModel *self, bool *supply)
 {
     if (self == NULL || supply == NULL) {
@@ -331,7 +345,10 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    if (IsSupplyEffect(info->libName) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: not support effect [%{public}s]", __func__, info->libName);
+        return HDF_FAILURE;
+    }
     struct EffectFactory *lib = NULL;
     struct ControllerManager *ctrlMgr = NULL;
     struct IEffectControlVdi *ctrlOps = NULL;
