@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include "dcamera.h"
 #include <chrono>
 #include "constants.h"
+#include "distributed_hardware_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -79,7 +80,11 @@ void SplitString(const std::string &str, std::vector<std::string> &tokens, const
 
 std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
 {
-    std::string ret;
+    std::string ret = "";
+    if (len == 0 || toEncode == nullptr) {
+        DHLOGE("toEncode is null or len is zero.");
+        return ret;
+    }
     uint32_t i = 0;
     unsigned char charArray3[3];
     unsigned char charArray4[4];
@@ -123,7 +128,11 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
 
 std::string Base64Decode(const std::string& basicString)
 {
-    std::string ret;
+    std::string ret = "";
+    if (basicString.empty()) {
+        DHLOGE("basicString is empty.");
+        return ret;
+    }
     uint32_t i = 0;
     int index = 0;
     int len = static_cast<int>(basicString.size());
