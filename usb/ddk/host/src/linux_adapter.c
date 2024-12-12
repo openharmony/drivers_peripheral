@@ -190,7 +190,7 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
     if (fd != HDF_FAILURE) {
         return fd;
     }
-
+    HDF_LOGI("%{public}s: path: %{public}s, fd:%{public}d", __func__, pathBuf, fd);
     usleep(SLEEP_TIME);
     switch (errno) {
         case ENOENT:
@@ -1004,6 +1004,7 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
 
     close(handle->fd);
     close(handle->mmapFd);
+    HDF_LOGI("%{public}s:close fd:%{public}d", __func__, handle->fd);
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
     handle = NULL;

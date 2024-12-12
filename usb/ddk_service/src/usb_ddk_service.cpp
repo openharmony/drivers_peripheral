@@ -91,10 +91,12 @@ static int32_t UsbdPnpEventHandler(void *priv, uint32_t id, HdfSBuf *data)
             return HDF_ERR_INVALID_PARAM;
         }
 
-        uint64_t interfaceHandle = 0;
-        if (UsbDdkGetRecordByVal({0, infoTable->busNum, infoTable->devNum}, interfaceHandle)) {
-            HDF_LOGD("%{public}s: need release interface", __func__);
-            ReleaseUsbInterface(interfaceHandle);
+        std::vector<uint64_t> interfaceHandleList;
+        if (UsbDdkGetAllRecords({0, infoTable->busNum, infoTable->devNum}, interfaceHandleList)) {
+            for (auto interfaceHandle : interfaceHandleList) {
+                HDF_LOGD("%{public}s: need release interface, handle: %{public}llu", __func__, interfaceHandle);
+                ReleaseUsbInterface(interfaceHandle);
+            }
         }
     }
     return HDF_SUCCESS;
@@ -233,6 +235,7 @@ int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex,
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s hash failed %{public}d", __func__, ret);
     }
+    HDF_LOGD("%{public}s: claim handle: %{public}llu", __func__, interfaceHandle);
     return ret;
 }
 
@@ -242,7 +245,7 @@ int32_t UsbDdkService::ReleaseInterface(uint64_t interfaceHandle)
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
     }
-
+    HDF_LOGD("%{public}s: release handle: %{public}llu", __func__, interfaceHandle);
     return ReleaseUsbInterface(interfaceHandle);
 }
 
