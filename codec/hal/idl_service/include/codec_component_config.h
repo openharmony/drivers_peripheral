@@ -58,7 +58,7 @@ private:
                                    CodecCompCapability &cap);
     int32_t GetVideoPortCapability(const struct DeviceResourceIface &iface, const struct DeviceResourceNode &childNode,
                                    CodecCompCapability &cap);
-    int32_t GetVideoPortFeature(const struct DeviceResourceIface &iface, const struct DeviceResourceNode &childNode,
+    void GetVideoPortFeature(const struct DeviceResourceIface &iface, const struct DeviceResourceNode &childNode,
                                    CodecCompCapability &cap);
 
 private:
