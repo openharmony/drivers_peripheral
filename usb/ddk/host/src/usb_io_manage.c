@@ -231,12 +231,12 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
         HDF_LOGE("%{public}s:%{public}d OsalSemWait failed, ret=%{public}d", __func__, __LINE__, ret);
         goto ERROR;
     }
+    
+    OsalMutexLock((struct OsalMutex *)&msgQueue->mutex);
     if (DListIsEmpty(&msgQueue->entry)) {
         ret = HDF_SUCCESS;
         goto ERROR;
     }
-
-    OsalMutexLock((struct OsalMutex *)&msgQueue->mutex);
     if (msgQueue->entry.next == NULL || msgQueue->entry.next->prev == NULL ||
         msgQueue->entry.prev == NULL || msgQueue->entry.prev->next == NULL) {
         ret = HDF_ERR_INVALID_OBJECT;
