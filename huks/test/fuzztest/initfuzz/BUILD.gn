@@ -35,7 +35,7 @@ ohos_fuzztest("huks_hdi_init_fuzz") {
     "huks_hdi_fuzzer.cpp",
   ]
 
-  deps = [ "../../../hdi_service:libhuks_hdi_service_1.0" ]
+  deps = [ "../../../hdi_service:libhuks_hdi_service_1.1" ]
 
   external_deps = [
     "c_utils:utils",
