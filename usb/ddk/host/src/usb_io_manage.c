@@ -235,6 +235,7 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
     OsalMutexLock((struct OsalMutex *)&msgQueue->mutex);
     if (DListIsEmpty(&msgQueue->entry)) {
         ret = HDF_SUCCESS;
+        OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
         goto ERROR;
     }
     if (msgQueue->entry.next == NULL || msgQueue->entry.next->prev == NULL ||
