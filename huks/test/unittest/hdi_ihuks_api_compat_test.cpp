@@ -17,8 +17,8 @@
 #include <vector>
 #include <unistd.h>
 
-#include "v1_0/ihuks.h"
-#include "v1_0/ihuks_types.h"
+#include "v1_1/ihuks.h"
+#include "v1_1/ihuks_types.h"
 #include "huks_sa_type.h"
 #include "huks_hdi_test_util.h"
 

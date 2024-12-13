@@ -277,6 +277,20 @@ struct HuksHdi {
      */
     int32_t (*HuksHdiExportChipsetPlatformPublicKey)(const struct HksBlob *salt,
         enum HksChipsetPlatformDecryptScene scene, struct HksBlob *publicKey);
+
+    /**
+     * @brief Get the detailed error information.
+     * @param errorInfo indicates the detailed error information
+     * @return error code, see huks_sa_type.h
+     */
+    int32_t (*HuksHdiGetErrorInfo)(struct HksBlob *errorInfo);
+
+        /**
+     * @brief Get the statistic information.
+     * @param errorInfo indicates the detailed statistic information
+     * @return error code, see huks_sa_type.h
+     */
+    int32_t (*HuksHdiGetStatInfo)(struct HksBlob *statInfo);
 };
 
 #endif

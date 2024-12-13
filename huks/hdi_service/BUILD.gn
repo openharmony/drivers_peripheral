@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 
-ohos_shared_library("libhuks_hdi_service_1.0") {
+ohos_shared_library("libhuks_hdi_service_1.1") {
   defines = []
   sources = [
     "huks_hdi_passthrough_adapter.c",
@@ -34,5 +34,5 @@ ohos_shared_library("libhuks_hdi_service_1.0") {
 }
 
 group("huks_hdi_service") {
-  deps = [ ":libhuks_hdi_service_1.0" ]
+  deps = [ ":libhuks_hdi_service_1.1" ]
 }

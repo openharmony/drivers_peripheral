@@ -41,6 +41,10 @@ int32_t HuksHdiAdapterDecrypt(const struct HksBlob *key, const struct HksParamSe
 
 int32_t HuksHdiAdapterGenerateRandom(const struct HksParamSet *paramSet, struct HksBlob *random);
 
+int32_t HuksHdiAdapterGetErrorInfo(struct  HksBlob *errorInfo);
+
+int32_t HuksHdiAdapterGetStatInfo(struct  HksBlob *statInfo);
+
 int32_t HuksHdiAdapterImportKey(const struct HksBlob *keyAlias, const struct HksBlob *key,
     const struct HksParamSet *paramSet, struct HksBlob *keyOut);
 
