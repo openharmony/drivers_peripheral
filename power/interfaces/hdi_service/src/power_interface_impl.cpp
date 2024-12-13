@@ -158,8 +158,8 @@ int32_t PowerInterfaceImpl::UnRegisterRunningLockCallback()
 
 int32_t PowerInterfaceImpl::StartSuspend()
 {
-    HDF_LOGI("start suspend");
     std::lock_guard<std::mutex> lock(g_mutex);
+    HDF_LOGI("start suspend");
     g_suspendRetry = true;
     if (g_suspending) {
         g_powerState = PowerHdfState::INACTIVE;
@@ -244,8 +244,6 @@ int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag)
 
 int32_t DoSuspend()
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
-
 #ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
     if (!g_suspendTag.empty()) {
         return DoSuspendWithTag();
