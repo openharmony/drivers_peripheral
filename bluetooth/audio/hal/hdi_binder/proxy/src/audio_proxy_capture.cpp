@@ -73,7 +73,7 @@ int32_t AudioProxyCaptureSetMute(const AudioHandle handle, bool mute)
     struct HdfSBuf *data = nullptr;
     struct HdfSBuf *reply = nullptr;
     struct AudioHwCapture *hwCapture = reinterpret_cast<struct AudioHwCapture *>(handle);
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture == nullptr || hwCapture->proxyRemoteHandle == nullptr) {
         HDF_LOGE("The pointer is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
