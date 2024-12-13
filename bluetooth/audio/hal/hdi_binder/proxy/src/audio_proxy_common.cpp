@@ -107,7 +107,7 @@ int32_t AudioProxyPreprocessCapture(struct AudioHwCapture *capture, struct HdfSB
     if (hwCapture == nullptr || data == nullptr || reply == nullptr) {
         return HDF_FAILURE;
     }
-    uint32_t capturePid = (uint32_t)getpid();
+    auto capturePid = static_cast<uint32_t>(getpid());
     const char *adapterName = hwCapture->captureParam.captureMode.hwInfo.adapterName;
     if (adapterName == nullptr) {
         HDF_LOGE("adapterName is NULL");
