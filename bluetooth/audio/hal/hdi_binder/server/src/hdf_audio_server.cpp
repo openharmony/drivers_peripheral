@@ -18,7 +18,6 @@
 #include "hdf_audio_server_render.h"
 #include "hdf_audio_server_capture.h"
 #include "hdf_audio_server.h"
-
 namespace OHOS::HDI::Audio_Bluetooth {
 #define HDF_LOG_TAG hdf_audio_bluetooth_server
 
