@@ -41,6 +41,30 @@ static string GetNfcHalSoName(const std::string &chipType)
     return nfcHalSoName;
 }
 
+int NfcVendorAdaptions::GetNfcStatus(void)
+{
+    int nfcStatus = NFC_STATUS_OPEN;
+    nfcExtHandle = dlopen(VENDOR_NFC_EXT_SERVICE_LIB.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    if (nfcExtHandle == nullptr) {
+        HDF_LOGE("%{public}s: fail to get nfc ext service handle.", __func__);
+        return NFC_STATUS_CLOSE;
+    }
+    nfcExtInf.getNfcStatus = reinterpret_cast<int (*)()>
+        (dlsym(nfcExtHandle, EXT_GET_NFC_STATUS_FUNC_NAME.c_str()));
+
+    if (nfcExtInf.getNfcStatus == nullptr) {
+        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        dlclose(nfcExtHandle);
+        nfcExtHandle = nullptr;
+        return NFC_STATUS_CLOSE;
+    }
+    nfcStatus = nfcExtInf.getNfcStatus();
+    dlclose(nfcExtHandle);
+    nfcExtHandle = nullptr;
+    HDF_LOGE("%{public}s: status %{public}d.", __func__, nfcStatus);
+    return nfcStatus;
+}
+
 string NfcVendorAdaptions::GetChipType(void)
 {
     string nfcChipType = "";
@@ -56,9 +80,13 @@ string NfcVendorAdaptions::GetChipType(void)
 
     if (nfcExtInf.getNfcChipType == nullptr || nfcExtInf.getNfcHalFuncNameSuffix == nullptr) {
         HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        dlclose(nfcExtHandle);
+        nfcExtHandle = nullptr;
         return nfcChipType;
     }
     nfcChipType = string(nfcExtInf.getNfcChipType());
+    dlclose(nfcExtHandle);
+    nfcExtHandle = nullptr;
     return nfcChipType;
 }
 
@@ -109,6 +137,7 @@ void NfcVendorAdaptions::ResetNfcInterface(void)
     nfcHalInf.nfcHalMinClose = nullptr;
     nfcExtHandle = nullptr;
     nfcExtInf.getNfcChipType = nullptr;
+    nfcExtInf.getNfcStatus = nullptr;
     nfcExtInf.getNfcHalFuncNameSuffix = nullptr;
 }
 
@@ -144,9 +173,11 @@ void* NfcVendorAdaptions::DoHalPreOpen(void* arg)
 void NfcVendorAdaptions::HalPreOpen(void)
 {
     int ret = HDF_SUCCESS;
+    int nfcStatus = NFC_STATUS_OPEN;
     pthread_t pthread;
     HDF_LOGI("%{public}s: enter.", __func__);
-    if (!isNfcPreDone) {
+    nfcStatus = GetNfcStatus();
+    if (!isNfcPreDone && (nfcStatus != NFC_STATUS_OPEN)) {
         ret = pthread_create(&pthread, nullptr, NfcVendorAdaptions::DoHalPreOpen, this);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: pthread_create is fail", __func__);
