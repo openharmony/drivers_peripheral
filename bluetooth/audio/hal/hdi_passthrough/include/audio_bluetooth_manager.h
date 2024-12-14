@@ -54,6 +54,9 @@ int FastStopPlaying();
 int FastReqMmapBuffer(int32_t ashmemLength);
 void FastReadMmapPosition(int64_t &sec, int64_t &nSec, uint64_t &frames);
 int FastGetLatency(uint32_t &latency);
+int SuspendPlayingFromParam();
+int FastSuspendPlayingFromParam();
+void UnBlockStart();
 #endif
 
 int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs);

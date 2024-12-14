@@ -30,6 +30,16 @@ enum class BTAudioStreamState : uint8_t {
     SUSPENDING
 };
 
+enum class RenderMixerState : uint8_t {
+    INVALID = 0,
+    INITED = 1,
+    NORMAL_STARTED = 2,
+    FAST_STARTED = 3,
+    MIX_STARTED = 4,
+    FAST_ON_MIX_STOP = 5,
+    NORMAL_ON_MIX_STOP = 6
+};
+
 typedef bool (*SetUpFunc)();
 typedef void (*TearDownFunc)();
 typedef BTAudioStreamState (*GetStateFunc)();
@@ -40,6 +50,8 @@ typedef size_t (*WriteFrameFunc)(const void* data, size_t size);
 typedef int32_t (*ReqMmapBufferFunc)(int32_t ashmemLength);
 typedef void (*ReadMmapPositionFunc)(int64_t &sec, int64_t &nSec, uint64_t &frames);
 typedef bool (*GetLatencyFunc)(uint32_t &latency);
+typedef BTAudioStreamState (*GetRealStateFunc)();
+typedef RenderMixerState (*GetRenderMixerStateFunc)();
 }
 }
 }
