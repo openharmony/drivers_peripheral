@@ -34,6 +34,8 @@ config("hdi_service_config") {
     "-fno-exceptions",
     "-ffunction-sections",
     "-fdata-sections",
+    "-Oz",
+    "-flto",
   ]
 
   ldflags = [ "-Wl" ]
