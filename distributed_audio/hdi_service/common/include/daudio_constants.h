@@ -85,6 +85,7 @@ constexpr uint32_t AUDIO_DEFAULT_MIN_VOLUME_LEVEL = 0;
 constexpr int32_t DAUDIO_MAX_ASHMEM_LEN = 100000;
 constexpr int32_t DAUDIO_MIN_ASHMEM_LEN = 10;
 
+constexpr const char *AUDIOCATEGORY = "AUDIOCATEGORY";
 constexpr const char *KEY_DH_ID = "dhId";
 constexpr const char *KEY_STATE = "STATE";
 constexpr const char *IS_UPDATEUI = "IS_UPDATEUI";
