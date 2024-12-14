@@ -1363,7 +1363,9 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockParam&
         param.reuseUnlockResultDuration);
     if (param.authTypes.empty() || param.authTypes.size() > MAX_AUTH_TYPE_LEN ||
         param.reuseUnlockResultDuration == 0 || param.reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||
-        (param.reuseUnlockResultMode != AUTH_TYPE_RELEVANT && param.reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
+        (param.reuseUnlockResultMode != AUTH_TYPE_RELEVANT && param.reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT &&
+        param.reuseUnlockResultMode != CALLER_IRRELEVANT_AUTH_TYPE_RELEVANT &&
+        param.reuseUnlockResultMode != CALLER_IRRELEVANT_AUTH_TYPE_IRRELEVANT)) {
         IAM_LOGE("checkReuseUnlockResult bad param");
         return RESULT_BAD_PARAM;
     }
