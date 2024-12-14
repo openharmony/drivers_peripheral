@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,42 +11,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+import("//build/config/features.gni")
 import("//build/test.gni")
 
-module_output_path = "drivers_peripheral_display/display"
+module_output_path = "drivers_peripheral_display/drivers_peripheral_display"
 
-ohos_benchmarktest("hdf_display_buffer_benchmarktest") {
+ohos_fuzztest("MapperFuzzTest") {
   module_out_path = module_output_path
-  sources = [ "display_buffer_benchmark_test.cpp" ]
-  include_dirs = [
-    "../common",
-    ".",
-  ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
+  fuzz_config_file = "."
+  include_dirs = [ "../common" ]
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_1",
     "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_2",
-    "drivers_interface_display:libdisplay_buffer_proxy_1.0",
-    "drivers_interface_display:libdisplay_buffer_proxy_1.1",
-    "drivers_interface_display:libdisplay_buffer_proxy_1.2",
+    "drivers_interface_display:libdisplay_buffer_stub_1.2",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
-    "drivers_interface_display:libdisplay_composer_proxy_1.0",
-    "googletest:gtest",
+    "drivers_interface_display:libdisplay_composer_stub_1.0",
+    "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",
-    "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
   ]
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_display"
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "mapper_fuzzer.cpp" ]
+}
+
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    # deps file
+    ":MapperFuzzTest",
+  ]
 }

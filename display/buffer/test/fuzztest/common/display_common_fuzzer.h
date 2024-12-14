@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,9 @@
 #ifndef DISPLAY_COMMON_FUZZER_H
 #define DISPLAY_COMMON_FUZZER_H
 
-#include "v1_1/include/idisplay_buffer.h"
 #include "v1_0/display_composer_type.h"
-#include "v1_0/display_buffer_type.h"
+#include "v1_2/display_buffer_type.h"
+#include "v1_2/include/idisplay_buffer.h"
 #include "buffer_handle.h"
 #include "hdf_log.h"
 
