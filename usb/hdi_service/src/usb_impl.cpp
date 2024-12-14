@@ -1125,15 +1125,16 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: openPort failed", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    for (uint8_t interfaceId = 0; interfaceId < USB_MAX_INTERFACES; ++interfaceId) {
-        if (port->iface[interfaceId] != nullptr) {
-            ReleaseInterface(dev, interfaceId);
-        }
-    }
     OsalMutexLock(&lock_);
     g_usbOpenCount--;
     int32_t ret = 0;
     if (port->ctrDevHandle != nullptr && g_usbOpenCount == 0) {
+        for (uint8_t interfaceId = 0; interfaceId < USB_MAX_INTERFACES; ++interfaceId) {
+            if (port->iface[interfaceId] != nullptr) {
+                ReleaseInterfaceByPort(port, interfaceId);
+            }
+            port->iface[interfaceId] = nullptr;
+        }
         RawUsbCloseCtlProcess(port->ctrDevHandle);
         ret = UsbCloseInterface(port->ctrDevHandle, true);
         if (ret != HDF_SUCCESS) {
@@ -1425,6 +1426,48 @@ int32_t UsbImpl::ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool di
 int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
 {
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    if (!port->initFlag) {
+        HDF_LOGE("%{public}s: openPort failed", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
+
+    if (interfaceId < USB_MAX_INTERFACES) {
+        if (port->devHandle[interfaceId] == nullptr || port->iface[interfaceId] == nullptr) {
+            HDF_LOGE("%{public}s: UsbOpenInterface or UsbClaimInterface failed", __func__);
+            return HDF_DEV_ERR_OP;
+        }
+        if (HdfSListCount(&port->reqSyncList) > 0) {
+            UsbdRequestSyncReleaseList(port);
+            HDF_LOGD("%{public}s:release sync list", __func__);
+        }
+        if (HdfSListCount(&port->reqASyncList) > 0) {
+            UsbdRequestASyncReleaseList(port);
+            HDF_LOGD("%{public}s:release async list", __func__);
+        }
+        int32_t ret = UsbdBulkASyncListReleasePort(port);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s:release bulk async list failed", __func__);
+        }
+        UsbCloseInterface(port->devHandle[interfaceId], false);
+        port->devHandle[interfaceId] = nullptr;
+        UsbReleaseInterface(port->iface[interfaceId]);
+        port->iface[interfaceId] = nullptr;
+        return HDF_SUCCESS;
+    } else {
+        HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
+            port->busNum, port->devAddr, interfaceId);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t UsbImpl::ReleaseInterfaceByPort(HostDevice *port, uint8_t interfaceId)
+{
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
