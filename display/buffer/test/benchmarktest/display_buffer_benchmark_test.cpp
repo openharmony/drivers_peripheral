@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,10 +22,11 @@
 #include "gtest/gtest.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
-#include "v1_0/display_composer_type.h"
-#include "v1_0/display_buffer_type.h"
-#include "v1_1/include/idisplay_buffer.h"
-using namespace OHOS::HDI::Display::Buffer::V1_1;
+#include "v1_2/display_composer_type.h"
+#include "v1_2/display_buffer_type.h"
+#include "v1_2/include/idisplay_buffer.h"
+using namespace OHOS::HDI::Display::Buffer;
+using namespace OHOS::HDI::Display::Buffer::V1_2;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace testing::ext;
 using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
@@ -33,7 +34,7 @@ using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
 const uint32_t ALLOC_SIZE_1080 = 1080; // alloc size 1080
 const uint32_t ALLOC_SIZE_1920 = 1920; // alloc size 1920
 
-static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
+static std::shared_ptr<V1_2::IDisplayBuffer> g_gralloc = nullptr;
 static BufferHandle* g_bufferHandle = nullptr;
 static AllocInfo g_allocInfo = {
     .width = ALLOC_SIZE_1920,
@@ -51,7 +52,7 @@ public:
 
 void DisplayBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
-    g_gralloc.reset(IDisplayBuffer::Get());
+    g_gralloc.reset(V1_2::IDisplayBuffer::Get());
     if (g_gralloc == nullptr) {
         HDF_LOGE("IDisplayBuffer get failed");
         ASSERT_TRUE(0);
@@ -152,6 +153,95 @@ BENCHMARK_F(DisplayBenchmarkTest, EraseMetadataKeyTest)(benchmark::State &state)
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, EraseMetadataKeyTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetAllocFreeTest
+  * @tc.desc: Benchmarktest for interface AllocMem and FreeMem.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetAllocFreeTest)(benchmark::State &state)
+{
+    int32_t ret;
+    BufferHandle* bufferHandle = nullptr;
+    for (auto _ : state) {
+        ret = g_gralloc->AllocMem(g_allocInfo, bufferHandle);
+        EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
+        g_gralloc->FreeMem(*bufferHandle);
+    }
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetAllocFreeTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: MmapTest
+  * @tc.desc: Benchmarktest for interface Mmap.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, MmapTest)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        g_gralloc->Mmap(*g_bufferHandle);
+    }
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, MmapTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: UnmapTest
+  * @tc.desc: Benchmarktest for interface Unmap.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, UnmapTest)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        g_gralloc->Unmap(*g_bufferHandle);
+    }
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, UnmapTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: FlushCacheTest
+  * @tc.desc: Benchmarktest for interface FlushCache.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, FlushCacheTest)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        g_gralloc->FlushCache(*g_bufferHandle);
+    }
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, FlushCacheTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: InvalidateCacheTest
+  * @tc.desc: Benchmarktest for interface InvalidateCache.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, InvalidateCacheTest)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        g_gralloc->InvalidateCache(*g_bufferHandle);
+    }
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, InvalidateCacheTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetImageLayoutTest
+  * @tc.desc: Benchmarktest for interface GetImageLayout.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetImageLayoutTest)(benchmark::State &state)
+{
+    V1_2::ImageLayout layout = {0};
+    for (auto _ : state) {
+        g_gralloc->GetImageLayout(*g_bufferHandle, layout);
+    }
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetImageLayoutTest)->
     Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
 
 } // namespace
