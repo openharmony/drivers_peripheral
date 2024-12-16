@@ -1731,14 +1731,14 @@ int32_t UserAuthInterfaceService::GetCredentialById(uint64_t credentialId, HdiCr
     std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *credList = nullptr;
     int32_t ret = QueryCredentialByIdFunc(credentialId, &credList);
-    if (ret != RESULT_SUCCESS) {
+    if (ret != RESULT_SUCCESS || credList == NULL) {
         IAM_LOGE("query credential failed");
-        return ret;
+        return RESULT_GENERAL_ERROR;
     }
-    if (credList == NULL || credList->head == NULL || credList->head->data == NULL) {
-        IAM_LOGE("query credential failed");
+    if (credList->head == NULL || credList->head->data == NULL) {
+        IAM_LOGE("credential is null");
         DestroyLinkedList(credList);
-        return RESULT_UNKNOWN;
+        return RESULT_NOT_ENROLLED;
     }
     auto credentialHal = static_cast<CredentialInfoHal *>(credList->head->data);
     CopyCredentialInfo(*credentialHal, info);
