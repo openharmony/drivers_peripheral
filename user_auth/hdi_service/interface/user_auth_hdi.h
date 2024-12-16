@@ -52,6 +52,7 @@ using HdiAuthIntent = OHOS::HDI::UserAuth::V3_0::AuthIntent;
 using HdiGlobalConfigType = OHOS::HDI::UserAuth::V3_0::GlobalConfigType;
 using HdiGlobalConfigValue= OHOS::HDI::UserAuth::V3_0::GlobalConfigValue;
 using HdiGlobalConfigParam = OHOS::HDI::UserAuth::V3_0::GlobalConfigParam;
+using HdiUserAuthTokenPlain = OHOS::HDI::UserAuth::V3_0::UserAuthTokenPlain;
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS

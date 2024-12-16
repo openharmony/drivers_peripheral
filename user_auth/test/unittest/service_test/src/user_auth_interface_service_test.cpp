@@ -1370,6 +1370,25 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestSetGlobalConfigParam_001, TestSize.Le
     }
     EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
 }
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestVerifyAuthToken_001, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    const std::string deviceUdid = std::string(64, ' ');
+    EXPECT_EQ(service->Init(deviceUdid), 0);
+
+    constexpr uint64_t allowableDuration = 1000;
+    std::vector<uint8_t> tokenIn = {};
+    HdiUserAuthTokenPlain tokenPlainOut = {};
+    std::vector<uint8_t> rootSecret = {};
+    EXPECT_EQ(service->VerifyAuthToken(tokenIn, allowableDuration, tokenPlainOut, rootSecret),
+        RESULT_VERIFY_TOKEN_FAIL);
+    tokenIn.resize(sizeof(UserAuthTokenHal));
+    EXPECT_EQ(service->VerifyAuthToken(tokenIn, allowableDuration, tokenPlainOut, rootSecret),
+        RESULT_GENERAL_ERROR);
+}
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS

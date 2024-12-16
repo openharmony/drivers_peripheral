@@ -52,8 +52,8 @@ ResultCode CheckIdmOperationToken(int32_t userId, UserAuthTokenHal *authToken)
         LOG_ERROR("auth token is null");
         return RESULT_BAD_PARAM;
     }
-    UserAuthTokenPlain tokenPlain = {0};
-    ResultCode ret = UserAuthTokenVerify(authToken, &tokenPlain);
+    UserAuthTokenPlainHal tokenPlain = {0};
+    ResultCode ret = UserAuthTokenVerify(authToken, TOKEN_VALIDITY_PERIOD, &tokenPlain);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("UserAuthTokenVerify fail");
         return RESULT_BAD_MATCH;
