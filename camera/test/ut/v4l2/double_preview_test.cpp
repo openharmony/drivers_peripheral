@@ -38,22 +38,22 @@ void DoublePreviewTest::SetStreamInfo(StreamInfo &streamInfo,
     const int streamId, const StreamIntent intent)
 {
     sptr<OHOS::IBufferProducer> producer;
-    constexpr uint32_t DATA_SPACE = 8; // picture dataspace
-    constexpr uint32_t TUNNEL_MODE = 5; // tunnel mode
-    constexpr uint32_t BUFFER_QUEUE_SIZE = 8; // set bufferQueue size
+    constexpr uint32_t dataSpace = 8; // picture dataspace
+    constexpr uint32_t tunnelMode = 5; // tunnel mode
+    constexpr uint32_t bufferQueueSize = 8; // set bufferQueue size
     if (intent == PREVIEW) {
         streamInfo.width_ = PREVIEW_WIDTH;
         streamInfo.height_ = PREVIEW_HEIGHT;
         streamInfo.format_ = PIXEL_FMT_RGBA_8888;
     }
     streamInfo.streamId_ = streamId;
-    streamInfo.dataspace_ = DATA_SPACE;
+    streamInfo.dataspace_ = dataSpace;
     streamInfo.intent_ = intent;
-    streamInfo.tunneledMode_ = TUNNEL_MODE;
+    streamInfo.tunneledMode_ = tunnelMode;
     producer = streamCustomer->CreateProducer();
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
     ASSERT_NE(streamInfo.bufferQueue_, nullptr);
-    streamInfo.bufferQueue_->producer_->SetQueueSize(BUFFER_QUEUE_SIZE);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(bufferQueueSize);
 }
 
 void DoublePreviewTest::CreateStream(int streamId, StreamIntent intent)
@@ -102,7 +102,7 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
     captureInfo_.streamIds_ = {streamId};
     captureInfo_.captureSetting_ = cameraBase_->ability_;
     captureInfo_.enableShutterCallback_ = shutterCallback;
-    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 2; // sleep two second
+    constexpr uint32_t timeForWaitImagePreview = 2; // sleep two second
     result_ = (CamRetCode)cameraBase_->streamOperator->Capture(captureId, captureInfo_, isStreaming);
     EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
@@ -121,7 +121,7 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
     } else {
         CAMERA_LOGE("StartCapture ignore command");
     }
-    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
+    sleep(timeForWaitImagePreview);
 }
 
 void DoublePreviewTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
@@ -181,8 +181,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_001, TestSize.Level1)
     StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
     StartCapture(STREAMID_PREVIEW_DOUBLE, CAPTUREID_PREVIEW_DOUBLE, false, true);
 
-    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 10; // sleep ten second 
-    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
+    constexpr uint32_t timeForWaitImagePreview = 10; // sleep ten second
+    sleep(timeForWaitImagePreview);
 
     std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE};
     std::vector<int> streamIds = {cameraBase_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE};
@@ -243,8 +243,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_002, TestSize.Level1)
         cameraBase_->StoreImage(addr, size);
     });
 
-    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 5; // sleep five second
-    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
+    constexpr uint32_t timeForWaitImagePreview = 5; // sleep five second
+    sleep(timeForWaitImagePreview);
 
     std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE,
         cameraBase_->CAPTURE_ID_CAPTURE};
@@ -276,8 +276,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_003, TestSize.Level1)
     StartCapture(STREAMID_PREVIEW_DOUBLE, CAPTUREID_PREVIEW_DOUBLE, false, true);
     cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
 
-    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 5; // sleep five second
-    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
+    constexpr uint32_t timeForWaitImagePreview = 5; // sleep five second
+    sleep(timeForWaitImagePreview);
 
     std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE,
         cameraBase_->CAPTURE_ID_VIDEO};
