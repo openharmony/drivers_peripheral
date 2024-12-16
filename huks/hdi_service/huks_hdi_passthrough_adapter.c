@@ -264,6 +264,26 @@ int32_t HuksHdiAdapterGenerateRandom(const struct HksParamSet *paramSet, struct 
     return g_coreEngine->HuksHdiGenerateRandom(paramSet, random);
 }
 
+int32_t HuksHdiAdapterGetErrorInfo(struct HksBlob *errorInfo)
+{
+    HUKS_HDI_IF_NOT_SUCC_RETURN(HuksInitHuksCoreEngine(), HUKS_ERROR_NULL_POINTER)
+
+    HUKS_HDI_IF_NULL_LOGE_RETURN(g_coreEngine->HuksHdiGetErrorInfo, HUKS_ERROR_NULL_POINTER,
+        "Init function is null pointer")
+
+    return g_coreEngine->HuksHdiGetErrorInfo(errorInfo);
+}
+
+int32_t HuksHdiAdapterGetStatInfo(struct HksBlob *statInfo)
+{
+    HUKS_HDI_IF_NOT_SUCC_RETURN(HuksInitHuksCoreEngine(), HUKS_ERROR_NULL_POINTER)
+
+    HUKS_HDI_IF_NULL_LOGE_RETURN(g_coreEngine->HuksHdiGetStatInfo, HUKS_ERROR_NULL_POINTER,
+        "Init function is null pointer")
+
+    return g_coreEngine->HuksHdiGetStatInfo(statInfo);
+}
+
 int32_t HuksInitHuksCoreEngine(void)
 {
     if (g_coreEngine != NULL) {
