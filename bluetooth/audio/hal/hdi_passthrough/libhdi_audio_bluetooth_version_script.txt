@@ -1,0 +1,7 @@
+{
+  global:
+    "*GetAudioManagerFuncs*";
+    "*AudioMemFree*";
+  local:
+    *;
+};
