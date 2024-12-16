@@ -39,6 +39,8 @@ config("hdi_audio_config") {
     "-fno-exceptions",
     "-ffunction-sections",
     "-fdata-sections",
+    "-Oz",
+    "-flto",
   ]
 
   ldflags = [ "-Wl" ]
@@ -92,7 +94,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
   ]
 
   public_configs = [ ":hdi_audio_config" ]
-
+  version_script = "libhdi_audio_bluetooth_version_script.txt"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_bluetooth"
