@@ -1385,6 +1385,7 @@ int32_t UsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle)
     }
 
     ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
+    HDF_LOGI("%{public}s:%{public}d dev is %{public}p", __func__, __LINE__, ifaceHdl->devHandle->dev);
     if (ifaceHdl->devHandle == NULL || ifaceHdl->devHandle->dev == NULL ||
         ifaceHdl->devHandle->dev->privateObject == NULL) {
         HDF_LOGE("%{public}s:%{public}d ifaceHdl is null", __func__, __LINE__);
@@ -1431,6 +1432,7 @@ int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle, bool isCtrI
     }
 
     ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
+    HDF_LOGI("%{public}s:%{public}d dev is %{public}p", __func__, __LINE__, ifaceHdl->devHandle->dev);
     if (ifaceHdl->devHandle == NULL || ifaceHdl->devHandle->dev == NULL ||
         ifaceHdl->devHandle->dev->privateObject == NULL) {
         HDF_LOGE("%{public}s:%{public}d ifaceHdl is null", __func__, __LINE__);
@@ -1559,6 +1561,7 @@ int32_t UsbGetPipeInfo(
     struct UsbPipeQueryPara pipeQueryPara;
     struct UsbPipe *pipeObj = NULL;
 
+    HDF_LOGI("%{public}s:%{public}d dev is %{public}p", __func__, __LINE__, ifaceHdl->devHandle->dev);
     if (interfaceHandle == NULL || pipeInfo == NULL || ifaceHdl == NULL || ifaceHdl->devHandle == NULL ||
         ifaceHdl->devHandle->dev == NULL) {
         HDF_LOGE("%{public}s:%{publid}d invalid parameter", __func__, __LINE__);
