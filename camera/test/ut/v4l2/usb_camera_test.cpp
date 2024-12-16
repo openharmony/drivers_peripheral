@@ -565,14 +565,14 @@ TEST_F(UtestUSBCameraTest, camera_usb_0020)
     cameraBase_->StartStream(cameraBase_->intents);
 
     // updateSettings
-    const uint32_t ITEM_CAPACITY = 100;
-    const uint32_t DATA_CAPACITY = 2000;
-    const int32_t FPS_VALUE = 10;
+    const uint32_t itemCapacity = 100;
+    const uint32_t dataCapacity = 2000;
+    const int32_t fpsValue = 10;
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
-        ITEM_CAPACITY, DATA_CAPACITY);
+        itemCapacity, dataCapacity);
     std::vector<int32_t> fpsRange;
-    fpsRange.push_back(FPS_VALUE);
-    fpsRange.push_back(FPS_VALUE);
+    fpsRange.push_back(fpsValue);
+    fpsRange.push_back(fpsValue);
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
     const int32_t DEVICE_STREAM_ID = 0;
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &DEVICE_STREAM_ID, 1);
@@ -889,14 +889,14 @@ TEST_F(UtestUSBCameraTest, camera_usb_0028)
     cameraBase_->StartStream(cameraBase_->intents);
 
     // updateSettings
-    const uint32_t ITEM_CAPACITY = 100;
-    const uint32_t DATA_CAPACITY = 2000;
-    const int32_t FPS_VALUE = 10;
+    const uint32_t itemCapacity = 100;
+    const uint32_t dataCapacity = 2000;
+    const int32_t fpsValue = 10;
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
-        ITEM_CAPACITY, DATA_CAPACITY);
+        itemCapacity, dataCapacity);
     std::vector<int32_t> fpsRange;
-    fpsRange.push_back(FPS_VALUE);
-    fpsRange.push_back(FPS_VALUE);
+    fpsRange.push_back(fpsValue);
+    fpsRange.push_back(fpsValue);
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
     const int32_t DEVICE_STREAM_ID = 0;
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &DEVICE_STREAM_ID, 1);
