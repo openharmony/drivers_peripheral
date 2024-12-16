@@ -123,8 +123,8 @@ uint64_t BufferAdapter::CameraUsageToGrallocUsage(const uint64_t cameraUsage)
 {
     uint64_t grallocUsage = 0;
     uint64_t test = 1;
-    const uint32_t BYTE = 8; // 8 bits per byte
-    for (uint32_t i = 0; i < sizeof(cameraUsage) * BYTE; i++) {
+    const uint32_t bitsPerByte = 8; // 8 bits per byte
+    for (uint32_t i = 0; i < sizeof(cameraUsage) * bitsPerByte; i++) {
         switch (cameraUsage & (test << i)) {
             case CAMERA_USAGE_MEM_SHARE:
                 grallocUsage |= BUFFER_CONSUMER_USAGE_SORTWARE;
@@ -147,8 +147,8 @@ uint64_t BufferAdapter::GrallocUsageToCameraUsage(const uint64_t usage)
 {
     uint64_t cameraUsage = 0;
     uint64_t test = 1;
-    const uint32_t BYTE = 8; // 8 bits per byte
-    for (uint32_t i = 0; i < sizeof(usage) * BYTE; i++) {
+    const uint32_t bitsPerByte = 8; // 8 bits per byte
+    for (uint32_t i = 0; i < sizeof(usage) * bitsPerByte; i++) {
         switch (usage & (test << i)) {
             case BUFFER_CONSUMER_USAGE_SORTWARE:
                 cameraUsage |= CAMERA_USAGE_MEM_SHARE;

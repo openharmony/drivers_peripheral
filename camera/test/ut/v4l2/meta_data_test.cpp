@@ -60,9 +60,9 @@ void MetaDataTest::SetStreamInfo(StreamInfo &streamInfo, const std::shared_ptr<S
     const int streamId, const StreamIntent intent)
 {
     sptr<OHOS::IBufferProducer> producer;
-    constexpr uint32_t DATA_SPACE = 8;
-    constexpr uint32_t TUNNEL_MODE = 5;
-    constexpr uint32_t BUFFER_QUEUE_SIZE = 8;
+    constexpr uint32_t dataSpace = 8;
+    constexpr uint32_t tunnelMode = 5;
+    constexpr uint32_t bufferQueueSize = 8;
     if (intent == STILL_CAPTURE) {
         streamInfo.encodeType_ = ENCODE_TYPE_JPEG;
     } else if (intent == VIDEO) {
@@ -72,13 +72,13 @@ void MetaDataTest::SetStreamInfo(StreamInfo &streamInfo, const std::shared_ptr<S
     streamInfo.height_ = PREVIEW_HEIGHT;
     streamInfo.format_ = PIXEL_FMT_RGBA_8888;
     streamInfo.streamId_ = streamId;
-    streamInfo.dataspace_ = DATA_SPACE;
+    streamInfo.dataspace_ = dataSpace;
     streamInfo.intent_ = intent;
-    streamInfo.tunneledMode_ = TUNNEL_MODE;
+    streamInfo.tunneledMode_ = tunnelMode;
     producer = streamCustomer->CreateProducer();
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
     CHECK_IF_PTR_NULL_RETURN_VOID(streamInfo.bufferQueue_);
-    streamInfo.bufferQueue_->producer_->SetQueueSize(BUFFER_QUEUE_SIZE);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(bufferQueueSize);
 }
 
 void MetaDataTest::CreateStream(int streamId, StreamIntent intent)
