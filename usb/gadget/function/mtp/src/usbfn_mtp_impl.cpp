@@ -166,6 +166,11 @@ void UsbfnMtpImpl::UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *r
         HDF_LOGD("%{public}s, mtpState: %{public}d.", __func__, mtpPort->mtpDev->mtpState);
         return;
     }
+    if (!mtpDev_->initFlag) {
+        pthread_rwlock_unlock(&mtpRunrwLock_);
+        HDF_LOGE("%{public}s: dev is release", __func__);
+        return;
+    }
     int32_t ret = UsbMtpPortRxPush(mtpPort, req);
     if (ret != HDF_SUCCESS) {
         HDF_LOGW("%{public}s: rx push failed(%{%{public}d/%{public}d}): %{public}d, state=%{public}hhu", __func__,
@@ -218,7 +223,7 @@ void UsbfnMtpImpl::UsbFnRequestWriteComplete(uint8_t pipe, struct UsbFnRequest *
         return;
     }
     UsbMtpPortReleaseTxReq(mtpPort, req);
-    if (mtpPort->mtpDev->mtpState == MTP_STATE_CANCELED) {
+    if (mtpPort->mtpDev->mtpState == MTP_STATE_CANCELED || !mtpDev_->initFlag) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGD("%{public}s, mtpState: %{public}d.", __func__, mtpPort->mtpDev->mtpState);
         return;
@@ -1100,6 +1105,7 @@ int32_t UsbfnMtpImpl::InitMtpPort()
 
 int32_t UsbfnMtpImpl::Release()
 {
+    HDF_LOGI("%{public}s: Release", __func__);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
@@ -1107,9 +1113,9 @@ int32_t UsbfnMtpImpl::Release()
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     mtpDev_->initFlag = false;
+    sem_post(&asyncReq_);
     (void)UsbMtpPortCancelRequest(mtpPort_);
     pthread_rwlock_unlock(&mtpRunrwLock_);
-    HDF_LOGI("%{public}s: Release", __func__);
     pthread_rwlock_wrlock(&mtpRunrwLock_);
 
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
@@ -1733,6 +1739,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     DListRemove(&req->list);
+    DListInsertTail(&req->list, &mtpPort_->writeQueue);
     uint64_t oneReqLeft = 0;
     int32_t ret = UsbMtpPortSendFileFillFirstReq(req, oneReqLeft);
     if (ret != HDF_SUCCESS) {
@@ -1741,6 +1748,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
         return ret;
     }
     ret = UsbFnSubmitRequestSync(req, BULK_IN_TIMEOUT_JIFFIES);
+    DListRemove(&req->list);
     DListInsertTail(&req->list, pool);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: bulk-in req failed: %{public}d", __func__, ret);
@@ -1757,6 +1765,10 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
             HDF_LOGD("%{public}s: unexpected status %{public}d", __func__, req->status);
             mtpDev_->mtpState = MTP_STATE_ERROR;
             return HDF_ERR_IO;
+    }
+    if (!mtpDev_->initFlag) {
+        HDF_LOGE("%{public}s: dev is release", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     if (oneReqLeft != mtpDev_->xferFileLength) {
         ret = UsbMtpPortSendFileLeftAsync(oneReqLeft);
