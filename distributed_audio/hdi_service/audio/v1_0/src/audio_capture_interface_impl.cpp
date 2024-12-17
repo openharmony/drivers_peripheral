@@ -160,8 +160,8 @@ int32_t AudioCaptureInterfaceImpl::Stop()
         return HDF_FAILURE;
     }
     cJSON_Delete(jParam);
-    cJSON_free(jsonData);
     std::string content(jsonData);
+    cJSON_free(jsonData);
     DAudioEvent event = { HDF_AUDIO_EVENT_STOP, content };
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
