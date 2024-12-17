@@ -456,6 +456,7 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
+    HDF_LOGI("Background runningLock active, type=%{public}d name=%{public}s", info.type, info.name.c_str());
     Power::PowerXCollie powerXcollie("Power_HoldRunningLockExt");
     return RunningLockImpl::HoldLock(info, g_powerState, lockid, bundleName);
 }
@@ -463,6 +464,7 @@ int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
 int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
+    HDF_LOGI("Background runningLock inactive, type=%{public}d name=%{public}s", info.type, info.name.c_str());
     Power::PowerXCollie powerXcollie("Power_UnholdRunningLockExt");
     return RunningLockImpl::UnholdLock(info, lockid, bundleName);
 }
