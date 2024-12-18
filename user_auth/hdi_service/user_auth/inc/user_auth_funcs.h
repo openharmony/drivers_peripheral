@@ -69,6 +69,7 @@ typedef enum ReuseMode {
 typedef struct {
     bool isCached;
     int32_t userId;
+    uint64_t secureUid;
     UserAuthTokenHal authToken;
 } __attribute__((__packed__)) UnlockAuthResultCache;
 
