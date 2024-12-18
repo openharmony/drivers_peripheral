@@ -280,6 +280,7 @@ DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &
         CHECK_AND_FREE_RETURN_RET_LOG(value == nullptr || !cJSON_IsObject(value), FAILED, rootValue, "mode get error.");
 
         char *jsonValue = cJSON_Print(value);
+        CHECK_AND_FREE_RETURN_RET_LOG(jsonValue == nullptr, FAILED, rootValue, "cJson print value error.");
         std::string format(jsonValue);
         DHLOGI("the current mode :%{public}s. value :%{public}s", key.c_str(), format.c_str());
         std::map<int, std::vector<DCResolution>> supportedFormats = GetDCameraSupportedFormats(format);
