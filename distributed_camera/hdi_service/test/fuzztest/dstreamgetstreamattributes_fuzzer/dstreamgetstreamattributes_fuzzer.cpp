@@ -17,32 +17,36 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dstream_operator.h"
 #include "v1_1/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+const uint8_t MAX_STRING_LENGTH = 255;
+
 void DstreamGetStreamAttributesFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
 
+    FuzzedDataProvider fdp(data, size);
     std::vector<StreamAttribute> attributes;
     StreamAttribute attribute;
-    attribute.streamId_ = *(reinterpret_cast<const int*>(data));
-    attribute.width_ = *(reinterpret_cast<const int*>(data));
-    attribute.height_ = *(reinterpret_cast<const int*>(data));
-    attribute.overrideFormat_ = *(reinterpret_cast<const int*>(data));
-    attribute.overrideDataspace_ = *(reinterpret_cast<const int*>(data));
-    attribute.producerUsage_ = *(reinterpret_cast<const int*>(data));
-    attribute.producerBufferCount_ = *(reinterpret_cast<const int*>(data));
-    attribute.maxBatchCaptureCount_ = *(reinterpret_cast<const int*>(data));
-    attribute.maxCaptureCount_ = *(reinterpret_cast<const int*>(data));
+    attribute.streamId_ = fdp.ConsumeIntegral<int>();
+    attribute.width_ = fdp.ConsumeIntegral<int>();
+    attribute.height_ = fdp.ConsumeIntegral<int>();
+    attribute.overrideFormat_ = fdp.ConsumeIntegral<int>();
+    attribute.overrideDataspace_ = fdp.ConsumeIntegral<int>();
+    attribute.producerUsage_ = fdp.ConsumeIntegral<int>();
+    attribute.producerBufferCount_ = fdp.ConsumeIntegral<int>();
+    attribute.maxBatchCaptureCount_ = fdp.ConsumeIntegral<int>();
+    attribute.maxCaptureCount_ = fdp.ConsumeIntegral<int>();
     attributes.push_back(attribute);
 
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sinkAbilityInfo(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
     dMetadataProcessor->InitDCameraAbility(sinkAbilityInfo);
     OHOS::sptr<DStreamOperator> dCameraStreamOperator(new (std::nothrow) DStreamOperator(dMetadataProcessor));
