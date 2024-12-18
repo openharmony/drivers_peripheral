@@ -1552,6 +1552,29 @@ static int WpaCliCmdStaShellCmd(WifiWpaStaInterface *this, const char *params)
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
+static int WpaCliCmdGetWpaStaData(WifiWpaStaInterface *this, const char *argv, char *staData, unsigned int size)
+{
+    if (this == NULL || argv == NULL || staData == NULL) {
+        HDF_LOGE("WpaCliCmdGetWpaStaData, interface null ir wpaMloInfo null");
+        return -1;
+    }
+    char cmd[CMD_BUFFER_SIZE] = {0};
+    char buf[REPLY_BUF_LENGTH] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s %s", this->ifname, argv) < 0) {
+        HDF_LOGE("WpaCliCmdGetWpaStaData, snprintf_s err");
+        return -1;
+    }
+    if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        HDF_LOGE("WpaCliCmdGetWpaStaData, err");
+        return -1;
+    }
+    if (strncpy_s(staData, size, buf, sizeof(buf)) != EOK) {
+        HDF_LOGE("WpaCliCmdGetWpaStaData, copy res err");
+        return -1;
+    }
+    return 0;
+}
+
 WifiWpaStaInterface *GetWifiStaInterface(const char *name)
 {
     WifiWpaStaInterface *p = g_wpaStaInterface;
@@ -1614,6 +1637,7 @@ WifiWpaStaInterface *GetWifiStaInterface(const char *name)
     p->wpaCliCmdGetRequirePmf = WpaCliCmdGetRequirePmf;
     p->wpaCliCmdGetConnectionCapabilities = WpaCliCmdGetConnectionCapabilities;
     p->wpaCliCmdStaShellCmd = WpaCliCmdStaShellCmd;
+    p->wpaCliCmdGetWpaStaData = WpaCliCmdGetWpaStaData;
     p->next = g_wpaStaInterface;
     g_wpaStaInterface = p;
 
