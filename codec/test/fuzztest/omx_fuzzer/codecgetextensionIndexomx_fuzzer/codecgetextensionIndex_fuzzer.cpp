@@ -15,22 +15,23 @@
 
 #include "codecgetextensionIndex_fuzzer.h"
 #include "codeccommon_fuzzer.h"
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include <securec.h>
 
 namespace OHOS {
 namespace Codec {
     bool CodecGetExtensionIndex(const uint8_t *data, size_t size)
     {
-        uint8_t *rawData = const_cast<uint8_t *>(data);
-        uint32_t *indexType = reinterpret_cast<uint32_t *>(rawData);
+        FuzzedDataProvider fdp(const_cast<uint8_t *>(data), size);
+        uint32_t* indexType = nullptr;
+        std::string paramName = fdp.ConsumeRandomLengthString();
         bool result = Preconditions();
         if (!result) {
             HDF_LOGE("%{public}s: Preconditions failed\n", __func__);
             return false;
         }
 
-        int32_t ret = g_component->GetExtensionIndex(g_component, "OMX.Topaz.index.param.extended_test", indexType);
+        int32_t ret = g_component->GetExtensionIndex(g_component, paramName.c_str(), indexType);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetExtensionIndex failed, ret is [%{public}x]\n", __func__, ret);
         }
