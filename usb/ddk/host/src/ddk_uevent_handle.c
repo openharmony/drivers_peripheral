@@ -32,6 +32,7 @@
 #include "securec.h"
 #include "usbfn_uevent_handle.h"
 #include "usbd_wrapper.h"
+#include "usb_accessory_uevent_handle.h"
 
 #define HDF_LOG_TAG usb_ddk_uevent
 
@@ -190,6 +191,7 @@ void *DdkUeventMain(void *param)
             }
             DdkHandleUevent(msg, rcvLen);
             UsbFnHandleUevent(msg, rcvLen);
+            UsbAccessoryUeventHandle(msg, rcvLen);
         } else if (((uint32_t)fd.revents & POLLERR) == POLLERR) {
             HDF_LOGE("usb event poll error");
         }
