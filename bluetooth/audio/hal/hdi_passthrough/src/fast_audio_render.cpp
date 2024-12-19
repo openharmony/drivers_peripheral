@@ -275,9 +275,30 @@ int32_t FastRenderGetChannelMode(struct AudioRender *render, AudioChannelMode *m
 int32_t FastRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
 {
     HDF_LOGI("%{public}s enter", __func__);
-    (void)handle;
-    (void)keyValueList;
-    return AUDIO_HAL_ERR_NOT_SUPPORT;
+    struct AudioHwRender *render = reinterpret_cast<struct AudioHwRender *>(handle);
+    if (render == nullptr || keyValueList == nullptr) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    int32_t count = 0;
+    int32_t sumOk = 0;
+    struct ExtraParams mExtraParams;
+    if (AudioSetExtraParams(keyValueList, &count, &mExtraParams, &sumOk) < 0) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (count != 0 && sumOk == count) {
+#ifdef A2DP_HDI_SERVICE
+        if (mExtraParams.audioStreamCtl == 1) {
+            HDF_LOGI("SetValue, try to fastSuspendPlaying=1");
+            OHOS::Bluetooth::FastSuspendPlayingFromParam();
+        } else if (mExtraParams.audioStreamCtl == 0) {
+            HDF_LOGI("SetValue, try to fastSuspendPlaying=0");
+            OHOS::Bluetooth::UnBlockStart();
+        }
+#endif
+        return AUDIO_HAL_SUCCESS;
+    } else {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
 }
 
 int32_t FastRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLength)

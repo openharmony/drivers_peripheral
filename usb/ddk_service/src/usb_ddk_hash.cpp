@@ -77,3 +77,14 @@ int32_t GetInterfaceInfoByVal(const uint64_t hashVal, InterfaceInfo &Info)
     Info = it->second;
     return HDF_SUCCESS;
 }
+
+bool UsbDdkGetAllRecords(const InterfaceInfo &info, std::vector<uint64_t> &records)
+{
+    std::lock_guard<std::mutex> lock(g_mapMutex);
+    for (auto &it : g_hashMap) {
+        if (it.second.busNum == info.busNum && it.second.devNum == info.devNum) {
+            records.push_back(it.first);
+        }
+    }
+    return true;
+}

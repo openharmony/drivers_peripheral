@@ -29,6 +29,7 @@ extern "C" {
 #define AUTH_TOKEN_LEN sizeof(UserAuthTokenHal)
 #define AUTH_TOKEN_DATA_LEN (AUTH_TOKEN_LEN - SHA256_DIGEST_SIZE)
 #define AUTH_TOKEN_CIPHER_LEN sizeof(TokenDataToEncrypt)
+#define TOKEN_VALIDITY_PERIOD (10 * 60 * 1000)
 #define TOKEN_VERSION 0
 #define UDID_LEN 64
 
@@ -63,10 +64,11 @@ typedef struct {
 typedef struct {
     TokenDataPlain tokenDataPlain;
     TokenDataToEncrypt tokenDataToEncrypt;
-} __attribute__((__packed__)) UserAuthTokenPlain;
+} __attribute__((__packed__)) UserAuthTokenPlainHal;
 
-ResultCode UserAuthTokenSign(UserAuthTokenPlain *tokenPlain, UserAuthTokenHal *authToken);
-ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
+ResultCode UserAuthTokenSign(UserAuthTokenPlainHal *tokenPlain, UserAuthTokenHal *authToken);
+ResultCode UserAuthTokenVerify(const UserAuthTokenHal *userAuthToken, uint64_t allowableDuration,
+    UserAuthTokenPlainHal *tokenPlain);
 ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *reuseToken);
 
 #ifdef __cplusplus

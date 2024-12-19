@@ -191,8 +191,15 @@ int32_t VibratorInterfaceImpl::IsVibratorRunning(bool& state)
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
+    
+    bool statePointer = false;
+    int32_t ret = vibratorInterface->IsVibratorRunning(&statePointer);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+    state = statePointer;
 
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t VibratorInterfaceImpl::PlayHapticPattern(const HapticPaketVdi& pkgVdi)

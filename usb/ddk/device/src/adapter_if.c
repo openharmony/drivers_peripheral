@@ -35,11 +35,6 @@
 #define HDF_LOG_TAG adapter_if
 #define SLEEP_DELAY 100000
 #define OPEN_CNT    30
-#define MTP_PATH "/config/usb_gadget/g1/functions/f_generic.mtp"
-#define PTP_PATH "/config/usb_gadget/g1/functions/f_generic.ptp"
-#define MTP_B_PATH "/config/usb_gadget/g1/configs/b.1/f_generic.mtp"
-#define PTP_B_PATH "/config/usb_gadget/g1/configs/b.1/f_generic.ptp"
-#define MTP_CONFIGURATION "/config/usb_gadget/g1/configs/b.1/strings/0x409/configuration"
 
 static bool IsDirExist(const char *path)
 {
@@ -122,6 +117,18 @@ static void DeleteFile(const char *path)
     }
 }
 
+static bool IsDeviceDirExist(const char *deviceName)
+{
+    char tmp[MAX_PATHLEN] = {0};
+    int32_t ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s", CONFIGFS_DIR, deviceName);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        return false;
+    }
+
+    return IsDirExist(tmp);
+}
+
 static int32_t UsbFnWriteFile(const char *path, const char *str)
 {
     size_t ret;
@@ -134,14 +141,10 @@ static int32_t UsbFnWriteFile(const char *path, const char *str)
         HDF_LOGE("%{public}s: UsbFnWriteFile failed", __func__);
         return HDF_ERR_BAD_FD;
     }
-
     ret = fwrite(str, strlen(str), 1, fp);
-    if (strcmp(path, MTP_CONFIGURATION) != 0) {
-        ret = fwrite(str, strlen(str), 1, fp);
-        if (ret != 1) {
-            (void)fclose(fp);
-            return HDF_FAILURE;
-        }
+    if (ret != 1) {
+        (void)fclose(fp);
+        return HDF_FAILURE;
     }
     (void)fclose(fp);
     return 0;
@@ -233,9 +236,6 @@ static int32_t UsbFnWriteDesString(
 static int32_t UsbFnAdapterCreateFunc(const char *configPath, const char *funcPath)
 {
     int32_t ret;
-    if (strcmp(funcPath, MTP_PATH) == 0 || strcmp(funcPath, PTP_PATH) == 0) {
-        return 0;
-    }
     ret = mkdir(funcPath, S_IREAD | S_IWRITE);
     if (ret != 0) {
         HDF_LOGE("%{public}s: mkdir failed", __func__);
@@ -251,8 +251,50 @@ static int32_t UsbFnAdapterCreateFunc(const char *configPath, const char *funcPa
     return 0;
 }
 
+static int32_t UsbFnReadFile(const char *path, char *str, uint16_t len)
+{
+    FILE *fp = fopen(path, "r");
+    if (fp == NULL) {
+        HDF_LOGE("%{public}s: fopen failed", __func__);
+        return HDF_ERR_BAD_FD;
+    }
+    if (fread(str, len, 1, fp) != 1) {
+        HDF_LOGE("%{public}s: fread failed", __func__);
+        (void)fclose(fp);
+        return HDF_ERR_IO;
+    }
+    (void)fclose(fp);
+    return 0;
+}
+
 static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int32_t enable)
 {
+    char tmp[MAX_PATHLEN] = {0};
+    if (deviceName == NULL || udcName == NULL || IsDeviceDirExist(deviceName) == false) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    int32_t ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/UDC", CONFIGFS_DIR, deviceName);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        return HDF_ERR_IO;
+    }
+    if (enable != 0) {
+        (void)UsbFnWriteFile(tmp, udcName);
+        char udcTmp[MAX_NAMELEN] = {0};
+        for (int32_t i = 0; i < OPEN_CNT; i++) {
+            (void)UsbFnReadFile(tmp, udcTmp, strlen(udcName));
+            if (!strcmp(udcName, udcTmp)) {
+                return 0;
+            }
+            usleep(SLEEP_DELAY);
+        }
+        if (strcmp(udcName, udcTmp)) {
+            return HDF_ERR_IO;
+        }
+    } else {
+        (void)UsbFnWriteFile(tmp, "\n");
+    }
     return 0;
 }
 
@@ -833,17 +875,11 @@ static void CleanConfigFs(const char *devName, const char *funcName)
     if (ret < 0) {
         return;
     }
-    if (strcmp(tmp, MTP_B_PATH) == 0 || strcmp(tmp, PTP_B_PATH) == 0) {
-        return;
-    }
     (void)remove(tmp);
 
     (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/functions/%s", CONFIGFS_DIR, devName, funcName);
     if (ret < 0) {
-        return;
-    }
-    if (strcmp(tmp, MTP_PATH) == 0 || strcmp(tmp, PTP_PATH) == 0) {
         return;
     }
     (void)remove(tmp);

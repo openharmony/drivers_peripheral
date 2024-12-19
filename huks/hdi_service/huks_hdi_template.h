@@ -185,6 +185,18 @@ typedef struct HksParamSet TargetParamSet;
                  HDI_ADAPTER_PARAM(random, &randomCore));  \
     HDI_CONVERTER_PARAM_OUT_BLOB(&randomCore, random)
 
+#define HDI_CONVERTER_FUNC_GETERRORINFO(errorInfo, ret, func)  \
+    TargetBlob errorInfoCore = {0};  \
+    HDI_CONVERTER_PARAM_IN_BLOB((errorInfo), &errorInfoCore)  \
+    (ret) = (func)(HDI_ADAPTER_PARAM((errorInfo), &errorInfoCore));  \
+    HDI_CONVERTER_PARAM_OUT_BLOB(&errorInfoCore, errorInfo)
+
+#define HDI_CONVERTER_FUNC_GETSTATINFO(statInfo, ret, func)  \
+    TargetBlob statInfoCore = {0};  \
+    HDI_CONVERTER_PARAM_IN_BLOB((statInfo), &statInfoCore)  \
+    (ret) = (func)(HDI_ADAPTER_PARAM((statInfo), &statInfoCore));  \
+    HDI_CONVERTER_PARAM_OUT_BLOB(&statInfoCore, statInfo)
+
 #define HDI_CONVERTER_FUNC_SIGN(key, paramSet, srcData, signature, ret, func) \
     TargetBlob keyCore = {0}; \
     TargetParamSet *paramSetCore = NULL; \

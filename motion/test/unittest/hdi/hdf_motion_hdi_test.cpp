@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include <securec.h>
 #include <vector>
 #include "hdf_base.h"
+#include "hdf_log.h"
 #include "osal_time.h"
 #include "v1_1/imotion_interface.h"
 #include "motion_callback_impl.h"
@@ -266,4 +267,116 @@ HWTEST_F(HdfMotionTest, SetMotionConfig_001, TestSize.Level1)
     int32_t motionType = -1;
     int32_t ret = g_motionInterface->SetMotionConfig(motionType, g_motionConfigData);
     EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(HdfMotionTest, EnableMotion_TYPE_WRIST_DOWN, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_WRIST_DOWN;
+    int32_t ret = g_motionInterface->EnableMotion(motionType);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    HDF_LOGI("EnableMotion %{public}d ret %{public}d\n", motionType, ret);
+
+    ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    HDF_LOGI("DisableMotion %{public}d ret %{public}d\n", motionType, ret);
+}
+
+HWTEST_F(HdfMotionTest, EnableMotion_TYPE_WAVE, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_WAVE;
+    int32_t ret = g_motionInterface->EnableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("EnableMotion %{public}d ret %{public}d\n", motionType, ret);
+
+    ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("DisableMotion %{public}d ret %{public}d\n", motionType, ret);
+}
+
+HWTEST_F(HdfMotionTest, EnableMotion_TYPE_STEP_COUNTER, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_STEP_COUNTER;
+    int32_t ret = g_motionInterface->EnableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("EnableMotion %{public}d ret %{public}d\n", motionType, ret);
+
+    ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("DisableMotion %{public}d ret %{public}d\n", motionType, ret);
+}
+
+HWTEST_F(HdfMotionTest, EnableMotion_TYPE_TOUCH_LINK, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_TOUCH_LINK;
+    int32_t ret = g_motionInterface->EnableMotion(motionType);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    HDF_LOGI("EnableMotion %{public}d ret %{public}d\n", motionType, ret);
+
+    ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    HDF_LOGI("DisableMotion %{public}d ret %{public}d\n", motionType, ret);
+}
+
+HWTEST_F(HdfMotionTest, EnableMotion_TYPE_HOVER, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_HOVER;
+    int32_t ret = g_motionInterface->EnableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("EnableMotion %{public}d ret %{public}d\n", motionType, ret);
+
+    ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("DisableMotion %{public}d ret %{public}d\n", motionType, ret);
+}
+
+HWTEST_F(HdfMotionTest, EnableMotion_TYPE_PUT_IN_POCKET, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_PUT_IN_POCKET;
+    int32_t ret = g_motionInterface->EnableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("EnableMotion %{public}d ret %{public}d\n", motionType, ret);
+
+    ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("DisableMotion %{public}d ret %{public}d\n", motionType, ret);
+}
+
+HWTEST_F(HdfMotionTest, EnableMotion_TYPE_RESERVED, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_RESERVED;
+    int32_t ret = g_motionInterface->EnableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("EnableMotion %{public}d ret %{public}d\n", motionType, ret);
+
+    ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    HDF_LOGI("DisableMotion %{public}d ret %{public}d\n", motionType, ret);
 }

@@ -523,7 +523,7 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
     if (frameInfoVdi->frameLen <= 0 || frameInfoVdi->frameEcLen <= 0 ||
         frameInfoVdi->frameLen > AUDIO_FRAME_LEN_MAX || frameInfoVdi->frameEcLen > AUDIO_FRAME_LEN_MAX) {
         AUDIO_FUNC_LOGE("frameLen len err, frameLen = [%{public}u], frameEcLen = [%{public}u]",
-            frameLen->frameLen, frameLen->frameEcLen);
+            frameInfoVdi->frameLen, frameInfoVdi->frameEcLen);
         return HDF_ERR_INVALID_PARAM;
     }
     frameInfo->frameLen = frameInfoVdi->frameLen;

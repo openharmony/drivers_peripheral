@@ -57,6 +57,7 @@ ohos_shared_library("libdistributed_camera_host_config") {
     "drivers_interface_camera:metadata",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.1",
+    "graphic_surface:buffer_handle",
     "graphic_surface:surface",
     "graphic_surface:sync_fence",
     "hdf_core:libhdf_host",

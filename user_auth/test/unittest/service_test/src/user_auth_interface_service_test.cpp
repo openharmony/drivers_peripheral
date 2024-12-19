@@ -31,7 +31,7 @@ namespace HDI {
 namespace UserAuth {
 using namespace testing;
 using namespace testing::ext;
-using namespace OHOS::HDI::UserAuth::V2_0;
+using namespace OHOS::HDI::UserAuth::V3_0;
 namespace {
 constexpr int32_t ATL1 = 10000;
 uint64_t g_pinIndex = 0;
@@ -1362,12 +1362,32 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestSetGlobalConfigParam_001, TestSize.Le
     param.authTypes.push_back(4);
     param.authTypes.push_back(4);
     param.authTypes.push_back(8);
+    param.authTypes.push_back(16);
     EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
 
     for (uint32_t i = 0; i <= MAX_USER; i++) {
         param.userIds.push_back(i);
     }
     EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestVerifyAuthToken_001, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    const std::string deviceUdid = std::string(64, ' ');
+    EXPECT_EQ(service->Init(deviceUdid), 0);
+
+    constexpr uint64_t allowableDuration = 1000;
+    std::vector<uint8_t> tokenIn = {};
+    HdiUserAuthTokenPlain tokenPlainOut = {};
+    std::vector<uint8_t> rootSecret = {};
+    EXPECT_EQ(service->VerifyAuthToken(tokenIn, allowableDuration, tokenPlainOut, rootSecret),
+        RESULT_BAD_PARAM);
+    tokenIn.resize(sizeof(UserAuthTokenHal));
+    EXPECT_EQ(service->VerifyAuthToken(tokenIn, allowableDuration, tokenPlainOut, rootSecret),
+        INNER_RESULT_AUTH_TOKEN_EXPIRED);
 }
 } // namespace UserAuth
 } // namespace HDI

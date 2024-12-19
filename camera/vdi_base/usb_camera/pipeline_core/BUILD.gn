@@ -153,6 +153,7 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
     "ffmpeg:libohosffmpeg",
+    "graphic_surface:buffer_handle",
     "graphic_surface:surface",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",

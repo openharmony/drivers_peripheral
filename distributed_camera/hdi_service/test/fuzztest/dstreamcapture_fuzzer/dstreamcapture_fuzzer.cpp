@@ -17,21 +17,26 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dstream_operator.h"
 #include "v1_1/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+const uint8_t MAX_STRING_LENGTH = 255;
+
 void DstreamCaptureFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-    int32_t captureId = *(reinterpret_cast<const int*>(data));
-    int32_t streamId = *(reinterpret_cast<const int*>(data));
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t captureId = fdp.ConsumeIntegral<int>();
+    int32_t streamId = fdp.ConsumeIntegral<int>();
     int32_t value = 2;
-    std::string captureSetting(reinterpret_cast<const char*>(data), size);
+    std::string captureSetting(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
     std::vector<int32_t> streamIds;
     streamIds.push_back(streamId);
 
@@ -40,7 +45,7 @@ void DstreamCaptureFuzzTest(const uint8_t* data, size_t size)
     info.captureSetting_.assign(captureSetting.begin(), captureSetting.end());
     info.enableShutterCallback_ = data[0] % value;
     bool isStreaming = data[0] % value;
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sinkAbilityInfo(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
     dMetadataProcessor->InitDCameraAbility(sinkAbilityInfo);
     OHOS::sptr<DStreamOperator> dCameraStreamOperator(new (std::nothrow) DStreamOperator(dMetadataProcessor));

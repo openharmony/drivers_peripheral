@@ -58,7 +58,15 @@ int32_t WifiP2pIface::GetIfaceName(std::string& name)
 
 int32_t WifiP2pIface::GetSupportFreqs(int band, std::vector<uint32_t>& frequencies)
 {
-    return HDF_SUCCESS;
+    WifiError status;
+    std::vector<uint32_t> validFrequencies;
+    std::tie(status, validFrequencies) = vendorHal_.lock()->GetValidFrequenciesForBand(
+        ifname_, band);
+    frequencies = validFrequencies;
+    if (status == HAL_SUCCESS) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
 }
 
 int32_t WifiP2pIface::GetIfaceCap(uint32_t& capabilities)

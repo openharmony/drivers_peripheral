@@ -24,6 +24,7 @@
 #define EFFECT_DURATION 2000
 #define VIBRATOR_SERVICE_NAME "hdf_misc_vibrator"
 #define DEFAULT_START_UP_TIME 20
+#define ERROR_STATE (-1)
 
 static struct VibratorDevice *GetVibratorDevicePriv(void)
 {
@@ -328,6 +329,51 @@ static int32_t GetHapticStartUpTime(int32_t mode, int32_t *startUpTime)
     return HDF_SUCCESS;
 }
 
+static int32_t IsVibratorRunning(bool *state)
+{
+    HDF_LOGI("%{public}s: in", __func__);
+    if (state == NULL) {
+        HDF_LOGE("%{public}s: state is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret;
+    struct VibratorDevice *priv = GetVibratorDevicePriv();
+
+    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
+
+    (void)OsalMutexLock(&priv->mutex);
+    struct HdfSBuf *reply = HdfSbufObtainDefaultSize();
+    if (reply == NULL) {
+        HDF_LOGE("%s: get sbuf failed", __func__);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_FAILURE;
+    }
+
+    ret = SendVibratorMsg(VIBRATOR_IO_IS_VIBRATOR_RUNNING, NULL, reply);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Vibrator send cmd failed, ret[%{public}d]", __func__, ret);
+        HdfSbufRecycle(reply);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return ret;
+    }
+
+    int32_t stateNum = ERROR_STATE;
+    if (!HdfSbufReadInt32(reply, &stateNum)) {
+        HDF_LOGE("%{public}s: HdfSbufReadInt32 failed", __func__);
+        HdfSbufRecycle(reply);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_FAILURE;
+    }
+
+    *state = stateNum;
+    HdfSbufRecycle(reply);
+    (void)OsalMutexUnlock(&priv->mutex);
+
+    HDF_LOGI("%{public}s: *state %{public}d", __func__, *state);
+
+    return HDF_SUCCESS;
+}
+
 const struct VibratorInterface *NewVibratorInterfaceInstance(void)
 {
     static struct VibratorInterface vibratorDevInstance;
@@ -350,6 +396,7 @@ const struct VibratorInterface *NewVibratorInterfaceInstance(void)
     vibratorDevInstance.PlayHapticPattern = PlayHapticPattern;
     vibratorDevInstance.GetHapticCapacity = GetHapticCapacity;
     vibratorDevInstance.GetHapticStartUpTime = GetHapticStartUpTime;
+    vibratorDevInstance.IsVibratorRunning = IsVibratorRunning;
 
     priv->ioService = HdfIoServiceBind(VIBRATOR_SERVICE_NAME);
     if (priv->ioService == NULL) {

@@ -120,7 +120,7 @@ constexpr uint32_t BULK_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means
 constexpr uint32_t BULK_OUT_TIMEOUT_JIFFIES = 0; /* sync timeout, set to 0 means wait forever */
 constexpr uint32_t INTR_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means wait forever */
 constexpr uint64_t MTP_MAX_FILE_SIZE = 0xFFFFFFFFULL;
-constexpr uint32_t WRITE_FILE_TEMP_SLICE = 100 * 1024; /* 100KB */
+constexpr uint32_t WRITE_FILE_TEMP_SLICE = 16 * 100 * 1024; /* 16*100KB */
 static constexpr int32_t WAIT_UDC_MAX_LOOP = 3;
 static constexpr uint32_t WAIT_UDC_TIME = 100000;
 static constexpr uint32_t REQ_ACTUAL_DEFAULT_LENGTH = 0;
@@ -129,6 +129,7 @@ static constexpr uint32_t REQ_ACTUAL_MININUM_LENGTH = 5;
 static constexpr int32_t  HDF_ERROR_ECANCEL = -20;
 static constexpr int32_t  WRITE_SPLIT_MININUM_LENGTH = 81920;
 static constexpr int32_t  MTP_PROTOCOL_PACKET_SIZE = 4;
+static constexpr int32_t  MTP_BUFFER_SIZE = 16384;
 enum UsbMtpNeedZeroLengthPacket {
     ZLP_NO_NEED = 0, /* no need send ZLP */
     ZLP_NEED,        /* need send ZLP */
@@ -163,6 +164,11 @@ void UsbfnMtpImpl::UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *r
         CopyReqToStandbyReqPool(req, mtpPort->standbyReq);
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGD("%{public}s, mtpState: %{public}d.", __func__, mtpPort->mtpDev->mtpState);
+        return;
+    }
+    if (!mtpDev_->initFlag) {
+        pthread_rwlock_unlock(&mtpRunrwLock_);
+        HDF_LOGE("%{public}s: dev is release", __func__);
         return;
     }
     int32_t ret = UsbMtpPortRxPush(mtpPort, req);
@@ -217,7 +223,7 @@ void UsbfnMtpImpl::UsbFnRequestWriteComplete(uint8_t pipe, struct UsbFnRequest *
         return;
     }
     UsbMtpPortReleaseTxReq(mtpPort, req);
-    if (mtpPort->mtpDev->mtpState == MTP_STATE_CANCELED) {
+    if (mtpPort->mtpDev->mtpState == MTP_STATE_CANCELED || !mtpDev_->initFlag) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGD("%{public}s, mtpState: %{public}d.", __func__, mtpPort->mtpDev->mtpState);
         return;
@@ -350,7 +356,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartTxAsync(struct UsbMtpPort *mtpPort, bool ca
 
     struct UsbMtpDevice *mtpDev = mtpPort->mtpDev;
     struct DListHead *pool = &mtpPort->writePool;
-    uint64_t reqMax = static_cast<uint64_t>(mtpDev->dataInPipe.maxPacketSize);
+    uint64_t reqMax = static_cast<uint64_t>(MTP_BUFFER_SIZE);
     while (!DListIsEmpty(pool)) {
         if (mtpDev->needZLP == ZLP_NO_NEED) {
             if (mtpDev->asyncSendFileExpect >= mtpDev->xferFileLength) {
@@ -363,7 +369,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartTxAsync(struct UsbMtpPort *mtpPort, bool ca
         }
         struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
         if (mtpDev->asyncSendFileExpect + reqMax < mtpDev->xferFileLength) {
-            req->length = static_cast<uint32_t>(mtpDev->dataInPipe.maxPacketSize);
+            req->length = static_cast<uint32_t>(MTP_BUFFER_SIZE);
         } else {
             req->length = static_cast<uint32_t>(mtpDev->xferFileLength - mtpDev->asyncSendFileExpect);
         }
@@ -434,7 +440,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortAllocReadWriteRequests(int32_t readSize, int32_t
     struct UsbFnRequest *req = nullptr;
     int32_t i = 0;
     for (i = 0; i < readSize; ++i) {
-        req = UsbFnAllocRequest(mtpDev_->dataIface.handle, mtpDev_->dataOutPipe.id, mtpDev_->dataOutPipe.maxPacketSize);
+        req = UsbFnAllocRequest(mtpDev_->dataIface.handle, mtpDev_->dataOutPipe.id, MTP_BUFFER_SIZE);
         if (req == nullptr) {
             if (DListIsEmpty(&mtpPort_->readPool)) {
                 HDF_LOGE("%{public}s: alloc read req failed", __func__);
@@ -448,14 +454,14 @@ int32_t UsbfnMtpImpl::UsbMtpPortAllocReadWriteRequests(int32_t readSize, int32_t
         mtpPort_->readAllocated++;
     }
     mtpPort_->standbyReq = UsbFnAllocRequest(mtpDev_->dataIface.handle,
-        mtpDev_->dataOutPipe.id, mtpDev_->dataOutPipe.maxPacketSize);
+        mtpDev_->dataOutPipe.id, MTP_BUFFER_SIZE);
     if (mtpPort_->standbyReq == nullptr) {
         HDF_LOGE("%{public}s: alloc standbyReq failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     mtpPort_->standbyReq->actual = REQ_ACTUAL_DEFAULT_LENGTH;
     for (i = 0; i < writeSize; ++i) {
-        req = UsbFnAllocRequest(mtpDev_->dataIface.handle, mtpDev_->dataInPipe.id, mtpDev_->dataInPipe.maxPacketSize);
+        req = UsbFnAllocRequest(mtpDev_->dataIface.handle, mtpDev_->dataInPipe.id, MTP_BUFFER_SIZE);
         if (req == nullptr) {
             HDF_LOGE("%{public}s: alloc write req failed", __func__);
             return HDF_ERR_MALLOC_FAIL;
@@ -1099,6 +1105,7 @@ int32_t UsbfnMtpImpl::InitMtpPort()
 
 int32_t UsbfnMtpImpl::Release()
 {
+    HDF_LOGI("%{public}s: Release", __func__);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
@@ -1106,9 +1113,9 @@ int32_t UsbfnMtpImpl::Release()
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     mtpDev_->initFlag = false;
+    sem_post(&asyncReq_);
     (void)UsbMtpPortCancelRequest(mtpPort_);
     pthread_rwlock_unlock(&mtpRunrwLock_);
-    HDF_LOGI("%{public}s: Release", __func__);
     pthread_rwlock_wrlock(&mtpRunrwLock_);
 
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
@@ -1243,7 +1250,7 @@ int32_t UsbfnMtpImpl::ReadImpl(std::vector<uint8_t> &data)
         }
         DListRemove(&req->list);
         DListInsertTail(&req->list, &mtpPort_->readQueue);
-        req->length = static_cast<uint32_t>(mtpDev_->dataOutPipe.maxPacketSize);
+        req->length = static_cast<uint32_t>(MTP_BUFFER_SIZE);
         ret = UsbFnSubmitRequestSync(req, BULK_OUT_TIMEOUT_JIFFIES);
         DListRemove(&req->list);
         DListInsertTail(&req->list, pool);
@@ -1282,7 +1289,7 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
     int32_t ret = HDF_SUCCESS;
     while (needXferCount > 0 || needZLP == ZLP_NEED) {
         req->actual = 0;
-        uint32_t reqMax = static_cast<uint32_t>(mtpDev_->dataInPipe.maxPacketSize);
+        uint32_t reqMax = static_cast<uint32_t>(MTP_BUFFER_SIZE);
         req->length = reqMax > needXferCount ? needXferCount : reqMax;
         if (needXferCount == 0) {
             needZLP = ZLP_TRY;
@@ -1320,7 +1327,7 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
     return ret;
 }
 
-int32_t UsbfnMtpImpl::getActualLength(const std::vector<uint8_t> &data)
+uint32_t UsbfnMtpImpl::getActualLength(const std::vector<uint8_t> &data)
 {
     if (data.size() < MTP_PROTOCOL_PACKET_SIZE) {
         return data.size();
@@ -1334,7 +1341,7 @@ int32_t UsbfnMtpImpl::getActualLength(const std::vector<uint8_t> &data)
 int32_t UsbfnMtpImpl::WriteSplitPacket(const std::vector<uint8_t> &data)
 {
     if (data.size() > WRITE_SPLIT_MININUM_LENGTH && writeActualLen_ == 0) {
-        size_t writeLen = getActualLength(data);
+        uint32_t writeLen = getActualLength(data);
         if (writeLen > data.size()) {
             vectorSplited_.resize(writeLen);
             std::copy(data.begin(), data.end(), vectorSplited_.begin());
@@ -1545,11 +1552,11 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartSubmitRxReq(struct UsbMtpPort *mtpPort, boo
     struct DListHead *pool = &mtpPort->readPool;
     struct UsbMtpDevice *mtpDev = mtpPort->mtpDev;
     struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
-    uint64_t reqMax = static_cast<uint64_t>(mtpDev->dataOutPipe.maxPacketSize);
+    uint64_t reqMax = static_cast<uint64_t>(MTP_BUFFER_SIZE);
     if (mtpDev->asyncRecvFileExpect + reqMax < mtpDev->xferFileLength) {
-        req->length = static_cast<uint32_t>(mtpDev->dataOutPipe.maxPacketSize);
+        req->length = static_cast<uint32_t>(MTP_BUFFER_SIZE);
     } else if (mtpDev->xferFileLength == MTP_MAX_FILE_SIZE) {
-        req->length = static_cast<uint32_t>(mtpDev->dataOutPipe.maxPacketSize);
+        req->length = static_cast<uint32_t>(MTP_BUFFER_SIZE);
     } else {
         req->length = static_cast<uint32_t>(mtpDev->xferFileLength - mtpDev->asyncRecvFileExpect);
     }
@@ -1696,7 +1703,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, u
 {
     uint64_t hdrSize = static_cast<uint64_t>((mtpDev_->xferSendHeader == 1) ? sizeof(struct UsbMtpDataHeader) : 0);
     uint64_t needXferCount = mtpDev_->xferFileLength + hdrSize;
-    uint64_t reqMax = static_cast<uint64_t>(mtpDev_->dataInPipe.maxPacketSize);
+    uint64_t reqMax = static_cast<uint64_t>(MTP_BUFFER_SIZE);
     req->length = (reqMax > needXferCount) ? static_cast<uint32_t>(needXferCount) : static_cast<uint32_t>(reqMax);
     if (hdrSize != 0) {
         /* write MTP header first */
@@ -1732,6 +1739,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     DListRemove(&req->list);
+    DListInsertTail(&req->list, &mtpPort_->writeQueue);
     uint64_t oneReqLeft = 0;
     int32_t ret = UsbMtpPortSendFileFillFirstReq(req, oneReqLeft);
     if (ret != HDF_SUCCESS) {
@@ -1740,6 +1748,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
         return ret;
     }
     ret = UsbFnSubmitRequestSync(req, BULK_IN_TIMEOUT_JIFFIES);
+    DListRemove(&req->list);
     DListInsertTail(&req->list, pool);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: bulk-in req failed: %{public}d", __func__, ret);
@@ -1757,7 +1766,11 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
             mtpDev_->mtpState = MTP_STATE_ERROR;
             return HDF_ERR_IO;
     }
-    if (oneReqLeft != mtpDev_->xferFileLength) {
+    if (!mtpDev_->initFlag) {
+        HDF_LOGE("%{public}s: dev is release", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
+    if (oneReqLeft != mtpDev_->xferFileLength || mtpDev_->needZLP) {
         ret = UsbMtpPortSendFileLeftAsync(oneReqLeft);
     }
     return ret;

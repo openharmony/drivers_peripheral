@@ -75,13 +75,13 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
     cameraBase_->StartStream(cameraBase_->intents);
 
     // updateSettings
-    constexpr uint32_t ITEM_CAPACITY = 100;
-    constexpr uint32_t DATA_CAPACITY = 2000;
-    constexpr uint32_t DATA_COUNT = 1;
+    constexpr uint32_t itemCapacity = 100;
+    constexpr uint32_t dataCapacity = 2000;
+    constexpr uint32_t dataCount = 1;
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
-        ITEM_CAPACITY, DATA_CAPACITY);
+        itemCapacity, dataCapacity);
     uint8_t videoStabiliMode = videoStabilizationAvailableModes_[0];
-    meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, DATA_COUNT);
+    meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, dataCount);
     const int32_t deviceStreamId = cameraBase_->STREAM_ID_VIDEO;
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
@@ -132,13 +132,13 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_002, TestSize.Level1)
     cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
 
     // updateSettings
-    constexpr uint32_t ITEM_CAPACITY = 100;
-    constexpr uint32_t DATA_CAPACITY = 2000;
-    constexpr uint32_t DATA_COUNT = 1;
+    constexpr uint32_t itemCapacity = 100;
+    constexpr uint32_t dataCapacity = 2000;
+    constexpr uint32_t dataCount = 1;
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
-        ITEM_CAPACITY, DATA_CAPACITY);
+        itemCapacity, dataCapacity);
     uint8_t videoStabiliMode = videoStabilizationAvailableModes_[0];
-    meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, DATA_COUNT);
+    meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, dataCount);
     const int32_t deviceStreamId = cameraBase_->STREAM_ID_VIDEO;
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
