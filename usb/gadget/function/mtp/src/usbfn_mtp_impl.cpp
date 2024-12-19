@@ -1106,7 +1106,7 @@ int32_t UsbfnMtpImpl::InitMtpPort()
 int32_t UsbfnMtpImpl::Release()
 {
     HDF_LOGI("%{public}s: Release", __func__);
-    pthread_rwlock_wrlock(&mtpRunrwLock_);
+    pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: no init", __func__);
@@ -1197,7 +1197,7 @@ uint32_t UsbfnMtpImpl::BufCopyFromVector(
 
 int32_t UsbfnMtpImpl::Read(std::vector<uint8_t> &data)
 {
-    pthread_rwlock_wrlock(&mtpRunrwLock_);
+    pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: no init", __func__);
@@ -1391,7 +1391,7 @@ int32_t UsbfnMtpImpl::WriteSplitPacket(const std::vector<uint8_t> &data)
 
 int32_t UsbfnMtpImpl::Write(const std::vector<uint8_t> &data)
 {
-    pthread_rwlock_wrlock(&mtpRunrwLock_);
+    pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: no init", __func__);
