@@ -38,7 +38,8 @@
                 "c_utils",
                 "drivers_interface_usb",
                 "hisysevent",
-                "access_token"
+                "access_token",
+                "libusb"
             ],
             "third_party": []
         },
