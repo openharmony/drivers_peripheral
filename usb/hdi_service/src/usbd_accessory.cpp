@@ -39,11 +39,22 @@ const std::string base64_chars =
              "abcdefghijklmnopqrstuvwxyz"
              "0123456789+/";
 
-static const int BASE64_BITS_PER_CHAR = -6;
 static const uint32_t BASE64_VAL_SHIFT = 8;
-static const int BASE64_GROUP_SIZE = 4;
 static const int32_t MIN_LENGTH_REQUIRED = 10;
-static const uint8_t BASE64_CHAR_MASK3F  = 0x3F;
+const int INDEX_FIRST = 0;
+const int INDEX_SECOND = 1;
+const int INDEX_THIRD = 2;
+const int INDEX_FORTH = 3;
+const int INDEX_FIFTH = 4;
+const uint8_t PARAM_FC = 0xfc;
+const uint8_t PARAM_03 = 0x03;
+const uint8_t PARAM_F0 = 0xf0;
+const uint8_t PARAM_0F = 0x0f;
+const uint8_t PARAM_C0 = 0xc0;
+const uint8_t PARAM_3F = 0x3f;
+const uint32_t OFFSET2 = 2;
+const uint32_t OFFSET4 = 4;
+const uint32_t OFFSET6 = 6;
 
 UsbdAccessory &UsbdAccessory::GetInstance()
 {
@@ -53,8 +64,8 @@ UsbdAccessory &UsbdAccessory::GetInstance()
 
 void UsbdAccessory::init_base64_char_map()
 {
-    for (int32_t i = 0; i < base64_chars.size(); ++i) {
-        base64_char_map[base64_chars[i]] = i;
+    for (size_t i = 0; i < base64_chars.size(); ++i) {
+        base64_char_map[base64_chars[i]] = static_cast<int>(i);
     }
 }
 
@@ -64,25 +75,53 @@ std::string UsbdAccessory::base64_encode(char *buffer, int32_t len)
         HDF_LOGE("%{public}s: buffer is nullptr", __func__);
         return "";
     }
-    std::string encoded_string;
-    uint32_t val = 0;
-    int valb = BASE64_BITS_PER_CHAR;
-    for (int32_t i = 0; i < len; i++) {
-        val = (val << BASE64_VAL_SHIFT) + buffer[i];
-        valb += BASE64_VAL_SHIFT;
-        while (valb >= 0) {
-            encoded_string.push_back(base64_chars[(val >> valb) & BASE64_CHAR_MASK3F]);
-            valb += BASE64_BITS_PER_CHAR;
+
+    std::string ret;
+    uint32_t i = 0;
+    uint8_t charArray3[INDEX_FORTH];
+    uint8_t charArray4[INDEX_FIFTH];
+
+    while (len > 0) {
+        charArray3[i++] = *(buffer++);
+        if (i == sizeof(charArray3)) {
+            charArray4[INDEX_FIRST] = (charArray3[INDEX_FIRST] & PARAM_FC) >> OFFSET2;
+            charArray4[INDEX_SECOND] = ((charArray3[INDEX_FIRST] & PARAM_03) << OFFSET4) +
+                                       ((charArray3[INDEX_SECOND] & PARAM_F0) >> OFFSET4);
+            charArray4[INDEX_THIRD] = ((charArray3[INDEX_SECOND] & PARAM_0F) << OFFSET2) +
+                                      ((charArray3[INDEX_THIRD] & PARAM_C0) >> OFFSET6);
+            charArray4[INDEX_FORTH] = charArray3[INDEX_THIRD] & PARAM_3F;
+            for (i = 0; i < sizeof(charArray4); i++) {
+                ret += base64_chars[charArray4[i]];
+            }
+            i = 0;
+        }
+        len--;
+    }
+
+    if (i == 0) {
+        return ret;
+    }
+
+    if (i) {
+        uint32_t j = 0;
+        for (j = i; j < sizeof(charArray3); j++) {
+            charArray3[j] = '\0';
+        }
+        charArray4[INDEX_FIRST] = (charArray3[INDEX_FIRST] & PARAM_FC) >> OFFSET2;
+        charArray4[INDEX_SECOND] = ((charArray3[INDEX_FIRST] & PARAM_03) << OFFSET4) +
+                                   ((charArray3[INDEX_SECOND] & PARAM_F0) >> OFFSET4);
+        charArray4[INDEX_THIRD] = ((charArray3[INDEX_SECOND] & PARAM_0F) << OFFSET2) +
+                                  ((charArray3[INDEX_THIRD] & PARAM_C0) >> OFFSET6);
+        charArray4[INDEX_FORTH] = charArray3[INDEX_THIRD] & PARAM_3F;
+        for (j = 0; j < i + 1; j++) {
+            ret += base64_chars[charArray4[j]];
+        }
+        while (i < sizeof(charArray3)) {
+            ret += '=';
+            i++;
         }
     }
-    if (valb > BASE64_BITS_PER_CHAR) {
-        encoded_string.push_back(base64_chars[((val << BASE64_VAL_SHIFT) >> (valb + BASE64_VAL_SHIFT))
-            & BASE64_CHAR_MASK3F]);
-    }
-    while (encoded_string.size() % BASE64_GROUP_SIZE) {
-        encoded_string.push_back('=');
-    }
-    return encoded_string;
+    return ret;
 }
 
 int32_t UsbdAccessory::ExtraToString(char* buffer, int32_t len, std::string &extraData)
@@ -122,6 +161,7 @@ int32_t UsbdAccessory::GetAccessoryString(int32_t fd, int32_t cmd, std::string &
     }
     return HDF_SUCCESS;
 }
+
 int32_t UsbdAccessory::GetAccessoryInfo(std::vector<std::string> &accessoryInfo)
 {
     int32_t fd = open(ACCESSORY_DRIVER_NAME, O_RDWR);
@@ -142,6 +182,7 @@ int32_t UsbdAccessory::GetAccessoryInfo(std::vector<std::string> &accessoryInfo)
     close(fd);
     return HDF_SUCCESS;
 }
+
 int32_t UsbdAccessory::OpenAccessory(int32_t &fd)
 {
     if (accFd > 0) {

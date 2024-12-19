@@ -624,6 +624,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
     ret = WaitForSANotify(renderId, EVENT_OPEN_SPK);
     if (ret != DH_SUCCESS) {
         DHLOGE("Wait SA notify failed. ret: %{public}d", ret);
+        extSpkCallback->DestroyStream(renderId);
         return ret;
     }
     spkPinInUse_ = static_cast<uint32_t>(dhId);
@@ -1024,7 +1025,8 @@ int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const DAudioEvent &eve
         << VOLUME_EVENT_TYPE << "=" << ParseStringFromArgs(event.content, VOLUME_EVENT_TYPE.c_str()) << ";"
         << FORCE_TYPE << "=" << ParseStringFromArgs(event.content, FORCE_TYPE) << ";"
         << HINT_TYPE << "=" << ParseStringFromArgs(event.content, HINT_TYPE) << ";"
-        << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
+        << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";"
+        << AUDIOCATEGORY << "=" << ParseStringFromArgs(event.content, AUDIOCATEGORY) << ";";
     DHLOGI("get ss : %{public}s", ss.str().c_str());
     int8_t reserved = 0;
     int8_t cookie = 0;

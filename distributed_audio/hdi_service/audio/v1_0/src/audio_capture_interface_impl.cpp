@@ -102,8 +102,8 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     DHLOGD("Capture audio frame success.");
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastCaptureStartTime_)) {
-        DHLOGD("This time capture frame spend: %" PRId64" us, The interval of this time and the last time: %" PRId64
-            " us", endTime - startTime, startTime - lastCaptureStartTime_);
+        DHLOGD("This frame spend: %{public}" PRId64" us, interval of two frames: %{public}" PRId64" us",
+            endTime - startTime, startTime - lastCaptureStartTime_);
     }
     lastCaptureStartTime_ = startTime;
     return HDF_SUCCESS;
@@ -160,8 +160,8 @@ int32_t AudioCaptureInterfaceImpl::Stop()
         return HDF_FAILURE;
     }
     cJSON_Delete(jParam);
-    cJSON_free(jsonData);
     std::string content(jsonData);
+    cJSON_free(jsonData);
     DAudioEvent event = { HDF_AUDIO_EVENT_STOP, content };
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");

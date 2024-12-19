@@ -23,7 +23,7 @@
 #include "audio_capture_vdi.h"
 #include "audio_common_vdi.h"
 #include "audio_render_vdi.h"
-#include "audio_dfx_vdi.h"
+#include "audio_dfx_util.h"
 #include "v4_0/iaudio_callback.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -118,6 +118,7 @@ static int32_t AudioInitAllPortsVdi(struct IAudioAdapter *adapter)
     ret = vdiAdapter->InitAllPorts(vdiAdapter);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter InitAllPorts fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 EXIT:
@@ -207,6 +208,7 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
     *render = CreateRenderPre(vdiAdapter, desc, attrs, renderId, adapterName);
     if (*render == NULL) {
         AUDIO_FUNC_LOGE("CreateRenderPre failed");
+        ret = HDF_FAILURE;
         goto EXIT;
     }
     AUDIO_FUNC_LOGI("AudioCreateRenderVdi Success, renderId = [%{public}u]", *renderId);
@@ -256,6 +258,7 @@ static int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t ren
     ret = vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyRender fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
     AudioDestroyRenderByIdVdi(renderId);
@@ -356,6 +359,7 @@ static int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t ca
     ret = vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyCapture fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
     AudioDestroyCaptureByIdVdi(captureId);
@@ -437,6 +441,7 @@ static int32_t AudioSetPassthroughModeVdi(struct IAudioAdapter *adapter, const s
     OsalMemFree((void *)vdiPort.portName);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call SetPassthroughMode fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -476,6 +481,7 @@ static int32_t AudioGetPassthroughModeVdi(struct IAudioAdapter *adapter, const s
     OsalMemFree((void *)vdiPort.portName);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call GetPassthroughMode fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -506,6 +512,7 @@ static int32_t AudioGetDeviceStatusVdi(struct IAudioAdapter *adapter, struct Aud
     ret = vdiAdapter->GetDeviceStatus(vdiAdapter, &vdiStatus);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call GetDeviceStatus fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -552,6 +559,7 @@ static int32_t AudioUpdateAudioRouteVdi(struct IAudioAdapter *adapter,
     AudioCommonFreeVdiRouteVdi(&vdiRoute);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call UpdateAudioRoute fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -580,6 +588,7 @@ static int32_t AudioReleaseAudioRouteVdi(struct IAudioAdapter *adapter, int32_t 
     ret = vdiAdapter->ReleaseAudioRoute(vdiAdapter, routeHandle);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call ReleaseAudioRoute fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -608,6 +617,7 @@ static int32_t AudioSetMicMuteVdi(struct IAudioAdapter *adapter, bool mute)
     ret = vdiAdapter->SetMicMute(vdiAdapter, mute);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call SetMicMute fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -636,6 +646,7 @@ static int32_t AudioGetMicMuteVdi(struct IAudioAdapter *adapter, bool *mute)
     ret = vdiAdapter->GetMicMute(vdiAdapter, mute);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call GetMicMute fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -664,6 +675,7 @@ static int32_t AudioSetVoiceVolumeVdi(struct IAudioAdapter *adapter, float volum
     ret = vdiAdapter->SetVoiceVolume(vdiAdapter, volume);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call SetVoiceVolume fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -693,6 +705,7 @@ static int32_t AudioSetExtraParamsVdi(struct IAudioAdapter *adapter, enum AudioE
     ret = vdiAdapter->SetExtraParams(vdiAdapter, (enum AudioExtParamKeyVdi)key, condition, value);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call SetExtraParams fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -723,6 +736,7 @@ static int32_t AudioGetExtraParamsVdi(struct IAudioAdapter *adapter, enum AudioE
         (int32_t)valueLen);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call GetExtraParams fail, ret=%{public}d", ret);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
@@ -757,6 +771,7 @@ static void AudioInitAdapterInstanceVdi(struct IAudioAdapter *adapter)
 uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex)
 {
     pthread_rwlock_rdlock(&g_rwAdapterLock);
+    uint32_t refCnt = 0;
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("get adapter ref error, descIndex=%{public}d", descIndex);
         pthread_rwlock_unlock(&g_rwAdapterLock);
@@ -764,8 +779,12 @@ uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex)
     }
 
     struct AudioAdapterPrivVdi *priv = AudioAdapterGetPrivVdi();
+    refCnt = priv->adapterInfo[descIndex].refCnt;
+    if (refCnt > AUDIO_VDI_ADAPTER_REF_CNT_MAX) {
+        priv->adapterInfo[descIndex].refCnt = 1;
+    }
     pthread_rwlock_unlock(&g_rwAdapterLock);
-    return priv->adapterInfo[descIndex].refCnt;
+    return refCnt;
 }
 
 int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **adapter)
@@ -794,7 +813,6 @@ int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **ad
     *adapter = priv->adapterInfo[descIndex].adapter;
     AUDIO_FUNC_LOGI("increase adapternameIndex[%{public}d], refCount[%{public}d]", descIndex,
         priv->adapterInfo[descIndex].refCnt);
-
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;
@@ -805,6 +823,7 @@ void AudioDecreaseAdapterRefVdi(uint32_t descIndex)
     pthread_rwlock_wrlock(&g_rwAdapterLock);
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("decrease adapter ref error, descIndex=%{public}d", descIndex);
+        pthread_rwlock_unlock(&g_rwAdapterLock);
         return;
     }
 
@@ -826,6 +845,7 @@ void AudioEnforceClearAdapterRefCntVdi(uint32_t descIndex)
     pthread_rwlock_wrlock(&g_rwAdapterLock);
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("decrease adapter descIndex error, descIndex=%{public}d", descIndex);
+        pthread_rwlock_unlock(&g_rwAdapterLock);
         return;
     }
 
@@ -877,7 +897,7 @@ struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAda
         return NULL;
     }
 
-    AUDIO_FUNC_LOGD(" audio vdiAdapter create adapter success, refcount[1]");
+    AUDIO_FUNC_LOGI(" audio vdiAdapter create adapter success, refcount[1], adapterName=[%{public}s]", adapterName);
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return adapter;
 }

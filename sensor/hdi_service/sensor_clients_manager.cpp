@@ -38,6 +38,8 @@ namespace {
     constexpr int64_t ERROR_INTERVAL = 0;
     constexpr int64_t STOP_INTERVAL = 0;
     constexpr int32_t INIT_CUR_COUNT = 0;
+    constexpr int32_t ZERO_PRINT_TIME = 0;
+    constexpr int32_t MAX_PRINT_TIME = 30;
     constexpr int64_t INIT_REPORT_COUNT = 1;
 }
 
@@ -503,6 +505,25 @@ std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUs
 {
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     return sensorUsed_;
+}
+
+void SensorClientsManager::ReSetSensorPrintTime(int32_t sensorId)
+{
+    SENSOR_TRACE;
+    std::unique_lock<std::mutex> lock(sensorPrintTimesMutex_);
+    sensorPrintTimes_[sensorId] = ZERO_PRINT_TIME;
+}
+
+bool SensorClientsManager::IsSensorNeedPrint(int32_t sensorId)
+{
+    SENSOR_TRACE;
+    std::unique_lock<std::mutex> lock(sensorPrintTimesMutex_);
+    auto it = sensorPrintTimes_.find(sensorId);
+    if (it == sensorPrintTimes_.end() || it->second > MAX_PRINT_TIME) {
+        return false;
+    }
+    it->second++;
+    return true;
 }
 
 SensorClientsManager* SensorClientsManager::GetInstance()

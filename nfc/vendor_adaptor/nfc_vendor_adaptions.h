@@ -19,6 +19,7 @@
 #include <string>
 #include "infc_vendor.h"
 
+typedef uint16_t NFCSTATUS;
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
@@ -28,6 +29,7 @@ const std::string VENDOR_NFC_EXT_SERVICE_LIB = "libvendor_ext_nfc_service.z.so";
 const std::string EXT_GET_CHIP_TYPE_FUNC_NAME = "GetChipType";
 const std::string EXT_GET_SUFFIX_FUNC_NAME = "GetNfcHalFuncNameSuffix";
 const std::string EXT_SET_FW_UPDATE_CONFIG_FUNC_NAME = "CheckFirmwareUpdate";
+const std::string EXT_GET_NFC_STATUS_FUNC_NAME = "GetNfcStatus";
 
 const std::string HAL_OPEN_FUNC_NAME = "phNxpNciHal_open";
 const std::string HAL_WRITE_FUNC_NAME = "phNxpNciHal_write";
@@ -40,6 +42,8 @@ const std::string HAL_IOCTL_FUNC_NAME = "phNxpNciHal_ioctl";
 const std::string HAL_GET_CONFIG_FUNC_NAME = "phNxpNciHal_getVendorConfig_1_2";
 const std::string HAL_FACTORY_RESET_FUNC_NAME = "phNxpNciHal_do_factory_reset";
 const std::string HAL_SHUTDOWN_CASE_FUNC_NAME = "phNxpNciHal_configDiscShutdown";
+const std::string HAL_MIN_OPEN_FUNC_NAME = "phNxpNciHal_MinOpen";
+const std::string HAL_MIN_CLOSE_FUNC_NAME = "phNxpNciHal_MinClose";
 const std::string DEFAULT_FUNC_NAME_SUFFIX = "";
 
 const std::string NFC_HAL_SO_PREFIX = "libnfc_hal_impl_";
@@ -57,7 +61,8 @@ const unsigned int VENDOR_IOCTL_OUTPUT_DATA_START_INDEX = 288;
 const unsigned int VENDOR_IOCTL_OUTPUT_DATA_LEN = 4128;
 const unsigned int VENDOR_IOCTL_TOTAL_LENGTH = VENDOR_IOCTL_INPUT_DATA_LEN + VENDOR_IOCTL_OUTPUT_DATA_LEN;
 const long VENDOR_GET_HISTORY_NCI_CMD = 112;
-
+const int NFC_STATUS_OPEN = 0;
+const int NFC_STATUS_CLOSE = 1;
 struct NfcHalInterface {
     int (*nfcHalOpen)(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback);
     int (*nfcHalWrite)(uint16_t dataLen, const uint8_t *pData);
@@ -70,12 +75,15 @@ struct NfcHalInterface {
     void (*nfcHalGetConfig)(V1_1::NfcVendorConfig &config);
     void (*nfcHalFactoryReset)(void);
     int (*nfcHalShutdownCase)(void);
+    NFCSTATUS (*nfcHalMinOpen)(bool isHalPreOpen);
+    NFCSTATUS (*nfcHalMinClose)(void);
 };
 
 struct NfcExtInterface {
     const char* (*getNfcChipType)(void);
     const char* (*getNfcHalFuncNameSuffix)(const char* chipType);
     void (*checkFirmwareUpdate)(void);
+    int (*getNfcStatus)(void);
 };
 
 class NfcVendorAdaptions : public INfcVendor {
@@ -95,18 +103,22 @@ public:
     int VendorGetConfig(V1_1::NfcVendorConfig &config) override;
     int VendorFactoryReset(void) override;
     int VendorShutdownCase(void) override;
+    static void *DoHalPreOpen(void *arg);
+    void HalPreOpen(void);
 
 private:
     std::string GetChipType(void);
     std::string GetNfcHalFuncNameSuffix(const std::string &chipType);
     void ResetNfcInterface(void);
+    int8_t PreInitNfcHalInterfaces(std::string nfcHalSoName, std::string suffix);
     int8_t InitNfcHalInterfaces(std::string nfcHalSoName, std::string suffix);
     void CheckFirmwareUpdate(void);
+    int GetNfcStatus(void);
     int VendorGetHistoryNci(void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal);
 
     void *nfcHalHandle; // handle of nfc hal so
     NfcHalInterface nfcHalInf;
-
+    bool isNfcPreDone = false;
     void *nfcExtHandle; // handle of nfc ext service
     NfcExtInterface nfcExtInf;
 };

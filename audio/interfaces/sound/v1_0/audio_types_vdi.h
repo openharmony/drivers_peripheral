@@ -295,6 +295,7 @@ enum AudioInputTypeVdi {
     AUDIO_VDI_INPUT_CAMCORDER_TYPE           = 1 << 7,
     AUDIO_VDI_INPUT_EC_TYPE                  = 1 << 8,
     AUDIO_VDI_INPUT_NOISE_REDUCTION_TYPE     = 1 << 9,
+    AUDIO_VDI_INPUT_RAW_TYPE                 = 1 << 10,
 };
 
 struct AudioOffloadInfoVdi {

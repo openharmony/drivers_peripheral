@@ -249,8 +249,8 @@ void UtestUSBCameraTestMult::StartCapture(int streamId, int captureId, bool shut
 
 void UtestUSBCameraTestMult::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
-    constexpr uint32_t TIME_FOR_WAIT_CANCEL_CAPTURE = 2;
-    sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
+    constexpr uint32_t timeForWaitCancelCapture = 2;
+    sleep(timeForWaitCancelCapture);
     if (captureIds.size() > 0) {
         for (auto &captureId : captureIds) {
             if (captureId == CAPTURE_ID_PREVIEW_DOUBLE) {
@@ -266,7 +266,7 @@ void UtestUSBCameraTestMult::StopStream(std::vector<int>& captureIds, std::vecto
         for (const auto &captureId : captureIds) {
             std::cout << "check Capture: CancelCapture success, captureId = " << captureId << std::endl;
             cameraBase_->rc = (CamRetCode)streamOperator_->CancelCapture(captureId);
-            sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
+            sleep(timeForWaitCancelCapture);
             EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
             if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
                 std::cout << "check Capture: CancelCapture success, captureId = " << captureId << std::endl;

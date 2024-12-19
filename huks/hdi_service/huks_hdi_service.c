@@ -15,8 +15,8 @@
 
 #include <securec.h>
 
-#include "v1_0/ihuks.h"
-#include "v1_0/ihuks_types.h"
+#include "v1_1/ihuks.h"
+#include "v1_1/ihuks_types.h"
 
 #include "huks_hdi_passthrough_adapter.h"
 #include "huks_hdi_template.h"
@@ -221,6 +221,22 @@ static int32_t HuksExportChipsetPlatformPublicKey(struct IHuks *self, const stru
     return HUKS_ERROR_API_NOT_SUPPORTED;
 }
 
+static int32_t HuksGetErrorInfo(struct IHuks *self, struct HuksBlob *errorInfo)
+{
+    (void)self;
+    int32_t ret = HUKS_FAILURE;
+    HDI_CONVERTER_FUNC_GETERRORINFO(errorInfo, ret, HuksHdiAdapterGetErrorInfo)
+    return ret;
+}
+
+static int32_t HuksGetStatInfo(struct IHuks *self, struct HuksBlob *statInfo)
+{
+    (void)self;
+    int32_t ret = HUKS_FAILURE;
+    HDI_CONVERTER_FUNC_GETSTATINFO(statInfo, ret, HuksHdiAdapterGetStatInfo)
+    return ret;
+}
+
 static int32_t HuksGetVersion(struct IHuks *self, uint32_t *majorVer, uint32_t *minorVer)
 {
     *majorVer = IHUKS_MAJOR_VERSION;
@@ -256,6 +272,8 @@ struct IHuks *HuksImplGetInstance(void)
     service->interface.DeriveKey = HuksDeriveKey;
     service->interface.Mac = HuksMac;
     service->interface.ExportChipsetPlatformPublicKey = HuksExportChipsetPlatformPublicKey;
+    service->interface.GetErrorInfo = HuksGetErrorInfo;
+    service->interface.GetStatInfo = HuksGetStatInfo;
     service->interface.UpgradeKey = HuksUpgradeKey;
     service->interface.GetVersion = HuksGetVersion;
     return &service->interface;

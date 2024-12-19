@@ -20,7 +20,8 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
-#include "audio_dfx_vdi.h"
+#include "audio_common_vdi.h"
+#include "audio_dfx_util.h"
 #include "v4_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -360,54 +361,6 @@ static struct IAudioAdapter* VendorLoadAdapter(struct IAudioManagerVdi *vdiManag
     return adapter;
 }
 
-int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc,
-    struct IAudioAdapter **adapter)
-{
-    CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
-
-    pthread_mutex_lock(&g_managerMutex);
-    struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)manager;
-    if (priv == NULL || priv->vdiManager == NULL || priv->vdiManager->LoadAdapter == NULL) {
-        pthread_mutex_unlock(&g_managerMutex);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    uint32_t descIndex = AudioManagerVendorFindAdapterPos(manager, desc->adapterName);
-    if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio vdiManager find adapter pos");
-        pthread_mutex_unlock(&g_managerMutex);
-        return HDF_FAILURE;
-    }
-
-    int32_t ret = HDF_SUCCESS;
-    uint32_t count = AudioGetAdapterRefCntVdi(descIndex);
-    if (count > 0 && count != UINT_MAX) {
-        ret = AudioIncreaseAdapterRefVdi(descIndex, adapter);
-        pthread_mutex_unlock(&g_managerMutex);
-        return ret;
-    }
-
-    struct AudioAdapterDescriptorVdi vdiDesc = {0};
-    ret = AudioManagerDescToVdiDesc(desc, &vdiDesc);
-    if (ret != HDF_SUCCESS) {
-        AudioManagerReleaseVdiDesc(&vdiDesc);
-        AUDIO_FUNC_LOGE("audio vdiManager desc To vdiDesc fail, ret=%{public}d", ret);
-        pthread_mutex_unlock(&g_managerMutex);
-        return HDF_FAILURE;
-    }
-
-    *adapter = VendorLoadAdapter(priv->vdiManager, &vdiDesc, descIndex);
-    if (*adapter == NULL) {
-        pthread_mutex_unlock(&g_managerMutex);
-        return HDF_FAILURE;
-    }
-    pthread_mutex_unlock(&g_managerMutex);
-    AUDIO_FUNC_LOGD("audio vdiManager load vdiAdapter success");
-    return HDF_SUCCESS;
-}
-
 static int32_t AudioManagerVendorUnloadAdapterLocked(struct IAudioManager *manager, const char *adapterName)
 {
     CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
@@ -440,7 +393,58 @@ static int32_t AudioManagerVendorUnloadAdapterLocked(struct IAudioManager *manag
     priv->vdiManager->UnloadAdapter(priv->vdiManager, vdiAdapter);
     HdfAudioFinishTrace();
 
-    AUDIO_FUNC_LOGD("audio vdiManager unload vdiAdapter success");
+    AUDIO_FUNC_LOGI("audio vdiManager unload vdiAdapter success, adapterName=[%{public}s]", adapterName);
+    return HDF_SUCCESS;
+}
+
+int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc,
+    struct IAudioAdapter **adapter)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
+
+    pthread_mutex_lock(&g_managerMutex);
+    struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)manager;
+    if (priv == NULL || priv->vdiManager == NULL || priv->vdiManager->LoadAdapter == NULL) {
+        pthread_mutex_unlock(&g_managerMutex);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    uint32_t descIndex = AudioManagerVendorFindAdapterPos(manager, desc->adapterName);
+    if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
+        AUDIO_FUNC_LOGE("audio vdiManager find adapter pos");
+        pthread_mutex_unlock(&g_managerMutex);
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = HDF_SUCCESS;
+    uint32_t count = AudioGetAdapterRefCntVdi(descIndex);
+    if (count > AUDIO_VDI_ADAPTER_REF_CNT_MAX) {
+        AUDIO_FUNC_LOGE("[%{public}s] adapter ref count over 20", desc->adapterName);
+        AudioManagerVendorUnloadAdapterLocked(manager, desc->adapterName);
+    } else if (count > 0 && count != UINT_MAX) {
+        ret = AudioIncreaseAdapterRefVdi(descIndex, adapter);
+        pthread_mutex_unlock(&g_managerMutex);
+        return ret;
+    }
+
+    struct AudioAdapterDescriptorVdi vdiDesc = {0};
+    ret = AudioManagerDescToVdiDesc(desc, &vdiDesc);
+    if (ret != HDF_SUCCESS) {
+        AudioManagerReleaseVdiDesc(&vdiDesc);
+        AUDIO_FUNC_LOGE("audio vdiManager desc To vdiDesc fail, ret=%{public}d", ret);
+        pthread_mutex_unlock(&g_managerMutex);
+        return HDF_FAILURE;
+    }
+
+    *adapter = VendorLoadAdapter(priv->vdiManager, &vdiDesc, descIndex);
+    if (*adapter == NULL) {
+        pthread_mutex_unlock(&g_managerMutex);
+        return HDF_FAILURE;
+    }
+    pthread_mutex_unlock(&g_managerMutex);
+    AUDIO_FUNC_LOGD("audio vdiManager load vdiAdapter success");
     return HDF_SUCCESS;
 }
 

@@ -201,7 +201,7 @@ bool ThermalDfx::Compress(const std::string& dataFile, const std::string& destFi
 void ThermalDfx::CompressFile()
 {
     ThermalHitrace trace("ThermalDfx_CompressFile");
-    THERMAL_HILOGI(COMP_HDI, "CompressFile start");
+    THERMAL_HILOGD(COMP_HDI, "CompressFile start");
     std::string unCompressFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) + "." + g_logTime;
 
     FILE* fp = fopen(unCompressFile.c_str(), "rb");
@@ -221,7 +221,7 @@ void ThermalDfx::CompressFile()
         if (fclose(fp) < 0) {
             THERMAL_HILOGW(COMP_HDI, "fclose() failed");
         }
-        THERMAL_HILOGI(COMP_HDI, "file is not enough for compress");
+        THERMAL_HILOGD(COMP_HDI, "file is not enough for compress");
         return;
     }
     if (fclose(fp) < 0) {
@@ -248,7 +248,7 @@ void ThermalDfx::CompressFile()
     g_saveLogFile.push_back(compressFile);
     g_currentLogIndex++;
     g_logTime = GetCurrentTime(TIME_FORMAT_1);
-    THERMAL_HILOGI(COMP_HDI, "CompressFile done");
+    THERMAL_HILOGD(COMP_HDI, "CompressFile done");
 }
 
 bool ThermalDfx::PrepareWriteDfxLog()
@@ -258,7 +258,7 @@ bool ThermalDfx::PrepareWriteDfxLog()
         return false;
     }
     if (!enable_) {
-        THERMAL_HILOGI(COMP_HDI, "param does not start recording");
+        THERMAL_HILOGD(COMP_HDI, "param does not start recording");
         return false;
     }
 
@@ -268,7 +268,7 @@ bool ThermalDfx::PrepareWriteDfxLog()
 void ThermalDfx::CreateLogFile()
 {
     ThermalHitrace trace("ThermalDfx_CreateLogFile");
-    THERMAL_HILOGI(COMP_HDI, "CreateLogFile start");
+    THERMAL_HILOGD(COMP_HDI, "CreateLogFile start");
     if (!PrepareWriteDfxLog()) {
         THERMAL_HILOGD(COMP_HDI, "prepare write dfx log failed");
         return;
@@ -298,7 +298,7 @@ void ThermalDfx::CreateLogFile()
     file.close();
 
     ProcessLogInfo(logFile, isEmpty);
-    THERMAL_HILOGI(COMP_HDI, "CreateLogFile done");
+    THERMAL_HILOGD(COMP_HDI, "CreateLogFile done");
 }
 
 void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)

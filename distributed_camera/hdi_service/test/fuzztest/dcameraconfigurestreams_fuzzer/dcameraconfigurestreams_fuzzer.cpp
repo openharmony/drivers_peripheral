@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dcamera_provider.h"
 #include "v1_1/dcamera_types.h"
@@ -33,6 +34,7 @@ const uint32_t DC_STREAM_SIZE = 2;
 const DCStreamType streamType[DC_STREAM_SIZE] = {
     DCStreamType::CONTINUOUS_FRAME, DCStreamType::SNAPSHOT_FRAME
 };
+const uint8_t MAX_STRING_LENGTH = 255;
 }
 void DcameraConfigureStreamsFuzzTest(const uint8_t* data, size_t size)
 {
@@ -40,19 +42,20 @@ void DcameraConfigureStreamsFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string deviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    std::string dhId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
     std::vector<DCStreamInfo> streamInfos;
     DCStreamInfo streamInfo;
-    streamInfo.streamId_ = *(reinterpret_cast<const int*>(data));
-    streamInfo.width_ = *(reinterpret_cast<const int*>(data));
-    streamInfo.height_ = *(reinterpret_cast<const int*>(data));
-    streamInfo.stride_ = *(reinterpret_cast<const int*>(data));
-    streamInfo.format_ = *(reinterpret_cast<const int*>(data));
-    streamInfo.dataspace_ = *(reinterpret_cast<const int*>(data));
+    streamInfo.streamId_ = fdp.ConsumeIntegral<int>();
+    streamInfo.width_ = fdp.ConsumeIntegral<int>();
+    streamInfo.height_ = fdp.ConsumeIntegral<int>();
+    streamInfo.stride_ = fdp.ConsumeIntegral<int>();
+    streamInfo.format_ = fdp.ConsumeIntegral<int>();
+    streamInfo.dataspace_ = fdp.ConsumeIntegral<int>();
     streamInfo.encodeType_ = encodeType[data[0] % DC_ENCODE_SIZE];
     streamInfo.type_ = streamType[data[0] % DC_STREAM_SIZE];
     streamInfos.push_back(streamInfo);

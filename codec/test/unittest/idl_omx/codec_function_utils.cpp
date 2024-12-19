@@ -312,6 +312,17 @@ bool FunctionUtil::PushAlongParam(OmxCodecBuffer &omxBuffer)
         omxBuffer.alongParam.push_back(*(ptr + i));
     }
 
+    constexpr uint32_t qpRangeMin = 12;
+    constexpr uint32_t qpRangeMax = 43;
+    CodecQPRangeParam param;
+    this->InitExtParam(param);
+    param.minQp = qpRangeMin;
+    param.maxQp = qpRangeMax;
+    size = sizeof(param);
+    ptr = reinterpret_cast<uint8_t*>(&param);
+    for (uint32_t i = 0; i < size; i++) {
+        omxBuffer.alongParam.push_back(*(ptr + i));
+    }
     return true;
 }
 

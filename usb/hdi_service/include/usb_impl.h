@@ -136,7 +136,7 @@ private:
     int32_t GetRequestMsgFromQueue(HostDevice *port, UsbdRequestASync **reqMsg);
     int32_t GetRequestMsgData(
         HostDevice *port, UsbdRequestASync *reqMsg, int32_t timeout, uint8_t **buffer, uint32_t *length);
-
+    int32_t ReleaseInterfaceByPort(HostDevice *port, uint8_t interfaceId);
     int32_t BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber);
 
     UsbdBulkASyncList *UsbdBulkASyncListInit(HostDevice *port, uint8_t ifId, uint8_t epId);

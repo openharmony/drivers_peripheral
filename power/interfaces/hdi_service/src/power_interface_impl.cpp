@@ -158,8 +158,8 @@ int32_t PowerInterfaceImpl::UnRegisterRunningLockCallback()
 
 int32_t PowerInterfaceImpl::StartSuspend()
 {
-    HDF_LOGI("start suspend");
     std::lock_guard<std::mutex> lock(g_mutex);
+    HDF_LOGI("start suspend");
     g_suspendRetry = true;
     if (g_suspending) {
         g_powerState = PowerHdfState::INACTIVE;
@@ -244,8 +244,6 @@ int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag)
 
 int32_t DoSuspend()
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
-
 #ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
     if (!g_suspendTag.empty()) {
         return DoSuspendWithTag();
@@ -456,6 +454,7 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
+    HDF_LOGI("Background runningLock active, type=%{public}d name=%{public}s", info.type, info.name.c_str());
     Power::PowerXCollie powerXcollie("Power_HoldRunningLockExt");
     return RunningLockImpl::HoldLock(info, g_powerState, lockid, bundleName);
 }
@@ -463,6 +462,7 @@ int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
 int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
+    HDF_LOGI("Background runningLock inactive, type=%{public}d name=%{public}s", info.type, info.name.c_str());
     Power::PowerXCollie powerXcollie("Power_UnholdRunningLockExt");
     return RunningLockImpl::UnholdLock(info, lockid, bundleName);
 }

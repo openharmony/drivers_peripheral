@@ -1364,6 +1364,7 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
             if (strcpy_s((char *)info->operSsid, WIFI_P2P_DEVICE_NAME_LENGTH + 1, retMsg.value) != EOK) {
                 HDF_LOGE("%{public}s strcpy failed", __func__);
             }
+            printf_decode((u8 *)info->operSsid, WIFI_P2P_DEVICE_NAME_LENGTH + 1, (char *)info->operSsid);
         }
         token = strtok_r(NULL, "\n", &savedPtr);
     }

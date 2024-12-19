@@ -67,6 +67,7 @@ ohos_shared_library("usb_camera_buffer_manager") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_camera:metadata",
+    "graphic_surface:buffer_handle",
     "graphic_surface:surface",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",

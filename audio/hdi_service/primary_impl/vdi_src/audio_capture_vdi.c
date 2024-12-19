@@ -21,7 +21,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_common_vdi.h"
-#include "audio_dfx_vdi.h"
+#include "audio_dfx_util.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 

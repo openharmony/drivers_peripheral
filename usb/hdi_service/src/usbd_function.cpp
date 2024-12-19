@@ -250,46 +250,6 @@ int32_t UsbdFunction::SetFunctionToManufactureHdc()
     return HDF_SUCCESS;
 }
  
-int32_t UsbdFunction::SetFunctionToMtp()
-{
-    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_MTP);
-    if (status != 0) {
-        HDF_LOGE("%{public}s:add MTP config error = %{public}d", __func__, status);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t UsbdFunction::SetFunctionToPtp()
-{
-    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_PTP);
-    if (status != 0) {
-        HDF_LOGE("%{public}s:add PTP config error = %{public}d", __func__, status);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t UsbdFunction::SetFunctionToMtpHdc()
-{
-    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_MTP_HDC);
-    if (status != 0) {
-        HDF_LOGE("%{public}s:add MTP&HDC config error = %{public}d", __func__, status);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t UsbdFunction::SetFunctionToPtpHdc()
-{
-    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_PTP_HDC);
-    if (status != 0) {
-        HDF_LOGE("%{public}s:add PTP&HDC config error = %{public}d", __func__, status);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
 int32_t UsbdFunction::SetFunctionToStorageHdc()
 {
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE_HDC);
@@ -590,20 +550,6 @@ int32_t UsbdFunction::UsbdInitDDKFunction(uint32_t funcs)
 
 int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
 {
-    switch (funcs) {
-        case USB_FUNCTION_MTP:
-            HDF_LOGI("%{public}s: set MTP", __func__);
-            return UsbdFunction::SetFunctionToMtp();
-        case USB_FUNCTION_PTP:
-            HDF_LOGI("%{public}s: set PTP", __func__);
-            return UsbdFunction::SetFunctionToPtp();
-        case USB_FUNCTION_MTP | USB_FUNCTION_HDC:
-            HDF_LOGI("%{public}s: set MTP&HDC", __func__);
-            return UsbdFunction::SetFunctionToMtpHdc();
-        case USB_FUNCTION_PTP | USB_FUNCTION_HDC:
-            HDF_LOGI("%{public}s: set PTP&HDC", __func__);
-            return UsbdFunction::SetFunctionToPtpHdc();
-    }
     switch (kfuns) {
         case USB_FUNCTION_HDC:
             HDF_LOGI("%{public}s: set hdc", __func__);
@@ -643,7 +589,7 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
     HDF_LOGI("%{public}s: UsbdSetFunction funcs=%{public}d", __func__, funcs);
     if ((funcs | USB_FUNCTION_SUPPORT) != USB_FUNCTION_SUPPORT) {
         HDF_LOGE("%{public}s: funcs invalid", __func__);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
 
     uint32_t kfuns = static_cast<uint32_t>(funcs) & (~USB_DDK_FUNCTION_SUPPORT);

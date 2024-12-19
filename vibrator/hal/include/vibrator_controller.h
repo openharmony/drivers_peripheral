@@ -43,6 +43,7 @@ enum VibratorIoCmd {
     VIBRATOR_IO_STOP                           = 2,
     VIBRATOR_IO_GET_INFO                       = 3,
     VIBRATOR_IO_ENABLE_MODULATION_PARAMETER    = 4,
+    VIBRATOR_IO_IS_VIBRATOR_RUNNING            = 5,
     VIBRATOR_IO_END,
 };
 
