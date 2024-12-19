@@ -365,9 +365,14 @@ void SourceNode::PortHandler::DistributeBuffers()
         }
 
         if (!dbtRun || respondBufferList.empty()) {
+            loopErrorCount_++;
+            if (loopErrorCount_ == LOOP_MAX_COUNT) {
+                CAMERA_LOGE("DistributeBuffers timeout 5s update dbtRun = false");
+                dbtRun = false;
+            }
             return;
         }
-
+        loopErrorCount_ = 0;
         buffer = respondBufferList.front();
         respondBufferList.pop_front();
     }
