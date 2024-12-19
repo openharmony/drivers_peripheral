@@ -1144,7 +1144,7 @@ int32_t UsbfnMtpImpl::Release()
 
 int32_t UsbfnMtpImpl::Start()
 {
-    pthread_rwlock_rdlock(&mtpRunrwLock_);
+    pthread_rwlock_wrlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: no init", __func__);
@@ -1160,7 +1160,7 @@ int32_t UsbfnMtpImpl::Start()
 
 int32_t UsbfnMtpImpl::Stop()
 {
-    pthread_rwlock_rdlock(&mtpRunrwLock_);
+    pthread_rwlock_wrlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: no init", __func__);
