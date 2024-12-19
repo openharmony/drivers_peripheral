@@ -37,6 +37,7 @@
 #include "usb_interface_pool.h"
 #include "usbd_dispatcher.h"
 #include "usbd_function.h"
+#include "usbd_accessory.h"
 #include "usbd_port.h"
 #include "usbd_wrapper.h"
 using namespace OHOS::HiviewDFX;
@@ -962,7 +963,6 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
     UsbdSubscriber *usbdSubscriber = static_cast<UsbdSubscriber *>(priv);
     const sptr<IUsbdSubscriber> subscriber = usbdSubscriber->subscriber;
 
-    int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_DRIVER_GADGET_ADD) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_GADGET_ADD");
         isGadgetConnected_ = true;
@@ -971,8 +971,7 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
             HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
             return HDF_FAILURE;
         }
-        ret = subscriber->DeviceEvent(info);
-        return ret;
+        return subscriber->DeviceEvent(info);
     } else if (id == USB_PNP_DRIVER_GADGET_REMOVE) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_GADGET_REMOVE");
         isGadgetConnected_ = false;
@@ -981,18 +980,33 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
             HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
             return HDF_FAILURE;
         }
-        ret = subscriber->DeviceEvent(info);
-        return ret;
+        UsbdAccessory::GetInstance().HandleEvent(ACT_DOWNDEVICE);
+        return subscriber->DeviceEvent(info);
     } else if (id == USB_PNP_DRIVER_PORT_HOST) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_HOST");
         return UsbdPort::GetInstance().UpdatePort(PORT_MODE_HOST, subscriber);
     } else if (id == USB_PNP_DRIVER_PORT_DEVICE) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_DEVICE");
         return UsbdPort::GetInstance().UpdatePort(PORT_MODE_DEVICE, subscriber);
+    } else if (id == USB_ACCESSORY_START) {
+        if (subscriber == nullptr) {
+            HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_ACCESSORY_START");
+        USBDeviceInfo info = {ACT_ACCESSORYUP, 0, 0};
+        return subscriber->DeviceEvent(info);
+    } else if (id == USB_ACCESSORY_SEND) {
+        if (subscriber == nullptr) {
+            HDF_LOGE("%{public}s: subsciber is nullptr, %{public}d", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_ACCESSORY_SEND");
+        USBDeviceInfo info = {ACT_ACCESSORYSEND, 0, 0};
+        return subscriber->DeviceEvent(info);
     }
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_NOTIFY_ADD_OR_REMOVE_DEVICE");
-    ret = UsbdPnpNotifyAddAndRemoveDevice(data, usbdSubscriber, id);
-    return ret;
+    return UsbdPnpNotifyAddAndRemoveDevice(data, usbdSubscriber, id);
 }
 
 int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
@@ -2222,6 +2236,20 @@ int32_t UsbImpl::GetDeviceSpeed(const UsbDev &dev, uint8_t &speed)
     return HDF_SUCCESS;
 }
 
+int32_t UsbImpl::GetAccessoryInfo(std::vector<std::string> &accessoryInfo)
+{
+    return UsbdAccessory::GetInstance().GetAccessoryInfo(accessoryInfo);
+}
+
+int32_t UsbImpl::OpenAccessory(int32_t &fd)
+{
+    return UsbdAccessory::GetInstance().OpenAccessory(fd);
+}
+
+int32_t UsbImpl::CloseAccessory(int32_t fd)
+{
+    return UsbdAccessory::GetInstance().CloseAccessory(fd);
+}
 
 } // namespace V1_1
 } // namespace Usb
