@@ -37,9 +37,9 @@
 #endif
 
 // Used to cache screenLock auth token plain.
-IAM_STATIC UnlockAuthResultCache g_unlockAuthResult = {false, 0, {}};
+IAM_STATIC UnlockAuthResultCache g_unlockAuthResult = {false, 0, 0, {}};
 // Used to cache any caller auth token plain.
-IAM_STATIC UnlockAuthResultCache g_anyAuthResult = {false, 0, {}};
+IAM_STATIC UnlockAuthResultCache g_anyAuthResult = {false, 0, 0, {}};
 
 ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
 {
@@ -76,19 +76,21 @@ ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
     return ret;
 }
 
-IAM_STATIC void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken)
+IAM_STATIC void CacheUnlockAuthResult(int32_t userId, uint64_t secureUid, const UserAuthTokenHal *unlockToken)
 {
     (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
     g_unlockAuthResult.isCached = true;
     g_unlockAuthResult.userId = userId;
+    g_unlockAuthResult.secureUid = secureUid;
     g_unlockAuthResult.authToken = *unlockToken;
 }
 
-IAM_STATIC void CacheAnyAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken)
+IAM_STATIC void CacheAnyAuthResult(int32_t userId, uint64_t secureUid, const UserAuthTokenHal *unlockToken)
 {
     (void)memset_s(&g_anyAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
     g_anyAuthResult.isCached = true;
     g_anyAuthResult.userId = userId;
+    g_anyAuthResult.secureUid = secureUid;
     g_anyAuthResult.authToken = *unlockToken;
 }
 
@@ -156,12 +158,18 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
         LOG_ERROR("GetExpiredInfoForResult failed");
         return ret;
     }
+    uint64_t secureUid;
+    ret = GetSecureUid(context->userId, &secureUid);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get secure uid failed");
+        return RESULT_GENERAL_ERROR;
+    }
     if (context->authIntent == UNLOCK) {
         LOG_INFO("cache unlock auth result");
-        CacheUnlockAuthResult(context->userId, authToken);
+        CacheUnlockAuthResult(context->userId, secureUid, authToken);
     }
     LOG_INFO("cache any auth result");
-    CacheAnyAuthResult(context->userId, authToken);
+    CacheAnyAuthResult(context->userId, secureUid, authToken);
     return RESULT_SUCCESS;
 }
 
@@ -381,7 +389,17 @@ IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, Reus
         info->reuseUnlockResultMode == CALLER_IRRELEVANT_AUTH_TYPE_IRRELEVANT) {
         authResultCache = g_anyAuthResult;
     }
-    uint32_t ret = CheckReuseUnlockTokenValid(info, authResultCache);
+    uint64_t secureUid;
+    ResultCode ret = GetSecureUid(info->userId, &secureUid);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get secure uid failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    if (secureUid != authResultCache.secureUid) {
+        LOG_ERROR("check secureUid failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    ret = CheckReuseUnlockTokenValid(info, authResultCache);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("check unlock token fail");
         return ret;
