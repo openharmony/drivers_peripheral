@@ -1416,6 +1416,7 @@ int32_t UsbImpl::GetConfig(const UsbDev &dev, uint8_t &configIndex)
 int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t force)
 {
 #ifndef LIBUSB_ENABLE
+    HDF_LOGI("%{public}s:%{public}d start", __func__, __LINE__);
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1451,6 +1452,7 @@ int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t 
             return HDF_FAILURE;
         }
     }
+    HDF_LOGI("%{public}s:%{public}d end", __func__, __LINE__);
     return HDF_SUCCESS;
 #else
     return LibusbAdapter::GetInstance()->ClaimInterface(dev, interfaceId, force);
@@ -1486,6 +1488,7 @@ int32_t UsbImpl::ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool di
 int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
 {
 #ifndef LIBUSB_ENABLE
+    HDF_LOGI("%{public}s:%{public}d start", __func__, __LINE__);
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1517,6 +1520,7 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         port->devHandle[interfaceId] = nullptr;
         UsbReleaseInterface(port->iface[interfaceId]);
         port->iface[interfaceId] = nullptr;
+        HDF_LOGI("%{public}s:%{public}d end", __func__, __LINE__);
         return HDF_SUCCESS;
     } else {
         HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
