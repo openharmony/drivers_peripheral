@@ -42,7 +42,7 @@ namespace {
     constexpr int32_t SENSOR_INTERVAL1 = 20;
     constexpr int32_t SENSOR_POLL_TIME = 3;
     constexpr uint32_t OPTION = 0;
-    constexpr uint32_t g_sensorId = 1;
+    constexpr uint32_t SENSOR_ID = 1;
 
 class SensorBenchmarkTest : public benchmark::Fixture {
 public:
@@ -102,7 +102,7 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, Register)->
 BENCHMARK_F(SensorBenchmarkTest, SetBatch)(benchmark::State &state)
 {
     for (auto _ : state) {
-        int32_t ret = g_sensorInterface->SetBatch(g_sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        int32_t ret = g_sensorInterface->SetBatch(SENSOR_ID, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
@@ -119,7 +119,7 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetBatch)->
 BENCHMARK_F(SensorBenchmarkTest, SetMode)(benchmark::State &state)
 {
     for (auto _ : state) {
-        int32_t ret = g_sensorInterface->SetMode(g_sensorId, SENSOR_MODE_ON_CHANGE);
+        int32_t ret = g_sensorInterface->SetMode(SENSOR_ID, SENSOR_MODE_ON_CHANGE);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
@@ -136,7 +136,7 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetMode)->
 BENCHMARK_F(SensorBenchmarkTest, SetOption)(benchmark::State &state)
 {
     for (auto _ : state) {
-        int32_t ret = g_sensorInterface->SetOption(g_sensorId, OPTION);
+        int32_t ret = g_sensorInterface->SetOption(SENSOR_ID, OPTION);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
@@ -170,9 +170,9 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, Unregister)->
 BENCHMARK_F(SensorBenchmarkTest, EnableAndDisable)(benchmark::State &state)
 {
     for (auto _ : state) {
-        int32_t ret = g_sensorInterface->Enable(g_sensorId);
+        int32_t ret = g_sensorInterface->Enable(SENSOR_ID);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
-        ret = g_sensorInterface->Disable(g_sensorId);
+        ret = g_sensorInterface->Disable(SENSOR_ID);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
