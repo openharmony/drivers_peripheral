@@ -46,7 +46,8 @@ namespace V1_0 {
 #define MAX_CONTROL_BUFF_SIZE 1024
 
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
-static std::mutex g_infMutex;
+static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
+
 extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
 {
     return new (std::nothrow) UsbDdkService();
@@ -54,11 +55,12 @@ extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
 
 int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
 {
-    std::lock_guard<std::mutex> lock(g_infMutex);
+    pthread_rwlock_wrlock(&g_rwLock);
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        pthread_rwlock_unlock(&g_rwLock);
         return ret;
     }
     UsbDdkDelHashRecord(interfaceHandle);
@@ -68,16 +70,20 @@ int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
     ret = GetInterfaceByHandle(handleConvert, &interface);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s get interface failed %{public}d", __func__, ret);
+        pthread_rwlock_unlock(&g_rwLock);
         return ret;
     }
 
     ret = UsbCloseInterface(handleConvert, false);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s close interface failed %{public}d", __func__, ret);
+        pthread_rwlock_unlock(&g_rwLock);
         return ret;
     }
 
-    return UsbReleaseInterface(interface);
+    ret = UsbReleaseInterface(interface);
+    pthread_rwlock_unlock(&g_rwLock);
+    return ret;
 }
 
 static int32_t UsbdPnpEventHandler(void *priv, uint32_t id, HdfSBuf *data)
@@ -403,11 +409,12 @@ int32_t UsbDdkService::SendPipeRequest(
         return HDF_ERR_NOPERM;
     }
 
-    std::lock_guard<std::mutex> lock(g_infMutex);
+    pthread_rwlock_rdlock(&g_rwLock);
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        pthread_rwlock_unlock(&g_rwLock);
         return ret;
     }
 
@@ -415,6 +422,7 @@ int32_t UsbDdkService::SendPipeRequest(
     struct UsbRequest *request = UsbAllocRequestByMmap(handleConvert, 0, size);
     if (request == nullptr) {
         HDF_LOGE("%{public}s alloc request failed", __func__);
+        pthread_rwlock_unlock(&g_rwLock);
         return HDF_DEV_ERR_NO_MEMORY;
     }
 
@@ -441,6 +449,7 @@ int32_t UsbDdkService::SendPipeRequest(
     transferedLength = request->compInfo.actualLength;
 FINISHED:
     (void)UsbFreeRequestByMmap(request);
+    pthread_rwlock_unlock(&g_rwLock);
     return ret;
 }
 
@@ -453,12 +462,13 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
         return HDF_ERR_NOPERM;
     }
 
-    std::lock_guard<std::mutex> lock(g_infMutex);
+    pthread_rwlock_rdlock(&g_rwLock);
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
         close(ashmem.ashmemFd);
+        pthread_rwlock_unlock(&g_rwLock);
         return ret;
     }
 
@@ -467,6 +477,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     if (request == nullptr) {
         HDF_LOGE("%{public}s alloc request failed", __func__);
         close(ashmem.ashmemFd);
+        pthread_rwlock_unlock(&g_rwLock);
         return HDF_DEV_ERR_NO_MEMORY;
     }
 
@@ -494,6 +505,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
 FINISHED:
     (void)UsbFreeRequestByMmap(request);
     close(ashmem.ashmemFd);
+    pthread_rwlock_unlock(&g_rwLock);
     return ret;
 }
 
