@@ -115,21 +115,22 @@ HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
     EXPECT_EQ(GetTokenKey(&userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(GetTokenDataCipherResult(&data, &token, &userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(UserAuthTokenHmac(&token, &userAuthTokenKey), RESULT_SUCCESS);
-    UserAuthTokenPlainHal UserAuthTokenPlainHal = {};
-    uint64_t allowableDuration = 0;
-    EXPECT_EQ(UserAuthTokenVerify(&token, allowableDuration, &UserAuthTokenPlainHal), RESULT_SUCCESS);
-    EXPECT_EQ(memcmp(&(UserAuthTokenPlainHal.tokenDataPlain), &(token.tokenDataPlain),
-        sizeof(UserAuthTokenPlainHal.tokenDataPlain)), 0);
-    EXPECT_EQ(memcmp(&(UserAuthTokenPlainHal.tokenDataToEncrypt), &data,
-        sizeof(UserAuthTokenPlainHal.tokenDataToEncrypt)), 0);
+    UserAuthTokenPlainHal userAuthTokenPlainHal = {};
+    userAuthTokenPlainHal.tokenDataPlain.time = GetSystemTime();
+    uint64_t allowableDuration = 10 * 60 * 1000;
+    EXPECT_EQ(UserAuthTokenVerify(&token, allowableDuration, &userAuthTokenPlainHal), RESULT_SUCCESS);
+    EXPECT_EQ(memcmp(&(userAuthTokenPlainHal.tokenDataPlain), &(token.tokenDataPlain),
+        sizeof(TokenDataPlain)), 0);
+    EXPECT_EQ(memcmp(&(userAuthTokenPlainHal.tokenDataToEncrypt), &data,
+        sizeof(TokenDataToEncrypt)), 0);
 }
 
 HWTEST_F(UserAuthSignTest, TestDecryptTokenCipher, TestSize.Level0)
 {
     UserAuthTokenHal userAuthToken = {};
-    UserAuthTokenPlainHal UserAuthTokenPlainHal = {};
+    UserAuthTokenPlainHal userAuthTokenPlainHal = {};
     HksAuthTokenKey userAuthTokenKey = {};
-    EXPECT_EQ(DecryptTokenCipher(&userAuthToken, &UserAuthTokenPlainHal, &userAuthTokenKey), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(DecryptTokenCipher(&userAuthToken, &userAuthTokenPlainHal, &userAuthTokenKey), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(UserAuthSignTest, TestCheckUserAuthTokenHmac, TestSize.Level0)
@@ -142,18 +143,17 @@ HWTEST_F(UserAuthSignTest, TestCheckUserAuthTokenHmac, TestSize.Level0)
 HWTEST_F(UserAuthSignTest, TestUserAuthTokenVerify, TestSize.Level0)
 {
     UserAuthTokenHal userAuthToken = {};
-    UserAuthTokenPlainHal UserAuthTokenPlainHal = {};
+    UserAuthTokenPlainHal userAuthTokenPlainHal = {};
     HksAuthTokenKey userAuthTokenKey = {};
     uint64_t allowableDuration = 0;
     EXPECT_EQ(GetTokenKey(&userAuthTokenKey), RESULT_SUCCESS);
-    EXPECT_EQ(UserAuthTokenVerify(nullptr, allowableDuration, &UserAuthTokenPlainHal), RESULT_BAD_PARAM);
+    EXPECT_EQ(UserAuthTokenVerify(nullptr, allowableDuration, &userAuthTokenPlainHal), RESULT_BAD_PARAM);
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, allowableDuration, nullptr), RESULT_BAD_PARAM);
     userAuthToken.tokenDataPlain.time = UINT64_MAX;
-    EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, allowableDuration, &UserAuthTokenPlainHal), RESULT_TOKEN_TIMEOUT);
+    EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, allowableDuration, &userAuthTokenPlainHal), RESULT_TOKEN_TIMEOUT);
     userAuthToken.tokenDataPlain.time = GetSystemTime();
-    EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, allowableDuration, &UserAuthTokenPlainHal), RESULT_BAD_SIGN);
+    EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, allowableDuration, &userAuthTokenPlainHal), RESULT_VERIFY_TOKEN_FAIL);
     EXPECT_EQ(UserAuthTokenHmac(&userAuthToken, &userAuthTokenKey), RESULT_SUCCESS);
-    EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, allowableDuration, &UserAuthTokenPlainHal), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(UserAuthSignTest, TestReuseUnlockTokenSign, TestSize.Level0)

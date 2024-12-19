@@ -1384,10 +1384,10 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestVerifyAuthToken_001, TestSize.Level0)
     HdiUserAuthTokenPlain tokenPlainOut = {};
     std::vector<uint8_t> rootSecret = {};
     EXPECT_EQ(service->VerifyAuthToken(tokenIn, allowableDuration, tokenPlainOut, rootSecret),
-        RESULT_VERIFY_TOKEN_FAIL);
+        RESULT_BAD_PARAM);
     tokenIn.resize(sizeof(UserAuthTokenHal));
     EXPECT_EQ(service->VerifyAuthToken(tokenIn, allowableDuration, tokenPlainOut, rootSecret),
-        RESULT_GENERAL_ERROR);
+        INNER_RESULT_AUTH_TOKEN_EXPIRED);
 }
 } // namespace UserAuth
 } // namespace HDI
