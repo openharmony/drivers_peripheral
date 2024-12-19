@@ -1374,7 +1374,7 @@ int32_t UsbfnMtpImpl::WriteSplitPacket(const std::vector<uint8_t> &data)
     uint8_t needZLP = ZLP_NO_NEED;
     uint32_t needXferCount = vectorSplited_.size() > WRITE_SPLIT_MININUM_LENGTH ?
         vectorSplited_.size() : data.size();
-    if ((needXferCount & (MTP_BUFFER_SIZE - 1)) == 0) {
+    if ((needXferCount & (mtpDev_->dataInPipe.maxPacketSize - 1)) == 0) {
         needZLP = ZLP_NEED;
     }
     int32_t ret = HDF_FAILURE;
@@ -1684,7 +1684,7 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
     mtpDev_->asyncRecvFileActual = 0;
     mtpDev_->asyncRecvFileExpect = 0;
     mtpDev_->needZLP = ZLP_NO_NEED;
-    if ((mtpDev_->xferFileLength & (MTP_BUFFER_SIZE - 1)) == 0) {
+    if ((mtpDev_->xferFileLength & (mtpDev_->dataInPipe.maxPacketSize - 1)) == 0) {
         mtpDev_->needZLP = ZLP_NEED;
     }
     int32_t ret = ReceiveFileEx();
@@ -1770,7 +1770,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
         HDF_LOGE("%{public}s: dev is release", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    if (oneReqLeft != mtpDev_->xferFileLength) {
+    if (oneReqLeft != mtpDev_->xferFileLength || mtpDev_->needZLP) {
         ret = UsbMtpPortSendFileLeftAsync(oneReqLeft);
     }
     return ret;
@@ -1841,7 +1841,7 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
     }
     mtpDev_->mtpState = MTP_STATE_BUSY;
     mtpDev_->needZLP = ZLP_NO_NEED;
-    if ((needXferCount & (MTP_BUFFER_SIZE - 1)) == 0) {
+    if ((needXferCount & (mtpDev_->dataInPipe.maxPacketSize - 1)) == 0) {
         mtpDev_->needZLP = ZLP_NEED;
     }
     int32_t ret = UsbMtpPortSendFileEx();
