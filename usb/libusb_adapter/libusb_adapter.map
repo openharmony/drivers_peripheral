@@ -53,6 +53,8 @@
         "OHOS::HDI::Usb::V1_1::LibusbAdapter::FreeUsbDescriptorsMemory(void*)";
         "OHOS::HDI::Usb::V1_1::LibusbAdapter::AdapterRealloc(void*, unsigned int, unsigned int)";
         "OHOS::HDI::Usb::V1_1::LibusbAdapter::GetDeviceMemMapFd(OHOS::HDI::Usb::V1_0::UsbDev const&, int&)";
+        "OHOS::HDI::Usb::V1_1::LibusbAdapter::AsyncSubmitTransfer(OHOS::HDI::Usb::V1_0::UsbDev const&, OHOS::HDI::Usb::V1_0::USBTransferInfo const&, OHOS::sptr<OHOS::HDI::Usb::V1_0::IUsbdTransferCallback> const&, OHOS::sptr<OHOS::Ashmem> const&)";
+        "OHOS::HDI::Usb::V1_1::LibusbAdapter::AsyncCancelTransfer(OHOS::HDI::Usb::V1_0::UsbDev const&, int)";
     };
   local:
     *;

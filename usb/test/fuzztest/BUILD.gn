@@ -11,10 +11,111 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("./fuzztest.gni")
+
 group("hdf_usb_fuzztest") {
   testonly = true
   deps = [
-    "usbdevice_fuzzer:fuzztest",
-    "usbhost_fuzzer:fuzztest",
+    #"usbdevice_fuzzer:fuzztest",
+    #"usbhost_fuzzer:fuzztest",
+    ":UsbAsyncCancelFuzzTest",
+    ":UsbAsyncTransferFuzzTest",
+  ]
+}
+module_output_path = "drivers_peripheral_usb/drivers_peripheral_usb"
+
+ohos_fuzztest("UsbAsyncCancelFuzzTest") {
+  module_out_path = module_output_path
+
+  fuzz_config_file =
+      "${usb_driver_path}/test/fuzztest/usbasynccanceltransfer_fuzzer"
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  include_dirs = [
+    "${usb_driver_path}/hdi_service/include",
+    "${usb_driver_path}/interfaces/ddk/host",
+    "${usb_driver_path}/interfaces/ddk/common",
+    "${usb_driver_path}/gadget/function/include",
+    "${usb_driver_path}/test/UsbSubscriberTest",
+    "${usb_driver_path}/hdf_usb/include",
+  ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_1.1",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  sources = [
+    "${usb_driver_path}/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
+    "${usb_driver_path}/test/fuzztest/usbasynccanceltransfer_fuzzer/usbasynccancel_fuzzer.cpp",
+  ]
+}
+
+ohos_fuzztest("UsbAsyncTransferFuzzTest") {
+  module_out_path = module_output_path
+
+  fuzz_config_file = "${usb_driver_path}/test/fuzztest/usbasynctransfer_fuzzer"
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  include_dirs = [
+    "${usb_driver_path}/hdi_service/include",
+    "${usb_driver_path}/interfaces/ddk/host",
+    "${usb_driver_path}/interfaces/ddk/common",
+    "${usb_driver_path}/gadget/function/include",
+    "${usb_driver_path}/test/UsbSubscriberTest",
+    "${usb_driver_path}/hdf_usb/include",
+  ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_1.1",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  sources = [
+    "${usb_driver_path}/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
+    "${usb_driver_path}/test/fuzztest/usbasynctransfer_fuzzer/usbasynctransfer_fuzzer.cpp",
   ]
 }

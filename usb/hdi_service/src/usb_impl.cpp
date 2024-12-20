@@ -2476,6 +2476,29 @@ int32_t UsbImpl::CloseAccessory(int32_t fd)
     return UsbdAccessory::GetInstance().CloseAccessory(fd);
 }
 
+int32_t UsbImpl::UsbSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
+    const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
+{
+#ifndef LIBUSB_ENABLE
+    HDF_LOGE("%{public}s: libusb is not enabled, please define macro LIBUSB_ENABLE.", __func__);
+    return LIBUSB_ERROR_NOT_SUPPORTED;
+#else
+    HDF_LOGI("%{public}s: UsbImpl UsbSubmitTransfer", __func__);
+    return LibusbAdapter::GetInstance()->AsyncSubmitTransfer(dev, info, cb, ashmem);
+#endif // LIBUSB_ENABLE
+}
+
+int32_t UsbImpl::UsbCancelTransfer(const UsbDev &dev, const int32_t endpoint)
+{
+#ifndef LIBUSB_ENABLE
+    HDF_LOGE("%{public}s: libusb is not enabled, please define macro LIBUSB_ENABLE.", __func__);
+    return LIBUSB_ERROR_NOT_SUPPORTED;
+#else
+    HDF_LOGI("%{public}s: UsbImpl UsbCancelTransfer", __func__);
+    return LibusbAdapter::GetInstance()->AsyncCancelTransfer(dev, endpoint);
+#endif // LIBUSB_ENABLE
+}
+
 } // namespace V1_1
 } // namespace Usb
 } // namespace HDI

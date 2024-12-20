@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <mutex>
+#include <thread>
 #include <list>
 
 #include <libusb.h>
@@ -37,6 +38,43 @@ struct SendRequestAshmemParameter {
     int32_t ashmemFd;
     uint32_t ashmemSize;
 };
+
+struct LibusbAsyncTransfer {
+    explicit LibusbAsyncTransfer(uint32_t numOfIsoPackage)
+    {
+        transferRef = libusb_alloc_transfer(numOfIsoPackage);
+        ashmemRef = nullptr;
+        cbRef = nullptr;
+    }
+
+    ~LibusbAsyncTransfer()
+    {
+        if (transferRef != nullptr) {
+            libusb_free_transfer(transferRef);
+            transferRef = nullptr;
+        }
+        ashmemRef = nullptr;
+        cbRef = nullptr;
+    }
+
+    libusb_transfer *transferRef;
+    sptr<Ashmem> ashmemRef;
+    sptr<IUsbdTransferCallback> cbRef;
+    int32_t busNum;
+    int32_t devAddr;
+    uint64_t userData;
+};
+
+struct LibusbAsyncWrapper {
+    std::list<LibusbAsyncTransfer *> transferList;
+    std::mutex transferLock;
+};
+
+struct LibusbAsyncManager {
+    std::vector<std::pair<UsbDev, LibusbAsyncWrapper*>> transferVec;
+    std::mutex transferVecLock;
+};
+
 class LibusbAdapter {
 public:
     LibusbAdapter();
@@ -81,6 +119,11 @@ public:
     int32_t GetCurrentInterfaceSetting(const UsbDev &dev, uint8_t &settingIndex);
     int32_t GetInterfaceIdByUsbDev(const UsbDev &dev, uint8_t &interfaceId);
     int32_t GetDeviceMemMapFd(const UsbDev &dev, int &fd);
+	
+    /* Async Transfer */
+    int32_t AsyncSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info, const sptr<IUsbdTransferCallback> &cb,
+        const sptr<Ashmem> &ashmem);
+    int32_t AsyncCancelTransfer(const UsbDev &dev, const int32_t endpoint);
 
     static std::shared_ptr<LibusbAdapter> GetInstance();
 
@@ -113,6 +156,31 @@ private:
     int32_t CloseMmapBuffer(void *mmapBuf, size_t length);
     bool CheckDeviceAndConfiguration(libusb_device_handle *handle);
     int32_t GetCurrentConfiguration(libusb_device_handle *handle, int32_t &currentConfig);
+
+    /* Async Transfer */
+    void TransferInit(const UsbDev &dev);
+    void TransferRelease(const UsbDev &dev);
+    uint8_t *AllocAsyncBuffer(const USBTransferInfo &info, const sptr<Ashmem> &ashmem);
+    LibusbAsyncTransfer *CreateAsyncTransfer(const UsbDev &dev, const USBTransferInfo &info,
+        const sptr<Ashmem> &ashmem, const sptr<IUsbdTransferCallback> &cb);
+    int32_t FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer, libusb_device_handle *devHandle,
+        unsigned char *buffer, const USBTransferInfo &info);
+    void DeleteAsyncDevRequest(const UsbDev &dev);
+    void ClearAsyncTranfer(LibusbAsyncWrapper *asyncWrapper);
+    void LibusbEventHandling();
+    static LibusbAsyncWrapper *GetAsyncWrapper(const UsbDev &dev);
+    static void HandleAsyncFailure(struct libusb_transfer *transfer);
+    static void AddTransferToList(LibusbAsyncTransfer *asyncTransfer);
+    static void DeleteTransferFromList(LibusbAsyncTransfer *asyncTransfer);
+    static void FeedbackToBase(struct libusb_transfer *transfer);
+    static void ParseIsoPacketDesc(libusb_transfer *transfer, std::vector<UsbIsoPacketDescriptor> &isoPkgDescs);
+    static int32_t ReadAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer);
+    static int32_t WriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer);
+    static void LIBUSB_CALL HandleAsyncResult(struct libusb_transfer *transfer);
+
+private:
+    std::atomic<bool> isRunning;
+    std::thread eventThread;
 };
 } // namespace V1_1
 } // namespace Usb
