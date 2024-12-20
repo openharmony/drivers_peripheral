@@ -142,7 +142,7 @@ void UsbdAsyncTransferTest::SubscriberEvent()
  * @tc.name: InterruptRead001
  * @tc.desc: Test functions to UsbSubmitTransfer
  * @tc.desc: int32_t UsbSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *           const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem);
+ *           const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
  * @tc.desc: Positive test: interrupt read, The parameters are correct.
  * @tc.type: FUNC
  */
@@ -159,9 +159,9 @@ HWTEST_F(UsbdAsyncTransferTest, InterruptRead001, TestSize.Level1)
         .userData = 0,
         .numIsoPackets = 0,
     };
-    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    sptr<UsbdTransferCallbackTest> usbdBulkCallback = new UsbdTransferCallbackTest();
     if (usbdBulkCallback == nullptr) {
-        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        HDF_LOGE("%{public}s:UsbdTransferCallbackTest new failed.", __func__);
         exit(0);
     }
     sptr<Ashmem> ashmem;
@@ -183,7 +183,7 @@ HWTEST_F(UsbdAsyncTransferTest, InterruptRead001, TestSize.Level1)
  * @tc.name: InterruptWrite001
  * @tc.desc: Test functions to UsbSubmitTransfer
  * @tc.desc: int32_t UsbSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *           const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem);
+ *           const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
  * @tc.desc: Positive test: interrupt write, The parameters are correct.
  * @tc.type: FUNC
  */
@@ -200,9 +200,9 @@ HWTEST_F(UsbdAsyncTransferTest, InterruptWrite001, TestSize.Level1)
         .userData = 0,
         .numIsoPackets = 0,
     };
-    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    sptr<UsbdTransferCallbackTest> usbdBulkCallback = new UsbdTransferCallbackTest();
     if (usbdBulkCallback == nullptr) {
-        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        HDF_LOGE("%{public}s:UsbdTransferCallbackTest new failed.", __func__);
         exit(0);
     }
     sptr<Ashmem> ashmem;
@@ -221,7 +221,7 @@ HWTEST_F(UsbdAsyncTransferTest, InterruptWrite001, TestSize.Level1)
  * @tc.name: IsochronousRead001
  * @tc.desc: Test functions to UsbSubmitTransfer
  * @tc.desc: int32_t UsbSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *           const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem);
+ *           const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
  * @tc.desc: Positive test: isochronous read, The parameters are correct.
  * @tc.type: FUNC
  */
@@ -238,9 +238,9 @@ HWTEST_F(UsbdAsyncTransferTest, IsochronousRead001, TestSize.Level1)
         .userData = 0,
         .numIsoPackets = ISOCHRONOUS_PACKETS,
     };
-    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    sptr<UsbdTransferCallbackTest> usbdBulkCallback = new UsbdTransferCallbackTest();
     if (usbdBulkCallback == nullptr) {
-        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        HDF_LOGE("%{public}s:UsbdTransferCallbackTest new failed.", __func__);
         exit(0);
     }
     sptr<Ashmem> ashmem;
@@ -259,7 +259,7 @@ HWTEST_F(UsbdAsyncTransferTest, IsochronousRead001, TestSize.Level1)
  * @tc.name: IsochronousWrite001
  * @tc.desc: Test functions to UsbSubmitTransfer
  * @tc.desc: int32_t UsbSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *           const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem);
+ *           const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
  * @tc.desc: Positive test: isochronous write, The parameters are correct.
  * @tc.type: FUNC
  */
@@ -276,9 +276,9 @@ HWTEST_F(UsbdAsyncTransferTest, IsochronousWrite001, TestSize.Level1)
         .userData = 0,
         .numIsoPackets = ISOCHRONOUS_PACKETS,
     };
-    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    sptr<UsbdTransferCallbackTest> usbdBulkCallback = new UsbdTransferCallbackTest();
     if (usbdBulkCallback == nullptr) {
-        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        HDF_LOGE("%{public}s:UsbdTransferCallbackTest new failed.", __func__);
         exit(0);
     }
     sptr<Ashmem> ashmem;
@@ -297,7 +297,7 @@ HWTEST_F(UsbdAsyncTransferTest, IsochronousWrite001, TestSize.Level1)
  * @tc.name: BulkRead001
  * @tc.desc: Test functions to UsbSubmitTransfer
  * @tc.desc: int32_t UsbSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *           const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem);
+ *           const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
  * @tc.desc: Positive test: bulk read, The parameters are correct.
  * @tc.type: FUNC
  */
@@ -321,9 +321,9 @@ HWTEST_F(UsbdAsyncTransferTest, BulkRead001, TestSize.Level1)
         .userData = 0,
         .numIsoPackets = 0,
     };
-    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    sptr<UsbdTransferCallbackTest> usbdBulkCallback = new UsbdTransferCallbackTest();
     if (usbdBulkCallback == nullptr) {
-        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        HDF_LOGE("%{public}s:UsbdTransferCallbackTest new failed.", __func__);
         exit(0);
     }
     sptr<Ashmem> ashmem;
@@ -345,7 +345,7 @@ HWTEST_F(UsbdAsyncTransferTest, BulkRead001, TestSize.Level1)
  * @tc.name: BulkWrite001
  * @tc.desc: Test functions to UsbSubmitTransfer
  * @tc.desc: int32_t UsbSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *           const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem);
+ *           const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
  * @tc.desc: Positive test: bulk write, The parameters are correct.
  * @tc.type: FUNC
  */
@@ -362,9 +362,9 @@ HWTEST_F(UsbdAsyncTransferTest, BulkWrite001, TestSize.Level1)
         .userData = 0,
         .numIsoPackets = 0,
     };
-    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    sptr<UsbdTransferCallbackTest> usbdBulkCallback = new UsbdTransferCallbackTest();
     if (usbdBulkCallback == nullptr) {
-        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        HDF_LOGE("%{public}s:UsbdTransferCallbackTest new failed.", __func__);
         exit(0);
     }
     sptr<Ashmem> ashmem;
@@ -402,9 +402,9 @@ HWTEST_F(UsbdAsyncTransferTest, CancelTransfer001, TestSize.Level1)
         .userData = 0,
         .numIsoPackets = 0,
     };
-    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    sptr<UsbdTransferCallbackTest> usbdBulkCallback = new UsbdTransferCallbackTest();
     if (usbdBulkCallback == nullptr) {
-        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        HDF_LOGE("%{public}s:UsbdTransferCallbackTest new failed.", __func__);
         exit(0);
     }
     sptr<Ashmem> ashmem;
@@ -436,7 +436,7 @@ HWTEST_F(UsbdAsyncTransferTest, CancelTransfer001, TestSize.Level1)
 /**
  * @tc.name: AsyncSubmitTransfer008
  * @tc.desc: Test functions to int32_t AsyncSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *    const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem)
+ *    const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
  * @tc.desc: negative test: No device connection
  * @tc.type: FUNC
  */
@@ -462,7 +462,7 @@ HWTEST_F(UsbdAsyncTransferTest, AsyncSubmitTransfer008, TestSize.Level1)
 /**
  * @tc.name: AsyncSubmitTransfer009
  * @tc.desc: Test functions to int32_t AsyncSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *     const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem)
+ *     const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
  * @tc.desc: negative test: Wrong device bus number and bus address
  * @tc.type: FUNC
  */
@@ -487,7 +487,7 @@ HWTEST_F(UsbdAsyncTransferTest, AsyncSubmitTransfer009, TestSize.Level1)
 /**
  * @tc.name: AsyncSubmitTransfer010
  * @tc.desc: Test functions to int32_t AsyncSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *    const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem)
+ *    const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
  * @tc.desc: negative test: data transfer length is zero
  * @tc.type: FUNC
  */
@@ -507,7 +507,7 @@ HWTEST_F(UsbdAsyncTransferTest, AsyncSubmitTransfer010, TestSize.Level1)
 /**
  * @tc.name: AsyncSubmitTransfer011
  * @tc.desc: Test functions to int32_t AsyncSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
- *    const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem)
+ *    const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
  * @tc.desc: negative test, use error endpoint
  * @tc.type: FUNC
  */
@@ -533,7 +533,7 @@ HWTEST_F(UsbdAsyncTransferTest, AsyncSubmitTransfer011, TestSize.Level1)
 /**
  * @tc.name: AsyncCancelTransfer012
  * @tc.desc: Test functions to int32_t AsyncSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
-        const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem)
+        const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
  * @tc.desc: negative test: error device busnum and devaddr
  * @tc.type: FUNC
  */
@@ -552,7 +552,7 @@ HWTEST_F(UsbdAsyncTransferTest, AsyncCancelTransfer012, TestSize.Level1)
 /**
  * @tc.name: AsyncCancelTransfer013
  * @tc.desc: Test functions to int32_t AsyncSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
-        const sptr<IUsbdBulkCallback> &cb, const sptr<Ashmem> &ashmem)
+        const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
  * @tc.desc: negative test: device exit and transferList is nullptr
  * @tc.type: FUNC
  */

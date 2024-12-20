@@ -16,7 +16,7 @@
 #ifndef USBASYNCTRANSFER_FUZZER_H
 #define USBASYNCTRANSFER_FUZZER_H
 
-#include "v1_0/iusbd_bulk_callback.h"
+#include "v1_0/iusbd_transfer_callback.h"
 #include "securec.h"
 #include "v1_0/iusbd_subscriber.h"
 #include "v1_1/usb_types.h"
