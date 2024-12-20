@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include "wpa_hal_p2p_struct.h"
 #include "wpa_hal_struct.h"
-#include "v1_1/iwpa_interface.h"
+#include "v1_2/iwpa_interface.h"
 
 #ifdef __cplusplus
 extern "C" {
