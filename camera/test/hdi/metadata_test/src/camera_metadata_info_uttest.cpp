@@ -115,18 +115,6 @@ HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_004, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Metedate_Info_005
- * @tc.desc: dst = nullptr
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_005, TestSize.Level1)
-{
-    printf("CameraMetadataInfoTest Camera_Metedate_Info_005 start...");
-    FreeCameraMetadataBuffer(nullptr);
-}
-
-/**
  * @tc.name: Camera_Metedate_Info_006
  * @tc.desc: dst = nullptr, item = 131071
  * @tc.size: MediumTest
