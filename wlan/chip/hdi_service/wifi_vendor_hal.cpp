@@ -375,7 +375,7 @@ WifiError WifiVendorHal::RegisterIfaceCallBack(const std::string& ifaceName,
     const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
     vendorHalCbHandler_.AddCallback(chipIfaceCallback);
-    WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport};
+    WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport, OnAsyncWifiNetlinkMsgReport};
     globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
     return HAL_SUCCESS;
 }
