@@ -16,7 +16,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include "securec.h"
-#include "v1_1/iwpa_interface.h"
+#include "v1_2/iwpa_interface.h"
 #include "wpa_fuzzer.h"
 #include "wpa_common_fuzzer.h"
 #include "servmgr_hdi.h"

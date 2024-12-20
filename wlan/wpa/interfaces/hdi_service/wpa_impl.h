@@ -25,7 +25,7 @@
 #include "hdf_dlist.h"
 #include "osal_mutex.h"
 #include "securec.h"
-#include "v1_1/wpa_interface_stub.h"
+#include "v1_2/wpa_interface_stub.h"
 
 struct HdfWpaRemoteNode {
     struct IWpaCallback *callbackObj;

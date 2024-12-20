@@ -31,8 +31,8 @@
 #include "wifi_display.h"
 #include "bssid_ignore.h"
 #include "config.h"
-#include "v1_1/iwpa_callback.h"
-#include "v1_1/iwpa_interface.h"
+#include "v1_2/iwpa_callback.h"
+#include "v1_2/iwpa_interface.h"
 #include "wpa_p2p_hal.h"
 
 #define HEX_TO_DEC_MOVING 4
