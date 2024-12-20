@@ -111,7 +111,7 @@ void UsbFnHandleUevent(const char msg[], ssize_t rcvLen)
 int32_t UsbFnUeventInit(const char *gadgetEventPath)
 {
     if (gadgetEventPath == NULL) {
-        HDF_LOGE("%{puiblic}s invalid param", __func__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
