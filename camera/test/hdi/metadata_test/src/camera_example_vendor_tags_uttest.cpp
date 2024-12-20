@@ -45,5 +45,6 @@ HWTEST_F(CameraExampleVendorTagsTest, Camera_Example_Vendor_Tags_001, TestSize.L
     auto cameraVendorTagExample = std::make_shared<OHOS::Camera::CameraVendorTagExample>();
     std::vector<vendorTag_t> tagVec {};
     cameraVendorTagExample->GetAllVendorTags(tagVec);
-    cameraVendorTagExample->GetVendorTagCount();
+    int ret = (int)cameraVendorTagExample->GetVendorTagCount();
+    EXPECT_EQ(true, ret != -1);
 }
