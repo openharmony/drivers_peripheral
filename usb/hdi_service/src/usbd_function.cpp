@@ -260,6 +260,28 @@ int32_t UsbdFunction::SetFunctionToStorageHdc()
     return HDF_SUCCESS;
 }
 
+int32_t UsbdFunction::SetFunctionToNcm()
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_NCM);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add ncm config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToNcmHdc()
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_NCM_HDC);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add ncm hdc config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbdFunction::SetFunctionToNone()
 {
     uint32_t ddkFuns = currentFuncs_ & USB_DDK_FUNCTION_SUPPORT;
@@ -536,6 +558,12 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
         case USB_FUNCTION_MANUFACTURE | USB_FUNCTION_HDC:
             HDF_LOGI("%{public}s: set manufacture hdc", __func__);
             return UsbdFunction::SetFunctionToManufactureHdc();
+        case USB_FUNCTION_NCM:
+            HDF_LOGI("%{public}s: set ncm", __func__);
+            return UsbdFunction::SetFunctionToNcm();
+        case USB_FUNCTION_NCM | USB_FUNCTION_HDC:
+            HDF_LOGI("%{public}s: set ncm hdc", __func__);
+            return UsbdFunction::SetFunctionToNcmHdc();
         default:
             HDF_LOGI("%{public}s: enable device", __func__);
             return UsbdEnableDevice(funcs);
