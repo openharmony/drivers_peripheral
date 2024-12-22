@@ -14,7 +14,7 @@
  */
 
 #include "accesstoken_kit.h"
-
+#include "hap_token_info.h"
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -22,6 +22,14 @@ extern "C" {
 int VerifyAccessToken(uint32_t callerToken, const std::string &permissionName)
 {
     return OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+}
+
+int GetApiVersion(uint32_t callerToken, int32_t &apiVersion)
+{
+    OHOS::Security::AccessToken::HapTokenInfo hapInfo;
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callerToken, hapInfo);
+    apiVersion = hapInfo.apiVersion;
+    return ret;
 }
 
 #ifdef __cplusplus
