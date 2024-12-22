@@ -46,7 +46,7 @@ namespace V1_0 {
 #define MAX_BUFF_SIZE         16384
 #define MAX_CONTROL_BUFF_SIZE 1024
 #define DEVICE_DESCRIPROR_LENGTH 18
-
+constexpr int32_t API_VERSION_ID = 16;
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 static std::mutex g_infMutex;
 #ifdef LIBUSB_ENABLE
@@ -113,7 +113,23 @@ void FillPipeRequestParamsWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem
     params.timeout = pipe.timeout;
     params.dataReq.length = ashmem.bufferLength;
 }
+int32_t CheckCompleteStatus(struct UsbRequest *request)
+{
+    if (request == NULL) {
+        return HDF_FAILURE;
+    }
+    int32_t apiVersion = 0;
+    int32_t ret = DdkPermissionManager::GetHapApiVersion(apiVersion);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get hap api version failed %{public}d", __func__, ret);
+        return ret;
+    }
 
+    if (apiVersion >= API_VERSION_ID && request->compInfo.status != USB_REQUEST_COMPLETED) {
+        return request->compInfo.status;
+    }
+    return HDF_SUCCESS;
+}
 int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
 {
     std::lock_guard<std::mutex> lock(g_infMutex);
@@ -511,16 +527,17 @@ int32_t UsbDdkService::SendControlWriteRequest(
     ret = UsbFillRequest(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
-        goto FINISHED;
+        (void)UsbFreeRequest(request);
+        return ret;
     }
 
     ret = UsbSubmitRequestSync(request);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s submit request failed %{public}d", __func__, ret);
-        goto FINISHED;
+        (void)UsbFreeRequest(request);
+        return ret;
     }
-
-FINISHED:
+    ret = CheckCompleteStatus(request);
     (void)UsbFreeRequest(request);
     return ret;
 #else
