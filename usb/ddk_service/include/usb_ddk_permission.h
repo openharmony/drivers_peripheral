@@ -27,6 +27,7 @@ class DdkPermissionManager {
 public:
     static bool VerifyPermission(const std::string &permissionName);
     static void Reset();
+    static int32_t GetHapApiVersion(int32_t &apiVersion);
 };
 } // namespace V1_0
 } // namespace Ddk
