@@ -25,14 +25,13 @@
 #include "usbd_wrapper.h"
 #include "v1_2/iusb_interface.h"
 
-const int SLEEP_TIME = 3;
-const uint8_t INTERFACEID_OK = 0;
-const uint32_t MAX_BUFFER_LENGTH = 0x0100U;
-const int32_t ASHMEM_MAX_SIZE = 1024;
-const int32_t ASYNC_TRANSFER_TIME_OUT = 1000;
-const int32_t  ENDPOINT_ADDRESS_IN = 0x81; // device-to-host
-const int32_t ENDPOINT_ADDRESS_OUT = 0x1; // host-to-device
-const int32_t ISOCHRONOUS_PACKETS = 2;
+constexpr uint8_t INTERFACEID_OK = 0;
+constexpr uint32_t MAX_BUFFER_LENGTH = 0x0100U;
+constexpr int32_t ASHMEM_MAX_SIZE = 1024;
+constexpr int32_t ASYNC_TRANSFER_TIME_OUT = 1000;
+constexpr int32_t  ENDPOINT_ADDRESS_IN = 0x81; // device-to-host
+constexpr int32_t ENDPOINT_ADDRESS_OUT = 0x1; // host-to-device
+constexpr int32_t ISOCHRONOUS_PACKETS = 2;
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -123,7 +122,7 @@ void UsbdAsyncTransferTest::SubscriberEvent()
     }
 
     dev_ = {subscriber_->busNum_, subscriber_->devAddr_};
-    ret = g_usbInterface->OpenDevice(dev_);
+    int32_t ret = g_usbInterface->OpenDevice(dev_);
     HDF_LOGI("UsbdAsyncTransferTest:: %{public}d OpenDevice=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
