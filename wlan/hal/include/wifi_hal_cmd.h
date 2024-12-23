@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 #define MAX_CHANNEL_NUM 14
+#define MAX_OSALMEMCALLOC_NUM 40
 int32_t HalCmdGetAvailableNetwork(void);
 int32_t HalCmdGetSupportType(uint8_t *supType);
 int32_t HalCmdGetSupportCombo(uint64_t *supCombo, uint32_t size);

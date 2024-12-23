@@ -138,8 +138,13 @@ int32_t HalCmdSetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
 int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *freqs,
     uint32_t size, uint32_t *num)
 {
+    HDF_LOGE("SAY %s %(public)d", __FUNCTION_, size);
     int32_t ret;
     struct FreqInfoResult result;
+    if(size > MAX_OSALMEMCALLOC_NUM){
+        HDF_LOGE("%s: OsalMemCalloc failed",__FUNCTION__);
+        return HDF_FAILURE;
+    }
 
     result.freqs = OsalMemCalloc(size * sizeof(uint32_t));
     if (result.freqs == NULL) {
