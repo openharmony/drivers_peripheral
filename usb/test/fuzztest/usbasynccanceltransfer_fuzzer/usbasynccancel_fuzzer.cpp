@@ -57,7 +57,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         return false;
     }
     sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    ret = usbInterface->BindUsbdSubscriber(subscriber);
+    int32_t ret = usbInterface->BindUsbdSubscriber(subscriber);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: bind usbd subscriber failed", __func__);
         return ret;
