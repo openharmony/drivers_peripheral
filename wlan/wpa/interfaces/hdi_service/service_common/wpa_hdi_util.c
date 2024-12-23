@@ -20,6 +20,9 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <hdf_log.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <regax.h>
 #include "securec.h"
 #include "wpa_hdi_util.h"
 
@@ -179,3 +182,25 @@ int DataAnonymize(const char *input, int inputLen, char* output, int outputSize)
     }
     return CharReplace(output, headKeepSize, inputLen - tailKeepSize, hiddenChar);
 }
+
+unsigned int AtoiToStrtol(const char *input)
+{
+    if (input[0] == '\0' || strlen(input) > MAX_INT32_LENGTH) {
+        HDF_LOGE("AtoiToStrtol: invalid data!");
+        return 0;
+    }
+    char *endPtr = NULL;
+    long result = 0;
+    result = strtol(input, &endPtr, NUMBER_BASE);
+
+    if(endPtr == input || *endPtr != '\0') {
+        HDF_LOGE("AtoiToStrtol: invalid data!");
+        return 0;
+    }else if((result == LONG_MIN || result == LONG_MAX) && (errno == ERANGE)){
+        HDF_LOGE("AtoiToStrtol: failed!");
+        return 0;
+    }else {
+        return (unsigned int)result;
+    }
+}
+
