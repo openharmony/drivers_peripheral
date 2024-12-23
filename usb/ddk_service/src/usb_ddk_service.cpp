@@ -50,8 +50,8 @@ namespace V1_0 {
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 static std::mutex g_infMutex;
 #ifdef LIBUSB_ENABLE
-static std::shared_ptr<OHOS::HDI::Usb::V1_1::LibusbAdapter> g_DdkLibusbAdapter =
-    std::make_shared<OHOS::HDI::Usb::V1_1::LibusbAdapter>();
+static std::shared_ptr<OHOS::HDI::Usb::V1_2::LibusbAdapter> g_DdkLibusbAdapter =
+    std::make_shared<OHOS::HDI::Usb::V1_2::LibusbAdapter>();
 #endif // LIBUSB_ENABLE
 
 extern "C" IUsbDdk *UsbDdkImplGetInstance(void)

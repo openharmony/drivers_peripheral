@@ -16,10 +16,10 @@
 #ifndef USBASYNCTRANSFER_FUZZER_H
 #define USBASYNCTRANSFER_FUZZER_H
 
-#include "v1_0/iusbd_transfer_callback.h"
+#include "v1_2/iusbd_transfer_callback.h"
 #include "securec.h"
 #include "v1_0/iusbd_subscriber.h"
-#include "v1_1/usb_types.h"
+#include "v1_2/usb_types.h"
 #include "usbd_type.h"
 
 #define FUZZ_PROJECT_NAME "usbasynctransfer_fuzzer"

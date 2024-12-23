@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 int32_t UsbdDispatcher::UsbdAllocFifo(DataFifo *fifo, uint32_t size)
 {
     if (!DataFifoIsInitialized(fifo)) {
@@ -1513,7 +1513,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqReadSubmit(UsbdBulkASyncReqNode *db)
     }
     return ret;
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS

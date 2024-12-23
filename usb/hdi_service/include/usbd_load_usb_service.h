@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 class OnDemandLoadCallback : public SystemAbilityLoadCallbackStub {
 public:
     std::atomic_bool loading_ {false};
@@ -50,7 +50,7 @@ private:
     sptr<OnDemandLoadCallback> loadCallback_ {nullptr};
     int32_t saId_ {0};
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
