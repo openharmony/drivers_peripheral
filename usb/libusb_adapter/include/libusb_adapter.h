@@ -121,7 +121,7 @@ public:
     int32_t GetDeviceMemMapFd(const UsbDev &dev, int &fd);
 	
     /* Async Transfer */
-    int32_t AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info, 
+    int32_t AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info,
         const sptr<V1_2::IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
     int32_t AsyncCancelTransfer(const UsbDev &dev, const int32_t endpoint);
 
