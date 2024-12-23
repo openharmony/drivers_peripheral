@@ -1849,6 +1849,10 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
     // call V1_2::IUsbdTransferCallback
     FeedbackToBase(transfer);
     // close resource
+    if (transfer->buffer != nullptr) {
+        OsalMemFree(transfer->buffer);
+        transfer->buffer = nullptr;
+    }
     DeleteTransferFromList(asyncTransfer);
     if (asyncTransfer != nullptr) {
         HDF_LOGI("%{public}s: delete async transfer", __func__);
@@ -1924,6 +1928,10 @@ void LibusbAdapter::HandleAsyncFailure(struct libusb_transfer *transfer)
 {
     if (transfer == nullptr) {
         return;
+    }
+    if (transfer->buffer != nullptr) {
+        OsalMemFree(transfer->buffer);
+        transfer->buffer = nullptr;
     }
     libusb_cancel_transfer(transfer);
     if (transfer->user_data != nullptr) {

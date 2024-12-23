@@ -27,16 +27,13 @@ using OHOS::HDI::Usb::V1_0::UsbDev;
 using namespace OHOS::USB;
 
 namespace OHOS {
-const int32_t SLEEP_TIME = 3;
-const int32_t DEFAULT_PORT_ID = 1;
-const int32_t DEFAULT_ROLE_HOST = 1;
-const int32_t ASHMEM_MAX_SIZE = 1024;
-const int32_t BITS_PER_BYTE = 8;
-const int32_t ASYNC_TRANSFER_TIME_OUT = 1000;
-const int32_t LIBUSB_TRANSFER_TYPE_BULK = 2;
-const int32_t NUM_THREE = 3;
-const int32_t NUM_TWO = 2;
-const int32_t NUM_ONE = 1;
+constexpr int32_t ASHMEM_MAX_SIZE = 1024;
+constexpr int32_t BITS_PER_BYTE = 8;
+constexpr int32_t ASYNC_TRANSFER_TIME_OUT = 1000;
+constexpr int32_t LIBUSB_TRANSFER_TYPE_BULK = 2;
+constexpr int32_t NUM_THREE = 3;
+constexpr int32_t NUM_TWO = 2;
+constexpr int32_t NUM_ONE = 1;
 
 uint32_t Convert2Uint32(const uint8_t *ptr)
 {
@@ -86,27 +83,17 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         return false;
     }
     uint32_t asmSize = Convert2Uint32(rawData);
-
     sptr<IUsbInterface> usbInterface = IUsbInterface::Get(false);
     if (usbInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
         return false;
     }
-
-    int32_t ret = usbInterface->SetPortRole(DEFAULT_PORT_ID, DEFAULT_ROLE_HOST, DEFAULT_ROLE_HOST);
-    sleep(SLEEP_TIME);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: set port role as host failed", __func__);
-        return ret;
-    }
-
     sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
     ret = usbInterface->BindUsbdSubscriber(subscriber);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: bind usbd subscriber failed", __func__);
         return ret;
     }
-
     sleep(1);
     UsbDev dev;
     dev.busNum = subscriber->busNum_;
@@ -116,7 +103,6 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         HDF_LOGE("%{public}s: open device failed", __func__);
         return ret;
     }
-
     USBTransferInfo usbInfo_;
     usbInfo_.endpoint = 0x1;
     usbInfo_.flags = 0;
@@ -125,10 +111,8 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     usbInfo_.userData = 0;
     usbInfo_.numIsoPackets = 0;
     usbInfo_.length = 0;
-
     sptr<Ashmem> ashmPtr;
     (void)InitAshmemOne(ashmPtr, asmSize, 0);
-
     usbInterface->UsbSubmitTransfer(dev, usbInfo_, nullptr, ashmPtr);
 
     return true;

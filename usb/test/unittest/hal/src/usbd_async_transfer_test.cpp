@@ -111,16 +111,6 @@ void UsbdAsyncTransferTest::SubscriberEvent()
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
         exit(0);
     }
-    const int32_t DEFAULT_PORT_ID = 1;
-    const int32_t DEFAULT_ROLE_HOST = 1;
-    auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, DEFAULT_ROLE_HOST, DEFAULT_ROLE_HOST);
-    sleep(SLEEP_TIME);
-    HDF_LOGI("UsbdAsyncTransferTest::[Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ret = SwitchErrCode(ret);
-    ASSERT_EQ(0, ret);
-    if (ret != 0) {
-        exit(0);
-    }
 
     subscriber_ = new UsbSubscriberTest();
     if (subscriber_ == nullptr) {
@@ -303,7 +293,7 @@ HWTEST_F(UsbdAsyncTransferTest, IsochronousWrite001, TestSize.Level1)
  */
 HWTEST_F(UsbdAsyncTransferTest, BulkRead001, TestSize.Level1)
 {
-    std::cout << "Please disconnect the currently connected device, then connect the RK3568, " \
+    std::cout << "Please disconnect the currently connected device, then connect bulk device(rk3568), " \
     "and press enter to continue" << std::endl;
     int32_t c;
     while ((c = getchar()) != '\n' && c != EOF) {}
