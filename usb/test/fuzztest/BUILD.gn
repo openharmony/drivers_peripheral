@@ -19,8 +19,6 @@ import("./fuzztest.gni")
 group("hdf_usb_fuzztest") {
   testonly = true
   deps = [
-    #"usbdevice_fuzzer:fuzztest",
-    #"usbhost_fuzzer:fuzztest",
     ":UsbAsyncCancelFuzzTest",
     ":UsbAsyncTransferFuzzTest",
   ]
