@@ -431,9 +431,13 @@ WifiError WifiVendorHal::RegisterActionFrameReceiver(const std::string& ifaceNam
 
 WifiError WifiVendorHal::GetCoexictenceChannelList(const std::string& ifaceName, std::vector<uint8_t>& paramBuf)
 {
-    return globalFuncTable_.getCoexictenceChannelList(ifaceName, paramBuf);
+    return globalFuncTable_.getCoexictenceChannelList(ifaceName.c_str(), paramBuf);
 }
 
+WifiError WifiVendorHal::SetProjectionScreenParam(const std::string& ifaceName, const ProjectionScreenCmdParam& param)
+{
+    return globalFuncTable_.setProjectionScreenParam(GetIfaceHandle(ifaceName), param);
+}
 } // namespace v1_0
 } // namespace Chip
 } // namespace Wlan
