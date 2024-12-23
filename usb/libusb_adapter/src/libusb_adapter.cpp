@@ -1884,7 +1884,8 @@ void LibusbAdapter::FeedbackToBase(struct libusb_transfer *transfer)
     HDF_LOGI("%{public}s: call feedback callback success", __func__);
 }
 
-void LibusbAdapter::ParseIsoPacketDesc(libusb_transfer *transfer, std::vector<V1_2::UsbIsoPacketDescriptor> &isoPkgDescs)
+void LibusbAdapter::ParseIsoPacketDesc(libusb_transfer *transfer,
+    std::vector<V1_2::UsbIsoPacketDescriptor> &isoPkgDescs)
 {
     HDF_LOGI("%{public}s: start parse iso package desc", __func__);
     for (int i = 0; i < transfer->num_iso_packets; ++i) {
