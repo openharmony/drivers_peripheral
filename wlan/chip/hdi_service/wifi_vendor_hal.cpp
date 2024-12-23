@@ -144,8 +144,9 @@ void WifiVendorHal::OnAsyncRssiReport(int32_t index, int32_t c0Rssi, int32_t c1R
 void WifiVendorHal::OnAsyncWifiNetlinkMsgReport(uint32_t type, const std::vector<uint8_t>& recvMsg)
 {
     const auto lock = AcquireGlobalLock();
+
     HDF_LOGD("OnAsyncWifiNetlinkMsgReport::OnWifiNetlinkMessage");
-    for (const auto& callback : vendorHalExtCbHandler_.GetCallbacks()) {
+    for (const auto& callback : vendorHalCbHandler_.GetCallbacks()) {
         if (callback) {
             callback->OnWifiNetlinkMessage(type, recvMsg);
         }
@@ -374,7 +375,7 @@ WifiError WifiVendorHal::RegisterIfaceCallBack(const std::string& ifaceName,
     const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
     vendorHalCbHandler_.AddCallback(chipIfaceCallback);
-    WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport};
+    WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport, OnAsyncWifiNetlinkMsgReport};
     globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
     return HAL_SUCCESS;
 }

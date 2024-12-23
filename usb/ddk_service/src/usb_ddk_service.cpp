@@ -19,6 +19,7 @@
 #include <iproxy_broker.h>
 
 #include "ddk_pnp_listener_mgr.h"
+#include "libusb_adapter.h"
 #include "usb_ddk_hash.h"
 #include "usb_ddk_interface.h"
 #include "usb_ddk_permission.h"
@@ -44,18 +45,93 @@ namespace V1_0 {
 
 #define MAX_BUFF_SIZE         16384
 #define MAX_CONTROL_BUFF_SIZE 1024
-
+#define DEVICE_DESCRIPROR_LENGTH 18
+constexpr int32_t API_VERSION_ID = 16;
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
+#ifdef LIBUSB_ENABLE
+static std::shared_ptr<OHOS::HDI::Usb::V1_1::LibusbAdapter> g_DdkLibusbAdapter =
+    std::make_shared<OHOS::HDI::Usb::V1_1::LibusbAdapter>();
+#endif // LIBUSB_ENABLE
 
 extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
 {
     return new (std::nothrow) UsbDdkService();
 }
 
+void FillReadRequestParams(const UsbControlRequestSetup &setup, const uint32_t length,
+    const uint32_t timeout, UsbRequestParams &params)
+{
+    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    params.interfaceId = USB_CTRL_INTERFACE_ID;
+    params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
+    params.timeout = timeout;
+    params.ctrlReq.target = static_cast<UsbRequestTargetType>(GET_CTRL_REQ_RECIP(setup.requestType));
+    params.ctrlReq.reqType = setup.requestType;
+    params.ctrlReq.directon = static_cast<UsbRequestDirection>(GET_CTRL_REQ_DIR(setup.requestType));
+    params.ctrlReq.request = setup.requestCmd;
+    params.ctrlReq.value = setup.value;
+    params.ctrlReq.index = setup.index;
+    params.ctrlReq.length = length;
+}
+
+void FillWriteRequestParams(const UsbControlRequestSetup &setup, const std::vector<uint8_t> &data,
+    const uint32_t timeout, UsbRequestParams &params)
+{
+    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    params.interfaceId = USB_CTRL_INTERFACE_ID;
+    params.pipeAddress = 0;
+    params.pipeId = 0;
+    params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
+    params.timeout = timeout;
+    params.ctrlReq.target = static_cast<UsbRequestTargetType>(GET_CTRL_REQ_RECIP(setup.requestType));
+    params.ctrlReq.reqType = setup.requestType;
+    params.ctrlReq.directon = static_cast<UsbRequestDirection>(GET_CTRL_REQ_DIR(setup.requestType));
+    params.ctrlReq.request = setup.requestCmd;
+    params.ctrlReq.value = setup.value;
+    params.ctrlReq.index = setup.index;
+    params.ctrlReq.buffer = (void *)data.data();
+    params.ctrlReq.length = data.size();
+}
+
+void FillPipeRequestParams(const UsbRequestPipe &pipe, const uint32_t length, UsbRequestParams &params)
+{
+    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    params.pipeId = pipe.endpoint;
+    params.pipeAddress = pipe.endpoint;
+    params.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
+    params.timeout = pipe.timeout;
+    params.dataReq.length = length;
+}
+
+void FillPipeRequestParamsWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem &ashmem, UsbRequestParams &params)
+{
+    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    params.pipeId = pipe.endpoint;
+    params.pipeAddress = pipe.endpoint;
+    params.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
+    params.timeout = pipe.timeout;
+    params.dataReq.length = ashmem.bufferLength;
+}
+int32_t CheckCompleteStatus(struct UsbRequest *request)
+{
+    if (request == NULL) {
+        return HDF_FAILURE;
+    }
+    int32_t apiVersion = 0;
+    int32_t ret = DdkPermissionManager::GetHapApiVersion(apiVersion);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get hap api version failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    if (apiVersion >= API_VERSION_ID && request->compInfo.status != USB_REQUEST_COMPLETED) {
+        return request->compInfo.status;
+    }
+    return HDF_SUCCESS;
+}
 int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
 {
-    pthread_rwlock_wrlock(&g_rwLock);
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -63,8 +139,9 @@ int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
         pthread_rwlock_unlock(&g_rwLock);
         return ret;
     }
+#ifndef LIBUSB_ENABLE
+    pthread_rwlock_wrlock(&g_rwLock);
     UsbDdkDelHashRecord(interfaceHandle);
-
     struct UsbInterface *interface = nullptr;
     const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
     ret = GetInterfaceByHandle(handleConvert, &interface);
@@ -84,6 +161,27 @@ int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
     ret = UsbReleaseInterface(interface);
     pthread_rwlock_unlock(&g_rwLock);
     return ret;
+#else
+    struct InterfaceInfo infoTemp;
+    ret = GetInterfaceInfoByVal(interfaceHandle, infoTemp);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s infoTemp failed", __func__);
+        return HDF_FAILURE;
+    }
+    UsbDdkDelHashRecord(interfaceHandle);
+    uint8_t interfaceId = 0;
+    ret = g_DdkLibusbAdapter->GetInterfaceIdByUsbDev({infoTemp.busNum, infoTemp.devNum}, interfaceId);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get interfaceId failed", __func__);
+        return ret;
+    }
+    ret = g_DdkLibusbAdapter->ReleaseInterface({infoTemp.busNum, infoTemp.devNum}, interfaceId);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed", __func__);
+        return ret;
+    }
+    return g_DdkLibusbAdapter->CloseDevice({infoTemp.busNum, infoTemp.devNum});
+#endif // LIBUSB_ENABLE
 }
 
 static int32_t UsbdPnpEventHandler(void *priv, uint32_t id, HdfSBuf *data)
@@ -153,7 +251,7 @@ int32_t UsbDdkService::GetDeviceDescriptor(uint64_t deviceId, UsbDeviceDescripto
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
     }
-
+#ifndef LIBUSB_ENABLE
     UsbRawHandle *rawHandle = UsbRawOpenDevice(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
     if (rawHandle == nullptr) {
         HDF_LOGE("%{public}s open device failed", __func__);
@@ -173,6 +271,22 @@ int32_t UsbDdkService::GetDeviceDescriptor(uint64_t deviceId, UsbDeviceDescripto
     }
     (void)UsbRawCloseDevice(rawHandle);
     return ret;
+#else
+    HDF_LOGD("%{public}s enter", __func__);
+    std::vector<uint8_t> descriptor(DEVICE_DESCRIPROR_LENGTH);
+    int32_t ret = g_DdkLibusbAdapter->GetDeviceDescriptor({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, descriptor);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get device descriptor failed", __func__);
+        return HDF_FAILURE;
+    }
+    ret = memcpy_s(&desc, sizeof(desc), descriptor.data(), sizeof(desc));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+        return HDF_FAILURE;
+    }
+    HDF_LOGD("%{public}s leave", __func__);
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbDdkService::GetConfigDescriptor(uint64_t deviceId, uint8_t configIndex, std::vector<uint8_t> &configDesc)
@@ -181,7 +295,7 @@ int32_t UsbDdkService::GetConfigDescriptor(uint64_t deviceId, uint8_t configInde
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
     }
-
+#ifndef LIBUSB_ENABLE
     UsbRawHandle *rawHandle = UsbRawOpenDevice(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
     if (rawHandle == nullptr) {
         HDF_LOGE("%{public}s open device failed", __func__);
@@ -215,6 +329,10 @@ int32_t UsbDdkService::GetConfigDescriptor(uint64_t deviceId, uint8_t configInde
 
     (void)UsbRawCloseDevice(rawHandle);
     return HDF_SUCCESS;
+#else
+    return g_DdkLibusbAdapter->GetConfigDescriptor({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)},
+        configIndex, configDesc);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex, uint64_t &interfaceHandle)
@@ -223,7 +341,7 @@ int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex,
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
     }
-
+#ifndef LIBUSB_ENABLE
     struct UsbInterface *interface =
         UsbClaimInterface(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId), interfaceIndex);
     if (interface == nullptr) {
@@ -243,6 +361,20 @@ int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex,
     }
     HDF_LOGD("%{public}s: claim handle: %{public}llu", __func__, interfaceHandle);
     return ret;
+#else
+    int32_t ret = g_DdkLibusbAdapter->OpenDevice({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)});
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("OpenDevice is error");
+        return HDF_FAILURE;
+    }
+    static std::atomic<int64_t> addr(0);
+    int64_t addrNumber = addr.fetch_add(1, std::memory_order_relaxed);
+    ret = UsbDdkHash({addrNumber, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, interfaceHandle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s hash failed %{public}d", __func__, ret);
+    }
+    return g_DdkLibusbAdapter->ClaimInterface({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, interfaceIndex, true);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbDdkService::ReleaseInterface(uint64_t interfaceHandle)
@@ -268,10 +400,25 @@ int32_t UsbDdkService::SelectInterfaceSetting(uint64_t interfaceHandle, uint8_t 
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
         return ret;
     }
-
+#ifndef LIBUSB_ENABLE
     struct UsbInterface *interface = nullptr;
     const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
     return UsbSelectInterfaceSetting(handleConvert, settingIndex, &interface);
+#else
+    struct InterfaceInfo infoTemp;
+    ret = GetInterfaceInfoByVal(interfaceHandle, infoTemp);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s infoTemp failed", __func__);
+        return HDF_FAILURE;
+    }
+    uint8_t interfaceId = 0;
+    ret = g_DdkLibusbAdapter->GetInterfaceIdByUsbDev({infoTemp.busNum, infoTemp.devNum}, interfaceId);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get interfaceId failed ", __func__);
+        return ret;
+    }
+    return g_DdkLibusbAdapter->SetInterface({infoTemp.busNum, infoTemp.devNum}, interfaceId, settingIndex);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbDdkService::GetCurrentInterfaceSetting(uint64_t interfaceHandle, uint8_t &settingIndex)
@@ -287,9 +434,18 @@ int32_t UsbDdkService::GetCurrentInterfaceSetting(uint64_t interfaceHandle, uint
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
         return ret;
     }
-
+#ifndef LIBUSB_ENABLE
     const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
     return UsbGetInterfaceSetting(handleConvert, &settingIndex);
+#else
+    struct InterfaceInfo infoTemp;
+    ret = GetInterfaceInfoByVal(interfaceHandle, infoTemp);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s infoTemp failed", __func__);
+        return HDF_FAILURE;
+    }
+    return g_DdkLibusbAdapter->GetCurrentInterfaceSetting({infoTemp.busNum, infoTemp.devNum}, settingIndex);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbDdkService::SendControlReadRequest(
@@ -306,7 +462,7 @@ int32_t UsbDdkService::SendControlReadRequest(
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
         return ret;
     }
-
+#ifndef LIBUSB_ENABLE
     const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
     uint32_t length = setup.length > MAX_CONTROL_BUFF_SIZE ? MAX_CONTROL_BUFF_SIZE : setup.length;
     struct UsbRequest *request = UsbAllocRequest(handleConvert, 0, static_cast<int32_t>(length));
@@ -316,18 +472,7 @@ int32_t UsbDdkService::SendControlReadRequest(
     }
 
     struct UsbRequestParams params;
-    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
-    params.interfaceId = USB_CTRL_INTERFACE_ID;
-    params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
-    params.timeout = timeout;
-    params.ctrlReq.target = static_cast<UsbRequestTargetType>(GET_CTRL_REQ_RECIP(setup.requestType));
-    params.ctrlReq.reqType = setup.requestType;
-    params.ctrlReq.directon = static_cast<UsbRequestDirection>(GET_CTRL_REQ_DIR(setup.requestType));
-    params.ctrlReq.request = setup.requestCmd;
-    params.ctrlReq.value = setup.value;
-    params.ctrlReq.index = setup.index;
-    params.ctrlReq.length = length;
-
+    FillReadRequestParams(setup, length, timeout, params);
     ret = UsbFillRequest(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
@@ -344,6 +489,20 @@ int32_t UsbDdkService::SendControlReadRequest(
 FINISHED:
     (void)UsbFreeRequest(request);
     return ret;
+#else
+    struct InterfaceInfo infoTemp;
+    ret = GetInterfaceInfoByVal(interfaceHandle, infoTemp);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s infoTemp failed", __func__);
+        return HDF_FAILURE;
+    }
+    uint8_t reqType = static_cast<uint8_t>(setup.requestType);
+    uint8_t reqCmd = static_cast<uint8_t>(setup.requestCmd);
+    uint16_t wValue = static_cast<uint16_t>(setup.value);
+    uint16_t wIndex = static_cast<uint16_t>(setup.index);
+    return g_DdkLibusbAdapter->ControlTransferRead({infoTemp.busNum, infoTemp.devNum},
+        {reqType, reqCmd, wValue, wIndex, timeout}, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbDdkService::SendControlWriteRequest(
@@ -360,7 +519,7 @@ int32_t UsbDdkService::SendControlWriteRequest(
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
         return ret;
     }
-
+#ifndef LIBUSB_ENABLE
     const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
     struct UsbRequest *request = UsbAllocRequest(handleConvert, 0, MAX_CONTROL_BUFF_SIZE);
     if (request == nullptr) {
@@ -369,36 +528,33 @@ int32_t UsbDdkService::SendControlWriteRequest(
     }
 
     struct UsbRequestParams params;
-    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
-    params.interfaceId = USB_CTRL_INTERFACE_ID;
-    params.pipeAddress = 0;
-    params.pipeId = 0;
-    params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
-    params.timeout = timeout;
-    params.ctrlReq.target = static_cast<UsbRequestTargetType>(GET_CTRL_REQ_RECIP(setup.requestType));
-    params.ctrlReq.reqType = setup.requestType;
-    params.ctrlReq.directon = static_cast<UsbRequestDirection>(GET_CTRL_REQ_DIR(setup.requestType));
-    params.ctrlReq.request = setup.requestCmd;
-    params.ctrlReq.value = setup.value;
-    params.ctrlReq.index = setup.index;
-    params.ctrlReq.buffer = (void *)data.data();
-    params.ctrlReq.length = data.size();
-
+    FillWriteRequestParams(setup, data, timeout, params);
     ret = UsbFillRequest(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
-        goto FINISHED;
+        (void)UsbFreeRequest(request);
+        return ret;
     }
 
     ret = UsbSubmitRequestSync(request);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s submit request failed %{public}d", __func__, ret);
-        goto FINISHED;
+        (void)UsbFreeRequest(request);
+        return ret;
     }
-
-FINISHED:
+    ret = CheckCompleteStatus(request);
     (void)UsbFreeRequest(request);
     return ret;
+#else
+    struct InterfaceInfo infoTemp;
+    ret = GetInterfaceInfoByVal(interfaceHandle, infoTemp);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s infoTemp failed", __func__);
+        return HDF_FAILURE;
+    }
+    return g_DdkLibusbAdapter->ControlTransferWrite({infoTemp.busNum, infoTemp.devNum},
+        {setup.requestType, setup.requestCmd, setup.value, setup.index, timeout}, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbDdkService::SendPipeRequest(
@@ -409,15 +565,15 @@ int32_t UsbDdkService::SendPipeRequest(
         return HDF_ERR_NOPERM;
     }
 
-    pthread_rwlock_rdlock(&g_rwLock);
+    
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
-        pthread_rwlock_unlock(&g_rwLock);
         return ret;
     }
-
+#ifndef LIBUSB_ENABLE
+    pthread_rwlock_rdlock(&g_rwLock);
     const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
     struct UsbRequest *request = UsbAllocRequestByMmap(handleConvert, 0, size);
     if (request == nullptr) {
@@ -427,13 +583,7 @@ int32_t UsbDdkService::SendPipeRequest(
     }
 
     struct UsbRequestParams params;
-    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
-    params.pipeId = pipe.endpoint;
-    params.pipeAddress = pipe.endpoint;
-    params.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
-    params.timeout = pipe.timeout;
-    params.dataReq.length = length;
-
+    FillPipeRequestParams(pipe, length, params);
     ret = UsbFillRequestByMmap(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
@@ -451,6 +601,16 @@ FINISHED:
     (void)UsbFreeRequestByMmap(request);
     pthread_rwlock_unlock(&g_rwLock);
     return ret;
+#else
+    struct InterfaceInfo infoTemp;
+    ret = GetInterfaceInfoByVal(pipe.interfaceHandle, infoTemp);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s infoTemp failed", __func__);
+        return HDF_FAILURE;
+    }
+    return g_DdkLibusbAdapter->SendPipeRequest({infoTemp.busNum, infoTemp.devNum}, pipe.endpoint, size,
+        transferedLength, pipe.timeout);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbDdkService::SendPipeRequestWithAshmem(
@@ -462,16 +622,15 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
         return HDF_ERR_NOPERM;
     }
 
-    pthread_rwlock_rdlock(&g_rwLock);
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
         close(ashmem.ashmemFd);
-        pthread_rwlock_unlock(&g_rwLock);
         return ret;
     }
-
+#ifndef LIBUSB_ENABLE
+    pthread_rwlock_rdlock(&g_rwLock);
     const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
     struct UsbRequest *request = UsbAllocRequestByAshmem(handleConvert, 0, ashmem.size, ashmem.ashmemFd);
     if (request == nullptr) {
@@ -482,13 +641,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     }
 
     struct UsbRequestParams params;
-    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
-    params.pipeId = pipe.endpoint;
-    params.pipeAddress = pipe.endpoint;
-    params.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
-    params.timeout = pipe.timeout;
-    params.dataReq.length = ashmem.bufferLength;
-
+    FillPipeRequestParamsWithAshmem(pipe, ashmem, params);
     ret = UsbFillRequestByMmap(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
@@ -507,6 +660,16 @@ FINISHED:
     close(ashmem.ashmemFd);
     pthread_rwlock_unlock(&g_rwLock);
     return ret;
+#else
+    struct InterfaceInfo infoTemp;
+    ret = GetInterfaceInfoByVal(pipe.interfaceHandle, infoTemp);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s infoTemp failed", __func__);
+        return HDF_FAILURE;
+    }
+    return g_DdkLibusbAdapter->SendPipeRequestWithAshmem({infoTemp.busNum, infoTemp.devNum}, pipe.endpoint,
+        {ashmem.ashmemFd, ashmem.size}, transferredLength, pipe.timeout);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbDdkService::GetDeviceMemMapFd(uint64_t deviceId, int &fd)
@@ -515,7 +678,7 @@ int32_t UsbDdkService::GetDeviceMemMapFd(uint64_t deviceId, int &fd)
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
     }
-    
+#ifndef LIBUSB_ENABLE
     int32_t ret = UsbGetDeviceMemMapFd(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
     if (ret < 0) {
         HDF_LOGE("%{public}s UsbGetDeviceMemMapFd failed %{public}d", __func__, ret);
@@ -524,6 +687,9 @@ int32_t UsbDdkService::GetDeviceMemMapFd(uint64_t deviceId, int &fd)
     fd = ret;
     HDF_LOGI("%{public}s:%{public}d fd:%{public}d", __func__, __LINE__, fd);
     return HDF_SUCCESS;
+#else
+    return g_DdkLibusbAdapter->GetDeviceMemMapFd({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, fd);
+#endif // LIBUSB_ENABLE
 }
 } // namespace V1_0
 } // namespace Ddk
