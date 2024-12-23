@@ -16,6 +16,7 @@
 #define USB_DDK_HASH_H
 #include <stddef.h>
 #include <stdint.h>
+#include <memory>
 #include <vector>
 struct InterfaceInfo {
     uint64_t addr;
@@ -27,5 +28,6 @@ int32_t UsbDdkHash(const InterfaceInfo &info, uint64_t &hashVal);
 int32_t UsbDdkUnHash(uint64_t hashVal, uint64_t &addr);
 void UsbDdkDelHashRecord(uint64_t hashVal);
 bool UsbDdkGetRecordByVal(const InterfaceInfo &info, uint64_t &hashVal);
+int32_t GetInterfaceInfoByVal(const uint64_t hashVal, InterfaceInfo &Info);
 bool UsbDdkGetAllRecords(const InterfaceInfo &info, std::vector<uint64_t> &records);
 #endif // USB_DDK_IMPL_H
