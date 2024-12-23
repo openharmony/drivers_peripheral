@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_USB_V1_1_USBD_PORT_H
-#define OHOS_HDI_USB_V1_1_USBD_PORT_H
+#ifndef OHOS_HDI_USB_V1_2_USBD_PORT_H
+#define OHOS_HDI_USB_V1_2_USBD_PORT_H
 
 #include <fcntl.h>
 #include <sys/types.h>
@@ -22,7 +22,7 @@
 
 #include "usbd.h"
 #include "v1_0/iusbd_subscriber.h"
-#include "v1_0/usb_types.h"
+#include "v1_2/usb_types.h"
 
 #define DEFAULT_PORT_ID 1
 
@@ -43,21 +43,21 @@
 #define PORT_MODE_DEVICE 1
 #define PORT_MODE_HOST   2
 
-using OHOS::HDI::Usb::V1_1::PortInfo;
+using OHOS::HDI::Usb::V1_2::PortInfo;
 
-using OHOS::HDI::Usb::V1_1::IUsbdSubscriber;
+using OHOS::HDI::Usb::V1_2::IUsbdSubscriber;
 
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 class UsbdPort {
 public:
     static UsbdPort &GetInstance();
     int32_t SetPort(int32_t portId, int32_t powerRole, int32_t dataRole,
         UsbdSubscriber *usbdSubscribers, uint32_t len);
     int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode);
-    int32_t UpdatePort(int32_t mode, const sptr<HDI::Usb::V1_1::IUsbdSubscriber> &subscriber);
+    int32_t UpdatePort(int32_t mode, const sptr<HDI::Usb::V1_2::IUsbdSubscriber> &subscriber);
     void setPortPath(const std::string &path);
 
 private:
@@ -73,11 +73,11 @@ private:
     int32_t WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mode);
     int32_t ReadPortFile(int32_t &powerRole, int32_t &dataRole, int32_t &mode);
     int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole);
-    HDI::Usb::V1_1::PortInfo currentPortInfo_ = {DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE, PORT_MODE_DEVICE};
+    HDI::Usb::V1_2::PortInfo currentPortInfo_ = {DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE, PORT_MODE_DEVICE};
     std::string path_;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_USB_V1_1_USBD_PORT_H
+#endif // OHOS_HDI_USB_V1_2_USBD_PORT_H

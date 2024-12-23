@@ -38,7 +38,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 constexpr uint8_t LIBUSB_MAX_INTERFACEID = 0x80;
 constexpr int32_t USB_MAX_INTERFACES = 32;
@@ -1694,8 +1694,8 @@ int32_t LibusbAdapter::GetCurrentConfiguration(libusb_device_handle *handle, int
 
 /* Async Transfer */
 
-int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
-    const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
+int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info,
+    const sptr<V1_2::IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
 {
     HDF_LOGI("%{public}s: params endpoint: 0x%{public}x, type: %{public}d, length: %{public}d, timeout: %{public}d",
         __func__, info.endpoint, info.type, info.length, info.timeOut);
@@ -1787,7 +1787,7 @@ void LibusbAdapter::LibusbEventHandling()
 }
 
 int32_t LibusbAdapter::FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer, libusb_device_handle *devHandle,
-    unsigned char *buffer, const USBTransferInfo &info)
+    unsigned char *buffer, const V1_2::USBTransferInfo &info)
 {
     HDF_LOGI("%{public}s: endpoint: 0x%{public}x, timeout: %{public}d, numIsoPackets: %{public}d",
         __func__, info.endpoint, info.timeOut, info.numIsoPackets);
@@ -1846,7 +1846,7 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
             return;
         }
     }
-    // call IUsbdTransferCallback
+    // call V1_2::IUsbdTransferCallback
     FeedbackToBase(transfer);
     // close resource
     DeleteTransferFromList(asyncTransfer);
@@ -1862,8 +1862,8 @@ void LibusbAdapter::FeedbackToBase(struct libusb_transfer *transfer)
 {
     HDF_LOGI("%{public}s: call feedback callback, actual length: %{public}d", __func__, transfer->actual_length);
     LibusbAsyncTransfer *asyncTransfer = reinterpret_cast<LibusbAsyncTransfer *>(transfer->user_data);
-    sptr<IUsbdTransferCallback> callback = asyncTransfer->cbRef;
-    std::vector<UsbIsoPacketDescriptor> isoPkgDescVec;
+    sptr<V1_2::IUsbdTransferCallback> callback = asyncTransfer->cbRef;
+    std::vector<V1_2::UsbIsoPacketDescriptor> isoPkgDescVec;
 
     if (transfer->type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
         ParseIsoPacketDesc(transfer, isoPkgDescVec);
@@ -1884,7 +1884,7 @@ void LibusbAdapter::FeedbackToBase(struct libusb_transfer *transfer)
     HDF_LOGI("%{public}s: call feedback callback success", __func__);
 }
 
-void LibusbAdapter::ParseIsoPacketDesc(libusb_transfer *transfer, std::vector<UsbIsoPacketDescriptor> &isoPkgDescs)
+void LibusbAdapter::ParseIsoPacketDesc(libusb_transfer *transfer, std::vector<V1_2::UsbIsoPacketDescriptor> &isoPkgDescs)
 {
     HDF_LOGI("%{public}s: start parse iso package desc", __func__);
     for (int i = 0; i < transfer->num_iso_packets; ++i) {
@@ -1892,7 +1892,7 @@ void LibusbAdapter::ParseIsoPacketDesc(libusb_transfer *transfer, std::vector<Us
         HDF_LOGI("%{public}s: iso pack %{public}d, status: %{public}d, length:%{public}u, actual length:%{public}u",
             __func__, i, pack->status, pack->length, pack->actual_length);
         
-        UsbIsoPacketDescriptor desc;
+        V1_2::UsbIsoPacketDescriptor desc;
         desc.isoLength = pack->length;
         desc.isoActualLength = pack->actual_length;
         desc.isoStatus = pack->status;
@@ -1900,8 +1900,8 @@ void LibusbAdapter::ParseIsoPacketDesc(libusb_transfer *transfer, std::vector<Us
     }
 }
 
-LibusbAsyncTransfer *LibusbAdapter::CreateAsyncTransfer(const UsbDev &dev, const USBTransferInfo &info,
-    const sptr<Ashmem> &ashmem, const sptr<IUsbdTransferCallback> &cb)
+LibusbAsyncTransfer *LibusbAdapter::CreateAsyncTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info,
+    const sptr<Ashmem> &ashmem, const sptr<V1_2::IUsbdTransferCallback> &cb)
 {
     uint32_t pkgNum = 0;
     if (info.type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
@@ -1975,7 +1975,7 @@ LibusbAsyncWrapper *LibusbAdapter::GetAsyncWrapper(const UsbDev &dev)
     return asyncWrapper;
 }
 
-uint8_t *LibusbAdapter::AllocAsyncBuffer(const USBTransferInfo &info, const sptr<Ashmem> &ashmem)
+uint8_t *LibusbAdapter::AllocAsyncBuffer(const V1_2::USBTransferInfo &info, const sptr<Ashmem> &ashmem)
 {
     if (info.length <= 0) {
         HDF_LOGE("%{public}s: invalid buffer length", __func__);
@@ -2123,7 +2123,7 @@ int32_t LibusbAdapter::WriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, u
     ashmem->UnmapAshmem();
     return HDF_SUCCESS;
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS

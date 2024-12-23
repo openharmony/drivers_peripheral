@@ -23,7 +23,7 @@
 #include "UsbSubscriberTest.h"
 #include "usbd_type.h"
 #include "usbd_wrapper.h"
-#include "v1_0/iusb_interface.h"
+#include "v1_2/iusb_interface.h"
 
 const int SLEEP_TIME = 3;
 const uint8_t INTERFACEID_OK = 0;
@@ -37,13 +37,13 @@ const int32_t ISOCHRONOUS_PACKETS = 2;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::USB;
-using namespace OHOS::HDI::Usb::V1_1;
-using OHOS::HDI::Usb::V1_0::USBTransferInfo;
+using namespace OHOS::HDI::Usb::V1_2;
+using OHOS::HDI::Usb::V1_2::USBTransferInfo;
 
 namespace OHOS::USB::UsbdAsyncTransfer {
 UsbDev UsbdAsyncTransferTest::dev_ = {0, 0};
 sptr<UsbSubscriberTest> UsbdAsyncTransferTest::subscriber_ = nullptr;
-sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> g_usbInterface = nullptr;
+sptr<OHOS::HDI::Usb::V1_2::IUsbInterface> g_usbInterface = nullptr;
 
 int32_t InitAshmemOne(sptr<Ashmem> &asmptr, int32_t asmSize, uint8_t rflg)
 {
@@ -106,7 +106,7 @@ void UsbdAsyncTransferTest::TearDown(void) {}
 
 void UsbdAsyncTransferTest::SubscriberEvent()
 {
-    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_2::IUsbInterface::Get();
     if (g_usbInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
         exit(0);

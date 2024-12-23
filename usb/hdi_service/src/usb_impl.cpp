@@ -53,7 +53,7 @@ int32_t g_usbOpenCount = 0;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 HdfDevEventlistener UsbImpl::listenerForLoadService_ = {nullptr};
 UsbdLoadService UsbImpl::loadUsbService_ = {USB_SYSTEM_ABILITY_ID};
 UsbdLoadService UsbImpl::loadHdfEdm_ = {HDF_EXTERNAL_DEVICE_MANAGER_SA_ID};
@@ -76,7 +76,7 @@ static const std::map<std::string, uint32_t> configMap = {
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Usb::V1_1::UsbImpl;
+    using OHOS::HDI::Usb::V1_2::UsbImpl;
     UsbImpl *service = new (std::nothrow) UsbImpl();
     if (service == nullptr) {
         return nullptr;
@@ -2476,8 +2476,8 @@ int32_t UsbImpl::CloseAccessory(int32_t fd)
     return UsbdAccessory::GetInstance().CloseAccessory(fd);
 }
 
-int32_t UsbImpl::UsbSubmitTransfer(const UsbDev &dev, const USBTransferInfo &info,
-    const sptr<IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
+int32_t UsbImpl::UsbSubmitTransfer(const UsbDev &dev, const OHOS::HDI::Usb::V1_2::USBTransferInfo &info,
+    const sptr<OHOS::HDI::Usb::V1_2::IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
 {
 #ifndef LIBUSB_ENABLE
     HDF_LOGE("%{public}s: libusb is not enabled, please define macro LIBUSB_ENABLE.", __func__);
@@ -2499,7 +2499,7 @@ int32_t UsbImpl::UsbCancelTransfer(const UsbDev &dev, const int32_t endpoint)
 #endif // LIBUSB_ENABLE
 }
 
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS

@@ -20,7 +20,7 @@
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
 #include "usbasynccancel_fuzzer.h"
-#include "v1_0/iusb_interface.h"
+#include "v1_2/iusb_interface.h"
 
 using namespace OHOS::HDI::Usb::V1_0;
 using OHOS::HDI::Usb::V1_0::UsbDev;
