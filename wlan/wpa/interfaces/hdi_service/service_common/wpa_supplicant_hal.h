@@ -24,7 +24,7 @@
 #include "wpa_hal_struct.h"
 #include "wpa_hal_define.h"
 #include "wpa_hdi_util.h"
-#include "v1_1/iwpa_interface.h"
+#include "v1_2/iwpa_interface.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,6 +118,7 @@ struct WifiWpaStaInterface {
     int (*wpaCliCmdGetRequirePmf)(WifiWpaStaInterface *this, int *enable);
     int (*wpaCliCmdGetConnectionCapabilities)(WifiWpaStaInterface *this, struct ConnectionCapabilities *connectionCap);
     int (*wpaCliCmdStaShellCmd)(WifiWpaStaInterface *this, const char *params);
+    int (*wpaCliCmdGetWpaStaData)(WifiWpaStaInterface *this, const char *argv, char *staData, unsigned int size);
 };
 
 WifiWpaStaInterface *GetWifiStaInterface(const char *name);

@@ -40,6 +40,7 @@
 #define MAX_NAME_LEN 12
 #define REPLY_BUF_LENGTH (4096 * 10)
 #define REPLY_BUF_SMALL_LENGTH 64
+#define REPLY_BUF_STA_INFO_LENGTH 2048
 #define CMD_FREQ_MAX_LEN 8
 #define STA_NO_LEN 2
 #define FREQ_MAX_SIZE 100
@@ -1552,6 +1553,29 @@ static int WpaCliCmdStaShellCmd(WifiWpaStaInterface *this, const char *params)
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
+static int WpaCliCmdGetWpaStaData(WifiWpaStaInterface *this, const char *argv, char *staData, unsigned int size)
+{
+    if (this == NULL || argv == NULL || staData == NULL) {
+        HDF_LOGE("WpaCliCmdGetWpaStaData, interface null ir wpaMloInfo null");
+        return -1;
+    }
+    char cmd[CMD_BUFFER_SIZE] = {0};
+    char buf[REPLY_BUF_STA_INFO_LENGTH] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s %s", this->ifname, argv) < 0) {
+        HDF_LOGE("WpaCliCmdGetWpaStaData, snprintf_s err");
+        return -1;
+    }
+    if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        HDF_LOGE("WpaCliCmdGetWpaStaData, err");
+        return -1;
+    }
+    if (strncpy_s(staData, size, buf, sizeof(buf)) != EOK) {
+        HDF_LOGE("WpaCliCmdGetWpaStaData, copy res err");
+        return -1;
+    }
+    return 0;
+}
+
 WifiWpaStaInterface *GetWifiStaInterface(const char *name)
 {
     WifiWpaStaInterface *p = g_wpaStaInterface;
@@ -1614,6 +1638,7 @@ WifiWpaStaInterface *GetWifiStaInterface(const char *name)
     p->wpaCliCmdGetRequirePmf = WpaCliCmdGetRequirePmf;
     p->wpaCliCmdGetConnectionCapabilities = WpaCliCmdGetConnectionCapabilities;
     p->wpaCliCmdStaShellCmd = WpaCliCmdStaShellCmd;
+    p->wpaCliCmdGetWpaStaData = WpaCliCmdGetWpaStaData;
     p->next = g_wpaStaInterface;
     g_wpaStaInterface = p;
 

@@ -17,8 +17,8 @@
 #include <hdf_log.h>
 #include <osal_time.h>
 #include <osal_mem.h>
-#include "v1_1/iwpa_callback.h"
-#include "v1_1/iwpa_interface.h"
+#include "v1_2/iwpa_callback.h"
+#include "v1_2/iwpa_interface.h"
 #include "wpa_common_cmd.h"
 #include "wpa_p2p_cmd.h"
 #include "wpa_impl.h"
@@ -122,6 +122,7 @@ struct IWpaInterface *WpaInterfaceImplGetInstance(void)
     service->interface.P2pSaveConfig = WpaInterfaceP2pSaveConfig;
 
     service->interface.VendorProcessCmd = WpaInterfaceVendorExtProcessCmd;
+    service->interface.GetWpaStaData = WpaInterfaceGetWpaStaData;
 
     return &service->interface;
 }
