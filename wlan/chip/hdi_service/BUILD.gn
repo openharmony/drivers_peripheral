@@ -18,14 +18,14 @@ ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
+    cfi_vcall_icall_only = true
     debug = false
   }
   include_dirs = []
-
 
   sources = [
     "hdi_sync_util.cpp",
@@ -55,6 +55,17 @@ ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
 
   deps = []
 
+  cflags_cc = [
+    "-fvisibility-inlines-hidden",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Os",
+    "-fno-merge-all-constants",
+  ]
+  ldflags = [
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+  ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_wlan"
@@ -64,10 +75,11 @@ ohos_shared_library("libchip_hdi_driver") {
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
+    cfi_vcall_icall_only = true
     debug = false
   }
   include_dirs = []
@@ -91,6 +103,17 @@ ohos_shared_library("libchip_hdi_driver") {
     ]
   }
 
+  cflags_cc = [
+    "-fvisibility-inlines-hidden",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Os",
+    "-fno-merge-all-constants",
+  ]
+  ldflags = [
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+  ]
   external_deps += [ "drivers_interface_wlan:libchip_stub_1.0" ]
 
   shlib_type = "hdi"
