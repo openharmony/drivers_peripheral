@@ -193,13 +193,13 @@ unsigned int AtoiToStrtol(const char *input)
     long result = 0;
     result = strtol(input, &endPtr, NUMBER_BASE);
 
-    if(endPtr == input || *endPtr != '\0') {
+    if (endPtr == input || *endPtr != '\0') {
         HDF_LOGE("AtoiToStrtol: invalid data!");
         return 0;
-    }else if((result == LONG_MIN || result == LONG_MAX) && (errno == ERANGE)){
+    } else if ((result == LONG_MIN || result == LONG_MAX) && (errno == ERANGE)) {
         HDF_LOGE("AtoiToStrtol: failed!");
         return 0;
-    }else {
+    } else {
         return (unsigned int)result;
     }
 }
