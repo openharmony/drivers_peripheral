@@ -28,10 +28,10 @@ using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
-using namespace OHOS::HDI::Usb::V1_1;
+using namespace OHOS::HDI::Usb::V1_2;
 
 namespace {
-sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> g_usbInterface = nullptr;
+sptr<OHOS::HDI::Usb::V1_2::IUsbInterface> g_usbInterface = nullptr;
 struct UsbDev g_dev = {0, 0};
 
 const int SLEEP_TIME = 3;
@@ -77,7 +77,7 @@ int32_t SwitchErrCode(int32_t ret)
 
 void HdfUsbdBenchmarkRequestTest::SetUp(const ::benchmark::State& state)
 {
-    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_2::IUsbInterface::Get();
     ASSERT_TRUE(g_usbInterface != nullptr);
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SOURCE, DATA_ROLE_HOST);
     sleep(SLEEP_TIME);

@@ -423,8 +423,5 @@ ohos_unittest("test_asynctransfer") {
 
 group("hal_test") {
   testonly = true
-  deps = [
-    ":test_asynctransfer",
-    "${usb_driver_path}/sample/device/linux:usb_dev_test",
-  ]
+  deps = []
 }

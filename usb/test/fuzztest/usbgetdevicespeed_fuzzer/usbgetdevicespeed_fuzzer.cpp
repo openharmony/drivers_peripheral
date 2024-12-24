@@ -18,8 +18,8 @@
 #include "securec.h"
 #include "usbcommonfunction_fuzzer.h"
 #include "usbd_type.h"
-#include "v1_1/iusb_interface.h"
-using namespace OHOS::HDI::Usb::V1_1;
+#include "v1_2/iusb_interface.h"
+using namespace OHOS::HDI::Usb::V1_2;
 
 namespace OHOS {
 namespace USB {
@@ -27,7 +27,7 @@ bool UsbGetDeviceSpeedFuzzTest(const uint8_t *data, size_t size)
 {
     (void)size;
     UsbDev dev;
-    sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
+    sptr<OHOS::HDI::Usb::V1_2::IUsbInterface> usbInterface = OHOS::HDI::Usb::V1_2::IUsbInterface::Get();
     int32_t ret = UsbFuzzTestHostModeInit(dev, usbInterface);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFuzzTestHostModeInit failed", __func__);
