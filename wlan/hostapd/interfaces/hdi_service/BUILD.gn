@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
 WPA_ROOT_DIR = "//third_party/wpa_supplicant"
 
+
 if (is_standard_system) {
   ohos_shared_library("libhostapd_interface_service_1.0") {
     branch_protector_ret = "pac_ret"

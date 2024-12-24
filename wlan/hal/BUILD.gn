@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 
 HAL_ROOT_DIR = "./.."
 
+
 if (defined(ohos_lite)) {
   ohos_shared_library("wifi_hal") {
     sources = [

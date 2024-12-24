@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 
+
 ohos_shared_library("libwlan_interface_service_1.3") {
   branch_protector_ret = "pac_ret"
   sanitize = {
