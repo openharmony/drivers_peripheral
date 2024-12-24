@@ -20,6 +20,7 @@ config("wpa_hdi_client_public_config") {
   ]
 }
 
+
 if (defined(ohos_lite)) {
   ohos_shared_library("wpa_hdi_client") {
     output_extension = "z.so"

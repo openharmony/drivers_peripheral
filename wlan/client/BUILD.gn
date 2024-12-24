@@ -18,6 +18,7 @@ config("wifi_driver_hdi_client_public_config") {
   include_dirs = [ "include" ]
 }
 
+
 if (defined(ohos_lite)) {
   ohos_shared_library("wifi_driver_client") {
     output_extension = "z.so"

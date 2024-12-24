@@ -21,6 +21,7 @@
 #include <string>
 #include "wifi_vendor_hal.h"
 
+
 #define SUBCHIP_PROP "ohos.boot.odm.conn.schiptype"
 #define PROP_SUBCHIPTYPE_LEN 10
 #define SUPPORT_COEXCHIP ""

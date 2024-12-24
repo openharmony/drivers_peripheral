@@ -17,6 +17,7 @@ import("../../wlan.gni")
 
 HDI_SERVICE_ROOT_DIR = "../.."
 
+
 ohos_shared_library("libwlan_service_extend") {
   branch_protector_ret = "pac_ret"
   sanitize = {
