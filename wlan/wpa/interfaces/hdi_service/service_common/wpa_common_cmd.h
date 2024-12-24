@@ -104,6 +104,8 @@ int32_t WpaInterfaceGetRequirePmf(struct IWpaInterface *self, const char *ifName
 int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifName, const char *countryCode);
 int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName);
 int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd);
+int32_t WpaInterfaceGetWpaStaData(struct IWpaInterface *self, const char *ifName, const char *staParam,
+    char *staData, uint32_t staDataLen);
 
 void HdfWpaDelRemoteObj(struct IWpaCallback *self);
 void ClearHdfWpaRemoteObj(void);
