@@ -40,15 +40,11 @@ ohos_fuzztest("UsbAsyncCancelFuzzTest") {
 
   include_dirs = [
     "${usb_driver_path}/hdi_service/include",
-    "${usb_driver_path}/interfaces/ddk/host",
-    "${usb_driver_path}/interfaces/ddk/common",
-    "${usb_driver_path}/gadget/function/include",
     "${usb_driver_path}/test/UsbSubscriberTest",
     "${usb_driver_path}/hdf_usb/include",
   ]
 
   deps = [
-    "${usb_driver_path}/ddk:libusb_core",
     "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
   ]
 
@@ -86,15 +82,11 @@ ohos_fuzztest("UsbAsyncTransferFuzzTest") {
 
   include_dirs = [
     "${usb_driver_path}/hdi_service/include",
-    "${usb_driver_path}/interfaces/ddk/host",
-    "${usb_driver_path}/interfaces/ddk/common",
-    "${usb_driver_path}/gadget/function/include",
     "${usb_driver_path}/test/UsbSubscriberTest",
     "${usb_driver_path}/hdf_usb/include",
   ]
 
   deps = [
-    "${usb_driver_path}/ddk:libusb_core",
     "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
   ]
 
