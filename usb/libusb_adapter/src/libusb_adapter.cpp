@@ -1767,6 +1767,10 @@ int32_t LibusbAdapter::AsyncCancelTransfer(const UsbDev &dev, const int32_t endp
             return ret;
         }
         it = asyncWrapper->transferList.erase(it);
+        if (asyncTransfer->transferRef->buffer != nullptr) {
+            OsalMemFree(asyncTransfer->transferRef->buffer);
+            asyncTransfer->transferRef->buffer = nullptr;
+        }
         delete asyncTransfer;
         asyncTransfer = nullptr;
     }
