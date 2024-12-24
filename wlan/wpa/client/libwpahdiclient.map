@@ -19,6 +19,7 @@
     *WpaEventReport*;
     *ReleaseEventCallback*;
     *WpaRegisterEventCallback*;
+    *WpaUnregisterEventCallback*;
   local:
     *;
 };
