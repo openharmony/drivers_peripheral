@@ -334,7 +334,7 @@ HWTEST_F(DeviceTest, test_UpdateHardwareCursor, TestSize.Level1)
     info.usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA |
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ |
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE |
-            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_HW_COMPOSER;
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_HW_COMPOSER;
     info.format = Composer::V1_0::PIXEL_FMT_RGBA_8888;
 
     g_gralloc->AllocMem(info, buffer);
