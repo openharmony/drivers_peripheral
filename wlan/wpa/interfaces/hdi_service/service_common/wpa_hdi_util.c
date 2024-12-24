@@ -22,7 +22,7 @@
 #include <hdf_log.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <regax.h>
+#include <regex.h>
 #include "securec.h"
 #include "wpa_hdi_util.h"
 
