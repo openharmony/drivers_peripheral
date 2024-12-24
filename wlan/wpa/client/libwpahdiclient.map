@@ -17,6 +17,7 @@
     *HostapdRegisterEventCallback*;
     *HostapdUnregisterEventCallback*;
     *WpaEventReport*;
+    *ReleaseEventCallback*;
   local:
     *;
 };
