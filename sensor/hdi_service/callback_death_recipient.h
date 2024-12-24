@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_HDI_SENSOR_V2_0_CALLBACKDEATHRECIPIENT_H
-#define OHOS_HDI_SENSOR_V2_0_CALLBACKDEATHRECIPIENT_H
+#ifndef OHOS_HDI_SENSOR_V2_1_CALLBACKDEATHRECIPIENT_H
+#define OHOS_HDI_SENSOR_V2_1_CALLBACKDEATHRECIPIENT_H
 
 #include <functional>
 #include "iremote_object.h"
@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 class CallBackDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     explicit CallBackDeathRecipient(const wptr<SensorIfService> &sensorIfService) : sensorIfService(sensorIfService) {};
@@ -40,9 +40,9 @@ public:
 private:
     wptr<SensorIfService> sensorIfService;
 };
-}  // namespace V2_0
+}  // namespace V2_1
 }  // namespace Senosr
 }  // namespace HDI
 }  // namespace OHOS
 
-#endif  // OHOS_HDI_SENSOR_V2_0_CALLBACKDEATHRECIPIENT_H
+#endif  // OHOS_HDI_SENSOR_V2_1_CALLBACKDEATHRECIPIENT_H

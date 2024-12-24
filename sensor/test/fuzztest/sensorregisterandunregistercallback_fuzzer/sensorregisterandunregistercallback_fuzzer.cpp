@@ -39,7 +39,7 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         sptr<ISensorInterface> sensorInterface = ISensorInterface::Get();
-        sptr<ISensorCallback> registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
+        sptr<V2_0::ISensorCallback> registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
         if (registerCallback == nullptr) {
             return false;
         }

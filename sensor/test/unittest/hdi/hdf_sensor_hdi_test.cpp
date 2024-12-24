@@ -32,9 +32,9 @@ using namespace testing::ext;
 
 namespace {
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
-    sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
-    sptr<ISensorCallback> g_traditionalCallbackTest = new SensorCallbackImplTest();
-    sptr<ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
+    sptr<V2_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
+    sptr<V2_0::ISensorCallback> g_traditionalCallbackTest = new SensorCallbackImplTest();
+    sptr<V2_0::ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
     std::vector<HdfSensorEvents> g_events;
     struct SensorValueRange {

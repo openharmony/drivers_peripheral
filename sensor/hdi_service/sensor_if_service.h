@@ -17,18 +17,17 @@
 #define HDI_SENSOR_IF_SERVICE_H
 
 #include <map>
-#include "v2_0/isensor_interface.h"
+#include "v2_1/isensor_interface.h"
 #include "isensor_interface_vdi.h"
 #include "sensor_callback_vdi.h"
 #include "sensor_client_info.h"
 #include "sensor_clients_manager.h"
-
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 
-using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallback>>>;
+using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<V2_0::ISensorCallback>>>;
 
 class SensorIfService : public ISensorInterface {
 public:
@@ -44,8 +43,10 @@ public:
                            int64_t reportInterval);
     int32_t SetMode(int32_t sensorId, int32_t mode) override;
     int32_t SetOption(int32_t sensorId, uint32_t option) override;
-    int32_t Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj) override;
-    int32_t Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj) override;
+    int32_t Register(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj) override;
+    int32_t Unregister(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj) override;
+    int32_t RegisterOneWay(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj) override;
+    int32_t UnregisterOneWay(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj) override;
     int32_t ReadData(int32_t sensorId, std::vector<HdfSensorEvents> &event) override;
     int32_t SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel) override;
     int32_t GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfo) override;
@@ -53,12 +54,12 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &object);
     std::mutex sensorServiceMutex_;
 private:
-    int32_t AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
-    int32_t RemoveSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
+    int32_t AddSensorDeathRecipient(const sptr<V2_0::ISensorCallback> &callbackObj);
+    int32_t RemoveSensorDeathRecipient(const sptr<V2_0::ISensorCallback> &callbackObj);
     void  RemoveDeathNotice(int32_t sensorType);
-    int32_t AddCallbackMap(int32_t groupId, const sptr<ISensorCallback> &callbackObj);
-    int32_t RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<ISensorCallback> &callbackObj);
-    sptr<SensorCallbackVdi> GetSensorCb(int32_t groupId, const sptr<ISensorCallback> &callbackObj, bool cbFlag);
+    int32_t AddCallbackMap(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj);
+    int32_t RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<V2_0::ISensorCallback> &callbackObj);
+    sptr<SensorCallbackVdi> GetSensorCb(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj, bool cbFlag);
     void RegisteDumpHost();
     OHOS::HDI::Sensor::V1_1::ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
@@ -68,7 +69,7 @@ private:
     std::vector<HdfSensorInformation> hdfSensorInformations;
     int32_t SetDelay(int32_t sensorId, int64_t &samplingInterval, int64_t &reportInterval);
 };
-} // V2_0
+} // V2_1
 } // Sensor
 } // HDI
 } // OHOS

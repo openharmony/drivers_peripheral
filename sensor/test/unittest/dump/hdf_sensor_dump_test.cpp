@@ -32,7 +32,7 @@ using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
 
 namespace {
-    sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
+    sptr<V2_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
     constexpr int64_t SAMPLING_INTERVAL = 10000000;
     constexpr int64_t REPORT_INTERVAL = 1;
@@ -57,8 +57,8 @@ public:
     void SetUp();
     void TearDown();
     void GetAllSensorInfo(std::vector<HdfSensorInformation> &info);
-    void Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj);
-    void Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj);
+    void Register(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj);
+    void Unregister(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj);
     void SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval);
     void Enable(int32_t sensorId);
     void Disable(int32_t sensorId);
@@ -106,13 +106,13 @@ void HdfSensorDumpTest::GetAllSensorInfo(std::vector<HdfSensorInformation> &info
     }
 }
 
-void HdfSensorDumpTest::Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+void HdfSensorDumpTest::Register(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE;
     SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, g_serviceId, callbackObj);
 }
 
-void HdfSensorDumpTest::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+void HdfSensorDumpTest::Unregister(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE;
     SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, g_serviceId, callbackObj);

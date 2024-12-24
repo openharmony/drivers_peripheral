@@ -41,7 +41,7 @@ enum BatchSeniorMode {
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 namespace {
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using CallBackDeathRecipientMap = std::unordered_map<IRemoteObject *, sptr<CallBackDeathRecipient>>;
@@ -121,7 +121,7 @@ int32_t SensorIfService::Init()
     return ret;
 }
 
-sptr<SensorCallbackVdi> SensorIfService::GetSensorCb(int32_t groupId, const sptr<ISensorCallback> &callbackObj,
+sptr<SensorCallbackVdi> SensorIfService::GetSensorCb(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj,
     bool cbFlag)
 {
     SENSOR_TRACE_PID;
@@ -360,7 +360,7 @@ int32_t SensorIfService::SetOption(int32_t sensorId, uint32_t option)
     return ret;
 }
 
-int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+int32_t SensorIfService::Register(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
@@ -400,7 +400,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
     return ret;
 }
 
-int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+int32_t SensorIfService::Unregister(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
@@ -444,7 +444,27 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
     return ret;
 }
 
-int32_t SensorIfService::AddCallbackMap(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
+int32_t SensorIfService::RegisterOneWay(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj)
+{
+    SENSOR_TRACE_PID;
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    HDF_LOGI("%{public}s: groupId %{public}d, service %{public}d", __func__, groupId, serviceId);
+    int32_t ret = Register(groupId, static_cast<sptr<V2_0::ISensorCallback>>(callbackObj));
+
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+    SensorClientsManager::GetInstance()->ReportDataCbOneWay(groupId, serviceId);
+    return ret;
+}
+
+int32_t SensorIfService::UnregisterOneWay(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj)
+{
+    SENSOR_TRACE_PID;
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    HDF_LOGI("%{public}s: groupId %{public}d, service %{public}d", __func__, groupId, serviceId);
+    return Unregister(groupId, static_cast<sptr<V2_0::ISensorCallback>>(callbackObj));
+}
+
+int32_t SensorIfService::AddCallbackMap(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
@@ -453,9 +473,9 @@ int32_t SensorIfService::AddCallbackMap(int32_t groupId, const sptr<ISensorCallb
     if (groupCallBackIter != callbackMap.end()) {
         auto callBackIter =
             find_if(callbackMap[groupId].begin(), callbackMap[groupId].end(),
-            [&callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
-                const sptr<IRemoteObject> &lhs = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackObj);
-                const sptr<IRemoteObject> &rhs = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackRegistered);
+            [&callbackObj](const sptr<V2_0::ISensorCallback> &callbackRegistered) {
+                const sptr<IRemoteObject> &lhs = OHOS::HDI::hdi_objcast<V2_0::ISensorCallback>(callbackObj);
+                const sptr<IRemoteObject> &rhs = OHOS::HDI::hdi_objcast<V2_0::ISensorCallback>(callbackRegistered);
                 return lhs == rhs;
             });
         if (callBackIter == callbackMap[groupId].end()) {
@@ -470,14 +490,14 @@ int32_t SensorIfService::AddCallbackMap(int32_t groupId, const sptr<ISensorCallb
         if (addResult != SENSOR_SUCCESS) {
             return HDF_FAILURE;
         }
-        std::vector<sptr<ISensorCallback>> remoteVec;
+        std::vector<sptr<V2_0::ISensorCallback>> remoteVec;
         remoteVec.push_back(callbackObj);
         callbackMap[groupId] = remoteVec;
     }
     return SENSOR_SUCCESS;
 }
 
-int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
+int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);
@@ -488,9 +508,9 @@ int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const
     }
     auto callBackIter =
         find_if(callbackMap[groupId].begin(), callbackMap[groupId].end(),
-        [&callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
-            const sptr<IRemoteObject> &lhs = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackObj);
-            const sptr<IRemoteObject> &rhs = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackRegistered);
+        [&callbackObj](const sptr<V2_0::ISensorCallback> &callbackRegistered) {
+            const sptr<IRemoteObject> &lhs = OHOS::HDI::hdi_objcast<V2_0::ISensorCallback>(callbackObj);
+            const sptr<IRemoteObject> &rhs = OHOS::HDI::hdi_objcast<V2_0::ISensorCallback>(callbackRegistered);
             return lhs == rhs;
         });
     if (callBackIter == callbackMap[groupId].end()) {
@@ -527,7 +547,7 @@ int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const
     return SENSOR_SUCCESS;
 }
 
-int32_t SensorIfService::AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj)
+int32_t SensorIfService::AddSensorDeathRecipient(const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
@@ -537,7 +557,7 @@ int32_t SensorIfService::AddSensorDeathRecipient(const sptr<ISensorCallback> &ca
         HDF_LOGE("%{public}s: new CallBackDeathRecipient fail", __func__);
         return HDF_FAILURE;
     }
-    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackObj);
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<V2_0::ISensorCallback>(callbackObj);
     bool result = remote->AddDeathRecipient(callBackDeathRecipient);
     if (!result) {
         HDF_LOGE("%{public}s: AddDeathRecipient fail", __func__);
@@ -547,12 +567,12 @@ int32_t SensorIfService::AddSensorDeathRecipient(const sptr<ISensorCallback> &ca
     return SENSOR_SUCCESS;
 }
 
-int32_t SensorIfService::RemoveSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj)
+int32_t SensorIfService::RemoveSensorDeathRecipient(const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);
-    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackObj);
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<V2_0::ISensorCallback>(callbackObj);
     auto callBackDeathRecipientIter = g_callBackDeathRecipientMap.find(remote.GetRefPtr());
     if (callBackDeathRecipientIter == g_callBackDeathRecipientMap.end()) {
         HDF_LOGE("%{public}s: not find recipient", __func__);
@@ -584,9 +604,9 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
         }
         auto callBackIter =
         find_if(callbackMap[groupId].begin(), callbackMap[groupId].end(),
-        [&callbackObject](const sptr<ISensorCallback> &callbackRegistered) {
+        [&callbackObject](const sptr<V2_0::ISensorCallback> &callbackRegistered) {
             return callbackObject.GetRefPtr() ==
-                (OHOS::HDI::hdi_objcast<ISensorCallback>(callbackRegistered)).GetRefPtr();
+                (OHOS::HDI::hdi_objcast<V2_0::ISensorCallback>(callbackRegistered)).GetRefPtr();
         });
         if (callBackIter != callbackMap[groupId].end()) {
             int32_t serviceId = SensorClientsManager::GetInstance()->GetServiceId(groupId, *callBackIter);
@@ -627,7 +647,7 @@ void  SensorIfService::RemoveDeathNotice(int32_t sensorType)
         return;
     }
     for (auto callback : callbackMap[sensorType]) {
-        const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISensorCallback>(callback);
+        const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<V2_0::ISensorCallback>(callback);
         auto recipientIter = g_callBackDeathRecipientMap.find(remote.GetRefPtr());
         if (recipientIter != g_callBackDeathRecipientMap.end()) {
             bool removeResult = remote->RemoveDeathRecipient(recipientIter->second);
@@ -789,7 +809,7 @@ extern "C" ISensorInterface *SensorInterfaceImplGetInstance(void)
 
     return impl;
 }
-} // namespace V2_0
+} // namespace V2_1
 } // namespace Sensor
 } // namespace HDI
 } // namespace OHOS

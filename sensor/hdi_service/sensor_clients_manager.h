@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 
 constexpr uint32_t MAX_DUMP_DATA_SIZE = 10;
 
@@ -41,8 +41,9 @@ struct SensorsDataPack {
 class SensorClientsManager {
 public:
     ~SensorClientsManager();
-    void ReportDataCbRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj);
-    void ReportDataCbUnRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj);
+    void ReportDataCbRegister(int groupId, int serviceId, const sptr<V2_0::ISensorCallback> &callbackObj);
+    void ReportDataCbUnRegister(int groupId, int serviceId, const sptr<V2_0::ISensorCallback> &callbackObj);
+    void ReportDataCbOneWay(int groupId, int serviceId);
     void SetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval);
     void SetSdcSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval);
     void GetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval);
@@ -63,7 +64,7 @@ public:
     void OpenSensor(int sensorId, int serviceId);
     void UpdateSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval);
     void UpdateSdcSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval);
-    int GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj);
+    int GetServiceId(int groupId, const sptr<V2_0::ISensorCallback> &callbackObj);
     static SensorClientsManager* GetInstance();
     std::mutex clientsMutex_;
     std::mutex sensorUsedMutex_;
@@ -79,6 +80,8 @@ public:
     void CopyEventData(const struct HdfSensorEvents event);
     void ReSetSensorPrintTime(int32_t sensorId);
     bool IsSensorNeedPrint(int32_t sensorId);
+    void HdiReportData(const sptr<V2_0::ISensorCallback> &callbackObj, const V2_0::HdfSensorEvents& event,
+        std::string &result, const bool &oneway, int32_t sensorId, int32_t serviceId);
 private:
     SensorClientsManager();
     static std::mutex instanceMutex_;
@@ -97,7 +100,7 @@ struct BestSensorConfig {
     int64_t reportInterval;
 };
 
-} // V2_0
+} // V2_1
 } // Sensor
 } // HDI
 } // OHOS
