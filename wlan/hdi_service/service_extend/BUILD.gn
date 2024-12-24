@@ -83,5 +83,6 @@ ohos_shared_library("libwlan_service_extend") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
+  version_script = "libwlanserviceextend.map"
   part_name = "drivers_peripheral_wlan"
 }
