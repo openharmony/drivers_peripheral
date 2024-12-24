@@ -44,9 +44,7 @@ ohos_fuzztest("UsbAsyncCancelFuzzTest") {
     "${usb_driver_path}/hdf_usb/include",
   ]
 
-  deps = [
-    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
-  ]
+  deps = [ "${usb_driver_path}/hdi_service:libusb_interface_service_1.2" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -86,9 +84,7 @@ ohos_fuzztest("UsbAsyncTransferFuzzTest") {
     "${usb_driver_path}/hdf_usb/include",
   ]
 
-  deps = [
-    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
-  ]
+  deps = [ "${usb_driver_path}/hdi_service:libusb_interface_service_1.2" ]
 
   if (is_standard_system) {
     external_deps = [
