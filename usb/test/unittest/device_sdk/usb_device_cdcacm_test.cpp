@@ -557,9 +557,9 @@ static int32_t SendBreak(struct AcmDevice *acm, int32_t duration)
 }
 
 static struct AcmNotifyMethod g_notifyMethod = {
-    .Connect = Connect,
-    .Disconnect = Disconnect,
-    .SendBreak = SendBreak,
+    .connect = Connect,
+    .disconnect = Disconnect,
+    .sendBreak = SendBreak,
 };
 
 static uint32_t Enable(struct AcmDevice *acm)
