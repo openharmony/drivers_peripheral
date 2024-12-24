@@ -208,13 +208,19 @@ int32_t TestGetDisplayProperty(uint32_t devId)
     return ret;
 }
 
-int32_t TestSetHardwareCursorPosition(uint32_t devId)
+int32_t TestUpdateHardwareCursor(uint32_t devId)
 {
+    BufferHandle* buffer = UsingAllocmem();
+    if (buffer == nullptr) {
+        HDF_LOGE("%{public}s: Failed to UsingAllocmem", __func__);
+        return DISPLAY_FAILURE;
+    }
+
     int32_t x = GetData<uint32_t>();
     int32_t y = GetData<uint32_t>();
-    int32_t ret = g_composerInterface->SetHardwareCursorPosition(devId, x, y);
+    int32_t ret = g_composerInterface->UpdateHardwareCursor(devId, x, y, buffer);
     if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
-        HDF_LOGE("%{public}s: function SetHardwareCursorPosition failed, %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: function UpdateHardwareCursor failed, %{public}d", __func__, ret);
         return DISPLAY_FAILURE;
     }
     return DISPLAY_SUCCESS;
@@ -491,7 +497,7 @@ TestFuncs g_testFuncs = {
     TestPrepareDisplayLayers,
     TestSetGetDisplayBacklight,
     TestGetDisplayProperty,
-    TestSetHardwareCursorPosition,
+    TestUpdateHardwareCursor,
     TestEnableHardwareCursorStats,
     TestGetHardwareCursorStats,
     TestGetDisplayCompChange,
