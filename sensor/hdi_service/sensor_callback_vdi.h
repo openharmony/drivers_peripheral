@@ -19,7 +19,7 @@
 #include <iproxy_broker.h>
 #include "sensor_uhdf_log.h"
 #include "isensor_callback_vdi.h"
-#include "v2_0/isensor_interface.h"
+#include "v2_1/isensor_interface.h"
 #include "v2_0/sensor_types.h"
 #include "sensor_clients_manager.h"
 #include "sensor_client_info.h"
@@ -27,25 +27,25 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 
 class SensorCallbackVdi : public OHOS::HDI::Sensor::V1_1::ISensorCallbackVdi {
 public:
     SensorCallbackVdi() = default;
     virtual ~SensorCallbackVdi() = default;
-    explicit SensorCallbackVdi(sptr<ISensorCallback> sensorCallback) : sensorCallback_(sensorCallback) {}
+    explicit SensorCallbackVdi(sptr<V2_0::ISensorCallback> sensorCallback) : sensorCallback_(sensorCallback) {}
     int32_t OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi) override;
     int32_t OnDataEvent(const V2_0::HdfSensorEvents& event) override;
     sptr<IRemoteObject> HandleCallbackDeath() override;
 private:
     void PrintData(const HdfSensorEvents &event, const std::string &reportResult, bool &isPrint);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
-    sptr<ISensorCallback> sensorCallback_;
+    sptr<V2_0::ISensorCallback> sensorCallback_;
     SensorClientInfo sensorClientInfo_;
     std::mutex timestampMapMutex_;
 };
 
-} // V2_0
+} // V2_1
 } // Sensor
 } // HDI
 } // OHOS
