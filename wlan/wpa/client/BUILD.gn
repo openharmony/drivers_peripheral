@@ -92,6 +92,7 @@ if (defined(ohos_lite)) {
       updater_vendor_base_dir,
     ]
     subsystem_name = "hdf"
+    version_script = "libwpahdiclient.map"
     part_name = "drivers_peripheral_wlan"
   }
 }
