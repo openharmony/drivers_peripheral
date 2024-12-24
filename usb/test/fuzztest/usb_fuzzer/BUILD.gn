@@ -32,7 +32,7 @@ ohos_fuzztest("UsbFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_usb:libusb_stub_1.1",
+    "drivers_interface_usb:libusb_stub_1.2",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",

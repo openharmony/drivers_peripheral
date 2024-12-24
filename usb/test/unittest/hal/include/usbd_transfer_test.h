@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include "UsbSubscriberTest.h"
 #include "v1_0/iusbd_subscriber.h"
-#include "v1_1/usb_types.h"
+#include "v1_2/usb_types.h"
 #include "v1_0/iusbd_bulk_callback.h"
 
 using OHOS::HDI::Usb::V1_0::UsbDev;

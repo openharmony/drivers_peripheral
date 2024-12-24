@@ -21,8 +21,8 @@
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
 #include "usbd_type.h"
-#include "v1_1/iusb_interface.h"
-#include "v1_1/usb_types.h"
+#include "v1_2/iusb_interface.h"
+#include "v1_2/usb_types.h"
 
 const int SLEEP_TIME = 3;
 const uint8_t INDEX_1 = 1;
@@ -48,12 +48,12 @@ using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
-using namespace OHOS::HDI::Usb::V1_1;
+using namespace OHOS::HDI::Usb::V1_2;
 
 UsbDev UsbdRequestTest::dev_ = {0, 0};
 sptr<UsbSubscriberTest> UsbdRequestTest::subscriber_ = nullptr;
 namespace {
-sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> g_usbInterface = nullptr;
+sptr<OHOS::HDI::Usb::V1_2::IUsbInterface> g_usbInterface = nullptr;
 
 int32_t SwitchErrCode(int32_t ret)
 {
@@ -62,7 +62,7 @@ int32_t SwitchErrCode(int32_t ret)
 
 void UsbdRequestTest::SetUpTestCase(void)
 {
-    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_2::IUsbInterface::Get();
     if (g_usbInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
         exit(0);
