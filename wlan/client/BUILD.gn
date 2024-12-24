@@ -110,6 +110,7 @@ if (defined(ohos_lite)) {
       ]
       install_images = [ chipset_base_dir ]
       subsystem_name = "hdf"
+      version_script = "libwifidriverclient.map"
       part_name = "drivers_peripheral_wlan"
     } else {
       sources += [
