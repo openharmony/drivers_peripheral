@@ -22,6 +22,7 @@ extern "C" {
 
 #define NUMBER_BASE 10
 #define MAX_INT32_LENGTH 11
+#define MAX_UINT32_LENGTH 10
 
 /**
  * @Description Convert [a,b,c,d,e,f] mac address to string type [xx:xx:xx:xx:xx:xx]
@@ -71,7 +72,9 @@ int DataAnonymize(const char *input, int inputLen, char* output, int outputSize)
 
 char IsValidHexCharAndConvert(char c);
 
-unsigned int AtoiToStrtol(const char *input);
+unsigned int AtoiToStrtolUint(const char *input);
+
+int AtoiToStrtol(const char *input);
 
 #ifdef __cplusplus
 }
