@@ -13,12 +13,12 @@
  
 1.0 {
   global:
-    *GetWifiHostapdDev*;
-    *ReleaseHostapdDev*;
-    *InitCfg*;
-    *GetIfaceState*;
-    *HostapdEventReport*;
-    *HdfHostapdStubDriver*;
+    GetWifiHostapdDev;
+    ReleaseHostapdDev;
+    InitCfg;
+    GetIfaceState;
+    HostapdEventReport;
+    HdfHostapdStubDriver;
     HostapdInterfaceStartAp;
     HostapdInterfaceStartApWithCmd;
     HostapdInterfaceStopAp;
