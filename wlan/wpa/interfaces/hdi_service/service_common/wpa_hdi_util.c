@@ -185,7 +185,7 @@ int DataAnonymize(const char *input, int inputLen, char* output, int outputSize)
 
 unsigned int AtoiToStrtolUint(const char *input)
 {
-    if (intput == NULL || input[0] == '\0' || strlen(input) > MAX_UINT32_LENGTH) {
+    if (input == NULL || input[0] == '\0' || strlen(input) > MAX_UINT32_LENGTH) {
         HDF_LOGE("AtoiToStrtolUint: invalid data!");
         return 0;
     }
@@ -196,7 +196,7 @@ unsigned int AtoiToStrtolUint(const char *input)
     if (endPtr == input || *endPtr != '\0') {
         HDF_LOGE("AtoiToStrtolUint: invalid data!");
         return 0;
-    } else if ((result == LONG_MIN || result == LONG_MAX) && (errno == ERANGE)) {
+    } else if ((result == ULONG_MAX) && (errno == ERANGE)) {
         HDF_LOGE("AtoiToStrtolUint: failed!");
         return 0;
     } else {
@@ -206,7 +206,7 @@ unsigned int AtoiToStrtolUint(const char *input)
 
 int AtoiToStrtol(const char *input)
 {
-    if (intput == NULL || input[0] == '\0' || strlen(input) > MAX_INT32_LENGTH) {
+    if (input == NULL || input[0] == '\0' || strlen(input) > MAX_INT32_LENGTH) {
         HDF_LOGE("AtoiToStrtol: invalid data!");
         return 0;
     }
