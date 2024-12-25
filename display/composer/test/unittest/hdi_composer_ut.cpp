@@ -322,14 +322,31 @@ HWTEST_F(DeviceTest, test_GetDisplayProperty, TestSize.Level1)
     EXPECT_EQ(DISPLAY_SUCCESS, result);
 }
 
-HWTEST_F(DeviceTest, test_SetHardwareCursorPosition, TestSize.Level1)
+HWTEST_F(DeviceTest, test_UpdateHardwareCursor, TestSize.Level1)
 {
+    BufferHandle* buffer = nullptr;
+    const int32_t WIDTH = 512;
+    const int32_t HEIGHT = 512;
+
+    AllocInfo info;
+    info.width  = WIDTH;
+    info.height = HEIGHT;
+    info.usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_HW_COMPOSER;
+    info.format = Composer::V1_0::PIXEL_FMT_RGBA_8888;
+
+    g_gralloc->AllocMem(info, buffer);
+    ASSERT_TRUE(buffer != nullptr);
+
     int32_t x = 1;
     int32_t y = 1;
-    auto ret = g_composerDevice->SetHardwareCursorPosition(g_displayIds[0], x, y);
+    auto ret = g_composerDevice->UpdateHardwareCursor(g_displayIds[0], x, y, buffer);
     if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         ret = DISPLAY_SUCCESS;
     }
+    g_gralloc->FreeMem(*buffer);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
