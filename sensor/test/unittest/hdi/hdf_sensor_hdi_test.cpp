@@ -20,20 +20,23 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v2_0/isensor_interface.h"
+#include "v2_1/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
+#include "sensor_callback_impl_v2_1.h"
 #include "sensor_callback_impl_test.h"
 #include "sensor_uhdf_log.h"
 #include "sensor_trace.h"
 
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V2_1;
+using namespace OHOS::HDI::Sensor;
 using namespace testing::ext;
 
 namespace {
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
     sptr<V2_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     sptr<V2_0::ISensorCallback> g_traditionalCallbackTest = new SensorCallbackImplTest();
+    sptr<V2_1::ISensorCallback> g_traditionalCallbackV2_1 = new SensorCallbackImplV2_1();
     sptr<V2_0::ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
     std::vector<HdfSensorEvents> g_events;
@@ -691,5 +694,36 @@ HWTEST_F(HdfSensorHdiTest, SensorCallbackImplFailureTest, TestSize.Level1)
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
     ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: V2_1_EnableSensor
+  * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, V2_1_EnableSensor, TestSize.Level1)
+{
+    HDF_LOGI("enter the V2_1_EnableSensor function");
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret = g_sensorInterface->RegisterOneWay(TRADITIONAL_SENSOR_TYPE, g_traditionalCallbackV2_1);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    for (auto iter : g_info) {
+        ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        ret = g_sensorInterface->Enable(iter.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    OsalMSleep(SENSOR_WAIT_TIME2);
+
+    for (auto iter : g_info) {
+        ret = g_sensorInterface->Disable(iter.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+    ret = g_sensorInterface->UnregisterOneWay(TRADITIONAL_SENSOR_TYPE, g_traditionalCallbackV2_1);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
