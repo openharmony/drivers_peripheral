@@ -39,6 +39,8 @@
     HostapdInterfaceDisassociateSta;
     HostapdInterfaceRegisterEventCallback;
     HostapdInterfaceUnregisterEventCallback;
+    HostapdInterfaceImplGetInstance;
+    HostapdInterfaceImplRelease;
   local:
     *;
 };
