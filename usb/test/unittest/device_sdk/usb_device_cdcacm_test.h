@@ -74,9 +74,9 @@ struct Serial {
 };
 
 struct AcmNotifyMethod {
-    void (*Connect)(struct AcmDevice *acm);
-    void (*Disconnect)(struct AcmDevice *acm);
-    int32_t (*SendBreak)(struct AcmDevice *acm, int32_t duration);
+    void (*connect)(struct AcmDevice *acm);
+    void (*disconnect)(struct AcmDevice *acm);
+    int32_t (*sendBreak)(struct AcmDevice *acm, int32_t duration);
 };
 
 struct AcmPipe {
