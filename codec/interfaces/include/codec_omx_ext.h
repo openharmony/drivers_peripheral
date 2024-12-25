@@ -317,8 +317,6 @@ enum OmxIndexCodecExType {
     OMX_IndexParamEncOutMse,
     /** CodecEncOutLTRParam */
     OMX_IndexParamEncOutLTR,
-    /** CodecTemperalLayerParam */
-    OMX_IndexParamTemperalLayer,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamEncParamsFeedback,
     /** OMX_S32 */
@@ -327,6 +325,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamQPStsart,
     /** OMX_BOOL */
     OMX_IndexParamSkipFrame,
+    /** CodecTemperalLayerParam */
+    OMX_IndexParamTemperalLayer,
     /** OMX_S32 */
     OMX_IndexParamEncOutRealBitrate,
     /** CodecEncOutMadParam */
