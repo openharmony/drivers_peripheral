@@ -20,7 +20,7 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v2_0/isensor_interface.h"
+#include "v2_1/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
 #include "sensor_uhdf_log.h"
@@ -28,7 +28,7 @@
 #include "sensor_clients_manager.h"
 
 using namespace OHOS::HDI::Sensor;
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V2_1;
 using namespace testing::ext;
 
 namespace {

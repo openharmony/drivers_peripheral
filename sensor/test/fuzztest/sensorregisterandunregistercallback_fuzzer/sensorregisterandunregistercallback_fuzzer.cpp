@@ -17,6 +17,7 @@
 #include "hdf_base.h"
 #include "v2_0/isensor_interface.h"
 
+using namespace OHOS::HDI::Sensor;
 using namespace OHOS::HDI::Sensor::V2_0;
 
 namespace OHOS {

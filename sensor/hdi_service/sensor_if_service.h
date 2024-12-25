@@ -45,8 +45,8 @@ public:
     int32_t SetOption(int32_t sensorId, uint32_t option) override;
     int32_t Register(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj) override;
     int32_t Unregister(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj) override;
-    int32_t RegisterOneWay(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj) override;
-    int32_t UnregisterOneWay(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj) override;
+    int32_t RegisterAsync(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj) override;
+    int32_t UnregisterAsync(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj) override;
     int32_t ReadData(int32_t sensorId, std::vector<HdfSensorEvents> &event) override;
     int32_t SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel) override;
     int32_t GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfo) override;

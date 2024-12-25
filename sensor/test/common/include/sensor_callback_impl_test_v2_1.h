@@ -12,30 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <cmath>
 
+#ifndef OHOS_HDI_SENSOR_V2_1_SENSORCALLBACKIMPLTEST_H
+#define OHOS_HDI_SENSOR_V2_1_SENSORCALLBACKIMPLTEST_H
+
+#include <hdf_base.h>
+#include <securec.h>
+#include "v2_1/isensor_callback.h"
+#include "sensor_uhdf_log.h"
 #include "osal_mem.h"
-#include "sensor_callback_impl_v2_1.h"
-#include "sensor_type.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V2_1 {
-int32_t SensorCallbackImplTestV2_1::OnDataEvent(const HdfSensorEvents& event)
-{
-    HDF_LOGI("%{public}s: sensorId=%{public}d", __func__, event.sensorId);
-    (void)event;
-    return HDF_SUCCESS;
-}
 
-int32_t SensorCallbackImplTestV2_1::OnDataEventOneWay(const HdfSensorEvents& event)
-{
-    HDF_LOGI("%{public}s: sensorId=%{public}d, timestamp=%{public}s", __func__, event.sensorId, event.timestamp);
-    (void)event;
-    return HDF_SUCCESS;
-}
+constexpr int32_t DATA_LEN = 256;
+
+class SensorCallbackImplTestV2_1 : public ISensorCallback {
+public:
+    virtual ~SensorCallbackImplTestV2_1() {}
+
+    int32_t OnDataEvent(const HdfSensorEvents& event) override;
+
+    int32_t OnDataEventAsync(const std::vector<HdfSensorEvents>& events) override;
+};
 } // V2_1
 } // Sensor
 } // HDI
 } // OHOS
+
+#endif // OHOS_HDI_SENSOR_V2_1_SENSORCALLBACKIMPLTEST_H
