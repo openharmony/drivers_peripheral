@@ -263,11 +263,9 @@ ERROR:
     OsalMemFree(descsVdi->effectId);
     OsalMemFree(descsVdi->effectName);
     OsalMemFree(descsVdi->libName);
-    OsalMemFree(descsVdi->supplier);
     descsVdi->effectId = NULL;
     descsVdi->effectName = NULL;
     descsVdi->libName = NULL;
-    descsVdi->supplier = NULL;
     return HDF_FAILURE；
 }
 
