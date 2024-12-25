@@ -13,9 +13,9 @@
  
 1.0 {
   global:
-    *HostapdEventReport*;
-    *HostapdRegisterEventCallback*;
-    *HostapdUnregisterEventCallback*;
+    HostapdEventReport;
+    HostapdRegisterEventCallback;
+    HostapdUnregisterEventCallback;
   local:
     *;
 };
