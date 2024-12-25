@@ -444,7 +444,7 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<V2_0::ISensorCal
     return ret;
 }
 
-int32_t SensorIfService::RegisterOneWay(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj)
+int32_t SensorIfService::RegisterAsync(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
@@ -456,7 +456,7 @@ int32_t SensorIfService::RegisterOneWay(int32_t groupId, const sptr<V2_1::ISenso
     return ret;
 }
 
-int32_t SensorIfService::UnregisterOneWay(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj)
+int32_t SensorIfService::UnregisterAsync(int32_t groupId, const sptr<V2_1::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
@@ -497,7 +497,8 @@ int32_t SensorIfService::AddCallbackMap(int32_t groupId, const sptr<V2_0::ISenso
     return SENSOR_SUCCESS;
 }
 
-int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<V2_0::ISensorCallback> &callbackObj)
+int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId,
+    const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);

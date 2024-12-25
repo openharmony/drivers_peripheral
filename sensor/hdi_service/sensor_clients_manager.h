@@ -72,6 +72,10 @@ public:
     std::mutex sdcSensorConfigMutex_;
     std::mutex sensorInfoMutex_;
     std::mutex sensorsDataPackMutex_;
+    struct SensorInfoId {
+        int32_t sensorId = 0;
+        int32_t serviceId = 0;
+    };
     void SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval, int64_t &reportInterval);
     static bool IsSensorContinues(int32_t sensorId);
     void UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval);
@@ -81,7 +85,7 @@ public:
     void ReSetSensorPrintTime(int32_t sensorId);
     bool IsSensorNeedPrint(int32_t sensorId);
     void HdiReportData(const sptr<V2_0::ISensorCallback> &callbackObj, const V2_0::HdfSensorEvents& event,
-        std::string &result, const bool &oneway, int32_t sensorId, int32_t serviceId);
+        std::string &result, const bool &oneway, SensorInfoId sensorInfoId);
 private:
     SensorClientsManager();
     static std::mutex instanceMutex_;
