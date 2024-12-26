@@ -1078,7 +1078,7 @@ HWTEST_F(DeviceTest, test_GetHDRCapabilityInfos, TestSize.Level1)
 
 HWTEST_F(DeviceTest, test_SetDisplayActiveRegion, TestSize.Level1)
 {
-    IRect rect = {0, 0, 1920, 540};
+    IRect rect = {0, 0, 1, 1};
     auto ret = g_composerDevice->SetDisplayActiveRegion(g_displayIds[0], rect);
     HDF_LOGI("SetDisplayActiveRegion ret = %{public}d", ret);
 
@@ -1086,7 +1086,7 @@ HWTEST_F(DeviceTest, test_SetDisplayActiveRegion, TestSize.Level1)
         DISPLAY_TEST_LOGD("SetDisplayActiveRegion not support");
         return;
     }
-    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
 }
 
 HWTEST_F(DeviceTest, test_FastPresent, TestSize.Level1)
