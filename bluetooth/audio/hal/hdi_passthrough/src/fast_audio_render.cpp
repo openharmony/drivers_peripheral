@@ -288,8 +288,11 @@ int32_t FastRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
     if (count != 0 && sumOk == count) {
 #ifdef A2DP_HDI_SERVICE
         if (mExtraParams.audioStreamCtl == 1) {
-            HDF_LOGI("SetValue, try to fastSuspendPlaying");
-            OHOS::Bluetooth::FastSuspendPlaying();
+            HDF_LOGI("SetValue, try to fastSuspendPlaying=1");
+            OHOS::Bluetooth::FastSuspendPlayingFromParam();
+        } else if (mExtraParams.audioStreamCtl == 0) {
+            HDF_LOGI("SetValue, try to fastSuspendPlaying=0");
+            OHOS::Bluetooth::UnBlockStart();
         }
 #endif
         return AUDIO_HAL_SUCCESS;
