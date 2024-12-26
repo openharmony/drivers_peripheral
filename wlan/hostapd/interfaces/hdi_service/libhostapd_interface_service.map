@@ -13,34 +13,8 @@
  
 1.0 {
   global:
-    GetWifiHostapdDev;
-    ReleaseHostapdDev;
-    InitCfg;
-    GetIfaceState;
-    HostapdEventReport;
-    HdfHostapdStubDriver;
-    HostapdInterfaceStartAp;
-    HostapdInterfaceStartApWithCmd;
-    HostapdInterfaceStopAp;
-    HostapdInterfaceEnableAp;
-    HostapdInterfaceDisableAp;
-    HostapdInterfaceSetApPasswd;
-    HostapdInterfaceSetApName;
-    HostapdInterfaceSetApWpaValue;
-    HostapdInterfaceSetApBand;
-    HostapdInterfaceSetAp80211n;
-    HostapdInterfaceSetApWmm;
-    HostapdInterfaceSetApChannel;
-    HostapdInterfaceSetApMaxConn;
-    HostapdInterfaceSetMacFilter;
-    HostapdInterfaceDelMacFilter;
-    HostapdInterfaceReloadApConfigInfo;
-    HostapdInterfaceGetStaInfos;
-    HostapdInterfaceDisassociateSta;
-    HostapdInterfaceRegisterEventCallback;
-    HostapdInterfaceUnregisterEventCallback;
     HostapdInterfaceImplGetInstance;
-    HostapdInterfaceImplRelease;
+    HdfHostapdStubDriver;
   local:
     *;
 };
