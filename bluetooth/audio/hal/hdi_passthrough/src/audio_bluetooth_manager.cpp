@@ -15,6 +15,7 @@
 
 #include <map>
 #include <hdf_log.h>
+#include <atomic>
 #include "audio_internal.h"
 #include "i_bluetooth_a2dp_src.h"
 #include "i_bluetooth_host.h"
@@ -38,6 +39,8 @@ using namespace OHOS::bluetooth;
 using namespace OHOS::bluetooth::audio;
 static const char *g_bluetoothAudioDeviceSoPath = HDF_LIBRARY_FULL_PATH("libbluetooth_audio_session");
 static void *g_ptrAudioDeviceHandle = NULL;
+std::atomic_bool g_allowAudioStart = true;
+
 SetUpFunc setUpFunc;
 TearDownFunc tearDownFunc;
 GetStateFunc getStateFunc;
@@ -56,6 +59,8 @@ StopPlayingFunc fastStopPlayingFunc;
 ReqMmapBufferFunc fastReqMmapBufferFunc;
 ReadMmapPositionFunc fastReadMmapPositionFunc;
 GetLatencyFunc fastGetLatencyFunc;
+GetRealStateFunc getRealStateFunc;
+GetRenderMixerStateFunc getRenderMixerStateFunc;
 #endif
 
 sptr<IBluetoothA2dpSrc> g_proxy_ = nullptr;
@@ -230,6 +235,9 @@ static bool InitAudioDeviceSoHandle(const char *path)
         GET_SYM_ERRPR_RET(
             g_ptrAudioDeviceHandle, ReadMmapPositionFunc, fastReadMmapPositionFunc, "FastReadMmapPosition");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetLatencyFunc, fastGetLatencyFunc, "FastGetLatency");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetRealStateFunc, getRealStateFunc, "GetRealState");
+        GET_SYM_ERRPR_RET(
+            g_ptrAudioDeviceHandle, GetRenderMixerStateFunc, getRenderMixerStateFunc, "GetRenderMixerState");
     }
     return true;
 }
@@ -272,7 +280,10 @@ void FastTearDown()
 int FastStartPlaying(uint32_t sampleRate, uint32_t channelCount, uint32_t format)
 {
     BTAudioStreamState state = fastGetStateFunc();
-    if (state != BTAudioStreamState::STARTED) {
+    if (!g_allowAudioStart.load()) {
+        HDF_LOGE("not allow to start fast render, state=%{public}hhu", state);
+        return HDF_FAILURE;
+    } else if (state != BTAudioStreamState::STARTED) {
         HDF_LOGI("%{public}s, state=%{public}hhu", __func__, state);
         if (!fastStartPlayingFunc(sampleRate, channelCount, format)) {
             HDF_LOGE("%{public}s, fail to startPlaying", __func__);
@@ -282,14 +293,39 @@ int FastStartPlaying(uint32_t sampleRate, uint32_t channelCount, uint32_t format
     return HDF_SUCCESS;
 }
 
+int FastSuspendPlayingFromParam()
+{
+    int ret = 0;
+    RenderMixerState renderState = getRenderMixerStateFunc();
+    if (!g_allowAudioStart.load()) {
+        if (renderState == RenderMixerState::INITED || renderState == RenderMixerState::NORMAL_ON_MIX_STOP) {
+            HDF_LOGE("fast render is already stopping or stopped");
+            return ret;
+        }
+    }
+
+    BTAudioStreamState state = fastGetStateFunc();
+    BTAudioStreamState realState = getRealStateFunc();
+    g_allowAudioStart = false;
+    if (state == BTAudioStreamState::STARTED) {
+        HDF_LOGI("%{public}s", __func__);
+        ret = (fastSuspendPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
+    } else if (realState == BTAudioStreamState::STARTING && renderState == RenderMixerState::FAST_STARTED) {
+        HDF_LOGI("%{public}s fast render starting, so stopPlaying", __func__);
+        ret = (fastStopPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
+    } else {
+        HDF_LOGE("%{public}s, state=%{public}hhu is bad state, realState=%{public}hhu, renderState=%{public}hhu",
+            __func__, state, realState, renderState);
+    }
+    return ret;
+}
+
 int FastSuspendPlaying()
 {
     int ret = 0;
     BTAudioStreamState state = fastGetStateFunc();
     if (state == BTAudioStreamState::STARTED) {
         ret = (fastSuspendPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
-    } else if (state == BTAudioStreamState::STARTING) {
-        ret = (fastStopPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
     } else {
         HDF_LOGE("%{public}s, state=%{public}hhu is bad state", __func__, state);
     }
@@ -320,6 +356,38 @@ int FastGetLatency(uint32_t &latency)
 {
     return (fastGetLatencyFunc(latency) ? HDF_SUCCESS : HDF_FAILURE);
 }
+
+int SuspendPlayingFromParam()
+{
+    int retVal = 0;
+    RenderMixerState renderState = getRenderMixerStateFunc();
+    if (!g_allowAudioStart.load()) {
+        if (renderState == RenderMixerState::INITED || renderState == RenderMixerState::FAST_ON_MIX_STOP) {
+            HDF_LOGE("normal render is already stopping or stopped");
+            return retVal;
+        }
+    }
+
+    BTAudioStreamState state = getStateFunc();
+    BTAudioStreamState realState = getRealStateFunc();
+    g_allowAudioStart = false;
+    if (state == BTAudioStreamState::STARTED) {
+        HDF_LOGI("%{public}s", __func__);
+        retVal = (suspendPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
+    } else if (realState == BTAudioStreamState::STARTING && renderState == RenderMixerState::INITED) {
+        HDF_LOGI("%{public}s normal render starting, so stopPlaying", __func__);
+        retVal = (stopPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
+    } else {
+        HDF_LOGE("%{public}s, state=%{public}hhu is bad state, realState=%{public}hhu, renderState=%{public}hhu",
+            __func__, state, realState, renderState);
+    }
+    return retVal;
+}
+
+void UnBlockStart()
+{
+    g_allowAudioStart = true;
+}
 #endif
 
 int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs)
@@ -327,7 +395,10 @@ int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::A
     HDF_LOGD("%{public}s", __func__);
 #ifdef A2DP_HDI_SERVICE
     BTAudioStreamState state = getStateFunc();
-    if (state != BTAudioStreamState::STARTED) {
+    if (!g_allowAudioStart.load()) {
+        HDF_LOGE("not allow to start normal render, state=%{public}hhu", state);
+        return HDF_FAILURE;
+    } else if (state != BTAudioStreamState::STARTED) {
         HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
         if (!startPlayingFunc(attrs->sampleRate, attrs->channelCount, static_cast<uint32_t>(attrs->format))) {
             HDF_LOGE("%{public}s: fail to startPlaying", __func__);
@@ -364,7 +435,6 @@ int StartPlaying()
 
 int SuspendPlaying()
 {
-    HDF_LOGI("%{public}s", __func__);
 #ifdef A2DP_HDI_SERVICE
     int retval = 0;
     BTAudioStreamState state = getStateFunc();
@@ -376,6 +446,7 @@ int SuspendPlaying()
     }
     return retval;
 #else
+    HDF_LOGI("%{public}s", __func__);
     if (!g_proxy_) {
         HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
         return RET_BAD_STATUS;
