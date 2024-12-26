@@ -196,7 +196,7 @@ unsigned int AtoiToStrtolUint(const char *input)
     if (endPtr == input || *endPtr != '\0') {
         HDF_LOGE("AtoiToStrtolUint: invalid data!");
         return 0;
-    } else if ((result == ULONG_MAX) && (errno == ERANGE)) {
+    } else if (errno == ERANGE) {
         HDF_LOGE("AtoiToStrtolUint: failed!");
         return 0;
     } else {
@@ -217,7 +217,7 @@ int AtoiToStrtol(const char *input)
     if (endPtr == input || *endPtr != '\0') {
         HDF_LOGE("AtoiToStrtol: invalid data!");
         return 0;
-    } else if ((result == LONG_MIN || result == LONG_MAX) && (errno == ERANGE)) {
+    } else if (errno == ERANGE) {
         HDF_LOGE("AtoiToStrtol: failed!");
         return 0;
     } else {
