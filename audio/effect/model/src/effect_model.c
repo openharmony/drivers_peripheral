@@ -266,7 +266,7 @@ ERROR:
     descsVdi->effectId = NULL;
     descsVdi->effectName = NULL;
     descsVdi->libName = NULL;
-    return HDF_FAILURE；
+    return HDF_FAILURE;
 }
 
 static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
