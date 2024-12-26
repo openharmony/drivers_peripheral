@@ -26,6 +26,7 @@
 #define AUDIO_EFFECT_PRODUCT_CONFIG HDF_CHIP_PROD_CONFIG_DIR"/audio_effect.json"
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 #define AUDIO_EFFECT_NUM_MAX 10
+#define AUDIO_EFFECT_DESC_LEN 256
 struct ConfigDescriptor *g_cfgDescs = NULL;
 struct AudioEffectLibInfo {
     char *libName;
@@ -66,13 +67,26 @@ static int32_t LoadLibraryByName(const char *libName, uint8_t **libHandle, struc
     int32_t ret = 0;
     struct EffectFactory *(*getFactoryLib)(void);
     char path[PATH_MAX];
-    ret = snprintf_s(path, PATH_MAX, PATH_MAX, "%s.z.so", libName);
+    char pathBuf[PATH_MAX];
+#if (defined(__aarch64__) || defined(__x86_64__))
+    ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib64/%s.z.so", libName);
+#else
+    ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", libName);
+#endif
     if (ret < 0) {
         HDF_LOGE("%{public}s: get libPath failed", __func__);
         return HDF_FAILURE;
     }
+    if (realpath(path, pathBuf) == NULL) {
+        HDF_LOGE("%{public}s: realpath is null! [%{public}d]", __func__, errno);
+        return HDF_FAILURE;
+    }
+    if (strncmp(HDF_LIBRARY_DIR, pathBuf, strlen(HDF_LIBRARY_DIR)) != 0) {
+        HDF_LOGE("%{public}s: The file path is incorrect", __func__);
+        return HDF_FAILURE;
+    }
 
-    void *handle = dlopen(path, RTLD_LAZY);
+    void *handle = dlopen(pathBuf, RTLD_LAZY);
     if (handle == NULL) {
         HDF_LOGE("%{public}s: open so failed, reason:%{public}s", __func__, dlerror());
         return HDF_FAILURE;
@@ -218,6 +232,43 @@ static int32_t EffectModelIsSupplyEffectLibs(struct IEffectModel *self, bool *su
     return HDF_SUCCESS;
 }
 
+static int32_t ConstructDescriptor(struct EffectControllerDescriptorVdi *descsVdi)
+{
+    if (descsVdi == NULL) {
+        HDF_LOGE("%{public}s: invailid input params", __func__);
+    }
+
+    descsVdi->effectId = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
+    if (descsVdi->effectId == NULL) {
+        HDF_LOGE("%{public}s: effectId OsalMemCalloc fail", __func__);
+        goto ERROR;
+    }
+    descsVdi->effectName = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
+    if (descsVdi->effectName == NULL) {
+        HDF_LOGE("%{public}s: effectName OsalMemCalloc fail", __func__);
+        goto ERROR;
+    }
+    descsVdi->libName = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
+    if (descsVdi->libName == NULL) {
+        HDF_LOGE("%{public}s: libName OsalMemCalloc fail", __func__);
+        goto ERROR;
+    }
+    descsVdi->supplier = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
+    if (descsVdi->supplier == NULL) {
+        HDF_LOGE("%{public}s: supplier OsalMemCalloc fail", __func__);
+        goto ERROR;
+    }
+    return HDF_SUCCESS;
+ERROR:
+    OsalMemFree(descsVdi->effectId);
+    OsalMemFree(descsVdi->effectName);
+    OsalMemFree(descsVdi->libName);
+    descsVdi->effectId = NULL;
+    descsVdi->effectName = NULL;
+    descsVdi->libName = NULL;
+    return HDF_FAILURE;
+}
+
 static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
                                                   struct EffectControllerDescriptor *descs, uint32_t *descsLen)
 {
@@ -242,6 +293,10 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
         ret = LoadEffectLibrary(g_cfgDescs->effectCfgDescs[i].library, &factLib, &ctrlMgr);
         if (ret != HDF_SUCCESS || factLib == NULL) {
             HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
+            continue;
+        }
+        if (ConstructDescriptor(&descsVdi[descNum]) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: ConstructDescriptor fail!", __func__);
             continue;
         }
         ret = factLib->GetDescriptor(factLib, g_cfgDescs->effectCfgDescs[i].effectId, &descsVdi[descNum]);
@@ -282,7 +337,10 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
             HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
             return HDF_FAILURE;
         }
-
+        if (ConstructDescriptor(descVdi) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: ConstructDescriptor fail!", __func__);
+            continue;
+        }
         if (factLib->GetDescriptor(factLib, uuid, descVdi) != HDF_SUCCESS) {
             DeleteEffectLibrary(g_cfgDescs->effectCfgDescs[i].library);
             HDF_LOGE("%{public}s: GetDescriptor fail!", __func__);
