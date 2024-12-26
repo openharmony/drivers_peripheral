@@ -217,6 +217,12 @@ if (defined(ohos_lite)) {
 
     cflags = configFlag
     deps = [ "$TEST_ROOT_DIR/chip/hdi_service:libchip_controller_chip_interface_service_1.0" ]
+
+    defines = [
+      "private = public",
+      "protected = public",
+    ]
+
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
