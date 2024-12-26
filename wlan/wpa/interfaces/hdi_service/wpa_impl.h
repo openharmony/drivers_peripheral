@@ -27,6 +27,9 @@
 #include "securec.h"
 #include "v1_2/wpa_interface_stub.h"
 
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD001566
+
 struct HdfWpaRemoteNode {
     struct IWpaCallback *callbackObj;
     struct HdfRemoteService *service;
