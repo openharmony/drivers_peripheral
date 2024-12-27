@@ -36,6 +36,7 @@ typedef struct {
     uint32_t executorSensorHint;
     uint32_t executorMatcher;
     uint32_t capabilityLevel;
+    uint32_t credentialType;
     uint64_t enrolledSysTime;
 } CredentialInfoHal;
 

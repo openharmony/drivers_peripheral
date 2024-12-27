@@ -45,10 +45,8 @@ public:
     ~PinAuth() = default;
     int32_t Init();
     int32_t Close();
-
     int32_t GetExecutorInfo(int32_t executorRole, std::vector<uint8_t> &pubKey, uint32_t &esl,
         uint32_t &maxTemplateAcl);
-
     // for all in one executor
     int32_t SetAllInOneFwkParam(
         const std::vector<uint64_t> &templateIdList, const std::vector<uint8_t> &frameworkPublicKey);
