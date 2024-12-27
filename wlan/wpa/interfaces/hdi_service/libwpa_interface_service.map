@@ -15,9 +15,8 @@
   global:
     WpaInterfaceImplGetInstance;
     HdfWpaStubDriver;
-    GetWifiWpaGlobalInterface;
-    InitWifiWpaGlobalInterface;
-    ReleaseWpaGlobalInterface;
+    HdfWpaInterfaceDriverInit;
+    HdfWpaInterfaceDriverRelease;
   local:
     *;
 };
