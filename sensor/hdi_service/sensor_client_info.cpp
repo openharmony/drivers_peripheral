@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 
 SensorClientInfo::SensorClientInfo()
 {
@@ -34,7 +34,7 @@ SensorClientInfo::~SensorClientInfo()
     curCountMap_.clear();
 }
 
-void SensorClientInfo::SetReportDataCb(const sptr<ISensorCallback> &callbackObj)
+void SensorClientInfo::SetReportDataCb(const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     pollCallback_ = callbackObj;
 }
@@ -45,12 +45,12 @@ void SensorClientInfo::PrintClientMapInfo(int32_t serviceId, int32_t sensorId)
              __func__, serviceId, sensorId, curCountMap_[sensorId], periodCountMap_[sensorId]);
 }
 
-const sptr<ISensorCallback> SensorClientInfo::GetReportDataCb()
+const sptr<V2_0::ISensorCallback> SensorClientInfo::GetReportDataCb()
 {
     return pollCallback_;
 }
 
-} // V2_0
+} // V2_1
 } // Sensor
 } // HDI
 } // OHOS
