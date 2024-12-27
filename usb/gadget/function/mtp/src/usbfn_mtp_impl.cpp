@@ -1766,8 +1766,8 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
             mtpDev_->mtpState = MTP_STATE_ERROR;
             return HDF_ERR_IO;
     }
-    if (!mtpDev_->initFlag) {
-        HDF_LOGE("%{public}s: dev is release", __func__);
+    if (!mtpDev_->initFlag || mtpDev_->mtpState == MTP_STATE_CANCELED) {
+        HDF_LOGE("%{public}s: dev is release or canceled", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     if (oneReqLeft != mtpDev_->xferFileLength || mtpDev_->needZLP) {
@@ -1788,6 +1788,10 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileLeftAsync(uint64_t oneReqLeft)
         return HDF_ERR_IO;
     }
     HDF_LOGD("%{public}s: wait async tx", __func__);
+    if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
+        HDF_LOGE("%{public}s: dev is canceled", __func__);
+        return HDF_ERROR_ECANCEL;
+    }
     sem_wait(&asyncReq_);
     return (mtpDev_->mtpState == MTP_STATE_ERROR) ? HDF_ERR_IO : HDF_SUCCESS;
 }
