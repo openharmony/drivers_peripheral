@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 
-ohos_shared_library("libuser_auth_interface_service_2.0") {
+ohos_shared_library("libuser_auth_interface_service_3.0") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -101,11 +101,11 @@ ohos_shared_library("libuser_auth_driver") {
     "../common/utils",
   ]
   sources = [ "service/user_auth_interface_driver.cpp" ]
-  deps = [ ":libuser_auth_interface_service_2.0" ]
+  deps = [ ":libuser_auth_interface_service_3.0" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_user_auth:libuser_auth_stub_2.0",
+    "drivers_interface_user_auth:libuser_auth_stub_3.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -125,6 +125,6 @@ ohos_shared_library("libuser_auth_driver") {
 group("hdf_user_auth_service") {
   deps = [
     ":libuser_auth_driver",
-    ":libuser_auth_interface_service_2.0",
+    ":libuser_auth_interface_service_3.0",
   ]
 }
