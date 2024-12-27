@@ -26,6 +26,9 @@ extern "C"
 {
 #endif
 
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD001566
+
 #define IFNAMSIZ_WIFI 16
 #define ETH_ADDR_LEN 6
 #define BSS_STATUS_ASSOCIATED 1
