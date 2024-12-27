@@ -183,10 +183,10 @@ int DataAnonymize(const char *input, int inputLen, char* output, int outputSize)
     return CharReplace(output, headKeepSize, inputLen - tailKeepSize, hiddenChar);
 }
 
-unsigned int AtoiToStrtolUint(const char *input)
+unsigned int StrtoUint(const char *input)
 {
     if (input == NULL || input[0] == '\0' || strlen(input) > MAX_UINT32_LENGTH) {
-        HDF_LOGE("AtoiToStrtolUint: invalid data!");
+        HDF_LOGE("StrtoUint: invalid data!");
         return 0;
     }
     char *endPtr = NULL;
@@ -194,20 +194,20 @@ unsigned int AtoiToStrtolUint(const char *input)
     result = strtol(input, &endPtr, NUMBER_BASE);
 
     if (endPtr == input || *endPtr != '\0') {
-        HDF_LOGE("AtoiToStrtolUint: invalid data!");
+        HDF_LOGE("StrtoUint: invalid data!");
         return 0;
     } else if (errno == ERANGE) {
-        HDF_LOGE("AtoiToStrtolUint: failed!");
+        HDF_LOGE("StrtoUint: failed!");
         return 0;
     } else {
         return (unsigned int)result;
     }
 }
 
-int AtoiToStrtol(const char *input)
+int StrtoInt(const char *input)
 {
     if (input == NULL || input[0] == '\0' || strlen(input) > MAX_INT32_LENGTH) {
-        HDF_LOGE("AtoiToStrtol: invalid data!");
+        HDF_LOGE("StrtoInt: invalid data!");
         return 0;
     }
     char *endPtr = NULL;
@@ -215,10 +215,10 @@ int AtoiToStrtol(const char *input)
     result = strtol(input, &endPtr, NUMBER_BASE);
 
     if (endPtr == input || *endPtr != '\0') {
-        HDF_LOGE("AtoiToStrtol: invalid data!");
+        HDF_LOGE("StrtoInt: invalid data!");
         return 0;
     } else if (errno == ERANGE) {
-        HDF_LOGE("AtoiToStrtol: failed!");
+        HDF_LOGE("StrtoInt: failed!");
         return 0;
     } else {
         return (int)result;
