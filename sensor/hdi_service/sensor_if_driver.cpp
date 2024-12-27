@@ -19,11 +19,11 @@
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "sensor_if.h"
-#include "v2_0/sensor_interface_stub.h"
+#include "v2_1/sensor_interface_stub.h"
 
 #define HDF_LOG_TAG    uhdf_sensor_service
 
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V2_1;
 
 struct HdfSensorInterfaceHost {
     struct IDeviceIoService ioService;
@@ -70,7 +70,7 @@ static int32_t HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject
     hdfSensorInterfaceHost->ioService.Open = nullptr;
     hdfSensorInterfaceHost->ioService.Release = nullptr;
 
-    auto serviceImpl = ISensorInterface::Get(true);
+    auto serviceImpl = OHOS::HDI::Sensor::V2_1::ISensorInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfSensorInterfaceHost;
@@ -78,7 +78,7 @@ static int32_t HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject
     }
 
     hdfSensorInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        ISensorInterface::GetDescriptor());
+        OHOS::HDI::Sensor::V2_1::ISensorInterface::GetDescriptor());
     if (hdfSensorInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfSensorInterfaceHost;

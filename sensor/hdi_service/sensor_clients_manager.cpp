@@ -16,13 +16,14 @@
 #include "sensor_uhdf_log.h"
 #include "sensor_clients_manager.h"
 #include <cinttypes>
+#include <iproxy_broker.h>
 
 #define HDF_LOG_TAG uhdf_sensor_clients_manager
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 
 namespace {
     const std::vector<int32_t> continuesSensor = {HDF_SENSOR_TYPE_ACCELEROMETER, HDF_SENSOR_TYPE_GYROSCOPE,
@@ -95,7 +96,7 @@ void SensorClientsManager::CopyEventData(const struct HdfSensorEvents event)
     return;
 }
 
-int SensorClientsManager::GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj)
+int SensorClientsManager::GetServiceId(int groupId, const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
@@ -107,7 +108,8 @@ int SensorClientsManager::GetServiceId(int groupId, const sptr<ISensorCallback> 
     return HDF_FAILURE;
 }
 
-void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
+void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId,
+    const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
@@ -128,7 +130,8 @@ void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, cons
     return;
 }
 
-void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
+void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId,
+    const sptr<V2_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
@@ -140,6 +143,22 @@ void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, co
     auto it = clients_[groupId].find(serviceId);
     clients_[groupId].erase(it);
     HDF_LOGD("%{public}s: service: %{public}d, UnRegisterCB Success", __func__, serviceId);
+    return;
+}
+
+void SensorClientsManager::ReportDataCbOneWay(int groupId, int serviceId)
+{
+    SENSOR_TRACE_PID;
+    HDF_LOGI("%{public}s: service: %{public}d", __func__, serviceId);
+    std::unique_lock<std::mutex> lock(clientsMutex_);
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
+        HDF_LOGD("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
+        return;
+    }
+
+    auto it = clients_[groupId].find(serviceId);
+    it->second.oneway = true;
+    HDF_LOGI("%{public}s: service: %{public}d set oneway = true", __func__, serviceId);
     return;
 }
 
@@ -456,6 +475,7 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
     int32_t sensorId = event.sensorId;
     const std::set<int32_t> services = GetServiceIds(sensorId);
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+    static struct SensorInfoId sensorInfoId;
     {
         std::unique_lock<std::mutex> lock(clientsMutex_);
         if (clients_.find(groupId) == clients_.end() || clients_.find(groupId)->second.empty()) {
@@ -465,7 +485,8 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
     }
     for (auto it = services.begin(); it != services.end(); ++it) {
         int32_t serviceId = *it;
-        sptr<ISensorCallback> callback;
+        sptr<V2_0::ISensorCallback> callback;
+        bool oneway = false;
         {
             std::unique_lock<std::mutex> lock(clientsMutex_);
             if (clients_.find(groupId)->second.find(serviceId) == clients_.find(groupId)->second.end()) {
@@ -476,29 +497,47 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
                 continue;
             }
             callback = sensorClientInfo.GetReportDataCb();
+            oneway = sensorClientInfo.oneway;
             if (callback == nullptr) {
                 HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, serviceId);
                 continue;
             }
         }
-        SENSOR_TRACE_MSG("serviceId=" + std::to_string(serviceId) + ",sensorId=" + std::to_string(event.sensorId));
-        int32_t ret = callback->OnDataEvent(event);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
-        } else {
-            static std::unordered_map<int32_t, std::unordered_map<int32_t, int64_t>> sensorReportCountMap;
-            auto it = sensorReportCountMap[sensorId].find(serviceId);
-            int64_t reportCount = INIT_REPORT_COUNT;
-            if (it == sensorReportCountMap[sensorId].end()) {
-                sensorReportCountMap[sensorId][serviceId] = INIT_REPORT_COUNT;
-            } else {
-                it->second++;
-                reportCount = it->second;
-            }
-            result += std::to_string(serviceId) + "-" + std::to_string(reportCount) + " ";
-        }
+        HITRACE_METER_FMT(HITRACE_TAG_HDF, "%s: serviceId %d, sensorId %d", __func__, serviceId, event.sensorId);
+        sensorInfoId.sensorId = event.sensorId;
+        sensorInfoId.serviceId = serviceId;
+        HdiReportData(callback, event, result, oneway, sensorInfoId);
     }
     return result;
+}
+
+void SensorClientsManager::HdiReportData(const sptr<V2_0::ISensorCallback> &callback,
+    const V2_0::HdfSensorEvents& event, std::string &result, const bool &oneway, SensorInfoId sensorInfoId)
+{
+    int32_t ret = HDF_SUCCESS;
+    if (oneway) {
+        const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast(callback);
+        const sptr<V2_1::ISensorCallback> &cb = OHOS::HDI::hdi_facecast<V2_1::ISensorCallback>(remote);
+        std::vector<OHOS::HDI::Sensor::V2_0::HdfSensorEvents> eventsVec;
+        eventsVec.push_back(std::move(event));
+        cb->OnDataEventAsync(eventsVec);
+    } else {
+        ret = callback->OnDataEvent(event);
+    }
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
+    } else {
+        static std::unordered_map<int32_t, std::unordered_map<int32_t, int64_t>> sensorReportCountMap;
+        auto it = sensorReportCountMap[sensorInfoId.sensorId].find(sensorInfoId.serviceId);
+        int64_t reportCount = INIT_REPORT_COUNT;
+        if (it == sensorReportCountMap[sensorInfoId.sensorId].end()) {
+            sensorReportCountMap[sensorInfoId.sensorId][sensorInfoId.serviceId] = INIT_REPORT_COUNT;
+        } else {
+            it->second++;
+            reportCount = it->second;
+        }
+        result += std::to_string(sensorInfoId.serviceId) + "-" + std::to_string(reportCount) + " ";
+    }
 }
 
 std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
@@ -532,7 +571,7 @@ SensorClientsManager* SensorClientsManager::GetInstance()
     return instance;
 }
 
-} // V2_0
+} // V2_1
 } // Sensor
 } // HDI
 } // OHOS

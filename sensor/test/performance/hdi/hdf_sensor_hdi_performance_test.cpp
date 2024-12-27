@@ -33,7 +33,7 @@ namespace {
     const int32_t SENSOR_MSEC_TIME = 1000;
     const int32_t SENSOR_COMMON_TIME = 2000;
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
-    sptr<ISensorCallback> g_callback = new SensorCallbackImpl();
+    sptr<V2_0::ISensorCallback> g_callback = new SensorCallbackImpl();
 }
 
 class HdfSensorHdiPerformanceTest : public testing::Test {
