@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,10 +17,10 @@
 #include <cstdint>
 #include "hdf_log.h"
 #include "hidddk_fuzzer.h"
-#include "v1_0/hid_ddk_stub.h"
-#include "v1_0/ihid_ddk.h"
+#include "v1_1/hid_ddk_stub.h"
+#include "v1_1/ihid_ddk.h"
 
-using namespace OHOS::HDI::Input::Ddk::V1_0;
+using namespace OHOS::HDI::Input::Ddk::V1_1;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
@@ -32,7 +32,7 @@ constexpr int32_t THIRD_BIT = 3;
 constexpr int32_t ZERO_MOVE_LEN = 24;
 constexpr int32_t FIRST_MOVE_LEN = 16;
 constexpr int32_t SECOND_MOVE_LEN = 8;
-const std::u16string HID_INTERFACE_TOKEN = u"ohos.hdi.input.ddk.v1_0.IHidDdk";
+const std::u16string HID_INTERFACE_TOKEN = u"ohos.hdi.input.ddk.v1_1.IHidDdk";
 
 uint32_t Convert2Uint32(const uint8_t *ptr)
 {
@@ -64,12 +64,12 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     data.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    sptr<IHidDdk> hidDdkInterface = IHidDdk::Get(false);
+    sptr<OHOS::HDI::Input::Ddk::V1_1::IHidDdk> hidDdkInterface = OHOS::HDI::Input::Ddk::V1_1::IHidDdk::Get(false);
     if (hidDdkInterface == nullptr) {
         HDF_LOGE("%{public}s: get hidDdkInterface failed", __func__);
         return false;
     }
-    sptr<HidDdkStub> hidDdk = new HidDdkStub(hidDdkInterface);
+    sptr<OHOS::HDI::Input::Ddk::V1_1::HidDdkStub> hidDdk = new OHOS::HDI::Input::Ddk::V1_1::HidDdkStub(hidDdkInterface);
     if (hidDdk == nullptr) {
         HDF_LOGE("%{public}s: new hidDdk failed", __func__);
         return false;

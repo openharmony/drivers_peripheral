@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,26 @@
  * limitations under the License.
  */
 
-#include "v1_0/hid_ddk_service.h"
+#include "hid_ddk_service.h"
 #include <hdf_base.h>
 #include "emit_event_manager.h"
 #include "hid_ddk_permission.h"
 #include "input_uhdf_log.h"
+#include <unistd.h>
+#include <fcntl.h>
+#include <iostream>
+#include <sys/ioctl.h>
+#include <linux/hiddev.h>
+#include <linux/hidraw.h>
+#include <poll.h>
+#include <memory.h>
+#include <securec.h>
+#include "ddk_sysfs_device.h"
+#ifdef __LITEOS__
+#include "hid_liteos_adapter.h"
+#else
+#include "hid_linux_adapter.h"
+#endif
 
 #define HDF_LOG_TAG hid_ddk_service
 
@@ -25,12 +40,32 @@ namespace OHOS {
 namespace HDI {
 namespace Input {
 namespace Ddk {
-namespace V1_0 {
+namespace V1_1 {
+const uint8_t DEVFS_PATH_LEN  = 128;
+const uint8_t THIRTY_TWO_BIT = 32;
+const uint32_t MAX_REPORT_BUFFER_SIZE = 16 * 1024 - 1;
+
+inline uint32_t GetBusNum(uint64_t devHandle)
+{
+    return static_cast<uint32_t>(devHandle >> THIRTY_TWO_BIT);
+}
+
+inline uint32_t GetDevNum(uint64_t devHandle)
+{
+    return static_cast<uint32_t>(devHandle & 0xFFFFFFFF);
+}
+
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_HID";
 
 extern "C" IHidDdk *HidDdkImplGetInstance(void)
 {
-    return new (std::nothrow) HidDdkService();
+    std::shared_ptr<HidOsAdapter> osAdapter;
+#ifdef __LITEOS__
+    osAdapter = std::make_shared<LiteosHidOsAdapter>();
+#else
+    osAdapter = std::make_shared<LinuxHidOsAdapter>();
+#endif
+    return new (std::nothrow) HidDdkService(osAdapter);
 }
 
 int32_t HidDdkService::CreateDevice(const Hid_Device &hidDevice,
@@ -75,7 +110,268 @@ int32_t HidDdkService::DestroyDevice(uint32_t deviceId)
     return OHOS::ExternalDeviceManager::EmitEventManager::GetInstance().DestroyDevice(deviceId);
 }
 
-} // V1_0
+int32_t HidDdkService::Init()
+{
+    HDF_LOGD("%{public}s init enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    return HID_DDK_SUCCESS;
+}
+
+int32_t HidDdkService::Release()
+{
+    HDF_LOGD("%{public}s release enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    return HID_DDK_SUCCESS;
+}
+
+int32_t HidDdkService::Open(uint64_t deviceId, uint8_t interfaceIndex, HidDeviceHandle& dev)
+{
+    HDF_LOGD("%{public}s open enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    DevInterfaceInfo devInfo;
+    devInfo.busNum = GetBusNum(deviceId);
+    devInfo.devNum = GetDevNum(deviceId);
+    devInfo.intfNum = interfaceIndex;
+    char buff[DEVFS_PATH_LEN] = {0};
+    int32_t ret = DdkSysfsGetDevNodePath(&devInfo, "hidraw", buff, sizeof(buff));
+    if (ret != HID_DDK_SUCCESS) {
+        HDF_LOGE("%{public}s device not found", __func__);
+        return HID_DDK_DEVICE_NOT_FOUND;
+    }
+
+    int32_t fd = open(buff, O_RDWR);
+    if (fd < 0) {
+        HDF_LOGE("%{public}s open failed, errno=%{public}d", __func__, errno);
+        return HID_DDK_IO_ERROR;
+    }
+
+    dev.fd = fd;
+
+    return HID_DDK_SUCCESS;
+}
+
+int32_t HidDdkService::Close(const HidDeviceHandle& dev)
+{
+    HDF_LOGD("%{public}s close enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    int32_t ret = close(dev.fd);
+    if (ret == -1) {
+        HDF_LOGE("%{public}s close failed, errno=%{public}d", __func__, errno);
+        return HID_DDK_IO_ERROR;
+    }
+
+    return HID_DDK_SUCCESS;
+}
+
+int32_t HidDdkService::Write(const HidDeviceHandle& dev, const std::vector<uint8_t>& data, uint32_t& bytesWritten)
+{
+    HDF_LOGD("%{public}s write enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    int32_t ret = write(dev.fd, data.data(), data.size());
+    if (ret < 0) {
+        HDF_LOGE("%{public}s write failed, errno=%{public}d", __func__, errno);
+        bytesWritten = 0;
+        return HID_DDK_IO_ERROR;
+    }
+
+    bytesWritten = ret;
+    return HID_DDK_SUCCESS;
+}
+
+int32_t HidDdkService::ReadTimeout(const HidDeviceHandle& dev, std::vector<uint8_t>& data, uint32_t buffSize,
+    int32_t timeout, uint32_t& bytesRead)
+{
+    HDF_LOGD("%{public}s read timeout enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    if (buffSize > MAX_REPORT_BUFFER_SIZE) {
+        HDF_LOGE("%{public}s: invalid parameter", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
+    if (timeout >= 0) {
+        int32_t ret;
+        struct pollfd fds;
+
+        fds.fd = dev.fd;
+        fds.events = POLLIN;
+        fds.revents = 0;
+        ret = poll(&fds, 1, timeout);
+        if (ret == 0) {
+            return HID_DDK_TIMEOUT;
+        } else if (ret == -1) {
+            HDF_LOGE("%{public}s poll failed, errno=%{public}d", __func__, errno);
+            return HID_DDK_IO_ERROR;
+        }
+        if (fds.revents & (POLLERR | POLLHUP | POLLNVAL)) {
+            HDF_LOGE("%{public}s poll failed, revents=%{public}d", __func__, fds.revents);
+            return HID_DDK_IO_ERROR;
+        }
+    }
+
+    data.resize(buffSize);
+    int32_t readRet = read(dev.fd, data.data(), data.size());
+    if (readRet < 0) {
+        HDF_LOGE("%{public}s read failed, errno=%{public}d", __func__, errno);
+        bytesRead = 0;
+        return HID_DDK_IO_ERROR;
+    }
+
+    bytesRead = readRet;
+    return HID_DDK_SUCCESS;
+}
+
+int32_t HidDdkService::SetNonBlocking(const HidDeviceHandle& dev, int32_t nonBlock)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    return HID_DDK_SUCCESS;
+}
+
+int32_t HidDdkService::GetRawInfo(const HidDeviceHandle& dev, HidRawDevInfo& rawDevInfo)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    return osAdapter_->GetRawInfo(dev.fd, rawDevInfo);
+}
+
+int32_t HidDdkService::GetRawName(const HidDeviceHandle& dev, std::vector<uint8_t>& data, uint32_t buffSize)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    if (buffSize > MAX_REPORT_BUFFER_SIZE) {
+        HDF_LOGE("%{public}s: invalid parameter", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
+    data.resize(buffSize);
+
+    return osAdapter_->GetRawName(dev.fd, data);
+}
+
+int32_t HidDdkService::GetPhysicalAddress(const HidDeviceHandle& dev, std::vector<uint8_t>& data, uint32_t buffSize)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    if (buffSize > MAX_REPORT_BUFFER_SIZE) {
+        HDF_LOGE("%{public}s: invalid parameter", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
+    data.resize(buffSize);
+
+    return osAdapter_->GetPhysicalAddress(dev.fd, data);
+}
+
+int32_t HidDdkService::GetRawUniqueId(const HidDeviceHandle& dev, std::vector<uint8_t>& data, uint32_t buffSize)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    if (buffSize > MAX_REPORT_BUFFER_SIZE) {
+        HDF_LOGE("%{public}s: invalid parameter", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
+    data.resize(buffSize);
+
+    return osAdapter_->GetRawUniqueId(dev.fd, data);
+}
+
+int32_t HidDdkService::SendReport(const HidDeviceHandle& dev, HidReportType reportType,
+    const std::vector<uint8_t>& data)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    return osAdapter_->SendReport(dev.fd, reportType, data);
+}
+
+int32_t HidDdkService::GetReport(const HidDeviceHandle& dev, HidReportType reportType, uint8_t reportNumber,
+    std::vector<uint8_t>& data, uint32_t buffSize)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    if (buffSize > MAX_REPORT_BUFFER_SIZE) {
+        HDF_LOGE("%{public}s: invalid parameter", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
+    data.resize(buffSize);
+    data[0] = reportNumber;
+
+    return osAdapter_->GetReport(dev.fd, reportType, data);
+}
+
+int32_t HidDdkService::GetReportDescriptor(const HidDeviceHandle& dev, std::vector<uint8_t>& buf, uint32_t buffSize,
+    uint32_t& bytesRead)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HID_DDK_NO_PERM;
+    }
+
+    if (buffSize > MAX_REPORT_BUFFER_SIZE) {
+        HDF_LOGE("%{public}s: invalid parameter", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
+    buf.resize(buffSize);
+
+    return osAdapter_->GetReportDescriptor(dev.fd, buf, bytesRead);
+}
+
+} // V1_1
 } // Ddk
 } // Input
 } // HDI

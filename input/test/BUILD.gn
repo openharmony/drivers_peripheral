@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -43,7 +43,23 @@ if (defined(ohos_lite)) {
       deps += [ "unittest/udriver:input_udriver_unittest" ]
     }
     if (drivers_peripheral_input_feature_support_ddk) {
-      deps += [ "fuzztest/hidddk_fuzzer:fuzztest" ]
+      deps += [
+        "fuzztest/hidclose_fuzzer:fuzztest",
+        "fuzztest/hidddk_fuzzer:fuzztest",
+        "fuzztest/hidgetphysicaladdress_fuzzer:fuzztest",
+        "fuzztest/hidgetrawinfo_fuzzer:fuzztest",
+        "fuzztest/hidgetrawname_fuzzer:fuzztest",
+        "fuzztest/hidgetrawuniqueid_fuzzer:fuzztest",
+        "fuzztest/hidgetreport_fuzzer:fuzztest",
+        "fuzztest/hidgetreportdescriptor_fuzzer:fuzztest",
+        "fuzztest/hidinit_fuzzer:fuzztest",
+        "fuzztest/hidopen_fuzzer:fuzztest",
+        "fuzztest/hidreadtimeout_fuzzer:fuzztest",
+        "fuzztest/hidrelease_fuzzer:fuzztest",
+        "fuzztest/hidsendreport_fuzzer:fuzztest",
+        "fuzztest/hidsetnonblocking_fuzzer:fuzztest",
+        "fuzztest/hidwrite_fuzzer:fuzztest",
+      ]
     }
   }
 }
