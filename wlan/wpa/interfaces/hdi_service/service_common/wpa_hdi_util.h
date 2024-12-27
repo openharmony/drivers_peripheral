@@ -72,9 +72,9 @@ int DataAnonymize(const char *input, int inputLen, char* output, int outputSize)
 
 char IsValidHexCharAndConvert(char c);
 
-unsigned int AtoiToStrtolUint(const char *input);
+unsigned int StrtoUint(const char *input);
 
-int AtoiToStrtol(const char *input);
+int StrtoInt(const char *input);
 
 #ifdef __cplusplus
 }
