@@ -59,10 +59,6 @@ if (defined(ohos_lite)) {
     "src/wifi_driver_client.c",
   ]
   version_script = "wifi_driver_client.map"
-  ldflags = [
-    "-Wl,--exclude-libs=ALL",
-    "-Wl,--gc-sections",
-  ]
   ohos_shared_library("wifi_driver_client") {
     branch_protector_ret = "pac_ret"
     sanitize = {
@@ -108,6 +104,10 @@ if (defined(ohos_lite)) {
         "-Os",
         "-fno-merge-all-constants",
       ]
+      ldflags = [
+        "-Wl,--exclude-libs=ALL",
+        "-Wl,--gc-sections",
+      ]
       install_images = [ chipset_base_dir ]
       subsystem_name = "hdf"
       part_name = "drivers_peripheral_wlan"
@@ -152,6 +152,10 @@ if (defined(ohos_lite)) {
         "-ffunction-sections",
         "-Os",
         "-fno-merge-all-constants",
+      ]
+      ldflags = [
+        "-Wl,--exclude-libs=ALL",
+        "-Wl,--gc-sections",
       ]
       install_images = [ chipset_base_dir ]
       subsystem_name = "hdf"
