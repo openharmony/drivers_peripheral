@@ -1702,8 +1702,8 @@ int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTra
     // 1.get device handle
     libusb_device_handle *devHandle = nullptr;
     int32_t ret = FindHandleByDev(dev, &devHandle);
-    if (devHandle == nullptr) {
-        HDF_LOGE("%{public}s: find libusb device handle failed", __func__);
+    if (ret < 0 || devHandle == nullptr) {
+        HDF_LOGE("%{public}s: find libusb device handle failed, ret = %{public}d", __func__, ret);
         return LIBUSB_ERROR_NO_DEVICE;
     }
     // 2.get buffer
@@ -1858,11 +1858,6 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
         transfer->buffer = nullptr;
     }
     DeleteTransferFromList(asyncTransfer);
-    if (asyncTransfer != nullptr) {
-        HDF_LOGI("%{public}s: delete async transfer", __func__);
-        delete asyncTransfer;
-        asyncTransfer = nullptr;
-    }
     HDF_LOGI("%{public}s: handle async transfer result success", __func__);
 }
 
@@ -1941,10 +1936,6 @@ void LibusbAdapter::HandleAsyncFailure(struct libusb_transfer *transfer)
     if (transfer->user_data != nullptr) {
         LibusbAsyncTransfer *asyncTransfer = reinterpret_cast<LibusbAsyncTransfer *>(transfer->user_data);
         DeleteTransferFromList(asyncTransfer);
-        if (asyncTransfer != nullptr) {
-            delete asyncTransfer;
-            asyncTransfer = nullptr;
-        }
     }
 }
 
@@ -1969,6 +1960,8 @@ void LibusbAdapter::DeleteTransferFromList(LibusbAsyncTransfer *asyncTransfer)
     }
     if (asyncTransfer != nullptr) {
         asyncWrapper->transferList.remove(asyncTransfer);
+        delete asyncTransfer;
+        asyncTransfer = nullptr;
     }
     HDF_LOGI("%{public}s: delete transfer from list end", __func__);
 }
