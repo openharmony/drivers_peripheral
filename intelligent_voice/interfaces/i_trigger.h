@@ -59,6 +59,7 @@ public:
 
 class ITriggerManager {
 public:
+    virtual ~ITriggerManager() {};
     virtual int32_t LoadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor,
         std::unique_ptr<ITrigger> &adapter) = 0;
     virtual int32_t UnloadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor) = 0;
