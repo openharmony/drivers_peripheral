@@ -260,6 +260,7 @@ ResultCode ParseMultiDataSerializedMsg(const Uint8Array msg, Uint8Array *subMsgD
     return SUCCESS;
 }
 
+
 Attribute *CreateEmptyAttribute(void)
 {
     AttributeImpl *attribute = Malloc(sizeof(AttributeImpl));

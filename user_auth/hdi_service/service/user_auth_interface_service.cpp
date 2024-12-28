@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v2_0/user_auth_interface_service.h"
+#include "v3_0/user_auth_interface_service.h"
 
 #include <cinttypes>
 #include <mutex>
@@ -916,6 +916,7 @@ int32_t UserAuthInterfaceService::CancelEnrollment(int32_t userId)
 static void CopyCredentialInfo(const CredentialInfoHal &in, HdiCredentialInfo &out)
 {
     out.authType = static_cast<AuthType>(in.authType);
+    out.authSubType = in.credentialType;
     out.credentialId = in.credentialId;
     out.templateId = in.templateId;
     out.executorMatcher = in.executorMatcher;
@@ -1686,6 +1687,27 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
         IAM_LOGE("SetGlobalConfigParamFunc failed");
     }
     return ret;
+}
+
+int32_t UserAuthInterfaceService::GetCredentialById(uint64_t credentialId, HdiCredentialInfo &info)
+{
+    IAM_LOGI("start");
+    std::lock_guard<std::mutex> lock(g_mutex);
+    LinkedList *credList = nullptr;
+    int32_t ret = QueryCredentialByIdFunc(credentialId, &credList);
+    if (ret != RESULT_SUCCESS || credList == NULL) {
+        IAM_LOGE("query credential failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    if (credList->head == NULL || credList->head->data == NULL) {
+        IAM_LOGE("credential is null");
+        DestroyLinkedList(credList);
+        return RESULT_NOT_ENROLLED;
+    }
+    auto credentialHal = static_cast<CredentialInfoHal *>(credList->head->data);
+    CopyCredentialInfo(*credentialHal, info);
+    DestroyLinkedList(credList);
+    return RESULT_SUCCESS;
 }
 } // Userauth
 } // HDI
