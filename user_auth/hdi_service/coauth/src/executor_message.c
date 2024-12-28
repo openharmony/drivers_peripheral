@@ -922,7 +922,6 @@ IAM_STATIC ResultCode GetScheduleInfoFromAttributeInner(const Attribute *attribu
     }
     return result;
 }
-
 IAM_STATIC ResultCode GetScheduleInfoFromAttribute(const Attribute *attribute, ScheduleInfoParam *scheduleInfo)
 {
     ResultCode result = GetScheduleInfoFromAttributeInner(attribute, scheduleInfo);
