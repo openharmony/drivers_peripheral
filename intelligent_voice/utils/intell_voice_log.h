@@ -18,6 +18,9 @@
 #include <cstdio>
 #include "hdf_log.h"
 
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD002561
+
 #define INTELLIGENT_VOICE_LOGD(fmt, arg...)                                                \
     do {                                                                            \
         HDF_LOGD("[%{public}s][line:%{public}d]: " fmt, __func__, __LINE__, ##arg); \

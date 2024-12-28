@@ -76,6 +76,7 @@ public:
 
 class IEngineManager {
 public:
+    virtual ~IEngineManager() {};
     virtual int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor,
         std::unique_ptr<IEngine> &engine) = 0;
     virtual int32_t ReleaseAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor) = 0;
