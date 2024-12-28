@@ -136,7 +136,6 @@ int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
-        pthread_rwlock_unlock(&g_rwLock);
         return ret;
     }
 #ifndef LIBUSB_ENABLE
@@ -565,7 +564,6 @@ int32_t UsbDdkService::SendPipeRequest(
         return HDF_ERR_NOPERM;
     }
 
-    
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -613,23 +611,9 @@ FINISHED:
 #endif // LIBUSB_ENABLE
 }
 
-int32_t UsbDdkService::SendPipeRequestWithAshmem(
-    const UsbRequestPipe &pipe, const UsbAshmem &ashmem, uint32_t &transferredLength)
+int32_t SubmitRequestWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem &ashmem, uint32_t &transferredLength,
+    uint64_t handle)
 {
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
-        HDF_LOGE("%{public}s: no permission", __func__);
-        close(ashmem.ashmemFd);
-        return HDF_ERR_NOPERM;
-    }
-
-    uint64_t handle = 0;
-    int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
-        close(ashmem.ashmemFd);
-        return ret;
-    }
-#ifndef LIBUSB_ENABLE
     pthread_rwlock_rdlock(&g_rwLock);
     const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
     struct UsbRequest *request = UsbAllocRequestByAshmem(handleConvert, 0, ashmem.size, ashmem.ashmemFd);
@@ -642,7 +626,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
 
     struct UsbRequestParams params;
     FillPipeRequestParamsWithAshmem(pipe, ashmem, params);
-    ret = UsbFillRequestByMmap(request, handleConvert, &params);
+    int32_t ret = UsbFillRequestByMmap(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
         goto FINISHED;
@@ -660,6 +644,26 @@ FINISHED:
     close(ashmem.ashmemFd);
     pthread_rwlock_unlock(&g_rwLock);
     return ret;
+}
+
+int32_t UsbDdkService::SendPipeRequestWithAshmem(
+    const UsbRequestPipe &pipe, const UsbAshmem &ashmem, uint32_t &transferredLength)
+{
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        close(ashmem.ashmemFd);
+        return HDF_ERR_NOPERM;
+    }
+
+    uint64_t handle = 0;
+    int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        close(ashmem.ashmemFd);
+        return ret;
+    }
+#ifndef LIBUSB_ENABLE
+    return SubmitRequestWithAshmem(pipe, ashmem, transferredLength, handle);
 #else
     struct InterfaceInfo infoTemp;
     ret = GetInterfaceInfoByVal(pipe.interfaceHandle, infoTemp);
