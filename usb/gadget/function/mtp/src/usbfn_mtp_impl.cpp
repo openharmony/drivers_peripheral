@@ -544,6 +544,12 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
             HDF_LOGD("%{public}s:cancel write, req:%{public}p", __func__, queueReq);
         }
     }
+
+    if (mtpPort && mtpPort->standbyReq) {
+        (void)UsbFnCancelRequest(mtpPort->standbyReq);
+        (void)UsbFnFreeRequest(mtpPort->standbyReq);
+        mtpPort->standbyReq = NULL;
+    }
     return HDF_SUCCESS;
 }
 
@@ -1123,6 +1129,7 @@ int32_t UsbfnMtpImpl::Release()
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
+    (void)UsbMtpPortReleaseIo();
     int32_t ret = UsbMtpDeviceReleaseFuncDevice();
     if (ret != HDF_SUCCESS) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
