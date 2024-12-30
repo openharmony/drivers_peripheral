@@ -55,7 +55,6 @@ void UsbAccessoryUeventHandle(const char msg[], ssize_t rcvLen)
         }
     }
     fullMsg[rcvLen] = '\0';
-    HDF_LOGD("%{public}s:Full message: %{public}s", __func__, fullMsg);
 
     struct UsbAccessoryUeventInfo info = {
         .devPath = "",
