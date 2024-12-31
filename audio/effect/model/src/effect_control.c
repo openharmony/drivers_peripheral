@@ -138,7 +138,7 @@ int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControl
         return HDF_FAILURE;
     }
     struct EffectControllerDescriptorVdi *descVdi = (struct EffectControllerDescriptorVdi *)desc;
-    if (ConstructDescriptor(&descsVdi[descNum]) != HDF_SUCCESS) {
+    if (ConstructDescriptor(descVdi) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: ConstructDescriptor fail!", __func__);
         continue;
     }
