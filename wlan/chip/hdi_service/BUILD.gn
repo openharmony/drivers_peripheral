@@ -61,6 +61,8 @@ ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
     "-ffunction-sections",
     "-Os",
     "-fno-merge-all-constants",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
   ]
   ldflags = [
     "-Wl,--exclude-libs=ALL",
@@ -110,6 +112,8 @@ ohos_shared_library("libchip_hdi_driver") {
     "-ffunction-sections",
     "-Os",
     "-fno-merge-all-constants",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
   ]
   ldflags = [
     "-Wl,--exclude-libs=ALL",
