@@ -41,13 +41,21 @@ namespace OHOS {
 namespace Input {
 using namespace std;
 constexpr uint32_t DEV_INDEX_MAX = 32;
+constexpr uint32_t RELOAD_INTERVAL_MAX = 800;
+const int32_t INVALID_ID = -1;
+const int32_t MEMCPY_ERROR = -1;
+const int32_t CREATE_SUCCESS = 1;
+const int32_t CREATE_ERROR = 0;
 void InputDeviceManager::Init()
 {
     inputDevList_.clear();
     reportEventPkgCallBackLock_.lock();
     reportEventPkgCallback_.clear();
     reportEventPkgCallBackLock_.unlock();
-    GetInputDeviceInfoList();
+    std::vector<std::string> flist = GetFiles(devPath_);
+    LoadInputDevices(flist);
+    std::thread reloadThread(&InputDeviceManager::ReloadInputDevices, this, flist);
+    reloadThread.detach();
     std::thread t1([this] {this->WorkerThread();});
     std::string wholeName1 = std::to_string(getpid()) + "_" + std::to_string(gettid());
     thread_ = std::move(t1);
@@ -272,47 +280,117 @@ uint32_t GetInputDeviceTypeInfo(const string &devName)
     return type;
 }
 
-void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
+int32_t InputDeviceManager::GetCurDevIndex()
+{
+    if (inputDevList_.size() >= DEV_INDEX_MAX) {
+        HDF_LOGE("%{public}s: The number of devices has reached max_num", __func__);
+        return INVALID_ID;
+    }
+    if (inputDevList_.count(devIndex_) == 0) {
+        return static_cast<int32_t>(devIndex_);
+    }
+    uint32_t newId = inputDevList_.size();
+    while (inputDevList_.count(newId) != 0) {
+        newId++;
+    }
+    return static_cast<int32_t>(newId);
+}
+
+int32_t InputDeviceManager::CreateInputDevListNode(InputDevListNode &inputDevNode, std::string &fileName)
+{
+    std::string devPathNode = devPath_ + "/" + fileName;
+    std::string::size_type n = devPathNode.find("event");
+    if (n == std::string::npos) {
+        HDF_LOGE("%{public}s: not found event node", __func__);
+        return CREATE_ERROR;
+    }
+    auto fd = OpenInputDevice(devPathNode);
+    if (fd < 0) {
+        HDF_LOGE("%{public}s: open node failed", __func__);
+        return CREATE_ERROR;
+    }
+    std::shared_ptr<InputDeviceInfo> detailInfo = std::make_shared<InputDeviceInfo>();
+    (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
+    (void)GetInputDeviceInfo(fd, detailInfo.get());
+    auto sDevName = string(detailInfo->attrSet.devName);
+    uint32_t type = GetInputDeviceTypeInfo(sDevName);
+    if (type == INDEV_TYPE_UNKNOWN) {
+        close(fd);
+        HDF_LOGE("%{public}s: input device type unknow: %{public}d", __func__, type);
+        return CREATE_ERROR;
+    }
+    inputDevNode.index = devIndex_;
+    inputDevNode.status = INPUT_DEVICE_STATUS_OPENED;
+    inputDevNode.fd = fd;
+    detailInfo->devIndex = devIndex_;
+    detailInfo->devType = type;
+    if (memcpy_s(&inputDevNode.devPathNode, devPathNode.length(),
+        devPathNode.c_str(), devPathNode.length()) != EOK ||
+        memcpy_s(&inputDevNode.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
+        sizeof(InputDeviceInfo)) != EOK) {
+        close(fd);
+        HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+        return MEMCPY_ERROR;
+    }
+    return CREATE_SUCCESS;
+}
+
+void InputDeviceManager::LoadInputDevices(std::vector<std::string> &flist)
 {
     inputDevList_.clear();
-    std::vector<std::string> flist = GetFiles(devPath_);
-    std::shared_ptr<InputDeviceInfo> detailInfo;
-    InputDevListNode inputDevList {};
+    InputDevListNode inputDevNode {};
 
     for (unsigned i = 0; i < flist.size(); i++) {
-        string devPathNode = devPath_ + "/" + flist[i];
-        std::string::size_type n = devPathNode.find("event");
-        if (n == std::string::npos) {
-            continue;
-        }
-        auto fd = OpenInputDevice(devPathNode);
-        if (fd < 0) {
-            HDF_LOGE("%{public}s: open node failed", __func__);
-            continue;
-        }
-        detailInfo = std::make_shared<InputDeviceInfo>();
-        (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
-        (void)GetInputDeviceInfo(fd, detailInfo.get());
-        auto sDevName = string(detailInfo->attrSet.devName);
-        uint32_t type = GetInputDeviceTypeInfo(sDevName);
-        if (type == INDEV_TYPE_UNKNOWN) {
-            continue;
-        }
-        inputDevList.index = devIndex_;
-        inputDevList.status = INPUT_DEVICE_STATUS_OPENED;
-        inputDevList.fd = fd;
-        detailInfo->devIndex = devIndex_;
-        detailInfo->devType = type;
-        if (memcpy_s(&inputDevList.devPathNode, devPathNode.length(),
-            devPathNode.c_str(), devPathNode.length()) != EOK ||
-            memcpy_s(&inputDevList.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
-            sizeof(InputDeviceInfo)) != EOK) {
-            HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+        int32_t curDevIndex = GetCurDevIndex();
+        if (curDevIndex == INVALID_ID) {
             return;
         }
-        inputDevList_.insert_or_assign(devIndex_, inputDevList);
-        devIndex_ += 1;
+        devIndex_ = static_cast<uint32_t>(curDevIndex);
+        int32_t ret = CreateInputDevListNode(inputDevNode, flist[i]);
+        if (ret == MEMCPY_ERROR) {
+            return;
+        }
+        if (ret == CREATE_SUCCESS) {
+            inputDevList_.insert_or_assign(devIndex_, inputDevNode);
+            devIndex_ += 1;
+        }
     }
+}
+
+void InputDeviceManager::ReloadInputDevices(std::vector<std::string> flist)
+{
+    // 线程等待，保证input节点创建完成
+    std::this_thread::sleep_for(std::chrono::milliseconds(RELOAD_INTERVAL_MAX));
+    std::vector<std::string> curFileList = GetFiles(devPath_);
+    // 当前节点与首次加载数量不一致，需加载新的节点
+    if (curFileList.size() <= flist.size()) {
+        return;
+    }
+    InputDevListNode inputDevNode {};
+    for (unsigned i = 0; i < curFileList.size(); i++) {
+        if (std::find(flist.begin(), flist.end(), curFileList[i]) != flist.end()) {
+            continue;
+        }
+        int32_t curDevIndex = GetCurDevIndex();
+        if (curDevIndex == INVALID_ID) {
+            return;
+        }
+        devIndex_ = static_cast<uint32_t>(curDevIndex);
+        int32_t ret = CreateInputDevListNode(inputDevNode, flist[i]);
+        if (ret == MEMCPY_ERROR) {
+            return;
+        }
+        if (ret == CREATE_SUCCESS) {
+            inputDevList_.insert_or_assign(devIndex_, inputDevNode);
+            devIndex_ += 1;
+        }
+    }
+}
+
+void InputDeviceManager::GetInputDeviceInfoList()
+{
+    std::vector<std::string> flist = GetFiles(devPath_);
+    LoadInputDevices(flist);
 }
 
 int32_t InputDeviceManager::DoInputDeviceAction(void)
@@ -359,7 +437,7 @@ void InputDeviceManager::DeleteDevListNode(int index)
             if (devIndex_ < 1 || devIndex_ > DEV_INDEX_MAX) {
                 return;
             }
-            devIndex_ -= 1;
+            devIndex_ = it->first;
         } else {
             ++it;
         }
@@ -374,6 +452,12 @@ int32_t InputDeviceManager::AddDeviceNodeToList(
         HDF_LOGE("%{public}s: param invalid, %{public}d", __func__, __LINE__);
         return INPUT_FAILURE;
     }
+    int32_t curDevIndex = GetCurDevIndex();
+    if (curDevIndex == INVALID_ID) {
+        HDF_LOGE("%{public}s: input device exceeds the maximum limit, %{public}d", __func__, __LINE__);
+        return INPUT_FAILURE;
+    }
+    devIndex_ = static_cast<uint32_t>(curDevIndex);
     InputDevListNode inputDevList {};
     inputDevList.index = devIndex_;
     inputDevList.status = INPUT_DEVICE_STATUS_OPENED;
@@ -386,12 +470,12 @@ int32_t InputDeviceManager::AddDeviceNodeToList(
         return INPUT_FAILURE;
     }
     inputDevList_.insert_or_assign(devIndex_, inputDevList);
-    devIndex_ += 1;
     if (AddToEpoll(epollFd, inputDevList.fd) != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: add to epoll failed, line: %{public}d", __func__, __LINE__);
         DeleteDevListNode(devIndex_);
         return INPUT_FAILURE;
     }
+    devIndex_ += 1;
     return INPUT_SUCCESS;
 }
 
@@ -407,7 +491,7 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
     (void)GetInputDeviceInfo(fd, detailInfo.get());
     auto sDevName = string(detailInfo->attrSet.devName);
     for (auto it = inputDevList_.begin(); it != inputDevList_.end();) {
-        if (string(it->second.detailInfo.attrSet.devName) == sDevName) {
+        if (string(it->second.devPathNode) == devPath && string(it->second.detailInfo.attrSet.devName) == sDevName) {
             it->second.fd = fd;
             it->second.status = INPUT_DEVICE_STATUS_OPENED;
             findDeviceFlag = true;
