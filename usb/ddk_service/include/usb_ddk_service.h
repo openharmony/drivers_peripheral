@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,13 @@
 #ifndef USB_DDK_SERVICE_H
 #define USB_DDK_SERVICE_H
 
-#include "v1_0/iusb_ddk.h"
+#include "v1_1/iusb_ddk.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_0 {
+namespace V1_1 {
 class UsbDdkService : public IUsbDdk {
 public:
     UsbDdkService() = default;
@@ -57,8 +57,14 @@ public:
         uint32_t &transferredLength) override;
 
     int32_t GetDeviceMemMapFd(uint64_t deviceId, int &fd) override;
+
+    int32_t GetDevices(std::vector<uint64_t> &deviceIds) override;
+
+    int32_t UpdateDriverInfo(const DriverAbilityInfo &driverInfo) override;
+
+    int32_t RemoveDriverInfo(const std::string &driverUid) override;
 };
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI
