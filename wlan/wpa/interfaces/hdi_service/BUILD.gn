@@ -20,10 +20,11 @@ if (is_standard_system) {
     branch_protector_ret = "pac_ret"
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
     include_dirs = [
@@ -63,7 +64,17 @@ if (is_standard_system) {
       "-DCONFIG_WEP",
       "-DCONFIG_WPS",
     ]
-
+    cflags += [
+      "-fvisibility=hidden",
+      "-fdata-sections",
+      "-ffunction-sections",
+      "-Os",
+      "-fno-merge-all-constants",
+    ]
+    ldflags = [
+      "-Wl,--exclude-libs=ALL",
+      "-Wl,--gc-sections",
+    ]
     external_deps = [
       "c_utils:utils",
       "drivers_interface_wlan:libwpa_stub_1.2",
@@ -76,6 +87,7 @@ if (is_standard_system) {
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
+    version_script = "libwpa_interface_service.map"
     part_name = "drivers_peripheral_wlan"
   }
 
@@ -83,10 +95,11 @@ if (is_standard_system) {
     branch_protector_ret = "pac_ret"
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
     include_dirs = [ "./service_common" ]
@@ -103,7 +116,17 @@ if (is_standard_system) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
-
+    cflags += [
+      "-fvisibility=hidden",
+      "-fdata-sections",
+      "-ffunction-sections",
+      "-Os",
+      "-fno-merge-all-constants",
+    ]
+    ldflags = [
+      "-Wl,--exclude-libs=ALL",
+      "-Wl,--gc-sections",
+    ]
     external_deps = [
       "c_utils:utils",
       "drivers_interface_wlan:libwpa_stub_1.2",
