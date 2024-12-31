@@ -301,6 +301,7 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
         }
         ret = factLib->GetDescriptor(factLib, g_cfgDescs->effectCfgDescs[i].effectId, &descsVdi[descNum]);
         if (ret != HDF_SUCCESS) {
+            descNum++;
             DeleteEffectLibrary(g_cfgDescs->effectCfgDescs[i].library);
             HDF_LOGE("%{public}s: GetDescriptor fail!", __func__);
             continue;
