@@ -140,7 +140,7 @@ int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControl
     struct EffectControllerDescriptorVdi *descVdi = (struct EffectControllerDescriptorVdi *)desc;
     if (ConstructDescriptor(descVdi) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: ConstructDescriptor fail!", __func__);
-        continue;
+        return HDF_FAILURE;
     }
     HdfAudioStartTrace(__func__, 0);
     int32_t ret = manager->ctrlOps->GetEffectDescriptor(manager->ctrlOps, descVdi);
