@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v1_0/usb_ddk_stub.h"
+#include "v1_1/usb_ddk_stub.h"
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
@@ -22,7 +22,7 @@
 
 #define HDF_LOG_TAG usb_ddk_driver
 
-using namespace OHOS::HDI::Usb::Ddk::V1_0;
+using namespace OHOS::HDI::Usb::Ddk;
 
 struct HdfUsbDdkHost {
     struct IDeviceIoService ioService;
@@ -69,7 +69,7 @@ static int HdfUsbDdkDriverBind(struct HdfDeviceObject *deviceObject)
     hdfUsbDdkHost->ioService.Open = NULL;
     hdfUsbDdkHost->ioService.Release = NULL;
 
-    auto serviceImpl = OHOS::HDI::Usb::Ddk::V1_0::IUsbDdk::Get(true);
+    auto serviceImpl = V1_1::IUsbDdk::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfUsbDdkHost;
@@ -77,7 +77,7 @@ static int HdfUsbDdkDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfUsbDdkHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(
-        serviceImpl, OHOS::HDI::Usb::Ddk::V1_0::IUsbDdk::GetDescriptor());
+        serviceImpl, V1_1::IUsbDdk::GetDescriptor());
     if (hdfUsbDdkHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfUsbDdkHost;

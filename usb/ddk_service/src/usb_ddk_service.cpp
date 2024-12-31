@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,17 +13,19 @@
  * limitations under the License.
  */
 
-#include "v1_0/usb_ddk_service.h"
+#include "v1_1/usb_ddk_service.h"
 
 #include <hdf_base.h>
 #include <iproxy_broker.h>
 #include <shared_mutex>
 
 #include "ddk_pnp_listener_mgr.h"
+#include "ipc_skeleton.h"
 #include "libusb_adapter.h"
 #include "usb_ddk_hash.h"
 #include "usb_ddk_interface.h"
 #include "usb_ddk_permission.h"
+#include "usb_driver_manager.h"
 #include "usb_raw_api.h"
 #include "usbd_wrapper.h"
 #define HDF_LOG_TAG usb_ddk_service
@@ -32,7 +34,7 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_0 {
+namespace V1_1 {
 // 32 means size of uint32_t
 #define GET_BUS_NUM(devHandle)          ((uint8_t)((devHandle) >> 32))
 #define GET_DEV_NUM(devHandle)          ((uint8_t)((devHandle)&0xFFFFFFFF))
@@ -733,7 +735,57 @@ int32_t UsbDdkService::GetDeviceMemMapFd(uint64_t deviceId, int &fd)
     return g_DdkLibusbAdapter->GetDeviceMemMapFd({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, fd);
 #endif // LIBUSB_ENABLE
 }
-} // namespace V1_0
+
+int32_t UsbDdkService::GetDevices(std::vector<uint64_t> &deviceIds)
+{
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
+#ifndef LIBUSB_ENABLE
+    return HDF_ERR_NOT_SUPPORT;
+#else
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    std::vector<uint16_t> vendorIds;
+    DriverAbilityInfo driverInfo;
+    int32_t ret = UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, driverInfo);
+    if (!ret) {
+        HDF_LOGW("%{public}s: not find driver info", __func__);
+        return HDF_SUCCESS;
+    }
+    vendorIds = driverInfo.vids;
+
+    std::vector<struct OHOS::HDI::Usb::V1_2::DeviceInfo> devices;
+    g_DdkLibusbAdapter->GetDevices(devices);
+    if (devices.empty()) {
+        HDF_LOGW("%{public}s: devices is empty", __func__);
+        return HDF_SUCCESS;
+    }
+
+    for (auto device : devices) {
+        for (auto vid : vendorIds) {
+            if (device.vendorId == vid) {
+                deviceIds.push_back(device.deviceId);
+                break;
+            }
+        }
+    }
+
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
+}
+
+int32_t UsbDdkService::UpdateDriverInfo(const DriverAbilityInfo &driverInfo)
+{
+    return UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
+}
+
+int32_t UsbDdkService::RemoveDriverInfo(const std::string &driverUid)
+{
+    return UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
+}
+} // namespace V1_1
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI
