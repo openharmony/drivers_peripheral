@@ -766,4 +766,278 @@ HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_024, TestSize.Level
     ASSERT_NE(ret, HDF_SUCCESS);
     ASSERT_EQ(filledLen_, 0);
 }
+
+// [FAIL] primary image + (COLOR_TYPE == PROF) + ICC_PROFILE not configured
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_025, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, unsupportedPixelFmt_, false);
+    ASSERT_TRUE(SetColorTypeOnly(primaryImageItem, PROF));
+    inputImgs_.emplace_back(primaryImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_NE(ret, HDF_SUCCESS);
+    ASSERT_EQ(filledLen_, 0);
+}
+
+static bool SetColorTypeAndProf(ImageItem &item)
+{
+    PropWriter pw;
+    ColorType clrType = PROF;
+    IF_TRUE_RETURN_VAL(!pw.AddData<ColorType>(COLOR_TYPE, clrType), false);
+    map<PropertyType, string> sharedProps;
+    sharedProps[ICC_PROFILE] = "000002246170706C040000006D6E7472";
+    IF_TRUE_RETURN_VAL(sharedProps.empty(), true);
+    size_t bufferSize = sizeof(sharedProps[ICC_PROFILE]);
+    item.sharedProperties = CodecHdiHeifEncodeTest::AllocateSharedBuffer(bufferSize);
+
+    IF_TRUE_RETURN_VAL(item.sharedProperties.fd < 0, false);
+    void *addr = mmap(nullptr, bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, item.sharedProperties.fd, 0);
+    if (addr == nullptr) {
+        close(item.sharedProperties.fd);
+        item.sharedProperties.fd = -1;
+        return false;
+    }
+
+    errno_t ret = memcpy_s(addr, bufferSize, sharedProps[ICC_PROFILE].c_str(), bufferSize);
+    (void)munmap(addr, bufferSize);
+    return (ret == EOK);
+}
+
+// [PASS] primary image + (COLOR_TYPE == PROF) + ICC_PROFILE
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_026, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtNv12_);
+    ASSERT_TRUE(SetColorTypeAndProf(primaryImageItem));
+    inputImgs_.emplace_back(primaryImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(filledLen_ > 0);
+}
+
+static bool SetValidProperties(ImageItem &item)
+{
+    PropWriter pw;
+    bool mirror = false;
+    IF_TRUE_RETURN_VAL(!pw.AddData<bool>(MIRROR_INFO, mirror), false);
+    HDF_LOGI("add MIRROR_INFO succeed");
+
+    uint32_t rotateDegree = 90;
+    IF_TRUE_RETURN_VAL(!pw.AddData<uint32_t>(ROTATE_INFO, rotateDegree), false);
+    HDF_LOGI("add ROTATE_INFO succeed");
+
+    ContentLightLevel level = {.maxContentLightLevel = 1, .maxPicAverageLightLevel = 2};
+    IF_TRUE_RETURN_VAL(!pw.AddData<ContentLightLevel>(CONTENT_LIGHT_LEVEL, level), false);
+    HDF_LOGI("add CONTENT_LIGHT_LEVEL succeed");
+
+    return pw.Finalize(item.liteProperties);
+}
+
+// [PASS] mirror + rotation + ContentLightLevel configured
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_027, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtNv12_);
+    ASSERT_TRUE(SetValidProperties(primaryImageItem));
+    inputImgs_.emplace_back(primaryImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(filledLen_ > 0);
+}
+
+static bool SetInValidProperties(ImageItem &item)
+{
+    PropWriter pw;
+
+    uint32_t rotateDegree = 100;
+    IF_TRUE_RETURN_VAL(!pw.AddData<uint32_t>(ROTATE_INFO, rotateDegree), false);
+    HDF_LOGI("add ROTATE_INFO succeed");
+
+    return pw.Finalize(item.liteProperties);
+}
+
+// [FAIL] invalid rotateDegree
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_028, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtNv12_);
+    ASSERT_TRUE(SetInValidProperties(primaryImageItem));
+    inputImgs_.emplace_back(primaryImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_NE(ret, HDF_SUCCESS);
+    ASSERT_EQ(filledLen_, 0);
+}
+
+static bool AddPropOnlyForTmap(PropWriter& pw)
+{
+    MasteringDisplayColourVolume clrVol = {
+        .displayPrimariesRX = 1,
+        .displayPrimariesRY = 2,
+        .displayPrimariesGX = 3,
+        .displayPrimariesGY = 4,
+        .displayPrimariesBX = 5,
+        .displayPrimariesBY = 6,
+        .whitePointX = 0,
+        .whitePointY = 0,
+        .maxDisplayMasteringLuminance = 0,
+        .minDisplayMasteringLuminance = 0
+    };
+    IF_TRUE_RETURN_VAL(!pw.AddData<MasteringDisplayColourVolume>(MASTER_DISPLAY_COLOR_VOLUME, clrVol), false);
+    HDF_LOGI("add MASTER_DISPLAY_COLOR_VOLUME succeed");
+
+    ToneMapMetadata tmapMeta;
+    static constexpr uint8_t MULTI_CHANNEL = 3;
+    tmapMeta.channelCnt = MULTI_CHANNEL;
+    tmapMeta.useBaseColorSpace = true;
+    tmapMeta.baseHdrHeadroom = {12, 23};
+    tmapMeta.alternateHdrHeadroom = {36, 62};
+    tmapMeta.channels1 = {
+        .gainMapMin = {5, 21},
+        .gainMapMax = {5, 7},
+        .gamma = {2, 7},
+        .baseOffset = {1, 3},
+        .alternateOffset = {1, 7}
+    };
+    tmapMeta.channels2 = {
+        .gainMapMin = {5, 21},
+        .gainMapMax = {5, 7},
+        .gamma = {2, 7},
+        .baseOffset = {1, 3},
+        .alternateOffset = {1, 7}
+    };
+    tmapMeta.channels3 = {
+        .gainMapMin = {5, 21},
+        .gainMapMax = {5, 7},
+        .gamma = {2, 7},
+        .baseOffset = {1, 3},
+        .alternateOffset = {1, 7}
+    };
+    IF_TRUE_RETURN_VAL(!pw.AddData<ToneMapMetadata>(TONE_MAP_METADATA, tmapMeta), false);
+    HDF_LOGI("add TONE_MAP_METADATA succeed");
+    return true;
+}
+
+static bool SetTmapProperties(ImageItem &item)
+{
+    PropWriter pw;
+
+    ContentLightLevel level = {.maxContentLightLevel = 1, .maxPicAverageLightLevel = 2};
+    IF_TRUE_RETURN_VAL(
+        !pw.AddData<ContentLightLevel>(CONTENT_LIGHT_LEVEL, level), false);
+    HDF_LOGI("add CONTENT_LIGHT_LEVEL succeed");
+
+    IF_TRUE_RETURN_VAL(!AddPropOnlyForTmap(pw), false);
+
+    return pw.Finalize(item.liteProperties);
+}
+
+// [PASS] tmap MASTER_DISPLAY_COLOR_VOLUME configured
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_029, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem tmapImageItem = CreateImageItem(T_MAP, pixelFmtNv12_);
+    ASSERT_TRUE(SetTmapProperties(tmapImageItem));
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtNv12_);
+    inputImgs_.emplace_back(tmapImageItem);
+    inputImgs_.emplace_back(primaryImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(filledLen_ > 0);
+}
+
+static bool SetIt35ForTmap(ImageItem &item)
+{
+    PropWriter pw;
+    map<PropertyType, string> sharedProps;
+    sharedProps[IT35_INFO] = "000002246170706C040000006D6E7472";
+    IF_TRUE_RETURN_VAL(sharedProps.empty(), true);
+    size_t bufferSize = sizeof(sharedProps[IT35_INFO]);
+    item.sharedProperties = CodecHdiHeifEncodeTest::AllocateSharedBuffer(bufferSize);
+
+    IF_TRUE_RETURN_VAL(item.sharedProperties.fd < 0, false);
+    void *addr = mmap(nullptr, bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, item.sharedProperties.fd, 0);
+    if (addr == nullptr) {
+        close(item.sharedProperties.fd);
+        item.sharedProperties.fd = -1;
+        return false;
+    }
+    errno_t ret = memcpy_s(addr, bufferSize, sharedProps[IT35_INFO].c_str(), bufferSize);
+    (void)munmap(addr, bufferSize);
+    return (ret == EOK);
+}
+
+// [PASS] tmap IT35_INFO configured
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_030, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem tmapImageItem = CreateImageItem(T_MAP, pixelFmtNv12_);
+    ASSERT_TRUE(SetIt35ForTmap(tmapImageItem));
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtNv12_);
+    inputImgs_.emplace_back(tmapImageItem);
+    inputImgs_.emplace_back(primaryImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(filledLen_ > 0);
+}
+
+static bool SetImageProperties(ImageItem &item)
+{
+    PropWriter pw;
+    std::string auxType = "urn:com:xxx:photo:xxximage";
+    Resolution reso {
+        .width = 1920,
+        .height = 1080
+    };
+    IF_TRUE_RETURN_VAL(!pw.AddData<std::string>(AUX_TYPE, auxType), false);
+    HDF_LOGI("add AUX_TYPE succeed");
+
+    IF_TRUE_RETURN_VAL(!pw.AddData<Resolution>(IMG_RESOLUTION, reso), false);
+    HDF_LOGI("add IMG_RESOLUTION succeed");
+
+    return pw.Finalize(item.liteProperties);
+}
+
+// [PASS] primaryImage AUX_TYPE + IMG_RESOLUTION configed
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_031, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtNv12_);
+    ASSERT_TRUE(SetImageProperties(primaryImageItem));
+    inputImgs_.emplace_back(primaryImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(filledLen_ > 0);
+}
+
+static bool SetImageRloc(ImageItem &item)
+{
+    PropWriter pw;
+    RelativeLocation rloc = {.horizontalOffset = 20, .verticalOffset = 30};
+    IF_TRUE_RETURN_VAL(!pw.AddData<RelativeLocation>(RLOC_INFO, rloc), false);
+    HDF_LOGI("add RLOC_INFO succeed");
+
+    return pw.Finalize(item.liteProperties);
+}
+
+// [PASS] primaryImage RLOC_INFO configed
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_032, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    ImageItem primaryImageItem = CreateImageItem(PRIMARY_IMG, pixelFmtNv12_);
+    ASSERT_TRUE(SetImageRloc(primaryImageItem));
+    inputImgs_.emplace_back(primaryImageItem);
+    int32_t ret = hdiHeifEncoder_->DoHeifEncode(inputImgs_, inputMetas_, refs_, output_, filledLen_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(filledLen_ > 0);
+}
+
 }
