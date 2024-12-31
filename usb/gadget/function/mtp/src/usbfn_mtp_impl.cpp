@@ -519,6 +519,12 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelPlusFreeIo(struct UsbMtpPort *mtpPort, boo
     HDF_LOGI("%{public}s: cancel and free write req: %{public}d/%{public}d", __func__, mtpPort->writeStarted,
         mtpPort->writeAllocated);
     (void)UsbMtpPortCancelAndFreeReq(&mtpPort->writeQueue, &mtpPort->writePool, mtpPort->writeAllocated, freeReq);
+
+    if (mtpPort && mtpPort->standbyReq) {
+        (void)UsbFnCancelRequest(mtpPort->standbyReq);
+        (void)UsbFnFreeRequest(mtpPort->standbyReq);
+        mtpPort->standbyReq = NULL;
+    }
     return HDF_SUCCESS;
 }
 
@@ -543,12 +549,6 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
             (void)UsbFnCancelRequest(queueReq);
             HDF_LOGD("%{public}s:cancel write, req:%{public}p", __func__, queueReq);
         }
-    }
-
-    if (mtpPort && mtpPort->standbyReq) {
-        (void)UsbFnCancelRequest(mtpPort->standbyReq);
-        (void)UsbFnFreeRequest(mtpPort->standbyReq);
-        mtpPort->standbyReq = NULL;
     }
     return HDF_SUCCESS;
 }
@@ -1516,7 +1516,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxPush(struct UsbMtpPort *mtpPort, struct UsbFnR
         sem_post(&asyncReq_);
         return HDF_ERR_IO;
     }
-    if (writeToFile) {
+    if (writeToFile && mtpDev->asyncRecvWriteTempContent) {
         uint8_t *bufOff = mtpDev->asyncRecvWriteTempContent + mtpDev->asyncRecvWriteTempCount;
         if (memcpy_s(bufOff, req->actual, req->buf, req->actual) != EOK) {
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
