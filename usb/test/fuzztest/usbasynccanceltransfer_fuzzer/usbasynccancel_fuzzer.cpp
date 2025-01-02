@@ -22,8 +22,8 @@
 #include "usbasynccancel_fuzzer.h"
 #include "v1_2/iusb_interface.h"
 
-using namespace OHOS::HDI::Usb::V1_0;
-using OHOS::HDI::Usb::V1_0::UsbDev;
+using namespace OHOS::HDI::Usb::V1_2;
+using OHOS::HDI::Usb::V1_2::UsbDev;
 using namespace OHOS::USB;
 
 namespace OHOS {
@@ -51,7 +51,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         return false;
     }
     uint32_t endPoint = Convert2Uint32(rawData);
-    sptr<IUsbInterface> usbInterface = IUsbInterface::Get(false);
+    sptr<OHOS::HDI::Usb::V1_2::IUsbInterface> usbInterface = OHOS::HDI::Usb::V1_2::IUsbInterface::Get(false);
     if (usbInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
         return false;
