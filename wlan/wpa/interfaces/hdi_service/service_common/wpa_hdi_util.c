@@ -20,6 +20,9 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <hdf_log.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <regex.h>
 #include "securec.h"
 #include "wpa_hdi_util.h"
 
@@ -179,3 +182,46 @@ int DataAnonymize(const char *input, int inputLen, char* output, int outputSize)
     }
     return CharReplace(output, headKeepSize, inputLen - tailKeepSize, hiddenChar);
 }
+
+unsigned int StrtoUint(const char *input)
+{
+    if (input == NULL || input[0] == '\0' || strlen(input) > MAX_UINT32_LENGTH) {
+        HDF_LOGE("StrtoUint: invalid data!");
+        return 0;
+    }
+    char *endPtr = NULL;
+    unsigned long result = 0;
+    result = strtol(input, &endPtr, NUMBER_BASE);
+
+    if (endPtr == input || *endPtr != '\0') {
+        HDF_LOGE("StrtoUint: invalid data!");
+        return 0;
+    } else if (errno == ERANGE) {
+        HDF_LOGE("StrtoUint: failed!");
+        return 0;
+    } else {
+        return (unsigned int)result;
+    }
+}
+
+int StrtoInt(const char *input)
+{
+    if (input == NULL || input[0] == '\0' || strlen(input) > MAX_INT32_LENGTH) {
+        HDF_LOGE("StrtoInt: invalid data!");
+        return 0;
+    }
+    char *endPtr = NULL;
+    long result = 0;
+    result = strtol(input, &endPtr, NUMBER_BASE);
+
+    if (endPtr == input || *endPtr != '\0') {
+        HDF_LOGE("StrtoInt: invalid data!");
+        return 0;
+    } else if (errno == ERANGE) {
+        HDF_LOGE("StrtoInt: failed!");
+        return 0;
+    } else {
+        return (int)result;
+    }
+}
+

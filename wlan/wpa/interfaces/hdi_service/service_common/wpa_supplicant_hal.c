@@ -441,7 +441,7 @@ static int WpaCliCmdWpsPin(WifiWpaStaInterface *this, const struct WpaWpsPinArgv
         HDF_LOGE("wps_pin return failed!");
         return -1;
     }
-    *pincode = atoi(buf);
+    *pincode = StrtoInt(buf);
     return 0;
 }
 
@@ -617,7 +617,7 @@ static int WpaCliCmdWepKeyTxKeyIdx(WifiWpaStaInterface *this, int *keyIdx)
     while (key != NULL) {
         char *value = strtok_r(NULL, "\n", &savedPtr);
         if (strcmp(key, "wep_tx_keyidx") == 0) {
-            *keyIdx = atoi(value);
+            *keyIdx = StrtoInt(value);
         }
         key = strtok_r(NULL, "=", &savedPtr);
     }
@@ -745,7 +745,7 @@ static int WpaCliCmdGetScanSsid(WifiWpaStaInterface *this, int *scanSsid)
     while (key != NULL) {
         char *value = strtok_r(NULL, "\n", &savedPtr);
         if (strcmp(key, "scan_ssid") == 0) {
-            *scanSsid = atoi(value);
+            *scanSsid = StrtoInt(value);
         }
         key = strtok_r(NULL, "=", &savedPtr);
     }

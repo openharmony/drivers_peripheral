@@ -20,6 +20,10 @@
 extern "C" {
 #endif
 
+#define NUMBER_BASE 10
+#define MAX_INT32_LENGTH 11   /* -2147483648 ~ 2147483647 */
+#define MAX_UINT32_LENGTH 10  /* 0 ~ 4294967295 */
+
 /**
  * @Description Convert [a,b,c,d,e,f] mac address to string type [xx:xx:xx:xx:xx:xx]
  *
@@ -67,6 +71,10 @@ int GetIfaceState(const char *ifaceName);
 int DataAnonymize(const char *input, int inputLen, char* output, int outputSize);
 
 char IsValidHexCharAndConvert(char c);
+
+unsigned int StrtoUint(const char *input);
+
+int StrtoInt(const char *input);
 
 #ifdef __cplusplus
 }
