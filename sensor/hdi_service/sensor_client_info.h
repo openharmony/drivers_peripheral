@@ -38,7 +38,7 @@ public:
     std::unordered_map<int32_t, int32_t> periodCountMap_;
     std::unordered_map<int32_t, int32_t> curCountMap_;
     void PrintClientMapInfo(int32_t serviceId, int32_t sensorId);
-    bool oneway;
+    bool oneway = false;
 private:
     sptr<V2_0::ISensorCallback> pollCallback_;
 };
