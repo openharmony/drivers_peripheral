@@ -1809,7 +1809,7 @@ int32_t UserAuthInterfaceService::VerifyAuthToken(const std::vector<uint8_t>& to
         return RESULT_BAD_PARAM;
     }
     UserAuthTokenPlainHal tokenPlain = {};
-    int32_t result = UserAuthTokenVerify((UserAuthTokenHal *)(&tokenIn), allowableDuration, &tokenPlain);
+    int32_t result = UserAuthTokenVerify((UserAuthTokenHal *)(tokenIn.data()), allowableDuration, &tokenPlain);
     if (result != RESULT_SUCCESS) {
         IAM_LOGE("UserAuthTokenVerify failed");
         return ConvertResultCode(result);
