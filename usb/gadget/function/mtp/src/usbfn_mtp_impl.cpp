@@ -23,6 +23,7 @@
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_log.h"
+#include "scope_guard.h"
 
 #define HDF_LOG_TAG usbfn_mtp_impl
 #define UDC_NAME "invalid_udc_name"
@@ -1656,30 +1657,29 @@ int32_t UsbfnMtpImpl::ReceiveFileEx()
 int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
 {
     pthread_rwlock_rdlock(&mtpRunrwLock_);
-    if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
+    ON_SCOPE_EXIT(release) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
+        close(mfs.fd);
+    };
+    if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
 
     if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
-        pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: device disconnect", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
     if (mfs.length <= 0) {
-        pthread_rwlock_unlock(&mtpRunrwLock_);
         return HDF_SUCCESS;
     }
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
         mtpDev_->mtpState = MTP_STATE_READY;
-        pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: states is ecanceled", __func__);
         return HDF_ERROR_ECANCEL;
     }
     std::lock_guard<std::mutex> guard(readMutex_);
     if (!mtpDev_->initFlag) {
-        pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: dev is release", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
@@ -1702,7 +1702,6 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
     } else if (mtpDev_->mtpState != MTP_STATE_OFFLINE) {
         mtpDev_->mtpState = MTP_STATE_READY;
     }
-    pthread_rwlock_unlock(&mtpRunrwLock_);
     return ret;
 }
 
@@ -1817,8 +1816,11 @@ void UsbfnMtpImpl::UsbMtpSendFileParamSet(const UsbFnMtpFileSlice &mfs)
 int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
 {
     pthread_rwlock_rdlock(&mtpRunrwLock_);
-    if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
+    ON_SCOPE_EXIT(release) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
+        close(mfs.fd);
+    };
+    if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
@@ -1829,24 +1831,20 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
     lseek(mfs.fd, mfs.offset, SEEK_SET);
 
     if (needXferCount == 0 || mfs.length < 0) {
-        pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGW("%{public}s: no data need to send", __func__);
         return HDF_SUCCESS;
     }
     if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
-        pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: device disconnect", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
         mtpDev_->mtpState = MTP_STATE_READY;
-        pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: states is ecanceled", __func__);
         return HDF_ERROR_ECANCEL;
     }
     std::lock_guard<std::mutex> guard(writeMutex_);
     if (!mtpDev_->initFlag) {
-        pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: dev is release", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
@@ -1863,7 +1861,6 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
     } else if (mtpDev_->mtpState != MTP_STATE_OFFLINE) {
         mtpDev_->mtpState = MTP_STATE_READY;
     }
-    pthread_rwlock_unlock(&mtpRunrwLock_);
     return ret;
 }
 
