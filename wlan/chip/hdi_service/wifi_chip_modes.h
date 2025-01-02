@@ -21,9 +21,9 @@
 #include <string>
 #include "wifi_vendor_hal.h"
 
-const char* const SUBCHIP_PROP = "ohos.boot.odm.conn.schiptype";
+#define SUBCHIP_PROP "ohos.boot.odm.conn.schiptype"
 #define PROP_SUBCHIPTYPE_LEN 10
-const char* const SUPPORT_COEXCHIP = "";
+#define SUPPORT_COEXCHIP ""
 #define PROP_MAX_LEN 128
 
 namespace OHOS {

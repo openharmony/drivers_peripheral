@@ -19,7 +19,7 @@
 #include "hdf_load_vdi.h"
 #include "wifi_hal.h"
 
-const char* WLAN_EXTEND_VDI_LIBNAME = "libhdi_wlan_impl.z.so";
+#define WLAN_EXTEND_VDI_LIBNAME "libhdi_wlan_impl.z.so"
 
 struct WlanExtendInterfaceVdi {
     int32_t (*startChannelMeas)(struct IWlanInterface *self, const char *ifName,

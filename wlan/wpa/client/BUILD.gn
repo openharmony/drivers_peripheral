@@ -50,11 +50,10 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = false  # Enable boundary san detection
+      boundary_sanitize = true  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = false  # Enable integer overflow detection
-      ubsan = false  # Enable some Ubsan options
-      cfi_vcall_icall_only = true
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     include_dirs = [ "include" ]
@@ -76,17 +75,7 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
-    cflags += [
-      "-fvisibility=hidden",
-      "-fdata-sections",
-      "-ffunction-sections",
-      "-Os",
-      "-fno-merge-all-constants",
-    ]
-    ldflags = [
-      "-Wl,--exclude-libs=ALL",
-      "-Wl,--gc-sections",
-    ]
+
     install_images = [
       chipset_base_dir,
       updater_vendor_base_dir,
