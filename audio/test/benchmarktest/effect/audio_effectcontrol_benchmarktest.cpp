@@ -160,7 +160,7 @@ BENCHMARK_F(AudioEffectControlBenchmarkTest, EffectProcess003)(benchmark::State 
 {
     ASSERT_NE(controller_, nullptr);
     int32_t ret;
-    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_SIGNED_32, 0, 0};
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_SINGED_32, 0, 0};
     struct AudioEffectBuffer output = {0};
 
     for (auto _ : state) {
