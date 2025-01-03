@@ -156,7 +156,7 @@ HWTEST_F(EffectControlTest, HdfAudioEffectProcess004, TestSize.Level1)
  */
 HWTEST_F(EffectControlTest, HdfAudioEffectProcess005, TestSize.Level1)
 {
-    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_SIGNED_32, 0, 0};
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_SINGED_32, 0, 0};
     struct AudioEffectBuffer output = {0};
 
     int32_t ret = controller_->EffectProcess(controller_, &input, &output);
