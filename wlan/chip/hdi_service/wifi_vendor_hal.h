@@ -73,11 +73,13 @@ public:
     static void OnAsyncGscanFullResult(int event);
     static void OnAsyncRssiReport(int32_t index, int32_t c0Rssi, int32_t c1Rssi);
     static void OnAsyncWifiNetlinkMsgReport(uint32_t type, const std::vector<uint8_t>& recvMsg);
+    static void OnAsyncWifiNetlinkMsgExtReport(uint32_t type, const std::vector<uint8_t>& recvMsg);
     WifiError SetTxPower(const std::string& ifaceName, int mode);
-    WifiError SendCmdToDriver(const std::string& ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf);
-    WifiError SendActionFrame(const std::string& ifName, uint32_t freq, const std::vector<uint8_t>& frameData);
-    WifiError RegisterActionFrameReceiver(const std::string& ifName, const std::vector<uint8_t>& match);
-    WifiError GetCoexictenceChannelList(const std::string& ifName, std::vector<uint8_t>& paramBuf);
+    WifiError SendCmdToDriver(const std::string& ifaceName, int32_t cmdId, const std::vector<int8_t>& paramBuf);
+    WifiError SendActionFrame(const std::string& ifaceName, uint32_t freq, const std::vector<uint8_t>& frameData);
+    WifiError RegisterActionFrameReceiver(const std::string& ifaceName, const std::vector<uint8_t>& match);
+    WifiError GetCoexictenceChannelList(const std::string& ifaceName, std::vector<uint8_t>& paramBuf);
+    WifiError SetProjectionScreenParam(const std::string& ifaceName, const ProjectionScreenCmdParam& param);
 
 private:
     WifiError RetrieveIfaceHandles();
