@@ -19,6 +19,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/test.gni")
   import("$HDF_CORE_DIR/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("$TEST_ROOT_DIR/wlan.gni")
 }
 
 configFlag = [
@@ -163,6 +164,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_unittest("hdf_client_wifi") {
+    CLIENT_ROOT_DIR = "./.."
     module_out_path = module_output_path
     include_dirs = [
       "$TEST_ROOT_DIR/client/include",
@@ -170,6 +172,9 @@ if (defined(ohos_lite)) {
       "$TEST_ROOT_DIR/hal/include",
       "$TEST_ROOT_DIR/interfaces/include",
       "$TEST_ROOT_DIR/wpa/client/include",
+      "$CLIENT_ROOT_DIR/interfaces/include",
+      "$root_out_dir/include",
+      "$root_out_dir/lib",
     ]
     defines = [ "OHOS_ARCH_LITE" ]
     sources = [
@@ -177,7 +182,17 @@ if (defined(ohos_lite)) {
       "$TEST_ROOT_DIR/hostapd/client/src/hostapd_client.c",
       "$TEST_ROOT_DIR/test/unittest/client/hdf_client_test.cpp",
       "$TEST_ROOT_DIR/wpa/client/src/wpa_client.c",
+      "$TEST_ROOT_DIR/client/src/sbuf/sbuf_common_adapter.c",
+      "$TEST_ROOT_DIR/client/src/wifi_driver_client.c",
     ]
+    if (drivers_peripheral_wlan_feature_enable_HDF_NL80211) {
+      sources += ["$TEST_ROOT_DIR/client/src/sbuf/sbuf_cmd_adapter.c",]
+    } else {
+      sources += [
+        "$TEST_ROOT_DIR/client/src/netlink/netlink_cmd_adapter.c",
+        "$TEST_ROOT_DIR/client/src/netlink/netlink_event_adapter.c",
+      ]
+    }
 
     resource_config_file =
         "$HDF_CORE_DIR/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
@@ -193,6 +208,8 @@ if (defined(ohos_lite)) {
         "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
+        "init:libbegetutil",
+        "libnl:libnl_share",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -213,6 +230,19 @@ if (defined(ohos_lite)) {
       "chip/wifi_test.cpp",
       "chip/wifi_vendor_hal_list_test.cpp",
       "chip/wifi_vendor_hal_test.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi_ap_iface.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/iface_tool.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi_vendor_hal.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/iface_util.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi_chip_modes.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi_p2p_iface.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi_sta_iface.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi_chip.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi_ext_iface.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi_vendor_hal_list.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/wifi_vendor_hal_stubs.cpp",
+      "$TEST_ROOT_DIR/chip/hdi_service/hdi_sync_util.cpp",
     ]
 
     cflags = configFlag

@@ -16,6 +16,7 @@
     WlanInterfaceServiceInit;
     HdfStubDriver;
     WlanInterfaceImplGetInstance;
+    WpaEventReport;
   local:
     *;
 };
