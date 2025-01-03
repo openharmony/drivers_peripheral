@@ -119,6 +119,81 @@ HWTEST_F(EffectControlTest, HdfAudioEffectProcess002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: HdfAudioEffectProcess003
+ * @tc.desc: Verify the EffectControlEffectProcess function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectControlTest, HdfAudioEffectProcess003, TestSize.Level1)
+{
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_VOID_TYPE, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    int32_t ret = controller_->EffectProcess(controller_, &input, &output);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: HdfAudioEffectProcess004
+ * @tc.desc: Verify the EffectControlEffectProcess function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectControlTest, HdfAudioEffectProcess004, TestSize.Level1)
+{
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_FLOAT_SIGNED_32, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    int32_t ret = controller_->EffectProcess(controller_, &input, &output);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: HdfAudioEffectProcess005
+ * @tc.desc: Verify the EffectControlEffectProcess function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectControlTest, HdfAudioEffectProcess005, TestSize.Level1)
+{
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_SIGNED_32, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    int32_t ret = controller_->EffectProcess(controller_, &input, &output);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: HdfAudioEffectProcess006
+ * @tc.desc: Verify the EffectControlEffectProcess function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectControlTest, HdfAudioEffectProcess006, TestSize.Level1)
+{
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_SIGNED_16, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    int32_t ret = controller_->EffectProcess(controller_, &input, &output);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: HdfAudioEffectProcess007
+ * @tc.desc: Verify the EffectControlEffectProcess function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectControlTest, HdfAudioEffectProcess007, TestSize.Level1)
+{
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_UNSIGNED_8, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    int32_t ret = controller_->EffectProcess(controller_, &input, &output);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
  * @tc.name: HdfAudioSendCommand001
  * @tc.desc: Verify the EffectControlSendCommand function when the input parameter is invalid.
  * @tc.type: FUNC
