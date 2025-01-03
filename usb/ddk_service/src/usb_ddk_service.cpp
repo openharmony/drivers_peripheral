@@ -113,6 +113,7 @@ void FillPipeRequestParamsWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem
     params.timeout = pipe.timeout;
     params.dataReq.length = ashmem.bufferLength;
 }
+
 int32_t CheckCompleteStatus(struct UsbRequest *request)
 {
     if (request == NULL) {
