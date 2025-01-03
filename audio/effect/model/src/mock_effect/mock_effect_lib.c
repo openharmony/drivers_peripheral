@@ -177,25 +177,6 @@ static int32_t MockEffectReverse(struct IEffectControlVdi *self, const struct Au
     return HDF_SUCCESS;
 }
 
-static void MockEffectReleaseDesc(struct EffectControllerDescriptorVdi *desc)
-{
-    if (desc == NULL) {
-        return;
-    }
-
-    OsalMemFree((void *)desc->effectId);
-    desc->effectId = NULL;
-
-    OsalMemFree((void *)desc->effectName);
-    desc->effectName = NULL;
-
-    OsalMemFree((void *)desc->libName);
-    desc->libName = NULL;
-
-    OsalMemFree((void *)desc->supplier);
-    desc->supplier = NULL;
-}
-
 static int32_t MockCpyDesc(const char *src, char **dest)
 {
     if (src == NULL || dest == NULL) {
@@ -203,7 +184,6 @@ static int32_t MockCpyDesc(const char *src, char **dest)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    *dest = (char *)OsalMemCalloc(HDF_EFFECT_NAME_LEN * sizeof(char));
     if (*dest == NULL) {
         HDF_LOGE("%{public}s: out of memory!", __func__);
         return HDF_ERR_MALLOC_FAIL;
@@ -226,25 +206,21 @@ static int32_t MockGetEffectDescriptorSub(struct EffectControllerDescriptorVdi *
 
     if (MockCpyDesc(g_mockEffectDescriptor.effectId, &(desc->effectId)) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: copy item %{public}s fail!", __func__, "effectId");
-        MockEffectReleaseDesc(desc);
         return HDF_FAILURE;
     }
 
     if (MockCpyDesc(g_mockEffectDescriptor.effectName, &(desc->effectName)) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: copy item %{public}s fail!", __func__, "effectName");
-        MockEffectReleaseDesc(desc);
         return HDF_FAILURE;
     }
 
     if (MockCpyDesc(g_mockEffectDescriptor.libName, &(desc->libName)) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: copy item %{public}s fail!", __func__, "libName");
-        MockEffectReleaseDesc(desc);
         return HDF_FAILURE;
     }
 
     if (MockCpyDesc(g_mockEffectDescriptor.supplier, &(desc->supplier)) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: copy item %{public}s fail!", __func__, "supplier");
-        MockEffectReleaseDesc(desc);
         return HDF_FAILURE;
     }
 
