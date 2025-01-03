@@ -272,7 +272,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid002, TestSize
     devicedesc.desc = const_cast<char*>("primary");
     devicedesc.pins = PIN_IN_MIC;
     InitAttrs(attrs);
-	attrs.sourceType = AUDIO_INPUT_VOICE_UPLINK_TYPE;
+    attrs.sourceType = AUDIO_INPUT_VOICE_UPLINK_TYPE;
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
@@ -287,7 +287,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid003, TestSize
     devicedesc.desc = const_cast<char*>("primary");
     devicedesc.pins = PIN_IN_MIC;
     InitAttrs(attrs);
-	attrs.sourceType = AUDIO_INPUT_VOICE_DOWNLINK_TYPE;
+    attrs.sourceType = AUDIO_INPUT_VOICE_DOWNLINK_TYPE;
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
@@ -302,7 +302,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid004, TestSize
     devicedesc.desc = const_cast<char*>("primary");
     devicedesc.pins = PIN_IN_MIC;
     InitAttrs(attrs);
-	attrs.sourceType = AUDIO_INPUT_VOICE_CALL_TYPE;
+    attrs.sourceType = AUDIO_INPUT_VOICE_CALL_TYPE;
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
@@ -317,7 +317,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid005, TestSize
     devicedesc.desc = const_cast<char*>("primary");
     devicedesc.pins = PIN_IN_MIC;
     InitAttrs(attrs);
-	attrs.sourceType = AUDIO_INPUT_CAMCORDER_TYPE;
+    attrs.sourceType = AUDIO_INPUT_CAMCORDER_TYPE;
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
@@ -332,7 +332,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid006, TestSize
     devicedesc.desc = const_cast<char*>("primary");
     devicedesc.pins = PIN_IN_MIC;
     InitAttrs(attrs);
-	attrs.sourceType = AUDIO_INPUT_EC_TYPE;
+    attrs.sourceType = AUDIO_INPUT_EC_TYPE;
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
@@ -347,7 +347,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid007, TestSize
     devicedesc.desc = const_cast<char*>("primary");
     devicedesc.pins = PIN_IN_MIC;
     InitAttrs(attrs);
-	attrs.sourceType = AUDIO_INPUT_NOISE_REDUCTION_TYPE;
+    attrs.sourceType = AUDIO_INPUT_NOISE_REDUCTION_TYPE;
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
