@@ -176,6 +176,10 @@ int32_t WifiP2pIface::GetCoexictenceChannelList(const std::string& ifName, std::
     return HDF_ERR_NOT_SUPPORT;
 }
 
+int32_t WifiP2pIface::SetProjectionScreenParam(const std::string& ifName, const ProjectionScreenCmdParam& param)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
 }
 }
 }

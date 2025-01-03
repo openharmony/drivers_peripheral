@@ -137,7 +137,9 @@ typedef struct {
     WifiError (*sendCmdToDriver)(const char* ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf);
     WifiError (*sendActionFrame)(wifiInterfaceHandle handle, uint32_t freq, const std::vector<uint8_t>& frameData);
     WifiError (*registerActionFrameReceiver)(wifiInterfaceHandle handle, const std::vector<uint8_t>& match);
-    WifiError (*getCoexictenceChannelList)(const std::string& ifName, std::vector<uint8_t>& paramBuf);
+    WifiError (*getCoexictenceChannelList)(const char* ifName, std::vector<uint8_t>& paramBuf);
+    WifiError (*setProjectionScreenParam)(wifiInterfaceHandle handle,
+        const OHOS::HDI::Wlan::Chip::V1_0::ProjectionScreenCmdParam& param);
 } WifiHalFn;
 
 WifiError InitWifiVendorHalFuncTable(WifiHalFn *fn);

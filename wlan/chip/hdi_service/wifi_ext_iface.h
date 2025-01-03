@@ -58,6 +58,7 @@ public:
     int32_t SendActionFrame(const std::string& ifName, uint32_t freq, const std::vector<uint8_t>& frameData) override;
     int32_t RegisterActionFrameReceiver(const std::string& ifName, const std::vector<uint8_t>& match) override;
     int32_t GetCoexictenceChannelList(const std::string& ifName, std::vector<uint8_t>& paramBuf) override;
+    int32_t SetProjectionScreenParam(const std::string& ifName, const ProjectionScreenCmdParam& param) override;
 
 private:
     std::string ifName_;
