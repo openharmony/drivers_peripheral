@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <condition_variable>
 #include <benchmark/benchmark.h>
+#include <thread>
 #include "gtest/gtest.h"
 #include "v1_2/include/idisplay_composer_interface.h"
 #include "v1_1/display_composer_type.h"
@@ -39,6 +40,7 @@ using namespace testing::ext;
 static sptr<Composer::V1_2::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
+const int SLEEP_CONT_100 = 100;
 
 namespace {
 class DisplayBenchmarkTest : public benchmark::Fixture {
