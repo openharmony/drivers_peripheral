@@ -168,6 +168,17 @@ static std::vector<std::shared_ptr<HdiTestLayer>> CreateLayers(std::vector<Layer
     return layers;
 }
 
+static void DestroyLayer(std::shared_ptr<HdiTestLayer> layer)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
+    auto ret = g_composerDevice->DestroyLayer(g_displayIds[0], layer->GetId());
+    if (ret != DISPLAY_SUCCESS && ret != DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("DestroyLayer fail or not support, ret: %{public}d", ret);
+        return;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
+}
+
 /**
   * @tc.name: SetClientBufferCacheCountTest
   * @tc.desc: Benchmarktest for interface SetClientBufferCacheCount.
@@ -717,7 +728,7 @@ BENCHMARK_F(DisplayBenchmarkTest, UpdateHardwareCursorTest)(benchmark::State &st
     ASSERT_TRUE(buffer != nullptr);
 
     std::vector<LayerSettings> settings = {
-        {.rectRatio = { 0, 0, 1.0f, 1.0f }, .color = RED,},
+        {.rectRatio = { 0, 0, 1.0f, 1.0f }, .color = RED},
     };
 
     std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
