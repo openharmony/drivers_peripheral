@@ -341,7 +341,7 @@ HWTEST_F(DeviceTest, test_UpdateHardwareCursor, TestSize.Level1)
     ASSERT_TRUE(buffer != nullptr);
 
     std::vector<LayerSettings> settings = {
-        {.rectRatio = { 0, 0, 1.0f, 1.0f }, .color = RED,},
+        {.rectRatio = { 0, 0, 1.0f, 1.0f }, .color = RED},
     };
 
     std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
