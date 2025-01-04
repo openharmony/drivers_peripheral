@@ -50,6 +50,13 @@ constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 constexpr uint8_t  USB_PARAM_REQTYPE = 128;
 constexpr uint8_t  USB_PARAM_STAND_REQTYPE = 0;
 int32_t g_usbOpenCount = 0;
+#ifdef LIBUSB_ENABLE
+constexpr uint8_t MAX_DEVICE_ADDRESS = 255;
+constexpr uint8_t MAX_ENDPOINT_ID = 158;
+constexpr uint8_t LIBUSB_MAX_INTERFACEID = 0x80;
+constexpr uint8_t LIBUSB_INTERFACEID = 255;
+constexpr uint8_t USB_ENDPOINT_MASK = 0x80;
+#endif
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -1996,6 +2003,7 @@ int32_t UsbImpl::IsoTransferWrite(
 int32_t UsbImpl::RequestQueue(
     const UsbDev &dev, const UsbPipe &pipe, const std::vector<uint8_t> &clientData, const std::vector<uint8_t> &buffer)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2036,11 +2044,20 @@ int32_t UsbImpl::RequestQueue(
     OsalMemFree(bufferAddr);
     bufferAddr = nullptr;
     return ret;
+#else
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::RequestWait(
     const UsbDev &dev, std::vector<uint8_t> &clientData, std::vector<uint8_t> &buffer, int32_t timeout)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2080,10 +2097,18 @@ int32_t UsbImpl::RequestWait(
     buffer.assign(bufferAddr, bufferAddr + reqMsg->reqMsg.request->compInfo.length);
     UsbdRequestASyncReleaseData(reqMsg);
     return ret;
+#else
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::RequestCancel(const UsbDev &dev, const UsbPipe &pipe)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2104,6 +2129,19 @@ int32_t UsbImpl::RequestCancel(const UsbDev &dev, const UsbPipe &pipe)
         }
     }
     return HDF_SUCCESS;
+#else
+    if (pipe.intfId == LIBUSB_INTERFACEID && pipe.endpointId == MAX_ENDPOINT_ID) {
+        HDF_LOGW("%{public}s: intfId = %{public}d, endpointId = %{public}d",
+           __func__, pipe.intfId, pipe.endpointId);
+        return HDF_SUCCESS;
+    }
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        ( pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetCurrentFunctions(int32_t &funcs)
@@ -2276,6 +2314,7 @@ void UsbImpl::UsbDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
 
 int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<IUsbdBulkCallback> &cb)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2294,10 +2333,19 @@ int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const s
     }
 
     return HDF_SUCCESS;
+#else
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID) || (cb == nullptr)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2311,10 +2359,19 @@ int32_t UsbImpl::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
     }
     list->cb = nullptr;
     return HDF_SUCCESS;
+#else
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2344,10 +2401,26 @@ int32_t UsbImpl::BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ash
     }
 
     return ret;
+#else
+    HDF_LOGI("ouliang %{public}s: ouliang dev.devAddr=%{public}d, dev.busNum=%{public}d, pipe.endpointId=%{public}d, pipe.intfId=%{public}d", 
+            __func__, dev.devAddr, dev.busNum, pipe.endpointId, pipe.intfId);
+    if ((pipe.endpointId & USB_ENDPOINT_MASK) != USB_ENDPOINT_MASK) {
+        HDF_LOGE("%{public}s:EndpointId is invalid", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2377,10 +2450,20 @@ int32_t UsbImpl::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<As
     }
 
     return ret;
+#else
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
+
 }
 
 int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2399,6 +2482,14 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
     BulkRequestCancel(list);
     list->cb = tcb;
     return HDF_SUCCESS;
+#else
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::ClearHalt(const UsbDev &dev, const UsbPipe &pipe)
