@@ -340,6 +340,19 @@ HWTEST_F(DeviceTest, test_UpdateHardwareCursor, TestSize.Level1)
     g_gralloc->AllocMem(info, buffer);
     ASSERT_TRUE(buffer != nullptr);
 
+    std::vector<LayerSettings> settings = {
+        {.rectRatio = { 0, 0, 1.0f, 1.0f }, .color = RED,},
+    };
+
+    std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+    ASSERT_TRUE((layers.size() > 0));
+
+    auto layer = layers[0];
+    PrepareAndCommit();
+    sleep(1);
+    HdiTestDevice::GetInstance().Clear();
+    DestroyLayer(layer);
+
     int32_t x = 1;
     int32_t y = 1;
     auto ret = g_composerDevice->UpdateHardwareCursor(g_displayIds[0], x, y, buffer);
