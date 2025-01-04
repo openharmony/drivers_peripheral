@@ -52,10 +52,11 @@ constexpr uint8_t  USB_PARAM_STAND_REQTYPE = 0;
 int32_t g_usbOpenCount = 0;
 #ifdef LIBUSB_ENABLE
 constexpr uint8_t MAX_DEVICE_ADDRESS = 255;
+constexpr uint8_t MAX_DEVICE_BUSNUM = 255;
 constexpr uint8_t MAX_ENDPOINT_ID = 158;
-constexpr uint8_t LIBUSB_MAX_INTERFACEID = 0x80;
-constexpr uint8_t LIBUSB_INTERFACEID = 255;
-constexpr uint8_t USB_ENDPOINT_MASK = 0x80;
+constexpr uint8_t MAX_INTERFACE_ID = 255;
+constexpr uint8_t LIBUSB_INTERFACE_ID = 0x80;
+constexpr uint8_t LIBUSB_ENDPOINT_MASK = 0x80;
 #endif
 namespace OHOS {
 namespace HDI {
@@ -2045,8 +2046,8 @@ int32_t UsbImpl::RequestQueue(
     bufferAddr = nullptr;
     return ret;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2098,7 +2099,7 @@ int32_t UsbImpl::RequestWait(
     UsbdRequestASyncReleaseData(reqMsg);
     return ret;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2130,13 +2131,13 @@ int32_t UsbImpl::RequestCancel(const UsbDev &dev, const UsbPipe &pipe)
     }
     return HDF_SUCCESS;
 #else
-    if (pipe.intfId == LIBUSB_INTERFACEID && pipe.endpointId == MAX_ENDPOINT_ID) {
-        HDF_LOGW("%{public}s: intfId = %{public}d, endpointId = %{public}d",
-           __func__, pipe.intfId, pipe.endpointId);
+    if (pipe.intfId == MAX_INTERFACE_ID && pipe.endpointId == MAX_ENDPOINT_ID) {
+        HDF_LOGW("%{public}s: intfId = %{public}d, endpointId = %{public}d", __func__,
+            pipe.intfId, pipe.endpointId);
         return HDF_SUCCESS;
     }
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
-        ( pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2334,8 +2335,8 @@ int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const s
 
     return HDF_SUCCESS;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID) || (cb == nullptr)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID) || (cb == nullptr)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2360,8 +2361,8 @@ int32_t UsbImpl::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
     list->cb = nullptr;
     return HDF_SUCCESS;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2402,15 +2403,13 @@ int32_t UsbImpl::BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ash
 
     return ret;
 #else
-    HDF_LOGI("ouliang %{public}s: ouliang dev.devAddr=%{public}d, dev.busNum=%{public}d, pipe.endpointId=%{public}d, pipe.intfId=%{public}d", 
-            __func__, dev.devAddr, dev.busNum, pipe.endpointId, pipe.intfId);
-    if ((pipe.endpointId & USB_ENDPOINT_MASK) != USB_ENDPOINT_MASK) {
+    if ((pipe.endpointId & LIBUSB_ENDPOINT_MASK) != LIBUSB_ENDPOINT_MASK) {
         HDF_LOGE("%{public}s:EndpointId is invalid", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2451,14 +2450,13 @@ int32_t UsbImpl::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<As
 
     return ret;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
 #endif // LIBUSB_ENABLE
-
 }
 
 int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
@@ -2483,8 +2481,8 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
     list->cb = tcb;
     return HDF_SUCCESS;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }

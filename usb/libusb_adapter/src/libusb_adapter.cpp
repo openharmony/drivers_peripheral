@@ -606,7 +606,7 @@ int32_t LibusbAdapter::BulkTransferWrite(
         &actlength, timeout);
     if (ret < 0) {
         if (ret == LIBUSB_IO_ERROR && interfaceId == pipe.intfId) {
-            HDF_LOGD("%{public}s: interfaceId=%{public}d, pipe.intfId=%{public}d", __func__, interfaceId, pipe.intfId);
+            HDF_LOGE("%{public}s: interfaceId=%{public}d, pipe.intfId=%{public}d", __func__, interfaceId, pipe.intfId);
             return LIBUSB_IO_ERROR_INVALID;
         }
         HDF_LOGE("%{public}s: libusb_bulk_transfer is error ret=%{public}d", __func__, ret);
@@ -872,11 +872,14 @@ int32_t LibusbAdapter::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, ui
         return HDF_FAILURE;
     }
 
-    if (force && (libusb_kernel_driver_active(devHandle, interfaceId) == 1)) {
-        ret = libusb_detach_kernel_driver(devHandle, interfaceId);
-        if (ret < HDF_SUCCESS) {
-            HDF_LOGD("Interface libusb_detach_kernel_driver is error, ret : %{public}d, force : %{public}d",
-                ret, force);
+    if (force) {
+        if (libusb_kernel_driver_active(devHandle, interfaceId) != 1) {
+            HDF_LOGW("This interface is not occupied by the kernel driver,interfaceId : %{public}d", interfaceId);
+        } else {
+            ret = libusb_detach_kernel_driver(devHandle, interfaceId);
+            if (ret < HDF_SUCCESS) {
+                HDF_LOGE("libusb_detach_kernel_driver is error, ret: %{public}d", ret);
+            }
         }
     }
 

@@ -551,8 +551,10 @@ int32_t UsbDdkService::SendControlWriteRequest(
         HDF_LOGE("%{public}s infoTemp failed", __func__);
         return HDF_FAILURE;
     }
-    return g_DdkLibusbAdapter->ControlTransferWrite({infoTemp.busNum, infoTemp.devNum},
+    ret = g_DdkLibusbAdapter->ControlTransferWrite({infoTemp.busNum, infoTemp.devNum},
         {setup.requestType, setup.requestCmd, setup.value, setup.index, timeout}, data);
+    HDF_LOGD("%{public}s ret%{public}d", __func__, ret);
+    return (ret == HDF_SUCCESS) ? HDF_SUCCESS : HDF_ERR_INVALID_PARAM;
 #endif // LIBUSB_ENABLE
 }
 
