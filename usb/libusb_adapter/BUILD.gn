@@ -37,12 +37,13 @@ ohos_shared_library("libusb_adapter") {
 
   if (is_standard_system) {
     external_deps = [
+      "access_token:libaccesstoken_sdk",
       "drivers_interface_usb:libusb_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hilog:libhilog",
-      "init:libbegetutil",
+      "ipc:ipc_single",
       "libusb:libusb",
     ]
     if (usb_c_utils_enable) {
