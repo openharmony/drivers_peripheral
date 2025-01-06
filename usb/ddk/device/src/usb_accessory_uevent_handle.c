@@ -33,6 +33,10 @@ struct UsbAccessoryUeventInfo {
 static void UsbAccessoryDispatchUevent(const struct UsbAccessoryUeventInfo *info)
 {
     HDF_LOGD("%{public}s: devPath: %{public}s, accessory: %{public}s", __func__, info->devPath, info->accessory);
+    if (info == NULL) {
+        HDF_LOGE("%{public}s: info is NULL", __func__);
+        return;
+    }
     if (strcmp(info->devPath, g_usbAccessoryUeventPath) != 0) {
         return;
     }
@@ -46,6 +50,10 @@ static void UsbAccessoryDispatchUevent(const struct UsbAccessoryUeventInfo *info
 void UsbAccessoryUeventHandle(const char msg[], ssize_t rcvLen)
 {
     HDF_LOGD("%{public}s: msg: %{public}s, len: %{public}zd", __func__, msg, rcvLen);
+    if (rcvLen <= 0) {
+        HDF_LOGE("%{public}s: rcvLen is invalid: %{public}zd", __func__, rcvLen);
+        return;
+    }
     char fullMsg[rcvLen + 1];
     for (int i = 0; i < rcvLen; i++) {
         if (msg[i] == '\0') {
