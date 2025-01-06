@@ -124,6 +124,86 @@ BENCHMARK_F(AudioEffectControlBenchmarkTest, EffectProcess)(benchmark::State &st
 BENCHMARK_REGISTER_F(AudioEffectControlBenchmarkTest, EffectProcess)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
+BENCHMARK_F(AudioEffectControlBenchmarkTest, EffectProcess001)(benchmark::State &state)
+{
+    ASSERT_NE(controller_, nullptr);
+    int32_t ret;
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_VOID_TYPE, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    for (auto _ : state) {
+        ret = controller_->EffectProcess(controller_, &input, &output);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(AudioEffectControlBenchmarkTest, EffectProcess001)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioEffectControlBenchmarkTest, EffectProcess002)(benchmark::State &state)
+{
+    ASSERT_NE(controller_, nullptr);
+    int32_t ret;
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_FLOAT_SIGNED_32, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    for (auto _ : state) {
+        ret = controller_->EffectProcess(controller_, &input, &output);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(AudioEffectControlBenchmarkTest, EffectProcess002)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioEffectControlBenchmarkTest, EffectProcess003)(benchmark::State &state)
+{
+    ASSERT_NE(controller_, nullptr);
+    int32_t ret;
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_SINGED_32, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    for (auto _ : state) {
+        ret = controller_->EffectProcess(controller_, &input, &output);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(AudioEffectControlBenchmarkTest, EffectProcess003)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioEffectControlBenchmarkTest, EffectProcess004)(benchmark::State &state)
+{
+    ASSERT_NE(controller_, nullptr);
+    int32_t ret;
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_SIGNED_16, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    for (auto _ : state) {
+        ret = controller_->EffectProcess(controller_, &input, &output);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(AudioEffectControlBenchmarkTest, EffectProcess004)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioEffectControlBenchmarkTest, EffectProcess005)(benchmark::State &state)
+{
+    ASSERT_NE(controller_, nullptr);
+    int32_t ret;
+    struct AudioEffectBuffer input = {0, EFFECT_BUFFER_UNSIGNED_8, 0, 0};
+    struct AudioEffectBuffer output = {0};
+
+    for (auto _ : state) {
+        ret = controller_->EffectProcess(controller_, &input, &output);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(AudioEffectControlBenchmarkTest, EffectProcess005)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+	
 BENCHMARK_F(AudioEffectControlBenchmarkTest, SendCommand)(benchmark::State &state)
 {
     ASSERT_NE(controller_, nullptr);
