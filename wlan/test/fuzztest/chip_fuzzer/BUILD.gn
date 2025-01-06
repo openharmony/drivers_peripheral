@@ -37,8 +37,8 @@ ohos_fuzztest("ChipFuzzTest") {
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
-    "ipc:ipc_single",
     "init:libbegetutil",
+    "ipc:ipc_single",
   ]
 
   cflags = [
@@ -48,21 +48,20 @@ ohos_fuzztest("ChipFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [
-    "chip_fuzzer.cpp",
-    "$TEST_ROOT_DIR/chip/hdi_service/wifi_ap_iface.cpp",
+  sources = [ 
+    "$TEST_ROOT_DIR/chip/hdi_service/hdi_sync_util.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/iface_tool.cpp",
-    "$TEST_ROOT_DIR/chip/hdi_service/wifi_vendor_hal.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/iface_util.cpp",
-    "$TEST_ROOT_DIR/chip/hdi_service/wifi_chip_modes.cpp",
-    "$TEST_ROOT_DIR/chip/hdi_service/wifi_p2p_iface.cpp",
-    "$TEST_ROOT_DIR/chip/hdi_service/wifi_sta_iface.cpp",
+    "$TEST_ROOT_DIR/chip/hdi_service/wifi.cpp",
+    "$TEST_ROOT_DIR/chip/hdi_service/wifi_ap_iface.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi_chip.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi_ext_iface.cpp",
+    "$TEST_ROOT_DIR/chip/hdi_service/wifi_p2p_iface.cpp",
+    "$TEST_ROOT_DIR/chip/hdi_service/wifi_sta_iface.cpp",
+    "$TEST_ROOT_DIR/chip/hdi_service/wifi_vendor_hal.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi_vendor_hal_list.cpp",
-    "$TEST_ROOT_DIR/chip/hdi_service/wifi.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi_vendor_hal_stubs.cpp",
-    "$TEST_ROOT_DIR/chip/hdi_service/hdi_sync_util.cpp",
+    "chip_fuzzer.cpp",
   ]
 }
 
