@@ -113,6 +113,7 @@ void FillPipeRequestParamsWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem
     params.timeout = pipe.timeout;
     params.dataReq.length = ashmem.bufferLength;
 }
+
 int32_t CheckCompleteStatus(struct UsbRequest *request)
 {
     if (request == NULL) {
@@ -126,7 +127,7 @@ int32_t CheckCompleteStatus(struct UsbRequest *request)
     }
 
     if (apiVersion >= API_VERSION_ID && request->compInfo.status != USB_REQUEST_COMPLETED) {
-        return request->compInfo.status;
+        return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
 }
