@@ -198,10 +198,6 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s:LibUSBInit is failed, ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    if (!eventThread.joinable()) {
-        isRunning = true;
-        eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
-    }
     libusb_device *device = nullptr;
     ret = GetUsbDevice(dev, &device);
     if (device == nullptr || ret != HDF_SUCCESS) {
@@ -228,6 +224,10 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     {
         std::unique_lock<std::shared_mutex> lock(g_mapMutexDeviceSettingsMap);
         g_deviceSettingsMap[devHandle].configurationIndex = currentConfig;
+    }
+    if (!eventThread.joinable()) {
+        isRunning = true;
+        eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
     }
     HDF_LOGI("%{public}s succeeded", __func__);
     return HDF_SUCCESS;
