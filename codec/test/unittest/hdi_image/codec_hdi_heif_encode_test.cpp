@@ -1040,4 +1040,24 @@ HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_032, TestSize.Level
     ASSERT_TRUE(filledLen_ > 0);
 }
 
+// [PASS] check GetImageCapability can get heif encode capability
+#ifdef SUPPORT_HEIF
+HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_033, TestSize.Level1)
+{
+    ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
+    ASSERT_TRUE(bufferMgr_ != nullptr);
+    std::vector<CodecImageCapability> capList;
+    int32_t ret = hdiHeifEncoder_->GetImageCapability(capList);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    
+    bool hasHeifEncodeCapability = false;
+    for (const auto& cap : capList) {
+        if (cap.role == CODEC_IMAGE_HEIF && cap.type == CODEC_IMAGE_TYPE_ENCODER) {
+            hasHeifEncodeCapability = true;
+            break;
+        }
+    }
+    ASSERT_TRUE(hasHeifEncodeCapability);
+}
+#endif
 }
