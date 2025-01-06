@@ -48,13 +48,14 @@ ohos_fuzztest("ChipFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ 
+  sources = [
     "$TEST_ROOT_DIR/chip/hdi_service/hdi_sync_util.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/iface_tool.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/iface_util.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi_ap_iface.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi_chip.cpp",
+    "$TEST_ROOT_DIR/chip/hdi_service/wifi_chip_modes.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi_ext_iface.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi_p2p_iface.cpp",
     "$TEST_ROOT_DIR/chip/hdi_service/wifi_sta_iface.cpp",
