@@ -186,7 +186,7 @@ if (defined(ohos_lite)) {
       "$TEST_ROOT_DIR/wpa/client/src/wpa_client.c",
     ]
     if (drivers_peripheral_wlan_feature_enable_HDF_NL80211) {
-      sources += ["$TEST_ROOT_DIR/client/src/sbuf/sbuf_cmd_adapter.c",]
+      sources += [ "$TEST_ROOT_DIR/client/src/sbuf/sbuf_cmd_adapter.c" ]
     } else {
       sources += [
         "$TEST_ROOT_DIR/client/src/netlink/netlink_cmd_adapter.c",
