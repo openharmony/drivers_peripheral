@@ -552,10 +552,9 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
     }
     bufferHdrType->pAppPrivate = nullptr;
     OMXBufferAppPrivateData privateData{};
-    OmxCodecBuffer& omxCodecBuffer = codecBuffer->GetCodecBuffer();
-    if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!omxCodecBuffer.alongParam.empty())) {
-        privateData.sizeOfParam = static_cast<uint32_t>(omxCodecBuffer.alongParam.size());
-        privateData.param = static_cast<void *>(omxCodecBuffer.alongParam.data());
+    if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!buffer.alongParam.empty())) {
+        privateData.sizeOfParam = static_cast<uint32_t>(buffer.alongParam.size());
+        privateData.param = static_cast<void *>(buffer.alongParam.data());
         bufferHdrType->pAppPrivate = static_cast<void *>(&privateData);
     }
 

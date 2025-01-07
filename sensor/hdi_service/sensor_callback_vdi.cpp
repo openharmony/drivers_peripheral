@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 namespace {
     constexpr int32_t DATA_LEN = 256;
     constexpr int64_t REPOPRT_TIME = 60000000000;
@@ -128,11 +128,11 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
 
 sptr<IRemoteObject> SensorCallbackVdi::HandleCallbackDeath()
 {
-    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<ISensorCallback>(sensorCallback_);
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<V2_0::ISensorCallback>(sensorCallback_);
 
     return remote;
 }
-} // V2_0
+} // V2_1
 } // Sensor
 } // HDI
 } // OHOS

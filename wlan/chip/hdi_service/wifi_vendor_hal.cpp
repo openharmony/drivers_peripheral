@@ -153,6 +153,18 @@ void WifiVendorHal::OnAsyncWifiNetlinkMsgReport(uint32_t type, const std::vector
     }
 }
 
+void WifiVendorHal::OnAsyncWifiNetlinkMsgExtReport(uint32_t type, const std::vector<uint8_t>& recvMsg)
+{
+    const auto lock = AcquireGlobalLock();
+
+    HDF_LOGD("OnAsyncWifiNetlinkMsgExtReport::OnWifiNetlinkMessage");
+    for (const auto& callback : vendorHalExtCbHandler_.GetCallbacks()) {
+        if (callback) {
+            callback->OnWifiNetlinkMessage(type, recvMsg);
+        }
+    }
+}
+
 WifiError WifiVendorHal::Stop(std::unique_lock<std::recursive_mutex>* lock,
     const std::function<void()>& onStopCompleteUserCallback)
 {
@@ -375,7 +387,7 @@ WifiError WifiVendorHal::RegisterIfaceCallBack(const std::string& ifaceName,
     const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
     vendorHalCbHandler_.AddCallback(chipIfaceCallback);
-    WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport};
+    WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport, OnAsyncWifiNetlinkMsgReport};
     globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
     return HAL_SUCCESS;
 }
@@ -393,7 +405,7 @@ WifiError WifiVendorHal::RegisterExtIfaceCallBack(const std::string& ifaceName,
     const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
     vendorHalExtCbHandler_.AddCallback(chipIfaceCallback);
-    WifiExtCallbackHandler handler = {OnAsyncWifiNetlinkMsgReport};
+    WifiExtCallbackHandler handler = {OnAsyncWifiNetlinkMsgExtReport};
     globalFuncTable_.registerExtIfaceCallBack(ifaceName.c_str(), handler);
     return HAL_SUCCESS;
 }
@@ -431,9 +443,13 @@ WifiError WifiVendorHal::RegisterActionFrameReceiver(const std::string& ifaceNam
 
 WifiError WifiVendorHal::GetCoexictenceChannelList(const std::string& ifaceName, std::vector<uint8_t>& paramBuf)
 {
-    return globalFuncTable_.getCoexictenceChannelList(ifaceName, paramBuf);
+    return globalFuncTable_.getCoexictenceChannelList(ifaceName.c_str(), paramBuf);
 }
 
+WifiError WifiVendorHal::SetProjectionScreenParam(const std::string& ifaceName, const ProjectionScreenCmdParam& param)
+{
+    return globalFuncTable_.setProjectionScreenParam(GetIfaceHandle(ifaceName), param);
+}
 } // namespace v1_0
 } // namespace Chip
 } // namespace Wlan

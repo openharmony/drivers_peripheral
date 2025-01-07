@@ -339,10 +339,6 @@ enum OmxIndexCodecExType {
     OMX_IndexParamSupportPackInput,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamIsMvUpload,
-    /** OMX_CONFIG_BOOLEANTYPE */
-    OMX_IndexParamEnableQPMap,
-    /** CodecBlockQpParam */
-    OMX_IndexParamBlockQP,
 };
 
 /**
@@ -471,15 +467,6 @@ struct CodecEncOutMadParam {
     int32_t frameMadi;
     int32_t frameMadp;
     int32_t sumMadi;
-};
-
-struct CodecBlockQpParam {
-    uint32_t size;                               /** Size of the structure */
-    union OMX_VERSIONTYPE version;               /** Component version */
-    void *blockQpAddr;                           /** qp map data address */
-    uint32_t blockQpSize;                        /** qp map data size */
-    uint32_t qpMapReserveInts;                   /**< Number of the qpMap reserved integers */
-    uint8_t qpMapReserve[0];                     /** reserve for qpmap data */
 };
 
 #ifdef __cplusplus

@@ -29,8 +29,8 @@
 #include "bssid_ignore.h"
 #include "wpa_supplicant/config.h"
 #include "common/defs.h"
-#include "v1_1/iwpa_callback.h"
-#include "v1_1/iwpa_interface.h"
+#include "v1_2/iwpa_callback.h"
+#include "v1_2/iwpa_interface.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <dlfcn.h>
@@ -1968,4 +1968,34 @@ void ClearHdfWpaRemoteObj(void)
         pos = NULL;
     }
     (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
+}
+
+int32_t WpaInterfaceGetWpaStaData(struct IWpaInterface *self, const char *ifName, const char *staParam,
+    char *staData, uint32_t staDataLen)
+{
+    (void)self;
+    HDF_LOGI("enter %{public}s ", __func__);
+    pthread_mutex_lock(&g_interfaceLock);
+    if (ifName == NULL || staParam == NULL || staData == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
+    if (pStaIfc == NULL) {
+        pthread_mutex_unlock(&g_interfaceLock);
+        HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
+        return HDF_FAILURE;
+    }
+
+    int ret = pStaIfc->wpaCliCmdGetWpaStaData(pStaIfc, staParam, staData, staDataLen);
+    if (ret < 0) {
+        pthread_mutex_unlock(&g_interfaceLock);
+        HDF_LOGE("%{public}s: wpaCliCmdGetWpaStaData fail! ret = %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+
+    pthread_mutex_unlock(&g_interfaceLock);
+    HDF_LOGI("%{public}s: wpaCliCmdGetWpaStaData success ret = %{public}d", __func__, ret);
+    return HDF_SUCCESS;
 }

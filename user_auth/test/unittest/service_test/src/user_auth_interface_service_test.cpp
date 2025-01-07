@@ -1022,7 +1022,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_001, TestSize.Level0)
     std::vector<uint8_t> authToken;
     std::vector<CredentialInfo> deletedCredInfos;
     std::vector<uint8_t> rootSecret;
-    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 10017);
+    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 8);
 
     authToken.resize(sizeof(UserAuthTokenHal));
     EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 10017);

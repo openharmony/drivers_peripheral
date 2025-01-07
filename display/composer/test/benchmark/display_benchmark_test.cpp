@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <condition_variable>
 #include <benchmark/benchmark.h>
+#include <thread>
 #include "gtest/gtest.h"
 #include "v1_2/include/idisplay_composer_interface.h"
 #include "v1_1/display_composer_type.h"
@@ -39,6 +40,7 @@ using namespace testing::ext;
 static sptr<Composer::V1_2::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
+const int SLEEP_CONT_100 = 100;
 
 namespace {
 class DisplayBenchmarkTest : public benchmark::Fixture {
@@ -64,6 +66,119 @@ void DisplayBenchmarkTest::OnseamlessChange(uint32_t devId, void* data)
 
 void DisplayBenchmarkTest::TestRefreshCallback(uint32_t devId, void* data)
 {
+}
+
+static inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
+{
+    return HdiTestDevice::GetInstance().GetFirstDisplay();
+}
+
+static std::shared_ptr<HdiTestLayer> CreateTestLayer(LayerSettings setting, uint32_t zorder)
+{
+    int ret;
+    HdiTestDevice::GetInstance();
+    DISPLAY_TEST_LOGE("color 0x%x", setting.color);
+    std::shared_ptr<HdiTestDisplay> display = HdiTestDevice::GetInstance().GetFirstDisplay();
+    DISPLAY_TEST_CHK_RETURN((display == nullptr), nullptr, DISPLAY_TEST_LOGE("can not get display"));
+
+    std::shared_ptr<HdiTestLayer> layer = display->CreateHdiTestLayer(setting.bufferSize.w, setting.bufferSize.h);
+    DISPLAY_TEST_CHK_RETURN((layer == nullptr), nullptr, DISPLAY_TEST_LOGE("can not create hdi test layer"));
+
+    layer->SetLayerPosition(setting.displayRect);
+
+    layer->SetCompType(setting.compositionType);
+
+    if ((setting.alpha >= 0) && (setting.alpha <= 0xff)) { // alpha rang 0x00 ~ 0xff
+        LayerAlpha alpha = { 0 };
+        alpha.gAlpha = setting.alpha;
+        alpha.enGlobalAlpha = true;
+        layer->SetAlpha(alpha);
+    }
+    HdiGrallocBuffer* handle = layer->GetFrontBuffer();
+    DISPLAY_TEST_CHK_RETURN((handle == nullptr), nullptr, DISPLAY_TEST_LOGE("can not get front buffer"));
+    ClearColor(*(handle->Get()), setting.color);
+    ret = layer->SwapFrontToBackQ();
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), nullptr, DISPLAY_TEST_LOGE("SwapFrontToBackQ failed"));
+    layer->SetZorder(zorder);
+    layer->SetBlendType(setting.blendType);
+    layer->SetTransform(setting.rotate);
+    return layer;
+}
+
+static int PrepareAndCommit()
+{
+    int ret;
+    DISPLAY_TEST_LOGE();
+    std::shared_ptr<HdiTestDisplay> display = HdiTestDevice::GetInstance().GetFirstDisplay();
+    DISPLAY_TEST_CHK_RETURN((display == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get display"));
+
+    ret = display->PrepareDisplayLayers();
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
+        DISPLAY_TEST_LOGE("PrepareDisplayLayers failed"));
+
+    ret = display->Commit();
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("Commit failed"));
+    return DISPLAY_SUCCESS;
+}
+
+static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w, uint32_t h)
+{
+    DISPLAY_TEST_LOGE();
+    for (uint32_t i = 0; i < settings.size(); i++) {
+        LayerSettings& setting = settings[i];
+        DISPLAY_TEST_LOGE(" ratio w: %f  ratio h: %f", setting.rectRatio.w, setting.rectRatio.h);
+        if ((setting.rectRatio.w > 0.0f) && (setting.rectRatio.h > 0.0f)) {
+            setting.displayRect.h = static_cast<uint32_t>(setting.rectRatio.h * h);
+            setting.displayRect.w = static_cast<uint32_t>(setting.rectRatio.w * w);
+            setting.displayRect.x = static_cast<uint32_t>(setting.rectRatio.x * w);
+            setting.displayRect.y = static_cast<uint32_t>(setting.rectRatio.y * h);
+            DISPLAY_TEST_LOGE("display rect adust form %f %f %f %f to %{public}d %{public}d %{public}d %{public}d ",
+                setting.rectRatio.x, setting.rectRatio.y, setting.rectRatio.w,
+                setting.rectRatio.h, setting.displayRect.x, setting.displayRect.y,
+                setting.displayRect.w, setting.displayRect.h);
+        }
+
+        if ((setting.bufferRatio.h > 0.0f) || (setting.bufferRatio.w > 0.0f)) {
+            setting.bufferSize.h = static_cast<uint32_t>(setting.bufferRatio.h * h);
+            setting.bufferSize.w = static_cast<uint32_t>(setting.bufferRatio.w * w);
+            DISPLAY_TEST_LOGE("buffer size adjust for %f %f to %{public}d %{public}d",
+                setting.bufferRatio.w, setting.bufferRatio.h, setting.bufferSize.w, setting.bufferSize.h);
+        }
+
+        if ((setting.bufferSize.w == 0) || (setting.bufferSize.h == 0)) {
+            DISPLAY_TEST_LOGE("buffer size adjust for %{public}d %{public}d to %{public}d %{public}d",
+                setting.bufferSize.w, setting.bufferSize.h, setting.displayRect.w, setting.displayRect.h);
+
+            setting.bufferSize.w = setting.displayRect.w;
+            setting.bufferSize.h = setting.displayRect.h;
+        }
+    }
+}
+
+static std::vector<std::shared_ptr<HdiTestLayer>> CreateLayers(std::vector<LayerSettings> &settings)
+{
+    DISPLAY_TEST_LOGE("settings %{public}zd", settings.size());
+    std::vector<std::shared_ptr<HdiTestLayer>> layers;
+    DisplayModeInfo mode = GetFirstDisplay()->GetCurrentMode();
+    AdjustLayerSettings(settings, mode.width, mode.height);
+    for (uint32_t i = 0; i < settings.size(); i++) {
+        LayerSettings setting = settings[i];
+
+        auto layer = CreateTestLayer(setting, i);
+        layers.push_back(layer);
+    }
+    return layers;
+}
+
+static void DestroyLayer(std::shared_ptr<HdiTestLayer> layer)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
+    auto ret = g_composerDevice->DestroyLayer(g_displayIds[0], layer->GetId());
+    if (ret != DISPLAY_SUCCESS && ret != DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("DestroyLayer fail or not support, ret: %{public}d", ret);
+        return;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
 }
 
 /**
@@ -592,24 +707,52 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayClientCropTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 
 /**
-  * @tc.name: SetHardwareCursorPositionTest
-  * @tc.desc: Benchmarktest for interface SetHardwareCursorPositionTest.
+  * @tc.name: UpdateHardwareCursorTest
+  * @tc.desc: Benchmarktest for interface UpdateHardwareCursorTest.
   */
-BENCHMARK_F(DisplayBenchmarkTest, SetHardwareCursorPositionTest)(benchmark::State &state)
+BENCHMARK_F(DisplayBenchmarkTest, UpdateHardwareCursorTest)(benchmark::State &state)
 {
     int32_t ret = 0;
     int32_t x = 1;
     int32_t y = 1;
+    BufferHandle* buffer = nullptr;
+
+    AllocInfo info;
+    info.width  = 512;
+    info.height = 512;
+    info.usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_HW_COMPOSER;
+    info.format = Composer::V1_0::PIXEL_FMT_RGBA_8888;
+
+    g_gralloc->AllocMem(info, buffer);
+    ASSERT_TRUE(buffer != nullptr);
+
+    std::vector<LayerSettings> settings = {
+        {.rectRatio = { 0, 0, 1.0f, 1.0f }, .color = RED},
+    };
+
+    std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+    ASSERT_TRUE((layers.size() > 0));
+
+    auto layer = layers[0];
+    PrepareAndCommit();
+    sleep(1);
+    HdiTestDevice::GetInstance().Clear();
+    DestroyLayer(layer);
+
     for (auto _ : state) {
-        ret = g_composerDevice->SetHardwareCursorPosition(g_displayIds[0], x, y);
+        ret = g_composerDevice->UpdateHardwareCursor(g_displayIds[0], x, y, buffer);
     }
     if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         ret = DISPLAY_SUCCESS;
     }
+    g_gralloc->FreeMem(*buffer);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
-BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetHardwareCursorPositionTest)->
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, UpdateHardwareCursorTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 
 /**

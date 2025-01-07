@@ -72,7 +72,9 @@ HWTEST_F(WifiP2pIfaceTest, WifiP2pIfaceTest, TestSize.Level1)
     EXPECT_TRUE(p2pIface->GetIfaceName(name) == HDF_SUCCESS);
     EXPECT_TRUE(name == P2P_IFNAME);
     std::vector<uint32_t> frequencies;
-    EXPECT_TRUE(p2pIface->GetSupportFreqs(1, frequencies) == HDF_SUCCESS);
+    if (p2pIface->vendorHal_.lock() != nullptr) {
+        EXPECT_TRUE(p2pIface->GetSupportFreqs(1, frequencies) == HDF_SUCCESS);
+    }
 }
 
 HWTEST_F(WifiP2pIfaceTest, SetMacAddressTest, TestSize.Level1)

@@ -66,7 +66,7 @@ namespace {
         {SENSOR_TYPE_TEMPERATURE, "tenperature", 1, 1, g_temperatureRange}
     };
 
-    constexpr int32_t g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
+    constexpr int32_t LIST_NUM = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
     constexpr float EPSINON = 1e-6;
 
     void SensorDataVerification(const float &data, const struct SensorDevelopmentList &sensorNode)
@@ -109,7 +109,7 @@ int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
     HDF_LOGI("%{public}s: event info: sensorId = %{public}d, option = %{public}d, mode = %{public}d\n\r", __func__,
         event.sensorId, event.option, event.mode);
 
-    for (int32_t i = 0; i < g_listNum; ++i) {
+    for (int32_t i = 0; i < LIST_NUM; ++i) {
         if (event.sensorId == g_sensorList[i].sensorTypeId) {
             float *data = reinterpret_cast<float*>(eventData);
             SensorDataVerification(*data, g_sensorList[i]);
