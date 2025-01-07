@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 UsbdPort &UsbdPort::GetInstance()
 {
     static UsbdPort instance;
@@ -228,7 +228,7 @@ int32_t UsbdPort::UpdatePort(int32_t mode, const sptr<IUsbdSubscriber> &subscrib
     subscriber->PortChangedEvent(currentPortInfo_);
     return HDF_SUCCESS;
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS

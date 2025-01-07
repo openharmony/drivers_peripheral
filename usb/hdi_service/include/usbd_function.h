@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_USB_V1_1_USBD_FUNCTION_H
-#define OHOS_HDI_USB_V1_1_USBD_FUNCTION_H
+#ifndef OHOS_HDI_USB_V1_2_USBD_FUNCTION_H
+#define OHOS_HDI_USB_V1_2_USBD_FUNCTION_H
 
 #include <stdint.h>
 #include <string>
@@ -73,7 +73,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 class UsbdFunction {
 public:
     UsbdFunction() = default;
@@ -110,8 +110,8 @@ private:
 
     static uint32_t currentFuncs_;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_USB_V1_1_USBD_FUNCTION_H
+#endif // OHOS_HDI_USB_V1_2_USBD_FUNCTION_H

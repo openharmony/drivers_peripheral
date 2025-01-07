@@ -40,7 +40,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 constexpr uint8_t LIBUSB_MAX_INTERFACEID = 0x80;
 constexpr int32_t USB_MAX_INTERFACES = 32;
@@ -60,6 +60,7 @@ constexpr int32_t LIBUSB_IO_ERROR = -1;
 constexpr int32_t LIBUSB_IO_ERROR_INVALID = 0;
 constexpr const char* USB_DEV_FS_PATH = "/dev/bus/usb";
 constexpr const char* LIBUSB_DEVICE_MMAP_PATH = "/data/service/el1/public/usb/";
+constexpr uint32_t MIN_NUM_OF_ISO_PACKAGE = 1;
 static libusb_context *g_libusb_context = nullptr;
 static std::shared_ptr<LibusbAdapter> g_LibusbAdapter = std::make_shared<LibusbAdapter>();
 struct CurrentUsbSetting {
@@ -76,6 +77,7 @@ std::shared_mutex g_mapMutexDeviceSettingsMap;
 std::shared_mutex g_mapMutexContext;
 std::shared_mutex g_mapMutexUsbOpenFdMap;
 std::shared_mutex g_mapMutexHandleVector;
+static LibusbAsyncManager g_asyncManager;
 } // namespace
 
 std::shared_ptr<LibusbAdapter> LibusbAdapter::GetInstance()
@@ -128,6 +130,10 @@ void LibusbAdapter::LibUSBExit()
     if (g_libusb_context != nullptr) {
         libusb_exit(g_libusb_context);
         g_libusb_context = nullptr;
+    }
+    isRunning = false;
+    if (eventThread.joinable()) {
+        eventThread.join();
     }
     HDF_LOGI("%{public}s leave", __func__);
 }
@@ -220,6 +226,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s:Opening device failed ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    TransferInit(dev);
     {
         std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleVector);
         g_handleVector.push_back(std::make_pair(dev, devHandle));
@@ -233,6 +240,10 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     {
         std::unique_lock<std::shared_mutex> lock(g_mapMutexDeviceSettingsMap);
         g_deviceSettingsMap[devHandle].configurationIndex = currentConfig;
+    }
+    if (!eventThread.joinable()) {
+        isRunning = true;
+        eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
     }
     HDF_LOGI("%{public}s succeeded", __func__);
     return HDF_SUCCESS;
@@ -260,7 +271,7 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
         g_usbOpenFdMap.erase(it);
     }
     libusb_close(devHandle);
-
+    TransferRelease(dev);
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
@@ -1725,7 +1736,446 @@ int32_t LibusbAdapter::GetCurrentConfiguration(libusb_device_handle *handle, int
     HDF_LOGD("%{public}s: leave ", __func__);
     return HDF_SUCCESS;
 }
-} // namespace V1_1
+
+/* Async Transfer */
+
+int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info,
+    const sptr<V1_2::IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
+{
+    HDF_LOGI("%{public}s: params endpoint: 0x%{public}x, type: %{public}d, length: %{public}d, timeout: %{public}d",
+        __func__, info.endpoint, info.type, info.length, info.timeOut);
+    // 1.get device handle
+    libusb_device_handle *devHandle = nullptr;
+    int32_t ret = FindHandleByDev(dev, &devHandle);
+    if (ret < 0 || devHandle == nullptr) {
+        HDF_LOGE("%{public}s: find libusb device handle failed, ret = %{public}d", __func__, ret);
+        return LIBUSB_ERROR_NO_DEVICE;
+    }
+    // 2.get buffer
+    unsigned char *buffer = AllocAsyncBuffer(info, ashmem);
+    if (buffer == nullptr) {
+        HDF_LOGE("%{public}s: alloc async buffer failed", __func__);
+        return LIBUSB_ERROR_NO_MEM;
+    }
+    // 3.create LibusbAsyncTransfer
+    LibusbAsyncTransfer *asyncTransfer = CreateAsyncTransfer(dev, info, ashmem, cb);
+    if (asyncTransfer == nullptr) {
+        HDF_LOGE("%{public}s: create libusb async transfer failed", __func__);
+        OsalMemFree(buffer);
+        buffer = nullptr;
+        return LIBUSB_ERROR_NO_MEM;
+    }
+    // 4.fill and submit libusb transfer
+    ret = FillAndSubmitTransfer(asyncTransfer, devHandle, buffer, info);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: libusb submit transfer failed, ret: %{public}d", __func__, ret);
+        OsalMemFree(buffer);
+        buffer = nullptr;
+        delete asyncTransfer;
+        asyncTransfer = nullptr;
+        return ret;
+    }
+    // 5.save transfer
+    AddTransferToList(asyncTransfer);
+    HDF_LOGI("%{public}s: handle async transfer success", __func__);
+    return LIBUSB_SUCCESS;
+}
+
+int32_t LibusbAdapter::AsyncCancelTransfer(const UsbDev &dev, const int32_t endpoint)
+{
+    HDF_LOGI("%{public}s: cancel transfer start", __func__);
+    int ret = HDF_FAILURE;
+    auto asyncWrapper = GetAsyncWrapper(dev);
+    if (!asyncWrapper) {
+        HDF_LOGE("%{public}s: get async wrapper failed", __func__);
+        return LIBUSB_ERROR_NO_DEVICE;
+    }
+    std::lock_guard guard(asyncWrapper->transferLock);
+    if (asyncWrapper->transferList.empty()) {
+        HDF_LOGE("%{public}s: transfer list is empty", __func__);
+        return LIBUSB_ERROR_NOT_FOUND;
+    }
+    for (auto it = asyncWrapper->transferList.begin(); it != asyncWrapper->transferList.end();) {
+        auto asyncTransfer = *it;
+        HDF_LOGI("%{public}s endpoint: %{public}d", __func__, asyncTransfer->transferRef->endpoint);
+        if (asyncTransfer->transferRef == nullptr || asyncTransfer->transferRef->endpoint != endpoint) {
+            ++it;
+            continue;
+        }
+        ret = libusb_cancel_transfer(asyncTransfer->transferRef);
+        if (ret == LIBUSB_ERROR_NOT_FOUND) {
+            HDF_LOGE("%{public}s: the transfer is already complete, or already cancelled", __func__);
+            return ret;
+        }
+        if (ret != LIBUSB_SUCCESS) {
+            HDF_LOGE("%{public}s: libusb cancel transfer failed, error: %{public}d", __func__, ret);
+            return ret;
+        }
+        it = asyncWrapper->transferList.erase(it);
+        delete asyncTransfer;
+        asyncTransfer = nullptr;
+        break;
+    }
+    HDF_LOGI("%{public}s: cancel transfer end", __func__);
+    return ret;
+}
+
+void LibusbAdapter::LibusbEventHandling()
+{
+    HDF_LOGI("%{public}s: libusb event handling thread started.", __func__);
+    while (isRunning) {
+        int rc = libusb_handle_events_completed(g_libusb_context, nullptr);
+        if (rc != LIBUSB_SUCCESS) {
+            HDF_LOGE("%{public}s: libusb handle events failed: %{public}d", __func__, rc);
+        }
+    }
+    HDF_LOGI("%{public}s:libusb event handling thread ended.", __func__);
+}
+
+int32_t LibusbAdapter::FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer, libusb_device_handle *devHandle,
+    unsigned char *buffer, const V1_2::USBTransferInfo &info)
+{
+    HDF_LOGI("%{public}s: endpoint: 0x%{public}x, timeout: %{public}d, numIsoPackets: %{public}d",
+        __func__, info.endpoint, info.timeOut, info.numIsoPackets);
+    if (info.type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
+        libusb_fill_iso_transfer(asyncTransfer->transferRef, devHandle, info.endpoint, buffer, info.length,
+            info.numIsoPackets, HandleAsyncResult, asyncTransfer, info.timeOut);
+        if (info.numIsoPackets > 0) {
+            uint32_t packetLength = info.length / info.numIsoPackets;
+            uint32_t maxIsoPacketLength = libusb_get_max_iso_packet_size(libusb_get_device(devHandle), info.endpoint);
+            packetLength = packetLength >= maxIsoPacketLength ? maxIsoPacketLength : packetLength;
+            HDF_LOGI("%{public}s: iso pkg len: %{public}d, max iso pkg len: %{public}d",
+                __func__, packetLength, maxIsoPacketLength);
+            libusb_set_iso_packet_lengths(asyncTransfer->transferRef, packetLength);
+        }
+    } else {
+        libusb_fill_bulk_transfer(asyncTransfer->transferRef, devHandle, info.endpoint, buffer, info.length,
+            HandleAsyncResult, asyncTransfer, info.timeOut);
+        asyncTransfer->transferRef->type = info.type;
+    }
+    HDF_LOGI("%{public}s: libusb submit transfer", __func__);
+    int ret = libusb_submit_transfer(asyncTransfer->transferRef);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: libusb submit transfer failed, ret: %{public}d", __func__, ret);
+        return ret;
+    }
+    return LIBUSB_SUCCESS;
+}
+
+void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transfer)
+{
+    HDF_LOGI("%{public}s: start handle async transfer result", __func__);
+    if (transfer == nullptr || transfer->user_data == nullptr) {
+        HDF_LOGE("%{public}s: async transfer or user_data is null", __func__);
+        return;
+    }
+    HDF_LOGI("%{public}s: transfer status: %{public}d, actual length: %{public}d", __func__,
+        transfer->status, transfer->actual_length);
+    LibusbAsyncTransfer *asyncTransfer = reinterpret_cast<LibusbAsyncTransfer *>(transfer->user_data);
+    // handle failed transfer
+    if (transfer->status == LIBUSB_TRANSFER_CANCELLED) {
+        HDF_LOGE("%{public}s: async transfer has been canceled", __func__);
+        return;
+    }
+    if (transfer->status != LIBUSB_TRANSFER_COMPLETED && transfer->actual_length <= 0) {
+        HDF_LOGE("%{public}s: libusb async transfer failed", __func__);
+        FeedbackToBase(transfer);
+        HandleAsyncFailure(transfer);
+        return;
+    }
+    // write data to ashmem when direction is in
+    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN) {
+        HDF_LOGI("%{public}s: write data to ashmem", __func__);
+        int32_t ret = WriteAshmem(asyncTransfer->ashmemRef, transfer->actual_length, transfer->buffer);
+        if (ret != HDF_SUCCESS) {
+            HandleAsyncFailure(transfer);
+            return;
+        }
+    }
+    // call V1_2::IUsbdTransferCallback
+    FeedbackToBase(transfer);
+    // close resource
+    if (transfer->buffer != nullptr) {
+        OsalMemFree(transfer->buffer);
+        transfer->buffer = nullptr;
+    }
+    DeleteTransferFromList(asyncTransfer);
+    HDF_LOGI("%{public}s: handle async transfer result success", __func__);
+}
+
+void LibusbAdapter::FeedbackToBase(struct libusb_transfer *transfer)
+{
+    HDF_LOGI("%{public}s: call feedback callback, actual length: %{public}d", __func__, transfer->actual_length);
+    LibusbAsyncTransfer *asyncTransfer = reinterpret_cast<LibusbAsyncTransfer *>(transfer->user_data);
+    sptr<V1_2::IUsbdTransferCallback> callback = asyncTransfer->cbRef;
+    std::vector<V1_2::UsbIsoPacketDescriptor> isoPkgDescVec;
+
+    if (transfer->type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
+        ParseIsoPacketDesc(transfer, isoPkgDescVec);
+    }
+
+    int32_t ret = 0;
+    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN) {
+        ret = callback->OnTransferReadCallback(transfer->status, transfer->actual_length, isoPkgDescVec,
+            asyncTransfer->userData);
+    } else {
+        ret = callback->OnTransferWriteCallback(transfer->status, transfer->actual_length, isoPkgDescVec,
+            asyncTransfer->userData);
+    }
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: feedback callback failed", __func__);
+        return;
+    }
+    HDF_LOGI("%{public}s: call feedback callback success", __func__);
+}
+
+void LibusbAdapter::ParseIsoPacketDesc(libusb_transfer *transfer,
+    std::vector<V1_2::UsbIsoPacketDescriptor> &isoPkgDescs)
+{
+    HDF_LOGI("%{public}s: start parse iso package desc", __func__);
+    for (int i = 0; i < transfer->num_iso_packets; ++i) {
+        struct libusb_iso_packet_descriptor *pack = &transfer->iso_packet_desc[i];
+        HDF_LOGI("%{public}s: iso pack %{public}d, status: %{public}d, length:%{public}u, actual length:%{public}u",
+            __func__, i, pack->status, pack->length, pack->actual_length);
+        
+        V1_2::UsbIsoPacketDescriptor desc;
+        desc.isoLength = pack->length;
+        desc.isoActualLength = pack->actual_length;
+        desc.isoStatus = pack->status;
+        isoPkgDescs.push_back(desc);
+    }
+}
+
+LibusbAsyncTransfer *LibusbAdapter::CreateAsyncTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info,
+    const sptr<Ashmem> &ashmem, const sptr<V1_2::IUsbdTransferCallback> &cb)
+{
+    uint32_t pkgNum = 0;
+    if (info.type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
+        pkgNum = info.numIsoPackets > 0 ? info.numIsoPackets : MIN_NUM_OF_ISO_PACKAGE;
+    }
+    LibusbAsyncTransfer *asyncTransfer = new(std::nothrow) LibusbAsyncTransfer(pkgNum);
+    if (asyncTransfer == nullptr) {
+        return nullptr;
+    }
+    asyncTransfer->ashmemRef = ashmem;
+    asyncTransfer->cbRef = cb;
+    asyncTransfer->busNum = dev.busNum;
+    asyncTransfer->devAddr = dev.devAddr;
+    asyncTransfer->userData = info.userData;
+    return asyncTransfer;
+}
+
+void LibusbAdapter::HandleAsyncFailure(struct libusb_transfer *transfer)
+{
+    if (transfer == nullptr) {
+        return;
+    }
+    if (transfer->buffer != nullptr) {
+        OsalMemFree(transfer->buffer);
+        transfer->buffer = nullptr;
+    }
+    libusb_cancel_transfer(transfer);
+    if (transfer->user_data != nullptr) {
+        LibusbAsyncTransfer *asyncTransfer = reinterpret_cast<LibusbAsyncTransfer *>(transfer->user_data);
+        DeleteTransferFromList(asyncTransfer);
+    }
+}
+
+void LibusbAdapter::DeleteTransferFromList(LibusbAsyncTransfer *asyncTransfer)
+{
+    if (asyncTransfer == nullptr) {
+        return;
+    }
+    HDF_LOGI("%{public}s: enter delete transfer from list, bus num: %{public}d, dev addr: %{public}d",
+        __func__, asyncTransfer->busNum, asyncTransfer->devAddr);
+
+    LibusbAsyncWrapper *asyncWrapper = GetAsyncWrapper({asyncTransfer->busNum, asyncTransfer->devAddr});
+    if (asyncWrapper == nullptr) {
+        HDF_LOGE("%{public}s: get async wrapper failed", __func__);
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(asyncWrapper->transferLock);
+    if (asyncWrapper->transferList.size() <= 0) {
+        HDF_LOGI("%{public}s: transfer list is empty", __func__);
+        return;
+    }
+    if (asyncTransfer != nullptr) {
+        asyncWrapper->transferList.remove(asyncTransfer);
+        delete asyncTransfer;
+        asyncTransfer = nullptr;
+    }
+    HDF_LOGI("%{public}s: delete transfer from list end", __func__);
+}
+
+LibusbAsyncWrapper *LibusbAdapter::GetAsyncWrapper(const UsbDev &dev)
+{
+    std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
+    LibusbAsyncWrapper *asyncWrapper = nullptr;
+
+    for (size_t i = 0; i < g_asyncManager.transferVec.size(); ++i) {
+        if (g_asyncManager.transferVec[i].first.busNum == dev.busNum
+                && g_asyncManager.transferVec[i].first.devAddr == dev.devAddr) {
+            asyncWrapper = g_asyncManager.transferVec[i].second;
+        }
+    }
+
+    return asyncWrapper;
+}
+
+uint8_t *LibusbAdapter::AllocAsyncBuffer(const V1_2::USBTransferInfo &info, const sptr<Ashmem> &ashmem)
+{
+    if (info.length <= 0) {
+        HDF_LOGE("%{public}s: invalid buffer length", __func__);
+        return nullptr;
+    }
+    HDF_LOGI("%{public}s: malloc buffer", __func__);
+    uint8_t *buffer = static_cast<uint8_t *>(OsalMemCalloc(info.length));
+    if (buffer == nullptr) {
+        HDF_LOGE("%{public}s: malloc buffer failed", __func__);
+        return nullptr;
+    }
+    if ((info.endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_OUT) {
+        HDF_LOGI("%{public}s: read from ashmem", __func__);
+        int32_t ret = ReadAshmem(ashmem, info.length, buffer);
+        if (ret != HDF_SUCCESS) {
+            OsalMemFree(buffer);
+            return nullptr;
+        }
+    }
+    return buffer;
+}
+
+void LibusbAdapter::AddTransferToList(LibusbAsyncTransfer *asyncTransfer)
+{
+    HDF_LOGI("%{public}s: start add transfer to list", __func__);
+    if (asyncTransfer == nullptr || asyncTransfer->transferRef == nullptr) {
+        HDF_LOGW("%{public}s: async transfer or libusb transfer is nullptr", __func__);
+        return;
+    }
+
+    LibusbAsyncWrapper *asyncWrapper = GetAsyncWrapper({asyncTransfer->busNum, asyncTransfer->devAddr});
+    if (asyncWrapper == nullptr) {
+        HDF_LOGE("%{public}s: get async wrapper failed", __func__);
+        return;
+    }
+
+    HDF_LOGI("%{public}s: push async transfer", __func__);
+    std::lock_guard<std::mutex> lock(asyncWrapper->transferLock);
+    asyncWrapper->transferList.push_back(asyncTransfer);
+}
+
+void LibusbAdapter::TransferInit(const UsbDev &dev)
+{
+    LibusbAsyncWrapper *wrapper = GetAsyncWrapper(dev);
+    if (wrapper != nullptr) {
+        return;
+    }
+    // init LibusbAsyncManager
+    HDF_LOGI("%{public}s: start init libusb async manager", __func__);
+    LibusbAsyncWrapper *asyncWrapper = new(std::nothrow) LibusbAsyncWrapper();
+    if (asyncWrapper == nullptr) {
+        HDF_LOGE("%{public}s:create libusb async manager failed", __func__);
+        return;
+    }
+    std::pair<UsbDev, LibusbAsyncWrapper*> asyncWrapperPair = std::make_pair(dev, asyncWrapper);
+    std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
+    g_asyncManager.transferVec.push_back(asyncWrapperPair);
+}
+
+void LibusbAdapter::TransferRelease(const UsbDev &dev)
+{
+    // release LibusbAsyncManager
+    std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
+    DeleteAsyncDevRequest(dev);
+}
+
+void LibusbAdapter::DeleteAsyncDevRequest(const UsbDev &dev)
+{
+    size_t deleteId = -1;
+    for (size_t i = 0; i < g_asyncManager.transferVec.size(); ++i) {
+        HDF_LOGI("%{public}s: delete async dev request bus num: %{public}d, dev addr: %{public}d", __func__,
+            g_asyncManager.transferVec[i].first.busNum, g_asyncManager.transferVec[i].first.devAddr);
+        if (g_asyncManager.transferVec[i].first.busNum == dev.busNum
+                && g_asyncManager.transferVec[i].first.devAddr == dev.devAddr) {
+            HDF_LOGI("%{public}s: delete async dev request device found", __func__);
+            if (g_asyncManager.transferVec[i].second != nullptr) {
+                ClearAsyncTranfer(g_asyncManager.transferVec[i].second);
+            }
+            deleteId = i;
+            break;
+        }
+    }
+    if (deleteId >= 0) {
+        g_asyncManager.transferVec.erase(g_asyncManager.transferVec.begin() + deleteId);
+    }
+}
+
+void LibusbAdapter::ClearAsyncTranfer(LibusbAsyncWrapper *asyncWrapper)
+{
+    HDF_LOGI("%{public}s: clear async tranfer enter", __func__);
+    if (asyncWrapper == nullptr) {
+        return;
+    }
+    if (asyncWrapper->transferList.size() <= 0) {
+        HDF_LOGI("%{public}s: clear async tranfer transfer list is empty", __func__);
+        return;
+    }
+
+    for (auto &asyncTransfer : asyncWrapper->transferList) {
+        if (asyncTransfer == nullptr) {
+            continue;
+        }
+        if (asyncTransfer->transferRef != nullptr) {
+            HDF_LOGI("%{public}s: clear async tranfer libusb free transfer", __func__);
+            libusb_free_transfer(asyncTransfer->transferRef);
+            asyncTransfer->transferRef = nullptr;
+        }
+        delete asyncTransfer;
+        asyncTransfer = nullptr;
+    }
+    delete asyncWrapper;
+    asyncWrapper = nullptr;
+}
+
+int32_t LibusbAdapter::ReadAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer)
+{
+    if (!ashmem->MapReadAndWriteAshmem()) {
+        HDF_LOGE("%{public}s: map read and write ashmem failed", __func__);
+        return HDF_FAILURE;
+    }
+    const void *content = ashmem->ReadFromAshmem(length, 0);
+    if (content == nullptr) {
+        HDF_LOGE("%{public}s: read from ashmem failed", __func__);
+        ashmem->UnmapAshmem();
+        return HDF_FAILURE;
+    }
+    if (memcpy_s(buffer, length, content, length) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+        ashmem->UnmapAshmem();
+        return HDF_FAILURE;
+    }
+    ashmem->UnmapAshmem();
+    return HDF_SUCCESS;
+}
+
+int32_t LibusbAdapter::WriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer)
+{
+    if (!ashmem->MapReadAndWriteAshmem()) {
+        HDF_LOGE("%{public}s: map read and write ashmem failed", __func__);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("%{public}s: libusb async read actual_length: %{public}d", __func__, length);
+    bool ret = ashmem->WriteToAshmem(buffer, length, 0);
+    if (!ret) {
+        HDF_LOGE("%{public}s: write to ashmem failed", __func__);
+        ashmem->UnmapAshmem();
+        return HDF_FAILURE;
+    }
+    ashmem->UnmapAshmem();
+    return HDF_SUCCESS;
+}
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS

@@ -39,7 +39,7 @@ ohos_unittest("transfer_auto_test") {
 
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
-    "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
   ]
 
   external_deps = [
@@ -73,7 +73,7 @@ ohos_unittest("device_auto_test") {
 
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
-    "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
   ]
 
   external_deps = [
@@ -101,7 +101,7 @@ ohos_unittest("request_auto_test") {
 
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
-    "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
   ]
 
   external_deps = [
@@ -126,7 +126,7 @@ ohos_unittest("function_auto_test") {
 
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
-    "${usb_driver_path}/hdi_service:libusb_interface_service_1.1",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
   ]
 
   external_deps = [

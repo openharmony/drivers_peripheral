@@ -23,23 +23,23 @@
 
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
-#include "v1_1/iusb_interface.h"
-#include "v1_1/usb_types.h"
+#include "v1_2/iusb_interface.h"
+#include "v1_2/usb_types.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
-using namespace OHOS::HDI::Usb::V1_1;
+using namespace OHOS::HDI::Usb::V1_2;
 
 sptr<UsbSubscriberTest> UsbdAccessoryTest::subscriber_ = nullptr;
 
-sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> g_usbInterface = nullptr;
+sptr<OHOS::HDI::Usb::V1_2::IUsbInterface> g_usbInterface = nullptr;
 
 void UsbdAccessoryTest::SetUpTestCase(void)
 {
-    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_2::IUsbInterface::Get();
     if (g_usbInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
         exit(0);

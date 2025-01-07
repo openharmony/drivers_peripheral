@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_USB_V1_1_USBD_DISPATCHER_H
-#define OHOS_HDI_USB_V1_1_USBD_DISPATCHER_H
+#ifndef OHOS_HDI_USB_V1_2_USBD_DISPATCHER_H
+#define OHOS_HDI_USB_V1_2_USBD_DISPATCHER_H
 
 #include "usbd.h"
 
@@ -62,7 +62,7 @@ enum UsbdReqNodeStatus {
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 class UsbImpl;
 class UsbdDispatcher {
 public:
@@ -136,8 +136,8 @@ public:
     static int32_t UsbdBulkASyncReqWriteSubmit(UsbdBulkASyncReqNode *req);
     static int32_t UsbdBulkASyncReqReadSubmit(UsbdBulkASyncReqNode *db);
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_USB_V1_1_USBD_DISPATCHER_H
+#endif // OHOS_HDI_USB_V1_2_USBD_DISPATCHER_H

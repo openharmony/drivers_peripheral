@@ -26,7 +26,7 @@
 #include "usb_ddk_interface.h"
 #include "usb_session.h"
 #include "usbd_type.h"
-#include "v1_1/iusb_interface.h"
+#include "v1_2/iusb_interface.h"
 #include "v1_0/iusbd_bulk_callback.h"
 
 #define USB_MAX_INTERFACES 32
@@ -40,7 +40,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 struct UsbdBulkASyncReqList;
 struct UsbdBulkASyncList;
 class UsbImpl;
@@ -75,7 +75,7 @@ struct UsbdBulkASyncList {
     struct HostDevice *instance;
     struct UsbdBulkASyncList *next;
     UsbInterfaceHandle *ifHandle;
-    sptr<HDI::Usb::V1_1::IUsbdBulkCallback> cb;
+    sptr<HDI::Usb::V1_2::IUsbdBulkCallback> cb;
     struct UsbdBulkASyncReqList rList;
     struct UsbPipeInfo pipe;
     struct UsbRequestParams params;
@@ -177,7 +177,7 @@ struct UsbdSubscriber {
     sptr<IRemoteObject> remote;
     void *deathRecipient;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS

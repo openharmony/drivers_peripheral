@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 
 const char *ACCESSORY_DRIVER_NAME = "/dev/usb_accessory";
 constexpr int BUFFER_SIZE = 256;
@@ -215,7 +215,7 @@ void UsbdAccessory::HandleEvent(int32_t state)
         accFd = 0;
     }
 }
-}  // namespace V1_1
+}  // namespace V1_2
 }  // namespace Usb
 }  // namespace HDI
 }  // namespace OHOS
