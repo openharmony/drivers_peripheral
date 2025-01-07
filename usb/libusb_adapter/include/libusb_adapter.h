@@ -117,7 +117,6 @@ public:
         uint32_t &transferedLength, unsigned int timeout);
     int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
     int32_t GetCurrentInterfaceSetting(const UsbDev &dev, uint8_t &settingIndex);
-    int32_t GetInterfaceIdByUsbDev(const UsbDev &dev, uint8_t &interfaceId);
     int32_t GetDeviceMemMapFd(const UsbDev &dev, int &fd);
 	
     /* Async Transfer */
@@ -156,6 +155,8 @@ private:
     int32_t CloseMmapBuffer(void *mmapBuf, size_t length);
     bool CheckDeviceAndConfiguration(libusb_device_handle *handle);
     int32_t GetCurrentConfiguration(libusb_device_handle *handle, int32_t &currentConfig);
+    int32_t RemoveInterfaceFromMap(const UsbDev &dev, libusb_device_handle *devHandle, uint8_t interfaceId);
+    bool IsInterfaceIdByUsbDev(const UsbDev &dev, const uint8_t intfId);
 
     /* Async Transfer */
     void TransferInit(const UsbDev &dev);
