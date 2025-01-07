@@ -68,7 +68,7 @@ struct CurrentUsbSetting {
     int32_t alternateSetting = -1;
 };
 std::vector<std::pair<UsbDev, libusb_device_handle*>> g_handleVector;
-std::map<uint32_t, uint8_t> g_InterfaceIdMap;
+std::map<uint32_t, std::map<int32_t, std::vector<uint8_t>>> g_InterfaceIdMap;
 std::map<libusb_device_handle*, CurrentUsbSetting> g_deviceSettingsMap;
 std::map<uint32_t, int32_t> g_usbOpenFdMap;
 std::shared_mutex g_mapMutexInterfaceIdMap;
@@ -196,6 +196,25 @@ int32_t LibusbAdapter::DeleteHandleVectorAndSettingsMap(const UsbDev &dev, libus
             }
         }
     }
+    bool isExist = false;
+    {
+        std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleVector);
+        for (auto it = g_handleVector.begin(); it != g_handleVector.end(); ++it) {
+            if (it->first.busNum == dev.busNum && it->first.devAddr == dev.devAddr) {
+                isExist = true;
+                break;
+            }
+        }
+    }
+    if (!isExist) {
+        std::shared_lock<std::shared_mutex> lock(g_mapMutexInterfaceIdMap);
+        uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
+            static_cast<uint32_t>(dev.devAddr);
+        auto info = g_InterfaceIdMap.find(result);
+        if (info != g_InterfaceIdMap.end()) {
+            g_InterfaceIdMap.erase(result);
+        }
+    }
     HDF_LOGD("%{public}s leave", __func__);
     return ret;
 }
@@ -214,6 +233,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s:GetUsbDevice is failed ret=%{public}d", __func__, ret);
         return HDF_DEV_ERR_NO_DEVICE;
     }
+
     libusb_device_handle* devHandle = nullptr;
     ret = libusb_open(device, &devHandle);
     if (devHandle == nullptr || ret != HDF_SUCCESS) {
@@ -498,6 +518,11 @@ int32_t LibusbAdapter::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         g_deviceSettingsMap[devHandle].interfaceNumber = -1;
         g_deviceSettingsMap[devHandle].alternateSetting = -1;
     }
+    ret = RemoveInterfaceFromMap(dev, devHandle, interfaceId);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: RemoveInterfaceFromMap failed", __func__);
+        return HDF_FAILURE;
+    }
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
@@ -553,10 +578,8 @@ int32_t LibusbAdapter::BulkTransferReadwithLength(const UsbDev &dev,
         HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
         return ret;
     }
-    uint8_t interfaceId = 0;
-    ret = GetInterfaceIdByUsbDev(dev, interfaceId);
-    if (ret != HDF_SUCCESS || interfaceId != pipe.intfId) {
-        HDF_LOGE("%{public}s get interfaceId failed", __func__);
+    if (!IsInterfaceIdByUsbDev(dev, pipe.intfId)) {
+        HDF_LOGE("%{public}s: IsInterfaceIdByUsbDev failed", __func__);
         return HDF_FAILURE;
     }
     std::vector<uint8_t> buffer(length);
@@ -564,8 +587,8 @@ int32_t LibusbAdapter::BulkTransferReadwithLength(const UsbDev &dev,
     ret = libusb_bulk_transfer(devHandle, (pipe.endpointId | LIBUSB_ENDPOINT_IN), (unsigned char *)buffer.data(),
         length, &transferred, timeout);
     if (ret < 0) {
-        if (ret == LIBUSB_IO_ERROR && interfaceId == pipe.intfId) {
-            HDF_LOGD("%{public}s: interfaceId=%{public}d, pipe.intfId=%{public}d", __func__, interfaceId, pipe.intfId);
+        if (ret == LIBUSB_IO_ERROR) {
+            HDF_LOGD("%{public}s: pipe.intfId=%{public}d", __func__, pipe.intfId);
             return LIBUSB_IO_ERROR_INVALID;
         }
         HDF_LOGE("%{public}s: libusb_bulk_transfer failed, ret: %{public}d",
@@ -596,17 +619,15 @@ int32_t LibusbAdapter::BulkTransferWrite(
         HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
         return ret;
     }
-    uint8_t interfaceId = 0;
-    ret = GetInterfaceIdByUsbDev(dev, interfaceId);
-    if (ret != HDF_SUCCESS || interfaceId != pipe.intfId) {
-        HDF_LOGE("%{public}s get interfaceId failed", __func__);
+    if (!IsInterfaceIdByUsbDev(dev, pipe.intfId)) {
+        HDF_LOGE("%{public}s: IsInterfaceIdByUsbDev failed", __func__);
         return HDF_FAILURE;
     }
     ret = libusb_bulk_transfer(devHandle, pipe.endpointId, (unsigned char *)data.data(), data.size(),
         &actlength, timeout);
     if (ret < 0) {
-        if (ret == LIBUSB_IO_ERROR && interfaceId == pipe.intfId) {
-            HDF_LOGE("%{public}s: interfaceId=%{public}d, pipe.intfId=%{public}d", __func__, interfaceId, pipe.intfId);
+        if (ret == LIBUSB_IO_ERROR) {
+            HDF_LOGE("%{public}s: pipe.intfId=%{public}d", __func__, pipe.intfId);
             return LIBUSB_IO_ERROR_INVALID;
         }
         HDF_LOGE("%{public}s: libusb_bulk_transfer is error ret=%{public}d", __func__, ret);
@@ -903,7 +924,13 @@ int32_t LibusbAdapter::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, ui
         std::unique_lock<std::shared_mutex> lock(g_mapMutexInterfaceIdMap);
         uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
             static_cast<uint32_t>(dev.devAddr);
-        g_InterfaceIdMap[result] = interfaceId;
+        int32_t currentConfig = -1;
+        ret = GetCurrentConfiguration(devHandle, currentConfig);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: GetCurrentConfiguration failed", __func__);
+            return HDF_FAILURE;
+        }
+        g_InterfaceIdMap[result][currentConfig].push_back(interfaceId);
     }
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
@@ -1131,19 +1158,42 @@ int32_t LibusbAdapter::GetCurrentInterfaceSetting(const UsbDev &dev, uint8_t &se
     return HDF_SUCCESS;
 }
 
-int32_t LibusbAdapter::GetInterfaceIdByUsbDev(const UsbDev &dev, uint8_t &interfaceId)
+bool LibusbAdapter::IsInterfaceIdByUsbDev(const UsbDev &dev, const uint8_t intfId)
 {
     HDF_LOGD("%{public}s enter", __func__);
-    std::shared_lock<std::shared_mutex> lock(g_mapMutexInterfaceIdMap);
-    uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) | static_cast<uint32_t>(dev.devAddr);
-    auto info = g_InterfaceIdMap.find(result);
-    if (info == g_InterfaceIdMap.end()) {
-        HDF_LOGE("%{public}s not found", __func__);
-        return HDF_FAILURE;
+    libusb_device_handle *devHandle = nullptr;
+    int32_t ret = FindHandleByDev(dev, &devHandle);
+    if (devHandle == nullptr || ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: FindHandleByDev failed, ret=%{public}d", __func__, ret);
+        return false;
     }
-    interfaceId = g_InterfaceIdMap[result];
+    std::shared_lock<std::shared_mutex> lock(g_mapMutexInterfaceIdMap);
+    uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
+        static_cast<uint32_t>(dev.devAddr);
+    auto deviceIt = g_InterfaceIdMap.find(result);
+    if (deviceIt == g_InterfaceIdMap.end()) {
+        HDF_LOGE("%{public}s device not found", __func__);
+        return false;
+    }
+    int32_t currentConfig = -1;
+    ret = GetCurrentConfiguration(devHandle, currentConfig);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: GetCurrentConfiguration failed", __func__);
+        return false;
+    }
+    auto configIt = deviceIt->second.find(currentConfig);
+    if (configIt == deviceIt->second.end()) {
+        HDF_LOGE("%{public}s config not found", __func__);
+        return false;
+    }
+    std::vector<uint8_t> interfaceIds = configIt->second;
+    if (std::find(interfaceIds.begin(), interfaceIds.end(), intfId) == interfaceIds.end()) {
+        HDF_LOGE("%{public}s: Interface %{public}u is not claimed", __func__, intfId);
+        return false;
+    }
+
     HDF_LOGD("%{public}s leave", __func__);
-    return HDF_SUCCESS;
+    return true;
 }
 
 unsigned char *LibusbAdapter::GetMmapBufferByFd(int32_t fd, size_t len)
@@ -1723,6 +1773,39 @@ int32_t LibusbAdapter::GetCurrentConfiguration(libusb_device_handle *handle, int
         return HDF_FAILURE;
     }
     HDF_LOGD("%{public}s: leave ", __func__);
+    return HDF_SUCCESS;
+}
+
+int32_t LibusbAdapter::RemoveInterfaceFromMap(const UsbDev &dev, libusb_device_handle *devHandle, uint8_t interfaceId)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    std::shared_lock<std::shared_mutex> lock(g_mapMutexInterfaceIdMap);
+    uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
+        static_cast<uint32_t>(dev.devAddr);
+    auto deviceIt = g_InterfaceIdMap.find(result);
+    if (deviceIt != g_InterfaceIdMap.end()) {
+        int32_t currentConfig = -1;
+        int32_t ret = GetCurrentConfiguration(devHandle, currentConfig);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: GetCurrentConfiguration failed", __func__);
+            return HDF_FAILURE;
+        }
+        auto configIt = deviceIt->second.find(currentConfig);
+        if (configIt != deviceIt->second.end()) {
+            auto& interfaceIds = configIt->second;
+            interfaceIds.erase(std::remove(interfaceIds.begin(), interfaceIds.end(),
+                interfaceId), interfaceIds.end());
+            HDF_LOGD("%{public}s erase interfaceId=%{public}u from, configIndex=%{public}u", __func__,
+                interfaceId, currentConfig);
+            if (interfaceIds.empty()) {
+                deviceIt->second.erase(configIt);
+            }
+            if (deviceIt->second.empty()) {
+                g_InterfaceIdMap.erase(deviceIt);
+            }
+        }
+    }
+    HDF_LOGD("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
 } // namespace V1_1
