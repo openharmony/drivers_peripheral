@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "usb_ddk_permission.h"
-
+#include <hdf_base.h>
 #include <hdf_log.h>
 #include <dlfcn.h>
 #include <mutex>
@@ -26,17 +26,17 @@ namespace Usb {
 namespace Ddk {
 namespace V1_0 {
 using VerifyAccessTokenFunc = int(*)(uint32_t callerToken, const std::string &permissionName);
-
+using GetApiVersion = int(*)(uint32_t callerToken, int32_t &apiVersion);
 static constexpr int PERMISSION_GRANTED = 0;
 
 static void *g_libHandle = nullptr;
 static VerifyAccessTokenFunc g_verifyAccessToken = nullptr;
-
+static GetApiVersion g_getApiVersion = nullptr;
 static std::mutex g_mutex;
 
 static void InitVerifyAccessToken()
 {
-    if (g_verifyAccessToken != nullptr) {
+    if (g_verifyAccessToken != nullptr && g_verifyAccessToken != nullptr) {
         return;
     }
 
@@ -55,6 +55,15 @@ static void InitVerifyAccessToken()
     }
 
     g_verifyAccessToken = reinterpret_cast<VerifyAccessTokenFunc>(funcPtr);
+
+    void *getApiVersionPtr = dlsym(g_libHandle, "GetApiVersion");
+    if (getApiVersionPtr == nullptr) {
+        HDF_LOGE("%{public}s dlsym getApiVersionPtr failed: %{public}s", __func__, dlerror());
+        dlclose(g_libHandle);
+        g_libHandle = nullptr;
+        return;
+    }
+    g_getApiVersion = reinterpret_cast<GetApiVersion>(getApiVersionPtr);
 }
 
 void DdkPermissionManager::Reset()
@@ -79,6 +88,18 @@ bool DdkPermissionManager::VerifyPermission(const std::string &permissionName)
     int result = g_verifyAccessToken(callerToken, permissionName);
     HDF_LOGI("%{public}s VerifyAccessToken: %{public}d", __func__, result);
     return result == PERMISSION_GRANTED;
+}
+
+int32_t DdkPermissionManager::GetHapApiVersion(int32_t &apiVersion)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    InitVerifyAccessToken();
+    if (g_getApiVersion == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
+    return g_getApiVersion(callerToken, apiVersion);
 }
 } // namespace V1_0
 } // namespace Ddk

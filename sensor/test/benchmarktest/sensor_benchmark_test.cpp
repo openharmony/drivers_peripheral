@@ -29,13 +29,14 @@
 #include "v2_0/isensor_interface.h"
 
 using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor;
 using namespace testing::ext;
 using namespace std;
 
 namespace {
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
-    sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
-    sptr<ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
+    sptr<V2_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
+    sptr<V2_0::ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
 
     constexpr int32_t ITERATION_FREQUENCY = 100;

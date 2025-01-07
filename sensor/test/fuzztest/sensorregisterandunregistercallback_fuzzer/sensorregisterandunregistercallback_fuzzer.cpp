@@ -17,6 +17,7 @@
 #include "hdf_base.h"
 #include "v2_0/isensor_interface.h"
 
+using namespace OHOS::HDI::Sensor;
 using namespace OHOS::HDI::Sensor::V2_0;
 
 namespace OHOS {
@@ -39,7 +40,7 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         sptr<ISensorInterface> sensorInterface = ISensorInterface::Get();
-        sptr<ISensorCallback> registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
+        sptr<V2_0::ISensorCallback> registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
         if (registerCallback == nullptr) {
             return false;
         }

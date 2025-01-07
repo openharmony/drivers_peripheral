@@ -140,6 +140,10 @@ int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *fr
 {
     int32_t ret;
     struct FreqInfoResult result;
+    if (size > MAX_OSALMEMCALLOC_NUM) {
+        HDF_LOGE("%s: OsalMemCalloc failed", __FUNCTION__);
+        return HDF_FAILURE;
+    }
 
     result.freqs = OsalMemCalloc(size * sizeof(uint32_t));
     if (result.freqs == NULL) {

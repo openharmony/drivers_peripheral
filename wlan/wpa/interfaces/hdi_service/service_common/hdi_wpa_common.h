@@ -23,6 +23,9 @@
 extern "C" {
 #endif
 
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD001566
+
 #define WPA_MESSAGE_KEY_LENGTH 64
 #define WPA_MESSAGE_VALUE_LENGTH 256
 #define IFNAME_LEN_MIN 3

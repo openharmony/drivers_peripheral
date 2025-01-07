@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 enum {
     MEM_X = 1,
     MEM_XY = 3,
@@ -58,7 +58,7 @@ private:
 
 int32_t GetSensorDump(struct HdfSBuf *data, struct HdfSBuf *reply);
 
-} // V2_0
+} // V2_1
 } // Sensor
 } // HDI
 } // OHOS

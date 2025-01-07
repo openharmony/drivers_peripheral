@@ -53,7 +53,11 @@ SimSeVendorAdaptions::SimSeVendorAdaptions()
     InitFunc();
 }
 
-SimSeVendorAdaptions::~SimSeVendorAdaptions() {}
+SimSeVendorAdaptions::~SimSeVendorAdaptions()
+{
+    std::lock_guard<std::mutex> guard(g_callbackMutex);
+    RemoveSecureElementDeathRecipient(g_callbackV1_0);
+}
 
 SimSeVendorAdaptions::DynamicLoad::DynamicLoad(const std::string &lib) : libPath_(lib) {}
 
@@ -117,7 +121,7 @@ void SimSeVendorAdaptions::InitFunc()
 }
 
 #define SIM_FUNCTION_INVOKE_RETURN(func, ...) \
-    if (g_initFuncFlag == false) {           \
+    if (!g_initFuncFlag) {           \
         InitFunc();                          \
     }                                        \
     if (func) {                              \
@@ -135,8 +139,6 @@ int SimSeVendorAdaptions::VendorSimSecureElementInit()
 int SimSeVendorAdaptions::VendorSimSecureElementUninit()
 {
     HDF_LOGI("SimSeVendorAdaptions::VendorSimSecureElementUninit");
-    std::lock_guard<std::mutex> guard(g_callbackMutex);
-    RemoveSecureElementDeathRecipient(g_callbackV1_0);
     SIM_FUNCTION_INVOKE_RETURN(vendorSimSecureElementUninitFunc_);
 }
 
@@ -162,13 +164,12 @@ int SimSeVendorAdaptions::VendorSimSecureElementOpenLogicalChannel(
     for (i = 0; i < aidLen; i++) {
         arrAid[i] = aid[i];
     }
-    if (g_initFuncFlag == false) {
+    if (!g_initFuncFlag) {
         InitFunc();
     }
     if (vendorSimSecureElementOpenLogicalChannelFunc_) {
         ret = vendorSimSecureElementOpenLogicalChannelFunc_(arrAid, aidLen, p2, rsp, &rspLen, channelNum, status);
         if (!ret && rspLen) {
-            response.resize(rspLen);
             for (i = 0; i < rspLen; i++) {
                 response.push_back(rsp[i]);
             }
@@ -253,8 +254,7 @@ int32_t SimSeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid
         status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
         return HDF_ERR_INVALID_PARAM;
     }
-    uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
-    uint32_t resLen = RES_BUFFER_MAX_LENGTH;
+    response.clear();
     uint32_t channelCreated = MAX_CHANNEL_SIZE + 1;
     int ret = VendorSimSecureElementOpenLogicalChannel(aid, p2, response, &channelCreated, &tmpStatus);
     HDF_LOGE("VendorSimSecureElementOpenLogicalChannel ret %{public}u, tmpStatus = %{public}d", ret, tmpStatus);
@@ -267,10 +267,7 @@ int32_t SimSeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid
         return HDF_SUCCESS;
     }
     status = (SecureElementStatus)tmpStatus;
-    resLen = response.size();
-    for (uint32_t i = 0; i < resLen; i++) {
-        response.push_back(res[i]);
-    }
+    uint32_t resLen = response.size();
     if (ret == SIM_SECURE_ELEMENT_RET_OK && resLen >= SW1_OFFSET &&
         channelCreated < MAX_CHANNEL_NUM - 1 && !g_openedChannels[channelCreated]) {
         if ((response[resLen - SW1_OFFSET] == 0x90 && response[resLen - SW2_OFFSET] == 0x00)
@@ -310,7 +307,7 @@ int32_t SimSeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, 
         return HDF_SUCCESS;
     }
     status = (SecureElementStatus)tmpStatus;
-    resLen = response.size();
+    response.clear();
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }

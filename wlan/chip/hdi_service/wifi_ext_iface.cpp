@@ -88,12 +88,24 @@ int32_t WifiExtIface::SetPowerMode(int32_t powerMode)
 
 int32_t WifiExtIface::RegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
-    return HDF_ERR_NOT_SUPPORT;
+    if (chipIfaceCallback == nullptr) {
+        HDF_LOGE("chipIfaceCallback is null");
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("register ext callback");
+    vendorHal_.lock()->RegisterExtIfaceCallBack(ifName_, chipIfaceCallback);
+    return HDF_SUCCESS;
 }
 
 int32_t WifiExtIface::UnRegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
-    return HDF_ERR_NOT_SUPPORT;
+    if (chipIfaceCallback == nullptr) {
+        HDF_LOGE("chipIfaceCallback is null");
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("unregister ext callback");
+    vendorHal_.lock()->UnRegisterExtIfaceCallBack(ifName_, chipIfaceCallback);
+    return HDF_SUCCESS;
 }
 
 int32_t WifiExtIface::StartScan(const ScanParams& scanParam)
@@ -152,19 +164,39 @@ int32_t WifiExtIface::SendCmdToDriver(const std::string& ifName, int32_t cmdId, 
 
 int32_t WifiExtIface::SendActionFrame(const std::string& ifName, uint32_t freq, const std::vector<uint8_t>& frameData)
 {
-    return HDF_ERR_NOT_SUPPORT;
+    WifiError status = vendorHal_.lock()->SendActionFrame(ifName, freq, frameData);
+    if (status == HAL_SUCCESS) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
 }
 
 int32_t WifiExtIface::RegisterActionFrameReceiver(const std::string& ifName, const std::vector<uint8_t>& match)
 {
-    return HDF_ERR_NOT_SUPPORT;
+    WifiError status = vendorHal_.lock()->RegisterActionFrameReceiver(ifName, match);
+    if (status == HAL_SUCCESS) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
 }
 
 int32_t WifiExtIface::GetCoexictenceChannelList(const std::string& ifName, std::vector<uint8_t>& paramBuf)
 {
-    return HDF_ERR_NOT_SUPPORT;
+    WifiError status = vendorHal_.lock()->GetCoexictenceChannelList(ifName, paramBuf);
+    if (status != HAL_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 
+int32_t WifiExtIface::SetProjectionScreenParam(const std::string& ifName, const ProjectionScreenCmdParam& param)
+{
+    WifiError status = vendorHal_.lock()->SetProjectionScreenParam(ifName, param);
+    if (status != HAL_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
 }
 }
 }

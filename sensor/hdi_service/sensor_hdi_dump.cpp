@@ -27,7 +27,7 @@ constexpr int32_t DATA_LEN = 256;
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V2_1 {
 
 static const char *SENSOR_HELP =
     " Sensor manager dump options:\n"
@@ -262,7 +262,7 @@ int32_t GetSensorDump(struct HdfSBuf *data, struct HdfSBuf *reply)
     return HDF_SUCCESS;
 }
 
-} // V2_0
+} // V2_1
 } // Sensor
 } // HDI
 } // OHOS

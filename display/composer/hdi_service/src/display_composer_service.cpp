@@ -235,8 +235,8 @@ void DisplayComposerService::LoadVdiFuncPart2()
         reinterpret_cast<RegDisplayVBlankIdleCallbackFunc>(dlsym(libHandle_, "RegDisplayVBlankIdleCallback"));
     vdiAdapter_->SetDisplayConstraint =
         reinterpret_cast<SetDisplayConstraintFunc>(dlsym(libHandle_, "SetDisplayConstraint"));
-    vdiAdapter_->SetHardwareCursorPosition =
-        reinterpret_cast<SetHardwareCursorPositionFunc>(dlsym(libHandle_, "SetHardwareCursorPosition"));
+    vdiAdapter_->UpdateHardwareCursor =
+        reinterpret_cast<UpdateHardwareCursorFunc>(dlsym(libHandle_, "UpdateHardwareCursor"));
     vdiAdapter_->EnableHardwareCursorStats =
         reinterpret_cast<EnableHardwareCursorStatsFunc>(dlsym(libHandle_, "EnableHardwareCursorStats"));
     vdiAdapter_->GetHardwareCursorStats =
@@ -474,12 +474,15 @@ int32_t DisplayComposerService::GetDisplayProperty(uint32_t devId, uint32_t id, 
     return ret;
 }
 
-int32_t DisplayComposerService::SetHardwareCursorPosition(uint32_t devId, int32_t x, int32_t y)
+int32_t DisplayComposerService::UpdateHardwareCursor(uint32_t devId, int32_t x, int32_t y,
+    const sptr<NativeBuffer>& buffer)
 {
     DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetHardwareCursorPosition, HDF_ERR_NOT_SUPPORT);
-    int32_t ret = vdiAdapter_->SetHardwareCursorPosition(devId, x, y);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->UpdateHardwareCursor, HDF_ERR_NOT_SUPPORT);
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_ERR_NOT_SUPPORT);
+    BufferHandle* handle = buffer->GetBufferHandle();
+    int32_t ret = vdiAdapter_->UpdateHardwareCursor(devId, x, y, handle);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u", __func__, devId));
     return ret;

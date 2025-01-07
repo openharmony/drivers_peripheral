@@ -18,6 +18,9 @@
 
 #include <set>
 
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD001566
+
 namespace OHOS {
 namespace HDI {
 namespace Wlan {
