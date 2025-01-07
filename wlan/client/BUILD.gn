@@ -58,7 +58,6 @@ if (defined(ohos_lite)) {
     "src/sbuf/sbuf_wpa_cmd_adapter.c",
     "src/wifi_driver_client.c",
   ]
-  version_script = "wifi_driver_client.map"
   ohos_shared_library("wifi_driver_client") {
     branch_protector_ret = "pac_ret"
     sanitize = {
@@ -98,7 +97,6 @@ if (defined(ohos_lite)) {
         "-fno-strict-aliasing",
       ]
       cflags += [
-        "-fvisibility=hidden",
         "-fdata-sections",
         "-ffunction-sections",
         "-Os",
@@ -108,6 +106,7 @@ if (defined(ohos_lite)) {
         "-Wl,--exclude-libs=ALL",
         "-Wl,--gc-sections",
       ]
+      version_script = "wifi_driver_client.map"
       install_images = [ chipset_base_dir ]
       subsystem_name = "hdf"
       part_name = "drivers_peripheral_wlan"
@@ -147,7 +146,6 @@ if (defined(ohos_lite)) {
         "-fno-strict-aliasing",
       ]
       cflags += [
-        "-fvisibility=hidden",
         "-fdata-sections",
         "-ffunction-sections",
         "-Os",
@@ -157,6 +155,7 @@ if (defined(ohos_lite)) {
         "-Wl,--exclude-libs=ALL",
         "-Wl,--gc-sections",
       ]
+      version_script = "wifi_driver_client.map"
       install_images = [ chipset_base_dir ]
       subsystem_name = "hdf"
       part_name = "drivers_peripheral_wlan"

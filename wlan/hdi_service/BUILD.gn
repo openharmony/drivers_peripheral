@@ -53,7 +53,6 @@ ohos_shared_library("libwlan_interface_service_1.3") {
     "-fno-strict-aliasing",
   ]
   cflags += [
-    "-fvisibility=hidden",
     "-fdata-sections",
     "-ffunction-sections",
     "-Os",
@@ -115,7 +114,6 @@ ohos_shared_library("libwifi_hdi_c_device") {
     "-fno-strict-aliasing",
   ]
   cflags += [
-    "-fvisibility=hidden",
     "-fdata-sections",
     "-ffunction-sections",
     "-Os",
