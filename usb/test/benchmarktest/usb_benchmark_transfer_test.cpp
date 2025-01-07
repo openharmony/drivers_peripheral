@@ -23,18 +23,18 @@
 #include "usbd_port.h"
 #include "usbd_function.h"
 #include "UsbSubscriberTest.h"
-#include "v1_1/iusb_interface.h"
-#include "v1_1/usb_types.h"
+#include "v1_2/iusb_interface.h"
+#include "v1_2/usb_types.h"
 
 using namespace benchmark::internal;
 using namespace OHOS;
 using namespace std;
 using namespace OHOS::USB;
 using namespace OHOS::HDI::Usb::V1_0;
-using namespace OHOS::HDI::Usb::V1_1;
+using namespace OHOS::HDI::Usb::V1_2;
 
 namespace {
-sptr<OHOS::HDI::Usb::V1_1::IUsbInterface> g_usbInterface = nullptr;
+sptr<OHOS::HDI::Usb::V1_2::IUsbInterface> g_usbInterface = nullptr;
 struct UsbDev g_dev = {0, 0};
 const int SLEEP_TIME = 3;
 const uint8_t INTERFACEID_OK = 1;
@@ -108,7 +108,7 @@ int32_t SwitchErrCode(int32_t ret)
 
 void HdfUsbdBenchmarkTransferTest::SetUp(const ::benchmark::State& state)
 {
-    g_usbInterface = OHOS::HDI::Usb::V1_1::IUsbInterface::Get();
+    g_usbInterface = OHOS::HDI::Usb::V1_2::IUsbInterface::Get();
     ASSERT_NE(g_usbInterface, nullptr);
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SOURCE, DATA_ROLE_HOST);
     sleep(SLEEP_TIME);

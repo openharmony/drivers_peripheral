@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_USB_V1_1_USBD_ACCESSORY_H
-#define OHOS_HDI_USB_V1_1_USBD_ACCESSORY_H
+#ifndef OHOS_HDI_USB_V1_2_USBD_ACCESSORY_H
+#define OHOS_HDI_USB_V1_2_USBD_ACCESSORY_H
 
 #include <fcntl.h>
 #include <sys/types.h>
@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 
 /* ioctls for retrieving strings set by the host */
 #define ACCESSORY_GET_STRING_MANUFACTURER   _IOW('M', 1, char[256])
@@ -58,8 +58,8 @@ private:
     int32_t accFd = {0};
 };
 
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_USB_V1_1_USBD_ACCESSORY_H
+#endif // OHOS_HDI_USB_V1_2_USBD_ACCESSORY_H

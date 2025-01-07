@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_USB_V1_1_USBIMPL_H
-#define OHOS_HDI_USB_V1_1_USBIMPL_H
+#ifndef OHOS_HDI_USB_V1_2_USBIMPL_H
+#define OHOS_HDI_USB_V1_2_USBIMPL_H
 
 #include "hdf_slist.h"
 #include "hdf_usb_pnp_manage.h"
@@ -24,7 +24,7 @@
 #include "usb_session.h"
 #include "usbd.h"
 #include "usbd_load_usb_service.h"
-#include "v1_1/iusb_interface.h"
+#include "v1_2/iusb_interface.h"
 
 #define BASE_CLASS_HUB 0x09
 
@@ -33,8 +33,8 @@ constexpr uint8_t MAX_INTERFACEID = 0xFF;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
-class UsbImpl : public IUsbInterface {
+namespace V1_2 {
+class UsbImpl : public OHOS::HDI::Usb::V1_2::IUsbInterface {
 public:
     OsalMutex lock_;
     HdfSList devList_;
@@ -93,6 +93,9 @@ public:
     int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem) override;
     int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem) override;
     int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe) override;
+    int32_t UsbSubmitTransfer(const UsbDev &dev, const OHOS::HDI::Usb::V1_2::USBTransferInfo &info,
+        const sptr<OHOS::HDI::Usb::V1_2::IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem) override;
+    int32_t UsbCancelTransfer(const UsbDev &dev, const int32_t endpoint) override;
     int32_t ClearHalt(const UsbDev &dev, const UsbPipe &pipe) override;
 
     static int32_t UsbdRequestSyncReleaseList(HostDevice *port);
@@ -173,8 +176,8 @@ private:
     static UsbdLoadService loadUsbService_;
     static UsbdLoadService loadHdfEdm_;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_USB_V1_1_USBIMPL_H
+#endif // OHOS_HDI_USB_V1_2_USBIMPL_H

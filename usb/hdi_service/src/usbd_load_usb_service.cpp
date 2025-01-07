@@ -33,7 +33,7 @@ using namespace std;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 OnDemandLoadCallback::OnDemandLoadCallback()
 {
     HDF_LOGI("%{public}s:construct", __func__);
@@ -99,7 +99,7 @@ int32_t UsbdLoadService::LoadService()
     }
     return HDF_SUCCESS;
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS

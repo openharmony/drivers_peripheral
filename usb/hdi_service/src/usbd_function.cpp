@@ -38,7 +38,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_1 {
+namespace V1_2 {
 uint32_t UsbdFunction::currentFuncs_ = USB_FUNCTION_HDC;
 
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
