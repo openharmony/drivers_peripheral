@@ -59,7 +59,6 @@ ohos_shared_library("libwlan_service_extend") {
     "-fstack-protector-all",
   ]
   cflags += [
-    "-fvisibility=hidden",
     "-fdata-sections",
     "-ffunction-sections",
     "-Os",
