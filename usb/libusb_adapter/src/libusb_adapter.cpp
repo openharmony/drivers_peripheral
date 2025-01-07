@@ -30,10 +30,12 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 
+#include "accesstoken_kit.h"
+#include "hap_token_info.h"
+#include "ipc_skeleton.h"
 #include "osal_mem.h"
 #include "securec.h"
 #include "usbd_wrapper.h"
-#include "parameters.h"
 
 namespace OHOS {
 namespace HDI {
@@ -54,6 +56,8 @@ constexpr int32_t DISPLACEMENT_NUMBER = 8;
 constexpr uint32_t LIBUSB_PATH_LENGTH = 64;
 constexpr uint64_t MAX_TOTAL_SIZE = 520447;
 constexpr int32_t API_VERSION_ID = 16;
+constexpr int32_t LIBUSB_IO_ERROR = -1;
+constexpr int32_t LIBUSB_IO_ERROR_INVALID = 0;
 constexpr const char* USB_DEV_FS_PATH = "/dev/bus/usb";
 constexpr const char* LIBUSB_DEVICE_MMAP_PATH = "/data/service/el1/public/usb/";
 static libusb_context *g_libusb_context = nullptr;
@@ -86,6 +90,18 @@ LibusbAdapter::LibusbAdapter()
 LibusbAdapter::~LibusbAdapter()
 {
     LibUSBExit();
+}
+
+void GetApiVersion(int32_t &apiVersion)
+{
+    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
+    OHOS::Security::AccessToken::HapTokenInfo info;
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callerToken, info);
+    if (ret < HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get hapInfo failed", __func__);
+        return;
+    }
+    apiVersion = info.apiVersion;
 }
 
 int32_t LibusbAdapter::LibUSBInit()
@@ -499,7 +515,7 @@ int32_t LibusbAdapter::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, 
     int actlength = 0;
     libusb_device_handle *devHandle = nullptr;
     int32_t ret = FindHandleByDev(dev, &devHandle);
-    if (devHandle == nullptr || ret != HDF_SUCCESS) {
+    if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s: FindHandleByDev failed, ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
@@ -530,10 +546,17 @@ int32_t LibusbAdapter::BulkTransferReadwithLength(const UsbDev &dev,
         return HDF_ERR_INVALID_PARAM;
     }
 
-    libusb_device_handle *devHandle = nullptr;
-    int32_t ret = FindHandleByDev(dev, &devHandle);
-    if (devHandle == nullptr || ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: FindHandleByDev failed, ret=%{public}d", __func__, ret);
+    libusb_device_handle* devHandle = nullptr;
+    libusb_endpoint_descriptor* endpointDes = nullptr;
+    int32_t ret = GetEndpointDesc(dev, pipe, &endpointDes, &devHandle);
+    if (ret != HDF_SUCCESS || devHandle == nullptr) {
+        HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
+        return ret;
+    }
+    uint8_t interfaceId = 0;
+    ret = GetInterfaceIdByUsbDev(dev, interfaceId);
+    if (ret != HDF_SUCCESS || interfaceId != pipe.intfId) {
+        HDF_LOGE("%{public}s get interfaceId failed", __func__);
         return HDF_FAILURE;
     }
     std::vector<uint8_t> buffer(length);
@@ -541,6 +564,10 @@ int32_t LibusbAdapter::BulkTransferReadwithLength(const UsbDev &dev,
     ret = libusb_bulk_transfer(devHandle, (pipe.endpointId | LIBUSB_ENDPOINT_IN), (unsigned char *)buffer.data(),
         length, &transferred, timeout);
     if (ret < 0) {
+        if (ret == LIBUSB_IO_ERROR && interfaceId == pipe.intfId) {
+            HDF_LOGD("%{public}s: interfaceId=%{public}d, pipe.intfId=%{public}d", __func__, interfaceId, pipe.intfId);
+            return LIBUSB_IO_ERROR_INVALID;
+        }
         HDF_LOGE("%{public}s: libusb_bulk_transfer failed, ret: %{public}d",
             __func__, ret);
         return ret;
@@ -562,15 +589,26 @@ int32_t LibusbAdapter::BulkTransferWrite(
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t actlength = 0;
-    libusb_device_handle *devHandle = nullptr;
-    int32_t ret = FindHandleByDev(dev, &devHandle);
-    if (devHandle == nullptr || ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:FindHandleByDev failed ret=%{public}d", __func__, ret);
+    libusb_device_handle* devHandle = nullptr;
+    libusb_endpoint_descriptor* endpointDes = nullptr;
+    int32_t ret = GetEndpointDesc(dev, pipe, &endpointDes, &devHandle);
+    if (ret != HDF_SUCCESS || devHandle == nullptr) {
+        HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
+        return ret;
+    }
+    uint8_t interfaceId = 0;
+    ret = GetInterfaceIdByUsbDev(dev, interfaceId);
+    if (ret != HDF_SUCCESS || interfaceId != pipe.intfId) {
+        HDF_LOGE("%{public}s get interfaceId failed", __func__);
         return HDF_FAILURE;
     }
     ret = libusb_bulk_transfer(devHandle, pipe.endpointId, (unsigned char *)data.data(), data.size(),
         &actlength, timeout);
     if (ret < 0) {
+        if (ret == LIBUSB_IO_ERROR && interfaceId == pipe.intfId) {
+            HDF_LOGE("%{public}s: interfaceId=%{public}d, pipe.intfId=%{public}d", __func__, interfaceId, pipe.intfId);
+            return LIBUSB_IO_ERROR_INVALID;
+        }
         HDF_LOGE("%{public}s: libusb_bulk_transfer is error ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
@@ -835,10 +873,13 @@ int32_t LibusbAdapter::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, ui
     }
 
     if (force) {
-        ret = libusb_detach_kernel_driver(devHandle, interfaceId);
-        if (ret < HDF_SUCCESS) {
-            HDF_LOGD("Interface libusb_detach_kernel_driver is error, ret : %{public}d, force : %{public}d",
-                ret, force);
+        if (libusb_kernel_driver_active(devHandle, interfaceId) != 1) {
+            HDF_LOGW("This interface is not occupied by the kernel driver,interfaceId : %{public}d", interfaceId);
+        } else {
+            ret = libusb_detach_kernel_driver(devHandle, interfaceId);
+            if (ret < HDF_SUCCESS) {
+                HDF_LOGE("libusb_detach_kernel_driver is error, ret: %{public}d", ret);
+            }
         }
     }
 
@@ -963,17 +1004,17 @@ int32_t LibusbAdapter::DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfe
     }
 
     ret = libusb_control_transfer(devHandle, reqType, reqCmd, wValue, wIndex, wData, wLength, ctrl.timeout);
-    std::string apiVersion = system::GetParameter("const.ohos.apiversion", "");
-    if (apiVersion.empty()) {
-        HDF_LOGE("%{public}s: get device api version failed", __func__);
-        return HDF_FAILURE;
+    if (ret < 0) {
+        int32_t apiVersion = 0;
+        GetApiVersion(apiVersion);
+        HDF_LOGD("%{public}s: apiVersion %{public}d", __func__, apiVersion);
+        if (apiVersion < API_VERSION_ID) {
+            HDF_LOGD("%{public}s: The version number is smaller than 16 apiVersion %{public}d",
+                __func__, apiVersion);
+            ret = HDF_SUCCESS;
+        }
     }
-    int32_t apiVersionId = std::stoi(apiVersion);
-    HDF_LOGI("%{public}s: apiVersionId %{public}d", __func__, apiVersionId);
-    if (reqType == LIBUSB_ENDPOINT_OUT && apiVersionId < API_VERSION_ID) {
-        HDF_LOGD("%{public}s: The version number is smaller than 16 apiVersionId %{public}d", __func__, apiVersionId);
-        ret = HDF_SUCCESS;
-    }
+
     HDF_LOGD("%{public}s leave", __func__);
     return ret;
 }
@@ -1555,6 +1596,10 @@ int32_t LibusbAdapter::GetEndpointByAddr(const unsigned char endpointAddr, libus
     }
     struct libusb_config_descriptor *config = nullptr;
     libusb_get_active_config_descriptor(device, &config);
+    if (config == nullptr) {
+        HDF_LOGE("%{public}s: config is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     for (int j = 0; j < config->bNumInterfaces; j++) {
         const struct libusb_interface *interface = &config->interface[j];
         const struct libusb_interface_descriptor *interfaceDesc = interface->altsetting;
