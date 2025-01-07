@@ -17,6 +17,7 @@
 
 #include <hdf_base.h>
 #include <iproxy_broker.h>
+#include <shared_mutex>
 
 #include "ddk_pnp_listener_mgr.h"
 #include "libusb_adapter.h"
@@ -52,6 +53,9 @@ static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 #ifdef LIBUSB_ENABLE
 static std::shared_ptr<OHOS::HDI::Usb::V1_2::LibusbAdapter> g_DdkLibusbAdapter =
     std::make_shared<OHOS::HDI::Usb::V1_2::LibusbAdapter>();
+constexpr uint8_t INTERFACE_ID_INVALID = 255;
+static std::unordered_map<uint64_t, uint8_t> g_InterfaceMap;
+std::shared_mutex g_MutexInterfaceMap;
 #endif // LIBUSB_ENABLE
 
 extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
@@ -116,7 +120,7 @@ void FillPipeRequestParamsWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem
 
 int32_t CheckCompleteStatus(struct UsbRequest *request)
 {
-    if (request == NULL) {
+    if (request == nullptr) {
         return HDF_FAILURE;
     }
     int32_t apiVersion = 0;
@@ -131,6 +135,31 @@ int32_t CheckCompleteStatus(struct UsbRequest *request)
     }
     return HDF_SUCCESS;
 }
+
+uint8_t GetInterfaceId(uint64_t interfaceHandle)
+{
+    std::shared_lock<std::shared_mutex> interfaceLock(g_MutexInterfaceMap);
+    auto it = g_InterfaceMap.find(interfaceHandle);
+    if (it == g_InterfaceMap.end()) {
+        HDF_LOGE("%{public}s find interfaceId failed", __func__);
+        return INTERFACE_ID_INVALID;
+    }
+    HDF_LOGD("%{public}s find interfaceId success. interfaceId=%{public}d", __func__, it->second);
+    return it->second;
+}
+
+void EraseInterfaceId(uint64_t interfaceHandle)
+{
+    std::unique_lock<std::shared_mutex> interfaceLock(g_MutexInterfaceMap);
+    auto it = g_InterfaceMap.find(interfaceHandle);
+    if (it == g_InterfaceMap.end()) {
+        HDF_LOGE("%{public}s find interfaceId failed", __func__);
+        return ;
+    }
+    g_InterfaceMap.erase(interfaceHandle);
+    HDF_LOGD("%{public}s erase interfaceId success.", __func__);
+}
+
 int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
 {
     uint64_t handle = 0;
@@ -169,17 +198,17 @@ int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
         return HDF_FAILURE;
     }
     UsbDdkDelHashRecord(interfaceHandle);
-    uint8_t interfaceId = 0;
-    ret = g_DdkLibusbAdapter->GetInterfaceIdByUsbDev({infoTemp.busNum, infoTemp.devNum}, interfaceId);
-    if (ret != HDF_SUCCESS) {
+    uint8_t interfaceId = GetInterfaceId(interfaceHandle);
+    if (interfaceId == INTERFACE_ID_INVALID) {
         HDF_LOGE("%{public}s get interfaceId failed", __func__);
-        return ret;
+        return HDF_FAILURE;
     }
     ret = g_DdkLibusbAdapter->ReleaseInterface({infoTemp.busNum, infoTemp.devNum}, interfaceId);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed", __func__);
         return ret;
     }
+    EraseInterfaceId(interfaceHandle);
     return g_DdkLibusbAdapter->CloseDevice({infoTemp.busNum, infoTemp.devNum});
 #endif // LIBUSB_ENABLE
 }
@@ -188,9 +217,9 @@ static int32_t UsbdPnpEventHandler(void *priv, uint32_t id, HdfSBuf *data)
 {
     if (id == USB_PNP_NOTIFY_REMOVE_DEVICE) {
         uint32_t infoSize;
-        struct UsbPnpNotifyMatchInfoTable *infoTable = NULL;
+        struct UsbPnpNotifyMatchInfoTable *infoTable = nullptr;
         auto flag = HdfSbufReadBuffer(data, (const void **)(&infoTable), &infoSize);
-        if ((!flag) || (infoTable == NULL)) {
+        if ((!flag) || (infoTable == nullptr)) {
             HDF_LOGE("%{public}s: fail to read infoTable in event data, flag = %{public}d", __func__, flag);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -373,7 +402,14 @@ int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex,
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s hash failed %{public}d", __func__, ret);
     }
-    return g_DdkLibusbAdapter->ClaimInterface({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, interfaceIndex, true);
+    ret = g_DdkLibusbAdapter->ClaimInterface({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, interfaceIndex, true);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("ClaimInterface is failed");
+        return HDF_FAILURE;
+    }
+    std::unique_lock<std::shared_mutex> interfaceLock(g_MutexInterfaceMap);
+    g_InterfaceMap[interfaceHandle] = interfaceIndex;
+    return HDF_SUCCESS;
 #endif // LIBUSB_ENABLE
 }
 
@@ -411,11 +447,10 @@ int32_t UsbDdkService::SelectInterfaceSetting(uint64_t interfaceHandle, uint8_t 
         HDF_LOGE("%{public}s infoTemp failed", __func__);
         return HDF_FAILURE;
     }
-    uint8_t interfaceId = 0;
-    ret = g_DdkLibusbAdapter->GetInterfaceIdByUsbDev({infoTemp.busNum, infoTemp.devNum}, interfaceId);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s get interfaceId failed ", __func__);
-        return ret;
+    uint8_t interfaceId = GetInterfaceId(interfaceHandle);
+    if (interfaceId == INTERFACE_ID_INVALID) {
+        HDF_LOGE("%{public}s get interfaceId failed", __func__);
+        return HDF_FAILURE;
     }
     return g_DdkLibusbAdapter->SetInterface({infoTemp.busNum, infoTemp.devNum}, interfaceId, settingIndex);
 #endif // LIBUSB_ENABLE

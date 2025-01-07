@@ -35,6 +35,7 @@ const uint8_t STRING_ID_INVALID = 233;
 const uint32_t MAX_BUFFER_LENGTH = 255;
 const int TAG_NUM_10 = 10;
 const uint8_t INTERFACEID_OK = 1;
+const uint8_t INTERFACEID_ZERO = 0;
 const uint8_t INTERFACEID_INVALID = 255;
 const uint8_t POINTID_INVALID = 158;
 // data interface have 2 point : 1->bulk_out 2->bulk_in
@@ -430,6 +431,25 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface008, TestSize.Level1)
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface008 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdClaimInterface009
+ * @tc.desc: Test functions to ClaimInterface
+ * @tc.desc: int32_t  ClaimInterface(const UsbDev &dev, uint8_t interfaceId);
+ * @tc.desc: Positive test: parameters correctly two interfaceIds
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdClaimInterface009, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_OK;
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdRequestTest::UsbdClaimInterface009 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    EXPECT_EQ(0, ret);
+    ret = g_usbInterface->ClaimInterface(dev, INTERFACEID_ZERO, 1);
+    EXPECT_EQ(0, ret);
+    HDF_LOGI("UsbdRequestTest::UsbdClaimInterface009 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
 }
 
 /**********************************************************************************************************/
