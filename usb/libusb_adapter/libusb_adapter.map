@@ -45,7 +45,6 @@
         "OHOS::HDI::Usb::V1_1::LibusbAdapter::GetInterfaceActiveStatus(OHOS::HDI::Usb::V1_0::UsbDev const&, unsigned char, bool&)";
         "OHOS::HDI::Usb::V1_1::LibusbAdapter::GetDeviceSpeed(OHOS::HDI::Usb::V1_0::UsbDev const&, unsigned char&)";
         "OHOS::HDI::Usb::V1_1::LibusbAdapter::GetCurrentInterfaceSetting(OHOS::HDI::Usb::V1_0::UsbDev const&, unsigned char&)";
-        "OHOS::HDI::Usb::V1_1::LibusbAdapter::GetInterfaceIdByUsbDev(OHOS::HDI::Usb::V1_0::UsbDev const&, unsigned char&)";
         "OHOS::HDI::Usb::V1_1::LibusbAdapter::SendPipeRequest(OHOS::HDI::Usb::V1_0::UsbDev const&, unsigned char, unsigned int, unsigned int&, unsigned int)";
         "OHOS::HDI::Usb::V1_1::LibusbAdapter::SendPipeRequestWithAshmem(OHOS::HDI::Usb::V1_0::UsbDev const&, unsigned char, OHOS::HDI::Usb::V1_1::SendRequestAshmemParameter, unsigned int&, unsigned int)";
         "OHOS::HDI::Usb::V1_1::LibusbAdapter::GetRawDescriptor(OHOS::HDI::Usb::V1_0::UsbDev const&, std::__h::vector<unsigned char, std::__h::allocator<unsigned char>>&)";
