@@ -164,7 +164,7 @@ ResultCode GetUserId(int32_t *userId)
     return RESULT_SUCCESS;
 }
 
-ResultCode CheckChallenge(uint8_t *challenge, uint32_t challengeLen)
+ResultCode CheckChallenge(const uint8_t *challenge, uint32_t challengeLen)
 {
     if (challenge == NULL || challengeLen != CHALLENGE_LEN) {
         LOG_ERROR("param is invalid");

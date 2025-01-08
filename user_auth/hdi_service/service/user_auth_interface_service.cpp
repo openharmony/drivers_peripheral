@@ -1799,6 +1799,41 @@ static int32_t ConvertResultCode(const int32_t in)
     return in;
 }
 
+static void GetRootSecret(const UserAuthTokenPlainHal& token, std::vector<uint8_t>& rootSecret)
+{
+    rootSecret.resize(0);
+    if (CheckSessionTimeout() != RESULT_SUCCESS) {
+        LOG_ERROR("CheckSessionTimeout fail");
+        return;
+    }
+    if (!IsValidTokenTime(token.tokenDataPlain.time)) {
+        LOG_ERROR("check token time failed, token is invalid");
+        return;
+    }
+    if (CheckChallenge(token.tokenDataPlain.challenge, CHALLENGE_LEN) != RESULT_SUCCESS) {
+        LOG_ERROR("check challenge failed, token is invalid");
+        return;
+    }
+    if (token.tokenDataPlain.authType != PIN_AUTH) {
+        LOG_ERROR("token authType is not pin");
+        return;
+    }
+
+    Buffer *rootSecretBuffer = GetCacheRootSecret(token.tokenDataToEncrypt.userId);
+    if (!IsBufferValid(rootSecretBuffer)) {
+        IAM_LOGE("get GetCacheRootSecret failed");
+        return;
+    }
+    rootSecret.resize(ROOT_SECRET_LEN);
+    if (memcpy_s(rootSecret.data(), rootSecret.size(), rootSecretBuffer->buf, rootSecretBuffer->contentSize) != EOK) {
+        IAM_LOGE("rootSecret copy failed");
+        (void)memset_s(rootSecret.data(), rootSecret.size(), 0, rootSecret.size());
+    }
+
+    DestoryBuffer(rootSecretBuffer);
+    return;
+}
+
 int32_t UserAuthInterfaceService::VerifyAuthToken(const std::vector<uint8_t>& tokenIn, uint64_t allowableDuration,
     HdiUserAuthTokenPlain &tokenPlainOut, std::vector<uint8_t>& rootSecret)
 {
@@ -1814,6 +1849,7 @@ int32_t UserAuthInterfaceService::VerifyAuthToken(const std::vector<uint8_t>& to
         IAM_LOGE("UserAuthTokenVerify failed");
         return ConvertResultCode(result);
     }
+    GetRootSecret(tokenPlain, rootSecret);
     result = CopyAuthTokenPlainHal(tokenPlain, tokenPlainOut);
     if (result != RESULT_SUCCESS) {
         IAM_LOGE("CopyAuthTokenPlainHal failed");
