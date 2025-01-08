@@ -22,6 +22,7 @@ group("hdf_sensor_fuzztest") {
     "sensorenable_fuzzer:fuzztest",
     "sensorgetsdcsensorInfo_fuzzer:fuzztest",
     "sensorregisterandunregistercallback_fuzzer:fuzztest",
+    "sensorregisterasyncandunregisterasynccallback_fuzzer:fuzztest",
     "sensorsetbatch_fuzzer:fuzztest",
     "sensorsetmode_fuzzer:fuzztest",
     "sensorsetoption_fuzzer:fuzztest",
