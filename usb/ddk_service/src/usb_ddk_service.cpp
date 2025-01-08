@@ -136,6 +136,7 @@ int32_t CheckCompleteStatus(struct UsbRequest *request)
     return HDF_SUCCESS;
 }
 
+#ifdef LIBUSB_ENABLE
 uint8_t GetInterfaceId(uint64_t interfaceHandle)
 {
     std::shared_lock<std::shared_mutex> interfaceLock(g_MutexInterfaceMap);
@@ -159,6 +160,7 @@ void EraseInterfaceId(uint64_t interfaceHandle)
     g_InterfaceMap.erase(interfaceHandle);
     HDF_LOGD("%{public}s erase interfaceId success.", __func__);
 }
+#endif // LIBUSB_ENABLE
 
 int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
 {
