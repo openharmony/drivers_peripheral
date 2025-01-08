@@ -67,14 +67,14 @@ bool UsbDdkGetRecordByVal(const InterfaceInfo &info, uint64_t &hashVal)
     return false;
 }
 
-int32_t GetInterfaceInfoByVal(const uint64_t hashVal, InterfaceInfo &Info)
+int32_t GetInterfaceInfoByVal(const uint64_t hashVal, InterfaceInfo &info)
 {
     std::lock_guard<std::mutex> lock(g_mapMutex);
     auto it = g_hashMap.find(hashVal);
     if (it == g_hashMap.end()) {
         return HDF_ERR_INVALID_PARAM;
     }
-    Info = it->second;
+    info = it->second;
     return HDF_SUCCESS;
 }
 
