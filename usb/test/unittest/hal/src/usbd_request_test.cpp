@@ -446,9 +446,9 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface009, TestSize.Level1)
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface009 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    EXPECT_EQ(0, ret);
+    ASSERT_EQ(0, ret);
     ret = g_usbInterface->ClaimInterface(dev, INTERFACEID_ZERO, 1);
-    EXPECT_EQ(0, ret);
+    ASSERT_EQ(0, ret);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface009 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
 }
 
