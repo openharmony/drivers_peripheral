@@ -477,14 +477,14 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
     int32_t ret = HDF_FAILURE;
     uint32_t tcur = 0;
     OsalMutexLock(&requestSync->lock);
-
+    requestSync->params.timeout = static_cast<uint32_t>(timeout);
     ret = UsbFillRequest(requestSync->request, requestSync->ifHandle, &requestSync->params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFillRequest failed, ret=%{public}d ", __func__, ret);
         OsalMutexUnlock(&requestSync->lock);
         return HDF_FAILURE;
     }
-    requestSync->params.timeout = static_cast<uint32_t>(timeout);
+
     struct UsbIfRequest* requestObj = (struct UsbIfRequest *)requestSync->request;
     struct UsbHostRequest* hostRequest = requestObj->hostRequest;
     hostRequest->length = size;
