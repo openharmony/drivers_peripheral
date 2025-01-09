@@ -14,6 +14,14 @@
 import("//build/ohos.gni")
 
 ohos_shared_library("libdaudio_hdf_utils") {
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
   include_dirs = [
     "include",
     "log/include",
@@ -23,6 +31,12 @@ ohos_shared_library("libdaudio_hdf_utils") {
   sources = [
     "log/src/daudio_log.cpp",
     "utils/src/daudio_utils.cpp",
+  ]
+
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
   ]
 
   external_deps = [
