@@ -53,6 +53,8 @@ ohos_unittest("HdfDstreamOperatorTest") {
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:libmap_data_sequenceable_1.0",
     "drivers_interface_camera:metadata",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.1",
     "graphic_surface:buffer_handle",
