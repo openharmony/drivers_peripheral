@@ -2157,10 +2157,6 @@ void LibusbAdapter::AddTransferToList(LibusbAsyncTransfer *asyncTransfer)
 
 void LibusbAdapter::TransferInit(const UsbDev &dev)
 {
-    LibusbAsyncWrapper *wrapper = GetAsyncWrapper(dev);
-    if (wrapper != nullptr) {
-        return;
-    }
     // init LibusbAsyncManager
     HDF_LOGI("%{public}s: start init libusb async manager", __func__);
     LibusbAsyncWrapper *asyncWrapper = new(std::nothrow) LibusbAsyncWrapper();
