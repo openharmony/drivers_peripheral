@@ -15,10 +15,24 @@ import("//build/ohos.gni")
 import("//drivers/peripheral/distributed_camera/distributedcamera.gni")
 
 ohos_shared_library("libdistributed_camera_provider_config") {
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
   include_dirs =
       [ "${distributedcamera_hdf_path}/hdi_service/include/dcamera_provider" ]
   sources = [ "./src/config/dcamera_provider_config.cpp" ]
   deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.1" ]
+
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
 
   external_deps = [
     "cJSON:cjson",
@@ -41,6 +55,14 @@ ohos_shared_library("libdistributed_camera_provider_config") {
 }
 
 ohos_shared_library("libdistributed_camera_host_config") {
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
   include_dirs = [
     "${distributedcamera_hdf_path}/hdi_service/include/dcamera_device",
     "${distributedcamera_hdf_path}/hdi_service/include/dcamera_host",
@@ -49,6 +71,11 @@ ohos_shared_library("libdistributed_camera_host_config") {
   ]
   sources = [ "./src/config/dcamera_host_config.cpp" ]
   deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.1" ]
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
@@ -75,6 +102,14 @@ ohos_shared_library("libdistributed_camera_host_config") {
 }
 
 ohos_shared_library("libdistributed_camera_hdf_service_1.1") {
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
   include_dirs = [
     "include/dcamera_device",
     "include/dcamera_host",
@@ -101,6 +136,12 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.1") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"distributedcamerahdf\"",
     "LOG_DOMAIN=0xD004150",
+  ]
+
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
   ]
 
   external_deps = [
