@@ -29,7 +29,7 @@ namespace Common {
 #undef LOG_DOMAIN
 #endif
 
-#define LOG_DOMAIN 0xD002405
+#define LOG_DOMAIN 0xD002415
 
 #ifdef LOG_TAG
 #undef LOG_TAG
