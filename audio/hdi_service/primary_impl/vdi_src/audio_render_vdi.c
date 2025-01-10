@@ -23,6 +23,7 @@
 #include "securec.h"
 #include "audio_common_vdi.h"
 #include "audio_dfx_util.h"
+#include "stub_collector.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
@@ -1070,6 +1071,7 @@ void AudioDestroyRenderByIdVdi(uint32_t renderId)
     priv->renderInfos[renderId]->desc.pins = PIN_NONE;
     priv->renderInfos[renderId]->callback = NULL;
     priv->renderInfos[renderId]->isRegCb = false;
+    StubCollectorRemoveObject(IAUDIORENDER_INTERFACE_DESC, &(priv->renderInfos[renderId]->render));
     OsalMemFree(priv->renderInfos[renderId]);
     priv->renderInfos[renderId] = NULL;
     AUDIO_FUNC_LOGI("audio destroy render success, renderId = [%{public}u]", renderId);
