@@ -26,9 +26,7 @@ ohos_shared_library("libmemory_tracker_interface_service_1.0") {
     "ipc:ipc_single",
   ]
 
-  cflags_cc = [
-    "-fstack-protector-all"
-  ]
+  cflags_cc = [ "-fstack-protector-all" ]
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
