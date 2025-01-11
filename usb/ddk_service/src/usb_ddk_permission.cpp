@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_0 {
+namespace V1_1 {
 using VerifyAccessTokenFunc = int(*)(uint32_t callerToken, const std::string &permissionName);
 using GetApiVersion = int(*)(uint32_t callerToken, int32_t &apiVersion);
 static constexpr int PERMISSION_GRANTED = 0;
@@ -101,7 +101,7 @@ int32_t DdkPermissionManager::GetHapApiVersion(int32_t &apiVersion)
     uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
     return g_getApiVersion(callerToken, apiVersion);
 }
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI

@@ -54,6 +54,7 @@
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::GetDeviceMemMapFd(OHOS::HDI::Usb::V1_0::UsbDev const&, int&)";
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::AsyncSubmitTransfer(OHOS::HDI::Usb::V1_0::UsbDev const&, OHOS::HDI::Usb::V1_2::USBTransferInfo const&, OHOS::sptr<OHOS::HDI::Usb::V1_2::IUsbdTransferCallback> const&, OHOS::sptr<OHOS::Ashmem> const&)";
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::AsyncCancelTransfer(OHOS::HDI::Usb::V1_0::UsbDev const&, int)";
+        "OHOS::HDI::Usb::V1_2::LibusbAdapter::GetDevices(std::__h::vector<OHOS::HDI::Usb::V1_2::DeviceInfo, std::__h::allocator<OHOS::HDI::Usb::V1_2::DeviceInfo>>&)";
     };
   local:
     *;

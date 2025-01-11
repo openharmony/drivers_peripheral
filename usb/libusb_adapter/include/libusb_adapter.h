@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,6 +75,11 @@ struct LibusbAsyncManager {
     std::mutex transferVecLock;
 };
 
+struct DeviceInfo {
+    uint64_t deviceId;
+    uint16_t vendorId;
+};
+
 class LibusbAdapter {
 public:
     LibusbAdapter();
@@ -123,6 +128,7 @@ public:
     int32_t AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info,
         const sptr<V1_2::IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
     int32_t AsyncCancelTransfer(const UsbDev &dev, const int32_t endpoint);
+    int32_t GetDevices(std::vector<struct DeviceInfo> &devices);
 
     static std::shared_ptr<LibusbAdapter> GetInstance();
 
