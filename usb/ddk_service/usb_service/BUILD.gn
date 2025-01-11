@@ -13,7 +13,7 @@
 
 import("//build/config/components/hdi/hdi.gni")
 import("//build/ohos.gni")
-import("./../usb.gni")
+import("./../../usb.gni")
 
 config("ddk_public_config") {
   include_dirs = [
