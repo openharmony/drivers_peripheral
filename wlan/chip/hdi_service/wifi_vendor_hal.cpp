@@ -249,6 +249,7 @@ WifiError WifiVendorHal::CreateVirtualInterface(const std::string& ifname, HalIf
 
 WifiError WifiVendorHal::DeleteVirtualInterface(const std::string& ifname)
 {
+    std::unique_lock<std::mutex> lock(vendorHalMutex);
     WifiError status = globalFuncTable_.vendorHalDeleteIface(
         globalHandle_, ifname.c_str());
     return HandleIfaceChangeStatus(ifname, status);
