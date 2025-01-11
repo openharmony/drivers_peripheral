@@ -21,6 +21,7 @@
 #include <map>
 #include <thread>
 #include <vector>
+#include <mutex>
 
 #include "wifi_hal.h"
 #include "iface_tool.h"
@@ -97,6 +98,7 @@ private:
     bool isPrimary_;
     static CallbackHandler<IChipIfaceCallback> vendorHalCbHandler_;
     static CallbackHandler<IChipIfaceCallback> vendorHalExtCbHandler_;
+    std::mutex vendorHalMutex;
 };
     
 } // namespace v1_0
