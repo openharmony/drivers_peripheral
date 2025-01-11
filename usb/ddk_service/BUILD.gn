@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -24,7 +24,7 @@ config("ddk_public_config") {
   ]
 }
 
-ohos_shared_library("libusb_ddk_service_1.0") {
+ohos_shared_library("libusb_ddk_service_1.1") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -39,6 +39,7 @@ ohos_shared_library("libusb_ddk_service_1.0") {
     "src/usb_ddk_hash.cpp",
     "src/usb_ddk_permission.cpp",
     "src/usb_ddk_service.cpp",
+    "src/usb_driver_manager.cpp",
   ]
   include_dirs = [
     "${usb_driver_path}/interfaces/ddk/host",
@@ -128,7 +129,7 @@ ohos_shared_library("libusb_ddk_driver") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_ddk_stub_1.0",
+      "drivers_interface_usb:libusb_ddk_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -153,7 +154,7 @@ ohos_shared_library("libusb_ddk_driver") {
 group("usb_ddk_target") {
   deps = [
     ":libusb_ddk_driver",
-    ":libusb_ddk_service_1.0",
+    ":libusb_ddk_service_1.1",
     ":usb_ddk_dynamic_library_wrapper",
   ]
 }

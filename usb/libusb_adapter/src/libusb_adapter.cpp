@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,6 +61,7 @@ constexpr int32_t LIBUSB_IO_ERROR_INVALID = 0;
 constexpr const char* USB_DEV_FS_PATH = "/dev/bus/usb";
 constexpr const char* LIBUSB_DEVICE_MMAP_PATH = "/data/service/el1/public/usb/";
 constexpr uint32_t MIN_NUM_OF_ISO_PACKAGE = 1;
+constexpr uint32_t SHIFT_32 = 32;
 static libusb_context *g_libusb_context = nullptr;
 static std::shared_ptr<LibusbAdapter> g_LibusbAdapter = std::make_shared<LibusbAdapter>();
 struct CurrentUsbSetting {
@@ -78,6 +79,11 @@ std::shared_mutex g_mapMutexContext;
 std::shared_mutex g_mapMutexUsbOpenFdMap;
 std::shared_mutex g_mapMutexHandleVector;
 static LibusbAsyncManager g_asyncManager;
+
+static uint64_t ToDdkDeviceId(int32_t busNum, int32_t devNum)
+{
+    return (static_cast<uint64_t>(busNum) << SHIFT_32) + devNum;
+}
 } // namespace
 
 std::shared_ptr<LibusbAdapter> LibusbAdapter::GetInstance()
@@ -2259,6 +2265,26 @@ int32_t LibusbAdapter::WriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, u
         return HDF_FAILURE;
     }
     ashmem->UnmapAshmem();
+    return HDF_SUCCESS;
+}
+
+int32_t LibusbAdapter::GetDevices(std::vector<struct DeviceInfo> &devices)
+{
+    HDF_LOGD("%{public}s: enter", __func__);
+    libusb_device **devs = nullptr;
+    ssize_t count = libusb_get_device_list(g_libusb_context, &devs);
+    HDF_LOGI("%{public}s: libusb_get_device_list return count: %{public}zu", __func__, count);
+    for (ssize_t i = 0; i < count; ++i) {
+        libusb_device *device = devs[i];
+        struct libusb_device_descriptor desc;
+        if (libusb_get_device_descriptor(device, &desc) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: libusb_get_device_descriptor failed", __func__);
+            continue;
+        }
+        uint64_t deviceId = ToDdkDeviceId(libusb_get_bus_number(device), libusb_get_device_address(device));
+        devices.emplace_back(DeviceInfo{deviceId, desc.idVendor});
+    }
+    libusb_free_device_list(devs, 1);
     return HDF_SUCCESS;
 }
 } // namespace V1_2
