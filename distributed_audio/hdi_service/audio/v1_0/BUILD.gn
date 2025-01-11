@@ -15,6 +15,14 @@ import("//build/ohos.gni")
 import("../../../distributedaudio.gni")
 
 ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
   include_dirs = [
     "${hdf_ser_aud_path}/include",
     "${hdf_service_path}/hdi_service/common/include",
@@ -29,6 +37,12 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
     "./src/audio_manager_interface_impl.cpp",
     "./src/audio_render_ext_impl.cpp",
     "./src/audio_render_interface_impl.cpp",
+  ]
+
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
   ]
 
   public_deps = [ "${hdf_service_path}/hdi_service/common:libdaudio_hdf_utils" ]
@@ -67,9 +81,23 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
 }
 
 ohos_shared_library("libdaudio_primary_driver") {
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
   include_dirs = [ "${hdf_ser_aud_path}/include" ]
 
   sources = [ "./src/audio_driver.cpp" ]
+
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
 
   deps = [ "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0" ]
 

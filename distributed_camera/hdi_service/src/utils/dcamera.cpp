@@ -85,11 +85,12 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
         DHLOGE("toEncode is null or len is zero.");
         return ret;
     }
+    int32_t length = static_cast<int32_t>(len);
     uint32_t i = 0;
     unsigned char charArray3[3];
     unsigned char charArray4[4];
 
-    while (len--) {
+    while (length--) {
         charArray3[i++] = *(toEncode++);
         if (i == sizeof(charArray3)) {
             charArray4[INDEX_FIRST] = (charArray3[INDEX_FIRST] & PARAM_FC) >> OFFSET2;
@@ -105,7 +106,7 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
         }
     }
 
-    if (i) {
+    if (i > 0) {
         uint32_t j = 0;
         for (j = i; j < sizeof(charArray3); j++) {
             charArray3[j] = '\0';
