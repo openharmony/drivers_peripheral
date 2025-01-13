@@ -1251,6 +1251,10 @@ int32_t UsbfnMtpImpl::ReadImpl(std::vector<uint8_t> &data)
         req = mtpPort_->standbyReq;
     } else {
         struct DListHead *pool = &mtpPort_->readPool;
+        if (pool == nullptr || DListIsEmpty(pool)) {
+            HDF_LOGE("%{public}s: invalid readPool", __func__);
+            return HDF_DEV_ERR_DEV_INIT_FAIL;
+        }
         req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
         if (req == nullptr) {
             HDF_LOGE("%{public}s: req invalid", __func__);
