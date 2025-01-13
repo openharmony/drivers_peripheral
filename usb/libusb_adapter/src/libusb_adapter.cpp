@@ -1900,7 +1900,7 @@ int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTra
     StartTrace(HITRACE_TAG_USB, "FillAndSubmitTransfer");
     ret = FillAndSubmitTransfer(asyncTransfer, devHandle, buffer, info);
     FinishTrace(HITRACE_TAG_USB);
-	if (ret < 0) {
+    if (ret < 0) {
         HDF_LOGE("%{public}s: libusb_submit_transfer failed, ret: %{public}d", __func__, ret);
         OsalMemFree(buffer);
         buffer = nullptr;
