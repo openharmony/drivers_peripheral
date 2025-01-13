@@ -44,9 +44,9 @@ ohos_shared_library("libusb_adapter") {
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hilog:libhilog",
+      "hitrace:hitrace_meter",
       "ipc:ipc_single",
       "libusb:libusb",
-      "hitrace:hitrace_meter",
     ]
     if (usb_c_utils_enable) {
       external_deps += [ "c_utils:utils" ]
