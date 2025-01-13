@@ -28,6 +28,7 @@ ohos_shared_library("libusb_adapter") {
   include_dirs = [
     "./include",
     "${usb_driver_path}/utils/include",
+    "${usb_driver_path}/../../../base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
   ]
 
   sources = [ "src/libusb_adapter.cpp" ]
@@ -45,6 +46,7 @@ ohos_shared_library("libusb_adapter") {
       "hilog:libhilog",
       "ipc:ipc_single",
       "libusb:libusb",
+      "hitrace:hitrace_meter",
     ]
     if (usb_c_utils_enable) {
       external_deps += [ "c_utils:utils" ]

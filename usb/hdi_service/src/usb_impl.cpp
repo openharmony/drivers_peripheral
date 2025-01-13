@@ -1622,6 +1622,7 @@ int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t al
 int32_t UsbImpl::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data)
 {
 #ifndef LIBUSB_ENABLE
+    HITRACE_METER_NAME(HITRACE_TAG_USB, "UsbImpl::BulkTransferRead");
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1632,7 +1633,9 @@ int32_t UsbImpl::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_
     uint32_t tsize = READ_BUF_SIZE;
     uint32_t actlength = 0;
     UsbdRequestSync *requestSync = nullptr;
+    StartTrace(HITRACE_TAG_USB, "UsbdFindRequestSyncAndCreat");
     int32_t ret = UsbdFindRequestSyncAndCreat(port, pipe.intfId, pipe.endpointId, &requestSync);
+    FinishTrace(HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || requestSync == nullptr) {
         HDF_LOGE("%{public}s:UsbdFindRequestSyncAndCreat failed.", __func__);
         return ret;
@@ -1642,7 +1645,9 @@ int32_t UsbImpl::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_
         HDF_LOGE("%{public}s:invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    StartTrace(HITRACE_TAG_USB, "UsbdBulkReadSyncBase");
     ret = UsbdBulkReadSyncBase(timeout, tbuf, tsize, &actlength, requestSync);
+    FinishTrace(HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS) {
         HDF_LOGW("%{public}s:UsbdBulkReadSyncBase ret:%{public}d, actlength:%{public}u", __func__, ret, actlength);
     }
@@ -1661,11 +1666,14 @@ int32_t UsbImpl::BulkTransferReadwithLength(const UsbDev &dev,
     const UsbPipe &pipe, int32_t timeout, int32_t length, std::vector<uint8_t> &data)
 {
 #ifndef LIBUSB_ENABLE
+    HITRACE_METER_NAME(HITRACE_TAG_USB, "UsbImpl::BulkTransferReadwithLength");
     if (length<= 0) {
         HDF_LOGE("%{public}s:invalid length param, length: %{public}d.", __func__, length);
         return HDF_ERR_INVALID_PARAM;
     }
+    StartTrace(HITRACE_TAG_USB, "FindDevFromService");
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    FinishTrace(HITRACE_TAG_USB);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
@@ -1680,7 +1688,9 @@ int32_t UsbImpl::BulkTransferReadwithLength(const UsbDev &dev,
     uint32_t tsize = static_cast<uint32_t>(length);
     uint32_t actlength = 0;
     UsbdRequestSync *requestSync = nullptr;
+    StartTrace(HITRACE_TAG_USB, "UsbdFindRequestSyncAndCreatwithLength");
     int32_t ret = UsbdFindRequestSyncAndCreatwithLength(port, pipe.intfId, pipe.endpointId, length, &requestSync);
+    FinishTrace(HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || requestSync == nullptr) {
         HDF_LOGE("%{public}s:UsbdFindRequestSyncAndCreat failed.", __func__);
         free(tbuf);
@@ -1694,7 +1704,9 @@ int32_t UsbImpl::BulkTransferReadwithLength(const UsbDev &dev,
         tbuf = nullptr;
         return HDF_ERR_INVALID_PARAM;
     }
+    StartTrace(HITRACE_TAG_USB, "UsbdBulkReadSyncBase");
     ret = UsbdBulkReadSyncBase(timeout, tbuf, tsize, &actlength, requestSync);
+    FinishTrace(HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS) {
         HDF_LOGW("%{public}s:UsbdBulkReadSyncBase ret:%{public}d, actlength:%{public}u", __func__, ret, actlength);
     }
@@ -1715,6 +1727,7 @@ int32_t UsbImpl::BulkTransferWrite(
     const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data)
 {
 #ifndef LIBUSB_ENABLE
+    HITRACE_METER_NAME(HITRACE_TAG_USB, "UsbImpl::BulkTransferWrite");
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1722,7 +1735,9 @@ int32_t UsbImpl::BulkTransferWrite(
     }
 
     UsbdRequestSync *requestSync = nullptr;
+    StartTrace(HITRACE_TAG_USB, "UsbdFindRequestSyncAndCreat");
     int32_t ret = UsbdFindRequestSyncAndCreat(port, pipe.intfId, pipe.endpointId, &requestSync);
+    FinishTrace(HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || requestSync == nullptr) {
         HDF_LOGE("%{public}s:read timeout error", __func__);
         return ret;
@@ -1732,7 +1747,9 @@ int32_t UsbImpl::BulkTransferWrite(
         HDF_LOGE("%{public}s:invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    StartTrace(HITRACE_TAG_USB, "UsbdFindRequestSyncAndCreat");
     ret = UsbdBulkWriteSyncBase(port, requestSync, data.data(), data.size(), timeout);
+    FinishTrace(HITRACE_TAG_USB);
     return ret;
 #else
     return LibusbAdapter::GetInstance()->BulkTransferWrite(dev, pipe, timeout, data);
