@@ -157,7 +157,7 @@ private:
     int32_t DoSyncPipeTranfer(libusb_device_handle *dev_handle, struct libusb_endpoint_descriptor *endpoint,
         unsigned char *buffer, SyncTranfer &syncTranfer);
     unsigned char *GetMmapBufferByFd(int32_t fd, size_t len);
-    unsigned char *GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busAddress, int32_t *fd, size_t len);
+    unsigned char *GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busAddress, int32_t &fd, size_t len);
     int32_t CloseMmapBuffer(void *mmapBuf, size_t length);
     bool CheckDeviceAndConfiguration(libusb_device_handle *handle);
     int32_t GetCurrentConfiguration(libusb_device_handle *handle, int32_t &currentConfig);
