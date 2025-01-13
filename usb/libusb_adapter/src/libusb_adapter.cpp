@@ -598,7 +598,9 @@ int32_t LibusbAdapter::BulkTransferReadwithLength(const UsbDev &dev,
 
     libusb_device_handle* devHandle = nullptr;
     libusb_endpoint_descriptor* endpointDes = nullptr;
+	StartTrace(HITRACE_TAG_USB, "GetEndpointDesc");
     int32_t ret = GetEndpointDesc(dev, pipe, &endpointDes, &devHandle);
+    FinishTrace(HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
         return ret;
@@ -641,7 +643,9 @@ int32_t LibusbAdapter::BulkTransferWrite(
     int32_t actlength = 0;
     libusb_device_handle* devHandle = nullptr;
     libusb_endpoint_descriptor* endpointDes = nullptr;
+	StartTrace(HITRACE_TAG_USB, "GetEndpointDesc");
     int32_t ret = GetEndpointDesc(dev, pipe, &endpointDes, &devHandle);
+    FinishTrace(HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
         return ret;
@@ -884,8 +888,10 @@ int32_t LibusbAdapter::InterruptTransferWrite(
         return HDF_ERR_INVALID_PARAM;
     }
     int transferred = 0;
+    StartTrace(HITRACE_TAG_USB, "libusb_interrupt_transfer");
     ret = libusb_interrupt_transfer(deviceHandle, pipe.endpointId, (unsigned char *)data.data(), data.size(),
         &transferred, timeout);
+    FinishTrace(HITRACE_TAG_USB);
     if (ret == 0 && transferred > 0) {
         HDF_LOGI("%{public}s: InterruptTransferWrite_lhx libusb_interrupt_transfer ok transferred:%{public}d",
             __func__, transferred);
@@ -1869,7 +1875,9 @@ int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTra
         __func__, info.endpoint, info.type, info.length, info.timeOut);
     // 1.get device handle
     libusb_device_handle *devHandle = nullptr;
+    StartTrace(HITRACE_TAG_USB, "FindHandleByDev");
     int32_t ret = FindHandleByDev(dev, &devHandle);
+	FinishTrace(HITRACE_TAG_USB);
     if (ret < 0 || devHandle == nullptr) {
         HDF_LOGE("%{public}s: find libusb device handle failed, ret = %{public}d", __func__, ret);
         return LIBUSB_ERROR_NO_DEVICE;
