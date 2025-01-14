@@ -60,6 +60,7 @@
 static const int MAX_IFACE_LEN = 6;
 
 #define WPA_CTRL_OPEN_IFNAME "@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
+#define P2P_NO_ADD_IFACE_NAME "p2p-dev-wlan0"
 
 static WifiWpaInterface *g_wpaInterface = NULL;
 
@@ -121,6 +122,10 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
             return 0;
         }
         info = info->next;
+    }
+    if (strncmp(argv->name, P2P_NO_ADD_IFACE_NAME, sizeof(argv->name)) == 0) {
+        HDF_LOGI("WpaCliAddIface: p2p name is p2p-dev-wlan0, no need add iface");
+        return 0;
     }
     info = (WpaIfaceInfo *)calloc(1, sizeof(WpaIfaceInfo));
     if (info == NULL) {
