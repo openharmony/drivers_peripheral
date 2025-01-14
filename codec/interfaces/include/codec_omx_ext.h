@@ -338,8 +338,6 @@ enum OmxIndexCodecExType {
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamSupportPackInput,
     /** OMX_CONFIG_BOOLEANTYPE */
-    OMX_IndexParamEnablePackInput,
-    /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamIsMvUpload,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamEnablePackInput,
