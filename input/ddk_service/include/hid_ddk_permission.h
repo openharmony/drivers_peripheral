@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,12 +22,12 @@ namespace OHOS {
 namespace HDI {
 namespace Input {
 namespace Ddk {
-namespace V1_0 {
+namespace V1_1 {
 class DdkPermissionManager {
 public:
     static bool VerifyPermission(std::string permissionName);
 };
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Ddk
 } // namespace Input
 } // namespace HDI

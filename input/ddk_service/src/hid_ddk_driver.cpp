@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,13 @@
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/hid_ddk_stub.h"
+#include "v1_1/hid_ddk_stub.h"
 #include "emit_event_manager.h"
 #include "input_uhdf_log.h"
 
 #define HDF_LOG_TAG hid_ddk_driver
 
-using namespace OHOS::HDI::Input::Ddk::V1_0;
+using namespace OHOS::HDI::Input::Ddk::V1_1;
 
 struct HdfHidDdkHost {
     struct IDeviceIoService ioService;
@@ -69,7 +69,7 @@ static int HdfHidDdkDriverBind(struct HdfDeviceObject *deviceObject)
     hdfHidDdkHost->ioService.Open = NULL;
     hdfHidDdkHost->ioService.Release = NULL;
 
-    auto serviceImpl = OHOS::HDI::Input::Ddk::V1_0::IHidDdk::Get(true);
+    auto serviceImpl = OHOS::HDI::Input::Ddk::V1_1::IHidDdk::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfHidDdkHost;
@@ -77,7 +77,7 @@ static int HdfHidDdkDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfHidDdkHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        OHOS::HDI::Input::Ddk::V1_0::IHidDdk::GetDescriptor());
+        OHOS::HDI::Input::Ddk::V1_1::IHidDdk::GetDescriptor());
     if (hdfHidDdkHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfHidDdkHost;
