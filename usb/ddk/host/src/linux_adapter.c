@@ -419,6 +419,9 @@ static void OsDiscardUrbs(const struct UsbHostRequest *request, int32_t first, i
         }
         if (ioctl(request->devHandle->fd, USBDEVFS_DISCARDURB, urb) == 0) {
             continue;
+        } else if (request->devHandle->dev != NULL) {
+            request->devHandle->dev->discardFailedUrb = (void *)urb;
+            HDF_LOGE("%{public}s:%{public}d discard failed urb: %{public}p", __func__, __LINE__, urb);
         }
     }
 }
@@ -963,6 +966,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
     }
 
     OsalAtomicSet(&dev->refcnt, 1);
+    dev->discardFailedUrb = NULL;
     /* add the new device to the device list on session */
     OsalMutexLock(&session->lock);
     HdfSListAdd(&session->usbDevs, &dev->list);
@@ -1463,7 +1467,7 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
     struct UsbHostRequest *request = NULL;
     int32_t ret;
 
-    if (devHandle == NULL) {
+    if (devHandle == NULL || devHandle->dev == NULL) {
         HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1481,7 +1485,11 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
     }
 
     request = urb->userContext;
-
+    if (devHandle->dev->discardFailedUrb == (void *)urb) {
+        devHandle->dev->discardFailedUrb = NULL;
+        HDF_LOGE("%{public}s:%{public}d reap discardurb", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
     switch (request->requestType) {
         case USB_REQUEST_TYPE_CONTROL:
             ret = OsControlCompletion(request, urb);

@@ -46,6 +46,7 @@ struct UsbDevice {
     struct HdfSList requestList;
     void *privateObject;
     void *privateData;
+    void *discardFailedUrb;
 };
 
 struct UsbDeviceHandle {
