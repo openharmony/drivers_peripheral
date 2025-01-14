@@ -20,6 +20,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <regex.h>
 
 #include "hdf_log.h"
 #include "securec.h"
@@ -29,12 +30,17 @@
 #define PROPERTY_MAX_LEN 128
 #define HDF_LOG_TAG      usb_ddk_sysfs_dev
 
+const int DEC_BASE = 10;
+const int HEX_BASE = 16;
+
 static inline int32_t DdkSysfsGetBase(const char *propName)
 {
-    if (strcmp(propName, "idProduct") == 0 || strcmp(propName, "idVendor") == 0) {
-        return 16; // 16 means hexadecimal
+    if (strcmp(propName, "idProduct") == 0 || strcmp(propName, "idVendor") == 0 ||
+        strcmp(propName, "bInterfaceNumber") == 0 || strcmp(propName, "bInterfaceProtocol") == 0 ||
+        strcmp(propName, "bInterfaceClass") == 0 || strcmp(propName, "bInterfaceSubClass") == 0) {
+        return HEX_BASE;
     }
-    return 10; // 10 means decimal
+    return DEC_BASE;
 }
 
 inline uint64_t DdkSysfsMakeDevAddr(uint32_t busNum, uint32_t devNum)
@@ -227,5 +233,205 @@ int32_t DdkSysfsGetDevice(const char *deviceDir, struct UsbPnpNotifyMatchInfoTab
         return ret;
     }
 
+    return HDF_SUCCESS;
+}
+
+static int32_t DdkSysfsFindDevPath(uint32_t busNum, uint32_t devNum, char *buff, uint32_t buffSize)
+{
+    if (buff == NULL || buffSize == 0) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    int32_t ret = HDF_ERR_OUT_OF_RANGE;
+    DIR *dir = opendir(SYSFS_DEVICES_DIR);
+    if (dir == NULL) {
+        HDF_LOGE("%{public}s: opendir failed sysfsDevDir:%{public}s", __func__, SYSFS_DEVICES_DIR);
+        return HDF_ERR_BAD_FD;
+    }
+
+    struct dirent *devHandle;
+    while ((devHandle = readdir(dir)) != NULL) {
+        if ((uint32_t)strtol(devHandle->d_name, NULL, DEC_BASE) != busNum || strchr(devHandle->d_name, ':')) {
+            continue;
+        }
+        int64_t value = 0;
+        ret = DdkSysfsReadProperty(devHandle->d_name, "devnum", &value, INT32_MAX);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: retrieve devnum failed:%{public}d", __func__, ret);
+            break;
+        }
+        if ((uint32_t)value != devNum) {
+            continue;
+        }
+
+        errno_t err = strncpy_s(buff, buffSize, devHandle->d_name, buffSize - 1);
+        if (err != 0) {
+            HDF_LOGE("%{public}s: strncpy_s error for devHandle->d_name:%{public}s", __func__, devHandle->d_name);
+            break;
+        }
+
+        break;
+    }
+
+    closedir(dir);
+    return ret;
+}
+
+static int32_t DdkSysfsFindIntfPath(char *deviceDir, uint8_t intfNum, char *buff, uint32_t buffSize)
+{
+    if (deviceDir == NULL || buff == NULL || buffSize == 0) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    int32_t ret = HDF_ERR_OUT_OF_RANGE;
+    int32_t num = sprintf_s(buff, buffSize, "%s%s/", SYSFS_DEVICES_DIR, deviceDir);
+    if (num <= 0) {
+        HDF_LOGE("%{public}s: sprintf_s error deviceDir:%{public}s", __func__, deviceDir);
+        return HDF_FAILURE;
+    }
+
+    DIR *dir = opendir(buff);
+    if (dir == NULL) {
+        HDF_LOGE("%{public}s: opendir failed buff:%{public}s", __func__, buff);
+        return HDF_ERR_BAD_FD;
+    }
+
+    struct dirent *devHandle;
+    while ((devHandle = readdir(dir)) != NULL) {
+        if (strncmp(devHandle->d_name, deviceDir, strlen(deviceDir)) != 0) {
+            continue;
+        }
+
+        struct UsbPnpNotifyInterfaceInfo intf;
+        ret = DdkSysfsGetInterface(deviceDir, devHandle->d_name, &intf);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: DdkSysfsGetInterface failed:%{public}d", __func__, ret);
+            break;
+        }
+
+        if (intf.interfaceNumber != intfNum) {
+            continue;
+        }
+
+        errno_t err = strncat_s(buff, buffSize, devHandle->d_name, buffSize - strlen(buff) - 1);
+        if (err == 0) {
+            ret = HDF_SUCCESS;
+            break;
+        }
+    }
+
+    closedir(dir);
+    return ret;
+}
+
+static bool DdkCheckProductDir(char *inputString)
+{
+    if (inputString == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return false;
+    }
+
+    regex_t regex;
+    const char *pattern = "^[0-9A-F]{4}:[0-9A-F]{4}:[0-9A-F]{4}\\.[0-9A-F]{4}$";
+    int32_t ret = regcomp(&regex, pattern, REG_EXTENDED);
+    if (ret != 0) {
+        HDF_LOGE("%{public}s: Could not compile regex", __func__);
+        return false;
+    }
+
+    ret = regexec(&regex, inputString, 0, NULL, 0);
+    regfree(&regex);
+    return ret == 0;
+}
+
+static int32_t DdkSysfsFindDevNodeName(char *path, const char *prefix, char *buff, uint32_t buffSize)
+{
+    if (path == NULL || prefix == NULL || buff == NULL || buffSize == 0) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    int32_t ret = HDF_ERR_OUT_OF_RANGE;
+    DIR *dir = opendir(path);
+    if (dir == NULL) {
+        HDF_LOGE("%{public}s: opendir failed path:%{public}s", __func__, path);
+        return HDF_ERR_BAD_FD;
+    }
+
+    struct dirent *devHandle;
+    while ((devHandle = readdir(dir)) != NULL) {
+        char *pSubStrOffset = strstr(devHandle->d_name, prefix);
+        if (pSubStrOffset != NULL && strlen(devHandle->d_name) > strlen(prefix)) {
+            errno_t err = strncpy_s(buff, buffSize, devHandle->d_name, buffSize - 1);
+            if (err != 0) {
+                HDF_LOGE("%{public}s: strncpy_s error for devHandle->d_name:%{public}s", __func__, devHandle->d_name);
+                ret = HDF_FAILURE;
+                break;
+            }
+            ret = HDF_SUCCESS;
+            break;
+        }
+
+        if (!DdkCheckProductDir(devHandle->d_name) && strcmp(devHandle->d_name, prefix) != 0) {
+            continue;
+        }
+
+        char subPath[SYSFS_PATH_LEN] = { 0x00 };
+        int32_t num = sprintf_s(subPath, sizeof(subPath), "%s/%s", path, devHandle->d_name);
+        if (num <= 0) {
+            HDF_LOGE("%{public}s: sprintf_s error devHandle->d_name:%{public}s", __func__, devHandle->d_name);
+            ret = HDF_FAILURE;
+            break;
+        }
+
+        ret = DdkSysfsFindDevNodeName(subPath, prefix, buff, buffSize);
+        if (ret != HDF_ERR_OUT_OF_RANGE) {
+            HDF_LOGI("%{public}s: subPath:%{public}s", __func__, subPath);
+            break;
+        }
+    }
+
+    closedir(dir);
+    return ret;
+}
+
+int32_t DdkSysfsGetDevNodePath(DevInterfaceInfo *devInfo, const char *prefix, char *buff, uint32_t buffSize)
+{
+    if (devInfo == NULL || buff == NULL || buffSize == 0) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    char devicePath[SYSFS_PATH_LEN] = { 0x00 };
+    int32_t ret = DdkSysfsFindDevPath(devInfo->busNum, devInfo->devNum, devicePath, sizeof(devicePath));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: retrieve device path failed, ret:%{public}d", __func__, ret);
+        return ret;
+    }
+    char fullPath[SYSFS_PATH_LEN] = { 0x00 };
+    ret = DdkSysfsFindIntfPath(devicePath, devInfo->intfNum, fullPath, sizeof(fullPath));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: retrieve interface path failed, ret:%{public}d", __func__, ret);
+        return ret;
+    }
+
+    HDF_LOGI("%{public}s: fullPath [%{public}s]", __func__, fullPath);
+
+    char nodeName[SYSFS_PATH_LEN] = { 0x00 };
+    ret = DdkSysfsFindDevNodeName(fullPath, prefix, nodeName, sizeof(nodeName));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: retrieve device file path failed, ret:%{public}d", __func__, ret);
+        return ret;
+    }
+
+    int32_t num = sprintf_s(buff, buffSize, "/dev/%s", nodeName);
+    if (num <= 0) {
+        HDF_LOGE("%{public}s: sprintf_s error nodeName:%{public}s", __func__, nodeName);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("%{public}s: devPath [%{public}s]", __func__, buff);
     return HDF_SUCCESS;
 }

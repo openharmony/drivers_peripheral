@@ -53,6 +53,9 @@
             "inner_kits": [
                 {
                     "name":"//drivers/peripheral/usb/hdi_service:libusb_interface_service_1.2"
+                },
+                {
+                    "name":"//drivers/peripheral/usb/ddk:libusb_pnp_manager"
                 }
             ]
         }
