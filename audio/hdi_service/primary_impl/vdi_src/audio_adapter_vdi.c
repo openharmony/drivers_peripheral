@@ -25,6 +25,7 @@
 #include "audio_render_vdi.h"
 #include "audio_dfx_vdi.h"
 #include "v4_0/iaudio_callback.h"
+#include "stub_collector.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 static pthread_mutex_t g_adapterMutex;
@@ -702,7 +703,7 @@ void AudioReleaseAdapterVdi(uint32_t descIndex)
     }
 
     struct AudioAdapterPrivVdi *priv = AudioAdapterGetPrivVdi();
-
+    StubCollectorRemoveObject(IAUDIOADAPTER_INTERFACE_DESC, priv->adapterInfo[descIndex].adapter);
     OsalMemFree((void *)priv->adapterInfo[descIndex].adapter);
     priv->adapterInfo[descIndex].adapter = NULL;
     priv->adapterInfo[descIndex].vdiAdapter = NULL;
