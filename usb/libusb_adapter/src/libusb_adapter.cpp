@@ -598,7 +598,7 @@ int32_t LibusbAdapter::BulkTransferReadwithLength(const UsbDev &dev,
 
     libusb_device_handle* devHandle = nullptr;
     libusb_endpoint_descriptor* endpointDes = nullptr;
-	StartTrace(HITRACE_TAG_USB, "GetEndpointDesc");
+    StartTrace(HITRACE_TAG_USB, "GetEndpointDesc");
     int32_t ret = GetEndpointDesc(dev, pipe, &endpointDes, &devHandle);
     FinishTrace(HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
@@ -643,7 +643,7 @@ int32_t LibusbAdapter::BulkTransferWrite(
     int32_t actlength = 0;
     libusb_device_handle* devHandle = nullptr;
     libusb_endpoint_descriptor* endpointDes = nullptr;
-	StartTrace(HITRACE_TAG_USB, "GetEndpointDesc");
+    StartTrace(HITRACE_TAG_USB, "GetEndpointDesc");
     int32_t ret = GetEndpointDesc(dev, pipe, &endpointDes, &devHandle);
     FinishTrace(HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
@@ -1877,7 +1877,7 @@ int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTra
     libusb_device_handle *devHandle = nullptr;
     StartTrace(HITRACE_TAG_USB, "FindHandleByDev");
     int32_t ret = FindHandleByDev(dev, &devHandle);
-	FinishTrace(HITRACE_TAG_USB);
+    FinishTrace(HITRACE_TAG_USB);
     if (ret < 0 || devHandle == nullptr) {
         HDF_LOGE("%{public}s: find libusb device handle failed, ret = %{public}d", __func__, ret);
         return LIBUSB_ERROR_NO_DEVICE;
