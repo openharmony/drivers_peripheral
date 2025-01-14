@@ -32,6 +32,11 @@ enum P2pWpsMethod {
     P2P_WPS_METHOD_INVALID
 };
 
+enum P2pRemoveGroupEvent {
+    P2P_REMOVE_GROUP_CLIENT = 0,
+    EVENT_MAX
+};
+
 int32_t WpaInterfaceP2pSetSsidPostfixName(struct IWpaInterface *self, const char *ifName, const char *name);
 
 int32_t WpaInterfaceP2pSetWpsDeviceType(struct IWpaInterface *self, const char *ifName, const char *type);
