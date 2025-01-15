@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,9 +20,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "usb_host_data.h"
 #include "usbd.h"
 #include "v1_0/iusbd_subscriber.h"
 #include "v1_2/usb_types.h"
+#include "v2_0/iusbd_subscriber.h"
 
 #define DEFAULT_PORT_ID 1
 
@@ -56,8 +58,11 @@ public:
     static UsbdPort &GetInstance();
     int32_t SetPort(int32_t portId, int32_t powerRole, int32_t dataRole,
         UsbdSubscriber *usbdSubscribers, uint32_t len);
+    int32_t SetUsbPort(int32_t portId, int32_t powerRole, int32_t dataRole,
+        HDI::Usb::V2_0::UsbdSubscriber *usbdSubscribers, uint32_t len);
     int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode);
     int32_t UpdatePort(int32_t mode, const sptr<HDI::Usb::V1_2::IUsbdSubscriber> &subscriber);
+    int32_t UpdateUsbPort(int32_t mode, const sptr<HDI::Usb::V2_0::IUsbdSubscriber> &subscriber);
     void setPortPath(const std::string &path);
 
 private:
@@ -74,6 +79,7 @@ private:
     int32_t ReadPortFile(int32_t &powerRole, int32_t &dataRole, int32_t &mode);
     int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole);
     HDI::Usb::V1_2::PortInfo currentPortInfo_ = {DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE, PORT_MODE_DEVICE};
+    HDI::Usb::V2_0::PortInfo currentPortInfos_ = {DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE, PORT_MODE_DEVICE};
     std::string path_;
 };
 } // namespace V1_2

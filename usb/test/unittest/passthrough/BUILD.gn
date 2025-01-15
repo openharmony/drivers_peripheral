@@ -1,0 +1,490 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("./../../../usb.gni")
+
+module_output_path = "drivers_peripheral_usb/usb"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "include",
+    "${usb_driver_path}/test/UsbSubTest",
+    "${usb_driver_path}/utils/include",
+  ]
+}
+
+ohos_unittest("test_feature_transfer") {
+  sources = [
+    "${usb_driver_path}/test/UsbSubTest/UsbSubTest.cpp",
+    "src/usbd_transfer_test.cpp",
+  ]
+
+  include_dirs = [ "${usb_driver_path}/test/UsbSubTest" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+ohos_unittest("test_feature_device") {
+  sources = [
+    "${usb_driver_path}/test/UsbSubTest/UsbSubTest.cpp",
+    "src/usbd_device_test.cpp",
+  ]
+
+  include_dirs = [
+    "${usb_driver_path}/test/UsbSubTest",
+    "${usb_driver_path}/utils/include",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_feature_function") {
+  sources = [ "src/usbd_function_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_port_interface_service_2.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_feature_request") {
+  sources = [
+    "${usb_driver_path}/test/UsbSubTest/UsbSubTest.cpp",
+    "src/usbd_request_test.cpp",
+  ]
+
+  include_dirs = [
+    "${usb_driver_path}/test/UsbSubTest",
+    "${usb_driver_path}/utils/include",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_port_interface_service_2.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_feature_usbfnmtp") {
+  sources = [ "src/usbfn_mtp_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_1.1",
+      "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_feature_manageinterface") {
+  sources = [
+    "${usb_driver_path}/test/UsbSubTest/UsbSubTest.cpp",
+    "src/usbd_manage_interface_test.cpp",
+  ]
+
+  include_dirs = [ "${usb_driver_path}/test/UsbSubTest" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_port_interface_service_2.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_feature_devicestatus") {
+  sources = [
+    "${usb_driver_path}/test/UsbSubTest/UsbSubTest.cpp",
+    "src/usbd_device_status_test.cpp",
+  ]
+
+  include_dirs = [ "${usb_driver_path}/test/UsbSubTest" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_feature_accessory") {
+  sources = [
+    "${usb_driver_path}/test/UsbSubTest/UsbSubTest.cpp",
+    "src/usbd_accessory_test.cpp",
+  ]
+
+  include_dirs = [ "${usb_driver_path}/test/UsbSubTest" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_feature_interrupt_transfer") {
+  sources = [
+    "${usb_driver_path}/test/UsbSubTest/UsbSubTest.cpp",
+    "src/usbd_interrupt_transfer_test.cpp",
+  ]
+
+  include_dirs = [ "${usb_driver_path}/test/UsbSubTest" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_port_interface_service_2.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_feature_asynctransfer") {
+  sources = [
+    "${usb_driver_path}/test/UsbSubTest/UsbSubTest.cpp",
+    "src/usbd_async_transfer_test.cpp",
+  ]
+
+  include_dirs = [ "${usb_driver_path}/test/UsbSubTest" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_port_interface_service_2.0",
+    "${usb_driver_path}/libusb_adapter:libusb_adapter",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "libusb:libusb",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+group("passthrough_test") {
+  testonly = true
+  deps = [
+    ":test_feature_accessory",
+    ":test_feature_asynctransfer",
+    ":test_feature_device",
+    ":test_feature_devicestatus",
+    ":test_feature_function",
+    ":test_feature_interrupt_transfer",
+    ":test_feature_manageinterface",
+    ":test_feature_request",
+    ":test_feature_transfer",
+    "${usb_driver_path}/sample/device/linux:usb_dev_test",
+  ]
+}

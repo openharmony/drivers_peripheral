@@ -24,6 +24,7 @@
 #include <libusb.h>
 
 #include "v1_2/iusb_interface.h"
+#include "v2_0/iusb_host_interface.h"
 
 namespace OHOS {
 namespace HDI {
@@ -80,6 +81,42 @@ struct DeviceInfo {
     uint16_t vendorId;
 };
 
+struct LibusbBulkTransfer {
+    explicit LibusbBulkTransfer()
+    {
+        bulkTransferRef = libusb_alloc_transfer(0);
+        buikAshmemRef = nullptr;
+        bulkCbRef = nullptr;
+    }
+
+    ~LibusbBulkTransfer()
+    {
+        if (bulkTransferRef != nullptr) {
+            libusb_free_transfer(bulkTransferRef);
+            bulkTransferRef = nullptr;
+        }
+        buikAshmemRef = nullptr;
+        bulkCbRef = nullptr;
+    }
+
+    libusb_transfer *bulkTransferRef;
+    sptr<Ashmem> buikAshmemRef;
+    sptr<V2_0::IUsbdBulkCallback> bulkCbRef;
+    int32_t busNum;
+    int32_t devAddr;
+    bool isTransferring {false};
+};
+
+struct LibusbBulkWrapper {
+    std::list<LibusbBulkTransfer *> bulkTransferList;
+    std::mutex bulkTransferLock;
+};
+
+struct LibusbBulkManager {
+    std::vector<std::pair<UsbDev, LibusbBulkWrapper*>> bulktransferVec;
+    std::mutex bulkTransferVecLock;
+};
+
 class LibusbAdapter {
 public:
     LibusbAdapter();
@@ -123,18 +160,28 @@ public:
     int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
     int32_t GetCurrentInterfaceSetting(const UsbDev &dev, uint8_t &settingIndex);
     int32_t GetDeviceMemMapFd(const UsbDev &dev, int &fd);
-	
+    int32_t SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
+    int32_t RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
+
     /* Async Transfer */
     int32_t AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info,
         const sptr<V1_2::IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
     int32_t AsyncCancelTransfer(const UsbDev &dev, const int32_t endpoint);
     int32_t GetDevices(std::vector<struct DeviceInfo> &devices);
 
+    /* Bulk Transfer */
+    int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem);
+    int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem);
+    int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe);
+    int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<V2_0::IUsbdBulkCallback> &cb);
+    int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe);
+
     static std::shared_ptr<LibusbAdapter> GetInstance();
 
 private:
     int32_t LibUSBInit();
     void LibUSBExit();
+    void GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSubscriber> subscriber);
     int32_t GetUsbDevice(const UsbDev &dev, libusb_device **device);
     int32_t FindHandleByDev(const UsbDev &dev, libusb_device_handle **handle);
     int32_t DeleteHandleVectorAndSettingsMap(const UsbDev &dev, libusb_device_handle* handle);
@@ -185,9 +232,28 @@ private:
     static int32_t WriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer);
     static void LIBUSB_CALL HandleAsyncResult(struct libusb_transfer *transfer);
 
+    /* Bulk Transfer */
+    static int32_t BulkReadAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer);
+    static int32_t BulkWriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer);
+    uint8_t *AllocBulkBuffer(const UsbPipe &pipe, const int32_t &length, const sptr<Ashmem> &ashmem);
+    static void DeleteBulkTransferFromList(LibusbBulkTransfer *bulkTransfer);
+    static void HandleBulkFail(struct libusb_transfer *transfer);
+    static void BulkFeedbackToBase(struct libusb_transfer *transfer);
+    static void LIBUSB_CALL HandleBulkResult(struct libusb_transfer *transfer);
+    void BulkTransferInit(const UsbDev &dev);
+    void BulkTransferRelease(const UsbDev &dev);
+    void DeleteBulkDevRequest(const UsbDev &dev);
+    void ClearBulkTranfer(LibusbBulkWrapper *bulkWrapper);
+    static LibusbBulkWrapper *GetBulkWrapper(const UsbDev &dev);
+    LibusbBulkTransfer *FindBulkTransfer(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem);
+
+    static int HotplugCallback(libusb_context* ctx, libusb_device* device,
+        libusb_hotplug_event event, void* user_data);
 private:
     std::atomic<bool> isRunning;
     std::thread eventThread;
+    libusb_hotplug_callback_handle hotplug_handle_;
+    static std::list<sptr<V2_0::IUsbdSubscriber>> subscribers_;
 };
 } // namespace V1_2
 } // namespace Usb
