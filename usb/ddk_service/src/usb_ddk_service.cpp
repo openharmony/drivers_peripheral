@@ -132,7 +132,7 @@ int32_t CheckCompleteStatus(struct UsbRequest *request)
         return ret;
     }
 
-    if (apiVersion >= API_VERSION_ID && request->compInfo.status != USB_REQUEST_COMPLETED) {
+    if (apiVersion >= API_VERSIVersion >= API_VERSION_ID && request->compInfo.status != USB_REQUEST_COMPLETED) {
         return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
@@ -635,7 +635,7 @@ int32_t UsbDdkService::SendPipeRequest(
         HDF_LOGE("%{public}s submit request failed %{public}d", __func__, ret);
         goto FINISHED;
     }
-
+    ret = CheckCompleteStatus(request);
     transferedLength = request->compInfo.actualLength;
 FINISHED:
     (void)UsbFreeRequestByMmap(request);
@@ -681,6 +681,7 @@ int32_t SubmitRequestWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem &ash
     }
 
     transferredLength = request->compInfo.actualLength;
+    ret = CheckCompleteStatus(request);
 FINISHED:
     (void)UsbFreeRequestByMmap(request);
     close(ashmem.ashmemFd);
