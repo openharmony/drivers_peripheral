@@ -171,9 +171,340 @@ ohos_shared_library("libusb_driver") {
   part_name = "drivers_peripheral_usb"
 }
 
+ohos_shared_library("libusb_port_interface_service_2.0") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/usb_port_impl.cpp",
+    "src/usbd_function.cpp",
+    "src/usbd_load_usb_service.cpp",
+    "src/usbd_port.cpp",
+  ]
+
+  configs = [ ":usbd_private_config" ]
+
+  public_configs = [ ":usbd_public_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_ddk_host",
+    "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:usb_idl_headers_2.0",
+      "drivers_interface_usb:usbfn_mtp_idl_headers",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
+      "init:libbegetutil",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
+    if (usb_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_HISYSEVENT" ]
+      } else {
+        defines = [ "USB_ENABLE_HISYSEVENT" ]
+      }
+    }
+
+    if (usb_samgr_enable) {
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [
+      "drivers_interface_usb:libusbfn_mtp_stub_1.0",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+ohos_shared_library("libusb_port_driver") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [ "src/usb_port_interface_driver.cpp" ]
+
+  public_deps = [ ":libusb_port_interface_service_2.0" ]
+
+  shlib_type = "hdi"
+
+  configs = [ ":usbd_private_config" ]
+
+  public_configs = [ ":usbd_public_config" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_stub_2.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [
+      "drivers_interface_usb:libusb_stub_2.0",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+ohos_shared_library("libusb_host_interface_service_2.0") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/usb_host_impl.cpp",
+    "src/usb_transfer_callback.cpp",
+    "src/usbd_function.cpp",
+    "src/usbd_load_usb_service.cpp",
+    "src/usbd_port.cpp",
+  ]
+
+  configs = [ ":usbd_private_config" ]
+
+  public_configs = [ ":usbd_public_config" ]
+
+  deps = [
+    "${usb_driver_path}/libusb_adapter:libusb_adapter",
+    "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:usb_idl_headers_2.0",
+      "drivers_interface_usb:usbfn_mtp_idl_headers",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
+      "init:libbegetutil",
+      "ipc:ipc_single",
+      "libusb:libusb",
+      "samgr:samgr_proxy",
+    ]
+    if (usb_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_HISYSEVENT" ]
+      } else {
+        defines = [ "USB_ENABLE_HISYSEVENT" ]
+      }
+    }
+
+    if (usb_samgr_enable) {
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [
+      "drivers_interface_usb:libusbfn_mtp_stub_1.0",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  innerapi_tags = [ "passthrough_indirect" ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+ohos_shared_library("libusb_device_interface_service_2.0") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/usb_device_impl.cpp",
+    "src/usbd_accessory.cpp",
+    "src/usbd_function.cpp",
+    "src/usbd_load_usb_service.cpp",
+  ]
+
+  configs = [ ":usbd_private_config" ]
+
+  public_configs = [ ":usbd_public_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_ddk_host",
+    "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:usb_idl_headers_2.0",
+      "drivers_interface_usb:usbfn_mtp_idl_headers",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
+      "init:libbegetutil",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
+    if (usb_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_HISYSEVENT" ]
+      } else {
+        defines = [ "USB_ENABLE_HISYSEVENT" ]
+      }
+    }
+
+    if (usb_samgr_enable) {
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [
+      "drivers_interface_usb:libusbfn_mtp_stub_1.0",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+ohos_shared_library("libusb_device_driver") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [ "src/usb_device_interface_driver.cpp" ]
+
+  public_deps = [ ":libusb_device_interface_service_2.0" ]
+
+  shlib_type = "hdi"
+
+  configs = [ ":usbd_private_config" ]
+
+  public_configs = [ ":usbd_public_config" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_stub_2.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [
+      "drivers_interface_usb:libusb_stub_2.0",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
 group("hdi_usb_service") {
   deps = [
+    ":libusb_device_driver",
+    ":libusb_device_interface_service_2.0",
     ":libusb_driver",
+    ":libusb_host_interface_service_2.0",
     ":libusb_interface_service_1.2",
+    ":libusb_port_driver",
+    ":libusb_port_interface_service_2.0",
   ]
 }

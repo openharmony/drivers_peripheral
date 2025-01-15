@@ -30,6 +30,7 @@ if (defined(ohos_lite)) {
       "fuzztest/usbgetdevices_fuzzer:fuzztest",
       "unittest/hal:hal_test",
       "unittest/mock:usb_mock_test",
+      "unittest/passthrough:passthrough_test",
     ]
   }
 }
