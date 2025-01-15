@@ -132,7 +132,7 @@ int32_t CheckCompleteStatus(struct UsbRequest *request)
         return ret;
     }
 
-    if (apiVersion >= API_VERSIVersion >= API_VERSION_ID && request->compInfo.status != USB_REQUEST_COMPLETED) {
+    if (apiVersion >= API_VERSION_ID && request->compInfo.status != USB_REQUEST_COMPLETED) {
         return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
