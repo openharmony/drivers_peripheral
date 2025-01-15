@@ -1256,8 +1256,6 @@ unsigned char *LibusbAdapter::GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busA
     HDF_LOGD("%{public}s open is already on, fd: %{public}d", __func__, info->second);
     unsigned char *memBuf = GetMmapBufferByFd(fd, len);
     if (memBuf == nullptr) {
-        close(fd);
-        g_usbOpenFdMap.erase(info);
         HDF_LOGE("%{public}s: GetMmapBufferByFd failed",  __func__);
         return nullptr;
     }
@@ -1331,7 +1329,6 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpoint
     }
     transferedLength = actlength;
     CloseMmapBuffer(buffer, size);
-    close(mmapFd);
     HDF_LOGI("%{public}s leave", __func__);
     return ret;
 }
@@ -1897,6 +1894,7 @@ int32_t LibusbAdapter::AsyncCancelTransfer(const UsbDev &dev, const int32_t endp
 {
     HDF_LOGI("%{public}s: cancel transfer start", __func__);
     int ret = HDF_FAILURE;
+    std::lock_guard<std::mutex> managerLock(g_asyncManager.transferVecLock);
     auto asyncWrapper = GetAsyncWrapper(dev);
     if (!asyncWrapper) {
         HDF_LOGE("%{public}s: get async wrapper failed", __func__);
@@ -2101,6 +2099,7 @@ void LibusbAdapter::DeleteTransferFromList(LibusbAsyncTransfer *asyncTransfer)
     HDF_LOGI("%{public}s: enter delete transfer from list, bus num: %{public}d, dev addr: %{public}d",
         __func__, asyncTransfer->busNum, asyncTransfer->devAddr);
 
+    std::lock_guard<std::mutex> managerLock(g_asyncManager.transferVecLock);
     LibusbAsyncWrapper *asyncWrapper = GetAsyncWrapper({asyncTransfer->busNum, asyncTransfer->devAddr});
     if (asyncWrapper == nullptr) {
         HDF_LOGE("%{public}s: get async wrapper failed", __func__);
@@ -2122,7 +2121,6 @@ void LibusbAdapter::DeleteTransferFromList(LibusbAsyncTransfer *asyncTransfer)
 
 LibusbAsyncWrapper *LibusbAdapter::GetAsyncWrapper(const UsbDev &dev)
 {
-    std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
     LibusbAsyncWrapper *asyncWrapper = nullptr;
 
     for (size_t i = 0; i < g_asyncManager.transferVec.size(); ++i) {
@@ -2165,7 +2163,7 @@ void LibusbAdapter::AddTransferToList(LibusbAsyncTransfer *asyncTransfer)
         HDF_LOGW("%{public}s: async transfer or libusb transfer is nullptr", __func__);
         return;
     }
-
+    std::lock_guard<std::mutex> managerLock(g_asyncManager.transferVecLock);
     LibusbAsyncWrapper *asyncWrapper = GetAsyncWrapper({asyncTransfer->busNum, asyncTransfer->devAddr});
     if (asyncWrapper == nullptr) {
         HDF_LOGE("%{public}s: get async wrapper failed", __func__);
