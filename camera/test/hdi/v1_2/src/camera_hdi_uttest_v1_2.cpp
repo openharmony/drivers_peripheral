@@ -491,7 +491,9 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_011, TestSize.Level1)
 
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_012, TestSize.Level1)
 {
+    EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_SUPPORTED_COLOR_MODES, &entry);
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {

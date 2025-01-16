@@ -405,4 +405,5 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_021, TestSize.Level1)
     common_metadata_header_t* data = cameraTest->ability->get();
     std::string metaStr = FormatCameraMetadataToString(data);
     CAMERA_LOGI("HdiHostUtTest matestr %{public}s\n", metaStr.c_str());
+    EXPECT_FALSE(metaStr.empty());
 }

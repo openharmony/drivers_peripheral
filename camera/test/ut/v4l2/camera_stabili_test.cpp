@@ -93,6 +93,7 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
     } else {
         CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", cameraBase_->rc);
     }
+    EXPECT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
 
     // get preview
     cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
@@ -150,6 +151,7 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_002, TestSize.Level1)
     } else {
         CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", cameraBase_->rc);
     }
+    EXPECT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(3);
 
     // release stream

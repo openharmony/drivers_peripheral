@@ -49,7 +49,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_001, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -73,7 +74,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_002, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -97,7 +99,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_003, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -121,7 +124,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_004, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -145,7 +149,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_005, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -169,7 +174,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_006, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -193,7 +199,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_007, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -217,7 +224,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_008, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -241,7 +249,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_009, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -265,7 +274,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_010, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     cameraTest->GetCameraMetadata();
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -289,7 +299,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_011, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
@@ -325,7 +336,8 @@ HWTEST_F(Camera3AUtTest, Camera_3a_012, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(3); // sleep for 3 seconds
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview};
