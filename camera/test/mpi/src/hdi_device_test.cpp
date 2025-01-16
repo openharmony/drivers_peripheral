@@ -76,7 +76,8 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0060, TestSize.Level0)
     // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
-    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
+    auto ret = meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
+    EXPECT_EQ(ret, true);
     Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::cout << "cameraDevice->UpdateSettings's rc " << Test_->rc << std::endl;
@@ -101,9 +102,11 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0061, TestSize.Level2)
     // Issue 3A parameters
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
-    meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    auto ret = meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    EXPECT_EQ(ret, true);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_AUTO." << std::endl;
-    Test_->cameraDevice->UpdateSettings(meta);
+    Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     sleep(2);
     // Release stream
     Test_->streamIds = {Test_->streamId_preview};
@@ -131,9 +134,11 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0062, TestSize.Level2)
     // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT;
-    meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    auto ret = meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    EXPECT_EQ(ret, true);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT." << std::endl;
-    Test_->cameraDevice->UpdateSettings(meta);
+    Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     sleep(2);
     // Release stream
     Test_->captureIds = {Test_->captureId_preview};
@@ -161,9 +166,11 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0063, TestSize.Level2)
     // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
-    meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    auto ret = meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    EXPECT_EQ(ret, true);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_TWILIGHT." << std::endl;
-    Test_->cameraDevice->UpdateSettings(meta);
+    Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     sleep(2);
     // Release stream
     Test_->captureIds = {Test_->captureId_preview};
@@ -191,9 +198,11 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0065, TestSize.Level2)
     // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_FLUORESCENT;
-    meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    auto ret = meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    EXPECT_EQ(ret, true);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_FLUORESCENT." << std::endl;
-    Test_->cameraDevice->UpdateSettings(meta);
+    Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     sleep(2);
     // Release stream
     Test_->captureIds = {Test_->captureId_preview};
@@ -221,9 +230,11 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0066, TestSize.Level2)
     // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT;
-    meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    auto ret = meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    EXPECT_EQ(ret, true);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT." << std::endl;
-    Test_->cameraDevice->UpdateSettings(meta);
+    Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+    EXPECT_EQ(Test_->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(2);
     // Release stream
     Test_->captureIds = {Test_->captureId_preview};
@@ -251,7 +262,8 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0067, TestSize.Level2)
     // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AE_MODE_ON_ALWAYS_FLASH;
-    meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    auto ret = meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
+    EXPECT_EQ(ret, true);
     Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
     std::cout << "cameraDevice->UpdateSettings's rc " << Test_->rc << std::endl;
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -282,7 +294,8 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0068, TestSize.Level2)
     // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xFFFF;
-    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
+    auto ret = meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
+    EXPECT_EQ(ret, true);
     Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
     std::cout << "cameraDevice->UpdateSettings's rc " << Test_->rc << std::endl;
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);

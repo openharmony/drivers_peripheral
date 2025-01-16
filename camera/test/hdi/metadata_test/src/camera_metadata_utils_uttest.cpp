@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "camera_metadata_utils_uttest.h"
-
+#include "camera_error_log_detector.h"
 using namespace OHOS;
 using namespace std;
 using namespace testing::ext;
@@ -192,6 +192,7 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_004, TestSize.Level1)
  */
 HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_005, TestSize.Level1)
 {
+    LOG_SetCallback(CameraErrorLogDetector::RegisterErrLogCallback);
     //item.count = MAX_SUPPORTED_ITEMS + 1
     uint32_t exceedMaxSupportedItem = MAX_SUPPORTED_ITEMS + 1;
     vector<uint8_t> metaVec = {232, 3, 0, 0, 16, 39, 0, 0, 160, 134, 1, 0};
@@ -202,6 +203,7 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_005, TestSize.Level1)
     metaVec[27] = exceedMaxSupportedItem;
     auto metaData = make_shared<CameraMetadata>(MAX_ITEM_CAPACITY, MAX_DATA_CAPACITY);
     MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
+    EXPECT_TRUE(CameraErrorLogDetector::IsErrorLogContains("ConvertVecToMetadata item.count out of range"));
 
     //dataCapacity = MAX_DATA_CAPACITY + 1
     uint32_t exceedMaxDataCapacity = MAX_DATA_CAPACITY +1;
@@ -210,6 +212,7 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_005, TestSize.Level1)
     metaVec[10] = exceedMaxDataCapacity >> 8;
     metaVec[11] = exceedMaxDataCapacity;
     MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
+    EXPECT_TRUE(CameraErrorLogDetector::IsErrorLogContains("ConvertVecToMetadata dataCapacity out of range"));
 
     //itemCapacity = MAX_ITEM_CAPACITY + 1
     uint32_t exceedMaxItemCapacity = MAX_ITEM_CAPACITY + 1;
@@ -218,6 +221,7 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_005, TestSize.Level1)
     metaVec[6] = exceedMaxItemCapacity >> 8;
     metaVec[7] = exceedMaxItemCapacity;
     MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
+    EXPECT_TRUE(CameraErrorLogDetector::IsErrorLogContains("ConvertVecToMetadata itemCapacity out of range"));
 
     //tagCount = MAX_SUPPORTED_TAGS + 1
     uint32_t exceedMaxSupportedTags = MAX_SUPPORTED_TAGS + 1;
@@ -226,6 +230,7 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_005, TestSize.Level1)
     metaVec[2] = exceedMaxSupportedTags >> 8;
     metaVec[3] = exceedMaxSupportedTags;
     MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
+    EXPECT_TRUE(CameraErrorLogDetector::IsErrorLogContains("ConvertVecToMetadata tagCount out of range"));
 }
 
 /**

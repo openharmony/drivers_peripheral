@@ -259,6 +259,7 @@ HWTEST_F(StabilityTest, Camera_Stability_3a_0001, TestSize.Level3)
                 std::cout << "==========[test log] Check Performance: UpdateSettings fail, , at the " << (i+1);
                 std::cout <<"times, RetCode is " << Test_->rc << std::endl;
             }
+            EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
             sleep(1);
         }
     }
@@ -280,12 +281,14 @@ HWTEST_F(StabilityTest, Camera_Stability_Flashlight_0001, TestSize.Level3)
         std::cout <<"times: " << i << std::endl;
         bool status = true;
         Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), status);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         if (Test_->rc != Camera::NO_ERROR) {
             std::cout << "==========[test log] Check Performance: Flashlight turn on fail, at the " << (i+1);
             std::cout <<"times, RetCode is " << Test_->rc << std::endl;
         }
         status = false;
         Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), status);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         if (Test_->rc != Camera::NO_ERROR) {
             std::cout << "==========[test log] Check Performance: Flashlight turn off fail, at the " <<(i+1);
             std::cout<<"times, RetCode is " << Test_->rc << std::endl;

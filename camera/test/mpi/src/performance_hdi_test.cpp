@@ -165,6 +165,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0040, TestSize.Level3)
         gettimeofday(&start, NULL);
         Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), status);
         gettimeofday(&end, NULL);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
         // Turn off the flashlight
@@ -172,6 +173,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0040, TestSize.Level3)
         gettimeofday(&start, NULL);
         Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), status);
         gettimeofday(&end, NULL);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
     }
@@ -256,6 +258,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0060, TestSize.Level3)
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
         gettimeofday(&end, NULL);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         std::cout << "rc = "<< Test_->rc << std::endl;
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;

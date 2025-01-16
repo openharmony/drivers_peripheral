@@ -981,6 +981,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_090, TestSize.Level2)
     } else {
         CAMERA_LOGE("CancelCapture fail, rc = %{public}d", cameraBase_->rc);
     }
+    EXPECT_EQ(cameraBase_->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
 }
 
 /**
