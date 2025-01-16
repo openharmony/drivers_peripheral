@@ -22,6 +22,7 @@
 #include "audio_uhdf_log.h"
 #include "audio_common_vdi.h"
 #include "audio_dfx_vdi.h"
+#include "stub_collector.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
@@ -859,6 +860,7 @@ void AudioDestroyCaptureByIdVdi(uint32_t captureId)
     priv->captureInfos[captureId]->desc.desc = NULL;
     priv->captureInfos[captureId]->desc.portId = UINT_MAX;
     priv->captureInfos[captureId]->desc.pins = PIN_NONE;
+    StubCollectorRemoveObject(IAUDIOCAPTURE_INTERFACE_DESC, &(priv->captureInfos[captureId]->capture));
 
     OsalMemFree(priv->captureInfos[captureId]);
     priv->captureInfos[captureId] = NULL;
