@@ -1221,7 +1221,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxPush(struct UsbMtpPort *mtpPort, struct UsbFnR
         sem_post(&asyncReq_);
         return HDF_ERR_IO;
     }
-    if (writeToFile) {
+    if (writeToFile && mtpDev->asyncRecvWriteTempContent) {
         uint8_t *bufOff = mtpDev->asyncRecvWriteTempContent + mtpDev->asyncRecvWriteTempCount;
         if (memcpy_s(bufOff, req->actual, req->buf, req->actual) != EOK) {
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
