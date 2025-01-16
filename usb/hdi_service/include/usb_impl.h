@@ -169,11 +169,11 @@ private:
     public:
         explicit UsbAsyncTransferDeathRecipient(const UsbDev &dev, const int32_t endpoint,
             UsbImpl *usbImpl, const sptr<IRemoteObject> remote)
-            : dev_(dev), endpoint_(endpoint), usbImpl_(usbImpl), remote_(remote) {}
+            : dev_(dev), endpoint_(endpoint), usbImpl_(usbImpl), remote_(remote) {};
         ~UsbAsyncTransferDeathRecipient()
         {
             remote_->RemoveDeathRecipient(this);
-        }
+        };
         void OnRemoteDied(const wptr<IRemoteObject> &object) override;
     private:
         const UsbDev dev_;
