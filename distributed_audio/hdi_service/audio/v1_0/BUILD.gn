@@ -58,9 +58,13 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
-
+  cflags = []
   if (drivers_peripheral_distributed_audio_extension) {
-    cflags = [ "-DDAUDIO_SUPPORT_EXTENSION" ]
+    cflags += [ "-DDAUDIO_SUPPORT_EXTENSION" ]
+  }
+
+  if (drivers_peripheral_daudio_shared_buffer) {
+    cflags += [ "-DDAUDIO_SUPPORT_SHARED_BUFFER" ]
   }
 
   defines = [

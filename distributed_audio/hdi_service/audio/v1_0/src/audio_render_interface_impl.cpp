@@ -117,11 +117,17 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
     }
-    int32_t ret = audioExtCallback_->WriteStreamData(renderId_, data);
-    if (ret != HDF_SUCCESS) {
+#ifdef DAUDIO_SUPPORT_SHARED_BUFFER
+    if (WriteToShmem(data) != HDF_SUCCESS) {
         DHLOGE("Write stream data failed.");
         return HDF_FAILURE;
     }
+#else
+    if (audioExtCallback_->WriteStreamData(renderId_, data) != HDF_SUCCESS) {
+        DHLOGE("Write stream data failed.");
+        return HDF_FAILURE;
+    }
+#endif
 
     ++frameIndex_;
     DHLOGD("Render audio frame success.");
@@ -224,6 +230,14 @@ int32_t AudioRenderInterfaceImpl::Start()
             DHLOGE("Restart failed.");
         }
     }
+#ifdef DAUDIO_SUPPORT_SHARED_BUFFER
+    writeIndex_ = 0;
+    writeNum_ = 0;
+    if (NotifyFirstChangeEvent(HDF_AUDIO_EVENT_START) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+#endif
+    
     std::lock_guard<std::mutex> renderLck(renderMtx_);
     renderStatus_ = RENDER_STATUS_START;
     currentFrame_ = CUR_FRAME_INIT_VALUE;
@@ -235,6 +249,10 @@ int32_t AudioRenderInterfaceImpl::Start()
 int32_t AudioRenderInterfaceImpl::Stop()
 {
     DHLOGI("Stop render.");
+#ifdef DAUDIO_SUPPORT_SHARED_BUFFER
+    writeIndex_ = 0;
+    writeNum_ = 0;
+#endif
     cJSON *jParam = cJSON_CreateObject();
     if (jParam == nullptr) {
         DHLOGE("Failed to create cJSON object.");
@@ -418,11 +436,118 @@ int32_t AudioRenderInterfaceImpl::GetExtraParams(std::string &keyValueList)
     return HDF_SUCCESS;
 }
 
+#ifdef DAUDIO_SUPPORT_SHARED_BUFFER
+int32_t AudioRenderInterfaceImpl::CreateAshmem(int32_t ashmemLength)
+{
+    const std::string memory_name = "Normal Render";
+    if (ashmemLength < DAUDIO_MIN_ASHMEM_LEN || ashmemLength > DAUDIO_MAX_ASHMEM_LEN) {
+        DHLOGE("The length of shared memory is illegal.");
+        return HDF_FAILURE;
+    }
+    ashmem_ = OHOS::Ashmem::CreateAshmem(memory_name.c_str(), ashmemLength);
+    if (ashmem_ == nullptr) {
+        DHLOGE("Create ashmem failed.");
+        return HDF_FAILURE;
+    }
+    bool ret = ashmem_->MapReadAndWriteAshmem();
+    if (ret != true) {
+        DHLOGE("Mmap ashmem failed.");
+        return HDF_FAILURE;
+    }
+    fd_ = ashmem_->GetAshmemFd();
+    DHLOGI("Init Ashmem success, fd: %{public}d, length: %{public}d", fd_, ashmemLength);
+    return HDF_SUCCESS;
+}
+
+int32_t AudioRenderInterfaceImpl::WriteToShmem(const AudioData &data)
+{
+    DHLOGD("Write to shared memory.");
+    if (ashmem_ == nullptr) {
+        DHLOGE("Share memory is null");
+        return HDF_FAILURE;
+    }
+    if (data.param.frameSize != static_cast<uint32_t>(lengthPerTrans_)) {
+        DHLOGE("The param:framsize is invalid.");
+        return HDF_FAILURE;
+    }
+    const auto &audioData = data.data;
+    bool writeRet = ashmem_->WriteToAshmem(audioData.data(), audioData.size(), writeIndex_);
+    if (writeRet) {
+        DHLOGD("Write to ashmem success! write index: %{public}d, writeLength: %{public}d.",
+            writeIndex_, lengthPerTrans_);
+    } else {
+        DHLOGE("Write data to ashmem failed.");
+    }
+    writeIndex_ += lengthPerTrans_;
+    if (writeIndex_ >= ashmemLength_) {
+        writeIndex_ = 0;
+    }
+    writeNum_ += CalculateSampleNum(devAttrs_.sampleRate, timeInterval_);
+    return HDF_SUCCESS;
+}
+
+int32_t AudioRenderInterfaceImpl::NotifyFirstChangeEvent(EXT_PARAM_EVENT evetType)
+{
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Ext callback is null.");
+        return HDF_FAILURE;
+    }
+    std::string content;
+    std::initializer_list<std::pair<std::string, std::string>> items = { {KEY_DH_ID, std::to_string(devDesc_.pins)} };
+    if (WrapCJsonItem(items, content) != HDF_SUCCESS) {
+        DHLOGE("Wrap the event failed.");
+        return HDF_FAILURE;
+    }
+    DAudioEvent event = { evetType, content };
+    int32_t ret = audioExtCallback_->NotifyEvent(renderId_, event);
+    if (ret != HDF_SUCCESS) {
+        DHLOGE("Start render mmap failed.");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+#endif
+
 int32_t AudioRenderInterfaceImpl::ReqMmapBuffer(int32_t reqSize, AudioMmapBufferDescriptor &desc)
 {
+#ifdef DAUDIO_SUPPORT_SHARED_BUFFER
+    DHLOGI("Request mmap buffer.");
+    int32_t minSize = CalculateSampleNum(devAttrs_.sampleRate, minTimeInterval_);
+    int32_t maxSize = CalculateSampleNum(devAttrs_.sampleRate, maxTimeInterval_);
+    int32_t realSize = reqSize;
+    if (reqSize < minSize) {
+        realSize = minSize;
+    } else if (reqSize > maxSize) {
+        realSize = maxSize;
+    }
+    DHLOGI("ReqMmap buffer realsize : %{public}d, minsize: %{public}d, maxsize:%{public}d.",
+        realSize, minSize, maxSize);
+    desc.totalBufferFrames = realSize;
+    ashmemLength_ = realSize * static_cast<int32_t>(devAttrs_.channelCount) * devAttrs_.format;
+    DHLOGI("Init ashmem real sample size : %{public}d, length: %{public}d.", realSize, ashmemLength_);
+    int32_t ret = CreateAshmem(ashmemLength_);
+    if (ret != HDF_SUCCESS) {
+        DHLOGE("Init ashmem error..");
+        return HDF_FAILURE;
+    }
+    desc.memoryFd = fd_;
+    desc.transferFrameSize = static_cast<int32_t>(CalculateSampleNum(devAttrs_.sampleRate, timeInterval_));
+    lengthPerTrans_ = desc.transferFrameSize * static_cast<int32_t>(devAttrs_.channelCount) * devAttrs_.format;
+    desc.isShareable = false;
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Callback is nullptr.");
+        return HDF_FAILURE;
+    }
+    ret = audioExtCallback_->RefreshAshmemInfo(renderId_, fd_, ashmemLength_, lengthPerTrans_);
+    if (ret != HDF_SUCCESS) {
+        DHLOGE("Refresh ashmem info failed.");
+        return HDF_FAILURE;
+    }
+#else
     DHLOGI("Request mmap buffer, not support yet.");
     (void)reqSize;
     (void)desc;
+#endif
     return HDF_SUCCESS;
 }
 
