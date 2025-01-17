@@ -1799,7 +1799,7 @@ static int32_t ConvertResultCode(const int32_t in)
     return in;
 }
 
-static void GetRootSecret(const UserAuthTokenPlainHal& token, std::vector<uint8_t>& rootSecret)
+static void GetRootSecret(const UserAuthTokenPlainHal &token, std::vector<uint8_t> &rootSecret)
 {
     rootSecret.resize(0);
     if (CheckSessionTimeout() != RESULT_SUCCESS) {
@@ -1822,20 +1822,22 @@ static void GetRootSecret(const UserAuthTokenPlainHal& token, std::vector<uint8_
     Buffer *rootSecretBuffer = GetCacheRootSecret(token.tokenDataToEncrypt.userId);
     if (!IsBufferValid(rootSecretBuffer)) {
         IAM_LOGE("get GetCacheRootSecret failed");
+        DestoryBuffer(rootSecretBuffer);
         return;
     }
     rootSecret.resize(ROOT_SECRET_LEN);
     if (memcpy_s(rootSecret.data(), rootSecret.size(), rootSecretBuffer->buf, rootSecretBuffer->contentSize) != EOK) {
         IAM_LOGE("rootSecret copy failed");
         (void)memset_s(rootSecret.data(), rootSecret.size(), 0, rootSecret.size());
+        rootSecret.clear();
     }
 
     DestoryBuffer(rootSecretBuffer);
     return;
 }
 
-int32_t UserAuthInterfaceService::VerifyAuthToken(const std::vector<uint8_t>& tokenIn, uint64_t allowableDuration,
-    HdiUserAuthTokenPlain &tokenPlainOut, std::vector<uint8_t>& rootSecret)
+int32_t UserAuthInterfaceService::VerifyAuthToken(const std::vector<uint8_t> &tokenIn, uint64_t allowableDuration,
+    HdiUserAuthTokenPlain &tokenPlainOut, std::vector<uint8_t> &rootSecret)
 {
     IAM_LOGI("start, allowableDuration:%{public}" PRIu64, allowableDuration);
     if (tokenIn.size() != sizeof(UserAuthTokenHal) || tokenIn.data() == NULL ||
