@@ -47,6 +47,8 @@ public:
     AudioSampleAttributes attrs_;
     sptr<IDAudioCallback> callback_;
     std::shared_ptr<AudioCaptureInterfaceImpl> audioCaptureInterfaceImpl_ = nullptr;
+    static constexpr uint32_t SAMPLE_RATE = 48000;
+    static constexpr uint32_t CHANNEL_COUNT = 1;
 };
 } // V1_0
 } // Audio
