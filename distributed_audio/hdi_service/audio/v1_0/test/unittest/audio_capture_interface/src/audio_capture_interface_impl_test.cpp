@@ -33,7 +33,12 @@ void AudioCaptureInterfaceImplTest::SetUpTestCase(void) {}
 
 void AudioCaptureInterfaceImplTest::TearDownTestCase(void) {}
 
-void AudioCaptureInterfaceImplTest::SetUp(void) {}
+void AudioCaptureInterfaceImplTest::SetUp(void)
+{
+    attrs_.sampleRate = SAMPLE_RATE;
+    attrs_.channelCount = CHANNEL_COUNT;
+    attrs_.format = AudioFormat::AUDIO_FORMAT_TYPE_PCM_16_BIT;
+}
 
 void AudioCaptureInterfaceImplTest::TearDown(void)
 {
