@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_manager_interface_impl.h"
 #include "if_system_ability_manager.h"
@@ -32,13 +33,13 @@ void NotifyEventFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-
-    std::string adpName(reinterpret_cast<const char*>(data), size);
-    int32_t devId = *(reinterpret_cast<const int32_t*>(data));
-    int32_t streamId = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    std::string adpName = fdp.ConsumeRandomLengthString();
+    int32_t devId = fdp.ConsumeIntegral<int32_t>();
+    int32_t streamId = fdp.ConsumeIntegral<int32_t>();
     DAudioEvent event = {
-        .type = *(reinterpret_cast<const int32_t*>(data)),
-        .content = std::string(reinterpret_cast<const char*>(data), size),
+        .type = fdp.ConsumeIntegral<int32_t>(),
+        .content = fdp.ConsumeRandomLengthString(),
     };
 
     DAudioManagerInterfaceImpl::GetDAudioManager()->NotifyEvent(adpName, devId, streamId, event);
