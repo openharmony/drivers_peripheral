@@ -20,7 +20,6 @@
 #include "v4_0/audio_types.h"
 
 #define AUDIO_VDI_ADAPTER_NUM_MAX        20 // Limit the number of sound cards supported to a maximum of 20
-#define AUDIO_VDI_ADAPTER_REF_CNT_MAX 20
 #define AUDIO_VDI_PORT_NUM_MAX    10
 #define AUDIO_VDI_STREAM_NUM_MAX  10
 

@@ -152,7 +152,7 @@ static int32_t MockSendCommand(struct IEffectControlVdi *self, enum EffectComman
     }
 
     struct EffectCommandTable *cmdTable = g_effectCommandTable;
-    
+
     if (cmdId >= (sizeof(g_effectCommandTable) / sizeof(struct EffectCommandTable))) {
         HDF_LOGE("%{public}s: the index of the table is invailied", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -191,7 +191,6 @@ static int32_t MockCpyDesc(const char *src, char **dest)
 
     if (memcpy_s((void *)(*dest), HDF_EFFECT_NAME_LEN, src, strlen(src)) != EOK) {
         HDF_LOGE("%{public}s: memcpy_s effect desc fail!", __func__);
-        OsalMemFree((void **)dest);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
