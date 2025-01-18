@@ -994,7 +994,7 @@ int32_t LibusbAdapter::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTran
 {
     HDF_LOGI("%{public}s enter", __func__);
     if ((static_cast<uint32_t>(ctrl.requestType) & USB_ENDPOINT_DIR_MASK) == USB_ENDPOINT_DIR_IN) {
-        HDF_LOGE("%{public}s: this function is read, not write", __func__);
+        HDF_LOGE("%{public}s: this function is write, not read", __func__);
         return HDF_FAILURE;
     }
     std::vector<uint8_t> buffer(data);
@@ -1251,32 +1251,30 @@ unsigned char *LibusbAdapter::GetMmapBufferByFd(int32_t fd, size_t len)
     return static_cast<unsigned char *>(memBuf);
 }
 
-unsigned char *LibusbAdapter::GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busAddress, int32_t *fd, size_t len)
+unsigned char *LibusbAdapter::GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busAddress, int32_t &fd, size_t len)
 {
     HDF_LOGD("%{public}s enter", __func__);
+    std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
     if (len < 0) {
         HDF_LOGE("%{public}s Invalid parameter", __func__);
         return nullptr;
     }
-    char path[LIBUSB_PATH_LENGTH] = {'\0'};
-    int32_t ret = sprintf_s(path, LIBUSB_PATH_LENGTH, "%s%03u_%03u", LIBUSB_DEVICE_MMAP_PATH, busNumber, busAddress);
-    if (ret < HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d path error", __func__, __LINE__);
+    uint32_t result = (static_cast<uint32_t>(busNumber) << DISPLACEMENT_NUMBER) |
+        static_cast<uint32_t>(busAddress);
+
+    auto info = g_usbOpenFdMap.find(result);
+    if (info == g_usbOpenFdMap.end()) {
+        HDF_LOGE("%{public}s not open fd", __func__);
         return nullptr;
     }
-    int32_t mmapFd = open(path, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
-    if (mmapFd < 0) {
-        HDF_LOGE("%{public}s: open error:%{public}s", __func__, path);
-        return nullptr;
-    }
-    *fd = mmapFd;
-    unsigned char *memBuf = GetMmapBufferByFd(mmapFd, len);
+    fd = info->second;
+    HDF_LOGD("%{public}s open is already on, fd: %{public}d", __func__, info->second);
+    unsigned char *memBuf = GetMmapBufferByFd(fd, len);
     if (memBuf == nullptr) {
-        close(mmapFd);
         HDF_LOGE("%{public}s: GetMmapBufferByFd failed",  __func__);
         return nullptr;
     }
-    HDF_LOGD("%{public}s Get mmap fd: %{public}d and memBuf: %{public}p success", __func__, mmapFd, memBuf);
+    HDF_LOGD("%{public}s Get mmap fd: %{public}d and memBuf: %{public}p success", __func__, fd, memBuf);
     return memBuf;
 }
 
@@ -1323,25 +1321,31 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpoint
 
     int32_t mmapFd = HDF_FAILURE;
     unsigned char *buffer = nullptr;
-    buffer = GetMmapFdAndBuffer(dev.busNum, dev.devAddr, &mmapFd, size);
+    buffer = GetMmapFdAndBuffer(dev.busNum, dev.devAddr, mmapFd, size);
     if (buffer == nullptr) {
         HDF_LOGE("%{public}s: GetMmapFdAndBuffer is error ", __func__);
         return HDF_FAILURE;
     }
     SyncTranfer syncTranfer = {size, &actlength, timeout};
     ret = DoSyncPipeTranfer(devHandle, &endpoint, buffer, syncTranfer);
-    HDF_LOGD("SendPipeRequest DoSyncPipeTranfer ret :%{public}d", ret);
     if (ret < 0) {
-        CloseMmapBuffer(buffer, size);
-        close(mmapFd);
-        HDF_LOGE("%{public}s: is error ", __func__);
-        return HDF_FAILURE;
+        if (ret != LIBUSB_ERROR_OVERFLOW) {
+            HDF_LOGE("%{public}s: is error ", __func__);
+            ret = HDF_FAILURE;
+        }
+        int32_t apiVersion = 0;
+        GetApiVersion(apiVersion);
+        HDF_LOGI("%{public}s: apiVersion %{public}d", __func__, apiVersion);
+        if (apiVersion < API_VERSION_ID) {
+            HDF_LOGI("%{public}s: The version number is smaller than 16 apiVersion %{public}d",
+                __func__, apiVersion);
+            ret = HDF_SUCCESS;
+        }
     }
     transferedLength = actlength;
     CloseMmapBuffer(buffer, size);
-    close(mmapFd);
     HDF_LOGI("%{public}s leave", __func__);
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned char endpointAddr,
@@ -1379,14 +1383,23 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
     ret = DoSyncPipeTranfer(devHandle, &endpoint, buffer, syncTranfer);
     HDF_LOGI("SendPipeRequestWithAshmem DoSyncPipeTranfer ret :%{public}d", ret);
     if (ret < 0) {
-        CloseMmapBuffer(buffer, sendRequestAshmemParameter.ashmemSize);
-        HDF_LOGE("%{public}s: is error ", __func__);
-        return HDF_FAILURE;
+        if (ret != LIBUSB_ERROR_OVERFLOW) {
+            HDF_LOGE("%{public}s: is error ", __func__);
+            ret = HDF_FAILURE;
+        }
+        int32_t apiVersion = 0;
+        GetApiVersion(apiVersion);
+        HDF_LOGI("%{public}s: apiVersion %{public}d", __func__, apiVersion);
+        if (apiVersion < API_VERSION_ID) {
+            HDF_LOGI("%{public}s: The version number is smaller than 16 apiVersion %{public}d",
+                __func__, apiVersion);
+            ret = HDF_SUCCESS;
+        }
     }
     transferredLength = actlength;
     CloseMmapBuffer(buffer, sendRequestAshmemParameter.ashmemSize);
-    HDF_LOGI("%{public}s leaves", __func__);
-    return HDF_SUCCESS;
+    close(sendRequestAshmemParameter.ashmemFd);
+    return ret;
 }
 
 int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
@@ -1896,6 +1909,7 @@ int32_t LibusbAdapter::AsyncCancelTransfer(const UsbDev &dev, const int32_t endp
 {
     HDF_LOGI("%{public}s: cancel transfer start", __func__);
     int ret = HDF_FAILURE;
+    std::lock_guard<std::mutex> managerLock(g_asyncManager.transferVecLock);
     auto asyncWrapper = GetAsyncWrapper(dev);
     if (!asyncWrapper) {
         HDF_LOGE("%{public}s: get async wrapper failed", __func__);
@@ -2100,6 +2114,7 @@ void LibusbAdapter::DeleteTransferFromList(LibusbAsyncTransfer *asyncTransfer)
     HDF_LOGI("%{public}s: enter delete transfer from list, bus num: %{public}d, dev addr: %{public}d",
         __func__, asyncTransfer->busNum, asyncTransfer->devAddr);
 
+    std::lock_guard<std::mutex> managerLock(g_asyncManager.transferVecLock);
     LibusbAsyncWrapper *asyncWrapper = GetAsyncWrapper({asyncTransfer->busNum, asyncTransfer->devAddr});
     if (asyncWrapper == nullptr) {
         HDF_LOGE("%{public}s: get async wrapper failed", __func__);
@@ -2121,7 +2136,6 @@ void LibusbAdapter::DeleteTransferFromList(LibusbAsyncTransfer *asyncTransfer)
 
 LibusbAsyncWrapper *LibusbAdapter::GetAsyncWrapper(const UsbDev &dev)
 {
-    std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
     LibusbAsyncWrapper *asyncWrapper = nullptr;
 
     for (size_t i = 0; i < g_asyncManager.transferVec.size(); ++i) {
@@ -2164,7 +2178,7 @@ void LibusbAdapter::AddTransferToList(LibusbAsyncTransfer *asyncTransfer)
         HDF_LOGW("%{public}s: async transfer or libusb transfer is nullptr", __func__);
         return;
     }
-
+    std::lock_guard<std::mutex> managerLock(g_asyncManager.transferVecLock);
     LibusbAsyncWrapper *asyncWrapper = GetAsyncWrapper({asyncTransfer->busNum, asyncTransfer->devAddr});
     if (asyncWrapper == nullptr) {
         HDF_LOGE("%{public}s: get async wrapper failed", __func__);

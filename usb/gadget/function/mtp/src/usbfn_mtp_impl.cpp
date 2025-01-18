@@ -514,6 +514,10 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelAndFreeReq(
 
 int32_t UsbfnMtpImpl::UsbMtpPortCancelPlusFreeIo(struct UsbMtpPort *mtpPort, bool freeReq)
 {
+    if (mtpPort == nullptr) {
+        HDF_LOGE("%{public}s: mtpPort is null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGI("%{public}s: cancel and free read req: %{public}d/%{public}d", __func__, mtpPort->readStarted,
         mtpPort->readAllocated);
     (void)UsbMtpPortCancelAndFreeReq(&mtpPort->readQueue, &mtpPort->readPool, mtpPort->readAllocated, freeReq);

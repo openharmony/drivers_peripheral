@@ -21,8 +21,16 @@
 extern "C" {
 #endif
 #define SYSFS_DEVICES_DIR "/sys/bus/usb/devices/"
+
+typedef struct DevInterfaceInfo {
+    uint32_t busNum;
+    uint32_t devNum;
+    uint8_t  intfNum;
+} DevInterfaceInfo;
+
 uint64_t DdkSysfsMakeDevAddr(uint32_t busNum, uint32_t devNum);
 int32_t DdkSysfsGetDevice(const char *deviceDir, struct UsbPnpNotifyMatchInfoTable *device);
+int32_t DdkSysfsGetDevNodePath(DevInterfaceInfo *devInfo, const char *prefix, char *buff, uint32_t buffSize);
 #ifdef __cplusplus
 }
 #endif

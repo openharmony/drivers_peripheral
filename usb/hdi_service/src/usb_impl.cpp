@@ -2568,6 +2568,16 @@ int32_t UsbImpl::CloseAccessory(int32_t fd)
     return UsbdAccessory::GetInstance().CloseAccessory(fd);
 }
 
+void UsbImpl::UsbAsyncTransferDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    HDF_LOGI("%{public}s: UsbImpl UsbAsyncTransferDeathRecipient enter", __func__);
+    int32_t ret = usbImpl_->UsbCancelTransfer(dev_, endpoint_);
+    if (ret == HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: UsbImpl OnRemoteDied close", __func__);
+        usbImpl_->CloseDevice(dev_);
+    }
+}
+
 int32_t UsbImpl::UsbSubmitTransfer(const UsbDev &dev, const OHOS::HDI::Usb::V1_2::USBTransferInfo &info,
     const sptr<OHOS::HDI::Usb::V1_2::IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem)
 {
@@ -2576,6 +2586,13 @@ int32_t UsbImpl::UsbSubmitTransfer(const UsbDev &dev, const OHOS::HDI::Usb::V1_2
     return LIBUSB_ERROR_NOT_SUPPORTED;
 #else
     HDF_LOGI("%{public}s: UsbImpl UsbSubmitTransfer", __func__);
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<OHOS::HDI::Usb::V1_2::IUsbdTransferCallback>(cb);
+    sptr<UsbImpl::UsbAsyncTransferDeathRecipient> asyncRecipient =
+        new UsbAsyncTransferDeathRecipient(dev, info.endpoint, this, remote);
+    if (!remote->AddDeathRecipient(asyncRecipient)) {
+        HDF_LOGE("%{public}s: add DeathRecipient failed", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return LibusbAdapter::GetInstance()->AsyncSubmitTransfer(dev, info, cb, ashmem);
 #endif // LIBUSB_ENABLE
 }

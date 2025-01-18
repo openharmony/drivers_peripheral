@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,15 +15,23 @@ import("//build/config/components/hdi/hdi.gni")
 import("//build/ohos.gni")
 import("./../input.gni")
 
-ohos_shared_library("libhid_ddk_service_1.0") {
+ohos_shared_library("libhid_ddk_service_1.1") {
   sources = [
     "src/hid_ddk_permission.cpp",
     "src/hid_ddk_service.cpp",
   ]
+
+  if (is_standard_system) {
+    sources += [ "src/hid_linux_adapter.cpp" ]
+  } else if (defined(ohos_lite)) {
+    sources += [ "src/hid_liteos_adapter.cpp" ]
+  }
   include_dirs = [
     "include/",
     "include/emit_event_manager/",
     "${input_driver_path}/utils/include",
+    "//drivers/hdf_core/framework/model/usb/include",
+    "//drivers/peripheral/usb/ddk/host/include",
   ]
 
   deps = [ "${input_driver_path}/ddk_service/src/emit_event_manager:emit_event_manager" ]
@@ -32,6 +40,7 @@ ohos_shared_library("libhid_ddk_service_1.0") {
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "drivers_interface_input:hid_ddk_idl_headers",
+    "drivers_peripheral_usb:libusb_pnp_manager",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -55,7 +64,7 @@ ohos_shared_library("libhid_ddk_driver") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_input:libhid_ddk_stub_1.0",
+    "drivers_interface_input:libhid_ddk_stub_1.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -73,6 +82,6 @@ ohos_shared_library("libhid_ddk_driver") {
 group("hid_ddk_target") {
   deps = [
     ":libhid_ddk_driver",
-    ":libhid_ddk_service_1.0",
+    ":libhid_ddk_service_1.1",
   ]
 }

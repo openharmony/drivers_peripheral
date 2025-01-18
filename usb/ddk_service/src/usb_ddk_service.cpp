@@ -54,7 +54,7 @@ static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 #ifdef LIBUSB_ENABLE
 static std::shared_ptr<OHOS::HDI::Usb::V1_2::LibusbAdapter> g_DdkLibusbAdapter =
-    std::make_shared<OHOS::HDI::Usb::V1_2::LibusbAdapter>();
+    V1_2::LibusbAdapter::GetInstance();
 constexpr uint8_t INTERFACE_ID_INVALID = 255;
 static std::unordered_map<uint64_t, uint8_t> g_InterfaceMap;
 std::shared_mutex g_MutexInterfaceMap;
@@ -635,7 +635,7 @@ int32_t UsbDdkService::SendPipeRequest(
         HDF_LOGE("%{public}s submit request failed %{public}d", __func__, ret);
         goto FINISHED;
     }
-
+    ret = CheckCompleteStatus(request);
     transferedLength = request->compInfo.actualLength;
 FINISHED:
     (void)UsbFreeRequestByMmap(request);
@@ -681,6 +681,7 @@ int32_t SubmitRequestWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem &ash
     }
 
     transferredLength = request->compInfo.actualLength;
+    ret = CheckCompleteStatus(request);
 FINISHED:
     (void)UsbFreeRequestByMmap(request);
     close(ashmem.ashmemFd);

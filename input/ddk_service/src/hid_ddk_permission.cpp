@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@ namespace OHOS {
 namespace HDI {
 namespace Input {
 namespace Ddk {
-namespace V1_0 {
+namespace V1_1 {
 using namespace OHOS::Security::AccessToken;
 
 bool DdkPermissionManager::VerifyPermission(std::string permissionName)
@@ -32,7 +32,7 @@ bool DdkPermissionManager::VerifyPermission(std::string permissionName)
     HDF_LOGI("%{public}s VerifyAccessToken: %{public}d", __func__, result);
     return result == PERMISSION_GRANTED;
 }
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Ddk
 } // namespace Input
 } // namespace HDI
