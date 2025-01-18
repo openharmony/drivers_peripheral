@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -193,6 +193,25 @@ int32_t UsbdPort::SetPort(
     return HDF_SUCCESS;
 }
 
+int32_t UsbdPort::SetUsbPort(int32_t portId, int32_t powerRole, int32_t dataRole,
+    HDI::Usb::V2_0::UsbdSubscriber *usbdSubscribers, uint32_t len)
+{
+    int32_t ret = SetPortInit(portId, powerRole, dataRole);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: SetPortInit failed! ret:%{public}d", __func__, ret);
+        return ret;
+    }
+    currentPortInfos_ = {currentPortInfo_.portId,
+        currentPortInfo_.powerRole, currentPortInfo_.dataRole, currentPortInfo_.mode};
+    for (uint32_t i = 0; i < len; i++) {
+        if (usbdSubscribers[i].subscriber != nullptr) {
+            usbdSubscribers[i].subscriber->PortChangedEvent(currentPortInfos_);
+        }
+    }
+
+    return HDF_SUCCESS;
+}
+
 int32_t UsbdPort::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode)
 {
     (void)ReadPortFile(currentPortInfo_.powerRole, currentPortInfo_.dataRole, currentPortInfo_.mode);
@@ -226,6 +245,34 @@ int32_t UsbdPort::UpdatePort(int32_t mode, const sptr<IUsbdSubscriber> &subscrib
         return HDF_FAILURE;
     }
     subscriber->PortChangedEvent(currentPortInfo_);
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdPort::UpdateUsbPort(int32_t mode, const sptr<V2_0::IUsbdSubscriber> &subscriber)
+{
+    switch (mode) {
+        case PORT_MODE_HOST:
+            currentPortInfo_.powerRole = POWER_ROLE_SOURCE;
+            currentPortInfo_.dataRole = DATA_ROLE_HOST;
+            currentPortInfo_.mode = PORT_MODE_HOST;
+            break;
+        case PORT_MODE_DEVICE:
+            currentPortInfo_.powerRole = POWER_ROLE_SINK;
+            currentPortInfo_.dataRole = DATA_ROLE_DEVICE;
+            currentPortInfo_.mode = PORT_MODE_DEVICE;
+            break;
+        default:
+            HDF_LOGE("%{public}s invalid mode:%{public}d", __func__, mode);
+            return HDF_FAILURE;
+    }
+
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s subscriber is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    currentPortInfos_ = {currentPortInfo_.portId,
+        currentPortInfo_.powerRole, currentPortInfo_.dataRole, currentPortInfo_.mode};
+    subscriber->PortChangedEvent(currentPortInfos_);
     return HDF_SUCCESS;
 }
 } // namespace V1_2

@@ -56,6 +56,12 @@
                 },
                 {
                     "name":"//drivers/peripheral/usb/ddk:libusb_pnp_manager"
+                },
+                {
+                    "name":"//drivers/peripheral/usb/hdi_service:libusb_device_interface_service_2.0"
+                },
+                {
+                    "name":"//drivers/peripheral/usb/hdi_service:libusb_port_interface_service_2.0"
                 }
             ]
         }

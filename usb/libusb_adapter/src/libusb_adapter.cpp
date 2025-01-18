@@ -58,6 +58,9 @@ constexpr uint64_t MAX_TOTAL_SIZE = 520447;
 constexpr int32_t API_VERSION_ID = 16;
 constexpr int32_t LIBUSB_IO_ERROR = -1;
 constexpr int32_t LIBUSB_IO_ERROR_INVALID = 0;
+constexpr uint32_t ACT_DEVUP = 0;
+constexpr uint32_t ACT_DEVDOWN = 1;
+constexpr uint8_t ENDPOINTID = 128;
 constexpr const char* USB_DEV_FS_PATH = "/dev/bus/usb";
 constexpr const char* LIBUSB_DEVICE_MMAP_PATH = "/data/service/el1/public/usb/";
 constexpr uint32_t MIN_NUM_OF_ISO_PACKAGE = 1;
@@ -79,12 +82,16 @@ std::shared_mutex g_mapMutexContext;
 std::shared_mutex g_mapMutexUsbOpenFdMap;
 std::shared_mutex g_mapMutexHandleVector;
 static LibusbAsyncManager g_asyncManager;
+static LibusbBulkManager g_bulkManager;
+#define USB_CTRL_SET_TIMEOUT 5000
 
 static uint64_t ToDdkDeviceId(int32_t busNum, int32_t devNum)
 {
     return (static_cast<uint64_t>(busNum) << SHIFT_32) + devNum;
 }
 } // namespace
+
+std::list<sptr<V2_0::IUsbdSubscriber>> LibusbAdapter::subscribers_;
 
 std::shared_ptr<LibusbAdapter> LibusbAdapter::GetInstance()
 {
@@ -93,6 +100,12 @@ std::shared_ptr<LibusbAdapter> LibusbAdapter::GetInstance()
 
 LibusbAdapter::LibusbAdapter()
 {
+    HDF_LOGI("%{public}s libusbadapter constructer", __func__);
+    LibUSBInit();
+    if (!eventThread.joinable()) {
+        isRunning = true;
+        eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
+    }
 }
 
 LibusbAdapter::~LibusbAdapter()
@@ -257,6 +270,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         return HDF_FAILURE;
     }
     TransferInit(dev);
+    BulkTransferInit(dev);
     {
         std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleVector);
         g_handleVector.push_back(std::make_pair(dev, devHandle));
@@ -302,6 +316,7 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
     }
     libusb_close(devHandle);
     TransferRelease(dev);
+    BulkTransferRelease(dev);
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
@@ -2299,6 +2314,559 @@ int32_t LibusbAdapter::GetDevices(std::vector<struct DeviceInfo> &devices)
         devices.emplace_back(DeviceInfo{deviceId, desc.idVendor});
     }
     libusb_free_device_list(devs, 1);
+    return HDF_SUCCESS;
+}
+
+uint8_t *LibusbAdapter::AllocBulkBuffer(const UsbPipe &pipe, const int32_t &length, const sptr<Ashmem> &ashmem)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (length <= 0) {
+        HDF_LOGE("%{public}s: invalid buffer length", __func__);
+        return nullptr;
+    }
+
+    uint8_t *buffer = static_cast<uint8_t *>(OsalMemCalloc(length));
+    if (buffer == nullptr) {
+        HDF_LOGE("%{public}s: malloc buffer failed", __func__);
+        return nullptr;
+    }
+    if ((pipe.endpointId & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_OUT) {
+        HDF_LOGI("%{public}s: read from ashmem", __func__);
+        int32_t ret = ReadAshmem(ashmem, length, buffer);
+        if (ret != HDF_SUCCESS) {
+            OsalMemFree(buffer);
+            return nullptr;
+        }
+    }
+    return buffer;
+}
+
+void LibusbAdapter::DeleteBulkTransferFromList(LibusbBulkTransfer *bulkTransfer)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (bulkTransfer == nullptr) {
+        HDF_LOGE("%{public}s: bulkTransfer is nullptr", __func__);
+        return;
+    }
+    HDF_LOGI("%{public}s: enter delete transfer, bus num: %{public}d, dev addr: %{public}d", __func__,
+        bulkTransfer->busNum, bulkTransfer->devAddr);
+
+    LibusbBulkWrapper *bulkWrapper = GetBulkWrapper({bulkTransfer->busNum, bulkTransfer->devAddr});
+    if (bulkWrapper == nullptr) {
+        HDF_LOGE("%{public}s: bulkWrapper is nullptr", __func__);
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(bulkWrapper->bulkTransferLock);
+    if (bulkWrapper->bulkTransferList.size() <= 0) {
+        HDF_LOGE("%{public}s: transfer list is empty", __func__);
+        return;
+    }
+    if (bulkTransfer != nullptr) {
+        bulkWrapper->bulkTransferList.remove(bulkTransfer);
+    }
+    HDF_LOGI("%{public}s: delete transfer from list end", __func__);
+}
+
+LibusbBulkWrapper *LibusbAdapter::GetBulkWrapper(const UsbDev &dev)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
+    LibusbBulkWrapper *bulkWrapper = nullptr;
+
+    for (size_t i = 0; i < g_bulkManager.bulktransferVec.size(); ++i) {
+        if (g_bulkManager.bulktransferVec[i].first.busNum == dev.busNum
+                && g_bulkManager.bulktransferVec[i].first.devAddr == dev.devAddr) {
+            bulkWrapper = g_bulkManager.bulktransferVec[i].second;
+        }
+    }
+
+    return bulkWrapper;
+}
+
+void LibusbAdapter::HandleBulkFail(struct libusb_transfer *transfer)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (transfer == nullptr) {
+        HDF_LOGE("%{public}s: transfer is nullptr", __func__);
+        return;
+    }
+    if (transfer->buffer != nullptr) {
+        OsalMemFree(transfer->buffer);
+        transfer->buffer = nullptr;
+    }
+    libusb_cancel_transfer(transfer);
+    if (transfer->user_data != nullptr) {
+        LibusbBulkTransfer *bulkTransfer = reinterpret_cast<LibusbBulkTransfer *>(transfer->user_data);
+        DeleteBulkTransferFromList(bulkTransfer);
+        if (bulkTransfer != nullptr) {
+            delete bulkTransfer;
+            bulkTransfer = nullptr;
+        }
+    }
+}
+
+void LibusbAdapter::BulkFeedbackToBase(struct libusb_transfer *transfer)
+{
+    HDF_LOGI("%{public}s: enter, actual_length=%{public}d", __func__, transfer->actual_length);
+    LibusbBulkTransfer *bulkTransfer = reinterpret_cast<LibusbBulkTransfer *>(transfer->user_data);
+    sptr<V2_0::IUsbdBulkCallback> callback = bulkTransfer->bulkCbRef;
+
+    int32_t ret = 0;
+    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN) {
+        ret = callback->OnBulkReadCallback(transfer->status, transfer->actual_length);
+    } else {
+        ret = callback->OnBulkWriteCallback(transfer->status, transfer->actual_length);
+    }
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: feedback callback failed", __func__);
+        return;
+    }
+    bulkTransfer->isTransferring = false;
+    HDF_LOGI("%{public}s: call feedback callback success", __func__);
+}
+
+void LIBUSB_CALL LibusbAdapter::HandleBulkResult(struct libusb_transfer *transfer)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (transfer == nullptr || transfer->user_data == nullptr) {
+        HDF_LOGE("%{public}s: bulk transfer or user_data is null", __func__);
+        return;
+    }
+    HDF_LOGI("%{public}s: transfer status: %{public}d, actual length: %{public}d", __func__,
+        transfer->status, transfer->actual_length);
+    LibusbBulkTransfer *bulkTransfer = reinterpret_cast<LibusbBulkTransfer *>(transfer->user_data);
+
+    if (transfer->status == LIBUSB_TRANSFER_CANCELLED) {
+        HDF_LOGE("%{public}s: bulk transfer has been canceled", __func__);
+        return;
+    }
+    if (transfer->status != LIBUSB_TRANSFER_COMPLETED && transfer->actual_length <= 0) {
+        HDF_LOGE("%{public}s: libusb bulk transfer failed", __func__);
+        BulkFeedbackToBase(transfer);
+        HandleBulkFail(transfer);
+        return;
+    }
+
+    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN) {
+        HDF_LOGI("%{public}s: write data to ashmem", __func__);
+        int32_t ret = WriteAshmem(bulkTransfer->buikAshmemRef, transfer->actual_length, transfer->buffer);
+        if (ret != HDF_SUCCESS) {
+            HandleBulkFail(transfer);
+            return;
+        }
+    }
+
+    BulkFeedbackToBase(transfer);
+    HDF_LOGI("%{public}s: handle bulk transfer success", __func__);
+}
+
+int32_t LibusbAdapter::BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (pipe.endpointId < ENDPOINTID) {
+        HDF_LOGE("%{public}s: endpointId is not expect", __func__);
+        return HDF_FAILURE;
+    }
+
+    libusb_device_handle *devHandle = nullptr;
+    int32_t ret = FindHandleByDev(dev, &devHandle);
+    if (devHandle == nullptr) {
+        HDF_LOGE("%{public}s: find libusb device handle failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    LibusbBulkTransfer *bulkTransfer = FindBulkTransfer(dev, pipe, ashmem);
+    if (bulkTransfer == nullptr) {
+        HDF_LOGE("%{public}s: create libusb bulk transfer failed", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t length = libusb_get_max_packet_size(libusb_get_device(devHandle), pipe.endpointId);
+    unsigned char *buffer = AllocBulkBuffer(pipe, length, ashmem);
+    if (buffer == nullptr) {
+        HDF_LOGE("%{public}s: alloc bulk buffer failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    libusb_fill_bulk_transfer(bulkTransfer->bulkTransferRef, devHandle, pipe.endpointId, buffer, length,
+        HandleBulkResult, bulkTransfer, USB_CTRL_SET_TIMEOUT);
+    HDF_LOGI("%{public}s: libusb submit transfer", __func__);
+    ret = libusb_submit_transfer(bulkTransfer->bulkTransferRef);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: libusb submit transfer failed, ret: %{public}d", __func__, ret);
+        return ret;
+    }
+    bulkTransfer->isTransferring = true;
+    return HDF_SUCCESS;
+}
+
+int32_t LibusbAdapter::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (pipe.endpointId >= ENDPOINTID) {
+        HDF_LOGE("%{public}s: endpointId is not expect", __func__);
+        return HDF_FAILURE;
+    }
+    libusb_device_handle *devHandle = nullptr;
+    int32_t ret = FindHandleByDev(dev, &devHandle);
+    if (devHandle == nullptr) {
+        HDF_LOGE("%{public}s: find handle failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    LibusbBulkTransfer *bulkTransfer = FindBulkTransfer(dev, pipe, ashmem);
+    if (bulkTransfer == nullptr) {
+        HDF_LOGE("%{public}s: create libusb bulk transfer failed", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t length = libusb_get_max_packet_size(libusb_get_device(devHandle), pipe.endpointId);
+    unsigned char *buffer = AllocBulkBuffer(pipe, length, ashmem);
+    if (buffer == nullptr) {
+        HDF_LOGE("%{public}s: alloc bulk buffer failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    libusb_fill_bulk_transfer(bulkTransfer->bulkTransferRef, devHandle, pipe.endpointId, buffer, length,
+        HandleBulkResult, bulkTransfer, USB_CTRL_SET_TIMEOUT);
+    HDF_LOGI("%{public}s: libusb submit transfer", __func__);
+    ret = libusb_submit_transfer(bulkTransfer->bulkTransferRef);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: libusb submit transfer failed, ret: %{public}d", __func__, ret);
+        return ret;
+    }
+    bulkTransfer->isTransferring = true;
+    return HDF_SUCCESS;
+}
+
+int32_t LibusbAdapter::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
+    auto it = std::find_if(
+        g_bulkManager.bulktransferVec.begin(), g_bulkManager.bulktransferVec.end(),
+        [&dev](const auto& pair) {
+            return pair.first.busNum == dev.busNum && pair.first.devAddr == dev.devAddr;
+    });
+    if (it == g_bulkManager.bulktransferVec.end()) {
+        HDF_LOGE("%{public}s: wrapper is nullptr, dev is not exist", __func__);
+        return HDF_FAILURE;
+    }
+    LibusbBulkWrapper* wrapper = it->second;
+    if (wrapper == nullptr) {
+        HDF_LOGE("%{public}s: wrapper is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    std::lock_guard<std::mutex> listLock(wrapper->bulkTransferLock);
+    auto transferIt = std::find_if(
+        wrapper->bulkTransferList.begin(), wrapper->bulkTransferList.end(),
+        [&pipe](const auto& pair) {
+            return pair->bulkTransferRef->endpoint == pipe.endpointId;
+    });
+    if (transferIt == wrapper->bulkTransferList.end()) {
+        HDF_LOGE("%{public}s: transferCancle is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    LibusbBulkTransfer* transferCancle = *transferIt;
+    if (transferCancle == nullptr) {
+        HDF_LOGE("%{public}s: transferCancle is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret = libusb_cancel_transfer(transferCancle->bulkTransferRef);
+    if (ret != LIBUSB_SUCCESS && ret != LIBUSB_ERROR_NOT_FOUND) {
+        HDF_LOGE("%{public}s: libusb cancel transfer fail ret=%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    if (transferCancle->bulkTransferRef->buffer != nullptr) {
+        OsalMemFree(transferCancle->bulkTransferRef->buffer);
+        transferCancle->bulkTransferRef->buffer = nullptr;
+    }
+    wrapper->bulkTransferList.remove(transferCancle);
+    delete transferCancle;
+    transferCancle = nullptr;
+    return HDF_SUCCESS;
+}
+
+void LibusbAdapter::BulkTransferInit(const UsbDev &dev)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    LibusbBulkWrapper *bulkWrapper = new(std::nothrow) LibusbBulkWrapper();
+    if (bulkWrapper == nullptr) {
+        HDF_LOGE("%{public}s:bulkWrapper is nullptr", __func__);
+        return;
+    }
+    std::pair<UsbDev, LibusbBulkWrapper*> bulkWrapperPair = std::make_pair(dev, bulkWrapper);
+    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
+    g_bulkManager.bulktransferVec.push_back(bulkWrapperPair);
+}
+
+void LibusbAdapter::BulkTransferRelease(const UsbDev &dev)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
+    DeleteBulkDevRequest(dev);
+}
+
+void LibusbAdapter::DeleteBulkDevRequest(const UsbDev &dev)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    size_t deleteId = -1;
+    for (size_t i = 0; i < g_bulkManager.bulktransferVec.size(); ++i) {
+        HDF_LOGI("%{public}s: delete bulk dev request bus num: %{public}d, dev addr: %{public}d", __func__,
+            g_bulkManager.bulktransferVec[i].first.busNum, g_bulkManager.bulktransferVec[i].first.devAddr);
+        if (g_bulkManager.bulktransferVec[i].first.busNum == dev.busNum
+                && g_bulkManager.bulktransferVec[i].first.devAddr == dev.devAddr) {
+            HDF_LOGI("%{public}s: delete bulk dev request device found", __func__);
+            if (g_bulkManager.bulktransferVec[i].second != nullptr) {
+                ClearBulkTranfer(g_bulkManager.bulktransferVec[i].second);
+            }
+            deleteId = i;
+            break;
+        }
+    }
+    if (deleteId >= 0) {
+        g_bulkManager.bulktransferVec.erase(g_bulkManager.bulktransferVec.begin() + deleteId);
+    }
+}
+
+void LibusbAdapter::ClearBulkTranfer(LibusbBulkWrapper *bulkWrapper)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (bulkWrapper == nullptr) {
+        HDF_LOGE("%{public}s: bulkWrapper is nullptr", __func__);
+        return;
+    }
+    if (bulkWrapper->bulkTransferList.size() <= 0) {
+        HDF_LOGI("%{public}s: clear bulk tranfer transfer list is empty", __func__);
+        return;
+    }
+
+    for (auto &bulkTransfer : bulkWrapper->bulkTransferList) {
+        if (bulkTransfer == nullptr) {
+            continue;
+        }
+        if (bulkTransfer->bulkTransferRef != nullptr) {
+            HDF_LOGI("%{public}s: clear bulk tranfer libusb free transfer", __func__);
+            libusb_free_transfer(bulkTransfer->bulkTransferRef);
+            bulkTransfer->bulkTransferRef = nullptr;
+        }
+        delete bulkTransfer;
+        bulkTransfer = nullptr;
+    }
+    delete bulkWrapper;
+    bulkWrapper = nullptr;
+}
+
+LibusbBulkTransfer *LibusbAdapter::FindBulkTransfer(const UsbDev &dev, const UsbPipe &pipe,
+    const sptr<Ashmem> &ashmem)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
+    auto it = std::find_if(
+        g_bulkManager.bulktransferVec.begin(), g_bulkManager.bulktransferVec.end(),
+        [&dev](const auto& pair) {
+            return pair.first.busNum == dev.busNum && pair.first.devAddr == dev.devAddr;
+    });
+    if (it == g_bulkManager.bulktransferVec.end()) {
+        HDF_LOGE("%{public}s: wrapper is nullptr", __func__);
+        return nullptr;
+    }
+    LibusbBulkWrapper* wrapper = it->second;
+    if (wrapper == nullptr) {
+        HDF_LOGE("%{public}s: wrapper is nullptr", __func__);
+        return nullptr;
+    }
+    std::lock_guard<std::mutex> listLock(wrapper->bulkTransferLock);
+
+    auto bulkPair = std::find_if(
+        wrapper->bulkTransferList.begin(), wrapper->bulkTransferList.end(),
+        [&pipe](const auto& pair) {
+            return pair->bulkTransferRef->endpoint == pipe.endpointId;
+    });
+    if (bulkPair != wrapper->bulkTransferList.end()) {
+        LibusbBulkTransfer* transferCancle = *bulkPair;
+        transferCancle->buikAshmemRef = ashmem;
+        return transferCancle;
+    }
+    HDF_LOGI("%{public}s:not find BulkTransfer", __func__);
+    return nullptr;
+}
+
+int32_t LibusbAdapter::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<V2_0::IUsbdBulkCallback> &cb)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (cb == nullptr) {
+        HDF_LOGE("%{public}s: cb is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    LibusbBulkTransfer *bulkTransfer = new(std::nothrow) LibusbBulkTransfer();
+    if (bulkTransfer == nullptr) {
+        HDF_LOGE("%{public}s: bulkTransfer is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
+    auto it = std::find_if(
+        g_bulkManager.bulktransferVec.begin(), g_bulkManager.bulktransferVec.end(),
+        [&dev](const auto& pair) {
+            return pair.first.busNum == dev.busNum && pair.first.devAddr == dev.devAddr;
+    });
+    if (it == g_bulkManager.bulktransferVec.end()) {
+        HDF_LOGE("%{public}s: Wrapper not found, device does not exist", __func__);
+        return HDF_FAILURE;
+    }
+    LibusbBulkWrapper* wrapper = it->second;
+    if (wrapper == nullptr) {
+        HDF_LOGE("%{public}s: Wrapper is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    bulkTransfer->busNum = dev.busNum;
+    bulkTransfer->devAddr = dev.devAddr;
+    bulkTransfer->bulkCbRef = cb;
+    bulkTransfer->bulkTransferRef->endpoint = pipe.endpointId;
+    std::lock_guard<std::mutex> listLock(wrapper->bulkTransferLock);
+    wrapper->bulkTransferList.push_back(bulkTransfer);
+    return HDF_SUCCESS;
+}
+
+int32_t LibusbAdapter::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
+    auto it = std::find_if(
+        g_bulkManager.bulktransferVec.begin(), g_bulkManager.bulktransferVec.end(),
+        [&dev](const auto& pair) {
+            return pair.first.busNum == dev.busNum && pair.first.devAddr == dev.devAddr;
+    });
+    if (it == g_bulkManager.bulktransferVec.end()) {
+        HDF_LOGE("%{public}s: wrapper is nullptr, dev is not exist", __func__);
+        return HDF_FAILURE;
+    }
+    LibusbBulkWrapper* wrapper = it->second;
+    if (wrapper == nullptr) {
+        HDF_LOGE("%{public}s: Wrapper is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    std::lock_guard<std::mutex> listLock(wrapper->bulkTransferLock);
+    auto transferIt = std::find_if(
+        wrapper->bulkTransferList.begin(), wrapper->bulkTransferList.end(),
+        [&pipe](const auto& pair) {
+            return pair->bulkTransferRef->endpoint == pipe.endpointId;
+    });
+    if (transferIt == wrapper->bulkTransferList.end()) {
+        HDF_LOGE("%{public}s: transferCancle is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    LibusbBulkTransfer* transferCancle = *transferIt;
+    if (transferCancle == nullptr) {
+        HDF_LOGE("%{public}s:transferCancle is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    if (transferCancle->isTransferring) {
+        HDF_LOGE("%{public}s:Data is being transmitted and cancellation of regist is not allowed", __func__);
+        return HDF_FAILURE;
+    }
+    transferCancle->bulkCbRef = nullptr;
+    return HDF_SUCCESS;
+}
+
+int32_t LibusbAdapter::RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
+{
+    HDF_LOGI("%{public}s: enter RemoveSubscriber.", __func__);
+    auto tempSize = subscribers_.size();
+    subscribers_.remove(subscriber);
+    if (tempSize == subscribers_.size()) {
+        HDF_LOGE("%{public}s: subsciber not exist.", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+void LibusbAdapter::GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSubscriber> subscriber)
+{
+    int r;
+    ssize_t cnt = 0;
+    libusb_device **devs;
+    cnt = libusb_get_device_list(ctx, &devs);
+    if (cnt < 0) {
+        HDF_LOGW("%{public}s ctx not init", __func__);
+        return;
+    }
+    int busNum = 0;
+    int devAddr = 0;
+    for (ssize_t i = 0; i < cnt; i++) {
+        libusb_device *dev = devs[i];
+        struct libusb_device_descriptor desc;
+        r = libusb_get_device_descriptor(dev, &desc);
+        if (r < 0) {
+            continue;
+        }
+        busNum = libusb_get_bus_number(dev);
+        devAddr = libusb_get_device_address(dev);
+        if (busNum == 0 || devAddr == 0) {
+            HDF_LOGW("%{public}s Invalid parameter", __func__);
+            continue;
+        }
+        HDF_LOGI("%{public}s:busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
+        V2_0::USBDeviceInfo info = {ACT_DEVUP, busNum,
+            devAddr};
+        subscriber->DeviceEvent(info);
+    }
+    libusb_free_device_list(devs, 1);
+}
+
+int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s subsriber is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    if (subscribers_.size() == 0) {
+        HDF_LOGI("%{public}s: rigister callback.", __func__);
+        int rc = libusb_hotplug_register_callback(g_libusb_context,
+            static_cast<libusb_hotplug_event>(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT),
+            LIBUSB_HOTPLUG_NO_FLAGS,
+            LIBUSB_HOTPLUG_MATCH_ANY,
+            LIBUSB_HOTPLUG_MATCH_ANY,
+            LIBUSB_HOTPLUG_MATCH_ANY,
+            HotplugCallback,
+            this,
+            &hotplug_handle_);
+        if (rc != LIBUSB_SUCCESS) {
+            HDF_LOGE("%{public}s: Failed to register hotplug callback: %{public}d", __func__, rc);
+            libusb_exit(g_libusb_context);
+            g_libusb_context = nullptr;
+            return HDF_FAILURE;
+        }
+    }
+    GetCurrentDeviceList(g_libusb_context, subscriber);
+    subscribers_.push_back(subscriber);
+    HDF_LOGI("%{public}s: hotpluginit success", __func__);
+    return HDF_SUCCESS;
+}
+
+void NotifyAllSubscriber(std::list<sptr<V2_0::IUsbdSubscriber>> subscribers, V2_0::USBDeviceInfo info)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    for (auto subscriber: subscribers) {
+        subscriber->DeviceEvent(info);
+    }
+}
+
+int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* device,
+    libusb_hotplug_event event, void* user_data)
+{
+    HDF_LOGI("%{public}s: enter.", __func__);
+    if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
+        HDF_LOGD("%{public}s: event=%{public}d arrival device", __func__, event);
+        V2_0::USBDeviceInfo info = {ACT_DEVUP, libusb_get_bus_number(device),
+            libusb_get_device_address(device)};
+        NotifyAllSubscriber(LibusbAdapter::subscribers_, info);
+    } else if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT) {
+        HDF_LOGD("%{public}s: event=%{public}d remove device", __func__, event);
+        V2_0::USBDeviceInfo info = {ACT_DEVDOWN, libusb_get_bus_number(device),
+            libusb_get_device_address(device)};
+        NotifyAllSubscriber(LibusbAdapter::subscribers_, info);
+    }
     return HDF_SUCCESS;
 }
 } // namespace V1_2
