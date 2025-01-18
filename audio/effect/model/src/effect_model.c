@@ -352,7 +352,7 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
         }
         if (ConstructDescriptor(descVdi) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: ConstructDescriptor fail!", __func__);
-            continue;
+            return HDF_FAILURE;
         }
         if (factLib->GetDescriptor(factLib, uuid, descVdi) != HDF_SUCCESS) {
             DeleteEffectLibrary(g_cfgDescs->effectCfgDescs[i].library);

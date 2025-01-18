@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "audio_dfx_util.h"
+#include "audio_dfx_vdi.h"
 #ifdef AUDIO_HITRACE_ENABLE
 #include <hitrace_meter.h>
 #endif
@@ -21,10 +21,8 @@
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 #endif
-#include "audio_uhdf_log.h"
 
 #define HICOLLIE_TIMEOUT 8
-#define TIME_1000 1000
 
 void HdfAudioStartTrace(const char* value, int valueLen)
 {
@@ -64,19 +62,4 @@ void CancelTimer(int32_t id)
 #else
     (void)id;
 #endif
-}
-
-void CheckOverTime(struct timeval startTimeStamp, int64_t overTime, const char* logStr)
-{
-    if (logStr == NULL) {
-        HDF_LOGE("logStr is NULL");
-        return;
-    }
-    struct timeval stopTimeStamp = {0};
-    gettimeofday(&stopTimeStamp, nullptr);
-    int32_t runTime = (int32_t)((stopTimeStamp.tv_sec - startTimeStamp.tv_sec) * TIME_1000 +
-        (stopTimeStamp.tv_usec - startTimeStamp.tv_usec) / TIME_1000);
-    if (runTime > overTime) {
-        HDF_LOGW("run %{public}s over time, [%{public}d]ms", logStr, runTime);
-    }
 }

@@ -15,9 +15,7 @@
 
 #ifndef AUDIO_DFX_VDI_H
 #define AUDIO_DFX_VDI_H
-#include <stdbool.h>
-#include <stdint.h>
-#include <sys/time.h>
+#include "audio_types_vdi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,7 +25,6 @@ void HdfAudioStartTrace(const char* value, int valueLen);
 void HdfAudioFinishTrace(void);
 int32_t SetTimer(const char* name);
 void CancelTimer(int32_t id);
-void CheckOverTime(struct timeval startTimeStamp, int64_t overTime, const char* logStr);
 
 #ifdef __cplusplus
 }

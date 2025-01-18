@@ -21,7 +21,6 @@
 #include "v1_0/ieffect_control_vdi.h"
 #include "audio_uhdf_log.h"
 #include "osal_mem.h"
-#include "audio_dfx_util.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 #define AUDIO_EFFECT_DESC_LEN 256
@@ -88,15 +87,13 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
     }
     struct AudioEffectBufferVdi *inputVdi = (struct AudioEffectBufferVdi *)input;
     struct AudioEffectBufferVdi *outputVdi = (struct AudioEffectBufferVdi *)output;
-    HdfAudioStartTrace(__func__, 0);
     int32_t ret = manager->ctrlOps->EffectProcess(manager->ctrlOps, inputVdi, outputVdi);
-    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("AudioEffectProcess failed, ret=%{public}d", ret);
         return ret;
     }
 
-    output = (struct AudioEffectBuffer *)outputVdi; 
+    output = (struct AudioEffectBuffer *)outputVdi;
     return ret;
 }
 
@@ -114,10 +111,8 @@ int32_t EffectControlSendCommand(struct IEffectControl *self, enum EffectCommand
         return HDF_FAILURE;
     }
     enum EffectCommandTableIndexVdi cmdIdVdi = (enum EffectCommandTableIndexVdi)cmdId;
-    HdfAudioStartTrace(__func__, 0);
     int32_t ret = manager->ctrlOps->SendCommand(manager->ctrlOps, cmdIdVdi, (void *)cmdData, cmdDataLen,
                                          (void *)replyData, replyDataLen);
-    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("SendCommand failed, ret=%{public}d", ret);
         return ret;
@@ -142,9 +137,7 @@ int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControl
         HDF_LOGE("%{public}s: ConstructDescriptor fail!", __func__);
         return HDF_FAILURE;
     }
-    HdfAudioStartTrace(__func__, 0);
     int32_t ret = manager->ctrlOps->GetEffectDescriptor(manager->ctrlOps, descVdi);
-    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("EffectGetOwnDescriptor failed, ret=%{public}d", ret);
         return ret;
@@ -169,13 +162,11 @@ int32_t EffectControlEffectReverse(struct IEffectControl *self, const struct Aud
     }
     struct AudioEffectBufferVdi *inputVdi = (struct AudioEffectBufferVdi *)input;
     struct AudioEffectBufferVdi *outputVdi = (struct AudioEffectBufferVdi *)output;
-    HdfAudioStartTrace(__func__, 0);
     int32_t ret = manager->ctrlOps->EffectReverse(manager->ctrlOps, inputVdi, outputVdi);
-    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("EffectReverse failed, ret=%{public}d", ret);
         return ret;
     }
-    output = (struct AudioEffectBuffer *)outputVdi;     
+    output = (struct AudioEffectBuffer *)outputVdi;
     return ret;
 }
