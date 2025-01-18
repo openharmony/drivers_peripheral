@@ -1362,16 +1362,16 @@ static int32_t HdiSerStubUpdateAudioRoute(const struct HdfDeviceIoClient *client
 
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
         AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
-        return AUDIO_HAL_ERR_INTERNAL;
+        goto FINISHED;
     }
     if (adapter == NULL) {
         AUDIO_FUNC_LOGE("adapter is NULL!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
+        goto FINISHED;
     }
 
     if (adapter->UpdateAudioRoute == NULL) {
         AUDIO_FUNC_LOGE("UpdateAudioRoute is NULL");
-        return AUDIO_HAL_ERR_INTERNAL;
+        goto FINISHED;
     }
     audioAdapterRet = adapter->UpdateAudioRoute(adapter, route, &routeHandle);
     if (audioAdapterRet != HDF_SUCCESS) {

@@ -23,7 +23,7 @@
 #include "audio_capture_vdi.h"
 #include "audio_common_vdi.h"
 #include "audio_render_vdi.h"
-#include "audio_dfx_util.h"
+#include "audio_dfx_vdi.h"
 #include "v4_0/iaudio_callback.h"
 #include "stub_collector.h"
 
@@ -268,6 +268,45 @@ EXIT:
     return ret;
 }
 
+static int32_t CreateCapturePre(struct IAudioAdapter *vdiAdapter, struct IAudioCapture **capture,
+    const struct AudioDeviceDescriptor *desc, const struct AudioSampleAttributes *attrs, uint32_t *captureId)
+{
+    struct IAudioCaptureVdi *vdiCapture = NULL;
+    struct AudioDeviceDescriptorVdi vdiDesc;
+    struct AudioSampleAttributesVdi vdiAttrs;
+    (void)memset_s((void *)&vdiDesc, sizeof(vdiDesc), 0, sizeof(vdiDesc));
+    (void)memset_s((void *)&vdiAttrs, sizeof(vdiAttrs), 0, sizeof(vdiAttrs));
+    if (AudioCommonDevDescToVdiDevDescVdi(desc, &vdiDesc) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Desc to VdiDesc fail");
+        return HDF_FAILURE;
+    }
+    AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
+
+    if (vdiAdapter == NULL || vdiAdapter->CreateCapture == NULL || vdiAdapter->DestroyCapture == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int32_t id = SetTimer("Hdi:CreateCapture");
+    ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
+    CancelTimer(id);
+    OsalMemFree((void *)vdiDesc.desc);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio vdiAdapter call CreateCapture fail, ret=%{public}d", ret);
+        return HDF_FAILURE;
+    }
+    vdiCapture->AddAudioEffect = NULL;
+    vdiCapture->RemoveAudioEffect = NULL;
+    vdiCapture->GetFrameBufferSize = NULL;
+    vdiCapture->IsSupportsPauseAndResume = NULL;
+    *capture = AudioCreateCaptureByIdVdi(attrs, captureId, vdiCapture, desc);
+    if (*capture == NULL) {
+        (void)vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
+        AUDIO_FUNC_LOGE("create audio capture failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+}
+
 static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture, uint32_t *captureId)
 {
@@ -281,42 +320,12 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
-
-    struct AudioDeviceDescriptorVdi vdiDesc;
-    struct AudioSampleAttributesVdi vdiAttrs;
-    (void)memset_s((void *)&vdiDesc, sizeof(vdiDesc), 0, sizeof(vdiDesc));
-    (void)memset_s((void *)&vdiAttrs, sizeof(vdiAttrs), 0, sizeof(vdiAttrs));
-    if (AudioCommonDevDescToVdiDevDescVdi(desc, &vdiDesc) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Desc to VdiDesc fail");
-        ret = HDF_FAILURE;
-        goto EXIT;
-    }
-    AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
-
-    if (vdiAdapter->CreateCapture == NULL || vdiAdapter->DestroyCapture == NULL) {
-        AUDIO_FUNC_LOGE("invalid param");
-        ret = HDF_ERR_INVALID_PARAM;
-        goto EXIT;
-    }
-    int32_t id = SetTimer("Hdi:CreateCapture");
-    ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
-    CancelTimer(id);
-    OsalMemFree((void *)vdiDesc.desc);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio vdiAdapter call CreateCapture fail, ret=%{public}d", ret);
-        goto EXIT;
-    }
-    vdiCapture->AddAudioEffect = NULL;
-    vdiCapture->RemoveAudioEffect = NULL;
-    vdiCapture->GetFrameBufferSize = NULL;
-    vdiCapture->IsSupportsPauseAndResume = NULL;
-    *capture = AudioCreateCaptureByIdVdi(attrs, captureId, vdiCapture, desc);
-    if (*capture == NULL) {
-        (void)vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
+    ret = CreateCapturePre(vdiAdapter, capture, desc, attrs, captureId);
+    if (*capture == NULL || ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("create audio capture failed");
-        ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
+    
     AUDIO_FUNC_LOGI("AudioCreateCaptureVdi Success, captureId = [%{public}u]", *captureId);
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
@@ -772,7 +781,6 @@ static void AudioInitAdapterInstanceVdi(struct IAudioAdapter *adapter)
 uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex)
 {
     pthread_rwlock_rdlock(&g_rwAdapterLock);
-    uint32_t refCnt = 0;
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("get adapter ref error, descIndex=%{public}d", descIndex);
         pthread_rwlock_unlock(&g_rwAdapterLock);
@@ -780,12 +788,8 @@ uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex)
     }
 
     struct AudioAdapterPrivVdi *priv = AudioAdapterGetPrivVdi();
-    refCnt = priv->adapterInfo[descIndex].refCnt;
-    if (refCnt > AUDIO_VDI_ADAPTER_REF_CNT_MAX) {
-        priv->adapterInfo[descIndex].refCnt = 1;
-    }
     pthread_rwlock_unlock(&g_rwAdapterLock);
-    return refCnt;
+    return priv->adapterInfo[descIndex].refCnt;
 }
 
 int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **adapter)
@@ -814,6 +818,7 @@ int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **ad
     *adapter = priv->adapterInfo[descIndex].adapter;
     AUDIO_FUNC_LOGI("increase adapternameIndex[%{public}d], refCount[%{public}d]", descIndex,
         priv->adapterInfo[descIndex].refCnt);
+
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;

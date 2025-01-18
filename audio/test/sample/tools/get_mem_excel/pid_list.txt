@@ -1,3 +1,0 @@
-sensor_host
-audio_host
-composer_host
