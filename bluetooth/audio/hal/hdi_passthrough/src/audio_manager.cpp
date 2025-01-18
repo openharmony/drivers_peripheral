@@ -129,6 +129,7 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
     } else {
         OHOS::Bluetooth::TearDown();
     }
+    OHOS::Bluetooth::UnBlockStart();
 #endif
 }
 
