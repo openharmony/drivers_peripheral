@@ -268,7 +268,7 @@ EXIT:
     return ret;
 }
 
-static int32_t CreateCapturePre(struct IAudioAdapter *vdiAdapter, struct IAudioCapture **capture,
+static int32_t CreateCapturePre(struct IAudioAdapterVdi *vdiAdapter, struct IAudioCapture **capture,
     const struct AudioDeviceDescriptor *desc, const struct AudioSampleAttributes *attrs, uint32_t *captureId)
 {
     struct IAudioCaptureVdi *vdiCapture = NULL;
@@ -287,7 +287,7 @@ static int32_t CreateCapturePre(struct IAudioAdapter *vdiAdapter, struct IAudioC
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t id = SetTimer("Hdi:CreateCapture");
-    ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
+    int32_t ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
@@ -312,7 +312,6 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
 {
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
-    struct IAudioCaptureVdi *vdiCapture = NULL;
     int32_t ret = HDF_SUCCESS;
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL || captureId == NULL) {
@@ -325,7 +324,6 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
         AUDIO_FUNC_LOGE("create audio capture failed");
         goto EXIT;
     }
-    
     AUDIO_FUNC_LOGI("AudioCreateCaptureVdi Success, captureId = [%{public}u]", *captureId);
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
