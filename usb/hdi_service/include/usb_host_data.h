@@ -40,10 +40,10 @@ namespace V2_0 {
 
 struct UsbdSubscriber {
     sptr<IUsbdSubscriber> subscriber;
-    void *impl;
+    std::shared_ptr<void> impl;
     struct HdfDevEventlistener usbPnpListener;
     sptr<IRemoteObject> remote;
-    void *deathRecipient;
+    std::shared_ptr<void> deathRecipient;
 };
 } // namespace V2_0
 } // namespace Usb

@@ -37,8 +37,8 @@ public:
     ~UsbHostImpl() override;
     int32_t OpenDevice(const UsbDev &dev) override;
     int32_t CloseDevice(const UsbDev &dev) override;
-    int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor) override;
-    int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor) override;
+    int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor) override;
+    int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor) override;
     int32_t SetConfig(const UsbDev &dev, uint8_t configIndex) override;
     int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex) override;
     int32_t ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t force) override;
@@ -65,8 +65,8 @@ public:
     int32_t ResetDevice(const UsbDev &dev) override;
     int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, const std::vector<uint8_t> &clientData,
         const std::vector<uint8_t> &buffer) override;
-    int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor) override;
-    int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor) override;
+    int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor) override;
+    int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor) override;
     int32_t GetFileDescriptor(const UsbDev &dev, int32_t &fd) override;
     int32_t InterruptTransferRead(
         const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data) override;
@@ -88,11 +88,6 @@ public:
         const sptr<Ashmem> &ashmem) override;
     int32_t UsbCancelTransfer(const UsbDev &dev, const int32_t endpoint) override;
 private:
-    void UsbConvertDev(const HDI::Usb::V2_0::UsbDev &dev);
-    void UsbConvertPipe(const HDI::Usb::V2_0::UsbPipe &pipe);
-    void UsbConvertCtrl(const HDI::Usb::V2_0::UsbCtrlTransfer &ctrl);
-    void UsbConvertCtrlParams(const HDI::Usb::V2_0::UsbCtrlTransferParams &ctrlParams);
-    static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];
     static bool isGadgetConnected_;
 };
 } // namespace V2_0

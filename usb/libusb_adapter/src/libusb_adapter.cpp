@@ -2805,9 +2805,11 @@ void LibusbAdapter::GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSu
             HDF_LOGW("%{public}s Invalid parameter", __func__);
             continue;
         }
+        if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
+            continue;
+        }
         HDF_LOGI("%{public}s:busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
-        V2_0::USBDeviceInfo info = {ACT_DEVUP, busNum,
-            devAddr};
+        V2_0::USBDeviceInfo info = {ACT_DEVUP, busNum, devAddr};
         subscriber->DeviceEvent(info);
     }
     libusb_free_device_list(devs, 1);
