@@ -69,6 +69,14 @@ int32_t UserAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cm
 int HdfUserAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("HdfUserAuthInterfaceDriverInit enter");
+    if (deviceObject == nullptr) {
+        IAM_LOGE("deviceObject is nullptr");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_USERAUTH)) {
+        IAM_LOGE("set pin auth hdf class failed");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
