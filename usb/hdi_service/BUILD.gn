@@ -72,6 +72,7 @@ ohos_shared_library("libusb_interface_service_1.2") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:usb_idl_headers_1.2",
+      "drivers_interface_usb:usb_idl_headers_2.0",
       "drivers_interface_usb:usbfn_mtp_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
