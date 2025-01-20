@@ -2593,7 +2593,12 @@ int32_t UsbImpl::UsbSubmitTransfer(const UsbDev &dev, const OHOS::HDI::Usb::V1_2
         HDF_LOGE("%{public}s: add DeathRecipient failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return LibusbAdapter::GetInstance()->AsyncSubmitTransfer(dev, info, cb, ashmem);
+    int32_t ret = LibusbAdapter::GetInstance()->AsyncSubmitTransfer(dev, info, cb, ashmem);
+    if (ret < 0) {
+        remote->RemoveDeathRecipient(asyncRecipient);
+        asyncRecipient.clear();
+    }
+    return ret;
 #endif // LIBUSB_ENABLE
 }
 
