@@ -68,6 +68,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &sinkAbilit
     }
 
     camera_metadata_item_entry_t* itemEntry = OHOS::Camera::GetMetadataItems(dCameraAbility_->get());
+    CHECK_AND_FREE_RETURN_RET_LOG(itemEntry == nullptr, FAILED, rootValue, "get itemEntry failed.");
     uint32_t count = dCameraAbility_->get()->item_count;
     for (uint32_t i = 0; i < count; i++, itemEntry++) {
         allResultSet_.insert((MetaType)(itemEntry->item));
