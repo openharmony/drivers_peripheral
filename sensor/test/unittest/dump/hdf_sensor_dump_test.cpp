@@ -166,7 +166,7 @@ HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
     HdfSbufWriteUint32(data, INIT_DATA_NUM);
     HdfSbufWriteString(data, "-h");
-    GetSensorDump(data, reply);
+    int32_t ret = GetSensorDump(data, reply);
     EXPECT_EQ(HDF_SUCCESS, ret);
     PrintDumpResult(reply);
 }
@@ -191,7 +191,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
     HdfSbufWriteUint32(data, INIT_DATA_NUM);
     HdfSbufWriteString(data, "-c");
-    GetSensorDump(data, reply);
+    int32_t ret = GetSensorDump(data, reply);
     EXPECT_EQ(HDF_SUCCESS, ret);
     PrintDumpResult(reply);
 
@@ -219,7 +219,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
     HdfSbufWriteUint32(data, INIT_DATA_NUM);
     HdfSbufWriteString(data, "-d");
-    GetSensorDump(data, reply);
+    int32_t ret = GetSensorDump(data, reply);
     EXPECT_EQ(HDF_SUCCESS, ret);
     PrintDumpResult(reply);
 
@@ -239,7 +239,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowListTest, TestSize.Level1)
     struct HdfSBuf* data = HdfSbufTypedObtain(SBUF_IPC);
     HdfSbufWriteUint32(data, INIT_DATA_NUM);
     HdfSbufWriteString(data, "-l");
-    GetSensorDump(data, reply);
+    int32_t ret = GetSensorDump(data, reply);
     EXPECT_EQ(HDF_SUCCESS, ret);
     PrintDumpResult(reply);
 }
