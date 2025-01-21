@@ -167,6 +167,7 @@ HWTEST_F(HdfSensorDumpTest, SensorDumpHelpTest, TestSize.Level1)
     HdfSbufWriteUint32(data, INIT_DATA_NUM);
     HdfSbufWriteString(data, "-h");
     GetSensorDump(data, reply);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     PrintDumpResult(reply);
 }
 
@@ -191,6 +192,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
     HdfSbufWriteUint32(data, INIT_DATA_NUM);
     HdfSbufWriteString(data, "-c");
     GetSensorDump(data, reply);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     PrintDumpResult(reply);
 
@@ -219,6 +221,7 @@ HWTEST_F(HdfSensorDumpTest, SensorShowDataTest, TestSize.Level1)
     HdfSbufWriteUint32(data, INIT_DATA_NUM);
     HdfSbufWriteString(data, "-d");
     GetSensorDump(data, reply);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     PrintDumpResult(reply);
 
     Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -238,5 +241,6 @@ HWTEST_F(HdfSensorDumpTest, SensorShowListTest, TestSize.Level1)
     HdfSbufWriteUint32(data, INIT_DATA_NUM);
     HdfSbufWriteString(data, "-l");
     GetSensorDump(data, reply);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     PrintDumpResult(reply);
 }
