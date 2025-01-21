@@ -227,7 +227,8 @@ HWTEST_F(UtestMpiDeviceManager, SendFrameBuffer_Success, TestSize.Level0)
     node.Init();
     TestDevice device;
     device.Init();
-    DM->SendFrameBuffer(buffer);
+    RetCode rc = DM->SendFrameBuffer(buffer);
+    EXPECT_EQ(RC_OK, rc);
 }
 
 HWTEST_F(UtestMpiDeviceManager, Configure_Success, TestSize.Level0)

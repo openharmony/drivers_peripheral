@@ -237,6 +237,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_009, TestSize.Level1)
         std::vector<uint8_t> metaVec;
         MetadataUtils::ConvertMetadataToVec(metaInvalid, metaVec);
         cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+        EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     }
 }
 

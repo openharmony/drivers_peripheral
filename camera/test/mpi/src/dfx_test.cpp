@@ -254,6 +254,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0015, TestSize.Level3)
         int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Close_Timeout = " << parameter << std::endl;
         Test_->Open();
+        EXPECT_EQ(false, Test_->cameraDevice == nullptr);
         Test_->Close();
     }
 }
@@ -1012,6 +1013,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0015, TestSize.Level3)
         std::string parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Close_Timeout = " << parameter << std::endl;
         Test_->Open();
+        EXPECT_EQ(false, Test_->cameraDevice == nullptr);
         Test_->Close();
     }
 }

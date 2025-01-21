@@ -241,6 +241,7 @@ void Test::Open()
         deviceCallback = new HdiDeviceCallback(this);
 #endif
         rc = service->OpenCamera(cameraIds.front(), deviceCallback, cameraDevice);
+        EXPECT_EQ(false, rc != Camera::NO_ERROR || cameraDevice == nullptr);
         if (rc != Camera::NO_ERROR || cameraDevice == nullptr) {
             std::cout << "==========[test log]OpenCamera failed, rc = " << rc << std::endl;
             return;
