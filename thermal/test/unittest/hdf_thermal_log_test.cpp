@@ -65,13 +65,9 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest001, TestSize.Level1)
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest001: start.");
     auto &hdfLog = ThermalDfx::GetInstance();
     hdfLog.Init();
-    hdfLog.DoWork();
     // thermal log off skipped tests
-    if (!hdfLog.enable_) {
-        ThermalDfx::DestroyInstance();
-        THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest001: thermal log off skipped tests.");
-        return;
-    }
+    ASSERT_TRUE(hdfLog.enable_) << "HdfThermalLogTest001: thermal log off skipped tests.";
+    hdfLog.DoWork();
     ThermalDfx::DestroyInstance();
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest001: end.");
 }
