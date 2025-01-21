@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include "securec.h"
 #include "lib_acm_test.h"
+#include "hdf_base.h"
 
 using namespace std;
 using namespace testing::ext;
