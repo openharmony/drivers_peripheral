@@ -52,6 +52,14 @@ static const string NODE_PATH = "dev/input/";
 static const size_t COUNT = 1;
 static const size_t INVALID_DEV_INDEX = 33;
 
+namespace {
+std::string g_errLog;
+void MyLogCallback(const LogType type, const LogLevel level, const unsigned int domain, const char *tag,
+    const char *msg)
+{
+    g_errLog = msg;
+}
+}
 
 class HdiInputTest : public testing::Test {
 public:
@@ -1046,8 +1054,10 @@ HWTEST_F(HdiInputTest, UnregisterHotPlugCallback001, TestSize.Level1)
 HWTEST_F(HdiInputTest, SendHotPlugEvent001, TestSize.Level1)
 {
     printf("%s: [Input] SendHotPlugEvent001 enter\n", __func__);
+    LOG_SetCallback(MyLogCallback);
     InputDeviceManager iInputDeviceManager;
     iInputDeviceManager.SendHotPlugEvent(g_type, g_index, STATUS);
+    EXPECT_TRUE(g_errLog.find("SendHotPlugEvent") != std::string::npos);
 }
 
 /**
@@ -1059,8 +1069,10 @@ HWTEST_F(HdiInputTest, SendHotPlugEvent001, TestSize.Level1)
 HWTEST_F(HdiInputTest, DoWithEventDeviceAdd001, TestSize.Level1)
 {
     printf("%s: [Input] DoWithEventDeviceAdd001 enter\n", __func__);
+    LOG_SetCallback(MyLogCallback);
     InputDeviceManager iInputDeviceManager;
     iInputDeviceManager.DoWithEventDeviceAdd(g_fileDescriptorFirst, g_fileDescriptorSecond, NODE_PATH);
+    EXPECT_TRUE(g_errLog.find("DoWithEventDeviceAdd") != std::string::npos);
 }
 
 /**
@@ -1072,8 +1084,10 @@ HWTEST_F(HdiInputTest, DoWithEventDeviceAdd001, TestSize.Level1)
 HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level1)
 {
     printf("%s: [Input] DoWithEventDeviceDel001 enter\n", __func__);
+    LOG_SetCallback(MyLogCallback);
     InputDeviceManager iInputDeviceManager;
     iInputDeviceManager.DoWithEventDeviceDel(g_fileDescriptorFirst, g_index);
+    EXPECT_TRUE(g_errLog.find("no found device") != std::string::npos);
 }
 
 /**
@@ -1085,10 +1099,12 @@ HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level1)
 HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level1)
 {
     printf("%s: [Input] ReportEventPkg001 enter\n", __func__);
+    LOG_SetCallback(MyLogCallback);
     InputEventPackage **evtPkg = (InputEventPackage **)OsalMemAlloc(sizeof(InputEventPackage *) * COUNT);
     INPUT_CHECK_NULL_POINTER(evtPkg, INPUT_NULL_PTR);
     InputDeviceManager iInputDeviceManager;
     iInputDeviceManager.ReportEventPkg(g_fileDescriptorFirst, evtPkg, COUNT);
+    EXPECT_TRUE(g_errLog.find("ReportEventPkg") != std::string::npos);
 }
 
 /**
@@ -1100,9 +1116,11 @@ HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level1)
 HWTEST_F(HdiInputTest, DoRead001, TestSize.Level1)
 {
     printf("%s: [Input] DoRead001 enter\n", __func__);
+    LOG_SetCallback(MyLogCallback);
     struct input_event evtBuffer[EVENT_BUFFER_SIZE] {};
     InputDeviceManager iInputDeviceManager;
     iInputDeviceManager.DoRead(g_fileDescriptorFirst, evtBuffer, EVENT_BUFFER_SIZE);
+    EXPECT_TRUE(g_errLog.find("CheckReadResult") != std::string::npos);
 }
 
 /**

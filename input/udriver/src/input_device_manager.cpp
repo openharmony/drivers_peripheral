@@ -118,6 +118,7 @@ void InputDeviceManager::ReportEventPkg(int32_t iFd, InputEventPackage **iEvtPkg
             callbackFunc.second->EventPkgCallback(const_cast<const InputEventPackage **>(iEvtPkg), iCount, index);
         }
     }
+    HDF_LOGI("%{public}s end", __func__);
     return;
 }
 
@@ -515,6 +516,7 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
         }
     }
     status = INPUT_DEVICE_STATUS_OPENED;
+    HDF_LOGI("%{public}s end", __func__);
     SendHotPlugEvent(type, index, status);
 }
 
@@ -536,6 +538,7 @@ void InputDeviceManager::SendHotPlugEvent(uint32_t &type, uint32_t &index, uint3
         reportHotPlugEventCallback_->HotPlugCallback(evtPlusPkg);
     }
 
+    HDF_LOGI("%{public}s end", __func__);
     OsalMemFree(evtPlusPkg);
     evtPlusPkg = nullptr;
 }
