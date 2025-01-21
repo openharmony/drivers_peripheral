@@ -1948,14 +1948,6 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest008, TestSize.Level1)
 }
 
 /**
- * @tc.number    : CheckRawSdkIfFillIsoRequest001
- * @tc.name      :
- * @tc.type      : PERFs
- * @tc.level     : Level 1
- */
-HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillIsoRequest001, TestSize.Level1) {}
-
-/**
  * @tc.number    : CheckRawSdkIfFillControlSetup001
  * @tc.name      :
  * @tc.type      : PERFs

@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include "securec.h"
 #include "lib_acm_test.h"
+#include "hdf_base.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -44,6 +45,7 @@ HWTEST_F(UsbDeviceSerialLoopback, DeviceSerialLoopback, TestSize.Level1)
 {
     printf("------start DeviceSerialLoopback------\n");
     char data[256] = {0};
+    int32_t ret = 0;
     while (1) {
         AcmRead(data);
         if (strlen(data) > 0) {
@@ -51,7 +53,8 @@ HWTEST_F(UsbDeviceSerialLoopback, DeviceSerialLoopback, TestSize.Level1)
                 break;
             }
             AcmWrite(data);
-            memset_s(data, sizeof(data), 0, sizeof(data));
+            ret = memset_s(data, sizeof(data), 0, sizeof(data));
+            EXPECT_EQ(HDF_SUCCESS, ret);
         }
     }
     printf("------end DeviceSerialLoopback------\n");

@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include "securec.h"
 #include "usbhost_ddk_test.h"
+#include "hdf_base.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -46,17 +47,22 @@ HWTEST_F(UsbHostSerialLoopback, HostSerialLoopback, TestSize.Level1)
 {
     printf("------start HostSerialLoopback------\n");
     char data[512] = {0};
+    int32_t ret = 0;
     while (true) {
-        UsbHostDdkTestOpen(HOST_ACM_SYNC_READ);
+        ret = UsbHostDdkTestOpen(HOST_ACM_SYNC_READ);
+        EXPECT_EQ(HDF_SUCCESS, ret);
         UsbHostDdkTestSyncRead(data);
-        UsbHostDdkTestClose(HOST_ACM_SYNC_READ);
+        ret = UsbHostDdkTestClose(HOST_ACM_SYNC_READ);
+        EXPECT_EQ(HDF_SUCCESS, ret);
         if (strlen(data) > 0) {
             if (strcmp(data, "q") == 0) {
                 break;
             }
-            UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
+            ret = UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
+            EXPECT_EQ(HDF_SUCCESS, ret);
             UsbHostDdkTestSyncWrite(data);
-            UsbHostDdkTestClose(HOST_ACM_SYNC_WRITE);
+            ret = UsbHostDdkTestClose(HOST_ACM_SYNC_WRITE);
+            EXPECT_EQ(HDF_SUCCESS, ret);
             memset_s(data, sizeof(data), 0, sizeof(data));
         }
     }
