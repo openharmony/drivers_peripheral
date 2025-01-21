@@ -1922,8 +1922,6 @@ int32_t LibusbAdapter::AsyncCancelTransfer(const UsbDev &dev, const int32_t endp
             return ret;
         }
         it = asyncWrapper->transferList.erase(it);
-        delete asyncTransfer;
-        asyncTransfer = nullptr;
         break;
     }
     HDF_LOGI("%{public}s: cancel transfer end", __func__);
@@ -1985,6 +1983,7 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
     // handle failed transfer
     if (transfer->status == LIBUSB_TRANSFER_CANCELLED) {
         HDF_LOGE("%{public}s: async transfer has been canceled", __func__);
+        HandleAsyncFailure(transfer);
         return;
     }
     if (transfer->status != LIBUSB_TRANSFER_COMPLETED && transfer->actual_length <= 0) {
