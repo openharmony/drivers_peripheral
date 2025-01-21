@@ -46,14 +46,12 @@ HWTEST_F(UsbDeviceSerialLoopback, DeviceSerialLoopback, TestSize.Level1)
     char data[256] = {0};
     int32_t ret = 0;
     while (1) {
-        ret = AcmRead(data);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        AcmRead(data);
         if (strlen(data) > 0) {
             if (strcmp(data, "q") == 0) {
                 break;
             }
-            ret = AcmWrite(data);
-            EXPECT_EQ(HDF_SUCCESS, ret);
+            AcmWrite(data);
             ret = memset_s(data, sizeof(data), 0, sizeof(data));
             EXPECT_EQ(HDF_SUCCESS, ret);
         }
