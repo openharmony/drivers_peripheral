@@ -36,6 +36,7 @@ ohos_unittest("camera_metadata_operator_ut") {
   testonly = true
   module_out_path = module_output_path
   sources = [
+    "$camera_test_path/metadata_test/src/camera_error_log_detector.cpp",
     "$camera_test_path/metadata_test/src/camera_example_vendor_tags_uttest.cpp",
     "$camera_test_path/metadata_test/src/camera_metadata_enum_uttest.cpp",
     "$camera_test_path/metadata_test/src/camera_metadata_info_uttest.cpp",

@@ -171,6 +171,7 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0020, TestSize.Level1)
     std::cout <<" the light will turn off." << std::endl;
     Test_->status = true;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     sleep(3); // sleep for 3 seconds
     // Open the camera, preview
     Test_->Open();

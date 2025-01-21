@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <gtest/gtest.h>
 #include "hdi_common.h"
 #include "camera.h"
 #include "video_key_info.h"
@@ -256,6 +257,7 @@ void HdiCommon::StartStream(std::vector<StreamIntent> intents)
         CAMERA_LOGE("GetStreamOperator fail, rc = %{public}d", rc);
         return;
     }
+    EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
     streamInfoPre = std::make_shared<StreamInfo>();
     streamInfoVideo = std::make_shared<StreamInfo>();
     streamInfoCapture = std::make_shared<StreamInfo>();
@@ -281,11 +283,13 @@ void HdiCommon::StartStream(std::vector<StreamIntent> intents)
         printf("check StartStream: CreateStreams fail, rc = %d\n", rc);
         CAMERA_LOGE("check StartStream: CreateStreams fail, rc = %{public}d", rc);
     }
+    EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
     rc = streamOperator->CommitStreams(OperationMode::NORMAL, abilityVec);
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
         printf("check StartStream: CommitStreams fail, rc = %d\n", rc);
         CAMERA_LOGE("check StartStream: CommitStreams fail, rc = %{public}d", rc);
     }
+    EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     std::vector<StreamInfo>().swap(streamInfos);
 }
@@ -301,6 +305,7 @@ void HdiCommon::StartCapture(int streamId, int captureId, bool shutterCallback, 
         printf("check Capture: Capture fail, rc = %d\n", rc);
         CAMERA_LOGE("check Capture: Capture fail, rc = %{public}d", rc);
     }
+    EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(UT_SLEEP_TIME);
 }
 
@@ -313,6 +318,7 @@ void HdiCommon::StopStream(std::vector<int>& captureIds, std::vector<int>& strea
                 printf("check CancelCapture fail, rc = %d, captureId = %d\n", rc, captureId);
                 CAMERA_LOGE("check CancelCapture fail, rc = %{public}d, captureId = %{public}d", rc, captureId);
             }
+            EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
         }
     }
     if (streamIds.size() > 0) {
@@ -321,6 +327,7 @@ void HdiCommon::StopStream(std::vector<int>& captureIds, std::vector<int>& strea
             printf("check Capture: ReleaseStreams fail, rc = %d\n", rc);
             CAMERA_LOGE("check Capture: ReleaseStreams fail, rc = %{public}d", rc);
         }
+        EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
     }
 }
 

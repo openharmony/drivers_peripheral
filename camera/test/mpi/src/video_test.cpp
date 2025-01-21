@@ -79,6 +79,7 @@ HWTEST_F(VideoTest, Camera_Video_0002, TestSize.Level1)
     int32_t expo = 0xb0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
         std::cout << "==========[test log]check Capture: UpdateSettings success, for 10s." << std::endl;
     } else {
@@ -240,6 +241,7 @@ HWTEST_F(VideoTest, Camera_Video_0021, TestSize.Level1)
     int32_t expo = 0xc0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
         std::cout << "==========[test log]check Capture: UpdateSettings success, for 10s." << std::endl;
     } else {
@@ -276,6 +278,7 @@ HWTEST_F(VideoTest, Camera_Video_0022, TestSize.Level2)
     int32_t expo = 0xb0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
         std::cout << "==========[test log]check Capture: UpdateSettings success, for 10s." << std::endl;
     } else {
