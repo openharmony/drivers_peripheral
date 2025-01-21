@@ -193,7 +193,6 @@ HWTEST_F(HdfSensorDumpTest, SensorShowClientTest, TestSize.Level1)
     HdfSbufWriteString(data, "-c");
     GetSensorDump(data, reply);
     EXPECT_EQ(HDF_SUCCESS, ret);
-
     PrintDumpResult(reply);
 
     Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
