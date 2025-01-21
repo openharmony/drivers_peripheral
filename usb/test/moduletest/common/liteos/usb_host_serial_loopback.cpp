@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include "securec.h"
 #include "usbhost_ddk_test.h"
+#include "hdf_base.h"
 
 using namespace std;
 using namespace testing::ext;
