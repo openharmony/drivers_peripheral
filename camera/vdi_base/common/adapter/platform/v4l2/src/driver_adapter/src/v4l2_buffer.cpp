@@ -154,8 +154,6 @@ RetCode HosV4L2Buffers::SetAndPushBuffer(int fd, const std::shared_ptr<FrameSpec
         CAMERA_LOGE("HosV4L2Buffers::V4L2QueueBuffer: IOC_QUEUE_BUFFER Failed: %d", ret);
         return RC_ERROR;
     }
-    std::lock_guard<std::mutex> l(bufferLock_);
-    queuedBuffers_.push(buf.index);
     return RC_OK;
 }
 #endif
@@ -180,6 +178,8 @@ RetCode HosV4L2Buffers::V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>
     if (rc == RC_ERROR) {
         return RC_ERROR;
     }
+    std::lock_guard<std::mutex> l(bufferLock_);
+    queuedBuffers_.push(buf.index);
 #else
     std::lock_guard<std::mutex> l(bufferLock_);
     int rc = ioctl(fd, VIDIOC_QBUF, &buf);
@@ -291,26 +291,28 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
         CAMERA_LOGE("IOC_REQUEST_BUFFER failed: %d\n", err);
         return RC_ERROR;
     }
- 
-    availableBuffers_ += buf_cnt;
-    if (availableBuffers_ <= 0) {
-        // host did not finish drawing the previous frame:
-        // either the host is very busy, or the host camera framerate is low
-        CAMERA_LOGD("no buffer to display.");
-        return RC_OK;
-    }
 
-    availableBuffers_ -= 1;
-    if (queuedBuffers_.size() == 0) {
-        CAMERA_LOGE("error! received buffer not in queued buffer list!");
-        return RC_ERROR;
-    } else {
+    {
         std::lock_guard<std::mutex> l(bufferLock_);
+        if (buf_cnt > 0) {
+            availableBuffers_ += buf_cnt;
+        }
+        if (availableBuffers_ <= 0) {
+            // host did not finish drawing the previous frame:
+            // either the host is very busy, or the host camera framerate is low
+            CAMERA_LOGD("no buffer to display.");
+            return RC_OK;
+        }
+        if (queuedBuffers_.size() == 0) {
+            CAMERA_LOGE("error! received buffer not in queued buffer list!");
+            return RC_ERROR;
+        }
+
+        availableBuffers_ -= 1;
         buf.index = (uint32_t)queuedBuffers_.front();
         queuedBuffers_.pop();
+        CAMERA_LOGI("dequeue buffer idx %d queue size %lu buf_cnt %d", buf.index, queuedBuffers_.size(), buf_cnt);
     }
-    CAMERA_LOGI("express_camera request buffer idx %d queue size %lu buf_cnt %d",
-        buf.index, queuedBuffers_.size(), buf_cnt);
 #else
     CAMERA_LOGI("ioctl VIDIOC_DQBUF fd: %{public}d\n", fd);
     int rc = ioctl(fd, VIDIOC_DQBUF, &buf);
@@ -496,6 +498,10 @@ RetCode HosV4L2Buffers::V4L2ReleaseBuffers(int fd)
 
     std::lock_guard<std::mutex> l(bufferLock_);
     queueBuffers_.erase(fd);
+#ifdef V4L2_EMULATOR
+    availableBuffers_ = 0;
+    queuedBuffers_ = {};
+#endif
 
     for (auto &mem : adapterBufferMap_) {
         if (mem.second.dmafd > 0) {
