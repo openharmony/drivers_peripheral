@@ -20,6 +20,11 @@
 #include <string>
 #include <cmath>
 
+#ifdef DAUDIO_SUPPORT_SHARED_BUFFER
+#include "ashmem.h"
+#include "daudio_events.h"
+#include "daudio_utils.h"
+#endif
 #include "audio_render_interface_impl_base.h"
 
 #include <v1_0/audio_types.h>
@@ -99,6 +104,11 @@ public:
 private:
     float GetFadeRate(uint32_t currentIndex, const uint32_t durationIndex);
     int32_t FadeInProcess(const uint32_t durationFrame, int8_t* frameData, const size_t frameLength);
+#ifdef DAUDIO_SUPPORT_SHARED_BUFFER
+    int32_t CreateAshmem(int32_t ashmemLength);
+    int32_t WriteToShmem(const AudioData &data);
+    int32_t NotifyFirstChangeEvent(DistributedHardware::EXT_PARAM_EVENT evetType);
+#endif
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
@@ -126,6 +136,18 @@ private:
     sptr<IDAudioCallback> audioExtCallback_ = nullptr;
     sptr<IAudioCallback> renderCallback_ = nullptr;
     FILE *dumpFile_ = nullptr;
+
+#ifdef DAUDIO_SUPPORT_SHARED_BUFFER
+    OHOS::sptr<OHOS::Ashmem> ashmem_ = nullptr;
+    int32_t ashmemLength_ = 0;
+    int32_t lengthPerTrans_ = 0;
+    int32_t fd_ = 0;
+    uint32_t timeInterval_ = AUDIO_NORMAL_INTERVAL;
+    uint32_t minTimeInterval_ = AUDIO_NORMAL_INTERVAL;
+    uint32_t maxTimeInterval_ = AUDIO_NORMAL_INTERVAL;
+    int32_t writeIndex_ = -1;
+    uint64_t writeNum_ = 0;
+#endif
 };
 } // V1_0
 } // Audio

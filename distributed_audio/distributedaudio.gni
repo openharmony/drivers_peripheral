@@ -27,3 +27,7 @@ build_flags = [ "-Werror" ]
 declare_args() {
   drivers_peripheral_distributed_audio_extension = false
 }
+
+declare_args() {
+  drivers_peripheral_daudio_shared_buffer = false
+}
