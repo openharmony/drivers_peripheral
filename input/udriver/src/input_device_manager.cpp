@@ -106,7 +106,7 @@ vector<string> InputDeviceManager::GetFiles(string path)
 
 void InputDeviceManager::ReportEventPkg(int32_t iFd, InputEventPackage **iEvtPkg, size_t iCount)
 {
-    HDF_LOGI("%{public} start", __func__);
+    HDF_LOGI("%{public}s start", __func__);
     if (iEvtPkg == nullptr) {
         HDF_LOGE("%{public}s: param invalid, line: %{public}d", __func__, __LINE__);
         return;
@@ -144,7 +144,7 @@ int32_t CheckReadResult(int32_t readResult)
 // read action
 void InputDeviceManager::DoRead(int32_t fd, struct input_event *event, size_t size)
 {
-    HDF_LOGI("%{public} start", __func__);
+    HDF_LOGI("%{public}s start", __func__);
     int32_t readLen = read(fd, event, sizeof(struct input_event) * size);
     if (CheckReadResult(readLen) == INPUT_FAILURE) {
         return;
@@ -568,7 +568,7 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t &epollFd, uint32_t &index)
     SendHotPlugEvent(type, devIndex, status);
     CloseInputDevice(inputDevList_[index].devPathNode);
     DeleteDevListNode(index);
-    HDF_LOGI("%{public}s end", __func__);
+    HDF_LOGI("%{public}s: end", __func__);
 }
 
 int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyFd)
