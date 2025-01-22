@@ -106,6 +106,7 @@ vector<string> InputDeviceManager::GetFiles(string path)
 
 void InputDeviceManager::ReportEventPkg(int32_t iFd, InputEventPackage **iEvtPkg, size_t iCount)
 {
+    HDF_LOGI("%{public} start", __func__);
     if (iEvtPkg == nullptr) {
         HDF_LOGE("%{public}s: param invalid, line: %{public}d", __func__, __LINE__);
         return;
@@ -118,7 +119,6 @@ void InputDeviceManager::ReportEventPkg(int32_t iFd, InputEventPackage **iEvtPkg
             callbackFunc.second->EventPkgCallback(const_cast<const InputEventPackage **>(iEvtPkg), iCount, index);
         }
     }
-    HDF_LOGI("%{public}s end", __func__);
     return;
 }
 
@@ -144,6 +144,7 @@ int32_t CheckReadResult(int32_t readResult)
 // read action
 void InputDeviceManager::DoRead(int32_t fd, struct input_event *event, size_t size)
 {
+    HDF_LOGI("%{public} start", __func__);
     int32_t readLen = read(fd, event, sizeof(struct input_event) * size);
     if (CheckReadResult(readLen) == INPUT_FAILURE) {
         return;
@@ -522,6 +523,7 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
 
 void InputDeviceManager::SendHotPlugEvent(uint32_t &type, uint32_t &index, uint32_t status)
 {
+    HDF_LOGI("%{public}s start", __func__);
     // hot plug evnets happened
     InputHotPlugEvent *evtPlusPkg = (InputHotPlugEvent *)OsalMemAlloc(sizeof(InputHotPlugEvent));
     if (evtPlusPkg == nullptr) {
@@ -538,7 +540,6 @@ void InputDeviceManager::SendHotPlugEvent(uint32_t &type, uint32_t &index, uint3
         reportHotPlugEventCallback_->HotPlugCallback(evtPlusPkg);
     }
 
-    HDF_LOGI("%{public}s end", __func__);
     OsalMemFree(evtPlusPkg);
     evtPlusPkg = nullptr;
 }
@@ -548,9 +549,6 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t &epollFd, uint32_t &index)
     uint32_t type {};
     uint32_t devIndex {};
     uint32_t status {};
-
-    HDF_LOGD("%{public}s: index: %{public}d fd: %{public}d devName: %{public}s", __func__,
-             index, inputDevList_[index].fd, inputDevList_[index].detailInfo.attrSet.devName);
 
     // hot plug evnets happened
     auto sDevName = string(inputDevList_[index].detailInfo.attrSet.devName);
@@ -562,14 +560,15 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t &epollFd, uint32_t &index)
     }
     auto ret = FindIndexFromDevName(sDevName, &devIndex);
     if (ret != INPUT_SUCCESS) {
-        HDF_LOGE("%{public}s: no found device maybe it has been removed", __func__);
         SendHotPlugEvent(type, devIndex_, status);
+        HDF_LOGE("%{public}s: no found device maybe it has been removed", __func__);
         return;
     }
     status = INPUT_DEVICE_STATUS_CLOSED;
     SendHotPlugEvent(type, devIndex, status);
     CloseInputDevice(inputDevList_[index].devPathNode);
     DeleteDevListNode(index);
+    HDF_LOGI("%{public}s end", __func__);
 }
 
 int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyFd)
