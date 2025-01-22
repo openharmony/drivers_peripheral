@@ -232,7 +232,8 @@ HWTEST_F(UsbdAsyncInterruptTransferTest, CancelInterruptTransfer001, TestSize.Le
     uint8_t rflg = 0;
     (void)InitAshmemOne(ashmem, asmSize, rflg);
     auto ret = g_usbInterface->ClaimInterface(dev, INTERFACEID_OK, 1);
-    HDF_LOGI("UsbdAsyncInterruptTransfer::CancelInterruptTransfer001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdAsyncInterruptTransfer::CancelInterruptTransfer001 %{public}d ClaimInterface=%{public}d",
+        __LINE__, ret);
     int32_t submitTransferRet = 0;
     for (int i = 0; i < 10; i++) {
         submitTransferRet = g_usbInterface->UsbSubmitTransfer(dev, info, usbdBulkCallback, ashmem);
