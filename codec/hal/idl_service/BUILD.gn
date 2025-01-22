@@ -100,7 +100,7 @@ ohos_shared_library("libcodec_driver") {
       "ipc:ipc_single",
     ]
   }
-  
+
   cflags_cc = [ "-fstack-protector-strong" ]
 
   external_deps += [ "openmax:libopenmax_static" ]
