@@ -781,12 +781,18 @@ int32_t UsbDdkService::GetDevices(std::vector<uint64_t> &deviceIds)
 
 int32_t UsbDdkService::UpdateDriverInfo(const DriverAbilityInfo &driverInfo)
 {
-    return UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
+    if (UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo)) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
 }
 
 int32_t UsbDdkService::RemoveDriverInfo(const std::string &driverUid)
 {
-    return UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
+    if (UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid)) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
 }
 } // namespace V1_1
 } // namespace Ddk
