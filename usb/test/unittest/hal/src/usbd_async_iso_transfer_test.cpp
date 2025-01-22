@@ -33,6 +33,7 @@ constexpr int32_t ASYNC_TRANSFER_TIME_OUT = 1000;
 constexpr int32_t ENDPOINT_ADDRESS_IN = 0x84; // device-to-host
 constexpr int32_t ENDPOINT_ADDRESS_OUT = 0x5; // host-to-device
 constexpr int32_t ISOCHRONOUS_PACKETS = 2;
+constexpr int32_t CONNECT_TIMEOUT = 5;
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -87,7 +88,7 @@ void UsbdAsyncIsoTransferTest::SetUpTestCase(void)
     do {
         c = getchar();
     } while (c != '\n' && c != EOF);
-    sleep(5);
+    sleep(CONNECT_TIMEOUT);
     SubscriberEvent();
 }
 
