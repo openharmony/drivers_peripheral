@@ -362,6 +362,15 @@ int32_t CodecComponentConfig::GetVideoPortCapability(const struct DeviceResource
             return HDF_FAILURE;
         }
     }
+        
+    GetVideoPortFeature(iface, childNode, cap);
+    return HDF_SUCCESS;
+}
+
+void CodecComponentConfig::GetVideoPortFeature(const struct DeviceResourceIface &iface,
+                                               const struct DeviceResourceNode &childNode,
+                                               CodecCompCapability &cap)
+{
     cap.port.video.isSupportPassthrough = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_PASSTHROUGH);
     cap.port.video.isSupportLowLatency = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY);
     cap.port.video.isSupportTSVC = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_TSVC);
@@ -375,7 +384,6 @@ int32_t CodecComponentConfig::GetVideoPortCapability(const struct DeviceResource
     cap.port.video.isSupportWaterMark = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_WATERMARK);
     cap.port.video.isSupportSeekWithoutFlush = iface.GetBool(&childNode,
         CODEC_CONFIG_KEY_IS_SUPPORT_SEEK_WITHOUT_FLUSH);
-    return HDF_SUCCESS;
 }
 
 int32_t CodecComponentConfig::GetAudioPortCapability(const struct DeviceResourceIface &iface,
