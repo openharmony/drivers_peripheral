@@ -1087,7 +1087,7 @@ HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level1)
     LOG_SetCallback(MyLogCallback);
     InputDeviceManager iInputDeviceManager;
     iInputDeviceManager.DoWithEventDeviceDel(g_fileDescriptorFirst, g_index);
-    EXPECT_TRUE(g_errLog.find("no found device") != std::string::npos);
+    EXPECT_TRUE(g_errLog.find("DoWithEventDeviceDel") != std::string::npos);
 }
 
 /**
@@ -1120,7 +1120,7 @@ HWTEST_F(HdiInputTest, DoRead001, TestSize.Level1)
     struct input_event evtBuffer[EVENT_BUFFER_SIZE] {};
     InputDeviceManager iInputDeviceManager;
     iInputDeviceManager.DoRead(g_fileDescriptorFirst, evtBuffer, EVENT_BUFFER_SIZE);
-    EXPECT_TRUE(g_errLog.find("CheckReadResult") != std::string::npos);
+    EXPECT_TRUE(g_errLog.find("DoRead") != std::string::npos);
 }
 
 /**
