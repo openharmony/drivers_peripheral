@@ -201,13 +201,13 @@ int32_t SensorIfService::Enable(int32_t sensorId)
     }
 
     SENSOR_TRACE_START("sensorVdiImpl_->Enable");
+    SensorClientsManager::GetInstance()->OpenSensor(sensorId, serviceId);
     int32_t ret = sensorVdiImpl_->Enable(sensorId);
     SENSOR_TRACE_FINISH;
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d, sensorId = %{public}d, serviceId = %{public}d", __func__,
                  ret, sensorId, serviceId);
-    } else {
-        SensorClientsManager::GetInstance()->OpenSensor(sensorId, serviceId);
+        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR);
     }
 
     return ret;
