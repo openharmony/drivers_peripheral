@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef USBD_ASYNC_TRANSFER_TEST_H
-#define USBD_ASYNC_TRANSFER_TEST_H
+#ifndef USBD_ASYNC_BULK_TRANSFER_TEST_H
+#define USBD_ASYNC_BULK_TRANSFER_TEST_H
 
 #include <gtest/gtest.h>
 
@@ -28,8 +28,8 @@ using OHOS::HDI::Usb::V1_0::UsbDev;
 
 namespace OHOS {
 namespace USB {
-namespace UsbdAsyncTransfer {
-class UsbdAsyncTransferTest : public testing::Test {
+namespace UsbdAsyncBulkTransfer {
+class UsbdAsyncBulkTransferTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -56,7 +56,7 @@ public:
         return 0;
     }
 };
-} // UsbdAsyncTransfer
-} // USB
-} // OHOS
-#endif // USBD_ASYNC_TRANSFER_TEST_H
+} // namespace UsbdAsyncBulkTransfer
+} // namespace USB
+} // namespace OHOS
+#endif // USBD_ASYNC_BULK_TRANSFER_TEST_H
