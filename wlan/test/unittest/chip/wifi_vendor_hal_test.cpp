@@ -87,6 +87,7 @@ public:
         wifiVendorHalTest->StopPnoScan(VAILD_IFNAME);
         std::vector<ScanResultsInfo> scanInfo;
         wifiVendorHalTest->GetScanInfos(VAILD_IFNAME, scanInfo);
+        EXPECT_FALSE(VAILD_IFNAME.find("GetScanInfos") != std::string::npos);
     }
 
     void StopTest()
@@ -95,6 +96,7 @@ public:
         wifiVendorHalTest->Stop(&lock, [&]() {});
         wifiVendorHalTest->Start();
         wifiVendorHalTest->Stop(&lock, [&]() {});
+        EXPECT_FALSE(VAILD_IFNAME.find("Stop") != std::string::npos);
     }
 
     void GetChipCapsTest()
