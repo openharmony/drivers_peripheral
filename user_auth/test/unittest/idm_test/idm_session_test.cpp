@@ -183,6 +183,7 @@ HWTEST_F(IdmSessionTest, TestCacheRootSecret, TestSize.Level0)
 {
     constexpr int32_t userId = 0;
     CacheRootSecret(userId, nullptr);
+    EXPECT_EQ(GetCacheRootSecret(userId), nullptr);
     constexpr int32_t dataLen = 32;
     Buffer *test = CreateBufferBySize(dataLen);
     CacheRootSecret(userId, test);
