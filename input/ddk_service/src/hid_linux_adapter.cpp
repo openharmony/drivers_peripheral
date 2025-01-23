@@ -50,7 +50,11 @@ namespace V1_1 {
 int32_t LinuxHidOsAdapter::GetRawInfo(int32_t fd, HidRawDevInfo& rawDevInfo)
 {
     struct hidraw_devinfo info;
-    (void)memset_s(&info, sizeof(info), 0x0, sizeof(info));
+    int32_t result = memset_s(&info, sizeof(info), 0x0, sizeof(info));
+    if (result != 0) {
+        HDF_LOGE("%{public}s memset_s(hidraw_devinfo) failed, result=%{public}d", __func__, result);
+        return HID_DDK_MEMORY_ERROR;
+    }
 
     int32_t ret = ioctl(fd, HIDIOCGRAWINFO, &info);
     if (ret < 0) {
@@ -67,6 +71,11 @@ int32_t LinuxHidOsAdapter::GetRawInfo(int32_t fd, HidRawDevInfo& rawDevInfo)
 
 int32_t LinuxHidOsAdapter::GetRawName(int32_t fd, std::vector<uint8_t>& data)
 {
+    if (data.empty()) {
+        HDF_LOGE("%{public}s param data is empty", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
     int32_t ret = ioctl(fd, HIDIOCGRAWNAME(data.size()), data.data());
     if (ret < 0) {
         HDF_LOGE("%{public}s ioctl failed, errno=%{public}d", __func__, errno);
@@ -78,6 +87,11 @@ int32_t LinuxHidOsAdapter::GetRawName(int32_t fd, std::vector<uint8_t>& data)
 
 int32_t LinuxHidOsAdapter::GetPhysicalAddress(int32_t fd, std::vector<uint8_t>& data)
 {
+    if (data.empty()) {
+        HDF_LOGE("%{public}s param data is empty", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
     int32_t ret = ioctl(fd, HIDIOCGRAWPHYS(data.size()), data.data());
     if (ret < 0) {
         HDF_LOGE("%{public}s ioctl failed, errno=%{public}d", __func__, errno);
@@ -89,6 +103,11 @@ int32_t LinuxHidOsAdapter::GetPhysicalAddress(int32_t fd, std::vector<uint8_t>& 
 
 int32_t LinuxHidOsAdapter::GetRawUniqueId(int32_t fd, std::vector<uint8_t>& data)
 {
+    if (data.empty()) {
+        HDF_LOGE("%{public}s param data is empty", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
     int32_t ret = ioctl(fd, HIDIOCGRAWUNIQ(data.size()), data.data());
     if (ret < 0) {
         HDF_LOGE("%{public}s ioctl failed, errno=%{public}d", __func__, errno);
@@ -100,7 +119,12 @@ int32_t LinuxHidOsAdapter::GetRawUniqueId(int32_t fd, std::vector<uint8_t>& data
 
 int32_t LinuxHidOsAdapter::SendReport(int32_t fd, HidReportType reportType, const std::vector<uint8_t>& data)
 {
-    unsigned long int req = 0;
+    if (data.empty()) {
+        HDF_LOGE("%{public}s param data is empty", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
+    int req = 0;
     switch (reportType) {
         case HID_INPUT_REPORT:
             req = HIDIOCSINPUT(data.size());
@@ -112,13 +136,16 @@ int32_t LinuxHidOsAdapter::SendReport(int32_t fd, HidReportType reportType, cons
             req = HIDIOCSFEATURE(data.size());
             break;
         default:
-            HDF_LOGE("%{public}s: invalid report type", __func__);
+            HDF_LOGE("%{public}s: unsupported report type [%d]", __func__, reportType);
             return HID_DDK_INVALID_PARAMETER;
     }
 
     int32_t res = ioctl(fd, req, data.data());
     if (res < 0) {
         HDF_LOGE("%{public}s ioctl failed, errno=%{public}d", __func__, errno);
+        if (errno == EINVAL) {
+            return HID_DDK_INVALID_OPERATION;
+        }
         return HID_DDK_IO_ERROR;
     }
 
@@ -127,7 +154,12 @@ int32_t LinuxHidOsAdapter::SendReport(int32_t fd, HidReportType reportType, cons
 
 int32_t LinuxHidOsAdapter::GetReport(int32_t fd, HidReportType reportType, std::vector<uint8_t>& data)
 {
-    unsigned long int req = 0;
+    if (data.empty()) {
+        HDF_LOGE("%{public}s param data is empty", __func__);
+        return HID_DDK_INVALID_PARAMETER;
+    }
+
+    int req = 0;
     switch (reportType) {
         case HID_INPUT_REPORT:
             req = HIDIOCGINPUT(data.size());
@@ -139,13 +171,16 @@ int32_t LinuxHidOsAdapter::GetReport(int32_t fd, HidReportType reportType, std::
             req = HIDIOCGFEATURE(data.size());
             break;
         default:
-            HDF_LOGE("%{public}s: invalid report type", __func__);
+            HDF_LOGE("%{public}s: unsupported report type [%d]", __func__, reportType);
             return HID_DDK_INVALID_PARAMETER;
     }
 
     int32_t res = ioctl(fd, req, data.data());
     if (res < 0) {
         HDF_LOGE("%{public}s ioctl failed, errno=%{public}d", __func__, errno);
+        if (errno == EINVAL) {
+            return HID_DDK_INVALID_OPERATION;
+        }
         return HID_DDK_IO_ERROR;
     }
 
@@ -164,7 +199,11 @@ int32_t LinuxHidOsAdapter::GetReportDescriptor(int32_t fd, std::vector<uint8_t>&
     }
 
     struct hidraw_report_descriptor desc;
-    (void)memset_s(&desc, sizeof(desc), 0x0, sizeof(desc));
+    int32_t result = memset_s(&desc, sizeof(desc), 0x0, sizeof(desc));
+    if (result != 0) {
+        HDF_LOGE("%{public}s memset_s(hidraw_report_descriptor) failed, result=%{public}d", __func__, result);
+        return HID_DDK_MEMORY_ERROR;
+    }
 
     desc.size = descSize;
     ret = ioctl(fd, HIDIOCGRDESC, &desc);
