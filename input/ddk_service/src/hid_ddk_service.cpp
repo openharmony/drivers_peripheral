@@ -27,7 +27,7 @@
 #include <poll.h>
 #include <memory.h>
 #include <securec.h>
-#include "ddk_sysfs_device.h"
+#include "ddk_sysfs_dev_node.h"
 #ifdef __LITEOS__
 #include "hid_liteos_adapter.h"
 #else
@@ -41,7 +41,6 @@ namespace HDI {
 namespace Input {
 namespace Ddk {
 namespace V1_1 {
-const uint8_t DEVFS_PATH_LEN  = 128;
 const uint8_t THIRTY_TWO_BIT = 32;
 const uint32_t MAX_REPORT_BUFFER_SIZE = 16 * 1024 - 1;
 
@@ -140,18 +139,17 @@ int32_t HidDdkService::Open(uint64_t deviceId, uint8_t interfaceIndex, HidDevice
         return HID_DDK_NO_PERM;
     }
 
-    DevInterfaceInfo devInfo;
-    devInfo.busNum = GetBusNum(deviceId);
-    devInfo.devNum = GetDevNum(deviceId);
-    devInfo.intfNum = interfaceIndex;
-    char buff[DEVFS_PATH_LEN] = {0};
-    int32_t ret = DdkSysfsGetDevNodePath(&devInfo, "hidraw", buff, sizeof(buff));
+    uint32_t busNum = GetBusNum(deviceId);
+    uint32_t devNum = GetDevNum(deviceId);
+    SysfsDevNode devNode(busNum, devNum, interfaceIndex, "hidraw");
+    std::string path;
+    int32_t ret = devNode.FindPath(path);
     if (ret != HID_DDK_SUCCESS) {
         HDF_LOGE("%{public}s device not found", __func__);
         return HID_DDK_DEVICE_NOT_FOUND;
     }
 
-    int32_t fd = open(buff, O_RDWR);
+    int32_t fd = open(path.c_str(), O_RDWR);
     if (fd < 0) {
         HDF_LOGE("%{public}s open failed, errno=%{public}d", __func__, errno);
         return HID_DDK_IO_ERROR;

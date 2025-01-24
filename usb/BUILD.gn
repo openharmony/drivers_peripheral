@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -23,7 +23,8 @@ if (defined(ohos_lite)) {
     deps = [
       "./cfg:usb_etc_files",
       "./ddk:libusb_core",
-      "./ddk_service:usb_ddk_target",
+      "./ddk_service/serial_service:usb_serial_ddk_target",
+      "./ddk_service/usb_service:usb_ddk_target",
       "./gadget/function/acm:libusbfn_cdcacm",
       "./gadget/function/ecm:libusbfn_cdcecm",
       "./gadget/function/mtp:hdi_usbfn_mtp_service",
