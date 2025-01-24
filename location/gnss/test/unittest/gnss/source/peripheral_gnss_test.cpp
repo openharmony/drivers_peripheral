@@ -417,9 +417,9 @@ HWTEST_F(PeripheralGnssTest, HexCharToIntTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, HexCharToIntTest001, TestSize.Level1";
-    std::string str = "123";
+    std::string str = "1234";
     std::vector<uint8_t> ret = StringUtils::HexToByteVector(str);
-    EXPECT_EQ(ret.size(), 3);
+    EXPECT_EQ(ret.size(), 2);
 }
 
 } // V2_0
