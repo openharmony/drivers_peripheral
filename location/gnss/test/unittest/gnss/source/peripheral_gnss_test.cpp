@@ -65,7 +65,8 @@ HWTEST_F(PeripheralGnssTest, SetGnssConfigParaTest001, TestSize.Level1)
         << "PeripheralGnssTest, SetGnssConfigParaTest001, TestSize.Level1";
     GnssConfigPara para;
     para.gnssBasic.gnssMode = GNSS_WORKING_MODE_MS_ASSISTED;
-    gnssInstance_->SetGnssConfigPara(para);
+    auto ret = gnssInstance_->SetGnssConfigPara(para);
+    EXPECT_NE(ret, HDF_ERR_INVALID_PARAM);
 }
 
 HWTEST_F(PeripheralGnssTest, NmeaCallbackTest001, TestSize.Level1)
