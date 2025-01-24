@@ -17,6 +17,10 @@ import("//build/test.gni")
 
 module_output_path = "memorytrackertest/"
 
+declare_args() {
+  drivers_peripheral_memorytracker_is_implemented = false
+}
+
 memorytracker_external_deps = [
   "c_utils:utils",
   "drivers_interface_memorytracker:libmemorytracker_proxy_1.0",
@@ -29,6 +33,9 @@ ohos_unittest("memorytracker_test") {
   sources = [ "unittest/phone/hdf_memorytracker_test.cpp" ]
   if (is_standard_system) {
     external_deps = memorytracker_external_deps
+  }
+  if (drivers_peripheral_memorytracker_is_implemented) {
+    defines = [ "HDF_MEMORYTRACKER_IS_IMPLEMENTED" ]
   }
 }
 group("memorytracker_unittest") {
