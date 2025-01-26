@@ -24,7 +24,6 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_1 {
 using VerifyAccessTokenFunc = int(*)(uint32_t callerToken, const std::string &permissionName);
 using GetApiVersion = int(*)(uint32_t callerToken, int32_t &apiVersion);
 static constexpr int PERMISSION_GRANTED = 0;
@@ -101,7 +100,6 @@ int32_t DdkPermissionManager::GetHapApiVersion(int32_t &apiVersion)
     uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
     return g_getApiVersion(callerToken, apiVersion);
 }
-} // namespace V1_1
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI

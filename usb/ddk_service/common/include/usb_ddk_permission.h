@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,21 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef USB_SERIAL_DDK_PERMISSION_H
-#define USB_SERIAL_DDK_PERMISSION_H
+#ifndef USB_DDK_PERMISSION_H
+#define USB_DDK_PERMISSION_H
+
+#include <iostream>
 
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace UsbSerialDdk {
-namespace V1_0 {
+namespace Ddk {
 class DdkPermissionManager {
 public:
     static bool VerifyPermission(const std::string &permissionName);
+    static void Reset();
+    static int32_t GetHapApiVersion(int32_t &apiVersion);
 };
-} // namespace V1_0
-} // namespace UsbSerialDdk
+} // namespace Ddk
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
-#endif // USB_SERIAL_DDK_PERMISSION_H
+#endif // USB_DDK_PERMISSION_H

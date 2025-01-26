@@ -37,7 +37,6 @@ ohos_shared_library("libusb_ddk_service_1.1") {
 
   sources = [
     "src/usb_ddk_hash.cpp",
-    "src/usb_ddk_permission.cpp",
     "src/usb_ddk_service.cpp",
     "src/usb_driver_manager.cpp",
   ]
@@ -45,6 +44,7 @@ ohos_shared_library("libusb_ddk_service_1.1") {
     "${usb_driver_path}/interfaces/ddk/host",
     "${usb_driver_path}/interfaces/ddk/common",
     "${usb_driver_path}/ddk/host/include",
+    "${usb_driver_path}/ddk_service/common/include",
     "//drivers/hdf_core/framework/model/usb/include",
     "${usb_driver_path}/utils/include",
   ]
@@ -54,6 +54,7 @@ ohos_shared_library("libusb_ddk_service_1.1") {
   deps = [
     "${usb_driver_path}/ddk:libusb_ddk_host",
     "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "${usb_driver_path}/ddk_service/common:libusb_ddk_service_common",
     "${usb_driver_path}/libusb_adapter:libusb_adapter",
   ]
 
