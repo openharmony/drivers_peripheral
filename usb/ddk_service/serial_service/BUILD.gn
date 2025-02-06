@@ -16,10 +16,7 @@ import("//build/ohos.gni")
 import("./../../usb.gni")
 
 ohos_shared_library("libusb_serial_ddk_service_1.0") {
-  sources = [
-    "src/usb_serial_ddk_permission.cpp",
-    "src/usb_serial_ddk_service.cpp",
-  ]
+  sources = [ "src/usb_serial_ddk_service.cpp" ]
 
   if (is_standard_system) {
     sources += [ "src/usb_serial_linux_adapter.cpp" ]
@@ -29,11 +26,15 @@ ohos_shared_library("libusb_serial_ddk_service_1.0") {
   include_dirs = [
     "include/",
     "${usb_driver_path}/ddk/host/include",
+    "${usb_driver_path}/ddk_service/common/include",
     "${usb_driver_path}/hdf_usb/include",
     "${usb_driver_path}/utils/include",
   ]
 
-  deps = [ "${usb_driver_path}/ddk:libusb_pnp_manager" ]
+  deps = [
+    "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "${usb_driver_path}/ddk_service/common:libusb_ddk_service_common",
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
