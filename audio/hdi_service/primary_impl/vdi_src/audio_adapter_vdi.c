@@ -165,10 +165,10 @@ static int32_t CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateRender fail, ret=%{public}d", ret);
         return ret;
     }
-    *vdiRender->AddAudioEffect = NULL;
-    *vdiRender->RemoveAudioEffect = NULL;
-    *vdiRender->GetFrameBufferSize = NULL;
-    *vdiRender->IsSupportsPauseAndResume = NULL;
+    (*vdiRender)->AddAudioEffect = NULL;
+    (*vdiRender)->RemoveAudioEffect = NULL;
+    (*vdiRender)->GetFrameBufferSize = NULL;
+    (*vdiRender)->IsSupportsPauseAndResume = NULL;
     
     return HDF_SUCCESS;
 }
