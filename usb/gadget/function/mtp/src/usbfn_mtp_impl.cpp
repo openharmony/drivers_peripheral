@@ -485,6 +485,10 @@ int32_t UsbfnMtpImpl::UsbMtpPortInitIo()
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: allocate requests for read/write failed: %{public}d", __func__, ret);
             UsbMtpPortFreeRequests(&mtpPort_->readPool, mtpPort_->readAllocated);
+            if (mtpPort_->standbyReq) {
+                (void)UsbFnFreeRequest(mtpPort_->standbyReq);
+                mtpPort_->standbyReq = NULL;
+            }
             UsbMtpPortFreeRequests(&mtpPort_->writePool, mtpPort_->writeAllocated);
             return HDF_ERR_MALLOC_FAIL;
         }
