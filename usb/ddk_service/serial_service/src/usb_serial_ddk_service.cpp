@@ -27,7 +27,7 @@
 #include <unistd.h>
 
 #include "ddk_sysfs_dev_node.h"
-#include "usb_serial_ddk_permission.h"
+#include "usb_ddk_permission.h"
 #include "usbd_wrapper.h"
 #ifdef __LITEOS__
 #include "usb_serial_liteos_adapter.h"
@@ -36,7 +36,7 @@
 #endif
 
 #define HDF_LOG_TAG usb_serial_ddk_service
-
+using namespace OHOS::HDI::Usb::Ddk;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -56,6 +56,11 @@ inline uint32_t GetDevNum(uint64_t devId)
     return static_cast<uint32_t>(devId & 0xFFFFFFFF);
 }
 
+static bool VerifyPermission(const std::string &permissionName)
+{
+    return DdkPermissionManager::VerifyPermission(permissionName);
+}
+
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB_SERIAL";
 extern "C" IUsbSerialDdk *UsbSerialDdkImplGetInstance(void)
 {
@@ -71,7 +76,7 @@ extern "C" IUsbSerialDdk *UsbSerialDdkImplGetInstance(void)
 int32_t UsbSerialDdkService::Init()
 {
     HDF_LOGI("Usb serial ddk init.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -81,7 +86,7 @@ int32_t UsbSerialDdkService::Init()
 int32_t UsbSerialDdkService::Release()
 {
     HDF_LOGI("Usb serial ddk exit.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -92,7 +97,7 @@ int32_t UsbSerialDdkService::Open(uint64_t deviceId, uint64_t interfaceIndex,
     OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev)
 {
     HDF_LOGI("Usb serial ddk Open.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -118,7 +123,7 @@ int32_t UsbSerialDdkService::Open(uint64_t deviceId, uint64_t interfaceIndex,
 int32_t UsbSerialDdkService::Close(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev)
 {
     HDF_LOGI("Usb serial ddk Close.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -138,7 +143,7 @@ int32_t UsbSerialDdkService::Read(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbS
     uint32_t bufferSize, std::vector<uint8_t> &buff)
 {
     HDF_LOGI("Usb serial ddk Read.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -179,7 +184,7 @@ int32_t UsbSerialDdkService::Write(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::Usb
     const std::vector<uint8_t> &buff, uint32_t &bytesWritten)
 {
     HDF_LOGI("Usb serial ddk Write.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -208,7 +213,7 @@ int32_t UsbSerialDdkService::SetBaudRate(const OHOS::HDI::Usb::UsbSerialDdk::V1_
     uint32_t baudRate)
 {
     HDF_LOGI("Usb serial ddk SetBaudRate.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -223,7 +228,7 @@ int32_t UsbSerialDdkService::SetParams(const OHOS::HDI::Usb::UsbSerialDdk::V1_0:
     const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialParams& params)
 {
     HDF_LOGI("Usb serial ddk SetParams.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -238,7 +243,7 @@ int32_t UsbSerialDdkService::SetTimeout(const OHOS::HDI::Usb::UsbSerialDdk::V1_0
     int32_t timeout)
 {
     HDF_LOGI("Usb serial ddk SetTimeout.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -258,7 +263,7 @@ int32_t UsbSerialDdkService::SetFlowControl(const OHOS::HDI::Usb::UsbSerialDdk::
     OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialFlowControl flowControl)
 {
     HDF_LOGI("Usb serial ddk SetFlowControl.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -276,7 +281,7 @@ int32_t UsbSerialDdkService::SetFlowControl(const OHOS::HDI::Usb::UsbSerialDdk::
 int32_t UsbSerialDdkService::Flush(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev)
 {
     HDF_LOGI("Usb serial ddk Flush.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -290,7 +295,7 @@ int32_t UsbSerialDdkService::Flush(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::Usb
 int32_t UsbSerialDdkService::FlushInput(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev)
 {
     HDF_LOGI("Usb serial ddk FlushInput.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
@@ -304,7 +309,7 @@ int32_t UsbSerialDdkService::FlushInput(const OHOS::HDI::Usb::UsbSerialDdk::V1_0
 int32_t UsbSerialDdkService::FlushOutput(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev)
 {
     HDF_LOGI("Usb serial ddk FlushOutput.");
-    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+    if (!VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
