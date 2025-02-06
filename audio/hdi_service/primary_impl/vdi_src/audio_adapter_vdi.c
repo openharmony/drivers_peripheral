@@ -147,11 +147,10 @@ static int32_t VerifyParamsOfAudioCreateRenderVdi(struct IAudioAdapter *adapter,
 
 static int32_t CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
     const struct AudioDeviceDescriptor *desc, const struct AudioSampleAttributes *attrs,
-    uint32_t *renderId, char *adapterName, struct IAudioRender **render)
+    uint32_t *renderId, struct IAudioRenderVdi **vdiRender)
 {
     struct AudioDeviceDescriptorVdi vdiDesc;
     struct AudioSampleAttributesVdi vdiAttrs;
-    struct IAudioRenderVdi *vdiRender = NULL;
     if (AudioCommonDevDescToVdiDevDescVdi(desc, &vdiDesc) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("desc to vdiDesc fail");
         return HDF_FAILURE;
@@ -159,23 +158,18 @@ static int32_t CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
 
     int32_t id = SetTimer("Hdi:CreateRender");
-    int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiRender);
+    int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, vdiRender);
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateRender fail, ret=%{public}d", ret);
         return ret;
     }
-    vdiRender->AddAudioEffect = NULL;
-    vdiRender->RemoveAudioEffect = NULL;
-    vdiRender->GetFrameBufferSize = NULL;
-    vdiRender->IsSupportsPauseAndResume = NULL;
-    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterName);
-    if (*render == NULL) {
-        (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
-        AUDIO_FUNC_LOGE("Create audio render failed");
-        return HDF_FAILURE;
-    }
+    *vdiRender->AddAudioEffect = NULL;
+    *vdiRender->RemoveAudioEffect = NULL;
+    *vdiRender->GetFrameBufferSize = NULL;
+    *vdiRender->IsSupportsPauseAndResume = NULL;
+    
     return HDF_SUCCESS;
 }
 
@@ -205,9 +199,17 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         ret = HDF_SUCCESS;
         goto EXIT;
     }
-    ret = CreateRenderPre(vdiAdapter, desc, attrs, renderId, adapterName, render);
+    struct IAudioRenderVdi *vdiRender = NULL;
+    ret = CreateRenderPre(vdiAdapter, desc, attrs, renderId, &vdiRender);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("CreateRenderPre failed, ret = [%{public}d]", ret);
+        goto EXIT;
+    }
+    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterName);
+    if (*render == NULL) {
+        (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
+        AUDIO_FUNC_LOGE("Create audio render failed");
+        ret = HDF_FAILURE;
         goto EXIT;
     }
     AUDIO_FUNC_LOGI("AudioCreateRenderVdi Success, renderId = [%{public}u]", *renderId);
