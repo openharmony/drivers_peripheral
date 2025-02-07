@@ -66,7 +66,7 @@ bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
     struct sched_param resetParams = {.sched_priority = RS_PRIORITY};
     int rc = sched_setscheduler(tid, SCHED_FIFO, &setParams);
     if (rc != 0) {
-        HDF_LOGi("vendorInterface setscheduler failed rc:%{public}d.", rc);
+        HDF_LOGI("vendorInterface setscheduler failed rc:%{public}d.", rc);
     }
     HDF_LOGI("VendorInterface BT_OP_HCI_CHANNEL_OPEN begin");
     int channel[HCI_MAX_CHANNEL] = {0};
