@@ -21,17 +21,18 @@
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_3 {
+namespace V1_4 {
 static std::mutex mutex_;
 static sptr<V1_1::IRilCallback> callback1_1_;
 static sptr<V1_2::IRilCallback> callback1_2_;
-static sptr<V1_3::IRilCallback> callback_;
+static sptr<V1_3::IRilCallback> callback1_3_;
+static sptr<V1_4::IRilCallback> callback_;
 namespace {
 sptr<RilImpl::RilDeathRecipient> g_deathRecipient = nullptr;
 }
 extern "C" IRil *RilImplGetInstance(void)
 {
-    using OHOS::HDI::Ril::V1_3::RilImpl;
+    using OHOS::HDI::Ril::V1_4::RilImpl;
     RilImpl *service = new (std::nothrow) RilImpl();
     if (service == nullptr) {
         return nullptr;
@@ -455,6 +456,11 @@ int32_t RilImpl::SetCallback1_2(const sptr<V1_2::IRilCallback> &rilCallback)
 
 int32_t RilImpl::SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback)
 {
+    return HDF_SUCCESS;
+}
+
+int32_t RilImpl::SetCallback1_4(const sptr<V1_4::IRilCallback> &rilCallback)
+{
     std::lock_guard<std::mutex> lock(mutex_);
     callback_ = rilCallback;
     if (callback_ == nullptr) {
@@ -463,7 +469,7 @@ int32_t RilImpl::SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback)
     }
     g_deathRecipient = new RilDeathRecipient(this);
     if (g_deathRecipient == nullptr) {
-        HDF_LOGE("SetCallback1_3 fail g_deathRecipient is null");
+        HDF_LOGE("SetCallback1_4 fail g_deathRecipient is null");
         return HDF_FAILURE;
     }
     AddRilDeathRecipient(callback_);
@@ -722,7 +728,7 @@ int32_t RilImpl::Init()
 {
     return HDF_SUCCESS;
 }
-} // namespace V1_3
+} // namespace V1_4
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS
