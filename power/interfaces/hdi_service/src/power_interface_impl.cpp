@@ -63,7 +63,11 @@ static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(500); // 500ms for 
 #else
 static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(1000); // 1000ms
 #endif
+#ifdef FASTER_RETRY_OF_SLEEP
+static constexpr std::chrono::milliseconds MAX_WAIT_TIME(5763); // 5763ms for phone and tablet
+#else
 static constexpr std::chrono::milliseconds MAX_WAIT_TIME(1000 * 60); // 1min
+#endif
 static constexpr int32_t WAIT_TIME_FACTOR = 2;
 static std::chrono::milliseconds waitTime_(DEFAULT_WAIT_TIME);
 static std::mutex g_mutex;
