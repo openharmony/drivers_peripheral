@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "usbd_interruptTransfer_test.h"
+#include "usbd_interrupt_transfer_test.h"
 
 #include <iostream>
 #include <vector>
