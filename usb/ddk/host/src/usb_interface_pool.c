@@ -1568,6 +1568,8 @@ int32_t UsbGetPipeInfo(
         return HDF_ERR_INVALID_PARAM;
     }
 
+    HDF_LOGE("%{public}s:%{public}d ifaceHdl->devHandle is %{public}p", __func__, __LINE__, ifaceHdl->devHandle);
+
     /* Find interfacePool object */
     interfacePool = (struct UsbInterfacePool *)ifaceHdl->devHandle->dev->privateObject;
     if (interfacePool == NULL) {
