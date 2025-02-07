@@ -133,7 +133,7 @@ static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w
             setting.displayRect.w = static_cast<uint32_t>(setting.rectRatio.w * w);
             setting.displayRect.x = static_cast<uint32_t>(setting.rectRatio.x * w);
             setting.displayRect.y = static_cast<uint32_t>(setting.rectRatio.y * h);
-            DISPLAY_TEST_LOGD("display rect adust form %f %f %f %f to %{public}d %{public}d %{public}d %{public}d ",
+            DISPLAY_TEST_LOGD("display rect adjust form %f %f %f %f to %{public}d %{public}d %{public}d %{public}d ",
                 setting.rectRatio.x, setting.rectRatio.y, setting.rectRatio.w, setting.rectRatio.h,
                 setting.displayRect.x, setting.displayRect.y, setting.displayRect.w, setting.displayRect.h);
         }
@@ -320,6 +320,16 @@ HWTEST_F(DeviceTest, test_GetDisplayProperty, TestSize.Level1)
         result = DISPLAY_SUCCESS;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, result);
+}
+
+HWTEST_F(DeviceTest, test_GetDisplayIdentificationData, TestSize.Level1)
+{
+    uint8_t portId = 0;
+	std::vector<uint8_t> edidData = {};
+    auto ret = g_composerDevice->GetDisplayIdentificationData(g_displayIds[0], portId, edidData);
+    DISPLAY_TEST_LOGD("displayId[%u], portId[%u], edidDataLength[%lu]", g_displayIds[0], portId, edidData.size());	
+
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
 HWTEST_F(DeviceTest, test_UpdateHardwareCursor, TestSize.Level1)
