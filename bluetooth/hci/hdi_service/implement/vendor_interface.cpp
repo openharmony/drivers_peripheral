@@ -72,11 +72,9 @@ bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
     int channel[HCI_MAX_CHANNEL] = {0};
     int channelCount = vendorInterface_->op(BtOpcodeT::BT_OP_HCI_CHANNEL_OPEN, channel);
     if (channelCount < 1 || channelCount > HCI_MAX_CHANNEL) {
-        sched_setscheduler(tid, SCHED_FIFO, &resetParams);
         HDF_LOGE("vendorInterface_->op BT_OP_HCI_CHANNEL_OPEN failed ret:%{public}d.", channelCount);
         return false;
     }
-    sched_setscheduler(tid, SCHED_FIFO, &resetParams);
     HDF_LOGI("VendorInterface BT_OP_HCI_CHANNEL_OPEN end");
 
     if (channelCount == 1) {
