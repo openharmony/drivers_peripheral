@@ -21,6 +21,9 @@
 
 #include <hdf_log.h>
 #include <securec.h>
+#include <sys/types.h>
+#include <syscall.h>
+#include <unistd.h>
 
 #include "bluetooth_address.h"
 #include "bt_hal_constant.h"
@@ -38,6 +41,7 @@ namespace Bluetooth {
 namespace Hci {
 namespace V1_0 {
 constexpr size_t BT_VENDOR_INVALID_DATA_LEN = 0;
+constexpr int32_t RT_PRIORITY = 1;
 BtVendorCallbacksT VendorInterface::vendorCallbacks_ = {
     .size = sizeof(BtVendorCallbacksT),
     .initCb = VendorInterface::OnInitCallback,
@@ -56,11 +60,17 @@ VendorInterface::~VendorInterface()
 
 bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
 {
+    pid_t tid = gettid();
+    struct sched_param setParams = {.sched_priority = RT_PRIORITY};
+    int rc = sched_setscheduler(tid, SCHED_FIFO, &setParams);
+    if (rc != 0) {
+        HDF_LOGI("vendorInterface setscheduler failed rc:%{public}d.", rc);
+    }
     HDF_LOGI("VendorInterface BT_OP_HCI_CHANNEL_OPEN begin");
     int channel[HCI_MAX_CHANNEL] = {0};
     int channelCount = vendorInterface_->op(BtOpcodeT::BT_OP_HCI_CHANNEL_OPEN, channel);
     if (channelCount < 1 || channelCount > HCI_MAX_CHANNEL) {
-        HDF_LOGE("vendorInterface_->op BT_OP_HCI_CHANNEL_OPEN failed ret:%d.", channelCount);
+        HDF_LOGE("vendorInterface_->op BT_OP_HCI_CHANNEL_OPEN failed ret:%{public}d.", channelCount);
         return false;
     }
     HDF_LOGI("VendorInterface BT_OP_HCI_CHANNEL_OPEN end");
