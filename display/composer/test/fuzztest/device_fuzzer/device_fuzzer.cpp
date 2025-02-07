@@ -487,6 +487,19 @@ int TestGetHDRCapabilityInfos(uint32_t devId)
     return ret;
 }
 
+int TestGetDisplayIdentificationData(uint32_t devId)
+{
+    uint8_t portId = GetData<uint8_t>();
+	std::vector<uint8_t> edidData = {};
+	edidData.push_back(GetData<uint8_t>());
+    int32_t ret = g_composerInterface->GetDisplayIdentificationData(devId, portId, edidData);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    HDF_LOGD("displayId[%u], portId[%u], edidDataLength[%lu]", devId, portId, edidData.size());	
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -518,6 +531,7 @@ TestFuncs g_testFuncs = {
     TestGetDisplaySupportedColorGamuts,
     TestGetHDRCapabilityInfos,
     TestCommit,
+	TestGetDisplayIdentificationData,
 };
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
