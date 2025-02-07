@@ -42,7 +42,6 @@ namespace Hci {
 namespace V1_0 {
 constexpr size_t BT_VENDOR_INVALID_DATA_LEN = 0;
 constexpr int32_t RT_PRIORITY = 1;
-constexpr int32_t RS_PRIORITY = 0;
 BtVendorCallbacksT VendorInterface::vendorCallbacks_ = {
     .size = sizeof(BtVendorCallbacksT),
     .initCb = VendorInterface::OnInitCallback,
@@ -63,7 +62,6 @@ bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
 {
     pid_t tid = gettid();
     struct sched_param setParams = {.sched_priority = RT_PRIORITY};
-    struct sched_param resetParams = {.sched_priority = RS_PRIORITY};
     int rc = sched_setscheduler(tid, SCHED_FIFO, &setParams);
     if (rc != 0) {
         HDF_LOGI("vendorInterface setscheduler failed rc:%{public}d.", rc);
