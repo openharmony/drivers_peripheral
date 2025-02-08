@@ -842,7 +842,7 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearLayerBufferTest)->
 BENCHMARK_F(DisplayBenchmarkTest, GetDisplayIdentificationData)(benchmark::State &state)
 {
     int32_t ret = 0;
-    uint32_t portId = 0;
+    uint8_t portId = 0;
     std::vector<uint8_t> edidData = {};
     for (auto _ : state) {
         ret = g_composerDevice->GetDisplayIdentificationData(g_displayIds[0], portId, edidData);
