@@ -113,7 +113,7 @@ int32_t UsbSerialDdkService::Open(uint64_t deviceId, uint64_t interfaceIndex,
     }
     int fd = open(path.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
     if (fd < 0) {
-        HDF_LOGE("error %{public}zu opening devNodePath: %{public}s\n", errno, strerror(errno));
+        HDF_LOGE("error %{public}d opening devNodePath: %{public}s\n", errno, strerror(errno));
         return USB_SERIAL_DDK_IO_ERROR;
     }
     dev.fd = fd;
