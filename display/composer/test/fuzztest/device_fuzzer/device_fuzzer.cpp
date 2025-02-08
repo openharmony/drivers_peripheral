@@ -496,7 +496,7 @@ int TestGetDisplayIdentificationData(uint32_t devId)
     if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
         HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
     }
-    HDF_LOGD("displayId[%u], portId[%u], edidDataLength[%lu]", devId, portId, edidData.size());
+    HDF_LOGD("displayId[%u], portId[%u], edidDataLength[%u]", devId, portId, edidData.size());
     return ret;
 }
 
