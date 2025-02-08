@@ -1460,8 +1460,7 @@ int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t 
             return HDF_FAILURE;
         }
     } else {
-        HDF_LOGE("%{public}s:the interface has been claimed.", __func__);
-        return HDF_FAILURE;
+        HDF_LOGW("%{public}s:the interface has been claimed.", __func__);
     }
     HDF_LOGI("%{public}s:%{public}d end", __func__, __LINE__);
     return HDF_SUCCESS;
