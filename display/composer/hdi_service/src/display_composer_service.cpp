@@ -952,10 +952,7 @@ int32_t DisplayComposerService::GetDisplayIdentificationData(uint32_t devId, uin
     FinishTrace(HITRACE_TAG_HDF);
 
     DISPLAY_LOGI("%{public}s: ret %{public}d, devId {%{public}u, the param idx [{%{public}u],
-        the length of edidData [%{public}lu]", __func__, devId, portId, edidData.size());
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGI("%{public}s: fail, ret %{public}d", __func__, ret);
-    }
+        the length of edidData [%{public}lu]", __func__, ret, devId, portId, edidData.size());
 
     return ret;
 }
