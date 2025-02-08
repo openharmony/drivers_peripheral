@@ -951,7 +951,7 @@ int32_t DisplayComposerService::GetDisplayIdentificationData(uint32_t devId, uin
     int32_t ret = vdiAdapter_->GetDisplayIdentificationData(devId, portId, edidData);
     FinishTrace(HITRACE_TAG_HDF);
 
-    DISPLAY_LOGI("%{public}s: ret %{public}d, devId {%{public}u, the param idx [{%{public}u]",
+    DISPLAY_LOGI("%{public}s: ret %{public}d, devId {%{public}u, the param idx [{%{public}u],"
         "the length of edidData [%{public}lu]", __func__, ret, devId, portId, edidData.size());
 
     return ret;
