@@ -45,7 +45,6 @@ struct LibusbAsyncTransfer {
     {
         transferRef = libusb_alloc_transfer(numOfIsoPackage);
         ashmemRef = nullptr;
-        cbRef = nullptr;
     }
 
     ~LibusbAsyncTransfer()
@@ -60,7 +59,7 @@ struct LibusbAsyncTransfer {
 
     libusb_transfer *transferRef;
     sptr<Ashmem> ashmemRef;
-    sptr<V1_2::IUsbdTransferCallback> cbRef;
+    sptr<V1_2::IUsbdTransferCallback> cbRef = nullptr;
     int32_t busNum;
     int32_t devAddr;
     uint64_t userData;

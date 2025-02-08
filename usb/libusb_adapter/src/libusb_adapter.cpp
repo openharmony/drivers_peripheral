@@ -169,12 +169,12 @@ int32_t LibusbAdapter::GetUsbDevice(const UsbDev &dev, libusb_device **device)
         return HDF_FAILURE;
     }
     libusb_device **devs = nullptr;
-    size_t count = libusb_get_device_list(g_libusb_context, &devs);
+    ssize_t count = libusb_get_device_list(g_libusb_context, &devs);
     if (count <= 0 || devs == nullptr) {
         HDF_LOGE("%{public}s: No device", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
-    for (size_t i = 0; i < count; i++) {
+    for (ssize_t i = 0; i < count; i++) {
         uint8_t devDusNum = libusb_get_bus_number(devs[i]);
         uint8_t devDevAddr = libusb_get_device_address(devs[i]);
         if (devDusNum == dev.busNum && devDevAddr == dev.devAddr) {
@@ -711,7 +711,7 @@ int32_t LibusbAdapter::IsoTransferWrite(
         HDF_LOGE("%{public}s interfaceId is invalid", __func__);
         return HDF_FAILURE;
     }
-    int actlength = data.size();
+    int32_t actlength = static_cast<int32_t>(data.size());
     libusb_device_handle *devHandle = nullptr;
     int32_t ret = FindHandleByDev(dev, &devHandle);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
@@ -907,13 +907,14 @@ int32_t LibusbAdapter::GetStringDescriptor(const UsbDev &dev, uint8_t descId, st
         return HDF_FAILURE;
     }
     int32_t length = sizeof(data);
+    uint16_t descLength = USB_MAX_DESCRIPTOR_SIZE;
     ret = libusb_get_string_descriptor(devHandle, descId, ENGLISH_US_LANGUAGE_ID, data, length);
     if (ret <= 0) {
         HDF_LOGE("%{public}s: libusb_get_string_descriptor is failed, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(data, data + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(data, data + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(descLength)), descriptor.begin());
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
@@ -1330,8 +1331,9 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpoint
     ret = DoSyncPipeTranfer(devHandle, &endpoint, buffer, syncTranfer);
     if (ret < 0) {
         if (ret != LIBUSB_ERROR_OVERFLOW) {
-            HDF_LOGE("%{public}s: is error ", __func__);
             ret = HDF_FAILURE;
+        } else {
+            ret = HDF_ERR_INVALID_PARAM;
         }
         int32_t apiVersion = 0;
         GetApiVersion(apiVersion);
@@ -1342,7 +1344,7 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpoint
             ret = HDF_SUCCESS;
         }
     }
-    transferedLength = actlength;
+    transferedLength = static_cast<uint32_t>(actlength);
     CloseMmapBuffer(buffer, size);
     HDF_LOGI("%{public}s leave", __func__);
     return ret;
@@ -1384,8 +1386,9 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
     HDF_LOGI("SendPipeRequestWithAshmem DoSyncPipeTranfer ret :%{public}d", ret);
     if (ret < 0) {
         if (ret != LIBUSB_ERROR_OVERFLOW) {
-            HDF_LOGE("%{public}s: is error ", __func__);
             ret = HDF_FAILURE;
+        } else {
+            ret = HDF_ERR_INVALID_PARAM;
         }
         int32_t apiVersion = 0;
         GetApiVersion(apiVersion);
@@ -1396,7 +1399,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
             ret = HDF_SUCCESS;
         }
     }
-    transferredLength = actlength;
+    transferredLength = static_cast<uint32_t>(actlength);
     CloseMmapBuffer(buffer, sendRequestAshmemParameter.ashmemSize);
     close(sendRequestAshmemParameter.ashmemFd);
     return ret;
@@ -1411,11 +1414,16 @@ int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> 
         HDF_LOGE("%{public}s: get usb device path failed:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-
-    int32_t fd = open(pathBuf, O_RDWR | O_CLOEXEC);
+    char resolvedPath[PATH_MAX] = {'\0'};
+    char *ptrBuf = realpath(pathBuf, resolvedPath);
+    if (ptrBuf == nullptr) {
+        HDF_LOGE("%{public}s: path conversion failed, ptr: %{public}s", __func__, ptrBuf);
+        return HDF_FAILURE;
+    }
+    int32_t fd = open(ptrBuf, O_RDWR | O_CLOEXEC);
     if (fd < 0) {
         HDF_LOGE("%{public}s: failed to open file: %{public}s, errno: %{public}d",
-            __func__, pathBuf, errno);
+            __func__, ptrBuf, errno);
         return HDF_FAILURE;
     }
     void *descriptors = nullptr;
@@ -1683,7 +1691,7 @@ void LibusbAdapter::ProcessExtraData(std::vector<uint8_t> &descriptor, size_t &c
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
             return;
         }
-        currentOffset += extraLength;
+        currentOffset += static_cast<size_t>(extraLength);
     }
     HDF_LOGD("%{public}s leave", __func__);
 }
@@ -1729,7 +1737,8 @@ int32_t LibusbAdapter::DoSyncPipeTranfer(libusb_device_handle *devHandle, struct
 {
     HDF_LOGD("%{public}s enter", __func__);
     int32_t ret = HDF_FAILURE;
-    if ((endpoint->bmAttributes & LIBUSB_TRANSFER_TYPE_INTERRUPT) == LIBUSB_TRANSFER_TYPE_INTERRUPT) {
+    uint8_t endpointAttributes = endpoint->bmAttributes & LIBUSB_TRANSFER_TYPE_INTERRUPT;
+    if (endpointAttributes == LIBUSB_TRANSFER_TYPE_INTERRUPT) {
         HDF_LOGD("%{public}s: DoSyncPipeTranfer call libusb_interrupt_transfer", __func__);
         ret = libusb_interrupt_transfer(devHandle, endpoint->bEndpointAddress, buffer, syncTranfer.length,
             syncTranfer.transferred, syncTranfer.timeout);
@@ -1922,7 +1931,6 @@ int32_t LibusbAdapter::AsyncCancelTransfer(const UsbDev &dev, const int32_t endp
     }
     for (auto it = asyncWrapper->transferList.begin(); it != asyncWrapper->transferList.end();) {
         auto asyncTransfer = *it;
-        HDF_LOGI("%{public}s endpoint: %{public}d", __func__, asyncTransfer->transferRef->endpoint);
         if (asyncTransfer->transferRef == nullptr || asyncTransfer->transferRef->endpoint != endpoint) {
             ++it;
             continue;
@@ -1965,7 +1973,8 @@ int32_t LibusbAdapter::FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer,
             info.numIsoPackets, HandleAsyncResult, asyncTransfer, info.timeOut);
         if (info.numIsoPackets > 0) {
             uint32_t packetLength = info.length / info.numIsoPackets;
-            uint32_t maxIsoPacketLength = libusb_get_max_iso_packet_size(libusb_get_device(devHandle), info.endpoint);
+            uint32_t maxIsoPacketLength =
+                static_cast<uint32_t>(libusb_get_max_iso_packet_size(libusb_get_device(devHandle), info.endpoint));
             packetLength = packetLength >= maxIsoPacketLength ? maxIsoPacketLength : packetLength;
             HDF_LOGI("%{public}s: iso pkg len: %{public}d, max iso pkg len: %{public}d",
                 __func__, packetLength, maxIsoPacketLength);
@@ -2067,7 +2076,7 @@ void LibusbAdapter::ParseIsoPacketDesc(libusb_transfer *transfer,
         
         V1_2::UsbIsoPacketDescriptor desc;
         desc.isoLength = pack->length;
-        desc.isoActualLength = pack->actual_length;
+        desc.isoActualLength = static_cast<int32_t>(pack->actual_length);
         desc.isoStatus = pack->status;
         isoPkgDescs.push_back(desc);
     }
@@ -2162,7 +2171,8 @@ uint8_t *LibusbAdapter::AllocAsyncBuffer(const V1_2::USBTransferInfo &info, cons
         HDF_LOGE("%{public}s: malloc buffer failed", __func__);
         return nullptr;
     }
-    if ((info.endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_OUT) {
+    uint32_t endpointId = static_cast<uint32_t>(info.endpoint) & LIBUSB_ENDPOINT_DIR_MASK;
+    if (endpointId == LIBUSB_ENDPOINT_OUT) {
         HDF_LOGI("%{public}s: read from ashmem", __func__);
         int32_t ret = ReadAshmem(ashmem, info.length, buffer);
         if (ret != HDF_SUCCESS) {
@@ -2229,7 +2239,7 @@ void LibusbAdapter::DeleteAsyncDevRequest(const UsbDev &dev)
             break;
         }
     }
-    if (deleteId >= 0) {
+    if (deleteId >= 0 && deleteId < g_asyncManager.transferVec.size()) {
         g_asyncManager.transferVec.erase(g_asyncManager.transferVec.begin() + deleteId);
     }
 }
