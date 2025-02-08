@@ -946,10 +946,12 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 
     handle = OsGetDeviceHandle(session, busNum, usbAddr);
     if (handle != NULL) {
+        HDF_LOGE("%{public}s:%{public}d OsGetDeviceHandle success: %{public}p", __func__, __LINE__, handle);
         return handle;
     }
 
     handle = OsCallocDeviceHandle();
+    HDF_LOGE("%{public}s:%{public}d OsCallocDeviceHandle = %{public}p", __func__, __LINE__, handle);
     if (handle == NULL) {
         return NULL;
     }

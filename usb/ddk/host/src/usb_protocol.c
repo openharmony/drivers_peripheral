@@ -248,7 +248,7 @@ int32_t UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t bu
     interfacePool->session = devHandle->dev->session;
     interfacePool->device = devHandle->dev;
     devHandle->dev->privateObject = (void *)interfacePool;
-
+    HDF_LOGE("%{public}s:%{public}d devHandle = %{public}p", __func__, __LINE__, devHandle);
     ret = CreateCtrPipe(interfacePool);
     if (ret != HDF_SUCCESS) {
         goto ERR;
