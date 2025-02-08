@@ -327,7 +327,7 @@ HWTEST_F(DeviceTest, test_GetDisplayIdentificationData, TestSize.Level1)
     uint8_t portId = 0;
     std::vector<uint8_t> edidData = {};
     auto ret = g_composerDevice->GetDisplayIdentificationData(g_displayIds[0], portId, edidData);
-    DISPLAY_TEST_LOGD("displayId[%u], portId[%u], edidDataLength[%lu]", g_displayIds[0], portId, edidData.size());
+    DISPLAY_TEST_LOGD("displayId[%u], portId[%u], edidDataLength[%u]", g_displayIds[0], portId, edidData.size());
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
