@@ -102,8 +102,8 @@ int32_t UsbSerialDdkService::Open(uint64_t deviceId, uint64_t interfaceIndex,
         return USB_SERIAL_DDK_NO_PERM;
     }
 
-    uint16_t busNum = GetBusNum(deviceId);
-    uint16_t devNum = GetDevNum(deviceId);
+    uint32_t busNum = GetBusNum(deviceId);
+    uint32_t devNum = GetDevNum(deviceId);
     SysfsDevNode devNode(busNum, devNum, interfaceIndex, "ttyUSB");
     std::string path;
     int32_t ret = devNode.FindPath(path);
