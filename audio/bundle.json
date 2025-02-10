@@ -43,7 +43,8 @@
                 "bounds_checking_function",
                 "hitrace",
                 "hicollie",
-                "alsa-lib"
+                "alsa-lib",
+                "ipc"
             ],
             "third_party": []
         },
