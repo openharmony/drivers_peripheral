@@ -25,7 +25,7 @@ void HdfAudioStartTrace(const char* value, int valueLen);
 void HdfAudioFinishTrace(void);
 int32_t SetTimer(const char* name);
 void CancelTimer(int32_t id);
-
+void SetMaxWorkThreadNum(int32_t count);
 #ifdef __cplusplus
 }
 #endif
