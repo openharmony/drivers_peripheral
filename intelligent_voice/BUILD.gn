@@ -11,6 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+import("intelligent_voice.gni")
+
 if (defined(ohos_lite)) {
   group("intell_voice_engine_entry") {
     deps = []
@@ -20,7 +23,9 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("intell_voice_engine_entry") {
-    deps = [ "hdi_service/engine:hdi_intell_voice_engine_service" ]
+    if (drivers_peripheral_intelligent_voice_engine_enable) {
+      deps = [ "hdi_service/engine:hdi_intell_voice_engine_service" ]
+    }
   }
   group("intell_voice_trigger_entry") {
     deps = [ "hdi_service/trigger:hdi_intell_voice_trigger_service" ]
