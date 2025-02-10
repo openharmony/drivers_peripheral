@@ -70,6 +70,7 @@ ohos_shared_library("audio_primary_impl_vendor") {
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
+      "ipc:ipc_single",
     ]
     if (enable_c_utils) {
       external_deps += [ "c_utils:utils" ]
