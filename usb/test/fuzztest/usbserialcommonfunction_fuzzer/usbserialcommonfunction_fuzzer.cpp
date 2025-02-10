@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cinttypes>
 #include "usbserialcommonfunction_fuzzer.h"
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
@@ -23,11 +24,10 @@ namespace OHOS {
 namespace USBSerial {
 
 constexpr uint32_t SHIFT_32 = 32;
-uint64_t interfaceIndex = 0x00;
 
 static uint64_t ToDdkDeviceId(const uint8_t busNum, const uint8_t devAddr)
 {
-    return ((uint64_t)busNum << SHIFT_32) + devAddr;
+    return (static_cast<uint64_t>(busNum) << SHIFT_32) + devAddr;
 }
 
 int32_t UsbSerialFuzzTestHostModeInit(const sptr<IUsbSerialDdk> &usbSerialInterface, UsbSerialDeviceHandle *device)
@@ -44,8 +44,9 @@ int32_t UsbSerialFuzzTestHostModeInit(const sptr<IUsbSerialDdk> &usbSerialInterf
 
     uint8_t busNum = subscriber->busNum_;
     uint8_t devAddr = subscriber->devAddr_;
+    uint64_t interfaceIndex = 0x00;
 
-    HDF_LOGI("%{public}s: busNum:%{public}d, devAddr:%{public}d, deviceID:%{public}llu", __func__,
+    HDF_LOGI("%{public}s: busNum:%{public}d, devAddr:%{public}d, deviceID:%{public}016" PRIX64, __func__,
              subscriber->busNum_, subscriber->devAddr_, ToDdkDeviceId(busNum, devAddr));
     ret = usbSerialInterface->Open(ToDdkDeviceId(busNum, devAddr), interfaceIndex, *device);
     if (ret != HDF_SUCCESS) {
