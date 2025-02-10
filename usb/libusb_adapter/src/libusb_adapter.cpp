@@ -2225,8 +2225,9 @@ void LibusbAdapter::TransferRelease(const UsbDev &dev)
 
 void LibusbAdapter::DeleteAsyncDevRequest(const UsbDev &dev)
 {
-    size_t deleteId = -1;
-    for (size_t i = 0; i < g_asyncManager.transferVec.size(); ++i) {
+    int32_t deleteId = -1;
+    int32_t number = static_cast<int32_t>(g_bulkManager.bulktransferVec.size());
+    for (int32_t i = 0; i < number; ++i) {
         HDF_LOGI("%{public}s: delete async dev request bus num: %{public}d, dev addr: %{public}d", __func__,
             g_asyncManager.transferVec[i].first.busNum, g_asyncManager.transferVec[i].first.devAddr);
         if (g_asyncManager.transferVec[i].first.busNum == dev.busNum
@@ -2621,8 +2622,9 @@ void LibusbAdapter::BulkTransferRelease(const UsbDev &dev)
 void LibusbAdapter::DeleteBulkDevRequest(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    size_t deleteId = -1;
-    for (size_t i = 0; i < g_bulkManager.bulktransferVec.size(); ++i) {
+    int32_t deleteId = -1;
+    int32_t number = static_cast<int32_t>(g_bulkManager.bulktransferVec.size());
+    for (int32_t i = 0; i < number; ++i) {
         HDF_LOGI("%{public}s: delete bulk dev request bus num: %{public}d, dev addr: %{public}d", __func__,
             g_bulkManager.bulktransferVec[i].first.busNum, g_bulkManager.bulktransferVec[i].first.devAddr);
         if (g_bulkManager.bulktransferVec[i].first.busNum == dev.busNum
