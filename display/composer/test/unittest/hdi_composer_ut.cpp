@@ -329,9 +329,9 @@ HWTEST_F(DeviceTest, test_GetDisplayIdentificationData, TestSize.Level1)
     auto ret = g_composerDevice->GetDisplayIdentificationData(g_displayIds[0], portId, edidData);
     DISPLAY_TEST_LOGD("displayId[%u], portId[%u], edidDataLength[%u]", g_displayIds[0], portId, edidData.size());
     if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
-        result = DISPLAY_SUCCESS;
+        ret = DISPLAY_SUCCESS;
     }
-    EXPECT_EQ(DISPLAY_FAILURE, result);
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
 }
 
 HWTEST_F(DeviceTest, test_UpdateHardwareCursor, TestSize.Level1)
