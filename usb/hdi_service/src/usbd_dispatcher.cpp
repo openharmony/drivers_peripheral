@@ -28,6 +28,10 @@ namespace Usb {
 namespace V1_2 {
 int32_t UsbdDispatcher::UsbdAllocFifo(DataFifo *fifo, uint32_t size)
 {
+    if (fifo == nullptr) {
+        HDF_LOGE("%{public}s:fifo is nullptr", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (!DataFifoIsInitialized(fifo)) {
         void *data = OsalMemAlloc(size);
         if (data == nullptr) {
