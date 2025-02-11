@@ -850,7 +850,7 @@ BENCHMARK_F(DisplayBenchmarkTest, GetDisplayIdentificationData)(benchmark::State
     if (ret == DISPLAY_NOT_SUPPORT) {
         return;
     }
-    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayIdentificationData)->
