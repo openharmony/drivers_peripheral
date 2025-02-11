@@ -181,6 +181,10 @@ static int32_t UsbFnDriverInit(struct HdfDeviceObject *device)
 
 static void UsbFnDriverRelease(struct HdfDeviceObject *device)
 {
+    if (device == NULL || device->service == NULL) {
+        HDF_LOGE("%{public}s: device or service is null", __func__);
+        return;
+    }
     struct DevUsbFnMgr *devMgr = NULL;
     devMgr = (struct DevUsbFnMgr *)device->service;
     if (devMgr == NULL) {
