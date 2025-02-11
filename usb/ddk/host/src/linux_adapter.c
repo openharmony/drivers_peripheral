@@ -357,8 +357,15 @@ static int32_t OsGetActiveConfig(struct UsbDevice *dev, int32_t fd)
     ctrlData.data = &activeConfig;
     ret = ioctl(fd, USBDEVFS_CONTROL, &ctrlData);
     if (ret < 0) {
-        HDF_LOGE("%{public}s:%{public}d ioctl failed errno = %{public}d", __func__, __LINE__, errno);
-        return HDF_FAILURE;
+        HDF_LOGW("%{public}s:%{public}d ioctl failed errno = %{public}d", __func__, __LINE__, errno);
+        if (dev->deviceDescriptor.bNumConfigurations == 1 && dev->configDescriptors != NULL) {
+            activeConfig = dev->configDescriptors[0].desc->bConfigurationValue;
+            HDF_LOGI("%{public}s:%{public}d get config value = %{public}d", __func__, __LINE__, activeConfig);
+        } else {
+            HDF_LOGE("%{public}s:%{public}d bNumConfigures = %{public}d", __func__, __LINE__,
+                dev->deviceDescriptor.bNumConfigurations);
+            return HDF_FAILURE;
+        }
     }
     dev->activeConfig = activeConfig;
 
