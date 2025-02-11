@@ -331,7 +331,7 @@ HWTEST_F(DeviceTest, test_GetDisplayIdentificationData, TestSize.Level1)
     if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         ret = DISPLAY_SUCCESS;
     }
-    EXPECT_EQ(DISPLAY_FAILURE, ret);
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
 HWTEST_F(DeviceTest, test_UpdateHardwareCursor, TestSize.Level1)
