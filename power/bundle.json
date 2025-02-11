@@ -21,7 +21,8 @@
         "drivers_peripheral_power_c_utils",
         "drivers_peripheral_power_config_policy",
         "drivers_peripheral_power_hisysevent",
-        "drivers_peripheral_power_hicollie"
+        "drivers_peripheral_power_hicollie",
+        "drivers_peripheral_power_host_sched_priority"
       ],
       "adapted_system_type": ["standard", "small"],
       "rom": "981KB",
