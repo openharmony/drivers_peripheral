@@ -18,6 +18,7 @@
 #include "securec.h"
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
+#include <sched.h>
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 #define AUDIO_FORMAT_NUM_MAX 15
@@ -559,4 +560,13 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
     frameInfo->replyBytesEc = frameInfoVdi->replyBytesEc;
 
     return HDF_SUCCESS;
+}
+
+void SetThreadPriority(void)
+{
+    struct sched_param param;
+    param.sched_priority = 1;
+    if (sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
+        AUDIO_FUNC_LOGE("failed to set thread priority");
+    }
 }
