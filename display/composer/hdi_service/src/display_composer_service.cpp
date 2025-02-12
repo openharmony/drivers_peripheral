@@ -252,6 +252,8 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<ClearDisplayClientBufferFunc>(dlsym(libHandle_, "ClearDisplayClientBuffer"));
     vdiAdapter_->ClearLayerBuffer =
         reinterpret_cast<ClearLayerBufferFunc>(dlsym(libHandle_, "ClearLayerBuffer"));
+    vdiAdapter_->SetDisplayPerFrameParameter =
+        reinterpret_cast<SetDisplayPerFrameParameterFunc>(dlsym(libHandle_, "SetDisplayPerFrameParameter"));
 }
 
 void DisplayComposerService::HidumperInit()
