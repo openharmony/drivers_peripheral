@@ -68,7 +68,9 @@ extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
 void FillReadRequestParams(const UsbControlRequestSetup &setup, const uint32_t length,
     const uint32_t timeout, UsbRequestParams &params)
 {
-    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    if (memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams)) != EOK) {
+        HDF_LOGE("%{public}s memset_s failed", __func__);
+    }
     params.interfaceId = USB_CTRL_INTERFACE_ID;
     params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     params.timeout = timeout;
@@ -84,7 +86,9 @@ void FillReadRequestParams(const UsbControlRequestSetup &setup, const uint32_t l
 void FillWriteRequestParams(const UsbControlRequestSetup &setup, const std::vector<uint8_t> &data,
     const uint32_t timeout, UsbRequestParams &params)
 {
-    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    if (memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams)) != EOK) {
+        HDF_LOGE("%{public}s memset_s failed", __func__);
+    }
     params.interfaceId = USB_CTRL_INTERFACE_ID;
     params.pipeAddress = 0;
     params.pipeId = 0;
@@ -102,7 +106,9 @@ void FillWriteRequestParams(const UsbControlRequestSetup &setup, const std::vect
 
 void FillPipeRequestParams(const UsbRequestPipe &pipe, const uint32_t length, UsbRequestParams &params)
 {
-    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    if (memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams)) != EOK) {
+        HDF_LOGE("%{public}s memset_s failed", __func__);
+    }
     params.pipeId = pipe.endpoint;
     params.pipeAddress = pipe.endpoint;
     params.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
@@ -112,7 +118,9 @@ void FillPipeRequestParams(const UsbRequestPipe &pipe, const uint32_t length, Us
 
 void FillPipeRequestParamsWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem &ashmem, UsbRequestParams &params)
 {
-    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    if (memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams)) != EOK) {
+        HDF_LOGE("%{public}s memset_s failed", __func__);
+    }
     params.pipeId = pipe.endpoint;
     params.pipeAddress = pipe.endpoint;
     params.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
@@ -306,6 +314,10 @@ int32_t UsbDdkService::GetDeviceDescriptor(uint64_t deviceId, UsbDeviceDescripto
 #else
     HDF_LOGD("%{public}s enter", __func__);
     std::vector<uint8_t> descriptor(DEVICE_DESCRIPROR_LENGTH);
+    if (g_DdkLibusbAdapter == nullptr) {
+        HDF_LOGE("%{public}s g_DdkLibusbAdapter is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     int32_t ret = g_DdkLibusbAdapter->GetDeviceDescriptor({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, descriptor);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s get device descriptor failed", __func__);
@@ -362,6 +374,10 @@ int32_t UsbDdkService::GetConfigDescriptor(uint64_t deviceId, uint8_t configInde
     (void)UsbRawCloseDevice(rawHandle);
     return HDF_SUCCESS;
 #else
+    if (g_DdkLibusbAdapter == nullptr) {
+        HDF_LOGE("%{public}s g_DdkLibusbAdapter is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     return g_DdkLibusbAdapter->GetConfigDescriptor({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)},
         configIndex, configDesc);
 #endif // LIBUSB_ENABLE
