@@ -252,6 +252,8 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<ClearDisplayClientBufferFunc>(dlsym(libHandle_, "ClearDisplayClientBuffer"));
     vdiAdapter_->ClearLayerBuffer =
         reinterpret_cast<ClearLayerBufferFunc>(dlsym(libHandle_, "ClearLayerBuffer"));
+    vdiAdapter_->GetDisplayIdentificationData =
+        reinterpret_cast<GetDisplayIdentificationDataFunc>(dlsym(libHandle_, "GetDisplayIdentificationData"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -935,6 +937,22 @@ int32_t DisplayComposerService::SetDisplayActiveRegion(uint32_t devId, const IRe
     if (ret != HDF_SUCCESS) {
         HDF_LOGI("%{public}s: fail, ret %{public}d", __func__, ret);
     }
+
+    return ret;
+}
+
+int32_t DisplayComposerService::GetDisplayIdentificationData(uint32_t devId, uint8_t& portId,
+    std::vector<uint8_t>& edidData)
+{
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayIdentificationData, HDF_ERR_NOT_SUPPORT);
+
+    StartTrace(HITRACE_TAG_HDF, "vdiAdapter_->GetDisplayIdentificationData");
+    int32_t ret = vdiAdapter_->GetDisplayIdentificationData(devId, portId, edidData);
+    FinishTrace(HITRACE_TAG_HDF);
+
+    DISPLAY_LOGI("%{public}s: ret %{public}d, devId {%{public}u, the param idx [{%{public}u],"
+        "the length of edidData [%{public}u]", __func__, ret, devId, portId, edidData.size());
 
     return ret;
 }
