@@ -60,8 +60,8 @@ struct LibusbAsyncTransfer {
     libusb_transfer *transferRef;
     sptr<Ashmem> ashmemRef;
     sptr<V1_2::IUsbdTransferCallback> cbRef = nullptr;
-    int32_t busNum;
-    int32_t devAddr;
+    int32_t busNum = 0;
+    int32_t devAddr = 0;
     uint64_t userData;
 };
 
