@@ -63,6 +63,7 @@ struct IAudioCaptureVdi *AudioGetVdiCaptureByIdVdi(uint32_t captureId)
 
 int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t *replyBytes)
 {
+    SetThreadPriority();
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frame, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
