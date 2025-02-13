@@ -389,12 +389,6 @@ void InputDeviceManager::ReloadInputDevices(std::vector<std::string> flist)
     }
 }
 
-void InputDeviceManager::GetInputDeviceInfoList()
-{
-    std::vector<std::string> flist = GetFiles(devPath_);
-    LoadInputDevices(flist);
-}
-
 int32_t InputDeviceManager::DoInputDeviceAction(void)
 {
     struct input_event evtBuffer[EVENT_BUFFER_SIZE] {};
