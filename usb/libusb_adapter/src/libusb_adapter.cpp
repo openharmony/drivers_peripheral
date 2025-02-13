@@ -1737,6 +1737,10 @@ int32_t LibusbAdapter::DoSyncPipeTranfer(libusb_device_handle *devHandle, struct
 {
     HDF_LOGD("%{public}s enter", __func__);
     int32_t ret = HDF_FAILURE;
+    if (endpoint == nullptr) {
+        HDF_LOGE("%{public}s endpoint is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     uint8_t endpointAttributes = endpoint->bmAttributes & LIBUSB_TRANSFER_TYPE_INTERRUPT;
     if (endpointAttributes == LIBUSB_TRANSFER_TYPE_INTERRUPT) {
         HDF_LOGD("%{public}s: DoSyncPipeTranfer call libusb_interrupt_transfer", __func__);
@@ -2075,7 +2079,7 @@ void LibusbAdapter::ParseIsoPacketDesc(libusb_transfer *transfer,
             __func__, i, pack->status, pack->length, pack->actual_length);
         
         V1_2::UsbIsoPacketDescriptor desc;
-        desc.isoLength = pack->length;
+        desc.isoLength = static_cast<int32_t>(pack->length);
         desc.isoActualLength = static_cast<int32_t>(pack->actual_length);
         desc.isoStatus = pack->status;
         isoPkgDescs.push_back(desc);
@@ -2226,7 +2230,7 @@ void LibusbAdapter::TransferRelease(const UsbDev &dev)
 void LibusbAdapter::DeleteAsyncDevRequest(const UsbDev &dev)
 {
     int32_t deleteId = -1;
-    int32_t number = static_cast<int32_t>(g_bulkManager.bulktransferVec.size());
+    int32_t number = static_cast<int32_t>(g_asyncManager.transferVec.size());
     for (int32_t i = 0; i < number; ++i) {
         HDF_LOGI("%{public}s: delete async dev request bus num: %{public}d, dev addr: %{public}d", __func__,
             g_asyncManager.transferVec[i].first.busNum, g_asyncManager.transferVec[i].first.devAddr);
@@ -2240,7 +2244,7 @@ void LibusbAdapter::DeleteAsyncDevRequest(const UsbDev &dev)
             break;
         }
     }
-    if (deleteId >= 0 && deleteId < g_asyncManager.transferVec.size()) {
+    if (deleteId >= 0 && deleteId < static_cast<int32_t>(g_asyncManager.transferVec.size())) {
         g_asyncManager.transferVec.erase(g_asyncManager.transferVec.begin() + deleteId);
     }
 }

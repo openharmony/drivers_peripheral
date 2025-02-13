@@ -85,6 +85,7 @@ int32_t AudioGetLatencyVdi(struct IAudioRender *render, uint32_t *ms)
 
 int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, uint32_t frameLen, uint64_t *replyBytes)
 {
+    SetThreadPriority();
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frame, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(replyBytes, HDF_ERR_INVALID_PARAM);

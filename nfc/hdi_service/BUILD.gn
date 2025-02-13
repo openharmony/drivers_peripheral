@@ -25,6 +25,7 @@ ohos_shared_library("libnfc_interface_service_1.1") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nfc:libnfc_stub_1.1",
     "drivers_interface_nfc:nfc_idl_headers",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
