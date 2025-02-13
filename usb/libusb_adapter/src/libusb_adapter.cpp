@@ -2226,7 +2226,7 @@ void LibusbAdapter::TransferRelease(const UsbDev &dev)
 void LibusbAdapter::DeleteAsyncDevRequest(const UsbDev &dev)
 {
     int32_t deleteId = -1;
-    int32_t number = static_cast<int32_t>(g_bulkManager.bulktransferVec.size());
+    int32_t number = static_cast<int32_t>(g_asyncManager.transferVec.size());
     for (int32_t i = 0; i < number; ++i) {
         HDF_LOGI("%{public}s: delete async dev request bus num: %{public}d, dev addr: %{public}d", __func__,
             g_asyncManager.transferVec[i].first.busNum, g_asyncManager.transferVec[i].first.devAddr);
@@ -2240,7 +2240,7 @@ void LibusbAdapter::DeleteAsyncDevRequest(const UsbDev &dev)
             break;
         }
     }
-    if (deleteId >= 0 && deleteId < g_asyncManager.transferVec.size()) {
+    if (deleteId >= 0 && deleteId < static_cast<int32_t>(g_asyncManager.transferVec.size())) {
         g_asyncManager.transferVec.erase(g_asyncManager.transferVec.begin() + deleteId);
     }
 }
