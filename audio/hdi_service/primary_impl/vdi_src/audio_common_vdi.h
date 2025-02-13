@@ -42,5 +42,5 @@ int32_t AudioCommonFrameInfoToVdiFrameInfoVdi(const struct AudioFrameLen *frameL
     struct AudioCaptureFrameInfoVdi *frameInfoVdi);
 int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *frameInfoVdi,
     struct AudioCaptureFrameInfo *frameInfo);
-
+void SetThreadPriority(void);
 #endif // AUDIO_COMMON_VDI_H
