@@ -18,7 +18,6 @@
 #include <sstream>
 #include <hdf_base.h>
 #include "hdf_log.h"
-#include "usbd_wrapper.h"
 #include "ddk_sysfs_dev_node.h"
 
 #define HDF_LOG_TAG      ddk_sysfs_dev_node
@@ -40,8 +39,19 @@ SysfsDevNode::SysfsDevNode(uint32_t busNum, uint32_t devNum, uint8_t intfNum, co
 
 int32_t SysfsDevNode::FindPath(std::string& devNodePath)
 {
-    for (const auto& entry : fs::directory_iterator(devDir_)) {
-        if (!fs::is_directory(entry.status())) {
+    std::error_code errorCode;
+    for (const auto& entry : fs::directory_iterator(devDir_, errorCode)) {
+        if (errorCode) {
+            HDF_LOGE("Error: %{public}s at %{public}s", errorCode.message().c_str(), entry.path().c_str());
+            errorCode.clear();
+            continue;
+        }
+
+        if (!fs::is_directory(entry, errorCode)) {
+            if (errorCode) {
+                HDF_LOGE("Error: %{public}s at %{public}s", errorCode.message().c_str(), entry.path().c_str());
+                errorCode.clear();
+            }
             continue;
         }
 
@@ -62,11 +72,9 @@ int32_t SysfsDevNode::FindPath(std::string& devNodePath)
             continue;
         }
 
-        std::error_code errorCode;
         for (fs::recursive_directory_iterator iter(entry, errorCode), end; iter != end; ++iter) {
             if (errorCode) {
-                HDF_LOGE("Error: %{public}s, at %{public}s", errorCode.message().c_str(),
-                    iter->path().string().c_str());
+                HDF_LOGE("Error: %{public}s at %{public}s", errorCode.message().c_str(), iter->path().string().c_str());
                 errorCode.clear();
                 continue;
             }

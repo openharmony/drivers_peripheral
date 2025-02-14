@@ -28,6 +28,15 @@ if (defined(ohos_lite)) {
     testonly = true
     deps = [
       "benchmarktest/:hdi_usb_benchmark_driver_test",
+      "fuzztest/scsiddk_fuzzer:fuzztest",
+      "fuzztest/scsiinquiry_fuzzer:fuzztest",
+      "fuzztest/scsiread10_fuzzer:fuzztest",
+      "fuzztest/scsireadcapacity10_fuzzer:fuzztest",
+      "fuzztest/scsirequestsense_fuzzer:fuzztest",
+      "fuzztest/scsisendrequestbycdb_fuzzer:fuzztest",
+      "fuzztest/scsitestunitready_fuzzer:fuzztest",
+      "fuzztest/scsiverify10_fuzzer:fuzztest",
+      "fuzztest/scsiwrite10_fuzzer:fuzztest",
       "fuzztest/usbgetdevices_fuzzer:fuzztest",
       "fuzztest/usbserialddk_fuzzer:fuzztest",
       "fuzztest/usbserialflush_fuzzer:fuzztest",
