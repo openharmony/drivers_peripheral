@@ -765,6 +765,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev)
     /* the mtpDev is enabled, ready for transfer */
     mtpDev->mtpState = MTP_STATE_READY;
     mtpPort->startDelayed = true;
+    mtpPort->suspended = false;
     return HDF_SUCCESS;
 }
 
