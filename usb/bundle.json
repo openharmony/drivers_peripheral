@@ -39,7 +39,8 @@
                 "drivers_interface_usb",
                 "hisysevent",
                 "access_token",
-                "libusb"
+                "libusb",
+                "eudev"
             ],
             "third_party": []
         },
@@ -62,6 +63,9 @@
                 },
                 {
                     "name":"//drivers/peripheral/usb/hdi_service:libusb_port_interface_service_2.0"
+                },
+                {
+                    "name":"//drivers/peripheral/usb/serial:libserial_interface_service_1.0"
                 }
             ]
         }
