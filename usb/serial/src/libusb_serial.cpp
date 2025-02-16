@@ -25,7 +25,6 @@
 #include <cstring>
 #include <string>
 #include <chrono>
-#include <libudev.h>
 #include "usbd_wrapper.h"
 #include "securec.h"
 
@@ -45,16 +44,9 @@ namespace V1_0 {
 #define RETRY_TIMEOUT 200
 #define RETRY_NUM 5
 #define BUFFER_SIZE 256
+#define SERIAL_NUM 256
 #define ERR_CODE_IOEXCEPTION (-5)
 #define ERR_CODE_DEVICENOTOPEN (-6)
-
-static const std::string SERIAL_TYPE_NAME = "ttyUSB";
-static const std::string DEVICE_NAME_STR = "/dev/ttyUSB";
-static const char *UDEV_SUB_SYSTEM = "tty";
-static const char *UDEV_PARENT_TYPE = "usb";
-static const char *UDEV_PARENT_DEVICE = "usb_device";
-static const char *BUSNUM_STR = "busnum";
-static const char *DEVNUM_STR = "devnum";
 
 LibusbSerial &LibusbSerial::GetInstance()
 {
@@ -66,9 +58,9 @@ LibusbSerial::LibusbSerial(): ctx_(nullptr), running_(true)
 {
     HDF_LOGI("%{public}s: enter SerialUSBWrapper initialization.", __func__);
 
-    int rc = libusb_init(&ctx_);
-    if (rc != LIBUSB_SUCCESS) {
-        HDF_LOGE("%{public}s: Failed to initialize libusb: %{public}d", __func__, rc);
+    int ret = libusb_init(&ctx_);
+    if (ret != LIBUSB_SUCCESS) {
+        HDF_LOGE("%{public}s: Failed to initialize libusb: %{public}d", __func__, ret);
         ctx_ = nullptr;
 
         return;
@@ -82,7 +74,7 @@ LibusbSerial::LibusbSerial(): ctx_(nullptr), running_(true)
         return;
     }
 
-    rc = libusb_hotplug_register_callback(ctx_,
+    ret = libusb_hotplug_register_callback(ctx_,
         static_cast<libusb_hotplug_event>(
             LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
             LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT),
@@ -93,8 +85,8 @@ LibusbSerial::LibusbSerial(): ctx_(nullptr), running_(true)
         HotplugCallback,
         this,
         &hotplug_handle_);
-    if (rc != LIBUSB_SUCCESS) {
-        HDF_LOGE("%{public}s: Failed to register hotplug callback: %{public}d", __func__, rc);
+    if (ret != LIBUSB_SUCCESS) {
+        HDF_LOGE("%{public}s: Failed to register hotplug callback: %{public}d", __func__, ret);
         libusb_exit(ctx_);
         ctx_ = nullptr;
 
@@ -146,6 +138,14 @@ void LibusbSerial::GetExistedDevices()
 
     for (ssize_t idx = 0; idx < count; ++idx) {
         libusb_device* device = device_list[idx];
+        struct libusb_device_descriptor desc;
+        int ret = libusb_get_device_descriptor(device, &desc);
+        if (ret < 0) {
+            continue;
+        }
+        if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
+            continue;
+        }
         int num = GetDeviceNum(device);
         if (num >= 0) {
             HandleDeviceArrival(device);
@@ -264,7 +264,7 @@ libusb_device* LibusbSerial::GetDevice(int portId)
     return nullptr;
 }
 
-int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint32_t size)
+int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint32_t size, uint32_t timeout)
 {
     HDF_LOGI("%{public}s: enter serial read.", __func__);
     libusb_device* device = GetDevice(portId);
@@ -292,14 +292,13 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
     }
     ret = 0;
     ret = libusb_bulk_transfer(deviceHandleInfo.handle,
-        deviceHandleInfo.intputEndpointAddr, data_in, size, &actual_length, TRANSFER_TIMEOUT);
+        deviceHandleInfo.intputEndpointAddr, data_in, size, &actual_length, timeout);
     if (ret < 0 && actual_length == 0) {
         libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
         libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
         HDF_LOGE("%{public}s: read message failed, ret:%{public}d", __func__, ret);
         return ret;
     }
-
     std::vector<uint8_t> vec(data_in, data_in + actual_length);
     data.insert(data.end(), vec.begin(), vec.end());
     size = actual_length;
@@ -308,7 +307,7 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
     return HDF_SUCCESS;
 }
 
-int32_t LibusbSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& data, uint32_t size)
+int32_t LibusbSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& data, uint32_t size, uint32_t timeout)
 {
     HDF_LOGI("%{public}s: enter serial write.", __func__);
     libusb_device* device = GetDevice(portId);
@@ -336,7 +335,7 @@ int32_t LibusbSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& da
     }
 
     ret = libusb_bulk_transfer(deviceHandleInfo.handle, deviceHandleInfo.outputEndpointAddr,
-        const_cast<uint8_t*>(data_out), data.size(), &actual_length, TRANSFER_TIMEOUT);
+        const_cast<uint8_t*>(data_out), data.size(), &actual_length, timeout);
     if (ret < 0) {
         HDF_LOGE("%{public}s: write message failed, ret:%{public}d", __func__, ret);
         libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
@@ -406,6 +405,7 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
         return HDF_FAILURE;
     }
     unsigned char request_type = LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
+    // unsigned char request_type = LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
     uint16_t index = 0;
     uint16_t value = 0;
     int length = sizeof(struct SerialAttribute);
@@ -442,7 +442,8 @@ int32_t LibusbSerial::SerialSetAttribute(int32_t portId, const struct SerialAttr
         HDF_LOGE("%{public}s: libusb claim failed, ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    unsigned char request_type = LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
+    // unsigned char request_type = LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
+    unsigned char request_type = LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
     uint16_t index = 0;
     uint16_t value = 0;
     int length = sizeof(struct SerialAttribute);
@@ -495,9 +496,9 @@ int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
     }
 
     libusb_device_handle* handle = nullptr;
-    int rc = libusb_open(device, &handle);
-    if (rc != LIBUSB_SUCCESS) {
-        HDF_LOGE("%{public}s: Failed to open device: %{public}d", __func__, rc);
+    int ret = libusb_open(device, &handle);
+    if (ret != LIBUSB_SUCCESS) {
+        HDF_LOGE("%{public}s: Failed to open device: %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
 
@@ -540,100 +541,49 @@ void LibusbSerial::EventHandlingThread()
 {
     HDF_LOGI("%{public}s: enter Event handling thread.", __func__);
     while (running_) {
-        int rc = libusb_handle_events_completed(ctx_, nullptr);
-        if (rc != LIBUSB_SUCCESS) {
-            HDF_LOGE("%{public}s: libusb_handle_events_completed failed: %{public}d", __func__, rc);
+        int ret = libusb_handle_events_completed(ctx_, nullptr);
+        if (ret != LIBUSB_SUCCESS) {
+            HDF_LOGE("%{public}s: libusb_handle_events_completed failed: %{public}d", __func__, ret);
         }
     }
     HDF_LOGI("%{public}s: Event handling thread end.", __func__);
 }
 
-static void HandleUdevListEntry(struct udev* udev, struct udev_list_entry* devices,
-    uint8_t busNumber, uint8_t deviceAddress, int *matchedNum)
-{
-    struct udev_list_entry* entry = nullptr;
-    HDF_LOGI("%{public}s: enter handle udevliset.", __func__);
-    udev_list_entry_foreach(entry, devices) {
-        const char* sysPath = udev_list_entry_get_name(entry);
-        struct udev_device* ttyDevice = udev_device_new_from_syspath(udev, sysPath);
-        if (!ttyDevice) {
-            continue;
-        }
-        const char* devname = udev_device_get_devnode(ttyDevice);
-        if (!devname) {
-            udev_device_unref(ttyDevice);
-            continue;
-        }
-        std::string devNameStr(devname);
-        if (devNameStr.find(DEVICE_NAME_STR) != 0) {
-            udev_device_unref(ttyDevice);
-            continue;
-        }
-        struct udev_device* parent = udev_device_get_parent_with_subsystem_devtype(
-            ttyDevice, UDEV_PARENT_TYPE, UDEV_PARENT_DEVICE);
-        if (!parent) {
-            udev_device_unref(ttyDevice);
-            continue;
-        }
-        const char* busNumStr = udev_device_get_sysattr_value(parent, BUSNUM_STR);
-        const char* devAddrStr = udev_device_get_sysattr_value(parent, DEVNUM_STR);
-        if (!busNumStr || !devAddrStr) {
-            udev_device_unref(ttyDevice);
-            continue;
-        }
-        uint8_t busNum = static_cast<uint8_t>(atoi(busNumStr));
-        uint8_t devAddr = static_cast<uint8_t>(atoi(devAddrStr));
-        if (busNum != busNumber || devAddr != deviceAddress) {
-            udev_device_unref(ttyDevice);
-            continue;
-        }
-        size_t pos = devNameStr.find(SERIAL_TYPE_NAME);
-        if (pos != std::string::npos) {
-            std::string numStr = devNameStr.substr(pos + SERIAL_TYPE_NAME.length());
-            int num = atoi(numStr.c_str());
-            if (num >= 0) {
-                *matchedNum = num;
-                udev_device_unref(ttyDevice);
-                break;
-            }
-        }
-        udev_device_unref(ttyDevice);
+static int GetStringDescriptor(libusb_device_handle *devHandle, uint8_t index, char *buf, int bufLen) {
+    int ret;
+    ret = libusb_get_string_descriptor_ascii(devHandle, index, (unsigned char *)buf, bufLen);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: libusb_get_string_descriptor_ascii failed: %{public}d", __func__, ret);
+        return HDF_FAILURE;
     }
+    return HDF_SUCCESS;
+}
+
+static int GetDeviceSerialNumber(libusb_device_handle *devHandle, char *serialNum, int serialNumLen) {
+    struct libusb_device_descriptor desc;
+    int ret;
+    ret = libusb_get_device_descriptor(libusb_get_device(devHandle), &desc);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: Failed to get device descriptor: %{public}s", __func__, libusb_error_name(ret));
+        return ret;
+    }
+    uint8_t serialIndex = desc.iSerialNumber;
+    if (serialIndex == 0) {
+        HDF_LOGE("%{public}s: Device does not have a serial number: %{public}s", __func__, libusb_error_name(ret));
+        return HDF_FAILURE;
+    }
+
+    return GetStringDescriptor(devHandle, serialIndex, serialNum, serialNumLen);
 }
 
 int32_t LibusbSerial::GetDeviceNum(libusb_device* device)
 {
-    uint8_t busNumber = libusb_get_bus_number(device);
-    uint8_t deviceAddress = libusb_get_device_address(device);
-
-    struct udev* udev = udev_new();
-    if (!udev) {
-        HDF_LOGE("%{public}s: Failed to initialize udev", __func__);
-        return HDF_FAILURE;
-    }
-
-    struct udev_enumerate* enumerate = udev_enumerate_new(udev);
-    if (!enumerate) {
-        HDF_LOGE("%{public}s: Failed to create udev enumerate", __func__);
-        udev_unref(udev);
-        return HDF_FAILURE;
-    }
-
-    udev_enumerate_add_match_subsystem(enumerate, UDEV_SUB_SYSTEM);
-    if (udev_enumerate_scan_devices(enumerate) != 0) {
-        HDF_LOGE("%{public}s: Failed to scan udev devices", __func__);
-        udev_enumerate_unref(enumerate);
-        udev_unref(udev);
-        return HDF_FAILURE;
-    }
-
-    struct udev_list_entry* devices = udev_enumerate_get_list_entry(enumerate);
-    int matchedNum = -1;
-    HandleUdevListEntry(udev, devices, busNumber, deviceAddress, &matchedNum);
-
-    udev_enumerate_unref(enumerate);
-    udev_unref(udev);
-
+    libusb_device_handle* handle = nullptr;
+    libusb_open(device, &handle);
+    char serialNum[SERIAL_NUM] = {'\0'};
+    GetDeviceSerialNumber(handle, serialNum, SERIAL_NUM);
+    int matchedNum = atoi(serialNum);
+    libusb_close(handle);
     return matchedNum;
 }
 } // V1_0

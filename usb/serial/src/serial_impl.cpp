@@ -35,7 +35,6 @@ namespace Usb {
 namespace Serial {
 namespace V1_0 {
 
-
 extern "C" ISerialInterface* SerialInterfaceImplGetInstance(void)
 {
     using OHOS::HDI::Usb::Serial::V1_0::SerialImpl;
@@ -92,13 +91,13 @@ int32_t SerialImpl::SerialClose(int32_t portId)
     return ret;
 }
 
-int32_t SerialImpl::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint32_t size)
+int32_t SerialImpl::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint32_t size, uint32_t timeout)
 {
     StartTrace(HITRACE_TAG_HDF, "SerialRead");
 #ifdef LINUX_SERIAL
-    int32_t ret = LinuxSerial::GetInstance().SerialRead(portId, data, size);
+    int32_t ret = LinuxSerial::GetInstance().SerialRead(portId, data, size, timeout);
 #else
-    int32_t ret = LibusbSerial::GetInstance().SerialRead(portId, data, size);
+    int32_t ret = LibusbSerial::GetInstance().SerialRead(portId, data, size, timeout);
 #endif
     FinishTrace(HITRACE_TAG_HDF);
     if (ret != HDF_SUCCESS) {
@@ -108,13 +107,13 @@ int32_t SerialImpl::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint3
     return ret;
 }
 
-int32_t SerialImpl::SerialWrite(int32_t portId, const std::vector<uint8_t>& data, uint32_t size)
+int32_t SerialImpl::SerialWrite(int32_t portId, const std::vector<uint8_t>& data, uint32_t size, uint32_t timeout)
 {
     StartTrace(HITRACE_TAG_HDF, "SerialWrite");
 #ifdef LINUX_SERIAL
-    int32_t ret = LinuxSerial::GetInstance().SerialWrite(portId, data, size);
+    int32_t ret = LinuxSerial::GetInstance().SerialWrite(portId, data, size, timeout);
 #else
-    int32_t ret = LibusbSerial::GetInstance().SerialWrite(portId, data, size);
+    int32_t ret = LibusbSerial::GetInstance().SerialWrite(portId, data, size, timeout);
 #endif
     FinishTrace(HITRACE_TAG_HDF);
     if (ret != HDF_SUCCESS) {

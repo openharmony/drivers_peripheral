@@ -24,11 +24,11 @@ config("serial_public_config") {
     "${usb_driver_path}/serial",
     "include",
     "${usb_driver_path}/utils/include",
+    "${usb_driver_path}/ddk/host/include",
     "${usb_driver_path}/hdi_service/include",
     "${usb_driver_path}/hdf_usb/include",
     "${usb_driver_path}/hdi_service",
     "${usb_driver_path}/utils/include",
-    "${usb_driver_path}../../../../../../third_party/eudev/src/libudev",
   ]
 }
 
@@ -140,6 +140,10 @@ ohos_shared_library("libserial_interface_service_1.0") {
   if (linux_serial_enable == true) {
     sources += [ "src/linux_serial.cpp" ]
     defines += [ "LINUX_SERIAL" ]
+    deps = [
+      "${usb_driver_path}/ddk:libusb_ddk_host",
+      "${usb_driver_path}/ddk:libusb_pnp_manager",
+    ]
   } else {
     sources += [ "src/libusb_serial.cpp" ]
   }
@@ -152,7 +156,6 @@ ohos_shared_library("libserial_interface_service_1.0") {
     external_deps = [
       "drivers_interface_usb:libserial_stub_1.0",
       "drivers_interface_usb:serial_idl_headers",
-      "eudev:libudev",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
