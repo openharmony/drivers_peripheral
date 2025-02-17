@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,52 +23,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
-class MockDCameraProviderCallbackImpl : public IDCameraProviderCallback {
-public:
-    MockDCameraProviderCallbackImpl(const std::string& devId, const std::string& dhId) : devId_(devId), dhId_(dhId)
-    {
-    }
-    ~MockDCameraProviderCallbackImpl() = default;
-
-    int32_t OpenSession(const DHBase& dhBase)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t CloseSession(const DHBase& dhBase)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t ConfigureStreams(const DHBase& dhBase, const std::vector<DCStreamInfo>& streamInfos)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t ReleaseStreams(const DHBase& dhBase, const std::vector<int>& streamIds)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t StartCapture(const DHBase& dhBase, const std::vector<DCCaptureInfo>& captureInfos)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t StopCapture(const DHBase& dhBase, const std::vector<int>& streamIds)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t UpdateSettings(const DHBase& dhBase, const std::vector<DCameraSettings>& settings)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-
-private:
-    std::string devId_;
-    std::string dhId_;
-};
-
 void DcameraEnableDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -81,7 +35,7 @@ void DcameraEnableDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-    sptr<IDCameraProviderCallback> callback(new MockDCameraProviderCallbackImpl(deviceId, dhId));
+    sptr<IDCameraProviderCallback> callback;
 
     DCameraProvider::GetInstance()->EnableDCameraDevice(dhBase, abilityInfo, callback);
 }
