@@ -551,8 +551,7 @@ void LibusbSerial::EventHandlingThread()
 
 static int GetStringDescriptor(libusb_device_handle *devHandle, uint8_t index, char *buf, int bufLen)
 {
-    int ret;
-    ret = libusb_get_string_descriptor_ascii(devHandle, index, (unsigned char *)buf, bufLen);
+    int ret = libusb_get_string_descriptor_ascii(devHandle, index, (unsigned char *)buf, bufLen);
     if (ret < 0) {
         HDF_LOGE("%{public}s: libusb_get_string_descriptor_ascii failed: %{public}d", __func__, ret);
         return HDF_FAILURE;
