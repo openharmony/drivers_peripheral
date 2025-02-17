@@ -54,6 +54,7 @@ int32_t g_usbOpenCount = 0;
 constexpr uint8_t MAX_DEVICE_ADDRESS = 255;
 constexpr uint8_t MAX_DEVICE_BUSNUM = 255;
 constexpr uint8_t MAX_ENDPOINT_ID = 158;
+constexpr uint8_t MAX_CANCEL_ENDPOINT_ID = 255;
 constexpr uint8_t MAX_INTERFACE_ID = 255;
 constexpr uint8_t LIBUSB_INTERFACE_ID = 0x80;
 constexpr uint8_t LIBUSB_ENDPOINT_MASK = 0x80;
@@ -2133,13 +2134,18 @@ int32_t UsbImpl::RequestCancel(const UsbDev &dev, const UsbPipe &pipe)
     }
     return HDF_SUCCESS;
 #else
+    if ((dev.devAddr == MAX_DEVICE_ADDRESS) && (dev.busNum == MAX_DEVICE_BUSNUM) &&
+        (pipe.endpointId == MAX_CANCEL_ENDPOINT_ID) && (pipe.intfId == MAX_INTERFACE_ID)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (pipe.intfId == MAX_INTERFACE_ID && pipe.endpointId == MAX_ENDPOINT_ID) {
         HDF_LOGW("%{public}s: intfId = %{public}d, endpointId = %{public}d", __func__,
             pipe.intfId, pipe.endpointId);
         return HDF_SUCCESS;
     }
     if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
+        (pipe.endpointId > MAX_CANCEL_ENDPOINT_ID) || (pipe.intfId > LIBUSB_INTERFACE_ID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
