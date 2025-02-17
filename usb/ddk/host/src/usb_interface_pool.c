@@ -951,7 +951,6 @@ int32_t UsbIfCreatInterfacePool(
     }
 
     ++idNum;
-    idNum %= INTERFACE_POOL_ID_MAX;
     interfacePoolTemp->object.objectId = idNum;
     interfacePoolTemp->ioProcessTid = 0;
 
