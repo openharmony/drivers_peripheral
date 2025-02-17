@@ -386,6 +386,18 @@ int32_t LibusbAdapter::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, st
 int32_t LibusbAdapter::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
 {
     HDF_LOGI("%{public}s enter", __func__);
+    libusb_device *device = nullptr;
+    int32_t ret = GetUsbDevice(dev, &device);
+    if (ret != HDF_SUCCESS || device == nullptr) {
+        HDF_LOGE("Search device does not exist, ret=%{public}d", ret);
+        return HDF_FAILURE;
+    }
+    libusb_device_handle *devHandle = nullptr;
+    ret = FindHandleByDev(dev, &devHandle);
+    if (ret != HDF_SUCCESS || devHandle == nullptr) {
+        HDF_LOGE("%{public}s: FindHandleByDev is failed, ret=%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
     uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
         static_cast<uint32_t>(dev.devAddr);
     {
@@ -398,7 +410,7 @@ int32_t LibusbAdapter::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
         }
     }
     char path[LIBUSB_PATH_LENGTH] = {"\0"};
-    int32_t ret = sprintf_s(path, sizeof(path), "%s/%03u/%03u", USB_DEV_FS_PATH, dev.busNum, dev.devAddr);
+    ret = sprintf_s(path, sizeof(path), "%s/%03u/%03u", USB_DEV_FS_PATH, dev.busNum, dev.devAddr);
     if (ret < 0) {
         HDF_LOGE("%{public}s: sprintf_s path failed, ret:%{public}d", __func__, ret);
         return ret;
@@ -1085,6 +1097,18 @@ int32_t LibusbAdapter::DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfe
 int32_t LibusbAdapter::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
 {
     HDF_LOGI("%{public}s enter", __func__);
+    libusb_device *device = nullptr;
+    int32_t ret = GetUsbDevice(dev, &device);
+    if (ret != HDF_SUCCESS || device == nullptr) {
+        HDF_LOGE("Search device does not exist, ret=%{public}d", ret);
+        return HDF_FAILURE;
+    }
+    libusb_device_handle *devHandle = nullptr;
+    ret = FindHandleByDev(dev, &devHandle);
+    if (ret != HDF_SUCCESS || devHandle == nullptr) {
+        HDF_LOGE("%{public}s: FindHandleByDev is failed, ret=%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
     uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
         static_cast<uint32_t>(dev.devAddr);
     {
@@ -1097,7 +1121,7 @@ int32_t LibusbAdapter::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
         }
     }
     char path[LIBUSB_PATH_LENGTH] = {'\0'};
-    int32_t ret = sprintf_s(path, sizeof(path), "%s/%03u/%03u", USB_DEV_FS_PATH, dev.busNum, dev.devAddr);
+    ret = sprintf_s(path, sizeof(path), "%s/%03u/%03u", USB_DEV_FS_PATH, dev.busNum, dev.devAddr);
     if (ret < 0) {
         HDF_LOGE("%{public}s:sprintf_s path failed, ret:%{public}d", __func__, ret);
         return ret;
@@ -1408,8 +1432,20 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
 int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
 {
     HDF_LOGI("%{public}s enter", __func__);
+    libusb_device *device = nullptr;
+    int32_t ret = GetUsbDevice(dev, &device);
+    if (ret != HDF_SUCCESS || device == nullptr) {
+        HDF_LOGE("Search device does not exist, ret=%{public}d", ret);
+        return HDF_FAILURE;
+    }
+    libusb_device_handle *devHandle = nullptr;
+    ret = FindHandleByDev(dev, &devHandle);
+    if (ret != HDF_SUCCESS || devHandle == nullptr) {
+        HDF_LOGE("%{public}s: FindHandleByDev is failed, ret=%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
     char pathBuf[LIBUSB_PATH_LENGTH] = {'\0'};
-    int32_t ret = GetUsbDevicePath(dev, pathBuf, LIBUSB_PATH_LENGTH);
+    ret = GetUsbDevicePath(dev, pathBuf, LIBUSB_PATH_LENGTH);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: get usb device path failed:%{public}d", __func__, ret);
         return HDF_FAILURE;
