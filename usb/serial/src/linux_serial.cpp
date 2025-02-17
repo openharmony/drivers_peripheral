@@ -34,6 +34,7 @@
 #define CMSPAR 010000000000
 #define BUFF_SIZE 50
 #define SYSFS_PATH_LEN   128
+#define RETRY_NUM 5
 
 #define ERR_CODE_IOEXCEPTION (-5)
 #define ERR_CODE_DEVICENOTOPEN (-6)
@@ -168,7 +169,7 @@ tcflag_t LinuxSerial::GetStopbits(tcflag_t c_cflag, unsigned char stopBits)
 
 int32_t LinuxSerial::GetFdByPortId(int32_t portId)
 {
-    int32_t index = 0;
+    size_t index = 0;
     bool isFound = false;
     std::lock_guard<std::mutex> lock(portMutex_);
     for (index = 0; index < serialPortList_.size(); index++) {
@@ -191,7 +192,7 @@ int32_t LinuxSerial::GetFdByPortId(int32_t portId)
 int32_t LinuxSerial::SerialOpen(int32_t portId)
 {
     std::lock_guard<std::mutex> lock(portMutex_);
-    int32_t index = 0;
+    size_t index = 0;
     bool isFound = false;
     char path[BUFF_SIZE] = {'\0'};
     for (index = 0; index < serialPortList_.size(); index++) {
@@ -231,7 +232,7 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
 int32_t LinuxSerial::SerialClose(int32_t portId)
 {
     std::lock_guard<std::mutex> lock(portMutex_);
-    int32_t index = 0;
+    size_t index = 0;
     bool isFound = false;
     for (index = 0; index < serialPortList_.size(); index++) {
         if (portId == serialPortList_[index].portId) {
@@ -254,7 +255,6 @@ int32_t LinuxSerial::SerialClose(int32_t portId)
 
 int32_t LinuxSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint32_t size, uint32_t timeout)
 {
-    //
     int32_t fd = -1;
     if (size <= 0) {
         return HDF_FAILURE;
@@ -268,14 +268,14 @@ int32_t LinuxSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint
     FD_ZERO(&readfds);
     FD_SET(fd, &readfds);
 
-    struct timeval timeout;
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
+    struct timeval readTimeout;
+    readTimeout.tv_sec = 0;
+    readTimeout.tv_usec = timeout;
 
-    int32_t activity = select(fd + 1, &readfds, nullptr, nullptr, &timeout);
-    if (activity == -1) {
+    int32_t status = select(fd + 1, &readfds, nullptr, nullptr, &readTimeout);
+    if (status == -1) {
         return HDF_FAILURE;
-    } else if (activity == 0) {
+    } else if (status == 0) {
         return ERR_CODE_TIMEOUT;
     } else {
         int32_t bytesRead = read(fd, data.data(), size);
@@ -356,7 +356,7 @@ int32_t LinuxSerial::SerialSetAttribute(int32_t portId, const SerialAttribute& a
 {
     HDF_LOGI("%{public}s: enter set attribute.", __func__);
     int32_t fd;
-    int retry = 3;
+    int retry = RETRY_NUM;
     fd = GetFdByPortId(portId);
     if (fd < 0) {
         return ERR_CODE_DEVICENOTOPEN;
@@ -401,7 +401,7 @@ int32_t LinuxSerial::SerialSetAttribute(int32_t portId, const SerialAttribute& a
     return HDF_SUCCESS;
 }
 
-void LinuxSerial::HandleUdevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds)
+void LinuxSerial::HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds)
 {
     SerialPort serialPort;
     Serialfd serialPortId;
@@ -409,7 +409,7 @@ void LinuxSerial::HandleUdevListEntry(struct UsbPnpNotifyMatchInfoTable *device,
     HDF_LOGI("%{public}s: device: devNum = %{public}d, busNum = %{public}d, numInfos = %{public}d",
         __func__, device->devNum, device->busNum, device->numInfos);
     HDF_LOGI("%{public}s: device info: vendorId = %{public}d, productId = %{public}d, deviceClass = %{public}d",
-         __func__, devInfo->vendorId, devInfo->productId, devInfo->deviceClass);
+        __func__, devInfo->vendorId, devInfo->productId, devInfo->deviceClass);
 
     char nodePath[SYSFS_PATH_LEN] = { 0x00 };
     DevInterfaceInfo interfaceInfo;
@@ -487,7 +487,7 @@ int32_t LinuxSerial::SerialGetPortList(std::vector<SerialPort>& portIds)
             HDF_LOGE("%{public}s: sysfs get device failed:%{public}d", __func__, status);
             break;
         }
-        HandleUdevListEntry(&device->info, portIds);
+        HandleDevListEntry(&device->info, portIds);
     }
 
     OsalMemFree(device);
