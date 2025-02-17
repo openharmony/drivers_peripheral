@@ -58,7 +58,7 @@ private:
     int32_t GetApiVersion();
     int GetEndPoint(DeviceHandleInfo* deviceHandleInfo);
     void EventHandlingThread();
-    int32_t GetDeviceNum(libusb_device* device);
+    int32_t GetPortIdByDevice(libusb_device* device);
     static int32_t HotplugCallback(libusb_context* ctx, libusb_device* device,
         libusb_hotplug_event event, void* user_data);
     int32_t HandleDeviceArrival(libusb_device* device);
