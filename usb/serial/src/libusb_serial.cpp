@@ -16,13 +16,20 @@
 #include "libusb_serial.h"
 #include <cerrno>
 #include <hdf_base.h>
+#include <dirent.h>
 #include <hdf_log.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sstream>
 #include <climits>
 #include <iostream>
+#include <filesystem>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <cstring>
+#include <errno.h>
 #include <string>
 #include <chrono>
 #include "usbd_wrapper.h"
@@ -47,6 +54,14 @@ namespace V1_0 {
 #define SERIAL_NUM 256
 #define ERR_CODE_IOEXCEPTION (-5)
 #define ERR_CODE_DEVICENOTOPEN (-6)
+
+static const std::string BUS_NUM_STR = "/busnum";
+static const std::string DEV_NUM_STR = "/devnum";
+static const std::string DEV_FILENAME_PREFIX = "ttyUSB";
+static const std::string DEV_PATH_PREFIX = "/sys/bus/usb-serial/devices";
+static const std::string TTYUSB_PATH = "/sys/class/tty";
+
+namespace fs = std::filesystem;
 
 LibusbSerial &LibusbSerial::GetInstance()
 {
@@ -127,6 +142,23 @@ LibusbSerial::~LibusbSerial()
     HDF_LOGI("%{public}s: SerialUSBWrapper destroyed.", __func__);
 }
 
+bool IsSerialDevice(libusb_device * device)
+{
+    struct libusb_device_descriptor desc;
+    int ret = 0;
+    ret = libusb_get_device_descriptor(device, &desc);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: libusb_get_device_descriptor failed: %{public}s", __func__, libusb_error_name(ret));
+        return false;
+    }
+    if (desc.bDeviceClass == LIBUSB_CLASS_COMM) {
+        return true;
+    } else {
+        HDF_LOGE("%{public}s : This is not a USB to serial device.", __func__);
+        return false;
+    }
+}
+
 void LibusbSerial::GetExistedDevices()
 {
     libusb_device** device_list = nullptr;
@@ -146,7 +178,7 @@ void LibusbSerial::GetExistedDevices()
         if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
             continue;
         }
-        int num = GetDeviceNum(device);
+        int num = GetPortIdByDevice(device);
         if (num >= 0) {
             HandleDeviceArrival(device);
         }
@@ -203,6 +235,7 @@ int32_t LibusbSerial::GetSerialDeviceInfo(libusb_device* device, libusb_device_h
     char serialNumber[BUFFER_SIZE] = {'\0'};
     unsigned char serial[BUFFER_SIZE] = {'\0'};
     if (handle && desc.iSerialNumber) {
+        HDF_LOGI("%{public}s: desc  serialNum: %{public}hhu", __func__, desc.iSerialNumber);
         result = libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, serial, sizeof(serial));
     }
     if (result > 0) {
@@ -264,6 +297,15 @@ libusb_device* LibusbSerial::GetDevice(int portId)
     return nullptr;
 }
 
+std::string VectorToHex(const std::vector<uint8_t>& data) {
+    std::ostringstream oss;
+    oss << std::hex << std::setfill('0');
+    for (uint8_t byte : data) {
+        oss << std::setw(2) << static_cast<int>(byte);
+    }
+    return oss.str();
+}
+
 int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint32_t size, uint32_t timeout)
 {
     HDF_LOGI("%{public}s: enter serial read.", __func__);
@@ -301,7 +343,9 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
     }
     std::vector<uint8_t> vec(data_in, data_in + actualLength);
     data.insert(data.end(), vec.begin(), vec.end());
+    std::string tempHexBuff = VectorToHex(vec);
     HDF_LOGI("%{public}s: read msg : %{public}s", __func__, data.data());
+    HDF_LOGI("%{public}s: read msg hex : %{public}s", __func__, tempHexBuff.c_str());
     size = actualLength;
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
@@ -487,7 +531,7 @@ int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
 
     while (retry-- > 0) {
         HDF_LOGI("%{public}s: Attempting to get device number, retry count: %{public}d", __func__, (RETRY_NUM - retry));
-        num = GetDeviceNum(device);
+        num = GetPortIdByDevice(device);
         if (num >= 0) {
             break;
         }
@@ -552,43 +596,84 @@ void LibusbSerial::EventHandlingThread()
     HDF_LOGI("%{public}s: Event handling thread end.", __func__);
 }
 
-static int GetStringDescriptor(libusb_device_handle *devHandle, uint8_t index, char *buf, int bufLen)
+std::string GetTtyDevicePath(const std::string& ttyDevice)
 {
-    int ret = libusb_get_string_descriptor_ascii(devHandle, index, (unsigned char *)buf, bufLen);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: libusb_get_string_descriptor_ascii failed: %{public}d", __func__, ret);
-        return HDF_FAILURE;
+    fs::path ttyPath = fs::path(TTYUSB_PATH) / ttyDevice;
+    if (!fs::exists(ttyPath) || !fs::is_symlink(ttyPath)) {
+        HDF_LOGE("%{public}s: path %{public}s not exist", __func__, ttyPath.string().c_str());
+        return NULL;
     }
-    return HDF_SUCCESS;
+    fs::path realPath = fs::read_symlink(ttyPath);
+    realPath = fs::weakly_canonical(ttyPath.parent_path() / realPath);
+    std::string targetPath = realPath.parent_path().parent_path().parent_path().parent_path().string();
+    return targetPath;
 }
 
-static int32_t GetDeviceSerialNumber(libusb_device_handle *devHandle, char *serialNum, int serialNumLen)
+bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
 {
-    struct libusb_device_descriptor desc;
-    int ret = 0;
-    ret = libusb_get_device_descriptor(libusb_get_device(devHandle), &desc);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: Failed to get device descriptor: %{public}s", __func__, libusb_error_name(ret));
-        return ret;
+    HDF_LOGI("%{public}s : enter checkTtyDeviceInfo.", __func__);
+    int busnumFd = 0;
+    int devnumFd = 0;
+    busnumFd = open((ttyUsbPath + BUS_NUM_STR).c_str(), O_RDONLY);
+    if (busnumFd < 0) {
+        HDF_LOGE("%{public}s : open file failed. ret = %{public}s", __func__, strerror(errno));
+        close(busnumFd);
+        return false;
     }
-    uint8_t serialIndex = desc.iSerialNumber;
-    if (serialIndex == 0) {
-        HDF_LOGE("%{public}s: Device does not have a serial number: %{public}s", __func__, libusb_error_name(ret));
-        return HDF_FAILURE;
+    char busnumBuff[BUFFER_SIZE] = {'\0'};
+    ssize_t readBytes = read(busnumFd, busnumBuff, BUFFER_SIZE);
+    if (readBytes < 0) {
+        close(busnumFd);
+        return false;
     }
-
-    return GetStringDescriptor(devHandle, serialIndex, serialNum, serialNumLen);
+    devnumFd = open((ttyUsbPath + DEV_NUM_STR).c_str(), O_RDONLY);
+    if (devnumFd < 0) {
+        HDF_LOGE("%{public}s : open file failed. ret = %{public}s", __func__, strerror(errno));
+        close(devnumFd);
+        close(busnumFd);
+        return false;
+    }
+    char devnumBuff[BUFFER_SIZE] = {'\0'};
+    readBytes = read(devnumFd, devnumBuff, BUFFER_SIZE);
+    if (readBytes < 0) {
+        close(busnumFd);
+        close(devnumFd);
+        return false;
+    }
+    close(devnumFd);
+    close(busnumFd);
+    if (atoi(devnumBuff) == libusb_get_device_address(device) && atoi(busnumBuff) == libusb_get_bus_number(device)) {
+        return true;
+    }
+    return false;
 }
 
-int32_t LibusbSerial::GetDeviceNum(libusb_device* device)
+int32_t LibusbSerial::GetPortIdByDevice(libusb_device* device)
 {
-    libusb_device_handle* handle = nullptr;
-    libusb_open(device, &handle);
-    char serialNum[SERIAL_NUM] = {'\0'};
-    GetDeviceSerialNumber(handle, serialNum, SERIAL_NUM);
-    int matchedNum = atoi(serialNum);
-    libusb_close(handle);
-    return matchedNum;
+    HDF_LOGI("%{public}s : getDeviceNum", __func__);
+    DIR* dir = opendir(DEV_PATH_PREFIX.c_str());
+    if (dir == nullptr) {
+        HDF_LOGI("%{public}s : dir is not existed %{public}s", __func__, strerror(errno));
+        return -1;
+    }
+    struct dirent* entry = nullptr;
+    while ((entry = readdir(dir)) != nullptr) {
+        if (strncmp(entry->d_name, DEV_FILENAME_PREFIX.c_str(), DEV_FILENAME_PREFIX.size()) == 0) {
+            std::string devName = entry->d_name;
+            std::string targetPath = GetTtyDevicePath(devName);
+            if (targetPath.size() == 0) {
+                continue;
+            }
+            if (CheckTtyDeviceInfo(targetPath, device)) {
+                closedir(dir);
+                int32_t target = atoi(devName.substr(DEV_FILENAME_PREFIX.size()).c_str());
+                return target;
+            }
+        }
+    }
+    closedir(dir);
+    HDF_LOGI("%{public}s : it's not a serial device", __func__);
+    return -1;
 }
 } // V1_0
 } // Serial
