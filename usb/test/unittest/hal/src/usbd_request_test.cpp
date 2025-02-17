@@ -38,6 +38,7 @@ const uint8_t INTERFACEID_OK = 1;
 const uint8_t INTERFACEID_ZERO = 0;
 const uint8_t INTERFACEID_INVALID = 255;
 const uint8_t POINTID_INVALID = 158;
+const uint8_t CANCEL_POINTID_INVALID = 255;
 // data interface have 2 point : 1->bulk_out 2->bulk_in
 const uint8_t POINTID_DIR_IN = USB_ENDPOINT_DIR_IN | 2;
 const uint8_t POINTID_DIR_OUT = USB_ENDPOINT_DIR_OUT | 1;
@@ -1555,7 +1556,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel004, TestSize.Level1)
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d RequestQueue=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
     pipe.intfId = INTERFACEID_INVALID;
-    pipe.endpointId = POINTID_INVALID;
+    pipe.endpointId = CANCEL_POINTID_INVALID;
     ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d RequestCancel=%{public}d", __LINE__, ret);
     EXPECT_EQ(0, ret);
