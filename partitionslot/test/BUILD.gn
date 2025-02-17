@@ -15,7 +15,7 @@ import("../../../../drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "partitionslot/"
 
-ohos_unittest("partitionslot_hdi_1.0_test") {
+ohos_unittest("partitionslot_hdi_test") {
   module_out_path = module_output_path
   sources = [ "unittest/hdf_partitionslot_test.cpp" ]
 
@@ -32,5 +32,5 @@ ohos_unittest("partitionslot_hdi_1.0_test") {
 
 group("partitionslot_unittest") {
   testonly = true
-  deps = [ ":partitionslot_hdi_1.0_test" ]
+  deps = [ ":partitionslot_hdi_test" ]
 }
