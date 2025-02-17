@@ -29,7 +29,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <cstring>
-#include <errno.h>
 #include <string>
 #include <chrono>
 #include "usbd_wrapper.h"
@@ -54,6 +53,7 @@ namespace V1_0 {
 #define SERIAL_NUM 256
 #define ERR_CODE_IOEXCEPTION (-5)
 #define ERR_CODE_DEVICENOTOPEN (-6)
+#define OUTPUT_WIDTH 2
 
 static const std::string BUS_NUM_STR = "/busnum";
 static const std::string DEV_NUM_STR = "/devnum";
@@ -297,11 +297,12 @@ libusb_device* LibusbSerial::GetDevice(int portId)
     return nullptr;
 }
 
-std::string VectorToHex(const std::vector<uint8_t>& data) {
+std::string VectorToHex(const std::vector<uint8_t>& data)
+{
     std::ostringstream oss;
     oss << std::hex << std::setfill('0');
     for (uint8_t byte : data) {
-        oss << std::setw(2) << static_cast<int>(byte);
+        oss << std::setw(OUTPUT_WIDTH) << static_cast<int>(byte);
     }
     return oss.str();
 }
@@ -598,13 +599,13 @@ void LibusbSerial::EventHandlingThread()
 
 std::string GetTtyDevicePath(const std::string& ttyDevice)
 {
-    fs::path ttyPath = fs::path(TTYUSB_PATH) / ttyDevice;
+    fs::path ttyPath = fs::path(TTYUSB_PATH) /= ttyDevice;
     if (!fs::exists(ttyPath) || !fs::is_symlink(ttyPath)) {
         HDF_LOGE("%{public}s: path %{public}s not exist", __func__, ttyPath.string().c_str());
         return NULL;
     }
     fs::path realPath = fs::read_symlink(ttyPath);
-    realPath = fs::weakly_canonical(ttyPath.parent_path() / realPath);
+    realPath = fs::weakly_canonical(ttyPath.parent_path() /= realPath);
     std::string targetPath = realPath.parent_path().parent_path().parent_path().parent_path().string();
     return targetPath;
 }
