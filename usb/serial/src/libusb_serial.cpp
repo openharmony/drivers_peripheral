@@ -425,6 +425,9 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
 
 int32_t LibusbSerial::SerialSetAttribute(int32_t portId, const struct SerialAttribute& attribute)
 {
+    HDF_LOGI("%{public}s: setattribute baudrate :%{public}d"
+        "databit :%{public}d stop :%{public}d parity :%{public}d", __func__, attribute.baudrate,
+        attribute.dataBits, attribute.stopBits, attribute.parity);
     HDF_LOGI("%{public}s: enter setAttribute msg", __func__);
     libusb_device* device = GetDevice(portId);
     if (device == nullptr) {
