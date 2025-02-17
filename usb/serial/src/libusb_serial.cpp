@@ -278,12 +278,12 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
         return ERR_CODE_DEVICENOTOPEN;
     }
     int ret = 0;
-    int actual_length = 0;
+    int actualLength = 0;
     uint8_t data_in[MAX_TRANS_DATA_SIZE] = {0};
     
     std::lock_guard<std::mutex> lock(writeMutex_);
-    libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
+    libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_detach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     ret = libusb_claim_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     if (ret < 0) {
@@ -292,16 +292,17 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
     }
     ret = 0;
     ret = libusb_bulk_transfer(deviceHandleInfo.handle,
-        deviceHandleInfo.intputEndpointAddr, data_in, size, &actual_length, timeout);
-    if (ret < 0 && actual_length == 0) {
+        deviceHandleInfo.intputEndpointAddr, data_in, size, &actualLength, timeout);
+    if (ret < 0 && actualLength == 0) {
         libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
         libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
         HDF_LOGE("%{public}s: read message failed, ret:%{public}d", __func__, ret);
         return ret;
     }
-    std::vector<uint8_t> vec(data_in, data_in + actual_length);
+    std::vector<uint8_t> vec(data_in, data_in + actualLength);
     data.insert(data.end(), vec.begin(), vec.end());
-    size = actual_length;
+    HDF_LOGI("%{public}s: read msg : %{public}s", __func__, data.data());
+    size = actualLength;
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     return HDF_SUCCESS;
@@ -322,8 +323,8 @@ int32_t LibusbSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& da
         return ERR_CODE_DEVICENOTOPEN;
     }
     int ret = 0;
-    int actual_length = 0;
-    const uint8_t* data_out = data.data();
+    int actualLength = 0;
+    const uint8_t* dataOut = data.data();
     std::lock_guard<std::mutex> lock(writeMutex_);
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
@@ -333,16 +334,16 @@ int32_t LibusbSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& da
         HDF_LOGE("%{public}s: libusb claim failed, ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-
+    HDF_LOGI("%{public}s: read msg : %{public}s", __func__, data.data());
     ret = libusb_bulk_transfer(deviceHandleInfo.handle, deviceHandleInfo.outputEndpointAddr,
-        const_cast<uint8_t*>(data_out), data.size(), &actual_length, timeout);
+        const_cast<uint8_t*>(dataOut), data.size(), &actualLength, timeout);
     if (ret < 0) {
         HDF_LOGE("%{public}s: write message failed, ret:%{public}d", __func__, ret);
         libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
         libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
         return ret;
     }
-    size = actual_length;
+    size = actualLength;
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     return HDF_SUCCESS;
@@ -404,15 +405,17 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
         HDF_LOGE("%{public}s: libusb claim failed, ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    unsigned char request_type = LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
-    // unsigned char request_type = LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
+    unsigned char requestType = LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
     uint16_t index = 0;
     uint16_t value = 0;
     int length = sizeof(struct SerialAttribute);
-    ret =  libusb_control_transfer(deviceHandleInfo.handle, request_type, TRANSFER_CONTROL_IN_CODE,
+    ret =  libusb_control_transfer(deviceHandleInfo.handle, requestType, TRANSFER_CONTROL_IN_CODE,
         value, index, (unsigned char *)&attribute, length, TRANSFER_TIMEOUT);
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
+    HDF_LOGI("%{public}s: getattribute baudrate :%{public}d"
+        "databit :%{public}d stop :%{public}d parity :%{public}d", __func__, attribute.baudrate,
+        attribute.dataBits, attribute.stopBits, attribute.parity);
     if (ret < 0) {
         HDF_LOGE("%{public}s: libusb get attribute failed, ret:%{public}d", __func__, ret);
         return ret;
@@ -433,7 +436,6 @@ int32_t LibusbSerial::SerialSetAttribute(int32_t portId, const struct SerialAttr
         return ERR_CODE_DEVICENOTOPEN;
     }
     int ret = 0;
-    //init
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_detach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
@@ -442,12 +444,11 @@ int32_t LibusbSerial::SerialSetAttribute(int32_t portId, const struct SerialAttr
         HDF_LOGE("%{public}s: libusb claim failed, ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    // unsigned char request_type = LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
-    unsigned char request_type = LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
+    unsigned char requestType = LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
     uint16_t index = 0;
     uint16_t value = 0;
     int length = sizeof(struct SerialAttribute);
-    ret = libusb_control_transfer(deviceHandleInfo.handle, request_type, TRANSFER_CONTROL_OUT_CODE,
+    ret = libusb_control_transfer(deviceHandleInfo.handle, requestType, TRANSFER_CONTROL_OUT_CODE,
         value, index, (unsigned char *)&attribute, length, TRANSFER_TIMEOUT);
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
@@ -479,7 +480,7 @@ int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
     HDF_LOGI("%{public}s: Device arrival detected.", __func__);
 
     int num = -1;
-    int retry = 5;
+    int retry = RETRY_NUM;
 
     while (retry-- > 0) {
         HDF_LOGI("%{public}s: Attempting to get device number, retry count: %{public}d", __func__, (RETRY_NUM - retry));
@@ -527,7 +528,6 @@ void LibusbSerial::HandleDeviceRemoval(libusb_device* device)
         HDF_LOGE("%{public}s: Device not found in map during removal.", __func__);
         return;
     }
-    // Close the handle
     if (it->second.handle) {
         libusb_close(it->second.handle);
         it->second.handle = nullptr;
@@ -549,7 +549,8 @@ void LibusbSerial::EventHandlingThread()
     HDF_LOGI("%{public}s: Event handling thread end.", __func__);
 }
 
-static int GetStringDescriptor(libusb_device_handle *devHandle, uint8_t index, char *buf, int bufLen) {
+static int GetStringDescriptor(libusb_device_handle *devHandle, uint8_t index, char *buf, int bufLen)
+{
     int ret;
     ret = libusb_get_string_descriptor_ascii(devHandle, index, (unsigned char *)buf, bufLen);
     if (ret < 0) {
@@ -559,9 +560,10 @@ static int GetStringDescriptor(libusb_device_handle *devHandle, uint8_t index, c
     return HDF_SUCCESS;
 }
 
-static int GetDeviceSerialNumber(libusb_device_handle *devHandle, char *serialNum, int serialNumLen) {
+static int32_t GetDeviceSerialNumber(libusb_device_handle *devHandle, char *serialNum, int serialNumLen)
+{
     struct libusb_device_descriptor desc;
-    int ret;
+    int ret = 0;
     ret = libusb_get_device_descriptor(libusb_get_device(devHandle), &desc);
     if (ret < 0) {
         HDF_LOGE("%{public}s: Failed to get device descriptor: %{public}s", __func__, libusb_error_name(ret));

@@ -19,7 +19,6 @@
 #include <atomic>
 #include <string>
 #include <vector>
-//#include <libudev.h>
 #include <termios.h>
 #include <thread>
 #include <map>
@@ -81,7 +80,7 @@ private:
     tcflag_t GetDatabits(unsigned char dataBits);
     tcflag_t GetParity(tcflag_t c_cflag, unsigned char parity);
     tcflag_t GetStopbits(tcflag_t c_cflag, unsigned char stopBits);
-    void HandleUdevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds);
+    void HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds);
 private:
     std::mutex portMutex_;
     std::vector<Serialfd> serialPortList_;
