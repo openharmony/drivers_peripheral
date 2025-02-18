@@ -304,7 +304,7 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
     }
     int ret = 0;
     int actualLength = 0;
-    uint8_t data_in[MAX_TRANS_DATA_SIZE] = {0};
+    uint8_t dataIn[MAX_TRANS_DATA_SIZE] = {0};
     
     std::lock_guard<std::mutex> lock(writeMutex_);
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
@@ -317,14 +317,14 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
     }
     ret = 0;
     ret = libusb_bulk_transfer(deviceHandleInfo.handle,
-        deviceHandleInfo.intputEndpointAddr, data_in, size, &actualLength, timeout);
+        deviceHandleInfo.intputEndpointAddr, dataIn, size, &actualLength, timeout);
     if (ret < 0 && actualLength == 0) {
         libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
         libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
         HDF_LOGE("%{public}s: read message failed, ret:%{public}d", __func__, ret);
         return ret;
     }
-    std::vector<uint8_t> vec(data_in, data_in + actualLength);
+    std::vector<uint8_t> vec(dataIn, dataIn + actualLength);
     data.insert(data.end(), vec.begin(), vec.end());
     std::string tempHexBuff = VectorToHex(vec);
     HDF_LOGI("%{public}s: read msg : %{public}s", __func__, data.data());
