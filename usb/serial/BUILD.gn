@@ -154,8 +154,8 @@ ohos_shared_library("libserial_interface_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libserial_stub_1.0",
       "drivers_interface_usb:libserial_proxy_1.0",
+      "drivers_interface_usb:libserial_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
@@ -169,8 +169,8 @@ ohos_shared_library("libserial_interface_service_1.0") {
     }
   } else {
     external_deps = [
-      "drivers_interface_usb:libserial_stub_1.0",
       "drivers_interface_usb:libserial_proxy_1.0",
+      "drivers_interface_usb:libserial_stub_1.0",
       "hilog:libhilog",
       "libusb:libusb",
     ]
