@@ -142,23 +142,6 @@ LibusbSerial::~LibusbSerial()
     HDF_LOGI("%{public}s: SerialUSBWrapper destroyed.", __func__);
 }
 
-bool IsSerialDevice(libusb_device * device)
-{
-    struct libusb_device_descriptor desc;
-    int ret = 0;
-    ret = libusb_get_device_descriptor(device, &desc);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: libusb_get_device_descriptor failed: %{public}s", __func__, libusb_error_name(ret));
-        return false;
-    }
-    if (desc.bDeviceClass == LIBUSB_CLASS_COMM) {
-        return true;
-    } else {
-        HDF_LOGE("%{public}s : This is not a USB to serial device.", __func__);
-        return false;
-    }
-}
-
 void LibusbSerial::GetExistedDevices()
 {
     libusb_device** device_list = nullptr;
@@ -599,13 +582,16 @@ void LibusbSerial::EventHandlingThread()
 
 std::string GetTtyDevicePath(const std::string& ttyDevice)
 {
-    fs::path ttyPath = fs::path(TTYUSB_PATH) /= ttyDevice;
+    HDF_LOGI("%{public}s : enter GetTtyDevicePath.", __func__);
+    std::string ttyPathStr = TTYUSB_PATH + "/" + ttyDevice;
+    fs::path ttyPath(ttyPathStr);
     if (!fs::exists(ttyPath) || !fs::is_symlink(ttyPath)) {
         HDF_LOGE("%{public}s: path %{public}s not exist", __func__, ttyPath.string().c_str());
         return NULL;
     }
     fs::path realPath = fs::read_symlink(ttyPath);
-    realPath = fs::weakly_canonical(ttyPath.parent_path() /= realPath);
+    std::string tempPath = ttyPath.parent_path().string() + "/" + realPath.string();
+    realPath = fs::weakly_canonical(fs::path(tempPath));
     std::string targetPath = realPath.parent_path().parent_path().parent_path().parent_path().string();
     return targetPath;
 }
@@ -651,7 +637,7 @@ bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
 
 int32_t LibusbSerial::GetPortIdByDevice(libusb_device* device)
 {
-    HDF_LOGI("%{public}s : getDeviceNum", __func__);
+    HDF_LOGI("%{public}s : enter GetPortIdByDevice.", __func__);
     DIR* dir = opendir(DEV_PATH_PREFIX.c_str());
     if (dir == nullptr) {
         HDF_LOGI("%{public}s : dir is not existed %{public}s", __func__, strerror(errno));
