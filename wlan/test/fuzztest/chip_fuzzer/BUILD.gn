@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//drivers/peripheral/wlan/wlan.gni")
 import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 TEST_ROOT_DIR = "../../.."
@@ -24,6 +25,11 @@ ohos_fuzztest("ChipFuzzTest") {
   fuzz_config_file = "$TEST_ROOT_DIR/test/fuzztest/chip_fuzzer"
 
   include_dirs = []
+
+  defines = [
+    "P2P_NAME=\"$drivers_peripheral_wlan_p2p_name\"",
+    "HAL_SO_NAME=\"$drivers_peripheral_wlan_feature_vendor\"",
+  ]
 
   deps = [
     "../../../chip/hdi_service:libchip_controller_chip_interface_service_1.0",
