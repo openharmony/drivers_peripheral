@@ -49,7 +49,7 @@ ohos_shared_library("libusb_serial_ddk_service_1.0") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
-    "drivers_interface_usb:usb_serial_ddk_idl_headers",
+    "drivers_interface_usb:libusb_serial_ddk_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
