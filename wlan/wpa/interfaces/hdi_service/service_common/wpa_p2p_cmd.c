@@ -1571,8 +1571,18 @@ int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifNam
         return HDF_ERR_INVALID_PARAM;
     }
     pthread_mutex_lock(GetInterfaceLock());
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
-        "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s", ifName, cmdType, dataType, carryData);
+    switch (cmdType) {
+        case P2P_REMOVE_GROUP_CLIENT: {
+            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+                "IFNAME=%s P2P_REMOVE_CLIENT %s", ifName, carryData);
+            break;
+        }
+        default: {
+            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+                "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s", ifName, cmdType, dataType, carryData);
+            break;
+        }
+    }
     if (ret < 0) {
         pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
