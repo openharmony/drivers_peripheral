@@ -243,7 +243,6 @@ int32_t LibusbSerial::GetSerialDeviceInfo(libusb_device* device, libusb_device_h
 int32_t LibusbSerial::SerialGetPortList(std::vector<SerialPort>& portIds)
 {
     HDF_LOGI("%{public}s: enter SerialGetPortList.", __func__);
-
     std::lock_guard<std::mutex> lock(map_mutex_);
     portIds.clear();
     for (const std::pair<libusb_device*, DeviceHandleInfo>& device : devices_) {
@@ -509,7 +508,7 @@ int32_t LibusbSerial::HotplugCallback(libusb_context* ctx, libusb_device* device
 int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
 {
     HDF_LOGI("%{public}s: Device arrival detected.", __func__);
-
+    std::lock_guard<std::mutex> lock(map_mutex_);
     int num = -1;
     int retry = RETRY_NUM;
 
@@ -534,7 +533,6 @@ int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
         return HDF_FAILURE;
     }
 
-    std::lock_guard<std::mutex> lock(map_mutex_);
     DeviceHandleInfo info;
     info.num = num;
     info.handle = handle;
