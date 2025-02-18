@@ -127,8 +127,7 @@ static void RemoveIfaceCallback(const char *ifName)
         return;
     }
     for (int i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_wpaCallbackEventMap[i] != NULL && (strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0))
-        {
+        if (g_wpaCallbackEventMap[i] != NULL && (strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0)) {
             g_wpaCallbackEventMap[i]->onRecFunc = NULL;
             free(g_wpaCallbackEventMap[i]);
             g_wpaCallbackEventMap[i] = NULL;
