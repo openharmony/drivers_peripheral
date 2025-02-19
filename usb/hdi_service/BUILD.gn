@@ -386,6 +386,7 @@ ohos_shared_library("libusb_device_interface_service_2.0") {
 
   sources = [
     "src/usb_device_impl.cpp",
+    "src/usb_sa_subscriber.cpp",
     "src/usbd_accessory.cpp",
     "src/usbd_function.cpp",
     "src/usbd_load_usb_service.cpp",
@@ -398,6 +399,7 @@ ohos_shared_library("libusb_device_interface_service_2.0") {
   deps = [
     "${usb_driver_path}/ddk:libusb_ddk_host",
     "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "${usb_driver_path}/libusb_adapter:libusb_adapter",
     "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
   ]
 
@@ -413,6 +415,7 @@ ohos_shared_library("libusb_device_interface_service_2.0") {
       "hitrace:hitrace_meter",
       "init:libbegetutil",
       "ipc:ipc_single",
+      "libusb:libusb",
       "samgr:samgr_proxy",
     ]
     if (usb_hisysevent_enable) {

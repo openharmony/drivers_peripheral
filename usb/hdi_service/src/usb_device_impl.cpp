@@ -27,8 +27,10 @@
 #include "ddk_pnp_listener_mgr.h"
 #include "hitrace_meter.h"
 #include "ipc_skeleton.h"
+#include "libusb_adapter.h"
 #include "parameter.h"
 #include "parameters.h"
+#include "usb_sa_subscriber.h"
 #include "usbd_accessory.h"
 #include "usbd_function.h"
 #include "usbd_wrapper.h"
@@ -271,16 +273,10 @@ int32_t UsbDeviceImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf 
     HDF_LOGI("%{public}s: enter", __func__);
     (void)priv;
     (void)data;
-    if (id == USB_PNP_DRIVER_GADGET_ADD || id == USB_PNP_NOTIFY_ADD_DEVICE) {
+    if (id == USB_PNP_DRIVER_GADGET_ADD) {
         if (loadUsbService_.LoadService() != 0) {
             HDF_LOGE("loadUsbService_ LoadService error");
             return HDF_FAILURE;
-        }
-        if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
-            if (loadHdfEdm_.LoadService() != 0) {
-                HDF_LOGE("loadHdfEdm_ LoadService error");
-                return HDF_FAILURE;
-            }
         }
     }
     return HDF_SUCCESS;
@@ -288,16 +284,25 @@ int32_t UsbDeviceImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf 
 
 int32_t UsbDeviceImpl::UsbdEventHandle(void)
 {
+    HDF_LOGI("%{public}s: enter", __func__);
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     int32_t ret = DdkListenerMgrAdd(&listenerForLoadService_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
+        return HDF_FAILURE;
     }
+    sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber = new (std::nothrow) V1_2::UsbSaSubscriber();
+    if (libUsbSaSubscriber == nullptr) {
+        HDF_LOGE("%{public}s: register listerer failed", __func__);
+        return HDF_FAILURE;
+    }
+    ret = V1_2::LibusbAdapter::GetInstance()->SetLoadUsbSaSubscriber(libUsbSaSubscriber);
     return ret;
 }
 
 int32_t UsbDeviceImpl::UsbdEventHandleRelease(void)
 {
+    HDF_LOGI("%{public}s: enter", __func__);
     int32_t ret = DdkListenerMgrRemove(&listenerForLoadService_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: DdkListenerMgrRemove failed", __func__);
