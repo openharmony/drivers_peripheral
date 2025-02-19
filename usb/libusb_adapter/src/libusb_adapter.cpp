@@ -92,6 +92,7 @@ static uint64_t ToDdkDeviceId(int32_t busNum, int32_t devNum)
 } // namespace
 
 std::list<sptr<V2_0::IUsbdSubscriber>> LibusbAdapter::subscribers_;
+sptr<V1_2::LibUsbSaSubscriber> LibusbAdapter::libUsbSaSubscriber_ {nullptr};
 
 std::shared_ptr<LibusbAdapter> LibusbAdapter::GetInstance()
 {
@@ -2870,6 +2871,80 @@ int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* devic
         NotifyAllSubscriber(LibusbAdapter::subscribers_, info);
     }
     return HDF_SUCCESS;
+}
+
+int32_t LibusbAdapter::SetLoadUsbSaSubscriber(sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (libUsbSaSubscriber == nullptr) {
+        HDF_LOGE("%{public}s subsriber is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    int rc = libusb_hotplug_register_callback(g_libusb_context,
+        static_cast<libusb_hotplug_event>(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT),
+        LIBUSB_HOTPLUG_NO_FLAGS,
+        LIBUSB_HOTPLUG_MATCH_ANY,
+        LIBUSB_HOTPLUG_MATCH_ANY,
+        LIBUSB_HOTPLUG_MATCH_ANY,
+        LoadUsbSaCallback,
+        this,
+        &hotplug_handle_);
+    if (rc != LIBUSB_SUCCESS) {
+        HDF_LOGE("%{public}s: Failed to register hotplug callback: %{public}d", __func__, rc);
+        libusb_exit(g_libusb_context);
+        g_libusb_context = nullptr;
+        return HDF_FAILURE;
+    }
+
+    GetCurrentDevList(g_libusb_context, libUsbSaSubscriber);
+    libUsbSaSubscriber_ = libUsbSaSubscriber;
+    HDF_LOGI("%{public}s: success", __func__);
+    return HDF_SUCCESS;
+}
+
+int32_t LibusbAdapter::LoadUsbSaCallback(libusb_context* ctx, libusb_device* device,
+    libusb_hotplug_event event, void* user_data)
+{
+    HDF_LOGI("%{public}s: enter.", __func__);
+    if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
+        libUsbSaSubscriber_->LoadUsbSa(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED);
+    }
+    return HDF_SUCCESS;
+}
+
+void LibusbAdapter::GetCurrentDevList(libusb_context *ctx, sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber)
+{
+    HDF_LOGI("%{public}s: enter.", __func__);
+    int r;
+    ssize_t cnt = 0;
+    libusb_device **devs;
+    cnt = libusb_get_device_list(ctx, &devs);
+    if (cnt < 0) {
+        HDF_LOGW("%{public}s ctx not init", __func__);
+        return;
+    }
+    int busNum = 0;
+    int devAddr = 0;
+    for (ssize_t i = 0; i < cnt; i++) {
+        libusb_device *dev = devs[i];
+        struct libusb_device_descriptor desc;
+        r = libusb_get_device_descriptor(dev, &desc);
+        if (r < 0) {
+            continue;
+        }
+        busNum = libusb_get_bus_number(dev);
+        devAddr = libusb_get_device_address(dev);
+        if (busNum == 0 || devAddr == 0) {
+            HDF_LOGW("%{public}s Invalid parameter", __func__);
+            continue;
+        }
+        if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
+            continue;
+        }
+        HDF_LOGI("%{public}s:busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
+        libUsbSaSubscriber->LoadUsbSa(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED);
+    }
+    libusb_free_device_list(devs, 1);
 }
 } // namespace V1_2
 } // namespace Usb
