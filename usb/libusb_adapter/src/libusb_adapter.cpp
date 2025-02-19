@@ -1777,7 +1777,7 @@ int32_t LibusbAdapter::DoSyncPipeTranfer(libusb_device_handle *devHandle, struct
         HDF_LOGE("%{public}s endpoint is nullptr", __func__);
         return HDF_FAILURE;
     }
-    uint8_t endpointAttributes = endpoint->bmAttributes & LIBUSB_TRANSFER_TYPE_INTERRUPT;
+    uint32_t endpointAttributes = endpoint->bmAttributes & LIBUSB_TRANSFER_TYPE_INTERRUPT;
     if (endpointAttributes == LIBUSB_TRANSFER_TYPE_INTERRUPT) {
         HDF_LOGD("%{public}s: DoSyncPipeTranfer call libusb_interrupt_transfer", __func__);
         ret = libusb_interrupt_transfer(devHandle, endpoint->bEndpointAddress, buffer, syncTranfer.length,
