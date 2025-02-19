@@ -1621,6 +1621,7 @@ int32_t LibusbAdapter::GetConfigDescriptor(libusb_device *dev, uint8_t descId, s
     int32_t ret = memcpy_s(descriptor.data() + currentOffset, descriptor.size(), config, config->bLength);
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+        libusb_free_config_descriptor(config);
         return HDF_FAILURE;
     }
     currentOffset += config->bLength;
