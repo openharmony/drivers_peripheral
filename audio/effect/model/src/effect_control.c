@@ -24,7 +24,6 @@
 #include "effect_core.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
-#define AUDIO_EFFECT_DESC_LEN 256
 
 int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct AudioEffectBuffer *input,
     struct AudioEffectBuffer *output)
