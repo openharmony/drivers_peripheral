@@ -27,7 +27,6 @@ ohos_shared_library("libusb_adapter") {
 
   include_dirs = [
     "./include",
-    "${usb_driver_path}/hdi_service/include",
     "${usb_driver_path}/utils/include",
   ]
 
