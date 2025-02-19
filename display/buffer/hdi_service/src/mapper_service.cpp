@@ -20,6 +20,9 @@
 #include <hdf_log.h>
 #include "display_log.h"
 #include "hdf_trace.h"
+#ifndef DISPLAY_COMMUNITY
+#include "../../../../../hdf_core/interfaces/inner_api/hdi/base/buffer_util.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "MAPPER_SRV"
@@ -119,6 +122,10 @@ int32_t MapperService::FreeMem(const sptr<NativeBuffer>& handle)
     BufferHandle* buffer = handle->Move();
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     vdiImpl_->FreeMem(*buffer);
+#ifndef DISPLAY_COMMUNITY
+    FreeNativeBufferHandle(buffer);
+    buffer = nullptr;
+#endif
     return HDF_SUCCESS;
 }
 

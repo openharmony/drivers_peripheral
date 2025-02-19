@@ -36,16 +36,15 @@ ohos_shared_library("libbattery_interface_service_2.0") {
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
     ]
-    if (has_battery_config_policy_part) {
+    if (drivers_peripheral_battery_feature_config_policy) {
       external_deps += [ "config_policy:configpolicy_util" ]
     }
-    if (has_battery_c_utils_part) {
+    if (drivers_peripheral_battery_feature_c_utils) {
       external_deps += [ "c_utils:utils" ]
     }
 
     # xcollie has a bug, disable it
-    has_battery_xcollie_part = false
-    if (has_battery_xcollie_part) {
+    if (drivers_peripheral_battery_feature_hicollie) {
       external_deps += [ "hicollie:libhicollie" ]
       defines += [ "HICOLLIE_ENABLE" ]
     }
@@ -84,7 +83,7 @@ ohos_shared_library("libbattery_driver") {
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
     ]
-    if (has_battery_c_utils_part) {
+    if (drivers_peripheral_battery_feature_c_utils) {
       external_deps += [ "c_utils:utils" ]
     }
   } else {

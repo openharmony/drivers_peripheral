@@ -32,6 +32,8 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+public:
+    std::shared_ptr<NfcVendorAdaptions> nfcVendorAdaptions = std::make_shared<NfcVendorAdaptions>();
 };
 
 void NfcVendorAdaptionsTest::SetUpTestCase()
@@ -46,6 +48,7 @@ void NfcVendorAdaptionsTest::TearDownTestCase()
 
 void NfcVendorAdaptionsTest::SetUp()
 {
+    sleep(1);
     HDF_LOGD("SetUp NfcVendorAdaptionsTest");
 }
 
@@ -63,7 +66,6 @@ HWTEST_F(NfcVendorAdaptionsTest, VendorOpen001, TestSize.Level1)
 {
     NfcStackCallbackT *pCback = nullptr;
     NfcStackDataCallbackT *pDataCback = nullptr;
-    std::shared_ptr<NfcVendorAdaptions> nfcVendorAdaptions = std::make_shared<NfcVendorAdaptions>();
     int ret = nfcVendorAdaptions->VendorOpen(pCback, pDataCback);
     EXPECT_EQ(ret, HDF_FAILURE);
 }
@@ -77,7 +79,6 @@ HWTEST_F(NfcVendorAdaptionsTest, VendorCoreInitialized001, TestSize.Level1)
 {
     uint16_t coreInitRspLen = 0;
     uint8_t *pCoreInitRspParams = nullptr;
-    std::shared_ptr<NfcVendorAdaptions> nfcVendorAdaptions = std::make_shared<NfcVendorAdaptions>();
     int ret = nfcVendorAdaptions->VendorCoreInitialized(coreInitRspLen, pCoreInitRspParams);
     EXPECT_EQ(ret, HDF_FAILURE);
 }
@@ -91,7 +92,6 @@ HWTEST_F(NfcVendorAdaptionsTest, VendorWrite001, TestSize.Level1)
 {
     uint16_t dataLen = 0;
     uint8_t *pData = nullptr;
-    std::shared_ptr<NfcVendorAdaptions> nfcVendorAdaptions = std::make_shared<NfcVendorAdaptions>();
     int ret = nfcVendorAdaptions->VendorWrite(dataLen, pData);
     EXPECT_EQ(ret, HDF_FAILURE);
 }
@@ -105,7 +105,6 @@ HWTEST_F(NfcVendorAdaptionsTest, VendorIoctl001, TestSize.Level1)
 {
     long arg = 0;
     void *pData = nullptr;
-    std::shared_ptr<NfcVendorAdaptions> nfcVendorAdaptions = std::make_shared<NfcVendorAdaptions>();
     int ret = nfcVendorAdaptions->VendorIoctl(arg, pData);
     EXPECT_EQ(ret, HDF_FAILURE);
 }
@@ -120,7 +119,6 @@ HWTEST_F(NfcVendorAdaptionsTest, VendorIoctlWithResponse001, TestSize.Level1)
     long arg = 0;
     void *pData = nullptr;
     std::vector<uint8_t> pRetVal;
-    std::shared_ptr<NfcVendorAdaptions> nfcVendorAdaptions = std::make_shared<NfcVendorAdaptions>();
     int ret = nfcVendorAdaptions->VendorIoctlWithResponse(arg, pData, 0, pRetVal);
     EXPECT_EQ(ret, HDF_FAILURE);
 }
@@ -132,7 +130,6 @@ HWTEST_F(NfcVendorAdaptionsTest, VendorIoctlWithResponse001, TestSize.Level1)
  */
 HWTEST_F(NfcVendorAdaptionsTest, VendorShutdownCase001, TestSize.Level1)
 {
-    std::shared_ptr<NfcVendorAdaptions> nfcVendorAdaptions = std::make_shared<NfcVendorAdaptions>();
     int ret = nfcVendorAdaptions->VendorShutdownCase();
     EXPECT_EQ(ret, HDF_SUCCESS);
 }

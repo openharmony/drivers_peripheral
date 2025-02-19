@@ -2680,6 +2680,9 @@ static int32_t ProcessMatchSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyI
 
 static void ClearSsidsList(struct DListHead *ssidsList)
 {
+    if (!ssidsList) {
+        return;
+    }
     struct SsidListNode *ssidListNode = NULL;
     struct SsidListNode *tmp = NULL;
 
@@ -3466,7 +3469,7 @@ static int32_t SendMsgToKernel(unsigned short nlmsgType, int opt, char *data, in
 
     if (memset_s(&ntlAddr, sizeof(ntlAddr), 0, sizeof(ntlAddr)) != EOK) {
         HILOG_ERROR(LOG_CORE, "ntlAddr memset_s is failed");
-        free(ntlMsg);
+        OsalMemFree(ntlMsg);
         ntlMsg = NULL;
         return RET_CODE_FAILURE;
     }
@@ -3476,7 +3479,7 @@ static int32_t SendMsgToKernel(unsigned short nlmsgType, int opt, char *data, in
 
     if (memset_s(ntlMsg, len, 0, len) != EOK) {
         HILOG_ERROR(LOG_CORE, "ntlMsg memset_s is failed");
-        free(ntlMsg);
+        OsalMemFree(ntlMsg);
         ntlMsg = NULL;
         return RET_CODE_FAILURE;
     }
@@ -3489,13 +3492,13 @@ static int32_t SendMsgToKernel(unsigned short nlmsgType, int opt, char *data, in
     if (data != NULL && datalen != 0) {
         if (memcpy_s(ntlMsg->data, datalen, data, datalen) != EOK) {
             HILOG_ERROR(LOG_CORE, "memcpy_s is failed");
-            free(ntlMsg);
+            OsalMemFree(ntlMsg);
             ntlMsg = NULL;
             return RET_CODE_FAILURE;
         }
     }
     ret = sendto(skfd, ntlMsg, ntlMsg->hdr.nlmsg_len, 0, (struct sockaddr*)&ntlAddr, sizeof(ntlAddr));
-    free(ntlMsg);
+    OsalMemFree(ntlMsg);
     ntlMsg = NULL;
     return ret;
 }

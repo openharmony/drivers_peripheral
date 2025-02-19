@@ -569,7 +569,7 @@ void DStreamOperator::ExtractCameraAttr(cJSON* rootValue, std::vector<int>& form
         std::string formatStr = std::to_string(format);
         cJSON *formatObj = GetFormatObj(rootNode, rootValue, formatStr);
         if (formatObj == nullptr) {
-            DHLOGE("Resolution or %s error.", formatStr.c_str());
+            DHLOGE("Resolution or %{public}s error.", formatStr.c_str());
             continue;
         }
         GetCameraAttr(rootValue, formatStr, rootNode, format);
@@ -588,7 +588,7 @@ void DStreamOperator::GetCameraAttr(cJSON *rootValue, std::string formatStr, con
     for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
         if (item == nullptr || !cJSON_IsString(item)) {
-            DHLOGE("Resolution %s %d, is not string.", formatStr.c_str(), i);
+            DHLOGE("Resolution %{public}s %{public}d ,is not string.", formatStr.c_str(), i);
             continue;
         }
         std::string resoStr = std::string(item->valuestring);

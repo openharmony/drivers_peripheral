@@ -35,4 +35,9 @@ declare_args() {
       !defined(global_parts_info.commonlibrary_c_utils)) {
     usb_c_utils_enable = false
   }
+
+  libusb_enable = true
+  if (defined(ohos_lite)) {
+    libusb_enable = false
+  }
 }

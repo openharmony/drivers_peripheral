@@ -35,7 +35,7 @@ public:
 private:
     int32_t LoadVdi();
     void FreeMemVdi(BufferHandle* handle);
-    void WriteAllocPidToDma(int32_t fd);
+    void WriteAllocPidToDma(int32_t fd, pid_t remotePid);
     std::mutex mutex_;
     void *libHandle_;
     IDisplayBufferVdi *vdiImpl_;

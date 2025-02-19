@@ -17,7 +17,9 @@
 #include <fstream>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <mutex>
 #include <iostream>
+#include <pthread.h>
 #include <string>
 #include "securec.h"
 
@@ -28,9 +30,8 @@
 #endif
 
 #define LOG_DOMAIN 0xD000306
-
+std::mutex g_openMutex;
 using namespace std;
-
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
@@ -38,6 +39,30 @@ static string GetNfcHalSoName(const std::string &chipType)
 {
     string nfcHalSoName = NFC_HAL_SO_PREFIX + chipType + NFC_HAL_SO_SUFFIX;
     return nfcHalSoName;
+}
+
+int NfcVendorAdaptions::GetNfcStatus(void)
+{
+    int nfcStatus = NFC_STATUS_OPEN;
+    nfcExtHandle = dlopen(VENDOR_NFC_EXT_SERVICE_LIB.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    if (nfcExtHandle == nullptr) {
+        HDF_LOGE("%{public}s: fail to get nfc ext service handle.", __func__);
+        return NFC_STATUS_CLOSE;
+    }
+    nfcExtInf.getNfcStatus = reinterpret_cast<int (*)()>
+        (dlsym(nfcExtHandle, EXT_GET_NFC_STATUS_FUNC_NAME.c_str()));
+
+    if (nfcExtInf.getNfcStatus == nullptr) {
+        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        dlclose(nfcExtHandle);
+        nfcExtHandle = nullptr;
+        return NFC_STATUS_CLOSE;
+    }
+    nfcStatus = nfcExtInf.getNfcStatus();
+    dlclose(nfcExtHandle);
+    nfcExtHandle = nullptr;
+    HDF_LOGE("%{public}s: status %{public}d.", __func__, nfcStatus);
+    return nfcStatus;
 }
 
 string NfcVendorAdaptions::GetChipType(void)
@@ -55,9 +80,13 @@ string NfcVendorAdaptions::GetChipType(void)
 
     if (nfcExtInf.getNfcChipType == nullptr || nfcExtInf.getNfcHalFuncNameSuffix == nullptr) {
         HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        dlclose(nfcExtHandle);
+        nfcExtHandle = nullptr;
         return nfcChipType;
     }
     nfcChipType = string(nfcExtInf.getNfcChipType());
+    dlclose(nfcExtHandle);
+    nfcExtHandle = nullptr;
     return nfcChipType;
 }
 
@@ -104,12 +133,60 @@ void NfcVendorAdaptions::ResetNfcInterface(void)
     nfcHalInf.nfcHalGetConfig = nullptr;
     nfcHalInf.nfcHalFactoryReset = nullptr;
     nfcHalInf.nfcHalShutdownCase = nullptr;
+    nfcHalInf.nfcHalMinOpen = nullptr;
+    nfcHalInf.nfcHalMinClose = nullptr;
     nfcExtHandle = nullptr;
     nfcExtInf.getNfcChipType = nullptr;
+    nfcExtInf.getNfcStatus = nullptr;
     nfcExtInf.getNfcHalFuncNameSuffix = nullptr;
 }
 
-int8_t NfcVendorAdaptions::InitNfcHalInterfaces(string nfcHalSoName, string suffix)
+void* NfcVendorAdaptions::DoHalPreOpen(void* arg)
+{
+    NFCSTATUS status = HDF_SUCCESS;
+    if (arg == nullptr) {
+        return nullptr;
+    }
+    NfcVendorAdaptions *mVendorAdapter = static_cast<NfcVendorAdaptions*>(arg);
+    HDF_LOGI("%{public}s: enter.", __func__);
+    mVendorAdapter->isNfcPreDone = true;
+    if (mVendorAdapter->nfcHalInf.nfcHalMinOpen == nullptr ||
+        mVendorAdapter->nfcHalInf.nfcHalMinClose == nullptr) {
+        HDF_LOGE("%{public}s: function is null", __func__);
+        return nullptr;
+    }
+    std::lock_guard<std::mutex> lock(g_openMutex);
+    status = mVendorAdapter->nfcHalInf.nfcHalMinOpen(true);
+    if (status != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: nfcHalMinOpen is fail", __func__);
+        return nullptr;
+    }
+    status = mVendorAdapter->nfcHalInf.nfcHalMinClose();
+    if (status != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: nfcHalMinClose is fail", __func__);
+        return nullptr;
+    }
+    HDF_LOGI("%{public}s: exit.", __func__);
+    return nullptr;
+}
+
+void NfcVendorAdaptions::HalPreOpen(void)
+{
+    int ret = HDF_SUCCESS;
+    int nfcStatus = NFC_STATUS_OPEN;
+    pthread_t pthread;
+    HDF_LOGI("%{public}s: enter.", __func__);
+    nfcStatus = GetNfcStatus();
+    if (!isNfcPreDone && (nfcStatus != NFC_STATUS_OPEN)) {
+        ret = pthread_create(&pthread, nullptr, NfcVendorAdaptions::DoHalPreOpen, this);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: pthread_create is fail", __func__);
+        }
+    }
+    HDF_LOGI("%{public}s: exit.", __func__);
+}
+
+int8_t NfcVendorAdaptions::PreInitNfcHalInterfaces(string nfcHalSoName, string suffix)
 {
     if (nfcHalHandle == nullptr) {
         nfcHalHandle = dlopen(nfcHalSoName.c_str(), RTLD_LAZY | RTLD_GLOBAL);
@@ -124,7 +201,15 @@ int8_t NfcVendorAdaptions::InitNfcHalInterfaces(string nfcHalSoName, string suff
         HDF_LOGE("%{public}s: fail to open hal path.", __func__);
         return HDF_FAILURE;
     }
+    return HDF_SUCCESS;
+}
 
+int8_t NfcVendorAdaptions::InitNfcHalInterfaces(string nfcHalSoName, string suffix)
+{
+    int8_t ret = PreInitNfcHalInterfaces(nfcHalSoName, suffix);
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
     nfcHalInf.nfcHalOpen = reinterpret_cast<int (*)(NfcStackCallbackT *, NfcStackDataCallbackT *)>
         (dlsym(nfcHalHandle, (HAL_OPEN_FUNC_NAME + suffix).c_str()));
 
@@ -158,6 +243,12 @@ int8_t NfcVendorAdaptions::InitNfcHalInterfaces(string nfcHalSoName, string suff
     nfcHalInf.nfcHalShutdownCase = reinterpret_cast<int (*)()>
         (dlsym(nfcHalHandle, (HAL_SHUTDOWN_CASE_FUNC_NAME + suffix).c_str()));
 
+    nfcHalInf.nfcHalMinOpen = reinterpret_cast<NFCSTATUS (*)(bool)>
+        (dlsym(nfcHalHandle, (HAL_MIN_OPEN_FUNC_NAME + suffix).c_str()));
+
+    nfcHalInf.nfcHalMinClose = reinterpret_cast<NFCSTATUS (*)()>
+        (dlsym(nfcHalHandle, (HAL_MIN_CLOSE_FUNC_NAME + suffix).c_str()));
+
     if (nfcHalInf.nfcHalOpen == nullptr || nfcHalInf.nfcHalWrite == nullptr ||
         nfcHalInf.nfcHalCoreInitialized == nullptr || nfcHalInf.nfcHalPrediscover == nullptr ||
         nfcHalInf.nfcHalClose == nullptr || nfcHalInf.nfcHalControlGranted == nullptr ||
@@ -182,6 +273,7 @@ NfcVendorAdaptions::NfcVendorAdaptions()
         if (InitNfcHalInterfaces(nfcHalSoName, nfcHalFuncNameSuffix) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: fail to init hal inf.", __func__);
         }
+        HalPreOpen();
     }
 }
 
@@ -197,6 +289,7 @@ int NfcVendorAdaptions::VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallba
         HDF_LOGE("%{public}s: input param null.", __func__);
         return HDF_FAILURE;
     }
+    std::lock_guard<std::mutex> lock(g_openMutex);
     int ret = nfcHalInf.nfcHalOpen(pCback, pDataCback);
     return ret;
 }

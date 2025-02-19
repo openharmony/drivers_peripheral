@@ -23,7 +23,10 @@
 int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t argv = 0;
-    (void)HdfSbufReadUint32(data, &argv);
+    if (!HdfSbufReadUint32(data, &argv)) {
+        CODEC_LOGE("read argv failed!");
+        return HDF_FAILURE;
+    }
     if (argv != 1) {
         HdfSbufWriteString(reply, "please enter -h for help!! \n");
         return HDF_SUCCESS;
@@ -34,11 +37,9 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
         return HDF_FAILURE;
     }
     if (strcmp(para, "-h") == 0) {
-        HdfSbufWriteString(reply, "-h: codec dump help ! \n");
-        HdfSbufWriteString(reply, "-l: dump codec components info list ! \n");
+        HdfSbufWriteString(reply, "-h: codec dump help ! -l: dump codec components info list ! \n");
         return HDF_SUCCESS;
     }
-
     if (strcmp(para, "-l") == 0) {
         struct CodecComponentManagerSerivce *managerService = CodecComponentManagerSerivceGet();
         if (managerService == NULL) {
@@ -62,7 +63,6 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
                     return HDF_FAILURE;
                 }
                 HdfSbufWriteString(reply, dump);
-                HdfSbufWriteString(reply, "--------------------------------------------------------------------- \n");
             }
         }
         CODEC_LOGI("codec hidumper success!");

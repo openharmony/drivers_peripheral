@@ -106,7 +106,6 @@ int32_t HciInterfaceImpl::Close()
         callbacks_ = nullptr;
     }
     VendorInterface::GetInstance()->CleanUp();
-    VendorInterface::DestroyInstance();
     return HDF_SUCCESS;
 }
 
@@ -115,7 +114,6 @@ void HciInterfaceImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
     HDF_LOGI("HciInterfaceImpl %{public}s", __func__);
     callbacks_ = nullptr;
     VendorInterface::GetInstance()->CleanUp();
-    VendorInterface::DestroyInstance();
 }
 
 int32_t HciInterfaceImpl::AddHciDeathRecipient(const sptr<IHciCallback>& callbackObj)

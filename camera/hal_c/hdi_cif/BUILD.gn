@@ -75,6 +75,7 @@ ohos_shared_library("hdi_cif") {
   }
   external_deps += [
     "drivers_interface_camera:metadata",
+    "graphic_surface:buffer_handle",
     "ipc:ipc_single",
   ]
 

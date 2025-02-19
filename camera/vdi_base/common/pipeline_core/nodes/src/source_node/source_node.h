@@ -20,6 +20,7 @@
 #include <vector>
 
 namespace OHOS::Camera {
+constexpr uint32_t LOOP_MAX_COUNT = 10;
 class SourceNode : virtual public NodeBase {
 public:
     SourceNode(const std::string& name, const std::string& type, const std::string &cameraId);
@@ -77,6 +78,7 @@ protected:
         bool isResize_ = false;
         int32_t maxWide_ = 0;
         int32_t maxHigh_ = 0;
+        uint32_t loopErrorCount_ = 0;
     };
 
     std::mutex hndl_ = {};

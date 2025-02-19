@@ -100,7 +100,7 @@ int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId,
 
     if (AudioCtlRenderSetVolumeSBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to Set Volume sBuf!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -108,11 +108,11 @@ int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId,
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, NULL) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to AudioServiceDispatch!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -133,7 +133,7 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
 
     if (AudioCtlRenderGetVolumeSBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderGetVolume Failed to Get Volume sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -141,7 +141,7 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, reply) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderGetVolume RenderDispatch Failed!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -149,12 +149,12 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
 
     if (!HdfSbufReadInt32(reply, &elemValue.value[0])) {
         AUDIO_FUNC_LOGE("RenderGetVolume Failed to Get Volume sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     handleData->renderMode.ctlParam.volume = elemValue.value[0];
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
     return HDF_SUCCESS;
 }
 
@@ -189,13 +189,13 @@ int32_t AudioCtlRenderSetPauseStu(const struct DevHandle *handle,
 
     if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
         AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     if (AudioCtlRenderSetPauseBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSetPauseStu Failed to Set Pause sBuf!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -204,11 +204,11 @@ int32_t AudioCtlRenderSetPauseStu(const struct DevHandle *handle,
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, NULL) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSetPauseStu Failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -244,7 +244,7 @@ int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle,
 
     if (AudioCtlRenderSetMuteBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSetMuteStu Failed to Set Mute sBuf!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -252,11 +252,11 @@ int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle,
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, NULL) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSetPauseStu Failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -292,7 +292,7 @@ int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, stru
 
     if (AudioCtlRenderGetMuteSBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderGetMuteStu Failed to Get Mute sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -300,7 +300,7 @@ int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, stru
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, reply) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderGetMuteStu RenderDispatch Failed!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -308,12 +308,12 @@ int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, stru
 
     if (!HdfSbufReadInt32(reply, &muteValueStu.value[0])) {
         AUDIO_FUNC_LOGE("RenderGetMuteStu Failed to Get Volume sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     handleData->renderMode.ctlParam.mute = muteValueStu.value[0];
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
     return HDF_SUCCESS;
 }
 
@@ -348,7 +348,7 @@ int32_t AudioCtlRenderSetGainStu(const struct DevHandle *handle,
 
     if (AudioCtlRenderSetGainBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSetGainStu Failed to Set Gain sBuf!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -356,11 +356,11 @@ int32_t AudioCtlRenderSetGainStu(const struct DevHandle *handle,
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, NULL) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSetGainStu Failed to send service call!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -396,7 +396,7 @@ int32_t AudioCtlRenderGetGainStu(const struct DevHandle *handle, int cmdId, stru
 
     if (AudioCtlRenderGetGainSBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderGetGainStu ailed to Get Gain sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -404,7 +404,7 @@ int32_t AudioCtlRenderGetGainStu(const struct DevHandle *handle, int cmdId, stru
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, reply) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Dispatch Fail!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -412,12 +412,12 @@ int32_t AudioCtlRenderGetGainStu(const struct DevHandle *handle, int cmdId, stru
 
     if (!HdfSbufReadInt32(reply, &gainValueStu.value[0])) {
         AUDIO_FUNC_LOGE("Failed to Get Gain sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     handleData->renderMode.ctlParam.audioGain.gain = gainValueStu.value[0];
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
     return HDF_SUCCESS;
 }
 
@@ -464,7 +464,7 @@ int32_t AudioCtlRenderSceneSelect(const struct DevHandle *handle,
     int32_t deviceNum = handleData->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     if (deviceNum < AUDIO_MIN_DEVICENUM) {
         AUDIO_FUNC_LOGE("AUDIO_MIN_ADAPTERNUM Failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -474,18 +474,18 @@ int32_t AudioCtlRenderSceneSelect(const struct DevHandle *handle,
         HdfSbufFlush(sBuf);
         if (AudioCtlRenderSceneSelectSBuf(sBuf, handleData, index) != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("AudioCtlRenderSceneSelectSBuf Failed!");
-            AudioFreeHdfSBuf(sBuf, NULL);
+            AudioFreeHdfSBuf(&sBuf, NULL);
             return HDF_FAILURE;
         }
 
         if (AudioServiceDispatch(handle->object, cmdId, sBuf, NULL) != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("Dispatch Fail!");
-            AudioFreeHdfSBuf(sBuf, NULL);
+            AudioFreeHdfSBuf(&sBuf, NULL);
             return HDF_FAILURE;
         }
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -537,7 +537,7 @@ int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
 
     if (AudioCtlRenderSceneGetGainThresholdSBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSceneGetGainThreshold Get Threshold sBuf Fail!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -545,7 +545,7 @@ int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, reply) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Dispatch Fail!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -553,19 +553,19 @@ int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
 
     if (!HdfSbufReadInt32(reply, &gainThreshold.type)) {
         AUDIO_FUNC_LOGE("RenderSceneGetGainThreshold Failed to Get Volume sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufReadInt32(reply, &gainThreshold.max)) {
         AUDIO_FUNC_LOGE("RenderSceneGetGainThreshold Failed to Get Volume sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     handleData->renderMode.ctlParam.audioGain.gainMax = gainThreshold.max;
     handleData->renderMode.ctlParam.audioGain.gainMin = 0;
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
     return HDF_SUCCESS;
 }
 
@@ -586,7 +586,7 @@ int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle, int cmdId,
 
     if (AudioCtlRenderGetVolThresholdSBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Get Threshold sBuf Fail!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -594,23 +594,23 @@ int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle, int cmdId,
     int32_t ret = AudioServiceDispatch(handle->object, cmdId, sBuf, reply);
     if (ret == HDF_ERR_NOT_SUPPORT) {
         AUDIO_FUNC_LOGW("This sound card does not have a volume control component!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_SUCCESS;
     } else if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Dispatch Fail!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     struct AudioCtrlElemInfo volThreshold;
     if (AudioGetElemValue(reply, &volThreshold) < 0) {
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     handleData->renderMode.ctlParam.volThreshold.volMax = volThreshold.max;
     handleData->renderMode.ctlParam.volThreshold.volMin = volThreshold.min;
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
     return HDF_SUCCESS;
 }
 
@@ -645,7 +645,7 @@ int32_t AudioCtlRenderSetChannelMode(const struct DevHandle *handle,
 
     if (AudioCtlRenderSetChannelModeBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSetChannelMode Failed to Set ChannelMode sBuf!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -653,11 +653,11 @@ int32_t AudioCtlRenderSetChannelMode(const struct DevHandle *handle,
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, NULL) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSetChannelMode Failed to send service call!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -693,7 +693,7 @@ int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, 
 
     if (AudioCtlRenderGetChannelModeSBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderGetChannelMode Failed to Get Channel Mode sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -702,7 +702,7 @@ int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, 
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, reply) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderGetChannelMode Failed to send service call!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -710,12 +710,12 @@ int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, 
 
     if (!HdfSbufReadInt32(reply, &elemValue.value[0])) {
         AUDIO_FUNC_LOGE("Failed to Get ChannelMode sBuf!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
     handleData->frameRenderMode.mode = (enum AudioChannelMode)elemValue.value[0];
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
     return HDF_SUCCESS;
 }
 
@@ -839,23 +839,23 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
 
     if (SetHwParams(handleData) < 0) {
         AUDIO_FUNC_LOGE("SetHwParams failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     if (ParamsSbufWriteBuffer(sBuf)) {
         AUDIO_FUNC_LOGE("ParamsSbufWriteBuffer failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     if (AudioServiceDispatch(handle->object, cmdId, sBuf, NULL) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderHwParams Failed to send service call!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -943,7 +943,7 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
     }
 
     if (FrameSbufWriteBuffer(sBuf, handleData) != HDF_SUCCESS) {
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
@@ -951,11 +951,11 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
     int32_t ret = AudioOutputRenderWriteFrame(service, cmdId, sBuf, reply, handleData);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("AudioOutputRenderWriteFrame is Fail!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
 
-    AudioFreeHdfSBuf(sBuf, reply);
+    AudioFreeHdfSBuf(&sBuf, &reply);
     return HDF_SUCCESS;
 }
 
@@ -974,7 +974,7 @@ int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -983,7 +983,7 @@ int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
         AUDIO_FUNC_LOGE("RenderStartPrepare Failed to send service call cmdId = %{public}d!", cmdId);
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return ret;
 }
 
@@ -1003,7 +1003,7 @@ int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
 
     if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
         AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -1012,7 +1012,7 @@ int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
         AUDIO_FUNC_LOGE("RenderStartPrepare Failed to send service call cmdId = %{public}d!", cmdId);
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return ret;
 }
 
@@ -1031,13 +1031,13 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle,
     }
     if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
         AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint32(sBuf, handleData->renderMode.ctlParam.turnStandbyStatus)) {
         AUDIO_FUNC_LOGE("HdfSbufWriteUint32 turnStandbyStatus failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -1046,7 +1046,7 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle,
         AUDIO_FUNC_LOGE("RenderStop Failed to send service call!");
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return ret;
 }
 
@@ -1102,7 +1102,7 @@ int32_t AudioOutputRenderReqMmapBuffer(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
     if (MmapDescWriteBuffer(sBuf, handleData)) {
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
@@ -1111,7 +1111,7 @@ int32_t AudioOutputRenderReqMmapBuffer(const struct DevHandle *handle,
         AUDIO_FUNC_LOGE("Failed to send service call!");
     }
 
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
     return ret;
 }
 
@@ -1138,26 +1138,26 @@ int32_t AudioOutputRenderGetMmapPosition(const struct DevHandle *handle,
 
     if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
         AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
+        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     int32_t ret = AudioServiceDispatch(handle->object, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to send service call!");
-        AudioFreeHdfSBuf(sBuf, reply);
+        AudioFreeHdfSBuf(&sBuf, &reply);
         return HDF_FAILURE;
     }
-    AudioFreeHdfSBuf(sBuf, NULL);
+    AudioFreeHdfSBuf(&sBuf, NULL);
 
     if (!HdfSbufReadUint64(reply, &frames)) {
         AUDIO_FUNC_LOGE("failed to get mmap position sBuf!");
-        AudioFreeHdfSBuf(reply, NULL);
+        AudioFreeHdfSBuf(&reply, NULL);
         return HDF_FAILURE;
     }
 
     handleData->frameRenderMode.frames = frames;
-    AudioFreeHdfSBuf(reply, NULL);
+    AudioFreeHdfSBuf(&reply, NULL);
     return HDF_SUCCESS;
 }
 

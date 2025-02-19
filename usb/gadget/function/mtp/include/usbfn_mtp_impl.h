@@ -200,10 +200,11 @@ private:
     static int32_t UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort);
     static int32_t UsbMtpPortRxCheckReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req, bool &writeToFile);
     static void UsbMtpPortReleaseRxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req);
-
+    static void UsbMtpPortReleaseTxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req);
     static int32_t UsbMtpPortCancelAndFreeReq(
         struct DListHead *queueHead, struct DListHead *poolHead, int32_t &allocated, bool freeReq);
     static int32_t UsbMtpPortCancelPlusFreeIo(struct UsbMtpPort *mtpPort, bool freeReq);
+    static int32_t UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort);
     static struct UsbFnRequest *UsbMtpDeviceGetCtrlReq(struct UsbMtpDevice *mtpDev);
     static int32_t UsbMtpDeviceStandardRequest(
         struct UsbMtpDevice *mtpDev, struct UsbFnCtrlRequest *setup, struct UsbFnRequest *req);
@@ -236,6 +237,8 @@ private:
     void UsbMtpDeviceFreeNotifyRequest();
     int32_t InitMtpPort();
     int32_t WriteEx(const std::vector<uint8_t> &data, uint8_t sendZLP, uint32_t &xferActual);
+    int32_t WriteSplitPacket(const std::vector<uint8_t> &data);
+    uint32_t getActualLength(const std::vector<uint8_t> &data);
     int32_t ReadImpl(std::vector<uint8_t> &data);
     int32_t UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, uint64_t &oneReqLeft);
     int32_t UsbMtpPortSendFileEx();
@@ -245,7 +248,7 @@ private:
     uint32_t BufCopyToVector(void *buf, uint32_t bufSize, std::vector<uint8_t> &vectorData);
     uint32_t BufCopyFromVector(
         void *buf, uint32_t bufSize, const std::vector<uint8_t> &vectorData, uint32_t vectorOffset);
-
+    void UsbMtpSendFileParamSet(const UsbFnMtpFileSlice &mfs);
     static struct UsbMtpDevice *mtpDev_;
     static struct UsbMtpPort *mtpPort_;
     static std::mutex startMutex_;
@@ -255,6 +258,8 @@ private:
     static std::mutex asyncMutex_;
     static sem_t asyncReq_;
     static pthread_rwlock_t mtpRunrwLock_;
+    std::vector<uint8_t> vectorSplited_;
+    uint32_t writeActualLen_;
 };
 } // namespace V1_0
 } // namespace Mtp

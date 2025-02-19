@@ -32,7 +32,6 @@ using OHOS::HDI::Codec::V3_0::EventInfo;
 using OHOS::HDI::Codec::V3_0::CodecEventType;
 using OHOS::HDI::Codec::V3_0::CodecStateType;
 using OHOS::HDI::Codec::V3_0::CodecCommandType;
-using OHOS::HDI::Codec::V3_0::CodecStateType;
 using OHOS::HDI::Codec::V3_0::CODEC_STATE_INVALID;
 using OHOS::HDI::Codec::V3_0::CODEC_STATE_LOADED;
 using OHOS::HDI::Codec::V3_0::CODEC_STATE_IDLE;
@@ -553,9 +552,10 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
     }
     bufferHdrType->pAppPrivate = nullptr;
     OMXBufferAppPrivateData privateData{};
-    if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!buffer.alongParam.empty())) {
-        privateData.sizeOfParam = static_cast<uint32_t>(buffer.alongParam.size());
-        privateData.param = static_cast<void *>(buffer.alongParam.data());
+    OmxCodecBuffer& omxCodecBuffer = codecBuffer->GetCodecBuffer();
+    if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!omxCodecBuffer.alongParam.empty())) {
+        privateData.sizeOfParam = static_cast<uint32_t>(omxCodecBuffer.alongParam.size());
+        privateData.param = static_cast<void *>(omxCodecBuffer.alongParam.data());
         bufferHdrType->pAppPrivate = static_cast<void *>(&privateData);
     }
 

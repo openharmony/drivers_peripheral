@@ -21,6 +21,9 @@
 #include "v1_3/icamera_device.h"
 #include "v1_3/istream_operator.h"
 #include "v1_3/camera_host_proxy.h"
+#include "v1_3/ivideo_process_service.h"
+#include "v1_3/ivideo_process_session.h"
+#include "v1_3/ivideo_process_callback.h"
 #include "hdi_common_v1_2.h"
 
 namespace OHOS::Camera {
@@ -41,19 +44,21 @@ public:
         OHOS::HDI::Camera::V1_3::OperationMode mode = OHOS::HDI::Camera::V1_3::NORMAL);
     void StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming);
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
+    int32_t DefferredVideoTestInit();
     OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraHost> serviceV1_3 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraDevice> cameraDeviceV1_3 = nullptr;
     class TestStreamOperatorCallbackV1_3;
     OHOS::sptr<TestStreamOperatorCallbackV1_3> streamOperatorCallbackV1_3 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperator> streamOperator_V1_3 = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoMeta = nullptr;
+    sptr<OHOS::HDI::Camera::V1_3::IVideoProcessService> videoProcessService_ = nullptr;
+    sptr<OHOS::HDI::Camera::V1_3::IVideoProcessSession> videoProcessSession_ = nullptr;
+    class TestVideoProcessCallback;
+    sptr<TestVideoProcessCallback> videoProcessCallback_ = nullptr;
     int streamIdMeta = 106;
-    int metaWidth = 1280;
-    int metaHeight = 960;
+    int metaWidth = 1920;
+    int metaHeight = 1080;
     int captureIdMeta = 2060;
-    uint32_t itemCapacity = 100;
-    uint32_t dataCapacity = 2000;
-    uint32_t dataCount = 1;
 
     class TestStreamOperatorCallbackV1_3 : public OHOS::HDI::Camera::V1_3::IStreamOperatorCallback {
     public:
@@ -76,6 +81,15 @@ public:
 
     using StreamResultCallback = std::function<void (int32_t, const std::shared_ptr<CameraMetadata>)>;
     static StreamResultCallback streamResultCallback_;
+
+    class TestVideoProcessCallback : public OHOS::HDI::Camera::V1_3::IVideoProcessCallback {
+    public:
+        TestVideoProcessCallback() = default;
+        virtual ~TestVideoProcessCallback() = default;
+        int32_t OnStatusChanged(OHOS::HDI::Camera::V1_2::SessionStatus status);
+        int32_t OnProcessDone(const std::string& videoId);
+        int32_t OnError(const std::string& videoId, OHOS::HDI::Camera::V1_2::ErrorCode errorCode);
+    };
 };
 }
 #endif

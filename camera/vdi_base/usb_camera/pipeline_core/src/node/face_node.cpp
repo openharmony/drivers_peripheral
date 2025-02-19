@@ -108,36 +108,36 @@ RetCode FaceNode::GetCameraFaceRectangles(std::shared_ptr<CameraMetadata> &metad
 {
     constexpr int32_t row = 3;
     constexpr int32_t col = 4;
-    constexpr float rect_one_x = 0.0; // dummy data: faceRectangles data
-    constexpr float rect_one_y = 0.0;
-    constexpr float rect_one_width = 0.2;
-    constexpr float rect_one_height = 0.3;
+    constexpr float rectOneX = 0.0; // dummy data: faceRectangles data
+    constexpr float rectOneY = 0.0;
+    constexpr float rectOneWidth = 0.2;
+    constexpr float rectOneHeight = 0.3;
 
-    constexpr float rect_two_x = 0.3; // dummy data: faceRectangles data
-    constexpr float rect_two_y = 0.3;
-    constexpr float rect_two_width = 0.2;
-    constexpr float rect_two_height = 0.3;
+    constexpr float rectTwoX = 0.3; // dummy data: faceRectangles data
+    constexpr float rectTwoY = 0.3;
+    constexpr float rectTwoWidth = 0.2;
+    constexpr float rectTwoHeight = 0.3;
 
-    constexpr float rect_three_x = 0.6; // dummy data: faceRectangles data
-    constexpr float rect_three_y = 0.6;
-    constexpr float rect_three_width = 0.2;
-    constexpr float rect_three_height = 0.3;
+    constexpr float rectThreeX = 0.6; // dummy data: faceRectangles data
+    constexpr float rectThreeY = 0.6;
+    constexpr float rectThreeWidth = 0.2;
+    constexpr float rectThreeHeight = 0.3;
 
     float faceRectangles[row][col];
-    faceRectangles[INDEX_0][INDEX_0] = rect_one_x;
-    faceRectangles[INDEX_0][INDEX_1] = rect_one_y;
-    faceRectangles[INDEX_0][INDEX_2] = rect_one_width;
-    faceRectangles[INDEX_0][INDEX_3] = rect_one_height;
+    faceRectangles[INDEX_0][INDEX_0] = rectOneX;
+    faceRectangles[INDEX_0][INDEX_1] = rectOneY;
+    faceRectangles[INDEX_0][INDEX_2] = rectOneWidth;
+    faceRectangles[INDEX_0][INDEX_3] = rectOneHeight;
 
-    faceRectangles[INDEX_1][INDEX_0] = rect_two_x;
-    faceRectangles[INDEX_1][INDEX_1] = rect_two_y;
-    faceRectangles[INDEX_1][INDEX_2] = rect_two_width;
-    faceRectangles[INDEX_1][INDEX_3] = rect_two_height;
+    faceRectangles[INDEX_1][INDEX_0] = rectTwoX;
+    faceRectangles[INDEX_1][INDEX_1] = rectTwoY;
+    faceRectangles[INDEX_1][INDEX_2] = rectTwoWidth;
+    faceRectangles[INDEX_1][INDEX_3] = rectTwoHeight;
 
-    faceRectangles[INDEX_2][INDEX_0] = rect_three_x;
-    faceRectangles[INDEX_2][INDEX_1] = rect_three_y;
-    faceRectangles[INDEX_2][INDEX_2] = rect_three_width;
-    faceRectangles[INDEX_2][INDEX_3] = rect_three_height;
+    faceRectangles[INDEX_2][INDEX_0] = rectThreeX;
+    faceRectangles[INDEX_2][INDEX_1] = rectThreeY;
+    faceRectangles[INDEX_2][INDEX_2] = rectThreeWidth;
+    faceRectangles[INDEX_2][INDEX_3] = rectThreeHeight;
     metadata->addEntry(OHOS_STATISTICS_FACE_RECTANGLES, static_cast<void*>(&faceRectangles[0]),
         row * col);
     return RC_OK;
@@ -146,12 +146,12 @@ RetCode FaceNode::GetCameraFaceRectangles(std::shared_ptr<CameraMetadata> &metad
 RetCode FaceNode::GetCameraFaceIds(std::shared_ptr<CameraMetadata> &metadata)
 {
     std::vector<int32_t> vFaceIds;
-    constexpr int32_t id_zero = 0;
-    constexpr int32_t id_one = 1;
-    constexpr int32_t id_two = 2;
-    vFaceIds.push_back(id_zero);
-    vFaceIds.push_back(id_one);
-    vFaceIds.push_back(id_two);
+    constexpr int32_t idZero = 0;
+    constexpr int32_t idOne = 1;
+    constexpr int32_t idTwo = 2;
+    vFaceIds.push_back(idZero);
+    vFaceIds.push_back(idOne);
+    vFaceIds.push_back(idTwo);
     metadata->addEntry(OHOS_STATISTICS_FACE_IDS, vFaceIds.data(), vFaceIds.size());
     return RC_OK;
 }
@@ -195,10 +195,10 @@ RetCode FaceNode::CopyBuffer(uint8_t *sourceBuffer, std::shared_ptr<IBuffer>& ou
 
 RetCode FaceNode::CreateMetadataInfo()
 {
-    const int ENTRY_CAPACITY = 30; // 30:entry capacity
-    const int DATA_CAPACITY = 2000; // 2000:data capacity
+    const int entryCapacity = 30; // 30:entry capacity
+    const int dataCapacity = 2000; // 2000:data capacity
     std::unique_lock <std::mutex> lock(mLock_);
-    metaData_ = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    metaData_ = std::make_shared<CameraMetadata>(entryCapacity, dataCapacity);
     RetCode result = GetFaceDetectMetaData(metaData_);
     if (result  != RC_OK) {
         CAMERA_LOGE("GetFaceDetectMetaData failed\n");

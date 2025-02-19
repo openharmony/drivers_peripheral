@@ -71,16 +71,16 @@ bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
             receiveCallback.onScoReceive,
             std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1),
             receiveCallback.onIsoReceive);
-        watcher_.AddFdToWatcher(channel[0], std::bind(&Hci::H4Protocol::ReadData, h4, std::placeholders::_1));
+        watcher_->AddFdToWatcher(channel[0], std::bind(&Hci::H4Protocol::ReadData, h4, std::placeholders::_1));
         hci_ = h4;
     } else {
         auto mct = std::make_shared<Hci::MctProtocol>(channel,
             receiveCallback.onAclReceive,
             receiveCallback.onScoReceive,
             std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1));
-        watcher_.AddFdToWatcher(
+        watcher_->AddFdToWatcher(
             channel[hci_channels_t::HCI_ACL_IN], std::bind(&Hci::MctProtocol::ReadAclData, mct, std::placeholders::_1));
-        watcher_.AddFdToWatcher(
+        watcher_->AddFdToWatcher(
             channel[hci_channels_t::HCI_EVT], std::bind(&Hci::MctProtocol::ReadEventData, mct, std::placeholders::_1));
         hci_ = mct;
     }
@@ -130,11 +130,13 @@ bool VendorInterface::Initialize(
         return false;
     }
 
+    watcher_ = std::make_shared<HciWatcher>();
+
     if (!WatchHciChannel(receiveCallback)) {
         return false;
     }
 
-    if (!watcher_.Start()) {
+    if (!watcher_->Start()) {
         HDF_LOGE("watcher start failed.");
         return false;
     }
@@ -159,9 +161,9 @@ void VendorInterface::CleanUp()
         HDF_LOGE("VendorInterface::CleanUp, vendorInterface_ is nullptr.");
         return;
     }
-
-    watcher_.Stop();
-
+    if (watcher_ != nullptr) {
+        watcher_->Stop();
+    }
     vendorInterface_->op(BtOpcodeT::BT_OP_LPM_DISABLE, nullptr);
     vendorInterface_->op(BtOpcodeT::BT_OP_HCI_CHANNEL_CLOSE, nullptr);
     vendorInterface_->op(BtOpcodeT::BT_OP_POWER_OFF, nullptr);
@@ -172,6 +174,12 @@ void VendorInterface::CleanUp()
     initializeCompleteCallback_ = nullptr;
     eventDataCallback_ = nullptr;
     dlclose(vendorHandle_);
+    vendorHandle_ = nullptr;
+    watcher_ = nullptr;
+    vendorSentOpcode_ = 0;
+    lpmTimer_ = 0;
+    wakeupLock_ = false;
+    activity_ = false;
 }
 
 size_t VendorInterface::SendPacket(Hci::HciPacketType type, const std::vector<uint8_t> &packet)
@@ -184,7 +192,10 @@ size_t VendorInterface::SendPacket(Hci::HciPacketType type, const std::vector<ui
     {
         std::lock_guard<std::mutex> lock(wakeupMutex_);
         activity_ = true;
-        watcher_.SetTimeout(std::chrono::milliseconds(lpmTimer_), std::bind(&VendorInterface::WatcherTimeout, this));
+        if (watcher_ != nullptr) {
+            watcher_->SetTimeout(
+                std::chrono::milliseconds(lpmTimer_), std::bind(&VendorInterface::WatcherTimeout, this));
+        }
         if (!wakeupLock_) {
             vendorInterface_->op(BtOpcodeT::BT_OP_WAKEUP_LOCK, nullptr);
             wakeupLock_ = true;
@@ -213,9 +224,10 @@ void VendorInterface::OnInitCallback(BtOpResultT result)
     VendorInterface::GetInstance()->lpmTimer_ = lpmTimer;
 
     VendorInterface::GetInstance()->vendorInterface_->op(BtOpcodeT::BT_OP_LPM_ENABLE, nullptr);
-
-    VendorInterface::GetInstance()->watcher_.SetTimeout(std::chrono::milliseconds(lpmTimer),
-        std::bind(&VendorInterface::WatcherTimeout, VendorInterface::GetInstance()));
+    if (VendorInterface::GetInstance()->watcher_ != nullptr) {
+        VendorInterface::GetInstance()->watcher_->SetTimeout(std::chrono::milliseconds(lpmTimer),
+            std::bind(&VendorInterface::WatcherTimeout, VendorInterface::GetInstance()));
+    }
 }
 
 void *VendorInterface::OnMallocCallback(int size)

@@ -140,7 +140,7 @@ struct FconfigPollFd {
 
 #define USB_EVENT_COUNT 10
 #define MAX_EP          16
-#define MAX_BUFLEN      2048
+#define MAX_BUFLEN      16384
 
 struct UsbDeviceFunctionsInfo {
     const char *functionName;

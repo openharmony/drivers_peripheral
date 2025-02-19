@@ -113,6 +113,7 @@ public:
     int32_t CloseAccessory(int32_t fd) override;
 
 private:
+    int32_t IfConfigIndex(const uint8_t configIndex, HostDevice *port, int32_t &ret);
     void MakeUsbControlParams(
         UsbControlParams *controlParams, uint8_t *buffer, uint16_t length, uint16_t value, uint16_t index);
     void MakeGetActiveUsbControlParams(
@@ -135,7 +136,7 @@ private:
     int32_t GetRequestMsgFromQueue(HostDevice *port, UsbdRequestASync **reqMsg);
     int32_t GetRequestMsgData(
         HostDevice *port, UsbdRequestASync *reqMsg, int32_t timeout, uint8_t **buffer, uint32_t *length);
-
+    int32_t ReleaseInterfaceByPort(HostDevice *port, uint8_t interfaceId);
     int32_t BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber);
 
     UsbdBulkASyncList *UsbdBulkASyncListInit(HostDevice *port, uint8_t ifId, uint8_t epId);

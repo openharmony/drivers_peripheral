@@ -41,9 +41,7 @@
 #include <thread>
 #include <unistd.h>
 
-#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
 #include "power_config.h"
-#endif
 #ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_S4
 #include "hibernate.h"
 #endif
@@ -105,11 +103,8 @@ extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 
 int32_t PowerInterfaceImpl::Init()
 {
-#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
     auto& powerConfig = PowerConfig::GetInstance();
     powerConfig.ParseConfig();
-#endif
-
 #ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_S4
     Hibernate::GetInstance().Init();
 #endif
@@ -163,8 +158,8 @@ int32_t PowerInterfaceImpl::UnRegisterRunningLockCallback()
 
 int32_t PowerInterfaceImpl::StartSuspend()
 {
-    HDF_LOGI("start suspend");
     std::lock_guard<std::mutex> lock(g_mutex);
+    HDF_LOGI("start suspend");
     g_suspendRetry = true;
     if (g_suspending) {
         g_powerState = PowerHdfState::INACTIVE;
@@ -249,8 +244,6 @@ int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag)
 
 int32_t DoSuspend()
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
-
 #ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
     if (!g_suspendTag.empty()) {
         return DoSuspendWithTag();
@@ -461,6 +454,7 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
+    HDF_LOGI("Background runningLock active, type=%{public}d name=%{public}s", info.type, info.name.c_str());
     Power::PowerXCollie powerXcollie("Power_HoldRunningLockExt");
     return RunningLockImpl::HoldLock(info, g_powerState, lockid, bundleName);
 }
@@ -468,6 +462,7 @@ int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
 int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
+    HDF_LOGI("Background runningLock inactive, type=%{public}d name=%{public}s", info.type, info.name.c_str());
     Power::PowerXCollie powerXcollie("Power_UnholdRunningLockExt");
     return RunningLockImpl::UnholdLock(info, lockid, bundleName);
 }
@@ -475,26 +470,67 @@ int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
 int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
 {
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
-    auto& powerConfig = PowerConfig::GetInstance();
-    std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap= powerConfig.GetPowerSceneConfigMap();
-    std::map<std::string, PowerConfig::PowerSceneConfig>::iterator it = sceneConfigMap.find("wakeuo_cause");
-    if (it == sceneConfigMap.end()) {
-        HDF_LOGW("wakeuo_cause getPath does not exist");
-        return HDF_FAILURE;
-    }
-    std::string getPath = (it->second).getPath;
-    HDF_LOGI("getPath = %{public}s", getPath.c_str());
-
-    UniqueFd wakeupCauseFd(TEMP_FAILURE_RETRY(open(getPath.c_str(), O_RDONLY | O_CLOEXEC)));
-    if (wakeupCauseFd < 0) {
-        return HDF_FAILURE;
-    }
-    LoadStringFd(wakeupCauseFd, reason);
-    return HDF_SUCCESS;
+    return GetPowerConfig("wakeuo_cause", reason);
 #else
     HDF_LOGW("wakrup cause path not config");
     return HDF_FAILURE;
 #endif
+}
+
+int32_t PowerInterfaceImpl::SetPowerConfig(const std::string &sceneName, const std::string &value)
+{
+    auto& powerConfig = PowerConfig::GetInstance();
+    std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap = powerConfig.GetPowerSceneConfigMap();
+    if (sceneConfigMap.empty()) {
+        HDF_LOGE("SetPowerConfig sceneConfigMap is empty");
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    std::map<std::string, PowerConfig::PowerSceneConfig>::iterator it = sceneConfigMap.find(sceneName);
+    if (it == sceneConfigMap.end()) {
+        HDF_LOGE("SetPowerConfig sceneName: %{public}s does not exist", sceneName.c_str());
+        return HDF_FAILURE;
+    }
+    std::string setPath = (it->second).setPath;
+    HDF_LOGI("SetPowerConfig setPath = %{public}s", setPath.c_str());
+
+    UniqueFd setValueFd = UniqueFd(TEMP_FAILURE_RETRY(open(setPath.c_str(), O_RDWR | O_CLOEXEC)));
+    if (setValueFd < 0) {
+        HDF_LOGE("SetPowerConfig open failed");
+        return HDF_FAILURE;
+    }
+    bool ret = SaveStringToFd(setValueFd, value);
+    if (!ret) {
+        HDF_LOGE("SetPowerConfig SaveStringToFd failed");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::GetPowerConfig(const std::string &sceneName, std::string &value)
+{
+    auto& powerConfig = PowerConfig::GetInstance();
+    std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap = powerConfig.GetPowerSceneConfigMap();
+    if (sceneConfigMap.empty()) {
+        HDF_LOGE("GetPowerConfig sceneConfigMap is empty");
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    std::map<std::string, PowerConfig::PowerSceneConfig>::iterator it = sceneConfigMap.find(sceneName);
+    if (it == sceneConfigMap.end()) {
+        HDF_LOGE("GetPowerConfig sceneName: %{public}s does not exist", sceneName.c_str());
+        return HDF_FAILURE;
+    }
+    std::string getPath = (it->second).getPath;
+    HDF_LOGI("GetPowerConfig getPath = %{public}s", getPath.c_str());
+
+    UniqueFd getValueFd = UniqueFd(TEMP_FAILURE_RETRY(open(getPath.c_str(), O_RDONLY | O_CLOEXEC)));
+    if (getValueFd < 0) {
+        HDF_LOGE("GetPowerConfig open failed");
+        return HDF_FAILURE;
+    }
+    LoadStringFd(getValueFd, value);
+    return HDF_SUCCESS;
 }
 } // namespace V1_2
 } // namespace Power

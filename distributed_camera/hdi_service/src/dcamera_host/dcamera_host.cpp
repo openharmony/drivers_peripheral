@@ -224,7 +224,7 @@ int32_t DCameraHost::GetResourceCost(const std::string &cameraId,
 {
     (void)cameraId;
     (void)resourceCost;
-    return CamRetCode::NO_ERROR;
+    return CamRetCode::METHOD_NOT_SUPPORTED;
 }
 
 int32_t DCameraHost::NotifyDeviceStateChangeInfo(int notifyType, int deviceState)

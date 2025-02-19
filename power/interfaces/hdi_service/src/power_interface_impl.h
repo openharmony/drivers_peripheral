@@ -68,6 +68,10 @@ public:
 
     int32_t GetWakeupReason(std::string &reason) override;
 
+    int32_t SetPowerConfig(const std::string &sceneName, const std::string &value) override;
+
+    int32_t GetPowerConfig(const std::string &sceneName, std::string &value) override;
+
     class PowerDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit PowerDeathRecipient(const wptr<PowerInterfaceImpl> &powerInterfaceImpl)

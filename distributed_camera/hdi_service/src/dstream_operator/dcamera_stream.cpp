@@ -198,6 +198,7 @@ DCamRetCode DCameraStream::GetNextRequest()
     };
 
     if (dcStreamInfo_->intent_ == StreamIntent::STILL_CAPTURE) {
+        DHLOGI("Photographing stream.");
         config.width = JPEG_MAX_SIZE;
         config.height = 1;
         config.format = GraphicPixelFormat::GRAPHIC_PIXEL_FMT_BLOB;
