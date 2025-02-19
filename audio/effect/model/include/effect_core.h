@@ -40,4 +40,5 @@ struct ControllerManagerNode {
 
 /* declare the function here */
 bool IsEffectLibExist(void);
+int32_t ConstructDescriptor(struct EffectControllerDescriptorVdi *descsVdi);
 #endif

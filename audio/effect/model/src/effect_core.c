@@ -47,3 +47,39 @@ bool IsEffectLibExist(void)
 
     return isSupply;
 }
+
+int32_t ConstructDescriptor(struct EffectControllerDescriptorVdi *descsVdi)
+{
+    if (descsVdi == NULL) {
+        HDF_LOGE("%{public}s: invailid input params", __func__);
+        return HDF_FAILURE;
+    }
+
+    descsVdi->effectId = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
+    if (descsVdi->effectId == NULL) {
+        HDF_LOGE("%{public}s: effectId OsalMemCalloc fail", __func__);
+        return HDF_FAILURE;
+    }
+    descsVdi->effectName = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
+    if (descsVdi->effectName == NULL) {
+        OsalMemFree(descsVdi->effectId);
+        HDF_LOGE("%{public}s: effectName OsalMemCalloc fail", __func__);
+        return HDF_FAILURE;
+    }
+    descsVdi->libName = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
+    if (descsVdi->libName == NULL) {
+        OsalMemFree(descsVdi->effectId);
+        OsalMemFree(descsVdi->effectName);
+        HDF_LOGE("%{public}s: libName OsalMemCalloc fail", __func__);
+        return HDF_FAILURE;
+    }
+    descsVdi->supplier = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
+    if (descsVdi->supplier == NULL) {
+        OsalMemFree(descsVdi->effectId);
+        OsalMemFree(descsVdi->effectName);
+        OsalMemFree(descsVdi->libName);
+        HDF_LOGE("%{public}s: supplier OsalMemCalloc fail", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
