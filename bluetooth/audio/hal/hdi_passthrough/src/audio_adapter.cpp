@@ -576,8 +576,8 @@ int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCap
     if (hwAdapter == nullptr || capture == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (hwAdapter->adapterMgrRenderFlag > 0) {
-        hwAdapter->adapterMgrRenderFlag--;
+    if (hwAdapter->adapterMgrCaptureFlag > 0) {
+        hwAdapter->adapterMgrCaptureFlag--;
     }
     struct AudioHwCapture *hwCapture = reinterpret_cast<struct AudioHwCapture *>(capture);
     if (hwCapture == nullptr) {

@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dstream_operator.h"
 #include "v1_1/dcamera_types.h"
@@ -34,6 +35,8 @@ const StreamIntent streamIntentType[DC_STREAMINTENT_SIZE] = {
     StreamIntent::PREVIEW, StreamIntent::VIDEO, StreamIntent::STILL_CAPTURE, StreamIntent::POST_VIEW,
     StreamIntent::ANALYZE, StreamIntent::CUSTOM
 };
+const uint32_t DC_TUNNELED_MODE = 2;
+const uint8_t MAX_STRING_LENGTH = 255;
 }
 void DcameraCreateStreamsFuzzTest(const uint8_t* data, size_t size)
 {
@@ -41,20 +44,21 @@ void DcameraCreateStreamsFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
+    FuzzedDataProvider fdp(data, size);
     std::vector<StreamInfo> infos;
     StreamInfo info;
-    info.streamId_ = *(reinterpret_cast<const int*>(data));
-    info.width_ = *(reinterpret_cast<const int*>(data));
-    info.height_ = *(reinterpret_cast<const int*>(data));
-    info.format_ = *(reinterpret_cast<const int*>(data));
-    info.dataspace_ = *(reinterpret_cast<const int*>(data));
+    info.streamId_ = fdp.ConsumeIntegral<int>();
+    info.width_ = fdp.ConsumeIntegral<int>();
+    info.height_ = fdp.ConsumeIntegral<int>();
+    info.format_ = fdp.ConsumeIntegral<int>();
+    info.dataspace_ = fdp.ConsumeIntegral<int>();
     info.intent_ = streamIntentType[data[0] % DC_STREAMINTENT_SIZE];
-    info.tunneledMode_ = *(reinterpret_cast<const int*>(data)) % 2;
+    info.tunneledMode_ = fdp.ConsumeIntegral<int>() % DC_TUNNELED_MODE;
     info.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
     info.encodeType_ = encodeType[data[0] % DC_ENCODE_SIZE];
     infos.push_back(info);
 
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sinkAbilityInfo(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
     dMetadataProcessor->InitDCameraAbility(sinkAbilityInfo);
     OHOS::sptr<DStreamOperator> dCameraStreamOperator(new (std::nothrow) DStreamOperator(dMetadataProcessor));

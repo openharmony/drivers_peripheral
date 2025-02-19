@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dcamera_provider.h"
 #include "v1_1/dcamera_types.h"
@@ -33,6 +34,7 @@ const uint32_t DC_STREAM_SIZE = 2;
 const DCStreamType streamType[DC_STREAM_SIZE] = {
     DCStreamType::CONTINUOUS_FRAME, DCStreamType::SNAPSHOT_FRAME
 };
+const uint8_t MAX_STRING_LENGTH = 255;
 }
 void DcameraStartCaptureFuzzTest(const uint8_t* data, size_t size)
 {
@@ -40,20 +42,21 @@ void DcameraStartCaptureFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string deviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    std::string dhId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
     std::vector<DCCaptureInfo> captureInfos;
     DCCaptureInfo captureInfo;
-    captureInfo.streamIds_.push_back(*(reinterpret_cast<const int32_t*>(data)));
-    captureInfo.width_ = *(reinterpret_cast<const int32_t*>(data));
-    captureInfo.height_ = *(reinterpret_cast<const int32_t*>(data));
-    captureInfo.stride_ = *(reinterpret_cast<const int32_t*>(data));
-    captureInfo.format_ = *(reinterpret_cast<const int32_t*>(data));
-    captureInfo.dataspace_ = *(reinterpret_cast<const int32_t*>(data));
-    captureInfo.isCapture_ = *(reinterpret_cast<const bool*>(data));
+    captureInfo.streamIds_.push_back(fdp.ConsumeIntegral<int32_t>());
+    captureInfo.width_ = fdp.ConsumeIntegral<int32_t>();
+    captureInfo.height_ = fdp.ConsumeIntegral<int32_t>();
+    captureInfo.stride_ = fdp.ConsumeIntegral<int32_t>();
+    captureInfo.format_ = fdp.ConsumeIntegral<int32_t>();
+    captureInfo.dataspace_ = fdp.ConsumeIntegral<int32_t>();
+    captureInfo.isCapture_ = fdp.ConsumeBool();
     captureInfo.encodeType_ = encodeType[data[0] % DC_ENCODE_SIZE];
     captureInfo.type_ = streamType[data[0] % DC_STREAM_SIZE];
     captureInfos.push_back(captureInfo);

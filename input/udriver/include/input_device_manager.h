@@ -26,8 +26,8 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
+#include "hdf_log.h"
 #include "input_manager.h"
-#include "input_uhdf_log.h"
 
 namespace OHOS {
 namespace Input {
@@ -75,7 +75,7 @@ public:
     int32_t OpenInputDevice(string devPath);
     RetStatus CloseInputDevice(string devPath);
     int32_t GetInputDeviceInfo(int32_t fd, InputDeviceInfo *detailInfo);
-    void GetInputDeviceInfoList(int32_t epollFd = 0);
+    void GetInputDeviceInfoList();
     int32_t DoInputDeviceAction(void);
     int32_t InotifyEventHandler(int32_t epollFd, int32_t notifyFd);
     void RemoveEpoll(int32_t epollFd, int32_t fileFd);
@@ -134,6 +134,10 @@ private:
     void DeleteDevListNode(int index);
     int32_t AddDeviceNodeToList(
         int32_t &epollFd, int32_t &fd, string devPath, std::shared_ptr<InputDeviceInfo> &detailInfo);
+    int32_t GetCurDevIndex();
+    void LoadInputDevices(std::vector<std::string> &flist);
+    void ReloadInputDevices(std::vector<std::string> flist);
+    int32_t CreateInputDevListNode(InputDevListNode &inputDevNode, std::string &fileName);
 
     mutable std::mutex lock_;
     std::mutex reportEventPkgCallBackLock_;

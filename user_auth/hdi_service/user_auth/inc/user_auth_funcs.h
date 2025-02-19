@@ -62,11 +62,14 @@ typedef struct {
 typedef enum ReuseMode {
     AUTH_TYPE_RELEVANT = 1,
     AUTH_TYPE_IRRELEVANT = 2,
+    CALLER_IRRELEVANT_AUTH_TYPE_RELEVANT = 3,
+    CALLER_IRRELEVANT_AUTH_TYPE_IRRELEVANT = 4,
 } ReuseMode;
 
 typedef struct {
     bool isCached;
     int32_t userId;
+    uint64_t secureUid;
     UserAuthTokenHal authToken;
 } __attribute__((__packed__)) UnlockAuthResultCache;
 

@@ -140,9 +140,6 @@ static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     struct HdfWpaInterfaceHost *wpainterfaceHost = CONTAINER_OF(
         deviceObject->service, struct HdfWpaInterfaceHost, ioService);
     StubCollectorRemoveObject(IWPAINTERFACE_INTERFACE_DESC, wpainterfaceHost->service);
-    if (wpainterfaceHost->stubObject != NULL) {
-        *(wpainterfaceHost->stubObject) = NULL;
-    }
     wpainterfaceHost->stubObject = NULL;
     IWpaInterfaceRelease(wpainterfaceHost->service, true);
     OsalMemFree(wpainterfaceHost);

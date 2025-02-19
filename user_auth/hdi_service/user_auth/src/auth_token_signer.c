@@ -88,7 +88,7 @@ ResultCode GetAuthTokenDataAndSign(
     }
     (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
 
-    UserAuthTokenPlain tokenPlain = {};
+    UserAuthTokenPlainHal tokenPlain = {};
     ResultCode ret = GetAuthTokenDataPlain(context, authMode, &(tokenPlain.tokenDataPlain));
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetAuthTokenDataPlain fail");

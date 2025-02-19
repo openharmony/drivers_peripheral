@@ -82,10 +82,10 @@ static HWTEST_F(CameraFpsTest, camera_fps_001, TestSize.Level1)
     cameraBase_->StartStream(cameraBase_->intents);
 
     // updateSettings
-    constexpr uint32_t ITEM_CAPACITY = 100;
-    constexpr uint32_t DATA_CAPACITY = 2000;
+    constexpr uint32_t itemCapacity = 100;
+    constexpr uint32_t dataCapacity = 2000;
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
-        ITEM_CAPACITY, DATA_CAPACITY);
+        itemCapacity, dataCapacity);
     std::vector<int32_t> fpsRange;
     fpsRange.push_back(fpsRange_[0]);
     fpsRange.push_back(fpsRange_[1]);

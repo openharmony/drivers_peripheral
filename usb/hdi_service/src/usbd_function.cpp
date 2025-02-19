@@ -249,7 +249,7 @@ int32_t UsbdFunction::SetFunctionToManufactureHdc()
     }
     return HDF_SUCCESS;
 }
-
+ 
 int32_t UsbdFunction::SetFunctionToStorageHdc()
 {
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE_HDC);
@@ -266,6 +266,28 @@ int32_t UsbdFunction::SetFunctionToUsbAccessory()
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_AOA);
     if (status != 0) {
         HDF_LOGE("%{public}s:add aoa config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToNcm()
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_NCM);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add ncm config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToNcmHdc()
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_NCM_HDC);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add ncm hdc config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -550,6 +572,12 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
         case USB_FUNCTION_ACCESSORY:
             HDF_LOGI("%{public}s: set usb accessory", __func__);
             return UsbdFunction::SetFunctionToUsbAccessory();
+        case USB_FUNCTION_NCM:
+            HDF_LOGI("%{public}s: set ncm", __func__);
+            return UsbdFunction::SetFunctionToNcm();
+        case USB_FUNCTION_NCM | USB_FUNCTION_HDC:
+            HDF_LOGI("%{public}s: set ncm hdc", __func__);
+            return UsbdFunction::SetFunctionToNcmHdc();
         default:
             HDF_LOGI("%{public}s: enable device", __func__);
             return UsbdEnableDevice(funcs);
@@ -561,7 +589,7 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
     HDF_LOGI("%{public}s: UsbdSetFunction funcs=%{public}d", __func__, funcs);
     if ((funcs | USB_FUNCTION_SUPPORT) != USB_FUNCTION_SUPPORT) {
         HDF_LOGE("%{public}s: funcs invalid", __func__);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
 
     uint32_t kfuns = static_cast<uint32_t>(funcs) & (~USB_DDK_FUNCTION_SUPPORT);
@@ -576,12 +604,14 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
 
     if (UsbdFunction::SetDDKFunction(funcs)) {
         HDF_LOGE("%{public}s:SetDDKFunction error", __func__);
+        SetFunctionToStorage();
         return HDF_FAILURE;
     }
 
     int32_t ret = UsbdSetKernelFunction(kfuns, funcs);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, set kernel func failed", __func__);
+        SetFunctionToStorage();
         return HDF_FAILURE;
     }
     currentFuncs_ |= kfuns;
@@ -592,12 +622,14 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
 
     if (UsbdWaitUdc() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, wait udc failed", __func__);
+        SetFunctionToStorage();
         return HDF_FAILURE;
     }
     if (UsbdInitDDKFunction(funcs) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, init ddk func failed", __func__);
         UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
         UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
+        SetFunctionToStorage();
         return HDF_FAILURE;
     }
     currentFuncs_ = funcs;

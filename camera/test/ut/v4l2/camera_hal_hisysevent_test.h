@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use this file expected in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -13,20 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_DFX_VDI_H
-#define AUDIO_DFX_VDI_H
-#include "audio_types_vdi.h"
+#ifndef CAMERA_HAL_HISYSEVENT_UTTEST_H
+#define CAMERA_HAL_HISYSEVENT_UTTEST_H
 
-#ifdef __cplusplus
-extern "C" {
+#include "test_camera_base.h"
+
+class CameraHalHisyseventTest : public testing::Test {
+public:
+    static void SetUpTestCase(void);
+    static void TearDownTestCase(void);
+    void SetUp(void);
+    void TearDown(void);
+    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
+};
 #endif
-
-void HdfAudioStartTrace(const char* value, int valueLen);
-void HdfAudioFinishTrace(void);
-int32_t SetTimer(const char* name);
-void CancelTimer(int32_t id);
-
-#ifdef __cplusplus
-}
-#endif
-#endif /* AUDIO_DFX_VDI_H */

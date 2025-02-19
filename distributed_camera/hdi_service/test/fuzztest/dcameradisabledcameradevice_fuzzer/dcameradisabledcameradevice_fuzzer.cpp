@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,8 +28,8 @@ void DcameraDisableDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-    std::string deviceId = "1";
-    std::string dhId = "2";
+    std::string deviceId(reinterpret_cast<const char*>(data), size);
+    std::string dhId(reinterpret_cast<const char*>(data), size);
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;

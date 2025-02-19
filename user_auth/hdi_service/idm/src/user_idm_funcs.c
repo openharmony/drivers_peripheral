@@ -260,7 +260,7 @@ IAM_STATIC ResultCode GetEnrollTokenDataToEncrypt(const CredentialInfoHal *crede
 
 IAM_STATIC Buffer *GetAuthTokenForPinEnroll(const CredentialInfoHal *credentialInfo, int32_t userId)
 {
-    UserAuthTokenPlain tokenPlain = {};
+    UserAuthTokenPlainHal tokenPlain = {};
     ResultCode ret = GetEnrollTokenDataPlain(credentialInfo, &(tokenPlain.tokenDataPlain));
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetEnrollTokenDataPlain fail");
@@ -565,5 +565,22 @@ ResultCode QueryAllExtUserInfoFunc(UserInfoResult *userInfos, uint32_t userInfol
         return RESULT_BAD_PARAM;
     }
 
+    return RESULT_SUCCESS;
+}
+ResultCode QueryCredentialByIdFunc(uint64_t credentialId, LinkedList **creds)
+{
+    if (creds == NULL) {
+        LOG_ERROR("creds is null");
+        return RESULT_BAD_PARAM;
+    }
+    CredentialCondition condition = {};
+    SetCredentialConditionCredentialId(&condition, credentialId);
+    SetCredentiaConditionNeedCachePin(&condition);
+    *creds = QueryCredentialLimit(&condition);
+    if (*creds == NULL) {
+        LOG_ERROR("query credential failed");
+        return RESULT_UNKNOWN;
+    }
+    LOG_INFO("query credential success");
     return RESULT_SUCCESS;
 }

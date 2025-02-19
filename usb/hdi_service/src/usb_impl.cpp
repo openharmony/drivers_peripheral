@@ -31,6 +31,7 @@
 #include "hdf_slist.h"
 #include "hisysevent.h"
 #include "hitrace_meter.h"
+#include "libusb_adapter.h"
 #include "osal_mutex.h"
 #include "usb_ddk_interface.h"
 #include "usb_ddk_pnp_loader.h"
@@ -42,7 +43,9 @@
 #include "usbd_wrapper.h"
 using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
+#ifndef LIBUSB_ENABLE
 constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
+#endif
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 constexpr uint8_t  USB_PARAM_REQTYPE = 128;
 constexpr uint8_t  USB_PARAM_STAND_REQTYPE = 0;
@@ -66,7 +69,9 @@ static const std::map<std::string, uint32_t> configMap = {
     {HDC_CONFIG_STORAGE, USB_FUNCTION_STORAGE},
     {HDC_CONFIG_RNDIS_HDC, USB_FUNCTION_HDC + USB_FUNCTION_RNDIS},
     {HDC_CONFIG_STORAGE_HDC, USB_FUNCTION_HDC + USB_FUNCTION_STORAGE},
-    {HDC_CONFIG_MANUFACTURE_HDC, USB_FUNCTION_MANUFACTURE}
+    {HDC_CONFIG_MANUFACTURE_HDC, USB_FUNCTION_MANUFACTURE},
+    {HDC_CONFIG_NCM, USB_FUNCTION_NCM},
+    {HDC_CONFIG_NCM_HDC, USB_FUNCTION_HDC + USB_FUNCTION_NCM}
 };
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
@@ -1086,6 +1091,7 @@ int32_t UsbImpl::UsbdReleaseDevices()
 
 int32_t UsbImpl::OpenDevice(const UsbDev &dev)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1095,6 +1101,7 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: OpenDevice too many times ", __func__);
         return HDF_FAILURE;
     }
+    OsalMutexLock(&lock_);
     g_usbOpenCount++;
     port->initFlag = true;
     if (port->ctrDevHandle == nullptr && port->ctrIface != nullptr) {
@@ -1102,15 +1109,21 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
             __func__, dev.busNum, dev.devAddr);
         port->ctrDevHandle = UsbOpenInterface(port->ctrIface);
         if (port->ctrDevHandle == nullptr) {
+            OsalMutexUnlock(&lock_);
             HDF_LOGE("%{public}s:ctrDevHandle UsbOpenInterface nullptr", __func__);
             return HDF_FAILURE;
         }
     }
+    OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->OpenDevice(dev);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::CloseDevice(const UsbDev &dev)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1120,23 +1133,36 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
         HDF_LOGE("%{public}s: openPort failed", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
+    OsalMutexLock(&lock_);
     g_usbOpenCount--;
     int32_t ret = 0;
     if (port->ctrDevHandle != nullptr && g_usbOpenCount == 0) {
+        for (uint8_t interfaceId = 0; interfaceId < USB_MAX_INTERFACES; ++interfaceId) {
+            if (port->iface[interfaceId] != nullptr) {
+                ReleaseInterfaceByPort(port, interfaceId);
+            }
+            port->iface[interfaceId] = nullptr;
+        }
         RawUsbCloseCtlProcess(port->ctrDevHandle);
         ret = UsbCloseInterface(port->ctrDevHandle, true);
         if (ret != HDF_SUCCESS) {
+            OsalMutexUnlock(&lock_);
             HDF_LOGE("%{public}s:usbCloseInterface ctrDevHandle failed.", __func__);
             return HDF_FAILURE;
         }
         port->ctrDevHandle = nullptr;
         port->initFlag = false;
     }
+    OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->CloseDevice(dev);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::ResetDevice(const UsbDev &dev)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1152,10 +1178,14 @@ int32_t UsbImpl::ResetDevice(const UsbDev &dev)
         }
     }
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->ResetDevice(dev);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1172,12 +1202,16 @@ int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         return ret;
     }
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->GetDeviceDescriptor(dev, descriptor);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1197,12 +1231,16 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     }
 
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->GetStringDescriptor(dev, descId, descriptor);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1221,12 +1259,16 @@ int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     }
 
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
+    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->GetConfigDescriptor(dev, descId, descriptor);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr || port->ctrDevHandle == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1241,10 +1283,14 @@ int32_t UsbImpl::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descr
     std::copy(ptr, ptr + length, descriptor.begin());
     OsalMutexUnlock(&handle->devHandle->lock);
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->GetRawDescriptor(dev, descriptor);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr || port->ctrDevHandle == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1256,10 +1302,14 @@ int32_t UsbImpl::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
     fd = handle->devHandle->fd;
     OsalMutexUnlock(&handle->devHandle->lock);
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->GetFileDescriptor(dev, fd);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr || port->ctrDevHandle == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1271,10 +1321,26 @@ int32_t UsbImpl::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
     fd = handle->devHandle->fd;
     OsalMutexUnlock(&handle->devHandle->lock);
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->GetDeviceFileDescriptor(dev, fd);
+#endif // LIBUSB_ENABLE
+}
+
+int32_t UsbImpl::IfConfigIndex(const uint8_t configIndex, HostDevice *port, int32_t &ret)
+{
+    if (configIndex != 0) {
+        ret = ReOpenDevice(port);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:ReOpenDevice failed ret:%{public}d", __func__, ret);
+            return ret;
+        }
+    }
+    return ret;
 }
 
 int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1318,18 +1384,15 @@ int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
             __func__, configIndex, configIdOld, configIdNew);
         return HDF_ERR_IO;
     }
-    if (configIndex != 0) {
-        ret = ReOpenDevice(port);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:ReOpenDevice failed ret:%{public}d", __func__, ret);
-            return ret;
-        }
-    }
-    return ret;
+    return IfConfigIndex(configIndex, port, ret);
+#else
+    return LibusbAdapter::GetInstance()->SetConfig(dev, configIndex);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetConfig(const UsbDev &dev, uint8_t &configIndex)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1345,10 +1408,15 @@ int32_t UsbImpl::GetConfig(const UsbDev &dev, uint8_t &configIndex)
         return HDF_ERR_IO;
     }
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->GetConfig(dev, configIndex);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t force)
 {
+#ifndef LIBUSB_ENABLE
+    HDF_LOGI("%{public}s:%{public}d start", __func__, __LINE__);
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1384,11 +1452,16 @@ int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t 
             return HDF_FAILURE;
         }
     }
+    HDF_LOGI("%{public}s:%{public}d end", __func__, __LINE__);
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->ClaimInterface(dev, interfaceId, force);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1407,11 +1480,62 @@ int32_t UsbImpl::ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool di
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->ManageInterface(dev, interfaceId, disable);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
 {
+#ifndef LIBUSB_ENABLE
+    HDF_LOGI("%{public}s:%{public}d start", __func__, __LINE__);
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    if (!port->initFlag) {
+        HDF_LOGE("%{public}s: openPort failed", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
+
+    if (interfaceId < USB_MAX_INTERFACES) {
+        if (port->devHandle[interfaceId] == nullptr || port->iface[interfaceId] == nullptr) {
+            HDF_LOGE("%{public}s: UsbOpenInterface or UsbClaimInterface failed", __func__);
+            return HDF_DEV_ERR_OP;
+        }
+        if (HdfSListCount(&port->reqSyncList) > 0) {
+            UsbdRequestSyncReleaseList(port);
+            HDF_LOGD("%{public}s:release sync list", __func__);
+        }
+        if (HdfSListCount(&port->reqASyncList) > 0) {
+            UsbdRequestASyncReleaseList(port);
+            HDF_LOGD("%{public}s:release async list", __func__);
+        }
+        int32_t ret = UsbdBulkASyncListReleasePort(port);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s:release bulk async list failed", __func__);
+        }
+        UsbCloseInterface(port->devHandle[interfaceId], false);
+        port->devHandle[interfaceId] = nullptr;
+        UsbReleaseInterface(port->iface[interfaceId]);
+        port->iface[interfaceId] = nullptr;
+        HDF_LOGI("%{public}s:%{public}d end", __func__, __LINE__);
+        return HDF_SUCCESS;
+    } else {
+        HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
+            port->busNum, port->devAddr, interfaceId);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->ReleaseInterface(dev, interfaceId);
+#endif // LIBUSB_ENABLE
+}
+
+int32_t UsbImpl::ReleaseInterfaceByPort(HostDevice *port, uint8_t interfaceId)
+{
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
@@ -1454,6 +1578,7 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
 
 int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1478,10 +1603,14 @@ int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t al
         UsbdBulkASyncListReleasePort(port);
     }
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->SetInterface(dev, interfaceId, altIndex);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1512,11 +1641,15 @@ int32_t UsbImpl::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_
         ret = HDF_SUCCESS;
     }
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->BulkTransferRead(dev, pipe, timeout, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::BulkTransferReadwithLength(const UsbDev &dev,
     const UsbPipe &pipe, int32_t timeout, int32_t length, std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     if (length<= 0) {
         HDF_LOGE("%{public}s:invalid length param, length: %{public}d.", __func__, length);
         return HDF_ERR_INVALID_PARAM;
@@ -1562,11 +1695,15 @@ int32_t UsbImpl::BulkTransferReadwithLength(const UsbDev &dev,
     free(tbuf);
     tbuf = nullptr;
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->BulkTransferReadwithLength(dev, pipe, timeout, length, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::BulkTransferWrite(
     const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1586,10 +1723,14 @@ int32_t UsbImpl::BulkTransferWrite(
     }
     ret = UsbdBulkWriteSyncBase(port, requestSync, data.data(), data.size(), timeout);
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->BulkTransferWrite(dev, pipe, timeout, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     if ((static_cast<uint32_t>(ctrl.requestType) & USB_ENDPOINT_DIR_MASK) == USB_ENDPOINT_DIR_OUT) {
         HDF_LOGE("%{public}s: this function is read, not write", __func__);
         return HDF_FAILURE;
@@ -1628,10 +1769,14 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
     data.assign(dataValue, dataValue + controlParams.size);
     OsalMemFree(controlParams.data);
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->ControlTransferRead(dev, ctrl, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &ctrl, const std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     if ((static_cast<uint32_t>(ctrl.requestType) & USB_ENDPOINT_DIR_MASK) != USB_ENDPOINT_DIR_OUT) {
         HDF_LOGE("%{public}s: this function is write, not read", __func__);
         return HDF_FAILURE;
@@ -1662,11 +1807,15 @@ int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &
         HDF_LOGE("%{public}s:%{public}d UsbControlTransfer failed ret:%{public}d", __func__, __LINE__, ret);
     }
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->ControlTransferWrite(dev, ctrl, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::ControlTransferReadwithLength(
     const UsbDev &dev, const UsbCtrlTransferParams &ctrlParams, std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     if ((static_cast<uint32_t>(ctrlParams.requestType) & USB_ENDPOINT_DIR_MASK) == USB_ENDPOINT_DIR_OUT) {
         HDF_LOGE("%{public}s: this function is read, not write", __func__);
         return HDF_FAILURE;
@@ -1706,11 +1855,15 @@ int32_t UsbImpl::ControlTransferReadwithLength(
     data.assign(dataValue, dataValue + controlParams.size);
     OsalMemFree(controlParams.data);
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->ControlTransferReadwithLength(dev, ctrlParams, data);
+#endif  // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::InterruptTransferRead(
     const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1740,11 +1893,15 @@ int32_t UsbImpl::InterruptTransferRead(
         ret = HDF_SUCCESS;
     }
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->InterruptTransferRead(dev, pipe, timeout, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::InterruptTransferWrite(
     const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1763,10 +1920,14 @@ int32_t UsbImpl::InterruptTransferWrite(
     }
     ret = UsbdBulkWriteSyncBase(port, requestSync, data.data(), data.size(), timeout);
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->InterruptTransferWrite(dev, pipe, timeout, data);
+#endif  // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1798,11 +1959,15 @@ int32_t UsbImpl::IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t
         ret = HDF_SUCCESS;
     }
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->IsoTransferRead(dev, pipe, timeout, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::IsoTransferWrite(
     const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -1823,6 +1988,9 @@ int32_t UsbImpl::IsoTransferWrite(
 
     ret = UsbdBulkWriteSyncBase(port, requestSync, data.data(), data.size(), timeout);
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->IsoTransferWrite(dev, pipe, timeout, data);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::RequestQueue(
@@ -2235,6 +2403,7 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
 
 int32_t UsbImpl::ClearHalt(const UsbDev &dev, const UsbPipe &pipe)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2249,10 +2418,14 @@ int32_t UsbImpl::ClearHalt(const UsbDev &dev, const UsbPipe &pipe)
         HDF_LOGE("%{public}s:ClearHalt error ret:%{public}d", __func__, ret);
     }
     return ret;
+#else
+    return LibusbAdapter::GetInstance()->ClearHalt(dev, pipe);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId, bool &unactivated)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2265,10 +2438,14 @@ int32_t UsbImpl::GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId
 
     unactivated = UsbGetInterfaceActiveStatus(port->service->session_, port->busNum, port->devAddr, interfaceId);
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->GetInterfaceActiveStatus(dev, interfaceId, unactivated);
+#endif  // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetDeviceSpeed(const UsbDev &dev, uint8_t &speed)
 {
+#ifndef LIBUSB_ENABLE
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
@@ -2279,6 +2456,9 @@ int32_t UsbImpl::GetDeviceSpeed(const UsbDev &dev, uint8_t &speed)
     speed = (uint8_t)ret;
     HDF_LOGE("%{public}s:GetDeviceSpeed, speed=%{public}u", __func__, speed);
     return HDF_SUCCESS;
+#else
+    return LibusbAdapter::GetInstance()->GetDeviceSpeed(dev, speed);
+#endif // LIBUSB_ENABLE
 }
 
 int32_t UsbImpl::GetAccessoryInfo(std::vector<std::string> &accessoryInfo)

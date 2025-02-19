@@ -36,10 +36,10 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &sinkAbilit
     std::string metadataStr = std::string(metaObj->valuestring);
     if (!metadataStr.empty()) {
         std::hash<std::string> h;
-        DHLOGI("Decode distributed camera metadata from base64, hash: %zu, length: %zu",
+        DHLOGI("Decode distributed camera metadata from base64, hash: %{public}zu, length: %{public}zu",
             h(metadataStr), metadataStr.length());
         std::string decodeString = Base64Decode(metadataStr);
-        DHLOGI("Decode distributed camera metadata from string, hash: %zu, length: %zu",
+        DHLOGI("Decode distributed camera metadata from string, hash: %{public}zu, length: %{public}zu",
             h(decodeString), decodeString.length());
         dCameraAbility_ = OHOS::Camera::MetadataUtils::DecodeFromString(decodeString);
         DHLOGI("Decode distributed camera metadata from string success.");
@@ -237,7 +237,7 @@ void DMetadataProcessor::InitOutputAbilityWithoutMode(const std::string &sinkAbi
     std::vector<int32_t> extendStreamConfigs;
     for (uint32_t i = 0; i < ADD_MODE; i++) { // Compatible camera framework modification
         camera_metadata_item_t item;
-        int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(),
+        int32_t ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(),
             OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &item);
         if (ret == CAM_META_SUCCESS && item.count != 0) {
             extendStreamConfigs.push_back(i);
@@ -280,6 +280,7 @@ DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &
         CHECK_AND_FREE_RETURN_RET_LOG(value == nullptr || !cJSON_IsObject(value), FAILED, rootValue, "mode get error.");
 
         char *jsonValue = cJSON_Print(value);
+        CHECK_AND_FREE_RETURN_RET_LOG(jsonValue == nullptr, FAILED, rootValue, "cJson print value error.");
         std::string format(jsonValue);
         DHLOGI("the current mode :%{public}s. value :%{public}s", key.c_str(), format.c_str());
         std::map<int, std::vector<DCResolution>> supportedFormats = GetDCameraSupportedFormats(format);
@@ -735,7 +736,7 @@ void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& format
         std::string formatStr = std::to_string(format);
         cJSON *formatObj = GetFormatObj(rootNode, rootValue, formatStr);
         if (formatObj == nullptr) {
-            DHLOGE("Resolution or %s error.", formatStr.c_str());
+            DHLOGE("Resolution or %{public}s error.", formatStr.c_str());
             continue;
         }
         GetNodeSupportedResolution(format, rootNode, supportedFormats, rootValue);
@@ -755,7 +756,7 @@ void DMetadataProcessor::GetNodeSupportedResolution(int format, const std::strin
     for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
         if (item == nullptr || !cJSON_IsString(item)) {
-            DHLOGE("Resolution %s %d ,is not string.", formatStr.c_str(), i);
+            DHLOGE("Resolution %{public}s %{public}d ,is not string.", formatStr.c_str(), i);
             continue;
         }
         std::string resoStr = std::string(item->valuestring);
@@ -806,8 +807,8 @@ std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupported
 {
     std::map<int, std::vector<DCResolution>> supportedFormats;
     cJSON *rootValue = cJSON_Parse(abilityInfo.c_str());
-    CHECK_NULL_RETURN_LOG(rootValue, supportedFormats, "The abilityInfo is null.");
-    CHECK_OBJECT_FREE_RETURN(rootValue, supportedFormats, "The abilityInfo is not object.");
+    CHECK_NULL_RETURN_LOG(rootValue, supportedFormats, "The sinkAbilityInfo is null.");
+    CHECK_OBJECT_FREE_RETURN(rootValue, supportedFormats, "The sinkAbilityInfo is not object.");
     ParsePhotoFormats(rootValue, supportedFormats);
     ParsePreviewFormats(rootValue, supportedFormats);
     ParseVideoFormats(rootValue, supportedFormats);
