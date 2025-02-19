@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_2 {
-class LibUsbSaSubscriber : public RefBase{
+class LibUsbSaSubscriber : public RefBase {
 public:
     LibUsbSaSubscriber() {};
     virtual ~LibUsbSaSubscriber() {};
