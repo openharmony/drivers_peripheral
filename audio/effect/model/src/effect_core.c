@@ -29,6 +29,7 @@
 #include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
+#define AUDIO_EFFECT_DESC_LEN 256
 
 /* list to manager the effect factory libs */
 AEM_GET_INITED_DLIST(g_libList);
