@@ -38,6 +38,7 @@ private:
     uint32_t devNum_;
     uint8_t intfNum_;
     std::string prefix_;
+    std::regex fileNameRegex_;
 };
 
 #endif

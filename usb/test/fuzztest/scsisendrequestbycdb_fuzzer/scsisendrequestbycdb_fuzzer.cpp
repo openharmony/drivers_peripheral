@@ -28,6 +28,10 @@ constexpr uint32_t TIMEOUT = 5000;
 bool ScsiSendRequestByCDBFuzzTest(const uint8_t *data, size_t size)
 {
     sptr<IScsiPeripheralDdk> scsiPeripheralDdk = IScsiPeripheralDdk::Get();
+    if (scsiPeripheralDdk == nullptr) {
+        HDF_LOGE("%{public}s: get ddk failed", __func__);
+        return false;
+    }
     int32_t ret = scsiPeripheralDdk->Init();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: init failed, ret = %{public}d", __func__, ret);

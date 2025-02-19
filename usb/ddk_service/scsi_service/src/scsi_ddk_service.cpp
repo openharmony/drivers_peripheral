@@ -30,7 +30,8 @@
 #include <iomanip> // for std::hex, std::dec, std::setw, std::setfill
 
 #include "ddk_sysfs_dev_node.h"
-#include "scsi_ddk_uhdf_log.h"
+#include "hdf_log.h"
+#include "usbd_wrapper.h"
 #include "usb_ddk_permission.h"
 
 #ifdef __LITEOS__
@@ -271,7 +272,7 @@ int32_t ScsiDdkService::Open(uint64_t deviceId, uint8_t interfaceIndex, ScsiPeri
         return open(path.c_str(), O_RDWR);
     }, __func__);
     if (fd < 0) {
-        HDF_LOGE("%{public}s open failed, errno=%{public}d", __func__, errno);
+        HDF_LOGE("%{public}s open failed, path=%{public}s, errno=%{public}d", __func__, path.c_str(), errno);
         return SCSIPERIPHERAL_DDK_IO_ERROR;
     }
 
