@@ -16,7 +16,7 @@
 #ifndef SCSI_DDK_SERVICE_H
 #define SCSI_DDK_SERVICE_H
 
-#include "scsi_os_apdater.h"
+#include "scsi_os_adapter.h"
 #include "v1_0/iscsi_peripheral_ddk.h"
 
 namespace OHOS {

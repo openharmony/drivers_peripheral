@@ -61,9 +61,22 @@ ohos_shared_library("libscsi_peripheral_ddk_service_1.0") {
 }
 
 ohos_shared_library("libscsi_ddk_driver") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
   sources = [ "src/scsi_ddk_driver.cpp" ]
 
-  include_dirs = [ "include/" ]
+  include_dirs = [
+    "include/",
+    "${usb_driver_path}/utils/include",
+  ]
 
   deps = []
 

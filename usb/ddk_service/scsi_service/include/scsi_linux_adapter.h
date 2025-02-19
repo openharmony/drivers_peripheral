@@ -16,7 +16,7 @@
 #ifndef SCSI_LINUX_ADAPTER_H
 #define SCSI_LINUX_ADAPTER_H
 
-#include "scsi_os_apdater.h"
+#include "scsi_os_adapter.h"
 
 namespace OHOS {
 namespace HDI {
