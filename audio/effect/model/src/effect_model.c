@@ -27,7 +27,6 @@
 #define AUDIO_EFFECT_PRODUCT_CONFIG HDF_CHIP_PROD_CONFIG_DIR"/audio_effect.json"
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 #define AUDIO_EFFECT_NUM_MAX 10
-#define AUDIO_EFFECT_DESC_LEN 256
 pthread_rwlock_t g_rwEffectLock = PTHREAD_RWLOCK_INITIALIZER;
 struct ConfigDescriptor *g_cfgDescs = NULL;
 struct AudioEffectLibInfo {
