@@ -69,7 +69,7 @@ void FillReadRequestParams(const UsbControlRequestSetup &setup, const uint32_t l
     const uint32_t timeout, UsbRequestParams &params)
 {
     if (memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams)) != EOK) {
-        HDF_LOGE("%{public}s memset_s failed", __func__);
+        HDF_LOGW("%{public}s memset_s failed", __func__);
     }
     params.interfaceId = USB_CTRL_INTERFACE_ID;
     params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
@@ -87,7 +87,7 @@ void FillWriteRequestParams(const UsbControlRequestSetup &setup, const std::vect
     const uint32_t timeout, UsbRequestParams &params)
 {
     if (memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams)) != EOK) {
-        HDF_LOGE("%{public}s memset_s failed", __func__);
+        HDF_LOGW("%{public}s memset_s failed", __func__);
     }
     params.interfaceId = USB_CTRL_INTERFACE_ID;
     params.pipeAddress = 0;
@@ -107,7 +107,7 @@ void FillWriteRequestParams(const UsbControlRequestSetup &setup, const std::vect
 void FillPipeRequestParams(const UsbRequestPipe &pipe, const uint32_t length, UsbRequestParams &params)
 {
     if (memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams)) != EOK) {
-        HDF_LOGE("%{public}s memset_s failed", __func__);
+        HDF_LOGW("%{public}s memset_s failed", __func__);
     }
     params.pipeId = pipe.endpoint;
     params.pipeAddress = pipe.endpoint;
