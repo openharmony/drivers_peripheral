@@ -14,8 +14,22 @@
 import("//build/config/components/hdi/hdi.gni")
 import("//build/ohos.gni")
 import("./../usb.gni")
-group("usbhost_acm") {
-  deps = [ ":libusbhost_acm" ]
+import("./serial.gni")
+
+# group("usbhost_acm") {
+#   deps = [ ":libusbhost_acm" ]
+# }
+config("serial_public_config") {
+  include_dirs = [
+    "${usb_driver_path}/serial",
+    "include",
+    "${usb_driver_path}/utils/include",
+    "${usb_driver_path}/ddk/host/include",
+    "${usb_driver_path}/hdi_service/include",
+    "${usb_driver_path}/hdf_usb/include",
+    "${usb_driver_path}/hdi_service",
+    "${usb_driver_path}/utils/include",
+  ]
 }
 
 ohos_shared_library("libusbhost_acm") {
@@ -107,4 +121,69 @@ ohos_shared_library("libusbhost_acm_rawapi") {
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_usb"
+}
+
+ohos_shared_library("libserial_interface_service_1.0") {
+  version_script = "serial_interface_service.map"
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [ "src/serial_impl.cpp" ]
+  defines = []
+  if (linux_serial_enable == true) {
+    sources += [ "src/linux_serial.cpp" ]
+    defines += [ "LINUX_SERIAL" ]
+    deps = [
+      "${usb_driver_path}/ddk:libusb_ddk_host",
+      "${usb_driver_path}/ddk:libusb_pnp_manager",
+    ]
+  } else {
+    sources += [ "src/libusb_serial.cpp" ]
+  }
+
+  shlib_type = "hdi"
+
+  public_configs = [ ":serial_public_config" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libserial_proxy_1.0",
+      "drivers_interface_usb:libserial_stub_1.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
+      "init:libbegetutil",
+      "libusb:libusb",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [
+      "drivers_interface_usb:libserial_proxy_1.0",
+      "drivers_interface_usb:libserial_stub_1.0",
+      "hilog:libhilog",
+      "libusb:libusb",
+    ]
+  }
+
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+group("usbhost_acm") {
+  deps = [
+    ":libserial_interface_service_1.0",
+    ":libusbhost_acm",
+    ":libusbhost_acm_rawapi",
+  ]
 }
