@@ -191,7 +191,7 @@ int32_t SensorIfService::Enable(int32_t sensorId)
     HDF_LOGI("%{public}s: sensorId %{public}d, serviceId = %{public}d", __func__, sensorId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     SensorClientsManager::GetInstance()->ReSetSensorPrintTime(sensorId);
-	if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, ENABLE_SENSOR)) {
+    if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, ENABLE_SENSOR)) {
         return HDF_SUCCESS;
     }
 
