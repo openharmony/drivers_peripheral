@@ -264,8 +264,10 @@ int32_t DoSuspend()
 
     UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
     if (suspendStateFd < 0) {
+        HDF_LOGE("DoSuspend open suspendStateFd fail, error: %{public}s", strerror(errno));
         return HDF_FAILURE;
     }
+    HDF_LOGD("DoSuspend SaveStringToFd");
     bool ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
     if (!ret) {
         HDF_LOGE("DoSuspend fail");
