@@ -77,7 +77,7 @@ public:
     void CopySensorInfo(std::vector<HdfSensorInformation> &info, bool cFlag);
     void GetEventData(struct SensorsDataPack &dataPack);
     void CopyEventData(const struct HdfSensorEvents event);
-	void ReSetSensorPrintTime(int32_t sensorId);
+    void ReSetSensorPrintTime(int32_t sensorId);
     bool IsSensorNeedPrint(int32_t sensorId);
 private:
     SensorClientsManager();
@@ -86,7 +86,7 @@ private:
     std::unordered_map<int32_t, std::set<int32_t>> sensorUsed_;
     std::unordered_map<int32_t, struct BestSensorConfig> sensorConfig_;
     std::unordered_map<int32_t, struct BestSensorConfig> sdcSensorConfig_;
-	std::unordered_map<int32_t, int32_t> sensorPrintTimes_;
+    std::unordered_map<int32_t, int32_t> sensorPrintTimes_;
     std::mutex sensorPrintTimesMutex_;
     std::vector<HdfSensorInformation> sensorInfo_;
     SensorsDataPack listDump_ = {0};
