@@ -540,6 +540,7 @@ int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
 
     if (GetEndPoint(&info) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: get endpoint failed", __func__);
+        return HDF_FAILURE;
     }
 
     devices_[device] = info;
