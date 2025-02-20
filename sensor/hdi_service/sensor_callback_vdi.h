@@ -38,8 +38,7 @@ public:
     int32_t OnDataEvent(const V2_0::HdfSensorEvents& event) override;
     sptr<IRemoteObject> HandleCallbackDeath() override;
 private:
-    void PrintData(const HdfSensorEvents &event, const std::string &reportResult);
-    void DataToStr(std::string &str, const HdfSensorEvents &event);
+    void PrintData(const HdfSensorEvents &event, const std::string &reportResult, bool &isPrint);
     sptr<ISensorCallback> sensorCallback_;
     SensorClientInfo sensorClientInfo_;
     std::mutex timestampMapMutex_;
