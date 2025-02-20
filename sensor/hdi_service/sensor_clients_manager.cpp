@@ -39,7 +39,7 @@ namespace {
     constexpr int64_t STOP_INTERVAL = 0;
     constexpr int32_t INIT_CUR_COUNT = 0;
     constexpr int32_t ZERO_PRINT_TIME = 0;
-    constexpr int32_t MAX_PRINT_TIME = 30;	
+    constexpr int32_t MAX_PRINT_TIME = 30;
     constexpr int64_t INIT_REPORT_COUNT = 1;
 }
 
