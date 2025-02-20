@@ -163,7 +163,7 @@ void BatteryThread::UeventCallback(void* service)
 
     ssize_t len = recv(ueventFd_, msg, UEVENT_MSG_LEN, 0);
     if (len < 0 || len >= UEVENT_MSG_LEN) {
-        BATTERY_HILOGI(COMP_HDI, "recv return msg is invalid, len: %{public}zd", len);
+        BATTERY_HILOGI(COMP_HDI, "recv return msg is invalid, len: %{public}zd, errno: %{public}d", len, errno);
         return;
     }
 
