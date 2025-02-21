@@ -35,6 +35,7 @@ SysfsDevNode::SysfsDevNode(uint32_t busNum, uint32_t devNum, uint8_t intfNum, co
     devNum_ = devNum;
     intfNum_ = intfNum;
     prefix_ = prefix;
+    fileNameRegex_ = std::regex("^" + prefix_ + "\\d+$");
 }
 
 int32_t SysfsDevNode::FindPath(std::string& devNodePath)
@@ -80,8 +81,7 @@ int32_t SysfsDevNode::FindPath(std::string& devNodePath)
             }
 
             std::string filename = iter->path().filename().string();
-            size_t pos = filename.find(prefix_);
-            if (pos == 0 && filename != prefix_) {
+            if (std::regex_match(filename, fileNameRegex_)) {
                 devNodePath = "/dev/" + filename;
                 return HDF_SUCCESS;
             }
