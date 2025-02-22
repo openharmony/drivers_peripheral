@@ -391,7 +391,7 @@ static struct UsbInterfacePool *IfFindInterfacePool(
 
     OsalMutexLock((struct OsalMutex *)&session->lock);
     ifacePoolList = (struct DListHead *)&session->ifacePoolList;
-    if (ifacePoolList == NULL || DListIsEmpty(ifacePoolList) == true) {
+    if (ifacePoolList == NULL || DListIsEmpty(ifacePoolList)) {
         OsalMutexUnlock((struct OsalMutex *)&session->lock);
         HDF_LOGE("%{public}s:%{public}d interface pool list is empty", __func__, __LINE__);
         return NULL;
@@ -951,7 +951,6 @@ int32_t UsbIfCreatInterfacePool(
     }
 
     ++idNum;
-    idNum %= INTERFACE_POOL_ID_MAX;
     interfacePoolTemp->object.objectId = idNum;
     interfacePoolTemp->ioProcessTid = 0;
 

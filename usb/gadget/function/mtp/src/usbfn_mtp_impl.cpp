@@ -559,6 +559,12 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
             HDF_LOGD("%{public}s:cancel write, req:%{public}p", __func__, queueReq);
         }
     }
+
+    if (mtpPort->mtpDev != NULL && mtpPort->mtpDev->notifyReq != NULL) {
+        struct UsbFnRequest *notifyReq = mtpPort->mtpDev->notifyReq;
+        (void)UsbFnCancelRequest(notifyReq);
+        HDF_LOGD("%{public}s:cancel notifyReq, req:%{public}p", __func__, notifyReq);
+    }
     return HDF_SUCCESS;
 }
 
@@ -759,6 +765,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev)
     /* the mtpDev is enabled, ready for transfer */
     mtpDev->mtpState = MTP_STATE_READY;
     mtpPort->startDelayed = true;
+    mtpPort->suspended = false;
     return HDF_SUCCESS;
 }
 

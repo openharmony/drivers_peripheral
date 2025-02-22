@@ -342,7 +342,7 @@ enum OmxIndexCodecExType {
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamEnablePackInput,
     /** OMX_CONFIG_BOOLEANTYPE */
-    OMX_IndexParamSwitchGruond,
+    OMX_IndexParamSwitchGround,
 };
 
 /**

@@ -1,0 +1,105 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/hdi/hdi.gni")
+import("//build/ohos.gni")
+import("./../../usb.gni")
+
+ohos_shared_library("libscsi_peripheral_ddk_service_1.0") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [ "src/scsi_ddk_service.cpp" ]
+  include_dirs = [
+    "include",
+    "${usb_driver_path}/ddk/host/include",
+    "${usb_driver_path}/ddk_service/common/include",
+    "${usb_driver_path}/hdf_usb/include",
+    "${usb_driver_path}/utils/include",
+  ]
+
+  if (is_standard_system) {
+    sources += [ "src/scsi_linux_adapter.cpp" ]
+  } else if (defined(ohos_lite)) {
+    sources += [ "src/scsi_liteos_adapter.cpp" ]
+  }
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "${usb_driver_path}/ddk_service/common:libusb_ddk_service_common",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "c_utils:utils",
+    "drivers_interface_usb:libscsi_ddk_proxy_1.0",
+    "hdf_core:libhdf_utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+ohos_shared_library("libscsi_ddk_driver") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [ "src/scsi_ddk_driver.cpp" ]
+
+  include_dirs = [
+    "include/",
+    "${usb_driver_path}/utils/include",
+  ]
+
+  deps = []
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_usb:libscsi_ddk_stub_1.0",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  shlib_type = "hdi"
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+group("scsi_ddk_target") {
+  deps = [
+    ":libscsi_ddk_driver",
+    ":libscsi_peripheral_ddk_service_1.0",
+  ]
+}

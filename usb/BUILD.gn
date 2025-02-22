@@ -24,6 +24,7 @@ if (defined(ohos_lite)) {
       "./cfg:usb_etc_files",
       "./ddk:libusb_core",
       "./ddk_service/common:libusb_ddk_service_common",
+      "./ddk_service/scsi_service:scsi_ddk_target",
       "./ddk_service/serial_service:usb_serial_ddk_target",
       "./ddk_service/usb_service:usb_ddk_target",
       "./gadget/function/acm:libusbfn_cdcacm",

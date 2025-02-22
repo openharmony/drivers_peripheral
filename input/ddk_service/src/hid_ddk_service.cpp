@@ -145,13 +145,13 @@ int32_t HidDdkService::Open(uint64_t deviceId, uint8_t interfaceIndex, HidDevice
     std::string path;
     int32_t ret = devNode.FindPath(path);
     if (ret != HID_DDK_SUCCESS) {
-        HDF_LOGE("%{public}s device not found", __func__);
+        HDF_LOGE("%{public}s device not found, path=%{public}s", __func__, path.c_str());
         return HID_DDK_DEVICE_NOT_FOUND;
     }
 
     int32_t fd = open(path.c_str(), O_RDWR);
     if (fd < 0) {
-        HDF_LOGE("%{public}s open failed, errno=%{public}d", __func__, errno);
+        HDF_LOGE("%{public}s open failed, path=%{public}s, errno=%{public}d", __func__, path.c_str(), errno);
         return HID_DDK_IO_ERROR;
     }
 
