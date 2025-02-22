@@ -28,6 +28,13 @@ if (defined(ohos_lite)) {
     testonly = true
     deps = [
       "benchmarktest/:hdi_usb_benchmark_driver_test",
+      "fuzztest/serialclose_fuzzer:fuzztest",
+      "fuzztest/serialgetattribute_fuzzer:fuzztest",
+      "fuzztest/serialgetportlist_fuzzer:fuzztest",
+      "fuzztest/serialopen_fuzzer:fuzztest",
+      "fuzztest/serialread_fuzzer:fuzztest",
+      "fuzztest/serialsetattribute_fuzzer:fuzztest",
+      "fuzztest/serialwrite_fuzzer:fuzztest",
       "fuzztest/usbgetdevices_fuzzer:fuzztest",
       "fuzztest/usbserialddk_fuzzer:fuzztest",
       "fuzztest/usbserialflush_fuzzer:fuzztest",

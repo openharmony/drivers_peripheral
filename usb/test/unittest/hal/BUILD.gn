@@ -565,14 +565,12 @@ ohos_unittest("test_serial") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${usb_driver_path}/serial:libserial_interface_service_1.0",
-  ]
+  deps = [ "${usb_driver_path}/serial:libserial_interface_service_1.0" ]
 
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libserial_proxy_1.0",
-      "drivers_interface_usb:libserial_stub_1.0",      
+      "drivers_interface_usb:libserial_stub_1.0",
       "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_host",
