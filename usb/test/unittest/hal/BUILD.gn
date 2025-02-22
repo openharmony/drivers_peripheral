@@ -560,6 +560,45 @@ ohos_unittest("test_asyncIsoTransfer") {
   module_out_path = module_output_path
 }
 
+ohos_unittest("test_serial") {
+  sources = [ "src/usbd_serial_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [ "${usb_driver_path}/serial:libserial_interface_service_1.0" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libserial_proxy_1.0",
+      "drivers_interface_usb:libserial_stub_1.0",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
 group("hal_test") {
   testonly = true
   deps = []
