@@ -33,9 +33,11 @@ namespace HDI {
 namespace Nfc {
 namespace V1_1 {
 static sptr<INfcCallback> g_callbackV1_1 = nullptr;
+static std::mutex g_callbacksMutex {};
 
 static void EventCallback(unsigned char event, unsigned char status)
 {
+    std::lock_guard<std::mutex> guard(g_callbacksMutex);
     if (g_callbackV1_1 != nullptr) {
         g_callbackV1_1->OnEvent((NfcEvent)event, (NfcStatus)status);
     }
@@ -43,6 +45,7 @@ static void EventCallback(unsigned char event, unsigned char status)
 
 static void DataCallback(uint16_t len, uint8_t *data)
 {
+    std::lock_guard<std::mutex> guard(g_callbacksMutex);
     if (g_callbackV1_1 != nullptr) {
         std::vector<uint8_t> vec(data, data + len / sizeof(uint8_t));
         g_callbackV1_1->OnData(vec);
@@ -68,7 +71,7 @@ NfcImpl::NfcImpl()
 NfcImpl::~NfcImpl()
 {
     HDF_LOGI("~NfcImpl");
-    std::lock_guard<std::mutex> guard(callbacksMutex_);
+    std::lock_guard<std::mutex> guard(g_callbacksMutex);
     if (callbacks_ != nullptr) {
         RemoveNfcDeathRecipient(callbacks_);
         callbacks_ = nullptr;
@@ -78,17 +81,18 @@ NfcImpl::~NfcImpl()
 int32_t NfcImpl::Open(const sptr<INfcCallback> &callbackObj, NfcStatus &status)
 {
     HDF_LOGI("NfcImpl::Open");
-    std::lock_guard<std::mutex> guard(callbacksMutex_);
-    if (callbackObj == nullptr) {
-        HDF_LOGE("Open, callback is nullptr!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    g_callbackV1_1 = callbackObj;
-
-    int ret = adaptor_.VendorOpen(EventCallback, DataCallback);
-    if (ret == 0) {
+    {
+        std::lock_guard<std::mutex> guard(g_callbacksMutex);
+        if (callbackObj == nullptr) {
+            HDF_LOGE("Open, callback is nullptr!");
+            return HDF_ERR_INVALID_PARAM;
+        }
+        g_callbackV1_1 = callbackObj;
         callbacks_ = callbackObj;
         AddNfcDeathRecipient(callbacks_);
+    }
+    int ret = adaptor_.VendorOpen(EventCallback, DataCallback);
+    if (ret == 0) {
         status = NfcStatus::OK;
         return HDF_SUCCESS;
     }
@@ -162,8 +166,8 @@ int32_t NfcImpl::PowerCycle(NfcStatus &status)
 int32_t NfcImpl::Close(NfcStatus &status)
 {
     HDF_LOGI("NfcImpl::Close");
-    std::lock_guard<std::mutex> guard(callbacksMutex_);
     int ret = adaptor_.VendorClose(false);
+    std::lock_guard<std::mutex> guard(g_callbacksMutex);
     g_callbackV1_1 = nullptr;
     if (callbacks_ != nullptr) {
         RemoveNfcDeathRecipient(callbacks_);
@@ -245,7 +249,7 @@ void NfcImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
     HDF_LOGW("NfcImpl::OnRemoteDied");
     {
-        std::lock_guard<std::mutex> guard(callbacksMutex_);
+        std::lock_guard<std::mutex> guard(g_callbacksMutex);
         callbacks_ = nullptr;
     }
     NfcStatus status = NfcStatus::FAILED;

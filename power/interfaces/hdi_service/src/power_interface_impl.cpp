@@ -63,7 +63,11 @@ static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(500); // 500ms for 
 #else
 static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(1000); // 1000ms
 #endif
+#ifdef FASTER_RETRY_OF_SLEEP
+static constexpr std::chrono::milliseconds MAX_WAIT_TIME(5763); // 5763ms for phone and tablet
+#else
 static constexpr std::chrono::milliseconds MAX_WAIT_TIME(1000 * 60); // 1min
+#endif
 static constexpr int32_t WAIT_TIME_FACTOR = 2;
 static std::chrono::milliseconds waitTime_(DEFAULT_WAIT_TIME);
 static std::mutex g_mutex;
@@ -175,6 +179,14 @@ int32_t PowerInterfaceImpl::StartSuspend()
 void AutoSuspendLoop()
 {
     auto suspendLock = std::unique_lock(g_suspendMutex);
+#ifdef DRIVERS_PERIPHERAL_POWER_HOST_SCHED_PRIORITY
+    struct sched_param param = { 0 };
+    param.sched_priority = 1; // thread priority：51
+    int32_t schRet = sched_setscheduler(0, SCHED_FIFO, &param);
+    if (schRet != 0) {
+        HDF_LOGI("power_host set SCHED_FIFO, schRet: %{public}d error: %{public}s", schRet, strerror(errno));
+    }
+#endif
     while (true) {
         std::this_thread::sleep_for(waitTime_);
         const std::string wakeupCount = ReadWakeCount();
@@ -252,8 +264,10 @@ int32_t DoSuspend()
 
     UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
     if (suspendStateFd < 0) {
+        HDF_LOGE("DoSuspend open suspendStateFd fail, error: %{public}s", strerror(errno));
         return HDF_FAILURE;
     }
+    HDF_LOGD("DoSuspend SaveStringToFd");
     bool ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
     if (!ret) {
         HDF_LOGE("DoSuspend fail");

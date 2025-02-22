@@ -17,7 +17,7 @@
 #define USB_SERIAL_LINUX_ADAPTER_H
 
 #include <stdint.h>
-#include "usb_serial_os_apdater.h"
+#include "usb_serial_os_adapter.h"
 
 namespace OHOS {
 namespace HDI {

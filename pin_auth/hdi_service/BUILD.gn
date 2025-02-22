@@ -60,7 +60,7 @@ ohos_shared_library("libpin_auth_interface_service_2.1") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_pin_auth:pin_auth_idl_headers",
+    "drivers_interface_pin_auth:libpin_auth_stub_2.1",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

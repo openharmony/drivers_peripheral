@@ -27,7 +27,6 @@
 #define AUDIO_EFFECT_PRODUCT_CONFIG HDF_CHIP_PROD_CONFIG_DIR"/audio_effect.json"
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 #define AUDIO_EFFECT_NUM_MAX 10
-#define AUDIO_EFFECT_DESC_LEN 256
 pthread_rwlock_t g_rwEffectLock = PTHREAD_RWLOCK_INITIALIZER;
 struct ConfigDescriptor *g_cfgDescs = NULL;
 struct AudioEffectLibInfo {
@@ -242,43 +241,6 @@ static int32_t EffectModelIsSupplyEffectLibs(struct IEffectModel *self, bool *su
 
     *supply = IsEffectLibExist();
     return HDF_SUCCESS;
-}
-
-static int32_t ConstructDescriptor(struct EffectControllerDescriptorVdi *descsVdi)
-{
-    if (descsVdi == NULL) {
-        HDF_LOGE("%{public}s: invailid input params", __func__);
-    }
-
-    descsVdi->effectId = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
-    if (descsVdi->effectId == NULL) {
-        HDF_LOGE("%{public}s: effectId OsalMemCalloc fail", __func__);
-        goto ERROR;
-    }
-    descsVdi->effectName = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
-    if (descsVdi->effectName == NULL) {
-        HDF_LOGE("%{public}s: effectName OsalMemCalloc fail", __func__);
-        goto ERROR;
-    }
-    descsVdi->libName = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
-    if (descsVdi->libName == NULL) {
-        HDF_LOGE("%{public}s: libName OsalMemCalloc fail", __func__);
-        goto ERROR;
-    }
-    descsVdi->supplier = (char*)OsalMemCalloc(sizeof(char) * AUDIO_EFFECT_DESC_LEN);
-    if (descsVdi->supplier == NULL) {
-        HDF_LOGE("%{public}s: supplier OsalMemCalloc fail", __func__);
-        goto ERROR;
-    }
-    return HDF_SUCCESS;
-ERROR:
-    OsalMemFree(descsVdi->effectId);
-    OsalMemFree(descsVdi->effectName);
-    OsalMemFree(descsVdi->libName);
-    descsVdi->effectId = NULL;
-    descsVdi->effectName = NULL;
-    descsVdi->libName = NULL;
-    return HDF_FAILURE;
 }
 
 static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
