@@ -61,8 +61,10 @@ void SerialTest::SetUpTestCase(void)
         exit(0);
     }
     std::cout << "请先插拔串口线，输入回车继续" << std::endl;
-    char c;
-    scanf("%c", &c);
+    int c;
+    do {
+        c = getchar();
+    } while (c != '\n' && c != EOF);
     g_serialInterface->SerialGetPortList(g_portList);
 }
 
@@ -183,8 +185,10 @@ HWTEST_F(SerialTest, SerialRead_003, TestSize.Level1)
     g_serialInterface->SerialClose(VALID_PORTID);
     g_serialInterface->SerialOpen(VALID_PORTID);
     std::cout << "请打开串口工具单次发送数据，输入回车继续" << std::endl;
-    char c;
-    scanf("%c", &c);
+    int c;
+    do {
+        c = getchar();
+    } while (c != '\n' && c != EOF);
     std::vector<uint8_t> data;
     int32_t ret = g_serialInterface->SerialRead(VALID_PORTID, data, ONE_KBYTE, 0);
     EXPECT_EQ(ret, 0);
