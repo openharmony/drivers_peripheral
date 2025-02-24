@@ -69,7 +69,6 @@ UsbDeviceImpl::~UsbDeviceImpl()
     if (UsbdEventHandleRelease() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbdEventHandleRelease fail", __func__);
     }
-    OsalMutexDestroy(&lockSetFunc_);
 }
 
 int32_t UsbDeviceImpl::GetCurrentFunctions(int32_t &funcs)
