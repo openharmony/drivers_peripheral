@@ -183,7 +183,7 @@ private:
     void GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSubscriber> subscriber);
     int32_t GetUsbDevice(const UsbDev &dev, libusb_device **device);
     int32_t FindHandleByDev(const UsbDev &dev, libusb_device_handle **handle);
-    int32_t DeleteHandleVectorAndSettingsMap(const UsbDev &dev, libusb_device_handle* handle);
+    void DeleteSettingsMap(libusb_device_handle* handle);
     int32_t DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
     int32_t ReadDescriptors(int32_t fd, void **descriptors, size_t &descriptorsLength);
     int32_t GetUsbDevicePath(const UsbDev &dev, char *pathBuf, size_t length);
