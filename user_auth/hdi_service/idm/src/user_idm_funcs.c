@@ -200,6 +200,7 @@ IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const Execu
     credentialInfo->capabilityLevel = result->capabilityLevel;
     credentialInfo->executorSensorHint = GetScheduleVerifierSensorHint(schedule);
     credentialInfo->executorMatcher = schedule->executors[0].executorMatcher;
+    credentialInfo->credentialType = result->authSubType;
 }
 
 IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo,
