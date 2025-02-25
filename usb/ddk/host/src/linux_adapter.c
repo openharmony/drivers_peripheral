@@ -150,7 +150,7 @@ static int32_t GetUsbDevicePath(struct UsbDevice *dev, char *pathBuf, size_t len
     }
 
     if (realpath(path, pathBuf) == NULL) {
-        HDF_LOGE("%{public}s: path conversion failed, path: %{public}s", __func__, path);
+        HDF_LOGE("%{public}s: path conversion failed, path: %{public}s, errno:%{public}d", __func__, path, errno);
         return HDF_FAILURE;
     }
 
