@@ -163,7 +163,7 @@ static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, 
         CODEC_LOGE("OMXAdapterCreateComponent err [%{public}x]", err);
         CodecComponentTypeServiceRelease(comp);
         OsalMemFree(node);
-        return HDF_ERR_INVALID_PARAM;
+        return err;
     }
     *component = comp;
     pthread_mutex_lock(&g_service->listMute);
