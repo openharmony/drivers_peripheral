@@ -629,7 +629,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor003, TestSize.Level1)
     auto ret = g_usbHostInterface->GetStringDescriptor(dev, stringId, devData);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor003 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devData.size(), sizeof(devData), ret);
-    EXPECT_NE(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
