@@ -550,10 +550,9 @@ FINISHED:
     }
     uint8_t reqType = static_cast<uint8_t>(setup.requestType);
     uint8_t reqCmd = static_cast<uint8_t>(setup.requestCmd);
-    uint16_t wValue = static_cast<uint16_t>(setup.value);
-    uint16_t wIndex = static_cast<uint16_t>(setup.index);
-    return g_DdkLibusbAdapter->ControlTransferRead({infoTemp.busNum, infoTemp.devNum},
-        {reqType, reqCmd, wValue, wIndex, timeout}, data);
+    uint32_t length = setup.length > MAX_CONTROL_BUFF_SIZE ? MAX_CONTROL_BUFF_SIZE : setup.length;
+    return g_DdkLibusbAdapter->ControlTransferReadwithLength({infoTemp.busNum, infoTemp.devNum},
+        {reqType, reqCmd, setup.value, setup.index, length, timeout}, data);
 #endif // LIBUSB_ENABLE
 }
 
