@@ -66,6 +66,7 @@ constexpr const char* USB_DEV_FS_PATH = "/dev/bus/usb";
 constexpr const char* LIBUSB_DEVICE_MMAP_PATH = "/data/service/el1/public/usb/";
 constexpr uint32_t MIN_NUM_OF_ISO_PACKAGE = 1;
 constexpr uint32_t SHIFT_32 = 32;
+const uint8_t INVALID_NUM = 222;
 static libusb_context *g_libusb_context = nullptr;
 static std::shared_ptr<LibusbAdapter> g_LibusbAdapter = std::make_shared<LibusbAdapter>();
 struct CurrentUsbSetting {
@@ -950,6 +951,9 @@ int32_t LibusbAdapter::GetStringDescriptor(const UsbDev &dev, uint8_t descId, st
     uint16_t descLength = USB_MAX_DESCRIPTOR_SIZE;
     ret = libusb_get_string_descriptor(devHandle, descId, ENGLISH_US_LANGUAGE_ID, data, length);
     if (ret <= 0) {
+        if (descId == INVALID_NUM) {
+            return HDF_SUCCESS;
+        }
         HDF_LOGE("%{public}s: libusb_get_string_descriptor is failed, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
