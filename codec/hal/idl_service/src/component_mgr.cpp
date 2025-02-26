@@ -39,7 +39,7 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
     auto iter = compoentsCore_.find(componentName);
     if (iter == compoentsCore_.end() || iter->second == nullptr) {
         CODEC_LOGE("can not find component[%{public}s] in core", componentName);
-        return err;
+        return HDF_ERR_NOT_SUPPORT;
     }
     auto core = iter->second;
     if (core == nullptr) {
