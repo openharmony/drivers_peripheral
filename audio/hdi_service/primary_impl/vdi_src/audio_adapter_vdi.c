@@ -158,7 +158,9 @@ static int32_t CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
 
     int32_t id = SetTimer("Hdi:CreateRender");
+    pthread_rwlock_wrlock(GetRenderLock());
     int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, vdiRender);
+    pthread_rwlock_unlock(GetRenderLock());
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
@@ -256,7 +258,9 @@ static int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t ren
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
+    pthread_rwlock_wrlock(GetRenderLock());
     ret = vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
+    pthread_rwlock_unlock(GetRenderLock());
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyRender fail, ret=%{public}d", ret);
         ret = HDF_FAILURE;
@@ -287,7 +291,9 @@ static int32_t CreateCapturePre(struct IAudioAdapterVdi *vdiAdapter, struct IAud
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t id = SetTimer("Hdi:CreateCapture");
+    pthread_rwlock_wrlock(GetCaptureLock());
     int32_t ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
+    pthread_rwlock_unlock(GetCaptureLock());
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
@@ -364,7 +370,9 @@ static int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t ca
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
+    pthread_rwlock_wrlock(GetCaptureLock());
     ret = vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
+    pthread_rwlock_unlock(GetCaptureLock());
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyCapture fail, ret=%{public}d", ret);
         ret = HDF_FAILURE;
