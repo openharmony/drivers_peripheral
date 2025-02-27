@@ -36,9 +36,8 @@
 
 #include <unique_fd.h>
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include <file_ex.h>
-
+#include "power_hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
