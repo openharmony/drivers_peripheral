@@ -440,6 +440,11 @@ static int32_t IfGetRequestPipeType(
         return HDF_ERR_INVALID_PARAM;
     }
 
+    if (devHandle->dev == NULL || devHandle->dev->privateObject == NULL) {
+        HDF_LOGE("%{public}s:%{public}d devHandle is null", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     /* Find interfacePool object */
     interfacePool = (struct UsbInterfacePool *)devHandle->dev->privateObject;
     if (interfacePool == NULL) {
