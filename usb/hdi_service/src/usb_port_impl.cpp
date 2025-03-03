@@ -160,18 +160,17 @@ int32_t UsbPortImpl::BindUsbdPortSubscriber(const sptr<IUsbdSubscriber> &subscri
     for (i = 0; i < MAX_SUBSCRIBER; i++) {
         if (subscribers_[i].subscriber == nullptr) {
             subscribers_[i].subscriber = subscriber;
-            subscribers_[i].impl = std::make_shared<UsbPortImpl>(*this);
+            subscribers_[i].impl = this;
             subscribers_[i].usbPnpListener.callBack = UsbdPnpLoaderEventReceived;
             subscribers_[i].usbPnpListener.priv = &subscribers_[i];
             subscribers_[i].remote = remote;
-            subscribers_[i].deathRecipient = std::make_shared<UsbDeathRecipient>(subscriber);
+            subscribers_[i].deathRecipient = new UsbPortImpl::UsbDeathRecipient(subscriber);
             if (subscribers_[i].deathRecipient == nullptr) {
                 HDF_LOGE("%{public}s: new deathRecipient failed", __func__);
                 return HDF_FAILURE;
             }
-            const sptr<UsbDeathRecipient>& recipient =
-                static_cast<UsbDeathRecipient *>(subscribers_[i].deathRecipient.get());
-            bool result = subscribers_[i].remote->AddDeathRecipient(recipient);
+            bool result = subscribers_[i].remote->AddDeathRecipient(
+                static_cast<UsbDeathRecipient *>(subscribers_[i].deathRecipient));
             if (!result) {
                 HDF_LOGE("%{public}s:AddUsbDeathRecipient failed", __func__);
                 return HDF_FAILURE;
@@ -210,8 +209,7 @@ int32_t UsbPortImpl::UnbindUsbdPortSubscriber(const sptr<IUsbdSubscriber> &subsc
         HDF_LOGE("%{public}s: current subscriber not bind", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
-    const sptr<UsbDeathRecipient>& recipient = static_cast<UsbDeathRecipient *>(subscribers_[i].deathRecipient.get());
-    bool result = remote->RemoveDeathRecipient(recipient);
+    bool result = remote->RemoveDeathRecipient(static_cast<UsbDeathRecipient *>(subscribers_[i].deathRecipient));
     if (!result) {
         HDF_LOGE("%{public}s:RemoveUsbDeathRecipient failed", __func__);
         return HDF_FAILURE;
