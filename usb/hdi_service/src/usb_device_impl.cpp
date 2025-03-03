@@ -58,12 +58,16 @@ extern "C" IUsbDeviceInterface *UsbDeviceInterfaceImplGetInstance(void)
 
 UsbDeviceImpl::UsbDeviceImpl()
 {
+    OsalMutexInit(&lockSetFunc_);
     if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
         loadUsbService_.LoadService();
     }
 }
 
-UsbDeviceImpl::~UsbDeviceImpl() {}
+UsbDeviceImpl::~UsbDeviceImpl()
+{
+    OsalMutexDestroy(&lockSetFunc_);
+}
 
 int32_t UsbDeviceImpl::GetCurrentFunctions(int32_t &funcs)
 {
@@ -176,7 +180,6 @@ void UsbDeviceImpl::UsbDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &o
 
 int32_t UsbDeviceImpl::BindUsbdDeviceSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
-    OsalMutexInit(&lockSetFunc_);
     int32_t i;
     if (subscriber == nullptr) {
         HDF_LOGE("%{public}s:subscriber is  null", __func__);
@@ -257,7 +260,6 @@ int32_t UsbDeviceImpl::UnbindUsbdDeviceSubscriber(const sptr<IUsbdSubscriber> &s
         HDF_LOGE("%{public}s: remove listerer failed", __func__);
         return HDF_FAILURE;
     }
-    OsalMutexDestroy(&lockSetFunc_);
     return HDF_SUCCESS;
 }
 
