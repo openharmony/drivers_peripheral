@@ -49,7 +49,7 @@ namespace V1_1 {
 #define MAX_BUFF_SIZE         16384
 #define MAX_CONTROL_BUFF_SIZE 1024
 #define DEVICE_DESCRIPROR_LENGTH 18
-constexpr int32_t API_VERSION_ID = 16;
+constexpr int32_t API_VERSION_ID_18 = 18;
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 #ifdef LIBUSB_ENABLE
@@ -140,7 +140,7 @@ int32_t CheckCompleteStatus(struct UsbRequest *request)
         return ret;
     }
 
-    if (apiVersion >= API_VERSION_ID && request->compInfo.status != USB_REQUEST_COMPLETED) {
+    if (apiVersion >= API_VERSION_ID_18 && request->compInfo.status != USB_REQUEST_COMPLETED) {
         return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
