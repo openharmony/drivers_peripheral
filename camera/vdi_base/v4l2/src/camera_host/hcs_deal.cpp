@@ -184,8 +184,11 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     DealJpegOrientation(node, metadata);
     DealAvaliableExtendConfigurations(node, metadata);
     DealJpegQuality(node, metadata);
+#ifdef V4L2_EMULATOR
+    DealCameraFoldStatus(node, metadata);
+    DealCameraFoldScreenType(node, metadata);
+#endif
     cameraMetadataMap_.insert(std::make_pair(cameraId, metadata));
-
     return RC_OK;
 }
 
@@ -994,4 +997,58 @@ RetCode HcsDeal::DealAvaliableExtendConfigurations(
     CAMERA_LOGI("extendAvailableConfigurations add success");
     return RC_OK;
 }
+
+#ifdef V4L2_EMULATOR
+RetCode HcsDeal::DealCameraFoldStatus(
+    const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    const char *nodeValue = nullptr;
+    int32_t cameraFoldStatus;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "cameraFoldStatus", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get cameraFoldStatus failed");
+        return RC_ERROR;
+    }
+
+    cameraFoldStatus = (int32_t)strtol(nodeValue, NULL, STRTOL_BASE);
+    CAMERA_LOGI("cameraFoldStatus  = %{public}d", cameraFoldStatus);
+
+    constexpr uint32_t DATA_COUNT = 1;
+    bool ret = metadata->addEntry(OHOS_ABILITY_CAMERA_FOLD_STATUS,
+        static_cast<const void *>(&cameraFoldStatus), DATA_COUNT);
+    if (!ret) {
+        CAMERA_LOGE("cameraFoldStatus add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("cameraFoldStatus add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealCameraFoldScreenType(
+    const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    const char *nodeValue = nullptr;
+    int32_t cameraFoldScreenType;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "cameraFoldScreenType", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get cameraFoldScreenType failed");
+        return RC_ERROR;
+    }
+
+    cameraFoldScreenType = (int32_t)strtol(nodeValue, NULL, STRTOL_BASE);
+    CAMERA_LOGI("cameraFoldScreenType  = %{public}d", cameraFoldScreenType);
+
+    constexpr uint32_t DATA_COUNT = 1;
+    bool ret = metadata->addEntry(OHOS_ABILITY_CAMERA_FOLDSCREEN_TYPE,
+        static_cast<const void *>(&cameraFoldScreenType), DATA_COUNT);
+    if (!ret) {
+        CAMERA_LOGE("cameraFoldScreenType add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("cameraFoldScreenType add success");
+    return RC_OK;
+}
+#endif
 } // namespace OHOS::Camera
