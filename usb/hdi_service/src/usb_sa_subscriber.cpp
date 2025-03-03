@@ -30,14 +30,13 @@ UsbdLoadService UsbSaSubscriber::loadHdfEdm_ = {HDF_EXTERNAL_DEVICE_MANAGER_SA_I
 UsbSaSubscriber::UsbSaSubscriber() {}
 int32_t UsbSaSubscriber::LoadUsbSa(const int32_t &eventId)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
     if (eventId == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
         if (loadUsbService_.LoadService() != 0) {
-            HDF_LOGE("loadUsbService_ LoadService error");
+            HDF_LOGE("loadUsbService LoadService error");
             return HDF_FAILURE;
         }
         if (loadHdfEdm_.LoadService() != 0) {
-            HDF_LOGE("loadHdfEdm_ LoadService error");
+            HDF_LOGE("loadHdfEdm LoadService error");
             return HDF_FAILURE;
         }
     }
