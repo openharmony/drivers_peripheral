@@ -125,524 +125,525 @@ namespace {
 
         return SENSOR_SUCCESS;
     }
-}
 
-class HdfSensorTest : public testing::Test {
-public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
-};
 
-void HdfSensorTest::SetUpTestCase()
-{
-    g_sensorDev = NewSensorInterfaceInstance();
-    if (g_sensorDev == nullptr) {
-        printf("test sensorHdi get Module instance failed\n\r");
-        return;
+    class HdfSensorTest : public testing::Test {
+    public:
+        static void SetUpTestCase();
+        static void TearDownTestCase();
+        void SetUp();
+        void TearDown();
+    };
+
+    void HdfSensorTest::SetUpTestCase()
+    {
+        g_sensorDev = NewSensorInterfaceInstance();
+        if (g_sensorDev == nullptr) {
+            printf("test sensorHdi get Module instance failed\n\r");
+            return;
+        }
+        int32_t ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
+        if (ret == SENSOR_FAILURE) {
+            printf("get sensor information failed\n\r");
+        }
     }
-    int32_t ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
-    if (ret == SENSOR_FAILURE) {
-        printf("get sensor information failed\n\r");
+
+    void HdfSensorTest::TearDownTestCase()
+    {
+        if (g_sensorDev != nullptr) {
+            FreeSensorInterfaceInstance();
+            g_sensorDev = nullptr;
+        }
     }
-}
 
-void HdfSensorTest::TearDownTestCase()
-{
-    if (g_sensorDev != nullptr) {
-        FreeSensorInterfaceInstance();
-        g_sensorDev = nullptr;
+    void HdfSensorTest::SetUp()
+    {
     }
-}
 
-void HdfSensorTest::SetUp()
-{
-}
+    void HdfSensorTest::TearDown()
+    {
+    }
 
-void HdfSensorTest::TearDown()
-{
-}
+    /**
+     * @tc.name: GetSensorInstance001
+     * @tc.desc: Create a sensor instance and check whether the instance is empty.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869N, AR000F8QNL
+     */
+    HWTEST_F(HdfSensorTest, GetSensorInstance001, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
 
-/**
-  * @tc.name: GetSensorInstance001
-  * @tc.desc: Create a sensor instance and check whether the instance is empty.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869N, AR000F8QNL
-  */
-HWTEST_F(HdfSensorTest, GetSensorInstance001, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
+        const struct SensorInterface *sensorDev = NewSensorInterfaceInstance();
+        EXPECT_EQ(sensorDev, g_sensorDev);
+    }
 
-    const struct SensorInterface *sensorDev = NewSensorInterfaceInstance();
-    EXPECT_EQ(sensorDev, g_sensorDev);
-}
+    /**
+     * @tc.name: RemoveSensorInstance001
+     * @tc.desc: The sensor instance is successfully removed.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869O, AR000F8QNL
+     */
+    HWTEST_F(HdfSensorTest, RemoveSensorInstance001, TestSize.Level1)
+    {
+        int32_t ret = FreeSensorInterfaceInstance();
+        ASSERT_EQ(SENSOR_SUCCESS, ret);
+        g_sensorDev = NewSensorInterfaceInstance();
+        ASSERT_NE(nullptr, g_sensorDev);
+        ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 
-/**
-  * @tc.name: RemoveSensorInstance001
-  * @tc.desc: The sensor instance is successfully removed.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869O, AR000F8QNL
-  */
-HWTEST_F(HdfSensorTest, RemoveSensorInstance001, TestSize.Level1)
-{
-    int32_t ret = FreeSensorInterfaceInstance();
-    ASSERT_EQ(SENSOR_SUCCESS, ret);
-    g_sensorDev = NewSensorInterfaceInstance();
-    ASSERT_NE(nullptr, g_sensorDev);
-    ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-}
+    /**
+     * @tc.name: RegisterSensorDataCb001
+     * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869P, AR000F8QNL
+     */
+    HWTEST_F(HdfSensorTest, RegisterSensorDataCb001, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
 
-/**
-  * @tc.name: RegisterSensorDataCb001
-  * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869P, AR000F8QNL
-  */
-HWTEST_F(HdfSensorTest, RegisterSensorDataCb001, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
+        int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        ret = g_sensorDev->Unregister(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 
-    int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-    ret = g_sensorDev->Unregister(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-}
+    /**
+     * @tc.name: RegisterSensorDataCb002
+     * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869P
+     */
+    HWTEST_F(HdfSensorTest, RegisterSensorDataCb002, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
 
-/**
-  * @tc.name: RegisterSensorDataCb002
-  * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869P
-  */
-HWTEST_F(HdfSensorTest, RegisterSensorDataCb002, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
+        int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, nullptr);
+        EXPECT_EQ(SENSOR_NULL_PTR, ret);
+        ret = g_sensorDev->Unregister(0, nullptr);
+        EXPECT_EQ(SENSOR_NULL_PTR, ret);
+    }
 
-    int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, nullptr);
-    EXPECT_EQ(SENSOR_NULL_PTR, ret);
-    ret = g_sensorDev->Unregister(0, nullptr);
-    EXPECT_EQ(SENSOR_NULL_PTR, ret);
-}
+    /**
+     * @tc.name: RegisterSensorDataCb003
+     * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869P, AR000F8QNL
+     */
+    HWTEST_F(HdfSensorTest, RegisterSensorDataCb003, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
 
-/**
-  * @tc.name: RegisterSensorDataCb003
-  * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869P, AR000F8QNL
-  */
-HWTEST_F(HdfSensorTest, RegisterSensorDataCb003, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
+        int32_t ret = g_sensorDev->Register(MEDICAL_SENSOR_TYPE, MedicalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        ret = g_sensorDev->Unregister(MEDICAL_SENSOR_TYPE, MedicalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 
-    int32_t ret = g_sensorDev->Register(MEDICAL_SENSOR_TYPE, MedicalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-    ret = g_sensorDev->Unregister(MEDICAL_SENSOR_TYPE, MedicalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-}
+    /**
+     * @tc.name: RegisterSensorDataCb004
+     * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869P
+     */
+    HWTEST_F(HdfSensorTest, RegisterSensorDataCb004, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
 
-/**
-  * @tc.name: RegisterSensorDataCb004
-  * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869P
-  */
-HWTEST_F(HdfSensorTest, RegisterSensorDataCb004, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
+        int32_t ret = g_sensorDev->Register(MEDICAL_SENSOR_TYPE, nullptr);
+        EXPECT_EQ(SENSOR_NULL_PTR, ret);
+        ret = g_sensorDev->Unregister(MEDICAL_SENSOR_TYPE, nullptr);
+        EXPECT_EQ(SENSOR_NULL_PTR, ret);
+    }
 
-    int32_t ret = g_sensorDev->Register(MEDICAL_SENSOR_TYPE, nullptr);
-    EXPECT_EQ(SENSOR_NULL_PTR, ret);
-    ret = g_sensorDev->Unregister(MEDICAL_SENSOR_TYPE, nullptr);
-    EXPECT_EQ(SENSOR_NULL_PTR, ret);
-}
+    /**
+     * @tc.name: RegisterSensorDataCb005
+     * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869P
+     */
+    HWTEST_F(HdfSensorTest, RegisterSensorDataCb005, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
 
-/**
-  * @tc.name: RegisterSensorDataCb005
-  * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869P
-  */
-HWTEST_F(HdfSensorTest, RegisterSensorDataCb005, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
+        int32_t ret = g_sensorDev->Register(SENSOR_TYPE_MAX, nullptr);
+        EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
+        ret = g_sensorDev->Unregister(SENSOR_TYPE_MAX, nullptr);
+        EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
+    }
 
-    int32_t ret = g_sensorDev->Register(SENSOR_TYPE_MAX, nullptr);
-    EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
-    ret = g_sensorDev->Unregister(SENSOR_TYPE_MAX, nullptr);
-    EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
-}
+    /**
+     * @tc.name: GetSensorList001
+     * @tc.desc: Obtains information about all sensors in the system. Validity check of input parameters.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869Q
+     */
+    HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorInfo);
+        EXPECT_GT(g_count, 0);
+    }
 
-/**
-  * @tc.name: GetSensorList001
-  * @tc.desc: Obtains information about all sensors in the system. Validity check of input parameters.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869Q
-  */
-HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorInfo);
-    EXPECT_GT(g_count, 0);
-}
+    /**
+     * @tc.name: GetSensorList002
+     * @tc.desc: Obtains information about all sensors in the system. Validity check of input parameters.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869Q
+     */
+    HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level1)
+    {
+        struct SensorInformation *info = nullptr;
+        int32_t j;
 
-/**
-  * @tc.name: GetSensorList002
-  * @tc.desc: Obtains information about all sensors in the system. Validity check of input parameters.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869Q
-  */
-HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level1)
-{
-    struct SensorInformation *info = nullptr;
-    int32_t j;
+        ASSERT_NE(nullptr, g_sensorInfo);
+        EXPECT_GT(g_count, 0);
+        printf("get sensor list num[%d]\n\r", g_count);
 
-    ASSERT_NE(nullptr, g_sensorInfo);
-    EXPECT_GT(g_count, 0);
-    printf("get sensor list num[%d]\n\r", g_count);
+        info = g_sensorInfo;
+        for (int32_t i = 0; i < g_count; ++i) {
+            printf("get sensoriId[%d], info name[%s], power[%f]\n\r", info->sensorId, info->sensorName, info->power);
+            for (j = 0; j < g_listNum; ++j) {
+                if (info->sensorId == g_sensorList[j].sensorTypeId) {
+                    EXPECT_STRNE("", info->sensorName);
+                    break;
+                }
+            }
+            info++;
+        }
+    }
 
-    info = g_sensorInfo;
-    for (int32_t i = 0; i < g_count; ++i) {
-        printf("get sensoriId[%d], info name[%s], power[%f]\n\r", info->sensorId, info->sensorName, info->power);
-        for (j = 0; j < g_listNum; ++j) {
-            if (info->sensorId == g_sensorList[j].sensorTypeId) {
-                EXPECT_STRNE("", info->sensorName);
-                break;
+    /**
+     * @tc.name: GetSensorList003
+     * @tc.desc: Obtains information about all sensors in the system. The operations include obtaining sensor information,
+     * subscribing to or unsubscribing from sensor data, enabling or disabling a sensor,
+     * setting the sensor data reporting mode, and setting sensor options such as the accuracy and measurement range.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869Q
+     */
+    HWTEST_F(HdfSensorTest, GetSensorList003, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        int32_t ret = g_sensorDev->GetAllSensors(nullptr, &g_count);
+        EXPECT_EQ(SENSOR_NULL_PTR, ret);
+        ret = g_sensorDev->GetAllSensors(&g_sensorInfo, nullptr);
+        EXPECT_EQ(SENSOR_NULL_PTR, ret);
+        ret = g_sensorDev->GetAllSensors(nullptr, nullptr);
+        EXPECT_EQ(SENSOR_NULL_PTR, ret);
+    }
+
+    /**
+     * @tc.name: EnableSensor001
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
+     */
+    HWTEST_F(HdfSensorTest, EnableSensor001, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        struct SensorInformation *info = nullptr;
+
+        ASSERT_NE(nullptr, g_sensorInfo);
+        info = g_sensorInfo;
+        for (int32_t i = 0; i < g_count; i++) {
+            ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            ret = g_sensorDev->Enable(info->sensorId);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            OsalSleep(SENSOR_POLL_TIME);
+            ret = g_sensorDev->Disable(info->sensorId);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            info++;
+        }
+
+        ret = g_sensorDev->Unregister(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_EQ(g_sensorDataFlag, 1);
+        g_sensorDataFlag = 1;
+    }
+
+    /**
+     * @tc.name: EnableSensor002
+     * @tc.desc: Enables the sensor available in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869R
+     */
+    HWTEST_F(HdfSensorTest, EnableSensor002, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+        ASSERT_NE(nullptr, g_sensorInfo);
+
+        int32_t ret = g_sensorDev->Enable(ABNORMAL_SENSORID);
+        EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+        ret = g_sensorDev->Disable(ABNORMAL_SENSORID);
+        EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+    }
+
+    /**
+     * @tc.name: SetSensorBatch001
+     * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869T
+     */
+    HWTEST_F(HdfSensorTest, SetSensorBatch001, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        struct SensorInformation *info = nullptr;
+
+        int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ASSERT_NE(nullptr, g_sensorInfo);
+        info = g_sensorInfo;
+        for (int32_t i = 0; i < g_count; i++) {
+            ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL2, SENSOR_POLL_TIME);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            ret = g_sensorDev->Enable(info->sensorId);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            OsalMSleep(SENSOR_WAIT_TIME);
+            ret = g_sensorDev->Disable(info->sensorId);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            info++;
+        }
+
+        ret = g_sensorDev->Unregister(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(g_sensorDataFlag, 1);
+        g_sensorDataFlag = 1;
+    }
+
+    /** @tc.name: SetSensorBatch002
+        @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+        @tc.type: FUNC
+        @tc.requrire: SR000F869M, AR000F869U
+        */
+    HWTEST_F(HdfSensorTest, SetSensorBatch002, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        int32_t ret = g_sensorDev->SetBatch(ABNORMAL_SENSORID, 0, 0);
+        EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+    }
+
+    /** @tc.name: SetSensorBatch003
+        @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+        @tc.type: FUNC
+        @tc.requrire: SR000F869M, AR000F869U
+        */
+    HWTEST_F(HdfSensorTest, SetSensorBatch003, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        struct SensorInformation *info = nullptr;
+
+        ASSERT_NE(nullptr, g_sensorInfo);
+        info = g_sensorInfo;
+        for (int32_t i = 0; i < g_count; i++) {
+            int32_t ret = g_sensorDev->SetBatch(info->sensorId, -1, SENSOR_POLL_TIME);
+            EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
+            info++;
+        }
+    }
+    /**
+     * @tc.name: SetSensorMode001
+     * @tc.desc: Sets the data reporting mode for the specified sensor.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869U, AR000F8QNL
+     */
+    HWTEST_F(HdfSensorTest, SetSensorMode001, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        struct SensorInformation *info = nullptr;
+
+        int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ASSERT_NE(nullptr, g_sensorInfo);
+        info = g_sensorInfo;
+        for (int32_t i = 0; i < g_count; i++) {
+            ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            if (info->sensorId == SENSOR_TYPE_HALL) {
+                ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_ON_CHANGE);
+                EXPECT_EQ(SENSOR_SUCCESS, ret);
+            } else {
+                ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_REALTIME);
+                EXPECT_EQ(SENSOR_SUCCESS, ret);
+            }
+
+            ret = g_sensorDev->Enable(info->sensorId);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            OsalMSleep(SENSOR_WAIT_TIME);
+            ret = g_sensorDev->Disable(info->sensorId);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            info++;
+        }
+
+        ret = g_sensorDev->Unregister(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(1, g_sensorDataFlag);
+        g_sensorDataFlag = 1;
+    }
+
+    /**
+     * @tc.name: SetSensorMode002
+     * @tc.desc: Sets the data reporting mode for the specified sensor.The current real-time polling mode is valid.
+     * Other values are invalid.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869U
+     */
+    HWTEST_F(HdfSensorTest, SetSensorMode002, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        int32_t ret = g_sensorDev->SetBatch(ABNORMAL_SENSORID, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+    }
+
+    /**
+     * @tc.name: SetSensorMode002
+     * @tc.desc: Sets the data reporting mode for the specified sensor.The current real-time polling mode is valid.
+     * Other values are invalid.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869U
+     */
+    HWTEST_F(HdfSensorTest, SetSensorMode003, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        struct SensorInformation *info = nullptr;
+
+        ASSERT_NE(nullptr, g_sensorInfo);
+        info = g_sensorInfo;
+        for (int32_t i = 0; i < g_count; i++) {
+            int32_t ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_DEFAULT);
+            EXPECT_EQ(SENSOR_FAILURE, ret);
+            ret = g_sensorDev->Enable(info->sensorId);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            OsalMSleep(SENSOR_WAIT_TIME);
+            ret = g_sensorDev->Disable(info->sensorId);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            info++;
+        }
+    }
+
+    /**
+     * @tc.name: SetSensorOption001
+     * @tc.desc: Sets options for the specified sensor, including its measurement range and accuracy.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869U
+     */
+    HWTEST_F(HdfSensorTest, SetSensorOption001, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        struct SensorInformation *info = nullptr;
+
+        ASSERT_NE(nullptr, g_sensorInfo);
+        info = g_sensorInfo;
+        for (int32_t i = 0; i < g_count; i++) {
+            int32_t ret = g_sensorDev->SetOption(info->sensorId, 0);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            info++;
+        }
+    }
+
+    /**
+     * @tc.name: SetSensorOption001
+     * @tc.desc: Sets options for the specified sensor, including its measurement range and accuracy.
+     * @tc.type: FUNC
+     * @tc.require: SR000F869M, AR000F869U
+     */
+    HWTEST_F(HdfSensorTest, SetSensorOption002, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        int32_t ret = g_sensorDev->SetOption(ABNORMAL_SENSORID, 0);
+        EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+    }
+
+    /**
+     * @tc.name: ReadSensorData001
+     * @tc.desc: Read event data for the specified sensor.
+     * @tc.type: FUNC
+     * @tc.require: AR000HQ6N4
+     */
+    HWTEST_F(HdfSensorTest, ReadSensorData001, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
+
+        g_sensorEvents = (struct SensorEvents*)OsalMemCalloc(sizeof(*g_sensorEvents));
+        ASSERT_NE(nullptr, g_sensorEvents);
+        g_sensorEvents->data = (uint8_t *)OsalMemCalloc(SENSOR_DATA_LEN);
+        ASSERT_NE(nullptr, g_sensorEvents->data);
+        g_sensorEvents->dataLen = SENSOR_DATA_LEN;
+
+        int32_t ret = g_sensorDev->Enable(SENSOR_TYPE_AMBIENT_LIGHT);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        ret = g_sensorDev->ReadData(SENSOR_TYPE_AMBIENT_LIGHT, g_sensorEvents);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        printf("sensorId[%d], mode[%d], option[%u]\n\r",
+            g_sensorEvents->sensorId, g_sensorEvents->mode, g_sensorEvents->option);
+        for (int32_t i = 0; i < g_listNum; i++) {
+            if (g_sensorEvents->sensorId == g_sensorList[i].sensorTypeId) {
+                float *data = reinterpret_cast<float*>(g_sensorEvents->data);
+                SensorDataVerification(*data, g_sensorList[i]);
             }
         }
-        info++;
-    }
-}
 
-/**
-  * @tc.name: GetSensorList003
-  * @tc.desc: Obtains information about all sensors in the system. The operations include obtaining sensor information,
-  * subscribing to or unsubscribing from sensor data, enabling or disabling a sensor,
-  * setting the sensor data reporting mode, and setting sensor options such as the accuracy and measurement range.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869Q
-  */
-HWTEST_F(HdfSensorTest, GetSensorList003, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    int32_t ret = g_sensorDev->GetAllSensors(nullptr, &g_count);
-    EXPECT_EQ(SENSOR_NULL_PTR, ret);
-    ret = g_sensorDev->GetAllSensors(&g_sensorInfo, nullptr);
-    EXPECT_EQ(SENSOR_NULL_PTR, ret);
-    ret = g_sensorDev->GetAllSensors(nullptr, nullptr);
-    EXPECT_EQ(SENSOR_NULL_PTR, ret);
-}
-
-/**
-  * @tc.name: EnableSensor001
-  * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
-  */
-HWTEST_F(HdfSensorTest, EnableSensor001, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-
-    struct SensorInformation *info = nullptr;
-
-    ASSERT_NE(nullptr, g_sensorInfo);
-    info = g_sensorInfo;
-    for (int32_t i = 0; i < g_count; i++) {
-        ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        ret = g_sensorDev->Disable(SENSOR_TYPE_AMBIENT_LIGHT);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
-        ret = g_sensorDev->Enable(info->sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        OsalSleep(SENSOR_POLL_TIME);
-        ret = g_sensorDev->Disable(info->sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        info++;
+
+        OsalMemFree(g_sensorEvents->data);
+        OsalMemFree(g_sensorEvents);
     }
 
-    ret = g_sensorDev->Unregister(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    /**
+     * @tc.name: ReadSensorData002
+     * @tc.desc: Read event data for the specified sensor.
+     * @tc.type: FUNC
+     * @tc.require: AR000HQ6N4
+     */
+    HWTEST_F(HdfSensorTest, ReadSensorData002, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
 
-    EXPECT_EQ(g_sensorDataFlag, 1);
-    g_sensorDataFlag = 1;
-}
-
-/**
-  * @tc.name: EnableSensor002
-  * @tc.desc: Enables the sensor available in the sensor list based on the specified sensor ID.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869R
-  */
-HWTEST_F(HdfSensorTest, EnableSensor002, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-    ASSERT_NE(nullptr, g_sensorInfo);
-
-    int32_t ret = g_sensorDev->Enable(ABNORMAL_SENSORID);
-    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
-    ret = g_sensorDev->Disable(ABNORMAL_SENSORID);
-    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
-}
-
-/**
-  * @tc.name: SetSensorBatch001
-  * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869T
-  */
-HWTEST_F(HdfSensorTest, SetSensorBatch001, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    struct SensorInformation *info = nullptr;
-
-    int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-
-    ASSERT_NE(nullptr, g_sensorInfo);
-    info = g_sensorInfo;
-    for (int32_t i = 0; i < g_count; i++) {
-        ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL2, SENSOR_POLL_TIME);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        ret = g_sensorDev->Enable(info->sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        OsalMSleep(SENSOR_WAIT_TIME);
-        ret = g_sensorDev->Disable(info->sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        info++;
+        int32_t ret = g_sensorDev->ReadData(SENSOR_TYPE_AMBIENT_LIGHT, nullptr);
+        EXPECT_EQ(SENSOR_NULL_PTR, ret);
     }
 
-    ret = g_sensorDev->Unregister(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-    EXPECT_EQ(g_sensorDataFlag, 1);
-    g_sensorDataFlag = 1;
-}
+    /**
+     * @tc.name: ReadSensorData003
+     * @tc.desc: Read event data for the specified sensor.
+     * @tc.type: FUNC
+     * @tc.require: AR000HQ6N4
+     */
+    HWTEST_F(HdfSensorTest, ReadSensorData003, TestSize.Level1)
+    {
+        ASSERT_NE(nullptr, g_sensorDev);
 
-/** @tc.name: SetSensorBatch002
-    @tc.desc: Sets the sampling time and data report interval for sensors in batches.
-    @tc.type: FUNC
-    @tc.requrire: SR000F869M, AR000F869U
-    */
-HWTEST_F(HdfSensorTest, SetSensorBatch002, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
+        g_sensorEvents = (struct SensorEvents*)OsalMemCalloc(sizeof(*g_sensorEvents));
+        ASSERT_NE(nullptr, g_sensorEvents);
+        g_sensorEvents->data = (uint8_t *)OsalMemCalloc(SENSOR_DATA_LEN);
+        ASSERT_NE(nullptr, g_sensorEvents->data);
+        g_sensorEvents->dataLen = SENSOR_DATA_LEN;
 
-    int32_t ret = g_sensorDev->SetBatch(ABNORMAL_SENSORID, 0, 0);
-    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
-}
+        int32_t ret = g_sensorDev->ReadData(ABNORMAL_SENSORID, g_sensorEvents);
+        EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
 
-/** @tc.name: SetSensorBatch003
-    @tc.desc: Sets the sampling time and data report interval for sensors in batches.
-    @tc.type: FUNC
-    @tc.requrire: SR000F869M, AR000F869U
-    */
-HWTEST_F(HdfSensorTest, SetSensorBatch003, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    struct SensorInformation *info = nullptr;
-
-    ASSERT_NE(nullptr, g_sensorInfo);
-    info = g_sensorInfo;
-    for (int32_t i = 0; i < g_count; i++) {
-        int32_t ret = g_sensorDev->SetBatch(info->sensorId, -1, SENSOR_POLL_TIME);
-        EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
-        info++;
+        OsalMemFree(g_sensorEvents->data);
+        OsalMemFree(g_sensorEvents);
     }
-}
-/**
-  * @tc.name: SetSensorMode001
-  * @tc.desc: Sets the data reporting mode for the specified sensor.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869U, AR000F8QNL
-  */
-HWTEST_F(HdfSensorTest, SetSensorMode001, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    struct SensorInformation *info = nullptr;
-
-    int32_t ret = g_sensorDev->Register(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-
-    ASSERT_NE(nullptr, g_sensorInfo);
-    info = g_sensorInfo;
-    for (int32_t i = 0; i < g_count; i++) {
-        ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        if (info->sensorId == SENSOR_TYPE_HALL) {
-            ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_ON_CHANGE);
-            EXPECT_EQ(SENSOR_SUCCESS, ret);
-        } else {
-            ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_REALTIME);
-            EXPECT_EQ(SENSOR_SUCCESS, ret);
-        }
-
-        ret = g_sensorDev->Enable(info->sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        OsalMSleep(SENSOR_WAIT_TIME);
-        ret = g_sensorDev->Disable(info->sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        info++;
-    }
-
-    ret = g_sensorDev->Unregister(TRADITIONAL_SENSOR_TYPE, TraditionalSensorTestDataCallback);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-    EXPECT_EQ(1, g_sensorDataFlag);
-    g_sensorDataFlag = 1;
-}
-
-/**
-  * @tc.name: SetSensorMode002
-  * @tc.desc: Sets the data reporting mode for the specified sensor.The current real-time polling mode is valid.
-  * Other values are invalid.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869U
-  */
-HWTEST_F(HdfSensorTest, SetSensorMode002, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    int32_t ret = g_sensorDev->SetBatch(ABNORMAL_SENSORID, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
-    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
-}
-
-/**
-  * @tc.name: SetSensorMode002
-  * @tc.desc: Sets the data reporting mode for the specified sensor.The current real-time polling mode is valid.
-  * Other values are invalid.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869U
-  */
-HWTEST_F(HdfSensorTest, SetSensorMode003, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    struct SensorInformation *info = nullptr;
-
-    ASSERT_NE(nullptr, g_sensorInfo);
-    info = g_sensorInfo;
-    for (int32_t i = 0; i < g_count; i++) {
-        int32_t ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_DEFAULT);
-        EXPECT_EQ(SENSOR_FAILURE, ret);
-        ret = g_sensorDev->Enable(info->sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        OsalMSleep(SENSOR_WAIT_TIME);
-        ret = g_sensorDev->Disable(info->sensorId);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        info++;
-    }
-}
-
-/**
-  * @tc.name: SetSensorOption001
-  * @tc.desc: Sets options for the specified sensor, including its measurement range and accuracy.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869U
-  */
-HWTEST_F(HdfSensorTest, SetSensorOption001, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    struct SensorInformation *info = nullptr;
-
-    ASSERT_NE(nullptr, g_sensorInfo);
-    info = g_sensorInfo;
-    for (int32_t i = 0; i < g_count; i++) {
-        int32_t ret = g_sensorDev->SetOption(info->sensorId, 0);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
-        info++;
-    }
-}
-
-/**
-  * @tc.name: SetSensorOption001
-  * @tc.desc: Sets options for the specified sensor, including its measurement range and accuracy.
-  * @tc.type: FUNC
-  * @tc.require: SR000F869M, AR000F869U
-  */
-HWTEST_F(HdfSensorTest, SetSensorOption002, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    int32_t ret = g_sensorDev->SetOption(ABNORMAL_SENSORID, 0);
-    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
-}
-
-/**
-  * @tc.name: ReadSensorData001
-  * @tc.desc: Read event data for the specified sensor.
-  * @tc.type: FUNC
-  * @tc.require: AR000HQ6N4
-  */
-HWTEST_F(HdfSensorTest, ReadSensorData001, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    g_sensorEvents = (struct SensorEvents*)OsalMemCalloc(sizeof(*g_sensorEvents));
-    ASSERT_NE(nullptr, g_sensorEvents);
-    g_sensorEvents->data = (uint8_t *)OsalMemCalloc(SENSOR_DATA_LEN);
-    ASSERT_NE(nullptr, g_sensorEvents->data);
-    g_sensorEvents->dataLen = SENSOR_DATA_LEN;
-
-    int32_t ret = g_sensorDev->Enable(SENSOR_TYPE_AMBIENT_LIGHT);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-    ret = g_sensorDev->ReadData(SENSOR_TYPE_AMBIENT_LIGHT, g_sensorEvents);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-
-    printf("sensorId[%d], mode[%d], option[%u]\n\r",
-        g_sensorEvents->sensorId, g_sensorEvents->mode, g_sensorEvents->option);
-    for (int32_t i = 0; i < g_listNum; i++) {
-        if (g_sensorEvents->sensorId == g_sensorList[i].sensorTypeId) {
-            float *data = reinterpret_cast<float*>(g_sensorEvents->data);
-            SensorDataVerification(*data, g_sensorList[i]);
-        }
-    }
-
-    ret = g_sensorDev->Disable(SENSOR_TYPE_AMBIENT_LIGHT);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
-
-    OsalMemFree(g_sensorEvents->data);
-    OsalMemFree(g_sensorEvents);
-}
-
-/**
-  * @tc.name: ReadSensorData002
-  * @tc.desc: Read event data for the specified sensor.
-  * @tc.type: FUNC
-  * @tc.require: AR000HQ6N4
-  */
-HWTEST_F(HdfSensorTest, ReadSensorData002, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    int32_t ret = g_sensorDev->ReadData(SENSOR_TYPE_AMBIENT_LIGHT, nullptr);
-    EXPECT_EQ(SENSOR_NULL_PTR, ret);
-}
-
-/**
-  * @tc.name: ReadSensorData003
-  * @tc.desc: Read event data for the specified sensor.
-  * @tc.type: FUNC
-  * @tc.require: AR000HQ6N4
-  */
-HWTEST_F(HdfSensorTest, ReadSensorData003, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_sensorDev);
-
-    g_sensorEvents = (struct SensorEvents*)OsalMemCalloc(sizeof(*g_sensorEvents));
-    ASSERT_NE(nullptr, g_sensorEvents);
-    g_sensorEvents->data = (uint8_t *)OsalMemCalloc(SENSOR_DATA_LEN);
-    ASSERT_NE(nullptr, g_sensorEvents->data);
-    g_sensorEvents->dataLen = SENSOR_DATA_LEN;
-
-    int32_t ret = g_sensorDev->ReadData(ABNORMAL_SENSORID, g_sensorEvents);
-    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
-
-    OsalMemFree(g_sensorEvents->data);
-    OsalMemFree(g_sensorEvents);
 }
