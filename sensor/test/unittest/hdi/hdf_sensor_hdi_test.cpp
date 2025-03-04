@@ -147,7 +147,8 @@ namespace {
         printf("get sensor list num[%zu]\n\r", g_info.size());
 
         for (auto iter : g_info) {
-            printf("get sensoriId[%d], info name[%s], power[%f]\n\r", iter.sensorId, iter.sensorName.c_str(), iter.power);
+            printf("get sensoriId[%d], info name[%s], power[%f]\n\r", iter.sensorId,
+                iter.sensorName.c_str(), iter.power);
             for (int j =0; j < g_listNum; ++j) {
                 if (iter.sensorId == g_sensorList[j].sensorTypeId) {
                     EXPECT_GT(iter.sensorName.size(), 0);
