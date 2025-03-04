@@ -2898,7 +2898,6 @@ int32_t LibusbAdapter::SetLoadUsbSaSubscriber(sptr<V1_2::LibUsbSaSubscriber> lib
 
     GetCurrentDevList(g_libusb_context, libUsbSaSubscriber);
     libUsbSaSubscriber_ = libUsbSaSubscriber;
-    HDF_LOGI("%{public}s: success", __func__);
     return HDF_SUCCESS;
 }
 
@@ -2907,6 +2906,10 @@ int32_t LibusbAdapter::LoadUsbSaCallback(libusb_context* ctx, libusb_device* dev
 {
     HDF_LOGI("%{public}s: enter.", __func__);
     if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
+        if (libUsbSaSubscriber_ == nullptr) {
+            HDF_LOGE("%{public}s: libUsbSaSubscriber is nullptr", __func__);
+            return HDF_FAILURE;
+        }
         libUsbSaSubscriber_->LoadUsbSa(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED);
     }
     return HDF_SUCCESS;
@@ -2915,7 +2918,6 @@ int32_t LibusbAdapter::LoadUsbSaCallback(libusb_context* ctx, libusb_device* dev
 void LibusbAdapter::GetCurrentDevList(libusb_context *ctx, sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber)
 {
     HDF_LOGI("%{public}s: enter.", __func__);
-    int r;
     ssize_t cnt = 0;
     libusb_device **devs;
     cnt = libusb_get_device_list(ctx, &devs);
@@ -2928,8 +2930,8 @@ void LibusbAdapter::GetCurrentDevList(libusb_context *ctx, sptr<V1_2::LibUsbSaSu
     for (ssize_t i = 0; i < cnt; i++) {
         libusb_device *dev = devs[i];
         struct libusb_device_descriptor desc;
-        r = libusb_get_device_descriptor(dev, &desc);
-        if (r < 0) {
+        int ret = libusb_get_device_descriptor(dev, &desc);
+        if (ret < 0) {
             continue;
         }
         busNum = libusb_get_bus_number(dev);
