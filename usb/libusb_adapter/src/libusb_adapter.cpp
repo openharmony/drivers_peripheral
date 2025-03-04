@@ -1121,7 +1121,7 @@ int32_t LibusbAdapter::DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfe
         GetApiVersion(apiVersion);
         HDF_LOGD("%{public}s: apiVersion %{public}d", __func__, apiVersion);
         if (apiVersion < API_VERSION_ID_18) {
-            HDF_LOGD("%{public}s: The version number is smaller than 16 apiVersion %{public}d",
+            HDF_LOGD("%{public}s: The version number is smaller than 18 apiVersion %{public}d",
                 __func__, apiVersion);
             ret = HDF_SUCCESS;
         }
@@ -1386,7 +1386,7 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpoint
         GetApiVersion(apiVersion);
         HDF_LOGI("%{public}s: apiVersion %{public}d", __func__, apiVersion);
         if (apiVersion < API_VERSION_ID_18) {
-            HDF_LOGI("%{public}s: The version number is smaller than 16 apiVersion %{public}d",
+            HDF_LOGI("%{public}s: The version number is smaller than 18 apiVersion %{public}d",
                 __func__, apiVersion);
             ret = HDF_SUCCESS;
         }
@@ -1428,7 +1428,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
         GetApiVersion(apiVersion);
         HDF_LOGI("%{public}s: apiVersion %{public}d", __func__, apiVersion);
         if (apiVersion < API_VERSION_ID_18) {
-            HDF_LOGI("%{public}s: The version number is smaller than 16 apiVersion %{public}d",
+            HDF_LOGI("%{public}s: The version number is smaller than 18 apiVersion %{public}d",
                 __func__, apiVersion);
             ret = HDF_SUCCESS;
         }
