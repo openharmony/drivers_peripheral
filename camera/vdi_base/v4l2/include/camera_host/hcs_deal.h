@@ -107,6 +107,12 @@ private:
         const struct DeviceResourceNode &metadataNode, std::shared_ptr<CameraMetadata> &metadata);
     RetCode DealAvaliableExtendConfigurations(
     const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
+#ifdef V4L2_EMULATOR
+    RetCode DealCameraFoldStatus(
+        const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
+    RetCode DealCameraFoldScreenType(
+        const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
+#endif
 
 private:
     std::string sPathName;
