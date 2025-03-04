@@ -316,7 +316,8 @@ namespace {
 
     /**
      * @tc.name: GetSensorList003
-     * @tc.desc: Obtains information about all sensors in the system. The operations include obtaining sensor information,
+     * @tc.desc: Obtains information about all sensors in the system.
+     * The operations include obtaining sensor information,
      * subscribing to or unsubscribing from sensor data, enabling or disabling a sensor,
      * setting the sensor data reporting mode, and setting sensor options such as the accuracy and measurement range.
      * @tc.type: FUNC

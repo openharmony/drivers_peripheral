@@ -121,7 +121,8 @@ namespace {
     void HdfSensorDumpTest::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
     {
         SENSOR_TRACE;
-        SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, g_serviceId, samplingInterval, reportInterval);
+        SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, g_serviceId, samplingInterval,
+            reportInterval);
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, samplingInterval, reportInterval);
         SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, samplingInterval, reportInterval);
     }
