@@ -23,6 +23,7 @@
 
 #include <libusb.h>
 
+#include "libusb_sa_subscriber.h"
 #include "v1_2/iusb_interface.h"
 #include "v2_0/iusb_host_interface.h"
 
@@ -175,12 +176,14 @@ public:
     int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<V2_0::IUsbdBulkCallback> &cb);
     int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe);
 
+    int32_t SetLoadUsbSaSubscriber(sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber);
     static std::shared_ptr<LibusbAdapter> GetInstance();
 
 private:
     int32_t LibUSBInit();
     void LibUSBExit();
     void GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSubscriber> subscriber);
+    void GetCurrentDevList(libusb_context *ctx, sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber);
     int32_t GetUsbDevice(const UsbDev &dev, libusb_device **device);
     int32_t FindHandleByDev(const UsbDev &dev, libusb_device_handle **handle);
     int32_t DeleteHandleVectorAndSettingsMap(const UsbDev &dev, libusb_device_handle* handle);
@@ -246,11 +249,14 @@ private:
 
     static int HotplugCallback(libusb_context* ctx, libusb_device* device,
         libusb_hotplug_event event, void* user_data);
+    static int LoadUsbSaCallback(libusb_context* ctx, libusb_device* device,
+        libusb_hotplug_event event, void* user_data);
 private:
     std::atomic<bool> isRunning;
     std::thread eventThread;
     libusb_hotplug_callback_handle hotplug_handle_;
     static std::list<sptr<V2_0::IUsbdSubscriber>> subscribers_;
+    static sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber_;
 };
 } // namespace V1_2
 } // namespace Usb
