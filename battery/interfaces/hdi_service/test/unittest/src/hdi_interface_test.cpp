@@ -50,7 +50,7 @@ void HdiInterfaceTest::TearDown(void)
 {
 }
 
-std::string CreateFile(std::string path, std::string content)
+static std::string CreateFile(std::string path, std::string content)
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
