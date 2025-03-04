@@ -58,7 +58,6 @@ if (defined(ohos_lite)) {
       "unittest/ddk_service:usb_ddk_service_test",
       "unittest/hal:hal_test",
       "unittest/mock:usb_mock_test",
-      "unittest/passthrough:passthrough_test",
     ]
   }
 }

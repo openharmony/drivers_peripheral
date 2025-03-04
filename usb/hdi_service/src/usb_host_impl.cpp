@@ -42,7 +42,6 @@ constexpr uint8_t MAX_ENDPOINT_ID = 158;
 constexpr uint8_t MAX_CANCEL_ENDPOINT_ID = 255;
 constexpr uint8_t MAX_INTERFACE_ID = 255;
 constexpr uint8_t LIBUSB_INTERFACE_ID = 0x80;
-UsbdSubscriber UsbHostImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbHostImpl::isGadgetConnected_ = false;
 extern "C" IUsbHostInterface *UsbHostInterfaceImplGetInstance(void)
 {
@@ -218,18 +217,18 @@ int32_t UsbHostImpl::ResetDevice(const UsbDev &dev)
     return V1_2::LibusbAdapter::GetInstance()->ResetDevice(usbDev_);
 }
 
-int32_t UsbHostImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor)
+int32_t UsbHostImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     const V1_2::UsbDev &usbDev_ = reinterpret_cast<const V1_2::UsbDev &>(dev);
-    return V1_2::LibusbAdapter::GetInstance()->GetDeviceDescriptor(usbDev_, decriptor);
+    return V1_2::LibusbAdapter::GetInstance()->GetDeviceDescriptor(usbDev_, descriptor);
 }
 
-int32_t UsbHostImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor)
+int32_t UsbHostImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     const V1_2::UsbDev &usbDev_ = reinterpret_cast<const V1_2::UsbDev &>(dev);
-    return V1_2::LibusbAdapter::GetInstance()->GetConfigDescriptor(usbDev_, descId, decriptor);
+    return V1_2::LibusbAdapter::GetInstance()->GetConfigDescriptor(usbDev_, descId, descriptor);
 }
 
 int32_t UsbHostImpl::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
