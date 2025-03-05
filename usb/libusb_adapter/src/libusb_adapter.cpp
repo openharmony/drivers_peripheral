@@ -74,7 +74,11 @@ struct CurrentUsbSetting {
     int32_t interfaceNumber = -1;
     int32_t alternateSetting = -1;
 };
-std::vector<std::pair<UsbDev, libusb_device_handle*>> g_handleVector;
+struct HandleCount {
+    libusb_device_handle* handle = nullptr;
+    int32_t count = 0;
+};
+std::map<uint32_t, HandleCount> g_handleMap;
 std::map<uint32_t, std::map<int32_t, std::vector<uint8_t>>> g_InterfaceIdMap;
 std::map<libusb_device_handle*, CurrentUsbSetting> g_deviceSettingsMap;
 std::map<uint32_t, int32_t> g_usbOpenFdMap;
@@ -82,7 +86,7 @@ std::shared_mutex g_mapMutexInterfaceIdMap;
 std::shared_mutex g_mapMutexDeviceSettingsMap;
 std::shared_mutex g_mapMutexContext;
 std::shared_mutex g_mapMutexUsbOpenFdMap;
-std::shared_mutex g_mapMutexHandleVector;
+std::shared_mutex g_mapMutexHandleMap;
 static LibusbAsyncManager g_asyncManager;
 static LibusbBulkManager g_bulkManager;
 #define USB_CTRL_SET_TIMEOUT 5000
@@ -195,19 +199,20 @@ int32_t LibusbAdapter::GetUsbDevice(const UsbDev &dev, libusb_device **device)
 int32_t LibusbAdapter::FindHandleByDev(const UsbDev &dev, libusb_device_handle **handle)
 {
     HDF_LOGD("%{public}s enter", __func__);
-    std::shared_lock<std::shared_mutex> lock(g_mapMutexHandleVector);
-    for (auto it = g_handleVector.begin(); it != g_handleVector.end(); ++it) {
-        if (it->first.busNum == dev.busNum && it->first.devAddr == dev.devAddr) {
-            *handle = it->second;
-            HDF_LOGD("%{public}s Search handle success leave", __func__);
-            return HDF_SUCCESS;
-        }
+    std::shared_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
+    uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
+            static_cast<uint32_t>(dev.devAddr);
+    auto it = g_handleMap.find(result);
+    if (it != g_handleMap.end()) {
+        *handle = it->second.handle;
+        HDF_LOGI("%{public}s Search handle success leave", __func__);
+        return HDF_SUCCESS;
     }
     HDF_LOGE("%{public}s Search handle failed leave", __func__);
     return HDF_DEV_ERR_NO_DEVICE;
 }
 
-int32_t LibusbAdapter::DeleteHandleVectorAndSettingsMap(const UsbDev &dev, libusb_device_handle* handle)
+void LibusbAdapter::DeleteSettingsMap(libusb_device_handle* handle)
 {
     HDF_LOGD("%{public}s enter", __func__);
     {
@@ -217,38 +222,7 @@ int32_t LibusbAdapter::DeleteHandleVectorAndSettingsMap(const UsbDev &dev, libus
             g_deviceSettingsMap.erase(entry);
         }
     }
-    int32_t ret = HDF_FAILURE;
-    {
-        std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleVector);
-        for (auto it = g_handleVector.begin(); it != g_handleVector.end(); ++it) {
-            if (it->first.busNum == dev.busNum && it->first.devAddr == dev.devAddr) {
-                g_handleVector.erase(it);
-                ret = HDF_SUCCESS;
-                break;
-            }
-        }
-    }
-    bool isExist = false;
-    {
-        std::shared_lock<std::shared_mutex> lock(g_mapMutexHandleVector);
-        for (auto it = g_handleVector.begin(); it != g_handleVector.end(); ++it) {
-            if (it->first.busNum == dev.busNum && it->first.devAddr == dev.devAddr) {
-                isExist = true;
-                break;
-            }
-        }
-    }
-    if (!isExist) {
-        std::unique_lock<std::shared_mutex> lock(g_mapMutexInterfaceIdMap);
-        uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
-            static_cast<uint32_t>(dev.devAddr);
-        auto info = g_InterfaceIdMap.find(result);
-        if (info != g_InterfaceIdMap.end()) {
-            g_InterfaceIdMap.erase(result);
-        }
-    }
     HDF_LOGD("%{public}s leave", __func__);
-    return ret;
 }
 
 int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
@@ -267,27 +241,34 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     }
 
     libusb_device_handle* devHandle = nullptr;
-    ret = libusb_open(device, &devHandle);
+    uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
+        static_cast<uint32_t>(dev.devAddr);
+    ret = FindHandleByDev(dev, &devHandle);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
-        HDF_LOGE("%{public}s:Opening device failed ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
+        ret = libusb_open(device, &devHandle);
+        if (ret != HDF_SUCCESS || devHandle == nullptr) {
+            HDF_LOGE("%{public}s:Opening device failed ret = %{public}d", __func__, ret);
+            return HDF_FAILURE;
+        }
+        std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
+        g_handleMap[result] = {devHandle, 1};
+    } else {
+        std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
+        auto it = g_handleMap.find(result);
+        if (it != g_handleMap.end() && (it->second.handle != nullptr)) {
+            it->second.count++;
+        }
     }
     TransferInit(dev);
     BulkTransferInit(dev);
-    {
-        std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleVector);
-        g_handleVector.push_back(std::make_pair(dev, devHandle));
-    }
     int32_t currentConfig = -1;
     ret = GetCurrentConfiguration(devHandle, currentConfig);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: GetCurrentConfiguration failed", __func__);
         return HDF_FAILURE;
     }
-    {
-        std::unique_lock<std::shared_mutex> lock(g_mapMutexDeviceSettingsMap);
-        g_deviceSettingsMap[devHandle].configurationIndex = currentConfig;
-    }
+    std::unique_lock<std::shared_mutex> lock(g_mapMutexDeviceSettingsMap);
+    g_deviceSettingsMap[devHandle].configurationIndex = currentConfig;
     if (!eventThread.joinable()) {
         isRunning = true;
         eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
@@ -307,19 +288,36 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
     }
     uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
         static_cast<uint32_t>(dev.devAddr);
-    ret = DeleteHandleVectorAndSettingsMap(dev, devHandle);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:DeleteHandleVectorAndSettingsMap is failed ret=%{public}d", __func__, ret);
+    std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
+    auto info = g_handleMap.find(result);
+    if (info == g_handleMap.end()) {
+        HDF_LOGE("%{public}s:Failed to find the handle", __func__);
         return HDF_FAILURE;
     }
-    auto it = g_usbOpenFdMap.find(result);
-    if (it != g_usbOpenFdMap.end()) {
-        close(it->second);
-        g_usbOpenFdMap.erase(it);
+    info->second.count--;
+    HDF_LOGI("%{public}s Number of devices that are opened=%{public}d", __func__, info->second.count);
+    if (info->second.count == 0 && (info->second.handle != nullptr)) {
+        {
+            std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
+            auto it = g_usbOpenFdMap.find(result);
+            if (it != g_usbOpenFdMap.end()) {
+                close(it->second);
+                g_usbOpenFdMap.erase(it);
+            }
+        }
+        {
+            std::unique_lock<std::shared_mutex> lock(g_mapMutexInterfaceIdMap);
+            auto InterfaceIt = g_InterfaceIdMap.find(result);
+            if (InterfaceIt != g_InterfaceIdMap.end()) {
+                g_InterfaceIdMap.erase(result);
+            }
+        }
+        DeleteSettingsMap(devHandle);
+        libusb_close(devHandle);
+        TransferRelease(dev);
+        BulkTransferRelease(dev);
+        g_handleMap.erase(info);
     }
-    libusb_close(devHandle);
-    TransferRelease(dev);
-    BulkTransferRelease(dev);
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
@@ -504,7 +502,10 @@ int32_t LibusbAdapter::ManageInterface(const UsbDev &dev, uint8_t interfaceId, b
         HDF_LOGE("%{public}s: GetUsbDevice failed, ret=%{public}d", __func__, ret);
         return HDF_DEV_ERR_NO_DEVICE;
     }
-
+    if (interfaceId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s:interfaceId larger then max num", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     libusb_device_handle *devHandle = nullptr;
     ret = FindHandleByDev(dev, &devHandle);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
@@ -516,7 +517,7 @@ int32_t LibusbAdapter::ManageInterface(const UsbDev &dev, uint8_t interfaceId, b
     } else {
         ret = libusb_attach_kernel_driver(devHandle, interfaceId);
     }
-    if (ret == LIBUSB_ERROR_NOT_FOUND) {
+    if (ret == LIBUSB_ERROR_NOT_FOUND || ret == LIBUSB_ERROR_BUSY) {
         ret = libusb_set_auto_detach_kernel_driver(devHandle, disable);
     }
     if (ret == LIBUSB_ERROR_NO_DEVICE || ret == LIBUSB_ERROR_NOT_SUPPORTED) {
@@ -532,16 +533,6 @@ int32_t LibusbAdapter::ManageInterface(const UsbDev &dev, uint8_t interfaceId, b
 int32_t LibusbAdapter::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
 {
     HDF_LOGI("%{public}s enter", __func__);
-    {
-        std::unique_lock<std::shared_mutex> lock(g_mapMutexInterfaceIdMap);
-        uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
-            static_cast<uint32_t>(dev.devAddr);
-        if (g_InterfaceIdMap.find(result) != g_InterfaceIdMap.end()) {
-            HDF_LOGI("%{public}s erase dev.busNum=%{public}u, dev.devAddr=%{public}u, result=%{public}d,",
-                __func__, dev.busNum, dev.devAddr, result);
-            g_InterfaceIdMap.erase(result);
-        }
-    }
     libusb_device_handle *devHandle = nullptr;
     int32_t ret = FindHandleByDev(dev, &devHandle);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
@@ -552,6 +543,11 @@ int32_t LibusbAdapter::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
     if (interfaceId >= USB_MAX_INTERFACES) {
         HDF_LOGE("%{public}s: interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u",
             __func__, dev.busNum, dev.devAddr, interfaceId);
+        return HDF_FAILURE;
+    }
+    ret = RemoveInterfaceFromMap(dev, devHandle, interfaceId);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: RemoveInterfaceFromMap failed", __func__);
         return HDF_FAILURE;
     }
     ret = libusb_release_interface(devHandle, interfaceId);
@@ -567,11 +563,6 @@ int32_t LibusbAdapter::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         std::unique_lock<std::shared_mutex> lock(g_mapMutexDeviceSettingsMap);
         g_deviceSettingsMap[devHandle].interfaceNumber = -1;
         g_deviceSettingsMap[devHandle].alternateSetting = -1;
-    }
-    ret = RemoveInterfaceFromMap(dev, devHandle, interfaceId);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: RemoveInterfaceFromMap failed", __func__);
-        return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
