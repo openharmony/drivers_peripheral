@@ -329,10 +329,9 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
     std::string tempHexBuff = VectorToHex(vec);
     HDF_LOGI("%{public}s: read msg : %{public}s", __func__, data.data());
     HDF_LOGI("%{public}s: read msg hex : %{public}s", __func__, tempHexBuff.c_str());
-    size = actualLength;
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
-    return HDF_SUCCESS;
+    return actualLength;
 }
 
 int32_t LibusbSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& data, uint32_t size, uint32_t timeout)
@@ -361,7 +360,7 @@ int32_t LibusbSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& da
         HDF_LOGE("%{public}s: libusb claim failed, ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    HDF_LOGI("%{public}s: read msg : %{public}s", __func__, data.data());
+    HDF_LOGI("%{public}s: write msg : %{public}s", __func__, data.data());
     ret = libusb_bulk_transfer(deviceHandleInfo.handle, deviceHandleInfo.outputEndpointAddr,
         const_cast<uint8_t*>(dataOut), data.size(), &actualLength, timeout);
     if (ret < 0) {
@@ -370,10 +369,9 @@ int32_t LibusbSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& da
         libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
         return ret;
     }
-    size = actualLength;
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
-    return HDF_SUCCESS;
+    return actualLength;
 }
 
 int LibusbSerial::GetEndPoint(DeviceHandleInfo *deviceHandleInfo)
