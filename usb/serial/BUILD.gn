@@ -160,6 +160,7 @@ ohos_shared_library("libserial_interface_service_1.0") {
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hilog:libhilog",
+      "hisysevent:libhisysevent",
       "hitrace:hitrace_meter",
       "init:libbegetutil",
       "libusb:libusb",
