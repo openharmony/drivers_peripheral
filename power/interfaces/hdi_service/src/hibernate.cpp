@@ -313,7 +313,7 @@ int32_t Hibernate::EnableSwap()
     HDF_LOGI("swapon begin.");
     int ret = swapon(SWAP_FILE_PATH, 0);
     if (ret < 0) {
-        HDF_LOGE("swapon failed, errno=%{public}d", errno);
+        HDF_LOGE("swapon failed, ret=%{public}d, errno=%{public}d", ret, errno);
         return HDF_FAILURE;
     }
     HDF_LOGI("swapon success.");
@@ -340,7 +340,7 @@ int32_t Hibernate::WriteOffsetAndResume()
 
     bool ret = SaveStringToFd(fd, offsetResume.c_str());
     if (!ret) {
-        HDF_LOGE("WriteOffsetAndResume fail");
+        HDF_LOGE("WriteOffsetAndResume fail, offsetResume: %{public}s", offsetResume.c_str());
         return HDF_FAILURE;
     }
     HDF_LOGI("WriteOffsetAndResume end");
