@@ -552,18 +552,20 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
             numRead = fread(frame, readSize, 1, file);
             if (numRead > 0) {
                 ret = render->RenderFrame(render, frame, readSize, &replyBytes);
-                if (ret < 0) {
-                    if (ret == -1) {
-                        if (tryNumFrame > TRY_NUM_FRAME) {
-                            free(frame);
-                            return ret;
-                        }
-                        tryNumFrame++;
-                        continue;
-                    }
+			    if (ret < 0 && ret == -1 && (tryNumFrame > TRY_NUM_FRAME) {
                     free(frame);
+                    frame = nullptr;
                     return ret;
-                }
+                }			
+			    if (ret < 0 && ret == -1 && (tryNumFrame <= TRY_NUM_FRAME) {
+                    tryNumFrame++;
+                    continue;
+                }				
+			    if (ret < 0 && ret != -1) {
+                    free(frame);
+                    frame = nullptr;
+                    return ret;
+                }				
                 tryNumFrame = 0;
             }
             remainingDataSize -= readSize;
@@ -686,19 +688,19 @@ int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize)
     do {
         if (g_frameStatus) {
             ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
-            if (ret < 0) {
-                if (ret == -1) {
-                    if (tryNumFrame++ > TRY_NUM_FRAME) {
-                        free(frame);
-                        frame = nullptr;
-                        return ret;
-                    }
-                    continue;
-                }
+			if (ret < 0 && ret == -1 && (tryNumFrame++ > TRY_NUM_FRAME) {
                 free(frame);
                 frame = nullptr;
                 return ret;
-            }
+            }			
+			if (ret < 0 && ret == -1 && (tryNumFrame++ <= TRY_NUM_FRAME) {
+                continue;
+            }				
+			if (ret < 0 && ret != -1) {
+                free(frame);
+                frame = nullptr;
+                return ret;
+            }				
             tryNumFrame = 0;
             uint32_t replyByte = static_cast<uint32_t>(replyBytes);
             size_t writeRet = fwrite(frame, replyByte, 1, file);
