@@ -552,7 +552,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
             numRead = fread(frame, readSize, 1, file);
             if (numRead > 0) {
                 ret = render->RenderFrame(render, frame, readSize, &replyBytes);
-                if (ret < 0 && ret == -1 && (tryNumFrame > TRY_NUM_FRAME) {
+                if (ret < 0 && ret == -1 && (tryNumFrame > TRY_NUM_FRAME)) {
                     free(frame);
                     frame = nullptr;
                     return ret;
@@ -565,7 +565,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
                     free(frame);
                     frame = nullptr;
                     return ret;
-                }				
+                }
                 tryNumFrame = 0;
             }
             remainingDataSize -= readSize;
@@ -692,7 +692,7 @@ int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize)
                 free(frame);
                 frame = nullptr;
                 return ret;
-            }			
+            }
             if (ret < 0 && ret == -1 && (tryNumFrame++ <= TRY_NUM_FRAME) {
                 continue;
             }
