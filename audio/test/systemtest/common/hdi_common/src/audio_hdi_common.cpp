@@ -560,7 +560,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
                 if (ret < 0 && ret == -1 && (tryNumFrame <= TRY_NUM_FRAME) {
                     tryNumFrame++;
                     continue;
-                }				
+                }
                 if (ret < 0 && ret != -1) {
                     free(frame);
                     frame = nullptr;
