@@ -693,7 +693,7 @@ int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize)
                 frame = nullptr;
                 return ret;
             }
-            if (ret < 0 && ret == -1 && (tryNumFrame++ <= TRY_NUM_FRAME) {
+            if (ret < 0 && ret == -1 && (tryNumFrame++ <= TRY_NUM_FRAME)) {
                 continue;
             }
             if (ret < 0 && ret != -1) {
