@@ -1968,8 +1968,6 @@ void LibusbAdapter::LibusbEventHandling()
             if (rc != LIBUSB_SUCCESS) {
                 HDF_LOGE("%{public}s: libusb handle events failed: %{public}d", __func__, rc);
             }
-        } else {
-            HDF_LOGE("%{public}s: g_libusb_context is nullptr", __func__);
         }
     }
 }
