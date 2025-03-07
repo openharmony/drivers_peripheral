@@ -1540,7 +1540,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel004, TestSize.Level1)
     pipe.endpointId = CANCEL_POINTID_INVALID;
     ret = g_usbHostInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    EXPECT_NQ(0, ret);
+    EXPECT_NE(0, ret);
     pipe = {interfaceId, pointId};
     ret = g_usbHostInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d again RequestCancel=%{public}d", __LINE__, ret);
