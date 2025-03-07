@@ -676,7 +676,7 @@ int32_t SensorIfService::DisableSensor(int32_t sensorId, uint32_t serviceId)
 {
     SENSOR_TRACE_PID_MSG("sensorId " + std::to_string(sensorId));
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
-        HDF_LOGE("%{public}s There are still some services enable", __func__);
+        HDF_LOGD("%{public}s There are still some services enable", __func__);
         return HDF_SUCCESS;
     }
 
