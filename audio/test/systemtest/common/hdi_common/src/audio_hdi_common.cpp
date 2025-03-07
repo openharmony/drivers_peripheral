@@ -529,7 +529,9 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
     size_t numRead = 0;
     uint64_t replyBytes = 0;
     int32_t tryNumFrame = 0;
-    if (render == nullptr || render->control.Start == nullptr || render->RenderFrame == nullptr || file == nullptr) {
+    bool audioPara = (render == nullptr) || (render->control.Start == nullptr) ||
+        (render->RenderFrame == nullptr) || (file == nullptr);
+    if (audioPara) {
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = render->control.Start((AudioHandle)render);
@@ -541,33 +543,33 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
     if (bufferSize == 0) {
         return HDF_FAILURE;
     }
-    char *frame = nullptr;
-    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
+    char *frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }
     do {
-        if (g_frameStatus) {
-            readSize = (remainingDataSize) > (bufferSize) ? (bufferSize) : (remainingDataSize);
-            numRead = fread(frame, readSize, 1, file);
-            if (numRead > 0) {
-                ret = render->RenderFrame(render, frame, readSize, &replyBytes);
-                if (ret < 0) {
-                    if (ret == -1) {
-                        if (tryNumFrame > TRY_NUM_FRAME) {
-                            free(frame);
-                            return ret;
-                        }
-                        tryNumFrame++;
-                        continue;
-                    }
-                    free(frame);
-                    return ret;
-                }
-                tryNumFrame = 0;
-            }
-            remainingDataSize -= readSize;
+        if (!g_frameStatus) {
+            break;
         }
+        readSize = (remainingDataSize) > (bufferSize) ? (bufferSize) : (remainingDataSize);
+        numRead = fread(frame, readSize, 1, file);
+        if (numRead > 0) {
+            ret = render->RenderFrame(render, frame, readSize, &replyBytes);
+            if (ret < 0 && ret == -1 && (tryNumFrame > TRY_NUM_FRAME)) {
+                free(frame);
+                return ret;
+            }
+            if (ret < 0 && ret == -1 && (tryNumFrame <= TRY_NUM_FRAME)) {
+                tryNumFrame++;
+                continue;
+            }
+            if (ret < 0 && ret != -1) {
+                free(frame);
+                return ret;
+            }
+            tryNumFrame = 0;
+        }
+        remainingDataSize -= readSize;
     } while (readSize > 0 && remainingDataSize > 0);
     free(frame);
     return HDF_SUCCESS;
@@ -686,15 +688,15 @@ int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize)
     do {
         if (g_frameStatus) {
             ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
-            if (ret < 0) {
-                if (ret == -1) {
-                    if (tryNumFrame++ > TRY_NUM_FRAME) {
-                        free(frame);
-                        frame = nullptr;
-                        return ret;
-                    }
-                    continue;
-                }
+            if (ret < 0 && ret == -1 && (tryNumFrame++ > TRY_NUM_FRAME)) {
+                free(frame);
+                frame = nullptr;
+                return ret;
+            }
+            if (ret < 0 && ret == -1 && (tryNumFrame++ <= TRY_NUM_FRAME)) {
+                continue;
+            }
+            if (ret < 0 && ret != -1) {
                 free(frame);
                 frame = nullptr;
                 return ret;
