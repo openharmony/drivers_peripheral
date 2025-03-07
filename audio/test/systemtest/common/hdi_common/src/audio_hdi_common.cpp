@@ -529,7 +529,8 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
     size_t numRead = 0;
     uint64_t replyBytes = 0;
     int32_t tryNumFrame = 0;
-    if (render == nullptr || render->control.Start == nullptr || render->RenderFrame == nullptr || file == nullptr) {
+    bool audiopara = render == nullptr || render->control.Start == nullptr || render->RenderFrame == nullptr || file == nullptr;
+    if (audiopara) {
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = render->control.Start((AudioHandle)render);
@@ -556,7 +557,6 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
             ret = render->RenderFrame(render, frame, readSize, &replyBytes);
             if (ret < 0 && ret == -1 && (tryNumFrame > TRY_NUM_FRAME)) {
                 free(frame);
-                frame = nullptr;
                 return ret;
             }
             if (ret < 0 && ret == -1 && (tryNumFrame <= TRY_NUM_FRAME)) {
@@ -565,7 +565,6 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
             }
             if (ret < 0 && ret != -1) {
                 free(frame);
-                frame = nullptr;
                 return ret;
             }
             tryNumFrame = 0;
