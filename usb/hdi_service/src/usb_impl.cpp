@@ -962,7 +962,7 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *
         ret = subscriber->DeviceEvent(info);
     } else if (id == USB_PNP_NOTIFY_REMOVE_DEVICE) {
         {
-            std::unique_lock<std::shared_mutex> lock(super->openedFdsMutex_);
+            std::lock_guard<std::shared_mutex> lock(super->openedFdsMutex_);
             auto iter = super->openedFds_.find({infoTable->busNum, infoTable->devNum});
             if (iter != super->openedFds_.end()) {
                 int32_t fd = iter->second;
@@ -1344,7 +1344,7 @@ int32_t UsbImpl::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
         fd = handle->devHandle->fd;
         HDF_LOGW("%{public}s:open fd failed, fall back to default", __func__);
     } else {
-        std::shared_lock<std::shared_mutex> lock(openedFdsMutex_);
+        std::lock_guard<std::shared_mutex> lock(openedFdsMutex_);
         auto iter = openedFds_.find({dev.busNum, dev.devAddr});
         if (iter != openedFds_.end()) {
             int32_t oldFd = iter->second;
