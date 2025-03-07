@@ -155,6 +155,7 @@ private:
     int32_t HdfReadDevice(int32_t *count, int32_t *size, HdfSBuf *reply);
     int32_t UsbdReleaseDevices();
     static void ReportUsbdSysEvent(int32_t code, UsbPnpNotifyMatchInfoTable *infoTable);
+    static void UsbdCloseFd(UsbImpl *super, UsbPnpNotifyMatchInfoTable *infoTable);
     static int32_t UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *usbdSubscriber, uint32_t id);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
