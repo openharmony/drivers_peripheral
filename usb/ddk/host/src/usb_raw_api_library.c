@@ -202,6 +202,23 @@ static int32_t FindNextDescriptor(const uint8_t *buffer, size_t size)
 
     return buffer - buffer0;
 }
+
+int32_t GetDeviceFd(struct UsbDevice *dev, mode_t mode)
+{
+    if (dev == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+    if (!osAdapterOps || !osAdapterOps->getDeviceFd) {
+        HDF_LOGE("%{public}s: not supported", __func__);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    return osAdapterOps->getDeviceFd(dev, mode);
+}
+
 static int32_t GetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIdx, uint8_t *buffer, size_t size)
 {
     int32_t ret;
