@@ -192,7 +192,7 @@ private:
     static uint32_t attachFailedCount_;
     static UsbdLoadService loadUsbService_;
     static UsbdLoadService loadHdfEdm_;
-    std::shared_mutex openedFdsMutex_;
+    std::mutex openedFdsMutex_;
     std::map<std::pair<uint8_t, uint8_t>, int32_t> openedFds_;
 };
 } // namespace V1_2
