@@ -16,6 +16,8 @@
 #ifndef USB_RAW_API_LIBRARY_H
 #define USB_RAW_API_LIBRARY_H
 
+#include <fcntl.h>
+
 #include "hdf_device_desc.h"
 #include "hdf_usb_pnp_manage.h"
 #include "usb_session.h"
@@ -144,6 +146,7 @@ int32_t RawUsbGetUsbSpeed(const struct UsbDeviceHandle *devHandle);
 bool RawGetInterfaceActiveStatus(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
 int32_t RawUsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle);
 int32_t RawUsbControlMsg(const struct UsbDeviceHandle *devHandle,  struct UsbControlRequestData *ctrlData);
+int32_t GetDeviceFd(struct UsbDevice *dev, mode_t mode);
 
 #ifdef __cplusplus
 }
