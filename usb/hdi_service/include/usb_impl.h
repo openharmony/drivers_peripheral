@@ -17,7 +17,7 @@
 #define OHOS_HDI_USB_V1_2_USBIMPL_H
 
 #include <map>
-#include <shared_mutex>
+#include <mutex>
 
 #include "hdf_slist.h"
 #include "hdf_usb_pnp_manage.h"
