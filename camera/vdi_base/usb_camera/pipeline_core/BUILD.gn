@@ -158,6 +158,7 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_single",
     "libexif:libexif",
     "libjpeg-turbo:turbojpeg_static",
