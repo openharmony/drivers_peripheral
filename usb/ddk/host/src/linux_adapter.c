@@ -211,6 +211,45 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
     return ret;
 }
 
+static int32_t AdapterGetUsbDeviceFd(struct UsbDevice *dev, mode_t mode)
+{
+    if (dev == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    char pathBuf[PATH_LEN] = {'\0'};
+    int32_t ret = GetUsbDevicePath(dev, pathBuf, PATH_LEN);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get usb device path failed:%{public}d", __func__, ret);
+        return ret;
+    }
+
+    int32_t fd = open(pathBuf, mode | O_CLOEXEC);
+    if (fd != HDF_FAILURE) {
+        HDF_LOGI("%{public}s: path: %{public}s, fd: %{public}d", __func__, pathBuf, fd);
+        return fd;
+    }
+    usleep(SLEEP_TIME);
+    switch (errno) {
+        case ENOENT:
+            fd = open(pathBuf, mode | O_CLOEXEC);
+            if (fd != HDF_FAILURE) {
+                return fd;
+            }
+            ret = HDF_DEV_ERR_NO_DEVICE;
+            break;
+        case EACCES:
+            ret = HDF_ERR_BAD_FD;
+            break;
+        default:
+            ret = HDF_FAILURE;
+            break;
+    }
+
+    return ret;
+}
+
 static int32_t OsReadDescriptors(struct UsbDevice *dev)
 {
     int32_t fd = dev->devHandle->fd;
@@ -1560,6 +1599,7 @@ static struct UsbOsAdapterOps g_usbAdapter = {
     .usbControlMsg = AdapterUsbControlMsg,
     .getUsbSpeed = AdapterGetUsbSpeed,
     .getInterfaceActiveStatus = AdapterGetInterfaceActiveStatus,
+    .getDeviceFd = AdapterGetUsbDeviceFd,
 };
 
 static void OsSignalHandler(int32_t signo)

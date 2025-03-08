@@ -920,6 +920,21 @@ void UsbImpl::ReportUsbdSysEvent(int32_t code, UsbPnpNotifyMatchInfoTable *infoT
     }
 }
 
+void UsbImpl::UsbdCloseFd(UsbImpl *super, UsbPnpNotifyMatchInfoTable *infoTable)
+{
+    std::lock_guard<std::mutex> lock(super->openedFdsMutex_);
+    auto iter = super->openedFds_.find({infoTable->busNum, infoTable->devNum});
+    if (iter != super->openedFds_.end()) {
+        int32_t fd = iter->second;
+        int res = close(fd);
+        super->openedFds_.erase(iter);
+        HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
+            __func__, __LINE__, iter->second, res);
+    } else {
+        HDF_LOGI("%{public}s:%{public}d not opened", __func__, __LINE__);
+    }
+}
+
 int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *usbdSubscriber, uint32_t id)
 {
     if (data == nullptr) {
@@ -961,6 +976,7 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *
         }
         ret = subscriber->DeviceEvent(info);
     } else if (id == USB_PNP_NOTIFY_REMOVE_DEVICE) {
+        UsbImpl::UsbdCloseFd(super, infoTable);
         UsbdDispatcher::UsbdDeviceDettach(super, infoTable->busNum, infoTable->devNum);
         USBDeviceInfo info = {ACT_DEVDOWN, infoTable->busNum, infoTable->devNum};
         if (subscriber == nullptr) {
@@ -1327,7 +1343,24 @@ int32_t UsbImpl::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
 
     UsbInterfaceHandleEntity *handle = reinterpret_cast<UsbInterfaceHandleEntity *>(port->ctrDevHandle);
     OsalMutexLock(&handle->devHandle->lock);
-    fd = handle->devHandle->fd;
+    fd = GetDeviceFd(handle->devHandle->dev, O_RDWR);
+    if (fd <= 0) {
+        fd = handle->devHandle->fd;
+        HDF_LOGW("%{public}s:open fd failed, fall back to default", __func__);
+    } else {
+        std::lock_guard<std::mutex> lock(openedFdsMutex_);
+        auto iter = openedFds_.find({dev.busNum, dev.devAddr});
+        if (iter != openedFds_.end()) {
+            int32_t oldFd = iter->second;
+            int res = close(oldFd);
+            HDF_LOGI("%{public}s:%{public}d close old %{public}d ret = %{public}d",
+                __func__, __LINE__, iter->second, res);
+        } else {
+            HDF_LOGI("%{public}s:%{public}d first time get fd", __func__, __LINE__);
+        }
+        openedFds_[{dev.busNum, dev.devAddr}] = fd;
+        HDF_LOGI("%{public}s:%{public}d opened %{public}d", __func__, __LINE__, fd);
+    }
     OsalMutexUnlock(&handle->devHandle->lock);
     return HDF_SUCCESS;
 #else
