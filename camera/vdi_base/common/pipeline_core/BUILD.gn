@@ -155,6 +155,7 @@ ohos_shared_library("peripheral_camera_pipeline_core") {
     external_deps = [
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
+      "hisysevent:libhisysevent",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
