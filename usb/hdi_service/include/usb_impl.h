@@ -16,6 +16,9 @@
 #ifndef OHOS_HDI_USB_V1_2_USBIMPL_H
 #define OHOS_HDI_USB_V1_2_USBIMPL_H
 
+#include <map>
+#include <mutex>
+
 #include "hdf_slist.h"
 #include "hdf_usb_pnp_manage.h"
 #include "iproxy_broker.h"
@@ -152,6 +155,7 @@ private:
     int32_t HdfReadDevice(int32_t *count, int32_t *size, HdfSBuf *reply);
     int32_t UsbdReleaseDevices();
     static void ReportUsbdSysEvent(int32_t code, UsbPnpNotifyMatchInfoTable *infoTable);
+    static void UsbdCloseFd(UsbImpl *super, UsbPnpNotifyMatchInfoTable *infoTable);
     static int32_t UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *usbdSubscriber, uint32_t id);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
@@ -189,6 +193,8 @@ private:
     static uint32_t attachFailedCount_;
     static UsbdLoadService loadUsbService_;
     static UsbdLoadService loadHdfEdm_;
+    std::mutex openedFdsMutex_;
+    std::map<std::pair<uint8_t, uint8_t>, int32_t> openedFds_;
 };
 } // namespace V1_2
 } // namespace Usb
