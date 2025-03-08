@@ -1566,12 +1566,17 @@ int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifNam
     char buf[CMD_SIZE] = {0};
 
     int32_t ret = 0;
-    if (ifName == NULL) {
+    if (ifName == NULL || carryData == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     pthread_mutex_lock(GetInterfaceLock());
     switch (cmdType) {
+        case P2P_REJECT: {
+            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+                "IFNAME=%s P2P_REJECT %s", ifName, carryData);
+            break;
+        }
         case P2P_REMOVE_GROUP_CLIENT: {
             ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
                 "IFNAME=%s P2P_REMOVE_CLIENT %s", ifName, carryData);
