@@ -117,7 +117,7 @@ const int32_t VIDEO_KEY_BURST_SEQUENCE_ID = 0x0D;
  * @brief Indicates the rotation of thumbnail. The value type is int32_t.
  */
 const std::string dataRotation = "dataRotation";
-const int32_t VIDEO_KEY_THUMBNAIL_ROTATION = 0x0E;
+const int32_t VIDEO_KEY_THUMBNAIL_ROTATION = 0x0F;
 
 /**
  * @brief Indicates the stride of thumbnail. The value type is int32_t.
