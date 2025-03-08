@@ -304,6 +304,44 @@ int32_t RilImpl::CleanAllConnections(int32_t slotId, int32_t serialId)
     return TaskSchedule(&Telephony::HRilManager::CleanAllConnections, slotId, serialId);
 }
 
+int32_t RilImpl::SendUrspDecodeResult(int32_t slotId,
+    int32_t serialId, const UePolicyDecodeResult &uePolicyDecodeResult)
+{
+    HDF_LOGI("RilImpl::SendUrspDecodeResult");
+    return TaskSchedule(&Telephony::HRilManager::SendUrspDecodeResult,
+        slotId, serialId, uePolicyDecodeResult);
+}
+ 
+int32_t RilImpl::SendUePolicySectionIdentifier(int32_t slotId, int32_t serialId,
+    const UePolicySectionIdentifier &uePolicySectionIdentifier)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendUePolicySectionIdentifier,
+        slotId, serialId, uePolicySectionIdentifier);
+}
+
+int32_t RilImpl::SendImsRsdList(int32_t slotId, int32_t serialId, const ImsRsdList &imsRsdList)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendImsRsdList, slotId, serialId, imsRsdList);
+}
+
+int32_t RilImpl::GetNetworkSliceAllowedNssai(int32_t slotId, int32_t serialId,
+    const SyncAllowedNssaiInfo &syncAllowedNssaiInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetNetworkSliceAllowedNssai, slotId, serialId, syncAllowedNssaiInfo);
+}
+
+int32_t RilImpl::GetNetworkSliceEhplmn(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetNetworkSliceEhplmn, slotId, serialId);
+}
+
+int32_t RilImpl::ActivatePdpContextWithApnTypesforSlice(int32_t slotId, int32_t serialId,
+    const DataCallInfoWithApnTypesforSlice &dataCallInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::ActivatePdpContextWithApnTypesforSlice,
+        slotId, serialId, dataCallInfo);
+}
+
 // Modem
 int32_t RilImpl::SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst)
 {
