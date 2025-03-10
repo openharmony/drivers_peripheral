@@ -378,7 +378,7 @@ void InputDeviceManager::ReloadInputDevices(std::vector<std::string> flist)
             return;
         }
         devIndex_ = static_cast<uint32_t>(curDevIndex);
-        (void)memset_s(&inputDevNode, sizeof(inputDevNode), 0, sizeof(inputDevNode));
+        static_cast<void>(memset_s(&inputDevNode, sizeof(inputDevNode), 0, sizeof(inputDevNode)));
         int32_t ret = CreateInputDevListNode(inputDevNode, flist[i]);
         if (ret == MEMCPY_ERROR) {
             return;
