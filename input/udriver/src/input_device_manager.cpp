@@ -313,6 +313,7 @@ int32_t InputDeviceManager::CreateInputDevListNode(InputDevListNode &inputDevNod
     }
     std::shared_ptr<InputDeviceInfo> detailInfo = std::make_shared<InputDeviceInfo>();
     (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
+    (void)memset_s(&inputDevNode, sizeof(inputDevNode), 0, sizeof(inputDevNode));
     (void)GetInputDeviceInfo(fd, detailInfo.get());
     auto sDevName = string(detailInfo->attrSet.devName);
     uint32_t type = GetInputDeviceTypeInfo(sDevName);
