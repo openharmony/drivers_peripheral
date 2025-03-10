@@ -379,7 +379,7 @@ void InputDeviceManager::ReloadInputDevices(std::vector<std::string> flist)
             return;
         }
         devIndex_ = static_cast<uint32_t>(curDevIndex);
-        ret = CreateInputDevListNode(inputDevNode, flist[i]);
+        int32_t ret = CreateInputDevListNode(inputDevNode, flist[i]);
         if (ret == MEMCPY_ERROR) {
             return;
         }
