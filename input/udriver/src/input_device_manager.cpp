@@ -313,6 +313,7 @@ int32_t InputDeviceManager::CreateInputDevListNode(InputDevListNode &inputDevNod
     }
     std::shared_ptr<InputDeviceInfo> detailInfo = std::make_shared<InputDeviceInfo>();
     (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
+    (void)memset_s(&inputDevNode, sizeof(inputDevNode), 0, sizeof(inputDevNode));
     (void)GetInputDeviceInfo(fd, detailInfo.get());
     auto sDevName = string(detailInfo->attrSet.devName);
     uint32_t type = GetInputDeviceTypeInfo(sDevName);
@@ -378,8 +379,7 @@ void InputDeviceManager::ReloadInputDevices(std::vector<std::string> flist)
             return;
         }
         devIndex_ = static_cast<uint32_t>(curDevIndex);
-        static_cast<void>(memset_s(&inputDevNode, sizeof(inputDevNode), 0, sizeof(inputDevNode)));
-        int32_t ret = CreateInputDevListNode(inputDevNode, flist[i]);
+        ret = CreateInputDevListNode(inputDevNode, flist[i]);
         if (ret == MEMCPY_ERROR) {
             return;
         }
