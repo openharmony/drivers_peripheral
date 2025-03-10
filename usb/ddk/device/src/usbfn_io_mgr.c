@@ -151,6 +151,13 @@ int32_t UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
         return HDF_ERR_INVALID_PARAM;
     }
 
+    if (reqList->entry.prev != NULL && rreqList->entry.next != NULL) {
+        DListRemove(&req->list);
+    } else if (reqList->entry.prev == NULL) {
+        DListRemove(&reqList->entry->next);
+    } else {
+        DListRemove(&reqList->entry->prev);
+    }
     DListRemove(&reqList->entry);
     UsbFnMemFree(reqList);
     return 0;
