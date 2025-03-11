@@ -1963,12 +1963,13 @@ void LibusbAdapter::LibusbEventHandling()
 {
     HDF_LOGI("%{public}s: libusb event handling thread started.", __func__);
     while (isRunning) {
-        int rc = libusb_handle_events_completed(g_libusb_context, nullptr);
-        if (rc != LIBUSB_SUCCESS) {
-            HDF_LOGE("%{public}s: libusb handle events failed: %{public}d", __func__, rc);
+        if (g_libusb_context != nullptr) {
+            int rc = libusb_handle_events_completed(g_libusb_context, nullptr);
+            if (rc != LIBUSB_SUCCESS) {
+                HDF_LOGE("%{public}s: libusb handle events failed: %{public}d", __func__, rc);
+            }
         }
     }
-    HDF_LOGI("%{public}s:libusb event handling thread ended.", __func__);
 }
 
 int32_t LibusbAdapter::FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer, libusb_device_handle *devHandle,
@@ -2319,6 +2320,10 @@ int32_t LibusbAdapter::WriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, u
 int32_t LibusbAdapter::GetDevices(std::vector<struct DeviceInfo> &devices)
 {
     HDF_LOGD("%{public}s: enter", __func__);
+    if (g_libusb_context == nullptr) {
+        HDF_LOGE("%{public}s: g_libusb_context is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     libusb_device **devs = nullptr;
     ssize_t count = libusb_get_device_list(g_libusb_context, &devs);
     HDF_LOGI("%{public}s: libusb_get_device_list return count: %{public}zu", __func__, count);
@@ -2836,8 +2841,8 @@ void LibusbAdapter::GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSu
 int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s subsriber is nullptr", __func__);
+    if (subscriber == nullptr || g_libusb_context == nullptr) {
+        HDF_LOGE("%{public}s subsriber or g_libusb_context is nullptr", __func__);
         return HDF_FAILURE;
     }
     if (subscribers_.size() == 0) {
@@ -2893,8 +2898,8 @@ int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* devic
 int32_t LibusbAdapter::SetLoadUsbSaSubscriber(sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    if (libUsbSaSubscriber == nullptr) {
-        HDF_LOGE("%{public}s subsriber is nullptr", __func__);
+    if (libUsbSaSubscriber == nullptr || g_libusb_context == nullptr) {
+        HDF_LOGE("%{public}s subsriber or g_libusb_context is nullptr", __func__);
         return HDF_FAILURE;
     }
     int rc = libusb_hotplug_register_callback(g_libusb_context,
