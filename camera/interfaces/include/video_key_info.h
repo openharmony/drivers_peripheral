@@ -114,6 +114,12 @@ const std::string burstSequenceId = "burstSequenceId";
 const int32_t VIDEO_KEY_BURST_SEQUENCE_ID = 0x0D;
 
 /**
+ * @brief Indicates the sequenceId of cloud image enhance flag. The value type is bool.
+ */
+const std::string cloudImageEnhanceFlag = "cloudImageEnhanceFlag";
+const int32_t VIDEO_KEY_BURST_CLOUD_IMAGE_ENHANCE_FLAG = 0x0E;
+
+/**
  * @brief Indicates the rotation of thumbnail. The value type is int32_t.
  */
 const std::string dataRotation = "dataRotation";
@@ -124,6 +130,6 @@ const int32_t VIDEO_KEY_THUMBNAIL_ROTATION = 0x0F;
  */
 const std::string dataStride = "dataStride";
 const int32_t VIDEO_KEY_THUMBNAIL_STRIDE = 0x10;
-
+ 
 } // end namespace OHOS::Camera
 #endif
