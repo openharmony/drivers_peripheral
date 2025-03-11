@@ -414,7 +414,7 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
     libusb_device* device = GetDevice(portId);
     if (device == nullptr) {
         HDF_LOGE("%{public}s: libusb_device is null", __func__);
-        return ERR_CODE_IOEXCEPTION;
+        return HDF_FAILURE;
     }
     DeviceHandleInfo deviceHandleInfo = devices_[device];
     if (!deviceHandleInfo.isOpen) {
@@ -443,7 +443,7 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
         attribute.dataBits, attribute.stopBits, attribute.parity);
     if (ret < 0) {
         HDF_LOGE("%{public}s: libusb get attribute failed, ret:%{public}d", __func__, ret);
-        return ret;
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
@@ -456,7 +456,7 @@ int32_t LibusbSerial::SerialSetAttribute(int32_t portId, const struct SerialAttr
     HDF_LOGI("%{public}s: enter setAttribute msg", __func__);
     libusb_device* device = GetDevice(portId);
     if (device == nullptr) {
-        return ERR_CODE_IOEXCEPTION;
+        return HDF_FAILURE;
     }
     DeviceHandleInfo deviceHandleInfo = devices_[device];
     if (!deviceHandleInfo.isOpen) {
@@ -482,7 +482,7 @@ int32_t LibusbSerial::SerialSetAttribute(int32_t portId, const struct SerialAttr
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     if (ret < 0) {
         HDF_LOGE("%{public}s: libusb set attribute failed, ret:%{public}d", __func__, ret);
-        return ret;
+        return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s: set attribute success", __func__);
     return HDF_SUCCESS;
