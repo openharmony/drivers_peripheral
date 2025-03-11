@@ -252,7 +252,11 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
         OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
         goto ERROR;
     }
-    DListRemove(&reqEntry->list);
+    if (reqEntry->list.prev != NULL && reqEntry->list.next != NULL) {
+        DListRemove(&reqEntry->list);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     *request = (struct UsbHostRequest *)reqEntry;
     OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
 

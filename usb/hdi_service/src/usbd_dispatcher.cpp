@@ -1143,7 +1143,11 @@ UsbdBulkASyncReqNode *UsbdDispatcher::UsbdBulkASyncReqGetENode(UsbdBulkASyncReqL
     UsbdBulkASyncReqNode *ptr = DLIST_FIRST_ENTRY(&list->eList, UsbdBulkASyncReqNode, node);
     if (ptr != nullptr) {
         ptr->use = USBD_REQNODE_OTHER;
-        DListRemove(&ptr->node);
+        if (ptr->node.prev != NULL && ptr->node.next != NULL) {
+            DListRemove(&ptr->node);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
     }
     OsalMutexUnlock(&list->elock);
     return ptr;

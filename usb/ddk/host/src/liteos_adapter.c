@@ -190,7 +190,11 @@ static int32_t OsReapUrb(const struct UsbDeviceHandle *handle, struct Async **ur
     LOS_SpinLockSave(&osDev->completeLock, &save);
     if (!DListIsEmpty(&osDev->asyncCompleted)) {
         as = DLIST_FIRST_ENTRY(&osDev->asyncCompleted, struct Async, asynclist);
-        DListRemove(&as->asynclist);
+        if (as->asynclist.prev != NULL && as->asynclist.next != NULL) {
+            DListRemove(&as->asynclist);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
     }
     LOS_SpinUnlockRestore(&osDev->completeLock, save);
     *urb = as;

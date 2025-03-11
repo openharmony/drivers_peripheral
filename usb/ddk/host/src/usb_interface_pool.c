@@ -76,7 +76,11 @@ static HDF_STATUS IfDestroyPipeObj(const struct UsbSdkInterface *interfaceObj, c
     DLIST_FOR_EACH_ENTRY_SAFE(pipePos, pipeTemp, &interfaceObj->pipeList, struct UsbPipe, object.entry) {
         if (destroyFlag || pipePos->object.objectId == pipeObj->object.objectId) {
             found = true;
-            DListRemove(&pipePos->object.entry);
+            if (pipePos->object.entry.prev != NULL && pipePos->object.entry.next != NULL) {
+                DListRemove(&pipePos->object.entry);
+            } else {
+                HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+            }
             ret = IfFreePipeObj(pipePos);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s:%{public}d IfFreePipeObj failed, ret = %{public}d ", __func__, __LINE__, ret);
@@ -207,7 +211,11 @@ static HDF_STATUS IfDestroyInterfacePool(const struct UsbInterfacePool *interfac
         interfacePoolPos, interfacePoolTemp, &session->ifacePoolList, struct UsbInterfacePool, object.entry) {
         if (interfacePoolPos->object.objectId == interfacePool->object.objectId) {
             found = true;
-            DListRemove(&interfacePoolPos->object.entry);
+            if (interfacePoolPos->object.entry.prev != NULL && interfacePoolPos->object.entry.next != NULL) {
+                DListRemove(&interfacePoolPos->object.entry);
+            } else {
+                HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+            }
             ret = IfFreeInterfacePool(interfacePoolPos);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s:%{public}d IfFreeInterfacePool failed, ret = %{public}d", __func__, __LINE__, ret);
@@ -915,7 +923,12 @@ HDF_STATUS UsbIfDestroyInterfaceObj(
         interfacePos, interfaceTemp, &interfacePool->interfaceList, struct UsbSdkInterface, interface.object.entry) {
         if (destroyFlag || interfacePos->interface.object.objectId == interfaceObj->interface.object.objectId) {
             found = true;
-            DListRemove(&interfacePos->interface.object.entry);
+            if (interfacePos->interface.object.entry.prev != NULL &&
+                interfacePos->interface.object.entry.next != NULL) {
+                DListRemove(&interfacePos->interface.object.entry);
+            } else {
+                HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+            }
             ret = IfFreeInterfaceObj(interfacePos);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s:%{public}d IfFreeInterfaceObj failed, ret = %{public}d", __func__, __LINE__, ret);

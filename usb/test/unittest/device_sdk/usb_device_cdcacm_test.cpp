@@ -594,7 +594,11 @@ static struct UsbFnRequest *GetCtrlReq(struct AcmDevice *acm)
     struct DListHead *pool = &acm->ctrlPool;
     if (!DListIsEmpty(pool)) {
         req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
     }
     return req;
 }
@@ -761,7 +765,9 @@ static int32_t FreeCtrlRequests(struct AcmDevice * const acmDevice)
 
     while (!DListIsEmpty(head)) {
         req = DLIST_FIRST_ENTRY(head, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        }
         OsalMemFree(req->context);
         (void)UsbFnFreeRequest(req);
         acmDevice->ctrlReqNum--;
