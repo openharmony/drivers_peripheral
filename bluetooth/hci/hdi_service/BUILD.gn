@@ -12,7 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//out/products_ext/homs_ext_var.gni")
+import("//out/products_ext/hmos_ext_var.gni")
 
 root_path = "//drivers/peripheral/bluetooth/hci/hdi_service"
 
