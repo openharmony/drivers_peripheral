@@ -12,7 +12,10 @@
 # limitations under the License.
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//out/products_ext/hmos_ext_var.gni")
+
+declare_args() {
+  drivers_peripheral_bluetooth_pc_ability = false;
+}
 
 root_path = "//drivers/peripheral/bluetooth/hci/hdi_service"
 
@@ -22,6 +25,10 @@ ohos_shared_library("libhci_interface_service_1.0") {
     "$root_path",
     "$root_path/implement",
   ]
+
+  if (drivers_peripheral_bluetooth_pc_ability) {
+    defines = ["BT_MAC_UPDATE"]
+  }
 
   sources = [
     "$root_path/hci_interface_impl.cpp",

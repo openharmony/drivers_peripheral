@@ -128,7 +128,7 @@ bool BluetoothAddress::CheckAddress(char *address)
     return false;
 }
 
-#ifdef PC_STANDARD
+#ifdef BT_MAC_UPDATE
 // system boot less 2min, need ReadbtAddress from NV
 bool BluetoothAddress::NeedReloadAddress()
 {
@@ -148,7 +148,7 @@ bool BluetoothAddress::NeedReloadAddress()
 
 std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::string &path)
 {
-#ifdef PC_STANDARD
+#ifdef BT_MAC_UPDATE
     if (NeedReloadAddress()) {
         return GenerateDeviceAddressFile();
     }
