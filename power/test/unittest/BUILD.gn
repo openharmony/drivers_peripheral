@@ -88,7 +88,4 @@ ohos_unittest("hdi_unittest_power_runninglock") {
   if (has_power_c_utils_part) {
     external_deps += [ "c_utils:utils" ]
   }
-  if (has_power_hisysevent_part) {
-    external_deps += [ "hisysevent:libhisysevent" ]
-  }
 }
