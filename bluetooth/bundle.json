@@ -12,7 +12,10 @@
   "component": {
     "name": "drivers_peripheral_bluetooth",
     "subsystem": "hdf",
-    "features": ["drivers_peripheral_bluetooth_a2dp_hdi"],
+    "features": [
+      "drivers_peripheral_bluetooth_a2dp_hdi",
+      "drivers_peripheral_bluetooth_pc_ability"
+    ],
     "adapted_system_type": ["standard"],
     "rom": "615KB",
     "ram": "7400KB",
