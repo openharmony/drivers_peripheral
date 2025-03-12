@@ -284,7 +284,11 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
         HDF_LOGE("%{public}s:%{public}d UsbFnMgrDeviceRemove failed", __func__, __LINE__);
         return ret;
     }
-    DListRemove(&fnDevice->object.entry);
+    if (fnDevice->object.entry.prev != NULL && fnDevice->object.entry.next != NULL) {
+        DListRemove(&fnDevice->object.entry);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     UsbFnCfgMgrUnRegisterAllProp();
 
     if (fnDevMgr->funcMgr != NULL) {

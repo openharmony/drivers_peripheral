@@ -151,7 +151,11 @@ int32_t UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    DListRemove(&reqList->entry);
+    if (reqList->entry.prev != NULL && reqList->entry.next != NULL) {
+        DListRemove(&reqList->entry);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     UsbFnMemFree(reqList);
     return 0;
 }
