@@ -2879,20 +2879,35 @@ void NotifyAllSubscriber(std::list<sptr<V2_0::IUsbdSubscriber>> subscribers, V2_
     }
 }
 
+void RunHotplugTask(std::list<sptr<V2_0::IUsbdSubscriber>> subscribers, V2_0::USBDeviceInfo info)
+{
+    HDF_LOGI("%{public}s: enter.", __func__);
+    std::thread hotplugThread([subscribers, info]() {
+        NotifyAllSubscriber(subscribers, info);
+    });
+    hotplugThread.detach();
+}
+
 int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* device,
     libusb_hotplug_event event, void* user_data)
 {
     HDF_LOGI("%{public}s: enter.", __func__);
+    struct libusb_device_descriptor devDesc;
+    libusb_get_device_descriptor(device, &devDesc);
+    if (devDesc.bDeviceClass == LIBUSB_CLASS_HUB) {
+        HDF_LOGW("%{public}s: do not handle hub class device", __func__);
+        return HDF_SUCCESS;
+    }
     if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
         HDF_LOGD("%{public}s: event=%{public}d arrival device", __func__, event);
         V2_0::USBDeviceInfo info = {ACT_DEVUP, libusb_get_bus_number(device),
             libusb_get_device_address(device)};
-        NotifyAllSubscriber(LibusbAdapter::subscribers_, info);
+        RunHotplugTask(LibusbAdapter::subscribers_, info);
     } else if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT) {
         HDF_LOGD("%{public}s: event=%{public}d remove device", __func__, event);
         V2_0::USBDeviceInfo info = {ACT_DEVDOWN, libusb_get_bus_number(device),
             libusb_get_device_address(device)};
-        NotifyAllSubscriber(LibusbAdapter::subscribers_, info);
+        RunHotplugTask(LibusbAdapter::subscribers_, info);
     }
     return HDF_SUCCESS;
 }
