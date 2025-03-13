@@ -137,8 +137,7 @@ static int32_t VerifyParamsOfAudioCreateRenderVdi(struct IAudioAdapter *adapter,
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(renderId, HDF_ERR_INVALID_PARAM);
 
-    if (desc->pins == PIN_OUT_LINEOUT || desc->pins == PIN_OUT_HDMI ||
-        desc->pins == PIN_NONE || desc->pins >= PIN_IN_MIC) {
+    if (desc->pins == PIN_OUT_LINEOUT || desc->pins == PIN_NONE || desc->pins >= PIN_IN_MIC) {
         AUDIO_FUNC_LOGE("invalid pin [%{public}d]", desc->pins);
         return HDF_FAILURE;
     }
