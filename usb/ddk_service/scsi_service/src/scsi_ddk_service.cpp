@@ -81,6 +81,7 @@ constexpr uint8_t OPERATION_CODE_VERIFY10 = 0x2F;
 constexpr uint8_t CDB_LENGTH_SIX = 6;
 constexpr uint8_t CDB_LENGTH_TEN = 10;
 constexpr uint32_t MAX_TRANSFER_BYTES = UINT32_MAX;
+constexpr uint32_t MAX_MEM_MAP_SIZE = UINT32_MAX;
 constexpr const char* SCSIPERIPHERAL_DEVICE_MMAP_PATH = "/data/service/el1/public/usb/scsi";
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_SCSI_PERIPHERAL";
 std::mutex g_memMapMutex;
@@ -180,8 +181,8 @@ static void BuildCdbForReadAndWrite(const ScsiPeripheralIORequest& request, unsi
 static int32_t AllocateAndInitializeBuffer(const ScsiPeripheralDevice& dev, uint32_t memMapSize, uint8_t*& buffer,
     uint16_t allocationLength)
 {
-    if (memMapSize < allocationLength) {
-        HDF_LOGE("%{public}s: memMapSize is too small. memMapSize=%{public}d, allocationLength=%{public}d", __func__,
+    if (memMapSize < allocationLength || memMapSize > MAX_MEM_MAP_SIZE) {
+        HDF_LOGE("%{public}s: memMapSize is invalid. memMapSize=%{public}d, allocationLength=%{public}d", __func__,
             memMapSize, allocationLength);
         return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
     }
@@ -596,8 +597,8 @@ int32_t ScsiDdkService::Write10(const ScsiPeripheralDevice& dev,
     std::lock_guard<std::mutex> lock(g_memMapMutex);
     uint32_t memMapSize = request.memMapSize;
     uint32_t bufferSize = request.transferLength * dev.lbLength;
-    if (memMapSize < bufferSize) {
-        HDF_LOGE("%{public}s: memMapSize is too small. memMapSize=%{public}d, bufferSize=%{public}d", __func__,
+    if (memMapSize < bufferSize || memMapSize > MAX_MEM_MAP_SIZE) {
+        HDF_LOGE("%{public}s: memMapSize is invalid. memMapSize=%{public}d, bufferSize=%{public}d", __func__,
             memMapSize, bufferSize);
         return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
     }
@@ -689,6 +690,11 @@ int32_t ScsiDdkService::SendRequestByCDB(const ScsiPeripheralDevice& dev,
 
     std::lock_guard<std::mutex> lock(g_memMapMutex);
     uint32_t memMapSize = request.memMapSize;
+    if (memMapSize > MAX_MEM_MAP_SIZE) {
+        HDF_LOGE("%{public}s: memMapSize is too large. memMapSize=%{public}d, MAX_MEM_MAP_SIZE=%{public}d", __func__,
+            memMapSize, MAX_MEM_MAP_SIZE);
+        return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
+    }
     auto buffer = static_cast<uint8_t *>(mmap(nullptr, memMapSize, PROT_READ | PROT_WRITE, MAP_SHARED,
         dev.memMapFd, 0));
     if (buffer == MAP_FAILED) {
