@@ -47,7 +47,7 @@ namespace V1_0 {
 #define DIRECT_NUM 2
 #define TRANSFER_CONTROL_OUT_CODE 0x20
 #define TRANSFER_CONTROL_IN_CODE 0x21
-#define RETRY_TIMEOUT 200
+#define RETRY_TIMEOUT 10
 #define RETRY_NUM 5
 #define BUFFER_SIZE 256
 #define SERIAL_NUM 256
@@ -161,10 +161,7 @@ void LibusbSerial::GetExistedDevices()
         if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
             continue;
         }
-        int num = GetPortIdByDevice(device);
-        if (num >= 0) {
-            HandleDeviceArrival(device);
-        }
+        HandleDeviceArrival(device);
     }
 
     libusb_free_device_list(device_list, ENABLE_UNREF);
@@ -414,7 +411,7 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
     libusb_device* device = GetDevice(portId);
     if (device == nullptr) {
         HDF_LOGE("%{public}s: libusb_device is null", __func__);
-        return ERR_CODE_IOEXCEPTION;
+        return HDF_FAILURE;
     }
     DeviceHandleInfo deviceHandleInfo = devices_[device];
     if (!deviceHandleInfo.isOpen) {
@@ -443,7 +440,7 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
         attribute.dataBits, attribute.stopBits, attribute.parity);
     if (ret < 0) {
         HDF_LOGE("%{public}s: libusb get attribute failed, ret:%{public}d", __func__, ret);
-        return ret;
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
@@ -456,7 +453,7 @@ int32_t LibusbSerial::SerialSetAttribute(int32_t portId, const struct SerialAttr
     HDF_LOGI("%{public}s: enter setAttribute msg", __func__);
     libusb_device* device = GetDevice(portId);
     if (device == nullptr) {
-        return ERR_CODE_IOEXCEPTION;
+        return HDF_FAILURE;
     }
     DeviceHandleInfo deviceHandleInfo = devices_[device];
     if (!deviceHandleInfo.isOpen) {
@@ -482,7 +479,7 @@ int32_t LibusbSerial::SerialSetAttribute(int32_t portId, const struct SerialAttr
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     if (ret < 0) {
         HDF_LOGE("%{public}s: libusb set attribute failed, ret:%{public}d", __func__, ret);
-        return ret;
+        return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s: set attribute success", __func__);
     return HDF_SUCCESS;
@@ -506,6 +503,18 @@ int32_t LibusbSerial::HotplugCallback(libusb_context* ctx, libusb_device* device
 int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
 {
     HDF_LOGI("%{public}s: Device arrival detected.", __func__);
+
+    struct libusb_device_descriptor desc;
+    int ret = libusb_get_device_descriptor(device, &desc);
+    if (ret < 0) {
+        HDF_LOGW("%{public}s: get device descriptor failed.", __func__);
+        return HDF_FAILURE;
+    }
+    if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
+        HDF_LOGE("%{public}s: hub device pass.", __func__);
+        return HDF_FAILURE;
+    }
+    
     std::lock_guard<std::mutex> lock(map_mutex_);
     int num = -1;
     int retry = RETRY_NUM;
@@ -525,7 +534,7 @@ int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
     }
 
     libusb_device_handle* handle = nullptr;
-    int ret = libusb_open(device, &handle);
+    ret = libusb_open(device, &handle);
     if (ret != LIBUSB_SUCCESS) {
         HDF_LOGE("%{public}s: Failed to open device: %{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -550,6 +559,16 @@ int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
 void LibusbSerial::HandleDeviceRemoval(libusb_device* device)
 {
     HDF_LOGI("%{public}s: Device removal detected.", __func__);
+    struct libusb_device_descriptor desc;
+    int ret = libusb_get_device_descriptor(device, &desc);
+    if (ret < 0) {
+        HDF_LOGW("%{public}s: get device descriptor failed.", __func__);
+        return;
+    }
+    if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
+        HDF_LOGE("%{public}s: hub device pass.", __func__);
+        return;
+    }
     std::lock_guard<std::mutex> lock(map_mutex_);
     auto it = devices_.find(device);
     if (it == devices_.end()) {
