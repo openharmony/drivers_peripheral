@@ -116,7 +116,7 @@ int32_t UsbSerialDdkService::Open(uint64_t deviceId, uint64_t interfaceIndex,
         HDF_LOGE("error %{public}d opening devNodePath: %{public}s\n", errno, strerror(errno));
         return USB_SERIAL_DDK_IO_ERROR;
     }
-    dev.fd = fd;
+    dev.fd = static_cast<uint32_t>(fd);
     return HDF_SUCCESS;
 }
 
@@ -128,7 +128,7 @@ int32_t UsbSerialDdkService::Close(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::Usb
         return USB_SERIAL_DDK_NO_PERM;
     }
 
-    int ret = close(dev.fd);
+    int ret = close(static_cast<int32_t>(dev.fd));
     if (ret != 0) {
         HDF_LOGE("Failed to close device: %{public}s.\n", strerror(errno));
         if (errno == EBADF) {
@@ -148,7 +148,7 @@ int32_t UsbSerialDdkService::Read(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbS
         return USB_SERIAL_DDK_NO_PERM;
     }
 
-    if (bufferSize <= 0) {
+    if (bufferSize == 0) {
         HDF_LOGE("BufferSize error.\n");
         return USB_SERIAL_DDK_INVALID_PARAMETER;
     }
@@ -161,7 +161,7 @@ int32_t UsbSerialDdkService::Read(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbS
         readBuffMaxSize = MAX_BUFFER_LENGTH;
     }
     buff.resize(readBuffMaxSize);
-    ssize_t bytesRead = read(dev.fd, &buff[0], readBuffMaxSize);
+    ssize_t bytesRead = read(static_cast<int32_t>(dev.fd), &buff[0], readBuffMaxSize);
     if (bytesRead < 0) {
         HDF_LOGE("bytesRead error %{public}s.\n", strerror(errno));
         if (errno == EBADF) {
@@ -170,7 +170,7 @@ int32_t UsbSerialDdkService::Read(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbS
             return USB_SERIAL_DDK_IO_ERROR;
         }
     } else if (bytesRead == 0) {
-        bool ret = osAdapter_->IsDeviceDisconnect(dev.fd);
+        bool ret = osAdapter_->IsDeviceDisconnect(static_cast<int32_t>(dev.fd));
         if (ret) {
             return USB_SERIAL_DDK_IO_ERROR;
         }
@@ -195,7 +195,7 @@ int32_t UsbSerialDdkService::Write(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::Usb
         return HDF_SUCCESS;
     }
 
-    ssize_t result = write(dev.fd, buff.data(), buff.size());
+    ssize_t result = write(static_cast<int32_t>(dev.fd), buff.data(), buff.size());
     if (result < 0) {
         HDF_LOGE("Error writing to device: %{public}s", strerror(errno));
         if (errno == EBADF) {
@@ -221,7 +221,7 @@ int32_t UsbSerialDdkService::SetBaudRate(const OHOS::HDI::Usb::UsbSerialDdk::V1_
         HDF_LOGE("%{public}s: osAdapter_ is null.", __func__);
         return USB_SERIAL_DDK_INVALID_OPERATION;
     }
-    return osAdapter_->SetBaudRate((int32_t)dev.fd, baudRate);
+    return osAdapter_->SetBaudRate(static_cast<int32_t>(dev.fd), baudRate);
 }
 
 int32_t UsbSerialDdkService::SetParams(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev,
@@ -236,7 +236,7 @@ int32_t UsbSerialDdkService::SetParams(const OHOS::HDI::Usb::UsbSerialDdk::V1_0:
         HDF_LOGE("%{public}s: osAdapter_ is null.", __func__);
         return USB_SERIAL_DDK_INVALID_OPERATION;
     }
-    return osAdapter_->SetParams((int32_t)dev.fd, params);
+    return osAdapter_->SetParams(static_cast<int32_t>(dev.fd), params);
 }
 
 int32_t UsbSerialDdkService::SetTimeout(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev,
@@ -247,8 +247,8 @@ int32_t UsbSerialDdkService::SetTimeout(const OHOS::HDI::Usb::UsbSerialDdk::V1_0
         HDF_LOGE("%{public}s: no permission", __func__);
         return USB_SERIAL_DDK_NO_PERM;
     }
-    const int max_timeout_val = 25500;
-    if (timeout < -1 || timeout > max_timeout_val) {
+    const int maxTimeoutVal = 25500;
+    if (timeout < -1 || timeout > maxTimeoutVal) {
         HDF_LOGE("timeout value %d error\n", timeout);
         return USB_SERIAL_DDK_INVALID_PARAMETER;
     }
@@ -256,7 +256,7 @@ int32_t UsbSerialDdkService::SetTimeout(const OHOS::HDI::Usb::UsbSerialDdk::V1_0
         HDF_LOGE("%{public}s: osAdapter_ is null.", __func__);
         return USB_SERIAL_DDK_INVALID_OPERATION;
     }
-    return osAdapter_->SetTimeout((int32_t)dev.fd, timeout);
+    return osAdapter_->SetTimeout(static_cast<int32_t>(dev.fd), timeout);
 }
 
 int32_t UsbSerialDdkService::SetFlowControl(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev,
@@ -275,7 +275,7 @@ int32_t UsbSerialDdkService::SetFlowControl(const OHOS::HDI::Usb::UsbSerialDdk::
         HDF_LOGE("%{public}s: osAdapter_ is null.", __func__);
         return USB_SERIAL_DDK_INVALID_OPERATION;
     }
-    return osAdapter_->SetFlowControl((int32_t)dev.fd, flowControl);
+    return osAdapter_->SetFlowControl(static_cast<int32_t>(dev.fd), flowControl);
 }
 
 int32_t UsbSerialDdkService::Flush(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev)
@@ -289,7 +289,7 @@ int32_t UsbSerialDdkService::Flush(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::Usb
         HDF_LOGE("%{public}s: osAdapter_ is null.", __func__);
         return USB_SERIAL_DDK_INVALID_OPERATION;
     }
-    return osAdapter_->Flush((int32_t)dev.fd);
+    return osAdapter_->Flush(static_cast<int32_t>(dev.fd));
 }
 
 int32_t UsbSerialDdkService::FlushInput(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev)
@@ -303,7 +303,7 @@ int32_t UsbSerialDdkService::FlushInput(const OHOS::HDI::Usb::UsbSerialDdk::V1_0
         HDF_LOGE("%{public}s: osAdapter_ is null.", __func__);
         return USB_SERIAL_DDK_INVALID_OPERATION;
     }
-    return osAdapter_->FlushInput((int32_t)dev.fd);
+    return osAdapter_->FlushInput(static_cast<int32_t>(dev.fd));
 }
 
 int32_t UsbSerialDdkService::FlushOutput(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::UsbSerialDeviceHandle &dev)
@@ -317,7 +317,7 @@ int32_t UsbSerialDdkService::FlushOutput(const OHOS::HDI::Usb::UsbSerialDdk::V1_
         HDF_LOGE("%{public}s: osAdapter_ is null.", __func__);
         return USB_SERIAL_DDK_INVALID_OPERATION;
     }
-    return osAdapter_->FlushOutput((int32_t)dev.fd);
+    return osAdapter_->FlushOutput(static_cast<int32_t>(dev.fd));
 }
 
 } // namespace V1_0
