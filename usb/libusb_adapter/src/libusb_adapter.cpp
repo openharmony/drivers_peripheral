@@ -57,6 +57,7 @@ constexpr int32_t DISPLACEMENT_NUMBER = 8;
 constexpr uint32_t LIBUSB_PATH_LENGTH = 64;
 constexpr uint64_t MAX_TOTAL_SIZE = 520447;
 constexpr int32_t API_VERSION_ID_18 = 18;
+constexpr int32_t API_VERSION_ID_20 = 20;
 constexpr int32_t LIBUSB_IO_ERROR = -1;
 constexpr int32_t LIBUSB_IO_ERROR_INVALID = 0;
 constexpr uint32_t ACT_DEVUP = 0;
@@ -1348,6 +1349,7 @@ int32_t LibusbAdapter::CloseMmapBuffer(void *mmapBuf, size_t length)
     HDF_LOGD("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
+
 int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpointAddr, uint32_t size,
     uint32_t &transferedLength, unsigned int timeout)
 {
@@ -1377,8 +1379,8 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpoint
         int32_t apiVersion = 0;
         GetApiVersion(apiVersion);
         HDF_LOGI("%{public}s: apiVersion %{public}d", __func__, apiVersion);
-        if (apiVersion < API_VERSION_ID_18) {
-            HDF_LOGI("%{public}s: The version number is smaller than 18 apiVersion %{public}d",
+        if (apiVersion < API_VERSION_ID_20) {
+            HDF_LOGI("%{public}s: The version number is smaller than 20 apiVersion %{public}d",
                 __func__, apiVersion);
             ret = HDF_SUCCESS;
         }
@@ -1419,8 +1421,8 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
         int32_t apiVersion = 0;
         GetApiVersion(apiVersion);
         HDF_LOGI("%{public}s: apiVersion %{public}d", __func__, apiVersion);
-        if (apiVersion < API_VERSION_ID_18) {
-            HDF_LOGI("%{public}s: The version number is smaller than 18 apiVersion %{public}d",
+        if (apiVersion < API_VERSION_ID_20) {
+            HDF_LOGI("%{public}s: The version number is smaller than 20 apiVersion %{public}d",
                 __func__, apiVersion);
             ret = HDF_SUCCESS;
         }
