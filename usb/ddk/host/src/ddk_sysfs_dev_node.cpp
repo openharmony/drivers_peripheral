@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -93,7 +94,12 @@ int32_t SysfsDevNode::FindPath(std::string& devNodePath)
 
 std::optional<std::string> SysfsDevNode::GetContent(const std::string& filePath)
 {
-    std::ifstream file(filePath);
+    char path[PATH_MAX] = {'\0'};
+    if (realpath(filePath.c_str(), path) == NULL) {
+        HDF_LOGE("File %{public}s is invalid", filePath.c_str());
+        return std::nullopt;
+    }
+    std::ifstream file(path);
     if (!file.is_open()) {
         return std::nullopt;
     }

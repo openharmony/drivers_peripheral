@@ -105,7 +105,7 @@ static int SetSpeed(struct termios &tty, uint32_t baudRate)
     tty.c_cflag |= CBAUDEX;
 
     // set baudRate
-    int baudRateConstant = 0;
+    uint32_t baudRateConstant = 0;
     baudRateConstant = TransToStandardBaudRate(baudRate);
     if (cfsetospeed(&tty, baudRateConstant) != 0) {
         HDF_LOGE("Cfsetospeed err.\n");
