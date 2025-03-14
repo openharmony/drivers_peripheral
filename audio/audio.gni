@@ -20,8 +20,8 @@ declare_args() {
   drivers_peripheral_audio_feature_double_pnp_detect = false
   drivers_peripheral_audio_feature_offload = false
   drivers_peripheral_audio_feature_multichannel = false
-  drivers_peripheral_audio_feature_hicollie_enable = false
-  drivers_peripheral_audio_feature_hitrace_enable = false
+  drivers_peripheral_audio_feature_hicollie_enable = true
+  drivers_peripheral_audio_feature_hitrace_enable = true
   drivers_peripheral_audio_feature_frame_ec = false
 }
 
@@ -54,14 +54,4 @@ enable_c_utils = true
 if (defined(global_parts_info) &&
     !defined(global_parts_info.commonlibrary_c_utils)) {
   enable_c_utils = false
-}
-
-if (defined(global_parts_info) &&
-    defined(global_parts_info.hiviewdfx_hicollie)) {
-  drivers_peripheral_audio_feature_hicollie_enable = true
-}
-
-if (defined(global_parts_info) &&
-    defined(global_parts_info.hiviewdfx_hitrace)) {
-  drivers_peripheral_audio_feature_hitrace_enable = true
 }
