@@ -19,13 +19,13 @@
 #include <list>
 #include <map>
 #include <mutex>
-#include "v1_0/iconcrete_chip.h"
-#include "v1_0/chip_types.h"
+#include "v2_0/iconcrete_chip.h"
+#include "v2_0/chip_types.h"
 #include "iface_tool.h"
 #include "wifi_vendor_hal_list.h"
 #include "wifi_chip_modes.h"
 #include "callback_handler.h"
-#include "v1_0/ichip_iface.h"
+#include "v2_0/ichip_iface.h"
 #include "wifi_ap_iface.h"
 #include "wifi_sta_iface.h"
 #include "wifi_p2p_iface.h"
@@ -36,7 +36,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 class WifiChip : public IConcreteChip {
 public:
     WifiChip(int32_t chipId, bool isPrimary,

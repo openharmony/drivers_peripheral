@@ -31,7 +31,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 const char K_WLAN0_INTERFACE_NAME[] = "wlan0";
 const int MAC_LEN = 6;
 const int MAC_POS_1 = 1;

@@ -18,7 +18,7 @@
 #include "../../../chip/hdi_service/wifi_p2p_iface.h"
 
 using namespace testing::ext;
-using namespace OHOS::HDI::Wlan::Chip::V1_0;
+using namespace OHOS::HDI::Wlan::Chip::V2_0;
 
 namespace WifiP2pIfaceTest {
 const std::string P2P_IFNAME = "P2P0";

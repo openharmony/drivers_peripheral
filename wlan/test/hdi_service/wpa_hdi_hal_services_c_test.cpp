@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 #include <servmgr_hdi.h>
 #include <osal_mem.h>
-#include "v1_2/iwpa_interface.h"
+#include "v2_0/iwpa_interface.h"
 #include "wpa_callback_impl.h"
 #include "securec.h"
 

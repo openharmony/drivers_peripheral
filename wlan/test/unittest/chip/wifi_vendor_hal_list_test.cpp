@@ -18,7 +18,7 @@
 #include "../../../chip/hdi_service/wifi_vendor_hal_list.h"
 
 using namespace testing::ext;
-using namespace OHOS::HDI::Wlan::Chip::V1_0;
+using namespace OHOS::HDI::Wlan::Chip::V2_0;
 
 namespace WifiVendorHalListTest {
 class WifiVendorHalListTest : public testing::Test {

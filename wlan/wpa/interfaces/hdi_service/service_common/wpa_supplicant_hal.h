@@ -24,7 +24,7 @@
 #include "wpa_hal_struct.h"
 #include "wpa_hal_define.h"
 #include "wpa_hdi_util.h"
-#include "v1_2/iwpa_interface.h"
+#include "v2_0/iwpa_interface.h"
 
 #ifdef __cplusplus
 extern "C" {

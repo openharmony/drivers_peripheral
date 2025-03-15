@@ -16,9 +16,9 @@
 #ifndef WIFI_H
 #define WIFI_H
 
-#include "v1_0/ichip_controller.h"
-#include "v1_0/iconcrete_chip.h"
-#include "v1_0/chip_types.h"
+#include "v2_0/ichip_controller.h"
+#include "v2_0/iconcrete_chip.h"
+#include "v2_0/chip_types.h"
 #include "iface_tool.h"
 #include "wifi_vendor_hal_list.h"
 #include "wifi_chip_modes.h"
@@ -31,7 +31,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 class Wifi : public IChipController {
 public:
     Wifi();

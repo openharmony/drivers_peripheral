@@ -16,8 +16,8 @@
 #ifndef WPA_COMMON_FUZZER_H
 #define WPA_COMMON_FUZZER_H
 #include "hdf_log.h"
-#include "v1_2/iwpa_callback.h"
-#include "v1_2/iwpa_interface.h"
+#include "v2_0/iwpa_callback.h"
+#include "v2_0/iwpa_interface.h"
 #include "securec.h"
 #include <osal_mem.h>
 
