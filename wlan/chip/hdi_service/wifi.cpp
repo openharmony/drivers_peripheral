@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 #ifdef FEATURE_ANCO_WIFI
 const int CHIP_ID_STA = 1;
 const int CHIP_ID_P2P = 2;
@@ -269,7 +269,7 @@ int32_t Wifi::RemoveWifiDeathRecipient(const sptr<IChipControllerCallback>& even
     return HDF_SUCCESS;
 }
     
-} // namespace V1_0
+} // namespace V2_0
 } // namespace Chip
 } // namespace Wlan
 } // namespace HDI

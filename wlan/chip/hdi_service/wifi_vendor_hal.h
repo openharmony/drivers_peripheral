@@ -26,14 +26,14 @@
 #include "wifi_hal.h"
 #include "iface_tool.h"
 #include "hdi_sync_util.h"
-#include "v1_0/chip_types.h"
+#include "v2_0/chip_types.h"
 #include "callback_handler.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 
 using OnVendorHalRestartCallback = std::function<void(const std::string&)>;
 class WifiVendorHal {
@@ -76,7 +76,8 @@ public:
     static void OnAsyncWifiNetlinkMsgReport(uint32_t type, const std::vector<uint8_t>& recvMsg);
     static void OnAsyncWifiNetlinkMsgExtReport(uint32_t type, const std::vector<uint8_t>& recvMsg);
     WifiError SetTxPower(const std::string& ifaceName, int mode);
-    WifiError SendCmdToDriver(const std::string& ifaceName, int32_t cmdId, const std::vector<int8_t>& paramBuf);
+    WifiError SendCmdToDriver(const std::string& ifaceName, int32_t cmdId,
+        const std::vector<int8_t>& paramBuf, std::vector<int8_t>& result);
     WifiError SendActionFrame(const std::string& ifaceName, uint32_t freq, const std::vector<uint8_t>& frameData);
     WifiError RegisterActionFrameReceiver(const std::string& ifaceName, const std::vector<uint8_t>& match);
     WifiError GetCoexictenceChannelList(const std::string& ifaceName, std::vector<uint8_t>& paramBuf);
@@ -101,7 +102,7 @@ private:
     std::mutex vendorHalMutex;
 };
     
-} // namespace v1_0
+} // namespace v2_0
 } // namespace Chip
 } // namespace Wlan
 } // namespace HDI

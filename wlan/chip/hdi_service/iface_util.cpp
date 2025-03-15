@@ -20,7 +20,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 IfaceUtil::IfaceUtil(const std::weak_ptr<IfaceTool> ifaceTool)
     : ifaceTool_(ifaceTool)
 {}

@@ -27,7 +27,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 constexpr int IFACE_TYPE_STA = 2;
 constexpr char K_ACTIVE_WLAN_IFACE_NAME_PROPERTY[] = "wifi.active.interface";
 constexpr char K_NO_ACTIVE_WLAN_IFACE_NAME_PROPERTY_VALUE[] = "";
@@ -503,7 +503,7 @@ int32_t WifiChip::CreateVirtualApInterface(const std::string& apVirtIf)
     return HDF_SUCCESS;
 }
 
-int32_t WifiChip::CreateApService(sptr<OHOS::HDI::Wlan::Chip::V1_0::IChipIface>& iface)
+int32_t WifiChip::CreateApService(sptr<OHOS::HDI::Wlan::Chip::V2_0::IChipIface>& iface)
 {
     if (!CanSupportIfaceType(IfaceType::AP)) {
         return HDF_FAILURE;

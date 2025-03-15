@@ -246,7 +246,7 @@ if (defined(ohos_lite)) {
     ]
 
     cflags = configFlag
-    deps = [ "$TEST_ROOT_DIR/chip/hdi_service:libchip_controller_chip_interface_service_1.0" ]
+    deps = [ "$TEST_ROOT_DIR/chip/hdi_service:libchip_controller_chip_interface_service_2.0" ]
 
     defines = [
       "private = public",
@@ -258,7 +258,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
-        "drivers_interface_wlan:chip_idl_headers",
+        "drivers_interface_wlan:chip_idl_headers_2.0",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",

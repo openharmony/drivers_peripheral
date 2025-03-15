@@ -25,7 +25,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 
 class WifiVendorHalList {
 public:
@@ -50,7 +50,7 @@ private:
     std::vector<std::shared_ptr<WifiVendorHal>> vendorHals_;
 };
     
-} // namespace v1_0
+} // namespace v2_0
 } // namespace Chip
 } // namespace Wlan
 } // namespace HDI

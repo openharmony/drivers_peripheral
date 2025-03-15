@@ -16,7 +16,7 @@ import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
 WPA_ROOT_DIR = "//third_party/wpa_supplicant"
 
 if (is_standard_system) {
-  ohos_shared_library("libwpa_interface_service_1.2") {
+  ohos_shared_library("libwpa_interface_service_2.0") {
     branch_protector_ret = "pac_ret"
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
@@ -30,11 +30,6 @@ if (is_standard_system) {
     include_dirs = [
       "./service_common",
       "../../client/include",
-      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard",
-      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/src",
-      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/src/utils",
-      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/wpa_supplicant",
-      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/wpa_supplicant_lib",
     ]
     sources = [
       "service_common/hdi_wpa_common.c",
@@ -76,7 +71,7 @@ if (is_standard_system) {
     ]
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_wlan:libwpa_stub_1.2",
+      "drivers_interface_wlan:libwpa_stub_2.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -105,7 +100,7 @@ if (is_standard_system) {
 
     sources = [ "wpa_interface_drivers.c" ]
 
-    deps = [ ":libwpa_interface_service_1.2" ]
+    deps = [ ":libwpa_interface_service_2.0" ]
 
     cflags = [
       "-Wall",
@@ -127,7 +122,7 @@ if (is_standard_system) {
     ]
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_wlan:libwpa_stub_1.2",
+      "drivers_interface_wlan:libwpa_stub_2.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -182,7 +177,7 @@ if (is_standard_system) {
 
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_wlan:libwpa_stub_1.2",
+      "drivers_interface_wlan:libwpa_stub_2.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -194,7 +189,7 @@ if (is_standard_system) {
     part_name = "drivers_peripheral_wlan"
   }
 } else {
-  ohos_shared_library("libwpa_interface_service_1.2") {
+  ohos_shared_library("libwpa_interface_service_2.0") {
     branch_protector_ret = "pac_ret"
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
@@ -234,7 +229,7 @@ if (is_standard_system) {
 group("hdi_wpa_service") {
   deps = [
     ":libwpa_hdi_c_device",
-    ":libwpa_interface_service_1.2",
+    ":libwpa_interface_service_2.0",
   ]
   if (is_standard_system) {
     deps += [ ":hdi_wpa_base_mini" ]

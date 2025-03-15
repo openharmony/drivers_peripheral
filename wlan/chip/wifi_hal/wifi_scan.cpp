@@ -191,11 +191,11 @@ static int WifiGetWiphyInfo(wifiInterfaceHandle handle, uint32_t wiphyIndex, Wip
 }
 
 class ScanCommand : public WifiCommand {
-    const OHOS::HDI::Wlan::Chip::V1_0::ScanParams mScanParams;
+    const OHOS::HDI::Wlan::Chip::V2_0::ScanParams mScanParams;
     WiphyInfo mWiphyInfo;
 public:
     ScanCommand(wifiInterfaceHandle iface,
-        const OHOS::HDI::Wlan::Chip::V1_0::ScanParams& scanParams,
+        const OHOS::HDI::Wlan::Chip::V2_0::ScanParams& scanParams,
         WiphyInfo &wiphyInfo)
         : WifiCommand("ScanCommand", iface, 0), mScanParams(scanParams), mWiphyInfo(wiphyInfo)
     { }
@@ -265,7 +265,7 @@ public:
 
 
 WifiError WifiStartScan(wifiInterfaceHandle handle,
-    const OHOS::HDI::Wlan::Chip::V1_0::ScanParams& scanParam)
+    const OHOS::HDI::Wlan::Chip::V2_0::ScanParams& scanParam)
 {
     uint32_t wiphyIndex;
     WiphyInfo wiphyInfo;
@@ -286,11 +286,11 @@ WifiError WifiStartScan(wifiInterfaceHandle handle,
 }
 
 class PnoScanCommand : public WifiCommand {
-    const OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams mPnoScanParams;
+    const OHOS::HDI::Wlan::Chip::V2_0::PnoScanParams mPnoScanParams;
     WiphyInfo mWiphyInfo;
 public:
     PnoScanCommand(wifiInterfaceHandle iface,
-        const OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams& pnoScanParams,
+        const OHOS::HDI::Wlan::Chip::V2_0::PnoScanParams& pnoScanParams,
         WiphyInfo &wiphyInfo)
         : WifiCommand("PnoScanCommand", iface, 0), mPnoScanParams(pnoScanParams), mWiphyInfo(wiphyInfo)
     { }
@@ -446,7 +446,7 @@ public:
 
 
 WifiError WifiStartPnoScan(wifiInterfaceHandle handle,
-    const OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams& pnoScanParam)
+    const OHOS::HDI::Wlan::Chip::V2_0::PnoScanParams& pnoScanParam)
 {
     uint32_t wiphyIndex;
     WiphyInfo wiphyInfo;
@@ -499,14 +499,14 @@ public:
 
         return HAL_SUCCESS;
     }
-    std::vector<OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo> &GetScanResultsInfo()
+    std::vector<OHOS::HDI::Wlan::Chip::V2_0::ScanResultsInfo> &GetScanResultsInfo()
     {
         return mscanResults;
     }
 protected:
     int HandleResponse(WifiEvent& reply) override
     {
-        OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo scanResult;
+        OHOS::HDI::Wlan::Chip::V2_0::ScanResultsInfo scanResult;
         struct nlattr **attr = reply.Attributes();
         struct nlattr *bssAttr[NL80211_BSS_MAX + 1];
         static struct nla_policy bssPolicy[NL80211_BSS_MAX + 1];
@@ -534,7 +534,7 @@ protected:
         return NL_SKIP;
     }
 
-    int HandleBssAttr(struct nlattr **bssAttr, OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo &scanResult)
+    int HandleBssAttr(struct nlattr **bssAttr, OHOS::HDI::Wlan::Chip::V2_0::ScanResultsInfo &scanResult)
     {
         if (bssAttr[NL80211_BSS_INFORMATION_ELEMENTS]) {
             uint8_t *ie =  reinterpret_cast<uint8_t*>(nla_data(bssAttr[NL80211_BSS_INFORMATION_ELEMENTS]));
@@ -587,11 +587,11 @@ protected:
     }
 
 private:
-    std::vector<OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo> mscanResults;
+    std::vector<OHOS::HDI::Wlan::Chip::V2_0::ScanResultsInfo> mscanResults;
 };
 
 WifiError WifiGetScanInfo(wifiInterfaceHandle handle,
-    std::vector<OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo>& mscanResults)
+    std::vector<OHOS::HDI::Wlan::Chip::V2_0::ScanResultsInfo>& mscanResults)
 {
     if (!handle) {
         HDF_LOGE("Handle is null");
