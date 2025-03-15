@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("./../../../usb.gni")
 
-module_output_path = "hdf/usb"
+module_output_path = "drivers_peripheral_usb/drivers_peripheral_usb"
 
 config("module_private_config") {
   visibility = [ ":*" ]
