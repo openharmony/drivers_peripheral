@@ -34,6 +34,7 @@ enum P2pWpsMethod {
 
 enum P2pRemoveGroupEvent {
     P2P_REMOVE_GROUP_CLIENT = 0,
+    P2P_REJECT,
     EVENT_MAX
 };
 
