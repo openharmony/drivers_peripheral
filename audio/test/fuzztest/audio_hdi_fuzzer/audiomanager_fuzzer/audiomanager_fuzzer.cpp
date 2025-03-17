@@ -15,6 +15,8 @@
 #include "audiomanager_fuzzer.h"
 #include "v4_0/iaudio_manager.h"
 #include "v4_0/audio_types.h"
+#include "hdi_service_common.h"
+
 using namespace std;
 namespace OHOS {
 namespace Audio {

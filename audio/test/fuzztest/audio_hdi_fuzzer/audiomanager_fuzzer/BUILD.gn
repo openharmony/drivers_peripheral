@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+hdf_test_path = "./../../.."
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -22,7 +23,10 @@ ohos_fuzztest("AudioManagerFuzzTest") {
   fuzz_config_file = "../audiomanager_fuzzer"
 
   sources = [ "audiomanager_fuzzer.cpp" ]
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "$hdf_test_path/systemtest/common/hdi_service_common/include/",
+    "include",
+  ]
   external_deps = [
     "drivers_interface_audio:libaudio_proxy_4.0",
     "hdf_core:libhdf_utils",
