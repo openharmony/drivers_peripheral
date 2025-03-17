@@ -42,7 +42,7 @@ static uint32_t Convert2Uint32(const uint8_t *ptr)
      * and the third digit no left
      */
     return (ptr[BUFFER_INDEX_ZERO] << PCM_24_BIT) | (ptr[BUFFER_INDEX_ONE] << PCM_16_BIT) |
-        (ptr[BUFFER_INDEX_TWO] << PCM_8_BIT) | (ptr[BUFFER_INDEX_THREE]);	
+        (ptr[BUFFER_INDEX_TWO] << PCM_8_BIT) | (ptr[BUFFER_INDEX_THREE]);
 }
 
 static int32_t InitScene(const struct AudioSceneDescriptor *scene)
