@@ -38,6 +38,7 @@ extern "C" ICameraHost *CameraHostServiceGetInstance(void)
 
 int32_t CameraHostService::GetVdiLibList(std::vector<std::string> &vdiLibList)
 {
+    CAMERA_LOGI("CameraHost:GetVdiLibList");
     std::vector<std::string>().swap(vdiLibList);
     ReleaseHcsTree();
     const struct DeviceResourceIface *pDevResIns = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
@@ -77,6 +78,7 @@ int32_t CameraHostService::GetVdiLibList(std::vector<std::string> &vdiLibList)
 
 void CameraHostService::HdfCloseVdiLoaderList(std::vector<struct HdfVdiObject *> &cameraHostVdiLoaderList)
 {
+    CAMERA_LOGI("CameraHost:HdfCloseVdiLoaderList");
     for (auto cameraHostVdiLoader : cameraHostVdiLoaderList) {
         if (cameraHostVdiLoader != nullptr) {
             HdfCloseVdi(cameraHostVdiLoader);
@@ -137,13 +139,13 @@ CameraHostService::CameraHostService(std::vector<ICameraHostVdi*> cameraHostVdiL
     std::vector<struct HdfVdiObject *> cameraHostVdiLoaderList)
     : cameraHostVdiList_(cameraHostVdiList), cameraHostVdiLoaderList_(cameraHostVdiLoaderList)
 {
-    CAMERA_LOGD("ctor, instance");
+    CAMERA_LOGI("ctor, instance");
 }
 
 CameraHostService::~CameraHostService()
 {
     HdfCloseVdiLoaderList(cameraHostVdiLoaderList_);
-    CAMERA_LOGD("dtor, instance");
+    CAMERA_LOGI("dtor, instance");
 }
 
 int32_t CameraHostService::SetCallback(const OHOS::sptr<ICameraHostCallback> &callbackObj)
@@ -168,6 +170,7 @@ int32_t CameraHostService::SetCallback(const OHOS::sptr<ICameraHostCallback> &ca
 
 int32_t CameraHostService::GetCameraIds(std::vector<std::string> &cameraIds)
 {
+    CAMERA_LOGI("CameraHost:GetCameraIds");
     std::vector<std::string>().swap(cameraIds);
     if (cameraIdInfoList_.size() == 0) {
         int32_t ret = UpdateCameraIdMapList();
@@ -204,6 +207,7 @@ int32_t CameraHostService::OpenCamera(const std::string &cameraId, const sptr<IC
     sptr<ICameraDevice> &device)
 {
     CAMERAHALPERFSYSEVENT(TIME_FOR_OPEN_CAMERA);
+    CAMERA_LOGI("CameraHost:OpenCamera");
     ICameraHostVdi* cameraHostVdi = GetCameraHostVdi(cameraId);
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostVdi, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
 
@@ -239,6 +243,7 @@ int32_t CameraHostService::OpenCamera(const std::string &cameraId, const sptr<IC
 
 int32_t CameraHostService::SetFlashlight(const std::string &cameraId, bool isEnable)
 {
+    CAMERA_LOGI("CameraHost:SetFlashlight");
     ICameraHostVdi* cameraHostVdi = GetCameraHostVdi(cameraId);
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostVdi, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
 
