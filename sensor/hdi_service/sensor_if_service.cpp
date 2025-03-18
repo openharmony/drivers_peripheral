@@ -300,13 +300,13 @@ int32_t SensorIfService::SetDelay(int32_t sensorId, int64_t &samplingInterval, i
         if (it->sensorId == sensorId) {
             if (samplingInterval < it->minDelay) {
                 samplingInterval = it->minDelay;
-                HDF_LOGI("%{public}s samplingInterval has been set minDelay %{public}s", __func__,
+                HDF_LOGD("%{public}s samplingInterval has been set minDelay %{public}s", __func__,
                          std::to_string(samplingInterval).c_str());
                 return SENSOR_SUCCESS;
             }
             if (samplingInterval > it->maxDelay && it->maxDelay != REPORT_INTERVAL) {
                 samplingInterval = it->maxDelay;
-                HDF_LOGI("%{public}s samplingInterval has been set maxDelay %{public}s", __func__,
+                HDF_LOGD("%{public}s samplingInterval has been set maxDelay %{public}s", __func__,
                          std::to_string(samplingInterval).c_str());
                 return SENSOR_SUCCESS;
             }
