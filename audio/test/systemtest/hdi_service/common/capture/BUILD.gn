@@ -17,7 +17,7 @@ if (!defined(ohos_lite)) {
 import("./../../../../../audio.gni")
 
 if (!defined(ohos_lite)) {
-  module_output_path = "drivers_peripheral_audio/audio"
+  module_output_path = "drivers_peripheral_audio/drivers_peripheral_audio"
 
   ohos_systemtest("hdf_audio_idlhdi_capture_test") {
     module_out_path = module_output_path
