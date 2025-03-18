@@ -242,7 +242,7 @@ int32_t LibusbSerial::SerialGetPortList(std::vector<SerialPort>& portIds)
     HDF_LOGI("%{public}s: enter SerialGetPortList.", __func__);
     std::lock_guard<std::mutex> lock(map_mutex_);
     portIds.clear();
-    for (const std::pair<libusb_device*, DeviceHandleInfo>& device : devices_) {
+    for (const auto& device : devices_) {
         SerialPort serialPort;
         libusb_device* dev = device.first;
         libusb_device_handle* handle = device.second.handle;
