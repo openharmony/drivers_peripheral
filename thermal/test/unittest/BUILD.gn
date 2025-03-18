@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../thermal.gni")
 
-module_output_path = "drivers_peripheral_thermal/thermal"
+module_output_path = "drivers_peripheral_thermal/drivers_peripheral_thermal"
 
 ohos_unittest("hdi_unittest_thermal") {
   module_out_path = module_output_path
