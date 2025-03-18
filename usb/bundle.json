@@ -14,7 +14,10 @@
         "subsystem": "hdf",
         "features": [
             "drivers_peripheral_usb_feature_linux_native_model",
-            "drivers_peripheral_usb_feature_emulator_mode"
+            "drivers_peripheral_usb_feature_emulator_mode",
+            "drivers_peripheral_usb_feature_hiviewdfx_hisysevent" ,
+            "drivers_peripheral_usb_feature_systemabilitymgr_samgr",
+            "drivers_peripheral_usb_feature_commonlibrary_c_utils"
         ],
         "hisysevent_config": [
             "//drivers/peripheral/usb/hisysevent.yaml"
