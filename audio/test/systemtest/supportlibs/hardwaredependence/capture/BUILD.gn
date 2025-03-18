@@ -53,7 +53,7 @@ if (defined(ohos_lite)) {
     ]
   }
 } else {
-  module_output_path = "drivers_peripheral_audio/audio"
+  module_output_path = "drivers_peripheral_audio/drivers_peripheral_audio"
 
   ohos_systemtest("hdf_audio_lib_capture_hardwaredependence_test") {
     module_out_path = module_output_path

@@ -45,7 +45,7 @@ if (defined(ohos_lite)) {
     ]
   }
 } else {
-  module_output_path = "drivers_peripheral_audio/audio"
+  module_output_path = "drivers_peripheral_audio/drivers_peripheral_audio"
 
   ohos_systemtest("hdf_audio_adm_interface_test") {
     resource_config_file = "./../../../resource/ohos_test.xml"
