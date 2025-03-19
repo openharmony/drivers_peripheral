@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,10 +85,12 @@ BaudratePair g_baudratePairs[] = {
 
 LinuxSerial::LinuxSerial()
 {
+    HDF_LOGI("%{public}s: enter SerialUSBWrapper initialization.", __func__);
 }
 
 LinuxSerial::~LinuxSerial()
 {
+    HDF_LOGI("%{public}s: enter Destroying SerialUSBWrapper.", __func__);
 }
 
 LinuxSerial &LinuxSerial::GetInstance()
@@ -129,7 +131,7 @@ tcflag_t LinuxSerial::GetDatabits(unsigned char dataBits)
         default:
             return HDF_FAILURE;
         }
-        return bit_temp;
+    return bit_temp;
 }
 
 tcflag_t LinuxSerial::GetParity(tcflag_t c_cflag, unsigned char parity)
@@ -213,7 +215,7 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
     ret = snprintf_s(path, sizeof(path), sizeof(path)-1, "/dev/ttyUSB%d", portId);
     if (ret < 0) {
         HDF_LOGE("%{public}s: sprintf_s path failed, ret:%{public}d", __func__, ret);
-        return ret;
+        return HDF_FAILURE;
     }
     serialPortList_[index].fd = open(path, O_RDWR | O_NOCTTY | O_NDELAY);
     if (serialPortList_[index].fd <= 0) {
@@ -221,11 +223,20 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
         return HDF_FAILURE;
     }
 
-    tcgetattr(serialPortList_[index].fd, &options_);
+    if (tcgetattr(serialPortList_[index].fd, &options_) = -1) {
+        close(serialPortList_[index].fd);
+        HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
+        serialPortList_.erase(index);
+        return HDF_FAILURE;
+    }
     options_.c_lflag &= ~ICANON;
     options_.c_lflag &= ~ECHO;
-    tcsetattr(serialPortList_[index].fd, TCSANOW, &options_);
-
+    if (tcsetattr(serialPortList_[index].fd, TCSANOW, &options_) = -1) {
+        close(serialPortList_[index].fd);
+        HDF_LOGE("%{public}s: set attribute failed %{public}d.", __func__, errno);
+        serialPortList_.erase(index);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -315,7 +326,10 @@ int32_t LinuxSerial::SerialGetAttribute(int32_t portId, SerialAttribute& attribu
     if (fd < 0) {
         return ERR_CODE_DEVICENOTOPEN;
     }
-    tcgetattr(fd, &options_);
+    if (tcgetattr(fd, &options_) = -1) {
+        HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
+        return HDF_FAILURE;
+    }
 
     for (const auto& pair : g_baudratePairs) {
         if (pair.second == cfgetispeed(&options_)) {
@@ -361,7 +375,10 @@ int32_t LinuxSerial::SerialSetAttribute(int32_t portId, const SerialAttribute& a
     if (fd < 0) {
         return ERR_CODE_DEVICENOTOPEN;
     }
-    tcgetattr(fd, &options_);
+    if (tcgetattr(fd, &options_) = -1) {
+        HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
+        return HDF_FAILURE;
+    }
     if (GetStopbits(options_.c_cflag, attribute.stopBits) < 0) {
         HDF_LOGE("%{public}s: stopBits set fail.", __func__);
         return GetStopbits(options_.c_cflag, attribute.stopBits);
@@ -390,7 +407,7 @@ int32_t LinuxSerial::SerialSetAttribute(int32_t portId, const SerialAttribute& a
     while (retry-- > 0) {
         if (tcsetattr(fd, TCSANOW, &options_) == 0) {
             break;
-        } else if (errno != EINTR) {
+        } else {
             HDF_LOGE("%{public}s: tcsetattr failed.", __func__);
         }
     }
@@ -435,7 +452,6 @@ void LinuxSerial::HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, 
     serialPort.deviceInfo.devAddr = static_cast<uint8_t>(device->devNum);
     serialPort.deviceInfo.vid = static_cast<int32_t>(devInfo->vendorId);
     serialPort.deviceInfo.pid = static_cast<int32_t>(devInfo->productId);
-    // serialPort.deviceInfo.serialNum = "";
     auto it = std::find_if(serialPortList_.begin(), serialPortList_.end(), [&](const Serialfd& tempSerial) {
         return tempSerial.portId == serialPortId.portId;
     });
@@ -469,6 +485,7 @@ int32_t LinuxSerial::SerialGetPortList(std::vector<SerialPort>& portIds)
     struct UsbDdkDeviceInfo *device = (struct UsbDdkDeviceInfo *)OsalMemCalloc(sizeof(struct UsbDdkDeviceInfo));
     if (device == NULL) {
         HDF_LOGE("%{public}s: init device failed", __func__);
+        closedir(dir);
         return HDF_FAILURE;
     }
     int32_t status = HDF_SUCCESS;
