@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -100,7 +100,7 @@ int32_t SerialImpl::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint3
     int32_t ret = LibusbSerial::GetInstance().SerialRead(portId, data, size, timeout);
 #endif
     FinishTrace(HITRACE_TAG_HDF);
-    if (ret != HDF_SUCCESS) {
+    if (ret < HDF_SUCCESS) {
         HDF_LOGE("%{public}s:SerialRead failed, ret:%{public}d", __func__, ret);
     }
 
@@ -116,7 +116,7 @@ int32_t SerialImpl::SerialWrite(int32_t portId, const std::vector<uint8_t>& data
     int32_t ret = LibusbSerial::GetInstance().SerialWrite(portId, data, size, timeout);
 #endif
     FinishTrace(HITRACE_TAG_HDF);
-    if (ret != HDF_SUCCESS) {
+    if (ret < HDF_SUCCESS) {
         HDF_LOGE("%{public}s:SerialWrite failed, ret:%{public}d", __func__, ret);
     }
 
