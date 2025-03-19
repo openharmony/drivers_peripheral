@@ -1062,7 +1062,7 @@ int32_t RawFillInterruptRequest(struct UsbHostRequest *request, const struct Usb
     if (UsbEndpointDirOut(fillRequestData->endPoint)) {
         if (memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length) != EOK) {
             HDF_LOGE("%{public}s:%{public}d memcpy_s failed!", __func__, __LINE__);
-            return HDF_FAILURE;
+            return HDF_ERR_IO;
         }
     }
     request->devHandle = (struct UsbDeviceHandle *)devHandle;
