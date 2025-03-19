@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -226,6 +226,20 @@ DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string 
     const int32_t jpegThumbnailSizes[] = {0, 0, DEGREE_240, DEGREE_180};
     AddAbilityEntry(OHOS_JPEG_AVAILABLE_THUMBNAIL_SIZES, jpegThumbnailSizes,
         (sizeof(jpegThumbnailSizes) / sizeof(jpegThumbnailSizes[0])));
+
+    std::vector<int32_t> streamDefault = {0};
+    streamDefault.assign(DEFAULT_EXTEND_SIZE, 0);
+    AddAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, streamDefault.data(), streamDefault.size());
+
+    AddAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, streamDefault.data(), streamDefault.size());
+
+    AddAbilityEntry(OHOS_SENSOR_INFO_MAX_FRAME_DURATION, &MAX_FRAME_DURATION, 1);
+
+    const int32_t jpegMaxSizeDefault = MAX_SUPPORT_PREVIEW_WIDTH * MAX_SUPPORT_PREVIEW_HEIGHT;
+    AddAbilityEntry(OHOS_JPEG_MAX_SIZE, &jpegMaxSizeDefault, 1);
+
+    const uint8_t connectionTypeDefault = OHOS_CAMERA_CONNECTION_TYPE_REMOTE;
+    AddAbilityEntry(OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connectionTypeDefault, 1);
     return SUCCESS;
 }
 
