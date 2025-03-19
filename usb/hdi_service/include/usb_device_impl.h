@@ -61,6 +61,7 @@ public:
 private:
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
+    static void UpdateFunctionStatus(void);
     static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];
     static bool isGadgetConnected_;
     static HdfDevEventlistener listenerForLoadService_;
