@@ -587,7 +587,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
         struct UsbFnRequest *queueReqTmp = nullptr;
         DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, queueHead, struct UsbFnRequest, list) {
             (void)UsbFnCancelRequest(queueReq);
-            HDF_LOGD("%{public}s:cancel read, req:%{public}p", __func__, queueReq);
+            HDF_LOGD("%{public}s:cancel read", __func__);
         }
     }
     DListHead *writeQueue = &(mtpPort->writeQueue);
@@ -597,14 +597,14 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
         struct UsbFnRequest *queueReqTmp = nullptr;
         DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, writeQueue, struct UsbFnRequest, list) {
             (void)UsbFnCancelRequest(queueReq);
-            HDF_LOGD("%{public}s:cancel write, req:%{public}p", __func__, queueReq);
+            HDF_LOGD("%{public}s:cancel write", __func__);
         }
     }
 
     if (mtpPort->mtpDev != NULL && mtpPort->mtpDev->notifyReq != NULL) {
         struct UsbFnRequest *notifyReq = mtpPort->mtpDev->notifyReq;
         (void)UsbFnCancelRequest(notifyReq);
-        HDF_LOGD("%{public}s:cancel notifyReq, req:%{public}p", __func__, notifyReq);
+        HDF_LOGD("%{public}s:cancel notifyReq", __func__);
     }
     return HDF_SUCCESS;
 }
@@ -667,7 +667,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceClassRequest(
                 struct UsbFnRequest *queueReqTmp = nullptr;
                 DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, queueHead, struct UsbFnRequest, list) {
                     (void)UsbFnCancelRequest(queueReq);
-                    HDF_LOGD("%{public}s:cancel read, req:%{public}p", __func__, req);
+                    HDF_LOGD("%{public}s:cancel read", __func__);
                 }
             }
             DListHead *writeQueue = &(mtpDev->mtpPort->writeQueue);
@@ -677,7 +677,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceClassRequest(
                 struct UsbFnRequest *queueReqTmp = nullptr;
                 DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, writeQueue, struct UsbFnRequest, list) {
                     (void)UsbFnCancelRequest(queueReq);
-                    HDF_LOGD("%{public}s:cancel write, req:%{public}p", __func__, req);
+                    HDF_LOGD("%{public}s:cancel write", __func__);
                 }
             }
             HDF_LOGD("%{public}s:async post, readStart:%{public}d", __func__, mtpDev->mtpPort->readStarted);

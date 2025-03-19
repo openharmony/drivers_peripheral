@@ -1330,7 +1330,6 @@ unsigned char *LibusbAdapter::GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busA
         HDF_LOGE("%{public}s: GetMmapBufferByFd failed",  __func__);
         return nullptr;
     }
-    HDF_LOGD("%{public}s Get mmap fd: %{public}d and memBuf: %{public}p success", __func__, fd, memBuf);
     return memBuf;
 }
 
