@@ -504,7 +504,7 @@ static int32_t IfFillControlRequest(
             if (ret != EOK) {
                 HDF_LOGE("%{public}s:%{public}d memcpy_s failed, ctrlReq.length = %{public}u", __func__, __LINE__,
                     ctrlReq.length);
-                return ret;
+                return HDF_ERR_IO;
             }
         }
     } else {
