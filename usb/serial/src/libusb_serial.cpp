@@ -314,7 +314,7 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
     }
     ret = 0;
     ret = libusb_bulk_transfer(deviceHandleInfo.handle,
-        deviceHandleInfo.intputEndpointAddr, dataIn, size, &actualLength, timeout);
+        deviceHandleInfo.inputEndpointAddr, dataIn, size, &actualLength, timeout);
     if (ret < 0 && actualLength == 0) {
         libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
         libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
@@ -389,7 +389,7 @@ int LibusbSerial::GetEndPoint(DeviceHandleInfo *deviceHandleInfo)
             if ((endpoint->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) == LIBUSB_TRANSFER_TYPE_BULK &&
                 (endpoint->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN) {
                 deviceHandleInfo->interface = j;
-                deviceHandleInfo->intputEndpointAddr = endpoint->bEndpointAddress;
+                deviceHandleInfo->inputEndpointAddr = endpoint->bEndpointAddress;
                 endpointNum++;
             }
             if ((endpoint->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) == LIBUSB_TRANSFER_TYPE_BULK &&
@@ -620,31 +620,25 @@ bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
     busnumFd = open((ttyUsbPath + BUS_NUM_STR).c_str(), O_RDONLY);
     if (busnumFd < 0) {
         HDF_LOGE("%{public}s : open file failed. ret = %{public}s", __func__, strerror(errno));
-        close(busnumFd);
         return false;
     }
     char busnumBuff[BUFFER_SIZE] = {'\0'};
     ssize_t readBytes = read(busnumFd, busnumBuff, BUFFER_SIZE);
+    close(busnumFd);
     if (readBytes < 0) {
-        close(busnumFd);
         return false;
     }
     devnumFd = open((ttyUsbPath + DEV_NUM_STR).c_str(), O_RDONLY);
     if (devnumFd < 0) {
         HDF_LOGE("%{public}s : open file failed. ret = %{public}s", __func__, strerror(errno));
-        close(devnumFd);
-        close(busnumFd);
         return false;
     }
     char devnumBuff[BUFFER_SIZE] = {'\0'};
     readBytes = read(devnumFd, devnumBuff, BUFFER_SIZE);
+    close(devnumFd);
     if (readBytes < 0) {
-        close(busnumFd);
-        close(devnumFd);
         return false;
     }
-    close(devnumFd);
-    close(busnumFd);
     if (atoi(devnumBuff) == libusb_get_device_address(device) && atoi(busnumBuff) == libusb_get_bus_number(device)) {
         return true;
     }
