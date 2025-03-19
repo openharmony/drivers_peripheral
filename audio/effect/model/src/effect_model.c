@@ -456,12 +456,14 @@ int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const stru
 
     if (ctrlMgr->ctrlOps == NULL) {
         HDF_LOGE("%{public}s: controller has no options", __func__);
+		pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_FAILURE;
     }
 
     /* call the lib destroy method，then free controller manager */
     lib->DestroyController(lib, ctrlMgr->ctrlOps);
     DeleteEffectLibrary(contollerId->libName);
+	pthread_rwlock_unlock(&g_rwEffectLock);
     HDF_LOGI("%{public}s: destroy effect succeed, libName = %{public}s", __func__, contollerId->libName);
     return HDF_SUCCESS;
 }
