@@ -31,7 +31,6 @@
 #include <cstring>
 #include <string>
 #include <chrono>
-#include <fcntl.h>
 #include "usbd_wrapper.h"
 #include "securec.h"
 
