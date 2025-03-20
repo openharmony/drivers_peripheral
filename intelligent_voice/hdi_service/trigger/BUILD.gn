@@ -50,6 +50,8 @@ ohos_shared_library("intell_voice_trigger_manager_service_1.1") {
     ]
   }
 
+  version_script = "libtrigger_manager_service_1_1.versionscript"
+
   install_enable = true
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
