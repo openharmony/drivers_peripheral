@@ -26,8 +26,6 @@
 #include <sys/ioctl.h>
 #include <scsi/sg.h>
 #include <unistd.h>
-#include <sstream> // for std::ostringstream
-#include <iomanip> // for std::hex, std::dec, std::setw, std::setfill
 
 #include "ddk_sysfs_dev_node.h"
 #include "hdf_log.h"
@@ -155,16 +153,6 @@ static inline uint32_t GetUint32(unsigned char *buf, int start)
         (static_cast<uint32_t>(buf[start + TWO_BYTE]) << EIGHT_BIT) |
         (static_cast<uint32_t>(buf[start + THREE_BYTE]))
     );
-}
-
-std::string BytesToHex(const uint8_t* data, size_t length)
-{
-    std::ostringstream oss;
-    oss << std::hex << std::setfill('0');
-    for (size_t i = 0; i < length; ++i) {
-        oss << std::setw(TWO_BYTE) << static_cast<int>(data[i]) << ' ';
-    }
-    return oss.str();
 }
 
 static void BuildCdbForReadAndWrite(const ScsiPeripheralIORequest& request, unsigned char cdb[CDB_LENGTH_TEN],
@@ -564,8 +552,6 @@ int32_t ScsiDdkService::Read10(const ScsiPeripheralDevice& dev,
         HDF_LOGE("%{public}s: SendRequest failed, ret=%{public}d", __func__, ret);
         return ret;
     }
-    HDF_LOGD("%{public}s, bufferAddr=%{public}p, bufferData=[ %{public}s ]",  __func__, buffer,
-        BytesToHex(reinterpret_cast<const uint8_t*>(buffer), bufferSize).c_str());
     UpdateResponseFromOsAdapter(response, resp);
 
     return HDF_SUCCESS;
@@ -610,7 +596,6 @@ int32_t ScsiDdkService::Write10(const ScsiPeripheralDevice& dev,
             errno, dev.memMapFd, memMapSize);
         return SCSIPERIPHERAL_DDK_MEMORY_ERROR;
     }
-    HDF_LOGD("%{public}s: bufferAddr=%{public}p, bufferData=%{public}s", __func__, buffer, buffer);
     MemMapFinalizer memMapFinalizer(buffer, memMapSize);
 
     if (osAdapter_ == nullptr) {
