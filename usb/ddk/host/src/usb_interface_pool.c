@@ -1733,9 +1733,11 @@ struct UsbRequest *UsbAllocRequestByAshmem(
     if (hostRequest == NULL) {
         HDF_LOGE("%{public}s: RawAllocRequest error", __func__);
         RawUsbMemFree(requestObj);
+        ifaceHdl->devHandle->isAshmem = false;
         return NULL;
     }
     hostRequest->devHandle = ifaceHdl->devHandle;
+    ifaceHdl->devHandle->isAshmem = false;
 
     ++g_usbRequestObjectId;
     g_usbRequestObjectId %= MAX_OBJECT_ID;

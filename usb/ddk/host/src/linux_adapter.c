@@ -173,16 +173,16 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t ret = GetMmapFd(dev);
+    char pathBuf[PATH_LEN] = {'\0'};
+    int32_t ret = GetUsbDevicePath(dev, pathBuf, PATH_LEN);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get mmap fd failed:%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: get usb device path failed:%{public}d", __func__, ret);
         return ret;
     }
 
-    char pathBuf[PATH_LEN] = {'\0'};
-    ret = GetUsbDevicePath(dev, pathBuf, PATH_LEN);
+    ret = GetMmapFd(dev);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get usb device path failed:%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: get mmap fd failed:%{public}d", __func__, ret);
         return ret;
     }
 
