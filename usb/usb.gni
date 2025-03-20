@@ -22,22 +22,22 @@ declare_args() {
   drivers_peripheral_usb_feature_commonlibrary_c_utils = false
 
   usb_hisysevent_enable = false
-  if (drivers_peripheral_usb_feature_hiviewdfx_hisysevent) {
+  if (!drivers_peripheral_usb_feature_hiviewdfx_hisysevent) {
     usb_hisysevent_enable = true
   }
 
   usb_samgr_enable = false
-  if (drivers_peripheral_usb_feature_systemabilitymgr_samgr) {
+  if (!drivers_peripheral_usb_feature_systemabilitymgr_samgr) {
     usb_samgr_enable = true
   }
 
   usb_c_utils_enable = false
-  if (drivers_peripheral_usb_feature_commonlibrary_c_utils) {
+  if (!drivers_peripheral_usb_feature_commonlibrary_c_utils) {
     usb_c_utils_enable = true
   }
 
-  libusb_enable = false
+  libusb_enable = true
   if (defined(ohos_lite)) {
-    libusb_enable = true
+    libusb_enable = false
   }
 }
