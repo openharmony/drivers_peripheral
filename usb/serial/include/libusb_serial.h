@@ -70,7 +70,7 @@ private:
 
 private:
     libusb_context* ctx_;
-    libusb_hotplug_callback_handle hotplug_handle_;
+    libusb_hotplug_callback_handle hotplug_handle_ = 0;
     // Map devices by libusb_device*
     std::unordered_map<libusb_device*, DeviceHandleInfo> devices_;
     std::mutex map_mutex_;
