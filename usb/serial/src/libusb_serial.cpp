@@ -622,7 +622,7 @@ bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
         HDF_LOGE("%{public}s : realpath failed. ret = %{public}s", __func__, strerror(errno));
         return false;
     }
-    busnumFd = open(realpathStr.c_str(), O_RDONLY);
+    busnumFd = open(realpathStr, O_RDONLY);
     if (busnumFd < 0) {
         HDF_LOGE("%{public}s : open file failed. ret = %{public}s", __func__, strerror(errno));
         close(busnumFd);
