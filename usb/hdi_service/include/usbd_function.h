@@ -30,10 +30,11 @@
 #define USB_FUNCTION_STORAGE (1 << 9)
 #define USB_FUNCTION_MANUFACTURE (1 << 10)
 #define USB_FUNCTION_ACCESSORY (1 << 11)
+#define USB_FUNCTION_DEVMODE_AUTH (1 << 12)
 #define USB_FUNCTION_SUPPORT                                                                        \
     (USB_FUNCTION_ACM | USB_FUNCTION_ECM | USB_FUNCTION_HDC | USB_FUNCTION_MTP | USB_FUNCTION_PTP | \
         USB_FUNCTION_RNDIS | USB_FUNCTION_STORAGE | USB_FUNCTION_MANUFACTURE | USB_FUNCTION_ACCESSORY | \
-        USB_FUNCTION_NCM)
+        USB_FUNCTION_NCM | USB_FUNCTION_DEVMODE_AUTH)
 
 #define DEV_SERVICE_NAME "usbfn"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
@@ -54,6 +55,7 @@
 #define HDC_CONFIG_AOA                  "aoa"
 #define HDC_CONFIG_NCM                  "ncm"
 #define HDC_CONFIG_NCM_HDC              "ncm_hdc"
+#define HDC_CONFIG_DEVMODE_AUTH         "devmode_auth"
 #define HDC_CONFIGFS_OFF       "0"
 #define HDC_CONFIGFS_ON        "1"
 
@@ -95,6 +97,7 @@ private:
     static int32_t SetFunctionToUsbAccessory();
     static int32_t SetFunctionToNcm();
     static int32_t SetFunctionToNcmHdc();
+    static int32_t SetFunctionToDevModeAuth();
     static int32_t SetDDKFunction(uint32_t funcs);
     static int32_t UsbdEnableDevice(int32_t funcs);
     static int32_t UsbdWaitUdc();
