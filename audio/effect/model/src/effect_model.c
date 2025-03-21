@@ -421,7 +421,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     return HDF_SUCCESS;
 EXIT:
     pthread_rwlock_unlock(&g_rwEffectLock);
-    return HDF_FAILURE;    
+    return HDF_FAILURE;
 }
 
 int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const struct ControllerId *contollerId)
