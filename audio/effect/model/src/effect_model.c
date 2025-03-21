@@ -401,7 +401,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
         HDF_LOGE("%{public}s: lib or lib->CreateController is null", __func__);
         pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_FAILURE;
-    }    
+    }
     
     struct EffectInfoVdi *infoVdi = (struct EffectInfoVdi *)info;
     lib->CreateController(lib, infoVdi, &ctrlOps);
