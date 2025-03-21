@@ -92,14 +92,4 @@
         }                                                     \
     } while (0)
 #endif
-
-#ifndef CHECK_RETURN_SUCCESS
-#define CHECK_RETURN_SUCCESS(ret)          \
-    do {                                                      \
-        if ((ret) != HDF_SUCCESS) {                              \
-            AUDIO_FUNC_LOGE("fuction fail and return ret=%{public}d", ret); \
-            return HDF_FAILURE;                                     \
-        }                                                     \
-    } while (0)
-#endif
 #endif
