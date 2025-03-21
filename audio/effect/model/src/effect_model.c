@@ -374,10 +374,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (IsSupplyEffect(info->libName) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: not support effect [%{public}s]", __func__, info->libName);
-        return HDF_FAILURE;
-    }
+    CHECK_RETURN_SUCCESS(IsSupplyEffect(info->libName));
     struct EffectFactory *lib = NULL;
     struct ControllerManager *ctrlMgr = NULL;
     struct IEffectControlVdi *ctrlOps = NULL;
