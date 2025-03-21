@@ -35,8 +35,8 @@ RetCode ForkNode::Start(const int32_t streamId)
         std::unique_lock<std::mutex> l(bufferMtx);
         stopForkThread_ = false;
     }
-    CAMERA_LOGI("ForkNode::Start streamId = %{public}d this:[%{public}p] streamRunning_ = %{public}d\n",
-        streamId, this, streamRunning_ ? 0 : 1);
+    CAMERA_LOGI("ForkNode::Start streamId = %{public}d streamRunning_ = %{public}d\n",
+        streamId, streamRunning_ ? 0 : 1);
     if (streamRunning_) {
         return RC_OK;
     }
@@ -89,7 +89,7 @@ RetCode ForkNode::Stop(const int32_t streamId)
         std::unique_lock<std::mutex> l(bufferMtx);
         stopForkThread_ = true;
         bqcv_.notify_all();
-        CAMERA_LOGD("ForkNode Stop streamId:%{public}d bqcv_:%{public}p this:%{public}p", &bqcv_, this, streamId);
+        CAMERA_LOGD("ForkNode Stop streamId:%{public}d", streamId);
     }
 
     if (forkThread_ != nullptr) {
@@ -147,7 +147,7 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGE("frameSpec is null");
         return;
     }
-    CAMERA_LOGD("ForkNode forkBuffer streamId:%{public}d this:%{public}p start", buffer->GetStreamId(), this);
+    CAMERA_LOGD("ForkNode forkBuffer streamId:%{public}d start", buffer->GetStreamId());
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
         std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
         if (forkBuffer != nullptr) {
@@ -162,8 +162,7 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                 CAMERA_LOGI("fork node deliver buffer streamid = %{public}d, in alone thread, index = %{public}d",
                     forkBuffer->GetStreamId(), forkBuffer->GetIndex());
                 bqcv_.notify_one();
-                CAMERA_LOGD("ForkNode forkBuffer bqcv_:%{public}p this:%{public}p streamId:%{public}d",
-                    &bqcv_, this, forkBuffer->GetStreamId());
+                CAMERA_LOGD("ForkNode forkBuffer streamId:%{public}d", forkBuffer->GetStreamId());
             } else {
                 CAMERA_LOGE("Deliver fork buffer, streamId[%{public}d], index[%{public}d], status = %{public}d",
                     forkBuffer->GetStreamId(), forkBuffer->GetIndex(), forkBuffer->GetBufferStatus());
@@ -216,7 +215,7 @@ void ForkNode::DeliverBufferToNextNode()
 {
     {
         std::unique_lock<std::mutex> l(bufferMtx);
-        CAMERA_LOGD("ForkNode DeliverBufferToNextNode bqcv_:%{public}p this:%{public}p", &bqcv_, this);
+        CAMERA_LOGD("ForkNode DeliverBufferToNextNode");
         bqcv_.wait(l, [this] {
             CAMERA_LOGD("ForkNode DeliverBufferToNextNode stopForkThread_:%{public}d, bufferQueue_:%{public}d",
                 stopForkThread_ ? 0 : 1, bufferQueue_.empty() ? 0 : 1);

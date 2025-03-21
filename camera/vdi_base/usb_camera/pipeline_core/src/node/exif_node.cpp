@@ -68,8 +68,7 @@ void ExifNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
         if (info.size != -1) {
             exifInfo.frame_size = info.size;
             ExifUtils::AddCustomExifInfo(exifInfo, buffer->GetVirAddress(), outPutBufferSize);
-            CAMERA_LOGI("%{public}s virAddress(%{public}p) and outPutBufferSize = (%{public}d)\n",
-                __FUNCTION__, buffer->GetVirAddress(), outPutBufferSize);
+            CAMERA_LOGI("%{public}s and outPutBufferSize = (%{public}d)\n", __FUNCTION__, outPutBufferSize);
             buffer->SetEsFrameSize(outPutBufferSize);
         }
     }
