@@ -410,8 +410,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
         goto EXIT;
     }
 
-    ret = CreateEffectController(info, contoller, contollerId, ctrlOps);
-    if (ret != HDF_SUCCESS) {
+    if (CreateEffectController(info, contoller, contollerId, ctrlOps) != HDF_SUCCESS) {
         DeleteEffectLibrary(info->libName);
         goto EXIT;
     }
