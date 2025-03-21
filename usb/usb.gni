@@ -20,7 +20,9 @@ declare_args() {
   drivers_peripheral_usb_feature_hiviewdfx_hisysevent = false
   drivers_peripheral_usb_feature_systemabilitymgr_samgr = false
   drivers_peripheral_usb_feature_commonlibrary_c_utils = false
+}
 
+declare_args() {
   usb_hisysevent_enable = false
   if (!drivers_peripheral_usb_feature_hiviewdfx_hisysevent) {
     usb_hisysevent_enable = true
