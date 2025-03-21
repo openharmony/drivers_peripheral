@@ -409,7 +409,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
         HDF_LOGE("%{public}s: ctrlOps is null", __func__);
         pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_FAILURE;
-    }    
+    }
 
     ret = CreateEffectController(info, contoller, contollerId, ctrlOps);
     if (ret != HDF_SUCCESS) {
