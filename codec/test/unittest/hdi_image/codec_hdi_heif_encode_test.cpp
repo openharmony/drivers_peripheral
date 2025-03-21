@@ -780,6 +780,7 @@ HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_025, TestSize.Level
     ASSERT_EQ(filledLen_, 0);
 }
 
+#ifdef SUPPORT_HEIF
 static bool SetColorTypeAndProf(ImageItem &item)
 {
     PropWriter pw;
@@ -847,6 +848,7 @@ HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_027, TestSize.Level
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(filledLen_ > 0);
 }
+#endif
 
 static bool SetInValidProperties(ImageItem &item)
 {
@@ -872,6 +874,7 @@ HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_028, TestSize.Level
     ASSERT_EQ(filledLen_, 0);
 }
 
+#ifdef SUPPORT_HEIF
 static bool AddPropOnlyForTmap(PropWriter& pw)
 {
     MasteringDisplayColourVolume clrVol = {
@@ -1041,7 +1044,6 @@ HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_032, TestSize.Level
 }
 
 // [PASS] check GetImageCapability can get heif encode capability
-#ifdef SUPPORT_HEIF
 HWTEST_F(CodecHdiHeifEncodeTest, HdfCodecHdiDoHeifEncodeTest_033, TestSize.Level1)
 {
     ASSERT_TRUE(hdiHeifEncoder_ != nullptr);
