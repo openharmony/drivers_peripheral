@@ -251,6 +251,8 @@ if (defined(ohos_lite)) {
     defines = [
       "private = public",
       "protected = public",
+      "P2P_NAME=\"$drivers_peripheral_wlan_p2p_name\"",
+      "HAL_SO_NAME=\"$drivers_peripheral_wlan_feature_vendor\"",
     ]
 
     if (is_standard_system) {

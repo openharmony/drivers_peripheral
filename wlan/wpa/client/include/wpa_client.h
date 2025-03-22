@@ -74,6 +74,7 @@ typedef enum {
     WPA_EVENT_STA_NOTIFY,
     WPA_EVENT_VENDOR_EXT,
     WPA_EVENT_AUTH_TIMEOUT,
+    WPA_EVENT_IFACE_REMOVED,
 } WpaCallBackEventType;
 
 enum WpaClientType {

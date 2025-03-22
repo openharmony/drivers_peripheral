@@ -21,17 +21,18 @@
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_3 {
+namespace V1_4 {
 static std::mutex mutex_;
 static sptr<V1_1::IRilCallback> callback1_1_;
 static sptr<V1_2::IRilCallback> callback1_2_;
-static sptr<V1_3::IRilCallback> callback_;
+static sptr<V1_3::IRilCallback> callback1_3_;
+static sptr<V1_4::IRilCallback> callback_;
 namespace {
 sptr<RilImpl::RilDeathRecipient> g_deathRecipient = nullptr;
 }
 extern "C" IRil *RilImplGetInstance(void)
 {
-    using OHOS::HDI::Ril::V1_3::RilImpl;
+    using OHOS::HDI::Ril::V1_4::RilImpl;
     RilImpl *service = new (std::nothrow) RilImpl();
     if (service == nullptr) {
         return nullptr;
@@ -303,6 +304,44 @@ int32_t RilImpl::CleanAllConnections(int32_t slotId, int32_t serialId)
     return TaskSchedule(&Telephony::HRilManager::CleanAllConnections, slotId, serialId);
 }
 
+int32_t RilImpl::SendUrspDecodeResult(int32_t slotId,
+    int32_t serialId, const UePolicyDecodeResult &uePolicyDecodeResult)
+{
+    HDF_LOGI("RilImpl::SendUrspDecodeResult");
+    return TaskSchedule(&Telephony::HRilManager::SendUrspDecodeResult,
+        slotId, serialId, uePolicyDecodeResult);
+}
+ 
+int32_t RilImpl::SendUePolicySectionIdentifier(int32_t slotId, int32_t serialId,
+    const UePolicySectionIdentifier &uePolicySectionIdentifier)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendUePolicySectionIdentifier,
+        slotId, serialId, uePolicySectionIdentifier);
+}
+
+int32_t RilImpl::SendImsRsdList(int32_t slotId, int32_t serialId, const ImsRsdList &imsRsdList)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendImsRsdList, slotId, serialId, imsRsdList);
+}
+
+int32_t RilImpl::GetNetworkSliceAllowedNssai(int32_t slotId, int32_t serialId,
+    const SyncAllowedNssaiInfo &syncAllowedNssaiInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetNetworkSliceAllowedNssai, slotId, serialId, syncAllowedNssaiInfo);
+}
+
+int32_t RilImpl::GetNetworkSliceEhplmn(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetNetworkSliceEhplmn, slotId, serialId);
+}
+
+int32_t RilImpl::ActivatePdpContextWithApnTypesforSlice(int32_t slotId, int32_t serialId,
+    const DataCallInfoWithApnTypesforSlice &dataCallInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::ActivatePdpContextWithApnTypesforSlice,
+        slotId, serialId, dataCallInfo);
+}
+
 // Modem
 int32_t RilImpl::SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst)
 {
@@ -455,6 +494,11 @@ int32_t RilImpl::SetCallback1_2(const sptr<V1_2::IRilCallback> &rilCallback)
 
 int32_t RilImpl::SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback)
 {
+    return HDF_SUCCESS;
+}
+
+int32_t RilImpl::SetCallback1_4(const sptr<V1_4::IRilCallback> &rilCallback)
+{
     std::lock_guard<std::mutex> lock(mutex_);
     callback_ = rilCallback;
     if (callback_ == nullptr) {
@@ -463,7 +507,7 @@ int32_t RilImpl::SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback)
     }
     g_deathRecipient = new RilDeathRecipient(this);
     if (g_deathRecipient == nullptr) {
-        HDF_LOGE("SetCallback1_3 fail g_deathRecipient is null");
+        HDF_LOGE("SetCallback1_4 fail g_deathRecipient is null");
         return HDF_FAILURE;
     }
     AddRilDeathRecipient(callback_);
@@ -722,7 +766,7 @@ int32_t RilImpl::Init()
 {
     return HDF_SUCCESS;
 }
-} // namespace V1_3
+} // namespace V1_4
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS

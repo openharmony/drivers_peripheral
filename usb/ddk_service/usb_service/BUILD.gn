@@ -1,0 +1,161 @@
+# Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/hdi/hdi.gni")
+import("//build/ohos.gni")
+import("./../../usb.gni")
+
+config("ddk_public_config") {
+  include_dirs = [
+    "include/",
+    "${usb_driver_path}/ddk/ndk/",
+    "${usb_driver_path}/utils/include",
+    "${usb_driver_path}/libusb_adapter/include",
+  ]
+}
+
+ohos_shared_library("libusb_ddk_service_1.1") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/usb_ddk_hash.cpp",
+    "src/usb_ddk_service.cpp",
+    "src/usb_driver_manager.cpp",
+  ]
+  include_dirs = [
+    "${usb_driver_path}/interfaces/ddk/host",
+    "${usb_driver_path}/interfaces/ddk/common",
+    "${usb_driver_path}/ddk/host/include",
+    "${usb_driver_path}/ddk_service/common/include",
+    "//drivers/hdf_core/framework/model/usb/include",
+    "${usb_driver_path}/utils/include",
+  ]
+
+  configs = [ ":ddk_public_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_ddk_host",
+    "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "${usb_driver_path}/ddk_service/common:libusb_ddk_service_common",
+    "${usb_driver_path}/libusb_adapter:libusb_adapter",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_stub_1.2",
+      "drivers_interface_usb:usb_ddk_idl_headers",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "libusb:libusb",
+    ]
+    if (usb_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+    }
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  if (libusb_enable) {
+    if (defined(defines)) {
+      defines += [ "LIBUSB_ENABLE" ]
+    } else {
+      defines = [ "LIBUSB_ENABLE" ]
+    }
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+ohos_shared_library("usb_ddk_dynamic_library_wrapper") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [ "src/usb_ddk_dynamic_library_wrapper.cpp" ]
+
+  external_deps = [ "access_token:libaccesstoken_sdk" ]
+  if (usb_c_utils_enable) {
+    external_deps += [ "c_utils:utils" ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+ohos_shared_library("libusb_ddk_driver") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [ "src/usb_ddk_driver.cpp" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_ddk_stub_1.1",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  configs = [ ":ddk_public_config" ]
+
+  shlib_type = "hdi"
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+group("usb_ddk_target") {
+  deps = [
+    ":libusb_ddk_driver",
+    ":libusb_ddk_service_1.1",
+    ":usb_ddk_dynamic_library_wrapper",
+  ]
+}

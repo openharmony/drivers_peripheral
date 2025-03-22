@@ -24,6 +24,7 @@
 #include "v4_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
+static int32_t THREAD_POOL_COUNT = 32;
 static pthread_mutex_t g_managerMutex;
 
 typedef struct IAudioManagerVdi* (*AudioManagerCreateIfInstanceVdi)(void);
@@ -512,14 +513,14 @@ static int32_t AudioManagerLoadVendorLib(struct AudioManagerPrivVdi *priv)
         return HDF_FAILURE;
     }
 
-    AUDIO_FUNC_LOGD("audio load vendor lib success");
+    AUDIO_FUNC_LOGI("audio load vendor lib success");
     return HDF_SUCCESS;
 }
 
 struct IAudioManager *AudioManagerCreateIfInstance(void)
 {
-    AUDIO_FUNC_LOGD("audio vdiManager create instance");
-
+    AUDIO_FUNC_LOGI("audio vdiManager create instance");
+    SetMaxWorkThreadNum(THREAD_POOL_COUNT);
     struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)OsalMemCalloc(sizeof(*priv));
     if (priv == NULL) {
         AUDIO_FUNC_LOGE("OsalMemCalloc AudioManagerPrivVdi failed");

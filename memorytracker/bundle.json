@@ -13,6 +13,7 @@
       "name": "drivers_peripheral_memorytracker",
       "subsystem": "hdf",
       "syscap": [],
+      "features": ["drivers_peripheral_memorytracker_is_implemented"],
       "adapted_system_type": ["standard"],
       "rom": "45KB",
       "ram": "100KB",

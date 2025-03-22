@@ -150,7 +150,7 @@ static int32_t GetUsbDevicePath(struct UsbDevice *dev, char *pathBuf, size_t len
     }
 
     if (realpath(path, pathBuf) == NULL) {
-        HDF_LOGE("%{public}s: path conversion failed, path: %{public}s", __func__, path);
+        HDF_LOGE("%{public}s: path conversion failed, path: %{public}s, errno:%{public}d", __func__, path, errno);
         return HDF_FAILURE;
     }
 
@@ -173,16 +173,16 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t ret = GetMmapFd(dev);
+    char pathBuf[PATH_LEN] = {'\0'};
+    int32_t ret = GetUsbDevicePath(dev, pathBuf, PATH_LEN);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get mmap fd failed:%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: get usb device path failed:%{public}d", __func__, ret);
         return ret;
     }
 
-    char pathBuf[PATH_LEN] = {'\0'};
-    ret = GetUsbDevicePath(dev, pathBuf, PATH_LEN);
+    ret = GetMmapFd(dev);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get usb device path failed:%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: get mmap fd failed:%{public}d", __func__, ret);
         return ret;
     }
 
@@ -191,6 +191,45 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
         return fd;
     }
     HDF_LOGI("%{public}s: path: %{public}s, fd:%{public}d", __func__, pathBuf, fd);
+    usleep(SLEEP_TIME);
+    switch (errno) {
+        case ENOENT:
+            fd = open(pathBuf, mode | O_CLOEXEC);
+            if (fd != HDF_FAILURE) {
+                return fd;
+            }
+            ret = HDF_DEV_ERR_NO_DEVICE;
+            break;
+        case EACCES:
+            ret = HDF_ERR_BAD_FD;
+            break;
+        default:
+            ret = HDF_FAILURE;
+            break;
+    }
+
+    return ret;
+}
+
+static int32_t AdapterGetUsbDeviceFd(struct UsbDevice *dev, mode_t mode)
+{
+    if (dev == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    char pathBuf[PATH_LEN] = {'\0'};
+    int32_t ret = GetUsbDevicePath(dev, pathBuf, PATH_LEN);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get usb device path failed:%{public}d", __func__, ret);
+        return ret;
+    }
+
+    int32_t fd = open(pathBuf, mode | O_CLOEXEC);
+    if (fd != HDF_FAILURE) {
+        HDF_LOGI("%{public}s: path: %{public}s, fd: %{public}d", __func__, pathBuf, fd);
+        return fd;
+    }
     usleep(SLEEP_TIME);
     switch (errno) {
         case ENOENT:
@@ -357,8 +396,15 @@ static int32_t OsGetActiveConfig(struct UsbDevice *dev, int32_t fd)
     ctrlData.data = &activeConfig;
     ret = ioctl(fd, USBDEVFS_CONTROL, &ctrlData);
     if (ret < 0) {
-        HDF_LOGE("%{public}s:%{public}d ioctl failed errno = %{public}d", __func__, __LINE__, errno);
-        return HDF_FAILURE;
+        HDF_LOGW("%{public}s:%{public}d ioctl failed errno = %{public}d", __func__, __LINE__, errno);
+        if (dev->deviceDescriptor.bNumConfigurations == 1 && dev->configDescriptors != NULL) {
+            activeConfig = dev->configDescriptors[0].desc->bConfigurationValue;
+            HDF_LOGI("%{public}s:%{public}d get config value = %{public}d", __func__, __LINE__, activeConfig);
+        } else {
+            HDF_LOGE("%{public}s:%{public}d bNumConfigures = %{public}d", __func__, __LINE__,
+                dev->deviceDescriptor.bNumConfigurations);
+            return HDF_FAILURE;
+        }
     }
     dev->activeConfig = activeConfig;
 
@@ -946,10 +992,12 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 
     handle = OsGetDeviceHandle(session, busNum, usbAddr);
     if (handle != NULL) {
+        HDF_LOGE("%{public}s:%{public}d OsGetDeviceHandle success: %{public}p", __func__, __LINE__, handle);
         return handle;
     }
 
     handle = OsCallocDeviceHandle();
+    HDF_LOGE("%{public}s:%{public}d OsCallocDeviceHandle = %{public}p", __func__, __LINE__, handle);
     if (handle == NULL) {
         return NULL;
     }
@@ -1551,6 +1599,7 @@ static struct UsbOsAdapterOps g_usbAdapter = {
     .usbControlMsg = AdapterUsbControlMsg,
     .getUsbSpeed = AdapterGetUsbSpeed,
     .getInterfaceActiveStatus = AdapterGetInterfaceActiveStatus,
+    .getDeviceFd = AdapterGetUsbDeviceFd,
 };
 
 static void OsSignalHandler(int32_t signo)

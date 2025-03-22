@@ -234,6 +234,18 @@ struct ControlRateConstantQuality {
 };
 
 /**
+ * @brief Defines the <b>StableControlRate</b>.
+ */
+struct StableControlRate {
+    uint32_t size;                                         /** Size of the structure */
+    union OMX_VERSIONTYPE version;                         /** Component version */
+    uint32_t portIndex;                                    /** Port index */
+    uint32_t sqrFactor;                                     /** sqr Factor */
+    uint32_t sMaxBitrate;                                  /** Control max bitrate */
+    uint32_t sTargetBitrate;                               /** Control bitrate */
+};
+
+/**
  * @brief Defines the <b>PassthroughParam</b>.
  */
 struct PassthroughParam {
@@ -341,6 +353,10 @@ enum OmxIndexCodecExType {
     OMX_IndexParamIsMvUpload,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamEnablePackInput,
+    /** OMX_CONFIG_BOOLEANTYPE */
+    OMX_IndexParamSwitchGround,
+    /** ControlRateSQR */
+    OMX_IndexParamControlRateSQR,
 };
 
 /**
@@ -349,6 +365,10 @@ enum OmxIndexCodecExType {
 typedef enum OmxVideoControlRateVendorExtType {
     /** constant bit rate mode with Rlambda */
     OMX_Video_ControlRateConstantWithRlambda = OMX_Video_ControlRateVendorStartUnused + 0x1,
+    /** constant bit rate mode with CQ */
+    OMX_Video_ControlRateConstantWithCQ,
+    /** stable bit rate mode with SQR */
+    OMX_Video_ControlRateConstantWithSQR,
 } OmxVideoControlRateVendorExtType;
 
 /**

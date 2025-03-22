@@ -32,7 +32,7 @@ ohos_source_set("partitionslot_source") {
 
 ohos_shared_library("libpartition_slot_manager") {
   deps = [ ":partitionslot_source" ]
-
+  public_configs = [ ":exported_header_files" ]
   install_images = [
     "system",
     "updater",

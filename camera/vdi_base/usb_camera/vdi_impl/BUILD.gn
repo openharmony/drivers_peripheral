@@ -123,6 +123,7 @@ ohos_shared_library("camera_daemon") {
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]
@@ -170,6 +171,7 @@ ohos_static_library("camera_daemon_static") {
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]

@@ -39,6 +39,7 @@ const int TAG_NUM_10 = 10;
 const uint8_t INTERFACEID_OK = 1;
 const uint8_t INTERFACEID_INVALID = 255;
 const uint8_t POINTID_INVALID = 158;
+const uint8_t CANCEL_POINTID_INVALID = 255;
 // data interface have 2 point : 1->bulk_out 2->bulk_in
 const uint8_t POINTID_DIR_IN = USB_ENDPOINT_DIR_IN | 2;
 const uint8_t POINTID_DIR_OUT = USB_ENDPOINT_DIR_OUT | 1;
@@ -629,7 +630,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor003, TestSize.Level1)
     auto ret = g_usbHostInterface->GetStringDescriptor(dev, stringId, devData);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor003 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devData.size(), sizeof(devData), ret);
-    EXPECT_NE(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -1536,10 +1537,10 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel004, TestSize.Level1)
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d RequestQueue=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
     pipe.intfId = INTERFACEID_INVALID;
-    pipe.endpointId = POINTID_INVALID;
+    pipe.endpointId = CANCEL_POINTID_INVALID;
     ret = g_usbHostInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    EXPECT_EQ(0, ret);
+    EXPECT_NE(0, ret);
     pipe = {interfaceId, pointId};
     ret = g_usbHostInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d again RequestCancel=%{public}d", __LINE__, ret);

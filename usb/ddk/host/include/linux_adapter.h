@@ -16,6 +16,8 @@
 #ifndef USB_HOST_LINUX_ADAPTER_H
 #define USB_HOST_LINUX_ADAPTER_H
 
+#include <fcntl.h>
+
 #include "usb_raw_api_library.h"
 
 #if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
@@ -147,6 +149,7 @@ struct UsbOsAdapterOps {
     int32_t (*getUsbSpeed)(const struct UsbDeviceHandle *handle);
     bool (*getInterfaceActiveStatus)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
     int32_t (*getDeviceSpeed)(const struct UsbDeviceHandle *devHandle);
+    int32_t (*getDeviceFd)(struct UsbDevice *dev, mode_t mode);
 };
 #ifdef __cplusplus
 extern "C" {

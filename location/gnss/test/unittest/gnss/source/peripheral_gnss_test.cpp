@@ -65,7 +65,8 @@ HWTEST_F(PeripheralGnssTest, SetGnssConfigParaTest001, TestSize.Level1)
         << "PeripheralGnssTest, SetGnssConfigParaTest001, TestSize.Level1";
     GnssConfigPara para;
     para.gnssBasic.gnssMode = GNSS_WORKING_MODE_MS_ASSISTED;
-    gnssInstance_->SetGnssConfigPara(para);
+    auto ret = gnssInstance_->SetGnssConfigPara(para);
+    EXPECT_NE(HDF_ERR_INVALID_PARAM, ret);
 }
 
 HWTEST_F(PeripheralGnssTest, NmeaCallbackTest001, TestSize.Level1)
@@ -77,7 +78,8 @@ HWTEST_F(PeripheralGnssTest, NmeaCallbackTest001, TestSize.Level1)
     sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
     auto gnssCallback_ = new (std::nothrow) GnssEventCallbackMock(saObject);
  
-    gnssInstance_->EnableGnss(gnssCallback_);
+    auto ret = gnssInstance_->EnableGnss(gnssCallback_);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     NmeaCallback(0, nullptr, 0);
     NmeaCallback(0, "nmea_str.", 0);
@@ -96,6 +98,7 @@ HWTEST_F(PeripheralGnssTest, GetGnssCallbackMethodsTest001, TestSize.Level1)
     GetGnssCallbackMethods(nullptr);
     GnssCallbackStruct device;
     GetGnssCallbackMethods(&device);
+    EXPECT_EQ(device.size > 0, true);
 }
 
 HWTEST_F(PeripheralGnssTest, SvStatusCallbackTest001, TestSize.Level1)
@@ -106,8 +109,8 @@ HWTEST_F(PeripheralGnssTest, SvStatusCallbackTest001, TestSize.Level1)
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
     auto gnssCallback_ = new (std::nothrow) GnssEventCallbackMock(saObject);
-    gnssInstance_->EnableGnss(gnssCallback_);
-    
+    auto ret = gnssInstance_->EnableGnss(gnssCallback_);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     SvStatusCallback(nullptr);
     GnssSatelliteStatus gnssSatelliteStatus;
     gnssSatelliteStatus.satellitesNum = 1;
@@ -127,19 +130,13 @@ HWTEST_F(PeripheralGnssTest, GnssWorkingStatusUpdateTest001, TestSize.Level1)
     sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
     auto gnssCallback_ = new (std::nothrow) GnssEventCallbackMock(saObject);
 
-    gnssInstance_->EnableGnss(gnssCallback_);
+    auto ret = gnssInstance_->EnableGnss(gnssCallback_);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     GnssWorkingStatusUpdate(nullptr);
     uint16_t statusPtr = 1;
     GnssWorkingStatusUpdate(&statusPtr);
     gnssInstance_->DisableGnss();
     sleep(1);
-}
-
-HWTEST_F(PeripheralGnssTest, GnssMeasurementUpdateTest001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO)
-        << "PeripheralGnssTest, GnssMeasurementUpdateTest001, TestSize.Level1";
-    GnssMeasurementUpdate(nullptr);
 }
 
 HWTEST_F(PeripheralGnssTest, LocationUpdateTest001, TestSize.Level1)
@@ -152,7 +149,8 @@ HWTEST_F(PeripheralGnssTest, LocationUpdateTest001, TestSize.Level1)
     sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
     auto gnssCallback_ = new (std::nothrow) GnssEventCallbackMock(saObject);
 
-    gnssInstance_->EnableGnss(gnssCallback_);
+    auto ret = gnssInstance_->EnableGnss(gnssCallback_);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     
     LocationUpdate(nullptr);
     GnssLocation location;
@@ -171,7 +169,8 @@ HWTEST_F(PeripheralGnssTest, NiNotifyCallbackTest001, TestSize.Level1)
     sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
     auto gnssCallback_ = new (std::nothrow) GnssEventCallbackMock(saObject);
 
-    gnssInstance_->EnableGnss(gnssCallback_);
+    auto ret = gnssInstance_->EnableGnss(gnssCallback_);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     
     NiNotifyCallback(nullptr);
     OHOS::HDI::Location::GnssNiNotificationRequest notification;
@@ -186,7 +185,8 @@ HWTEST_F(PeripheralGnssTest, SendNiUserResponseTest001, TestSize.Level1)
         << "PeripheralGnssTest, SendNiUserResponseTest001, TestSize.Level1";
     HDF_LOGI("PeripheralGnssTest, SendNiUserResponseTest001, TestSize.Level1");
     GnssNiResponseCmd userResponse = GnssNiResponseCmd::GNSS_NI_RESPONSE_CMD_ACCEPT;
-    gnssInstance_->SendNiUserResponse(200, userResponse);
+    auto ret = gnssInstance_->SendNiUserResponse(200, userResponse);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     gnssInstance_->SendNetworkInitiatedMsg("0", 0);
     gnssInstance_->SendNetworkInitiatedMsg("0x20", 4);
 }
@@ -202,6 +202,7 @@ HWTEST_F(PeripheralGnssTest, EnableGnssTest001, TestSize.Level1)
 
     int32_t ret = 0;
     ret = gnssInstance_->EnableGnss(gnssCallback_);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     HDF_LOGI("PeripheralGnssTest, EnableGnssTest001, TestSize.Level1");
     gnssInstance_->DisableGnss();
     sleep(1);
@@ -225,6 +226,7 @@ HWTEST_F(PeripheralGnssTest, EnableGnssMeasurementTest001, TestSize.Level1)
     OHOS::HDI::Location::GnssMeasurementInfo gnssMeasurementInfo;
     gnssMeasurementInfo.size = 2;
     GnssMeasurementUpdate(&gnssMeasurementInfo);
+    GnssMeasurementUpdate(nullptr);
 
     HDF_LOGI("PeripheralGnssTest, EnableGnssMeasurementTest001, TestSize.Level1");
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -369,7 +371,8 @@ HWTEST_F(PeripheralGnssTest, DoubleEnableGnssTest001, TestSize.Level1)
     sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
     auto gnssCallback_ = new (std::nothrow) GnssEventCallbackMock(saObject);
 
-    gnssInstance_->EnableGnss(gnssCallback_);
+    auto ret = gnssInstance_->EnableGnss(gnssCallback_);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     sleep(1);
     auto gnssCallback_2 = new (std::nothrow) GnssEventCallbackMock(saObject);
     gnssInstance_->EnableGnss(gnssCallback_2);
@@ -383,6 +386,7 @@ HWTEST_F(PeripheralGnssTest, GetGnssMeasurementCallbackMethodsTest001, TestSize.
     GnssMeasurementCallbackIfaces device;
     GetGnssMeasurementCallbackMethods(nullptr);
     GetGnssMeasurementCallbackMethods(&device);
+    EXPECT_EQ(device.size > 0, true);
 }
 
 HWTEST_F(PeripheralGnssTest, GetModuleInterfaceTest001, TestSize.Level1)
@@ -399,7 +403,8 @@ HWTEST_F(PeripheralGnssTest, RestGnssTest001, TestSize.Level1)
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, RestGnssTest001, TestSize.Level1";
     auto gnssImpl = new (std::nothrow) GnssInterfaceImpl();
-    gnssImpl->StartGnss(GNSS_START_TYPE_NORMAL);
+    auto ret = gnssImpl->StartGnss(GNSS_START_TYPE_NORMAL);
+    EXPECT_NE(HDF_ERR_INVALID_PARAM, ret);
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
@@ -412,8 +417,9 @@ HWTEST_F(PeripheralGnssTest, HexCharToIntTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, HexCharToIntTest001, TestSize.Level1";
-    std::string str = "123";
-    StringUtils::HexToByteVector(str);
+    std::string str = "1234";
+    std::vector<uint8_t> ret = StringUtils::HexToByteVector(str);
+    EXPECT_EQ(ret.size(), 2);
 }
 
 } // V2_0

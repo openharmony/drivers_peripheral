@@ -184,6 +184,15 @@ void UsbfnMtpImpl::UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *r
     pthread_rwlock_unlock(&mtpRunrwLock_);
 }
 
+static void RemoveReqFromList(struct UsbFnRequest *req)
+{
+    if (req->list.prev != NULL && req->list.next != NULL) {
+        DListRemove(&req->list);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
+}
+
 void UsbfnMtpImpl::UsbMtpPortReleaseRxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req)
 {
     std::lock_guard<std::mutex> guard(asyncMutex_);
@@ -191,7 +200,11 @@ void UsbfnMtpImpl::UsbMtpPortReleaseRxReq(struct UsbMtpPort *mtpPort, struct Usb
     if (mtpPort->suspended) {
         return;
     }
-    DListRemove(&req->list);
+    if (req->list.prev != NULL && req->list.next != NULL) {
+        DListRemove(&req->list);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     DListInsertTail(&req->list, &mtpPort->readPool);
     mtpPort->readStarted--;
 }
@@ -203,7 +216,11 @@ void UsbfnMtpImpl::UsbMtpPortReleaseTxReq(struct UsbMtpPort *mtpPort, struct Usb
     if (mtpPort->suspended) {
         return;
     }
-    DListRemove(&req->list);
+    if (req->list.prev != NULL && req->list.next != NULL) {
+        DListRemove(&req->list);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     DListInsertTail(&req->list, &mtpPort->writePool);
     mtpPort->writeStarted--;
 }
@@ -334,12 +351,20 @@ int32_t UsbfnMtpImpl::UsbMtpPortSubmitAsyncTxReq(struct UsbMtpPort *mtpPort, str
         HDF_LOGE("%{public}s: read failed: %{public}zd < %{public}u", __func__, readRet, req->length);
         return HDF_FAILURE;
     }
-    DListRemove(&req->list);
+    if (req->list.prev != NULL && req->list.next != NULL) {
+        DListRemove(&req->list);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     DListInsertTail(&req->list, &mtpPort->writeQueue);
     int32_t ret = UsbFnSubmitRequestAsync(req);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: submit bulk-in req error: %{public}d", __func__, ret);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         DListInsertTail(&req->list, &mtpPort->writePool);
         return ret;
     }
@@ -419,7 +444,11 @@ void UsbfnMtpImpl::UsbMtpDeviceFreeCtrlRequests()
     struct DListHead *head = &mtpDev_->ctrlPool;
     while (!DListIsEmpty(head)) {
         struct UsbFnRequest *req = DLIST_FIRST_ENTRY(head, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         (void)OsalMemFree(req->context);
         (void)UsbFnFreeRequest(req);
         mtpDev_->ctrlReqNum--;
@@ -430,7 +459,11 @@ void UsbfnMtpImpl::UsbMtpPortFreeRequests(struct DListHead *head, int32_t &alloc
 {
     while (!DListIsEmpty(head)) {
         struct UsbFnRequest *req = DLIST_FIRST_ENTRY(head, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         (void)UsbFnFreeRequest(req);
         allocated--;
     }
@@ -485,6 +518,10 @@ int32_t UsbfnMtpImpl::UsbMtpPortInitIo()
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: allocate requests for read/write failed: %{public}d", __func__, ret);
             UsbMtpPortFreeRequests(&mtpPort_->readPool, mtpPort_->readAllocated);
+            if (mtpPort_->standbyReq) {
+                (void)UsbFnFreeRequest(mtpPort_->standbyReq);
+                mtpPort_->standbyReq = NULL;
+            }
             UsbMtpPortFreeRequests(&mtpPort_->writePool, mtpPort_->writeAllocated);
             return HDF_ERR_MALLOC_FAIL;
         }
@@ -497,12 +534,20 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelAndFreeReq(
 {
     while (!DListIsEmpty(queueHead)) {
         struct UsbFnRequest *req = DLIST_FIRST_ENTRY(queueHead, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         DListInsertTail(&req->list, poolHead);
     }
     while (!DListIsEmpty(poolHead)) {
         struct UsbFnRequest *req = DLIST_FIRST_ENTRY(poolHead, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         (void)UsbFnCancelRequest(req);
         if (freeReq) {
             (void)UsbFnFreeRequest(req);
@@ -542,7 +587,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
         struct UsbFnRequest *queueReqTmp = nullptr;
         DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, queueHead, struct UsbFnRequest, list) {
             (void)UsbFnCancelRequest(queueReq);
-            HDF_LOGD("%{public}s:cancel read, req:%{public}p", __func__, queueReq);
+            HDF_LOGD("%{public}s:cancel read", __func__);
         }
     }
     DListHead *writeQueue = &(mtpPort->writeQueue);
@@ -552,8 +597,14 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
         struct UsbFnRequest *queueReqTmp = nullptr;
         DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, writeQueue, struct UsbFnRequest, list) {
             (void)UsbFnCancelRequest(queueReq);
-            HDF_LOGD("%{public}s:cancel write, req:%{public}p", __func__, queueReq);
+            HDF_LOGD("%{public}s:cancel write", __func__);
         }
+    }
+
+    if (mtpPort->mtpDev != NULL && mtpPort->mtpDev->notifyReq != NULL) {
+        struct UsbFnRequest *notifyReq = mtpPort->mtpDev->notifyReq;
+        (void)UsbFnCancelRequest(notifyReq);
+        HDF_LOGD("%{public}s:cancel notifyReq", __func__);
     }
     return HDF_SUCCESS;
 }
@@ -570,7 +621,11 @@ struct UsbFnRequest *UsbfnMtpImpl::UsbMtpDeviceGetCtrlReq(struct UsbMtpDevice *m
         return nullptr;
     }
     struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
-    DListRemove(&req->list);
+    if (req->list.prev != NULL && req->list.next != NULL) {
+        DListRemove(&req->list);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     return req;
 }
 
@@ -612,7 +667,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceClassRequest(
                 struct UsbFnRequest *queueReqTmp = nullptr;
                 DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, queueHead, struct UsbFnRequest, list) {
                     (void)UsbFnCancelRequest(queueReq);
-                    HDF_LOGD("%{public}s:cancel read, req:%{public}p", __func__, req);
+                    HDF_LOGD("%{public}s:cancel read", __func__);
                 }
             }
             DListHead *writeQueue = &(mtpDev->mtpPort->writeQueue);
@@ -622,7 +677,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceClassRequest(
                 struct UsbFnRequest *queueReqTmp = nullptr;
                 DLIST_FOR_EACH_ENTRY_SAFE(queueReq, queueReqTmp, writeQueue, struct UsbFnRequest, list) {
                     (void)UsbFnCancelRequest(queueReq);
-                    HDF_LOGD("%{public}s:cancel write, req:%{public}p", __func__, req);
+                    HDF_LOGD("%{public}s:cancel write", __func__);
                 }
             }
             HDF_LOGD("%{public}s:async post, readStart:%{public}d", __func__, mtpDev->mtpPort->readStarted);
@@ -755,6 +810,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev)
     /* the mtpDev is enabled, ready for transfer */
     mtpDev->mtpState = MTP_STATE_READY;
     mtpPort->startDelayed = true;
+    mtpPort->suspended = false;
     return HDF_SUCCESS;
 }
 
@@ -1264,11 +1320,11 @@ int32_t UsbfnMtpImpl::ReadImpl(std::vector<uint8_t> &data)
             HDF_LOGE("%{public}s: req invalid", __func__);
             return HDF_DEV_ERR_DEV_INIT_FAIL;
         }
-        DListRemove(&req->list);
+        RemoveReqFromList(req);
         DListInsertTail(&req->list, &mtpPort_->readQueue);
         req->length = static_cast<uint32_t>(MTP_BUFFER_SIZE);
         ret = UsbFnSubmitRequestSync(req, BULK_OUT_TIMEOUT_JIFFIES);
-        DListRemove(&req->list);
+        RemoveReqFromList(req);
         DListInsertTail(&req->list, pool);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: send bulk-out sync req failed: %{public}d", __func__, ret);
@@ -1299,7 +1355,7 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
 {
     struct DListHead *pool = &mtpPort_->writePool;
     struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
-    DListRemove(&req->list);
+    RemoveReqFromList(req);
     DListInsertTail(&req->list, &mtpPort_->writeQueue);
     uint32_t needXferCount = data.size();
     int32_t ret = HDF_SUCCESS;
@@ -1338,7 +1394,7 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
             break;
         }
     }
-    DListRemove(&req->list);
+    RemoveReqFromList(req);
     DListInsertTail(&req->list, pool);
     return ret;
 }
@@ -1504,7 +1560,11 @@ int32_t UsbfnMtpImpl::UsbMtpPortProcessAsyncRxDone(struct UsbMtpPort *mtpPort)
         while (!DListIsEmpty(&mtpPort->readQueue)) {
             struct UsbFnRequest *req = DLIST_FIRST_ENTRY(&mtpPort->readQueue, struct UsbFnRequest, list);
             (void)UsbFnCancelRequest(req);
-            DListRemove(&req->list);
+            if (req->list.prev != NULL && req->list.next != NULL) {
+                DListRemove(&req->list);
+            } else {
+                HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+            }
             DListInsertTail(&req->list, &mtpPort->readPool);
         }
     }
@@ -1580,12 +1640,16 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartSubmitRxReq(struct UsbMtpPort *mtpPort, boo
     if (needZLP) {
         req->length = 0;
     }
-    DListRemove(&req->list);
+    RemoveReqFromList(req);
     DListInsertTail(&req->list, &mtpPort->readQueue);
     int32_t ret = UsbFnSubmitRequestAsync(req);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: submit bulk-out req error %{public}d", __func__, ret);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         DListInsertTail(&req->list, pool);
         return ret;
     }
@@ -1752,7 +1816,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
         HDF_LOGE("%{public}s: req invalid", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    DListRemove(&req->list);
+    RemoveReqFromList(req);
     DListInsertTail(&req->list, &mtpPort_->writeQueue);
     uint64_t oneReqLeft = 0;
     int32_t ret = UsbMtpPortSendFileFillFirstReq(req, oneReqLeft);
@@ -1762,7 +1826,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
         return ret;
     }
     ret = UsbFnSubmitRequestSync(req, BULK_IN_TIMEOUT_JIFFIES);
-    DListRemove(&req->list);
+    RemoveReqFromList(req);
     DListInsertTail(&req->list, pool);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: bulk-in req failed: %{public}d", __func__, ret);

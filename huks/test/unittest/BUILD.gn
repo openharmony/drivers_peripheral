@@ -14,7 +14,8 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-module_output_path = "drivers_peripheral_huks/drivers_peripheral_huks/huks_hdi_unittest"
+module_output_path =
+    "drivers_peripheral_huks/drivers_peripheral_huks/huks_hdi_unittest"
 
 ohos_unittest("huks_hdi_unittest") {
   module_out_path = module_output_path

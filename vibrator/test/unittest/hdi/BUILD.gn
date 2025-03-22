@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../vibrator.gni")
 
-module_output_path = "hdf/vibrator"
+module_output_path = "drivers_peripheral_vibrator/drivers_peripheral_vibrator"
 ohos_unittest("hdf_unittest_hdi_vibrator") {
   module_out_path = module_output_path
   include_dirs = [
