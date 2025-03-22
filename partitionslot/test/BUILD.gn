@@ -13,10 +13,9 @@
 import("//build/test.gni")
 import("../../../../drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-module_output_path = "partitionslot/"
-
 ohos_unittest("partitionslot_hdi_test") {
-  module_out_path = module_output_path
+  module_out_path =
+      "drivers_peripheral_partitionslot/drivers_peripheral_partition_slot"
   sources = [ "unittest/hdf_partitionslot_test.cpp" ]
 
   external_deps = [
