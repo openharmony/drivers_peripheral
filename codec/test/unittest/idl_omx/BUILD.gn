@@ -16,7 +16,7 @@ import("//build/test.gni")
 import("../../../codec.gni")
 
 ohos_unittest("codec_idl_omx_test") {
-  module_out_path = "drivers_peripheral_codec/codec"
+  module_out_path = "drivers_peripheral_codec/drivers_peripheral_codec/codec"
   include_dirs = [
     "./",
     "../../../interfaces/include",

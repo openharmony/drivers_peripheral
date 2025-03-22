@@ -16,7 +16,7 @@ import("//build/test.gni")
 import("../../../codec.gni")
 
 ohos_unittest("codec_hdi_omx_test") {
-  module_out_path = "drivers_peripheral_codec/codec"
+  module_out_path = "drivers_peripheral_codec/drivers_peripheral_codec/codec"
 
   sources = [
     "codec_hdi_manager_test.cpp",
