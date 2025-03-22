@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("./../../../usb.gni")
 
-module_output_path = "drivers_peripheral_usb/usb"
+module_output_path = "drivers_peripheral_usb/drivers_peripheral_usb"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -485,6 +485,5 @@ group("passthrough_test") {
     ":test_feature_manageinterface",
     ":test_feature_request",
     ":test_feature_transfer",
-    "${usb_driver_path}/sample/device/linux:usb_dev_test",
   ]
 }

@@ -327,7 +327,7 @@ bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
     SENSOR_TRACE_PID;
     auto it = sensorUsed_.find(sensorId);
     if (it == sensorUsed_.end()) {
-        HDF_LOGE("%{public}s: sensor %{public}d has been disabled  or not support", __func__, sensorId);
+        HDF_LOGD("%{public}s: sensor %{public}d has been disabled  or not support", __func__, sensorId);
         return true;
     }
     sensorUsed_[sensorId].erase(serviceId);

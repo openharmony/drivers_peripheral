@@ -76,7 +76,11 @@ static HDF_STATUS IfDestroyPipeObj(const struct UsbSdkInterface *interfaceObj, c
     DLIST_FOR_EACH_ENTRY_SAFE(pipePos, pipeTemp, &interfaceObj->pipeList, struct UsbPipe, object.entry) {
         if (destroyFlag || pipePos->object.objectId == pipeObj->object.objectId) {
             found = true;
-            DListRemove(&pipePos->object.entry);
+            if (pipePos->object.entry.prev != NULL && pipePos->object.entry.next != NULL) {
+                DListRemove(&pipePos->object.entry);
+            } else {
+                HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+            }
             ret = IfFreePipeObj(pipePos);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s:%{public}d IfFreePipeObj failed, ret = %{public}d ", __func__, __LINE__, ret);
@@ -207,7 +211,11 @@ static HDF_STATUS IfDestroyInterfacePool(const struct UsbInterfacePool *interfac
         interfacePoolPos, interfacePoolTemp, &session->ifacePoolList, struct UsbInterfacePool, object.entry) {
         if (interfacePoolPos->object.objectId == interfacePool->object.objectId) {
             found = true;
-            DListRemove(&interfacePoolPos->object.entry);
+            if (interfacePoolPos->object.entry.prev != NULL && interfacePoolPos->object.entry.next != NULL) {
+                DListRemove(&interfacePoolPos->object.entry);
+            } else {
+                HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+            }
             ret = IfFreeInterfacePool(interfacePoolPos);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s:%{public}d IfFreeInterfacePool failed, ret = %{public}d", __func__, __LINE__, ret);
@@ -391,7 +399,7 @@ static struct UsbInterfacePool *IfFindInterfacePool(
 
     OsalMutexLock((struct OsalMutex *)&session->lock);
     ifacePoolList = (struct DListHead *)&session->ifacePoolList;
-    if (ifacePoolList == NULL || DListIsEmpty(ifacePoolList) == true) {
+    if (ifacePoolList == NULL || DListIsEmpty(ifacePoolList)) {
         OsalMutexUnlock((struct OsalMutex *)&session->lock);
         HDF_LOGE("%{public}s:%{public}d interface pool list is empty", __func__, __LINE__);
         return NULL;
@@ -437,6 +445,11 @@ static int32_t IfGetRequestPipeType(
 
     if (pipeType == NULL) {
         HDF_LOGE("%{public}s:%{public}d pipeType is null", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (devHandle->dev == NULL || devHandle->dev->privateObject == NULL) {
+        HDF_LOGE("%{public}s:%{public}d devHandle is null", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -491,7 +504,7 @@ static int32_t IfFillControlRequest(
             if (ret != EOK) {
                 HDF_LOGE("%{public}s:%{public}d memcpy_s failed, ctrlReq.length = %{public}u", __func__, __LINE__,
                     ctrlReq.length);
-                return ret;
+                return HDF_ERR_IO;
             }
         }
     } else {
@@ -910,7 +923,12 @@ HDF_STATUS UsbIfDestroyInterfaceObj(
         interfacePos, interfaceTemp, &interfacePool->interfaceList, struct UsbSdkInterface, interface.object.entry) {
         if (destroyFlag || interfacePos->interface.object.objectId == interfaceObj->interface.object.objectId) {
             found = true;
-            DListRemove(&interfacePos->interface.object.entry);
+            if (interfacePos->interface.object.entry.prev != NULL &&
+                interfacePos->interface.object.entry.next != NULL) {
+                DListRemove(&interfacePos->interface.object.entry);
+            } else {
+                HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+            }
             ret = IfFreeInterfaceObj(interfacePos);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s:%{public}d IfFreeInterfaceObj failed, ret = %{public}d", __func__, __LINE__, ret);
@@ -951,7 +969,6 @@ int32_t UsbIfCreatInterfacePool(
     }
 
     ++idNum;
-    idNum %= INTERFACE_POOL_ID_MAX;
     interfacePoolTemp->object.objectId = idNum;
     interfacePoolTemp->ioProcessTid = 0;
 
@@ -1568,6 +1585,8 @@ int32_t UsbGetPipeInfo(
         return HDF_ERR_INVALID_PARAM;
     }
 
+    HDF_LOGE("%{public}s:%{public}d ifaceHdl->devHandle is %{public}p", __func__, __LINE__, ifaceHdl->devHandle);
+
     /* Find interfacePool object */
     interfacePool = (struct UsbInterfacePool *)ifaceHdl->devHandle->dev->privateObject;
     if (interfacePool == NULL) {
@@ -1714,9 +1733,11 @@ struct UsbRequest *UsbAllocRequestByAshmem(
     if (hostRequest == NULL) {
         HDF_LOGE("%{public}s: RawAllocRequest error", __func__);
         RawUsbMemFree(requestObj);
+        ifaceHdl->devHandle->isAshmem = false;
         return NULL;
     }
     hostRequest->devHandle = ifaceHdl->devHandle;
+    ifaceHdl->devHandle->isAshmem = false;
 
     ++g_usbRequestObjectId;
     g_usbRequestObjectId %= MAX_OBJECT_ID;

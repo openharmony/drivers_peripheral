@@ -16,7 +16,7 @@ hdf_audio_path = "./../../../../.."
 import("//build/test.gni")
 import("$hdf_audio_path/audio.gni")
 
-module_output_path = "drivers_peripheral_audio/audio"
+module_output_path = "drivers_peripheral_audio/drivers_peripheral_audio"
 
 ohos_systemtest("hdf_audio_idlhdi_render_hardware_dependence_test") {
   module_out_path = module_output_path

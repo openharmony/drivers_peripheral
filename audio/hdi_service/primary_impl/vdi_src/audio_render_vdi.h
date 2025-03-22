@@ -18,7 +18,9 @@
 
 #include "iaudio_render_vdi.h"
 #include "v4_0/iaudio_render.h"
+#include <pthread.h>
 
+pthread_rwlock_t* GetRenderLock(void);
 struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
     struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc, char *adapterName);
 void AudioDestroyRenderByIdVdi(uint32_t renderId);

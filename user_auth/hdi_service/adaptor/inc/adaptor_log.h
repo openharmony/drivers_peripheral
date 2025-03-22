@@ -22,7 +22,17 @@
 extern "C" {
 #endif // __cplusplus
 
-#define HDF_LOG_TAG USER_AUTH_HDI
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+
+#define LOG_DOMAIN 0xD002411
+
+#ifdef LOG_TAG
+#undef LOG_TAG
+#endif
+
+#define LOG_TAG "USER_AUTH_HDI"
 
 #ifndef OHOS_DEBUG
 #define DECORATOR_HDFLOG(op, fmt, args...)             \

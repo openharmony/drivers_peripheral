@@ -57,7 +57,6 @@ public:
 private:
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
-    static void UpdateFunctionStatus(void);
     void ParsePortPath();
     bool UsbPortImplInit();
     static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];

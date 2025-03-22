@@ -17,6 +17,7 @@ import("./../input.gni")
 
 ohos_shared_library("libhid_ddk_service_1.1") {
   sources = [
+    "src/ddk_sysfs_dev_node.cpp",
     "src/hid_ddk_permission.cpp",
     "src/hid_ddk_service.cpp",
   ]
@@ -40,7 +41,6 @@ ohos_shared_library("libhid_ddk_service_1.1") {
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "drivers_interface_input:hid_ddk_idl_headers",
-    "drivers_peripheral_usb:libusb_pnp_manager",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",

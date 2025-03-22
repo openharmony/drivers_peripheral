@@ -29,7 +29,6 @@
         "hilog",
         "hilog_lite",
         "drivers_interface_input",
-        "drivers_peripheral_usb",
         "access_token"
       ],
       "third_party": [

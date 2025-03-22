@@ -153,7 +153,7 @@ ohos_benchmarktest("hdi_usb_benchmark_driver_test") {
 
   sources = [ "usb_benchmark_driver_test.cpp" ]
 
-  deps = [ "./../../ddk_service:usb_ddk_target" ]
+  deps = [ "./../../ddk_service/usb_service:usb_ddk_target" ]
 
   external_deps = [
     "benchmark:benchmark",

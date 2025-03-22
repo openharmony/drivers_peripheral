@@ -11,4 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-persist.thermal.log.="power_host:power_host:500"
+persist.thermal.log.="power_host:power_host:504"

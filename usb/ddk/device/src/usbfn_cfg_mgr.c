@@ -1314,7 +1314,11 @@ void UsbFnCfgMgrUnRegisterAllProp(void)
     struct UsbFnCfgPropMgr *obj = NULL;
     struct UsbFnCfgPropMgr *temp = NULL;
     DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, struct UsbFnCfgPropMgr, entry) {
-        DListRemove(&obj->entry);
+        if (obj->entry.prev != NULL && obj->entry.next != NULL) {
+            DListRemove(&obj->entry);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         UsbFnMemFree(obj);
     }
     DListHeadInit(&g_cfgEntry);

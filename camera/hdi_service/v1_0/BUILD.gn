@@ -135,6 +135,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdi",
         "hicollie:libhicollie",
         "hilog:libhilog",
+        "hisysevent:libhisysevent",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -180,6 +181,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdi",
         "hicollie:libhicollie",
         "hilog:libhilog",
+        "hisysevent:libhisysevent",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

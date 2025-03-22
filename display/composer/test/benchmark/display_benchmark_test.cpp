@@ -126,7 +126,7 @@ static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w
     DISPLAY_TEST_LOGE();
     for (uint32_t i = 0; i < settings.size(); i++) {
         LayerSettings& setting = settings[i];
-        DISPLAY_TEST_LOGE(" ratio w: %f  ratio h: %f", setting.rectRatio.w, setting.rectRatio.h);
+        DISPLAY_TEST_LOGE("ratio w: %f  ratio h: %f", setting.rectRatio.w, setting.rectRatio.h);
         if ((setting.rectRatio.w > 0.0f) && (setting.rectRatio.h > 0.0f)) {
             setting.displayRect.h = static_cast<uint32_t>(setting.rectRatio.h * h);
             setting.displayRect.w = static_cast<uint32_t>(setting.rectRatio.w * w);
@@ -833,6 +833,27 @@ BENCHMARK_F(DisplayBenchmarkTest, ClearLayerBufferTest)(benchmark::State &state)
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ClearLayerBufferTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetDisplayIdentificationData
+  * @tc.desc: Benchmarktest for interface GetDisplayIdentificationData.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplayIdentificationData)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    uint8_t portId = 0;
+    std::vector<uint8_t> edidData = {};
+    for (auto _ : state) {
+        ret = g_composerDevice->GetDisplayIdentificationData(g_displayIds[0], portId, edidData);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayIdentificationData)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 
 } // namespace
