@@ -77,18 +77,30 @@ bool PreProcessRawData(const uint8_t *rawData, size_t size, uint8_t *tmpRawData,
 /* **********Wpa Interface********** */
 void FuzzWpaInterfaceStart(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     interface->Start(interface);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
 void FuzzWpaInterfaceStop(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     interface->Stop(interface);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
 void FuzzWpaInterfaceScan(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->Scan(interface, ifName);
@@ -97,6 +109,10 @@ void FuzzWpaInterfaceScan(struct IWpaInterface *interface, const uint8_t *rawDat
 
 void FuzzWpaInterfaceScanResult(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     unsigned char buf[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
     uint32_t bufLen = ETH_ADDR_LEN;
@@ -106,6 +122,10 @@ void FuzzWpaInterfaceScanResult(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceAddNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -115,6 +135,10 @@ void FuzzWpaInterfaceAddNetwork(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceRemoveNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
     
@@ -124,6 +148,10 @@ void FuzzWpaInterfaceRemoveNetwork(struct IWpaInterface *interface, const uint8_
 
 void FuzzWpaInterfaceDisableNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -133,6 +161,10 @@ void FuzzWpaInterfaceDisableNetwork(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceSetNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *name = reinterpret_cast<const char *>(rawData);
     const char *value = reinterpret_cast<const char *>(rawData);
@@ -144,6 +176,10 @@ void FuzzWpaInterfaceSetNetwork(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceReconnect(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->Reconnect(interface, ifName);
@@ -152,6 +188,10 @@ void FuzzWpaInterfaceReconnect(struct IWpaInterface *interface, const uint8_t *r
 
 void FuzzWpaInterfaceDisconnect(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->Disconnect(interface, ifName);
@@ -160,6 +200,10 @@ void FuzzWpaInterfaceDisconnect(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceSelectNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -169,6 +213,10 @@ void FuzzWpaInterfaceSelectNetwork(struct IWpaInterface *interface, const uint8_
 
 void FuzzWpaInterfaceEnableNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -178,6 +226,10 @@ void FuzzWpaInterfaceEnableNetwork(struct IWpaInterface *interface, const uint8_
 
 void FuzzWpaInterfaceSetPowerSave(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t enable = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -187,6 +239,10 @@ void FuzzWpaInterfaceSetPowerSave(struct IWpaInterface *interface, const uint8_t
 
 void FuzzWpaInterfaceAutoConnect(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t enable = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -196,6 +252,10 @@ void FuzzWpaInterfaceAutoConnect(struct IWpaInterface *interface, const uint8_t 
 
 void FuzzWpaInterfaceSaveConfig(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->SaveConfig(interface, ifName);
@@ -204,6 +264,10 @@ void FuzzWpaInterfaceSaveConfig(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceWpsCancel(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->WpsCancel(interface, ifName);
@@ -212,6 +276,10 @@ void FuzzWpaInterfaceWpsCancel(struct IWpaInterface *interface, const uint8_t *r
 
 void FuzzWpaInterfaceGetCountryCode(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     char countryCode[3] = {0};
 
@@ -221,6 +289,10 @@ void FuzzWpaInterfaceGetCountryCode(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceGetNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int networkId = 0;
     char value[32] = {0};
@@ -231,6 +303,10 @@ void FuzzWpaInterfaceGetNetwork(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceBlocklistClear(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->BlocklistClear(interface, ifName);
@@ -239,6 +315,10 @@ void FuzzWpaInterfaceBlocklistClear(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceSetSuspendMode(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t mode = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -248,6 +328,10 @@ void FuzzWpaInterfaceSetSuspendMode(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceGetScanSsid(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t enable = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -257,6 +341,10 @@ void FuzzWpaInterfaceGetScanSsid(struct IWpaInterface *interface, const uint8_t 
 
 void FuzzWpaInterfaceGetPskPassphrase(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     char psk[32] = {0};
 
@@ -266,6 +354,10 @@ void FuzzWpaInterfaceGetPskPassphrase(struct IWpaInterface *interface, const uin
 
 void FuzzWpaInterfaceGetPsk(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     uint8_t psk[32] = {0};
     uint32_t pskLen = 32;
@@ -276,6 +368,10 @@ void FuzzWpaInterfaceGetPsk(struct IWpaInterface *interface, const uint8_t *rawD
 
 void FuzzWpaInterfaceGetWepKey(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     uint8_t wepKey[16] = {0};
     uint32_t wepKeyLen = 16;
@@ -286,6 +382,10 @@ void FuzzWpaInterfaceGetWepKey(struct IWpaInterface *interface, const uint8_t *r
 
 void FuzzWpaInterfaceGetWepTxKeyIdx(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int keyIdx = *const_cast<int *>(reinterpret_cast<const int *>(rawData));
 
@@ -295,6 +395,10 @@ void FuzzWpaInterfaceGetWepTxKeyIdx(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceGetRequirePmf(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int enable = *const_cast<int *>(reinterpret_cast<const int *>(rawData));
 
@@ -304,6 +408,10 @@ void FuzzWpaInterfaceGetRequirePmf(struct IWpaInterface *interface, const uint8_
 
 void FuzzWpaInterfaceSetCountryCode(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char countryCode[3] = {0};
 
@@ -313,6 +421,10 @@ void FuzzWpaInterfaceSetCountryCode(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceListNetworks(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiWifiWpaNetworkInfo networkInfo;
     (void)memset_s(&networkInfo, sizeof(struct HdiWifiWpaNetworkInfo), 0, sizeof(struct HdiWifiWpaNetworkInfo));
@@ -324,6 +436,10 @@ void FuzzWpaInterfaceListNetworks(struct IWpaInterface *interface, const uint8_t
 
 void FuzzWpaInterfaceWifiStatus(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiWpaCmdStatus wifiStatus;
     (void)memset_s(&wifiStatus, sizeof(struct HdiWpaCmdStatus), 0, sizeof(struct HdiWpaCmdStatus));
@@ -334,6 +450,10 @@ void FuzzWpaInterfaceWifiStatus(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceWpsPbcMode(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiWifiWpsParam wpsParam;
     (void)memset_s(&wpsParam, sizeof(struct HdiWifiWpsParam), 0, sizeof(struct HdiWifiWpsParam));
@@ -358,6 +478,10 @@ void FuzzWpaInterfaceWpsPbcMode(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceWpsPinMode(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiWifiWpsParam wpsParam;
     (void)memset_s(&wpsParam, sizeof(struct HdiWifiWpsParam), 0, sizeof(struct HdiWifiWpsParam));
@@ -383,6 +507,10 @@ void FuzzWpaInterfaceWpsPinMode(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceRegisterEventCallback(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->RegisterEventCallback(interface, g_wpaCallbackObj, ifName);
@@ -391,6 +519,10 @@ void FuzzWpaInterfaceRegisterEventCallback(struct IWpaInterface *interface, cons
 
 void FuzzWpaInterfaceUnregisterEventCallback(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->UnregisterEventCallback(interface, g_wpaCallbackObj, ifName);
@@ -399,6 +531,10 @@ void FuzzWpaInterfaceUnregisterEventCallback(struct IWpaInterface *interface, co
 
 void FuzzWpaInterfaceGetConnectionCapabilities(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct ConnectionCapabilities connectionCap;
     (void)memset_s(&connectionCap, sizeof(struct ConnectionCapabilities), 0, sizeof(struct ConnectionCapabilities));
@@ -409,6 +545,10 @@ void FuzzWpaInterfaceGetConnectionCapabilities(struct IWpaInterface *interface, 
 
 void FuzzWpaInterfaceAddWpaIface(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *configname = "/data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf";
     interface->AddWpaIface(interface, ifName, configname);
@@ -417,6 +557,10 @@ void FuzzWpaInterfaceAddWpaIface(struct IWpaInterface *interface, const uint8_t 
 
 void FuzzWpaInterfaceRemoveWpaIface(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->RemoveWpaIface(interface, ifName);
@@ -425,6 +569,10 @@ void FuzzWpaInterfaceRemoveWpaIface(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceReassociate(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->Reassociate(interface, ifName);
@@ -433,6 +581,10 @@ void FuzzWpaInterfaceReassociate(struct IWpaInterface *interface, const uint8_t 
 
 void FuzzWpaInterfaceStaShellCmd(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *cmd = reinterpret_cast<const char *>(rawData);
     
@@ -444,6 +596,10 @@ void FuzzWpaInterfaceStaShellCmd(struct IWpaInterface *interface, const uint8_t 
 /* **********P2p Interface********** */
 void FuzzWpaInterfaceP2pSetSsidPostfixName(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *name = reinterpret_cast<const char *>(rawData);
 
@@ -453,6 +609,10 @@ void FuzzWpaInterfaceP2pSetSsidPostfixName(struct IWpaInterface *interface, cons
 
 void FuzzWpaInterfaceP2pSetWpsDeviceType(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *type = reinterpret_cast<const char *>(rawData);
 
@@ -462,6 +622,10 @@ void FuzzWpaInterfaceP2pSetWpsDeviceType(struct IWpaInterface *interface, const 
 
 void FuzzWpaInterfaceP2pSetWpsConfigMethods(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *methods = reinterpret_cast<const char *>(rawData);
 
@@ -471,6 +635,10 @@ void FuzzWpaInterfaceP2pSetWpsConfigMethods(struct IWpaInterface *interface, con
 
 void FuzzWpaInterfaceP2pSetGroupMaxIdle(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t time = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -480,6 +648,10 @@ void FuzzWpaInterfaceP2pSetGroupMaxIdle(struct IWpaInterface *interface, const u
 
 void FuzzWpaInterfaceP2pSetWfdEnable(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t enable = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -489,6 +661,10 @@ void FuzzWpaInterfaceP2pSetWfdEnable(struct IWpaInterface *interface, const uint
 
 void FuzzWpaInterfaceP2pSetPersistentReconnect(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t status = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -498,6 +674,10 @@ void FuzzWpaInterfaceP2pSetPersistentReconnect(struct IWpaInterface *interface, 
 
 void FuzzWpaInterfaceP2pSetWpsSecondaryDeviceType(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *type = reinterpret_cast<const char *>(rawData);
 
@@ -507,6 +687,10 @@ void FuzzWpaInterfaceP2pSetWpsSecondaryDeviceType(struct IWpaInterface *interfac
 
 void FuzzWpaInterfaceP2pSetupWpsPbc(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *address = reinterpret_cast<const char *>(rawData);
 
@@ -516,6 +700,10 @@ void FuzzWpaInterfaceP2pSetupWpsPbc(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceP2pSetupWpsPin(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *address = reinterpret_cast<const char *>(rawData);
     const char *pin = reinterpret_cast<const char *>(rawData);
@@ -529,6 +717,10 @@ void FuzzWpaInterfaceP2pSetupWpsPin(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceP2pSetPowerSave(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t enable = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -538,6 +730,10 @@ void FuzzWpaInterfaceP2pSetPowerSave(struct IWpaInterface *interface, const uint
 
 void FuzzWpaInterfaceP2pSetDeviceName(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *name = reinterpret_cast<const char *>(rawData);
 
@@ -547,6 +743,10 @@ void FuzzWpaInterfaceP2pSetDeviceName(struct IWpaInterface *interface, const uin
 
 void FuzzWpaInterfaceP2pSetWfdDeviceConfig(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *config = reinterpret_cast<const char *>(rawData);
 
@@ -556,6 +756,10 @@ void FuzzWpaInterfaceP2pSetWfdDeviceConfig(struct IWpaInterface *interface, cons
 
 void FuzzWpaInterfaceP2pSetRandomMac(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -565,6 +769,10 @@ void FuzzWpaInterfaceP2pSetRandomMac(struct IWpaInterface *interface, const uint
 
 void FuzzWpaInterfaceP2pStartFind(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t timeout = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -574,6 +782,10 @@ void FuzzWpaInterfaceP2pStartFind(struct IWpaInterface *interface, const uint8_t
 
 void FuzzWpaInterfaceP2pSetExtListen(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t enable = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
     int32_t period = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
@@ -585,6 +797,10 @@ void FuzzWpaInterfaceP2pSetExtListen(struct IWpaInterface *interface, const uint
 
 void FuzzWpaInterfaceP2pSetListenChannel(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t channel = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
     int32_t regClass = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
@@ -595,6 +811,10 @@ void FuzzWpaInterfaceP2pSetListenChannel(struct IWpaInterface *interface, const 
 
 void FuzzWpaInterfaceP2pProvisionDiscovery(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *peerBssid = reinterpret_cast<const char *>(rawData);
     int32_t mode = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
@@ -605,6 +825,10 @@ void FuzzWpaInterfaceP2pProvisionDiscovery(struct IWpaInterface *interface, cons
 
 void FuzzWpaInterfaceP2pAddGroup(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t isPersistent = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
@@ -616,6 +840,10 @@ void FuzzWpaInterfaceP2pAddGroup(struct IWpaInterface *interface, const uint8_t 
 
 void FuzzWpaInterfaceP2pAddService(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiP2pServiceInfo info = {0};
     (void)memset_s(&info, sizeof(struct HdiP2pServiceInfo), 0, sizeof(struct HdiP2pServiceInfo));
@@ -644,6 +872,10 @@ void FuzzWpaInterfaceP2pAddService(struct IWpaInterface *interface, const uint8_
 
 void FuzzWpaInterfaceP2pRemoveService(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiP2pServiceInfo info = {0};
     (void)memset_s(&info, sizeof(struct HdiP2pServiceInfo), 0, sizeof(struct HdiP2pServiceInfo));
@@ -672,6 +904,10 @@ void FuzzWpaInterfaceP2pRemoveService(struct IWpaInterface *interface, const uin
 
 void FuzzWpaInterfaceP2pStopFind(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->P2pStopFind(interface, ifName);
@@ -680,6 +916,10 @@ void FuzzWpaInterfaceP2pStopFind(struct IWpaInterface *interface, const uint8_t 
 
 void FuzzWpaInterfaceP2pFlush(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->P2pFlush(interface, ifName);
@@ -688,6 +928,10 @@ void FuzzWpaInterfaceP2pFlush(struct IWpaInterface *interface, const uint8_t *ra
 
 void FuzzWpaInterfaceP2pFlushService(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->P2pFlushService(interface, ifName);
@@ -696,6 +940,10 @@ void FuzzWpaInterfaceP2pFlushService(struct IWpaInterface *interface, const uint
 
 void FuzzWpaInterfaceP2pRemoveNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -705,6 +953,10 @@ void FuzzWpaInterfaceP2pRemoveNetwork(struct IWpaInterface *interface, const uin
 
 void FuzzWpaInterfaceP2pSetGroupConfig(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
     const char *name = reinterpret_cast<const char *>(rawData);
@@ -716,6 +968,10 @@ void FuzzWpaInterfaceP2pSetGroupConfig(struct IWpaInterface *interface, const ui
 
 void FuzzWpaInterfaceP2pInvite(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *peerBssid = reinterpret_cast<const char *>(rawData);
     const char *goBssid = reinterpret_cast<const char *>(rawData);
@@ -726,6 +982,10 @@ void FuzzWpaInterfaceP2pInvite(struct IWpaInterface *interface, const uint8_t *r
 
 void FuzzWpaInterfaceP2pReinvoke(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *bssid = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
@@ -736,6 +996,10 @@ void FuzzWpaInterfaceP2pReinvoke(struct IWpaInterface *interface, const uint8_t 
 
 void FuzzWpaInterfaceP2pGetDeviceAddress(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     char deviceAddress[32] = {0};
     uint32_t deviceAddressLen = *const_cast<uint32_t *>(reinterpret_cast<const uint32_t *>(rawData));
@@ -746,6 +1010,10 @@ void FuzzWpaInterfaceP2pGetDeviceAddress(struct IWpaInterface *interface, const 
 
 void FuzzWpaInterfaceP2pReqServiceDiscovery(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     char *replyDisc = static_cast<char *>(calloc(REPLY_SIZE, sizeof(char)));
     if (replyDisc == nullptr) {
@@ -775,6 +1043,10 @@ void FuzzWpaInterfaceP2pReqServiceDiscovery(struct IWpaInterface *interface, con
 
 void FuzzWpaInterfaceP2pCancelServiceDiscovery(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *id = reinterpret_cast<const char *>(rawData);
 
@@ -784,6 +1056,10 @@ void FuzzWpaInterfaceP2pCancelServiceDiscovery(struct IWpaInterface *interface, 
 
 void FuzzWpaInterfaceP2pRespServerDiscovery(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiP2pServDiscReqInfo info;
     (void)memset_s(&info, sizeof(struct HdiP2pServDiscReqInfo), 0, sizeof(struct HdiP2pServDiscReqInfo));
@@ -794,6 +1070,10 @@ void FuzzWpaInterfaceP2pRespServerDiscovery(struct IWpaInterface *interface, con
 
 void FuzzWpaInterfaceP2pConnect(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiP2pConnectInfo info;
     (void)memset_s(&info, sizeof(struct HdiP2pConnectInfo), 0, sizeof(struct HdiP2pConnectInfo));
@@ -810,6 +1090,10 @@ void FuzzWpaInterfaceP2pConnect(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceP2pHid2dConnect(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const int macAddrIndexOne = 0;
     const int macAddrIndexTwo = 1;
     const int macAddrIndexThree = 2;
@@ -837,6 +1121,10 @@ void FuzzWpaInterfaceP2pHid2dConnect(struct IWpaInterface *interface, const uint
 
 void FuzzWpaInterfaceP2pSetServDiscExternal(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t mode = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -846,6 +1134,10 @@ void FuzzWpaInterfaceP2pSetServDiscExternal(struct IWpaInterface *interface, con
 
 void FuzzWpaInterfaceP2pRemoveGroup(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *groupName = reinterpret_cast<const char *>(rawData);
 
@@ -855,6 +1147,10 @@ void FuzzWpaInterfaceP2pRemoveGroup(struct IWpaInterface *interface, const uint8
 
 void FuzzWpaInterfaceP2pCancelConnect(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->P2pCancelConnect(interface, ifName);
@@ -863,6 +1159,10 @@ void FuzzWpaInterfaceP2pCancelConnect(struct IWpaInterface *interface, const uin
 
 void FuzzWpaInterfaceP2pGetGroupConfig(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
     const char *param = reinterpret_cast<const char *>(rawData);
@@ -875,6 +1175,10 @@ void FuzzWpaInterfaceP2pGetGroupConfig(struct IWpaInterface *interface, const ui
 
 void FuzzWpaInterfaceP2pAddNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
@@ -884,6 +1188,10 @@ void FuzzWpaInterfaceP2pAddNetwork(struct IWpaInterface *interface, const uint8_
 
 void FuzzWpaInterfaceP2pGetPeer(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *bssid = reinterpret_cast<const char *>(rawData);
     struct HdiP2pDeviceInfo info;
@@ -895,6 +1203,10 @@ void FuzzWpaInterfaceP2pGetPeer(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceP2pGetGroupCapability(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     const char *bssid = reinterpret_cast<const char *>(rawData);
     int32_t cap = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
@@ -905,6 +1217,10 @@ void FuzzWpaInterfaceP2pGetGroupCapability(struct IWpaInterface *interface, cons
 
 void FuzzWpaInterfaceP2pListNetworks(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiP2pNetworkList infoList;
     (void)memset_s(&infoList, sizeof(struct HdiP2pNetworkList), 0, sizeof(struct HdiP2pNetworkList));
@@ -915,6 +1231,10 @@ void FuzzWpaInterfaceP2pListNetworks(struct IWpaInterface *interface, const uint
 
 void FuzzWpaInterfaceP2pSaveConfig(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s: interface is null", __FUNCTION__);
+        return;
+    }
     const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->P2pSaveConfig(interface, ifName);

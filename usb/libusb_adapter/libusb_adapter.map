@@ -62,6 +62,7 @@
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::UnRegBulkCallback(OHOS::HDI::Usb::V1_0::UsbDev const&, OHOS::HDI::Usb::V1_0::UsbPipe const&)";
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::SetSubscriber(OHOS::sptr<OHOS::HDI::Usb::V2_0::IUsbdSubscriber>)";
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::RemoveSubscriber(OHOS::sptr<OHOS::HDI::Usb::V2_0::IUsbdSubscriber>)";
+        "OHOS::HDI::Usb::V1_2::LibusbAdapter::SetLoadUsbSaSubscriber(OHOS::sptr<OHOS::HDI::Usb::V1_2::LibUsbSaSubscriber>)";
     };
   local:
     *;

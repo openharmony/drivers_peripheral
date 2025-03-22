@@ -52,10 +52,12 @@ void HdfMemoryTrackerTest::TearDown()
 {
 }
 
+#ifdef HDF_MEMORYTRACKER_IS_IMPLEMENTED
 HWTEST_F(HdfMemoryTrackerTest, GetMemoryTest_01, TestSize.Level1)
 {
     printf("begin call memtrack by service \n");
     sptr<IMemoryTrackerInterface> memtrack = IMemoryTrackerInterface::Get();
+    EXPECT_EQ(memtrack, nullptr);
     if (memtrack == nullptr) {
         printf("memtrack service is null \n");
         return;
@@ -76,6 +78,7 @@ HWTEST_F(HdfMemoryTrackerTest, GetMemoryTest_02, TestSize.Level1)
 {
     printf("begin call memtrack passthrough \n");
     sptr<IMemoryTrackerInterface> memtrack = IMemoryTrackerInterface::Get(true);
+    EXPECT_NE(memtrack, nullptr);
     if (memtrack == nullptr) {
         printf("memtrack service is null \n");
         return;
@@ -83,6 +86,7 @@ HWTEST_F(HdfMemoryTrackerTest, GetMemoryTest_02, TestSize.Level1)
 
     std::vector<MemoryRecord> records;
     int errCode = memtrack->GetDevMem(0, MEMORY_TRACKER_TYPE_GL, records);
+    EXPECT_EQ(errCode, HDF_SUCCESS);
     if (errCode == HDF_SUCCESS) {
         printf("memtrack calll GetMemory success, num_records=%zu \n", records.size());
         int i = 0;
@@ -91,5 +95,6 @@ HWTEST_F(HdfMemoryTrackerTest, GetMemoryTest_02, TestSize.Level1)
         }
     }
 }
+#endif
 }
 }

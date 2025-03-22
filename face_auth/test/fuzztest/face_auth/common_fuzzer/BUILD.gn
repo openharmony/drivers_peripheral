@@ -14,7 +14,7 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 
-ohos_shared_library("libface_auth_interface_service_2.0_fuzzer") {
+ohos_source_set("libface_auth_interface_service_2.0_fuzzer") {
   branch_protector_ret = "pac_ret"
   include_dirs = [
     "../../../../hdi_service/include",
@@ -29,7 +29,6 @@ ohos_shared_library("libface_auth_interface_service_2.0_fuzzer") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
-    "drivers_interface_face_auth:face_auth_idl_headers",
     "drivers_interface_face_auth:libface_auth_stub_2.0",
     "graphic_surface:surface",
     "hdf_core:libhdi",
@@ -37,7 +36,6 @@ ohos_shared_library("libface_auth_interface_service_2.0_fuzzer") {
     "ipc:ipc_single",
   ]
 
-  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_face_auth"
 }

@@ -33,7 +33,8 @@ static uint32_t Convert2Uint32(const uint8_t *ptr)
      * Move the 0th digit 24 to the left, the first digit 16 to the left, the second digit 8 to the left,
      * and the third digit no left
      */
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
+    return (ptr[BUFFER_INDEX_ZERO] << PCM_24_BIT) | (ptr[BUFFER_INDEX_ONE] << PCM_16_BIT) |
+        (ptr[BUFFER_INDEX_TWO] << PCM_8_BIT) | (ptr[BUFFER_INDEX_THREE]);
 }
 
 void RenderFucSwitch(struct IAudioRender *&render, uint32_t cmd, const uint8_t *&rawData, size_t size)

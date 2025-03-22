@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include "ipc_skeleton.h"
 #include "audio_dfx_vdi.h"
 #ifdef AUDIO_HITRACE_ENABLE
 #include <hitrace_meter.h>
@@ -62,4 +62,9 @@ void CancelTimer(int32_t id)
 #else
     (void)id;
 #endif
+}
+
+void SetMaxWorkThreadNum(int32_t count)
+{
+    OHOS::IPCSkeleton::GetInstance().SetMaxWorkThreadNum(count);
 }

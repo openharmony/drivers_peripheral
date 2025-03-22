@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("../../../../battery.gni")
 
-module_output_path = "drivers_peripheral_battery/battery"
+module_output_path = "drivers_peripheral_battery/drivers_peripheral_battery"
 
 ###############################################################################
 config("module_private_config") {

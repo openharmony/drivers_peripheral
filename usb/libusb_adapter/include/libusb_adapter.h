@@ -23,6 +23,7 @@
 
 #include <libusb.h>
 
+#include "libusb_sa_subscriber.h"
 #include "v1_2/iusb_interface.h"
 #include "v2_0/iusb_host_interface.h"
 
@@ -45,7 +46,6 @@ struct LibusbAsyncTransfer {
     {
         transferRef = libusb_alloc_transfer(numOfIsoPackage);
         ashmemRef = nullptr;
-        cbRef = nullptr;
     }
 
     ~LibusbAsyncTransfer()
@@ -60,10 +60,10 @@ struct LibusbAsyncTransfer {
 
     libusb_transfer *transferRef;
     sptr<Ashmem> ashmemRef;
-    sptr<V1_2::IUsbdTransferCallback> cbRef;
-    int32_t busNum;
-    int32_t devAddr;
-    uint64_t userData;
+    sptr<V1_2::IUsbdTransferCallback> cbRef = nullptr;
+    int32_t busNum = 0;
+    int32_t devAddr = 0;
+    uint64_t userData = 0;
 };
 
 struct LibusbAsyncWrapper {
@@ -176,15 +176,17 @@ public:
     int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<V2_0::IUsbdBulkCallback> &cb);
     int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe);
 
+    int32_t SetLoadUsbSaSubscriber(sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber);
     static std::shared_ptr<LibusbAdapter> GetInstance();
 
 private:
     int32_t LibUSBInit();
     void LibUSBExit();
     void GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSubscriber> subscriber);
+    void GetCurrentDevList(libusb_context *ctx, sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber);
     int32_t GetUsbDevice(const UsbDev &dev, libusb_device **device);
     int32_t FindHandleByDev(const UsbDev &dev, libusb_device_handle **handle);
-    int32_t DeleteHandleVectorAndSettingsMap(const UsbDev &dev, libusb_device_handle* handle);
+    void DeleteSettingsMap(libusb_device_handle* handle);
     int32_t DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
     int32_t ReadDescriptors(int32_t fd, void **descriptors, size_t &descriptorsLength);
     int32_t GetUsbDevicePath(const UsbDev &dev, char *pathBuf, size_t length);
@@ -199,9 +201,7 @@ private:
         int32_t extraLength);
     int32_t GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe, libusb_endpoint_descriptor **endpoint_desc,
         libusb_device_handle** deviceHandle);
-    int32_t GetEndpointByAddr(const unsigned char endpointAddr, libusb_device *device,
-        struct libusb_endpoint_descriptor *endpoint);
-    int32_t DoSyncPipeTranfer(libusb_device_handle *dev_handle, struct libusb_endpoint_descriptor *endpoint,
+    int32_t DoSyncPipeTranfer(libusb_device_handle *dev_handle, unsigned char endpoint,
         unsigned char *buffer, SyncTranfer &syncTranfer);
     unsigned char *GetMmapBufferByFd(int32_t fd, size_t len);
     unsigned char *GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busAddress, int32_t &fd, size_t len);
@@ -249,11 +249,14 @@ private:
 
     static int HotplugCallback(libusb_context* ctx, libusb_device* device,
         libusb_hotplug_event event, void* user_data);
+    static int LoadUsbSaCallback(libusb_context* ctx, libusb_device* device,
+        libusb_hotplug_event event, void* user_data);
 private:
     std::atomic<bool> isRunning;
     std::thread eventThread;
     libusb_hotplug_callback_handle hotplug_handle_;
     static std::list<sptr<V2_0::IUsbdSubscriber>> subscribers_;
+    static sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber_;
 };
 } // namespace V1_2
 } // namespace Usb

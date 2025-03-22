@@ -144,6 +144,7 @@ int32_t UsbdPort::ReadPortFile(int32_t &powerRole, int32_t &dataRole, int32_t &m
 void UsbdPort::setPortPath(const std::string &path)
 {
     path_ = path;
+    HDF_LOGI("%{public}s: port_file_path = %{public}s", __func__, path_.c_str());
 }
 
 int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole)

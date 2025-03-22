@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/wlan/wlan.gni")
 
 ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
   branch_protector_ret = "pac_ret"
@@ -41,6 +42,11 @@ ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
     "wifi_vendor_hal.cpp",
     "wifi_vendor_hal_list.cpp",
     "wifi_vendor_hal_stubs.cpp",
+  ]
+
+  defines = [
+    "P2P_NAME=\"$drivers_peripheral_wlan_p2p_name\"",
+    "HAL_SO_NAME=\"$drivers_peripheral_wlan_feature_vendor\"",
   ]
 
   external_deps = [
@@ -127,9 +133,55 @@ ohos_shared_library("libchip_hdi_driver") {
   part_name = "drivers_peripheral_wlan"
 }
 
+if (drivers_peripheral_wlan_feature_vendor == "default") {
+  ohos_shared_library("wifi_hal_default") {
+    include_dirs = [
+      "../hdi_service",
+      "../wifi_hal",
+    ]
+    sources = [
+      "../wifi_hal/common.cpp",
+      "../wifi_hal/cpp_bindings.cpp",
+      "../wifi_hal/gscan.cpp",
+      "../wifi_hal/wifi_hal.cpp",
+      "../wifi_hal/wifi_ioctl.cpp",
+      "../wifi_hal/wifi_logger.cpp",
+      "../wifi_hal/wifi_scan.cpp",
+    ]
+
+    if (drivers_peripheral_wlan_feature_emulator) {
+      defines = [ "SUPPORT_EMULATOR" ]
+    }
+
+    if (is_standard_system) {
+      external_deps = [
+        "c_utils:utils",
+        "drivers_interface_wlan:chip_idl_headers",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hilog:libhilog",
+        "ipc:ipc_single",
+        "libnl:libnl_share",
+      ]
+    } else {
+      external_deps = [
+        "hilog:libhilog",
+        "ipc:ipc_single",
+      ]
+    }
+
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_wlan"
+  }
+}
+
 group("hdi_chip_service") {
   deps = [
     ":libchip_controller_chip_interface_service_1.0",
     ":libchip_hdi_driver",
   ]
+  if (drivers_peripheral_wlan_feature_vendor == "default") {
+    deps += [ ":wifi_hal_default" ]
+  }
 }

@@ -15,7 +15,8 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../../../distributedaudio.gni")
 
-module_out_path = "distributed_audio/hdf_service/hdi_service/audio_ext"
+module_out_path =
+    "distributed_audio/distributed_audio/hdf_service/hdi_service/audio_ext"
 
 config("module_private_config") {
   visibility = [ ":*" ]

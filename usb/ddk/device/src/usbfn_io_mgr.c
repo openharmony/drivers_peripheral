@@ -102,7 +102,8 @@ struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t
 
     struct ReqList *reqList = UsbFnMemCalloc(sizeof(struct ReqList));
     if (reqList == NULL) {
-        HDF_LOGE("%{public}s:%{public}d UsbFnMemCalloc err", __func__, __LINE__);
+        int32_t ret = fnOps->unmapAddr(mapAddr, len);
+        HDF_LOGE("%{public}s:%{public}d UsbFnMemCalloc err, unmap:%{public}d", __func__, __LINE__, ret);
         return NULL;
     }
     struct UsbFnRequest *req = &reqList->req;
@@ -150,7 +151,11 @@ int32_t UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    DListRemove(&reqList->entry);
+    if (reqList->entry.prev != NULL && reqList->entry.next != NULL) {
+        DListRemove(&reqList->entry);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     UsbFnMemFree(reqList);
     return 0;
 }

@@ -14,7 +14,7 @@
 import("//build/test.gni")
 
 hdi_input_base_path = "./../../.."
-module_output_path = "drivers_peripheral_input/input"
+module_output_path = "drivers_peripheral_input/drivers_peripheral_input"
 config("camhdi_impl_utest_config") {
   visibility = [ ":*" ]
   cflags_cc = [

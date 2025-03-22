@@ -103,6 +103,11 @@ ResultCode CheckSpecification(int32_t userId, uint32_t authType)
         return RESULT_UNKNOWN;
     }
     uint32_t maxNumber = GetMaxNumber(authType);
+    if (maxNumber == 0) {
+        LOG_ERROR("authType:%{public}u not support, maxNumber is 0", authType);
+        DestroyLinkedList(credList);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     if (credList->getSize(credList) >= maxNumber) {
         LOG_ERROR("the enrolled quantity has reached the upper limit, authType is %{public}u", authType);
         DestroyLinkedList(credList);

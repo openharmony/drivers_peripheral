@@ -89,7 +89,8 @@ public:
     {
         std::map<std::string, std::string> tmp_map;
 #ifdef V4L2_EMULATOR
-        tmp_map.insert(std::pair<std::string, std::string>("express_camera", "/dev/video0 "));
+        tmp_map.insert(std::pair<std::string, std::string>("express_camera", "/dev/video0"));
+        tmp_map.insert(std::pair<std::string, std::string>("express_camera_second", "/dev/video1"));
 #else
         tmp_map.insert(std::pair<std::string, std::string>("INVALID", "INVALID"));
 #endif

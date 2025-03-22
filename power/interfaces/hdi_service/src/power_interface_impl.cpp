@@ -63,7 +63,11 @@ static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(500); // 500ms for 
 #else
 static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(1000); // 1000ms
 #endif
+#ifdef FASTER_RETRY_OF_SLEEP
+static constexpr std::chrono::milliseconds MAX_WAIT_TIME(5763); // 5763ms for phone and tablet
+#else
 static constexpr std::chrono::milliseconds MAX_WAIT_TIME(1000 * 60); // 1min
+#endif
 static constexpr int32_t WAIT_TIME_FACTOR = 2;
 static std::chrono::milliseconds waitTime_(DEFAULT_WAIT_TIME);
 static std::mutex g_mutex;
@@ -159,7 +163,7 @@ int32_t PowerInterfaceImpl::UnRegisterRunningLockCallback()
 int32_t PowerInterfaceImpl::StartSuspend()
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    HDF_LOGI("start suspend");
+    HDF_LOGI("staS3");
     g_suspendRetry = true;
     if (g_suspending) {
         g_powerState = PowerHdfState::INACTIVE;
@@ -175,6 +179,14 @@ int32_t PowerInterfaceImpl::StartSuspend()
 void AutoSuspendLoop()
 {
     auto suspendLock = std::unique_lock(g_suspendMutex);
+#ifdef DRIVERS_PERIPHERAL_POWER_HOST_SCHED_PRIORITY
+    struct sched_param param = { 0 };
+    param.sched_priority = 1; // thread priority：51
+    int32_t schRet = sched_setscheduler(0, SCHED_FIFO, &param);
+    if (schRet != 0) {
+        HDF_LOGI("power_host set SCHED_FIFO, schRet: %{public}d error: %{public}s", schRet, strerror(errno));
+    }
+#endif
     while (true) {
         std::this_thread::sleep_for(waitTime_);
         const std::string wakeupCount = ReadWakeCount();
@@ -252,11 +264,13 @@ int32_t DoSuspend()
 
     UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
     if (suspendStateFd < 0) {
+        HDF_LOGE("DoSuspend open suspendStateFd fail, error: %{public}s", strerror(errno));
         return HDF_FAILURE;
     }
+    HDF_LOGD("DoSuspend SaveStringToFd");
     bool ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
     if (!ret) {
-        HDF_LOGE("DoSuspend fail");
+        HDF_LOGE("S3 FA");
         waitTime_ = std::min(waitTime_ * WAIT_TIME_FACTOR, MAX_WAIT_TIME);
         return HDF_FAILURE;
     }
@@ -283,7 +297,7 @@ void NotifyCallback(int code)
 
 int32_t PowerInterfaceImpl::StopSuspend()
 {
-    HDF_LOGI("stop suspend");
+    HDF_LOGI("stpS3");
     g_suspendRetry = false;
     g_powerState = PowerHdfState::AWAKE;
     return HDF_SUCCESS;
@@ -454,7 +468,8 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
-    HDF_LOGI("Background runningLock active, type=%{public}d name=%{public}s", info.type, info.name.c_str());
+    // Background runningLock active
+    HDF_LOGI("BL active,T=%{public}d,N=%{public}s", info.type, info.name.c_str());
     Power::PowerXCollie powerXcollie("Power_HoldRunningLockExt");
     return RunningLockImpl::HoldLock(info, g_powerState, lockid, bundleName);
 }
@@ -462,7 +477,8 @@ int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
 int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
-    HDF_LOGI("Background runningLock inactive, type=%{public}d name=%{public}s", info.type, info.name.c_str());
+    // Background runningLock inactive
+    HDF_LOGI("BL inactive,T=%{public}d,N=%{public}s", info.type, info.name.c_str());
     Power::PowerXCollie powerXcollie("Power_UnholdRunningLockExt");
     return RunningLockImpl::UnholdLock(info, lockid, bundleName);
 }

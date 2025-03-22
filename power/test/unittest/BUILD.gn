@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../power.gni")
 
-module_output_path = "drivers_peripheral_power/power"
+module_output_path = "drivers_peripheral_power/drivers_peripheral_power"
 power_hdi_service_path = "../../interfaces/hdi_service"
 
 ohos_unittest("hdi_unittest_power") {

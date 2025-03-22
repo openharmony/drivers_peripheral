@@ -71,7 +71,11 @@ static int32_t UsbSerialStartTx(struct UsbSerial *port)
             break;
         }
         req->length = len;
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         port->writeBusy = true;
         ret = UsbFnSubmitRequestAsync(req);
         port->writeBusy = false;
@@ -102,7 +106,11 @@ static uint32_t UsbSerialStartRx(struct UsbSerial *port)
         }
 
         req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         req->length = out->maxPacketSize;
         ret = UsbFnSubmitRequestAsync(req);
         if (ret != HDF_SUCCESS) {
@@ -152,7 +160,11 @@ static void UsbSerialRxPush(struct UsbSerial *port)
             }
         }
 
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         DListInsertTail(&req->list, &port->readPool);
         port->readStarted--;
     }
@@ -167,7 +179,11 @@ static void UsbSerialFreeRequests(struct DListHead * const head, int32_t *alloca
     struct UsbFnRequest *req = NULL;
     while (!DListIsEmpty(head)) {
         req = DLIST_FIRST_ENTRY(head, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         (void)UsbFnCancelRequest(req);
         (void)UsbFnFreeRequest(req);
         if (allocated) {
@@ -1004,7 +1020,11 @@ static void AcmFreeCtrlRequests(struct UsbAcmDevice *acm)
 
     while (!DListIsEmpty(head)) {
         req = DLIST_FIRST_ENTRY(head, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         OsalMemFree(req->context);
         (void)UsbFnFreeRequest(req);
         acm->ctrlReqNum--;
@@ -1093,7 +1113,11 @@ static struct UsbFnRequest *AcmGetCtrlReq(struct UsbAcmDevice *acm)
 
     if (!DListIsEmpty(pool)) {
         req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
     }
     return req;
 }

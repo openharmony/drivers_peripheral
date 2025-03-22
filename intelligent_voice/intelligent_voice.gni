@@ -13,4 +13,6 @@
 
 declare_args() {
   drivers_peripheral_intelligent_voice_feature_community = true
+  drivers_peripheral_intelligent_voice_engine_enable = true
+  drivers_peripheral_intelligent_voice_trigger_enable = true
 }

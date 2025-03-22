@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-module_output_path = "drivers_peripheral_input/input"
+module_output_path = "drivers_peripheral_input/drivers_peripheral_input"
 INPUT_ROOT_DIR = "./../../.."
 
 ohos_unittest("InputPassthroughAdditionalTest") {

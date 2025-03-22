@@ -560,7 +560,7 @@ int32_t WifiChip::CreateP2pService(sptr<IChipIface>& iface)
 
 std::string WifiChip::GetDefaultP2pIfaceName()
 {
-    return "p2p0";
+    return P2P_NAME;
 }
 
 int32_t WifiChip::GetP2pServiceIfNames(std::vector<std::string>& ifnames)

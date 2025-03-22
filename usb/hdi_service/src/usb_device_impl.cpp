@@ -27,8 +27,10 @@
 #include "ddk_pnp_listener_mgr.h"
 #include "hitrace_meter.h"
 #include "ipc_skeleton.h"
+#include "libusb_adapter.h"
 #include "parameter.h"
 #include "parameters.h"
+#include "usb_sa_subscriber.h"
 #include "usbd_accessory.h"
 #include "usbd_function.h"
 #include "usbd_wrapper.h"
@@ -44,6 +46,17 @@ V1_2::UsbdLoadService UsbDeviceImpl::loadUsbService_ = {USB_SYSTEM_ABILITY_ID};
 V1_2::UsbdLoadService UsbDeviceImpl::loadHdfEdm_ = {HDF_EXTERNAL_DEVICE_MANAGER_SA_ID};
 UsbdSubscriber UsbDeviceImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbDeviceImpl::isGadgetConnected_ = false;
+constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
+static const std::map<std::string, uint32_t> configMap = {
+    {HDC_CONFIG_OFF, USB_FUNCTION_NONE},
+    {HDC_CONFIG_HDC, USB_FUNCTION_HDC},
+    {HDC_CONFIG_ON, USB_FUNCTION_HDC},
+    {HDC_CONFIG_RNDIS, USB_FUNCTION_RNDIS},
+    {HDC_CONFIG_STORAGE, USB_FUNCTION_STORAGE},
+    {HDC_CONFIG_RNDIS_HDC, USB_FUNCTION_HDC + USB_FUNCTION_RNDIS},
+    {HDC_CONFIG_STORAGE_HDC, USB_FUNCTION_HDC + USB_FUNCTION_STORAGE},
+    {HDC_CONFIG_MANUFACTURE_HDC, USB_FUNCTION_MANUFACTURE}
+};
 extern "C" IUsbDeviceInterface *UsbDeviceInterfaceImplGetInstance(void)
 {
     using OHOS::HDI::Usb::V2_0::UsbDeviceImpl;
@@ -64,9 +77,6 @@ UsbDeviceImpl::UsbDeviceImpl()
 
 UsbDeviceImpl::~UsbDeviceImpl()
 {
-    if (UsbdEventHandleRelease() != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: UsbdEventHandleRelease fail", __func__);
-    }
     OsalMutexDestroy(&lockSetFunc_);
 }
 
@@ -269,33 +279,57 @@ int32_t UsbDeviceImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf 
     HDF_LOGI("%{public}s: enter", __func__);
     (void)priv;
     (void)data;
-    if (id == USB_PNP_DRIVER_GADGET_ADD || id == USB_PNP_NOTIFY_ADD_DEVICE) {
+    if (id == USB_PNP_DRIVER_GADGET_ADD) {
         if (loadUsbService_.LoadService() != 0) {
             HDF_LOGE("loadUsbService_ LoadService error");
             return HDF_FAILURE;
-        }
-        if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
-            if (loadHdfEdm_.LoadService() != 0) {
-                HDF_LOGE("loadHdfEdm_ LoadService error");
-                return HDF_FAILURE;
-            }
         }
     }
     return HDF_SUCCESS;
 }
 
+void UsbDeviceImpl::UpdateFunctionStatus()
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    char cFunctionValue[FUNCTION_VALUE_MAX_LEN] = {0};
+    int32_t ret = GetParameter(PERSIST_SYS_USB_CONFIG, "invalid", cFunctionValue, FUNCTION_VALUE_MAX_LEN);
+    if (ret <= 0) {
+        HDF_LOGE("%{public}s: GetParameter failed", __func__);
+    }
+
+    std::string functionValue(cFunctionValue);
+    auto it = configMap.find(functionValue);
+    if (it != configMap.end()) {
+        HDF_LOGI("Function is %{public}s", functionValue.c_str());
+        ret = V1_2::UsbdFunction::UsbdUpdateFunction(it->second);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: UsbdUpdateFunction failed", __func__);
+        }
+    }
+}
+
 int32_t UsbDeviceImpl::UsbdEventHandle(void)
 {
+    HDF_LOGI("%{public}s: enter", __func__);
+    UpdateFunctionStatus();
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     int32_t ret = DdkListenerMgrAdd(&listenerForLoadService_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
+        return HDF_FAILURE;
     }
+    sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber = new (std::nothrow) V1_2::UsbSaSubscriber();
+    if (libUsbSaSubscriber == nullptr) {
+        HDF_LOGE("%{public}s: register listerer failed", __func__);
+        return HDF_FAILURE;
+    }
+    ret = V1_2::LibusbAdapter::GetInstance()->SetLoadUsbSaSubscriber(libUsbSaSubscriber);
     return ret;
 }
 
 int32_t UsbDeviceImpl::UsbdEventHandleRelease(void)
 {
+    HDF_LOGI("%{public}s: enter", __func__);
     int32_t ret = DdkListenerMgrRemove(&listenerForLoadService_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: DdkListenerMgrRemove failed", __func__);

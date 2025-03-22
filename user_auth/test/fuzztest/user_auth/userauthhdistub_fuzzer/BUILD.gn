@@ -34,7 +34,6 @@ ohos_fuzztest("UserAuthHdiStubFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_user_auth:libuser_auth_stub_3.0",
-    "drivers_interface_user_auth:user_auth_idl_headers",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",

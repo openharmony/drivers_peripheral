@@ -172,7 +172,11 @@ int32_t DdkListenerMgrRemove(struct HdfDevEventlistener *listener)
     }
 
     OsalMutexLock(&g_ddkListenerList.listMutex);
-    DListRemove(&listener->listNode);
+    if (listener->listNode.prev != NULL && listener->listNode.next != NULL) {
+        DListRemove(&listener->listNode);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     OsalMutexUnlock(&g_ddkListenerList.listMutex);
     return HDF_SUCCESS;
 }
