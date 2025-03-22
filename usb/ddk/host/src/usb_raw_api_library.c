@@ -1133,11 +1133,16 @@ int32_t RawSendControlRequest(struct UsbHostRequest *request, const struct UsbDe
     int32_t completed = 0;
     int32_t ret;
 
-    if (request == NULL || request->buffer == NULL || devHandle == NULL || requestData == NULL) {
+    if (request == NULL || request->buffer == NULL || devHandle == NULL ||
+        requestData == NULL || requestData->data) {
         HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
+    if (USB_RAW_CONTROL_SETUP_SIZE > (size_t)requestData->length) {
+        HDF_LOGE("%{public}s:%{public}d oversize", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     setup = request->buffer;
     RawFillControlSetup(setup, requestData);
     if ((requestData->requestType & USB_DDK_ENDPOINT_DIR_MASK) == USB_PIPE_DIRECTION_OUT) {
