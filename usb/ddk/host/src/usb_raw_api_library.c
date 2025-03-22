@@ -1134,7 +1134,7 @@ int32_t RawSendControlRequest(struct UsbHostRequest *request, const struct UsbDe
     int32_t ret;
 
     if (request == NULL || request->buffer == NULL || devHandle == NULL ||
-        requestData == NULL || requestData->data) {
+        requestData == NULL || requestData->data == NULL) {
         HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
