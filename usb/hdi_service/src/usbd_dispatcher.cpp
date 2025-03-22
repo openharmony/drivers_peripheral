@@ -28,6 +28,10 @@ namespace Usb {
 namespace V1_2 {
 int32_t UsbdDispatcher::UsbdAllocFifo(DataFifo *fifo, uint32_t size)
 {
+    if (fifo == nullptr) {
+        HDF_LOGE("%{public}s:fifo is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     if (!DataFifoIsInitialized(fifo)) {
         void *data = OsalMemAlloc(size);
         if (data == nullptr) {
@@ -1139,7 +1143,11 @@ UsbdBulkASyncReqNode *UsbdDispatcher::UsbdBulkASyncReqGetENode(UsbdBulkASyncReqL
     UsbdBulkASyncReqNode *ptr = DLIST_FIRST_ENTRY(&list->eList, UsbdBulkASyncReqNode, node);
     if (ptr != nullptr) {
         ptr->use = USBD_REQNODE_OTHER;
-        DListRemove(&ptr->node);
+        if (ptr->node.prev != NULL && ptr->node.next != NULL) {
+            DListRemove(&ptr->node);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
     }
     OsalMutexUnlock(&list->elock);
     return ptr;

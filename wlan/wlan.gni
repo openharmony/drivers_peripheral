@@ -15,4 +15,7 @@ declare_args() {
   drivers_peripheral_wlan_feature_enable_HDF_NL80211 = true
   drivers_peripheral_wlan_feature_enable_HDF_UT = false
   drivers_peripheral_wlan_feature_enable_HDF_WLAN_EXTEND_VDI = true
+  drivers_peripheral_wlan_feature_emulator = false
+  drivers_peripheral_wlan_feature_vendor = "hardware"
+  drivers_peripheral_wlan_p2p_name = "p2p0"
 }

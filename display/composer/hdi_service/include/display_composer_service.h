@@ -83,6 +83,7 @@ public:
     int32_t SetDisplayActiveRegion(uint32_t devId, const IRect& rect) override;
     int32_t FastPresent(uint32_t devId, const PresentParam& param,
         const std::vector<sptr<NativeBuffer>>& inHandles) override;
+    int32_t GetDisplayIdentificationData(uint32_t devId, uint8_t& portId, std::vector<uint8_t>& edidData) override;
 
 private:
     void HidumperInit();

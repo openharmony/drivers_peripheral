@@ -167,7 +167,7 @@ int32_t UsbdAccessory::GetAccessoryInfo(std::vector<std::string> &accessoryInfo)
     int32_t fd = open(ACCESSORY_DRIVER_NAME, O_RDWR);
     if (fd < 0) {
         HDF_LOGE("%{public}s:%{public}d open failed", __func__, __LINE__);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
     int32_t ret = HDF_FAILURE;
     std::string accInfoString;
@@ -192,7 +192,7 @@ int32_t UsbdAccessory::OpenAccessory(int32_t &fd)
     accFd = open(ACCESSORY_DRIVER_NAME, O_RDWR);
     if (accFd < 0) {
         HDF_LOGE("%{public}s:%{public}d open failed", __func__, __LINE__);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
     fd = accFd;
     return HDF_SUCCESS;

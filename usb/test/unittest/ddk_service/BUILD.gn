@@ -15,13 +15,13 @@ import("//build/config/sanitizers/sanitizers.gni")
 import("//build/test.gni")
 import("./../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
-module_output_path = "drivers_peripheral_usb/usb"
+module_output_path = "drivers_peripheral_usb/drivers_peripheral_usb"
 ohos_unittest("usb_ddk_service_test") {
-  include_dirs = [ "./../../../ddk_service/include" ]
+  include_dirs = [ "./../../../ddk_service/usb_service/include" ]
 
   sources = [ "./usb_ddk_service_test.cpp" ]
 
-  deps = [ "./../../../ddk_service:usb_ddk_target" ]
+  deps = [ "./../../../ddk_service/usb_service:usb_ddk_target" ]
 
   external_deps = [
     "c_utils:utils",

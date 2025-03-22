@@ -128,8 +128,31 @@ bool BluetoothAddress::CheckAddress(char *address)
     return false;
 }
 
+#ifdef BT_MAC_UPDATE
+// system boot less 2min, need ReadbtAddress from NV
+bool BluetoothAddress::NeedReloadAddress()
+{
+    const int64_t maxNeedReloadTime = 120000; // 120s
+    constexpr int64_t msPerSecond = 1000;
+    constexpr int64_t nsPerMs = 1000000;
+    struct timespec times = {0};
+    if (clock_gettime(CLOCK_MONOTONIC, &times) < 0) {
+        HDF_LOGE("Failed clock_gettime:%{public}s, needReloadAddress:false", strerror(errno));
+        return false;
+    }
+    int64_t relativeTime = ((times.tv_sec * msPerSecond) + (times.tv_nsec / nsPerMs));
+    HDF_LOGI("relativeTime:%{public}lu", relativeTime);
+    return relativeTime < maxNeedReloadTime;
+}
+#endif
+
 std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::string &path)
 {
+#ifdef BT_MAC_UPDATE
+    if (NeedReloadAddress()) {
+        return GenerateDeviceAddressFile();
+    }
+#endif
     int addrFd = open(path.c_str(), O_RDONLY);
     if (addrFd < 0) {
         HDF_LOGI("GetDeviceAddress open %{public}s.", path.c_str());

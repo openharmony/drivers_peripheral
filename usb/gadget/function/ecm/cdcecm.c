@@ -70,7 +70,11 @@ static int32_t UsbEcmStartTx(struct UsbEcm *port)
             break;
         }
         req->length = len;
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         port->writeBusy = true;
         int32_t ret = UsbFnSubmitRequestAsync(req);
         port->writeBusy = false;
@@ -102,7 +106,11 @@ static uint32_t UsbEcmStartRx(struct UsbEcm *port)
         }
 
         req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         req->length = out->maxPacketSize;
         ret = UsbFnSubmitRequestAsync(req);
         if (ret != HDF_SUCCESS) {
@@ -152,7 +160,11 @@ static void UsbEcmRxPush(struct UsbEcm *port)
             }
             OsalMutexUnlock(&port->lockReadFifo);
         }
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         DListInsertTail(&req->list, &port->readPool);
         port->readStarted--;
     }
@@ -167,7 +179,11 @@ static void UsbEcmFreeRequests(const struct DListHead *head, int32_t *allocated)
     struct UsbFnRequest *req = NULL;
     while (!DListIsEmpty(head)) {
         req = DLIST_FIRST_ENTRY(head, struct UsbFnRequest, list);
-        DListRemove(&req->list);
+        if (req->list.prev != NULL && req->list.next != NULL) {
+            DListRemove(&req->list);
+        } else {
+            HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+        }
         (void)UsbFnFreeRequest(req);
         if (allocated) {
             (*allocated)--;

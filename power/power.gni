@@ -21,4 +21,5 @@ declare_args() {
   drivers_peripheral_power_config_policy = true
   drivers_peripheral_power_c_utils = true
   drivers_peripheral_power_hisysevent = true
+  drivers_peripheral_power_host_sched_priority = false
 }

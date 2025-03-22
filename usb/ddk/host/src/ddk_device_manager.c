@@ -111,7 +111,11 @@ int32_t DdkDevMgrRemoveDevice(int32_t busNum, int32_t devNum, struct UsbPnpNotif
     }
 
     OsalMutexLock(&g_ddkDevList.listMutex);
-    DListRemove(&dev->list);
+    if (dev->list.prev != NULL && dev->list.next != NULL) {
+        DListRemove(&dev->list);
+    } else {
+        HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
+    }
     OsalMemFree(dev);
     dev = NULL;
     OsalMutexUnlock(&g_ddkDevList.listMutex);

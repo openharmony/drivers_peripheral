@@ -39,9 +39,9 @@ namespace V2_0 {
 constexpr uint8_t MAX_DEVICE_ADDRESS = 255;
 constexpr uint8_t MAX_DEVICE_BUSNUM = 255;
 constexpr uint8_t MAX_ENDPOINT_ID = 158;
+constexpr uint8_t MAX_CANCEL_ENDPOINT_ID = 255;
 constexpr uint8_t MAX_INTERFACE_ID = 255;
 constexpr uint8_t LIBUSB_INTERFACE_ID = 0x80;
-UsbdSubscriber UsbHostImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbHostImpl::isGadgetConnected_ = false;
 extern "C" IUsbHostInterface *UsbHostInterfaceImplGetInstance(void)
 {
@@ -217,18 +217,18 @@ int32_t UsbHostImpl::ResetDevice(const UsbDev &dev)
     return V1_2::LibusbAdapter::GetInstance()->ResetDevice(usbDev_);
 }
 
-int32_t UsbHostImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor)
+int32_t UsbHostImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     const V1_2::UsbDev &usbDev_ = reinterpret_cast<const V1_2::UsbDev &>(dev);
-    return V1_2::LibusbAdapter::GetInstance()->GetDeviceDescriptor(usbDev_, decriptor);
+    return V1_2::LibusbAdapter::GetInstance()->GetDeviceDescriptor(usbDev_, descriptor);
 }
 
-int32_t UsbHostImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor)
+int32_t UsbHostImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     const V1_2::UsbDev &usbDev_ = reinterpret_cast<const V1_2::UsbDev &>(dev);
-    return V1_2::LibusbAdapter::GetInstance()->GetConfigDescriptor(usbDev_, descId, decriptor);
+    return V1_2::LibusbAdapter::GetInstance()->GetConfigDescriptor(usbDev_, descId, descriptor);
 }
 
 int32_t UsbHostImpl::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
@@ -363,13 +363,18 @@ int32_t UsbHostImpl::RequestWait(
 
 int32_t UsbHostImpl::RequestCancel(const UsbDev &dev, const UsbPipe &pipe)
 {
+    if ((dev.devAddr == MAX_DEVICE_ADDRESS) && (dev.busNum == MAX_DEVICE_BUSNUM) &&
+        (pipe.endpointId == MAX_CANCEL_ENDPOINT_ID) && (pipe.intfId == MAX_INTERFACE_ID)) {
+        HDF_LOGE("%{public}s:Invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (pipe.intfId == MAX_INTERFACE_ID && pipe.endpointId == MAX_ENDPOINT_ID) {
         HDF_LOGW("%{public}s: intfId = %{public}d, endpointId = %{public}d", __func__,
             pipe.intfId, pipe.endpointId);
         return HDF_SUCCESS;
     }
     if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
+        (pipe.endpointId > MAX_CANCEL_ENDPOINT_ID) || (pipe.intfId > LIBUSB_INTERFACE_ID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }

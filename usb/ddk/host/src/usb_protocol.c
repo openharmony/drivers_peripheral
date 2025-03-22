@@ -21,12 +21,12 @@
 
 int32_t UsbProtocalFillControlSetup(const unsigned char *setup, const struct UsbControlRequest *ctrlReq)
 {
-    struct UsbRawControlSetup *setupData = (struct UsbRawControlSetup *)setup;
-    int32_t ret = HDF_SUCCESS;
     if ((setup == NULL) || (ctrlReq == NULL)) {
         HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
+    struct UsbRawControlSetup *setupData = (struct UsbRawControlSetup *)setup;
+    int32_t ret = HDF_SUCCESS;
    
     setupData->requestType = ctrlReq->reqType;
     setupData->request     = ctrlReq->request;
@@ -248,7 +248,7 @@ int32_t UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t bu
     interfacePool->session = devHandle->dev->session;
     interfacePool->device = devHandle->dev;
     devHandle->dev->privateObject = (void *)interfacePool;
-
+    HDF_LOGE("%{public}s:%{public}d devHandle = %{public}p", __func__, __LINE__, devHandle);
     ret = CreateCtrPipe(interfacePool);
     if (ret != HDF_SUCCESS) {
         goto ERR;

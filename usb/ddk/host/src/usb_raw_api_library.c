@@ -202,6 +202,23 @@ static int32_t FindNextDescriptor(const uint8_t *buffer, size_t size)
 
     return buffer - buffer0;
 }
+
+int32_t GetDeviceFd(struct UsbDevice *dev, mode_t mode)
+{
+    if (dev == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+    if (!osAdapterOps || !osAdapterOps->getDeviceFd) {
+        HDF_LOGE("%{public}s: not supported", __func__);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    return osAdapterOps->getDeviceFd(dev, mode);
+}
+
 static int32_t GetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIdx, uint8_t *buffer, size_t size)
 {
     int32_t ret;
@@ -809,6 +826,8 @@ int32_t RawCloseDevice(const struct UsbDeviceHandle *devHandle)
         HDF_LOGE("%{public}s devHandle is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    
+    HDF_LOGE("%{public}s:%{public}d RawCloseDevice devHandle = %{public}p", __func__, __LINE__, devHandle);
 
     if (osAdapterOps->closeDevice) {
         osAdapterOps->closeDevice((struct UsbDeviceHandle *)devHandle);
@@ -1043,7 +1062,7 @@ int32_t RawFillInterruptRequest(struct UsbHostRequest *request, const struct Usb
     if (UsbEndpointDirOut(fillRequestData->endPoint)) {
         if (memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length) != EOK) {
             HDF_LOGE("%{public}s:%{public}d memcpy_s failed!", __func__, __LINE__);
-            return HDF_FAILURE;
+            return HDF_ERR_IO;
         }
     }
     request->devHandle = (struct UsbDeviceHandle *)devHandle;

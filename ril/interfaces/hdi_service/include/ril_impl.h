@@ -22,13 +22,13 @@
 #include <iproxy_broker.h>
 #include <iremote_object.h>
 
-#include "v1_3/iril.h"
+#include "v1_4/iril.h"
 #include "vector"
 
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_3 {
+namespace V1_4 {
 class RilImpl : public IRil {
 public:
     RilImpl() = default;
@@ -129,7 +129,16 @@ public:
     int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key) override;
     int32_t SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t serialId, const NcfgOperatorInfo &ncfgOperatorInfo) override;
-
+    int32_t SendUrspDecodeResult(int32_t slotId, int32_t serialId,
+        const UePolicyDecodeResult &uePolicyDecodeResult) override;
+    int32_t SendUePolicySectionIdentifier(int32_t slotId, int32_t serialId,
+        const UePolicySectionIdentifier &uePolicySectionIdentifier) override;
+    int32_t SendImsRsdList(int32_t slotId, int32_t serialId, const ImsRsdList &imsRsdList) override;
+    int32_t GetNetworkSliceAllowedNssai(int32_t slotId, int32_t serialId,
+        const SyncAllowedNssaiInfo &syncAllowedNssaiInfo) override;
+    int32_t GetNetworkSliceEhplmn(int32_t slotId, int32_t serialId) override;
+    int32_t ActivatePdpContextWithApnTypesforSlice(int32_t slotId, int32_t serialId,
+            const DataCallInfoWithApnTypesforSlice &dataCallInfo) override;
     // Network
     int32_t GetSignalStrength(int32_t slotId, int32_t serialId) override;
     int32_t GetCsRegStatus(int32_t slotId, int32_t serialId) override;
@@ -176,6 +185,7 @@ public:
     int32_t SetCallback(const sptr<V1_1::IRilCallback> &rilCallback) override;
     int32_t SetCallback1_2(const sptr<V1_2::IRilCallback> &rilCallback) override;
     int32_t SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback) override;
+    int32_t SetCallback1_4(const sptr<V1_4::IRilCallback> &rilCallback) override;
     int32_t Init();
     class RilDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -207,7 +217,7 @@ private:
     int32_t AddRilDeathRecipient(const sptr<IRilCallback> &callback);
     int32_t RemoveRilDeathRecipient(const sptr<IRilCallback> &callback);
 };
-} // namespace V1_3
+} // namespace V1_4
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS

@@ -75,7 +75,6 @@ public:
     int32_t OpenInputDevice(string devPath);
     RetStatus CloseInputDevice(string devPath);
     int32_t GetInputDeviceInfo(int32_t fd, InputDeviceInfo *detailInfo);
-    void GetInputDeviceInfoList();
     int32_t DoInputDeviceAction(void);
     int32_t InotifyEventHandler(int32_t epollFd, int32_t notifyFd);
     void RemoveEpoll(int32_t epollFd, int32_t fileFd);

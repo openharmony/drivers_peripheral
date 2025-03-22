@@ -121,9 +121,27 @@ void ReleaseEventCallback(void)
     pthread_rwlock_unlock(&g_wpaCallbackMutex);
 }
 
+static void RemoveIfaceCallback(const char *ifName)
+{
+    if (ifName == NULL) {
+        return;
+    }
+    for (int i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_wpaCallbackEventMap[i] != NULL && (strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0)) {
+            g_wpaCallbackEventMap[i]->onRecFunc = NULL;
+            free(g_wpaCallbackEventMap[i]);
+            g_wpaCallbackEventMap[i] = NULL;
+        }
+    }
+}
+
 void WpaEventReport(const char *ifName, uint32_t event, void *data)
 {
     uint32_t i;
+    if (event == WPA_EVENT_IFACE_REMOVED) {
+        RemoveIfaceCallback(ifName);
+        return;
+    }
     OnReceiveFunc callbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 
     pthread_rwlock_rdlock(&g_wpaCallbackMutex);

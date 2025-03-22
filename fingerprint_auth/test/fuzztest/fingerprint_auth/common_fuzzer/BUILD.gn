@@ -14,7 +14,7 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 
-ohos_shared_library("libfingerprint_auth_interface_service_2.0_fuzzer") {
+ohos_source_set("libfingerprint_auth_interface_service_2.0_fuzzer") {
   branch_protector_ret = "pac_ret"
   include_dirs = [
     "../../../../hdi_service/include",
@@ -28,14 +28,12 @@ ohos_shared_library("libfingerprint_auth_interface_service_2.0_fuzzer") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers",
     "drivers_interface_fingerprint_auth:libfingerprint_auth_stub_2.0",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
 
-  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_fingerprint_auth"
 }
