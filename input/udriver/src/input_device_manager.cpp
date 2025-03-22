@@ -36,6 +36,7 @@
 #include "securec.h"
 
 #define HDF_LOG_TAG InputDeviceHdiManager
+#define DRIVERS_PERIPHERAL_INPUT_FDSAN_TAG 0xC02555
 
 namespace OHOS {
 namespace Input {
@@ -196,26 +197,32 @@ int32_t InputDeviceManager::OpenInputDevice(string devPath)
             devRealPath, errno, strerror(errno));
         return INPUT_FAILURE;
     }
+    uint64_t ownerTag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DRIVERS_PERIPHERAL_INPUT_FDSAN_TAG);
+    fdsan_exchange_owner_tag(nodeFd, 0, ownerTag);
     return nodeFd;
 }
 
 // close input device node
 RetStatus InputDeviceManager::CloseInputDevice(string devPath)
 {
-    for (auto &inputDev : inputDevList_) {
-        if (string(inputDev.second.devPathNode) == devPath) {
-            int32_t fd = inputDev.second.fd;
-            if (fd > 0) {
-                RemoveEpoll(mEpollId_, fd);
-                close(fd);
-                inputDev.second.fd = -1;
-                inputDev.second.status = INPUT_DEVICE_STATUS_CLOSED;
-                return INPUT_SUCCESS;
-            }
-        }
+    auto it = std::find_if(inputDevList_.begin(), inputDevList_.end(), [&devPath](const auto &inputDev) {
+            return string(inputDev.second.devPathNode) == devPath;
+        });
+    if (it == inputDevList_.end()) {
+        return INPUT_FAILURE;
     }
-    // device list remove this node
-    return INPUT_FAILURE;
+    int32_t fd = it->second.fd;
+    if (fd <= 0) {
+        return INPUT_FAILURE;
+    }
+
+    RemoveEpoll(mEpollId_, fd);
+    uint64_t ownerTag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DRIVERS_PERIPHERAL_INPUT_FDSAN_TAG);
+    fdsan_close_with_tag(fd, ownerTag);
+
+    it->second.fd = -1;
+    it->second.status = INPUT_DEVICE_STATUS_CLOSED;
+    return INPUT_SUCCESS;
 }
 
 int32_t InputDeviceManager::GetInputDeviceInfo(int32_t fd, InputDeviceInfo *detailInfo)
@@ -318,7 +325,8 @@ int32_t InputDeviceManager::CreateInputDevListNode(InputDevListNode &inputDevNod
     auto sDevName = string(detailInfo->attrSet.devName);
     uint32_t type = GetInputDeviceTypeInfo(sDevName);
     if (type == INDEV_TYPE_UNKNOWN) {
-        close(fd);
+        uint64_t ownerTag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DRIVERS_PERIPHERAL_INPUT_FDSAN_TAG);
+        fdsan_close_with_tag(fd, ownerTag);
         HDF_LOGE("%{public}s: input device type unknow: %{public}d", __func__, type);
         return CREATE_ERROR;
     }
@@ -331,7 +339,8 @@ int32_t InputDeviceManager::CreateInputDevListNode(InputDevListNode &inputDevNod
         devPathNode.c_str(), devPathNode.length()) != EOK ||
         memcpy_s(&inputDevNode.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
         sizeof(InputDeviceInfo)) != EOK) {
-        close(fd);
+        uint64_t ownerTag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DRIVERS_PERIPHERAL_INPUT_FDSAN_TAG);
+        fdsan_close_with_tag(fd, ownerTag);
         HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
         return MEMCPY_ERROR;
     }
@@ -589,6 +598,8 @@ int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyF
                 HDF_LOGE("%{public}s: open file failure: %{public}s", __func__, nodeRealPath);
                 return INPUT_FAILURE;
             }
+            uint64_t ownerTag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DRIVERS_PERIPHERAL_INPUT_FDSAN_TAG);
+            fdsan_exchange_owner_tag(tmpFd, 0, ownerTag);
             if (nodePath.find("event") == std::string::npos) {
                 break;
             }
