@@ -257,6 +257,8 @@ private:
     libusb_hotplug_callback_handle hotplug_handle_;
     static std::list<sptr<V2_0::IUsbdSubscriber>> subscribers_;
     static sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber_;
+    std::mutex openFdsMutex_;
+    std::map<pair<uint8_t, uint8_t>, int32_t> openedFds_;
 };
 } // namespace V1_2
 } // namespace Usb
