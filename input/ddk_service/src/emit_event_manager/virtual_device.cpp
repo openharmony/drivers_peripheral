@@ -75,18 +75,22 @@ VirtualDevice::~VirtualDevice()
 {
     if (fd_ >= 0) {
         ioctl(fd_, UI_DEV_DESTROY);
-        close(fd_);
         fd_ = -1;
+    }
+    if (file_ != nullptr) {
+        fclose(file_);
+        file_ = nullptr;
     }
 }
 
 bool VirtualDevice::SetUp()
 {
-    fd_ = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
-    if (fd_ < 0) {
+    file_ = fopen("/dev/uinput", "wb");
+    if (file_ == nullptr) {
         HDF_LOGE("%{public}s Failed to open uinput, errno=%{public}d", __func__, errno);
         return false;
     }
+    fd_ = fileno(file_);
 
     if (!SetAttribute()) {
         HDF_LOGE("%{public}s Failed to set attribute", __func__);
