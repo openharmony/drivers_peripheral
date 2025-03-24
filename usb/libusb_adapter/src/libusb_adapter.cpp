@@ -422,7 +422,7 @@ int32_t LibusbAdapter::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
         HDF_LOGE("%{public}s: sprintf_s path failed, ret:%{public}d", __func__, ret);
         return ret;
     }
-    int32_t fd = open(path, O_RDWR);
+    fd = open(path, O_RDWR);
     if (fd < 0) {
         HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
         return HDF_FAILURE;
@@ -431,7 +431,7 @@ int32_t LibusbAdapter::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
         auto iter = openedFds_.find({dev.busNum, dev.devAddr});
         if (iter != openedFds_.end()) {
             int32_t oldFd = iter->second;
-            if (oldfd != fd) {
+            if (oldFd != fd) {
                 int res = close(oldFd);
                 HDF_LOGI("%{public}s:%{public}d close old %{public}d ret = %{public}d",
                     __func__, __LINE__, iter->second, res);
