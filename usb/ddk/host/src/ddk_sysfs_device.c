@@ -69,6 +69,7 @@ static int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName,
         HDF_LOGE("%{public}s: open file failed path:%{public}s, errno:%{public}d", __func__, path, errno);
         return HDF_ERR_IO;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     int32_t ret = HDF_SUCCESS;
     do {
@@ -98,7 +99,7 @@ static int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName,
         *value = res;
     } while (0);
 
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     return ret;
 }
 

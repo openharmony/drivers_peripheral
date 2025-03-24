@@ -305,6 +305,7 @@ static int32_t UsbFnAdapterOpenFn(void)
     for (i = 0; i < OPEN_CNT; i++) {
         ep = open(USBFN_DEV, O_RDWR);
         if (ep > 0) {
+            fdsan_exchange_owner_tag(ep, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             break;
         }
         usleep(SLEEP_DELAY);
@@ -320,7 +321,7 @@ static int32_t UsbFnAdapterClosefn(int32_t fd)
     if (fd <= 0) {
         return HDF_ERR_INVALID_PARAM;
     }
-    return close(fd);
+    return fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 }
 
 static int32_t UsbFnAdapterCreatInterface(const char *interfaceName, int32_t nameLen)
@@ -402,6 +403,7 @@ static int32_t UsbFnAdapterOpenPipe(const char *interfaceName, int32_t epIndex)
     for (int32_t i = 0; i < OPEN_CNT; i++) {
         ep = open(epName, O_RDWR);
         if (ep > 0) {
+            fdsan_exchange_owner_tag(ep, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             break;
         }
         usleep(SLEEP_DELAY);
@@ -419,7 +421,7 @@ static int32_t UsbFnAdapterClosePipe(int32_t ep)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return close(ep);
+    return fdsan_close_with_tag(ep, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 }
 
 static void GetHeaderStr(struct UsbFnStrings ** const strings, struct UsbFunctionfsStringsHead *headerStr)

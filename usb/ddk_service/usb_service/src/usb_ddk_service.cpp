@@ -673,7 +673,7 @@ int32_t SubmitRequestWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem &ash
     struct UsbRequest *request = UsbAllocRequestByAshmem(handleConvert, 0, ashmem.size, ashmem.ashmemFd);
     if (request == nullptr) {
         HDF_LOGE("%{public}s alloc request failed", __func__);
-        close(ashmem.ashmemFd);
+        fdsan_close_with_tag(ashmem.ashmemFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         pthread_rwlock_unlock(&g_rwLock);
         return HDF_DEV_ERR_NO_MEMORY;
     }
@@ -695,7 +695,7 @@ int32_t SubmitRequestWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem &ash
     transferredLength = request->compInfo.actualLength;
 FINISHED:
     (void)UsbFreeRequestByMmap(request);
-    close(ashmem.ashmemFd);
+    fdsan_close_with_tag(ashmem.ashmemFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     pthread_rwlock_unlock(&g_rwLock);
     return ret;
 }
@@ -705,7 +705,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
 {
     if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
-        close(ashmem.ashmemFd);
+        fdsan_close_with_tag(ashmem.ashmemFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return HDF_ERR_NOPERM;
     }
 
@@ -713,7 +713,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
-        close(ashmem.ashmemFd);
+        fdsan_close_with_tag(ashmem.ashmemFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return ret;
     }
 #ifndef LIBUSB_ENABLE

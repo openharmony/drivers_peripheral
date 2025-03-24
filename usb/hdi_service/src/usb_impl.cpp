@@ -775,7 +775,7 @@ int32_t UsbImpl::InitAsmBufferHandle(UsbdBufferHandle *handle, int32_t fd, int32
     handle->cbflg = 0;
     lseek(fd, 0, SEEK_SET);
     handle->starAddr = static_cast<uint8_t *>(mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (handle->starAddr == nullptr) {
         handle->fd = -1;
         handle->size = 0;
@@ -926,7 +926,7 @@ void UsbImpl::UsbdCloseFd(UsbImpl *super, UsbPnpNotifyMatchInfoTable *infoTable)
     auto iter = super->openedFds_.find({infoTable->busNum, infoTable->devNum});
     if (iter != super->openedFds_.end()) {
         int32_t fd = iter->second;
-        int res = close(fd);
+        int res = fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         super->openedFds_.erase(iter);
         HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
             __func__, __LINE__, iter->second, res);
@@ -1352,7 +1352,7 @@ int32_t UsbImpl::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
         auto iter = openedFds_.find({dev.busNum, dev.devAddr});
         if (iter != openedFds_.end()) {
             int32_t oldFd = iter->second;
-            int res = close(oldFd);
+            int res = fdsan_close_with_tag(oldFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             HDF_LOGI("%{public}s:%{public}d close old %{public}d ret = %{public}d",
                 __func__, __LINE__, iter->second, res);
         } else {

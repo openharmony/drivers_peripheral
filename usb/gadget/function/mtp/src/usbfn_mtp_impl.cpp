@@ -1731,7 +1731,7 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     ON_SCOPE_EXIT(release) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
-        close(mfs.fd);
+        fdsan_close_with_tag(mfs.fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     };
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         HDF_LOGE("%{public}s: no init", __func__);
@@ -1890,7 +1890,7 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     ON_SCOPE_EXIT(release) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
-        close(mfs.fd);
+        fdsan_close_with_tag(mfs.fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     };
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         HDF_LOGE("%{public}s: no init", __func__);

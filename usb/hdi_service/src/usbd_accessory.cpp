@@ -169,6 +169,7 @@ int32_t UsbdAccessory::GetAccessoryInfo(std::vector<std::string> &accessoryInfo)
         HDF_LOGE("%{public}s:%{public}d open failed", __func__, __LINE__);
         return HDF_ERR_NOT_SUPPORT;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     int32_t ret = HDF_FAILURE;
     std::string accInfoString;
     for (size_t i = 0; i < accStringList.size(); i++) {
@@ -179,7 +180,7 @@ int32_t UsbdAccessory::GetAccessoryInfo(std::vector<std::string> &accessoryInfo)
         }
         accessoryInfo.push_back(accInfoString);
     }
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     return HDF_SUCCESS;
 }
 
@@ -194,6 +195,7 @@ int32_t UsbdAccessory::OpenAccessory(int32_t &fd)
         HDF_LOGE("%{public}s:%{public}d open failed", __func__, __LINE__);
         return HDF_ERR_NOT_SUPPORT;
     }
+    fdsan_exchange_owner_tag(accFd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     fd = accFd;
     return HDF_SUCCESS;
 }
@@ -201,9 +203,9 @@ int32_t UsbdAccessory::OpenAccessory(int32_t &fd)
 int32_t UsbdAccessory::CloseAccessory(int32_t fd)
 {
     if (accFd > 0) {
-        close(accFd);
+        fdsan_close_with_tag(accFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     }
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     accFd = 0;
     return HDF_SUCCESS;
 }
@@ -211,7 +213,7 @@ int32_t UsbdAccessory::CloseAccessory(int32_t fd)
 void UsbdAccessory::HandleEvent(int32_t state)
 {
     if (state == ACT_DOWNDEVICE && accFd > 0) {
-        close(accFd);
+        fdsan_close_with_tag(accFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         accFd = 0;
     }
 }
