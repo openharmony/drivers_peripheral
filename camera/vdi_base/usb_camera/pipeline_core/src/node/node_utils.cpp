@@ -58,9 +58,7 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
     CAMERA_LOGI("====imageSize: %{public}d * %{public}d -> %{public}d * %{public}d, format: %{public}d -> %{public}d",
         srcBufferInfo.width, srcBufferInfo.height, dstBufferInfo.width, dstBufferInfo.height,
         srcBufferInfo.format, dstBufferInfo.format);
-    CAMERA_LOGI("====buffer: %{public}p [%{public}d] -> %{public}p [%{public}d]",
-        srcBufferInfo.bufferAddr, srcBufferInfo.bufferSize,
-        dstBufferInfo.bufferAddr, dstBufferInfo.bufferSize);
+    CAMERA_LOGI("====buffer: [%{public}d] -> [%{public}d]", srcBufferInfo.bufferSize, dstBufferInfo.bufferSize);
 
     AVFrame *pFrameSrc = av_frame_alloc();
     if (pFrameSrc == nullptr) {
