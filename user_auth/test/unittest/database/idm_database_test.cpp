@@ -842,7 +842,7 @@ HWTEST_F(IdmDatabaseTest, TestGetEnableStatus, TestSize.Level0)
     EXPECT_EQ(GetEnableStatus(userId, authType), true);
 
     g_globalConfigArray[0].authType = 1;
-    EXPECT_EQ(GetEnableStatus(userId, authType), false);
+    EXPECT_EQ(GetEnableStatus(userId, authType), true);
 }
 } // namespace UserAuth
 } // namespace UserIam

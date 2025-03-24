@@ -306,7 +306,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_003, TestSize.Level0)
     EnrollParam param = {};
     param.userId = userId;
     ScheduleInfo scheduleInfo = {};
-    EXPECT_EQ(service->BeginEnrollment(authToken, param, scheduleInfo), 10018);
+    EXPECT_EQ(service->BeginEnrollment(authToken, param, scheduleInfo), RESULT_TYPE_NOT_SUPPORT);
 
     EXPECT_EQ(service->CloseSession(userId), 0);
 }
@@ -1022,7 +1022,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_001, TestSize.Level0)
     std::vector<uint8_t> authToken;
     std::vector<CredentialInfo> deletedCredInfos;
     std::vector<uint8_t> rootSecret;
-    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 8);
+    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), RESULT_VERIFY_TOKEN_FAIL);
 
     authToken.resize(sizeof(UserAuthTokenHal));
     EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 10017);
