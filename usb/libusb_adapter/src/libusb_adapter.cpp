@@ -278,6 +278,21 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     return HDF_SUCCESS;
 }
 
+void LibusbAdapter::CloseOpenedFd(const UsbDev &dev)
+{
+    std::lock_guard<std::mutex> lock(openedFdsMutex_);
+    auto iter = openedFds_.find({dev.busNum, dev.devAddr});
+    if (iter != openedFds_.end()) {
+        int32_t fd = iter->second;
+        int res = close(fd);
+        openedFds_.erase(iter);
+        HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
+            __func__, __LINE__, iter->second, res);
+    } else {
+        HDF_LOGI("%{public}s:%{public}d not opened", __func__, __LINE__);
+    }
+}
+
 int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s enter", __func__);
@@ -298,20 +313,7 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
     info->second.count--;
     HDF_LOGI("%{public}s Number of devices that are opened=%{public}d", __func__, info->second.count);
     if (info->second.count == 0 && (info->second.handle != nullptr)) {
-        {
-            std::lock_guard<std::mutex> lock(openedFdsMutex_);
-            auto iter = openedFds_.find({dev.busNum, dev.devAddr});
-            if (iter != openedFds_.end()) {
-                int32_t fd = iter->second;
-                if (fd != )
-                int res = close(fd);
-                openedFds_.erase(iter);
-                HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
-                    __func__, __LINE__, iter->second, res);
-            } else {
-                HDF_LOGI("%{public}s:%{public}d not opened", __func__, __LINE__);
-            }
-        }
+        CloseOpenedFd(dev);
         {
             std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
             auto it = g_usbOpenFdMap.find(result);
