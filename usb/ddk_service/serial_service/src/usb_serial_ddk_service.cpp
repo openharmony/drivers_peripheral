@@ -116,6 +116,7 @@ int32_t UsbSerialDdkService::Open(uint64_t deviceId, uint64_t interfaceIndex,
         HDF_LOGE("error %{public}d opening devNodePath: %{public}s\n", errno, strerror(errno));
         return USB_SERIAL_DDK_IO_ERROR;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     dev.fd = static_cast<uint32_t>(fd);
     return HDF_SUCCESS;
 }
@@ -128,7 +129,8 @@ int32_t UsbSerialDdkService::Close(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::Usb
         return USB_SERIAL_DDK_NO_PERM;
     }
 
-    int ret = close(static_cast<int32_t>(dev.fd));
+    int ret = fdsan_close_with_tag(static_cast<int32_t>(dev.fd),
+                                   fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (ret != 0) {
         HDF_LOGE("Failed to close device: %{public}s.\n", strerror(errno));
         if (errno == EBADF) {
