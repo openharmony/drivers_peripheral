@@ -52,6 +52,8 @@ enum AudioPortPinVdi {
     PIN_VDI_IN_BLUETOOTH_SCO_HEADSET = 1 << 27 | 1 << 4,
     PIN_VDI_IN_DAUDIO_DEFAULT = 1 << 27 | 1 << 5,
     PIN_VDI_IN_USB_HEADSET = 1 << 27 | 1 << 6,
+    PIN_VDI_IN_PENCIL = 1 << 27 | 1 << 7,
+    PIN_VDI_IN_UWB = 1 << 27 | 1 << 8,
     PIN_VDI_IN_BUTT,
 };
 
