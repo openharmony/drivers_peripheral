@@ -23,6 +23,7 @@ ohos_shared_library("nfc_vendor_adaptor") {
     "drivers_interface_nfc:nfc_idl_headers",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_single",
   ]
 

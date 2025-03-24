@@ -22,6 +22,7 @@
 #include <pthread.h>
 #include <string>
 #include "securec.h"
+#include "hisysevent.h"
 
 #define HDF_LOG_TAG hdf_nfc_dal
 
@@ -30,11 +31,36 @@
 #endif
 
 #define LOG_DOMAIN 0xD000306
-std::mutex g_openMutex;
+
 using namespace std;
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
+std::mutex g_openMutex;
+enum BootloaderRecoverStatus : uint16_t {
+    BOOTLOADER_STATUS_RECOVER_SUCCESS = 1,
+    BOOTLOADER_STATUS_RECOVER_FAILED,
+};
+template<typename... Types>
+static void WriteEvent(const std::string& eventType, OHOS::HiviewDFX::HiSysEvent::EventType type, Types... args)
+{
+    int ret = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::SECURE_ELEMENT, eventType, type, args...);
+    if (ret != 0) {
+        HDF_LOGE("Write event fail: %{public}s", eventType.c_str());
+    } else {
+        HDF_LOGI("%{public}s success!", __func__);
+    }
+}
+
+static void WriteBootloaderHiSysEvent(uint16_t errorCode)
+{
+    const uint8_t bootloaderStatusType = 200; /* 100 ~ 199 for CA to TA hisysevent */
+    WriteEvent("ACCESS_SE_FAILED", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+               "CHANNEL_TYPE", bootloaderStatusType,
+               "ERROR_CODE", errorCode);
+    HDF_LOGI("%{public}s value:%{public}d", __func__, errorCode);
+}
+
 static string GetNfcHalSoName(const std::string &chipType)
 {
     string nfcHalSoName = NFC_HAL_SO_PREFIX + chipType + NFC_HAL_SO_SUFFIX;
@@ -82,6 +108,58 @@ void NfcVendorAdaptions::CheckFirmwareUpdate(void)
     nfcExtHandle = nullptr;
 }
 
+void NfcVendorAdaptions::UpdateNfcOpenStatus(const std::string &status)
+{
+    nfcExtHandle = dlopen(VENDOR_NFC_EXT_SERVICE_LIB.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    if (nfcExtHandle == nullptr) {
+        HDF_LOGE("%{public}s: fail to get nfc ext service handle.", __func__);
+        return;
+    }
+    nfcExtInf.updateNfcOpenStatus = reinterpret_cast<void (*)(const char*, int)>
+        (dlsym(nfcExtHandle, EXT_UPDATE_NFC_OPEN_STATUS.c_str()));
+    if (nfcExtInf.updateNfcOpenStatus == nullptr) {
+        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        dlclose(nfcExtHandle);
+        nfcExtHandle = nullptr;
+        return;
+    }
+    nfcExtInf.updateNfcOpenStatus(status.c_str(), status.length());
+    HDF_LOGI("%{public}s: status [%{public}s].", __func__, status.c_str());
+    dlclose(nfcExtHandle);
+    nfcExtHandle = nullptr;
+}
+
+/*
+** true : NFC in bootloader status
+** false : NFC in normal status
+*/
+bool NfcVendorAdaptions::CheckNfcBootloaderStatus(void)
+{
+    nfcExtHandle = dlopen(VENDOR_NFC_EXT_SERVICE_LIB.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    if (nfcExtHandle == nullptr) {
+        HDF_LOGE("%{public}s: fail to get nfc ext service handle.", __func__);
+        return false;
+    }
+    nfcExtInf.checkNfcBootloaderStatus = reinterpret_cast<int (*)()>
+        (dlsym(nfcExtHandle, EXT_CHECK_NFC_BOOTLOADER_STATUS.c_str()));
+    if (nfcExtInf.checkNfcBootloaderStatus == nullptr) {
+        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        dlclose(nfcExtHandle);
+        nfcExtHandle = nullptr;
+        return false;
+    }
+    if (nfcExtInf.checkNfcBootloaderStatus() == 0) {
+        dlclose(nfcExtHandle);
+        nfcExtHandle = nullptr;
+        HDF_LOGE("%{public}s: NFC in bootloader status", __func__);
+        return true;
+    }
+    dlclose(nfcExtHandle);
+    nfcExtHandle = nullptr;
+    HDF_LOGI("%{public}s: NFC in normal status", __func__);
+    return false;
+}
+
 string NfcVendorAdaptions::GetNfcHalFuncNameSuffix(const std::string &chipType)
 {
     string suffix = DEFAULT_FUNC_NAME_SUFFIX;
@@ -127,15 +205,24 @@ void* NfcVendorAdaptions::DoHalPreOpen(void* arg)
         return nullptr;
     }
     std::lock_guard<std::mutex> lock(g_openMutex);
-    status = mVendorAdapter->nfcHalInf.nfcHalMinOpen(true);
-    if (status != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: nfcHalMinOpen is fail", __func__);
-        return nullptr;
-    }
-    status = mVendorAdapter->nfcHalInf.nfcHalMinClose();
-    if (status != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: nfcHalMinClose is fail", __func__);
-        return nullptr;
+    if (mVendorAdapter->CheckNfcBootloaderStatus()) {
+        mVendorAdapter->UpdateNfcOpenStatus(NFC_OPENING_STATUS);
+        status = mVendorAdapter->nfcHalInf.nfcHalMinOpen(true);
+        if (status != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: nfcHalMinOpen is fail", __func__);
+            mVendorAdapter->UpdateNfcOpenStatus(NFC_CLOSE_STATUS);
+            WriteBootloaderHiSysEvent(BOOTLOADER_STATUS_RECOVER_FAILED);
+            return nullptr;
+        }
+        status = mVendorAdapter->nfcHalInf.nfcHalMinClose();
+        if (status != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: nfcHalMinClose is fail", __func__);
+            mVendorAdapter->UpdateNfcOpenStatus(NFC_OPEN_STATUS);
+            WriteBootloaderHiSysEvent(BOOTLOADER_STATUS_RECOVER_FAILED);
+            return nullptr;
+        }
+        mVendorAdapter->UpdateNfcOpenStatus(NFC_CLOSE_STATUS);
+        WriteBootloaderHiSysEvent(BOOTLOADER_STATUS_RECOVER_SUCCESS);
     }
     HDF_LOGI("%{public}s: exit.", __func__);
     return nullptr;
