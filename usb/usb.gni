@@ -23,19 +23,19 @@ declare_args() {
 }
 
 declare_args() {
-  usb_hisysevent_enable = false
+  usb_hisysevent_enable = true
   if (!drivers_peripheral_usb_feature_hiviewdfx_hisysevent) {
-    usb_hisysevent_enable = true
+    usb_hisysevent_enable = false
   }
 
-  usb_samgr_enable = false
+  usb_samgr_enable = true
   if (!drivers_peripheral_usb_feature_systemabilitymgr_samgr) {
-    usb_samgr_enable = true
+    usb_samgr_enable = false
   }
 
-  usb_c_utils_enable = false
+  usb_c_utils_enable = true
   if (!drivers_peripheral_usb_feature_commonlibrary_c_utils) {
-    usb_c_utils_enable = true
+    usb_c_utils_enable = false
   }
 
   libusb_enable = true
