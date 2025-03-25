@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -488,8 +488,8 @@ int32_t DStreamOperator::CancelCapture(int32_t captureId)
         EraseStreamCaptureBufferNum(std::make_pair(captureId, id));
         EraseNotifyCaptureMap(id);
     }
-    if (dcStreamOperatorCallback_) {
-        dcStreamOperatorCallback_->OnCaptureEnded(captureId, info);
+    if (dcStreamOperatorCallback__V1_3) {
+        dcStreamOperatorCallback__V1_3->OnCaptureEnded(captureId, info);
     }
 
     EraseCaptureInfo(captureId);
@@ -654,26 +654,10 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    if (currentOperMode_ == 0) {
-        if (ParsePhotoFormats(rootValue) != SUCCESS || ParsePreviewFormats(rootValue) != SUCCESS ||
-            ParseVideoFormats(rootValue) != SUCCESS) {
-            cJSON_Delete(rootValue);
-            cJSON_Delete(srcRootValue);
-            return DCamRetCode::INVALID_ARGUMENT;
-        }
-    } else {
-        cJSON *modeValue = cJSON_GetObjectItemCaseSensitive(rootValue, std::to_string(currentOperMode_).c_str());
-        if (modeValue == nullptr || !cJSON_IsObject(modeValue)) {
-            cJSON_Delete(rootValue);
-            cJSON_Delete(srcRootValue);
-            return DCamRetCode::INVALID_ARGUMENT;
-        }
-        if (ParsePhotoFormats(modeValue) != SUCCESS || ParsePreviewFormats(modeValue) != SUCCESS ||
-            ParseVideoFormats(modeValue) != SUCCESS) {
-            cJSON_Delete(rootValue);
-            cJSON_Delete(srcRootValue);
-            return DCamRetCode::INVALID_ARGUMENT;
-        }
+    if (ParseFormats(rootValue) != SUCCESS) {
+        cJSON_Delete(rootValue);
+        cJSON_Delete(srcRootValue);
+        return DCamRetCode::INVALID_ARGUMENT;
     }
 
     if (!CheckInputInfo()) {
@@ -683,6 +667,31 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
     }
     cJSON_Delete(rootValue);
     cJSON_Delete(srcRootValue);
+    return SUCCESS;
+}
+
+DCamRetCode DStreamOperator::ParseFormats(cJSON* rootValue)
+{
+    cJSON *modeValue = cJSON_GetObjectItemCaseSensitive(rootValue, std::to_string(currentOperMode_).c_str());
+    if (currentOperMode_ == 0) {
+        if (ParsePhotoFormats(rootValue) != SUCCESS || ParsePreviewFormats(rootValue) != SUCCESS ||
+            ParseVideoFormats(rootValue) != SUCCESS) {
+            return DCamRetCode::INVALID_ARGUMENT;
+        }
+    } else if (currentOperMode_ != 0 && modeValue == nullptr) {
+        if (ParsePhotoFormats(rootValue) != SUCCESS || ParsePreviewFormats(rootValue) != SUCCESS ||
+            ParseVideoFormats(rootValue) != SUCCESS) {
+            return DCamRetCode::INVALID_ARGUMENT;
+        }
+    } else {
+        if (modeValue == nullptr || !cJSON_IsObject(modeValue)) {
+            return DCamRetCode::INVALID_ARGUMENT;
+        }
+        if (ParsePhotoFormats(modeValue) != SUCCESS || ParsePreviewFormats(modeValue) != SUCCESS ||
+            ParseVideoFormats(modeValue) != SUCCESS) {
+            return DCamRetCode::INVALID_ARGUMENT;
+        }
+    }
     return SUCCESS;
 }
 
@@ -838,10 +847,10 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &bu
 
     auto iter = notifyCaptureStartedMap_.find(streamId);
     if (iter != notifyCaptureStartedMap_.end()) {
-        if (!iter->second && dcStreamOperatorCallback_ != nullptr) {
+        if (!iter->second && dcStreamOperatorCallback__V1_3 != nullptr) {
             vector<int> tmpStreamIds;
             tmpStreamIds.push_back(streamId);
-            dcStreamOperatorCallback_->OnCaptureStarted(captureId, tmpStreamIds);
+            dcStreamOperatorCallback__V1_3->OnCaptureStarted(captureId, tmpStreamIds);
             iter->second = true;
         }
     }
@@ -865,20 +874,32 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &bu
 
     bool enableShutter = FindEnableShutter(streamId);
     if (!enableShutter) {
-        if (dcStreamOperatorCallback_ == nullptr) {
+        if (dcStreamOperatorCallback__V1_3 == nullptr) {
             DHLOGE("DStreamOperator::ShutterBuffer failed, need shutter frame, but stream operator callback is null.");
             return DCamRetCode::FAILED;
         }
         std::vector<int32_t> streamIds;
         streamIds.push_back(streamId);
-        dcStreamOperatorCallback_->OnFrameShutter(captureId, streamIds, resultTimestamp);
+        dcStreamOperatorCallback__V1_3->OnFrameShutter(captureId, streamIds, resultTimestamp);
     }
     return DCamRetCode::SUCCESS;
 }
 
-DCamRetCode DStreamOperator::SetCallBack(OHOS::sptr<IStreamOperatorCallback> const &callback)
+DCamRetCode DStreamOperator::SetCallBack(OHOS::sptr<HDI::Camera::V1_0::IStreamOperatorCallback> const &callback)
 {
     dcStreamOperatorCallback_ = callback;
+    return SUCCESS;
+}
+
+DCamRetCode DStreamOperator::SetCallBack_V1_2(OHOS::sptr<HDI::Camera::V1_2::IStreamOperatorCallback> const &callback)
+{
+    dcStreamOperatorCallback__V1_2 = callback;
+    return SUCCESS;
+}
+
+DCamRetCode DStreamOperator::SetCallBack_V1_3(OHOS::sptr<HDI::Camera::V1_3::IStreamOperatorCallback> const &callback)
+{
+    dcStreamOperatorCallback__V1_3 = callback;
     return SUCCESS;
 }
 
@@ -902,7 +923,7 @@ void DStreamOperator::SnapShotStreamOnCaptureEnded(int32_t captureId, int stream
     if (dcStreamInfo->type_ != DCStreamType::SNAPSHOT_FRAME) {
         return;
     }
-    if (dcStreamOperatorCallback_ == nullptr) {
+    if (dcStreamOperatorCallback__V1_3 == nullptr) {
         return;
     }
     std::vector<CaptureEndedInfo> info;
@@ -910,7 +931,15 @@ void DStreamOperator::SnapShotStreamOnCaptureEnded(int32_t captureId, int stream
     tmp.frameCount_ = FindStreamCaptureBufferNum(std::make_pair(captureId, streamId));
     tmp.streamId_ = streamId;
     info.push_back(tmp);
-    dcStreamOperatorCallback_->OnCaptureEnded(captureId, info);
+    dcStreamOperatorCallback__V1_3->OnCaptureEnded(captureId, info);
+    auto halCaptureInfo = FindCaptureInfoById(captureId);
+    if (captureId < 0 || halCaptureInfo == nullptr) {
+        DHLOGE("Input captureId %{public}d is not exist.", captureId);
+        return;
+    }
+    std::vector<int> streamIds = halCaptureInfo->streamIds_;
+    uint64_t resultTimestamp = GetCurrentLocalTimeStamp();
+    dcStreamOperatorCallback__V1_3->OnCaptureReady(captureId, streamIds, resultTimestamp);
     DHLOGD("snapshot stream successfully reported captureId = %{public}d streamId = %{public}d.", captureId, streamId);
 }
 
@@ -936,6 +965,8 @@ void DStreamOperator::Release()
     cachedDCaptureInfoList_.clear();
     notifyCaptureStartedMap_.clear();
     dcStreamOperatorCallback_ = nullptr;
+    dcStreamOperatorCallback__V1_2 = nullptr;
+    dcStreamOperatorCallback__V1_3 = nullptr;
 }
 
 std::vector<int> DStreamOperator::GetStreamIds()
