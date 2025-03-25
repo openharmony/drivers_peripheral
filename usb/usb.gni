@@ -42,4 +42,6 @@ declare_args() {
   if (defined(ohos_lite)) {
     libusb_enable = false
   }
+
+  usb_drivers_pass_through = true
 }
