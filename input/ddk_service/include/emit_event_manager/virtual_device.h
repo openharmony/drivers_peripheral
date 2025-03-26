@@ -48,6 +48,7 @@ protected:
     virtual const std::vector<uint32_t> &GetRepeats() const;
     virtual const std::vector<uint32_t> &GetSwitches() const;
     bool SetAttribute();
+    FILE *file_ {nullptr};
     int32_t fd_ {-1};
     const char * const deviceName_;
     const uint16_t busType_;

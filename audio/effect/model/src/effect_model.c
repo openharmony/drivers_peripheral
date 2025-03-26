@@ -145,11 +145,9 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
     }
     uint8_t *libHandle = NULL;
     int32_t index = 0;
-    pthread_rwlock_wrlock(&g_rwEffectLock);
     for (int i = 0; i <= AUDIO_EFFECT_NUM_MAX; i++) {
         if (i == AUDIO_EFFECT_NUM_MAX) {
             HDF_LOGE("%{public}s: over effect max num", __func__);
-            pthread_rwlock_unlock(&g_rwEffectLock);
             return HDF_FAILURE;
         }
         if (g_libInfos[i] == NULL) {
@@ -163,24 +161,20 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
         *factLib = g_libInfos[i]->libEffect;
         *ctrlMgr = g_libInfos[i]->ctrlMgr;
         HDF_LOGI("%{public}s: %{public}s increase, cnt=[%{public}d]", __func__, libName, g_libInfos[i]->effectCnt);
-        pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_SUCCESS;
     }
     int32_t ret = LoadLibraryByName(libName, &libHandle, factLib);
     if (ret != HDF_SUCCESS || libHandle == NULL || *factLib == NULL) {
         HDF_LOGE("%{public}s: load lib fail, libName:[%{public}s]", __func__, libName);
-        pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_FAILURE;
     }
     g_libInfos[index] = AddEffectLibInfo(libName, libHandle, *factLib);
     if (g_libInfos[index] == NULL) {
         HDF_LOGE("%{public}s: AddEffectLibInfo fail", __func__);
         dlclose((void *)libHandle);
-        pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s: %{public}s create, cnt=[%{public}d]", __func__, libName, g_libInfos[index]->effectCnt);
-    pthread_rwlock_unlock(&g_rwEffectLock);
     return HDF_SUCCESS;
 }
 
@@ -190,11 +184,9 @@ static int32_t DeleteEffectLibrary(const char *libName)
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    pthread_rwlock_wrlock(&g_rwEffectLock);
     for (int i = 0; i <= AUDIO_EFFECT_NUM_MAX; i++) {
         if (i == AUDIO_EFFECT_NUM_MAX) {
             HDF_LOGE("%{public}s: fail to destroy effect, can not find %{public}s", __func__, libName);
-            pthread_rwlock_unlock(&g_rwEffectLock);
             return HDF_FAILURE;
         }
         if (g_libInfos[i] == NULL || strcmp(g_libInfos[i]->libName, libName) != 0) {
@@ -203,7 +195,6 @@ static int32_t DeleteEffectLibrary(const char *libName)
         if (g_libInfos[i]->effectCnt > 1) {
             g_libInfos[i]->effectCnt--;
             HDF_LOGI("%{public}s: %{public}s decrease, cnt=[%{public}d]", __func__, libName, g_libInfos[i]->effectCnt);
-            pthread_rwlock_unlock(&g_rwEffectLock);
             return HDF_SUCCESS;
         }
         dlclose((void*)g_libInfos[i]->libHandle);
@@ -214,7 +205,6 @@ static int32_t DeleteEffectLibrary(const char *libName)
         break;
     }
     HDF_LOGI("%{public}s: %{public}s delete", __func__, libName);
-    pthread_rwlock_unlock(&g_rwEffectLock);
     return HDF_SUCCESS;
 }
 
@@ -263,6 +253,7 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
         return HDF_FAILURE;
     }
     struct EffectControllerDescriptorVdi *descsVdi = (struct EffectControllerDescriptorVdi *)descs;
+    pthread_rwlock_wrlock(&g_rwEffectLock);
     for (i = 0; i < g_cfgDescs->effectNum; i++) {
         ret = LoadEffectLibrary(g_cfgDescs->effectCfgDescs[i].library, &factLib, &ctrlMgr);
         if (ret != HDF_SUCCESS || factLib == NULL) {
@@ -286,6 +277,7 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
     }
     *descsLen = descNum;
     descs = (struct EffectControllerDescriptor *)descsVdi;
+    pthread_rwlock_unlock(&g_rwEffectLock);
     HDF_LOGD("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -306,23 +298,27 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
         if (strcmp(uuid, g_cfgDescs->effectCfgDescs[i].effectId) != 0) {
             continue;
         }
-
+        pthread_rwlock_wrlock(&g_rwEffectLock);
         LoadEffectLibrary(g_cfgDescs->effectCfgDescs[i].library, &factLib, &ctrlMgr);
         if (factLib == NULL) {
             HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
+            pthread_rwlock_unlock(&g_rwEffectLock);
             return HDF_FAILURE;
         }
         if (ConstructDescriptor(descVdi) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: ConstructDescriptor fail!", __func__);
+            pthread_rwlock_unlock(&g_rwEffectLock);
             return HDF_FAILURE;
         }
         if (factLib->GetDescriptor(factLib, uuid, descVdi) != HDF_SUCCESS) {
             DeleteEffectLibrary(g_cfgDescs->effectCfgDescs[i].library);
             HDF_LOGE("%{public}s: GetDescriptor fail!", __func__);
+            pthread_rwlock_unlock(&g_rwEffectLock);
             return HDF_FAILURE;
         }
         DeleteEffectLibrary(g_cfgDescs->effectCfgDescs[i].library);
         HDF_LOGD("%{public}s success", __func__);
+        pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_SUCCESS;
     }
     desc = (struct EffectControllerDescriptor *)descVdi;
@@ -339,16 +335,13 @@ static int32_t CreateEffectController(const struct EffectInfo *info, struct IEff
     }
     struct ControllerManager *ctrlMgr = (struct ControllerManager *)OsalMemCalloc(sizeof(struct ControllerManager));
     CHECK_NULL_PTR_RETURN_VALUE(ctrlMgr, HDF_FAILURE);
-    pthread_rwlock_rdlock(&g_rwEffectLock);
     struct AudioEffectLibInfo *libInfo = GetEffectLibInfoByName(info->libName);
     if (libInfo == NULL) {
         HDF_LOGE("%{public}s: GetEffectLibInfoByName failed", __func__);
         OsalMemFree(ctrlMgr);
-        pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_FAILURE;
     }
     libInfo->ctrlMgr = ctrlMgr;
-    pthread_rwlock_unlock(&g_rwEffectLock);
     ctrlMgr->ctrlOps = ctrlOps;
     ctrlMgr->libName = strdup(info->libName);
     if (ctrlMgr->libName == NULL) {
@@ -388,37 +381,46 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     struct EffectFactory *lib = NULL;
     struct ControllerManager *ctrlMgr = NULL;
     struct IEffectControlVdi *ctrlOps = NULL;
-
+    pthread_rwlock_wrlock(&g_rwEffectLock);
     int32_t ret = LoadEffectLibrary(info->libName, &lib, &ctrlMgr);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: LoadEffectLibrary fail", __func__);
-        return HDF_FAILURE;
+        goto EXIT;
     }
     if (ctrlMgr != NULL) {
         contollerId->libName = strdup(info->libName);
         contollerId->effectId = strdup(info->effectId);
         if (contollerId->libName == NULL || contollerId->effectId == NULL) {
             HDF_LOGE("%{public}s: strdup failed", __func__);
-            return HDF_FAILURE;
+            goto EXIT;
         }
         *contoller = &ctrlMgr->ctrlImpls;
+        pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_SUCCESS;
     }
-    CHECK_NULL_PTR_RETURN_VALUE(lib, HDF_FAILURE);
-    CHECK_NULL_PTR_RETURN_VALUE(lib->CreateController, HDF_FAILURE);
+    if (lib == NULL || lib->CreateController == NULL) {
+        HDF_LOGE("%{public}s: lib or lib->CreateController is null", __func__);
+        goto EXIT;
+    }
     
     struct EffectInfoVdi *infoVdi = (struct EffectInfoVdi *)info;
     lib->CreateController(lib, infoVdi, &ctrlOps);
-    CHECK_NULL_PTR_RETURN_VALUE(ctrlOps, HDF_FAILURE);
-
-    ret = CreateEffectController(info, contoller, contollerId, ctrlOps);
-    if (ret != HDF_SUCCESS) {
-        DeleteEffectLibrary(info->libName);
-        return HDF_FAILURE;
+    if (ctrlOps == NULL) {
+        HDF_LOGE("%{public}s: ctrlOps is null", __func__);
+        goto EXIT;
     }
-    
+
+    if (CreateEffectController(info, contoller, contollerId, ctrlOps) != HDF_SUCCESS) {
+        DeleteEffectLibrary(info->libName);
+        goto EXIT;
+    }
+
+    pthread_rwlock_unlock(&g_rwEffectLock);
     HDF_LOGI("%{public}s: create effect succeed, libName = %{public}s", __func__, info->libName);
     return HDF_SUCCESS;
+EXIT:
+    pthread_rwlock_unlock(&g_rwEffectLock);
+    return HDF_FAILURE;
 }
 
 int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const struct ControllerId *contollerId)
@@ -427,7 +429,7 @@ int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const stru
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    pthread_rwlock_rdlock(&g_rwEffectLock);
+    pthread_rwlock_wrlock(&g_rwEffectLock);
     struct AudioEffectLibInfo *libInfo = GetEffectLibInfoByName(contollerId->libName);
     if (libInfo == NULL) {
         HDF_LOGE("%{public}s: GetEffectLibInfoByName failed", __func__);
@@ -446,9 +448,12 @@ int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const stru
         return HDF_FAILURE;
     }
     struct ControllerManager *ctrlMgr = libInfo->ctrlMgr;
-    pthread_rwlock_unlock(&g_rwEffectLock);
-    CHECK_NULL_PTR_RETURN_VALUE(ctrlMgr, HDF_FAILURE);
-
+    if (ctrlMgr == NULL) {
+        HDF_LOGE("%{public}s: ctrlMgr is null", __func__);
+        pthread_rwlock_unlock(&g_rwEffectLock);
+        return HDF_FAILURE;
+    }
+    
     if (ctrlMgr->libName != NULL) {
         OsalMemFree(ctrlMgr->libName);
         ctrlMgr->libName = NULL;
@@ -456,12 +461,14 @@ int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const stru
 
     if (ctrlMgr->ctrlOps == NULL) {
         HDF_LOGE("%{public}s: controller has no options", __func__);
+        pthread_rwlock_unlock(&g_rwEffectLock);
         return HDF_FAILURE;
     }
 
     /* call the lib destroy method，then free controller manager */
     lib->DestroyController(lib, ctrlMgr->ctrlOps);
     DeleteEffectLibrary(contollerId->libName);
+    pthread_rwlock_unlock(&g_rwEffectLock);
     HDF_LOGI("%{public}s: destroy effect succeed, libName = %{public}s", __func__, contollerId->libName);
     return HDF_SUCCESS;
 }
@@ -525,3 +532,4 @@ void EffectModelImplRelease(struct IEffectModel *instance)
     OsalMemFree(service);
     service = NULL;
 }
+

@@ -149,13 +149,16 @@ int32_t HidDdkService::Open(uint64_t deviceId, uint8_t interfaceIndex, HidDevice
         return HID_DDK_DEVICE_NOT_FOUND;
     }
 
-    int32_t fd = open(path.c_str(), O_RDWR);
-    if (fd < 0) {
-        HDF_LOGE("%{public}s open failed, path=%{public}s, errno=%{public}d", __func__, path.c_str(), errno);
+    FILE* file = fopen(path.c_str(), "r+");
+    if (file == nullptr) {
+        HDF_LOGE("%{public}s fopen failed, path=%{public}s, errno=%{public}d", __func__, path.c_str(), errno);
         return HID_DDK_IO_ERROR;
     }
-
-    dev.fd = fd;
+    dev.fd = fileno(file);
+    {
+        std::lock_guard<std::mutex> lock(fileDescriptorLock_);
+        fileDescriptorMap_[dev.fd] = file;
+    }
 
     return HID_DDK_SUCCESS;
 }
@@ -168,10 +171,18 @@ int32_t HidDdkService::Close(const HidDeviceHandle& dev)
         return HID_DDK_NO_PERM;
     }
 
-    int32_t ret = close(dev.fd);
-    if (ret == -1) {
-        HDF_LOGE("%{public}s close failed, errno=%{public}d", __func__, errno);
-        return HID_DDK_IO_ERROR;
+    {
+        std::lock_guard<std::mutex> lock(fileDescriptorLock_);
+        if (fileDescriptorMap_.find(dev.fd) == fileDescriptorMap_.end()) {
+            HDF_LOGE("%{public}s file not found, fd=%{public}d", __func__, dev.fd);
+            return HID_DDK_IO_ERROR;
+        }
+        int32_t ret = fclose(fileDescriptorMap_[dev.fd]);
+        if (ret == EOF) {
+            HDF_LOGE("%{public}s fclose failed, errno=%{public}d", __func__, errno);
+            return HID_DDK_IO_ERROR;
+        }
+        fileDescriptorMap_.erase(dev.fd);
     }
 
     return HID_DDK_SUCCESS;
