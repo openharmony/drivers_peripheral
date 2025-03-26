@@ -264,7 +264,6 @@ int32_t ScsiDdkService::Open(uint64_t deviceId, uint8_t interfaceIndex, ScsiPeri
         HDF_LOGE("%{public}s open failed, path=%{public}s, errno=%{public}d", __func__, path.c_str(), errno);
         return SCSIPERIPHERAL_DDK_IO_ERROR;
     }
-    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     dev.devFd = fd;
     HDF_LOGD("Open success, dev.devFd=%{public}d, path.c_str()=%{public}s", dev.devFd, path.c_str());
@@ -305,7 +304,7 @@ int32_t ScsiDdkService::Close(const ScsiPeripheralDevice& dev)
     }
 
     int32_t ret = TrackTime([&]() {
-        return fdsan_close_with_tag(dev.devFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        return close(dev.devFd);
     }, __func__);
     if (ret == -1) {
         HDF_LOGE("%{public}s close failed", __func__);
@@ -313,7 +312,7 @@ int32_t ScsiDdkService::Close(const ScsiPeripheralDevice& dev)
     }
 
     ret = TrackTime([&]() {
-        return fdsan_close_with_tag(dev.memMapFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        return close(dev.memMapFd);
     }, __func__);
     if (ret < 0) {
         HDF_LOGE("%{public}s: close failed, memMapFd=%{public}d, errno=%{public}d", __func__, dev.memMapFd, errno);
@@ -728,7 +727,6 @@ int32_t ScsiDdkService::GetDeviceMemMapFd(uint16_t busNum, uint16_t devAddr, uin
         HDF_LOGE("%{public}s: open error, path=%{public}s, errno=%{public}d", __func__, path, errno);
         return SCSIPERIPHERAL_DDK_IO_ERROR;
     }
-    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     memMapFd = fd;
     HDF_LOGD("%{public}s: memMapFd:%{public}d", __func__, memMapFd);
