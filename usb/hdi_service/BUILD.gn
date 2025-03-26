@@ -502,13 +502,18 @@ ohos_shared_library("libusb_device_driver") {
 }
 
 group("hdi_usb_service") {
-  deps = [
-    ":libusb_device_driver",
-    ":libusb_device_interface_service_2.0",
-    ":libusb_driver",
-    ":libusb_host_interface_service_2.0",
-    ":libusb_interface_service_1.2",
-    ":libusb_port_driver",
-    ":libusb_port_interface_service_2.0",
-  ]
+  if (usb_drivers_pass_through) {
+    deps = [
+      ":libusb_device_driver",
+      ":libusb_device_interface_service_2.0",
+      ":libusb_host_interface_service_2.0",
+      ":libusb_port_driver",
+      ":libusb_port_interface_service_2.0",
+    ]
+  } else {
+    deps = [
+      ":libusb_driver",
+      ":libusb_interface_service_1.2",
+    ]
+  }
 }

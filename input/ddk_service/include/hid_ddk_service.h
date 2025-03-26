@@ -18,6 +18,8 @@
 
 #include "hid_adapter.h"
 #include "v1_1/ihid_ddk.h"
+#include <mutex>
+#include <unordered_map>
 
 namespace OHOS {
 namespace HDI {
@@ -69,6 +71,8 @@ public:
 
 private:
     std::shared_ptr<HidOsAdapter> osAdapter_;
+    std::mutex fileDescriptorLock_;
+    std::unordered_map<uint32_t, FILE*> fileDescriptorMap_;
 };
 } // V1_1
 } // Ddk

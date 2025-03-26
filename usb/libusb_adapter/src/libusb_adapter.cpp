@@ -278,6 +278,21 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     return HDF_SUCCESS;
 }
 
+void LibusbAdapter::CloseOpenedFd(const UsbDev &dev)
+{
+    std::lock_guard<std::mutex> lock(openedFdsMutex_);
+    auto iter = openedFds_.find({dev.busNum, dev.devAddr});
+    if (iter != openedFds_.end()) {
+        int32_t fd = iter->second;
+        int res = close(fd);
+        openedFds_.erase(iter);
+        HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
+            __func__, __LINE__, iter->second, res);
+    } else {
+        HDF_LOGI("%{public}s:%{public}d not opened", __func__, __LINE__);
+    }
+}
+
 int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s enter", __func__);
@@ -298,6 +313,7 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
     info->second.count--;
     HDF_LOGI("%{public}s Number of devices that are opened=%{public}d", __func__, info->second.count);
     if (info->second.count == 0 && (info->second.handle != nullptr)) {
+        CloseOpenedFd(dev);
         {
             std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
             auto it = g_usbOpenFdMap.find(result);
@@ -400,29 +416,17 @@ int32_t LibusbAdapter::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
         HDF_LOGE("%{public}s: FindHandleByDev is failed, ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
-        static_cast<uint32_t>(dev.devAddr);
-    {
-        std::shared_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
-        auto info = g_usbOpenFdMap.find(result);
-        if (info != g_usbOpenFdMap.end()) {
-            fd = info->second;
-            HDF_LOGI("%{public}s open is already on, fd: %{public}d", __func__, info->second);
-            return HDF_SUCCESS;
-        }
-    }
     char path[LIBUSB_PATH_LENGTH] = {"\0"};
     ret = sprintf_s(path, sizeof(path), "%s/%03u/%03u", USB_DEV_FS_PATH, dev.busNum, dev.devAddr);
     if (ret < 0) {
         HDF_LOGE("%{public}s: sprintf_s path failed, ret:%{public}d", __func__, ret);
         return ret;
     }
-    int32_t fileFd = open(path, O_RDWR);
-    if (fileFd < 0) {
+    fd = open(path, O_RDWR);
+    if (fd < 0) {
         HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
         return HDF_FAILURE;
     }
-    fdsan_exchange_owner_tag(fileFd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     fd = fileFd;
     {
         std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
@@ -1162,7 +1166,6 @@ int32_t LibusbAdapter::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
         HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
         return HDF_FAILURE;
     }
-    fdsan_exchange_owner_tag(fileFd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     fd = fileFd;
     {
         std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
@@ -1430,8 +1433,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
     }
     transferredLength = static_cast<uint32_t>(actlength);
     CloseMmapBuffer(buffer, sendRequestAshmemParameter.ashmemSize);
-    fdsan_close_with_tag(sendRequestAshmemParameter.ashmemFd,
-                         fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    close(sendRequestAshmemParameter.ashmemFd);
     return ret;
 }
 
@@ -1468,12 +1470,11 @@ int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> 
             __func__, ptrBuf, errno);
         return HDF_FAILURE;
     }
-    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     void *descriptors = nullptr;
     size_t descriptorsLength = 0;
     if (ReadDescriptors(fd, &descriptors, descriptorsLength) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: ReadDescriptors failed", __func__);
-        fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        close(fd);
         return HDF_FAILURE;
     }
     uint8_t *ptr = static_cast<uint8_t *>(descriptors);
@@ -1481,7 +1482,7 @@ int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> 
     descriptor.resize(length);
     std::copy(ptr, ptr + length, descriptor.begin());
     FreeUsbDescriptorsMemory(descriptors);
-    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    close(fd);
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
@@ -1792,7 +1793,6 @@ int32_t LibusbAdapter::GetDeviceMemMapFd(const UsbDev &dev, int &fd)
         return HDF_FAILURE;
     }
     fd = ret;
-    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     {
         std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
         g_usbOpenFdMap[result] = fd;

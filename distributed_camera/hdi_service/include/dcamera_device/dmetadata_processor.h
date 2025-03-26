@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -96,6 +96,7 @@ private:
     constexpr static uint32_t EXTEND_PHOTO = 2;
     constexpr static int32_t EXTEND_EOF = -1;
     constexpr static uint32_t ADD_MODE = 3;
+    constexpr static uint32_t DEFAULT_EXTEND_SIZE = 1000;
     std::function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> resultCallback_;
     std::shared_ptr<CameraAbility> dCameraAbility_;
     std::string protocolVersion_;

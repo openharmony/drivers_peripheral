@@ -16,7 +16,7 @@ import("//build/test.gni")
 import("../../../codec.gni")
 
 ohos_unittest("codec_hdi_jpeg_test") {
-  module_out_path = "drivers_peripheral_codec/codec"
+  module_out_path = "drivers_peripheral_codec/drivers_peripheral_codec/codec"
 
   sources = [ "codec_hdi_jpeg_test.cpp" ]
 
@@ -42,7 +42,7 @@ ohos_unittest("codec_hdi_jpeg_test") {
 }
 
 ohos_unittest("codec_hdi_heif_encode_test") {
-  module_out_path = "drivers_peripheral_codec/codec"
+  module_out_path = "drivers_peripheral_codec/drivers_peripheral_codec/codec"
 
   sources = [ "codec_hdi_heif_encode_test.cpp" ]
 

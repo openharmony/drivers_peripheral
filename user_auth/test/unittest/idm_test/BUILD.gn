@@ -25,7 +25,7 @@ ohos_unittest("UserAuthIdmTest") {
     blocklist = "../../../cfi_blocklist.txt"
   }
   branch_protector_ret = "pac_ret"
-  module_out_path = "useriam/user_auth_hdi"
+  module_out_path = "drivers_peripheral_user_auth/drivers_peripheral_user_auth"
 
   cflags = [ "-DIAM_TEST_ENABLE" ]
 

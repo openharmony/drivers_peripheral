@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,9 @@
 #include "v1_1/istream_operator.h"
 #include "v1_2/istream_operator.h"
 #include "v1_3/istream_operator.h"
+#include "v1_0/istream_operator_callback.h"
+#include "v1_2/istream_operator_callback.h"
+#include "v1_3/istream_operator_callback.h"
 #include "v1_0/types.h"
 #include "v1_1/types.h"
 
@@ -82,7 +85,9 @@ public:
     DCamRetCode ParseVideoFormats(cJSON* rootValue);
     DCamRetCode AcquireBuffer(int streamId, DCameraBuffer &buffer);
     DCamRetCode ShutterBuffer(int streamId, const DCameraBuffer &buffer);
-    DCamRetCode SetCallBack(OHOS::sptr<IStreamOperatorCallback> const &callback);
+    DCamRetCode SetCallBack(OHOS::sptr<HDI::Camera::V1_0::IStreamOperatorCallback> const &callback);
+    DCamRetCode SetCallBack_V1_2(OHOS::sptr<HDI::Camera::V1_2::IStreamOperatorCallback> const &callback);
+    DCamRetCode SetCallBack_V1_3(OHOS::sptr<HDI::Camera::V1_3::IStreamOperatorCallback> const &callback);
     DCamRetCode SetDeviceCallback(function<void(ErrorType, int)> &errorCbk,
         function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> &resultCbk);
     void Release();
@@ -149,11 +154,14 @@ private:
     void InsertNotifyCaptureMap(int32_t captureId);
     void EraseNotifyCaptureMap(int32_t captureId);
     bool CheckInputInfo();
+    DCamRetCode ParseFormats(cJSON* rootValue);
 
 private:
     constexpr static uint32_t JSON_ARRAY_MAX_SIZE = 1000;
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;
-    OHOS::sptr<IStreamOperatorCallback> dcStreamOperatorCallback_;
+    OHOS::sptr<HDI::Camera::V1_0::IStreamOperatorCallback> dcStreamOperatorCallback_;
+    OHOS::sptr<HDI::Camera::V1_2::IStreamOperatorCallback> dcStreamOperatorCallback__V1_2;
+    OHOS::sptr<HDI::Camera::V1_3::IStreamOperatorCallback> dcStreamOperatorCallback__V1_3;
     function<void(ErrorType, int)> errorCallback_;
 
     DHBase dhBase_;
