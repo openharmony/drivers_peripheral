@@ -2032,6 +2032,7 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
     // handle failed transfer
     if (transfer->status == LIBUSB_TRANSFER_CANCELLED) {
         HDF_LOGE("%{public}s: async transfer has been canceled", __func__);
+        FeedbackToBase(transfer);
         HandleAsyncFailure(transfer);
         return;
     }
