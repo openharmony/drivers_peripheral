@@ -278,6 +278,21 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     return HDF_SUCCESS;
 }
 
+void LibusbAdapter::CloseOpenedFd(const UsbDev &dev)
+{
+    std::lock_guard<std::mutex> lock(openedFdsMutex_);
+    auto iter = openedFds_.find({dev.busNum, dev.devAddr});
+    if (iter != openedFds_.end()) {
+        int32_t fd = iter->second;
+        int res = close(fd);
+        openedFds_.erase(iter);
+        HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
+            __func__, __LINE__, iter->second, res);
+    } else {
+        HDF_LOGI("%{public}s:%{public}d not opened", __func__, __LINE__);
+    }
+}
+
 int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s enter", __func__);
@@ -298,6 +313,7 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
     info->second.count--;
     HDF_LOGI("%{public}s Number of devices that are opened=%{public}d", __func__, info->second.count);
     if (info->second.count == 0 && (info->second.handle != nullptr)) {
+        CloseOpenedFd(dev);
         {
             std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
             auto it = g_usbOpenFdMap.find(result);
@@ -400,32 +416,31 @@ int32_t LibusbAdapter::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
         HDF_LOGE("%{public}s: FindHandleByDev is failed, ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
-        static_cast<uint32_t>(dev.devAddr);
-    {
-        std::shared_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
-        auto info = g_usbOpenFdMap.find(result);
-        if (info != g_usbOpenFdMap.end()) {
-            fd = info->second;
-            HDF_LOGI("%{public}s open is already on, fd: %{public}d", __func__, info->second);
-            return HDF_SUCCESS;
-        }
-    }
     char path[LIBUSB_PATH_LENGTH] = {"\0"};
     ret = sprintf_s(path, sizeof(path), "%s/%03u/%03u", USB_DEV_FS_PATH, dev.busNum, dev.devAddr);
     if (ret < 0) {
         HDF_LOGE("%{public}s: sprintf_s path failed, ret:%{public}d", __func__, ret);
         return ret;
     }
-    int32_t fileFd = open(path, O_RDWR);
-    if (fileFd < 0) {
+    fd = open(path, O_RDWR);
+    if (fd < 0) {
         HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
         return HDF_FAILURE;
-    }
-    fd = fileFd;
-    {
-        std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
-        g_usbOpenFdMap[result] = fd;
+    } else {
+        std::lock_guard<std::mutex> lock(openedFdsMutex_);
+        auto iter = openedFds_.find({dev.busNum, dev.devAddr});
+        if (iter != openedFds_.end()) {
+            int32_t oldFd = iter->second;
+            if (oldFd != fd) {
+                int res = close(oldFd);
+                HDF_LOGI("%{public}s:%{public}d close old %{public}d ret = %{public}d",
+                    __func__, __LINE__, iter->second, res);
+            }
+        } else {
+            HDF_LOGI("%{public}s:%{public}d first time get fd", __func__, __LINE__);
+        }
+        openedFds_[{dev.busNum, dev.devAddr}] = fd;
+        HDF_LOGI("%{public}s:%{public}d opened %{public}d", __func__, __LINE__, fd);
     }
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
