@@ -136,7 +136,6 @@ static int32_t GetMmapFd(struct UsbDevice *dev)
         HDF_LOGE("%{public}s: open error:%{public}s", __func__, path);
         return HDF_FAILURE;
     }
-    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     dev->devHandle->mmapFd = fd;
     return HDF_SUCCESS;
 }
@@ -189,7 +188,6 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
 
     int32_t fd = open(pathBuf, mode | O_CLOEXEC);
     if (fd != HDF_FAILURE) {
-        fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return fd;
     }
     HDF_LOGI("%{public}s: path: %{public}s, fd:%{public}d", __func__, pathBuf, fd);
@@ -198,7 +196,6 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
         case ENOENT:
             fd = open(pathBuf, mode | O_CLOEXEC);
             if (fd != HDF_FAILURE) {
-                fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
                 return fd;
             }
             ret = HDF_DEV_ERR_NO_DEVICE;
@@ -231,7 +228,6 @@ static int32_t AdapterGetUsbDeviceFd(struct UsbDevice *dev, mode_t mode)
     int32_t fd = open(pathBuf, mode | O_CLOEXEC);
     if (fd != HDF_FAILURE) {
         HDF_LOGI("%{public}s: path: %{public}s, fd: %{public}d", __func__, pathBuf, fd);
-        fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return fd;
     }
     usleep(SLEEP_TIME);
@@ -239,7 +235,6 @@ static int32_t AdapterGetUsbDeviceFd(struct UsbDevice *dev, mode_t mode)
         case ENOENT:
             fd = open(pathBuf, mode | O_CLOEXEC);
             if (fd != HDF_FAILURE) {
-                fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
                 return fd;
             }
             ret = HDF_DEV_ERR_NO_DEVICE;
@@ -1059,9 +1054,9 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
     }
     RawUsbMemFree(dev);
 
-    fdsan_close_with_tag(handle->fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-    fdsan_close_with_tag(handle->mmapFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-    HDF_LOGI("%{public}s:close fd:%{public}d handle->mmapFd:%{public}d", __func__, handle->fd, handle->mmapFd);
+    close(handle->fd);
+    close(handle->mmapFd);
+    HDF_LOGI("%{public}s:close fd:%{public}d", __func__, handle->fd);
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
     handle = NULL;
