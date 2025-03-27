@@ -150,12 +150,13 @@ void Hibernate::InitSwap()
         if (ret != HDF_SUCCESS) {
             return;
         }
-        ret = MkSwap();
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGI("init swap failed");
-            RemoveSwapFile();
-            return;
-        }
+    }
+
+    ret = MkSwap();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGI("init swap failed");
+        RemoveSwapFile();
+        return;
     }
 
     ret = WriteOffsetAndResume();
