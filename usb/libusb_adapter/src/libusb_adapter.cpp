@@ -109,8 +109,7 @@ std::shared_ptr<LibusbAdapter> LibusbAdapter::GetInstance()
 LibusbAdapter::LibusbAdapter()
 {
     HDF_LOGI("%{public}s libusbadapter constructer", __func__);
-    LibUSBInit();
-    if (!eventThread.joinable()) {
+    if ((LibUSBInit() == HDF_SUCCESS) && (!eventThread.joinable())) {
         isRunning = true;
         eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
     }
