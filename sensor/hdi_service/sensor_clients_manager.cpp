@@ -212,7 +212,8 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
     std::string result = "";
     for (auto &entry : clients_[groupId]) {
         auto &client = entry.second;
-        if (client.curCountMap_.find(sensorId) == client.curCountMap_.end()) {
+        if (client.curCountMap_.find(sensorId) == client.curCountMap_.end() ||
+            static_cast<uint32_t>(HdfRemoteGetCallingPid()) == entry.first) {
             client.curCountMap_[sensorId] = INIT_CUR_COUNT;
         }
         if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
