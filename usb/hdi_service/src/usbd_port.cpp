@@ -251,6 +251,7 @@ int32_t UsbdPort::UpdatePort(int32_t mode, const sptr<IUsbdSubscriber> &subscrib
 
 int32_t UsbdPort::UpdateUsbPort(int32_t mode, const sptr<V2_0::IUsbdSubscriber> &subscriber)
 {
+    HDF_LOGD("%{public}s enter, mode is %{public}d", __func__, mode);
     switch (mode) {
         case PORT_MODE_HOST:
             currentPortInfo_.powerRole = POWER_ROLE_SOURCE;
@@ -274,6 +275,7 @@ int32_t UsbdPort::UpdateUsbPort(int32_t mode, const sptr<V2_0::IUsbdSubscriber> 
     currentPortInfos_ = {currentPortInfo_.portId,
         currentPortInfo_.powerRole, currentPortInfo_.dataRole, currentPortInfo_.mode};
     subscriber->PortChangedEvent(currentPortInfos_);
+    HDF_LOGD("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 } // namespace V1_2
