@@ -574,7 +574,6 @@ static int32_t EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlRe
 static int32_t EcmDeviceDispatch(
     struct HdfDeviceIoClient *client, int32_t cmd, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGI("%{public}s: enter, cmd is %{public}d", __func__, cmd);
     struct UsbEcmDevice *ecm = NULL;
     struct UsbEcm *port = NULL;
     int32_t ret;
@@ -624,7 +623,6 @@ static int32_t EcmDeviceDispatch(
             break;
     }
     OsalMutexUnlock(&port->lockRW);
-    HDF_LOGI("%{public}s: exit", __func__);
     return ret;
 }
 
@@ -955,7 +953,6 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
 
 static int32_t EcmInit(struct HdfDeviceObject *device)
 {
-    HDF_LOGD("%{public}s: enter", __func__);
     struct UsbEcmDevice *ecm = NULL;
     struct DeviceResourceIface *iface = NULL;
     int32_t ret;
@@ -1007,7 +1004,6 @@ static int32_t EcmInit(struct HdfDeviceObject *device)
         goto ERR;
     }
     ecm->initFlag = true;
-    HDF_LOGD("%{public}s: exit", __func__);
     return ret;
 ERR:
     UsbEcmFree(ecm);
