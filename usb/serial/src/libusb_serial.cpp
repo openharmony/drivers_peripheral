@@ -639,6 +639,7 @@ bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
         HDF_LOGE("%{public}s : open file failed. ret = %{public}s", __func__, strerror(errno));
         return false;
     }
+    fdsan_exchange_owner_tag(devnumFd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     char devnumBuff[BUFFER_SIZE] = {'\0'};
     readBytes = read(devnumFd, devnumBuff, BUFFER_SIZE);
     fdsan_close_with_tag(devnumFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));

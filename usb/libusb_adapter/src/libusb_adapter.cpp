@@ -1445,8 +1445,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
     }
     transferredLength = static_cast<uint32_t>(actlength);
     CloseMmapBuffer(buffer, sendRequestAshmemParameter.ashmemSize);
-    fdsan_close_with_tag(sendRequestAshmemParameter.ashmemFd,
-                         fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    close(sendRequestAshmemParameter.ashmemFd);
     return ret;
 }
 
