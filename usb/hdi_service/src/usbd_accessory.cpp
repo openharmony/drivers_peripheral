@@ -205,7 +205,7 @@ int32_t UsbdAccessory::CloseAccessory(int32_t fd)
     if (accFd > 0) {
         fdsan_close_with_tag(accFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     }
-    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    close(fd);
     accFd = 0;
     return HDF_SUCCESS;
 }
