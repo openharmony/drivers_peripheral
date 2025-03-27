@@ -308,7 +308,7 @@ int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, 
     }  else if (strncmp(ifName, "chba0", strlen("chba0")) == 0) {
         if (strcpy_s(addInterface.name, sizeof(addInterface.name) - 1, ifName) != EOK ||
             strcpy_s(addInterface.confName, sizeof(addInterface.confName) - 1,
-                     CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
+                     CONFIG_ROOR_DIR"/wpa_supplicant/chba_supplicant.conf") != EOK) {
             pthread_mutex_unlock(GetInterfaceLock());
             return HDF_FAILURE;
         }
