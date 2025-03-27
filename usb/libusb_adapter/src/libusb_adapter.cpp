@@ -2877,6 +2877,8 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
             libusb_exit(g_libusb_context);
             g_libusb_context = nullptr;
             return HDF_FAILURE;
+        } else {
+            HDF_LOGD("%{public}s: register hotplug callback success.", __func__);
         }
     }
     GetCurrentDeviceList(g_libusb_context, subscriber);
