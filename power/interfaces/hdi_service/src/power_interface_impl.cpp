@@ -163,7 +163,7 @@ int32_t PowerInterfaceImpl::UnRegisterRunningLockCallback()
 int32_t PowerInterfaceImpl::StartSuspend()
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    HDF_LOGI("start suspend");
+    HDF_LOGI("staS3");
     g_suspendRetry = true;
     if (g_suspending) {
         g_powerState = PowerHdfState::INACTIVE;
@@ -253,7 +253,7 @@ int32_t DoSuspend()
     }
     bool ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
     if (!ret) {
-        HDF_LOGE("DoSuspend fail");
+        HDF_LOGE("S3 FA");
         waitTime_ = std::min(waitTime_ * WAIT_TIME_FACTOR, MAX_WAIT_TIME);
         return HDF_FAILURE;
     }
@@ -280,7 +280,7 @@ void NotifyCallback(int code)
 
 int32_t PowerInterfaceImpl::StopSuspend()
 {
-    HDF_LOGI("stop suspend");
+    HDF_LOGI("stpS3");
     g_suspendRetry = false;
     g_powerState = PowerHdfState::AWAKE;
     return HDF_SUCCESS;
@@ -449,14 +449,16 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
-    HDF_LOGI("Background runningLock active, type=%{public}d name=%{public}s", info.type, info.name.c_str());
+    // Background runningLock active
+    HDF_LOGI("BL active,T=%{public}d", info.type);
     return RunningLockImpl::HoldLock(info, g_powerState, lockid, bundleName);
 }
 
 int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
-    HDF_LOGI("Background runningLock inactive, type=%{public}d name=%{public}s", info.type, info.name.c_str());
+    // Background runningLock inactive
+    HDF_LOGI("BL inactive,T=%{public}d", info.type);
     return RunningLockImpl::UnholdLock(info, lockid, bundleName);
 }
 
