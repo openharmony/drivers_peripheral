@@ -19,7 +19,8 @@
           "hdf_core",
           "hilog",
           "c_utils",
-          "drivers_interface_nfc"
+          "drivers_interface_nfc",
+          "hisysevent"
         ],
         "third_party": []
       },
