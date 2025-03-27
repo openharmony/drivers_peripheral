@@ -249,6 +249,7 @@ static int32_t SpeedReadThread(void *arg)
 struct OsalThread g_threadRead;
 static int32_t StartThreadReadSpeed(struct UsbSerial *port)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     int32_t ret;
     struct OsalThreadParam threadCfg;
     ret = memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
@@ -272,6 +273,7 @@ static int32_t StartThreadReadSpeed(struct UsbSerial *port)
         HDF_LOGE("%{public}s:%{public}d OsalThreadStart failed, ret=%{public}d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
@@ -299,9 +301,11 @@ static int32_t UsbSerialGetTempReadSpeedInt(struct UsbSerial *port, struct HdfSB
 static int32_t UsbSerialReadSpeedDone(struct UsbSerial *port)
 {
     (void)port;
+    HDF_LOGI("%{public}s: enter", __func__);
     gettimeofday(&g_readTimeEnd, NULL);
     g_isReadDone = true;
     g_isStartRead = false;
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
@@ -433,6 +437,7 @@ static void UsbSerialStopIo(struct UsbSerial *port)
 
 static int32_t UsbSerialAllocFifo(struct DataFifo *fifo, uint32_t size)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     if (!DataFifoIsInitialized(fifo)) {
         void *data = OsalMemAlloc(size);
         if (data == NULL) {
@@ -441,11 +446,13 @@ static int32_t UsbSerialAllocFifo(struct DataFifo *fifo, uint32_t size)
         }
         DataFifoInit(fifo, size, data);
     }
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t UsbSerialOpen(struct UsbSerial *port)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     int32_t ret;
 
     if (port == NULL) {
@@ -484,11 +491,13 @@ static int32_t UsbSerialOpen(struct UsbSerial *port)
 
 OUT:
     OsalMutexUnlock(&port->lock);
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t UsbSerialClose(struct UsbSerial *port)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     struct UsbAcmDevice *acm = NULL;
 
     if (port == NULL) {
@@ -510,6 +519,7 @@ static int32_t UsbSerialClose(struct UsbSerial *port)
     port->startDelayed = false;
 
     OsalMutexUnlock(&port->lock);
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
@@ -601,6 +611,7 @@ static int32_t SpeedThread(void *arg)
 struct OsalThread g_thread;
 static int32_t StartThreadSpeed(struct UsbSerial *port)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     struct OsalThreadParam threadCfg;
     int32_t ret = memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     if (ret != EOK) {
@@ -622,6 +633,7 @@ static int32_t StartThreadSpeed(struct UsbSerial *port)
         HDF_LOGE("%{public}s:%{public}d OsalThreadStart failed, ret=%{public}d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
+    HDF_LOGD("%{public}s: exit", __func__);
     return 0;
 }
 
@@ -651,6 +663,7 @@ static int32_t UsbSerialSpeedDone(struct UsbSerial *port)
     (void)port;
     gettimeofday(&g_timeEnd, NULL);
     g_isWriteDone = true;
+    HDF_LOGI("%{public}s: Serial speed done success", __func__);
     return HDF_SUCCESS;
 }
 
@@ -662,6 +675,7 @@ static int32_t UsbSerialSpeed(struct UsbSerial *port)
 
 static int32_t UsbSerialRead(struct UsbSerial *port, struct HdfSBuf *reply)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     uint32_t len, fifoLen;
     int32_t ret = HDF_SUCCESS;
     uint8_t *buf = NULL;
@@ -703,11 +717,13 @@ OUT:
     }
     OsalMemFree(buf);
     OsalMutexUnlock(&port->lock);
+    HDF_LOGD("%{public}s: exit", __func__);
     return ret;
 }
 
 static int32_t UsbSerialWrite(struct UsbSerial *port, struct HdfSBuf *data)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     int32_t size;
     const char *tmp = NULL;
 
@@ -741,21 +757,25 @@ static int32_t UsbSerialWrite(struct UsbSerial *port, struct HdfSBuf *data)
     }
     OsalMutexUnlock(&port->lock);
     OsalMemFree(buf);
+    HDF_LOGD("%{public}s: exit", __func__);
     return size;
 }
 
 static int32_t UsbSerialGetBaudrate(struct UsbSerial *port, struct HdfSBuf *reply)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     uint32_t baudRate = LE32_TO_CPU(port->lineCoding.dwDTERate);
     if (!HdfSbufWriteBuffer(reply, &baudRate, sizeof(baudRate))) {
         HDF_LOGE("%{public}s: sbuf write buffer failed", __func__);
         return HDF_ERR_IO;
     }
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t UsbSerialSetBaudrate(struct UsbSerial *port, struct HdfSBuf *data)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     uint32_t size;
     uint32_t *baudRate = NULL;
 
@@ -767,11 +787,13 @@ static int32_t UsbSerialSetBaudrate(struct UsbSerial *port, struct HdfSBuf *data
     if (port->acm) {
         port->acm->lineCoding.dwDTERate = CPU_TO_LE32(*baudRate);
     }
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t UsbSerialGetProp(struct UsbAcmDevice *acmDevice, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     struct UsbFnInterface *intf = acmDevice->ctrlIface.fn;
     const char *propName = NULL;
     char propValue[USB_MAX_PACKET_SIZE] = {0};
@@ -779,30 +801,36 @@ static int32_t UsbSerialGetProp(struct UsbAcmDevice *acmDevice, struct HdfSBuf *
 
     propName = HdfSbufReadString(data);
     if (propName == NULL) {
+        HDF_LOGE("%{public}s: sbuf read buffer failed.", __func__);
         return HDF_ERR_IO;
     }
     ret = UsbFnGetInterfaceProp(intf, propName, propValue);
     if (ret) {
+        HDF_LOGE("%{public}s: get interface face prop failed.", __func__);
         return HDF_ERR_IO;
     }
     if (!HdfSbufWriteString(reply, propValue)) {
         HDF_LOGE("%{public}s:failed to write result", __func__);
         return HDF_ERR_IO;
     }
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t UsbSerialSetProp(struct UsbAcmDevice *acmDevice, struct HdfSBuf *data)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     struct UsbFnInterface *intf = acmDevice->ctrlIface.fn;
     char tmp[USB_MAX_PACKET_SIZE] = {0};
 
     const char *propName = HdfSbufReadString(data);
     if (propName == NULL) {
+        HDF_LOGE("%{public}s: sbuf read buffer failed.", __func__);
         return HDF_ERR_IO;
     }
     const char *propValue = HdfSbufReadString(data);
     if (propValue == NULL) {
+        HDF_LOGE("%{public}s: sbuf read buffer failed.", __func__);
         return HDF_ERR_IO;
     }
     (void)memset_s(&tmp, sizeof(tmp), 0, sizeof(tmp));
@@ -816,6 +844,7 @@ static int32_t UsbSerialSetProp(struct UsbAcmDevice *acmDevice, struct HdfSBuf *
         HDF_LOGE("%{public}s: UsbFnInterfaceSetProp failed", __func__);
         return HDF_ERR_IO;
     }
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
@@ -839,6 +868,7 @@ static int32_t UsbSerialRegistPropASet(const struct UsbFnInterface *intf, const 
 
 static int32_t UsbSerialRegistProp(struct UsbAcmDevice *acmDevice, struct HdfSBuf *data)
 {
+    HDF_LOGI("%{public}s: enter", __func__);
     struct UsbFnInterface *intf = acmDevice->ctrlIface.fn;
     struct UsbFnRegistInfo registInfo;
     int32_t ret;
@@ -860,12 +890,14 @@ static int32_t UsbSerialRegistProp(struct UsbAcmDevice *acmDevice, struct HdfSBu
         HDF_LOGE("%{public}s: UsbFnInterfaceSetProp failed", __func__);
         return HDF_ERR_IO;
     }
+    HDF_LOGI("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t AcmSerialCmd(
     struct UsbAcmDevice *acm, int32_t cmd, struct UsbSerial *port, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    HDF_LOGI("%{public}s: cmd is %{public}d", __func__, cmd);
     switch (cmd) {
         case USB_SERIAL_OPEN:
             return UsbSerialOpen(port);
@@ -904,6 +936,7 @@ static int32_t AcmSerialCmd(
         default:
             return HDF_ERR_NOT_SUPPORT;
     }
+    HDF_LOGI("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
