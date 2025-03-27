@@ -312,9 +312,11 @@ static int32_t UsbEcmAllocFifo(struct DataFifo *fifo, uint32_t size)
 
 static int32_t UsbEcmOpen(struct UsbEcm *port)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     int32_t ret;
 
     if (port == NULL) {
+        HDF_LOGE("%{public}s: port is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -348,12 +350,15 @@ static int32_t UsbEcmOpen(struct UsbEcm *port)
 
 OUT:
     OsalMutexUnlock(&port->lock);
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t UsbEcmClose(struct UsbEcm *port)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     if (port == NULL) {
+        HDF_LOGE("%{public}s: port is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -371,11 +376,13 @@ static int32_t UsbEcmClose(struct UsbEcm *port)
 
 OUT:
     OsalMutexUnlock(&port->lock);
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t UsbEcmRead(struct UsbEcm *port, struct HdfSBuf *reply)
 {
+    HDF_LOGI("%{public}s: enter", __func__);
     uint32_t len;
     int32_t ret = HDF_SUCCESS;
     uint8_t *buf = NULL;
@@ -384,6 +391,7 @@ static int32_t UsbEcmRead(struct UsbEcm *port, struct HdfSBuf *reply)
     if (DataFifoIsEmpty(&port->readFifo)) {
         OsalMutexUnlock(&port->lockReadFifo);
         OsalMutexUnlock(&port->lock);
+        HDF_LOGI("%{public}s: data fifl is empty", __func__);
         return 0;
     }
 
@@ -417,11 +425,13 @@ OUT:
     }
     OsalMemFree(buf);
     OsalMutexUnlock(&port->lock);
+    HDF_LOGD("%{public}s: exit", __func__);
     return ret;
 }
 
 static int32_t UsbEcmWrite(struct UsbEcm *port, struct HdfSBuf *data)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     uint32_t size = 0;
     uint8_t *buf = NULL;
 
@@ -435,11 +445,14 @@ static int32_t UsbEcmWrite(struct UsbEcm *port, struct HdfSBuf *data)
         OsalMutexLock(&port->lockWriteFifo);
         size = DataFifoWrite(&port->writeFifo, buf, size);
         OsalMutexUnlock(&port->lockWriteFifo);
+    } else {
+        HDF_LOGE("%{public}s: buf is null", __func__);
     }
     if (port->ecm) {
         UsbEcmStartTx(port);
     }
     OsalMutexUnlock(&port->lock);
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
@@ -836,6 +849,7 @@ static int32_t EcmReleaseFuncDevice(struct UsbEcmDevice *ecm)
     UsbFnCloseInterface(ecm->ctrlIface.handle);
     (void)UsbFnCloseInterface(ecm->dataIface.handle);
     (void)UsbFnStopRecvInterfaceEvent(ecm->ctrlIface.fn);
+    HDF_LOGD("%{public}s: ecn was released heres", __func__);
     return ret;
 }
 
@@ -901,6 +915,7 @@ static void UsbEcmFree(struct UsbEcmDevice *ecm)
 /* HdfDriverEntry implementations */
 static int32_t EcmDriverBind(struct HdfDeviceObject *device)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     struct UsbEcmDevice *ecm = NULL;
 
     if (device == NULL) {
@@ -932,6 +947,7 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
     if (ecm->device->service) {
         ecm->device->service->Dispatch = EcmDeviceDispatch;
     }
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
@@ -997,6 +1013,7 @@ ERR:
 
 static int32_t EcmRelease(struct HdfDeviceObject *device)
 {
+    HDF_LOGD("%{public}s: enter", __func__);
     struct UsbEcmDevice *ecm = NULL;
 
     if (device == NULL) {
@@ -1016,6 +1033,7 @@ static int32_t EcmRelease(struct HdfDeviceObject *device)
     UsbEcmFree(ecm);
     (void)EcmReleaseFuncDevice(ecm);
     ecm->initFlag = false;
+    HDF_LOGD("%{public}s: exit", __func__);
     return HDF_SUCCESS;
 }
 
