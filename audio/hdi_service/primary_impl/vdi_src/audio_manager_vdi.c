@@ -20,13 +20,14 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
-#include "audio_dfx_vdi.h"
+#include "audio_dfx.h"
 #include "v4_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 static int32_t THREAD_POOL_COUNT = 32;
 static pthread_mutex_t g_managerMutex;
 
+void SetMaxWorkThreadNum(int32_t);
 typedef struct IAudioManagerVdi* (*AudioManagerCreateIfInstanceVdi)(void);
 
 struct AudioManagerPrivVdi {
@@ -559,4 +560,9 @@ int32_t AudioManagerDestroyIfInstance(struct IAudioManager *manager)
     int32_t ret = ReleaseAudioManagerVendorObject(manager);
     pthread_mutex_destroy(&g_managerMutex);
     return ret;
+}
+
+void SetMaxWorkThreadNum(int32_t count)
+{
+    OHOS::IPCSkeleton::GetInstance().SetMaxWorkThreadNum(count);
 }

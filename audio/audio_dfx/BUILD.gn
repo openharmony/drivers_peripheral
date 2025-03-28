@@ -1,0 +1,48 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("../audio.gni")
+
+config("drivers_peripheral_audio_dfx_header") {
+  include_dirs = [ "include" ]
+}
+
+ohos_static_library("libaudio_dfx_static") {
+  external_deps = []
+  defines = []
+
+  if (enable_c_utils) {
+    external_deps += [ "c_utils:utils" ]
+  }
+
+  if (!drivers_peripheral_audio_feature_community) {
+    if (drivers_peripheral_audio_feature_hitrace_enable) {
+      external_deps += [ "hitrace:hitrace_meter" ]
+      defines += [ "AUDIO_HITRACE_ENABLE" ]
+    }
+
+    if (drivers_peripheral_audio_feature_hicollie_enable) {
+      external_deps += [ "hicollie:libhicollie" ]
+      defines += [ "AUDIO_HICOLLIE_ENABLE" ]
+    }
+  }
+
+  public_configs = [ ":drivers_peripheral_audio_dfx_header" ]
+  include_dirs = [ "include" ]
+
+  sources = [ "src/audio_dfx.cpp" ]
+
+  part_name = "drivers_peripheral_audio"
+  subsystem_name = "hdf"
+}
