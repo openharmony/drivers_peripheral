@@ -305,7 +305,6 @@ static int EnableAp(int id)
         HDF_LOGE("add config sprintf_s fail");
         return -1;
     }
-    HDF_LOGD("cmdAdd is %{public}s", cmdAdd);
     if (WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmdAdd, buf, sizeof(buf)) < 0) {
         HDF_LOGE("add ap failed");
         return -1;
