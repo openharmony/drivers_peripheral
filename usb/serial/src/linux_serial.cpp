@@ -222,9 +222,10 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
         HDF_LOGE("%{public}s: Unable to open serial port.", __func__);
         return HDF_FAILURE;
     }
+    fdsan_exchange_owner_tag(serialPortList_[index].fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     if (tcgetattr(serialPortList_[index].fd, &options_) = -1) {
-        close(serialPortList_[index].fd);
+        fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
         serialPortList_.erase(index);
         return HDF_FAILURE;
@@ -232,7 +233,7 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
     options_.c_lflag &= ~ICANON;
     options_.c_lflag &= ~ECHO;
     if (tcsetattr(serialPortList_[index].fd, TCSANOW, &options_) = -1) {
-        close(serialPortList_[index].fd);
+        fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         HDF_LOGE("%{public}s: set attribute failed %{public}d.", __func__, errno);
         serialPortList_.erase(index);
         return HDF_FAILURE;
@@ -259,7 +260,7 @@ int32_t LinuxSerial::SerialClose(int32_t portId)
         HDF_LOGE("%{public}s: fd not exist.", __func__);
         return HDF_FAILURE;
     }
-    close(serialPortList_[index].fd);
+    fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     serialPortList_[index].fd = -1;
     return HDF_SUCCESS;
 }

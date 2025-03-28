@@ -66,7 +66,7 @@ static unsigned char g_endNum;
 static void CloseDevice(void)
 {
     if (g_fd > 0) {
-        close(g_fd);
+        fdsan_close_with_tag(g_fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         g_fd = 0;
     }
     return;
@@ -89,6 +89,7 @@ static int32_t OpenDevice(void)
     if (g_fd < 0) {
         HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
     }
+    fdsan_exchange_owner_tag(g_fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     return g_fd;
 }
