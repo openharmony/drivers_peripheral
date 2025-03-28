@@ -21,40 +21,53 @@
 #include "v1_0/ieffect_control_vdi.h"
 #include "audio_uhdf_log.h"
 #include "osal_mem.h"
+#include "osal_time.h"
 #include "effect_core.h"
+#include "audio_dfx.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 
 int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct AudioEffectBuffer *input,
     struct AudioEffectBuffer *output)
 {
-    if (self == NULL || input == NULL || output == NULL) {
-        HDF_LOGE("%{public}s: invailid input params", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
+    CHECK_TRUE_RETURN_RET_LOG(self == NULL || input == NULL || output == NULL, HDF_ERR_INVALID_PARAM,
+        "%{public}s: invailid input params", __func__);
 
     struct ControllerManager *manager = (struct ControllerManager *)self;
-    if (manager->ctrlOps == NULL || manager->ctrlOps->EffectProcess == NULL) {
-        HDF_LOGE("%{public}s: controller has no options", __func__);
-        return HDF_FAILURE;
-    }
+    CHECK_TRUE_RETURN_RET_LOG(manager->ctrlOps == NULL || manager->ctrlOps->EffectProcess == NULL,
+        HDF_FAILURE, "%{public}s: controller has no options", __func__);
     if (strcmp(manager->libName, "libmock_effect_lib") != 0) {
         output->frameCount = input->frameCount;
         output->datatag = input->datatag;
         output->rawDataLen = input->rawDataLen;
         output->rawData = (int8_t *)OsalMemCalloc(sizeof(int8_t) * output->rawDataLen);
-        if (output->rawData == NULL) {
-            HDF_LOGE("%{public}s: OsalMemCalloc fail", __func__);
-            return HDF_FAILURE;
-        }
+        CHECK_TRUE_RETURN_RET_LOG(output->rawData == NULL, HDF_FAILURE,
+            "%{public}s: OsalMemCalloc fail", __func__);
     }
     struct AudioEffectBufferVdi *inputVdi = (struct AudioEffectBufferVdi *)input;
     struct AudioEffectBufferVdi *outputVdi = (struct AudioEffectBufferVdi *)output;
+
+    OsalTimespec start;
+    OsalTimespec end;
+    OsalTimespec diff;
+    int res = OsalGetTime(&start);
+    CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalGetTime start failed.");
+
+    HdfAudioStartTrace("Hdi:Audio:EffectProcess", 0);
     int32_t ret = manager->ctrlOps->EffectProcess(manager->ctrlOps, inputVdi, outputVdi);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("AudioEffectProcess failed, ret=%{public}d", ret);
-        return ret;
-    }
+    HdfAudioFinishTrace();
+
+    res = OsalGetTime(&end);
+    CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalGetTime end failed.");
+
+    res = OsalDiffTime(&start, &end, &diff);
+    CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalDiffTime failed.");
+
+    HDF_LOGI("EffectProcess cost time %{public}llu us",
+        (HDF_KILO_UNIT * HDF_KILO_UNIT) * diff.sec + diff.usec);
+
+    CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, ret,
+        "AudioEffectProcess failed, ret=%{public}d", ret);
 
     output = (struct AudioEffectBuffer *)outputVdi;
     return ret;
@@ -85,26 +98,38 @@ int32_t EffectControlSendCommand(struct IEffectControl *self, enum EffectCommand
 
 int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControllerDescriptor *desc)
 {
-    if (self == NULL || desc == NULL) {
-        HDF_LOGE("%{public}s: invailid input params", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
+    CHECK_TRUE_RETURN_RET_LOG(self == NULL || desc == NULL, HDF_ERR_INVALID_PARAM,
+        "%{public}s: invailid input params", __func__);
 
     struct ControllerManager *manager = (struct ControllerManager *)self;
-    if (manager->ctrlOps == NULL || manager->ctrlOps->GetEffectDescriptor == NULL) {
-        HDF_LOGE("%{public}s: controller has no options", __func__);
-        return HDF_FAILURE;
-    }
+    CHECK_TRUE_RETURN_RET_LOG(manager->ctrlOps == NULL || manager->ctrlOps->GetEffectDescriptor == NULL,
+        HDF_FAILURE, "%{public}s: controller has no options", __func__);
+
     struct EffectControllerDescriptorVdi *descVdi = (struct EffectControllerDescriptorVdi *)desc;
-    if (ConstructDescriptor(descVdi) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: ConstructDescriptor fail!", __func__);
-        return HDF_FAILURE;
-    }
+    CHECK_TRUE_RETURN_RET_LOG(ConstructDescriptor(descVdi) != HDF_SUCCESS, HDF_FAILURE,
+        "%{public}s: ConstructDescriptor fail!", __func__);
+
+    OsalTimespec start;
+    OsalTimespec end;
+    OsalTimespec diff;
+    int res = OsalGetTime(&start);
+    CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalGetTime start failed.");
+
+    HdfAudioStartTrace("Hdi:Audio:GetEffectDescriptor", 0);
     int32_t ret = manager->ctrlOps->GetEffectDescriptor(manager->ctrlOps, descVdi);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("EffectGetOwnDescriptor failed, ret=%{public}d", ret);
-        return ret;
-    }
+    HdfAudioFinishTrace();
+
+    res = OsalGetTime(&end);
+    CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalGetTime end failed.");
+
+    res = OsalDiffTime(&start, &end, &diff);
+    CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalDiffTime failed.");
+
+    HDF_LOGI("GetEffectDescriptor cost time %{public}llu us",
+        (HDF_KILO_UNIT * HDF_KILO_UNIT) * diff.sec + diff.usec);
+
+    CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, ret,
+        "EffectGetOwnDescriptor failed, ret=%{public}d", ret);
 
     desc = (struct EffectControllerDescriptor *)descVdi;
     return ret;

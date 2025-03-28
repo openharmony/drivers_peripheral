@@ -24,6 +24,8 @@ group("hdi_audio") {
     }
     deps += [ "hdi_service:idl_audio" ]
   }
+
+  deps += [ "audio_dfx:libaudio_dfx_static" ]
 }
 
 config("drivers_peripheral_audio_header") {
