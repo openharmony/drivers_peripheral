@@ -60,6 +60,7 @@ static const std::string DEV_NUM_STR = "/devnum";
 static const std::string DEV_FILENAME_PREFIX = "ttyUSB";
 static const std::string DEV_PATH_PREFIX = "/sys/bus/usb-serial/devices";
 static const std::string TTYUSB_PATH = "/sys/class/tty";
+static const std::string THREAD_NAME = "serialHotPlug";
 
 namespace fs = std::filesystem;
 
@@ -587,6 +588,7 @@ void LibusbSerial::HandleDeviceRemoval(libusb_device* device)
 void LibusbSerial::EventHandlingThread()
 {
     HDF_LOGI("%{public}s: enter Event handling thread.", __func__);
+    pthread_setname_np(pthread_self(), THREAD_NAME.c_str());
     while (running_) {
         int ret = libusb_handle_events_completed(ctx_, nullptr);
         if (ret != LIBUSB_SUCCESS) {
