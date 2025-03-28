@@ -23,7 +23,7 @@
 #include "audio_capture_vdi.h"
 #include "audio_common_vdi.h"
 #include "audio_render_vdi.h"
-#include "audio_dfx_vdi.h"
+#include "audio_dfx.h"
 #include "v4_0/iaudio_callback.h"
 #include "stub_collector.h"
 
@@ -116,7 +116,11 @@ static int32_t AudioInitAllPortsVdi(struct IAudioAdapter *adapter)
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
+
+    HdfAudioStartTrace("Hdi:Audio:InitAllPorts", 0);
     ret = vdiAdapter->InitAllPorts(vdiAdapter);
+    HdfAudioFinishTrace();
+
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter InitAllPorts fail, ret=%{public}d", ret);
         ret = HDF_FAILURE;

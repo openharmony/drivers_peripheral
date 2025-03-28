@@ -29,6 +29,7 @@ if (!defined(ohos_lite)) {
       "$hdf_audio_path/interfaces/effect",
       "../config/include/",
       "$hdf_audio_path/hdi_service/vendor_interface/utils",
+      "$hdf_audio_path/hdi_service/primary_impl/vdi_src",
     ]
 
     defines = []
@@ -51,6 +52,8 @@ if (!defined(ohos_lite)) {
       "bounds_checking_function:libsec_shared",
       "cJSON:cjson",
     ]
+
+    deps = [ "$hdf_audio_path/audio_dfx:libaudio_dfx_static" ]
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"

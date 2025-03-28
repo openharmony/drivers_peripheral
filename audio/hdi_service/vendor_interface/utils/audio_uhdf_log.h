@@ -92,4 +92,16 @@
         }                                                     \
     } while (0)
 #endif
+
+#ifdef CHECK_TRUE_RETURN_RET_LOG
+#undef CHECK_TRUE_RETURN_RET_LOG
+#endif
+#define CHECK_TRUE_RETURN_RET_LOG(cond, ret, fmt, ...)   \
+    do {                                                \
+        if ((cond)) {                                   \
+            HDF_LOGE(fmt, ##__VA_ARGS__);               \
+            return ret;                                 \
+        }                                               \
+    } while (0)
+
 #endif
