@@ -22,9 +22,7 @@ ohos_fuzztest("UsbQueryPortsFuzzTest") {
 
   fuzz_config_file = "./../../usbqueryports_fuzzer"
 
-  include_dirs = [
-    "./../../../hdi_service/include"
-  ]
+  include_dirs = [ "./../../../hdi_service/include" ]
 
   deps = [ "./../../../hdi_service:libusb_port_interface_service_2.0" ]
 
@@ -37,9 +35,7 @@ ohos_fuzztest("UsbQueryPortsFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [
-    "usbqueryports_fuzzer.cpp",
-  ]
+  sources = [ "usbqueryports_fuzzer.cpp" ]
 }
 
 group("fuzztest") {
