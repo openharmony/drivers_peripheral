@@ -78,6 +78,8 @@ class UsbdFunction {
 public:
     UsbdFunction() = default;
     ~UsbdFunction() = default;
+    void UsbdInitLock();
+    void UsbdDestroyLock();
     static int32_t UsbdInnerSetFunction(uint32_t funcs);
     static int32_t UsbdSetFunction(uint32_t funcs);
     static int32_t UsbdGetFunction();
