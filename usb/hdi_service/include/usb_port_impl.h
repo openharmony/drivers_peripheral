@@ -26,6 +26,7 @@
 #include "usbd_function.h"
 #include "usbd_load_usb_service.h"
 #include "usbd_port.h"
+#include "usbd_ports.h"
 #include "v2_0/iusb_port_interface.h"
 
 #define BASE_CLASS_HUB 0x09

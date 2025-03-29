@@ -56,6 +56,7 @@ ohos_shared_library("libusb_interface_service_1.2") {
     "src/usbd_function.cpp",
     "src/usbd_load_usb_service.cpp",
     "src/usbd_port.cpp",
+    "src/usbd_ports.cpp",
   ]
 
   configs = [ ":usbd_private_config" ]
@@ -188,6 +189,7 @@ ohos_shared_library("libusb_port_interface_service_2.0") {
     "src/usbd_function.cpp",
     "src/usbd_load_usb_service.cpp",
     "src/usbd_port.cpp",
+    "src/usbd_ports.cpp",
   ]
 
   configs = [ ":usbd_private_config" ]
@@ -313,6 +315,7 @@ ohos_shared_library("libusb_host_interface_service_2.0") {
     "src/usbd_function.cpp",
     "src/usbd_load_usb_service.cpp",
     "src/usbd_port.cpp",
+    "src/usbd_ports.cpp",
   ]
 
   configs = [ ":usbd_private_config" ]

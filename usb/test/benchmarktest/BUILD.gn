@@ -24,11 +24,15 @@ ohos_benchmarktest("hdf_usb_benchmark_function_test") {
 
   sources = [ "usb_benchmark_function_test.cpp" ]
 
-  deps = [ "${usb_driver_path}/hdi_service:libusb_interface_service_1.2" ]
+  deps = [
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
+    "${usb_driver_path}/hdi_service:libusb_port_interface_service_2.0",
+  ]
 
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.0",
+      "drivers_interface_usb:libusb_proxy_2.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
