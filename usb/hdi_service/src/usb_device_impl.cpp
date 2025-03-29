@@ -69,7 +69,8 @@ extern "C" IUsbDeviceInterface *UsbDeviceInterfaceImplGetInstance(void)
 
 UsbDeviceImpl::UsbDeviceImpl()
 {
-    OsalMutexInit(&lockSetFunc_);
+    V1_2::UsbdFunction::UsbdInitLock();
+    // OsalMutexInit(&lockSetFunc_);
     if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
         loadUsbService_.LoadService();
     }
@@ -77,7 +78,8 @@ UsbDeviceImpl::UsbDeviceImpl()
 
 UsbDeviceImpl::~UsbDeviceImpl()
 {
-    OsalMutexDestroy(&lockSetFunc_);
+    V1_2::UsbdFunction::UsbdDestroyLock();
+    // OsalMutexDestroy(&lockSetFunc_);
 }
 
 int32_t UsbDeviceImpl::GetCurrentFunctions(int32_t &funcs)

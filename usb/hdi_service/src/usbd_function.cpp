@@ -584,6 +584,16 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
     }
 }
 
+void UsbdInitLock()
+{
+    OsalMutexInit(setFunctionLock_);
+}
+
+void UsbdDestroyLock()
+{
+    OsalMutexDestroy(setFunctionLock_);
+}
+
 int32_t UsbdInnerSetFunction(uint32_t funcs)
 {
     HDF_LOGI("%{public}s: UsbdSetFunction funcs=%{public}d", __func__, funcs);
