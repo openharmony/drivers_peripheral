@@ -90,14 +90,11 @@ int32_t UsbDeviceImpl::GetCurrentFunctions(int32_t &funcs)
 int32_t UsbDeviceImpl::SetCurrentFunctions(int32_t funcs)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    OsalMutexLock(&lockSetFunc_);
     int32_t ret = V1_2::UsbdFunction::UsbdSetFunction(funcs);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:UsbdSetFunction failed, ret:%{public}d", __func__, ret);
-        OsalMutexUnlock(&lockSetFunc_);
         return ret;
     }
-    OsalMutexUnlock(&lockSetFunc_);
     return HDF_SUCCESS;
 }
 
