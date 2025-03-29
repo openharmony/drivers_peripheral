@@ -37,6 +37,8 @@
 
 #define HDF_LOG_TAG UsbPortImpl
 using namespace OHOS::HiviewDFX;
+bool PRODUCT_FLAG = false;
+constexpr int32_t SUPPORTEDMODES = 1;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -61,7 +63,13 @@ UsbPortImpl::~UsbPortImpl() {}
 int32_t UsbPortImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    int32_t ret = V1_2::UsbdPort::GetInstance().SetUsbPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
+    int32_t ret = 0;
+    if (PRODUCT_FLAG) {
+        ret = V1_2::UsbdPorts::GetInstance().SetPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
+    } else {
+        ret = V1_2::UsbdPort::GetInstance().SetUsbPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
+    }
+
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:SetUsbPort failed, ret:%{public}d", __func__, ret);
         return ret;
@@ -73,7 +81,12 @@ int32_t UsbPortImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t data
 int32_t UsbPortImpl::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    int32_t ret = V1_2::UsbdPort::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
+    int32_t ret = 0;
+    if (PRODUCT_FLAG) {
+        ret = V1_2::UsbdPorts::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
+    } else {
+        ret = V1_2::UsbdPort::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
+    }
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:QueryPort failed, ret:%{public}d", __func__, ret);
         return ret;
@@ -84,7 +97,34 @@ int32_t UsbPortImpl::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dat
 
 int32_t UsbPortImpl::QueryPorts(std::vector<UsbPort>& portList)
 {
-    HDF_LOGE("UsbPortImpl::QueryPorts Function not supported ");
+    HDF_LOGI("%{public}s: enter", __func__);
+    int32_t ret = 0;
+    if (PRODUCT_FLAG) {
+        ret = V1_2::UsbdPorts::GetInstance().QueryPorts(portList);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:QueryPorts failed, ret:%{public}d", __func__, ret);
+            return ret;
+        }
+        return HDF_SUCCESS;
+    }
+    
+    int32_t portId = 0;
+    int32_t powerRole = 0;
+    int32_t dataRole = 0;
+    int32_t mode = 0;
+    ret = V1_2::UsbdPort::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:QueryPorts failed, ret:%{public}d", __func__, ret);
+        return ret;
+    }
+ 
+    UsbPort port;
+    port.id = portId;
+    port.supportedModes = SUPPORTEDMODES;
+    port.usbPortStatus.currentMode = mode;
+    port.usbPortStatus.currentPowerRole = powerRole;
+    port.usbPortStatus.currentDataRole = dataRole;
+    portList.push_back(port);
     return HDF_SUCCESS;
 }
 
@@ -117,10 +157,18 @@ int32_t UsbPortImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_DRIVER_PORT_HOST) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_HOST");
-        ret = V1_2::UsbdPort::GetInstance().UpdateUsbPort(PORT_MODE_HOST, subscriber);
+        if (PRODUCT_FLAG) {
+            return V1_2::UsbdPorts::GetInstance().UpdatePort(PORT_MODE_HOST, subscriber);
+        } else {
+            return V1_2::UsbdPort::GetInstance().UpdateUsbPort(PORT_MODE_HOST, subscriber);
+        }
     } else if (id == USB_PNP_DRIVER_PORT_DEVICE) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_DEVICE");
-        ret = V1_2::UsbdPort::GetInstance().UpdateUsbPort(PORT_MODE_DEVICE, subscriber);
+        if (PRODUCT_FLAG) {
+            return V1_2::UsbdPorts::GetInstance().UpdatePort(PORT_MODE_DEVICE, subscriber);
+        } else {
+            return V1_2::UsbdPort::GetInstance().UpdateUsbPort(PORT_MODE_DEVICE, subscriber);
+        }
     } else {
         HDF_LOGW("%{public}s: port not support this id %{public}u", __func__, id);
         return HDF_ERR_NOT_SUPPORT;
@@ -234,6 +282,14 @@ void UsbPortImpl::ParsePortPath()
         return;
     }
     HDF_LOGI("%{public}s: parsePortPath path_=%{public}s", __func__, path_);
+
+    if (strcmp(path_, "/sys/class/dual_role_pd/") == 0) {
+        PRODUCT_FLAG = true;
+        V1_2::UsbdPorts::GetInstance().setPortPath(path_);
+        return;
+    }
+ 
+    PRODUCT_FLAG = false;
     V1_2::UsbdPort::GetInstance().setPortPath(path_);
     return;
 }

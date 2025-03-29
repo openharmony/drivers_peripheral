@@ -40,9 +40,11 @@
 #include "usbd_function.h"
 #include "usbd_accessory.h"
 #include "usbd_port.h"
+#include "usbd_ports.h"
 #include "usbd_wrapper.h"
 using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
+bool PRODUCT_FLAG = false;
 #ifndef LIBUSB_ENABLE
 constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
 #endif
@@ -988,6 +990,14 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *
     return ret;
 }
 
+int32_t UpdatePort(uint32_t mode, const sptr<IUsbdSubscriber> subscriber)
+{
+    if (PRODUCT_FLAG) {
+        return UsbdPorts::GetInstance().UpdatePort(mode, subscriber);
+    }
+    return UsbdPort::GetInstance().UpdatePort(mode, subscriber);
+}
+
 int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data)
 {
     UsbdSubscriber *usbdSubscriber = static_cast<UsbdSubscriber *>(priv);
@@ -1014,10 +1024,10 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
         return subscriber->DeviceEvent(info);
     } else if (id == USB_PNP_DRIVER_PORT_HOST) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_HOST");
-        return UsbdPort::GetInstance().UpdatePort(PORT_MODE_HOST, subscriber);
+        return UpdatePort(PORT_MODE_HOST, subscriber);
     } else if (id == USB_PNP_DRIVER_PORT_DEVICE) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_DEVICE");
-        return UsbdPort::GetInstance().UpdatePort(PORT_MODE_DEVICE, subscriber);
+        return UpdatePort(PORT_MODE_DEVICE, subscriber);
     } else if (id == USB_ACCESSORY_START) {
         if (subscriber == nullptr) {
             HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
@@ -2223,13 +2233,27 @@ void UsbImpl::parsePortPath()
         HDF_LOGE("%{public}s: read port_file_path failed", __func__);
         return;
     }
+
+    if (strcmp(path_, "/sys/class/dual_role_pd/") == 0) {
+        PRODUCT_FLAG = true;
+        UsbdPorts::GetInstance().setPortPath(path_);
+        return;
+    }
+ 
+    PRODUCT_FLAG = false;
     UsbdPort::GetInstance().setPortPath(path_);
     return;
 }
 
 int32_t UsbImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole)
 {
-    int32_t ret = UsbdPort::GetInstance().SetPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
+    int32_t ret = 0;
+    if (PRODUCT_FLAG) {
+        ret = UsbdPorts::GetInstance().SetPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
+    } else {
+        ret = UsbdPort::GetInstance().SetPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
+    }
+
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:FunSetRole failed, ret:%{public}d", __func__, ret);
         return ret;
@@ -2240,7 +2264,13 @@ int32_t UsbImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole
 
 int32_t UsbImpl::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode)
 {
-    int32_t ret = UsbdPort::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
+    int32_t ret = 0;
+    if (PRODUCT_FLAG) {
+        ret = UsbdPorts::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
+    } else {
+        ret = UsbdPort::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
+    }
+    
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:QueryPort failed, ret:%{public}d", __func__, ret);
         return ret;
