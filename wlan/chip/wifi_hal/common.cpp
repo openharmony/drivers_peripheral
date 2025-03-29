@@ -97,8 +97,7 @@ WifiError WifiRegisterHandler(wifiHandle handle, int cmd, nl_recvmsg_msg_cb_t fu
         info->eventCb[info->numEventCb].vendorSubcmd  = 0;
         info->eventCb[info->numEventCb].cbFunc = func;
         info->eventCb[info->numEventCb].cbArg  = arg;
-        HDF_LOGD("Successfully added event handler %{public}p:%{public}p for command %{public}d at %{public}d",
-            arg, func, cmd, info->numEventCb);
+        HDF_LOGD("Successfully added event handler for command %{public}d at %{public}d", cmd, info->numEventCb);
         info->numEventCb++;
         result = HAL_SUCCESS;
     }

@@ -121,8 +121,7 @@ public:
 
             if (*mHandler.onVendorHalRestart) {
                 (*mHandler.onVendorHalRestart)(mBuff);
-                HDF_LOGI("Hang event received. Trigger SSR handler:%p",
-                    mHandler.onVendorHalRestart);
+                HDF_LOGI("Hang event received.");
             } else {
                 HDF_LOGI("No Restart handler registered");
             }
@@ -255,8 +254,7 @@ exit:
         cmd->ReleaseRef();
     }
     if (info->restartHandler.onVendorHalRestart) {
-        HDF_LOGI("Trigger ssr handler registered handler:%p",
-            info->restartHandler.onVendorHalRestart);
+        HDF_LOGI("Trigger ssr handler registered handler");
         (info->restartHandler.onVendorHalRestart)(errorStr);
     } else {
         HDF_LOGI("No trigger ssr handler registered");
