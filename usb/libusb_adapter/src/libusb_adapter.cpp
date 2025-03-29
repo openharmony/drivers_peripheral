@@ -57,7 +57,6 @@ constexpr int32_t DISPLACEMENT_NUMBER = 8;
 constexpr uint32_t LIBUSB_PATH_LENGTH = 64;
 constexpr uint64_t MAX_TOTAL_SIZE = 520447;
 constexpr int32_t API_VERSION_ID_18 = 18;
-constexpr int32_t API_VERSION_ID_20 = 20;
 constexpr int32_t LIBUSB_IO_ERROR = -1;
 constexpr int32_t LIBUSB_IO_ERROR_INVALID = 0;
 constexpr uint32_t ACT_DEVUP = 0;
