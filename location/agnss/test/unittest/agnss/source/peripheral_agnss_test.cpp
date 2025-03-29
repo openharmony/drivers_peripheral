@@ -47,6 +47,7 @@ void PeripheralAGnssTest::TearDown()
 
 HWTEST_F(PeripheralAGnssTest, SetAgnssCallbackTest001, TestSize.Level1)
 {
+#ifdef HDF_DRIVERS_INTERFACE_AGNSS_ENABLE
     GTEST_LOG_(INFO)
         << "PeripheralAGnssTest, SetAgnssCallbackTest001, TestSize.Level1";
     EXPECT_NE(nullptr, agnssInstance_);
@@ -59,6 +60,7 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssCallbackTest001, TestSize.Level1)
         auto callbackObj2 = new (std::nothrow) AgnssEventCallbackMock(saObject);
         ret = agnssInstance_->SetAgnssCallback(callbackObj2);
     }
+#endif
 }
 
 HWTEST_F(PeripheralAGnssTest, RequestSetupAgnssDataConnectionTest001, TestSize.Level1)
