@@ -110,6 +110,7 @@ private:
     static int32_t ReleaseMtp();
 
     static uint32_t currentFuncs_;
+    OsalMutex setFunctionLock_;
 };
 } // namespace V1_2
 } // namespace Usb
