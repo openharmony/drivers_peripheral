@@ -68,10 +68,10 @@ void DisplayBufferDfx::StartTimeStamp()
 void DisplayBufferDfx::StopTimeStamp()
 {
     gettimeofday(&stopTimeStamp, nullptr);
-    int32_t runTime = (int32_t)((stopTimeStamp.tv_sec - startTimeStamp.tv_sec) * TIME_1000 +
-        (stopTimeStamp.tv_usec - startTimeStamp.tv_usec) / TIME_1000);
+    int64_t runTime = (stopTimeStamp.tv_sec - startTimeStamp.tv_sec) * TIME_1000 +
+        (stopTimeStamp.tv_usec - startTimeStamp.tv_usec) / TIME_1000;
     if (runTime > TIME_10) {
-        HDF_LOGW("run %{public}s over time, [%{public}d]ms", dfxName_.c_str(), runTime);
+        HDF_LOGW("run %{public}s over time, [%{public}ld]ms", dfxName_.c_str(), runTime);
     }
     flag_ = false;
 }
