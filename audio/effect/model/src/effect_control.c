@@ -24,6 +24,7 @@
 #include "osal_time.h"
 #include "effect_core.h"
 #include "audio_dfx.h"
+#include <inttypes.h>
 
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 
@@ -63,7 +64,7 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
     res = OsalDiffTime(&start, &end, &diff);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalDiffTime failed.");
 
-    HDF_LOGI("EffectProcess cost time %{public}llu us",
+    HDF_LOGI("EffectProcess cost time %{public}" PRIu64 " us",
         (HDF_KILO_UNIT * HDF_KILO_UNIT) * diff.sec + diff.usec);
 
     CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, ret,
@@ -125,7 +126,7 @@ int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControl
     res = OsalDiffTime(&start, &end, &diff);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalDiffTime failed.");
 
-    HDF_LOGI("GetEffectDescriptor cost time %{public}llu us",
+    HDF_LOGI("GetEffectDescriptor cost time %{public}" PRIu64 " us",
         (HDF_KILO_UNIT * HDF_KILO_UNIT) * diff.sec + diff.usec);
 
     CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, ret,
