@@ -110,6 +110,15 @@ ohos_shared_library("libusbhost_acm_rawapi") {
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
+    if (usb_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_HISYSEVENT" ]
+      } else {
+        defines = [ "USB_ENABLE_HISYSEVENT" ]
+      }
+    }
     if (usb_c_utils_enable) {
       external_deps += [ "c_utils:utils" ]
     }
