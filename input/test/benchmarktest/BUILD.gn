@@ -17,7 +17,7 @@ import("//build/test.gni")
 INPUT_ROOT_DIR = "./../.."
 
 ohos_benchmarktest("hdf_input_benchmark_test") {
-  module_out_path = "drivers_peripheral_input/input"
+  module_out_path = "drivers_peripheral_input/drivers_peripheral_input"
   include_dirs = [
     "$INPUT_ROOT_DIR/hdi_service",
     "$INPUT_ROOT_DIR/interfaces/include",
