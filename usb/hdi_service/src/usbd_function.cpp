@@ -56,6 +56,7 @@ static std::string MTP_PTP_SERVICE_NAME {"usbfn_mtp_interface_service"};
 
 static void *g_libHandle = nullptr;
 static GetMtpImplFunc g_getMtpImpl = nullptr;
+OsalMutex UsbdFunction::setFunctionLock_;
 
 static void InitGetMtpImpl()
 {
@@ -584,7 +585,17 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
     }
 }
 
-int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
+void UsbdFunction::UsbdInitLock()
+{
+    OsalMutexInit(&setFunctionLock_);
+}
+
+void UsbdFunction::UsbdDestroyLock()
+{
+    OsalMutexDestroy(&setFunctionLock_);
+}
+
+int32_t UsbdFunction::UsbdInnerSetFunction(uint32_t funcs)
 {
     HDF_LOGI("%{public}s: UsbdSetFunction funcs=%{public}d", __func__, funcs);
     if ((funcs | USB_FUNCTION_SUPPORT) != USB_FUNCTION_SUPPORT) {
@@ -634,6 +645,14 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
     }
     currentFuncs_ = funcs;
     return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
+{
+    OsalMutexLock(&setFunctionLock_);
+    int32_t ret = UsbdInnerSetFunction(funcs);
+    OsalMutexUnlock(&setFunctionLock_);
+    return ret;
 }
 
 int32_t UsbdFunction::UsbdGetFunction(void)

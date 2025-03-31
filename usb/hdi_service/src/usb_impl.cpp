@@ -97,6 +97,7 @@ UsbImpl::UsbImpl() : session_(nullptr), device_(nullptr)
 {
     HdfSListInit(&devList_);
     OsalMutexInit(&lock_);
+    V1_2::UsbdFunction::UsbdInitLock();
     if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
         loadUsbService_.LoadService();
     }
@@ -104,6 +105,7 @@ UsbImpl::UsbImpl() : session_(nullptr), device_(nullptr)
 
 UsbImpl::~UsbImpl()
 {
+    V1_2::UsbdFunction::UsbdDestroyLock();
     UsbdReleaseDevices();
 }
 
@@ -2194,14 +2196,11 @@ int32_t UsbImpl::GetCurrentFunctions(int32_t &funcs)
 
 int32_t UsbImpl::SetCurrentFunctions(int32_t funcs)
 {
-    OsalMutexLock(&lock_);
     int32_t ret = UsbdFunction::UsbdSetFunction(funcs);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:UsbdSetFunction failed, ret:%{public}d", __func__, ret);
-        OsalMutexUnlock(&lock_);
         return ret;
     }
-    OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
 }
 
