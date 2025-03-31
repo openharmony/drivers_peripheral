@@ -19,6 +19,8 @@
 #include <stdint.h>
 #include <string>
 
+#include "osal_mutex.h"
+
 #define USB_FUNCTION_NONE    0
 #define USB_FUNCTION_ACM     (1 << 0)
 #define USB_FUNCTION_ECM     (1 << 1)
