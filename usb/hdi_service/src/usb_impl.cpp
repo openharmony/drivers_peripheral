@@ -96,6 +96,7 @@ extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 UsbImpl::UsbImpl() : session_(nullptr), device_(nullptr)
 {
     HdfSListInit(&devList_);
+    OsalMutexInit(&lock_);
     V1_2::UsbdFunction::UsbdInitLock();
     if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
         loadUsbService_.LoadService();
