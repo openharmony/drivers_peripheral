@@ -533,17 +533,17 @@ HWTEST_F(UsbdFunctionTest, QueryPort001, TestSize.Level1)
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
- HWTEST_F(UsbdFunctionTest, QueryPorts001, TestSize.Level1)
- {
-     sptr<HDI::Usb::V2_0::IUsbPortInterface> usbPortInterface_ = nullptr;
-     usbPortInterface_ = HDI::Usb::V2_0::IUsbPortInterface::Get();
-     if (usbPortInterface_ == nullptr) {
-         HDF_LOGE("%{public}s:usbPortInterface_::Get() failed.", __func__);
-         exit(0);
-     }
-     std::vector<HDI::Usb::V2_0::UsbPort> portList;
-     auto ret = usbPortInterface_->QueryPorts(portList);
-     HDF_LOGI("UsbdFunctionTest::QueryPorts001 %{public}d ret=%{public}d", __LINE__, ret);
-     EXPECT_EQ(0, ret);
+HWTEST_F(UsbdFunctionTest, QueryPorts001, TestSize.Level1)
+{
+    sptr<HDI::Usb::V2_0::IUsbPortInterface> usbPortInterface_ = nullptr;
+    usbPortInterface_ = HDI::Usb::V2_0::IUsbPortInterface::Get();
+    if (usbPortInterface_ == nullptr) {
+        HDF_LOGE("%{public}s:usbPortInterface_::Get() failed.", __func__);
+        exit(0);
+    }
+    std::vector<HDI::Usb::V2_0::UsbPort> portList;
+    auto ret = usbPortInterface_->QueryPorts(portList);
+    HDF_LOGI("UsbdFunctionTest::QueryPorts001 %{public}d ret=%{public}d", __LINE__, ret);
+    EXPECT_EQ(0, ret);
 }
 } // namespace

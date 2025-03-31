@@ -44,7 +44,7 @@
 #include "usbd_wrapper.h"
 using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
-bool PRODUCT_FLAG = false;
+bool g_productFlag = false;
 #ifndef LIBUSB_ENABLE
 constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
 #endif
@@ -992,7 +992,7 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *
 
 int32_t UpdatePort(uint32_t mode, const sptr<IUsbdSubscriber> subscriber)
 {
-    if (PRODUCT_FLAG) {
+    if (g_productFlag) {
         return UsbdPorts::GetInstance().UpdatePort(mode, subscriber);
     }
     return UsbdPort::GetInstance().UpdatePort(mode, subscriber);
@@ -2235,12 +2235,12 @@ void UsbImpl::parsePortPath()
     }
 
     if (strcmp(path_, "/sys/class/dual_role_pd/") == 0) {
-        PRODUCT_FLAG = true;
+        g_productFlag = true;
         UsbdPorts::GetInstance().setPortPath(path_);
         return;
     }
  
-    PRODUCT_FLAG = false;
+    g_productFlag = false;
     UsbdPort::GetInstance().setPortPath(path_);
     return;
 }
@@ -2248,7 +2248,7 @@ void UsbImpl::parsePortPath()
 int32_t UsbImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole)
 {
     int32_t ret = 0;
-    if (PRODUCT_FLAG) {
+    if (g_productFlag) {
         ret = UsbdPorts::GetInstance().SetPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
     } else {
         ret = UsbdPort::GetInstance().SetPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
@@ -2265,7 +2265,7 @@ int32_t UsbImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole
 int32_t UsbImpl::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode)
 {
     int32_t ret = 0;
-    if (PRODUCT_FLAG) {
+    if (g_productFlag) {
         ret = UsbdPorts::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
     } else {
         ret = UsbdPort::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
