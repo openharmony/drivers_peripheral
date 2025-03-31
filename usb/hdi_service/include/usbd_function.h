@@ -78,9 +78,6 @@ class UsbdFunction {
 public:
     UsbdFunction() = default;
     ~UsbdFunction() = default;
-    static void UsbdInitLock();
-    static void UsbdDestroyLock();
-    static int32_t UsbdInnerSetFunction(uint32_t funcs);
     static int32_t UsbdSetFunction(uint32_t funcs);
     static int32_t UsbdGetFunction();
     static int32_t UsbdUpdateFunction(uint32_t funcs);
@@ -110,6 +107,9 @@ private:
     static int32_t UsbdRegisterDevice(const std::string &serviceName);
     static int32_t InitMtp();
     static int32_t ReleaseMtp();
+    static void UsbdInitLock();
+    static void UsbdDestroyLock();
+    static int32_t UsbdInnerSetFunction(uint32_t funcs);
 
     static uint32_t currentFuncs_;
     static OsalMutex setFunctionLock_;
