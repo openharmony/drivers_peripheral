@@ -149,21 +149,21 @@ BENCHMARK_REGISTER_F(UsbBenchmarkFunctionTest, QueryPort)->
  * @tc.type: FUNC
  */
  
- BENCHMARK_F(UsbBenchmarkFunctionTest, QueryPorts)(benchmark::State &state)
- {
-     sptr<HDI::Usb::V2_0::IUsbPortInterface> usbPortInterface_ = nullptr;
-     usbPortInterface_ = HDI::Usb::V2_0::IUsbPortInterface::Get();
-     ASSERT_TRUE(usbPortInterface_ != nullptr);
-     std::vector<HDI::Usb::V2_0::UsbPort> portList;
-     auto ret = 0;
-     for (auto _ : state) {
-         ret = usbPortInterface_->QueryPorts(portList);
-     }
-     ASSERT_EQ(0, ret);
- }
-  
- BENCHMARK_REGISTER_F(UsbBenchmarkFunctionTest, QueryPorts)->
-     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+BENCHMARK_F(UsbBenchmarkFunctionTest, QueryPorts)(benchmark::State &state)
+{
+    sptr<HDI::Usb::V2_0::IUsbPortInterface> usbPortInterface_ = nullptr;
+    usbPortInterface_ = HDI::Usb::V2_0::IUsbPortInterface::Get();
+    ASSERT_TRUE(usbPortInterface_ != nullptr);
+    std::vector<HDI::Usb::V2_0::UsbPort> portList;
+    auto ret = 0;
+    for (auto _ : state) {
+        ret = usbPortInterface_->QueryPorts(portList);
+    }
+    ASSERT_EQ(0, ret);
+}
+
+BENCHMARK_REGISTER_F(UsbBenchmarkFunctionTest, QueryPorts)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }
 
 BENCHMARK_MAIN();
