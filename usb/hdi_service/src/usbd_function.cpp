@@ -649,7 +649,7 @@ int32_t UsbdInnerSetFunction(uint32_t funcs)
 int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
 {
     OsalMutexLock(&setFunctionLock_);
-    int ret = UsbdInnerSetFunction(funcs);
+    int32_t ret = UsbdInnerSetFunction(funcs);
     OsalMutexUnLock(&setFunctionLock_);
     return ret;
 }
