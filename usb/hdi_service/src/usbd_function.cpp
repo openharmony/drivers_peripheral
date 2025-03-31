@@ -584,17 +584,17 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
     }
 }
 
-void UsbdInitLock()
+void UsbdFunction::UsbdInitLock()
 {
-    OsalMutexInit(setFunctionLock_);
+    OsalMutexInit(&setFunctionLock_);
 }
 
-void UsbdDestroyLock()
+void UsbdFunction::UsbdDestroyLock()
 {
-    OsalMutexDestroy(setFunctionLock_);
+    OsalMutexDestroy(&setFunctionLock_);
 }
 
-int32_t UsbdInnerSetFunction(uint32_t funcs)
+int32_t UsbdFunction::UsbdInnerSetFunction(uint32_t funcs)
 {
     HDF_LOGI("%{public}s: UsbdSetFunction funcs=%{public}d", __func__, funcs);
     if ((funcs | USB_FUNCTION_SUPPORT) != USB_FUNCTION_SUPPORT) {
