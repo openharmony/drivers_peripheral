@@ -15,7 +15,7 @@ import("//build/test.gni")
 import("./../../../audio.gni")
 
 ohos_unittest("audio_ut_common_test") {
-  module_out_path = "drivers_peripheral_audio/audio"
+  module_out_path = "drivers_peripheral_audio/drivers_peripheral_audio"
   sources = [
     "adapter/audio_adapter_common_test.cpp",
     "capture/audio_capture_common_test.cpp",

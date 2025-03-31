@@ -49,7 +49,7 @@ ohos_unittest("hdf_unittest_hdi_vibrator") {
 }
 
 ohos_unittest("hdi_unittest_vibrator") {
-  module_out_path = "drivers_peripheral_vibrator/vibrator"
+  module_out_path = "drivers_peripheral_vibrator/drivers_peripheral_vibrator"
   include_dirs = [
     "../../../interfaces/include",
     "../../../utils/include",
