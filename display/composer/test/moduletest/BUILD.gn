@@ -19,7 +19,7 @@ group("hdf_disp_composer_moduletest") {
   deps = [ ":composer_mt" ]
 }
 
-module_output_path = "drivers_peripheral_display/composer"
+module_output_path = "drivers_peripheral_display/drivers_peripheral_display"
 
 config("module_private_config") {
   visibility = [ ":*" ]
