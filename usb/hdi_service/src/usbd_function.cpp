@@ -56,6 +56,7 @@ static std::string MTP_PTP_SERVICE_NAME {"usbfn_mtp_interface_service"};
 
 static void *g_libHandle = nullptr;
 static GetMtpImplFunc g_getMtpImpl = nullptr;
+OsalMutex UsbdFunction::setFunctionLock_;
 
 static void InitGetMtpImpl()
 {
