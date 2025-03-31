@@ -78,8 +78,8 @@ class UsbdFunction {
 public:
     UsbdFunction() = default;
     ~UsbdFunction() = default;
-    void UsbdInitLock();
-    void UsbdDestroyLock();
+    static void UsbdInitLock();
+    static void UsbdDestroyLock();
     static int32_t UsbdInnerSetFunction(uint32_t funcs);
     static int32_t UsbdSetFunction(uint32_t funcs);
     static int32_t UsbdGetFunction();
@@ -112,7 +112,7 @@ private:
     static int32_t ReleaseMtp();
 
     static uint32_t currentFuncs_;
-    OsalMutex setFunctionLock_;
+    static OsalMutex setFunctionLock_;
 };
 } // namespace V1_2
 } // namespace Usb

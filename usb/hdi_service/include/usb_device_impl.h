@@ -67,7 +67,6 @@ private:
     static HdfDevEventlistener listenerForLoadService_;
     static V1_2::UsbdLoadService loadUsbService_;
     static V1_2::UsbdLoadService loadHdfEdm_;
-    OsalMutex lockSetFunc_;
 };
 } // namespace v2_0
 } // namespace Usb
