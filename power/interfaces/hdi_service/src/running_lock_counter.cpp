@@ -27,8 +27,8 @@ int32_t RunningLockCounter::Increase(const RunningLockInfo &info)
     auto iterator = runninglockInfos_.find(info.name);
     if (iterator != runninglockInfos_.end()) {
         if (info.timeoutMs < 0) {
-            HDF_LOGW("Lock counter increase failed, runninglock name=%{public}s is exist and timeout < 0",
-                info.name.c_str());
+            // Lock counter increase failed, runninglock is exist and timeout < 0
+            HDF_LOGW("LCIF,N=%{public}s exist", info.name.c_str());
             return HDF_FAILURE;
         }
         iterator->second.timeoutMs = info.timeoutMs;
@@ -46,7 +46,8 @@ int32_t RunningLockCounter::Decrease(const RunningLockInfo &info)
 {
     auto iterator = runninglockInfos_.find(info.name);
     if (iterator == runninglockInfos_.end()) {
-        HDF_LOGW("Runninglock name=%{public}s is not exist, no need to decrease lock counter", info.name.c_str());
+        // Runninglock is not exist, no need to decrease lock counter
+        HDF_LOGW("RL N=%{public}s no exist", info.name.c_str());
         return HDF_ERR_NOT_SUPPORT;
     }
     --counter_;
