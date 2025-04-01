@@ -6,6 +6,7 @@
 
 ## Introduction<a name="section11660541593"></a>
 
+
 This repository stores the hardware driver interfaces \(HDIs\), hardware abstraction layer \(HAL\) implementation, driver models, and test cases related to drivers of peripherals. The directory is structured based on the driver modules. For details about each driver module, see the readme file in the sub-directory of each module.
 
 ## Directory Structure<a name="section161941989596"></a>
