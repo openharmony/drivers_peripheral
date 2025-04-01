@@ -52,7 +52,6 @@ private:
         RUNNINGLOCK_STATE_DISABLE = 0,
         RUNNINGLOCK_STATE_ENABLE = 1,
     };
-    void NotifyHiView(const RunningLockInfo &info, ChangedType changeType, RunningLockState state);
     const std::array<std::string, RUNNINGLOCK_CHANGED_BUTT> runninglockNotifyStr_ {
         "DUBAI_TAG_RUNNINGLOCK_ADD", "DUBAI_TAG_RUNNINGLOCK_REMOVE", "DUBAI_TAG_RUNNINGLOCK_OVERTIME"
     };
