@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dcamera_provider.h"
 #include "v1_1/dcamera_types.h"
@@ -35,9 +36,10 @@ void DcameraShutterBufferFuzzTest(const uint8_t* data, size_t size)
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
+    FuzzedDataProvider fdp(data, size);
     DCameraBuffer buffer;
-    buffer.index_ = *(reinterpret_cast<const int32_t*>(data));
-    buffer.size_ = *(reinterpret_cast<const unsigned int*>(data));
+    buffer.index_ = fdp.ConsumeIntegral<int32_t>();
+    buffer.size_ = fdp.ConsumeIntegral<uint32_t>();
     buffer.bufferHandle_ = sptr<NativeBuffer>(new NativeBuffer());
 
     DCameraProvider::GetInstance()->ShutterBuffer(dhBase, streamId, buffer);
