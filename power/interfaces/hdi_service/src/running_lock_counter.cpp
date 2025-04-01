@@ -14,9 +14,6 @@
  */
 
 #include "running_lock_counter.h"
-#ifdef HAS_POWER_HISYSEVENT_PART
-#include "hisysevent.h"
-#endif
 #include "hdf_base.h"
 #include "system_operation.h"
 #include "power_hdf_log.h"
@@ -42,7 +39,6 @@ int32_t RunningLockCounter::Increase(const RunningLockInfo &info)
         SystemOperation::WriteWakeLock(tag_);
     }
     runninglockInfos_.emplace(info.name, info);
-    NotifyHiView(info, ChangedType::NOTIFY_RUNNINGLOCK_ADD, RunningLockState::RUNNINGLOCK_STATE_ENABLE);
     return HDF_SUCCESS;
 }
 
@@ -59,7 +55,6 @@ int32_t RunningLockCounter::Decrease(const RunningLockInfo &info)
         SystemOperation::WriteWakeUnlock(tag_);
     }
     runninglockInfos_.erase(info.name);
-    NotifyHiView(info, ChangedType::NOTIFY_RUNNINGLOCK_REMOVE, RunningLockState::RUNNINGLOCK_STATE_DISABLE);
     return HDF_SUCCESS;
 }
 
@@ -68,18 +63,6 @@ void RunningLockCounter::Clean()
     runninglockInfos_.clear();
 }
 
-void RunningLockCounter::NotifyHiView(const RunningLockInfo &info, ChangedType changeType, RunningLockState state)
-{
-#ifdef HAS_POWER_HISYSEVENT_PART
-    const int logLevel = 2;
-    const std::string &tag = runninglockNotifyStr_.at(changeType);
-    const std::string bundleName = "";
-    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::POWER, "RUNNINGLOCK",
-        HiviewDFX::HiSysEvent::EventType::STATISTIC,
-        "PID", info.pid, "UID", info.uid, "STATE", static_cast<int32_t>(state), "TYPE", type_, "NAME", info.name,
-        "BUNDLENAME", bundleName, "LOG_LEVEL", logLevel, "TAG", tag);
-#endif
-}
 } // namespace V1_2
 } // namespace Power
 } // namespace HDI
