@@ -21,8 +21,10 @@ namespace HDI {
 namespace Usb {
 namespace Port {
 
-#define PORT_NONE "none"
-#define SUPPORTED_MODE "drp"
+#define PORT_CONFIG_NONE "none"
+#define SUPPORTED_MODE_DRP "drp"
+#define SUPPORTED_MODE_UFP "ufp"
+#define SUPPORTED_MODE_DFP "dfp"
 
 #define PORT_MODE_UFP "UFP"
 #define PORT_MODE_DFP "DFP"

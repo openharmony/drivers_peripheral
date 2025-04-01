@@ -28,7 +28,9 @@ namespace HDI {
 namespace Usb {
 namespace V1_2 {
 constexpr int32_t NONE = 0;
-constexpr int32_t SUPPORT_MODE = 1;
+constexpr int32_t SUPPORT_MODE_DRP = 1;
+constexpr int32_t SUPPORT_MODE_UFP = 2;
+constexpr int32_t SUPPORT_MODE_DFP = 3;
 constexpr int32_t STRING_PORT = 4;
 
 UsbdPorts &UsbdPorts::GetInstance()
@@ -44,7 +46,7 @@ UsbdPorts::UsbdPorts()
 
 void UsbdPorts::InitMap()
 {
-    portAttributeMap_[PORT_NONE] = NONE;
+    portAttributeMap_[PORT_CONFIG_NONE] = NONE;
     portAttributeMap_[PORT_MODE_UFP] = static_cast<int32_t>(Port::PortMode::UFP);
     portAttributeMap_[PORT_MODE_DFP] = static_cast<int32_t>(Port::PortMode::DFP);
     portAttributeMap_[PORT_MODE_DRP] = static_cast<int32_t>(Port::PortMode::DRP);
@@ -52,7 +54,9 @@ void UsbdPorts::InitMap()
     portAttributeMap_[POWER_ROLE_SINK] = static_cast<int32_t>(PowerRole::SINK);
     portAttributeMap_[DATA_ROLE_HOST] = static_cast<int32_t>(DataRole::HOST);
     portAttributeMap_[DATA_ROLE_DEVICE] = static_cast<int32_t>(DataRole::DEVICE);
-    portAttributeMap_[SUPPORTED_MODE] = SUPPORT_MODE;
+    portAttributeMap_[SUPPORTED_MODE_DRP] = SUPPORT_MODE_DRP;
+    portAttributeMap_[SUPPORTED_MODE_UFP] = SUPPORT_MODE_UFP;
+    portAttributeMap_[SUPPORTED_MODE_DFP] = SUPPORT_MODE_DFP;
 }
 
 void UsbdPorts::setPortPath(const std::string &path)
