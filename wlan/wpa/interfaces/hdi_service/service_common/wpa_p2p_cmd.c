@@ -1562,7 +1562,7 @@ int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifNam
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    char cmd[CMD_SIZE] = {0};
+    char cmd[MAX_CMD_SIZE] = {0};
     char buf[CMD_SIZE] = {0};
 
     int32_t ret = 0;
@@ -1580,6 +1580,11 @@ int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifNam
         case P2P_REMOVE_GROUP_CLIENT: {
             ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
                 "IFNAME=%s P2P_REMOVE_CLIENT %s", ifName, carryData);
+            break;
+        }
+        case P2P_SET_MIRACAST_SINK_CONFIG: {
+            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+                "IFNAME=%s SINK_CONFIG_SET %s", ifName, carryData);
             break;
         }
         default: {
