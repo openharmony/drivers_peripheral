@@ -22,11 +22,11 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 
 bool InitHalFuncTableWithStubs(WifiHalFn* halFn);
     
-} // namespace v1_0
+} // namespace v2_0
 } // namespace Chip
 } // namespace Wlan
 } // namespace HDI

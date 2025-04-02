@@ -16,7 +16,7 @@
 #ifndef OHOS_HDI_P2P_V1_0_P2PCALLBACKSERVICE_H
 #define OHOS_HDI_P2P_V1_0_P2PCALLBACKSERVICE_H
 
-#include "v1_2/iwpa_callback.h"
+#include "v2_0/iwpa_callback.h"
 
 #ifdef __cplusplus
 extern "C" {

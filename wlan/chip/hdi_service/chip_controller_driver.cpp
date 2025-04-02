@@ -17,11 +17,11 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/chip_controller_stub.h"
+#include "v2_0/chip_controller_stub.h"
 
 #define HDF_LOG_TAG    chip_controller_driver
 
-using namespace OHOS::HDI::Wlan::Chip::V1_0;
+using namespace OHOS::HDI::Wlan::Chip::V2_0;
 
 struct HdfChipControllerHost {
     struct IDeviceIoService ioService;
@@ -68,7 +68,7 @@ static int HdfChipControllerDriverBind(struct HdfDeviceObject *deviceObject)
     hdfChipControllerHost->ioService.Open = NULL;
     hdfChipControllerHost->ioService.Release = NULL;
 
-    auto serviceImpl = OHOS::HDI::Wlan::Chip::V1_0::IChipController::Get("chip_interface_service", true);
+    auto serviceImpl = OHOS::HDI::Wlan::Chip::V2_0::IChipController::Get("chip_interface_service", true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfChipControllerHost;
@@ -76,7 +76,7 @@ static int HdfChipControllerDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfChipControllerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        OHOS::HDI::Wlan::Chip::V1_0::IChipController::GetDescriptor());
+        OHOS::HDI::Wlan::Chip::V2_0::IChipController::GetDescriptor());
     if (hdfChipControllerHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfChipControllerHost;

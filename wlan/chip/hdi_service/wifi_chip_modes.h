@@ -16,8 +16,8 @@
 #ifndef WIFI_FEATURE_FLAGS_H
 #define WIFI_FEATURE_FLAGS_H
 
-#include "v1_0/ichip_controller.h"
-#include "v1_0/chip_types.h"
+#include "v2_0/ichip_controller.h"
+#include "v2_0/chip_types.h"
 #include <string>
 #include "wifi_vendor_hal.h"
 
@@ -30,7 +30,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 
 namespace chip_mode_ids {
 constexpr int32_t K_INVALID = UINT32_MAX;

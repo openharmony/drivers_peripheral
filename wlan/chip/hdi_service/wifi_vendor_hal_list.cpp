@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 
 const std::string VENDOR_HARDWARE_PATH = "libwifi_hal_hw.z.so";
 const std::string VENDOR_DAFAULT_PATH = "libwifi_hal_default.z.so";
@@ -101,7 +101,7 @@ out_err:
     return false;
 }
 
-} // namespace v1_0
+} // namespace v2_0
 } // namespace Chip
 } // namespace Wlan
 } // namespace HDI

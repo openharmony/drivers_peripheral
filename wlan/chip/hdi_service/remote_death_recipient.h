@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 class RemoteDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     explicit RemoteDeathRecipient(std::function<void(const wptr<IRemoteObject> &)> callback)

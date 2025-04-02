@@ -102,7 +102,7 @@ WifiError EnablePowerMode(const char *ifName, int mode)
 }
 
 static WifiError WifiGetSignalInfo(wifiInterfaceHandle handle,
-    OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult& signalPollresult)
+    OHOS::HDI::Wlan::Chip::V2_0::SignalPollResult& signalPollresult)
 {
     return HAL_SUCCESS;
 }
@@ -116,7 +116,7 @@ WifiError WifiSetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
 }
 
 WifiError WifiStartScan(wifiInterfaceHandle handle,
-    const OHOS::HDI::Wlan::Chip::V1_0::ScanParams& scanParam)
+    const OHOS::HDI::Wlan::Chip::V2_0::ScanParams& scanParam)
 {
     if (scanParam.fastConnectFlag == 0) {
         return HAL_SUCCESS;
@@ -134,13 +134,13 @@ static WifiError RegisterIfaceCallBack(const char *ifaceName, WifiCallbackHandle
 }
 
 WifiError WifiGetScanInfo(wifiInterfaceHandle handle,
-    std::vector<OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo>& res)
+    std::vector<OHOS::HDI::Wlan::Chip::V2_0::ScanResultsInfo>& res)
 {
     return HAL_SUCCESS;
 }
 
 WifiError WifiStartPnoScan(wifiInterfaceHandle handle,
-    const OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams& pnoScanParam)
+    const OHOS::HDI::Wlan::Chip::V2_0::PnoScanParams& pnoScanParam)
 {
     if (pnoScanParam.min2gRssi == 0) {
         return HAL_SUCCESS;
