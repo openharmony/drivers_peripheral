@@ -56,7 +56,7 @@ if (defined(ohos_lite)) {
     ]
   }
 } else {
-  module_output_path = "drivers_peripheral_wlan/wlan"
+  module_output_path = "drivers_peripheral_wlan/drivers_peripheral_wlan"
   ohos_unittest("hdf_peripheral_wlan_test_performance") {
     module_out_path = module_output_path
     include_dirs = [
