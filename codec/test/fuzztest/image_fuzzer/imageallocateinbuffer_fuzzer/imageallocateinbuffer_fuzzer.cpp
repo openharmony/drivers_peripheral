@@ -46,8 +46,7 @@ bool AllocateInBuffer(const uint8_t *data, size_t size)
     ImageAutoIniter autoIniter(image, role);
 
     CodecImageBuffer inBuffer;
-    auto srcData = const_cast<uint8_t *>(data);
-    unsigned int bufferSize = *reinterpret_cast<unsigned int *>(srcData);
+    unsigned int bufferSize = *reinterpret_cast<unsigned int *>(const_cast<uint8_t *>(data));
     auto err = image->AllocateInBuffer(inBuffer, bufferSize, role);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s AllocateInBuffer return %{public}d", __func__, err);
