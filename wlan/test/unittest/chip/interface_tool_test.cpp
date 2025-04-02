@@ -18,7 +18,7 @@
 #include "../../../chip/hdi_service/iface_tool.h"
 
 using namespace testing::ext;
-using namespace OHOS::HDI::Wlan::Chip::V1_0;
+using namespace OHOS::HDI::Wlan::Chip::V2_0;
 
 namespace IfaceToolTest {
 class IfaceToolTest : public testing::Test {

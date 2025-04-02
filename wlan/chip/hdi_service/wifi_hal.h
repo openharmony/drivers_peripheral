@@ -18,8 +18,8 @@
 
 #include <cstdint>
 #include <cstddef>
-#include "v1_0/ichip_iface_callback.h"
-#include "v1_0/chip_types.h"
+#include "v2_0/ichip_iface_callback.h"
+#include "v2_0/chip_types.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -121,25 +121,26 @@ typedef struct {
     WifiError (*setPowerMode)(const char *, int);
     WifiError (*isSupportCoex)(bool&);
     WifiError (*wifiStartScan)(wifiInterfaceHandle handle,
-        const OHOS::HDI::Wlan::Chip::V1_0::ScanParams& scanParam);
+        const OHOS::HDI::Wlan::Chip::V2_0::ScanParams& scanParam);
     WifiError (*wifiStartPnoScan)(wifiInterfaceHandle handle,
-        const OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams& pnoScanParam);
+        const OHOS::HDI::Wlan::Chip::V2_0::PnoScanParams& pnoScanParam);
     WifiError (*wifiStopPnoScan)(wifiInterfaceHandle handle);
     WifiError (*getScanResults)(wifiInterfaceHandle handle,
-        std::vector<OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo>& mscanResults);
+        std::vector<OHOS::HDI::Wlan::Chip::V2_0::ScanResultsInfo>& mscanResults);
     WifiError (*enablePowerMode)(const char *, int);
     WifiError (*getSignalPollInfo)(wifiInterfaceHandle handle,
-        OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult& signalPollResult);
+        OHOS::HDI::Wlan::Chip::V2_0::SignalPollResult& signalPollResult);
     WifiError (*setDpiMarkRule)(int32_t, int32_t, int32_t);
     WifiError (*registerIfaceCallBack)(const char *, WifiCallbackHandler);
     WifiError (*setTxPower)(const char *, int);
     WifiError (*registerExtIfaceCallBack)(const char* ifName, WifiExtCallbackHandler handler);
-    WifiError (*sendCmdToDriver)(const char* ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf);
+    WifiError (*sendCmdToDriver)(const char* ifName, int32_t cmdId,
+        const std::vector<int8_t>& paramBuf, std::vector<int8_t>& result);
     WifiError (*sendActionFrame)(wifiInterfaceHandle handle, uint32_t freq, const std::vector<uint8_t>& frameData);
     WifiError (*registerActionFrameReceiver)(wifiInterfaceHandle handle, const std::vector<uint8_t>& match);
     WifiError (*getCoexictenceChannelList)(const char* ifName, std::vector<uint8_t>& paramBuf);
     WifiError (*setProjectionScreenParam)(wifiInterfaceHandle handle,
-        const OHOS::HDI::Wlan::Chip::V1_0::ProjectionScreenCmdParam& param);
+        const OHOS::HDI::Wlan::Chip::V2_0::ProjectionScreenCmdParam& param);
 } WifiHalFn;
 
 WifiError InitWifiVendorHalFuncTable(WifiHalFn *fn);

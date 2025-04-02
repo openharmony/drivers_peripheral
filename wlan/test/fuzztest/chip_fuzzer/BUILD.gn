@@ -32,14 +32,14 @@ ohos_fuzztest("ChipFuzzTest") {
   ]
 
   deps = [
-    "../../../chip/hdi_service:libchip_controller_chip_interface_service_1.0",
+    "../../../chip/hdi_service:libchip_controller_chip_interface_service_2.0",
   ]
 
   public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_wlan:libchip_stub_1.0",
+    "drivers_interface_wlan:libchip_stub_2.0",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",

@@ -54,11 +54,11 @@ typedef struct {
 } WiphyInfo;
 
 WifiError WifiStartScan(wifiInterfaceHandle handle,
-    const OHOS::HDI::Wlan::Chip::V1_0::ScanParams& scanParam);
+    const OHOS::HDI::Wlan::Chip::V2_0::ScanParams& scanParam);
 WifiError WifiGetScanInfo(wifiInterfaceHandle handle,
-    std::vector<OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo>& mscanResults);
+    std::vector<OHOS::HDI::Wlan::Chip::V2_0::ScanResultsInfo>& mscanResults);
 WifiError WifiStartPnoScan(wifiInterfaceHandle handle,
-    const OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams& scanParam);
+    const OHOS::HDI::Wlan::Chip::V2_0::PnoScanParams& scanParam);
 WifiError WifiStopPnoScan(wifiInterfaceHandle handle);
 
 #endif

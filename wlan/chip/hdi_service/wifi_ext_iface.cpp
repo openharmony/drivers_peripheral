@@ -20,7 +20,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 WifiExtIface::WifiExtIface(
     const std::string& ifName,
     const std::weak_ptr<WifiVendorHal> vendorHal,
@@ -153,9 +153,10 @@ int32_t WifiExtIface::SetIfaceState(bool state)
     return HDF_ERR_NOT_SUPPORT;
 }
 
-int32_t WifiExtIface::SendCmdToDriver(const std::string& ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf)
+int32_t WifiExtIface::SendCmdToDriver(const std::string& ifName, int32_t cmdId,
+    const std::vector<int8_t>& paramBuf, std::vector<int8_t>& result)
 {
-    WifiError status = vendorHal_.lock()->SendCmdToDriver(ifName, cmdId, paramBuf);
+    WifiError status = vendorHal_.lock()->SendCmdToDriver(ifName, cmdId, paramBuf, result);
     if (status == HAL_SUCCESS) {
         return HDF_SUCCESS;
     }

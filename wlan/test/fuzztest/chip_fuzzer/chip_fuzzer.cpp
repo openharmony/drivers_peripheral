@@ -17,17 +17,17 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
-#include "v1_0/chip_controller_stub.h"
+#include "v2_0/chip_controller_stub.h"
 #include "../../../chip/hdi_service/wifi.h"
 
-using namespace OHOS::HDI::Wlan::Chip::V1_0;
+using namespace OHOS::HDI::Wlan::Chip::V2_0;
 using namespace std;
 
 namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 
 namespace {
 const int32_t REWIND_READ_DATA = 0;
@@ -67,6 +67,6 @@ static void WifiChipStubFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::Wlan::Chip::V1_0::WifiChipStubFuzzTest(data, size);
+    OHOS::HDI::Wlan::Chip::V2_0::WifiChipStubFuzzTest(data, size);
     return 0;
 }

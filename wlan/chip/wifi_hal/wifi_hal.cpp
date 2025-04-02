@@ -46,7 +46,7 @@
 #include "gscan.h"
 #include "wifi_ioctl.h"
 #include "wifi_scan.h"
-#include "v1_0/ichip_iface.h"
+#include "v2_0/ichip_iface.h"
 
 constexpr int32_t WIFI_HAL_CMD_SOCK_PORT = 644;
 constexpr int32_t WIFI_HAL_EVENT_SOCK_PORT = 645;
@@ -77,7 +77,7 @@ static void InternalCleanedUpHandler(wifiHandle handle);
 static int InternalPollinHandler(wifiHandle handle);
 static WifiError WifiSetCountryCode(wifiInterfaceHandle handle, const char *country_code);
 static WifiError WifiGetSignalInfo(wifiInterfaceHandle handle,
-    OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult& signalPollresult);
+    OHOS::HDI::Wlan::Chip::V2_0::SignalPollResult& signalPollresult);
 static WifiError RegisterIfaceCallBack(const char *ifaceName,
     WifiCallbackHandler OnCallbackEvent);
 static WifiError VendorHalCreateIface(wifiHandle handle, const char* ifname,
@@ -85,7 +85,8 @@ static WifiError VendorHalCreateIface(wifiHandle handle, const char* ifname,
 static WifiError VendorHalDeleteIface(wifiHandle handle, const char* ifname);
 static void CheckWhetherAddIface(wifiHandle handle, const char* ifname);
 WifiError IsSupportCoex(bool& isCoex);
-static WifiError SendCmdToDriver(const char *ifaceName, int32_t commandId, const std::vector<int8_t>& paramData);
+static WifiError SendCmdToDriver(const char *ifaceName, int32_t commandId,
+    const std::vector<int8_t>& paramData, std::vector<int8_t>& result);
 
 typedef enum WifiAttr {
     HAL_INVALID                    = 0,
@@ -1357,7 +1358,7 @@ public:
         mSignalInfo.associatedFreq = static_cast<int32_t>(mAssocInfo.associatedFreq);
         return HAL_SUCCESS;
     }
-    OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult &GetScanResultsInfo()
+    OHOS::HDI::Wlan::Chip::V2_0::SignalPollResult &GetScanResultsInfo()
     {
         return mSignalInfo;
     }
@@ -1406,7 +1407,7 @@ protected:
         return NL_SKIP;
     }
 private:
-    OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult mSignalInfo;
+    OHOS::HDI::Wlan::Chip::V2_0::SignalPollResult mSignalInfo;
     AssociatedInfo mAssocInfo;
 
     void FillSignal(struct nlattr **stats, uint32_t size)
@@ -1420,10 +1421,10 @@ private:
             mSignalInfo.currentRssi = nla_get_s8(stats[NL80211_STA_INFO_SIGNAL]);
         }
         if (stats[NL80211_STA_INFO_TX_BYTES] != nullptr) {
-            mSignalInfo.currentTxBytes = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_TX_BYTES]);
+            mSignalInfo.currentTxBytes = (uint64_t)nla_get_u32(stats[NL80211_STA_INFO_TX_BYTES]);
         }
         if (stats[NL80211_STA_INFO_RX_BYTES] != nullptr) {
-            mSignalInfo.currentRxBytes = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_RX_BYTES]);
+            mSignalInfo.currentRxBytes = (uint64_t)nla_get_u32(stats[NL80211_STA_INFO_RX_BYTES]);
         }
         if (stats[NL80211_STA_INFO_TX_PACKETS] != nullptr) {
             mSignalInfo.currentTxPackets = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_TX_PACKETS]);
@@ -1575,7 +1576,7 @@ private:
 
 
 static WifiError WifiGetSignalInfo(wifiInterfaceHandle handle,
-    OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult& signalPollresult)
+    OHOS::HDI::Wlan::Chip::V2_0::SignalPollResult& signalPollresult)
 {
     AssociatedInfo associatedInfo;
 
@@ -1613,7 +1614,8 @@ WifiError IsSupportCoex(bool& isCoex)
     return HAL_SUCCESS;
 }
 
-static WifiError SendCmdToDriver(const char *ifaceName, int32_t commandId, const std::vector<int8_t>& paramData)
+static WifiError SendCmdToDriver(const char *ifaceName, int32_t commandId,
+    const std::vector<int8_t>& paramData, std::vector<int8_t>& result)
 {
     return HAL_SUCCESS;
 }

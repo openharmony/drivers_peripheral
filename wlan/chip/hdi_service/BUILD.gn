@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/wlan/wlan.gni")
 
-ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
+ohos_shared_library("libchip_controller_chip_interface_service_2.0") {
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
@@ -51,7 +51,7 @@ ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_wlan:chip_idl_headers",
+    "drivers_interface_wlan:chip_idl_headers_2.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
@@ -125,7 +125,7 @@ ohos_shared_library("libchip_hdi_driver") {
     "-Wl,--exclude-libs=ALL",
     "-Wl,--gc-sections",
   ]
-  external_deps += [ "drivers_interface_wlan:libchip_stub_1.0" ]
+  external_deps += [ "drivers_interface_wlan:libchip_stub_2.0" ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
@@ -156,7 +156,7 @@ if (drivers_peripheral_wlan_feature_vendor == "default") {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
-        "drivers_interface_wlan:chip_idl_headers",
+        "drivers_interface_wlan:chip_idl_headers_2.0",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
@@ -178,7 +178,7 @@ if (drivers_peripheral_wlan_feature_vendor == "default") {
 
 group("hdi_chip_service") {
   deps = [
-    ":libchip_controller_chip_interface_service_1.0",
+    ":libchip_controller_chip_interface_service_2.0",
     ":libchip_hdi_driver",
   ]
   if (drivers_peripheral_wlan_feature_vendor == "default") {

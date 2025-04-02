@@ -31,13 +31,20 @@
 #include "wifi_display.h"
 #include "bssid_ignore.h"
 #include "config.h"
-#include "v1_2/iwpa_callback.h"
-#include "v1_2/iwpa_interface.h"
+#include "v2_0/iwpa_callback.h"
+#include "v2_0/iwpa_interface.h"
 #include "wpa_p2p_hal.h"
 
 #define HEX_TO_DEC_MOVING 4
 #define DEC_MAX_SCOPE 10
 #define MIN_MAC_LEN 6
+#define LIST_BUF_LEN 200
+#define LIST_BUF_TYPE 5
+#define LIST_ID_OFFSET 0
+#define LIST_SSID_OFFSET 1
+#define LIST_BSSID_OFFSET 2
+#define LIST_FLAG_OFFSET 3
+#define LIST_CLIENLIST_OFFSET 4
 
 struct HdiWpaKeyValue {
     char key[CMD_SIZE];
@@ -67,45 +74,107 @@ void GetStrKeyVal(char *src, const char *split, struct HdiWpaKeyValue *out)
     return;
 }
 
+static void GetSsidInfo(char *res, struct HdiP2pNetworkInfo *info)
+{
+    if (strcpy_s((char *)info->ssid, WIFI_SSID_LENGTH, res) != EOK) {
+        HDF_LOGE("%{public}s strcpy failed", __func__);
+        return;
+    }
+    printf_decode((u8 *)info->ssid, WIFI_SSID_LENGTH, (char *)info->ssid);
+}
+
+static void GetBssidInfo(char *res, struct HdiP2pNetworkInfo *info)
+{
+    uint8_t tmpBssid[ETH_ADDR_LEN] = {0};
+    hwaddr_aton(res, tmpBssid);
+    if (memcpy_s((char *)info->bssid, ETH_ADDR_LEN, (char *)tmpBssid, ETH_ADDR_LEN) != EOK) {
+        HDF_LOGE("%{public}s memcpy_s failed", __func__);
+        return;
+    }
+    info->bssid[ETH_ADDR_LEN] = '\0';
+}
+
+static void GetFlagInfo(char *res, struct HdiP2pNetworkInfo *info)
+{
+    int falgLen = strlen(res);
+    info->flags = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (falgLen + 1));
+    if (info->flags == NULL) {
+        HDF_LOGE("malloc flags failed!");
+        return;
+    }
+    info->flagsLen = falgLen + 1;
+    if (strcpy_s((char *)info->flags, falgLen + 1, res) != EOK) {
+        HDF_LOGE("GetFlagInfo strcpy_s failed!");
+    }
+}
+
+static void GetClientListInfo(char *res, struct HdiP2pNetworkInfo *info)
+{
+    int clientLen = strlen(res);
+    info->clientList = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (clientLen + 1));
+    if (info->clientList == NULL) {
+        HDF_LOGE("malloc client list failed!");
+        return;
+    }
+    info->clientListLen = clientLen + 1;
+    if (strcpy_s((char *)info->clientList, clientLen + 1, res) != EOK) {
+        HDF_LOGE("GetClientListInfo strcpy_s failed!");
+    }
+}
+
 void GetHalNetworkInfos(char *buf, struct HdiP2pNetworkInfo *info)
 {
+    /* The buf format is as follows:
+     * id'\t'ssid'\t'bssid'\t'flag'\t'clientlist
+     * In the format, clientlist exists when the device is go
+     */
     if (buf == NULL || info == NULL) {
         return;
     }
-    int len = strlen(buf);
-    int start = 0;
-    int end = 0;
+    char *tmp = buf;
     int i = 0;
-    const int count = 2;
-    while (end < len) {
-        if (buf[end] != '\t') {
-            ++end;
-            continue;
-        }
-        buf[end] = '\0';
-        if (i == 0) {
-            info->id = atoi(buf);
-        } else if (i == 1) {
-            if (strcpy_s((char *)info->ssid, WIFI_SSID_LENGTH + 1, buf + start) != EOK) {
-                break;
-            }
-            printf_decode((u8 *)info->ssid, WIFI_SSID_LENGTH + 1, (char *)info->ssid);
-        } else if (i == count) {
-            uint8_t tmpBssid[ETH_ADDR_LEN] = {0};
-            hwaddr_aton(buf + start, tmpBssid);
-            if (memcpy_s((char *)info->bssid, ETH_ADDR_LEN, (char *)tmpBssid, ETH_ADDR_LEN) != EOK) {
-                break;
-            }
-            info->bssid[ETH_ADDR_LEN] = '\0';
-            start = end + 1;
-            if (strcpy_s((char *)info->flags, WIFI_NETWORK_FLAGS_LENGTH + 1, buf + start) != EOK) {
-                break;
-            }
+    char res[LIST_BUF_TYPE][LIST_BUF_LEN] = {0};
+    char *pos = strstr(buf, "\t");
+    if (pos == NULL) {
+        HDF_LOGE("invaild str, return");
+        return;
+    }
+    while (pos != NULL) {
+        if (i >= LIST_BUF_TYPE) {
             break;
         }
-        ++i;
-        end++;
-        start = end;
+        if (memcpy_s(res[i], LIST_BUF_LEN, tmp, pos - tmp) != EOK) {
+            HDF_LOGE("%{public}s memcpy_s failed %{public}d", __func__, i);
+            return;
+        }
+        if (pos - tmp + 1 >= LIST_BUF_LEN) {
+            HDF_LOGE("%{public}s tmp len is max, i is %{public}d", __func__, i);
+            return;
+        } else {
+            res[i][pos - tmp + 1] = '\0';
+        }
+        pos += 1;
+        tmp = pos;
+        pos = strstr(pos, "\t");
+        i++;
+    }
+    if (memcpy_s(res[i], LIST_BUF_LEN, tmp, strlen(tmp)) != EOK) {
+        HDF_LOGE("%{public}s memcpy_s failed %{public}d", __func__, i);
+        return;
+    }
+    if (strlen(tmp) >= LIST_BUF_LEN) {
+        HDF_LOGE("%{public}s tmp len is max, i is %{public}d", __func__, i);
+        return;
+    } else {
+        res[i][strlen(tmp)] = '\0';
+    }
+    info->id = atoi(res[LIST_ID_OFFSET]);
+    GetSsidInfo(res[LIST_SSID_OFFSET], info);
+    GetBssidInfo(res[LIST_BSSID_OFFSET], info);
+    /* The memory alloced for the info structure will be released by wifi_manager_service. */
+    GetFlagInfo(res[LIST_FLAG_OFFSET], info);
+    if (i == LIST_CLIENLIST_OFFSET) {
+        GetClientListInfo(res[LIST_CLIENLIST_OFFSET], info);
     }
     return;
 }
@@ -1516,13 +1585,6 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
             break;
         }
         infoList->infos[index].bssidLen = ETH_ADDR_LEN + 1;
-        infoList->infos[index].flags = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_NETWORK_FLAGS_LENGTH);
-        if (infoList->infos[index].flags == NULL) {
-            HDF_LOGE("malloc flags failed!");
-            HdiP2pNetworkInfoFree(&(infoList->infos[index]), true);
-            break;
-        }
-        infoList->infos[index].flagsLen = WIFI_NETWORK_FLAGS_LENGTH;
         GetHalNetworkInfos(token, &(infoList->infos[index]));
         index++;
         token = strtok_r(NULL, "\n", &savedPtr);

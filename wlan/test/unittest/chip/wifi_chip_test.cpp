@@ -20,7 +20,7 @@
 #include "wifi_hal_fn.h"
 
 using namespace testing::ext;
-using namespace OHOS::HDI::Wlan::Chip::V1_0;
+using namespace OHOS::HDI::Wlan::Chip::V2_0;
 
 namespace WifiChipTest {
 const std::string TEST_AP_IFNAME = "wlan1";

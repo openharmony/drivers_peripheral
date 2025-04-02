@@ -23,7 +23,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 
 std::unique_lock<std::recursive_mutex> AcquireGlobalLock()
 {

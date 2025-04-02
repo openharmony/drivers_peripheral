@@ -17,11 +17,11 @@
 #include <hdf_log.h>
 #include "../../../chip/hdi_service/wifi_vendor_hal.h"
 #include "../../../chip/hdi_service/hdi_sync_util.h"
-#include "v1_0/ichip_iface_callback.h"
+#include "v2_0/ichip_iface_callback.h"
 #include "wifi_hal_fn.h"
 
 using namespace testing::ext;
-using namespace OHOS::HDI::Wlan::Chip::V1_0;
+using namespace OHOS::HDI::Wlan::Chip::V2_0;
 
 namespace WifiVendorHalTest {
 const std::string VAILD_IFNAME = "wlan0";

@@ -16,17 +16,17 @@
 #ifndef WIFI_P2P_IFACE_H
 #define WIFI_P2P_IFACE_H
 
-#include "v1_0/ichip_iface.h"
-#include "v1_0/chip_types.h"
+#include "v2_0/ichip_iface.h"
+#include "v2_0/chip_types.h"
 #include "wifi_vendor_hal.h"
-#include "v1_0/ichip_iface_callback.h"
+#include "v2_0/ichip_iface_callback.h"
 #include "iface_util.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 
 class WifiP2pIface : public IChipIface {
 public:
@@ -54,7 +54,8 @@ public:
     int32_t SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable) override;
     int32_t SetTxPower(int32_t power) override;
     int32_t SetIfaceState(bool state) override;
-    int32_t SendCmdToDriver(const std::string& ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf) override;
+    int32_t SendCmdToDriver(const std::string& ifName, int32_t cmdId,
+        const std::vector<int8_t>& paramBuf, std::vector<int8_t>& result) override;
     int32_t SendActionFrame(const std::string& ifName, uint32_t freq, const std::vector<uint8_t>& frameData) override;
     int32_t RegisterActionFrameReceiver(const std::string& ifName, const std::vector<uint8_t>& match) override;
     int32_t GetCoexictenceChannelList(const std::string& ifName, std::vector<uint8_t>& paramBuf) override;

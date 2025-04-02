@@ -29,7 +29,7 @@ namespace OHOS {
 namespace HDI {
 namespace Wlan {
 namespace Chip {
-namespace V1_0 {
+namespace V2_0 {
 std::function<void(wifiHandle handle)> onStopCompleteCallback;
 std::function<void(const char*)> onVendorHalRestartCallback;
 std::function<void(int)> onFullScanResultCallback;
@@ -426,9 +426,9 @@ WifiError WifiVendorHal::SetTxPower(const std::string& ifaceName, int mode)
 }
 
 WifiError WifiVendorHal::SendCmdToDriver(const std::string& ifaceName, int32_t cmdId,
-    const std::vector<int8_t>& paramBuf)
+    const std::vector<int8_t>& paramBuf, std::vector<int8_t>& result)
 {
-    return globalFuncTable_.sendCmdToDriver(ifaceName.c_str(), cmdId, paramBuf);
+    return globalFuncTable_.sendCmdToDriver(ifaceName.c_str(), cmdId, paramBuf, result);
 }
 
 WifiError WifiVendorHal::SendActionFrame(const std::string& ifaceName, uint32_t freq,
@@ -451,7 +451,7 @@ WifiError WifiVendorHal::SetProjectionScreenParam(const std::string& ifaceName, 
 {
     return globalFuncTable_.setProjectionScreenParam(GetIfaceHandle(ifaceName), param);
 }
-} // namespace v1_0
+} // namespace v2_0
 } // namespace Chip
 } // namespace Wlan
 } // namespace HDI
