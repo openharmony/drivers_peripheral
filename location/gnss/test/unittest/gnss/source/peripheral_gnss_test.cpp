@@ -61,16 +61,19 @@ void PeripheralGnssTest::TearDown()
 
 HWTEST_F(PeripheralGnssTest, SetGnssConfigParaTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, SetGnssConfigParaTest001, TestSize.Level1";
     GnssConfigPara para;
     para.gnssBasic.gnssMode = GNSS_WORKING_MODE_MS_ASSISTED;
     auto ret = gnssInstance_->SetGnssConfigPara(para);
     EXPECT_NE(HDF_ERR_INVALID_PARAM, ret);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, NmeaCallbackTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, NmeaCallbackTest001, TestSize.Level1";
     sptr<ISystemAbilityManager> samgr =
@@ -85,6 +88,7 @@ HWTEST_F(PeripheralGnssTest, NmeaCallbackTest001, TestSize.Level1)
     NmeaCallback(0, "nmea_str.", 0);
     gnssInstance_->DisableGnss();
     sleep(1);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, GetGnssCallbackMethodsTest001, TestSize.Level1)
@@ -103,6 +107,7 @@ HWTEST_F(PeripheralGnssTest, GetGnssCallbackMethodsTest001, TestSize.Level1)
 
 HWTEST_F(PeripheralGnssTest, SvStatusCallbackTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, SvStatusCallbackTest001, TestSize.Level1";
     sptr<ISystemAbilityManager> samgr =
@@ -118,10 +123,12 @@ HWTEST_F(PeripheralGnssTest, SvStatusCallbackTest001, TestSize.Level1)
     
     gnssInstance_->DisableGnss();
     sleep(1);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, GnssWorkingStatusUpdateTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, GnssWorkingStatusUpdateTest001, TestSize.Level1";
     
@@ -137,10 +144,12 @@ HWTEST_F(PeripheralGnssTest, GnssWorkingStatusUpdateTest001, TestSize.Level1)
     GnssWorkingStatusUpdate(&statusPtr);
     gnssInstance_->DisableGnss();
     sleep(1);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, LocationUpdateTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, LocationUpdateTest001, TestSize.Level1";
     
@@ -158,10 +167,12 @@ HWTEST_F(PeripheralGnssTest, LocationUpdateTest001, TestSize.Level1)
     LocationUpdate(&location);
     gnssInstance_->DisableGnss();
     sleep(1);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, NiNotifyCallbackTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, NiNotifyCallbackTest001, TestSize.Level1";
     sptr<ISystemAbilityManager> samgr =
@@ -177,10 +188,12 @@ HWTEST_F(PeripheralGnssTest, NiNotifyCallbackTest001, TestSize.Level1)
     NiNotifyCallback(&notification);
     gnssInstance_->DisableGnss();
     sleep(1);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, SendNiUserResponseTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, SendNiUserResponseTest001, TestSize.Level1";
     HDF_LOGI("PeripheralGnssTest, SendNiUserResponseTest001, TestSize.Level1");
@@ -189,10 +202,12 @@ HWTEST_F(PeripheralGnssTest, SendNiUserResponseTest001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     gnssInstance_->SendNetworkInitiatedMsg("0", 0);
     gnssInstance_->SendNetworkInitiatedMsg("0x20", 4);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, EnableGnssTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     HDF_LOGI("PeripheralGnssTest, EnableGnssTest001, TestSize.Level1");
 
     sptr<ISystemAbilityManager> samgr =
@@ -206,10 +221,12 @@ HWTEST_F(PeripheralGnssTest, EnableGnssTest001, TestSize.Level1)
     HDF_LOGI("PeripheralGnssTest, EnableGnssTest001, TestSize.Level1");
     gnssInstance_->DisableGnss();
     sleep(1);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, EnableGnssMeasurementTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     HDF_LOGI("PeripheralGnssTest, EnableGnssMeasurementTest001, TestSize.Level1");
 
     sptr<ISystemAbilityManager> samgr =
@@ -232,6 +249,7 @@ HWTEST_F(PeripheralGnssTest, EnableGnssMeasurementTest001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     gnssInstance_->DisableGnss();
     sleep(1);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, DisableGnssMeasurementTest001, TestSize.Level1)
@@ -257,6 +275,7 @@ HWTEST_F(PeripheralGnssTest, DisableGnssMeasurementTest001, TestSize.Level1)
 
 HWTEST_F(PeripheralGnssTest, SetGnssReferenceInfoTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, SetGnssReferenceInfoTest001, TestSize.Level1";
     EXPECT_NE(nullptr, gnssInstance_);
@@ -273,10 +292,12 @@ HWTEST_F(PeripheralGnssTest, SetGnssReferenceInfoTest001, TestSize.Level1)
         refInfo.type = GnssRefInfoType::GNSS_REF_INFO_BEST_LOCATION;
         ret = gnssInstance_->SetGnssReferenceInfo(refInfo);
     }
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, DeleteAuxiliaryData001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, DeleteAuxiliaryData001, TestSize.Level1";
     EXPECT_NE(nullptr, gnssInstance_);
@@ -287,6 +308,7 @@ HWTEST_F(PeripheralGnssTest, DeleteAuxiliaryData001, TestSize.Level1)
         ret = gnssInstance_->DeleteAuxiliaryData(data);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, SetPredictGnssDataTest001, TestSize.Level1)
@@ -326,6 +348,7 @@ HWTEST_F(PeripheralGnssTest, GetCachedGnssLocationsTest001, TestSize.Level1)
 
 HWTEST_F(PeripheralGnssTest, SendNiUserResponseTest002, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, SendNiUserResponseTest002, TestSize.Level1";
     EXPECT_NE(nullptr, gnssInstance_);
@@ -335,10 +358,12 @@ HWTEST_F(PeripheralGnssTest, SendNiUserResponseTest002, TestSize.Level1)
         int32_t ret = gnssInstance_->SendNiUserResponse(gnssNiNotificationId, userResponse);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, SendNetworkInitiatedMsg001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, SendNetworkInitiatedMsg001, TestSize.Level1";
     EXPECT_NE(nullptr, gnssInstance_);
@@ -348,10 +373,12 @@ HWTEST_F(PeripheralGnssTest, SendNetworkInitiatedMsg001, TestSize.Level1)
         int32_t ret = gnssInstance_->SendNetworkInitiatedMsg(msg, length);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, StartGnssTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, StartGnssTest001, TestSize.Level1";
     int32_t ret = 0;
@@ -359,10 +386,12 @@ HWTEST_F(PeripheralGnssTest, StartGnssTest001, TestSize.Level1)
     ret = gnssInstance_->StartGnss(GNSS_START_TYPE_NORMAL);
     ret = gnssInstance_->StopGnss(GNSS_START_TYPE_NORMAL);
     EXPECT_EQ(-1, ret);
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, DoubleEnableGnssTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, DoubleEnableGnssTest001, TestSize.Level1";
 
@@ -377,6 +406,7 @@ HWTEST_F(PeripheralGnssTest, DoubleEnableGnssTest001, TestSize.Level1)
     auto gnssCallback_2 = new (std::nothrow) GnssEventCallbackMock(saObject);
     gnssInstance_->EnableGnss(gnssCallback_2);
     gnssInstance_->DisableGnss();
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, GetGnssMeasurementCallbackMethodsTest001, TestSize.Level1)
@@ -400,6 +430,7 @@ HWTEST_F(PeripheralGnssTest, GetModuleInterfaceTest001, TestSize.Level1)
 
 HWTEST_F(PeripheralGnssTest, RestGnssTest001, TestSize.Level1)
 {
+#ifdef FEATURE_GNSS_SUPPORT
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, RestGnssTest001, TestSize.Level1";
     auto gnssImpl = new (std::nothrow) GnssInterfaceImpl();
@@ -411,6 +442,7 @@ HWTEST_F(PeripheralGnssTest, RestGnssTest001, TestSize.Level1)
     gnssMeasurementCallback_ = new (std::nothrow) GnssMeasurementCallbackTest(saObject);
     gnssImpl->EnableGnssMeasurement(gnssMeasurementCallback_);
     gnssImpl->ResetGnss();
+#endif
 }
 
 HWTEST_F(PeripheralGnssTest, HexCharToIntTest001, TestSize.Level1)
