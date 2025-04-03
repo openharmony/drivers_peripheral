@@ -25,6 +25,7 @@
 #include <stub_collector.h>
 #include "v1_0/ihostapd_interface.h"
 #include "hostapd_impl.h"
+#include <signal.h>
 
 struct HdfHostapdInterfaceHost {
     struct IDeviceIoService ioService;
@@ -111,6 +112,10 @@ static int HdfHostapdInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfHostapdInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfHostapdInterfaceDriverRelease enter.");
+    void (*result)(int) = signal(SIGTERM, SIG_IGN);
+    if (result == SIG_ERR) {
+        HDF_LOGE("Failed to set signal ignore handler for SIGTERM");
+    }
     struct HdfHostapdRemoteNode *pos = NULL;
     struct HdfHostapdRemoteNode *tmp = NULL;
     pthread_rwlock_wrlock(&g_rwLock);
