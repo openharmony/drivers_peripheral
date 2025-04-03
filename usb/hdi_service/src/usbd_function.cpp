@@ -294,6 +294,16 @@ int32_t UsbdFunction::SetFunctionToNcmHdc()
     return HDF_SUCCESS;
 }
 
+int32_t UsbdFunction::SetFunctionToDevModeAuth()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_DEVMODE_AUTH);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add devmode_auth config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbdFunction::SetFunctionToNone()
 {
     uint32_t ddkFuns = currentFuncs_ & USB_DDK_FUNCTION_SUPPORT;
@@ -579,6 +589,9 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
         case USB_FUNCTION_NCM | USB_FUNCTION_HDC:
             HDF_LOGI("%{public}s: set ncm hdc", __func__);
             return UsbdFunction::SetFunctionToNcmHdc();
+        case USB_FUNCTION_DEVMODE_AUTH:
+            HDF_LOGI("%{public}s: set devmode_auth", __func__);
+            return UsbdFunction::SetFunctionToDevModeAuth();
         default:
             HDF_LOGI("%{public}s: enable device", __func__);
             return UsbdEnableDevice(funcs);
