@@ -108,8 +108,7 @@ static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared
         if (bufferAddr != nullptr) {
             forkBuffer->SetVirAddress(bufferAddr);
             forkBuffer->SetSize(bufferSize);
-            CAMERA_LOGI("PcForkNode::DeliverBuffer malloc sucess, Address = %{public}p, SbAddr =  %{public}p",
-                forkBuffer->GetVirAddress(), forkBuffer->GetSuffaceBufferAddr());
+            CAMERA_LOGI("PcForkNode::DeliverBuffer malloc sucess");
         } else {
             CAMERA_LOGE("PcForkNode::DeliverBuffer malloc buffer fail");
             return;
