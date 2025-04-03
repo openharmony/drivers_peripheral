@@ -33,6 +33,7 @@
 #define COLUMN_INDEX_TWO 2
 #define COUNTRY_CODE_LENGTH_MAX 2
 #define CMD_SIZE 200
+#define MAX_CMD_SIZE 1024
 #define REPLY_SIZE 1024
 /* get more than 100 p2p lists */
 #define P2P_LIST_REPLY_SIZE 7168
