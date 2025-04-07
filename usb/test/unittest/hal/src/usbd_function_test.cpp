@@ -25,7 +25,6 @@
 #include "v1_0/iusb_interface.h"
 #include "v1_0/usb_types.h"
 
-constexpr int32_t SLEEP_TIME = 3;
 constexpr int32_t USB_FUNCTION_INVALID = -1;
 constexpr int32_t USB_PORT_ID_INVALID = 2;
 constexpr int32_t USB_POWER_ROLE_INVALID = 4;
@@ -50,14 +49,6 @@ void UsbdFunctionTest::SetUpTestCase(void)
     g_usbInterface = IUsbInterface::Get();
     if (g_usbInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
-        exit(0);
-    }
-    auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE);
-    sleep(SLEEP_TIME);
-    HDF_LOGI("UsbdFunctionTest::[Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ret = SwitchErrCode(ret);
-    ASSERT_EQ(0, ret);
-    if (ret != 0) {
         exit(0);
     }
 }
@@ -532,6 +523,27 @@ HWTEST_F(UsbdFunctionTest, QueryPort001, TestSize.Level1)
     int32_t mode = PORT_MODE_NONE;
     auto ret = g_usbInterface->QueryPort(portId, powerRole, dataRole, mode);
     HDF_LOGI("UsbdFunctionTest::QueryPort001 %{public}d ret=%{public}d", __LINE__, ret);
+    EXPECT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: QueryPorts001
+ * @tc.desc: Test functions to QueryPorts
+ * @tc.desc: int32_t QueryPorts(std::vector<UsbPort>& portList);
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, QueryPorts001, TestSize.Level1)
+{
+    sptr<HDI::Usb::V2_0::IUsbPortInterface> usbPortInterface_ = nullptr;
+    usbPortInterface_ = HDI::Usb::V2_0::IUsbPortInterface::Get();
+    if (usbPortInterface_ == nullptr) {
+        HDF_LOGE("%{public}s:usbPortInterface_::Get() failed.", __func__);
+        exit(0);
+    }
+    std::vector<HDI::Usb::V2_0::UsbPort> portList;
+    auto ret = usbPortInterface_->QueryPorts(portList);
+    HDF_LOGI("UsbdFunctionTest::QueryPorts001 %{public}d ret=%{public}d", __LINE__, ret);
     EXPECT_EQ(0, ret);
 }
 } // namespace

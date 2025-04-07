@@ -126,11 +126,13 @@ ohos_unittest("test_function") {
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
     "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
+    "${usb_driver_path}/hdi_service:libusb_port_interface_service_2.0",
   ]
 
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
+      "drivers_interface_usb:libusb_proxy_2.0",
       "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_host",
