@@ -416,20 +416,24 @@ int32_t InputDeviceManager::DoInputDeviceAction(void)
         return result;
     }
     AddToEpoll(mEpollId_, mInotifyId_);
+    bool hasDelOrCreate = false;
     while (true) {
         result = epoll_wait(mEpollId_, epollEventList_, EPOLL_MAX_EVENTS, EPOLL_WAIT_TIMEOUT);
         if (result <= 0) {
             continue;
         }
+        hasDelOrCreate = false;
         for (int32_t i = 0; i < result; i++) {
             if (epollEventList_[i].data.fd != mInotifyId_) {
                 DoRead(epollEventList_[i].data.fd, evtBuffer, EVENT_BUFFER_SIZE);
                 continue;
             }
-            if (INPUT_FAILURE == InotifyEventHandler(mEpollId_, mInotifyId_)) {
-                HDF_LOGE("%{public}s: inotify handler failed", __func__);
-                return INPUT_FAILURE;
-            }
+            hasDelOrCreate = true;
+        }
+        // The fd delete event occurred before the data was read
+        if (hasDelOrCreate && INPUT_FAILURE == InotifyEventHandler(mEpollId_, mInotifyId_)) {
+            HDF_LOGE("%{public}s: inotify handler failed", __func__);
+            return INPUT_FAILURE;
         }
     }
     return INPUT_SUCCESS;
