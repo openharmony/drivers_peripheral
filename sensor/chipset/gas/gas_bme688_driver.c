@@ -100,14 +100,14 @@ static int32_t BmeHalRegWriteOneByte(struct SensorCfgData *data, uint8_t rega, u
     g_regw_buffer[0] = (rega & 0xFF);
     do {
         g_regw_buffer[index + 1] = buffer;
-        index++;
+        index ++;
     } while (index < len);
 
     rc = WriteSensor(&data->busCfg, g_regw_buffer, (len + 1));
     OsalUDelay(BME688_DELAY_10);
 
     if (rc != HDF_SUCCESS) {
-        HDF_LOGE("%s: [BME688] w reg:%d err", __func__, rega);
+        HDF_LOGE("%s: [BME688] w reg:%d err:%d", __func__, rega, rc);
     }
 
     return rc;
@@ -128,7 +128,7 @@ static int32_t BmeHalRegWriteMulByte(struct SensorCfgData *data, uint8_t *rega, 
 
     do {
         rc = BmeHalRegWriteOneByte(data, rega[index], buffer[index]);
-        index++;
+        index ++;
     } while (index < len);
 
     return rc;
@@ -158,6 +158,9 @@ static int32_t Bme688HalReadSensorRawData(struct SensorCfgData *data, struct Gas
     struct GasFieldData fieldData = { 0 };
     uint8_t opMode = 0;
     int32_t ret = HDF_SUCCESS;
+
+    CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(rawData, HDF_ERR_INVALID_PARAM);
 
     ret = Bme688GetOpMode(data, &opMode);
     if ((opMode & BME68X_MODE_MSK) == BME68X_SLEEP_MODE) {
@@ -192,22 +195,22 @@ static int32_t Bme688HalReadSensorRawData(struct SensorCfgData *data, struct Gas
 
 /// @brief basic register write function
 /// @param data       Sensor configuration data structre pointer
-/// @param rega       register address
-/// @param buffer     value to write
-/// @param len        write len
-/// @return           HDF_SUCCESS if success, failed any error
+/// @param rawData    The raw data buffer need to read
+/// @param timestamp  timestamp when reading data
+/// @return           HDF_SUCCESS if success, failed any others error
 static int32_t ReadBme688RawData(struct SensorCfgData *data, struct GasData *rawData, int64_t *timestamp)
 {
     OsalTimespec time;
     uint8_t regv[GAS_PART_SUM] = {0};
     int32_t ret = HDF_SUCCESS;
-    struct GasFieldData fieldData = { 0 };
     struct GasCfg conf;
     struct bme688HeatrConf heatConf;
     (void)memset_s(&time, sizeof(time), 0, sizeof(time));
     (void)memset_s(regv, sizeof(regv), 0, sizeof(regv));
 
     CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(rawData, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(timestamp, HDF_ERR_INVALID_PARAM);
 
     if (OsalGetTime(&time) != HDF_SUCCESS) {
         HDF_LOGE("%s: Get time failed", __func__);
@@ -240,7 +243,7 @@ static int32_t ReadBme688RawData(struct SensorCfgData *data, struct GasData *raw
         ret = Bme688SetOpMode(data, BME68X_FORCED_MODE);
         g_bme688State.workState = BME688_WORK_MODE_IDLE;
     }
-    
+
     if (g_bme688State.workState == BME688_WORK_MODE_IDLE) {
         ret = Bme688HalReadSensorRawData(data, rawData);
     }
@@ -251,9 +254,9 @@ static int32_t ReadBme688RawData(struct SensorCfgData *data, struct GasData *raw
 /* read bme688 sensor data */
 static int32_t ReadBme688Data(struct SensorCfgData *cfg, struct SensorReportEvent *event)
 {
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     struct GasData rawData = {0};
-    static int16_t tmp[GAS_DEP_PART_SUM];
+    static int16_t tmp[GAS_DEP_PART_SUM] = {0};
 
     CHECK_NULL_PTR_RETURN_VALUE(cfg, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(event, HDF_ERR_INVALID_PARAM);
@@ -298,8 +301,8 @@ static int32_t Bme688SoftReset(struct SensorCfgData *data)
         HDF_LOGE("%s: bme688 write command register failed", __func__);
         return HDF_FAILURE;
     }
-    // delay 5ms after reset
-    OsalMDelay(BME688_DELAY_5);
+
+    OsalMDelay(BME688_DELAY_5); /* delay 5ms after reset */
 
     return rc;
 }
@@ -338,6 +341,7 @@ static int32_t Bme688ReadVariantId(struct SensorCfgData *data)
     }
     HDF_LOGI("%s: rc = %d, regv = 0x%x", __func__, rc, regv);
     g_bme688State.variantId = regv;
+
     return rc;
 }
 
@@ -440,7 +444,7 @@ static int32_t Bme688GetOpMode(struct SensorCfgData *data, uint8_t *opMode)
 static int32_t Bme688SetOpMode(struct SensorCfgData *data, const uint8_t opMode)
 {
     int32_t rc;
-    uint8_t tmpPowMode;
+    uint8_t tmpPowMode = 0;
     uint8_t powMode = 0;
     uint8_t regAddr = BME68X_REG_CTRL_MEAS;
 
@@ -641,7 +645,7 @@ static uint8_t BmeHalCalcResHeat(struct SensorCfgData *data, uint16_t temp)
 static uint8_t BmeHalCalcGasWait(uint16_t dur)
 {
     uint8_t factor = 0;
-    uint8_t durVal;
+    uint8_t durVal = 0;
 
     if (dur > 0xfc0) {
         durVal = 0xff;
@@ -660,7 +664,7 @@ static uint32_t Bme688GetMeasDur(struct SensorCfgData *data, const uint8_t opMod
 {
     int32_t ret = HDF_SUCCESS;
     uint32_t meas_dur = 0; /* Calculate in us */
-    uint32_t meas_cycles;
+    uint32_t meas_cycles = 0;
     uint8_t os_to_meas_cycles[6] = { 0, 1, 2, 4, 8, 16 };
 
     CHECK_NULL_PTR_RETURN_VALUE(gascfg, HDF_ERR_INVALID_PARAM);
@@ -687,7 +691,6 @@ static uint32_t Bme688GetMeasDur(struct SensorCfgData *data, const uint8_t opMod
 
     return meas_dur;
 }
-
 
 static int32_t BmeHalSetConfig(struct SensorCfgData *data, struct bme688HeatrConf *conf,
                                uint8_t opMode, uint8_t *nbConv)
@@ -723,16 +726,15 @@ static int32_t Bme688SetHeatrConfig(struct SensorCfgData *data, struct bme688Hea
 {
     int32_t rc;
     uint8_t nb_conv = 0;
-    uint8_t hctrl, run_gas = 0;
+    uint8_t hctrl = 0;
+    uint8_t run_gas = 0;
     uint8_t ctrl_gas_data[2];
     uint8_t ctrl_gas_addr[2] = { BME68X_REG_CTRL_GAS_0, BME68X_REG_CTRL_GAS_1 };
 
     CHECK_NULL_PTR_RETURN_VALUE(conf, HDF_ERR_INVALID_PARAM);
 
     rc = Bme688SetOpMode(data, BME68X_SLEEP_MODE);
-    
     rc = BmeHalSetConfig(data, conf, opMode, &nb_conv);
-
     rc = BmeHalRegRead(data, BME68X_REG_CTRL_GAS_0, ctrl_gas_data, 2);
 
     if (conf->enable == BME68X_ENABLE) {
@@ -752,7 +754,6 @@ static int32_t Bme688SetHeatrConfig(struct SensorCfgData *data, struct bme688Hea
     ctrl_gas_data[1] = BME68X_SET_BITS(ctrl_gas_data[1], BME68X_RUN_GAS, run_gas);
 
     rc = BmeHalRegWriteMulByte(data, ctrl_gas_addr, ctrl_gas_data, 2);
-
     return rc;
 }
 
@@ -772,119 +773,221 @@ static int32_t BmeHalBoundaryCheck(struct SensorCfgData *data, uint8_t *value, u
     return rc;
 }
 
-static int32_t Bme688SetConfig(struct SensorCfgData *data, struct GasCfg *gascfg)
+static int32_t PerformBoundaryChecks(struct SensorCfgData *data, struct GasCfg *gascfg)
 {
-    int32_t rc = HDF_SUCCESS;
-    uint8_t odr20 = 0, odr3 = 1;
-    uint8_t currentOpMode;
-
-    CHECK_NULL_PTR_RETURN_VALUE(gascfg, HDF_ERR_INVALID_PARAM);
-
-    uint8_t regArray[BME68X_LEN_CONFIG] = {0x71, 0x72, 0x73, 0x74, 0x75};
-    uint8_t dataArray[BME68X_LEN_CONFIG] = {0};
-
-    rc = Bme688GetOpMode(data, &currentOpMode);
-    if (rc != HDF_SUCCESS) {
-        HDF_LOGE("%s: bme688 get operation mode failed", __func__);
-    }
-
-    rc = Bme688SetOpMode(data, BME68X_SLEEP_MODE);
-    if (rc != HDF_SUCCESS) {
-        HDF_LOGE("%s: bme688 set sleep mode failed", __func__);
-    }
-
-    rc = BmeHalRegRead(data, regArray[0], dataArray, BME68X_LEN_CONFIG);
-    if (rc != HDF_SUCCESS) {
-        HDF_LOGE("%s, line : %d, bme688 read data array failed", __func__, __LINE__);
-    }
+    int32_t rc;
 
     rc = BmeHalBoundaryCheck(data, &gascfg->filter, BME68X_FILTER_SIZE_127);
-    rc = BmeHalBoundaryCheck(data, &gascfg->tempOs, BME68X_OS_16X);
-    rc = BmeHalBoundaryCheck(data, &gascfg->presOs, BME68X_OS_16X);
-    rc = BmeHalBoundaryCheck(data, &gascfg->humOs, BME68X_OS_16X);
-    rc = BmeHalBoundaryCheck(data, &gascfg->odr, BME68X_ODR_NONE);
     if (rc != HDF_SUCCESS) {
-        HDF_LOGE("%s: bme688 boundary check failed", __func__);
+        return rc;
     }
 
+    rc = BmeHalBoundaryCheck(data, &gascfg->tempOs, BME68X_OS_16X);
+    if (rc != HDF_SUCCESS) {
+        return rc;
+    }
+
+    rc = BmeHalBoundaryCheck(data, &gascfg->presOs, BME68X_OS_16X);
+    if (rc != HDF_SUCCESS) {
+        return rc;
+    }
+
+    rc = BmeHalBoundaryCheck(data, &gascfg->humOs, BME68X_OS_16X);
+    if (rc != HDF_SUCCESS) {
+        return rc;
+    }
+
+    rc = BmeHalBoundaryCheck(data, &gascfg->odr, BME68X_ODR_NONE);
+    if (rc != HDF_SUCCESS) {
+        return rc;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static void ConfigureDataArray(uint8_t *dataArray, struct GasCfg *gascfg, uint8_t *odr20, uint8_t *odr3)
+{
     dataArray[4] = BME68X_SET_BITS(dataArray[4], BME68X_FILTER, gascfg->filter);
     dataArray[3] = BME68X_SET_BITS(dataArray[3], BME68X_OST, gascfg->tempOs);
     dataArray[3] = BME68X_SET_BITS(dataArray[3], BME68X_OSP, gascfg->presOs);
     dataArray[1] = BME68X_SET_BITS_POS_0(dataArray[1], BME68X_OSH, gascfg->humOs);
+
     if (gascfg->odr != BME68X_ODR_NONE) {
-        odr20 = gascfg->odr;
-        odr3 = 0;
+        *odr20 = gascfg->odr;
+        *odr3 = 0;
     }
 
-    dataArray[4] = BME68X_SET_BITS(dataArray[4], BME68X_ODR20, odr20);
-    dataArray[0] = BME68X_SET_BITS(dataArray[0], BME68X_ODR3, odr3);
+    dataArray[4] = BME68X_SET_BITS(dataArray[4], BME68X_ODR20, *odr20);
+    dataArray[0] = BME68X_SET_BITS(dataArray[0], BME68X_ODR3, *odr3);
+}
 
-    rc = BmeHalRegWriteMulByte(data, regArray, dataArray, BME68X_LEN_CONFIG);
-    if (rc != HDF_SUCCESS) {
-        HDF_LOGE("%s: bme688 write config failed", __func__);
-    }
+static int32_t ReadAdditionalRegisters(struct SensorCfgData* data, struct GasFieldData* fieldData)
+{
+    int32_t rc = HDF_SUCCESS;
+    int32_t tempRc;
 
-    if (currentOpMode != BME68X_SLEEP_MODE) {
-        rc = Bme688SetOpMode(data, currentOpMode);
-    }
+    tempRc = BmeHalRegRead(data, BME68X_REG_RES_HEAT0 + fieldData->gas_index, &fieldData->res_heat, 1);
+    rc |= tempRc;
+
+    tempRc = BmeHalRegRead(data, BME68X_REG_IDAC_HEAT0 + fieldData->gas_index, &fieldData->idac, 1);
+    rc |= tempRc;
+
+    tempRc = BmeHalRegRead(data, BME68X_REG_GAS_WAIT0 + fieldData->gas_index, &fieldData->gas_wait, 1);
+    rc |= tempRc;
 
     return rc;
 }
 
-static int32_t BmeHalReadFieldData(struct SensorCfgData *data,
-                                   uint8_t index, struct GasFieldData *fieldData)
+static int32_t Bme688SetConfigInternal(struct SensorCfgData *data, struct GasCfg *gascfg,
+                                       int32_t *rc, uint8_t odr20, uint8_t odr3)
 {
-    uint8_t gas_range_l, gas_range_h, buff[BME68X_LEN_FIELD] = {0};
-    uint32_t adc_temp, adc_pres, tries = BME688_TRY_TIMES, rc = HDF_SUCCESS;
-    uint16_t adc_gas_res_low, adc_gas_res_high, adc_hum;
+    uint8_t regArray[BME68X_LEN_CONFIG];
+    uint8_t dataArray[BME68X_LEN_CONFIG] = {0};
+    uint8_t currentOpMode = 0;
+
+    regArray[0] = 0x71;
+    regArray[1] = 0x72;
+    regArray[2] = 0x73;
+    regArray[3] = 0x74;
+    regArray[4] = 0x75;
+
+    *rc = Bme688GetOpMode(data, &currentOpMode);
+    if (*rc != HDF_SUCCESS) {
+        HDF_LOGE("%s: bme688 get operation mode failed", __func__);
+        return *rc;
+    }
+
+    *rc = Bme688SetOpMode(data, BME68X_SLEEP_MODE);
+    if (*rc != HDF_SUCCESS) {
+        HDF_LOGE("%s: bme688 set sleep mode failed", __func__);
+        return *rc;
+    }
+
+    *rc = BmeHalRegRead(data, regArray[0], dataArray, BME68X_LEN_CONFIG);
+    if (*rc != HDF_SUCCESS) {
+        HDF_LOGE("%s, line : %d, bme688 read data array failed", __func__, __LINE__);
+        return *rc;
+    }
+
+    *rc = PerformBoundaryChecks(data, gascfg);
+    if (*rc != HDF_SUCCESS) {
+        HDF_LOGE("%s: bme688 boundary check failed", __func__);
+        return *rc;
+    }
+
+    ConfigureDataArray(dataArray, gascfg, &odr20, &odr3);
+
+    *rc = BmeHalRegWriteMulByte(data, regArray, dataArray, BME68X_LEN_CONFIG);
+    if (*rc != HDF_SUCCESS) {
+        HDF_LOGE("%s: bme688 write config failed", __func__);
+        return *rc;
+    }
+
+    if (currentOpMode != BME68X_SLEEP_MODE) {
+        *rc = Bme688SetOpMode(data, currentOpMode);
+        if (*rc != HDF_SUCCESS) {
+            HDF_LOGE("%s: bme688 restore operation mode failed", __func__);
+            return *rc;
+        }
+    }
+
+    return *rc;
+}
+
+static int32_t Bme688SetConfig(struct SensorCfgData *data, struct GasCfg *gascfg)
+{
+    int32_t rc;
+    uint8_t odr20;
+    uint8_t odr3;
+
+    rc = HDF_SUCCESS;
+    odr20 = 0;
+    odr3 = 1;
+
+    CHECK_NULL_PTR_RETURN_VALUE(gascfg, HDF_ERR_INVALID_PARAM);
+
+    return Bme688SetConfigInternal(data, gascfg, &rc, odr20, odr3);
+}
+
+static void ParseSensorData(const uint8_t* buff, struct GasFieldData* fieldData, struct Bme688GasRawData *gasRawdata)
+{
+    fieldData->status = buff[0] & BME68X_NEW_DATA_MSK;
+    fieldData->gas_index = buff[0] & BME68X_GAS_INDEX_MSK;
+    fieldData->meas_index = buff[1];
+    gasRawData->adc_pres = ((uint32_t)buff[2] * 4096) | ((uint32_t)buff[3] * 16) | ((uint32_t)buff[4] / 16);
+    gasRawData->adc_temp = ((uint32_t)buff[5] * 4096) | ((uint32_t)buff[6] * 16) | ((uint32_t)buff[7] / 16);
+    gasRawData->adc_hum = ((uint32_t)buff[8] * 256) | (uint32_t)buff[9];
+    gasRawData->adc_gas_res_low = ((uint32_t)buff[13] * 4) | ((uint32_t)buff[14] / 64);
+    gasRawData->adc_gas_res_high = ((uint32_t)buff[15] * 4) | ((uint32_t)buff[16] / 64);
+    gasRawData->gas_range_l = buff[14] & BME68X_GAS_RANGE_MSK;
+    gasRawData->gas_range_h = buff[16] & BME68X_GAS_RANGE_MSK;
+}
+
+static void UpdateFieldDataStatus(struct GasFieldData* fieldData, uint8_t statusByte)
+{
+    fieldData->status |= statusByte & BME68X_GASM_VALID_MSK;
+    fieldData->status |= statusByte & BME68X_HEAT_STAB_MSK;
+}
+
+static void CalculateGasResistance(struct SensorCfgData* data, struct GasFieldData* fieldData,
+                                   struct Bme688GasRawData *gasRawData)
+{
+    if (g_bme688State.variantId == BME68X_VARIANT_GAS_HIGH) {
+        fieldData->gas_resistance = BmeHalCalcGasResistanceHigh(gasRawData->adc_gas_res_high,
+                                                                gasRawData->gas_range_h);
+    } else {
+        fieldData->gas_resistance = BmeHalCalcGasResistanceLow(data,
+                                                               gasRawData->adc_gas_res_low,
+                                                               gasRawData->gas_range_l);
+    }
+}
+
+static int32_t BmeHalReadFieldData(struct SensorCfgData* data, uint8_t index,
+                                   struct GasFieldData* fieldData)
+{
+    uint8_t buff[BME68X_LEN_FIELD] = {0};
+    uint32_t tries = BME688_TRY_TIMES;
+    uint32_t rc = HDF_SUCCESS;
+    struct Bme688GasRawData gasRaw;
+
     CHECK_NULL_PTR_RETURN_VALUE(fieldData, HDF_ERR_INVALID_PARAM);
 
-    while ((tries) && (rc == HDF_SUCCESS)) {
-        rc = BmeHalRegRead(data, (uint8_t)(BME68X_REG_FIELD0 + index * BME68X_LEN_FIELD_OFFSET),
-                           buff, (uint16_t)BME68X_LEN_FIELD);
+    (void)memset_s(&gasRaw, sizeof(gasRaw), 0, sizeof(gasRaw));
+
+    while (tries && (rc == HDF_SUCCESS)) {
+        rc = BmeHalRegRead(data, BME68X_REG_FIELD0 + index * BME68X_LEN_FIELD_OFFSET, buff, BME68X_LEN_FIELD);
         if (rc != HDF_SUCCESS) {
-            HDF_LOGE("%s: bme688 read data failed", __func__);
-        }
-        fieldData->status = buff[0] & BME68X_NEW_DATA_MSK;
-        fieldData->gas_index = buff[0] & BME68X_GAS_INDEX_MSK;
-        fieldData->meas_index = buff[1];
-        /* read the raw data from the sensor */
-        adc_pres = (uint32_t)(((uint32_t)buff[2] * 4096) | ((uint32_t)buff[3] * 16) | ((uint32_t)buff[4] / 16));
-        adc_temp = (uint32_t)(((uint32_t)buff[5] * 4096) | ((uint32_t)buff[6] * 16) | ((uint32_t)buff[7] / 16));
-        adc_hum = (uint16_t)(((uint32_t)buff[8] * 256) | (uint32_t)buff[9]);
-        adc_gas_res_low = (uint16_t)((((uint32_t)buff[13]) * 4) | (((uint32_t)buff[14]) / 64));
-        adc_gas_res_high = (uint16_t)((((uint32_t)buff[15]) * 4) | (((uint32_t)buff[16]) / 64));
-        gas_range_l = buff[14] & BME68X_GAS_RANGE_MSK;
-        gas_range_h = buff[16] & BME68X_GAS_RANGE_MSK;
-
-        if (g_bme688State.variantId == BME68X_VARIANT_GAS_HIGH) {
-            fieldData->status |= buff[16] & BME68X_GASM_VALID_MSK;
-            fieldData->status |= buff[16] & BME68X_HEAT_STAB_MSK;
-        } else {
-            fieldData->status |= buff[14] & BME68X_GASM_VALID_MSK;
-            fieldData->status |= buff[14] & BME68X_HEAT_STAB_MSK;
-        }
-
-        if (fieldData->status & BME68X_NEW_DATA_MSK) {
-            rc = BmeHalRegRead(data, BME68X_REG_RES_HEAT0 + fieldData->gas_index, &fieldData->res_heat, 1);
-            rc |= BmeHalRegRead(data, BME68X_REG_IDAC_HEAT0 + fieldData->gas_index, &fieldData->idac, 1);
-            rc |= BmeHalRegRead(data, BME68X_REG_GAS_WAIT0 + fieldData->gas_index, &fieldData->gas_wait, 1);
-            if (rc != HDF_SUCCESS) {
-                HDF_LOGE("%s: bme688 read data failed", __func__);
-            }
-            fieldData->temperature = BmeHalCalcTemperature(data, adc_temp);
-            fieldData->pressure = BmeHalCalcPressure(data, adc_pres);
-            fieldData->humidity = BmeHalCalcHumidity(data, adc_hum);
-            if (g_bme688State.variantId == BME68X_VARIANT_GAS_HIGH) {
-                fieldData->gas_resistance = BmeHalCalcGasResistanceHigh(adc_gas_res_high, gas_range_h);
-            } else {
-                fieldData->gas_resistance = BmeHalCalcGasResistanceLow(data, adc_gas_res_low, gas_range_l);
-            }
+            HDF_LOGE("%s: Read data failed", __func__);
             break;
         }
-        OsalMDelay(BME688_DELAY_10);
-        tries--;
+
+        ParseSensorData(buff, fieldData, &gasRaw);
+
+        if (g_bme688State.variantId == BME68X_VARIANT_GAS_HIGH) {
+            UpdateFieldDataStatus(fieldData, buff[16]);
+        } else {
+            UpdateFieldDataStatus(fieldData, buff[14]);
+        }
+
+        if (!(fieldData->status & BME68X_NEW_DATA_MSK)) {
+            OsalMDelay(BME688_DELAY_10);
+            tries--;
+            continue;
+        }
+
+        rc = ReadAdditionalRegisters(data, fieldData);
+        if (rc != HDF_SUCCESS) {
+            HDF_LOGE("%s: Read additional failed", __func__);
+            break;
+        }
+
+        fieldData->temperature = BmeHalCalcTemperature(data, gasRaw.adc_temp);
+        fieldData->pressure = BmeHalCalcPressure(data, gasRaw.adc_pres);
+        fieldData->humidity = BmeHalCalcHumidity(data, gasRaw.adc_hum);
+        CalculateGasResistance(data, fieldData, &gasRaw);
+        break;
     }
+
     return rc;
 }
 
@@ -987,6 +1090,7 @@ static int32_t Bme688InitDriver(struct HdfDeviceObject *device)
     ret = Bme688SoftReset(drvData->sensorCfg);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: bme688 dump data failed!", __func__);
+        return ret;
     }
 
     // validate chip id
@@ -1034,3 +1138,4 @@ struct HdfDriverEntry g_gasBme688DevEntry = {
 };
 
 HDF_INIT(g_gasBme688DevEntry);
+
