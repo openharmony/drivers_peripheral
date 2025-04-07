@@ -501,7 +501,7 @@ static int32_t OsSubmitControlRequest(struct UsbHostRequest *request)
     ret = ioctl(fd, USBDEVFS_SUBMITURB, urb);
     if (ret < 0) {
         HDF_LOGE("%{public}s:%{public}d submiturb failed, errno = %{public}d", __func__, __LINE__, errno);
-        RawUsbMemFree(urb);
+        RawUsbMemFree(request->urbs);
         request->urbs = NULL;
         if (errno == ENODEV) {
             return HDF_DEV_ERR_NO_DEVICE;
