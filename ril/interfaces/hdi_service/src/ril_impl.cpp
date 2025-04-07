@@ -304,6 +304,40 @@ int32_t RilImpl::CleanAllConnections(int32_t slotId, int32_t serialId)
     return TaskSchedule(&Telephony::HRilManager::CleanAllConnections, slotId, serialId);
 }
 
+int32_t RilImpl::SendUrspDecodeResult(int32_t slotId,
+    int32_t serialId, const UePolicyDecodeResult &uePolicyDecodeResult)
+{
+    return HDF_SUCCESS;
+}
+ 
+int32_t RilImpl::SendUePolicySectionIdentifier(int32_t slotId, int32_t serialId,
+    const UePolicySectionIdentifier &uePolicySectionIdentifier)
+{
+    return HDF_SUCCESS;
+}
+
+int32_t RilImpl::SendImsRsdList(int32_t slotId, int32_t serialId, const ImsRsdList &imsRsdList)
+{
+    return HDF_SUCCESS;
+}
+
+int32_t RilImpl::GetNetworkSliceAllowedNssai(int32_t slotId, int32_t serialId,
+    const SyncAllowedNssaiInfo &syncAllowedNssaiInfo)
+{
+    return HDF_SUCCESS;
+}
+
+int32_t RilImpl::GetNetworkSliceEhplmn(int32_t slotId, int32_t serialId)
+{
+    return HDF_SUCCESS;
+}
+
+int32_t RilImpl::ActivatePdpContextWithApnTypesforSlice(int32_t slotId, int32_t serialId,
+    const DataCallInfoWithApnTypesforSlice &dataCallInfo)
+{
+    return HDF_SUCCESS;
+}
+
 // Modem
 int32_t RilImpl::SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst)
 {
