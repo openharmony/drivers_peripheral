@@ -2731,11 +2731,15 @@ int32_t LibusbAdapter::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, c
     });
     if (it == g_bulkManager.bulktransferVec.end()) {
         HDF_LOGE("%{public}s: Wrapper not found, device does not exist", __func__);
+        delete bulkTransfer;
+        bulkTransfer = nullptr;
         return HDF_FAILURE;
     }
     LibusbBulkWrapper* wrapper = it->second;
     if (wrapper == nullptr) {
         HDF_LOGE("%{public}s: Wrapper is nullptr", __func__);
+        delete bulkTransfer;
+        bulkTransfer = nullptr;
         return HDF_FAILURE;
     }
     bulkTransfer->busNum = dev.busNum;

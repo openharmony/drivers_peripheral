@@ -103,8 +103,8 @@ struct LibusbBulkTransfer {
     libusb_transfer *bulkTransferRef;
     sptr<Ashmem> buikAshmemRef;
     sptr<V2_0::IUsbdBulkCallback> bulkCbRef;
-    int32_t busNum;
-    int32_t devAddr;
+    int32_t busNum = 0;
+    int32_t devAddr = 0;
     bool isTransferring {false};
 };
 
@@ -256,7 +256,7 @@ private:
 private:
     std::atomic<bool> isRunning;
     std::thread eventThread;
-    libusb_hotplug_callback_handle hotplug_handle_;
+    libusb_hotplug_callback_handle hotplug_handle_ = 0;
     static std::list<sptr<V2_0::IUsbdSubscriber>> subscribers_;
     static sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber_;
     std::mutex openedFdsMutex_;
