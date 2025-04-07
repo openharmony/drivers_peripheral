@@ -620,7 +620,8 @@ bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
     int busnumFd = 0;
     int devnumFd = 0;
     char realpathStr[PATH_MAX] = {'\0'};
-    if (realpath((ttyUsbPath + BUS_NUM_STR).c_str(), realpathStr) == nullptr) {
+    if (realpath((ttyUsbPath + BUS_NUM_STR).c_str(), realpathStr) == nullptr ||
+        realpath((ttyUsbPath + DEV_NUM_STR).c_str(), realpathStr)) {
         HDF_LOGE("%{public}s : realpath failed. ret = %{public}s", __func__, strerror(errno));
         return false;
     }
