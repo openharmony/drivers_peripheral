@@ -39,7 +39,7 @@ ohos_fuzztest("huks_hdi_agreekey_fuzz") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_huks:huks_idl_headers",
+    "drivers_interface_huks:libhuks_proxy_1.1",
     "hilog:libhilog",
   ]
 
