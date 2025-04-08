@@ -61,7 +61,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiChipTest, GetCurrentModeTest, TestSize.Level1)
+HWTEST_F(WifiChipTest, GetCurrentModeTest, TestSize.Level0)
 {
     HDF_LOGI("GetCurrentModeTest started");
     uint32_t modeId = -1;
@@ -81,7 +81,7 @@ HWTEST_F(WifiChipTest, GetCurrentModeTest, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiChipTest, SetChipModeTest, TestSize.Level1)
+HWTEST_F(WifiChipTest, SetChipModeTest, TestSize.Level0)
 {
     HDF_LOGI("SetChipModeTest started");
     uint32_t modeId = UINT32_MAX;
@@ -98,7 +98,7 @@ HWTEST_F(WifiChipTest, SetChipModeTest, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiChipTest, CreateApServiceTest, TestSize.Level1)
+HWTEST_F(WifiChipTest, CreateApServiceTest, TestSize.Level0)
 {
     HDF_LOGI("CreateApServiceTest started");
     if (wifiChip == nullptr) {
@@ -127,7 +127,7 @@ HWTEST_F(WifiChipTest, CreateApServiceTest, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiChipTest, CreateP2pIfaceTest, TestSize.Level1)
+HWTEST_F(WifiChipTest, CreateP2pIfaceTest, TestSize.Level0)
 {
     HDF_LOGI("CreateP2pIfaceTest started");
     if (wifiChip == nullptr) {
@@ -155,7 +155,7 @@ HWTEST_F(WifiChipTest, CreateP2pIfaceTest, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiChipTest, CreateStaIfaceTest, TestSize.Level1)
+HWTEST_F(WifiChipTest, CreateStaIfaceTest, TestSize.Level0)
 {
     HDF_LOGI("CreateStaIfaceTest started");
     if (wifiChip == nullptr) {
