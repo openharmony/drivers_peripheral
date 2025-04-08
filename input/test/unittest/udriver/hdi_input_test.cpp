@@ -1121,7 +1121,7 @@ HWTEST_F(HdiInputTest, DoRead001, TestSize.Level1)
     InputDeviceManager iInputDeviceManager;
     iInputDeviceManager.DoRead(g_fileDescriptorFirst, evtBuffer, EVENT_BUFFER_SIZE);
     EXPECT_TRUE((g_errLog.find("DoRead") != std::string::npos) ||
-        (g_errLog.find("CheckReadResult") != std::string::npos);
+        (g_errLog.find("CheckReadResult") != std::string::npos));
 }
 
 /**
