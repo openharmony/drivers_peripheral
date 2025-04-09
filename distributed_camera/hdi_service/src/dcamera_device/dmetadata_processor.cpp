@@ -304,7 +304,7 @@ DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &
         int32_t ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(),
             OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &item);
         if (ret == CAM_META_SUCCESS && item.count != 0) {
-            extendStreamConfigs.push_back(std::stoi(key)); // mode
+            extendStreamConfigs.push_back(std::atoi(key.c_str())); // mode
         }
 
         InitBasicConfigTag(supportedFormats, streamConfigs);
@@ -786,8 +786,8 @@ void DMetadataProcessor::GetNodeSupportedResolution(int format, const std::strin
         if (reso.size() != SIZE_FMT_LEN) {
             continue;
         }
-        uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
-        uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
+        uint32_t width = static_cast<uint32_t>(std::atoi(reso[0].c_str()));
+        uint32_t height = static_cast<uint32_t>(std::atoi(reso[1].c_str()));
         if (height == 0 || width == 0 || ((rootNode == "Photo") &&
             ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
             ((rootNode != "Photo") && (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
