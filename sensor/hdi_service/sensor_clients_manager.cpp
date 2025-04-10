@@ -42,6 +42,8 @@ namespace {
     constexpr int32_t ZERO_PRINT_TIME = 0;
     constexpr int32_t MAX_PRINT_TIME = 30;
     constexpr int64_t INIT_REPORT_COUNT = 1;
+    constexpr int REPORT_INTERVAL = 0;
+    constexpr int ERROR_RETURN_VALUE = 32;
 }
 
 std::mutex SensorClientsManager::instanceMutex_;
@@ -527,6 +529,9 @@ void SensorClientsManager::HdiReportData(const sptr<V2_0::ISensorCallback> &call
     }
     if (ret != HDF_SUCCESS) {
         HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
+        if (ret == ERROR_RETURN_VALUE) {
+            DeleteService(sensorInfoId.sensorId, sensorInfoId.serviceId);
+        }
     } else {
         static std::unordered_map<int32_t, std::unordered_map<int32_t, int64_t>> sensorReportCountMap;
         auto it = sensorReportCountMap[sensorInfoId.sensorId].find(sensorInfoId.serviceId);
@@ -545,6 +550,72 @@ std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUs
 {
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     return sensorUsed_;
+}
+
+void SensorClientsManager::DeleteService(int32_t sensorId, int32_t serviceId)
+{
+    HDF_LOGD("%{public}s Delete service: %{public}d, sensorId: %{public}d", __func__, serviceId, sensorId);
+    int32_t ret = HDF_SUCCESS;
+    int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+    bool needDisableSensor = false;
+    {
+        std::unique_lock<std::mutex> lock(sensorUsedMutex_);
+        auto it = sensorUsed_.find(sensorId);
+        if (it != sensorUsed_.end()) {
+            sensorUsed_[sensorId].erase(serviceId);
+            if (sensorUsed_[sensorId].empty()) {
+                sensorUsed_.erase(sensorId);
+                sensorConfig_.erase(sensorId);
+                HDF_LOGD("%{public}s: disabled sensor %{public}d", __func__, sensorId);
+                needDisableSensor = true;
+            }
+        }
+        for (auto sid : sensorUsed_[sensorId]) {
+            HDF_LOGD("%{public}s: sensor %{public}d also is enabled by service %{public}d", __func__, sensorId, sid);
+        }
+    }
+    if (needDisableSensor) {
+        if (sensorVdiImpl_ == nullptr) {
+            HDF_LOGE("%{public}s: sensorVdiImpl_ is nullptr", __func__);
+            return;
+        }
+        if (IsExistSdcSensorEnable(sensorId)) {
+            SENSOR_TRACE_START("sensorVdiImpl_->SetSaBatch");
+            ret = sensorVdiImpl_->SetSaBatch(sensorId, REPORT_INTERVAL, REPORT_INTERVAL);
+            SENSOR_TRACE_FINISH;
+            if (ret != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: SetSaBatch failed, error code is %{public}d, sensorId = %{public}d,"
+                    "serviceId = %{public}d", __func__, ret, sensorId, serviceId);
+            }
+        } else {
+            SENSOR_TRACE_START("sensorVdiImpl_->Disable");
+            ret = sensorVdiImpl_->Disable(sensorId);
+            SENSOR_TRACE_FINISH;
+            if (ret != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: Disable failed, error code is %{public}d, sensorId = %{public}d,"
+                    "serviceId = %{public}d", __func__, ret, sensorId, serviceId);
+            }
+        }
+    }
+    EraseClients(groupId, serviceId);
+}
+
+void SensorClientsManager::EraseClients(int32_t groupId, int32_t serviceId)
+{
+    std::unique_lock<std::mutex> lock(clientsMutex_);
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
+        HDF_LOGE("%{public}s: service: %{public}d already UnRegister", __func__, serviceId);
+        return;
+    }
+
+    auto it = clients_[groupId].find(serviceId);
+    clients_[groupId].erase(it);
+    HDF_LOGI("%{public}s: service: %{public}d  UnRegisterCB Success", __func__, serviceId);
+}
+
+void SensorClientsManager::SetSensorVdiImpl(OHOS::HDI::Sensor::V1_1::ISensorInterfaceVdi *sensorVdiImpl)
+{
+    sensorVdiImpl_ = sensorVdiImpl;
 }
 
 void SensorClientsManager::ReSetSensorPrintTime(int32_t sensorId)
