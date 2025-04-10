@@ -84,6 +84,9 @@ public:
     void CopyEventData(const struct HdfSensorEvents event);
     void ReSetSensorPrintTime(int32_t sensorId);
     bool IsSensorNeedPrint(int32_t sensorId);
+    void SetSensorVdiImpl(OHOS::HDI::Sensor::V1_1::ISensorInterfaceVdi *sensorVdiImpl);
+    void EraseClients(int32_t groupId, int32_t serviceId);
+    void DeleteService(int32_t sensorId, int32_t serviceId);
     void HdiReportData(const sptr<V2_0::ISensorCallback> &callbackObj, const V2_0::HdfSensorEvents& event,
         std::string &result, const bool &oneway, SensorInfoId sensorInfoId);
 private:
@@ -97,6 +100,7 @@ private:
     std::mutex sensorPrintTimesMutex_;
     std::vector<HdfSensorInformation> sensorInfo_;
     SensorsDataPack listDump_ = {0};
+    OHOS::HDI::Sensor::V1_1::ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
 };
 
 struct BestSensorConfig {
