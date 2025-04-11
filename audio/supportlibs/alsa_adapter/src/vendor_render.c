@@ -209,6 +209,16 @@ static int32_t RenderSetChannelModeImpl(struct AlsaRender *renderIns, enum Audio
     return HDF_SUCCESS;
 }
 
+static int32_t RenderSetPauseStateImpl(struct AlsaRender *renderIns, bool pauseFlag)
+{
+    (void)pauseFlag;
+    if (renderIns == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t RenderOverrideFunc(struct AlsaRender *renderIns)
 {
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
@@ -229,6 +239,7 @@ int32_t RenderOverrideFunc(struct AlsaRender *renderIns)
         renderIns->SetMute = RenderSetMuteImpl;
         renderIns->GetChannelMode = RenderGetChannelModeImpl;
         renderIns->SetChannelMode = RenderSetChannelModeImpl;
+        renderIns->SetPauseState = RenderSetPauseStateImpl;
     }
 
     return HDF_SUCCESS;
