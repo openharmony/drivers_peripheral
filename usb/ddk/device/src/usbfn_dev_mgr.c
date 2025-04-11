@@ -238,7 +238,7 @@ const struct UsbFnDeviceMgr *UsbFnMgrDeviceCreate(
     }
 
     CreateInterface(des, fnDevMgr);
-    fnDevMgr->running = true;
+    fnDevMgr->stopping = false;
     ret = StartThreadIo(fnDevMgr);
     if (ret) {
         HDF_LOGE("%{public}s: StartThreadIo failed", __func__);
@@ -264,8 +264,8 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
     struct UsbFnDeviceMgr *fnDevMgr = (struct UsbFnDeviceMgr *)fnDevice;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
 
-    fnDevMgr->running = false;
-    while (!fnDevMgr->running) {
+    fnDevMgr->stopping = true;
+    while (fnDevMgr->running) {
         i++;
         OsalMSleep(SLEEP_TIME_OUT);
         if (i > SLEEP_TIMES) {
@@ -305,7 +305,8 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
     }
     UsbFnMemFree(fnDevMgr);
     fnDevMgr = NULL;
-    return 0;
+    HDF_LOGE("%{public}s: dev remove success", __func__);
+    return HDF_SUCCESS;
 }
 
 const struct UsbFnDeviceMgr *UsbFnMgrDeviceGet(const char *udcName)
@@ -514,14 +515,18 @@ static int32_t UsbFnEventProcess(void *arg)
     struct UsbFnEventAll event;
     struct UsbHandleMgr *handle = NULL;
     int32_t timeout = SLEEP_TIME_OUT;
-
+    if (devMgr) {
+        devMgr->running = true;
+    }
+    HDF_LOGI("%{public}s, start.", __func__);
     while (true) {
-        if (devMgr == NULL || !devMgr->running) {
+        if (devMgr == NULL || devMgr->stopping) {
+            HDF_LOGW("%{public}s:%{public}d is null", __func__, __LINE__);
             break;
         }
         if (memset_s(&event, sizeof(event), 0, sizeof(event)) != EOK) {
             HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
-            return HDF_FAILURE;
+            break;
         }
 
         CollectEventHandle(&event, devMgr);
@@ -530,7 +535,8 @@ static int32_t UsbFnEventProcess(void *arg)
         }
         int32_t ret = fnOps->pollEvent(&event, timeout);
         if (ret != 0) {
-            if (devMgr == NULL || !devMgr->running) {
+            if (devMgr == NULL || devMgr->stopping) {
+                HDF_LOGW("%{public}s:%{public}d pollEvent after, is null", __func__, __LINE__);
                 break;
             }
             OsalMSleep(1);
@@ -548,7 +554,7 @@ static int32_t UsbFnEventProcess(void *arg)
         }
     }
     if (devMgr) {
-        devMgr->running = true;
+        devMgr->running = false;
     }
     HDF_LOGI("%{public}s, exit", __func__);
     return 0;
