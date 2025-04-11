@@ -129,7 +129,16 @@ public:
     int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key) override;
     int32_t SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t serialId, const NcfgOperatorInfo &ncfgOperatorInfo) override;
-
+    int32_t SendUrspDecodeResult(int32_t slotId, int32_t serialId,
+        const UePolicyDecodeResult &uePolicyDecodeResult) override;
+    int32_t SendUePolicySectionIdentifier(int32_t slotId, int32_t serialId,
+        const UePolicySectionIdentifier &uePolicySectionIdentifier) override;
+    int32_t SendImsRsdList(int32_t slotId, int32_t serialId, const ImsRsdList &imsRsdList) override;
+    int32_t GetNetworkSliceAllowedNssai(int32_t slotId, int32_t serialId,
+        const SyncAllowedNssaiInfo &syncAllowedNssaiInfo) override;
+    int32_t GetNetworkSliceEhplmn(int32_t slotId, int32_t serialId) override;
+    int32_t ActivatePdpContextWithApnTypesforSlice(int32_t slotId, int32_t serialId,
+            const DataCallInfoWithApnTypesforSlice &dataCallInfo) override;
     // Network
     int32_t GetSignalStrength(int32_t slotId, int32_t serialId) override;
     int32_t GetCsRegStatus(int32_t slotId, int32_t serialId) override;
