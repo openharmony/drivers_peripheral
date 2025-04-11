@@ -152,8 +152,8 @@ static void DdkDispatchUevent(const struct DdkUeventTaskInfo *info)
 
 void TaskQueue::Init(void)
 {
-    pthread_setname_np(pthread_self(), "ueventTaskQueue");
     auto taskWork = [this]() -> void {
+        pthread_setname_np(pthread_self(), "ueventTaskQueue");
         while (threadRun_) {
             std::unique_lock<std::mutex> uniqueLock(queueLock_);
             conditionVariable_.wait(uniqueLock, [this] {

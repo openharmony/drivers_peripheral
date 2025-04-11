@@ -1031,11 +1031,10 @@ static int32_t UsbFnAdapterGetPipeInfo(int32_t ep, struct UsbFnPipeInfo * const 
 
     struct UsbEndpointDescriptor desc;
     ret = ioctl(ep, FUNCTIONFS_ENDPOINT_DESC, &desc);
-    if (ret != 0) {
-        HDF_LOGE("%{public}s: FUNCTIONFS_ENDPOINT_DESC failed", __func__);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: GetPipeInfo failed, ret: %{public}d, errno: %{public}d", __func__, ret, errno);
         return HDF_ERR_IO;
     }
-
     pipeInfo->type = desc.bmAttributes;
     pipeInfo->dir = USB_PIPE_DIRECTION_OUT;
     if (desc.bEndpointAddress & 0x80) {
