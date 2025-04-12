@@ -31,6 +31,12 @@
 #include "common/wpa_ctrl.h"
 #include "securec.h"
 
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD001560
+
+#undef LOG_TAG
+#define LOG_TAG "HdiHostapdHal"
+
 #ifdef OHOS_EUPDATER
 #define CONFIG_ROOR_DIR "/tmp/service/el1/public/wifi"
 #else
@@ -298,10 +304,18 @@ static int InitHostapdHal(int id)
 static int EnableAp(int id)
 {
     char cmdAdd[BUFSIZE_CMD] = {0};
+    char cmdSet[BUFSIZE_CMD] = {0};
     char cmdEnable[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
-    if (sprintf_s(cmdAdd, sizeof(cmdAdd), "ADD %s config=%s wpa_passphrase=%s pass_length=%d",
-        g_apIfaceName, g_hostapdCfg, g_hostapdPasswd, strlen(g_hostapdPasswd)) < 0) {
+    if (sprintf_s(cmdSet, sizeof(cmdSet), "SET_WPA_PASS %s", g_hostapdPasswd) < 0) {
+        HDF_LOGE("set ap passphrase sprintf_s fail");
+        return -1;
+    }
+    if (WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmdSet, buf, sizeof(buf)) < 0) {
+        HDF_LOGE("set ap passphrase failed");
+        return -1;
+    }
+    if (sprintf_s(cmdAdd, sizeof(cmdAdd), "ADD %s config=%s", g_apIfaceName, g_hostapdCfg) < 0) {
         HDF_LOGE("add config sprintf_s fail");
         return -1;
     }
