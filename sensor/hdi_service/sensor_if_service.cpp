@@ -97,6 +97,7 @@ int32_t SensorIfService::GetSensorVdiImpl()
         return HDF_FAILURE;
     }
 
+    SensorClientsManager::GetInstance()->SetSensorVdiImpl(sensorVdiImpl_);
     return HDF_SUCCESS;
 }
 
