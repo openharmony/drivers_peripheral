@@ -68,7 +68,7 @@ int32_t UsbPortImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t data
     } else {
         ret = V1_2::UsbdPort::GetInstance().SetUsbPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
     }
- 
+
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:SetUsbPort failed, ret:%{public}d", __func__, ret);
         return ret;
