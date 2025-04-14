@@ -794,7 +794,7 @@ static bool IsNotMock()
  * @tc.desc: Test functions of PowerSupplyProvider
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, ProviderIsNotNull, TestSize.Level1)
+HWTEST_F(HdiServiceTest, ProviderIsNotNull, TestSize.Level0)
 {
     ASSERT_TRUE(giver_ != nullptr);
     if (!IsNotMock()) {
@@ -809,7 +809,7 @@ HWTEST_F(HdiServiceTest, ProviderIsNotNull, TestSize.Level1)
  * @tc.desc: Test functions of ParseTemperature
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService001, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService001, TestSize.Level0)
 {
     int32_t temperature = 0;
     if (IsNotMock()) {
@@ -831,7 +831,7 @@ HWTEST_F(HdiServiceTest, HdiService001, TestSize.Level1)
  * @tc.desc: Test functions of ParseVoltage
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService002, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService002, TestSize.Level0)
 {
     int32_t voltage = 0;
     if (IsNotMock()) {
@@ -853,7 +853,7 @@ HWTEST_F(HdiServiceTest, HdiService002, TestSize.Level1)
  * @tc.desc: Test functions of ParseCapacity
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService003, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService003, TestSize.Level0)
 {
     int32_t capacity = -1;
     if (IsNotMock()) {
@@ -875,7 +875,7 @@ HWTEST_F(HdiServiceTest, HdiService003, TestSize.Level1)
  * @tc.desc: Test functions of ParseHealthState
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService004, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService004, TestSize.Level0)
 {
     int32_t healthState = -1;
     if (IsNotMock()) {
@@ -898,7 +898,7 @@ HWTEST_F(HdiServiceTest, HdiService004, TestSize.Level1)
  * @tc.desc: Test functions of ParsePluggedType
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService005, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService005, TestSize.Level0)
 {
     int32_t pluggedType = PowerSupplyProvider::PLUGGED_TYPE_NONE;
     if (IsNotMock()) {
@@ -922,7 +922,7 @@ HWTEST_F(HdiServiceTest, HdiService005, TestSize.Level1)
  * @tc.desc: Test functions of ParseChargeState
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService006, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService006, TestSize.Level0)
 {
     int32_t chargeState = PowerSupplyProvider::CHARGE_STATE_RESERVED;
     if (IsNotMock()) {
@@ -945,7 +945,7 @@ HWTEST_F(HdiServiceTest, HdiService006, TestSize.Level1)
  * @tc.desc: Test functions of ParseChargeCounter
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService007, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService007, TestSize.Level0)
 {
     int32_t chargeCounter = -1;
     if (IsNotMock()) {
@@ -967,7 +967,7 @@ HWTEST_F(HdiServiceTest, HdiService007, TestSize.Level1)
  * @tc.desc: Test functions of ParsePresent
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService008, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService008, TestSize.Level0)
 {
     int8_t present = -1;
     if (IsNotMock()) {
@@ -988,7 +988,7 @@ HWTEST_F(HdiServiceTest, HdiService008, TestSize.Level1)
  * @tc.desc: Test functions to get value of technology
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService009, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService009, TestSize.Level0)
 {
     std::string technology = "invalid";
     if (IsNotMock()) {
@@ -1011,7 +1011,7 @@ HWTEST_F(HdiServiceTest, HdiService009, TestSize.Level1)
  * @tc.desc: Test functions to get fd of socket
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService010, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService010, TestSize.Level0)
 {
     using namespace OHOS::HDI::Battery::V2_0;
 
@@ -1028,7 +1028,7 @@ HWTEST_F(HdiServiceTest, HdiService010, TestSize.Level1)
  * @tc.desc: Test functions UpdateEpollInterval when charge-online
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService011, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService011, TestSize.Level0)
 {
     const int32_t CHARGE_STATE_ENABLE = 1;
     BatteryThread bt;
@@ -1045,7 +1045,7 @@ HWTEST_F(HdiServiceTest, HdiService011, TestSize.Level1)
  * @tc.desc: Test functions UpdateEpollInterval when charge-offline
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService012, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService012, TestSize.Level0)
 {
     const int32_t CHARGE_STATE_NONE = 0;
     BatteryThread bt;
@@ -1062,7 +1062,7 @@ HWTEST_F(HdiServiceTest, HdiService012, TestSize.Level1)
  * @tc.desc: Test functions Init
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService013, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService013, TestSize.Level0)
 {
     void* service = nullptr;
     BatteryThread bt;
@@ -1080,7 +1080,7 @@ HWTEST_F(HdiServiceTest, HdiService013, TestSize.Level1)
  * @tc.desc: Test functions of ParseTotalEnergy
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService023, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService023, TestSize.Level0)
 {
     int32_t totalEnergy = 0;
     if (IsNotMock()) {
@@ -1102,7 +1102,7 @@ HWTEST_F(HdiServiceTest, HdiService023, TestSize.Level1)
  * @tc.desc: Test functions of ParseCurrentAverage
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService024, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService024, TestSize.Level0)
 {
     int32_t currentAvg = HDF_FAILURE;
     if (IsNotMock()) {
@@ -1124,7 +1124,7 @@ HWTEST_F(HdiServiceTest, HdiService024, TestSize.Level1)
  * @tc.desc: Test functions of ParseCurrentNow
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService025, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService025, TestSize.Level0)
 {
     int32_t currentNow = 0;
     if (IsNotMock()) {
@@ -1146,7 +1146,7 @@ HWTEST_F(HdiServiceTest, HdiService025, TestSize.Level1)
  * @tc.desc: Test functions of ParseChargeNow
  * @tc.type: FUNC
  */
-HWTEST_F(HdiServiceTest, HdiService026, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService026, TestSize.Level0)
 {
     int32_t chargeNow = 0;
     if (IsNotMock()) {
