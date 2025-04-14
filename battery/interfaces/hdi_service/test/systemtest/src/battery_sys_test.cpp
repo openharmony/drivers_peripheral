@@ -34,7 +34,7 @@ namespace {
  * @tc.type: FUNC
  */
 
-HWTEST_F(BatterySysTest, BatterySysTest_01, TestSize.Level1)
+HWTEST_F(BatterySysTest, BatterySysTest_01, TestSize.Level0)
 {
     ASSERT_TRUE(g_batteryconfig.ParseConfig());
 }
@@ -46,7 +46,7 @@ HWTEST_F(BatterySysTest, BatterySysTest_01, TestSize.Level1)
  * @tc.type: FUNC
  */
 
-HWTEST_F(BatterySysTest, BatterySysTest_02, TestSize.Level1)
+HWTEST_F(BatterySysTest, BatterySysTest_02, TestSize.Level0)
 {
     BATTERY_HILOGD(LABEL_TEST, "BatteryConfig002 begin");
     const std::vector<BatteryConfig::LightConfig> lightConf = g_batteryconfig.GetLightConfig();
@@ -71,7 +71,7 @@ HWTEST_F(BatterySysTest, BatterySysTest_02, TestSize.Level1)
  * @tc.desc: test power conf
  * @tc.type: FUNC
  */
-HWTEST_F(BatterySysTest, BatteryConfig001, TestSize.Level1)
+HWTEST_F(BatterySysTest, BatteryConfig001, TestSize.Level0)
 {
     BATTERY_HILOGI(LABEL_TEST, "BatteryConfig001 begin");
     const std::map<std::string, BatteryConfig::ChargeSceneConfig>
@@ -95,7 +95,7 @@ HWTEST_F(BatterySysTest, BatteryConfig001, TestSize.Level1)
  * @tc.desc: test refactor GetChargerConf
  * @tc.type: FUNC
  */
-HWTEST_F(BatterySysTest, BatteryConfig002, TestSize.Level1)
+HWTEST_F(BatterySysTest, BatteryConfig002, TestSize.Level0)
 {
     BATTERY_HILOGI(LABEL_TEST, "BatteryConfig002 begin");
     const BatteryConfig::ChargerConfig chargerConf = g_batteryconfig.GetChargerConfig();
