@@ -211,7 +211,6 @@ void UsbdPort::setPortPath(const std::string &path)
         }
     }
     closedir(dir);
-
 }
 
 int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole)
