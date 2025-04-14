@@ -31,6 +31,12 @@
 #include "common/wpa_ctrl.h"
 #include "securec.h"
 
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD001560
+
+#undef LOG_TAG
+#define LOG_TAG "HdiHostapdHal"
+
 #ifdef OHOS_EUPDATER
 #define CONFIG_ROOR_DIR "/tmp/service/el1/public/wifi"
 #else
@@ -76,6 +82,7 @@ static char g_ctrlInterfacel[CTRL_LEN];
 static char g_hostapdCfg[CTRL_LEN];
 static char g_apIfaceName[IFACENAME_LEN];
 static char g_apCfgName[CFGNAME_LEN];
+static char g_hostapdPasswd[CTRL_LEN];
 #endif
 
 static pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -297,8 +304,17 @@ static int InitHostapdHal(int id)
 static int EnableAp(int id)
 {
     char cmdAdd[BUFSIZE_CMD] = {0};
+    char cmdSet[BUFSIZE_CMD] = {0};
     char cmdEnable[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
+    if (sprintf_s(cmdSet, sizeof(cmdSet), "SET_WPA_PASS %s", g_hostapdPasswd) < 0) {
+        HDF_LOGE("set ap passphrase sprintf_s fail");
+        return -1;
+    }
+    if (WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmdSet, buf, sizeof(buf)) < 0) {
+        HDF_LOGE("set ap passphrase failed");
+        return -1;
+    }
     if (sprintf_s(cmdAdd, sizeof(cmdAdd), "ADD %s config=%s", g_apIfaceName, g_hostapdCfg) < 0) {
         HDF_LOGE("add config sprintf_s fail");
         return -1;
@@ -453,14 +469,15 @@ static int SetApPasswd(const char *pass, int id)
         HDF_LOGE("SetApPasswd pass is null");
         return -1;
     }
-    char cmd[BUFSIZE_CMD] = {0};
-    char buf[BUFSIZE_REQUEST_SMALL] = {0};
-
-    if (sprintf_s(cmd, sizeof(cmd), "SET wpa_passphrase %s", pass) < 0) {
-        HDF_LOGE("SetApPasswd sprintf_s fail");
+    if (memset_s(g_hostapdPasswd, CTRL_LEN, 0, strlen(g_hostapdPasswd)) != 0) {
+        HDF_LOGE("SetApPasswd memset_s is null");
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    if (memcpy_s(g_hostapdPasswd, CTRL_LEN, pass, strlen(pass)) != 0) {
+        HDF_LOGE("SetApPasswd memcpy_s fail");
+        return -1;
+    }
+    return 0;
 }
 
 static int SetApChannel(int channel, int id)
