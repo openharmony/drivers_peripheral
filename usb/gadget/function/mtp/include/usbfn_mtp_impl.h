@@ -115,6 +115,7 @@ struct UsbMtpPort {
     bool suspended;
     bool startDelayed;
     int32_t refCount;
+    bool isActive;
 };
 
 struct UsbMtpDevice {
