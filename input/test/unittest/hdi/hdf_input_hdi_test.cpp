@@ -129,7 +129,7 @@ static void CloseOnlineDev(std::vector<DevDesc> sta)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetInputClient001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetInputClient001, TestSize.Level0)
 {
     ASSERT_NE(nullptr, g_inputInterfaces);
 }
@@ -140,7 +140,7 @@ HWTEST_F(HdfInputHdiTest, GetInputClient001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, ScanInputDevice001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, ScanInputDevice001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -165,7 +165,7 @@ HWTEST_F(HdfInputHdiTest, ScanInputDevice001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, OpenInputDevice001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, OpenInputDevice001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -186,7 +186,7 @@ HWTEST_F(HdfInputHdiTest, OpenInputDevice001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, OpenInputDevice002, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, OpenInputDevice002, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -208,7 +208,7 @@ HWTEST_F(HdfInputHdiTest, OpenInputDevice002, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, CloseInputDevice001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, CloseInputDevice001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -229,7 +229,7 @@ HWTEST_F(HdfInputHdiTest, CloseInputDevice001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, CloseInputDevice002, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, CloseInputDevice002, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -251,7 +251,7 @@ HWTEST_F(HdfInputHdiTest, CloseInputDevice002, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetInputDevice001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetInputDevice001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -284,7 +284,7 @@ HWTEST_F(HdfInputHdiTest, GetInputDevice001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetInputDeviceList001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetInputDeviceList001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -318,7 +318,7 @@ HWTEST_F(HdfInputHdiTest, GetInputDeviceList001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetDeviceType001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetDeviceType001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -344,7 +344,7 @@ HWTEST_F(HdfInputHdiTest, GetDeviceType001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetChipInfo001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetChipInfo001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -370,7 +370,7 @@ HWTEST_F(HdfInputHdiTest, GetChipInfo001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetInputDevice002, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetInputDevice002, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -398,7 +398,7 @@ HWTEST_F(HdfInputHdiTest, GetInputDevice002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, RegisterCallback001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, RegisterCallback001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -420,7 +420,7 @@ HWTEST_F(HdfInputHdiTest, RegisterCallback001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, SetPowerStatus001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, SetPowerStatus001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -443,7 +443,7 @@ HWTEST_F(HdfInputHdiTest, SetPowerStatus001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, SetPowerStatus002, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, SetPowerStatus002, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -466,7 +466,7 @@ HWTEST_F(HdfInputHdiTest, SetPowerStatus002, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetPowerStatus001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetPowerStatus001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -492,7 +492,7 @@ HWTEST_F(HdfInputHdiTest, GetPowerStatus001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetPowerStatus002, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetPowerStatus002, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -516,7 +516,7 @@ HWTEST_F(HdfInputHdiTest, GetPowerStatus002, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetVendorName001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetVendorName001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -542,7 +542,7 @@ HWTEST_F(HdfInputHdiTest, GetVendorName001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetVendorName002, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetVendorName002, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -566,7 +566,7 @@ HWTEST_F(HdfInputHdiTest, GetVendorName002, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetChipName001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetChipName001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -592,7 +592,7 @@ HWTEST_F(HdfInputHdiTest, GetChipName001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, GetChipName002, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, GetChipName002, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -616,7 +616,7 @@ HWTEST_F(HdfInputHdiTest, GetChipName002, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, SetGestureMode001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, SetGestureMode001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -639,7 +639,7 @@ HWTEST_F(HdfInputHdiTest, SetGestureMode001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, SetGestureMode002, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, SetGestureMode002, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -662,7 +662,7 @@ HWTEST_F(HdfInputHdiTest, SetGestureMode002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, RunCapacitanceTest001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, RunCapacitanceTest001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -686,7 +686,7 @@ HWTEST_F(HdfInputHdiTest, RunCapacitanceTest001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, RunExtraCommand001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, RunExtraCommand001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -711,7 +711,7 @@ HWTEST_F(HdfInputHdiTest, RunExtraCommand001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, RegisterCallbackAndReportData001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, RegisterCallbackAndReportData001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -736,7 +736,7 @@ HWTEST_F(HdfInputHdiTest, RegisterCallbackAndReportData001, TestSize.Level1)
   * @tc.type: func
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, UnregisterReportCallback001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, UnregisterReportCallback001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
@@ -764,7 +764,7 @@ HWTEST_F(HdfInputHdiTest, UnregisterReportCallback001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require:
   */
-HWTEST_F(HdfInputHdiTest, HotPlugCallback001, TestSize.Level1)
+HWTEST_F(HdfInputHdiTest, HotPlugCallback001, TestSize.Level0)
 {
     if (g_inputInterfaces == nullptr) {
         ASSERT_NE(nullptr, g_inputInterfaces);
