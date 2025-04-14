@@ -68,7 +68,7 @@ namespace {
  * @tc.desc: Test limit charging current
  * @tc.type: FUNC
  */
-HWTEST_F (HdiInterfaceTest, HdiInterfaceTest001, TestSize.Level1)
+HWTEST_F (HdiInterfaceTest, HdiInterfaceTest001, TestSize.Level0)
 {
     std::string currentPath = "/data/service/el0/battery/current_limit";
     CreateFile(currentPath, "");
@@ -104,7 +104,7 @@ HWTEST_F (HdiInterfaceTest, HdiInterfaceTest001, TestSize.Level1)
  * @tc.desc: Test limit charging voltage
  * @tc.type: FUNC
  */
-HWTEST_F (HdiInterfaceTest, HdiInterfaceTest002, TestSize.Level1)
+HWTEST_F (HdiInterfaceTest, HdiInterfaceTest002, TestSize.Level0)
 {
     std::string voltagePath = "/data/service/el0/battery/voltage_limit";
     CreateFile(voltagePath, "");

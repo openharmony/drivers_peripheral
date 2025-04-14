@@ -139,7 +139,7 @@ namespace {
   * @tc.desc: Get a client and check whether the client is empty.
   * @tc.type: FUNC
   */
-HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest001, TestSize.Level1)
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest001, TestSize.Level0)
 {
     ASSERT_NE(nullptr, g_thermalInterface);
 }
@@ -149,7 +149,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest001, TestSize.Level1)
   * @tc.desc: set cpu freq
   * @tc.type: FUNC
   */
-HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest002: start.");
     int32_t cpuFreq = 1994100;
@@ -181,7 +181,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
   * @tc.desc: set gpu freq
   * @tc.type: FUNC
   */
-HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level1)
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest003: start.");
     int32_t gpuFreq = 40000;
@@ -213,7 +213,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level1)
   * @tc.desc: set battery current
   * @tc.type: FUNC
   */
-HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest004, TestSize.Level1)
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest004, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest004: start.");
     int32_t batteryCurrent = 1000;
@@ -245,7 +245,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest004, TestSize.Level1)
   * @tc.desc: get thermal zone info
   * @tc.type: FUNC
   */
-HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest005, TestSize.Level1)
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest005, TestSize.Level0)
 {
     HdfThermalCallbackInfo event;
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest005: start.");
@@ -263,7 +263,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest005, TestSize.Level1)
   * @tc.desc: register callback
   * @tc.type: FUNC
   */
-HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest006, TestSize.Level1)
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest006, TestSize.Level0)
 {
     HdfThermalCallbackInfo event;
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest006: start.");
@@ -279,7 +279,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest006, TestSize.Level1)
   * @tc.desc: isolate cpu num
   * @tc.type: FUNC
   */
-HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest007, TestSize.Level1)
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest007, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest007: start.");
     int32_t isolateNum = 2;
@@ -310,7 +310,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest007, TestSize.Level1)
   * @tc.desc: register fan callback
   * @tc.type: FUNC
   */
-HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest008, TestSize.Level1)
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest008, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest008: start.");
     int32_t ret = g_thermalInterface->RegisterFanCallback(g_fanCallback);
