@@ -47,7 +47,12 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
     ]
   }
 
-  install_images = [ chipset_base_dir, updater_vendor_base_dir ]
+  install_images = [ chipset_base_dir ]
+  if (defined(global_parts_info.updater_updater_chip_ext)) {
+    install_images += [ updater_vendor_base_dir ]
+  } else {
+    install_images += [ "updater" ]
+  }
   subsystem_name = "hdf"
   innerapi_tags = [ "passthrough_indirect" ]
   part_name = "drivers_peripheral_input"
