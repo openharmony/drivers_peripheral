@@ -908,7 +908,12 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceParseEachPipe(struct UsbMtpInterface &iface)
         int32_t ret = UsbFnGetInterfacePipeInfo(fnIface, static_cast<uint8_t>(i), &pipeInfo);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: get pipe info error", __func__);
-            return ret;
+            if (repetIdx < WAIT_UDC_MAX_LOOP) {
+                usleep(WAIT_UDC_TIME);
+                i--;
+            }
+            repetIdx++;
+            continue;
         }
         HDF_LOGI("%{public}s: pipe: id=%{public}d type=%{public}d dir=%{public}d max=%{public}d interval=%{public}d",
             __func__, pipeInfo.id, pipeInfo.type, pipeInfo.dir, pipeInfo.maxPacketSize, pipeInfo.interval);
@@ -930,11 +935,6 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceParseEachPipe(struct UsbMtpInterface &iface)
                 }
                 break;
             default:
-                if (repetIdx < WAIT_UDC_MAX_LOOP) {
-                    usleep(WAIT_UDC_TIME);
-                    i--;
-                }
-                repetIdx++;
                 HDF_LOGE("%{public}s: pipe type %{public}d don't support", __func__, pipeInfo.type);
                 break;
         }
@@ -1059,6 +1059,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceAlloc()
         HDF_LOGE("%{public}s: Alloc usb mtpDev mtpPort failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    mtpPort->isActive = false;
     DListHeadInit(&mtpPort->readPool);
     DListHeadInit(&mtpPort->readQueue);
     DListHeadInit(&mtpPort->writePool);
@@ -1212,36 +1213,56 @@ int32_t UsbfnMtpImpl::Release()
 
 int32_t UsbfnMtpImpl::Start()
 {
-    pthread_rwlock_wrlock(&mtpRunrwLock_);
+    HDF_LOGI("%{public}s: start", __func__);
+    pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
+    if (mtpPort_->isActive) {
+        sem_post(&asyncReq_);
+        (void)UsbMtpPortCancelRequest(mtpPort_);
+        pthread_rwlock_unlock(&mtpRunrwLock_);
+        HDF_LOGI("%{public}s: is active end", __func__);
+        return HDF_SUCCESS;
+    }
+    pthread_rwlock_unlock(&mtpRunrwLock_);
+
+    pthread_rwlock_wrlock(&mtpRunrwLock_);
     std::lock_guard<std::mutex> guard(startMutex_);
     mtpDev_->mtpState = MTP_STATE_READY;
     mtpPort_->startDelayed = true;
+    mtpPort_->isActive = true;
     int32_t ret = UsbMtpPortInitIo();
     pthread_rwlock_unlock(&mtpRunrwLock_);
+    HDF_LOGI("%{public}s: end", __func__);
     return ret;
 }
 
 int32_t UsbfnMtpImpl::Stop()
 {
-    pthread_rwlock_wrlock(&mtpRunrwLock_);
+    HDF_LOGI("%{public}s: start", __func__);
+    pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
+    sem_post(&asyncReq_);
+    (void)UsbMtpPortCancelRequest(mtpPort_);
+    pthread_rwlock_unlock(&mtpRunrwLock_);
+
+    pthread_rwlock_wrlock(&mtpRunrwLock_);
     std::lock_guard<std::mutex> guard(startMutex_);
     (void)UsbMtpPortReleaseIo();
     mtpPort_->startDelayed = false;
-
+    mtpPort_->isActive = false;
     if (mtpDev_ != nullptr) {
         mtpDev_->mtpState = MTP_STATE_OFFLINE;
     }
     pthread_rwlock_unlock(&mtpRunrwLock_);
+    HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
 
