@@ -66,7 +66,7 @@ namespace {
   * @tc.desc: Get a client and check whether the client is empty.
   * @tc.type: FUNC
   */
-HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest001, TestSize.Level1)
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest001, TestSize.Level0)
 {
     ASSERT_NE(nullptr, g_powerInterface);
 }
@@ -76,7 +76,7 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest001, TestSize.Level1)
   * @tc.desc: check startsuspend
   * @tc.type: FUNC
   */
-HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest002, TestSize.Level1)
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest002, TestSize.Level0)
 {
     int32_t ret = g_powerInterface->StartSuspend();
     EXPECT_EQ(0, ret);
@@ -98,7 +98,7 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest002, TestSize.Level1)
   * @tc.desc: check StopSuspend
   * @tc.type: FUNC
   */
-HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest003, TestSize.Level1)
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest003, TestSize.Level0)
 {
     int32_t ret = g_powerInterface->StopSuspend();
     EXPECT_EQ(0, ret) << "HdfPowerHdiTest003 failed";
@@ -109,7 +109,7 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest003, TestSize.Level1)
   * @tc.desc: check SuspendBlock
   * @tc.type: FUNC
   */
-HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest005, TestSize.Level1)
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest005, TestSize.Level0)
 {
     std::string testName = "HdfPowerHdiTest005";
     int32_t ret = g_powerInterface->SuspendBlock(testName);
@@ -134,7 +134,7 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest005, TestSize.Level1)
   * @tc.desc: check SuspendUnblock
   * @tc.type: FUNC
   */
-HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest006, TestSize.Level1)
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest006, TestSize.Level0)
 {
     std::string testName = "HdfPowerHdiTest006";
     g_powerInterface->SuspendBlock(testName);
@@ -160,7 +160,7 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest006, TestSize.Level1)
   * @tc.desc: check GetWakeupReason
   * @tc.type: FUNC
   */
-HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest007, TestSize.Level1)
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest007, TestSize.Level0)
 {
     std::string testName = "HdfPowerHdiTest007";
     int32_t ret = g_powerInterface->GetWakeupReason(testName);
@@ -176,7 +176,7 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest007, TestSize.Level1)
   * @tc.desc: check GetWakeupReason
   * @tc.type: FUNC
   */
-HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest008, TestSize.Level1)
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest008, TestSize.Level0)
 {
     std::string testName = "HdfPowerHdiTest008";
     RunningLockInfo filledInfo;

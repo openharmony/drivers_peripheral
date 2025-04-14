@@ -60,7 +60,7 @@ namespace {
  * @tc.desc: Tests that the created thread is running properly
  * @tc.type: FUNC
  */
-HWTEST_F(HdfThermalLogTest, HdfThermalLogTest001, TestSize.Level1)
+HWTEST_F(HdfThermalLogTest, HdfThermalLogTest001, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest001: start.");
     auto &hdfLog = ThermalDfx::GetInstance();
@@ -77,7 +77,7 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest001, TestSize.Level1)
  * @tc.desc: Tests that the GetIntParameter Limiting minimum
  * @tc.type: FUNC
  */
-HWTEST_F(HdfThermalLogTest, HdfThermalLogTest002, TestSize.Level1)
+HWTEST_F(HdfThermalLogTest, HdfThermalLogTest002, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest002: start.");
     auto &hdfLog = ThermalDfx::GetInstance();
@@ -99,7 +99,7 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest002, TestSize.Level1)
  * @tc.desc: Tests that the WidthWatchCallback Limiting minimum
  * @tc.type: FUNC
  */
-HWTEST_F(HdfThermalLogTest, HdfThermalLogTest003, TestSize.Level1)
+HWTEST_F(HdfThermalLogTest, HdfThermalLogTest003, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest003: start.");
     auto &hdfLog = ThermalDfx::GetInstance();
@@ -122,7 +122,7 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest003, TestSize.Level1)
  * @tc.desc: Tests that the WidthWatchCallback abnormal value
  * @tc.type: FUNC
  */
-HWTEST_F(HdfThermalLogTest, HdfThermalLogTest004, TestSize.Level1)
+HWTEST_F(HdfThermalLogTest, HdfThermalLogTest004, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest004: start.");
     auto &hdfLog = ThermalDfx::GetInstance();
@@ -140,7 +140,7 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest004, TestSize.Level1)
  * @tc.desc: Tests that the IntervalWatchCallback Limiting minimum
  * @tc.type: FUNC
  */
-HWTEST_F(HdfThermalLogTest, HdfThermalLogTest005, TestSize.Level1)
+HWTEST_F(HdfThermalLogTest, HdfThermalLogTest005, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest005: start.");
     auto &hdfLog = ThermalDfx::GetInstance();
@@ -163,7 +163,7 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest005, TestSize.Level1)
  * @tc.desc: Tests that the IntervalWatchCallback abnormal value
  * @tc.type: FUNC
  */
-HWTEST_F(HdfThermalLogTest, HdfThermalLogTest006, TestSize.Level1)
+HWTEST_F(HdfThermalLogTest, HdfThermalLogTest006, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest006: start.");
     auto &hdfLog = ThermalDfx::GetInstance();
@@ -181,7 +181,7 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest006, TestSize.Level1)
  * @tc.desc: Tests that the EnableWatchCallback The thread starts and stops normally
  * @tc.type: FUNC
  */
-HWTEST_F(HdfThermalLogTest, HdfThermalLogTest007, TestSize.Level1)
+HWTEST_F(HdfThermalLogTest, HdfThermalLogTest007, TestSize.Level0)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest007: start.");
     auto &hdfLog = ThermalDfx::GetInstance();

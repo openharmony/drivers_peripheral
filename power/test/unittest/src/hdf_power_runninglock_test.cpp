@@ -49,7 +49,7 @@ namespace {
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest001, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest001, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -66,7 +66,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest002, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest002, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -83,7 +83,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest003, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest003, TestSize.Level0)
 {
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = "";
@@ -99,7 +99,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest004, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest004, TestSize.Level0)
 {
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = runnninglockNameLabel + "normal.4";
@@ -115,7 +115,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest004, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest005, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest005, TestSize.Level0)
 {
     RunningLockType setLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
     std::string setLockNameOne = runnninglockNameLabel + "phone.5";
@@ -168,7 +168,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest005, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest006, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest006, TestSize.Level0)
 {
     RunningLockType setLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION;
     std::string setLockNameOne = runnninglockNameLabel + "notify.6";
@@ -221,7 +221,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest006, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest007, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest007, TestSize.Level0)
 {
     RunningLockType setLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO;
     std::string setLockNameOne = runnninglockNameLabel + "audio.7";
@@ -274,7 +274,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest007, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest008, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest008, TestSize.Level0)
 {
     RunningLockType setLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
     std::string setLockNameOne = runnninglockNameLabel + "sport.8";
@@ -327,7 +327,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest008, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest009, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest009, TestSize.Level0)
 {
     RunningLockType setLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION;
     std::string setLockNameOne = runnninglockNameLabel + "navi.9";
@@ -380,7 +380,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest009, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest010, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest010, TestSize.Level0)
 {
     RunningLockType setLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     std::string setLockNameOne = runnninglockNameLabel + "task.10";
@@ -433,7 +433,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest010, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest011, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest011, TestSize.Level0)
 {
     RunningLockType setLockType = static_cast<RunningLockType>(0);
     std::string setLockName = runnninglockNameLabel + "zero.11";
@@ -459,7 +459,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest011, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest012, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest012, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::SLEEP;
     std::string setLockName = runnninglockNameLabel + "sleep.12";
@@ -493,7 +493,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest012, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::INACTIVE;
     std::string setLockName = runnninglockNameLabel + "inactive.13";
@@ -548,7 +548,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest014, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest014, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -611,7 +611,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest014, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest015, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest015, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -674,7 +674,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest015, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest016, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest016, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -732,7 +732,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest016, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest017, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest017, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -790,7 +790,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest017, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest018, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest018, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -857,7 +857,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest018, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest019, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest019, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -888,7 +888,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest019, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest020, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest020, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -917,7 +917,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest020, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI6IU18
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest021, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest021, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
@@ -954,7 +954,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest021, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: issueI9C4GG
   */
-HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest022, TestSize.Level1)
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest022, TestSize.Level0)
 {
     PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo1 {};
