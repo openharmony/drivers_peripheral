@@ -597,8 +597,8 @@ void DStreamOperator::GetCameraAttr(cJSON *rootValue, std::string formatStr, con
         if (reso.size() != SIZE_FMT_LEN) {
             continue;
         }
-        uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
-        uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
+        uint32_t width = static_cast<uint32_t>(std::atoi(reso[0].c_str()));
+        uint32_t height = static_cast<uint32_t>(std::atoi(reso[1].c_str()));
         if (height == 0 || width == 0 ||
             ((rootNode == "Photo") &&
                 ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
