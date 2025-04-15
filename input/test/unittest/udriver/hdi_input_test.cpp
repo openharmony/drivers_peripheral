@@ -1051,7 +1051,7 @@ HWTEST_F(HdiInputTest, UnregisterHotPlugCallback001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, SendHotPlugEvent001, TestSize.Level0)
+HWTEST_F(HdiInputTest, SendHotPlugEvent001, TestSize.Level1)
 {
     printf("%s: [Input] SendHotPlugEvent001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1066,7 +1066,7 @@ HWTEST_F(HdiInputTest, SendHotPlugEvent001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, DoWithEventDeviceAdd001, TestSize.Level0)
+HWTEST_F(HdiInputTest, DoWithEventDeviceAdd001, TestSize.Level1)
 {
     printf("%s: [Input] DoWithEventDeviceAdd001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1081,7 +1081,7 @@ HWTEST_F(HdiInputTest, DoWithEventDeviceAdd001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level0)
+HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level1)
 {
     printf("%s: [Input] DoWithEventDeviceDel001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1096,7 +1096,7 @@ HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level0)
+HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level1)
 {
     printf("%s: [Input] ReportEventPkg001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1113,7 +1113,7 @@ HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, DoRead001, TestSize.Level0)
+HWTEST_F(HdiInputTest, DoRead001, TestSize.Level1)
 {
     printf("%s: [Input] DoRead001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1130,7 +1130,7 @@ HWTEST_F(HdiInputTest, DoRead001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, InotifyEventHandler001, TestSize.Level0)
+HWTEST_F(HdiInputTest, InotifyEventHandler001, TestSize.Level1)
 {
     printf("%s: [Input] InotifyEventHandler001 enter\n", __func__);
     int32_t ret;
