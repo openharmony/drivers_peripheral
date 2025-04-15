@@ -59,7 +59,6 @@ ohos_shared_library("libcodec_hdi_omx_server") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
-      "openmax:libopenmax_static"
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -166,7 +165,6 @@ ohos_shared_library("libcodec_hdi_omx_client") {
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
-      "openmax:libopenmax_static"
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
