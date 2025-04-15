@@ -132,7 +132,7 @@ static void ReportHotPlugEventPkgCallback(const InputHotPlugEvent *msg)
   * @tc.type: FUNC
   * @tc.require: AR000F867R
   */
-HWTEST_F(HdiInputTest, ScanInputDevice001, TestSize.Level1)
+HWTEST_F(HdiInputTest, ScanInputDevice001, TestSize.Level0)
 {
     InputDevDesc sta[MAX_DEVICES];
     if (memset_s(sta, MAX_DEVICES * sizeof(InputDevDesc), 0, MAX_DEVICES * sizeof(InputDevDesc)) != EOK) {
@@ -165,7 +165,7 @@ HWTEST_F(HdiInputTest, ScanInputDevice001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F867R
   */
-HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level1)
+HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level0)
 {
     printf("%s: [Input] OpenInputDev001 enter %d\n", __func__, __LINE__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -183,7 +183,7 @@ HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F867R
   */
-HWTEST_F(HdiInputTest, OpenInputDevice002, TestSize.Level1)
+HWTEST_F(HdiInputTest, OpenInputDevice002, TestSize.Level0)
 {
     printf("%s: [Input] OpenInputDev002 enter %d\n", __func__, __LINE__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -203,7 +203,7 @@ HWTEST_F(HdiInputTest, OpenInputDevice002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F867R
   */
-HWTEST_F(HdiInputTest, OpenInputDevice003, TestSize.Level1)
+HWTEST_F(HdiInputTest, OpenInputDevice003, TestSize.Level0)
 {
     printf("%s: [Input] OpenInputDev003 enter %d\n", __func__, __LINE__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -222,7 +222,7 @@ HWTEST_F(HdiInputTest, OpenInputDevice003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F867T, AR000F8QNL
   */
-HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level1)
+HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level0)
 {
     printf("%s: [Input] CloseInputDev001 enter %d\n", __func__, __LINE__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -240,7 +240,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F867T
   */
-HWTEST_F(HdiInputTest, CloseInputDevice002, TestSize.Level1)
+HWTEST_F(HdiInputTest, CloseInputDevice002, TestSize.Level0)
 {
     printf("%s: [Input] CloseInputDev002 enter %d\n", __func__, __LINE__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -259,7 +259,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F867T
   */
-HWTEST_F(HdiInputTest, CloseInputDevice003, TestSize.Level1)
+HWTEST_F(HdiInputTest, CloseInputDevice003, TestSize.Level0)
 {
     printf("%s: [Input] CloseInputDev002 enter %d\n", __func__, __LINE__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -278,7 +278,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level0)
 {
     printf("%s: [Input] GetInputDevice001 enter %d\n", __func__, __LINE__);
     InputDeviceInfo *dev = nullptr;
@@ -302,7 +302,7 @@ HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level0)
 {
     printf("%s: [Input] GetInputDevice002 enter %d\n", __func__, __LINE__);
     InputDeviceInfo *dev = nullptr;
@@ -321,7 +321,7 @@ HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, GetInputDevice003, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetInputDevice003, TestSize.Level0)
 {
     printf("%s: [Input] GetInputDevice003 enter %d\n", __func__, __LINE__);
     InputDeviceInfo *dev = nullptr;
@@ -340,7 +340,7 @@ HWTEST_F(HdiInputTest, GetInputDevice003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F8680
   */
-HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level0)
 {
     printf("%s: [Input] GetInputDeviceList001 enter\n", __func__);
     int32_t ret;
@@ -369,7 +369,7 @@ HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F8682, AR000F8QNL
   */
-HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
+HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level0)
 {
     printf("%s: [Input] RegisterCallbackAndReportData001 enter\n", __func__);
     int32_t ret;
@@ -396,7 +396,7 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F8682, AR000F8QNL
   */
-HWTEST_F(HdiInputTest, RegisterReportCallback001, TestSize.Level1)
+HWTEST_F(HdiInputTest, RegisterReportCallback001, TestSize.Level0)
 {
     printf("%s: [Input] RegisterReportCallback001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -415,7 +415,7 @@ HWTEST_F(HdiInputTest, RegisterReportCallback001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level1)
+HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level0)
 {
     printf("%s: [Input] UnregisterReportCallback001 enter\n", __func__);
     int32_t ret;
@@ -441,7 +441,7 @@ HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: AR000F8682, AR000F8QNL
   */
-HWTEST_F(HdiInputTest, UnRegisterReportCallback001, TestSize.Level1)
+HWTEST_F(HdiInputTest, UnRegisterReportCallback001, TestSize.Level0)
 {
     printf("%s: [Input] UnRegisterReportCallback001 enter\n", __func__);
     int32_t ret;
@@ -461,7 +461,7 @@ HWTEST_F(HdiInputTest, UnRegisterReportCallback001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, FindIndexFromFd001, TestSize.Level1)
+HWTEST_F(HdiInputTest, FindIndexFromFd001, TestSize.Level0)
 {
     printf("%s: [Input] FindIndexFromFd001 enter\n", __func__);
     int32_t ret;
@@ -481,7 +481,7 @@ HWTEST_F(HdiInputTest, FindIndexFromFd001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, FindIndexFromDevName001, TestSize.Level1)
+HWTEST_F(HdiInputTest, FindIndexFromDevName001, TestSize.Level0)
 {
     printf("%s: [Input] FindIndexFromDevName001 enter\n", __func__);
     int32_t ret;
@@ -501,7 +501,7 @@ HWTEST_F(HdiInputTest, FindIndexFromDevName001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level1)
+HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level0)
 {
     printf("%s: [Input] SetPowerStatus001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -522,7 +522,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level1)
+HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level0)
 {
     printf("%s: [Input] SetPowerStatus002 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -543,7 +543,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, SetPowerStatus003, TestSize.Level1)
+HWTEST_F(HdiInputTest, SetPowerStatus003, TestSize.Level0)
 {
     printf("%s: [Input] SetPowerStatus003 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -564,7 +564,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level0)
 {
     printf("%s: [Input] GetPowerStatus001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -585,7 +585,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level0)
 {
     printf("%s: [Input] GetPowerStatus002 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -606,7 +606,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetPowerStatus003, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetPowerStatus003, TestSize.Level0)
 {
     printf("%s: [Input] GetPowerStatus003 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -627,7 +627,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level0)
 {
     printf("%s: [Input] GetDeviceType001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -648,7 +648,7 @@ HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetDeviceType002, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetDeviceType002, TestSize.Level0)
 {
     printf("%s: [Input] GetDeviceType002 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -669,7 +669,7 @@ HWTEST_F(HdiInputTest, GetDeviceType002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetDeviceType003, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetDeviceType003, TestSize.Level0)
 {
     printf("%s: [Input] GetDeviceType003 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -690,7 +690,7 @@ HWTEST_F(HdiInputTest, GetDeviceType003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level0)
 {
     printf("%s: [Input] GetChipInfo001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -711,7 +711,7 @@ HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetChipInfo002, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetChipInfo002, TestSize.Level0)
 {
     printf("%s: [Input] GetChipInfo002 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -732,7 +732,7 @@ HWTEST_F(HdiInputTest, GetChipInfo002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetChipInfo003, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetChipInfo003, TestSize.Level0)
 {
     printf("%s: [Input] GetChipInfo003 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -753,7 +753,7 @@ HWTEST_F(HdiInputTest, GetChipInfo003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level0)
 {
     printf("%s: [Input] GetVendorName001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -774,7 +774,7 @@ HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level0)
 {
     printf("%s: [Input] GetVendorName002 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -795,7 +795,7 @@ HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetVendorName003, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetVendorName003, TestSize.Level0)
 {
     printf("%s: [Input] GetVendorName003 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -816,7 +816,7 @@ HWTEST_F(HdiInputTest, GetVendorName003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level0)
 {
     printf("%s: [Input] GetChipName001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -837,7 +837,7 @@ HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level0)
 {
     printf("%s: [Input] GetChipName002 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -858,7 +858,7 @@ HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetChipName003, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetChipName003, TestSize.Level0)
 {
     printf("%s: [Input] GetChipName003 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -879,7 +879,7 @@ HWTEST_F(HdiInputTest, GetChipName003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level1)
+HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level0)
 {
     printf("%s: [Input] SetGestureMode001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -900,7 +900,7 @@ HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level1)
+HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level0)
 {
     printf("%s: [Input] SetGestureMode002 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -921,7 +921,7 @@ HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level1)
+HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level0)
 {
     printf("%s: [Input] RunCapacitanceTest001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -943,7 +943,7 @@ HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, RunCapacitanceTest002, TestSize.Level1)
+HWTEST_F(HdiInputTest, RunCapacitanceTest002, TestSize.Level0)
 {
     printf("%s: [Input] RunCapacitanceTest002 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -965,7 +965,7 @@ HWTEST_F(HdiInputTest, RunCapacitanceTest002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level1)
+HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level0)
 {
     printf("%s: [Input] RunExtraCommand001 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -988,7 +988,7 @@ HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, RunExtraCommand002, TestSize.Level1)
+HWTEST_F(HdiInputTest, RunExtraCommand002, TestSize.Level0)
 {
     printf("%s: [Input] RunExtraCommand002 enter\n", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -1011,7 +1011,7 @@ HWTEST_F(HdiInputTest, RunExtraCommand002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, RegisterHotPlugCallback001, TestSize.Level1)
+HWTEST_F(HdiInputTest, RegisterHotPlugCallback001, TestSize.Level0)
 {
     printf("%s: [Input] RegisterHotPlugCallback001 enter\n", __func__);
     int32_t ret;
@@ -1031,7 +1031,7 @@ HWTEST_F(HdiInputTest, RegisterHotPlugCallback001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, UnregisterHotPlugCallback001, TestSize.Level1)
+HWTEST_F(HdiInputTest, UnregisterHotPlugCallback001, TestSize.Level0)
 {
     printf("%s: [Input] UnregisterHotPlugCallback001 enter\n", __func__);
     int32_t ret;
@@ -1051,7 +1051,7 @@ HWTEST_F(HdiInputTest, UnregisterHotPlugCallback001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, SendHotPlugEvent001, TestSize.Level1)
+HWTEST_F(HdiInputTest, SendHotPlugEvent001, TestSize.Level0)
 {
     printf("%s: [Input] SendHotPlugEvent001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1066,7 +1066,7 @@ HWTEST_F(HdiInputTest, SendHotPlugEvent001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, DoWithEventDeviceAdd001, TestSize.Level1)
+HWTEST_F(HdiInputTest, DoWithEventDeviceAdd001, TestSize.Level0)
 {
     printf("%s: [Input] DoWithEventDeviceAdd001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1081,7 +1081,7 @@ HWTEST_F(HdiInputTest, DoWithEventDeviceAdd001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level1)
+HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level0)
 {
     printf("%s: [Input] DoWithEventDeviceDel001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1096,7 +1096,7 @@ HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level1)
+HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level0)
 {
     printf("%s: [Input] ReportEventPkg001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1113,7 +1113,7 @@ HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, DoRead001, TestSize.Level1)
+HWTEST_F(HdiInputTest, DoRead001, TestSize.Level0)
 {
     printf("%s: [Input] DoRead001 enter\n", __func__);
     LOG_SetCallback(MyLogCallback);
@@ -1130,7 +1130,7 @@ HWTEST_F(HdiInputTest, DoRead001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, InotifyEventHandler001, TestSize.Level1)
+HWTEST_F(HdiInputTest, InotifyEventHandler001, TestSize.Level0)
 {
     printf("%s: [Input] InotifyEventHandler001 enter\n", __func__);
     int32_t ret;
@@ -1149,7 +1149,7 @@ HWTEST_F(HdiInputTest, InotifyEventHandler001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, ScanDevice001, TestSize.Level1)
+HWTEST_F(HdiInputTest, ScanDevice001, TestSize.Level0)
 {
     printf("%s: [Input] ScanDevice001 enter\n", __func__);
     int32_t ret;
@@ -1167,7 +1167,7 @@ HWTEST_F(HdiInputTest, ScanDevice001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, GetDeviceList001, TestSize.Level1)
+HWTEST_F(HdiInputTest, GetDeviceList001, TestSize.Level0)
 {
     printf("%s: [Input] GetDeviceList001 enter\n", __func__);
     int32_t ret;
