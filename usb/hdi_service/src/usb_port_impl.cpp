@@ -38,7 +38,6 @@
 #define HDF_LOG_TAG UsbPortImpl
 using namespace OHOS::HiviewDFX;
 bool g_productFlag = false;
-constexpr int32_t SUPPORTEDMODES = 1;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -107,7 +106,6 @@ int32_t UsbPortImpl::QueryPorts(std::vector<UsbPort>& portList)
         }
         return HDF_SUCCESS;
     }
-    
     int32_t portId = 0;
     int32_t powerRole = 0;
     int32_t dataRole = 0;
@@ -117,10 +115,16 @@ int32_t UsbPortImpl::QueryPorts(std::vector<UsbPort>& portList)
         HDF_LOGE("%{public}s:QueryPorts failed, ret:%{public}d", __func__, ret);
         return ret;
     }
- 
+
     UsbPort port;
     port.id = portId;
-    port.supportedModes = SUPPORTEDMODES;
+    int32_t supportedModes = 0;
+    ret = V1_2::UsbdPort::GetInstance().GetSupportedModes(supportedModes);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:GetSupportedModes, ret:%{public}d", __func__, ret);
+        return ret;
+    }
+    port.supportedModes = supportedModes;
     port.usbPortStatus.currentMode = mode;
     port.usbPortStatus.currentPowerRole = powerRole;
     port.usbPortStatus.currentDataRole = dataRole;
@@ -288,7 +292,7 @@ void UsbPortImpl::ParsePortPath()
         V1_2::UsbdPorts::GetInstance().setPortPath(path_);
         return;
     }
- 
+
     g_productFlag = false;
     V1_2::UsbdPort::GetInstance().setPortPath(path_);
     return;
