@@ -54,8 +54,7 @@
                 "codec_callback_if.h",
                 "codec_component_if.h",
                 "codec_component_manager.h",
-                "codec_component_type.h",
-                "codec_omx_ext.h"
+                "codec_component_type.h"
               ],
               "header_base": "//drivers/peripheral/codec/interfaces/include"
           }
