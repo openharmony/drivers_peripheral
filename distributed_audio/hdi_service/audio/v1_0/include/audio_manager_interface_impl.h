@@ -76,6 +76,7 @@ private:
     int32_t CreateAdapter(const std::string &adpName, const uint32_t devId, const sptr<IDAudioCallback> &callback);
     sptr<IRemoteObject> GetRemote(const std::string &adpName);
     sptr<AudioAdapterInterfaceImpl> GetAdapterFromMap(const std::string &adpName);
+    int32_t AddAudioDeviceInner(const uint32_t dhId, const DAudioDevEvent &event);
 
 private:
     class Deletor {
@@ -99,6 +100,7 @@ private:
     static AudioManagerInterfaceImpl *audioManager_;
     static std::mutex audioManagerMtx_;
     struct HdfDeviceObject *deviceObject_ = nullptr;
+    static constexpr int32_t LOW_LATENCY_RENDER_ID = 1 << 1 | 1 << 0;
     std::mutex adapterMapMtx_;
     std::map<std::string, sptr<AudioAdapterInterfaceImpl>> mapAudioAdapter_;
     std::map<std::string, sptr<IDAudioCallback>> mapAudioCallback_;
