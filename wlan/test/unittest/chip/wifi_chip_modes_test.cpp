@@ -58,9 +58,6 @@ public:
 HWTEST_F(WifiChipModesTest, GetChipModesTest, TestSize.Level1)
 {
     HDF_LOGI("GetChipModesTest started.");
-    if (wifiChipModes == nullptr) {
-        return;
-    }
     std::vector<UsableMode> modes;
     modes = wifiChipModes->GetChipModes(true);
     EXPECT_TRUE(modes.size() != 0);

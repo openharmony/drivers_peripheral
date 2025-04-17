@@ -39,10 +39,6 @@ HWTEST_F(IfaceToolTest, SetWifiUpStateTest, TestSize.Level1)
 {
     HDF_LOGI("SetWifiUpStateTest started");
     std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
-    if (ifaceTool == nullptr) {
-        HDF_LOGE("ifaceTool is null");
-        return;
-    }
     bool requestUp = true;
     EXPECT_TRUE(ifaceTool->SetWifiUpState(requestUp));
     requestUp = false;

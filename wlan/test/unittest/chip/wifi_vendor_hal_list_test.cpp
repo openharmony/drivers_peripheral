@@ -37,10 +37,6 @@ public:
 
     void GetHalsTest()
     {
-        if (vendorHalListTest == nullptr) {
-            HDF_LOGE("vendorHalListTest is null");
-            return;
-        }
         EXPECT_TRUE(vendorHalListTest->GetHals().size() != 0);
     }
 

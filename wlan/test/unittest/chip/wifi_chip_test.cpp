@@ -65,10 +65,6 @@ HWTEST_F(WifiChipTest, GetCurrentModeTest, TestSize.Level0)
 {
     HDF_LOGI("GetCurrentModeTest started");
     uint32_t modeId = -1;
-    if (wifiChip == nullptr) {
-        HDF_LOGE("wifiChip is null");
-        return;
-    }
     EXPECT_TRUE(wifiChip->GetCurrentMode(modeId) == HDF_ERR_INVALID_PARAM);
     modeId = 0;
     wifiChip->GetCurrentMode(modeId);
@@ -85,10 +81,6 @@ HWTEST_F(WifiChipTest, SetChipModeTest, TestSize.Level0)
 {
     HDF_LOGI("SetChipModeTest started");
     uint32_t modeId = UINT32_MAX;
-    if (wifiChip == nullptr) {
-        HDF_LOGE("wifiChip is null");
-        return;
-    }
     EXPECT_TRUE(wifiChip->SetChipMode(modeId) == HDF_FAILURE);
 }
 
@@ -101,10 +93,6 @@ HWTEST_F(WifiChipTest, SetChipModeTest, TestSize.Level0)
 HWTEST_F(WifiChipTest, CreateApServiceTest, TestSize.Level0)
 {
     HDF_LOGI("CreateApServiceTest started");
-    if (wifiChip == nullptr) {
-        HDF_LOGE("wifiChip is null");
-        return;
-    }
     std::vector<std::string> instances;
     std::weak_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
     WifiHalFn fn;
@@ -130,10 +118,6 @@ HWTEST_F(WifiChipTest, CreateApServiceTest, TestSize.Level0)
 HWTEST_F(WifiChipTest, CreateP2pIfaceTest, TestSize.Level0)
 {
     HDF_LOGI("CreateP2pIfaceTest started");
-    if (wifiChip == nullptr) {
-        HDF_LOGE("wifiChip is null");
-        return;
-    }
     std::weak_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
     WifiHalFn fn;
     std::weak_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
@@ -158,10 +142,6 @@ HWTEST_F(WifiChipTest, CreateP2pIfaceTest, TestSize.Level0)
 HWTEST_F(WifiChipTest, CreateStaIfaceTest, TestSize.Level0)
 {
     HDF_LOGI("CreateStaIfaceTest started");
-    if (wifiChip == nullptr) {
-        HDF_LOGE("wifiChip is null");
-        return;
-    }
     std::weak_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
     WifiHalFn fn;
     std::weak_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);

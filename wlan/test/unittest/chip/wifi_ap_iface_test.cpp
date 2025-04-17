@@ -65,9 +65,6 @@ public:
 HWTEST_F(WifiApIfaceTest, wifiApIfaceTest001, TestSize.Level1)
 {
     HDF_LOGI("wifiApIfaceTest001 started");
-    if (apIface == nullptr) {
-        return;
-    }
     apIface->Invalidate();
     EXPECT_FALSE(apIface->IsValid());
     EXPECT_TRUE(apIface->GetName() == AP_IFNAME);
@@ -89,10 +86,6 @@ HWTEST_F(WifiApIfaceTest, wifiApIfaceTest001, TestSize.Level1)
 HWTEST_F(WifiApIfaceTest, GetIfaceCapTest, TestSize.Level1)
 {
     HDF_LOGI("GetIfaceCapTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     uint32_t cap;
     EXPECT_TRUE(apIface->GetIfaceCap(cap) == HDF_ERR_NOT_SUPPORT);
 }
@@ -100,10 +93,6 @@ HWTEST_F(WifiApIfaceTest, GetIfaceCapTest, TestSize.Level1)
 HWTEST_F(WifiApIfaceTest, StartScanTest, TestSize.Level1)
 {
     HDF_LOGI("StartScanTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     ScanParams scanParam;
     scanParam.bssid = TEST_MAC;
     EXPECT_TRUE(apIface->StartScan(scanParam) == HDF_ERR_NOT_SUPPORT);
@@ -112,10 +101,6 @@ HWTEST_F(WifiApIfaceTest, StartScanTest, TestSize.Level1)
 HWTEST_F(WifiApIfaceTest, GetScanInfosTest, TestSize.Level1)
 {
     HDF_LOGI("GetScanInfosTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     std::vector<ScanResultsInfo> scanResult;
     EXPECT_TRUE(apIface->GetScanInfos(scanResult) == HDF_ERR_NOT_SUPPORT);
 }
@@ -123,10 +108,6 @@ HWTEST_F(WifiApIfaceTest, GetScanInfosTest, TestSize.Level1)
 HWTEST_F(WifiApIfaceTest, StartPnoScanTest, TestSize.Level1)
 {
     HDF_LOGI("StartPnoScanTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     PnoScanParams pnoParam;
     pnoParam.min2gRssi = 1;
     EXPECT_TRUE(apIface->StartPnoScan(pnoParam) == HDF_ERR_NOT_SUPPORT);
@@ -135,20 +116,12 @@ HWTEST_F(WifiApIfaceTest, StartPnoScanTest, TestSize.Level1)
 HWTEST_F(WifiApIfaceTest, StopPnoScanTest, TestSize.Level1)
 {
     HDF_LOGI("StopPnoScanTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     EXPECT_TRUE(apIface->StopPnoScan() == HDF_ERR_NOT_SUPPORT);
 }
 
 HWTEST_F(WifiApIfaceTest, GetSignalPollInfoTest, TestSize.Level1)
 {
     HDF_LOGI("GetSignalPollInfoTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     SignalPollResult info;
     EXPECT_TRUE(apIface->GetSignalPollInfo(info) == HDF_ERR_NOT_SUPPORT);
 }
@@ -156,30 +129,18 @@ HWTEST_F(WifiApIfaceTest, GetSignalPollInfoTest, TestSize.Level1)
 HWTEST_F(WifiApIfaceTest, SetDpiMarkRuleTest, TestSize.Level1)
 {
     HDF_LOGI("SetDpiMarkRuleTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     EXPECT_TRUE(apIface->SetDpiMarkRule(0, 0, 0) == HDF_ERR_NOT_SUPPORT);
 }
 
 HWTEST_F(WifiApIfaceTest, EnablePowerModeTest, TestSize.Level1)
 {
     HDF_LOGI("EnablePowerModeTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     EXPECT_TRUE(apIface->EnablePowerMode(0) == HDF_ERR_NOT_SUPPORT);
 }
 
 HWTEST_F(WifiApIfaceTest, GetSupportFreqsTest, TestSize.Level1)
 {
     HDF_LOGI("GetSupportFreqsTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     std::vector<uint32_t> freqs;
     EXPECT_TRUE(apIface->GetSupportFreqs(0, freqs) == HDF_SUCCESS);
     EXPECT_TRUE(apIface->SetMacAddress(TEST_MAC) == HDF_SUCCESS);
@@ -192,10 +153,6 @@ HWTEST_F(WifiApIfaceTest, GetSupportFreqsTest, TestSize.Level1)
 HWTEST_F(WifiApIfaceTest, RegisterChipIfaceCallBackTest, TestSize.Level1)
 {
     HDF_LOGI("RegisterChipIfaceCallBackTest started");
-    if (apIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     sptr<IChipIfaceCallback> ifaceCallback;
     EXPECT_TRUE(apIface->RegisterChipIfaceCallBack(ifaceCallback) == HDF_ERR_NOT_SUPPORT);
     EXPECT_TRUE(apIface->UnRegisterChipIfaceCallBack(ifaceCallback) == HDF_ERR_NOT_SUPPORT);
