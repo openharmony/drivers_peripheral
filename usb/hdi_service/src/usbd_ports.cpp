@@ -104,7 +104,7 @@ int32_t UsbdPorts::QueryPorts(std::vector<V2_0::UsbPort>& portList)
             return HDF_FAILURE;
         }
         if (!std::regex_match(portId, std::regex("^[0-9]+$"))) {
-            USB_HILOGE(MODULE_USB_SERVICE, "Invalid tokenId");
+            HDF_LOGE("%{public}s Invalid portId", __func__);
             return HDF_FAILURE;
         }
         usbPort.id = std::stoi(portId);
