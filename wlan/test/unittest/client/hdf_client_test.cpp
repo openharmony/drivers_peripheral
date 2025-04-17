@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <hdf_log.h>
 #include <osal_mem.h>
 #include "wifi_driver_client.h"
 #ifdef OHOS_ARCH_LITE
