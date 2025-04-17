@@ -14,6 +14,7 @@
 */
 #include <iostream>
 #include <sstream>
+#include <regex>
 
 #include "usbd_ports.h"
 #include "hdf_base.h"
