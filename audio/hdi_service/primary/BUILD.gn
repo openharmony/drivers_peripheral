@@ -16,6 +16,7 @@ import("../../audio.gni")
 hdf_hdi_service_path = "./.."
 
 ohos_shared_library("audio_primary_driver") {
+  branch_protector_ret = "pac_ret"
   sources = [ "audio_manager_driver.c" ]
 
   if (is_standard_system) {
@@ -45,16 +46,15 @@ ohos_shared_library("audio_primary_driver") {
 }
 
 ohos_shared_library("audio_manager_service_4.0") {
+  branch_protector_ret = "pac_ret"
   sources = [ "audio_manager_service.c" ]
 
   cflags = [
-    "-fstack-protector-strong",
     "-D_FORTIFY_SOURCE=2",
     "-O2",
   ]
 
   cflags_cc = [
-    "-fstack-protector-strong",
     "-D_FORTIFY_SOURCE=2",
     "-O2",
   ]
