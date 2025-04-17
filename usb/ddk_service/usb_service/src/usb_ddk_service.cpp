@@ -174,13 +174,13 @@ void EraseInterfaceId(uint64_t interfaceHandle)
 
 int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
 {
+#ifndef LIBUSB_ENABLE
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
         return ret;
     }
-#ifndef LIBUSB_ENABLE
     pthread_rwlock_wrlock(&g_rwLock);
     UsbDdkDelHashRecord(interfaceHandle);
     struct UsbInterface *interface = nullptr;
@@ -204,7 +204,7 @@ int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
     return ret;
 #else
     struct InterfaceInfo infoTemp;
-    ret = GetInterfaceInfoByVal(interfaceHandle, infoTemp);
+    int32_t ret = GetInterfaceInfoByVal(interfaceHandle, infoTemp);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s infoTemp failed", __func__);
         return HDF_FAILURE;
@@ -218,10 +218,10 @@ int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
     ret = g_DdkLibusbAdapter->ReleaseInterface({infoTemp.busNum, infoTemp.devNum}, interfaceId);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed", __func__);
-        return ret;
     }
     EraseInterfaceId(interfaceHandle);
-    return g_DdkLibusbAdapter->CloseDevice({infoTemp.busNum, infoTemp.devNum});
+    g_DdkLibusbAdapter->CloseDevice({infoTemp.busNum, infoTemp.devNum});
+    return ret;
 #endif // LIBUSB_ENABLE
 }
 

@@ -560,11 +560,6 @@ int32_t LibusbAdapter::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
             __func__, dev.busNum, dev.devAddr, interfaceId);
         return HDF_FAILURE;
     }
-    ret = RemoveInterfaceFromMap(dev, devHandle, interfaceId);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: RemoveInterfaceFromMap failed", __func__);
-        return HDF_FAILURE;
-    }
     ret = libusb_release_interface(devHandle, interfaceId);
     if (ret < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: libusb_release_interface failed, ret=%{public}d", __func__, ret);
@@ -579,6 +574,7 @@ int32_t LibusbAdapter::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         g_deviceSettingsMap[devHandle].interfaceNumber = -1;
         g_deviceSettingsMap[devHandle].alternateSetting = -1;
     }
+    RemoveInterfaceFromMap(dev, devHandle, interfaceId);
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
