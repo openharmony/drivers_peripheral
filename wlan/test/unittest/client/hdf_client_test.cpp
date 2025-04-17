@@ -29,14 +29,8 @@ using namespace testing::ext;
 namespace ClientTest {
 const uint32_t DEFAULT_COMBO_SIZE = 10;
 const char *WLAN_IFNAME = "wlan0";
-const std::string g_errlog = "wifitest";
+const std::string g_errlog = "wifiTest";
 const uint32_t RESET_TIME = 3;
-static std::string g_errLog = "wifi_test";
-void WifiClientTestCallback(const LogType type, const LogLevel level, unsigned int domain,
-    const char *tag, const char *msg)
-{
-    g_errLog = msg;
-}
 class WifiClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -55,7 +49,6 @@ void WifiClientTest::TearDownTestCase()
 
 void WifiClientTest::SetUp()
 {
-    LOG_SetCallback(WifiClientTestCallback);
     WifiDriverClientInit();
 }
 
