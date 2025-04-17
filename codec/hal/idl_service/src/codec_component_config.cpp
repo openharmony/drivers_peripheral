@@ -177,9 +177,9 @@ int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
         if (GetOneCapability(*iface, *childNode, cap, isVideoGroup) != HDF_SUCCESS) {
             CODEC_LOGE("GetOneCapability failed, role is %{public}d!", cap.role);
         }
-        CODEC_LOGI("role=%{public}d, type=%{public}d, name=%{public}s", 
+        CODEC_LOGI("role=%{public}d, type=%{public}d, name=%{public}s",
             cap.role, cap.type, cap.compName.c_str());
-        const char *devPath = nullptr;    
+        const char *devPath = nullptr;
         if (iface->GetString(childNode, "devPath", &devPath, "") == HDF_SUCCESS &&
             devPath != nullptr && strlen(devPath) != 0 &&
             access(devPath, F_OK) < 0) {
