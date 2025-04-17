@@ -21,7 +21,8 @@ group("hdf_disp_composer_unittest") {
   ]
 }
 
-module_output_path = "drivers_peripheral_display/drivers_peripheral_display_composer"
+module_output_path =
+    "drivers_peripheral_display/drivers_peripheral_display_composer"
 
 config("module_private_config") {
   visibility = [ ":*" ]
