@@ -165,9 +165,8 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     if (mapAddFlags_.find(flagString) == mapAddFlags_.end()) {
         DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_ADD, 0, adp->second->GetVolumeGroup(dhId),
             adp->second->GetInterruptGroup(dhId) };
-        ret = NotifyFwk(event);
+        ret = AddAudioDeviceInner(dhId, event);
         if (ret != DH_SUCCESS) {
-            DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
             return ret;
         }
         mapAddFlags_.insert(std::make_pair(flagString, true));
@@ -178,6 +177,19 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     }
     DHLOGI("Add audio device success.");
     return DH_SUCCESS;
+}
+
+int32_t AudioManagerInterfaceImpl::AddAudioDeviceInner(const uint32_t dhId, const DAudioDevEvent &event)
+{
+    int32_t ret = DH_SUCCESS;
+    if (dhId != LOW_LATENCY_RENDER_ID) {
+        int32_t ret = NotifyFwk(event);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
+            return ret;
+        }
+    }
+    return ret;
 }
 
 int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName, const uint32_t dhId)
