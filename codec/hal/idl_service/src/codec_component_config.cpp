@@ -15,9 +15,9 @@
 #include "codec_component_config.h"
 #include <cinttypes>
 #include <osal_mem.h>
+#include <unistd.h>
 #include "codec_log_wrapper.h"
 #include "codec_hcb_util.h"
-
 #define CODEC_CONFIG_NAME "media_codec_capabilities"
 
 namespace {
@@ -176,6 +176,15 @@ int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
         CodecCompCapability cap;
         if (GetOneCapability(*iface, *childNode, cap, isVideoGroup) != HDF_SUCCESS) {
             CODEC_LOGE("GetOneCapability failed, role is %{public}d!", cap.role);
+        }
+        CODEC_LOGI("role=%{public}d, type=%{public}d, name=%{public}s", 
+            cap.role, cap.type, cap.compName.c_str());
+        const char *devPath = nullptr;    
+        if (iface->GetString(childNode, "devPath", &devPath, "") == HDF_SUCCESS &&
+            devPath != nullptr && strlen(devPath) != 0 &&
+            access(devPath, F_OK) < 0) {
+            CODEC_LOGW("access %{public}s failed, ignore", devPath);
+            continue;
         }
         capList_.push_back(cap);
     }
