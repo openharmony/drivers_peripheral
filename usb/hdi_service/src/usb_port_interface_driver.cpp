@@ -136,7 +136,7 @@ static void HdfUsbPortInterfaceDriverRelease(struct HdfDeviceObject *deviceObjec
     return;
 }
 
-struct HdfDriverEntry g_usbportinterfaceDriverEntry = {
+static struct HdfDriverEntry g_usbportinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "",
     .Bind = HdfUsbPortInterfaceDriverBind,
