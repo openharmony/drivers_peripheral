@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <hdf_log.h>
 #include <osal_mem.h>
 #include "wifi_driver_client.h"
 #ifdef OHOS_ARCH_LITE
@@ -22,6 +23,7 @@
 #endif
 #include "securec.h"
 
+
 using namespace testing::ext;
 
 namespace ClientTest {
@@ -29,6 +31,12 @@ const uint32_t DEFAULT_COMBO_SIZE = 10;
 const char *WLAN_IFNAME = "wlan0";
 const std::string g_errlog = "wifitest";
 const uint32_t RESET_TIME = 3;
+static std::string g_errLog = "wifi_test";
+void WifiClientTestCallback(const LogType type, const LogLevel level, unsigned int domain,
+    const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 class WifiClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -47,6 +55,7 @@ void WifiClientTest::TearDownTestCase()
 
 void WifiClientTest::SetUp()
 {
+    LOG_SetCallback(WifiClientTestCallback);
     WifiDriverClientInit();
 }
 
@@ -225,17 +234,8 @@ HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level1)
     const char *ifNameInvalid = "wlanTest";
 
     result.freqs = (uint32_t *)OsalMemCalloc(35 * sizeof(uint32_t));
-    if (result.freqs == NULL) {
-        printf("%s: OsalMemCalloc failed", __FUNCTION__);
-        return;
-    }
 
     result.txPower = (uint32_t *)OsalMemCalloc(35 * sizeof(uint32_t));
-    if (result.txPower == NULL) {
-        printf("%s: OsalMemCalloc failed", __FUNCTION__);
-        OsalMemFree(result.freqs);
-        return;
-    }
 
     ret = GetValidFreqByBand(WLAN_IFNAME, bandNotSupport, &result, size);
     EXPECT_NE(RET_CODE_SUCCESS, ret);
@@ -777,7 +777,7 @@ HWTEST_F(WifiClientTest, WifiCmdSetKey0010, TestSize.Level1)
     const char *ifNameInvalid = "wlanTest";
     WifiKeyExt keyExt;
     WifiCmdSetKey(ifNameInvalid, &keyExt);
-    EXPECT_FALSE(g_errlog.find("WifiCmdSetKey") != std::string::npos);
+    EXPECT_FALSE(g_errlog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: WifiCmdGetOwnMac0011
@@ -795,6 +795,7 @@ HWTEST_F(WifiClientTest, WifiCmdGetOwnMac0011, TestSize.Level1)
     ret = WifiCmdGetOwnMac(ifNameInvalid, NULL, len);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     WifiCmdGetOwnMac(ifNameInvalid, NULL, len);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: WifiCmdSetMode0012
@@ -913,7 +914,7 @@ HWTEST_F(WifiClientTest, WifiCmdSetClient0020, TestSize.Level1)
 {
     uint32_t clientNum = 0;
     WifiCmdSetClient(clientNum);
-    EXPECT_FALSE(g_errlog.find("WifiCmdSetClient") != std::string::npos);
+    EXPECT_FALSE(g_errlog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: WifiCmdProbeReqReport0021

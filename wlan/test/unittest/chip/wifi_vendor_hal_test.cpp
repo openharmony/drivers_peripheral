@@ -27,12 +27,19 @@ namespace WifiVendorHalTest {
 const std::string VAILD_IFNAME = "wlan0";
 const std::string INVAILD_IFNAME = "wlan2";
 
+static std::string g_errLog;
+void WifiVendorHalTestCallback(const LogType type, const LogLevel level, unsigned int domain,
+    const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 class WifiVendorHalTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     void SetUp()
     {
+        LOG_SetCallback(WifiVendorHalTestCallback);
         ifaceTool = std::make_shared<IfaceTool>();
         WifiHalFn fn = {};
         InitWifiHalFuncTable(&fn);
@@ -125,20 +132,24 @@ HWTEST_F(WifiVendorHalTest, StartTest, TestSize.Level1)
 HWTEST_F(WifiVendorHalTest, ScanResultEventTest, TestSize.Level1)
 {
     ScanResultEventTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiVendorHalTest, StopTest, TestSize.Level1)
 {
     StopTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiVendorHalTest, GetChipCapsTest, TestSize.Level1)
 {
     GetChipCapsTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiVendorHalTest, GetValidFrequenciesForBandTest, TestSize.Level1)
 {
     GetValidFrequenciesForBandTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 }
