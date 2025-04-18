@@ -65,10 +65,6 @@ public:
 HWTEST_F(WifiStaIfaceTest, WifiStaIfaceTest001, TestSize.Level1)
 {
     HDF_LOGI("WifiStaIfaceTest001 started");
-    if (staIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     staIface->Invalidate();
     EXPECT_FALSE(staIface->IsValid());
     staIface->IsValid();
@@ -84,10 +80,6 @@ HWTEST_F(WifiStaIfaceTest, WifiStaIfaceTest001, TestSize.Level1)
 HWTEST_F(WifiStaIfaceTest, SetDpiMarkRuleTest, TestSize.Level1)
 {
     HDF_LOGI("SetDpiMarkRuleTest started");
-    if (staIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     EXPECT_TRUE(staIface->SetDpiMarkRule(0, 0, 0) == HDF_SUCCESS);
     EXPECT_TRUE(staIface->SetDpiMarkRule(1, 1, 1) == HDF_FAILURE);
     EXPECT_TRUE(staIface->SetTxPower(0) == HDF_SUCCESS);
@@ -97,10 +89,6 @@ HWTEST_F(WifiStaIfaceTest, SetDpiMarkRuleTest, TestSize.Level1)
 HWTEST_F(WifiStaIfaceTest, EnablePowerModeTest, TestSize.Level1)
 {
     HDF_LOGI("EnablePowerModeTest started");
-    if (staIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     EXPECT_TRUE(staIface->EnablePowerMode(0) == HDF_SUCCESS);
     uint32_t cap;
     EXPECT_TRUE(staIface->GetIfaceCap(cap) == HDF_SUCCESS);
@@ -110,10 +98,6 @@ HWTEST_F(WifiStaIfaceTest, EnablePowerModeTest, TestSize.Level1)
 HWTEST_F(WifiStaIfaceTest, GetSupportFreqsTest, TestSize.Level1)
 {
     HDF_LOGI("GetSupportFreqsTest started");
-    if (staIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     std::vector<uint32_t> freqs;
     EXPECT_TRUE(staIface->GetSupportFreqs(0, freqs) == HDF_SUCCESS);
     EXPECT_TRUE(staIface->SetMacAddress(TEST_MAC) == HDF_SUCCESS);
@@ -126,10 +110,6 @@ HWTEST_F(WifiStaIfaceTest, GetSupportFreqsTest, TestSize.Level1)
 HWTEST_F(WifiStaIfaceTest, RegisterChipIfaceCallBackTest, TestSize.Level1)
 {
     HDF_LOGI("RegisterChipIfaceCallBackTest started");
-    if (staIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     sptr<IChipIfaceCallback> ifaceCallback;
     EXPECT_TRUE(staIface->RegisterChipIfaceCallBack(ifaceCallback) == HDF_FAILURE);
     EXPECT_TRUE(staIface->UnRegisterChipIfaceCallBack(ifaceCallback) == HDF_FAILURE);
@@ -138,10 +118,6 @@ HWTEST_F(WifiStaIfaceTest, RegisterChipIfaceCallBackTest, TestSize.Level1)
 HWTEST_F(WifiStaIfaceTest, ScanTest, TestSize.Level1)
 {
     HDF_LOGI("ScanTest started");
-    if (staIface == nullptr) {
-        HDF_LOGE("iface is null");
-        return;
-    }
     ScanParams scanParam;
     scanParam.fastConnectFlag = 0;
     EXPECT_TRUE(staIface->StartScan(scanParam) == HDF_SUCCESS);
