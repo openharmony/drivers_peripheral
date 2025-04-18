@@ -22,12 +22,13 @@
 #endif
 #include "securec.h"
 
+
 using namespace testing::ext;
 
 namespace ClientTest {
 const uint32_t DEFAULT_COMBO_SIZE = 10;
 const char *WLAN_IFNAME = "wlan0";
-const std::string g_errlog = "wifitest";
+const std::string g_errLog = "wifiTest";
 const uint32_t RESET_TIME = 3;
 class WifiClientTest : public testing::Test {
 public:
@@ -225,17 +226,8 @@ HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level1)
     const char *ifNameInvalid = "wlanTest";
 
     result.freqs = (uint32_t *)OsalMemCalloc(35 * sizeof(uint32_t));
-    if (result.freqs == NULL) {
-        printf("%s: OsalMemCalloc failed", __FUNCTION__);
-        return;
-    }
 
     result.txPower = (uint32_t *)OsalMemCalloc(35 * sizeof(uint32_t));
-    if (result.txPower == NULL) {
-        printf("%s: OsalMemCalloc failed", __FUNCTION__);
-        OsalMemFree(result.freqs);
-        return;
-    }
 
     ret = GetValidFreqByBand(WLAN_IFNAME, bandNotSupport, &result, size);
     EXPECT_NE(RET_CODE_SUCCESS, ret);
@@ -764,7 +756,7 @@ HWTEST_F(WifiClientTest, WifiCmdNewKey009, TestSize.Level1)
     const char *ifNameInvalid = "wlanTest";
     WifiKeyExt keyExt;
     WifiCmdNewKey(ifNameInvalid, &keyExt);
-    EXPECT_FALSE(g_errlog.find("cmd") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("cmd") != std::string::npos);
 }
 /**
  * @tc.name: WifiCmdSetKey0010
@@ -777,7 +769,7 @@ HWTEST_F(WifiClientTest, WifiCmdSetKey0010, TestSize.Level1)
     const char *ifNameInvalid = "wlanTest";
     WifiKeyExt keyExt;
     WifiCmdSetKey(ifNameInvalid, &keyExt);
-    EXPECT_FALSE(g_errlog.find("WifiCmdSetKey") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: WifiCmdGetOwnMac0011
@@ -795,6 +787,7 @@ HWTEST_F(WifiClientTest, WifiCmdGetOwnMac0011, TestSize.Level1)
     ret = WifiCmdGetOwnMac(ifNameInvalid, NULL, len);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     WifiCmdGetOwnMac(ifNameInvalid, NULL, len);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: WifiCmdSetMode0012
@@ -913,7 +906,7 @@ HWTEST_F(WifiClientTest, WifiCmdSetClient0020, TestSize.Level1)
 {
     uint32_t clientNum = 0;
     WifiCmdSetClient(clientNum);
-    EXPECT_FALSE(g_errlog.find("WifiCmdSetClient") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: WifiCmdProbeReqReport0021
@@ -1031,7 +1024,7 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
     int32_t dstAddr = 0;
     int32_t buf = 0;
     WifiSetDpiMarkRule(srcAddr, dstAddr, buf);
-    EXPECT_FALSE(g_errlog.find("enter") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("enter") != std::string::npos);
 }
 /**
  * @tc.name: WifiInstallWlanExtParam029
@@ -1112,7 +1105,7 @@ HWTEST_F(WifiClientTest, WpaEventReport02, TestSize.Level1)
     WpaEventReport(WLAN_IFNAME, WPA_EVENT_STATE_CHANGED, (void *) &wpaStateChangedParma);
     WpaEventReport(WLAN_IFNAME, WPA_EVENT_STATE_CHANGED, nullptr);
     WpaEventReport(nullptr, WPA_EVENT_STATE_CHANGED, (void *) &wpaStateChangedParma);
-    EXPECT_FALSE(g_errlog.find("wlan0") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("wlan0") != std::string::npos);
 }
 
 /**
@@ -1147,7 +1140,7 @@ HWTEST_F(WifiClientTest, HostapdEventReport04, TestSize.Level1)
     HostapdEventReport(WLAN_IFNAME, HOSTAPD_EVENT_AP_STATE, (void *) &hostapdApCbParm);
     HostapdEventReport(WLAN_IFNAME, HOSTAPD_EVENT_AP_STATE, nullptr);
     HostapdEventReport(nullptr, HOSTAPD_EVENT_AP_STATE, (void *) &hostapdApCbParm);
-    EXPECT_FALSE(g_errlog.find("HostapdEventReport") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("HostapdEventReport") != std::string::npos);
 }
 
 /**
@@ -1162,7 +1155,7 @@ HWTEST_F(WifiClientTest, WifiSetPowerSaveMode029, TestSize.Level1)
     int32_t mode = 0;
     const char *ifName = "wlanTest";
     WifiSetPowerSaveMode(ifName, frequency, mode);
-    EXPECT_FALSE(g_errlog.find("save") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("save") != std::string::npos);
 }
 
 /**
@@ -1174,7 +1167,7 @@ HWTEST_F(WifiClientTest, WifiSetPowerSaveMode029, TestSize.Level1)
 HWTEST_F(WifiClientTest, ReleaseEventCallback01, TestSize.Level1)
 {
     ReleaseEventCallback();
-    EXPECT_FALSE(g_errlog.find("wlan0") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("wlan0") != std::string::npos);
 }
 
 /**

@@ -47,10 +47,6 @@ public:
 HWTEST_F(WifiTest, IsInitTest, TestSize.Level1)
 {
     HDF_LOGI("IsInitTest started");
-    if (wifiTest == nullptr) {
-        HDF_LOGE("wifiTest is null");
-        return;
-    }
     bool inited = true;
     wifiTest->IsInit(inited);
     EXPECT_FALSE(inited);
@@ -68,10 +64,6 @@ HWTEST_F(WifiTest, IsInitTest, TestSize.Level1)
 HWTEST_F(WifiTest, GetAvailableChipsTest, TestSize.Level1)
 {
     HDF_LOGI("GetAvailableChipsTest started");
-    if (wifiTest == nullptr) {
-        HDF_LOGE("wifiTest is null");
-        return;
-    }
     std::vector<uint32_t> chipIds;
     EXPECT_TRUE(wifiTest->GetAvailableChips(chipIds) == HDF_SUCCESS);
 }
@@ -85,10 +77,6 @@ HWTEST_F(WifiTest, GetAvailableChipsTest, TestSize.Level1)
 HWTEST_F(WifiTest, ReleaseTest, TestSize.Level1)
 {
     HDF_LOGI("ReleaseTest started");
-    if (wifiTest == nullptr) {
-        HDF_LOGE("wifiTest is null");
-        return;
-    }
     EXPECT_TRUE(wifiTest->Release() == HDF_SUCCESS);
 }
 }
