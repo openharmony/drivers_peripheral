@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "audio_render_interface_impl.h"
 #include "if_system_ability_manager.h"
@@ -33,15 +34,16 @@ void RenderFrameFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string adpName(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string adpName = fdp.ConsumeRandomLengthString();
     AudioDeviceDescriptor desc;
     AudioSampleAttributes attrs;
     sptr<IDAudioCallback> callback = nullptr;
-    uint32_t renderId = *(reinterpret_cast<const uint32_t*>(data));
+    uint32_t renderId = fdp.ConsumeIntegral<uint32_t>();
     auto audioRender = std::make_shared<AudioRenderInterfaceImpl>(adpName, desc, attrs, callback, renderId);
 
     std::vector<int8_t> frame;
-    uint64_t replyBytes = *(reinterpret_cast<const uint64_t*>(data));
+    uint64_t replyBytes = fdp.ConsumeIntegral<uint64_t>();
     audioRender->RenderFrame(frame, replyBytes);
 }
 } // V1_0
