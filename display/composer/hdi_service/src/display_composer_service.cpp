@@ -450,8 +450,8 @@ int32_t DisplayComposerService::SetDisplayPowerStatus(uint32_t devId, V1_0::Disp
     if (vsyncEnableStatus_[devId]) {
         (void)SetDisplayVsyncEnabled(devId, false);
         vsyncEnableStatus_[devId] = false;
-	}
-	
+    }
+
     if (status == V1_0::DispPowerStatus::POWER_STATUS_OFF) {
         currentBacklightLevel_[devId] = 0;
     }
@@ -548,7 +548,7 @@ int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enab
     /*Already enabled, return success */
     if (enabled && vsyncEnableStatus_[devId]) {
         DISPLAY_LOGW("%{public}s:vsyncStatus[%{public}u] = %{public}d, skip",
-		    __func__, devId, vsyncEnableStatus_[devId]);
+            __func__, devId, vsyncEnableStatus_[devId]);
         return HDF_SUCCESS;
     }
 	
