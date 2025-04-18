@@ -61,7 +61,7 @@ void NfcImplTest::TearDown()
  * @tc.desc: Test NfcImplTest Open.
  * @tc.type: FUNC
  */
-HWTEST_F(NfcImplTest, Open001, TestSize.Level1)
+HWTEST_F(NfcImplTest, Open001, TestSize.Level0)
 {
     sleep(1);
     const sptr<INfcCallback> callbackObj = nullptr;
