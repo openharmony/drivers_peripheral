@@ -46,7 +46,6 @@ DisplayComposerService::DisplayComposerService()
     : libHandle_(nullptr),
     vdiAdapter_(new(std::nothrow) DisplayComposerVdiAdapter),
     cacheMgr_(nullptr),
-    currentBacklightLevel_(0),
     hotPlugCb_(nullptr),
     vBlankCb_(nullptr),
     modeCb_(nullptr),
@@ -73,6 +72,9 @@ DisplayComposerService::DisplayComposerService()
     }
 
     HidumperInit();
+	
+	vsyncEnableStatus_.clear();
+	currentBacklightLevel_.clear();
 }
 
 DisplayComposerService::~DisplayComposerService()
@@ -327,6 +329,11 @@ void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* 
         }
     }
 
+    auto vsyncEnableStatus = reinterpret_cast<DisplayComposerService*>(data)->vsyncEnableStatus_;
+    auto currentBacklightLevel = reinterpret_cast<DisplayComposerService*>(data)->currentBacklightLevel_;
+    vsyncEnableStatus[outputId] = false;
+	currentBacklightLevel[outputId] = 0;
+	
     sptr<IHotPlugCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->hotPlugCb_;
     if (remoteCb == nullptr) {
         DISPLAY_LOGE("hotPlugCb_ is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected);
@@ -439,7 +446,16 @@ int32_t DisplayComposerService::SetDisplayPowerStatus(uint32_t devId, V1_0::Disp
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->SetDisplayPowerStatus(devId, status);
     DISPLAY_LOGI("devid: %{public}u, status: %{public}u, vdi return %{public}d", devId, status, ret);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));	
+	if (vsyncEnableStatus_[devId]) {
+		(void)SetDisplayVsyncEnabled(devId, false);
+	    vsyncEnableStatus_[devId] = false;
+	}
+	
+	if (status == V1_0::DisplayPowerStatus::POWER_STATUS_OFF) {
+        currentBacklightLevel_[devId] = 0;
+	}	
+	
     return ret;
 }
 
@@ -449,7 +465,7 @@ int32_t DisplayComposerService::GetDisplayBacklight(uint32_t devId, uint32_t& le
 
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->GetDisplayBacklight(devId, level);
-    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_SUCCESS, level = currentBacklightLevel_);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_SUCCESS, level = currentBacklightLevel_[devId]);
     return ret;
 }
 
@@ -462,7 +478,7 @@ int32_t DisplayComposerService::SetDisplayBacklight(uint32_t devId, uint32_t lev
     DISPLAY_LOGD("devid: %{public}u, level: %{public}u, vdi return %{public}d", devId, level, ret);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u, level:%{public}u", __func__, devId, level));
-    currentBacklightLevel_ = level;
+    currentBacklightLevel_[devId] = level;
     return ret;
 }
 
@@ -529,10 +545,18 @@ int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enab
 {
     DISPLAY_TRACE;
 
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    /*Already enabled, return success */
+	if (enabled && vsyncEnableStatus_[devId]) {
+		DISPLAY_LOGW("%{public}s:vsyncStatus[%{public}u] = %{public}d, skip",
+		    _func_, devId, vsyncEnableStatus_[devId]);
+	    return HDF_SUCCESS;
+	}
+	
+	CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->SetDisplayVsyncEnabled(devId, enabled);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
-        DISPLAY_LOGE("%{public}s fail devId:%{public}u enabled:%{public}d", __func__, devId, enabled));
+        DISPLAY_LOGE("%{public}s: vsyncStatus[%{public}u] = %{public}d, fail", __func__, devId, enabled));
+	    vsyncEnableStatus_[devId] = enabled;	
     return ret;
 }
 

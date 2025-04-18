@@ -106,8 +106,9 @@ private:
     DisplayComposerVdiAdapter* vdiAdapter_;
     std::mutex mutex_;
     std::shared_ptr<DeviceCacheManager> cacheMgr_;
-    uint32_t currentBacklightLevel_;
-    sptr<IHotPlugCallback> hotPlugCb_;
+    std::unordered_map<uint32_t, uint32_t> currentBacklightLevel_;
+	std::unordered_map<uint32_t, bool> vsyncEnableStatus_;
+	sptr<IHotPlugCallback> hotPlugCb_;
     sptr<IVBlankCallback> vBlankCb_;
     sptr<IModeCallback> modeCb_;
     sptr<ISeamlessChangeCallback> seamlessChangeCb_;
