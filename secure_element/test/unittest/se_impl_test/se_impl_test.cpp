@@ -62,7 +62,7 @@ void SeImplTest::TearDown()
  * @tc.desc: Test SeImplTest init.
  * @tc.type: FUNC
  */
-HWTEST_F(SeImplTest, init001, TestSize.Level1)
+HWTEST_F(SeImplTest, init001, TestSize.Level0)
 {
     const sptr<ISecureElementCallback> clientCallback = nullptr;
     SecureElementStatus status;
