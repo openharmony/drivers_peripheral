@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "audio_capture_interface_impl.h"
 #include "if_system_ability_manager.h"
@@ -33,13 +34,14 @@ void CaptureFrameFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string adpName(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string adpName = fdp.ConsumeRandomLengthString();
     AudioDeviceDescriptor desc;
     AudioSampleAttributes attrs;
     sptr<IDAudioCallback> callback = nullptr;
     auto audioCapture = std::make_shared<AudioCaptureInterfaceImpl>(adpName, desc, attrs, callback);
     std::vector<int8_t> frame;
-    uint64_t requestBytes = *(reinterpret_cast<const uint64_t*>(data));
+    uint64_t requestBytes = fdp.ConsumeIntegral<uint64_t>();
 
     audioCapture->CaptureFrame(frame, requestBytes);
 }
