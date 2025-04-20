@@ -64,7 +64,7 @@ void AudioIdlHdiRendervolumeTest::TearDown(void)
     * @tc.desc    Test RenderGetGainThreshold interface,return 0 if the GetGainThreshold is obtained successfully
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainThreshold_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainThreshold_001, TestSize.Level0)
 {
     int32_t ret = -1;
     float min = 0;
@@ -129,7 +129,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainThresholdNull_004, TestS
     * @tc.desc    Test RenderSetGain interface,return 0 if Set gain to normal value, maximum or minimum and get success
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_001, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, render);
@@ -168,7 +168,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_001, TestSize.Level1)
     * @tc.desc    Test RenderSetGain interface,return -3 if Set gain to exceed the boundary value
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_002, TestSize.Level0)
 {
     int32_t ret = -1;
     float min = 0;
@@ -191,7 +191,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_002, TestSize.Level1)
     * @tc.desc    Test RenderSetGain interface,return -1 if set gain to exception type
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_003, TestSize.Level0)
 {
     int32_t ret = -1;
     char gain = 'a';
@@ -221,7 +221,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGainNull_004, TestSize.Level
     * @tc.desc    Test RenderGetGain interface,return 0 if the RenderGetGain was obtained successfully
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGain_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGain_001, TestSize.Level0)
 {
     int32_t ret = -1;
     float min = 0;
@@ -291,7 +291,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainNull_004, TestSize.Level
 * @tc.desc    Test AudioRenderSetMute interface , return 0 if the audiorender object sets mute successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetMute_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetMute_001, TestSize.Level0)
 {
     int32_t ret = -1;
     bool muteFalse = false;
@@ -352,7 +352,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetMute_003, TestSize.Level1)
 * @tc.desc    Test AudioRenderGetMute interface , return 0 if the audiocapture gets mute successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetMute_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetMute_001, TestSize.Level0)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -412,7 +412,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetMuteNull_003, TestSize.Level
 * @tc.desc    Test AudioRenderSetVolume interface , return 0 if the audiocapture sets volume successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolume_001, TestSize.Level0)
 {
     int32_t ret = -1;
     float volumeInit = 0.20;
@@ -500,7 +500,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolumeNull_003, TestSize.Lev
 * @tc.desc    Test AudioRenderGetVolume interface , return 0 if the audiocapture is get successful.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetVolume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetVolume_001, TestSize.Level0)
 {
     int32_t ret = -1;
     float volume = 0.30;

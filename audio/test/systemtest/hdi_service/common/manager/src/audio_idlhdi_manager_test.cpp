@@ -54,7 +54,7 @@ void AudioIdlHdiManagerTest::TearDown(void) {}
 * @tc.desc  test GetAllAdapters interface，Returns 0 if the list is obtained successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdapters_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdapters_001, TestSize.Level0)
 {
     int32_t ret = -1;
     uint32_t descsLen = AUDIO_ADAPTER_MAX_NUM;
@@ -134,7 +134,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdaptersNull_004, TestSize.Level1)
 * @tc.desc  test GetAllAdapters interface，Returns -7001 if the incoming parameter descsLen is too small
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdapters_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdapters_005, TestSize.Level0)
 {
     int32_t ret = -1;
     uint32_t descsLen = AUDIO_ADAPTER_MAX_NUM;
@@ -156,7 +156,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdapters_005, TestSize.Level1)
 * @tc.desc  test LoadAdapter interface，Returns 0 if the driver is loaded successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_001, TestSize.Level0)
 {
     uint32_t descsLen = AUDIO_ADAPTER_MAX_NUM;
     struct AudioAdapterDescriptor *descs = nullptr;
@@ -258,7 +258,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapterNull_004, TestSize.Level1)
 * @tc.type: FUNC
 */
 
-HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_005, TestSize.Level0)
 {
     uint32_t descsLen = AUDIO_ADAPTER_MAX_NUM;
     struct AudioAdapterDescriptor *descs = nullptr;
@@ -280,7 +280,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_005, TestSize.Level1)
 * @tc.desc  test LoadAdapter interface，Returns -3 if the adapterName of incoming parameter desc is illegal
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_006, TestSize.Level0)
 {
     int32_t ret = -1;
     struct AudioAdapterDescriptor desc = {
@@ -300,7 +300,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_006, TestSize.Level1)
 * @tc.desc  test LoadAdapter interface，Load two sound cards at the same time, Returns 0 If the loading is successful,
             Return - 1 If the loading fails.
 */
-HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_008, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_008, TestSize.Level0)
 {
     int32_t ret = -1;
     struct AudioPort audioPort = {};
@@ -329,7 +329,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_008, TestSize.Level1)
 * @tc.desc  test UnloadAdapter interface，Returns 0 if If the sound card can be successfully uninstalled
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiManagerTest, AudioUnloadAdapter_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerTest, AudioUnloadAdapter_001, TestSize.Level0)
 {
     int32_t ret = -1;
     struct AudioPort audioPort = {};
@@ -400,7 +400,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioUnloadAdapterNull_003, TestSize.Level1)
 * @tc.desc  test UnloadAdapter interface，Returns -1 if The name of the adapterName is not supported
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiManagerTest, AudioUnloadAdapter_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerTest, AudioUnloadAdapter_004, TestSize.Level0)
 {
     int32_t ret = -1;
     struct AudioPort audioPort = {};
