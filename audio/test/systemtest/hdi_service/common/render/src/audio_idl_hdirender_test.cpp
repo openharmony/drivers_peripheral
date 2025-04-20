@@ -67,7 +67,7 @@ void AudioIdlHdiRenderTest::TearDown(void)
 * @tc.desc  test RenderGetLatency interface, return 0 if GetLatency successful
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetLatency_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetLatency_001, TestSize.Level0)
 {
     int32_t ret;
     uint32_t latencyTime = 0;
@@ -124,7 +124,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetLatencyNull_003, TestSize.Level1)
 * @tc.desc  test RenderFrame interface,Returns 0 if the data is written successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderFrame_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderFrame_001, TestSize.Level0)
 {
     int32_t ret;
     uint64_t requestBytes = 0;
@@ -225,7 +225,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderFrameNull_004, TestSize.Level1)
 * @tc.desc  Test RenderFrame interface,Returns -3 if without calling interface renderstart
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderFrame_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderFrame_005, TestSize.Level0)
 {
     int32_t ret;
     uint64_t replyBytes = 0;
@@ -249,7 +249,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderFrame_005, TestSize.Level1)
 * @tc.desc    Test GetRenderPosition interface,Returns 0 if get RenderPosition during playing.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_001, TestSize.Level0)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -278,7 +278,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_001, TestSize.Level
 * @tc.desc     Test GetRenderPosition interface,Returns 0 if get RenderPosition after Pause and resume during playing
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_002, TestSize.Level0)
 {
     int32_t ret;
     int64_t timeExp = 0;
@@ -319,7 +319,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_002, TestSize.Level
 * @tc.desc    Test GetRenderPosition interface,Returns 0 if get RenderPosition after stop
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_003, TestSize.Level0)
 {
     int32_t ret;
     int64_t timeExp = 0;
@@ -342,7 +342,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_003, TestSize.Level
     * @tc.desc    Test RenderGetRenderPosition interface, return 0 if setting the parameter render is legal
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_004, TestSize.Level0)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -405,7 +405,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPositionNull_007, TestSize.L
     * @tc.desc    Test RenderGetRenderPosition interface, return 0 if the GetRenderPosition was called twice
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_008, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_008, TestSize.Level0)
 {
     int32_t ret;
     int64_t timeExp = 0;
@@ -429,7 +429,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_008, TestSize.Level
     * @tc.desc    Test SetRenderSpeed interface,return -2 if setting RenderSpeed
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderSetRenderSpeed_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderSetRenderSpeed_001, TestSize.Level0)
 {
     int32_t ret;
     float speed = 100;
@@ -464,7 +464,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderSetRenderSpeedNull_002, TestSize.Leve
     * @tc.desc    Test GetRenderSpeed interface,return -2 if getting RenderSpeed
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderSpeed_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderSpeed_001, TestSize.Level0)
 {
     int32_t ret;
     float speed = 0;
@@ -518,7 +518,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderSpeedNull_003, TestSize.Leve
 * @tc.desc    Test AudioRenderTurnStandbyMode interface,return 0 if the interface use correctly.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_001, TestSize.Level0)
 {
     int32_t ret;
 
@@ -540,7 +540,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_001, TestSize.Level1)
 * @tc.desc    Test AudioRenderRegCallback interface,return 0 if the interface use correctly.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_002, TestSize.Level0)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs;
@@ -580,7 +580,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_002, TestSize.Level1)
 * @tc.desc    Test AudioRenderRegCallback interface,return 0 if setting input paramter self is nullptr
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_003, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioRender *renderNull = nullptr;
@@ -596,7 +596,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_003, TestSize.Level1)
 * @tc.desc    Test AudioRenderRegCallback interface,return -3 if setting input paramter IAudioCallback is nullptr
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_004, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioCallback *AudioRenderCallbackNull = nullptr;
@@ -610,7 +610,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_004, TestSize.Level1)
 * @tc.desc    Test AudioRenderRegCallback interface,return -3 if setting input paramter callback function is nullptr
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_005, TestSize.Level0)
 {
     int32_t ret;
     ASSERT_NE(nullptr, render);
@@ -625,7 +625,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderRegCallback_005, TestSize.Level1)
     * @tc.desc    Test SetChannelMode interface,return 0 if set channel mode after render object is created
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderSetChannelMode_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderSetChannelMode_003, TestSize.Level0)
 {
     int32_t ret;
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
@@ -658,7 +658,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderSetChannelModeNull_004, TestSize.Leve
     * @tc.desc    Test GetChannelMode interface,return 0 if getting the channel mode after setting
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetChannelMode_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetChannelMode_001, TestSize.Level0)
 {
     int32_t ret;
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;

@@ -68,7 +68,7 @@ void AudioIdlHdiRenderAttrTest::TearDown(void)
     * @tc.desc  Test RenderGetFrameSize interface,return 0 if the FrameSize was obtained successfully
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetFrameSize_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetFrameSize_001, TestSize.Level0)
 {
     int32_t ret;
     uint64_t size = 0;
@@ -99,7 +99,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetFrameSizeNull_002, TestSize.Le
     * @tc.desc  Test RenderGetFrameCount interface, return 0 if the FrameSize was obtained successfully
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetFrameCount_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetFrameCount_001, TestSize.Level0)
 {
     int32_t ret;
     uint64_t count = 0;
@@ -154,7 +154,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetFrameCountNull_003, TestSize.L
     * @tc.desc    Test RenderGetCurrentChannelId, return 0 if the default CurrentChannelId is obtained successfully
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetCurrentChannelId_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetCurrentChannelId_001, TestSize.Level0)
 {
     int32_t ret;
     uint32_t channelId = 0;
@@ -199,7 +199,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetCurrentChannelIdNull_004, Test
     * @tc.desc    Test RenderSetExtraParams interface,return 0 if the ExtraParams is set during playback
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_001, TestSize.Level0)
 {
     int32_t ret;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
@@ -238,7 +238,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_001, TestSize.Leve
     * @tc.desc    Test RenderSetExtraParams interface,return 0 if some parameters is set after playing
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_002, TestSize.Level0)
 {
     int32_t ret;
     char keyValueListOne[] = "attr-frame-count=1024;";
@@ -297,7 +297,7 @@ attr-sampling-rate=48000";
     * @tc.desc    Test RenderSetExtraParams interface,return -1 if the Keyvaluelist is a value out of range
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_003, TestSize.Level0)
 {
     int32_t ret;
     char keyValueList[] = "attr-para=abc;";
@@ -311,7 +311,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_003, TestSize.Leve
     * @tc.desc    Test RenderSetExtraParams interface,return -1 if adding parameters to keyvaluelist
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_004, TestSize.Level0)
 {
     int32_t ret;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;\
@@ -327,7 +327,7 @@ attr-frame-count=82;attr-sampling-rate=48000;attr-para=123";
     is different
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_005, TestSize.Level0)
 {
     int32_t ret;
     char keyValueList[] = "attr-sampling-rate=48000;attr-sampling-rate=96000;attr-frame-count=4096;";
@@ -355,7 +355,7 @@ attr-sampling-rate=96000";
                   as an abnormal value
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_006, TestSize.Level0)
 {
     int32_t ret;
     char attrSamplingRateError[] = "attr-sampling-rate=1234567;";
@@ -396,7 +396,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParamsNull_007, TestSize.
     * @tc.desc    Test RenderSetExtraParams interface,return -1 if set the format of ExtraParams is nullptr
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_008, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParams_008, TestSize.Level0)
 {
     int32_t ret;
     char keyValueLnullptr[] = "attr-format=;";
@@ -425,7 +425,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetExtraParamsNull_009, TestSize.
 * @tc.desc    Test RenderGetExtraParams interface,return 0 if the RenderGetExtraParams was obtained successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetExtraParams_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetExtraParams_001, TestSize.Level0)
 {
     int32_t ret;
     uint64_t count = 0;
@@ -485,7 +485,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetExtraParamsNull_002, TestSize.
     * @tc.desc    Test RenderGetExtraParams interface,return -1 if set listlength to be less than the actual length
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetExtraParams_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetExtraParams_003, TestSize.Level0)
 {
     int32_t ret;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000;";
@@ -503,7 +503,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetExtraParams_003, TestSize.Leve
     * @tc.desc    Test RenderGetExtraParams interface,return 0 if set listlenth equal to the actual length
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetExtraParams_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetExtraParams_004, TestSize.Level0)
 {
     int32_t ret;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=11111111111111111111;\

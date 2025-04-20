@@ -70,7 +70,7 @@ void AudioIdlHdiCaptureTest::TearDown(void)
 * @tc.desc  test AudioCaptureCaptureFrame interface,Returns 0 if the input data is read successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_001, TestSize.Level0)
 {
     int32_t ret;
     uint32_t replyBytes = 0;
@@ -184,7 +184,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrameNull_004, TestSize.Level1)
 * @tc.desc  Test AudioCaptureFrame interface,Returns -3 if without calling interface capturestart
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_005, TestSize.Level0)
 {
     int32_t ret;
     uint64_t requestBytes = 0;
@@ -212,7 +212,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_005, TestSize.Level1)
     requestBytes less than interface requirements
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_006, TestSize.Level0)
 {
     int32_t ret;
     uint64_t requestBytes = BUFFER_SIZE_LITTLE;
@@ -242,7 +242,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_006, TestSize.Level1)
 * @tc.desc  Test AudioCaptureGetCapturePosition interface,Returns 0 if get CapturePosition during playing.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_001, TestSize.Level0)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -273,7 +273,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_001, TestSize.Le
 * @tc.desc   Test GetCapturePosition interface,Returns 0 if get Position after Pause and resume during playing
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_002, TestSize.Level0)
 {
     int32_t ret;
     int64_t timeExp = 0;
@@ -316,7 +316,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_002, TestSize.Le
 * @tc.desc  Test GetCapturePosition interface,Returns 0 if get CapturePosition after stop during playing
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_003, TestSize.Level0)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -338,7 +338,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_003, TestSize.Le
 * @tc.desc  Test GetCapturePosition interface, return 0 if get CapturePosition after the object is created
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_004, TestSize.Level0)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -406,7 +406,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePositionNull_007, TestSiz
 * @tc.desc  Test GetCapturePosition interface, return 0 if the GetCapturePosition was called twice
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_008, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_008, TestSize.Level0)
 {
     int32_t ret;
     uint64_t frames = 0;

@@ -147,7 +147,7 @@ void HdfAudioUtAdapterDirectTest::TearDown()
     manager_ = nullptr;
 }
 
-HWTEST_F(HdfAudioUtAdapterDirectTest, HdfAudioAdapterDirectCreateRenderIsvalid001, TestSize.Level1)
+HWTEST_F(HdfAudioUtAdapterDirectTest, HdfAudioAdapterDirectCreateRenderIsvalid001, TestSize.Level0)
 {
     struct IAudioRender *render = nullptr;
     struct AudioDeviceDescriptor devicedesc = {};
@@ -163,7 +163,7 @@ HWTEST_F(HdfAudioUtAdapterDirectTest, HdfAudioAdapterDirectCreateRenderIsvalid00
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(HdfAudioUtAdapterDirectTest, HdfAudioAdapterDirectCreateRenderIsvalid002, TestSize.Level1)
+HWTEST_F(HdfAudioUtAdapterDirectTest, HdfAudioAdapterDirectCreateRenderIsvalid002, TestSize.Level0)
 {
     struct IAudioRender *render = nullptr;
     struct AudioDeviceDescriptor devicedesc = {};
@@ -180,7 +180,7 @@ HWTEST_F(HdfAudioUtAdapterDirectTest, HdfAudioAdapterDirectCreateRenderIsvalid00
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(HdfAudioUtAdapterDirectTest, HdfAudioAdapterDirectCreateRenderIsvalid003, TestSize.Level1)
+HWTEST_F(HdfAudioUtAdapterDirectTest, HdfAudioAdapterDirectCreateRenderIsvalid003, TestSize.Level0)
 {
     struct IAudioRender *render = nullptr;
     struct AudioDeviceDescriptor devicedesc = {};
