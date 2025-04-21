@@ -50,7 +50,11 @@ extern "C" void IntellVoiceEngineManagerImplRelease(IIntellVoiceEngineManager *m
 int32_t IntellVoiceEngineManagerImpl::LoadVendorLib()
 {
     std::string error;
+#ifdef ONLY_SECOND_STAGE
+    const char *vendorLibPath = HDF_LIBRARY_FULL_PATH("libintell_voice_engine_wrapper");
+#else
     const char *vendorLibPath = HDF_LIBRARY_FULL_PATH("libvendor_intell_voice_engine");
+#endif
     engineManagerPriv_.handle = dlopen(vendorLibPath, RTLD_LAZY);
     if (engineManagerPriv_.handle == nullptr) {
         error = dlerror();
