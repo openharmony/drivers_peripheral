@@ -81,6 +81,7 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
             codecBuffer.filledLen = sizeof(DynamicBuffer);
         }
     }
+    codecBuffer_.alongParam = std::move(codecBuffer.alongParam);
 
     int fence = codecBuffer.fenceFd;
     if (fence >= 0) {
