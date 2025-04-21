@@ -68,6 +68,7 @@ namespace {
     constexpr char CODEC_CONFIG_KEY_MAX_LTR_FRAME_NUM[] = "maxLTRFrameNum";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_WATERMARK[] = "isSupportWaterMark";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_SEEK_WITHOUT_FLUSH[] = "isSupportSeekWithoutFlush";
+    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_QP_MAP[] = "isSupportQPMap";
 
     constexpr char CODEC_CONFIG_KEY_SAMPLE_FORMATS[] = "sampleFormats";
     constexpr char CODEC_CONFIG_KEY_SAMPLE_RATE[] = "sampleRate";
@@ -391,6 +392,7 @@ void CodecComponentConfig::GetVideoPortFeature(const struct DeviceResourceIface 
         }
     }
     cap.port.video.isSupportWaterMark = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_WATERMARK);
+    cap.port.video.isSupportQPMap = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_QP_MAP);
     cap.port.video.isSupportSeekWithoutFlush = iface.GetBool(&childNode,
         CODEC_CONFIG_KEY_IS_SUPPORT_SEEK_WITHOUT_FLUSH);
 }
