@@ -377,7 +377,8 @@ static ResultCode WriteAddPinInfo(const Buffer *secret, const Buffer *pinCredent
 static Buffer *GenerateExpandData(char *str, const uint8_t *data, const uint32_t dataLen)
 {
     /* CONST_EXPAND_DATA_LEN is twice the size of dataLen */
-    if (dataLen < strlen(str) || dataLen != (CONST_EXPAND_DATA_LEN / 2)) {
+    int32_t multiple = 2;
+    if (dataLen < strlen(str) || dataLen != (CONST_EXPAND_DATA_LEN / multiple)) {
         LOG_ERROR("bad param.");
         return NULL;
     }
