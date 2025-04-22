@@ -26,7 +26,7 @@ namespace Sensor {
 namespace V2_1 {
 namespace {
     constexpr int32_t DATA_LEN = 256;
-    constexpr int64_t REPOPRT_TIME = 60000000000;
+    constexpr int64_t REPOPRT_TIME = 120000000000;
     constexpr int64_t INIT_DATA_COUNT = 1;
     static std::unordered_map<int32_t, int64_t> firstTimestampMap_;
     static std::unordered_map<int32_t, int64_t> lastTimestampMap_;
