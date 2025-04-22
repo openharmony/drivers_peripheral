@@ -146,7 +146,7 @@ void HdfAudioUtAdapterMultiTest::TearDown()
     manager_ = nullptr;
 }
 
-HWTEST_F(HdfAudioUtAdapterMultiTest, HdfAudioAdapterMultchannelCreateRenderIsvalid001, TestSize.Level1)
+HWTEST_F(HdfAudioUtAdapterMultiTest, HdfAudioAdapterMultchannelCreateRenderIsvalid001, TestSize.Level0)
 {
     struct IAudioRender *render = nullptr;
     struct AudioDeviceDescriptor devicedesc = {};

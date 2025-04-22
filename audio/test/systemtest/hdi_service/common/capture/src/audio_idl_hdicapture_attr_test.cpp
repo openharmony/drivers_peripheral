@@ -67,7 +67,7 @@ void AudioIdlHdiCaptureAttrTest::TearDown(void)
 * @tc.desc  test AudioCaptureGetFrameSize interface, return 0 is call successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameSize_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameSize_001, TestSize.Level0)
 {
     int32_t ret = -1;
     uint64_t size = 0;
@@ -108,7 +108,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameSizeNull_003, TestSize.
 * @tc.desc  test AudioCaptureGetFrameCount interface, return 0 if the FrameCount is called after creating the object.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCount_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCount_001, TestSize.Level0)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -122,7 +122,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCount_001, TestSize.Lev
 * @tc.desc  test AudioCaptureGetFrameCount interface, return 0 if the GetFrameCount is called after started.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCount_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCount_002, TestSize.Level0)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -167,7 +167,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCountNull_004, TestSize
 * @tc.desc  Test GetCurrentChannelId, return 0 if the default CurrentChannelId is obtained successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelId_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelId_001, TestSize.Level0)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -182,7 +182,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelId_001, TestSi
 * @tc.desc  Test GetCurrentChannelId interface, return 0 if CurrentChannelId is obtained after started
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelId_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelId_003, TestSize.Level0)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -228,7 +228,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelIdNull_005, Te
 * @tc.desc  Test CaptureSetExtraParams interface,return 0 if the ExtraParams is set during playback
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_001, TestSize.Level0)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
@@ -270,7 +270,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_001, TestSize.Le
 * @tc.desc  Test CaptureSetExtraParams interface,return 0 if some parameters is set after playing
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_002, TestSize.Level0)
 {
     int32_t ret = -1;
     char keyValueListOne[] = "attr-frame-count=4096;";
@@ -330,7 +330,7 @@ attr-sampling-rate=48000";
 * @tc.desc  Test CaptureSetExtraParams interface,return -1 if the Keyvaluelist is a value out of range
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_003, TestSize.Level0)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-para=abc;";
@@ -343,7 +343,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_003, TestSize.Le
 * @tc.desc  Test CaptureSetExtraParams interface,return -1 if adding parameters to keyvaluelist
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_004, TestSize.Level0)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;\
@@ -358,7 +358,7 @@ attr-frame-count=82;attr-sampling-rate=48000;attr-para=abc";
     is different
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_005, TestSize.Level0)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-frame-count=4096;";
@@ -387,7 +387,7 @@ attr-sampling-rate=48000";
 * @tc.desc  Test CaptureSetExtraParams interface,return -1 if set the parameter in keyvaluelist as an abnormal value
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_006, TestSize.Level0)
 {
     int32_t ret = -1;
     char attrSamplingRateError[] = "attr-sampling-rate=1234567;";
@@ -439,7 +439,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParamsNull_008, TestSiz
 * @tc.desc  Test CaptureGetExtraParams interface,return 0 if the RenderGetExtraParams was obtained successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParams_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParams_001, TestSize.Level0)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -500,7 +500,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParamsNull_002, TestSiz
 * @tc.desc  Test CaptureGetExtraParams interface,return -1 if set listlength to be less than the actual length
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParams_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParams_003, TestSize.Level0)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;\
@@ -519,7 +519,7 @@ attr-frame-count=82;attr-sampling-rate=48000;";
 * @tc.desc  Test CaptureGetExtraParams interface,return 0 if set listlenth equal to the actual length
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParams_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParams_004, TestSize.Level0)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=11111111111111111111;\

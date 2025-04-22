@@ -67,7 +67,7 @@ void AudioIdlHdiCaptureControlTest::TearDown(void)
 * @tc.desc  Test AudioCaptureStart interface,return 0 if the audiocapture object is started successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStart_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStart_001, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -94,7 +94,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStartNull_002, TestSize.Leve
 * @tc.desc  Test AudioCaptureStart interface,return 0 if the Audiocapturestart was successfully called twice
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStart_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStart_003, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -109,7 +109,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStart_003, TestSize.Level1)
 * @tc.desc  Test AudioCaptureStop interface,return 0 if the audiocapture object is stopped successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_001, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -123,7 +123,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_001, TestSize.Level1)
 * @tc.desc  Test AudioCaptureStop interface,return -2 if Audiocapturestop was successfully called twice
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_002, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -139,7 +139,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_002, TestSize.Level1)
 * @tc.desc  Test AudioCaptureStop interface,return 0 if stop and start an audio capture successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_003, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -156,7 +156,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_003, TestSize.Level1)
 * @tc.desc  Test AudioCaptureStop interface,return -2 if the capture does not start and stop only
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_004, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -183,7 +183,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStopNull_005, TestSize.Level
 * @tc.desc  test HDI CapturePause interface, return 0 if the capture is paused after start
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_001, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -199,7 +199,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_001, TestSize.Level1)
 * @tc.desc  Test CapturePause interface, return -2 the second time if CapturePause is called twice
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_002, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -234,7 +234,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePauseNull_003, TestSize.Leve
 * @tc.desc  Test AudioCapturePause interface,return -1 if the capture is not Started and paused only.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_004, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -246,7 +246,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_004, TestSize.Level1)
 * @tc.desc  Test CapturePause interface, return -1 the capture is paused after stopped.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_005, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -262,7 +262,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_005, TestSize.Level1)
 * @tc.desc  Test CaptureResume interface,return 0 if the capture is resumed after paused
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_001, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -280,7 +280,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_001, TestSize.Level1)
 * @tc.desc  Test CaptureResume interface,return -2 the second time if the CaptureResume is called twice
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_002, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -301,7 +301,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_002, TestSize.Level1)
 * @tc.desc  test HDI CaptureResume interface,return -2 if the capture is resumed after started
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_003, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -336,7 +336,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResumeNull_004, TestSize.Lev
 * @tc.desc  test HDI CaptureResume interface,return -2 if the capture is resumed after stopped
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_005, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -352,7 +352,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_005, TestSize.Level1)
 * @tc.desc  test HDI CaptureResume interface,return -1 if the capture Continue to start after resume
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_006, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -372,7 +372,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_006, TestSize.Level1)
 * @tc.desc  Test CaptureFlush interface,return -2 if the data in the buffer is flushed successfully after stop
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureFlush_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureFlush_001, TestSize.Level0)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -405,7 +405,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureFlushNull_002, TestSize.Leve
 * @tc.desc    Test CaptureTurnStandbyMode interface,return 0 if the interface use correctly.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureTurnStandbyMode_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureTurnStandbyMode_001, TestSize.Level0)
 {
     int32_t ret = -1;
 
@@ -440,7 +440,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureTurnStandbyModeNull_002, Tes
 * @tc.desc    Test CaptureAudioDevDump interface,return 0 if the interface use correctly.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_001, TestSize.Level0)
 {
     int32_t ret = -1;
     char pathBuf[] = "./DevDump.log";
@@ -478,7 +478,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_001, TestSize.L
 * @tc.desc    Test CaptureAudioDevDump interface,return 0 if the interface use correctly.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_002, TestSize.Level0)
 {
     int32_t ret = -1;
     char path[] = "./DevDump.log";
@@ -517,7 +517,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_002, TestSize.L
 * @tc.desc    Test CaptureAudioDevDump interface,return -3 if setting the incoming parameter range is out of range
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_003, TestSize.Level0)
 {
     int32_t ret = -1;
     char pathBuf[] = "./DevDump.log";
@@ -562,7 +562,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDumpNull_004, TestSi
 * @tc.desc    Test CaptureAudioDevDump interface,return -3 if setting the incoming parameter fd is illegal
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_005, TestSize.Level0)
 {
     int32_t ret = -1;
 

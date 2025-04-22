@@ -63,7 +63,7 @@ void AudioIdlHdiAdapterTest::TearDown(void)
 * @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if the ports is initialize successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPorts_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPorts_001, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -105,7 +105,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPortsNull_003, TestSize.Leve
 * @tc.desc  Test AudioAdapterGetPortCapability,return 0 if PortType is PORT_OUT.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapability_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapability_001, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = {};
@@ -251,7 +251,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapabilityNull_005, TestSize
 * @tc.desc  test AdapterSetPassthroughMode interface, return 0 if PortType is PORT_OUT.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterSetPassthroughMode_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterSetPassthroughMode_001, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -384,7 +384,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterSetPassthroughMode_005, TestSize.Le
 * @tc.desc  test AdapterGetPassthroughMode interface, return 0 if is get successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPassthroughMode_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPassthroughMode_001, TestSize.Level0)
 {
     int32_t ret;
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_AUTO;
@@ -495,7 +495,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPassthroughModeNull_004, TestSiz
 * @tc.desc  Test AudioCreateCapture interface,Returns 0 if the IAudioCapture object is created successfully
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_001, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -519,7 +519,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_001, TestSize.Level1)
      (2)passthrough mode: Returns -1,if the IAudioCapture object can't be created which was created
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_002, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -552,7 +552,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_002, TestSize.Level1)
     when IAudioRender was created
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_003, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -691,7 +691,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCaptureNull_008, TestSize.Level1)
 * PIN_OUT_SPEAKER
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_009, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_009, TestSize.Level0)
 {
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
@@ -716,7 +716,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_009, TestSize.Level1)
 * @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter desc which portID is not configed
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_010, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_010, TestSize.Level0)
 {
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
@@ -741,7 +741,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_010, TestSize.Level1)
 * @tc.desc  test AudioCreateRender interface,return 0 if render is created successful.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_001, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -767,7 +767,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_001, TestSize.Level1)
     * @tc.desc  test AudioCreateRender interface,return -1 if the incoming parameter pins is PIN_IN_MIC.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_003, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -794,7 +794,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_003, TestSize.Level1)
 * @tc.desc  test AudioCreateRender interface,return -1 if the incoming parameter attr is error.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_004, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -933,7 +933,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRenderNull_008, TestSize.Level1)
 * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming parameter pins of devDesc is error.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_009, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_009, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -961,7 +961,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_009, TestSize.Level1)
 * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming desc which portId is not configed
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_010, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_010, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -988,7 +988,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_010, TestSize.Level1)
 * @tc.desc  Test AudioDestroyCapture interface,Returns 0 if the IAudioCapture object is destroyed
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyCapture_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyCapture_001, TestSize.Level0)
 {
     int32_t ret;
     AudioPortPin pins = PIN_IN_MIC;
@@ -1038,7 +1038,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyCaptureNull_002, TestSize.Level1)
     * @tc.desc  Test AudioDestroyRender interface, return 0 if render is destroyed successful.
     * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyRender_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyRender_001, TestSize.Level0)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;

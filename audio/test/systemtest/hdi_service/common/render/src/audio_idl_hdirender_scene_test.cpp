@@ -66,7 +66,7 @@ void AudioIdlHdiRenderSceneTest::TearDown(void)
 * @tc.desc    Test AudioRenderCheckSceneCapability interface,return 0 if check scene's capability successful.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapability_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapability_001, TestSize.Level0)
 {
     int32_t ret = -1;
     bool supported = false;
@@ -86,7 +86,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapability_001, TestSi
 * @tc.desc    Test RenderCheckSceneCapability interface,return -1 if the scene is not configed in the josn.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapability_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapability_002, TestSize.Level0)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -160,7 +160,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapabilityNull_005, Te
 * @tc.desc    Test RenderSelectScene interface,return 0 if select Render's scene successful.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectScene_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectScene_001, TestSize.Level0)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -183,7 +183,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectScene_001, TestSize.Level1
 * @tc.desc    Test RenderSelectScene, return 0 if select Render's scene successful after Render start.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectScene_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectScene_002, TestSize.Level0)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
