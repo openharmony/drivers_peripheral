@@ -1031,7 +1031,7 @@ static int32_t UsbFnAdapterGetPipeInfo(int32_t ep, struct UsbFnPipeInfo * const 
 
     struct UsbEndpointDescriptor desc;
     ret = ioctl(ep, FUNCTIONFS_ENDPOINT_DESC, &desc);
-    if (ret < 0) {
+    if (ret != 0) {
         HDF_LOGE("%{public}s: GetPipeInfo failed, ret: %{public}d, errno: %{public}d", __func__, ret, errno);
         return HDF_ERR_IO;
     }
