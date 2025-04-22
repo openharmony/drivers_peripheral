@@ -189,7 +189,7 @@ HWTEST_F(AudioUtRenderTest, RenderStartNull001, TestSize.Level1)
     render_->Stop(render_);
 }
 
-HWTEST_F(AudioUtRenderTest, RenderStartNull002, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderStartNull002, TestSize.Level0)
 {
     EXPECT_EQ(HDF_SUCCESS, render_->Start(render_));
     EXPECT_NE(HDF_SUCCESS, render_->Start(render_));
@@ -197,7 +197,7 @@ HWTEST_F(AudioUtRenderTest, RenderStartNull002, TestSize.Level1)
     render_->Stop(render_);
 }
 
-HWTEST_F(AudioUtRenderTest, RenderStartStopIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderStartStopIsValid001, TestSize.Level0)
 {
     EXPECT_EQ(HDF_SUCCESS, render_->Start(render_));
     EXPECT_EQ(HDF_SUCCESS, render_->Stop(render_));
@@ -208,7 +208,7 @@ HWTEST_F(AudioUtRenderTest, RenderFlushNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->Flush(nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderFlushIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderFlushIsValid001, TestSize.Level0)
 {
     EXPECT_NE(HDF_SUCCESS, render_->Flush(render_));
 }
@@ -218,7 +218,7 @@ HWTEST_F(AudioUtRenderTest, RenderStopNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->Stop(nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderStopInvalid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderStopInvalid001, TestSize.Level0)
 {
     int32_t ret = render_->Stop(render_);
     ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
@@ -235,7 +235,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetFrameSizeNull002, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->GetFrameSize(render_, nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetFrameSizeIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetFrameSizeIsValid001, TestSize.Level0)
 {
     uint64_t frameSize = 0;
     EXPECT_EQ(HDF_SUCCESS, render_->GetFrameSize(render_, &frameSize));
@@ -252,7 +252,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetFrameCountNull002, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->GetFrameCount(render_, nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetFrameCountIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetFrameCountIsValid001, TestSize.Level0)
 {
     uint64_t frameCount = 0;
     EXPECT_EQ(HDF_SUCCESS, render_->GetFrameCount(render_, &frameCount));
@@ -269,7 +269,7 @@ HWTEST_F(AudioUtRenderTest, RenderSetSampleAttributesNull002, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->SetSampleAttributes(render_, nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderSetSampleAttributesIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderSetSampleAttributesIsValid001, TestSize.Level0)
 {
     struct AudioSampleAttributes attrs = attrsRender_;
     EXPECT_EQ(HDF_SUCCESS, render_->SetSampleAttributes(render_, &attrs));
@@ -286,7 +286,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetSampleAttributesNull002, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->GetSampleAttributes(render_, nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetSampleAttributesIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetSampleAttributesIsValid001, TestSize.Level0)
 {
     struct AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_SUCCESS, render_->GetSampleAttributes(render_, &attrs));
@@ -303,7 +303,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetCurrentChannelIdNull002, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->GetCurrentChannelId(render_, nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetCurrentChannelIdIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetCurrentChannelIdIsValid001, TestSize.Level0)
 {
     uint32_t channelId;
     EXPECT_EQ(HDF_SUCCESS, render_->GetCurrentChannelId(render_, &channelId));
@@ -338,7 +338,7 @@ HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityInValid001, TestSize.Level
     ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
 }
 
-HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityIsValid001, TestSize.Level0)
 {
     struct AudioSceneDescriptor scene;
     bool supported = false;
@@ -369,7 +369,7 @@ HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid001, TestSize.Level1)
     free(scene.desc.desc);
 }
 
-HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid001, TestSize.Level0)
 {
     struct AudioSceneDescriptor scene;
     scene.scene.id = AUDIO_IN_MEDIA;
@@ -392,7 +392,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetLatencyNull002, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->GetLatency(render_, nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetLatencyIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetLatencyIsValid001, TestSize.Level0)
 {
     uint32_t ms = 0;
     EXPECT_EQ(HDF_SUCCESS, render_->GetLatency(render_, &ms));
@@ -417,7 +417,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionNull003, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->GetRenderPosition(render_, &frames, nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid001, TestSize.Level0)
 {
     uint64_t frames = 0;
     struct AudioTimeStamp time;
@@ -428,7 +428,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid001, TestSize.Level1)
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid002, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid002, TestSize.Level0)
 {
     uint64_t frames;
     struct AudioTimeStamp time;
@@ -465,7 +465,7 @@ HWTEST_F(AudioUtRenderTest, RenderSetExtraParamsNull002, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->SetExtraParams(render_, nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderSetExtraParamsIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderSetExtraParamsIsValid001, TestSize.Level0)
 {
     char keyValueList[AUDIO_RENDER_BUF_TEST] =
         "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
@@ -485,7 +485,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetExtraParamsNull002, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->GetExtraParams(render_, nullptr, keyValueListLen));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetExtraParamsIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetExtraParamsIsValid001, TestSize.Level0)
 {
     char keyValueList[AUDIO_RENDER_BUF_TEST] = {};
     uint32_t keyValueListLen = BUFFER_LENTH;
@@ -498,7 +498,7 @@ HWTEST_F(AudioUtRenderTest, RenderTurnStandbyModeNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->TurnStandbyMode(nullptr));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderTurnStandbyModeIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderTurnStandbyModeIsValid001, TestSize.Level0)
 {
     int32_t ret = render_->Start(render_);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -516,7 +516,7 @@ HWTEST_F(AudioUtRenderTest, RenderAudioDevDumpNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->AudioDevDump(nullptr, range, -1));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderAudioDevDumpIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderAudioDevDumpIsValid001, TestSize.Level0)
 {
     int32_t range = 4;
     char pathBuf[] = "/data/RenderDump.log";
@@ -541,7 +541,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetGainNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->GetGain(nullptr, &gain));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetGainIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetGainIsValid001, TestSize.Level0)
 {
     float gain;
     int32_t ret = render_->GetGain(render_, &gain);
@@ -556,7 +556,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetGainThresholdNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->GetGainThreshold(nullptr, &min, &max));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetGainThresholdIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetGainThresholdIsValid001, TestSize.Level0)
 {
     float min = 0.0;
     float max = 1.0;
@@ -573,7 +573,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetMuteNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->GetMute(nullptr, &isMute));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetMuteIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetMuteIsValid001, TestSize.Level0)
 {
     bool isMute = false;
     int32_t ret = render_->GetMute(render_, &isMute);
@@ -626,7 +626,7 @@ HWTEST_F(AudioUtRenderTest, RenderResumeInvalid001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, render_->Resume(render_));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderPauseResumeIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderPauseResumeIsValid001, TestSize.Level0)
 {
     EXPECT_EQ(HDF_SUCCESS, render_->Start(render_));
     int32_t ret = render_->Pause(render_);
@@ -655,7 +655,7 @@ HWTEST_F(AudioUtRenderTest, RenderRenderFrameNull001, TestSize.Level1)
     }
 }
 
-HWTEST_F(AudioUtRenderTest, RenderRenderFrameIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderRenderFrameIsValid001, TestSize.Level0)
 {
     uint32_t frameLen = (uint64_t)GetRenderBufferSize();
     uint64_t requestBytes = frameLen;
@@ -679,7 +679,7 @@ HWTEST_F(AudioUtRenderTest, RenderSetChannelModeNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->SetChannelMode(nullptr, mode));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid001, TestSize.Level0)
 {
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     int32_t ret = render_->SetChannelMode(render_, mode);
@@ -693,7 +693,7 @@ HWTEST_F(AudioUtRenderTest, RenderSetGainNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->SetGain(nullptr, gain));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderSetGainIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderSetGainIsValid001, TestSize.Level0)
 {
     float gain = 1.0;
     int32_t ret = render_->SetGain(render_, gain);
@@ -707,7 +707,7 @@ HWTEST_F(AudioUtRenderTest, RenderSetMuteNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->SetMute(nullptr, mute));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderSetMuteIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderSetMuteIsValid001, TestSize.Level0)
 {
     bool mute = false;
     int32_t ret = render_->SetMute(render_, mute);
@@ -753,7 +753,7 @@ HWTEST_F(AudioUtRenderTest, RenderSetVolumeIsValid001, TestSize.Level1)
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetRenderSpeedIsInValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetRenderSpeedIsInValid001, TestSize.Level0)
 {
     float speed = 0.0;
     ASSERT_EQ(HDF_SUCCESS, render_->Start(render_));
@@ -762,7 +762,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetRenderSpeedIsInValid001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, render_->Stop(render_));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetRenderSpeedIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetRenderSpeedIsValid001, TestSize.Level0)
 {
     float speed = 0.0;
     ASSERT_EQ(HDF_SUCCESS, render_->Start(render_));
@@ -780,7 +780,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid001, TestSize.Level1)
     ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid001, TestSize.Level0)
 {
     enum AudioChannelMode channelMode = AUDIO_CHANNEL_NORMAL;
     int32_t ret = render_->GetChannelMode(render_, &channelMode);
@@ -795,7 +795,7 @@ HWTEST_F(AudioUtRenderTest, RenderRegCallbackIsInValid001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->RegCallback(render_, nullptr, cookie));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderRegCallbackIsValid001, TestSize.Level1)
+HWTEST_F(AudioUtRenderTest, RenderRegCallbackIsValid001, TestSize.Level0)
 {
     int8_t cookie = 0;
     struct IAudioCallback *audioCallback = nullptr;

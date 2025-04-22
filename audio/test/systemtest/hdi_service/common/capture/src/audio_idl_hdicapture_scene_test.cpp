@@ -67,7 +67,7 @@ void AudioIdlHdiCaptureSceneTest::TearDown(void)
 * @tc.desc  Test AudioCaptureCheckSceneCapability interface,return 0 if check scene's capability successful.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_001, TestSize.Level0)
 {
     int32_t ret = -1;
     bool supported = false;
@@ -87,7 +87,7 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_001, Test
 * @tc.desc  Test AudioCreateCapture interface,return -1 if the scene is not configured in the json.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_002, TestSize.Level0)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -164,7 +164,7 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapabilityNull_005, 
 * @tc.desc  Test AudioCaptureSelectScene interface,return 0 if select capture's scene successful.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_001, TestSize.Level0)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -181,7 +181,7 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_001, TestSize.Leve
 * @tc.desc  Test AudioCaptureSelectScene, return 0 if select capture's scene successful after capture start.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_002, TestSize.Level0)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -238,7 +238,7 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectSceneNull_004, TestSize.
 * @tc.desc  Test AudioCaptureSelectScene, return -1 if the scene is not configured in the json.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_005, TestSize.Level0)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};

@@ -67,7 +67,7 @@ void AudioIdlHdiCaptureVolumeTest::TearDown(void)
 * @tc.desc  Test AudioCaptureSetMute interface , return 0 if the audiocapture object sets mute successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMute_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMute_001, TestSize.Level0)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -111,7 +111,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMuteNull_002, TestSize.Lev
 * @tc.desc  Test AudioCaptureSetMute interface and set the parameter mutevalue with 2.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMute_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMute_003, TestSize.Level0)
 {
     bool muteValue = 2;
     int32_t ret = -1;
@@ -129,7 +129,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMute_003, TestSize.Level1)
 * @tc.desc  Test AudioCaptureGetMute interface , return 0 if the audiocapture gets mute successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetMute_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetMute_001, TestSize.Level0)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -177,7 +177,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetMuteNull_002, TestSize.Lev
 * @tc.desc  Test AudioCaptureSetVolume interface , return 0 if the audiocapture sets volume successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolume_001, TestSize.Level0)
 {
     int32_t ret = -1;
     float volumeInit = 0.30;
@@ -215,7 +215,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolume_001, TestSize.Level
 * @tc.desc  Test AudioCaptureSetVolume,return -3 if volume is set maximum value or minimum value.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolume_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolume_002, TestSize.Level0)
 {
     int32_t ret = -1;
     float volumeMin = 0;
@@ -264,7 +264,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolumeNull_003, TestSize.L
 * @tc.desc  Test AudioCaptureGetVolume interface , return 0 if the audiocapture is get successful.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolume_001, TestSize.Level0)
 {
     int32_t ret = -1;
     float volume = 0.60;
@@ -282,7 +282,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolume_001, TestSize.Level
 * @tc.desc  Test AudioCaptureGetVolume,return 0 when when capturing is in progress.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolume_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolume_002, TestSize.Level0)
 {
     int32_t ret = -1;
     float volume = 0.60;
@@ -320,7 +320,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolumeNull_003, TestSize.L
 * @tc.desc  test AudioCaptureGetGainThreshold interface, return 0 is call successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThreshold_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThreshold_001, TestSize.Level0)
 {
     int32_t ret = -1;
     float min = 0;
@@ -385,7 +385,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThresholdNull_004, Tes
 * @tc.desc  test AudioCaptureSetGain interface, return 0 is call successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_001, TestSize.Level0)
 {
     int32_t ret = -1;
     float min = 0;
@@ -424,7 +424,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_001, TestSize.Level1)
 * @tc.desc  test AudioCaptureSetGain interface, return -3 if gain greater than the maximum and less than the minimum
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_002, TestSize.Level0)
 {
     int32_t ret = -1;
     float min = 0;
@@ -462,7 +462,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGainNull_003, TestSize.Lev
 * @tc.desc  test AudioCaptureGetGain interface, return 0 if CaptureGetGain is call successfully.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGain_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGain_001, TestSize.Level0)
 {
     int32_t ret = -1;
     float min = 0;
@@ -498,7 +498,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainNull_002, TestSize.Lev
 * @tc.desc  test AudioCaptureGetGain interface, return 0 if get gain after creating the capture object.
 * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGain_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGain_003, TestSize.Level0)
 {
     int32_t ret = -1;
     float gain = GAIN_MAX - 1;
