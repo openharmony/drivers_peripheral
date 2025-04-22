@@ -41,6 +41,9 @@ ohos_shared_library("intell_voice_engine_manager_service_1.2") {
       "ipc:ipc_single",
     ]
   }
+  if (drivers_peripheral_intelligent_voice_only_second_stage) {
+    cflags_cc = [ "-DONLY_SECOND_STAGE" ]
+  }
 
   version_script = "libengine_manager_service_1_2.versionscript"
 
