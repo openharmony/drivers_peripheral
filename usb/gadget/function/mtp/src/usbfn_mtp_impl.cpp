@@ -123,7 +123,7 @@ constexpr uint32_t INTR_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means
 constexpr uint64_t MTP_MAX_FILE_SIZE = 0xFFFFFFFFULL;
 constexpr uint32_t WRITE_FILE_TEMP_SLICE = 16 * 100 * 1024; /* 16*100KB */
 static constexpr int32_t WAIT_UDC_MAX_LOOP = 3;
-static constexpr uint32_t WAIT_UDC_TIME = 100000;
+static constexpr uint32_t WAIT_UDC_TIME = 300000;
 static constexpr uint32_t REQ_ACTUAL_DEFAULT_LENGTH = 0;
 static constexpr uint32_t REQ_ACTUAL_MAX_LENGTH = 128;
 static constexpr uint32_t REQ_ACTUAL_MININUM_LENGTH = 5;
@@ -1364,7 +1364,6 @@ int32_t UsbfnMtpImpl::ReadImpl(std::vector<uint8_t> &data)
             break;
         default:
             HDF_LOGE("%{public}s: unexpected status %{public}d", __func__, req->status);
-            mtpDev_->mtpState = MTP_STATE_ERROR;
             ret = HDF_ERR_IO;
             break;
     }
@@ -1388,6 +1387,10 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
             needZLP = ZLP_TRY;
             req->length = 0;
         }
+        if (mtpDev_->mtpState != MTP_STATE_BUSY) {
+            ret = HDF_ERR_IO;
+            break;
+        }
         (void)BufCopyFromVector(req->buf, req->length, data, xferActual);
         ret = UsbFnSubmitRequestSync(req, BULK_IN_TIMEOUT_JIFFIES);
         if (needZLP == ZLP_TRY) {
@@ -1406,7 +1409,6 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
                 break;
             default:
                 HDF_LOGE("%{public}s: unexpected status %{public}d", __func__, req->status);
-                mtpDev_->mtpState = MTP_STATE_ERROR;
                 ret = HDF_ERR_IO;
                 break;
         }
@@ -1790,7 +1792,6 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
     int32_t ret = ReceiveFileEx();
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
         HDF_LOGE("%{public}s: running, states is ecanceled", __func__);
-        mtpDev_->mtpState = MTP_STATE_READY;
         ret = HDF_ERROR_ECANCEL;
     } else if (mtpDev_->mtpState != MTP_STATE_OFFLINE) {
         mtpDev_->mtpState = MTP_STATE_READY;
@@ -1862,7 +1863,6 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
             return HDF_DEV_ERR_NO_DEVICE;
         default:
             HDF_LOGD("%{public}s: unexpected status %{public}d", __func__, req->status);
-            mtpDev_->mtpState = MTP_STATE_ERROR;
             return HDF_ERR_IO;
     }
     if (!mtpDev_->initFlag || mtpDev_->mtpState == MTP_STATE_CANCELED) {
@@ -1950,7 +1950,6 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
         HDF_LOGE("%{public}s: running, states is ecanceled", __func__);
         ret = HDF_ERROR_ECANCEL;
-        mtpDev_->mtpState = MTP_STATE_READY;
     } else if (mtpDev_->mtpState != MTP_STATE_OFFLINE) {
         mtpDev_->mtpState = MTP_STATE_READY;
     }
