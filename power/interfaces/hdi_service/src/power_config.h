@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_2_POWER_CONFIG_H
-#define OHOS_HDI_POWER_V1_2_POWER_CONFIG_H
+#ifndef OHOS_HDI_POWER_V1_3_POWER_CONFIG_H
+#define OHOS_HDI_POWER_V1_3_POWER_CONFIG_H
 
 #include <fstream>
 #include <string>
@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
 class PowerConfig : public NoCopyable {
 public:
     struct PowerSceneConfig {
@@ -50,8 +50,8 @@ private:
     static std::mutex mutex_;
     static std::shared_ptr<PowerConfig> instance_;
 };
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_POWER_V1_2_POWER_CONFIG_H
+#endif // OHOS_HDI_POWER_V1_3_POWER_CONFIG_H

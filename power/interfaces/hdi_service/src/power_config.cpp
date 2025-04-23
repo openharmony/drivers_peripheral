@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
 namespace {
 constexpr const char* POWER_CONFIG_PATH = "etc/power_config/power_config.json";
 constexpr const char* SYSTEM_POWER_CONFIG_PATH = "/system/etc/power_config/power_config.json";
@@ -187,7 +187,7 @@ bool PowerConfig::isValidJsonString(const Json::Value& config) const
     return !config.isNull() && config.isString();
 }
 
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
