@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
 int32_t SystemOperation::WriteWakeLock(const std::string &name)
 {
     MockWakeLockName::WriteWakeLockName(name);
@@ -33,7 +33,7 @@ int32_t SystemOperation::WriteWakeUnlock(const std::string &name)
     MockWakeLockName::WriteWakeUnlockName(name);
     return HDF_SUCCESS;
 }
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

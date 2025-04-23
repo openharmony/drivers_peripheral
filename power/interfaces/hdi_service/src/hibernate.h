@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_2_HIBERNATE_H
-#define OHOS_HDI_POWER_V1_2_HIBERNATE_H
+#ifndef OHOS_HDI_POWER_V1_3_HIBERNATE_H
+#define OHOS_HDI_POWER_V1_3_HIBERNATE_H
 
 #include <cstdint>
 #include <atomic>
@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
 class Hibernate {
 public:
     Hibernate(const Hibernate &) = delete;
@@ -61,9 +61,9 @@ private:
     std::atomic_bool swapFileReady_ {false};
     std::mutex initMutex_;
 };
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_POWER_V1_2_HIBERNATE_H
+#endif // OHOS_HDI_POWER_V1_3_HIBERNATE_H
