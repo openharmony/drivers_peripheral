@@ -236,7 +236,7 @@ int32_t UsbdPorts::OpenFile(const std::string& path, int32_t flags)
         HDF_LOGE("%{public}s : realpath failed. ret = %{public}s", __func__, strerror(errno));
         return HDF_FAILURE;
     }
-    return open(realpathStr.c_str(), flags);
+    return open(realpathStr, flags);
 }
 
 int32_t UsbdPorts::ParsePortAttribute(const std::string& portAttributeFileName,
