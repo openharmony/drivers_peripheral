@@ -33,6 +33,7 @@ namespace Wlan {
 namespace Chip {
 namespace V2_0 {
 const char K_WLAN0_INTERFACE_NAME[] = "wlan0";
+const char K_P2P0_INTERFACE_NAME[] = "p2p0";
 const int MAC_LEN = 6;
 const int MAC_POS_1 = 1;
 const int MAC_POS_2 = 2;
@@ -72,12 +73,19 @@ bool IfaceTool::GetUpState(const char* ifName)
     return ifr.ifr_flags & IFF_UP;
 }
 
-bool IfaceTool::SetUpState(const char* ifName, bool requestUp)
+bool IfaceTool::SetUpState(const char* ifName, bool requestUp, bool needP2pUp)
 {
     UniqueFd sock(socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0));
     if (sock.Get() < 0) {
         HDF_LOGE("Failed to open socket to set up/down state %{public}s", strerror(errno));
         return false;
+    }
+    // If the interface is wlan0, we need to set p2p0 up/down state
+    if (strcmp(ifName, K_WLAN0_INTERFACE_NAME) == 0 && needP2pUp) {
+        // if wlan0 is down, set p2p0 up to avoid driver deinit that causes connect fail
+        if ((!GetUpState(K_P2P0_INTERFACE_NAME)) && !requestUp) {
+            SetUpState(K_P2P0_INTERFACE_NAME, !requestUp);
+        }
     }
     struct ifreq ifr;
     if (!GetIfState(ifName, sock.Get(), &ifr)) {
@@ -101,7 +109,7 @@ bool IfaceTool::SetUpState(const char* ifName, bool requestUp)
 
 bool IfaceTool::SetWifiUpState(bool requestUp)
 {
-    return SetUpState(K_WLAN0_INTERFACE_NAME, requestUp);
+    return SetUpState(K_WLAN0_INTERFACE_NAME, requestUp, false);
 }
 
 bool IfaceTool::SetMacAddress(const char* ifName, const char* mac)

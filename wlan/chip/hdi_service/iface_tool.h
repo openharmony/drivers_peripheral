@@ -34,7 +34,7 @@ public:
     IfaceTool() = default;
     virtual ~IfaceTool() = default;
     virtual bool GetUpState(const char* ifName);
-    virtual bool SetUpState(const char* ifName, bool requestUp);
+    virtual bool SetUpState(const char* ifName, bool requestUp, bool needP2pUp = true);
     virtual bool SetWifiUpState(bool requestUp);
     virtual bool SetMacAddress(const char* ifName, const char* mac);
 };
