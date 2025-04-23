@@ -201,12 +201,7 @@ int32_t UsbdPorts::ReadPortInfo(const std::string& portId, V2_0::UsbPort& usbPor
         char buff[PATH_MAX] = {'\0'};
 
         portAttributeFile = portAttributeDir + "/" + it;
-        char realpathStr[PATH_MAX] = {'\0'};
-        if (realpath(portAttributeFile.c_str(), realpathStr) == nullptr) {
-            HDF_LOGE("%{public}s : realpath failed. ret = %{public}s", __func__, strerror(errno));
-            return HDF_FAILURE;
-        }
-        int32_t fd = OpenFile(realpathStr, O_RDONLY);
+        int32_t fd = OpenFile(portAttributeFile, O_RDONLY);
         if (fd < 0) {
             HDF_LOGE("%{public}s: file open error fd = %{public}d", __func__, fd);
             return HDF_FAILURE;
@@ -236,7 +231,12 @@ int32_t UsbdPorts::OpenFile(const std::string& path, int32_t flags)
         return HDF_FAILURE;
     }
 
-    return open(path.c_str(), flags);
+    char realpathStr[PATH_MAX] = {'\0'};
+    if (realpath(path.c_str(), realpathStr) == nullptr) {
+        HDF_LOGE("%{public}s : realpath failed. ret = %{public}s", __func__, strerror(errno));
+        return HDF_FAILURE;
+    }
+    return open(realpathStr.c_str(), flags);
 }
 
 int32_t UsbdPorts::ParsePortAttribute(const std::string& portAttributeFileName,
