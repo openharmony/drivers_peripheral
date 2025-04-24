@@ -57,6 +57,7 @@ constexpr int32_t DISPLACEMENT_NUMBER = 8;
 constexpr uint32_t LIBUSB_PATH_LENGTH = 64;
 constexpr uint64_t MAX_TOTAL_SIZE = 520447;
 constexpr int32_t API_VERSION_ID_18 = 18;
+constexpr int32_t API_VERSION_ID_20 = 20;
 constexpr int32_t LIBUSB_IO_ERROR = -1;
 constexpr int32_t LIBUSB_IO_ERROR_INVALID = 0;
 constexpr uint32_t ACT_DEVUP = 0;
@@ -1381,8 +1382,19 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpoint
     SyncTranfer syncTranfer = {size, &actlength, timeout};
     ret = DoSyncPipeTranfer(devHandle, endpointAddr, buffer, syncTranfer);
     if (ret < 0) {
-        HDF_LOGW("%{public}s: DoSyncPipeTranfer is error.", __func__);
-        ret = HDF_SUCCESS;
+        if (ret != LIBUSB_ERROR_OVERFLOW) {
+            ret = HDF_FAILURE;
+        } else {
+            ret = HDF_ERR_INVALID_PARAM;
+        }
+        int32_t apiVersion = 0;
+        GetApiVersion(apiVersion);
+        HDF_LOGI("%{public}s: apiVersion %{public}d", __func__, apiVersion);
+        if (apiVersion < API_VERSION_ID_20) {
+            HDF_LOGI("%{public}s: The version number is smaller than 20 apiVersion %{public}d",
+                __func__, apiVersion);
+            ret = HDF_SUCCESS;
+        }
     }
     transferedLength = static_cast<uint32_t>(actlength);
     CloseMmapBuffer(buffer, size);
@@ -1412,8 +1424,19 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
     ret = DoSyncPipeTranfer(devHandle, endpointAddr, buffer, syncTranfer);
     HDF_LOGI("SendPipeRequestWithAshmem DoSyncPipeTranfer ret :%{public}d", ret);
     if (ret < 0) {
-        HDF_LOGW("%{public}s: DoSyncPipeTranfer is error.", __func__);
-        ret = HDF_SUCCESS;
+        if (ret != LIBUSB_ERROR_OVERFLOW) {
+            ret = HDF_FAILURE;
+        } else {
+            ret = HDF_ERR_INVALID_PARAM;
+        }
+        int32_t apiVersion = 0;
+        GetApiVersion(apiVersion);
+        HDF_LOGI("%{public}s: apiVersion %{public}d", __func__, apiVersion);
+        if (apiVersion < API_VERSION_ID_20) {
+            HDF_LOGI("%{public}s: The version number is smaller than 20 apiVersion %{public}d",
+                __func__, apiVersion);
+            ret = HDF_SUCCESS;
+        }
     }
     transferredLength = static_cast<uint32_t>(actlength);
     CloseMmapBuffer(buffer, sendRequestAshmemParameter.ashmemSize);
