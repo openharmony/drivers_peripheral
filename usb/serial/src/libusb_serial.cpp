@@ -436,7 +436,7 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
         value, index, (unsigned char *)&attribute, length, TRANSFER_TIMEOUT);
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
-    HDF_LOGI("%{public}s: getattribute baudrate :%{public}d"
+    HDF_LOGI("%{public}s: getattribute baudrate :%{public}zu"
         "databit :%{public}d stop :%{public}d parity :%{public}d", __func__, attribute.baudrate,
         attribute.dataBits, attribute.stopBits, attribute.parity);
     if (ret < 0) {
@@ -448,7 +448,7 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
 
 int32_t LibusbSerial::SerialSetAttribute(int32_t portId, const struct SerialAttribute& attribute)
 {
-    HDF_LOGI("%{public}s: setattribute baudrate :%{public}d"
+    HDF_LOGI("%{public}s: setattribute baudrate :%{public}zu"
         "databit :%{public}d stop :%{public}d parity :%{public}d", __func__, attribute.baudrate,
         attribute.dataBits, attribute.stopBits, attribute.parity);
     HDF_LOGI("%{public}s: enter setAttribute msg", __func__);
