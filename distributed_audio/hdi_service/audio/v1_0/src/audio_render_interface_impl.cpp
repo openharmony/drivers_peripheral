@@ -103,7 +103,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     std::lock_guard<std::mutex> renderLck(renderMtx_);
     if (renderStatus_ != RENDER_STATUS_START) {
         DHLOGE("Render status wrong, return false.");
-        return HDF_FAILURE;
+        return HDF_ERR_DEVICE_BUSY;
     }
 
     AudioParameter param = { devAttrs_.format, devAttrs_.channelCount, devAttrs_.sampleRate, 0,
