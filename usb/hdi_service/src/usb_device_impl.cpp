@@ -320,7 +320,7 @@ int32_t UsbDeviceImpl::UsbdEventHandle(void)
         HDF_LOGE("%{public}s: register listerer failed", __func__);
         return HDF_FAILURE;
     }
-    ret = V1_2::LibusbAdapter::GetInstance()->SetLoadUsbSaSubscriber(libUsbSaSubscriber);
+    V1_2::LibusbAdapter::GetInstance()->SetLoadUsbSaSubscriber(libUsbSaSubscriber);
     return ret;
 }
 
