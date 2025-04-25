@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_2_RUNNINGLOCKCOUNTER_H
-#define OHOS_HDI_POWER_V1_2_RUNNINGLOCKCOUNTER_H
+#ifndef OHOS_HDI_POWER_V1_3_RUNNINGLOCKCOUNTER_H
+#define OHOS_HDI_POWER_V1_3_RUNNINGLOCKCOUNTER_H
 
 #include <cstdint>
 #include <map>
 
-#include "v1_2/running_lock_types.h"
+#include "v1_3/running_lock_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
 class RunningLockCounter {
 public:
     RunningLockCounter(RunningLockType type, const std::string &tag)
@@ -60,9 +60,9 @@ private:
     uint32_t counter_;
     std::map<std::string, RunningLockInfo> runninglockInfos_ {};
 };
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_POWER_V1_2_RUNNINGLOCKCOUNTER_H
+#endif // OHOS_HDI_POWER_V1_3_RUNNINGLOCKCOUNTER_H

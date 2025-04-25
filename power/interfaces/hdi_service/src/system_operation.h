@@ -13,23 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_2_SYSTEMOPERATION_H
-#define OHOS_HDI_POWER_V1_2_SYSTEMOPERATION_H
+#ifndef OHOS_HDI_POWER_V1_3_SYSTEMOPERATION_H
+#define OHOS_HDI_POWER_V1_3_SYSTEMOPERATION_H
 
 #include <string>
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
 class SystemOperation {
 public:
     static int32_t WriteWakeLock(const std::string &name);
     static int32_t WriteWakeUnlock(const std::string &name);
 };
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_POWER_V1_2_SYSTEMOPERATION_H
+#endif // OHOS_HDI_POWER_V1_3_SYSTEMOPERATION_H
