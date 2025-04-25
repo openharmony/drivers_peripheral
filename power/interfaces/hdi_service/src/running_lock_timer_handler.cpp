@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
 namespace {
 const std::string RUNNINGLOCK_TIMER_HANDLER_NAME = "RunningLock.Timer.Handler";
 }
@@ -134,7 +134,7 @@ void RunningLockTimerHandler::Clean()
     }
 }
 
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

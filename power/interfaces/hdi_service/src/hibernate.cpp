@@ -42,7 +42,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
 
 #ifndef HMFS_IOCTL_MAGIC
 #define HMFS_IOCTL_MAGIC 0xf5
@@ -482,7 +482,7 @@ int32_t Hibernate::GetResumeOffset(uint64_t &resumeOffset)
     close(fd);
     return HDF_SUCCESS;
 }
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

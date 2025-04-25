@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_2_RUNNINGLOCK_TIMERHANDKER_H
-#define OHOS_HDI_POWER_V1_2_RUNNINGLOCK_TIMERHANDKER_H
+#ifndef OHOS_HDI_POWER_V1_3_RUNNINGLOCK_TIMERHANDKER_H
+#define OHOS_HDI_POWER_V1_3_RUNNINGLOCK_TIMERHANDKER_H
 
 #include <cstdint>
 #include <map>
 #include <timer.h>
 
-#include "v1_2/running_lock_types.h"
+#include "v1_3/running_lock_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
 class RunningLockTimerHandler {
 public:
     RunningLockTimerHandler() = default;
@@ -43,9 +43,9 @@ private:
     std::unique_ptr<OHOS::Utils::Timer> handlerTimer_;
     std::map<RunningLockType, std::map<std::string, uint32_t>> runninglockTimerMap_;
 };
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_POWER_V1_2_RUNNINGLOCK_TIMERHANDKER_H
+#endif // OHOS_HDI_POWER_V1_3_RUNNINGLOCK_TIMERHANDKER_H
