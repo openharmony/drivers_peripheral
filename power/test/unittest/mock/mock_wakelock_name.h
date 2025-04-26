@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_2 {
 class MockWakeLockName {
 public:
     static bool FindWakeLockName(const std::string &name);
@@ -32,7 +32,7 @@ public:
 private:
     static std::vector<std::string> wakeLockName;
 };
-} // namespace V1_3
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

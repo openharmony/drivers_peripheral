@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_2 {
 std::vector<std::string> MockWakeLockName::wakeLockName = {};
 
 bool MockWakeLockName::FindWakeLockName(const std::string &name)
@@ -47,7 +47,7 @@ void MockWakeLockName::WriteWakeUnlockName(const std::string &name)
         wakeLockName.erase(it);
     }
 }
-} // namespace V1_3
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_3_RUNNINGLOCKIMPL_H
-#define OHOS_HDI_POWER_V1_3_RUNNINGLOCKIMPL_H
+#ifndef OHOS_HDI_POWER_V1_2_RUNNINGLOCKIMPL_H
+#define OHOS_HDI_POWER_V1_2_RUNNINGLOCKIMPL_H
 
 #include <cstdint>
 #include <map>
@@ -22,14 +22,14 @@
 
 #include "running_lock_counter.h"
 #include "running_lock_timer_handler.h"
-#include "v1_3/power_types.h"
-#include "v1_3/ipower_running_lock_callback.h"
-#include "v1_3/running_lock_types.h"
+#include "v1_2/power_types.h"
+#include "v1_2/ipower_running_lock_callback.h"
+#include "v1_2/running_lock_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_2 {
 class RunningLockImpl {
 public:
     static int32_t Hold(const RunningLockInfo &info, PowerHdfState state,
@@ -62,9 +62,9 @@ private:
     static std::map<RunningLockType, std::shared_ptr<RunningLockCounter>> lockCounters_;
 };
 
-} // namespace V1_3
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_POWER_V1_3_RUNNINGLOCKIMPL_H
+#endif // OHOS_HDI_POWER_V1_2_RUNNINGLOCKIMPL_H

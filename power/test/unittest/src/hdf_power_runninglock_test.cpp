@@ -20,7 +20,7 @@
 #include "running_lock_impl.h"
 
 using namespace OHOS::HDI;
-using namespace OHOS::HDI::Power::V1_3;
+using namespace OHOS::HDI::Power::V1_2;
 using namespace testing::ext;
 
 namespace {
