@@ -19,18 +19,18 @@
 #include <memory>
 
 #include "power_interface_impl.h"
-#include "v1_3/ipower_interface.h"
-#include "v1_3/power_interface_stub.h"
-#include "v1_3/power_types.h"
+#include "v1_2/ipower_interface.h"
+#include "v1_2/power_interface_stub.h"
+#include "v1_2/power_types.h"
 
 using namespace OHOS::HDI;
-using namespace OHOS::HDI::Power::V1_3;
+using namespace OHOS::HDI::Power::V1_2;
 using namespace std;
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_2 {
 class PowerFuzzTest {
 public:
     PowerFuzzTest()
@@ -85,7 +85,7 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
         g_fuzzService->OnRemoteRequest(code, datas, reply, option);
     }
 }
-} // namespace V1_3
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
@@ -94,6 +94,6 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::Power::V1_3::PowerStubFuzzTest(data, size);
+    OHOS::HDI::Power::V1_2::PowerStubFuzzTest(data, size);
     return 0;
 }
