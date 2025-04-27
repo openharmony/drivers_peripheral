@@ -284,6 +284,11 @@ int32_t UsbdPort::SetUsbPort(int32_t portId, int32_t powerRole, int32_t dataRole
 
 int32_t UsbdPort::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode)
 {
+    if (path == DEFAULT_USB_MODE_PATH) {
+        HDF_LOGE("%{public}s: not support", __func__);
+        return HDF_FAILURE;
+    }
+
     portId = currentPortInfo_.portId;
     if (isPdV2_0) {
         QueryPdPort(powerRole, dataRole, mode);
