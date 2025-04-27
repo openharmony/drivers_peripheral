@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_2 {
 static constexpr const char * const WAKE_LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const WAKE_UNLOCK_PATH = "/sys/power/wake_unlock";
 
@@ -53,7 +53,7 @@ int32_t SystemOperation::WriteWakeUnlock(const std::string &name)
     }
     return HDF_SUCCESS;
 }
-} // namespace V1_3
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

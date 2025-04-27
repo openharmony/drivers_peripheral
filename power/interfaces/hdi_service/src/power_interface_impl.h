@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_3_POWERINTERFACEIMPL_H
-#define OHOS_HDI_POWER_V1_3_POWERINTERFACEIMPL_H
+#ifndef OHOS_HDI_POWER_V1_2_POWERINTERFACEIMPL_H
+#define OHOS_HDI_POWER_V1_2_POWERINTERFACEIMPL_H
 
 #include <functional>
 
 #include "iremote_object.h"
 #include "refbase.h"
-#include "v1_3/ipower_interface.h"
-#include "v1_3/running_lock_types.h"
+#include "v1_2/ipower_interface.h"
+#include "v1_2/running_lock_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_2 {
 class PowerInterfaceImpl : public IPowerInterface {
 public:
     ~PowerInterfaceImpl() override {};
@@ -88,9 +88,9 @@ private:
     int32_t AddPowerDeathRecipient(const sptr<IPowerHdiCallback> &callback);
     int32_t RemovePowerDeathRecipient(const sptr<IPowerHdiCallback> &callback);
 };
-} // namespace V1_3
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_POWER_V1_3_POWERINTERFACEIMPL_H
+#endif // OHOS_HDI_POWER_V1_2_POWERINTERFACEIMPL_H

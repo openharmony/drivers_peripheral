@@ -19,19 +19,19 @@
 #include <memory>
 
 #include "power_interface_impl.h"
-#include "v1_3/ipower_interface.h"
-#include "v1_3/power_interface_stub.h"
+#include "v1_2/ipower_interface.h"
+#include "v1_2/power_interface_stub.h"
 #include "running_lock_impl.h"
 #include "refbase.h"
 
 using namespace OHOS::HDI;
-using namespace OHOS::HDI::Power::V1_3;
+using namespace OHOS::HDI::Power::V1_2;
 using namespace std;
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_2 {
 constexpr int32_t DEFAULT_TIMEOUT_FOR_TEST_MS = 100;
 
 class PowerFuzzTest {
@@ -68,7 +68,7 @@ static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
     if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
         return;
     }
-    OHOS::HDI::Power::V1_3::IPowerInterface::Get(true);
+    OHOS::HDI::Power::V1_2::IPowerInterface::Get(true);
 
     MessageParcel datas;
     MessageParcel reply;
@@ -97,7 +97,7 @@ static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
     RunningLockImpl::GetRunningLockTagInner(RunningLockType::RUNNINGLOCK_BUTT);
     RunningLockImpl::Clean();
 }
-} // namespace V1_3
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
@@ -106,6 +106,6 @@ static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::Power::V1_3::PowerHdiFuzzTest(data, size);
+    OHOS::HDI::Power::V1_2::PowerHdiFuzzTest(data, size);
     return 0;
 }
