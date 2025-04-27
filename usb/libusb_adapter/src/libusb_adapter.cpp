@@ -283,9 +283,9 @@ void LibusbAdapter::CloseOpenedFd(const UsbDev &dev)
     if (iter != openedFds_.end()) {
         int32_t fd = iter->second;
         int res = fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-        openedFds_.erase(iter);
         HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
             __func__, __LINE__, iter->second, res);
+        openedFds_.erase(iter);
     } else {
         HDF_LOGI("%{public}s:%{public}d not opened", __func__, __LINE__);
     }

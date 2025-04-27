@@ -931,9 +931,9 @@ void UsbImpl::UsbdCloseFd(UsbImpl *super, UsbPnpNotifyMatchInfoTable *infoTable)
     if (iter != super->openedFds_.end()) {
         int32_t fd = iter->second;
         int res = close(fd);
-        super->openedFds_.erase(iter);
         HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
             __func__, __LINE__, iter->second, res);
+        super->openedFds_.erase(iter);
     } else {
         HDF_LOGI("%{public}s:%{public}d not opened", __func__, __LINE__);
     }
