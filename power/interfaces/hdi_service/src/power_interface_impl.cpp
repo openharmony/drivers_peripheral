@@ -25,7 +25,7 @@
 #include "unique_fd.h"
 #include "power_hdf_log.h"
 #include "power_xcollie.h"
-#include "v1_3/power_types.h"
+#include "v1_2/power_types.h"
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -49,7 +49,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_2 {
 static constexpr const int32_t MAX_FILE_LENGTH = 32 * 1024 * 1024;
 static constexpr const char * const SUSPEND_STATE = "mem";
 static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
@@ -92,7 +92,7 @@ bool g_isHdiStart = false;
 
 extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Power::V1_3::PowerInterfaceImpl;
+    using OHOS::HDI::Power::V1_2::PowerInterfaceImpl;
     PowerInterfaceImpl *service = new (std::nothrow) PowerInterfaceImpl();
     if (service == nullptr) {
         return nullptr;
@@ -548,7 +548,7 @@ int32_t PowerInterfaceImpl::GetPowerConfig(const std::string &sceneName, std::st
     LoadStringFd(getValueFd, value);
     return HDF_SUCCESS;
 }
-} // namespace V1_3
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

@@ -29,9 +29,9 @@ ohos_fuzztest("PowerHdiStubFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "powerhdistub_fuzz.cpp" ]
-  deps = [ "../../../interfaces/hdi_service:libpower_interface_service_1.3" ]
+  deps = [ "../../../interfaces/hdi_service:libpower_interface_service_1.2" ]
   external_deps = [
-    "drivers_interface_power:libpower_stub_1.3",
+    "drivers_interface_power:libpower_stub_1.2",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
