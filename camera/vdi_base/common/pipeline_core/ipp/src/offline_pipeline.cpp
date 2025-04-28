@@ -75,7 +75,7 @@ RetCode OfflinePipeline::StopProcess()
         cv_.notify_one();
     }
 
-    processThread_->detach();
+    processThread_->join();
     delete processThread_;
     processThread_ = nullptr;
     return RC_OK;
