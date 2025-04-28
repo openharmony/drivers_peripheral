@@ -28,7 +28,6 @@ ohos_shared_library("intell_voice_engine_manager_service_1.2") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_intelligent_voice:intell_voice_engine_idl_headers",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.0",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.1",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.2",

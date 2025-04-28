@@ -22,7 +22,9 @@ ohos_shared_library("vendor_intell_voice_trigger") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_intelligent_voice:intell_voice_trigger_idl_headers",
+    "drivers_interface_intelligent_voice:intell_voice_trigger_idl_headers_1.0",
+    "drivers_interface_intelligent_voice:intell_voice_trigger_idl_headers_1.1",
+    "drivers_interface_intelligent_voice:intell_voice_trigger_idl_headers_1.2",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
@@ -49,7 +51,9 @@ ohos_shared_library("vendor_intell_voice_engine") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_intelligent_voice:intell_voice_engine_idl_headers",
+    "drivers_interface_intelligent_voice:intell_voice_engine_idl_headers_1.0",
+    "drivers_interface_intelligent_voice:intell_voice_engine_idl_headers_1.1",
+    "drivers_interface_intelligent_voice:intell_voice_engine_idl_headers_1.2",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
