@@ -78,7 +78,7 @@ DisplayComposerService::DisplayComposerService()
 
     HidumperInit();
 
-    OHOS::system::SetParameter(BOOTEVENT_COMPOSER_HOST_READY, "true");
+    OHOS::system::SetParameter(BOOTEVENT_COMPOSER_HOST_READY.c_str(), "true");
     vsyncEnableStatus_.clear();
     currentBacklightLevel_.clear();
 }
