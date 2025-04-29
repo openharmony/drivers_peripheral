@@ -900,7 +900,7 @@ int32_t UsbImpl::BulkRequestCancel(UsbdBulkASyncList *list)
     return HDF_SUCCESS;
 }
 
-void UsbImpl::ReportUsbdSysEvent(int32_t code, UsbPnpNotifyMatchInfoTable *infoTable)
+void UsbImpl::ReportUsbdSysEvent(int32_t code, UsbPnpNotifyMatchInfoTable *infoTable, const std::string &operationType)
 {
     if (code == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: UsbdDeviceCreateAndAttach successed", __func__);
@@ -909,11 +909,11 @@ void UsbImpl::ReportUsbdSysEvent(int32_t code, UsbPnpNotifyMatchInfoTable *infoT
         attachFailedCount_++;
         attachCount_++;
         HDF_LOGI("%{public}s: UsbdDeviceCreateAndAttach failed", __func__);
-        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "DEVICE_NAME",
-            std::to_string(infoTable->busNum) + "-" + std::to_string(infoTable->devNum), "DEVICE_PROTOCOL",
-            infoTable->deviceInfo.deviceProtocol, "DEVICE_CLASS", infoTable->deviceInfo.deviceClass, "VENDOR_ID",
-            infoTable->deviceInfo.vendorId, "PRODUCT_ID", infoTable->deviceInfo.productId, "VERSION", "1.0.0",
-            "FAIL_REASON", 0, "FAIL_INFO", "USB device recognition failed");
+        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "OPERATION_TYPE",
+            operationType, "DEVICE_NAME", std::to_string(infoTable->busNum) + "-" + std::to_string(infoTable->devNum), 
+            "DEVICE_PROTOCOL", infoTable->deviceInfo.deviceProtocol, "DEVICE_CLASS", infoTable->deviceInfo.deviceClass,
+            "VENDOR_ID", infoTable->deviceInfo.vendorId, "PRODUCT_ID", infoTable->deviceInfo.productId,
+            "VERSION", "1.0.0", "FAIL_REASON", 0, "FAIL_INFO", "USB device recognition failed");
         HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL_STATISTICS", HiSysEvent::EventType::FAULT,
             "EXCEPTION_CNT", attachFailedCount_, "TOTAL_CNT", attachCount_, "FAIL_RATE",
             (static_cast<double>(attachFailedCount_)) /
@@ -972,7 +972,7 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
         ret = UsbdDispatcher::UsbdDeviceCreateAndAttach(super, infoTable->busNum, infoTable->devNum);
-        ReportUsbdSysEvent(ret, infoTable);
+        ReportUsbdSysEvent(ret, infoTable, "UsbdPnpNotifyAddAndRemoveDevice");
         USBDeviceInfo info = {ACT_DEVUP, infoTable->busNum, infoTable->devNum};
         if (subscriber == nullptr) {
             HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
