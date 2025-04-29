@@ -20,6 +20,7 @@
 #include "hdf_log.h"
 #include "usbd_function.h"
 #include "usbd_wrapper.h"
+#include "usb_report_sys_event.h"
 
 namespace OHOS {
 namespace HDI {
@@ -268,6 +269,7 @@ int32_t UsbdPort::SetUsbPort(int32_t portId, int32_t powerRole, int32_t dataRole
     int32_t ret = SetPortInit(portId, powerRole, dataRole);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SetPortInit failed! ret:%{public}d", __func__, ret);
+        UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("SetUsbPort", HDF_FAILURE, "UsbdWaitUdc error");
         return ret;
     }
     currentPortInfos_ = {currentPortInfo_.portId,

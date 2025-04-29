@@ -34,6 +34,7 @@
 #include "usbd_type.h"
 #include "usbfn_mtp_impl.h"
 #include "usbd_wrapper.h"
+#include "usb_report_sys_event.h"
 
 namespace OHOS {
 namespace HDI {
@@ -333,6 +334,7 @@ int32_t UsbdFunction::SetFunctionToNone()
     ret = UsbdWaitToNone();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbdWaitToNone error, ret = %{public}d", __func__, ret);
+        UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdSetFunction", ret, "UsbdWaitToNone error");
         return ret;
     }
     currentFuncs_ = USB_FUNCTION_NONE;
@@ -553,6 +555,7 @@ int32_t UsbdFunction::UsbdInitDDKFunction(uint32_t funcs)
         ret = InitMtp();
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: failed to init mtp", __func__);
+            UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdSetFunction", ret, "UsbdWaitToNone error");
             return HDF_FAILURE;
         }
     }
@@ -628,6 +631,7 @@ int32_t UsbdFunction::UsbdInnerSetFunction(uint32_t funcs)
 
     if (UsbdFunction::SetDDKFunction(funcs)) {
         HDF_LOGE("%{public}s:SetDDKFunction error", __func__);
+        UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdSetFunction", HDF_FAILURE, "SetDDKFunction error");
         SetFunctionToStorage();
         return HDF_FAILURE;
     }
@@ -635,6 +639,8 @@ int32_t UsbdFunction::UsbdInnerSetFunction(uint32_t funcs)
     int32_t ret = UsbdSetKernelFunction(kfuns, funcs);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, set kernel func failed", __func__);
+        UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdSetFunction", HDF_FAILURE,
+            "SetUsbdSetKernelFunctionDDKFunction error");
         SetFunctionToStorage();
         return HDF_FAILURE;
     }
@@ -646,6 +652,7 @@ int32_t UsbdFunction::UsbdInnerSetFunction(uint32_t funcs)
 
     if (UsbdWaitUdc() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, wait udc failed", __func__);
+        UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdSetFunction", HDF_FAILURE, "UsbdWaitUdc error");
         SetFunctionToStorage();
         return HDF_FAILURE;
     }
