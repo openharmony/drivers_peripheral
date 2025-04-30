@@ -207,7 +207,7 @@ int32_t AudioRenderRegCallbackVdi(struct IAudioRender *render, struct IAudioCall
     int32_t ret = vdiRender->RegCallback(vdiRender, AudioRenderCallbackVdi, (void *)renderInfo);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render regCallback fail, ret=%{public}d", ret);
-        return HDF_FAILURE;
+        return ret;
     }
     renderInfo->callback = audioCallback;
     renderInfo->isRegCb = true;
