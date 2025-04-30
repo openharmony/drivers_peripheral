@@ -216,7 +216,7 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::ParseAddressToPtr(char *addr
         return nullptr;
     }
     auto ptr = std::make_shared<BluetoothAddress>();
-    if (ptr->ParseAddressFromString(addressStr) != ADDRESS_SIZE) {
+    if (ptr->ParseAddressFromString(address) != ADDRESS_SIZE) {
         return nullptr;
     }
     return ptr;
@@ -258,7 +258,7 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddressFile(co
         }
     }
 
-    // mac in txt is the same as that in  NV, not update txt
+    // mac in txt is the same as that in NV, not update txt
     if (readNVSucc && readTxtSucc && strcmp(addressStr, readAddressStr) == 0) {
         HDF_LOGI("no need update mac");
         needUpdateTxt = false;
