@@ -18,6 +18,8 @@
 #include <mutex>
 #include <dlfcn.h>
 #include <hdf_base.h>
+#include <parameters.h>
+#include <param_wrapper.h>
 #include "display_log.h"
 #include "hdf_log.h"
 #include "hdf_trace.h"
@@ -37,6 +39,9 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
+
+const std::string BOOTEVENT_COMPOSER_HOST_READY = "bootevent.composer_host.ready";
+
 extern "C" V1_2::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
     return new (std::nothrow) DisplayComposerService();
@@ -72,7 +77,8 @@ DisplayComposerService::DisplayComposerService()
     }
 
     HidumperInit();
-	
+
+    OHOS::system::SetParameter(BOOTEVENT_COMPOSER_HOST_READY.c_str(), "true");
     vsyncEnableStatus_.clear();
     currentBacklightLevel_.clear();
 }
