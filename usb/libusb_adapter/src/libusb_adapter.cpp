@@ -226,7 +226,7 @@ void LibusbAdapter::DeleteSettingsMap(libusb_device_handle* handle)
     HDF_LOGD("%{public}s leave", __func__);
 }
 
-void LibusbAdapter::ReportUsbdRecognitionFailSysEvent(const std::string &operationType, int32_t code, 
+void LibusbAdapter::ReportUsbdRecognitionFailSysEvent(const std::string &operationType, int32_t code,
     const std::string &failDescription, libusb_device *device)
 {
     libusb_device_descriptor device_descriptor;
