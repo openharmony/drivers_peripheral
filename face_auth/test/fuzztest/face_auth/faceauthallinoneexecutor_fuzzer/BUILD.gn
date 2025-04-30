@@ -41,6 +41,7 @@ ohos_fuzztest("FaceAuthAllInOneExecutorFuzzTest") {
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_face_auth:libface_auth_stub_2.0",
     "graphic_surface:surface",
+    "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
