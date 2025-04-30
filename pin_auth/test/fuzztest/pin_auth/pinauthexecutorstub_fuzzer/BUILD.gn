@@ -37,6 +37,7 @@ ohos_fuzztest("PinAuthExecutorStubFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_pin_auth:libpin_auth_stub_2.1",
+    "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
