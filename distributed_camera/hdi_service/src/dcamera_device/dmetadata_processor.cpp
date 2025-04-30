@@ -325,20 +325,16 @@ DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &
 void DMetadataProcessor::UpdateAbilityTag(std::vector<int32_t> &streamConfigs,
     std::vector<int32_t> &extendStreamConfigs)
 {
-    int32_t ret = UpdateAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, streamConfigs.data(),
+    UpdateAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, streamConfigs.data(),
         streamConfigs.size());
 
-    ret &= UpdateAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, extendStreamConfigs.data(),
+    UpdateAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, extendStreamConfigs.data(),
         extendStreamConfigs.size());
 
-    ret &= UpdateAbilityEntry(OHOS_SENSOR_INFO_MAX_FRAME_DURATION, &MAX_FRAME_DURATION, 1);
+    UpdateAbilityEntry(OHOS_SENSOR_INFO_MAX_FRAME_DURATION, &MAX_FRAME_DURATION, 1);
 
     const int32_t jpegMaxSize = maxPhotoResolution_.width_ * maxPhotoResolution_.height_;
-    ret &= UpdateAbilityEntry(OHOS_JPEG_MAX_SIZE, &jpegMaxSize, 1);
-    if (ret == FAILED) {
-        DHLOGE("UpdateAbilityTag failed.");
-        return;
-    }
+    UpdateAbilityEntry(OHOS_JPEG_MAX_SIZE, &jpegMaxSize, 1);
 
     const uint8_t connectionType = OHOS_CAMERA_CONNECTION_TYPE_REMOTE;
     UpdateAbilityEntry(OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connectionType, 1);
@@ -446,8 +442,6 @@ DCamRetCode DMetadataProcessor::UpdateAbilityEntry(uint32_t tag, const void *dat
             DHLOGE("Update tag %{public}u failed.", tag);
             return FAILED;
         }
-    } else {
-        return FAILED;
     }
     return SUCCESS;
 }
