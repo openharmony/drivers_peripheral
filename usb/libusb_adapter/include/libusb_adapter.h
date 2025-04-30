@@ -164,7 +164,7 @@ public:
     int32_t GetDeviceMemMapFd(const UsbDev &dev, int &fd);
     int32_t SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
     int32_t RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
-    void ReportUsbdRecognitionFailSysEvent(const std::string &operationType, int32_t code, 
+    void ReportUsbdRecognitionFailSysEvent(const std::string &operationType, int32_t code,
         const std::string &failDescription, libusb_device *device = nullptr);
 
     /* Async Transfer */
