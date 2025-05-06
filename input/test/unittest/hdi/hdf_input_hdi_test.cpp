@@ -142,10 +142,7 @@ HWTEST_F(HdfInputHdiTest, GetInputClient001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, ScanInputDevice001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     std::vector<DevDesc> sta;
 
     HDF_LOGI("%s: [Hdi-Input] ScanInputDevice001 enter", __func__);
@@ -167,10 +164,7 @@ HWTEST_F(HdfInputHdiTest, ScanInputDevice001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, OpenInputDevice001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [Hdi-Input] OpenInputDevice001 enter", __func__);
 
     int32_t ret = g_inputInterfaces->OpenInputDevice(TOUCH_INDEX);
@@ -188,10 +182,7 @@ HWTEST_F(HdfInputHdiTest, OpenInputDevice001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, OpenInputDevice002, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [Hdi-Input] OpenInputDevice002 enter", __func__);
 
     /* Device "5" is used for testing nonexistent device node */
@@ -210,10 +201,7 @@ HWTEST_F(HdfInputHdiTest, OpenInputDevice002, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, CloseInputDevice001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] CloseInputDevice001 enter", __func__);
 
     int32_t ret = g_inputInterfaces->CloseInputDevice(TOUCH_INDEX);
@@ -231,10 +219,7 @@ HWTEST_F(HdfInputHdiTest, CloseInputDevice001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, CloseInputDevice002, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] CloseInputDevice002 enter", __func__);
 
     /* Device "5" is used for testing nonexistent device node */
@@ -253,10 +238,7 @@ HWTEST_F(HdfInputHdiTest, CloseInputDevice002, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetInputDevice001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetInputDevice001 enter", __func__);
     struct DeviceInfo dev;
 
@@ -286,10 +268,7 @@ HWTEST_F(HdfInputHdiTest, GetInputDevice001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetInputDeviceList001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetInputDeviceList001 enter", __func__);
     int32_t ret;
     uint32_t num = 0;
@@ -320,10 +299,7 @@ HWTEST_F(HdfInputHdiTest, GetInputDeviceList001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetDeviceType001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetDeviceType001 enter", __func__);
     int32_t ret;
     uint32_t devType = INIT_DEFAULT_VALUE;
@@ -346,10 +322,7 @@ HWTEST_F(HdfInputHdiTest, GetDeviceType001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetChipInfo001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetChipInfo001 enter", __func__);
     int32_t ret;
     std::string chipInfo;
@@ -372,10 +345,7 @@ HWTEST_F(HdfInputHdiTest, GetChipInfo001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetInputDevice002, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
 
     HDF_LOGI("%s: [hdi-input] GetInputDevice002 enter", __func__);
     struct DeviceInfo dev;
@@ -400,10 +370,7 @@ HWTEST_F(HdfInputHdiTest, GetInputDevice002, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, RegisterCallback001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] RegisterCallback001 enter", __func__);
 
     /* Device "5" is used for testing nonexistent device node */
@@ -422,10 +389,7 @@ HWTEST_F(HdfInputHdiTest, RegisterCallback001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, SetPowerStatus001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] SetPowerStatus001 enter", __func__);
     int32_t ret;
     uint32_t setStatus = INPUT_LOW_POWER;
@@ -445,10 +409,7 @@ HWTEST_F(HdfInputHdiTest, SetPowerStatus001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, SetPowerStatus002, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] SetPowerStatus002 enter", __func__);
     int32_t ret;
     uint32_t setStatus = INPUT_LOW_POWER;
@@ -468,10 +429,7 @@ HWTEST_F(HdfInputHdiTest, SetPowerStatus002, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetPowerStatus001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetPowerStatus001 enter", __func__);
     int32_t ret;
     uint32_t getStatus = 0;
@@ -494,10 +452,7 @@ HWTEST_F(HdfInputHdiTest, GetPowerStatus001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetPowerStatus002, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetPowerStatus002 enter", __func__);
     int32_t ret;
     uint32_t getStatus = 0;
@@ -518,10 +473,7 @@ HWTEST_F(HdfInputHdiTest, GetPowerStatus002, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetVendorName001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetVendorName001 enter", __func__);
     int32_t ret;
     std::string vendorName;
@@ -544,10 +496,7 @@ HWTEST_F(HdfInputHdiTest, GetVendorName001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetVendorName002, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetVendorName002 enter", __func__);
     int32_t ret;
     std::string vendorName;
@@ -568,10 +517,7 @@ HWTEST_F(HdfInputHdiTest, GetVendorName002, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetChipName001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetChipName001 enter", __func__);
     int32_t ret;
     std::string chipName;
@@ -594,10 +540,7 @@ HWTEST_F(HdfInputHdiTest, GetChipName001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, GetChipName002, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] GetChipName002 enter", __func__);
     int32_t ret;
     std::string chipName;
@@ -618,10 +561,7 @@ HWTEST_F(HdfInputHdiTest, GetChipName002, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, SetGestureMode001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] SetGestureMode001 enter", __func__);
     int32_t ret;
     uint32_t gestureMode = 1;
@@ -641,10 +581,7 @@ HWTEST_F(HdfInputHdiTest, SetGestureMode001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, SetGestureMode002, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] SetGestureMode002 enter", __func__);
     int32_t ret;
     uint32_t gestureMode = 1;
@@ -664,10 +601,7 @@ HWTEST_F(HdfInputHdiTest, SetGestureMode002, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, RunCapacitanceTest001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] RunCapacitanceTest001 enter", __func__);
     int32_t ret;
     std::string result;
@@ -688,10 +622,7 @@ HWTEST_F(HdfInputHdiTest, RunCapacitanceTest001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, RunExtraCommand001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] RunExtraCommand001 enter", __func__);
     int32_t ret;
     struct ExtraCmd extraCmd;
@@ -713,10 +644,7 @@ HWTEST_F(HdfInputHdiTest, RunExtraCommand001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, RegisterCallbackAndReportData001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] RegisterCallbackAndReportData001 enter", __func__);
     int32_t ret;
 
@@ -738,10 +666,7 @@ HWTEST_F(HdfInputHdiTest, RegisterCallbackAndReportData001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, UnregisterReportCallback001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
     HDF_LOGI("%s: [hdi-input] UnregisterReportCallback001 enter", __func__);
     int32_t ret;
 
@@ -766,10 +691,7 @@ HWTEST_F(HdfInputHdiTest, UnregisterReportCallback001, TestSize.Level1)
   */
 HWTEST_F(HdfInputHdiTest, HotPlugCallback001, TestSize.Level1)
 {
-    if (g_inputInterfaces == nullptr) {
-        ASSERT_NE(nullptr, g_inputInterfaces);
-        return;
-    }
+    ASSERT_NE(nullptr, g_inputInterfaces);
 
     HDF_LOGI("%s: [hdi-input] HotPlugCallback001 enter", __func__);
     int32_t ret = INPUT_SUCCESS;

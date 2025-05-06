@@ -46,11 +46,7 @@ HWTEST_F(DdkSysfsDeviceTest, DdkSysfsGetDevNameTestForHidraw001, TestSize.Level1
 {
     UsbDeviceInfoParser parser;
     std::optional<UsbDeviceInfo> dev = parser.Find("USB Optical Mouse");
-    if (!dev.has_value()) {
-        std::cout << "DdkGetDevInfos failed!" << std::endl;
-        return;
-    }
-
+    EXPECT_EQ(dev.has_value(), true);
     std::cout << "busNum:" << dev.value().busNum << " devNum:" << dev.value().devNum << std::endl;
     DevInterfaceInfo devInfo;
     devInfo.busNum = dev.value().busNum;
@@ -72,11 +68,7 @@ HWTEST_F(DdkSysfsDeviceTest, DdkSysfsGetDevNameTestForHidraw002, TestSize.Level1
 {
     UsbDeviceInfoParser parser;
     std::optional<UsbDeviceInfo> dev = parser.Find("USB (Serial|UART)");
-    if (!dev.has_value()) {
-        std::cout << "DdkGetDevInfos failed!" << std::endl;
-        return;
-    }
-
+    EXPECT_EQ(dev.has_value(), true);
     std::cout << "busNum:" << dev.value().busNum << " devNum:" << dev.value().devNum << std::endl;
     DevInterfaceInfo devInfo;
     devInfo.busNum = dev.value().busNum;
@@ -97,11 +89,7 @@ HWTEST_F(DdkSysfsDeviceTest, DdkSysfsGetDevNameTestForHidraw003, TestSize.Level1
 {
     UsbDeviceInfoParser parser;
     std::optional<UsbDeviceInfo> dev = parser.Find("USB Optical Mouse");
-    if (!dev.has_value()) {
-        std::cout << "DdkGetDevInfos failed!" << std::endl;
-        return;
-    }
-
+    EXPECT_EQ(dev.has_value(), true);
     std::cout << "busNum:" << dev.value().busNum << " devNum:" << dev.value().devNum << std::endl;
     DevInterfaceInfo devInfo;
     devInfo.busNum = dev.value().busNum;
@@ -122,11 +110,7 @@ HWTEST_F(DdkSysfsDeviceTest, DdkSysfsGetDevNameTestForUsbSerial001, TestSize.Lev
 {
     UsbDeviceInfoParser parser;
     std::optional<UsbDeviceInfo> dev = parser.Find("USB Serial");
-    if (!dev.has_value()) {
-        std::cout << "DdkGetDevInfos failed!" << std::endl;
-        return;
-    }
-
+    EXPECT_EQ(dev.has_value(), true);
     std::cout << "busNum:" << dev.value().busNum << " devNum:" << dev.value().devNum << std::endl;
     DevInterfaceInfo devInfo;
     devInfo.busNum = dev.value().busNum;
@@ -148,11 +132,7 @@ HWTEST_F(DdkSysfsDeviceTest, DdkSysfsGetDevNameTestForUsbSerial002, TestSize.Lev
 {
     UsbDeviceInfoParser parser;
     std::optional<UsbDeviceInfo> dev = parser.Find("USB Optical Mouse");
-    if (!dev.has_value()) {
-        std::cout << "DdkGetDevInfos failed!" << std::endl;
-        return;
-    }
-
+    EXPECT_EQ(dev.has_value(), true);
     std::cout << "busNum:" << dev.value().busNum << " devNum:" << dev.value().devNum << std::endl;
     DevInterfaceInfo devInfo;
     devInfo.busNum = dev.value().busNum;
@@ -173,11 +153,7 @@ HWTEST_F(DdkSysfsDeviceTest, DdkSysfsGetDevNameTestForUsbSerial003, TestSize.Lev
 {
     UsbDeviceInfoParser parser;
     std::optional<UsbDeviceInfo> dev = parser.Find("USB Serial");
-    if (!dev.has_value()) {
-        std::cout << "DdkGetDevInfos failed!" << std::endl;
-        return;
-    }
-
+    EXPECT_EQ(dev.has_value(), true);
     std::cout << "busNum:" << dev.value().busNum << " devNum:" << dev.value().devNum << std::endl;
     DevInterfaceInfo devInfo;
     devInfo.busNum = dev.value().busNum;
