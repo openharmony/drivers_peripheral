@@ -15,6 +15,7 @@
 
 #ifndef I_CODEC_BUFFER_H
 #define I_CODEC_BUFFER_H
+
 #include <buffer_handle.h>
 namespace OHOS {
 namespace Codec {
