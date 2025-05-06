@@ -51,10 +51,7 @@
           "name": "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
             "header": {
               "header_files": [
-                "codec_callback_if.h",
-                "codec_component_if.h",
-                "codec_component_manager.h",
-                "codec_component_type.h"
+                "icodec_buffer.h"
               ],
               "header_base": "//drivers/peripheral/codec/interfaces/include"
           }
