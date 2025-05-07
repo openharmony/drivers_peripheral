@@ -53,7 +53,6 @@ ohos_unittest("test_hdisrv") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "jsoncpp:jsoncpp",
   ]
   if (drivers_peripheral_battery_feature_config_policy) {
     external_deps += [ "config_policy:configpolicy_util" ]
