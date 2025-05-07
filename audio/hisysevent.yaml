@@ -1,0 +1,34 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+domain: HDF_AUDIO
+
+DRIVER_AUDIO_STREAM_EVENT:
+  __BASE: {type: STATISTIC, level: MINOR, tag: HdfAudio, desc: DriverAudioStreamEvent}
+  ADAPTER_NAME: {type: STRING, desc: adapter name}
+  AUDIO_CATEGORY: {type: INT32, desc: audio category}
+  AUDIO_INPUT_TYPE: {type: INT32, desc: audio input type}
+  AUDIO_FORMAT: {type: INT32, desc: audio format}
+  SAMPLE_RATE: {type: INT32, desc: sample rate}
+  CHANNEL_COUNT: {type: INT32, desc: channel count}
+  AUDIO_PIN: {type: INT32, desc: audio pin}
+
+DRIVER_AUDIO_ERROR_EVENT:
+  __BASE: {type: STATISTIC, level: CRITICAL, tag: HdfAudio, desc: DriverAudioErrorEvent}
+  ERROR_LOG: {type: STRING, desc: error log}
+  ERROR_CODE: {type: INT32, desc: error code}
+
+DRIVER_AUDIO_OVER_TIME_EVENT:
+  __BASE: {type: STATISTIC, level: CRITICAL, tag: HdfAudio, desc: DriverAudioOverTimeEvent}
+  LOG: {type: STRING, desc: log}
+  OVER_TIME: {type: INT32, desc: over time}
