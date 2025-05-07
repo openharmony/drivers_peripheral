@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef USB_REPORT_SYS_EVENT_H
+#define USB_REPORT_SYS_EVENT_H
+
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -26,3 +29,4 @@ public:
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
+#endif // USB_REPORT_SYS_EVENT_H
