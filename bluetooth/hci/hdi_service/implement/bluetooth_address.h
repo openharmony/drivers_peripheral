@@ -35,15 +35,16 @@ public:
         const std::string &path = BT_DEVICE_ADDRESS_PATH);
     void ReadAddress(std::vector<uint8_t> &address) const;
     void ReadAddress(std::string &address) const;
-#ifdef BT_MAC_UPDATE
-    static bool NeedReloadAddress();
-#endif
 
 private:
     static void ParseAddressToString(std::vector<uint8_t> &address, std::string &outString);
     int ParseAddressFromString(const std::string &string) const;
     static bool GetConstantAddress(char *address, int len);
     static bool CheckAddress(char *address);
+    static std::shared_ptr<BluetoothAddress> ParseAddressToPtr(char *address, int len);
+#ifdef BT_MAC_UPDATE
+    static bool NeedReloadAddress();
+#endif
 
 private:
     std::vector<uint8_t> address_;
