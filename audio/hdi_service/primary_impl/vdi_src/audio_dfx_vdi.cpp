@@ -21,6 +21,9 @@
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 #endif
+#include "hisysevent.h"
+
+using namespace OHOS::HiviewDFX;
 
 #define HICOLLIE_TIMEOUT 8
 
@@ -67,4 +70,44 @@ void CancelTimer(int32_t id)
 void SetMaxWorkThreadNum(int32_t count)
 {
     OHOS::IPCSkeleton::GetInstance().SetMaxWorkThreadNum(count);
+}
+
+int32_t AudioDfxSysEventStreamInfo(const char* name, const struct AudioSampleAttributes* attrs,
+    const struct AudioDeviceDescriptor* desc)
+{
+    if (name == nullptr || attrs == nullptr || desc == nullptr) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HiSysEventWrite(HiSysEvent::Domain::HDF_AUDIO, "DRIVER_AUDIO_STREAM_EVENT",
+        HiSysEvent::EventType::STATISTIC, "ADAPTER_NAME", name, "AUDIO_CATEGORY", attrs->type,
+        "AUDIO_INPUT_TYPE", attrs->sourceType, "AUDIO_FORMAT", attrs->format, "SAMPLE_RATE", attrs->sampleRate,
+        "CHANNEL_COUNT", attrs->channelCount, "AUDIO_PIN", desc->pins);
+}
+
+int32_t AudioDfxSysEventError(const char* errLog, int32_t code)
+{
+    return HiSysEventWrite(HiSysEvent::Domain::HDF_AUDIO, "DRIVER_AUDIO_ERROR_EVENT",
+        HiSysEvent::EventType::STATISTIC, "ERROR_LOG", errLog, "ERROR_CODE", code);
+}
+
+struct timeval AudioDfxSysEventGetTimeStamp(void)
+{
+    struct timeval startTime;
+    gettimeofday(&startTime, nullptr);
+    return startTime;
+}
+
+int32_t AudioDfxSysEventOverTime(const char* log, struct timeval startTime, int timeThreshold)
+{
+    struct timeval endTime;
+    gettimeofday(&endTime, nullptr);
+    int32_t runTime = (int32_t)((endTime.tv_sec - startTime.tv_sec) * TIME_1000 +
+        (endTime.tv_usec - startTime.tv_usec) / TIME_1000);
+    if (runTime > (int64_t)timeThreshold) {
+        AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}ld]", log, runTime);
+        return HiSysEventWrite(HiSysEvent::Domain::HDF_AUDIO, "DRIVER_AUDIO_OVER_TIME_EVENT",
+            HiSysEvent::EventType::STATISTIC, "LOG", log, "OVER_TIME", runTime);
+    }
+    return HDF_SUCCESS;
 }

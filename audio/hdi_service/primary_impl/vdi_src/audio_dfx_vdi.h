@@ -15,7 +15,16 @@
 
 #ifndef AUDIO_DFX_VDI_H
 #define AUDIO_DFX_VDI_H
-#include "audio_types_vdi.h"
+#include "v4_0/audio_types.h"
+#include "v4_0/audio_manager.h"
+#include "v4_0/audio_adapter.h"
+#include "v4_0/audio_render.h"
+#include "v4_0/audio_capture.h"
+#include "audio_uhdf_log.h"
+#include <sys/time.h>
+
+#define TIME_1000 1000
+#define TIME_THRESHOLD 30
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +35,11 @@ void HdfAudioFinishTrace(void);
 int32_t SetTimer(const char* name);
 void CancelTimer(int32_t id);
 void SetMaxWorkThreadNum(int32_t count);
+int32_t AudioDfxSysEventStreamInfo(const char* name, const struct AudioSampleAttributes* attrs,
+    const struct AudioDeviceDescriptor* desc);
+int32_t AudioDfxSysEventError(const char* errLog, int32_t code);
+struct timeval AudioDfxSysEventGetTimeStamp(void);
+int32_t AudioDfxSysEventOverTime(const char* log, struct timeval startTime, int timeThreshold);
 #ifdef __cplusplus
 }
 #endif

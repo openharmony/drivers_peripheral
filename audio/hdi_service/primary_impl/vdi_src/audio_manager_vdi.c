@@ -342,7 +342,9 @@ static struct IAudioAdapter* VendorLoadAdapter(struct IAudioManagerVdi *vdiManag
     struct IAudioAdapterVdi *vdiAdapter = NULL;
     int32_t id = SetTimer("Hdi:LoadAdapter");
     HdfAudioStartTrace("Hdi:AudioManagerVendorLoadAdapter", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     ret = vdiManager->LoadAdapter(vdiManager, vdiDesc, &vdiAdapter);
+    AudioDfxSysEventOverTime("LoadAdapter over time", startTime, TIME_THRESHOLD);
     HdfAudioFinishTrace();
     CancelTimer(id);
 
