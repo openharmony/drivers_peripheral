@@ -166,7 +166,7 @@ void LibusbSerial::GetExistedDevices()
     }
 
     libusb_free_device_list(device_list, ENABLE_UNREF);
-    HDF_LOGI("%{public}s: Existing devices enumeration completed. device count: %{public}d", __func__, count);
+    HDF_LOGI("%{public}s: Existing devices enumeration completed. device count: %{public}zd", __func__, count);
 }
 
 int32_t LibusbSerial::SerialOpen(int32_t num)
