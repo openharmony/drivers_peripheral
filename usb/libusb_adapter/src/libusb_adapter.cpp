@@ -97,8 +97,9 @@ static uint64_t ToDdkDeviceId(int32_t busNum, int32_t devNum)
 }
 } // namespace
 
-std::list<sptr<V2_0::IUsbdSubscriber>> LibusbAdapter::subscribers_;
 sptr<V1_2::LibUsbSaSubscriber> LibusbAdapter::libUsbSaSubscriber_ {nullptr};
+std::shared_ptr<HotplugEventPorcess> HotplugEventPorcess::instance_ = nullptr;
+std::mutex HotplugEventPorcess::mtx_;
 
 std::shared_ptr<LibusbAdapter> LibusbAdapter::GetInstance()
 {
@@ -2791,13 +2792,7 @@ int32_t LibusbAdapter::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
 int32_t LibusbAdapter::RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
 {
     HDF_LOGI("%{public}s: enter RemoveSubscriber.", __func__);
-    auto tempSize = subscribers_.size();
-    subscribers_.remove(subscriber);
-    if (tempSize == subscribers_.size()) {
-        HDF_LOGE("%{public}s: subsciber not exist.", __func__);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
+    return HotplugEventPorcess::GetInstance()->RemoveSubscriber(subscriber);
 }
 
 void LibusbAdapter::GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSubscriber> subscriber)
@@ -2842,7 +2837,7 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
         HDF_LOGE("%{public}s subsriber or g_libusb_context is nullptr", __func__);
         return HDF_FAILURE;
     }
-    if (subscribers_.size() == 0) {
+    if (HotplugEventPorcess::GetInstance()->GetSubscriberSize() == 0) {
         HDF_LOGI("%{public}s: rigister callback.", __func__);
         int rc = libusb_hotplug_register_callback(g_libusb_context,
             static_cast<libusb_hotplug_event>(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT),
@@ -2863,32 +2858,106 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
         }
     }
     GetCurrentDeviceList(g_libusb_context, subscriber);
+    return HotplugEventPorcess::GetInstance()->SetSubscriber(subscriber);
+}
+
+void HotplugEventPorcess::AddHotplugTask(V2_0::USBDeviceInfo& info)
+{
+    std::unique_lock<std::mutex> lock(queueMutex_);
+    hotplugEventQueue_.push(info);
+    if (activeThreads_ == 0) {
+        std::thread(&HotplugEventPorcess::OnProcessHotplugEvent, this).detach();
+        activeThreads_++;
+    } else {
+        queueCv_.notify_one();
+    }
+    HDF_LOGI("%{public}s: event: %{public}d, busNum: %{public}d, devAddr: %{public}d, activeThreads: %{public}d",
+        __func__, info.status, info.busNum, info.devNum, activeThreads_.load());
+}
+
+HotplugEventPorcess::HotplugEventPorcess()
+{
+    activeThreads_ = 0;
+    shutdown_ = false;
+    HDF_LOGI("%{public}s: init constructor.", __func__);
+}
+
+HotplugEventPorcess::~HotplugEventPorcess()
+{
+    std::unique_lock<std::mutex> lock(queueMutex_);
+    shutdown_ = false;
+    queueCv_.notify_all();
+    HDF_LOGI("%{public}s: destructor.", __func__);
+};
+
+std::shared_ptr<HotplugEventPorcess> HotplugEventPorcess::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::unique_lock<std::mutex> lock(mtx_);
+        if (instance_ == nullptr) {
+            instance_ = std::make_shared<HotplugEventPorcess>();
+        }
+    }
+    return instance_;
+}
+
+int32_t HotplugEventPorcess::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s subsriber is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     subscribers_.push_back(subscriber);
-    HDF_LOGI("%{public}s: hotpluginit success", __func__);
+    HDF_LOGI("%{public}s: subscriber add success", __func__);
     return HDF_SUCCESS;
 }
 
-void NotifyAllSubscriber(std::list<sptr<V2_0::IUsbdSubscriber>> subscribers, V2_0::USBDeviceInfo info)
+int32_t HotplugEventPorcess::RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
-    for (auto subscriber: subscribers) {
-        subscriber->DeviceEvent(info);
+    HDF_LOGI("%{public}s: enter RemoveSubscriber.", __func__);
+    auto tempSize = subscribers_.size();
+    subscribers_.remove(subscriber);
+    if (tempSize == subscribers_.size()) {
+        HDF_LOGE("%{public}s: subsciber not exist.", __func__);
+        return HDF_FAILURE;
     }
+    return HDF_SUCCESS;
 }
 
-void RunHotplugTask(std::list<sptr<V2_0::IUsbdSubscriber>> subscribers, V2_0::USBDeviceInfo info)
+size_t HotplugEventPorcess::GetSubscriberSize()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
-    std::thread hotplugThread([subscribers, info]() {
-        NotifyAllSubscriber(subscribers, info);
-    });
-    hotplugThread.detach();
+    return subscribers_.size();
+}
+
+void HotplugEventPorcess::OnProcessHotplugEvent()
+{
+    while (!shutdown_) {
+        V2_0::USBDeviceInfo info;
+        {
+            std::unique_lock<std::mutex> lock(queueMutex_);
+            if (shutdown_ || hotplugEventQueue_.empty()) {
+                activeThreads_--;
+                HDF_LOGD("%{public}s: activeThreads: %{public}d", __func__, activeThreads_.load());
+                return;
+            }
+            queueCv_.wait(lock, [this] {
+                return shutdown_ || !hotplugEventQueue_.empty();
+            });
+            info = hotplugEventQueue_.front();
+            hotplugEventQueue_.pop();
+        }
+        for (auto subscriber: subscribers_) {
+            subscriber->DeviceEvent(info);
+        }
+    }
 }
 
 int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* device,
     libusb_hotplug_event event, void* user_data)
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
+    HDF_LOGI("%{public}s: enter, event: %{public}d, busNum: %{public}u, devAddr: %{public}u.", __func__,
+        event, libusb_get_bus_number(device), libusb_get_device_address(device));
     struct libusb_device_descriptor devDesc;
     libusb_get_device_descriptor(device, &devDesc);
     if (devDesc.bDeviceClass == LIBUSB_CLASS_HUB) {
@@ -2899,12 +2968,12 @@ int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* devic
         HDF_LOGD("%{public}s: event=%{public}d arrival device", __func__, event);
         V2_0::USBDeviceInfo info = {ACT_DEVUP, libusb_get_bus_number(device),
             libusb_get_device_address(device)};
-        RunHotplugTask(LibusbAdapter::subscribers_, info);
+        HotplugEventPorcess::GetInstance()->AddHotplugTask(info);
     } else if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT) {
         HDF_LOGD("%{public}s: event=%{public}d remove device", __func__, event);
         V2_0::USBDeviceInfo info = {ACT_DEVDOWN, libusb_get_bus_number(device),
             libusb_get_device_address(device)};
-        RunHotplugTask(LibusbAdapter::subscribers_, info);
+        HotplugEventPorcess::GetInstance()->AddHotplugTask(info);
     }
     return HDF_SUCCESS;
 }
