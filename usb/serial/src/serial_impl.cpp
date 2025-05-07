@@ -99,7 +99,7 @@ int32_t SerialImpl::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint3
 #else
     int32_t ret = LibusbSerial::GetInstance().SerialRead(portId, data, size, timeout);
 #endif
-    FinishTrace(HITRACE_LEVEL_INFO, HITRACE_TAG_HDF);
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_HDF);
     if (ret < HDF_SUCCESS) {
         HDF_LOGE("%{public}s:SerialRead failed, ret:%{public}d", __func__, ret);
     }
@@ -109,13 +109,13 @@ int32_t SerialImpl::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint3
 
 int32_t SerialImpl::SerialWrite(int32_t portId, const std::vector<uint8_t>& data, uint32_t size, uint32_t timeout)
 {
-    StartTrace(HITRACE_LEVEL_INFO, HITRACE_TAG_HDF, "SerialWrite");
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_HDF, "SerialWrite");
 #ifdef LINUX_SERIAL
     int32_t ret = LinuxSerial::GetInstance().SerialWrite(portId, data, size, timeout);
 #else
     int32_t ret = LibusbSerial::GetInstance().SerialWrite(portId, data, size, timeout);
 #endif
-    FinishTrace(HITRACE_LEVEL_INFO, HITRACE_TAG_HDF);
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_HDF);
     if (ret < HDF_SUCCESS) {
         HDF_LOGE("%{public}s:SerialWrite failed, ret:%{public}d", __func__, ret);
     }
