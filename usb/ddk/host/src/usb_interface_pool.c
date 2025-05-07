@@ -269,6 +269,7 @@ static struct UsbPipe *IfFindPipeObj(const struct UsbSdkInterface *interfaceObj,
     // double check null pointers
     if (interfaceObj == NULL || DListIsEmpty(&interfaceObj->pipeList) ||
         interfaceObj->status == USB_INTERFACE_STATUS_REMOVE) {
+        OsalMutexUnlock((struct OsalMutex *)&interfaceObj->listLock);
         HDF_LOGE(
             "%{public}s:%{public}d interfaceObj is null or status is remove or pipe list is empty", __func__, __LINE__);
         return NULL;
@@ -317,6 +318,7 @@ static struct UsbSdkInterface *IfFindInterfaceObj(const struct UsbInterfacePool 
     OsalMutexLock((struct OsalMutex *)&interfacePool->interfaceLock);
     // double check null pointers
     if (interfacePool == NULL || DListIsEmpty(&interfacePool->interfaceList)) {
+        OsalMutexUnlock((struct OsalMutex *)&interfacePool->interfaceLock);
         HDF_LOGE("%{public}s:%{public}d interfacePool is null or interface list is empty", __func__, __LINE__);
         return NULL;
     }
