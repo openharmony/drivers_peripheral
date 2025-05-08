@@ -15,7 +15,8 @@
 
 #include "display_buffer_dfx.h"
 #include <hdf_log.h>
-
+#include <cinttypes>
+ 
 #define TIME_1000 1000
 #define TIME_10 10
 #define HICOLLIE_TIMEOUT 10
@@ -71,7 +72,7 @@ void DisplayBufferDfx::StopTimeStamp()
     int64_t runTime = (stopTimeStamp.tv_sec - startTimeStamp.tv_sec) * TIME_1000 +
         (stopTimeStamp.tv_usec - startTimeStamp.tv_usec) / TIME_1000;
     if (runTime > TIME_10) {
-        HDF_LOGW("run %{public}s over time, [%{public}lld]ms", dfxName_.c_str(), runTime);
+        HDF_LOGW("run %{public}s over time, [%{public}" PRId64 "]ms", dfxName_.c_str(), runTime);
     }
     flag_ = false;
 }
