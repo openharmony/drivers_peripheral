@@ -88,7 +88,7 @@ int32_t AudioDfxSysEventStreamInfo(const char* name, const struct AudioSampleAtt
 int32_t AudioDfxSysEventError(const char* errLog, int32_t code)
 {
     return HiSysEventWrite(HiSysEvent::Domain::HDF_AUDIO, "DRIVER_AUDIO_ERROR_EVENT",
-        HiSysEvent::EventType::STATISTIC, "ERROR_LOG", errLog, "ERROR_CODE", code);
+        HiSysEvent::EventType::FAULT, "ERROR_LOG", errLog, "ERROR_CODE", code);
 }
 
 struct timeval AudioDfxSysEventGetTimeStamp(void)
@@ -107,7 +107,7 @@ int32_t AudioDfxSysEventOverTime(const char* log, struct timeval startTime, int 
     if (runTime > timeThreshold) {
         AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}d]", log, runTime);
         return HiSysEventWrite(HiSysEvent::Domain::HDF_AUDIO, "DRIVER_AUDIO_OVER_TIME_EVENT",
-            HiSysEvent::EventType::STATISTIC, "LOG", log, "OVER_TIME", runTime);
+            HiSysEvent::EventType::FAULT, "LOG", log, "OVER_TIME", runTime);
     }
     return HDF_SUCCESS;
 }

@@ -14,7 +14,7 @@
 domain: HDF_AUDIO
 
 DRIVER_AUDIO_STREAM_EVENT:
-  __BASE: {type: STATISTIC, level: MINOR, tag: HdfAudio, desc: DriverAudioStreamEvent}
+  __BASE: {type: STATISTIC, level: CRITICAL, tag: HdfAudio, desc: DriverAudioStreamEvent}
   ADAPTER_NAME: {type: STRING, desc: adapter name}
   AUDIO_CATEGORY: {type: INT32, desc: audio category}
   AUDIO_INPUT_TYPE: {type: INT32, desc: audio input type}
@@ -24,11 +24,11 @@ DRIVER_AUDIO_STREAM_EVENT:
   AUDIO_PIN: {type: INT32, desc: audio pin}
 
 DRIVER_AUDIO_ERROR_EVENT:
-  __BASE: {type: STATISTIC, level: CRITICAL, tag: HdfAudio, desc: DriverAudioErrorEvent}
+  __BASE: {type: FAULT, level: CRITICAL, tag: HdfAudio, desc: DriverAudioErrorEvent}
   ERROR_LOG: {type: STRING, desc: error log}
   ERROR_CODE: {type: INT32, desc: error code}
 
 DRIVER_AUDIO_OVER_TIME_EVENT:
-  __BASE: {type: STATISTIC, level: CRITICAL, tag: HdfAudio, desc: DriverAudioOverTimeEvent}
+  __BASE: {type: FAULT, level: CRITICAL, tag: HdfAudio, desc: DriverAudioOverTimeEvent}
   LOG: {type: STRING, desc: log}
   OVER_TIME: {type: INT32, desc: over time}
