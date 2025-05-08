@@ -104,8 +104,8 @@ int32_t AudioDfxSysEventOverTime(const char* log, struct timeval startTime, int 
     gettimeofday(&endTime, nullptr);
     int32_t runTime = (int32_t)((endTime.tv_sec - startTime.tv_sec) * TIME_1000 +
         (endTime.tv_usec - startTime.tv_usec) / TIME_1000);
-    if (runTime > (int64_t)timeThreshold) {
-        AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}ld]", log, runTime);
+    if (runTime > timeThreshold) {
+        AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}d]", log, runTime);
         return HiSysEventWrite(HiSysEvent::Domain::HDF_AUDIO, "DRIVER_AUDIO_OVER_TIME_EVENT",
             HiSysEvent::EventType::STATISTIC, "LOG", log, "OVER_TIME", runTime);
     }

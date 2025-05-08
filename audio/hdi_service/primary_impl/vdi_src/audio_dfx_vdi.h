@@ -16,10 +16,10 @@
 #ifndef AUDIO_DFX_VDI_H
 #define AUDIO_DFX_VDI_H
 #include "v4_0/audio_types.h"
-#include "v4_0/audio_manager.h"
-#include "v4_0/audio_adapter.h"
-#include "v4_0/audio_render.h"
-#include "v4_0/audio_capture.h"
+#include "v4_0/iaudio_manager.h"
+#include "v4_0/iaudio_adapter.h"
+#include "v4_0/iaudio_render.h"
+#include "v4_0/iaudio_capture.h"
 #include "audio_uhdf_log.h"
 #include <sys/time.h>
 
