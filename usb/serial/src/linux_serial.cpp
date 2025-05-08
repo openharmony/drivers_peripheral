@@ -31,7 +31,7 @@
 #include "usbd_wrapper.h"
 #include "securec.h"
 
-#define _BSD_SOURCE 
+#define _BSD_SOURCE
 #define UEVENT_BUFFER_SIZE 2048
 #define CMSPAR 010000000000
 #define BUFF_SIZE 50
@@ -52,7 +52,6 @@ namespace V1_0 {
 
 static const std::string SERIAL_TYPE_NAME = "ttyUSB";
 static const int32_t ERR_NO = -1;
-static const uint8_t DATABITS_FOUR = 4;
 static const uint8_t DATABITS_FIVE = 5;
 static const uint8_t DATABITS_SIX = 6;
 static const uint8_t DATABITS_SEVEN = 7;
@@ -125,9 +124,6 @@ int32_t LinuxSerial::GetBaudrate(unsigned int baudrate)
 int32_t LinuxSerial::GetDatabits(unsigned char dataBits, tcflag_t& cflag)
 {
     switch (dataBits) {
-        case DATABITS_FOUR:
-            HDF_LOGE("%{public}s: Not Supported 4 data bits.", __func__);
-            return HDF_FAILURE;
         case DATABITS_FIVE:
             cflag |= CS5;
             break;
@@ -175,9 +171,6 @@ int32_t LinuxSerial::GetStopbits(tcflag_t& cflag, unsigned char stopBits)
 {
     if (stopBits == USB_ATTR_STOPBIT_1) {
         cflag &= ~CSTOPB;
-    } else if (stopBits == USB_ATTR_STOPBIT_1P5) {
-        HDF_LOGE("%{public}s: Not Supported 1.5.", __func__);
-        return HDF_FAILURE;
     } else if (stopBits == USB_ATTR_STOPBIT_2) {
         cflag |= CSTOPB;
     } else {
@@ -464,6 +457,7 @@ int32_t LinuxSerial::SerialSetAttribute(int32_t portId, const SerialAttribute& a
     cfsetispeed(&options_, GetBaudrate(attribute.baudrate));
     cfsetospeed(&options_, GetBaudrate(attribute.baudrate));
     while (retry-- > 0) {
+        //dev/ttyUSB0
         if (tcsetattr(fd, TCSANOW, &options_) == 0) {
             break;
         } else {
