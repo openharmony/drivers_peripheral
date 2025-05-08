@@ -23,6 +23,12 @@
 #include <hdf_log.h>
 #include <dlfcn.h>
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000307
+#define HDF_LOG_TAG NFCTAG_ADAPTER
+
 namespace OHOS {
 namespace HDI {
 namespace ConnectedNfcTag {
