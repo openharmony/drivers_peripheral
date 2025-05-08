@@ -746,7 +746,7 @@ int32_t AudioRenderStartVdi(struct IAudioRender *render)
     HdfAudioStartTrace("Hdi:AudioRenderStartVdi", 0);
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->Start(vdiRender);
-    AudioDfxSysEventOverTime("Capture Start over time", startTime, TIME_THRESHOLD);
+    AudioDfxSysEventOverTime("Render Start over time", startTime, TIME_THRESHOLD);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render Start fail, ret=%{public}d", ret);
@@ -772,7 +772,7 @@ int32_t AudioRenderStopVdi(struct IAudioRender *render)
     HdfAudioStartTrace("Hdi:AudioRenderStopVdi", 0);
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->Stop(vdiRender);
-    AudioDfxSysEventOverTime("Capture Start over time", startTime, TIME_THRESHOLD);
+    AudioDfxSysEventOverTime("Render Stop over time", startTime, TIME_THRESHOLD);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render Stop fail, ret=%{public}d", ret);
