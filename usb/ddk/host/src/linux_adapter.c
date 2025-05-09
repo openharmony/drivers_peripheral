@@ -30,6 +30,7 @@
 #define EP_NUM_MAX           30
 #define SLEEP_TIME           500000
 #define USB_DEVICE_MMAP_PATH "/data/service/el1/public/usb/"
+#define MAX_RETRY_TIMES      10
 
 static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
 {
@@ -149,8 +150,19 @@ static int32_t GetUsbDevicePath(struct UsbDevice *dev, char *pathBuf, size_t len
         return HDF_FAILURE;
     }
 
-    if (realpath(path, pathBuf) == NULL) {
-        HDF_LOGE("%{public}s: path conversion failed, path: %{public}s, errno:%{public}d", __func__, path, errno);
+    int32_t retryTimes = 0;
+    bool isSuccess = false;
+    while (retryTimes < MAX_RETRY_TIMES) {
+        if (realpath(path, pathBuf) != NULL) {
+            isSuccess = true;
+            break;
+        }
+        HDF_LOGE("%{public}s: realpath failed: %{public}s, %{public}d:%{public}d", __func__, path, retryTimes, errno);
+        usleep(SLEEP_TIME);
+        ++retryTimes;
+    }
+
+    if (!isSuccess) {
         return HDF_FAILURE;
     }
 
