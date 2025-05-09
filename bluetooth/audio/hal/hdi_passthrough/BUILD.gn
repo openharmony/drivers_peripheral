@@ -69,7 +69,6 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/bluetooth/audio/supportlibs/adm_adapter/include",
     "//third_party/cJSON",
-    "//drivers/peripheral/bluetooth/audio/interfaces/include",
     "//third_party/bounds_checking_function/include",
   ]
 
@@ -77,6 +76,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_bluetooth:hdi_audio_bluetooth_header",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
