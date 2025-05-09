@@ -32,6 +32,7 @@
 #include "securec.h"
 
 #define _BSD_SOURCE
+
 #define UEVENT_BUFFER_SIZE 2048
 #define CMSPAR 010000000000
 #define BUFF_SIZE 50
