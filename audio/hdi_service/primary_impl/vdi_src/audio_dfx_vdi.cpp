@@ -72,25 +72,6 @@ void SetMaxWorkThreadNum(int32_t count)
     OHOS::IPCSkeleton::GetInstance().SetMaxWorkThreadNum(count);
 }
 
-int32_t AudioDfxSysEventStreamInfo(const char* name, const struct AudioSampleAttributes* attrs,
-    const struct AudioDeviceDescriptor* desc)
-{
-    if (name == nullptr || attrs == nullptr || desc == nullptr) {
-        AUDIO_FUNC_LOGE("invalid param");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    return HiSysEventWrite(HiSysEvent::Domain::HDF_AUDIO, "DRIVER_AUDIO_STREAM_EVENT",
-        HiSysEvent::EventType::STATISTIC, "ADAPTER_NAME", name, "AUDIO_CATEGORY", attrs->type,
-        "AUDIO_INPUT_TYPE", attrs->sourceType, "AUDIO_FORMAT", attrs->format, "SAMPLE_RATE", attrs->sampleRate,
-        "CHANNEL_COUNT", attrs->channelCount, "AUDIO_PIN", desc->pins);
-}
-
-int32_t AudioDfxSysEventError(const char* errLog, int32_t code)
-{
-    return HiSysEventWrite(HiSysEvent::Domain::HDF_AUDIO, "DRIVER_AUDIO_ERROR_EVENT",
-        HiSysEvent::EventType::FAULT, "ERROR_LOG", errLog, "ERROR_CODE", code);
-}
-
 struct timeval AudioDfxSysEventGetTimeStamp(void)
 {
     struct timeval startTime;
@@ -98,16 +79,20 @@ struct timeval AudioDfxSysEventGetTimeStamp(void)
     return startTime;
 }
 
-int32_t AudioDfxSysEventOverTime(const char* log, struct timeval startTime, int timeThreshold)
+int32_t AudioDfxSysEventError(const char* desc, struct timeval startTime, int timeThreshold, int err)
 {
+    if (err != HDF_SUCCESS) {
+        HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_OVER_TIME_EVENT", HiSysEvent::EventType::FAULT,
+            "ERROR_DESC", desc, "ERROR_CODE", err, "OVER_TIME", 0);
+    }
     struct timeval endTime;
     gettimeofday(&endTime, nullptr);
     int32_t runTime = (int32_t)((endTime.tv_sec - startTime.tv_sec) * TIME_1000 +
         (endTime.tv_usec - startTime.tv_usec) / TIME_1000);
     if (runTime > timeThreshold) {
-        AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}d]", log, runTime);
-        return HiSysEventWrite(HiSysEvent::Domain::HDF_AUDIO, "DRIVER_AUDIO_OVER_TIME_EVENT",
-            HiSysEvent::EventType::FAULT, "LOG", log, "OVER_TIME", runTime);
+        AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}d]", desc, runTime);
+        HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_OVER_TIME_EVENT", HiSysEvent::EventType::FAULT,
+            "ERROR_DESC", desc, "ERROR_CODE", err, "OVER_TIME", runTime);
     }
     return HDF_SUCCESS;
 }
