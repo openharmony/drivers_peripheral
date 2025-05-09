@@ -31,7 +31,9 @@
 #include "string_ex.h"
 #include "sysparam_errno.h"
 #include "thermal_hdf_utils.h"
-#include "thermal_hitrace.h"
+#ifdef THERMAL_HITRACE_ENABLE
+#include "hitrace_meter.h"
+#endif
 #include "thermal_log.h"
 #include "thermal_zone_manager.h"
 #include "zlib.h"
@@ -200,7 +202,9 @@ bool ThermalDfx::Compress(const std::string& dataFile, const std::string& destFi
 
 void ThermalDfx::CompressFile()
 {
-    ThermalHitrace trace("ThermalDfx_CompressFile");
+#ifdef THERMAL_HITRACE_ENABLE
+    HitraceScopedEx trace(HITRACE_LEVEL_COMMERCIAL, HITRACE_TAG_POWER, "ThermalDfx_CompressFile");
+#endif
     THERMAL_HILOGD(COMP_HDI, "CompressFile start");
     std::string unCompressFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) + "." + g_logTime;
 
@@ -267,7 +271,9 @@ bool ThermalDfx::PrepareWriteDfxLog()
 
 void ThermalDfx::CreateLogFile()
 {
-    ThermalHitrace trace("ThermalDfx_CreateLogFile");
+#ifdef THERMAL_HITRACE_ENABLE
+    HitraceScopedEx trace(HITRACE_LEVEL_COMMERCIAL, HITRACE_TAG_POWER, "ThermalDfx_CreateLogFile");
+#endif
     THERMAL_HILOGD(COMP_HDI, "CreateLogFile start");
     if (!PrepareWriteDfxLog()) {
         THERMAL_HILOGD(COMP_HDI, "prepare write dfx log failed");
