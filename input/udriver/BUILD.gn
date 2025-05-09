@@ -44,11 +44,12 @@ if (drivers_peripheral_input_feature_udriver) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-
-    install_images = [
-      chipset_base_dir,
-      updater_base_dir,
-    ]
+    install_images = [ chipset_base_dir ]
+    if (defined(global_parts_info.updater_updater_chip_ext)) {
+      install_images += [ updater_vendor_base_dir ]
+    } else {
+      install_images += [ updater_base_dir ]
+    }
     install_enable = true
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_input"
