@@ -19,7 +19,11 @@
 #include "v1_1/connected_nfc_tag_service.h"
 #include "connected_nfc_tag_vendor_adapter.h"
 
-#define HDF_LOG_TAG connected_nfc_tag_service
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000307
+#define HDF_LOG_TAG NFCTAG_IMPL
 
 namespace OHOS {
 namespace HDI {
