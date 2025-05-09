@@ -158,12 +158,13 @@ static int32_t CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
 
     int32_t id = SetTimer("Hdi:CreateRender");
     pthread_rwlock_wrlock(GetRenderLock());
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, vdiRender);
+    AudioDfxSysEventError("CreateRender", startTime, TIME_THRESHOLD, ret);
     pthread_rwlock_unlock(GetRenderLock());
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
-        AudioDfxSysEventError("CreateRender fail", ret);
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateRender fail, ret=%{public}d", ret);
         return ret;
     }
@@ -195,7 +196,6 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
     }
 
     char *adapterName = AudioGetAdapterNameVdi(adapter);
-    AudioDfxSysEventStreamInfo(adapterName, attrs, desc);
     *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName);
     if (*render != NULL) {
         AUDIO_FUNC_LOGE("already created");
@@ -293,12 +293,13 @@ static int32_t CreateCapturePre(struct IAudioAdapterVdi *vdiAdapter, struct IAud
     }
     int32_t id = SetTimer("Hdi:CreateCapture");
     pthread_rwlock_wrlock(GetCaptureLock());
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
+    AudioDfxSysEventError("CreateCapture", startTime, TIME_THRESHOLD, ret);
     pthread_rwlock_unlock(GetCaptureLock());
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
-        AudioDfxSysEventError("CreateCapture fail", ret);
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateCapture fail, ret=%{public}d", ret);
         return HDF_FAILURE;
     }
@@ -327,7 +328,6 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
-    AudioDfxSysEventStreamInfo(AudioGetAdapterNameVdi(adapter), attrs, desc);
     ret = CreateCapturePre(vdiAdapter, capture, desc, attrs, captureId);
     if (*capture == NULL || ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("create audio capture failed");

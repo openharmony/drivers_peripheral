@@ -86,7 +86,7 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     HdfAudioStartTrace("Hdi:AudioCaptureFrameVdi", 0);
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiCapture->CaptureFrame(vdiCapture, frame, frameLen, replyBytes);
-    AudioDfxSysEventOverTime("CaptureFrame over time", startTime, TIME_THRESHOLD);
+    AudioDfxSysEventError("CaptureFrame", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     CancelTimer(id);
     if (ret != HDF_SUCCESS) {
@@ -118,9 +118,7 @@ int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct Audio
     }
 
     HdfAudioStartTrace("Hdi:AudioCaptureFrameEcVdi", 0);
-    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     ret = vdiCapture->CaptureFrameEc(vdiCapture, &frameInfoVdi);
-    AudioDfxSysEventOverTime("CaptureFrameEc over time", startTime, TIME_THRESHOLD);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         OsalMemFree((void *)frameInfoVdi.frame);
@@ -633,7 +631,7 @@ int32_t AudioCaptureStartVdi(struct IAudioCapture *capture)
     HdfAudioStartTrace("Hdi:AudioCaptureStartVdi", 0);
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiCapture->Start(vdiCapture);
-    AudioDfxSysEventOverTime("Capture Start over time", startTime, TIME_THRESHOLD);
+    AudioDfxSysEventError("Capture Start", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture Start fail, ret=%{public}d", ret);
@@ -659,7 +657,7 @@ int32_t AudioCaptureStopVdi(struct IAudioCapture *capture)
     HdfAudioStartTrace("Hdi:AudioCaptureStopVdi", 0);
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiCapture->Stop(vdiCapture);
-    AudioDfxSysEventOverTime("Capture Stop over time", startTime, TIME_THRESHOLD);
+    AudioDfxSysEventError("Capture Stop", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture Stop fail, ret=%{public}d", ret);
