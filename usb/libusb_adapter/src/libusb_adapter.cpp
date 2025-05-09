@@ -32,12 +32,14 @@
 
 #include "accesstoken_kit.h"
 #include "hap_token_info.h"
+#include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "osal_mem.h"
 #include "securec.h"
 #include "usbd_wrapper.h"
 #include "hitrace_meter.h"
 
+using OHOS::HiviewDFX::HiSysEvent;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -97,8 +99,9 @@ static uint64_t ToDdkDeviceId(int32_t busNum, int32_t devNum)
 }
 } // namespace
 
-std::list<sptr<V2_0::IUsbdSubscriber>> LibusbAdapter::subscribers_;
 sptr<V1_2::LibUsbSaSubscriber> LibusbAdapter::libUsbSaSubscriber_ {nullptr};
+std::shared_ptr<HotplugEventPorcess> HotplugEventPorcess::instance_ = nullptr;
+std::mutex HotplugEventPorcess::mtx_;
 
 std::shared_ptr<LibusbAdapter> LibusbAdapter::GetInstance()
 {
@@ -224,18 +227,38 @@ void LibusbAdapter::DeleteSettingsMap(libusb_device_handle* handle)
     HDF_LOGD("%{public}s leave", __func__);
 }
 
+void LibusbAdapter::ReportUsbdRecognitionFailSysEvent(const std::string &operationType, int32_t code,
+    const std::string &failDescription, libusb_device *device)
+{
+    libusb_device_descriptor device_descriptor;
+    libusb_get_device_descriptor(device, &device_descriptor);
+    if (device == nullptr) {
+        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "OPERATION_TYPE",
+            operationType, "DEVICE_NAME", 0, "DEVICE_PROTOCOL", 0, "DEVICE_CLASS", 0, "VENDOR_ID", 0, "PRODUCT_ID", 0,
+            "VERSION", 0, "FAIL_REASON", code, "FAIL_INFO", failDescription);
+    } else {
+        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "OPERATION_TYPE",
+            operationType, "DEVICE_NAME", 0, "DEVICE_PROTOCOL", device_descriptor.bDeviceProtocol,
+            "DEVICE_CLASS", device_descriptor.bDeviceClass, "VENDOR_ID", device_descriptor.idVendor,
+            "PRODUCT_ID", device_descriptor.idVendor, "VERSION", 0, "FAIL_REASON", code,
+            "FAIL_INFO", failDescription);
+    }
+}
+
 int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s enter", __func__);
     int32_t ret = LibUSBInit();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:LibUSBInit is failed, ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "LibUSBInit failed");
         return HDF_FAILURE;
     }
     libusb_device *device = nullptr;
     ret = GetUsbDevice(dev, &device);
     if (ret != HDF_SUCCESS || device == nullptr) {
         HDF_LOGE("%{public}s:GetUsbDevice is failed ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "GetUsbDevice failed");
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
@@ -247,6 +270,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         ret = libusb_open(device, &devHandle);
         if (ret != HDF_SUCCESS || devHandle == nullptr) {
             HDF_LOGE("%{public}s:Opening device failed ret = %{public}d", __func__, ret);
+            ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "Opening device failed", device);
             return HDF_FAILURE;
         }
         std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
@@ -264,6 +288,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     ret = GetCurrentConfiguration(devHandle, currentConfig);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: GetCurrentConfiguration failed", __func__);
+        ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "GetCurrentConfiguration failed");
         return HDF_FAILURE;
     }
     std::unique_lock<std::shared_mutex> lock(g_mapMutexDeviceSettingsMap);
@@ -585,6 +610,7 @@ int32_t LibusbAdapter::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, 
     HDF_LOGI("%{public}s enter", __func__);
     if (pipe.intfId >= LIBUSB_MAX_INTERFACEID) {
         HDF_LOGE("interfaceId is invalid");
+        ReportUsbdRecognitionFailSysEvent("BulkTransferRead", HDF_ERR_INVALID_PARAM, "interfaceId invalid");
         return HDF_ERR_INVALID_PARAM;
     }
     uint8_t tbuf[READ_BUF_SIZE] = {'\0'};
@@ -596,6 +622,7 @@ int32_t LibusbAdapter::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, 
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s: FindHandleByDev failed, ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferRead", HDF_FAILURE, "FindHandleByDev failed");
         return HDF_FAILURE;
     }
     StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB, "libusb_bulk_transfer");
@@ -603,6 +630,7 @@ int32_t LibusbAdapter::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, 
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret < 0) {
         HDF_LOGE("%{public}s: libusb_bulk_transfer is error ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferRead", HDF_FAILURE, "libusb_bulk_transfer error");
         return HDF_FAILURE;
     }
 
@@ -669,6 +697,7 @@ int32_t LibusbAdapter::BulkTransferWrite(
     HDF_LOGI("%{public}s enter", __func__);
     if (pipe.intfId >= LIBUSB_MAX_INTERFACEID) {
         HDF_LOGE("%{public}s interfaceId is invalid", __func__);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferWrite", HDF_ERR_INVALID_PARAM, "interfaceId invalid");
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t actlength = 0;
@@ -679,6 +708,7 @@ int32_t LibusbAdapter::BulkTransferWrite(
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferWrite", HDF_ERR_INVALID_PARAM, "GetEndpointDesc invalid");
         return ret;
     }
     if (!IsInterfaceIdByUsbDev(dev, pipe.intfId)) {
@@ -695,6 +725,7 @@ int32_t LibusbAdapter::BulkTransferWrite(
             return LIBUSB_IO_ERROR_INVALID;
         }
         HDF_LOGE("%{public}s: libusb_bulk_transfer is error ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferWrite", HDF_FAILURE, "libusb_bulk_transfer error");
         return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s leave", __func__);
@@ -1098,6 +1129,7 @@ int32_t LibusbAdapter::DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfe
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s: Find UsbHandle failed, ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("DoControlTransfer", ret, "FindUsbHandle failed");
         return HDF_FAILURE;
     }
 
@@ -1434,6 +1466,7 @@ int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> 
     ret = FindHandleByDev(dev, &devHandle);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s: FindHandleByDev is failed, ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("GetRawDescriptor", ret, "Opening device failed");
         return HDF_FAILURE;
     }
     char pathBuf[LIBUSB_PATH_LENGTH] = {'\0'};
@@ -1459,6 +1492,7 @@ int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> 
     size_t descriptorsLength = 0;
     if (ReadDescriptors(fd, &descriptors, descriptorsLength) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: ReadDescriptors failed", __func__);
+        ReportUsbdRecognitionFailSysEvent("GetRawDescriptor", ret, "ReadDescriptors failed");
         fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return HDF_FAILURE;
     }
@@ -1517,6 +1551,7 @@ int32_t LibusbAdapter::GetUsbDevicePath(const UsbDev &dev, char *pathBuf, size_t
     char *ptr = realpath(path, resolvedPath);
     if (ptr == nullptr) {
         HDF_LOGE("%{public}s: path conversion failed, resolvedPath: %{public}s", __func__, resolvedPath);
+        ReportUsbdRecognitionFailSysEvent("GetRawDescriptor", ret, "path conversion failed");
         return HDF_FAILURE;
     }
     uint32_t len = strlen(resolvedPath);
@@ -2490,6 +2525,7 @@ int32_t LibusbAdapter::BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sp
     int32_t ret = FindHandleByDev(dev, &devHandle);
     if (devHandle == nullptr) {
         HDF_LOGE("%{public}s: find libusb device handle failed", __func__);
+        ReportUsbdRecognitionFailSysEvent("BulkRead", ret, "find handle failed");
         return HDF_FAILURE;
     }
 
@@ -2528,6 +2564,7 @@ int32_t LibusbAdapter::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const s
     int32_t ret = FindHandleByDev(dev, &devHandle);
     if (devHandle == nullptr) {
         HDF_LOGE("%{public}s: find handle failed", __func__);
+        ReportUsbdRecognitionFailSysEvent("BulkWrite", ret, "find handle failed");
         return HDF_FAILURE;
     }
 
@@ -2791,13 +2828,7 @@ int32_t LibusbAdapter::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
 int32_t LibusbAdapter::RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
 {
     HDF_LOGI("%{public}s: enter RemoveSubscriber.", __func__);
-    auto tempSize = subscribers_.size();
-    subscribers_.remove(subscriber);
-    if (tempSize == subscribers_.size()) {
-        HDF_LOGE("%{public}s: subsciber not exist.", __func__);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
+    return HotplugEventPorcess::GetInstance()->RemoveSubscriber(subscriber);
 }
 
 void LibusbAdapter::GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSubscriber> subscriber)
@@ -2842,7 +2873,7 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
         HDF_LOGE("%{public}s subsriber or g_libusb_context is nullptr", __func__);
         return HDF_FAILURE;
     }
-    if (subscribers_.size() == 0) {
+    if (HotplugEventPorcess::GetInstance()->GetSubscriberSize() == 0) {
         HDF_LOGI("%{public}s: rigister callback.", __func__);
         int rc = libusb_hotplug_register_callback(g_libusb_context,
             static_cast<libusb_hotplug_event>(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT),
@@ -2863,32 +2894,106 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
         }
     }
     GetCurrentDeviceList(g_libusb_context, subscriber);
+    return HotplugEventPorcess::GetInstance()->SetSubscriber(subscriber);
+}
+
+void HotplugEventPorcess::AddHotplugTask(V2_0::USBDeviceInfo& info)
+{
+    std::unique_lock<std::mutex> lock(queueMutex_);
+    hotplugEventQueue_.push(info);
+    if (activeThreads_ == 0) {
+        std::thread(&HotplugEventPorcess::OnProcessHotplugEvent, this).detach();
+        activeThreads_++;
+    } else {
+        queueCv_.notify_one();
+    }
+    HDF_LOGI("%{public}s: event: %{public}d, busNum: %{public}d, devAddr: %{public}d, activeThreads: %{public}d",
+        __func__, info.status, info.busNum, info.devNum, activeThreads_.load());
+}
+
+HotplugEventPorcess::HotplugEventPorcess()
+{
+    activeThreads_ = 0;
+    shutdown_ = false;
+    HDF_LOGI("%{public}s: init constructor.", __func__);
+}
+
+HotplugEventPorcess::~HotplugEventPorcess()
+{
+    std::unique_lock<std::mutex> lock(queueMutex_);
+    shutdown_ = false;
+    queueCv_.notify_all();
+    HDF_LOGI("%{public}s: destructor.", __func__);
+};
+
+std::shared_ptr<HotplugEventPorcess> HotplugEventPorcess::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::unique_lock<std::mutex> lock(mtx_);
+        if (instance_ == nullptr) {
+            instance_ = std::make_shared<HotplugEventPorcess>();
+        }
+    }
+    return instance_;
+}
+
+int32_t HotplugEventPorcess::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s subsriber is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     subscribers_.push_back(subscriber);
-    HDF_LOGI("%{public}s: hotpluginit success", __func__);
+    HDF_LOGI("%{public}s: subscriber add success", __func__);
     return HDF_SUCCESS;
 }
 
-void NotifyAllSubscriber(std::list<sptr<V2_0::IUsbdSubscriber>> subscribers, V2_0::USBDeviceInfo info)
+int32_t HotplugEventPorcess::RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
-    for (auto subscriber: subscribers) {
-        subscriber->DeviceEvent(info);
+    HDF_LOGI("%{public}s: enter RemoveSubscriber.", __func__);
+    auto tempSize = subscribers_.size();
+    subscribers_.remove(subscriber);
+    if (tempSize == subscribers_.size()) {
+        HDF_LOGE("%{public}s: subsciber not exist.", __func__);
+        return HDF_FAILURE;
     }
+    return HDF_SUCCESS;
 }
 
-void RunHotplugTask(std::list<sptr<V2_0::IUsbdSubscriber>> subscribers, V2_0::USBDeviceInfo info)
+size_t HotplugEventPorcess::GetSubscriberSize()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
-    std::thread hotplugThread([subscribers, info]() {
-        NotifyAllSubscriber(subscribers, info);
-    });
-    hotplugThread.detach();
+    return subscribers_.size();
+}
+
+void HotplugEventPorcess::OnProcessHotplugEvent()
+{
+    while (!shutdown_) {
+        V2_0::USBDeviceInfo info;
+        {
+            std::unique_lock<std::mutex> lock(queueMutex_);
+            if (shutdown_ || hotplugEventQueue_.empty()) {
+                activeThreads_--;
+                HDF_LOGD("%{public}s: activeThreads: %{public}d", __func__, activeThreads_.load());
+                return;
+            }
+            queueCv_.wait(lock, [this] {
+                return shutdown_ || !hotplugEventQueue_.empty();
+            });
+            info = hotplugEventQueue_.front();
+            hotplugEventQueue_.pop();
+        }
+        for (auto subscriber: subscribers_) {
+            subscriber->DeviceEvent(info);
+        }
+    }
 }
 
 int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* device,
     libusb_hotplug_event event, void* user_data)
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
+    HDF_LOGI("%{public}s: enter, event: %{public}d, busNum: %{public}u, devAddr: %{public}u.", __func__,
+        event, libusb_get_bus_number(device), libusb_get_device_address(device));
     struct libusb_device_descriptor devDesc;
     libusb_get_device_descriptor(device, &devDesc);
     if (devDesc.bDeviceClass == LIBUSB_CLASS_HUB) {
@@ -2899,12 +3004,12 @@ int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* devic
         HDF_LOGD("%{public}s: event=%{public}d arrival device", __func__, event);
         V2_0::USBDeviceInfo info = {ACT_DEVUP, libusb_get_bus_number(device),
             libusb_get_device_address(device)};
-        RunHotplugTask(LibusbAdapter::subscribers_, info);
+        HotplugEventPorcess::GetInstance()->AddHotplugTask(info);
     } else if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT) {
         HDF_LOGD("%{public}s: event=%{public}d remove device", __func__, event);
         V2_0::USBDeviceInfo info = {ACT_DEVDOWN, libusb_get_bus_number(device),
             libusb_get_device_address(device)};
-        RunHotplugTask(LibusbAdapter::subscribers_, info);
+        HotplugEventPorcess::GetInstance()->AddHotplugTask(info);
     }
     return HDF_SUCCESS;
 }

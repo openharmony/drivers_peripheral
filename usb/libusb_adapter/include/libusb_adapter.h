@@ -21,7 +21,9 @@
 #include <thread>
 #include <list>
 #include <map>
-
+#include <queue>
+#include <condition_variable>
+#include <atomic>
 #include <libusb.h>
 
 #include "libusb_sa_subscriber.h"
@@ -118,6 +120,27 @@ struct LibusbBulkManager {
     std::mutex bulkTransferVecLock;
 };
 
+class HotplugEventPorcess {
+public:
+    static std::shared_ptr<HotplugEventPorcess> GetInstance();
+    void AddHotplugTask(OHOS::HDI::Usb::V2_0::USBDeviceInfo &info);
+    int32_t SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
+    int32_t RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
+    size_t GetSubscriberSize();
+    ~HotplugEventPorcess();
+    HotplugEventPorcess();
+private:
+    std::queue<OHOS::HDI::Usb::V2_0::USBDeviceInfo> hotplugEventQueue_;
+    std::mutex queueMutex_;
+    std::condition_variable queueCv_;
+    std::atomic<int32_t> activeThreads_;
+    bool shutdown_;
+    std::list<sptr<V2_0::IUsbdSubscriber>> subscribers_;
+    static std::shared_ptr<HotplugEventPorcess> instance_;
+    static std::mutex mtx_;
+    void OnProcessHotplugEvent();
+};
+
 class LibusbAdapter {
 public:
     LibusbAdapter();
@@ -164,6 +187,8 @@ public:
     int32_t GetDeviceMemMapFd(const UsbDev &dev, int &fd);
     int32_t SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
     int32_t RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
+    void ReportUsbdRecognitionFailSysEvent(const std::string &operationType, int32_t code,
+        const std::string &failDescription, libusb_device *device = nullptr);
 
     /* Async Transfer */
     int32_t AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info,
@@ -257,7 +282,6 @@ private:
     std::atomic<bool> isRunning;
     std::thread eventThread;
     libusb_hotplug_callback_handle hotplug_handle_ = 0;
-    static std::list<sptr<V2_0::IUsbdSubscriber>> subscribers_;
     static sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber_;
     std::mutex openedFdsMutex_;
     std::map<std::pair<uint8_t, uint8_t>, int32_t> openedFds_;

@@ -21,6 +21,7 @@
 #include "usb_interface_pool.h"
 #include "v1_0/iusbd_subscriber.h"
 #include "usbd_wrapper.h"
+#include "usb_report_sys_event.h"
 
 namespace OHOS {
 namespace HDI {
@@ -947,10 +948,13 @@ int32_t UsbdDispatcher::UsbdDeviceCreateAndAttach(const sptr<UsbImpl> &service, 
         ret = FunAttachDevice(port, nullptr, nullptr);
         if (ret != HDF_SUCCESS) {
             HDF_LOGW("%{public}s:FunAttachDevice error ret:%{public}d", __func__, ret);
+            UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdDeviceCreateAndAttach", ret,
+                "FunAttachDevice error");
         }
         port = nullptr;
     } else {
         HDF_LOGE("%{public}s:createdevice error ret:%{public}d", __func__, ret);
+        UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdDeviceCreateAndAttach", ret, "createdevice error");
     }
     return ret;
 }
