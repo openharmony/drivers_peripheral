@@ -19,7 +19,11 @@
 #include <hdf_sbuf_ipc.h>
 #include "v1_1/connected_nfc_tag_stub.h"
 
-#define HDF_LOG_TAG connected_nfc_tag_driver
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000307
+#define HDF_LOG_TAG NFCTAG_HOST
 
 using namespace OHOS::HDI::ConnectedNfcTag::V1_1;
 
@@ -108,7 +112,7 @@ static void HdfConnectedNfcTagDriverRelease(struct HdfDeviceObject *deviceObject
 
 static struct HdfDriverEntry g_connectedNfcTagDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "ConnectedNfcTag_service",
+    .moduleName = "",
     .Bind = HdfConnectedNfcTagDriverBind,
     .Init = HdfConnectedNfcTagDriverInit,
     .Release = HdfConnectedNfcTagDriverRelease,
