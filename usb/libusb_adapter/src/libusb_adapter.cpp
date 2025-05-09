@@ -32,12 +32,14 @@
 
 #include "accesstoken_kit.h"
 #include "hap_token_info.h"
+#include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "osal_mem.h"
 #include "securec.h"
 #include "usbd_wrapper.h"
 #include "hitrace_meter.h"
 
+using OHOS::HiviewDFX::HiSysEvent;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -225,18 +227,38 @@ void LibusbAdapter::DeleteSettingsMap(libusb_device_handle* handle)
     HDF_LOGD("%{public}s leave", __func__);
 }
 
+void LibusbAdapter::ReportUsbdRecognitionFailSysEvent(const std::string &operationType, int32_t code,
+    const std::string &failDescription, libusb_device *device)
+{
+    libusb_device_descriptor device_descriptor;
+    libusb_get_device_descriptor(device, &device_descriptor);
+    if (device == nullptr) {
+        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "OPERATION_TYPE",
+            operationType, "DEVICE_NAME", 0, "DEVICE_PROTOCOL", 0, "DEVICE_CLASS", 0, "VENDOR_ID", 0, "PRODUCT_ID", 0,
+            "VERSION", 0, "FAIL_REASON", code, "FAIL_INFO", failDescription);
+    } else {
+        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "OPERATION_TYPE",
+            operationType, "DEVICE_NAME", 0, "DEVICE_PROTOCOL", device_descriptor.bDeviceProtocol,
+            "DEVICE_CLASS", device_descriptor.bDeviceClass, "VENDOR_ID", device_descriptor.idVendor,
+            "PRODUCT_ID", device_descriptor.idVendor, "VERSION", 0, "FAIL_REASON", code,
+            "FAIL_INFO", failDescription);
+    }
+}
+
 int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s enter", __func__);
     int32_t ret = LibUSBInit();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:LibUSBInit is failed, ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "LibUSBInit failed");
         return HDF_FAILURE;
     }
     libusb_device *device = nullptr;
     ret = GetUsbDevice(dev, &device);
     if (ret != HDF_SUCCESS || device == nullptr) {
         HDF_LOGE("%{public}s:GetUsbDevice is failed ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "GetUsbDevice failed");
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
@@ -248,6 +270,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         ret = libusb_open(device, &devHandle);
         if (ret != HDF_SUCCESS || devHandle == nullptr) {
             HDF_LOGE("%{public}s:Opening device failed ret = %{public}d", __func__, ret);
+            ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "Opening device failed", device);
             return HDF_FAILURE;
         }
         std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
@@ -265,6 +288,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     ret = GetCurrentConfiguration(devHandle, currentConfig);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: GetCurrentConfiguration failed", __func__);
+        ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "GetCurrentConfiguration failed");
         return HDF_FAILURE;
     }
     std::unique_lock<std::shared_mutex> lock(g_mapMutexDeviceSettingsMap);
@@ -586,6 +610,7 @@ int32_t LibusbAdapter::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, 
     HDF_LOGI("%{public}s enter", __func__);
     if (pipe.intfId >= LIBUSB_MAX_INTERFACEID) {
         HDF_LOGE("interfaceId is invalid");
+        ReportUsbdRecognitionFailSysEvent("BulkTransferRead", HDF_ERR_INVALID_PARAM, "interfaceId invalid");
         return HDF_ERR_INVALID_PARAM;
     }
     uint8_t tbuf[READ_BUF_SIZE] = {'\0'};
@@ -597,6 +622,7 @@ int32_t LibusbAdapter::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, 
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s: FindHandleByDev failed, ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferRead", HDF_FAILURE, "FindHandleByDev failed");
         return HDF_FAILURE;
     }
     StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB, "libusb_bulk_transfer");
@@ -604,6 +630,7 @@ int32_t LibusbAdapter::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, 
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret < 0) {
         HDF_LOGE("%{public}s: libusb_bulk_transfer is error ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferRead", HDF_FAILURE, "libusb_bulk_transfer error");
         return HDF_FAILURE;
     }
 
@@ -670,6 +697,7 @@ int32_t LibusbAdapter::BulkTransferWrite(
     HDF_LOGI("%{public}s enter", __func__);
     if (pipe.intfId >= LIBUSB_MAX_INTERFACEID) {
         HDF_LOGE("%{public}s interfaceId is invalid", __func__);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferWrite", HDF_ERR_INVALID_PARAM, "interfaceId invalid");
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t actlength = 0;
@@ -680,6 +708,7 @@ int32_t LibusbAdapter::BulkTransferWrite(
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferWrite", HDF_ERR_INVALID_PARAM, "GetEndpointDesc invalid");
         return ret;
     }
     if (!IsInterfaceIdByUsbDev(dev, pipe.intfId)) {
@@ -696,6 +725,7 @@ int32_t LibusbAdapter::BulkTransferWrite(
             return LIBUSB_IO_ERROR_INVALID;
         }
         HDF_LOGE("%{public}s: libusb_bulk_transfer is error ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("BulkTransferWrite", HDF_FAILURE, "libusb_bulk_transfer error");
         return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s leave", __func__);
@@ -1099,6 +1129,7 @@ int32_t LibusbAdapter::DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfe
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s: Find UsbHandle failed, ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("DoControlTransfer", ret, "FindUsbHandle failed");
         return HDF_FAILURE;
     }
 
@@ -1435,6 +1466,7 @@ int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> 
     ret = FindHandleByDev(dev, &devHandle);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s: FindHandleByDev is failed, ret=%{public}d", __func__, ret);
+        ReportUsbdRecognitionFailSysEvent("GetRawDescriptor", ret, "Opening device failed");
         return HDF_FAILURE;
     }
     char pathBuf[LIBUSB_PATH_LENGTH] = {'\0'};
@@ -1460,6 +1492,7 @@ int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> 
     size_t descriptorsLength = 0;
     if (ReadDescriptors(fd, &descriptors, descriptorsLength) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: ReadDescriptors failed", __func__);
+        ReportUsbdRecognitionFailSysEvent("GetRawDescriptor", ret, "ReadDescriptors failed");
         fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return HDF_FAILURE;
     }
@@ -1518,6 +1551,7 @@ int32_t LibusbAdapter::GetUsbDevicePath(const UsbDev &dev, char *pathBuf, size_t
     char *ptr = realpath(path, resolvedPath);
     if (ptr == nullptr) {
         HDF_LOGE("%{public}s: path conversion failed, resolvedPath: %{public}s", __func__, resolvedPath);
+        ReportUsbdRecognitionFailSysEvent("GetRawDescriptor", ret, "path conversion failed");
         return HDF_FAILURE;
     }
     uint32_t len = strlen(resolvedPath);
@@ -2491,6 +2525,7 @@ int32_t LibusbAdapter::BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sp
     int32_t ret = FindHandleByDev(dev, &devHandle);
     if (devHandle == nullptr) {
         HDF_LOGE("%{public}s: find libusb device handle failed", __func__);
+        ReportUsbdRecognitionFailSysEvent("BulkRead", ret, "find handle failed");
         return HDF_FAILURE;
     }
 
@@ -2529,6 +2564,7 @@ int32_t LibusbAdapter::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const s
     int32_t ret = FindHandleByDev(dev, &devHandle);
     if (devHandle == nullptr) {
         HDF_LOGE("%{public}s: find handle failed", __func__);
+        ReportUsbdRecognitionFailSysEvent("BulkWrite", ret, "find handle failed");
         return HDF_FAILURE;
     }
 
