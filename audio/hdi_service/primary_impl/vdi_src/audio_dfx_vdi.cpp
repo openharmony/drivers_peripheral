@@ -82,7 +82,7 @@ struct timeval AudioDfxSysEventGetTimeStamp(void)
 int32_t AudioDfxSysEventError(const char* desc, struct timeval startTime, int timeThreshold, int err)
 {
     if (err != HDF_SUCCESS) {
-        HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_OVER_TIME_EVENT", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_ERROR_EVENT", HiSysEvent::EventType::FAULT,
             "ERROR_DESC", desc, "ERROR_CODE", err, "OVER_TIME", 0);
     }
     struct timeval endTime;
@@ -91,7 +91,7 @@ int32_t AudioDfxSysEventError(const char* desc, struct timeval startTime, int ti
         (endTime.tv_usec - startTime.tv_usec) / TIME_1000);
     if (runTime > timeThreshold) {
         AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}d]", desc, runTime);
-        HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_OVER_TIME_EVENT", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_ERROR_EVENT", HiSysEvent::EventType::FAULT,
             "ERROR_DESC", desc, "ERROR_CODE", err, "OVER_TIME", runTime);
     }
     return HDF_SUCCESS;
