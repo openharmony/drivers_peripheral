@@ -39,6 +39,7 @@ ohos_fuzztest("FingerprintAuthInterfaceStubFuzzTest") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "hdf_core:libhdf_utils",
   ]
 
   subsystem_name = "hdf"

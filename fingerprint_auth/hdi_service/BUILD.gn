@@ -38,6 +38,7 @@ ohos_shared_library("libfingerprint_auth_interface_service_2.0") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "hdf_core:libhdf_utils",
   ]
 
   install_images = [ chipset_base_dir ]
