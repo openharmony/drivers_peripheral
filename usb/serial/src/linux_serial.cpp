@@ -361,9 +361,9 @@ void TranslateParity(tcflag_t parity, SerialAttribute& attribute)
         }
     } else {
         if (parity & PARODD) {
-            attribute.parity = USB_ATTR_PARITY_MARK;
+            attribute.parity = USB_ATTR_PARITY_ODD;
         } else {
-            attribute.parity = USB_ATTR_PARITY_SPACE;
+            attribute.parity = USB_ATTR_PARITY_EVEN;
         }
     }
 }
