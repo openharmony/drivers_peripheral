@@ -72,7 +72,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_001, TestSize.Level1)
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     std::vector<int8_t> frame;
     uint64_t replyBytes = 0;
-    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
+    EXPECT_EQ(HDF_ERR_DEVICE_BUSY, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
 }
 
 /**
