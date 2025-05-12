@@ -21,13 +21,7 @@ config("headers_config") {
 }
 
 ohos_shared_library("libcodec_hdi_omx_client") {
-  include_dirs = [
-    "../utils/include",
-  ]
   public_configs = [ ":headers_config" ]
-  sources = [
-    "../utils/src/codec_util.c"
-  ]
 
   if (is_standard_system) {
     external_deps = [
