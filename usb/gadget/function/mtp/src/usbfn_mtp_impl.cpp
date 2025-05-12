@@ -174,8 +174,7 @@ void UsbfnMtpImpl::UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *r
     }
     int32_t ret = UsbMtpPortRxPush(mtpPort, req);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: rx push failed(%{%{public}d/%{public}d}): %{public}d, state=%{public}hhu", __func__,
-            mtpPort->readStarted, mtpPort->readAllocated, ret, mtpPort->mtpDev->mtpState);
+        HDF_LOGW("%{public}s: rx push failed: %{public}d, state=%{public}d", __func__, ret, mtpPort->mtpDev->mtpState);
     }
     std::lock_guard<std::mutex> guard(asyncMutex_);
     if (mtpPort->readStarted == 0 && mtpPort->writeStarted == 0 && mtpPort->mtpDev->mtpState == MTP_STATE_CANCELED) {
