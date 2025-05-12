@@ -186,6 +186,7 @@ ohos_shared_library("libserial_interface_service_1.0") {
   }
 
   install_images = [ chipset_base_dir ]
+  innerapi_tags = [ "passthrough_indirect" ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_usb"
 }
