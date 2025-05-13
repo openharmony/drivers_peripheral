@@ -40,12 +40,17 @@ ohos_shared_library("libthermal_interface_service_1.1") {
       "libxml2:libxml2",
       "zlib:libz",
     ]
+    defines = []
     if (drivers_peripheral_thermal_feature_c_utils) {
       external_deps += [ "c_utils:utils" ]
     }
     if (drivers_peripheral_thermal_feature_config_policy) {
-      defines = [ "HAS_THERMAL_CONFIG_POLICY_PART" ]
+      defines += [ "HAS_THERMAL_CONFIG_POLICY_PART" ]
       external_deps += [ "config_policy:configpolicy_util" ]
+    }
+    if (drivers_peripheral_thermal_feature_datasize_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+      defines += [ "DATA_SIZE_HISYSEVENT_ENABLE" ]
     }
     if (drivers_peripheral_thermal_feature_hitrace) {
       external_deps += [ "hitrace:hitrace_meter" ]

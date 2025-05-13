@@ -17,14 +17,20 @@
 #include <cerrno>
 #include <cstdio>
 #include <deque>
+#include <dirent.h>
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/statfs.h>
 #include <unistd.h>
 #include <hdf_log.h>
 #include <hdf_base.h>
 
 #include "directory_ex.h"
+#include <datetime_ex.h>
+#ifdef DATA_SIZE_HISYSEVENT_ENABLE
+#include "hisysevent.h"
+#endif
 #include "param_wrapper.h"
 #include "parameter.h"
 #include "securec.h"
@@ -53,11 +59,14 @@ constexpr int32_t COMPRESS_READ_BUF_SIZE = 4096;
 constexpr int32_t DEFAULT_WIDTH = 20;
 constexpr int32_t DEFAULT_INTERVAL = 5000;
 constexpr int32_t MIN_INTERVAL = 100;
+constexpr int64_t TWENTY_FOUR_HOURS = 60 * 60 * 24 * 1000;
 const std::string TIMESTAMP_TITLE = "timestamp";
 const std::string THERMAL_LOG_ENABLE = "persist.thermal.log.enable";
 const std::string THERMAL_LOG_WIDTH = "persist.thermal.log.width";
 const std::string THERMAL_LOG_INTERVAL = "persist.thermal.log.interval";
+const std::string DATA_FILE_PATH = "/data";
 uint32_t g_currentLogIndex = 0;
+bool g_firstReport = true;
 bool g_firstCreate = true;
 std::deque<std::string> g_saveLogFile;
 std::string g_outPath = "";
@@ -425,16 +434,88 @@ uint32_t ThermalDfx::GetInterval()
     return interval_;
 }
 
+double ThermalDfx::GetDeviceValidSize(const std::string& path)
+{
+    struct statfs stat;
+    if (statfs(path.c_str(), &stat) != 0) {
+        return 0;
+    }
+    constexpr double units = 1024.0;
+    return (static_cast<double>(stat.f_bfree) / units) * (static_cast<double>(stat.f_bsize) / units);
+}
+
+uint64_t ThermalDfx::GetDirectorySize(const std::string& directoryPath)
+{
+    uint64_t totalSize = 0;
+    DIR* dir = opendir(directoryPath.c_str());
+    if (dir == nullptr) {
+        THERMAL_HILOGE(COMP_HDI, "Failed to open directory: %{public}s, errno = %{public}d",
+            directoryPath.c_str(), errno);
+        return totalSize;
+    }
+
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+
+        std::string filePath = directoryPath + "/" + entry->d_name;
+        struct stat fileStat;
+        if (stat(filePath.c_str(), &fileStat) == 0) {
+            totalSize += fileStat.st_size;
+        }
+    }
+
+    closedir(dir);
+    return totalSize;
+}
+
+void ThermalDfx::WriteDataHisysevent()
+{
+    THERMAL_HILOGD(COMP_HDI, "Report data hisysevent, g_outPath: %{public}s", g_outPath.c_str());
+#ifdef DATA_SIZE_HISYSEVENT_ENABLE
+    uint64_t remainSize = static_cast<uint64_t>(GetDeviceValidSize(DATA_FILE_PATH));
+    uint64_t fileSize = GetDirectorySize(g_outPath);
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::FILEMANAGEMENT, "USER_DATA_SIZE",
+        HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "COMPONENT_NAME", "drivers_peripheral_thermal",
+        "PARTITION_NAME", DATA_FILE_PATH,
+        "REMAIN_PARTITION_SIZE", remainSize,
+        "FILE_OR_FOLDER_PATH", g_outPath,
+        "FILE_OR_FOLDER_SIZE", fileSize);
+#endif
+}
+
+void ThermalDfx::ReportDataHisysevent()
+{
+    if (g_firstReport) {
+        WriteDataHisysevent();
+        beginTimeMs_ = GetTickCount();
+        g_firstReport = false;
+        return;
+    }
+    int64_t endTimeMs = GetTickCount();
+    if (endTimeMs - beginTimeMs_ >= TWENTY_FOUR_HOURS) {
+        WriteDataHisysevent();
+        beginTimeMs_ = endTimeMs;
+    }
+}
+
 void ThermalDfx::DoWork()
 {
     if (enable_) {
         CreateLogFile();
         CompressFile();
+#ifdef DATA_SIZE_HISYSEVENT_ENABLE
+        ReportDataHisysevent();
+#endif
     }
 }
 
 void ThermalDfx::Init()
 {
+    beginTimeMs_ = GetTickCount();
     interval_ = static_cast<uint32_t>(GetIntParameter(THERMAL_LOG_INTERVAL, DEFAULT_INTERVAL, MIN_INTERVAL));
     width_ = static_cast<uint8_t>(GetIntParameter(THERMAL_LOG_WIDTH, DEFAULT_WIDTH, DEFAULT_WIDTH));
     enable_ = GetBoolParameter(THERMAL_LOG_ENABLE, true);
