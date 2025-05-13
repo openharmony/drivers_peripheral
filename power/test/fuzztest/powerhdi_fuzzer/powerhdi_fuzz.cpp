@@ -19,12 +19,12 @@
 #include <memory>
 
 #include "power_interface_impl.h"
-#include "v1_2/ipower_interface.h"
-#include "v1_2/power_interface_stub.h"
+#include "v1_3/ipower_interface.h"
+#include "v1_3/power_interface_stub.h"
 #include "running_lock_impl.h"
 #include "refbase.h"
 
-using namespace OHOS::HDI;
+using namespace OHOS::HDI::Power;
 using namespace OHOS::HDI::Power::V1_2;
 using namespace std;
 
@@ -38,20 +38,20 @@ class PowerFuzzTest {
 public:
     PowerFuzzTest()
     {
-        impl_ = sptr<PowerInterfaceImpl>::MakeSptr();
+        impl_ = sptr<V1_3::PowerInterfaceImpl>::MakeSptr();
         impl_->SuspendBlock("PowerStubFuzzTest"); // Prevent device sleep
     }
     ~PowerFuzzTest()
     {
         impl_->SuspendUnblock("PowerStubFuzzTest");
     }
-    sptr<PowerInterfaceImpl> GetImpl() const
+    sptr<V1_3::PowerInterfaceImpl> GetImpl() const
     {
         return impl_;
     }
 
 private:
-    sptr<PowerInterfaceImpl> impl_ = nullptr;
+    sptr<V1_3::PowerInterfaceImpl> impl_ = nullptr;
 };
 namespace {
 shared_ptr<PowerInterfaceStub> g_fuzzService = nullptr;
@@ -68,7 +68,7 @@ static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
     if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
         return;
     }
-    OHOS::HDI::Power::V1_2::IPowerInterface::Get(true);
+    OHOS::HDI::Power::V1_3::IPowerInterface::Get(true);
 
     MessageParcel datas;
     MessageParcel reply;
