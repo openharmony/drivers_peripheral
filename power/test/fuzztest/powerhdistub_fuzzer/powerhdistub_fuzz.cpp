@@ -19,11 +19,11 @@
 #include <memory>
 
 #include "power_interface_impl.h"
-#include "v1_2/ipower_interface.h"
-#include "v1_2/power_interface_stub.h"
+#include "v1_3/ipower_interface.h"
+#include "v1_3/power_interface_stub.h"
 #include "v1_2/power_types.h"
 
-using namespace OHOS::HDI;
+using namespace OHOS::HDI::Power;
 using namespace OHOS::HDI::Power::V1_2;
 using namespace std;
 
@@ -35,20 +35,20 @@ class PowerFuzzTest {
 public:
     PowerFuzzTest()
     {
-        impl_ = new PowerInterfaceImpl();
+        impl_ = new V1_3::PowerInterfaceImpl();
         impl_->SuspendBlock("PowerStubFuzzTest"); // Prevent device sleep
     }
     ~PowerFuzzTest()
     {
         impl_->SuspendUnblock("PowerStubFuzzTest");
     }
-    sptr<PowerInterfaceImpl> GetImpl() const
+    sptr<V1_3::PowerInterfaceImpl> GetImpl() const
     {
         return impl_;
     }
 
 private:
-    sptr<PowerInterfaceImpl> impl_ = nullptr;
+    sptr<V1_3::PowerInterfaceImpl> impl_ = nullptr;
 };
 namespace {
 const int32_t REWIND_READ_DATA = 0;
@@ -79,7 +79,7 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
         if (CMD_POWER_INTERFACE_FORCE_SUSPEND == code) {
             continue;
         }
-        datas.WriteInterfaceToken(IPowerInterface::GetDescriptor());
+        datas.WriteInterfaceToken(V1_3::IPowerInterface::GetDescriptor());
         datas.WriteBuffer(data, size);
         datas.RewindRead(REWIND_READ_DATA);
         g_fuzzService->OnRemoteRequest(code, datas, reply, option);

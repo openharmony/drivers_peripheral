@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("../../power.gni")
 
-ohos_shared_library("libpower_interface_service_1.2") {
+ohos_shared_library("libpower_interface_service_1.3") {
   include_dirs = [ "../../utils/include" ]
   sources = [
     "../../utils/power_xcollie.cpp",
@@ -27,6 +27,7 @@ ohos_shared_library("libpower_interface_service_1.2") {
 
   external_deps = [
     "drivers_interface_power:libpower_stub_1.2",
+    "drivers_interface_power:libpower_stub_1.3",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
@@ -87,6 +88,7 @@ ohos_shared_library("libpower_driver") {
 
   external_deps = [
     "drivers_interface_power:libpower_stub_1.2",
+    "drivers_interface_power:libpower_stub_1.3",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -107,7 +109,7 @@ ohos_shared_library("libpower_driver") {
 group("hdf_power") {
   deps = [
     ":libpower_driver",
-    ":libpower_interface_service_1.2",
+    ":libpower_interface_service_1.3",
   ]
 
   if (drivers_peripheral_power_wakeup_cause_path) {
