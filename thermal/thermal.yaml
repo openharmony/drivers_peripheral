@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,11 +10,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build/ohos.gni")
 
-declare_args() {
-  drivers_peripheral_thermal_feature_config_policy = true
-  drivers_peripheral_thermal_feature_c_utils = true
-  drivers_peripheral_thermal_feature_datasize_hisysevent_enable = false
-  drivers_peripheral_thermal_feature_hitrace = true
-}
+domain: FILEMANAGEMENT
+
+USER_DATA_SIZE:
+  __BASE: {type: STATISTIC, level: CRITICAL, desc: user data size}
+  COMPONENT_NAME: {type: STRING, desc: component name}
+  PARTITION_NAME: {type: STRING, desc: partition name}
+  REMAIN_PARTITION_SIZE: {type: UINT64, desc: remain partition size}
+  FILE_OR_FOLDER_PATH: {type: STRING, desc: file or folder path}
+  FILE_OR_FOLDER_SIZE: {type: UINT64, desc: file or folder size}
