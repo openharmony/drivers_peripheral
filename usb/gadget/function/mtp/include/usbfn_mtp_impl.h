@@ -245,7 +245,7 @@ private:
     int32_t UsbMtpPortSendFileEx();
     int32_t UsbMtpPortSendFileLeftAsync(uint64_t oneReqLeft);
     int32_t ReceiveFileEx();
-
+    void ReadZLP(uint32_t length, uint32_t actual);
     uint32_t BufCopyToVector(void *buf, uint32_t bufSize, std::vector<uint8_t> &vectorData);
     uint32_t BufCopyFromVector(
         void *buf, uint32_t bufSize, const std::vector<uint8_t> &vectorData, uint32_t vectorOffset);
