@@ -121,7 +121,8 @@ if (defined(ohos_lite)) {
     if (use_hitrace) {
       defines += [ "HITRACE_LOG_ENABLED" ]
     }
-    if (drivers_peripheral_camera_feature_usb) {
+    if (drivers_peripheral_camera_feature_usb &&
+        !drivers_peripheral_camera_use_commom_usb_camera_host_config) {
       defines += [ "CHIP_PROD_CAMERA_HOST_CONFIG" ]
     }
 

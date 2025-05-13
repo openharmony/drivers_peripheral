@@ -89,7 +89,7 @@ host_includes = [
   "$camera_path_vdi/pipeline_core/ipp/include",
 ]
 
-ohos_shared_library("camera_daemon") {
+ohos_shared_library("camera_external_usb_camera") {
   output_extension = "so"
   sources = host_sources
   include_dirs = host_includes
@@ -125,6 +125,7 @@ ohos_shared_library("camera_daemon") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "init:libbegetutil",
     "ipc:ipc_single",
   ]
 
