@@ -81,6 +81,22 @@ ohos_prebuilt_etc("ipp_algo_config.hcb") {
   part_name = "drivers_peripheral_camera"
 }
 
+if (drivers_peripheral_camera_use_commom_usb_camera_host_config) {
+  hc_gen("build_usb_camera_host_config") {
+    sources = [ rebase_path("hdi_impl/usb_camera_host_config.hcs") ]
+    outputs = [ "$target_gen_dir/camera_host_config.hcb" ]
+  }
+  ohos_prebuilt_etc("camera_host_config.hcb") {
+    deps = [ ":build_usb_camera_host_config" ]
+    hcs_outputs = get_target_outputs(":build_usb_camera_host_config")
+    source = hcs_outputs[0]
+    relative_install_dir = "hdfconfig"
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_camera"
+  }
+}
+
 config("example_config") {
   visibility = [ ":*" ]
 
@@ -98,4 +114,8 @@ group("chipset_build") {
     ":params.c",
     "$camera_path_usb/adapter/platform/v4l2/src/driver_adapter:usb_camera_v4l2_adapter",
   ]
+
+  if (drivers_peripheral_camera_use_commom_usb_camera_host_config) {
+    public_deps += [ ":camera_host_config.hcb" ]
+  }
 }
