@@ -1999,3 +1999,10 @@ int32_t WpaInterfaceGetWpaStaData(struct IWpaInterface *self, const char *ifName
     HDF_LOGI("%{public}s: wpaCliCmdGetWpaStaData success ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
+
+int32_t WpaGetVersion(struct IWpaInterface *self, uint32_t *majorVer, uint32_t *minorVer)
+{
+    *majorVer = WPA_MAJOR_VER;
+    *minorVer = WPA_MINOR_VER;
+    return HDF_SUCCESS;
+}
