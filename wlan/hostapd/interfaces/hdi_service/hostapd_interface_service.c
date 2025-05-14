@@ -55,6 +55,7 @@ struct IHostapdInterface *HostapdInterfaceImplGetInstance(void)
     service->interface.RegisterEventCallback = HostapdInterfaceRegisterEventCallback;
     service->interface.UnregisterEventCallback = HostapdInterfaceUnregisterEventCallback;
     service->interface.HostApdShellCmd = HostApdInterfaceShellCmd;
+    service->interface.GetVersion = HostapdGetVersion;
     return &service->interface;
 }
 
