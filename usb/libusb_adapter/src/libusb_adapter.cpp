@@ -244,7 +244,6 @@ void LibusbAdapter::ReportUsbdRecognitionFailSysEvent(const std::string &operati
         "DEVICE_CLASS", device_descriptor.bDeviceClass, "VENDOR_ID", device_descriptor.idVendor,
         "PRODUCT_ID", device_descriptor.idVendor, "VERSION", 0, "FAIL_REASON", code,
         "FAIL_INFO", failDescription);
-    }
 }
 
 int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
