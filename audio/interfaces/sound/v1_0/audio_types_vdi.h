@@ -45,6 +45,8 @@ enum AudioPortPinVdi {
     PIN_VDI_OUT_USB_HEADSET = 1 << 9,
     PIN_VDI_OUT_BLUETOOTH_A2DP = 1 << 10,
     PIN_VDI_OUT_DP = 1 << 11,
+    PIN_VDI_OUT_NEARLINK_SCO = 1 << 12,
+    PIN_VDI_OUT_NEARLINK = 1 << 13,
     PIN_VDI_IN_MIC = 1 << 27 | 1 << 0,
     PIN_VDI_IN_HS_MIC = 1 << 27 | 1 << 1,
     PIN_VDI_IN_LINEIN = 1 << 27 | 1 << 2,
@@ -54,6 +56,7 @@ enum AudioPortPinVdi {
     PIN_VDI_IN_USB_HEADSET = 1 << 27 | 1 << 6,
     PIN_VDI_IN_PENCIL = 1 << 27 | 1 << 7,
     PIN_VDI_IN_UWB = 1 << 27 | 1 << 8,
+    PIN_VDI_IN_NEARLINK = 1 << 27 | 1 << 9,
     PIN_VDI_IN_BUTT,
 };
 
