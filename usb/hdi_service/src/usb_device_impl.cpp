@@ -276,10 +276,16 @@ int32_t UsbDeviceImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf 
     HDF_LOGI("%{public}s: enter", __func__);
     (void)priv;
     (void)data;
-    if (id == USB_PNP_DRIVER_GADGET_ADD) {
+    if (id == USB_PNP_DRIVER_GADGET_ADD || id == USB_PNP_NOTIFY_ADD_DEVICE) {
         if (loadUsbService_.LoadService() != 0) {
             HDF_LOGE("loadUsbService_ LoadService error");
             return HDF_FAILURE;
+        }
+        if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
+            if (loadHdfEdm_.LoadService() != 0) {
+                HDF_LOGE("loadHdfEdm_ LoadService error");
+                return HDF_FAILURE;
+            }
         }
     }
     return HDF_SUCCESS;
@@ -315,12 +321,6 @@ int32_t UsbDeviceImpl::UsbdEventHandle(void)
         HDF_LOGE("%{public}s: register listerer failed", __func__);
         return HDF_FAILURE;
     }
-    sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber = new (std::nothrow) V1_2::UsbSaSubscriber();
-    if (libUsbSaSubscriber == nullptr) {
-        HDF_LOGE("%{public}s: register listerer failed", __func__);
-        return HDF_FAILURE;
-    }
-    V1_2::LibusbAdapter::GetInstance()->SetLoadUsbSaSubscriber(libUsbSaSubscriber);
     return ret;
 }
 
