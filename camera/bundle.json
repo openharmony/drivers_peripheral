@@ -13,7 +13,8 @@
     "name": "drivers_peripheral_camera",
     "subsystem": "hdf",
     "features": [
-      "drivers_peripheral_camera_feature_usb"
+      "drivers_peripheral_camera_feature_usb",
+      "drivers_peripheral_camera_use_commom_usb_camera_host_config"
     ],
     "adapted_system_type": ["standard", "small"],
     "hisysevent_config": ["//drivers/peripheral/camera/hisysevent.yaml"],
@@ -24,6 +25,7 @@
         "hdf_core",
         "hilog",
         "samgr",
+        "init",
         "ipc",
         "drivers_interface_camera",
         "graphic_surface",

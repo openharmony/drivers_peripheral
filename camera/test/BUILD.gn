@@ -29,4 +29,7 @@ group("camera_hal_test") {
       "$test_path/ut/v4l2:camera_test_v4l2_ut",
     ]
   }
+  deps += [
+    "$test_path/ut/utils:camera_utils_ut",    
+  ]
 }

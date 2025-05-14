@@ -39,3 +39,7 @@ if (is_emulator) {
 declare_args() {
   drivers_peripheral_camera_feature_usb = false
 }
+
+declare_args() {
+  drivers_peripheral_camera_use_commom_usb_camera_host_config = false
+}
