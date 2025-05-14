@@ -40,8 +40,12 @@ int32_t HostapdRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType
 {
     uint32_t i;
     struct HostapdCallbackEvent *callbackEvent = NULL;
- 
-    if (onRecFunc == NULL || ifName == NULL) {
+    int ifNameLen = 0;
+
+    if (ifName != NULL) {
+        ifNameLen = strnlen(ifName, IFNAMSIZ + 1);
+    }
+    if (onRecFunc == NULL || ifName == NULL || ifNameLen == (IFNAMSIZ + 1)) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return -1;
     }
@@ -61,11 +65,12 @@ int32_t HostapdRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType
         return -1;
     }
     callbackEvent->eventType = eventType;
-    if (strcpy_s(callbackEvent->ifName, IFNAMSIZ, ifName) != 0) {
+    if (memcpy_s(callbackEvent->ifName, IFNAMSIZ, ifName, ifNameLen) != 0) {
         free(callbackEvent);
-        HDF_LOGE("%s: ifName strcpy_s fail", __FUNCTION__);
+        HDF_LOGE("%s: ifName memcpy_s fail", __FUNCTION__);
         return -1;
     }
+    callbackEvent->ifName[ifNameLen] = '\0';
     callbackEvent->onRecFunc = onRecFunc;
     pthread_mutex_lock(&g_hostapdCallbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
