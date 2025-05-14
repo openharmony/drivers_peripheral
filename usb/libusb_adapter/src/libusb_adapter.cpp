@@ -231,18 +231,19 @@ void LibusbAdapter::DeleteSettingsMap(libusb_device_handle* handle)
 void LibusbAdapter::ReportUsbdRecognitionFailSysEvent(const std::string &operationType, int32_t code,
     const std::string &failDescription, libusb_device *device)
 {
-    libusb_device_descriptor device_descriptor;
-    libusb_get_device_descriptor(device, &device_descriptor);
     if (device == nullptr) {
         HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "OPERATION_TYPE",
             operationType, "DEVICE_NAME", 0, "DEVICE_PROTOCOL", 0, "DEVICE_CLASS", 0, "VENDOR_ID", 0, "PRODUCT_ID", 0,
             "VERSION", 0, "FAIL_REASON", code, "FAIL_INFO", failDescription);
-    } else {
-        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "OPERATION_TYPE",
-            operationType, "DEVICE_NAME", 0, "DEVICE_PROTOCOL", device_descriptor.bDeviceProtocol,
-            "DEVICE_CLASS", device_descriptor.bDeviceClass, "VENDOR_ID", device_descriptor.idVendor,
-            "PRODUCT_ID", device_descriptor.idVendor, "VERSION", 0, "FAIL_REASON", code,
-            "FAIL_INFO", failDescription);
+        return;
+    }
+    libusb_device_descriptor device_descriptor;
+    libusb_get_device_descriptor(device, &device_descriptor);
+    HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "OPERATION_TYPE",
+        operationType, "DEVICE_NAME", 0, "DEVICE_PROTOCOL", device_descriptor.bDeviceProtocol,
+        "DEVICE_CLASS", device_descriptor.bDeviceClass, "VENDOR_ID", device_descriptor.idVendor,
+        "PRODUCT_ID", device_descriptor.idVendor, "VERSION", 0, "FAIL_REASON", code,
+        "FAIL_INFO", failDescription);
     }
 }
 
