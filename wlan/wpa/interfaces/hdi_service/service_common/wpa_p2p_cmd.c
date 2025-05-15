@@ -1618,21 +1618,10 @@ int32_t WpaInterfaceP2pSaveConfig(struct IWpaInterface *self, const char *ifName
     return HDF_SUCCESS;
 }
 
-int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifName,
+static int32_t GetCmdWithCarryDate(char *cmd, const char *ifName,
     int32_t cmdType, int32_t dataType, const char *carryData)
 {
-    HDF_LOGI("Ready to enter hdi %{public}s", __func__);
-    (void)self;
-    (void)ifName;
-    char cmd[MAX_CMD_SIZE] = {0};
-    char buf[CMD_SIZE] = {0};
-
-    int32_t ret = 0;
-    if (ifName == NULL || carryData == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    pthread_mutex_lock(GetInterfaceLock());
+    int ret = 0;
     switch (cmdType) {
         case P2P_REJECT: {
             ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
@@ -1649,12 +1638,37 @@ int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifNam
                 "IFNAME=%s SINK_CONFIG_SET %s", ifName, carryData);
             break;
         }
+        case P2P_CREATE_TEMP_GROUP: {
+            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+                "IFNAME=%s CREATE_TEMP_GROUP %s", ifName, carryData);
+            break;
+        }
         default: {
             ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
-                "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s", ifName, cmdType, dataType, carryData);
+                "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s",
+                ifName, cmdType, dataType, carryData);
             break;
         }
     }
+    return ret;
+}
+
+int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifName,
+    int32_t cmdType, int32_t dataType, const char *carryData)
+{
+    HDF_LOGI("Ready to enter hdi %{public}s", __func__);
+    (void)self;
+    (void)ifName;
+    char cmd[MAX_CMD_SIZE] = {0};
+    char buf[CMD_SIZE] = {0};
+
+    int32_t ret = 0;
+    if (ifName == NULL || carryData == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    pthread_mutex_lock(GetInterfaceLock());
+    ret = GetCmdWithCarryDate(cmd, ifName, cmdType, dataType, carryData);
     if (ret < 0) {
         pthread_mutex_unlock(GetInterfaceLock());
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
