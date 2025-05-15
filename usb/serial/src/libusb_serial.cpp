@@ -625,7 +625,7 @@ bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
         HDF_LOGE("%{public}s : realpath failed. ret = %{public}s", __func__, strerror(errno));
         return false;
     }
-    busnumFd = open(realpathStr, O_RDONLY);
+    busnumFd = open((ttyUsbPath + BUS_NUM_STR).c_str(), O_RDONLY);
     if (busnumFd < 0) {
         HDF_LOGE("%{public}s : open file failed. ret = %{public}s", __func__, strerror(errno));
         return false;
@@ -635,6 +635,7 @@ bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
     ssize_t readBytes = read(busnumFd, busnumBuff, BUFFER_SIZE);
     fdsan_close_with_tag(busnumFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (readBytes < 0) {
+        HDF_LOGE("%{public}s : busnumFd readbytes < 0. ret = %{public}s", __func__, strerror(errno));
         return false;
     }
     devnumFd = open((ttyUsbPath + DEV_NUM_STR).c_str(), O_RDONLY);
@@ -647,6 +648,7 @@ bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
     readBytes = read(devnumFd, devnumBuff, BUFFER_SIZE);
     fdsan_close_with_tag(devnumFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (readBytes < 0) {
+        HDF_LOGE("%{public}s : busnumFd readbytes < 0. ret = %{public}s", __func__, strerror(errno));
         return false;
     }
     if (atoi(devnumBuff) == libusb_get_device_address(device) && atoi(busnumBuff) == libusb_get_bus_number(device)) {
