@@ -40,8 +40,12 @@ int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, co
 {
     uint32_t i;
     struct WpaCallbackEvent *callbackEvent = NULL;
+    int ifNameLen = 0;
 
-    if (onRecFunc == NULL || ifName == NULL) {
+    if (ifName != NULL) {
+        ifNameLen = strnlen(ifName, IFNAMSIZ + 1);
+    }
+    if (onRecFunc == NULL || ifName == NULL || ifNameLen == (IFNAMSIZ + 1)) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return -1;
     }
@@ -61,12 +65,13 @@ int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, co
         return -1;
     }
     callbackEvent->eventType = eventType;
-    if (strcpy_s(callbackEvent->ifName, IFNAMSIZ, ifName) != 0) {
+    if (memcpy_s(callbackEvent->ifName, IFNAMSIZ, ifName, ifNameLen) != 0) {
         free(callbackEvent);
-        HDF_LOGE("%s: ifName strcpy_s fail", __FUNCTION__);
+        HDF_LOGE("%s: ifName memcpy_s fail", __FUNCTION__);
         pthread_rwlock_unlock(&g_wpaCallbackMutex);
         return -1;
     }
+    callbackEvent->ifName[ifNameLen] = '\0';
     callbackEvent->onRecFunc = onRecFunc;
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_wpaCallbackEventMap[i] == NULL) {
