@@ -49,7 +49,8 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_2 {
+namespace V1_3 {
+using namespace OHOS::HDI::Power;
 static constexpr const int32_t MAX_FILE_LENGTH = 32 * 1024 * 1024;
 static constexpr const char * const SUSPEND_STATE = "mem";
 static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
@@ -76,7 +77,6 @@ static std::condition_variable g_suspendCv;
 static std::unique_ptr<std::thread> g_daemon;
 static std::atomic_bool g_suspending;
 static std::atomic_bool g_suspendRetry;
-static sptr<IPowerHdiCallback> g_callback;
 static UniqueFd wakeupCountFd;
 static PowerHdfState g_powerState {PowerHdfState::AWAKE};
 static void AutoSuspendLoop();
@@ -85,14 +85,26 @@ static void LoadStringFd(int32_t fd, std::string &content);
 static std::string ReadWakeCount();
 static bool WriteWakeCount(const std::string &count);
 static void NotifyCallback(int code);
-namespace {
+// IPowerHdiCallback
+static sptr<IPowerHdiCallback> g_callback = nullptr;
 sptr<PowerInterfaceImpl::PowerDeathRecipient> g_deathRecipient = nullptr;
 bool g_isHdiStart = false;
-} // namespace
 
-extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+static constexpr const char * const WAKEUP_TAG_NONE = "";
+static constexpr const int32_t MAX_RETRY_COUNT = 5;
+static constexpr int32_t g_ulsr_loop = 0;
+static std::string g_suspendTag = WAKEUP_TAG_NONE;
+static std::string g_wakeupTag = WAKEUP_TAG_NONE;
+// IPowerHdiCallbackExt
+static sptr<V1_3::IPowerHdiCallbackExt> g_callbackExt = nullptr;
+static sptr<PowerInterfaceImpl::PowerDeathRecipientExt> g_deathRecipientExt = nullptr;
+static bool g_isPowerHdiExtReg = false;
+#endif
+
+extern "C" V1_3::IPowerInterface *PowerInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Power::V1_2::PowerInterfaceImpl;
+    using OHOS::HDI::Power::V1_3::PowerInterfaceImpl;
     PowerInterfaceImpl *service = new (std::nothrow) PowerInterfaceImpl();
     if (service == nullptr) {
         return nullptr;
@@ -128,7 +140,8 @@ int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback> &ipow
         if (g_deathRecipient == nullptr) {
             return HDF_FAILURE;
         }
-        AddPowerDeathRecipient(g_callback);
+        const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IPowerHdiCallback>(g_callback);
+        AddPowerDeathRecipient(remote, g_deathRecipient);
         g_isHdiStart = true;
     }
 
@@ -138,7 +151,8 @@ int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback> &ipow
 int32_t PowerInterfaceImpl::UnRegister()
 {
     HDF_LOGI("UnRegister");
-    RemovePowerDeathRecipient(g_callback);
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IPowerHdiCallback>(g_callback);
+    RemovePowerDeathRecipient(remote, g_deathRecipient);
     g_callback = nullptr;
     g_isHdiStart = false;
     return HDF_SUCCESS;
@@ -211,15 +225,53 @@ void AutoSuspendLoop()
 }
 
 #ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
-static constexpr const int32_t MAX_RETRY_COUNT = 5;
-static int32_t g_ulsr_loop = 0;
-static std::string g_suspendTag;
 int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag)
 {
     HDF_LOGI("Set suspend tag: %{public}s", tag.c_str());
     g_suspendTag = tag;
     g_ulsr_loop = 0;
     return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::RegisterPowerCallbackExt(const sptr<V1_3::IPowerHdiCallbackExt> &ipowerHdiCallback)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    HDF_LOGI("RegisterPowerCallbackExt, g_isPowerHdiExtReg:%{public}d", static_cast<int32_t>(g_isPowerHdiExtReg));
+    if (!g_isPowerHdiExtReg) {
+        if (ipowerHdiCallback == nullptr) {
+            return HDF_FAILURE;
+        }
+        g_deathRecipientExt = new PowerDeathRecipientExt(this);
+        if (g_deathRecipientExt == nullptr) {
+            return HDF_FAILURE;
+        }
+        g_callbackExt = ipowerHdiCallback;
+        const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<V1_3::IPowerHdiCallbackExt>(g_callbackExt);
+        AddPowerDeathRecipient(remote, g_deathRecipientExt);
+        g_isPowerHdiExtReg = true;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::UnRegisterPowerCallbackExt(const sptr<V1_3::IPowerHdiCallbackExt> &ipowerHdiCallback)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    HDF_LOGI("UnRegisterPowerCallbackExt, g_isPowerHdiExtReg:%{public}d", static_cast<int32_t>(g_isPowerHdiExtReg));
+    if (g_isPowerHdiExtReg) {
+        const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<V1_3::IPowerHdiCallbackExt>(g_callbackExt);
+        RemovePowerDeathRecipient(remote, g_deathRecipientExt);
+        g_callbackExt = nullptr;
+        g_isPowerHdiExtReg = false;
+    }
+    return HDF_SUCCESS;
+}
+
+void PowerInterfaceImpl::PowerDeathRecipientExt::OnRemoteDied(const wptr<IRemoteObject>& object)
+{
+    HDF_LOGI("PowerDeathRecipientExt OnRemoteDied");
+    powerInterfaceImpl_->UnRegisterPowerCallbackExt(g_callbackExt);
+    RunningLockImpl::Clean();
 }
 
 int32_t DoSuspendWithTag()
@@ -250,7 +302,27 @@ int32_t DoSuspendWithTag()
 #else
 int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag)
 {
+    HDF_LOGI("SetSuspendTag not supported");
     return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::RegisterPowerCallbackExt(const sptr<V1_3::IPowerHdiCallbackExt> &ipowerHdiCallback)
+{
+    HDF_LOGI("RegisterPowerCallbackExt not supported");
+    (void)ipowerHdiCallback;
+    return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::UnRegisterPowerCallbackExt(const sptr<V1_3::IPowerHdiCallbackExt> &ipowerHdiCallback)
+{
+    HDF_LOGI("UnRegisterPowerCallbackExt not supported");
+    (void)ipowerHdiCallback;
+    return HDF_SUCCESS;
+}
+
+void PowerInterfaceImpl::PowerDeathRecipientExt::OnRemoteDied(const wptr<IRemoteObject>& object)
+{
+    HDF_LOGI("PowerDeathRecipientExt not supported");
 }
 #endif
 
@@ -284,12 +356,28 @@ void NotifyCallback(int code)
         return;
     }
     switch (code) {
-        case CMD_ON_SUSPEND:
-            g_callback->OnSuspend();
+        case CMD_ON_SUSPEND: {
+            if (g_callback != nullptr) {
+                g_callback->OnSuspend();
+            }
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+            if (g_callbackExt != nullptr) {
+                g_callbackExt->OnSuspendWithTag(g_suspendTag);
+            }
+#endif
             break;
-        case CMD_ON_WAKEUP:
-            g_callback->OnWakeup();
+        }
+        case CMD_ON_WAKEUP: {
+            if (g_callback != nullptr) {
+                g_callback->OnWakeup();
+            }
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+            if (g_callbackExt != nullptr) {
+                g_callbackExt->OnWakeupWithTag(g_wakeupTag);
+            }
+#endif
             break;
+        }
         default:
             break;
     }
@@ -350,11 +438,14 @@ int32_t PowerInterfaceImpl::SuspendUnblock(const std::string &name)
     return HDF_SUCCESS;
 }
 
-int32_t PowerInterfaceImpl::AddPowerDeathRecipient(const sptr<IPowerHdiCallback> &callback)
+int32_t PowerInterfaceImpl::AddPowerDeathRecipient(
+    const sptr<IRemoteObject>& remote, const sptr<IRemoteObject::DeathRecipient>& recipient)
 {
+    if (remote == nullptr) {
+        return HDF_FAILURE;
+    }
     HDF_LOGI("AddPowerDeathRecipient");
-    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IPowerHdiCallback>(callback);
-    bool result = remote->AddDeathRecipient(g_deathRecipient);
+    bool result = remote->AddDeathRecipient(recipient);
     if (!result) {
         HDF_LOGI("AddPowerDeathRecipient fail");
         return HDF_FAILURE;
@@ -362,11 +453,14 @@ int32_t PowerInterfaceImpl::AddPowerDeathRecipient(const sptr<IPowerHdiCallback>
     return HDF_SUCCESS;
 }
 
-int32_t PowerInterfaceImpl::RemovePowerDeathRecipient(const sptr<IPowerHdiCallback> &callback)
+int32_t PowerInterfaceImpl::RemovePowerDeathRecipient(
+    const sptr<IRemoteObject>& remote, const sptr<IRemoteObject::DeathRecipient>& recipient)
 {
+    if (remote == nullptr) {
+        return HDF_FAILURE;
+    }
     HDF_LOGI("RemovePowerDeathRecipient");
-    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IPowerHdiCallback>(callback);
-    bool result = remote->RemoveDeathRecipient(g_deathRecipient);
+    bool result = remote->RemoveDeathRecipient(recipient);
     if (!result) {
         HDF_LOGI("RemovePowerDeathRecipient fail");
         return HDF_FAILURE;
@@ -548,7 +642,7 @@ int32_t PowerInterfaceImpl::GetPowerConfig(const std::string &sceneName, std::st
     LoadStringFd(getValueFd, value);
     return HDF_SUCCESS;
 }
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

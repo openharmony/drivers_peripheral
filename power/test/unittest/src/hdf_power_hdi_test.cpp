@@ -17,16 +17,16 @@
 #include <gtest/gtest.h>
 #include <securec.h>
 
-#include "v1_2/ipower_interface.h"
+#include "v1_3/ipower_interface.h"
 #include "v1_2/power_types.h"
 #include "v1_2/running_lock_types.h"
 
-using namespace OHOS::HDI;
+using namespace OHOS::HDI::Power;
 using namespace OHOS::HDI::Power::V1_2;
 using namespace testing::ext;
 
 namespace {
-sptr<IPowerInterface> g_powerInterface = nullptr;
+sptr<V1_3::IPowerInterface> g_powerInterface = nullptr;
 std::mutex g_mutex;
 const uint32_t MAX_PATH = 256;
 const uint32_t WAIT_TIME = 1;
@@ -42,7 +42,7 @@ public:
 
 void HdfPowerHdiTest::SetUpTestCase()
 {
-    g_powerInterface = IPowerInterface::Get(true);
+    g_powerInterface = V1_3::IPowerInterface::Get(true);
 }
 
 std::string HdfPowerHdiTest::ReadFile(const std::string& file)
