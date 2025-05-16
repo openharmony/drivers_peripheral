@@ -109,7 +109,9 @@ ResultCode CheckSpecification(int32_t userId, uint32_t authType)
         return RESULT_TYPE_NOT_SUPPORT;
     }
     if (credList->getSize(credList) >= maxNumber) {
-        LOG_ERROR("the enrolled quantity has reached the upper limit, authType is %{public}u", authType);
+        LOG_ERROR("the enrolled quantity has reached the upper limit,"
+            " authType is %{public}u, maxNumber:%{public}u, size:%{public}u",
+            authType, maxNumber, credList->getSize(credList));
         DestroyLinkedList(credList);
         return RESULT_EXCEED_LIMIT;
     }

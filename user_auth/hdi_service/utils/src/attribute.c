@@ -69,6 +69,8 @@ AttributeKey g_attributeKeyArray[] = {
     ATTR_COLLECTOR_UDID,
     ATTR_CHALLENGE,
     ATTR_EXPIRED_SYS_TIME,
+    ATTR_OLD_ROOT_SECRET,
+    ATTR_AUTH_PURPOSE,
 };
 
 #define ARRAY_LENGTH(array) (uint32_t)(sizeof(array) / sizeof((array)[0]))

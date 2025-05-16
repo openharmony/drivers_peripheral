@@ -90,15 +90,17 @@ HWTEST_F(AllInOneFuncTest, DoAuthPin_test, TestSize.Level1)
     Buffer *retTlv = CreateBufferBySize(RESULT_TLV_LEN);
     EXPECT_NE(retTlv, nullptr);
 
-    uint32_t result = DoAuthPin(nullptr, retTlv, nullptr);
+    Buffer *extra = CreateBufferBySize(RESULT_TLV_LEN);
+    EXPECT_NE(extra, nullptr);
+    uint32_t result = DoAuthPin(nullptr, extra, retTlv, nullptr);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
     retTlv->contentSize = retTlv->maxSize + 1;
-    result = DoAuthPin(pinAuthParam, retTlv, nullptr);
+    result = DoAuthPin(pinAuthParam, extra, retTlv, nullptr);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
     retTlv->contentSize = retTlv->maxSize;
-    result = DoAuthPin(pinAuthParam, retTlv, nullptr);
+    result = DoAuthPin(pinAuthParam, extra, retTlv, nullptr);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
     delete pinAuthParam;
