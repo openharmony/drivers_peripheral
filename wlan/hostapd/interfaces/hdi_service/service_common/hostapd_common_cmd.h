@@ -28,6 +28,8 @@
 #define MAX_WPA_MAIN_ARGV_LEN 128
 #define PATH_NUM 2
 #define BUFF_SIZE 256
+#define HOSTAPD_MAJOR_VER 1
+#define HOSTAPD_MINOR_VER 0
 
 #define WPA_HOSTAPD_NAME "hostapd"
 #define HOSTAPD_START_CMD "hostapd -g /data/service/el1/public/wifi/sockets/wpa/hostapd"
@@ -93,6 +95,8 @@ int32_t HostapdInterfaceUnregisterEventCallback(struct IHostapdInterface *self,
 void HostapdEventReport(const char *ifName, uint32_t event, void *data);
 
 int32_t HostApdInterfaceShellCmd(struct IHostapdInterface *self, const char *ifName, const char *cmd);
+
+int32_t HostapdGetVersion(struct IHostapdInterface *self, uint32_t *majorVer, uint32_t *minorVer);
 
 struct StApMainParam {
     int argc;

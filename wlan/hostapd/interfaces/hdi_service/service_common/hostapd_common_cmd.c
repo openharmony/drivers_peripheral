@@ -852,3 +852,10 @@ int32_t HostApdInterfaceShellCmd(struct IHostapdInterface *self, const char *ifN
     }
     return HDF_SUCCESS;
 }
+
+int32_t HostapdGetVersion(struct IHostapdInterface *self, uint32_t *majorVer, uint32_t *minorVer)
+{
+    *majorVer = HOSTAPD_MAJOR_VER;
+    *minorVer = HOSTAPD_MINOR_VER;
+    return HDF_SUCCESS;
+}

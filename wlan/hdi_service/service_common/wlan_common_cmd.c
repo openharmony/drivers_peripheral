@@ -1705,3 +1705,10 @@ int32_t WlanInterfaceWifiDestruct(void)
     }
     return ret;
 }
+
+int32_t WlanGetVersion(struct IWlanInterface *self, uint32_t *majorVer, uint32_t *minorVer)
+{
+    *majorVer = WLAN_MAJOR_VER;
+    *minorVer = WLAN_MINOR_VER;
+    return HDF_SUCCESS;
+}
