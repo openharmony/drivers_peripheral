@@ -105,7 +105,9 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
 
     int32_t id = SetTimer("Hdi:RenderFrame");
     HdfAudioStartTrace("Hdi:AudioRenderFrameVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->RenderFrame(vdiRender, frame, frameLen, replyBytes);
+    AudioDfxSysEventError("RenderFrame", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     CancelTimer(id);
     if (ret != HDF_SUCCESS) {
@@ -742,7 +744,9 @@ int32_t AudioRenderStartVdi(struct IAudioRender *render)
         return HDF_ERR_INVALID_PARAM;
     }
     HdfAudioStartTrace("Hdi:AudioRenderStartVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->Start(vdiRender);
+    AudioDfxSysEventError("Render Start", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render Start fail, ret=%{public}d", ret);
@@ -766,7 +770,9 @@ int32_t AudioRenderStopVdi(struct IAudioRender *render)
         return HDF_ERR_INVALID_PARAM;
     }
     HdfAudioStartTrace("Hdi:AudioRenderStopVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->Stop(vdiRender);
+    AudioDfxSysEventError("Render Stop", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render Stop fail, ret=%{public}d", ret);
