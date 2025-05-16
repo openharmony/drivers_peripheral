@@ -96,7 +96,7 @@ struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t
     }
     uint8_t *mapAddr = fnOps->mapAddr(ep, len);
     if (mapAddr == NULL || mapAddr == (uint8_t *)-1) {
-        HDF_LOGE("%{public}s:%{public}d mapAddr %{public}d to %{public}p failed", __func__, __LINE__, ep, mapAddr);
+        HDF_LOGE("%{public}s:%{public}d mapAddr %{public}d failed", __func__, __LINE__, ep);
         return NULL;
     }
 
