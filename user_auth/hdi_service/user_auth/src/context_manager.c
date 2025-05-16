@@ -104,9 +104,14 @@ IAM_STATIC UserAuthContext *InitAuthContext(AuthParamHal params)
 
 IAM_STATIC ResultCode SetContextExpiredTime(UserAuthContext *authContext)
 {
+    LOG_INFO("start");
     if (authContext == NULL) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
+    }
+    if (authContext->authIntent == ABANDONED_PIN_AUTH) {
+        authContext->authExpiredSysTime = NO_CHECK_PIN_EXPIRED_PERIOD;
+        return RESULT_SUCCESS;
     }
     PinExpiredInfo expiredInfo = {};
     ResultCode result = GetPinExpiredInfo(authContext->userId, &expiredInfo);
@@ -319,6 +324,9 @@ IAM_STATIC LinkedList *GetAuthCredentialList(const UserAuthContext *context)
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, context->authType);
     SetCredentialConditionUserId(&condition, context->userId);
+    if (context->authIntent == ABANDONED_PIN_AUTH) {
+        SetCredentialConditionAbandonPin(&condition);
+    }
     if (context->collectorSensorHint != INVALID_SENSOR_HINT) {
         uint32_t executorMatcher;
         ResultCode ret = QueryCollecterMatcher(context->authType, context->collectorSensorHint, &executorMatcher);
@@ -676,6 +684,7 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
     SetCredentialConditionAuthType(&condition, context->authType);
     SetCredentialConditionTemplateId(&condition, info->templateId);
     SetCredentialConditionExecutorSensorHint(&condition, verifierSensorHint);
+    SetCredentialConditionNeedAbandonPin(&condition);
     LinkedList *credList = QueryCredentialLimit(&condition);
     if (credList == NULL || credList->getSize(credList) != 1) {
         LOG_ERROR("query credential failed");

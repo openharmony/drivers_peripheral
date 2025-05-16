@@ -19,6 +19,7 @@
 #include "idm_database.h"
 #include "idm_session.h"
 #include "user_sign_centre.h"
+#include "coauth.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,16 +47,31 @@ typedef struct {
     Buffer *authToken;
 } UpdateCredentialOutput;
 
-ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId);
-ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleId);
+typedef enum {
+    DELETE_CREDENTIAL = 1,
+    ABANDON_CREDENTIAL = 2,
+} OperateType;
+
+typedef struct {
+    OperateType operateType;
+    CredentialInfoHal credentialInfo;
+    CoAuthSchedule scheduleInfo;
+} OperateResult;
+
+ResultCode CheckEnrollPermission(PermissionCheckParam *param);
+ResultCode CheckUpdatePermission(PermissionCheckParam *param);
 ResultCode AddCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId, Buffer **rootSecret,
     Buffer **authToken);
-ResultCode DeleteCredentialFunc(CredentialDeleteParam param, CredentialInfoHal *credentialInfo);
+ResultCode DeleteCredentialFunc(CredentialDeleteParam param, OperateResult *operateResult);
 ResultCode QueryCredentialFunc(int32_t userId, uint32_t authType, LinkedList **creds);
 ResultCode GetUserInfoFunc(int32_t userId, uint64_t *secureUid, uint64_t *pinSubType,
     EnrolledInfoHal **enrolledInfoArray, uint32_t *enrolledNum);
 ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, UpdateCredentialOutput *output);
 ResultCode QueryAllExtUserInfoFunc(UserInfoResult *userInfos, uint32_t userInfolen, uint32_t *userInfoCount);
+CoAuthSchedule *GenerateCoAuthSchedule(PermissionCheckParam *param, ScheduleType scheduleType);
+ResultCode UpdateAbandonResultFunc(int32_t userId, const Buffer *scheduleResult,
+    bool *isDelete, CredentialInfoHal *credentialInfo);
+ResultCode ClearUnavailableCredentialFunc(int32_t userId, CredentialInfoHal *credentialInfo);
 
 #ifdef __cplusplus
 }

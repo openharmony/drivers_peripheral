@@ -30,14 +30,14 @@ extern "C" {
 ResultCode OpenEditSession(int32_t userId, uint8_t *challenge, uint32_t challengeLen);
 ResultCode CloseEditSession(void);
 
-ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool isUpdate);
+ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, ScheduleType scheduleType);
 void BreakOffCoauthSchedule(void);
 
 ResultCode CheckSessionTimeout(void);
 ResultCode CheckSessionValid(int32_t userId);
 ResultCode GetUserId(int32_t *userId);
 ResultCode CheckChallenge(const uint8_t *challenge, uint32_t challengeLen);
-ResultCode GetIsUpdate(bool *isUpdate);
+ResultCode GetScheduleType(ScheduleType *scheduleType);
 ResultCode GetEnrollScheduleInfo(uint64_t *scheduleId, uint32_t *authType);
 ResultCode IsValidUserType(int32_t userType);
 
@@ -45,8 +45,15 @@ void RefreshValidTokenTime(void);
 bool IsValidTokenTime(uint64_t tokenTime);
 
 ResultCode GetChallenge(uint8_t *challenge, uint32_t challengeLen);
-void CacheRootSecret(int32_t userId, Buffer *rootSecret);
-Buffer *GetCacheRootSecret(int32_t userId);
+
+void SetPinChangeScence(int32_t userId, uint32_t authIntent);
+PinChangeScence GetPinChangeScence(int32_t userId);
+void SetOldRootSecret(int32_t userId, Buffer *rootSecret);
+Buffer *GetOldRootSecret(int32_t userId);
+void SetCurRootSecret(int32_t userId, Buffer *rootSecret);
+Buffer *GetCurRootSecret(int32_t userId);
+ResultCode SetNewRootSecret(int32_t userId, Buffer *rootSecret);
+Buffer *GetNewRootSecret(int32_t userId);
 
 #ifdef __cplusplus
 }

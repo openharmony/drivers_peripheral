@@ -55,13 +55,15 @@ public:
     int32_t EnrollPin(uint64_t scheduleId, uint64_t subType, std::vector<uint8_t> &salt,
         const std::vector<uint8_t> &pinData, std::vector<uint8_t> &result);
     int32_t AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &pinData,
-        std::vector<uint8_t> &result);
+        const std::vector<uint8_t> &extraInfo, std::vector<uint8_t> &resultTlv);
     void WriteAntiBrute(uint64_t templateId);
     int32_t QueryPinInfo(uint64_t templateId, PinCredentialInfo &pinCredentialInfoRet);
     int32_t DeleteTemplate(uint64_t templateId);
     int32_t GenerateAlgoParameter(std::vector<uint8_t> &algoParameter, uint32_t &algoVersion);
     int32_t AllInOneAuth(
         uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo, PinAlgoParam &pinAlgoParam);
+    int32_t Abandon(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
+            std::vector<uint8_t> &resultTlv);
 
     // for collector executor
     int32_t SetCollectorFwkParam(const std::vector<uint8_t> &frameworkPublicKey);

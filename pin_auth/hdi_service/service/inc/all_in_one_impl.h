@@ -50,6 +50,8 @@ public:
         HdiProperty &property) override;
     int32_t SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
         const sptr<HdiIExecutorCallback> &callbackObj) override;
+    int32_t Abandon(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
+        const sptr<HdiIExecutorCallback> &callbackObj) override;
 
 private:
     struct ScheduleInfo {
@@ -58,6 +60,7 @@ private:
         sptr<HdiIExecutorCallback> callback;
         uint64_t templateId{0};
         std::vector<uint8_t> algoParameter;
+        std::vector<uint8_t> extraInfo;
     };
 
     class ScheduleList {
@@ -72,9 +75,9 @@ private:
 
 private:
     int32_t AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &data,
-        std::vector<uint8_t> &resultTlv);
+        const std::vector<uint8_t> &extraInfo, std::vector<uint8_t> &resultTlv);
     int32_t AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
-        const sptr<HdiIExecutorCallback> &callbackObj);
+        const sptr<HdiIExecutorCallback> &callbackObj, const std::vector<uint8_t> &extraInfo);
     int32_t EnrollInner(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
         const sptr<HdiIExecutorCallback> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion);
 

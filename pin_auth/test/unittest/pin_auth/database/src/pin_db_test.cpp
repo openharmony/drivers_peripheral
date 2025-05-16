@@ -23,10 +23,6 @@ namespace UserIam {
 namespace PinAuth {
 using namespace testing;
 using namespace testing::ext;
-namespace {
-    constexpr uint32_t ROOT_SECRET_LEN = 32U;
-}
-
 void PinDataBaseTest::SetUpTestCase()
 {
 }

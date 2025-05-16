@@ -96,6 +96,10 @@ typedef enum {
     ATTR_CHALLENGE = 100066,
     /* executor index */
     ATTR_EXECUTOR_INDEX = 100067,
+    /* old pin root secret */
+    ATTR_OLD_ROOT_SECRET = 100068,
+    /* auth purpose */
+    ATTR_AUTH_PURPOSE = 100069
 } AttributeKey;
 
 #define MAX_SUB_MSG_NUM 10

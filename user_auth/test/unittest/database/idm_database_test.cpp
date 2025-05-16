@@ -17,6 +17,7 @@
 
 #include "idm_database.h"
 #include "securec.h"
+#include "adaptor_time.h"
 
 typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 
@@ -121,33 +122,34 @@ HWTEST_F(IdmDatabaseTest, TestGetEnrolledInfoAuthType_002, TestSize.Level0)
 {
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo userInfo = {};
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
     constexpr int32_t userId = 1135;
     constexpr uint32_t authType = 1;
-    userInfo.userId = userId;
-    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     EnrolledInfoHal info = {};
     EXPECT_EQ(GetEnrolledInfoAuthType(userId, authType, &info), RESULT_NOT_FOUND);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestGetEnrolledInfoAuthType_003, TestSize.Level0)
 {
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo userInfo = {};
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
     constexpr int32_t userId = 1135;
     constexpr uint32_t authType1 = 1;
-    constexpr uint32_t authType2 = 2;
-    userInfo.userId = userId;
-    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    EnrolledInfoHal enrolledInfo = {};
-    enrolledInfo.authType = authType2;
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
-    g_userInfoList->insert(g_userInfoList, nullptr);
+    userInfo->userId = userId;
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     EnrolledInfoHal info = {};
     EXPECT_EQ(GetEnrolledInfoAuthType(userId, authType1, &info), RESULT_NOT_FOUND);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestGetEnrolledInfo, TestSize.Level0)
@@ -170,6 +172,7 @@ HWTEST_F(IdmDatabaseTest, TestDeleteUserInfo, TestSize.Level0)
 HWTEST_F(IdmDatabaseTest, TestQueryUserInfo_001, TestSize.Level0)
 {
     g_userInfoList = nullptr;
+    g_currentUser = nullptr;
     constexpr int32_t userId1 = 123;
     constexpr int32_t userId2 = 1123;
     UserInfo userInfo = {};
@@ -182,21 +185,26 @@ HWTEST_F(IdmDatabaseTest, TestQueryUserInfo_001, TestSize.Level0)
 
 HWTEST_F(IdmDatabaseTest, TestQueryUserInfo_002, TestSize.Level0)
 {
+    g_userInfoList = nullptr;
     g_currentUser = nullptr;
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
     constexpr int32_t userId1 = 123;
     constexpr int32_t userId2 = 1336;
-    UserInfo userInfo1 = {};
-    userInfo1.userId = userId1;
-    userInfo1.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    userInfo1.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo1));
-    UserInfo userInfo2 = {};
-    userInfo2.userId = userId2;
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo2));
-    g_userInfoList->insert(g_userInfoList, nullptr);
+    UserInfo *userInfo1 = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo1, nullptr);
+    userInfo1->userId = userId1;
+    userInfo1->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo1->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo1));
+    UserInfo *userInfo2 = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo2, nullptr);
+    userInfo2->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo2->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo2->userId = userId2;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo2));
     EXPECT_NE(QueryUserInfo(userId1), nullptr);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestIsSecureUidDuplicate, TestSize.Level0)
@@ -208,46 +216,62 @@ HWTEST_F(IdmDatabaseTest, TestIsSecureUidDuplicate, TestSize.Level0)
     LinkedList *userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(userInfoList, nullptr);
     EXPECT_FALSE(IsSecureUidDuplicate(userInfoList, secUid));
-    UserInfo info1 = {};
-    info1.secUid = secUid1;
-    userInfoList->insert(userInfoList, static_cast<void *>(&info1));
-    UserInfo info2 = info1;
-    info2.secUid = secUid2;
-    userInfoList->insert(userInfoList, static_cast<void *>(&info2));
-    userInfoList->insert(userInfoList, nullptr);
+    UserInfo *info1 = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(info1, nullptr);
+    info1->secUid = secUid1;
+    info1->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    info1->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfoList->insert(userInfoList, static_cast<void *>(info1));
+    UserInfo *info2 = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(info2, nullptr);
+    info2->secUid = secUid2;
+    info2->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    info2->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfoList->insert(userInfoList, static_cast<void *>(info2));
     EXPECT_TRUE(IsSecureUidDuplicate(userInfoList, secUid1));
+    DestroyLinkedList(userInfoList);
 }
 
 HWTEST_F(IdmDatabaseTest, TestCreateUser, TestSize.Level0)
 {
     g_userInfoList = nullptr;
+    g_currentUser = nullptr;
     constexpr int32_t userId = 123;
     EXPECT_EQ(CreateUser(userId, 0), nullptr);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestDeleteUser, TestSize.Level0)
 {
     g_userInfoList = nullptr;
+    g_currentUser = nullptr;
     constexpr int32_t userId = 123;
     EXPECT_EQ(DeleteUser(userId), RESULT_BAD_PARAM);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestIsCredentialIdDuplicate, TestSize.Level0)
 {
     g_userInfoList = nullptr;
+    g_currentUser = nullptr;
     constexpr uint64_t credentialId1 = 1221;
     constexpr uint64_t credentialId2 = 10;
     EXPECT_TRUE(IsCredentialIdDuplicate(nullptr, credentialId1));
     g_userInfoList =  CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo info = {};
-    info.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    EXPECT_NE(info.credentialInfoList, nullptr);
-    CredentialInfoHal credInfo = {};
-    credInfo.credentialId = credentialId2;
-    info.credentialInfoList->insert(info.credentialInfoList, static_cast<void *>(&credInfo));
-    g_userInfoList->insert(g_userInfoList, &info);
-    EXPECT_FALSE(IsCredentialIdDuplicate(nullptr, credentialId2));
+    UserInfo *info = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(info, nullptr);
+    info->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    info->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    EXPECT_NE(info->credentialInfoList, nullptr);
+    CredentialInfoHal *credInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo, nullptr);
+    credInfo->credentialId = credentialId2;
+    credInfo->isAbandoned = false;
+    info->credentialInfoList->insert(info->credentialInfoList, static_cast<void *>(credInfo));
+    g_userInfoList->insert(g_userInfoList, info);
+    EXPECT_TRUE(IsCredentialIdDuplicate(nullptr, credentialId2));
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestIsEnrolledIdDuplicate, TestSize.Level0)
@@ -256,14 +280,16 @@ HWTEST_F(IdmDatabaseTest, TestIsEnrolledIdDuplicate, TestSize.Level0)
     constexpr uint64_t enrolledId2 = 222;
     LinkedList *enrolledList = CreateLinkedList(DestroyEnrolledNode);
     EXPECT_NE(enrolledList, nullptr);
-    EnrolledInfoHal info1 = {};
-    info1.enrolledId = enrolledId1;
-    enrolledList->insert(enrolledList, static_cast<void *>(&info1));
-    EnrolledInfoHal info2 = {};
-    info2.enrolledId = enrolledId2;
-    enrolledList->insert(enrolledList, static_cast<void *>(&info2));
-    enrolledList->insert(enrolledList, nullptr);
+    EnrolledInfoHal *info1 = static_cast<EnrolledInfoHal *>(malloc(sizeof(EnrolledInfoHal)));
+    EXPECT_NE(info1, nullptr);
+    info1->enrolledId = enrolledId1;
+    enrolledList->insert(enrolledList, static_cast<void *>(info1));
+    EnrolledInfoHal *info2 = static_cast<EnrolledInfoHal *>(malloc(sizeof(EnrolledInfoHal)));
+    EXPECT_NE(info2, nullptr);
+    info2->enrolledId = enrolledId2;
+    enrolledList->insert(enrolledList, static_cast<void *>(info2));
     EXPECT_TRUE(IsEnrolledIdDuplicate(enrolledList, enrolledId1));
+    DestroyLinkedList(enrolledList);
 }
 
 HWTEST_F(IdmDatabaseTest, TestGenerateDeduplicateUint64, TestSize.Level0)
@@ -277,31 +303,39 @@ HWTEST_F(IdmDatabaseTest, TestUpdateEnrolledId, TestSize.Level0)
     constexpr uint32_t authType2 = 2;
     LinkedList *enrolledList = CreateLinkedList(DestroyEnrolledNode);
     EXPECT_NE(enrolledList, nullptr);
-    EnrolledInfoHal info1 = {};
-    info1.authType = authType1;
-    enrolledList->insert(enrolledList, static_cast<void *>(&info1));
-    EnrolledInfoHal info2 = {};
-    info2.authType = authType2;
-    enrolledList->insert(enrolledList, static_cast<void *>(&info2));
+    EnrolledInfoHal *info1 = static_cast<EnrolledInfoHal *>(malloc(sizeof(EnrolledInfoHal)));
+    EXPECT_NE(info1, nullptr);
+    info1->authType = authType1;
+    enrolledList->insert(enrolledList, static_cast<void *>(info1));
+    EnrolledInfoHal *info2 = static_cast<EnrolledInfoHal *>(malloc(sizeof(EnrolledInfoHal)));
+    EXPECT_NE(info2, nullptr);
+    info2->authType = authType2;
+    enrolledList->insert(enrolledList, static_cast<void *>(info2));
     enrolledList->insert(enrolledList, nullptr);
     EXPECT_EQ(UpdateEnrolledId(enrolledList, authType1), RESULT_SUCCESS);
+    DestroyLinkedList(enrolledList);
 }
 
 HWTEST_F(IdmDatabaseTest, TestAddCredentialToUser, TestSize.Level0)
 {
     g_userInfoList = nullptr;
+    g_currentUser = nullptr;
     EXPECT_EQ(AddCredentialToUser(nullptr, nullptr), RESULT_NEED_INIT);
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
-    UserInfo userInfo = {};
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    EXPECT_NE(userInfo.credentialInfoList, nullptr);
-    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    CredentialInfoHal credInfo = {};
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    EXPECT_NE(userInfo->credentialInfoList, nullptr);
+    EXPECT_NE(userInfo->enrolledInfoList, nullptr);
     constexpr uint32_t credNum = 102;
     for (uint32_t i = 0; i < credNum; ++i) {
-        userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
+        CredentialInfoHal *credInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+        EXPECT_NE(credInfo, nullptr);
+        userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo));
     }
-    EXPECT_EQ(AddCredentialToUser(&userInfo, nullptr), RESULT_EXCEED_LIMIT);
+    EXPECT_EQ(AddCredentialToUser(userInfo, nullptr), RESULT_EXCEED_LIMIT);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestAddUser, TestSize.Level0)
@@ -312,11 +346,15 @@ HWTEST_F(IdmDatabaseTest, TestAddUser, TestSize.Level0)
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
     constexpr uint32_t userNum = 1002;
-    UserInfo info = {};
     for (uint32_t i = 0; i < userNum; ++i) {
-        g_userInfoList->insert(g_userInfoList, static_cast<void *>(&info));
+        UserInfo *info = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+        EXPECT_NE(info, nullptr);
+        info->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+        info->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+        g_userInfoList->insert(g_userInfoList, static_cast<void *>(info));
     }
     EXPECT_EQ(AddUser(111, nullptr, 0), RESULT_EXCEED_LIMIT);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestAddCredentialInfo_001, TestSize.Level0)
@@ -342,6 +380,7 @@ HWTEST_F(IdmDatabaseTest, TestAddCredentialInfo_002, TestSize.Level0)
     EXPECT_EQ(AddUser(userId, &credInfo, userType), RESULT_SUCCESS);
 
     EXPECT_EQ(AddCredentialInfo(userId, &credInfo, userType), RESULT_SUCCESS);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestMatchCredentialById, TestSize.Level0)
@@ -382,13 +421,15 @@ HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_002, TestSize.Level0)
     constexpr int32_t userId = 112;
     constexpr uint64_t credentialId = 1;
     EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo userInfo = {};
-    userInfo.userId = userId;
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo->userId = userId;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     CredentialInfoHal credInfo = {};
     EXPECT_EQ(DeleteCredentialInfo(userId, credentialId, &credInfo), RESULT_UNKNOWN);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_003, TestSize.Level0)
@@ -398,18 +439,20 @@ HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_003, TestSize.Level0)
     EXPECT_NE(g_userInfoList, nullptr);
     constexpr int32_t userId = 113;
     constexpr uint64_t credentialId = 10;
-    UserInfo userInfo = {};
-    userInfo.userId = userId;
-    userInfo.enrolledInfoList = nullptr;
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    EXPECT_NE(userInfo.credentialInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    EXPECT_NE(userInfo->credentialInfoList, nullptr);
     auto *credInfo = static_cast<CredentialInfoHal *>(Malloc(sizeof(CredentialInfoHal)));
     credInfo->credentialId = credentialId;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo));
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    credInfo->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo));
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     CredentialInfoHal info = {};
     EXPECT_EQ(DeleteCredentialInfo(userId, credentialId, &info), RESULT_SUCCESS);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_004, TestSize.Level0)
@@ -421,24 +464,26 @@ HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_004, TestSize.Level0)
     constexpr uint32_t authType = 2;
     constexpr uint64_t credentialId1 = 10;
     constexpr uint64_t credentialId2 = 20;
-    UserInfo userInfo = {};
-    userInfo.userId = userId;
-    userInfo.enrolledInfoList = nullptr;
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    EXPECT_NE(userInfo.credentialInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    EXPECT_NE(userInfo->credentialInfoList, nullptr);
     auto *credInfo1 = static_cast<CredentialInfoHal *>(Malloc(sizeof(CredentialInfoHal)));
     credInfo1->credentialId = credentialId1;
     credInfo1->authType = authType;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo1));
+    credInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo1));
     auto *credInfo2 = static_cast<CredentialInfoHal *>(Malloc(sizeof(CredentialInfoHal)));
     credInfo2->credentialId = credentialId2;
     credInfo2->authType = authType;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo2));
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    credInfo2->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo2));
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     CredentialInfoHal info = {};
     EXPECT_EQ(DeleteCredentialInfo(userId, credentialId1, &info), RESULT_SUCCESS);
-    Free(credInfo2);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestClearCachePin, TestSize.Level0)
@@ -449,15 +494,19 @@ HWTEST_F(IdmDatabaseTest, TestClearCachePin, TestSize.Level0)
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
     constexpr uint64_t credentialId1 = 10;
-    UserInfo userInfo = {};
-    userInfo.userId = userId;
-    userInfo.enrolledInfoList = nullptr;
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    EXPECT_NE(userInfo.credentialInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->enrolledInfoList = nullptr;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    EXPECT_NE(userInfo->credentialInfoList, nullptr);
     auto *credInfo1 = static_cast<CredentialInfoHal *>(Malloc(sizeof(CredentialInfoHal)));
     credInfo1->credentialId = credentialId1;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo1));
+    credInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo1));
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     ClearCachePin(userId);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestQueryCredentialById, TestSize.Level0)
@@ -468,14 +517,16 @@ HWTEST_F(IdmDatabaseTest, TestQueryCredentialById, TestSize.Level0)
     EXPECT_EQ(QueryCredentialById(credentialId, nullptr), nullptr);
     LinkedList *credentialList = CreateLinkedList(DestroyCredentialNode);
     EXPECT_NE(credentialList, nullptr);
-    CredentialInfoHal credInfo1 = {};
-    credInfo1.credentialId = credentialId1;
-    credentialList->insert(credentialList, static_cast<void *>(&credInfo1));
-    CredentialInfoHal credInfo2 = {};
-    credInfo2.credentialId = credentialId2;
-    credentialList->insert(credentialList, static_cast<void *>(&credInfo2));
-    credentialList->insert(credentialList, nullptr);
+    CredentialInfoHal *credInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo1, nullptr);
+    credInfo1->credentialId = credentialId1;
+    credentialList->insert(credentialList, static_cast<void *>(credInfo1));
+    CredentialInfoHal *credInfo2 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo2, nullptr);
+    credInfo2->credentialId = credentialId2;
+    credentialList->insert(credentialList, static_cast<void *>(credInfo2));
     EXPECT_NE(QueryCredentialById(credentialId1, credentialList), nullptr);
+    DestroyLinkedList(credentialList);
 }
 
 HWTEST_F(IdmDatabaseTest, TestQueryCredentialByAuthType, TestSize.Level0)
@@ -485,14 +536,16 @@ HWTEST_F(IdmDatabaseTest, TestQueryCredentialByAuthType, TestSize.Level0)
     EXPECT_EQ(QueryCredentialByAuthType(1, nullptr), nullptr);
     LinkedList *credentialList = CreateLinkedList(DestroyCredentialNode);
     EXPECT_NE(credentialList, nullptr);
-    CredentialInfoHal credInfo1 = {};
-    credInfo1.authType = authType1;
-    credentialList->insert(credentialList, static_cast<void *>(&credInfo1));
-    CredentialInfoHal credInfo2 = {};
-    credInfo2.authType = authType2;
-    credentialList->insert(credentialList, static_cast<void *>(&credInfo2));
-    credentialList->insert(credentialList, nullptr);
+    CredentialInfoHal *credInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo1, nullptr);
+    credInfo1->authType = authType1;
+    credentialList->insert(credentialList, static_cast<void *>(credInfo1));
+    CredentialInfoHal *credInfo2 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo2, nullptr);
+    credInfo2->authType = authType2;
+    credentialList->insert(credentialList, static_cast<void *>(credInfo2));
     EXPECT_NE(QueryCredentialByAuthType(authType1, credentialList), nullptr);
+    DestroyLinkedList(credentialList);
 }
 
 HWTEST_F(IdmDatabaseTest, TestIsCredMatch_001, TestSize.Level0)
@@ -533,9 +586,38 @@ HWTEST_F(IdmDatabaseTest, TestIsCredMatch_003, TestSize.Level0)
     EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
     SetCredentialConditionExecutorMatcher(&limit, executorMatcher2);
     EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
-    SetCredentiaConditionNeedCachePin(nullptr);
+    SetCredentialConditionNeedCachePin(nullptr);
     EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
-    SetCredentiaConditionNeedCachePin(&limit);
+    SetCredentialConditionNeedCachePin(&limit);
+    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+}
+
+HWTEST_F(IdmDatabaseTest, TestIsCredMatch_004, TestSize.Level0)
+{
+    CredentialInfoHal credInfo = {};
+    credInfo.authType = PIN_AUTH;
+    credInfo.isAbandoned = false;
+    CredentialCondition limit = {};
+    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+    SetCredentialConditionNeedAbandonPin(nullptr);
+    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+    SetCredentialConditionNeedAbandonPin(&limit);
+    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+    credInfo.isAbandoned = true;
+    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+}
+
+HWTEST_F(IdmDatabaseTest, TestIsCredMatch_005, TestSize.Level0)
+{
+    CredentialInfoHal credInfo = {};
+    credInfo.authType = PIN_AUTH;
+    credInfo.isAbandoned = false;
+    CredentialCondition limit = {};
+    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+    SetCredentialConditionAbandonPin(nullptr);
+    SetCredentialConditionAbandonPin(&limit);
+    EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
+    credInfo.isAbandoned = true;
     EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
 }
 
@@ -557,10 +639,12 @@ HWTEST_F(IdmDatabaseTest, TestTraverseCredentialList, TestSize.Level0)
     EXPECT_NE(credentialList, nullptr);
     credentialList->insert(credentialList, nullptr);
     EXPECT_EQ(TraverseCredentialList(nullptr, credentialList, nullptr), RESULT_UNKNOWN);
+    DestroyLinkedList(credentialList);
 }
 
 HWTEST_F(IdmDatabaseTest, TestQueryCredentialLimit_001, TestSize.Level0)
 {
+    g_currentUser = nullptr;
     g_userInfoList = nullptr;
     EXPECT_EQ(QueryCredentialLimit(nullptr), nullptr);
     CredentialCondition limit = {};
@@ -569,29 +653,97 @@ HWTEST_F(IdmDatabaseTest, TestQueryCredentialLimit_001, TestSize.Level0)
     EXPECT_NE(g_userInfoList, nullptr);
     g_userInfoList->insert(g_userInfoList, nullptr);
     EXPECT_EQ(QueryCredentialLimit(&limit), nullptr);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestQueryCredentialLimit_002, TestSize.Level0)
 {
     constexpr int32_t userId1 = 1001;
     constexpr int32_t userId2 = 1002;
+    g_currentUser = nullptr;
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo userInfo1 = {};
-    userInfo1.userId = userId1;
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo1));
-    UserInfo userInfo2 = {};
-    userInfo2.userId = userId2;
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo2));
+    UserInfo *userInfo1 = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo1, nullptr);
+    userInfo1->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo1->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo1->userId = userId1;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo1));
+    UserInfo *userInfo2 = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo2, nullptr);
+    userInfo2->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo2->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo2->userId = userId2;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo2));
     CredentialCondition limit = {};
     SetCredentialConditionUserId(&limit, userId1);
-    EXPECT_EQ(QueryCredentialLimit(&limit), nullptr);
+    EXPECT_NE(QueryCredentialLimit(&limit), nullptr);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestQueryCredentialLimit_003, TestSize.Level0)
+{
+    constexpr int32_t userId1 = 1001;
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo1 = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo1, nullptr);
+    userInfo1->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo1->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo1->userId = userId1;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo1));
+    CredentialInfoHal *credInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo1, nullptr);
+    credInfo1->authType = PIN_AUTH;
+    credInfo1->isAbandoned = true;
+    userInfo1->credentialInfoList->insert(userInfo1->credentialInfoList, static_cast<void *>(credInfo1));
+    CredentialInfoHal *credInfo2 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo2, nullptr);
+    credInfo2->authType = PIN_AUTH;
+    credInfo2->isAbandoned = false;
+    userInfo1->credentialInfoList->insert(userInfo1->credentialInfoList, static_cast<void *>(credInfo2));
+    CredentialCondition limit = {};
+    SetCredentialConditionUserId(&limit, userId1);
+    SetCredentialConditionAbandonPin(&limit);
+    EXPECT_NE(QueryCredentialLimit(&limit), nullptr);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestQueryCredentialLimit_004, TestSize.Level0)
+{
+    constexpr int32_t userId1 = 1001;
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo1 = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo1, nullptr);
+    userInfo1->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo1->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo1->userId = userId1;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo1));
+    CredentialInfoHal *credInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo1, nullptr);
+    credInfo1->authType = PIN_AUTH;
+    credInfo1->isAbandoned = true;
+    userInfo1->credentialInfoList->insert(userInfo1->credentialInfoList, static_cast<void *>(credInfo1));
+    CredentialInfoHal *credInfo2 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo2, nullptr);
+    credInfo2->authType = PIN_AUTH;
+    credInfo2->isAbandoned = false;
+    userInfo1->credentialInfoList->insert(userInfo1->credentialInfoList, static_cast<void *>(credInfo2));
+    CredentialCondition limit = {};
+    SetCredentialConditionUserId(&limit, userId1);
+    SetCredentialConditionNeedAbandonPin(&limit);
+    EXPECT_NE(QueryCredentialLimit(&limit), nullptr);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestQueryCredentialUserId_001, TestSize.Level0)
 {
     constexpr int32_t userId1 = 1001;
     constexpr uint64_t credentialId = 10;
+    g_currentUser = nullptr;
     g_userInfoList = nullptr;
     EXPECT_EQ(QueryCredentialUserId(credentialId, nullptr), RESULT_BAD_PARAM);
     int32_t userId = userId1;
@@ -601,6 +753,7 @@ HWTEST_F(IdmDatabaseTest, TestQueryCredentialUserId_001, TestSize.Level0)
     EXPECT_EQ(QueryCredentialUserId(credentialId, &userId), RESULT_NOT_FOUND);
     g_userInfoList->insert(g_userInfoList, nullptr);
     EXPECT_EQ(QueryCredentialUserId(credentialId, &userId), RESULT_UNKNOWN);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestQueryCredentialUserId_002, TestSize.Level0)
@@ -608,13 +761,18 @@ HWTEST_F(IdmDatabaseTest, TestQueryCredentialUserId_002, TestSize.Level0)
     constexpr int32_t userId1 = 1002;
     constexpr int32_t userId2 = 1001;
     constexpr uint64_t credentialId = 10;
+    g_currentUser = nullptr;
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo userInfo = {};
-    userInfo.userId = userId1;
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo->userId = userId1;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     int32_t userId = userId2;
-    EXPECT_EQ(QueryCredentialUserId(credentialId, &userId), RESULT_UNKNOWN);
+    EXPECT_EQ(QueryCredentialUserId(credentialId, &userId), RESULT_NOT_FOUND);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestQueryCredentialUserId_003, TestSize.Level0)
@@ -622,15 +780,18 @@ HWTEST_F(IdmDatabaseTest, TestQueryCredentialUserId_003, TestSize.Level0)
     constexpr int32_t userId1 = 1002;
     constexpr int32_t userId2 = 1001;
     constexpr uint64_t credentialId = 10;
+    g_currentUser = nullptr;
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo userInfo = {};
-    userInfo.userId = userId1;
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    EXPECT_NE(userInfo.credentialInfoList, nullptr);
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo->userId = userId1;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     int32_t userId = userId2;
     EXPECT_EQ(QueryCredentialUserId(credentialId, &userId), RESULT_NOT_FOUND);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestSetPinSubType, TestSize.Level0)
@@ -717,16 +878,18 @@ HWTEST_F(IdmDatabaseTest, TestGetEnrolledState_001, TestSize.Level0)
 {
     constexpr int32_t userId = 1;
     constexpr uint32_t authType = 1;
+    g_currentUser = nullptr;
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
-    UserInfo userInfo = {};
-    userInfo.userId = userId;
-    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
-
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo->userId = userId;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     EnrolledStateHal enrolledState = {};
     EXPECT_EQ(GetEnrolledState(0, authType, &enrolledState), RESULT_NOT_ENROLLED);
     EXPECT_EQ(GetEnrolledState(userId, authType, &enrolledState), RESULT_NOT_ENROLLED);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestGetEnrolledState_002, TestSize.Level0)
@@ -735,26 +898,49 @@ HWTEST_F(IdmDatabaseTest, TestGetEnrolledState_002, TestSize.Level0)
     constexpr static int32_t testEnrolledId = 2;
     constexpr int32_t userId = 1;
     constexpr uint32_t authType = 1;
+    g_currentUser = nullptr;
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
 
-    UserInfo userInfo = {};
-    userInfo.userId = userId;
-    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    EnrolledInfoHal enrolledInfo = {1, testEnrolledId};
-    userInfo.enrolledInfoList->insert(userInfo.enrolledInfoList, static_cast<void *>(&enrolledInfo));
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo->userId = userId;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
 
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    CredentialInfoHal credentialInfo = {0, 0, 1, 0, 0, 0};
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo));
-    CredentialInfoHal credentialInfo1 = {1, 1, 1, 1, 1, 1};
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo1));
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    EnrolledInfoHal *enrolledInfo = static_cast<EnrolledInfoHal *>(malloc(sizeof(EnrolledInfoHal)));
+    EXPECT_NE(enrolledInfo, nullptr);
+    enrolledInfo->authType = 1;
+    enrolledInfo->enrolledId = testEnrolledId;
+    userInfo->enrolledInfoList->insert(userInfo->enrolledInfoList, static_cast<void *>(enrolledInfo));
 
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 0;
+    credentialInfo->templateId = 0;
+    credentialInfo->authType = 1;
+    credentialInfo->executorSensorHint = 0;
+    credentialInfo->executorMatcher = 0;
+    credentialInfo->capabilityLevel = 0;
+    credentialInfo->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = 1;
+    credentialInfo1->templateId = 1;
+    credentialInfo1->authType = 1;
+    credentialInfo1->executorSensorHint = 1;
+    credentialInfo1->executorMatcher = 1;
+    credentialInfo1->capabilityLevel = 1;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
     EnrolledStateHal enrolledState = {};
     EXPECT_EQ(GetEnrolledState(userId, authType, &enrolledState), RESULT_SUCCESS);
     EXPECT_EQ(enrolledState.credentialDigest, testEnrolledId);
     EXPECT_EQ(enrolledState.credentialCount, expectCredentialCount);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestRemoveCachePin_001, TestSize.Level0)
@@ -765,13 +951,29 @@ HWTEST_F(IdmDatabaseTest, TestRemoveCachePin_001, TestSize.Level0)
     bool removed = false;
 
     userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    CredentialInfoHal credentialInfo = {0, 0, 2, 2, 3, 4};
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo));
-    CredentialInfoHal credentialInfo1 = {1, 1, 1, 1, 1, 1};
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo1));
-
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 0;
+    credentialInfo->templateId = 0;
+    credentialInfo->authType = FACE_AUTH;
+    credentialInfo->executorSensorHint = 2;
+    credentialInfo->executorMatcher = 3;
+    credentialInfo->capabilityLevel = 4;
+    credentialInfo->isAbandoned = false;
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credentialInfo));
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = 1;
+    credentialInfo1->templateId = 1;
+    credentialInfo1->authType = FACE_AUTH;
+    credentialInfo1->executorSensorHint = 1;
+    credentialInfo1->executorMatcher = 1;
+    credentialInfo1->capabilityLevel = 1;
+    credentialInfo1->isAbandoned = false;
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credentialInfo1));
     RemoveCachePin(&userInfo, &removed);
     EXPECT_EQ(removed, false);
+    DestroyLinkedList(userInfo.credentialInfoList);
 }
 
 HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
@@ -816,13 +1018,24 @@ HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)
     g_currentUser = nullptr;
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo userInfo = {};
-    userInfo.userId = 1;
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    CredentialInfoHal credentialInfo1 = {1, 1, 1, 1, 0, 1, 0};
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo1));
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo->userId = userId;
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = 1;
+    credentialInfo1->templateId = 1;
+    credentialInfo1->authType = PIN_AUTH;
+    credentialInfo1->executorSensorHint = 0;
+    credentialInfo1->executorMatcher = 1;
+    credentialInfo1->capabilityLevel = 0;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_SUCCESS);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(IdmDatabaseTest, TestGetEnableStatus, TestSize.Level0)
@@ -843,6 +1056,289 @@ HWTEST_F(IdmDatabaseTest, TestGetEnableStatus, TestSize.Level0)
 
     g_globalConfigArray[0].authType = 1;
     EXPECT_EQ(GetEnableStatus(userId, authType), false);
+}
+
+HWTEST_F(IdmDatabaseTest, TestGetCredentialByUserIdAndCredId_001, TestSize.Level0)
+{
+    constexpr int32_t userId = 1;
+    constexpr uint64_t credentialId = 1;
+    CredentialInfoHal info = {};
+    EXPECT_EQ(GetCredentialByUserIdAndCredId(userId, credentialId, &info), RESULT_NOT_ENROLLED);
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    EXPECT_EQ(GetCredentialByUserIdAndCredId(userId, credentialId, &info), RESULT_NOT_ENROLLED);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    EXPECT_EQ(GetCredentialByUserIdAndCredId(userId, credentialId, &info), RESULT_NOT_ENROLLED);
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = credentialId;
+    credentialInfo1->templateId = 1;
+    credentialInfo1->authType = PIN_AUTH;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
+    EXPECT_EQ(GetCredentialByUserIdAndCredId(userId, credentialId, &info), RESULT_SUCCESS);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestGetCredentialByUserIdAndCredId, TestSize.Level0)
+{
+    constexpr int32_t userId = 1;
+    constexpr uint64_t credentialId = 1;
+    CredentialInfoHal info = {};
+    EXPECT_EQ(GetCredentialByUserIdAndCredId(userId, credentialId, &info), RESULT_NOT_ENROLLED);
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    EXPECT_EQ(GetCredentialByUserIdAndCredId(userId, credentialId, &info), RESULT_NOT_ENROLLED);
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    EXPECT_EQ(GetCredentialByUserIdAndCredId(userId, credentialId, &info), RESULT_NOT_ENROLLED);
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = credentialId;
+    credentialInfo1->templateId = 1;
+    credentialInfo1->authType = PIN_AUTH;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
+    EXPECT_EQ(GetCredentialByUserIdAndCredId(userId, credentialId, &info), RESULT_SUCCESS);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestUpdateAbandonResultForReset_001, TestSize.Level0)
+{
+    constexpr int32_t userId = 1;
+    CredentialInfoHal info = {};
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = true;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = 2;
+    credentialInfo1->templateId = 2;
+    credentialInfo1->authType = PIN_AUTH;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
+    CredentialInfoHal *credentialInfo2 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo2, nullptr);
+    credentialInfo2->credentialId = 3;
+    credentialInfo2->templateId = 3;
+    credentialInfo2->authType = DEFAULT_AUTH_TYPE;
+    credentialInfo2->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo2));
+    bool isDelete = false;
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_SUCCESS);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestUpdateAbandonResultForReset_002, TestSize.Level0)
+{
+    constexpr int32_t userId = 1;
+    CredentialInfoHal info = {};
+    bool isDelete = false;
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_BAD_PARAM);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = true;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = 2;
+    credentialInfo1->templateId = 2;
+    credentialInfo1->authType = PIN_AUTH;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestUpdateAbandonResultForReset_003, TestSize.Level0)
+{
+    constexpr int32_t userId = 1;
+    CredentialInfoHal info = {};
+    bool isDelete = false;
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = true;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = 2;
+    credentialInfo1->templateId = 2;
+    credentialInfo1->authType = DEFAULT_AUTH_TYPE;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestUpdateAbandonResultForUpdate_001, TestSize.Level0)
+{
+    constexpr int32_t userId = 1;
+    CredentialInfoHal info = {};
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = true;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = 2;
+    credentialInfo1->templateId = 2;
+    credentialInfo1->authType = PIN_AUTH;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
+    CredentialInfoHal *credentialInfo2 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo2, nullptr);
+    credentialInfo2->credentialId = 3;
+    credentialInfo2->templateId = 3;
+    credentialInfo2->authType = DEFAULT_AUTH_TYPE;
+    credentialInfo2->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo2));
+    bool isDelete = false;
+    EXPECT_EQ(UpdateAbandonResultForUpdate(userId, &isDelete, &info), RESULT_SUCCESS);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestUpdateAbandonResultForUpdate_002, TestSize.Level0)
+{
+    constexpr int32_t userId = 1;
+    CredentialInfoHal info = {};
+    bool isDelete = false;
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_BAD_PARAM);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = true;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = 2;
+    credentialInfo1->templateId = 2;
+    credentialInfo1->authType = PIN_AUTH;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
+    EXPECT_EQ(UpdateAbandonResultForUpdate(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestUpdateAbandonResultForUpdate_003, TestSize.Level0)
+{
+    constexpr int32_t userId = 1;
+    CredentialInfoHal info = {};
+    bool isDelete = false;
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = true;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    EXPECT_EQ(UpdateAbandonResultForReset(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    CredentialInfoHal *credentialInfo1 = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo1, nullptr);
+    credentialInfo1->credentialId = 2;
+    credentialInfo1->templateId = 2;
+    credentialInfo1->authType = DEFAULT_AUTH_TYPE;
+    credentialInfo1->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo1));
+    EXPECT_EQ(UpdateAbandonResultForUpdate(userId, &isDelete, &info), RESULT_GENERAL_ERROR);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestCalcCredentialValidPeriod_001, TestSize.Level0)
+{
+    CredentialInfoHal credentialInfo = {0};
+    credentialInfo.isAbandoned = false;
+    credentialInfo.abandonedSysTime = 0;
+    EXPECT_EQ(CalcCredentialValidPeriod(&credentialInfo), -1);
+    credentialInfo.isAbandoned = true;
+    credentialInfo.abandonedSysTime = GetReeTime();
+    EXPECT_NE(CalcCredentialValidPeriod(&credentialInfo), 0);
+    credentialInfo.abandonedSysTime = GetReeTime() + 1;
+    EXPECT_EQ(CalcCredentialValidPeriod(&credentialInfo), 0);
 }
 } // namespace UserAuth
 } // namespace UserIam

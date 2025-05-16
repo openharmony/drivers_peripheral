@@ -198,7 +198,7 @@ IAM_STATIC bool IsScheduleIdDuplicate(uint64_t scheduleId)
 IAM_STATIC ResultCode GenerateValidScheduleId(uint64_t *scheduleId)
 {
     if (g_scheduleList == NULL) {
-        LOG_ERROR("g_poolList is null");
+        LOG_ERROR("g_scheduleList is null");
         return RESULT_BAD_PARAM;
     }
 

@@ -92,6 +92,7 @@ typedef enum ScheduleMode {
     SCHEDULE_MODE_AUTH = 1,
     SCHEDULE_MODE_IDENTIFY = 2,
     SCHEDULE_MODE_REUSE_UNLOCK_AUTH_RESULT = 3,
+    SCHEDULE_MODE_ABANDON = 4,
 } ScheduleMode;
 
 typedef enum AuthSubType {
@@ -147,7 +148,19 @@ typedef enum AuthIntent {
     DEFUALT = 0,
     UNLOCK = 1,
     SILENT_AUTH = 2,
+    ABANDONED_PIN_AUTH = 4,
 } AuthIntent;
+
+typedef enum ScheduleType {
+    SCHEDULE_TYPE_ENROLL = 1,
+    SCHEDULE_TYPE_UPDATE = 2,
+    SCHEDULE_TYPE_ABANDON = 3,
+} ScheduleType;
+
+typedef enum PinChangeScence {
+    PIN_UPDATE_SCENCE = 0,
+    PIN_RESET_SCENCE = 1,
+} PinChangeScence;
 
 #define IF_TRUE_LOGE_AND_RETURN_VAL(cond, retVal) \
     do { \
