@@ -70,6 +70,54 @@ ohos_unittest("test_transfer") {
   }
   module_out_path = module_output_path
 }
+
+ohos_unittest("test_hubdevice") {
+  sources = [
+    "src/usbd_hub_device_test.cpp",
+  ]
+
+  include_dirs = [
+    "${usb_driver_path}/utils/include",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_1.2",
+      "eventhandler:libeventhandler",
+      "googletest:gtest_main",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+      "drivers_interface_usb:libusb_proxy_2.0",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
 ohos_unittest("test_device") {
   sources = [
     "${usb_driver_path}/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
