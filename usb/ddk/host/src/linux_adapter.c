@@ -1544,6 +1544,11 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
         return HDF_ERR_IO;
     }
 
+    if (urb == NULL || urb->userContext == NULL) {
+        HDF_LOGE("%{public}s:%{public}d urb is NULL or userContext is NULL", __func__, __LINE__);
+        return HDF_ERR_IO;
+    }
+
     request = urb->userContext;
     if (devHandle->dev->discardFailedUrb == (void *)urb) {
         devHandle->dev->discardFailedUrb = NULL;
