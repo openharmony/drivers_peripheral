@@ -18,6 +18,7 @@
     "features": [
       "drivers_peripheral_thermal_feature_config_policy",
       "drivers_peripheral_thermal_feature_c_utils",
+      "drivers_peripheral_thermal_feature_datasize_hisysevent_enable",
       "drivers_peripheral_thermal_feature_hitrace"
     ],
     "deps": {
@@ -29,6 +30,7 @@
         "ipc",
         "hdf_core",
         "hilog",
+        "hisysevent",
         "hitrace",
         "libxml2",
         "zlib"

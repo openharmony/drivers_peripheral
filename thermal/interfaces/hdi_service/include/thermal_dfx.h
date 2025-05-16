@@ -49,6 +49,10 @@ private:
     void WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime);
     void WriteToFile(std::ofstream& wStream, std::string& currentTime);
     void CompressFile();
+    void ReportDataHisysevent();
+    void WriteDataHisysevent();
+    double GetDeviceValidSize(const std::string& path);
+    uint64_t GetDirectorySize(const std::string& directoryPath);
     bool PrepareWriteDfxLog();
     std::string GetFileNameIndex(const uint32_t index);
     int32_t GetIntParameter(const std::string& key, const int32_t def, const int32_t minValue);
@@ -58,6 +62,7 @@ private:
     void EnableWatchCallback(const std::string& value);
     static void InfoChangedCallback(const char* key, const char* value, void* context);
 
+    int64_t beginTimeMs_;
     std::atomic_uint8_t width_;
     std::atomic_uint32_t interval_;
     std::atomic_bool enable_;
