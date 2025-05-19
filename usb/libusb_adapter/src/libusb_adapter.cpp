@@ -2879,9 +2879,6 @@ void LibusbAdapter::GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSu
             HDF_LOGW("%{public}s Invalid parameter", __func__);
             continue;
         }
-        if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
-            continue;
-        }
         HDF_LOGI("%{public}s:busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
         V2_0::USBDeviceInfo info = {ACT_DEVUP, busNum, devAddr};
         subscriber->DeviceEvent(info);
@@ -3017,12 +3014,6 @@ int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* devic
 {
     HDF_LOGI("%{public}s: enter, event: %{public}d, busNum: %{public}u, devAddr: %{public}u.", __func__,
         event, libusb_get_bus_number(device), libusb_get_device_address(device));
-    struct libusb_device_descriptor devDesc;
-    libusb_get_device_descriptor(device, &devDesc);
-    if (devDesc.bDeviceClass == LIBUSB_CLASS_HUB) {
-        HDF_LOGW("%{public}s: do not handle hub class device", __func__);
-        return HDF_SUCCESS;
-    }
     if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
         HDF_LOGD("%{public}s: event=%{public}d arrival device", __func__, event);
         V2_0::USBDeviceInfo info = {ACT_DEVUP, libusb_get_bus_number(device),

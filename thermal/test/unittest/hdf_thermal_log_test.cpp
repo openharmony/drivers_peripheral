@@ -201,4 +201,32 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest007, TestSize.Level0)
     ThermalDfx::DestroyInstance();
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest007: end.");
 }
+
+/**
+ * @tc.name: HdfThermalLogTest008
+ * @tc.desc: Test the data partition size calculation
+ * @tc.type: FUNC
+ */
+#ifdef DATA_SIZE_HISYSEVENT_ENABLE
+HWTEST_F(HdfThermalLogTest, HdfThermalLogTest008, TestSize.Level0)
+{
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest008: start.");
+    auto &hdfLog = ThermalDfx::GetInstance();
+    hdfLog.Init();
+    ASSERT_TRUE(hdfLog.enable_);
+    hdfLog.DoWork();
+    double dataSize = hdfLog.GetDeviceValidSize("/data");
+    EXPECT_NE(dataSize, 0);
+    dataSize = hdfLog.GetDeviceValidSize("");
+    EXPECT_EQ(dataSize, 0);
+
+    uint64_t getDirectorySize = hdfLog.GetDirectorySize("/data/log/thermal/thermal-log");
+    EXPECT_NE(getDirectorySize, 0);
+    getDirectorySize = hdfLog.GetDirectorySize("");
+    EXPECT_EQ(getDirectorySize, 0);
+
+    ThermalDfx::DestroyInstance();
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest008: end.");
+}
+#endif
 } // namespace

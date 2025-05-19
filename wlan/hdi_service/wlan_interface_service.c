@@ -76,6 +76,7 @@ struct IWlanInterface *WlanInterfaceImplGetInstance(void)
     service->interface.GetCoexictenceChannelList = WlanInterfaceGetCoexChannelList;
     service->interface.SetPowerSaveMode = WlanInterfaceSetPowerSaveMode;
     service->interface.SetDpiMarkRule = WlanInterfaceSetDpiMarkRule;
+    service->interface.GetVersion = WlanGetVersion;
     return &service->interface;
 }
 

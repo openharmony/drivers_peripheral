@@ -23,31 +23,18 @@
 #include <thread>
 #include <map>
 #include "v1_0/serial_types.h"
-#include "ddk_sysfs_device.h"
-#include "ddk_device_manager.h"
+#include "serial_sysfs_device.h"
 #include "hdf_dlist.h"
 #include "hdf_io_service_if.h"
 #include "hdf_sbuf.h"
 #include "osal_mem.h"
 #include "osal_mutex.h"
-#include "hdf_usb_pnp_manage.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Serial {
 namespace V1_0 {
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-int32_t DdkSysfsGetDevice(const char *deviceDir, struct UsbPnpNotifyMatchInfoTable *device);
-int32_t DdkSysfsGetDevNodePath(DevInterfaceInfo *devInfo, const char *prefix, char *buff, uint32_t buffSize);
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 struct Serialfd {
     int32_t fd;
@@ -77,10 +64,11 @@ private:
 
     int32_t GetFdByPortId(int32_t portId);
     int32_t GetBaudrate(unsigned int baudrate);
-    tcflag_t GetDatabits(unsigned char dataBits);
-    tcflag_t GetParity(tcflag_t c_cflag, unsigned char parity);
-    tcflag_t GetStopbits(tcflag_t c_cflag, unsigned char stopBits);
-    void HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds);
+    int32_t GetDatabits(unsigned char dataBits, tcflag_t& cflag);
+    int32_t GetParity(tcflag_t& cflag, unsigned char parity);
+    int32_t GetStopbits(tcflag_t& cflag, unsigned char stopBits);
+    void HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds,
+        std::string targetPath);
 private:
     std::mutex portMutex_;
     std::vector<Serialfd> serialPortList_;

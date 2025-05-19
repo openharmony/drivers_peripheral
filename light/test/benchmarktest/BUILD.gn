@@ -30,7 +30,7 @@ ohos_benchmarktest("hdf_light_benchmark_test") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [ "//third_party/googletest:gmock_main" ]
+  deps = []
 
   if (is_standard_system) {
     external_deps = [
@@ -45,5 +45,8 @@ ohos_benchmarktest("hdf_light_benchmark_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "ipc:ipc_single" ]
+  external_deps += [
+    "googletest:gmock_main",
+    "ipc:ipc_single",
+  ]
 }
