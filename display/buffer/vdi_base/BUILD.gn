@@ -46,6 +46,7 @@ ohos_shared_library("display_buffer_vdi_impl_default") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
+    "drivers_interface_display:libhdifd_parcelable",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
