@@ -366,8 +366,14 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
 int32_t LibusbAdapter::ResetDevice(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s enter", __func__);
+    libusb_device *device = nullptr;
+    int32_t ret = GetUsbDevice(dev, &device);
+    if (ret != HDF_SUCCESS || device == nullptr) {
+        HDF_LOGE("%{public}s:GetUsbDevice is failed ret=%{public}d", __func__, ret);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
     libusb_device_handle *devHandle = nullptr;
-    int32_t ret = FindHandleByDev(dev, &devHandle);
+    ret = FindHandleByDev(dev, &devHandle);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s: FindHandleByDev failed ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
