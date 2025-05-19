@@ -21,6 +21,9 @@
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 #endif
+#include "hisysevent.h"
+
+using namespace OHOS::HiviewDFX;
 
 #define HICOLLIE_TIMEOUT 8
 
@@ -67,4 +70,29 @@ void CancelTimer(int32_t id)
 void SetMaxWorkThreadNum(int32_t count)
 {
     OHOS::IPCSkeleton::GetInstance().SetMaxWorkThreadNum(count);
+}
+
+struct timeval AudioDfxSysEventGetTimeStamp(void)
+{
+    struct timeval startTime;
+    gettimeofday(&startTime, nullptr);
+    return startTime;
+}
+
+int32_t AudioDfxSysEventError(const char* desc, struct timeval startTime, int timeThreshold, int err)
+{
+    if (err != HDF_SUCCESS) {
+        HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_ERROR_EVENT", HiSysEvent::EventType::FAULT,
+            "ERROR_DESC", desc, "ERROR_CODE", err, "OVER_TIME", 0);
+    }
+    struct timeval endTime;
+    gettimeofday(&endTime, nullptr);
+    int32_t runTime = (int32_t)((endTime.tv_sec - startTime.tv_sec) * TIME_1000 +
+        (endTime.tv_usec - startTime.tv_usec) / TIME_1000);
+    if (runTime > timeThreshold) {
+        AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}d]", desc, runTime);
+        HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_ERROR_EVENT", HiSysEvent::EventType::FAULT,
+            "ERROR_DESC", desc, "ERROR_CODE", err, "OVER_TIME", runTime);
+    }
+    return HDF_SUCCESS;
 }

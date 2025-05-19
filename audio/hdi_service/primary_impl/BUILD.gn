@@ -81,7 +81,10 @@ ohos_shared_library("audio_primary_impl_vendor") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  external_deps += [ "bounds_checking_function:libsec_shared" ]
+  external_deps += [
+    "bounds_checking_function:libsec_shared",
+    "hisysevent:libhisysevent",
+  ]
 
   if (drivers_peripheral_audio_feature_hitrace_enable) {
     external_deps += [ "hitrace:hitrace_meter" ]
