@@ -15,7 +15,10 @@ import("//build/ohos.gni")
 import("../audio.gni")
 
 config("drivers_peripheral_audio_dfx_header") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "../hdi_service/vendor_interface/utils",
+  ]
 }
 
 ohos_static_library("libaudio_dfx_static") {
@@ -37,6 +40,12 @@ ohos_static_library("libaudio_dfx_static") {
       defines += [ "AUDIO_HICOLLIE_ENABLE" ]
     }
   }
+
+  external_deps += [
+    "drivers_interface_audio:libaudio_proxy_4.0",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+  ]
 
   public_configs = [ ":drivers_peripheral_audio_dfx_header" ]
   include_dirs = [ "include" ]
