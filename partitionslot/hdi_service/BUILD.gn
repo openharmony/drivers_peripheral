@@ -12,20 +12,16 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("../../../../drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libpartition_slot_service_1.0") {
-  include_dirs = [
-    "include",
-    "../../../../base/user_iam/user_auth/common/logs",
-  ]
+  include_dirs = [ "include" ]
   sources = [ "src/partitionslot_impl.cpp" ]
   public_deps = [
     "../../../../drivers/peripheral/partitionslot/hal:partitionslot_source",
   ]
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_partitionslot:partitionslot_idl_headers",
+    "drivers_interface_partitionslot:libpartitionslot_proxy_1.0",
     "hilog:libhilog",
     "init:libbegetutil",
   ]
@@ -36,15 +32,11 @@ ohos_shared_library("libpartition_slot_service_1.0") {
 }
 
 ohos_shared_library("libpartitionslot_driver") {
-  include_dirs = [
-    "include",
-    "../../../../base/user_iam/user_auth/common/logs",
-  ]
+  include_dirs = [ "include" ]
   sources = [ "src/partition_slot_driver.cpp" ]
-  deps = [ "../../../../drivers/interface/partitionslot/v1_0:libpartitionslot_stub_1.0" ]
-
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_partitionslot:libpartitionslot_stub_1.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",

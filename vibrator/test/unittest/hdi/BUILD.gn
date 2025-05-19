@@ -15,68 +15,70 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../vibrator.gni")
 
-module_output_path = "drivers_peripheral_vibrator/drivers_peripheral_vibrator"
-ohos_unittest("hdf_unittest_hdi_vibrator") {
-  module_out_path = module_output_path
-  include_dirs = [
-    "../../../interfaces/include",
-    "../../../utils/include",
-  ]
-
-  sources = [ "hdf_vibrator_hdi_test.cpp" ]
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
-  if (is_standard_system) {
-    external_deps = [
-      "drivers_interface_vibrator:libvibrator_proxy_1.3",
-      "hdf_core:libhdf_utils",
-      "hilog:libhilog",
-      "ipc:ipc_single",
+if (drivers_peripheral_vibrator_feature_model) {
+  module_output_path = "drivers_peripheral_vibrator/drivers_peripheral_vibrator"
+  ohos_unittest("hdf_unittest_hdi_vibrator") {
+    module_out_path = module_output_path
+    include_dirs = [
+      "../../../interfaces/include",
+      "../../../utils/include",
     ]
-    if (c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
-    }
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
-  external_deps += [ "ipc:ipc_single" ]
-}
 
-ohos_unittest("hdi_unittest_vibrator") {
-  module_out_path = "drivers_peripheral_vibrator/drivers_peripheral_vibrator"
-  include_dirs = [
-    "../../../interfaces/include",
-    "../../../utils/include",
-  ]
-
-  sources = [ "hdi_unittest_vibrator.cpp" ]
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
-  if (is_standard_system) {
-    external_deps = [
-      "drivers_interface_vibrator:libvibrator_proxy_1.3",
-      "hdf_core:libhdf_utils",
-      "hilog:libhilog",
-      "init:libbegetutil",
-      "ipc:ipc_single",
+    sources = [ "hdf_vibrator_hdi_test.cpp" ]
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsigned-char",
+      "-fno-common",
+      "-fno-strict-aliasing",
     ]
-    if (c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+    if (is_standard_system) {
+      external_deps = [
+        "drivers_interface_vibrator:libvibrator_proxy_1.3",
+        "hdf_core:libhdf_utils",
+        "hilog:libhilog",
+        "ipc:ipc_single",
+      ]
+      if (c_utils_enable) {
+        external_deps += [ "c_utils:utils" ]
+      }
+    } else {
+      external_deps = [ "hilog:libhilog" ]
     }
-  } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps += [ "ipc:ipc_single" ]
   }
-  external_deps += [ "ipc:ipc_single" ]
+} else {
+  ohos_unittest("hdi_unittest_vibrator") {
+    module_out_path = "drivers_peripheral_vibrator/drivers_peripheral_vibrator"
+    include_dirs = [
+      "../../../interfaces/include",
+      "../../../utils/include",
+    ]
+
+    sources = [ "hdi_unittest_vibrator.cpp" ]
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsigned-char",
+      "-fno-common",
+      "-fno-strict-aliasing",
+    ]
+    if (is_standard_system) {
+      external_deps = [
+        "drivers_interface_vibrator:libvibrator_proxy_1.3",
+        "hdf_core:libhdf_utils",
+        "hilog:libhilog",
+        "init:libbegetutil",
+        "ipc:ipc_single",
+      ]
+      if (c_utils_enable) {
+        external_deps += [ "c_utils:utils" ]
+      }
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+    external_deps += [ "ipc:ipc_single" ]
+  }
 }

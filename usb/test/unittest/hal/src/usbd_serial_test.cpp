@@ -27,10 +27,12 @@ using namespace OHOS::HDI::Usb::Serial::V1_0;
 
 constexpr int32_t VALID_PORTID = 0;
 constexpr int32_t INVALID_PORTID = -1;
+constexpr int32_t FAILED = -1;
 constexpr int32_t OK = 0;
 constexpr int32_t ONE_KBYTE = 1024;
 constexpr int32_t ONE_SECOND = 1000;
 constexpr int32_t MAX_MEMORY = 8192;
+constexpr uint8_t DATA_BITS_SIX = 6;
 static std::vector<OHOS::HDI::Usb::Serial::V1_0::SerialPort> g_portList;
 
 template<typename T>
@@ -121,8 +123,8 @@ HWTEST_F(SerialTest, SerialWrite_001, TestSize.Level1)
     g_serialInterface->SerialClose(VALID_PORTID);
     g_serialInterface->SerialOpen(VALID_PORTID);
     std::vector<uint8_t> data = { 't', 'e', 's', 't' };
-    int32_t ret = g_serialInterface->SerialWrite(VALID_PORTID, data, data.size(), 0);
-    EXPECT_EQ(ret, OK);
+    int32_t ret = g_serialInterface->SerialWrite(VALID_PORTID, data, data.size(), ONE_SECOND);
+    EXPECT_EQ(ret, data.size());
     g_serialInterface->SerialClose(VALID_PORTID);
 }
 
@@ -137,7 +139,7 @@ HWTEST_F(SerialTest, SerialWrite_002, TestSize.Level1)
     g_serialInterface->SerialClose(INVALID_PORTID);
     g_serialInterface->SerialOpen(INVALID_PORTID);
     std::vector<uint8_t> data = { 't', 'e', 's', 't' };
-    int32_t ret = g_serialInterface->SerialWrite(INVALID_PORTID, data, data.size(), 0);
+    int32_t ret = g_serialInterface->SerialWrite(INVALID_PORTID, data, data.size(), ONE_SECOND);
     EXPECT_EQ(ret, ERR_CODE_IOEXCEPTION);
     g_serialInterface->SerialClose(INVALID_PORTID);
 }
@@ -169,7 +171,7 @@ HWTEST_F(SerialTest, SerialRead_002, TestSize.Level1)
     g_serialInterface->SerialClose(INVALID_PORTID);
     g_serialInterface->SerialOpen(INVALID_PORTID);
     std::vector<uint8_t> data;
-    int32_t ret = g_serialInterface->SerialRead(INVALID_PORTID, data, ONE_KBYTE, 0);
+    int32_t ret = g_serialInterface->SerialRead(INVALID_PORTID, data, ONE_KBYTE, ONE_SECOND);
     EXPECT_EQ(ret, ERR_CODE_IOEXCEPTION);
     g_serialInterface->SerialClose(INVALID_PORTID);
 }
@@ -190,8 +192,8 @@ HWTEST_F(SerialTest, SerialRead_003, TestSize.Level1)
         c = getchar();
     } while (c != '\n' && c != EOF);
     std::vector<uint8_t> data;
-    int32_t ret = g_serialInterface->SerialRead(VALID_PORTID, data, ONE_KBYTE, 0);
-    EXPECT_EQ(ret, 0);
+    int32_t ret = g_serialInterface->SerialRead(VALID_PORTID, data, ONE_KBYTE, ONE_SECOND);
+    EXPECT_NE(ret, FAILED);
     g_serialInterface->SerialClose(VALID_PORTID);
 }
 
@@ -239,7 +241,7 @@ HWTEST_F(SerialTest, SerialSetAttribute_001, TestSize.Level1)
     g_serialInterface->SerialOpen(VALID_PORTID);
     OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
     attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_576000;
-    attributeInfo.dataBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_DATABIT_6;
+    attributeInfo.dataBits = DATA_BITS_SIX;
     attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
     attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
     int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
@@ -259,7 +261,7 @@ HWTEST_F(SerialTest, SerialSetAttribute_002, TestSize.Level1)
     g_serialInterface->SerialOpen(INVALID_PORTID);
     OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
     attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_576000;
-    attributeInfo.dataBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_DATABIT_6;
+    attributeInfo.dataBits = DATA_BITS_SIX;
     attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
     attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
     int32_t ret = g_serialInterface->SerialSetAttribute(INVALID_PORTID, attributeInfo);

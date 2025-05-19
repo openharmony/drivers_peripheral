@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <fcntl.h>
 #include <cstring>
+#include <filesystem>
 #include <cerrno>
 #include <cstdio>
 #include <cctype>
@@ -30,11 +31,15 @@
 #include "usbd_wrapper.h"
 #include "securec.h"
 
+#define _BSD_SOURCE
+
 #define UEVENT_BUFFER_SIZE 2048
 #define CMSPAR 010000000000
 #define BUFF_SIZE 50
 #define SYSFS_PATH_LEN   128
 #define RETRY_NUM 5
+#define MAX_TRANS_DATA_SIZE 8192
+
 
 #define ERR_CODE_IOEXCEPTION (-5)
 #define ERR_CODE_DEVICENOTOPEN (-6)
@@ -48,6 +53,14 @@ namespace V1_0 {
 
 static const std::string SERIAL_TYPE_NAME = "ttyUSB";
 static const int32_t ERR_NO = -1;
+static const uint8_t DATABITS_FIVE = 5;
+static const uint8_t DATABITS_SIX = 6;
+static const uint8_t DATABITS_SEVEN = 7;
+static const uint8_t DATABITS_EIGHT = 8;
+static const int32_t THOUSAND = 1000;
+
+namespace fs = std::filesystem;
+
 typedef std::pair<int32_t, int32_t> BaudratePair;
 
 BaudratePair g_baudratePairs[] = {
@@ -109,64 +122,62 @@ int32_t LinuxSerial::GetBaudrate(unsigned int baudrate)
     return HDF_FAILURE;
 }
 
-tcflag_t LinuxSerial::GetDatabits(unsigned char dataBits)
+int32_t LinuxSerial::GetDatabits(unsigned char dataBits, tcflag_t& cflag)
 {
-    tcflag_t bit_temp;
     switch (dataBits) {
-        case USB_ATTR_DATABIT_4:
-            HDF_LOGE("%{public}s: Not Supported 4 data bits.", __func__);
-            return HDF_FAILURE;
-        case USB_ATTR_DATABIT_5:
-            bit_temp = CS5;
+        case DATABITS_FIVE:
+            cflag |= CS5;
             break;
-        case USB_ATTR_DATABIT_6:
-            bit_temp = CS6;
+        case DATABITS_SIX:
+            cflag |= CS6;
             break;
-        case USB_ATTR_DATABIT_7:
-            bit_temp = CS7;
+        case DATABITS_SEVEN:
+            cflag |= CS7;
             break;
-        case USB_ATTR_DATABIT_8:
-            bit_temp = CS8;
+        case DATABITS_EIGHT:
+            cflag |= CS8;
             break;
         default:
             return HDF_FAILURE;
         }
-    return bit_temp;
+    return HDF_SUCCESS;
 }
 
-tcflag_t LinuxSerial::GetParity(tcflag_t c_cflag, unsigned char parity)
+int32_t LinuxSerial::GetParity(tcflag_t& cflag, unsigned char parity)
 {
-    c_cflag &= ~(PARENB | PARODD);
-    c_cflag |= PARENB;
-    if (parity == USB_ATTR_PARITY_NONE) {
-        c_cflag &= ~PARENB;
-    } else if (parity == USB_ATTR_PARITY_ODD) {
-        c_cflag |= PARODD;
-    } else if (parity == USB_ATTR_PARITY_EVEN) {
-        c_cflag &= ~PARODD;
-    } else if (parity == USB_ATTR_PARITY_MARK || parity == USB_ATTR_PARITY_SPACE) {
-        HDF_LOGE("%{public}s: Not Supported Mark and Space.", __func__);
-        return HDF_FAILURE;
-    } else {
-        HDF_LOGE("%{public}s: Parity not exist!", __func__);
-        return HDF_FAILURE;
+    cflag &= ~(PARENB | PARODD | CMSPAR);
+    switch (parity) {
+        case USB_ATTR_PARITY_NONE:
+            break;
+        case USB_ATTR_PARITY_ODD:
+            cflag |= PARENB | PARODD;
+            break;
+        case USB_ATTR_PARITY_EVEN:
+            cflag |= PARENB;
+            break;
+        case USB_ATTR_PARITY_MARK:
+            cflag |= PARENB | PARODD | CMSPAR;
+            break;
+        case USB_ATTR_PARITY_SPACE:
+            cflag |= PARENB | CMSPAR;
+            break;
+        default:
+            HDF_LOGE("%{public}s: Parity not exist!", __func__);
+            return HDF_FAILURE;
     }
-    return c_cflag;
+    return HDF_SUCCESS;
 }
 
-tcflag_t LinuxSerial::GetStopbits(tcflag_t c_cflag, unsigned char stopBits)
+int32_t LinuxSerial::GetStopbits(tcflag_t& cflag, unsigned char stopBits)
 {
     if (stopBits == USB_ATTR_STOPBIT_1) {
-        c_cflag &= ~CSTOPB;
-    } else if (stopBits == USB_ATTR_STOPBIT_1P5) {
-        HDF_LOGE("%{public}s: Not Supported 1.5.", __func__);
-        return HDF_FAILURE;
+        cflag &= ~CSTOPB;
     } else if (stopBits == USB_ATTR_STOPBIT_2) {
-        c_cflag |= CSTOPB;
+        cflag |= CSTOPB;
     } else {
         return HDF_FAILURE;
     }
-    return c_cflag;
+    return HDF_SUCCESS;
 }
 
 int32_t LinuxSerial::GetFdByPortId(int32_t portId)
@@ -224,18 +235,18 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
     }
     fdsan_exchange_owner_tag(serialPortList_[index].fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
-    if (tcgetattr(serialPortList_[index].fd, &options_) = -1) {
+    if (tcgetattr(serialPortList_[index].fd, &options_) == -1) {
         fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
-        serialPortList_.erase(index);
+        serialPortList_.erase(serialPortList_.begin() + index);
         return HDF_FAILURE;
     }
     options_.c_lflag &= ~ICANON;
     options_.c_lflag &= ~ECHO;
-    if (tcsetattr(serialPortList_[index].fd, TCSANOW, &options_) = -1) {
+    if (tcsetattr(serialPortList_[index].fd, TCSANOW, &options_) == -1) {
         fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         HDF_LOGE("%{public}s: set attribute failed %{public}d.", __func__, errno);
-        serialPortList_.erase(index);
+        serialPortList_.erase(serialPortList_.begin() + index);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -273,30 +284,35 @@ int32_t LinuxSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint
     }
     fd = GetFdByPortId(portId);
     if (fd < 0) {
-        return ERR_CODE_DEVICENOTOPEN;
+        return ERR_CODE_IOEXCEPTION;
     }
-    
+     
+    uint8_t dataIn[MAX_TRANS_DATA_SIZE] = {0};
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(fd, &readfds);
 
     struct timeval readTimeout;
     readTimeout.tv_sec = 0;
-    readTimeout.tv_usec = timeout;
-
+    readTimeout.tv_usec = timeout * THOUSAND;
+    
+    int32_t bytesRead;
     int32_t status = select(fd + 1, &readfds, nullptr, nullptr, &readTimeout);
     if (status == -1) {
         return HDF_FAILURE;
     } else if (status == 0) {
         return ERR_CODE_TIMEOUT;
     } else {
-        int32_t bytesRead = read(fd, data.data(), size);
+        bytesRead = read(fd, dataIn, size);
         if (bytesRead < 0) {
-            HDF_LOGE("%{public}s: read fail.", __func__);
+            HDF_LOGE("%{public}s: read fail. %{public}d", __func__, errno);
             return ERR_CODE_IOEXCEPTION;
         }
     }
-    return HDF_SUCCESS;
+    std::vector<uint8_t> vec(dataIn, dataIn + bytesRead);
+    data.insert(data.end(), vec.begin(), vec.end());
+    HDF_LOGI("%{public}s: read success. %{public}s", __func__, data.data());
+    return bytesRead;
 }
 
 int32_t LinuxSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& data, uint32_t size, uint32_t timeout)
@@ -305,19 +321,51 @@ int32_t LinuxSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& dat
     int32_t bytesWritten;
     fd = GetFdByPortId(portId);
     if (fd < 0) {
-        return ERR_CODE_DEVICENOTOPEN;
+        return ERR_CODE_IOEXCEPTION;
     }
     if (data.empty()) {
         HDF_LOGE("%{public}s: data is empty!", __func__);
         return HDF_FAILURE;
     }
+    fd_set writefd;
+    FD_ZERO(&writefd);
+    FD_SET(fd, &writefd);
 
-    bytesWritten = write(fd, data.data(), data.size());
-    if (bytesWritten == ERR_NO) {
-        HDF_LOGE("%{public}s: write fail.", __func__);
-        return ERR_CODE_IOEXCEPTION;
+    struct timeval writeTimeout;
+    writeTimeout.tv_sec = 0;
+    writeTimeout.tv_usec = timeout * THOUSAND;
+    
+    int32_t status = select(fd + 1, nullptr, &writefd, nullptr, &writeTimeout);
+    if (status == -1) {
+        return HDF_FAILURE;
+    } else if (status == 0) {
+        HDF_LOGE("%{public}s: write timed out. %{public}d", __func__, errno);
+        return ERR_CODE_TIMEOUT;
+    } else {
+        bytesWritten = write(fd, data.data(), data.size());
+        if (bytesWritten == ERR_NO) {
+            HDF_LOGE("%{public}s: write fail.", __func__);
+            return ERR_CODE_IOEXCEPTION;
+        }
     }
-    return HDF_SUCCESS;
+    return bytesWritten;
+}
+
+void TranslateParity(tcflag_t parity, SerialAttribute& attribute)
+{
+    if ((parity & PARENB) && (parity & CMSPAR)) {
+        if (parity & PARODD) {
+            attribute.parity = USB_ATTR_PARITY_MARK;
+        } else {
+            attribute.parity = USB_ATTR_PARITY_SPACE;
+        }
+    } else {
+        if (parity & PARODD) {
+            attribute.parity = USB_ATTR_PARITY_ODD;
+        } else {
+            attribute.parity = USB_ATTR_PARITY_EVEN;
+        }
+    }
 }
 
 int32_t LinuxSerial::SerialGetAttribute(int32_t portId, SerialAttribute& attribute)
@@ -325,9 +373,9 @@ int32_t LinuxSerial::SerialGetAttribute(int32_t portId, SerialAttribute& attribu
     HDF_LOGI("%{public}s: enter get attribute.", __func__);
     int32_t fd = GetFdByPortId(portId);
     if (fd < 0) {
-        return ERR_CODE_DEVICENOTOPEN;
+        return ERR_CODE_IOEXCEPTION;
     }
-    if (tcgetattr(fd, &options_) = -1) {
+    if (tcgetattr(fd, &options_) == -1) {
         HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
         return HDF_FAILURE;
     }
@@ -338,19 +386,20 @@ int32_t LinuxSerial::SerialGetAttribute(int32_t portId, SerialAttribute& attribu
         }
     }
 
-    int databits = options_.c_cflag & CSIZE;
+    auto databits = options_.c_cflag & CSIZE;
+
     switch (databits) {
         case CS5:
-            attribute.dataBits = USB_ATTR_DATABIT_5;
+            attribute.dataBits = DATABITS_FIVE;
             break;
         case CS6:
-            attribute.dataBits = USB_ATTR_DATABIT_6;
+            attribute.dataBits = DATABITS_SIX;
             break;
         case CS7:
-            attribute.dataBits = USB_ATTR_DATABIT_7;
+            attribute.dataBits = DATABITS_SEVEN;
             break;
         case CS8:
-            attribute.dataBits = USB_ATTR_DATABIT_8;
+            attribute.dataBits = DATABITS_EIGHT;
             break;
         default:
             HDF_LOGE("%{public}s: Unknown data bits setting", __func__);
@@ -358,7 +407,7 @@ int32_t LinuxSerial::SerialGetAttribute(int32_t portId, SerialAttribute& attribu
     }
 
     if (options_.c_cflag & PARENB) {
-        attribute.parity = (options_.c_cflag & PARODD) ? USB_ATTR_PARITY_ODD : USB_ATTR_PARITY_EVEN;
+        TranslateParity(options_.c_cflag, attribute);
     } else {
         attribute.parity = USB_ATTR_PARITY_NONE;
     }
@@ -374,38 +423,42 @@ int32_t LinuxSerial::SerialSetAttribute(int32_t portId, const SerialAttribute& a
     int retry = RETRY_NUM;
     fd = GetFdByPortId(portId);
     if (fd < 0) {
-        return ERR_CODE_DEVICENOTOPEN;
+        return ERR_CODE_IOEXCEPTION;
     }
-    if (tcgetattr(fd, &options_) = -1) {
+
+    if (tcgetattr(fd, &options_) == -1) {
         HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
         return HDF_FAILURE;
     }
-    if (GetStopbits(options_.c_cflag, attribute.stopBits) < 0) {
+
+    int ret = GetStopbits(options_.c_cflag, attribute.stopBits);
+    if (ret < 0) {
         HDF_LOGE("%{public}s: stopBits set fail.", __func__);
-        return GetStopbits(options_.c_cflag, attribute.stopBits);
+        return HDF_FAILURE;
     }
+
+    ret = GetParity(options_.c_cflag, attribute.parity);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s:parity set fail.", __func__);
+        return ret;
+    }
+
+    options_.c_cflag &= ~CSIZE;
+    if (GetDatabits(attribute.dataBits, options_.c_cflag) < 0) {
+        HDF_LOGE("%{public}s: dataBits set fail.", __func__);
+        return HDF_FAILURE;
+    }
+    
     options_.c_cflag |= (CLOCAL | CREAD);
     if (GetBaudrate(attribute.baudrate) < 0) {
         HDF_LOGE("%{public}s: baudrate set fail.", __func__);
         return HDF_FAILURE;
     }
+
     cfsetispeed(&options_, GetBaudrate(attribute.baudrate));
     cfsetospeed(&options_, GetBaudrate(attribute.baudrate));
-    options_.c_cflag &= ~CSIZE;
-    if (GetDatabits(attribute.dataBits) < 0) {
-        HDF_LOGE("%{public}s: dataBits set fail.", __func__);
-        return GetDatabits(attribute.dataBits);
-    }
-    options_.c_cflag |= GetDatabits(attribute.dataBits);
-    if (GetParity(options_.c_cflag, attribute.parity)< 0) {
-        HDF_LOGE("%{public}s:parity set fail.", __func__);
-        return GetParity(options_.c_cflag, attribute.parity);
-    }
-    options_.c_cflag = GetParity(options_.c_cflag, attribute.parity);
-    options_.c_cflag = GetStopbits(options_.c_cflag, attribute.stopBits);
-    options_.c_cc[VMIN] = 1;
-    options_.c_cc[VTIME] = 0;
     while (retry-- > 0) {
+        //dev/ttyUSB0
         if (tcsetattr(fd, TCSANOW, &options_) == 0) {
             break;
         } else {
@@ -419,7 +472,8 @@ int32_t LinuxSerial::SerialSetAttribute(int32_t portId, const SerialAttribute& a
     return HDF_SUCCESS;
 }
 
-void LinuxSerial::HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds)
+void LinuxSerial::HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds,
+    std::string targetPath)
 {
     SerialPort serialPort;
     Serialfd serialPortId;
@@ -428,19 +482,9 @@ void LinuxSerial::HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, 
         __func__, device->devNum, device->busNum, device->numInfos);
     HDF_LOGI("%{public}s: device info: vendorId = %{public}d, productId = %{public}d, deviceClass = %{public}d",
         __func__, devInfo->vendorId, devInfo->productId, devInfo->deviceClass);
+    HDF_LOGI("%{public}s: device: serialNo: %{public}s", __func__, devInfo->serialNo.c_str());
 
-    char nodePath[SYSFS_PATH_LEN] = { 0x00 };
-    DevInterfaceInfo interfaceInfo;
-    interfaceInfo.busNum = device->busNum;
-    interfaceInfo.devNum = device->devNum;
-    interfaceInfo.intfNum = 0;
-    int32_t ret = DdkSysfsGetDevNodePath(&interfaceInfo, SERIAL_TYPE_NAME.c_str(), nodePath, sizeof(nodePath));
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Get device node path failed.", __func__);
-        return;
-    }
-    HDF_LOGI("%{public}s: Device node path: %{public}s", __func__, nodePath);
-    std::string devnameStr(nodePath);
+    std::string devnameStr(targetPath);
     int32_t pos = devnameStr.find(SERIAL_TYPE_NAME);
     if (pos != std::string::npos) {
         std::string numStr = devnameStr.substr(pos + SERIAL_TYPE_NAME.length());
@@ -453,6 +497,7 @@ void LinuxSerial::HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, 
     serialPort.deviceInfo.devAddr = static_cast<uint8_t>(device->devNum);
     serialPort.deviceInfo.vid = static_cast<int32_t>(devInfo->vendorId);
     serialPort.deviceInfo.pid = static_cast<int32_t>(devInfo->productId);
+    serialPort.deviceInfo.serialNum = devInfo->serialNo;
     auto it = std::find_if(serialPortList_.begin(), serialPortList_.end(), [&](const Serialfd& tempSerial) {
         return tempSerial.portId == serialPortId.portId;
     });
@@ -462,7 +507,7 @@ void LinuxSerial::HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, 
     portIds.push_back(serialPort);
 }
 
-static int32_t DdkDevMgrInitDevice(struct UsbDdkDeviceInfo *deviceInfo)
+static int32_t DevMgrInitDevice(struct UsbDdkDeviceInfo *deviceInfo)
 {
     (void)memset_s(deviceInfo, sizeof(struct UsbDdkDeviceInfo), 0, sizeof(struct UsbDdkDeviceInfo));
     int32_t ret = OsalMutexInit(&deviceInfo->deviceMutex);
@@ -492,20 +537,30 @@ int32_t LinuxSerial::SerialGetPortList(std::vector<SerialPort>& portIds)
     int32_t status = HDF_SUCCESS;
     struct dirent *devHandle;
     while ((devHandle = readdir(dir))) {
-        if (devHandle->d_name[0] > '9' || devHandle->d_name[0] < '0' || strchr(devHandle->d_name, ':')) {
+        std::string ttyPathStr(devHandle->d_name);
+        if (ttyPathStr == "." || ttyPathStr == "..") {
             continue;
         }
-        status = DdkDevMgrInitDevice(device);
+        fs::path ttyPath(SYSFS_DEVICES_DIR + ttyPathStr);
+        if (!fs::exists(ttyPath) || !fs::is_symlink(ttyPath)) {
+            HDF_LOGE("%{public}s: path %{public}s not exist", __func__, ttyPath.string().c_str());
+            continue;
+        }
+        fs::path realPath = fs::read_symlink(ttyPath);
+        std::string tempPath = ttyPath.parent_path().string() + "/" + realPath.string();
+        realPath = fs::weakly_canonical(fs::path(tempPath));
+        std::string targetPath = realPath.parent_path().parent_path().string();
+        status = DevMgrInitDevice(device);
         if (status != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: init device failed:%{public}d", __func__, status);
             break;
         }
-        status = DdkSysfsGetDevice(devHandle->d_name, &device->info);
+        status = SerialGetDevice(targetPath.c_str(), &device->info);
         if (status != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: sysfs get device failed:%{public}d", __func__, status);
             break;
         }
-        HandleDevListEntry(&device->info, portIds);
+        HandleDevListEntry(&device->info, portIds, ttyPath.string());
     }
 
     OsalMemFree(device);

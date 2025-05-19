@@ -26,37 +26,37 @@
 #include "usb_raw_api.h"
 #include "rndis_host.h"
 
-/* MS-Windows uses this strange size, but RNDIS spec says 1024 minimum */
+/* The MS-Windows uses this strange size, but RNDIS spec says 1024 minimum */
 #define    CONTROL_BUFFER_SIZE        1025
 
-/* RNDIS defines an (absurdly huge) 10 second control timeout,
+/* The RNDIS defines an (absurdly huge) 10 second control timeout,
  * but ActiveSync seems to use a more usual 5 second timeout
  * (which matches the USB 2.0 spec).
  */
 #define    RNDIS_CONTROL_TIMEOUT_MS    (5 * 1000)
 
-/* default filter used with RNDIS devices */
+/* Default filter used with RNDIS devices */
 #define RNDIS_DEFAULT_FILTER ( \
     RNDIS_PACKET_TYPE_DIRECTED | \
     RNDIS_PACKET_TYPE_BROADCAST | \
     RNDIS_PACKET_TYPE_ALL_MULTICAST | \
     RNDIS_PACKET_TYPE_PROMISCUOUS)
 
-/* Flags to require specific physical medium type for generic_rndis_bind() */
+/* Flags to require the specific physical medium type for generic_rndis_bind() */
 #define FLAG_RNDIS_PHYM_NOT_WIRELESS    0x0001
 #define FLAG_RNDIS_PHYM_WIRELESS        0x0002
-/* Flags for driver_info::data */
+/* Flags for driverInfo::data */
 #define RNDIS_DRIVER_DATA_POLL_STATUS    1    /* poll status before control */
 
 /*
- * CONTROL uses CDC "encapsulated commands" with funky notifications.
+ * CONTROL uses CDC "encapsulated commands" with notifications.
  *  - control-out:  SEND_ENCAPSULATED
  *  - interrupt-in:  RESPONSE_AVAILABLE
  *  - control-in:  GET_ENCAPSULATED
  *
- * We'll try to ignore the RESPONSE_AVAILABLE notifications.
+ * We will try to ignore the RESPONSE_AVAILABLE notifications.
  *
- * REVISIT some RNDIS implementations seem to have curious issues still
+ * REVISIT some RNDIS implementations seem to have curious issues which still
  * to be resolved.
  */
 struct RndisMsgHdr {

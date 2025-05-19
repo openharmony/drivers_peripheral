@@ -51,6 +51,9 @@ namespace Audio {
             HDF_LOGE("%{public}s: Write eleValue to buffer failed\n", __func__);
             return false;
         }
+        if (size < sizeof(int32_t)) {
+            return false;
+        }
         int32_t cmdId = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
         ret = service->dispatcher->Dispatch(&service->object, cmdId, writeBuf, writeReply);
         if (ret == HDF_SUCCESS) {
