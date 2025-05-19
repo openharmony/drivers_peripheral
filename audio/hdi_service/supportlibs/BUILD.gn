@@ -32,7 +32,7 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
-    public_deps = [ "drivers_interface_audio:libaudio_proxy_4.0" ]
+    public_deps = [ "drivers_interface_audio:libaudio_proxy_5.0" ]
     external_deps = [
       "bounds_checking_function:libsec_shared",
       "hdf_core:libhdf_utils",
@@ -49,7 +49,7 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/primary_impl/src/audio_common.c",
     ]
 
-    public_deps = [ "drivers_interface_audio:libaudio_proxy_4.0" ]
+    public_deps = [ "drivers_interface_audio:libaudio_proxy_5.0" ]
 
     include_dirs = [
       "$hdf_hdi_service_path/primary_impl/include",
@@ -119,7 +119,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "drivers_interface_audio:libaudio_proxy_4.0",
+        "drivers_interface_audio:libaudio_proxy_5.0",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
@@ -194,7 +194,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "drivers_interface_audio:libaudio_proxy_4.0",
+        "drivers_interface_audio:libaudio_proxy_5.0",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
