@@ -16,7 +16,7 @@
 #ifndef AUDIO_INTERNAL_MANAGER_H
 #define AUDIO_INTERNAL_MANAGER_H
 
-#include "v4_0/iaudio_manager.h"
+#include "v5_0/iaudio_manager.h"
 
 #ifdef __cplusplus
 extern "C" {

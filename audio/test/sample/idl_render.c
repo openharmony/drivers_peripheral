@@ -28,8 +28,8 @@
 #include "hdf_base.h"
 #include "inttypes.h"
 #include "osal_mem.h"
-#include "v4_0/audio_types.h"
-#include "v4_0/iaudio_manager.h"
+#include "v5_0/audio_types.h"
+#include "v5_0/iaudio_manager.h"
 
 #define MAX_AUDIO_ADAPTER_DESC         5
 #define BUFFER_LEN                     256

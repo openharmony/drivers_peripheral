@@ -66,7 +66,7 @@ ohos_shared_library("audio_primary_impl_vendor") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_audio:libaudio_proxy_4.0",
+      "drivers_interface_audio:libaudio_proxy_5.0",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",

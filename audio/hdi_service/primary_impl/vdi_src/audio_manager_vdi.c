@@ -21,7 +21,7 @@
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
 #include "audio_dfx.h"
-#include "v4_0/iaudio_adapter.h"
+#include "v5_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 static int32_t THREAD_POOL_COUNT = 32;
