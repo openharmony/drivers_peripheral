@@ -18,10 +18,10 @@
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_sbuf_ipc.h"
-#include "v1_4/ril_stub.h"
+#include "v1_5/ril_stub.h"
 #include "hril_hdf.h"
 
-using namespace OHOS::HDI::Ril::V1_4;
+using namespace OHOS::HDI::Ril::V1_5;
 using namespace OHOS::HDI::Ril;
 
 struct HdfRilHost {
@@ -68,7 +68,7 @@ static int32_t HdfRilDriverBind(struct HdfDeviceObject *deviceObject)
     hdfRilHost->ioService.Open = nullptr;
     hdfRilHost->ioService.Release = nullptr;
 
-    auto serviceImpl = V1_4::IRil::Get(true);
+    auto serviceImpl = V1_5::IRil::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfRilHost;
@@ -77,7 +77,7 @@ static int32_t HdfRilDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfRilHost->stub =
-        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, V1_4::IRil::GetDescriptor());
+        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, V1_5::IRil::GetDescriptor());
     if (hdfRilHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfRilHost;
