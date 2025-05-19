@@ -37,7 +37,7 @@ void HdfAudioFinishTrace(void);
 int32_t SetTimer(const char* name);
 void CancelTimer(int32_t id);
 struct timeval AudioDfxSysEventGetTimeStamp(void);
-int32_t AudioDfxSysEventERROR(const char* log, struct timeval startTime, int timeThreshold, int err);
+int32_t AudioDfxSysEventError(const char* log, struct timeval startTime, int timeThreshold, int err);
 #ifdef __cplusplus
 }
 #endif
