@@ -22,10 +22,11 @@ group("hdi_audio") {
     if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       deps += [ "hal/hdi_binder/server:hdi_audio_a2dp_server" ]
     }
-    deps += [ "hdi_service:idl_audio" ]
+    deps += [
+      "audio_dfx:libaudio_dfx_static",
+      "hdi_service:idl_audio",
+    ]
   }
-
-  deps += [ "audio_dfx:libaudio_dfx_static" ]
 }
 
 config("drivers_peripheral_audio_header") {
