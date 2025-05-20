@@ -22,7 +22,7 @@
 #include "audio_interface_lib_capture.h"
 #include "audio_internal.h"
 #include "audio_uhdf_log.h"
-#include "v4_0/iaudio_capture.h"
+#include "v5_0/iaudio_capture.h"
 #include "securec.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_PRIMARY_IMPL

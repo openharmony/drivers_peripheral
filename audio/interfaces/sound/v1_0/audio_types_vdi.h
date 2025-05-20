@@ -88,6 +88,7 @@ enum AudioFormatVdi {
     AUDIO_VDI_FORMAT_TYPE_AAC_ELD = 1 << 24 | 1 << 2,
     AUDIO_VDI_FORMAT_TYPE_AAC_HE_V1 = 1 << 24 | 1 << 2 | 1 << 0,
     AUDIO_VDI_FORMAT_TYPE_AAC_HE_V2 = 1 << 24 | 1 << 2 | 1 << 1,
+    AUDIO_VDI_FORMAT_TYPE_EAC3 = 1 << 24 | 1 << 2 | 1 << 1 | 1 << 0,
     AUDIO_VDI_FORMAT_TYPE_G711A = 1 << 25 | 1 << 0,
     AUDIO_VDI_FORMAT_TYPE_G711U = 1 << 25 | 1 << 1,
     AUDIO_VDI_FORMAT_TYPE_G726 = 1 << 25 | 1 << 1 | 1 << 0,
@@ -226,6 +227,8 @@ enum AudioDeviceTypeVdi {
     AUDIO_VDI_HDMI_DEVICE = 1 << 10,
     AUDIO_VDI_ADAPTER_DEVICE = 1 << 11,
     AUDIO_VDI_DP_DEVICE = 1 << 12,
+    AUDIO_VDI_ACCESSORY_DEVICE = 1 << 13,
+    AUDIO_VDI_REMOTE_DEVICE = 1 << 14,
     AUDIO_VDI_DEVICE_UNKNOWN,
     AUDIO_VDI_DEVICE_TYPE_BUTT,
 };
@@ -395,6 +398,7 @@ struct AudioMmapBufferDescriptorVdi {
     int32_t isShareable;
     uint32_t offset;
     char *filePath;
+    uint32_t syncInfoSize;
 };
 
 struct AudioDevExtInfoVdi {

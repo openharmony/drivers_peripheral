@@ -36,7 +36,7 @@ if (!defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "drivers_interface_audio:libaudio_proxy_4.0",
+        "drivers_interface_audio:libaudio_proxy_5.0",
         "drivers_interface_audio:libeffect_proxy_1.0",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
