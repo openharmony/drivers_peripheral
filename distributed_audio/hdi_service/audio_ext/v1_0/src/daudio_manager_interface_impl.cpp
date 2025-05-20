@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -103,6 +103,43 @@ int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int3
         return HDF_FAILURE;
     }
 
+    return HDF_SUCCESS;
+}
+
+int32_t DAudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &serviceName,
+    const sptr<IDAudioHdfCallback> &callbackObj)
+{
+    DHLOGI("Register audio HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    if (audioMgr_ == nullptr) {
+        DHLOGE("Audio manager is null.");
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = audioMgr_->RegisterAudioHdfListener(serviceName, callbackObj);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Register audio HDF listener failed, ret = %{public}d", ret);
+        return HDF_FAILURE;
+    }
+
+    DHLOGI("Register audio HDF listener success.");
+    return HDF_SUCCESS;
+}
+
+int32_t DAudioManagerInterfaceImpl::UnRegisterAudioHdfListener(const std::string &serviceName)
+{
+    DHLOGI("Unregister audio HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    if (audioMgr_ == nullptr) {
+        DHLOGE("Audio manager is null.");
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = audioMgr_->UnRegisterAudioHdfListener(serviceName);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Unregister audio HDF listener failed. ret = %{public}d", ret);
+        return HDF_FAILURE;
+    }
+
+    DHLOGI("Unregister audio HDF listener success.");
     return HDF_SUCCESS;
 }
 } // v2_0
