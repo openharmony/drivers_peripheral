@@ -658,6 +658,7 @@ int32_t AudioRenderReqMmapBufferVdi(struct IAudioRender *render, int32_t reqSize
     desc->transferFrameSize = vdiDesc.transferFrameSize;
     desc->isShareable = vdiDesc.isShareable;
     desc->offset = vdiDesc.offset;
+    desc->syncInfoSize = vdiDesc.syncInfoSize;
     desc->filePath = strdup("");
     if (desc->filePath == NULL) {
         AUDIO_FUNC_LOGE("strdup fail");

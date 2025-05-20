@@ -521,6 +521,7 @@ int32_t AudioCaptureReqMmapBufferVdi(struct IAudioCapture *capture, int32_t reqS
     desc->totalBufferFrames = vdiDesc.totalBufferFrames;
     desc->transferFrameSize = vdiDesc.transferFrameSize;
     desc->isShareable = vdiDesc.isShareable;
+    desc->syncInfoSize = vdiDesc.syncInfoSize;
     desc->filePath = strdup("");  // which will be released after send reply
     if (desc->filePath == NULL) {
         AUDIO_FUNC_LOGE("strdup fail");

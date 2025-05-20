@@ -16,7 +16,7 @@
 #ifndef AUDIO_COMMON_H
 #define AUDIO_COMMON_H
 
-#include "v4_0/audio_types.h"
+#include "v5_0/audio_types.h"
 
 #ifdef __cplusplus
 extern "C" {
