@@ -1624,27 +1624,27 @@ static int32_t GetCmdWithCarryDate(char *cmd, const char *ifName,
     int ret = 0;
     switch (cmdType) {
         case P2P_REJECT: {
-            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+            ret = snprintf_s(cmd, MAX_CMD_SIZE, MAX_CMD_SIZE - 1,
                 "IFNAME=%s P2P_REJECT %s", ifName, carryData);
             break;
         }
         case P2P_REMOVE_GROUP_CLIENT: {
-            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+            ret = snprintf_s(cmd, MAX_CMD_SIZE, MAX_CMD_SIZE - 1,
                 "IFNAME=%s P2P_REMOVE_CLIENT %s", ifName, carryData);
             break;
         }
         case P2P_SET_MIRACAST_SINK_CONFIG: {
-            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+            ret = snprintf_s(cmd, MAX_CMD_SIZE, MAX_CMD_SIZE - 1,
                 "IFNAME=%s SINK_CONFIG_SET %s", ifName, carryData);
             break;
         }
         case P2P_CREATE_TEMP_GROUP: {
-            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+            ret = snprintf_s(cmd, MAX_CMD_SIZE, MAX_CMD_SIZE - 1,
                 "IFNAME=%s CREATE_TEMP_GROUP %s", ifName, carryData);
             break;
         }
         default: {
-            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+            ret = snprintf_s(cmd, MAX_CMD_SIZE, MAX_CMD_SIZE - 1,
                 "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s",
                 ifName, cmdType, dataType, carryData);
             break;
