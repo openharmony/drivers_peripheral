@@ -22,6 +22,7 @@ ohos_shared_library("libpartition_slot_service_1.0") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_partitionslot:libpartitionslot_proxy_1.0",
+    "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "init:libbegetutil",
   ]
