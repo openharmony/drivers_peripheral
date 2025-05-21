@@ -117,18 +117,18 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_002, TestSize.Level1)
             PORTRAIT);
         EXPECT_EQ(portraitFlag, false);
         CAMERA_LOGI("OHOS::HDI::Camera::V1_1::PORTRAIT found!");
-        return;
+        GTEST_SKIP();
     }
     printf("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES value count is %d\n", entry.count);
     // Take a photo using the blurring effect TakePhotoWithTags()
     if (entry.count == 0) {
         printf("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES value count is 0 ...\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES value count is 0 ...");
-        return;
+        GTEST_SKIP();
     } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES data is NULL!");
-        return;
+        GTEST_SKIP();
     } else {
         for (size_t i = 0; i < entry.count; i++)
         {
@@ -165,24 +165,24 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_005, TestSize.Level1)
         OHOS_CAMERA_BEAUTY_TYPE_AUTO);
     if (!beautyAutoFlag) {
         CAMERA_LOGE("OHOS_CAMERA_BEAUTY_TYPE_AUTO not found");
-        return;
+        GTEST_SKIP();
     }
 
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_BEAUTY_AUTO_VALUES, &entry);
     if (ret != 0) {
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_AUTO_VALUES not found");
-        return;
+        GTEST_SKIP();
     }
     printf("OHOS_ABILITY_BEAUTY_AUTO_VALUES value count is %d\n", entry.count);
     // Take a photo using the blurring effect TakePhotoWithTags()
     if (entry.count == 0) {
         printf("OHOS_ABILITY_BEAUTY_AUTO_VALUES value count is 0 ...\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_AUTO_VALUES value count is 0 ...");
-        return;
+        GTEST_SKIP();
     } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_BEAUTY_AUTO_VALUES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_AUTO_VALUES data is NULL!");
-        return;
+        GTEST_SKIP();
     } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
@@ -213,7 +213,7 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_009, TestSize.Level1)
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CUSTOM_VIDEO_FPS, &entry);
     if (ret == CAM_META_ITEM_NOT_FOUND) {
         CAMERA_LOGI("OHOS_ABILITY_CUSTOM_VIDEO_FPS not found!");
-        return;
+        GTEST_SKIP();
     }
 
     //obtain an FPS  value through OHOS_CONTROL_FPS_RANGES.(An interval.
@@ -221,11 +221,11 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_009, TestSize.Level1)
     if (entry.count == 0) {
         printf("OHOS_ABILITY_CUSTOM_VIDEO_FPS value count is 0 ...\n");
         CAMERA_LOGI("OHOS_ABILITY_CUSTOM_VIDEO_FPS value count is 0 ...");
-        return;
+        GTEST_SKIP();
     } else if (entry.data.i32 == nullptr) {
         printf("OHOS_ABILITY_CUSTOM_VIDEO_FPS data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_CUSTOM_VIDEO_FPS data is NULL!");
-        return;
+        GTEST_SKIP();
     } else {
         std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
         int32_t tagValue[2] = {entry.data.i32[0], entry.data.i32[0]};

@@ -63,7 +63,7 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
     // get camera ability
     if (cameraBase_->ability == nullptr) {
         CAMERA_LOGE("ability is null.");
-        return;
+        GTEST_SKIP();
     }
     GetAvalialbleVideoStabilizationModes(cameraBase_->ability);
 
@@ -117,7 +117,7 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_002, TestSize.Level1)
     // get camera ability
     if (cameraBase_->ability == nullptr) {
         CAMERA_LOGE("ability is null.");
-        return;
+        GTEST_SKIP();
     }
     GetAvalialbleVideoStabilizationModes(cameraBase_->ability);
 
