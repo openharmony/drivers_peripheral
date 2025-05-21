@@ -163,7 +163,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_003, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->Close();
@@ -198,7 +198,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_003, TestSiz
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Professional_Hdi_V1_3_003 PROFESSIONAL_PHOTO resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -217,7 +217,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_004, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -284,7 +284,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_005, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -321,7 +321,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_006, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -376,7 +376,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_007, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -410,7 +410,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_008, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -468,7 +468,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_009, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -501,7 +501,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_009, TestSiz
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Professional_Hdi_V1_3_009 PROFESSIONAL_PHOTO resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -520,7 +520,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_010, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -551,7 +551,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_010, TestSiz
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Professional_Hdi_V1_3_010 PROFESSIONAL_PHOTO resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -570,7 +570,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_011, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -604,7 +604,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_011, TestSiz
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Professional_Hdi_V1_3_011 PROFESSIONAL_PHOTO resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -623,7 +623,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_012, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -667,7 +667,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_013, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -726,7 +726,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_014, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -774,7 +774,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_015, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -841,7 +841,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_016, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -874,7 +874,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_016, TestSiz
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Professional_Hdi_V1_3_016 PROFESSIONAL_PHOTO resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -893,7 +893,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_017, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -941,7 +941,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_018, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -969,7 +969,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_018, TestSiz
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Professional_Hdi_V1_3_018 PROFESSIONAL_VIDEO resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -988,7 +988,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_019, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1024,7 +1024,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_020, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1057,7 +1057,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_021, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1104,7 +1104,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_022, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1129,7 +1129,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_022, TestSiz
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Professional_Hdi_V1_3_022 PROFESSIONAL_VIDEO resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -1148,7 +1148,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_023, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1178,7 +1178,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_023, TestSiz
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Professional_Hdi_V1_3_023 PROFESSIONAL_VIDEO resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -1197,7 +1197,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_024, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1236,7 +1236,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_024, TestSiz
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Professional_Hdi_V1_3_024 PROFESSIONAL_VIDEO resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -1257,7 +1257,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_025, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1290,7 +1290,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_026, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1341,7 +1341,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_027, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1388,7 +1388,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_028, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1435,7 +1435,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_029, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_VIDEO)) {
         cout << "skip this test, because PROFESSIONAL_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1535,7 +1535,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_031, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -1571,7 +1571,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_032, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -1607,7 +1607,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_033, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -1643,7 +1643,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_034, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);
@@ -1680,7 +1680,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_035, TestSiz
 {
     if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
         cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     FillCaptureSetting(cameraTest);

@@ -98,7 +98,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_004, TestSize.Level1)
         EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
         if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->cameraDevice == nullptr) {
             CAMERA_LOGE("check hdi_host: OpenCamera failed");
-            return;
+            GTEST_SKIP();
         }
     }
 }

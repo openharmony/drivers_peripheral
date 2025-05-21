@@ -100,7 +100,7 @@ HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_002, TestSize.Level1)
         if (entry.count == 1) {
             CAMERA_LOGI("OHOS_ABILITY_TRIPOD_DETECTION %{public}d\n", entry.data.i32[0]);
             printf("OHOS_ABILITY_TRIPOD_DETECTION %d\n", entry.data.i32[0]);
-            return;
+            GTEST_SKIP();
         }
         constexpr size_t step = 10;
         std::stringstream ss;
@@ -136,7 +136,7 @@ HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_003, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_FOCUS_RANGE_TYPES, &entry);
     if (cameraTest->rc != CAM_META_SUCCESS || entry.count == 0) {
         cout << "skip this test, because OHOS_ABILITY_FOCUS_RANGE_TYPES not supported now" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     for (int i = 0; i < entry.count; i++) {
@@ -146,7 +146,7 @@ HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_003, TestSize.Level1)
             CAMERA_LOGI("focus range type OHOS_CAMERA_FOCUS_RANGE_AUTO is supported");
         } else {
             CAMERA_LOGI("supported focus range type is null");
-            return;
+            GTEST_SKIP();
         }
     }
 
@@ -205,7 +205,7 @@ HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_004, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_FOCUS_DRIVEN_TYPES, &entry);
     if (cameraTest->rc != CAM_META_SUCCESS || entry.count == 0) {
         cout << "skip this test, because OHOS_ABILITY_FOCUS_DRIVEN_TYPES not supported now" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     for (int i = 0; i < entry.count; i++) {
@@ -215,7 +215,7 @@ HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_004, TestSize.Level1)
             CAMERA_LOGI("focus driven type OHOS_CAMERA_FOCUS_DRIVEN_FACE is supported");
         } else {
             CAMERA_LOGI("supported focus driven type is null");
-            return;
+            GTEST_SKIP();
         }
     }
 
@@ -274,7 +274,7 @@ HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_005, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_COLOR_RESERVATION_TYPES, &entry);
     if (cameraTest->rc != CAM_META_SUCCESS || entry.count == 0) {
         cout << "skip this test, because OHOS_ABILITY_COLOR_RESERVATION_TYPES not supported now" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     for (int i = 0; i < entry.count; i++) {
@@ -284,7 +284,7 @@ HWTEST_F(CameraHdiTagTestV1_3, Camera_Hdi_TAG_TEST_V1_3_005, TestSize.Level1)
             CAMERA_LOGI("color reservation type OHOS_CAMERA_COLOR_RESERVATION_PORTRAIT is supported");
         } else {
             CAMERA_LOGI("supported color reservation type is null");
-            return;
+            GTEST_SKIP();
         }
     }
 
