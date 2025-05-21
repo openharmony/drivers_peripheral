@@ -22,13 +22,13 @@
 #include <iproxy_broker.h>
 #include <iremote_object.h>
 
-#include "v1_4/iril.h"
+#include "v1_5/iril.h"
 #include "vector"
 
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_4 {
+namespace V1_5 {
 class RilImpl : public IRil {
 public:
     RilImpl() = default;
@@ -139,6 +139,8 @@ public:
     int32_t GetNetworkSliceEhplmn(int32_t slotId, int32_t serialId) override;
     int32_t ActivatePdpContextWithApnTypesforSlice(int32_t slotId, int32_t serialId,
             const DataCallInfoWithApnTypesforSlice &dataCallInfo) override;
+    int32_t GetPrimarySlot(int32_t slotId, int32_t serialId) override;
+    int32_t SetPrimarySlot(int32_t slotId, int32_t serialId) override;
     // Network
     int32_t GetSignalStrength(int32_t slotId, int32_t serialId) override;
     int32_t GetCsRegStatus(int32_t slotId, int32_t serialId) override;
@@ -186,6 +188,7 @@ public:
     int32_t SetCallback1_2(const sptr<V1_2::IRilCallback> &rilCallback) override;
     int32_t SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback) override;
     int32_t SetCallback1_4(const sptr<V1_4::IRilCallback> &rilCallback) override;
+    int32_t SetCallback1_5(const sptr<V1_5::IRilCallback> &rilCallback) override;
     int32_t Init();
     class RilDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -217,7 +220,7 @@ private:
     int32_t AddRilDeathRecipient(const sptr<IRilCallback> &callback);
     int32_t RemoveRilDeathRecipient(const sptr<IRilCallback> &callback);
 };
-} // namespace V1_4
+} // namespace V1_5
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS
