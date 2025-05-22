@@ -38,6 +38,7 @@ ohos_shared_library("libhid_ddk_service_1.1") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
+    "drivers_interface_input:libhid_ddk_proxy_1.0",
     "drivers_interface_input:libhid_ddk_proxy_1.1",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
