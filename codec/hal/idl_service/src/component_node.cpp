@@ -313,6 +313,11 @@ int32_t ComponentNode::UseEglImage(struct OmxCodecBuffer &buffer, uint32_t portI
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_BUFFERHEADERTYPE *pBufferHdrType = nullptr;
+    OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
+    if (comType->UseEGLImage == nullptr) {
+        CODEC_LOGE("The requested function is not implemented.");
+        return OMX_ErrorNotImplemented;
+    }
     auto err = OMX_UseEGLImage(comp_, &pBufferHdrType, portIndex, 0, const_cast<int8_t *>(eglImage));
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("OMX_UseEGLImage error[0x%{public}x]", err);
