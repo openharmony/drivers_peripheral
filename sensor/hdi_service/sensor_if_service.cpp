@@ -736,7 +736,7 @@ void SensorIfService::VoteInterval(int32_t sensorId, uint32_t serviceId, int64_t
     for (auto it = sdcIntervalMap[sensorId].begin(); it != sdcIntervalMap[sensorId].end(); ++it) {
         samplingInterval = samplingInterval < it->second ? samplingInterval : it->second;
     }
-    HDF_LOGI("%{public}s: samplingInterval is %{public}s", __func__, std::to_string(it->second).c_str());
+    HDF_LOGI("%{public}s: samplingInterval is %{public}s", __func__, std::to_string(samplingInterval).c_str());
 }
 
 int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel)
