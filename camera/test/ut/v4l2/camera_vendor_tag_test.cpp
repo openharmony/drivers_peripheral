@@ -47,7 +47,7 @@ TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_001)
     int ohosTag = EXAMPLE_VENDOR_SENSOR_MODE;
     if (!meta->addEntry(ohosTag, &sensorMode, 1)) {
         CAMERA_LOGE("%{public}s(%{public}d) add failed", GetCameraMetadataItemName(ohosTag), ohosTag);
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGD("%{public}s(%{public}ld) add success", GetCameraMetadataItemName(ohosTag), ohosTag);
 
@@ -70,7 +70,7 @@ TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_002)
     int ohosTag = EXAMPLE_VENDOR_SENSOR_MODE;
     if (!meta->addEntry(ohosTag, &sensorMode, 1)) {
         CAMERA_LOGE("%{public}s(%{public}d) add failed", GetCameraMetadataItemName(ohosTag), ohosTag);
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGD("%{public}s(%{public}ld) add success", GetCameraMetadataItemName(ohosTag), ohosTag);
 
@@ -108,7 +108,7 @@ TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_004)
     int ohosTag = EXAMPLE_VENDOR_SENSOR_EXPOSURE;
     if (!meta->addEntry(ohosTag, &sensorExposure, 1)) {
         CAMERA_LOGE("%{public}s(%{public}d) add failed", GetCameraMetadataItemName(ohosTag), ohosTag);
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGD("%{public}s(%{public}ld) add success", GetCameraMetadataItemName(ohosTag), ohosTag);
 
@@ -135,7 +135,7 @@ TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_005)
     int ohosTag = EXAMPLE_VENDOR_SENSOR_EXPOSURE;
     if (!meta->addEntry(ohosTag, &sensorExposure, 1)) {
         CAMERA_LOGE("%{public}s(%{public}d) add failed", GetCameraMetadataItemName(ohosTag), ohosTag);
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGD("%{public}s(%{public}ld) add success", GetCameraMetadataItemName(ohosTag), ohosTag);
 
@@ -187,7 +187,7 @@ TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_007)
     int ohosTag = EXAMPLE_VENDOR_SENSOR_EXPOSURE;
     if (!meta->addEntry(ohosTag, &sensorExposure, 1)) {
         std::cout << "addEntry failed" << std::endl;
-        return;
+        GTEST_SKIP();
     }
     std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << "add success" << std::endl;
     const int32_t deviceStreamId = 0;

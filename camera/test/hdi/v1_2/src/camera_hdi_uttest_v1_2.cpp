@@ -830,7 +830,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_022, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_VIDEO_STABILIZATION_MODES, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         printf("get tag<OHOS_ABILITY_VIDEO_STABILIZATION_MODES> failed.\n");
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("get OHOS_ABILITY_VIDEO_STABILIZATION_MODES success!");
     if (entry.data.u8 != nullptr && entry.count > 0) {
@@ -1235,7 +1235,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
         sleep(UT_SECOND_TIMES);
         if (cameraTest->deviceCallback->resultMeta == nullptr) {
             printf("Camera_Device_Hdi_V1_2_035 Macro mode nullptr\n");
-            return;
+            GTEST_SKIP();
         }
         common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
         EXPECT_NE(data, nullptr);
@@ -1612,7 +1612,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_052, TestSize.Level1)
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("get OHOS_ABILITY_VIDEO_STABILIZATION_MODES success!");
     } else {
-        return;
+        GTEST_SKIP();
     }
     if (entry.data.i32 != nullptr && entry.count > 0) {
         for (size_t i = 0; i < entry.count; i++) {
@@ -1697,7 +1697,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
         sleep(UT_SECOND_TIMES);
         if (cameraTest->deviceCallback->resultMeta == nullptr) {
             printf("Camera_Device_Hdi_V1_2_054 Macro mode nullptr\n");
-            return;
+            GTEST_SKIP();
         }
         common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
         EXPECT_NE(data, nullptr);
