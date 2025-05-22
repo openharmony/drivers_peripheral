@@ -137,7 +137,7 @@ TEST_F(UtestHdiTest, camera_hdi_0030)
         EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
         if (cameraBase->rc != NO_ERROR || cameraBase->cameraDevice == nullptr) {
             std::cout << "==========[test log] OpenCamera failed." << std::endl;
-            return;
+            GTEST_SKIP();
         }
         std::cout << "==========[test log] OpenCamera success." << std::endl;
     }
