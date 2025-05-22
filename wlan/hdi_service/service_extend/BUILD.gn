@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../wlan.gni")
 
 HDI_SERVICE_ROOT_DIR = "../.."

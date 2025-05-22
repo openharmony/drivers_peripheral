@@ -12,8 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
-WPA_ROOT_DIR = "//third_party/wpa_supplicant"
 
 if (is_standard_system) {
   ohos_shared_library("libhostapd_interface_service_1.0") {
@@ -30,8 +28,6 @@ if (is_standard_system) {
     include_dirs = [
       "./service_common",
       "../../client/include",
-      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/src",
-      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/hostapd",
     ]
     sources = [
       "hostapd_interface_service.c",
@@ -64,6 +60,7 @@ if (is_standard_system) {
       "-Wl,--gc-sections",
     ]
     external_deps = [
+      "hdf_core:libhdf_ipc_adapter",
       "c_utils:utils",
       "drivers_interface_wlan:libhostapd_stub_1.0",
       "hdf_core:libhdf_host",
