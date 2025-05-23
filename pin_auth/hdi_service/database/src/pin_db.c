@@ -1142,7 +1142,7 @@ ResultCode DoGenerateAlgoParameter(uint8_t *algoParameter, uint32_t *algoParamet
     return RESULT_SUCCESS;
 }
 
-void DestroyAbandonParam()
+void DestroyAbandonParam(void)
 {
     LOG_INFO("start");
     if (g_abandonCacheParam == NULL) {
@@ -1197,7 +1197,8 @@ ResultCode WriteRootSecretFile(uint64_t templateId, uint64_t newTemplateId, Buff
         return RESULT_BAD_COPY;
     }
     buffer->contentSize += sizeof(uint64_t);
-    if (memcpy_s(buffer->buf + sizeof(uint64_t), ciperInfo->contentSize, ciperInfo->buf, ciperInfo->contentSize) != EOK) {
+    if (memcpy_s(buffer->buf + sizeof(uint64_t), ciperInfo->contentSize, ciperInfo->buf,
+        ciperInfo->contentSize) != EOK) {
         LOG_ERROR("copy rootSecret fialed");
         DestroyBuffer(buffer);
         return RESULT_BAD_COPY;
@@ -1398,7 +1399,7 @@ Buffer *GenerateDecodeRootSecret(uint64_t templateId, Buffer *oldRootSecret)
     Buffer *rootSecretPlain = NULL;
     Buffer *cipherInfo = NULL;
     uint64_t newTemplateId = 0;
-    ResultCode ret = ReadRootSecretFile(templateId, &newTemplateId, &cipherInfo);;
+    ResultCode ret = ReadRootSecretFile(templateId, &newTemplateId, &cipherInfo);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("ReadRootSecretFile fail");
         goto EXIT;
