@@ -32,6 +32,8 @@ typedef enum {
     ATTR_SIGNATURE = 100004,
     /* Tag of templateId data in TLV */
     ATTR_TEMPLATE_ID = 100006,
+    /* Tag of templateId list data in TLV */
+    ATTR_TEMPLATE_ID_LIST = 100007,
     /* Expected attribute, tag of remain count in TLV */
     ATTR_REMAIN_ATTEMPTS = 100009,
     /* Remain time */
@@ -52,6 +54,9 @@ typedef enum {
     ATTR_PEER_UDID = 100064,
     ATTR_PUBLIC_KEY = 100065,
     ATTR_CHALLENGE = 100066,
+    /* old pin root secret */
+    ATTR_OLD_ROOT_SECRET = 100068,
+    ATTR_AUTH_PURPOSE = 100069,
 
     PIN_ATTR_MSG_ID = 200001,
     PIN_ATTR_ALGO_VERSION = 200004,

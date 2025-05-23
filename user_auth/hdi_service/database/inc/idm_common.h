@@ -23,11 +23,14 @@
 extern "C" {
 #endif
 
-#define MAX_USER 32
+#define MAX_USER 5
 #define MAX_CREDENTIAL 100
 #define ROOT_SECRET_LEN 32
 #define NO_CHECK_PIN_EXPIRED_PERIOD 0
 #define MAX_GLOBAL_CONFIG_NUM (1 + MAX_AUTH_TYPE_LEN * 1)
+#define NO_SET_PIN_EXPIRED_PERIOD (-1)
+
+#define ABANDON_PIN_VALID_PERIOD (96 * 3600 * 1000)
 
 typedef struct {
     uint64_t credentialId;
@@ -37,7 +40,9 @@ typedef struct {
     uint32_t executorMatcher;
     uint32_t capabilityLevel;
     uint32_t credentialType;
+    bool isAbandoned;
     uint64_t enrolledSysTime;
+    uint64_t abandonedSysTime;
 } CredentialInfoHal;
 
 typedef struct {

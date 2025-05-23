@@ -53,6 +53,7 @@
 #define SALT_RANDOM_LENGTH 32
 
 static PinDbV1 *g_pinDbOp = NULL;
+static AbandonCacheParam *g_abandonCacheParam = NULL;
 
 bool LoadPinDb(void)
 {
@@ -77,6 +78,7 @@ void DestroyPinDb(void)
     }
 
     FreePinDb(&g_pinDbOp);
+    DestroyAbandonParam();
     LOG_INFO("DestroyPinDb succ.");
 }
 
@@ -157,6 +159,10 @@ static ResultCode RemoveAllFile(uint64_t templateId)
         LOG_ERROR("RemovePinSalt fail.");
     }
     ret = RemovePinFile(templateId, SECRET_SUFFIX, true);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("RemovePinSecret fail.");
+    }
+    ret = RemovePinFile(templateId, ROOTSECRET_CRYPTO_SUFFIX, true);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("RemovePinSecret fail.");
     }
@@ -278,8 +284,14 @@ ResultCode DelPinById(uint64_t templateId)
     ret = DelPin(templateId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR(" DelPin fail.");
+        return ret;
     }
 
+    ret = ReWriteRootSecretFile(templateId);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR(" ReWriteRootSecretFile fail.");
+        return ret;
+    }
     LOG_INFO("DelPinById succ.");
     /* ignore pin file remove result, return success when index file remove success */
     return RESULT_SUCCESS;
@@ -1128,4 +1140,277 @@ ResultCode DoGenerateAlgoParameter(uint8_t *algoParameter, uint32_t *algoParamet
 
     LOG_INFO("gen algo succ size is [%{public}u] and version is [%{public}u]", *algoParameterLength, *algoVersion);
     return RESULT_SUCCESS;
+}
+
+void DestroyAbandonParam()
+{
+    LOG_INFO("start");
+    if (g_abandonCacheParam == NULL) {
+        return;
+    }
+    DestroyBuffer(g_abandonCacheParam->newRootSecret);
+    Free(g_abandonCacheParam);
+    g_abandonCacheParam = NULL;
+    return;
+}
+
+static ResultCode CacheAbandonParam(uint64_t oldTemplateId, uint64_t curTemplateId, uint64_t newTemplateId,
+    Buffer *ciperInfo)
+{
+    LOG_INFO("oldTemplateId:0x%{public}x, curTemplateId:0x%{public}x, newTemplateId:0x%{public}x",
+        (uint16_t)oldTemplateId, (uint16_t)curTemplateId, (uint16_t)newTemplateId);
+    DestroyAbandonParam();
+    AbandonCacheParam *cacheParam = (AbandonCacheParam *)Malloc(sizeof(AbandonCacheParam));
+    if (cacheParam == NULL) {
+        LOG_ERROR("no memory");
+        return RESULT_NO_MEMORY;
+    }
+    (void)memset_s(cacheParam, sizeof(AbandonCacheParam), 0, sizeof(AbandonCacheParam));
+    cacheParam->oldTemplateId = oldTemplateId;
+    cacheParam->curTemplateId = curTemplateId;
+    cacheParam->newTemplateId = newTemplateId;
+    cacheParam->newRootSecret = CreateBufferByData(ciperInfo->buf, ciperInfo->contentSize);
+    if (cacheParam->newRootSecret == NULL) {
+        LOG_ERROR("no memory");
+        Free(cacheParam);
+        return RESULT_NO_MEMORY;
+    }
+    g_abandonCacheParam = cacheParam;
+    return RESULT_SUCCESS;
+}
+
+ResultCode WriteRootSecretFile(uint64_t templateId, uint64_t newTemplateId, Buffer *ciperInfo)
+{
+    LOG_INFO("templateId:0x%{public}x, newTemplateId:0x%{public}x", (uint16_t)templateId, (uint16_t)newTemplateId);
+    if (!IsBufferValid(ciperInfo)) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    Buffer *buffer = CreateBufferBySize(sizeof(uint64_t) + ciperInfo->contentSize);
+    if (buffer == NULL) {
+        LOG_ERROR("no memory");
+        return RESULT_NO_MEMORY;
+    }
+    if (memcpy_s(buffer->buf, sizeof(uint64_t), &newTemplateId, sizeof(uint64_t)) != EOK) {
+        LOG_ERROR("copy templateId fialed");
+        DestroyBuffer(buffer);
+        return RESULT_BAD_COPY;
+    }
+    buffer->contentSize += sizeof(uint64_t);
+    if (memcpy_s(buffer->buf + sizeof(uint64_t), ciperInfo->contentSize, ciperInfo->buf, ciperInfo->contentSize) != EOK) {
+        LOG_ERROR("copy rootSecret fialed");
+        DestroyBuffer(buffer);
+        return RESULT_BAD_COPY;
+    }
+    buffer->contentSize += ciperInfo->contentSize;
+    ResultCode ret = WritePinFile(buffer->buf, buffer->contentSize, templateId, ROOTSECRET_CRYPTO_SUFFIX);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("WritePinFile fail.");
+        DestroyBuffer(buffer);
+        return ret;
+    }
+    DestroyBuffer(buffer);
+    return RESULT_SUCCESS;
+}
+
+ResultCode ReadRootSecretFile(uint64_t templateId, uint64_t *newTemplateId, Buffer **ciperInfo)
+{
+    LOG_INFO("templateId:0x%{public}x", (uint16_t)templateId);
+    uint32_t ciperInfoLen = AES_GCM_256_IV_SIZE + AES_GCM_256_TAG_SIZE + ROOT_SECRET_LEN;
+    Buffer *buffer = CreateBufferBySize(sizeof(uint64_t) + ciperInfoLen);
+    if (buffer == NULL) {
+        LOG_ERROR("no memory");
+        return RESULT_NO_MEMORY;
+    }
+
+    ResultCode ret = ReadPinFile(buffer->buf, buffer->maxSize, templateId, ROOTSECRET_CRYPTO_SUFFIX);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("ReadPinFile fail");
+        DestroyBuffer(buffer);
+        return ret;
+    }
+    buffer->contentSize = sizeof(uint64_t) + ciperInfoLen;
+    if (memcpy_s(newTemplateId, sizeof(uint64_t), buffer->buf, sizeof(uint64_t)) != EOK) {
+        LOG_ERROR("copy templateId fialed");
+        DestroyBuffer(buffer);
+        return RESULT_BAD_COPY;
+    }
+
+    *ciperInfo = CreateBufferBySize(ciperInfoLen);
+    if (*ciperInfo == NULL) {
+        LOG_ERROR("no memory");
+        DestroyBuffer(buffer);
+        return RESULT_NO_MEMORY;
+    }
+    if (memcpy_s((*ciperInfo)->buf, ciperInfoLen, buffer->buf + sizeof(uint64_t), ciperInfoLen) != EOK) {
+        LOG_ERROR("copy rootSecret fialed");
+        DestroyBuffer(buffer);
+        DestroyBuffer(*ciperInfo);
+        return RESULT_BAD_COPY;
+    }
+    (*ciperInfo)->contentSize = ciperInfoLen;
+    DestroyBuffer(buffer);
+    return RESULT_SUCCESS;
+}
+
+ResultCode ReWriteRootSecretFile(uint64_t templateId)
+{
+    LOG_INFO("templateId:0x%{public}x", (uint16_t)templateId);
+    if (g_abandonCacheParam == NULL || templateId != g_abandonCacheParam->curTemplateId) {
+        LOG_INFO("g_abandonCacheParam is null or templateId is not same");
+        return RESULT_SUCCESS;
+    }
+
+    ResultCode ret = WriteRootSecretFile(g_abandonCacheParam->oldTemplateId, g_abandonCacheParam->newTemplateId,
+        g_abandonCacheParam->newRootSecret);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("WriteRootSecretFile fail, ret:%{public}u", ret);
+        return ret;
+    }
+    DestroyAbandonParam();
+    return RESULT_SUCCESS;
+}
+
+Buffer *GetRootSecretCipherInfo(Buffer *oldRootSecret, Buffer *newRootSecret)
+{
+    if (!IsBufferValid(oldRootSecret) || !IsBufferValid(newRootSecret)) {
+        LOG_ERROR("invalid param.");
+        return NULL;
+    }
+
+    Buffer *cipherText = NULL;
+    Buffer *tag = NULL;
+    Buffer *cipherInfo = NULL;
+    AesGcmParam param = {};
+    param.key = oldRootSecret;
+    param.iv = CreateBufferBySize(AES_GCM_256_IV_SIZE);
+    if (!IsBufferValid(param.iv)) {
+        LOG_ERROR("create iv fail.");
+        goto EXIT;
+    }
+    if (SecureRandom(param.iv->buf, param.iv->maxSize) != RESULT_SUCCESS) {
+        LOG_ERROR("random iv fail.");
+        goto EXIT;
+    }
+    param.iv->contentSize = param.iv->maxSize;
+    if (AesGcm256Encrypt(newRootSecret, &param, &cipherText, &tag) != RESULT_SUCCESS) {
+        LOG_ERROR("AesGcmEncrypt fail.");
+        goto EXIT;
+    }
+    cipherInfo = SplicePinCiperInfo(param.iv, tag, cipherText);
+    if (cipherInfo == NULL) {
+        LOG_ERROR("SplicePinCiperInfo fail.");
+        goto EXIT;
+    }
+
+EXIT:
+    DestroyBuffer(param.iv);
+    DestroyBuffer(cipherText);
+    DestroyBuffer(tag);
+    return cipherInfo;
+}
+
+Buffer *GetRootSecretPlainInfo(Buffer *oldRootSecret, const Buffer *cipherInfo)
+{
+    if (!IsBufferValid(oldRootSecret) || !IsBufferValid(cipherInfo)) {
+        LOG_ERROR("invalid param.");
+        return NULL;
+    }
+
+    if (cipherInfo->contentSize < AES_GCM_256_IV_SIZE + AES_GCM_256_TAG_SIZE + ROOT_SECRET_LEN) {
+        LOG_ERROR("check cipher info fail.");
+        return NULL;
+    }
+
+    AesGcmParam param = {};
+    Buffer iv = GetTmpBuffer(cipherInfo->buf, AES_GCM_256_IV_SIZE, AES_GCM_256_IV_SIZE);
+    param.iv = &iv;
+    param.key = oldRootSecret;
+    Buffer tag = GetTmpBuffer(cipherInfo->buf + AES_GCM_256_IV_SIZE, AES_GCM_256_TAG_SIZE, AES_GCM_256_TAG_SIZE);
+    uint32_t cipherTextSize = cipherInfo->contentSize - AES_GCM_256_IV_SIZE - AES_GCM_256_TAG_SIZE;
+    Buffer cipherText = GetTmpBuffer(
+        cipherInfo->buf + AES_GCM_256_IV_SIZE + AES_GCM_256_TAG_SIZE, cipherTextSize, cipherTextSize);
+    Buffer *plainText = NULL;
+    int32_t result = AesGcm256Decrypt(&cipherText, &param, &tag, &plainText);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("Aes256GcmDecrypt fail");
+        return NULL;
+    }
+
+    return plainText;
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+ResultCode Abandon(uint64_t oldTemplateId, uint64_t newTemplateId, Buffer *oldRootSecret, Buffer *newRootSecret)
+{
+    LOG_INFO("oldTemplateId:0x%{public}x, newTemplateId:0x%{public}x",
+        (uint16_t)oldTemplateId, (uint16_t)newTemplateId);
+    if (!IsBufferValid(oldRootSecret) || !IsBufferValid(newRootSecret)) {
+        LOG_ERROR("get invalid params.");
+        return RESULT_BAD_PARAM;
+    }
+
+    uint32_t index = MAX_CRYPTO_INFO_SIZE;
+    ResultCode ret = SearchPinIndex(oldTemplateId, &index);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get invalid params.");
+        return ret;
+    }
+
+    Buffer *cipherInfo = GetRootSecretCipherInfo(oldRootSecret, newRootSecret);
+    if (cipherInfo == NULL) {
+        LOG_ERROR("GetRootSecretCipherInfo fail.");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    Buffer *oldCipherInfo = NULL;
+    uint64_t curTemplateId = 0;
+    ret = ReadRootSecretFile(oldTemplateId, &curTemplateId, &oldCipherInfo);
+    if (ret == RESULT_SUCCESS) {
+        ret = CacheAbandonParam(oldTemplateId, curTemplateId, newTemplateId, cipherInfo);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("CacheAbandonParam fail, ret:%{public}u", ret);
+            goto EXIT;
+        }
+    } else {
+        ret = WriteRootSecretFile(oldTemplateId, newTemplateId, cipherInfo);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("WriteRootSecretFile fail.");
+            goto EXIT;
+        }
+    }
+
+    LOG_INFO("Abandon success");
+EXIT:
+    DestroyBuffer(oldCipherInfo);
+    DestroyBuffer(cipherInfo);
+    return ret;
+}
+
+Buffer *GenerateDecodeRootSecret(uint64_t templateId, Buffer *oldRootSecret)
+{
+    LOG_INFO("templateId:0x%{public}x", (uint16_t)templateId);
+    if (!IsBufferValid(oldRootSecret)) {
+        LOG_ERROR("bad param.");
+        return NULL;
+    }
+
+    Buffer *rootSecretPlain = NULL;
+    Buffer *cipherInfo = NULL;
+    uint64_t newTemplateId = 0;
+    ResultCode ret = ReadRootSecretFile(templateId, &newTemplateId, &cipherInfo);;
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("ReadRootSecretFile fail");
+        goto EXIT;
+    }
+
+    rootSecretPlain = GetRootSecretPlainInfo(oldRootSecret, cipherInfo);
+    if (!IsBufferValid(rootSecretPlain)) {
+        LOG_ERROR("rootSecretPlain is invalid.");
+        goto EXIT;
+    }
+    LOG_INFO("GenerateDecodeRootSecret success");
+EXIT:
+    DestroyBuffer(cipherInfo);
+    return rootSecretPlain;
 }

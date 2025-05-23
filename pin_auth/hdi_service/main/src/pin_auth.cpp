@@ -202,11 +202,11 @@ int32_t PinAuth::AllInOneAuth(
 
 /* This is for example only, Should be implemented in trusted environment. */
 int32_t PinAuth::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &pinData,
-    std::vector<uint8_t> &resultTlv)
+    const std::vector<uint8_t> &extraInfo, std::vector<uint8_t> &resultTlv)
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
-    if (pinData.size() != CONST_PIN_DATA_LEN) {
+    if (pinData.size() != CONST_PIN_DATA_LEN || extraInfo.size() == 0) {
         LOG_ERROR("bad pinData len!");
         return PinResultToCoAuthResult(RESULT_BAD_PARAM);
     }
@@ -218,13 +218,19 @@ int32_t PinAuth::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::ve
         LOG_ERROR("mem copy pinData to pinAuthParam fail!");
         return PinResultToCoAuthResult(RESULT_BAD_COPY);
     }
+    Buffer *extra = CreateBufferByData(extraInfo.data(), extraInfo.size());
+    if (!IsBufferValid(extra)) {
+        LOG_ERROR("extraInfo is unValid!");
+        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+    }
     Buffer *retTlv = CreateBufferBySize(RESULT_TLV_LEN);
     if (!IsBufferValid(retTlv)) {
         LOG_ERROR("retTlv is unValid!");
+        DestroyBuffer(extra);
         return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
     }
     ResultCode compareRet = RESULT_COMPARE_FAIL;
-    ResultCode result = DoAuthPin(&pinAuthParam, retTlv, &compareRet);
+    ResultCode result = DoAuthPin(&pinAuthParam, extra, retTlv, &compareRet);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("DoAuthPin fail!");
         goto ERROR;
@@ -238,6 +244,7 @@ int32_t PinAuth::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::ve
     result = compareRet;
 
 ERROR:
+    DestroyBuffer(extra);
     DestroyBuffer(retTlv);
     return PinResultToCoAuthResult(result);
 }
@@ -556,6 +563,52 @@ int32_t PinAuth::SendMessageToVerifier(uint64_t scheduleId,
     }
     isAuthEnd = verifierMsg.isAuthEnd;
     compareResult = PinResultToCoAuthResult(verifierMsg.authResult);
+    return PinResultToCoAuthResult(result);
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::Abandon(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
+    std::vector<uint8_t> &resultTlv)
+{
+    LOG_INFO("start");
+    std::lock_guard<std::mutex> gurard(mutex_);
+    if (extraInfo.size() == 0) {
+        LOG_ERROR("get bad params!");
+        return PinResultToCoAuthResult(RESULT_BAD_PARAM);
+    }
+
+    PinAbandonParam pinAbandonParam = {};
+    pinAbandonParam.scheduleId = scheduleId;
+    pinAbandonParam.templateId = templateId;
+
+    Buffer *extra = CreateBufferByData(extraInfo.data(), extraInfo.size());
+    if (!IsBufferValid(extra)) {
+        LOG_ERROR("extra is unValid!");
+        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+    }
+
+    Buffer *retTlv = CreateBufferBySize(RESULT_TLV_LEN);
+    if (!IsBufferValid(retTlv)) {
+        LOG_ERROR("retTlv is unValid!");
+        DestroyBuffer(extra);
+        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+    }
+    ResultCode result = DoAbandonPin(&pinAbandonParam, extra, retTlv);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoEnrollPin fail!");
+        goto ERROR;
+    }
+
+    resultTlv.resize(retTlv->contentSize);
+    if (memcpy_s(resultTlv.data(), retTlv->contentSize, retTlv->buf, retTlv->contentSize) != EOK) {
+        LOG_ERROR("copy retTlv to resultTlv fail!");
+        result = RESULT_BAD_COPY;
+        goto ERROR;
+    }
+
+ERROR:
+    DestroyBuffer(extra);
+    DestroyBuffer(retTlv);
     return PinResultToCoAuthResult(result);
 }
 } // namespace PinAuth

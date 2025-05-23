@@ -111,28 +111,32 @@ IAM_STATIC ResultCode GetExpiredInfoForResult(const UserAuthContext *context, Au
         LOG_INFO("bad param");
         return RESULT_BAD_PARAM;
     }
-    if (context->authExpiredSysTime == NO_CHECK_PIN_EXPIRED_PERIOD) {
-        LOG_INFO("pinExpiredPeriod is not set");
-        result->pinExpiredInfo = NO_SET_PIN_EXPIRED_PERIOD;
-        return RESULT_SUCCESS;
-    }
-    uint64_t currentTime = GetReeTime();
-    if (currentTime < context->authExpiredSysTime) {
-        // MAX_JS_NUMBER_VALUE is 2^50.
-        const uint64_t MAX_JS_NUMBER_VALUE = 1125899906842624;
-        result->pinExpiredInfo = MAX_JS_NUMBER_VALUE;
-        if (context->authExpiredSysTime - currentTime < MAX_JS_NUMBER_VALUE) {
-            result->pinExpiredInfo = context->authExpiredSysTime - currentTime;
+    if (context->authIntent == ABANDONED_PIN_AUTH) {
+        result->pinExpiredInfo = GetCredentialValidPeriod(context->userId, result->credentialId);
+    } else {
+        if (context->authExpiredSysTime == NO_CHECK_PIN_EXPIRED_PERIOD) {
+            LOG_INFO("pinExpiredPeriod is not set");
+            result->pinExpiredInfo = NO_SET_PIN_EXPIRED_PERIOD;
+            return RESULT_SUCCESS;
         }
-        LOG_INFO("pin is not expired");
-        return RESULT_SUCCESS;
+        uint64_t currentTime = GetReeTime();
+        if (currentTime < context->authExpiredSysTime) {
+            // MAX_JS_NUMBER_VALUE is 2^50.
+            const uint64_t MAX_JS_NUMBER_VALUE = 1125899906842624;
+            result->pinExpiredInfo = MAX_JS_NUMBER_VALUE;
+            if (context->authExpiredSysTime - currentTime < MAX_JS_NUMBER_VALUE) {
+                result->pinExpiredInfo = context->authExpiredSysTime - currentTime;
+            }
+            LOG_INFO("pin is not expired");
+            return RESULT_SUCCESS;
+        }
+        result->pinExpiredInfo = 0;
+        if (!context->isExpiredReturnSuccess) {
+            LOG_ERROR("pin is expired");
+            return RESULT_PIN_EXPIRED;
+        }
+        LOG_INFO("caller is screenLock or setting");
     }
-    result->pinExpiredInfo = 0;
-    if (!context->isExpiredReturnSuccess) {
-        LOG_ERROR("pin is expired");
-        return RESULT_PIN_EXPIRED;
-    }
-    LOG_INFO("caller is screenLock or setting");
     return RESULT_SUCCESS;
 }
 
@@ -144,14 +148,18 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
         result->credentialDigest = enrolledState.credentialDigest;
         result->credentialCount = enrolledState.credentialCount;
     }
+
     if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH &&
         memcmp(context->localUdid, context->collectorUdid, sizeof(context->localUdid)) == 0) {
+        if (context->authIntent == ABANDONED_PIN_AUTH) {
+            SetOldRootSecret(context->userId, info->oldRootSecret);
+        }
         result->rootSecret = CopyBuffer(info->rootSecret);
         if (!IsBufferValid(result->rootSecret)) {
             LOG_ERROR("rootSecret is invalid");
             return RESULT_NO_MEMORY;
         }
-        CacheRootSecret(context->userId, result->rootSecret);
+        SetCurRootSecret(context->userId, result->rootSecret);
     }
     ResultCode ret = GetExpiredInfoForResult(context, result);
     if (ret != RESULT_SUCCESS) {
@@ -168,6 +176,7 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
         LOG_INFO("cache unlock auth result");
         CacheUnlockAuthResult(context->userId, secureUid, authToken);
     }
+
     LOG_INFO("cache any auth result");
     CacheAnyAuthResult(context->userId, secureUid, authToken);
     return RESULT_SUCCESS;
@@ -265,6 +274,8 @@ IAM_STATIC ResultCode RequestAuthResultFuncInner(UserAuthContext *userAuthContex
             LOG_ERROR("handle auth success result failed");
             return ret;
         }
+
+        SetPinChangeScence(userAuthContext->userId, userAuthContext->authIntent);
     }
     return ret;
 }
@@ -290,7 +301,6 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
         DestroyContext(userAuthContext);
         return RESULT_GENERAL_ERROR;
     }
-
 
     uint64_t credentialId;
     ResultCode ret = FillInContext(userAuthContext, &credentialId, executorResultInfo, SCHEDULE_MODE_AUTH);

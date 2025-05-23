@@ -31,6 +31,7 @@ extern "C" {
 #define MAX_FILE_NAME_LEN 256
 #define DEFAULT_FILE_HEAD "/data/service/el1/public/pinauth/"
 #define PIN_INDEX_NAME "/data/service/el1/public/pinauth/PinIndexDb"
+#define ROOTSECRET_CRYPTO_SUFFIX "_rootSecret_cryptoInfo"
 
 ResultCode GetDataFromBuf(uint8_t **src, uint32_t *srcLen, uint8_t *dest, uint32_t destLen);
 ResultCode GetBufFromData(uint8_t *src, uint32_t srcLen, uint8_t **dest, uint32_t *destLen);

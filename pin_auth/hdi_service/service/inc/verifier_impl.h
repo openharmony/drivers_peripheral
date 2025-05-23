@@ -33,7 +33,7 @@ public:
     explicit VerifierImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi);
     ~VerifierImpl() override;
 
-    int32_t GetExecutorInfo(OHOS::HDI::PinAuth::V2_1::ExecutorInfo &executorInfo) override;
+    int32_t GetExecutorInfo(OHOS::HDI::PinAuth::V3_0::ExecutorInfo &executorInfo) override;
     int32_t OnRegisterFinish(const std::vector<uint64_t> &templateIdList,
         const std::vector<uint8_t> &frameworkPublicKey, const std::vector<uint8_t> &extraInfo) override;
     int32_t Cancel(uint64_t scheduleId) override;

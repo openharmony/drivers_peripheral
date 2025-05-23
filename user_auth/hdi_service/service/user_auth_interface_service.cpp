@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v3_0/user_auth_interface_service.h"
+#include "v4_0/user_auth_interface_service.h"
 
 #include <cinttypes>
 #include <mutex>
@@ -385,7 +385,10 @@ static int32_t SetAttributeToAllInOneExecMsg(AuthParamHal paramHal, HdiScheduleI
             IAM_LOGE("SetAttributeUint8Array challenge failed");
             break;
         }
-
+        if (SetAttributeInt32(attribute, ATTR_AUTH_PURPOSE, paramHal.authIntent) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeUint32 auth purpose failed");
+            break;
+        }
         SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
         if (GetAttributeExecutorMsg(attribute, retExtraInfo, signParam) != RESULT_SUCCESS) {
             IAM_LOGE("GetAttributeExecutorMsg failed");
@@ -421,6 +424,63 @@ static int32_t GetAuthExecutorMsg(uint32_t executorRole, AuthParamHal paramHal,
         return RESULT_GENERAL_ERROR;
     }
     return RESULT_SUCCESS;
+}
+
+static int32_t SetBufferToAttribute(Attribute *attribute, AttributeKey key, Buffer *buf)
+{
+    if ((attribute == NULL) || !IsBufferValid(buf)) {
+        LOG_ERROR("SetBufferToAttribute bad param!");
+        return RESULT_BAD_PARAM;
+    }
+    Uint8Array uint8Array = {
+        .data = buf->buf,
+        .len = buf->contentSize,
+    };
+    return SetAttributeUint8Array(attribute, key, uint8Array);
+}
+
+static int32_t SetAttributeToAbandonMsg(HdiScheduleInfo &info, uint64_t scheduleId, Buffer *oldRootSecret,
+    Buffer *newRootSecret)
+{
+    IF_TRUE_LOGE_AND_RETURN_VAL(oldRootSecret == nullptr, RESULT_GENERAL_ERROR);
+    IF_TRUE_LOGE_AND_RETURN_VAL(newRootSecret == nullptr, RESULT_GENERAL_ERROR);
+
+    Attribute *attribute = CreateEmptyAttribute();
+    IF_TRUE_LOGE_AND_RETURN_VAL(attribute == nullptr, RESULT_GENERAL_ERROR);
+    ResultCode ret = RESULT_GENERAL_ERROR;
+    do {
+        Uint64Array templateIdsIn = {info.templateIds.data(), info.templateIds.size()};
+        if (SetAttributeUint64Array(attribute, ATTR_TEMPLATE_ID_LIST, templateIdsIn) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeUint64Array templateIdsIn failed");
+            break;
+        }
+        if (SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, scheduleId) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeUint64 scheduleId failed");
+            break;
+        }
+        if (SetBufferToAttribute(attribute, ATTR_OLD_ROOT_SECRET, oldRootSecret) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeUint64 old root secret failed");
+            break;
+        }
+        if (SetBufferToAttribute(attribute, ATTR_ROOT_SECRET, newRootSecret) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeUint64 new root secret failed");
+            break;
+        }
+        info.executorMessages.resize(1);
+        info.executorMessages[0].resize(MAX_EXECUTOR_MSG_LEN);
+        Uint8Array retExtraInfo = { info.executorMessages[0].data(), MAX_EXECUTOR_MSG_LEN };
+        SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+        if (GetAttributeExecutorMsg(attribute, &retExtraInfo, signParam) != RESULT_SUCCESS) {
+            IAM_LOGE("GetAttributeExecutorMsg failed");
+            info.executorMessages.clear();
+            break;
+        }
+        info.executorMessages[0].resize(retExtraInfo.len);
+        ret = RESULT_SUCCESS;
+    } while (0);
+
+    FreeAttribute(&attribute);
+    return ret;
 }
 
 static bool CopyAuthScheduleInfo(AuthParamHal paramHal, const CoAuthSchedule *in, HdiScheduleInfo *out)
@@ -857,53 +917,73 @@ int32_t UserAuthInterfaceService::CloseSession(int32_t userId)
     return CloseEditSession();
 }
 
-int32_t UserAuthInterfaceService::BeginEnrollment(
-    const std::vector<uint8_t> &authToken, const HdiEnrollParam &param, HdiScheduleInfo &info)
+static int32_t CheckOperatePermission(const std::vector<uint8_t> &authToken, const HdiEnrollParam &param,
+    PermissionCheckParam *checkParam, ScheduleType *scheduleType)
 {
     IAM_LOGI("start");
-    if (authToken.size() != sizeof(UserAuthTokenHal) && authToken.size() != 0) {
+    if ((authToken.size() != sizeof(UserAuthTokenHal) && authToken.size() != 0) ||
+        checkParam == NULL || scheduleType == NULL) {
         IAM_LOGE("authToken len is invalid");
         return RESULT_BAD_PARAM;
     }
-    PermissionCheckParam checkParam = {};
     if (authToken.size() == sizeof(UserAuthTokenHal) &&
-        memcpy_s(checkParam.token, AUTH_TOKEN_LEN, &authToken[0], authToken.size()) != EOK) {
+        memcpy_s(checkParam->token, AUTH_TOKEN_LEN, &authToken[0], authToken.size()) != EOK) {
         return RESULT_BAD_COPY;
     }
-    checkParam.authType = param.authType;
-    checkParam.userId = param.userId;
-    checkParam.executorSensorHint = param.executorSensorHint;
-    checkParam.userType = param.userType;
+    checkParam->authType = param.authType;
+    checkParam->userId = param.userId;
+    checkParam->executorSensorHint = param.executorSensorHint;
+    checkParam->userType = param.userType;
     std::lock_guard<std::mutex> lock(g_mutex);
-    uint64_t scheduleId;
     int32_t ret;
-    if (authToken.size() == sizeof(UserAuthTokenHal) && param.authType == PIN) {
-        ret = CheckUpdatePermission(checkParam, &scheduleId);
+    if (authToken.size() == sizeof(UserAuthTokenHal) && param.authType == HdiAuthType::PIN) {
+        ret = CheckUpdatePermission(checkParam);
         if (ret != RESULT_SUCCESS) {
             IAM_LOGE("check update permission failed");
             return ret;
         }
+        *scheduleType = SCHEDULE_TYPE_UPDATE;
     } else {
-        ret = CheckEnrollPermission(checkParam, &scheduleId);
+        ret = CheckEnrollPermission(checkParam);
         if (ret != RESULT_SUCCESS) {
             IAM_LOGE("check enroll permission failed");
             return ret;
         }
+        *scheduleType = SCHEDULE_TYPE_ENROLL;
     }
-    const CoAuthSchedule *scheduleInfo = GetCoAuthSchedule(scheduleId);
+
+    return RESULT_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::BeginEnrollment(
+    const std::vector<uint8_t> &authToken, const HdiEnrollParam &param, HdiScheduleInfo &info)
+{
+    IAM_LOGI("start");
+    PermissionCheckParam checkParam = {};
+    ScheduleType scheduleType = SCHEDULE_TYPE_ENROLL;
+    int32_t ret = CheckOperatePermission(authToken, param, &checkParam, &scheduleType);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("CheckOperatePermission failed, ret:%{public}d", ret);
+        return ret;
+    }
+
+    CoAuthSchedule *scheduleInfo = GenerateCoAuthSchedule(&checkParam, scheduleType);
     if (scheduleInfo == nullptr) {
         IAM_LOGE("get schedule info failed");
         return RESULT_UNKNOWN;
     }
     if (!CopyScheduleInfo(scheduleInfo, &info)) {
         IAM_LOGE("copy schedule info failed");
+        DestroyCoAuthSchedule(scheduleInfo);
+        BreakOffCoauthSchedule();
         return RESULT_BAD_COPY;
     }
-    ret = SetAttributeToExtraInfo(info, INVALID_CAPABILITY_LEVEL, scheduleId);
+    ret = SetAttributeToExtraInfo(info, INVALID_CAPABILITY_LEVEL, scheduleInfo->scheduleId);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetAttributeToExtraInfo failed");
+        BreakOffCoauthSchedule();
     }
-
+    DestroyCoAuthSchedule(scheduleInfo);
     IAM_LOGI("end");
     return ret;
 }
@@ -925,6 +1005,20 @@ static void CopyCredentialInfo(const CredentialInfoHal &in, HdiCredentialInfo &o
     out.executorMatcher = in.executorMatcher;
     out.executorSensorHint = in.executorSensorHint;
     out.executorIndex = QueryCredentialExecutorIndex(in.authType, in.executorSensorHint);
+    out.isAbandoned = in.isAbandoned;
+    out.validityPeriod = CalcCredentialValidPeriod(&in);
+    IAM_LOGI("credentialId:%{public}u, authType:%{public}u, isAbandoned:%{public}d, validityPeriod:%{public}lld",
+        static_cast<uint16_t>(out.credentialId), out.authType, out.isAbandoned,out. validityPeriod);
+}
+
+static void CopyCredentialOpeateResult(OperateResult &in, HdiCredentialOperateResult &out)
+{
+    out.operateType = static_cast<HdiCredentialOperateType>(in.operateType);
+    if (in.operateType == DELETE_CREDENTIAL) {
+        CopyCredentialInfo(in.credentialInfo, out.credentialInfo);
+    } else if (in.operateType == ABANDON_CREDENTIAL) {
+        CopyScheduleInfo(&(in.scheduleInfo), &(out.scheduleInfo));
+    }
 }
 
 static int32_t GetUpdateResult(int32_t userId, HdiEnrollResultInfo &info, Buffer *scheduleResultBuffer)
@@ -1017,19 +1111,19 @@ int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const s
         return RESULT_NO_MEMORY;
     }
     std::lock_guard<std::mutex> lock(g_mutex);
-    bool isUpdate;
-    int32_t ret = GetIsUpdate(&isUpdate);
+    ScheduleType scheduleType;
+    int32_t ret = GetScheduleType(&scheduleType);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("get isUpdate failed");
         DestoryBuffer(scheduleResultBuffer);
         return ret;
     }
-    if (isUpdate) {
+    if (scheduleType == SCHEDULE_TYPE_UPDATE) {
         ret = GetUpdateResult(userId, info, scheduleResultBuffer);
         if (ret != RESULT_SUCCESS) {
             IAM_LOGE("GetUpdateResult failed");
         }
-    } else {
+    } else if (scheduleType == SCHEDULE_TYPE_ENROLL) {
         ret = GetEnrollResult(userId, info, scheduleResultBuffer);
         if (ret != RESULT_SUCCESS) {
             IAM_LOGE("GetEnrollResult failed");
@@ -1041,7 +1135,7 @@ int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const s
 }
 
 int32_t UserAuthInterfaceService::DeleteCredential(int32_t userId, uint64_t credentialId,
-    const std::vector<uint8_t> &authToken, CredentialInfo &info)
+    const std::vector<uint8_t> &authToken, HdiCredentialOperateResult &hdiOperateResult)
 {
     IAM_LOGI("start");
     if (authToken.size() != sizeof(UserAuthTokenHal)) {
@@ -1056,13 +1150,33 @@ int32_t UserAuthInterfaceService::DeleteCredential(int32_t userId, uint64_t cred
     }
     param.userId = userId;
     param.credentialId = credentialId;
-    CredentialInfoHal credentialInfoHal = {};
-    int32_t ret = DeleteCredentialFunc(param, &credentialInfoHal);
+
+    OperateResult operateResult = {};
+    int32_t ret = DeleteCredentialFunc(param, &operateResult);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("delete credential failed");
+        BreakOffCoauthSchedule();
         return ret;
     }
-    CopyCredentialInfo(credentialInfoHal, info);
+
+    CopyCredentialOpeateResult(operateResult, hdiOperateResult);
+    if (operateResult.operateType == ABANDON_CREDENTIAL) {
+        Buffer *oldRootSecret = nullptr;
+        Buffer *newRootSecret = GetNewRootSecret(userId);
+        PinChangeScence pinChangeScence = GetPinChangeScence(userId);
+        if (pinChangeScence == PIN_RESET_SCENCE) {
+            oldRootSecret = GetOldRootSecret(userId);
+        } else {
+            oldRootSecret = GetCurRootSecret(userId);
+        }
+        ret = SetAttributeToAbandonMsg(hdiOperateResult.scheduleInfo, 
+            hdiOperateResult.scheduleInfo.scheduleId, oldRootSecret, newRootSecret);
+        if (ret != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeToAbandonMsg failed");
+            BreakOffCoauthSchedule();
+            return ret;
+        }
+    }
     return RESULT_SUCCESS;
 }
 
@@ -1078,6 +1192,8 @@ int32_t UserAuthInterfaceService::GetCredential(int32_t userId, int32_t authType
     }
     infos.reserve(credList->getSize(credList));
     LinkedListNode *temp = credList->head;
+    CredentialInfo abandonCredential = {};
+    bool hasAbandonedCredential = false;
     while (temp != nullptr) {
         if (temp->data == nullptr) {
             IAM_LOGE("list node is invalid");
@@ -1085,10 +1201,24 @@ int32_t UserAuthInterfaceService::GetCredential(int32_t userId, int32_t authType
             return RESULT_UNKNOWN;
         }
         auto credentialHal = static_cast<CredentialInfoHal *>(temp->data);
-        CredentialInfo credentialInfo = {};
-        CopyCredentialInfo(*credentialHal, credentialInfo);
-        infos.push_back(credentialInfo);
+        if (credentialHal->isAbandoned) {
+            if (!hasAbandonedCredential) {
+                CopyCredentialInfo(*credentialHal, abandonCredential);
+                hasAbandonedCredential = true;
+            } else {
+                IAM_LOGE("abandoned credenttial excced limit");
+                DestroyLinkedList(credList);
+                return RESULT_GENERAL_ERROR;
+            }
+        } else {
+            CredentialInfo credentialInfo = {};
+            CopyCredentialInfo(*credentialHal, credentialInfo);
+            infos.push_back(credentialInfo);
+        }
         temp = temp->next;
+    }
+    if (hasAbandonedCredential) {
+        infos.push_back(abandonCredential);
     }
     DestroyLinkedList(credList);
     return RESULT_SUCCESS;
@@ -1142,14 +1272,14 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
     }
     ret = EnforceDeleteUser(userId, deletedInfos);
     if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("oldRootSecret is invalid");
+        IAM_LOGE("EnforceDeleteUser fail");
         return RESULT_GENERAL_ERROR;
     }
 
     rootSecret.resize(ROOT_SECRET_LEN);
-    Buffer *oldRootSecret = GetCacheRootSecret(userId);
+    Buffer *oldRootSecret = GetCurRootSecret(userId);
     if (!IsBufferValid(oldRootSecret)) {
-        IAM_LOGE("get GetCacheRootSecret failed");
+        IAM_LOGE("get GetCurRootSecret failed");
         return RESULT_SUCCESS;
     }
     if (memcpy_s(rootSecret.data(), rootSecret.size(), oldRootSecret->buf, oldRootSecret->contentSize) != EOK) {
@@ -1157,7 +1287,6 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
         ret = RESULT_BAD_COPY;
     }
 
-    DestoryBuffer(oldRootSecret);
     return ret;
 }
 
@@ -1243,7 +1372,8 @@ static int32_t ObtainReconciliationData(uint32_t authType, uint32_t sensorHint, 
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, authType);
     SetCredentialConditionExecutorSensorHint(&condition, sensorHint);
-    SetCredentiaConditionNeedCachePin(&condition);
+    SetCredentialConditionNeedCachePin(&condition);
+    SetCredentialConditionNeedAbandonPin(&condition);
     LinkedList *credList = QueryCredentialLimit(&condition);
     if (credList == nullptr) {
         IAM_LOGE("query credential failed");
@@ -1819,10 +1949,9 @@ static void GetRootSecret(const UserAuthTokenPlainHal &token, std::vector<uint8_
         return;
     }
 
-    Buffer *rootSecretBuffer = GetCacheRootSecret(token.tokenDataToEncrypt.userId);
+    Buffer *rootSecretBuffer = GetCurRootSecret(token.tokenDataToEncrypt.userId);
     if (!IsBufferValid(rootSecretBuffer)) {
-        IAM_LOGE("get GetCacheRootSecret failed");
-        DestoryBuffer(rootSecretBuffer);
+        IAM_LOGE("get curRootSecret failed");
         return;
     }
     rootSecret.resize(ROOT_SECRET_LEN);
@@ -1832,7 +1961,6 @@ static void GetRootSecret(const UserAuthTokenPlainHal &token, std::vector<uint8_
         rootSecret.clear();
     }
 
-    DestoryBuffer(rootSecretBuffer);
     return;
 }
 
@@ -1858,6 +1986,61 @@ int32_t UserAuthInterfaceService::VerifyAuthToken(const std::vector<uint8_t> &to
         return result;
     }
     return result;
+}
+
+int32_t UserAuthInterfaceService::UpdateAbandonResult(int32_t userId, const std::vector<uint8_t> &scheduleResult,
+    std::vector<HdiCredentialInfo> &infos)
+{
+    IAM_LOGI("start");
+    if (scheduleResult.size() == 0) {
+        IAM_LOGE("enrollToken is invalid");
+        return RESULT_BAD_PARAM;
+    }
+    Buffer *scheduleResultBuffer = CreateBufferByData(&scheduleResult[0], scheduleResult.size());
+    if (scheduleResultBuffer == nullptr) {
+        IAM_LOGE("scheduleTokenBuffer is null");
+        return RESULT_NO_MEMORY;
+    }
+    std::lock_guard<std::mutex> lock(g_mutex);
+    bool isDelete = false;
+    CredentialInfoHal credentialInfo = {};
+    int32_t ret = UpdateAbandonResultFunc(userId, scheduleResultBuffer, &isDelete, &credentialInfo);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("UpdateAbandonResultFunc fail");
+        goto EXIT;
+    }
+
+    if (isDelete) {
+        HdiCredentialInfo hdiCredentialInfo = {};
+        CopyCredentialInfo(credentialInfo, hdiCredentialInfo);
+        infos.push_back(hdiCredentialInfo);
+    }
+
+EXIT:
+    DestoryBuffer(scheduleResultBuffer);
+    BreakOffCoauthSchedule();
+    return ret;
+}
+
+int32_t UserAuthInterfaceService::ClearUnavailableCredential(const std::vector<int32_t> &userIds,
+    std::vector<HdiCredentialInfo> &infos)
+{
+    IAM_LOGI("start");
+    std::lock_guard<std::mutex> lock(g_mutex);
+    for (auto &iter : userIds) {
+        CredentialInfoHal credentialInfo = {};
+        int32_t ret = ClearUnavailableCredentialFunc(iter, &credentialInfo);
+        if (ret != RESULT_SUCCESS) {
+            IAM_LOGE("ClearUnavailableCredentialFunc fail");
+            continue;
+        }
+
+        HdiCredentialInfo hdiCredentialInfo = {};
+        CopyCredentialInfo(credentialInfo, hdiCredentialInfo);
+        infos.push_back(hdiCredentialInfo);
+    }
+
+    return RESULT_SUCCESS;
 }
 } // Userauth
 } // HDI
