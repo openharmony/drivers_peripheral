@@ -51,6 +51,8 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "drivers_interface_vibrator:libvibrator_stub_1.1",
+        "drivers_interface_vibrator:libvibrator_stub_1.2",
         "drivers_interface_vibrator:libvibrator_stub_1.3",
         "hdf_core:libhdf_host",
         "hilog:libhilog",

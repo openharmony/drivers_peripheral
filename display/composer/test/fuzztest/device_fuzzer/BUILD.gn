@@ -26,6 +26,8 @@ ohos_fuzztest("DeviceFuzzTest") {
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_stub_1.0",
+    "drivers_interface_display:libdisplay_composer_stub_1.1",
     "drivers_interface_display:libdisplay_composer_stub_1.2",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",
