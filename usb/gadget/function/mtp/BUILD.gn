@@ -40,7 +40,7 @@ ohos_shared_library("libusbfn_mtp_interface_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:usbfn_mtp_idl_headers",
+      "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
