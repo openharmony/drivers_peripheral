@@ -68,6 +68,8 @@ private:
     sptr<SensorCallbackVdi> medicalCb = nullptr;
     std::vector<HdfSensorInformation> hdfSensorInformations;
     int32_t SetDelay(int32_t sensorId, int64_t &samplingInterval, int64_t &reportInterval);
+    void VoteEnable(int32_t sensorId, uint32_t serviceId, bool& enabled);
+    void VoteInterval(int32_t sensorId, uint32_t serviceId, int64_t &samplingInterval, bool &enabled);
 };
 } // V2_1
 } // Sensor

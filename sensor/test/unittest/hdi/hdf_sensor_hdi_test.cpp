@@ -768,4 +768,166 @@ namespace {
         EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
         SensorCallbackImpl::sensorDataFlag = 1;
     }
+
+    /**
+     * @tc.name: SetSdcSensorTest1_1
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, SetSdcSensorTest1_1, TestSize.Level1)
+    {
+        HDF_LOGI("enter the SetSdcSensorTest1_1 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->SetSdcSensor(1, true, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(2000);
+        ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    /**
+     * @tc.name: SetSdcSensorTest1_2
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, SetSdcSensorTest1_2, TestSize.Level1)
+    {
+        HDF_LOGI("enter the SetSdcSensorTest1_2 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->SetSdcSensor(1, true, 20);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(2000);
+        ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    /**
+     * @tc.name: SetSdcSensorTest1_3
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, SetSdcSensorTest1_3, TestSize.Level1)
+    {
+        HDF_LOGI("enter the SetSdcSensorTest1_3 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->SetSdcSensor(1, true, 50);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(2000);
+        ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    /**
+     * @tc.name: SetSdcSensorTest2_1
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, SetSdcSensorTest2_1, TestSize.Level1)
+    {
+        HDF_LOGI("enter the SetSdcSensorTest2_1 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->SetSdcSensor(1, true, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(2000);
+        ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    /**
+     * @tc.name: SetSdcSensorTest2_2
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, SetSdcSensorTest2_2, TestSize.Level1)
+    {
+        HDF_LOGI("enter the SetSdcSensorTest2_2 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->SetSdcSensor(1, true, 20);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(2000);
+        ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    /**
+     * @tc.name: SetSdcSensorTest2_3
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, SetSdcSensorTest2_3, TestSize.Level1)
+    {
+        HDF_LOGI("enter the SetSdcSensorTest2_3 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->SetSdcSensor(1, false, 50);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(2000);
+        ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    /**
+     * @tc.name: SetSdcSensorTest3_1
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, SetSdcSensorTest3_1, TestSize.Level1)
+    {
+        HDF_LOGI("enter the SetSdcSensorTest3_1 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(2000);
+        ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    /**
+     * @tc.name: SetSdcSensorTest3_2
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, SetSdcSensorTest3_2, TestSize.Level1)
+    {
+        HDF_LOGI("enter the SetSdcSensorTest3_2 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(2000);
+        ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+
+    /**
+     * @tc.name: SetSdcSensorTest3_3
+     * @tc.desc: Enables the sensor unavailable in the sensor list based on the specified sensor ID.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, SetSdcSensorTest3_3, TestSize.Level1)
+    {
+        HDF_LOGI("enter the SetSdcSensorTest3_3 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(2000);
+        ret = g_sensorInterface->SetSdcSensor(1, false, 10);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }
