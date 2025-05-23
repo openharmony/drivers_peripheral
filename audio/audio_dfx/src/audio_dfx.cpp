@@ -21,7 +21,9 @@
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 #endif
+#ifdef AUDIO_HISYSEVENT_ENABLE
 #include "hisysevent.h"
+#endif
 
 using namespace OHOS::HiviewDFX;
 
@@ -77,8 +79,10 @@ struct timeval AudioDfxSysEventGetTimeStamp(void)
 int32_t AudioDfxSysEventError(const char* desc, struct timeval startTime, int timeThreshold, int err)
 {
     if (err != HDF_SUCCESS) {
+#ifdef AUDIO_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_ERROR_EVENT", HiSysEvent::EventType::FAULT,
             "ERROR_DESC", desc, "ERROR_CODE", err, "OVER_TIME", 0);
+#endif
     }
     struct timeval endTime;
     gettimeofday(&endTime, nullptr);
@@ -86,8 +90,10 @@ int32_t AudioDfxSysEventError(const char* desc, struct timeval startTime, int ti
         (endTime.tv_usec - startTime.tv_usec) / TIME_1000);
     if (runTime > timeThreshold) {
         AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}d]", desc, runTime);
+#ifdef AUDIO_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_ERROR_EVENT", HiSysEvent::EventType::FAULT,
             "ERROR_DESC", desc, "ERROR_CODE", err, "OVER_TIME", runTime);
+#endif
     }
     return HDF_SUCCESS;
 }

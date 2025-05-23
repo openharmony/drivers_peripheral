@@ -39,12 +39,16 @@ ohos_static_library("libaudio_dfx_static") {
       external_deps += [ "hicollie:libhicollie" ]
       defines += [ "AUDIO_HICOLLIE_ENABLE" ]
     }
+
+    if (drivers_peripheral_audio_feature_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+      defines += [ "AUDIO_HISYSEVENT_ENABLE" ]
+    }
   }
 
   external_deps += [
     "drivers_interface_audio:libaudio_proxy_5.0",
     "hilog:libhilog",
-    "hisysevent:libhisysevent",
   ]
 
   public_configs = [ ":drivers_peripheral_audio_dfx_header" ]
