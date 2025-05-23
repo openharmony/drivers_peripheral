@@ -39,7 +39,9 @@
                 "drivers_interface_usb",
                 "hisysevent",
                 "access_token",
-                "libusb"
+                "libusb",
+                "eventhandler",
+                "safwk"
             ],
             "third_party": []
         },
