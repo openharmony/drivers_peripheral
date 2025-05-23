@@ -63,7 +63,7 @@ int32_t GetNextFailLockoutDuration(uint32_t authErrorCount);
 Buffer *GetRootSecretPlainInfo(Buffer *oldRootSecret, const Buffer *cipherInfo);
 Buffer *GenerateDecodeRootSecret(uint64_t templateId, Buffer *oldRootSecret);
 ResultCode Abandon(uint64_t oldTemplateId, uint64_t newTemplateId, Buffer *oldRootSecret, Buffer *newRootSecret);
-void DestroyAbandonParam();
+void DestroyAbandonParam(void);
 ResultCode WriteRootSecretFile(uint64_t templateId, uint64_t newTemplateId, Buffer *ciperInfo);
 ResultCode ReadRootSecretFile(uint64_t templateId, uint64_t *newTemplateId, Buffer **ciperInfo);
 ResultCode ReWriteRootSecretFile(uint64_t templateId);
