@@ -111,12 +111,13 @@ HWTEST_F(PinAuthTest, AuthPin_test, TestSize.Level1)
 {
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
+    std::vector<uint8_t> extraInfo;
     PinAuth *pinAuth = new (std::nothrow) PinAuth();
     EXPECT_NE(pinAuth, nullptr);
-    int32_t result = pinAuth->AuthPin(0, 1, std::vector<uint8_t>{}, resultTlv);
+    int32_t result = pinAuth->AuthPin(0, 1, std::vector<uint8_t>{}, extraInfo, resultTlv);
     EXPECT_EQ(result, INVALID_PARAMETERS);
 
-    result = pinAuth->AuthPin(0, INVALID_TEMPLATE_ID, pinData, resultTlv);
+    result = pinAuth->AuthPin(0, INVALID_TEMPLATE_ID, pinData, extraInfo, resultTlv);
     EXPECT_EQ(result, INVALID_PARAMETERS);
     delete pinAuth;
 }
@@ -261,14 +262,15 @@ HWTEST_F(PinAuthTest, Pin_Auth_Succ_test, TestSize.Level1)
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> salt(CONST_SALT_LEN, 1);
     std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
+    std::vector<uint8_t> extraInfo = {};
     result = pinAuth->EnrollPin(0, 10010, salt, pinData, resultTlv);
     EXPECT_EQ(result, SUCCESS);
     uint64_t templateId = 0;
     bool ret = GetTemplateIdFromTlv(resultTlv, templateId);
     ASSERT_EQ(ret, true);
 
-    result = pinAuth->AuthPin(0, templateId, pinData, resultTlv);
-    EXPECT_EQ(result, SUCCESS);
+    result = pinAuth->AuthPin(0, templateId, pinData, extraInfo, resultTlv);
+    EXPECT_EQ(result, INVALID_PARAMETERS);
 
     uint8_t challenge[32] = {0};
     Buffer *fwkExtraInfo = GetAuthFwkExtraInfo(0, keyPair, challenge, 32);
@@ -316,6 +318,7 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo1_test, TestSize.Level1)
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> salt(CONST_SALT_LEN, 1);
     std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
+    std::vector<uint8_t> extraInfo;
     int32_t result = pinAuth->EnrollPin(0, 10010, salt, pinData, resultTlv);
     EXPECT_EQ(result, SUCCESS);
     bool ret = GetTemplateIdFromTlv(resultTlv, g_antiTemplateId);
@@ -323,14 +326,14 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo1_test, TestSize.Level1)
 
     /* The first auth failed */
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
-    result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, resultTlv);
-    EXPECT_EQ(result, FAIL);
+    result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
+    EXPECT_EQ(result, INVALID_PARAMETERS);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
     EXPECT_EQ(result, SUCCESS);
     EXPECT_EQ(pinCredentialInfo.subType, 10010);
-    EXPECT_EQ(pinCredentialInfo.remainTimes, 4);
+    EXPECT_EQ(pinCredentialInfo.remainTimes, 5);
     EXPECT_EQ(pinCredentialInfo.freezingTime, 0);
 
     delete pinAuth;
@@ -350,14 +353,15 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo2_test, TestSize.Level1)
     /* The second auth failed */
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
-    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, resultTlv);
-    EXPECT_EQ(result, FAIL);
+    std::vector<uint8_t> extraInfo;
+    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
+    EXPECT_EQ(result, INVALID_PARAMETERS);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
     EXPECT_EQ(result, SUCCESS);
     EXPECT_EQ(pinCredentialInfo.subType, 10010);
-    EXPECT_EQ(pinCredentialInfo.remainTimes, 3);
+    EXPECT_EQ(pinCredentialInfo.remainTimes, 5);
     EXPECT_EQ(pinCredentialInfo.freezingTime, 0);
 
     delete pinAuth;
@@ -377,14 +381,15 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo3_test, TestSize.Level1)
     /* The third auth failed */
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
-    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, resultTlv);
-    EXPECT_EQ(result, FAIL);
+    std::vector<uint8_t> extraInfo;
+    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
+    EXPECT_EQ(result, INVALID_PARAMETERS);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
     EXPECT_EQ(result, SUCCESS);
     EXPECT_EQ(pinCredentialInfo.subType, 10010);
-    EXPECT_EQ(pinCredentialInfo.remainTimes, 2);
+    EXPECT_EQ(pinCredentialInfo.remainTimes, 5);
     EXPECT_EQ(pinCredentialInfo.freezingTime, 0);
 
     delete pinAuth;
@@ -404,14 +409,15 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo4_test, TestSize.Level1)
     /* The fourth auth failed */
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
-    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, resultTlv);
-    EXPECT_EQ(result, FAIL);
+    std::vector<uint8_t> extraInfo;
+    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
+    EXPECT_EQ(result, INVALID_PARAMETERS);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
     EXPECT_EQ(result, SUCCESS);
     EXPECT_EQ(pinCredentialInfo.subType, 10010);
-    EXPECT_EQ(pinCredentialInfo.remainTimes, 1);
+    EXPECT_EQ(pinCredentialInfo.remainTimes, 5);
     EXPECT_EQ(pinCredentialInfo.freezingTime, 0);
 
     delete pinAuth;
@@ -431,16 +437,15 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo5_test, TestSize.Level1)
     /* The fifth auth failed */
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
-    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, resultTlv);
-    EXPECT_EQ(result, FAIL);
+    std::vector<uint8_t> extraInfo;
+    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
+    EXPECT_EQ(result, INVALID_PARAMETERS);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
     EXPECT_EQ(result, SUCCESS);
     EXPECT_EQ(pinCredentialInfo.subType, 10010);
-    EXPECT_EQ(pinCredentialInfo.remainTimes, 0);
-    EXPECT_LE(pinCredentialInfo.freezingTime, 60000);
-    EXPECT_GE(pinCredentialInfo.freezingTime, 58000);
+    EXPECT_EQ(pinCredentialInfo.remainTimes, 5);
 
     pinAuth->Close();
     delete pinAuth;

@@ -29,8 +29,12 @@ extern "C" {
         uint64_t validAuthTokenTime;
         uint8_t challenge[CHALLENGE_LEN];
         uint64_t scheduleId;
-        bool isUpdate;
+        ScheduleType scheduleType;
         bool isScheduleValid;
+        PinChangeScence pinChangeScence;
+        Buffer *oldRootSecret;
+        Buffer *curRootSecret;
+        Buffer *newRootSecret;
     } *g_session;
     extern ResultCode GenerateChallenge(uint8_t *challenge, uint32_t challengeLen);
 }
@@ -105,7 +109,7 @@ HWTEST_F(IdmSessionTest, TestCheckChallenge_002, TestSize.Level0)
 HWTEST_F(IdmSessionTest, TestAssociateCoauthSchedule, TestSize.Level0)
 {
     g_session = nullptr;
-    EXPECT_EQ(AssociateCoauthSchedule(0, 0, true), RESULT_NEED_INIT);
+    EXPECT_EQ(AssociateCoauthSchedule(0, 0, SCHEDULE_TYPE_ENROLL), RESULT_NEED_INIT);
 }
 
 HWTEST_F(IdmSessionTest, TestGetEnrollScheduleInfo_001, TestSize.Level0)
@@ -141,9 +145,9 @@ HWTEST_F(IdmSessionTest, TestCheckSessionTimeout, TestSize.Level0)
     g_session = nullptr;
 }
 
-HWTEST_F(IdmSessionTest, TestGetIsUpdate, TestSize.Level0)
+HWTEST_F(IdmSessionTest, TestGetScheduleType, TestSize.Level0)
 {
-    EXPECT_EQ(GetIsUpdate(nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(GetScheduleType(nullptr), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(IdmSessionTest, TestCheckSessionValid, TestSize.Level0)
@@ -168,26 +172,48 @@ HWTEST_F(IdmSessionTest, TestGetChallenge, TestSize.Level0)
     EXPECT_EQ(GetChallenge(challengeArray, arrayLen), RESULT_NEED_INIT);
 }
 
-HWTEST_F(IdmSessionTest, TestGetCacheRootSecret, TestSize.Level0)
+HWTEST_F(IdmSessionTest, TestGetCurRootSecret, TestSize.Level0)
 {
-    constexpr int32_t userId = 0;
-    Buffer *rootSecret = GetCacheRootSecret(userId);
-    EXPECT_EQ(rootSecret, nullptr);
+    LOG_INFO("start");
     struct SessionInfo session;
+    constexpr int32_t userId = 1;
     session.userId = userId;
-    rootSecret = GetCacheRootSecret(userId);
+    session.time = GetSystemTime();
+    session.oldRootSecret = nullptr;
+    session.curRootSecret = nullptr;
+    session.newRootSecret = nullptr;
+    g_session = &session;
+    Buffer *rootSecret = GetCurRootSecret(0);
     EXPECT_EQ(rootSecret, nullptr);
+    rootSecret = GetCurRootSecret(userId);
+    EXPECT_EQ(rootSecret, nullptr);
+    g_session = NULL;
+    LOG_INFO("end");
 }
 
-HWTEST_F(IdmSessionTest, TestCacheRootSecret, TestSize.Level0)
+HWTEST_F(IdmSessionTest, TestSetCurRootSecret, TestSize.Level0)
 {
-    constexpr int32_t userId = 0;
-    CacheRootSecret(userId, nullptr);
-    EXPECT_EQ(GetCacheRootSecret(userId), nullptr);
+    LOG_INFO("start");
+    struct SessionInfo session;
+    constexpr int32_t userId = 1;
+    session.userId = userId;
+    session.time = GetSystemTime();
+    session.oldRootSecret = nullptr;
+    session.curRootSecret = nullptr;
+    session.newRootSecret = nullptr;
+    g_session = &session;
+    SetCurRootSecret(0, nullptr);
+    EXPECT_EQ(GetCurRootSecret(userId), nullptr);
+    SetCurRootSecret(userId, nullptr);
+    EXPECT_EQ(GetCurRootSecret(userId), nullptr);
     constexpr int32_t dataLen = 32;
     Buffer *test = CreateBufferBySize(dataLen);
-    CacheRootSecret(userId, test);
+    test->contentSize = dataLen;
+    SetCurRootSecret(userId, test);
+    EXPECT_NE(GetCurRootSecret(userId), nullptr);
     DestoryBuffer(test);
+    g_session = NULL;
+    LOG_INFO("end");
 }
 
 HWTEST_F(IdmSessionTest, TestIsValidUserType, TestSize.Level0)
@@ -196,6 +222,131 @@ HWTEST_F(IdmSessionTest, TestIsValidUserType, TestSize.Level0)
     EXPECT_EQ(IsValidUserType(userType), RESULT_BAD_PARAM);
 }
 
+HWTEST_F(IdmSessionTest, TestGetOldRootSecret, TestSize.Level0)
+{
+    LOG_INFO("start");
+    struct SessionInfo session;
+    constexpr int32_t userId = 1;
+    session.userId = userId;
+    session.time = GetSystemTime();
+    session.oldRootSecret = nullptr;
+    session.curRootSecret = nullptr;
+    session.newRootSecret = nullptr;
+    g_session = &session;
+    Buffer *rootSecret = GetOldRootSecret(0);
+    EXPECT_EQ(rootSecret, nullptr);
+    rootSecret = GetOldRootSecret(userId);
+    EXPECT_EQ(rootSecret, nullptr);
+    g_session = NULL;
+    LOG_INFO("end");
+}
+
+HWTEST_F(IdmSessionTest, TestSetOldRootSecret, TestSize.Level0)
+{
+    LOG_INFO("start");
+    struct SessionInfo session;
+    constexpr int32_t userId = 1;
+    session.userId = userId;
+    session.time = GetSystemTime();
+    session.oldRootSecret = nullptr;
+    session.curRootSecret = nullptr;
+    session.newRootSecret = nullptr;
+    g_session = &session;
+    SetOldRootSecret(0, nullptr);
+    EXPECT_EQ(GetOldRootSecret(userId), nullptr);
+    SetOldRootSecret(userId, nullptr);
+    EXPECT_EQ(GetOldRootSecret(userId), nullptr);
+    constexpr int32_t dataLen = 32;
+    Buffer *test = CreateBufferBySize(dataLen);
+    test->contentSize = dataLen;
+    SetOldRootSecret(userId, test);
+    EXPECT_NE(GetOldRootSecret(userId), nullptr);
+    DestoryBuffer(test);
+    g_session = NULL;
+    LOG_INFO("end");
+}
+
+HWTEST_F(IdmSessionTest, TestGetNewRootSecret, TestSize.Level0)
+{
+    LOG_INFO("start");
+    struct SessionInfo session;
+    constexpr int32_t userId = 1;
+    session.userId = userId;
+    session.time = GetSystemTime();
+    session.oldRootSecret = nullptr;
+    session.curRootSecret = nullptr;
+    session.newRootSecret = nullptr;
+    g_session = &session;
+    Buffer *rootSecret = GetNewRootSecret(0);
+    EXPECT_EQ(rootSecret, nullptr);
+    rootSecret = GetNewRootSecret(userId);
+    EXPECT_EQ(rootSecret, nullptr);
+    g_session = NULL;
+    LOG_INFO("end");
+}
+
+HWTEST_F(IdmSessionTest, TestSetNewRootSecret, TestSize.Level0)
+{
+    LOG_INFO("start");
+    struct SessionInfo session;
+    constexpr int32_t userId = 1;
+    session.userId = userId;
+    session.time = GetSystemTime();
+    session.oldRootSecret = nullptr;
+    session.curRootSecret = nullptr;
+    session.newRootSecret = nullptr;
+    g_session = &session;
+    EXPECT_EQ(SetNewRootSecret(0, nullptr), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(GetNewRootSecret(userId), nullptr);
+    EXPECT_EQ(SetNewRootSecret(userId, nullptr), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(GetNewRootSecret(userId), nullptr);
+    constexpr int32_t dataLen = 32;
+    Buffer *test = CreateBufferBySize(dataLen);
+    test->contentSize = dataLen;
+    EXPECT_EQ(SetNewRootSecret(userId, test), RESULT_SUCCESS);
+    EXPECT_NE(GetNewRootSecret(userId), nullptr);
+    DestoryBuffer(test);
+    g_session = NULL;
+    LOG_INFO("end");
+}
+
+HWTEST_F(IdmSessionTest, TestGetPinChangeScence, TestSize.Level0)
+{
+    LOG_INFO("start");
+    struct SessionInfo session;
+    constexpr int32_t userId = 2135;
+    session.userId = userId;
+    session.time = GetSystemTime();
+    session.pinChangeScence = PIN_UPDATE_SCENCE;
+    g_session = &session;
+    PinChangeScence pinChangeScence = GetPinChangeScence(0);
+    EXPECT_EQ(pinChangeScence, 0);
+    pinChangeScence = GetPinChangeScence(userId);
+    EXPECT_EQ(pinChangeScence, 0);
+    g_session = NULL;
+    LOG_INFO("end");
+}
+
+HWTEST_F(IdmSessionTest, TestSetPinChangeScence, TestSize.Level0)
+{
+    LOG_INFO("start");
+    struct SessionInfo session;
+    constexpr int32_t userId = 2135;
+    session.userId = userId;
+    session.time = GetSystemTime();
+    session.pinChangeScence = PIN_UPDATE_SCENCE;
+    session.authType = PIN_AUTH;
+    g_session = &session;
+    SetPinChangeScence(0, DEFUALT);
+    SetPinChangeScence(userId, DEFUALT);
+    PinChangeScence pinChangeScence = GetPinChangeScence(userId);
+    EXPECT_EQ(pinChangeScence, PIN_UPDATE_SCENCE);
+    SetPinChangeScence(userId, ABANDONED_PIN_AUTH);
+    pinChangeScence = GetPinChangeScence(userId);
+    EXPECT_EQ(pinChangeScence, PIN_RESET_SCENCE);
+    g_session = NULL;
+    LOG_INFO("end");
+}
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS

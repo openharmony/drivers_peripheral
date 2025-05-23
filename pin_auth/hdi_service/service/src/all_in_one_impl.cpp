@@ -159,7 +159,7 @@ int32_t AllInOneImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
 }
 
 int32_t AllInOneImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
-    const sptr<HdiIExecutorCallback> &callbackObj)
+    const sptr<HdiIExecutorCallback> &callbackObj, const std::vector<uint8_t> &extraInfo)
 {
     IAM_LOGI("start");
     OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
@@ -180,6 +180,7 @@ int32_t AllInOneImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId
         .callback = callbackObj,
         .templateId = templateId,
         .algoParameter = algoParameter,
+        .extraInfo = extraInfo,
     };
     if (!scheduleList_.AddScheduleInfo(scheduleInfo)) {
         IAM_LOGE("Add scheduleInfo failed");
@@ -212,8 +213,7 @@ int32_t AllInOneImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64
     }
     IAM_LOGI("algorithm parameter len:%{public}zu version:%{public}u",
         pinAlgoParam.algoParameter.size(), pinAlgoParam.algoVersion);
-    result = AuthenticateInner(
-        scheduleId, templateIdList[0], pinAlgoParam.algoParameter, callbackObj);
+    result = AuthenticateInner(scheduleId, templateIdList[0], pinAlgoParam.algoParameter, callbackObj, extraInfo);
     if (result != SUCCESS) {
         IAM_LOGE("AuthenticateInner failed, fail code : %{public}d", result);
         return HDF_SUCCESS;
@@ -233,9 +233,9 @@ int32_t AllInOneImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64
 }
 
 int32_t AllInOneImpl::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &data,
-    std::vector<uint8_t> &resultTlv)
+    const std::vector<uint8_t> &extraInfo, std::vector<uint8_t> &resultTlv)
 {
-    int32_t result = pinHdi_->AuthPin(scheduleId, templateId, data, resultTlv);
+    int32_t result = pinHdi_->AuthPin(scheduleId, templateId, data, extraInfo, resultTlv);
     if (result != SUCCESS) {
         IAM_LOGE("Auth Pin failed, fail code : %{public}d", result);
         return result;
@@ -278,7 +278,7 @@ int32_t AllInOneImpl::SetData(uint64_t scheduleId, uint64_t authSubType, const s
             }
             break;
         case AUTH_PIN:
-            result = AuthPin(scheduleId, scheduleInfo.templateId, data, resultTlv);
+            result = AuthPin(scheduleId, scheduleInfo.templateId, data, scheduleInfo.extraInfo, resultTlv);
             if (result != SUCCESS) {
                 IAM_LOGE("Auth Pin failed, fail code : %{public}d", result);
             }
@@ -330,8 +330,8 @@ int32_t AllInOneImpl::GetProperty(
         return HDF_FAILURE;
     }
 
-    if (templateIdList.size() != 1) {
-        IAM_LOGE("templateIdList size is not 1");
+    if (templateIdList.size() == 0) {
+        IAM_LOGE("templateIdList size is 0");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -353,6 +353,33 @@ int32_t AllInOneImpl::GetProperty(
 int32_t AllInOneImpl::SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
     const sptr<HdiIExecutorCallback> &callbackObj)
 {
+    return HDF_SUCCESS;
+}
+
+int32_t AllInOneImpl::Abandon(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
+    const sptr<HdiIExecutorCallback> &callbackObj)
+{
+    IAM_LOGI("start");
+    if (callbackObj == nullptr) {
+        IAM_LOGE("callbackObj is nullptr");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (pinHdi_ == nullptr) {
+        IAM_LOGE("pinHdi_ is nullptr");
+        CallError(callbackObj, INVALID_PARAMETERS);
+        return HDF_SUCCESS;
+    }
+
+    std::vector<uint8_t> resultTlv;
+    int32_t result = pinHdi_->Abandon(scheduleId, templateId, extraInfo, resultTlv);
+    if (result != SUCCESS) {
+        IAM_LOGE("Abandon Pin failed, fail code : %{public}d", result);
+        CallError(callbackObj, GENERAL_ERROR);
+    }
+
+    if (callbackObj->OnResult(result, resultTlv) != SUCCESS) {
+        IAM_LOGE("callback OnResult failed");
+    }
     return HDF_SUCCESS;
 }
 

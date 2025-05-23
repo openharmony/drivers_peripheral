@@ -39,6 +39,9 @@ typedef enum CredentialConditionTag {
     CREDENTIAL_CONDITION_EXECUTOR_MATCHER = 16, // 1 << 4
     CREDENTIAL_CONDITION_USER_ID = 32, // 1 << 5
     CREDENTIAL_CONDITION_NEED_CACHE_PIN = 64, // 1 << 6
+    CREDENTIAL_CONDITION_NEED_ABANDON = 128, // 1 << 7
+    CREDENTIAL_CONDITION_ABANDON = 256, // 1 << 8
+    CREDENTIAL_CONDITION_CACHE_PIN = 512, // 1 << 8
 } CredentialConditionTag;
 
 typedef struct {
@@ -71,14 +74,28 @@ void SetCredentialConditionAuthType(CredentialCondition *condition, uint32_t aut
 void SetCredentialConditionExecutorSensorHint(CredentialCondition *condition, uint32_t executorSensorHint);
 void SetCredentialConditionExecutorMatcher(CredentialCondition *condition, uint32_t executorMatcher);
 void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId);
-void SetCredentiaConditionNeedCachePin(CredentialCondition *condition);
-
+void SetCredentialConditionNeedCachePin(CredentialCondition *condition);
+void SetCredentialConditionNeedAbandonPin(CredentialCondition *condition);
+void SetCredentialConditionAbandonPin(CredentialCondition *condition);
+void SetCredentialConditionCachePin(CredentialCondition *condition);
 ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfolen, uint32_t *userInfoCount);
 ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
 ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param);
+ResultCode QueryPinExpiredInfo(int64_t *pinExpiredPeriod);
 ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo);
 bool GetEnableStatus(int32_t userId, uint32_t authType);
 ResultCode QueryCredentialByIdFunc(uint64_t credentialId, LinkedList **creds);
+ResultCode QueryAbandonCredential(int32_t userId, LinkedList **creds);
+ResultCode GetCredentialListByAuthType(int32_t userId, uint32_t authType, LinkedList **creds);
+ResultCode GetCredentialListByCachePin(int32_t userId, LinkedList **creds);
+ResultCode GetCredentialListByAbandonFlag(int32_t userId, uint32_t authType, LinkedList **creds);
+ResultCode GetCredentialByUserIdAndCredId(int32_t userId, uint64_t credentialId, CredentialInfoHal *credentialInfo);
+ResultCode UpdateAbandonResultForReset(int32_t userId, bool *isDelete, CredentialInfoHal *credentialInfo);
+ResultCode UpdateAbandonResultForUpdate(int32_t userId, bool *isDelete, CredentialInfoHal *credentialInfo);
+bool IsAbandonCredentialExpired(const CredentialInfoHal *credentialInfo);
+int64_t CalcCredentialValidPeriod(const CredentialInfoHal *credentialInfo);
+int64_t GetCredentialValidPeriod(int32_t userId, uint64_t credentialId);
+ResultCode ClearAbandonExpiredCredential(int32_t userId, CredentialInfoHal *credentialInfo);
 
 #ifdef __cplusplus
 }

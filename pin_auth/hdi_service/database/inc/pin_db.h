@@ -28,7 +28,7 @@ extern "C" {
 #define INIT_START_FREEZE_TIMES 0
 #define CONST_PIN_DATA_LEN 64U
 #define CONST_SALT_LEN 32U
-#define RESULT_TLV_LEN 240U
+#define RESULT_TLV_LEN 2048U
 
 typedef struct {
     uint64_t scheduleId;
@@ -36,6 +36,13 @@ typedef struct {
     uint8_t salt[CONST_SALT_LEN];
     uint8_t pinData[CONST_PIN_DATA_LEN];
 } __attribute__((__packed__)) PinEnrollParam;
+
+typedef struct {
+    uint64_t oldTemplateId;
+    uint64_t curTemplateId;
+    uint64_t newTemplateId;
+    Buffer *newRootSecret;
+} __attribute__((__packed__)) AbandonCacheParam;
 
 bool LoadPinDb(void);
 void DestroyPinDb(void);
@@ -53,7 +60,13 @@ ResultCode GetAntiBruteInfo(uint64_t templateId, uint32_t *authErrorCount, uint6
 ResultCode RefreshAntiBruteInfoToFile(uint64_t templateId);
 ResultCode VerifyTemplateDataPin(const uint64_t *templateIdList, uint32_t templateIdListLen);
 int32_t GetNextFailLockoutDuration(uint32_t authErrorCount);
-
+Buffer *GetRootSecretPlainInfo(Buffer *oldRootSecret, const Buffer *cipherInfo);
+Buffer *GenerateDecodeRootSecret(uint64_t templateId, Buffer *oldRootSecret);
+ResultCode Abandon(uint64_t oldTemplateId, uint64_t newTemplateId, Buffer *oldRootSecret, Buffer *newRootSecret);
+void DestroyAbandonParam();
+ResultCode WriteRootSecretFile(uint64_t templateId, uint64_t newTemplateId, Buffer *ciperInfo);
+ResultCode ReadRootSecretFile(uint64_t templateId, uint64_t *newTemplateId, Buffer **ciperInfo);
+ResultCode ReWriteRootSecretFile(uint64_t templateId);
 #ifdef __cplusplus
 }
 #endif // __cplusplus

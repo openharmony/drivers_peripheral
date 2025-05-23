@@ -32,12 +32,14 @@
 #define IAM_STATIC static
 #endif
 
-IAM_STATIC ResultCode SetScheduleParam(const PermissionCheckParam *param, ScheduleParam *scheduleParam)
+IAM_STATIC ResultCode SetScheduleParam(const PermissionCheckParam *param, ScheduleType scheduleType,
+    ScheduleParam *scheduleParam)
 {
     scheduleParam->associateId.userId = param->userId;
     scheduleParam->authType = param->authType;
     scheduleParam->userType = param->userType;
-    scheduleParam->scheduleMode = SCHEDULE_MODE_ENROLL;
+    scheduleParam->scheduleMode = (scheduleType == SCHEDULE_TYPE_ABANDON) ?
+        SCHEDULE_MODE_ABANDON : SCHEDULE_MODE_ENROLL;
     scheduleParam->collectorSensorHint = param->executorSensorHint;
 
     Uint8Array localUdid = { scheduleParam->localUdid, UDID_LEN };
@@ -51,14 +53,130 @@ IAM_STATIC ResultCode SetScheduleParam(const PermissionCheckParam *param, Schedu
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param)
+IAM_STATIC ResultCode GetEnrollTemplateIdList(ScheduleParam *scheduleParam, const PermissionCheckParam *param)
 {
+    LinkedList *credList = NULL;
+    if (GetCredentialListByAuthType(param->userId, param->authType, &credList) != RESULT_SUCCESS) {
+        LOG_ERROR("query credential failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    uint64_t templateIdsBuffer[MAX_CREDENTIAL_OUTPUT];
+    uint32_t len = 0;
+    LinkedListNode *temp = credList->head;
+    while (temp != NULL) {
+        if (temp->data == NULL) {
+            LOG_ERROR("list node is invalid");
+            DestroyLinkedList(credList);
+            return RESULT_GENERAL_ERROR;
+        }
+        CredentialInfoHal *credentialHal = (CredentialInfoHal *)(temp->data);
+        if (len >= MAX_CREDENTIAL_OUTPUT) {
+            LOG_ERROR("len out of bound");
+            DestroyLinkedList(credList);
+            return RESULT_GENERAL_ERROR;
+        }
+        templateIdsBuffer[len] = credentialHal->templateId;
+        ++len;
+        temp = temp->next;
+    }
+
+    scheduleParam->templateIds = CreateUint64ArrayByData(templateIdsBuffer, len);
+    DestroyLinkedList(credList);
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode CopyTemplateIds(LinkedList *credList, uint64_t *templateIdsBuffer,
+    uint32_t tempalteIdsMaxLen, uint32_t *templateIdsLen)
+{
+    uint32_t len = *templateIdsLen;
+    LinkedListNode *temp = credList->head;
+    while (temp != NULL) {
+        if (temp->data == NULL) {
+            LOG_ERROR("list node is invalid");
+            return RESULT_GENERAL_ERROR;
+        }
+        CredentialInfoHal *credentialHal = (CredentialInfoHal *)(temp->data);
+        if (len >= MAX_CREDENTIAL_OUTPUT) {
+            LOG_ERROR("len out of bound");
+            return RESULT_GENERAL_ERROR;
+        }
+        templateIdsBuffer[len] = credentialHal->templateId;
+        ++len;
+        temp = temp->next;
+    }
+    *templateIdsLen = len;
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode GetAbandonTemplateIdList(ScheduleParam *scheduleParam, const PermissionCheckParam *param)
+{
+    uint64_t templateIdsBuffer[MAX_CREDENTIAL_OUTPUT];
+    uint32_t len = 0;
+    LinkedList *currCredList = NULL;
+    LinkedList *cacheCredList = NULL;
+    PinChangeScence pinChangeScence = GetPinChangeScence(param->userId);
+    if (pinChangeScence == PIN_RESET_SCENCE) {
+        if (GetCredentialListByAbandonFlag(param->userId, param->authType, &currCredList) != RESULT_SUCCESS) {
+            LOG_ERROR("query abandon credential failed");
+            goto FAIL;
+        }
+    } else {
+        if (GetCredentialListByAuthType(param->userId, param->authType, &currCredList) != RESULT_SUCCESS) {
+            LOG_ERROR("query current credential failed");
+            goto FAIL;
+        }
+    }
+
+    if (GetCredentialListByCachePin(param->userId, &cacheCredList) != RESULT_SUCCESS) {
+        LOG_ERROR("query current credential failed");
+        goto FAIL;
+    }
+
+    if (currCredList != NULL &&
+        CopyTemplateIds(currCredList, templateIdsBuffer, MAX_CREDENTIAL_OUTPUT, &len) != RESULT_SUCCESS) {
+        LOG_ERROR("copy current credential failed");
+        goto FAIL;
+    }
+
+    if (cacheCredList != NULL &&
+        CopyTemplateIds(cacheCredList, templateIdsBuffer, MAX_CREDENTIAL_OUTPUT, &len) != RESULT_SUCCESS) {
+        LOG_ERROR("copy cache credential failed");
+        goto FAIL;
+    }
+    scheduleParam->templateIds = CreateUint64ArrayByData(templateIdsBuffer, len);
+FAIL:
+    DestroyLinkedList(currCredList);
+    DestroyLinkedList(cacheCredList);
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode GetTemplateIdList(ScheduleParam *scheduleParam, const PermissionCheckParam *param,
+    ScheduleType scheduleType)
+{
+    switch (scheduleType) {
+        case SCHEDULE_TYPE_ENROLL:
+        case SCHEDULE_TYPE_UPDATE: {
+            return GetEnrollTemplateIdList(scheduleParam, param);
+        }
+        case SCHEDULE_TYPE_ABANDON: {
+            return GetAbandonTemplateIdList(scheduleParam, param);
+        }
+        default: {
+            LOG_ERROR("scheduleType:%{public}d", scheduleType);
+        }
+    }
+    return RESULT_GENERAL_ERROR;
+}
+
+IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param, ScheduleType scheduleType)
+{
+    ResultCode ret = RESULT_SUCCESS;
     ScheduleParam scheduleParam = {};
-    if (SetScheduleParam(param, &scheduleParam) != RESULT_SUCCESS) {
+    if (SetScheduleParam(param, scheduleType, &scheduleParam) != RESULT_SUCCESS) {
         LOG_ERROR("SetScheduleParam failed");
         return NULL;
     }
-    
+
     if (scheduleParam.collectorSensorHint != INVALID_SENSOR_HINT) {
         ResultCode ret = QueryCollecterMatcher(scheduleParam.authType, scheduleParam.collectorSensorHint,
             &scheduleParam.executorMatcher);
@@ -68,128 +186,107 @@ IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param
         }
     }
 
-    LinkedList *credList = NULL;
-    if (QueryCredentialFunc(param->userId, param->authType, &credList) != RESULT_SUCCESS) {
-        LOG_ERROR("query credential failed");
+    ret = GetTemplateIdList(&scheduleParam, param, scheduleType);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetTemplateIdList failed");
+        DestroyUint64Array(&(scheduleParam.templateIds));
         return NULL;
     }
-    uint64_t templateIdsBuffer[MAX_CREDENTIAL_OUTPUT];
-    uint32_t len = 0;
-    LinkedListNode *temp = credList->head;
-    while (temp != NULL) {
-        if (temp->data == NULL) {
-            LOG_ERROR("list node is invalid");
-            DestroyLinkedList(credList);
-            return NULL;
-        }
-        CredentialInfoHal *credentialHal = (CredentialInfoHal *)(temp->data);
-        if (len >= MAX_CREDENTIAL_OUTPUT) {
-            LOG_ERROR("len out of bound");
-            DestroyLinkedList(credList);
-            return NULL;
-        }
-        templateIdsBuffer[len] = credentialHal->templateId;
-        ++len;
-        temp = temp->next;
+    CoAuthSchedule *coAuthSchedule = GenerateSchedule(&scheduleParam);
+    if (coAuthSchedule == NULL) {
+        LOG_ERROR("GenerateSchedule failed");
+        DestroyUint64Array(&(scheduleParam.templateIds));
+        return NULL;
     }
-
-    Uint64Array templateIds = { templateIdsBuffer, len };
-    scheduleParam.templateIds = &templateIds;
-
-    DestroyLinkedList(credList);
-    return GenerateSchedule(&scheduleParam);
+    DestroyUint64Array(&(scheduleParam.templateIds));
+    return coAuthSchedule;
 }
 
-IAM_STATIC ResultCode GenerateCoAuthSchedule(PermissionCheckParam *param, bool isUpdate, uint64_t *scheduleId)
+CoAuthSchedule *GenerateCoAuthSchedule(PermissionCheckParam *param, ScheduleType scheduleType)
 {
-    CoAuthSchedule *enrollSchedule = GenerateIdmSchedule(param);
+    CoAuthSchedule *enrollSchedule = GenerateIdmSchedule(param, scheduleType);
     if (enrollSchedule == NULL) {
         LOG_ERROR("enrollSchedule malloc failed");
-        return RESULT_NO_MEMORY;
+        return NULL;
     }
     ResultCode ret = AddCoAuthSchedule(enrollSchedule);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("add coauth schedule failed");
         goto EXIT;
     }
-    ret = AssociateCoauthSchedule(enrollSchedule->scheduleId, param->authType, isUpdate);
+    ret = AssociateCoauthSchedule(enrollSchedule->scheduleId, param->authType, scheduleType);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("idm associate coauth schedule failed");
         RemoveCoAuthSchedule(enrollSchedule->scheduleId);
         goto EXIT;
     }
-    *scheduleId = enrollSchedule->scheduleId;
+    return enrollSchedule;
 
 EXIT:
     DestroyCoAuthSchedule(enrollSchedule);
-    return ret;
+    return NULL;
 }
 
-ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId)
+ResultCode CheckEnrollPermission(PermissionCheckParam *param)
 {
-    if (scheduleId == NULL) {
-        LOG_ERROR("scheduleId is null");
-        return RESULT_BAD_PARAM;
-    }
-    if (!GetEnableStatus(param.userId, param.authType)) {
-        LOG_ERROR("authType is not support %{public}d", param.authType);
+    if (!GetEnableStatus(param->userId, param->authType)) {
+        LOG_ERROR("authType is not support %{public}d", param->authType);
         return RESULT_TYPE_NOT_SUPPORT;
     }
-    ResultCode ret = IsValidUserType(param.userType);
+    ResultCode ret = IsValidUserType(param->userType);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("userType is invalid");
         return ret;
     }
-    ret = CheckSessionValid(param.userId);
+    ret = CheckSessionValid(param->userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("session is invalid");
         return ret;
     }
-    UserAuthTokenHal *authToken = (UserAuthTokenHal *)param.token;
-    ret = CheckSpecification(param.userId, param.authType);
+    UserAuthTokenHal *authToken = (UserAuthTokenHal *)param->token;
+    ret = CheckSpecification(param->userId, param->authType);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("check specification failed, authType is %{public}u, ret is %{public}d", param.authType, ret);
+        LOG_ERROR("check specification failed, authType is %{public}u, ret is %{public}d", param->authType, ret);
         return ret;
     }
-    if (param.authType != PIN_AUTH) {
-        ret = CheckIdmOperationToken(param.userId, authToken);
+    if (param->authType != PIN_AUTH) {
+        ret = CheckIdmOperationToken(param->userId, authToken);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("a valid token is required");
             return RESULT_VERIFY_TOKEN_FAIL;
         }
     }
-
-    return GenerateCoAuthSchedule(&param, false, scheduleId);
+    return RESULT_SUCCESS;
 }
 
-ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleId)
+ResultCode CheckUpdatePermission(PermissionCheckParam *param)
 {
-    if (scheduleId == NULL || param.authType != PIN_AUTH) {
+    if (param->authType != PIN_AUTH) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
-    if (!GetEnableStatus(param.userId, param.authType)) {
-        LOG_ERROR("authType is not support %{public}d", param.authType);
+    if (!GetEnableStatus(param->userId, param->authType)) {
+        LOG_ERROR("authType is not support %{public}d", param->authType);
         return RESULT_TYPE_NOT_SUPPORT;
     }
-    ResultCode ret = CheckSessionValid(param.userId);
+    ResultCode ret = CheckSessionValid(param->userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("session is invalid");
         return ret;
     }
-    ret = CheckSpecification(param.userId, param.authType);
+    ret = CheckSpecification(param->userId, param->authType);
     if (ret != RESULT_EXCEED_LIMIT) {
-        LOG_ERROR("no pin or exception, authType is %{public}u, ret is %{public}d", param.authType, ret);
+        LOG_ERROR("no pin or exception, authType is %{public}u, ret is %{public}d", param->authType, ret);
         return ret;
     }
-    UserAuthTokenHal *authToken = (UserAuthTokenHal *)param.token;
-    ret = CheckIdmOperationToken(param.userId, authToken);
+    UserAuthTokenHal *authToken = (UserAuthTokenHal *)param->token;
+    ret = CheckIdmOperationToken(param->userId, authToken);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("a valid token is required");
         return RESULT_VERIFY_TOKEN_FAIL;
     }
 
-    return GenerateCoAuthSchedule(&param, true, scheduleId);
+    return RESULT_SUCCESS;
 }
 
 IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const ExecutorResultInfo *result,
@@ -201,6 +298,8 @@ IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const Execu
     credentialInfo->executorSensorHint = GetScheduleVerifierSensorHint(schedule);
     credentialInfo->executorMatcher = schedule->executors[0].executorMatcher;
     credentialInfo->credentialType = result->authSubType;
+    credentialInfo->isAbandoned = false;
+    credentialInfo->abandonedSysTime = 0;
 }
 
 IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo,
@@ -210,7 +309,7 @@ IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *ex
     uint32_t scheduleAuthType;
     ResultCode ret = GetEnrollScheduleInfo(&currentScheduleId, &scheduleAuthType);
     if (ret != RESULT_SUCCESS || executorInfo->scheduleId != currentScheduleId) {
-        LOG_ERROR("schedule is mismatch");
+        LOG_ERROR("schedule is mismatch, ret:%{public}d", ret);
         return RESULT_GENERAL_ERROR;
     }
     ret = CheckSessionTimeout();
@@ -362,9 +461,36 @@ EXIT:
     return ret;
 }
 
-ResultCode DeleteCredentialFunc(CredentialDeleteParam param, CredentialInfoHal *credentialInfo)
+static ResultCode GenerateAbandonSchedule(CredentialDeleteParam param, CoAuthSchedule *info)
 {
-    if (credentialInfo == NULL) {
+    PermissionCheckParam checkParam = {};
+    if (memcpy_s(checkParam.token, AUTH_TOKEN_LEN, param.token, AUTH_TOKEN_LEN) != EOK) {
+        LOG_ERROR("bad copy");
+        return RESULT_BAD_COPY;
+    }
+
+    checkParam.userId = param.userId;
+    checkParam.authType = PIN_AUTH;
+    CoAuthSchedule *scheduleInfo = GenerateCoAuthSchedule(&checkParam, SCHEDULE_TYPE_ABANDON);
+    if (scheduleInfo == NULL) {
+        LOG_ERROR("get schedule info failed");
+        BreakOffCoauthSchedule();
+        return RESULT_UNKNOWN;
+    }
+
+    if (memcpy_s(info, sizeof(CoAuthSchedule), scheduleInfo, sizeof(CoAuthSchedule)) != EOK) {
+        LOG_ERROR("bad copy");
+        DestroyCoAuthSchedule(scheduleInfo);
+        BreakOffCoauthSchedule();
+        return RESULT_BAD_COPY;
+    }
+
+    return RESULT_SUCCESS;
+}
+
+ResultCode DeleteCredentialFunc(CredentialDeleteParam param, OperateResult *operateResult)
+{
+    if (operateResult == NULL) {
         LOG_ERROR("param is null");
         return RESULT_BAD_PARAM;
     }
@@ -379,12 +505,25 @@ ResultCode DeleteCredentialFunc(CredentialDeleteParam param, CredentialInfoHal *
         return RESULT_VERIFY_TOKEN_FAIL;
     }
 
-    ret = DeleteCredentialInfo(param.userId, param.credentialId, credentialInfo);
+    CredentialInfoHal credentialInfo = {};
+    ret = GetCredentialByUserIdAndCredId(param.userId, param.credentialId, &credentialInfo);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetCredentialByUserIdAndCredId failed, ret:%d", ret);
+        return ret;
+    }
+
+    if (credentialInfo.authType == PIN_AUTH && !credentialInfo.isAbandoned) {
+        operateResult->operateType = ABANDON_CREDENTIAL;
+        return GenerateAbandonSchedule(param, &(operateResult->scheduleInfo));
+    }
+    operateResult->operateType = DELETE_CREDENTIAL;
+    ret = DeleteCredentialInfo(param.userId, param.credentialId, &(operateResult->credentialInfo));
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("delete database info failed");
         return RESULT_BAD_SIGN;
     }
-    return ret;
+
+    return RESULT_SUCCESS;
 }
 
 ResultCode QueryCredentialFunc(int32_t userId, uint32_t authType, LinkedList **creds)
@@ -398,6 +537,7 @@ ResultCode QueryCredentialFunc(int32_t userId, uint32_t authType, LinkedList **c
     if (authType != DEFAULT_AUTH_TYPE) {
         SetCredentialConditionAuthType(&condition, authType);
     }
+    SetCredentialConditionNeedAbandonPin(&condition);
     *creds = QueryCredentialLimit(&condition);
     if (*creds == NULL) {
         LOG_ERROR("query credential failed");
@@ -491,9 +631,9 @@ IAM_STATIC ResultCode GetUpdateCredentialOutput(int32_t userId, const Buffer *ro
         LOG_ERROR("copy rootSecret fail");
         goto ERROR;
     }
-    output->oldRootSecret = GetCacheRootSecret(userId);
+    output->oldRootSecret = CopyBuffer(GetCurRootSecret(userId));
     if (!IsBufferValid(output->oldRootSecret)) {
-        LOG_ERROR("GetCacheRootSecret fail");
+        LOG_ERROR("GetCurRootSecret fail");
         goto ERROR;
     }
     output->authToken = GetAuthTokenForPinEnroll(&credInfo, userId);
@@ -552,7 +692,11 @@ ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, Up
         LOG_ERROR("GetUpdateCredentialOutputRootSecret fail");
         goto EXIT;
     }
-
+    ret = SetNewRootSecret(userId, executorResultInfo->rootSecret);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("SetNewRootSecret fail");
+        goto EXIT;
+    }
 EXIT:
     DestroyExecutorResultInfo(executorResultInfo);
     return ret;
@@ -576,7 +720,8 @@ ResultCode QueryCredentialByIdFunc(uint64_t credentialId, LinkedList **creds)
     }
     CredentialCondition condition = {};
     SetCredentialConditionCredentialId(&condition, credentialId);
-    SetCredentiaConditionNeedCachePin(&condition);
+    SetCredentialConditionNeedCachePin(&condition);
+    SetCredentialConditionNeedAbandonPin(&condition);
     *creds = QueryCredentialLimit(&condition);
     if (*creds == NULL) {
         LOG_ERROR("query credential failed");
@@ -584,4 +729,63 @@ ResultCode QueryCredentialByIdFunc(uint64_t credentialId, LinkedList **creds)
     }
     LOG_INFO("query credential success");
     return RESULT_SUCCESS;
+}
+
+ResultCode UpdateAbandonResultInnerFunc(int32_t userId, uint64_t scheduleId,
+    bool *isDelete, CredentialInfoHal *credentialInfo)
+{
+    const CoAuthSchedule *schedule = GetCoAuthSchedule(scheduleId);
+    if (schedule == NULL) {
+        LOG_ERROR("schedule is null");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    PinChangeScence pinChangeScence = GetPinChangeScence(userId);
+    if (pinChangeScence == PIN_RESET_SCENCE) {
+        return UpdateAbandonResultForReset(userId, isDelete, credentialInfo);
+    } else {
+        return UpdateAbandonResultForUpdate(userId, isDelete, credentialInfo);
+    }
+
+    LOG_ERROR("UpdateAbandonResultInnerFunc fail, pinChangeScence:%d", pinChangeScence);
+    return RESULT_GENERAL_ERROR;
+}
+
+ResultCode UpdateAbandonResultFunc(int32_t userId, const Buffer *scheduleResult,
+    bool *isDelete, CredentialInfoHal *credentialInfo)
+{
+    if (!IsBufferValid(scheduleResult) || isDelete == NULL || credentialInfo == NULL) {
+        LOG_ERROR("query credential failed");
+        return RESULT_BAD_PARAM;
+    }
+
+    ExecutorResultInfo *executorResultInfo = CreateExecutorResultInfo(scheduleResult);
+    if (executorResultInfo == NULL) {
+        LOG_ERROR("executorResultInfo is null");
+        return RESULT_UNKNOWN;
+    }
+
+    ResultCode ret = RESULT_GENERAL_ERROR;
+    if (executorResultInfo->result != RESULT_SUCCESS) {
+        LOG_ERROR("executorResultInfo result is %d", executorResultInfo->result);
+        goto EXIT;
+    }
+
+    ret = UpdateAbandonResultInnerFunc(userId, executorResultInfo->scheduleId, isDelete, credentialInfo);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("UpdateAbandonResultInnerFunc fali, ret:%d", ret);
+        goto EXIT;
+    }
+EXIT:
+    DestroyExecutorResultInfo(executorResultInfo);
+    return ret;
+}
+
+ResultCode ClearUnavailableCredentialFunc(int32_t userId, CredentialInfoHal *credentialInfo)
+{
+    if (CheckSessionValid(userId) == RESULT_SUCCESS) {
+        LOG_ERROR("session is vliad, expired pin delay delete");
+        return RESULT_SUCCESS;
+    }
+    return ClearAbandonExpiredCredential(userId, credentialInfo);
 }

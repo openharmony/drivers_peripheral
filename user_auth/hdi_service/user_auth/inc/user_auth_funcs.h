@@ -27,7 +27,6 @@ extern "C" {
 #endif
 
 #define REUSED_UNLOCK_TOKEN_PERIOD (5 * 60 * 1000)
-#define NO_SET_PIN_EXPIRED_PERIOD (-1)
 
 typedef struct AuthResult {
     int32_t userId;

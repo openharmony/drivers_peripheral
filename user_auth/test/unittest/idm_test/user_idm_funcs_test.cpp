@@ -26,6 +26,7 @@
 #include "idm_session.h"
 #include "pool.h"
 #include "user_idm_funcs.h"
+#include "udid_manager.h"
 
 extern "C" {
     extern struct SessionInfo {
@@ -35,13 +36,17 @@ extern "C" {
         uint64_t validAuthTokenTime;
         uint8_t challenge[CHALLENGE_LEN];
         uint64_t scheduleId;
-        bool isUpdate;
+        ScheduleType scheduleType;
         bool isScheduleValid;
+        PinChangeScence pinChangeScence;
+        Buffer *oldRootSecret;
+        Buffer *curRootSecret;
+        Buffer *newRootSecret;
     } *g_session;
     extern LinkedList *g_poolList;
     extern LinkedList *g_userInfoList;
     extern LinkedList *g_scheduleList;
-    extern CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param);
+    extern CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param, ScheduleType scheduleType);
     extern int32_t GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo,
         CredentialInfoHal *credentialInfo, const CoAuthSchedule *schedule);
     extern int32_t GetDeletedCredential(int32_t userId, CredentialInfoHal *deletedCredential);
@@ -70,7 +75,8 @@ HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_001, TestSize.Level0)
     PermissionCheckParam param = {};
     constexpr uint32_t executorSensorHint = 10;
     param.executorSensorHint = executorSensorHint;
-    EXPECT_EQ(GenerateIdmSchedule(&param), nullptr);
+    ScheduleType scheduleType = SCHEDULE_TYPE_ENROLL;
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
 }
 
 HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_002, TestSize.Level0)
@@ -78,22 +84,226 @@ HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_002, TestSize.Level0)
     InitResourcePool();
     EXPECT_NE(g_poolList, nullptr);
     constexpr uint32_t executorSensorHint = 10;
-    ExecutorInfoHal info = {};
-    info.authType = PIN_AUTH;
-    info.executorSensorHint = executorSensorHint;
-    info.executorRole = COLLECTOR;
-    g_poolList->insert(g_poolList, static_cast<void *>(&info));
+    ExecutorInfoHal *info = static_cast<ExecutorInfoHal *>(malloc(sizeof(ExecutorInfoHal)));
+    EXPECT_NE(info, nullptr);
+    info->authType = PIN_AUTH;
+    info->executorSensorHint = executorSensorHint;
+    info->executorRole = COLLECTOR;
+    g_poolList->insert(g_poolList, static_cast<void *>(info));
     PermissionCheckParam param = {};
     param.authType = PIN_AUTH;
     param.executorSensorHint = executorSensorHint;
-    EXPECT_EQ(GenerateIdmSchedule(&param), nullptr);
-    g_poolList = nullptr;
+    ScheduleType scheduleType = SCHEDULE_TYPE_ENROLL;
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    DestroyResourcePool();
+}
+
+HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_003, TestSize.Level0)
+{
+    LOG_INFO("TestGenerateIdmSchedule_003 start");
+    PermissionCheckParam param = {};
+    constexpr uint32_t executorSensorHint = 0;
+    constexpr int32_t userId = 1;
+    param.userId = userId;
+    param.authType = PIN_AUTH;
+    param.executorSensorHint = executorSensorHint;
+    ScheduleType scheduleType = SCHEDULE_TYPE_UPDATE;
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    param.executorSensorHint = INVALID_SENSOR_HINT;
+    static char udid[UDID_LEN + 1] = "0123456789012345678901234567890123456789012345678901234567890123";
+    SetLocalUdid(udid);
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    InitResourcePool();
+    InitCoAuth();
+    ExecutorInfoHal *info = static_cast<ExecutorInfoHal *>(malloc(sizeof(ExecutorInfoHal)));
+    EXPECT_NE(info, nullptr);
+    info->authType = PIN_AUTH;
+    info->executorSensorHint = executorSensorHint;
+    info->executorRole = ALL_IN_ONE;
+    memcpy_s(info->deviceUdid, UDID_LEN, udid, UDID_LEN);
+    g_poolList->insert(g_poolList, static_cast<void *>(info));
+    EXPECT_NE(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    DestroyResourcePool();
+    DestoryCoAuth();
+    LOG_INFO("TestGenerateIdmSchedule_003 end");
+}
+
+HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_004, TestSize.Level0)
+{
+    LOG_INFO("TestGenerateIdmSchedule_004 start");
+    InitResourcePool();
+    EXPECT_NE(g_poolList, nullptr);
+    constexpr uint32_t executorSensorHint = 0;
+    ExecutorInfoHal *info = static_cast<ExecutorInfoHal *>(malloc(sizeof(ExecutorInfoHal)));
+    EXPECT_NE(info, nullptr);
+    info->authType = PIN_AUTH;
+    info->executorSensorHint = executorSensorHint;
+    info->executorRole = ALL_IN_ONE;
+    g_poolList->insert(g_poolList, static_cast<void *>(info));
+    PermissionCheckParam param = {};
+    param.authType = PIN_AUTH;
+    param.executorSensorHint = executorSensorHint;
+    ScheduleType scheduleType = SCHEDULE_TYPE_UPDATE;
+    static char udid[UDID_LEN + 1] = "0123456789012345678901234567890123456789012345678901234567890123";
+    SetLocalUdid(udid);
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    DestroyResourcePool();
+    LOG_INFO("TestGenerateIdmSchedule_004 end");
+}
+
+HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_005, TestSize.Level0)
+{
+    LOG_INFO("TestGenerateIdmSchedule_005 start");
+    PermissionCheckParam param = {};
+    constexpr uint32_t executorSensorHint = 10;
+    constexpr int32_t userId = 1;
+    param.userId = userId;
+    param.authType = PIN_AUTH;
+    param.executorSensorHint = executorSensorHint;
+    ScheduleType scheduleType = SCHEDULE_TYPE_ABANDON;
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    param.executorSensorHint = INVALID_SENSOR_HINT;
+    static char udid[UDID_LEN + 1] = "0123456789012345678901234567890123456789012345678901234567890123";
+    SetLocalUdid(udid);
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    InitResourcePool();
+    InitCoAuth();
+    ExecutorInfoHal *info = static_cast<ExecutorInfoHal *>(malloc(sizeof(ExecutorInfoHal)));
+    EXPECT_NE(info, nullptr);
+    info->authType = PIN_AUTH;
+    info->executorSensorHint = executorSensorHint;
+    info->executorRole = ALL_IN_ONE;
+    memcpy_s(info->deviceUdid, UDID_LEN, udid, UDID_LEN);
+    g_poolList->insert(g_poolList, static_cast<void *>(info));
+    struct SessionInfo session = {};
+    session.userId = userId;
+    session.isScheduleValid = true;
+    session.scheduleId = 10;
+    session.authType = PIN_AUTH;
+    session.time = GetSystemTime();
+    session.pinChangeScence = PIN_UPDATE_SCENCE;
+    g_session = &session;
+    EXPECT_NE(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    DestroyResourcePool();
+    DestoryCoAuth();
+    g_session = nullptr;
+    LOG_INFO("TestGenerateIdmSchedule_005 end");
+}
+
+HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_006, TestSize.Level0)
+{
+    LOG_INFO("TestGenerateIdmSchedule_006 start");
+    PermissionCheckParam param = {};
+    constexpr uint32_t executorSensorHint = 10;
+    constexpr int32_t userId = 1;
+    param.userId = userId;
+    param.authType = PIN_AUTH;
+    param.executorSensorHint = executorSensorHint;
+    ScheduleType scheduleType = SCHEDULE_TYPE_ABANDON;
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    param.executorSensorHint = INVALID_SENSOR_HINT;
+    static char udid[UDID_LEN + 1] = "0123456789012345678901234567890123456789012345678901234567890123";
+    SetLocalUdid(udid);
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = true;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    InitResourcePool();
+    InitCoAuth();
+    ExecutorInfoHal *info = static_cast<ExecutorInfoHal *>(malloc(sizeof(ExecutorInfoHal)));
+    EXPECT_NE(info, nullptr);
+    info->authType = PIN_AUTH;
+    info->executorSensorHint = executorSensorHint;
+    info->executorRole = ALL_IN_ONE;
+    memcpy_s(info->deviceUdid, UDID_LEN, udid, UDID_LEN);
+    g_poolList->insert(g_poolList, static_cast<void *>(info));
+    struct SessionInfo session = {};
+    session.userId = userId;
+    session.isScheduleValid = true;
+    session.scheduleId = 10;
+    session.authType = PIN_AUTH;
+    session.time = GetSystemTime();
+    session.pinChangeScence = PIN_RESET_SCENCE;
+    g_session = &session;
+    EXPECT_NE(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    DestroyResourcePool();
+    DestoryCoAuth();
+    g_session = nullptr;
+    LOG_INFO("TestGenerateIdmSchedule_006 end");
+}
+
+HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_007, TestSize.Level0)
+{
+    LOG_INFO("TestGenerateIdmSchedule_006 start");
+    InitResourcePool();
+    EXPECT_NE(g_poolList, nullptr);
+    constexpr uint32_t executorSensorHint = 10;
+    ExecutorInfoHal *info = static_cast<ExecutorInfoHal *>(malloc(sizeof(ExecutorInfoHal)));
+    EXPECT_NE(info, nullptr);
+    info->authType = PIN_AUTH;
+    info->executorSensorHint = executorSensorHint;
+    info->executorRole = ALL_IN_ONE;
+    g_poolList->insert(g_poolList, static_cast<void *>(info));
+    PermissionCheckParam param = {};
+    param.authType = PIN_AUTH;
+    param.executorSensorHint = executorSensorHint;
+    ScheduleType scheduleType = SCHEDULE_TYPE_ABANDON;
+    static char udid[UDID_LEN + 1] = "0123456789012345678901234567890123456789012345678901234567890123";
+    SetLocalUdid(udid);
+    EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
+    DestroyResourcePool();
+    LOG_INFO("TestGenerateIdmSchedule_006 start");
 }
 
 HWTEST_F(UserIdmFuncsTest, TestCheckEnrollPermission_001, TestSize.Level0)
 {
     PermissionCheckParam param = {};
-    EXPECT_EQ(CheckEnrollPermission(param, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(CheckEnrollPermission(&param), RESULT_NEED_INIT);
 }
 
 HWTEST_F(UserIdmFuncsTest, TestCheckEnrollPermission_002, TestSize.Level0)
@@ -108,10 +318,9 @@ HWTEST_F(UserIdmFuncsTest, TestCheckEnrollPermission_002, TestSize.Level0)
     EXPECT_NE(g_userInfoList, nullptr);
     PermissionCheckParam param = {};
     param.authType = FACE_AUTH;
-    uint64_t scheduleId = 0;
-    EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(CheckEnrollPermission(&param), RESULT_GENERAL_ERROR);
     param.userId = userId;
-    EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_VERIFY_TOKEN_FAIL);
+    EXPECT_EQ(CheckEnrollPermission(&param), RESULT_VERIFY_TOKEN_FAIL);
     DestroyLinkedList(g_userInfoList);
     g_userInfoList = nullptr;
     g_session = nullptr;
@@ -121,11 +330,9 @@ HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_001, TestSize.Level0)
 {
     PermissionCheckParam param = {};
     param.authType = FACE_AUTH;
-    EXPECT_EQ(CheckUpdatePermission(param, nullptr), RESULT_BAD_PARAM);
-    uint64_t scheduleId = 0;
-    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_BAD_PARAM);
+    EXPECT_EQ(CheckUpdatePermission(&param), RESULT_BAD_PARAM);
     param.authType = PIN_AUTH;
-    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_NEED_INIT);
+    EXPECT_EQ(CheckUpdatePermission(&param), RESULT_NEED_INIT);
 }
 
 HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_002, TestSize.Level0)
@@ -143,20 +350,23 @@ HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_002, TestSize.Level0)
     PermissionCheckParam param = {};
     param.authType = PIN_AUTH;
     param.userId = userId;
-    uint64_t scheduleId = 0;
-    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_SUCCESS);
-    UserInfo userInfo = {};
-    userInfo.userId = userId;
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    EXPECT_NE(userInfo.credentialInfoList, nullptr);
-    CredentialInfoHal credInfo = {};
-    credInfo.authType = PIN_AUTH;
-    credInfo.executorSensorHint = excutorSensorHint2;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    EXPECT_EQ(CheckUpdatePermission(&param), RESULT_SUCCESS);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    EXPECT_NE(userInfo->credentialInfoList, nullptr);
+    CredentialInfoHal *credInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo, nullptr);
+    credInfo->authType = PIN_AUTH;
+    credInfo->executorSensorHint = excutorSensorHint2;
+    credInfo->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo));
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     param.executorSensorHint = excutorSensorHint1;
-    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_VERIFY_TOKEN_FAIL);
-    g_userInfoList = nullptr;
+    EXPECT_EQ(CheckUpdatePermission(&param), RESULT_VERIFY_TOKEN_FAIL);
+    DestroyUserInfoList();
     g_session = nullptr;
 }
 
@@ -210,11 +420,11 @@ HWTEST_F(UserIdmFuncsTest, TestDeleteCredentialFunc, TestSize.Level0)
     CredentialDeleteParam param = {};
     EXPECT_EQ(DeleteCredentialFunc(param, nullptr), RESULT_BAD_PARAM);
 
-    CredentialInfoHal credInfo = {};
+    OperateResult operateResult = {};
     UserAuthTokenHal token = {};
     token.tokenDataPlain.authType = 4;
     EXPECT_EQ(memcpy_s(param.token, sizeof(UserAuthTokenHal), &token, sizeof(UserAuthTokenHal)), EOK);
-    EXPECT_EQ(DeleteCredentialFunc(param, &credInfo), RESULT_VERIFY_TOKEN_FAIL);
+    EXPECT_EQ(DeleteCredentialFunc(param, &operateResult), RESULT_VERIFY_TOKEN_FAIL);
 }
 
 HWTEST_F(UserIdmFuncsTest, TestQueryCredentialFunc, TestSize.Level0)
@@ -241,16 +451,20 @@ HWTEST_F(UserIdmFuncsTest, TestGetDeletedCredential, TestSize.Level0)
     EXPECT_NE(g_userInfoList, nullptr);
     EXPECT_EQ(GetDeletedCredential(userId, &deletedCredInfo), RESULT_UNKNOWN);
 
-    UserInfo userInfo = {};
-    userInfo.userId = userId;
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    EXPECT_NE(userInfo.credentialInfoList, nullptr);
-    CredentialInfoHal credInfo = {};
-    credInfo.authType = 1;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
-    EXPECT_EQ(GetDeletedCredential(userId, &deletedCredInfo), RESULT_UNKNOWN);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = userId;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    EXPECT_NE(userInfo->credentialInfoList, nullptr);
+    CredentialInfoHal *credInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo, nullptr);
+    credInfo->authType = 1;
+    credInfo->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo));
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    EXPECT_EQ(GetDeletedCredential(userId, &deletedCredInfo), RESULT_SUCCESS);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(UserIdmFuncsTest, TestCheckResultValid, TestSize.Level0)

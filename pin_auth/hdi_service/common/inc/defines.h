@@ -125,9 +125,16 @@ typedef enum AuthSubType {
     DEFAULT_TYPE = 0,
 } AuthSubType;
 
+typedef enum {
+    DEDAULT = 0,
+    ABANDONED_PIN_AUTH = 4,
+} AuthInent;
+
 #define MAX_DULPLICATE_CHECK 100
 
 #define MAX_EXECUTOR_MSG_LEN 2048
+
+#define ROOT_SECRET_LEN 32U
 
 #ifdef __cplusplus
 }

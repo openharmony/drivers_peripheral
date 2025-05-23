@@ -56,11 +56,11 @@ ohos_unittest("PinAuthHdiUtTest") {
     "service/src/all_in_one_impl_test.cpp",
   ]
 
-  deps = [ "../../../hdi_service:libpin_auth_interface_service_2.1" ]
+  deps = [ "../../../hdi_service:libpin_auth_interface_service_3.0" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_pin_auth:libpin_auth_proxy_2.1",
+    "drivers_interface_pin_auth:libpin_auth_proxy_3.0",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
