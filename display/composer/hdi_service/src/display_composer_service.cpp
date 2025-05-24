@@ -997,7 +997,7 @@ int32_t DisplayComposerService::FastPresent(uint32_t devId, const PresentParam& 
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->FastPresent, HDF_ERR_NOT_SUPPORT);
 
     if (param.sliceNum != inHandles.size()) {
-        DISPLAY_LOGE("%{public}s fail devId:%{public}u inHandles size not equals sliceNum inHandles size = %{public}lu "
+        DISPLAY_LOGE("%{public}s fail devId:%{public}u inHandles size not equals sliceNum inHandles size = %{public}zu "
                      "sliceNum = %{public}u", __func__, devId, inHandles.size(), param.sliceNum);
         return HDF_FAILURE;
     }
