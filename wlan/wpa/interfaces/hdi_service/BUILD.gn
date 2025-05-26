@@ -68,9 +68,9 @@ if (is_standard_system) {
       "-Wl,--gc-sections",
     ]
     external_deps = [
-      "hdf_core:libhdf_ipc_adapter",
       "c_utils:utils",
       "drivers_interface_wlan:libwpa_stub_2.0",
+      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
