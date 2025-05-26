@@ -25,6 +25,7 @@ void HdiHostUtTest::SetUp(void)
 {
     cameraTest = std::make_shared<OHOS::Camera::HdiCommon>();
     cameraTest->Init();
+    ASSERT_NE(cameraTest->service, nullptr);
 }
 
 void HdiHostUtTest::TearDown(void)
