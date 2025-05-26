@@ -64,6 +64,7 @@ private:
     static void UpdateFunctionStatus(void);
     static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];
     static bool isGadgetConnected_;
+    static bool isEdmExist_;
     static HdfDevEventlistener listenerForLoadService_;
     static V1_2::UsbdLoadService loadUsbService_;
     static V1_2::UsbdLoadService loadHdfEdm_;

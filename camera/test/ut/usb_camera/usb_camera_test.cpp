@@ -25,6 +25,7 @@ void UtestUSBCameraTest::SetUp(void)
     if (cameraBase_ == nullptr)
     cameraBase_ = std::make_shared<TestCameraBase>();
     cameraBase_->UsbInit();
+    ASSERT_NE(cameraBase_->cameraHost, nullptr);
 }
 void UtestUSBCameraTest::TearDown(void)
 {
