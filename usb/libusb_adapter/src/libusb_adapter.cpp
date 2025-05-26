@@ -874,34 +874,33 @@ int32_t LibusbAdapter::GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe,
         HDF_LOGE("%{public}s: libusb_get_active_config_descriptor failed ret=%{public}d", __func__, ret);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (pipe.intfId < 0 || pipe.intfId >= config_desc->bNumInterfaces) {
-        HDF_LOGE("%{public}s: pipe.intfId is failed", __func__);
+    if (pipe.intfId < 0 || pipe.intfId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s: pipe.intfId is failed, intfId: %{public}d, enpointId:%{public}d", __func__, pipe.intfId, pipe.endpointId);
         return HDF_FAILURE;
     }
-    bool findFlag = false;
-    const libusb_interface *intf = &config_desc->interface[pipe.intfId];
-    for (int j = 0; j < intf->num_altsetting; j++) {
-        const libusb_interface_descriptor *intf_desc = &intf->altsetting[j];
-        for (int k = 0; k < intf_desc->bNumEndpoints; k++) {
-            const libusb_endpoint_descriptor *endpoint_desc_tmp = &intf_desc->endpoint[k];
-            if (endpoint_desc_tmp->bEndpointAddress == pipe.endpointId) {
-                *endpoint_desc = (libusb_endpoint_descriptor *)endpoint_desc_tmp;
-                findFlag = true;
-                break;
+
+    for (int i = 0; i < config_desc->bNumInterfaces; i++) {
+        const libusb_interface *intf = &config_desc->interface[i];
+        for (int j = 0; j < intf->num_altsetting; j++) {
+            const libusb_interface_descriptor *intf_desc = &intf->altsetting[j];
+            HDF_LOGD("%{public}s: bInterfaceNumber: %{public}d, bNumEndpoints:%{public}d", __func__,
+                intf_desc->bInterfaceNumber, intf_desc->bNumEndpoints);
+            if (intf_desc->bInterfaceNumber == pipe.intfId) {
+                for (int k = 0; k < intf_desc->bNumEndpoints; k++) {
+                    const libusb_endpoint_descriptor *endpoint_desc_tmp = &intf_desc->endpoint[k];
+                    HDF_LOGD("%{public}s: bmAddress: %{public}d, bmAttributes:%{public}d", __func__,
+                        endpoint_desc_tmp->bEndpointAddress, endpoint_desc_tmp->bmAttributes);
+                    if (endpoint_desc_tmp->bEndpointAddress == pipe.endpointId) {
+                        *endpoint_desc = (libusb_endpoint_descriptor *)endpoint_desc_tmp;
+                        return HDF_SUCCESS;
+                    }
+                }
             }
         }
-        if (findFlag) {
-            break;
-        }
     }
-    
-    if (findFlag) {
-        HDF_LOGD("%{public}s leave", __func__);
-        return HDF_SUCCESS;
-    } else {
-        HDF_LOGE("%{public}s: LibUSBGetEndpointDesc is failed", __func__);
-        return HDF_FAILURE;
-    }
+
+    HDF_LOGE("%{public}s: get desc failed, intfId: %{public}d, epid:%{public}d", __func__, pipe.intfId, pipe.endpointId);
+    return HDF_FAILURE;
 }
 
 int32_t LibusbAdapter::InterruptTransferRead(
