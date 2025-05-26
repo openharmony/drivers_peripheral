@@ -996,8 +996,17 @@ int32_t DisplayComposerService::FastPresent(uint32_t devId, const PresentParam& 
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->FastPresent, HDF_ERR_NOT_SUPPORT);
 
-    std::vector<BufferHandle*> handles;
+    if (param.sliceNum != inHandles.size()) {
+        DISPLAY_LOGE("%{public}s fail devId:%{public}u inHandles size not equals sliceNum inHandles size = %{public}zu "
+                     "sliceNum = %{public}u", __func__, devId, inHandles.size(), param.sliceNum);
+        return HDF_FAILURE;
+    }
+    std::vector<BufferHandle *> handles;
     for (uint32_t i = 0; i < param.sliceNum; i++) {
+        if (!inHandles[i]) {
+            DISPLAY_LOGE("%{public}s fail devId:%{public}u inHandle is nullptr i = %{public}u", __func__, devId, i);
+            return HDF_FAILURE;
+        }
         handles.emplace_back(inHandles[i]->GetBufferHandle());
     }
 
