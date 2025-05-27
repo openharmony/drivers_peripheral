@@ -18,7 +18,9 @@ group("vibrator_entry") {
   if (defined(ohos_lite)) {
     deps += [ "hal:hdi_vibrator" ]
   } else {
-    deps += [ "hdi_service:hdf_vibrator_service" ]
+    deps += [
+      "hdi_service_2.0:hdf_vibrator_service_2.0"
+    ]
     if (drivers_peripheral_vibrator_feature_community) {
       deps += [ "hdi_impl:libhdi_vibrator_impl" ]
     }

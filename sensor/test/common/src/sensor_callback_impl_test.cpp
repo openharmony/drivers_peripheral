@@ -21,14 +21,14 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V3_0 {
 int32_t SensorCallbackImplTest::OnDataEvent(const HdfSensorEvents& event)
 {
-    HDF_LOGI("%{public}s sensorId=%{public}d", __func__, event.sensorId);
+    HDF_LOGI("%{public}s sensorId=%{public}d", __func__, event.deviceSensorInfo.sensorType);
     (void)event;
     return HDF_FAILURE;
 }
-} // V2_0
+} // V3_0
 } // Sensor
 } // HDI
 } // OHOS

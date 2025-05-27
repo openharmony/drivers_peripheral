@@ -80,7 +80,7 @@ ohos_shared_library("libsensor_interface_service_2.1") {
   part_name = "drivers_peripheral_sensor"
 }
 
-ohos_shared_library("libsensor_driver") {
+ohos_shared_library("libsensor_driver_2.1") {
   include_dirs = [
     "../interfaces/include/",
     "../utils/include",
@@ -125,7 +125,7 @@ ohos_shared_library("libsensor_driver") {
 
 group("hdi_sensor_service") {
   deps = [
-    ":libsensor_driver",
+    ":libsensor_driver_2.1",
     ":libsensor_interface_service_2.1",
   ]
 }

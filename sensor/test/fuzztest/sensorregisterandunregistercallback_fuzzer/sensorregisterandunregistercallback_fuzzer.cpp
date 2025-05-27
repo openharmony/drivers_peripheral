@@ -15,21 +15,21 @@
 
 #include "sensorregisterandunregistercallback_fuzzer.h"
 #include "hdf_base.h"
-#include "v2_0/isensor_interface.h"
+#include "v3_0/isensor_interface.h"
 
 using namespace OHOS::HDI::Sensor;
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V3_0;
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V3_0 {
 int32_t SensorRegisterAndUnregisterCallbackFuzzer::OnDataEvent(const HdfSensorEvents& event)
 {
     (void)event;
     return HDF_SUCCESS;
 }
-} // V2_0
+} // V3_0
 } // Sensor
 } // HDI
 } // OHOS
@@ -40,7 +40,7 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         sptr<ISensorInterface> sensorInterface = ISensorInterface::Get();
-        sptr<V2_0::ISensorCallback> registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
+        sptr<V3_0::ISensorCallback> registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
         if (registerCallback == nullptr) {
             return false;
         }
