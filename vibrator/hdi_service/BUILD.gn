@@ -55,6 +55,7 @@ if (defined(ohos_lite)) {
         "drivers_interface_vibrator:libvibrator_stub_1.2",
         "drivers_interface_vibrator:libvibrator_stub_1.3",
         "hdf_core:libhdf_host",
+        "hdf_core:libhdf_utils",
         "hilog:libhilog",
         "hitrace:hitrace_meter",
         "ipc:ipc_single",
