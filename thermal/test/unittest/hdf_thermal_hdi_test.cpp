@@ -159,15 +159,10 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
     char cpuBuf[MAX_PATH] = {0};
     char freqValue[MAX_PATH] = {0};
 
-    if (snprintf_s(cpuBuf, MAX_PATH, sizeof(cpuBuf) - 1, CPU_FREQ_PATH.c_str()) < EOK) {
-        return;
-    }
+    ASSERT_FALSE(snprintf_s(cpuBuf, MAX_PATH, sizeof(cpuBuf) - 1, CPU_FREQ_PATH.c_str()) < EOK);
 
     ret = HdfThermalHdiTest::ReadFile(cpuBuf, freqValue, sizeof(freqValue));
-    if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest002: Failed to read file ");
-        return;
-    }
+    ASSERT_EQ(ret, HDF_SUCCESS);
 
     std::string freq = freqValue;
     int32_t value = HdfThermalHdiTest::ConvertInt(freq);
@@ -191,15 +186,11 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level1)
     char cpuBuf[MAX_PATH] = {0};
     char freqValue[MAX_PATH] = {0};
 
-    if (snprintf_s(cpuBuf, MAX_PATH, sizeof(cpuBuf) - 1, GPU_FREQ_PATH.c_str()) < EOK) {
-        return;
-    }
+
+    ASSERT_FALSE(snprintf_s(cpuBuf, MAX_PATH, sizeof(cpuBuf) - 1, GPU_FREQ_PATH.c_str()) < EOK);
 
     ret = HdfThermalHdiTest::ReadFile(cpuBuf, freqValue, sizeof(freqValue));
-    if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest003: Failed to read file ");
-        return;
-    }
+    ASSERT_EQ(ret, HDF_SUCCESS);
 
     std::string freq = freqValue;
     int32_t value = HdfThermalHdiTest::ConvertInt(freq);
@@ -223,15 +214,11 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest004, TestSize.Level1)
     char cpuBuf[MAX_PATH] = {0};
     char currentValue[MAX_PATH] = {0};
 
-    if (snprintf_s(cpuBuf, MAX_PATH, sizeof(cpuBuf) - 1, BATTERY_CHARGER_CURRENT_PATH.c_str()) < EOK) {
-        return;
-    }
+    ASSERT_FALSE(snprintf_s(cpuBuf, MAX_PATH, sizeof(cpuBuf) - 1, BATTERY_CHARGER_CURRENT_PATH.c_str()) < EOK);
 
     ret = HdfThermalHdiTest::ReadFile(cpuBuf, currentValue, sizeof(currentValue));
-    if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest004: Failed to read file ");
-        return;
-    }
+
+    ASSERT_EQ(ret, HDF_SUCCESS);
 
     std::string current = currentValue;
     int32_t value = HdfThermalHdiTest::ConvertInt(current);
@@ -288,20 +275,17 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest007, TestSize.Level1)
     char path[MAX_PATH] = {0};
     char valueBuf[MAX_PATH] = {0};
 
-    if (snprintf_s(path, MAX_PATH, sizeof(path) - 1, ISOLATE_PATH.c_str()) < EOK) {
-        return;
-    }
+    ASSERT_FALSE(snprintf_s(path, MAX_PATH, sizeof(path) - 1, ISOLATE_PATH.c_str()) < EOK);
 
     ret = HdfThermalHdiTest::ReadFile(path, valueBuf, sizeof(valueBuf));
-    if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest007: Failed to read file ");
-        return;
-    }
-
     std::string isolateNumStr = valueBuf;
     int32_t value = HdfThermalHdiTest::ConvertInt(isolateNumStr);
     THERMAL_HILOGD(LABEL_TEST, "isolate cpu num is %{public}d", value);
-    EXPECT_EQ(value, isolateNum) << "HdfThermalHdiTest007 failed";
+    if (ret == HDF_SUCCESS) {
+        EXPECT_EQ(value, isolateNum) << "HdfThermalHdiTest007 failed";
+    } else {
+        EXPECT_NE(value, isolateNum) << "HdfThermalHdiTest007 failed";
+    }
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest007: return.");
 }
 
