@@ -52,9 +52,9 @@ private:
 };
 namespace {
 const int32_t REWIND_READ_DATA = 0;
-shared_ptr<PowerInterfaceStub> g_fuzzService = nullptr;
+shared_ptr<V1_3::PowerInterfaceStub> g_fuzzService = nullptr;
 shared_ptr<PowerFuzzTest> g_fuzzTest = nullptr;
-const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = 15;
+const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = V1_3::CMD_POWER_INTERFACE_UN_REGISTER_POWER_CALLBACK_EXT + 1;
 } // namespace
 
 static void PowerStubFuzzTest(const uint8_t *data, size_t size)
@@ -72,14 +72,18 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
     MessageOption option;
     if (g_fuzzService == nullptr) {
         g_fuzzTest = make_shared<PowerFuzzTest>();
-        g_fuzzService = make_shared<PowerInterfaceStub>(g_fuzzTest->GetImpl());
+        g_fuzzService = make_shared<V1_3::PowerInterfaceStub>(g_fuzzTest->GetImpl());
     }
     for (code = CMD_POWER_INTERFACE_GET_VERSION; code < POWER_INTERFACE_STUB_FUNC_MAX_SIZE; code++) {
         // Filter force sleep calls
         if (CMD_POWER_INTERFACE_FORCE_SUSPEND == code) {
             continue;
         }
-        datas.WriteInterfaceToken(V1_3::IPowerInterface::GetDescriptor());
+        if (code < V1_3::CMD_POWER_INTERFACE_REGISTER_POWER_CALLBACK_EXT) {
+            datas.WriteInterfaceToken(V1_2::IPowerInterface::GetDescriptor());
+        } else {
+            datas.WriteInterfaceToken(V1_3::IPowerInterface::GetDescriptor());
+        }
         datas.WriteBuffer(data, size);
         datas.RewindRead(REWIND_READ_DATA);
         g_fuzzService->OnRemoteRequest(code, datas, reply, option);

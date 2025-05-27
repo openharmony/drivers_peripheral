@@ -54,9 +54,9 @@ private:
     sptr<V1_3::PowerInterfaceImpl> impl_ = nullptr;
 };
 namespace {
-shared_ptr<PowerInterfaceStub> g_fuzzService = nullptr;
+shared_ptr<V1_3::PowerInterfaceStub> g_fuzzService = nullptr;
 shared_ptr<PowerFuzzTest> g_fuzzTest = nullptr;
-const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = 18;
+const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = V1_3::CMD_POWER_INTERFACE_UN_REGISTER_POWER_CALLBACK_EXT + 1;
 } // namespace
 
 static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
@@ -75,7 +75,7 @@ static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
     MessageOption option;
     if (g_fuzzService == nullptr) {
         g_fuzzTest = make_shared<PowerFuzzTest>();
-        g_fuzzService = make_shared<PowerInterfaceStub>(g_fuzzTest->GetImpl());
+        g_fuzzService = make_shared<V1_3::PowerInterfaceStub>(g_fuzzTest->GetImpl());
     }
     for (code = CMD_POWER_INTERFACE_GET_VERSION; code < POWER_INTERFACE_STUB_FUNC_MAX_SIZE; code++) {
         g_fuzzService->OnRemoteRequest(code, datas, reply, option);
