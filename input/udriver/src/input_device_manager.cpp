@@ -281,7 +281,8 @@ uint32_t GetInputDeviceTypeInfo(const string &devName)
     } else if (devName.find("Mouse") != std::string::npos) {
         type = INDEV_TYPE_MOUSE;
     } else if ((devName.find("_gpio_key") != std::string::npos) ||
-               (devName.find("ponkey_on") != std::string::npos)) {
+               (devName.find("ponkey_on") != std::string::npos) ||
+               (devName.find("gpiokey") != std::string::npos)) {
         type = INDEV_TYPE_KEY;
     } else if (devName.find("Touchpad") != std::string::npos) {
         type = INDEV_TYPE_TOUCHPAD;
