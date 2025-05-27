@@ -13,31 +13,36 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V2_0_SENSORCALLBACKIMPLTEST_H
-#define OHOS_HDI_SENSOR_V2_0_SENSORCALLBACKIMPLTEST_H
+#ifndef OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPLTEST_H
+#define OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPLTEST_H
 
 #include <hdf_base.h>
 #include <securec.h>
-#include "v2_0/isensor_callback.h"
+#include "v3_0/isensor_callback.h"
 #include "sensor_uhdf_log.h"
 #include "osal_mem.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V3_0 {
 
 constexpr int32_t DATA_LEN = 256;
 
-class SensorCallbackImplTest : public ISensorCallback {
+class SensorCallbackImplTest : public V3_0::ISensorCallback {
 public:
     virtual ~SensorCallbackImplTest() {}
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override;
+
+    int32_t OnDataEventAsync(const std::vector<HdfSensorEvents>& events) override
+    {
+        return HDF_SUCCESS;
+    }
 };
-} // V2_0
+} // V3_0
 } // Sensor
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V2_0_SENSORCALLBACKIMPLTEST_H
+#endif // OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPLTEST_H

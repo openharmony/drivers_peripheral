@@ -42,10 +42,9 @@ ohos_unittest("dump_unittest_sensor") {
   ]
 
   if (is_standard_system) {
-    deps = [ "../../../hdi_service:libsensor_interface_service_2.1" ]
+    deps = [ "../../../hdi_service_3.0:libsensor_interface_service_3.0" ]
     external_deps = [
-      "drivers_interface_sensor:libsensor_proxy_2.0",
-      "drivers_interface_sensor:libsensor_proxy_2.1",
+      "drivers_interface_sensor:libsensor_proxy_3.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",

@@ -19,17 +19,22 @@
 #define FUZZ_PROJECT_NAME "sensorregisterandunregistercallback_fuzzer"
 
 #include <hdf_base.h>
-#include "v2_0/isensor_callback.h"
+#include "v3_0/isensor_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V3_0 {
 class SensorRegisterAndUnregisterCallbackFuzzer : public ISensorCallback {
 public:
     virtual ~SensorRegisterAndUnregisterCallbackFuzzer() {}
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override;
+
+    int32_t OnDataEventAsync(const std::vector<HdfSensorEvents>& events) override
+    {
+        return HDF_SUCCESS;
+    }
     static uint32_t sensorDataFlag;
 };
 } // V1_1
