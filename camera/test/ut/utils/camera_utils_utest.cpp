@@ -123,7 +123,7 @@ HWTEST_F(CameraUtilsUTest, TestSelfKiller003, TestSize.Level0)
     EXPECT_EQ(selfkillNotifyFlag, false);
     usbCameraSelfKiller->Init([&cameraCount]() { return cameraCount == 0; },
         [&selfkillNotifyFlag]() {
-            CAMERA_LOGI("TestSelfKiller002 selfkill notify.");
+            CAMERA_LOGI("TestSelfKiller003 selfkill notify.");
             selfkillNotifyFlag = true;
         },
         DEBUG_SELF_KILL_PARAM_NAME,
