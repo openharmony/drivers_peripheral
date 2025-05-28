@@ -1015,7 +1015,11 @@ static void CopyCredentialOpeateResult(OperateResult &in, HdiCredentialOperateRe
 {
     out.operateType = static_cast<HdiCredentialOperateType>(in.operateType);
     if (in.operateType == DELETE_CREDENTIAL) {
-        CopyCredentialInfo(in.credentialInfo, out.credentialInfo);
+        for (uint32_t index = 0; index < in.credentialCount && index < MAX_CREDENTIAL_NUM_OF_ENROLL; index++) {
+            HdiCredentialInfo credentialInfo = {};
+            CopyCredentialInfo(in.credentialInfos[index], credentialInfo);
+            out.credentialInfos.push_back(credentialInfo);
+        }
     } else if (in.operateType == ABANDON_CREDENTIAL) {
         CopyScheduleInfo(&(in.scheduleInfo), &(out.scheduleInfo));
     }
