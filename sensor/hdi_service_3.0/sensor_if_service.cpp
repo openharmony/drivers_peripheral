@@ -44,10 +44,6 @@ namespace HDI {
 namespace Sensor {
 namespace V3_0 {
 
-#define DEFAULT_DEVICE_ID (-1)
-#define DEFAULT_SENSOR_ID 0
-#define DEFAULT_LOCATION 1
-
 namespace {
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using CallBackDeathRecipientMap = std::unordered_map<IRemoteObject *, sptr<CallBackDeathRecipient>>;
