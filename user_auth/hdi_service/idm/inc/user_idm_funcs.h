@@ -54,8 +54,9 @@ typedef enum {
 
 typedef struct {
     OperateType operateType;
-    CredentialInfoHal credentialInfo;
     CoAuthSchedule scheduleInfo;
+    uint32_t credentialCount;
+    CredentialInfoHal credentialInfos[MAX_CREDENTIAL_NUM_OF_ENROLL];
 } OperateResult;
 
 ResultCode CheckEnrollPermission(PermissionCheckParam *param);
