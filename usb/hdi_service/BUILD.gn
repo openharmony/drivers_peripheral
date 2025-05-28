@@ -149,6 +149,8 @@ ohos_shared_library("libusb_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_usb:libusb_stub_1.0",
+      "drivers_interface_usb:libusb_stub_1.1",
       "drivers_interface_usb:libusb_stub_1.2",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -163,6 +165,8 @@ ohos_shared_library("libusb_driver") {
     }
   } else {
     external_deps = [
+      "drivers_interface_usb:libusb_stub_1.0",
+      "drivers_interface_usb:libusb_stub_1.1",
       "drivers_interface_usb:libusb_stub_1.2",
       "hilog:libhilog",
       "ipc:ipc_single",
