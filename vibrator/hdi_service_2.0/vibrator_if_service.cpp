@@ -246,12 +246,10 @@ int32_t VibratorIfService::GetVibratorIdSingle(const OHOS::HDI::Vibrator::V2_0::
         hdfVibratorInfo.position = iter.position;
         hdfVibratorInfo.isLocal = iter.isLocal;
 #else
-#else
         hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
         hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
         hdfVibratorInfo.position = DEFAULT_POSITION;
         hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
-#endif
 #endif
         vibratorInfo.push_back(std::move(hdfVibratorInfo));
     }
