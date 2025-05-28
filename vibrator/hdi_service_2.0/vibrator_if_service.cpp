@@ -24,6 +24,11 @@ namespace OHOS {
 namespace HDI {
 namespace Vibrator {
 namespace V2_0 {
+#define DEFAULT_DEVICE_ID (-1)
+#define DEFAULT_VIBRATOR_ID 1
+#define DEFAULT_POSITION 0
+#define DEFAULT_IS_LOCAL 1
+
 VibratorIfService::VibratorIfService()
 {
     int32_t ret = GetVibratorVdiImpl();
@@ -164,13 +169,8 @@ int32_t VibratorIfService::GetVibratorInfo(std::vector<V2_0::HdfVibratorInfo> &v
     HDF_LOGD("%{public}s: Enter the GetVibratorInfo function.", __func__);
 
     StartTrace(HITRACE_TAG_HDF, "GetVibratorInfo");
-#ifdef TV_FLAG
-    std::vector<OHOS::HDI::Vibrator::V2_0::HdfVibratorInfoVdi> vibratorInfoVdi;
-    int32_t ret = vibratorVdiImplV1_1_->GetVibratorInfo(vibratorInfoVdi);
-#else
     std::vector<OHOS::HDI::Vibrator::V1_1::HdfVibratorInfoVdi> vibratorInfoVdi;
     int32_t ret = vibratorVdiImplV1_1_->GetVibratorInfo(vibratorInfoVdi);
-#endif
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -195,6 +195,11 @@ int32_t VibratorIfService::GetVibratorInfo(std::vector<V2_0::HdfVibratorInfo> &v
         hdfVibratorInfo.vibratorId = iter.vibratorId;
         hdfVibratorInfo.position = iter.position;
         hdfVibratorInfo.isLocal = iter.isLocal;
+#else
+        hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
+        hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
+        hdfVibratorInfo.position = DEFAULT_POSITION;
+        hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
 #endif
         vibratorInfo.push_back(std::move(hdfVibratorInfo));
     }
@@ -240,6 +245,13 @@ int32_t VibratorIfService::GetVibratorIdSingle(const OHOS::HDI::Vibrator::V2_0::
         hdfVibratorInfo.vibratorId = iter.vibratorId;
         hdfVibratorInfo.position = iter.position;
         hdfVibratorInfo.isLocal = iter.isLocal;
+#else
+#else
+        hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
+        hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
+        hdfVibratorInfo.position = DEFAULT_POSITION;
+        hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
+#endif
 #endif
         vibratorInfo.push_back(std::move(hdfVibratorInfo));
     }
@@ -538,6 +550,11 @@ int32_t VibratorIfService::GetDeviceVibratorInfo(
         hdfVibratorInfo.vibratorId = iter.vibratorId;
         hdfVibratorInfo.position = iter.position;
         hdfVibratorInfo.isLocal = iter.isLocal;
+#else
+        hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
+        hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
+        hdfVibratorInfo.position = DEFAULT_POSITION;
+        hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
 #endif
         vibratorInfo.push_back(std::move(hdfVibratorInfo));
     }
