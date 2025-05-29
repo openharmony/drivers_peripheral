@@ -120,17 +120,29 @@ struct LibusbBulkManager {
     std::mutex bulkTransferVecLock;
 };
 
+struct HotplugInfo {
+public:
+    HotplugInfo() : subscriberPtr(nullptr){};
+    HotplugInfo(OHOS::HDI::Usb::V2_0::USBDeviceInfo &info, sptr<V2_0::IUsbdSubscriber> subscriber)
+        : hotplugInfo(info),
+        subscriberPtr(subscriber) {};
+
+    OHOS::HDI::Usb::V2_0::USBDeviceInfo hotplugInfo;
+    sptr<V2_0::IUsbdSubscriber> subscriberPtr;
+};
+
 class HotplugEventPorcess {
 public:
     static std::shared_ptr<HotplugEventPorcess> GetInstance();
-    void AddHotplugTask(OHOS::HDI::Usb::V2_0::USBDeviceInfo &info);
+    void AddHotplugTask(OHOS::HDI::Usb::V2_0::USBDeviceInfo &info,
+        sptr<V2_0::IUsbdSubscriber> subscriber = nullptr);
     int32_t SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
     int32_t RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
     size_t GetSubscriberSize();
     ~HotplugEventPorcess();
     HotplugEventPorcess();
 private:
-    std::queue<OHOS::HDI::Usb::V2_0::USBDeviceInfo> hotplugEventQueue_;
+    std::queue<HotplugInfo> hotplugEventQueue_;
     std::mutex queueMutex_;
     std::condition_variable queueCv_;
     std::atomic<int32_t> activeThreads_;
