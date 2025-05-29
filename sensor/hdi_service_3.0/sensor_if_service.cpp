@@ -43,6 +43,7 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V3_0 {
+
 namespace {
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using CallBackDeathRecipientMap = std::unordered_map<IRemoteObject *, sptr<CallBackDeathRecipient>>;
@@ -588,7 +589,7 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<V3_0::HdfSensorInformation
         sensorInfo.deviceSensorInfo = {it.sensorHandle.deviceId, it.sensorHandle.sensorType, it.sensorHandle.sensorId,
                                        it.sensorHandle.location};
 #else
-        sensorInfo.deviceSensorInfo = {0, it.sensorId, 0, 0};
+        sensorInfo.deviceSensorInfo = {DEFAULT_DEVICE_ID, it.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
 #endif
         sensorInfo.accuracy = it.accuracy;
         sensorInfo.power = it.power;
@@ -856,7 +857,8 @@ void SensorIfService::VoteEnable(const SensorHandle sensorHandle, uint32_t servi
     }
 }
 
-void SensorIfService::VoteInterval(const SensorHandle sensorHandle, uint32_t serviceId, int64_t &samplingInterval, bool &enabled)
+void SensorIfService::VoteInterval(const SensorHandle sensorHandle, uint32_t serviceId,
+    int64_t &samplingInterval, bool &enabled)
 {
     static std::map<SensorHandle, std::map<uint32_t, int64_t>> sdcIntervalMap;
     if (enabled) {
@@ -1131,7 +1133,7 @@ int32_t SensorIfService::GetDeviceSensorInfo(int32_t deviceId, std::vector<V3_0:
         sensorInfo.deviceSensorInfo = {it.sensorHandle.deviceId, it.sensorHandle.sensorType, it.sensorHandle.sensorId,
                                        it.sensorHandle.location};
 #else
-        sensorInfo.deviceSensorInfo = {0, it.sensorId, 0, 0};
+        sensorInfo.deviceSensorInfo = {DEFAULT_DEVICE_ID, it.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
 #endif
         sensorInfo.accuracy = it.accuracy;
         sensorInfo.power = it.power;
