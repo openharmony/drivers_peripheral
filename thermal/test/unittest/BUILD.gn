@@ -46,6 +46,7 @@ ohos_unittest("hdi_unittest_thermal") {
       "ipc:ipc_single",
       "libxml2:libxml2",
     ]
+    defines = []
     if (drivers_peripheral_thermal_feature_c_utils) {
       external_deps += [ "c_utils:utils" ]
     }
