@@ -512,6 +512,5 @@ TEST_F(UtestCamera3ATest, camera_3a_0041)
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
-    cameraBase->rc = cameraBase->cameraDevice->UpdateSettings(meta);
-    EXPECT_EQ(cameraBase->rc, Camera::NO_ERROR);
+    EXPECT_EQ(cameraBase->cameraDevice->UpdateSettings(meta), Camera::NO_ERROR);
 }
