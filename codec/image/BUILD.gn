@@ -33,7 +33,7 @@ ohos_shared_library("libcodec_image_service_2.0") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libimage_stub_2.0",
+      "drivers_interface_codec:libimage_proxy_2.0",
       "drivers_interface_display:libdisplay_buffer_stub_1.0",
       "drivers_interface_display:libdisplay_buffer_stub_1.1",
       "drivers_interface_display:libdisplay_composer_stub_1.0",
