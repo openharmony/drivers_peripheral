@@ -62,7 +62,7 @@ private:
     void EnableWatchCallback(const std::string& value);
     static void InfoChangedCallback(const char* key, const char* value, void* context);
 
-    int64_t beginTimeMs_;
+    int64_t beginTimeMs_ = 0;
     std::atomic_uint8_t width_;
     std::atomic_uint32_t interval_;
     std::atomic_bool enable_;
