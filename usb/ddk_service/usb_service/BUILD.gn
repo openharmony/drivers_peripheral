@@ -130,7 +130,6 @@ ohos_shared_library("libusb_ddk_driver") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_ddk_stub_1.0",
       "drivers_interface_usb:libusb_ddk_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",

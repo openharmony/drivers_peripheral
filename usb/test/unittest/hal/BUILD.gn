@@ -179,8 +179,6 @@ ohos_unittest("test_function") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_proxy_1.0",
-      "drivers_interface_usb:libusb_proxy_1.1",
       "drivers_interface_usb:libusb_proxy_1.2",
       "drivers_interface_usb:libusb_proxy_2.0",
       "eventhandler:libeventhandler",
@@ -232,8 +230,6 @@ ohos_unittest("test_request") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_proxy_1.0",
-      "drivers_interface_usb:libusb_proxy_1.1",
       "drivers_interface_usb:libusb_proxy_1.2",
       "eventhandler:libeventhandler",
       "googletest:gtest_main",
@@ -275,8 +271,6 @@ ohos_unittest("test_usbfnmtp") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_proxy_1.0",
-      "drivers_interface_usb:libusb_proxy_1.1",
       "drivers_interface_usb:libusb_proxy_1.2",
       "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
       "eventhandler:libeventhandler",
@@ -312,8 +306,6 @@ ohos_unittest("test_manageinterface") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_proxy_1.0",
-      "drivers_interface_usb:libusb_proxy_1.1",
       "drivers_interface_usb:libusb_proxy_1.2",
       "eventhandler:libeventhandler",
       "googletest:gtest_main",
