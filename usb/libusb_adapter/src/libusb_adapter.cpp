@@ -2886,7 +2886,7 @@ void LibusbAdapter::GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSu
         }
         HDF_LOGI("%{public}s:busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
         V2_0::USBDeviceInfo info = {ACT_DEVUP, busNum, devAddr};
-        subscriber->DeviceEvent(info);
+        HotplugEventPorcess::GetInstance()->AddHotplugTask(info, subscriber);
     }
     libusb_free_device_list(devs, 1);
 }
@@ -2923,14 +2923,16 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
             HDF_LOGD("%{public}s: register hotplug callback success.", __func__);
         }
     }
+    int32_t ret = HotplugEventPorcess::GetInstance()->SetSubscriber(subscriber);
     GetCurrentDeviceList(g_libusb_context, subscriber);
-    return HotplugEventPorcess::GetInstance()->SetSubscriber(subscriber);
+    return ret;
 }
 
-void HotplugEventPorcess::AddHotplugTask(V2_0::USBDeviceInfo& info)
+void HotplugEventPorcess::AddHotplugTask(V2_0::USBDeviceInfo& info, sptr<V2_0::IUsbdSubscriber> subscriber)
 {
     std::unique_lock<std::mutex> lock(queueMutex_);
-    hotplugEventQueue_.push(info);
+    HotplugInfo hotplugEvent(info, subscriber);
+    hotplugEventQueue_.push(hotplugEvent);
     if (activeThreads_ == 0) {
         std::thread(&HotplugEventPorcess::OnProcessHotplugEvent, this).detach();
         activeThreads_++;
@@ -2999,7 +3001,7 @@ size_t HotplugEventPorcess::GetSubscriberSize()
 void HotplugEventPorcess::OnProcessHotplugEvent()
 {
     while (!shutdown_) {
-        V2_0::USBDeviceInfo info;
+        HotplugInfo info;
         {
             std::unique_lock<std::mutex> lock(queueMutex_);
             if (shutdown_ || hotplugEventQueue_.empty()) {
@@ -3013,8 +3015,12 @@ void HotplugEventPorcess::OnProcessHotplugEvent()
             info = hotplugEventQueue_.front();
             hotplugEventQueue_.pop();
         }
+        if (info.subscriberPtr != nullptr) {
+            info.subscriberPtr->DeviceEvent(info.hotplugInfo);
+            continue;
+        }
         for (auto subscriber: subscribers_) {
-            subscriber->DeviceEvent(info);
+            subscriber->DeviceEvent(info.hotplugInfo);
         }
     }
 }
