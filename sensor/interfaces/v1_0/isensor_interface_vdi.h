@@ -24,8 +24,12 @@
 struct SensorHandle : public OHOS::HDI::Sensor::V3_0::DeviceSensorInfo {
     bool operator == (const SensorHandle& other) const
     {
+#ifdef TV_FLAG
         return deviceId == other.deviceId && sensorType == other.sensorType && sensorId == other.sensorId &&
                 location == other.location;
+#else
+        return sensorType == other.sensorType;
+#endif
     }
 
     bool operator < (const SensorHandle& other) const
@@ -48,12 +52,18 @@ namespace std {
     struct hash<SensorHandle> {
         std::size_t operator()(const SensorHandle& obj) const
         {
+#ifdef TV_FLAG
             std::size_t h1 = std::hash<int64_t>{}(obj.deviceId);
             std::size_t h2 = std::hash<int64_t>{}(obj.sensorType);
             std::size_t h3 = std::hash<int64_t>{}(obj.sensorId);
             std::size_t h4 = std::hash<int64_t>{}(obj.location);
 
             return h1 ^ h2 ^ h3 ^ h4;
+#else
+            std::size_t h2 = std::hash<int64_t>{}(obj.sensorType);
+
+            return h2;
+#endif
         }
     };
 }
