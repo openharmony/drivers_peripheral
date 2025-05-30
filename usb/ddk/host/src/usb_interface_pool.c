@@ -1598,6 +1598,7 @@ int32_t UsbGetPipeInfo(
         HDF_LOGE("%{public}s:%{publid}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
+    OsalMutexLock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
 
     HDF_LOGE("%{public}s:%{public}d ifaceHdl->devHandle is %{public}p", __func__, __LINE__, ifaceHdl->devHandle);
 
@@ -1628,6 +1629,7 @@ int32_t UsbGetPipeInfo(
     }
 
     *pipeInfo = pipeObj->info;
+    OsalMutexUnlock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
 
     return HDF_SUCCESS;
 }
