@@ -1599,6 +1599,11 @@ int32_t UsbGetPipeInfo(
         return HDF_ERR_INVALID_PARAM;
     }
     OsalMutexLock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
+    if (ifaceHdl->devHandle->dev == NULL) {
+        OsalMutexUnlock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
+        HDF_LOGE("%{public}s:%{publid}d device is null", __func__, __LINE__);
+        return HDF_ERR_BAD_FD;
+    }
 
     HDF_LOGE("%{public}s:%{public}d ifaceHdl->devHandle is %{public}p", __func__, __LINE__, ifaceHdl->devHandle);
 
