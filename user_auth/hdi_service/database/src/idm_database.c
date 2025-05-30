@@ -1595,19 +1595,23 @@ ResultCode GetCredentialByUserIdAndCredId(int32_t userId, uint64_t credentialId,
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC void FindCredential(UserInfo *user, CredentialInfoHal **abandonCredential,
-    CredentialInfoHal **oldCredential, CredentialInfoHal **newCredential)
+IAM_STATIC void FindCredential(UserInfo *user, CredentialInfoHal **oldCredential,
+    CredentialInfoHal **curCredential, CredentialInfoHal **newCredential)
 {
     LinkedListNode *temp = user->credentialInfoList->head;
     while (temp != NULL) {
         CredentialInfoHal *nodeData = (CredentialInfoHal*)temp->data;
-        if (nodeData != NULL && nodeData->authType == PIN_AUTH && nodeData->isAbandoned) {
-            *abandonCredential = nodeData;
+        if (nodeData == NULL) {
+            temp = temp->next;
+            continue;
         }
-        if (nodeData != NULL && nodeData->authType == PIN_AUTH && !nodeData->isAbandoned) {
+        if (nodeData->authType == PIN_AUTH && nodeData->isAbandoned) {
             *oldCredential = nodeData;
         }
-        if (nodeData != NULL && nodeData->authType == DEFAULT_AUTH_TYPE) {
+        if (nodeData->authType == PIN_AUTH && !nodeData->isAbandoned) {
+            *curCredential = nodeData;
+        }
+        if (nodeData->authType == DEFAULT_AUTH_TYPE) {
             *newCredential = nodeData;
         }
         temp = temp->next;
@@ -1623,19 +1627,20 @@ ResultCode UpdateAbandonResultForReset(int32_t userId, bool *isDelete, Credentia
         return RESULT_BAD_PARAM;
     }
 
-    CredentialInfoHal *abandonCredential = NULL;
     CredentialInfoHal *oldCredential = NULL;
+    CredentialInfoHal *curCredential = NULL;
     CredentialInfoHal *newCredential = NULL;
-    FindCredential(user, &abandonCredential, &oldCredential, &newCredential);
-    if (abandonCredential == NULL || oldCredential == NULL || newCredential == NULL) {
-        LOG_ERROR("abandonCredential, oldCredential or newCredential is not exist");
+    FindCredential(user, &oldCredential, &curCredential, &newCredential);
+    if (oldCredential == NULL || curCredential == NULL || newCredential == NULL) {
+        LOG_ERROR("oldCredential, curCredential or newCredential is not exist");
         return RESULT_GENERAL_ERROR;
     }
 
     *isDelete = true;
-    *credentialInfo = *oldCredential;
-    uint64_t abandonTime = abandonCredential->abandonedSysTime;
-    oldCredential->authType = DEFAULT_AUTH_TYPE;
+    *credentialInfo = *curCredential;
+    uint64_t abandonTime = oldCredential->abandonedSysTime;
+    oldCredential->abandonedSysTime = GetReeTime();
+    curCredential->authType = DEFAULT_AUTH_TYPE;
     newCredential->authType = PIN_AUTH;
     SwitchSubType(user);
     ResultCode result = UpdateFileInfo(g_userInfoList);
@@ -1645,9 +1650,9 @@ ResultCode UpdateAbandonResultForReset(int32_t userId, bool *isDelete, Credentia
         return result;
     }
     LOG_ERROR("switch cache pin fail");
-    oldCredential->authType = PIN_AUTH;
+    curCredential->authType = PIN_AUTH;
     newCredential->authType = DEFAULT_AUTH_TYPE;
-    abandonCredential->abandonedSysTime = abandonTime;
+    oldCredential->abandonedSysTime = abandonTime;
     SwitchSubType(user);
     *isDelete = false;
     return RESULT_GENERAL_ERROR;
@@ -1661,21 +1666,21 @@ ResultCode UpdateAbandonResultForUpdate(int32_t userId, bool *isDelete, Credenti
         return RESULT_BAD_PARAM;
     }
 
-    CredentialInfoHal *abandonCredential = NULL;
     CredentialInfoHal *oldCredential = NULL;
+    CredentialInfoHal *curCredential = NULL;
     CredentialInfoHal *newCredential = NULL;
-    FindCredential(user, &abandonCredential, &oldCredential, &newCredential);
-    if (oldCredential == NULL || newCredential == NULL) {
-        LOG_ERROR("oldCredential or newCredential is not exist");
+    FindCredential(user, &oldCredential, &curCredential, &newCredential);
+    if (curCredential == NULL || newCredential == NULL) {
+        LOG_ERROR("curCredential or newCredential is not exist");
         return RESULT_GENERAL_ERROR;
     }
     newCredential->authType = PIN_AUTH;
-    oldCredential->isAbandoned = true;
-    oldCredential->abandonedSysTime = GetReeTime();
-    if (abandonCredential != NULL) {
+    curCredential->isAbandoned = true;
+    curCredential->abandonedSysTime = GetReeTime();
+    if (oldCredential != NULL) {
         *isDelete = true;
-        *credentialInfo = *abandonCredential;
-        abandonCredential->authType = DEFAULT_AUTH_TYPE;
+        *credentialInfo = *oldCredential;
+        oldCredential->authType = DEFAULT_AUTH_TYPE;
     }
 
     SwitchSubType(user);
@@ -1686,11 +1691,11 @@ ResultCode UpdateAbandonResultForUpdate(int32_t userId, bool *isDelete, Credenti
         return result;
     }
     LOG_ERROR("switch cache pin fail");
-    oldCredential->isAbandoned = false;
-    oldCredential->abandonedSysTime = 0;
+    curCredential->isAbandoned = false;
+    curCredential->abandonedSysTime = 0;
     newCredential->authType = DEFAULT_AUTH_TYPE;
-    if (abandonCredential != NULL) {
-        abandonCredential->authType = PIN_AUTH;
+    if (oldCredential != NULL) {
+        oldCredential->authType = PIN_AUTH;
     }
     SwitchSubType(user);
     *isDelete = false;
