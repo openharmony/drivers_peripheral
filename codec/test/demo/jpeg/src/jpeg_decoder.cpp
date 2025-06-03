@@ -18,7 +18,7 @@
 #include <securec.h>
 #include <cstdio>
 #include <unistd.h>
-#include <sys/mman.h> 
+#include <sys/mman.h>
 #include "codec_log_wrapper.h"
 #include "jpeg_decoder.h"
 

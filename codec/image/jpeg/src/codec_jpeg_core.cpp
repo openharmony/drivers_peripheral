@@ -35,8 +35,13 @@ CodecJpegCore::~CodecJpegCore()
 
 void CodecJpegCore::NotifyPowerOn()
 {
-    CHECK_AND_RETURN_RET_LOG(JpegHwi_ != nullptr, , "JpegHwi_ is null");
-    JpegHwi_->NotifyPowerOn();
+    if (JpegHwi_ == nullptr) {
+        CODEC_LOGE("JpegHwi_ is null");
+        return;
+    }
+    if (JpegHwi_->NotifyPowerOn != nullptr) {
+        JpegHwi_->NotifyPowerOn();
+    }  
 }
 
 void CodecJpegCore::AddVendorLib()

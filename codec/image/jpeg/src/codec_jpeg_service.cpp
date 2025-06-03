@@ -29,7 +29,10 @@ CodecJpegService::CodecJpegService()
 void CodecJpegService::NotifyJpegPowerOn()
 {
     CODEC_LOGD("servcie impl!");
-    CHECK_AND_RETURN_RET_LOG(core_ != nullptr, , "core_ is null");
+    if (core_ == nullptr) {
+        CODEC_LOGE("core_ is null");
+        return;
+    }
     core_->NotifyPowerOn();
 }
 

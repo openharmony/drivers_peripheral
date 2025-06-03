@@ -43,7 +43,7 @@ int32_t CodecImageService::NotifyPowerOn(enum CodecImageRole role)
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecPrePowerOn");
     CODEC_LOGD("servcie impl!");
     if (role == CODEC_IMAGE_JPEG) {
-        CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE , "jpegImpl_ is null");
+        CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE, "jpegImpl_ is null");
         jpegImpl_->NotifyJpegPowerOn();
     }
     return HDF_SUCCESS;
