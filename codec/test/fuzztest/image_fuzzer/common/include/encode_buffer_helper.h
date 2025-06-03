@@ -22,7 +22,7 @@
 #include <set>
 #include <fstream>
 #include "log.h"
-#include "v2_0/icodec_image.h"
+#include "v2_1/icodec_image.h"
 #include "v1_2/display_composer_type.h"
 #include "v1_2/display_buffer_type.h"
 #include "v1_2/include/idisplay_buffer.h"
@@ -34,7 +34,7 @@ public:
     EncodeBufferHelper();
     ~EncodeBufferHelper();
     OHOS::sptr<OHOS::HDI::Base::NativeBuffer> CreateImgBuffer(uint8_t* data, size_t &size);
-    OHOS::HDI::Codec::Image::V2_0::SharedBuffer CreateSharedBuffer(uint8_t* data, size_t &size);
+    OHOS::HDI::Codec::Image::V2_1::SharedBuffer CreateSharedBuffer(uint8_t* data, size_t &size);
 private:
     struct PixelFileInfo {
         uint32_t displayWidth;

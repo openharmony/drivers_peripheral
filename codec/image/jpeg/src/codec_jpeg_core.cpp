@@ -33,6 +33,12 @@ CodecJpegCore::~CodecJpegCore()
     }
 }
 
+void CodecJpegCore::NotifyPowerOn()
+{
+    CHECK_AND_RETURN_RET_LOG(JpegHwi_ != nullptr, , "JpegHwi_ is null");
+    JpegHwi_->NotifyPowerOn();
+}
+
 void CodecJpegCore::AddVendorLib()
 {
     CODEC_LOGI("start load jpeg dependency library!");
@@ -88,10 +94,10 @@ int32_t CodecJpegCore::FreeInBuffer(BufferHandle *buffer)
 }
 
 int32_t CodecJpegCore::DoDecode(BufferHandle *buffer, BufferHandle *outBuffer,
-    const V2_0::CodecJpegDecInfo *decInfo)
+    const V2_1::CodecJpegDecInfo *decInfo)
 {
     CHECK_AND_RETURN_RET_LOG(JpegHwi_ != nullptr, HDF_FAILURE, "JpegHwi_ is null");
-    CodecJpegDecInfo *vdiDecInfo = reinterpret_cast<CodecJpegDecInfo *>(const_cast<V2_0::CodecJpegDecInfo *>(decInfo));
+    CodecJpegDecInfo *vdiDecInfo = reinterpret_cast<CodecJpegDecInfo *>(const_cast<V2_1::CodecJpegDecInfo *>(decInfo));
     return (JpegHwi_->DoJpegDecode)(buffer, outBuffer, vdiDecInfo);
 }
 } // Image

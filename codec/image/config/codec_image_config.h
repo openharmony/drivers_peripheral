@@ -17,12 +17,12 @@
 #define CODEC_IMAGE_CONFIG_H
 #include <refbase.h>
 #include "device_resource_if.h"
-#include "v2_0/codec_image_type.h"
+#include "v2_1/codec_image_type.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V2_0 {
+namespace V2_1 {
 struct ConfigUintNodeAttr {
     std::string attrName;
     uint32_t &value;
@@ -55,7 +55,7 @@ private:
     std::vector<CodecImageCapability> capList_;
     static CodecImageConfig config_;
 };
-} // V2_0
+} // V2_1
 } // Image
 } // Codec
 } // HDI
