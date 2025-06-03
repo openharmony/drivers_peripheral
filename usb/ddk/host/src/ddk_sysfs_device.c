@@ -58,13 +58,13 @@ static int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName,
         return HDF_FAILURE;
     }
 
-    char normalizedPath[PATH_MAX];
+    char normalizedPath[PATH_MAX] = {'\0'};
     if (realpath(pathTmp, normalizedPath) == NULL) {
         HDF_LOGE("%{public}s: failed to normalize path: %{public}s, errno: %{public}d", __func__, pathTmp, errno);
         return HDF_FAILURE;
     }
     // read string  from file
-    char *path = normalizedPath = {'\0'};
+    char *path = normalizedPath;
     int32_t fd = open(path, O_RDONLY | O_CLOEXEC);
     if (fd == -1) {
         HDF_LOGE("%{public}s: open file failed path:%{public}s, errno:%{public}d", __func__, path, errno);
