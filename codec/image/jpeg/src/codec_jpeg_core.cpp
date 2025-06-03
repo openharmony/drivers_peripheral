@@ -41,7 +41,7 @@ void CodecJpegCore::NotifyPowerOn()
     }
     if (JpegHwi_->NotifyPowerOn != nullptr) {
         JpegHwi_->NotifyPowerOn();
-    }  
+    }
 }
 
 void CodecJpegCore::AddVendorLib()
