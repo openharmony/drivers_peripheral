@@ -364,6 +364,11 @@ int32_t DoQueryPinInfo(uint64_t templateId, PinCredentialInfos *pinCredentialInf
         LOG_ERROR("GetSubTypeAndFreezeTime fail.");
         return ret;
     }
+    ret = GetCredentialLength(templateId, &(pinCredentialInfo->credentialLength));
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetCredentialLength fail.");
+        return ret;
+    }
     pinCredentialInfo->nextFailLockoutDuration = GetNextFailLockoutDuration(authErrorCount);
     if (pinCredentialInfo->freezeTime > 0) {
         pinCredentialInfo->remainTimes = 0;

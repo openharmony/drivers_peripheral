@@ -35,6 +35,7 @@ typedef struct {
     uint64_t subType;
     uint8_t salt[CONST_SALT_LEN];
     uint8_t pinData[CONST_PIN_DATA_LEN];
+    uint32_t pinLength;
 } __attribute__((__packed__)) PinEnrollParam;
 
 typedef struct {
@@ -52,7 +53,8 @@ ResultCode DoGetAlgoParameter(uint64_t templateId, uint8_t *salt, uint32_t *salt
 ResultCode DoGenerateAlgoParameter(uint8_t *algoParameter, uint32_t *algoParameterLength, uint32_t *algoVersion,
     uint8_t *localDeviceId, uint32_t deviceUuidLength);
 ResultCode DelPinById(uint64_t templateId);
-ResultCode AuthPinById(const Buffer *inputPinData, uint64_t templateId, Buffer *outRootSecret, ResultCode *compareRet);
+ResultCode AuthPinById(const Buffer *inputPinData, uint64_t templateId, uint32_t pinLength,
+    Buffer *outRootSecret, ResultCode *compareRet);
 ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *freezeTime, uint32_t count, uint64_t startFreezeTime);
 ResultCode GetRemainTimes(uint64_t templateId, uint32_t *remainingAuthTimes, uint32_t authErrorCount);
 ResultCode GetSubType(uint64_t templateId, uint64_t *subType);
@@ -67,6 +69,8 @@ void DestroyAbandonParam(void);
 ResultCode WriteRootSecretFile(uint64_t templateId, uint64_t newTemplateId, Buffer *ciperInfo);
 ResultCode ReadRootSecretFile(uint64_t templateId, uint64_t *newTemplateId, Buffer **ciperInfo);
 ResultCode ReWriteRootSecretFile(uint64_t templateId);
+ResultCode GetCredentialLength(uint64_t templateId, uint32_t *credentialLength);
+ResultCode RestartLockoutDurationByUserId(int32_t userId);
 #ifdef __cplusplus
 }
 #endif // __cplusplus
