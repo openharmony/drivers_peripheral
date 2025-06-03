@@ -27,7 +27,6 @@
 
 #include "adaptor_memory.h"
 #include "adaptor_log.h"
-#include "all_in_one_func.h"
 #include "collector_func.h"
 #include "executor_func_common.h"
 #include "pin_auth_hdi.h"
@@ -46,6 +45,7 @@ std::map<int32_t, ResultCodeForCoAuth> g_convertResult = {
     {RESULT_PIN_FREEZE, ResultCodeForCoAuth::LOCKED},
     {RESULT_BAD_COPY, ResultCodeForCoAuth::GENERAL_ERROR},
     {RESULT_GENERAL_ERROR, ResultCodeForCoAuth::GENERAL_ERROR},
+    {RESULT_OPERATION_NOT_SUPPORT, ResultCodeForCoAuth::OPERATION_NOT_SUPPORT},
 };
 }
 
@@ -102,26 +102,10 @@ int32_t PinAuth::PinResultToCoAuthResult(int32_t resultCode)
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-int32_t PinAuth::EnrollPin(uint64_t scheduleId, uint64_t subType, std::vector<uint8_t> &salt,
-    const std::vector<uint8_t> &pinData, std::vector<uint8_t> &resultTlv)
+int32_t PinAuth::EnrollPin(PinEnrollParam &pinEnrollParam, std::vector<uint8_t> &resultTlv)
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
-    if (salt.size() != CONST_SALT_LEN || pinData.size() != CONST_PIN_DATA_LEN) {
-        LOG_ERROR("get bad params!");
-        return PinResultToCoAuthResult(RESULT_BAD_PARAM);
-    }
-    PinEnrollParam pinEnrollParam = {};
-    pinEnrollParam.scheduleId = scheduleId;
-    pinEnrollParam.subType = subType;
-    if (memcpy_s(&(pinEnrollParam.salt[0]), CONST_SALT_LEN, salt.data(), CONST_SALT_LEN) != EOK) {
-        LOG_ERROR("copy salt to pinEnrollParam fail!");
-        return PinResultToCoAuthResult(RESULT_BAD_COPY);
-    }
-    if (memcpy_s(&(pinEnrollParam.pinData[0]), CONST_PIN_DATA_LEN, pinData.data(), CONST_PIN_DATA_LEN) != EOK) {
-        LOG_ERROR("copy pinData to pinEnrollParam fail!");
-        return PinResultToCoAuthResult(RESULT_BAD_COPY);
-    }
     Buffer *retTlv = CreateBufferBySize(RESULT_TLV_LEN);
     if (!IsBufferValid(retTlv)) {
         LOG_ERROR("retTlv is unValid!");
@@ -201,23 +185,11 @@ int32_t PinAuth::AllInOneAuth(
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-int32_t PinAuth::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &pinData,
+int32_t PinAuth::AuthPin(PinAuthParam &pinAuthParam,
     const std::vector<uint8_t> &extraInfo, std::vector<uint8_t> &resultTlv)
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
-    if (pinData.size() != CONST_PIN_DATA_LEN || extraInfo.size() == 0) {
-        LOG_ERROR("bad pinData len!");
-        return PinResultToCoAuthResult(RESULT_BAD_PARAM);
-    }
-
-    PinAuthParam pinAuthParam = {};
-    pinAuthParam.scheduleId = scheduleId;
-    pinAuthParam.templateId = templateId;
-    if (memcpy_s(&(pinAuthParam.pinData[0]), CONST_PIN_DATA_LEN, pinData.data(), pinData.size()) != EOK) {
-        LOG_ERROR("mem copy pinData to pinAuthParam fail!");
-        return PinResultToCoAuthResult(RESULT_BAD_COPY);
-    }
     Buffer *extra = CreateBufferByData(extraInfo.data(), extraInfo.size());
     if (!IsBufferValid(extra)) {
         LOG_ERROR("extraInfo is unValid!");
@@ -264,6 +236,7 @@ int32_t PinAuth::QueryPinInfo(uint64_t templateId, PinCredentialInfo &pinCredent
     pinCredentialInfoRet.remainTimes = pinCredentialInfosRet.remainTimes;
     pinCredentialInfoRet.freezingTime = pinCredentialInfosRet.freezeTime;
     pinCredentialInfoRet.nextFailLockoutDuration = pinCredentialInfosRet.nextFailLockoutDuration;
+    pinCredentialInfoRet.credentialLength = pinCredentialInfosRet.credentialLength;
 
     return RESULT_SUCCESS;
 }
@@ -609,6 +582,25 @@ int32_t PinAuth::Abandon(uint64_t scheduleId, uint64_t templateId, const std::ve
 ERROR:
     DestroyBuffer(extra);
     DestroyBuffer(retTlv);
+    return PinResultToCoAuthResult(result);
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::RestartLockoutDuration(const std::vector<uint8_t> &extraInfo)
+{
+    int32_t userId = 0;
+    if (extraInfo.size() < sizeof(int32_t)) {
+        LOG_ERROR("extraInfo size too small!");
+        return RESULT_GENERAL_ERROR;
+    }
+    if (memcpy_s(&userId, sizeof(int32_t), extraInfo.data(), sizeof(int32_t)) != EOK) {
+        LOG_ERROR("copy userId fail!");
+        return RESULT_GENERAL_ERROR;
+    }
+    ResultCode result = DoRestartLockoutDuration(userId);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoRestartLockoutDuration fail!");
+    }
     return PinResultToCoAuthResult(result);
 }
 } // namespace PinAuth

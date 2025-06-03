@@ -26,6 +26,9 @@ ohos_fuzztest("PinAuthHdiFuzzTest") {
   ]
   include_dirs = [
     "../../../../hdi_service/service/inc",
+    "../../../../hdi_service/adaptor/inc",
+    "../../../../hdi_service/common/inc",
+    "../../../../hdi_service/database/inc",
     "../../../../hdi_service/main/inc",
     "../../../../common/logs",
   ]

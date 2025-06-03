@@ -62,6 +62,7 @@ typedef struct {
     uint32_t remainTimes;
     uint32_t freezeTime;
     int32_t nextFailLockoutDuration;
+    uint32_t credentialLength;
 } PinCredentialInfos;
 
 typedef struct AlgoParamOut {
