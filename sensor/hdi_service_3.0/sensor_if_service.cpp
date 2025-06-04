@@ -996,7 +996,7 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<V3_0::SdcSensorInfo>& sdcS
                                  infoVdi.sensorHandle.sensorId,
                                  infoVdi.sensorHandle.location};
 #else
-        info.deviceSensorInfo = {DEFAULT_DEVICE_ID, infoVdi.sensorHandle.sensorType, DEFAULT_SENSOR_ID,
+        info.deviceSensorInfo = {DEFAULT_DEVICE_ID, infoVdi.sensorId, DEFAULT_SENSOR_ID,
                                  DEFAULT_LOCATION};
 #endif
         info.ddrSize = infoVdi.ddrSize;
