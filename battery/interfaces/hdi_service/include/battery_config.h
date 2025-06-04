@@ -23,7 +23,7 @@
 #include <string>
 #include <map>
 
-#include <json/json.h>
+#include <cJSON.h>
 #include "nocopyable.h"
 
 namespace OHOS {
@@ -62,20 +62,21 @@ public:
 
 private:
     bool OpenFile(std::ifstream& ifsConf, const std::string& configPath);
-    void ParseConfInner(const Json::Value& config);
-    void ParseConfSplit(const Json::Value& config);
-    void ParseLightConfig(const Json::Value& lightConfig);
-    void ParseChargeSceneConfig(const Json::Value& chargeSceneConfig);
-    bool IsValidChargeSceneConfig(const std::string& key, const Json::Value& valueObj);
-    bool ParseChargeSceneSupport(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config);
-    bool ParseChargeSceneSet(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config);
-    bool ParseChargeSceneGet(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config);
+    void ParseConfInner(const cJSON* config);
+    void ParseConfSplit(const cJSON* config);
+    void ParseLightConfig(const cJSON* lightConfig);
+    void ParseChargeSceneConfig(const cJSON* chargeSceneConfig);
+    bool IsValidChargeSceneConfig(const std::string& key, const cJSON* valueObj);
+    bool ParseChargeSceneSupport(const cJSON* valueObj, BatteryConfig::ChargeSceneConfig& config);
+    bool ParseChargeSceneSet(const cJSON* valueObj, BatteryConfig::ChargeSceneConfig& config);
+    bool ParseChargeSceneGet(const cJSON* valueObj, BatteryConfig::ChargeSceneConfig& config);
     bool IsValidSysPath(const std::string& path);
-    void ParseChargerConfig(const Json::Value& chargerConfig);
-    void ParseUeventConfig(const Json::Value& ueventConfig);
+    void ParseChargerConfig(const cJSON* chargerConfig);
+    void ParseUeventConfig(const cJSON* ueventConfig);
+    cJSON* ParseJsonStream(std::istream& ifsConf);
     bool SplitKey(const std::string& key, std::vector<std::string>& keys) const;
-    Json::Value GetValue(const Json::Value& config, std::string key) const;
-    bool isValidJsonString(const Json::Value& config) const;
+    cJSON* GetValue(const cJSON* config, std::string key) const;
+    bool isValidJsonString(const cJSON* config) const;
     std::vector<BatteryConfig::LightConfig> lightConfig_;
     BatteryConfig::ChargerConfig chargerConfig_;
     std::map<std::string, BatteryConfig::ChargeSceneConfig> chargeSceneConfigMap_;

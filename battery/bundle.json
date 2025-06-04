@@ -22,16 +22,15 @@
     ],
     "deps": {
       "components": [
+        "cJSON",
         "c_utils",
         "config_policy",
-        "cJSON",
         "drivers_interface_battery",
         "hdf_core",
         "hicollie",
         "hilog",
         "init",
-        "ipc",
-        "jsoncpp"
+        "ipc"
       ]
     },
     "build": {
