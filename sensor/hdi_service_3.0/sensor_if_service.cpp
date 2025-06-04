@@ -755,11 +755,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<V3_0::ISensorCallb
             return HDF_FAILURE;
         }
         SENSOR_TRACE_START("sensorVdiImplV1_1_->Register");
-#ifdef TV_FLAG
         ret = sensorVdiImplV1_1_->Register(groupId, sensorCb);
-#else
-        ret = sensorVdiImplV1_1_->Register(groupId, sensorCb);
-#endif
         SENSOR_TRACE_FINISH;
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s Register failed, error code is %{public}d", __func__, ret);
@@ -813,11 +809,7 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<V3_0::ISensorCal
         return HDF_FAILURE;
     }
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Unregister");
-#ifdef TV_FLAG
     int32_t ret = sensorVdiImplV1_1_->Unregister(groupId, sensorCb);
-#else
-    int32_t ret = sensorVdiImplV1_1_->Unregister(groupId, sensorCb);
-#endif
     SENSOR_TRACE_FINISH;
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: Unregister failed, error code is %{public}d", __func__, ret);
@@ -978,11 +970,7 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<V3_0::SdcSensorInfo>& sdcS
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->GetSdcSensorInfo");
     std::vector<OHOS::HDI::Sensor::V1_1::SdcSensorInfoVdi> sdcSensorInfoVdi1_1;
-#ifdef TV_FLAG
     int32_t ret = sensorVdiImplV1_1_->GetSdcSensorInfo(sdcSensorInfoVdi1_1);
-#else
-    int32_t ret = sensorVdiImplV1_1_->GetSdcSensorInfo(sdcSensorInfoVdi1_1);
-#endif
     SENSOR_TRACE_FINISH;
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s GetSdcSensorInfo failed, error code is %{public}d", __func__, ret);
@@ -1052,51 +1040,7 @@ int32_t SensorIfService::RegisterAsync(int32_t groupId, const sptr<V3_0::ISensor
 
 int32_t SensorIfService::UnregisterAsync(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj)
 {
-    SENSOR_TRACE_PID;
-    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: groupId %{public}d, service %{public}d", __func__, groupId, serviceId);
-    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
-    if (groupId < TRADITIONAL_SENSOR_TYPE || groupId >= SENSOR_GROUP_TYPE_MAX) {
-        HDF_LOGE("%{public}s: groupId %{public}d is error", __func__, groupId);
-        return SENSOR_INVALID_PARAM;
-    }
-    const sptr<IRemoteObject> &iRemoteObject = OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(callbackObj);
-    int32_t result = RemoveCallbackMap(groupId, serviceId, iRemoteObject);
-    if (result !=SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s: RemoveCallbackMap failed groupId[%{public}d]", __func__, groupId);
-    }
-    SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, serviceId, callbackObj);
-    if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
-        HDF_LOGD("%{public}s: clients is not empty, do not unregister", __func__);
-        return HDF_SUCCESS;
-    }
-    if (!SensorClientsManager::GetInstance()->IsNoSensorUsed()) {
-        HDF_LOGD("%{public}s: sensorUsed is not empty, do not unregister", __func__);
-        return HDF_SUCCESS;
-    }
-
-    if (sensorVdiImplV1_1_ == nullptr) {
-        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
-        return HDF_FAILURE;
-    }
-
-    sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, callbackObj, UNREGISTER_SENSOR);
-    if (sensorCb == nullptr) {
-        HDF_LOGE("%{public}s: get sensorcb fail, groupId[%{public}d]", __func__, groupId);
-        return HDF_FAILURE;
-    }
-    SENSOR_TRACE_START("sensorVdiImplV1_1_->Unregister");
-#ifdef TV_FLAG
-    int32_t ret = sensorVdiImplV1_1_->Unregister(groupId, sensorCb);
-#else
-    int32_t ret = sensorVdiImplV1_1_->Unregister(groupId, sensorCb);
-#endif
-    SENSOR_TRACE_FINISH;
-    if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s: Unregister failed, error code is %{public}d", __func__, ret);
-    }
-
-    return ret;
+    return Unregister(groupId, callbackObj);
 }
 
 int32_t SensorIfService::GetDeviceSensorInfo(int32_t deviceId, std::vector<V3_0::HdfSensorInformation> &info)
