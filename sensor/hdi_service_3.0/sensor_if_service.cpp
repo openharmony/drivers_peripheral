@@ -991,9 +991,14 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<V3_0::SdcSensorInfo>& sdcS
     for (auto infoVdi : sdcSensorInfoVdi1_1) {
         V3_0::SdcSensorInfo info;
         info.offset = infoVdi.offset;
+#ifdef TV_FLAG
         info.deviceSensorInfo = {infoVdi.sensorHandle.deviceId, infoVdi.sensorHandle.sensorType,
                                  infoVdi.sensorHandle.sensorId,
                                  infoVdi.sensorHandle.location};
+#else
+        info.deviceSensorInfo = {DEFAULT_DEVICE_ID, infoVdi.sensorId, DEFAULT_SENSOR_ID,
+                                 DEFAULT_LOCATION};
+#endif
         info.ddrSize = infoVdi.ddrSize;
         info.minRateLevel = infoVdi.minRateLevel;
         info.maxRateLevel = infoVdi.maxRateLevel;
