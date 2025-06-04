@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -187,6 +187,18 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest008, TestSize.Level0)
     int32_t ret = g_powerInterface->HoldRunningLockExt(filledInfo, 0, testName);
     EXPECT_NE(0, ret);
     ret = g_powerInterface->UnholdRunningLockExt(filledInfo, 0, testName);
+    EXPECT_NE(0, ret);
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest009
+  * @tc.desc: check GetInstance and GetPowerSceneConfigMap
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest009, TestSize.Level0)
+{
+    std::string testName = "HdfPowerHdiTest009";
+    int32_t ret = g_powerInterface->SetPowerConfig("123", "345");
     EXPECT_NE(0, ret);
 }
 }
