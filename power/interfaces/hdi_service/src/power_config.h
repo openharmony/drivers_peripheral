@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,11 +17,12 @@
 #define OHOS_HDI_POWER_V1_2_POWER_CONFIG_H
 
 #include <fstream>
-#include <string>
-#include <mutex>
-#include <vector>
 #include <map>
-#include <json/json.h>
+#include <mutex>
+#include <string>
+#include <vector>
+
+#include <cJSON.h>
 #include "nocopyable.h"
 
 namespace OHOS {
@@ -41,11 +42,12 @@ public:
 
 private:
     bool OpenFile(std::ifstream& ifsConf, const std::string& configPath);
-    void ParseConfInner(const Json::Value& config);
+    void ParseConfInner(const cJSON* config);
     bool SplitKey(const std::string& key, std::vector<std::string>& keys) const;
-    Json::Value GetValue(const Json::Value& config, std::string key) const;
-    void ParseSceneConfig(const Json::Value& sceneConfig);
-    bool isValidJsonString(const Json::Value& config) const;
+    cJSON* GetValue(const cJSON* config, std::string key) const;
+    void ParseSceneConfig(const cJSON* sceneConfig);
+    cJSON* ParseJsonStream(std::istream& ifsConf);
+    bool isValidJsonString(const cJSON* config) const;
     std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap_;
     static std::mutex mutex_;
     static std::shared_ptr<PowerConfig> instance_;
