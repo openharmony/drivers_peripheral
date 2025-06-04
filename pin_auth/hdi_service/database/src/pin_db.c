@@ -297,11 +297,12 @@ ResultCode DelPinById(uint64_t templateId)
     return RESULT_SUCCESS;
 }
 
-static void InitPinInfo(PinInfoV1 *pinInfo, uint64_t templateId, uint64_t subType)
+static void InitPinInfo(PinInfo *pinInfo, uint64_t templateId, uint64_t subType, uint32_t pinLength)
 {
     pinInfo->templateId = templateId;
     pinInfo->subType = subType;
     pinInfo->algoVersion = ALGORITHM_VERSION_0;
+    pinInfo->pinLength = pinLength;
 }
 
 static void InitAntiBruteInfo(AntiBruteInfoV0 *info)
@@ -310,13 +311,13 @@ static void InitAntiBruteInfo(AntiBruteInfoV0 *info)
     info->startFreezeTime = INIT_START_FREEZE_TIMES;
 }
 
-static void InitPinIndex(PinIndexV1 *pinIndex, uint64_t templateId, uint64_t subType)
+static void InitPinIndex(PinIndex *pinIndex, uint64_t templateId, uint64_t subType, uint32_t pinLength)
 {
-    InitPinInfo(&(pinIndex->pinInfo), templateId, subType);
+    InitPinInfo(&(pinIndex->pinInfo), templateId, subType, pinLength);
     InitAntiBruteInfo(&(pinIndex->antiBruteInfo));
 }
 
-static ResultCode AddPinInDb(uint64_t templateId, uint64_t subType)
+static ResultCode AddPinInDb(uint64_t templateId, uint64_t subType, uint32_t pinLength)
 {
     if (g_pinDbOp->pinIndexLen > MAX_CRYPTO_INFO_SIZE - 1) {
         LOG_ERROR("pinIndexLen too large.");
@@ -338,7 +339,7 @@ static ResultCode AddPinInDb(uint64_t templateId, uint64_t subType)
             return RESULT_NO_MEMORY;
         }
     }
-    InitPinIndex(&pinIndex[g_pinDbOp->pinIndexLen], templateId, subType);
+    InitPinIndex(&pinIndex[g_pinDbOp->pinIndexLen], templateId, subType, pinLength);
     if (g_pinDbOp->pinIndex != NULL) {
         Free(g_pinDbOp->pinIndex);
     }
@@ -588,12 +589,40 @@ static ResultCode ProcessAddPin(const Buffer *deviceKey, const Buffer *secret, P
         return ret;
     }
 
-    ret = AddPinInDb(*templateId, pinEnrollParam->subType);
+    ret = AddPinInDb(*templateId, pinEnrollParam->subType, pinEnrollParam->pinLength);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("AddPinDb fail.");
         (void)RemoveAllFile(*templateId);
         return ret;
     }
+    return ret;
+}
+
+static ResultCode UpdatePinLength(uint64_t templateId, uint32_t pinLength)
+{
+    LOG_INFO("start UpdatePinLength");
+    if (templateId == INVALID_TEMPLATE_ID) {
+        LOG_ERROR("check param fail.");
+        return RESULT_BAD_PARAM;
+    }
+
+    uint32_t index = MAX_CRYPTO_INFO_SIZE;
+    ResultCode ret = SearchPinIndex(templateId, &index);
+    if (ret != RESULT_SUCCESS) {
+        return ret;
+    }
+    uint32_t currentPinLength = g_pinDbOp->pinIndex[index].pinInfo.pinLength;
+    LOG_INFO("currentPinLength : %{public}u, inputPinLength : %{public}u", currentPinLength, pinLength);
+    if (currentPinLength == pinLength) {
+        return RESULT_SUCCESS;
+    }
+    g_pinDbOp->pinIndex[index].pinInfo.pinLength = pinLength;
+    ret = WritePinDb(g_pinDbOp);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("WritePinDb fail.");
+        return ret;
+    }
+    LOG_INFO("end UpdatePinLength");
     return ret;
 }
 
@@ -999,7 +1028,8 @@ EXIT:
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-ResultCode AuthPinById(const Buffer *inputPinData, uint64_t templateId, Buffer *outRootSecret, ResultCode *compareRet)
+ResultCode AuthPinById(const Buffer *inputPinData, uint64_t templateId, uint32_t pinLength, Buffer *outRootSecret,
+    ResultCode *compareRet)
 {
     if (!CheckBufferWithSize(inputPinData, CONST_PIN_DATA_LEN) ||
         templateId == INVALID_TEMPLATE_ID || compareRet == NULL) {
@@ -1038,6 +1068,11 @@ ResultCode AuthPinById(const Buffer *inputPinData, uint64_t templateId, Buffer *
         ret = UpdateAntiBruteFile(templateId, true);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("UpdateAntiBruteFile fail.");
+            goto EXIT;
+        }
+        ret = UpdatePinLength(templateId, pinLength);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("UpdatePinLength fail.");
             goto EXIT;
         }
     }
@@ -1414,4 +1449,75 @@ Buffer *GenerateDecodeRootSecret(uint64_t templateId, Buffer *oldRootSecret)
 EXIT:
     DestroyBuffer(cipherInfo);
     return rootSecretPlain;
+}
+
+ResultCode GetCredentialLength(uint64_t templateId, uint32_t *credentialLength)
+{
+    if (templateId == INVALID_TEMPLATE_ID || credentialLength == NULL) {
+        LOG_ERROR("check param fail!");
+        return RESULT_BAD_PARAM;
+    }
+    if (!LoadPinDb()) {
+        LOG_ERROR("LoadPinDb fail.");
+        return RESULT_NEED_INIT;
+    }
+
+    uint32_t index = MAX_CRYPTO_INFO_SIZE;
+    ResultCode ret = SearchPinIndex(templateId, &index);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("SearchPinIndex no pin exist.");
+        return ret;
+    }
+    *credentialLength = g_pinDbOp->pinIndex[index].pinInfo.pinLength;
+
+    LOG_INFO("GetCredentialLength succ.");
+    return RESULT_SUCCESS;
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+ResultCode RestartLockoutDurationByUserId(int32_t userId)
+{
+    // Example implementation, This will restart lockout duration for all users.
+    LOG_INFO("start");
+    (void)userId;
+    if (!LoadPinDb()) {
+        LOG_ERROR("load pinDb fail.");
+        return RESULT_NEED_INIT;
+    }
+    if (g_pinDbOp->pinIndexLen == 0) {
+        LOG_ERROR("SearchPinIndex no pin exist.");
+        return RESULT_BAD_MATCH;
+    }
+
+    uint32_t errorCount = 0;
+    uint64_t templateId = 0;
+    uint64_t startFreezeTime = 0;
+    uint32_t freezeTime = 0;
+    ResultCode ret = RESULT_GENERAL_ERROR;
+    bool anyLockoutRestart = false;
+    for (uint32_t index = 0; index < g_pinDbOp->pinIndexLen; index++) {
+        errorCount = g_pinDbOp->pinIndex[index].antiBruteInfo.authErrorCount;
+        templateId = g_pinDbOp->pinIndex[index].pinInfo.templateId;
+        startFreezeTime = g_pinDbOp->pinIndex[index].antiBruteInfo.startFreezeTime;
+        freezeTime = 0;
+        ret = ComputeFreezeTime(templateId, &freezeTime, errorCount, startFreezeTime);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("ComputeFreezeTime fail.");
+            return ret;
+        }
+        if (freezeTime != 0) {
+            uint64_t nowTime = GetRtcTime();
+            ret = SetAntiBruteInfoById(templateId, errorCount, nowTime);
+            if (ret != RESULT_SUCCESS) {
+                LOG_ERROR("SetAntiBruteInfoById fail.");
+                return ret;
+            }
+            anyLockoutRestart = true;
+            LOG_INFO("restart lockout duration success.");
+        }
+    }
+    if (anyLockoutRestart) {
+        return RESULT_SUCCESS;
+    }
+    return ret;
 }

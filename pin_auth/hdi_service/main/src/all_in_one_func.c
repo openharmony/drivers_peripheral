@@ -228,7 +228,8 @@ ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *extraInfo, Buffer *retT
 
     if (pinCredentialInfo.freezeTime == 0) {
         Buffer pinData = GetTmpBuffer(pinAuthParam->pinData, CONST_PIN_DATA_LEN, CONST_PIN_DATA_LEN);
-        ret = AuthPinById(&pinData, pinAuthParam->templateId, pinAuthFwkInfo.rootSecret, compareRet);
+        ret = AuthPinById(&pinData, pinAuthParam->templateId, pinAuthParam->pinLength,
+            pinAuthFwkInfo.rootSecret, compareRet);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("AuthPinById fail.");
             goto EXIT;
@@ -448,5 +449,14 @@ ResultCode DoAbandonPin(PinAbandonParam *pinAbandonParam, Buffer *extraInfo, Buf
 EXIT:
     DestroyBuffer(pinAbandonExtraInfo.oldRootSecret);
     DestroyBuffer(pinAbandonExtraInfo.newRootSecret);
+    return ret;
+}
+
+ResultCode DoRestartLockoutDuration(int32_t userId)
+{
+    ResultCode ret = RestartLockoutDurationByUserId(userId);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("RestartLockoutDurationByUserId fail.");
+    }
     return ret;
 }
