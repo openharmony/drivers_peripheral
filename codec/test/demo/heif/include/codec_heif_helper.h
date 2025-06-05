@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_IMAGE_V2_0_CODEC_HEIF_HELPER
-#define OHOS_HDI_CODEC_IMAGE_V2_0_CODEC_HEIF_HELPER
+#ifndef OHOS_HDI_CODEC_IMAGE_V2_1_CODEC_HEIF_HELPER
+#define OHOS_HDI_CODEC_IMAGE_V2_1_CODEC_HEIF_HELPER
 
 #include <vector>
 #include "command_parser.h"
@@ -45,19 +45,19 @@ private:
     bool AssembleParamForOtherImg(uint32_t primaryImgId);
     bool AssembleParamForMetaData(uint32_t primaryImgId);
     uint32_t GetNextId() { return id_++; }
-    bool FillImageItem(ImgType type, OHOS::HDI::Codec::Image::V2_0::ImageItem& item);
-    bool FillMetaItem(const std::string& metaFile, MetaType type, OHOS::HDI::Codec::Image::V2_0::MetaItem& item);
+    bool FillImageItem(ImgType type, OHOS::HDI::Codec::Image::V2_1::ImageItem& item);
+    bool FillMetaItem(const std::string& metaFile, MetaType type, OHOS::HDI::Codec::Image::V2_1::MetaItem& item);
     static bool AddPropOnlyForTmap(ByteWriter& bw);
     bool AddPropMirrorAndRotate(ByteWriter& bw);
     bool CreateImgParam(ImgType type, std::vector<uint8_t>& props);
-    bool AllocOutputBuffer(OHOS::HDI::Codec::Image::V2_0::SharedBuffer& output);
+    bool AllocOutputBuffer(OHOS::HDI::Codec::Image::V2_1::SharedBuffer& output);
 private:
     CommandOpt encodeOpt_;
-    std::vector<OHOS::HDI::Codec::Image::V2_0::ImageItem> inputImgs_;
-    std::vector<OHOS::HDI::Codec::Image::V2_0::MetaItem> inputMetas_;
-    std::vector<OHOS::HDI::Codec::Image::V2_0::ItemRef> refs_;
+    std::vector<OHOS::HDI::Codec::Image::V2_1::ImageItem> inputImgs_;
+    std::vector<OHOS::HDI::Codec::Image::V2_1::MetaItem> inputMetas_;
+    std::vector<OHOS::HDI::Codec::Image::V2_1::ItemRef> refs_;
     uint32_t id_ = 0;
     BufferHelper bufferHelper_;
 };
 } // OHOS::VDI::HEIF
-#endif // OHOS_HDI_CODEC_IMAGE_V2_0_CODEC_HEIF_HELPER
+#endif // OHOS_HDI_CODEC_IMAGE_V2_1_CODEC_HEIF_HELPER

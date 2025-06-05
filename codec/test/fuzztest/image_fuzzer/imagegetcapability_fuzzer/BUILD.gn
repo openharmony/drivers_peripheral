@@ -26,7 +26,7 @@ ohos_fuzztest("ImageGetCapabilityFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_codec:libimage_proxy_2.0",
+    "drivers_interface_codec:libimage_proxy_2.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",

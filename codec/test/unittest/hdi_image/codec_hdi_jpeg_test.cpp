@@ -19,14 +19,14 @@
 #include "v1_0/include/idisplay_buffer.h"
 #include "v1_0/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
-#include "v2_0/icodec_image.h"
+#include "v2_1/icodec_image.h"
 #define HDF_LOG_TAG codec_jpeg_test
 
 using namespace std;
 using namespace testing::ext;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
-using namespace OHOS::HDI::Codec::Image::V2_0;
+using namespace OHOS::HDI::Codec::Image::V2_1;
 namespace {
 constexpr int32_t WIDTH = 640;
 constexpr int32_t HEIGHT = 480;

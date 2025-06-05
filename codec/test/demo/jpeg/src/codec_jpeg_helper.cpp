@@ -18,7 +18,7 @@
 #include <cerrno>
 #include <cstring>
 #include <securec.h>
-#include "hdf_log.h"
+#include "codec_log_wrapper.h"
 
 static int8_t UnZigZagTable[64] = {
     0,  1,  5,  6, 14, 15, 27, 28,
@@ -30,60 +30,60 @@ static int8_t UnZigZagTable[64] = {
     21, 34, 37, 47, 50, 56, 59, 61,
     35, 36, 48, 49, 57, 58, 62, 63};
 
-using namespace OHOS::HDI::Codec::Image::V2_0;
+using namespace OHOS::HDI::Codec::Image::V2_1;
 int32_t CodecJpegHelper::JpegAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t fd)
 {
-    HDF_LOGI("enter");
+    CODEC_LOGI("enter");
     int32_t curPos = 0;
     // SOI
     curPos = PutInt16(buffer, curPos, 0xffd8);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOI error");
+        CODEC_LOGE("assemble SOI error");
         return -1;
     }
 
     // DQT
     curPos = JpegDqtAssemble(decInfo, buffer, curPos);
     if (curPos < 0) {
-        HDF_LOGE("assemble DQT error");
+        CODEC_LOGE("assemble DQT error");
         return -1;
     }
 
     // DHT
     curPos = JpegDhtAssemble(decInfo, buffer, curPos);
     if (curPos < 0) {
-        HDF_LOGE("assemble DHT error");
+        CODEC_LOGE("assemble DHT error");
         return -1;
     }
     // DRI
     curPos = JpegDriAssemble(decInfo, buffer, curPos);
     if (curPos < 0) {
-        HDF_LOGE("assemble DRI error");
+        CODEC_LOGE("assemble DRI error");
         return -1;
     }
 
     // SOF
     curPos = JpegSofAssemble(decInfo, buffer, curPos);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOF error");
+        CODEC_LOGE("assemble SOF error");
         return -1;
     }
     // SOS
     curPos = JpegSosAssemble(decInfo, buffer, curPos);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOS error");
+        CODEC_LOGE("assemble SOS error");
         return -1;
     }
     // DATA
     curPos = JpegDataAssemble(buffer, curPos, fd);
     if (curPos < 0) {
-        HDF_LOGE("assemble CompressedData error");
+        CODEC_LOGE("assemble CompressedData error");
         return -1;
     }
     // EOI
     curPos = PutInt16(buffer, curPos, 0xffd9);
     if (curPos < 0) {
-        HDF_LOGE("assemble EOI error");
+        CODEC_LOGE("assemble EOI error");
         return -1;
     }
     return curPos;
@@ -92,7 +92,7 @@ int32_t CodecJpegHelper::JpegAssemble(const struct CodecJpegDecInfo &decInfo, in
 bool CodecJpegHelper::DessambleJpeg(int8_t *buffer, size_t bufferLen, struct CodecJpegDecInfo &decInfo,
                                     std::unique_ptr<int8_t[]> &compressBuffer, uint32_t &comBufLen, uint32_t &dataStart)
 {
-    HDF_LOGI("enter");
+    CODEC_LOGI("enter");
     int8_t *start = buffer;
     const int8_t *end = buffer + bufferLen;
     while (start < end) {
@@ -114,7 +114,7 @@ bool CodecJpegHelper::DessambleJpeg(int8_t *buffer, size_t bufferLen, struct Cod
                 // compressed data start
                 auto len = DessambleCompressData(start, compressBuffer, comBufLen);
                 if (len < 0) {
-                    HDF_LOGE("copy compressed data error");
+                    CODEC_LOGE("copy compressed data error");
                     return false;
                 }
                 start += len;
@@ -131,9 +131,9 @@ bool CodecJpegHelper::DessambleJpeg(int8_t *buffer, size_t bufferLen, struct Cod
                 break;
             }
             default: {
-                short len = GetInt16(start);
+                int32_t len = GetInt16(start);
                 start += len;
-                HDF_LOGW("skip marker[%{public}x], len[%{public}d]", marker, len);
+                CODEC_LOGW("skip marker[%{public}x], len[%{public}d]", marker, len);
                 break;
             }
         }
@@ -142,11 +142,11 @@ bool CodecJpegHelper::DessambleJpeg(int8_t *buffer, size_t bufferLen, struct Cod
 }
 int32_t CodecJpegHelper::JpegDqtAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    HDF_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGI("enter. curPos = %{public}d", curPos);
     // flag
     curPos = PutInt16(buffer, curPos, 0xffdb);
     if (curPos < 0) {
-        HDF_LOGE("assemble DQT flag error");
+        CODEC_LOGE("assemble DQT flag error");
         return curPos;
     }
 
@@ -163,12 +163,12 @@ int32_t CodecJpegHelper::JpegDqtAssemble(const struct CodecJpegDecInfo &decInfo,
         index = (index << 4) | i;  // precision << 4 | tableid
         curPos = PutInt8(buffer, curPos, index);
         if (curPos < 0) {
-            HDF_LOGE("assemble precision and tableid error");
+            CODEC_LOGE("assemble precision and tableid error");
             return curPos;
         }
 
         for (size_t j = 0; j < decInfo.quantTbl[i].quantVal.size(); j++) {
-            HDF_LOGI("decInfo.quantTbl[%{public}zu].quantVal[%{public}zu] = %{public}d", i, j,
+            CODEC_LOGI("decInfo.quantTbl[%{public}zu].quantVal[%{public}zu] = %{public}d", i, j,
                 decInfo.quantTbl[i].quantVal[j]);
             curPos = PutInt16(buffer, curPos, decInfo.quantTbl[i].quantVal[j]);
         }
@@ -176,59 +176,59 @@ int32_t CodecJpegHelper::JpegDqtAssemble(const struct CodecJpegDecInfo &decInfo,
     int16_t bufferLen = static_cast<int16_t>(curPos - lenPos);
     auto ret = PutInt16(buffer, lenPos, bufferLen);
     if (ret < 0) {
-        HDF_LOGE("assemble len error");
+        CODEC_LOGE("assemble len error");
         return ret;
     }
     return curPos;
 }
 int32_t CodecJpegHelper::JpegDriAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    HDF_LOGI("enter, restartInterval = %{public}d curPos = %{public}d", decInfo.restartInterval, curPos);
+    CODEC_LOGI("enter, restartInterval = %{public}d curPos = %{public}d", decInfo.restartInterval, curPos);
     if (decInfo.restartInterval <= 0) {
         return curPos;
     }
     curPos = PutInt16(buffer, curPos, 0xffdd);
     if (curPos < 0) {
-        HDF_LOGE("assemble DRI flag error");
+        CODEC_LOGE("assemble DRI flag error");
         return curPos;
     }
 
     curPos = PutInt16(buffer, curPos, 4);  // 4: dri data len( marker len included)
     if (curPos < 0) {
-        HDF_LOGE("assemble DRI len error");
+        CODEC_LOGE("assemble DRI len error");
         return curPos;
     }
 
     curPos = PutInt16(buffer, curPos, decInfo.restartInterval);
     if (curPos < 0) {
-        HDF_LOGE("assemble dri value error");
+        CODEC_LOGE("assemble dri value error");
         return curPos;
     }
     return curPos;
 }
 int32_t CodecJpegHelper::JpegDhtAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    HDF_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGI("enter. curPos = %{public}d", curPos);
     curPos = JpegDhtAssemble(decInfo.dcHuffTbl, buffer, curPos);
     if (curPos < 0) {
-        HDF_LOGE("assemble dc hufman error");
+        CODEC_LOGE("assemble dc hufman error");
         return curPos;
     }
 
     curPos = JpegDhtAssemble(decInfo.acHuffTbl, buffer, curPos, false);
     if (curPos < 0) {
-        HDF_LOGE("assemble ac hufman error");
+        CODEC_LOGE("assemble ac hufman error");
     }
     return curPos;
 }
 int32_t CodecJpegHelper::JpegDhtAssemble(const std::vector<CodecJpegHuffTable> &table, int8_t *buffer, int32_t curPos,
                                          bool dc)
 {
-    HDF_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGI("enter. curPos = %{public}d", curPos);
     // DC Hufman
     curPos = PutInt16(buffer, curPos, 0xffc4);
     if (curPos < 0) {
-        HDF_LOGE("assemble hufman flag error");
+        CODEC_LOGE("assemble hufman flag error");
         return curPos;
     }
     // skip len
@@ -245,7 +245,7 @@ int32_t CodecJpegHelper::JpegDhtAssemble(const std::vector<CodecJpegHuffTable> &
         type = (type << 4) | i;  // type << 4 | tableid
         curPos = PutInt8(buffer, curPos, type);
         if (curPos < 0) {
-            HDF_LOGE("assemble tableid and dc/ac error");
+            CODEC_LOGE("assemble tableid and dc/ac error");
             return curPos;
         }
         // bits
@@ -253,14 +253,14 @@ int32_t CodecJpegHelper::JpegDhtAssemble(const std::vector<CodecJpegHuffTable> &
         if (ret != EOK) {
             char buf[MAX_BUFFER_LEN] = {0};
             strerror_r(errno, buf, sizeof(buf));
-            HDF_LOGE("assemble bits error ret = %{public}s", buf);
+            CODEC_LOGE("assemble bits error ret = %{public}s", buf);
             return ret;
         }
         curPos += table[i].bits.size();
         // val
         ret = memcpy_s(buffer + curPos, table[i].huffVal.size(), table[i].huffVal.data(), table[i].huffVal.size());
         if (ret != EOK) {
-            HDF_LOGE("assemble huffVal error, ret = %{public}d", ret);
+            CODEC_LOGE("assemble huffVal error, ret = %{public}d", ret);
             return ret;
         }
         curPos += table[i].huffVal.size();
@@ -268,7 +268,7 @@ int32_t CodecJpegHelper::JpegDhtAssemble(const std::vector<CodecJpegHuffTable> &
     int16_t bufferLen = static_cast<int16_t>(curPos - lenPos);
     auto ret = PutInt16(buffer, lenPos, bufferLen);
     if (ret < 0) {
-        HDF_LOGE("assemble len error");
+        CODEC_LOGE("assemble len error");
         return ret;
     }
     return curPos;
@@ -276,25 +276,25 @@ int32_t CodecJpegHelper::JpegDhtAssemble(const std::vector<CodecJpegHuffTable> &
 
 int32_t CodecJpegHelper::JpegSofAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    HDF_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGI("enter. curPos = %{public}d", curPos);
     // flag
     curPos = PutInt16(buffer, curPos, 0xffc0);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOF flag error");
+        CODEC_LOGE("assemble SOF flag error");
         return curPos;
     }
 
     int16_t len = decInfo.numComponents * 3 + 8; // * rgb channel + other data
     curPos = PutInt16(buffer, curPos, len);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOF len error");
+        CODEC_LOGE("assemble SOF len error");
         return curPos;
     }
 
     int8_t precision = decInfo.dataPrecision & 0xFF;
     curPos = PutInt8(buffer, curPos, precision);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOF precision error");
+        CODEC_LOGE("assemble SOF precision error");
         return curPos;
     }
 
@@ -302,7 +302,7 @@ int32_t CodecJpegHelper::JpegSofAssemble(const struct CodecJpegDecInfo &decInfo,
     int16_t width = decInfo.imageHeight & 0xFFFF;
     curPos = PutInt16(buffer, curPos, width);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOF width error");
+        CODEC_LOGE("assemble SOF width error");
         return curPos;
     }
 
@@ -310,14 +310,14 @@ int32_t CodecJpegHelper::JpegSofAssemble(const struct CodecJpegDecInfo &decInfo,
     int16_t height = decInfo.imageWidth & 0xFFFF;
     curPos = PutInt16(buffer, curPos, height);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOF width error");
+        CODEC_LOGE("assemble SOF width error");
         return curPos;
     }
     // components
     int8_t components = decInfo.numComponents & 0xFF;
     curPos = PutInt8(buffer, curPos, components);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOF components error");
+        CODEC_LOGE("assemble SOF components error");
         return curPos;
     }
     for (size_t i = 0; i < decInfo.compInfo.size(); i++) {
@@ -328,7 +328,7 @@ int32_t CodecJpegHelper::JpegSofAssemble(const struct CodecJpegDecInfo &decInfo,
         int8_t bufferValue[] = {componentId, sampFactor, quantity};
         auto ret = memcpy_s(buffer + curPos, sizeof(bufferValue), bufferValue, sizeof(bufferValue));
         if (ret != EOK) {
-            HDF_LOGE("assemble component error, ret = %{public}d", ret);
+            CODEC_LOGE("assemble component error, ret = %{public}d", ret);
             return ret;
         }
         curPos += sizeof(bufferValue);
@@ -337,25 +337,25 @@ int32_t CodecJpegHelper::JpegSofAssemble(const struct CodecJpegDecInfo &decInfo,
 }
 int32_t CodecJpegHelper::JpegSosAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    HDF_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGI("enter. curPos = %{public}d", curPos);
     // flag
     curPos = PutInt16(buffer, curPos, 0xffda);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOS flag error");
+        CODEC_LOGE("assemble SOS flag error");
         return curPos;
     }
 
     int16_t len = decInfo.numComponents * 2 + 6; // * rgb table length + other data
     curPos = PutInt16(buffer, curPos, len);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOS len error");
+        CODEC_LOGE("assemble SOS len error");
         return curPos;
     }
 
     int8_t components = decInfo.numComponents & 0xFF;
     curPos = PutInt8(buffer, curPos, components);
     if (curPos < 0) {
-        HDF_LOGE("assemble SOS components error");
+        CODEC_LOGE("assemble SOS components error");
         return curPos;
     }
 
@@ -365,14 +365,14 @@ int32_t CodecJpegHelper::JpegSosAssemble(const struct CodecJpegDecInfo &decInfo,
         int16_t value = ((componentId << 8) | indexNo) & 0xffff;
         curPos = PutInt16(buffer, curPos, value);
         if (curPos < 0) {
-            HDF_LOGE("assemble SOS component value error");
+            CODEC_LOGE("assemble SOS component value error");
             return curPos;
         }
     }
     int8_t dataStart[] = {0x00, 0x3F, 0x00};
     auto ret = memcpy_s(buffer + curPos, sizeof(dataStart), dataStart, sizeof(dataStart));
     if (ret != EOK) {
-        HDF_LOGE("assemble SOS data flag error, ret = %{public}d", ret);
+        CODEC_LOGE("assemble SOS data flag error, ret = %{public}d", ret);
         return ret;
     }
     curPos += sizeof(dataStart);
@@ -380,16 +380,16 @@ int32_t CodecJpegHelper::JpegSosAssemble(const struct CodecJpegDecInfo &decInfo,
 }
 int32_t CodecJpegHelper::JpegDataAssemble(int8_t *buffer, int32_t curPos, int32_t fd)
 {
-    HDF_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGI("enter. curPos = %{public}d", curPos);
     int32_t size = OHOS::AshmemGetSize(fd);
-    HDF_LOGI("get size %{public}d from fd %{public}d", size, fd);
+    CODEC_LOGI("get size %{public}d from fd %{public}d", size, fd);
     OHOS::Ashmem mem(fd, size);
     // check ret value
     mem.MapReadOnlyAshmem();
     auto addr = const_cast<void *>(mem.ReadFromAshmem(0, 0));
     auto ret = memcpy_s(buffer + curPos, size, addr, size);
     if (ret != EOK) {
-        HDF_LOGE("assemble compressed data error, ret = %{public}d", ret);
+        CODEC_LOGE("assemble compressed data error, ret = %{public}d", ret);
         mem.UnmapAshmem();
         if (ret > 0) {
             return -ret;
@@ -404,7 +404,7 @@ int32_t CodecJpegHelper::JpegDataAssemble(int8_t *buffer, int32_t curPos, int32_
 
 int32_t CodecJpegHelper::DessambleSof(int8_t *buffer, struct CodecJpegDecInfo &decInfo)
 {
-    HDF_LOGI("dessamble SOI");
+    CODEC_LOGI("dessamble SOI");
     // len
     int32_t len = GetInt16(buffer);
     buffer += 2;  // 2: marker len
@@ -421,7 +421,7 @@ int32_t CodecJpegHelper::DessambleSof(int8_t *buffer, struct CodecJpegDecInfo &d
     decInfo.numComponents = GetInt8(buffer);
     buffer++;
 
-    HDF_LOGI("image width[%{public}d],height[%{public}d],components[%{public}d]", decInfo.imageWidth,
+    CODEC_LOGI("image width[%{public}d],height[%{public}d],components[%{public}d]", decInfo.imageWidth,
         decInfo.imageHeight, decInfo.numComponents);
     for (size_t i = 0; i < decInfo.numComponents; i++) {
         CodecJpegCompInfo comInfo;
@@ -438,14 +438,14 @@ int32_t CodecJpegHelper::DessambleSof(int8_t *buffer, struct CodecJpegDecInfo &d
         comInfo.quantTableNo = GetInt8(buffer);
         buffer++;
         decInfo.compInfo.push_back(std::move(comInfo));
-        HDF_LOGI("componentId[%{public}d],hSampFactor[%{public}d],vSampFactor[%{public}d],quantTableNo[%{public}d]",
+        CODEC_LOGI("componentId[%{public}d],hSampFactor[%{public}d],vSampFactor[%{public}d],quantTableNo[%{public}d]",
             comInfo.componentId, comInfo.hSampFactor, comInfo.vSampFactor, comInfo.quantTableNo);
     }
     return len;
 }
 int32_t CodecJpegHelper::DessambleSos(int8_t *buffer, struct CodecJpegDecInfo &decInfo)
 {
-    HDF_LOGI("dessamble SOS");
+    CODEC_LOGI("dessamble SOS");
     int32_t len = GetInt16(buffer);
     buffer += 2;  // 2:marker len
 
@@ -463,7 +463,7 @@ int32_t CodecJpegHelper::DessambleSos(int8_t *buffer, struct CodecJpegDecInfo &d
         buffer++;
         decInfo.compInfo[i].dcTableNo = (data >> 4) & 0x0F;  // 4: dctable offset
         decInfo.compInfo[i].acTableNo = data & 0x0F;
-        HDF_LOGI("componentId[%{public}d],dcTableNo[%{public}d],acTableNo[%{public}d]", componentId,
+        CODEC_LOGI("componentId[%{public}d],dcTableNo[%{public}d],acTableNo[%{public}d]", componentId,
             decInfo.compInfo[i].dcTableNo, decInfo.compInfo[i].acTableNo);
     }
     buffer += 3;  // skip 0x003F00
@@ -491,7 +491,7 @@ int32_t CodecJpegHelper::DessambleCompressData(int8_t *buffer, std::unique_ptr<i
     compressBuffer = std::make_unique<int8_t[]>(comBufLen);
     auto ret = memcpy_s(compressBuffer.get(), comBufLen, dataStart, comBufLen);
     if (ret != EOK) {
-        HDF_LOGE("copy compressed data error, dataLen %{public}d, ret %{public}d", comBufLen, ret);
+        CODEC_LOGE("copy compressed data error, dataLen %{public}d, ret %{public}d", comBufLen, ret);
         compressBuffer = nullptr;
         return ret;
     }
@@ -499,7 +499,7 @@ int32_t CodecJpegHelper::DessambleCompressData(int8_t *buffer, std::unique_ptr<i
 }
 int32_t CodecJpegHelper::DessambleDqt(int8_t *buffer, struct CodecJpegDecInfo &decInfo)
 {
-    HDF_LOGI("dessamble DQT");
+    CODEC_LOGI("dessamble DQT");
     int8_t *bufferOri = buffer;
     int32_t len = GetInt16(buffer);
     buffer += 2;  // 2: marker len
@@ -514,7 +514,7 @@ int32_t CodecJpegHelper::DessambleDqt(int8_t *buffer, struct CodecJpegDecInfo &d
         table.tableFlag = true;
         table.quantVal.resize(size);
         std::vector<uint16_t> mtx;
-        HDF_LOGI("tableid[%{public}d]", tableId);
+        CODEC_LOGI("tableid[%{public}d]", tableId);
         for (int32_t i = 0; i < size; i++) {
             if (((data >> 4) & 0x0f) == 1) { // 4: low 4 bits, 1: for 16 bits
                 mtx.push_back(static_cast<int16_t>(GetInt16(buffer)));
@@ -534,7 +534,7 @@ int32_t CodecJpegHelper::DessambleDqt(int8_t *buffer, struct CodecJpegDecInfo &d
 }
 int32_t CodecJpegHelper::DessambleDht(int8_t *buffer, struct CodecJpegDecInfo &decInfo)
 {
-    HDF_LOGI("dessamble DHT");
+    CODEC_LOGI("dessamble DHT");
     int8_t *bufferOri = buffer;
     int32_t len = GetInt16(buffer);
     buffer += 2;  // 2: marker len
@@ -554,7 +554,7 @@ int32_t CodecJpegHelper::DessambleDht(int8_t *buffer, struct CodecJpegDecInfo &d
             table.bits.push_back(data);
             num += data & 0x00ff;
         }
-        HDF_LOGI("tableid[%{public}d], acOrDc[%{public}d], num[%{public}d]", tableId, acOrDc, num);
+        CODEC_LOGI("tableid[%{public}d], acOrDc[%{public}d], num[%{public}d]", tableId, acOrDc, num);
         // val
         for (int32_t i = 0; i < num; i++) {
             table.huffVal.push_back(*buffer++);
@@ -579,7 +579,7 @@ int32_t CodecJpegHelper::PutInt16(int8_t *buffer, int32_t curPos, int16_t value)
     int8_t data[] = {value >> 8, value & 0xFF};
     auto ret = memcpy_s(buffer + curPos, sizeof(data), data, sizeof(data));
     if (ret != EOK) {
-        HDF_LOGE("memcpy ret err %{public}d", ret);
+        CODEC_LOGE("memcpy ret err %{public}d", ret);
         return -1;
     }
     return curPos + sizeof(data);
@@ -589,7 +589,7 @@ int32_t CodecJpegHelper::PutInt8(int8_t *buffer, int32_t curPos, int8_t value)
 {
     auto ret = memcpy_s(buffer + curPos, sizeof(value), &value, sizeof(value));
     if (ret != EOK) {
-        HDF_LOGE("memcpy ret err %{public}d", ret);
+        CODEC_LOGE("memcpy ret err %{public}d", ret);
         return -1;
     }
     return curPos + sizeof(value);

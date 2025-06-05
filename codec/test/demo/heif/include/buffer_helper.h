@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_IMAGE_V2_0_BUFFER_HELPER
-#define OHOS_HDI_CODEC_IMAGE_V2_0_BUFFER_HELPER
+#ifndef OHOS_HDI_CODEC_IMAGE_V2_1_BUFFER_HELPER
+#define OHOS_HDI_CODEC_IMAGE_V2_1_BUFFER_HELPER
 
 #include <map>
 #include <list>
@@ -22,7 +22,7 @@
 #include <fstream>
 #include <securec.h>
 #include "log.h"
-#include "v2_0/icodec_image.h"
+#include "v2_1/icodec_image.h"
 #include "v1_2/display_composer_type.h"
 #include "v1_2/display_buffer_type.h"
 #include "v1_2/include/idisplay_buffer.h"
@@ -33,10 +33,10 @@ public:
     BufferHelper();
     ~BufferHelper();
     OHOS::sptr<OHOS::HDI::Base::NativeBuffer> CreateImgBuffer(const std::string& imageFile);
-    OHOS::HDI::Codec::Image::V2_0::SharedBuffer CreateSharedBuffer(
-        std::map<OHOS::HDI::Codec::Image::V2_0::PropertyType, std::string>& metaInfo);
-    OHOS::HDI::Codec::Image::V2_0::SharedBuffer CreateSharedBuffer(const std::string& metaFile);
-    void DumpBuffer(const std::string& filePath, const OHOS::HDI::Codec::Image::V2_0::SharedBuffer& buffer);
+    OHOS::HDI::Codec::Image::V2_1::SharedBuffer CreateSharedBuffer(
+        std::map<OHOS::HDI::Codec::Image::V2_1::PropertyType, std::string>& metaInfo);
+    OHOS::HDI::Codec::Image::V2_1::SharedBuffer CreateSharedBuffer(const std::string& metaFile);
+    void DumpBuffer(const std::string& filePath, const OHOS::HDI::Codec::Image::V2_1::SharedBuffer& buffer);
 private:
     struct PixelFileInfo {
         uint32_t displayWidth;
@@ -60,7 +60,7 @@ public:
     ByteWriter() = default;
     ~ByteWriter();
     template <typename T>
-    bool AddData(OHOS::HDI::Codec::Image::V2_0::PropertyType key, T& value)
+    bool AddData(OHOS::HDI::Codec::Image::V2_1::PropertyType key, T& value)
     {
         std::size_t keySize = sizeof(key);
         std::size_t valueSize = sizeof(value);
@@ -84,8 +84,8 @@ public:
         return true;
     }
     bool Finalize(std::vector<uint8_t>& dst);
-    bool AddDataFromFile(OHOS::HDI::Codec::Image::V2_0::PropertyType key, const std::string& filePath);
-    bool Finalize(OHOS::HDI::Codec::Image::V2_0::SharedBuffer& buffer);
+    bool AddDataFromFile(OHOS::HDI::Codec::Image::V2_1::PropertyType key, const std::string& filePath);
+    bool Finalize(OHOS::HDI::Codec::Image::V2_1::SharedBuffer& buffer);
 private:
     struct DataBlock {
         uint8_t* data = nullptr;
@@ -98,4 +98,4 @@ private:
     std::size_t totalSize_ = 0;
 };
 } // OHOS::VDI::HEIF
-#endif // OHOS_HDI_CODEC_IMAGE_V2_0_BUFFER_HELPER
+#endif // OHOS_HDI_CODEC_IMAGE_V2_1_BUFFER_HELPER
