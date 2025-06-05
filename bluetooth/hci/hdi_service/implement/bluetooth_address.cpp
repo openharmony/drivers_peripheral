@@ -246,7 +246,7 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddressFile(co
             HDF_LOGI("device mac addr: %{public}s", GetEncryptAddr(strAddress).c_str());
             int ret = strcpy_s(addressStr, ADDRESS_STR_LEN + 1, strAddress.c_str());
             if (ret != 0) {
-                HDF_LOGI("ParseAddressToString strcpy_s err!");
+                HDF_LOGE("ParseAddressToString strcpy_s err!");
             }
         } else {
             HDF_LOGI("newFd %{public}d not update", newFd);
@@ -264,7 +264,7 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddressFile(co
         int fdRet = write(newFd, addressStr, ADDRESS_STR_LEN);
         if (fdRet < 0) {
             strerror_r(errno, buf, sizeof(buf));
-            HDF_LOGI("GetDeviceAddress addr write failed, err:%{public}s.", buf);
+            HDF_LOGE("GetDeviceAddress addr write failed, err:%{public}s.", buf);
         }
     }
     close(newFd);
