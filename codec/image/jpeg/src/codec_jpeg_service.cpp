@@ -19,11 +19,21 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V2_0 {
+namespace V2_1 {
 CodecJpegService::CodecJpegService()
 {
     core_ = std::make_unique<CodecJpegCore>();
     bufferId_ = 0;
+}
+
+void CodecJpegService::NotifyJpegPowerOn()
+{
+    CODEC_LOGD("servcie impl!");
+    if (core_ == nullptr) {
+        CODEC_LOGE("core_ is null");
+        return;
+    }
+    core_->NotifyPowerOn();
 }
 
 int32_t CodecJpegService::JpegInit()
@@ -110,7 +120,7 @@ uint32_t CodecJpegService::GetNextBufferId(void)
     return bufferId_;
 }
 
-} // V2_0
+} // V2_1
 } // Image
 } // Codec
 } // HDI

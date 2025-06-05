@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V2_1_CODECHEIFENCODESERVICE_H
-#define OHOS_HDI_CODEC_V2_1_CODECHEIFENCODESERVICE_H
+#ifndef OHOS_HDI_CODEC_V2_1_CODECHEIFDECODESERVICE_H
+#define OHOS_HDI_CODEC_V2_1_CODECHEIFDECODESERVICE_H
 
 #include <mutex>
-#include "codec_heif_vdi.h"
+#include "codec_heif_decode_vdi.h"
 #include "v2_1/icodec_image.h"
 
 namespace OHOS {
@@ -25,19 +25,18 @@ namespace HDI {
 namespace Codec {
 namespace Image {
 namespace V2_1 {
-class CodecHeifEncodeService {
+class CodecHeifDecodeService {
 public:
-    CodecHeifEncodeService();
-    virtual ~CodecHeifEncodeService();
-    int32_t DoHeifEncode(const std::vector<ImageItem>& inputImgs, const std::vector<MetaItem>& inputMetas,
-                         const std::vector<ItemRef>& refs, const SharedBuffer& output, uint32_t& filledLen);
+    CodecHeifDecodeService();
+    virtual ~CodecHeifDecodeService();
+    int32_t DoHeifDecode(const std::vector<sptr<Ashmem>>& inputs, const sptr<NativeBuffer>& output,
+                         const CodecHeifDecInfo& decInfo);
 private:
     bool LoadVendorLib();
-    bool ReWrapNativeBufferInImageItem(const std::vector<ImageItem>& inputImgs);
 private:
     std::mutex mutex_;
     std::shared_ptr<void> libHeif_ = nullptr;
-    ICodecHeifHwi* heifHwi_ = nullptr;
+    ICodecHeifDecodeHwi* heifDecodeHwi_ = nullptr;
     bool isIPCMode_;
 };
 } // V2_1
@@ -46,4 +45,4 @@ private:
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_CODEC_V2_1_CODECHEIFENCODESERVICE_H
+#endif // OHOS_HDI_CODEC_V2_1_CODECHEIFDECODESERVICE_H

@@ -38,7 +38,7 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V2_0 {
+namespace V2_1 {
 CodecImageConfig CodecImageConfig::config_;
 
 CodecImageConfig::CodecImageConfig()
@@ -177,7 +177,7 @@ int32_t CodecImageConfig::GetUintTableConfig(const struct DeviceResourceIface &i
     }
     return HDF_SUCCESS;
 }
-} // V2_0
+} // V2_1
 } // Image
 } // Codec
 } // HDI

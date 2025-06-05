@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef CODEC_HEIF_VDI_H
-#define CODEC_HEIF_VDI_H
+#ifndef CODEC_HEIF_DECODE_VDI_H
+#define CODEC_HEIF_DECODE_VDI_H
 
 #include <vector>
+#include "ashmem.h"
 #include "native_buffer.h"
 #include "v2_1/codec_image_type.h"
 
@@ -24,18 +25,17 @@
 extern "C" {
 #endif
 
-#define CODEC_HEIF_VDI_LIB_NAME "libheif_vdi_impl.z.so"
+#define CODEC_HEIF_DECODE_VDI_LIB_NAME "libheifdecode_vdi_impl.z.so"
 
-struct ICodecHeifHwi {
-    int32_t (*DoHeifEncode)(const std::vector<OHOS::HDI::Codec::Image::V2_1::ImageItem>& inputImgs,
-                            const std::vector<OHOS::HDI::Codec::Image::V2_1::MetaItem>& inputMetas,
-                            const std::vector<OHOS::HDI::Codec::Image::V2_1::ItemRef>& refs,
-                            OHOS::HDI::Codec::Image::V2_1::SharedBuffer& output);
+struct ICodecHeifDecodeHwi {
+    int32_t (*DoHeifDecode)(const std::vector<OHOS::sptr<OHOS::Ashmem>>& inputs,
+                            const OHOS::sptr<OHOS::HDI::Base::NativeBuffer>& output,
+                            const OHOS::HDI::Codec::Image::V2_1::CodecHeifDecInfo& decInfo);
 };
 
-struct ICodecHeifHwi *GetCodecHeifHwi(void);
+struct ICodecHeifDecodeHwi *GetCodecHeifDecodeHwi(void);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* CODEC_HEIF_VDI_H */
+#endif /* CODEC_HEIF_DECODE_VDI_H */
