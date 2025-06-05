@@ -24,6 +24,7 @@
 #include <stub_collector.h>
 #include "v2_0/iwpa_interface.h"
 #include "wpa_impl.h"
+#include <signal.h>
 
 struct HdfWpaInterfaceHost {
     struct IDeviceIoService ioService;
@@ -115,6 +116,10 @@ static int HdfWpaInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfWpaInterfaceDriverRelease enter.");
+    void (*result)(int) = signal(SIGTERM, SIG_IGN);
+    if (result == SIG_ERR) {
+        HDF_LOGE("Failed to set signal ignore handler for SIGTERM");
+    }
     struct HdfWpaRemoteNode *pos = NULL;
     struct HdfWpaRemoteNode *tmp = NULL;
     pthread_rwlock_wrlock(&g_rwLock);
