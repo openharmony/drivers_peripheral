@@ -70,7 +70,6 @@ ohos_unittest("camera_hdi_sequenceable_ut") {
     "googletest:gtest",
     "googletest:gtest_main",
     "graphic_surface:surface",
-    "samgr:samgr_proxy",
   ]
   public_configs = [ ":camhdi_sequenceable_ut_config" ]
 }
