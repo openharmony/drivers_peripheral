@@ -1007,7 +1007,7 @@ static void CopyCredentialInfo(const CredentialInfoHal &in, HdiCredentialInfo &o
     out.executorIndex = QueryCredentialExecutorIndex(in.authType, in.executorSensorHint);
     out.isAbandoned = in.isAbandoned;
     out.validityPeriod = CalcCredentialValidPeriod(&in);
-    IAM_LOGI("credentialId:%{public}u, authType:%{public}u, isAbandoned:%{public}d, validityPeriod:%{public}lld",
+    IAM_LOGI("credentialId:%{public}u, authType:%{public}u, isAbandoned:%{public}d, validityPeriod:%{public}" PRId64,
         static_cast<uint16_t>(out.credentialId), out.authType, out.isAbandoned, out.validityPeriod);
 }
 
