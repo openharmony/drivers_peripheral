@@ -731,9 +731,13 @@ void SensorIfService::VoteInterval(int32_t sensorId, uint32_t serviceId, int64_t
     if (enabled) {
         sdcIntervalMap[sensorId][serviceId] = samplingInterval;
     } else {
+        samplingInterval = 0;
         sdcIntervalMap[sensorId].erase(serviceId);
     }
     for (auto it = sdcIntervalMap[sensorId].begin(); it != sdcIntervalMap[sensorId].end(); ++it) {
+        if (samplingInterval == 0) {
+            samplingInterval = it->second;
+        }
         samplingInterval = samplingInterval < it->second ? samplingInterval : it->second;
     }
     HDF_LOGI("%{public}s: samplingInterval is %{public}s", __func__, std::to_string(samplingInterval).c_str());
@@ -758,8 +762,8 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     }
     int64_t samplingInterval = rateLevel == REPORT_INTERVAL ? REPORT_INTERVAL : COMMON_REPORT_FREQUENCY / rateLevel;
     int64_t reportInterval = REPORT_INTERVAL;
-    VoteEnable(sensorId, serviceId, enabled);
     VoteInterval(sensorId, serviceId, samplingInterval, enabled);
+    VoteEnable(sensorId, serviceId, enabled);
     if (enabled) {
         ret = SetBatchSenior(serviceId, sensorId, SDC, samplingInterval, reportInterval);
         if (ret != SENSOR_SUCCESS) {

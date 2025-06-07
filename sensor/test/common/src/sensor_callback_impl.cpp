@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V3_0 {
 uint32_t SensorCallbackImpl::sensorDataFlag = 1;
 namespace {
     struct SensorValueRange {
@@ -66,7 +66,7 @@ namespace {
         {SENSOR_TYPE_TEMPERATURE, "tenperature", 1, 1, g_temperatureRange}
     };
 
-    constexpr int32_t LIST_NUM = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
+    constexpr int32_t g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
     constexpr float EPSINON = 1e-6;
 
     void SensorDataVerification(const float &data, const struct SensorDevelopmentList &sensorNode)
@@ -107,10 +107,10 @@ int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
        *tmp++ = value;
     }
     HDF_LOGI("%{public}s: event info: sensorId = %{public}d, option = %{public}d, mode = %{public}d\n\r", __func__,
-        event.sensorId, event.option, event.mode);
+        event.deviceSensorInfo.sensorType, event.option, event.mode);
 
-    for (int32_t i = 0; i < LIST_NUM; ++i) {
-        if (event.sensorId == g_sensorList[i].sensorTypeId) {
+    for (int32_t i = 0; i < g_listNum; ++i) {
+        if (event.deviceSensorInfo.sensorType == g_sensorList[i].sensorTypeId) {
             float *data = reinterpret_cast<float*>(eventData);
             SensorDataVerification(*data, g_sensorList[i]);
         }
@@ -118,7 +118,7 @@ int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
     OsalMemFree(origin);
     return HDF_SUCCESS;
 }
-} // V2_0
+} // V3_0
 } // Sensor
 } // HDI
 } // OHOS

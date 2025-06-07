@@ -115,7 +115,7 @@ LinuxSerial &LinuxSerial::GetInstance()
 int32_t LinuxSerial::GetBaudrate(unsigned int baudrate)
 {
     for (const auto& pair : g_baudratePairs) {
-        if (pair.first == baudrate) {
+        if (static_cast<unsigned int>(pair.first) == baudrate) {
             return pair.second;
         }
     }
@@ -381,8 +381,8 @@ int32_t LinuxSerial::SerialGetAttribute(int32_t portId, SerialAttribute& attribu
     }
 
     for (const auto& pair : g_baudratePairs) {
-        if (pair.second == cfgetispeed(&options_)) {
-            attribute.baudrate = pair.first;
+        if (static_cast<unsigned int>(pair.second) == cfgetispeed(&options_)) {
+            attribute.baudrate = static_cast<unsigned int>(pair.first);
         }
     }
 
@@ -485,7 +485,7 @@ void LinuxSerial::HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, 
     HDF_LOGI("%{public}s: device: serialNo: %{public}s", __func__, devInfo->serialNo.c_str());
 
     std::string devnameStr(targetPath);
-    int32_t pos = devnameStr.find(SERIAL_TYPE_NAME);
+    size_t pos = devnameStr.find(SERIAL_TYPE_NAME);
     if (pos != std::string::npos) {
         std::string numStr = devnameStr.substr(pos + SERIAL_TYPE_NAME.length());
         int num = atoi(numStr.c_str());

@@ -1007,15 +1007,19 @@ static void CopyCredentialInfo(const CredentialInfoHal &in, HdiCredentialInfo &o
     out.executorIndex = QueryCredentialExecutorIndex(in.authType, in.executorSensorHint);
     out.isAbandoned = in.isAbandoned;
     out.validityPeriod = CalcCredentialValidPeriod(&in);
-    IAM_LOGI("credentialId:%{public}u, authType:%{public}u, isAbandoned:%{public}d, validityPeriod:%{public}lld",
-        static_cast<uint16_t>(out.credentialId), out.authType, out.isAbandoned,out. validityPeriod);
+    IAM_LOGI("credentialId:%{public}u, authType:%{public}u, isAbandoned:%{public}d, validityPeriod:%{public}" PRId64,
+        static_cast<uint16_t>(out.credentialId), out.authType, out.isAbandoned, out.validityPeriod);
 }
 
 static void CopyCredentialOpeateResult(OperateResult &in, HdiCredentialOperateResult &out)
 {
     out.operateType = static_cast<HdiCredentialOperateType>(in.operateType);
     if (in.operateType == DELETE_CREDENTIAL) {
-        CopyCredentialInfo(in.credentialInfo, out.credentialInfo);
+        for (uint32_t index = 0; index < in.credentialCount && index < MAX_CREDENTIAL_NUM_OF_ENROLL; index++) {
+            HdiCredentialInfo credentialInfo = {};
+            CopyCredentialInfo(in.credentialInfos[index], credentialInfo);
+            out.credentialInfos.push_back(credentialInfo);
+        }
     } else if (in.operateType == ABANDON_CREDENTIAL) {
         CopyScheduleInfo(&(in.scheduleInfo), &(out.scheduleInfo));
     }
@@ -1169,7 +1173,7 @@ int32_t UserAuthInterfaceService::DeleteCredential(int32_t userId, uint64_t cred
         } else {
             oldRootSecret = GetCurRootSecret(userId);
         }
-        ret = SetAttributeToAbandonMsg(hdiOperateResult.scheduleInfo, 
+        ret = SetAttributeToAbandonMsg(hdiOperateResult.scheduleInfo,
             hdiOperateResult.scheduleInfo.scheduleId, oldRootSecret, newRootSecret);
         if (ret != RESULT_SUCCESS) {
             IAM_LOGE("SetAttributeToAbandonMsg failed");

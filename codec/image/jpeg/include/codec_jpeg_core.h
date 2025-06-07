@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V2_0_CODECJPEGCORE_H
-#define OHOS_HDI_CODEC_V2_0_CODECJPEGCORE_H
+#ifndef OHOS_HDI_CODEC_V2_1_CODECJPEGCORE_H
+#define OHOS_HDI_CODEC_V2_1_CODECJPEGCORE_H
 
 #include "codec_jpeg_vdi.h"
-#include "v2_0/icodec_image.h"
+#include "v2_1/icodec_image.h"
 
 namespace OHOS {
 namespace HDI {
@@ -31,6 +31,8 @@ public:
 
     ~CodecJpegCore();
 
+    void NotifyPowerOn();
+
     int32_t JpegInit();
 
     int32_t JpegDeInit();
@@ -39,7 +41,7 @@ public:
 
     int32_t FreeInBuffer(BufferHandle *buffer);
 
-    int32_t DoDecode(BufferHandle *buffer, BufferHandle *outBuffer, const V2_0::CodecJpegDecInfo *decInfo);
+    int32_t DoDecode(BufferHandle *buffer, BufferHandle *outBuffer, const V2_1::CodecJpegDecInfo *decInfo);
 
 private:
     void AddVendorLib();
@@ -54,4 +56,4 @@ private:
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_CODEC_V2_0_CODECJPEGCORE_H
+#endif // OHOS_HDI_CODEC_V2_1_CODECJPEGCORE_H

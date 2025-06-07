@@ -19,11 +19,11 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v2_0/sensor_interface_proxy.h"
+#include "v3_0/sensor_interface_proxy.h"
 #include "sensor_callback_impl.h"
 
 using namespace testing::ext;
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V3_0;
 
 namespace {
     const int32_t SENSOR_ID = 0;
@@ -33,7 +33,7 @@ namespace {
     const int32_t SENSOR_MSEC_TIME = 1000;
     const int32_t SENSOR_COMMON_TIME = 2000;
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
-    sptr<V2_0::ISensorCallback> g_callback = new SensorCallbackImpl();
+    sptr<V3_0::ISensorCallback> g_callback = new SensorCallbackImpl();
 }
 
 class HdfSensorHdiPerformanceTest : public testing::Test {

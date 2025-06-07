@@ -552,6 +552,10 @@ void TestCameraBase::AchieveStreamOperator()
 {
     // Create and get streamOperator information
     OHOS::sptr<DemoStreamOperatorCallback> streamOperatorCallback_ = new DemoStreamOperatorCallback();
+    if (cameraDevice == nullptr) {
+        CAMERA_LOGI("cameraDevice is nullptr");
+        return;
+    }
     rc = (CamRetCode)cameraDevice->GetStreamOperator(streamOperatorCallback_, streamOperator);
     EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
     if (rc == HDI::Camera::V1_0::NO_ERROR) {

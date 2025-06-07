@@ -13,7 +13,6 @@
 
 import("//build/config/sanitizers/sanitizers.gni")
 import("//build/test.gni")
-import("./../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "drivers_peripheral_usb/drivers_peripheral_usb"
 ohos_unittest("usb_ddk_service_test") {
@@ -25,7 +24,7 @@ ohos_unittest("usb_ddk_service_test") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_usb:usb_ddk_idl_headers",
+    "drivers_interface_usb:libusb_ddk_proxy_1.0",
     "googletest:gtest_main",
     "hilog:libhilog",
   ]

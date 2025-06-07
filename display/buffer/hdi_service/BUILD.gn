@@ -117,6 +117,7 @@ ohos_shared_library("libmapper_service_1.2") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_buffer_stub_1.2",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_ipc_adapter",

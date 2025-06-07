@@ -17,9 +17,9 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "v2_0/sensor_interface_stub.h"
+#include "v3_0/sensor_interface_stub.h"
 
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V3_0;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;

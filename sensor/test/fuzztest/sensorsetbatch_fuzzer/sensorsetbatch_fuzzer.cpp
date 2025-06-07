@@ -15,9 +15,9 @@
 
 #include "sensorsetbatch_fuzzer.h"
 #include "hdf_base.h"
-#include "v2_0/sensor_interface_proxy.h"
+#include "v3_0/sensor_interface_proxy.h"
 
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V3_0;
 
 namespace OHOS {
     bool SensorSetBatchFuzzTest(const uint8_t* data, size_t size)
@@ -25,7 +25,7 @@ namespace OHOS {
         bool result = false;
         sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
 
-        if (!g_sensorInterface->SetBatch(*(int32_t *)data, (int64_t)(*data), (int64_t)(*data))) {
+        if (!g_sensorInterface->SetBatch({0, *(int32_t *)data, 0, 0}, (int64_t)(*data), (int64_t)(*data))) {
             result = true;
         }
         return result;

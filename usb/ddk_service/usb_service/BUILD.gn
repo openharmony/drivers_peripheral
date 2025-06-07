@@ -45,7 +45,7 @@ ohos_shared_library("libusb_ddk_service_1.1") {
     "${usb_driver_path}/interfaces/ddk/common",
     "${usb_driver_path}/ddk/host/include",
     "${usb_driver_path}/ddk_service/common/include",
-    "//drivers/hdf_core/framework/model/usb/include",
+    "${usb_driver_path}/hdf_usb/include",
     "${usb_driver_path}/utils/include",
   ]
 
@@ -61,8 +61,7 @@ ohos_shared_library("libusb_ddk_service_1.1") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_stub_1.2",
-      "drivers_interface_usb:usb_ddk_idl_headers_1.0",
-      "drivers_interface_usb:usb_ddk_idl_headers_1.1",
+      "drivers_interface_usb:libusb_ddk_proxy_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -131,6 +130,7 @@ ohos_shared_library("libusb_ddk_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_usb:libusb_ddk_stub_1.0",
       "drivers_interface_usb:libusb_ddk_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",

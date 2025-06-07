@@ -30,6 +30,7 @@ ohos_fuzztest("VibratorGetHapticCapacityFuzzTest") {
   deps = [ "../../../hal:hdi_vibrator" ]
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "drivers_interface_vibrator:libvibrator_proxy_1.2",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",

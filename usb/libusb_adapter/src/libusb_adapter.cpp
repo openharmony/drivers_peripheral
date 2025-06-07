@@ -112,10 +112,9 @@ std::shared_ptr<LibusbAdapter> LibusbAdapter::GetInstance()
 LibusbAdapter::LibusbAdapter()
 {
     HDF_LOGI("%{public}s libusbadapter constructer", __func__);
-    if ((LibUSBInit() == HDF_SUCCESS) && (!eventThread.joinable())) {
-        isRunning = true;
-        eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
-    }
+    isRunning = false;
+    int32_t ret = LibUSBInit();
+    HDF_LOGI("%{public}s libusb init, ret = %{public}d", __func__, ret);
 }
 
 LibusbAdapter::~LibusbAdapter()
@@ -294,10 +293,6 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     }
     std::unique_lock<std::shared_mutex> lock(g_mapMutexDeviceSettingsMap);
     g_deviceSettingsMap[devHandle].configurationIndex = currentConfig;
-    if (!eventThread.joinable()) {
-        isRunning = true;
-        eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
-    }
     HDF_LOGI("%{public}s succeeded", __func__);
     return HDF_SUCCESS;
 }
@@ -1970,7 +1965,12 @@ int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTra
         asyncTransfer = nullptr;
         return ret;
     }
-    // 5.save transfer
+    // 5.create thread, handle asynchronous transfer completion events
+    if (!isRunning && !eventThread.joinable()) {
+        isRunning = true;
+        eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
+    }
+    // 6.save transfer
     AddTransferToList(asyncTransfer);
     HDF_LOGI("%{public}s: handle async transfer success", __func__);
     return LIBUSB_SUCCESS;
@@ -2886,7 +2886,7 @@ void LibusbAdapter::GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSu
         }
         HDF_LOGI("%{public}s:busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
         V2_0::USBDeviceInfo info = {ACT_DEVUP, busNum, devAddr};
-        subscriber->DeviceEvent(info);
+        HotplugEventPorcess::GetInstance()->AddHotplugTask(info, subscriber);
     }
     libusb_free_device_list(devs, 1);
 }
@@ -2897,6 +2897,11 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
     if (subscriber == nullptr || g_libusb_context == nullptr) {
         HDF_LOGE("%{public}s subsriber or g_libusb_context is nullptr", __func__);
         return HDF_FAILURE;
+    }
+    // create thread, handle hotplug
+    if (!isRunning && !eventThread.joinable()) {
+        isRunning = true;
+        eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
     }
     if (HotplugEventPorcess::GetInstance()->GetSubscriberSize() == 0) {
         HDF_LOGI("%{public}s: rigister callback.", __func__);
@@ -2923,10 +2928,11 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
     return ret;
 }
 
-void HotplugEventPorcess::AddHotplugTask(V2_0::USBDeviceInfo& info)
+void HotplugEventPorcess::AddHotplugTask(V2_0::USBDeviceInfo& info, sptr<V2_0::IUsbdSubscriber> subscriber)
 {
     std::unique_lock<std::mutex> lock(queueMutex_);
-    hotplugEventQueue_.push(info);
+    HotplugInfo hotplugEvent(info, subscriber);
+    hotplugEventQueue_.push(hotplugEvent);
     if (activeThreads_ == 0) {
         std::thread(&HotplugEventPorcess::OnProcessHotplugEvent, this).detach();
         activeThreads_++;
@@ -2995,7 +3001,7 @@ size_t HotplugEventPorcess::GetSubscriberSize()
 void HotplugEventPorcess::OnProcessHotplugEvent()
 {
     while (!shutdown_) {
-        V2_0::USBDeviceInfo info;
+        HotplugInfo info;
         {
             std::unique_lock<std::mutex> lock(queueMutex_);
             if (shutdown_ || hotplugEventQueue_.empty()) {
@@ -3009,8 +3015,12 @@ void HotplugEventPorcess::OnProcessHotplugEvent()
             info = hotplugEventQueue_.front();
             hotplugEventQueue_.pop();
         }
+        if (info.subscriberPtr != nullptr) {
+            info.subscriberPtr->DeviceEvent(info.hotplugInfo);
+            continue;
+        }
         for (auto subscriber: subscribers_) {
-            subscriber->DeviceEvent(info);
+            subscriber->DeviceEvent(info.hotplugInfo);
         }
     }
 }

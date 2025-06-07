@@ -31,7 +31,7 @@
 #include "common/defs.h"
 #include "v2_0/iwpa_callback.h"
 #include "v2_0/iwpa_interface.h"
-
+#include <dirent.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <dlfcn.h>
@@ -40,6 +40,7 @@
 
 pthread_t g_tid;
 #define MAX_WPA_WAIT_TIMES 30
+#define CTRL_LEN 128
 
 static void SplitCmdString(const char *startCmd, struct StWpaMainParam *pParam)
 {
@@ -205,6 +206,33 @@ static int32_t StartWpaSupplicant(const char *moduleName, const char *startCmd)
     return HDF_SUCCESS;
 }
 
+static void RemoveLostCtrl(void)
+{
+    DIR *dir = NULL;
+    char path[CTRL_LEN];
+    struct dirent *entry;
+
+    dir = opendir(CONFIG_ROOR_DIR);
+    if (dir == NULL) {
+        HDF_LOGE("can not open wifi dir");
+        return;
+    }
+    while ((entry = readdir(dir)) != NULL) {
+        if (strncmp(entry->d_name, "wpa_ctrl_", strlen("wpa_ctrl_")) != 0) {
+            continue;
+        }
+        int ret = sprintf_s(path, sizeof(path), "%s/%s", CONFIG_ROOR_DIR, entry->d_name);
+        if (ret == -1) {
+            HDF_LOGE("sprintf_s dir name fail");
+            break;
+        }
+        if (entry->d_type != DT_DIR) {
+            remove(path);
+        }
+    }
+    closedir(dir);
+}
+
 int32_t WpaInterfaceStart(struct IWpaInterface *self)
 {
     int32_t ret;
@@ -218,6 +246,7 @@ int32_t WpaInterfaceStart(struct IWpaInterface *self)
         return HDF_FAILURE;
     }
     pthread_mutex_lock(GetInterfaceLock());
+    RemoveLostCtrl();
     ret = StartWpaSupplicant(WPA_SUPPLICANT_NAME, START_CMD);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: StartWpaSupplicant failed, error code: %{public}d", __func__, ret);

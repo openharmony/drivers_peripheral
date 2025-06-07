@@ -39,7 +39,7 @@ ohos_fuzztest("SensorSetOptionFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_sensor:libsensor_proxy_2.0",
+    "drivers_interface_sensor:libsensor_proxy_3.0",
     "hdf_core:libhdf_utils",
     "ipc:ipc_single",
   ]

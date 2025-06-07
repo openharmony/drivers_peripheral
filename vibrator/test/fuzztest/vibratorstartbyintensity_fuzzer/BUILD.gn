@@ -30,6 +30,8 @@ ohos_fuzztest("VibratorStartByIntensityFuzzTest") {
   deps = [ "../../../hal:hdi_vibrator" ]
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_vibrator:libvibrator_proxy_1.1",
+    "drivers_interface_vibrator:libvibrator_proxy_1.2",
     "drivers_interface_vibrator:libvibrator_proxy_1.3",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",

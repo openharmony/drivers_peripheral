@@ -74,9 +74,10 @@ HWTEST_F(AllInOneImplTest, Hdi_is_nullptr_test, TestSize.Level1)
     EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
     uint64_t authSubType = 10010;
+    uint32_t pinLength = 0;
     std::vector<uint8_t> pinData(32, 1);
     int32_t resultCode = 0;
-    result = impl->SetData(scheduleId, authSubType, pinData, resultCode);
+    result = impl->SetData(scheduleId, authSubType, pinData, pinLength, resultCode);
     EXPECT_EQ(result, HDF_FAILURE);
 
     result = impl->Delete(templateId);
@@ -133,8 +134,9 @@ HWTEST_F(AllInOneImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
 
     uint64_t authSubType = 10010;
     int32_t resultCode = 0;
+    uint32_t pinLength = 0;
     std::vector<uint8_t> pinData(32, 1);
-    result = impl->SetData(scheduleId, authSubType, pinData, resultCode);
+    result = impl->SetData(scheduleId, authSubType, pinData, pinLength, resultCode);
     EXPECT_EQ(result, HDF_FAILURE);
 
     result = impl->Delete(templateId);

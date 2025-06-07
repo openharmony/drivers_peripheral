@@ -134,4 +134,17 @@ HWTEST_F (HdiInterfaceTest, HdiInterfaceTest002, TestSize.Level0)
     }
     EXPECT_EQ(true, voltageLimitStr == writeVoltageInfo);
 }
+
+/**
+ * @tc.name: HdiInterfaceTest003
+ * @tc.desc: Test SetBatteryConfig
+ * @tc.type: FUNC
+ */
+HWTEST_F (HdiInterfaceTest, HdiInterfaceTest003, TestSize.Level0)
+{
+    string sceneName = "testScene";
+    string value = "";
+    int32_t result = g_batteryInterface->SetBatteryConfig(sceneName, value);
+    EXPECT_EQ(true, result == HDF_ERR_NOT_SUPPORT);
+}
 }
