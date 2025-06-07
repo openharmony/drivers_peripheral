@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_IMAGE_V2_0_HEIF_ENCODE_TEST_HELPER
-#define OHOS_HDI_CODEC_IMAGE_V2_0_HEIF_ENCODE_TEST_HELPER
+#ifndef OHOS_HDI_CODEC_IMAGE_V2_1_HEIF_ENCODE_TEST_HELPER
+#define OHOS_HDI_CODEC_IMAGE_V2_1_HEIF_ENCODE_TEST_HELPER
 
 #include <list>
 #include <securec.h>
 #include <sys/mman.h>
 #include "hdf_log.h"
 #include "ashmem.h"
-#include "v2_0/icodec_image.h"
+#include "v2_1/icodec_image.h"
 
 #define IF_TRUE_RETURN_VAL(cond, val)  \
     do {                               \
@@ -41,7 +41,7 @@ public:
         data_.clear();
     }
     template <typename T>
-    bool AddData(OHOS::HDI::Codec::Image::V2_0::PropertyType key, T& value)
+    bool AddData(OHOS::HDI::Codec::Image::V2_1::PropertyType key, T& value)
     {
         std::size_t keySize = sizeof(key);
         std::size_t valueSize = sizeof(value);
@@ -83,4 +83,4 @@ private:
     std::list<DataBlock> data_;
     std::size_t totalSize_ = 0;
 };
-#endif // OHOS_HDI_CODEC_IMAGE_V2_0_HEIF_ENCODE_TEST_HELPER
+#endif // OHOS_HDI_CODEC_IMAGE_V2_1_HEIF_ENCODE_TEST_HELPER

@@ -16,13 +16,16 @@
 #include "codec_log_wrapper.h"
 #include "codec_image_service.h"
 #include "hitrace_meter.h"
+#include "v1_0/display_composer_type.h"
+#include "v1_0/imapper.h"
+#include "v1_1/imetadata.h"
 #include <unistd.h>
 
 namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V2_0 {
+namespace V2_1 {
 extern "C" ICodecImage *CodecImageImplGetInstance(void)
 {
     return new (std::nothrow) CodecImageService();
@@ -32,6 +35,18 @@ CodecImageService::CodecImageService()
 {
     jpegImpl_ = std::make_unique<CodecJpegService>();
     heifEncodeImpl_ = std::make_unique<CodecHeifEncodeService>();
+    heifDecodeImpl_ = std::make_unique<CodecHeifDecodeService>();
+}
+
+int32_t CodecImageService::NotifyPowerOn(enum CodecImageRole role)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecPrePowerOn");
+    CODEC_LOGD("servcie impl!");
+    if (role == CODEC_IMAGE_JPEG) {
+        CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE, "jpegImpl_ is null");
+        jpegImpl_->NotifyJpegPowerOn();
+    }
+    return HDF_SUCCESS;
 }
 
 int32_t CodecImageService::GetImageCapability(std::vector<CodecImageCapability>& capList)
@@ -117,7 +132,16 @@ int32_t CodecImageService::DoHeifEncode(const std::vector<ImageItem>& inputImgs,
     CHECK_AND_RETURN_RET_LOG(heifEncodeImpl_ != nullptr, HDF_FAILURE, "heifEncodeImpl_ is null");
     return heifEncodeImpl_->DoHeifEncode(inputImgs, inputMetas, refs, output, filledLen);
 }
-} // V2_0
+
+int32_t CodecImageService::DoHeifDecode(const std::vector<sptr<Ashmem>>& inputs, const sptr<NativeBuffer>& output,
+                                        const CodecHeifDecInfo& decInfo)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDoHeifDecode");
+    CODEC_LOGI("servcie impl!");
+    CHECK_AND_RETURN_RET_LOG(heifDecodeImpl_ != nullptr, HDF_FAILURE, "heifDecodeImpl_ is null");
+    return heifDecodeImpl_->DoHeifDecode(inputs, output, decInfo);
+}
+} // V2_1
 } // Image
 } // Codec
 } // HDI

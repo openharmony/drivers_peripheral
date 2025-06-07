@@ -23,7 +23,7 @@ ohos_unittest("codec_hdi_jpeg_test") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libimage_proxy_2.0",
+      "drivers_interface_codec:libimage_proxy_2.1",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_buffer_proxy_1.0",
       "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
@@ -49,8 +49,11 @@ ohos_unittest("codec_hdi_heif_encode_test") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libimage_proxy_2.0",
+      "drivers_interface_codec:libimage_proxy_2.1",
+      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
       "drivers_interface_display:libdisplay_buffer_proxy_1.2",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
+      "drivers_interface_display:libdisplay_composer_proxy_1.1",
       "drivers_interface_display:libdisplay_composer_proxy_1.2",
       "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_2",
       "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",

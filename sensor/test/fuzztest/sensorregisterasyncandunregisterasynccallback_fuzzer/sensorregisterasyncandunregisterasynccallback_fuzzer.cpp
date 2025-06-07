@@ -15,19 +15,19 @@
 
 #include "sensorregisterasyncandunregisterasynccallback_fuzzer.h"
 #include "hdf_base.h"
-#include "v2_1/isensor_interface.h"
+#include "v3_0/isensor_interface.h"
 #include <hdf_log.h>
 
 using namespace OHOS::HDI::Sensor;
-using namespace OHOS::HDI::Sensor::V2_1;
+using namespace OHOS::HDI::Sensor::V3_0;
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_1 {
+namespace V3_0 {
 int32_t SensorRegisterAsyncAndUnregisterAsyncCallbackFuzzer::OnDataEvent(const HdfSensorEvents& event)
 {
-    HDF_LOGI("%{public}s: sensorId=%{public}d", __func__, event.sensorId);
+    HDF_LOGI("%{public}s: sensorId=%{public}d", __func__, event.deviceSensorInfo.sensorType);
     (void)event;
     return HDF_SUCCESS;
 }
@@ -35,12 +35,12 @@ int32_t SensorRegisterAsyncAndUnregisterAsyncCallbackFuzzer::OnDataEvent(const H
 int32_t SensorRegisterAsyncAndUnregisterAsyncCallbackFuzzer::OnDataEventAsync(
     const std::vector<HdfSensorEvents>& events)
 {
-    HDF_LOGI("%{public}s: sensorId=%{public}d, timestamp=%{public}lld", __func__,
-        events[0].sensorId, events[0].timestamp);
+    HDF_LOGI("%{public}s: sensorId=%{public}d, timestamp=%{public}s", __func__,
+        events[0].deviceSensorInfo.sensorType, std::to_string(events[0].timestamp).c_str());
     (void)events;
     return HDF_SUCCESS;
 }
-} // V2_0
+} // V3_0
 } // Sensor
 } // HDI
 } // OHOS
@@ -50,8 +50,8 @@ namespace OHOS {
     {
         bool result = false;
         int32_t ret;
-        sptr<V2_1::ISensorInterface> sensorInterface = V2_1::ISensorInterface::Get();
-        sptr<V2_1::ISensorCallback> registerAsyncCallback = new SensorRegisterAsyncAndUnregisterAsyncCallbackFuzzer();
+        sptr<V3_0::ISensorInterface> sensorInterface = V3_0::ISensorInterface::Get();
+        sptr<V3_0::ISensorCallback> registerAsyncCallback = new SensorRegisterAsyncAndUnregisterAsyncCallbackFuzzer();
         if (registerAsyncCallback == nullptr) {
             return false;
         }

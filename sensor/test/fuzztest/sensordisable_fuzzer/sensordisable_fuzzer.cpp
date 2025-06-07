@@ -15,19 +15,19 @@
 
 #include "sensordisable_fuzzer.h"
 #include "hdf_base.h"
-#include "v2_0/sensor_interface_proxy.h"
+#include "v3_0/sensor_interface_proxy.h"
 
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V3_0;
 
 namespace OHOS {
     bool SensorDisableFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
-        if (!g_sensorInterface->Enable(*(int32_t *)data)) {
+        if (!g_sensorInterface->Enable({0, *(int32_t *)data, 0, 0})) {
             result = true;
         }
-        if (!g_sensorInterface->Disable(*(int32_t *)data)) {
+        if (!g_sensorInterface->Disable({0, *(int32_t *)data, 0, 0})) {
             result = true;
         }
         return result;

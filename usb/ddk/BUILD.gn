@@ -36,7 +36,7 @@ ohos_shared_library("libusb_ddk_host") {
 
   include_dirs = [
     "device/include",
-    "//drivers/hdf_core/framework/model/usb/include",
+    "./../hdf_usb/include",
     "host/include",
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/device",
@@ -95,14 +95,14 @@ ohos_shared_library("libusb_pnp_manager") {
   branch_protector_ret = "pac_ret"
 
   include_dirs = [
-    "//drivers/hdf_core/framework/model/usb/include",
+    "./../hdf_usb/include",
     "host/include",
     "device/include",
     "./../utils/include",
   ]
   sources = [
-    "//drivers/hdf_core/framework/model/usb/src/usb_ddk_pnp_loader.c",
-    "//drivers/hdf_core/framework/model/usb/src/usb_wrapper.cpp",
+    "./../hdf_usb/src/usb_ddk_pnp_loader.c",
+    "./../hdf_usb/src/usb_wrapper.cpp",
     "device/src/usb_accessory_uevent_handle.c",
     "device/src/usbfn_uevent_handle.c",
     "host/src/ddk_device_manager.c",

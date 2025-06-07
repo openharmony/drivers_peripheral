@@ -39,15 +39,15 @@ public:
     bool AssembleParamForPrimaryImg(uint8_t *data, size_t &size);
     bool AssembleParamForOtherImg(uint32_t primaryImgId, uint8_t *data, size_t &size);
     bool AssembleParamForMetaData(uint32_t primaryImgId, uint8_t *data, size_t &size);
-    bool FillImageItem(ImgType type, OHOS::HDI::Codec::Image::V2_0::ImageItem& item, uint8_t *data, size_t &size);
-    OHOS::HDI::Codec::Image::V2_0::ItemRef FillRefItem(OHOS::HDI::Codec::Image::V2_0::ItemRef item,
+    bool FillImageItem(ImgType type, OHOS::HDI::Codec::Image::V2_1::ImageItem& item, uint8_t *data, size_t &size);
+    OHOS::HDI::Codec::Image::V2_1::ItemRef FillRefItem(OHOS::HDI::Codec::Image::V2_1::ItemRef item,
                                                        uint8_t *data, size_t &size);
-    bool FillMetaItem(MetaType type, OHOS::HDI::Codec::Image::V2_0::MetaItem& item, uint8_t *data, size_t &size);
-    bool AllocOutputBuffer(OHOS::HDI::Codec::Image::V2_0::SharedBuffer& output);
+    bool FillMetaItem(MetaType type, OHOS::HDI::Codec::Image::V2_1::MetaItem& item, uint8_t *data, size_t &size);
+    bool AllocOutputBuffer(OHOS::HDI::Codec::Image::V2_1::SharedBuffer& output);
 public:
-    std::vector<OHOS::HDI::Codec::Image::V2_0::ImageItem> inputImgs_;
-    std::vector<OHOS::HDI::Codec::Image::V2_0::MetaItem> inputMetas_;
-    std::vector<OHOS::HDI::Codec::Image::V2_0::ItemRef> refs_;
+    std::vector<OHOS::HDI::Codec::Image::V2_1::ImageItem> inputImgs_;
+    std::vector<OHOS::HDI::Codec::Image::V2_1::MetaItem> inputMetas_;
+    std::vector<OHOS::HDI::Codec::Image::V2_1::ItemRef> refs_;
     uint32_t id_ = 0;
     EncodeBufferHelper bufferHelper_;
 };
