@@ -1519,5 +1519,5 @@ ResultCode RestartLockoutDurationByUserId(int32_t userId)
     if (anyLockoutRestart) {
         return RESULT_SUCCESS;
     }
-    return ret;
+    return RESULT_GENERAL_ERROR;
 }
