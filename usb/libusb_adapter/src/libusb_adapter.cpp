@@ -2918,8 +2918,9 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
             HDF_LOGD("%{public}s: register hotplug callback success.", __func__);
         }
     }
+    int32_t ret = HotplugEventPorcess::GetInstance()->SetSubscriber(subscriber);
     GetCurrentDeviceList(g_libusb_context, subscriber);
-    return HotplugEventPorcess::GetInstance()->SetSubscriber(subscriber);
+    return ret;
 }
 
 void HotplugEventPorcess::AddHotplugTask(V2_0::USBDeviceInfo& info)
