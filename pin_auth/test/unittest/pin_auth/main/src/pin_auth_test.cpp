@@ -141,7 +141,7 @@ HWTEST_F(PinAuthTest, AuthPin_test, TestSize.Level1)
     PinAuthParam *pinAuthParam = getPinAuthParam();
     EXPECT_NE(pinAuthParam, nullptr);
     int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    EXPECT_EQ(result, GENERAL_ERROR);
     delete pinAuth;
 }
 
@@ -296,7 +296,7 @@ HWTEST_F(PinAuthTest, Pin_Auth_Succ_test, TestSize.Level1)
     EXPECT_NE(pinAuthParam, nullptr);
     pinAuthParam->templateId = templateId;
     result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     uint8_t challenge[32] = {0};
     Buffer *fwkExtraInfo = GetAuthFwkExtraInfo(0, keyPair, challenge, 32);
@@ -353,7 +353,7 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo1_test, TestSize.Level1)
     EXPECT_NE(pinAuthParam, nullptr);
     pinAuthParam->templateId = g_antiTemplateId;
     result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
@@ -385,7 +385,7 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo2_test, TestSize.Level1)
     pinAuthParam->templateId = g_antiTemplateId;
     (void)memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinErrorData[0], CONST_PIN_DATA_LEN);
     int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
@@ -417,7 +417,7 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo3_test, TestSize.Level1)
     pinAuthParam->templateId = g_antiTemplateId;
     (void)memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinErrorData[0], CONST_PIN_DATA_LEN);
     int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
@@ -449,7 +449,7 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo4_test, TestSize.Level1)
     pinAuthParam->templateId = g_antiTemplateId;
     (void)memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinErrorData[0], CONST_PIN_DATA_LEN);
     int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
@@ -481,7 +481,7 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo5_test, TestSize.Level1)
     pinAuthParam->templateId = g_antiTemplateId;
     (void)memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinErrorData[0], CONST_PIN_DATA_LEN);
     int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
