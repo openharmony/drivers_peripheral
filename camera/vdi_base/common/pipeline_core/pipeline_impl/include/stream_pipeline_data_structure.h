@@ -18,11 +18,11 @@
 #include <string>
 #include <memory>
 #include <dlfcn.h>
+#include "ibuffer.h"
+#include "stream.h"
 extern "C" {
 #include "config.h"
 #include "params.h"
-#include "ibuffer.h"
-#include "stream.h"
 }
 namespace OHOS::Camera {
 using PortInfo = struct {
