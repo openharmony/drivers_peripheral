@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,8 +29,15 @@ void DcameraSetFlashlightFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     std::string cameraId(reinterpret_cast<const char*>(data), size);
-    bool isEnable = *(reinterpret_cast<const int32_t*>(data)) % 2;
+    bool isEnable = *(reinterpret_cast<const int32_t*>(data)) % 2; // 2: bool value
     DCameraHost::GetInstance()->SetFlashlight(cameraId, isEnable);
+    float level = 0.0;
+    DCameraHost::GetInstance()->SetFlashlight_V1_2(level);
+    DCameraHost::GetInstance()->PreCameraSwitch(cameraId);
+    PrelaunchConfig config;
+    int32_t operationMode = 0;
+    DCameraHost::GetInstance()->PrelaunchWithOpMode(config, operationMode);
+    DCameraHost::GetInstance()->Prelaunch(config);
 }
 }
 }
