@@ -65,7 +65,7 @@ ohos_shared_library("libcodec_component_manager_service_3.0") {
   if (use_musl && musl_use_jemalloc && musl_use_jemalloc_dfx_intf) {
     defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
   }
-  innerapi_tags = [ "passthrough_indirect" ]
+  innerapi_tags = [ "passthrough" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
