@@ -192,7 +192,8 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     DeviceControl& ctrl, v4l2_queryctrl& qCtrl)
 {
     CAMERA_LOGD("V4L2SetValue in fd = %{public}d\n", fd);
-    int value, rc;
+    int value;
+    int rc;
 
     ctrl.id = qCtrl.id;
     ctrl.ctrl_class = V4L2_CTRL_ID2CLASS(qCtrl.id);
