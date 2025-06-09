@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,6 +42,8 @@ void DcameraGetCameraAbilityFuzzTest(const uint8_t* data, size_t size)
     if (dcameraDevice != nullptr) {
         DCameraHost::GetInstance()->dCameraDeviceMap_[cameraId] = dcameraDevice;
     }
+    std::string dCameraId;
+    DCameraHost::GetInstance()->AddDcameraId(dhBase, dCameraId, cameraId);
     DCameraHost::GetInstance()->GetCameraAbility(cameraId, cameraAbility);
 }
 }

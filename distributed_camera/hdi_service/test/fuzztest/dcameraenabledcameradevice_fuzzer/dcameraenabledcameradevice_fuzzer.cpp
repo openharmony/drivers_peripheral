@@ -23,6 +23,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* TEST_ABILITY = R"({"SinkAbility": "SinkAbilityTest",
+    "SourceCodec": "SourceCodecTest"
+    })";
+
 void DcameraEnableDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -38,6 +42,10 @@ void DcameraEnableDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
     sptr<IDCameraProviderCallback> callback;
 
     DCameraProvider::GetInstance()->EnableDCameraDevice(dhBase, abilityInfo, callback);
+    std::string sinkAbilityInfo = "";
+    std::string sourceCodecInfo = "";
+    DCameraProvider::GetInstance()->GetAbilityInfo(abilityInfo, sinkAbilityInfo, sourceCodecInfo);
+    DCameraProvider::GetInstance()->GetAbilityInfo(TEST_ABILITY, sinkAbilityInfo, sourceCodecInfo);
 }
 }
 }
