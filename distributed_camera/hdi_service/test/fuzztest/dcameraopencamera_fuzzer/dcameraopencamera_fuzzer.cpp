@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,7 +58,18 @@ void DcameraOpenCameraFuzzTest(const uint8_t* data, size_t size)
     if (dcameraDevice != nullptr) {
         DCameraHost::GetInstance()->dCameraDeviceMap_[cameraId] = dcameraDevice;
     }
+    std::string dCameraId;
+    DCameraHost::GetInstance()->AddDcameraId(dhBase, dCameraId, cameraId);
     DCameraHost::GetInstance()->OpenCamera(cameraId, callbackObj, demoCameraDevice);
+    sptr<HDI::Camera::V1_1::ICameraDevice> demoCameraDevice_V1_1 = nullptr;
+    DCameraHost::GetInstance()->OpenCamera_V1_1(cameraId, callbackObj, demoCameraDevice_V1_1);
+    sptr<HDI::Camera::V1_2::ICameraDevice> demoCameraDevice_V1_2 = nullptr;
+    DCameraHost::GetInstance()->OpenCamera_V1_2(cameraId, callbackObj, demoCameraDevice_V1_2);
+    sptr<HDI::Camera::V1_3::ICameraDevice> demoCameraDevice_V1_3 = nullptr;
+    DCameraHost::GetInstance()->OpenCamera_V1_3(cameraId, callbackObj, demoCameraDevice_V1_3);
+    DCameraHost::GetInstance()->OpenSecureCamera(cameraId, callbackObj, demoCameraDevice_V1_3);
+    OHOS::HDI::Camera::V1_3::CameraDeviceResourceCost resourceCost;
+    DCameraHost::GetInstance()->GetResourceCost(cameraId, resourceCost);
 }
 }
 }
