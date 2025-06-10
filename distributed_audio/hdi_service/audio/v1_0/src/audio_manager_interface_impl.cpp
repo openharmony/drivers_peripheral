@@ -164,7 +164,7 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     std::string flagString = adpName + std::to_string(dhId);
     if (mapAddFlags_.find(flagString) == mapAddFlags_.end()) {
         DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_ADD, 0, adp->second->GetVolumeGroup(dhId),
-            adp->second->GetInterruptGroup(dhId) };
+            adp->second->GetInterruptGroup(dhId), caps };
         ret = AddAudioDeviceInner(dhId, event);
         if (ret != DH_SUCCESS) {
             return ret;
