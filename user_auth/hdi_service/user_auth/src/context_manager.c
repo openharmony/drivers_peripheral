@@ -185,9 +185,7 @@ IAM_STATIC ResultCode CreateIdentifySchedule(const UserAuthContext *context, CoA
     scheduleParam.scheduleMode = SCHEDULE_MODE_IDENTIFY;
     Uint8Array localUdid = { scheduleParam.localUdid, UDID_LEN };
     bool getLocalUdidRet = GetLocalUdid(&localUdid);
-    Uint8Array collectorUdid = { scheduleParam.collectorUdid, UDID_LEN };
-    bool getCollectorUdidRet = GetLocalUdid(&collectorUdid);
-    if (!getLocalUdidRet || !getCollectorUdidRet) {
+    if (!getLocalUdidRet) {
         LOG_ERROR("get udid failed");
         return RESULT_GENERAL_ERROR;
     }

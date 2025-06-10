@@ -1003,7 +1003,7 @@ ResultCode CreateScheduleInfo(const Buffer *tlv, Uint8Array peerUdid, ScheduleIn
     }
 
     Uint8Array msg = { tlv->buf, tlv->contentSize };
-    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_CROSS_DEVICE, .peerUdid =  peerUdid };
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_CROSS_DEVICE, .peerUdid = peerUdid };
     Attribute *attribute = CreateAttributeFromExecutorMsg(msg, signParam);
     if (attribute == NULL) {
         LOG_ERROR("CreateAttributeFromExecutorMsg failed");
