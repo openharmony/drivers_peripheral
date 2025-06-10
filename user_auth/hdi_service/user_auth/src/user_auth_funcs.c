@@ -150,7 +150,7 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
     }
 
     if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH &&
-        memcmp(context->localUdid, context->collectorUdid, sizeof(context->localUdid)) == 0) {
+        IsAllZero(&context->collectorUdid[0], UDID_LEN)) {
         if (context->authIntent == ABANDONED_PIN_AUTH) {
             SetOldRootSecret(context->userId, info->oldRootSecret);
         }
@@ -260,7 +260,7 @@ IAM_STATIC ResultCode RequestAuthResultFuncInner(UserAuthContext *userAuthContex
 {
     ResultCode ret = RESULT_SUCCESS;
     Uint8Array collectorUdid = { userAuthContext->collectorUdid, sizeof(userAuthContext->collectorUdid) };
-    if (!IsLocalUdid(collectorUdid)) {
+    if (!IsLocalUdid(collectorUdid) && !IsAllZero(userAuthContext->collectorUdid, UDID_LEN)) {
         ret = GenerateRemoteAuthResultMsg(result, executorResultInfo->scheduleId, collectorUdid, authToken);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("generate remote auth result failed");
