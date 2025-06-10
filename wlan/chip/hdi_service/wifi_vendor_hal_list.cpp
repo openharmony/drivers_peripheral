@@ -66,39 +66,40 @@ void WifiVendorHalList::InitVendorHalsDescriptorList()
 
 bool WifiVendorHalList::LoadVendorHalLib(const std::string& path, WifiHalLibDesc &desc)
 {
-    void* h = dlopen(path.c_str(), RTLD_NOW | RTLD_LOCAL);
+    void* fd = dlopen(path.c_str(), RTLD_NOW | RTLD_LOCAL);
     InitWifiVendorHalFuncTableT initfn;
     WifiError res;
-    if (!h) {
+    if (!fd) {
         HDF_LOGE("failed to open vendor hal library: %{public}s", path.c_str());
         return false;
     }
     initfn = reinterpret_cast<InitWifiVendorHalFuncTableT>(dlsym(
-        h, "InitWifiVendorHalFuncTable"));
+        fd, "InitWifiVendorHalFuncTable"));
     if (!initfn) {
         HDF_LOGE("InitWifiVendorHalFuncTable not found in: %{public}s", path.c_str());
-        goto out_err;
+        dlclose(fd);
+        return false;
     }
     if (!InitHalFuncTableWithStubs(&desc.fn)) {
         HDF_LOGE("Can not initialize the basic function pointer table");
-        goto out_err;
+        dlclose(fd);
+        return false;
     }
     res = initfn(&desc.fn);
     if (res != HAL_SUCCESS) {
         HDF_LOGE("failed to initialize the vendor func table in: %{public}s, error: %{public}d",
             path.c_str(), res);
-        goto out_err;
+        dlclose(fd);
+        return false;
     }
     res = desc.fn.vendorHalPreInit();
     if (res != HAL_SUCCESS && res != HAL_NOT_SUPPORTED) {
         HDF_LOGE("early initialization failed in: %{public}s, error: %{public}d", path.c_str(), res);
-        goto out_err;
+        dlclose(fd);
+        return false;
     }
-    desc.handle = h;
+    desc.handle = fd;
     return true;
-out_err:
-    dlclose(h);
-    return false;
 }
 
 } // namespace v2_0
