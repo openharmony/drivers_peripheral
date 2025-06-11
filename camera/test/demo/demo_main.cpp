@@ -185,7 +185,8 @@ static void VideoTest(const std::shared_ptr<OhosCameraDemo>& mainDemo)
 static void ManuList(const std::shared_ptr<OhosCameraDemo>& mainDemo,
     const int argc, char** argv)
 {
-    int idx, c;
+    int idx;
+    int c;
     bool isAwb = true;
     const char *shortOptions = "h:cwvaeqof:";
     c = getopt_long(argc, argv, shortOptions, LONG_OPTIONS, &idx);
