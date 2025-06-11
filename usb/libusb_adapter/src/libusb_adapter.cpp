@@ -297,21 +297,6 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     return HDF_SUCCESS;
 }
 
-void LibusbAdapter::CloseOpenedFd(const UsbDev &dev)
-{
-    std::lock_guard<std::mutex> lock(openedFdsMutex_);
-    auto iter = openedFds_.find({dev.busNum, dev.devAddr});
-    if (iter != openedFds_.end()) {
-        int32_t fd = iter->second;
-        int res = fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-        HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
-            __func__, __LINE__, iter->second, res);
-        openedFds_.erase(iter);
-    } else {
-        HDF_LOGI("%{public}s:%{public}d not opened", __func__, __LINE__);
-    }
-}
-
 int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s enter", __func__);
@@ -332,7 +317,6 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
     info->second.count--;
     HDF_LOGI("%{public}s Number of devices that are opened=%{public}d", __func__, info->second.count);
     if (info->second.count == 0 && (info->second.handle != nullptr)) {
-        CloseOpenedFd(dev);
         {
             std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
             auto it = g_usbOpenFdMap.find(result);
@@ -452,23 +436,8 @@ int32_t LibusbAdapter::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
         HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
         return HDF_FAILURE;
     } else {
-        fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-        std::lock_guard<std::mutex> lock(openedFdsMutex_);
-        auto iter = openedFds_.find({dev.busNum, dev.devAddr});
-        if (iter != openedFds_.end()) {
-            int32_t oldFd = iter->second;
-            if (oldFd != fd) {
-                int res = fdsan_close_with_tag(oldFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-                HDF_LOGI("%{public}s:%{public}d close old %{public}d ret = %{public}d",
-                    __func__, __LINE__, iter->second, res);
-            }
-        } else {
-            HDF_LOGI("%{public}s:%{public}d first time get fd", __func__, __LINE__);
-        }
-        openedFds_[{dev.busNum, dev.devAddr}] = fd;
         HDF_LOGI("%{public}s:%{public}d opened %{public}d", __func__, __LINE__, fd);
     }
-    HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
 
