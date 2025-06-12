@@ -67,6 +67,7 @@ cJSON* PowerConfig::ParseJsonStream(std::istream& ifsConf)
     if (cJSON_IsNull(config) || (cJSON_IsObject(config) && (config->child == nullptr)) ||
         (cJSON_IsArray(config) && (cJSON_GetArraySize(config) == 0))) {
         cJSON_Delete(config);
+        HDF_LOGW("cJSON parse result is empty, power config is %{public}s", content.c_str());
         return nullptr;
     }
     return config;
@@ -167,17 +168,17 @@ cJSON* PowerConfig::GetValue(const cJSON* config, std::string key) const
 
 void PowerConfig::ParseSceneConfig(const cJSON* sceneConfig)
 {
-    if (cJSON_IsNull(sceneConfig) || !cJSON_IsObject(sceneConfig)) {
+    if (!IsValidJsonObject(sceneConfig)) {
         HDF_LOGW("sceneConfig is invalid");
         return;
     }
 
     sceneConfigMap_.clear();
     cJSON* item = nullptr;
-    cJSON_ArrayForEach(item, sceneConfig)
-    {
-        if (!cJSON_IsObject(item))
+    cJSON_ArrayForEach(item, sceneConfig) {
+        if (!cJSON_IsObject(item)) {
             continue;
+        }
 
         const char* key = item->string;
         if (key == nullptr || strlen(key) == 0) {
@@ -189,12 +190,12 @@ void PowerConfig::ParseSceneConfig(const cJSON* sceneConfig)
         cJSON* getPath = GetValue(item, "get.path");
         cJSON* setPath = GetValue(item, "set.path");
 
-        if (isValidJsonString(getPath)) {
-            tempConfig.getPath = cJSON_GetStringValue(getPath);
+        if (IsValidJsonString(getPath)) {
+            tempConfig.getPath = getPath->valuestring;
             HDF_LOGI("getPath key=%{public}s", tempConfig.getPath.c_str());
         }
-        if (isValidJsonString(setPath)) {
-            tempConfig.setPath = cJSON_GetStringValue(setPath);
+        if (IsValidJsonString(setPath)) {
+            tempConfig.setPath = setPath->valuestring;
             HDF_LOGI("setPath key=%{public}s", tempConfig.setPath.c_str());
         }
 
@@ -203,11 +204,15 @@ void PowerConfig::ParseSceneConfig(const cJSON* sceneConfig)
     HDF_LOGI("The charge scene config size: %{public}d", static_cast<int32_t>(sceneConfigMap_.size()));
 }
 
-bool PowerConfig::isValidJsonString(const cJSON* config) const
+bool PowerConfig::IsValidJsonString(const cJSON* jsonValue) const
 {
-    return !cJSON_IsNull(config) && cJSON_IsString(config);
+    return jsonValue && cJSON_IsString(jsonValue) && jsonValue->valuestring != nullptr;
 }
 
+bool PowerConfig::IsValidJsonObject(const cJSON* jsonValue) const
+{
+    return jsonValue && cJSON_IsObject(jsonValue);
+}
 } // namespace V1_2
 } // namespace Power
 } // namespace HDI
