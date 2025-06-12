@@ -56,14 +56,11 @@ int32_t CodecHandleBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int fenceFd = codecBuffer.fenceFd;
-    if (fenceFd >= 0) {
-        auto ret = SyncWait(fenceFd, TIME_WAIT_MS);
+    if (codecBuffer.fenceFd != nullptr) {
+        auto ret = SyncWait(codecBuffer.fenceFd->Get(), TIME_WAIT_MS);
         if (ret != EOK) {
             CODEC_LOGE("SyncWait ret err [%{public}d]", ret);
         }
-        close(codecBuffer.fenceFd);
-        codecBuffer.fenceFd = -1;
     }
     return ICodecBuffer::FillOmxBuffer(codecBuffer, omxBuffer);
 }
