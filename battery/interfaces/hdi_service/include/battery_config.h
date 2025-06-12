@@ -76,7 +76,7 @@ private:
     cJSON* ParseJsonStream(std::istream& ifsConf);
     bool SplitKey(const std::string& key, std::vector<std::string>& keys) const;
     cJSON* GetValue(const cJSON* config, std::string key) const;
-    bool isValidJsonString(const cJSON* config) const;
+    void SaveJsonResult(const cJSON* lightConfig);
     std::vector<BatteryConfig::LightConfig> lightConfig_;
     BatteryConfig::ChargerConfig chargerConfig_;
     std::map<std::string, BatteryConfig::ChargeSceneConfig> chargeSceneConfigMap_;
