@@ -116,7 +116,7 @@ static int HdfWpaInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfWpaInterfaceDriverRelease enter.");
-    void (*result)(int) = signal(SIGTERM, SIG_IGN);
+    void (*result)(int) = signal(SIGTERM, SIG_DFL);
     if (result == SIG_ERR) {
         HDF_LOGE("Failed to set signal ignore handler for SIGTERM");
     }
