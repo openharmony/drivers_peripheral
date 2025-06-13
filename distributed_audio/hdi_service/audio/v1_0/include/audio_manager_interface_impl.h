@@ -42,6 +42,7 @@ typedef struct {
     uint32_t deviceType;
     uint32_t volGroupId;
     uint32_t iptGroupId;
+    std::string caps;
 } DAudioDevEvent;
 
 class AudioManagerInterfaceImpl : public IAudioManager {
