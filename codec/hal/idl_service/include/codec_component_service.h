@@ -18,7 +18,6 @@
 
 #include "component_node.h"
 #include "v3_0/icodec_component.h"
-#include "v1_0/imapper.h"
 
 namespace OHOS {
 namespace HDI {
@@ -57,17 +56,16 @@ public:
 
     const std::string &GetComponentCompName() const;
     void GetComponentNode(std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode_);
-    bool ReWrapNativeBufferInOmxBuffer(const OmxCodecBuffer &inBuffer);
+
 private:
     void SetComponentRole();
     void ReleaseCache();
     bool isIPCMode_;
     std::string name_;
+    std::mutex nodeMutex_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentNode> node_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
 };
-
-sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> GetMapperService();
 
 }  // namespace V3_0
 }  // namespace Codec
