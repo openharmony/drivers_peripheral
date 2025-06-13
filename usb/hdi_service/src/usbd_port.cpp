@@ -267,7 +267,7 @@ int32_t UsbdPort::SwitchFunction(int32_t dataRole)
         ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_NONE);
     }
     if (dataRole == DATA_ROLE_DEVICE) {
-        if (usbdFunction::IsHdcOpen()) {
+        if (UsbdFunction::IsHdcOpen()) {
 	        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_HDC);
 	    } else {
 	        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_STORAGE);
