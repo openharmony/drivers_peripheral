@@ -26,6 +26,5 @@ group("hdf_vibrator_fuzztest") {
     "vibratorstartbyintensity_fuzzer:fuzztest",
     "vibratorstartonce_fuzzer:fuzztest",
     "vibratorstop_fuzzer:fuzztest",
-    "vibratorstopv1_2_fuzzer:fuzztest",
   ]
 }
