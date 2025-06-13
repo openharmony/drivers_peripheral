@@ -82,13 +82,11 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t id = SetTimer("Hdi:CaptureFrame");
     HdfAudioStartTrace("Hdi:AudioCaptureFrameVdi", 0);
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiCapture->CaptureFrame(vdiCapture, frame, frameLen, replyBytes);
     AudioDfxSysEventError("CaptureFrame", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
-    CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture frame fail, ret=%{public}d", ret);
         pthread_rwlock_unlock(&g_rwVdiCaptureLock);
