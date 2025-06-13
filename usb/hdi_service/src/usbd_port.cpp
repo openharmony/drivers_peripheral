@@ -230,7 +230,9 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
         return HDF_SUCCESS;
     }
 
-    if (currentProtInfo_.powerRole != powerRole) {    
+    if (currentPortInfo_.powerRole != powerRole) {
+        HDF_LOGI("%{public}s: powerRole switch from %{public}d to %{public}d", __func__,
+            currentPortInfo_.powerRole, powerRole);   
         ret = WritePortFile(powerRole, POWER_ROLE_PATH);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: write powerRole failed, ret: %{public}d", __func__, ret);
@@ -238,17 +240,19 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
         }
     }
     if (currentPortInfo_.dataRole != dataRole) {
+        HDF_LOGI("%{public}s: dataRole switch from %{public}d to %{public}d", __func__,
+            currentPortInfo_.dataRole, dataRole);
         ret = WritePortFile(dataRole, DATA_ROLE_PATH);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: write dataRole failed, ret: %{public}d", __func__, ret);
             return ret;
         }
-	if (currentPortInfo_.dataRole == DATA_ROLE_DEVICE && dataRole == DATA_ROLE_HOST) {
-	    ret = SwitchFunction(DATA_ROLE_HOST);
-	}
-	if (currentPortInfo_.dataRole == DATA_ROLE_HOST && dataRole == DATA_ROLE_DEVICE) {
-	    ret = SwitchFunction(DATA_ROLE_DEVICE);
-	}
+	    if (currentPortInfo_.dataRole == DATA_ROLE_DEVICE && dataRole == DATA_ROLE_HOST) {
+	        ret = SwitchFunction(DATA_ROLE_HOST);
+	    }
+	    if (currentPortInfo_.dataRole == DATA_ROLE_HOST && dataRole == DATA_ROLE_DEVICE) {
+	        ret = SwitchFunction(DATA_ROLE_DEVICE);
+	    }
     }
     currentPortInfo_.portId = portId;
     currentPortInfo_.powerRole = powerRole;
@@ -264,10 +268,10 @@ int32_t UsbdPort::SwitchFunction(int32_t dataRole)
     }
     if (dataRole == DATA_ROLE_DEVICE) {
         if (usbdFunction::IsHdcOpen()) {
-	    ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_HDC);
-	} else {
-	    ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_STORAGE);
-	}
+	        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_HDC);
+	    } else {
+	        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_STORAGE);
+	    }
     }
     return ret;
 }
