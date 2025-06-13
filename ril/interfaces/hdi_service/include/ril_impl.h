@@ -29,6 +29,8 @@ namespace OHOS {
 namespace HDI {
 namespace Ril {
 namespace V1_5 {
+static constexpr int32_t DEFAULT_SLOT_ID = 0;
+
 class RilImpl : public IRil {
 public:
     RilImpl() = default;
@@ -207,7 +209,7 @@ public:
             HDF_LOGE("manager or func is null pointer");
             return RIL_ERR_NULL_POINT;
         }
-        if (slotId >= Telephony::HRilManager::GetInstance().GetMaxSimSlotCount()) {
+        if (slotId >= Telephony::HRilManager::GetInstance().GetMaxSimSlotCount() || slotId < DEFAULT_SLOT_ID) {
             HDF_LOGE("slotId is inValid");
             return RIL_ERR_INVALID_PARAMETER;
         }
