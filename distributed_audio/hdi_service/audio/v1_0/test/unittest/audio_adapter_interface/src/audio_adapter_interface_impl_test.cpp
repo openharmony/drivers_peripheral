@@ -1534,6 +1534,54 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleDeviceClosed_003, TestSize.Level1)
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockRevertIAudioParamCallback());
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleDeviceClosed(streamId, event));
 }
+
+/**
+ * @tc.name: HandleRenderCallback_001
+ * @tc.desc: Verify the HandleRenderCallback function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_001, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    DAudioEvent event = {HDF_AUDIO_EVENT_FULL, "gtest"};
+
+    AdapterTest_->paramCallback_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleRenderCallback(event));
+}
+
+/**
+ * @tc.name: HandleRenderCallback_002
+ * @tc.desc: Verify the HandleRenderCallback function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    DAudioEvent event = {HDF_AUDIO_EVENT_FULL, "gtest"};
+
+    AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleRenderCallback(event));
+}
+
+/**
+ * @tc.name: HandleRenderCallback_003
+ * @tc.desc: Verify the HandleRenderCallback function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_003, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    DAudioEvent event = {HDF_AUDIO_EVENT_FULL, "gtest"};
+
+    AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleRenderCallback(event));
+}
 } // V1_0
 } // Audio
 } // Distributedaudio
