@@ -15,17 +15,17 @@
 
 #include "vibratorplayhapticpattern_fuzzer.h"
 #include "hdf_base.h"
-#include "v1_2/vibrator_interface_proxy.h"
+#include "v2_0/vibrator_interface_proxy.h"
 #include <hdf_log.h>
 #include <securec.h>
 
-using namespace OHOS::HDI::Vibrator::V1_2;
+using namespace OHOS::HDI::Vibrator::V2_0;
 
 namespace {
     struct AllParameters {
         int32_t g_pkgTime;
         int32_t g_pkgEventNum;
-        enum OHOS::HDI::Vibrator::V1_2::EVENT_TYPE g_eventType;
+        enum OHOS::HDI::Vibrator::V2_0::EVENT_TYPE g_eventType;
         int32_t g_eventDuration;
         int32_t g_eventTime;
         int32_t g_eventIntensity;
@@ -45,7 +45,7 @@ namespace OHOS {
         if (data == nullptr) {
             return false;
         }
-        OHOS::HDI::Vibrator::V1_2::HapticPaket pkg;
+        OHOS::HDI::Vibrator::V2_0::HapticPaket pkg;
 
         if (size < sizeof(params)) {
             return false;
@@ -56,13 +56,13 @@ namespace OHOS {
             return false;
         }
 
-        sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface =
-            OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
+        sptr<OHOS::HDI::Vibrator::V2_0::IVibratorInterface> g_vibratorInterface =
+            OHOS::HDI::Vibrator::V2_0::IVibratorInterface::Get();
         
         pkg.time = params.g_pkgTime;
         pkg.eventNum = params.g_pkgEventNum;
 
-        OHOS::HDI::Vibrator::V1_2::HapticEvent hapticEvent;
+        OHOS::HDI::Vibrator::V2_0::HapticEvent hapticEvent;
         hapticEvent.type = params.g_eventType;
         hapticEvent.duration = params.g_eventDuration;
         hapticEvent.time = params.g_eventTime;
@@ -71,14 +71,14 @@ namespace OHOS {
         hapticEvent.index = params.g_eventIndex;
         hapticEvent.pointNum = params.g_eventPointNum;
 
-        OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint;
+        OHOS::HDI::Vibrator::V2_0::CurvePoint curvePoint;
         curvePoint.time = params.g_pointTime;
         curvePoint.intensity = params.g_pointIntensity;
         curvePoint.frequency = params.g_pointFrequency;
         hapticEvent.points.push_back(std::move(curvePoint));
 
         pkg.events.push_back(std::move(hapticEvent));
-        int32_t ret = !g_vibratorInterface->PlayHapticPattern(pkg);
+        int32_t ret = !g_vibratorInterface->PlayHapticPattern({-1, 1}, pkg);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetConfig failed, ret is [%{public}x]\n", __func__, ret);
             return false;

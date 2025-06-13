@@ -40,7 +40,5 @@ if (defined(ohos_lite)) {
         "unittest/hdi:hdi_unittest_sensor",
       ]
     }
-    deps = []
-    deps += [ "unittest/hdi:hdi_unittest_sensor" ]
   }
 }

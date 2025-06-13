@@ -17,9 +17,10 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "v1_1/vibrator_interface_stub.h"
+#include "v2_0/vibrator_interface_proxy.h"
+#include "v2_0/vibrator_interface_stub.h"
 
-using namespace OHOS::HDI::Vibrator::V1_1;
+using namespace OHOS::HDI::Vibrator::V2_0;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
