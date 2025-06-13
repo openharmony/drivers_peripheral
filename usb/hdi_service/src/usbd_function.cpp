@@ -180,20 +180,21 @@ int32_t UsbdFunction::ReleaseMtp()
     return ret;
 }
 
-int32_t UsbdFunction::SwitchFunction()
+bool UsbdFunction::IsHdcOpen()
 {
     char persistConfig[UDC_NAME_MAX_LEN] = {0}；
     int32_t ret = GetParameter("persist.sys.usb.config", "invalid", persistConfig, UDC_NAME_MAX_LEN);
     if (ret <= 0) {
         HDF_LOGE("%{public}s:GetPersistParameter failed", __func__);
+        return false;
     }
     for (size_t i = 0; i <= UDC_NAME_MAX_LEN - 3; ++i) {
         if (persistConfig[i] == 'h' &&
-	    persistConfig[i+1] == 'd' &&
-	    persistConfig[i+2] == 'c') {
-	    HDF_LOGI("%{public}s:hdc is opening", __func__);
-	    return true;
-	}
+	        persistConfig[i+1] == 'd' &&
+	        persistConfig[i+2] == 'c') {
+            HDF_LOGI("%{public}s:hdc is opening", __func__);
+	        return true;
+	    }
     }
     return false;
 }
