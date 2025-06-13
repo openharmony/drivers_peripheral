@@ -24,7 +24,8 @@
 #include <refbase.h>
 #include "codec_omx_ext.h"
 #include "v3_0/codec_types.h"
-using OHOS::HDI::Codec::V3_0::OmxCodecBuffer;
+#include "codec_buffer_wrapper.h"
+
 constexpr uint32_t TIME_WAIT_MS = 10;
 namespace OHOS {
 namespace Codec {
