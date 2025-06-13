@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V3_0 {
+namespace V4_0 {
 #define ARGV_FLAG 1
 #define INPUT_PORT_INDEX 0
 #define OUTPUT_PORT_INDEX 1
@@ -150,7 +150,7 @@ int32_t CodecDfxService::DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *
     }
     return HDF_SUCCESS;
 }
-}  // namespace V3_0
+}  // namespace V4_0
 }  // namespace Codec
 }  // namespace HDI
 }  // namespace OHOS

@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "v3_0/codec_callback_service.h"
+#include "v4_0/codec_callback_service.h"
 #include <hdf_base.h>
 
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V3_0 {
+namespace V4_0 {
 int32_t CodecCallbackService::EventHandler(CodecEventType event, const EventInfo &info)
 {
     (void)event;
@@ -40,7 +40,7 @@ int32_t CodecCallbackService::FillBufferDone(int64_t appData, const OmxCodecBuff
     (void)buffer;
     return HDF_SUCCESS;
 }
-} // V3_0
+} // V4_0
 } // Codec
 } // HDI
 } // OHOS

@@ -25,7 +25,7 @@ using namespace std;
 using namespace OHOS;
 using OHOS::sptr;
 using OHOS::HDI::Base::NativeBuffer;
-using namespace OHOS::HDI::Codec::V3_0;
+using namespace OHOS::HDI::Codec::V4_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 #define HDF_LOG_TAG     codec_omx_hdi_enc
@@ -105,7 +105,7 @@ bool CodecHdiEncode::Init(const CommandOpt &opt)
         return false;
     }
     // Interface init
-    omxMgr_ = OHOS::HDI::Codec::V3_0::ICodecComponentManager::Get();
+    omxMgr_ = OHOS::HDI::Codec::V4_0::ICodecComponentManager::Get();
     callback_ = new CodecHdiCallback(shared_from_this());
     if ((omxMgr_ == nullptr) || (callback_ == nullptr)) {
         HDF_LOGE("%{public}s:omxMgr_ or callback_ is null", __func__);
@@ -124,7 +124,7 @@ bool CodecHdiEncode::Init(const CommandOpt &opt)
         return false;
     }
     // get version
-    struct OHOS::HDI::Codec::V3_0::CompVerInfo verInfo;
+    struct OHOS::HDI::Codec::V4_0::CompVerInfo verInfo;
     err = memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
     if (err != EOK) {
         HDF_LOGE("%{public}s: memset_s verInfo err [%{public}d].", __func__, err);
@@ -430,10 +430,10 @@ int32_t CodecHdiEncode::UseBufferOnPort(PortIndex portIndex, int bufferCount, in
         omxBuffer->pts = 0;
         omxBuffer->flag = 0;
         if (portIndex == PortIndex::PORT_INDEX_INPUT) {
-            omxBuffer->type = OHOS::HDI::Codec::V3_0::READ_ONLY_TYPE;
+            omxBuffer->type = OHOS::HDI::Codec::V4_0::READ_ONLY_TYPE;
             spSharedMem->MapReadAndWriteAshmem();
         } else {
-            omxBuffer->type = OHOS::HDI::Codec::V3_0::READ_WRITE_TYPE;
+            omxBuffer->type = OHOS::HDI::Codec::V4_0::READ_WRITE_TYPE;
             spSharedMem->MapReadOnlyAshmem();
         }
         OmxCodecBuffer outBuffer;
@@ -570,7 +570,7 @@ int CodecHdiEncode::GetFreeBufferId()
 
 int32_t CodecHdiEncode::GetComponentName(std::string &compName)
 {
-    OHOS::HDI::Codec::V3_0::AvCodecRole role = OHOS::HDI::Codec::V3_0::AvCodecRole::MEDIA_ROLETYPE_VIDEO_AVC;
+    OHOS::HDI::Codec::V4_0::AvCodecRole role = OHOS::HDI::Codec::V4_0::AvCodecRole::MEDIA_ROLETYPE_VIDEO_AVC;
     int32_t count = 0;
     auto err = omxMgr_->GetComponentNum(count);
     if (err != HDF_SUCCESS || count <= 0) {
@@ -585,7 +585,7 @@ int32_t CodecHdiEncode::GetComponentName(std::string &compName)
     }
     err = HDF_FAILURE;
     for (auto cap : caps) {
-        if (cap.type == OHOS::HDI::Codec::V3_0::CodecType::VIDEO_ENCODER && cap.role == role) {
+        if (cap.type == OHOS::HDI::Codec::V4_0::CodecType::VIDEO_ENCODER && cap.role == role) {
             compName = cap.compName;
             err = HDF_SUCCESS;
         }
@@ -697,8 +697,8 @@ int32_t CodecHdiEncode::CreateBufferHandle()
     return err;
 }
 
-int32_t CodecHdiEncode::EventHandler(OHOS::HDI::Codec::V3_0::CodecEventType event,
-    const OHOS::HDI::Codec::V3_0::EventInfo &info)
+int32_t CodecHdiEncode::EventHandler(OHOS::HDI::Codec::V4_0::CodecEventType event,
+    const OHOS::HDI::Codec::V4_0::EventInfo &info)
 {
     if (event == CODEC_EVENT_CMD_COMPLETE) {
         CodecCommandType cmd = (CodecCommandType)info.data1;

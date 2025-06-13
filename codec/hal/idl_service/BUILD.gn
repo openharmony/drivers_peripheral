@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("../..//codec.gni")
 
-ohos_shared_library("libcodec_component_manager_service_3.0") {
+ohos_shared_library("libcodec_component_manager_service_4.0") {
   include_dirs = [
     "../../interfaces/include/",
     "../../utils/include/",
@@ -41,7 +41,7 @@ ohos_shared_library("libcodec_component_manager_service_3.0") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libcodec_stub_3.0",
+      "drivers_interface_codec:libcodec_stub_4.0",
       "drivers_interface_display:libdisplay_buffer_proxy_1.0",
       "drivers_interface_display:libdisplay_buffer_proxy_1.1",
       "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -84,12 +84,12 @@ ohos_shared_library("libcodec_driver") {
 
   sources = [ "src/codec_component_manager_driver.cpp" ]
 
-  deps = [ ":libcodec_component_manager_service_3.0" ]
+  deps = [ ":libcodec_component_manager_service_4.0" ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libcodec_stub_3.0",
+      "drivers_interface_codec:libcodec_stub_4.0",
       "drivers_interface_display:libdisplay_buffer_proxy_1.0",
       "graphic_surface:buffer_handle",
       "hdf_core:libhdf_host",
@@ -116,7 +116,7 @@ ohos_shared_library("libcodec_driver") {
 
 group("codec_idl_omx_service") {
   deps = [
-    ":libcodec_component_manager_service_3.0",
+    ":libcodec_component_manager_service_4.0",
     ":libcodec_driver",
   ]
 }

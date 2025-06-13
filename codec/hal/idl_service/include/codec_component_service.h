@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V3_0_CODECCOMPONENTSERVICE_H
-#define OHOS_HDI_CODEC_V3_0_CODECCOMPONENTSERVICE_H
+#ifndef OHOS_HDI_CODEC_V4_0_CODECCOMPONENTSERVICE_H
+#define OHOS_HDI_CODEC_V4_0_CODECCOMPONENTSERVICE_H
 
 #include "component_node.h"
-#include "v3_0/icodec_component.h"
+#include "v4_0/icodec_component.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V3_0 {
+namespace V4_0 {
 class CodecComponentService : public ICodecComponent {
 public:
     CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node,
@@ -67,9 +67,9 @@ private:
     std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
 };
 
-}  // namespace V3_0
+}  // namespace V4_0
 }  // namespace Codec
 }  // namespace HDI
 }  // namespace OHOS
 
-#endif  // OHOS_HDI_CODEC_V3_0_CODECCOMPONENTSERVICE_H
+#endif  // OHOS_HDI_CODEC_V4_0_CODECCOMPONENTSERVICE_H

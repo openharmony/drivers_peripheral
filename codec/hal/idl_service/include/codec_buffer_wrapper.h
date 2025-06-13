@@ -15,11 +15,11 @@
 #ifndef CODEC_BUFFER_WRAPPER_H
 #define CODEC_BUFFER_WRAPPER_H
 
-#include "v3_0/codec_types.h"
+#include "v4_0/codec_types.h"
 #include "buffer_helper.h"
 
 namespace OHOS::Codec::Omx {
-namespace CodecHDI = OHOS::HDI::Codec::V3_0;
+namespace CodecHDI = OHOS::HDI::Codec::V4_0;
 
 struct OmxCodecBuffer {
     uint32_t bufferId;

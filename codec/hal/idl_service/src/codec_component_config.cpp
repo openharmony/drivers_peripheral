@@ -16,6 +16,7 @@
 #include <cinttypes>
 #include <osal_mem.h>
 #include <unistd.h>
+#include <map>
 #include "codec_log_wrapper.h"
 #include "codec_hcb_util.h"
 #define CODEC_CONFIG_NAME "media_codec_capabilities"
@@ -64,11 +65,13 @@ namespace {
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_PASSTHROUGH[] = "isSupportPassthrough";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY[] = "isSupportLowLatency";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_TSVC[] = "isSupportTSVC";
-    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LTR[] = "isSupportLTR";
-    constexpr char CODEC_CONFIG_KEY_MAX_LTR_FRAME_NUM[] = "maxLTRFrameNum";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_WATERMARK[] = "isSupportWaterMark";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_SEEK_WITHOUT_FLUSH[] = "isSupportSeekWithoutFlush";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_QP_MAP[] = "isSupportQPMap";
+    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LTR[] = "isSupportLTR";
+    constexpr char CODEC_CONFIG_KEY_MAX_LTR_FRAME_NUM[] = "maxLTRFrameNum";
+    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_B_FRAME[] = "isSupportBFrame";
+    constexpr char CODEC_CONFIG_KEY_MAX_SUPPORT_B_FRAME_CNT[] = "maxSupportBFrameCnt";
 
     constexpr char CODEC_CONFIG_KEY_SAMPLE_FORMATS[] = "sampleFormats";
     constexpr char CODEC_CONFIG_KEY_SAMPLE_RATE[] = "sampleRate";
@@ -76,7 +79,7 @@ namespace {
     constexpr char CODEC_CONFIG_KEY_CHANNEL_COUNT[] = "channelCount";
 }
 
-using namespace OHOS::HDI::Codec::V3_0;
+using namespace OHOS::HDI::Codec::V4_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -381,20 +384,49 @@ void CodecComponentConfig::GetVideoPortFeature(const struct DeviceResourceIface 
                                                const struct DeviceResourceNode &childNode,
                                                CodecCompCapability &cap)
 {
-    cap.port.video.isSupportPassthrough = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_PASSTHROUGH);
-    cap.port.video.isSupportLowLatency = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY);
-    cap.port.video.isSupportTSVC = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_TSVC);
-    cap.port.video.isSupportLTR = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LTR);
-    if (cap.port.video.isSupportLTR) {
+    std::vector<VideoFeature> &features = cap.port.video.features;
+
+    // ltr
+    bool ltrSupport = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LTR);
+    if (ltrSupport) {
+        int32_t maxLtrNum {0};
         if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_MAX_LTR_FRAME_NUM,
-                            reinterpret_cast<uint32_t *>(&cap.port.video.maxLTRFrameNum), 0) != HDF_SUCCESS) {
+                            reinterpret_cast<uint32_t *>(&maxLtrNum), 0) == HDF_SUCCESS) {
+            std::vector<int32_t> ltrExtends(1, maxLtrNum);
+            features.push_back(VideoFeature{VIDEO_FEATURE_LTR, ltrSupport, ltrExtends});
+        } else {
             CODEC_LOGE("failed to get %{public}s maxLTRFrameNum!", childNode.name);
         }
     }
-    cap.port.video.isSupportWaterMark = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_WATERMARK);
-    cap.port.video.isSupportQPMap = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_QP_MAP);
-    cap.port.video.isSupportSeekWithoutFlush = iface.GetBool(&childNode,
-        CODEC_CONFIG_KEY_IS_SUPPORT_SEEK_WITHOUT_FLUSH);
+
+    // b frame
+    bool bSupport = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_B_FRAME);
+    if (bSupport) {
+        int32_t maxBCount {0};
+        if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_MAX_SUPPORT_B_FRAME_CNT,
+                            reinterpret_cast<uint32_t *>(&maxBCount), 0) == HDF_SUCCESS) {
+            std::vector<int32_t> bFrameExtends(1, maxBCount);
+            features.push_back(VideoFeature{VIDEO_FEATURE_ENCODE_B_FRAME, bSupport, bFrameExtends});
+        } else {
+            CODEC_LOGE("failed to get %{public}s maxSupportBFrameCnt!", childNode.name);
+        }
+    }
+
+    std::vector<int32_t> defaultExtends(0);
+    std::map<enum VideoFeatureKey, std::string> boolKeys = {
+        { VIDEO_FEATURE_PASS_THROUGH,       CODEC_CONFIG_KEY_IS_SUPPORT_PASSTHROUGH        },
+        { VIDEO_FEATURE_LOW_LATENCY,        CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY        },
+        { VIDEO_FEATURE_TSVC,               CODEC_CONFIG_KEY_IS_SUPPORT_TSVC               },
+        { VIDEO_FEATURE_WATERMARK,          CODEC_CONFIG_KEY_IS_SUPPORT_WATERMARK          },
+        { VIDEO_FEATURE_SEEK_WITHOUT_FLUSH, CODEC_CONFIG_KEY_IS_SUPPORT_SEEK_WITHOUT_FLUSH },
+        { VIDEO_FEATURE_QP_MAP,             CODEC_CONFIG_KEY_IS_SUPPORT_QP_MAP             },
+    };
+    for (auto key: boolKeys) {
+        bool support = iface.GetBool(&childNode, key.second.c_str());
+        if (support) {
+            features.push_back(VideoFeature{key.first, support, defaultExtends});
+        }
+    }
 }
 
 int32_t CodecComponentConfig::GetAudioPortCapability(const struct DeviceResourceIface &iface,
