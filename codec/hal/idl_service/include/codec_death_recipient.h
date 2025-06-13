@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V3_0_CODECDEATHRECIPIENT_H
-#define OHOS_HDI_CODEC_V3_0_CODECDEATHRECIPIENT_H
+#ifndef OHOS_HDI_CODEC_V4_0_CODECDEATHRECIPIENT_H
+#define OHOS_HDI_CODEC_V4_0_CODECDEATHRECIPIENT_H
 
 #include <functional>
 #include "iremote_object.h"
@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V3_0 {
+namespace V4_0 {
 
 void CleanResourceOfDiedService(sptr<IRemoteObject> remote, wptr<CodecComponentManagerService> service);
 void RegisterDeathRecipientService(const sptr<ICodecCallback> callback, uint32_t componentId,
@@ -47,9 +47,9 @@ private:
     wptr<CodecComponentManagerService> mgr;
 };
 
-}  // namespace V3_0
+}  // namespace V4_0
 }  // namespace Codec
 }  // namespace HDI
 }  // namespace OHOS
 
-#endif  // OHOS_HDI_CODEC_V3_0_CODECDEATHRECIPIENT_H
+#endif  // OHOS_HDI_CODEC_V4_0_CODECDEATHRECIPIENT_H

@@ -29,7 +29,7 @@ ohos_fuzztest("CodecGetComponentCapabilityListHdiFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_codec:libcodec_proxy_3.0",
+    "drivers_interface_codec:libcodec_proxy_4.0",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",

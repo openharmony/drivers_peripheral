@@ -18,17 +18,17 @@
 
 #include <hdf_log.h>
 #include "codec_omx_ext.h"
-#include "v3_0/codec_types.h"
-#include "v3_0/icodec_component.h"
-#include "v3_0/icodec_component_manager.h"
+#include "v4_0/codec_types.h"
+#include "v4_0/icodec_component.h"
+#include "v4_0/icodec_component_manager.h"
 #include "codeccallback_fuzzer.h"
 
-using OHOS::HDI::Codec::V3_0::OmxCodecBuffer;
+using OHOS::HDI::Codec::V4_0::OmxCodecBuffer;
 namespace OHOS {
 namespace Codec {
-    inline OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecComponent> g_component;
-    inline OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecCallback> g_callback;
-    inline OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecComponentManager> g_manager;
+    inline OHOS::sptr<OHOS::HDI::Codec::V4_0::ICodecComponent> g_component;
+    inline OHOS::sptr<OHOS::HDI::Codec::V4_0::ICodecCallback> g_callback;
+    inline OHOS::sptr<OHOS::HDI::Codec::V4_0::ICodecComponentManager> g_manager;
     extern uint32_t g_componentId;
 
     void FillDataOmxCodecBuffer(struct OmxCodecBuffer *dataFuzz);
