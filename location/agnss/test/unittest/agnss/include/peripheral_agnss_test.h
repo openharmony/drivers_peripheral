@@ -28,11 +28,13 @@ namespace Agnss {
 namespace V2_0 {
 
 using OHOS::HDI::Location::Agnss::V2_0::IAGnssInterface;
+static const std::string SYSPARAM_GPS_SUPPORT = "const.location.gps.support";
 class PeripheralAGnssTest : public testing::Test {
 public:
     void SetUp();
     void TearDown();
     sptr<AGnssInterfaceImpl> agnssInstance_;
+    bool isSupportGnss = false;
 };
 } // V2_0
 } // Agnss
