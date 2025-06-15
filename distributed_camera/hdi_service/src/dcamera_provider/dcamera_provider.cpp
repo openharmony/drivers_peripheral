@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -247,6 +247,41 @@ int32_t DCameraProvider::Notify(const DHBase& dhBase, const DCameraHDFEvent& eve
     dCameraEvent->result_ = event.result_;
     dCameraEvent->content_ = event.content_;
     return device->Notify(dCameraEvent);
+}
+
+int32_t DCameraProvider::RegisterCameraHdfListener(const std::string &serviceName,
+    const sptr<IDCameraHdfCallback> &callbackObj)
+{
+    DHLOGI("Register camera HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    OHOS::sptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
+    if (dCameraHost == nullptr) {
+        DHLOGE("dcamera host is null.");
+        return DCamRetCode::DEVICE_NOT_INIT;
+    }
+    auto ret = dCameraHost->RegisterCameraHdfListener(serviceName, callbackObj);
+    if (ret != DCamRetCode::SUCCESS) {
+        DHLOGE("call dcamera host RegisterCameraHdfListener failed, ret = %{public}d.", ret);
+        return ret;
+    }
+    DHLOGI("Register camera HDF listener success.");
+    return DCamRetCode::SUCCESS;
+}
+
+int32_t DCameraProvider::UnRegisterCameraHdfListener(const std::string &serviceName)
+{
+    DHLOGI("Unregister camera HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    OHOS::sptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
+    if (dCameraHost == nullptr) {
+        DHLOGE("dcamera host is null.");
+        return DCamRetCode::DEVICE_NOT_INIT;
+    }
+    auto ret = dCameraHost->UnRegisterCameraHdfListener(serviceName);
+    if (ret != DCamRetCode::SUCCESS) {
+        DHLOGE("call dcamera host UnRegisterCameraHdfListener failed, ret = %{public}d.", ret);
+        return ret;
+    }
+    DHLOGI("Unregister camera HDF listener success.");
+    return DCamRetCode::SUCCESS;
 }
 
 int32_t DCameraProvider::OpenSession(const DHBase &dhBase)
