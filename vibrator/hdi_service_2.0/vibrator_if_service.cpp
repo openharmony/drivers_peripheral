@@ -596,6 +596,119 @@ int32_t VibratorIfService::UnRegVibratorPlugCallback(const sptr<V2_0::IVibratorP
     return ret;
 }
 
+int32_t VibratorIfService::PlayPatternBySessionId(
+    const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
+    uint32_t sessionId,
+    const OHOS::HDI::Vibrator::V2_0::HapticPaket& hapticPaket)
+{
+    HDF_LOGI("%{public}s: Enter the PlayPatternBySessionId function", __func__);
+
+    HapticPaketVdi hapticPaketVdi;
+    hapticPaketVdi.time = hapticPaket.time;
+    hapticPaketVdi.eventNum = hapticPaket.eventNum;
+    for (const auto &event : hapticPaket.events) {
+        HapticEventVdi hapticEventVdi;
+        if (event.type == CONTINUOUS) {
+            hapticEventVdi.type = VDI_CONTINUOUS;
+        } else if (event.type == TRANSIENT) {
+            hapticEventVdi.type = VDI_TRANSIENT;
+        }
+        hapticEventVdi.time = event.time;
+        hapticEventVdi.duration = event.duration;
+        hapticEventVdi.intensity = event.intensity;
+        hapticEventVdi.frequency = event.frequency;
+        hapticEventVdi.index = event.index;
+        hapticEventVdi.pointNum = event.pointNum;
+        for (const auto &point : event.points) {
+            CurvePointVdi curvePointVdip;
+            curvePointVdip.time = point.time;
+            curvePointVdip.intensity = point.intensity;
+            curvePointVdip.frequency = point.frequency;
+            hapticEventVdi.points.push_back(std::move(curvePointVdip));
+        }
+        hapticPaketVdi.events.push_back(std::move(hapticEventVdi));
+    }
+
+    StartTrace(HITRACE_TAG_HDF, "PlayPatternBySessionId");
+    int32_t ret = vibratorVdiImplV1_1_->PlayPatternBySessionId(deviceVibratorInfo, sessionId, hapticPaket);
+    FinishTrace(HITRACE_TAG_HDF);
+    
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
+                 __func__, deviceVibratorInfo.deviceId, deviceVibratorInfo.vibratorId, ret);
+    }
+
+    return ret;
+}
+
+int32_t VibratorIfService::PlayPackageBySession(
+    const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
+    uint32_t sessionId,
+    const OHOS::HDI::Vibrator::V2_0::VibratorPackage& vibratorPackage)
+{
+    HDF_LOGI("%{public}s: Enter the PlayPackageBySession function", __func__);
+
+    VibratorPackageVdi vibratorPackageVdi;
+    vibratorPackageVdi.patternNum = vibratorPackage.patternNum;
+    vibratorPackageVdi.packageduration = vibratorPackage.packageduration;
+    for (const auto &pattern : vibratorPackage.patterns) {
+        HapticPaketVdi hapticPaketVdi;
+        hapticPaketVdi.time = pattern.time;
+        hapticPaketVdi.eventNum = pattern.eventNum;
+        for (const auto &event : pattern.events) {
+            HapticEventVdi hapticEventVdi;
+            if (event.type == CONTINUOUS) {
+                hapticEventVdi.type = VDI_CONTINUOUS;
+            } else if (event.type == TRANSIENT) {
+                hapticEventVdi.type = VDI_TRANSIENT;
+            }
+            hapticEventVdi.time = event.time;
+            hapticEventVdi.duration = event.duration;
+            hapticEventVdi.intensity = event.intensity;
+            hapticEventVdi.frequency = event.frequency;
+            hapticEventVdi.index = event.index;
+            hapticEventVdi.pointNum = event.pointNum;
+            for (const auto &point : event.points) {
+                CurvePointVdi curvePointVdip;
+                curvePointVdip.time = point.time;
+                curvePointVdip.intensity = point.intensity;
+                curvePointVdip.frequency = point.frequency;
+                hapticEventVdi.points.push_back(std::move(curvePointVdip));
+            }
+            hapticPaketVdi.events.push_back(std::move(hapticEventVdi));
+        }
+        vibratorPackageVdi.patterns.push_back(std::move(hapticPaketVdi));
+    }
+    StartTrace(HITRACE_TAG_HDF, "PlayPackageBySession");
+    int32_t ret = vibratorVdiImplV1_1_->PlayPackageBySession(deviceVibratorInfo, sessionId, vibratorPackage);
+    FinishTrace(HITRACE_TAG_HDF);
+
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
+                 __func__, deviceVibratorInfo.deviceId, deviceVibratorInfo.vibratorId, ret);
+    }
+
+    return ret;
+}
+
+int32_t VibratorIfService::StopVibrateBySessionId(
+    const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
+    uint32_t sessionId)
+{
+    HDF_LOGI("%{public}s: Enter the StopVibrateBySessionId function", __func__);
+
+    StartTrace(HITRACE_TAG_HDF, "StopVibrateBySessionId");
+    int32_t ret = vibratorVdiImplV1_1_->StopVibrateBySessionId(deviceVibratorInfo, sessionId);
+    FinishTrace(HITRACE_TAG_HDF);
+
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
+                 __func__, deviceVibratorInfo.deviceId, deviceVibratorInfo.vibratorId, ret);
+    }
+
+    return ret;
+}
+
 extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
 {
     VibratorIfService *impl = new (std::nothrow) VibratorIfService();
