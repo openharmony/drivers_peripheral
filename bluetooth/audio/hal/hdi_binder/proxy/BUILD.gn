@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 config("hdi_service_proxy_config") {
   visibility = [ ":*" ]
@@ -45,22 +44,6 @@ ohos_shared_library("audio_bluetooth_hdi_proxy_server") {
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_binder/proxy/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_binder/server/include",
-    "//third_party/cJSON",
-    "$hdf_framework_path/include/utils",
-    "$hdf_framework_path/include",
-    "//third_party/bounds_checking_function/include",
-    "$hdf_framework_path/ability/sbuf/include",
-    "$hdf_framework_path/utils/include",
-    "$hdf_framework_path/ability/sbuf/include",
-    "$hdf_framework_path/include",
-    "$hdf_framework_path/core/sec/include",
-    "$hdf_framework_path/core/host/include",
-    "$hdf_framework_path/core/manager/include",
-    "$hdf_uhdf_path/include/devhost",
-    "$hdf_uhdf_path/devhost/include",
-    "$hdf_uhdf_path/devmgr/include",
-    "$hdf_uhdf_path/host/include",
-    "$hdf_uhdf_path/manager/include",
   ]
 
   sources = [
@@ -84,6 +67,7 @@ ohos_shared_library("audio_bluetooth_hdi_proxy_server") {
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
+      "cJSON:cjson",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
