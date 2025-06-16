@@ -63,6 +63,17 @@ public:
                            std::vector<HdfWaveInformation> &info) override;
     int32_t RegVibratorPlugCallback(const sptr<IVibratorPlugCallback> &callbackObj) override;
     int32_t UnRegVibratorPlugCallback(const sptr<IVibratorPlugCallback> &callbackObj) override;
+    int32_t PlayPatternBySessionId(
+        const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
+        uint32_t sessionId,
+        const OHOS::HDI::Vibrator::V2_0::HapticPaket &hapticPaket) override;
+    int32_t PlayPackageBySession(
+        const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
+        uint32_t sessionId,
+        const OHOS::HDI::Vibrator::V2_0::VibratorPackage& vibratorPackage) override;
+    int32_t StopVibrateBySessionId(
+        const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo &deviceVibratorInfo,
+        uint32_t sessionId) override;
     int32_t GetVibratorVdiImpl();
 
 private:
