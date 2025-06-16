@@ -29,7 +29,8 @@
         "samgr",
         "drivers_interface_bluetooth",
         "bluetooth_service",
-        "hitrace"
+        "hitrace",
+        "cJSON"
       ]
     },
     "build": {
