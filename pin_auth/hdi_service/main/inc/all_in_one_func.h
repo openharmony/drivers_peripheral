@@ -29,6 +29,7 @@ typedef struct {
     uint64_t scheduleId;
     uint64_t templateId;
     uint8_t pinData[CONST_PIN_DATA_LEN];
+    uint32_t pinLength;
 } PinAuthParam;
 
 typedef struct {
@@ -67,6 +68,7 @@ ResultCode DoSetAllInOneFwkParam(
     const uint64_t *templateIdList, uint32_t templateIdListLen, const uint8_t *fwkPubKey, uint32_t fwkPubKeySize);
 ResultCode DoWriteAntiBruteInfoToFile(uint64_t templateId);
 ResultCode DoAbandonPin(PinAbandonParam *pinAbandonParam, Buffer *extraInfo, Buffer *retTlv);
+ResultCode DoRestartLockoutDuration(int32_t userId);
 
 #ifdef __cplusplus
 }

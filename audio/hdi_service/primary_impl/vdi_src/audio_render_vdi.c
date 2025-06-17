@@ -103,13 +103,11 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t id = SetTimer("Hdi:RenderFrame");
     HdfAudioStartTrace("Hdi:AudioRenderFrameVdi", 0);
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->RenderFrame(vdiRender, frame, frameLen, replyBytes);
     AudioDfxSysEventError("RenderFrame", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
-    CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render frame fail, ret=%{public}d", ret);
         pthread_rwlock_unlock(&g_rwVdiRenderLock);

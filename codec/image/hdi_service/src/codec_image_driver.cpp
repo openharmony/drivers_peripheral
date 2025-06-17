@@ -19,9 +19,9 @@
 #include <hdf_sbuf_ipc.h>
 #include "codec_image_config.h"
 #include "codec_log_wrapper.h"
-#include "v2_0/codec_image_stub.h"
+#include "v2_1/codec_image_stub.h"
 
-using namespace OHOS::HDI::Codec::Image::V2_0;
+using namespace OHOS::HDI::Codec::Image::V2_1;
 
 struct HdfCodecImageHost {
     struct IDeviceIoService ioService;
@@ -73,7 +73,7 @@ static int HdfCodecImageDriverBind(struct HdfDeviceObject *deviceObject)
     hdfCodecImageHost->ioService.Open = NULL;
     hdfCodecImageHost->ioService.Release = NULL;
 
-    auto serviceImpl = OHOS::HDI::Codec::Image::V2_0::ICodecImage::Get(true);
+    auto serviceImpl = OHOS::HDI::Codec::Image::V2_1::ICodecImage::Get(true);
     if (serviceImpl == nullptr) {
         CODEC_LOGE("failed to get of implement service");
         delete hdfCodecImageHost;
@@ -81,7 +81,7 @@ static int HdfCodecImageDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfCodecImageHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        OHOS::HDI::Codec::Image::V2_0::ICodecImage::GetDescriptor());
+        OHOS::HDI::Codec::Image::V2_1::ICodecImage::GetDescriptor());
     if (hdfCodecImageHost->stub == nullptr) {
         CODEC_LOGE("failed to get stub object");
         delete hdfCodecImageHost;

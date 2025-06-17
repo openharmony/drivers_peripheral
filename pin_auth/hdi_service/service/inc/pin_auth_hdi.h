@@ -40,6 +40,10 @@ using HdiExecutorSecureLevel = OHOS::HDI::PinAuth::V3_0::ExecutorSecureLevel;
 using HdiExecutorInfo = OHOS::HDI::PinAuth::V3_0::ExecutorInfo;
 using HdiGetPropertyType = OHOS::HDI::PinAuth::V3_0::GetPropertyType;
 using HdiProperty = OHOS::HDI::PinAuth::V3_0::Property;
+
+enum PinAuthExtendCommandId {
+    RESTART_LOCKOUT_DURATION = 10001,
+};
 } // namespace PinAuth
 } // namespace HDI
 } // namespace OHOS

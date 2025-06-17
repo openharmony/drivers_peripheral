@@ -278,13 +278,12 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest007, TestSize.Level0)
     ASSERT_FALSE(snprintf_s(path, MAX_PATH, sizeof(path) - 1, ISOLATE_PATH.c_str()) < EOK);
 
     ret = HdfThermalHdiTest::ReadFile(path, valueBuf, sizeof(valueBuf));
-    std::string isolateNumStr = valueBuf;
-    int32_t value = HdfThermalHdiTest::ConvertInt(isolateNumStr);
-    THERMAL_HILOGD(LABEL_TEST, "isolate cpu num is %{public}d", value);
+
     if (ret == HDF_SUCCESS) {
+        std::string isolateNumStr = valueBuf;
+        int32_t value = HdfThermalHdiTest::ConvertInt(isolateNumStr);
+        THERMAL_HILOGD(LABEL_TEST, "isolate cpu num is %{public}d", value);
         EXPECT_EQ(value, isolateNum) << "HdfThermalHdiTest007 failed";
-    } else {
-        EXPECT_NE(value, isolateNum) << "HdfThermalHdiTest007 failed";
     }
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest007: return.");
 }

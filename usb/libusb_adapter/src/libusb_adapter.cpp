@@ -297,21 +297,6 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
     return HDF_SUCCESS;
 }
 
-void LibusbAdapter::CloseOpenedFd(const UsbDev &dev)
-{
-    std::lock_guard<std::mutex> lock(openedFdsMutex_);
-    auto iter = openedFds_.find({dev.busNum, dev.devAddr});
-    if (iter != openedFds_.end()) {
-        int32_t fd = iter->second;
-        int res = fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-        HDF_LOGI("%{public}s:%{public}d close %{public}d ret = %{public}d",
-            __func__, __LINE__, iter->second, res);
-        openedFds_.erase(iter);
-    } else {
-        HDF_LOGI("%{public}s:%{public}d not opened", __func__, __LINE__);
-    }
-}
-
 int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s enter", __func__);
@@ -332,7 +317,6 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev)
     info->second.count--;
     HDF_LOGI("%{public}s Number of devices that are opened=%{public}d", __func__, info->second.count);
     if (info->second.count == 0 && (info->second.handle != nullptr)) {
-        CloseOpenedFd(dev);
         {
             std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
             auto it = g_usbOpenFdMap.find(result);
@@ -452,23 +436,8 @@ int32_t LibusbAdapter::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
         HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
         return HDF_FAILURE;
     } else {
-        fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-        std::lock_guard<std::mutex> lock(openedFdsMutex_);
-        auto iter = openedFds_.find({dev.busNum, dev.devAddr});
-        if (iter != openedFds_.end()) {
-            int32_t oldFd = iter->second;
-            if (oldFd != fd) {
-                int res = fdsan_close_with_tag(oldFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-                HDF_LOGI("%{public}s:%{public}d close old %{public}d ret = %{public}d",
-                    __func__, __LINE__, iter->second, res);
-            }
-        } else {
-            HDF_LOGI("%{public}s:%{public}d first time get fd", __func__, __LINE__);
-        }
-        openedFds_[{dev.busNum, dev.devAddr}] = fd;
         HDF_LOGI("%{public}s:%{public}d opened %{public}d", __func__, __LINE__, fd);
     }
-    HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
 
@@ -2886,7 +2855,7 @@ void LibusbAdapter::GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSu
         }
         HDF_LOGI("%{public}s:busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
         V2_0::USBDeviceInfo info = {ACT_DEVUP, busNum, devAddr};
-        subscriber->DeviceEvent(info);
+        HotplugEventPorcess::GetInstance()->AddHotplugTask(info, subscriber);
     }
     libusb_free_device_list(devs, 1);
 }
@@ -2923,14 +2892,16 @@ int32_t LibusbAdapter::SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber)
             HDF_LOGD("%{public}s: register hotplug callback success.", __func__);
         }
     }
+    int32_t ret = HotplugEventPorcess::GetInstance()->SetSubscriber(subscriber);
     GetCurrentDeviceList(g_libusb_context, subscriber);
-    return HotplugEventPorcess::GetInstance()->SetSubscriber(subscriber);
+    return ret;
 }
 
-void HotplugEventPorcess::AddHotplugTask(V2_0::USBDeviceInfo& info)
+void HotplugEventPorcess::AddHotplugTask(V2_0::USBDeviceInfo& info, sptr<V2_0::IUsbdSubscriber> subscriber)
 {
     std::unique_lock<std::mutex> lock(queueMutex_);
-    hotplugEventQueue_.push(info);
+    HotplugInfo hotplugEvent(info, subscriber);
+    hotplugEventQueue_.push(hotplugEvent);
     if (activeThreads_ == 0) {
         std::thread(&HotplugEventPorcess::OnProcessHotplugEvent, this).detach();
         activeThreads_++;
@@ -2999,7 +2970,7 @@ size_t HotplugEventPorcess::GetSubscriberSize()
 void HotplugEventPorcess::OnProcessHotplugEvent()
 {
     while (!shutdown_) {
-        V2_0::USBDeviceInfo info;
+        HotplugInfo info;
         {
             std::unique_lock<std::mutex> lock(queueMutex_);
             if (shutdown_ || hotplugEventQueue_.empty()) {
@@ -3013,10 +2984,56 @@ void HotplugEventPorcess::OnProcessHotplugEvent()
             info = hotplugEventQueue_.front();
             hotplugEventQueue_.pop();
         }
+        if (info.subscriberPtr != nullptr) {
+            info.subscriberPtr->DeviceEvent(info.hotplugInfo);
+            continue;
+        }
         for (auto subscriber: subscribers_) {
-            subscriber->DeviceEvent(info);
+            subscriber->DeviceEvent(info.hotplugInfo);
         }
     }
+}
+
+int32_t LibusbAdapter::DetachDevice(const UsbDev &dev)
+{
+    HDF_LOGD("%{public}s enter", __func__);
+    libusb_device_handle *devHandle = nullptr;
+    int32_t ret = FindHandleByDev(dev, &devHandle);
+    if (ret != HDF_SUCCESS || devHandle == nullptr) {
+        HDF_LOGE("%{public}s:FindHandleByDev is failed ret=%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
+        static_cast<uint32_t>(dev.devAddr);
+    std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
+    auto info = g_handleMap.find(result);
+    if (info == g_handleMap.end()) {
+        HDF_LOGE("%{public}s:Failed to find the handle", __func__);
+        return HDF_FAILURE;
+    }
+
+    {
+        std::unique_lock<std::shared_mutex> lock(g_mapMutexUsbOpenFdMap);
+        auto it = g_usbOpenFdMap.find(result);
+        if (it != g_usbOpenFdMap.end()) {
+            fdsan_close_with_tag(it->second, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+            g_usbOpenFdMap.erase(it);
+        }
+    }
+    {
+        std::unique_lock<std::shared_mutex> lock(g_mapMutexInterfaceIdMap);
+        auto InterfaceIt = g_InterfaceIdMap.find(result);
+        if (InterfaceIt != g_InterfaceIdMap.end()) {
+            g_InterfaceIdMap.erase(result);
+        }
+    }
+    DeleteSettingsMap(devHandle);
+    libusb_close(devHandle);
+    TransferRelease(dev);
+    BulkTransferRelease(dev);
+    g_handleMap.erase(info);
+    HDF_LOGD("%{public}s leave", __func__);
+    return HDF_SUCCESS;
 }
 
 int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* device,
@@ -3034,6 +3051,8 @@ int32_t LibusbAdapter::HotplugCallback(libusb_context* ctx, libusb_device* devic
         V2_0::USBDeviceInfo info = {ACT_DEVDOWN, libusb_get_bus_number(device),
             libusb_get_device_address(device)};
         HotplugEventPorcess::GetInstance()->AddHotplugTask(info);
+        UsbDev dev = {libusb_get_bus_number(device), libusb_get_device_address(device)};
+        LibusbAdapter::GetInstance()->DetachDevice(dev);
     }
     return HDF_SUCCESS;
 }

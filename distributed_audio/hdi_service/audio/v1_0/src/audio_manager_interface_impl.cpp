@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -164,7 +164,7 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     std::string flagString = adpName + std::to_string(dhId);
     if (mapAddFlags_.find(flagString) == mapAddFlags_.end()) {
         DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_ADD, 0, adp->second->GetVolumeGroup(dhId),
-            adp->second->GetInterruptGroup(dhId) };
+            adp->second->GetInterruptGroup(dhId), caps };
         ret = AddAudioDeviceInner(dhId, event);
         if (ret != DH_SUCCESS) {
             return ret;
@@ -173,7 +173,7 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     }
     sptr<IRemoteObject> remote = GetRemote(adpName);
     if (remote != nullptr) {
-        remote->AddDeathRecipient(audioManagerRecipient_);
+        AddClearRegisterRecipient(remote, adpName, dhId);
     }
     DHLOGI("Add audio device success.");
     return DH_SUCCESS;
@@ -215,7 +215,7 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
             mapAudioAdapter_.erase(adpName);
             sptr<IRemoteObject> remote = GetRemote(adpName);
             if (remote != nullptr) {
-                remote->RemoveDeathRecipient(audioManagerRecipient_);
+                RemoveClearRegisterRecipient(remote, adpName, dhId);
             }
             mapAudioCallback_.erase(adpName);
         }
@@ -314,6 +314,63 @@ void AudioManagerInterfaceImpl::SetDeviceObject(struct HdfDeviceObject *deviceOb
     deviceObject_ = deviceObject;
 }
 
+int32_t AudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &serviceName,
+    const sptr<IDAudioHdfCallback> &callbackObj)
+{
+    DHLOGI("Register audio HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDAudioHdfCallback>(callbackObj);
+    if (remote == nullptr) {
+        DHLOGE("Remote callback is nullptr.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
+    if (!remote->AddDeathRecipient(audioManagerRecipient_)) {
+        DHLOGE("AddDeathRecipient failed, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(hdfCallbackMapMtx_);
+    if (mapAudioHdfCallback_.find(serviceName) != mapAudioHdfCallback_.end()) {
+        DHLOGI("The callback has been registered and will be replaced, serviceName: %{public}s.",
+            GetAnonyString(serviceName).c_str());
+    }
+    mapAudioHdfCallback_[serviceName] = callbackObj;
+    DHLOGI("Register audio HDF listener suncess, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    return DH_SUCCESS;
+}
+
+int32_t AudioManagerInterfaceImpl::UnRegisterAudioHdfListener(const std::string &serviceName)
+{
+    DHLOGI("Unregister audio HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    std::lock_guard<std::mutex> lock(hdfCallbackMapMtx_);
+    auto itCallback = mapAudioHdfCallback_.find(serviceName);
+    if (itCallback == mapAudioHdfCallback_.end() || itCallback->second == nullptr) {
+        DHLOGE("Audio HDF callback has not been created or is null ptr.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDAudioHdfCallback>(itCallback->second);
+    if (remote == nullptr) {
+        DHLOGE("Remote callback is nullptr.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
+    if (!remote->RemoveDeathRecipient(audioManagerRecipient_)) {
+        DHLOGE("RemoveDeathRecipient failed, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    mapAudioHdfCallback_.erase(itCallback);
+    DHLOGI("Unregister audio HDF listener suncess, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    return DH_SUCCESS;
+}
+
+void AudioManagerInterfaceImpl::ClearRegisterRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    DHLOGI("Remote died, remote daudio device begin.");
+    auto audioMgr = AudioManagerInterfaceImpl::GetAudioManager();
+    if (audioMgr != nullptr) {
+        audioMgr->RemoveAudioDevice(deviceId_, dhId_);
+    }
+    needErase_ = true;
+    DHLOGI("Remote died, remote daudio device end.");
+}
+
 void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     DHLOGE("Exit the current process.");
@@ -333,6 +390,50 @@ sptr<IRemoteObject> AudioManagerInterfaceImpl::GetRemote(const std::string &adpN
         return nullptr;
     }
     return remote;
+}
+
+int32_t AudioManagerInterfaceImpl::AddClearRegisterRecipient(sptr<IRemoteObject> &remote,
+    const std::string &deviceId, uint32_t dhId)
+{
+    DHLOGI("add clear register recipient begin.");
+    auto clearRegisterRecipient = sptr<ClearRegisterRecipient>(new ClearRegisterRecipient(deviceId, dhId));
+    if (clearRegisterRecipient == nullptr) {
+        DHLOGE("Create clear register recipient object failed.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
+    if (remote->AddDeathRecipient(clearRegisterRecipient) == false) {
+        DHLOGE("call AddDeathRecipient failed.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(clearRegisterRecipientsMtx_);
+    clearRegisterRecipients_.erase(std::remove_if(clearRegisterRecipients_.begin(), clearRegisterRecipients_.end(),
+        [](sptr<ClearRegisterRecipient> &clearRegisterRecipient) {
+            return clearRegisterRecipient->IsNeedErase();
+        }), clearRegisterRecipients_.end());
+    clearRegisterRecipients_.push_back(clearRegisterRecipient);
+    DHLOGI("add clear register recipient end.");
+    return DH_SUCCESS;
+}
+
+int32_t AudioManagerInterfaceImpl::RemoveClearRegisterRecipient(sptr<IRemoteObject> &remote,
+    const std::string &deviceId, uint32_t dhId)
+{
+    DHLOGI("remove clear register recipient begin.");
+    std::lock_guard<std::mutex> lock(clearRegisterRecipientsMtx_);
+    for (auto itRecipient = clearRegisterRecipients_.begin();
+        itRecipient != clearRegisterRecipients_.end(); ++itRecipient) {
+        auto &clearRegisterRecipient = *itRecipient;
+        if (clearRegisterRecipient->IsMatch(deviceId, dhId)) {
+            if (remote->RemoveDeathRecipient(clearRegisterRecipient) == false) {
+                DHLOGE("call RemoveDeathRecipient failed.");
+            }
+            clearRegisterRecipients_.erase(itRecipient);
+            DHLOGI("remove one clear register recipient.");
+            break;
+        }
+    }
+    DHLOGI("remove clear register recipient end.");
+    return DH_SUCCESS;
 }
 } // V1_0
 } // Audio

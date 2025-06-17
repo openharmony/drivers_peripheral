@@ -150,16 +150,19 @@ BENCHMARK_F(SensorBenchmarkTest, Enable)(benchmark::State &state)
     EXPECT_GT(g_info.size(), 0);
 
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
-            iter.deviceSensorInfo.sensorId, iter.sensorName.c_str(), iter.power);
-        ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorId, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
+                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
+                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
+                 iter.sensorName.c_str(), iter.power);
+        ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1,
+                                          SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         for (auto _ : state) {
-            ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorId, 0, 0});
+            ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
         OsalMSleep(SENSOR_POLL_TIME);
-        ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
     ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -187,15 +190,18 @@ BENCHMARK_F(SensorBenchmarkTest, Disable)(benchmark::State &state)
     EXPECT_GT(g_info.size(), 0);
 
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
-            iter.deviceSensorInfo.sensorId, iter.sensorName.c_str(), iter.power);
-        ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorId, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
+                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
+                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
+                 iter.sensorName.c_str(), iter.power);
+        ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1,
+                                          SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
-        ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(SENSOR_POLL_TIME);
         for (auto _ : state) {
-            ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorId, 0, 0});
+            ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
@@ -224,16 +230,19 @@ BENCHMARK_F(SensorBenchmarkTest, SetBatch)(benchmark::State &state)
 
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
-            iter.deviceSensorInfo.sensorId, iter.sensorName.c_str(), iter.power);
+        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
+                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
+                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
+                 iter.sensorName.c_str(), iter.power);
         for (auto _ : state) {
-            ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorId, 0, 0}, SENSOR_INTERVAL2, SENSOR_POLL_TIME);
+            ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL2,
+                                              SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
-        ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(SENSOR_WAIT_TIME);
-        ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
     ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -259,22 +268,25 @@ BENCHMARK_F(SensorBenchmarkTest, SetMode)(benchmark::State &state)
     int32_t ret;
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
-            iter.deviceSensorInfo.sensorId, iter.sensorName.c_str(), iter.power);
-        ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorId, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
+                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
+                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
+                 iter.sensorName.c_str(), iter.power);
+        ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1,
+                                          SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         for (auto _ : state) {
             if (SENSOR_TYPE_HALL == 0) {
-                ret = g_sensorInterface->SetMode({0, iter.deviceSensorInfo.sensorId, 0, 0}, SENSOR_MODE_ON_CHANGE);
+                ret = g_sensorInterface->SetMode({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_MODE_ON_CHANGE);
             } else {
-                ret = g_sensorInterface->SetMode({0, iter.deviceSensorInfo.sensorId, 0, 0}, SENSOR_MODE_REALTIME);
+                ret = g_sensorInterface->SetMode({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_MODE_REALTIME);
             }
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
-        ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(SENSOR_WAIT_TIME);
-        ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
@@ -296,10 +308,12 @@ BENCHMARK_F(SensorBenchmarkTest, SetOption)(benchmark::State &state)
     int32_t ret;
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
-            iter.deviceSensorInfo.sensorId, iter.sensorName.c_str(), iter.power);
+        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
+                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
+                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
+                 iter.sensorName.c_str(), iter.power);
         for (auto _ : state) {
-            ret = g_sensorInterface->SetOption({0, iter.deviceSensorInfo.sensorId, 0, 0}, OPTION);
+            ret = g_sensorInterface->SetOption({0, iter.deviceSensorInfo.sensorType, 0, 0}, OPTION);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }

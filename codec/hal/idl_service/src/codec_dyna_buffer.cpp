@@ -55,14 +55,11 @@ int32_t CodecDynaBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_B
         }
     }
 
-    int fenceFd = codecBuffer.fenceFd;
-    if (fenceFd >= 0) {
-        auto ret = SyncWait(fenceFd, TIME_WAIT_MS);
+    if (codecBuffer.fenceFd != nullptr) {
+        auto ret = SyncWait(codecBuffer.fenceFd->Get(), TIME_WAIT_MS);
         if (ret != EOK) {
             CODEC_LOGW("SyncWait ret err");
         }
-        close(codecBuffer.fenceFd);
-        codecBuffer.fenceFd = -1;
     }
     return ICodecBuffer::FillOmxBuffer(codecBuffer, omxBuffer);
 }
@@ -73,6 +70,7 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
         CODEC_LOGE("CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
+
     if (codecBuffer.bufferhandle != nullptr) {
         BufferHandle* handle = codecBuffer.bufferhandle->GetBufferHandle();
         if (handle != nullptr) {
@@ -83,14 +81,11 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
     }
     codecBuffer_.alongParam = std::move(codecBuffer.alongParam);
 
-    int fence = codecBuffer.fenceFd;
-    if (fence >= 0) {
-        auto ret = SyncWait(fence, TIME_WAIT_MS);
+    if (codecBuffer.fenceFd != nullptr) {
+        auto ret = SyncWait(codecBuffer.fenceFd->Get(), TIME_WAIT_MS);
         if (ret != EOK) {
             CODEC_LOGW("SyncWait ret err");
         }
-        close(codecBuffer.fenceFd);
-        codecBuffer.fenceFd = -1;
     }
 
     return ICodecBuffer::EmptyOmxBuffer(codecBuffer, omxBuffer);

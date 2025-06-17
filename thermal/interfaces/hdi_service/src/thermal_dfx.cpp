@@ -463,7 +463,7 @@ uint64_t ThermalDfx::GetDirectorySize(const std::string& directoryPath)
         std::string filePath = directoryPath + "/" + entry->d_name;
         struct stat fileStat;
         if (stat(filePath.c_str(), &fileStat) == 0) {
-            totalSize += fileStat.st_size;
+            totalSize += static_cast<uint64_t>(fileStat.st_size);
         }
     }
 

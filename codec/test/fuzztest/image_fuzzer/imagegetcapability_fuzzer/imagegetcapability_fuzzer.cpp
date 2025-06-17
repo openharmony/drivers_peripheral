@@ -16,8 +16,8 @@
 #include "imagegetcapability_fuzzer.h"
 #include <hdf_log.h>
 #include <vector>
-#include "v2_0/icodec_image.h"
-using namespace OHOS::HDI::Codec::Image::V2_0;
+#include "v2_1/icodec_image.h"
+using namespace OHOS::HDI::Codec::Image::V2_1;
 using namespace OHOS;
 using namespace std;
 

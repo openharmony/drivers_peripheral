@@ -24,6 +24,10 @@
 #include "v2_0/isensor_interface.h"
 #include "v3_0/isensor_interface.h"
 
+#define DEFAULT_DEVICE_ID (-1)
+#define DEFAULT_SENSOR_ID 0
+#define DEFAULT_LOCATION 1
+
 namespace OHOS {
 namespace HDI {
 namespace Sensor {

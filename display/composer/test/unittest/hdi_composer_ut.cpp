@@ -45,6 +45,8 @@ const int SLEEP_CONT_2000 = 2000;
 static bool g_isOnSeamlessChangeCalled = false;
 static bool g_isOnModeCalled = false;
 static bool g_threadCtrl = false;
+static constexpr int32_t VALID_HDI_FD = 1;
+static constexpr int32_t INVALID_HDI_FD = -1;
 
 static inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
 {
@@ -1124,4 +1126,94 @@ HWTEST_F(DeviceTest, test_FastPresent, TestSize.Level1)
         return;
     }
     EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+HWTEST_F(DeviceTest, test_HdifdParcelable, TestSize.Level1)
+{
+    HdifdParcelable hdiFd1(VALID_HDI_FD);
+    bool ret = hdiFd1.Init(VALID_HDI_FD);
+    EXPECT_FALSE(ret);
+    (void)hdiFd1.Move();
+
+    HdifdParcelable hdiFd2;
+    ret = hdiFd2.Init(INVALID_HDI_FD);
+    EXPECT_TRUE(ret);
+
+    HdifdParcelable hdiFd3;
+    ret = hdiFd3.Init(VALID_HDI_FD);
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(DeviceTest, test_HdifdParcelable_Unmarshall, TestSize.Level1)
+{
+    MessageParcel parcel;
+ 
+    sptr<HdifdParcelable> hdiFd1 = HdifdParcelable::Unmarshalling(parcel);
+    EXPECT_EQ(hdiFd1, nullptr);
+ 
+    bool ret = parcel.WriteBool(true);
+    EXPECT_TRUE(ret);
+    sptr<HdifdParcelable> hdiFd2 = HdifdParcelable::Unmarshalling(parcel);
+    EXPECT_EQ(hdiFd2, nullptr);
+}
+ 
+HWTEST_F(DeviceTest, test_HdifdParcelable_Marshall01, TestSize.Level1)
+{
+    HdifdParcelable hdiFd1;
+    MessageParcel parcel;
+    bool ret = hdiFd1.Marshalling(parcel);
+    EXPECT_TRUE(ret);
+ 
+    auto hdiFd2 = HdifdParcelable::Unmarshalling(parcel);
+    int32_t fd = hdiFd2->GetFd();
+    EXPECT_EQ(INVALID_HDI_FD, fd);
+}
+ 
+HWTEST_F(DeviceTest, test_HdifdParcelable_Marshall02, TestSize.Level1)
+{
+    HdifdParcelable hdiFd1(VALID_HDI_FD);
+    MessageParcel parcel;
+    bool ret = hdiFd1.Marshalling(parcel);
+    EXPECT_TRUE(ret);
+ 
+    auto hdiFd2 = HdifdParcelable::Unmarshalling(parcel);
+    int32_t fd = hdiFd2->GetFd();
+    EXPECT_TRUE(fd >= 0);
+ 
+    (void)hdiFd1.Move(); // avoid call close()
+}
+ 
+HWTEST_F(DeviceTest, test_HdifdParcelable_Move, TestSize.Level1)
+{
+    HdifdParcelable hdiFd1;
+    int32_t fd = hdiFd1.Move();
+    EXPECT_EQ(INVALID_HDI_FD, fd);
+ 
+    HdifdParcelable hdiFd2(VALID_HDI_FD);
+    fd = hdiFd2.Move();
+    EXPECT_EQ(VALID_HDI_FD, fd);
+}
+ 
+HWTEST_F(DeviceTest, test_HdifdParcelable_GetFd, TestSize.Level1)
+{
+    HdifdParcelable hdiFd1;
+    int32_t fd = hdiFd1.GetFd();
+    EXPECT_EQ(INVALID_HDI_FD, fd);
+ 
+    HdifdParcelable hdiFd2(VALID_HDI_FD);
+    fd = hdiFd2.GetFd();
+    EXPECT_EQ(VALID_HDI_FD, fd);
+    (void)hdiFd2.Move(); // avoid call close()
+}
+ 
+HWTEST_F(DeviceTest, test_HdifdParcelable_Dump, TestSize.Level1)
+{
+    HdifdParcelable hdiFd1;
+    auto dumpFd = hdiFd1.Dump();
+    EXPECT_EQ("fd: {" + std::to_string(INVALID_HDI_FD) + "}\n", dumpFd);
+ 
+    HdifdParcelable hdiFd2(VALID_HDI_FD);
+    dumpFd = hdiFd2.Dump();
+    EXPECT_EQ("fd: {" + std::to_string(VALID_HDI_FD) + "}\n", dumpFd);
+    (void)hdiFd2.Move(); // avoid call close()
 }

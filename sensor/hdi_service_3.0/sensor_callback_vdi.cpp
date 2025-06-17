@@ -45,7 +45,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
 #ifdef TV_FLAG
     event.deviceSensorInfo = eventVdi.deviceSensorInfo;
 #else
-    event.deviceSensorInfo = {0, eventVdi.sensorId, 0, 0};
+    event.deviceSensorInfo = {DEFAULT_DEVICE_ID, eventVdi.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
 #endif
     int32_t ret = OnDataEvent(event);
     return ret;
@@ -60,7 +60,7 @@ int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
     event3_0.mode = event.mode;
     event3_0.data = event.data;
     event3_0.dataLen = event.dataLen;
-    event3_0.deviceSensorInfo = {0, event.sensorId, 0, 0};
+    event3_0.deviceSensorInfo = {DEFAULT_DEVICE_ID, event.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
     return OnDataEvent(event3_0);
 }
 

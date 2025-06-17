@@ -13,28 +13,31 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V2_0_CODECIMAGESERVICE_H
-#define OHOS_HDI_CODEC_V2_0_CODECIMAGESERVICE_H
+#ifndef OHOS_HDI_CODEC_V2_1_CODECIMAGESERVICE_H
+#define OHOS_HDI_CODEC_V2_1_CODECIMAGESERVICE_H
 
 #include <map>
 #include <mutex>
 #include "buffer_handle.h"
 #include "codec_image_config.h"
-#include "v2_0/icodec_image.h"
+#include "v2_1/icodec_image.h"
 #include "codec_jpeg_service.h"
 #include "codec_heif_encode_service.h"
+#include "codec_heif_decode_service.h"
 
 constexpr uint32_t CODEC_IMAGE_MAX_BUFFER_SIZE = 50 * 1024 *1024;
 namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V2_0 {
+namespace V2_1 {
 class CodecImageService : public ICodecImage {
 public:
     explicit CodecImageService();
 
     virtual ~CodecImageService() = default;
+
+    int32_t NotifyPowerOn(enum CodecImageRole role) override;
 
     int32_t GetImageCapability(std::vector<CodecImageCapability>& capList) override;
 
@@ -53,14 +56,18 @@ public:
                          const std::vector<ItemRef>& refs, const SharedBuffer& output,
                          uint32_t& filledLen) override;
 
+    int32_t DoHeifDecode(const std::vector<sptr<Ashmem>>& inputs, const sptr<NativeBuffer>& output,
+                         const CodecHeifDecInfo& decInfo) override;
+
 private:
     std::unique_ptr<CodecJpegService> jpegImpl_;
     std::unique_ptr<CodecHeifEncodeService> heifEncodeImpl_;
+    std::unique_ptr<CodecHeifDecodeService> heifDecodeImpl_;
 };
-} // V2_0
+} // V2_1
 } // Image
 } // Codec
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_CODEC_V2_0_CODECIMAGESERVICE_H
+#endif // OHOS_HDI_CODEC_V2_1_CODECIMAGESERVICE_H

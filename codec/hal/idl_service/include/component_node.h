@@ -29,7 +29,6 @@
 #include "component_mgr.h"
 using OHOS::HDI::Codec::V3_0::CompVerInfo;
 using OHOS::HDI::Codec::V3_0::ICodecCallback;
-using OHOS::HDI::Codec::V3_0::OmxCodecBuffer;
 using OHOS::HDI::Codec::V3_0::CodecStateType;
 namespace OHOS {
 namespace Codec {
@@ -98,6 +97,7 @@ private:
     uint32_t maxStateWaitCount = 100;
     std::shared_mutex mapMutex_;
     std::string compName_;
+    bool isIPCMode_;
 };
 }  // namespace Omx
 }  // namespace Codec

@@ -517,11 +517,13 @@ ResultCode DeleteCredentialFunc(CredentialDeleteParam param, OperateResult *oper
         return GenerateAbandonSchedule(param, &(operateResult->scheduleInfo));
     }
     operateResult->operateType = DELETE_CREDENTIAL;
-    ret = DeleteCredentialInfo(param.userId, param.credentialId, &(operateResult->credentialInfo));
+    operateResult->credentialCount = 0;
+    ret = DeleteCredentialInfo(param.userId, param.credentialId, &(operateResult->credentialInfos[0]));
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("delete database info failed");
         return RESULT_BAD_SIGN;
     }
+    operateResult->credentialCount++;
 
     return RESULT_SUCCESS;
 }

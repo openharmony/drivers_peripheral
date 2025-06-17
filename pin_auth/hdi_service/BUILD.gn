@@ -87,6 +87,9 @@ ohos_shared_library("libpin_auth_driver") {
   include_dirs = [
     "service/inc",
     "main/inc",
+    "adaptor/inc",
+    "common/inc",
+    "database/inc",
     "../common/logs",
     "../common/utils",
   ]

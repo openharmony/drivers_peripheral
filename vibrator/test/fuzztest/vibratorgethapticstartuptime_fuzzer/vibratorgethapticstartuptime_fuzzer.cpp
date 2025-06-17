@@ -15,11 +15,11 @@
 
 #include "vibratorgethapticstartuptime_fuzzer.h"
 #include "hdf_base.h"
-#include "v1_2/vibrator_interface_proxy.h"
+#include "v2_0/vibrator_interface_proxy.h"
 #include <hdf_log.h>
 #include <securec.h>
 
-using namespace OHOS::HDI::Vibrator::V1_2;
+using namespace OHOS::HDI::Vibrator::V2_0;
 
 namespace OHOS {
     bool VibratorGetHapticStartUpTimeTest(const uint8_t* data, size_t size)
@@ -28,11 +28,11 @@ namespace OHOS {
             return false;
         }
 
-        sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface =
-            OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
+        sptr<OHOS::HDI::Vibrator::V2_0::IVibratorInterface> g_vibratorInterface =
+            OHOS::HDI::Vibrator::V2_0::IVibratorInterface::Get();
         
         int startUpTime = 0;
-        int32_t ret = !g_vibratorInterface->GetHapticStartUpTime(*(int32_t *)data, startUpTime);
+        int32_t ret = !g_vibratorInterface->GetHapticStartUpTime({-1, 1}, *(int32_t *)data, startUpTime);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetConfig failed, ret is [%{public}x]\n", __func__, ret);
             return false;
