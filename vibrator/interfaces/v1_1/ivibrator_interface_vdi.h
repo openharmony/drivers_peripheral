@@ -316,6 +316,7 @@ public:
         HDF_LOGI("%{public}s: only in Hdi return", __func__);
         return HDF_SUCCESS;
     };
+
     virtual int32_t PlayPackageBySession(const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
         uint32_t sessionId,
         const OHOS::HDI::Vibrator::V2_0::VibratorPackageVdi& vibratorPackage)
@@ -323,6 +324,7 @@ public:
         HDF_LOGI("%{public}s: only in Hdi return", __func__);
         return HDF_SUCCESS;
     };
+    
     virtual int32_t StopVibrateBySessionId(
         const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
         uint32_t sessionId)
