@@ -24,20 +24,20 @@
 #include "component_mgr.h"
 #include "icodec_buffer.h"
 #include "sys/mman.h"
-#include "v3_0/codec_ext_types.h"
+#include "v4_0/codec_ext_types.h"
 #include "codec_component_service.h"
 
 #define AUDIO_CODEC_NAME "OMX.audio"
 
-using OHOS::HDI::Codec::V3_0::EventInfo;
-using OHOS::HDI::Codec::V3_0::CodecEventType;
-using OHOS::HDI::Codec::V3_0::CodecStateType;
-using OHOS::HDI::Codec::V3_0::CodecCommandType;
-using OHOS::HDI::Codec::V3_0::CODEC_STATE_INVALID;
-using OHOS::HDI::Codec::V3_0::CODEC_STATE_LOADED;
-using OHOS::HDI::Codec::V3_0::CODEC_STATE_IDLE;
-using OHOS::HDI::Codec::V3_0::CODEC_STATE_EXECUTING;
-using OHOS::HDI::Codec::V3_0::CODEC_COMMAND_STATE_SET;
+using OHOS::HDI::Codec::V4_0::EventInfo;
+using OHOS::HDI::Codec::V4_0::CodecEventType;
+using OHOS::HDI::Codec::V4_0::CodecStateType;
+using OHOS::HDI::Codec::V4_0::CodecCommandType;
+using OHOS::HDI::Codec::V4_0::CODEC_STATE_INVALID;
+using OHOS::HDI::Codec::V4_0::CODEC_STATE_LOADED;
+using OHOS::HDI::Codec::V4_0::CODEC_STATE_IDLE;
+using OHOS::HDI::Codec::V4_0::CODEC_STATE_EXECUTING;
+using OHOS::HDI::Codec::V4_0::CODEC_COMMAND_STATE_SET;
 #define FD_SIZE sizeof(int)
 namespace {
     constexpr int NAME_LENGTH = 32;
@@ -200,10 +200,10 @@ int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<i
     const OmxCodecBuffer& inBuffer)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
-    if (index != HDI::Codec::V3_0::Codec_IndexParamOverlayBuffer) {
+    if (index != HDI::Codec::V4_0::Codec_IndexParamOverlayBuffer) {
         return OMX_ErrorNotImplemented;
     }
-    if (paramStruct.size() != sizeof(HDI::Codec::V3_0::CodecParamOverlay)) {
+    if (paramStruct.size() != sizeof(HDI::Codec::V4_0::CodecParamOverlay)) {
         return OMX_ErrorBadParameter;
     }
     if (inBuffer.bufferhandle == nullptr) {
@@ -220,7 +220,7 @@ int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<i
         CODEC_LOGE("mmap failed");
         return ret;
     }
-    auto paramSrc = reinterpret_cast<const HDI::Codec::V3_0::CodecParamOverlay *>(paramStruct.data());
+    auto paramSrc = reinterpret_cast<const HDI::Codec::V4_0::CodecParamOverlay *>(paramStruct.data());
     CodecParamOverlayBuffer paramDst {
         .size = sizeof(CodecParamOverlayBuffer),
         .enable = paramSrc->enable,
@@ -286,7 +286,7 @@ int32_t ComponentNode::GetState(CodecStateType &state)
 }
 
 int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                              OHOS::HDI::Codec::V3_0::CodecTunnelSetupType &tunnelSetup)
+                                              OHOS::HDI::Codec::V4_0::CodecTunnelSetupType &tunnelSetup)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);

@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V3_0 {
+namespace V4_0 {
 
 CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node,
     const std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr, const std::string name)
@@ -340,7 +340,7 @@ void CodecComponentService::GetComponentNode(std::shared_ptr<OHOS::Codec::Omx::C
     dumpNode_ = node_;
 }
 
-}  // namespace V3_0
+}  // namespace V4_0
 }  // namespace Codec
 }  // namespace HDI
 }  // namespace OHOS

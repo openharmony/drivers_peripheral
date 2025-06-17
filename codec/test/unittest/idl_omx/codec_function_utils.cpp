@@ -23,7 +23,7 @@
 #define HDF_LOG_TAG codec_hdi_test
 
 using namespace std;
-using namespace OHOS::HDI::Codec::V3_0;
+using namespace OHOS::HDI::Codec::V4_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 IDisplayBuffer *FunctionUtil::buffer_ = nullptr;
