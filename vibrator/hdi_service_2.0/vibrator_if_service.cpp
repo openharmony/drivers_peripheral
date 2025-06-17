@@ -630,7 +630,7 @@ int32_t VibratorIfService::PlayPatternBySessionId(
     }
 
     StartTrace(HITRACE_TAG_HDF, "PlayPatternBySessionId");
-    int32_t ret = vibratorVdiImplV1_1_->PlayPatternBySessionId(deviceVibratorInfo, sessionId, hapticPaket);
+    int32_t ret = vibratorVdiImplV1_1_->PlayPatternBySessionId(deviceVibratorInfo, sessionId, hapticPaketVdi);
     FinishTrace(HITRACE_TAG_HDF);
     
     if (ret != HDF_SUCCESS) {
