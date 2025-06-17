@@ -680,7 +680,7 @@ int32_t VibratorIfService::PlayPackageBySession(
         vibratorPackageVdi.patterns.push_back(std::move(hapticPaketVdi));
     }
     StartTrace(HITRACE_TAG_HDF, "PlayPackageBySession");
-    int32_t ret = vibratorVdiImplV1_1_->PlayPackageBySession(deviceVibratorInfo, sessionId, vibratorPackage);
+    int32_t ret = vibratorVdiImplV1_1_->PlayPackageBySession(deviceVibratorInfo, sessionId, vibratorPackageVdi);
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
