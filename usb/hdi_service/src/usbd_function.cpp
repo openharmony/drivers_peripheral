@@ -188,13 +188,15 @@ bool UsbdFunction::IsHdcOpen()
         HDF_LOGE("%{public}s:GetPersistParameter failed", __func__);
         return false;
     }
-    for (size_t i = 0; i <= UDC_NAME_MAX_LEN - 3; ++i) {
-        if (persistConfig[i] == 'h' &&
-	        persistConfig[i+1] == 'd' &&
-	        persistConfig[i+2] == 'c') {
+    const char HDC_SIGNATURE[] = "hdc";
+    const size_t HDC_STR_LEN = strlen(HDC_SIGNATURE);
+    for (size_t i = 0; i <= UDC_NAME_MAX_LEN - HDC_STR_LEN; ++i) {
+        if (persistConfig[i] == HDC_SIGNATURE[0] &&
+            persistConfig[i+1] == HDC_SIGNATURE[1] &&
+            persistConfig[i+2] == HDC_SIGNATURE[2]) {
             HDF_LOGI("%{public}s:hdc is opening", __func__);
-	        return true;
-	    }
+            return true;
+        }
     }
     return false;
 }
