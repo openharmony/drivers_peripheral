@@ -1,0 +1,69 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("../../../../../../distributedaudio.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("UnRegisterAudioHdfListenerFuzzTest") {
+  module_out_path = "${distributedaudio_fuzz_path}/unregisteraudiohdflistener_fuzzer"
+  fuzz_config_file =
+      "${hdf_ser_aud_ext_path}/test/fuzztest/unregisteraudiohdflistener_fuzzer"
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "unregisteraudiohdflistener_fuzzer.cpp" ]
+
+  include_dirs = [
+    "${hdf_ser_aud_ext_path}/include",
+    "${hdf_ser_aud_path}/include",
+    "${hdf_service_path}/hdi_service/common/include",
+    "${hdf_service_path}/hdi_service/common/log/include",
+    "${hdf_service_path}/hdi_service/common/utils/include",
+  ]
+
+  include_dirs += [
+    "include",
+    "${common_path}/include",
+  ]
+
+  deps = [ "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.0" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_distributed_audio:libdaudio_stub_1.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_2.0",
+    "hdf_core:libhdf_host",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"UnRegisterAudioHdfListenerFuzzTest\"",
+    "LOG_DOMAIN=0xD004130",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = [ ":UnRegisterAudioHdfListenerFuzzTest" ]
+}
+###############################################################################

@@ -372,7 +372,7 @@ int32_t CodecComponentConfig::GetVideoPortCapability(const struct DeviceResource
             return HDF_FAILURE;
         }
     }
-    
+
     GetVideoPortFeature(iface, childNode, cap);
     return HDF_SUCCESS;
 }

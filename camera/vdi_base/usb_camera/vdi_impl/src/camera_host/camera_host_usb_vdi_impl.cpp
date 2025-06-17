@@ -40,7 +40,7 @@ CameraHostVdiImpl::CameraHostVdiImpl()
 CameraHostVdiImpl::~CameraHostVdiImpl()
 {
     CAMERA_LOGD("Dtor, instance");
-    if (g_usbCameraSelfKiller == nullptr) {
+    if (g_usbCameraSelfKiller != nullptr) {
         g_usbCameraSelfKiller->DeInit();
         g_usbCameraSelfKiller = nullptr;
     }

@@ -23,6 +23,10 @@
 extern "C" {
 #endif // __cplusplus
 
+typedef PinDbV1 PinDb;
+typedef PinIndexV1 PinIndex;
+typedef PinInfoV1 PinInfo;
+
 PinDbV1 *ReadPinDb(void);
 ResultCode WritePinDb(PinDbV1 *pinDbV1);
 void FreePinDb(PinDbV1 **pinDbV1);

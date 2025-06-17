@@ -42,6 +42,7 @@ ohos_unittest("composer_ut") {
     "drivers_interface_display:libdisplay_composer_stub_1.0",
     "drivers_interface_display:libdisplay_composer_stub_1.1",
     "drivers_interface_display:libdisplay_composer_stub_1.2",
+    "drivers_interface_display:libhdifd_parcelable",
     "googletest:gtest",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",

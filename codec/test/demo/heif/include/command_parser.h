@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_IMAGE_V2_0_COMMAND_PARSER
-#define OHOS_HDI_CODEC_IMAGE_V2_0_COMMAND_PARSER
+#ifndef OHOS_HDI_CODEC_IMAGE_V2_1_COMMAND_PARSER
+#define OHOS_HDI_CODEC_IMAGE_V2_1_COMMAND_PARSER
 
 #include <string>
 #include <vector>
@@ -52,4 +52,4 @@ struct CommandOpt {
 CommandOpt Parse(int argc, char *argv[]);
 void ShowUsage();
 } // OHOS::VDI::HEIF
-#endif // OHOS_HDI_CODEC_IMAGE_V2_0_COMMAND_PARSER
+#endif // OHOS_HDI_CODEC_IMAGE_V2_1_COMMAND_PARSER

@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 declare_args() {
   drivers_peripheral_bluetooth_mac_update = false
@@ -21,7 +20,6 @@ root_path = "//drivers/peripheral/bluetooth/hci/hdi_service"
 
 ohos_shared_library("libhci_interface_service_1.0") {
   include_dirs = [
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "$root_path",
     "$root_path/implement",
   ]

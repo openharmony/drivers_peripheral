@@ -24,7 +24,7 @@
 namespace {
 using namespace std;
 using namespace testing::ext;
-using namespace OHOS::HDI::Codec::Image::V2_0;
+using namespace OHOS::HDI::Codec::Image::V2_1;
 using namespace OHOS::HDI::Display::Buffer::V1_2;
 using namespace OHOS::HDI::Display::Composer::V1_2;
 

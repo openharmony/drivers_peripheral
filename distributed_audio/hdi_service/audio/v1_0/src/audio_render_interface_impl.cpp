@@ -150,8 +150,19 @@ int32_t AudioRenderInterfaceImpl::GetRenderPosition(uint64_t &frames, AudioTimeS
 
 int32_t AudioRenderInterfaceImpl::SetRenderSpeed(float speed)
 {
-    DHLOGI("Set render speed, control render speed is not support yet.");
+    DHLOGI("Set render speed.");
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Callback is nullptr.");
+        return HDF_FAILURE;
+    }
+
     renderSpeed_ = speed;
+    std::string content = std::to_string(speed);
+    DAudioEvent event = { HDF_AUDIO_EVENT_SPEED_CHANGE, content};
+    if (audioExtCallback_->NotifyEvent(renderId_, event) != HDF_SUCCESS) {
+        DHLOGE("Set render speed failed.");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -299,6 +310,18 @@ int32_t AudioRenderInterfaceImpl::Resume()
 
 int32_t AudioRenderInterfaceImpl::Flush()
 {
+    DHLOGI("Flush.");
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Callback is nullptr.");
+        return HDF_FAILURE;
+    }
+
+    std::string content;
+    DAudioEvent event = { HDF_AUDIO_EVENT_FLUSH, content};
+    if (audioExtCallback_->NotifyEvent(renderId_, event) != HDF_SUCCESS) {
+        DHLOGE("Flush failed.");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -355,8 +378,18 @@ int32_t AudioRenderInterfaceImpl::GetMute(bool &mute)
 
 int32_t AudioRenderInterfaceImpl::SetVolume(float volume)
 {
-    DHLOGI("Can not set vol not by this interface.");
-    (void)volume;
+    DHLOGI("Set volume.");
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Callback is nullptr.");
+        return HDF_FAILURE;
+    }
+
+    std::string content = std::to_string(volume);
+    DAudioEvent event = { HDF_AUDIO_EVENT_VOLUME_CHANGE, content};
+    if (audioExtCallback_->NotifyEvent(renderId_, event) != HDF_SUCCESS) {
+        DHLOGE("Set volume failed.");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 

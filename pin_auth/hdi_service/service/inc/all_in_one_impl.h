@@ -39,7 +39,7 @@ public:
         const std::vector<uint8_t> &frameworkPublicKey, const std::vector<uint8_t> &extraInfo) override;
     int32_t Cancel(uint64_t scheduleId) override;
     int32_t SendMessage(uint64_t scheduleId, int32_t srcRole, const std::vector<uint8_t>& msg) override;
-    int32_t SetData(uint64_t scheduleId, uint64_t authSubType, const std::vector<uint8_t> &data,
+    int32_t SetData(uint64_t scheduleId, uint64_t authSubType, const std::vector<uint8_t> &data, uint32_t pinLength,
         int32_t resultCode) override;
     int32_t Enroll(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
         const sptr<HdiIExecutorCallback> &callbackObj) override;
@@ -74,12 +74,20 @@ private:
     };
 
 private:
-    int32_t AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &data,
+    int32_t AuthPin(PinAuthParam &pinAuthParam,
         const std::vector<uint8_t> &extraInfo, std::vector<uint8_t> &resultTlv);
     int32_t AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
         const sptr<HdiIExecutorCallback> &callbackObj, const std::vector<uint8_t> &extraInfo);
     int32_t EnrollInner(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
         const sptr<HdiIExecutorCallback> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion);
+    int32_t FillPinEnrollParam(PinEnrollParam &pinEnrollParam, uint64_t subType, const std::vector<uint8_t>
+        &salt, const std::vector<uint8_t> &pinData, uint32_t pinLength);
+    int32_t FillPinAuthParam(PinAuthParam &pinAuthParam, uint64_t scheduleId, uint64_t templateId,
+        const std::vector<uint8_t> &pinData,  uint32_t pinLength);
+    int32_t EnrollPinInner(ScheduleInfo &scheduleInfo, uint64_t authSubType, const std::vector<uint8_t> &pinData,
+        uint32_t pinLength, std::vector<uint8_t> &resultTlv);
+    int32_t AuthPinInner(ScheduleInfo &scheduleInfo, uint64_t authSubType, const std::vector<uint8_t> &pinData,
+        uint32_t pinLength, std::vector<uint8_t> &resultTlv);
 
     std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi_;
     ScheduleList scheduleList_;

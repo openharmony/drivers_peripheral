@@ -46,10 +46,10 @@ ohos_systemtest("test_battery_sys_test") {
   deps = []
 
   external_deps = [
+    "cJSON:cjson",
     "googletest:gtest_main",
     "hdf_core:libpub_utils",
     "hilog:libhilog",
-    "jsoncpp:jsoncpp",
   ]
   if (drivers_peripheral_battery_feature_config_policy) {
     external_deps += [ "config_policy:configpolicy_util" ]

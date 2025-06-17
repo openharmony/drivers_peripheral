@@ -75,7 +75,6 @@ public:
     int32_t OpenInputDevice(string devPath);
     RetStatus CloseInputDevice(string devPath);
     int32_t GetInputDeviceInfo(int32_t fd, InputDeviceInfo *detailInfo);
-    int32_t DoInputDeviceAction(void);
     int32_t InotifyEventHandler(int32_t epollFd, int32_t notifyFd);
     void RemoveEpoll(int32_t epollFd, int32_t fileFd);
     int32_t AddToEpoll(int32_t epollFd, int32_t fileFd);
@@ -130,6 +129,7 @@ public:
         }
     }
 private:
+    int32_t DoInputDeviceAction(void);
     void DeleteDevListNode(int index);
     int32_t AddDeviceNodeToList(
         int32_t &epollFd, int32_t &fd, string devPath, std::shared_ptr<InputDeviceInfo> &detailInfo);

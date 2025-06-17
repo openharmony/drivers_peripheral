@@ -14,7 +14,10 @@
 import("//build/ohos.gni")
 
 ohos_executable("codec_jpeg_decode") {
-  include_dirs = [ "./include" ]
+  include_dirs = [ 
+    "./include",
+    "../../../utils/include",
+  ]
 
   sources = [
     "src/codec_jpeg_helper.cpp",
@@ -22,10 +25,12 @@ ohos_executable("codec_jpeg_decode") {
     "src/jpeg_decoder.cpp",
   ]
 
+  defines = [ "LOG_TAG_IMAGE" ]
+
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libimage_proxy_2.0",
+      "drivers_interface_codec:libimage_proxy_2.1",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_buffer_proxy_1.0",
       "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",

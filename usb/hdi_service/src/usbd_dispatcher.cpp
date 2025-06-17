@@ -447,6 +447,7 @@ void UsbdDispatcher::UsbdReleaseInterfaces(HostDevice *dev)
             dev->iface[i] = nullptr;
         }
     }
+    HDF_LOGI("%{public}s: %{public}d release iface success.", __func__, __LINE__);
     if (dev->ctrIface != nullptr) {
         UsbReleaseInterface(dev->ctrIface);
         dev->ctrIface = nullptr;
@@ -659,7 +660,11 @@ void UsbdDispatcher::UsbdRelease(HostDevice *dev)
     UsbdCloseInterfaces(dev);
     UsbdReleaseInterfaces(dev);
     UsbdFreeCtrlPipe(dev);
+    HDF_LOGI("%{public}s: %{public}d interface,pipe free success", __func__, __LINE__);
+
     UsbImpl::UsbdRequestSyncReleaseList(dev);
+    HDF_LOGI("%{public}s: %{public}d sync request release success", __func__, __LINE__);
+
     UsbImpl::UsbdRequestASyncReleaseList(dev);
     UsbImpl::UsbdBulkASyncListReleasePort(dev);
 

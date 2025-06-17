@@ -15,12 +15,12 @@
 
 #include "vibratorstartbyintensity_fuzzer.h"
 #include "hdf_base.h"
-#include "v1_3/vibrator_interface_proxy.h"
+#include "v2_0/vibrator_interface_proxy.h"
 #include <hdf_log.h>
 #include <securec.h>
 
 using namespace OHOS::HDI::Vibrator;
-using namespace OHOS::HDI::Vibrator::V1_3;
+using namespace OHOS::HDI::Vibrator::V2_0;
 
 namespace OHOS {
     bool VibratorStartByIntensityFuzzTest(const uint8_t* data, size_t size)
@@ -28,8 +28,9 @@ namespace OHOS {
         if (data == nullptr) {
             return false;
         }
-        sptr<V1_3::IVibratorInterface> g_vibratorInterface = V1_3::IVibratorInterface::Get();
-        int ret = g_vibratorInterface->StartByIntensity(reinterpret_cast<const std::string &>(data), *(uint16_t *)data);
+        sptr<V2_0::IVibratorInterface> g_vibratorInterface = V2_0::IVibratorInterface::Get();
+        int ret = g_vibratorInterface->StartByIntensity({-1, 1}, reinterpret_cast<const std::string &>(data),
+                                                        *(uint16_t *)data);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Vibrator StartByIntensity failed, ret is [%{public}x]\n", __func__, ret);
             return false;

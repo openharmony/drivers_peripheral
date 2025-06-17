@@ -32,7 +32,7 @@ extern "C" IMemoryTrackerInterface *MemoryTrackerInterfaceImplGetInstance(void)
 
 int32_t MemoryTrackerInterfaceImpl::GetDevMem(int32_t pid, MemoryTrackerType type, std::vector<MemoryRecord>& records)
 {
-    HDF_LOGI("%{public}s called!", __func__);
+    HDF_LOGD("%{public}s called!", __func__);
 
     auto libMemTrackHandle = dlopen("libmemorytracker.default.so", RTLD_NOW);
     if (!libMemTrackHandle) {
@@ -48,13 +48,13 @@ int32_t MemoryTrackerInterfaceImpl::GetDevMem(int32_t pid, MemoryTrackerType typ
     }
 
     if (getDevMemFunc(pid, type, records) != 0) {
-        HDF_LOGE("%{public}s, get device memory failed!", __func__);
+        HDF_LOGD("%{public}s, get device memory failed!", __func__);
         dlclose(libMemTrackHandle);
         return HDF_FAILURE;
     }
 
     dlclose(libMemTrackHandle);
-    HDF_LOGI("%{public}s, get device memory success!", __func__);
+    HDF_LOGD("%{public}s, get device memory success!", __func__);
     return HDF_SUCCESS;
 }
 } // V1_0

@@ -18,8 +18,8 @@
 #include "parameters.h"
 #include "camera.h"
 namespace OHOS::Camera {
-CameraHostSelfkiller::CameraHostSelfkiller(uint8_t sleepInteral, uint32_t noCameraForExitMaxTimeSecond)
-    : sleepInteral_(sleepInteral), noCameraForExitMaxTimeSecond_(noCameraForExitMaxTimeSecond)
+CameraHostSelfkiller::CameraHostSelfkiller(uint8_t sleepInterval, uint32_t noCameraForExitMaxTimeSecond)
+    : sleepInterval_(sleepInterval), noCameraForExitMaxTimeSecond_(noCameraForExitMaxTimeSecond)
 {
     CAMERA_LOGD("Ctor, instance");
 }
@@ -72,7 +72,7 @@ void CameraHostSelfkiller::UnloadHdfServiceByName(const std::string &serviceName
 
 void CameraHostSelfkiller::CameraHostSelfkillerHandler()
 {
-    uint32_t noCameraForExitMax = noCameraForExitMaxTimeSecond_ / sleepInteral_;
+    uint32_t noCameraForExitMax = noCameraForExitMaxTimeSecond_ / sleepInterval_;
     uint32_t count = 0;
     if (selfKillParamName_ != "") {
         bool isEnableSelfKill = OHOS::system::GetBoolParameter(selfKillParamName_.c_str(), false);
@@ -84,7 +84,7 @@ void CameraHostSelfkiller::CameraHostSelfkillerHandler()
 
     CAMERA_LOGI("CameraHostSelfkillerHandler Begin");
     while (selfKillerThreadLoopFlag_) {
-        sleep(sleepInteral_);
+        sleep(sleepInterval_);
         if (canBeKilledFn_ == nullptr) {
             CAMERA_LOGW("canBeKilledFn_ is nullptr, just break");
             break;
@@ -95,7 +95,7 @@ void CameraHostSelfkiller::CameraHostSelfkillerHandler()
             continue;
         }
         CAMERA_LOGI("selfkill condition matched, timeout is %{public}us / %{public}us",
-            count * sleepInteral_,
+            count * sleepInterval_,
             noCameraForExitMaxTimeSecond_);
         if (count++ < noCameraForExitMax) {
             continue;
