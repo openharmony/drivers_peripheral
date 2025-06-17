@@ -16,19 +16,19 @@
 #ifndef CODECCALLBACK_FUZZER_H
 #define CODECCALLBACK_FUZZER_H
 
-#include "v3_0/icodec_callback.h"
-#include "v3_0/codec_types.h"
+#include "v4_0/icodec_callback.h"
+#include "v4_0/codec_types.h"
 
 namespace OHOS {
 namespace Codec {
-class CodecCallbackFuzz : public OHOS::HDI::Codec::V3_0::ICodecCallback {
+class CodecCallbackFuzz : public OHOS::HDI::Codec::V4_0::ICodecCallback {
 public:
     CodecCallbackFuzz() = default;
     virtual ~CodecCallbackFuzz() = default;
-    int32_t EventHandler(OHOS::HDI::Codec::V3_0::CodecEventType event,
-        const OHOS::HDI::Codec::V3_0::EventInfo &info) override;
-    int32_t EmptyBufferDone(int64_t appData, const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer) override;
-    int32_t FillBufferDone(int64_t appData, const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer) override;
+    int32_t EventHandler(OHOS::HDI::Codec::V4_0::CodecEventType event,
+        const OHOS::HDI::Codec::V4_0::EventInfo &info) override;
+    int32_t EmptyBufferDone(int64_t appData, const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer) override;
+    int32_t FillBufferDone(int64_t appData, const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer) override;
 };
 } // namespace Codec
 } // namespace OHOS

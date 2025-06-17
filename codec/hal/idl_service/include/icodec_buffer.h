@@ -23,7 +23,7 @@
 #include <memory>
 #include <refbase.h>
 #include "codec_omx_ext.h"
-#include "v3_0/codec_types.h"
+#include "v4_0/codec_types.h"
 #include "codec_buffer_wrapper.h"
 
 constexpr uint32_t TIME_WAIT_MS = 10;

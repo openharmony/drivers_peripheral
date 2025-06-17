@@ -20,8 +20,8 @@ CodecHdiCallback::CodecHdiCallback(std::shared_ptr<ICodecHdiCallBackBase> codecH
     codecHdi_ = codecHdi;
 }
 
-int32_t CodecHdiCallback::EventHandler(OHOS::HDI::Codec::V3_0::CodecEventType event,
-    const OHOS::HDI::Codec::V3_0::EventInfo &info)
+int32_t CodecHdiCallback::EventHandler(OHOS::HDI::Codec::V4_0::CodecEventType event,
+    const OHOS::HDI::Codec::V4_0::EventInfo &info)
 {
     if (codecHdi_) {
         codecHdi_->EventHandler(event, info);
@@ -29,7 +29,7 @@ int32_t CodecHdiCallback::EventHandler(OHOS::HDI::Codec::V3_0::CodecEventType ev
     return HDF_SUCCESS;
 }
 
-int32_t CodecHdiCallback::EmptyBufferDone(int64_t appData, const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer)
+int32_t CodecHdiCallback::EmptyBufferDone(int64_t appData, const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer)
 {
     if (codecHdi_) {
         codecHdi_->OnEmptyBufferDone(buffer);
@@ -37,7 +37,7 @@ int32_t CodecHdiCallback::EmptyBufferDone(int64_t appData, const OHOS::HDI::Code
     return HDF_SUCCESS;
 }
 
-int32_t CodecHdiCallback::FillBufferDone(int64_t appData, const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer)
+int32_t CodecHdiCallback::FillBufferDone(int64_t appData, const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer)
 {
     if (codecHdi_) {
         codecHdi_->OnFillBufferDone(buffer);

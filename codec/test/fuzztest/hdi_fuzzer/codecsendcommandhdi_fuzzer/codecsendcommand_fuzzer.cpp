@@ -19,9 +19,9 @@
 #include <securec.h>
 #include <unistd.h>
 
-using namespace OHOS::HDI::Codec::V3_0;
-using OHOS::HDI::Codec::V3_0::CodecCommandType;
-using OHOS::HDI::Codec::V3_0::CodecStateType;
+using namespace OHOS::HDI::Codec::V4_0;
+using OHOS::HDI::Codec::V4_0::CodecCommandType;
+using OHOS::HDI::Codec::V4_0::CodecStateType;
 
 namespace {
     struct AllParameters {

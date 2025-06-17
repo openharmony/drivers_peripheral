@@ -16,9 +16,9 @@
 #ifndef CODEC_CONFIG_H
 #define CODEC_CONFIG_H
 #include <refbase.h>
-#include "v3_0/codec_types.h"
+#include "v4_0/codec_types.h"
 #include "device_resource_if.h"
-using OHOS::HDI::Codec::V3_0::CodecCompCapability;
+using OHOS::HDI::Codec::V4_0::CodecCompCapability;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
