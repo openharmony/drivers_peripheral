@@ -247,11 +247,11 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
             HDF_LOGE("%{public}s: write dataRole failed, ret: %{public}d", __func__, ret);
             return ret;
         }
-	    if (currentPortInfo_.dataRole == DATA_ROLE_DEVICE && dataRole == DATA_ROLE_HOST) {
-	        ret = SwitchFunction(DATA_ROLE_HOST);
-	    }
+        if (currentPortInfo_.dataRole == DATA_ROLE_DEVICE && dataRole == DATA_ROLE_HOST) {
+            ret = SwitchFunction(DATA_ROLE_HOST);
+        }
         if (currentPortInfo_.dataRole == DATA_ROLE_HOST && dataRole == DATA_ROLE_DEVICE) {
-	        ret = SwitchFunction(DATA_ROLE_DEVICE);
+            ret = SwitchFunction(DATA_ROLE_DEVICE);
         }
     }
     currentPortInfo_.portId = portId;
@@ -268,7 +268,7 @@ int32_t UsbdPort::SwitchFunction(int32_t dataRole)
     }
     if (dataRole == DATA_ROLE_DEVICE) {
         if (UsbdFunction::IsHdcOpen()) {
-	        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_HDC);
+            ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_HDC);
         } else {
             ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_STORAGE);
         }
