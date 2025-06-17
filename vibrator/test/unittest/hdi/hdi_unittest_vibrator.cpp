@@ -40,7 +40,7 @@ namespace {
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
     V2_0::HapticPaket g_hapticPaket = {434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
-    V2_0::VibratorPackage g_vibPackage = {434, 149, {434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
+    V2_0::VibratorPackage g_vibPackage = {434, 149, {{434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}}};
     int32_t g_intensity = 60;
     int32_t g_sessionId = 1 ;
