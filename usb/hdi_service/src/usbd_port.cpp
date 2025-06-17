@@ -232,7 +232,7 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
 
     if (currentPortInfo_.powerRole != powerRole) {
         HDF_LOGI("%{public}s: powerRole switch from %{public}d to %{public}d", __func__,
-            currentPortInfo_.powerRole, powerRole);   
+            currentPortInfo_.powerRole, powerRole);
         ret = WritePortFile(powerRole, POWER_ROLE_PATH);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: write powerRole failed, ret: %{public}d", __func__, ret);
