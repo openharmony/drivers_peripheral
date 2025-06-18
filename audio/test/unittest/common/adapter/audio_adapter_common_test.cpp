@@ -202,7 +202,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid001, TestSize.
     }
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
 }
-/***********************add******************************/
+
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid002, TestSize.Level0)
 {
     struct IAudioRender *render = nullptr;
@@ -934,7 +934,6 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid014, TestSize
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
 }
 
-/*pin*/
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid015, TestSize.Level0)
 {
     struct IAudioCapture *capture = nullptr;
