@@ -209,38 +209,67 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddress(const 
     return ptr;
 }
 
+std::shared_ptr<BluetoothAddress> BluetoothAddress::ParseAddressToPtr(char *address, int len)
+{
+    if (address == nullptr || len < ADDRESS_STR_LEN + 1) {
+        HDF_LOGE("ParseAddressToPtr buf error");
+        return nullptr;
+    }
+    auto ptr = std::make_shared<BluetoothAddress>();
+    if (ptr->ParseAddressFromString(address) != ADDRESS_SIZE) {
+        return nullptr;
+    }
+    return ptr;
+}
+
 std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddressFile(const std::string &path)
 {
     const int bufsize = 256;
     char buf[bufsize] = {0};
     char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
+    bool readNVSucc = GetConstantAddress(addressStr, ADDRESS_STR_LEN + 1);
     int newFd = open(path.c_str(), O_RDWR | O_CREAT, 00644);
     HDF_LOGI("GetDeviceAddress open newFd %{public}d.", newFd);
+    if (newFd < 0) {
+        return ParseAddressToPtr(addressStr, ADDRESS_STR_LEN + 1);
+    }
+    bool needUpdateTxt = true;
+    char readAddressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
+    bool readTxtSucc = read(newFd, readAddressStr, ADDRESS_STR_LEN) == ADDRESS_STR_LEN;
 
-    if (!GetConstantAddress(addressStr, ADDRESS_STR_LEN + 1)) {
-        auto tmpPtr = GenerateDeviceAddress();
-        std::string strAddress;
-        ParseAddressToString(tmpPtr->address_, strAddress);
-        HDF_LOGI("device mac addr: %{public}s", GetEncryptAddr(strAddress).c_str());
-        int ret = strcpy_s(addressStr, ADDRESS_STR_LEN + 1, strAddress.c_str());
-        if (ret != 0) {
-            HDF_LOGI("ParseAddressToString strcpy_s err!");
+    if (!readNVSucc) {
+        // read NV fail, if btmac.txt exsit mac, not update, needUpdateTxt = false
+        if (!readTxtSucc) {
+            auto tmpPtr = GenerateDeviceAddress();
+            std::string strAddress;
+            ParseAddressToString(tmpPtr->address_, strAddress);
+            HDF_LOGI("device mac addr: %{public}s", GetEncryptAddr(strAddress).c_str());
+            int ret = strcpy_s(addressStr, ADDRESS_STR_LEN + 1, strAddress.c_str());
+            if (ret != 0) {
+                HDF_LOGE("ParseAddressToString strcpy_s err!");
+            }
+        } else {
+            HDF_LOGI("newFd %{public}d not update", newFd);
+            needUpdateTxt = false;
         }
     }
 
-    if (newFd >= 0) {
+    // mac in txt is the same as that in NV, not update txt
+    if (readNVSucc && readTxtSucc && strcmp(addressStr, readAddressStr) == 0) {
+        HDF_LOGI("no need update mac");
+        needUpdateTxt = false;
+    }
+
+    if (needUpdateTxt) {
         int fdRet = write(newFd, addressStr, ADDRESS_STR_LEN);
         if (fdRet < 0) {
             strerror_r(errno, buf, sizeof(buf));
-            HDF_LOGI("GetDeviceAddress addr write failed, err:%{public}s.", buf);
+            HDF_LOGE("GetDeviceAddress addr write failed, err:%{public}s.", buf);
         }
-        close(newFd);
     }
-    auto ptr = std::make_shared<BluetoothAddress>();
-    if (ptr->ParseAddressFromString(addressStr) != ADDRESS_SIZE) {
-        return nullptr;
-    }
-    return ptr;
+    close(newFd);
+    return needUpdateTxt ? ParseAddressToPtr(addressStr, ADDRESS_STR_LEN + 1) :
+        ParseAddressToPtr(readAddressStr, ADDRESS_STR_LEN + 1);
 }
 
 void BluetoothAddress::ReadAddress(std::vector<uint8_t> &address) const
