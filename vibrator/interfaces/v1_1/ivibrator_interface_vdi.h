@@ -311,7 +311,7 @@ public:
     virtual int32_t PlayPatternBySessionId(
         const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
         uint32_t sessionId,
-        const OHOS::HDI::Vibrator::V2_0::HapticPaket& hapticPaketVdi)
+        const HapticPaketVdi& hapticPaketVdi)
     {
         HDF_LOGI("%{public}s: only in Hdi return", __func__);
         return HDF_SUCCESS;
@@ -319,7 +319,7 @@ public:
 
     virtual int32_t PlayPackageBySession(const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
         uint32_t sessionId,
-        const OHOS::HDI::Vibrator::V2_0::VibratorPackage& vibratorPackage)
+        const VibratorPackageVdi& vibratorPackageVdi)
     {
         HDF_LOGI("%{public}s: only in Hdi return", __func__);
         return HDF_SUCCESS;
