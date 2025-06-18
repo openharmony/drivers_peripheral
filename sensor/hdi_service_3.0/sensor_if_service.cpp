@@ -897,7 +897,7 @@ int32_t SensorIfService::SetSdcSensor(const OHOS::HDI::Sensor::V3_0::DeviceSenso
     VoteEnable(sensorHandle, serviceId, enabled);
 
     return enabled ? EnableSdcSensor(serviceId, sensorHandle, samplingInterval, reportInterval)
-                   : DisableSdcSensor(serviceId, sensorHandle, samplingInterval);
+                   : DisableSdcSensor(serviceId, sensorHandle, samplingInterval, reportInterval);
 }
 
 int64_t SensorIfService::CalculateSamplingInterval(int32_t rateLevel)
