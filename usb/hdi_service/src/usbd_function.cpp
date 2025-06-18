@@ -189,14 +189,9 @@ bool UsbdFunction::IsHdcOpen()
         return false;
     }
     const char HDC_SIGNATURE[] = "hdc";
-    const size_t HDC_STR_LEN = strlen(HDC_SIGNATURE);
-    for (size_t i = 0; i <= UDC_NAME_MAX_LEN - HDC_STR_LEN; ++i) {
-        if (persistConfig[i] == HDC_SIGNATURE[0] &&
-            persistConfig[i + 1] == HDC_SIGNATURE[1] &&
-            persistConfig[i + NUM_TWO] == HDC_SIGNATURE[NUM_TWO]) {
-            HDF_LOGI("%{public}s:hdc is opening", __func__);
-            return true;
-        }
+    if (strstr(persistConfig, HDC_SIGNATURE) != nullptr) {
+        HDF_LOGI("%{public}s:hdc is opening", __func__);
+        return true;
     }
     return false;
 }
