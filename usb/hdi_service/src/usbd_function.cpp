@@ -46,7 +46,7 @@ using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
 using OHOS::HDI::ServiceManager::V1_0::IServiceManager;
 using OHOS::HDI::Usb::Gadget::Mtp::V1_0::IUsbfnMtpInterface;
 using GetMtpImplFunc = void*(*)();
-constexpr int32_t NUM_TWO = 2;
+
 constexpr uint32_t UDC_NAME_MAX_LEN = 32;
 constexpr int32_t WAIT_UDC_MAX_LOOP = 30;
 constexpr uint32_t WAIT_UDC_TIME = 100000;
