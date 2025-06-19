@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/wlan/wlan.gni")
 
 ohos_shared_library("libchip_controller_chip_interface_service_2.0") {

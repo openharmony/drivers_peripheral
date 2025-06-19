@@ -459,6 +459,7 @@ HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_002, TestSize.Level0)
     static_cast<void>(memset_s(credInfo, sizeof(CredentialInfoHal), 0, sizeof(CredentialInfoHal)));
     credInfo->authType = authType;
     credInfo->executorSensorHint = executorSensorHint_1;
+    credInfo->isAbandoned = false;
     userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
 
@@ -506,6 +507,34 @@ HWTEST_F(ExecutorMessageTest, TestGetExecutorMsgList, TestSize.Level0)
     info.authType = authType;
     g_poolList->insert(g_poolList, static_cast<void *>(&info));
     EXPECT_EQ(GetExecutorMsgList(1, 4, &executorMsg), RESULT_SUCCESS);
+}
+
+HWTEST_F(ExecutorMessageTest, TestGetOldRootSecretFromAttribute_001, TestSize.Level0)
+{
+    Attribute *attribute = CreateEmptyAttribute();
+    EXPECT_NE(attribute, nullptr);
+    ExecutorResultInfo resultInfo= {};
+    GetRootSecretFromAttribute(attribute, &resultInfo);
+    uint8_t testUint8Buffer[] = { 'a', 'b', 'c' };
+    Uint8Array rootSecret = { testUint8Buffer, sizeof(testUint8Buffer) };
+    ResultCode result = SetAttributeUint8Array(attribute, ATTR_OLD_ROOT_SECRET, rootSecret);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+    GetRootSecretFromAttribute(attribute, &resultInfo);
+    FreeAttribute(&attribute);
+}
+
+HWTEST_F(ExecutorMessageTest, TestGetOldRootSecretFromAttribute_002, TestSize.Level0)
+{
+    Attribute *attribute = CreateEmptyAttribute();
+    EXPECT_NE(attribute, nullptr);
+    ExecutorResultInfo resultInfo= {};
+    uint8_t testUint8Buffer[ROOT_SECRET_LEN] = {};
+    Uint8Array rootSecret = { testUint8Buffer, ROOT_SECRET_LEN };
+    ResultCode result = SetAttributeUint8Array(attribute, ATTR_OLD_ROOT_SECRET, rootSecret);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+    GetRootSecretFromAttribute(attribute, &resultInfo);
+    FreeAttribute(&attribute);
+    DestoryBuffer(resultInfo.oldRootSecret);
 }
 } // namespace UserAuth
 } // namespace UserIam

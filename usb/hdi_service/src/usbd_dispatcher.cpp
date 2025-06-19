@@ -21,6 +21,7 @@
 #include "usb_interface_pool.h"
 #include "v1_0/iusbd_subscriber.h"
 #include "usbd_wrapper.h"
+#include "usb_report_sys_event.h"
 
 namespace OHOS {
 namespace HDI {
@@ -446,6 +447,7 @@ void UsbdDispatcher::UsbdReleaseInterfaces(HostDevice *dev)
             dev->iface[i] = nullptr;
         }
     }
+    HDF_LOGI("%{public}s: %{public}d release iface success.", __func__, __LINE__);
     if (dev->ctrIface != nullptr) {
         UsbReleaseInterface(dev->ctrIface);
         dev->ctrIface = nullptr;
@@ -658,7 +660,11 @@ void UsbdDispatcher::UsbdRelease(HostDevice *dev)
     UsbdCloseInterfaces(dev);
     UsbdReleaseInterfaces(dev);
     UsbdFreeCtrlPipe(dev);
+    HDF_LOGI("%{public}s: %{public}d interface,pipe free success", __func__, __LINE__);
+
     UsbImpl::UsbdRequestSyncReleaseList(dev);
+    HDF_LOGI("%{public}s: %{public}d sync request release success", __func__, __LINE__);
+
     UsbImpl::UsbdRequestASyncReleaseList(dev);
     UsbImpl::UsbdBulkASyncListReleasePort(dev);
 
@@ -947,10 +953,13 @@ int32_t UsbdDispatcher::UsbdDeviceCreateAndAttach(const sptr<UsbImpl> &service, 
         ret = FunAttachDevice(port, nullptr, nullptr);
         if (ret != HDF_SUCCESS) {
             HDF_LOGW("%{public}s:FunAttachDevice error ret:%{public}d", __func__, ret);
+            UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdDeviceCreateAndAttach", ret,
+                "FunAttachDevice error");
         }
         port = nullptr;
     } else {
         HDF_LOGE("%{public}s:createdevice error ret:%{public}d", __func__, ret);
+        UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdDeviceCreateAndAttach", ret, "createdevice error");
     }
     return ret;
 }

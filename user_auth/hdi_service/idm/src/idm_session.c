@@ -23,6 +23,7 @@
 #include "adaptor_memory.h"
 #include "adaptor_time.h"
 #include "coauth.h"
+#include "buffer.h"
 #include "linked_list.h"
 #include "idm_database.h"
 
@@ -43,17 +44,13 @@ struct SessionInfo {
     uint64_t validAuthTokenTime;
     uint8_t challenge[CHALLENGE_LEN];
     uint64_t scheduleId;
-    bool isUpdate;
+    ScheduleType scheduleType;
     bool isScheduleValid;
+    PinChangeScence pinChangeScence;
+    Buffer *oldRootSecret;
+    Buffer *curRootSecret;
+    Buffer *newRootSecret;
 } *g_session;
-
-IAM_STATIC Buffer *g_cacheRootSecret = NULL;
-
-IAM_STATIC void DestroyCacheRootSecret(void)
-{
-    DestoryBuffer(g_cacheRootSecret);
-    g_cacheRootSecret = NULL;
-}
 
 IAM_STATIC bool IsSessionExist(void)
 {
@@ -147,8 +144,10 @@ ResultCode CloseEditSession(void)
     if (!IsSessionExist()) {
         return RESULT_GENERAL_ERROR;
     }
-    DestroyCacheRootSecret();
     ClearCachePin(g_session->userId);
+    DestoryBuffer(g_session->oldRootSecret);
+    DestoryBuffer(g_session->curRootSecret);
+    DestoryBuffer(g_session->newRootSecret);
     Free(g_session);
     g_session = NULL;
     return RESULT_SUCCESS;
@@ -181,14 +180,16 @@ ResultCode CheckChallenge(const uint8_t *challenge, uint32_t challengeLen)
     return RESULT_SUCCESS;
 }
 
-ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool isUpdate)
+ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, ScheduleType scheduleType)
 {
+    LOG_INFO("start");
     if (!IsSessionExist()) {
+        LOG_ERROR("session is not exist");
         return RESULT_NEED_INIT;
     }
     g_session->scheduleId = scheduleId;
     g_session->authType = authType;
-    g_session->isUpdate = isUpdate;
+    g_session->scheduleType = scheduleType;
     g_session->isScheduleValid = true;
     return RESULT_SUCCESS;
 }
@@ -232,16 +233,16 @@ ResultCode CheckSessionTimeout(void)
     if (currentTime - g_session->time > SESSION_VALIDITY_PERIOD) {
         LOG_ERROR("timeout, currentTime: %{public}" PRIu64 ", sessionTime: %{public}" PRIu64,
             currentTime, g_session->time);
-        DestroyCacheRootSecret();
+        DestoryBuffer(g_session->oldRootSecret);
         ClearCachePin(g_session->userId);
         return RESULT_TIMEOUT;
     }
     return RESULT_SUCCESS;
 }
 
-ResultCode GetIsUpdate(bool *isUpdate)
+ResultCode GetScheduleType(ScheduleType *scheduleType)
 {
-    if (isUpdate == NULL) {
+    if (scheduleType == NULL) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
@@ -249,7 +250,7 @@ ResultCode GetIsUpdate(bool *isUpdate)
         LOG_ERROR("session need init");
         return RESULT_NEED_INIT;
     }
-    *isUpdate = g_session->isUpdate;
+    *scheduleType = g_session->scheduleType;
     return RESULT_SUCCESS;
 }
 
@@ -263,43 +264,6 @@ ResultCode CheckSessionValid(int32_t userId)
         return RESULT_GENERAL_ERROR;
     }
     return RESULT_SUCCESS;
-}
-
-void CacheRootSecret(int32_t userId, Buffer *rootSecret)
-{
-    /* The presence of a session is the pin change phase */
-    if (CheckSessionTimeout() != RESULT_SUCCESS) {
-        return;
-    }
-    if (g_session->userId != userId) {
-        LOG_ERROR("CacheRootSecret check user id fail");
-        return;
-    }
-    if (!CheckBufferWithSize(rootSecret, ROOT_SECRET_LEN)) {
-        LOG_ERROR("check root secret fail");
-        return;
-    }
-    DestroyCacheRootSecret();
-    g_cacheRootSecret = CopyBuffer(rootSecret);
-    if (g_cacheRootSecret == NULL) {
-        LOG_ERROR("copy cache root secret fail");
-    }
-}
-
-Buffer *GetCacheRootSecret(int32_t userId)
-{
-    if (CheckSessionTimeout() != RESULT_SUCCESS) {
-        return NULL;
-    }
-    if (g_session->userId != userId) {
-        LOG_ERROR("GetCacheRootSecret check user id fail");
-        return NULL;
-    }
-    if (g_cacheRootSecret == NULL) {
-        LOG_ERROR("no cache root secret");
-        return NULL;
-    }
-    return CopyBuffer(g_cacheRootSecret);
 }
 
 ResultCode GetChallenge(uint8_t *challenge, uint32_t challengeLen)
@@ -330,4 +294,122 @@ ResultCode IsValidUserType(int32_t userType)
     }
     LOG_INFO("userType is valid");
     return RESULT_SUCCESS;
+}
+
+void SetPinChangeScence(int32_t userId, uint32_t authIntent)
+{
+    if (CheckSessionValid(userId) != RESULT_SUCCESS) {
+        LOG_ERROR("session is invalid, userId: %{public}d", userId);
+        return;
+    }
+    if (authIntent == ABANDONED_PIN_AUTH) {
+        g_session->pinChangeScence = PIN_RESET_SCENCE;
+    } else {
+        g_session->pinChangeScence = PIN_UPDATE_SCENCE;
+    }
+    LOG_INFO("pinChangeScence: %{public}d", g_session->pinChangeScence);
+    return;
+}
+
+PinChangeScence GetPinChangeScence(int32_t userId)
+{
+    if (CheckSessionValid(userId) != RESULT_SUCCESS) {
+        LOG_ERROR("session is invalid, userId: %{public}d", userId);
+        return 0;
+    }
+    LOG_INFO("pinChangeScence: %{public}d", g_session->pinChangeScence);
+    return g_session->pinChangeScence;
+}
+
+void SetOldRootSecret(int32_t userId, Buffer *rootSecret)
+{
+    if (CheckSessionValid(userId) != RESULT_SUCCESS) {
+        LOG_ERROR("session is invalid, userId: %{public}d", userId);
+        return;
+    }
+
+    if (!CheckBufferWithSize(rootSecret, ROOT_SECRET_LEN)) {
+        LOG_ERROR("rootSecret is invalid, userId: %{public}d", userId);
+        return;
+    }
+
+    DestoryBuffer(g_session->oldRootSecret);
+    g_session->oldRootSecret = CreateBufferByData(rootSecret->buf, rootSecret->contentSize);
+    if (g_session->oldRootSecret == NULL) {
+        LOG_ERROR("CreateBufferByData fail, userId: %{public}d", userId);
+        return;
+    }
+
+    return;
+}
+
+Buffer *GetOldRootSecret(int32_t userId)
+{
+    if (CheckSessionValid(userId) != RESULT_SUCCESS) {
+        LOG_ERROR("session is invalid, userId: %{public}d", userId);
+        return NULL;
+    }
+    return g_session->oldRootSecret;
+}
+
+void SetCurRootSecret(int32_t userId, Buffer *rootSecret)
+{
+    if (CheckSessionValid(userId) != RESULT_SUCCESS) {
+        LOG_ERROR("session is invalid, userId: %{public}d", userId);
+        return;
+    }
+
+    if (!CheckBufferWithSize(rootSecret, ROOT_SECRET_LEN)) {
+        LOG_ERROR("rootSecret is invalid, userId: %{public}d", userId);
+        return;
+    }
+
+    DestoryBuffer(g_session->curRootSecret);
+    g_session->curRootSecret = CreateBufferByData(rootSecret->buf, rootSecret->contentSize);
+    if (g_session->curRootSecret == NULL) {
+        LOG_ERROR("CreateBufferByData fail, userId: %{public}d", userId);
+        return;
+    }
+
+    return;
+}
+
+Buffer *GetCurRootSecret(int32_t userId)
+{
+    if (CheckSessionValid(userId) != RESULT_SUCCESS) {
+        LOG_ERROR("session is invalid, userId: %{public}d", userId);
+        return NULL;
+    }
+    return g_session->curRootSecret;
+}
+
+ResultCode SetNewRootSecret(int32_t userId, Buffer *rootSecret)
+{
+    if (CheckSessionValid(userId) != RESULT_SUCCESS) {
+        LOG_ERROR("session is invalid, userId: %{public}d", userId);
+        return RESULT_GENERAL_ERROR;
+    }
+
+    if (!CheckBufferWithSize(rootSecret, ROOT_SECRET_LEN)) {
+        LOG_ERROR("rootSecret is invalid, userId: %{public}d", userId);
+        return RESULT_GENERAL_ERROR;
+    }
+
+    DestoryBuffer(g_session->newRootSecret);
+    g_session->newRootSecret = CreateBufferByData(rootSecret->buf, rootSecret->contentSize);
+    if (g_session->newRootSecret == NULL) {
+        LOG_ERROR("CreateBufferByData fail, userId: %{public}d", userId);
+        return RESULT_NO_MEMORY;
+    }
+
+    return RESULT_SUCCESS;
+}
+
+Buffer *GetNewRootSecret(int32_t userId)
+{
+    if (CheckSessionValid(userId) != RESULT_SUCCESS) {
+        LOG_ERROR("session is invalid, userId: %{public}d", userId);
+        return NULL;
+    }
+    return g_session->newRootSecret;
 }

@@ -18,25 +18,26 @@
 #include <securec.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <hdf_remote_service.h>
 #include <hitrace_meter.h>
 #include "codec_log_wrapper.h"
 #include "component_mgr.h"
 #include "icodec_buffer.h"
 #include "sys/mman.h"
-#include "v3_0/codec_ext_types.h"
+#include "v4_0/codec_ext_types.h"
 #include "codec_component_service.h"
 
 #define AUDIO_CODEC_NAME "OMX.audio"
 
-using OHOS::HDI::Codec::V3_0::EventInfo;
-using OHOS::HDI::Codec::V3_0::CodecEventType;
-using OHOS::HDI::Codec::V3_0::CodecStateType;
-using OHOS::HDI::Codec::V3_0::CodecCommandType;
-using OHOS::HDI::Codec::V3_0::CODEC_STATE_INVALID;
-using OHOS::HDI::Codec::V3_0::CODEC_STATE_LOADED;
-using OHOS::HDI::Codec::V3_0::CODEC_STATE_IDLE;
-using OHOS::HDI::Codec::V3_0::CODEC_STATE_EXECUTING;
-using OHOS::HDI::Codec::V3_0::CODEC_COMMAND_STATE_SET;
+using OHOS::HDI::Codec::V4_0::EventInfo;
+using OHOS::HDI::Codec::V4_0::CodecEventType;
+using OHOS::HDI::Codec::V4_0::CodecStateType;
+using OHOS::HDI::Codec::V4_0::CodecCommandType;
+using OHOS::HDI::Codec::V4_0::CODEC_STATE_INVALID;
+using OHOS::HDI::Codec::V4_0::CODEC_STATE_LOADED;
+using OHOS::HDI::Codec::V4_0::CODEC_STATE_IDLE;
+using OHOS::HDI::Codec::V4_0::CODEC_STATE_EXECUTING;
+using OHOS::HDI::Codec::V4_0::CODEC_COMMAND_STATE_SET;
 #define FD_SIZE sizeof(int)
 namespace {
     constexpr int NAME_LENGTH = 32;
@@ -87,6 +88,7 @@ ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appD
       bufferIdCount_(0),
       mgr_(mgr)
 {
+    isIPCMode_ = (HdfRemoteGetCallingPid() == getpid() ? false : true);
 }
 
 ComponentNode::~ComponentNode()
@@ -198,10 +200,10 @@ int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<i
     const OmxCodecBuffer& inBuffer)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
-    if (index != HDI::Codec::V3_0::Codec_IndexParamOverlayBuffer) {
+    if (index != HDI::Codec::V4_0::Codec_IndexParamOverlayBuffer) {
         return OMX_ErrorNotImplemented;
     }
-    if (paramStruct.size() != sizeof(HDI::Codec::V3_0::CodecParamOverlay)) {
+    if (paramStruct.size() != sizeof(HDI::Codec::V4_0::CodecParamOverlay)) {
         return OMX_ErrorBadParameter;
     }
     if (inBuffer.bufferhandle == nullptr) {
@@ -213,11 +215,12 @@ int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<i
         CODEC_LOGE("null bufferhandle");
         return OMX_ErrorBadParameter;
     }
-    sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> mapper = HDI::Codec::V3_0::GetMapperService();
-    if (mapper != nullptr) {
-        mapper->Mmap(inBuffer.bufferhandle);
+    int ret = Mmap(inBuffer.bufferhandle);
+    if (ret != 0) {
+        CODEC_LOGE("mmap failed");
+        return ret;
     }
-    auto paramSrc = reinterpret_cast<const HDI::Codec::V3_0::CodecParamOverlay *>(paramStruct.data());
+    auto paramSrc = reinterpret_cast<const HDI::Codec::V4_0::CodecParamOverlay *>(paramStruct.data());
     CodecParamOverlayBuffer paramDst {
         .size = sizeof(CodecParamOverlayBuffer),
         .enable = paramSrc->enable,
@@ -232,9 +235,7 @@ int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<i
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("OMX_SetParameter err = %{public}x ", err);
     }
-    if (mapper != nullptr) {
-        mapper->Unmap(inBuffer.bufferhandle);
-    }
+    (void)Unmap(inBuffer.bufferhandle);
     return err;
 }
 
@@ -285,7 +286,7 @@ int32_t ComponentNode::GetState(CodecStateType &state)
 }
 
 int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                              OHOS::HDI::Codec::V3_0::CodecTunnelSetupType &tunnelSetup)
+                                              OHOS::HDI::Codec::V4_0::CodecTunnelSetupType &tunnelSetup)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
@@ -313,6 +314,11 @@ int32_t ComponentNode::UseEglImage(struct OmxCodecBuffer &buffer, uint32_t portI
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_BUFFERHEADERTYPE *pBufferHdrType = nullptr;
+    OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
+    if (comType->UseEGLImage == nullptr) {
+        CODEC_LOGE("The requested function is not implemented.");
+        return OMX_ErrorNotImplemented;
+    }
     auto err = OMX_UseEGLImage(comp_, &pBufferHdrType, portIndex, 0, const_cast<int8_t *>(eglImage));
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("OMX_UseEGLImage error[0x%{public}x]", err);
@@ -380,7 +386,11 @@ int32_t ComponentNode::OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer)
     }
     OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecOnEmptyBufferDone");
-    (void)omxCallback_->EmptyBufferDone(appData_, codecOmxBuffer);
+    OmxCodecBuffer copy = codecOmxBuffer;
+    copy.bufferhandle = nullptr;
+    copy.fd.reset();
+    copy.fenceFd.reset();
+    (void)omxCallback_->EmptyBufferDone(appData_, OHOS::Codec::Omx::Convert(copy, isIPCMode_));
     return OMX_ErrorNone;
 }
 
@@ -407,7 +417,11 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
                   static_cast<uint8_t*>(appPrivate->param) + appPrivate->sizeOfParam,
                   codecOmxBuffer.alongParam.begin());
     }
-    (void)omxCallback_->FillBufferDone(appData_, codecOmxBuffer);
+    OmxCodecBuffer copy = codecOmxBuffer;
+    copy.bufferhandle = nullptr;
+    copy.fd.reset();
+    copy.fenceFd.reset();
+    (void)omxCallback_->FillBufferDone(appData_, OHOS::Codec::Omx::Convert(copy, isIPCMode_));
     return OMX_ErrorNone;
 }
 
@@ -592,8 +606,9 @@ int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffe
     switch (buffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD: {
             if (compName_.find(AUDIO_CODEC_NAME) != std::string::npos) {
+                CHECK_AND_RETURN_RET_LOG(buffer.fd != nullptr, OMX_ErrorBadParameter, "invalid fd");
                 void *addr = ::mmap(nullptr, static_cast<size_t>(buffer.allocLen),
-                    static_cast<int>(PROT_READ | PROT_WRITE), MAP_SHARED, buffer.fd, 0);
+                    static_cast<int>(PROT_READ | PROT_WRITE), MAP_SHARED, buffer.fd->Get(), 0);
                 CHECK_AND_RETURN_RET_LOG(addr != nullptr, OMX_ErrorBadParameter, "addr is null");
                 err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
                     reinterpret_cast<uint8_t *>(addr));

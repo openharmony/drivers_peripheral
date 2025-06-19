@@ -72,7 +72,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_001, TestSize.Level1)
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     std::vector<int8_t> frame;
     uint64_t replyBytes = 0;
-    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
+    EXPECT_EQ(HDF_ERR_DEVICE_BUSY, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
 }
 
 /**
@@ -131,6 +131,35 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetRenderSpeed_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     float speed = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetRenderSpeed(speed));
+}
+
+/**
+ * @tc.name: SetRenderSpeed_002
+ * @tc.desc: Verify the SetRenderSpeed function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetRenderSpeed_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    float speed = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetRenderSpeed(speed));
+}
+
+/**
+ * @tc.name: SetRenderSpeed_003
+ * @tc.desc: Verify the SetRenderSpeed function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetRenderSpeed_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    float speed = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetRenderSpeed(speed));
 }
 
@@ -299,6 +328,33 @@ HWTEST_F(AudioRenderInterfaceImplTest, Resume_001, TestSize.Level1)
 HWTEST_F(AudioRenderInterfaceImplTest, Flush_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Flush());
+}
+
+/**
+ * @tc.name: Flush_002
+ * @tc.desc: Verify the Flush function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, Flush_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Flush());
+}
+
+/**
+ * @tc.name: Flush_003
+ * @tc.desc: Verify the Flush function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, Flush_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Flush());
 }
 
@@ -405,6 +461,35 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetVolume_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     float volume = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetVolume(volume));
+}
+
+/**
+ * @tc.name: SetVolume_002
+ * @tc.desc: Verify the SetVolume function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetVolume_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    float volume = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetVolume(volume));
+}
+
+/**
+ * @tc.name: SetVolume_003
+ * @tc.desc: Verify the SetVolume function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetVolume_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    float volume = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetVolume(volume));
 }
 

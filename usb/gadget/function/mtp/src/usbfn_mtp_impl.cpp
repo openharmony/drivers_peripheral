@@ -122,6 +122,8 @@ constexpr uint32_t BULK_OUT_TIMEOUT_JIFFIES = 0; /* sync timeout, set to 0 means
 constexpr uint32_t INTR_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means wait forever */
 constexpr uint64_t MTP_MAX_FILE_SIZE = 0xFFFFFFFFULL;
 constexpr uint32_t WRITE_FILE_TEMP_SLICE = 16 * 100 * 1024; /* 16*100KB */
+constexpr uint32_t ZERO_LENGTH_PACKET_JIFFIES = 100;  /* sync timeout, set to 0 means wait forever */
+constexpr uint32_t ZERO_LENGTH_PACKET = 0;
 static constexpr int32_t WAIT_UDC_MAX_LOOP = 3;
 static constexpr uint32_t WAIT_UDC_TIME = 300000;
 static constexpr uint32_t REQ_ACTUAL_DEFAULT_LENGTH = 0;
@@ -174,8 +176,7 @@ void UsbfnMtpImpl::UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *r
     }
     int32_t ret = UsbMtpPortRxPush(mtpPort, req);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: rx push failed(%{%{public}d/%{public}d}): %{public}d, state=%{public}hhu", __func__,
-            mtpPort->readStarted, mtpPort->readAllocated, ret, mtpPort->mtpDev->mtpState);
+        HDF_LOGW("%{public}s: rx push failed: %{public}d, state=%{public}d", __func__, ret, mtpPort->mtpDev->mtpState);
     }
     std::lock_guard<std::mutex> guard(asyncMutex_);
     if (mtpPort->readStarted == 0 && mtpPort->writeStarted == 0 && mtpPort->mtpDev->mtpState == MTP_STATE_CANCELED) {
@@ -1324,6 +1325,29 @@ int32_t UsbfnMtpImpl::Read(std::vector<uint8_t> &data)
     return ret;
 }
 
+void UsbfnMtpImpl::ReadZLP(uint32_t length, uint32_t actual)
+{
+    if (actual != length || actual != MTP_BUFFER_SIZE) {
+        return;
+    }
+    struct DListHead *pool = &mtpPort_->readPool;
+    if (pool == nullptr || DListIsEmpty(pool)) {
+        HDF_LOGE("%{public}s: invalid readPool", __func__);
+        return;
+    }
+    struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
+    if (req == nullptr) {
+        HDF_LOGE("%{public}s: req invalid", __func__);
+        return;
+    }
+    RemoveReqFromList(req);
+    DListInsertTail(&req->list, &mtpPort_->readQueue);
+    req->length = ZERO_LENGTH_PACKET;
+    (void)UsbFnSubmitRequestSync(req, ZERO_LENGTH_PACKET_JIFFIES);
+    RemoveReqFromList(req);
+    DListInsertTail(&req->list, pool);
+}
+
 int32_t UsbfnMtpImpl::ReadImpl(std::vector<uint8_t> &data)
 {
     int32_t ret = HDF_FAILURE;
@@ -1356,6 +1380,7 @@ int32_t UsbfnMtpImpl::ReadImpl(std::vector<uint8_t> &data)
     switch (req->status) {
         case USB_REQUEST_COMPLETED:
             (void)BufCopyToVector(req->buf, req->actual, data);
+            ReadZLP(req->length, getActualLength(data));
             break;
         case USB_REQUEST_NO_DEVICE:
             HDF_LOGE("%{public}s: device disconnect", __func__);

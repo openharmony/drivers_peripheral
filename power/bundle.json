@@ -29,6 +29,7 @@
       "ram": "6000KB",
       "deps": {
         "components": [
+          "cJSON",
           "c_utils",
           "config_policy",
           "drivers_interface_power",
@@ -37,11 +38,10 @@
           "hilog", 
           "hisysevent",
           "libxml2",
-          "ipc",
-          "jsoncpp"
+          "ipc"
         ],
         "third_party": [
-          "jsoncpp"
+          "cJSON"
         ]
       },
       "build": {

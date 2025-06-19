@@ -24,7 +24,7 @@
 #include "audio_common_vdi.h"
 #include "audio_render_vdi.h"
 #include "audio_dfx.h"
-#include "v4_0/iaudio_callback.h"
+#include "v5_0/iaudio_callback.h"
 #include "stub_collector.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -162,7 +162,9 @@ static int32_t CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
 
     int32_t id = SetTimer("Hdi:CreateRender");
     pthread_rwlock_wrlock(GetRenderLock());
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, vdiRender);
+    AudioDfxSysEventError("CreateRender", startTime, TIME_THRESHOLD, ret);
     pthread_rwlock_unlock(GetRenderLock());
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
@@ -295,7 +297,9 @@ static int32_t CreateCapturePre(struct IAudioAdapterVdi *vdiAdapter, struct IAud
     }
     int32_t id = SetTimer("Hdi:CreateCapture");
     pthread_rwlock_wrlock(GetCaptureLock());
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
+    AudioDfxSysEventError("CreateCapture", startTime, TIME_THRESHOLD, ret);
     pthread_rwlock_unlock(GetCaptureLock());
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);

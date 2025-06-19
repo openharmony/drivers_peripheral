@@ -27,16 +27,20 @@ ohos_fuzztest("PinAuthExecutorStubFuzzTest") {
   include_dirs = [
     "../../../../hdi_service/service/inc",
     "../../../../hdi_service/main/inc",
+    "../../../../hdi_service/adaptor/inc",
+    "../../../../hdi_service/common/inc",
+    "../../../../hdi_service/database/inc",
     "../../../../common/logs",
   ]
 
   sources = [ "pin_auth_executor_stub_fuzzer.cpp" ]
 
-  deps = [ "../common_fuzzer:libpin_auth_interface_service_2.1_fuzzer" ]
+  deps = [ "../common_fuzzer:libpin_auth_interface_service_3.0_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_pin_auth:libpin_auth_stub_2.1",
+    "drivers_interface_pin_auth:libpin_auth_stub_3.0",
+    "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",

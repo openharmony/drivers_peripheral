@@ -710,6 +710,39 @@ int32_t SensorIfService::DisableSensor(int32_t sensorId, uint32_t serviceId)
     return ret;
 }
 
+void SensorIfService::VoteEnable(int32_t sensorId, uint32_t serviceId, bool& enabled)
+{
+    static std::map<int32_t, std::map<uint32_t, bool>> sdcEnableMap;
+    if (enabled) {
+        sdcEnableMap[sensorId][serviceId] = enabled;
+    } else {
+        sdcEnableMap[sensorId].erase(serviceId);
+    }
+    for (auto it = sdcEnableMap[sensorId].begin(); it != sdcEnableMap[sensorId].end(); ++it) {
+        if (it->second == true) {
+            enabled = true;
+        }
+    }
+}
+
+void SensorIfService::VoteInterval(int32_t sensorId, uint32_t serviceId, int64_t &samplingInterval, bool &enabled)
+{
+    static std::map<int32_t, std::map<uint32_t, int64_t>> sdcIntervalMap;
+    if (enabled) {
+        sdcIntervalMap[sensorId][serviceId] = samplingInterval;
+    } else {
+        samplingInterval = 0;
+        sdcIntervalMap[sensorId].erase(serviceId);
+    }
+    for (auto it = sdcIntervalMap[sensorId].begin(); it != sdcIntervalMap[sensorId].end(); ++it) {
+        if (samplingInterval == 0) {
+            samplingInterval = it->second;
+        }
+        samplingInterval = samplingInterval < it->second ? samplingInterval : it->second;
+    }
+    HDF_LOGI("%{public}s: samplingInterval is %{public}s", __func__, std::to_string(samplingInterval).c_str());
+}
+
 int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel)
 {
     SENSOR_TRACE_PID_MSG("sensorId " + std::to_string(sensorId) + "enabled " + std::to_string(enabled) + "rateLevel " +
@@ -729,6 +762,8 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     }
     int64_t samplingInterval = rateLevel == REPORT_INTERVAL ? REPORT_INTERVAL : COMMON_REPORT_FREQUENCY / rateLevel;
     int64_t reportInterval = REPORT_INTERVAL;
+    VoteInterval(sensorId, serviceId, samplingInterval, enabled);
+    VoteEnable(sensorId, serviceId, enabled);
     if (enabled) {
         ret = SetBatchSenior(serviceId, sensorId, SDC, samplingInterval, reportInterval);
         if (ret != SENSOR_SUCCESS) {

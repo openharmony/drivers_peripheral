@@ -32,7 +32,8 @@ ohos_fuzztest("VibratorFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_vibrator:libvibrator_stub_1.1",
+    "drivers_interface_vibrator:libvibrator_proxy_2.0",
+    "drivers_interface_vibrator:libvibrator_stub_2.0",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

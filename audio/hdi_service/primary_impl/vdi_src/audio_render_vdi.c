@@ -103,11 +103,11 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t id = SetTimer("Hdi:RenderFrame");
     HdfAudioStartTrace("Hdi:AudioRenderFrameVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->RenderFrame(vdiRender, frame, frameLen, replyBytes);
+    AudioDfxSysEventError("RenderFrame", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
-    CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render frame fail, ret=%{public}d", ret);
         pthread_rwlock_unlock(&g_rwVdiRenderLock);
@@ -656,6 +656,7 @@ int32_t AudioRenderReqMmapBufferVdi(struct IAudioRender *render, int32_t reqSize
     desc->transferFrameSize = vdiDesc.transferFrameSize;
     desc->isShareable = vdiDesc.isShareable;
     desc->offset = vdiDesc.offset;
+    desc->syncInfoSize = vdiDesc.syncInfoSize;
     desc->filePath = strdup("");
     if (desc->filePath == NULL) {
         AUDIO_FUNC_LOGE("strdup fail");
@@ -742,7 +743,9 @@ int32_t AudioRenderStartVdi(struct IAudioRender *render)
         return HDF_ERR_INVALID_PARAM;
     }
     HdfAudioStartTrace("Hdi:AudioRenderStartVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->Start(vdiRender);
+    AudioDfxSysEventError("Render Start", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render Start fail, ret=%{public}d", ret);
@@ -766,7 +769,9 @@ int32_t AudioRenderStopVdi(struct IAudioRender *render)
         return HDF_ERR_INVALID_PARAM;
     }
     HdfAudioStartTrace("Hdi:AudioRenderStopVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->Stop(vdiRender);
+    AudioDfxSysEventError("Render Stop", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render Stop fail, ret=%{public}d", ret);

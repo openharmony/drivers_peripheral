@@ -86,6 +86,7 @@ public:
     static void UsbdDestroyLock();
     static int32_t UsbdSetFunction(uint32_t funcs);
     static int32_t UsbdGetFunction();
+    static bool IsHdcOpen();
     static int32_t UsbdUpdateFunction(uint32_t funcs);
 
 private:

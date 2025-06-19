@@ -165,7 +165,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_003, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::HIGH_FRAME_RATE)) {
         cout << "skip this test, because HIGH_FRAME_RATE not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     CreateAndCommitStreamsForHighFrameRate(cameraTest);
@@ -201,7 +201,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_004, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::HIGH_FRAME_RATE)) {
         cout << "skip this test, because HIGH_FRAME_RATE not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     CreateAndCommitStreamsForHighFrameRate(cameraTest);
@@ -286,7 +286,7 @@ static void SuperSlowMotionStatusCallback(std::shared_ptr<OHOS::Camera::HdiCommo
 {
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         CAMERA_LOGI("callback not triggered");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(data, nullptr);
@@ -342,7 +342,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_006, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_2::SLOW_MOTION)) {
         cout << "skip this test, because SLOW_MOTION not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     CreateAndCommitStreamsForSlowMotion(cameraTest);
@@ -378,7 +378,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_007, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_2::SLOW_MOTION)) {
         cout << "skip this test, because SLOW_MOTION not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     // Set callback object
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::HdiCommonV1_2::TestCameraHostCallbackV1_2();
@@ -514,7 +514,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_009, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_MOVING_PHOTO, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         printf("OHOS_ABILITY_MOVING_PHOTO is not support\n");
-        return;
+        GTEST_SKIP();
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
         CAMERA_LOGI("print tag<OHOS_ABILITY_MOVING_PHOTO> i32 value start.");
@@ -549,7 +549,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_011, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAPTURE_DURATION_SUPPORTED, &entry);
     if (cameraTest->rc != 0 || entry.data.u8[0] != 1) {
         cout << "skip this test, because OHOS_ABILITY_CAPTURE_DURATION_SUPPORTED not supported now" << endl;
-        return;
+        GTEST_SKIP();
     }
 
     // Start stream
@@ -581,7 +581,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_011, TestSize.Level1)
     sleep(UT_SECOND_TIMES);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         printf("Camera_Device_Hdi_V1_3_011 deferredImage resultMeta nullptr\n");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
     EXPECT_NE(callbackData, nullptr);
@@ -720,7 +720,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_015, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_EQUIVALENT_FOCUS, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_EQUIVALENT_FOCUS can not be find");
-        return;
+        GTEST_SKIP();
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
         EXPECT_NE(entry.data.i32, nullptr);
@@ -755,7 +755,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_016, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_CAMERA_MODES is can not be found");
-        return;
+        GTEST_SKIP();
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
         EXPECT_NE(entry.data.u8, nullptr);
@@ -810,7 +810,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_017, TestSize.Level1)
     if (!IsTagValueExistsU8(cameraTest->ability,
         OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::HIGH_RESOLUTION_PHOTO)) {
         cout << "skip this test, because HIGH_RESOLUTION_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
@@ -860,7 +860,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_018, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_CAMERA_MODES can not be found");
-        return;
+        GTEST_SKIP();
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
         EXPECT_NE(entry.data.u8, nullptr);
@@ -884,7 +884,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_019, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::CAPTURE_MACRO)) {
         cout << "skip this test, because CAPTURE_MACRO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get stream operator
@@ -942,7 +942,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_020, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_CAMERA_MODES can not be find");
-        return;
+        GTEST_SKIP();
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
         EXPECT_NE(entry.data.u8, nullptr);
@@ -966,7 +966,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_021, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::VIDEO_MACRO)) {
         cout << "skip this test, because VIDEO_MACRO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get stream operator
@@ -1122,7 +1122,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_027, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_HIGH_QUALITY_SUPPORT, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         printf("OHOS_ABILITY_HIGH_QUALITY_SUPPORT is not support\n");
-        return;
+        GTEST_SKIP();
     }
     PrintAllTagDataU8(cameraTest->ability, OHOS_ABILITY_HIGH_QUALITY_SUPPORT);
 }
@@ -1256,7 +1256,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_033, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL is not support");
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL> value start.");
     constexpr size_t step = 20; // print step
@@ -1292,7 +1292,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_034, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_AVAILABLE_CONFIGURATIONS, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_AVAILABLE_CONFIGURATIONS is not support");
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_CONFIGURATIONS> value start.");
     constexpr size_t step = 20; // print step
@@ -1328,7 +1328,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_035, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CONFLICT_CONFIGURATIONS, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_CONFLICT_CONFIGURATIONS is not support");
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("print tag<OHOS_ABILITY_CONFLICT_CONFIGURATIONS> value start.");
     constexpr size_t step = 20; // print step
@@ -1388,7 +1388,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_LIGHT_PAINTING_TYPE, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         printf("get tag<OHOS_ABILITY_LIGHT_PAINTING_TYPE> failed.\n");
-        return;
+        GTEST_SKIP();
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
@@ -1451,7 +1451,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_038, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::LIGHT_PAINTING)) {
         cout << "skip this test, because LIGHT_PAINTING not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("test Camera_Device_Hdi_V1_3_038 start.");
     EXPECT_NE(cameraTest->ability, nullptr);
@@ -1510,7 +1510,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_039, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::LIGHT_PAINTING)) {
         cout << "skip this test, because LIGHT_PAINTING not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get stream operator
@@ -1672,7 +1672,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_042, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PANORAMA_PHOTO)) {
         cout << "skip this test, because PANORAMA_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("test Camera_Device_Hdi_V1_3_042 start.");
     // Get stream operator
@@ -1725,7 +1725,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_043, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PANORAMA_PHOTO)) {
         cout << "skip this test, because PANORAMA_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("test Camera_Device_Hdi_V1_3_043 start.");
     // Get stream operator
@@ -1780,7 +1780,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_044, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PANORAMA_PHOTO)) {
         cout << "skip this test, because PANORAMA_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("test Camera_Device_Hdi_V1_3_044 start.");
     // Get stream operator
@@ -1917,7 +1917,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_047, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PANORAMA_PHOTO)) {
         cout << "skip this test, because APERTURE_VIDEO not in OHOS_ABILITY_CAMERA_MODES" << endl;
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("test Camera_Device_Hdi_V1_3_047 start.");
 
@@ -1981,7 +1981,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_048, TestSize.Level1)
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || entry.data.i32 == nullptr
         || entry.count <= 0 || entry.data.i32[0] != 1) {
         CAMERA_LOGI("OHOS_ABILITY_TRIPOD_DETECTION value error");
-        return;
+        GTEST_SKIP();
     }
     cameraTest->intents = {PREVIEW, STILL_CAPTURE};
     cameraTest->StartStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::CAPTURE);
@@ -1991,12 +1991,12 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_048, TestSize.Level1)
     sleep(3);
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
         CAMERA_LOGI("Camera_Device_Hdi_V1_3_048 onresult not be invoked.");
-        return;
+        GTEST_SKIP();
     }
     common_metadata_header_t* resultData = cameraTest->deviceCallback->resultMeta->get();
     if (resultData == nullptr) {
         CAMERA_LOGI("Camera_Device_Hdi_V1_3_048 onresult be invoked but data was nullptr.");
-        return;
+        GTEST_SKIP();
     }
     camera_metadata_item_t statusEntry;
     cameraTest->rc = FindCameraMetadataItem(resultData, OHOS_STATUS_TRIPOD_DETECTION_STATUS, &statusEntry);
@@ -2188,12 +2188,12 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_053, TestSize.Level1)
         sleep(3);
         if (cameraTest->streamOperatorCallbackV1_3->streamResultMeta == nullptr) {
             CAMERA_LOGI("Camera_Device_Hdi_V1_3_053 onresult not be invoked.");
-            return;
+            GTEST_SKIP();
         }
         common_metadata_header_t* streamData = cameraTest->streamOperatorCallbackV1_3->streamResultMeta->get();
         if (data == nullptr) {
             CAMERA_LOGI("Camera_Device_Hdi_V1_3_053 onresult be invoked but data was nullptr.");
-            return;
+            GTEST_SKIP();
         }
         FindHumanDetectResult(streamData);
         FindOtherDetectResult(streamData);

@@ -23,12 +23,13 @@ extern "C" {
 #endif // __cplusplus
 
 #define TAG_AND_LEN_BYTE 8
-#define ROOT_SECRET_LEN 32U
+#define MAX_TEMPLATE_OF_SCHEDUAL 10
 
 typedef struct {
     uint64_t scheduleId;
     uint64_t templateId;
     uint8_t pinData[CONST_PIN_DATA_LEN];
+    uint32_t pinLength;
 } PinAuthParam;
 
 typedef struct {
@@ -36,17 +37,38 @@ typedef struct {
     uint64_t templateId;
 } QueryCredential;
 
+typedef struct {
+    uint64_t scheduleId;
+    int32_t authIntent;
+    Buffer *oldRootSecret;
+    Buffer *rootSecret;
+} PinAuthFwkInfo;
+
+typedef struct {
+    uint64_t scheduleId;
+    uint64_t templateId;
+} PinAbandonParam;
+
+typedef struct {
+    uint64_t oldTemplateId;
+    uint64_t newTemplateId;
+    Buffer *oldRootSecret;
+    Buffer *newRootSecret;
+} PinAbandonExtraInfo;
+
 ResultCode DoGetAllInOneExecutorInfo(PinExecutorInfo *pinExecutorInfo);
 ResultCode DoEnrollPin(PinEnrollParam *pinEnrollParam, Buffer *retTlv);
 ResultCode DoAllInOneAuth(uint64_t scheduleId, uint64_t templateId,
     const uint8_t *extraInfo, uint32_t extraInfoSize, AlgoParamOut *algoParam);
-ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *retTlv, ResultCode *compareRet);
+ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *extra, Buffer *retTlv, ResultCode *compareRet);
 ResultCode DoDeleteTemplate(uint64_t templateId);
 ResultCode GenerateAllInOneKeyPair(void);
 void DestroyAllInOneKeyPair(void);
 ResultCode DoSetAllInOneFwkParam(
     const uint64_t *templateIdList, uint32_t templateIdListLen, const uint8_t *fwkPubKey, uint32_t fwkPubKeySize);
 ResultCode DoWriteAntiBruteInfoToFile(uint64_t templateId);
+ResultCode DoAbandonPin(PinAbandonParam *pinAbandonParam, Buffer *extraInfo, Buffer *retTlv);
+ResultCode DoRestartLockoutDuration(int32_t userId);
 
 #ifdef __cplusplus
 }

@@ -56,6 +56,8 @@
 #define WIFI_NETWORK_CONFIG_NAME_LENGTH 64
 #define WIFI_NETWORK_CONFIG_VALUE_LENGTH 2048
 #define CMD_LEN 6
+#define WPA_MAJOR_VER 2
+#define WPA_MINOR_VER 0
 
 int32_t WpaInterfaceAddNetwork(struct IWpaInterface *self, const char *ifName, int32_t *networkId);
 int32_t WpaInterfaceRemoveNetwork(struct IWpaInterface *self, const char *ifName, int32_t networkId);
@@ -111,6 +113,7 @@ int32_t WpaInterfaceGetWpaStaData(struct IWpaInterface *self, const char *ifName
 void HdfWpaDelRemoteObj(struct IWpaCallback *self);
 void ClearHdfWpaRemoteObj(void);
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);
+int32_t WpaGetVersion(struct IWpaInterface *self, uint32_t *majorVer, uint32_t *minorVer);
 pthread_mutex_t *GetInterfaceLock();
 
 struct StWpaMainParam {

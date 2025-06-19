@@ -155,7 +155,7 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_003, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_DEPTH_DATA_PROFILES, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_DEPTH_DATA_PROFILES is not support.");
-        return;
+        GTEST_SKIP();
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
         CAMERA_LOGI("print tag<OHOS_ABILITY_DEPTH_DATA_PROFILES> i32 value start.");
@@ -232,7 +232,9 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_005, TestSize.Level1)
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_LCD_FLASH, &entry);
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
-        if (entry.data.i32[0] != 1) return;
+        if (entry.data.i32[0] != 1) {
+            GTEST_SKIP();
+        }
         FillFrontCaptureSetting(cameraTest);
         cameraTest->intents = {PREVIEW, STILL_CAPTURE};
         cameraTest->StartStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::CAPTURE);
@@ -249,18 +251,20 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_005, TestSize.Level1)
         sleep(3);
         if (cameraTest->deviceCallback->resultMeta == nullptr) {
             CAMERA_LOGI("Camera_Device_Hdi_V1_3_049 onresult not be invoked.");
-            return;
+            GTEST_SKIP();
         }
         // 返回结果是否需要环形补光
         common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
         if (data == nullptr) {
             CAMERA_LOGI("Camera_Device_Hdi_V1_3_049 onresult be invoked but data was nullptr.");
-            return;
+            GTEST_SKIP();
         }
         camera_metadata_item_t entry;
         cameraTest->rc = FindCameraMetadataItem(data, OHOS_STATUS_LCD_FLASH_STATUS, &entry);
         if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
-            if (!entry.data.i32[0]) return;
+            if (!entry.data.i32[0]) {
+                GTEST_SKIP();
+            }
             // 使能环形补光
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
             uint8_t lcdFlash = 1;

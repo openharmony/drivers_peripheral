@@ -23,6 +23,7 @@ ohos_unittest("audio_ut_common_test") {
     "manager/audio_manager_common_test.cpp",
     "render/audio_render_common_test.cpp",
     "render/audio_render_mmap_test.cpp",
+    "types/audio_types_test.cpp",
   ]
   if (!drivers_peripheral_audio_feature_community) {
     sources += [
@@ -39,7 +40,7 @@ ohos_unittest("audio_ut_common_test") {
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
-    "drivers_interface_audio:libaudio_proxy_4.0",
+    "drivers_interface_audio:libaudio_proxy_5.0",
     "hdf_core:libhdf_utils",
   ]
   if (defined(ohos_lite)) {

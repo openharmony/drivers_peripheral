@@ -23,7 +23,7 @@ namespace {
         uint32_t port;
         int32_t tunneledComp;
         uint32_t tunneledPort;
-        struct OHOS::HDI::Codec::V3_0::CodecTunnelSetupType tunnelSetup;
+        struct OHOS::HDI::Codec::V4_0::CodecTunnelSetupType tunnelSetup;
     };
 }
 
@@ -51,8 +51,8 @@ namespace Codec {
             return false;
         }
 
-        const struct OHOS::HDI::Codec::V3_0::CodecTunnelSetupType inTunnelSetup = params.tunnelSetup;
-        struct OHOS::HDI::Codec::V3_0::CodecTunnelSetupType outTunnelSetup;
+        const struct OHOS::HDI::Codec::V4_0::CodecTunnelSetupType inTunnelSetup = params.tunnelSetup;
+        struct OHOS::HDI::Codec::V4_0::CodecTunnelSetupType outTunnelSetup;
 
         int32_t ret = g_component->ComponentTunnelRequest(params.port, params.tunneledComp,
             params.tunneledPort, inTunnelSetup, outTunnelSetup);

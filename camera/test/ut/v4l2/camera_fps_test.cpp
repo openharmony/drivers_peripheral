@@ -64,7 +64,7 @@ static HWTEST_F(CameraFpsTest, camera_fps_001, TestSize.Level1)
     // get camera ability
     if (cameraBase_->ability == nullptr) {
         CAMERA_LOGE("ability is null.");
-        return;
+        GTEST_SKIP();
     }
     GetFpsRange(cameraBase_->ability);
 

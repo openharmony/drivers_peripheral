@@ -15,16 +15,16 @@
 
 #include "vibratorstart_fuzzer.h"
 #include "hdf_base.h"
-#include "v1_1/vibrator_interface_proxy.h"
+#include "v2_0/vibrator_interface_proxy.h"
 
-using namespace OHOS::HDI::Vibrator::V1_1;
+using namespace OHOS::HDI::Vibrator::V2_0;
 
 namespace OHOS {
     bool VibratorStartFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         sptr<IVibratorInterface> g_vibratorInterface = IVibratorInterface::Get();
-        if (!g_vibratorInterface->Start(reinterpret_cast<const std::string &>(data))) {
+        if (!g_vibratorInterface->Start({-1, 1}, reinterpret_cast<const std::string &>(data))) {
             result = true;
         }
         return result;

@@ -21,18 +21,19 @@
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_4 {
+namespace V1_5 {
 static std::mutex mutex_;
 static sptr<V1_1::IRilCallback> callback1_1_;
 static sptr<V1_2::IRilCallback> callback1_2_;
 static sptr<V1_3::IRilCallback> callback1_3_;
-static sptr<V1_4::IRilCallback> callback_;
+static sptr<V1_4::IRilCallback> callback1_4_;
+static sptr<V1_5::IRilCallback> callback_;
 namespace {
 sptr<RilImpl::RilDeathRecipient> g_deathRecipient = nullptr;
 }
 extern "C" IRil *RilImplGetInstance(void)
 {
-    using OHOS::HDI::Ril::V1_4::RilImpl;
+    using OHOS::HDI::Ril::V1_5::RilImpl;
     RilImpl *service = new (std::nothrow) RilImpl();
     if (service == nullptr) {
         return nullptr;
@@ -499,6 +500,11 @@ int32_t RilImpl::SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback)
 
 int32_t RilImpl::SetCallback1_4(const sptr<V1_4::IRilCallback> &rilCallback)
 {
+    return HDF_SUCCESS;
+}
+
+int32_t RilImpl::SetCallback1_5(const sptr<V1_5::IRilCallback> &rilCallback)
+{
     std::lock_guard<std::mutex> lock(mutex_);
     callback_ = rilCallback;
     if (callback_ == nullptr) {
@@ -507,7 +513,7 @@ int32_t RilImpl::SetCallback1_4(const sptr<V1_4::IRilCallback> &rilCallback)
     }
     g_deathRecipient = new RilDeathRecipient(this);
     if (g_deathRecipient == nullptr) {
-        HDF_LOGE("SetCallback1_4 fail g_deathRecipient is null");
+        HDF_LOGE("SetCallback1_5 fail g_deathRecipient is null");
         return HDF_FAILURE;
     }
     AddRilDeathRecipient(callback_);
@@ -633,6 +639,16 @@ int32_t RilImpl::UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockTyp
 int32_t RilImpl::SendSimMatchedOperatorInfo(int32_t slotId, int32_t serialId, const NcfgOperatorInfo &ncfgOperatorInfo)
 {
     return TaskSchedule(&Telephony::HRilManager::SendSimMatchedOperatorInfo, slotId, serialId, ncfgOperatorInfo);
+}
+
+int32_t RilImpl::GetPrimarySlot(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetPrimarySlot, slotId, serialId);
+}
+
+int32_t RilImpl::SetPrimarySlot(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetPrimarySlot, slotId, serialId);
 }
 
 // Sms
@@ -766,7 +782,7 @@ int32_t RilImpl::Init()
 {
     return HDF_SUCCESS;
 }
-} // namespace V1_4
+} // namespace V1_5
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS

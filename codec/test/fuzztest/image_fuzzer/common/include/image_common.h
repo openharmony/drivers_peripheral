@@ -15,7 +15,7 @@
 
 #ifndef IMAGE_COMMON_H
 #define IMAGE_COMMON_H
-#include "v2_0/codec_image_type.h"
+#include "v2_1/codec_image_type.h"
 namespace OHOS {
 namespace Codec {
 namespace Image {
@@ -33,7 +33,7 @@ static const int32_t DATA_PTS = 200;
 static const int32_t DATA_FLAG = 300;
 static const int32_t TESTING_APP_DATA = 33;
 
-void FillDataImageBuffer(HDI::Codec::Image::V2_0::CodecImageBuffer &dataFuzz)
+void FillDataImageBuffer(HDI::Codec::Image::V2_1::CodecImageBuffer &dataFuzz)
 {
     dataFuzz.id = DATA_BUFFERID;
     dataFuzz.size = DATA_SIZE;

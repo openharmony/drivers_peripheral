@@ -119,7 +119,7 @@ void HdiCommon::GetCameraMetadata()
 
 void HdiCommon::Open()
 {
-    if (cameraDevice == nullptr) {
+    if (cameraDevice == nullptr  && service != nullptr) {
         service->GetCameraIds(cameraIds);
         if (cameraIds.size() == 0) {
             printf("camera device list empty\n");

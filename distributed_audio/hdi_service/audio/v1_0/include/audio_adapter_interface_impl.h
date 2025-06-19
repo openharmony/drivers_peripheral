@@ -123,6 +123,7 @@ private:
     int32_t HandleSANotifyEvent(const uint32_t streamId, const DAudioEvent &event);
     int32_t WaitForSANotify(const uint32_t streamId, const AudioDeviceEvent &event);
     int32_t HandleDeviceClosed(const uint32_t streamId, const DAudioEvent &event);
+    int32_t HandleRenderCallback(const DAudioEvent &event);
     int32_t getEventTypeFromCondition(const std::string& condition);
     sptr<AudioRenderInterfaceImplBase> CreateRenderImpl(const AudioDeviceDescriptor &desc,
         const AudioSampleAttributes &attrs, int32_t renderId);

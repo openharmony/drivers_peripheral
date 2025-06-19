@@ -136,7 +136,7 @@ static HWTEST_F(CameraAbilityTest, camera_ability_001, TestSize.Level1)
     EXPECT_EQ(true, cameraBase_->ability != nullptr);
     if (cameraBase_->ability == nullptr) {
         CAMERA_LOGE("ability is null.");
-        return;
+        GTEST_SKIP();
     }
     GetSensorOrientation(cameraBase_->ability);
     GetFlashAvailable(cameraBase_->ability);

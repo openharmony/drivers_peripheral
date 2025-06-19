@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include "hdf_base.h"
 #include "osal_mem.h"
-#include "v4_0/iaudio_manager.h"
+#include "v5_0/iaudio_manager.h"
 
 using namespace testing::ext;
 using namespace std;

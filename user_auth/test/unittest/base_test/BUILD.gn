@@ -51,13 +51,13 @@ ohos_unittest("UserAuthBaseTest") {
     "src/key_mgr_test.cpp",
   ]
 
-  deps = [ "../../../hdi_service:libuser_auth_interface_service_3.0" ]
+  deps = [ "../../../hdi_service:libuser_auth_interface_service_4.0" ]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_user_auth:libuser_auth_proxy_3.0",
+    "drivers_interface_user_auth:libuser_auth_proxy_4.0",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",

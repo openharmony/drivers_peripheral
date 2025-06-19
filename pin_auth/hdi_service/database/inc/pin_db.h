@@ -28,14 +28,22 @@ extern "C" {
 #define INIT_START_FREEZE_TIMES 0
 #define CONST_PIN_DATA_LEN 64U
 #define CONST_SALT_LEN 32U
-#define RESULT_TLV_LEN 240U
+#define RESULT_TLV_LEN 2048U
 
 typedef struct {
     uint64_t scheduleId;
     uint64_t subType;
     uint8_t salt[CONST_SALT_LEN];
     uint8_t pinData[CONST_PIN_DATA_LEN];
+    uint32_t pinLength;
 } __attribute__((__packed__)) PinEnrollParam;
+
+typedef struct {
+    uint64_t oldTemplateId;
+    uint64_t curTemplateId;
+    uint64_t newTemplateId;
+    Buffer *newRootSecret;
+} __attribute__((__packed__)) AbandonCacheParam;
 
 bool LoadPinDb(void);
 void DestroyPinDb(void);
@@ -45,7 +53,8 @@ ResultCode DoGetAlgoParameter(uint64_t templateId, uint8_t *salt, uint32_t *salt
 ResultCode DoGenerateAlgoParameter(uint8_t *algoParameter, uint32_t *algoParameterLength, uint32_t *algoVersion,
     uint8_t *localDeviceId, uint32_t deviceUuidLength);
 ResultCode DelPinById(uint64_t templateId);
-ResultCode AuthPinById(const Buffer *inputPinData, uint64_t templateId, Buffer *outRootSecret, ResultCode *compareRet);
+ResultCode AuthPinById(const Buffer *inputPinData, uint64_t templateId, uint32_t pinLength,
+    Buffer *outRootSecret, ResultCode *compareRet);
 ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *freezeTime, uint32_t count, uint64_t startFreezeTime);
 ResultCode GetRemainTimes(uint64_t templateId, uint32_t *remainingAuthTimes, uint32_t authErrorCount);
 ResultCode GetSubType(uint64_t templateId, uint64_t *subType);
@@ -53,7 +62,15 @@ ResultCode GetAntiBruteInfo(uint64_t templateId, uint32_t *authErrorCount, uint6
 ResultCode RefreshAntiBruteInfoToFile(uint64_t templateId);
 ResultCode VerifyTemplateDataPin(const uint64_t *templateIdList, uint32_t templateIdListLen);
 int32_t GetNextFailLockoutDuration(uint32_t authErrorCount);
-
+Buffer *GetRootSecretPlainInfo(Buffer *oldRootSecret, const Buffer *cipherInfo);
+Buffer *GenerateDecodeRootSecret(uint64_t templateId, Buffer *oldRootSecret);
+ResultCode Abandon(uint64_t oldTemplateId, uint64_t newTemplateId, Buffer *oldRootSecret, Buffer *newRootSecret);
+void DestroyAbandonParam(void);
+ResultCode WriteRootSecretFile(uint64_t templateId, uint64_t newTemplateId, Buffer *ciperInfo);
+ResultCode ReadRootSecretFile(uint64_t templateId, uint64_t *newTemplateId, Buffer **ciperInfo);
+ResultCode ReWriteRootSecretFile(uint64_t templateId);
+ResultCode GetCredentialLength(uint64_t templateId, uint32_t *credentialLength);
+ResultCode RestartLockoutDurationByUserId(int32_t userId);
 #ifdef __cplusplus
 }
 #endif // __cplusplus

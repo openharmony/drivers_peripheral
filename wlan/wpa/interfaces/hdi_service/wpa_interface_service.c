@@ -123,7 +123,7 @@ struct IWpaInterface *WpaInterfaceImplGetInstance(void)
 
     service->interface.VendorProcessCmd = WpaInterfaceVendorExtProcessCmd;
     service->interface.GetWpaStaData = WpaInterfaceGetWpaStaData;
-
+    service->interface.GetVersion = WpaGetVersion;
     return &service->interface;
 }
 

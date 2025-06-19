@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,7 @@ namespace Audio {
 namespace V1_0 {
 using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
 using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioHdfCallback;
 
 typedef struct {
     std::string adapterName;
@@ -42,6 +43,7 @@ typedef struct {
     uint32_t deviceType;
     uint32_t volGroupId;
     uint32_t iptGroupId;
+    std::string caps;
 } DAudioDevEvent;
 
 class AudioManagerInterfaceImpl : public IAudioManager {
@@ -69,6 +71,8 @@ public:
     int32_t Notify(const std::string &adpName, const uint32_t devId,
         const uint32_t streamId, const DAudioEvent &event);
     void SetDeviceObject(struct HdfDeviceObject *deviceObject);
+    int32_t RegisterAudioHdfListener(const std::string &serviceName, const sptr<IDAudioHdfCallback> &callbackObj);
+    int32_t UnRegisterAudioHdfListener(const std::string &serviceName);
 
 private:
     AudioManagerInterfaceImpl();
@@ -77,6 +81,10 @@ private:
     sptr<IRemoteObject> GetRemote(const std::string &adpName);
     sptr<AudioAdapterInterfaceImpl> GetAdapterFromMap(const std::string &adpName);
     int32_t AddAudioDeviceInner(const uint32_t dhId, const DAudioDevEvent &event);
+    int32_t AddClearRegisterRecipient(sptr<IRemoteObject> &remote,
+        const std::string &deviceId, uint32_t dhId);
+    int32_t RemoveClearRegisterRecipient(sptr<IRemoteObject> &remote,
+        const std::string &deviceId, uint32_t dhId);
 
 private:
     class Deletor {
@@ -88,6 +96,30 @@ private:
             }
         };
     };
+
+    class ClearRegisterRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit ClearRegisterRecipient(const std::string &deviceId, uint32_t dhId)
+            : deviceId_(deviceId), dhId_(dhId)
+        {
+        }
+        bool IsNeedErase()
+        {
+            return needErase_;
+        }
+        bool IsMatch(const std::string &deviceId, uint32_t dhId)
+        {
+            return (deviceId == deviceId_) && (dhId == dhId_);
+        }
+    protected:
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+    private:
+        std::string deviceId_;
+        uint32_t dhId_;
+        bool needErase_ = false;
+    };
+    std::mutex clearRegisterRecipientsMtx_;
+    std::vector<sptr<ClearRegisterRecipient>> clearRegisterRecipients_;
 
     class AudioManagerRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -105,6 +137,8 @@ private:
     std::map<std::string, sptr<AudioAdapterInterfaceImpl>> mapAudioAdapter_;
     std::map<std::string, sptr<IDAudioCallback>> mapAudioCallback_;
     std::map<std::string, bool> mapAddFlags_;
+    std::mutex hdfCallbackMapMtx_;
+    std::map<std::string, sptr<IDAudioHdfCallback>> mapAudioHdfCallback_;
 };
 } // V1_0
 } // Audio

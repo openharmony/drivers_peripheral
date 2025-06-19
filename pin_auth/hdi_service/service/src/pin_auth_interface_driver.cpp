@@ -17,7 +17,7 @@
 #include <hdf_device_desc.h>
 #include <hdf_sbuf_ipc.h>
 
-#include "v2_1/pin_auth_interface_stub.h"
+#include "v3_0/pin_auth_interface_stub.h"
 
 #include "pin_auth.h"
 #include "pin_auth_hdi.h"
@@ -103,7 +103,7 @@ int HdfPinAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfPinAuthInterfaceHost->ioService.Open = NULL;
     hdfPinAuthInterfaceHost->ioService.Release = NULL;
 
-    auto serviceImpl = OHOS::HDI::PinAuth::V2_1::IPinAuthInterface::Get(true);
+    auto serviceImpl = OHOS::HDI::PinAuth::V3_0::IPinAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
         IAM_LOGE("failed to get of implement service");
         delete hdfPinAuthInterfaceHost;
@@ -111,7 +111,7 @@ int HdfPinAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfPinAuthInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(
-        serviceImpl, OHOS::HDI::PinAuth::V2_1::IPinAuthInterface::GetDescriptor());
+        serviceImpl, OHOS::HDI::PinAuth::V3_0::IPinAuthInterface::GetDescriptor());
     if (hdfPinAuthInterfaceHost->stub == nullptr) {
         IAM_LOGE("failed to get stub object");
         delete hdfPinAuthInterfaceHost;

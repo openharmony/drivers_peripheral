@@ -27,7 +27,10 @@ ohos_systemtest("hdf_audio_idlhdi_render_hardware_dependence_test") {
   ]
   include_dirs = [ "./../../../common/hdi_service_common/include" ]
   external_deps = [
-    "drivers_interface_audio:libaudio_proxy_4.0",
+    "bounds_checking_function:libsec_shared",
+    "drivers_interface_audio:libaudio_proxy_5.0",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hdf_core:libhdf_utils",
   ]
   if (defined(ohos_lite)) {
@@ -35,10 +38,7 @@ ohos_systemtest("hdf_audio_idlhdi_render_hardware_dependence_test") {
   } else {
     external_deps += [ "hilog:libhilog" ]
   }
-  deps = [
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = []
   defines = []
   if (enable_audio_adm_passthrough) {
     defines += [ "AUDIO_ADM_PASSTHROUGH" ]

@@ -12,5 +12,5 @@
 # limitations under the License.
 
 declare_args() {
-  linux_serial_enable = false
+  linux_serial_enable = true
 }

@@ -334,6 +334,8 @@ IAM_STATIC bool IsCredentialIdDuplicate(LinkedList *userInfoList, uint64_t crede
     (void)userInfoList;
     CredentialCondition condition = {};
     SetCredentialConditionCredentialId(&condition, credentialId);
+    SetCredentialConditionNeedCachePin(&condition);
+    SetCredentialConditionNeedAbandonPin(&condition);
     LinkedList *credList = QueryCredentialLimit(&condition);
     if (credList == NULL) {
         LOG_ERROR("query failed");
@@ -711,7 +713,7 @@ ResultCode DeleteCredentialInfo(int32_t userId, uint64_t credentialId, Credentia
         LOG_ERROR("copy failed");
         return RESULT_BAD_COPY;
     }
-    if (credentialInfo->authType == PIN_AUTH) {
+    if (credentialInfo->authType == PIN_AUTH && !credentialInfo->isAbandoned) {
         return DeletePinCredentialInfo(user);
     }
     ResultCode ret = credentialList->remove(credentialList, &credentialId, MatchCredentialById, true);
@@ -777,14 +779,21 @@ IAM_STATIC CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, Linke
     return credentialInfo;
 }
 
-// do not cotain cache pin credential
-IAM_STATIC bool IsCredMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
+IAM_STATIC bool IsCredentialIdMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
 {
     if ((limit->conditionFactor & CREDENTIAL_CONDITION_CREDENTIAL_ID) != 0 &&
         limit->credentialId != credentialInfo->credentialId) {
         return false;
     }
+    return true;
+}
+
+IAM_STATIC bool IsAuthTypeMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
+{
     if (credentialInfo->authType == DEFAULT_AUTH_TYPE) {
+        if ((limit->conditionFactor & CREDENTIAL_CONDITION_CACHE_PIN) != 0) {
+            return true;
+        }
         if ((limit->conditionFactor & CREDENTIAL_CONDITION_NEED_CACHE_PIN) == 0) {
             return false;
         }
@@ -793,18 +802,78 @@ IAM_STATIC bool IsCredMatch(const CredentialCondition *limit, const CredentialIn
             limit->authType != credentialInfo->authType) {
             return false;
         }
+        if ((limit->conditionFactor & CREDENTIAL_CONDITION_CACHE_PIN) != 0) {
+            return false;
+        }
     }
+    return true;
+}
+
+IAM_STATIC bool IsTemplateIdMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
+{
     if ((limit->conditionFactor & CREDENTIAL_CONDITION_TEMPLATE_ID) != 0 &&
         limit->templateId != credentialInfo->templateId) {
         return false;
     }
+    return true;
+}
+
+IAM_STATIC bool IsExecutorSensorHintMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
+{
     if ((limit->conditionFactor & CREDENTIAL_CONDITION_SENSOR_HINT) != 0 &&
         limit->executorSensorHint != INVALID_SENSOR_HINT &&
         limit->executorSensorHint != credentialInfo->executorSensorHint) {
         return false;
     }
+    return true;
+}
+
+IAM_STATIC bool IsExecutorMatcherMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
+{
     if ((limit->conditionFactor & CREDENTIAL_CONDITION_EXECUTOR_MATCHER) != 0 &&
         limit->executorMatcher != credentialInfo->executorMatcher) {
+        return false;
+    }
+    return true;
+}
+
+IAM_STATIC bool IsAbandonedMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
+{
+    if ((limit->conditionFactor & CREDENTIAL_CONDITION_ABANDON) != 0) {
+        if (credentialInfo->isAbandoned) {
+            return true;
+        }
+        return false;
+    }
+    if ((limit->conditionFactor & CREDENTIAL_CONDITION_NEED_ABANDON) != 0) {
+        return true;
+    }
+    if (!credentialInfo->isAbandoned) {
+        return true;
+    }
+
+    return false;
+}
+
+// do not cotain cache pin credential
+IAM_STATIC bool IsCredMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
+{
+    if (!IsCredentialIdMatch(limit, credentialInfo)) {
+        return false;
+    }
+    if (!IsAuthTypeMatch(limit, credentialInfo)) {
+        return false;
+    }
+    if (!IsTemplateIdMatch(limit, credentialInfo)) {
+        return false;
+    }
+    if (!IsExecutorSensorHintMatch(limit, credentialInfo)) {
+        return false;
+    }
+    if (!IsExecutorMatcherMatch(limit, credentialInfo)) {
+        return false;
+    }
+    if (!IsAbandonedMatch(limit, credentialInfo)) {
         return false;
     }
     return true;
@@ -909,6 +978,7 @@ ResultCode QueryCredentialUserId(uint64_t credentialId, int32_t *userId)
     LinkedListNode *temp = g_userInfoList->head;
     CredentialCondition condition = {};
     SetCredentialConditionCredentialId(&condition, credentialId);
+    SetCredentialConditionNeedAbandonPin(&condition);
     while (temp != NULL) {
         UserInfo *user = (UserInfo *)temp->data;
         if (user == NULL) {
@@ -1020,13 +1090,40 @@ void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId
     condition->conditionFactor |= CREDENTIAL_CONDITION_USER_ID;
 }
 
-void SetCredentiaConditionNeedCachePin(CredentialCondition *condition)
+void SetCredentialConditionNeedCachePin(CredentialCondition *condition)
 {
     if (condition == NULL) {
         LOG_ERROR("condition is null");
         return;
     }
     condition->conditionFactor |= CREDENTIAL_CONDITION_NEED_CACHE_PIN;
+}
+
+void SetCredentialConditionNeedAbandonPin(CredentialCondition *condition)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->conditionFactor |= CREDENTIAL_CONDITION_NEED_ABANDON;
+}
+
+void SetCredentialConditionAbandonPin(CredentialCondition *condition)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->conditionFactor |= CREDENTIAL_CONDITION_ABANDON;
+}
+
+void SetCredentialConditionCachePin(CredentialCondition *condition)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->conditionFactor |= CREDENTIAL_CONDITION_CACHE_PIN;
 }
 
 IAM_STATIC bool IsUserValid(UserInfo *user)
@@ -1080,6 +1177,8 @@ IAM_STATIC ResultCode GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCou
         if (isRemoved) {
             *cachePinRemoved = true;
         }
+        CredentialInfoHal credentialInfo = {};
+        (void)ClearAbandonExpiredCredential(user->userId, &credentialInfo);
     }
 
     g_userInfoList->destroyIterator(iterator);
@@ -1323,21 +1422,40 @@ IAM_STATIC ResultCode QueryPinCredential(int32_t userId, CredentialInfoHal *pinC
     return RESULT_SUCCESS;
 }
 
+ResultCode QueryPinExpiredInfo(int64_t *pinExpiredPeriod)
+{
+    if (pinExpiredPeriod == NULL) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
+        if (g_globalConfigArray[i].type == PIN_EXPIRED_PERIOD) {
+            *pinExpiredPeriod = g_globalConfigArray[i].value.pinExpiredPeriod;
+            break;
+        }
+    }
+    if (*pinExpiredPeriod <= 0) {
+        *pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
+        LOG_INFO("no need check pinExpiredPeriod");
+        return RESULT_SUCCESS;
+    }
+    return RESULT_SUCCESS;
+}
+
 ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo)
 {
+    LOG_INFO("start");
     if (expiredInfo == NULL) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
     (void)memset_s(expiredInfo, sizeof(PinExpiredInfo), 0, sizeof(PinExpiredInfo));
-    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
-        if (g_globalConfigArray[i].type == PIN_EXPIRED_PERIOD) {
-            expiredInfo->pinExpiredPeriod = g_globalConfigArray[i].value.pinExpiredPeriod;
-            break;
-        }
+    ResultCode ret = QueryPinExpiredInfo(&(expiredInfo->pinExpiredPeriod));
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("QueryPinExpiredInfo fail");
+        return ret;
     }
-    if (expiredInfo->pinExpiredPeriod <= 0) {
-        expiredInfo->pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
+    if (expiredInfo->pinExpiredPeriod == NO_CHECK_PIN_EXPIRED_PERIOD) {
         LOG_INFO("no need check pinExpiredPeriod");
         return RESULT_SUCCESS;
     }
@@ -1371,4 +1489,324 @@ bool GetEnableStatus(int32_t userId, uint32_t authType)
         return (!g_globalConfigArray[infoIndex].value.enableStatus);
     }
     return true;
+}
+
+ResultCode QueryAbandonCredential(int32_t userId, LinkedList **creds)
+{
+    if (creds == NULL) {
+        LOG_ERROR("creds is null");
+        return RESULT_BAD_PARAM;
+    }
+    CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, userId);
+    SetCredentialConditionAbandonPin(&condition);
+    *creds = QueryCredentialLimit(&condition);
+    if (*creds == NULL) {
+        LOG_ERROR("query credential failed");
+        return RESULT_UNKNOWN;
+    }
+    LOG_INFO("query abandon credential success");
+    return RESULT_SUCCESS;
+}
+
+ResultCode GetCredentialListByAuthType(int32_t userId, uint32_t authType, LinkedList **creds)
+{
+    if (creds == NULL) {
+        LOG_ERROR("creds is null");
+        return RESULT_BAD_PARAM;
+    }
+    CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, userId);
+    SetCredentialConditionAuthType(&condition, authType);
+
+    *creds = QueryCredentialLimit(&condition);
+    if (*creds == NULL) {
+        LOG_ERROR("query credential failed");
+        return RESULT_UNKNOWN;
+    }
+    LOG_INFO("query credential success");
+    return RESULT_SUCCESS;
+}
+
+ResultCode GetCredentialListByCachePin(int32_t userId, LinkedList **creds)
+{
+    if (creds == NULL) {
+        LOG_ERROR("creds is null");
+        return RESULT_BAD_PARAM;
+    }
+    CredentialCondition condition = {};
+    SetCredentialConditionCachePin(&condition);
+
+    *creds = QueryCredentialLimit(&condition);
+    if (*creds == NULL) {
+        LOG_ERROR("query credential failed");
+        return RESULT_UNKNOWN;
+    }
+    LOG_INFO("query cache credential success");
+    return RESULT_SUCCESS;
+}
+
+ResultCode GetCredentialListByAbandonFlag(int32_t userId, uint32_t authType, LinkedList **creds)
+{
+    if (creds == NULL) {
+        LOG_ERROR("creds is null");
+        return RESULT_BAD_PARAM;
+    }
+    CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, userId);
+    if (authType != DEFAULT_AUTH_TYPE) {
+        SetCredentialConditionAuthType(&condition, authType);
+        SetCredentialConditionAbandonPin(&condition);
+    }
+
+    *creds = QueryCredentialLimit(&condition);
+    if (*creds == NULL) {
+        LOG_ERROR("query credential failed");
+        return RESULT_UNKNOWN;
+    }
+    LOG_INFO("query abandon credential success");
+    return RESULT_SUCCESS;
+}
+
+ResultCode GetCredentialByUserIdAndCredId(int32_t userId, uint64_t credentialId, CredentialInfoHal *credentialInfo)
+{
+    UserInfo *user = QueryUserInfo(userId);
+    if (user == NULL) {
+        LOG_ERROR("user is null, usrId:%{public}d", userId);
+        return RESULT_NOT_ENROLLED;
+    }
+
+    if (user->credentialInfoList == NULL) {
+        LOG_ERROR("credentialInfoList is null, usrId:%{public}d", userId);
+        return RESULT_NOT_ENROLLED;
+    }
+
+    CredentialInfoHal *temp = QueryCredentialById(credentialId, user->credentialInfoList);
+    if (temp == NULL) {
+        LOG_ERROR("QueryCredentialById failed, usrId:%{public}d", userId);
+        return RESULT_NOT_ENROLLED;
+    }
+
+    if (memcpy_s(credentialInfo, sizeof(CredentialInfoHal), temp, sizeof(CredentialInfoHal)) != EOK) {
+        LOG_ERROR("bad copy");
+        return RESULT_BAD_COPY;
+    }
+
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC void FindCredential(UserInfo *user, CredentialInfoHal **oldCredential,
+    CredentialInfoHal **curCredential, CredentialInfoHal **newCredential)
+{
+    LinkedListNode *temp = user->credentialInfoList->head;
+    while (temp != NULL) {
+        CredentialInfoHal *nodeData = (CredentialInfoHal*)temp->data;
+        if (nodeData == NULL) {
+            temp = temp->next;
+            continue;
+        }
+        if (nodeData->authType == PIN_AUTH && nodeData->isAbandoned) {
+            *oldCredential = nodeData;
+        }
+        if (nodeData->authType == PIN_AUTH && !nodeData->isAbandoned) {
+            *curCredential = nodeData;
+        }
+        if (nodeData->authType == DEFAULT_AUTH_TYPE) {
+            *newCredential = nodeData;
+        }
+        temp = temp->next;
+    }
+    return;
+}
+
+ResultCode UpdateAbandonResultForReset(int32_t userId, bool *isDelete, CredentialInfoHal *credentialInfo)
+{
+    UserInfo *user = QueryUserInfo(userId);
+    if (user == NULL) {
+        LOG_ERROR("user is null, usrId:%{public}d", userId);
+        return RESULT_BAD_PARAM;
+    }
+
+    CredentialInfoHal *oldCredential = NULL;
+    CredentialInfoHal *curCredential = NULL;
+    CredentialInfoHal *newCredential = NULL;
+    FindCredential(user, &oldCredential, &curCredential, &newCredential);
+    if (oldCredential == NULL || curCredential == NULL || newCredential == NULL) {
+        LOG_ERROR("oldCredential, curCredential or newCredential is not exist");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    *isDelete = true;
+    *credentialInfo = *curCredential;
+    uint64_t abandonTime = oldCredential->abandonedSysTime;
+    oldCredential->abandonedSysTime = GetReeTime();
+    curCredential->authType = DEFAULT_AUTH_TYPE;
+    newCredential->authType = PIN_AUTH;
+    SwitchSubType(user);
+    ResultCode result = UpdateFileInfo(g_userInfoList);
+    if (result == RESULT_SUCCESS) {
+        LOG_INFO("switch cache pin success");
+        ClearCachePin(user->userId);
+        return result;
+    }
+    LOG_ERROR("switch cache pin fail");
+    curCredential->authType = PIN_AUTH;
+    newCredential->authType = DEFAULT_AUTH_TYPE;
+    oldCredential->abandonedSysTime = abandonTime;
+    SwitchSubType(user);
+    *isDelete = false;
+    return RESULT_GENERAL_ERROR;
+}
+
+ResultCode UpdateAbandonResultForUpdate(int32_t userId, bool *isDelete, CredentialInfoHal *credentialInfo)
+{
+    UserInfo *user = QueryUserInfo(userId);
+    if (user == NULL) {
+        LOG_ERROR("user is null, usrId:%{public}d", userId);
+        return RESULT_BAD_PARAM;
+    }
+
+    CredentialInfoHal *oldCredential = NULL;
+    CredentialInfoHal *curCredential = NULL;
+    CredentialInfoHal *newCredential = NULL;
+    FindCredential(user, &oldCredential, &curCredential, &newCredential);
+    if (curCredential == NULL || newCredential == NULL) {
+        LOG_ERROR("curCredential or newCredential is not exist");
+        return RESULT_GENERAL_ERROR;
+    }
+    newCredential->authType = PIN_AUTH;
+    curCredential->isAbandoned = true;
+    curCredential->abandonedSysTime = GetReeTime();
+    if (oldCredential != NULL) {
+        *isDelete = true;
+        *credentialInfo = *oldCredential;
+        oldCredential->authType = DEFAULT_AUTH_TYPE;
+    }
+
+    SwitchSubType(user);
+    ResultCode result = UpdateFileInfo(g_userInfoList);
+    if (result == RESULT_SUCCESS) {
+        LOG_INFO("switch cache pin success");
+        ClearCachePin(user->userId);
+        return result;
+    }
+    LOG_ERROR("switch cache pin fail");
+    curCredential->isAbandoned = false;
+    curCredential->abandonedSysTime = 0;
+    newCredential->authType = DEFAULT_AUTH_TYPE;
+    if (oldCredential != NULL) {
+        oldCredential->authType = PIN_AUTH;
+    }
+    SwitchSubType(user);
+    *isDelete = false;
+    return RESULT_GENERAL_ERROR;
+}
+
+bool IsAbandonCredentialExpired(const CredentialInfoHal *credentialInfo)
+{
+    if (!credentialInfo->isAbandoned) {
+        LOG_INFO("isAbandoned is false");
+        return false;
+    }
+
+    uint64_t currentTime = GetReeTime();
+    if (currentTime < credentialInfo->abandonedSysTime) {
+        LOG_INFO("crdential abandoned time is error");
+        return true;
+    }
+
+    if (currentTime > credentialInfo->abandonedSysTime &&
+        currentTime - credentialInfo->abandonedSysTime > ABANDON_PIN_VALID_PERIOD) {
+        LOG_INFO("crdential is abandoned");
+        return true;
+    }
+
+    return false;
+}
+
+int64_t CalcAbandonCredentialValidPeriod(const CredentialInfoHal *credentialInfo)
+{
+    LOG_INFO("start");
+    if (IsAbandonCredentialExpired(credentialInfo)) {
+        LOG_INFO("crdential is Expired");
+        return 0;
+    }
+
+    if (credentialInfo->abandonedSysTime + ABANDON_PIN_VALID_PERIOD <= UINT64_MAX) {
+        return credentialInfo->abandonedSysTime + ABANDON_PIN_VALID_PERIOD - GetReeTime();
+    }
+
+    return ABANDON_PIN_VALID_PERIOD;
+}
+
+int64_t CalcCredentialValidPeriod(const CredentialInfoHal *credentialInfo)
+{
+    LOG_INFO("start");
+    if (credentialInfo->isAbandoned) {
+        return CalcAbandonCredentialValidPeriod(credentialInfo);
+    }
+
+    int64_t pinExpiredPeriod = 0;
+    ResultCode ret = QueryPinExpiredInfo(&pinExpiredPeriod);
+    if (ret != RESULT_SUCCESS) {
+        LOG_INFO("QueryPinExpiredInfo fail, ret:%{public}u", ret);
+        return 0;
+    }
+
+    if (pinExpiredPeriod == NO_CHECK_PIN_EXPIRED_PERIOD) {
+        return NO_SET_PIN_EXPIRED_PERIOD;
+    }
+
+    uint64_t currentTime = GetReeTime();
+    if (currentTime < credentialInfo->enrolledSysTime) {
+        return 0;
+    }
+
+    if (currentTime > credentialInfo->enrolledSysTime &&
+        currentTime - credentialInfo->enrolledSysTime >= (uint64_t)pinExpiredPeriod) {
+        return 0;
+    }
+
+    if (UINT64_MAX - credentialInfo->enrolledSysTime >= (uint64_t)pinExpiredPeriod) {
+        return (int64_t)(credentialInfo->enrolledSysTime + (uint64_t)pinExpiredPeriod - currentTime);
+    }
+
+    return pinExpiredPeriod;
+}
+
+int64_t GetCredentialValidPeriod(int32_t userId, uint64_t credentialId)
+{
+    LOG_INFO("start");
+    CredentialInfoHal credentialInfo = {};
+    ResultCode ret = GetCredentialByUserIdAndCredId(userId, credentialId, &credentialInfo);
+    if (ret != RESULT_SUCCESS) {
+        LOG_INFO("GetCredentialByUserIdAndCredId fail, ret:%{public}u", ret);
+        return 0;
+    }
+
+    return CalcCredentialValidPeriod(&credentialInfo);
+}
+
+ResultCode ClearAbandonExpiredCredential(int32_t userId, CredentialInfoHal *credentialInfo)
+{
+    LinkedList *credList = NULL;
+    ResultCode ret = QueryAbandonCredential(userId, &credList);
+    if (ret != RESULT_SUCCESS || credList == NULL) {
+        LOG_ERROR("query credential failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    if (credList->head == NULL || credList->head->data == NULL) {
+        LOG_ERROR("credential is null");
+        DestroyLinkedList(credList);
+        return RESULT_NOT_ENROLLED;
+    }
+    CredentialInfoHal *credentialHal = (CredentialInfoHal *)(credList->head->data);
+    if (IsAbandonCredentialExpired(credentialHal)) {
+        ret = DeleteCredentialInfo(userId, credentialHal->credentialId, credentialInfo);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("delete database info failed");
+            return RESULT_BAD_SIGN;
+        }
+    }
+    return RESULT_SUCCESS;
 }

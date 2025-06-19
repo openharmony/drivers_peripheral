@@ -30,8 +30,9 @@ ohos_fuzztest("HidGetReportFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_input:hid_ddk_idl_headers",
+    "drivers_interface_input:libhid_ddk_proxy_1.0",
     "drivers_interface_input:libhid_ddk_proxy_1.1",
+    "drivers_interface_input:libhid_ddk_stub_1.0",
     "drivers_interface_input:libhid_ddk_stub_1.1",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

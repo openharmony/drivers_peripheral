@@ -31,7 +31,7 @@ namespace HDI {
 namespace UserAuth {
 using namespace testing;
 using namespace testing::ext;
-using namespace OHOS::HDI::UserAuth::V3_0;
+using namespace OHOS::HDI::UserAuth::V4_0;
 namespace {
 constexpr int32_t ATL1 = 10000;
 uint64_t g_pinIndex = 0;
@@ -306,7 +306,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_003, TestSize.Level0)
     EnrollParam param = {};
     param.userId = userId;
     ScheduleInfo scheduleInfo = {};
-    EXPECT_EQ(service->BeginEnrollment(authToken, param, scheduleInfo), 10018);
+    EXPECT_EQ(service->BeginEnrollment(authToken, param, scheduleInfo), RESULT_TYPE_NOT_SUPPORT);
 
     EXPECT_EQ(service->CloseSession(userId), 0);
 }
@@ -329,7 +329,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_004, TestSize.Level0)
     param.userId = userId;
     param.authType = AuthType::PIN;
     ScheduleInfo scheduleInfo = {};
-    EXPECT_EQ(service->BeginEnrollment(authToken, param, scheduleInfo), 10004);
+    EXPECT_EQ(service->BeginEnrollment(authToken, param, scheduleInfo), 10012);
 
     EXPECT_EQ(service->CloseSession(userId), 0);
 }
@@ -665,7 +665,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_004, TestS
     const std::string deviceUdid = std::string(64, ' ');
     EXPECT_EQ(service->Init(deviceUdid), 0);
 
-    constexpr int32_t userId = 314265;
+    constexpr int32_t userId = 1;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -709,7 +709,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelAuthentication_002, TestSize.Le
     const std::string deviceUdid = std::string(64, ' ');
     EXPECT_EQ(service->Init(deviceUdid), 0);
 
-    constexpr int32_t userId = 314265;
+    constexpr int32_t userId = 2;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -829,7 +829,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateIdentificationResult_002, TestS
     const std::string deviceUdid = std::string(64, ' ');
     EXPECT_EQ(service->Init(deviceUdid), 0);
 
-    constexpr int32_t userId = 314265;
+    constexpr int32_t userId = 3;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -893,7 +893,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelIdentification_002, TestSize.Le
     const std::string deviceUdid = std::string(64, ' ');
     EXPECT_EQ(service->Init(deviceUdid), 0);
 
-    constexpr int32_t userId = 314265;
+    constexpr int32_t userId = 4;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -1022,7 +1022,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_001, TestSize.Level0)
     std::vector<uint8_t> authToken;
     std::vector<CredentialInfo> deletedCredInfos;
     std::vector<uint8_t> rootSecret;
-    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 8);
+    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), RESULT_VERIFY_TOKEN_FAIL);
 
     authToken.resize(sizeof(UserAuthTokenHal));
     EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 10017);
@@ -1369,6 +1369,13 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestSetGlobalConfigParam_001, TestSize.Le
         param.userIds.push_back(i);
     }
     EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
+
+    param.authTypes.clear();
+    param.userIds.clear();
+    param.type = PIN_EXPIRED_PERIOD;
+    param.authTypes.push_back(1);
+    param.value.pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
+    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_SUCCESS);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestVerifyAuthToken_001, TestSize.Level0)

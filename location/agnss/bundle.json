@@ -24,7 +24,8 @@
           "drivers_peripheral_location_gnss",
           "ipc",
           "hdf_core",
-          "hilog"
+          "hilog",
+          "samgr"
         ],
         "third_party": []
       },

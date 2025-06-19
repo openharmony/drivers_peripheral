@@ -16,7 +16,7 @@
 #include "codeccommon_fuzzer.h"
 #include <cstdlib>
 
-using namespace OHOS::HDI::Codec::V3_0;
+using namespace OHOS::HDI::Codec::V4_0;
 
 extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
 {

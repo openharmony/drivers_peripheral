@@ -247,16 +247,8 @@ int32_t NfcImpl::Shutdown(NfcStatus &status)
 
 void NfcImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
-    HDF_LOGW("NfcImpl::OnRemoteDied");
-    {
-        std::lock_guard<std::mutex> guard(g_callbacksMutex);
-        callbacks_ = nullptr;
-    }
-    NfcStatus status = NfcStatus::FAILED;
-    int32_t ret = Close(status);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("OnRemoteDied, Close failed, status(%{public}d)!", status);
-    }
+    HDF_LOGW("NfcImpl::OnRemoteDied, abort the nfc_host process.");
+    _exit(0);
 }
 
 int32_t NfcImpl::AddNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)

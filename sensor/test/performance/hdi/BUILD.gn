@@ -40,7 +40,7 @@ ohos_unittest("hdf_sensor_hdi_test_performance") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_sensor:libsensor_proxy_2.0",
+      "drivers_interface_sensor:libsensor_proxy_3.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
