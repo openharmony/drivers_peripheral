@@ -662,6 +662,37 @@ HWTEST_F(AudioRenderInterfaceImplTest, ReqMmapBuffer_001, TestSize.Level1)
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     int32_t reqSize = 1;
     AudioMmapBufferDescriptor desc;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->ReqMmapBuffer(reqSize, desc));
+}
+
+/**
+ * @tc.name: ReqMmapBuffer_002
+ * @tc.desc: Verify the ReqMmapBuffer function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, ReqMmapBuffer_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    int32_t reqSize = 1;
+    AudioMmapBufferDescriptor desc;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->ReqMmapBuffer(reqSize, desc));
+}
+
+/**
+ * @tc.name: ReqMmapBuffer_003
+ * @tc.desc: Verify the ReqMmapBuffer function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, ReqMmapBuffer_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    int32_t reqSize = 1;
+    AudioMmapBufferDescriptor desc;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->ReqMmapBuffer(reqSize, desc));
 }
 

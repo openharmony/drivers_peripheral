@@ -1577,7 +1577,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_003, TestSize.Level1
 {
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
-    DAudioEvent event = {HDF_AUDIO_EVENT_FULL, "gtest"};
+    DAudioEvent event = {HDF_AUDIO_EVENT_NEED_DATA, "gtest"};
 
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
     EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleRenderCallback(event));
