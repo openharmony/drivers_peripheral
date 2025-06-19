@@ -51,7 +51,10 @@
           "name": "//drivers/peripheral/codec/hal:libcodec_vdi_headers",
             "header": {
               "header_files": [
-                "icodec_buffer.h"
+                "icodec_buffer.h",
+                "codec_common_type.h",
+                "codec_interface.h",
+                "codec_type.h"
               ],
               "header_base": "//drivers/peripheral/codec/interfaces/include"
           }
