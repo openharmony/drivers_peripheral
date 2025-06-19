@@ -38,7 +38,6 @@ namespace V2_0 {
 void PeripheralAGnssTest::SetUp()
 {
     agnssInstance_ = new (std::nothrow) AGnssInterfaceImpl();
-    isSupportGnss = OHOS::system::GetBoolParameter(SYSPARAM_GPS_SUPPORT, false);
 }
 
 void PeripheralAGnssTest::TearDown()
@@ -50,20 +49,14 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssCallbackTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "PeripheralAGnssTest, SetAgnssCallbackTest001, TestSize.Level1";
-    if (!isSupportGnss) {
-        GTEST_LOG_(INFO)
-            << "PeripheralGnssTest, not support gnss, skip tdd.";
-        return;
-    }
     EXPECT_NE(nullptr, agnssInstance_);
-    int32_t ret = 0;
     if (agnssInstance_ != nullptr) {
         sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
     
         auto callbackObj2 = new (std::nothrow) AgnssEventCallbackMock(saObject);
-        ret = agnssInstance_->SetAgnssCallback(callbackObj2);
+        agnssInstance_->SetAgnssCallback(callbackObj2);
     }
 }
 
@@ -71,11 +64,6 @@ HWTEST_F(PeripheralAGnssTest, RequestSetupAgnssDataConnectionTest001, TestSize.L
 {
     GTEST_LOG_(INFO)
         << "PeripheralAGnssTest, RequestSetupAgnssDataConnectionTest001, TestSize.Level1";
-    if (!isSupportGnss) {
-        GTEST_LOG_(INFO)
-            << "PeripheralGnssTest, not support gnss, skip tdd.";
-        return;
-    }
     EXPECT_NE(nullptr, agnssInstance_);
     GetSetidCb(0);
     RequestSetupAgnssDataConnection(nullptr);
@@ -84,13 +72,12 @@ HWTEST_F(PeripheralAGnssTest, RequestSetupAgnssDataConnectionTest001, TestSize.L
     status.requestCategory = 2;
     RequestSetupAgnssDataConnection(&status);
 
-    int32_t ret = 0;
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
 
     auto callbackObj2 = new (std::nothrow) AgnssEventCallbackMock(saObject);
-    ret = agnssInstance_->SetAgnssCallback(callbackObj2);
+    agnssInstance_->SetAgnssCallback(callbackObj2);
     
     GetSetidCb(0);
     RequestSetupAgnssDataConnection(&status);
@@ -100,17 +87,13 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1";
-    if (!isSupportGnss) {
-        GTEST_LOG_(INFO)
-            << "PeripheralGnssTest, not support gnss, skip tdd.";
-        return;
-    }
+
     EXPECT_NE(nullptr, agnssInstance_);
     if (agnssInstance_ != nullptr) {
         AGnssServerInfo server;
         server.type = AGNSS_TYPE_SUPL;
         server.port = 8700;
-        int32_t ret = agnssInstance_->SetAgnssServer(server);
+        agnssInstance_->SetAgnssServer(server);
     }
 }
 
@@ -118,11 +101,7 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssRefInfoTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "PeripheralAGnssTest, SetAgnssRefInfoTest001, TestSize.Level1";
-    if (!isSupportGnss) {
-        GTEST_LOG_(INFO)
-            << "PeripheralGnssTest, not support gnss, skip tdd.";
-        return;
-    }
+
     EXPECT_NE(nullptr, agnssInstance_);
     AGnssRefInfo refInfo;
     refInfo.type = HDI::Location::Agnss::V2_0::ANSS_REF_INFO_TYPE_CELLID;
@@ -146,11 +125,7 @@ HWTEST_F(PeripheralAGnssTest, SetSubscriberSetIdTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "PeripheralAGnssTest, SetSubscriberSetIdTest001, TestSize.Level1";
-    if (!isSupportGnss) {
-        GTEST_LOG_(INFO)
-            << "PeripheralGnssTest, not support gnss, skip tdd.";
-        return;
-    }
+
     EXPECT_NE(nullptr, agnssInstance_);
     SubscriberSetId setId;
     setId.type = HDI::Location::Agnss::V2_0::AGNSS_SETID_TYPE_IMSI;
@@ -163,13 +138,9 @@ HWTEST_F(PeripheralAGnssTest, ResetAgnssTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "PeripheralAGnssTest, ResetAgnssTest001, TestSize.Level1";
-    if (!isSupportGnss) {
-        GTEST_LOG_(INFO)
-            << "PeripheralGnssTest, not support gnss, skip tdd.";
-        return;
-    }
-    EXPECT_NE(nullptr, agnssInstance_);
+
     agnssInstance_->ResetAgnss();
+    EXPECT_NE(nullptr, agnssInstance_);
 }
 
 } // V2_0
