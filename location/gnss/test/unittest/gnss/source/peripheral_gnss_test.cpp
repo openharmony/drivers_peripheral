@@ -300,8 +300,8 @@ HWTEST_F(PeripheralGnssTest, SetPredictGnssDataTest001, TestSize.Level1)
     if (gnssInstance_ != nullptr) {
         std::string data = "test";
         int32_t ret = gnssInstance_->SetPredictGnssData(data);
+        HDF_LOGI("test ret:%{public}d", ret);
     }
-    HDF_LOGI("test ret:%{public}d", ret);
 }
 
 HWTEST_F(PeripheralGnssTest, GetCachedGnssLocationsSizeTest001, TestSize.Level1)
@@ -312,8 +312,8 @@ HWTEST_F(PeripheralGnssTest, GetCachedGnssLocationsSizeTest001, TestSize.Level1)
     if (gnssInstance_ != nullptr) {
         int32_t size = 0;
         int32_t ret = gnssInstance_->GetCachedGnssLocationsSize(size);
+        HDF_LOGI("test ret:%{public}d", ret);
     }
-    HDF_LOGI("test ret:%{public}d", ret);
 }
 
 HWTEST_F(PeripheralGnssTest, GetCachedGnssLocationsTest001, TestSize.Level1)
@@ -323,8 +323,8 @@ HWTEST_F(PeripheralGnssTest, GetCachedGnssLocationsTest001, TestSize.Level1)
     EXPECT_NE(nullptr, gnssInstance_);
     if (gnssInstance_ != nullptr) {
         int32_t ret = gnssInstance_->GetCachedGnssLocations();
+        HDF_LOGI("test ret:%{public}d", ret);
     }
-    HDF_LOGI("test ret:%{public}d", ret);
 }
 
 HWTEST_F(PeripheralGnssTest, SendNiUserResponseTest002, TestSize.Level1)
@@ -338,7 +338,6 @@ HWTEST_F(PeripheralGnssTest, SendNiUserResponseTest002, TestSize.Level1)
         int32_t ret = gnssInstance_->SendNiUserResponse(gnssNiNotificationId, userResponse);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
-    HDF_LOGI("test ret:%{public}d", ret);
 }
 
 HWTEST_F(PeripheralGnssTest, SendNetworkInitiatedMsg001, TestSize.Level1)
@@ -350,8 +349,8 @@ HWTEST_F(PeripheralGnssTest, SendNetworkInitiatedMsg001, TestSize.Level1)
         std::string msg = "test";
         int length = msg.length();
         int32_t ret = gnssInstance_->SendNetworkInitiatedMsg(msg, length);
+        HDF_LOGI("test ret:%{public}d", ret);
     }
-    HDF_LOGI("test ret:%{public}d", ret);
 }
 
 HWTEST_F(PeripheralGnssTest, StartGnssTest001, TestSize.Level1)
@@ -426,7 +425,7 @@ HWTEST_F(PeripheralGnssTest, HexCharToIntTest001, TestSize.Level1)
 
     std::string str = "1234";
     std::vector<uint8_t> ret = StringUtils::HexToByteVector(str);
-    EXPECT_NE(ret, nullptr);
+    EXPECT_NE(ret.size(), 10);
 }
 
 } // V2_0
