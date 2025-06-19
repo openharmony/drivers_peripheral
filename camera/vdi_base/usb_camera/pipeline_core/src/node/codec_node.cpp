@@ -235,7 +235,8 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGE("CodecNode::Yuv422ToJpeg fail, malloc tmpBufferAddr fail");
         return;
     }
-    auto oldFormat = buffer->GetCurFormat();
+    auto oldFormat = buffer->GetFormat();
+    CAMERA_LOGI("CodecNode::Yuv422ToJpeg, %{public}d, %{public}d", oldFormat, CAMERA_FORMAT_RGB_888);
     buffer->SetFormat(CAMERA_FORMAT_RGB_888);
     NodeUtils::BufferScaleFormatTransform(buffer, tmpBufferAddr, tmpBufferSize);
     buffer->SetFormat(oldFormat);

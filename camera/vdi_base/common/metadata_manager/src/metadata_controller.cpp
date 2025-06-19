@@ -157,9 +157,32 @@ int32_t MetadataController::DelEnabledAbility(const std::vector<int32_t> &result
     return RC_OK;
 }
 
+static bool UpdateMuteMode(const std::shared_ptr<CameraMetadata>& metadata, bool oldMode)
+{
+    bool newMode = oldMode;
+    common_metadata_header_t *data = metadata->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_MUTE_MODE, &entry);
+    if (ret == 0) {
+        if (entry.count == 1) {
+            newMode = (entry.data.u8[0] > 0 ? true : false);
+            CAMERA_LOGI("update mute mode, %{public}d -> %{public}d", oldMode, newMode);
+        } else {
+            CAMERA_LOGE("OHOS_CONTROL_MUTE_MODE tag, size error %{public}d", entry.count);
+        }
+    }
+    return newMode;
+}
+
+bool MetadataController::IsMute()
+{
+    return isMute_;
+}
+
 bool MetadataController::UpdateSettingsConfig(const std::shared_ptr<CameraMetadata> &meta)
 {
     bool result = false;
+    isMute_ = UpdateMuteMode(meta, isMute_);
     int32_t streamId = GetStreamId(meta);
     if (streamId < 0) {
         CAMERA_LOGE("streamId is invalid %{public}d", streamId);
@@ -460,7 +483,7 @@ bool MetadataController::UpdateNewTagData(const std::vector<int32_t> &keys,
     const std::shared_ptr<CameraMetadata> &inMeta, std::shared_ptr<CameraMetadata> &outMeta)
 {
     if (keys.size() == 0) {
-        CAMERA_LOGE("invalid size.");
+        CAMERA_LOGW("invalid size.");
         return false;
     }
     common_metadata_header_t *data = inMeta->get();
@@ -606,7 +629,7 @@ void MetadataController::NotifyMetaData(int32_t streamId)
     std::shared_ptr<CameraMetadata> metaTemp = nullptr;
     bool result = metaDataConfig_->GetMetadata(streamId, metaTemp);
     if (!result) {
-        CAMERA_LOGE("%{public}s GetMetaData failed and streamId=%{public}d", __FUNCTION__, streamId);
+        CAMERA_LOGW("%{public}s GetMetaData failed and streamId=%{public}d", __FUNCTION__, streamId);
         return;
     }
 

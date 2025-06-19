@@ -35,7 +35,7 @@ public:
         const std::vector<std::string> &physicalCameraIds, const std::shared_ptr<CameraAbility> ability);
     std::string SubtractCameraId(const std::vector<std::string> &physicalCameraIds);
     std::string ReturnEnableLogicalCameraId();
-    std::string GenerateNewLogicalCameraId();
+    std::string GenerateNewLogicalCameraId(const std::string &cameraName = "");
     std::string ReturnPhysicalCameraIdToString(const CameraId &physicalCameraId);
     std::string ReturnLogicalCameraIdToString(const std::string &physicalCameraId);
     void AddUsbCameraId(std::string cameraId);

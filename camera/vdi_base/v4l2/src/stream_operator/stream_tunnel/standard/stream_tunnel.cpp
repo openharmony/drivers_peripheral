@@ -82,7 +82,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
         stats_.RequestBufferResult(sfError);
     } while (!stop_ && sfError == OHOS::SURFACE_ERROR_NO_BUFFER);
     wakeup_ = false;
-    CAMERA_LOGE("bufferQueue_->RequestBuffer Done, sfError = %{public}d, cast time = %{public}d us",
+    CAMERA_LOGI("bufferQueue_->RequestBuffer Done, sfError = %{public}d, cast time = %{public}d us",
         sfError, timtCount * SLEEP_TIME);
 
     if (stop_) {

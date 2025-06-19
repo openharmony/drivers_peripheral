@@ -72,6 +72,7 @@ RetCode StreamOperatorVdiImpl::Init()
     messenger_ = std::make_shared<CaptureMessageOperator>(cb);
     CHECK_IF_PTR_NULL_RETURN_VALUE(messenger_, RC_ERROR);
     messenger_->StartProcess();
+    CAMERA_LOGI("stream pipeline core init done. cameraIds:%{public}s", cameraIds.c_str());
 
     return RC_OK;
 }
@@ -210,6 +211,14 @@ DynamicStreamSwitchMode StreamOperatorVdiImpl::CheckStreamsSupported(
     return streamPipeline_->CheckStreamsSupported(mode, modeSetting, configs);
 }
 
+static void BugFixForCapture(StreamConfiguration &scg, const VdiStreamInfo &info)
+{
+    if (info.intent_ == STILL_CAPTURE) {
+        scg.encodeType = ENCODE_TYPE_JPEG;
+        return;
+    }
+}
+
 void StreamOperatorVdiImpl::StreamInfoToStreamConfiguration(StreamConfiguration &scg, const VdiStreamInfo info)
 {
     scg.id = info.streamId_;
@@ -222,6 +231,7 @@ void StreamOperatorVdiImpl::StreamInfoToStreamConfiguration(StreamConfiguration 
     scg.tunnelMode = info.tunneledMode_;
     scg.minFrameDuration = info.minFrameDuration_;
     scg.encodeType = info.encodeType_;
+    BugFixForCapture(scg, info);
 }
 
 int32_t StreamOperatorVdiImpl::CreateStreams(const std::vector<VdiStreamInfo> &streamInfos)
@@ -231,8 +241,8 @@ int32_t StreamOperatorVdiImpl::CreateStreams(const std::vector<VdiStreamInfo> &s
     DFX_LOCAL_HITRACE_BEGIN;
     for (const auto &it : streamInfos) {
         CHECK_IF_NOT_EQUAL_RETURN_VALUE(CheckStreamInfo(it), true, INVALID_ARGUMENT);
-        CAMERA_LOGI("streamId:%{public}d and format:%{public}d and width:%{public}d and height:%{public}d",
-            it.streamId_, it.format_, it.width_, it.height_);
+        CAMERA_LOGI("streamId:%{public}d,format:%{public}d,width:%{public}d,height:%{public}d,encodeType_:%{public}d",
+                    it.streamId_, it.format_, it.width_, it.height_, it.encodeType_);
         if (streamMap_.count(it.streamId_) > 0) {
             CAMERA_LOGE("stream [id = %{public}d] has already been created.", it.streamId_);
             return INVALID_ARGUMENT;

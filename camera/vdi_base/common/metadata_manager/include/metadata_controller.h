@@ -44,6 +44,7 @@ public:
     void SetDeviceDefaultMetadata(std::shared_ptr<CameraMetadata> &meta);
     void Start();
     void Stop();
+    bool IsMute();
 
 private:
     MetadataController();
@@ -85,6 +86,7 @@ private:
     std::atomic_bool isRunning_;
     std::thread *notifyChangedMetadata_ = nullptr;
     bool isInit_ = false;
+    bool isMute_ = false;
 };
 } // namespace Camera
 } // namespace OHOS

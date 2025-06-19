@@ -51,7 +51,8 @@ private:
     RetCode CameraIdInvalid(const std::string &cameraId);
     RetCode SetFlashlight(const std::vector<std::string> &phyCameraIds,
         bool isEnable, VdiFlashlightStatus &flashlightStatus);
-    void OnCameraStatus(CameraId cameraId, VdiCameraStatus status, const std::shared_ptr<CameraAbility> ability);
+    void OnCameraStatus(CameraId cameraId, VdiCameraStatus status, const std::shared_ptr<CameraAbility> ability,
+        const std::string &cameraName = "");
 
     int32_t CloseAllCameras() override;
 

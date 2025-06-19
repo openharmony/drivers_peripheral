@@ -354,7 +354,7 @@ RetCode HosV4L2Control::V4L2GetControls(int fd, std::vector<DeviceControl>& cont
         CAMERA_LOGE("V4L2GetControls no support V4L2_CTRL_FLAG_NEXT_CTRL\n");
         V4L2EnumControls(fd, control);
     } else {
-        CAMERA_LOGE("V4L2GetControls support V4L2_CTRL_FLAG_NEXT_CTRL\n");
+        CAMERA_LOGI("V4L2GetControls support V4L2_CTRL_FLAG_NEXT_CTRL\n");
         V4L2EnumExtControls(fd, control);
     }
     CAMERA_LOGI("V4L2GetControls in fd = %{public}d\n", fd);
