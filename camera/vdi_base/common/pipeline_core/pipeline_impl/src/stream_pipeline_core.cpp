@@ -125,6 +125,7 @@ RetCode StreamPipelineCore::Config(const std::vector<int>& streamIds, const Capt
 
 RetCode StreamPipelineCore::Capture(const std::vector<int>& streamIds, const int32_t captureId)
 {
+    CAMERA_LOGI("StreamPipelineCore::Capture %{public}s", cameraId_.c_str());
     std::lock_guard<std::recursive_mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {

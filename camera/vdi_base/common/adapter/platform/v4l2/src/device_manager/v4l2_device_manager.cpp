@@ -164,6 +164,21 @@ RetCode V4L2DeviceManager::DestroyManager()
 {
     return RC_OK;
 }
+CameraId V4L2DeviceManager::HardwareToCameraId(std::string hardwareName)
+{
+    CAMERA_LOGD("ReturnEnableCameraId begin : %{public}s end", hardwareName.c_str());
+    hardwareName = hardwareName.substr(0, hardwareName.find("&id"));
+    if (hardwareName.size() != 0) {
+        for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
+            CAMERA_LOGD("ReturnEnableCameraId %{public}d : %{public}s end", (*iter).cameraId,
+                (*iter).hardwareName.c_str());
+            if (hardwareName == (*iter).hardwareName) {
+                return (*iter).cameraId;
+            }
+        }
+        return CAMERA_MAX;
+    }
+}
 std::shared_ptr<IController> V4L2DeviceManager::GetController(CameraId cameraId, ManagerId managerId,
     ControllerId controllerId)
 {
@@ -348,7 +363,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         Convert(deviceControl, deviceFormat, meta);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
 
-        uvcCb_(meta, uvcState, id);
+        uvcCb_(meta, uvcState, id, hardwareName);
         CAMERA_LOGI("uvc plug in %{public}s end", hardwareName.c_str());
     } else {
         CAMERA_LOGI("uvc plug out %{public}s begin", hardwareName.c_str());
@@ -365,7 +380,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
                 std::shared_ptr<CameraMetadata> meta =
                     std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
                 CHECK_IF_PTR_NULL_RETURN_VOID(meta);
-                uvcCb_(meta, uvcState, id);
+                uvcCb_(meta, uvcState, id, hardwareName);
             }
             {
                 std::lock_guard<std::mutex> l(mtx_);

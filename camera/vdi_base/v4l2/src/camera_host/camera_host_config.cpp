@@ -172,7 +172,7 @@ std::string CameraHostConfig::ReturnEnableLogicalCameraId()
     }
 }
 
-std::string CameraHostConfig::GenerateNewLogicalCameraId()
+std::string CameraHostConfig::GenerateNewLogicalCameraId(const std::string &cameraName)
 {
     for (int32_t id = 1; id < CAMERA_MAX + 1; id++) {
         std::string logicalCameraId = "lcam00" + std::to_string(id);

@@ -22,6 +22,8 @@
 #include "camera_device_service_callback.h"
 #include "camera_hal_hisysevent.h"
 
+constexpr int NAME_START_POS = 6;
+
 namespace OHOS::Camera {
 OHOS::sptr<CameraHostService> CameraHostService::cameraHostService_ = nullptr;
 
@@ -254,6 +256,20 @@ int32_t CameraHostService::SetFlashlight(const std::string &cameraId, bool isEna
     return cameraHostVdi->SetFlashlight(vdiCameraId, isEnable);
 }
 
+static inline const std::string vdiCameraIdToPrefix(const std::string &id)
+{
+    size_t startPos;
+    size_t endPos;
+    std::string preFix = "lcam00";
+    if ((startPos = id.find("&name=")) != std::string::npos) {
+        startPos += NAME_START_POS;
+        endPos = id.find("&id=");
+        preFix = id.substr(startPos, endPos - startPos);
+        preFix += "/";
+    }
+    return preFix;
+}
+
 int32_t CameraHostService::UpdateCameraIdMapList()
 {
     std::vector<CameraIdInfo>().swap(cameraIdInfoList_);
@@ -269,7 +285,7 @@ int32_t CameraHostService::UpdateCameraIdMapList()
         }
         for (auto id : vdiCameraIds) {
             struct CameraIdInfo cameraIdInfo;
-            std::string currentCameraId = "lcam00" + std::to_string(currentCameraIndex);
+            std::string currentCameraId = vdiCameraIdToPrefix(id) + std::to_string(currentCameraIndex);
             cameraIdInfo.currentCameraId = currentCameraId;
             cameraIdInfo.cameraHostVdi = cameraHostVdi;
             cameraIdInfo.vendorCameraId = id;
