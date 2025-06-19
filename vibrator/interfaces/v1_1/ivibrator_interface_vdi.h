@@ -120,6 +120,12 @@ struct HapticPaketVdi {
     std::vector<HapticEventVdi> events;
 };
 
+struct VibratorPackageVdi {
+    int32_t patternNum;
+    int32_t packageduration;
+    std::vector<HapticPaketVdi> patterns;
+};
+
 struct HapticCapacityVdi {
     bool isSupportHdHaptic;
     bool isSupportPresetMapping;
@@ -297,6 +303,31 @@ public:
         return HDF_SUCCESS;
     };
     virtual int32_t UnRegVibratorPlugCallback(const sptr<V2_0::IVibratorPlugCallback> &callbackObj)
+    {
+        HDF_LOGI("%{public}s: only in Hdi return", __func__);
+        return HDF_SUCCESS;
+    };
+
+    virtual int32_t PlayPatternBySessionId(
+        const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
+        uint32_t sessionId,
+        const HapticPaketVdi& hapticPaketVdi)
+    {
+        HDF_LOGI("%{public}s: only in Hdi return", __func__);
+        return HDF_SUCCESS;
+    };
+
+    virtual int32_t PlayPackageBySession(const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
+        uint32_t sessionId,
+        const VibratorPackageVdi& vibratorPackageVdi)
+    {
+        HDF_LOGI("%{public}s: only in Hdi return", __func__);
+        return HDF_SUCCESS;
+    };
+    
+    virtual int32_t StopVibrateBySessionId(
+        const OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo& deviceVibratorInfo,
+        uint32_t sessionId)
     {
         HDF_LOGI("%{public}s: only in Hdi return", __func__);
         return HDF_SUCCESS;

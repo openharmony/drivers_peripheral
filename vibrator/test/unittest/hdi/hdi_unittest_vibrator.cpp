@@ -38,7 +38,12 @@ namespace {
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
     V2_0::HapticPaket g_pkg1 = {434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
+    V2_0::HapticPaket g_hapticPaket = {434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
+        {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
+    V2_0::VibratorPackage g_vibPackage = {434, 149, {{434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
+        {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}}};
     int32_t g_intensity = 60;
+    int32_t g_sessionId = 1 ;
     std::vector<HdfWaveInformation> g_info;
     const std::vector<std::string> g_effect{"haptic.long_press.light", "haptic.slide.light", \
         "haptic.threshold", "haptic.long_press.medium", "haptic.fail", "haptic.common.notice1", \
@@ -663,4 +668,40 @@ HWTEST_F(HdiUnitTestVibrator, GetAllWaveInfoTest, TestSize.Level1)
     } else {
         HDF_LOGI("device is not support preset mapping");
     }
+}
+
+/**
+  * @tc.name: PlayPatternBySessionId
+  * @tc.desc: HD vibration data packet delivery.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestVibrator, PlayPatternBySessionId, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = g_vibratorInterface->PlayPatternBySessionId({0, 0}, g_sessionId, g_hapticPaket);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    int32_t endRet = g_vibratorInterface->StopVibrateBySessionId({0, 0}, g_sessionId);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
+}
+
+/**
+  * @tc.name: PlayPatternBySessionId
+  * @tc.desc: HD vibration data packet delivery.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestVibrator, PlayPackageBySession, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = g_vibratorInterface->PlayPackageBySession({0, 0}, g_sessionId, g_vibPackage);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    int32_t endRet = g_vibratorInterface->StopVibrateBySessionId({0, 0}, g_sessionId);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
