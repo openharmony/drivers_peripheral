@@ -51,8 +51,11 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "drivers_interface_vibrator:libvibrator_stub_1.1",
+        "drivers_interface_vibrator:libvibrator_stub_1.2",
         "drivers_interface_vibrator:libvibrator_stub_1.3",
         "hdf_core:libhdf_host",
+        "hdf_core:libhdf_utils",
         "hilog:libhilog",
         "hitrace:hitrace_meter",
         "ipc:ipc_single",
@@ -72,7 +75,7 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_vibrator"
   }
 
-  ohos_shared_library("libvibrator_driver") {
+  ohos_shared_library("libvibrator_driver_1.3") {
     include_dirs = [
       "../interfaces/include/",
       "../utils/include",
@@ -118,7 +121,7 @@ if (defined(ohos_lite)) {
 
   group("hdf_vibrator_service") {
     deps = [
-      ":libvibrator_driver",
+      ":libvibrator_driver_1.3",
       ":libvibrator_interface_service_1.3",
     ]
   }

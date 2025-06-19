@@ -51,7 +51,7 @@ ohos_shared_library("libusbhost_acm") {
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
     "./../gadget/function/include",
-    "//drivers/hdf_core/framework/model/usb/include",
+    "./../hdf_usb/include",
     "include",
     "${usb_driver_path}/utils/include",
   ]
@@ -97,7 +97,7 @@ ohos_shared_library("libusbhost_acm_rawapi") {
     "./../gadget/function/include",
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
-    "//drivers/hdf_core/framework/model/usb/include",
+    "./../hdf_usb/include",
     "include",
     "${usb_driver_path}/utils/include",
   ]
@@ -147,12 +147,11 @@ ohos_shared_library("libserial_interface_service_1.0") {
   sources = [ "src/serial_impl.cpp" ]
   defines = []
   if (linux_serial_enable == true) {
-    sources += [ "src/linux_serial.cpp" ]
-    defines += [ "LINUX_SERIAL" ]
-    deps = [
-      "${usb_driver_path}/ddk:libusb_ddk_host",
-      "${usb_driver_path}/ddk:libusb_pnp_manager",
+    sources += [
+      "src/linux_serial.cpp",
+      "src/serial_sysfs_device.cpp",
     ]
+    defines += [ "LINUX_SERIAL" ]
   } else {
     sources += [ "src/libusb_serial.cpp" ]
   }
@@ -186,6 +185,8 @@ ohos_shared_library("libserial_interface_service_1.0") {
     ]
   }
 
+  install_images = [ chipset_base_dir ]
+  innerapi_tags = [ "passthrough_indirect" ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_usb"
 }

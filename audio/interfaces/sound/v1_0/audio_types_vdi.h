@@ -45,6 +45,8 @@ enum AudioPortPinVdi {
     PIN_VDI_OUT_USB_HEADSET = 1 << 9,
     PIN_VDI_OUT_BLUETOOTH_A2DP = 1 << 10,
     PIN_VDI_OUT_DP = 1 << 11,
+    PIN_VDI_OUT_NEARLINK_SCO = 1 << 12,
+    PIN_VDI_OUT_NEARLINK = 1 << 13,
     PIN_VDI_IN_MIC = 1 << 27 | 1 << 0,
     PIN_VDI_IN_HS_MIC = 1 << 27 | 1 << 1,
     PIN_VDI_IN_LINEIN = 1 << 27 | 1 << 2,
@@ -54,6 +56,7 @@ enum AudioPortPinVdi {
     PIN_VDI_IN_USB_HEADSET = 1 << 27 | 1 << 6,
     PIN_VDI_IN_PENCIL = 1 << 27 | 1 << 7,
     PIN_VDI_IN_UWB = 1 << 27 | 1 << 8,
+    PIN_VDI_IN_NEARLINK = 1 << 27 | 1 << 9,
     PIN_VDI_IN_BUTT,
 };
 
@@ -85,6 +88,7 @@ enum AudioFormatVdi {
     AUDIO_VDI_FORMAT_TYPE_AAC_ELD = 1 << 24 | 1 << 2,
     AUDIO_VDI_FORMAT_TYPE_AAC_HE_V1 = 1 << 24 | 1 << 2 | 1 << 0,
     AUDIO_VDI_FORMAT_TYPE_AAC_HE_V2 = 1 << 24 | 1 << 2 | 1 << 1,
+    AUDIO_VDI_FORMAT_TYPE_EAC3 = 1 << 24 | 1 << 2 | 1 << 1 | 1 << 0,
     AUDIO_VDI_FORMAT_TYPE_G711A = 1 << 25 | 1 << 0,
     AUDIO_VDI_FORMAT_TYPE_G711U = 1 << 25 | 1 << 1,
     AUDIO_VDI_FORMAT_TYPE_G726 = 1 << 25 | 1 << 1 | 1 << 0,
@@ -223,6 +227,8 @@ enum AudioDeviceTypeVdi {
     AUDIO_VDI_HDMI_DEVICE = 1 << 10,
     AUDIO_VDI_ADAPTER_DEVICE = 1 << 11,
     AUDIO_VDI_DP_DEVICE = 1 << 12,
+    AUDIO_VDI_ACCESSORY_DEVICE = 1 << 13,
+    AUDIO_VDI_REMOTE_DEVICE = 1 << 14,
     AUDIO_VDI_DEVICE_UNKNOWN,
     AUDIO_VDI_DEVICE_TYPE_BUTT,
 };
@@ -298,6 +304,7 @@ enum AudioInputTypeVdi {
     AUDIO_VDI_INPUT_EC_TYPE                  = 1 << 8,
     AUDIO_VDI_INPUT_NOISE_REDUCTION_TYPE     = 1 << 9,
     AUDIO_VDI_INPUT_RAW_TYPE                 = 1 << 10,
+    AUDIO_VDI_INPUT_LIVE_TYPE                = 1 << 11,
 };
 
 struct AudioOffloadInfoVdi {
@@ -391,6 +398,7 @@ struct AudioMmapBufferDescriptorVdi {
     int32_t isShareable;
     uint32_t offset;
     char *filePath;
+    uint32_t syncInfoSize;
 };
 
 struct AudioDevExtInfoVdi {

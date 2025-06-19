@@ -12,8 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
 
 config("hdi_service_config") {
   visibility = [ ":*" ]
@@ -43,10 +41,8 @@ config("hdi_service_config") {
 
 ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
   include_dirs = [
-    "//drivers/peripheral/bluetooth/audio/interfaces/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_binder/server/include",
-    "//third_party/bounds_checking_function/include",
   ]
 
   sources = [
@@ -61,6 +57,7 @@ ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
   defines = []
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_bluetooth:hdi_audio_bluetooth_header",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

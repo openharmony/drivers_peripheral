@@ -15,11 +15,11 @@
 
 #include "sensorsetsdcsensor_fuzzer.h"
 #include "hdf_base.h"
-#include "v2_0/sensor_interface_proxy.h"
+#include "v3_0/sensor_interface_proxy.h"
 #include <hdf_log.h>
 #include <securec.h>
 
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V3_0;
 
 namespace OHOS {
     bool SensorSetSdcSensorFuzzTest(const uint8_t* data, size_t size)
@@ -27,7 +27,7 @@ namespace OHOS {
         bool result = false;
         sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
         
-        if (!g_sensorInterface->SetSdcSensor(*(int32_t *)data, *(bool *)data, *(int32_t *)data)) {
+        if (!g_sensorInterface->SetSdcSensor({0, *(int32_t *)data, 0, 0}, *(bool *)data, *(int32_t *)data)) {
             result = true;
         }
         return result;

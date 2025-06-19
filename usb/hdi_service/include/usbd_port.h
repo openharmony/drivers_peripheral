@@ -113,6 +113,7 @@ private:
 
     int32_t IfCanSwitch(int32_t portId, int32_t powerRole, int32_t dataRole);
     int32_t OpenPortFile(int32_t flags, const std::string &subPath);
+    int32_t SwitchFunction(int32_t dataRole);
     int32_t WritePortFile(int32_t role, const std::string &subPath);
     int32_t ReadPortFile(int32_t &role, const std::string &subPath);
     int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole);

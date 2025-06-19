@@ -55,7 +55,8 @@ typedef enum ResultCode {
     RESULT_BUSY = 0xF,
     RESULT_PIN_FREEZE = 0x11,
     RESULT_PIN_FAIL = 0X12,
-    RESULT_COMPARE_FAIL = 0x13
+    RESULT_COMPARE_FAIL = 0x13,
+    RESULT_OPERATION_NOT_SUPPORT = 0x14
 } ResultCode;
 
 typedef enum ResultCodeForCoAuth {
@@ -113,6 +114,11 @@ typedef enum ResultCodeForCoAuth {
      * Indicates that the user has not enrolled the authenticator.
      */
     NOT_ENROLLED = 10,
+
+    /**
+     * Indicates that the operation is not supported.
+     */
+    OPERATION_NOT_SUPPORT = 11,
 } ResultCodeForCoAuth;
 
 typedef enum AuthType {
@@ -123,11 +129,25 @@ typedef enum AuthType {
 
 typedef enum AuthSubType {
     DEFAULT_TYPE = 0,
+    PIN_SIX = 10000,
+    PIN_NUMBER = 10001,
+    PIN_MIXED = 10002,
+    PIN_FOUR = 10003,
+    PIN_PATTERN = 10004,
+    PIN_QUESTION = 10005,
+    PIN_MAX,
 } AuthSubType;
+
+typedef enum {
+    DEDAULT = 0,
+    ABANDONED_PIN_AUTH = 4,
+} AuthInent;
 
 #define MAX_DULPLICATE_CHECK 100
 
 #define MAX_EXECUTOR_MSG_LEN 2048
+
+#define ROOT_SECRET_LEN 32U
 
 #ifdef __cplusplus
 }

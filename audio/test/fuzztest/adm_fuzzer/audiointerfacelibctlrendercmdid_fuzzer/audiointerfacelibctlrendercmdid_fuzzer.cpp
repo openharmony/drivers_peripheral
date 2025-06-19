@@ -53,6 +53,9 @@ namespace Audio {
         struct AudioHwRender *hwRender = nullptr;
         (void)BindServiceAndHwRender(hwRender);
         hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
+        if (size < sizeof(int32_t)) {
+            return false;
+        }
         int32_t cmdId = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
         int32_t ret = InterfaceLibCtlRender(handle, cmdId, &hwRender->renderParam);
         if (ret == HDF_SUCCESS) {

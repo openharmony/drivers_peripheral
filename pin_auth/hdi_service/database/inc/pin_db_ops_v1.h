@@ -26,11 +26,13 @@ extern "C" {
 #define DB_VERSION_1 1
 #define ALGORITHM_VERSION_0 0
 #define ALGORITHM_VERSION_1 1
+#define PIN_LENGTH_DEFAULT 0
 
 typedef struct {
     uint32_t algoVersion;
     uint64_t templateId;
     uint64_t subType;
+    uint32_t pinLength;
 } __attribute__((__packed__)) PinInfoV1;
 
 typedef struct {

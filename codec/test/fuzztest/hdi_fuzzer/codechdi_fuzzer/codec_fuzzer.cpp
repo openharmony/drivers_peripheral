@@ -17,9 +17,9 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "v3_0/codec_component_manager_stub.h"
+#include "v4_0/codec_component_manager_stub.h"
 
-using namespace OHOS::HDI::Codec::V3_0;
+using namespace OHOS::HDI::Codec::V4_0;
 
 extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
 {
@@ -29,7 +29,7 @@ extern "C" __attribute__((visibility("default"))) int dlclose(void* handle)
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
-const std::u16string CODEC_INTERFACE_TOKEN = u"ohos.hdi.codec.V3_0.ICodecComponentManager";
+const std::u16string CODEC_INTERFACE_TOKEN = u"ohos.hdi.codec.V4_0.ICodecComponentManager";
 #define CMD_CODEC_COMPONENT_MANAGER_GREATE_COMPONENT 3
 
 uint32_t Convert2Uint32(const uint8_t* ptr)

@@ -18,22 +18,22 @@
 
 namespace OHOS {
 namespace Codec {
-int32_t CodecCallbackFuzz::EventHandler(OHOS::HDI::Codec::V3_0::CodecEventType event,
-    const OHOS::HDI::Codec::V3_0::EventInfo &info)
+int32_t CodecCallbackFuzz::EventHandler(OHOS::HDI::Codec::V4_0::CodecEventType event,
+    const OHOS::HDI::Codec::V4_0::EventInfo &info)
 {
     (void)event;
     (void)info;
     return HDF_SUCCESS;
 }
 
-int32_t CodecCallbackFuzz::EmptyBufferDone(int64_t appData, const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer)
+int32_t CodecCallbackFuzz::EmptyBufferDone(int64_t appData, const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer)
 {
     (void)appData;
     (void)buffer;
     return HDF_SUCCESS;
 }
 
-int32_t CodecCallbackFuzz::FillBufferDone(int64_t appData, const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer)
+int32_t CodecCallbackFuzz::FillBufferDone(int64_t appData, const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer)
 {
     (void)appData;
     (void)buffer;

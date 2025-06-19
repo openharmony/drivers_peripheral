@@ -60,6 +60,7 @@ void *UpdatePinDbFrom0To1(void *pinDb)
         pinDbV1->pinIndex[i].pinInfo.subType = pinDbV0->pinIndex[i].pinInfo.subType;
         pinDbV1->pinIndex[i].pinInfo.templateId = pinDbV0->pinIndex[i].pinInfo.templateId;
         pinDbV1->pinIndex[i].pinInfo.algoVersion = ALGORITHM_VERSION_0;
+        pinDbV1->pinIndex[i].pinInfo.pinLength = PIN_LENGTH_DEFAULT;
     }
     return pinDbV1;
 }

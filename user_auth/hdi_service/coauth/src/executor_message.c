@@ -317,6 +317,32 @@ EXIT:
     Free(array.data);
 }
 
+IAM_STATIC void GetOldRootSecretFromAttribute(const Attribute *attribute, ExecutorResultInfo *resultInfo)
+{
+    Uint8Array array = { Malloc(ROOT_SECRET_LEN), ROOT_SECRET_LEN };
+    IF_TRUE_LOGE_AND_RETURN(IS_ARRAY_NULL(array));
+    ResultCode result = GetAttributeUint8Array(attribute, ATTR_OLD_ROOT_SECRET, &(array));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("There is no old rootSecret in this attribute");
+        goto EXIT;
+    }
+    if (array.len != ROOT_SECRET_LEN) {
+        LOG_ERROR("rootSecret len is invalid");
+        goto EXIT;
+    }
+    resultInfo->oldRootSecret = CreateBufferByData(array.data, array.len);
+    if (!IsBufferValid(resultInfo->oldRootSecret)) {
+        LOG_ERROR("Generate old rootSecret buffer failed");
+        goto EXIT;
+    }
+    LOG_INFO("get old rootSecret success");
+
+EXIT:
+    (void)memset_s(array.data, ROOT_SECRET_LEN, 0, ROOT_SECRET_LEN);
+    Free(array.data);
+}
+
+
 IAM_STATIC ResultCode GetExecutorResultInfoFromAttribute(const Attribute *attribute, ExecutorResultInfo *resultInfo)
 {
     ResultCode result = RESULT_GENERAL_ERROR;
@@ -358,6 +384,7 @@ IAM_STATIC ResultCode GetExecutorResultInfoFromAttribute(const Attribute *attrib
 
     // Only pin auth has rootSecret
     GetRootSecretFromAttribute(attribute, resultInfo);
+    GetOldRootSecretFromAttribute(attribute, resultInfo);
     return RESULT_SUCCESS;
 }
 
@@ -402,6 +429,9 @@ void DestroyExecutorResultInfo(ExecutorResultInfo *result)
     }
     if (result->rootSecret != NULL) {
         DestoryBuffer(result->rootSecret);
+    }
+    if (result->oldRootSecret != NULL) {
+        DestoryBuffer(result->oldRootSecret);
     }
     Free(result);
 }
@@ -498,6 +528,7 @@ IAM_STATIC ResultCode GetExecutorTemplateList(
     SetCredentialConditionUserId(&condition, userId);
     SetCredentialConditionAuthType(&condition, executorNode->authType);
     SetCredentialConditionExecutorSensorHint(&condition, executorNode->executorSensorHint);
+    SetCredentialConditionNeedAbandonPin(&condition);
     LinkedList *credList = QueryCredentialLimit(&condition);
     if (credList == NULL) {
         LOG_ERROR("query credential failed");

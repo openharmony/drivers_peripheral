@@ -24,13 +24,12 @@
 #include <osal_mem.h>
 #include <vector>
 #include "icodec_buffer.h"
-#include "v3_0/icodec_callback.h"
-#include "v3_0/icodec_component.h"
+#include "v4_0/icodec_callback.h"
+#include "v4_0/icodec_component.h"
 #include "component_mgr.h"
-using OHOS::HDI::Codec::V3_0::CompVerInfo;
-using OHOS::HDI::Codec::V3_0::ICodecCallback;
-using OHOS::HDI::Codec::V3_0::OmxCodecBuffer;
-using OHOS::HDI::Codec::V3_0::CodecStateType;
+using OHOS::HDI::Codec::V4_0::CompVerInfo;
+using OHOS::HDI::Codec::V4_0::ICodecCallback;
+using OHOS::HDI::Codec::V4_0::CodecStateType;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -41,7 +40,7 @@ public:
     int32_t OpenHandle(const std::string& name);
     int32_t CloseHandle();
     int32_t GetComponentVersion(CompVerInfo &verInfo);
-    int32_t SendCommand(HDI::Codec::V3_0::CodecCommandType cmd, uint32_t param, int8_t *cmdData);
+    int32_t SendCommand(HDI::Codec::V4_0::CodecCommandType cmd, uint32_t param, int8_t *cmdData);
     int32_t GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param);
     int32_t SetParameter(OMX_INDEXTYPE paramIndex, const int8_t *param);
     int32_t SetParameterWithBuffer(int32_t index, const std::vector<int8_t>& paramStruct,
@@ -49,9 +48,9 @@ public:
     int32_t GetConfig(OMX_INDEXTYPE index, int8_t *config);
     int32_t SetConfig(OMX_INDEXTYPE index, const int8_t *config);
     int32_t GetExtensionIndex(const char *parameterName, uint32_t& index);
-    int32_t GetState(HDI::Codec::V3_0::CodecStateType &state);
+    int32_t GetState(HDI::Codec::V4_0::CodecStateType &state);
     int32_t ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                   OHOS::HDI::Codec::V3_0::CodecTunnelSetupType &tunnelSetup);
+                                   OHOS::HDI::Codec::V4_0::CodecTunnelSetupType &tunnelSetup);
     int32_t UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer);
     int32_t AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer);
     int32_t FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer);
@@ -72,7 +71,7 @@ public:
     static OMX_CALLBACKTYPE callbacks_;  // callbacks
 
 private:
-    int32_t OnEvent(HDI::Codec::V3_0::CodecEventType event, uint32_t data1, uint32_t data2, void *eventData);
+    int32_t OnEvent(HDI::Codec::V4_0::CodecEventType event, uint32_t data1, uint32_t data2, void *eventData);
     int32_t OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer);
     int32_t OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer);
     int32_t UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffer,
@@ -98,6 +97,7 @@ private:
     uint32_t maxStateWaitCount = 100;
     std::shared_mutex mapMutex_;
     std::string compName_;
+    bool isIPCMode_;
 };
 }  // namespace Omx
 }  // namespace Codec

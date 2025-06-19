@@ -205,11 +205,6 @@ int32_t VibratorInterfaceImpl::IsVibratorRunning(bool& state)
 int32_t VibratorInterfaceImpl::PlayHapticPattern(const HapticPaketVdi& pkgVdi)
 {
     HDF_LOGI("%{public}s: Enter the PlayHapticPattern function\n", __func__);
-    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr || vibratorInterface->PlayHapticPattern == nullptr) {
-        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
-        return HDF_FAILURE;
-    }
 
     return HDF_SUCCESS;
 }
@@ -217,20 +212,6 @@ int32_t VibratorInterfaceImpl::PlayHapticPattern(const HapticPaketVdi& pkgVdi)
 int32_t VibratorInterfaceImpl::GetHapticCapacity(HapticCapacityVdi& hapticCapacityVdi)
 {
     HDF_LOGI("%{public}s: Enter the GetHapticCapacity function\n", __func__);
-    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr || vibratorInterface->GetHapticCapacity == nullptr) {
-        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
-        return HDF_FAILURE;
-    }
-    struct HapticCapacity hapticCapacity;
-    int32_t ret = vibratorInterface->GetHapticCapacity(&hapticCapacity);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
-        return ret;
-    }
-    hapticCapacityVdi.isSupportHdHaptic = hapticCapacity.isSupportHdHaptic;
-    hapticCapacityVdi.isSupportPresetMapping = hapticCapacity.isSupportPresetMapping;
-    hapticCapacityVdi.isSupportTimeDelay = hapticCapacity.isSupportTimeDelay;
 
     return HDF_SUCCESS;
 }
@@ -238,17 +219,8 @@ int32_t VibratorInterfaceImpl::GetHapticCapacity(HapticCapacityVdi& hapticCapaci
 int32_t VibratorInterfaceImpl::GetHapticStartUpTime(int32_t mode, int32_t& startUpTime)
 {
     HDF_LOGI("%{public}s: Enter the GetHapticStartUpTime function\n", __func__);
-    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr || vibratorInterface->GetHapticStartUpTime == nullptr) {
-        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
-        return HDF_FAILURE;
-    }
-    int32_t ret = vibratorInterface->GetHapticStartUpTime(mode, &startUpTime);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
-    }
 
-    return ret;
+    return HDF_SUCCESS;
 }
 
 int32_t VibratorInterfaceImpl::StartByIntensity(const std::string& effectType, uint16_t intensity)

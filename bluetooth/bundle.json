@@ -29,33 +29,14 @@
         "samgr",
         "drivers_interface_bluetooth",
         "bluetooth_service",
-        "hitrace"
+        "hitrace",
+        "cJSON"
       ]
     },
     "build": {
       "sub_component": [
         "//drivers/peripheral/bluetooth/hci:bluetooth_hci_entry",
         "//drivers/peripheral/bluetooth/audio:hdi_audio_bluetooth"
-      ],
-      "inner_kits": [
-        {
-          "header": {
-            "header_base": "//drivers/peripheral/bluetooth/audio",
-            "header_files": [
-              "interfaces/include/audio_adapter.h",
-              "interfaces/include/audio_attribute.h",
-              "interfaces/include/audio_capture.h",
-              "interfaces/include/audio_control.h",
-              "interfaces/include/audio_manager.h",
-              "interfaces/include/audio_render.h",
-              "interfaces/include/audio_scene.h",
-              "interfaces/include/audio_types.h",
-              "interfaces/include/audio_volume.h",
-              "/hal/hdi_binder/proxy/include/audio_proxy_manager.h"
-            ]
-          },
-          "name": "//drivers/peripheral/bluetooth/audio:hdi_audio_bluetooth_header"
-        }
       ]
     }
   }

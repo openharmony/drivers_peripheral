@@ -18,8 +18,8 @@
 #include "iam_logger.h"
 #include "pin_auth_hdi.h"
 #include "all_in_one_impl.h"
-#include "v2_1/all_in_one_executor_service.h"
-#include "v2_1/all_in_one_executor_stub.h"
+#include "v3_0/all_in_one_executor_service.h"
+#include "v3_0/all_in_one_executor_stub.h"
 
 #undef LOG_TAG
 #define LOG_TAG "PIN_AUTH_HDI"
@@ -48,8 +48,8 @@ bool PinAuthExecutorStubFuzzTest(const uint8_t *rawData, size_t size)
         IAM_LOGE("%{public}s:get serviceImpl failed.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::PinAuth::V2_1::AllInOneExecutorStub> executorStub =
-        new OHOS::HDI::PinAuth::V2_1::AllInOneExecutorStub(impl);
+    sptr<OHOS::HDI::PinAuth::V3_0::AllInOneExecutorStub> executorStub =
+        new OHOS::HDI::PinAuth::V3_0::AllInOneExecutorStub(impl);
     if (executorStub == nullptr) {
         IAM_LOGE("%{public}s:new executorStub failed.", __func__);
         return false;

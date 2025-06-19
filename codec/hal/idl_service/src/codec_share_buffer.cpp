@@ -18,7 +18,7 @@
 #include <securec.h>
 #include <unistd.h>
 #include "codec_log_wrapper.h"
-using namespace OHOS::HDI::Codec::V3_0;
+using namespace OHOS::HDI::Codec::V4_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -37,12 +37,12 @@ void CodecShareBuffer::SetAshMem(std::shared_ptr<OHOS::Ashmem> shMem)
 
 OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 {
-    if (codecBuffer.fd < 0) {
+    if (codecBuffer.fd == nullptr) {
         CODEC_LOGE("codecBuffer.fd is invalid");
         return OHOS::sptr<ICodecBuffer>();
     }
-    int size = OHOS::AshmemGetSize(codecBuffer.fd);
-    std::shared_ptr<OHOS::Ashmem> sharedMem = std::make_shared<OHOS::Ashmem>(codecBuffer.fd, size);
+    int size = OHOS::AshmemGetSize(codecBuffer.fd->Get());
+    std::shared_ptr<OHOS::Ashmem> sharedMem = std::make_shared<OHOS::Ashmem>(codecBuffer.fd->Get(), size);
     if (sharedMem == nullptr) {
         CODEC_LOGE("Failed to init sharedMem");
         return OHOS::sptr<ICodecBuffer>();
@@ -57,7 +57,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBu
         CODEC_LOGE("MapReadAndWriteAshmem or MapReadOnlyAshmem return false");
         return OHOS::sptr<ICodecBuffer>();
     }
-    codecBuffer.fd = -1;
+    codecBuffer.fd.reset();
     CodecShareBuffer *buffer = new CodecShareBuffer(codecBuffer);
     buffer->SetAshMem(sharedMem);
     return OHOS::sptr<ICodecBuffer>(buffer);
@@ -86,8 +86,8 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Allocate(struct OmxCodecBuffer &codec
     }
     codecBuffer.offset = 0;
     codecBuffer.filledLen = 0;
+    codecBuffer.fd = UniqueFd::Create(sharedFD, false);
     CodecShareBuffer *buffer = new CodecShareBuffer(codecBuffer);
-    codecBuffer.fd = sharedFD;
     buffer->SetAshMem(sharedMemory);
     return OHOS::sptr<ICodecBuffer>(buffer);
 }

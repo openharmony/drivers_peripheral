@@ -65,7 +65,7 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_004, TestSize.Level1)
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_SCENE_BEAUTY_TYPES, &entry);
     if (ret != 0) {
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES not found");
-        return;
+        GTEST_SKIP();
     }
     CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES found");
     printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES value count is %d\n", entry.count);
@@ -73,11 +73,11 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_004, TestSize.Level1)
     if (entry.count == 0) {
         printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES value count is 0\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES value count is 0");
-        return;
+        GTEST_SKIP();
     } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!");
-        return;
+        GTEST_SKIP();
     } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
@@ -108,24 +108,24 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_006, TestSize.Level1)
         OHOS_CAMERA_BEAUTY_TYPE_FACE_SLENDER);
     if (!beautyFaceSlenderFlag) {
         CAMERA_LOGE("OHOS_CAMERA_BEAUTY_TYPE_FACE_SLENDER not found");
-        return;
+        GTEST_SKIP();
     }
 
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES, &entry);
     if (ret != 0) {
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES not found");
-        return;
+        GTEST_SKIP();
     }
     printf("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES value count is %d\n", entry.count);
     // Take a photo using the blurring effect TakePhotoWithTags()
     if (entry.count == 0) {
         printf("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES value count is 0\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES value count is 0");
-        return;
+        GTEST_SKIP();
     } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES data is NULL!");
-        return;
+        GTEST_SKIP();
     } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
@@ -157,24 +157,24 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_007, TestSize.Level1)
         OHOS_ABILITY_SCENE_BEAUTY_TYPES, OHOS_CAMERA_BEAUTY_TYPE_SKIN_TONE);
     if (!beautyFaceSlenderFlag) {
         CAMERA_LOGE("OHOS_CAMERA_BEAUTY_TYPE_SKIN_TONE not found");
-        return;
+        GTEST_SKIP();
     }
 
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES, &entry);
     if (ret != 0) {
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES not found");
-        return;
+        GTEST_SKIP();
     }
     printf("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES value count is %d\n", entry.count);
     // Take a photo using the blurring effect TakePhotoWithTags()
     if (entry.count == 0) {
         printf("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES value count is 0\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES value count is 0");
-        return;
+        GTEST_SKIP();
     } else if (entry.data.i32 == nullptr) {
         printf("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES data is NULL!");
-        return;
+        GTEST_SKIP();
     } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
@@ -206,24 +206,24 @@ HWTEST_F(FrontCameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_008, TestSize.Level1)
         OHOS_ABILITY_SCENE_BEAUTY_TYPES, OHOS_CAMERA_BEAUTY_TYPE_SKIN_SMOOTH);
     if (!beautyFaceSlenderFlag) {
         CAMERA_LOGE("OHOS_CAMERA_BEAUTY_TYPE_SKIN_SMOOTH, not found");
-        return;
+        GTEST_SKIP();
     }
 
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES, &entry);
     if (ret != 0) {
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES not found");
-        return;
+        GTEST_SKIP();
     }
     printf("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES value count is %d\n", entry.count);
     // Take a photo using the blurring effect TakePhotoWithTags()
     if (entry.count == 0) {
         printf("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES value count is 0\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES value count is 0");
-        return;
+        GTEST_SKIP();
     } else if (entry.data.u8 == nullptr) {
         printf("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES data is NULL!\n");
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES data is NULL!");
-        return;
+        GTEST_SKIP();
     } else {
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);

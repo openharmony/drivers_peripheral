@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,32 @@ public:
     }
 };
 
+class DemoCameraHostCallback_V1_2 : public HDI::Camera::V1_2::ICameraHostCallback {
+public:
+    DemoCameraHostCallback_V1_2() = default;
+    virtual ~DemoCameraHostCallback_V1_2() = default;
+
+    int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status)
+    {
+        return 0;
+    }
+
+    int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status)
+    {
+        return 0;
+    }
+
+    int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event)
+    {
+        return 0;
+    }
+
+    int32_t OnFlashlightStatus_V1_2(FlashlightStatus status)
+    {
+        return 0;
+    }
+};
+
 void DcameraHostSetCallbackFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -52,6 +78,12 @@ void DcameraHostSetCallbackFuzzTest(const uint8_t* data, size_t size)
     foo = "source";
     sptr<ICameraHostCallback> callbackObj(new DemoCameraHostCallback());
     DCameraHost::GetInstance()->SetCallback(callbackObj);
+    sptr<ICameraHostCallback> callback;
+    DCameraHost::GetInstance()->SetCallback(callback);
+    sptr<HDI::Camera::V1_2::ICameraHostCallback> callbackObj_V1_2;
+    DCameraHost::GetInstance()->SetCallback_V1_2(callbackObj_V1_2);
+    sptr<HDI::Camera::V1_2::ICameraHostCallback> callback_V1_2(new DemoCameraHostCallback_V1_2());
+    DCameraHost::GetInstance()->SetCallback_V1_2(callback_V1_2);
 }
 }
 }

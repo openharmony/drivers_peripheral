@@ -19,8 +19,8 @@
 #include <unistd.h>
 #include <hdf_remote_service.h>
 #include "codec_log_wrapper.h"
-#include "v3_0/codec_types.h"
-using namespace OHOS::HDI::Codec::V3_0;
+#include "v4_0/codec_types.h"
+using namespace OHOS::HDI::Codec::V4_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -47,19 +47,13 @@ sptr<ICodecBuffer> CodecDMABuffer::Allocate(struct OmxCodecBuffer &codecBuffer, 
         CODEC_LOGE("omxBuffer.pAppPrivate is invalid!");
         return sptr<ICodecBuffer>();
     }
-    bool isIpcMode = (HdfRemoteGetCallingPid() == getpid() ? false : true);
+
     codecBuffer.bufferType = CODEC_BUFFER_TYPE_DMA_MEM_FD;
     codecBuffer.offset = 0;
     codecBuffer.filledLen = 0;
     OMXBufferAppPrivateData *privateData = static_cast<OMXBufferAppPrivateData *>(omxBuffer.pAppPrivate);
-    if (isIpcMode) {
-        codecBuffer.fd = privateData->fd;
-    } else {
-        codecBuffer.fd = dup(privateData->fd);
-    }
-    struct OmxCodecBuffer codecBufferToStore = codecBuffer;
-    codecBufferToStore.fd = -1;
-    CodecDMABuffer *buffer = new CodecDMABuffer(codecBufferToStore);
+    codecBuffer.fd = UniqueFd::Create(privateData->fd, false);
+    CodecDMABuffer *buffer = new CodecDMABuffer(codecBuffer);
     return sptr<ICodecBuffer>(buffer);
 }
 

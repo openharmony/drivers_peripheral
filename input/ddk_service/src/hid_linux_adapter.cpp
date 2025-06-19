@@ -215,7 +215,7 @@ int32_t LinuxHidOsAdapter::GetReportDescriptor(int32_t fd, std::vector<uint8_t>&
     uint32_t tempSize = desc.size < data.size() ? desc.size : data.size();
     ret = memcpy_s(data.data(), data.size(), desc.value, tempSize);
     if (ret < 0) {
-        HDF_LOGE("%{public}s memcpy_s failed, ret=%{public}d, data.size=%{public}d, tempSize=%{public}d", __func__,
+        HDF_LOGE("%{public}s memcpy_s failed, ret=%{public}d, data.size=%{public}zu, tempSize=%{public}d", __func__,
             ret, data.size(), tempSize);
         return HID_DDK_MEMORY_ERROR;
     }

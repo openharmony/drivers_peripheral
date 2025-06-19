@@ -15,7 +15,8 @@
     "features": [
       "drivers_peripheral_vibrator_feature_model",
       "drivers_peripheral_vibrator_feature_community",
-      "drivers_peripheral_vibrator_feature_lite_support_test"
+      "drivers_peripheral_vibrator_feature_lite_support_test",
+      "drivers_peripheral_vibrator_feature_tv_flag"
     ],
     "syscap": [],
     "adapted_system_type": ["standard", "small"],
@@ -54,7 +55,7 @@
           }
         },
         {
-          "name": "//drivers/peripheral/vibrator/hdi_service:libvibrator_vdi_config"
+          "name": "//drivers/peripheral/vibrator/hdi_service_2.0:libvibrator_vdi_config"
         }
       ]
     }

@@ -18,7 +18,7 @@
 
 #include <vector>
 #include "native_buffer.h"
-#include "v2_0/codec_image_type.h"
+#include "v2_1/codec_image_type.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,10 +27,10 @@ extern "C" {
 #define CODEC_HEIF_VDI_LIB_NAME "libheif_vdi_impl.z.so"
 
 struct ICodecHeifHwi {
-    int32_t (*DoHeifEncode)(const std::vector<OHOS::HDI::Codec::Image::V2_0::ImageItem>& inputImgs,
-                            const std::vector<OHOS::HDI::Codec::Image::V2_0::MetaItem>& inputMetas,
-                            const std::vector<OHOS::HDI::Codec::Image::V2_0::ItemRef>& refs,
-                            OHOS::HDI::Codec::Image::V2_0::SharedBuffer& output);
+    int32_t (*DoHeifEncode)(const std::vector<OHOS::HDI::Codec::Image::V2_1::ImageItem>& inputImgs,
+                            const std::vector<OHOS::HDI::Codec::Image::V2_1::MetaItem>& inputMetas,
+                            const std::vector<OHOS::HDI::Codec::Image::V2_1::ItemRef>& refs,
+                            OHOS::HDI::Codec::Image::V2_1::SharedBuffer& output);
 };
 
 struct ICodecHeifHwi *GetCodecHeifHwi(void);

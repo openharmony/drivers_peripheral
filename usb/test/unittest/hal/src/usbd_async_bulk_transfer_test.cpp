@@ -201,7 +201,11 @@ HWTEST_F(UsbdAsyncBulkTransferTest, BulkWrite001, TestSize.Level1)
         ret = 0;
     }
     HDF_LOGI("UsbdAsyncBulkTransferTest::BulkWrite001 %{public}d UsbSubmitTransfer=%{public}d", __LINE__, ret);
-    EXPECT_EQ(ret, 0);
+    if (ret == 0) {
+        EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
+    }
     HDF_LOGI("Case End: BulkWrite001");
 }
 

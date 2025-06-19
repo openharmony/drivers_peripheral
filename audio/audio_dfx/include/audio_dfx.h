@@ -17,6 +17,17 @@
 #define AUDIO_DFX_H
 
 #include <stdint.h>
+#include "v5_0/audio_types.h"
+#include "v5_0/iaudio_manager.h"
+#include "v5_0/iaudio_adapter.h"
+#include "v5_0/iaudio_render.h"
+#include "v5_0/iaudio_capture.h"
+#include "audio_uhdf_log.h"
+#include <sys/time.h>
+
+#define TIME_1000 1000
+#define TIME_THRESHOLD 30
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,7 +36,8 @@ void HdfAudioStartTrace(const char* value, int valueLen);
 void HdfAudioFinishTrace(void);
 int32_t SetTimer(const char* name);
 void CancelTimer(int32_t id);
-
+struct timeval AudioDfxSysEventGetTimeStamp(void);
+int32_t AudioDfxSysEventError(const char* log, struct timeval startTime, int timeThreshold, int err);
 #ifdef __cplusplus
 }
 #endif

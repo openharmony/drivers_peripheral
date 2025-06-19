@@ -12,8 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
 
 group("hdi_audio_bluetooth") {
   deps = [
@@ -22,18 +20,4 @@ group("hdi_audio_bluetooth") {
     "hal/hdi_config:hdf_a2dp_adapter_json",
     "hal/hdi_passthrough:hdi_audio_bluetooth",
   ]
-}
-
-config("hdi_audio_bluetooth_header_config") {
-  include_dirs = [
-    "interfaces/include",
-    "hal/hdi_binder/proxy/include",
-  ]
-}
-
-ohos_static_library("hdi_audio_bluetooth_header") {
-  public_configs = [ ":hdi_audio_bluetooth_header_config" ]
-
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_bluetooth"
 }

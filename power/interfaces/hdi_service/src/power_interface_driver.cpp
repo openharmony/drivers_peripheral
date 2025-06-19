@@ -17,10 +17,11 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_2/power_interface_stub.h"
+#include "v1_3/power_interface_stub.h"
 
 #define HDF_LOG_TAG PowerInterfaceDriver
 
+using namespace OHOS::HDI::Power;
 using namespace OHOS::HDI::Power::V1_2;
 
 namespace {
@@ -71,7 +72,7 @@ static int HdfPowerInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfPowerInterfaceHost->ioService.Open = NULL;
     hdfPowerInterfaceHost->ioService.Release = NULL;
 
-    auto serviceImpl = IPowerInterface::Get(true);
+    auto serviceImpl = V1_3::IPowerInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfPowerInterfaceHost;
@@ -79,7 +80,7 @@ static int HdfPowerInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfPowerInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        IPowerInterface::GetDescriptor());
+        V1_3::IPowerInterface::GetDescriptor());
     if (hdfPowerInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfPowerInterfaceHost;

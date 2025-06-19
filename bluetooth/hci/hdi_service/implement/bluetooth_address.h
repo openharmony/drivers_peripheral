@@ -41,6 +41,7 @@ private:
     static bool CheckAddress(char *address);
     static std::shared_ptr<BluetoothAddress> GenerateDeviceAddressFile(
         const std::string &path = BT_DEVICE_ADDRESS_PATH);
+    static std::shared_ptr<BluetoothAddress> ParseAddressToPtr(char *address, int len);
 #ifdef BT_MAC_UPDATE
     static bool NeedReloadAddress();
 #endif

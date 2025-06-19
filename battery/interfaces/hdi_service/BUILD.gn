@@ -30,11 +30,11 @@ ohos_shared_library("libbattery_interface_service_2.0") {
   defines = []
   if (is_standard_system) {
     external_deps = [
+      "cJSON:cjson",
       "drivers_interface_battery:libbattery_stub_2.0",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "jsoncpp:jsoncpp",
     ]
     if (drivers_peripheral_battery_feature_config_policy) {
       external_deps += [ "config_policy:configpolicy_util" ]
@@ -50,9 +50,9 @@ ohos_shared_library("libbattery_interface_service_2.0") {
     }
   } else {
     external_deps = [
+      "cJSON:cjson",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "jsoncpp:jsoncpp",
     ]
   }
 
@@ -74,6 +74,7 @@ ohos_shared_library("libbattery_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "cJSON:cjson",
       "drivers_interface_battery:libbattery_stub_2.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -81,16 +82,15 @@ ohos_shared_library("libbattery_driver") {
       "hdf_core:libhdi",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "jsoncpp:jsoncpp",
     ]
     if (drivers_peripheral_battery_feature_c_utils) {
       external_deps += [ "c_utils:utils" ]
     }
   } else {
     external_deps = [
+      "cJSON:cjson",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "jsoncpp:jsoncpp",
     ]
   }
 

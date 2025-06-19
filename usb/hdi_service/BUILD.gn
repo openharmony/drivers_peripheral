@@ -51,6 +51,7 @@ ohos_shared_library("libusb_interface_service_1.2") {
 
   sources = [
     "src/usb_impl.cpp",
+    "src/usb_report_sys_event.cpp",
     "src/usbd_accessory.cpp",
     "src/usbd_dispatcher.cpp",
     "src/usbd_function.cpp",
@@ -73,8 +74,8 @@ ohos_shared_library("libusb_interface_service_1.2") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:usb_idl_headers_1.2",
-      "drivers_interface_usb:usb_idl_headers_2.0",
-      "drivers_interface_usb:usbfn_mtp_idl_headers",
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -148,6 +149,8 @@ ohos_shared_library("libusb_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_usb:libusb_stub_1.0",
+      "drivers_interface_usb:libusb_stub_1.1",
       "drivers_interface_usb:libusb_stub_1.2",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -162,6 +165,8 @@ ohos_shared_library("libusb_driver") {
     }
   } else {
     external_deps = [
+      "drivers_interface_usb:libusb_stub_1.0",
+      "drivers_interface_usb:libusb_stub_1.1",
       "drivers_interface_usb:libusb_stub_1.2",
       "hilog:libhilog",
       "ipc:ipc_single",
@@ -186,6 +191,7 @@ ohos_shared_library("libusb_port_interface_service_2.0") {
 
   sources = [
     "src/usb_port_impl.cpp",
+    "src/usb_report_sys_event.cpp",
     "src/usbd_function.cpp",
     "src/usbd_load_usb_service.cpp",
     "src/usbd_port.cpp",
@@ -204,8 +210,8 @@ ohos_shared_library("libusb_port_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:usb_idl_headers_2.0",
-      "drivers_interface_usb:usbfn_mtp_idl_headers",
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -311,6 +317,7 @@ ohos_shared_library("libusb_host_interface_service_2.0") {
 
   sources = [
     "src/usb_host_impl.cpp",
+    "src/usb_report_sys_event.cpp",
     "src/usb_transfer_callback.cpp",
     "src/usbd_function.cpp",
     "src/usbd_load_usb_service.cpp",
@@ -329,8 +336,8 @@ ohos_shared_library("libusb_host_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:usb_idl_headers_2.0",
-      "drivers_interface_usb:usbfn_mtp_idl_headers",
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -390,6 +397,7 @@ ohos_shared_library("libusb_device_interface_service_2.0") {
 
   sources = [
     "src/usb_device_impl.cpp",
+    "src/usb_report_sys_event.cpp",
     "src/usb_sa_subscriber.cpp",
     "src/usbd_accessory.cpp",
     "src/usbd_function.cpp",
@@ -409,8 +417,8 @@ ohos_shared_library("libusb_device_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:usb_idl_headers_2.0",
-      "drivers_interface_usb:usbfn_mtp_idl_headers",
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

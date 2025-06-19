@@ -17,7 +17,7 @@
 #include "parcel.h"
 #include "iam_logger.h"
 #include "pin_auth_hdi.h"
-#include "v2_1/pin_auth_interface_stub.h"
+#include "v3_0/pin_auth_interface_stub.h"
 
 #undef LOG_TAG
 #define LOG_TAG "PIN_AUTH_HDI"
@@ -41,7 +41,7 @@ bool PinAuthInterfaceStubFuzzTest(const uint8_t *rawData, size_t size)
         return false;
     }
     sptr<IPinAuthInterface> pinAuthInterface = IPinAuthInterface::Get(true);
-    OHOS::HDI::PinAuth::V2_1::PinAuthInterfaceStub pinAuthInterfaceStub(pinAuthInterface);
+    OHOS::HDI::PinAuth::V3_0::PinAuthInterfaceStub pinAuthInterfaceStub(pinAuthInterface);
     for (uint32_t code = HDI_PIN_AUTH_CODE_MIN; code <= HDI_PIN_AUTH_CODE_MAX; code++) {
         MessageParcel data;
         MessageParcel reply;

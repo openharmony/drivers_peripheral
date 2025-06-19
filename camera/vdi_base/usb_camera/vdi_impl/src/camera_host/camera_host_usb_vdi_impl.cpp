@@ -21,6 +21,7 @@
 
 #include "v1_0/icamera_host_vdi_callback.h"
 #include "camera_dump.h"
+#include "camera_host_selfkiller.h"
 #ifdef HITRACE_LOG_ENABLED
 #include "hdf_trace.h"
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
@@ -29,6 +30,7 @@
 #endif
 
 namespace OHOS::Camera {
+static std::unique_ptr<CameraHostSelfkiller> g_usbCameraSelfKiller = nullptr;
 
 CameraHostVdiImpl::CameraHostVdiImpl()
 {
@@ -38,6 +40,10 @@ CameraHostVdiImpl::CameraHostVdiImpl()
 CameraHostVdiImpl::~CameraHostVdiImpl()
 {
     CAMERA_LOGD("Dtor, instance");
+    if (g_usbCameraSelfKiller != nullptr) {
+        g_usbCameraSelfKiller->DeInit();
+        g_usbCameraSelfKiller = nullptr;
+    }
 }
 
 VdiCamRetCode CameraHostVdiImpl::Init()
@@ -66,6 +72,19 @@ VdiCamRetCode CameraHostVdiImpl::Init()
         });
 
     (void)DevHostRegisterDumpHost(CameraDumpEvent);
+    if (g_usbCameraSelfKiller == nullptr) {
+        g_usbCameraSelfKiller = std::make_unique<CameraHostSelfkiller>();
+        g_usbCameraSelfKiller->Init(
+            [this]() {
+                std::vector<std::string> cameraIds;
+                int32_t ret = GetCameraIds(cameraIds);
+                if (ret != 0) {
+                    return false;
+                }
+                return cameraIds.size() == 0;
+            },
+            []() { CAMERA_LOGW("Notify begin to selfkill."); });
+    }
     return VDI::Camera::V1_0::NO_ERROR;
 }
 
@@ -424,11 +443,11 @@ static int DestoryCameraHostVdiInstance(struct HdfVdiBase *vdiBase)
 
 static struct VdiWrapperCameraHost g_vdiCameraHost = {
     .base = {
-        .moduleVersion = 1,
-        .moduleName = "CameraHostVdiImplement",
-        .CreateVdiInstance = CreateCameraHostVdiInstance,
-        .DestoryVdiInstance = DestoryCameraHostVdiInstance,
-    },
+            .moduleVersion = 1,
+            .moduleName = "CameraHostVdiImplement",
+            .CreateVdiInstance = CreateCameraHostVdiInstance,
+            .DestoryVdiInstance = DestoryCameraHostVdiInstance,
+        },
     .module = nullptr,
 };
 

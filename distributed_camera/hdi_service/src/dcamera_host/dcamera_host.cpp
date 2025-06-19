@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,9 +71,9 @@ int32_t DCameraHost::SetCallback_V1_2(const sptr<HDI::Camera::V1_2::ICameraHostC
 
 int32_t DCameraHost::GetCameraIds(std::vector<std::string> &cameraIds)
 {
-    std::lock_guard<std::mutex> autoLock(deviceMapLock_);
-    auto iter = dCameraDeviceMap_.begin();
-    while (iter != dCameraDeviceMap_.end()) {
+    std::lock_guard<std::mutex> autoLock(dCameraIdMapLock_);
+    auto iter = dCameraIdMap_.begin();
+    while (iter != dCameraIdMap_.end()) {
         if (!(iter->first).empty()) {
             cameraIds.push_back(iter->first);
         }
@@ -96,7 +96,7 @@ int32_t DCameraHost::GetCameraAbilityFromDev(const std::string &cameraId, std::s
         }
     }
     if (device->GetDCameraAbility(cameraAbility) != CamRetCode::NO_ERROR) {
-        DHLOGE("DCameraHost::GetCameraAbility, GetDCameraAbility failed.");
+        DHLOGE("DCameraHost::GetCameraAbilityFromDev, GetDCameraAbility failed.");
         return CamRetCode::INVALID_ARGUMENT;
     }
     return CamRetCode::NO_ERROR;
@@ -104,13 +104,14 @@ int32_t DCameraHost::GetCameraAbilityFromDev(const std::string &cameraId, std::s
 
 int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<uint8_t> &cameraAbility)
 {
-    if (IsCameraIdInvalid(cameraId)) {
-        DHLOGE("DCameraHost::GetCameraAbility, input cameraId is invalid.");
+    std::string dcameraId = GetDcameraIdById(cameraId);
+    if (IsCameraIdInvalid(dcameraId)) {
+        DHLOGE("DCameraHost::GetCameraAbility, input dcameraId is invalid.");
         return CamRetCode::INVALID_ARGUMENT;
     }
-    DHLOGI("DCameraHost::GetCameraAbility for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
+    DHLOGI("DCameraHost::GetCameraAbility for dcameraId: %{public}s", GetAnonyString(dcameraId).c_str());
     std::shared_ptr<CameraAbility> ability;
-    int32_t ret = GetCameraAbilityFromDev(cameraId, ability);
+    int32_t ret = GetCameraAbilityFromDev(dcameraId, ability);
     if (ret != CamRetCode::NO_ERROR) {
         DHLOGE("DCameraHost::GetCameraAbility, GetCameraAbilityFromDev failed.");
         return CamRetCode::INVALID_ARGUMENT;
@@ -150,17 +151,18 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
 template<typename Callback, typename Device>
 int32_t DCameraHost::OpenCameraImpl(const std::string &cameraId, const Callback &callbackObj, Device &device)
 {
-    if (IsCameraIdInvalid(cameraId) || callbackObj == nullptr) {
-        DHLOGE("OpenCameraImpl, open camera id is invalid or camera device callback is null.");
+    std::string dcameraId = GetDcameraIdById(cameraId);
+    if (IsCameraIdInvalid(dcameraId) || callbackObj == nullptr) {
+        DHLOGE("OpenCameraImpl, open dcamera id is invalid or camera device callback is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    DHLOGI("OpenCameraImpl for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
+    DHLOGI("OpenCameraImpl for dcameraId: %{public}s", GetAnonyString(dcameraId).c_str());
 
     OHOS::sptr<DCameraDevice> dcameraDevice = nullptr;
     {
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
-        auto iter = dCameraDeviceMap_.find(cameraId);
+        auto iter = dCameraDeviceMap_.find(dcameraId);
         if (iter == dCameraDeviceMap_.end()) {
             DHLOGE("OpenCameraImpl, dcamera device not found.");
             return CamRetCode::INSUFFICIENT_RESOURCES;
@@ -174,7 +176,7 @@ int32_t DCameraHost::OpenCameraImpl(const std::string &cameraId, const Callback 
     }
 
     if (dcameraDevice->IsOpened()) {
-        DHLOGE("OpenCameraImpl, dcamera device %{public}s already opened.", GetAnonyString(cameraId).c_str());
+        DHLOGE("OpenCameraImpl, dcamera device %{public}s already opened.", GetAnonyString(dcameraId).c_str());
         return CamRetCode::CAMERA_BUSY;
     }
 
@@ -185,7 +187,7 @@ int32_t DCameraHost::OpenCameraImpl(const std::string &cameraId, const Callback 
     }
     device = dcameraDevice;
 
-    DHLOGI("OpenCameraImpl, open camera %{public}s success.", GetAnonyString(cameraId).c_str());
+    DHLOGI("OpenCameraImpl, open camera %{public}s success.", GetAnonyString(dcameraId).c_str());
     return CamRetCode::NO_ERROR;
 }
 
@@ -312,6 +314,8 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         return DCamRetCode::INVALID_ARGUMENT;
     }
     std::string dCameraId = dhBase.deviceId_ + "__" + dhBase.dhId_;
+    std::string cameraId = "";
+    AddDcameraId(dhBase, cameraId, dCameraId);
     {
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         if (dCameraDeviceMap_.find(dCameraId) != dCameraDeviceMap_.end()) {
@@ -340,17 +344,28 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
     }
     dcameraDevice->SetProviderCallback(callback);
     if (dCameraHostCallback_ != nullptr) {
-        dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
+        dCameraHostCallback_->OnCameraEvent(cameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
     }
     if (dCameraHostCallback_V1_2_ != nullptr) {
-        dCameraHostCallback_V1_2_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
+        dCameraHostCallback_V1_2_->OnCameraEvent(cameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
     }
     sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
     if (remote != nullptr) {
-        remote->AddDeathRecipient(dCameraHostRecipient_);
+        AddClearRegisterRecipient(remote, dhBase);
     }
     DHLOGI("AddDCameraDevice create dcamera device success, dCameraId: %{public}s", GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
+}
+
+void DCameraHost::AddDcameraId(const DHBase &dhBase, std::string &cameraId, const std::string &dCameraId)
+{
+    std::string dhId = dhBase.dhId_;
+    std::string lastStr = dhId.substr(dhId.length() - 1, 1);
+    cameraId = "device/remote" + lastStr;
+    {
+        std::lock_guard<std::mutex> autoLock(dCameraIdMapLock_);
+        dCameraIdMap_[cameraId] = dCameraId;
+    }
 }
 
 size_t DCameraHost::GetCamDevNum()
@@ -380,7 +395,7 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
         if (callback != nullptr) {
             sptr<IRemoteObject> remoteObj = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
             if (remoteObj != nullptr) {
-                remoteObj->RemoveDeathRecipient(dCameraHostRecipient_);
+                RemoveClearRegisterRecipient(remoteObj, dhBase);
             }
         }
     }
@@ -388,13 +403,24 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         dCameraDeviceMap_.erase(dCameraId);
     }
+    std::string cameraId = "";
+    {
+        std::lock_guard<std::mutex> autoLock(dCameraIdMapLock_);
+        for (const auto &pair : dCameraIdMap_) {
+            if (pair.second == dCameraId) {
+                cameraId = pair.first;
+                break;
+            }
+        }
+        dCameraDeviceMap_.erase(cameraId);
+    }
 
     if (dCameraHostCallback_ != nullptr) {
-        dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
+        dCameraHostCallback_->OnCameraEvent(cameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
 
     if (dCameraHostCallback_V1_2_ != nullptr) {
-        dCameraHostCallback_V1_2_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
+        dCameraHostCallback_V1_2_->OnCameraEvent(cameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
 
     DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %{public}s",
@@ -457,10 +483,124 @@ void DCameraHost::NotifyDCameraStatus(const DHBase &dhBase, int32_t result)
     }
 }
 
+std::string DCameraHost::GetDcameraIdById(const std::string &cameraId)
+{
+    if (cameraId.empty()) {
+        DHLOGE("DCameraHost::GetDcameraIdById, cameraId not exist.");
+        return "";
+    }
+    std::lock_guard<std::mutex> autoLock(dCameraIdMapLock_);
+    auto iter = dCameraIdMap_.find(cameraId);
+    if (iter == dCameraIdMap_.end()) {
+        DHLOGE("DCameraHost::GetDcameraIdById, dcamera id not found.");
+        return "";
+    }
+    return iter->second;
+}
+
+DCamRetCode DCameraHost::RegisterCameraHdfListener(const std::string &serviceName,
+    const sptr<IDCameraHdfCallback> &callbackObj)
+{
+    DHLOGI("Register camera HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraHdfCallback>(callbackObj);
+    if (remote == nullptr) {
+        DHLOGE("Remote callback is nullptr.");
+        return DCamRetCode::FAILED;
+    }
+    if (!remote->AddDeathRecipient(dCameraHostRecipient_)) {
+        DHLOGE("AddDeathRecipient failed, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+        return DCamRetCode::FAILED;
+    }
+    std::lock_guard<std::mutex> lock(hdfCallbackMapMtx_);
+    if (mapCameraHdfCallback_.find(serviceName) != mapCameraHdfCallback_.end()) {
+        DHLOGI("The callback has been registered and will be replaced, serviceName: %{public}s.",
+            GetAnonyString(serviceName).c_str());
+    }
+    mapCameraHdfCallback_[serviceName] = callbackObj;
+    DHLOGI("Register camera HDF listener suncess, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    return DCamRetCode::SUCCESS;
+}
+
+DCamRetCode DCameraHost::UnRegisterCameraHdfListener(const std::string &serviceName)
+{
+    DHLOGI("Unregister camera HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    std::lock_guard<std::mutex> lock(hdfCallbackMapMtx_);
+    auto itCallback = mapCameraHdfCallback_.find(serviceName);
+    if (itCallback == mapCameraHdfCallback_.end() || itCallback->second == nullptr) {
+        DHLOGE("Camera HDF callback has not been created or is null ptr.");
+        return DCamRetCode::FAILED;
+    }
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraHdfCallback>(itCallback->second);
+    if (remote == nullptr) {
+        DHLOGE("Remote callback is nullptr.");
+        return DCamRetCode::FAILED;
+    }
+    if (!remote->RemoveDeathRecipient(dCameraHostRecipient_)) {
+        DHLOGE("RemoveDeathRecipient failed, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+        return DCamRetCode::FAILED;
+    }
+    mapCameraHdfCallback_.erase(itCallback);
+    DHLOGI("Unregister camera HDF listener suncess, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    return DCamRetCode::SUCCESS;
+}
+
+void DCameraHost::ClearRegisterRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    DHLOGI("Remote died, remote dcamera device begin.");
+    auto dCameraHost = DCameraHost::GetInstance();
+    if (dCameraHost != nullptr) {
+        dCameraHost->RemoveDCameraDevice(dhBase_);
+    }
+    needErase_ = true;
+    DHLOGI("Remote died, remote dcamera device end.");
+}
+
 void DCameraHost::DCameraHostRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     DHLOGE("Exit the current process.");
     _Exit(0);
+}
+
+int32_t DCameraHost::AddClearRegisterRecipient(sptr<IRemoteObject> &remote, const DHBase &dhBase)
+{
+    DHLOGI("add clear register recipient begin.");
+    auto clearRegisterRecipient = sptr<ClearRegisterRecipient>(new ClearRegisterRecipient(dhBase));
+    if (clearRegisterRecipient == nullptr) {
+        DHLOGE("Create clear register recipient object failed.");
+        return DCamRetCode::FAILED;
+    }
+    if (remote->AddDeathRecipient(clearRegisterRecipient) == false) {
+        DHLOGE("call AddDeathRecipient failed.");
+        return DCamRetCode::FAILED;
+    }
+    std::lock_guard<std::mutex> lock(clearRegisterRecipientsMtx_);
+    clearRegisterRecipients_.erase(std::remove_if(clearRegisterRecipients_.begin(), clearRegisterRecipients_.end(),
+        [](sptr<ClearRegisterRecipient> &clearRegisterRecipient) {
+            return clearRegisterRecipient->IsNeedErase();
+        }), clearRegisterRecipients_.end());
+    clearRegisterRecipients_.push_back(clearRegisterRecipient);
+    DHLOGI("add clear register recipient end.");
+    return DCamRetCode::SUCCESS;
+}
+
+int32_t DCameraHost::RemoveClearRegisterRecipient(sptr<IRemoteObject> &remote, const DHBase &dhBase)
+{
+    DHLOGI("remove clear register recipient begin.");
+    std::lock_guard<std::mutex> lock(clearRegisterRecipientsMtx_);
+    for (auto itRecipient = clearRegisterRecipients_.begin();
+        itRecipient != clearRegisterRecipients_.end(); ++itRecipient) {
+        auto &clearRegisterRecipient = *itRecipient;
+        if (clearRegisterRecipient->IsMatch(dhBase)) {
+            if (remote->RemoveDeathRecipient(clearRegisterRecipient) == false) {
+                DHLOGE("call RemoveDeathRecipient failed.");
+            }
+            clearRegisterRecipients_.erase(itRecipient);
+            DHLOGI("remove one clear register recipient.");
+            break;
+        }
+    }
+    DHLOGI("remove clear register recipient end.");
+    return DCamRetCode::SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

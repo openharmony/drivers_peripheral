@@ -39,6 +39,7 @@ typedef struct ExecutorResultInfo {
     int32_t freezingTime;
     int32_t remainTimes;
     Buffer *rootSecret;
+    Buffer *oldRootSecret;
 } ExecutorResultInfo;
 
 typedef struct ExecutorMsg {

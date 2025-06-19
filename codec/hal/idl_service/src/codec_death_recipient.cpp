@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V3_0 {
+namespace V4_0 {
 
 static std::map<IRemoteObject *, std::set<uint32_t>> g_remoteCompsMap;
 static std::map<IRemoteObject *, sptr<CodecDeathRecipient>> g_deathReciMap;
@@ -111,7 +111,7 @@ void RemoveMapperOfDestoryedComponent(uint32_t componentId)
     }
     CODEC_LOGI("Remove mapper destoryedComponent success!");
 }
-}  // namespace V3_0
+}  // namespace V4_0
 }  // namespace Codec
 }  // namespace HDI
 }  // namespace OHOS

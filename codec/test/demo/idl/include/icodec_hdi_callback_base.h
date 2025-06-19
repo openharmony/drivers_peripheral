@@ -15,12 +15,12 @@
 
 #ifndef CODEC_HDI_BASE_H
 #define CODEC_HDI_BASE_H
-#include "v3_0/codec_types.h"
+#include "v4_0/codec_types.h"
 class ICodecHdiCallBackBase {
 public:
-    virtual int32_t EventHandler(OHOS::HDI::Codec::V3_0::CodecEventType event,
-        const OHOS::HDI::Codec::V3_0::EventInfo &info) = 0;
-    virtual int32_t OnEmptyBufferDone(const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer) = 0;
-    virtual int32_t OnFillBufferDone(const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer) = 0;
+    virtual int32_t EventHandler(OHOS::HDI::Codec::V4_0::CodecEventType event,
+        const OHOS::HDI::Codec::V4_0::EventInfo &info) = 0;
+    virtual int32_t OnEmptyBufferDone(const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer) = 0;
+    virtual int32_t OnFillBufferDone(const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer) = 0;
 };
 #endif  // CODEC_HDI_BASE_H

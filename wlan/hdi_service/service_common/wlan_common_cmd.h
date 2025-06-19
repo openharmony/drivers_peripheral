@@ -17,6 +17,8 @@
  
 #include "../wlan_impl.h"
 
+#define WLAN_MAJOR_VER 1
+#define WLAN_MINOR_VER 3
 int32_t WlanInterfaceStart(struct IWlanInterface *self);
 int32_t WlanInterfaceStop(struct IWlanInterface *self);
 int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, struct HdfFeatureInfo *ifeature);
@@ -78,4 +80,5 @@ int32_t WlanInterfaceSetPowerSaveMode(struct IWlanInterface *self, const char *i
 int32_t WlanInterfaceSetDpiMarkRule(struct IWlanInterface *self, int32_t uid, int32_t protocol, int32_t enable);
 int32_t WlanInterfaceWifiConstruct(void);
 int32_t WlanInterfaceWifiDestruct(void);
+int32_t WlanGetVersion(struct IWlanInterface *self, uint32_t *majorVer, uint32_t *minorVer);
 #endif

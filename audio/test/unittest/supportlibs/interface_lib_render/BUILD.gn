@@ -70,14 +70,9 @@ if (defined(ohos_lite)) {
       "$hdf_audio_path/hal/hdi_passthrough/include",
       "$hdf_audio_path/interfaces/include",
       "$hdf_audio_path/supportlibs/interfaces/include",
-      "//third_party/googletest/googletest/include/gtest",
     ]
 
-    deps = [
-      "$hdf_audio_path/hdi_service/supportlibs:audio_render_adapter",
-      "//third_party/googletest:gmock_main",
-      "//third_party/googletest:gtest_main",
-    ]
+    deps = [ "$hdf_audio_path/hdi_service/supportlibs:audio_render_adapter" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -90,6 +85,10 @@ if (defined(ohos_lite)) {
     } else if (defined(ohos_lite)) {
       external_deps = [ "hilog_lite:hilog_shared" ]
     }
-    external_deps += [ "bounds_checking_function:libsec_shared" ]
+    external_deps += [
+      "bounds_checking_function:libsec_shared",
+      "googletest:gmock_main",
+      "googletest:gtest_main",
+    ]
   }
 }

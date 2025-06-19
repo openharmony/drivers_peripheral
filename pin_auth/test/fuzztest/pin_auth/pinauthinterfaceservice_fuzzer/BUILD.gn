@@ -32,11 +32,12 @@ ohos_fuzztest("PinAuthInterfaceServiceFuzzTest") {
 
   sources = [ "pin_auth_interface_service_fuzzer.cpp" ]
 
-  deps = [ "../common_fuzzer:libpin_auth_interface_service_2.1_fuzzer" ]
+  deps = [ "../common_fuzzer:libpin_auth_interface_service_3.0_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_pin_auth:libpin_auth_stub_2.1",
+    "drivers_interface_pin_auth:libpin_auth_stub_3.0",
+    "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
   ]

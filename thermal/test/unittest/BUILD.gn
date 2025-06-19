@@ -46,8 +46,13 @@ ohos_unittest("hdi_unittest_thermal") {
       "ipc:ipc_single",
       "libxml2:libxml2",
     ]
+    defines = []
     if (drivers_peripheral_thermal_feature_c_utils) {
       external_deps += [ "c_utils:utils" ]
+    }
+    if (drivers_peripheral_thermal_feature_datasize_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+      defines += [ "DATA_SIZE_HISYSEVENT_ENABLE" ]
     }
   } else {
     external_deps = [ "hilog:libhilog" ]

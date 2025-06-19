@@ -138,7 +138,8 @@ void HosV4L2UVC::V4L2UvcMatchDev(const std::string name, const std::string v4l2D
 
 RetCode HosV4L2UVC::V4L2UvcGetCap(const std::string v4l2Device, struct v4l2_capability& cap)
 {
-    int fd, rc;
+    int fd;
+    int rc;
     char *devName = nullptr;
     char absPath[PATH_MAX] = {0};
 

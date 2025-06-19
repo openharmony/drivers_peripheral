@@ -36,6 +36,9 @@
 #include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG UsbDeviceImpl
+namespace {
+constexpr const char* EDM_SYSTEM_CAPABILITY = "const.SystemCapability.Driver.ExternalDevice";  
+}
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace HDI {
@@ -46,6 +49,7 @@ V1_2::UsbdLoadService UsbDeviceImpl::loadUsbService_ = {USB_SYSTEM_ABILITY_ID};
 V1_2::UsbdLoadService UsbDeviceImpl::loadHdfEdm_ = {HDF_EXTERNAL_DEVICE_MANAGER_SA_ID};
 UsbdSubscriber UsbDeviceImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbDeviceImpl::isGadgetConnected_ = false;
+bool UsbDeviceImpl::isEdmExist_ = false;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 static const std::map<std::string, uint32_t> configMap = {
     {HDC_CONFIG_OFF, USB_FUNCTION_NONE},
@@ -276,10 +280,16 @@ int32_t UsbDeviceImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf 
     HDF_LOGI("%{public}s: enter", __func__);
     (void)priv;
     (void)data;
-    if (id == USB_PNP_DRIVER_GADGET_ADD) {
+    if (id == USB_PNP_DRIVER_GADGET_ADD || id == USB_PNP_NOTIFY_ADD_DEVICE) {
         if (loadUsbService_.LoadService() != 0) {
             HDF_LOGE("loadUsbService_ LoadService error");
             return HDF_FAILURE;
+        }
+        if (isEdmExist_ && id == USB_PNP_NOTIFY_ADD_DEVICE) {
+            if (loadHdfEdm_.LoadService() != 0) {
+                HDF_LOGE("loadHdfEdm_ LoadService error");
+                return HDF_FAILURE;
+            }
         }
     }
     return HDF_SUCCESS;
@@ -309,18 +319,14 @@ int32_t UsbDeviceImpl::UsbdEventHandle(void)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     UpdateFunctionStatus();
+    isEdmExist_ = OHOS::system::GetBoolParameter(EDM_SYSTEM_CAPABILITY, false);
+    HDF_LOGI("%{public}s: isEmdExit: %{public}d", __func__, isEdmExist_);
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     int32_t ret = DdkListenerMgrAdd(&listenerForLoadService_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
         return HDF_FAILURE;
     }
-    sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber = new (std::nothrow) V1_2::UsbSaSubscriber();
-    if (libUsbSaSubscriber == nullptr) {
-        HDF_LOGE("%{public}s: register listerer failed", __func__);
-        return HDF_FAILURE;
-    }
-    V1_2::LibusbAdapter::GetInstance()->SetLoadUsbSaSubscriber(libUsbSaSubscriber);
     return ret;
 }
 

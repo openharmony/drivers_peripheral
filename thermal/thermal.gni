@@ -15,5 +15,6 @@ import("//build/ohos.gni")
 declare_args() {
   drivers_peripheral_thermal_feature_config_policy = true
   drivers_peripheral_thermal_feature_c_utils = true
+  drivers_peripheral_thermal_feature_datasize_hisysevent_enable = false
   drivers_peripheral_thermal_feature_hitrace = true
 }

@@ -14,7 +14,7 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 
-ohos_source_set("libpin_auth_interface_service_2.1_fuzzer") {
+ohos_source_set("libpin_auth_interface_service_3.0_fuzzer") {
   branch_protector_ret = "pac_ret"
   include_dirs = [
     "../../../../hdi_service/service/inc",
@@ -53,7 +53,8 @@ ohos_source_set("libpin_auth_interface_service_2.1_fuzzer") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_pin_auth:libpin_auth_stub_2.1",
+    "drivers_interface_pin_auth:libpin_auth_stub_3.0",
+    "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
