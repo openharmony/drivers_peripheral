@@ -1,0 +1,40 @@
+{
+    "name": "@ohos/drivers_peripheral_lpplayer",
+    "description": "low_power_player device driver",
+    "version": "6.0",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+      "destPath": "drivers/peripheral/low_power_player"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+      "name": "drivers_peripheral_lpplayer",
+      "subsystem": "hdf",
+      "features": [
+      ],
+      "syscap": [],
+      "adapted_system_type": ["standard"],
+      "rom": "675KB",
+      "ram": "7400KB",
+      "deps": {
+        "components": [
+          "drivers_interface_lpplayer",
+          "bounds_checking_function",
+          "c_utils",
+          "graphic_surface",
+          "hdf_core",
+          "hitrace",
+          "hilog",
+          "ipc"
+        ],
+        "third_party": []
+      },
+      "build": {
+        "sub_component": [
+          "//drivers/peripheral/low_power_player:lpp_idl_service"
+        ]
+      }
+    }
+  }
