@@ -11,7 +11,7 @@
   "scripts": {},
   "component": {
     "name": "drivers_peripheral_clearplay",
-    "subsystem": "hdf",
+    "subsystem": "multimedia",
     "syscap": [],
     "adapted_system_type": ["standard"],
     "rom": "675KB",
