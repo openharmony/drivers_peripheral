@@ -268,7 +268,8 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
         GetAnonyString(event.adapterName).c_str(), event.dhId);
     std::stringstream ss;
     ss << "EVENT_TYPE=" << event.eventType << ";NID=" << event.adapterName << ";PIN=" << event.dhId << ";VID=" <<
-        event.volGroupId << ";IID=" << event.iptGroupId;
+        event.volGroupId << ";IID=" << event.iptGroupId << ";CAPS=" << event.caps;
+
     std::string eventInfo = ss.str();
     int ret = HdfDeviceObjectSetServInfo(deviceObject_, eventInfo.c_str());
     if (ret != HDF_SUCCESS) {
