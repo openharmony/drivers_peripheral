@@ -62,7 +62,7 @@ class SensorIfService : public V3_0::ISensorInterface {
     int32_t EnableSdcSensor(uint32_t serviceId, const SensorHandle& sensorHandle,
                                              int64_t samplingInterval, int64_t reportInterval);
     int32_t DisableSdcSensor(uint32_t serviceId, const SensorHandle& sensorHandle,
-                                              int64_t samplingInterval);
+                                              int64_t samplingInterval, int64_t reportInterval);
     int32_t GetSdcSensorInfo(std::vector<V3_0::SdcSensorInfo> &sdcSensorInfo) override;
     int32_t RegisterAsync(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj) override;
     int32_t UnregisterAsync(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj) override;
