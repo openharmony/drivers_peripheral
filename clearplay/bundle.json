@@ -23,11 +23,11 @@
         "c_utils",
         "hdf_core",
         "hilog",
-        "ipc"
+        "ipc",
+        "openssl",
+	      "cJSON"
       ],
       "third_party": [
-        "openssl",
-	"cJSON"
       ]
     },
     "build": {
