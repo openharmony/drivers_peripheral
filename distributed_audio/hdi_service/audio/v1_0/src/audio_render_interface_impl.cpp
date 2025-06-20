@@ -129,6 +129,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     }
 #endif
 
+    replyBytes = data.data.size();
     ++frameIndex_;
     DHLOGD("Render audio frame success.");
     int64_t endTime = GetNowTimeUs();
@@ -577,9 +578,18 @@ int32_t AudioRenderInterfaceImpl::ReqMmapBuffer(int32_t reqSize, AudioMmapBuffer
         return HDF_FAILURE;
     }
 #else
-    DHLOGI("Request mmap buffer, not support yet.");
-    (void)reqSize;
-    (void)desc;
+    DHLOGI("Request mmap buffer.");
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Callback is nullptr.");
+        return HDF_FAILURE;
+    }
+
+    std::string content = std::to_string(reqSize);
+    DAudioEvent event = { HDF_AUDIO_OFFLOAD_BUF_SIZE_CHANGE, content};
+    if (audioExtCallback_->NotifyEvent(renderId_, event) != HDF_SUCCESS) {
+        DHLOGE("Set volume failed.");
+        return HDF_FAILURE;
+    }
 #endif
     return HDF_SUCCESS;
 }
