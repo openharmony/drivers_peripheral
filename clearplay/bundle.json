@@ -11,7 +11,7 @@
   "scripts": {},
   "component": {
     "name": "drivers_peripheral_clearplay",
-    "subsystem": "multimedia",
+    "subsystem": "hdf",
     "syscap": [],
     "adapted_system_type": ["standard"],
     "rom": "675KB",
@@ -25,7 +25,7 @@
         "hilog",
         "ipc",
         "openssl",
-	      "cJSON"
+        "cJSON"
       ],
       "third_party": [
       ]
