@@ -897,7 +897,7 @@ int32_t SensorIfService::SetSdcSensor(const OHOS::HDI::Sensor::V3_0::DeviceSenso
     VoteEnable(sensorHandle, serviceId, enabled);
 
     return enabled ? EnableSdcSensor(serviceId, sensorHandle, samplingInterval, reportInterval)
-                   : DisableSdcSensor(serviceId, sensorHandle, samplingInterval);
+                   : DisableSdcSensor(serviceId, sensorHandle, samplingInterval, reportInterval);
 }
 
 int64_t SensorIfService::CalculateSamplingInterval(int32_t rateLevel)
@@ -930,7 +930,7 @@ int32_t SensorIfService::EnableSdcSensor(uint32_t serviceId, const SensorHandle&
 }
 
 int32_t SensorIfService::DisableSdcSensor(uint32_t serviceId, const SensorHandle& sensorHandle,
-                                          int64_t samplingInterval)
+                                          int64_t samplingInterval, int64_t reportInterval)
 {
     SensorClientsManager::GetInstance()->EraseSdcSensorBestConfig(sensorHandle);
 
@@ -940,13 +940,13 @@ int32_t SensorIfService::DisableSdcSensor(uint32_t serviceId, const SensorHandle
         return ret;
     }
 
-    SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorHandle, samplingInterval, samplingInterval);
+    SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorHandle, samplingInterval, reportInterval);
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
 #ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, samplingInterval, samplingInterval);
+    ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, samplingInterval, reportInterval);
 #else
-    ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, samplingInterval, samplingInterval);
+    ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, samplingInterval, reportInterval);
 #endif
     SENSOR_TRACE_FINISH;
 
