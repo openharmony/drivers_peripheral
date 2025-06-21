@@ -22,8 +22,6 @@ ohos_shared_library("libmedia_key_system_factory_clearplay_service_1.0") {
     "./../interfaces/include/drm/v1_0",
     "./../interfaces/include/drm",
     "./common",
-    "//third_party/openssl/include",
-    "//third_party/cJSON/",
   ]
   sources = [
     "./common/base64_utils.cpp",
@@ -37,11 +35,6 @@ ohos_shared_library("libmedia_key_system_factory_clearplay_service_1.0") {
     "./src/media_key_system_factory_service.cpp",
     "./src/media_key_system_service.cpp",
     "./src/oem_certificate_service.cpp",
-  ]
-
-  deps = [
-    "//third_party/cJSON:cjson",
-    "//third_party/openssl:libcrypto_shared",
   ]
 
   cflags = [
@@ -58,6 +51,8 @@ ohos_shared_library("libmedia_key_system_factory_clearplay_service_1.0") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "cJSON:cjson",
+    "openssl:libcrypto_shared",
   ]
 
   install_images = [ chipset_base_dir ]
