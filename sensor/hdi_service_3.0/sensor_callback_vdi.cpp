@@ -117,6 +117,10 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
 
 void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event)
 {
+    if (event.dataLen <= 0 || event.dataLen % sizeof(float) != 0) {
+        HDF_LOGE("%{public}s: invalid dataLen: %d", __func__, event.dataLen);
+        return;
+    }
     void *origin = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
     if (origin == nullptr) {
         HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);

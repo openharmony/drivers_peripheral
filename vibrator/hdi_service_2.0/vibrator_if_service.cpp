@@ -324,7 +324,7 @@ int32_t VibratorIfService::GetEffectInfo(const OHOS::HDI::Vibrator::V2_0::Device
 {
     HDF_LOGD("%{public}s: Enter the GetEffectInfo function.", __func__);
 
-    HdfEffectInfoVdi effectInfoVdi;
+    HdfEffectInfoVdi effectInfoVdi = {0, false};
     StartTrace(HITRACE_TAG_HDF, "GetEffectInfo");
 #ifdef TV_FLAG
     int32_t ret = vibratorVdiImplV1_1_->GetEffectInfo(deviceVibratorInfo, effectType, effectInfoVdi);
@@ -417,7 +417,7 @@ int32_t VibratorIfService::GetHapticCapacity(const OHOS::HDI::Vibrator::V2_0::De
 {
     HDF_LOGD("%{public}s: Enter the GetHapticCapacity function", __func__);
 
-    HapticCapacityVdi hapticCapacityVdi;
+    HapticCapacityVdi hapticCapacityVdi = {false, false, false, 0, false, 0};
     StartTrace(HITRACE_TAG_HDF, "GetHapticCapacity");
 #ifdef TV_FLAG
     int32_t ret = vibratorVdiImplV1_1_->GetHapticCapacity(deviceVibratorInfo, hapticCapacityVdi);

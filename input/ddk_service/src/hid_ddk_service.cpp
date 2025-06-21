@@ -149,7 +149,13 @@ int32_t HidDdkService::Open(uint64_t deviceId, uint8_t interfaceIndex, HidDevice
         return HID_DDK_DEVICE_NOT_FOUND;
     }
 
-    FILE* file = fopen(path.c_str(), "r+");
+    char realpathStr[PATH_MAX] = {'\0'};
+    if (realpath(path.c_str(), realpathStr) == nullptr) {
+        HDF_LOGE("%{public}s:realpath failed.ret = %{public}s", __func__, strerror(errno));
+        return HID_DDK_IO_ERROR;
+    }
+
+    FILE* file = fopen(realpathStr, "r+");
     if (file == nullptr) {
         HDF_LOGE("%{public}s fopen failed, path=%{public}s, errno=%{public}d", __func__, path.c_str(), errno);
         return HID_DDK_IO_ERROR;
@@ -235,8 +241,8 @@ int32_t HidDdkService::ReadTimeout(const HidDeviceHandle& dev, std::vector<uint8
             HDF_LOGE("%{public}s poll failed, errno=%{public}d", __func__, errno);
             return HID_DDK_IO_ERROR;
         }
-        if (fds.revents & (POLLERR | POLLHUP | POLLNVAL)) {
-            HDF_LOGE("%{public}s poll failed, revents=%{public}d", __func__, fds.revents);
+        if ((unsigned int)fds.revents & (POLLERR | POLLHUP | POLLNVAL)) {
+            HDF_LOGE("%{public}s poll failed, revents=%{public}u", __func__, (unsigned int)fds.revents);
             return HID_DDK_IO_ERROR;
         }
     }
@@ -249,7 +255,7 @@ int32_t HidDdkService::ReadTimeout(const HidDeviceHandle& dev, std::vector<uint8
         return HID_DDK_IO_ERROR;
     }
 
-    bytesRead = readRet;
+    bytesRead = static_cast<uint32_t>readRet;
     return HID_DDK_SUCCESS;
 }
 
