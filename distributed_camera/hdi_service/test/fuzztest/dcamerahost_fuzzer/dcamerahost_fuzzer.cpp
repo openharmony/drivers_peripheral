@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h> 
 
 #include "dcamera_host.h"
 
@@ -101,6 +102,56 @@ void DCameraGetCameraIdByDHBaseFuzzTest(const uint8_t* data, size_t size)
     dhBase.dhId_ = dhId;
     DCameraHost::GetInstance()->GetCameraIdByDHBase(dhBase);
 }
+
+void DCameraGetResourceCostFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+    std::string cameraId(reinterpret_cast<const char*>(data), size);
+    OHOS::HDI::Camera::V1_3::CameraDeviceResourceCost resourceCost;
+
+    DCameraHost::GetInstance()->GetResourceCost(cameraId, resourceCost);
+}
+
+void DCameraNotifyDeviceStateChangeInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t) * 2)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    int32_t notifyType = *(reinterpret_cast<const int32_t*>(data));
+    int32_t deviceState = *(reinterpret_cast<const int32_t*>(data + sizeof(int32_t)));
+    DCameraHost::GetInstance()->NotifyDeviceStateChangeInfo(notifyType, deviceState);
+}
+
+void DCameraPreCameraSwitchFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+    std::string cameraId(reinterpret_cast<const char*>(data), size);
+    DCameraHost::GetInstance()->PreCameraSwitch(cameraId);
+}
+
+void DCameraPrelaunchWithOpModeFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    int32_t operationMode = *(reinterpret_cast<const int32_t*>(data));
+    PrelaunchConfig config;
+    DCameraHost::GetInstance()->PrelaunchWithOpMode(config, operationMode);
+}
+
+void DCameraPrelaunchFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+    PrelaunchConfig config;
+    DCameraHost::GetInstance()->Prelaunch(config);
+}
 }
 }
 
@@ -113,5 +164,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::DCameraGetCamDevNumFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraIsCameraIdInvalidFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraGetCameraIdByDHBaseFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraGetResourceCostFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraNotifyDeviceStateChangeInfoFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraPreCameraSwitchFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraPrelaunchWithOpModeFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraPrelaunchFuzzTest(data, size);
     return 0;
 }
