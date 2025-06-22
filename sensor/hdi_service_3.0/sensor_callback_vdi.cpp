@@ -117,7 +117,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
 
 void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event)
 {
-    if (event.dataLen < static_cast<int>(sizeof(float))) {
+    if (event.dataLen < static_cast<int>(sizeof(float)) || event.dataLen > DATA_LEN) {
         HDF_LOGE("%{public}s: invalid dataLen: %d", __func__, event.dataLen);
         return;
     }
@@ -136,7 +136,13 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
     char arrayStr[DATA_LEN] = {0};
 
     for (int32_t i = 0; i < dataDimension; i++) {
-        if (sprintf_s(arrayStr + strlen(arrayStr), DATA_LEN, "[%f]", data[i]) < 0) {
+        int32_t ilen = DATA_LEN - strlen(arrayStr) - 1;
+        if (ilen <= 0) {
+           HDF_LOGE("%{public}s: bufferover failed", __func__);
+           OsalMemFree(origin);
+           return;
+        }
+        if (sprintf_s(arrayStr + strlen(arrayStr), ilen, "[%f]", data[i]) < 0) {
             HDF_LOGE("%{public}s: sprintf_s failed", __func__);
             OsalMemFree(origin);
             return;
