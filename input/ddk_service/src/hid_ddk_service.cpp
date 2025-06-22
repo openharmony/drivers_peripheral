@@ -255,7 +255,7 @@ int32_t HidDdkService::ReadTimeout(const HidDeviceHandle& dev, std::vector<uint8
         return HID_DDK_IO_ERROR;
     }
 
-    bytesRead = static_cast<uint32_t>readRet;
+    bytesRead = static_cast<uint32_t>(readRet);
     return HID_DDK_SUCCESS;
 }
 
