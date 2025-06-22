@@ -282,6 +282,22 @@ std::string V4L2DeviceManager::CameraIdToHardware(CameraId cameraId, ManagerId m
     return nullptr;
 }
 
+CameraId V4L2DeviceManager::HardwareToCameraId(std::string hardwareName)
+{
+    CAMERA_LOGD("ReturnEnableCameraId begin : %{public}s end", hardwareName.c_str());
+    hardwareName = hardwareName.substr(0, hardwareName.find("&id"));
+    if (hardwareName.size() != 0) {
+        for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
+            CAMERA_LOGD("ReturnEnableCameraId %{public}d : %{public}s end", (*iter).cameraId,
+                (*iter).hardwareName.c_str());
+            if (hardwareName == (*iter).hardwareName) {
+                return (*iter).cameraId;
+            }
+        }
+        return CAMERA_MAX;
+    }
+}
+
 void V4L2DeviceManager::SetHotplugDevCallBack(HotplugDevCb cb)
 {
     uvcCb_ = cb;
@@ -293,6 +309,7 @@ void V4L2DeviceManager::SetHotplugDevCallBack(HotplugDevCb cb)
 
 void V4L2DeviceManager::AddHardware(CameraId id, const std::string hardwareName)
 {
+    CAMERA_LOGD("AddHardware:id = %{public}d, name = %{public}s", id, hardwareName.c_str());
     std::lock_guard<std::mutex> l(mtx_);
     HardwareConfiguration hardware;
     hardware.cameraId = id;
@@ -336,7 +353,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         Convert(deviceControl, deviceFormat, meta);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
 
-        uvcCb_(meta, uvcState, id);
+        uvcCb_(meta, uvcState, id, hardwareName);
         CAMERA_LOGI("uvc plug in %{public}s end", hardwareName.c_str());
     } else {
         CAMERA_LOGI("uvc plug out %{public}s begin", hardwareName.c_str());
@@ -353,7 +370,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
                 std::shared_ptr<CameraMetadata> meta =
                     std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
                 CHECK_IF_PTR_NULL_RETURN_VOID(meta);
-                uvcCb_(meta, uvcState, id);
+                uvcCb_(meta, uvcState, id, hardwareName);
             }
             {
                 std::lock_guard<std::mutex> l(mtx_);
@@ -439,6 +456,7 @@ void V4L2DeviceManager::AddDefaultOhosTag(std::shared_ptr<CameraMetadata> camera
 {
     AddDefaultSensorInfoPhysicalSize(cameraMetadata, deviceFormat);
     AddDefaultAbilityMuteModes(cameraMetadata);
+    AddDefaultAbilityConcurrentCameras(cameraMetadata);
     AddDefaultControlCaptureMirrorSupport(cameraMetadata);
     AddDefaultCameraConnectionType(cameraMetadata);
     AddDefaultCameraPosition(cameraMetadata);
@@ -627,55 +645,110 @@ constexpr int PREVIEW_STREAM = 0;
 constexpr int CAPTURE_STREAM = 2;
 constexpr int VIDEO_STREAM = 1;
 constexpr int FORMAT = 1;
+std::string VectorInt32ToString(std::vector<int> vec)
+{
+    std::string res = "";
+    res += "vector size is " + std::to_string(vec.size()) + ", print vector begin:\n";
+    for (auto &x : vec) {
+        res += std::to_string(x);
+        if (x == -1) {
+            res += "\n";
+        } else {
+            res += " ";
+        }
+    }
+    res += "\n print vector end.";
+    return res;
+}
+
+/*
+按照模式场景及流类型查询基础规格及特性能力，32位整型数组，格式如下：
+[模式1, 流类型1, 能力信息1, 能力信息2, ..., 结束符, 流类型2, 能力信息1, 能力信息2, ...，结束符, 结束符, 模式2, 流类型1, 能力信息1, 能力信息2, ..., 结束符,
+ 流类型2, 能力信息1, 能力信息2, ...，结束符, 结束符]
+结束符约定为-1, 其中能力信息格式为：
+[图像格式, 分辨率款, 分辨率高, 固定帧率, 动态帧率下限, 动态帧率上限, 特性能力1, 特性能力2, ..., 结束符]
+其中特性能力采用其对应查询TAG表示。
+
+格式举例：
+[0, 0, 1, 640, 480, 0, 0, 0, -1, 1, 1, 640, 480, 30, 30, 30, -1, 2, 4, 1280, 960, 0, 0, 0, -1, -1,
+ 1, 0, 1, 640, 480, 0, 0, 0, 虚化, 滤镜, 美颜, -1, 1, 2, 4, 1280, 960, 0, 0, 0, 虚化, -1, -1]
+PS: '虚化'为OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES, '滤镜'为OHOS_ABILITY_SCENE_FILTER_TYPES,
+    '美颜'为OHOS_ABILITY_SCENE_BEAUTY_TYPES。
+*/
+void ChangeAbilityVectorFormat(std::vector<int> &abilityVec, uint32_t format)
+{
+    constexpr uint32_t SkipNum = 7;
+    constexpr int32_t endMarker = -1;
+    if (abilityVec.size() == 0) {
+        CAMERA_LOGI("ChangeAbilityVectorFormat error, abilityVec.size() == 0");
+        return;
+    }
+    abilityVec[0] = format;
+    for (uint32_t index = SkipNum; index < abilityVec.size();) {
+        if (abilityVec[index - 1] == endMarker) {
+            abilityVec[index] = format;
+            index += SkipNum;
+        } else {
+            index += 1;
+        }
+    }
+}
+
+// {0, 3, 9, -1, 2, 3, 9, -1, 1, 3, -1} for pc
+std::vector<int> g_defaultUsbCameraStreamFormatConfig = {
+    PREVIEW_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, OHOS_CAMERA_FORMAT_422_YUYV, -1,
+    CAPTURE_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, OHOS_CAMERA_FORMAT_422_YUYV, -1,
+    VIDEO_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, -1,
+};
+
 void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     std::shared_ptr<CameraMetadata> metadata, const std::vector<DeviceFormat>& deviceFormat)
 {
     std::string name = "YUYV 4:2:2";
     std::vector<int32_t> formatVector;
     int32_t fpsValue = 0;
+    uint32_t index = 0;
     for (auto& it : deviceFormat) {
+        fpsValue = it.fmtdesc.fps.denominator / it.fmtdesc.fps.numerator;
+        CAMERA_LOGI("formatVector[%{public}u], format = %{public}d * %{public}d @%{public}s, fps = %{public}d",
+            index, it.fmtdesc.width, it.fmtdesc.height, it.fmtdesc.description.c_str(), fpsValue);
+        index++;
         if (it.fmtdesc.description != name || it.fmtdesc.fps.numerator == 0) {
             continue;
         }
-        fpsValue = it.fmtdesc.fps.denominator / it.fmtdesc.fps.numerator;
         if (fpsValue > MINIMUM_FPS) {
+            formatVector.push_back(FORMAT);
             formatVector.push_back(it.fmtdesc.width);
             formatVector.push_back(it.fmtdesc.height);
             formatVector.push_back(fpsValue);
             formatVector.push_back(fpsValue);
             formatVector.push_back(fpsValue);
             formatVector.push_back(END_SYMBOL);
-            formatVector.push_back(FORMAT);
         }
-    }
-    if (formatVector.size() > 0) {
-        formatVector.pop_back();
     }
 
     std::vector<int32_t> streamAvailableExtendConfigurationsVector;
     streamAvailableExtendConfigurationsVector.push_back(0);
-    streamAvailableExtendConfigurationsVector.push_back(PREVIEW_STREAM);
-    streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_RGBA_8888);
-    streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
-                                                     formatVector.begin(), formatVector.end());
-    streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_YCRCB_420_SP);
-    streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
-                                                     formatVector.begin(), formatVector.end());
-    streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
-
-    streamAvailableExtendConfigurationsVector.push_back(CAPTURE_STREAM);
-    streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_RGBA_8888);
-    streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
-                                                     formatVector.begin(), formatVector.end());
-    streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
-
-    streamAvailableExtendConfigurationsVector.push_back(VIDEO_STREAM);
-    streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_YCRCB_420_SP);
-    streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
-                                                     formatVector.begin(), formatVector.end());
-    streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
+    int32_t streamId = -1;
+    for (uint32_t i = 0; i < g_defaultUsbCameraStreamFormatConfig.size(); i++) {
+        int32_t cur = g_defaultUsbCameraStreamFormatConfig[i];
+        if (cur == -1) {
+            streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
+            streamId = -1;
+            continue;
+        }
+        if (streamId == -1) {
+            streamId = cur;
+            streamAvailableExtendConfigurationsVector.push_back(streamId);
+            continue;
+        }
+        ChangeAbilityVectorFormat(formatVector, cur);
+        streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
+            formatVector.begin(), formatVector.end());
+    }
 
     streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
+    CAMERA_LOGD("config is:%{public}s", VectorInt32ToString(streamAvailableExtendConfigurationsVector).c_str());
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS,
                        streamAvailableExtendConfigurationsVector);
 }
@@ -694,8 +767,14 @@ void V4L2DeviceManager::AddDefaultSensorInfoPhysicalSize(std::shared_ptr<CameraM
 void V4L2DeviceManager::AddDefaultAbilityMuteModes(std::shared_ptr<CameraMetadata> metadata)
 {
     std::vector<uint8_t> muteModesVector;
-    muteModesVector.push_back(OHOS_CAMERA_MUTE_MODE_OFF);
+    muteModesVector.push_back(OHOS_CAMERA_MUTE_MODE_SOLID_COLOR_BLACK);
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_MUTE_MODES, muteModesVector);
+}
+
+void V4L2DeviceManager::AddDefaultAbilityConcurrentCameras(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<uint8_t> concurrentList = {1, 2, 3, 4, 5, 6, 7};
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_CONCURRENT_SUPPORTED_CAMERAS, concurrentList);
 }
 
 void V4L2DeviceManager::AddDefaultControlCaptureMirrorSupport(std::shared_ptr<CameraMetadata> metadata)

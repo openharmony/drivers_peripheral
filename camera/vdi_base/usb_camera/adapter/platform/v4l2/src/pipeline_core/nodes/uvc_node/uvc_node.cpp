@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include "metadata_controller.h"
 
+constexpr int PIXEL_SPACE = 2;
+
 namespace OHOS::Camera {
 UvcNode::UvcNode(const std::string& name, const std::string& type, const std::string &cameraId)
     : NodeBase(name, type, cameraId), SourceNode(name, type, cameraId)
@@ -46,27 +48,19 @@ struct MetadataTag {
     CameraId cameraId2 = CAMERA_FIRST;
 };
 
-const MetadataTag OHOS_MAP_CAMERA_ID[] = {
-    { "lcam001", CAMERA_FIRST },
-    { "lcam002", CAMERA_SECOND },
-    { "lcam003", CAMERA_THIRD },
-    { "lcam004", CAMERA_FOURTH },
-    { "lcam005", CAMERA_FIFTH },
-};
-
 CameraId UvcNode::ConvertCameraId(const std::string &cameraId)
 {
-    for (auto cameraID : OHOS_MAP_CAMERA_ID) {
-        if (cameraID.cameraId1 == cameraId) {
-            return cameraID.cameraId2;
-        }
+    CameraId id = deviceManager_->HardwareToCameraId(cameraId);
+    if (id == CAMERA_MAX) {
+        CAMERA_LOGE("HardwareToCameraId error, cameraId = %{public}s", cameraId.c_str());
     }
-    return CAMERA_FIRST;
+    return id;
 }
 
 RetCode UvcNode::GetDeviceController()
 {
     CameraId cameraId = ConvertCameraId(cameraId_);
+    CAMERA_LOGI("GetDeviceController, cameraId = %{public}d, cameraId_ = %{public}s", cameraId, cameraId_.c_str());
     sensorController_ = std::static_pointer_cast<SensorController>
         (deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
     if (sensorController_ == nullptr) {
@@ -195,6 +189,16 @@ void UvcNode::SetBufferCallback()
     return;
 }
 
+static void SetImageAllBlack(uint8_t *buf, size_t bufferSize, uint32_t format)
+{
+    if (format == CAMERA_FORMAT_YUYV_422_PKG) {
+        for (size_t i = 0; i + 1 < bufferSize; i += PIXEL_SPACE) {
+            buf[i] = 0;
+            buf[i + 1] = 0x80;
+        }
+    }
+}
+
 void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
@@ -204,9 +208,12 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     CAMERA_LOGI("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]",
         buffer->GetStreamId(), buffer->GetIndex());
 
-    buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_422_P);
+    buffer->SetCurFormat(CAMERA_FORMAT_YUYV_422_PKG);
     buffer->SetCurWidth(wide_);
     buffer->SetCurHeight(high_);
+    if (MetadataController::GetInstance().IsMute()) {
+        SetImageAllBlack((uint8_t *)buffer->GetVirAddress(), buffer->GetSize(), CAMERA_FORMAT_YUYV_422_PKG);
+    }
 
     SourceNode::DeliverBuffer(buffer);
     return;
@@ -215,7 +222,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 
 RetCode UvcNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
-    CAMERA_LOGI("UvcNode::ProvideBuffers enter.");
+    CAMERA_LOGI("UvcNode::ProvideBuffers enter. %{public}s", sensorController_->GetName().c_str());
     if (sensorController_->SendFrameBuffer(frameSpec) == RC_OK) {
         CAMERA_LOGD("Sendframebuffer success bufferpool id = %llu", frameSpec->bufferPoolId_);
         return RC_OK;

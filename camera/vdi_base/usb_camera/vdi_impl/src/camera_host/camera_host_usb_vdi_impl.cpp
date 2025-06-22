@@ -66,9 +66,9 @@ VdiCamRetCode CameraHostVdiImpl::Init()
     }
 
     deviceManager->SetHotplugDevCallBack([this](const std::shared_ptr<CameraAbility> &meta,
-        const bool &status, const CameraId &cameraId) {
+        const bool &status, const CameraId &cameraId, const std::string &cameraName) {
             VdiCameraStatus cameraStatus = status ? AVAILABLE : UN_AVAILABLE;
-            OnCameraStatus(cameraId, cameraStatus, meta);
+            OnCameraStatus(cameraId, cameraStatus, meta, cameraName);
         });
 
     (void)DevHostRegisterDumpHost(CameraDumpEvent);
@@ -148,7 +148,7 @@ int32_t CameraHostVdiImpl::GetCameraAbility(const std::string &cameraId,
 int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceVdiCallback> &callbackObj,
     sptr<ICameraDeviceVdi> &device)
 {
-    CAMERA_LOGD("OpenCamera entry");
+    CAMERA_LOGI("OpenCamera entry, cameraId = %{public}s", cameraId.c_str());
     DFX_LOCAL_HITRACE_BEGIN;
     HDF_CAMERA_TRACE;
     if (CameraIdInvalid(cameraId) != RC_OK || callbackObj == nullptr) {
@@ -161,7 +161,7 @@ int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<IC
         CAMERA_LOGE("Camera device not found.");
         return INSUFFICIENT_RESOURCES;
     }
-    CAMERA_LOGD("OpenCamera cameraId find success.");
+    CAMERA_LOGI("OpenCamera cameraId find success. %{public}x", (void*)itr->second.get());
 
     std::shared_ptr<CameraDeviceVdiImpl> cameraDevice = itr->second;
     if (cameraDevice == nullptr) {
@@ -352,8 +352,10 @@ RetCode CameraHostVdiImpl::SetFlashlight(const std::vector<std::string> &phyCame
 }
 
 void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
-    VdiCameraStatus status, const std::shared_ptr<CameraAbility> ability)
+    VdiCameraStatus status, const std::shared_ptr<CameraAbility> ability, const std::string &cameraName)
 {
+    CAMERA_LOGI("CameraHostVdiImpl::OnCameraStatus cameraId: %{public}d, cameraName: %{public}s, status: %{public}d",
+        static_cast<int>(cameraId), cameraName.c_str(), static_cast<int>(status));
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {
         CAMERA_LOGE("Config is nullptr");
@@ -372,7 +374,7 @@ void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
     physicalCameraIds.push_back(physicalCameraId);
 
     if (status == AVAILABLE) {
-        std::string logicalCameraId = config->GenerateNewLogicalCameraId();
+        std::string logicalCameraId = config->GenerateNewLogicalCameraId(cameraName);
         config->AddUsbCameraId(logicalCameraId);
         RetCode rc = config->AddCameraId(logicalCameraId, physicalCameraIds, ability);
         if (rc == RC_OK && logicalCameraId.size() > 0) {
@@ -383,8 +385,7 @@ void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
             }
         }
-        std::shared_ptr<CameraDeviceVdiImpl> cameraDevice =
-            CameraDeviceVdiImpl::CreateCameraDevice(logicalCameraId);
+        std::shared_ptr<CameraDeviceVdiImpl> cameraDevice = CameraDeviceVdiImpl::CreateCameraDevice(logicalCameraId);
         if (cameraDevice != nullptr) {
             std::lock_guard<std::mutex> lck (mtx);
             cameraDeviceMap_[logicalCameraId] = cameraDevice;

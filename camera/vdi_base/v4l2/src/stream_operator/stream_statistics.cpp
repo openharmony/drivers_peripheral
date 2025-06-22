@@ -103,7 +103,7 @@ void StreamStatistics::DumpStats(int interval)
             flushBufferFailCount_ <<", cancel:" << cancelBufferSuccessCount_ << "/" <<
             cancelBufferFailCount_ << ", fps:" << fpsValue_;
         streamInfo_ = ss.str();
-        CAMERA_LOGE("%{public}s", streamInfo_.c_str());
+        CAMERA_LOGI("%{public}s", streamInfo_.c_str());
         lastOutputTime_ = timestamp_.tv_sec;
     }
 }

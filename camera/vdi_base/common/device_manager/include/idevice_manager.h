@@ -140,6 +140,11 @@ public:
         (void)(memType);
         return;
     }
+    virtual CameraId HardwareToCameraId(std::string hardwareName)
+    {
+        (void)hardwareName;
+        return CAMERA_MAX;
+    }
 };
 } // namespace Camera
 } // namespace OHOS
