@@ -236,7 +236,7 @@ void NodeBase::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     auto it = std::find_if(outPorts.begin(), outPorts.end(),
         [&buffer](const auto &port) { return port->format_.bufferPoolId_ == buffer->GetPoolId(); });
     if (it != outPorts.end()) {
-        CAMERA_LOGE("NodeBase::DeliverBuffer to next node, %{public}s -> %{public}s, \
+        CAMERA_LOGI("NodeBase::DeliverBuffer to next node, %{public}s -> %{public}s, \
 streamId = %{public}d, index = %{public}d",
             GetName().c_str(), (*it)->Peer()->GetNode()->GetName().c_str(), buffer->GetStreamId(), buffer->GetIndex());
         (*it)->DeliverBuffer(buffer);

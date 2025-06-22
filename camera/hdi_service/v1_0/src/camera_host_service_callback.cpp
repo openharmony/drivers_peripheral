@@ -16,6 +16,8 @@
 #include "camera_host_service_callback.h"
 #include "iproxy_broker.h"
 
+constexpr int NAME_START_POS = 6;
+
 namespace OHOS::Camera {
 CameraHostServiceCallback::CameraHostServiceCallback(OHOS::sptr<ICameraHostCallback> cameraHostCallback,
     OHOS::sptr<ICameraHostVdi> cameraHostVdi, std::vector<CameraIdInfo> &cameraIdInfoList)
@@ -57,6 +59,20 @@ int32_t CameraHostServiceCallback::OnFlashlightStatus(const std::string &cameraI
     return cameraHostCallback_->OnFlashlightStatus(itr->currentCameraId, static_cast<FlashlightStatus>(status));
 }
 
+static inline const std::string vdiCameraIdToPrefix(const std::string &id)
+{
+    size_t startPos;
+    size_t endPos;
+    std::string preFix = "lcam00";
+    if ((startPos = id.find("&name=")) != std::string::npos) {
+        startPos += NAME_START_POS;
+        endPos = id.find("&id=");
+        preFix = id.substr(startPos, endPos - startPos);
+        preFix += "/";
+    }
+    return preFix;
+}
+
 int32_t CameraHostServiceCallback::OnCameraEvent(const std::string &cameraId, VdiCameraEvent event)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostCallback_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
@@ -68,7 +84,7 @@ int32_t CameraHostServiceCallback::OnCameraEvent(const std::string &cameraId, Vd
             });
         if (itr == cameraIdInfoList_.end()) {
             struct CameraIdInfo cameraIdInfo;
-            currentCameraId = "lcam00" + std::to_string(cameraIdInfoList_.size() + 1);
+            currentCameraId = vdiCameraIdToPrefix(cameraId) + std::to_string(cameraIdInfoList_.size() + 1);
             cameraIdInfo.currentCameraId = currentCameraId;
             cameraIdInfo.cameraHostVdi = cameraHostVdi_;
             cameraIdInfo.vendorCameraId = cameraId;

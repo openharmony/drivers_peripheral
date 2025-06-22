@@ -83,7 +83,7 @@ VdiCamRetCode CameraHostVdiImpl::Init()
     }
 
     deviceManager->SetHotplugDevCallBack([this](const std::shared_ptr<CameraAbility> &meta,
-        const bool &status, const CameraId &cameraId) {
+        const bool &status, const CameraId &cameraId, const std::string &cameraName) {
             VdiCameraStatus cameraStatus = status ? AVAILABLE : UN_AVAILABLE;
             OnCameraStatus(cameraId, cameraStatus, meta);
         });
@@ -369,7 +369,7 @@ RetCode CameraHostVdiImpl::SetFlashlight(const std::vector<std::string> &phyCame
 }
 
 void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
-    VdiCameraStatus status, const std::shared_ptr<CameraAbility> ability)
+    VdiCameraStatus status, const std::shared_ptr<CameraAbility> ability, const std::string &cameraName)
 {
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {

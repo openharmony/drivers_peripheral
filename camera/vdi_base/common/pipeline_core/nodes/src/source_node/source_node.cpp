@@ -386,7 +386,7 @@ void SourceNode::PortHandler::DistributeBuffers()
 
     auto node = port->GetNode();
     CHECK_IF_PTR_NULL_RETURN_VOID(node);
-    CAMERA_LOGE("DistributeBuffers Loop, start deliverBuffer, streamId = %{public}d", buffer->GetStreamId());
+    CAMERA_LOGI("DistributeBuffers Loop, start deliverBuffer, streamId = %{public}d", buffer->GetStreamId());
     node->DeliverBuffer(buffer);
 
     return;

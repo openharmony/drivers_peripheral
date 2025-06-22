@@ -49,6 +49,7 @@ public:
     void SetHotplugDevCallBack(HotplugDevCb cb);
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag);
     void SetMemoryType(uint8_t &memType);
+    CameraId HardwareToCameraId(std::string hardwareName) override;
 
 private:
     void AddHardware(CameraId id, const std::string hardwareName);
@@ -136,6 +137,7 @@ private:
     void AddDefaultSensorInfoPhysicalSize(std::shared_ptr<CameraMetadata> metadata,
                                           std::vector<DeviceFormat>& deviceFormat);
     void AddDefaultAbilityMuteModes(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultAbilityConcurrentCameras(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultControlCaptureMirrorSupport(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultCameraConnectionType(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultCameraPosition(std::shared_ptr<CameraMetadata> metadata);

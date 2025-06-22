@@ -138,6 +138,7 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
             forkBuffer->SetCurFormat(buffer->GetCurFormat());
             forkBuffer->SetCurWidth(buffer->GetCurWidth());
             forkBuffer->SetCurHeight(buffer->GetCurHeight());
+            forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
             CameraDumper& dumper = CameraDumper::GetInstance();
             dumper.DumpBuffer("PcForkNode", ENABLE_FORK_NODE_CONVERTED, buffer);
             auto id = forkBuffer->GetStreamId();
@@ -153,8 +154,9 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                         captureRequests_[id].size(), forkBuffer->GetCaptureId());
                 }
             }
-            CAMERA_LOGE("Deliver fork buffer, streamId[%{public}d], index[%{public}d], status = %{public}d",
-                forkBuffer->GetStreamId(), forkBuffer->GetIndex(), forkBuffer->GetBufferStatus());
+            CAMERA_LOGI("DeliverForkBuffer,streamId:%{public}d,index:%{public}d,status=%{public}d,format =%{public}d",
+                forkBuffer->GetStreamId(), forkBuffer->GetIndex(),
+                forkBuffer->GetBufferStatus(), forkBuffer->GetFormat());
             NodeBase::DeliverBuffer(forkBuffer);
         }
     }

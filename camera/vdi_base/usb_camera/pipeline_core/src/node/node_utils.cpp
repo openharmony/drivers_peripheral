@@ -34,7 +34,8 @@ static enum AVPixelFormat ConvertOhosFormat2AVPixelFormat(uint32_t format)
         {CAMERA_FORMAT_RGBA_8888,    AV_PIX_FMT_RGBA},
         {CAMERA_FORMAT_RGB_888,      AV_PIX_FMT_RGB24},
         {CAMERA_FORMAT_YCRCB_420_SP, AV_PIX_FMT_NV21},
-        {CAMERA_FORMAT_YCRCB_422_P,  AV_PIX_FMT_YUYV422},
+        {CAMERA_FORMAT_YCBCR_420_SP, AV_PIX_FMT_NV12},
+        {CAMERA_FORMAT_YUYV_422_PKG, AV_PIX_FMT_YUYV422},
     };
     auto it = ohosFormat2AVPixelFormatMap.find(format);
     if (it != ohosFormat2AVPixelFormatMap.end()) {
@@ -103,7 +104,7 @@ void NodeUtils::BufferScaleFormatTransform(std::shared_ptr<IBuffer>& buffer, voi
     if (buffer->GetCurWidth() == buffer->GetWidth()
         && buffer->GetCurHeight() == buffer->GetHeight()
         && buffer->GetCurFormat() == buffer->GetFormat()) {
-            CAMERA_LOGE("no need ImageFormatConvert, nothing to do");
+            CAMERA_LOGI("no need ImageFormatConvert, nothing to do");
             return;
     }
     if (buffer->GetIsValidDataInSurfaceBuffer()) {
