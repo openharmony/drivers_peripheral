@@ -117,7 +117,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
 
 void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event)
 {
-    if (event.dataLen <= 0 || event.dataLen % sizeof(float) != 0) {
+    if (event.dataLen < static_cast<int>(sizeof(float))) {
         HDF_LOGE("%{public}s: invalid dataLen: %d", __func__, event.dataLen);
         return;
     }
