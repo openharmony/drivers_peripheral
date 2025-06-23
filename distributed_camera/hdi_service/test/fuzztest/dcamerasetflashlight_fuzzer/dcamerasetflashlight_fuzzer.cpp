@@ -17,7 +17,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dcamera_host.h"
 
@@ -40,16 +39,6 @@ void DcameraSetFlashlightFuzzTest(const uint8_t* data, size_t size)
     DCameraHost::GetInstance()->PrelaunchWithOpMode(config, operationMode);
     DCameraHost::GetInstance()->Prelaunch(config);
 }
-
-void DCameraSetFlashlightV1_2FuzzTest(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size < sizeof(float))) {
-        return;
-    }
-    FuzzedDataProvider fuzzProvider(data, size);
-    float level = fuzzProvider.ConsumeFloatingPoint<float>();
-    DCameraHost::GetInstance()->SetFlashlight_V1_2(level);
-}
 }
 }
 
@@ -58,6 +47,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::DcameraSetFlashlightFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraSetFlashlightV1_2FuzzTest(data, size);
     return 0;
 }
