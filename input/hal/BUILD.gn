@@ -57,6 +57,7 @@ if (defined(ohos_lite)) {
       chipset_base_dir,
       "updater",
     ]
+    innerapi_tags = [ "passthrough_indirect" ]
     part_name = "drivers_peripheral_input"
   }
 } else {
