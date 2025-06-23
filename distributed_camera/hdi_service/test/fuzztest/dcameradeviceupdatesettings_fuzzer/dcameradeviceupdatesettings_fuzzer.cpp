@@ -55,29 +55,18 @@ void DcameraDeviceGetStreamOperatorFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -93,29 +82,18 @@ void DcameraDeviceGetStreamOperatorV1_1FuzzTest(const uint8_t* data, size_t size
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -132,29 +110,18 @@ void DcameraDeviceGetStreamOperatorV1_2FuzzTest(const uint8_t* data, size_t size
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -171,29 +138,18 @@ void DcameraDeviceGetStreamOperatorV1_3FuzzTest(const uint8_t* data, size_t size
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -210,29 +166,18 @@ void DCameraGetSecureCameraSeqFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -247,29 +192,18 @@ void DCameraDeviceGetStatusFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -286,29 +220,18 @@ void DCameraDeviceResetFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -321,29 +244,18 @@ void DCameraDeviceGetDefaultSettingsFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -358,17 +270,6 @@ void DCameraDeviceSetResultModeFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    DHBase dhBase;
-    dhBase.deviceId_ = deviceId;
-    dhBase.dhId_ = dhId;
-
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
@@ -380,7 +281,6 @@ void DCameraDeviceSetResultModeFuzzTest(const uint8_t* data, size_t size)
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
     
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -394,18 +294,6 @@ void DCameraDeviceGetEnabledResultsFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-<<<<<<< HEAD
-
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    DHBase dhBase;
-    dhBase.deviceId_ = deviceId;
-    dhBase.dhId_ = dhId;
-
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
@@ -417,7 +305,6 @@ void DCameraDeviceGetEnabledResultsFuzzTest(const uint8_t* data, size_t size)
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -432,29 +319,18 @@ void DCameraEnableResultFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -471,30 +347,19 @@ void DCameraDisableResultFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-<<<<<<< HEAD
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-=======
     FuzzedDataProvider fdp(data, size);
     std::string deviceId = fdp.ConsumeRandomLengthString(size);
     std::string dhId = fdp.ConsumeRandomLengthString(size);
 
->>>>>>> origin/dev_addFUZZ
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -517,25 +382,15 @@ void DCameraAcquireBufferFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo = "sinkAbilityInfo";
-    std::string sourceCodecInfo = "sourceCodecInfo";
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string sourceCodecInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
 
-<<<<<<< HEAD
-    FuzzedDataProvider fdp(data, size);
-=======
->>>>>>> origin/dev_addFUZZ
     int32_t streamId = fdp.ConsumeIntegral<int32_t>();
     DCameraBuffer buffer;
     buffer.index_ = fdp.ConsumeIntegral<int32_t>();
@@ -556,25 +411,15 @@ void DCameraShutterBufferFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo = "sinkAbilityInfo";
-    std::string sourceCodecInfo = "sourceCodecInfo";
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string sourceCodecInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
 
-<<<<<<< HEAD
-    FuzzedDataProvider fdp(data, size);
-=======
->>>>>>> origin/dev_addFUZZ
     int32_t streamId = fdp.ConsumeIntegral<int32_t>();
     DCameraBuffer buffer;
     buffer.index_ = fdp.ConsumeIntegral<int32_t>();
@@ -595,25 +440,15 @@ void DCameraOnSettingsResultFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo = "sinkAbilityInfo";
-    std::string sourceCodecInfo = "sourceCodecInfo";
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string sourceCodecInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
 
-<<<<<<< HEAD
-    FuzzedDataProvider fdp(data, size);
-=======
->>>>>>> origin/dev_addFUZZ
     DCameraSettings result;
     result.type_ = static_cast<DCSettingsType>(fdp.ConsumeIntegral<int32_t>());
     result.value_ = fdp.ConsumeRemainingBytesAsString();
@@ -633,25 +468,15 @@ void DCameraNotifyFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo = "sinkAbilityInfo";
-    std::string sourceCodecInfo = "sourceCodecInfo";
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string sourceCodecInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
 
-<<<<<<< HEAD
-    FuzzedDataProvider fdp(data, size);
-=======
->>>>>>> origin/dev_addFUZZ
     std::shared_ptr<DCameraHDFEvent> event = std::make_shared<DCameraHDFEvent>();
     event->type_ = static_cast<DCameraEventType>(fdp.ConsumeIntegral<int32_t>());
     event->result_ = static_cast<DCameraEventResult>(fdp.ConsumeIntegral<int32_t>());
@@ -672,27 +497,17 @@ void DCameraIsOpenSessFailedStateFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo = "sinkAbilityInfo";
-    std::string sourceCodecInfo = "sourceCodecInfo";
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string sourceCodecInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
 
     FuzzedDataProvider fdp(data, size);
     bool state = fdp.ConsumeBool();
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/dev_addFUZZ
     dcameraDevice->IsOpenSessFailedState(state);
 }
 
@@ -708,17 +523,11 @@ void DCameraNotifyStartCaptureErrorFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo = "sinkAbilityInfo";
-    std::string sourceCodecInfo = "sourceCodecInfo";
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string sourceCodecInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
@@ -738,25 +547,15 @@ void DCameraNotifyCameraErrorFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo = "sinkAbilityInfo";
-    std::string sourceCodecInfo = "sourceCodecInfo";
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string sourceCodecInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
 
-<<<<<<< HEAD
-    FuzzedDataProvider fdp(data, size);
-=======
->>>>>>> origin/dev_addFUZZ
     ErrorType errorType = static_cast<ErrorType>(fdp.ConsumeIntegral<int32_t>());
 
     dcameraDevice->NotifyCameraError(errorType);
@@ -774,28 +573,16 @@ void DCameraSetDcameraAbilityFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-<<<<<<< HEAD
-    std::string sinkAbilityInfo = "sinkAbilityInfo";
-    std::string sourceCodecInfo = "sourceCodecInfo";
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
-=======
     FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string sourceCodecInfo = fdp.ConsumeRandomLengthString(size);
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo));
->>>>>>> origin/dev_addFUZZ
     if (dcameraDevice == nullptr) {
         return;
     }
 
-<<<<<<< HEAD
-    FuzzedDataProvider fdp(data, size);
     std::string randomSinkAbilityInfo = fdp.ConsumeRemainingBytesAsString();
-
-=======
-    std::string randomSinkAbilityInfo = fdp.ConsumeRemainingBytesAsString();
->>>>>>> origin/dev_addFUZZ
     dcameraDevice->SetDcameraAbility(randomSinkAbilityInfo);
 }
 }
