@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,11 @@
 
 #include <cstddef>
 #include <cstdint>
+<<<<<<< HEAD
 #include <fuzzer/FuzzedDataProvider.h>
+=======
+#include <fuzzer/FuzzedDataProvider.h> 
+>>>>>>> origin/dev_addFUZZ
 
 #include "dcamera_host.h"
 
@@ -108,7 +112,13 @@ void DCameraGetResourceCostFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
+<<<<<<< HEAD
     std::string cameraId(reinterpret_cast<const char*>(data), size);
+=======
+
+    FuzzedDataProvider fdp(data, size);
+    std::string cameraId = fdp.ConsumeRandomLengthString(size);
+>>>>>>> origin/dev_addFUZZ
     OHOS::HDI::Camera::V1_3::CameraDeviceResourceCost resourceCost;
 
     DCameraHost::GetInstance()->GetResourceCost(cameraId, resourceCost);
@@ -116,6 +126,7 @@ void DCameraGetResourceCostFuzzTest(const uint8_t* data, size_t size)
 
 void DCameraNotifyDeviceStateChangeInfoFuzzTest(const uint8_t* data, size_t size)
 {
+<<<<<<< HEAD
     int doubleNum = 2;
     if ((data == nullptr) || (size < sizeof(int32_t) * doubleNum)) {
         return;
@@ -123,6 +134,14 @@ void DCameraNotifyDeviceStateChangeInfoFuzzTest(const uint8_t* data, size_t size
     FuzzedDataProvider fdp(data, size);
     int32_t notifyType = *(reinterpret_cast<const int32_t*>(data));
     int32_t deviceState = *(reinterpret_cast<const int32_t*>(data + sizeof(int32_t)));
+=======
+    if ((data == nullptr) || (size < sizeof(int32_t) * 2)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    int32_t notifyType = fdp.ConsumeIntegral<int32_t>();
+    int32_t deviceState = fdp.ConsumeIntegral<int32_t>();
+>>>>>>> origin/dev_addFUZZ
     DCameraHost::GetInstance()->NotifyDeviceStateChangeInfo(notifyType, deviceState);
 }
 
@@ -131,7 +150,13 @@ void DCameraPreCameraSwitchFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
+<<<<<<< HEAD
     std::string cameraId(reinterpret_cast<const char*>(data), size);
+=======
+
+    FuzzedDataProvider fdp(data, size);
+    std::string cameraId = fdp.ConsumeRandomLengthString(size);
+>>>>>>> origin/dev_addFUZZ
     DCameraHost::GetInstance()->PreCameraSwitch(cameraId);
 }
 
@@ -140,7 +165,13 @@ void DCameraPrelaunchWithOpModeFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+<<<<<<< HEAD
     int32_t operationMode = *(reinterpret_cast<const int32_t*>(data));
+=======
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t operationMode = fdp.ConsumeIntegral<int32_t>();
+>>>>>>> origin/dev_addFUZZ
     PrelaunchConfig config;
     DCameraHost::GetInstance()->PrelaunchWithOpMode(config, operationMode);
 }
