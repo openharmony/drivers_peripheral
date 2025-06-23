@@ -355,7 +355,6 @@ void DCameraDisableResultFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-    FuzzedDataProvider fdp(data, size);
     std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
     std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
 
@@ -506,7 +505,6 @@ void DCameraIsOpenSessFailedStateFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    FuzzedDataProvider fdp(data, size);
     bool state = fdp.ConsumeBool();
     dcameraDevice->IsOpenSessFailedState(state);
 }
