@@ -37,7 +37,7 @@
 #include <string.h>
 #include "hdi_wpa_common.h"
 
-#define BUF_SIZE 512
+#define BUF_SIZE 2048
 
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;
