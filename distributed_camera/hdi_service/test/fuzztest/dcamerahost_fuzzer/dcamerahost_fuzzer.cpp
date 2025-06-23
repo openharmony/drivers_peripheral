@@ -17,7 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <fuzzer/FuzzedDataProvider.h> 
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dcamera_host.h"
 
@@ -118,7 +118,8 @@ void DCameraGetResourceCostFuzzTest(const uint8_t* data, size_t size)
 
 void DCameraNotifyDeviceStateChangeInfoFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t) * 2)) {
+    int32_t doubleNum = 2;
+    if ((data == nullptr) || (size < sizeof(int32_t) * doubleNum)) {
         return;
     }
     FuzzedDataProvider fdp(data, size);
