@@ -79,7 +79,12 @@ std::string SensorHdiDump::SensorInfoDataToString(const float *data,
     char arrayStr[DATA_LEN] = {0};
 
     for (int32_t i = 0; i < dataDimension; i++) {
-        if (sprintf_s(arrayStr + strlen(arrayStr), DATA_LEN, "[%f]", data[i]) < 0) {
+        int32_t ilen = DATA_LEN - strlen(arrayStr) - 1;
+        if (ilen <= 0) {
+            HDF_LOGE("%{public}s: bufferover failed", __func__);
+            return st;
+        }
+        if (sprintf_s(arrayStr + strlen(arrayStr), ilen, "[%f]", data[i]) < 0) {
             HDF_LOGE("%{public}s: sprintf_s failed", __func__);
             return st;
         }
