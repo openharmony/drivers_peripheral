@@ -826,8 +826,6 @@ int32_t RawCloseDevice(const struct UsbDeviceHandle *devHandle)
         HDF_LOGE("%{public}s devHandle is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    
-    HDF_LOGE("%{public}s:%{public}d RawCloseDevice devHandle = %{public}p", __func__, __LINE__, devHandle);
 
     if (osAdapterOps->closeDevice) {
         osAdapterOps->closeDevice((struct UsbDeviceHandle *)devHandle);
