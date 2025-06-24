@@ -1182,7 +1182,6 @@ static int32_t UsbnetHostRegisterNet(struct UsbnetHost *usbNet)
     };
     listener.priv = (void *)(usbNet->deviceObject);
 
-    HARCH_INFO_PRINT("listener.priv addr = %{public}p", &(listener.priv));
     if (HdfDeviceRegisterEventListener(serv, &listener) != HDF_SUCCESS) {
         HDF_LOGE("fail to register event listener");
         return HDF_FAILURE;

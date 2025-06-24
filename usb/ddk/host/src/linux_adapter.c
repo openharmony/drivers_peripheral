@@ -479,7 +479,7 @@ static void OsDiscardUrbs(const struct UsbHostRequest *request, int32_t first, i
             continue;
         } else if (request->devHandle->dev != NULL) {
             request->devHandle->dev->discardFailedUrb = (void *)urb;
-            HDF_LOGE("%{public}s:%{public}d discard failed urb: %{public}p", __func__, __LINE__, urb);
+            HDF_LOGE("%{public}s:%{public}d discard failed urb", __func__, __LINE__);
         }
     }
 }
@@ -1004,12 +1004,11 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 
     handle = OsGetDeviceHandle(session, busNum, usbAddr);
     if (handle != NULL) {
-        HDF_LOGE("%{public}s:%{public}d OsGetDeviceHandle success: %{public}p", __func__, __LINE__, handle);
+        HDF_LOGI("%{public}s:%{public}d OsGetDeviceHandle success", __func__, __LINE__);
         return handle;
     }
 
     handle = OsCallocDeviceHandle();
-    HDF_LOGE("%{public}s:%{public}d OsCallocDeviceHandle = %{public}p", __func__, __LINE__, handle);
     if (handle == NULL) {
         return NULL;
     }
