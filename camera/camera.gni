@@ -45,5 +45,5 @@ declare_args() {
 }
 
 declare_args() {
-  drivers_peripheral_camera_feature_open_test = true
+  drivers_peripheral_camera_feature_open_test = false
 }
