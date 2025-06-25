@@ -23,6 +23,7 @@ ohos_fuzztest("CodecSendCommandHdiFuzzTest") {
 
   include_dirs = [
     "${codec_root}/interfaces/include",
+    "${codec_root}/hal/include",
     "${codec_root}/test/fuzztest/hdi_fuzzer/codecsendcommandhdi_fuzzer",
     "${codec_root}/test/fuzztest/hdi_fuzzer/codeccommonhdi_fuzzer",
   ]

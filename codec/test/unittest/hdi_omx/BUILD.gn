@@ -1,0 +1,55 @@
+# Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("../../../codec.gni")
+
+ohos_unittest("codec_hdi_omx_test") {
+  module_out_path = "drivers_peripheral_codec/drivers_peripheral_codec/codec"
+
+  sources = [
+    "codec_hdi_manager_test.cpp",
+    "codec_hdi_omx_test.cpp",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_display:libdisplay_buffer_hdi_impl",
+      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
+      "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
+      "drivers_peripheral_codec:libcodec_hdi_omx_client",
+      "graphic_surface:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [ "openmax:libopenmax_static" ]
+  defines = []
+  if (drivers_peripheral_codec_feature_support_omx_extend_test) {
+    defines += [ "SUPPORT_OMX" ]
+  }
+}
+
+group("codec_hdi_2.0_test") {
+  testonly = true
+  deps = [ ":codec_hdi_omx_test" ]
+}
