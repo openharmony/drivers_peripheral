@@ -22,6 +22,9 @@
 #include "v1_2/display_command/display_cmd_responser.h"
 #include "v1_2/idisplay_composer.h"
 #include "v1_2/display_composer_type.h"
+#include "v1_3/display_command/display_cmd_responser.h"
+#include "v1_3/idisplay_composer.h"
+#include "v1_3/display_composer_type.h"
 #include "common/include/display_vdi_adapter_interface.h"
 #include <mutex>
 
@@ -29,9 +32,9 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-using namespace OHOS::HDI::Display::Composer::V1_2;
+using namespace OHOS::HDI::Display::Composer::V1_3;
 
-class DisplayComposerService : public V1_2::IDisplayComposer {
+class DisplayComposerService : public V1_3::IDisplayComposer {
 public:
     DisplayComposerService();
     virtual ~DisplayComposerService();
@@ -100,6 +103,7 @@ private:
     static void OnSeamlessChange(uint32_t devId, void* data);
     static void OnRefresh(uint32_t devId, void *data);
     static void OnVBlankIdleCallback(uint32_t devId, uint64_t ns, void* data);
+    static void OnHwcEvent(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void *data);
 private:
     /* Common */
     void* libHandle_;
@@ -112,9 +116,10 @@ private:
     sptr<IVBlankCallback> vBlankCb_;
     sptr<IModeCallback> modeCb_;
     sptr<ISeamlessChangeCallback> seamlessChangeCb_;
-    std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponser_;
+    std::unique_ptr<V1_3::HdiDisplayCmdResponser> cmdResponser_;
     sptr<IRefreshCallback> refreshCb_;
     sptr<IVBlankIdleCallback> VBlankIdleCb_;
+    sptr<IHwcEventCallback> hwcEventCb_;
 };
 } // namespace Composer
 } // namespace Display
