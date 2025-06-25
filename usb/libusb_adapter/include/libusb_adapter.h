@@ -127,7 +127,7 @@ public:
         : hotplugInfo(info),
         subscriberPtr(subscriber) {};
 
-    OHOS::HDI::Usb::V2_0::USBDeviceInfo hotplugInfo;
+    OHOS::HDI::Usb::V2_0::USBDeviceInfo hotplugInfo = {0, 0, 0};
     sptr<V2_0::IUsbdSubscriber> subscriberPtr;
 };
 
