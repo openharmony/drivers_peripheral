@@ -17,15 +17,208 @@ import("../codec.gni")
 config("headers_config") {
   include_dirs = [
     "../interfaces/include",
+    "../hal/include",
   ]
 }
 
-ohos_shared_library("libcodec_vdi_headers") {
+ohos_shared_library("libcodec_hdi_omx_server") {
+  include_dirs = [
+    "../hal/v2.0/hdi_impl/include",
+    "../hal/include",
+    "../utils/include",
+  ]
+  configs = [ ":headers_config" ]
+
+  sources = [
+    "../utils/src/codec_util.c",
+    "src/codec_adapter.cpp",
+    "src/codec_callback_type_proxy.c",
+    "src/codec_component_capability_config.c",
+    "src/codec_component_manager_service.c",
+    "src/codec_component_manager_stub.c",
+    "src/codec_component_type_driver.c",
+    "src/codec_component_type_service.c",
+    "src/codec_component_type_stub.c",
+    "src/codec_config_parser.c",
+    "src/codec_death_recipient.cpp",
+    "src/codec_dfx_service.c",
+    "src/codec_types.c",
+    "v2.0/hdi_impl/src/codec_dyna_buffer.cpp",
+    "v2.0/hdi_impl/src/codec_handle_buffer.cpp",
+    "v2.0/hdi_impl/src/codec_omx_core.cpp",
+    "v2.0/hdi_impl/src/codec_share_buffer.cpp",
+    "v2.0/hdi_impl/src/component_mgr.cpp",
+    "v2.0/hdi_impl/src/component_node.cpp",
+    "v2.0/hdi_impl/src/icodec_buffer.cpp",
+  ]
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "graphic_surface:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [
+    "hitrace:hitrace_meter",
+    "openmax:libopenmax_static",
+  ]
+  defines = [ "LOG_TAG_HDI_SERVER" ]
+  if (drivers_peripheral_codec_feature_set_omx_role) {
+    defines += [ "SUPPORT_ROLE" ]
+  }
+  if (use_musl) {
+    if (musl_use_jemalloc && musl_use_jemalloc_dfx_intf) {
+      defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
+    }
+  }
+
+  cflags_cc = [ "-fstack-protector-strong" ]
+
+  shlib_type = "hdi"
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
+ohos_static_library("libcodec_hdi_omx_server_static") {
+  include_dirs = [
+    "../interfaces/include",
+    "../hal/v2.0/hdi_impl/include",
+    "../hal/include",
+    "../utils/include",
+  ]
+  sources = [
+    "../utils/src/codec_util.c",
+    "src/codec_adapter.cpp",
+    "src/codec_callback_type_proxy.c",
+    "src/codec_component_capability_config.c",
+    "src/codec_component_manager_service.c",
+    "src/codec_component_manager_stub.c",
+    "src/codec_component_type_driver.c",
+    "src/codec_component_type_service.c",
+    "src/codec_component_type_stub.c",
+    "src/codec_config_parser.c",
+    "src/codec_death_recipient.cpp",
+    "src/codec_dfx_service.c",
+    "src/codec_types.c",
+    "v2.0/hdi_impl/src/codec_dyna_buffer.cpp",
+    "v2.0/hdi_impl/src/codec_handle_buffer.cpp",
+    "v2.0/hdi_impl/src/codec_omx_core.cpp",
+    "v2.0/hdi_impl/src/codec_share_buffer.cpp",
+    "v2.0/hdi_impl/src/component_mgr.cpp",
+    "v2.0/hdi_impl/src/component_node.cpp",
+    "v2.0/hdi_impl/src/icodec_buffer.cpp",
+  ]
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "graphic_surface:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [
+    "hitrace:hitrace_meter",
+    "openmax:libopenmax_static",
+  ]
+  defines = [ "LOG_TAG_HDI_SERVER" ]
+  if (drivers_peripheral_codec_feature_set_omx_role) {
+    defines += [ "SUPPORT_ROLE" ]
+  }
+  if (use_musl) {
+    if (musl_use_jemalloc && musl_use_jemalloc_dfx_intf) {
+      defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
+    }
+  }
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
+ohos_shared_library("libcodec_hdi_omx_client") {
+  include_dirs = [
+    "../hal/include",
+    "../utils/include",
+  ]
   public_configs = [ ":headers_config" ]
+  sources = [
+    "../utils/src/codec_util.c",
+    "src/codec_callback_type_stub.c",
+    "src/codec_component_manager_proxy.c",
+    "src/codec_component_type_proxy.c",
+    "src/codec_types.c",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "graphic_surface:buffer_handle",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdi",
+      "hdf_core:libpub_utils",
+      "hilog:libhilog",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [ "openmax:libopenmax_static" ]
+  defines = [ "LOG_TAG_HDI_CLIENT" ]
+  if (use_musl) {
+    if (musl_use_jemalloc && musl_use_jemalloc_dfx_intf) {
+      defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
+    }
+  }
+
+  cflags_cc = [ "-fstack-protector-strong" ]
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
+ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
+  include_dirs = [
+    "../hal/include",
+    "../utils/include",
+  ]
+  configs = [ ":headers_config" ]
+
+  sources = [ "src/codec_callback_type_service.c" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [ "openmax:libopenmax_static" ]
+  defines = [ "LOG_TAG_HDI_CLIENT" ]
+
+  cflags_cc = [ "-fstack-protector-strong" ]
+
+  install_images = [ chipset_base_dir ]
+  innerapi_tags = [ "passthrough" ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
 }
 
 group("codec_hdi_omx") {
   deps = [
-    ":libcodec_vdi_headers"
+    ":libcodec_hdi_omx_callback_type_service_impl",
+    ":libcodec_hdi_omx_client",
+    ":libcodec_hdi_omx_server",
   ]
 }

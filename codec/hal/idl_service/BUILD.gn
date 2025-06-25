@@ -15,6 +15,7 @@ import("../..//codec.gni")
 
 ohos_shared_library("libcodec_component_manager_service_4.0") {
   include_dirs = [
+    "../../interfaces/include/",
     "../../utils/include/",
     "include",
   ]
@@ -76,6 +77,7 @@ ohos_shared_library("libcodec_component_manager_service_4.0") {
 
 ohos_shared_library("libcodec_driver") {
   include_dirs = [
+    "../../interfaces/include/",
     "../../utils/include/",
     "include",
   ]
