@@ -17,7 +17,7 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_2/display_composer_stub.h"
+#include "v1_3/display_composer_stub.h"
 #ifdef DISPLAY_HICOLLIE_ENABLE
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
@@ -96,7 +96,7 @@ static int HdfDisplayComposerDriverBind(struct HdfDeviceObject* deviceObject)
     hdfDisplayComposerHost->ioService.Open = NULL;
     hdfDisplayComposerHost->ioService.Release = NULL;
 
-    auto serviceImpl = OHOS::HDI::Display::Composer::V1_2::IDisplayComposer::Get(true);
+    auto serviceImpl = OHOS::HDI::Display::Composer::V1_3::IDisplayComposer::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get the implement of service", __func__);
         delete hdfDisplayComposerHost;
@@ -104,7 +104,7 @@ static int HdfDisplayComposerDriverBind(struct HdfDeviceObject* deviceObject)
     }
 
     hdfDisplayComposerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        OHOS::HDI::Display::Composer::V1_2::IDisplayComposer::GetDescriptor());
+        OHOS::HDI::Display::Composer::V1_3::IDisplayComposer::GetDescriptor());
     if (hdfDisplayComposerHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfDisplayComposerHost;

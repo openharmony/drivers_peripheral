@@ -24,9 +24,9 @@
 
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_2;
+using namespace OHOS::HDI::Display::Composer::V1_3;
 
-static sptr<Composer::V1_2::IDisplayComposerInterface> g_composerInterface = nullptr;
+static sptr<Composer::V1_3::IDisplayComposerInterface> g_composerInterface = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_bufferInterface = nullptr;
 
 static bool g_isInit = false;
@@ -500,6 +500,19 @@ int TestGetDisplayIdentificationData(uint32_t devId)
     return ret;
 }
 
+void TestHwcEventCallback(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void* data)
+{
+}
+
+int TestRegHwcEventCallback(uint32_t devId)
+{
+    int32_t ret = g_composerInterface->RegHwcEventCallback(TestHwcEventCallback, nullptr);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -532,6 +545,7 @@ TestFuncs g_testFuncs = {
     TestGetHDRCapabilityInfos,
     TestCommit,
     TestGetDisplayIdentificationData,
+    TestRegHwcEventCallback,
 };
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
@@ -543,7 +557,7 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
     // initialize service
     if (!g_isInit) {
         g_isInit = true;
-        g_composerInterface = Composer::V1_2::IDisplayComposerInterface::Get();
+        g_composerInterface = Composer::V1_3::IDisplayComposerInterface::Get();
         if (g_composerInterface == nullptr) {
             HDF_LOGE("%{public}s: get IDisplayComposerInterface failed", __func__);
             return false;

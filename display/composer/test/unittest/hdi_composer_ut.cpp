@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
-#include "hdi_composer_ut.h"
+#include <sys/time.h>
+#include <thread>
 #include <chrono>
 #include <cinttypes>
 #include <algorithm>
-#include "v1_2/include/idisplay_composer_interface.h"
-#include "v1_2/display_composer_type.h"
+#include "v1_3/include/idisplay_composer_interface.h"
+#include "v1_3/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
 #include "display_test_utils.h"
@@ -28,15 +29,14 @@
 #include "hdi_test_display.h"
 #include "hdi_test_render_utils.h"
 #include "timer.h"
-#include <sys/time.h>
-#include <thread>
+#include "hdi_composer_ut.h"
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_2;
+using namespace OHOS::HDI::Display::Composer::V1_3;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-static sptr<Composer::V1_2::IDisplayComposerInterface> g_composerDevice = nullptr;
+static sptr<Composer::V1_3::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
 const int SLEEP_CONT_10 = 10;
@@ -44,6 +44,7 @@ const int SLEEP_CONT_100 = 100;
 const int SLEEP_CONT_2000 = 2000;
 static bool g_isOnSeamlessChangeCalled = false;
 static bool g_isOnModeCalled = false;
+static bool g_isOnHwcEventCalled = false;
 static bool g_threadCtrl = false;
 static constexpr int32_t VALID_HDI_FD = 1;
 static constexpr int32_t INVALID_HDI_FD = -1;
@@ -935,6 +936,11 @@ void DeviceTest::OnSeamlessChange(uint32_t devId, void* data)
     g_isOnSeamlessChangeCalled = true;
 }
 
+void DeviceTest::OnHwcEvent(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void* data)
+{
+    g_isOnHwcEventCalled = true;
+}
+
 HWTEST_F(DeviceTest, test_GetDisplaySupportedModesExt, TestSize.Level1)
 {
     std::vector<DisplayModeInfoExt> modes;
@@ -1009,6 +1015,21 @@ HWTEST_F(DeviceTest, test_RegSeamlessChangeCallback, TestSize.Level1)
     if (ret == DISPLAY_SUCCESS) {
         std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         ASSERT_EQ(g_isOnSeamlessChangeCalled, true);
+    }
+}
+
+HWTEST_F(DeviceTest, test_RegHwcEventCallback, TestSize.Level1)
+{
+    g_isOnHwcEventCalled = false;
+    auto ret = g_composerDevice->RegHwcEventCallback(OnHwcEvent, nullptr);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("RegHwcEventCallback not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    if (ret == DISPLAY_SUCCESS) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        ASSERT_EQ(g_isOnHwcEventCalled, true);
     }
 }
 
