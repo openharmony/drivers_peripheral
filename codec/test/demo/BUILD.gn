@@ -19,5 +19,6 @@ group("hdf_demo_codec") {
     "heif:codec_hdi_heif_demo",
     "idl:codec_idl_omx_demo",
     "jpeg:codec_hdi_jpeg_demo",
+    "v2.0:codec_hdi_omx_demo",
   ]
 }

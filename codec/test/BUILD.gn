@@ -20,6 +20,7 @@ group("hdf_test_media_codec") {
     "demo:hdf_demo_codec",
     "fuzztest/hdi_fuzzer:hdf_codec_idl_fuzz_test",
     "fuzztest/image_fuzzer:hdf_image_fuzz_test",
+    "fuzztest/omx_fuzzer:hdf_fuzztest_media_codec",
     "unittest:hdf_unittest_codec",
   ]
 }
