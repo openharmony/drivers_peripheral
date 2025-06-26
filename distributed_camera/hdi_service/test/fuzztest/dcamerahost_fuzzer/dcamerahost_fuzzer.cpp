@@ -150,15 +150,6 @@ void DCameraPrelaunchWithOpModeFuzzTest(const uint8_t* data, size_t size)
     PrelaunchConfig config;
     DCameraHost::GetInstance()->PrelaunchWithOpMode(config, operationMode);
 }
-
-void DCameraPrelaunchFuzzTest(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    PrelaunchConfig config;
-    DCameraHost::GetInstance()->Prelaunch(config);
-}
 }
 }
 
@@ -175,6 +166,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::DCameraNotifyDeviceStateChangeInfoFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraPreCameraSwitchFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraPrelaunchWithOpModeFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraPrelaunchFuzzTest(data, size);
     return 0;
 }
