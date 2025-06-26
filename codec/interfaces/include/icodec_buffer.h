@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,9 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef CODECSETCONFIG_FUZZER
-#define CODECSETCONFIG_FUZZER
+#ifndef I_CODEC_BUFFER_H
+#define I_CODEC_BUFFER_H
 
-#define FUZZ_PROJECT_NAME "codecsetconfig_fuzzer"
-
-#endif
+#include <buffer_handle.h>
+namespace OHOS {
+namespace Codec {
+namespace Omx {
+ 
+struct DynamicBuffer {
+    int32_t type = 0;
+    BufferHandle *bufferHandle = nullptr;
+};
+ 
+}  // namespace Omx
+}  // namespace Codec
+}  // namespace OHOS
+ 
+#endif // I_CODEC_BUFFER_H
