@@ -16,7 +16,6 @@
 #include <net/if.h>
 #include <arpa/inet.h>
 #include <dirent.h>
-#include <netlink-private/types.h>
 #include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
 #include <netlink/handlers.h>
