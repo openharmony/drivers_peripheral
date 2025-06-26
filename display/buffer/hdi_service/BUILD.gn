@@ -105,7 +105,7 @@ ohos_shared_library("libmapper_service_1.0") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  innerapi_tags = [ "passthrough_indirect" ]
+  innerapi_tags = [ "passthrough" ]
   part_name = "drivers_peripheral_display"
 }
 
@@ -130,7 +130,7 @@ ohos_shared_library("libmapper_service_1.2") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  innerapi_tags = [ "passthrough_indirect" ]
+  innerapi_tags = [ "passthrough" ]
   part_name = "drivers_peripheral_display"
 }
 
@@ -178,7 +178,7 @@ ohos_shared_library("libmetadata_service_1.1") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  innerapi_tags = [ "passthrough_indirect" ]
+  innerapi_tags = [ "passthrough" ]
   part_name = "drivers_peripheral_display"
 }
 
