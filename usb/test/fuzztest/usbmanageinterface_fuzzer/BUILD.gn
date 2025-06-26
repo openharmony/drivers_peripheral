@@ -35,7 +35,7 @@ ohos_fuzztest("UsbManageInterfaceFuzzTest") {
     "c_utils:utils",
     "drivers_interface_usb:libusb_ddk_stub_1.0",
     "drivers_interface_usb:libusb_proxy_1.0",
-    "drivers_interface_usb:libusb_ddk_proxy_1.0",
+    "drivers_interface_usb:usb_ddk_idl_headers",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
