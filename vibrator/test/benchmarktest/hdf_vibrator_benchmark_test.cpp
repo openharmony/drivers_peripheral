@@ -38,6 +38,7 @@ namespace {
     std::string g_timeSequence = "haptic.clock.timer";
     std::string g_builtIn = "haptic.default.effect";
     sptr<IVibratorInterface> g_vibratorInterface = nullptr;
+    std::vector<HdfVibratorInfo> g_vibratorInfo;
 
 class VibratorBenchmarkTest : public benchmark::Fixture {
 public:
@@ -48,6 +49,12 @@ public:
 void VibratorBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
     g_vibratorInterface = IVibratorInterface::Get();
+    if (g_vibratorInterface == nullptr) {
+        printf("g_vibratorInterface is nullptr");
+        GTEST_SKIP() << "g_vibratorInterface is nullptr" << std::endl;
+        return;
+    }
+    g_vibratorInterface->GetVibratorInfo(g_vibratorInfo);
 }
 
 void VibratorBenchmarkTest::TearDown(const ::benchmark::State &state)
@@ -67,11 +74,13 @@ BENCHMARK_F(VibratorBenchmarkTest, StartOnce)(benchmark::State &state)
     int32_t startRet;
     int32_t endRet;
     for (auto _ : state) {
-        startRet = g_vibratorInterface->StartOnce({-1, 1}, g_duration);
-        EXPECT_EQ(startRet, HDF_SUCCESS);
+        for (auto it : g_vibratorInfo) {
+            startRet = g_vibratorInterface->StartOnce({it.deviceId, it.vibratorId}, g_duration);
+            EXPECT_EQ(startRet, HDF_SUCCESS);
 
-        endRet = g_vibratorInterface->Stop({-1, 1}, HDF_VIBRATOR_MODE_ONCE);
-        EXPECT_EQ(endRet, HDF_SUCCESS);
+            endRet = g_vibratorInterface->Stop({it.deviceId, it.vibratorId}, HDF_VIBRATOR_MODE_ONCE);
+            EXPECT_EQ(endRet, HDF_SUCCESS);
+        }
     }
 }
 
@@ -91,14 +100,16 @@ BENCHMARK_F(VibratorBenchmarkTest, Start)(benchmark::State &state)
     int32_t startRet;
     int32_t endRet;
     for (auto _ : state) {
-        HdfEffectInfo effectInfo;
-        g_vibratorInterface->GetEffectInfo({0, 0}, g_timeSequence, effectInfo);
-        if (effectInfo.isSupportEffect == true) {
-        startRet = g_vibratorInterface->Start({-1, 1}, g_timeSequence);
-        EXPECT_EQ(startRet, HDF_SUCCESS);
+        for (auto it : g_vibratorInfo) {
+            HdfEffectInfo effectInfo;
+            g_vibratorInterface->GetEffectInfo({it.deviceId, it.vibratorId}, g_timeSequence, effectInfo);
+            if (effectInfo.isSupportEffect == true) {
+                startRet = g_vibratorInterface->Start({it.deviceId, it.vibratorId}, g_timeSequence);
+                EXPECT_EQ(startRet, HDF_SUCCESS);
 
-        endRet = g_vibratorInterface->Stop({-1, 1}, HDF_VIBRATOR_MODE_PRESET);
-        EXPECT_EQ(endRet, HDF_SUCCESS);
+                endRet = g_vibratorInterface->Stop({it.deviceId, it.vibratorId}, HDF_VIBRATOR_MODE_PRESET);
+                EXPECT_EQ(endRet, HDF_SUCCESS);
+            }
         }
     }
 }
@@ -119,14 +130,16 @@ BENCHMARK_F(VibratorBenchmarkTest, Stop)(benchmark::State &state)
     int32_t endRet;
 
     for (auto _ : state) {
-        HdfEffectInfo effectInfo;
-        g_vibratorInterface->GetEffectInfo({0, 0}, g_builtIn, effectInfo);
-        if (effectInfo.isSupportEffect == true) {
-            startRet = g_vibratorInterface->Start({-1, 1}, g_builtIn);
-            EXPECT_EQ(startRet, HDF_SUCCESS);
+        for (auto it : g_vibratorInfo) {
+            HdfEffectInfo effectInfo;
+            g_vibratorInterface->GetEffectInfo({it.deviceId, it.vibratorId}, g_builtIn, effectInfo);
+            if (effectInfo.isSupportEffect == true) {
+                startRet = g_vibratorInterface->Start({it.deviceId, it.vibratorId}, g_builtIn);
+                EXPECT_EQ(startRet, HDF_SUCCESS);
 
-            endRet = g_vibratorInterface->Stop({-1, 1}, HDF_VIBRATOR_MODE_PRESET);
-            EXPECT_EQ(endRet, HDF_SUCCESS);
+                endRet = g_vibratorInterface->Stop({it.deviceId, it.vibratorId}, HDF_VIBRATOR_MODE_PRESET);
+                EXPECT_EQ(endRet, HDF_SUCCESS);
+            }
         }
     }
 }
@@ -142,14 +155,7 @@ BENCHMARK_REGISTER_F(VibratorBenchmarkTest, Stop)->
   */
 BENCHMARK_F(VibratorBenchmarkTest, GetVibratorInfo)(benchmark::State &state)
 {
-    uint32_t majorVer;
-    uint32_t minorVer;
-    uint32_t ret;
-
     ASSERT_NE(nullptr, g_vibratorInterface);
-
-    ret = g_vibratorInterface->GetVersion(majorVer, minorVer);
-    ASSERT_EQ(HDF_SUCCESS, ret);
 
     std::vector<HdfVibratorInfo> info;
 
@@ -170,12 +176,6 @@ BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetVibratorInfo)->
   */
 BENCHMARK_F(VibratorBenchmarkTest, EnableVibratorModulation)(benchmark::State &state)
 {
-    uint32_t majorVer;
-    uint32_t minorVer;
-
-    if (g_vibratorInterface->GetVersion(majorVer, minorVer) != HDF_SUCCESS) {
-        return;
-    }
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     std::vector<HdfVibratorInfo> info;
@@ -184,19 +184,22 @@ BENCHMARK_F(VibratorBenchmarkTest, EnableVibratorModulation)(benchmark::State &s
     EXPECT_EQ(startRet, HDF_SUCCESS);
 
     for (auto _ : state) {
-        if ((info[0].isSupportIntensity == 1) || (info[0].isSupportFrequency == 1)) {
-            printf("vibratot benchmarktest successed!\n\t");
-            EXPECT_GT(g_duration, 0);
-            EXPECT_GE(g_intensity1, info[0].intensityMinValue);
-            EXPECT_LE(g_intensity1, info[0].intensityMaxValue);
-            EXPECT_GE(g_frequency1, info[0].frequencyMinValue);
-            EXPECT_LE(g_frequency1, info[0].frequencyMaxValue);
-            printf("vibratot benchmark test successed!\n\t");
-            startRet = g_vibratorInterface->EnableVibratorModulation({-1, 1}, g_duration, g_intensity1, g_frequency1);
-            EXPECT_EQ(startRet, HDF_SUCCESS);
-            OsalMSleep(g_sleepTime1);
-            startRet = g_vibratorInterface->Stop({-1, 1}, HDF_VIBRATOR_MODE_ONCE);
-            EXPECT_EQ(startRet, HDF_SUCCESS);
+        for (auto it : g_vibratorInfo) {
+            if ((info[0].isSupportIntensity == 1) || (info[0].isSupportFrequency == 1)) {
+                printf("vibratot benchmarktest successed!\n\t");
+                EXPECT_GT(g_duration, 0);
+                EXPECT_GE(g_intensity1, info[0].intensityMinValue);
+                EXPECT_LE(g_intensity1, info[0].intensityMaxValue);
+                EXPECT_GE(g_frequency1, info[0].frequencyMinValue);
+                EXPECT_LE(g_frequency1, info[0].frequencyMaxValue);
+                printf("vibratot benchmark test successed!\n\t");
+                startRet = g_vibratorInterface->EnableVibratorModulation({it.deviceId, it.vibratorId}, g_duration,
+                                                                         g_intensity1, g_frequency1);
+                EXPECT_EQ(startRet, HDF_SUCCESS);
+                OsalMSleep(g_sleepTime1);
+                startRet = g_vibratorInterface->Stop({it.deviceId, it.vibratorId}, HDF_VIBRATOR_MODE_ONCE);
+                EXPECT_EQ(startRet, HDF_SUCCESS);
+            }
         }
     }
 }
@@ -213,41 +216,43 @@ BENCHMARK_F(VibratorBenchmarkTest, EnableCompositeEffect)(benchmark::State &stat
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    PrimitiveEffect primitiveEffect1 {0, 60007, 0};
-    PrimitiveEffect primitiveEffect2 {1000, 60007, 0};
-    PrimitiveEffect primitiveEffect3 {1000, 60007, 0};
-    CompositeEffect effect1 = {
-        .primitiveEffect = primitiveEffect1
-    };
-    CompositeEffect effect2 = {
-        .primitiveEffect = primitiveEffect2
-    };
-    CompositeEffect effect3 = {
-        .primitiveEffect = primitiveEffect3
-    };
-    std::vector<CompositeEffect> vec;
-    vec.push_back(effect1);
-    vec.push_back(effect2);
-    vec.push_back(effect3);
-    HdfCompositeEffect effect;
-    effect.type = HDF_EFFECT_TYPE_PRIMITIVE;
-    effect.compositeEffects = vec;
-    int32_t ret;
-    HapticCapacity hapticCapacity;
-    ret = g_vibratorInterface->GetHapticCapacity({0, 0}, hapticCapacity);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    if (hapticCapacity.isSupportPresetMapping) {
-        for (auto _ : state) {
-            ret = g_vibratorInterface->EnableCompositeEffect({-1, 1}, effect);
+    for (auto _ : state) {
+        PrimitiveEffect primitiveEffect1 {0, 60007, 0};
+        PrimitiveEffect primitiveEffect2 {1000, 60007, 0};
+        PrimitiveEffect primitiveEffect3 {1000, 60007, 0};
+        CompositeEffect effect1 = {
+            .primitiveEffect = primitiveEffect1
+        };
+        CompositeEffect effect2 = {
+            .primitiveEffect = primitiveEffect2
+        };
+        CompositeEffect effect3 = {
+            .primitiveEffect = primitiveEffect3
+        };
+        std::vector<CompositeEffect> vec;
+        vec.push_back(effect1);
+        vec.push_back(effect2);
+        vec.push_back(effect3);
+        HdfCompositeEffect effect;
+        effect.type = HDF_EFFECT_TYPE_PRIMITIVE;
+        effect.compositeEffects = vec;
+        int32_t ret;
+        for (auto it : g_vibratorInfo) {
+            HapticCapacity hapticCapacity;
+            ret = g_vibratorInterface->GetHapticCapacity({it.deviceId, it.vibratorId}, hapticCapacity);
+            EXPECT_EQ(ret, HDF_SUCCESS);
+            if (hapticCapacity.isSupportPresetMapping) {
+                ret = g_vibratorInterface->EnableCompositeEffect({it.deviceId, it.vibratorId}, effect);
+                EXPECT_EQ(HDF_SUCCESS, ret);
+            }
         }
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
-
     OsalMSleep(2);
 }
 
 BENCHMARK_REGISTER_F(VibratorBenchmarkTest, EnableCompositeEffect)->
-    Iterations(ITERATION_FREQUENCY)->Repetitions(3)->ReportAggregatesOnly();
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
   * @tc.name: SUB_DriverSystem_VibratorBenchmark_GetEffectInfo
@@ -260,7 +265,9 @@ BENCHMARK_F(VibratorBenchmarkTest, GetEffectInfo)(benchmark::State &state)
     HdfEffectInfo effectInfo;
     int32_t ret;
     for (auto _ : state) {
-        ret = g_vibratorInterface->GetEffectInfo({-1, 1}, "haptic.pattern.type1", effectInfo);
+        for (auto it : g_vibratorInfo) {
+            ret = g_vibratorInterface->GetEffectInfo({it.deviceId, it.vibratorId}, "haptic.pattern.type1", effectInfo);
+        }
     }
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -279,7 +286,9 @@ BENCHMARK_F(VibratorBenchmarkTest, IsVibratorRunning)(benchmark::State &state)
     bool stat {false};
     int32_t ret;
     for (auto _ : state) {
-        ret = g_vibratorInterface->IsVibratorRunning({-1, 1}, stat);
+        for (auto it : g_vibratorInfo) {
+            ret = g_vibratorInterface->IsVibratorRunning({it.deviceId, it.vibratorId}, stat);
+        }
     }
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
