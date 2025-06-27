@@ -33,11 +33,10 @@ public:
                          const std::vector<ItemRef>& refs, const SharedBuffer& output, uint32_t& filledLen);
 private:
     bool LoadVendorLib();
-    bool ReWrapNativeBufferInImageItem(const std::vector<ImageItem>& inputImgs);
 private:
     std::mutex mutex_;
     std::shared_ptr<void> libHeif_ = nullptr;
-    ICodecHeifHwi* heifHwi_ = nullptr;
+    OHOS::VDI::HEIF::ICodecHeifHwi* heifHwi_ = nullptr;
     bool isIPCMode_;
 };
 } // V2_1

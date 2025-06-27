@@ -187,9 +187,9 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecUseBuffer");
     CODEC_LOGD("portIndex: [%{public}d]", portIndex);
+    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(inBuffer, isIPCMode_);
     std::lock_guard<std::mutex> lock(nodeMutex_);
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
-    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(inBuffer, isIPCMode_);
     int32_t ret = node_->UseBuffer(portIndex, internal);
     outBuffer = OHOS::Codec::Omx::Convert(internal, isIPCMode_);
     return ret;
@@ -200,9 +200,9 @@ int32_t CodecComponentService::AllocateBuffer(uint32_t portIndex, const OmxCodec
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecAllocateBuffer");
     CODEC_LOGD("portIndex: [%{public}d]", portIndex);
+    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(inBuffer, isIPCMode_);
     std::lock_guard<std::mutex> lock(nodeMutex_);
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
-    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(inBuffer, isIPCMode_);
     int32_t ret = node_->AllocateBuffer(portIndex, internal);
     outBuffer = OHOS::Codec::Omx::Convert(internal, isIPCMode_);
     return ret;
@@ -212,9 +212,9 @@ int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuff
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecFreeBuffer");
     CODEC_LOGD("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, buffer.bufferId);
+    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(buffer, isIPCMode_);
     std::lock_guard<std::mutex> lock(nodeMutex_);
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
-    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(buffer, isIPCMode_);
     int32_t ret = node_->FreeBuffer(portIndex, internal);
     ReleaseCache();
 
@@ -224,18 +224,18 @@ int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuff
 int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecEmptyThisBuffer");
+    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(buffer, isIPCMode_);
     std::lock_guard<std::mutex> lock(nodeMutex_);
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
-    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(buffer, isIPCMode_);
     return node_->EmptyThisBuffer(internal);
 }
 
 int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecFillThisBuffer");
+    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(buffer, isIPCMode_);
     std::lock_guard<std::mutex> lock(nodeMutex_);
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
-    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(buffer, isIPCMode_);
     return node_->FillThisBuffer(internal);
 }
 
@@ -262,9 +262,9 @@ int32_t CodecComponentService::UseEglImage(uint32_t portIndex, const OmxCodecBuf
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecUseEglImage");
     CODEC_LOGI("portIndex [%{public}d]", portIndex);
+    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(inBuffer, isIPCMode_);
     std::lock_guard<std::mutex> lock(nodeMutex_);
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
-    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(inBuffer, isIPCMode_);
     int32_t ret = node_->UseEglImage(internal, portIndex, eglImage.data());
     outBuffer = OHOS::Codec::Omx::Convert(internal, isIPCMode_);
     return ret;
@@ -323,9 +323,9 @@ void CodecComponentService::SetComponentRole()
 int32_t CodecComponentService::SetParameterWithBuffer(uint32_t index, const std::vector<int8_t>& paramStruct,
                                                       const OmxCodecBuffer& inBuffer)
 {
+    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(inBuffer, isIPCMode_);
     std::lock_guard<std::mutex> lock(nodeMutex_);
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
-    OHOS::Codec::Omx::OmxCodecBuffer internal = OHOS::Codec::Omx::Convert(inBuffer, isIPCMode_);
     return node_->SetParameterWithBuffer(index, paramStruct, internal);
 }
 
