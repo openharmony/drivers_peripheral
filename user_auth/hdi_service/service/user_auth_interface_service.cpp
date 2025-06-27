@@ -1544,7 +1544,7 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockParam&
     if (ret != RESULT_SUCCESS) {
         info.token.clear();
         IAM_LOGE("check reuse unlock result failed, ret:%{public}d", ret);
-        return ConvertResultCode(ret);
+        return ret;
     }
     info.authType = reuseResult.authType;
     info.enrolledState.credentialDigest = reuseResult.enrolledState.credentialDigest;
