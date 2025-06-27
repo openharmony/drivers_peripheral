@@ -189,7 +189,7 @@ void CodecNode::EncodeJpegToMemory(uint8_t* image, JpegData jpegData,
     cInfo.err = jpeg_std_error(&jErr);
 
     jpeg_create_compress(&cInfo);
-    cInfo.image_width = jpegData.width;
+    cInfo.image_width = static_cast<unsigned int>(jpegData.width);
     cInfo.image_height = jpegData.height;
     cInfo.input_components = colorMap;
     cInfo.in_color_space = JCS_RGB;

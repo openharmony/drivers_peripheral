@@ -193,7 +193,6 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
 {
     CAMERA_LOGD("V4L2SetValue in fd = %{public}d\n", fd);
     int value;
-    int rc;
 
     ctrl.id = qCtrl.id;
     ctrl.ctrl_class = V4L2_CTRL_ID2CLASS(qCtrl.id);
@@ -211,7 +210,7 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
         return;
     }
 
-    rc = V4L2GetCtrl(fd, qCtrl.id, value);
+    RetCode rc = V4L2GetCtrl(fd, qCtrl.id, value);
     if (rc != RC_ERROR) {
         ctrl.value = value;
         CAMERA_LOGD("%{public}s-14s : id=%{public}x-08x, type=%{public}d, minimum=%{public}d, maximum=%{public}d\n"

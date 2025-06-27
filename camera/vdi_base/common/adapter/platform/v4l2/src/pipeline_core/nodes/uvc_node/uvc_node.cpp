@@ -177,7 +177,7 @@ void UvcNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
         CAMERA_LOGE("Meta is nullptr");
         return;
     }
-    constexpr uint32_t DEVICE_STREAM_ID = 0;
+    constexpr int32_t DEVICE_STREAM_ID = 0;
     if (sensorController_ != nullptr) {
         sensorController_->ConfigStart();
         if (GetStreamId(metadata) == DEVICE_STREAM_ID) {

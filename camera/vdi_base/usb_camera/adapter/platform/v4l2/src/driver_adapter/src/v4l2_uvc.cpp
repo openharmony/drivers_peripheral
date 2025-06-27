@@ -392,7 +392,7 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
                 V4L2UvcMatchDev(itr->first, devName, false);
             }
         } else {
-            int rc;
+            RetCode rc;
             struct v4l2_capability cap = {};
             rc = V4L2UvcGetCap(devName, cap);
             if (rc == RC_ERROR) {

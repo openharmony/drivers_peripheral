@@ -118,7 +118,7 @@ uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
     }
 
     ConvertGpsDataToDms(number, &degree, &minute, &second);
-    gpsRational[0].numerator = degree; // Index
+    gpsRational[0].numerator = static_cast<uint32_t>(degree); // Index
     gpsRational[0].denominator = 1;
     gpsRational[1].numerator = minute; // Index
     gpsRational[1].denominator = 1;
@@ -130,6 +130,10 @@ uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
         entry = CreateTag(exif, EXIF_IFD_GPS, EXIF_TAG_GPS_LATITUDE_REF, sizeof(gpsRef), EXIF_FORMAT_ASCII);
     } else {
         entry = CreateTag(exif, EXIF_IFD_GPS, EXIF_TAG_GPS_LONGITUDE_REF, sizeof(gpsRef), EXIF_FORMAT_ASCII);
+    }
+    if (entry == nullptr) {
+        CAMERA_LOGE("%{public}s CreateTag failed.", __FUNCTION__);
+        return RC_ERROR;
     }
     if (memcpy_s(entry->data, entry->size, gpsRef, sizeof(gpsRef)) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
