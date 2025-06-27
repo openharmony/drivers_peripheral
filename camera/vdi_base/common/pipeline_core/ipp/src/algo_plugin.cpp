@@ -102,22 +102,7 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
     }
 
     IppAlgoBuffer** inAlgoBuffers = new(std::nothrow) IppAlgoBuffer* [inBuffers.size()];
-    for (uint32_t i = 0; i < inBuffers.size(); i++) {
-        if (inBuffers[i] == nullptr) {
-            inAlgoBuffers[i] = nullptr;
-        } else {
-            inAlgoBuffers[i] = new(std::nothrow) IppAlgoBuffer();
-            if (inAlgoBuffers[i] != nullptr){
-                inAlgoBuffers[i]->addr = inBuffers[i]->GetVirAddress();
-                inAlgoBuffers[i]->size = inBuffers[i]->GetSize();
-                inAlgoBuffers[i]->width = inBuffers[i]->GetWidth();
-                inAlgoBuffers[i]->height = inBuffers[i]->GetHeight();
-                inAlgoBuffers[i]->stride = inBuffers[i]->GetStride();
-                inAlgoBuffers[i]->id = i;
-            }
-        }
-    }
-
+    SetInAlgoBuffers(inBuffers, inAlgoBuffers);
     int ret = algoHandler_->func.Process(inAlgoBuffers, inBuffers.size(), outAlgoBuffer, nullptr);
     if (outAlgoBuffer != nullptr) {
         delete outAlgoBuffer;
@@ -138,6 +123,25 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
         return RC_ERROR;
     }
     return RC_OK;
+}
+
+void SetInAlgoBuffers(std::vector<std::shared_ptr<IBuffer>>& inBuffers, IppAlgoBuffer** inAlgoBuffers)
+{
+    for (uint32_t i = 0; i < inBuffers.size(); i++) {
+        if (inBuffers[i] == nullptr) {
+            inAlgoBuffers[i] = nullptr;
+        } else {
+            inAlgoBuffers[i] = new(std::nothrow) IppAlgoBuffer();
+            if (inAlgoBuffers[i] != nullptr) {
+                inAlgoBuffers[i]->addr = inBuffers[i]->GetVirAddress();
+                inAlgoBuffers[i]->size = inBuffers[i]->GetSize();
+                inAlgoBuffers[i]->width = inBuffers[i]->GetWidth();
+                inAlgoBuffers[i]->height = inBuffers[i]->GetHeight();
+                inAlgoBuffers[i]->stride = inBuffers[i]->GetStride();
+                inAlgoBuffers[i]->id = i;
+            }
+        }
+    }
 }
 
 RetCode AlgoPlugin::Stop()

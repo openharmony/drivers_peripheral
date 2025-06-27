@@ -395,6 +395,7 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
 RetCode HosV4L2Buffers::SetAdapterBuffer(int fd, struct v4l2_buffer &buf, const std::shared_ptr<FrameSpec>& frameSpec)
 {
     CAMERA_LOGI("HosV4L2Buffers::SetAdapterBuffer in.");
+    RetCode ret = 0;
     int32_t index = (uint32_t)frameSpec->buffer_->GetIndex();
 
     auto findIf = adapterBufferMap_.find(index);
@@ -431,7 +432,7 @@ RetCode HosV4L2Buffers::SetAdapterBuffer(int fd, struct v4l2_buffer &buf, const 
             } else if (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
                 adapterBufferMap_[index].length = buf.length;
             }
-            RetCode ret = SetDmabufOn(buf, frameSpec);
+            ret = SetDmabufOn(buf, frameSpec);
             if (ret < 0) {
                 CAMERA_LOGE("SetDmabufOn err.\n");
                 return RC_ERROR;
