@@ -233,12 +233,14 @@ UsbDeviceHandle *FuncAdapterOpenDevice(UsbSession *session, uint8_t busNum, uint
     if (g_dev == nullptr) {
         OsalMutexDestroy(&g_usbHandle->lock);
         RawUsbMemFree(g_usbHandle);
+        g_usbHandle = nullptr;
         return nullptr;
     }
 
     int32_t ret = OsInitDevice(g_dev, busNum, usbAddr);
     if (ret != HDF_SUCCESS) {
         RawUsbMemFree(g_dev);
+        g_dev = nullptr;
         return nullptr;
     }
 
@@ -276,8 +278,11 @@ void FuncAdapterCloseDevice(UsbDeviceHandle *handle)
         RawUsbMemFree(dev->descriptors);
     }
     RawUsbMemFree(dev);
+    handle->dev = NULL;
+    dev = NULL;
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
+    handle = NULL;
 }
 
 int32_t FuncAdapterGetConfigDescriptor(const UsbDevice *dev, uint8_t configIndex, void *buffer, size_t len)
@@ -421,6 +426,7 @@ int32_t FuncAdapterFreeRequest(UsbHostRequest *request)
     }
     if (request->bulkUrb != nullptr) {
         RawUsbMemFree(request->bulkUrb);
+        request->bulkUrb = nullptr;
         request->urbs = nullptr;
     }
     if (request != nullptr) {
