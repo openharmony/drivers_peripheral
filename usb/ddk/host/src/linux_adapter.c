@@ -454,6 +454,7 @@ static void OsFreeIsoUrbs(struct UsbHostRequest *request)
             break;
         }
         RawUsbMemFree(urb);
+        request->isoUrbs[i] = NULL;
     }
 
     RawUsbMemFree(request->isoUrbs);
@@ -1021,6 +1022,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
     ret = OsInitDevice(dev, busNum, usbAddr);
     if (ret) {
         RawUsbMemFree(dev);
+        dev = NULL;
         goto ERR;
     }
 
@@ -1036,6 +1038,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 ERR:
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
+    handle = NULL;
     return NULL;
 }
 
@@ -1064,6 +1067,8 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
         RawUsbMemFree(dev->descriptors);
     }
     RawUsbMemFree(dev);
+    handle->dev = NULL;
+    dev = NULL;
 
     close(handle->fd);
     close(handle->mmapFd);
