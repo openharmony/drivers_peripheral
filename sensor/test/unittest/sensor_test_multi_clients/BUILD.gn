@@ -49,6 +49,7 @@ ohos_unittest("SensorSetBatchTest") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_sensor:libsensor_proxy_3.0",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "hitrace:hitrace_meter",
@@ -87,6 +88,7 @@ ohos_unittest("SensorSetSdcSensorTest") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_sensor:libsensor_proxy_3.0",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "hitrace:hitrace_meter",
