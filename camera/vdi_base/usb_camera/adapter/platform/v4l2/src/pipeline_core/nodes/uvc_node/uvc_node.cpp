@@ -98,7 +98,7 @@ RetCode UvcNode::Start(const int32_t streamId)
         format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
         format.fmtdesc.width = wide_;
         format.fmtdesc.height = high_;
-        int bufCnt = it->format_.bufferCount_;
+        int bufCnt = static_cast<int>(it->format_.bufferCount_);
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
             CAMERA_LOGE("Start failed.");
@@ -170,7 +170,7 @@ void UvcNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
         CAMERA_LOGE("Meta is nullptr");
         return;
     }
-    constexpr uint32_t DEVICE_STREAM_ID = 0;
+    constexpr int32_t DEVICE_STREAM_ID = 0;
     if (sensorController_ != nullptr) {
         if (GetStreamId(metadata) == DEVICE_STREAM_ID) {
             sensorController_->Configure(metadata);

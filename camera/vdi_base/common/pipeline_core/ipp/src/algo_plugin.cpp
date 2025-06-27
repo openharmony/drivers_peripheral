@@ -107,12 +107,14 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
             inAlgoBuffers[i] = nullptr;
         } else {
             inAlgoBuffers[i] = new(std::nothrow) IppAlgoBuffer();
-            inAlgoBuffers[i]->addr = inBuffers[i]->GetVirAddress();
-            inAlgoBuffers[i]->size = inBuffers[i]->GetSize();
-            inAlgoBuffers[i]->width = inBuffers[i]->GetWidth();
-            inAlgoBuffers[i]->height = inBuffers[i]->GetHeight();
-            inAlgoBuffers[i]->stride = inBuffers[i]->GetStride();
-            inAlgoBuffers[i]->id = i;
+            if (inAlgoBuffers[i] != nullptr){
+                inAlgoBuffers[i]->addr = inBuffers[i]->GetVirAddress();
+                inAlgoBuffers[i]->size = inBuffers[i]->GetSize();
+                inAlgoBuffers[i]->width = inBuffers[i]->GetWidth();
+                inAlgoBuffers[i]->height = inBuffers[i]->GetHeight();
+                inAlgoBuffers[i]->stride = inBuffers[i]->GetStride();
+                inAlgoBuffers[i]->id = i;
+            }
         }
     }
 

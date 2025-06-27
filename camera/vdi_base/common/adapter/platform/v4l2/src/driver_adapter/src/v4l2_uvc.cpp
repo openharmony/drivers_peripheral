@@ -203,7 +203,7 @@ void HosV4L2UVC::V4L2UvcEnmeDevices()
     std::string name = DEVICENAMEX;
     char devName[16] = {0};
     std::string cameraId = "uvcvideo";
-    int rc = 0;
+    RetCode rc = 0;
     int fd = 0;
 
     for (int j = 0; j < MAXVIDEODEVICE; ++j) {
@@ -255,7 +255,7 @@ const char* HosV4L2UVC::V4L2GetUsbValue(const char* key, const char* str, int le
 void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
     std::string& devnode, char* buf, unsigned int len)
 {
-    int lineLen;
+    unsigned int lineLen;
     int pos = 0;
     const char* retVal;
 
@@ -366,7 +366,7 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
                 V4L2UvcMatchDev(itr->first, devName, false);
             }
         } else {
-            int rc;
+            RetCode rc;
             struct v4l2_capability cap = {};
             rc = V4L2UvcGetCap(devName, cap);
             if (rc == RC_ERROR) {

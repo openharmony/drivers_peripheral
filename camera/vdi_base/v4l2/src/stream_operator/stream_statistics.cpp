@@ -91,7 +91,7 @@ void StreamStatistics::DumpStats(int interval)
     }
 
     if (lastOutputTime_ == 0) {
-        lastOutputTime_ = timestamp_.tv_sec;
+        lastOutputTime_ = static_cast<uint64_t>(timestamp_.tv_sec);
         return;
     }
 
