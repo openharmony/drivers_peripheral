@@ -26,6 +26,7 @@ public:
     static std::shared_ptr<UniqueFd> Create(int fd, bool transferOwnership);
     ~UniqueFd();
     int Get();
+    int Release();
 
 private:
     UniqueFd(int fd);

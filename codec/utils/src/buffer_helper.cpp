@@ -46,6 +46,13 @@ int UniqueFd::Get()
     return fd_;
 }
 
+int UniqueFd::Release()
+{
+    int fd = fd_;
+    fd_ = -1;
+    return fd;
+}
+
 std::mutex g_mapperMtx;
 sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> g_mapperService;
 
