@@ -31,6 +31,7 @@ ohos_unittest("SensorSetBatchTest") {
 
   include_dirs = [
     "../../../interfaces/include",
+    "../../../interfaces/v1_0",
     "../../../utils/include",
   ]
 
@@ -68,6 +69,7 @@ ohos_unittest("SensorSetSdcSensorTest") {
 
   include_dirs = [
     "../../../interfaces/include",
+    "../../../interfaces/v1_0",
     "../../../utils/include",
   ]
 

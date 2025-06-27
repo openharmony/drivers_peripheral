@@ -21,16 +21,11 @@
 #include "osal_mem.h"
 #include <securec.h>
 #include "sensor_uhdf_log.h"
+#include "isensor_interface_vdi.h"
 
 #define HDF_LOG_TAG uhdf_sensor_testcase
 
 #define DATA_LEN 256
-#define SENSOR_HANDLE_TO_STRING(sensorHandle) ("deviceId" + std::to_string((sensorHandle).deviceId) + "sensorType" + \
-    std::to_string((sensorHandle).sensorType) + "sensorId" + std::to_string((sensorHandle).sensorId) + "location" + \
-    std::to_string((sensorHandle).location))
-#define SENSOR_HANDLE_TO_C_STR(sensorHandle) ("deviceId" + std::to_string((sensorHandle).deviceId) + "sensorType" + \
-    std::to_string((sensorHandle).sensorType) + "sensorId" + std::to_string((sensorHandle).sensorId) + "location" + \
-    std::to_string((sensorHandle).location)).c_str()
 
 namespace OHOS {
 namespace HDI {
