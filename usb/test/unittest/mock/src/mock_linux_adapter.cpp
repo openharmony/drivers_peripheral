@@ -233,14 +233,12 @@ UsbDeviceHandle *FuncAdapterOpenDevice(UsbSession *session, uint8_t busNum, uint
     if (g_dev == nullptr) {
         OsalMutexDestroy(&g_usbHandle->lock);
         RawUsbMemFree(g_usbHandle);
-        g_usbHandle = nullptr;
         return nullptr;
     }
 
     int32_t ret = OsInitDevice(g_dev, busNum, usbAddr);
     if (ret != HDF_SUCCESS) {
         RawUsbMemFree(g_dev);
-        g_dev = nullptr;
         return nullptr;
     }
 
@@ -426,7 +424,6 @@ int32_t FuncAdapterFreeRequest(UsbHostRequest *request)
     }
     if (request->bulkUrb != nullptr) {
         RawUsbMemFree(request->bulkUrb);
-        request->bulkUrb = nullptr;
         request->urbs = nullptr;
     }
     if (request != nullptr) {
