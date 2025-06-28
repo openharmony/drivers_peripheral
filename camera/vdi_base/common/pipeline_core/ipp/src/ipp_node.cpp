@@ -297,7 +297,7 @@ RetCode IppNode::SendFocusMetaData(const common_metadata_header_t *data)
     ret = FindCameraMetadataItem(data, OHOS_CONTROL_AF_REGIONS, &entry);
     if (ret == 0) {
         std::vector<int32_t> afRegions;
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             CAMERA_LOGI("Set afRegions [%{public}d]", *(entry.data.i32 + i));
             afRegions.push_back(*(entry.data.i32 + i));
         }
