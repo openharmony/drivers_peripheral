@@ -125,7 +125,7 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
     return RC_OK;
 }
 
-void SetInAlgoBuffers(std::vector<std::shared_ptr<IBuffer>>& inBuffers, IppAlgoBuffer** inAlgoBuffers)
+void AlgoPlugin::SetInAlgoBuffers(std::vector<std::shared_ptr<IBuffer>>& inBuffers, IppAlgoBuffer** inAlgoBuffers)
 {
     for (uint32_t i = 0; i < inBuffers.size(); i++) {
         if (inBuffers[i] == nullptr) {
