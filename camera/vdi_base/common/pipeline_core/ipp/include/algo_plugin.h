@@ -45,6 +45,7 @@ public:
 
 private:
     RetCode CheckLibPath(const char *path);
+    void SetInAlgoBuffers(std::vector<std::shared_ptr<IBuffer>>& inBuffers, IppAlgoBuffer** inAlgoBuffers);
 
 public:
     struct IppAlgoHandler {

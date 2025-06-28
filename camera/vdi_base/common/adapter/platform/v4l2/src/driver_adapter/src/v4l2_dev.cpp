@@ -153,7 +153,7 @@ RetCode HosV4L2Dev::ReqBuffers(const std::string& cameraID, unsigned int buffCon
 
 RetCode HosV4L2Dev::CreatBuffer(const std::string& cameraID, const std::shared_ptr<FrameSpec>& frameSpec)
 {
-    int rc;
+    RetCode rc;
     int fd;
     CAMERA_LOGI("HosV4L2Dev::CreatBuffer in %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);
@@ -238,7 +238,7 @@ RetCode HosV4L2Dev::ReleaseBuffers(const std::string& cameraID)
 void HosV4L2Dev::dequeueBuffers()
 {
     int nfds;
-    int rc;
+    RetCode rc;
     struct epoll_event events[MAXSTREAMCOUNT];
     nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);
     CAMERA_LOGI("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %{public}d\n", nfds, streamNumber_);
@@ -462,7 +462,7 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
 }
 
 void SetCtrlByCondition(int32_t fd, AdapterCmd command, const int* args,
-    int &rc, std::shared_ptr<HosV4L2Control> myControl_)
+    RetCode &rc, std::shared_ptr<HosV4L2Control> myControl_)
 {
     switch (command) {
         case CMD_EXPOSURE_MODE:
@@ -513,7 +513,7 @@ RetCode HosV4L2Dev::UpdateSetting(const std::string& cameraID, AdapterCmd comman
 {
     CAMERA_LOGI("UpdateSetting enter, cameraID = %{public}s\n", cameraID.c_str());
     int32_t fd;
-    int rc = 0;
+    RetCode rc = 0;
     if (args == nullptr) {
         CAMERA_LOGE("HosV4L2Dev::UpdateSetting: args is NULL\n");
         return RC_ERROR;
@@ -542,7 +542,7 @@ RetCode HosV4L2Dev::QuerySetting(const std::string& cameraID, unsigned int comma
 {
     int32_t fd;
     int32_t value = 0;
-    int rc = 0;
+    RetCode rc = 0;
     CAMERA_LOGI("QuerySetting enter, cameraID = %{public}s\n", cameraID.c_str());
     if (args == nullptr) {
         CAMERA_LOGE("HosV4L2Dev::QuerySetting: args is NULL\n");
@@ -646,7 +646,7 @@ RetCode HosV4L2Dev::GetControls(const std::string& cameraID, std::vector<DeviceC
 RetCode HosV4L2Dev::GetFmtDescs(const std::string& cameraID, std::vector<DeviceFormat>& fmtDesc)
 {
     int fd;
-    int rc;
+    RetCode rc;
     CAMERA_LOGI("GetFmtDescs enter, cameraID = %{public}s\n", cameraID.c_str());
     if (myFileFormat_ == nullptr) {
         CAMERA_LOGE("GetFmtDescs: myFileFormat_ == nullptr\n");
