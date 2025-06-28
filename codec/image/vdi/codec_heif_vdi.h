@@ -28,6 +28,7 @@ struct SharedBuffer {
     sptr<Ashmem> ashmem;
     uint32_t filledLen;
 };
+
 inline SharedBuffer ConvertSharedBuffer(const ImageHDI::SharedBuffer& src)
 {
     return SharedBuffer {
@@ -48,11 +49,10 @@ struct ImageItem {
     std::vector<uint8_t> liteProperties;
     SharedBuffer sharedProperties;
 };
+
 inline ImageItem ConvertImageItem(const ImageHDI::ImageItem& src)
 {
-    return ImageItem {
-        .itemName = src.itemName,
-        .id = src.id,
+    return ImageItem {.itemName = src.itemName, .id = src.id,
         .pixelBuffer = OHOS::Codec::Omx::ReWrap(src.pixelBuffer, true),
         .pixelSharedBuffer = ConvertSharedBuffer(src.pixelSharedBuffer),
         .isPrimary = src.isPrimary,
@@ -70,6 +70,7 @@ struct MetaItem {
     SharedBuffer data;
     std::vector<uint8_t> properties;
 };
+
 inline MetaItem ConvertMetaItem(const ImageHDI::MetaItem& src)
 {
     return MetaItem {
