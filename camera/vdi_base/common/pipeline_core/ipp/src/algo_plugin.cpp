@@ -109,7 +109,7 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
         outAlgoBuffer = nullptr;
     }
 
-    for (int i = 0; i < inBuffers.size(); i++) {
+    for (unsigned int i = 0; i < inBuffers.size(); i++) {
         if (inAlgoBuffers[i] != nullptr) {
             delete inAlgoBuffers[i];
             inAlgoBuffers[i] = nullptr;
@@ -138,7 +138,7 @@ void AlgoPlugin::SetInAlgoBuffers(std::vector<std::shared_ptr<IBuffer>>& inBuffe
                 inAlgoBuffers[i]->width = inBuffers[i]->GetWidth();
                 inAlgoBuffers[i]->height = inBuffers[i]->GetHeight();
                 inAlgoBuffers[i]->stride = inBuffers[i]->GetStride();
-                inAlgoBuffers[i]->id = i;
+                inAlgoBuffers[i]->id = static_cast<int>(i);
             }
         }
     }

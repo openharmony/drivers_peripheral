@@ -468,7 +468,7 @@ RetCode HosV4L2Buffers::SetDmabufOn(struct v4l2_buffer &buf, const std::shared_p
         return RC_ERROR;
     }
     adapterBufferMap_[index].heapfd = heapfd;
-    adapterBufferMap_[index].dmafd = data.fd;
+    adapterBufferMap_[index].dmafd = static_cast<int32_t>(data.fd);
     adapterBufferMap_[index].start = mmap(NULL, adapterBufferMap_[index].length, PROT_READ | PROT_WRITE,
         MAP_SHARED, adapterBufferMap_[index].dmafd, 0);
     if (adapterBufferMap_[index].start == MAP_FAILED) {

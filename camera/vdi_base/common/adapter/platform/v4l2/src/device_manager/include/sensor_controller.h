@@ -117,7 +117,7 @@ private:
     std::mutex metaDataSetlock_;
     std::mutex metaDataFlaglock_;
     bool metaDataFlag_ = false;
-    int buffCont_;
+    int buffCont_ = 0;
     std::shared_ptr<HosV4L2Dev> sensorVideo_;
     static std::map<int32_t, uint32_t> tagV4L2CidMap_;
     static std::map<int32_t, TagFunType> tagMethodMap_;

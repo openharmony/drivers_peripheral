@@ -121,7 +121,7 @@ RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& contro
         if (itrNext == control.end() || itr->ctrl_class != itrNext->ctrl_class) {
             struct v4l2_ext_controls ctrls = {};
             ctrls.ctrl_class = itr->ctrl_class;
-            ctrls.count = count;
+            ctrls.count = static_cast<uint16_t>(count);
             ctrls.controls = cList;
             ret = ioctl(fd, VIDIOC_G_EXT_CTRLS, &ctrls);
             V4L2VidiocGExtCtrls(fd, ret, count, cList, control);

@@ -164,7 +164,7 @@ void UvcNode::GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
     if (ret == 0) {
         std::vector<int32_t> fpsRange;
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             fpsRange.push_back(*(entry.data.i32 + i));
         }
         meta_->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
@@ -234,6 +234,10 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     dumper.DumpBuffer("YUV422", ENABLE_UVC_NODE, buffer, wide_, high_);
 
     uint8_t* jBuf = static_cast<uint8_t *>(malloc(buffer->GetSize()));
+    if (jBuf == nullptr) {
+        CAMERA_LOGE("UvcNode::DeliverBuffer malloc jBuf failed");
+        return;
+    }
     YUV422To420(static_cast<uint8_t *>(buffer->GetVirAddress()), static_cast<uint8_t *>(jBuf),
         wide_, high_);
     int ret = memcpy_s(static_cast<uint8_t *>(buffer->GetVirAddress()), buffer->GetSize(),

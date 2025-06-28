@@ -96,8 +96,8 @@ RetCode UvcNode::Start(const int32_t streamId)
     for (const auto& it : outPorts) {
         DeviceFormat format;
         format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
-        format.fmtdesc.width = wide_;
-        format.fmtdesc.height = high_;
+        format.fmtdesc.width = static_cast<uint32_t>(wide_);
+        format.fmtdesc.height = static_cast<uint32_t>(high_);
         int bufCnt = static_cast<int>(it->format_.bufferCount_);
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {

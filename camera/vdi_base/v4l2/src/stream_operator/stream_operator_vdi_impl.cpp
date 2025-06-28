@@ -200,7 +200,7 @@ DynamicStreamSwitchMode StreamOperatorVdiImpl::CheckStreamsSupported(
         config.width = it.width_;
         config.height = it.height_;
         PixelFormat pf = static_cast<PixelFormat>(it.format_);
-        config.format = BufferAdapter::PixelFormatToCameraFormat(pf);
+        config.format = static_cast<int32_t>(BufferAdapter::PixelFormatToCameraFormat(pf));
         config.dataspace = it.dataspace_; // fix spell error
         config.tunnelMode = it.tunneledMode_;
         config.minFrameDuration = it.minFrameDuration_;
@@ -391,7 +391,7 @@ int32_t StreamOperatorVdiImpl::GetStreamAttributes(std::vector<VdiStreamAttribut
         attribute.height_ = configuration.height;
         attribute.overrideFormat_ = (int32_t)BufferAdapter::CameraFormatToPixelFormat(configuration.format);
         attribute.overrideDataspace_ = configuration.dataspace;
-        attribute.producerUsage_ = BufferAdapter::CameraUsageToGrallocUsage(configuration.usage);
+        attribute.producerUsage_ = static_cast<int32_t>(BufferAdapter::CameraUsageToGrallocUsage(configuration.usage));
         attribute.producerBufferCount_ = configuration.bufferCount;
         attribute.maxBatchCaptureCount_ = configuration.maxCaptureCount;
         attribute.maxCaptureCount_ = configuration.maxCaptureCount;
