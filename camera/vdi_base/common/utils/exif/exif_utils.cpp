@@ -31,6 +31,10 @@ static const unsigned char EXIF_HEADER[] = {0xff, 0xd8, 0xff, 0xe1};
 
 static const unsigned int EXIF_HEADER_LENGTH = sizeof(EXIF_HEADER);
 
+constexpr uint32_t DEGREE_INDEX = 0; // Index
+constexpr uint32_t MINUTE_INDEX = 1; // Index
+constexpr uint32_t SECOND_INDEX = 2; // Index
+
 #define FILE_BYTE_ORDER EXIF_BYTE_ORDER_INTEL
 
 static ExifEntry *CreateTag(ExifData *exif, ExifIfd ifd, ExifTag tag, size_t len, ExifFormat format)
@@ -118,12 +122,12 @@ uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
     }
 
     ConvertGpsDataToDms(number, &degree, &minute, &second);
-    gpsRational[0].numerator = static_cast<uint32_t>(degree); // Index
-    gpsRational[0].denominator = 1;
-    gpsRational[1].numerator = static_cast<uint32_t>(minute); // Index
-    gpsRational[1].denominator = 1;
-    gpsRational[2].numerator = static_cast<uint32_t>(second); // Index
-    gpsRational[2].denominator = 1;
+    gpsRational[DEGREE_INDEX].numerator = static_cast<uint32_t>(degree); // Index
+    gpsRational[DEGREE_INDEX].denominator = 1;
+    gpsRational[MINUTE_INDEX].numerator = static_cast<uint32_t>(minute); // Index
+    gpsRational[MINUTE_INDEX].denominator = 1;
+    gpsRational[SECOND_INDEX].numerator = static_cast<uint32_t>(second); // Index
+    gpsRational[SECOND_INDEX].denominator = 1;
 
     // LATITUDE_TYPE/LONGITUDE_TYPE reference
     if (latOrLongType == LATITUDE_TYPE) {

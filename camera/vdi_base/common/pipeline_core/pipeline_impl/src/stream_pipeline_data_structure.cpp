@@ -15,8 +15,6 @@
 #define STREAM_PIPELINE_DATA_STRUCTURE_H
 
 #include <dlfcn.h>
-#include <cstdlib>
-#include <csignal>
 #include "stream_pipeline_data_structure.h"
 #include "hdf_base.h"
 #include "camera.h"
