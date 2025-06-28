@@ -215,7 +215,7 @@ void V4L2SourceNode::GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadat
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
     if (ret == 0) {
         std::vector<int32_t> fpsRange;
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             fpsRange.push_back(*(entry.data.i32 + i));
         }
         meta_->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());

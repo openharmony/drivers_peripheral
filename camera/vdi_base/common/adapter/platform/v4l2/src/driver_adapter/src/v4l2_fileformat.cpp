@@ -27,7 +27,7 @@ void HosFileFormat::V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtD
     struct v4l2_frmivalenum  fraMival = {};
     constexpr int32_t fmtMax = 50;
     for (int k = 0; k < fmtMax; ++k) {
-        fraMival.index = k;
+        fraMival.index = static_cast<uint32_t>(k);
         fraMival.pixel_format = frmSize.pixel_format;
         fraMival.width = frmSize.discrete.width;
         fraMival.height = frmSize.discrete.height;

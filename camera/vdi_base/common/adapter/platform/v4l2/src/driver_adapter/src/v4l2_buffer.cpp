@@ -395,7 +395,7 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
 RetCode HosV4L2Buffers::SetAdapterBuffer(int fd, struct v4l2_buffer &buf, const std::shared_ptr<FrameSpec>& frameSpec)
 {
     CAMERA_LOGI("HosV4L2Buffers::SetAdapterBuffer in.");
-    int32_t ret = 0;
+    RetCode ret = 0;
     int32_t index = (uint32_t)frameSpec->buffer_->GetIndex();
 
     auto findIf = adapterBufferMap_.find(index);
