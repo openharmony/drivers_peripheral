@@ -31,7 +31,7 @@ uint64_t BufferManager::GenerateBufferPoolId()
 
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    uint64_t id = static_cast<uint64_t>(tv.tv_sec) * 1000 * 1000 + tv.tv_usec; // 1000:usec
+    uint64_t id = static_cast<uint64_t>(tv.tv_sec) * 1000 * 1000 + static_cast<uint64_t>(tv.tv_usec); // 1000:usec
 
     std::shared_ptr<IBufferPool> bufferPool = nullptr;
     bufferPoolMap_[id] = bufferPool;

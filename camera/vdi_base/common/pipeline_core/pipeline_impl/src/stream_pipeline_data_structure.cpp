@@ -52,6 +52,9 @@ extern "C" const struct HdfConfigRoot* HdfGetModuleConfigRoot(void)
         if (errStr) {
             return nullptr;
         }
+        if (!HdfGetModuleConfigRootF) {
+            return nullptr;
+        }
         pHdfConfigRoot = HdfGetModuleConfigRootF();
     }
 

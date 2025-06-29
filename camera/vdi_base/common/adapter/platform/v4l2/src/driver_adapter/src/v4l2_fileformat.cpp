@@ -40,7 +40,7 @@ void HosFileFormat::V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtD
         currentFormat.fmtdesc.pixelformat = enumFmtDesc.pixelformat;
         currentFormat.fmtdesc.width = frmSize.discrete.width;
         currentFormat.fmtdesc.height = frmSize.discrete.height;
-        currentFormat.fmtdesc.fps.numerator = fraMival.discrete.numerator;
+        currentFormat.fmtdesc.fps.numerator = static_cast<int32_t>(fraMival.discrete.numerator);
         currentFormat.fmtdesc.fps.denominator = fraMival.discrete.denominator;
 
         fmtDesc.push_back(currentFormat);
