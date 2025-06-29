@@ -183,7 +183,8 @@ uint64_t CaptureRequest::RequestSemaphore::GenerateTimeStamp()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    uint64_t time = static_cast<uint64_t>(tv.tv_sec) * 1000 * 1000 + tv.tv_usec; // 1000:microsecond
+    uint64_t time = static_cast<uint64_t>(tv.tv_sec) * 1000 * 1000 +
+        static_cast<uint64_t>(tv.tv_usec); // 1000:microsecond
     return time;
 }
 } // namespace OHOS::Camera

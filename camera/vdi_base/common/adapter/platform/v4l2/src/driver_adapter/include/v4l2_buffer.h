@@ -93,7 +93,7 @@ private:
     enum v4l2_memory memoryType_;
     enum v4l2_buf_type bufferType_;
 
-    uint32_t buffLong_;
+    uint32_t buffLong_ = 0;
 #ifdef V4L2_EMULATOR
     RetCode SetAndPushBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec, v4l2_buffer buf);
     std::queue<uint64_t> queuedBuffers_;

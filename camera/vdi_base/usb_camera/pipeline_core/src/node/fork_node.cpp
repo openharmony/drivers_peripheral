@@ -45,7 +45,7 @@ RetCode PcForkNode::Start(const int32_t streamId)
         for (auto& out : outPutPorts_) {
             if (out->format_.streamId_ != in->format_.streamId_) {
                 id = out->format_.streamId_;
-                bufferPoolId = out->format_.bufferPoolId_;
+                bufferPoolId = static_cast<uint64_t>(out->format_.bufferPoolId_);
                 CAMERA_LOGI("fork buffer get buffer streamId = %{public}d", out->format_.streamId_);
             }
         }
@@ -202,7 +202,7 @@ void PcForkNode::DrainForkBufferPool()
             buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
 
             for (auto& it : outPutPorts_) {
-                if (it->format_.streamId_ == streamId_) {
+                if (it->format_.streamId_ == static_cast<uint32_t>(streamId_)) {
                     it->DeliverBuffer(buffer);
                     break;
                 }
