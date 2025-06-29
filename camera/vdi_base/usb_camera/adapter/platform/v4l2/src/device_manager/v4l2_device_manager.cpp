@@ -474,7 +474,7 @@ void V4L2DeviceManager::AddDefaultOhosTag(std::shared_ptr<CameraMetadata> camera
 int V4L2DeviceManager::GetOhosMetaTag(uint32_t v4l2Tag)
 {
     for (auto metatag : g_metadataTagList) {
-        if (metatag.v4l2Tag == v4l2Tag) {
+        if (static_cast<uint32_t>(metatag.v4l2Tag) == v4l2Tag) {
             return metatag.ohosTag;
         }
     }
