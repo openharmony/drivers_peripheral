@@ -41,7 +41,7 @@ private:
     std::atomic_bool                      streamRunning_ = false;
     std::atomic_bool                      forkThreadRunFlag_ = false;
     std::shared_ptr<IBufferPool>          bufferPool_ = nullptr;    // buffer pool of branch stream
-    int32_t                               streamId_;        // stream id of branch stream
+    int32_t                               streamId_ = 0;        // stream id of branch stream
     std::shared_ptr<IBuffer>              pendingBuffer_ = nullptr;   // pending buffer for branch stream
     std::mutex requestLock_;
     std::unordered_map<int32_t, std::list<int32_t>> captureRequests_ = {};

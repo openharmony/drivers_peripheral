@@ -77,7 +77,7 @@ private:
     std::unordered_set<int32_t> firstNotifyNodes_;
     std::map<int32_t, std::vector<int32_t>> updateMetaDataKeys_;
     std::map<int32_t, std::vector<int32_t>> changeDataKeys_;
-    bool peerFrame_;
+    bool peerFrame_ = false;
     std::vector<int32_t> abilityMetaData_;
     std::mutex dataConfigLock_;
     std::mutex queueLock_;

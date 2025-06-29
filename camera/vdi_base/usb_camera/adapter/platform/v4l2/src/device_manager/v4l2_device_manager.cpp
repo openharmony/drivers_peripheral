@@ -557,7 +557,7 @@ void V4L2DeviceManager::ConvertAbilityExposureModesToOhos(std::shared_ptr<Camera
 {
     std::vector<uint8_t> abilityExposureModesVector;
 
-    for (int i = 0; i < deviceControl.menu.size(); i++) {
+    for (uint32_t i = 0; i < deviceControl.menu.size(); i++) {
         if (deviceControl.menu[i].id != V4L2_CID_EXPOSURE_AUTO) {
             continue;
         }

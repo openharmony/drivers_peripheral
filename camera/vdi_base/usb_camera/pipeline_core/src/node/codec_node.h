@@ -42,7 +42,11 @@ private:
         int width;
         int height;
     };
-    void EncodeJpegToMemory(uint8_t* image, JpegData jpegData,
+    struct ImageData {
+        uint8_t* data;
+        uint32_t size;
+    };
+    void EncodeJpegToMemory(const ImageData& imageData, JpegData jpegData,
             const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf);
 
     void Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer);

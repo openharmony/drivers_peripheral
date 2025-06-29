@@ -52,8 +52,8 @@ void HosFileFormat::V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtD
 
 RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDesc)
 {
-    int i;
-    int j;
+    uint32_t i;
+    uint32_t j;
     struct v4l2_fmtdesc enumFmtDesc = {};
     struct v4l2_frmsizeenum frmSize = {};
     constexpr int32_t fmtMax = 50;
