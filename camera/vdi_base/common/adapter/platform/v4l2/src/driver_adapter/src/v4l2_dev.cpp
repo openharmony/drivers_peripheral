@@ -175,7 +175,7 @@ RetCode HosV4L2Dev::CreatBuffer(const std::string& cameraID, const std::shared_p
         return RC_ERROR;
     }
 
-    rc = myBuffers_->V4L2QueueBuffer(fd, frameSpec);
+    rc = myBuffers_->V4L2QueueBuffer(fd, frameSpec)
     if (rc == RC_ERROR) {
         CAMERA_LOGE("error: Creatbuffer: V4L2QueueBuffer error\n");
         return RC_ERROR;
