@@ -266,7 +266,7 @@ void SourceNode::PortHandler::CollectBuffers()
     frameSpec->bufferPoolId_ = format.bufferPoolId_;
     frameSpec->bufferCount_ = format.bufferCount_;
     constexpr uint32_t NewBufferBytePrePiex = 4;
-    uint32_t bufferSize = maxWide_ * maxHigh_ * NewBufferBytePrePiex;
+    uint32_t bufferSize = static_cast<uint32_t>(maxWide_) * static_cast<uint32_t>(maxHigh_) * NewBufferBytePrePiex;
     CAMERA_LOGI("streamId[%{public}d], bufferIndex[%{public}d], Size %{public}d => %{public}d",
                 buffer->GetStreamId(), buffer->GetIndex(), buffer->GetSize(), bufferSize);
 
