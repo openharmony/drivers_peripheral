@@ -206,11 +206,12 @@ void CodecNode::EncodeJpegToMemory(const ImageData& imageData, JpegData jpegData
 
     rowStride = jpegData.width;
     while (cInfo.next_scanline < cInfo.image_height) {
-        if (cInfo.next_scanline * rowStride * pixelsThick >= imageData.size) {
+        uint32_t imageDataIndex = cInfo.next_scanline * rowStride * pixelsThick;
+        if (imageDataIndex >= imageData.size) {
             CAMERA_LOGE("CodecNode::EncodeJpegToMemory imageSize is not enough");
             break;
         }
-        row_pointer[0] = &imageData.data[cInfo.next_scanline * rowStride * pixelsThick];
+        row_pointer[0] = &imageData.data[imageDataIndex];
         jpeg_write_scanlines(&cInfo, row_pointer, 1);
     }
 

@@ -226,7 +226,7 @@ void StreamOperatorVdiImpl::StreamInfoToStreamConfiguration(StreamConfiguration 
     scg.width = info.width_;
     scg.height = info.height_;
     PixelFormat pf = static_cast<PixelFormat>(info.format_);
-    scg.format = BufferAdapter::PixelFormatToCameraFormat(pf);
+    scg.format = static_cast<int32_t>(BufferAdapter::PixelFormatToCameraFormat(pf));
     scg.dataspace = info.dataspace_; // fix misspell
     scg.tunnelMode = info.tunneledMode_;
     scg.minFrameDuration = info.minFrameDuration_;
@@ -624,7 +624,7 @@ void StreamOperatorVdiImpl::FillCaptureEndedInfo(std::vector<VdiCaptureEndedInfo
         CHECK_IF_PTR_NULL_RETURN_VOID(m);
         VdiCaptureEndedInfo edi = {};
         edi.streamId_ = m->GetStreamId();
-        edi.frameCount_ = m->GetFrameCount();
+        edi.frameCount_ = static_cast<int32_t>(m->GetFrameCount());
         info.push_back(edi);
     }
 }
