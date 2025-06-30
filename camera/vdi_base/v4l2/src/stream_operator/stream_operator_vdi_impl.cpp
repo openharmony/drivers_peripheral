@@ -624,7 +624,7 @@ void StreamOperatorVdiImpl::FillCaptureEndedInfo(std::vector<VdiCaptureEndedInfo
         CHECK_IF_PTR_NULL_RETURN_VOID(m);
         VdiCaptureEndedInfo edi = {};
         edi.streamId_ = m->GetStreamId();
-        edi.frameCount_ = m->static_cast<int32_t>(GetFrameCount());
+        edi.frameCount_ = static_cast<int32_t>(m->GetFrameCount());
         info.push_back(edi);
     }
 }
