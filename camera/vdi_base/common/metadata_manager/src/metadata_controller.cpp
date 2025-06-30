@@ -467,7 +467,7 @@ bool MetadataController::IsChangeI32ArrayMetadata(
 {
     uint32_t count = newEntry.count;
     bool isDiff = false;
-    for (int i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < count; i++) {
         if (*(baseEntry.data.i32 + i) != *(newEntry.data.i32 + i)) {
             isDiff = true;
             break;

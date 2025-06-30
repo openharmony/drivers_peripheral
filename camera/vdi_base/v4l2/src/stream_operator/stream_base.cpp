@@ -66,7 +66,7 @@ RetCode StreamBase::ConfigStream(StreamConfiguration& config)
     if (tunnel_ != nullptr) {
         streamConfig_.tunnelMode = true;
     }
-    streamConfig_.bufferCount = GetBufferCount();
+    streamConfig_.bufferCount = static_cast<int32_t>(GetBufferCount());
     streamConfig_.maxBatchCaptureCount = 1;
     streamConfig_.maxCaptureCount = 1;
     // get device cappability to override configuration

@@ -102,7 +102,7 @@ RetCode V4L2SourceNode::Start(const int32_t streamId)
 #endif
         format.fmtdesc.width = static_cast<uint32_t>(wide_);
         format.fmtdesc.height = static_cast<uint32_t>(high_);
-        int bufCnt = it->format_.bufferCount_;
+        int bufCnt = static_cast<int>(it->format_.bufferCount_);
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
             CAMERA_LOGE("start failed.");

@@ -364,7 +364,7 @@ void HosV4L2Dev::EraseEpoll(int fd)
 
 RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
 {
-    int rc;
+    RetCode rc;
     int fd;
     CAMERA_LOGI("StartStream enter, cameraID = %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);

@@ -43,7 +43,10 @@ extern "C" const struct HdfConfigRoot* HdfGetModuleConfigRoot(void)
 {
     static const struct HdfConfigRoot* pHdfConfigRoot = nullptr;
     static struct HdfConfigRoot defaultConfigRoot = {
+        .module = nullptr,
+        .streamInfo = nullptr,
         .streamInfoSize = 0,
+        .sceneInfo = nullptr,
         .sceneInfoSize = 0,
     };
     if (pHdfConfigRoot == nullptr) {

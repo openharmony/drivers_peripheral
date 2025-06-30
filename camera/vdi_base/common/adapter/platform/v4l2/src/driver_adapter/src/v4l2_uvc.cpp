@@ -433,7 +433,7 @@ RetCode HosV4L2UVC::V4L2UvcDetectInit(UvcCallback cb)
 
     (void)memset_s(&nls, sizeof(nls), 0, sizeof(nls));
     nls.nl_family = AF_NETLINK;
-    nls.nl_pid = getpid();
+    nls.nl_pid = static_cast<uint32_t>(getpid());
     nls.nl_groups = 1;
     rc = bind(uDevFd_, (struct sockaddr *)&nls, sizeof(nls));
     if (rc < 0) {
