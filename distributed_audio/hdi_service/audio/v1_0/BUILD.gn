@@ -51,7 +51,7 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
     "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
-    "drivers_interface_distributed_audio:libdaudioext_stub_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_2.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
@@ -108,7 +108,7 @@ ohos_shared_library("libdaudio_primary_driver") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
-    "drivers_interface_distributed_audio:libdaudioext_stub_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_2.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",

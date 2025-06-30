@@ -31,7 +31,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_0 {
+namespace V2_1 {
 DAudioManagerInterfaceImpl *DAudioManagerInterfaceImpl::dAudioMgr_ = nullptr;
 std::mutex DAudioManagerInterfaceImpl::mgrMtx_;
 extern "C" IDAudioManager *DAudioManagerImplGetInstance(void)
@@ -142,7 +142,7 @@ int32_t DAudioManagerInterfaceImpl::UnRegisterAudioHdfListener(const std::string
     DHLOGI("Unregister audio HDF listener success.");
     return HDF_SUCCESS;
 }
-} // v2_0
+} // v2_1
 } // AudioExt
 } // Daudio
 } // HDI

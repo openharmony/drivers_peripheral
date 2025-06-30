@@ -21,7 +21,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_0 {
+namespace V2_1 {
 void DAudioManagerInterfaceImplTest::SetUpTestCase(void) {}
 
 void DAudioManagerInterfaceImplTest::TearDownTestCase(void) {}
@@ -129,7 +129,7 @@ HWTEST_F(DAudioManagerInterfaceImplTest, UnRegisterAudioHdfListener_001, TestSiz
     DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_ = audioMgr;
     EXPECT_EQ(HDF_FAILURE, ret);
 }
-} // V2_0
+} // V2_1
 } // AudioExt
 } // Daudio
 } // HDI

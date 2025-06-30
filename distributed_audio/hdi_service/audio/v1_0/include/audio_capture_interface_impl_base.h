@@ -19,16 +19,16 @@
 #include <string>
 
 #include <v1_0/iaudio_capture.h>
-#include <v2_0/id_audio_manager.h>
+#include <v2_1/id_audio_manager.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
 typedef enum {
     CAPTURE_STATUS_OPEN = 0,
     CAPTURE_STATUS_CLOSE,

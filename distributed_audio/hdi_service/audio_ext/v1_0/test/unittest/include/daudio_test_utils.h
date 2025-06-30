@@ -16,13 +16,13 @@
 #ifndef OHOS_DAUDIO_TEST_UTILS_H
 #define OHOS_DAUDIO_TEST_UTILS_H
 
-#include <v2_0/id_audio_manager.h>
+#include <v2_1/id_audio_manager.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_0 {
+namespace V2_1 {
 class MockIDAudioCallback : public IDAudioCallback {
 public:
     virtual ~MockIDAudioCallback() = default;
@@ -66,6 +66,16 @@ public:
     {
         return 0;
     }
+
+    int32_t GetLatency(int32_t streamId, uint32_t& ms) override
+    {
+        return 0;
+    }
+
+    int32_t GetRenderPosition(int32_t streamId, uint64_t &frames, CurrentTime &time) override
+    {
+        return 0;
+    }
 };
 
 class MockIDAudioHdfCallback : public IDAudioHdfCallback {
@@ -77,7 +87,7 @@ public:
         return 0;
     }
 };
-} // V2_0
+} // V2_1
 } // AudioExt
 } // Distributedaudio
 } // HDI
