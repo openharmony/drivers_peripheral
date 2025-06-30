@@ -200,7 +200,7 @@ void UvcNode::SetBufferCallback()
 
 void UvcNode::YUV422To420(uint8_t yuv422[], uint8_t yuv420[], int width, int height)
 {
-    if (yuv420 == nullptr || yuv420 == nullptr) {
+    if (yuv420 == nullptr || yuv422 == nullptr) {
         CAMERA_LOGE("input buffer is null, conversion failed.");
         return;
     }
