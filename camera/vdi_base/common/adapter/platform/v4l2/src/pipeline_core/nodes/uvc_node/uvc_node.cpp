@@ -200,6 +200,10 @@ void UvcNode::SetBufferCallback()
 
 void UvcNode::YUV422To420(uint8_t yuv422[], uint8_t yuv420[], int width, int height)
 {
+    if (yuv420 == nullptr || yuv422 == nullptr) {
+        CAMERA_LOGE("input buffer is null, conversion failed.");
+        return;
+    }
     int yCount = width * height;
     constexpr int POSITION_INTERVAL = 2;
     constexpr int U_V_POSITION_INTERVAL = 4;

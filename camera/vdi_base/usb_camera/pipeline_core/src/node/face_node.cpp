@@ -159,7 +159,7 @@ RetCode FaceNode::GetCameraFaceIds(std::shared_ptr<CameraMetadata> &metadata)
 RetCode FaceNode::CopyMetadataBuffer(std::shared_ptr<CameraMetadata> &metadata,
     std::shared_ptr<IBuffer>& outPutBuffer, int32_t dataSize)
 {
-    int bufferSize = outPutBuffer->GetSize();
+    uint32_t bufferSize = outPutBuffer->GetSize();
     uint32_t metadataSize = metadata->get()->size;
     CAMERA_LOGI("outPutBuffer.size = %{public}d dataSize = %{public}d and metadataSize = %{public}d",
         bufferSize, dataSize, metadataSize);
