@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("../../../distributedaudio.gni")
 
-ohos_shared_library("libdaudio_manager_daudio_ext_service_2.0") {
+ohos_shared_library("libdaudio_manager_daudio_ext_service_2.1") {
   sanitize = {
     boundary_sanitize = true
     cfi = true
@@ -49,7 +49,7 @@ ohos_shared_library("libdaudio_manager_daudio_ext_service_2.0") {
     "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
-    "drivers_interface_distributed_audio:libdaudioext_stub_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_2.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
@@ -86,12 +86,12 @@ ohos_shared_library("libdaudio_ext_driver") {
     "-Wl,-z,now",
   ]
 
-  deps = [ "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.0" ]
+  deps = [ "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.1" ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
-    "drivers_interface_distributed_audio:libdaudioext_stub_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_2.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -109,6 +109,6 @@ ohos_shared_library("libdaudio_ext_driver") {
 group("hdf_daudio_ext_service") {
   deps = [
     ":libdaudio_ext_driver",
-    ":libdaudio_manager_daudio_ext_service_2.0",
+    ":libdaudio_manager_daudio_ext_service_2.1",
   ]
 }

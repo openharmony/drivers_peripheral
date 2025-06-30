@@ -22,7 +22,7 @@
 #include <v1_0/iaudio_callback.h>
 #include <v1_0/iaudio_capture.h>
 #include <v1_0/iaudio_render.h>
-#include <v2_0/id_audio_callback.h>
+#include <v2_1/id_audio_callback.h>
 
 #include "daudio_errcode.h"
 
@@ -31,11 +31,11 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::CurrentTime;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
 using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioCallback;
 class MockIDAudioCallback : public IDAudioCallback {
 public:
@@ -78,6 +78,16 @@ public:
     }
 
     int32_t RefreshAshmemInfo(int32_t streamId, int fd, int32_t ashmemLength, int32_t lengthPerTrans) override
+    {
+        return DistributedHardware::DH_SUCCESS;
+    }
+
+    int32_t GetLatency(int32_t streamId, uint32_t& ms) override
+    {
+        return DistributedHardware::DH_SUCCESS;
+    }
+
+    int32_t GetRenderPosition(int32_t streamId, uint64_t &frames, CurrentTime &time) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
@@ -522,6 +532,16 @@ public:
     int32_t RefreshAshmemInfo(int32_t streamId, int fd, int32_t ashmemLength, int32_t lengthPerTrans) override
     {
         return DistributedHardware::DH_SUCCESS;
+    }
+
+    int32_t GetLatency(int32_t streamId, uint32_t& ms) override
+    {
+        return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
+    }
+
+    int32_t GetRenderPosition(int32_t streamId, uint64_t &frames, CurrentTime &time) override
+    {
+        return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
 };
 } // V1_0
