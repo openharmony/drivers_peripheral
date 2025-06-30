@@ -382,7 +382,7 @@ RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
             return RC_ERROR;
         }
     }
-    RetCode rc;
+    RetCode rc = RC_ERROR;
     rc = myStreams_->V4L2StreamOn(fd);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("error: StartStream: V4L2StreamOn error\n");
