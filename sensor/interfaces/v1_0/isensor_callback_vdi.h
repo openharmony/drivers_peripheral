@@ -46,6 +46,11 @@ struct HdfSensorEventsVdi {
     uint32_t dataLen;
 };
 
+struct SensorInterval {
+    int64_t samplingInterval;
+    int64_t reportInterval;
+};
+
 class ISensorCallbackVdi : public HdiBase {
 public:
     virtual ~ISensorCallbackVdi() = default;
