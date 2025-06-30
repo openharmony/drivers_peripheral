@@ -149,6 +149,8 @@ public:
     {
         return 0;
     }
+
+    virtual int32_t IsSupportAllocPassthrough(const AllocInfo& info) const = 0;
 };
 
 using CreateDisplayBufferVdiFunc = IDisplayBufferVdi* (*)();
