@@ -72,8 +72,8 @@ RetCode HosV4L2Streams::V4L2StreamFPSGet(int fd, DeviceFormat& format)
         return RC_ERROR;
     }
 
-    format.fmtdesc.fps.numerator = Stream_Parm.parm.capture.timeperframe.numerator;
-    format.fmtdesc.fps.denominator = Stream_Parm.parm.capture.timeperframe.denominator;
+    format.fmtdesc.fps.numerator = static_cast<int32_t>(Stream_Parm.parm.capture.timeperframe.numerator);
+    format.fmtdesc.fps.denominator = static_cast<int32_t>(Stream_Parm.parm.capture.timeperframe.denominator);
 
     return RC_OK;
 }
@@ -85,8 +85,8 @@ RetCode HosV4L2Streams::V4L2StreamFPSSet(int fd, DeviceFormat& format)
 
     Stream_Parm.type = bufferType_;
 
-    Stream_Parm.parm.capture.timeperframe.denominator = format.fmtdesc.fps.denominator;
-    Stream_Parm.parm.capture.timeperframe.numerator = format.fmtdesc.fps.numerator;
+    Stream_Parm.parm.capture.timeperframe.denominator = static_cast<int32_t>(format.fmtdesc.fps.denominator);
+    Stream_Parm.parm.capture.timeperframe.numerator = static_cast<int32_t>(format.fmtdesc.fps.numerator);
 
     rc = ioctl(fd, VIDIOC_S_PARM, &Stream_Parm);
     if (rc < 0) {

@@ -641,8 +641,8 @@ RetCode SensorController::SendAWBLockMetaData(common_metadata_header_t *data)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_LOCK, &entry);
     if (ret == 0) {
         awbLock = *(entry.data.u8);
-        int curLock = 0;
-        sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
+        uint32_t curLock = 0;
+        sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, reinterpret_cast<int*>(&curLock));
         if (awbLock == OHOS_CAMERA_AWB_LOCK_ON) {
         // set the position of AWB bit to 1;
             curLock |= V4L2_LOCK_WHITE_BALANCE;
@@ -650,7 +650,7 @@ RetCode SensorController::SendAWBLockMetaData(common_metadata_header_t *data)
             // set the position of AWB bit to 0;
             curLock &= ~V4L2_LOCK_WHITE_BALANCE;
         }
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_LOCK, &curLock);
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_LOCK, reinterpret_cast<int*>(&curLock));
         CAMERA_LOGI("Set CMD_AWB_LOCK [%{public}d]", awbLock);
         if (rc == RC_OK) {
             CAMERA_LOGI("Send OHOS_CONTROL_AWB_LOCK value=%{public}d success", curLock);

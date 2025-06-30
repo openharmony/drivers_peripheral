@@ -177,8 +177,8 @@ uint32_t ExifUtils::AddAltitudeInfo(ExifData *exif, double altitude)
         seaLevelFlag = 1;
     }
     ConvertAltitudeToRational(altitude, altitudeRational);
-    gpsAltitudeRational.numerator = altitudeRational.numerator;
-    gpsAltitudeRational.denominator = altitudeRational.denominator;
+    gpsAltitudeRational.numerator = static_cast<uint32_t>(altitudeRational.numerator);
+    gpsAltitudeRational.denominator = static_cast<uint32_t>(altitudeRational.denominator);
     // Altitude reference
     entry = CreateTag(exif, EXIF_IFD_GPS, EXIF_TAG_GPS_ALTITUDE_REF, sizeof(seaLevelFlag), EXIF_FORMAT_BYTE);
     exif_set_short(entry->data, FILE_BYTE_ORDER, seaLevelFlag);
@@ -192,6 +192,10 @@ uint32_t ExifUtils::AddAltitudeInfo(ExifData *exif, double altitude)
 
 uint32_t ExifUtils::IsJpegPicture(unsigned char *dataBuffer, int32_t dataBufferSize, void *address)
 {
+    if (address == nullptr) {
+        CAMERA_LOGE("%{public}s address pointer is null", __FUNCTION__);
+        return RC_ERROR;
+    }
     if (memcpy_s(dataBuffer, dataBufferSize, address, dataBufferSize) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
         return RC_ERROR;

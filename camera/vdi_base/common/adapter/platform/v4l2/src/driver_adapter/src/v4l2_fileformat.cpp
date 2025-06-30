@@ -338,7 +338,7 @@ void HosFileFormat::V4L2MatchDevice(const std::vector<std::string>& cameraIDs)
     char devName[16] = {0};
     std::string name = DEVICENAMEX;
     int fd = 0;
-    int rc = 0;
+    RetCode rc = 0;
 
     for (auto &it : cameraIDs) {
         for (int i = 0; i < MAXVIDEODEVICE; ++i) {
