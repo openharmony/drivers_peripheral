@@ -185,6 +185,45 @@ int32_t MapperService::GetImageLayout(const sptr<NativeBuffer>& handle, V1_2::Im
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
+
+void MapperService::FreeMemVdi(BufferHandle* handle)
+{
+    HdfTrace traceTwo("FreeMem", "HDI:VDI:");
+    vdiImpl_->FreeMem(*handle);
+}
+
+int32_t MapperService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
+{
+    BufferHandle* buffer = nullptr;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
+    int32_t ec = vdiImpl_->AllocMem(info, buffer);
+    if (ec != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
+        return ec;
+    }
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_DEV_ERR_NO_MEMORY);
+
+    handle = new NativeBuffer();
+    if (handle == nullptr) {
+        HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
+        FreeMemVdi(buffer);
+        return HDF_FAILURE;
+    }
+
+    handle->SetBufferHandle(buffer, true, [this](BufferHandle* freeBuffer){
+        FreeMemVdi(freeBuffer)
+    });
+    return HDF_SUCCESS;
+}
+
+int32_t MapperService::IsSupportAllocPassthrough(const AllocInfo& info)
+{
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    HdfTrace traceOne("IsSupportAllocPassthrough-VDI", "HDI:VID:");
+    return vdiImpl_->IsSupportAllocPassthrough(info);
+}
 } // namespace V1_2
 } // namespace Buffer
 } // namespace Display

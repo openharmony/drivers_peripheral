@@ -18,7 +18,7 @@
 
 #include "idisplay_buffer_vdi.h"
 #include "v1_2/display_buffer_type.h"
-#include "v1_2/imapper.h"
+#include "v1_3/imapper.h"
 #include <mutex>
 
 namespace OHOS {
@@ -29,7 +29,7 @@ namespace V1_0 {
 using OHOS::HDI::Display::Buffer::V1_2::IDisplayBufferVdi;
 using OHOS::HDI::Display::Buffer::V1_2::CreateDisplayBufferVdiFunc;
 using OHOS::HDI::Display::Buffer::V1_2::DestroyDisplayBufferVdiFunc;
-class MapperService : public Buffer::V1_2::IMapper {
+class MapperService : public Buffer::V1_3::IMapper {
 public:
     MapperService();
     virtual ~MapperService();
@@ -40,9 +40,12 @@ public:
     int32_t FlushCache(const sptr<NativeBuffer>& handle) override;
     int32_t InvalidateCache(const sptr<NativeBuffer>& handle) override;
     int32_t GetImageLayout(const sptr<NativeBuffer>& handle, V1_2::ImageLayout& layout) override;
+    int32_t AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle) override;
+    int32_t IsSupportAllocPassthrough(const AllocInfo& info) override;
 
 private:
     int32_t LoadVdi();
+    void FreeMemVdi(BufferHandle* handle);
     std::mutex mutex_;
     void* libHandle_;
     IDisplayBufferVdi* vdiImpl_;
