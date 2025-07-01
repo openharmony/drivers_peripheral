@@ -58,7 +58,7 @@ void OnDemandLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 
 UsbdLoadService::UsbdLoadService(int32_t saId) : saId_(saId)
 {
-    HDF_LOGI("%{public}s:construct", __func__);
+    HDF_LOGI("%{public}s:construct, saId is %{public}d", __func__, saId);
 }
 
 UsbdLoadService::~UsbdLoadService()
