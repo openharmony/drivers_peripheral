@@ -42,6 +42,9 @@ void DcameraEnableDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
     sptr<IDCameraProviderCallback> callback;
 
     DCameraProvider::GetInstance()->EnableDCameraDevice(dhBase, abilityInfo, callback);
+    dhBase.deviceId_ = "";
+    std::string emptyAbilityInfo = "";
+    DCameraProvider::GetInstance()->EnableDCameraDevice(dhBase, emptyAbilityInfo, callback);
     std::string sinkAbilityInfo = "";
     std::string sourceCodecInfo = "";
     DCameraProvider::GetInstance()->GetAbilityInfo(abilityInfo, sinkAbilityInfo, sourceCodecInfo);
