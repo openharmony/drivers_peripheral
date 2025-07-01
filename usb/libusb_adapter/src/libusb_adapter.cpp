@@ -207,7 +207,7 @@ int32_t LibusbAdapter::FindHandleByDev(const UsbDev &dev, libusb_device_handle *
     auto it = g_handleMap.find(result);
     if (it != g_handleMap.end()) {
         *handle = it->second.handle;
-        HDF_LOGI("%{public}s Search handle success leave", __func__);
+        HDF_LOGI("%{public}s Search handle success leave, result is %{public}u", __func__, result);
         return HDF_SUCCESS;
     }
     HDF_LOGE("%{public}s Search handle failed leave", __func__);

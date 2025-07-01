@@ -1296,7 +1296,7 @@ int32_t UsbfnMtpImpl::Read(std::vector<uint8_t> &data)
 
     if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
-        HDF_LOGE("%{public}s: device disconnect, no-operation", __func__);
+        HDF_LOGE("%{public}s: device disconnect, no-operation, mtpState is %{public}u", __func__, mtpDev_->mtpState);
         return HDF_DEV_ERR_NO_DEVICE;
     }
     if (mtpDev_->mtpState == MTP_STATE_CANCELED) {
@@ -1997,7 +1997,7 @@ int32_t UsbfnMtpImpl::SendEvent(const std::vector<uint8_t> &eventData)
     }
     if (mtpDev_->mtpState == MTP_STATE_OFFLINE || mtpDev_->mtpPort == nullptr || mtpDev_->mtpPort->suspended) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
-        HDF_LOGE("%{public}s: device disconnect", __func__);
+        HDF_LOGE("%{public}s: device disconnect, mtpState is %{public}u", __func__, mtpDev_->mtpState);
         return HDF_DEV_ERR_NO_DEVICE;
     }
     std::lock_guard<std::mutex> guard(eventMutex_);
