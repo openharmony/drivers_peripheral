@@ -45,6 +45,7 @@ ohos_shared_library("libhci_interface_service_1.0") {
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
+      "ipc:ipc_core",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
