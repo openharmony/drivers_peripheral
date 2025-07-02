@@ -68,7 +68,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "//drivers/peripheral/bluetooth/audio/supportlibs/adm_adapter/include",
   ]
 
-  deps = [ "//foundation/communication/bluetooth_service/services/bluetooth/ipc:btipc_static" ]
+  deps = []
 
   if (is_standard_system) {
     external_deps = [
@@ -89,6 +89,13 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
+
+  if(!drivers_peripheral_bluetooth_a2dp_hdi) {
+    external_deps += [
+      "bluetooth:btframework",
+      "bluetooth:btcommon",
+    ]
+  }
 
   public_configs = [ ":hdi_audio_config" ]
   version_script = "libhdi_audio_bluetooth_version_script.txt"
