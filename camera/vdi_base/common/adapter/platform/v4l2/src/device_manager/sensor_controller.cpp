@@ -741,7 +741,7 @@ RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *dat
             curLock = exposureMode == OHOS_CAMERA_EXPOSURE_MODE_LOCKED ?
                 curLock | V4L2_LOCK_EXPOSURE : curLock & ~V4L2_LOCK_EXPOSURE;
             if (queryResult == RC_OK) {
-                rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_LOCK, &curLock);
+                rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_LOCK, reinterpret_cast<int*>(&curLock);
                 CAMERA_LOGI("Set CMD_EXPOSURE_LOCK [%{public}d]", exposureMode);
                 CheckRetCodeValue(rc);
             }
