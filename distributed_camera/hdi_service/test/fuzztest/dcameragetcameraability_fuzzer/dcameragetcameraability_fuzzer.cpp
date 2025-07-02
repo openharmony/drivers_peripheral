@@ -41,6 +41,7 @@ void DcameraGetCameraAbilityFuzzTest(const uint8_t* data, size_t size)
         sourceAbilityInfo));
     if (dcameraDevice != nullptr) {
         DCameraHost::GetInstance()->dCameraDeviceMap_[cameraId] = dcameraDevice;
+        DCameraHost::GetInstance()->dCameraIdMap_[cameraId] = cameraId;
     }
     std::string dCameraId;
     DCameraHost::GetInstance()->AddDcameraId(dhBase, dCameraId, cameraId);
