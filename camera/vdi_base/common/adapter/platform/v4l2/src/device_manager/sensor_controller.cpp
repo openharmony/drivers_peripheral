@@ -645,7 +645,7 @@ RetCode SensorController::SendAWBLockMetaData(common_metadata_header_t *data)
         sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, reinterpret_cast<int*>(&curLock));
         if (awbLock == OHOS_CAMERA_AWB_LOCK_ON) {
         // set the position of AWB bit to 1;
-            curLock |= (V4L2_LOCK_WHITE_BALANCE);
+            curLock |= V4L2_LOCK_WHITE_BALANCE;
         } else if (awbLock == OHOS_CAMERA_AWB_LOCK_OFF) {
             // set the position of AWB bit to 0;
             curLock &= ~V4L2_LOCK_WHITE_BALANCE;
