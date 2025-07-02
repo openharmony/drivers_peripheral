@@ -90,7 +90,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "samgr:samgr_proxy",
   ]
 
-  if(!drivers_peripheral_bluetooth_a2dp_hdi) {
+  if (!drivers_peripheral_bluetooth_a2dp_hdi) {
     external_deps += [
       "bluetooth:btframework",
       "bluetooth:btcommon",
