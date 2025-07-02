@@ -29,8 +29,8 @@ void StreamPipelineBuilder::SetMaxSize(const std::set<std::vector<int32_t>>& siz
             max[1] = i[1];
         }
     }
-    pipeline_->maxWidth_ = max[0];
-    pipeline_->maxHeight_ = max[1];
+    pipeline_->maxWidth_ = static_cast<uint32_t>(max[0]);
+    pipeline_->maxHeight_ = static_cast<uint32_t>(max[1]);
 }
 
 std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<PipelineSpec>& pipelineSpec,

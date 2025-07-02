@@ -18,6 +18,7 @@
 #include "stream_pipeline_data_structure.h"
 #include "hdf_base.h"
 #include "camera.h"
+#include "params.h"
 namespace OHOS::Camera {
 #ifdef __ARCH64__
 #define PIPELINE_CONFIG_LIB_PATH HDF_LIBRARY_DIR"64/libcamera_pipeline_config.z.so"
@@ -41,16 +42,23 @@ extern "C" void* GetHandle()
 extern "C" const struct HdfConfigRoot* HdfGetModuleConfigRoot(void)
 {
     static const struct HdfConfigRoot* pHdfConfigRoot = nullptr;
+    static struct HdfConfigRoot defaultConfigRoot = {
+        .module = nullptr,
+        .streamInfo = nullptr,
+        .streamInfoSize = 0,
+        .sceneInfo = nullptr,
+        .sceneInfoSize = 0,
+    };
     if (pHdfConfigRoot == nullptr) {
         void* handle = GetHandle();
         if (!handle) {
-            return nullptr;
+            return &defaultConfigRoot;
         }
         HdfGetModuleConfigRootFunc HdfGetModuleConfigRootF =
             reinterpret_cast<HdfGetModuleConfigRootFunc>(dlsym(handle, "HdfGetModuleConfigRoot"));
         char* errStr = dlerror();
         if (errStr) {
-            return nullptr;
+            return &defaultConfigRoot;
         }
         pHdfConfigRoot = HdfGetModuleConfigRootF();
     }

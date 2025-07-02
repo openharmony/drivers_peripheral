@@ -27,7 +27,7 @@ void HosFileFormat::V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtD
     struct v4l2_frmivalenum  fraMival = {};
     constexpr int32_t fmtMax = 50;
     for (int k = 0; k < fmtMax; ++k) {
-        fraMival.index = k;
+        fraMival.index = static_cast<uint32_t>(k);
         fraMival.pixel_format = frmSize.pixel_format;
         fraMival.width = frmSize.discrete.width;
         fraMival.height = frmSize.discrete.height;
@@ -40,7 +40,7 @@ void HosFileFormat::V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtD
         currentFormat.fmtdesc.pixelformat = enumFmtDesc.pixelformat;
         currentFormat.fmtdesc.width = frmSize.discrete.width;
         currentFormat.fmtdesc.height = frmSize.discrete.height;
-        currentFormat.fmtdesc.fps.numerator = fraMival.discrete.numerator;
+        currentFormat.fmtdesc.fps.numerator = static_cast<int32_t>(fraMival.discrete.numerator);
         currentFormat.fmtdesc.fps.denominator = fraMival.discrete.denominator;
 
         fmtDesc.push_back(currentFormat);
@@ -52,8 +52,8 @@ void HosFileFormat::V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtD
 
 RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDesc)
 {
-    int i;
-    int j;
+    uint32_t i;
+    uint32_t j;
     struct v4l2_fmtdesc enumFmtDesc = {};
     struct v4l2_frmsizeenum frmSize = {};
     constexpr int32_t fmtMax = 50;
@@ -338,7 +338,6 @@ void HosFileFormat::V4L2MatchDevice(const std::vector<std::string>& cameraIDs)
     char devName[16] = {0};
     std::string name = DEVICENAMEX;
     int fd = 0;
-    int rc = 0;
 
     for (auto &it : cameraIDs) {
         for (int i = 0; i < MAXVIDEODEVICE; ++i) {
@@ -359,6 +358,7 @@ void HosFileFormat::V4L2MatchDevice(const std::vector<std::string>& cameraIDs)
                 continue;
             }
 
+            RetCode rc = 0;
             rc = V4L2GetCapability(fd, devName, it);
             if (rc == RC_ERROR) {
                 close(fd);

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 #include "codec_heif_encode_service.h"
+#include <algorithm>
 #include "codec_log_wrapper.h"
 #include "hdf_base.h"
-#include "buffer_handle_registration_mgr.h"
 #include "hdf_remote_service.h"
 #include <dlfcn.h>
 #include <unistd.h>
@@ -25,7 +25,7 @@ namespace HDI {
 namespace Codec {
 namespace Image {
 namespace V2_1 {
-using GetCodecHeifHwi = ICodecHeifHwi*(*)();
+using GetCodecHeifHwi = OHOS::VDI::HEIF::ICodecHeifHwi*(*)();
 
 CodecHeifEncodeService::CodecHeifEncodeService()
 {
@@ -65,49 +65,31 @@ bool CodecHeifEncodeService::LoadVendorLib()
     return true;
 }
 
-bool CodecHeifEncodeService::ReWrapNativeBufferInImageItem(const std::vector<ImageItem>& inputImgs)
-{
-    if (!isIPCMode_) {
-        return true;
-    }
-
-    for (const auto &image : inputImgs) {
-        if (!BufferHandleRegistrationMgr::ReWrapNativeBuffer(const_cast<ImageItem &>(image).pixelBuffer)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 int32_t CodecHeifEncodeService::DoHeifEncode(const std::vector<ImageItem>& inputImgs,
                                              const std::vector<MetaItem>& inputMetas,
                                              const std::vector<ItemRef>& refs,
                                              const SharedBuffer& output, uint32_t& filledLen)
 {
+    if (!isIPCMode_) {
+        return HDF_FAILURE;
+    }
+
+    std::vector<OHOS::VDI::HEIF::ImageItem> inputImgsInternal(inputImgs.size());
+    std::transform(inputImgs.cbegin(), inputImgs.cend(), inputImgsInternal.begin(),
+        OHOS::VDI::HEIF::ConvertImageItem);
+
+    std::vector<OHOS::VDI::HEIF::MetaItem> inputMetasInternal(inputMetas.size());
+    std::transform(inputMetas.cbegin(), inputMetas.cend(), inputMetasInternal.begin(),
+        OHOS::VDI::HEIF::ConvertMetaItem);
+
+    OHOS::VDI::HEIF::SharedBuffer outputToReturn = OHOS::VDI::HEIF::ConvertSharedBuffer(output);
+
     if (!LoadVendorLib()) {
         return HDF_FAILURE;
     }
 
-    if (!ReWrapNativeBufferInImageItem(inputImgs)) {
-        return HDF_FAILURE;
-    }
-
-    SharedBuffer outputToReturn = output;
-    int32_t ret = (heifHwi_->DoHeifEncode)(inputImgs, inputMetas, refs, outputToReturn);
+    int32_t ret = (heifHwi_->DoHeifEncode)(inputImgsInternal, inputMetasInternal, refs, outputToReturn);
     filledLen = outputToReturn.filledLen;
-    auto releaseRes = [](int fd) {
-        if (fd > 0) {
-            close(fd);
-        }
-    };
-    for (auto one : inputImgs) {
-        releaseRes(one.sharedProperties.fd);
-    }
-    for (auto one : inputMetas) {
-        releaseRes(one.data.fd);
-    }
-    releaseRes(output.fd);
     return ret;
 }
 } // V2_1

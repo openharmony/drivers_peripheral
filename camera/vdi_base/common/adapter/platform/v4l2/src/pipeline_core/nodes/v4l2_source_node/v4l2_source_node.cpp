@@ -100,9 +100,9 @@ RetCode V4L2SourceNode::Start(const int32_t streamId)
 #ifdef V4L2_EMULATOR
         }
 #endif
-        format.fmtdesc.width = wide_;
-        format.fmtdesc.height = high_;
-        int bufCnt = it->format_.bufferCount_;
+        format.fmtdesc.width = static_cast<uint32_t>(wide_);
+        format.fmtdesc.height = static_cast<uint32_t>(high_);
+        int bufCnt = static_cast<int>(it->format_.bufferCount_);
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
             CAMERA_LOGE("start failed.");
@@ -179,7 +179,7 @@ void V4L2SourceNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& me
         CAMERA_LOGE("meta is nullptr");
         return;
     }
-    constexpr uint32_t DEVICE_STREAM_ID = 0;
+    constexpr int32_t DEVICE_STREAM_ID = 0;
     if (sensorController_ != nullptr) {
         if (GetStreamId(metadata) == DEVICE_STREAM_ID) {
             sensorController_->Configure(metadata);
@@ -215,7 +215,7 @@ void V4L2SourceNode::GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadat
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
     if (ret == 0) {
         std::vector<int32_t> fpsRange;
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             fpsRange.push_back(*(entry.data.i32 + i));
         }
         meta_->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());

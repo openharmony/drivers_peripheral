@@ -149,7 +149,7 @@ HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult_001, TestSize.Level0)
     userAuthTokenCached.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
     userAuthTokenCached.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
     CacheAnyAuthResult(userIdCached, 999, &userAuthTokenCached);
-    EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_REUSE_AUTH_RESULT_FAILED);
 
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime();
     CacheAnyAuthResult(userIdCached, 999, &userAuthTokenCached);
@@ -167,7 +167,7 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc001, TestSize.Level0)
 
     info.reuseUnlockResultDuration = 10;
     info.reuseUnlockResultMode = AUTH_TYPE_IRRELEVANT;
-    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_REUSE_AUTH_RESULT_FAILED);
     (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
 }
 
@@ -205,7 +205,7 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_GENERAL_ERROR);
 
     info.userId = 0;
-    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_REUSE_AUTH_RESULT_FAILED);
 
     info.authTrustLevel = ATL2;
     info.authTypes[0] = 2;
@@ -213,7 +213,7 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_SUCCESS);
 
     info.reuseUnlockResultMode = AUTH_TYPE_RELEVANT;
-    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_REUSE_AUTH_RESULT_FAILED);
 
     info.authTypes[1] = 1;
     info.authTypeSize = 2;
@@ -256,22 +256,17 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc003, TestSize.Level0)
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     CacheAnyAuthResult(userIdCached, 999, &userAuthTokenCached);
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_GENERAL_ERROR);
-
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime();
     CacheAnyAuthResult(userIdCached, 999, &userAuthTokenCached);
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_GENERAL_ERROR);
-
     info.userId = 0;
-    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_GENERAL_ERROR);
-
+    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_REUSE_AUTH_RESULT_FAILED);
     info.authTrustLevel = ATL2;
     info.authTypes[0] = 2;
     info.authTypeSize = 1;
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_SUCCESS);
-
     info.reuseUnlockResultMode = CALLER_IRRELEVANT_AUTH_TYPE_RELEVANT;
-    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_GENERAL_ERROR);
-
+    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_REUSE_AUTH_RESULT_FAILED);
     info.authTypes[1] = 1;
     info.authTypeSize = 2;
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_SUCCESS);

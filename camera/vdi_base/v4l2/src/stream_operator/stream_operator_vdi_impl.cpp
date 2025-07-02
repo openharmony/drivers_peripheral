@@ -200,7 +200,7 @@ DynamicStreamSwitchMode StreamOperatorVdiImpl::CheckStreamsSupported(
         config.width = it.width_;
         config.height = it.height_;
         PixelFormat pf = static_cast<PixelFormat>(it.format_);
-        config.format = BufferAdapter::PixelFormatToCameraFormat(pf);
+        config.format = static_cast<int32_t>(BufferAdapter::PixelFormatToCameraFormat(pf));
         config.dataspace = it.dataspace_; // fix spell error
         config.tunnelMode = it.tunneledMode_;
         config.minFrameDuration = it.minFrameDuration_;
@@ -226,7 +226,7 @@ void StreamOperatorVdiImpl::StreamInfoToStreamConfiguration(StreamConfiguration 
     scg.width = info.width_;
     scg.height = info.height_;
     PixelFormat pf = static_cast<PixelFormat>(info.format_);
-    scg.format = BufferAdapter::PixelFormatToCameraFormat(pf);
+    scg.format = static_cast<int32_t>(BufferAdapter::PixelFormatToCameraFormat(pf));
     scg.dataspace = info.dataspace_; // fix misspell
     scg.tunnelMode = info.tunneledMode_;
     scg.minFrameDuration = info.minFrameDuration_;
@@ -391,7 +391,7 @@ int32_t StreamOperatorVdiImpl::GetStreamAttributes(std::vector<VdiStreamAttribut
         attribute.height_ = configuration.height;
         attribute.overrideFormat_ = (int32_t)BufferAdapter::CameraFormatToPixelFormat(configuration.format);
         attribute.overrideDataspace_ = configuration.dataspace;
-        attribute.producerUsage_ = BufferAdapter::CameraUsageToGrallocUsage(configuration.usage);
+        attribute.producerUsage_ = static_cast<int32_t>(BufferAdapter::CameraUsageToGrallocUsage(configuration.usage));
         attribute.producerBufferCount_ = configuration.bufferCount;
         attribute.maxBatchCaptureCount_ = configuration.maxCaptureCount;
         attribute.maxCaptureCount_ = configuration.maxCaptureCount;
@@ -624,7 +624,7 @@ void StreamOperatorVdiImpl::FillCaptureEndedInfo(std::vector<VdiCaptureEndedInfo
         CHECK_IF_PTR_NULL_RETURN_VOID(m);
         VdiCaptureEndedInfo edi = {};
         edi.streamId_ = m->GetStreamId();
-        edi.frameCount_ = m->GetFrameCount();
+        edi.frameCount_ = static_cast<int32_t>(m->GetFrameCount());
         info.push_back(edi);
     }
 }

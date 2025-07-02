@@ -395,7 +395,7 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
 RetCode HosV4L2Buffers::SetAdapterBuffer(int fd, struct v4l2_buffer &buf, const std::shared_ptr<FrameSpec>& frameSpec)
 {
     CAMERA_LOGI("HosV4L2Buffers::SetAdapterBuffer in.");
-    int32_t ret = 0;
+    RetCode ret = 0;
     int32_t index = (uint32_t)frameSpec->buffer_->GetIndex();
 
     auto findIf = adapterBufferMap_.find(index);
@@ -450,7 +450,7 @@ RetCode HosV4L2Buffers::SetDmabufOn(struct v4l2_buffer &buf, const std::shared_p
 {
     CAMERA_LOGI("HosV4L2Buffers::SetDmabufOn in.");
     int32_t ret = 0;
-    int32_t index = (uint32_t)frameSpec->buffer_->GetIndex();
+    int32_t index = static_cast<int32_t>(frameSpec->buffer_->GetIndex());
 
     int heapfd = open(DMA_BUF_FILE_NAME.c_str(), O_RDONLY | O_CLOEXEC);
     if (heapfd < 0) {
@@ -468,7 +468,7 @@ RetCode HosV4L2Buffers::SetDmabufOn(struct v4l2_buffer &buf, const std::shared_p
         return RC_ERROR;
     }
     adapterBufferMap_[index].heapfd = heapfd;
-    adapterBufferMap_[index].dmafd = data.fd;
+    adapterBufferMap_[index].dmafd = static_cast<int32_t>(data.fd);
     adapterBufferMap_[index].start = mmap(NULL, adapterBufferMap_[index].length, PROT_READ | PROT_WRITE,
         MAP_SHARED, adapterBufferMap_[index].dmafd, 0);
     if (adapterBufferMap_[index].start == MAP_FAILED) {

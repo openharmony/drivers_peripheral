@@ -203,7 +203,7 @@ void HosV4L2UVC::V4L2UvcEnmeDevices()
     std::string name = DEVICENAMEX;
     char devName[16] = {0};
     std::string cameraId = "uvcvideo";
-    int rc = 0;
+    RetCode rc = 0;
     int fd = 0;
 
     for (int j = 0; j < MAXVIDEODEVICE; ++j) {
@@ -255,7 +255,7 @@ const char* HosV4L2UVC::V4L2GetUsbValue(const char* key, const char* str, int le
 void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
     std::string& devnode, char* buf, unsigned int len)
 {
-    int lineLen;
+    unsigned int lineLen;
     int pos = 0;
     const char* retVal;
 
@@ -319,7 +319,7 @@ void HosV4L2UVC::loopUvcDevice()
             usleep(delayTime);
             constexpr uint32_t buffSize = 4096;
             char buf[buffSize] = {};
-            unsigned int len = recv(uDevFd, buf, sizeof(buf), 0);
+            unsigned int len = static_cast<unsigned int>(recv(uDevFd, buf, sizeof(buf), 0));
             if (CheckBuf(len, buf)) {
                 return;
             }
@@ -333,8 +333,8 @@ void HosV4L2UVC::loopUvcDevice()
 
 int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)
 {
-    constexpr uint32_t UVC_DETECT_ENABLE = 0;
-    constexpr uint32_t UVC_DETECT_DISABLE = -1;
+    constexpr int32_t UVC_DETECT_ENABLE = 0;
+    constexpr int32_t UVC_DETECT_DISABLE = -1;
     if (len > 0 && (strstr(buf, "video4linux") != nullptr)) {
         std::lock_guard<std::mutex> lock(g_uvcDetectLock);
         if (!g_uvcDetectEnable) {
@@ -366,7 +366,7 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
                 V4L2UvcMatchDev(itr->first, devName, false);
             }
         } else {
-            int rc;
+            RetCode rc;
             struct v4l2_capability cap = {};
             rc = V4L2UvcGetCap(devName, cap);
             if (rc == RC_ERROR) {
@@ -433,7 +433,7 @@ RetCode HosV4L2UVC::V4L2UvcDetectInit(UvcCallback cb)
 
     (void)memset_s(&nls, sizeof(nls), 0, sizeof(nls));
     nls.nl_family = AF_NETLINK;
-    nls.nl_pid = getpid();
+    nls.nl_pid = static_cast<uint32_t>(getpid());
     nls.nl_groups = 1;
     rc = bind(uDevFd_, (struct sockaddr *)&nls, sizeof(nls));
     if (rc < 0) {
