@@ -150,7 +150,7 @@ RetCode ExifNode::SetGpsInfoMetadata(common_metadata_header_t *data)
         return RC_ERROR;
     }
 
-    for (int i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < count; i++) {
         std::lock_guard<std::mutex> l(gpsMetaDatalock_);
         gpsInfo_.push_back(*(entry.data.d + i));
     }

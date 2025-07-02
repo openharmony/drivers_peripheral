@@ -76,7 +76,7 @@ void StreamStatistics::Clear()
 void StreamStatistics::CalculateFps(int interval)
 {
     if (interval > 0) {
-        fpsValue_ = static_cast<int>(requestBufferSuccessCount_ - lastRequestBufferCount_) / interval;
+        static_cast<int>(fpsValue_) = static_cast<int>(requestBufferSuccessCount_ - lastRequestBufferCount_) / interval;
         lastRequestBufferCount_ = requestBufferSuccessCount_;
     } else {
         return;
