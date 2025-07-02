@@ -11,11 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("../../location.gni")
 
 config("libagnss_interface_service_cfg") {
   visibility = [":*"]
-  include_dirs = [ "${location_driver_path}/gnss/hdi_service" ]
+  include_dirs = [ "//drivers/peripheral/location/gnss/hdi_service" ]
 }
 
 ohos_shared_library("libgnss_interface_service_2.0") {
@@ -68,7 +67,7 @@ ohos_shared_library("libgnss_interface_service_2.0") {
 }
 
 ohos_shared_library("liblocation_gnss_hdi_driver") {
-  include_dirs = [ "${location_driver_path}/gnss/hdi_service" ]
+  include_dirs = [ "//drivers/peripheral/location/gnss/hdi_service" ]
 
   sources = [ "gnss_interface_driver.cpp" ]
 
