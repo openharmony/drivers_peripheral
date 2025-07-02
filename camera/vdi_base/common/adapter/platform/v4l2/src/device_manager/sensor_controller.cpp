@@ -645,7 +645,7 @@ RetCode SensorController::SendAWBLockMetaData(common_metadata_header_t *data)
         sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, reinterpret_cast<int*>(&curLock));
         if (awbLock == OHOS_CAMERA_AWB_LOCK_ON) {
         // set the position of AWB bit to 1;
-            curLock |= V4L2_LOCK_WHITE_BALANCE;
+            curLock |= static_cast<uint32_t>(V4L2_LOCK_WHITE_BALANCE);
         } else if (awbLock == OHOS_CAMERA_AWB_LOCK_OFF) {
             // set the position of AWB bit to 0;
             curLock &= ~V4L2_LOCK_WHITE_BALANCE;
@@ -736,7 +736,7 @@ RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *dat
             aeLock = *(entry.data.u8);
         }
         if (aeLock == 0) {
-            int curLock = 0;
+            uint32_t curLock = 0;
             auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
             curLock = exposureMode == OHOS_CAMERA_EXPOSURE_MODE_LOCKED ?
                 curLock | V4L2_LOCK_EXPOSURE : curLock & ~V4L2_LOCK_EXPOSURE;
@@ -882,7 +882,7 @@ RetCode SensorController::SendFocusRegionsMetaData(common_metadata_header_t *dat
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AF_REGIONS, &entry);
     if (ret == 0) {
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             afRegions.push_back(*(entry.data.i32 + i));
             CAMERA_LOGI("Set afRegions [%{public}d]", *(entry.data.i32 + i));
         }

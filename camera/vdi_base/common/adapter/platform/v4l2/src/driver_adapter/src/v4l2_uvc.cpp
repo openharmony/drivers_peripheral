@@ -256,7 +256,7 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
     std::string& devnode, char* buf, unsigned int len)
 {
     unsigned int lineLen;
-    int pos = 0;
+    unsigned int pos = 0;
     const char* retVal;
 
     CAMERA_LOGD("UVC:V4L2GetUsbString enter\n");
