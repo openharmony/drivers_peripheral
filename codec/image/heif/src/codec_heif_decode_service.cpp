@@ -17,7 +17,7 @@
 #include "codec_log_wrapper.h"
 #include "hdf_base.h"
 #include "hdf_remote_service.h"
-#include "buffer_handle_registration_mgr.h"
+#include "buffer_helper.h"
 #include "codec_heif_decode_service.h"
 
 namespace OHOS {
@@ -69,15 +69,14 @@ int32_t CodecHeifDecodeService::DoHeifDecode(const std::vector<sptr<Ashmem>>& in
                                              const sptr<NativeBuffer>& output,
                                              const CodecHeifDecInfo& decInfo)
 {
+    if (!isIPCMode_) {
+        return HDF_FAILURE;
+    }
     if (!LoadVendorLib()) {
         return HDF_FAILURE;
     }
-
-    if (isIPCMode_ && !BufferHandleRegistrationMgr::ReWrapNativeBuffer(const_cast<sptr<NativeBuffer>&>(output))) {
-        return HDF_FAILURE;
-    }
-
-    return (heifDecodeHwi_->DoHeifDecode)(inputs, output, decInfo);
+    sptr<NativeBuffer> registered = OHOS::Codec::Omx::ReWrap(output, true);
+    return (heifDecodeHwi_->DoHeifDecode)(inputs, registered, decInfo);
 }
 } // V2_1
 } // Image

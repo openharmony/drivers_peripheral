@@ -81,6 +81,19 @@ void FormatHexString(uint8_t* data, int32_t dataSize, char* outBuffer, int32_t o
         memset_s(outBuffer, outBufferSize, 0, outBufferSize);
     }
 }
+
+int32_t ConvertResultCode(const int32_t in)
+{
+    static const std::map<ResultCode, InnerKitResultCode> data = {
+        {ResultCode::RESULT_TOKEN_TIMEOUT, InnerKitResultCode::INNER_RESULT_AUTH_TOKEN_EXPIRED},
+        {ResultCode::RESULT_VERIFY_TOKEN_FAIL, InnerKitResultCode::INNER_RESULT_AUTH_TOKEN_CHECK_FAILED},
+    };
+    auto iter = data.find(static_cast<ResultCode>(in));
+    if (iter != data.end()) {
+        return iter->second;
+    }
+    return in;
+}
 } // namespace
 
 using namespace std;
@@ -1918,19 +1931,6 @@ static bool CopyAuthTokenPlainHal(const UserAuthTokenPlainHal &tokenIn, HdiUserA
         return RESULT_BAD_COPY;
     }
     return RESULT_SUCCESS;
-}
-
-static int32_t ConvertResultCode(const int32_t in)
-{
-    static const std::map<ResultCode, InnerKitResultCode> data = {
-        {ResultCode::RESULT_TOKEN_TIMEOUT, InnerKitResultCode::INNER_RESULT_AUTH_TOKEN_EXPIRED},
-        {ResultCode::RESULT_VERIFY_TOKEN_FAIL, InnerKitResultCode::INNER_RESULT_AUTH_TOKEN_CHECK_FAILED},
-    };
-    auto iter = data.find(static_cast<ResultCode>(in));
-    if (iter != data.end()) {
-        return iter->second;
-    }
-    return in;
 }
 
 static void GetRootSecret(const UserAuthTokenPlainHal &token, std::vector<uint8_t> &rootSecret)

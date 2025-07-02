@@ -416,6 +416,8 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
         std::copy(static_cast<uint8_t*>(appPrivate->param),
                   static_cast<uint8_t*>(appPrivate->param) + appPrivate->sizeOfParam,
                   codecOmxBuffer.alongParam.begin());
+    } else {
+        codecOmxBuffer.alongParam.clear();
     }
     OmxCodecBuffer copy = codecOmxBuffer;
     copy.bufferhandle = nullptr;

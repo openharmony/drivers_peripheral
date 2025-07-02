@@ -25,11 +25,11 @@ ohos_shared_library("libcodec_image_service_2.1") {
   sources = [
     "config/codec_image_config.cpp",
     "hdi_service/src/codec_image_service.cpp",
-    "heif/src/buffer_handle_registration_mgr.cpp",
     "heif/src/codec_heif_decode_service.cpp",
     "heif/src/codec_heif_encode_service.cpp",
     "jpeg/src/codec_jpeg_core.cpp",
     "jpeg/src/codec_jpeg_service.cpp",
+    "../utils/src/buffer_helper.cpp",
   ]
   defines = [ "LOG_TAG_IMAGE" ]
   if (is_standard_system) {

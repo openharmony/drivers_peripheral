@@ -39,7 +39,7 @@ extern "C" IChipController *ChipControllerImplGetInstance(void)
     static IChipController *gWifiService = NULL;
     std::unique_lock<std::mutex> lock(g_chipMutex);
     if (gWifiService == NULL) {
-        gWifiService = new (std::nothrow) Wifi();
+        gWifiService = new Wifi();
     }
     return gWifiService;
 }

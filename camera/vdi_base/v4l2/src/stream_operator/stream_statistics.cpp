@@ -76,7 +76,7 @@ void StreamStatistics::Clear()
 void StreamStatistics::CalculateFps(int interval)
 {
     if (interval > 0) {
-        fpsValue_ = (requestBufferSuccessCount_ - lastRequestBufferCount_) / interval;
+        fpsValue_ = static_cast<int>(requestBufferSuccessCount_ - lastRequestBufferCount_) / interval;
         lastRequestBufferCount_ = requestBufferSuccessCount_;
     } else {
         return;
@@ -91,12 +91,12 @@ void StreamStatistics::DumpStats(int interval)
     }
 
     if (lastOutputTime_ == 0) {
-        lastOutputTime_ = timestamp_.tv_sec;
+        lastOutputTime_ = static_cast<uint64_t>(timestamp_.tv_sec);
         return;
     }
 
-    if (timestamp_.tv_sec - lastOutputTime_ > interval) {
-        CalculateFps(timestamp_.tv_sec - lastOutputTime_);
+    if (static_cast<uint64_t>(timestamp_.tv_sec) - lastOutputTime_ > static_cast<uint64_t>(interval)) {
+        CalculateFps(timestamp_.tv_sec - static_cast<int64_t>(lastOutputTime_));
         std::stringstream ss;
         ss << "streamId:" << streamId_ << ", buf status(suc/fail) req:" << requestBufferSuccessCount_ <<
             "/" << requestBufferFailCount_ << ", flush:" <<flushBufferSuccessCount_ << "/" <<
@@ -104,7 +104,7 @@ void StreamStatistics::DumpStats(int interval)
             cancelBufferFailCount_ << ", fps:" << fpsValue_;
         streamInfo_ = ss.str();
         CAMERA_LOGI("%{public}s", streamInfo_.c_str());
-        lastOutputTime_ = timestamp_.tv_sec;
+        lastOutputTime_ = static_cast<uint64_t>(timestamp_.tv_sec);
     }
 }
 

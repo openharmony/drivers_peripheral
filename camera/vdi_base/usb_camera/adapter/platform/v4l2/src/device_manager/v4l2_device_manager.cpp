@@ -344,8 +344,10 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         if (id == CAMERA_FIRST) {
             CreateManager();
         } else {
-            RetCode rc = GetManager(DM_M_SENSOR)->CreateController(DM_C_SENSOR, hardwareName);
-            CHECK_IF_EQUAL_RETURN_VOID(rc, RC_ERROR);
+            if (GetManager(DM_M_SENSOR) != nullptr) {
+                RetCode rc = GetManager(DM_M_SENSOR)->CreateController(DM_C_SENSOR, hardwareName);
+                CHECK_IF_EQUAL_RETURN_VOID(rc, RC_ERROR);
+            }
         }
         std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE,
             DATA_CAPACITY_SIZE);
@@ -472,7 +474,7 @@ void V4L2DeviceManager::AddDefaultOhosTag(std::shared_ptr<CameraMetadata> camera
 int V4L2DeviceManager::GetOhosMetaTag(uint32_t v4l2Tag)
 {
     for (auto metatag : g_metadataTagList) {
-        if (metatag.v4l2Tag == v4l2Tag) {
+        if (static_cast<uint32_t>(metatag.v4l2Tag) == v4l2Tag) {
             return metatag.ohosTag;
         }
     }
@@ -524,12 +526,12 @@ void V4L2DeviceManager::Convert3aLockToOhos(std::shared_ptr<CameraMetadata> meta
     std::vector<uint8_t> lockModeVector;
     const int EXPOSURE_MASK = 1 << 0;
     const int FOCUS_MASK = 1 << 2;
-    if (deviceControl.default_value & FOCUS_MASK) {
+    if (static_cast<uint32_t>(deviceControl.default_value) & FOCUS_MASK) {
         lockModeVector.push_back(OHOS_CAMERA_FOCUS_MODE_LOCKED);
         AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FOCUS_MODES, lockModeVector);
         std::vector<uint8_t>().swap(lockModeVector);
     }
-    if (deviceControl.default_value & EXPOSURE_MASK) {
+    if (static_cast<uint32_t>(deviceControl.default_value) & EXPOSURE_MASK) {
         lockModeVector.push_back(OHOS_CAMERA_EXPOSURE_MODE_LOCKED);
         AddOrUpdateOhosTag(metadata, OHOS_ABILITY_EXPOSURE_MODES, lockModeVector);
     }
@@ -555,7 +557,7 @@ void V4L2DeviceManager::ConvertAbilityExposureModesToOhos(std::shared_ptr<Camera
 {
     std::vector<uint8_t> abilityExposureModesVector;
 
-    for (int i = 0; i < deviceControl.menu.size(); i++) {
+    for (uint32_t i = 0; i < deviceControl.menu.size(); i++) {
         if (deviceControl.menu[i].id != V4L2_CID_EXPOSURE_AUTO) {
             continue;
         }
@@ -590,7 +592,7 @@ void V4L2DeviceManager::ConvertAbilityFlashModesToOhos(std::shared_ptr<CameraMet
 {
     std::vector<uint8_t> flashModesVector;
 
-    for (int i = 0; i < deviceControl.menu.size(); i++) {
+    for (size_t i = 0; i < deviceControl.menu.size(); i++) {
         if (deviceControl.menu[i].id != V4L2_CID_FLASH_LED_MODE) {
             continue;
         }

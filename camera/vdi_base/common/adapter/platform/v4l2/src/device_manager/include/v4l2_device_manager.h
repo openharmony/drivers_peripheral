@@ -80,7 +80,7 @@ private:
         if (ret != CAM_META_SUCCESS) {
             return;
         }
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             if (data_type == META_TYPE_BYTE) {
                 ohosTagVec.push_back(entry.data.u8[i]);
             } else if (data_type == META_TYPE_INT32) {

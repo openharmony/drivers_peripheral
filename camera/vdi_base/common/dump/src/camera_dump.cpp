@@ -350,7 +350,7 @@ void CameraDumper::CheckDiskInfo()
     }
 
     std::string userPerStr = infos[4].substr(0, infos[4].length() - 1);
-    uint32_t usePer = std::atoi(userPerStr.c_str());
+    uint32_t usePer = static_cast<uint32_t>(std::atoi(userPerStr.c_str()));
     if (usePer >= MAX_USAGE_RATE) {
         CAMERA_LOGE("dump use disk over the limit, stop dump");
         std::lock_guard<std::mutex> l(dumpStateLock_);

@@ -454,6 +454,10 @@ int32_t BufferLoopTracking::IsEmpty(const int32_t id, const std::string node)
         return INVALID_TRACKING_ID;
     }
     auto n = stream->FindTrackingNode(node);
+    if (n == nullptr) {
+        CAMERA_LOGE("FindTrackingNode is null");
+        return NODE_IS_EMPTY;
+    }
     return n->IsEmpty() ? NODE_IS_EMPTY : NODE_IS_NOT_EMPTY;
 }
 

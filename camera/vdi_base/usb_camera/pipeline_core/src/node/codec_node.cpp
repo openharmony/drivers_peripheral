@@ -176,21 +176,21 @@ RetCode CodecNode::Config(const int32_t streamId, const CaptureMeta& meta)
     return rc;
 }
 
-void CodecNode::EncodeJpegToMemory(uint8_t* image, JpegData jpegData,
+void CodecNode::EncodeJpegToMemory(const ImageData& imageData, JpegData jpegData,
     const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf)
 {
     struct jpeg_compress_struct cInfo;
     struct jpeg_error_mgr jErr;
     JSAMPROW row_pointer[1];
-    int rowStride = 0;
+    uint32_t rowStride = 0;
     constexpr uint32_t colorMap = 3;
     constexpr uint32_t pixelsThick = 3;
 
     cInfo.err = jpeg_std_error(&jErr);
 
     jpeg_create_compress(&cInfo);
-    cInfo.image_width = jpegData.width;
-    cInfo.image_height = jpegData.height;
+    cInfo.image_width = static_cast<unsigned int>(jpegData.width);
+    cInfo.image_height = static_cast<unsigned int>(jpegData.height);
     cInfo.input_components = colorMap;
     cInfo.in_color_space = JCS_RGB;
 
@@ -206,7 +206,12 @@ void CodecNode::EncodeJpegToMemory(uint8_t* image, JpegData jpegData,
 
     rowStride = jpegData.width;
     while (cInfo.next_scanline < cInfo.image_height) {
-        row_pointer[0] = &image[cInfo.next_scanline * rowStride * pixelsThick];
+        uint32_t imageDataIndex = cInfo.next_scanline * rowStride * pixelsThick;
+        if (imageDataIndex >= imageData.size) {
+            CAMERA_LOGE("CodecNode::EncodeJpegToMemory imageSize is not enough");
+            break;
+        }
+        row_pointer[0] = &imageData.data[imageDataIndex];
         jpeg_write_scanlines(&cInfo, row_pointer, 1);
     }
 
@@ -245,7 +250,8 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     unsigned long jpegSize = 0;
 
     JpegData jpegdata = {buffer->GetWidth(), buffer->GetHeight()};
-    EncodeJpegToMemory((uint8_t *)tmpBufferAddr, jpegdata, nullptr, &jpegSize, &jBuf);
+    ImageData imageData = {static_cast<uint8_t*>(tmpBufferAddr), tmpBufferSize};
+    EncodeJpegToMemory(imageData, jpegdata, nullptr, &jpegSize, &jBuf);
 
     ret = memcpy_s((uint8_t *)buffer->GetSuffaceBufferAddr(), buffer->GetSuffaceBufferSize(), jBuf, jpegSize);
     if (ret == 0) {

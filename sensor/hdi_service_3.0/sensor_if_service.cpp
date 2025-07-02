@@ -157,40 +157,42 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
     SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorHandle, serviceId, samplingInterval,
                                                                reportInterval);
 
-    AdjustSensorConfig(sensorHandle, samplingInterval, reportInterval);
+    SensorInterval sensorInterval = {samplingInterval, reportInterval};
+    SensorInterval saSensorInterval = {samplingInterval, reportInterval};
+    SensorInterval sdcSensorInterval = {samplingInterval, reportInterval};
+    AdjustSensorConfig(sensorHandle, sensorInterval, saSensorInterval, sdcSensorInterval);
 
-    int32_t ret = SetBatchConfig(sensorHandle, samplingInterval, reportInterval);
+    int32_t ret = SetBatchConfig(sensorHandle, sensorInterval.samplingInterval, sensorInterval.reportInterval);
     if (ret != SENSOR_SUCCESS) {
         return ret;
     }
 
-    UpdateSensorModeConfig(sensorHandle, mode, samplingInterval, reportInterval);
+    UpdateSensorModeConfig(sensorHandle, mode, saSensorInterval, sdcSensorInterval);
 
     return ret;
 }
 
-void SensorIfService::AdjustSensorConfig(const SensorHandle &sensorHandle, int64_t &samplingInterval,
-                                         int64_t &reportInterval)
+void SensorIfService::AdjustSensorConfig(const SensorHandle &sensorHandle, SensorInterval &sensorInterval,
+                                         SensorInterval &saSensorInterval, SensorInterval &sdcSensorInterval)
 {
-    int64_t saSamplingInterval = samplingInterval;
-    int64_t saReportInterval = reportInterval;
-    int64_t sdcSamplingInterval = samplingInterval;
-    int64_t sdcReportInterval = reportInterval;
+    SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorHandle, saSensorInterval.samplingInterval,
+                                                             saSensorInterval.reportInterval);
+    SensorClientsManager::GetInstance()->SetSdcSensorBestConfig(sensorHandle, sdcSensorInterval.samplingInterval,
+                                                                sdcSensorInterval.reportInterval);
 
-    SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorHandle, saSamplingInterval,
-                                                             saReportInterval);
-    SensorClientsManager::GetInstance()->SetSdcSensorBestConfig(sensorHandle, sdcSamplingInterval,
-                                                                sdcReportInterval);
-
-    samplingInterval = std::min(saSamplingInterval, sdcSamplingInterval);
-    reportInterval = std::min(saReportInterval, sdcReportInterval);
+    sensorInterval.samplingInterval = std::min(saSensorInterval.samplingInterval, sdcSensorInterval.samplingInterval);
+    sensorInterval.reportInterval = std::min(saSensorInterval.reportInterval, sdcSensorInterval.reportInterval);
 }
 
 int32_t SensorIfService::SetBatchConfig(const SensorHandle &sensorHandle, int64_t samplingInterval,
                                         int64_t reportInterval)
 {
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetBatch");
+#ifdef TV_FLAG
+    int32_t ret = sensorVdiImplV1_1_->SetBatch(sensorHandle, samplingInterval, reportInterval);
+#else
     int32_t ret = sensorVdiImplV1_1_->SetBatch(sensorHandle.sensorType, samplingInterval, reportInterval);
+#endif
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {
@@ -200,21 +202,32 @@ int32_t SensorIfService::SetBatchConfig(const SensorHandle &sensorHandle, int64_
     return ret;
 }
 
-void SensorIfService::UpdateSensorModeConfig(const SensorHandle &sensorHandle, int32_t mode, int64_t samplingInterval,
-                                             int64_t reportInterval)
+void SensorIfService::UpdateSensorModeConfig(const SensorHandle &sensorHandle, int32_t mode,
+                                             SensorInterval &saSensorInterval, SensorInterval &sdcSensorInterval)
 {
     if (mode == SA) {
-        SetDelay(sensorHandle, samplingInterval, reportInterval);
-        SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorHandle, samplingInterval, reportInterval);
-        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorHandle, samplingInterval, reportInterval);
-    } else if (mode == SDC) {
-        SensorClientsManager::GetInstance()->UpdateSdcSensorConfig(sensorHandle, samplingInterval, reportInterval);
+        SetDelay(sensorHandle, saSensorInterval.samplingInterval, saSensorInterval.reportInterval);
+        SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorHandle, saSensorInterval.samplingInterval,
+                                                                saSensorInterval.reportInterval);
+        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorHandle, saSensorInterval.samplingInterval,
+                                                                     saSensorInterval.reportInterval);
+    }
+    if (mode == SDC) {
+        SensorClientsManager::GetInstance()->UpdateSdcSensorConfig(sensorHandle, sdcSensorInterval.samplingInterval,
+                                                                   sdcSensorInterval.reportInterval);
     }
 
-    SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorHandle, samplingInterval, reportInterval);
+    SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorHandle, saSensorInterval.samplingInterval,
+                                                             saSensorInterval.reportInterval);
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
-    int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, samplingInterval, reportInterval);
+#ifdef TV_FLAG
+    int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, saSensorInterval.samplingInterval,
+                                                 saSensorInterval.reportInterval);
+#else
+    int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, saSensorInterval.samplingInterval,
+                                                 saSensorInterval.reportInterval);
+#endif
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {

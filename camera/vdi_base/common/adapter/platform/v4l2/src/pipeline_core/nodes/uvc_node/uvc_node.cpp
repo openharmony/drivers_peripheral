@@ -102,9 +102,9 @@ RetCode UvcNode::Start(const int32_t streamId)
     for (const auto& it : outPorts) {
         DeviceFormat format;
         format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
-        format.fmtdesc.width = wide_;
-        format.fmtdesc.height = high_;
-        int bufCnt = it->format_.bufferCount_;
+        format.fmtdesc.width = static_cast<uint32_t>(wide_);
+        format.fmtdesc.height = static_cast<uint32_t>(high_);
+        uint32_t bufCnt = it->format_.bufferCount_;
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
             CAMERA_LOGE("Start failed.");
@@ -164,7 +164,7 @@ void UvcNode::GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
     if (ret == 0) {
         std::vector<int32_t> fpsRange;
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             fpsRange.push_back(*(entry.data.i32 + i));
         }
         meta_->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
@@ -177,7 +177,7 @@ void UvcNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
         CAMERA_LOGE("Meta is nullptr");
         return;
     }
-    constexpr uint32_t DEVICE_STREAM_ID = 0;
+    constexpr int32_t DEVICE_STREAM_ID = 0;
     if (sensorController_ != nullptr) {
         sensorController_->ConfigStart();
         if (GetStreamId(metadata) == DEVICE_STREAM_ID) {
@@ -200,6 +200,10 @@ void UvcNode::SetBufferCallback()
 
 void UvcNode::YUV422To420(uint8_t yuv422[], uint8_t yuv420[], int width, int height)
 {
+    if (yuv420 == nullptr || yuv422 == nullptr) {
+        CAMERA_LOGE("input buffer is null, conversion failed.");
+        return;
+    }
     int yCount = width * height;
     constexpr int POSITION_INTERVAL = 2;
     constexpr int U_V_POSITION_INTERVAL = 4;
@@ -234,6 +238,10 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     dumper.DumpBuffer("YUV422", ENABLE_UVC_NODE, buffer, wide_, high_);
 
     uint8_t* jBuf = static_cast<uint8_t *>(malloc(buffer->GetSize()));
+    if (jBuf == nullptr) {
+        CAMERA_LOGE("UvcNode::DeliverBuffer malloc jBuf failed");
+        return;
+    }
     YUV422To420(static_cast<uint8_t *>(buffer->GetVirAddress()), static_cast<uint8_t *>(jBuf),
         wide_, high_);
     int ret = memcpy_s(static_cast<uint8_t *>(buffer->GetVirAddress()), buffer->GetSize(),

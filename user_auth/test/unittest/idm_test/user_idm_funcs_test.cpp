@@ -167,6 +167,25 @@ HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_004, TestSize.Level0)
     LOG_INFO("TestGenerateIdmSchedule_004 end");
 }
 
+static void TestInitUserInfoList()
+{
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    userInfo->userId = 1;
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
+    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credentialInfo, nullptr);
+    credentialInfo->credentialId = 1;
+    credentialInfo->templateId = 1;
+    credentialInfo->authType = PIN_AUTH;
+    credentialInfo->isAbandoned = false;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+}
+
 HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_005, TestSize.Level0)
 {
     LOG_INFO("TestGenerateIdmSchedule_005 start");
@@ -182,21 +201,7 @@ HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_005, TestSize.Level0)
     static char udid[UDID_LEN + 1] = "0123456789012345678901234567890123456789012345678901234567890123";
     SetLocalUdid(udid);
     EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
-    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
-    EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
-    EXPECT_NE(userInfo, nullptr);
-    userInfo->userId = userId;
-    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
-    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
-    EXPECT_NE(credentialInfo, nullptr);
-    credentialInfo->credentialId = 1;
-    credentialInfo->templateId = 1;
-    credentialInfo->authType = PIN_AUTH;
-    credentialInfo->isAbandoned = false;
-    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    TestInitUserInfoList();
     EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
     InitResourcePool();
     InitCoAuth();
@@ -237,21 +242,7 @@ HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_006, TestSize.Level0)
     static char udid[UDID_LEN + 1] = "0123456789012345678901234567890123456789012345678901234567890123";
     SetLocalUdid(udid);
     EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
-    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
-    EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
-    EXPECT_NE(userInfo, nullptr);
-    userInfo->userId = userId;
-    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
-    CredentialInfoHal *credentialInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
-    EXPECT_NE(credentialInfo, nullptr);
-    credentialInfo->credentialId = 1;
-    credentialInfo->templateId = 1;
-    credentialInfo->authType = PIN_AUTH;
-    credentialInfo->isAbandoned = true;
-    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credentialInfo));
+    TestInitUserInfoList();
     EXPECT_EQ(GenerateIdmSchedule(&param, scheduleType), nullptr);
     InitResourcePool();
     InitCoAuth();

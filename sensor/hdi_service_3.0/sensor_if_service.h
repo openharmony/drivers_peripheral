@@ -46,10 +46,11 @@ class SensorIfService : public V3_0::ISensorInterface {
                      int64_t reportInterval) override;
     int32_t SetBatchSenior(int32_t serviceId, const SensorHandle sensorHandle, int32_t mode, int64_t samplingInterval,
                            int64_t reportInterval);
-    void AdjustSensorConfig(const SensorHandle &sensorHandle, int64_t &samplingInterval, int64_t &reportInterval);
+    void AdjustSensorConfig(const SensorHandle &sensorHandle, SensorInterval &sensorInterval,
+                            SensorInterval &saSensorInterval, SensorInterval &sdcSensorInterval);
     int32_t SetBatchConfig(const SensorHandle &sensorHandle, int64_t samplingInterval, int64_t reportInterval);
-    void UpdateSensorModeConfig(const SensorHandle &sensorHandle, int32_t mode, int64_t samplingInterval,
-                                int64_t reportInterval);
+    void UpdateSensorModeConfig(const SensorHandle &sensorHandle, int32_t mode, SensorInterval &saSensorInterval,
+                                SensorInterval &sdcSensorInterval);
     int32_t SetMode(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo, int32_t mode) override;
     int32_t SetOption(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo, uint32_t option) override;
     int32_t Register(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj) override;
