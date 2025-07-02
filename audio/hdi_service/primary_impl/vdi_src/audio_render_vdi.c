@@ -331,12 +331,13 @@ int32_t AudioRenderSelectSceneVdi(struct IAudioRender *render, const struct Audi
 
     AUDIO_FUNC_LOGI("portId = [%{public}u], pin = [%{public}d], desc = [%{public}s]",
         scene->desc.portId, scene->desc.pins, scene->desc.desc);
-
+    HdfAudioStartTrace("Hdi:SelectScene", 0);
     struct AudioSceneDescriptorVdi vdiScene;
     (void)memset_s((void *)&vdiScene, sizeof(vdiScene), 0, sizeof(vdiScene));
     int32_t ret = AudioCommonSceneToVdiSceneVdi(scene, &vdiScene);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render scene To vdiScene fail");
+        HdfAudioFinishTrace();
         return HDF_FAILURE;
     }
 
@@ -346,9 +347,10 @@ int32_t AudioRenderSelectSceneVdi(struct IAudioRender *render, const struct Audi
     OsalMemFree((void *)vdiScene.desc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render select scene fail, ret=%{public}d", ret);
+        HdfAudioFinishTrace();
         return ret;
     }
-
+    HdfAudioFinishTrace();
     return HDF_SUCCESS;
 }
 
