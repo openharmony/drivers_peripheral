@@ -150,7 +150,10 @@ public:
         return 0;
     }
 
-    virtual int32_t IsSupportAllocPassthrough(const AllocInfo& info) const = 0;
+    virtual int32_t IsSupportAllocPassthrough(const AllocInfo& info) const
+    {
+        return -2;
+    }
 };
 
 using CreateDisplayBufferVdiFunc = IDisplayBufferVdi* (*)();

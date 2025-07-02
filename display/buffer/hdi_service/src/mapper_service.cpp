@@ -213,7 +213,7 @@ int32_t MapperService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handl
     }
 
     handle->SetBufferHandle(buffer, true, [this](BufferHandle* freeBuffer) {
-        FreeMemVdi(freeBuffer)
+        FreeMemVdi(freeBuffer);
     });
     return HDF_SUCCESS;
 }
