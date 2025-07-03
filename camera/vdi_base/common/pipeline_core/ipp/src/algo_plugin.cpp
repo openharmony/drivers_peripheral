@@ -102,6 +102,14 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
     }
 
     IppAlgoBuffer** inAlgoBuffers = new(std::nothrow) IppAlgoBuffer* [inBuffers.size()];
+    if (inAlgoBuffers == nullptr) {
+        CAMERA_LOGE("create inAlgoBuffers failed.");
+        if (outAlgoBuffer != nullptr) {
+            delete outAlgoBuffer;
+            outAlgoBuffer = nullptr;
+        }
+        return RC_ERROR;
+    }
     SetInAlgoBuffers(inBuffers, inAlgoBuffers);
     int ret = algoHandler_->func.Process(inAlgoBuffers, inBuffers.size(), outAlgoBuffer, nullptr);
     if (outAlgoBuffer != nullptr) {
