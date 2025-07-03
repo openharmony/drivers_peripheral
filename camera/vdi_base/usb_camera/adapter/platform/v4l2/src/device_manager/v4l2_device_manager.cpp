@@ -524,7 +524,7 @@ void V4L2DeviceManager::Convert3aLockToOhos(std::shared_ptr<CameraMetadata> meta
     const DeviceControl& deviceControl)
 {
     std::vector<uint8_t> lockModeVector;
-    const int EXPOSURE_MASK = 1 << 0;
+    const uint32_t EXPOSURE_MASK = 1 << 0;
     const uint32_t FOCUS_MASK = 1 << 2;
     if (static_cast<uint32_t>(deviceControl.default_value) & FOCUS_MASK) {
         lockModeVector.push_back(OHOS_CAMERA_FOCUS_MODE_LOCKED);
