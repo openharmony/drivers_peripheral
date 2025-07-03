@@ -44,6 +44,16 @@ void DcameraNotifyFuzzTest(const uint8_t* data, size_t size)
     event.content_ = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
 
     DCameraProvider::GetInstance()->Notify(dhBase, event);
+    dhBase.deviceId_ = "";
+    DCameraProvider::GetInstance()->Notify(dhBase, event);
+
+    const uint32_t HDF_EVENT_CONTENT_MAX_LENGTH = 50 * 1024 * 1024;
+    const uint32_t EXTRA_CONTENT_LENGTH = 1024;
+    const uint32_t MIN_CONTENT_LENGTH = HDF_EVENT_CONTENT_MAX_LENGTH + 1;
+    size_t contentLength = fdp.ConsumeIntegralInRange<size_t>(MIN_CONTENT_LENGTH,
+        HDF_EVENT_CONTENT_MAX_LENGTH + EXTRA_CONTENT_LENGTH);
+    event.content_ = fdp.ConsumeBytesAsString(contentLength);
+    DCameraProvider::GetInstance()->Notify(dhBase, event);
 }
 }
 }
