@@ -737,7 +737,8 @@ RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *dat
         }
         if (aeLock == 0) {
             unsigned int curLock = 0;
-            auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, reinterpret_cast(&curLock));
+            auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK,
+                reinterpret_cast(&curLock));
             curLock = exposureMode == OHOS_CAMERA_EXPOSURE_MODE_LOCKED ?
                 curLock | V4L2_LOCK_EXPOSURE : curLock & ~V4L2_LOCK_EXPOSURE;
             if (queryResult == RC_OK) {
