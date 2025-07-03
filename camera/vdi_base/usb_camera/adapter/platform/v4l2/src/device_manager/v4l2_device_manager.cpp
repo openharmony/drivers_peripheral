@@ -688,7 +688,7 @@ void ChangeAbilityVectorFormat(std::vector<int> &abilityVec, uint32_t format)
     abilityVec[0] = static_cast<int32_t>(format);
     for (uint32_t index = SkipNum; index < abilityVec.size();) {
         if (abilityVec[index - 1] == endMarker) {
-            abilityVec[index] = format;
+            abilityVec[index] = static_cast<int32_t>(format);
             index += SkipNum;
         } else {
             index += 1;
