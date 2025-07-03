@@ -47,11 +47,11 @@ void DcameraNotifyFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = "";
     DCameraProvider::GetInstance()->Notify(dhBase, event);
 
-    const uint32_t HDF_EVENT_CONTENT_MAX_LENGTH = 50 * 1024 * 1024;
-    const uint32_t EXTRA_CONTENT_LENGTH = 1024;
-    const uint32_t MIN_CONTENT_LENGTH = (50 * 1024 * 1024) + 1;
-    size_t contentLength = fdp.ConsumeIntegralInRange<size_t>(MIN_CONTENT_LENGTH,
-        HDF_EVENT_CONTENT_MAX_LENGTH + EXTRA_CONTENT_LENGTH);
+    const uint32_t eventContentMaxLength = 50 * 1024 * 1024;
+    const uint32_t extraContentLength = 1024;
+    const uint32_t minContentLength = (50 * 1024 * 1024) + 1;
+    size_t contentLength = fdp.ConsumeIntegralInRange<size_t>(minContentLength,
+        eventContentMaxLength + extraContentLength);
     event.content_ = fdp.ConsumeBytesAsString(contentLength);
     DCameraProvider::GetInstance()->Notify(dhBase, event);
 }
