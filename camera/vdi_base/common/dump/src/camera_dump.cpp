@@ -250,7 +250,6 @@ bool CameraDumper::SaveDataToFile(const char *fileName, const void *data, uint32
         CAMERA_LOGE("dump path <%{public}s> not exist, error: %{public}s", DUMP_PATH.c_str(), std::strerror(errno));
         return false;
     }
- 
 
     std::stringstream ss;
     ss << DUMP_PATH << fileName;
