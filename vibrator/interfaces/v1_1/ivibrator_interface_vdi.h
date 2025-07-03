@@ -20,7 +20,6 @@
 #include <vector>
 #include <hdf_base.h>
 #include "hdf_load_vdi.h"
-#include "v1_3/ivibrator_interface.h"
 #include "v2_0/ivibrator_interface.h"
 #include "hdf_log.h"
 
@@ -28,7 +27,6 @@ namespace OHOS {
 namespace HDI {
 namespace Vibrator {
 namespace V1_1 {
-using namespace OHOS::HDI::Vibrator::V1_3;
 using namespace OHOS::HDI::Vibrator::V2_0;
 
 enum HdfVibratorStatusVdi {
@@ -206,7 +204,7 @@ public:
         HDF_LOGI("%{public}s: only in Hdi return", __func__);
         return HDF_SUCCESS;
     };
-    virtual int32_t GetAllWaveInfo(int32_t vibratorId, std::vector<OHOS::HDI::Vibrator::V1_3::HdfWaveInformation> &info)
+    virtual int32_t GetAllWaveInfo(int32_t vibratorId, std::vector<OHOS::HDI::Vibrator::V2_0::HdfWaveInformation> &info)
     {
         HDF_LOGI("%{public}s: only in Hdi return", __func__);
         return HDF_SUCCESS;

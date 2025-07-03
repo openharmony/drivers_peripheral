@@ -488,19 +488,8 @@ int32_t VibratorIfService::GetAllWaveInfo(const OHOS::HDI::Vibrator::V2_0::Devic
 #ifdef TV_FLAG
     int32_t ret = vibratorVdiImplV1_1_->GetAllWaveInfo(deviceVibratorInfo, info);
 #else
-    std::vector<OHOS::HDI::Vibrator::V1_3::HdfWaveInformation> infoV1_3;
-    int32_t ret = vibratorVdiImplV1_1_->GetAllWaveInfo(deviceVibratorInfo.vibratorId, infoV1_3);
-    for (const auto &iter : infoV1_3) {
-        OHOS::HDI::Vibrator::V2_0::HdfWaveInformation infoV2_0;
-        infoV2_0.waveId = iter.waveId;
-        infoV2_0.intensity = iter.intensity;
-        infoV2_0.frequency = iter.frequency;
-        infoV2_0.duration = iter.duration;
-        infoV2_0.reserved = iter.reserved;
-        info.push_back(std::move(infoV2_0));
-    }
+    int32_t ret = vibratorVdiImplV1_1_->GetAllWaveInfo(deviceVibratorInfo.vibratorId, info);
 #endif
-
     FinishTrace(HITRACE_TAG_HDF);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
