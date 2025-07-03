@@ -315,8 +315,8 @@ BENCHMARK_F(VibratorBenchmarkTest, PlayPatternBySessionId)(benchmark::State &sta
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    int32_t startRet;
-    int32_t endRet;
+    int32_t startRet = 0;
+    int32_t endRet = 0;
     for (auto _ : state) {
         startRet = g_vibratorInterface->PlayPatternBySessionId(
             {-1, 1}, g_sessionId, g_hapticPaket);
@@ -337,8 +337,8 @@ BENCHMARK_F(VibratorBenchmarkTest, PlayPackageBySession)(benchmark::State &state
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    int32_t startRet;
-    int32_t endRet;
+    int32_t startRet = 0;
+    int32_t endRet = 0;
     for (auto _ : state) {
         startRet = g_vibratorInterface->PlayPackageBySession(
             {-1, 1}, g_sessionId, g_vibPackage);
