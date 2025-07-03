@@ -110,6 +110,11 @@ int32_t DAudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &
     const sptr<IDAudioHdfCallback> &callbackObj)
 {
     DHLOGI("Register audio HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    if (callbackObj == nullptr) {
+        DHLOGE("Audio hdf callback is null.");
+        return HDF_FAILURE;
+    }
+
     if (audioMgr_ == nullptr) {
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;

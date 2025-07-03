@@ -113,6 +113,26 @@ HWTEST_F(DAudioManagerInterfaceImplTest, NotifyEvent_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: RegisterAudioHdfListener_001
+ * @tc.desc: Verify the RegisterAudioHdfListener function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DAudioManagerInterfaceImplTest, RegisterAudioHdfListener_001, TestSize.Level1)
+{
+    std::string adpName = "hello";
+    sptr<IDAudioHdfCallback> callback = nullptr;
+    EXPECT_EQ(HDF_FAILURE,
+        DAudioManagerInterfaceImpl::GetDAudioManager()->RegisterAudioHdfListener(adpName, callback));
+    callback = sptr<IDAudioHdfCallback>(new MockIDAudioHdfCallback());
+    auto audioMgr = DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_;
+    DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_ = nullptr;
+    auto ret = DAudioManagerInterfaceImpl::GetDAudioManager()->RegisterAudioHdfListener(adpName, callback);
+    DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_ = audioMgr;
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/**
  * @tc.name: UnRegisterAudioHdfListener_001
  * @tc.desc: Verify the UnRegisterAudioHdfListener function.
  * @tc.type: FUNC

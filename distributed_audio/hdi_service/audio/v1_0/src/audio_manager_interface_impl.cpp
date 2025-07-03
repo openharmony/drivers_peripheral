@@ -319,6 +319,10 @@ int32_t AudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &s
     const sptr<IDAudioHdfCallback> &callbackObj)
 {
     DHLOGI("Register audio HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    if (callbackObj == nullptr) {
+        DHLOGE("Audio hdf callback is null.");
+        return HDF_FAILURE;
+    }
     sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDAudioHdfCallback>(callbackObj);
     if (remote == nullptr) {
         DHLOGE("Remote callback is nullptr.");
