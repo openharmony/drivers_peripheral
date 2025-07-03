@@ -525,7 +525,7 @@ void V4L2DeviceManager::Convert3aLockToOhos(std::shared_ptr<CameraMetadata> meta
 {
     std::vector<uint8_t> lockModeVector;
     const int EXPOSURE_MASK = 1 << 0;
-    const int FOCUS_MASK = 1 << 2;
+    const uint32_t FOCUS_MASK = 1 << 2;
     if (static_cast<uint32_t>(deviceControl.default_value) & FOCUS_MASK) {
         lockModeVector.push_back(OHOS_CAMERA_FOCUS_MODE_LOCKED);
         AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FOCUS_MODES, lockModeVector);
@@ -685,7 +685,7 @@ void ChangeAbilityVectorFormat(std::vector<int> &abilityVec, uint32_t format)
         CAMERA_LOGI("ChangeAbilityVectorFormat error, abilityVec.size() == 0");
         return;
     }
-    abilityVec[0] = format;
+    abilityVec[0] = static_cast<int32_t>(format);
     for (uint32_t index = SkipNum; index < abilityVec.size();) {
         if (abilityVec[index - 1] == endMarker) {
             abilityVec[index] = format;
