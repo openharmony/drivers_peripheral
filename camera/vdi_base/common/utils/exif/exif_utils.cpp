@@ -326,13 +326,13 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &ou
     tempBuffer = static_cast<unsigned char *>(malloc(totalTempBufferSize));
     if (!tempBuffer) {
         CAMERA_LOGE("%{public}s Allocate temp buf failed.", __FUNCTION__);
-        goto error;;
+        goto error;
     }
     ret = PackageJpeg(tempBuffer, totalTempBufferSize, exifData, exifDataLength, sourceData);
     outPutSize = totalTempBufferSize;
     if (memcpy_s(address, totalTempBufferSize, tempBuffer, totalTempBufferSize) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
-        goto error;;
+        goto error;
     }
 
 error:
