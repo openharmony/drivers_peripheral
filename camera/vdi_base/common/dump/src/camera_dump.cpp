@@ -90,11 +90,16 @@ bool CameraDumper::ReadDumpConfig()
 {
     std::stringstream ss;
     ss << DUMP_CONFIG_PATH;
+    std::string configPath = ss.str();
+    if (access(configPath.c_str(), R_OK) != 0) {
+        CAMERA_LOGE("dump config file <%{public}s> not exist or not readable", configPath.c_str());
+        return false;
+    }
     std::ifstream ifs;
-    ifs.open(ss.str(), std::ios::in);
+    ifs.open(configPath, std::ios::in);
     if (!ifs) {
         CAMERA_LOGE("open dump config file <%{public}s> failed, error: %{public}s",
-            ss.str().c_str(), std::strerror(errno));
+            configPath.c_str(), std::strerror(errno));
         return false;
     }
 
