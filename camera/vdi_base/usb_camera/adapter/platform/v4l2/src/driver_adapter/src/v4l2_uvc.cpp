@@ -360,6 +360,7 @@ int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)
 {
     constexpr uint32_t UVC_DETECT_ENABLE = 0;
     constexpr uint32_t UVC_DETECT_DISABLE = -1;
+    ++++
     if (len > 0 && (strstr(buf, "video4linux") != nullptr)) {
         std::lock_guard<std::mutex> lock(g_uvcDetectLock);
         if (!g_uvcDetectEnable) {
