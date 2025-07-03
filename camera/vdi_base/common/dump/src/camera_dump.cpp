@@ -16,6 +16,7 @@
 #include "camera_dump.h"
 
 #include <sys/time.h>
+#include <unistd.h>
 #include <fstream>
 #include <sstream>
 #include <cstdio>
@@ -245,6 +246,11 @@ bool CameraDumper::SaveDataToFile(const char *fileName, const void *data, uint32
     std::stringstream mkdirCmd;
     mkdirCmd << "mkdir -p " << DUMP_PATH;
     system(mkdirCmd.str().c_str());
+    if (access(DUMP_PATH.c_str(), F_OK) != 0 || access(DUMP_PATH.c_str(), R_OK | W_OK) != 0) {
+        CAMERA_LOGE("dump path <%{public}s> not exist, error: %{public}s", DUMP_PATH.c_str(), std::strerror(errno));
+        return false;
+    }
+ 
 
     std::stringstream ss;
     ss << DUMP_PATH << fileName;
