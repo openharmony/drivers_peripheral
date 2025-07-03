@@ -228,7 +228,7 @@ void HosV4L2UVC::V4L2UvcEnmeDevices()
     std::string name = DEVICENAMEX;
     char devName[16] = {0};
     std::string cameraId = "uvcvideo";
-    int rc = 0;
+    RetCode rc = 0;
     int fd = 0;
 
     for (int j = 0; j < MAXVIDEODEVICE; ++j) {

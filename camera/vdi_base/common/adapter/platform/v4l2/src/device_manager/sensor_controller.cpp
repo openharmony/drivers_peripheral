@@ -882,7 +882,7 @@ RetCode SensorController::SendFocusRegionsMetaData(common_metadata_header_t *dat
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AF_REGIONS, &entry);
     if (ret == 0) {
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             afRegions.push_back(*(entry.data.i32 + i));
             CAMERA_LOGI("Set afRegions [%{public}d]", *(entry.data.i32 + i));
         }
