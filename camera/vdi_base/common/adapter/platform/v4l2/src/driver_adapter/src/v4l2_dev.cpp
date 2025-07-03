@@ -125,7 +125,7 @@ RetCode HosV4L2Dev::Init(const std::vector<std::string>& cameraIDs)
 
 RetCode HosV4L2Dev::ReqBuffers(const std::string& cameraID, unsigned int buffCont)
 {
-    int rc;
+    RetCode rc;
     int fd;
     CAMERA_LOGI("HosV4L2Dev::ReqBuffers enters %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);
@@ -186,7 +186,7 @@ RetCode HosV4L2Dev::CreatBuffer(const std::string& cameraID, const std::shared_p
 
 RetCode HosV4L2Dev::QueueBuffer(const std::string& cameraID, const std::shared_ptr<FrameSpec>& frameSpec)
 {
-    int rc;
+    RetCode rc;
     int fd;
     CAMERA_LOGI("HosV4L2Dev::QueueBuffer in %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);
@@ -212,7 +212,7 @@ RetCode HosV4L2Dev::QueueBuffer(const std::string& cameraID, const std::shared_p
 RetCode HosV4L2Dev::ReleaseBuffers(const std::string& cameraID)
 {
     int fd;
-    int rc = 0;
+    RetCode rc = 0;
     CAMERA_LOGI("HosV4L2Dev::ReleaseBuffers in %{public}s\n", cameraID.c_str());
     if (myBuffers_ == nullptr) {
         CAMERA_LOGE("ReleaseBuffers myBuffers_ is NULL\n");
@@ -617,7 +617,7 @@ RetCode HosV4L2Dev::SetNumberCtrls(const std::string& cameraID, std::vector<Devi
 RetCode HosV4L2Dev::GetControls(const std::string& cameraID, std::vector<DeviceControl>& control)
 {
     int fd;
-    int rc;
+    RetCode rc;
     CAMERA_LOGI("GetControls enter, cameraID = %{public}s\n", cameraID.c_str());
     if (myControl_ == nullptr) {
         myControl_ = std::make_shared<HosV4L2Control>();
@@ -763,7 +763,7 @@ RetCode HosV4L2Dev::SetV4L2DevCallback(BufCallback cb)
 }
 RetCode HosV4L2Dev::Flush(const std::string& cameraID)
 {
-    int rc;
+    RetCode rc;
     int fd;
     CAMERA_LOGI("Flush enter, cameraID = %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);

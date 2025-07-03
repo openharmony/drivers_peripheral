@@ -204,7 +204,7 @@ void CodecNode::EncodeJpegToMemory(const ImageData& imageData, JpegData jpegData
         jpeg_write_marker(&cInfo, JPEG_COM, (const JOCTET*)comment, strlen(comment));
     }
 
-    rowStride = jpegData.width;
+    rowStride = static_cast<uint32_t>(jpegData.width);
     while (cInfo.next_scanline < cInfo.image_height) {
         uint32_t imageDataIndex = cInfo.next_scanline * rowStride * pixelsThick;
         if (imageDataIndex >= imageData.size) {

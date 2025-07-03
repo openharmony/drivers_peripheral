@@ -228,7 +228,7 @@ void HosV4L2UVC::V4L2UvcEnmeDevices()
     std::string name = DEVICENAMEX;
     char devName[16] = {0};
     std::string cameraId = "uvcvideo";
-    int rc = 0;
+    RetCode rc = 0;
     int fd = 0;
 
     for (int j = 0; j < MAXVIDEODEVICE; ++j) {
@@ -344,7 +344,7 @@ void HosV4L2UVC::loopUvcDevice()
             usleep(delayTime);
             constexpr uint32_t buffSize = 4096;
             char buf[buffSize] = {};
-            unsigned int len = recv(uDevFd, buf, sizeof(buf), 0);
+            unsigned int len = static_cast<unsigned int>(recv(uDevFd, buf, sizeof(buf), 0));
             if (CheckBuf(len, buf)) {
                 return;
             }
