@@ -396,7 +396,7 @@ RetCode HosV4L2Buffers::SetAdapterBuffer(int fd, struct v4l2_buffer &buf, const 
 {
     CAMERA_LOGI("HosV4L2Buffers::SetAdapterBuffer in.");
     RetCode ret = 0;
-    int32_t index = frameSpec->buffer_->GetIndex();
+    uint32_t index = static_cast<uint32_t>(frameSpec->buffer_->GetIndex());
 
     auto findIf = adapterBufferMap_.find(index);
     if (findIf == adapterBufferMap_.end()) {
@@ -450,7 +450,7 @@ RetCode HosV4L2Buffers::SetDmabufOn(struct v4l2_buffer &buf, const std::shared_p
 {
     CAMERA_LOGI("HosV4L2Buffers::SetDmabufOn in.");
     int32_t ret = 0;
-    int32_t index = static_cast<int32_t>(frameSpec->buffer_->GetIndex());
+    uint32_t index = static_cast<uint32_t>(frameSpec->buffer_->GetIndex());
 
     int heapfd = open(DMA_BUF_FILE_NAME.c_str(), O_RDONLY | O_CLOEXEC);
     if (heapfd < 0) {
