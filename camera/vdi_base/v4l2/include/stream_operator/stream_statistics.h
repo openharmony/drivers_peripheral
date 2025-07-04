@@ -43,7 +43,7 @@ public:
     void CalculateFps(int interval);
 
 private:
-    int32_t streamId_;
+    int32_t streamId_ = 0;
     uint32_t requestBufferSuccessCount_;
     uint32_t lastRequestBufferCount_ = 0;
     uint32_t requestBufferFailCount_;

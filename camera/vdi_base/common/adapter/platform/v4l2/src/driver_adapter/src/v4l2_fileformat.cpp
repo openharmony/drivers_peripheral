@@ -299,8 +299,8 @@ RetCode HosFileFormat::V4L2GetCropCap(int fd, DeviceFormat& format)
     format.cropcap.defrect.top = cropcap.defrect.top;
     format.cropcap.defrect.width = cropcap.defrect.width;
 
-    format.cropcap.pixelaspect.denominator = cropcap.pixelaspect.denominator;
-    format.cropcap.pixelaspect.numerator = cropcap.pixelaspect.numerator;
+    format.cropcap.pixelaspect.denominator = static_cast<int32_t>(cropcap.pixelaspect.denominator);
+    format.cropcap.pixelaspect.numerator = static_cast<int32_t>(cropcap.pixelaspect.numerator);
 
     return RC_OK;
 }
