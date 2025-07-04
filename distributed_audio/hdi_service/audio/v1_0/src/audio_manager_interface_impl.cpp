@@ -268,7 +268,14 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
         GetAnonyString(event.adapterName).c_str(), event.dhId);
     std::stringstream ss;
     ss << "EVENT_TYPE=" << event.eventType << ";NID=" << event.adapterName << ";PIN=" << event.dhId << ";VID=" <<
-        event.volGroupId << ";IID=" << event.iptGroupId << ";CAPS=" << event.caps;
+        event.volGroupId << ";IID=" << event.iptGroupId;
+
+    if (event.caps.find("Daudio") == std::string::npos) {
+        DHLOGI("Not daudio.");
+        ss << ";CAPS=" << event.caps;
+    } else {
+        DHLOGI("Is daudio.");
+    }
 
     std::string eventInfo = ss.str();
     int ret = HdfDeviceObjectSetServInfo(deviceObject_, eventInfo.c_str());
