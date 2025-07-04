@@ -253,6 +253,10 @@ int32_t DCameraProvider::RegisterCameraHdfListener(const std::string &serviceNam
     const sptr<IDCameraHdfCallback> &callbackObj)
 {
     DHLOGI("Register camera HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    if (callbackObj == nullptr) {
+        DHLOGE("dcamera hdf callback is null.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     OHOS::sptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
     if (dCameraHost == nullptr) {
         DHLOGE("dcamera host is null.");
