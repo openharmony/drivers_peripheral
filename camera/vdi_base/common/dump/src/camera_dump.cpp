@@ -251,7 +251,7 @@ bool CameraDumper::SaveDataToFile(const char *fileName, const void *data, uint32
     std::stringstream mkdirCmd;
     mkdirCmd << "mkdir -p " << DUMP_PATH;
     system(mkdirCmd.str().c_str());
-    if (access(DUMP_PATH.c_str(), F_OK) != 0 || access(DUMP_PATH.c_str(), R_OK | W_OK) != 0) {
+    if (access(DUMP_PATH.c_str(), F_OK) != 0 || access(DUMP_PATH.c_str(), W_OK) != 0) {
         CAMERA_LOGE("dump path <%{public}s> not exist, error: %{public}s", DUMP_PATH.c_str(), std::strerror(errno));
         return false;
     }
