@@ -85,8 +85,8 @@ RetCode HosV4L2Streams::V4L2StreamFPSSet(int fd, DeviceFormat& format)
 
     Stream_Parm.type = bufferType_;
 
-    Stream_Parm.parm.capture.timeperframe.denominator = static_cast<int32_t>(format.fmtdesc.fps.denominator);
-    Stream_Parm.parm.capture.timeperframe.numerator = static_cast<int32_t>(format.fmtdesc.fps.numerator);
+    Stream_Parm.parm.capture.timeperframe.denominator = static_cast<uint32_t>(format.fmtdesc.fps.denominator);
+    Stream_Parm.parm.capture.timeperframe.numerator = static_cast<uint32_t>(format.fmtdesc.fps.numerator);
 
     rc = ioctl(fd, VIDIOC_S_PARM, &Stream_Parm);
     if (rc < 0) {
