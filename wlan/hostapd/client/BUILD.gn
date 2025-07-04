@@ -83,7 +83,10 @@ if (defined(ohos_lite)) {
       "-Wl,--exclude-libs=ALL",
       "-Wl,--gc-sections",
     ]
-    install_images = [ chipset_base_dir ]
+    install_images = [
+      chipset_base_dir,
+      updater_vendor_base_dir
+    ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_wlan"
   }

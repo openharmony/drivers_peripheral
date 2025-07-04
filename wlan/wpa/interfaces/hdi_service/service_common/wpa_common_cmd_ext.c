@@ -206,6 +206,29 @@ static int32_t StartWpaSupplicant(const char *moduleName, const char *startCmd)
     return HDF_SUCCESS;
 }
 
+static void HdfWpaInterfaceDriverInit(void)
+{
+    static bool flag = false;
+    if (!flag) {
+        HDF_LOGI("HdfWpaInterfaceDriverInit enter.");
+        DListHeadInit(&(HdfWpaStubDriver()->remoteListHead));
+        if (OsalMutexInit(&(HdfWpaStubDriver()->mutex)) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: Mutex init failed", __func__);
+        }
+        flag = true;
+    }
+}
+
+static const char *GetWpaStartCmd(void)
+{
+    if (IsUpdaterMode()) {
+        HdfWpaInterfaceDriverInit();
+        HDF_LOGI("updater mode");
+        return START_CMD_UPDATER;
+    }
+    return START_CMD;
+}
+
 static void RemoveLostCtrl(void)
 {
     DIR *dir = NULL;
@@ -247,7 +270,7 @@ int32_t WpaInterfaceStart(struct IWpaInterface *self)
     }
     pthread_mutex_lock(GetInterfaceLock());
     RemoveLostCtrl();
-    ret = StartWpaSupplicant(WPA_SUPPLICANT_NAME, START_CMD);
+    ret = StartWpaSupplicant(WPA_SUPPLICANT_NAME, GetWpaStartCmd());
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: StartWpaSupplicant failed, error code: %{public}d", __func__, ret);
         pthread_mutex_unlock(GetInterfaceLock());
@@ -304,6 +327,15 @@ int32_t WpaInterfaceStop(struct IWpaInterface *self)
     return HDF_SUCCESS;
 }
 
+static const char *GetWpaSupplicantConfPath(void)
+{
+    if (IsUpdaterMode()) {
+        HDF_LOGI("updater mode");
+        return CONFIG_ROOR_DIR_UPDATER"/wpa_supplicant/wpa_supplicant.conf";
+    }
+    return CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf";
+}
+
 int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, const char *confName)
 {
     (void)self;
@@ -323,7 +355,7 @@ int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, 
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
         if (strcpy_s(addInterface.name, sizeof(addInterface.name) - 1, ifName) != EOK ||
             strcpy_s(addInterface.confName, sizeof(addInterface.confName) - 1,
-            CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != EOK) {
+            GetWpaSupplicantConfPath()) != EOK) {
             pthread_mutex_unlock(GetInterfaceLock());
             return HDF_FAILURE;
         }
