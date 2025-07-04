@@ -502,9 +502,17 @@ DCamRetCode DCameraHost::RegisterCameraHdfListener(const std::string &serviceNam
     const sptr<IDCameraHdfCallback> &callbackObj)
 {
     DHLOGI("Register camera HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    if (callbackObj == nullptr) {
+        DHLOGE("dcamera hdf callback is null.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraHdfCallback>(callbackObj);
     if (remote == nullptr) {
         DHLOGE("Remote callback is nullptr.");
+        return DCamRetCode::FAILED;
+    }
+    if (dCameraHostRecipient_ == nullptr) {
+        DHLOGE("dcamera host recipient is null.");
         return DCamRetCode::FAILED;
     }
     if (!remote->AddDeathRecipient(dCameraHostRecipient_)) {
