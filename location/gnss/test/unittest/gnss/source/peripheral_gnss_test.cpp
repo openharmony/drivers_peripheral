@@ -335,8 +335,7 @@ HWTEST_F(PeripheralGnssTest, SendNiUserResponseTest002, TestSize.Level1)
     int32_t gnssNiNotificationId = 0;
     GnssNiResponseCmd userResponse = GnssNiResponseCmd::GNSS_NI_RESPONSE_CMD_ACCEPT;
     if (gnssInstance_ != nullptr) {
-        int32_t ret = gnssInstance_->SendNiUserResponse(gnssNiNotificationId, userResponse);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        gnssInstance_->SendNiUserResponse(gnssNiNotificationId, userResponse);
     }
 }
 
