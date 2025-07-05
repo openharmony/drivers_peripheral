@@ -61,6 +61,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "src/bluetooth_a2dp_src_observer.cpp",
     "src/fast_audio_render.cpp",
     "src/audio_capture.cpp",
+    "src/audio_hearing_aid.cpp",
   ]
 
   include_dirs = [

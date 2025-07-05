@@ -1,5 +1,5 @@
 {
-    "adapterNum": 6,
+    "adapterNum": 7,
     "adapters": [{
         "name": "internal",
         "portnum": 2,
@@ -65,6 +65,15 @@
         "portnum": 1,
         "port": [{
             "dir": "PORT_IN",
+            "id": 0,
+            "name": "AIP"
+        }]
+    },
+    {
+        "name": "bt_hearing_aid",
+        "portnum": 1,
+        "port": [{
+            "dir": "PORT_OUT",
             "id": 0,
             "name": "AIP"
         }]

@@ -49,6 +49,9 @@ bool SetupBluetoothInterface(struct AudioHwAdapter *hwAdapter, const struct Audi
     } else if (strcmp(desc->adapterName, "bt_hdap") == 0) {
         HDF_LOGI("%{public}s, hdap set up", __func__);
         ret = OHOS::Bluetooth::SetUpCapture();
+    } else if (strcmp(desc->adapterName, "bt_hearing_aid") == 0) {
+        HDF_LOGI("%{public}s, hearing aid set up", __func__);
+        ret = OHOS::Bluetooth::SetUpHearingAid();
     } else {
         HDF_LOGI("%{public}s, normal set up", __func__);
         ret = OHOS::Bluetooth::SetUp();
@@ -60,18 +63,18 @@ bool SetupBluetoothInterface(struct AudioHwAdapter *hwAdapter, const struct Audi
 int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
                                 struct AudioAdapter **adapter)
 {
-    HDF_LOGD("%s", __func__);
+    HDF_LOGD("%{public}s", __func__);
     if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    HDF_LOGI("%s: adapter name %s", __func__, desc->adapterName);
+    HDF_LOGI("%{public}s: adapter name %{public}s", __func__, desc->adapterName);
     if (AudioAdapterExist(desc->adapterName)) {
-        HDF_LOGE("%s: not supported this adapter %s", __func__, desc->adapterName);
+        HDF_LOGE("%{public}s: not supported this adapter %{public}s", __func__, desc->adapterName);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(calloc(1, sizeof(*hwAdapter)));
     if (hwAdapter == NULL) {
-        HDF_LOGE("%s: calloc AudioHwAdapter failed", __func__);
+        HDF_LOGE("%{public}s: calloc AudioHwAdapter failed", __func__);
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
@@ -88,7 +91,7 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     hwAdapter->adapterDescriptor = *desc;
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
     hwAdapter->adapterMgrCaptureFlag = 0;
-    HDF_LOGI("%s call bluetooth RegisterObserver interface", __func__);
+    HDF_LOGI("%{public}s call bluetooth RegisterObserver interface", __func__);
     if (!SetupBluetoothInterface(hwAdapter, desc)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -104,6 +107,7 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
 #ifdef A2DP_HDI_SERVICE
     bool isFastAdapter = (strcmp(hwAdapter->adapterDescriptor.adapterName, "bt_a2dp_fast") == 0);
     bool isHdapAdapter = (strcmp(hwAdapter->adapterDescriptor.adapterName, "bt_hdap") == 0);
+    bool isHearingAidAdapter = (strcmp(hwAdapter->adapterDescriptor.adapterName, "bt_hearing_aid") == 0);
 #endif
     if (hwAdapter->portCapabilitys != NULL) {
         int32_t portNum = hwAdapter->adapterDescriptor.portNum;
@@ -126,6 +130,8 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
         OHOS::Bluetooth::FastTearDown();
     } else if (isHdapAdapter) {
         OHOS::Bluetooth::TearDownCapture();
+    } else if (isHearingAidAdapter) {
+        OHOS::Bluetooth::TearDownHearingAid();
     } else {
         OHOS::Bluetooth::TearDown();
     }
