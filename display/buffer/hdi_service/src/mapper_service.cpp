@@ -203,7 +203,7 @@ int32_t MapperService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handl
         return ec;
     }
 
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_DEV_ERR_NO_MEMORY);
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
 
     handle = new NativeBuffer();
     if (handle == nullptr) {
@@ -221,7 +221,7 @@ int32_t MapperService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handl
 int32_t MapperService::IsSupportAllocPassthrough(const AllocInfo& info)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    HdfTrace traceOne("IsSupportAllocPassthrough-VDI", "HDI:VID:");
+    HdfTrace traceOne("IsSupportAllocPassthrough-VDI", "HDI:VDI:");
     return vdiImpl_->IsSupportAllocPassthrough(info);
 }
 } // namespace V1_2
