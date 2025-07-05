@@ -30,7 +30,7 @@ namespace V1_0 {
 #define DISPLAY_BUFFER_VDI_DEFAULT_LIBRARY "libdisplay_buffer_vdi_impl_default.z.so"
 #endif // BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
 #define DISPLAY_BUFFER_VDI_LIBRARY "libdisplay_buffer_vdi_impl.z.so"
-#define NOT_SUPPORT -2
+#define NOT_SUPPORT (-2)
 
 class IDisplayBufferVdi {
 public:
