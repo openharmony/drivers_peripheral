@@ -56,7 +56,7 @@ ohos_unittest("HDIServiceAudioCaptureExtTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
-    "drivers_interface_distributed_audio:libdaudioext_stub_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_2.1",
     "googletest:gmock",
     "hilog:libhilog",
     "ipc:ipc_core",

@@ -22,7 +22,7 @@
 
 #include <v1_0/iaudio_adapter.h>
 #include <v1_0/audio_types.h>
-#include <v2_0/id_audio_manager.h>
+#include <v2_1/id_audio_manager.h>
 
 #include "audio_capture_interface_impl.h"
 #include "audio_capture_interface_impl_base.h"
@@ -38,10 +38,10 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::PortOperationMode;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::PortOperationMode;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
 using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortPin;
 
 typedef enum {
@@ -186,8 +186,8 @@ private:
     uint32_t streamMuteStatus_ = 0;
 
     // mmap param
-    PortOperationMode renderFlags_ = Audioext::V2_0::NORMAL_MODE;
-    PortOperationMode capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
+    PortOperationMode renderFlags_ = Audioext::V2_1::NORMAL_MODE;
+    PortOperationMode capturerFlags_ = Audioext::V2_1::NORMAL_MODE;
 
     const std::string NOT_MUTE_STATUS = "0";
     const std::string IS_MUTE_STATUS = "1";
