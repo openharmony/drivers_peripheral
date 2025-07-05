@@ -16,6 +16,7 @@
 #ifndef OHOS_DCAMERA_TEST_UTILS_H
 #define OHOS_DCAMERA_TEST_UTILS_H
 
+#include <iremote_proxy.h>
 #include <v1_1/id_camera_provider.h>
 
 namespace OHOS {
@@ -27,6 +28,56 @@ public:
     virtual ~MockIDCameraHdfCallback() = default;
 
     int32_t NotifyEvent(int32_t devId, const DCameraHDFEvent& event) override
+    {
+        return 0;
+    }
+};
+class MockIRemoteObject : public IRemoteObject {
+public:
+    MockIRemoteObject() : IRemoteObject {u"MockIRemoteObject"}
+    {
+    }
+
+    ~MockIRemoteObject()
+    {
+    }
+
+    int32_t GetObjectRefCount()
+    {
+        return 0;
+    }
+
+    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    {
+        return 0;
+    }
+
+    bool IsProxyObject() const
+    {
+        return true;
+    }
+
+    bool CheckObjectLegality() const
+    {
+        return true;
+    }
+
+    bool AddDeathRecipient(const sptr<DeathRecipient> &recipient)
+    {
+        return true;
+    }
+
+    bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient)
+    {
+        return true;
+    }
+
+    sptr<IRemoteBroker> AsInterface()
+    {
+        return nullptr;
+    }
+
+    int Dump(int fd, const std::vector<std::u16string> &args)
     {
         return 0;
     }
