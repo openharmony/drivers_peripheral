@@ -58,6 +58,35 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetLatency_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     uint32_t ms = 12;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetLatency(ms));
+}
+
+/**
+ * @tc.name: GetLatency_002
+ * @tc.desc: Verify the GetLatency function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, GetLatency_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    uint32_t ms = 12;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetLatency(ms));
+}
+
+/**
+ * @tc.name: GetLatency_003
+ * @tc.desc: Verify the GetLatency function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, GetLatency_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    uint32_t ms = 12;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetLatency(ms));
 }
 
@@ -118,6 +147,37 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetRenderPosition_001, TestSize.Level1)
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     uint64_t frames = 0;
     AudioTimeStamp time;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetRenderPosition(frames, time));
+}
+
+/**
+ * @tc.name: GetRenderPosition_002
+ * @tc.desc: Verify the GetRenderPosition function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, GetRenderPosition_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    uint64_t frames = 0;
+    AudioTimeStamp time;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetRenderPosition(frames, time));
+}
+
+/**
+ * @tc.name: GetRenderPosition_003
+ * @tc.desc: Verify the GetRenderPosition function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, GetRenderPosition_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    uint64_t frames = 0;
+    AudioTimeStamp time;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetRenderPosition(frames, time));
 }
 
