@@ -226,7 +226,7 @@ int32_t MapperService::IsSupportAllocPassthrough(const AllocInfo& info)
 }
 
 int32_t MapperService::ReAllocMem(const AllocInfo& info,
-    sptr<NativeBuffer>& inBuffer, sptr<NativeBuffer>& outBuffer)
+    const sptr<NativeBuffer>& inBuffer, sptr<NativeBuffer>& outBuffer)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     BufferHandle* inHandle = inBuffer->GetBufferHandle();
