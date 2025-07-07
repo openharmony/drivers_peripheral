@@ -44,12 +44,10 @@ ohos_unittest("test_transfer") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -90,12 +88,10 @@ ohos_unittest("test_hubdevice") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
       "drivers_interface_usb:libusb_proxy_2.0",
     ]
 
@@ -139,12 +135,10 @@ ohos_unittest("test_device") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -183,13 +177,11 @@ ohos_unittest("test_function") {
       "drivers_interface_usb:libusb_proxy_1.1",
       "drivers_interface_usb:libusb_proxy_1.2",
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -235,12 +227,10 @@ ohos_unittest("test_request") {
       "drivers_interface_usb:libusb_proxy_1.0",
       "drivers_interface_usb:libusb_proxy_1.1",
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -279,7 +269,6 @@ ohos_unittest("test_usbfnmtp") {
       "drivers_interface_usb:libusb_proxy_1.1",
       "drivers_interface_usb:libusb_proxy_1.2",
       "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
@@ -315,12 +304,10 @@ ohos_unittest("test_manageinterface") {
       "drivers_interface_usb:libusb_proxy_1.0",
       "drivers_interface_usb:libusb_proxy_1.1",
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -360,12 +347,10 @@ ohos_unittest("test_devicestatus") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -405,12 +390,10 @@ ohos_unittest("test_accessory") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -450,12 +433,10 @@ ohos_unittest("test_interrupt_transfer") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -496,13 +477,11 @@ ohos_unittest("test_asyncBulkTransfer") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
       "libusb:libusb",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -543,13 +522,11 @@ ohos_unittest("test_asyncInterruptTransfer") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
       "libusb:libusb",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -590,13 +567,11 @@ ohos_unittest("test_asyncIsoTransfer") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
       "libusb:libusb",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -629,13 +604,11 @@ ohos_unittest("test_serial") {
     external_deps = [
       "drivers_interface_usb:libserial_proxy_1.0",
       "drivers_interface_usb:libserial_stub_1.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
