@@ -224,6 +224,35 @@ int32_t MapperService::IsSupportAllocPassthrough(const AllocInfo& info)
     HdfTrace traceOne("IsSupportAllocPassthrough-VDI", "HDI:VDI:");
     return vdiImpl_->IsSupportAllocPassthrough(info);
 }
+
+int32_t MapperService::ReAllocMem(const AllocInfo& info,
+    sptr<NativeBuffer>& inBuffer, sptr<NativeBuffer>& outBuffer)
+{
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    BufferHandle* inHandle = inBuffer->GetBufferHandle();
+    BufferHandle* outHandle = nullptr;
+    HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
+
+    int32_t ec = vdiImpl_->ReAllocMem(info, *inHandle, outHandle);
+    if (ec != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: ReAllocMem failed, ec = %{public}d", __func__, ec);
+        return ec;
+    }
+
+    CHECK_NULLPOINTER_RETURN_VALUE(outHandle, HDF_FAILURE);
+
+    outBuffer = new NativeBuffer();
+    if (outBuffer == nullptr) {
+        HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
+        FreeMemVdi(outBuffer);
+        return HDF_FAILURE;
+    }
+
+    outBuffer->SetBufferHandle(outHandle, true, [this](BufferHandle* freeBuffer) {
+        FreeMemVdi(freeBuffer);
+    });
+    return HDF_SUCCESS;
+}
 } // namespace V1_2
 } // namespace Buffer
 } // namespace Display
