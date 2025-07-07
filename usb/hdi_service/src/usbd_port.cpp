@@ -200,6 +200,7 @@ void UsbdPort::setPortPath(const std::string &path)
     DIR *dir = opendir(path.c_str());
     if (dir == nullptr) {
         HDF_LOGE("%{public}s: Failed to open directory: %{public}s", __func__, path.c_str());
+        return;
     }
     struct dirent *entry;
     while ((entry = readdir(dir)) != nullptr) {
