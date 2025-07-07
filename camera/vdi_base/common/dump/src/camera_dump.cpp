@@ -141,7 +141,7 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
     uint32_t size = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferSize() : buffer->GetSize();
     const std::string DqBufferName = "DQBuffer";
     if (name != DqBufferName) {
-        size = buffer->GetEsFrameInfo().size > 0 ? buffer->GetEsFrameInfo().size : size;
+        size = buffer->GetEsFrameInfo().size > 0 ? static_cast<uint32_t>(buffer->GetEsFrameInfo().size) : size;
     }
 
     std::stringstream ss;
