@@ -244,7 +244,7 @@ int32_t MapperService::ReAllocMem(const AllocInfo& info,
     outBuffer = new NativeBuffer();
     if (outBuffer == nullptr) {
         HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
-        FreeMemVdi(outBuffer);
+        FreeMemVdi(outHandle);
         return HDF_FAILURE;
     }
 
