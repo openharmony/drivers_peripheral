@@ -6,22 +6,17 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
-#include "codec_heif_helper.h"
+#ifndef IMAGE_DO_HEIF_DECODE_FUZZER
+#define IMAGE_DO_HEIF_DECODE_FUZZER
 
-int main(int argc, char *argv[])
-{
-    OHOS::VDI::HEIF::CommandOpt opt = OHOS::VDI::HEIF::Parse(argc, argv);
-    if (!opt.isGetHelpInfoOnly) {
-        opt.Print();
-        OHOS::VDI::HEIF::HeifEncoderHelper obj(opt);
-        obj.DoEncode();
-    }
-    return 0;
-}
+#define FUZZ_PROJECT_NAME "imagedoheifdecode_fuzzer"
+
+
+#endif
