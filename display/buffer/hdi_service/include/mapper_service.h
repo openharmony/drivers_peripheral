@@ -43,7 +43,7 @@ public:
     int32_t AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle) override;
     int32_t IsSupportAllocPassthrough(const AllocInfo& info) override;
     int32_t ReAllocMem(const OHOS::HDI::Display::Buffer::V1_0::AllocInfo& info,
-        sptr<NativeBuffer>& inHandle, sptr<NativeBuffer>& outHandle) override;
+        const sptr<NativeBuffer>& inHandle, sptr<NativeBuffer>& outHandle) override;
 
 private:
     int32_t LoadVdi();
