@@ -69,7 +69,8 @@ void DisplayBenchmarkTest::TestRefreshCallback(uint32_t devId, void* data)
 {
 }
 
-void DisplayBenchmarkTest::OnHwcEvent(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void *data)
+void DisplayBenchmarkTest::OnHwcEvent(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData,
+                                      void *data)
 {
 }
 
