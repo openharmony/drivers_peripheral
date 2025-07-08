@@ -265,6 +265,8 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<SetDisplayPerFrameParameterFunc>(dlsym(libHandle_, "SetDisplayPerFrameParameter"));
     vdiAdapter_->GetDisplayIdentificationData =
         reinterpret_cast<GetDisplayIdentificationDataFunc>(dlsym(libHandle_, "GetDisplayIdentificationData"));
+    vdiAdapter_->RegHwcEventCallback =
+        reinterpret_cast<RegHwcEventCallbackFunc>(dlsym(libHandle_, "RegHwcEventCallback"));
 }
 
 void DisplayComposerService::HidumperInit()
