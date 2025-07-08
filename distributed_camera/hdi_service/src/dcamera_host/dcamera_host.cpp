@@ -498,6 +498,7 @@ std::string DCameraHost::GetDcameraIdById(const std::string &cameraId)
     return iter->second;
 }
 
+//LCOV_EXCL_START
 DCamRetCode DCameraHost::RegisterCameraHdfListener(const std::string &serviceName,
     const sptr<IDCameraHdfCallback> &callbackObj)
 {
@@ -528,6 +529,7 @@ DCamRetCode DCameraHost::RegisterCameraHdfListener(const std::string &serviceNam
     DHLOGI("Register camera HDF listener suncess, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
     return DCamRetCode::SUCCESS;
 }
+//LCOV_EXCL_STOP
 
 DCamRetCode DCameraHost::UnRegisterCameraHdfListener(const std::string &serviceName)
 {
@@ -552,6 +554,7 @@ DCamRetCode DCameraHost::UnRegisterCameraHdfListener(const std::string &serviceN
     return DCamRetCode::SUCCESS;
 }
 
+//LCOV_EXCL_START
 void DCameraHost::ClearRegisterRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     DHLOGI("Remote died, remote dcamera device begin.");
@@ -568,6 +571,7 @@ void DCameraHost::DCameraHostRecipient::OnRemoteDied(const wptr<IRemoteObject> &
     DHLOGE("Exit the current process.");
     _Exit(0);
 }
+//LCOV_EXCL_STOP
 
 int32_t DCameraHost::AddClearRegisterRecipient(sptr<IRemoteObject> &remote, const DHBase &dhBase)
 {
