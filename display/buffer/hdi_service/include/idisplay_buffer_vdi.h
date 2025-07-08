@@ -155,6 +155,12 @@ public:
     {
         return NOT_SUPPORT;
     }
+
+    virtual int32_t ReAllocMem(const OHOS::HDI::Display::Buffer::V1_0::AllocInfo& info,
+        const BufferHandle& inHandle, BufferHandle*& outHandle) const
+    {
+        return NOT_SUPPORT;
+    }
 };
 
 using CreateDisplayBufferVdiFunc = IDisplayBufferVdi* (*)();
