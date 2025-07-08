@@ -39,6 +39,7 @@ if (defined(ohos_lite)) {
         #"unittest/dump:dump_unittest_sensor",
         "unittest/hdi:hdi_unittest_sensor",
         "unittest/sensor_test_multi_clients:SensorTestMultiClients",
+        "unittest/sensor_test_three_clients:SensorTestThreeClients",
       ]
     }
   }
