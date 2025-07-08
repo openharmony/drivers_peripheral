@@ -503,10 +503,10 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest, TestSize.Level1)
     EXPECT_NE(inBuffer, nullptr);
 
     BufferHandle* outBuffer = nullptr;
-    AllocInfo newinfo = {
+    AllocInfo newInfo = {
         .width = ALLOC_SIZE_1920,
         .height = ALLOC_SIZE_1080,
-        .usage = HBM_USE_MEM_DMA | HBM_USE_VIDEO_DECODER | HBM_USE_HW_COMPOSER,
+        .usage = HBM_USE_MEM_DMA | Composer::V1_0::HBM_USE_VIDEO_DECODER | Composer::V1_0::HBM_USE_HW_COMPOSER,
         .format = PIXEL_FMT_YCBCR_420_P
     };
 
@@ -521,12 +521,12 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest, TestSize.Level1)
     EXPECT_EQ(outBuffer->size, inBuffer->size);
     EXPECT_NE(outBuffer->fd, inBuffer->fd);
 
-    AllocInfo nullInfo = new AllocInfo();
+    AllocInfo nullInfo;
     ret = displayBuffer_->ReAllocMem(nullInfo, *inBuffer, outBuffer);
     EXPECT_TRUE(ret != DISPLAY_SUCCESS);
 
     displayBuffer_->FreeMem(*inBuffer);
-    displayBuffer_->FreeMem(outBuffer);
+    displayBuffer_->FreeMem(*outBuffer);
 }
 
 int32_t DisplayBufferUt::PassthroughTest(AllocInfo& info)
