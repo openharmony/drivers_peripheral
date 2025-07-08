@@ -496,19 +496,19 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest, TestSize.Level1)
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_YCBCR_420_P
-    }
+    };
     BufferHandle* inBuffer = nullptr;
     ret = displayBuffer_->AllocMem(info, inBuffer);
     EXPECT_TRUE(ret == DISPLAY_SUCCESS);
     EXPECT_NE(inBuffer, nullptr);
 
-    BuuferHandle* outBuffer = nullptr;
+    BufferHandle* outBuffer = nullptr;
     AllocInfo newinfo = {
         .width = ALLOC_SIZE_1920,
         .height = ALLOC_SIZE_1080,
         .usage = HBM_USE_MEM_DMA | HBM_USE_VIDEO_DECODER | HBM_USE_HW_COMPOSER,
         .format = PIXEL_FMT_YCBCR_420_P
-    }
+    };
 
     ret = displayBuffer_->ReAllocMem(newInfo, nullptr, outBuffer);
     EXPECT_TRUE(ret != DISPLAY_SUCCESS);
@@ -525,8 +525,8 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest, TestSize.Level1)
     ret = displayBuffer_->ReAllocMem(nullInfo, *inBuffer, outBuffer);
     EXPECT_TRUE(ret != DISPLAY_SUCCESS);
 
-    displayBuffer->FreeMem(*inBuffer);
-    displayBuffer->FreeMem(outBuffer);
+    displayBuffer_->FreeMem(*inBuffer);
+    displayBuffer_->FreeMem(outBuffer);
 }
 
 int32_t DisplayBufferUt::PassthroughTest(AllocInfo& info)
@@ -553,7 +553,7 @@ HWTEST_F(DisplayBufferUt, test_PassthroughTest, TestSize.Level1)
         .height = ALLOC_SIZE_1920,
         .usage = TEST_INFO,
         .format = PIXEL_FMT_YCBCR_420_P
-    }
+    };
     int ret = PassthroughTest(info);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS);
 }
