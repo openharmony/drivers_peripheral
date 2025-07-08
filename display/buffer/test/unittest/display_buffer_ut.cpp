@@ -510,7 +510,8 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest, TestSize.Level1)
         .format = PIXEL_FMT_YCBCR_420_P
     };
 
-    ret = displayBuffer_->ReAllocMem(newInfo, nullptr, outBuffer);
+    BufferHandle* nullBuffer = nullptr;
+    ret = displayBuffer_->ReAllocMem(newInfo, *nullBuffer, outBuffer);
     EXPECT_TRUE(ret != DISPLAY_SUCCESS);
 
     ret = displayBuffer_->ReAllocMem(newInfo, *inBuffer, outBuffer);
