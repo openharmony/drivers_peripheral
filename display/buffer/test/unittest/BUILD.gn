@@ -21,6 +21,9 @@ ohos_unittest("hdf_disp_buffer_unittest") {
   defines += display_defines
   module_out_path = module_output_path
   sources = [ "display_buffer_ut.cpp" ]
+  deps = [
+    ":libmapper_service_1.3",
+  ]
 
   external_deps = [
     "c_utils:utils",
