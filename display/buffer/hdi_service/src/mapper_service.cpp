@@ -229,6 +229,7 @@ int32_t MapperService::ReAllocMem(const AllocInfo& info,
     const sptr<NativeBuffer>& inBuffer, sptr<NativeBuffer>& outBuffer)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(inBuffer, HDF_FAILURE);
     BufferHandle* inHandle = inBuffer->GetBufferHandle();
     BufferHandle* outHandle = nullptr;
     HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
