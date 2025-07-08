@@ -21,14 +21,9 @@ ohos_unittest("hdf_disp_buffer_unittest") {
   defines += display_defines
   module_out_path = module_output_path
   sources = [ "display_buffer_ut.cpp" ]
-  deps = [
-    ":libmapper_service_1.3",
-  ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_1",
-    "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_2",
     "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_3",
     "drivers_interface_display:libdisplay_buffer_proxy_1.0",
     "drivers_interface_display:libdisplay_buffer_proxy_1.1",
