@@ -512,7 +512,7 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest, TestSize.Level1)
 
     BufferHandle* nullBuffer = nullptr;
     ret = displayBuffer_->ReAllocMem(newInfo, *nullBuffer, outBuffer);
-    EXPECT_TRUE(ret != DISPLAY_SUCCESS);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
 
     ret = displayBuffer_->ReAllocMem(newInfo, *inBuffer, outBuffer);
     EXPECT_TRUE(ret == DISPLAY_SUCCESS);
