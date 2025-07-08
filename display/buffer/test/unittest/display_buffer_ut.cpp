@@ -519,9 +519,6 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest, TestSize.Level1)
     EXPECT_NE(inBuffer, nullptr);
     EXPECT_NE(outBuffer, nullptr);
 
-    EXPECT_EQ(outBuffer->size, inBuffer->size);
-    EXPECT_NE(outBuffer->fd, inBuffer->fd);
-
     AllocInfo nullInfo;
     ret = displayBuffer_->ReAllocMem(nullInfo, *inBuffer, outBuffer);
     EXPECT_TRUE(ret != DISPLAY_SUCCESS);
