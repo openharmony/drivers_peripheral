@@ -20,7 +20,7 @@
 #include "v1_0/imapper.h"
 #include "v1_1/imetadata.h"
 #include "v1_0/display_buffer_type.h"
-#include "v1_1/include/idisplay_buffer.h"
+#include "v1_3/include/idisplay_buffer.h"
 
 namespace OHOS {
 namespace HDI {
@@ -30,7 +30,7 @@ using OHOS::HDI::Display::Buffer::V1_0::IAllocator;
 using OHOS::HDI::Display::Buffer::V1_0::IMapper;
 using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
 using OHOS::HDI::Display::Buffer::V1_1::IMetadata;
-using OHOS::HDI::Display::Buffer::V1_1::IDisplayBuffer;
+using OHOS::HDI::Display::Buffer::V1_3::IDisplayBuffer;
 
 class DisplayBufferUt : public ::testing::TestWithParam<AllocInfo> {
 protected:
@@ -39,6 +39,7 @@ protected:
 public:
     IDisplayBuffer* displayBuffer_{ nullptr };
     int32_t AllocMemTest(AllocInfo& info);
+    int32_t PassthroughTest(AllocInfo& info);
     void MetadataTest(BufferHandle& handle);
 };
 } // OHOS
