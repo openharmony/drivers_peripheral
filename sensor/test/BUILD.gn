@@ -38,6 +38,7 @@ if (defined(ohos_lite)) {
         "fuzztest:hdf_sensor_fuzztest",
         #"unittest/dump:dump_unittest_sensor",
         "unittest/hdi:hdi_unittest_sensor",
+        "unittest/sensor_test_five_clients:SensorTestFiveClients",
         "unittest/sensor_test_multi_clients:SensorTestMultiClients",
       ]
     }
