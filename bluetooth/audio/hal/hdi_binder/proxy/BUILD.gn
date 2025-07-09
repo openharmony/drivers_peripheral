@@ -49,7 +49,6 @@ ohos_shared_library("audio_bluetooth_hdi_proxy_server") {
   sources = [
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/src/audio_adapter_info_common.cpp",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/src/audio_common.cpp",
-    "//third_party/cJSON/cJSON.c",
     "src/audio_proxy_adapter.cpp",
     "src/audio_proxy_common.cpp",
     "src/audio_proxy_manager.cpp",
