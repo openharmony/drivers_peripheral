@@ -85,6 +85,7 @@ std::shared_ptr<CameraDeviceVdiImpl> CameraDeviceVdiImpl::CreateCameraDevice(con
 int32_t CameraDeviceVdiImpl::GetStreamOperator(const sptr<IStreamOperatorVdiCallback> &callbackObj,
     sptr<IStreamOperatorVdi> &streamOperator)
 {
+    CAMERA_LOGI("CameraDeviceVdiImpl::GetStreamOperator Begin, deviceName = %{public}s", cameraId_.c_str());
     HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;

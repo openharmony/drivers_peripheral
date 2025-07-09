@@ -163,7 +163,6 @@ ohos_benchmarktest("hdi_usb_benchmark_driver_test") {
     "benchmark:benchmark",
     "c_utils:utils",
     "drivers_interface_usb:libusb_ddk_proxy_1.1",
-    "drivers_interface_usb:usb_ddk_idl_headers",
     "googletest:gtest_main",
     "hilog:libhilog",
   ]

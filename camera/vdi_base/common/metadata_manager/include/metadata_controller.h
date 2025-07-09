@@ -44,6 +44,7 @@ public:
     void SetDeviceDefaultMetadata(std::shared_ptr<CameraMetadata> &meta);
     void Start();
     void Stop();
+    bool IsMute();
 
 private:
     MetadataController();
@@ -76,7 +77,7 @@ private:
     std::unordered_set<int32_t> firstNotifyNodes_;
     std::map<int32_t, std::vector<int32_t>> updateMetaDataKeys_;
     std::map<int32_t, std::vector<int32_t>> changeDataKeys_;
-    bool peerFrame_;
+    bool peerFrame_ = false;
     std::vector<int32_t> abilityMetaData_;
     std::mutex dataConfigLock_;
     std::mutex queueLock_;
@@ -85,6 +86,7 @@ private:
     std::atomic_bool isRunning_;
     std::thread *notifyChangedMetadata_ = nullptr;
     bool isInit_ = false;
+    bool isMute_ = false;
 };
 } // namespace Camera
 } // namespace OHOS

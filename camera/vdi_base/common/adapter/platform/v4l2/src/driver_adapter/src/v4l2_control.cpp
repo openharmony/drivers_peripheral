@@ -60,7 +60,7 @@ RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& contro
         if (itrNext == control.end() || itr->ctrl_class != itrNext->ctrl_class) {
             struct v4l2_ext_controls ctrls = {};
             ctrls.ctrl_class = itr->ctrl_class;
-            ctrls.count = count;
+            ctrls.count = static_cast<uint32_t>(count);
             ctrls.controls = cList;
             ret = ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls);
             
@@ -121,7 +121,7 @@ RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& contro
         if (itrNext == control.end() || itr->ctrl_class != itrNext->ctrl_class) {
             struct v4l2_ext_controls ctrls = {};
             ctrls.ctrl_class = itr->ctrl_class;
-            ctrls.count = count;
+            ctrls.count = static_cast<uint16_t>(count);
             ctrls.controls = cList;
             ret = ioctl(fd, VIDIOC_G_EXT_CTRLS, &ctrls);
             V4L2VidiocGExtCtrls(fd, ret, count, cList, control);
@@ -192,7 +192,7 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     DeviceControl& ctrl, v4l2_queryctrl& qCtrl)
 {
     CAMERA_LOGD("V4L2SetValue in fd = %{public}d\n", fd);
-    int value, rc;
+    int value;
 
     ctrl.id = qCtrl.id;
     ctrl.ctrl_class = V4L2_CTRL_ID2CLASS(qCtrl.id);
@@ -210,7 +210,7 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
         return;
     }
 
-    rc = V4L2GetCtrl(fd, qCtrl.id, value);
+    RetCode rc = V4L2GetCtrl(fd, qCtrl.id, value);
     if (rc != RC_ERROR) {
         ctrl.value = value;
         CAMERA_LOGD("%{public}s-14s : id=%{public}x-08x, type=%{public}d, minimum=%{public}d, maximum=%{public}d\n"
@@ -353,7 +353,7 @@ RetCode HosV4L2Control::V4L2GetControls(int fd, std::vector<DeviceControl>& cont
         CAMERA_LOGE("V4L2GetControls no support V4L2_CTRL_FLAG_NEXT_CTRL\n");
         V4L2EnumControls(fd, control);
     } else {
-        CAMERA_LOGE("V4L2GetControls support V4L2_CTRL_FLAG_NEXT_CTRL\n");
+        CAMERA_LOGI("V4L2GetControls support V4L2_CTRL_FLAG_NEXT_CTRL\n");
         V4L2EnumExtControls(fd, control);
     }
     CAMERA_LOGI("V4L2GetControls in fd = %{public}d\n", fd);

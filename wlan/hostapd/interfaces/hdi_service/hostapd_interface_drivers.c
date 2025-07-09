@@ -112,7 +112,7 @@ static int HdfHostapdInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfHostapdInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfHostapdInterfaceDriverRelease enter.");
-    void (*result)(int) = signal(SIGTERM, SIG_IGN);
+    void (*result)(int) = signal(SIGTERM, SIG_DFL);
     if (result == SIG_ERR) {
         HDF_LOGE("Failed to set signal ignore handler for SIGTERM");
     }

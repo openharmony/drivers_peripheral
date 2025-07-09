@@ -180,6 +180,22 @@ int32_t UsbdFunction::ReleaseMtp()
     return ret;
 }
 
+bool UsbdFunction::IsHdcOpen()
+{
+    char persistConfig[UDC_NAME_MAX_LEN] = {0};
+    int32_t ret = GetParameter("persist.sys.usb.config", "invalid", persistConfig, UDC_NAME_MAX_LEN);
+    if (ret <= 0) {
+        HDF_LOGE("%{public}s:GetPersistParameter failed", __func__);
+        return false;
+    }
+    const char HDC_SIGNATURE[] = "hdc";
+    if (strstr(persistConfig, HDC_SIGNATURE) != nullptr) {
+        HDF_LOGI("%{public}s:hdc is opening", __func__);
+        return true;
+    }
+    return false;
+}
+
 int32_t UsbdFunction::RemoveHdc()
 {
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);

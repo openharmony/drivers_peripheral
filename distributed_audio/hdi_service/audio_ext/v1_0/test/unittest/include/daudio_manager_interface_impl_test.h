@@ -27,7 +27,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_0 {
+namespace V2_1 {
 class DAudioManagerInterfaceImplTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -37,7 +37,7 @@ public:
 
     sptr<IDAudioCallback> callbackObj_ = nullptr;
 };
-} // V2_0
+} // V2_1
 } // AudioExt
 } // Distributedaudio
 } // HDI

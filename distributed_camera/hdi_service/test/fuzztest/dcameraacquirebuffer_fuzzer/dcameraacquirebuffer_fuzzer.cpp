@@ -43,6 +43,9 @@ void DcameraAcquireBufferFuzzTest(const uint8_t* data, size_t size)
     buffer.bufferHandle_ = sptr<NativeBuffer>(new NativeBuffer());
 
     DCameraProvider::GetInstance()->AcquireBuffer(dhBase, streamId, buffer);
+    dhBase.deviceId_ = "";
+    int32_t negativeStreamId = -1;
+    DCameraProvider::GetInstance()->AcquireBuffer(dhBase, negativeStreamId, buffer);
 }
 }
 }

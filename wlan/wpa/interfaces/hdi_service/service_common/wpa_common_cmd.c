@@ -35,9 +35,10 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <string.h>
+#include <sys/stat.h>
 #include "hdi_wpa_common.h"
 
-#define BUF_SIZE 512
+#define BUF_SIZE 2048
 
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;
@@ -1086,6 +1087,21 @@ static void AddDeathRecipientForService(struct IWpaCallback *cbFunc)
     HdfRemoteServiceAddDeathRecipient(remote, &g_deathRecipient.recipient);
 }
 
+bool IsUpdaterMode(void)
+{
+    static bool hasRun = false;
+    static bool updaterMode = false;
+    if (hasRun) {
+        return updaterMode;
+    }
+    struct stat st = {};
+    if (stat("/bin/updater", &st) == 0 && S_ISREG(st.st_mode)) {
+        updaterMode = true;
+    }
+    hasRun = true;
+    return updaterMode;
+}
+
 static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
 {
     struct HdfWpaRemoteNode *pos = NULL;
@@ -1111,7 +1127,7 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
     DListInsertTail(&newRemoteNode->node, head);
-    if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0) {
+    if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0 && !IsUpdaterMode()) {
         AddDeathRecipientForService(self);
     }
     return HDF_SUCCESS;

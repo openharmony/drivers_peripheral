@@ -90,7 +90,7 @@ static int32_t DdkListenerMgrNotifyOne(const struct UsbPnpNotifyMatchInfoTable *
         }
 
         if (listener->callBack(listener->priv, handlePriv->cmd, dataTmp) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:callback failed", __func__);
+            HDF_LOGE("%{public}s:callback failed, cmd is %{public}u", __func__, handlePriv->cmd);
             ret = HDF_FAILURE;
         }
     } while (0);

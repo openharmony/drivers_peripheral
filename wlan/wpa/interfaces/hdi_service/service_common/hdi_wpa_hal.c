@@ -21,9 +21,7 @@
 #include "hdi_wpa_hal.h"
 #include "hdi_wpa_common.h"
 #include "wpa_common_cmd.h"
-#ifndef OHOS_EUPDATER
 #include "wpa_client.h"
-#endif
 
 #undef LOG_TAG
 #define LOG_TAG "HdiWpaHal"
@@ -60,6 +58,8 @@
 static const int MAX_IFACE_LEN = 6;
 
 #define WPA_CTRL_OPEN_IFNAME "@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
+
+#define WPA_CTRL_OPEN_IFNAME_UPDATER "@abstract:"CONFIG_ROOR_DIR_UPDATER"/sockets/wpa/wlan0"
 #define P2P_NO_ADD_IFACE_NAME "p2p-dev-wlan0"
 
 static WifiWpaInterface *g_wpaInterface = NULL;
@@ -77,9 +77,14 @@ static int WpaCliConnect(WifiWpaInterface *p)
         return 0;
     }
     int count = WPA_TRY_CONNECT_TIMES;
+    char *ifNamePath = WPA_CTRL_OPEN_IFNAME;
+    if (IsUpdaterMode()) {
+        HDF_LOGI("updater mode");
+        ifNamePath = WPA_CTRL_OPEN_IFNAME_UPDATER;
+    }
     while (count-- > 0) {
-        if (!InitWpaCtrl(&p->staCtrl, WPA_CTRL_OPEN_IFNAME) && !InitWpaCtrl(&p->p2pCtrl, WPA_CTRL_OPEN_IFNAME) &&
-            !InitWpaCtrl(&p->chbaCtrl, WPA_CTRL_OPEN_IFNAME) && !InitWpaCtrl(&p->commonCtrl, WPA_CTRL_OPEN_IFNAME)) {
+        if (!InitWpaCtrl(&p->staCtrl, ifNamePath) && !InitWpaCtrl(&p->p2pCtrl, ifNamePath) &&
+            !InitWpaCtrl(&p->chbaCtrl, ifNamePath) && !InitWpaCtrl(&p->commonCtrl, ifNamePath)) {
             HDF_LOGI("Global wpa interface connect successfully!");
             break;
         } else {
@@ -296,9 +301,7 @@ void ReleaseIfaceCtrl(char *ifName, int len)
         ReleaseWpaCtrl(&(g_wpaInterface->staCtrl));
         ReleaseWpaCtrl(&(g_wpaInterface->p2pCtrl));
         ReleaseWpaCtrl(&(g_wpaInterface->chbaCtrl));
-#ifndef OHOS_EUPDATER
         ReleaseEventCallback();
         ClearHdfWpaRemoteObj();
-#endif
     }
 }

@@ -31,6 +31,10 @@ static const unsigned char EXIF_HEADER[] = {0xff, 0xd8, 0xff, 0xe1};
 
 static const unsigned int EXIF_HEADER_LENGTH = sizeof(EXIF_HEADER);
 
+constexpr uint32_t DEGREE_INDEX = 0; // Index
+constexpr uint32_t MINUTE_INDEX = 1; // Index
+constexpr uint32_t SECOND_INDEX = 2; // Index
+
 #define FILE_BYTE_ORDER EXIF_BYTE_ORDER_INTEL
 
 static ExifEntry *CreateTag(ExifData *exif, ExifIfd ifd, ExifTag tag, size_t len, ExifFormat format)
@@ -47,6 +51,9 @@ static ExifEntry *CreateTag(ExifData *exif, ExifIfd ifd, ExifTag tag, size_t len
     buf = exif_mem_alloc(mem, len);
     assert(buf != nullptr);
 
+    if (!entry) {
+        return nullptr;
+    }
     entry->data = static_cast<unsigned char*>(buf);
     entry->size = len;
     entry->tag = tag;
@@ -118,18 +125,22 @@ uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
     }
 
     ConvertGpsDataToDms(number, &degree, &minute, &second);
-    gpsRational[0].numerator = degree; // Index
-    gpsRational[0].denominator = 1;
-    gpsRational[1].numerator = minute; // Index
-    gpsRational[1].denominator = 1;
-    gpsRational[2].numerator = second; // Index
-    gpsRational[2].denominator = 1;
+    gpsRational[DEGREE_INDEX].numerator = static_cast<uint32_t>(degree); // Index
+    gpsRational[DEGREE_INDEX].denominator = 1;
+    gpsRational[MINUTE_INDEX].numerator = static_cast<uint32_t>(minute); // Index
+    gpsRational[MINUTE_INDEX].denominator = 1;
+    gpsRational[SECOND_INDEX].numerator = static_cast<uint32_t>(second); // Index
+    gpsRational[SECOND_INDEX].denominator = 1;
 
     // LATITUDE_TYPE/LONGITUDE_TYPE reference
     if (latOrLongType == LATITUDE_TYPE) {
         entry = CreateTag(exif, EXIF_IFD_GPS, EXIF_TAG_GPS_LATITUDE_REF, sizeof(gpsRef), EXIF_FORMAT_ASCII);
     } else {
         entry = CreateTag(exif, EXIF_IFD_GPS, EXIF_TAG_GPS_LONGITUDE_REF, sizeof(gpsRef), EXIF_FORMAT_ASCII);
+    }
+    if (entry == nullptr) {
+        CAMERA_LOGE("%{public}s CreateTag failed.", __FUNCTION__);
+        return RC_ERROR;
     }
     if (memcpy_s(entry->data, entry->size, gpsRef, sizeof(gpsRef)) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
@@ -166,8 +177,8 @@ uint32_t ExifUtils::AddAltitudeInfo(ExifData *exif, double altitude)
         seaLevelFlag = 1;
     }
     ConvertAltitudeToRational(altitude, altitudeRational);
-    gpsAltitudeRational.numerator = altitudeRational.numerator;
-    gpsAltitudeRational.denominator = altitudeRational.denominator;
+    gpsAltitudeRational.numerator = static_cast<uint32_t>(altitudeRational.numerator);
+    gpsAltitudeRational.denominator = static_cast<uint32_t>(altitudeRational.denominator);
     // Altitude reference
     entry = CreateTag(exif, EXIF_IFD_GPS, EXIF_TAG_GPS_ALTITUDE_REF, sizeof(seaLevelFlag), EXIF_FORMAT_BYTE);
     exif_set_short(entry->data, FILE_BYTE_ORDER, seaLevelFlag);
@@ -181,6 +192,10 @@ uint32_t ExifUtils::AddAltitudeInfo(ExifData *exif, double altitude)
 
 uint32_t ExifUtils::IsJpegPicture(unsigned char *dataBuffer, int32_t dataBufferSize, void *address)
 {
+    if (address == nullptr) {
+        CAMERA_LOGE("%{public}s address pointer is null", __FUNCTION__);
+        return RC_ERROR;
+    }
     if (memcpy_s(dataBuffer, dataBufferSize, address, dataBufferSize) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
         return RC_ERROR;
@@ -272,7 +287,7 @@ void ExifUtils::FreeResource(unsigned char *dataBuffer, unsigned char *tempBuffe
 
 uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &outPutSize)
 {
-    int32_t ret = RC_ERROR;
+    uint32_t ret = RC_ERROR;
     unsigned char *exifData = nullptr;
     unsigned int exifDataLength = 0;
     ExifData *exif = nullptr;
@@ -306,18 +321,18 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &ou
     if (IsJpegPicture(dataBuffer, dataBufferSize, address) == RC_ERROR) {
         goto error;
     }
-    totalTempBufferSize = EXIF_HEADER_LENGTH + exifBlockLength +  exifDataLength +
-        (static_cast<uint32_t>(dataBufferSize) - IMAGE_DATA_OFFSET);
+    totalTempBufferSize = static_cast<int32_t>(EXIF_HEADER_LENGTH + exifBlockLength +  exifDataLength +
+        (static_cast<uint32_t>(dataBufferSize) - IMAGE_DATA_OFFSET));
     tempBuffer = static_cast<unsigned char *>(malloc(totalTempBufferSize));
     if (!tempBuffer) {
         CAMERA_LOGE("%{public}s Allocate temp buf failed.", __FUNCTION__);
-        return ret;
+        goto error;
     }
     ret = PackageJpeg(tempBuffer, totalTempBufferSize, exifData, exifDataLength, sourceData);
     outPutSize = totalTempBufferSize;
     if (memcpy_s(address, totalTempBufferSize, tempBuffer, totalTempBufferSize) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
-        return RC_ERROR;
+        goto error;
     }
 
 error:
@@ -361,7 +376,7 @@ void ExifUtils::ConvertAltitudeToRational(double altitude, exif_rational &outPut
     long long numerator = 0;
     long long denominator = 1;
     bool isSeparator = false;
-    int count = 0;
+    uint32_t count = 0;
     std::string strData = "";
     strData = std::to_string(altitude);
     CAMERA_LOGI("%{public}s strData = %{public}s", __FUNCTION__, strData.c_str());
@@ -369,7 +384,7 @@ void ExifUtils::ConvertAltitudeToRational(double altitude, exif_rational &outPut
     count = strData.length();
     CAMERA_LOGI("%{public}s count = %{public}d", __FUNCTION__, count);
     constexpr uint32_t digitPosition = 10;
-    for (int i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < count; i++) {
         char character = strData[i];
         if (character == '.') {
             isSeparator = true;

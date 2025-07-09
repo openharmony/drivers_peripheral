@@ -282,6 +282,16 @@ struct bme688HeatrConf {
     uint16_t shared_heatr_dur;
 };
 
+struct Bme688GasRawData {
+    uint32_t adc_temp;
+    uint32_t adc_pres;
+    uint16_t adc_hum;
+    uint16_t adc_gas_res_low;
+    uint16_t adc_gas_res_high;
+    uint8_t gas_range_l;
+    uint8_t gas_range_h;
+};
+
 struct Bme688Status {
     int8_t variantId;
     int8_t workState;

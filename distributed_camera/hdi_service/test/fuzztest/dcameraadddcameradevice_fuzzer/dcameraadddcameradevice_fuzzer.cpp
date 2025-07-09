@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -84,8 +84,26 @@ void DcameraAddDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
     dhBase.dhId_ = dhId;
 
     sptr<IDCameraProviderCallback> callback;
+    OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
+    if (dcameraDevice == nullptr) {
+        return;
+    }
 
-    DCameraHost::GetInstance()->AddDCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
+    std::string cameraId = dhBase.deviceId_ + "__" + dhBase.dhId_;
+    auto temp = DCameraHost::GetInstance();
+    temp->dCameraDeviceMap_[cameraId] = dcameraDevice;
+    temp->AddDCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
+    std::string sourceCodecInfo = "";
+    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, sourceCodecInfo, callback);
+    sinkAbilityInfo = "";
+    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
+    dhBase.deviceId_ = "";
+    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
+    temp->dCameraDeviceMap_.clear();
+    temp->AddDCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
+    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, sourceCodecInfo, callback);
+    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
+    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
 }
 }
 }

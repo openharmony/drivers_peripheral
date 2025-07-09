@@ -347,35 +347,35 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info
 {
     if (!authResultCache.isCached) {
         LOG_ERROR("invalid cached unlock token");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_REUSE_AUTH_RESULT_FAILED;
     }
     if ((authResultCache.authToken.tokenDataPlain.authMode != SCHEDULE_MODE_AUTH)
         || (authResultCache.authToken.tokenDataPlain.tokenType != TOKEN_TYPE_LOCAL_AUTH)) {
         LOG_ERROR("need local auth");
-        return RESULT_VERIFY_TOKEN_FAIL;
+        return RESULT_REUSE_AUTH_RESULT_FAILED;
     }
     uint64_t time = GetSystemTime();
     if (time < authResultCache.authToken.tokenDataPlain.time) {
         LOG_ERROR("bad system time");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_REUSE_AUTH_RESULT_FAILED;
     }
     if ((time - authResultCache.authToken.tokenDataPlain.time) > REUSED_UNLOCK_TOKEN_PERIOD) {
         (void)memset_s(&authResultCache, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
         authResultCache.isCached = false;
         LOG_ERROR("cached unlock token is time out");
-        return RESULT_TOKEN_TIMEOUT;
+        return RESULT_REUSE_AUTH_RESULT_FAILED;
     }
     if ((time - authResultCache.authToken.tokenDataPlain.time) > info->reuseUnlockResultDuration) {
         LOG_ERROR("reuse unlock check reuseUnlockResultDuration fail");
-        return RESULT_TOKEN_TIMEOUT;
+        return RESULT_REUSE_AUTH_RESULT_FAILED;
     }
     if (info->userId != authResultCache.userId) {
         LOG_ERROR("reuse unlock check userId fail");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_REUSE_AUTH_RESULT_FAILED;
     }
     if (info->authTrustLevel > authResultCache.authToken.tokenDataPlain.authTrustLevel) {
         LOG_ERROR("reuse unlock check authTrustLevel fail");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_REUSE_AUTH_RESULT_FAILED;
     }
     if (info->reuseUnlockResultMode == AUTH_TYPE_RELEVANT ||
         info->reuseUnlockResultMode == CALLER_IRRELEVANT_AUTH_TYPE_RELEVANT) {
@@ -385,7 +385,7 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info
             }
         }
         LOG_ERROR("reuse unlock check authType fail");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_REUSE_AUTH_RESULT_FAILED;
     }
     return RESULT_SUCCESS;
 }

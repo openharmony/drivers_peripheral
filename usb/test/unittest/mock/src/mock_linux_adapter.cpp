@@ -276,8 +276,11 @@ void FuncAdapterCloseDevice(UsbDeviceHandle *handle)
         RawUsbMemFree(dev->descriptors);
     }
     RawUsbMemFree(dev);
+    handle->dev = NULL;
+    dev = NULL;
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
+    handle = NULL;
 }
 
 int32_t FuncAdapterGetConfigDescriptor(const UsbDevice *dev, uint8_t configIndex, void *buffer, size_t len)

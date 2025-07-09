@@ -50,6 +50,7 @@ if (drivers_peripheral_input_feature_udriver) {
     } else {
       install_images += [ updater_base_dir ]
     }
+    innerapi_tags = [ "passthrough_indirect" ]
     install_enable = true
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_input"

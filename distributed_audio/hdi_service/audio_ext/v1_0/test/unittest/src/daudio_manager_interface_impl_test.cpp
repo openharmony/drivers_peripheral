@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_0 {
+namespace V2_1 {
 void DAudioManagerInterfaceImplTest::SetUpTestCase(void) {}
 
 void DAudioManagerInterfaceImplTest::TearDownTestCase(void) {}
@@ -111,7 +111,45 @@ HWTEST_F(DAudioManagerInterfaceImplTest, NotifyEvent_002, TestSize.Level1)
     EXPECT_NE(HDF_SUCCESS, DAudioManagerInterfaceImpl::GetDAudioManager()->NotifyEvent(adpName,
         devId, streamId, event));
 }
-} // V2_0
+
+/**
+ * @tc.name: RegisterAudioHdfListener_001
+ * @tc.desc: Verify the RegisterAudioHdfListener function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DAudioManagerInterfaceImplTest, RegisterAudioHdfListener_001, TestSize.Level1)
+{
+    std::string adpName = "hello";
+    sptr<IDAudioHdfCallback> callback = nullptr;
+    EXPECT_EQ(HDF_FAILURE,
+        DAudioManagerInterfaceImpl::GetDAudioManager()->RegisterAudioHdfListener(adpName, callback));
+    callback = sptr<IDAudioHdfCallback>(new MockIDAudioHdfCallback());
+    auto audioMgr = DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_;
+    DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_ = nullptr;
+    auto ret = DAudioManagerInterfaceImpl::GetDAudioManager()->RegisterAudioHdfListener(adpName, callback);
+    DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_ = audioMgr;
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/**
+ * @tc.name: UnRegisterAudioHdfListener_001
+ * @tc.desc: Verify the UnRegisterAudioHdfListener function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DAudioManagerInterfaceImplTest, UnRegisterAudioHdfListener_001, TestSize.Level1)
+{
+    std::string adpName = "hello";
+    EXPECT_EQ(HDF_FAILURE,
+        DAudioManagerInterfaceImpl::GetDAudioManager()->UnRegisterAudioHdfListener(adpName));
+    auto audioMgr = DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_;
+    DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_ = nullptr;
+    auto ret = DAudioManagerInterfaceImpl::GetDAudioManager()->UnRegisterAudioHdfListener(adpName);
+    DAudioManagerInterfaceImpl::GetDAudioManager()->audioMgr_ = audioMgr;
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+} // V2_1
 } // AudioExt
 } // Daudio
 } // HDI

@@ -191,11 +191,10 @@ void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
         return;
     }
 
-    constexpr uint32_t UNIT_COUNT = 1000;
+    constexpr int64_t UNIT_COUNT = 1000;
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    int64_t timestamp =
-        static_cast<uint64_t>(tv.tv_sec) * UNIT_COUNT * UNIT_COUNT * UNIT_COUNT + tv.tv_usec * UNIT_COUNT;
+    int64_t timestamp = tv.tv_sec * UNIT_COUNT * UNIT_COUNT * UNIT_COUNT + tv.tv_usec * UNIT_COUNT;
     buffer->buffer_->SetEsTimestamp(timestamp);
     nodeBufferCb_(buffer);
 }
@@ -322,22 +321,27 @@ RetCode SensorController::GetAWBMetaData(std::shared_ptr<CameraMetadata> meta)
     RetCode rc = RC_ERROR;
     std::lock_guard<std::mutex> metaDataLock(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
-        if (*iter == OHOS_SENSOR_COLOR_CORRECTION_GAINS) {
-            rc = sensorVideo_->QuerySetting(GetName(), CMD_AWB_COLORGAINS, &value);
-            if (rc == RC_ERROR) {
-                CAMERA_LOGE("%s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
-                return rc;
-            }
-            colorGains[0] = (float)value;
-            int gainsSize = 4;
-            if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
-                std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
-                metaDataFlag_ = true;
-                (void)memcpy_s(oldColorGains, sizeof(oldColorGains) / sizeof(float), colorGains,
-                    gainsSize * sizeof(float));
-            }
-            meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4); // 4:data size
+        if (*iter != OHOS_SENSOR_COLOR_CORRECTION_GAINS) {
+            continue;
         }
+        rc = sensorVideo_->QuerySetting(GetName(), CMD_AWB_COLORGAINS, &value);
+        if (rc == RC_ERROR) {
+            CAMERA_LOGE("%s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
+            return rc;
+        }
+        colorGains[0] = (float)value;
+        int gainsSize = 4;
+        if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
+            std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
+            metaDataFlag_ = true;
+            errno_t ret = memcpy_s(oldColorGains, sizeof(oldColorGains) / sizeof(float), colorGains,
+                gainsSize * sizeof(float));
+            if (ret != EOK) {
+                CAMERA_LOGE("memcpy_s failed, ret = %{public}d", ret);
+                return RC_ERROR;
+            }
+        }
+        meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4); // 4:data size
     }
     return rc;
 }
@@ -637,8 +641,8 @@ RetCode SensorController::SendAWBLockMetaData(common_metadata_header_t *data)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_LOCK, &entry);
     if (ret == 0) {
         awbLock = *(entry.data.u8);
-        int curLock = 0;
-        sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
+        uint32_t curLock = 0;
+        sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, reinterpret_cast<int*>(&curLock));
         if (awbLock == OHOS_CAMERA_AWB_LOCK_ON) {
         // set the position of AWB bit to 1;
             curLock |= V4L2_LOCK_WHITE_BALANCE;
@@ -646,7 +650,7 @@ RetCode SensorController::SendAWBLockMetaData(common_metadata_header_t *data)
             // set the position of AWB bit to 0;
             curLock &= ~V4L2_LOCK_WHITE_BALANCE;
         }
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_LOCK, &curLock);
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_LOCK, reinterpret_cast<int*>(&curLock));
         CAMERA_LOGI("Set CMD_AWB_LOCK [%{public}d]", awbLock);
         if (rc == RC_OK) {
             CAMERA_LOGI("Send OHOS_CONTROL_AWB_LOCK value=%{public}d success", curLock);
@@ -732,12 +736,13 @@ RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *dat
             aeLock = *(entry.data.u8);
         }
         if (aeLock == 0) {
-            int curLock = 0;
-            auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
+            unsigned int curLock = 0;
+            auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK,
+                reinterpret_cast<int*>(&curLock));
             curLock = exposureMode == OHOS_CAMERA_EXPOSURE_MODE_LOCKED ?
                 curLock | V4L2_LOCK_EXPOSURE : curLock & ~V4L2_LOCK_EXPOSURE;
             if (queryResult == RC_OK) {
-                rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_LOCK, &curLock);
+                rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_LOCK, reinterpret_cast<int*>(&curLock));
                 CAMERA_LOGI("Set CMD_EXPOSURE_LOCK [%{public}d]", exposureMode);
                 CheckRetCodeValue(rc);
             }
@@ -793,8 +798,8 @@ RetCode SensorController::SendAELockMetaData(common_metadata_header_t *data)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_LOCK, &entry);
     if (ret == 0) {
         aeLock = *(entry.data.u8);
-        int curLock = 0;
-        sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
+        unsigned int curLock = 0;
+        sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, reinterpret_cast<int*>(&curLock));
         if (aeLock == OHOS_CAMERA_AE_LOCK_ON) {
             // set the position of AE bit to 1;
             curLock |= V4L2_LOCK_EXPOSURE;
@@ -803,7 +808,7 @@ RetCode SensorController::SendAELockMetaData(common_metadata_header_t *data)
             curLock &= ~V4L2_LOCK_EXPOSURE;
         }
 
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_LOCK, &curLock);
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_LOCK, reinterpret_cast<const int*>(&curLock));
         CAMERA_LOGI("Set CMD_AE_LOCK [%{public}d]", aeLock);
         if (rc == RC_OK) {
             CAMERA_LOGI("Send OHOS_CONTROL_AE_LOCK value=%{public}d success", curLock);
@@ -823,8 +828,8 @@ RetCode SensorController::SendFocusMetaData(common_metadata_header_t *data)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FOCUS_MODE, &entry);
     if (ret == 0) {
         focusMode = *(entry.data.u8);
-        int curLock = 0;
-        auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
+        uint32_t curLock = 0;
+        auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, reinterpret_cast<int*>(&curLock));
         if (focusMode == OHOS_CAMERA_FOCUS_MODE_LOCKED) {
             curLock |= V4L2_LOCK_FOCUS;
         } else {
@@ -832,7 +837,7 @@ RetCode SensorController::SendFocusMetaData(common_metadata_header_t *data)
         }
 
         if (queryResult == RC_OK) {
-            rc = sensorVideo_->UpdateSetting(GetName(), CMD_FOCUS_LOCK, &curLock);
+            rc = sensorVideo_->UpdateSetting(GetName(), CMD_FOCUS_LOCK, reinterpret_cast<const int*>(&curLock));
             CAMERA_LOGI("Set CMD_FOCUS_LOCK [%{public}d]", focusMode);
             if (rc == RC_OK) {
                 CAMERA_LOGI("Send OHOS_CONTROL_FOCUS_MODE value=%{public}d success", focusMode);
@@ -878,7 +883,7 @@ RetCode SensorController::SendFocusRegionsMetaData(common_metadata_header_t *dat
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AF_REGIONS, &entry);
     if (ret == 0) {
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             afRegions.push_back(*(entry.data.i32 + i));
             CAMERA_LOGI("Set afRegions [%{public}d]", *(entry.data.i32 + i));
         }
@@ -927,7 +932,7 @@ RetCode SensorController::SendMeterMetaData(common_metadata_header_t *data)
     std::vector<int32_t> meterPoint;
     ret = FindCameraMetadataItem(data, OHOS_CONTROL_METER_POINT, &entry);
     if (ret == 0) {
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             meterPoint.push_back(*(entry.data.i32 + i));
             CAMERA_LOGI("Set CMD_METER_POINT [%{public}d]", *(entry.data.i32 + i));
         }
@@ -966,7 +971,7 @@ RetCode SensorController::SendFpsMetaData(common_metadata_header_t *data)
     fpsRange_.clear();
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
     if (ret == 0) {
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             fpsRange_.push_back(*(entry.data.i32 + i));
         }
         if (fpsRange_.size() != GROUP_LEN) {

@@ -125,7 +125,8 @@ RetCode HosV4L2Dev::Init(const std::vector<std::string>& cameraIDs)
 
 RetCode HosV4L2Dev::ReqBuffers(const std::string& cameraID, unsigned int buffCont)
 {
-    int rc, fd;
+    RetCode rc;
+    int fd;
     CAMERA_LOGI("HosV4L2Dev::ReqBuffers enters %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);
     if (fd < 0) {
@@ -152,7 +153,8 @@ RetCode HosV4L2Dev::ReqBuffers(const std::string& cameraID, unsigned int buffCon
 
 RetCode HosV4L2Dev::CreatBuffer(const std::string& cameraID, const std::shared_ptr<FrameSpec>& frameSpec)
 {
-    int rc, fd;
+    RetCode rc;
+    int fd;
     CAMERA_LOGI("HosV4L2Dev::CreatBuffer in %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);
     if (fd < 0) {
@@ -184,7 +186,8 @@ RetCode HosV4L2Dev::CreatBuffer(const std::string& cameraID, const std::shared_p
 
 RetCode HosV4L2Dev::QueueBuffer(const std::string& cameraID, const std::shared_ptr<FrameSpec>& frameSpec)
 {
-    int rc, fd;
+    RetCode rc;
+    int fd;
     CAMERA_LOGI("HosV4L2Dev::QueueBuffer in %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);
     if (fd < 0) {
@@ -209,7 +212,7 @@ RetCode HosV4L2Dev::QueueBuffer(const std::string& cameraID, const std::shared_p
 RetCode HosV4L2Dev::ReleaseBuffers(const std::string& cameraID)
 {
     int fd;
-    int rc = 0;
+    RetCode rc = 0;
     CAMERA_LOGI("HosV4L2Dev::ReleaseBuffers in %{public}s\n", cameraID.c_str());
     if (myBuffers_ == nullptr) {
         CAMERA_LOGE("ReleaseBuffers myBuffers_ is NULL\n");
@@ -235,7 +238,7 @@ RetCode HosV4L2Dev::ReleaseBuffers(const std::string& cameraID)
 void HosV4L2Dev::dequeueBuffers()
 {
     int nfds;
-    int rc;
+    RetCode rc;
     struct epoll_event events[MAXSTREAMCOUNT];
     nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);
     CAMERA_LOGI("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %{public}d\n", nfds, streamNumber_);
@@ -361,7 +364,7 @@ void HosV4L2Dev::EraseEpoll(int fd)
 
 RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
 {
-    int rc, fd;
+    int fd;
     CAMERA_LOGI("StartStream enter, cameraID = %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);
     if (fd < 0) {
@@ -379,7 +382,7 @@ RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
             return RC_ERROR;
         }
     }
-
+    RetCode rc = RC_ERROR;
     rc = myStreams_->V4L2StreamOn(fd);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("error: StartStream: V4L2StreamOn error\n");
@@ -394,7 +397,7 @@ RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
 
     if (streamNumber_ == 0) {
         streamNumber_++;
-        CAMERA_LOGE("go start thread loopBuffers, streamNumber_=%{public}d\n", streamNumber_);
+        CAMERA_LOGI("go start thread loopBuffers, streamNumber_=%{public}d\n", streamNumber_);
         streamThread_ = new (std::nothrow) std::thread([this] {this->loopBuffers();});
         if (streamThread_ == nullptr) {
             CAMERA_LOGE("V4L2 StartStream start thread failed\n");
@@ -458,7 +461,7 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
 }
 
 void SetCtrlByCondition(int32_t fd, AdapterCmd command, const int* args,
-    int &rc, std::shared_ptr<HosV4L2Control> myControl_)
+    RetCode &rc, std::shared_ptr<HosV4L2Control> myControl_)
 {
     switch (command) {
         case CMD_EXPOSURE_MODE:
@@ -509,7 +512,7 @@ RetCode HosV4L2Dev::UpdateSetting(const std::string& cameraID, AdapterCmd comman
 {
     CAMERA_LOGI("UpdateSetting enter, cameraID = %{public}s\n", cameraID.c_str());
     int32_t fd;
-    int rc = 0;
+    RetCode rc = 0;
     if (args == nullptr) {
         CAMERA_LOGE("HosV4L2Dev::UpdateSetting: args is NULL\n");
         return RC_ERROR;
@@ -538,7 +541,7 @@ RetCode HosV4L2Dev::QuerySetting(const std::string& cameraID, unsigned int comma
 {
     int32_t fd;
     int32_t value = 0;
-    int rc = 0;
+    RetCode rc = 0;
     CAMERA_LOGI("QuerySetting enter, cameraID = %{public}s\n", cameraID.c_str());
     if (args == nullptr) {
         CAMERA_LOGE("HosV4L2Dev::QuerySetting: args is NULL\n");
@@ -613,7 +616,8 @@ RetCode HosV4L2Dev::SetNumberCtrls(const std::string& cameraID, std::vector<Devi
 
 RetCode HosV4L2Dev::GetControls(const std::string& cameraID, std::vector<DeviceControl>& control)
 {
-    int fd, rc;
+    int fd;
+    RetCode rc;
     CAMERA_LOGI("GetControls enter, cameraID = %{public}s\n", cameraID.c_str());
     if (myControl_ == nullptr) {
         myControl_ = std::make_shared<HosV4L2Control>();
@@ -640,7 +644,8 @@ RetCode HosV4L2Dev::GetControls(const std::string& cameraID, std::vector<DeviceC
 
 RetCode HosV4L2Dev::GetFmtDescs(const std::string& cameraID, std::vector<DeviceFormat>& fmtDesc)
 {
-    int fd, rc;
+    int fd;
+    RetCode rc;
     CAMERA_LOGI("GetFmtDescs enter, cameraID = %{public}s\n", cameraID.c_str());
     if (myFileFormat_ == nullptr) {
         CAMERA_LOGE("GetFmtDescs: myFileFormat_ == nullptr\n");
@@ -758,7 +763,8 @@ RetCode HosV4L2Dev::SetV4L2DevCallback(BufCallback cb)
 }
 RetCode HosV4L2Dev::Flush(const std::string& cameraID)
 {
-    int rc, fd;
+    RetCode rc;
+    int fd;
     CAMERA_LOGI("Flush enter, cameraID = %{public}s\n", cameraID.c_str());
     fd = GetCurrentFd(cameraID);
     if (fd < 0) {

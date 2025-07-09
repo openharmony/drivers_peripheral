@@ -1416,7 +1416,6 @@ int32_t UsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle)
     }
 
     ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
-    HDF_LOGI("%{public}s:%{public}d dev is %{public}p", __func__, __LINE__, ifaceHdl->devHandle->dev);
     if (ifaceHdl->devHandle == NULL || ifaceHdl->devHandle->dev == NULL ||
         ifaceHdl->devHandle->dev->privateObject == NULL) {
         HDF_LOGE("%{public}s:%{public}d ifaceHdl is null", __func__, __LINE__);
@@ -1463,7 +1462,6 @@ int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle, bool isCtrI
     }
 
     ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
-    HDF_LOGI("%{public}s:%{public}d dev is %{public}p", __func__, __LINE__, ifaceHdl->devHandle->dev);
     if (ifaceHdl->devHandle == NULL || ifaceHdl->devHandle->dev == NULL ||
         ifaceHdl->devHandle->dev->privateObject == NULL) {
         HDF_LOGE("%{public}s:%{public}d ifaceHdl is null", __func__, __LINE__);
@@ -1592,18 +1590,22 @@ int32_t UsbGetPipeInfo(
     struct UsbPipeQueryPara pipeQueryPara;
     struct UsbPipe *pipeObj = NULL;
 
-    HDF_LOGI("%{public}s:%{public}d dev is %{public}p", __func__, __LINE__, ifaceHdl->devHandle->dev);
     if (interfaceHandle == NULL || pipeInfo == NULL || ifaceHdl == NULL || ifaceHdl->devHandle == NULL ||
         ifaceHdl->devHandle->dev == NULL) {
         HDF_LOGE("%{public}s:%{publid}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-
-    HDF_LOGE("%{public}s:%{public}d ifaceHdl->devHandle is %{public}p", __func__, __LINE__, ifaceHdl->devHandle);
+    OsalMutexLock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
+    if (ifaceHdl->devHandle->dev == NULL) {
+        OsalMutexUnlock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
+        HDF_LOGE("%{public}s:%{publid}d ifaceHdl->devHandle->dev is null", __func__, __LINE__);
+        return HDF_ERR_BAD_FD;
+    }
 
     /* Find interfacePool object */
     interfacePool = (struct UsbInterfacePool *)ifaceHdl->devHandle->dev->privateObject;
     if (interfacePool == NULL) {
+        OsalMutexUnlock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
         HDF_LOGE("%{public}s:%{public}d interfacePool is null", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
@@ -1614,6 +1616,7 @@ int32_t UsbGetPipeInfo(
     interfaceQueryPara.altSettingId = altSettingIndex;
     interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, false, NULL, true);
     if (interfaceObj == NULL) {
+        OsalMutexUnlock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
         HDF_LOGE("%{public}s:%{public}d interfaceObj is null", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
@@ -1623,11 +1626,13 @@ int32_t UsbGetPipeInfo(
     pipeQueryPara.pipeId = pipeId;
     pipeObj = IfFindPipeObj(interfaceObj, pipeQueryPara);
     if (pipeObj == NULL) {
+        OsalMutexUnlock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
         HDF_LOGE("%{public}s:%{public}d pipeObj is null", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
 
     *pipeInfo = pipeObj->info;
+    OsalMutexUnlock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
 
     return HDF_SUCCESS;
 }

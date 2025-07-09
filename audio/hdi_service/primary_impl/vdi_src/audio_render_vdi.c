@@ -103,13 +103,11 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t id = SetTimer("Hdi:RenderFrame");
     HdfAudioStartTrace("Hdi:AudioRenderFrameVdi", 0);
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->RenderFrame(vdiRender, frame, frameLen, replyBytes);
     AudioDfxSysEventError("RenderFrame", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
-    CancelTimer(id);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render frame fail, ret=%{public}d", ret);
         pthread_rwlock_unlock(&g_rwVdiRenderLock);
@@ -333,12 +331,13 @@ int32_t AudioRenderSelectSceneVdi(struct IAudioRender *render, const struct Audi
 
     AUDIO_FUNC_LOGI("portId = [%{public}u], pin = [%{public}d], desc = [%{public}s]",
         scene->desc.portId, scene->desc.pins, scene->desc.desc);
-
+    HdfAudioStartTrace("Hdi:SelectScene", 0);
     struct AudioSceneDescriptorVdi vdiScene;
     (void)memset_s((void *)&vdiScene, sizeof(vdiScene), 0, sizeof(vdiScene));
     int32_t ret = AudioCommonSceneToVdiSceneVdi(scene, &vdiScene);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render scene To vdiScene fail");
+        HdfAudioFinishTrace();
         return HDF_FAILURE;
     }
 
@@ -348,9 +347,10 @@ int32_t AudioRenderSelectSceneVdi(struct IAudioRender *render, const struct Audi
     OsalMemFree((void *)vdiScene.desc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render select scene fail, ret=%{public}d", ret);
+        HdfAudioFinishTrace();
         return ret;
     }
-
+    HdfAudioFinishTrace();
     return HDF_SUCCESS;
 }
 

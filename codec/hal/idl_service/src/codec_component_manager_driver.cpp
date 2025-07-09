@@ -18,10 +18,10 @@
 #include <hdf_sbuf_ipc.h>
 #include "codec_component_config.h"
 #include "codec_log_wrapper.h"
-#include "v3_0/codec_component_manager_stub.h"
+#include "v4_0/codec_component_manager_stub.h"
 #include "codec_dfx_service.h"
 #include <devhost_dump_reg.h>
-using namespace OHOS::HDI::Codec::V3_0;
+using namespace OHOS::HDI::Codec::V4_0;
 namespace {
     struct HdfCodecComponentManagerHost {
         struct IDeviceIoService ioService;

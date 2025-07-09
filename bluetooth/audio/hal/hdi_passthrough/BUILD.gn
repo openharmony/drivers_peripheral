@@ -12,8 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
 
 declare_args() {
   drivers_peripheral_bluetooth_a2dp_hdi = false
@@ -68,11 +66,9 @@ ohos_shared_library("hdi_audio_bluetooth") {
   include_dirs = [
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/bluetooth/audio/supportlibs/adm_adapter/include",
-    "//third_party/cJSON",
-    "//third_party/bounds_checking_function/include",
   ]
 
-  deps = [ "//foundation/communication/bluetooth_service/services/bluetooth/ipc:btipc_static" ]
+  deps = []
 
   if (is_standard_system) {
     external_deps = [
@@ -82,6 +78,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hilog:libhilog",
+      "cJSON:cjson",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -92,6 +89,13 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
+
+  if (!drivers_peripheral_bluetooth_a2dp_hdi) {
+    external_deps += [
+      "bluetooth:btframework",
+      "bluetooth:btcommon",
+    ]
+  }
 
   public_configs = [ ":hdi_audio_config" ]
   version_script = "libhdi_audio_bluetooth_version_script.txt"

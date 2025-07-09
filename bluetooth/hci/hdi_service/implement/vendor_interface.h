@@ -19,7 +19,7 @@
 #include <functional>
 #include <vector>
 
-#include "singleton.h"
+#include "nocopyable.h"
 
 #include "hci_internal.h"
 #include "hci_protocol.h"
@@ -31,7 +31,7 @@ namespace HDI {
 namespace Bluetooth {
 namespace Hci {
 namespace V1_0 {
-class VendorInterface : public DelayedSingleton<VendorInterface> {
+class VendorInterface {
 public:
     using InitializeCompleteCallback = std::function<void(bool isSuccess)>;
     using ReceiveDataCallback = Hci::HciProtocol::HciDataCallback;
@@ -42,11 +42,15 @@ public:
         ReceiveDataCallback onIsoReceive;
     };
 
+    static VendorInterface *GetInstance();
     bool Initialize(InitializeCompleteCallback initializeCompleteCallback, const ReceiveCallback &receiveCallback);
     void CleanUp();
     size_t SendPacket(Hci::HciPacketType type, const std::vector<uint8_t> &packet);
 
 private:
+    VendorInterface();
+    ~VendorInterface();
+
     static void OnInitCallback(BtOpResultT result);
     static void* OnMallocCallback(int size);
     static void OnFreeCallback(void* buf);
@@ -71,7 +75,6 @@ private:
     bool activity_ = false;
     std::mutex initAndCleanupProcessMutex_;
 
-    DECLARE_DELAYED_SINGLETON(VendorInterface);
     DISALLOW_COPY_AND_MOVE(VendorInterface);
 };
 }  // namespace V1_0

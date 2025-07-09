@@ -454,6 +454,7 @@ static void OsFreeIsoUrbs(struct UsbHostRequest *request)
             break;
         }
         RawUsbMemFree(urb);
+        request->isoUrbs[i] = NULL;
     }
 
     RawUsbMemFree(request->isoUrbs);
@@ -479,7 +480,7 @@ static void OsDiscardUrbs(const struct UsbHostRequest *request, int32_t first, i
             continue;
         } else if (request->devHandle->dev != NULL) {
             request->devHandle->dev->discardFailedUrb = (void *)urb;
-            HDF_LOGE("%{public}s:%{public}d discard failed urb: %{public}p", __func__, __LINE__, urb);
+            HDF_LOGE("%{public}s:%{public}d discard failed urb", __func__, __LINE__);
         }
     }
 }
@@ -1004,12 +1005,11 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 
     handle = OsGetDeviceHandle(session, busNum, usbAddr);
     if (handle != NULL) {
-        HDF_LOGE("%{public}s:%{public}d OsGetDeviceHandle success: %{public}p", __func__, __LINE__, handle);
+        HDF_LOGI("%{public}s:%{public}d OsGetDeviceHandle success", __func__, __LINE__);
         return handle;
     }
 
     handle = OsCallocDeviceHandle();
-    HDF_LOGE("%{public}s:%{public}d OsCallocDeviceHandle = %{public}p", __func__, __LINE__, handle);
     if (handle == NULL) {
         return NULL;
     }
@@ -1022,6 +1022,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
     ret = OsInitDevice(dev, busNum, usbAddr);
     if (ret) {
         RawUsbMemFree(dev);
+        dev = NULL;
         goto ERR;
     }
 
@@ -1037,6 +1038,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 ERR:
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
+    handle = NULL;
     return NULL;
 }
 
@@ -1065,6 +1067,8 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
         RawUsbMemFree(dev->descriptors);
     }
     RawUsbMemFree(dev);
+    handle->dev = NULL;
+    dev = NULL;
 
     close(handle->fd);
     close(handle->mmapFd);

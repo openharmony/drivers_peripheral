@@ -58,6 +58,12 @@ VendorInterface::~VendorInterface()
     CleanUp();
 }
 
+VendorInterface *VendorInterface::GetInstance()
+{
+    static VendorInterface instance;
+    return &instance;
+}
+
 bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
 {
     pid_t tid = gettid();

@@ -33,9 +33,6 @@ namespace PinAuth {
 using namespace testing;
 using namespace testing::ext;
 namespace {
-    constexpr uint32_t CONST_SALT_LEN  = 32U;
-    constexpr uint32_t CONST_PIN_DATA_LEN = 64U;
-    constexpr uint64_t INVALID_TEMPLATE_ID = 0xFFFFFFFFFFFFFFFF;
     uint64_t g_antiTemplateId = 0;
 }
 
@@ -55,6 +52,38 @@ void PinAuthTest::TearDown()
 {
 }
 
+static PinEnrollParam *getPinEnrollParam()
+{
+    PinEnrollParam *pinEnrollParam = new (std::nothrow) PinEnrollParam();
+    EXPECT_NE(pinEnrollParam, nullptr);
+
+    uint32_t pinLength = 6;
+    uint64_t subType = 10010;
+    pinEnrollParam->scheduleId = 1;
+    pinEnrollParam->subType = subType;
+    pinEnrollParam->pinLength = pinLength;
+    std::vector<uint8_t> salt(CONST_SALT_LEN, 1);
+    std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
+    (void)memcpy_s(&(pinEnrollParam->salt[0]), CONST_SALT_LEN, &salt[0], CONST_SALT_LEN);
+    (void)memcpy_s(&(pinEnrollParam->pinData[0]), CONST_PIN_DATA_LEN, &pinData[0], CONST_PIN_DATA_LEN);
+    return pinEnrollParam;
+}
+
+static PinAuthParam *getPinAuthParam()
+{
+    PinAuthParam *pinAuthParam = new (std::nothrow) PinAuthParam();
+    EXPECT_NE(pinAuthParam, nullptr);
+
+    uint64_t templateId = 123;
+    uint32_t pinLength = 6;
+    pinAuthParam->scheduleId = 1;
+    pinAuthParam->templateId = templateId;
+    pinAuthParam->pinLength = pinLength;
+    std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
+    (void)memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinData[0], CONST_PIN_DATA_LEN);
+    return pinAuthParam;
+}
+
 /**
  * @tc.name: EnrollPin test
  * @tc.desc: verify EnrollPin
@@ -64,15 +93,11 @@ void PinAuthTest::TearDown()
 HWTEST_F(PinAuthTest, EnrollPin_test, TestSize.Level1)
 {
     std::vector<uint8_t> resultTlv;
-    std::vector<uint8_t> salt(30, 1);
-    std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
     PinAuth *pinAuth = new (std::nothrow) PinAuth();
     EXPECT_NE(pinAuth, nullptr);
-    int32_t result = pinAuth->EnrollPin(0, 10010, salt, pinData, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
-
-    std::vector<uint8_t> salt1(CONST_SALT_LEN, 1);
-    result = pinAuth->EnrollPin(0, 10010, salt1, std::vector<uint8_t>{}, resultTlv);
+    PinEnrollParam *pinEnrollParam = getPinEnrollParam();
+    EXPECT_NE(pinEnrollParam, nullptr);
+    int32_t result = pinAuth->EnrollPin(*pinEnrollParam, resultTlv);
     EXPECT_EQ(result, INVALID_PARAMETERS);
     delete pinAuth;
 }
@@ -110,15 +135,13 @@ HWTEST_F(PinAuthTest, AllInOneAuth_test, TestSize.Level1)
 HWTEST_F(PinAuthTest, AuthPin_test, TestSize.Level1)
 {
     std::vector<uint8_t> resultTlv;
-    std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
     std::vector<uint8_t> extraInfo;
     PinAuth *pinAuth = new (std::nothrow) PinAuth();
     EXPECT_NE(pinAuth, nullptr);
-    int32_t result = pinAuth->AuthPin(0, 1, std::vector<uint8_t>{}, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
-
-    result = pinAuth->AuthPin(0, INVALID_TEMPLATE_ID, pinData, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    PinAuthParam *pinAuthParam = getPinAuthParam();
+    EXPECT_NE(pinAuthParam, nullptr);
+    int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
+    EXPECT_EQ(result, GENERAL_ERROR);
     delete pinAuth;
 }
 
@@ -260,17 +283,20 @@ HWTEST_F(PinAuthTest, Pin_Auth_Succ_test, TestSize.Level1)
     EXPECT_EQ(result, SUCCESS);
 
     std::vector<uint8_t> resultTlv;
-    std::vector<uint8_t> salt(CONST_SALT_LEN, 1);
-    std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
     std::vector<uint8_t> extraInfo = {};
-    result = pinAuth->EnrollPin(0, 10010, salt, pinData, resultTlv);
+    PinEnrollParam *pinEnrollParam = getPinEnrollParam();
+    EXPECT_NE(pinEnrollParam, nullptr);
+    result = pinAuth->EnrollPin(*pinEnrollParam, resultTlv);
     EXPECT_EQ(result, SUCCESS);
     uint64_t templateId = 0;
     bool ret = GetTemplateIdFromTlv(resultTlv, templateId);
     ASSERT_EQ(ret, true);
 
-    result = pinAuth->AuthPin(0, templateId, pinData, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    PinAuthParam *pinAuthParam = getPinAuthParam();
+    EXPECT_NE(pinAuthParam, nullptr);
+    pinAuthParam->templateId = templateId;
+    result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     uint8_t challenge[32] = {0};
     Buffer *fwkExtraInfo = GetAuthFwkExtraInfo(0, keyPair, challenge, 32);
@@ -316,18 +342,18 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo1_test, TestSize.Level1)
     EXPECT_NE(pinAuth, nullptr);
     pinAuth->Init();
     std::vector<uint8_t> resultTlv;
-    std::vector<uint8_t> salt(CONST_SALT_LEN, 1);
-    std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
     std::vector<uint8_t> extraInfo;
-    int32_t result = pinAuth->EnrollPin(0, 10010, salt, pinData, resultTlv);
+    PinEnrollParam *pinEnrollParam = getPinEnrollParam();
+    EXPECT_NE(pinEnrollParam, nullptr);
+    int32_t result = pinAuth->EnrollPin(*pinEnrollParam, resultTlv);
     EXPECT_EQ(result, SUCCESS);
     bool ret = GetTemplateIdFromTlv(resultTlv, g_antiTemplateId);
     ASSERT_EQ(ret, true);
-
-    /* The first auth failed */
-    std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
-    result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    PinAuthParam *pinAuthParam = getPinAuthParam();
+    EXPECT_NE(pinAuthParam, nullptr);
+    pinAuthParam->templateId = g_antiTemplateId;
+    result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
@@ -354,8 +380,12 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo2_test, TestSize.Level1)
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
     std::vector<uint8_t> extraInfo;
-    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    PinAuthParam *pinAuthParam = getPinAuthParam();
+    EXPECT_NE(pinAuthParam, nullptr);
+    pinAuthParam->templateId = g_antiTemplateId;
+    (void)memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinErrorData[0], CONST_PIN_DATA_LEN);
+    int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
@@ -382,8 +412,12 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo3_test, TestSize.Level1)
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
     std::vector<uint8_t> extraInfo;
-    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    PinAuthParam *pinAuthParam = getPinAuthParam();
+    EXPECT_NE(pinAuthParam, nullptr);
+    pinAuthParam->templateId = g_antiTemplateId;
+    (void)memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinErrorData[0], CONST_PIN_DATA_LEN);
+    int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
@@ -410,8 +444,12 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo4_test, TestSize.Level1)
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
     std::vector<uint8_t> extraInfo;
-    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    PinAuthParam *pinAuthParam = getPinAuthParam();
+    EXPECT_NE(pinAuthParam, nullptr);
+    pinAuthParam->templateId = g_antiTemplateId;
+    (void)memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinErrorData[0], CONST_PIN_DATA_LEN);
+    int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);
@@ -438,8 +476,12 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo5_test, TestSize.Level1)
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);
     std::vector<uint8_t> extraInfo;
-    int32_t result = pinAuth->AuthPin(0, g_antiTemplateId, pinErrorData, extraInfo, resultTlv);
-    EXPECT_EQ(result, INVALID_PARAMETERS);
+    PinAuthParam *pinAuthParam = getPinAuthParam();
+    EXPECT_NE(pinAuthParam, nullptr);
+    pinAuthParam->templateId = g_antiTemplateId;
+    (void)memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinErrorData[0], CONST_PIN_DATA_LEN);
+    int32_t result = pinAuth->AuthPin(*pinAuthParam, extraInfo, resultTlv);
+    EXPECT_EQ(result, GENERAL_ERROR);
 
     PinCredentialInfo pinCredentialInfo = {};
     result = pinAuth->QueryPinInfo(g_antiTemplateId, pinCredentialInfo);

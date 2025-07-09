@@ -24,9 +24,9 @@
 #include <vector>
 #include <benchmark/benchmark.h>
 #include "codec_omx_ext.h"
-#include "v3_0/codec_callback_service.h"
-#include "v3_0/icodec_component.h"
-#include "v3_0/icodec_component_manager.h"
+#include "v4_0/codec_callback_service.h"
+#include "v4_0/icodec_component.h"
+#include "v4_0/icodec_component_manager.h"
 #include "v1_0/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
@@ -40,7 +40,7 @@ using namespace std;
 using namespace testing::ext;
 using OHOS::sptr;
 using OHOS::HDI::Base::NativeBuffer;
-using namespace OHOS::HDI::Codec::V3_0;
+using namespace OHOS::HDI::Codec::V4_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 namespace {
@@ -57,7 +57,7 @@ static IDisplayBuffer *gralloc_ = nullptr;
 static sptr<ICodecComponent> component_ = nullptr;
 static sptr<ICodecCallback> callback_ = nullptr;
 static sptr<ICodecComponentManager> manager_ = nullptr;
-static OHOS::HDI::Codec::V3_0::CodecVersionType version_;
+static OHOS::HDI::Codec::V4_0::CodecVersionType version_;
 static inline std::string compName_ = "";
 
 class CodecBenchmarkOmxTest : public benchmark::Fixture {
@@ -393,8 +393,8 @@ BENCHMARK_F(CodecBenchmarkOmxTest, ComponentTunnelRequest)(benchmark::State &sta
     int32_t ret;
     const int32_t tunneledComp = TUNNELE_COMP;
     const uint32_t tunneledPort = TUNNELED_PORT;
-    OHOS::HDI::Codec::V3_0::CodecTunnelSetupType tunnelSetup;
-    tunnelSetup.supplier = OHOS::HDI::Codec::V3_0::CODEC_BUFFER_SUPPLY_INPUT;
+    OHOS::HDI::Codec::V4_0::CodecTunnelSetupType tunnelSetup;
+    tunnelSetup.supplier = OHOS::HDI::Codec::V4_0::CODEC_BUFFER_SUPPLY_INPUT;
     for (auto _ : state) {
     ret = component_->ComponentTunnelRequest(outputIndex, tunneledComp, tunneledPort,
         tunnelSetup, tunnelSetup);

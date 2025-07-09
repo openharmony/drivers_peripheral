@@ -227,16 +227,21 @@ void ProcessImage(const unsigned char* p, unsigned char* fbp)
     int width = imageWidth;
     int height = imageHeight;
     int istride = 1280;
-    int x, y, j;
-    int y0, u, v, r, g, b;
+    int x;
+    int y;
+    int j;
+    int y0;
+    int u;
+    int v;
+    int r;
+    int g;
+    int b;
     int32_t location = 0;
     int xpos = (g_vInfo.xres - width) / 2;
     int ypos = (g_vInfo.yres - height) / 2;
-    int yPos, uPos, vPos;
-
-    yPos = 0;
-    uPos = 1;
-    vPos = 3; // 3:v position 3
+    int yPos = 0;
+    int uPos = 1;
+    int vPos = 3; // 3:v position 3
     uint32_t bitsPerByte = 8; // 8:8 bits per byte
 
     for (y = ypos; y < (height + ypos); y++) {
@@ -473,7 +478,8 @@ void V4L2SetBuffers(const int32_t i, std::shared_ptr<FrameSpec> buffptr[],
 
 void* V4L2FrameThread(void* data)
 {
-    int rc, i;
+    int rc;
+    int i;
     const std::string devname(reinterpret_cast<const char*>(data));
     unsigned char* addr[g_bufCont];
     std::shared_ptr<FrameSpec> buffptr[buffersCount];
@@ -852,7 +858,8 @@ void QuitMain()
 
 int main(int argc, char** argv)
 {
-    int idx, c;
+    int idx;
+    int c;
     constexpr char shortOptions[] = "h:pcwevuaq:";
 
     V4L2InitSensors();

@@ -15,11 +15,11 @@
 
 #include "sensorgetsdcsensorInfo_fuzzer.h"
 #include "hdf_base.h"
-#include "v2_0/sensor_interface_proxy.h"
+#include "v3_0/sensor_interface_proxy.h"
 #include <hdf_log.h>
 #include <securec.h>
 
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V3_0;
 
 namespace {
     struct AllParameters {

@@ -43,13 +43,12 @@
 #define REPLY_SIZE_FACTOR_SECOND 10
 #define WPA_CMD_BUF_LEN 256
 #define WPA_SUPPLICANT_NAME "wpa_supplicant"
-#ifdef OHOS_EUPDATER
-#define CONFIG_ROOR_DIR "/tmp/service/el1/public/wifi"
-#else
 #define CONFIG_ROOR_DIR "/data/service/el1/public/wifi"
-#endif // OHOS_EUPDATER
 #define START_CMD "wpa_supplicant -c"CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf"\
     " -g@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
+#define CONFIG_ROOR_DIR_UPDATER "/tmp/service/el1/public/wifi"
+#define START_CMD_UPDATER "wpa_supplicant -c"CONFIG_ROOR_DIR_UPDATER"/wpa_supplicant/wpa_supplicant.conf"\
+    " -g@abstract:"CONFIG_ROOR_DIR_UPDATER"/sockets/wpa/wlan0"
 #define WPA_SLEEP_TIME (100 * 1000) /* 100ms */
 #define MAX_WPA_MAIN_ARGC_NUM 20
 #define MAX_WPA_MAIN_ARGV_LEN 128
@@ -115,6 +114,8 @@ void ClearHdfWpaRemoteObj(void);
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);
 int32_t WpaGetVersion(struct IWpaInterface *self, uint32_t *majorVer, uint32_t *minorVer);
 pthread_mutex_t *GetInterfaceLock();
+
+bool IsUpdaterMode(void);
 
 struct StWpaMainParam {
     int argc;

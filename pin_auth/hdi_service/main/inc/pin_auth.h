@@ -20,6 +20,7 @@
 #include <mutex>
 #include <vector>
 #include "nocopyable.h"
+#include "all_in_one_func.h"
 
 namespace OHOS {
 namespace UserIam {
@@ -29,6 +30,7 @@ struct PinCredentialInfo {
     uint32_t remainTimes;
     uint32_t freezingTime;
     int32_t nextFailLockoutDuration;
+    uint32_t credentialLength;
 };
 
 struct PinAlgoParam {
@@ -52,9 +54,8 @@ public:
     // for all in one executor
     int32_t SetAllInOneFwkParam(
         const std::vector<uint64_t> &templateIdList, const std::vector<uint8_t> &frameworkPublicKey);
-    int32_t EnrollPin(uint64_t scheduleId, uint64_t subType, std::vector<uint8_t> &salt,
-        const std::vector<uint8_t> &pinData, std::vector<uint8_t> &result);
-    int32_t AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &pinData,
+    int32_t EnrollPin(PinEnrollParam &pinEnrollParam, std::vector<uint8_t> &result);
+    int32_t AuthPin(PinAuthParam &pinAuthParam,
         const std::vector<uint8_t> &extraInfo, std::vector<uint8_t> &resultTlv);
     void WriteAntiBrute(uint64_t templateId);
     int32_t QueryPinInfo(uint64_t templateId, PinCredentialInfo &pinCredentialInfoRet);
@@ -79,10 +80,11 @@ public:
     int32_t CancelVerifierAuth();
     int32_t SendMessageToVerifier(uint64_t scheduleId,
         const std::vector<uint8_t> &msgIn, std::vector<uint8_t> &msgOut, bool &isAuthEnd, int32_t &compareResult);
+    int32_t RestartLockoutDuration(const std::vector<uint8_t> &extraInfo);
+    int32_t PinResultToCoAuthResult(int32_t resultCode);
 
 private:
     int32_t SetVectorByBuffer(std::vector<uint8_t> &vec, const uint8_t *buf, uint32_t bufSize);
-    int32_t PinResultToCoAuthResult(int32_t resultCode);
     std::mutex mutex_;
 };
 } // namespace PinAuth

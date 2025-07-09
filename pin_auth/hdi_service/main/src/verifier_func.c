@@ -468,7 +468,7 @@ static int32_t AuthPin(VerifierMsg *verifierMsg, Buffer *pinDataBuf)
 
     if (pinCredentialInfo.freezeTime == 0) {
         ResultCode compareRet = RESULT_COMPARE_FAIL;
-        ResultCode result = AuthPinById(pinDataBuf, g_verifierSchedule->templateId, NULL, &compareRet);
+        ResultCode result = AuthPinById(pinDataBuf, g_verifierSchedule->templateId, 0, NULL, &compareRet);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("AuthPinById fail!");
         }

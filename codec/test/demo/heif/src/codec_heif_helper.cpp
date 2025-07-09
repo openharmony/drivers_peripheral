@@ -16,7 +16,7 @@
 #include "codec_heif_helper.h"
 
 namespace OHOS::VDI::HEIF {
-using namespace OHOS::HDI::Codec::Image::V2_0;
+using namespace OHOS::HDI::Codec::Image::V2_1;
 using namespace std;
 
 void HeifEncoderHelper::DoEncode()

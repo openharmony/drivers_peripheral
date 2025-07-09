@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V2_0_CODECHEIFENCODESERVICE_H
-#define OHOS_HDI_CODEC_V2_0_CODECHEIFENCODESERVICE_H
+#ifndef OHOS_HDI_CODEC_V2_1_CODECHEIFENCODESERVICE_H
+#define OHOS_HDI_CODEC_V2_1_CODECHEIFENCODESERVICE_H
 
 #include <mutex>
 #include "codec_heif_vdi.h"
-#include "v2_0/icodec_image.h"
+#include "v2_1/icodec_image.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V2_0 {
+namespace V2_1 {
 class CodecHeifEncodeService {
 public:
     CodecHeifEncodeService();
@@ -33,17 +33,16 @@ public:
                          const std::vector<ItemRef>& refs, const SharedBuffer& output, uint32_t& filledLen);
 private:
     bool LoadVendorLib();
-    bool ReWrapNativeBufferInImageItem(const std::vector<ImageItem>& inputImgs);
 private:
     std::mutex mutex_;
     std::shared_ptr<void> libHeif_ = nullptr;
-    ICodecHeifHwi* heifHwi_ = nullptr;
+    OHOS::VDI::HEIF::ICodecHeifHwi* heifHwi_ = nullptr;
     bool isIPCMode_;
 };
-} // V2_0
+} // V2_1
 } // Image
 } // Codec
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_CODEC_V2_0_CODECHEIFENCODESERVICE_H
+#endif // OHOS_HDI_CODEC_V2_1_CODECHEIFENCODESERVICE_H

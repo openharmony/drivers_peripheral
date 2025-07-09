@@ -44,8 +44,8 @@ RetCode PcForkNode::Start(const int32_t streamId)
     for (const auto& in : inPutPorts_) {
         for (auto& out : outPutPorts_) {
             if (out->format_.streamId_ != in->format_.streamId_) {
-                id = out->format_.streamId_;
-                bufferPoolId = out->format_.bufferPoolId_;
+                id = static_cast<int32_t>(out->format_.streamId_);
+                bufferPoolId = static_cast<uint64_t>(out->format_.bufferPoolId_);
                 CAMERA_LOGI("fork buffer get buffer streamId = %{public}d", out->format_.streamId_);
             }
         }
@@ -138,6 +138,7 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
             forkBuffer->SetCurFormat(buffer->GetCurFormat());
             forkBuffer->SetCurWidth(buffer->GetCurWidth());
             forkBuffer->SetCurHeight(buffer->GetCurHeight());
+            forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
             CameraDumper& dumper = CameraDumper::GetInstance();
             dumper.DumpBuffer("PcForkNode", ENABLE_FORK_NODE_CONVERTED, buffer);
             auto id = forkBuffer->GetStreamId();
@@ -153,8 +154,9 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                         captureRequests_[id].size(), forkBuffer->GetCaptureId());
                 }
             }
-            CAMERA_LOGE("Deliver fork buffer, streamId[%{public}d], index[%{public}d], status = %{public}d",
-                forkBuffer->GetStreamId(), forkBuffer->GetIndex(), forkBuffer->GetBufferStatus());
+            CAMERA_LOGI("DeliverForkBuffer,streamId:%{public}d,index:%{public}d,status=%{public}d,format =%{public}d",
+                forkBuffer->GetStreamId(), forkBuffer->GetIndex(),
+                forkBuffer->GetBufferStatus(), forkBuffer->GetFormat());
             NodeBase::DeliverBuffer(forkBuffer);
         }
     }
@@ -200,7 +202,7 @@ void PcForkNode::DrainForkBufferPool()
             buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
 
             for (auto& it : outPutPorts_) {
-                if (it->format_.streamId_ == streamId_) {
+                if (it->format_.streamId_ == static_cast<uint32_t>(streamId_)) {
                     it->DeliverBuffer(buffer);
                     break;
                 }

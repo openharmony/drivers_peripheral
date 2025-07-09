@@ -86,6 +86,7 @@ RetCode CameraHostConfig::AddCameraId(const std::string &logicalCameraId,
     } else {
         cameraIdMap_.insert(std::make_pair(logicalCameraId, physicalCameraIds));
         cameraAbilityMap_.insert(std::make_pair(logicalCameraId, ability));
+        CAMERA_LOGI("logicalCameraId %{public}s Add Success", logicalCameraId.c_str());
         return RC_OK;
     }
 }
@@ -131,10 +132,14 @@ std::string CameraHostConfig::ReturnEnableLogicalCameraId()
     }
 }
 
-std::string CameraHostConfig::GenerateNewLogicalCameraId()
+std::string CameraHostConfig::GenerateNewLogicalCameraId(const std::string &cameraName)
 {
+    std::string cameraIdPrefix = "lcam00";
+    if (cameraName != "") {
+        cameraIdPrefix = cameraName + "&id=";
+    }
     for (int32_t id = 1; id < CAMERA_MAX + 1; id++) {
-        std::string logicalCameraId = "lcam00" + std::to_string(id);
+        std::string logicalCameraId = cameraIdPrefix + std::to_string(id);
         auto itr = cameraIdMap_.find(logicalCameraId);
         if (itr == cameraIdMap_.end()) {
             return logicalCameraId;

@@ -13,26 +13,32 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V2_0_SENSORCALLBACKIMPL_H
-#define OHOS_HDI_SENSOR_V2_0_SENSORCALLBACKIMPL_H
+#ifndef OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H
+#define OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H
 
 #include <hdf_base.h>
-#include "v2_0/isensor_callback.h"
+#include "v3_0/isensor_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
-class SensorCallbackImpl : public ISensorCallback {
+namespace V3_0 {
+class SensorCallbackImpl : public V3_0::ISensorCallback {
 public:
     virtual ~SensorCallbackImpl() {}
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override;
+
+    int32_t OnDataEventAsync(const std::vector<HdfSensorEvents>& events) override
+    {
+        return HDF_SUCCESS;
+    }
+
     static uint32_t sensorDataFlag;
 };
-} // V2_0
+} // V3_0
 } // Sensor
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V2_0_SENSORCALLBACKIMPL_H
+#endif // OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H

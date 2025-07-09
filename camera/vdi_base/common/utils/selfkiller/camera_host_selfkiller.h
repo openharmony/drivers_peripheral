@@ -23,7 +23,7 @@ namespace OHOS::Camera {
 
 class CameraHostSelfkiller {
 public:
-    CameraHostSelfkiller(uint8_t sleepInteral_ = 3, uint32_t noCameraForExitMaxTimeSecond_ = 30);
+    explicit CameraHostSelfkiller(uint8_t sleepInterval = 3, uint32_t noCameraForExitMaxTimeSecond = 30);
     ~CameraHostSelfkiller();
     void Init(std::function<bool(void)> canBeKilledFn, std::function<void(void)> killerTimeoutCb = nullptr,
         std::string selfKillParamName = DEFAULT_SELF_KILL_PARAM_NAME,
@@ -41,7 +41,7 @@ private:
     void CameraHostSelfkillerHandler();
     static constexpr const char *DEFAULT_SELF_KILL_PARAM_NAME = "const.camera.setting.selfkill.enable";
     static constexpr const char *DEFAULT_CAMERA_SERVICE_NAME = "camera_service_usb";
-    uint8_t sleepInteral_ = 3;
+    uint8_t sleepInterval_ = 3;
     uint32_t noCameraForExitMaxTimeSecond_ = 30;
 };  // class CameraHostSelfkiller
 };  // namespace OHOS::Camera

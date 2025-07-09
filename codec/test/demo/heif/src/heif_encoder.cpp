@@ -18,8 +18,10 @@
 int main(int argc, char *argv[])
 {
     OHOS::VDI::HEIF::CommandOpt opt = OHOS::VDI::HEIF::Parse(argc, argv);
-    opt.Print();
-    OHOS::VDI::HEIF::HeifEncoderHelper obj(opt);
-    obj.DoEncode();
+    if (!opt.isGetHelpInfoOnly) {
+        opt.Print();
+        OHOS::VDI::HEIF::HeifEncoderHelper obj(opt);
+        obj.DoEncode();
+    }
     return 0;
 }

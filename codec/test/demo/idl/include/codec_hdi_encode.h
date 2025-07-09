@@ -33,13 +33,13 @@
 #include "command_parse.h"
 #include "hdf_log.h"
 #include "sys/mman.h"
-#include "v3_0/codec_types.h"
-#include "v3_0/icodec_callback.h"
-#include "v3_0/icodec_component.h"
-#include "v3_0/icodec_component_manager.h"
+#include "v4_0/codec_types.h"
+#include "v4_0/icodec_callback.h"
+#include "v4_0/icodec_component.h"
+#include "v4_0/icodec_component_manager.h"
 #include "v1_0/include/idisplay_buffer.h"
 
-using OHOS::HDI::Codec::V3_0::OmxCodecBuffer;
+using OHOS::HDI::Codec::V4_0::OmxCodecBuffer;
 class CodecHdiEncode : public ICodecHdiCallBackBase,
                        public std::enable_shared_from_this<CodecHdiEncode> {
     enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
@@ -85,8 +85,8 @@ public:
     bool ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount);
     int32_t OnEmptyBufferDone(const struct OmxCodecBuffer &buffer) override;
     int32_t OnFillBufferDone(const struct OmxCodecBuffer &buffer) override;
-    int32_t EventHandler(OHOS::HDI::Codec::V3_0::CodecEventType event,
-        const OHOS::HDI::Codec::V3_0::EventInfo &info) override;
+    int32_t EventHandler(OHOS::HDI::Codec::V4_0::CodecEventType event,
+        const OHOS::HDI::Codec::V4_0::EventInfo &info) override;
 
 private:
     int32_t ConfigBitMode();
@@ -113,9 +113,9 @@ private:
     uint32_t width_;
     uint32_t height_;
     uint32_t stride_;
-    OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecComponent> client_;
-    OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecCallback> callback_;
-    OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecComponentManager> omxMgr_;
+    OHOS::sptr<OHOS::HDI::Codec::V4_0::ICodecComponent> client_;
+    OHOS::sptr<OHOS::HDI::Codec::V4_0::ICodecCallback> callback_;
+    OHOS::sptr<OHOS::HDI::Codec::V4_0::ICodecComponentManager> omxMgr_;
     uint32_t componentId_;
     std::map<int, std::shared_ptr<BufferInfo>> omxBuffers_;  // key is bufferID
     std::map<int, const void *> addrs_;
