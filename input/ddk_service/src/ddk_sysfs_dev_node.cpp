@@ -68,7 +68,12 @@ int32_t SysfsDevNode::FindPath(std::string& devNodePath)
 
         auto devPath = std::filesystem::path(devDir_).append(match.str(GROUP_ONE) + "-" + match.str(GROUP_TWO))
             .append("devnum");
-        std::optional<std::string> devNumInfo = GetContent(devPath);
+        char realpathStr[PATH_MAX] = {'\0'};
+        if (realpath(devPath.c_str(), realpathStr) == nullptr) {
+            HDF_LOGE("Realpath failed, errno: %{public}s", strerror(errno));
+            continue;
+        }
+        std::optional<std::string> devNumInfo = GetContent(realpathStr);
         if (!devNumInfo.has_value() || devNumInfo.value().find(std::to_string(devNum_)) == std::string::npos) {
             continue;
         }
