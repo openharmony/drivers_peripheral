@@ -1183,7 +1183,10 @@ int32_t UsbfnMtpImpl::Release()
     }
     mtpDev_->initFlag = false;
     sem_post(&asyncReq_);
-    (void)UsbMtpPortCancelRequest(mtpPort_);
+    {
+        std::lock_guard<std::mutex> guard(asyncMutex_);
+        (void)UsbMtpPortCancelRequest(mtpPort_);
+    }
     pthread_rwlock_unlock(&mtpRunrwLock_);
     pthread_rwlock_wrlock(&mtpRunrwLock_);
 
