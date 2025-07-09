@@ -169,6 +169,10 @@ int32_t DStreamOperator::ExtractStreamInfo(std::vector<DCStreamInfo>& dCameraStr
         return CamRetCode::INVALID_ARGUMENT;
     }
     for (auto streamInfo : dcStreamInfoMap_) {
+        if (streamInfo.second == nullptr) {
+            DHLOGE("Stream info is null.");
+            continue;
+        }
         DCStreamInfo dstStreamInfo;
         dstStreamInfo.streamId_ = streamInfo.second->streamId_;
         dstStreamInfo.width_ = streamInfo.second->width_;
@@ -270,6 +274,10 @@ int32_t DStreamOperator::GetStreamAttributes(std::vector<StreamAttribute> &attri
     attributes.clear();
     std::lock_guard<std::mutex> autoLock(halStreamLock_);
     for (const auto &stream : halStreamMap_) {
+        if (stream.second == nullptr) {
+            DHLOGE("Stream is null.");
+            continue;
+        }
         StreamAttribute attribute;
         DCamRetCode ret = stream.second->GetDCameraStreamAttribute(attribute);
         if (ret != SUCCESS) {
@@ -506,6 +514,10 @@ bool DStreamOperator::HasContinuousCaptureInfo(int captureId)
     bool flag = false;
     std::lock_guard<std::mutex> autoLock(streamAttrLock_);
     for (auto iter : halCaptureInfoMap_) {
+        if (iter.second == nullptr) {
+            DHLOGE("Capture info is null.");
+            continue;
+        }
         for (auto id : iter.second->streamIds_) {
             auto dcStreamInfo = dcStreamInfoMap_.find(id);
             if (dcStreamInfo == dcStreamInfoMap_.end()) {
@@ -997,6 +1009,10 @@ void DStreamOperator::SetCapturing(bool isCapturing)
 
 void DStreamOperator::ConvertStreamInfo(const StreamInfo &srcInfo, std::shared_ptr<DCStreamInfo> &dstInfo)
 {
+    if (dstInfo == nullptr) {
+        DHLOGE("DStreamOperator::ConvertStreamInfo, dstInfo is null.");
+        return;
+    }
     dstInfo->streamId_ = srcInfo.streamId_;
     dstInfo->width_ = srcInfo.width_;
     dstInfo->stride_ = srcInfo.width_;
@@ -1069,6 +1085,10 @@ void DStreamOperator::AppendCaptureInfo(std::shared_ptr<DCCaptureInfo> &appendCa
             appendCaptureInfo->isCapture_ = false;
         }
     } else {
+        if (inputCaptureInfo == nullptr) {
+            DHLOGE("Input capture info is null.");
+            return;
+        }
         for (auto cacheCapture : cachedDCaptureInfoList_) {
             if ((isStreaming && (cacheCapture->type_ == DCStreamType::SNAPSHOT_FRAME)) ||
                 (!isStreaming && (cacheCapture->type_ == DCStreamType::CONTINUOUS_FRAME))) {
@@ -1131,6 +1151,10 @@ std::shared_ptr<DCCaptureInfo> DStreamOperator::BuildSuitableCaptureInfo(const C
 void DStreamOperator::ChooseSuitableFormat(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
     std::shared_ptr<DCCaptureInfo> &captureInfo)
 {
+    if (captureInfo == nullptr || streamInfo.empty()) {
+        DHLOGE("DStreamOperator::ChooseSuitableFormat, captureInfo is null or streamInfo is empty.");
+        return;
+    }
     for (auto stream : streamInfo) {
         if ((streamInfo.at(0)->type_ == DCStreamType::CONTINUOUS_FRAME &&
             dcSupportedVideoResolutionMap_.count(stream->format_) > 0) ||
@@ -1183,6 +1207,10 @@ void DStreamOperator::ChooseSuitableResolution(std::vector<std::shared_ptr<DCStr
     std::lock_guard<std::mutex> autoLock(streamAttrLock_);
     DCResolution tempResolution = { 0, 0 };
     for (auto iter : dcStreamInfoMap_) {
+        if (iter.second == nullptr) {
+            DHLOGE("DStreamOperator::ChooseSuitableResolution, dcStreamInfoMap_ iter.second is null.");
+            continue;
+        }
         if (iter.second->type_ != (streamInfo.at(0))->type_) {
             continue;
         }
@@ -1212,12 +1240,20 @@ void DStreamOperator::ChooseSuitableResolution(std::vector<std::shared_ptr<DCStr
 void DStreamOperator::ChooseSuitableDataSpace(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
     std::shared_ptr<DCCaptureInfo> &captureInfo)
 {
+    if (captureInfo == nullptr || streamInfo.empty()) {
+        DHLOGE("DStreamOperator::ChooseSuitableDataSpace, captureInfo is null or streamInfo is empty.");
+        return;
+    }
     captureInfo->dataspace_ = (streamInfo.at(0))->dataspace_;
 }
 
 void DStreamOperator::ChooseSuitableEncodeType(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
     std::shared_ptr<DCCaptureInfo> &captureInfo)
 {
+    if (captureInfo == nullptr || streamInfo.empty()) {
+        DHLOGE("DStreamOperator::ChooseSuitableEncodeType, captureInfo is null or streamInfo is empty.");
+        return;
+    }
     if ((streamInfo.at(0))->type_ == DCStreamType::CONTINUOUS_FRAME) {
         if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(), DCEncodeType::ENCODE_TYPE_H265) &&
             count(sourceEncodeTypes_.begin(), sourceEncodeTypes_.end(), DCEncodeType::ENCODE_TYPE_H265)) {
@@ -1247,6 +1283,10 @@ void DStreamOperator::ChooseSuitableStreamId(std::shared_ptr<DCCaptureInfo> &cap
     captureInfo->streamIds_.clear();
     std::lock_guard<std::mutex> autoLock(streamAttrLock_);
     for (auto iter : halCaptureInfoMap_) {
+        if (iter.second == nullptr) {
+            DHLOGE("DStreamOperator::ChooseSuitableStreamId, halCaptureInfoMap_ iter.second is null.");
+            continue;
+        }
         for (auto id : iter.second->streamIds_) {
             auto dcStreamInfo = dcStreamInfoMap_.find(id);
             if (dcStreamInfo == dcStreamInfoMap_.end()) {
@@ -1321,6 +1361,10 @@ int32_t DStreamOperator::FindCaptureIdByStreamId(int32_t streamId)
     int32_t captureId = -1;
     for (auto iter = halCaptureInfoMap_.begin(); iter != halCaptureInfoMap_.end(); iter++) {
         std::shared_ptr<CaptureInfo> captureInfo = iter->second;
+        if (captureInfo == nullptr) {
+            DHLOGE("DStreamOperator::FindCaptureIdByStreamId, halCaptureInfoMap_ iter.second is null.");
+            continue;
+        }
         std::vector<int> streamIds = captureInfo->streamIds_;
         if (std::find(streamIds.begin(), streamIds.end(), streamId) != streamIds.end()) {
             captureId = iter->first;
@@ -1363,6 +1407,10 @@ void DStreamOperator::ExtractNotCaptureStream(bool isStreaming,
 {
     std::lock_guard<std::mutex> autoLock(streamAttrLock_);
     for (auto iter = dcStreamInfoMap_.begin(); iter != dcStreamInfoMap_.end(); iter++) {
+        if (iter->second == nullptr) {
+            DHLOGE("DStreamOperator::ExtractNotCaptureStream, dcStreamInfoMap_ iter.second is null.");
+            continue;
+        }
         if ((isStreaming && (iter->second->type_ == DCStreamType::SNAPSHOT_FRAME)) ||
             (!isStreaming && (iter->second->type_ == DCStreamType::CONTINUOUS_FRAME))) {
             appendStreamInfo.push_back(iter->second);
