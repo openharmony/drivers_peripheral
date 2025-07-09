@@ -39,7 +39,10 @@ static int32_t AudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
-
+    if (client == nullptr || data == nullptr || reply == nullptr) {
+        HDF_LOGE("%{public}s: input client/data/reply is NULL", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
