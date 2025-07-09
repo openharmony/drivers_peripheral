@@ -378,7 +378,7 @@ void ImageBuffer::Free()
 {
     std::lock_guard<std::mutex> l(l_);
     if (virAddr_ != sbAddr_ && virAddr_ != nullptr) {
-        CAMERA_LOGE("Free VirtualAddr, streamId = %{public}d, index = %{public}d", streamId_, index_);
+        CAMERA_LOGI("Free VirtualAddr, streamId = %{public}d, index = %{public}d", streamId_, index_);
         free(virAddr_);
     }
     virAddr_ = nullptr;

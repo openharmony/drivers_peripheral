@@ -51,7 +51,7 @@ ohos_shared_library("libusbhost_acm") {
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
     "./../gadget/function/include",
-    "//drivers/hdf_core/framework/model/usb/include",
+    "./../hdf_usb/include",
     "include",
     "${usb_driver_path}/utils/include",
   ]
@@ -97,7 +97,7 @@ ohos_shared_library("libusbhost_acm_rawapi") {
     "./../gadget/function/include",
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
-    "//drivers/hdf_core/framework/model/usb/include",
+    "./../hdf_usb/include",
     "include",
     "${usb_driver_path}/utils/include",
   ]

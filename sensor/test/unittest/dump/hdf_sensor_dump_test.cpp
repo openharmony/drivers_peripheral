@@ -20,7 +20,7 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v2_1/isensor_interface.h"
+#include "v3_0/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
 #include "sensor_uhdf_log.h"
@@ -28,11 +28,11 @@
 #include "sensor_clients_manager.h"
 
 using namespace OHOS::HDI::Sensor;
-using namespace OHOS::HDI::Sensor::V2_1;
+using namespace OHOS::HDI::Sensor::V3_0;
 using namespace testing::ext;
 
 namespace {
-    sptr<V2_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
+    sptr<V3_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
     constexpr int64_t SAMPLING_INTERVAL = 10000000;
     constexpr int64_t REPORT_INTERVAL = 1;
@@ -57,14 +57,14 @@ namespace {
         void SetUp();
         void TearDown();
         void GetAllSensorInfo(std::vector<HdfSensorInformation> &info);
-        void Register(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj);
-        void Unregister(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj);
+        void Register(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj);
+        void Unregister(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj);
         void SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval);
         void Enable(int32_t sensorId);
         void Disable(int32_t sensorId);
-        void OnDataEvent(const V2_0::HdfSensorEvents& event);
+        void OnDataEvent(const V3_0::HdfSensorEvents& event);
         void PrintDumpResult(struct HdfSBuf* reply);
-        V2_0::HdfSensorEvents g_event = {1, 1, 100000000, 1, 1, {1, 2, 3, 4}, 4};
+        V3_0::HdfSensorEvents g_event = {1, 1, 100000000, 1, 1, {1, 2, 3, 4}, 4};
     };
 
     void HdfSensorDumpTest::SetUpTestCase()
@@ -106,13 +106,13 @@ namespace {
         }
     }
 
-    void HdfSensorDumpTest::Register(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj)
+    void HdfSensorDumpTest::Register(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj)
     {
         SENSOR_TRACE;
         SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, g_serviceId, callbackObj);
     }
 
-    void HdfSensorDumpTest::Unregister(int32_t groupId, const sptr<V2_0::ISensorCallback> &callbackObj)
+    void HdfSensorDumpTest::Unregister(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj)
     {
         SENSOR_TRACE;
         SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, g_serviceId, callbackObj);
@@ -139,7 +139,7 @@ namespace {
         SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, g_serviceId, 0);
     }
 
-    void HdfSensorDumpTest::OnDataEvent(const V2_0::HdfSensorEvents& event)
+    void HdfSensorDumpTest::OnDataEvent(const V3_0::HdfSensorEvents& event)
     {
         SENSOR_TRACE;
         SensorClientsManager::GetInstance()->CopyEventData(event);
@@ -210,7 +210,7 @@ namespace {
         SENSOR_TRACE;
         Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
 
-        V2_0::HdfSensorEvents event;
+        V3_0::HdfSensorEvents event;
         for (auto it : g_info) {
             g_event.sensorId = it.sensorId;
             OnDataEvent(g_event);

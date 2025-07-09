@@ -114,7 +114,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyRender_001, TestSize.Level1)
     devDesc.pins = PIN_OUT_DAUDIO_DEFAULT;
     uint32_t renderId = 0;
     AdapterTest_->renderDevs_[renderId] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, devDesc, attrs, callback, renderId));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, devDesc, attrs, callback, renderId)));
     AdapterTest_->spkPinInUse_ = 0;
 
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyRender(renderId));
@@ -517,7 +517,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AdapterUnload_001, TestSize.Level1)
     sptr<IDAudioCallback> callbackSpk = sptr<IDAudioCallback>(new MockIDAudioCallback());
     AdapterTest_->SetSpeakerCallback(dhId, callbackSpk);
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, descSpk, attrsSpk, callbackSpk, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, descSpk, attrsSpk, callbackSpk, 0)));
     EXPECT_EQ(HDF_ERR_DEVICE_BUSY, AdapterTest_->AdapterUnload());
 
     AudioDeviceDescriptor devDescMic;
@@ -526,7 +526,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AdapterUnload_001, TestSize.Level1)
     sptr<IDAudioCallback> callbackMic = sptr<IDAudioCallback>(new MockIDAudioCallback());
     AdapterTest_->SetMicCallback(dhId, callbackMic);
     AdapterTest_->captureDevs_[0] = std::make_pair(dhId,
-        new AudioCaptureInterfaceImpl(adpterName, devDescMic, attrsMic, callbackMic));
+        sptr<AudioCaptureInterfaceImpl>(new AudioCaptureInterfaceImpl(adpterName, devDescMic, attrsMic, callbackMic)));
     EXPECT_EQ(HDF_ERR_DEVICE_BUSY, AdapterTest_->AdapterUnload());
 
     AdapterTest_->renderDevs_[0].first = 0;
@@ -833,7 +833,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetAudioVolume_001, TestSize.Level1)
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
     param = "0";
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
@@ -861,7 +861,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_001, TestSize.Level1)
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=1;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
@@ -886,7 +886,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_002, TestSize.Level1)
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=3;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
@@ -911,7 +911,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_003, TestSize.Level1)
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=2;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
@@ -936,7 +936,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_004, TestSize.Level1)
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=4;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
@@ -962,7 +962,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_005, TestSize.Level1)
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=66;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
@@ -1108,7 +1108,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_001, TestSize.Lev
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
@@ -1133,7 +1133,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_002, TestSize.Lev
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleVolumeChangeEvent(event));
 }
 
@@ -1156,7 +1156,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_003, TestSize.Lev
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0));
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
 }
 
@@ -1533,6 +1533,54 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleDeviceClosed_003, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleDeviceClosed(streamId, event));
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockRevertIAudioParamCallback());
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleDeviceClosed(streamId, event));
+}
+
+/**
+ * @tc.name: HandleRenderCallback_001
+ * @tc.desc: Verify the HandleRenderCallback function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_001, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    DAudioEvent event = {HDF_AUDIO_EVENT_FULL, "gtest"};
+
+    AdapterTest_->paramCallback_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleRenderCallback(event));
+}
+
+/**
+ * @tc.name: HandleRenderCallback_002
+ * @tc.desc: Verify the HandleRenderCallback function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    DAudioEvent event = {HDF_AUDIO_EVENT_FULL, "gtest"};
+
+    AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleRenderCallback(event));
+}
+
+/**
+ * @tc.name: HandleRenderCallback_003
+ * @tc.desc: Verify the HandleRenderCallback function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_003, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    DAudioEvent event = {HDF_AUDIO_EVENT_NEED_DATA, "gtest"};
+
+    AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleRenderCallback(event));
 }
 } // V1_0
 } // Audio

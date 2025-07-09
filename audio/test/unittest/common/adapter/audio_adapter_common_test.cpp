@@ -203,6 +203,488 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid001, TestSize.
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
 }
 
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid002, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_NONE;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid003, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_HEADSET;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid004, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_LINEOUT;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid005, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_HDMI;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid006, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_USB;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid007, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_USB_EXT;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid008, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_EARPIECE;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid009, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_BLUETOOTH_SCO;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid010, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_DAUDIO_DEFAULT;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid011, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_HEADPHONE;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid012, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_USB_HEADSET;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid013, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_BLUETOOTH_A2DP;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid014, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_DP;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid015, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_IN_COMMUNICATION;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid016, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_IN_RINGTONE;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid017, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_IN_CALL;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid018, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_MMAP_NOIRQ;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid019, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_OFFLOAD;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid020, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_MULTI_CHANNEL;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid021, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_DP;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid022, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_MMAP_VOIP;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid023, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_IN_NAVIGATION;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid024, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = 0;
+    attrs.streamId = 0;
+    attrs.type = AUDIO_DIRECT;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_FEATURE_COMMUNITY
+    EXPECT_NE(HDF_SUCCESS, ret);
+#else
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+    }
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
+}
+
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderNull001, TestSize.Level1)
 {
     EXPECT_NE(HDF_SUCCESS, adapter_->DestroyRender(nullptr, renderId_));
@@ -352,6 +834,216 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid007, TestSize
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
 }
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid008, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_RAW_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid009, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_LIVE_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid010, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_DEFAULT_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid011, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_MIC_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid012, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_SPEECH_WAKEUP_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid013, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_VOICE_COMMUNICATION_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid014, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_VOICE_RECOGNITION_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid015, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_HS_MIC;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid016, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_LINEIN;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid017, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_USB_EXT;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid018, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_BLUETOOTH_SCO_HEADSET;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid019, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_DAUDIO_DEFAULT;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid020, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_USB_HEADSET;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid021, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_PENCIL;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid022, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_UWB;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid023, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_NEARLINK;
+    InitAttrs(attrs);
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+}
+
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyCaptureNull001, TestSize.Level1)
 {

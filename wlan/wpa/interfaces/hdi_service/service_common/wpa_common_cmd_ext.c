@@ -31,7 +31,7 @@
 #include "common/defs.h"
 #include "v2_0/iwpa_callback.h"
 #include "v2_0/iwpa_interface.h"
-
+#include <dirent.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <dlfcn.h>
@@ -40,6 +40,7 @@
 
 pthread_t g_tid;
 #define MAX_WPA_WAIT_TIMES 30
+#define CTRL_LEN 128
 
 static void SplitCmdString(const char *startCmd, struct StWpaMainParam *pParam)
 {
@@ -205,6 +206,56 @@ static int32_t StartWpaSupplicant(const char *moduleName, const char *startCmd)
     return HDF_SUCCESS;
 }
 
+static void HdfWpaInterfaceDriverInit(void)
+{
+    static bool flag = false;
+    if (!flag) {
+        HDF_LOGI("HdfWpaInterfaceDriverInit enter.");
+        DListHeadInit(&(HdfWpaStubDriver()->remoteListHead));
+        if (OsalMutexInit(&(HdfWpaStubDriver()->mutex)) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: Mutex init failed", __func__);
+        }
+        flag = true;
+    }
+}
+
+static const char *GetWpaStartCmd(void)
+{
+    if (IsUpdaterMode()) {
+        HdfWpaInterfaceDriverInit();
+        HDF_LOGI("updater mode");
+        return START_CMD_UPDATER;
+    }
+    return START_CMD;
+}
+
+static void RemoveLostCtrl(void)
+{
+    DIR *dir = NULL;
+    char path[CTRL_LEN];
+    struct dirent *entry;
+
+    dir = opendir(CONFIG_ROOR_DIR);
+    if (dir == NULL) {
+        HDF_LOGE("can not open wifi dir");
+        return;
+    }
+    while ((entry = readdir(dir)) != NULL) {
+        if (strncmp(entry->d_name, "wpa_ctrl_", strlen("wpa_ctrl_")) != 0) {
+            continue;
+        }
+        int ret = sprintf_s(path, sizeof(path), "%s/%s", CONFIG_ROOR_DIR, entry->d_name);
+        if (ret == -1) {
+            HDF_LOGE("sprintf_s dir name fail");
+            break;
+        }
+        if (entry->d_type != DT_DIR) {
+            remove(path);
+        }
+    }
+    closedir(dir);
+}
+
 int32_t WpaInterfaceStart(struct IWpaInterface *self)
 {
     int32_t ret;
@@ -218,7 +269,8 @@ int32_t WpaInterfaceStart(struct IWpaInterface *self)
         return HDF_FAILURE;
     }
     pthread_mutex_lock(GetInterfaceLock());
-    ret = StartWpaSupplicant(WPA_SUPPLICANT_NAME, START_CMD);
+    RemoveLostCtrl();
+    ret = StartWpaSupplicant(WPA_SUPPLICANT_NAME, GetWpaStartCmd());
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: StartWpaSupplicant failed, error code: %{public}d", __func__, ret);
         pthread_mutex_unlock(GetInterfaceLock());
@@ -275,6 +327,15 @@ int32_t WpaInterfaceStop(struct IWpaInterface *self)
     return HDF_SUCCESS;
 }
 
+static const char *GetWpaSupplicantConfPath(void)
+{
+    if (IsUpdaterMode()) {
+        HDF_LOGI("updater mode");
+        return CONFIG_ROOR_DIR_UPDATER"/wpa_supplicant/wpa_supplicant.conf";
+    }
+    return CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf";
+}
+
 int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, const char *confName)
 {
     (void)self;
@@ -294,7 +355,7 @@ int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, 
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
         if (strcpy_s(addInterface.name, sizeof(addInterface.name) - 1, ifName) != EOK ||
             strcpy_s(addInterface.confName, sizeof(addInterface.confName) - 1,
-            CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != EOK) {
+            GetWpaSupplicantConfPath()) != EOK) {
             pthread_mutex_unlock(GetInterfaceLock());
             return HDF_FAILURE;
         }

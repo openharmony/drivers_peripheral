@@ -54,7 +54,7 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
     install_images += [ "updater" ]
   }
   subsystem_name = "hdf"
-  innerapi_tags = [ "passthrough_indirect" ]
+  innerapi_tags = [ "passthrough" ]
   part_name = "drivers_peripheral_input"
 }
 

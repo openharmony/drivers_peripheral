@@ -13,94 +13,19 @@
  * limitations under the License.
  */
 #include "codec_heif_encode_service.h"
+#include <algorithm>
 #include "codec_log_wrapper.h"
 #include "hdf_base.h"
 #include "hdf_remote_service.h"
-#include "v1_0/display_composer_type.h"
-#include "v1_0/imapper.h"
-#include "v1_1/imetadata.h"
 #include <dlfcn.h>
 #include <unistd.h>
-#include <mutex>
 
 namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
-namespace V2_0 {
-using GetCodecHeifHwi = ICodecHeifHwi*(*)();
-
-std::mutex g_mapperMtx;
-std::mutex g_metaMtx;
-sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> g_mapperService;
-sptr<OHOS::HDI::Display::Buffer::V1_1::IMetadata> g_metaService;
-
-sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> GetMapperService()
-{
-    std::lock_guard<std::mutex> lk(g_mapperMtx);
-    if (g_mapperService) {
-        return g_mapperService;
-    }
-    g_mapperService = OHOS::HDI::Display::Buffer::V1_0::IMapper::Get(true);
-    if (g_mapperService) {
-        CODEC_LOGI("get IMapper succ");
-        return g_mapperService;
-    }
-    CODEC_LOGE("get IMapper failed");
-    return nullptr;
-}
-
-sptr<OHOS::HDI::Display::Buffer::V1_1::IMetadata> GetMetaService()
-{
-    std::lock_guard<std::mutex> lk(g_metaMtx);
-    if (g_metaService) {
-        return g_metaService;
-    }
-    g_metaService = OHOS::HDI::Display::Buffer::V1_1::IMetadata::Get(true);
-    if (g_metaService) {
-        CODEC_LOGI("get IMetadata succ");
-        return g_metaService;
-    }
-    CODEC_LOGE("get IMetadata failed");
-    return nullptr;
-}
- 
-void BufferDestructor(BufferHandle* handle)
-{
-    if (handle == nullptr) {
-        return;
-    }
-    sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> mapper = GetMapperService();
-    if (mapper == nullptr) {
-        return;
-    }
-    sptr<NativeBuffer> buffer = new NativeBuffer();
-    buffer->SetBufferHandle(handle, true);
-    mapper->FreeMem(buffer);
-}
-
-bool ReWrapNativeBuffer(sptr<NativeBuffer>& buffer)
-{
-    if (buffer == nullptr) {
-        return true;
-    }
-    BufferHandle* handle = buffer->Move();
-    if (handle == nullptr) {
-        return true;
-    }
-    buffer->SetBufferHandle(handle, true, BufferDestructor);
-    sptr<OHOS::HDI::Display::Buffer::V1_1::IMetadata> meta = GetMetaService();
-    if (meta == nullptr) {
-        return false;
-    }
-    int32_t ret = meta->RegisterBuffer(buffer);
-    if (ret != Display::Composer::V1_0::DISPLAY_SUCCESS &&
-        ret != Display::Composer::V1_0::DISPLAY_NOT_SUPPORT) {
-        CODEC_LOGE("RegisterBuffer failed, ret = %{public}d", ret);
-        return false;
-    }
-    return true;
-}
+namespace V2_1 {
+using GetCodecHeifHwi = OHOS::VDI::HEIF::ICodecHeifHwi*(*)();
 
 CodecHeifEncodeService::CodecHeifEncodeService()
 {
@@ -140,52 +65,34 @@ bool CodecHeifEncodeService::LoadVendorLib()
     return true;
 }
 
-bool CodecHeifEncodeService::ReWrapNativeBufferInImageItem(const std::vector<ImageItem>& inputImgs)
-{
-    if (!isIPCMode_) {
-        return true;
-    }
-
-    for (const auto &image : inputImgs) {
-        if (!ReWrapNativeBuffer(const_cast<ImageItem &>(image).pixelBuffer)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 int32_t CodecHeifEncodeService::DoHeifEncode(const std::vector<ImageItem>& inputImgs,
                                              const std::vector<MetaItem>& inputMetas,
                                              const std::vector<ItemRef>& refs,
                                              const SharedBuffer& output, uint32_t& filledLen)
 {
+    if (!isIPCMode_) {
+        return HDF_FAILURE;
+    }
+
+    std::vector<OHOS::VDI::HEIF::ImageItem> inputImgsInternal(inputImgs.size());
+    std::transform(inputImgs.cbegin(), inputImgs.cend(), inputImgsInternal.begin(),
+        OHOS::VDI::HEIF::ConvertImageItem);
+
+    std::vector<OHOS::VDI::HEIF::MetaItem> inputMetasInternal(inputMetas.size());
+    std::transform(inputMetas.cbegin(), inputMetas.cend(), inputMetasInternal.begin(),
+        OHOS::VDI::HEIF::ConvertMetaItem);
+
+    OHOS::VDI::HEIF::SharedBuffer outputToReturn = OHOS::VDI::HEIF::ConvertSharedBuffer(output);
+
     if (!LoadVendorLib()) {
         return HDF_FAILURE;
     }
 
-    if (!ReWrapNativeBufferInImageItem(inputImgs)) {
-        return HDF_FAILURE;
-    }
-
-    SharedBuffer outputToReturn = output;
-    int32_t ret = (heifHwi_->DoHeifEncode)(inputImgs, inputMetas, refs, outputToReturn);
+    int32_t ret = (heifHwi_->DoHeifEncode)(inputImgsInternal, inputMetasInternal, refs, outputToReturn);
     filledLen = outputToReturn.filledLen;
-    auto releaseRes = [](int fd) {
-        if (fd > 0) {
-            close(fd);
-        }
-    };
-    for (auto one : inputImgs) {
-        releaseRes(one.sharedProperties.fd);
-    }
-    for (auto one : inputMetas) {
-        releaseRes(one.data.fd);
-    }
-    releaseRes(output.fd);
     return ret;
 }
-} // V2_0
+} // V2_1
 } // Image
 } // Codec
 } // HDI

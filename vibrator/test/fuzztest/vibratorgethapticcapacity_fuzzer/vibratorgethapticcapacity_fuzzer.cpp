@@ -15,15 +15,15 @@
 
 #include "vibratorgethapticcapacity_fuzzer.h"
 #include "hdf_base.h"
-#include "v1_2/vibrator_interface_proxy.h"
+#include "v2_0/vibrator_interface_proxy.h"
 #include <hdf_log.h>
 #include <securec.h>
 
-using namespace OHOS::HDI::Vibrator::V1_2;
+using namespace OHOS::HDI::Vibrator::V2_0;
 
 namespace {
     struct AllParameters {
-        OHOS::HDI::Vibrator::V1_2::HapticCapacity hapticCapacity;
+        OHOS::HDI::Vibrator::V2_0::HapticCapacity hapticCapacity;
     };
 }
 
@@ -44,9 +44,9 @@ namespace OHOS {
             return false;
         }
 
-        sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface =
-            OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
-        int32_t ret = !g_vibratorInterface->GetHapticCapacity(params.hapticCapacity);
+        sptr<OHOS::HDI::Vibrator::V2_0::IVibratorInterface> g_vibratorInterface =
+            OHOS::HDI::Vibrator::V2_0::IVibratorInterface::Get();
+        int32_t ret = !g_vibratorInterface->GetHapticCapacity({-1, 1}, params.hapticCapacity);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetConfig failed, ret is [%{public}x]\n", __func__, ret);
             return false;

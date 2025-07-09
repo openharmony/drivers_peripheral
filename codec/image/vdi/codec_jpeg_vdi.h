@@ -34,6 +34,8 @@ struct ICodecJpegHwi {
     int32_t (*FreeInBuffer)(BufferHandle *buffer);
 
     int32_t (*DoJpegDecode)(BufferHandle *buffer, BufferHandle *outBuffer, const struct CodecJpegDecInfo *decInfo);
+    
+    void (*NotifyPowerOn)();
 };
 
 struct CodecImageRegion {

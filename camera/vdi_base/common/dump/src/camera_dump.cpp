@@ -16,6 +16,7 @@
 #include "camera_dump.h"
 
 #include <sys/time.h>
+#include <unistd.h>
 #include <fstream>
 #include <sstream>
 #include <cstdio>
@@ -89,11 +90,16 @@ bool CameraDumper::ReadDumpConfig()
 {
     std::stringstream ss;
     ss << DUMP_CONFIG_PATH;
+    std::string configPath = ss.str();
+    if (access(configPath.c_str(), R_OK) != 0) {
+        CAMERA_LOGE("dump config file <%{public}s> not exist or not readable", configPath.c_str());
+        return false;
+    }
     std::ifstream ifs;
-    ifs.open(ss.str(), std::ios::in);
+    ifs.open(configPath, std::ios::in);
     if (!ifs) {
         CAMERA_LOGE("open dump config file <%{public}s> failed, error: %{public}s",
-            ss.str().c_str(), std::strerror(errno));
+            configPath.c_str(), std::strerror(errno));
         return false;
     }
 
@@ -135,7 +141,7 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
     uint32_t size = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferSize() : buffer->GetSize();
     const std::string DqBufferName = "DQBuffer";
     if (name != DqBufferName) {
-        size = buffer->GetEsFrameInfo().size > 0 ? buffer->GetEsFrameInfo().size : size;
+        size = buffer->GetEsFrameInfo().size > 0 ? static_cast<uint32_t>(buffer->GetEsFrameInfo().size) : size;
     }
 
     std::stringstream ss;
@@ -245,6 +251,10 @@ bool CameraDumper::SaveDataToFile(const char *fileName, const void *data, uint32
     std::stringstream mkdirCmd;
     mkdirCmd << "mkdir -p " << DUMP_PATH;
     system(mkdirCmd.str().c_str());
+    if (access(DUMP_PATH.c_str(), F_OK) != 0 || access(DUMP_PATH.c_str(), W_OK) != 0) {
+        CAMERA_LOGE("dump path <%{public}s> not exist, error: %{public}s", DUMP_PATH.c_str(), std::strerror(errno));
+        return false;
+    }
 
     std::stringstream ss;
     ss << DUMP_PATH << fileName;
@@ -350,7 +360,7 @@ void CameraDumper::CheckDiskInfo()
     }
 
     std::string userPerStr = infos[4].substr(0, infos[4].length() - 1);
-    uint32_t usePer = std::atoi(userPerStr.c_str());
+    uint32_t usePer = static_cast<uint32_t>(std::atoi(userPerStr.c_str()));
     if (usePer >= MAX_USAGE_RATE) {
         CAMERA_LOGE("dump use disk over the limit, stop dump");
         std::lock_guard<std::mutex> l(dumpStateLock_);

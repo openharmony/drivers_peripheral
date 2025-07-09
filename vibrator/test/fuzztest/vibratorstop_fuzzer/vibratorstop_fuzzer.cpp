@@ -15,20 +15,20 @@
 
 #include "vibratorstop_fuzzer.h"
 #include "hdf_base.h"
-#include "v1_1/vibrator_interface_proxy.h"
+#include "v2_0/vibrator_interface_proxy.h"
 
-using namespace OHOS::HDI::Vibrator::V1_1;
+using namespace OHOS::HDI::Vibrator::V2_0;
 
 namespace OHOS {
     bool VibratorStopFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         sptr<IVibratorInterface> g_vibratorInterface = IVibratorInterface::Get();
-        if (!g_vibratorInterface->Start(reinterpret_cast<const std::string &>(data))) {
+        if (!g_vibratorInterface->Start({-1, 1}, reinterpret_cast<const std::string &>(data))) {
             result = true;
         }
         HdfVibratorMode mode = static_cast<HdfVibratorMode>(*data);
-        if (!g_vibratorInterface->Stop(mode)) {
+        if (!g_vibratorInterface->Stop({-1, 1}, mode)) {
             result = true;
         }
         return result;

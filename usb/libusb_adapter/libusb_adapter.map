@@ -19,7 +19,7 @@
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::~LibusbAdapter()";
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::ManageInterface(OHOS::HDI::Usb::V1_0::UsbDev const&, unsigned char, bool)";
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::OpenDevice(OHOS::HDI::Usb::V1_0::UsbDev const&)";
-        "OHOS::HDI::Usb::V1_2::LibusbAdapter::CloseDevice(OHOS::HDI::Usb::V1_0::UsbDev const&)";
+        "OHOS::HDI::Usb::V1_2::LibusbAdapter::CloseDevice(OHOS::HDI::Usb::V1_0::UsbDev const&, bool)";
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::GetDeviceDescriptor(OHOS::HDI::Usb::V1_0::UsbDev const&, std::__h::vector<unsigned char, std::__h::allocator<unsigned char>>&)";
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::GetStringDescriptor(OHOS::HDI::Usb::V1_0::UsbDev const&, unsigned char, std::__h::vector<unsigned char, std::__h::allocator<unsigned char>>&)";
         "OHOS::HDI::Usb::V1_2::LibusbAdapter::GetConfigDescriptor(OHOS::HDI::Usb::V1_0::UsbDev const&, unsigned char, std::__h::vector<unsigned char, std::__h::allocator<unsigned char>>&)";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 
 #include <mutex>
 
-#include <v2_0/id_audio_manager.h>
+#include <v2_1/id_audio_manager.h>
 
 #include "audio_manager_interface_impl.h"
 
@@ -26,8 +26,8 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
+namespace V2_1 {
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
 
 class DAudioManagerInterfaceImpl : public IDAudioManager {
 public:
@@ -50,6 +50,11 @@ public:
     int32_t UnRegisterAudioDevice(const std::string &adpName, int32_t devId) override;
 
     int32_t NotifyEvent(const std::string &adpName, int32_t devId, int32_t streamId, const DAudioEvent &event) override;
+
+    int32_t RegisterAudioHdfListener(const std::string &serviceName,
+        const sptr<IDAudioHdfCallback> &callbackObj) override;
+
+    int32_t UnRegisterAudioHdfListener(const std::string &serviceName) override;
 
 private:
     DAudioManagerInterfaceImpl();
@@ -75,7 +80,7 @@ private:
     static DAudioManagerInterfaceImpl *dAudioMgr_;
     static std::mutex mgrMtx_;
 };
-} // V2_0
+} // V2_1
 } // AudioExt
 } // Distributedaudio
 } // HDI

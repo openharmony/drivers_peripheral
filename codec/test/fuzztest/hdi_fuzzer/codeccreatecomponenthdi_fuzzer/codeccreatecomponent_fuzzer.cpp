@@ -16,7 +16,7 @@
 #include "codeccreatecomponent_fuzzer.h"
 #include "codeccommon_fuzzer.h"
 
-using namespace OHOS::HDI::Codec::V3_0;
+using namespace OHOS::HDI::Codec::V4_0;
 
 namespace OHOS {
 namespace Codec {
@@ -26,9 +26,9 @@ namespace Codec {
             return false;
         }
         
-        OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecComponent> client_ = nullptr;
-        OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecCallback> callback_ = nullptr;
-        OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecComponentManager> omxMgr_ = nullptr;
+        OHOS::sptr<OHOS::HDI::Codec::V4_0::ICodecComponent> client_ = nullptr;
+        OHOS::sptr<OHOS::HDI::Codec::V4_0::ICodecCallback> callback_ = nullptr;
+        OHOS::sptr<OHOS::HDI::Codec::V4_0::ICodecComponentManager> omxMgr_ = nullptr;
         uint32_t g_componentId = 0;
         
         omxMgr_ = ICodecComponentManager::Get(true);

@@ -21,6 +21,7 @@
         "components": [
           "c_utils",
           "drivers_interface_location_geofence",
+          "drivers_peripheral_location_gnss",
           "ipc",
           "hdf_core",
           "hilog"

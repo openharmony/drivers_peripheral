@@ -424,7 +424,7 @@ int32_t AudioProxyRenderRenderFrame(struct AudioRender *render, const void *fram
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_RENDER_FRAME, data, reply);
-    if (ret < 0) {
+    if (ret != 0) {
         if (ret != AUDIO_HAL_ERR_INVALID_OBJECT) {
             HDF_LOGE("AudioRenderRenderFrame FAIL");
         }

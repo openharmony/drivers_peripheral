@@ -22,7 +22,7 @@
 
 #include <v1_0/audio_types.h>
 #include <v1_0/iaudio_capture.h>
-#include <v2_0/id_audio_manager.h>
+#include <v2_1/id_audio_manager.h>
 
 #include "ashmem.h"
 #include "audio_capture_interface_impl_base.h"
@@ -33,11 +33,11 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::CurrentTime;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
 class AudioCaptureExtImpl : public AudioCaptureInterfaceImplBase {
 public:
     AudioCaptureExtImpl();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,11 @@
  */
 
 #include "dcamerahost_fuzzer.h"
+#include "dcamera_test_utils.h"
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dcamera_host.h"
 
@@ -101,6 +103,98 @@ void DCameraGetCameraIdByDHBaseFuzzTest(const uint8_t* data, size_t size)
     dhBase.dhId_ = dhId;
     DCameraHost::GetInstance()->GetCameraIdByDHBase(dhBase);
 }
+
+void DCameraGetResourceCostFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    std::string cameraId = fdp.ConsumeRandomLengthString(size);
+    OHOS::HDI::Camera::V1_3::CameraDeviceResourceCost resourceCost;
+
+    DCameraHost::GetInstance()->GetResourceCost(cameraId, resourceCost);
+}
+
+void DCameraNotifyDeviceStateChangeInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t doubleNum = 2;
+    if ((data == nullptr) || (size < sizeof(int32_t) * doubleNum)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    int32_t notifyType = fdp.ConsumeIntegral<int32_t>();
+    int32_t deviceState = fdp.ConsumeIntegral<int32_t>();
+    DCameraHost::GetInstance()->NotifyDeviceStateChangeInfo(notifyType, deviceState);
+}
+
+void DCameraPreCameraSwitchFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    std::string cameraId = fdp.ConsumeRandomLengthString(size);
+    DCameraHost::GetInstance()->PreCameraSwitch(cameraId);
+}
+
+void DCameraPrelaunchWithOpModeFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t operationMode = fdp.ConsumeIntegral<int32_t>();
+    PrelaunchConfig config;
+    DCameraHost::GetInstance()->PrelaunchWithOpMode(config, operationMode);
+}
+
+void DCameraGetDcameraIdByIdFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    std::string cameraId = fdp.ConsumeRandomLengthString(size);
+
+    DCameraHost::GetInstance()->GetDcameraIdById(cameraId);
+    std::string emptyCameraId = "";
+    DCameraHost::GetInstance()->GetDcameraIdById(emptyCameraId);
+}
+
+void DCameraAddClearRegisterRecipientFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    sptr<IRemoteObject> remote = sptr<MockIRemoteObject>(new MockIRemoteObject());
+    std::string deviceId(reinterpret_cast<const char*>(data), size);
+    std::string dhId(reinterpret_cast<const char*>(data), size);
+    DHBase dhBase;
+    dhBase.deviceId_ = deviceId;
+    dhBase.dhId_ = dhId;
+    DCameraHost::GetInstance()->AddClearRegisterRecipient(remote, dhBase);
+}
+
+void DCameraRemoveClearRegisterRecipientFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    sptr<IRemoteObject> remote = sptr<MockIRemoteObject>(new MockIRemoteObject());
+    std::string deviceId(reinterpret_cast<const char*>(data), size);
+    std::string dhId(reinterpret_cast<const char*>(data), size);
+    DHBase dhBase;
+    dhBase.deviceId_ = deviceId;
+    dhBase.dhId_ = dhId;
+    DCameraHost::GetInstance()->RemoveClearRegisterRecipient(remote, dhBase);
+}
 }
 }
 
@@ -113,5 +207,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::DCameraGetCamDevNumFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraIsCameraIdInvalidFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraGetCameraIdByDHBaseFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraGetResourceCostFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraNotifyDeviceStateChangeInfoFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraPreCameraSwitchFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraPrelaunchWithOpModeFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraGetDcameraIdByIdFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraAddClearRegisterRecipientFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraRemoveClearRegisterRecipientFuzzTest(data, size);
     return 0;
 }

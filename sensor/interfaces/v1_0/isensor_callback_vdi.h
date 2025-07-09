@@ -21,15 +21,23 @@
 #include <hdf_base.h>
 #include <hdi_base.h>
 #include "iremote_object.h"
-#include "v2_0/sensor_types.h"
+#include "v2_0/isensor_interface.h"
+#include "v3_0/isensor_interface.h"
+
+#define DEFAULT_DEVICE_ID (-1)
+#define DEFAULT_SENSOR_ID 0
+#define DEFAULT_LOCATION 1
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_1 {
 
+using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V3_0;
 struct HdfSensorEventsVdi {
     int32_t sensorId;
+    struct DeviceSensorInfo deviceSensorInfo;
     int32_t version;
     int64_t timestamp;
     uint32_t option;
@@ -38,11 +46,17 @@ struct HdfSensorEventsVdi {
     uint32_t dataLen;
 };
 
+struct SensorInterval {
+    int64_t samplingInterval;
+    int64_t reportInterval;
+};
+
 class ISensorCallbackVdi : public HdiBase {
 public:
     virtual ~ISensorCallbackVdi() = default;
     virtual int32_t OnDataEventVdi(const HdfSensorEventsVdi& eventVdi) = 0;
     virtual int32_t OnDataEvent(const V2_0::HdfSensorEvents& event) = 0;
+    virtual int32_t OnDataEvent(const V3_0::HdfSensorEvents& event) = 0;
     virtual sptr<IRemoteObject> HandleCallbackDeath() = 0;
 };
 

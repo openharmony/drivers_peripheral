@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,6 +55,23 @@ const std::map<std::string, PowerConfig::PowerSceneConfig>& PowerConfig::GetPowe
     return sceneConfigMap_;
 }
 
+cJSON* PowerConfig::ParseJsonStream(std::istream& ifsConf)
+{
+    std::string content((std::istreambuf_iterator<char>(ifsConf)), std::istreambuf_iterator<char>());
+    cJSON* config = cJSON_Parse(content.c_str());
+    if (config == nullptr) {
+        const char *errorPtr = cJSON_GetErrorPtr();
+        HDF_LOGW("cJSON parse error: in %{public}s", (errorPtr != nullptr) ? errorPtr : "unknown error");
+        return nullptr;
+    }
+    if (cJSON_IsNull(config) || (cJSON_IsObject(config) && (config->child == nullptr)) ||
+        (cJSON_IsArray(config) && (cJSON_GetArraySize(config) == 0))) {
+        cJSON_Delete(config);
+        return nullptr;
+    }
+    return config;
+}
+
 bool PowerConfig::ParseConfig()
 {
     char buf[MAX_PATH_LEN];
@@ -65,21 +82,21 @@ bool PowerConfig::ParseConfig()
     }
     HDF_LOGI("GetOneCfgFile power_config.json");
 
-    Json::CharReaderBuilder readerBuilder;
     std::ifstream ifsConf;
-
     if (!OpenFile(ifsConf, path)) {
         return false;
     }
 
-    Json::Value config;
-    readerBuilder["collectComments"] = false;
-    JSONCPP_STRING errs;
-
-    if (parseFromStream(readerBuilder, ifsConf, &config, &errs) && !config.empty()) {
-        ParseConfInner(config);
-    }
+    cJSON* config = ParseJsonStream(ifsConf);
     ifsConf.close();
+    if (!config) {
+        HDF_LOGE("Failed to parse JSON");
+        return false;
+    }
+
+    ParseConfInner(config);
+    cJSON_Delete(config);
+    config = nullptr;
     return true;
 }
 
@@ -110,10 +127,11 @@ bool PowerConfig::OpenFile(std::ifstream& ifsConf, const std::string& configPath
     return isOpen;
 }
 
-void PowerConfig::ParseConfInner(const Json::Value& config)
+void PowerConfig::ParseConfInner(const cJSON* config)
 {
     HDF_LOGI("start parse power config inner");
-    ParseSceneConfig(GetValue(config, "scene"));
+    cJSON* sceneNode = GetValue(config, "scene");
+    ParseSceneConfig(sceneNode);
 }
 
 bool PowerConfig::SplitKey(const std::string& key, std::vector<std::string>& keys) const
@@ -122,69 +140,72 @@ bool PowerConfig::SplitKey(const std::string& key, std::vector<std::string>& key
     return (keys.size() < MIN_DEPTH || keys.size() > MAX_DEPTH) ? false : true;
 }
 
-Json::Value PowerConfig::GetValue(const Json::Value& config, std::string key) const
+cJSON* PowerConfig::GetValue(const cJSON* config, std::string key) const
 {
     std::vector<std::string> keys;
     if (!SplitKey(key, keys)) {
         HDF_LOGW("The key does not meet the. key=%{public}s", key.c_str());
-        return Json::Value();
+        return nullptr;
     }
 
     std::string firstKey = keys[MAP_KEY_INDEX];
-    Json::Value value = (config.isObject() && config.isMember(firstKey)) ? config[firstKey] : Json::Value();
-    if (value.isNull()) {
-        HDF_LOGW("Value is empty. key=%{public}s", keys[MAP_KEY_INDEX].c_str());
+    cJSON* value = (config && cJSON_IsObject(config) && cJSON_HasObjectItem(config, firstKey.c_str())) ?
+        cJSON_GetObjectItemCaseSensitive(config, firstKey.c_str()) : nullptr;
+    if (!value || cJSON_IsNull(value)) {
+        HDF_LOGW("Value is empty. key=%{public}s", key.c_str());
         return value;
     }
-
     for (size_t i = 1; i < keys.size(); ++i) {
-        if (!value.isObject() || !value.isMember(keys[i])) {
-            HDF_LOGW("The key is not configured. key=%{public}s", keys[i].c_str());
+        if (!cJSON_IsObject(value) || !cJSON_HasObjectItem(value, keys[i].c_str())) {
+            HDF_LOGW("Invalid JSON type for key: %{public}s", keys[i].c_str());
             break;
         }
-        value = value[keys[i]];
+        value = cJSON_GetObjectItemCaseSensitive(value, keys[i].c_str());
     }
     return value;
 }
 
-void PowerConfig::ParseSceneConfig(const Json::Value& sceneConfig)
+void PowerConfig::ParseSceneConfig(const cJSON* sceneConfig)
 {
-    if (sceneConfig.isNull() || !sceneConfig.isObject()) {
+    if (cJSON_IsNull(sceneConfig) || !cJSON_IsObject(sceneConfig)) {
         HDF_LOGW("sceneConfig is invalid");
         return;
     }
 
     sceneConfigMap_.clear();
-    Json::Value::Members members = sceneConfig.getMemberNames();
-    for (auto iter = members.begin(); iter != members.end(); iter++) {
-        std::string key = *iter;
-        Json::Value valueObj = sceneConfig[key];
-        if (key.empty() || valueObj.isNull() || !valueObj.isObject()) {
-            HDF_LOGW("The scene config is invalid, key=%{public}s", key.c_str());
+    cJSON* item = nullptr;
+    cJSON_ArrayForEach(item, sceneConfig)
+    {
+        if (!cJSON_IsObject(item))
+            continue;
+
+        const char* key = item->string;
+        if (key == nullptr || strlen(key) == 0) {
+            HDF_LOGW("Invalid scene key");
             continue;
         }
 
-        PowerConfig::PowerSceneConfig tempPowerSceneConfig;
-        Json::Value getPath = GetValue(valueObj, "get.path");
-        Json::Value setPath = GetValue(valueObj, "set.path");
+        PowerSceneConfig tempConfig;
+        cJSON* getPath = GetValue(item, "get.path");
+        cJSON* setPath = GetValue(item, "set.path");
+
         if (isValidJsonString(getPath)) {
-            tempPowerSceneConfig.getPath = getPath.asString();
-            HDF_LOGI("getPath key=%{public}s", tempPowerSceneConfig.getPath.c_str());
+            tempConfig.getPath = cJSON_GetStringValue(getPath);
+            HDF_LOGI("getPath key=%{public}s", tempConfig.getPath.c_str());
         }
         if (isValidJsonString(setPath)) {
-            tempPowerSceneConfig.setPath = setPath.asString();
-            HDF_LOGI("setPath key=%{public}s", tempPowerSceneConfig.setPath.c_str());
+            tempConfig.setPath = cJSON_GetStringValue(setPath);
+            HDF_LOGI("setPath key=%{public}s", tempConfig.setPath.c_str());
         }
 
-        sceneConfigMap_.insert(std::make_pair(key, tempPowerSceneConfig));
+        sceneConfigMap_.emplace(key, tempConfig);
     }
-    HDF_LOGI("The charge scene config size: %{public}d",
-        static_cast<int32_t>(sceneConfigMap_.size()));
+    HDF_LOGI("The charge scene config size: %{public}d", static_cast<int32_t>(sceneConfigMap_.size()));
 }
 
-bool PowerConfig::isValidJsonString(const Json::Value& config) const
+bool PowerConfig::isValidJsonString(const cJSON* config) const
 {
-    return !config.isNull() && config.isString();
+    return !cJSON_IsNull(config) && cJSON_IsString(config);
 }
 
 } // namespace V1_2

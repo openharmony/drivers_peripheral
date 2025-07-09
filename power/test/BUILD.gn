@@ -17,6 +17,7 @@ import("//build/test.gni")
 group("hdf_test_power") {
   testonly = true
   deps = [
+    "fuzztest/power_fuzzer:hdf_power_fuzztest",
     "fuzztest/powerhdi_fuzzer:hdf_power_hdi_fuzztest",
     "fuzztest/powerhdistub_fuzzer:hdf_power_stub_fuzztest",
     "unittest:hdi_unittest_power",

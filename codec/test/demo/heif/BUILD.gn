@@ -26,7 +26,7 @@ ohos_executable("codec_heif_encode") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libimage_proxy_2.0",
+      "drivers_interface_codec:libimage_proxy_2.1",
       "drivers_interface_display:libdisplay_buffer_proxy_1.0",
       "drivers_interface_display:libdisplay_buffer_proxy_1.2",
       "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -50,6 +50,48 @@ ohos_executable("codec_heif_encode") {
   part_name = "drivers_peripheral_codec"
 }
 
+ohos_executable("codec_heif_decode") {
+  include_dirs = [ "./include" ]
+
+  sources = [
+    "src/codec_heif_decode_helper.cpp",
+    "src/command_parser.cpp",
+    "src/heif_decoder.cpp",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_codec:libimage_proxy_2.1",
+      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
+      "drivers_interface_display:libdisplay_buffer_proxy_1.2",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
+      "drivers_interface_display:libdisplay_composer_proxy_1.1",
+      "drivers_interface_display:libdisplay_composer_proxy_1.2",
+      "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_2",
+      "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+      "drivers_interface_display:libdisplay_commontype_proxy_2.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "graphic_surface:buffer_handle",
+      "graphic_surface:surface",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  install_enable = false
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
 group("codec_hdi_heif_demo") {
-  deps = [ ":codec_heif_encode" ]
+  deps = [
+    ":codec_heif_decode",
+    ":codec_heif_encode"
+  ]
 }

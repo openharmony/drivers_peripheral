@@ -21,6 +21,8 @@
 #include "v4l2_dev.h"
 #include "v4l2_uvc.h"
 
+constexpr int NAME_START_POS = 2;
+
 namespace OHOS::Camera {
 static bool g_uvcDetectEnable = false;
 static std::mutex g_uvcDetectLock;
@@ -93,10 +95,34 @@ int HosV4L2UVC::V4L2SprintfDev(std::pair<std::map<std::string, std::string>::ite
     return RC_OK;
 }
 
+static std::string GetCameraDevNameByCap(struct v4l2_capability& cap)
+{
+    std::string cameraCard = reinterpret_cast<char*>(cap.card);
+    std::string cameraName = cameraCard;
+    size_t startPos = cameraCard.find(": ");
+    if (startPos != std::string::npos) {
+        cameraName = cameraCard.substr(startPos + NAME_START_POS, std::string::npos);
+    } else {
+        startPos = cameraCard.find(":");
+        if (startPos != std::string::npos) {
+            cameraName = cameraCard.substr(startPos + 1, std::string::npos);
+        }
+    }
+
+    std::string devName = "";
+    devName += reinterpret_cast<char*>(cap.driver);
+    devName += "&name=";
+    devName += cameraName;
+    devName += "_device";
+    CAMERA_LOGI("GetCameraDevNameByCap cameraCard = %{public}s, cameraName = %{public}s, devName = %{public}s",
+        cameraCard.c_str(), cameraName.c_str(), devName.c_str());
+    return devName;
+}
+
 void HosV4L2UVC::V4L2UvcMatchDev(const std::string name, const std::string v4l2Device, bool inOut)
 {
     std::pair<std::map<std::string, std::string>::iterator, bool> iter;
-    constexpr uint32_t nameSize = 16;
+    constexpr uint32_t nameSize = 128;
     char devName[nameSize] = {0};
     uint32_t devNameSize = sizeof(devName);
 
@@ -138,7 +164,8 @@ void HosV4L2UVC::V4L2UvcMatchDev(const std::string name, const std::string v4l2D
 
 RetCode HosV4L2UVC::V4L2UvcGetCap(const std::string v4l2Device, struct v4l2_capability& cap)
 {
-    int fd, rc;
+    int fd;
+    int rc;
     char *devName = nullptr;
     char absPath[PATH_MAX] = {0};
 
@@ -185,7 +212,7 @@ RetCode HosV4L2UVC::V4L2UVCGetCapability(int fd, const std::string devName, std:
     if (cameraId != std::string(reinterpret_cast<char*>(capability.driver))) {
         return RC_ERROR;
     }
-    V4L2UvcMatchDev(std::string(reinterpret_cast<char*>(capability.driver)), devName, true);
+    V4L2UvcMatchDev(GetCameraDevNameByCap(capability), devName, true);
 
     CAMERA_LOGI("UVC:v4l2 driver name = %{public}s\n", capability.driver);
     CAMERA_LOGD("UVC:v4l2 capabilities = 0x{public}%x\n", capability.capabilities);
@@ -201,7 +228,7 @@ void HosV4L2UVC::V4L2UvcEnmeDevices()
     std::string name = DEVICENAMEX;
     char devName[16] = {0};
     std::string cameraId = "uvcvideo";
-    int rc = 0;
+    RetCode rc = 0;
     int fd = 0;
 
     for (int j = 0; j < MAXVIDEODEVICE; ++j) {
@@ -317,7 +344,7 @@ void HosV4L2UVC::loopUvcDevice()
             usleep(delayTime);
             constexpr uint32_t buffSize = 4096;
             char buf[buffSize] = {};
-            unsigned int len = recv(uDevFd, buf, sizeof(buf), 0);
+            unsigned int len = static_cast<unsigned int>(recv(uDevFd, buf, sizeof(buf), 0));
             if (CheckBuf(len, buf)) {
                 return;
             }
@@ -331,8 +358,8 @@ void HosV4L2UVC::loopUvcDevice()
 
 int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)
 {
-    constexpr uint32_t UVC_DETECT_ENABLE = 0;
-    constexpr uint32_t UVC_DETECT_DISABLE = -1;
+    constexpr int32_t UVC_DETECT_ENABLE = 0;
+    constexpr int32_t UVC_DETECT_DISABLE = -1;
     if (len > 0 && (strstr(buf, "video4linux") != nullptr)) {
         std::lock_guard<std::mutex> lock(g_uvcDetectLock);
         if (!g_uvcDetectEnable) {
@@ -341,6 +368,7 @@ int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)
         std::string action = "";
         std::string subsystem = "";
         std::string devnode = "";
+        CAMERA_LOGI("CheckBuf video4linux, %{public}s", buf);
         V4L2GetUsbString(action, subsystem, devnode, buf, len);
         UpdateV4L2UvcMatchDev(action, subsystem, devnode);
     }
@@ -364,7 +392,7 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
                 V4L2UvcMatchDev(itr->first, devName, false);
             }
         } else {
-            int rc;
+            RetCode rc;
             struct v4l2_capability cap = {};
             rc = V4L2UvcGetCap(devName, cap);
             if (rc == RC_ERROR) {
@@ -372,7 +400,7 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
                 return;
             }
             CAMERA_LOGI("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
-            V4L2UvcMatchDev(std::string(reinterpret_cast<char*>(cap.driver)), devName, true);
+            V4L2UvcMatchDev(GetCameraDevNameByCap(cap), devName, true);
         }
     }
 }
@@ -431,7 +459,7 @@ RetCode HosV4L2UVC::V4L2UvcDetectInit(UvcCallback cb)
 
     memset_s(&nls, sizeof(nls), 0, sizeof(nls));
     nls.nl_family = AF_NETLINK;
-    nls.nl_pid = getpid();
+    nls.nl_pid = static_cast<uint32_t>(getpid());
     nls.nl_groups = 1;
     rc = bind(uDevFd_, (struct sockaddr *)&nls, sizeof(nls));
     if (rc < 0) {

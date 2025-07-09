@@ -141,8 +141,9 @@ void FuzzSetData(Parcel &parcel)
     uint64_t authSubType = parcel.ReadUint64();
     std::vector<uint8_t> data;
     FillFuzzUint8Vector(parcel, data);
+    uint32_t pinLength = data.size();
     int32_t resultCode = parcel.ReadInt32();
-    g_executorImpl.SetData(scheduleId, authSubType, data, resultCode);
+    g_executorImpl.SetData(scheduleId, authSubType, data, pinLength, resultCode);
     IAM_LOGI("end");
 }
 

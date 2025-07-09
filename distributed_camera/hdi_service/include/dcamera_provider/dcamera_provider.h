@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,6 +44,9 @@ public:
     int32_t ShutterBuffer(const DHBase& dhBase, int32_t streamId, const DCameraBuffer& buffer) override;
     int32_t OnSettingsResult(const DHBase& dhBase, const DCameraSettings& result) override;
     int32_t Notify(const DHBase& dhBase, const DCameraHDFEvent& event) override;
+    int32_t RegisterCameraHdfListener(const std::string &serviceName,
+        const sptr<IDCameraHdfCallback> &callbackObj) override;
+    int32_t UnRegisterCameraHdfListener(const std::string &serviceName) override;
 
     int32_t OpenSession(const DHBase &dhBase);
     int32_t CloseSession(const DHBase &dhBase);

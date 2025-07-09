@@ -689,6 +689,7 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest * const request)
         request->urbs = (void *)as;
     } else if (numUrbs > 1) {
         RawUsbMemFree(request->urbs);
+        request->urbs = NULL;
         as = RawUsbMemCalloc(numUrbs * sizeof(*as));
         request->urbs = (void *)as;
     }
@@ -1140,6 +1141,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
         DPRINTFN(0, "%s: OsInitDevice failed ret=%d\n", __func__, ret);
         RawUsbMemFree(dev->privateData);
         RawUsbMemFree(dev);
+        dev = NULL;
         goto ERR;
     }
     OsalAtomicSet(&dev->refcnt, 1);
@@ -1150,6 +1152,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 ERR:
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
+    handle = NULL;
     return NULL;
 }
 
@@ -1186,6 +1189,8 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
         dev->privateData = NULL;
     }
     RawUsbMemFree(dev);
+    handle->dev = NULL;
+    dev = NULL;
 
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
@@ -1338,6 +1343,7 @@ static int32_t AdapterFreeRequest(struct UsbHostRequest *request)
         request->urbs = NULL;
     }
     RawUsbMemFree((void *)request);
+    request = NULL;
     return HDF_SUCCESS;
 }
 

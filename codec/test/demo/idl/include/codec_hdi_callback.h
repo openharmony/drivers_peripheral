@@ -16,18 +16,18 @@
 #ifndef CODEC_HDI_CALLBACK_H
 #define CODEC_HDI_CALLBACK_H
 #include "icodec_hdi_callback_base.h"
-#include "v3_0/icodec_callback.h"
-class CodecHdiCallback : public OHOS::HDI::Codec::V3_0::ICodecCallback {
+#include "v4_0/icodec_callback.h"
+class CodecHdiCallback : public OHOS::HDI::Codec::V4_0::ICodecCallback {
 public:
     CodecHdiCallback(std::shared_ptr<ICodecHdiCallBackBase> codecHdi);
     virtual ~CodecHdiCallback() = default;
 
-    int32_t EventHandler(OHOS::HDI::Codec::V3_0::CodecEventType event,
-        const OHOS::HDI::Codec::V3_0::EventInfo &info) override;
+    int32_t EventHandler(OHOS::HDI::Codec::V4_0::CodecEventType event,
+        const OHOS::HDI::Codec::V4_0::EventInfo &info) override;
 
-    int32_t EmptyBufferDone(int64_t appData, const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer) override;
+    int32_t EmptyBufferDone(int64_t appData, const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer) override;
 
-    int32_t FillBufferDone(int64_t appData, const OHOS::HDI::Codec::V3_0::OmxCodecBuffer &buffer) override;
+    int32_t FillBufferDone(int64_t appData, const OHOS::HDI::Codec::V4_0::OmxCodecBuffer &buffer) override;
 
 private:
     std::shared_ptr<ICodecHdiCallBackBase> codecHdi_;

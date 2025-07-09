@@ -58,6 +58,35 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetLatency_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     uint32_t ms = 12;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetLatency(ms));
+}
+
+/**
+ * @tc.name: GetLatency_002
+ * @tc.desc: Verify the GetLatency function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, GetLatency_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    uint32_t ms = 12;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetLatency(ms));
+}
+
+/**
+ * @tc.name: GetLatency_003
+ * @tc.desc: Verify the GetLatency function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, GetLatency_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    uint32_t ms = 12;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetLatency(ms));
 }
 
@@ -118,6 +147,37 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetRenderPosition_001, TestSize.Level1)
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     uint64_t frames = 0;
     AudioTimeStamp time;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetRenderPosition(frames, time));
+}
+
+/**
+ * @tc.name: GetRenderPosition_002
+ * @tc.desc: Verify the GetRenderPosition function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, GetRenderPosition_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    uint64_t frames = 0;
+    AudioTimeStamp time;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetRenderPosition(frames, time));
+}
+
+/**
+ * @tc.name: GetRenderPosition_003
+ * @tc.desc: Verify the GetRenderPosition function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, GetRenderPosition_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    uint64_t frames = 0;
+    AudioTimeStamp time;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetRenderPosition(frames, time));
 }
 
@@ -131,6 +191,35 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetRenderSpeed_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     float speed = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetRenderSpeed(speed));
+}
+
+/**
+ * @tc.name: SetRenderSpeed_002
+ * @tc.desc: Verify the SetRenderSpeed function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetRenderSpeed_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    float speed = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetRenderSpeed(speed));
+}
+
+/**
+ * @tc.name: SetRenderSpeed_003
+ * @tc.desc: Verify the SetRenderSpeed function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetRenderSpeed_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    float speed = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetRenderSpeed(speed));
 }
 
@@ -299,6 +388,33 @@ HWTEST_F(AudioRenderInterfaceImplTest, Resume_001, TestSize.Level1)
 HWTEST_F(AudioRenderInterfaceImplTest, Flush_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Flush());
+}
+
+/**
+ * @tc.name: Flush_002
+ * @tc.desc: Verify the Flush function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, Flush_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Flush());
+}
+
+/**
+ * @tc.name: Flush_003
+ * @tc.desc: Verify the Flush function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, Flush_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Flush());
 }
 
@@ -405,6 +521,35 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetVolume_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     float volume = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetVolume(volume));
+}
+
+/**
+ * @tc.name: SetVolume_002
+ * @tc.desc: Verify the SetVolume function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetVolume_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    float volume = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetVolume(volume));
+}
+
+/**
+ * @tc.name: SetVolume_003
+ * @tc.desc: Verify the SetVolume function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetVolume_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    float volume = 0;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetVolume(volume));
 }
 
@@ -577,6 +722,37 @@ HWTEST_F(AudioRenderInterfaceImplTest, ReqMmapBuffer_001, TestSize.Level1)
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     int32_t reqSize = 1;
     AudioMmapBufferDescriptor desc;
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->ReqMmapBuffer(reqSize, desc));
+}
+
+/**
+ * @tc.name: ReqMmapBuffer_002
+ * @tc.desc: Verify the ReqMmapBuffer function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, ReqMmapBuffer_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    int32_t reqSize = 1;
+    AudioMmapBufferDescriptor desc;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->ReqMmapBuffer(reqSize, desc));
+}
+
+/**
+ * @tc.name: ReqMmapBuffer_003
+ * @tc.desc: Verify the ReqMmapBuffer function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, ReqMmapBuffer_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    int32_t reqSize = 1;
+    AudioMmapBufferDescriptor desc;
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->ReqMmapBuffer(reqSize, desc));
 }
 

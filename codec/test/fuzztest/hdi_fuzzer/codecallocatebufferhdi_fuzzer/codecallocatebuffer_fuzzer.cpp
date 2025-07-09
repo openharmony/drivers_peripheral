@@ -35,8 +35,8 @@ namespace Codec {
 
         struct OmxCodecBuffer inbuffer, outBuffer;
         FillDataOmxCodecBuffer(&inbuffer);
-        int32_t ret = g_component->SendCommand(HDI::Codec::V3_0::CODEC_COMMAND_STATE_SET,
-                                               HDI::Codec::V3_0::CODEC_STATE_IDLE, {});
+        int32_t ret = g_component->SendCommand(HDI::Codec::V4_0::CODEC_COMMAND_STATE_SET,
+                                               HDI::Codec::V4_0::CODEC_STATE_IDLE, {});
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Set LOADED failed, ret is [%{public}x]\n", __func__, ret);
         }
