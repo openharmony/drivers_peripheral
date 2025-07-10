@@ -251,8 +251,9 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetImageLayoutTest)->
 BENCHMARK_F(DisplayBenchmarkTest, IsSupportAllocPassthroughTest)(benchmark::State &state)
 {
     int32_t ret;
+    BufferHandle* handle = nullptr;
     for (auto _ : state) {
-        ret = g_gralloc->IsSupportAllocPassthrough(g_allocInfo);
+        ret = g_gralloc->AllocMem(g_allocInfo, handle);
         EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
     }
 }
@@ -269,7 +270,7 @@ BENCHMARK_F(DisplayBenchmarkTest, ReAllocMemTest)(benchmark::State &state)
 {
     int32_t ret;
     BufferHandle* inHandle = nullptr;
-    ret = g_gralloc->AllocMem(g_allocInfo, inBuffer);
+    ret = g_gralloc->AllocMem(g_allocInfo, inHandle);
     EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
     BufferHandle* outHandle = nullptr;
     for (auto _ : state) {
