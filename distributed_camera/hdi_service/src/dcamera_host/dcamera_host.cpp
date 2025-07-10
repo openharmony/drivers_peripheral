@@ -581,7 +581,7 @@ int32_t DCameraHost::AddClearRegisterRecipient(sptr<IRemoteObject> &remote, cons
         DHLOGE("Create clear register recipient object failed.");
         return DCamRetCode::FAILED;
     }
-    if (remote->AddDeathRecipient(clearRegisterRecipient) == false) {
+    if (remote != nullptr && remote->AddDeathRecipient(clearRegisterRecipient) == false) {
         DHLOGE("call AddDeathRecipient failed.");
         return DCamRetCode::FAILED;
     }
@@ -603,7 +603,7 @@ int32_t DCameraHost::RemoveClearRegisterRecipient(sptr<IRemoteObject> &remote, c
         itRecipient != clearRegisterRecipients_.end(); ++itRecipient) {
         auto &clearRegisterRecipient = *itRecipient;
         if (clearRegisterRecipient->IsMatch(dhBase)) {
-            if (remote->RemoveDeathRecipient(clearRegisterRecipient) == false) {
+            if (remote != nullptr && remote->RemoveDeathRecipient(clearRegisterRecipient) == false) {
                 DHLOGE("call RemoveDeathRecipient failed.");
             }
             clearRegisterRecipients_.erase(itRecipient);
