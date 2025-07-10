@@ -23,7 +23,7 @@
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "v1_2/display_composer_type.h"
-#include "v1_3/display_buffer_type.h"
+#include "v1_2/display_buffer_type.h"
 #include "v1_3/include/idisplay_buffer.h"
 using namespace OHOS::HDI::Display::Buffer;
 using namespace OHOS::HDI::Display::Buffer::V1_3;
