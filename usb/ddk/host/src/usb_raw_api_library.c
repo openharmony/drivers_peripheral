@@ -196,9 +196,9 @@ static int32_t FindNextDescriptor(const uint8_t *buffer, size_t size)
         if (h->bDescriptorType == USB_DDK_DT_INTERFACE || h->bDescriptorType == USB_DDK_DT_ENDPOINT) {
             break;
         }
-	if (h->bLength <= 0) {
-		break;
-	}
+        if (h->bLength <= 0) {
+            break;
+        }
         buffer += h->bLength;
         size -= h->bLength;
     }
