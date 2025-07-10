@@ -104,6 +104,44 @@ static void GetNormalRenderFuncs(struct AudioHwRender *hwRender)
     hwRender->common.DrainBuffer = AudioRenderDrainBuffer;
 }
 
+static void GetHearingAidFuncs(struct AudioHwRender *hwRender)
+{
+    hwRender->common.control.Start = HearingAidStart;
+    hwRender->common.control.Stop = HearingAidStop;
+    hwRender->common.control.Pause = HearingAidPause;
+    hwRender->common.control.Resume = HearingAidResume;
+    hwRender->common.control.Flush = HearingAidFlush;
+    hwRender->common.control.TurnStandbyMode = HearingAidTurnStandbyMode;
+    hwRender->common.control.AudioDevDump = HearingAidAudioDevDump;
+    hwRender->common.attr.GetFrameSize = HearingAidGetFrameSize;
+    hwRender->common.attr.GetFrameCount = HearingAidGetFrameCount;
+    hwRender->common.attr.SetSampleAttributes = HearingAidSetSampleAttributes;
+    hwRender->common.attr.GetSampleAttributes = HearingAidGetSampleAttributes;
+    hwRender->common.attr.GetCurrentChannelId = HearingAidGetCurrentChannelId;
+    hwRender->common.attr.SetExtraParams = HearingAidSetExtraParams;
+    hwRender->common.attr.GetExtraParams = HearingAidGetExtraParams;
+    hwRender->common.attr.ReqMmapBuffer = HearingAidReqMmapBuffer;
+    hwRender->common.attr.GetMmapPosition = HearingAidGetMmapPosition;
+    hwRender->common.scene.CheckSceneCapability = HearingAidCheckSceneCapability;
+    hwRender->common.scene.SelectScene = HearingAidSelectScene;
+    hwRender->common.volume.SetMute = HearingAidSetMute;
+    hwRender->common.volume.GetMute = HearingAidGetMute;
+    hwRender->common.volume.SetVolume = HearingAidSetVolume;
+    hwRender->common.volume.GetVolume = HearingAidGetVolume;
+    hwRender->common.volume.GetGainThreshold = HearingAidGetGainThreshold;
+    hwRender->common.volume.GetGain = HearingAidGetGain;
+    hwRender->common.volume.SetGain = HearingAidSetGain;
+    hwRender->common.GetLatency = HearingAidGetLatency;
+    hwRender->common.RenderFrame = HearingAidRenderFrame;
+    hwRender->common.GetRenderPosition = HearingAidGetRenderPosition;
+    hwRender->common.SetRenderSpeed = HearingAidSetRenderSpeed;
+    hwRender->common.GetRenderSpeed = HearingAidGetRenderSpeed;
+    hwRender->common.SetChannelMode = HearingAidSetChannelMode;
+    hwRender->common.GetChannelMode = HearingAidGetChannelMode;
+    hwRender->common.RegCallback = HearingAidRegCallback;
+    hwRender->common.DrainBuffer = HearingAidDrainBuffer;
+}
+
 static void GetCaptureFuncs(struct AudioHwCapture *hwCapture)
 {
     hwCapture->common.control.Start = AudioCaptureStart;
@@ -123,6 +161,8 @@ int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender, const char *adapterNa
     }
     if (strcmp(adapterName, "bt_a2dp_fast") == 0) {
         GetFastRenderFuncs(hwRender);
+    } else if (strcmp(adapterName, "bt_hearing_aid") == 0) {
+        GetHearingAidFuncs(hwRender);
     } else {
         GetNormalRenderFuncs(hwRender);
     }
@@ -421,7 +461,7 @@ void AudioReleaseCaptureHandle(struct AudioHwCapture *hwCapture)
 int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
                                     const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter)
 {
-    HDF_LOGD("%s", __func__);
+    HDF_LOGD("%{public}s", __func__);
     if (hwAdapter == NULL || hwRender == NULL || desc == NULL || attrs == NULL) {
         HDF_LOGE("Pointer is null!");
         return HDF_FAILURE;
