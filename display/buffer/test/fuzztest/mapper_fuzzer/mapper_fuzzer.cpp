@@ -125,12 +125,13 @@ void TestIsSupportAllocPassthrough()
 {
     AllocInfo info = { 0 };
     int32_t ret = GetAllocInfo(info);
+    BufferHandle* handle = nullptr;
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetAllocInfo failed", __func__);
         return;
     }
 
-    (void)g_bufferInterface->IsSupportAllocPassthrough(info);
+    (void)g_bufferInterface->AllocMem(info, handle);
 }
 
 void TestReAllocMem(const BufferHandle& handle)
