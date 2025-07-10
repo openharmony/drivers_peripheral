@@ -22,9 +22,9 @@
 #include "display_common_fuzzer.h"
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer;
-using namespace OHOS::HDI::Display::Buffer::V1_2;
+using namespace OHOS::HDI::Display::Buffer::V1_3;
 using namespace OHOS::HDI::Display::Composer::V1_0;
-static std::shared_ptr<OHOS::HDI::Display::Buffer::V1_2::IDisplayBuffer> g_bufferInterface = nullptr;
+static std::shared_ptr<OHOS::HDI::Display::Buffer::V1_3::IDisplayBuffer> g_bufferInterface = nullptr;
 
 static bool g_isInit = false;
 static const uint8_t* RANDOM_DATA = nullptr;
@@ -121,6 +121,31 @@ void TestGetImageLayout(const BufferHandle& handle)
     (void)g_bufferInterface->FreeMem(handle);
 }
 
+void TestIsSupportAllocPassthrough()
+{
+    AllocInfo info = { 0 };
+    int32_t ret = GetAllocInfo(info);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%{public}s: function GetAllocInfo failed", __func__);
+        return;
+    }
+
+    (void)g_bufferInterface->IsSupportAllocPassthrough(info);
+}
+
+void TestReAllocMem(const BufferHandle& handle)
+{
+    AllocInfo info = { 0 };
+    int32_t ret = GetAllocInfo(info);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%{public}s: function GetAllocInfo failed", __func__);
+        return;
+    }
+
+    BufferHandle* outHandle = nullptr;
+    (void)g_bufferInterface->ReAllocMem(info, handle, outHandle);
+}
+
 using TestFuncs = void (*)(const BufferHandle&);
 
 TestFuncs g_testFuncs[] = {
@@ -128,7 +153,9 @@ TestFuncs g_testFuncs[] = {
     TestMmapUnmap,
     TestFlushCache,
     TestInvalidateCache,
-    TestGetImageLayout
+    TestGetImageLayout,
+    TestIsSupportAllocPassthrough,
+    TestReAllocMem
 };
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
