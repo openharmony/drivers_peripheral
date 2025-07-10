@@ -23,10 +23,10 @@
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "v1_2/display_composer_type.h"
-#include "v1_2/display_buffer_type.h"
-#include "v1_2/include/idisplay_buffer.h"
+#include "v1_3/display_buffer_type.h"
+#include "v1_3/include/idisplay_buffer.h"
 using namespace OHOS::HDI::Display::Buffer;
-using namespace OHOS::HDI::Display::Buffer::V1_2;
+using namespace OHOS::HDI::Display::Buffer::V1_3;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace testing::ext;
 using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
@@ -34,7 +34,7 @@ using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
 const uint32_t ALLOC_SIZE_1080 = 1080; // alloc size 1080
 const uint32_t ALLOC_SIZE_1920 = 1920; // alloc size 1920
 
-static std::shared_ptr<V1_2::IDisplayBuffer> g_gralloc = nullptr;
+static std::shared_ptr<V1_3::IDisplayBuffer> g_gralloc = nullptr;
 static BufferHandle* g_bufferHandle = nullptr;
 static AllocInfo g_allocInfo = {
     .width = ALLOC_SIZE_1920,
@@ -52,7 +52,7 @@ public:
 
 void DisplayBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
-    g_gralloc.reset(V1_2::IDisplayBuffer::Get());
+    g_gralloc.reset(V1_3::IDisplayBuffer::Get());
     if (g_gralloc == nullptr) {
         HDF_LOGE("IDisplayBuffer get failed");
         ASSERT_TRUE(0);
@@ -244,6 +244,42 @@ BENCHMARK_F(DisplayBenchmarkTest, GetImageLayoutTest)(benchmark::State &state)
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetImageLayoutTest)->
     Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
 
+/**
+  * @tc.name: IsSupportAllocPassthroughTest
+  * @tc.desc: Benchmarktest for interface IsSupportAllocPassthrough.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, IsSupportAllocPassthroughTest)(benchmark::State &state)
+{
+    int32_t ret;
+    for (auto _ : state) {
+        ret = g_gralloc->IsSupportAllocPassthrough(g_allocInfo);
+        EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
+    }
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, IsSupportAllocPassthroughTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+
+
+/**
+  * @tc.name: IsSupportAllocPassthroughTest
+  * @tc.desc: Benchmarktest for interface IsSupportAllocPassthrough.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, ReAllocMemTest)(benchmark::State &state)
+{
+    int32_t ret;
+    BufferHandle* inHandle = nullptr;
+    ret = g_gralloc->AllocMem(g_allocInfo, inBuffer);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
+    BufferHandle* outHandle = nullptr;
+    for (auto _ : state) {
+        ret = g_gralloc->ReAllocMem(g_allocInfo, *inHandle, outHandle);
+        EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
+    }
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ReAllocMemTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
 } // namespace
 BENCHMARK_MAIN();
 
