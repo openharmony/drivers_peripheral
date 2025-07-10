@@ -50,7 +50,6 @@ ohos_shared_library("hdi_audio_bluetooth") {
   }
 
   sources = [
-    "//third_party/cJSON/cJSON.c",
     "src/audio_adapter.cpp",
     "src/audio_adapter_info_common.cpp",
     "src/audio_bluetooth_manager.cpp",
