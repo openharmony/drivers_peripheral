@@ -527,7 +527,7 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest002, TestSize.Level1)
 {
     int ret;
     AllocInfo info = {
-        .width = ALLOC_SIZE_1080,
+        .width = ALLOC_SIZE_720,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_YCBCR_420_P
@@ -540,7 +540,7 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest002, TestSize.Level1)
     BufferHandle* outBuffer = nullptr;
     AllocInfo newInfo = {
         .width = ALLOC_SIZE_1920,
-        .height = ALLOC_SIZE_720,
+        .height = ALLOC_SIZE_1080,
         .usage = HBM_USE_MEM_DMA | Composer::V1_0::HBM_USE_VIDEO_DECODER | Composer::V1_0::HBM_USE_HW_COMPOSER,
         .format = PIXEL_FMT_YCBCR_420_P
     };
