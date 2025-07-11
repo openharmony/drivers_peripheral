@@ -28,6 +28,7 @@ ohos_shared_library("libmemory_tracker_interface_service_1.0") {
 
   cflags_cc = [ "-fstack-protector-all" ]
 
+  innerapi_tags = [ "passthrough" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_memorytracker"
