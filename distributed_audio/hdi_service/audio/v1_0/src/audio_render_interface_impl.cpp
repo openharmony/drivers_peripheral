@@ -164,6 +164,8 @@ int32_t AudioRenderInterfaceImpl::GetRenderPosition(uint64_t &frames, AudioTimeS
         DHLOGE("Get render position failed.");
         return HDF_FAILURE;
     }
+    time.tvSec = currentTime.tvSec;
+    time.tvNSec = currentTime.tvNSec;
     return HDF_SUCCESS;
 }
 
