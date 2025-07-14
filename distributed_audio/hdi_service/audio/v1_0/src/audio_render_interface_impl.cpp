@@ -50,6 +50,11 @@ AudioRenderInterfaceImpl::~AudioRenderInterfaceImpl()
     DHLOGD("Distributed audio render destructed, id(%{public}d).", devDesc_.pins);
 }
 
+sptr<IAudioCallback> AudioRenderInterfaceImpl::GetAudioCallback()
+{
+    return renderCallback_;
+}
+
 int32_t AudioRenderInterfaceImpl::GetLatency(uint32_t &ms)
 {
     DHLOGD("Get render device latency.");
