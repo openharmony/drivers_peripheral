@@ -21,6 +21,7 @@
 #include "adaptor_log.h"
 #include "adaptor_memory.h"
 #include "pool.h"
+#include "udid_manager.h"
 
 #ifdef IAM_TEST_ENABLE
 #define IAM_STATIC
@@ -269,7 +270,7 @@ IAM_STATIC ResultCode MountExecutor(const ScheduleParam *param, CoAuthSchedule *
         param->verifierSensorHint);
     if ((param->collectorSensorHint == INVALID_SENSOR_HINT || param->verifierSensorHint == INVALID_SENSOR_HINT ||
         param->collectorSensorHint == param->verifierSensorHint) &&
-        memcmp(param->localUdid, param->collectorUdid, UDID_LEN) == 0) {
+        IsAllZero(param->collectorUdid, UDID_LEN)) {
         uint32_t allInOneSensorHint = param->verifierSensorHint | param->collectorSensorHint;
         LOG_INFO("mount all-in-one executor");
         ret = MountExecutorOnce(executors, coAuthSchedule, allInOneSensorHint, ALL_IN_ONE, localUdidArray);
