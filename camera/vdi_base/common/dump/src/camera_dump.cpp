@@ -180,7 +180,7 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
 
         ss << "]_" << GetCurrentLocalTimeStamp();
         ss >> fileName;
-        fileName += ".yuv";
+        fileName += (buffer->GetCurFormat() == CAMERA_FORMAT_BLOB ? ".jpeg" : ".yuv");
     }
     return SaveDataToFile(fileName.c_str(), srcAddr, size);
 }

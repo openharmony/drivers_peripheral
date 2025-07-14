@@ -677,58 +677,101 @@ std::string VectorInt32ToString(std::vector<int> vec)
 PS: '虚化'为OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES, '滤镜'为OHOS_ABILITY_SCENE_FILTER_TYPES,
     '美颜'为OHOS_ABILITY_SCENE_BEAUTY_TYPES。
 */
-void ChangeAbilityVectorFormat(std::vector<int> &abilityVec, uint32_t format)
-{
-    constexpr uint32_t SkipNum = 7;
-    constexpr int32_t endMarker = -1;
-    if (abilityVec.size() == 0) {
-        CAMERA_LOGI("ChangeAbilityVectorFormat error, abilityVec.size() == 0");
-        return;
-    }
-    abilityVec[0] = static_cast<int32_t>(format);
-    for (uint32_t index = SkipNum; index < abilityVec.size();) {
-        if (abilityVec[index - 1] == endMarker) {
-            abilityVec[index] = static_cast<int32_t>(format);
-            index += SkipNum;
-        } else {
-            index += 1;
-        }
-    }
-}
 
 // {0, 3, 9, -1, 2, 3, 9, -1, 1, 3, -1} for pc
 std::vector<int> g_defaultUsbCameraStreamFormatConfig = {
-    PREVIEW_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, OHOS_CAMERA_FORMAT_422_YUYV, -1,
-    CAPTURE_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, OHOS_CAMERA_FORMAT_422_YUYV, -1,
-    VIDEO_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, -1,
+    PREVIEW_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, OHOS_CAMERA_FORMAT_422_YUYV, OHOS_CAMERA_FORMAT_MJPEG, -1,
+    CAPTURE_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, OHOS_CAMERA_FORMAT_422_YUYV, OHOS_CAMERA_FORMAT_MJPEG, -1,
+    VIDEO_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, OHOS_CAMERA_FORMAT_MJPEG, -1,
 };
+
+struct FormatInfoInner {
+    int32_t width;
+    int32_t height;
+    int32_t minFps;
+    int32_t maxFps;
+    bool isMjpeg;
+    bool isYuv;
+};
+
+static std::vector<struct FormatInfoInner>& ConvertDeviceFormat(const std::vector<DeviceFormat>& deviceFormat)
+{
+    static std::vector<struct FormatInfoInner> formatList = {};
+    formatList.clear();
+    const std::string nameYuv = "YUYV 4:2:2";
+    const std::string nameMjpeg = "Motion-JPEG";
+    int32_t fpsValue = 0;
+    uint32_t index = 0;
+    for (auto& it : deviceFormat) {
+        if (it.fmtdesc.fps.numerator == 0) {
+            continue;
+        }
+        fpsValue = it.fmtdesc.fps.denominator / it.fmtdesc.fps.numerator;
+        CAMERA_LOGI("ConvertDeviceFormat [%{public}u], format = %{public}d * %{public}d @%{public}s, fps = %{public}d",
+            index, it.fmtdesc.width, it.fmtdesc.height, it.fmtdesc.description.c_str(), fpsValue);
+        index++;
+        std::string formatDesc = std::to_string(it.fmtdesc.width) + "x" + std::to_string(it.fmtdesc.height);
+        auto fmt = std::find_if(formatList.begin(), formatList.end(),
+            [&] (const struct FormatInfoInner& format) {
+            return format.width == it.fmtdesc.width && format.height == it.fmtdesc.height;
+        });
+        if (fmt == formatList.end()) {
+            FormatInfoInner format = {
+                .width = it.fmtdesc.width,
+                .height = it.fmtdesc.height,
+                .minFps = fpsValue,
+                .maxFps = fpsValue,
+                .isYuv = it.fmtdesc.description == nameYuv,
+                .isMjpeg = it.fmtdesc.description == nameMjpeg,
+            };
+            formatList.push_back(format);
+        } else {
+            fmt->minFps = (fmt->minFps > fpsValue) ? fpsValue : fmt->minFps;
+            fmt->maxFps = (fmt->maxFps < fpsValue) ? fpsValue : fmt->maxFps;
+            fmt->isYuv = (fmt->isYuv || it.fmtdesc.description == nameYuv);
+            fmt->isMjpeg = (fmt->isMjpeg || it.fmtdesc.description == nameMjpeg);
+        }
+    }
+    std::sort(formatList.begin(), formatList.end(),
+        [](const struct FormatInfoInner& format1, const struct FormatInfoInner& format2) {
+            return (format1.width != format2.width) ?
+                format1.width < format2.width : format1.height < format2.height;
+    });
+    return formatList;
+}
+
+static std::vector<int32_t> GetFormatVector(const std::vector<struct FormatInfoInner>& formatInfo,
+    uint32_t format, uint32_t streamId)
+{
+    std::vector<int32_t> formatVector;
+    constexpr uint32_t minWidthForVideoStream = 160;
+    uint32_t minWidth = (streamId == VIDEO_STREAM) ? minWidthForVideoStream : 0;
+    for (auto& it : formatInfo) {
+        if (it.width <= minWidth) {
+            continue;
+        }
+        if (!it.isMjpeg && format == OHOS_CAMERA_FORMAT_MJPEG) {
+            CAMERA_LOGI("this format not support mjpeg, %{public}d x %{public}d @fps[%{public}d, %{public}d]",
+                it.width, it.height, it.minFps, it.maxFps);
+            continue;
+        }
+        formatVector.push_back(format);
+        formatVector.push_back(it.width);
+        formatVector.push_back(it.height);
+        formatVector.push_back(it.maxFps);
+        formatVector.push_back(it.minFps);
+        formatVector.push_back(it.maxFps);
+        formatVector.push_back(END_SYMBOL);
+        CAMERA_LOGI("add format, %{public}d x %{public}d @fps[%{public}d, %{public}d]",
+            it.width, it.height, it.minFps, it.maxFps);
+    }
+    return formatVector;
+}
 
 void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     std::shared_ptr<CameraMetadata> metadata, const std::vector<DeviceFormat>& deviceFormat)
 {
-    std::string name = "YUYV 4:2:2";
-    std::vector<int32_t> formatVector;
-    int32_t fpsValue = 0;
-    uint32_t index = 0;
-    for (auto& it : deviceFormat) {
-        fpsValue = it.fmtdesc.fps.denominator / it.fmtdesc.fps.numerator;
-        CAMERA_LOGI("formatVector[%{public}u], format = %{public}d * %{public}d @%{public}s, fps = %{public}d",
-            index, it.fmtdesc.width, it.fmtdesc.height, it.fmtdesc.description.c_str(), fpsValue);
-        index++;
-        if (it.fmtdesc.description != name || it.fmtdesc.fps.numerator == 0) {
-            continue;
-        }
-        if (fpsValue > MINIMUM_FPS) {
-            formatVector.push_back(FORMAT);
-            formatVector.push_back(it.fmtdesc.width);
-            formatVector.push_back(it.fmtdesc.height);
-            formatVector.push_back(fpsValue);
-            formatVector.push_back(fpsValue);
-            formatVector.push_back(fpsValue);
-            formatVector.push_back(END_SYMBOL);
-        }
-    }
-
+    auto &formatList = ConvertDeviceFormat(deviceFormat);
     std::vector<int32_t> streamAvailableExtendConfigurationsVector;
     streamAvailableExtendConfigurationsVector.push_back(0);
     int32_t streamId = -1;
@@ -744,13 +787,13 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
             streamAvailableExtendConfigurationsVector.push_back(streamId);
             continue;
         }
-        ChangeAbilityVectorFormat(formatVector, cur);
+        auto fmtVec = GetFormatVector(formatList, cur, streamId);
         streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
-            formatVector.begin(), formatVector.end());
+            fmtVec.begin(), fmtVec.end());
     }
 
     streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
-    CAMERA_LOGD("config is:%{public}s", VectorInt32ToString(streamAvailableExtendConfigurationsVector).c_str());
+    CAMERA_LOGI("config is:%{public}s", VectorInt32ToString(streamAvailableExtendConfigurationsVector).c_str());
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS,
                        streamAvailableExtendConfigurationsVector);
 }

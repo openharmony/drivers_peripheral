@@ -327,8 +327,15 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
                 CAMERA_LOGE("ERROR: BufferMap length error");
                 return RC_ERROR;
             }
+            CAMERA_LOGD("memcpy_s buffer to user buffer, curFormat = %{public}u, bytesused = %{public}u",
+                adapterBufferMap_[buf.index].cameraBuffer->GetCurFormat(), buf.bytesused);
+            uint32_t length = adapterBufferMap_[buf.index].length;
+            if (adapterBufferMap_[buf.index].cameraBuffer->GetCurFormat() == CAMERA_FORMAT_BLOB) {
+                length = buf.bytesused;
+                adapterBufferMap_[buf.index].cameraBuffer->SetEsFrameSize(length);
+            }
             (void)memcpy_s(adapterBufferMap_[buf.index].userBufPtr, adapterBufferMap_[buf.index].length,
-                adapterBufferMap_[buf.index].start, adapterBufferMap_[buf.index].length);
+                adapterBufferMap_[buf.index].start, length);
         }
     }
     std::lock_guard<std::mutex> l(bufferLock_);
@@ -405,6 +412,7 @@ RetCode HosV4L2Buffers::SetAdapterBuffer(int fd, struct v4l2_buffer &buf, const 
     }
 
     adapterBufferMap_[index].userBufPtr = frameSpec->buffer_->GetVirAddress();
+    adapterBufferMap_[index].cameraBuffer = frameSpec->buffer_;
 
     switch (memoryType_) {
         case V4L2_MEMORY_MMAP:
