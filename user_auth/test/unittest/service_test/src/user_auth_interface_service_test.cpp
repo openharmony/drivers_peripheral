@@ -662,10 +662,20 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_004, TestS
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
+    HdiGlobalConfigParam param = {};
+    param.type = ENABLE_STATUS;
+    param.value.enableStatus = true;
+    param.authTypes.push_back(1);
+    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_SUCCESS);
+
     const std::string deviceUdid = std::string(64, ' ');
     EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 1;
+
+    std::vector<CredentialInfo> deletedCredInfos;
+    service->EnforceDeleteUser(userId, deletedCredInfos);
+
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -681,7 +691,6 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_004, TestS
     DoOnceAuth(service, userId, authType, challenge, authResultTest);
     EXPECT_EQ(authResultTest.result, 0);
 
-    std::vector<CredentialInfo> deletedCredInfos;
     EXPECT_EQ(service->EnforceDeleteUser(userId, deletedCredInfos), 0);
     EXPECT_TRUE(!deletedCredInfos.empty());
 

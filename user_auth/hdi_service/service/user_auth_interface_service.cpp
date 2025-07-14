@@ -217,11 +217,15 @@ static int32_t SetAttributeToCollectorExecMsg(AuthParamHal paramHal, HdiSchedule
             break;
         }
 
-        SignParam signParam = {
-            .needSignature = true,
-            .keyType = KEY_TYPE_CROSS_DEVICE,
-            .peerUdid = { paramHal.collectorUdid, sizeof(paramHal.collectorUdid) }
-        };
+        SignParam signParam = { .needSignature = true };
+        Uint8Array collectorUdid = { paramHal.collectorUdid, sizeof(paramHal.collectorUdid) };
+        if (IsLocalUdid(collectorUdid)) {
+            signParam.keyType = KEY_TYPE_EXECUTOR;
+        } else {
+            signParam.keyType = KEY_TYPE_CROSS_DEVICE;
+            signParam.peerUdid = collectorUdid;
+        }
+
         if (GetAttributeExecutorMsg(attribute, retExtraInfo, signParam) != RESULT_SUCCESS) {
             IAM_LOGE("GetAttributeExecutorMsg failed");
             break;
@@ -557,12 +561,6 @@ static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
             (uint8_t *)param.collectorUdid.c_str(), param.collectorUdid.length()) != EOK) {
             IAM_LOGE("collectorUdid copy failed");
             return RESULT_BAD_COPY;
-        }
-    } else {
-        Uint8Array collectorUdid = { paramHal.collectorUdid, sizeof(paramHal.collectorUdid) };
-        if (!GetLocalUdid(&collectorUdid)) {
-            IAM_LOGE("fill collector udid by local udid failed");
-            return RESULT_GENERAL_ERROR;
         }
     }
     Uint8Array localUdid = { paramHal.localUdid, sizeof(paramHal.localUdid) };
