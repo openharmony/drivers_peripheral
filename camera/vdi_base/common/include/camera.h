@@ -140,6 +140,7 @@ enum CameraBufferFormat : uint32_t {
     CAMERA_FORMAT_UYVY_422_PKG, /* UYVY422 packed format */
     CAMERA_FORMAT_YVYU_422_PKG, /* YVYU422 packed format */
     CAMERA_FORMAT_VYUY_422_PKG, /* VYUY422 packed format */
+    CAMERA_FORMAT_BLOB,         /* MJPEG packed format */
 };
 
 enum CameraEncodeType : int32_t {

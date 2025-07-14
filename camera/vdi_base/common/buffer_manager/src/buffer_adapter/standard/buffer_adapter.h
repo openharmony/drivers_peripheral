@@ -83,6 +83,7 @@ public:
                 CameraHalHisysevent::CreateMsg("CameraFormatToPixelFormat failed cameraFormat:%d", cameraFormat));
             CAMERA_LOGI("not find cameraFormat = %{public}u, use default format", cameraFormat);
         }
+        CAMERA_LOGD("CameraFormatToPixelFormat: %{public}u -> %{public}u", cameraFormat, format);
         return format;
     }
     // convert pixel format to camera format. inline implementation to avoid duplicate code
@@ -97,6 +98,7 @@ public:
                 CameraHalHisysevent::CreateMsg("PixelFormatToCameraFormat failed format:%d", format));
             CAMERA_LOGI("not find format = %{public}u, use default format", static_cast<uint32_t>(format));
         }
+        CAMERA_LOGD("PixelFormatToCameraFormat: %{public}u -> %{public}u", format, cameraFormat);
         return cameraFormat;
     }
 
