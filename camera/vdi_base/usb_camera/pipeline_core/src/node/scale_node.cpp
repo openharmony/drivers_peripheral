@@ -55,6 +55,9 @@ void ScaleNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGE("ScaleNode::DeliverBuffer frameSpec is null");
         return;
     }
+    if (buffer->GetCurFormat() == CAMERA_FORMAT_BLOB) {
+        return NodeBase::DeliverBuffer(buffer);
+    }
 
     if (buffer->GetBufferStatus() != CAMERA_BUFFER_STATUS_OK) {
         CAMERA_LOGE("BufferStatus() != CAMERA_BUFFER_STATUS_OK");

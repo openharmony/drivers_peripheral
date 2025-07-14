@@ -144,4 +144,87 @@ void NodeUtils::BufferScaleFormatTransform(std::shared_ptr<IBuffer>& buffer, voi
         buffer->SetIsValidDataInSurfaceBuffer(true);
     }
 }
+
+static void AddStrideToNV21(uint8_t* buffer, uint8_t* bufferMAX, int width, int height, int newStride)
+{
+    const int yPlaneSize = width * height;
+    const int uvPlaneSize = yPlaneSize / 2;
+    const int totalSize = yPlaneSize + uvPlaneSize;
+
+    // 1. 计算需要扩展的总空间
+    int newYPlaneSize = height * newStride;
+    int newUvPlaneSize = (height / 2) * newStride;
+
+    // 2. 从后向前处理UV平面
+    uint8_t* uvEnd = buffer + totalSize;
+    for (int y = (height / 2) - 1; y >= 0; --y) {
+        uint8_t* src = buffer + yPlaneSize + y * width;
+        uint8_t* dst = buffer + newYPlaneSize + y * newStride;
+        if (memmove_s(dst, bufferMAX - dst, src, width) != 0) {
+            CAMERA_LOGE("AddStrideToNV21 memmove_s Fail 1");
+            return;
+        }
+        if (newStride > width) {
+            if (memset_s(dst + width, bufferMAX - (dst + width), 0, newStride - width)) {
+                CAMERA_LOGE("AddStrideToNV21 memset_s Fail 1");
+                return;
+            }
+        }
+    }
+
+    // 3. 从后向前处理Y平面
+    for (int y = height - 1; y >= 0; --y) {
+        uint8_t* src = buffer + y * width;
+        uint8_t* dst = buffer + y * newStride;
+        if (memmove_s(dst, bufferMAX - dst, src, width) != 0) {
+            CAMERA_LOGE("AddStrideToNV21 memmove_s Fail 2");
+            return;
+        }
+        if (newStride > width) {
+            if (memset_s(dst + width, bufferMAX - (dst + width), 0, newStride - width)) {
+                CAMERA_LOGE("AddStrideToNV21 memset_s Fail 2");
+                return;
+            }
+        }
+    }
+}
+
+void NodeUtils::BufferTransformForStride(std::shared_ptr<IBuffer>& buffer)
+{
+    if (buffer == nullptr) {
+        CAMERA_LOGI("BufferScaleFormatTransform Error buffer == nullptr");
+        return;
+    }
+
+    if (buffer->GetCurWidth() != buffer->GetWidth()
+        || buffer->GetCurHeight() != buffer->GetHeight()
+        || buffer->GetCurFormat() != buffer->GetFormat()) {
+            CAMERA_LOGI("width, width or format is not all the same");
+            return;
+    }
+
+    if (buffer->GetWidth() == buffer->GetStride()) {
+        CAMERA_LOGI("buffer->GetWidth() == buffer->GetStride(), no need stride");
+        return;
+    }
+
+    if (buffer->GetIsValidDataInSurfaceBuffer()) {
+        CAMERA_LOGE("IsValidDataInSurfaceBuffer true");
+        if (memcpy_s(buffer->GetVirAddress(), buffer->GetSize(),
+            buffer->GetSuffaceBufferAddr(), buffer->GetSuffaceBufferSize()) != 0) {
+            CAMERA_LOGE("BufferScaleFormatTransform Fail, memcpy_s error");
+            return;
+        }
+    }
+
+    uint8_t* bufferForStride = (uint8_t*)buffer->GetSuffaceBufferAddr();
+    uint8_t* bufferForStrideMax = bufferForStride + buffer->GetSuffaceBufferSize();
+    auto dstAVFmt = ConvertOhosFormat2AVPixelFormat(buffer->GetFormat());
+    if (dstAVFmt == AV_PIX_FMT_NV21 || dstAVFmt == AV_PIX_FMT_NV12) {
+        AddStrideToNV21(bufferForStride, bufferForStrideMax,
+            buffer->GetWidth(), buffer->GetHeight(), buffer->GetStride());
+    } else {
+        CAMERA_LOGE("format not supported for stride, format = %{public}d", buffer->GetFormat());
+    }
+}
 };

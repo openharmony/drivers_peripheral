@@ -95,9 +95,12 @@ RetCode UvcNode::Start(const int32_t streamId)
     std::vector<std::shared_ptr<IPort>> outPorts = GetOutPorts();
     for (const auto& it : outPorts) {
         DeviceFormat format;
-        format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
+        cameraformat_ = it->format_.format_;
+        format.fmtdesc.pixelformat = (cameraformat_ == CAMERA_FORMAT_BLOB ? V4L2_PIX_FMT_MJPEG : V4L2_PIX_FMT_YUYV);
         format.fmtdesc.width = static_cast<uint32_t>(wide_);
         format.fmtdesc.height = static_cast<uint32_t>(high_);
+        CAMERA_LOGI("UvcNode::Start width: %{public}d, height: %{public}d, format: %{public}u, pixelformat: %{public}s",
+            wide_, high_, it->format_.format_, format.fmtdesc.pixelformat == V4L2_PIX_FMT_YUYV ? "yuv" : "mjpeg");
         int bufCnt = static_cast<int>(it->format_.bufferCount_);
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
@@ -196,6 +199,13 @@ static void SetImageAllBlack(uint8_t *buf, size_t bufferSize, uint32_t format)
             buf[i] = 0;
             buf[i + 1] = 0x80;
         }
+        return;
+    }
+    if (format == CAMERA_FORMAT_BLOB) {
+        if (memset_s(buf, bufferSize, 0, bufferSize) != EOK) {
+            CAMERA_LOGE("SetImageAllBlack memset_s failed");
+        }
+        return;
     }
 }
 
@@ -208,21 +218,21 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     CAMERA_LOGI("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]",
         buffer->GetStreamId(), buffer->GetIndex());
 
-    buffer->SetCurFormat(CAMERA_FORMAT_YUYV_422_PKG);
     buffer->SetCurWidth(wide_);
     buffer->SetCurHeight(high_);
     if (MetadataController::GetInstance().IsMute()) {
-        SetImageAllBlack((uint8_t *)buffer->GetVirAddress(), buffer->GetSize(), CAMERA_FORMAT_YUYV_422_PKG);
+        SetImageAllBlack((uint8_t *)buffer->GetVirAddress(), buffer->GetSize(), buffer->GetCurFormat());
     }
 
     SourceNode::DeliverBuffer(buffer);
     return;
 }
 
-
 RetCode UvcNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
     CAMERA_LOGI("UvcNode::ProvideBuffers enter. %{public}s", sensorController_->GetName().c_str());
+    frameSpec->buffer_->SetCurFormat(
+        cameraformat_ == CAMERA_FORMAT_BLOB ? CAMERA_FORMAT_BLOB : CAMERA_FORMAT_YUYV_422_PKG);
     if (sensorController_->SendFrameBuffer(frameSpec) == RC_OK) {
         CAMERA_LOGD("Sendframebuffer success bufferpool id = %llu", frameSpec->bufferPoolId_);
         return RC_OK;
