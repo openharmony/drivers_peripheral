@@ -1219,13 +1219,9 @@ int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const uint32_t streamId, c
     return DH_SUCCESS;
 }
 
-int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const DAudioEvent &event)
+int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const uint32_t devId, const DAudioEvent &event)
 {
     DHLOGI("Handle render callback, event type: %{public}d.", event.type);
-    if (paramCallback_ == nullptr) {
-        DHLOGE("Audio param observer is null.");
-        return ERR_DH_AUDIO_HDF_NULLPTR;
-    }
     AudioCallbackType type = AUDIO_ERROR_OCCUR;
     if (static_cast<AudioExtParamEvent>(event.type) == HDF_AUDIO_EVENT_FULL) {
         type = AUDIO_RENDER_FULL;
@@ -1235,12 +1231,46 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const DAudioEvent &event
     int8_t reserved = 0;
     int8_t cookie = 0;
 
-    int32_t ret = paramCallback_->RenderCallback(type, reserved, cookie);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Notify fwk failed.");
+    auto renderCallback = GetRenderCallback(devId);
+    if (renderCallback == nullptr) {
+        DHLOGE("renderCallback is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
     }
-    DHLOGI("Handle device closed success.");
-    return ret == DH_SUCCESS ? DH_SUCCESS : ERR_DH_AUDIO_HDF_FAIL;
+    int32_t ret = renderCallback->RenderCallback(type, reserved, cookie);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("HandleRenderCallback failed.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    DHLOGI("HandleRenderCallback success.");
+    return DH_SUCCESS;
+}
+
+sptr<IAudioCallback> AudioAdapterInterfaceImpl::GetRenderCallback(const uint32_t devId)
+{
+    DHLOGI("GetRenderCallback enter.");
+    std::lock_guard<std::mutex> devLck(renderDevMtx_);
+    auto renderDev = find_if(renderDevs_.begin(), renderDevs_.end(),
+        [devId](std::pair<int32_t, sptr<AudioRenderInterfaceImplBase>> item) { return item.first == devId; });
+    if (renderDev == renderDevs_.end()) {
+        DHLOGE("Not find devId:%{public}d", devId);
+        return nullptr;
+    }
+    AudioRenderInterfaceImplBase* basePtr = renderDev->second.GetRefPtr();
+    if (basePtr == nullptr) {
+        DHLOGE("BasePtr is null.");
+        return nullptr;
+    }
+    AudioRenderInterfaceImpl* implPtr = static_cast<AudioRenderInterfaceImpl*>(basePtr);
+    if (!implPtr) {
+        DHLOGE("Failed to cast interface");
+        return nullptr;
+    }
+    sptr<AudioRenderInterfaceImpl> audioRender(implPtr);
+    if (!audioRender) {
+        DHLOGE("Failed to cast interface");
+        return nullptr;
+    }
+    return audioRender->GetAudioCallback();
 }
 
 bool AudioAdapterInterfaceImpl::IsPortsNoReg()
