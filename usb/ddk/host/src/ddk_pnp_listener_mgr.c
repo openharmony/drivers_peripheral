@@ -42,6 +42,8 @@ struct UsbDdkDeviceHanldePriv {
 };
 
 static struct UsbDdkListenerList g_ddkListenerList = {.isInit = false};
+static bool g_hasCacheAccessory = false;
+static struct OsalMutex g_cacheAccMutex;
 
 static bool DdkListenerMgrIsExists(const struct HdfDevEventlistener *listener)
 {
@@ -113,6 +115,10 @@ static int32_t DdkListenerMgrNotifyGadgetOne(void *priv)
 void DdkListenerMgrNotifyAll(const struct UsbPnpNotifyMatchInfoTable *device, enum UsbPnpNotifyServiceCmd cmd)
 {
     HDF_LOGI("%{public}s: notify cmd:%{public}d, start.", __func__, cmd);
+    OsalMutexLock(&g_cacheAccMutex);
+    g_hasCacheAccessory = (cmd == USB_ACCESSORY_SEND);
+    OsalMutexUnLock(&g_cacheAccMutex);
+
     OsalMutexLock(&g_ddkListenerList.listMutex);
     if (DListIsEmpty(&g_ddkListenerList.listenerList)) {
         HDF_LOGI("%{public}s: the listenerList is empty.", __func__);
@@ -161,6 +167,14 @@ int32_t DdkListenerMgrAdd(struct HdfDevEventlistener *listener)
         HDF_LOGE("%{public}s:DdkDevMgrGetGadgetLinkStatusSafe failed", __func__);
         return ret;
     }
+
+    OsalMutexLock(&g_cacheAccMutex);
+    if (g_hasCacheAccessory) {
+        struct UsbDdkDeviceHanldePriv accessoryPriv = {.listener = listener, .cmd = USB_ACCESSORY_SEND};
+        HDF_LOGI("%{public}s:DdkDevMgrGetGadgetLinkStatusSafe notify cache accessory send", __func__);
+        (void)DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&accessoryPriv);
+    }
+    OsalMutexUnLock(&g_cacheAccMutex);
     return ret;
 }
 
@@ -193,6 +207,11 @@ int32_t DdkListenerMgrInit(void)
         return HDF_FAILURE;
     }
 
+    ret = OsalMutexInit(&g_cacheAccMutex);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: init cache accessory mutex failed", __func__);
+        return HDF_FAILURE;
+    }
     DListHeadInit(&g_ddkListenerList.listenerList);
     g_ddkListenerList.isInit = true;
     return HDF_SUCCESS;
