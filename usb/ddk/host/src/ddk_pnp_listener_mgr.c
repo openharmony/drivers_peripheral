@@ -118,6 +118,8 @@ void DdkListenerMgrNotifyAll(const struct UsbPnpNotifyMatchInfoTable *device, en
     OsalMutexLock(&g_cacheAccMutex);
     g_hasCacheAccessory = (cmd == USB_ACCESSORY_SEND);
     OsalMutexUnlock(&g_cacheAccMutex);
+
+    OsalMutexLock(&g_ddkListenerList.listMutex);
     if (DListIsEmpty(&g_ddkListenerList.listenerList)) {
         HDF_LOGI("%{public}s: the listenerList is empty.", __func__);
         OsalMutexUnlock(&g_ddkListenerList.listMutex);
