@@ -212,6 +212,7 @@ int32_t DdkListenerMgrInit(void)
         HDF_LOGE("%{public}s: init cache accessory mutex failed", __func__);
         return HDF_FAILURE;
     }
+    
     DListHeadInit(&g_ddkListenerList.listenerList);
     g_ddkListenerList.isInit = true;
     return HDF_SUCCESS;
