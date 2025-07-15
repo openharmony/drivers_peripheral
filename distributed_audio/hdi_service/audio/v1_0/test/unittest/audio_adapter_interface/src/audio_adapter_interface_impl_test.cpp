@@ -1548,7 +1548,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_001, TestSize.Level1
     DAudioEvent event = {HDF_AUDIO_EVENT_FULL, "gtest"};
 
     AdapterTest_->paramCallback_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleRenderCallback(event));
+    uint32_t devId = 0;
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleRenderCallback(devId, event));
 }
 
 /**
@@ -1564,7 +1565,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_002, TestSize.Level1
     DAudioEvent event = {HDF_AUDIO_EVENT_FULL, "gtest"};
 
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
-    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleRenderCallback(event));
+    uint32_t devId = 0;
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleRenderCallback(devId, event));
 }
 
 /**
@@ -1580,7 +1582,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_003, TestSize.Level1
     DAudioEvent event = {HDF_AUDIO_EVENT_NEED_DATA, "gtest"};
 
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
-    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleRenderCallback(event));
+    uint32_t devId = 0;
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleRenderCallback(devId, event));
 }
 } // V1_0
 } // Audio
