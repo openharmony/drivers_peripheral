@@ -74,28 +74,28 @@ private:
     int32_t OnEvent(HDI::Codec::V4_0::CodecEventType event, uint32_t data1, uint32_t data2, void *eventData);
     int32_t OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer);
     int32_t OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer);
-    int32_t UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffer,
-        sptr<ICodecBuffer> codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType);
     uint32_t GenerateBufferId();
     sptr<ICodecBuffer> GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer);
-    bool GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType);
-    void ReleaseCodecBuffer(struct OmxCodecBuffer &buffer);
+    sptr<ICodecBuffer> GetBufferById(uint32_t bufferId);
     void WaitStateChange(CodecStateType objState, CodecStateType &status);
-    int32_t ReleaseAllBuffer();
+
 private:
+    struct BufferInfo {
+        uint32_t bufferId;
+        uint32_t portIndex;
+        sptr<ICodecBuffer> icodecBuf;
+        OMX_BUFFERHEADERTYPE *omxHeader;
+    };
+
     OMX_HANDLETYPE comp_;  // Compnent handle
     sptr<ICodecCallback> omxCallback_;
     int64_t appData_;
-    std::map<uint32_t, sptr<ICodecBuffer>> codecBufferMap_;       // Key is buffferID
-    std::map<OMX_BUFFERHEADERTYPE *, uint32_t> portIndexMap_;
-    std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderMap_;  // Key is omx buffer header type
-    std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderPortMap_;
-    std::vector<std::pair<void *, uint32_t>> audioBuffer_;
+    std::shared_mutex poolMutex_;
+    std::vector<BufferInfo> bufferPool_;
     uint32_t bufferIdCount_;
     std::shared_ptr<ComponentMgr> mgr_;
     uint32_t maxStateWaitTime = 10000;
     uint32_t maxStateWaitCount = 100;
-    std::shared_mutex mapMutex_;
     std::string compName_;
     bool isIPCMode_;
 };

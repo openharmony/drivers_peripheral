@@ -23,35 +23,34 @@ using namespace OHOS::HDI::Codec::V4_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-CodecDynaBuffer::CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer)
-    : ICodecBuffer(codecBuffer)
-{
-}
 
-CodecDynaBuffer::~CodecDynaBuffer()
+sptr<ICodecBuffer> CodecDynaBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
-}
+    CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
 
-sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
-{
-    codecBuffer.bufferhandle = nullptr;
     codecBuffer.allocLen = sizeof(DynamicBuffer);
-    CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer);
-    return sptr<ICodecBuffer>(buffer);
-}
-
-int32_t CodecDynaBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("CheckInvalid return false");
-        return HDF_ERR_INVALID_PARAM;
+    std::shared_ptr<DynamicBuffer> dynamic = std::make_shared<DynamicBuffer>();
+    int32_t err = OMX_UseBuffer(comp, &header, portIndex, nullptr, codecBuffer.allocLen,
+        reinterpret_cast<OMX_U8 *>(dynamic.get()));
+    if (err != OMX_ErrorNone) {
+        CODEC_LOGE("OMX_UseBuffer ret = [%{public}x]", err);
+        return nullptr;
     }
 
+    codecBuffer.bufferhandle = nullptr;
+    codecBuffer.fd.reset();
+    codecBuffer.fenceFd.reset();
+    return sptr<ICodecBuffer>(new CodecDynaBuffer(InitInfo{comp, portIndex, codecBuffer, header}, dynamic));
+}
+
+int32_t CodecDynaBuffer::FillThisBuffer(OmxCodecBuffer &codecBuffer)
+{
     if (buffer_ == nullptr && codecBuffer.bufferhandle != nullptr) {
         BufferHandle* handle = codecBuffer.bufferhandle->GetBufferHandle();
         if (handle != nullptr) {
             buffer_ = codecBuffer.bufferhandle;
-            dynaBuffer_.bufferHandle = handle;
+            dynaBuffer_->bufferHandle = handle;
         }
     }
 
@@ -61,25 +60,19 @@ int32_t CodecDynaBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_B
             CODEC_LOGW("SyncWait ret err");
         }
     }
-    return ICodecBuffer::FillOmxBuffer(codecBuffer, omxBuffer);
+    return ICodecBuffer::FillThisBuffer(codecBuffer);
 }
 
-int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+int32_t CodecDynaBuffer::EmptyThisBuffer(OmxCodecBuffer &codecBuffer)
 {
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("CheckInvalid return false");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
     if (codecBuffer.bufferhandle != nullptr) {
         BufferHandle* handle = codecBuffer.bufferhandle->GetBufferHandle();
         if (handle != nullptr) {
             buffer_ = codecBuffer.bufferhandle;
-            dynaBuffer_.bufferHandle = handle;
+            dynaBuffer_->bufferHandle = handle;
             codecBuffer.filledLen = sizeof(DynamicBuffer);
         }
     }
-    codecBuffer_.alongParam = std::move(codecBuffer.alongParam);
 
     if (codecBuffer.fenceFd != nullptr) {
         auto ret = SyncWait(codecBuffer.fenceFd->Get(), TIME_WAIT_MS);
@@ -87,34 +80,7 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
             CODEC_LOGW("SyncWait ret err");
         }
     }
-
-    return ICodecBuffer::EmptyOmxBuffer(codecBuffer, omxBuffer);
-}
-
-int32_t CodecDynaBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
-{
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    buffer_ = nullptr;
-    return HDF_SUCCESS;
-}
-
-int32_t CodecDynaBuffer::EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    return ICodecBuffer::EmptyOmxBufferDone(omxBuffer);
-}
-
-int32_t CodecDynaBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    return ICodecBuffer::FillOmxBufferDone(omxBuffer);
-}
-
-uint8_t *CodecDynaBuffer::GetBuffer()
-{
-    return reinterpret_cast<uint8_t *>(&dynaBuffer_);
+    return ICodecBuffer::EmptyThisBuffer(codecBuffer);
 }
 
 }  // namespace Omx

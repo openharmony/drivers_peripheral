@@ -26,106 +26,101 @@ using namespace OHOS::HDI::Codec::V4_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-ICodecBuffer::ICodecBuffer(struct OmxCodecBuffer &codecBuffer)
-{
-    codecBuffer_ = codecBuffer;
-}
-ICodecBuffer::~ICodecBuffer()
-{}
 
-sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBuffer)
+sptr<ICodecBuffer> ICodecBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header, bool doCopy)
 {
-    sptr<ICodecBuffer> buffer = nullptr;
     switch (codecBuffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
-            buffer = CodecShareBuffer::Create(codecBuffer);
-            break;
+            return CodecShareBuffer::UseBuffer(comp, portIndex, codecBuffer, header, doCopy);
         case CODEC_BUFFER_TYPE_HANDLE:
-            buffer = CodecHandleBuffer::Create(codecBuffer);
-            break;
+            return CodecHandleBuffer::UseBuffer(comp, portIndex, codecBuffer, header);
         case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
-            buffer = CodecDynaBuffer::Create(codecBuffer);
-            break;
+            return CodecDynaBuffer::UseBuffer(comp, portIndex, codecBuffer, header);
         case CODEC_BUFFER_TYPE_DMA_MEM_FD:
-            buffer = CodecDMABuffer::Create(codecBuffer);
-            break;
+            return CodecDMABuffer::UseBuffer(comp, portIndex, codecBuffer, header);
         default:
             CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
-            break;
+            return nullptr;
     }
-    return buffer;
 }
 
-sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer,
-                                                     OMX_BUFFERHEADERTYPE &omxBuffer)
+sptr<ICodecBuffer> ICodecBuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
-    sptr<ICodecBuffer> buffer = nullptr;
     switch (codecBuffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
-            buffer = CodecShareBuffer::Allocate(codecBuffer);
-            break;
+            return CodecShareBuffer::AllocateBuffer(comp, portIndex, codecBuffer, header);
         case CODEC_BUFFER_TYPE_DMA_MEM_FD:
-            buffer = CodecDMABuffer::Allocate(codecBuffer, omxBuffer);
-            break;
+            return CodecDMABuffer::AllocateBuffer(comp, portIndex, codecBuffer, header);
         default:
             CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
-            break;
+            return nullptr;
     }
-
-    return buffer;
 }
 
-struct OmxCodecBuffer &ICodecBuffer::GetCodecBuffer()
+int32_t ICodecBuffer::EmptyThisBuffer(OmxCodecBuffer &codecBuffer)
 {
-    return codecBuffer_;
-}
+    CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "null component");
+    CHECK_AND_RETURN_RET_LOG(omxBufHeader_ != nullptr, OMX_ErrorBadParameter, "null header");
+    omxBufHeader_->nOffset = codecBuffer.offset;
+    omxBufHeader_->nFilledLen = codecBuffer.filledLen;
+    omxBufHeader_->nFlags = codecBuffer.flag;
+    omxBufHeader_->nTimeStamp = codecBuffer.pts;
 
-void ICodecBuffer::SetBufferId(int32_t bufferId)
-{
-    codecBuffer_.bufferId = bufferId;
-}
-
-bool ICodecBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
-{
-    if (codecBuffer_.type != codecBuffer.type) {
-        CODEC_LOGE("input buffer type [%{public}d], but expect type [%{public}d]", codecBuffer.bufferType,
-                   codecBuffer_.bufferType);
-        return false;
+    codecBuffer_.alongParam = std::move(codecBuffer.alongParam);
+    omxBufHeader_->pAppPrivate = nullptr;
+    OMXBufferAppPrivateData privateData{};
+    if (codecBuffer_.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && !codecBuffer_.alongParam.empty()) {
+        privateData.sizeOfParam = static_cast<uint32_t>(codecBuffer_.alongParam.size());
+        privateData.param = static_cast<void *>(codecBuffer_.alongParam.data());
+        omxBufHeader_->pAppPrivate = static_cast<void *>(&privateData);
     }
-    return true;
+    int32_t ret = OMX_EmptyThisBuffer(comp_, omxBufHeader_);
+    omxBufHeader_->pAppPrivate = nullptr;
+    return ret;
 }
 
-int32_t ICodecBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+int32_t ICodecBuffer::FillThisBuffer(OmxCodecBuffer &codecBuffer)
 {
-    omxBuffer.nOffset = codecBuffer.offset;
-    omxBuffer.nFilledLen = codecBuffer.filledLen;
-    omxBuffer.nFlags = codecBuffer.flag;
-    return HDF_SUCCESS;
+    CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "null component");
+    CHECK_AND_RETURN_RET_LOG(omxBufHeader_ != nullptr, OMX_ErrorBadParameter, "null header");
+    (void)codecBuffer;
+    return OMX_FillThisBuffer(comp_, omxBufHeader_);
 }
 
-int32_t ICodecBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+int32_t ICodecBuffer::EmptyBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer, OmxCodecBuffer& codecBuffer)
 {
-    omxBuffer.nOffset = codecBuffer.offset;
-    omxBuffer.nFilledLen = codecBuffer.filledLen;
-    omxBuffer.nFlags = codecBuffer.flag;
-    omxBuffer.nTimeStamp = codecBuffer.pts;
-    return HDF_SUCCESS;
+    (void)omxBuffer;
+    codecBuffer = codecBuffer_;
+    codecBuffer.bufferhandle = nullptr;
+    codecBuffer.fd = nullptr;
+    codecBuffer.fenceFd = nullptr;
+    codecBuffer.alongParam.clear();
+    return 0;
 }
 
-int32_t ICodecBuffer::EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
+int32_t ICodecBuffer::FillBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer, OmxCodecBuffer& codecBuffer)
 {
-    codecBuffer_.offset = omxBuffer.nOffset;
-    codecBuffer_.filledLen = omxBuffer.nFilledLen;
-    return HDF_SUCCESS;
-}
-
-int32_t ICodecBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    codecBuffer_.offset = omxBuffer.nOffset;
-    codecBuffer_.filledLen = omxBuffer.nFilledLen;
-    codecBuffer_.flag = omxBuffer.nFlags;
-    codecBuffer_.pts = omxBuffer.nTimeStamp;
-    return HDF_SUCCESS;
+    codecBuffer = codecBuffer_;
+    codecBuffer.bufferhandle = nullptr;
+    codecBuffer.fd = nullptr;
+    codecBuffer.fenceFd = nullptr;
+    codecBuffer.offset = omxBuffer.nOffset;
+    codecBuffer.filledLen = omxBuffer.nFilledLen;
+    codecBuffer.flag = omxBuffer.nFlags;
+    codecBuffer.pts = omxBuffer.nTimeStamp;
+    auto appPrivate = static_cast<OMXBufferAppPrivateData *>(omxBuffer.pAppPrivate);
+    if (appPrivate != nullptr && appPrivate->param != nullptr &&
+        appPrivate->sizeOfParam < 1024) { // 1024: to protect from taint data
+        codecBuffer.alongParam.resize(appPrivate->sizeOfParam);
+        std::copy(static_cast<uint8_t*>(appPrivate->param),
+                  static_cast<uint8_t*>(appPrivate->param) + appPrivate->sizeOfParam,
+                  codecBuffer.alongParam.begin());
+    } else {
+        codecBuffer.alongParam.clear();
+    }
+    return 0;
 }
 
 int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
@@ -156,16 +151,20 @@ int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
     return retCode < 0 ? -errno : EOK;
 }
 
-uint8_t *ICodecBuffer::GetBuffer()
+ICodecBuffer::~ICodecBuffer()
 {
-    return nullptr;
+    FreeBuffer();
 }
 
-int32_t ICodecBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
+void ICodecBuffer::FreeBuffer()
 {
-    (void)codecBuffer;
-    return HDF_SUCCESS;
+    if (comp_ && omxBufHeader_) {
+        OMX_FreeBuffer(comp_, portIndex_, omxBufHeader_);
+    }
+    comp_ = nullptr;
+    omxBufHeader_ = nullptr;
 }
+
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS

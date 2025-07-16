@@ -24,88 +24,57 @@ using namespace OHOS::HDI::Codec::V4_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-CodecDMABuffer::CodecDMABuffer(struct OmxCodecBuffer &codecBuffer) : ICodecBuffer(codecBuffer)
-{}
 
-CodecDMABuffer::~CodecDMABuffer()
-{}
-
-sptr<ICodecBuffer> CodecDMABuffer::Create(struct OmxCodecBuffer &codecBuffer)
+sptr<ICodecBuffer> CodecDMABuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
-    if (codecBuffer.fd < 0) {
-        CODEC_LOGE("codecBuffer.fd is invalid");
-        return sptr<ICodecBuffer>();
+    CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
+    CHECK_AND_RETURN_RET_LOG(codecBuffer.fd != nullptr, nullptr, "invalid dma fd");
+    CHECK_AND_RETURN_RET_LOG(codecBuffer.allocLen > 0, nullptr, "invalid allocLen");
+    CODEC_LOGI("port=%{public}u, use dmabuffer, fd=%{public}d", portIndex, codecBuffer.fd->Get());
+
+    std::shared_ptr<UniqueFd> dmaFd = codecBuffer.fd;
+    OMXBufferAppPrivateData priv{};
+    int fd = codecBuffer.fd->Get();
+    priv.fd = codecBuffer.fd->Get();
+    priv.sizeOfParam = static_cast<uint32_t>(codecBuffer.alongParam.size());
+    priv.param = static_cast<void *>(codecBuffer.alongParam.data());
+    int32_t err = OMX_UseBuffer(comp, &header, portIndex, &priv, codecBuffer.allocLen,
+        reinterpret_cast<OMX_U8 *>(&fd));
+    if (err != OMX_ErrorNone) {
+        CODEC_LOGE("OMX_UseBuffer ret = [%{public}x]", err);
+        return nullptr;
     }
-
-    CodecDMABuffer *buffer = new CodecDMABuffer(codecBuffer);
-    return sptr<ICodecBuffer>(buffer);
+    codecBuffer.bufferhandle = nullptr;
+    codecBuffer.fd.reset();
+    codecBuffer.fenceFd.reset();
+    return sptr<ICodecBuffer>(new CodecDMABuffer(
+        InitInfo{comp, portIndex, codecBuffer, header}, dmaFd)
+    );
 }
 
-sptr<ICodecBuffer> CodecDMABuffer::Allocate(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+sptr<ICodecBuffer> CodecDMABuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
-    if (omxBuffer.pAppPrivate == nullptr) {
-        CODEC_LOGE("omxBuffer.pAppPrivate is invalid!");
-        return sptr<ICodecBuffer>();
+    CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
+    CHECK_AND_RETURN_RET_LOG(codecBuffer.allocLen > 0, nullptr, "invalid allocLen");
+
+    OMXBufferAppPrivateData priv{};
+    int32_t err = OMX_AllocateBuffer(comp, &header, portIndex, &priv, codecBuffer.allocLen);
+    if (err != OMX_ErrorNone) {
+        CODEC_LOGE("OMX_AllocateBuffer error, err = %{public}x", err);
+        return nullptr;
     }
-
-    codecBuffer.bufferType = CODEC_BUFFER_TYPE_DMA_MEM_FD;
-    codecBuffer.offset = 0;
-    codecBuffer.filledLen = 0;
-    OMXBufferAppPrivateData *privateData = static_cast<OMXBufferAppPrivateData *>(omxBuffer.pAppPrivate);
-    codecBuffer.fd = UniqueFd::Create(privateData->fd, false);
-    CodecDMABuffer *buffer = new CodecDMABuffer(codecBuffer);
-    return sptr<ICodecBuffer>(buffer);
+    CODEC_LOGI("port=%{public}u, allocate dmabuffer, fd=%{public}d", portIndex, priv.fd);
+    std::shared_ptr<UniqueFd> dmaFd = UniqueFd::Create(priv.fd, false);
+    codecBuffer.bufferhandle = nullptr;
+    codecBuffer.fd = dmaFd;
+    codecBuffer.fenceFd.reset();
+    return sptr<ICodecBuffer>(new CodecDMABuffer(
+        InitInfo{comp, portIndex, codecBuffer, header}, dmaFd)
+    );
 }
 
-int32_t CodecDMABuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("CheckInvalid return false or mem has no right to write ");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    return ICodecBuffer::FillOmxBuffer(codecBuffer, omxBuffer);
-}
-
-int32_t CodecDMABuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("CheckInvalid return false or mem has no right to write ");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    return ICodecBuffer::EmptyOmxBuffer(codecBuffer, omxBuffer);
-}
-
-int32_t CodecDMABuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
-{
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    return HDF_SUCCESS;
-}
-
-int32_t CodecDMABuffer::EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    return ICodecBuffer::EmptyOmxBufferDone(omxBuffer);
-}
-
-int32_t CodecDMABuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    return ICodecBuffer::FillOmxBufferDone(omxBuffer);
-}
-
-uint8_t *CodecDMABuffer::GetBuffer()
-{
-    return nullptr;
-}
-
-bool CodecDMABuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
-{
-    return ICodecBuffer::CheckInvalid(codecBuffer);
-}
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS

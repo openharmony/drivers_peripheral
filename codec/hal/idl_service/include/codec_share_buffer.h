@@ -22,25 +22,23 @@
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-class CodecShareBuffer : ICodecBuffer {
+class CodecShareBuffer : public ICodecBuffer {
 public:
-    ~CodecShareBuffer();
-    OHOS::sptr<ICodecBuffer> static Create(struct OmxCodecBuffer &codecBuffer);
-    OHOS::sptr<ICodecBuffer> static Allocate(struct OmxCodecBuffer &codecBuffer);
-    int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer) override;
-    int32_t EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    int32_t FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    void SetAshMem(std::shared_ptr<OHOS::Ashmem> shMem);
-    uint8_t *GetBuffer() override;
+    ~CodecShareBuffer() = default;
+    static sptr<ICodecBuffer> UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header, bool doCopy);
+    static sptr<ICodecBuffer> AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header);
+    int32_t EmptyThisBuffer(OmxCodecBuffer &codecBuffer) override;
+    int32_t FillBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer, OmxCodecBuffer& codecBuffer) override;
 
 protected:
-    CodecShareBuffer(struct OmxCodecBuffer &codecBuffer);
-    bool CheckInvalid(struct OmxCodecBuffer &codecBuffer) override;
+    CodecShareBuffer(const InitInfo& info, sptr<Ashmem> shMem, bool doCopy)
+        : ICodecBuffer(info), shMem_(shMem), doCopy_(doCopy) {}
 
 private:
-    std::shared_ptr<OHOS::Ashmem> shMem_;
+    sptr<Ashmem> shMem_;
+    bool doCopy_ = false;
 };
 }  // namespace Omx
 }  // namespace Codec
