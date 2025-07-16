@@ -24,7 +24,7 @@ namespace Codec {
 namespace Omx {
 
 sptr<ICodecBuffer> CodecShareBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
-        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header, bool doCopy)
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header, bool doCopy)
 {
     CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
     CHECK_AND_RETURN_RET_LOG(codecBuffer.fd != nullptr, nullptr, "invalid ashmem fd");
@@ -57,7 +57,7 @@ sptr<ICodecBuffer> CodecShareBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t por
 }
 
 OHOS::sptr<ICodecBuffer> CodecShareBuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
-        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
     CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
     CHECK_AND_RETURN_RET_LOG(codecBuffer.allocLen > 0, nullptr, "invalid allocLen");
