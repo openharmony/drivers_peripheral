@@ -28,7 +28,7 @@ namespace Codec {
 namespace Omx {
 
 sptr<ICodecBuffer> ICodecBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
-        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header, bool doCopy)
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header, bool doCopy)
 {
     switch (codecBuffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
@@ -46,7 +46,7 @@ sptr<ICodecBuffer> ICodecBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portInd
 }
 
 sptr<ICodecBuffer> ICodecBuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
-        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
     switch (codecBuffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
