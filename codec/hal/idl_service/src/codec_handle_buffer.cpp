@@ -25,7 +25,7 @@ namespace Codec {
 namespace Omx {
 
 sptr<ICodecBuffer> CodecHandleBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
-        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
     CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
     CHECK_AND_RETURN_RET_LOG(codecBuffer.bufferhandle != nullptr, nullptr, "null nativebuffer");
