@@ -26,7 +26,7 @@ namespace Codec {
 namespace Omx {
 
 sptr<ICodecBuffer> CodecDMABuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
-        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
     CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
     CHECK_AND_RETURN_RET_LOG(codecBuffer.fd != nullptr, nullptr, "invalid dma fd");
@@ -54,7 +54,7 @@ sptr<ICodecBuffer> CodecDMABuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portI
 }
 
 sptr<ICodecBuffer> CodecDMABuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
-        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
     CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
     CHECK_AND_RETURN_RET_LOG(codecBuffer.allocLen > 0, nullptr, "invalid allocLen");
