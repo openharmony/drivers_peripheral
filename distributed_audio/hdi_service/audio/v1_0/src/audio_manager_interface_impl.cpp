@@ -40,6 +40,7 @@ namespace Audio {
 namespace V1_0 {
 AudioManagerInterfaceImpl *AudioManagerInterfaceImpl::audioManager_ = nullptr;
 std::mutex AudioManagerInterfaceImpl::audioManagerMtx_;
+#define SERVICE_INFO_LEN_MAX 256
 extern "C" IAudioManager *AudioManagerImplGetInstance(void)
 {
     return AudioManagerInterfaceImpl::GetAudioManager();
@@ -270,11 +271,11 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
     ss << "EVENT_TYPE=" << event.eventType << ";NID=" << event.adapterName << ";PIN=" << event.dhId << ";VID=" <<
         event.volGroupId << ";IID=" << event.iptGroupId;
 
-    if (event.caps.find("Daudio") == std::string::npos) {
-        DHLOGI("Not daudio.");
+    std::stringstream temp(ss.str());
+    temp << ";CAPS=" << event.caps;
+    std::string tempStr = temp.str();
+    if (strlen(tempStr.c_str()) <= SERVICE_INFO_LEN_MAX) {
         ss << ";CAPS=" << event.caps;
-    } else {
-        DHLOGI("Is daudio.");
     }
 
     std::string eventInfo = ss.str();
