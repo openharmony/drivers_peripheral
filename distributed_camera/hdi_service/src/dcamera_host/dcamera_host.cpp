@@ -54,7 +54,6 @@ int32_t DCameraHost::SetCallback(const sptr<HDI::Camera::V1_0::ICameraHostCallba
         return CamRetCode::INVALID_ARGUMENT;
     }
     dCameraHostCallback_ = callbackObj;
-    dCameraHostRecipient_ = sptr<DCameraHostRecipient>(new DCameraHostRecipient());
     return CamRetCode::NO_ERROR;
 }
 
@@ -65,7 +64,6 @@ int32_t DCameraHost::SetCallback_V1_2(const sptr<HDI::Camera::V1_2::ICameraHostC
         return CamRetCode::INVALID_ARGUMENT;
     }
     dCameraHostCallback_V1_2_ = callbackObj;
-    dCameraHostRecipient_ = sptr<DCameraHostRecipient>(new DCameraHostRecipient());
     return CamRetCode::NO_ERROR;
 }
 
