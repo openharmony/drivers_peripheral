@@ -23,86 +23,44 @@ using namespace OHOS::HDI::Codec::V4_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-CodecHandleBuffer::CodecHandleBuffer(struct OmxCodecBuffer &codecBuffer)
-    : ICodecBuffer(codecBuffer)
-{
-    buffer_ = codecBuffer.bufferhandle;
-}
 
-CodecHandleBuffer::~CodecHandleBuffer()
+sptr<ICodecBuffer> CodecHandleBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
-}
-
-sptr<ICodecBuffer> CodecHandleBuffer::Create(struct OmxCodecBuffer &codecBuffer)
-{
-    if (codecBuffer.bufferhandle == nullptr) {
-        CODEC_LOGE("nativebuffer is null");
-        return nullptr;
-    }
+    CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
+    CHECK_AND_RETURN_RET_LOG(codecBuffer.bufferhandle != nullptr, nullptr, "null nativebuffer");
     BufferHandle *bufferHandle = codecBuffer.bufferhandle->GetBufferHandle();
-    if (bufferHandle == nullptr) {
-        CODEC_LOGE("bufferHandle is null");
+    CHECK_AND_RETURN_RET_LOG(bufferHandle != nullptr, nullptr, "null bufferhandle");
+
+    int32_t err = OMX_UseBuffer(comp, &header, portIndex, nullptr, codecBuffer.allocLen,
+        reinterpret_cast<OMX_U8 *>(bufferHandle));
+    if (err != OMX_ErrorNone) {
+        CODEC_LOGE("OMX_UseBuffer ret = [%{public}x]", err);
         return nullptr;
     }
-    CodecHandleBuffer *buffer = new CodecHandleBuffer(codecBuffer);
+    sptr<HDI::Base::NativeBuffer> nativebuffer = codecBuffer.bufferhandle;
     codecBuffer.bufferhandle = nullptr;
-    return sptr<ICodecBuffer>(buffer);
+    codecBuffer.fd.reset();
+    codecBuffer.fenceFd.reset();
+    return sptr<ICodecBuffer>(new CodecHandleBuffer(InitInfo{comp, portIndex, codecBuffer, header}, nativebuffer));
 }
 
-int32_t CodecHandleBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+int32_t CodecHandleBuffer::FillThisBuffer(OmxCodecBuffer &codecBuffer)
 {
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("CheckInvalid return false or mem has no right to write ");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
     if (codecBuffer.fenceFd != nullptr) {
         auto ret = SyncWait(codecBuffer.fenceFd->Get(), TIME_WAIT_MS);
         if (ret != EOK) {
             CODEC_LOGE("SyncWait ret err [%{public}d]", ret);
         }
     }
-    return ICodecBuffer::FillOmxBuffer(codecBuffer, omxBuffer);
+    return ICodecBuffer::FillThisBuffer(codecBuffer);
 }
 
-int32_t CodecHandleBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+int32_t CodecHandleBuffer::EmptyThisBuffer(OmxCodecBuffer &codecBuffer)
 {
     CODEC_LOGE("bufferHandle is not support in EmptyThisBuffer");
     (void)codecBuffer;
-    (void)omxBuffer;
-    return HDF_ERR_INVALID_PARAM;
-}
-
-int32_t CodecHandleBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
-{
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    codecBuffer.bufferhandle = nullptr;
-    buffer_ = nullptr;
-
-    return HDF_SUCCESS;
-}
-
-int32_t CodecHandleBuffer::EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    CODEC_LOGE("bufferHandle is not support in EmptyThisBuffer");
-    (void)omxBuffer;
-    return HDF_ERR_INVALID_PARAM;
-}
-
-int32_t CodecHandleBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    return ICodecBuffer::FillOmxBufferDone(omxBuffer);
-}
-
-uint8_t *CodecHandleBuffer::GetBuffer()
-{
-    if (buffer_ == nullptr) {
-        return nullptr;
-    }
-    return reinterpret_cast<uint8_t *>(buffer_->GetBufferHandle());
+    return OMX_ErrorNotImplemented;
 }
 
 }  // namespace Omx
