@@ -39,6 +39,7 @@ struct CameraIdInfo {
     ICameraHostVdi* cameraHostVdi;
     std::string vendorCameraId;
     bool isDeleted;
+    uint8_t index;
 };
 
 class CameraHostService : public ICameraHost {

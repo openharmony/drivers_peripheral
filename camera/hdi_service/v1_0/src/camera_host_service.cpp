@@ -285,6 +285,7 @@ int32_t CameraHostService::UpdateCameraIdMapList()
         }
         for (auto id : vdiCameraIds) {
             struct CameraIdInfo cameraIdInfo;
+            cameraIdInfo.index = currentCameraIndex;
             std::string currentCameraId = vdiCameraIdToPrefix(id) + std::to_string(currentCameraIndex);
             cameraIdInfo.currentCameraId = currentCameraId;
             cameraIdInfo.cameraHostVdi = cameraHostVdi;

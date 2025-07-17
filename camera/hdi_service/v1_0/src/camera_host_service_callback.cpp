@@ -38,7 +38,7 @@ int32_t CameraHostServiceCallback::OnCameraStatus(const std::string &cameraId, V
         CAMERA_LOGE("Vendor camera id %{public}s doesn't exist", cameraId.c_str());
         return OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT;
     }
-    CAMERA_LOGD("Current cameraId %{public}s, vendor camera id %{public}s, status=%{public}d",
+    CAMERA_LOGI("Current cameraId %{public}s, vendor camera id %{public}s, status=%{public}d",
         itr->currentCameraId.c_str(), cameraId.c_str(), status);
 
     return cameraHostCallback_->OnCameraStatus(itr->currentCameraId, static_cast<CameraStatus>(status));
@@ -76,6 +76,8 @@ static inline const std::string vdiCameraIdToPrefix(const std::string &id)
 int32_t CameraHostServiceCallback::OnCameraEvent(const std::string &cameraId, VdiCameraEvent event)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostCallback_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
+    CAMERA_LOGI("CameraHostServiceCallback::OnCameraEvent, cameraId = %{public}s, event = %{public}d",
+        cameraId.c_str(), event);
     std::string currentCameraId;
     if (event == OHOS::VDI::Camera::V1_0::CAMERA_EVENT_DEVICE_ADD) {
         auto itr = std::find_if(cameraIdInfoList_.begin(), cameraIdInfoList_.end(),
@@ -84,16 +86,21 @@ int32_t CameraHostServiceCallback::OnCameraEvent(const std::string &cameraId, Vd
             });
         if (itr == cameraIdInfoList_.end()) {
             struct CameraIdInfo cameraIdInfo;
-            currentCameraId = vdiCameraIdToPrefix(cameraId) + std::to_string(cameraIdInfoList_.size() + 1);
+            cameraIdInfo.index = cameraIdInfoList_.size() + 1;
+            currentCameraId = vdiCameraIdToPrefix(cameraId) + std::to_string(cameraIdInfo.index);
             cameraIdInfo.currentCameraId = currentCameraId;
             cameraIdInfo.cameraHostVdi = cameraHostVdi_;
             cameraIdInfo.vendorCameraId = cameraId;
             cameraIdInfo.isDeleted = false;
             cameraIdInfoList_.push_back(cameraIdInfo);
         } else {
+            CAMERA_LOGI("find a slot for cameraIdInfo, index = %{public}d", itr->index);
             itr->cameraHostVdi = cameraHostVdi_;
             itr->vendorCameraId = cameraId;
             itr->isDeleted = false;
+            if (cameraId.find("&name=") != std::string::npos) {
+                itr->currentCameraId = vdiCameraIdToPrefix(cameraId) + std::to_string(itr->index);
+            }
             currentCameraId = itr->currentCameraId;
         }
     } else {
@@ -109,7 +116,7 @@ int32_t CameraHostServiceCallback::OnCameraEvent(const std::string &cameraId, Vd
         itr->isDeleted = true;
         currentCameraId = itr->currentCameraId;
     }
-    CAMERA_LOGD("Current cameraId %{public}s, vendor camera id %{public}s, event=%{public}d",
+    CAMERA_LOGI("Current cameraId %{public}s, vendor camera id %{public}s, event=%{public}d",
         currentCameraId.c_str(), cameraId.c_str(), event);
 
     return cameraHostCallback_->OnCameraEvent(currentCameraId, static_cast<CameraEvent>(event));
