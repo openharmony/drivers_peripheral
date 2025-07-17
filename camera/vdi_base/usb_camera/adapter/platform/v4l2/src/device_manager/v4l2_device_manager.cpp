@@ -135,7 +135,7 @@ RetCode V4L2DeviceManager::CreateManager()
                 return RC_ERROR;
             } else {
                 managerList_.push_back(manager);
-        }
+            }
         }
     }
     return rc;
@@ -342,13 +342,12 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         CHECK_IF_EQUAL_RETURN_VOID(id, CAMERA_MAX);
         AddHardware(id, hardwareName);
         if (id == CAMERA_FIRST) {
-            CreateManager();
-        } else {
-            if (GetManager(DM_M_SENSOR) != nullptr) {
-                RetCode rc = GetManager(DM_M_SENSOR)->CreateController(DM_C_SENSOR, hardwareName);
-                CHECK_IF_EQUAL_RETURN_VOID(rc, RC_ERROR);
-            }
+            RetCode ret = CreateManager();
+            CHECK_IF_NOT_EQUAL_RETURN_VOID(ret, RC_OK);
         }
+        CHECK_IF_PTR_NULL_RETURN_VOID(GetManager(DM_M_SENSOR));
+        RetCode rc = GetManager(DM_M_SENSOR)->CreateController(DM_C_SENSOR, hardwareName);
+        CHECK_IF_EQUAL_RETURN_VOID(rc, RC_ERROR);
         std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE,
             DATA_CAPACITY_SIZE);
         CHECK_IF_PTR_NULL_RETURN_VOID(meta);
