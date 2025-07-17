@@ -19,6 +19,7 @@
 #include <climits>
 #include "string_ex.h"
 #include "config_policy_utils.h"
+#include "hdf_battery_json_utils.h"
 
 namespace OHOS {
 namespace HDI {
@@ -67,9 +68,9 @@ cJSON* BatteryConfig::ParseJsonStream(std::istream& ifsConf)
             (errorPtr != nullptr) ? errorPtr : "unknown error");
         return nullptr;
     }
-    if (cJSON_IsNull(config) || (cJSON_IsObject(config) && (config->child == nullptr)) ||
-        (cJSON_IsArray(config) && (cJSON_GetArraySize(config) == 0))) {
+    if (HdfBatteryJsonUtils::IsEmptyJsonParse(config)) {
         cJSON_Delete(config);
+        BATTERY_HILOGW(COMP_HDI, "cJSON parse result is empty, battery config is %{public}s", content.c_str());
         return nullptr;
     }
     return config;
@@ -190,35 +191,42 @@ void BatteryConfig::ParseConfSplit(const cJSON* config)
 
 void BatteryConfig::ParseChargerConfig(const cJSON* chargerConfig)
 {
-    if (!chargerConfig || cJSON_IsNull(chargerConfig) || !cJSON_IsObject(chargerConfig)) {
+    if (!HdfBatteryJsonUtils::IsValidJsonObject(chargerConfig)) {
         BATTERY_HILOGW(COMP_HDI, "chargerConfig is invalid");
         return;
     }
 
     cJSON* currentPath = GetValue(chargerConfig, "current_limit.path");
-    if (isValidJsonString(currentPath)) {
-        chargerConfig_.currentPath = (currentPath->valuestring != nullptr) ? currentPath->valuestring : "";
+    if (HdfBatteryJsonUtils::IsValidJsonString(currentPath)) {
+        chargerConfig_.currentPath = currentPath->valuestring;
     }
 
     cJSON* voltagePath = GetValue(chargerConfig, "voltage_limit.path");
-    if (isValidJsonString(voltagePath)) {
-        chargerConfig_.voltagePath = (voltagePath->valuestring != nullptr) ? voltagePath->valuestring : "";
+    if (HdfBatteryJsonUtils::IsValidJsonString(voltagePath)) {
+        chargerConfig_.voltagePath = voltagePath->valuestring;
     }
 
     cJSON* chargeTypePath = GetValue(chargerConfig, "type.path");
-    if (isValidJsonString(chargeTypePath)) {
-        chargerConfig_.chargeTypePath = (chargeTypePath->valuestring != nullptr) ? chargeTypePath->valuestring : "";
+    if (HdfBatteryJsonUtils::IsValidJsonString(chargeTypePath)) {
+        chargerConfig_.chargeTypePath = chargeTypePath->valuestring;
     }
     BATTERY_HILOGI(COMP_HDI, "The battery charger configuration parse succeed");
 }
 
 void BatteryConfig::ParseLightConfig(const cJSON* lightConfig)
 {
-    if (!lightConfig || cJSON_IsNull(lightConfig) || !cJSON_IsObject(lightConfig)) {
+    if (!HdfBatteryJsonUtils::IsValidJsonObject(lightConfig)) {
         BATTERY_HILOGW(COMP_HDI, "lightConf is invalid");
         return;
     }
     lightConfig_.clear();
+    SaveJsonResult(lightConfig);
+    BATTERY_HILOGI(COMP_HDI, "The battery light configuration size %{public}d",
+        static_cast<int32_t>(lightConfig_.size()));
+}
+
+void BatteryConfig::SaveJsonResult(const cJSON* lightConfig)
+{
     cJSON* valueObj = nullptr;
     cJSON_ArrayForEach(valueObj, lightConfig) {
         if (valueObj->string == nullptr) {
@@ -232,21 +240,30 @@ void BatteryConfig::ParseLightConfig(const cJSON* lightConfig)
         }
         cJSON* soc = GetValue(valueObj, "soc");
         cJSON* rgb = GetValue(valueObj, "rgb");
-        if (!cJSON_IsArray(soc) || !cJSON_IsArray(rgb)) {
+        if (!HdfBatteryJsonUtils::IsValidJsonArray(soc) || !HdfBatteryJsonUtils::IsValidJsonArray(rgb)) {
             BATTERY_HILOGW(COMP_HDI, "The battery light %{public}s configuration is invalid.", key.c_str());
+            continue;
+        }
+        if (cJSON_GetArraySize(soc) != MAX_SOC_RANGE) {
+            BATTERY_HILOGW(COMP_HDI, "The battery light %{public}s soc data length error.", key.c_str());
             continue;
         }
         cJSON* beginSocItem = cJSON_GetArrayItem(soc, BEGIN_SOC_INDEX);
         cJSON* endSocItem = cJSON_GetArrayItem(soc, END_SOC_INDEX);
-        if (cJSON_GetArraySize(soc) != MAX_SOC_RANGE || !cJSON_IsNumber(beginSocItem) || !cJSON_IsNumber(endSocItem)) {
+        if (!HdfBatteryJsonUtils::IsValidJsonNumber(beginSocItem) ||
+            !HdfBatteryJsonUtils::IsValidJsonNumber(endSocItem)) {
             BATTERY_HILOGW(COMP_HDI, "The battery light %{public}s soc data type error.", key.c_str());
+            continue;
+        }
+        if (cJSON_GetArraySize(rgb) != MAX_RGB_RANGE) {
+            BATTERY_HILOGW(COMP_HDI, "The battery light %{public}s rgb data length error.", key.c_str());
             continue;
         }
         cJSON* redItem = cJSON_GetArrayItem(rgb, RED_INDEX);
         cJSON* greenItem = cJSON_GetArrayItem(rgb, GREEN_INDEX);
         cJSON* blueItem = cJSON_GetArrayItem(rgb, BLUE_INDEX);
-        if (cJSON_GetArraySize(rgb) != MAX_RGB_RANGE || !cJSON_IsNumber(redItem) || !cJSON_IsNumber(greenItem) ||
-            !cJSON_IsNumber(blueItem)) {
+        if (!HdfBatteryJsonUtils::IsValidJsonNumber(redItem) || !HdfBatteryJsonUtils::IsValidJsonNumber(greenItem) ||
+            !HdfBatteryJsonUtils::IsValidJsonNumber(blueItem)) {
             BATTERY_HILOGW(COMP_HDI, "The battery light %{public}s rgb data type error.", key.c_str());
             continue;
         }
@@ -254,18 +271,15 @@ void BatteryConfig::ParseLightConfig(const cJSON* lightConfig)
             .beginSoc = static_cast<int32_t>(beginSocItem->valueint),
             .endSoc = static_cast<int32_t>(endSocItem->valueint),
             .rgb = (static_cast<uint32_t>(redItem->valueint) << MOVE_LEFT_16) |
-                (static_cast<uint32_t>(greenItem->valueint) << MOVE_LEFT_8) |
-                static_cast<uint32_t>(blueItem->valueint)
+                (static_cast<uint32_t>(greenItem->valueint) << MOVE_LEFT_8) | static_cast<uint32_t>(blueItem->valueint)
         };
         lightConfig_.push_back(tempLightConfig);
     }
-    BATTERY_HILOGI(COMP_HDI, "The battery light configuration size %{public}d",
-        static_cast<int32_t>(lightConfig_.size()));
 }
 
 void BatteryConfig::ParseChargeSceneConfig(const cJSON* chargeSceneConfig)
 {
-    if (!chargeSceneConfig || cJSON_IsNull(chargeSceneConfig) || !cJSON_IsObject(chargeSceneConfig)) {
+    if (!HdfBatteryJsonUtils::IsValidJsonObject(chargeSceneConfig)) {
         BATTERY_HILOGW(COMP_HDI, "chargeSceneConfig is invalid");
         return;
     }
@@ -297,7 +311,7 @@ void BatteryConfig::ParseChargeSceneConfig(const cJSON* chargeSceneConfig)
 
 bool BatteryConfig::IsValidChargeSceneConfig(const std::string& key, const cJSON* valueObj)
 {
-    if (key.empty() || !valueObj || cJSON_IsNull(valueObj) || !cJSON_IsObject(valueObj)) {
+    if (key.empty() || !HdfBatteryJsonUtils::IsValidJsonObject(valueObj)) {
         BATTERY_HILOGW(COMP_HDI, "The charge scene config is invalid, key=%{public}s", key.c_str());
         return false;
     }
@@ -305,7 +319,8 @@ bool BatteryConfig::IsValidChargeSceneConfig(const std::string& key, const cJSON
     cJSON* supportPath = GetValue(valueObj, "support.path");
     cJSON* setPath = GetValue(valueObj, "set.path");
     cJSON* getPath = GetValue(valueObj, "get.path");
-    if (!isValidJsonString(supportPath) && !isValidJsonString(setPath) && !isValidJsonString(getPath)) {
+    if (!HdfBatteryJsonUtils::IsValidJsonString(supportPath) && !HdfBatteryJsonUtils::IsValidJsonString(setPath) &&
+        !HdfBatteryJsonUtils::IsValidJsonString(getPath)) {
         BATTERY_HILOGW(COMP_HDI, "The charge scene config path is invalid, key=%{public}s", key.c_str());
         return false;
     }
@@ -318,12 +333,12 @@ bool BatteryConfig::ParseChargeSceneSupport(const cJSON* valueObj, BatteryConfig
     cJSON* supportPath = GetValue(valueObj, "support.path");
     cJSON* type = GetValue(valueObj, "support.type");
     cJSON* expectValue = GetValue(valueObj, "support.expect_value");
-    if (isValidJsonString(supportPath)) {
-        std::string path = (supportPath->valuestring != nullptr) ? supportPath->valuestring : "";
+    if (HdfBatteryJsonUtils::IsValidJsonString(supportPath)) {
+        std::string path = supportPath->valuestring;
         if (IsValidSysPath(path)) {
             config.supportPath = path;
-            config.type = isValidJsonString(type) ? type->valuestring : "";
-            config.expectValue = isValidJsonString(expectValue) ? expectValue->valuestring : "";
+            config.type = HdfBatteryJsonUtils::IsValidJsonString(type) ? type->valuestring : "";
+            config.expectValue = HdfBatteryJsonUtils::IsValidJsonString(expectValue) ? expectValue->valuestring : "";
             return true;
         }
     }
@@ -333,8 +348,8 @@ bool BatteryConfig::ParseChargeSceneSupport(const cJSON* valueObj, BatteryConfig
 bool BatteryConfig::ParseChargeSceneSet(const cJSON* valueObj, BatteryConfig::ChargeSceneConfig& config)
 {
     cJSON* setPath = GetValue(valueObj, "set.path");
-    if (isValidJsonString(setPath)) {
-        std::string path = (setPath->valuestring != nullptr) ? setPath->valuestring : "";
+    if (HdfBatteryJsonUtils::IsValidJsonString(setPath)) {
+        std::string path = setPath->valuestring;
         if (IsValidSysPath(path)) {
             config.setPath = path;
             return true;
@@ -346,8 +361,8 @@ bool BatteryConfig::ParseChargeSceneSet(const cJSON* valueObj, BatteryConfig::Ch
 bool BatteryConfig::ParseChargeSceneGet(const cJSON* valueObj, BatteryConfig::ChargeSceneConfig& config)
 {
     cJSON* getPath = GetValue(valueObj, "get.path");
-    if (isValidJsonString(getPath)) {
-        std::string path = (getPath->valuestring != nullptr) ? getPath->valuestring : "";
+    if (HdfBatteryJsonUtils::IsValidJsonString(getPath)) {
+        std::string path = getPath->valuestring;
         if (IsValidSysPath(path)) {
             config.getPath = path;
             return true;
@@ -369,7 +384,7 @@ bool BatteryConfig::IsValidSysPath(const std::string& path)
 
 void BatteryConfig::ParseUeventConfig(const cJSON* ueventConfig)
 {
-    if (!ueventConfig || cJSON_IsNull(ueventConfig) || !cJSON_IsObject(ueventConfig)) {
+    if (!HdfBatteryJsonUtils::IsValidJsonObject(ueventConfig)) {
         BATTERY_HILOGW(COMP_HDI, "ueventConfig is invalid");
         return;
     }
@@ -394,11 +409,11 @@ void BatteryConfig::ParseUeventConfig(const cJSON* ueventConfig)
                 continue;
             }
             const std::string event = subChild->string;
-            if (!cJSON_IsString(subChild)) {
+            if (!HdfBatteryJsonUtils::IsValidJsonString(subChild)) {
                 BATTERY_HILOGW(COMP_SVC, "The uevent conf is invalid, key=%{public}s", key.c_str());
                 continue;
             }
-            std::string act = (subChild->valuestring != nullptr) ? subChild->valuestring : "";
+            std::string act = subChild->valuestring;
             ueventList.emplace_back(std::make_pair(event, act));
         }
 
@@ -438,11 +453,6 @@ cJSON* BatteryConfig::GetValue(const cJSON* config, std::string key) const
         value = cJSON_GetObjectItemCaseSensitive(value, keys[i].c_str());
     }
     return value;
-}
-
-bool BatteryConfig::isValidJsonString(const cJSON* config) const
-{
-    return config && !cJSON_IsNull(config) && cJSON_IsString(config);
 }
 }  // namespace V2_0
 }  // namespace Battery
