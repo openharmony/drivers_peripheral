@@ -293,6 +293,9 @@ static int32_t CreateCapturePre(struct IAudioAdapterVdi *vdiAdapter, struct IAud
 
     if (vdiAdapter == NULL || vdiAdapter->CreateCapture == NULL || vdiAdapter->DestroyCapture == NULL) {
         AUDIO_FUNC_LOGE("invalid param");
+        if (vdiDesc.desc != NULL) {
+            OsalMemFree((viod *)vdiDesc.desc);
+        }
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t id = SetTimer("Hdi:CreateCapture");
