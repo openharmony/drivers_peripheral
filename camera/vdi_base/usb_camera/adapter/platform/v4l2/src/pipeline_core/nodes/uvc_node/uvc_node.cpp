@@ -95,7 +95,11 @@ RetCode UvcNode::Start(const int32_t streamId)
     std::vector<std::shared_ptr<IPort>> outPorts = GetOutPorts();
     for (const auto& it : outPorts) {
         DeviceFormat format;
-        cameraformat_ = it->format_.format_;
+        if (it->format_.format_ < 0) {
+            CAMERA_LOGE("it->format_.format_ is negative");
+            return RC_ERROR;
+        }
+        cameraformat_ = static_cast<uint32_t>(it->format_.format_);
         format.fmtdesc.pixelformat = (cameraformat_ == CAMERA_FORMAT_BLOB ? V4L2_PIX_FMT_MJPEG : V4L2_PIX_FMT_YUYV);
         format.fmtdesc.width = static_cast<uint32_t>(wide_);
         format.fmtdesc.height = static_cast<uint32_t>(high_);
