@@ -181,7 +181,7 @@ static uint64_t GeneratePinTemplateId(void)
         }
         uint32_t j = 0;
         for (; j < g_pinDbOp->pinIndexLen; j++) {
-            if (templateId == g_pinDbOp->pinIndex[i].pinInfo.templateId) {
+            if (templateId == g_pinDbOp->pinIndex[j].pinInfo.templateId) {
                 break;
             }
         }
