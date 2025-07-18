@@ -452,8 +452,6 @@ int32_t HdiServiceGetFuncs()
         handle = NULL;
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    dlclose(handle);
-    handle = NULL;
     AUDIO_FUNC_LOGD("end");
     return AUDIO_HAL_SUCCESS;
 }
