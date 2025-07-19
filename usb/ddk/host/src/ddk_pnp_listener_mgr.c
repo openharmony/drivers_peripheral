@@ -43,7 +43,6 @@ struct UsbDdkDeviceHanldePriv {
 
 static struct UsbDdkListenerList g_ddkListenerList = {.isInit = false};
 static bool g_hasCacheAccessory = false;
-static struct OsalMutex g_cacheAccMutex;
 
 static bool DdkListenerMgrIsExists(const struct HdfDevEventlistener *listener)
 {
@@ -115,11 +114,9 @@ static int32_t DdkListenerMgrNotifyGadgetOne(void *priv)
 void DdkListenerMgrNotifyAll(const struct UsbPnpNotifyMatchInfoTable *device, enum UsbPnpNotifyServiceCmd cmd)
 {
     HDF_LOGI("%{public}s: notify cmd:%{public}d, start.", __func__, cmd);
-    OsalMutexLock(&g_cacheAccMutex);
-    g_hasCacheAccessory = (cmd == USB_ACCESSORY_SEND);
-    OsalMutexUnlock(&g_cacheAccMutex);
 
     OsalMutexLock(&g_ddkListenerList.listMutex);
+    g_hasCacheAccessory = (cmd == USB_ACCESSORY_SEND);
     if (DListIsEmpty(&g_ddkListenerList.listenerList)) {
         HDF_LOGI("%{public}s: the listenerList is empty.", __func__);
         OsalMutexUnlock(&g_ddkListenerList.listMutex);
@@ -168,13 +165,13 @@ int32_t DdkListenerMgrAdd(struct HdfDevEventlistener *listener)
         return ret;
     }
 
-    OsalMutexLock(&g_cacheAccMutex);
+    OsalMutexLock(&g_ddkListenerList.listMutex);
     if (g_hasCacheAccessory) {
         struct UsbDdkDeviceHanldePriv accessoryPriv = {.listener = listener, .cmd = USB_ACCESSORY_SEND};
         HDF_LOGI("%{public}s:DdkDevMgrGetGadgetLinkStatusSafe notify cache accessory send", __func__);
         (void)DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&accessoryPriv);
     }
-    OsalMutexUnlock(&g_cacheAccMutex);
+    OsalMutexUnlock(&g_ddkListenerList.listMutex);
     return ret;
 }
 
@@ -204,12 +201,6 @@ int32_t DdkListenerMgrInit(void)
     int32_t ret = OsalMutexInit(&g_ddkListenerList.listMutex);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: init mutex failed", __func__);
-        return HDF_FAILURE;
-    }
-
-    ret = OsalMutexInit(&g_cacheAccMutex);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: init cache accessory mutex failed", __func__);
         return HDF_FAILURE;
     }
 
