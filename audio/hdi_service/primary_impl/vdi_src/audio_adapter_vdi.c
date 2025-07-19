@@ -199,7 +199,6 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
 
     char *adapterName = AudioGetAdapterNameVdi(adapter);
     pthread_rwlock_wrlock(GetRenderLock());
-    AUDIO_FUNC_LOGI("testtest %{public}s, FindRenderCreated", __func__);
     *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName);
     if (*render != NULL) {
         pthread_rwlock_unlock(GetRenderLock());
@@ -256,7 +255,6 @@ static int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t ren
         goto EXIT;
     }
     pthread_rwlock_wrlock(GetRenderLock());
-    AUDIO_FUNC_LOGI("testtest %{public}s, AudioGetVdiRenderByIdVdi", __func__);
     struct IAudioRenderVdi *vdiRender = AudioGetVdiRenderByIdVdi(renderId);
     if (vdiRender == NULL) {
         pthread_rwlock_unlock(GetRenderLock());
