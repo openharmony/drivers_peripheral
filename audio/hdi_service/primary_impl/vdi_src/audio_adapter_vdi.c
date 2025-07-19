@@ -161,11 +161,9 @@ static int32_t CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
 
     int32_t id = SetTimer("Hdi:CreateRender");
-    pthread_rwlock_wrlock(GetRenderLock());
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, vdiRender);
     AudioDfxSysEventError("CreateRender", startTime, TIME_THRESHOLD, ret);
-    pthread_rwlock_unlock(GetRenderLock());
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
@@ -200,8 +198,11 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
     }
 
     char *adapterName = AudioGetAdapterNameVdi(adapter);
+    pthread_rwlock_wrlock(GetRenderLock());
+    AUDIO_FUNC_LOGI("testtest %{public}s, FindRenderCreated", __func__);
     *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName);
     if (*render != NULL) {
+        pthread_rwlock_unlock(GetRenderLock());
         AUDIO_FUNC_LOGE("already created");
         ret = HDF_SUCCESS;
         goto EXIT;
@@ -209,16 +210,19 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
     struct IAudioRenderVdi *vdiRender = NULL;
     ret = CreateRenderPre(vdiAdapter, desc, attrs, renderId, &vdiRender);
     if (ret != HDF_SUCCESS) {
+        pthread_rwlock_unlock(GetRenderLock());
         AUDIO_FUNC_LOGE("CreateRenderPre failed, ret = [%{public}d]", ret);
         goto EXIT;
     }
     *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterName);
     if (*render == NULL) {
         (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
+        pthread_rwlock_unlock(GetRenderLock());
         AUDIO_FUNC_LOGE("Create audio render failed");
         ret = HDF_FAILURE;
         goto EXIT;
     }
+    pthread_rwlock_unlock(GetRenderLock());
     AUDIO_FUNC_LOGI("AudioCreateRenderVdi Success, renderId = [%{public}u]", *renderId);
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
@@ -251,27 +255,30 @@ static int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t ren
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
-
+    pthread_rwlock_wrlock(GetRenderLock());
+    AUDIO_FUNC_LOGI("testtest %{public}s, AudioGetVdiRenderByIdVdi", __func__);
     struct IAudioRenderVdi *vdiRender = AudioGetVdiRenderByIdVdi(renderId);
     if (vdiRender == NULL) {
+        pthread_rwlock_unlock(GetRenderLock());
         AUDIO_FUNC_LOGE("vdiRender pointer is null");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
     if (vdiAdapter->DestroyRender == NULL) {
+        pthread_rwlock_unlock(GetRenderLock());
         AUDIO_FUNC_LOGE("invalid param");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
-    pthread_rwlock_wrlock(GetRenderLock());
     ret = vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
-    pthread_rwlock_unlock(GetRenderLock());
     if (ret != HDF_SUCCESS) {
+        pthread_rwlock_unlock(GetRenderLock());
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyRender fail, ret=%{public}d", ret);
         ret = HDF_FAILURE;
         goto EXIT;
     }
     AudioDestroyRenderByIdVdi(renderId);
+    pthread_rwlock_unlock(GetRenderLock());
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;
@@ -295,15 +302,15 @@ static int32_t CreateCapturePre(struct IAudioAdapterVdi *vdiAdapter, struct IAud
         AUDIO_FUNC_LOGE("invalid param");
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t id = SetTimer("Hdi:CreateCapture");
     pthread_rwlock_wrlock(GetCaptureLock());
+    int32_t id = SetTimer("Hdi:CreateCapture");
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
     AudioDfxSysEventError("CreateCapture", startTime, TIME_THRESHOLD, ret);
-    pthread_rwlock_unlock(GetCaptureLock());
     CancelTimer(id);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
+        pthread_rwlock_unlock(GetCaptureLock());
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateCapture fail, ret=%{public}d", ret);
         return HDF_FAILURE;
     }
@@ -314,9 +321,11 @@ static int32_t CreateCapturePre(struct IAudioAdapterVdi *vdiAdapter, struct IAud
     *capture = AudioCreateCaptureByIdVdi(attrs, captureId, vdiCapture, desc);
     if (*capture == NULL) {
         (void)vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
+        pthread_rwlock_unlock(GetCaptureLock());
         AUDIO_FUNC_LOGE("create audio capture failed");
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_rwlock_unlock(GetCaptureLock());
     return HDF_SUCCESS;
 }
 
@@ -371,21 +380,23 @@ static int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t ca
         goto EXIT;
     }
 
+    pthread_rwlock_wrlock(GetCaptureLock());
     struct IAudioCaptureVdi *vdiCapture = AudioGetVdiCaptureByIdVdi(captureId);
     if (vdiCapture == NULL || vdiAdapter->DestroyCapture == NULL) {
+        pthread_rwlock_unlock(GetCaptureLock());
         AUDIO_FUNC_LOGE("invalid parameter");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
-    pthread_rwlock_wrlock(GetCaptureLock());
     ret = vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
-    pthread_rwlock_unlock(GetCaptureLock());
     if (ret != HDF_SUCCESS) {
+        pthread_rwlock_unlock(GetCaptureLock());
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyCapture fail, ret=%{public}d", ret);
         ret = HDF_FAILURE;
         goto EXIT;
     }
     AudioDestroyCaptureByIdVdi(captureId);
+    pthread_rwlock_unlock(GetCaptureLock());
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;
