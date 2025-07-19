@@ -447,6 +447,9 @@ int32_t HdiServiceGetFuncs()
     if (managerFuncs == NULL) {
         error = dlerror();
         AUDIO_FUNC_LOGE("dlsym GetAudioManagerFuncs failed, err=%{public}s", error);
+        dlclose(handle);
+        handle = NULL;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     g_serverManager = managerFuncs();
     if (g_serverManager == NULL) {
