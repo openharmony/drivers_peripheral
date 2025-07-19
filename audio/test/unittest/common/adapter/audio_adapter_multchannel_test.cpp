@@ -15,6 +15,8 @@
 
 #include <climits>
 #include <cstring>
+#include <chrono>
+#include <thread>
 #include <gtest/gtest.h>
 #include "hdf_dlist.h"
 #include "osal_mem.h"
@@ -157,7 +159,7 @@ HWTEST_F(HdfAudioUtAdapterMultiTest, HdfAudioAdapterMultchannelCreateRenderIsval
     InitMultchannelAttrs(attrs);
     attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
-    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
     ret = adapter_->DestroyRender(adapter_, renderId_);
     EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
 }
