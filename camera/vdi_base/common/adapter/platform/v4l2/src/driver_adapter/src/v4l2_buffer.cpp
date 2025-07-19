@@ -335,8 +335,7 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
                 adapterBufferMap_[buf.index].cameraBuffer->SetEsFrameSize(length);
             }
             errno_t ret = memcpy_s(
-                adapterBufferMap_[buf.index].userBufPtr,
-                adapterBufferMap_[buf.index].length,
+                adapterBufferMap_[buf.index].userBufPtr, adapterBufferMap_[buf.index].length,
                 adapterBufferMap_[buf.index].start, length);
             if (ret != EOK) {
                 CAMERA_LOGE("memcpy_s failed with error code: %d", ret);
