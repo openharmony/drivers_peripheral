@@ -90,7 +90,6 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
     CHECK_NULL_PTR_RETURN_VALUE(frame, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(replyBytes, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiRenderLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
     if (vdiRender == NULL || vdiRender->RenderFrame == NULL) {
@@ -733,7 +732,6 @@ int32_t AudioRenderStartVdi(struct IAudioRender *render)
     AUDIO_FUNC_LOGI("hdi start enter");
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiRenderLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
     if (vdiRender == NULL || vdiRender->Start == NULL) {
@@ -760,7 +758,6 @@ int32_t AudioRenderStopVdi(struct IAudioRender *render)
     AUDIO_FUNC_LOGI("hdi stop enter");
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiRenderLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
     if (vdiRender == NULL || vdiRender->Stop == NULL) {
@@ -786,7 +783,6 @@ int32_t AudioRenderPauseVdi(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiRenderLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
     if (vdiRender == NULL || vdiRender->Pause == NULL) {
@@ -809,7 +805,6 @@ int32_t AudioRenderResumeVdi(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiRenderLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
     if (vdiRender == NULL || vdiRender->Resume == NULL) {
