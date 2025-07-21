@@ -68,7 +68,6 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(replyBytes, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiCaptureLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
     if (vdiCapture == NULL || vdiCapture->CaptureFrame == NULL) {
@@ -615,7 +614,6 @@ int32_t AudioCaptureStartVdi(struct IAudioCapture *capture)
     AUDIO_FUNC_LOGI("hdi start enter");
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiCaptureLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
     if (vdiCapture == NULL || vdiCapture->Start == NULL) {
@@ -642,7 +640,6 @@ int32_t AudioCaptureStopVdi(struct IAudioCapture *capture)
     AUDIO_FUNC_LOGI("hdi stop enter");
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiCaptureLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
     if (vdiCapture == NULL || vdiCapture->Stop == NULL) {
@@ -668,7 +665,6 @@ int32_t AudioCapturePauseVdi(struct IAudioCapture *capture)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiCaptureLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
     if (vdiCapture == NULL || vdiCapture->Pause == NULL) {
@@ -691,7 +687,6 @@ int32_t AudioCaptureResumeVdi(struct IAudioCapture *capture)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiCaptureLock);
-    AUDIO_FUNC_LOGI("testtest %{public}s", __func__);
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
     if (vdiCapture == NULL || vdiCapture->Resume == NULL) {
