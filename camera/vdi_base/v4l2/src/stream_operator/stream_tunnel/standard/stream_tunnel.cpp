@@ -128,7 +128,7 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
         }
     }
     if (!buffer->GetIsValidDataInSurfaceBuffer()) {
-        if (buffer->GetSize() = 0) {
+        if (buffer->GetSize() == 0) {
             CAMERA_LOGE("buffer size no data to copy");
         }
         uint32_t availableSize = (
