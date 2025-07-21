@@ -334,8 +334,13 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
                 length = buf.bytesused;
                 adapterBufferMap_[buf.index].cameraBuffer->SetEsFrameSize(length);
             }
-            (void)memcpy_s(adapterBufferMap_[buf.index].userBufPtr, adapterBufferMap_[buf.index].length,
+            errno_t ret = memcpy_s(
+                adapterBufferMap_[buf.index].userBufPtr, adapterBufferMap_[buf.index].length,
                 adapterBufferMap_[buf.index].start, length);
+            if (ret != EOK) {
+                CAMERA_LOGE("memcpy_s failed with error code: %d", ret);
+                return RC_ERROR;
+            }
         }
     }
     std::lock_guard<std::mutex> l(bufferLock_);
