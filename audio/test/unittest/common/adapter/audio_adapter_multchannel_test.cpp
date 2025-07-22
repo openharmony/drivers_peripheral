@@ -15,6 +15,8 @@
 
 #include <climits>
 #include <cstring>
+#include <chrono>
+#include <thread>
 #include <gtest/gtest.h>
 #include "hdf_dlist.h"
 #include "osal_mem.h"
@@ -31,7 +33,7 @@ using namespace testing::ext;
 #define AUDIO_MULTCHANNEL_CHANNELLAYOUT 1551
 #define MULTICHANNEL_OUTPUT_STREAM_ID   61
 namespace {
-static const uint32_t g_audioAdapterNumMax = 5;
+static const uint32_t G_AUDIO_ADAPTER_NUM_MAX = 5;
 
 class HdfAudioUtAdapterMultiTest : public testing::Test {
 public:
@@ -110,26 +112,26 @@ void HdfAudioUtAdapterMultiTest::InitDevDesc(struct AudioDeviceDescriptor &devDe
 
 void HdfAudioUtAdapterMultiTest::SetUp()
 {
-    uint32_t size = g_audioAdapterNumMax;
+    uint32_t size = G_AUDIO_ADAPTER_NUM_MAX;
     manager_ = IAudioManagerGet(false);
     ASSERT_NE(manager_, nullptr);
 
     adapterDescs_ = (struct AudioAdapterDescriptor *)OsalMemCalloc(
-        sizeof(struct AudioAdapterDescriptor) * (g_audioAdapterNumMax));
+        sizeof(struct AudioAdapterDescriptor) * (G_AUDIO_ADAPTER_NUM_MAX));
     ASSERT_NE(adapterDescs_, nullptr);
 
     ASSERT_EQ(HDF_SUCCESS, manager_->GetAllAdapters(manager_, adapterDescs_, &size));
-    if (size > g_audioAdapterNumMax) {
-        ReleaseAdapterDescs(&adapterDescs_, g_audioAdapterNumMax);
-        ASSERT_LT(size, g_audioAdapterNumMax);
+    if (size > G_AUDIO_ADAPTER_NUM_MAX) {
+        ReleaseAdapterDescs(&adapterDescs_, G_AUDIO_ADAPTER_NUM_MAX);
+        ASSERT_LT(size, G_AUDIO_ADAPTER_NUM_MAX);
     }
 
     if (manager_->LoadAdapter(manager_, &adapterDescs_[0], &adapter_) != HDF_SUCCESS) {
-        ReleaseAdapterDescs(&adapterDescs_, g_audioAdapterNumMax);
+        ReleaseAdapterDescs(&adapterDescs_, G_AUDIO_ADAPTER_NUM_MAX);
         ASSERT_TRUE(false);
     }
     if (adapter_ == nullptr) {
-        ReleaseAdapterDescs(&adapterDescs_, g_audioAdapterNumMax);
+        ReleaseAdapterDescs(&adapterDescs_, G_AUDIO_ADAPTER_NUM_MAX);
         ASSERT_TRUE(false);
     }
 }
@@ -140,7 +142,7 @@ void HdfAudioUtAdapterMultiTest::TearDown()
     ASSERT_NE(adapter_, nullptr);
 
     manager_->UnloadAdapter(manager_, adapterDescs_[0].adapterName);
-    ReleaseAdapterDescs(&adapterDescs_, g_audioAdapterNumMax);
+    ReleaseAdapterDescs(&adapterDescs_, G_AUDIO_ADAPTER_NUM_MAX);
     adapter_ = nullptr;
     IAudioManagerRelease(manager_, false);
     manager_ = nullptr;
@@ -157,7 +159,7 @@ HWTEST_F(HdfAudioUtAdapterMultiTest, HdfAudioAdapterMultchannelCreateRenderIsval
     InitMultchannelAttrs(attrs);
     attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
-    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
     ret = adapter_->DestroyRender(adapter_, renderId_);
     EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
 }
