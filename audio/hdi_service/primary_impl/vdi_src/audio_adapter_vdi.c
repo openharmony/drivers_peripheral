@@ -258,7 +258,7 @@ static int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t ren
     struct IAudioRenderVdi *vdiRender = AudioGetVdiRenderByIdVdi(renderId);
     if (vdiRender == NULL || vdiAdapter->DestroyRender == NULL) {
         pthread_rwlock_unlock(GetRenderLock());
-        AUDIO_FUNC_LOGE("invalid of vdiRender is param");
+        AUDIO_FUNC_LOGE("invalid param or vdiRender pointer is null");
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
