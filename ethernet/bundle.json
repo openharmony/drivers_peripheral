@@ -1,0 +1,49 @@
+{
+  "name": "@ohos/drivers_peripheral_ethernet",
+  "description": "ethernet device driver",
+  "version": "6.0",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/ethernet"
+  },
+  "dirs": {},
+  "scripts": {},
+  "component": {
+    "name": "drivers_peripheral_ethernet",
+    "subsystem": "hdf",
+    "features": [],
+    "adapted_system_type": ["standard"],
+    "rom": "660KB",
+    "ram": "7600KB",
+    "deps": {
+      "components": [
+        "hdf_core",
+        "hilog",
+        "c_utils",
+        "drivers_interface_ethernet",
+        "wpa_supplicant",
+        "init",
+        "libnl",
+        "ipc"
+      ],
+      "third_party": [ ]
+    },
+    "build": {
+      "sub_component": [
+        "//drivers/peripheral/ethernet:ethernet_entry"
+      ],
+      "inner_kits": [
+        {
+          "name": "//drivers/peripheral/ethernet/eth_client:ethernet_hdi_client",
+          "header": {
+            "header_files": [
+              "ethernet_eap_client.h"
+            ],
+            "header_base": "//drivers/peripheral/ethernet/eth_client/include"
+          }
+        }
+      ]
+    }
+  }
+}
