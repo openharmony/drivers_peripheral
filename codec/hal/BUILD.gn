@@ -20,7 +20,7 @@ config("headers_config") {
   ]
 }
 
-ohos_static_library("libcodec_vdi_headers") {
+ohos_shared_library("libcodec_vdi_headers") {
   public_configs = [ ":headers_config" ]
 }
 
