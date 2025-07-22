@@ -34,7 +34,7 @@ ohos_shared_library("libdaudio_manager_daudio_ext_service_2.1") {
 
   sources = [ "./src/daudio_manager_interface_impl.cpp" ]
 
-  public_deps = [
+  deps = [
     "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0",
     "${hdf_service_path}/hdi_service/common:libdaudio_hdf_utils",
   ]
@@ -86,7 +86,11 @@ ohos_shared_library("libdaudio_ext_driver") {
     "-Wl,-z,now",
   ]
 
-  deps = [ "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.1" ]
+  deps = [
+    "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.1",
+    "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0",
+    "${hdf_service_path}/hdi_service/common:libdaudio_hdf_utils",
+  ]
 
   external_deps = [
     "c_utils:utils",
