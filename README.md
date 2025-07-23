@@ -1,8 +1,3 @@
- peripheral/wlan/client/src/netlink/netlink_cmd_adapter.c
-1051 if (strncmp(preValue, SUPPORT_COEXCHIP, strlen(SUPPORT_COEXCHIP)) == 0)
-
-1504 if (memcpy_s(*ifNames, IFNAMSIZ, "wlan0", strlen(STR_WLAN0)+1) != EOK) {
-
 # Peripheral<a name="EN-US_TOPIC_0000001101652164"></a>
 
 -   [Introduction](#section11660541593)
