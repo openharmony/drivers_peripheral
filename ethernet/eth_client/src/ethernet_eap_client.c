@@ -135,13 +135,12 @@ void EthEapClientEventReport(const char *ifName, const char *data)
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_ethEapCallbackMap[i] != NULL && ((strstr(ifName, g_ethEapCallbackMap[i]->ifName))
             || (strcmp(g_ethEapCallbackMap[i]->ifName, ifName) == 0))) {
-            HDF_LOGI("%s: ifName = %s, data = %s", __FUNCTION__, ifName, data);
+            HDF_LOGI("%s: EapEventReport ifName = %s", __FUNCTION__, ifName);
             callbackEventMap[i] = g_ethEapCallbackMap[i]->callback;
         }
     }
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (callbackEventMap[i] != NULL) {
-            HDF_LOGI("%s: call ifName = %s, data = %s", __FUNCTION__, ifName, data);
             callbackEventMap[i]->OnEapEventNotify(callbackEventMap[i], ifName, data);
         }
     }
