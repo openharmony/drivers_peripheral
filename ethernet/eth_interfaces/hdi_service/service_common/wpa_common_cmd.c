@@ -203,6 +203,7 @@ int32_t EthStartEap(struct IEthernet *self, const char *ifName)
     char startCmd[START_CMD_BUF_SIZE];
     ret = sprintf_s(startCmd, sizeof(startCmd), "%s -i%s", START_CMD, ifName);
     if (ret == -1) {
+        pthread_mutex_unlock(&g_wpaLock);
         HDF_LOGE("%{public}s: sprintf_s start cmd fail", __func__);
         return HDF_FAILURE;
     }
@@ -298,8 +299,9 @@ int32_t EthRegisterEapEventCallback(struct IEthernet *self, struct IEthernetCall
     ret = EthEapClientRegisterCallback(cbFunc, ifName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Register failed!, error code: %{public}d", __func__, ret);
+    } else {
+        HDF_LOGI("%{public}s: Register success", __func__);
     }
-    HDF_LOGI("%{public}s: Register success", __func__);
     pthread_mutex_unlock(&g_wpaLock);
     return ret;
 }
@@ -317,8 +319,9 @@ int32_t EthUnregisterEapEventCallback(struct IEthernet *self, struct IEthernetCa
     int32_t ret = EthEapClientUnregisterCallback(cbFunc, ifName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
+    } else {
+        HDF_LOGI("%{public}s: Register success", __func__);
     }
-    HDF_LOGI("%{public}s: Register success", __func__);
     pthread_mutex_unlock(&g_wpaLock);
     return HDF_SUCCESS;
 }
