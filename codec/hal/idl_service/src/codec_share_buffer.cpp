@@ -22,147 +22,115 @@ using namespace OHOS::HDI::Codec::V4_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-CodecShareBuffer::CodecShareBuffer(struct OmxCodecBuffer &codecBuffer) : ICodecBuffer(codecBuffer)
-{}
 
-CodecShareBuffer::~CodecShareBuffer()
+sptr<ICodecBuffer> CodecShareBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header, bool doCopy)
 {
-    shMem_ = nullptr;
-}
+    CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
+    CHECK_AND_RETURN_RET_LOG(codecBuffer.fd != nullptr, nullptr, "invalid ashmem fd");
+    CODEC_LOGI("port=%{public}u, use ashmem, fd=%{public}d, doCopy=%{public}d",
+        portIndex, codecBuffer.fd->Get(), doCopy);
 
-void CodecShareBuffer::SetAshMem(std::shared_ptr<OHOS::Ashmem> shMem)
-{
-    shMem_ = shMem;
-}
-
-OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBuffer)
-{
-    if (codecBuffer.fd == nullptr) {
-        CODEC_LOGE("codecBuffer.fd is invalid");
-        return OHOS::sptr<ICodecBuffer>();
-    }
     int size = OHOS::AshmemGetSize(codecBuffer.fd->Get());
-    std::shared_ptr<OHOS::Ashmem> sharedMem = std::make_shared<OHOS::Ashmem>(codecBuffer.fd->Release(), size);
-    if (sharedMem == nullptr) {
-        CODEC_LOGE("Failed to init sharedMem");
-        return OHOS::sptr<ICodecBuffer>();
+    CHECK_AND_RETURN_RET_LOG(size > 0, nullptr, "ashmem fd has invalid size");
+    codecBuffer.allocLen = size;
+
+    sptr<Ashmem> shMem = sptr<Ashmem>::MakeSptr(codecBuffer.fd->Release(), size);
+    CHECK_AND_RETURN_RET_LOG(shMem != nullptr, nullptr, "create Ashmem failed");
+
+    bool mapd = shMem->MapReadAndWriteAshmem();
+    CHECK_AND_RETURN_RET_LOG(mapd, nullptr, "MapReadAndWriteAshmem failed");
+
+    OMX_U8 *va = reinterpret_cast<OMX_U8 *>(const_cast<void*>(shMem->ReadFromAshmem(size, 0)));
+    int32_t err = doCopy ? OMX_AllocateBuffer(comp, &header, portIndex, nullptr, size) :
+                           OMX_UseBuffer(comp, &header, portIndex, nullptr, size, va);
+    if (err != OMX_ErrorNone) {
+        CODEC_LOGE("OMX_AllocateBuffer or OMX_UseBuffer ret = [%{public}x]", err);
+        return nullptr;
     }
-    bool mapd = false;
-    if (codecBuffer.type == READ_WRITE_TYPE) {
-        mapd = sharedMem->MapReadAndWriteAshmem();
-    } else {
-        mapd = sharedMem->MapReadOnlyAshmem();
-    }
-    if (!mapd) {
-        CODEC_LOGE("MapReadAndWriteAshmem or MapReadOnlyAshmem return false");
-        return OHOS::sptr<ICodecBuffer>();
-    }
+    codecBuffer.bufferhandle = nullptr;
     codecBuffer.fd.reset();
-    CodecShareBuffer *buffer = new CodecShareBuffer(codecBuffer);
-    buffer->SetAshMem(sharedMem);
-    return OHOS::sptr<ICodecBuffer>(buffer);
+    codecBuffer.fenceFd.reset();
+    return sptr<ICodecBuffer>(new CodecShareBuffer(
+        InitInfo{comp, portIndex, codecBuffer, header}, shMem, doCopy)
+    );
 }
 
-OHOS::sptr<ICodecBuffer> CodecShareBuffer::Allocate(struct OmxCodecBuffer &codecBuffer)
+OHOS::sptr<ICodecBuffer> CodecShareBuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
-    codecBuffer.bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
-    // create shared memory
-    int sharedFD = AshmemCreate(nullptr, codecBuffer.allocLen);
+    CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
+    CHECK_AND_RETURN_RET_LOG(codecBuffer.allocLen > 0, nullptr, "invalid allocLen");
+    sptr<Ashmem> shMem = Ashmem::CreateAshmem("codechdi", codecBuffer.allocLen);
+    CHECK_AND_RETURN_RET_LOG(shMem != nullptr, nullptr, "create Ashmem failed");
+    CODEC_LOGI("port=%{public}u, allocate ashmem, fd=%{public}d", portIndex, shMem->GetAshmemFd());
 
-    std::shared_ptr<Ashmem> sharedMemory = std::make_shared<Ashmem>(sharedFD, codecBuffer.allocLen);
-    if (sharedMemory == nullptr) {
-        CODEC_LOGE("Failed to init sharedMemory");
-        return OHOS::sptr<ICodecBuffer>();
+    bool mapd = shMem->MapReadAndWriteAshmem();
+    CHECK_AND_RETURN_RET_LOG(mapd, nullptr, "MapReadAndWriteAshmem failed");
+
+    int32_t err = OMX_AllocateBuffer(comp, &header, portIndex, nullptr, codecBuffer.allocLen);
+    if (err != OMX_ErrorNone) {
+        CODEC_LOGE("OMX_AllocateBuffer error, err = %{public}x", err);
+        return nullptr;
     }
-    bool mapd = false;
-    if (codecBuffer.type == READ_WRITE_TYPE) {
-        mapd = sharedMemory->MapReadAndWriteAshmem();
-    } else {
-        mapd = sharedMemory->MapReadOnlyAshmem();
-    }
-    if (!mapd) {
-        CODEC_LOGE("MapReadAndWriteAshmem or MapReadOnlyAshmem return false");
-        return OHOS::sptr<ICodecBuffer>();
-    }
-    codecBuffer.offset = 0;
-    codecBuffer.filledLen = 0;
-    codecBuffer.fd = UniqueFd::Create(sharedFD, false);
-    CodecShareBuffer *buffer = new CodecShareBuffer(codecBuffer);
-    buffer->SetAshMem(sharedMemory);
-    return OHOS::sptr<ICodecBuffer>(buffer);
+    codecBuffer.bufferhandle = nullptr;
+    codecBuffer.fd = UniqueFd::Create(shMem->GetAshmemFd(), false);
+    codecBuffer.fenceFd.reset();
+    return sptr<ICodecBuffer>(new CodecShareBuffer(
+        InitInfo{comp, portIndex, codecBuffer, header}, shMem, true)
+    );
 }
 
-int32_t CodecShareBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+int32_t CodecShareBuffer::EmptyThisBuffer(OmxCodecBuffer &codecBuffer)
 {
-    if (!CheckInvalid(codecBuffer) || codecBuffer_.type != READ_WRITE_TYPE) {
-        CODEC_LOGE("CheckInvalid return false or mem has no right to write ");
-        return HDF_ERR_INVALID_PARAM;
+    if (codecBuffer_.allocLen < codecBuffer.offset ||
+        codecBuffer_.allocLen < codecBuffer.offset + codecBuffer.filledLen) {
+        CODEC_LOGE("invalid param, allocLen %{public}u, offset %{public}u, filledLen %{public}u",
+            codecBuffer_.allocLen, codecBuffer.offset, codecBuffer.filledLen);
+        return OMX_ErrorBadParameter;
     }
-
-    return ICodecBuffer::FillOmxBuffer(codecBuffer, omxBuffer);
+    if (doCopy_) {
+        void *src = const_cast<void *>(shMem_->ReadFromAshmem(codecBuffer.filledLen, codecBuffer.offset));
+        if (src == nullptr) {
+            CODEC_LOGE("invalid param, allocLen %{public}u, offset %{public}u, filledLen %{public}u",
+                codecBuffer_.allocLen, codecBuffer.offset, codecBuffer.filledLen);
+            return OMX_ErrorBadParameter;
+        }
+        if (omxBufHeader_->pBuffer == nullptr) {
+            CODEC_LOGE("null pBuffer");
+            return OMX_ErrorBadParameter;
+        }
+        auto ret = memcpy_s(omxBufHeader_->pBuffer + codecBuffer.offset, codecBuffer_.allocLen - codecBuffer.offset,
+            src, codecBuffer.filledLen);
+        if (ret != EOK) {
+            CODEC_LOGE("memcpy_s ret [%{public}d]", ret);
+            return OMX_ErrorBadParameter;
+        }
+    }
+    return ICodecBuffer::EmptyThisBuffer(codecBuffer);
 }
 
-int32_t CodecShareBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+int32_t CodecShareBuffer::FillBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer, OmxCodecBuffer& codecBuffer)
 {
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
-        return HDF_ERR_INVALID_PARAM;
+    if (codecBuffer_.allocLen < omxBuffer.nOffset ||
+        codecBuffer_.allocLen < omxBuffer.nOffset + omxBuffer.nFilledLen) {
+        CODEC_LOGE("invalid param, allocLen %{public}u, offset %{public}u, filledLen %{public}u",
+            codecBuffer_.allocLen, omxBuffer.nOffset, omxBuffer.nFilledLen);
+        return OMX_ErrorBadParameter;
     }
-
-    void *sharedPtr = const_cast<void *>(shMem_->ReadFromAshmem(codecBuffer.filledLen, codecBuffer.offset));
-    if (!sharedPtr) {
-        CODEC_LOGE("omxBuffer.length [%{public}d omxBuffer.offset[%{public}d]", codecBuffer.filledLen,
-                   codecBuffer.offset);
-        return HDF_ERR_INVALID_PARAM;
+    if (doCopy_) {
+        if (omxBuffer.pBuffer == nullptr) {
+            CODEC_LOGE("null pBuffer");
+            return OMX_ErrorBadParameter;
+        }
+        if (!shMem_->WriteToAshmem(omxBuffer.pBuffer, omxBuffer.nFilledLen, omxBuffer.nOffset)) {
+            CODEC_LOGE("WriteToAshmem failed");
+            return OMX_ErrorBadParameter;
+        }
     }
-    auto ret = memcpy_s(omxBuffer.pBuffer + codecBuffer.offset, codecBuffer.allocLen - codecBuffer.offset, sharedPtr,
-                        codecBuffer.filledLen);
-    if (ret != EOK) {
-        CODEC_LOGE("memcpy_s ret [%{public}d]", ret);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    return ICodecBuffer::EmptyOmxBuffer(codecBuffer, omxBuffer);
+    return ICodecBuffer::FillBufferDone(omxBuffer, codecBuffer);
 }
 
-int32_t CodecShareBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
-{
-    if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    shMem_ = nullptr;
-    return HDF_SUCCESS;
-}
-
-uint8_t *CodecShareBuffer::GetBuffer()
-{
-    return nullptr;
-}
-
-int32_t CodecShareBuffer::EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    return ICodecBuffer::EmptyOmxBufferDone(omxBuffer);
-}
-
-int32_t CodecShareBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
-{
-    if (shMem_ == nullptr || !shMem_->WriteToAshmem(omxBuffer.pBuffer, omxBuffer.nFilledLen, omxBuffer.nOffset)) {
-        CODEC_LOGE("write to ashmem fail");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    return ICodecBuffer::FillOmxBufferDone(omxBuffer);
-}
-
-bool CodecShareBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
-{
-    if (!ICodecBuffer::CheckInvalid(codecBuffer) || shMem_ == nullptr) {
-        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
-        return false;
-    }
-    return true;
-}
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS

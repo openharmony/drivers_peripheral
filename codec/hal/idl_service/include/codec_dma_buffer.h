@@ -22,19 +22,18 @@ namespace Codec {
 namespace Omx {
 class CodecDMABuffer : ICodecBuffer {
 public:
-    ~CodecDMABuffer();
-    sptr<ICodecBuffer> static Create(struct OmxCodecBuffer &codecBuffer);
-    OHOS::sptr<ICodecBuffer> static Allocate(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
-    int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer) override;
-    int32_t EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    int32_t FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    uint8_t *GetBuffer() override;
+    ~CodecDMABuffer() = default;
+    static sptr<ICodecBuffer> UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header);
+    static sptr<ICodecBuffer> AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header);
 
 protected:
-    CodecDMABuffer(struct OmxCodecBuffer &codecBuffer);
-    bool CheckInvalid(struct OmxCodecBuffer &codecBuffer) override;
+    CodecDMABuffer(const InitInfo& info, std::shared_ptr<UniqueFd> fd)
+        : ICodecBuffer(info), dmaFd_(fd) {}
+
+private:
+    std::shared_ptr<UniqueFd> dmaFd_;
 };
 }  // namespace Omx
 }  // namespace Codec

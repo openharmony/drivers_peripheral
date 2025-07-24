@@ -37,26 +37,32 @@ struct DynamicBuffer {
 
 class ICodecBuffer : public RefBase {
 public:
-    ICodecBuffer(struct OmxCodecBuffer &codecBuffer);
     virtual ~ICodecBuffer();
-    sptr<ICodecBuffer> static CreateCodeBuffer(struct OmxCodecBuffer &codecBuffer);
-    sptr<ICodecBuffer> static AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
-    virtual int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
-    virtual int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
-    virtual int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer);
-    virtual int32_t EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer);
-    virtual int32_t FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer);
-    virtual uint8_t *GetBuffer();
-    struct OmxCodecBuffer &GetCodecBuffer();
-    void SetBufferId(int32_t bufferId);
+    static sptr<ICodecBuffer> UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header, bool doCopy);
+    static sptr<ICodecBuffer> AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header);
+    virtual int32_t EmptyThisBuffer(OmxCodecBuffer &codecBuffer);
+    virtual int32_t FillThisBuffer(OmxCodecBuffer &codecBuffer);
+    int32_t EmptyBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer, OmxCodecBuffer& codecBuffer);
+    virtual int32_t FillBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer, OmxCodecBuffer& codecBuffer);
+    void FreeBuffer();
 
 protected:
-    ICodecBuffer()
-    {}
-    virtual bool CheckInvalid(struct OmxCodecBuffer &codecBuffer);
+    struct InitInfo {
+        OMX_HANDLETYPE comp;
+        uint32_t portIndex;
+        OmxCodecBuffer codecBuf;
+        OMX_BUFFERHEADERTYPE* omxHeader;
+    };
+    ICodecBuffer(const InitInfo& info) : comp_(info.comp), portIndex_(info.portIndex),
+        codecBuffer_(info.codecBuf), omxBufHeader_(info.omxHeader) {}
     int32_t SyncWait(int fd, uint32_t timeout);
 protected:
+    OMX_HANDLETYPE comp_ = nullptr;
+    uint32_t portIndex_;
     struct OmxCodecBuffer codecBuffer_;
+    OMX_BUFFERHEADERTYPE *omxBufHeader_ = nullptr;
 };
 }  // namespace Omx
 }  // namespace Codec
