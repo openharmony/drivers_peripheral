@@ -406,7 +406,7 @@ CamRetCode DCameraDevice::OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &c
     }
 
     DCamRetCode retDCode = CreateDStreamOperator();
-    if (ret != SUCCESS) {
+    if (retDCode != SUCCESS) {
         DHLOGE("Create distributed camera stream operator failed.");
         return MapToExternalRetCode(retDCode);
     }
@@ -630,7 +630,7 @@ bool DCameraDevice::IsOpened()
 void DCameraDevice::SetDcameraAbility(const std::string& sinkAbilityInfo)
 {
     DHLOGI("DCameraDevice SetDcameraAbility enter.");
-    if (dCameraAbilityInfo_.find(FULL_DATA_KEY) != sinkAbilityInfo.npos &&
+    if (dCameraAbilityInfo_.find(FULL_DATA_KEY) != dCameraAbilityInfo_.npos &&
         sinkAbilityInfo.find(META_DATA_KEY) != sinkAbilityInfo.npos) {
         SetRefreshFlag(false);
         DHLOGE("The sinkAbilityInfo is meta data, it is not allowed to refresh full data.");

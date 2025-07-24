@@ -336,7 +336,7 @@ void DCameraEnableResultFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::vector<int32_t> results;
-    results.push_back(*(reinterpret_cast<const int32_t*>(data)));
+    results.push_back(fdp.ConsumeIntegral<int32_t>());
 
     dcameraDevice->EnableResult(results);
 }
@@ -364,7 +364,7 @@ void DCameraDisableResultFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::vector<int32_t> results;
-    results.push_back(*(reinterpret_cast<const int32_t*>(data)));
+    results.push_back(fdp.ConsumeIntegral<int32_t>());
 
     dcameraDevice->DisableResult(results);
 }
@@ -475,10 +475,21 @@ void DCameraNotifyFuzzTest(const uint8_t* data, size_t size)
     if (dcameraDevice == nullptr) {
         return;
     }
+    const std::vector<DCameraEventResult> validEventResults = {
+        DCAMERA_EVENT_CHANNEL_DISCONNECTED, DCAMERA_EVENT_CHANNEL_CONNECTED,
+        DCAMERA_EVENT_CAMERA_SUCCESS,       DCAMERA_EVENT_CAMERA_ERROR,
+        DCAMERA_EVENT_OPEN_CHANNEL_ERROR,   DCAMERA_EVENT_CLOSE_CHANNEL_ERROR,
+        DCAMERA_EVENT_CONFIG_STREAMS_ERROR, DCAMERA_EVENT_RELEASE_STREAMS_ERROR,
+        DCAMERA_EVENT_START_CAPTURE_ERROR,  DCAMERA_EVENT_STOP_CAPTURE_ERROR,
+        DCAMERA_EVENT_UPDATE_SETTINGS_ERROR, DCAMERA_EVENT_DEVICE_ERROR,
+        DCAMERA_EVENT_DEVICE_PREEMPT,       DCAMERA_EVENT_DEVICE_IN_USE,
+        DCAMERA_EVENT_NO_PERMISSION
+    };
 
     std::shared_ptr<DCameraHDFEvent> event = std::make_shared<DCameraHDFEvent>();
-    event->type_ = static_cast<DCameraEventType>(fdp.ConsumeIntegral<int32_t>());
-    event->result_ = static_cast<DCameraEventResult>(fdp.ConsumeIntegral<int32_t>());
+    event->type_ = static_cast<DCameraEventType>(fdp.ConsumeIntegralInRange<int>(DCAMERA_MESSAGE, DCAMERE_GETFULLCAP));
+    size_t index = fdp.ConsumeIntegralInRange<size_t>(0, validEventResults.size() - 1);
+    event->result_ = validEventResults[index];
     event->content_ = fdp.ConsumeRemainingBytesAsString();
 
     dcameraDevice->Notify(event);
