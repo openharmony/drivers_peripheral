@@ -129,12 +129,12 @@ struct DCResolution {
 
     DCResolution(int32_t width, int32_t height) : width_(width), height_(height) {}
 
-    bool operator ==(const DCResolution others) const
+    bool operator ==(const DCResolution& others) const
     {
         return (this->width_ == others.width_) && (this->height_ == others.height_);
     }
 
-    bool operator <(const DCResolution others) const
+    bool operator <(const DCResolution& others) const
     {
         return this->width_ < others.width_ ||
             (this->width_ == others.width_ && this->height_ < others.height_);
