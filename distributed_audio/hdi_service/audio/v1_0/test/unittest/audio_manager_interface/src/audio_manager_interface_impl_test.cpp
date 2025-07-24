@@ -241,6 +241,26 @@ HWTEST_F(AudioManagerInterfaceImplTest, RegisterAudioHdfListener_001, TestSize.L
     sptr<IDAudioHdfCallback> callback = nullptr;
     EXPECT_EQ(HDF_FAILURE, audioManagerInterfaceImpl_->RegisterAudioHdfListener(adpName, callback));
 }
+
+/**
+ * @tc.name: IsAllClearRegisterRecipientErased_001
+ * @tc.desc: Verify the IsAllClearRegisterRecipientErased function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioManagerInterfaceImplTest, IsAllClearRegisterRecipientErased_001, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    auto clearRegisterRecipient = sptr<AudioManagerInterfaceImpl::ClearRegisterRecipient>(
+        new AudioManagerInterfaceImpl::ClearRegisterRecipient("deviceId", 1));
+    ASSERT_FALSE(clearRegisterRecipient == nullptr);
+    audioManagerInterfaceImpl_->clearRegisterRecipients_.push_back(clearRegisterRecipient);
+    EXPECT_EQ(false, audioManagerInterfaceImpl_->IsAllClearRegisterRecipientErased());
+    clearRegisterRecipient->needErase_ = true;
+    EXPECT_EQ(true, audioManagerInterfaceImpl_->IsAllClearRegisterRecipientErased());
+    audioManagerInterfaceImpl_->clearRegisterRecipients_.clear();
+    EXPECT_EQ(true, audioManagerInterfaceImpl_->IsAllClearRegisterRecipientErased());
+}
 } // V1_0
 } // Audio
 } // Distributedaudio

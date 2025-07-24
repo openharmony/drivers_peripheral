@@ -22,6 +22,7 @@
 #include "iproxy_broker.h"
 #include "iservmgr_hdi.h"
 #include <sstream>
+#include <thread>
 
 #include "daudio_constants.h"
 #include "daudio_errcode.h"
@@ -41,6 +42,8 @@ namespace V1_0 {
 AudioManagerInterfaceImpl *AudioManagerInterfaceImpl::audioManager_ = nullptr;
 std::mutex AudioManagerInterfaceImpl::audioManagerMtx_;
 #define SERVICE_INFO_LEN_MAX 256
+constexpr int32_t WAIT_RECIPIENT_ERASED_TIME_SEC = 1;
+constexpr int32_t WAIT_RECIPIENT_ERASED_RETRY_CNT = 3;
 extern "C" IAudioManager *AudioManagerImplGetInstance(void)
 {
     return AudioManagerInterfaceImpl::GetAudioManager();
@@ -48,13 +51,17 @@ extern "C" IAudioManager *AudioManagerImplGetInstance(void)
 
 AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 {
-    DHLOGD("Distributed audio manager constructed.");
+    DHLOGI("Distributed audio manager constructed.");
     audioManagerRecipient_ = sptr<AudioManagerRecipient>(new AudioManagerRecipient());
 }
 
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
 {
-    DHLOGD("Distributed audio manager destructed.");
+    DHLOGI("Distributed audio manager destructed.");
+    auto retryCount = WAIT_RECIPIENT_ERASED_RETRY_CNT;
+    while (!IsAllClearRegisterRecipientErased() && retryCount--) {
+        std::this_thread::sleep_for(std::chrono::seconds(WAIT_RECIPIENT_ERASED_TIME_SEC));
+    }
 }
 
 int32_t AudioManagerInterfaceImpl::GetAllAdapters(std::vector<AudioAdapterDescriptor> &descs)
@@ -447,6 +454,26 @@ int32_t AudioManagerInterfaceImpl::RemoveClearRegisterRecipient(sptr<IRemoteObje
     }
     DHLOGI("remove clear register recipient end.");
     return DH_SUCCESS;
+}
+
+bool AudioManagerInterfaceImpl::IsAllClearRegisterRecipientErased()
+{
+    DHLOGI("is all clear register recipient erased begin.");
+    std::lock_guard<std::mutex> lock(clearRegisterRecipientsMtx_);
+    for (auto itRecipient = clearRegisterRecipients_.begin();
+        itRecipient != clearRegisterRecipients_.end(); ++itRecipient) {
+        auto &clearRegisterRecipient = *itRecipient;
+        if (clearRegisterRecipient == nullptr) {
+            DHLOGE("Clear register recipient is nullptr.");
+            continue;
+        }
+        if (!clearRegisterRecipient->IsNeedErase()) {
+            DHLOGI("clear register recipient not erased.");
+            return false;
+        }
+    }
+    DHLOGI("is all clear register recipient erased end.");
+    return true;
 }
 } // V1_0
 } // Audio
