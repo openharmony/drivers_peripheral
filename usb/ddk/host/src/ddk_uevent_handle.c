@@ -43,6 +43,7 @@
 #define TIMEVAL_SECOND          0
 #define TIMEVAL_USECOND         (100 * 1000)
 #define UEVENT_POLL_WAIT_TIME   100
+#define MAX_ERR_TIMES           10
 
 static int DdkUeventOpen(int *fd)
 {
@@ -163,6 +164,7 @@ static ssize_t DdkReadUeventMsg(int sockFd, char *buffer, size_t length)
 void *DdkUeventMain(void *param)
 {
     (void)param;
+    int errorTimes = 0;
     int socketfd = -1;
     if (DdkUeventOpen(&socketfd) != HDF_SUCCESS) {
         HDF_LOGE("DdkUeventOpen failed");
@@ -184,6 +186,7 @@ void *DdkUeventMain(void *param)
         }
 
         if (((uint32_t)fd.revents & POLLIN) == POLLIN) {
+            errorTimes = 0;
             (void)memset_s(&msg, sizeof(msg), 0, sizeof(msg));
             rcvLen = DdkReadUeventMsg(socketfd, msg, UEVENT_MSG_LEN);
             if (rcvLen <= 0) {
@@ -193,6 +196,11 @@ void *DdkUeventMain(void *param)
             UsbFnHandleUevent(msg, rcvLen);
             UsbAccessoryUeventHandle(msg, rcvLen);
         } else if (((uint32_t)fd.revents & POLLERR) == POLLERR) {
+            if (errorTimes < MAX_ERR_TIMES) {
+                ++errorTimes;
+            } else {
+                OsalMSleep(UEVENT_POLL_WAIT_TIME);
+            }
             HDF_LOGE("usb event poll error");
         }
     } while (true);
