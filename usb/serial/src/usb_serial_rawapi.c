@@ -1019,6 +1019,10 @@ ERROR:
 static void AcmProcessNotification(const struct AcmDevice *acm, const unsigned char *buf)
 {
     (void)acm;
+    if (buf == NULL) {
+        HDF_LOGE("%{public}s - invalid buffer", __func__);
+        return;
+    }
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
 
     switch (dr->bNotificationType) {
