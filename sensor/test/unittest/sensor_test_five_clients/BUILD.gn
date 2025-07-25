@@ -53,8 +53,6 @@ ohos_unittest("SensorSetBatchTest1") {
 
     if (is_standard_system) {
         external_deps = [
-            "drivers_interface_sensor:libsensor_proxy_2.0",
-            "drivers_interface_sensor:libsensor_proxy_2.1",
             "drivers_interface_sensor:libsensor_proxy_3.0",
             "hdf_core:libhdf_host",
             "hdf_core:libhdf_utils",
@@ -95,8 +93,6 @@ ohos_unittest("SensorSetBatchTest2") {
 
     if (is_standard_system) {
         external_deps = [
-            "drivers_interface_sensor:libsensor_proxy_2.0",
-            "drivers_interface_sensor:libsensor_proxy_2.1",
             "drivers_interface_sensor:libsensor_proxy_3.0",
             "hdf_core:libhdf_host",
             "hdf_core:libhdf_utils",
@@ -137,8 +133,6 @@ ohos_unittest("SensorSetBatchTest3") {
 
     if (is_standard_system) {
         external_deps = [
-            "drivers_interface_sensor:libsensor_proxy_2.0",
-            "drivers_interface_sensor:libsensor_proxy_2.1",
             "drivers_interface_sensor:libsensor_proxy_3.0",
             "hdf_core:libhdf_host",
             "hdf_core:libhdf_utils",
@@ -179,8 +173,6 @@ ohos_unittest("SensorSetBatchTest4") {
 
     if (is_standard_system) {
         external_deps = [
-            "drivers_interface_sensor:libsensor_proxy_2.0",
-            "drivers_interface_sensor:libsensor_proxy_2.1",
             "drivers_interface_sensor:libsensor_proxy_3.0",
             "hdf_core:libhdf_host",
             "hdf_core:libhdf_utils",
@@ -221,8 +213,6 @@ ohos_unittest("SensorSetBatchTest5") {
 
     if (is_standard_system) {
         external_deps = [
-            "drivers_interface_sensor:libsensor_proxy_2.0",
-            "drivers_interface_sensor:libsensor_proxy_2.1",
             "drivers_interface_sensor:libsensor_proxy_3.0",
             "hdf_core:libhdf_host",
             "hdf_core:libhdf_utils",
