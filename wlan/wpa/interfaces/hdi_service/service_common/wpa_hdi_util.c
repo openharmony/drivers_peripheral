@@ -191,7 +191,7 @@ unsigned int StrtoUint(const char *input)
     }
     char *endPtr = NULL;
     unsigned long result = 0;
-    result = strtol(input, &endPtr, NUMBER_BASE);
+    result = (unsigned long)strtol(input, &endPtr, NUMBER_BASE);
 
     if (endPtr == input || *endPtr != '\0') {
         HDF_LOGE("StrtoUint: invalid data!");

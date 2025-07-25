@@ -1359,6 +1359,10 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         }
         len = last - start - 1;
         infoElemsTemp[infoElemsSize].size = len / lenValue;
+         if ((len / lenValue + 1) <= 0) {
+            HDF_LOGE("GetInfoElems len is error");
+            break;
+        }
         infoElemsTemp[infoElemsSize].content = (char *)calloc(len / lenValue + 1, sizeof(char));
         if (infoElemsTemp[infoElemsSize].content == NULL) {
             break;
