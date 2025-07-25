@@ -110,4 +110,27 @@ void CameraHostSelfkiller::CameraHostSelfkillerHandler()
     }
 }
 
+void CameraHostSelfkiller::WaitForBootComplete()
+{
+    constexpr const char *bootCompleteParamName = "bootevent.boot.completed";
+    static bool isBootComplete = false;
+    if (isBootComplete) {
+        CAMERA_LOGD("isBootComplete is true, just return");
+        return;
+    }
+    CAMERA_LOGI("Wait isBootComplete begin");
+    isBootComplete = OHOS::system::GetBoolParameter(bootCompleteParamName, false);
+    while (!isBootComplete) {
+        isBootComplete = OHOS::system::GetBoolParameter(bootCompleteParamName, false);
+        if (isBootComplete) {
+            CAMERA_LOGI("Get %{public}s true, sleep 1s and then continue", bootCompleteParamName);
+            sleep(1);
+            break;
+        }
+        CAMERA_LOGI("Get %{public}s true, sleep 1s and then continue", bootCompleteParamName);
+        sleep(1);
+    }
+    CAMERA_LOGI("Wait isBootComplete end");
+}
+
 }  // namespace OHOS::Camera

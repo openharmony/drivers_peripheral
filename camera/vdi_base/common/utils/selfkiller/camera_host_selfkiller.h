@@ -30,6 +30,7 @@ public:
         std::string cameraServiceName = DEFAULT_CAMERA_SERVICE_NAME);
     void DeInit();
     static void UnloadHdfServiceByName(const std::string &serviceName);
+    static void WaitForBootComplete();
 
 private:
     std::thread *selfKillerThread_ = nullptr;
