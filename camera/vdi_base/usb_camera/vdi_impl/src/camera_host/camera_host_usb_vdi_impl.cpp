@@ -72,6 +72,7 @@ VdiCamRetCode CameraHostVdiImpl::Init()
         });
 
     (void)DevHostRegisterDumpHost(CameraDumpEvent);
+    CameraHostSelfkiller::WaitForBootComplete();
     if (g_usbCameraSelfKiller == nullptr) {
         g_usbCameraSelfKiller = std::make_unique<CameraHostSelfkiller>();
         g_usbCameraSelfKiller->Init(
