@@ -38,7 +38,7 @@ IAM_STATIC ResultCode GetAuthTokenDataPlain(
     dataPlain->authTrustLevel = context->authTrustLevel;
     dataPlain->authType = context->authType;
     dataPlain->authMode = authMode;
-    if (memcmp(context->localUdid, context->collectorUdid, sizeof(context->localUdid)) == 0) {
+    if (IsAllZero(context->collectorUdid, UDID_LEN)) {
         dataPlain->tokenType = TOKEN_TYPE_LOCAL_AUTH;
     } else {
         dataPlain->tokenType = TOKEN_TYPE_COAUTH;
@@ -65,10 +65,18 @@ IAM_STATIC ResultCode GetAuthTokenDataToEncrypt(const UserAuthContext *context, 
     data->secureUid = secureUid;
     data->enrolledId = enrolledInfo.enrolledId;
     data->credentialId = credentialId;
-    if (memcpy_s(data->collectorUdid, sizeof(data->collectorUdid),
-        context->collectorUdid, sizeof(context->collectorUdid)) != EOK) {
-        LOG_ERROR("copy collectorUdid failed");
-        return RESULT_GENERAL_ERROR;
+    if (IsAllZero(context->collectorUdid, UDID_LEN)) {
+        if (memcpy_s(data->collectorUdid, sizeof(data->collectorUdid),
+            context->localUdid, sizeof(context->localUdid)) != EOK) {
+            LOG_ERROR("copy collectorUdid failed");
+            return RESULT_GENERAL_ERROR;
+        }
+    } else {
+        if (memcpy_s(data->collectorUdid, sizeof(data->collectorUdid),
+            context->collectorUdid, sizeof(context->collectorUdid)) != EOK) {
+            LOG_ERROR("copy collectorUdid failed");
+            return RESULT_GENERAL_ERROR;
+        }
     }
 
     if (memcpy_s(data->verifierUdid, sizeof(data->verifierUdid),

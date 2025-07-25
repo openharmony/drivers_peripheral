@@ -222,6 +222,15 @@ DCamRetCode DCameraStream::GetNextRequest()
 DCamRetCode DCameraStream::SurfaceBufferToDImageBuffer(OHOS::sptr<OHOS::SurfaceBuffer> &surfaceBuffer,
     OHOS::sptr<OHOS::SyncFence> &syncFence)
 {
+    if (dcStreamProducer_ == nullptr) {
+        DHLOGE("dcStreamProducer_ is nullptr.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    if (syncFence == nullptr || dcStreamInfo_ == nullptr) {
+        DHLOGE("SyncFence or dcStreamInfo_ is nullptr");
+        dcStreamProducer_->CancelBuffer(surfaceBuffer);
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     std::shared_ptr<DImageBuffer> imageBuffer = std::make_shared<DImageBuffer>();
     RetCode ret = DBufferManager::SurfaceBufferToDImageBuffer(surfaceBuffer, imageBuffer);
     if (ret != RC_OK) {
@@ -229,11 +238,13 @@ DCamRetCode DCameraStream::SurfaceBufferToDImageBuffer(OHOS::sptr<OHOS::SurfaceB
         dcStreamProducer_->CancelBuffer(surfaceBuffer);
         return DCamRetCode::EXCEED_MAX_NUMBER;
     }
-
     imageBuffer->SetIndex(++index_);
     imageBuffer->SetSyncFence(syncFence);
-    CHECK_AND_RETURN_RET_LOG(
-        dcStreamBufferMgr_ == nullptr, DCamRetCode::INVALID_ARGUMENT, "dcStreamBufferMgr_ is nullptr");
+    if (dcStreamBufferMgr_ == nullptr) {
+        DHLOGE("dcStreamBufferMgr_ is nullptr.");
+        dcStreamProducer_->CancelBuffer(surfaceBuffer);
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     ret = dcStreamBufferMgr_->AddBuffer(imageBuffer);
     if (ret != RC_OK) {
         DHLOGE("Add buffer to buffer manager failed. [streamId = %{public}d]", dcStreamInfo_->streamId_);
@@ -323,6 +334,10 @@ DCamRetCode DCameraStream::FlushDCameraBuffer(const DCameraBuffer &buffer)
     }
     auto surfaceBuffer = std::get<0>(bufCfg->second);
     int64_t timeStamp = static_cast<int64_t>(GetVideoTimeStamp());
+    if (dcStreamInfo_ == nullptr) {
+        DHLOGE("dcStreamInfo_ or dcStreamProducer_ is nullptr.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     OHOS::BufferFlushConfig flushConf = {
         .damage = { .x = 0, .y = 0, .w = dcStreamInfo_->width_, .h = dcStreamInfo_->height_ },
         .timestamp = timeStamp
@@ -357,6 +372,11 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
 
 void DCameraStream::SetSurfaceBuffer(OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer, const DCameraBuffer &buffer)
 {
+    if (dcStreamInfo_ == nullptr || surfaceBuffer == nullptr) {
+        DHLOGE("dcStreamInfo_ or surfaceBuffer is nullptr.");
+        return;
+    }
+
     if (dcStreamInfo_->intent_ == StreamIntent::VIDEO) {
         int32_t size = (dcStreamInfo_->width_) * (dcStreamInfo_->height_) * YUV_WIDTH_RATIO / YUV_HEIGHT_RATIO;
         int64_t timeStamp = static_cast<int64_t>(GetVideoTimeStamp());
@@ -381,6 +401,10 @@ uint64_t DCameraStream::GetVideoTimeStamp()
 
 void DCameraStream::DoCapture()
 {
+    if (dcStreamInfo_ == nullptr) {
+        DHLOGE("dcStreamInfo_ is nullptr.");
+        return;
+    }
     DHLOGI("Do capture, streamId %{public}d", dcStreamInfo_->streamId_);
     std::lock_guard<std::mutex> lockRequest(requestMutex_);
     isCancelCapture_ = false;
@@ -388,6 +412,10 @@ void DCameraStream::DoCapture()
 
 void DCameraStream::CancelCaptureWait()
 {
+    if (dcStreamInfo_ == nullptr) {
+        DHLOGE("dcStreamInfo_ is nullptr.");
+        return;
+    }
     DHLOGI("Cancel capture wait for, streamId %{public}d", dcStreamInfo_->streamId_);
     std::lock_guard<std::mutex> lockRequest(requestMutex_);
     if (isCancelCapture_) {
@@ -409,6 +437,10 @@ void DCameraStream::CancelCaptureWait()
 
 DCamRetCode DCameraStream::CancelDCameraBuffer()
 {
+    if (dcStreamInfo_ == nullptr) {
+        DHLOGE("dcStreamInfo_ is nullptr.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     DHLOGI("Cancel dcamera buffer wait for, streamId %{public}d", dcStreamInfo_->streamId_);
     std::lock_guard<std::mutex> lockRequest(requestMutex_);
     if (dcStreamBufferMgr_ == nullptr || dcStreamProducer_ == nullptr || isCancelBuffer_) {

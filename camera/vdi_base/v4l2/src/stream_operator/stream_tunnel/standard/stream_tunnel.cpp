@@ -60,20 +60,23 @@ void StreamTunnel::CleanBuffers()
     index = -1;
 }
 
+const int32_t BLOB_MAX_SIZE = 24 * 1024 * 1024;
+
 std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferQueue_, nullptr);
     OHOS::sptr<OHOS::SurfaceBuffer> sb = nullptr;
     int32_t fence = 0;
-    constexpr int32_t SLEEP_TIME = 2000;
+    constexpr int32_t sleepTime = 2000;
     int32_t timtCount = 0;
     OHOS::SurfaceError sfError = OHOS::SURFACE_ERROR_OK;
+    auto tmpConfig = requestConfig_;
     do {
-        sfError = bufferQueue_->RequestBuffer(sb, fence, requestConfig_);
+        sfError = bufferQueue_->RequestBuffer(sb, fence, tmpConfig);
         if (sfError == OHOS::SURFACE_ERROR_NO_BUFFER) {
             std::unique_lock<std::mutex> l(waitLock_);
             waitCV_.wait(l, [this] { return wakeup_ == true; });
-            usleep(SLEEP_TIME);
+            usleep(sleepTime);
             timtCount++;
         }
         if (fence != -1) {
@@ -83,7 +86,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
     } while (!stop_ && sfError == OHOS::SURFACE_ERROR_NO_BUFFER);
     wakeup_ = false;
     CAMERA_LOGI("bufferQueue_->RequestBuffer Done, sfError = %{public}d, cast time = %{public}d us",
-        sfError, timtCount * SLEEP_TIME);
+        sfError, timtCount * sleepTime);
 
     if (stop_) {
         if (sb != nullptr) {
@@ -125,8 +128,13 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
         }
     }
     if (!buffer->GetIsValidDataInSurfaceBuffer()) {
+        if (buffer->GetSize() == 0) {
+            CAMERA_LOGE("buffer size no data to copy");
+        }
+        uint32_t availableSize = (
+            esInfo.size > 0 ? static_cast<uint32_t>(esInfo.size) : buffer->GetSize());
         CAMERA_LOGI("copy data from cb to sb, size = %{public}d", sb->GetSize());
-        auto ret = memcpy_s(sb->GetVirAddr(), sb->GetSize(), buffer->GetVirAddress(), sb->GetSize());
+        auto ret = memcpy_s(sb->GetVirAddr(), sb->GetSize(), buffer->GetVirAddress(), availableSize);
         if (ret != 0) {
             CAMERA_LOGE("PrepareBufferBeforeFlush memcpy_s fail, error = %{public}d", ret);
         }

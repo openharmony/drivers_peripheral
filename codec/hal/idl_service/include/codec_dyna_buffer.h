@@ -22,20 +22,18 @@ namespace Codec {
 namespace Omx {
 class CodecDynaBuffer : ICodecBuffer {
 public:
-    ~CodecDynaBuffer();
-    sptr<ICodecBuffer> static Create(struct OmxCodecBuffer &codecBuffer);
-    int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer) override;
-    int32_t EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    int32_t FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer) override;
-    uint8_t *GetBuffer() override;
+    ~CodecDynaBuffer() = default;
+    static sptr<ICodecBuffer> UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header);
+    int32_t EmptyThisBuffer(OmxCodecBuffer &codecBuffer) override;
+    int32_t FillThisBuffer(OmxCodecBuffer &codecBuffer) override;
 
 protected:
-    CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer);
+    CodecDynaBuffer(const InitInfo& info, std::shared_ptr<DynamicBuffer> dynamicBuf)
+        : ICodecBuffer(info), dynaBuffer_(dynamicBuf) {}
 
 private:
-    DynamicBuffer dynaBuffer_{};
+    std::shared_ptr<DynamicBuffer> dynaBuffer_;
     sptr<HDI::Base::NativeBuffer> buffer_;
 };
 }  // namespace Omx

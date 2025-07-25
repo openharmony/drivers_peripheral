@@ -23,6 +23,7 @@ namespace OHOS::Camera {
         static int32_t ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBufferInfo &dstBufferInfo);
         static void BufferScaleFormatTransform(std::shared_ptr<IBuffer>& buffer,
             void *dstBuffer = nullptr, uint32_t dstBufferSize = 0);
+        static void BufferTransformForStride(std::shared_ptr<IBuffer>& buffer);
 
         struct ImageBufferInfo {
             int32_t width;

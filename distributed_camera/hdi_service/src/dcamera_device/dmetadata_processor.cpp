@@ -250,6 +250,10 @@ void DMetadataProcessor::InitOutputAbilityWithoutMode(const std::string &sinkAbi
 
     std::vector<int32_t> streamConfigs;
     std::vector<int32_t> extendStreamConfigs;
+    if (dCameraAbility_ == nullptr) {
+        DHLOGE("Distributed camera abilily is null.");
+        return;
+    }
     for (uint32_t i = 0; i < ADD_MODE; i++) { // Compatible camera framework modification
         camera_metadata_item_t item;
         int32_t ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(),
@@ -290,6 +294,7 @@ DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &
     }
     std::vector<int32_t> streamConfigs;
     std::vector<int32_t> extendStreamConfigs;
+    CHECK_AND_FREE_RETURN_RET_LOG(dCameraAbility_ == nullptr, FAILED, rootValue, "dCameraAbility_ null.");
     for (std::string key : keys) {
         cJSON *value = cJSON_GetObjectItem(rootValue, key.c_str());
         CHECK_AND_FREE_RETURN_RET_LOG(value == nullptr || !cJSON_IsObject(value), FAILED, rootValue, "mode get error.");
@@ -566,6 +571,10 @@ void DMetadataProcessor::UpdateAllResult(const uint64_t &resultTimestamp)
 void DMetadataProcessor::UpdateOnChanged(const uint64_t &resultTimestamp)
 {
     bool needReturn = false;
+    if (latestProducerMetadataResult_ == nullptr || latestConsumerMetadataResult_ == nullptr) {
+        DHLOGD("DMetadataProcessor::UpdateResultMetadata latest producer metadata result is null");
+        return;
+    }
     uint32_t itemCap = OHOS::Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
     uint32_t dataSize = OHOS::Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
     DHLOGD("DMetadataProcessor::UpdateOnChanged itemCapacity: %{public}u, dataSize: %{public}u", itemCap, dataSize);
@@ -643,6 +652,10 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
     }
 
     camera_metadata_item_entry_t* itemEntry = OHOS::Camera::GetMetadataItems(latestProducerMetadataResult_->get());
+    if (itemEntry == nullptr) {
+        DHLOGE("Failed to get metadata items from latest producer metadata result.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     uint32_t count = latestProducerMetadataResult_->get()->item_count;
     for (uint32_t i = 0; i < count; i++, itemEntry++) {
         enabledResultSet_.insert((MetaType)(itemEntry->item));

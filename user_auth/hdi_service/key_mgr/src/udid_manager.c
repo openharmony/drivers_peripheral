@@ -67,7 +67,7 @@ bool GetLocalUdid(Uint8Array *udid)
 bool IsLocalUdid(Uint8Array udid)
 {
     IF_TRUE_LOGE_AND_RETURN_VAL(IS_ARRAY_NULL(udid), false);
-    
+
     if (udid.len != UDID_LEN) {
         return false;
     }

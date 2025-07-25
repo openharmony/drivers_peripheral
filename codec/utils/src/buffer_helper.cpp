@@ -96,9 +96,14 @@ void BufferDestructor(BufferHandle* handle)
     }
     sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> mapper = GetMapperService();
     if (mapper == nullptr) {
+        CODEC_LOGE("destruct bufferHandle failed: unable to get mapper");
         return;
     }
-    sptr<NativeBuffer> buffer = new NativeBuffer();
+    sptr<NativeBuffer> buffer = sptr<NativeBuffer>::MakeSptr();
+    if (buffer == nullptr) {
+        CODEC_LOGE("destruct bufferHandle failed: unable to get nativeBuffer");
+        return;
+    }
     buffer->SetBufferHandle(handle, true);
     mapper->FreeMem(buffer);
 }
@@ -108,19 +113,14 @@ sptr<NativeBuffer> ReWrap(const sptr<NativeBuffer>& src, bool isIpcMode)
     if (!isIpcMode) {
         return src;
     }
-    if (src == nullptr) {
-        return nullptr;
-    }
+    CHECK_AND_RETURN_RET((src != nullptr), nullptr);
     BufferHandle* handle = src->Move();
-    if (handle == nullptr) {
-        return nullptr;
-    }
-    sptr<NativeBuffer> buffer = new NativeBuffer();
+    CHECK_AND_RETURN_RET((handle != nullptr), nullptr);
+    sptr<NativeBuffer> buffer = sptr<NativeBuffer>::MakeSptr();
+    CHECK_AND_RETURN_RET((buffer != nullptr), nullptr);
     buffer->SetBufferHandle(handle, true, BufferDestructor);
     sptr<OHOS::HDI::Display::Buffer::V1_1::IMetadata> meta = GetMetaService();
-    if (meta == nullptr) {
-        return nullptr;
-    }
+    CHECK_AND_RETURN_RET((meta != nullptr), nullptr);
     int32_t ret = meta->RegisterBuffer(buffer);
     if (ret != OHOS::HDI::Display::Composer::V1_0::DISPLAY_SUCCESS &&
         ret != OHOS::HDI::Display::Composer::V1_0::DISPLAY_NOT_SUPPORT) {

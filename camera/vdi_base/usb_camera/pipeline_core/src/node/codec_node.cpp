@@ -204,7 +204,7 @@ void CodecNode::EncodeJpegToMemory(const ImageData& imageData, JpegData jpegData
         jpeg_write_marker(&cInfo, JPEG_COM, (const JOCTET*)comment, strlen(comment));
     }
 
-    rowStride = jpegData.width;
+    rowStride = static_cast<uint32_t>(jpegData.width);
     while (cInfo.next_scanline < cInfo.image_height) {
         uint32_t imageDataIndex = cInfo.next_scanline * rowStride * pixelsThick;
         if (imageDataIndex >= imageData.size) {
@@ -280,10 +280,14 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         return NodeBase::DeliverBuffer(buffer);
     }
 
+    if (buffer->GetCurFormat() == CAMERA_FORMAT_BLOB) {
+        return NodeBase::DeliverBuffer(buffer);
+    }
+
     int32_t id = buffer->GetStreamId();
     CAMERA_LOGI("CodecNode::DeliverBuffer, streamId[%{public}d], index[%{public}d],\
-        format = %{public}d, encode =  %{public}d",
-        id, buffer->GetIndex(), buffer->GetFormat(), buffer->GetEncodeType());
+        format = %{public}d, encode = %{public}d, stride = %{public}d",
+        id, buffer->GetIndex(), buffer->GetFormat(), buffer->GetEncodeType(), buffer->GetStride());
 
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {
         Yuv422ToJpeg(buffer);
@@ -299,6 +303,10 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         buffer->SetEsTimestamp(timestamp);
         buffer->SetEsFrameSize(buffer->GetSuffaceBufferSize());
         buffer->SetEsKeyFrame(0);
+    }
+
+    if (buffer->GetStride() != buffer->GetWidth()) {
+        NodeUtils::BufferTransformForStride(buffer);
     }
 
     CameraDumper& dumper = CameraDumper::GetInstance();

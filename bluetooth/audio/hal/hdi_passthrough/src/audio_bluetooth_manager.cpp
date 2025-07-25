@@ -69,6 +69,14 @@ StartCaptureFunc startCaptureFunc;
 SuspendPlayingFunc suspendCaptureFunc;
 StopPlayingFunc stopCaptureFunc;
 ReadFrameFunc readFrameFunc;
+
+SetUpFunc setUpHearingAidFunc;
+TearDownFunc tearDownHearingAidFunc;
+GetStateFunc getHearingAidStateFunc;
+StartHearingAidFunc startHearingAidFunc;
+SuspendPlayingFunc suspendHearingAidFunc;
+StopPlayingFunc stopHearingAidFunc;
+WriteFrameFunc writeFrameHearingAidFunc;
 #endif
 
 sptr<IBluetoothA2dpSrc> g_proxy_ = nullptr;
@@ -208,6 +216,18 @@ void DeRegisterObserver()
         }                                                           \
     } while (0)
 
+static bool InitHearingAidDevice()
+{
+    GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SetUpFunc, setUpHearingAidFunc, "SetUpHearingAid");
+    GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, TearDownFunc, tearDownHearingAidFunc, "TearDownHearingAid");
+    GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetStateFunc, getHearingAidStateFunc, "GetHearingAidState");
+    GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StartHearingAidFunc, startHearingAidFunc, "StartHearingAid");
+    GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, suspendHearingAidFunc, "SuspendHearingAid");
+    GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, stopHearingAidFunc, "StopHearingAid");
+    GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, WriteFrameFunc, writeFrameHearingAidFunc, "WriteFrameHearingAid");
+    return true;
+}
+
 static bool InitAudioDeviceSoHandle(const char *path)
 {
     if (path == NULL) {
@@ -254,6 +274,10 @@ static bool InitAudioDeviceSoHandle(const char *path)
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, suspendCaptureFunc, "SuspendCapture");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, stopCaptureFunc, "StopCapture");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, ReadFrameFunc, readFrameFunc, "ReadFrame");
+
+        if (!InitHearingAidDevice()) {
+            return false;
+        }
     }
     return true;
 }
@@ -283,6 +307,18 @@ bool SetUpCapture()
     return ret;
 }
 
+bool SetUpHearingAid()
+{
+    bool ret = InitAudioDeviceSoHandle(g_bluetoothAudioDeviceSoPath);
+    if (ret) {
+        ret = setUpHearingAidFunc();
+    }
+    if (!ret) {
+        HDF_LOGE("%{public}s failed!", __func__);
+    }
+    return ret;
+}
+
 void TearDown()
 {
     tearDownFunc();
@@ -291,6 +327,11 @@ void TearDown()
 void TearDownCapture()
 {
     tearDownCaptureFunc();
+}
+
+void TearDownHearingAid()
+{
+    tearDownHearingAidFunc();
 }
 
 bool FastSetUp()
@@ -463,7 +504,71 @@ int ReadFrame(uint8_t *data, uint64_t size)
     return readFrameFunc(data, size);
 }
 
+int StartHearingAid()
+{
+    BTAudioStreamState state = getHearingAidStateFunc();
+    if (state != BTAudioStreamState::STARTED) {
+        HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
+        if (!startHearingAidFunc()) {
+            HDF_LOGE("%{public}s: fail to startPlaying", __func__);
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
+int SuspendHearingAid()
+{
+    int ret = 0;
+    BTAudioStreamState state = getHearingAidStateFunc();
+    if (state == BTAudioStreamState::STARTED) {
+        ret = suspendHearingAidFunc() ? HDF_SUCCESS : HDF_FAILURE;
+    } else {
+        HDF_LOGE("%{public}s: state=%{public}hhu is bad state", __func__, state);
+    }
+    return ret;
+}
+
+int StopHearingAid()
+{
+    BTAudioStreamState state = getHearingAidStateFunc();
+    HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
+    if (state != BTAudioStreamState::INVALID) {
+        stopHearingAidFunc();
+    }
+    return HDF_SUCCESS;
+}
+
 #endif
+
+int WriteFrameHearingAid(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs)
+{
+    HDF_LOGD("%{public}s", __func__);
+#ifdef A2DP_HDI_SERVICE
+    BTAudioStreamState state = getHearingAidStateFunc();
+    if (!g_allowAudioStart.load()) {
+        HDF_LOGE("not allow to start normal render, state=%{public}hhu", state);
+        return HDF_FAILURE;
+    } else if (state != BTAudioStreamState::STARTED) {
+        HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
+        if (!startHearingAidFunc()) {
+            HDF_LOGE("%{public}s: fail to startHearingAid", __func__);
+            return HDF_FAILURE;
+        }
+    }
+    return writeFrameHearingAidFunc(data, size);
+#else
+    if (!g_proxy_) {
+        HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
+        return RET_BAD_STATUS;
+    }
+    if (g_playState == A2DP_NOT_PLAYING) {
+        HDF_LOGE("%{public}s: playState is not Streaming", __func__);
+        return RET_BAD_STATUS;
+    }
+    return g_proxy_->WriteFrame(data, size);
+#endif
+}
 
 int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs)
 {

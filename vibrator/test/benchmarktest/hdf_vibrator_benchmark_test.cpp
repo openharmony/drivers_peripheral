@@ -24,6 +24,7 @@
 #include "osal_time.h"
 #include "v2_0/ivibrator_interface.h"
 
+using namespace OHOS::HDI::Vibrator;
 using namespace OHOS::HDI::Vibrator::V2_0;
 using namespace testing::ext;
 using namespace std;
@@ -35,6 +36,11 @@ namespace {
     int32_t g_intensity1 = 30;
     int32_t g_frequency1 = 200;
     uint32_t g_sleepTime1 = 200;
+    V2_0::HapticPaket g_hapticPaket = {434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
+        {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
+    V2_0::VibratorPackage g_vibPackage = {434, 149, {{434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
+        {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}}}};
+    int32_t g_sessionId = 1;
     std::string g_timeSequence = "haptic.clock.timer";
     std::string g_builtIn = "haptic.default.effect";
     sptr<IVibratorInterface> g_vibratorInterface = nullptr;
@@ -298,3 +304,48 @@ BENCHMARK_REGISTER_F(VibratorBenchmarkTest, IsVibratorRunning)->
 }
 
 BENCHMARK_MAIN();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_PlayPatternBySessionId
+  * @tc.desc: Benchmarktest for interface PlayPatternBySessionId
+  * Control vibrator perform and stop by sessionID
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, PlayPatternBySessionId)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = 0;
+    int32_t endRet = 0;
+    for (auto _ : state) {
+        startRet = g_vibratorInterface->PlayPatternBySessionId(
+            {-1, 1}, g_sessionId, g_hapticPaket);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+
+        endRet = g_vibratorInterface->StopVibrateBySessionId({-1, 1}, g_sessionId);
+        EXPECT_EQ(endRet, HDF_SUCCESS);
+    }
+}
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_PlayPackageBySession
+  * @tc.desc: Benchmarktest for interface PlayPackageBySession
+  * Control vibrator perform and stop by sessionID
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, PlayPackageBySession)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = 0;
+    int32_t endRet = 0;
+    for (auto _ : state) {
+        startRet = g_vibratorInterface->PlayPackageBySession(
+            {-1, 1}, g_sessionId, g_vibPackage);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+
+        endRet = g_vibratorInterface->StopVibrateBySessionId({-1, 1}, g_sessionId);
+        EXPECT_EQ(endRet, HDF_SUCCESS);
+    }
+}
+

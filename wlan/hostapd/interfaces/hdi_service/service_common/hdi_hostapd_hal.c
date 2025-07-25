@@ -37,11 +37,7 @@
 #undef LOG_TAG
 #define LOG_TAG "HdiHostapdHal"
 
-#ifdef OHOS_EUPDATER
-#define CONFIG_ROOR_DIR "/tmp/service/el1/public/wifi"
-#else
 #define CONFIG_ROOR_DIR "/data/service/el1/public/wifi"
-#endif // OHOS_EUPDATER
 
 #define CONFIG_DENY_MAC_FILE_NAME "deny_mac.conf"
 #define SLEEP_TIME_100_MS (100 * 1000)

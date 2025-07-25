@@ -49,6 +49,19 @@ void DcameraProviderTest::TearDown(void)
 }
 
 /**
+ * @tc.name: RegisterCameraHdfListener_001
+ * @tc.desc: Verify RegisterCameraHdfListener
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DcameraProviderTest, RegisterCameraHdfListener_001, TestSize.Level1)
+{
+    sptr<IDCameraHdfCallback> callback = nullptr;
+    EXPECT_EQ(DCamRetCode::INVALID_ARGUMENT,
+        DCameraProvider::GetInstance()->RegisterCameraHdfListener(TEST_DEVICE_ID, callback));
+}
+
+/**
  * @tc.name: UnRegisterCameraHdfListener_001
  * @tc.desc: Verify UnRegisterCameraHdfListener
  * @tc.type: FUNC

@@ -52,6 +52,7 @@ enum HdfEffectTypeVdi {
 enum EVENT_TYPEVdi {
     VDI_CONTINUOUS = 0,
     VDI_TRANSIENT = 1,
+    VDI_UNKNOWN = -3,
 };
 
 struct HdfVibratorInfoVdi {

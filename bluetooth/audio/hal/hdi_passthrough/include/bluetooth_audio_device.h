@@ -54,6 +54,7 @@ typedef BTAudioStreamState (*GetRealStateFunc)();
 typedef RenderMixerState (*GetRenderMixerStateFunc)();
 typedef size_t (*ReadFrameFunc)(void *data, size_t size);
 typedef bool (*StartCaptureFunc)();
+typedef bool (*StartHearingAidFunc)();
 }
 }
 }

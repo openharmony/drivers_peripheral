@@ -158,7 +158,7 @@ public:
     LibusbAdapter();
     ~LibusbAdapter();
     int32_t OpenDevice(const UsbDev &dev);
-    int32_t CloseDevice(const UsbDev &dev);
+    int32_t CloseDevice(const UsbDev &dev, bool isDetach = false);
     int32_t ResetDevice(const UsbDev &dev);
     int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
     int32_t GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd);
@@ -248,7 +248,7 @@ private:
     int32_t GetCurrentConfiguration(libusb_device_handle *handle, int32_t &currentConfig);
     int32_t RemoveInterfaceFromMap(const UsbDev &dev, libusb_device_handle *devHandle, uint8_t interfaceId);
     bool IsInterfaceIdByUsbDev(const UsbDev &dev, const uint8_t intfId);
-    int32_t DetachDevice(const UsbDev &dev);
+
     /* Async Transfer */
     void TransferInit(const UsbDev &dev);
     void TransferRelease(const UsbDev &dev);

@@ -64,10 +64,17 @@ extern "C" {
 
 #define CHECK_AND_RETURN_RET_LOG(cond, ret, fmt, ...) \
 do {                                                  \
-if (!(cond)) {                                        \
-CODEC_LOGE(fmt, ##__VA_ARGS__);                       \
-return ret;                                           \
-}                                                     \
+    if (!(cond)) {                                    \
+        CODEC_LOGE(fmt, ##__VA_ARGS__);               \
+        return ret;                                   \
+    }                                                 \
+} while (0)
+
+#define CHECK_AND_RETURN_RET(cond, ret) \
+do {                                \
+    if (!(cond)) {                  \
+        return ret;                     \
+    }                                   \
 } while (0)
 
 #ifdef __cplusplus

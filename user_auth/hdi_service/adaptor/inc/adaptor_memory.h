@@ -16,7 +16,9 @@
 #ifndef ADAPTOR_MEMORY_H
 #define ADAPTOR_MEMORY_H
 
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +33,16 @@ void Free(void *ptr);
         Free(ptr);                    \
         (ptr) = NULL;                 \
     } while (0)
+
+static inline bool IsAllZero(const uint8_t *data, size_t size)
+{
+    for (size_t i = 0; i < size; i++) {
+        if (data[i] != 0) {
+            return false;
+        }
+    }
+    return true;
+}
 
 #ifdef __cplusplus
 }

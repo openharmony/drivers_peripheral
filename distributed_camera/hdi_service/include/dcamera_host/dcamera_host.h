@@ -142,7 +142,7 @@ private:
     public:
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
     };
-    sptr<DCameraHostRecipient> dCameraHostRecipient_;
+    sptr<DCameraHostRecipient> dCameraHostRecipient_ = sptr<DCameraHostRecipient>(new DCameraHostRecipient());
     static AutoRelease autoRelease_;
     static OHOS::sptr<DCameraHost> instance_;
 

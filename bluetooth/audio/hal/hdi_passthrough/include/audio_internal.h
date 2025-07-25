@@ -439,6 +439,42 @@ int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, void *frame, uint
     uint64_t *replyBytes);
 void AudioReleaseCaptureHandle(struct AudioHwCapture *hwCapture);
 
+int32_t HearingAidStart(AudioHandle handle);
+int32_t HearingAidStop(AudioHandle handle);
+int32_t HearingAidPause(AudioHandle handle);
+int32_t HearingAidResume(AudioHandle handle);
+int32_t HearingAidFlush(AudioHandle handle);
+int32_t HearingAidGetFrameSize(AudioHandle handle, uint64_t *size);
+int32_t HearingAidGetFrameCount(AudioHandle handle, uint64_t *count);
+int32_t HearingAidSetSampleAttributes(AudioHandle handle, const struct AudioSampleAttributes *attrs);
+int32_t HearingAidGetSampleAttributes(AudioHandle handle, struct AudioSampleAttributes *attrs);
+int32_t HearingAidGetCurrentChannelId(AudioHandle handle, uint32_t *channelId);
+int32_t HearingAidCheckSceneCapability(AudioHandle handle, const struct AudioSceneDescriptor *scene, bool *supported);
+int32_t HearingAidSelectScene(AudioHandle handle, const struct AudioSceneDescriptor *scene);
+int32_t HearingAidSetMute(AudioHandle handle, bool mute);
+int32_t HearingAidGetMute(AudioHandle handle, bool *mute);
+int32_t HearingAidSetVolume(AudioHandle handle, float volume);
+int32_t HearingAidGetVolume(AudioHandle handle, float *volume);
+int32_t HearingAidGetGainThreshold(AudioHandle handle, float *min, float *max);
+int32_t HearingAidGetGain(AudioHandle handle, float *gain);
+int32_t HearingAidSetGain(AudioHandle handle, float gain);
+int32_t HearingAidGetLatency(struct AudioRender *render, uint32_t *ms);
+int32_t HearingAidRenderFrame(
+    struct AudioRender *render, const void *frame, uint64_t requestBytes, uint64_t *replyBytes);
+int32_t HearingAidGetRenderPosition(struct AudioRender *render, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t HearingAidSetRenderSpeed(struct AudioRender *render, float speed);
+int32_t HearingAidGetRenderSpeed(struct AudioRender *render, float *speed);
+int32_t HearingAidSetChannelMode(struct AudioRender *render, AudioChannelMode mode);
+int32_t HearingAidGetChannelMode(struct AudioRender *render, AudioChannelMode *mode);
+int32_t HearingAidSetExtraParams(AudioHandle handle, const char *keyValueList);
+int32_t HearingAidGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLength);
+int32_t HearingAidReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc);
+int32_t HearingAidGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t HearingAidTurnStandbyMode(AudioHandle handle);
+int32_t HearingAidAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);
+int32_t HearingAidRegCallback(struct AudioRender *render, RenderCallback callback, void *cookie);
+int32_t HearingAidDrainBuffer(struct AudioRender *render, AudioDrainNotifyType *type);
+
 #ifdef __cplusplus
 }
 #endif

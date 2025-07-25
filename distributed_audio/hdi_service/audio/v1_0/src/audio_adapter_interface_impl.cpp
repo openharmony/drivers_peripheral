@@ -106,7 +106,7 @@ sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::CreateRenderImpl(c
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP) {
         DHLOGI("Try to mmap mode.");
-        renderFlags_ = Audioext::V2_0::MMAP_MODE;
+        renderFlags_ = Audioext::V2_1::MMAP_MODE;
         audioRender = sptr<AudioRenderInterfaceImplBase>(new AudioRenderExtImpl());
         if (audioRender == nullptr) {
             DHLOGE("audioRender is null.");
@@ -115,12 +115,12 @@ sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::CreateRenderImpl(c
         audioRender->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback, renderPinId);
     } else {
         DHLOGI("Try to normal mode.");
-        renderFlags_ = Audioext::V2_0::NORMAL_MODE;
+        renderFlags_ = Audioext::V2_1::NORMAL_MODE;
         audioRender = sptr<AudioRenderInterfaceImplBase>(new AudioRenderInterfaceImpl(adpDescriptor_.adapterName,
             desc, attrs, extSpkCallback, renderId));
     }
 #else
-    renderFlags_ = Audioext::V2_0::NORMAL_MODE;
+    renderFlags_ = Audioext::V2_1::NORMAL_MODE;
     audioRender = sptr<AudioRenderInterfaceImplBase>(new AudioRenderInterfaceImpl(adpDescriptor_.adapterName,
         desc, attrs, extSpkCallback, renderId));
 #endif
@@ -278,7 +278,7 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP) {
         DHLOGI("Try to mmap mode.");
-        capturerFlags_ = Audioext::V2_0::MMAP_MODE;
+        capturerFlags_ = Audioext::V2_1::MMAP_MODE;
         audioCapture = sptr<AudioCaptureInterfaceImplBase>(new AudioCaptureExtImpl());
         if (audioCapture == nullptr) {
             DHLOGE("audioCapture is null.");
@@ -287,12 +287,12 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
         audioCapture->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback, desc.pins);
     } else {
         DHLOGI("Try to normal mode.");
-        capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
+        capturerFlags_ = Audioext::V2_1::NORMAL_MODE;
         audioCapture = sptr<AudioCaptureInterfaceImplBase>(new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName,
             desc, attrs, extMicCallback));
     }
 #else
-    capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
+    capturerFlags_ = Audioext::V2_1::NORMAL_MODE;
     audioCapture = sptr<AudioCaptureInterfaceImplBase>(new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName,
         desc, attrs, extMicCallback));
 #endif
@@ -539,7 +539,7 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t s
             return HandleDeviceClosed(streamId, event);
         case HDF_AUDIO_EVENT_FULL:
         case HDF_AUDIO_EVENT_NEED_DATA:
-            return HandleRenderCallback(event);
+            return HandleRenderCallback(devId, event);
         default:
             DHLOGE("Audio event: %{public}d is undefined.", event.type);
             return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
@@ -610,7 +610,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
         renderParam_.period = AUDIO_NORMAL_INTERVAL;
     }
     renderParam_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
-        renderParam_.period, renderFlags_ == Audioext::V2_0::MMAP_MODE);
+        renderParam_.period, renderFlags_ == Audioext::V2_1::MMAP_MODE);
     renderParam_.renderFlags = renderFlags_;
 
     int32_t ret = extSpkCallback->SetParameters(renderId, renderParam_);
@@ -688,7 +688,7 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
         captureParam_.period = AUDIO_NORMAL_INTERVAL;
     }
     captureParam_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount,
-        attrs.format, captureParam_.period, capturerFlags_ == Audioext::V2_0::MMAP_MODE);
+        attrs.format, captureParam_.period, capturerFlags_ == Audioext::V2_1::MMAP_MODE);
     captureParam_.capturerFlags = capturerFlags_;
 
     if (extMicCallback == nullptr) {
@@ -1219,13 +1219,9 @@ int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const uint32_t streamId, c
     return DH_SUCCESS;
 }
 
-int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const DAudioEvent &event)
+int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const uint32_t devId, const DAudioEvent &event)
 {
     DHLOGI("Handle render callback, event type: %{public}d.", event.type);
-    if (paramCallback_ == nullptr) {
-        DHLOGE("Audio param observer is null.");
-        return ERR_DH_AUDIO_HDF_NULLPTR;
-    }
     AudioCallbackType type = AUDIO_ERROR_OCCUR;
     if (static_cast<AudioExtParamEvent>(event.type) == HDF_AUDIO_EVENT_FULL) {
         type = AUDIO_RENDER_FULL;
@@ -1235,12 +1231,46 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const DAudioEvent &event
     int8_t reserved = 0;
     int8_t cookie = 0;
 
-    int32_t ret = paramCallback_->RenderCallback(type, reserved, cookie);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Notify fwk failed.");
+    auto renderCallback = GetRenderCallback(devId);
+    if (renderCallback == nullptr) {
+        DHLOGE("renderCallback is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
     }
-    DHLOGI("Handle device closed success.");
-    return ret == DH_SUCCESS ? DH_SUCCESS : ERR_DH_AUDIO_HDF_FAIL;
+    int32_t ret = renderCallback->RenderCallback(type, reserved, cookie);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("HandleRenderCallback failed.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    DHLOGI("HandleRenderCallback success.");
+    return DH_SUCCESS;
+}
+
+sptr<IAudioCallback> AudioAdapterInterfaceImpl::GetRenderCallback(const uint32_t devId)
+{
+    DHLOGI("GetRenderCallback enter.");
+    std::lock_guard<std::mutex> devLck(renderDevMtx_);
+    auto renderDev = find_if(renderDevs_.begin(), renderDevs_.end(),
+        [devId](std::pair<int32_t, sptr<AudioRenderInterfaceImplBase>> item) { return item.first == devId; });
+    if (renderDev == renderDevs_.end()) {
+        DHLOGE("Not find devId:%{public}d", devId);
+        return nullptr;
+    }
+    AudioRenderInterfaceImplBase* basePtr = renderDev->second.GetRefPtr();
+    if (basePtr == nullptr) {
+        DHLOGE("BasePtr is null.");
+        return nullptr;
+    }
+    AudioRenderInterfaceImpl* implPtr = static_cast<AudioRenderInterfaceImpl*>(basePtr);
+    if (!implPtr) {
+        DHLOGE("Failed to cast interface");
+        return nullptr;
+    }
+    sptr<AudioRenderInterfaceImpl> audioRender(implPtr);
+    if (!audioRender) {
+        DHLOGE("Failed to cast interface");
+        return nullptr;
+    }
+    return audioRender->GetAudioCallback();
 }
 
 bool AudioAdapterInterfaceImpl::IsPortsNoReg()

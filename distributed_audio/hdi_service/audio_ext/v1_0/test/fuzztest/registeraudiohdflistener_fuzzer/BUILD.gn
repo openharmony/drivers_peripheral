@@ -43,12 +43,16 @@ ohos_fuzztest("RegisterAudioHdfListenerFuzzTest") {
     "${common_path}/include",
   ]
 
-  deps = [ "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.0" ]
+  deps = [
+    "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.1",
+    "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0",
+    "${hdf_service_path}/hdi_service/common:libdaudio_hdf_utils",
+  ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
-    "drivers_interface_distributed_audio:libdaudioext_stub_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_2.1",
     "hdf_core:libhdf_host",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

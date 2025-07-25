@@ -79,6 +79,10 @@ static int HdfCameraHostDriverInit(struct HdfDeviceObject *deviceObject)
 
 static int HdfCameraHostDriverBind(struct HdfDeviceObject *deviceObject)
 {
+    if (deviceObject == nullptr) {
+        HDF_LOGE("HdfCameraHostDriverBind:: HdfDeviceObject is NULL !");
+        return HDF_FAILURE;
+    }
     HDF_LOGI("HdfCameraHostDriverBind enter");
 
     auto *hdfCameraHostHost = new (std::nothrow) HdfCameraHostHost;
