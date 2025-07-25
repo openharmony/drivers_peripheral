@@ -40,6 +40,7 @@ namespace Audio {
 namespace V1_0 {
 AudioManagerInterfaceImpl *AudioManagerInterfaceImpl::audioManager_ = nullptr;
 std::mutex AudioManagerInterfaceImpl::audioManagerMtx_;
+#define SERVICE_INFO_LEN_MAX 256
 extern "C" IAudioManager *AudioManagerImplGetInstance(void)
 {
     return AudioManagerInterfaceImpl::GetAudioManager();
@@ -268,7 +269,14 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
         GetAnonyString(event.adapterName).c_str(), event.dhId);
     std::stringstream ss;
     ss << "EVENT_TYPE=" << event.eventType << ";NID=" << event.adapterName << ";PIN=" << event.dhId << ";VID=" <<
-        event.volGroupId << ";IID=" << event.iptGroupId << ";CAPS=" << event.caps;
+        event.volGroupId << ";IID=" << event.iptGroupId;
+
+    std::stringstream temp(ss.str());
+    temp << ";CAPS=" << event.caps;
+    std::string tempStr = temp.str();
+    if (strlen(tempStr.c_str()) <= SERVICE_INFO_LEN_MAX) {
+        ss << ";CAPS=" << event.caps;
+    }
 
     std::string eventInfo = ss.str();
     int ret = HdfDeviceObjectSetServInfo(deviceObject_, eventInfo.c_str());
@@ -319,6 +327,10 @@ int32_t AudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &s
     const sptr<IDAudioHdfCallback> &callbackObj)
 {
     DHLOGI("Register audio HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    if (callbackObj == nullptr) {
+        DHLOGE("Audio hdf callback is null.");
+        return HDF_FAILURE;
+    }
     sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDAudioHdfCallback>(callbackObj);
     if (remote == nullptr) {
         DHLOGE("Remote callback is nullptr.");

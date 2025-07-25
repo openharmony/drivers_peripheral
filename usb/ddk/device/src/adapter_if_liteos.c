@@ -842,6 +842,10 @@ static int32_t Ep0Event(struct UsbFnEventAll * const event, struct FconfigPollFd
     uint8_t i;
     for (i = 0; i < event->ep0Num; i++) {
         if (pfds[i].revents & POLLIN) {
+            if (event->ep0[i] < 0) {
+                HDF_LOGE("ep0[%{public}d] read after closed", i);
+                continue;
+            }
             ret = handle_read(event->ep0[i], &event->ep0Event[i].ctrlEvent, sizeof(struct UsbFnCtrlEvent));
             if (ret < 0) {
                 HDF_LOGE("unable to read event from ep0");
@@ -866,6 +870,10 @@ static int32_t EpEvent(struct UsbFnEventAll * const event, struct FconfigPollFd 
     int32_t ret;
     for (i = 0; i < event->epNum; i++) {
         if ((pfds[i + event->ep0Num].revents & POLLIN)) {
+            if (event->epx[i] < 0) {
+                HDF_LOGE("epx[%{public}d] read after closed", i);
+                continue;
+            }
             ret = handle_read(event->epx[i], event->reqEvent[i], MAX_REQUEST * sizeof(struct UsbFnReqEvent));
             if (ret < 0) {
                 HDF_LOGE("unable to read event from eps");

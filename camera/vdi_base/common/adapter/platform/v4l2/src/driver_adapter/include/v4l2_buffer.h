@@ -41,6 +41,7 @@ struct AdapterBuff {
     void* userBufPtr;
     int32_t heapfd;
     int32_t dmafd;
+    std::shared_ptr<IBuffer> cameraBuffer;
 };
 class HosV4L2Buffers : public std::enable_shared_from_this<HosV4L2Buffers> {
     // hide construct function

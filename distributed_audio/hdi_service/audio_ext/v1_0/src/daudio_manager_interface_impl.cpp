@@ -31,7 +31,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_0 {
+namespace V2_1 {
 DAudioManagerInterfaceImpl *DAudioManagerInterfaceImpl::dAudioMgr_ = nullptr;
 std::mutex DAudioManagerInterfaceImpl::mgrMtx_;
 extern "C" IDAudioManager *DAudioManagerImplGetInstance(void)
@@ -110,6 +110,11 @@ int32_t DAudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &
     const sptr<IDAudioHdfCallback> &callbackObj)
 {
     DHLOGI("Register audio HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    if (callbackObj == nullptr) {
+        DHLOGE("Audio hdf callback is null.");
+        return HDF_FAILURE;
+    }
+
     if (audioMgr_ == nullptr) {
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;
@@ -142,7 +147,7 @@ int32_t DAudioManagerInterfaceImpl::UnRegisterAudioHdfListener(const std::string
     DHLOGI("Unregister audio HDF listener success.");
     return HDF_SUCCESS;
 }
-} // v2_0
+} // v2_1
 } // AudioExt
 } // Daudio
 } // HDI

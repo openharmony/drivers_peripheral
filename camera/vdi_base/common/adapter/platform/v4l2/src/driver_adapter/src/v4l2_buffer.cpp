@@ -327,8 +327,20 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
                 CAMERA_LOGE("ERROR: BufferMap length error");
                 return RC_ERROR;
             }
-            (void)memcpy_s(adapterBufferMap_[buf.index].userBufPtr, adapterBufferMap_[buf.index].length,
-                adapterBufferMap_[buf.index].start, adapterBufferMap_[buf.index].length);
+            CAMERA_LOGD("memcpy_s buffer to user buffer, curFormat = %{public}u, bytesused = %{public}u",
+                adapterBufferMap_[buf.index].cameraBuffer->GetCurFormat(), buf.bytesused);
+            uint32_t length = adapterBufferMap_[buf.index].length;
+            if (adapterBufferMap_[buf.index].cameraBuffer->GetCurFormat() == CAMERA_FORMAT_BLOB) {
+                length = buf.bytesused;
+                adapterBufferMap_[buf.index].cameraBuffer->SetEsFrameSize(length);
+            }
+            errno_t ret = memcpy_s(
+                adapterBufferMap_[buf.index].userBufPtr, adapterBufferMap_[buf.index].length,
+                adapterBufferMap_[buf.index].start, length);
+            if (ret != EOK) {
+                CAMERA_LOGE("memcpy_s failed with error code: %d", ret);
+                return RC_ERROR;
+            }
         }
     }
     std::lock_guard<std::mutex> l(bufferLock_);
@@ -396,7 +408,7 @@ RetCode HosV4L2Buffers::SetAdapterBuffer(int fd, struct v4l2_buffer &buf, const 
 {
     CAMERA_LOGI("HosV4L2Buffers::SetAdapterBuffer in.");
     RetCode ret = 0;
-    int32_t index = (uint32_t)frameSpec->buffer_->GetIndex();
+    uint32_t index = static_cast<uint32_t>(frameSpec->buffer_->GetIndex());
 
     auto findIf = adapterBufferMap_.find(index);
     if (findIf == adapterBufferMap_.end()) {
@@ -405,6 +417,7 @@ RetCode HosV4L2Buffers::SetAdapterBuffer(int fd, struct v4l2_buffer &buf, const 
     }
 
     adapterBufferMap_[index].userBufPtr = frameSpec->buffer_->GetVirAddress();
+    adapterBufferMap_[index].cameraBuffer = frameSpec->buffer_;
 
     switch (memoryType_) {
         case V4L2_MEMORY_MMAP:
@@ -450,7 +463,7 @@ RetCode HosV4L2Buffers::SetDmabufOn(struct v4l2_buffer &buf, const std::shared_p
 {
     CAMERA_LOGI("HosV4L2Buffers::SetDmabufOn in.");
     int32_t ret = 0;
-    int32_t index = static_cast<int32_t>(frameSpec->buffer_->GetIndex());
+    uint32_t index = static_cast<uint32_t>(frameSpec->buffer_->GetIndex());
 
     int heapfd = open(DMA_BUF_FILE_NAME.c_str(), O_RDONLY | O_CLOEXEC);
     if (heapfd < 0) {

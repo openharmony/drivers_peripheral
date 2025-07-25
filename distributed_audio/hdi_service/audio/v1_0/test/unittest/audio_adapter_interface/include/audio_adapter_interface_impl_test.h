@@ -33,9 +33,9 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
 
 class AudioAdapterInterfaceImpTest : public testing::Test {
 public:

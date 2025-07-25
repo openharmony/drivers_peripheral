@@ -33,7 +33,39 @@ enum class ImageRotation {
     NONE
 };
 
+enum class SampleSize {
+    SAMPLE_SIZE_1 = 1,
+    SAMPLE_SIZE_2 = 2,
+    SAMPLE_SIZE_4 = 4,
+    SAMPLE_SIZE_8 = 8,
+    SAMPLE_SIZE_16 = 16,
+};
+
+enum class UserPixelFormat {
+    NV12 = 0,
+    NV21,
+    NV12_10BIT,
+    NV21_10BIT,
+    RGBA8888,
+    BGRA8888,
+    RGB565,
+    RGBA1010102,
+    NONE
+};
+
+enum class ColorSpace {
+    BT_601_P,
+    BT_601_N,
+    P3,
+    BT_709,
+    BT_2020
+};
+
 struct CommandOpt {
+    // common
+    bool isGetHelpInfoOnly = false;
+    bool isEncoder = true;
+    // for encoder
     std::string primaryImgPath = "";
     std::string auxiliaryImgPath = "";
     std::string thumbnailImgPath = "";
@@ -45,8 +77,16 @@ struct CommandOpt {
     std::string outputPath = "/storage/media/100/local/files/heif_edit_dump";
     ImageMirror mirrorInfo = ImageMirror::NONE;
     ImageRotation rotateInfo = ImageRotation::NONE;
+    // for decoder
+    std::string inputPath = "";
+    SampleSize sampleSize = SampleSize::SAMPLE_SIZE_1;
+    UserPixelFormat pixelFmt = UserPixelFormat::NV12;
+    bool isLimitedRange = true;
+    ColorSpace colorSpace = ColorSpace::BT_601_P;
 
     void Print() const;
+    void PrintEncoderParam() const;
+    void PrintDecoderParam() const;
 };
 
 CommandOpt Parse(int argc, char *argv[]);

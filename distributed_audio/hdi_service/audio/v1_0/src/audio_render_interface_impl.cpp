@@ -50,10 +50,23 @@ AudioRenderInterfaceImpl::~AudioRenderInterfaceImpl()
     DHLOGD("Distributed audio render destructed, id(%{public}d).", devDesc_.pins);
 }
 
+sptr<IAudioCallback> AudioRenderInterfaceImpl::GetAudioCallback()
+{
+    return renderCallback_;
+}
+
 int32_t AudioRenderInterfaceImpl::GetLatency(uint32_t &ms)
 {
-    DHLOGI("Get render device latency, not support yet.");
-    ms = 0;
+    DHLOGD("Get render device latency.");
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Callback is nullptr.");
+        return HDF_FAILURE;
+    }
+
+    if (audioExtCallback_->GetLatency(renderId_, ms) != HDF_SUCCESS) {
+        DHLOGE("Get render device latency failed.");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -143,9 +156,21 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
 
 int32_t AudioRenderInterfaceImpl::GetRenderPosition(uint64_t &frames, AudioTimeStamp &time)
 {
-    DHLOGI("Get render position, not support yet.");
-    (void)frames;
-    (void)time;
+    DHLOGI("Get render position.");
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Callback is nullptr.");
+        return HDF_FAILURE;
+    }
+
+    CurrentTime currentTime;
+    currentTime.tvSec = time.tvSec;
+    currentTime.tvNSec = time.tvNSec;
+    if (audioExtCallback_->GetRenderPosition(renderId_, frames, currentTime) != HDF_SUCCESS) {
+        DHLOGE("Get render position failed.");
+        return HDF_FAILURE;
+    }
+    time.tvSec = currentTime.tvSec;
+    time.tvNSec = currentTime.tvNSec;
     return HDF_SUCCESS;
 }
 

@@ -54,7 +54,6 @@ int32_t DCameraHost::SetCallback(const sptr<HDI::Camera::V1_0::ICameraHostCallba
         return CamRetCode::INVALID_ARGUMENT;
     }
     dCameraHostCallback_ = callbackObj;
-    dCameraHostRecipient_ = sptr<DCameraHostRecipient>(new DCameraHostRecipient());
     return CamRetCode::NO_ERROR;
 }
 
@@ -65,7 +64,6 @@ int32_t DCameraHost::SetCallback_V1_2(const sptr<HDI::Camera::V1_2::ICameraHostC
         return CamRetCode::INVALID_ARGUMENT;
     }
     dCameraHostCallback_V1_2_ = callbackObj;
-    dCameraHostRecipient_ = sptr<DCameraHostRecipient>(new DCameraHostRecipient());
     return CamRetCode::NO_ERROR;
 }
 
@@ -498,13 +496,22 @@ std::string DCameraHost::GetDcameraIdById(const std::string &cameraId)
     return iter->second;
 }
 
+//LCOV_EXCL_START
 DCamRetCode DCameraHost::RegisterCameraHdfListener(const std::string &serviceName,
     const sptr<IDCameraHdfCallback> &callbackObj)
 {
     DHLOGI("Register camera HDF listener, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
+    if (callbackObj == nullptr) {
+        DHLOGE("dcamera hdf callback is null.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraHdfCallback>(callbackObj);
     if (remote == nullptr) {
         DHLOGE("Remote callback is nullptr.");
+        return DCamRetCode::FAILED;
+    }
+    if (dCameraHostRecipient_ == nullptr) {
+        DHLOGE("dcamera host recipient is null.");
         return DCamRetCode::FAILED;
     }
     if (!remote->AddDeathRecipient(dCameraHostRecipient_)) {
@@ -520,6 +527,7 @@ DCamRetCode DCameraHost::RegisterCameraHdfListener(const std::string &serviceNam
     DHLOGI("Register camera HDF listener suncess, serviceName: %{public}s.", GetAnonyString(serviceName).c_str());
     return DCamRetCode::SUCCESS;
 }
+//LCOV_EXCL_STOP
 
 DCamRetCode DCameraHost::UnRegisterCameraHdfListener(const std::string &serviceName)
 {
@@ -544,6 +552,7 @@ DCamRetCode DCameraHost::UnRegisterCameraHdfListener(const std::string &serviceN
     return DCamRetCode::SUCCESS;
 }
 
+//LCOV_EXCL_START
 void DCameraHost::ClearRegisterRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     DHLOGI("Remote died, remote dcamera device begin.");
@@ -560,6 +569,7 @@ void DCameraHost::DCameraHostRecipient::OnRemoteDied(const wptr<IRemoteObject> &
     DHLOGE("Exit the current process.");
     _Exit(0);
 }
+//LCOV_EXCL_STOP
 
 int32_t DCameraHost::AddClearRegisterRecipient(sptr<IRemoteObject> &remote, const DHBase &dhBase)
 {
@@ -569,7 +579,7 @@ int32_t DCameraHost::AddClearRegisterRecipient(sptr<IRemoteObject> &remote, cons
         DHLOGE("Create clear register recipient object failed.");
         return DCamRetCode::FAILED;
     }
-    if (remote->AddDeathRecipient(clearRegisterRecipient) == false) {
+    if (remote != nullptr && remote->AddDeathRecipient(clearRegisterRecipient) == false) {
         DHLOGE("call AddDeathRecipient failed.");
         return DCamRetCode::FAILED;
     }
@@ -591,7 +601,7 @@ int32_t DCameraHost::RemoveClearRegisterRecipient(sptr<IRemoteObject> &remote, c
         itRecipient != clearRegisterRecipients_.end(); ++itRecipient) {
         auto &clearRegisterRecipient = *itRecipient;
         if (clearRegisterRecipient->IsMatch(dhBase)) {
-            if (remote->RemoveDeathRecipient(clearRegisterRecipient) == false) {
+            if (remote != nullptr && remote->RemoveDeathRecipient(clearRegisterRecipient) == false) {
                 DHLOGE("call RemoveDeathRecipient failed.");
             }
             clearRegisterRecipients_.erase(itRecipient);

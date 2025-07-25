@@ -54,7 +54,7 @@ static int32_t ShowLightInfo(struct HdfSBuf *reply)
     for (i = 0; i < lightDevice->lightNum; i++) {
         ret = memset_s(lightInfo, STRING_LEN, 0, STRING_LEN);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{publuc}s: memset sensorInfoList is failed\n", __func__);
+            HDF_LOGE("%{public}s: memset sensorInfoList is failed\n", __func__);
             return HDF_FAILURE;
         }
 
@@ -93,7 +93,7 @@ static int32_t ShowLightEffectInfo(struct HdfSBuf *reply)
 
     ret = memset_s(lightEffectInfo, STRING_LEN, 0, STRING_LEN);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{publuc}s: memset sensorInfoList is failed\n", __func__);
+        HDF_LOGE("%{public}s: memset sensorInfoList is failed\n", __func__);
         return HDF_FAILURE;
     }
 

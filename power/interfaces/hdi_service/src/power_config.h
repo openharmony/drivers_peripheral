@@ -47,7 +47,8 @@ private:
     cJSON* GetValue(const cJSON* config, std::string key) const;
     void ParseSceneConfig(const cJSON* sceneConfig);
     cJSON* ParseJsonStream(std::istream& ifsConf);
-    bool isValidJsonString(const cJSON* config) const;
+    bool IsValidJsonString(const cJSON* config) const;
+    bool IsValidJsonObject(const cJSON* jsonValue) const;
     std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap_;
     static std::mutex mutex_;
     static std::shared_ptr<PowerConfig> instance_;

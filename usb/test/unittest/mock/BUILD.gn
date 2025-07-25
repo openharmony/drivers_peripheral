@@ -45,13 +45,11 @@ ohos_unittest("transfer_auto_test") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_usb:libusb_proxy_1.0",
-    "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
   module_out_path = module_output_path
@@ -79,13 +77,11 @@ ohos_unittest("device_auto_test") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_usb:libusb_proxy_1.0",
-    "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
   module_out_path = module_output_path
@@ -107,13 +103,11 @@ ohos_unittest("request_auto_test") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_usb:libusb_proxy_1.0",
-    "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
   module_out_path = module_output_path
@@ -132,13 +126,11 @@ ohos_unittest("function_auto_test") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_usb:libusb_proxy_1.0",
-    "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
   module_out_path = module_output_path

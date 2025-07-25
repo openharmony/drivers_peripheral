@@ -400,6 +400,10 @@ int32_t SensorIfService::AddSensorDeathRecipient(const sptr<IRemoteObject> &iRem
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);
+    if (iRemoteObject == nullptr) {
+        HDF_LOGE("%{public}s: iRemoteObject is null", __func__);
+        return HDF_FAILURE;
+    }
     sptr<CallBackDeathRecipient> callBackDeathRecipient = new CallBackDeathRecipient(this);
     if (callBackDeathRecipient == nullptr) {
         HDF_LOGE("%{public}s: new CallBackDeathRecipient fail", __func__);

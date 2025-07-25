@@ -32,11 +32,17 @@ void StreamCustomer::CamFrame(const std::function<void(const unsigned char *, ui
         consumer_->AcquireBuffer(buff, flushFence, timestamp, damage);
         if (buff != nullptr) {
             void* addr = buff->GetVirAddr();
-            int32_t size = buff->GetSize();
+            int32_t gotSize = 0;
+            buff->GetExtraData()->ExtraGet(OHOS::Camera::dataSize, gotSize);
+            CAMERA_LOGD("OHOS::Camera::dataSize: %{public}d", gotSize);
+            uint32_t size = gotSize > 0 ? gotSize : buff->GetSize();
             if (callback != nullptr) {
                 callback(static_cast<const unsigned char*>(addr), size);
             }
-            consumer_->ReleaseBuffer(buff, -1);
+            auto ret = consumer_->ReleaseBuffer(buff, flushFence);
+            if (!ret) {
+                CAMERA_LOGE("ReleaseBuffer fail: %{public}d", ret);
+            }
         }
         usleep(delayTime);
     } while (camFrameExit_ == 0);

@@ -63,8 +63,14 @@ int StartCapture();
 int SuspendCapture();
 int StopCapture();
 int ReadFrame(uint8_t *data, uint64_t size);
+bool SetUpHearingAid();
+void TearDownHearingAid();
+int StartHearingAid();
+int SuspendHearingAid();
+int StopHearingAid();
 #endif
 
+int WriteFrameHearingAid(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs);
 int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs);
 int StartPlaying();
 int SuspendPlaying();

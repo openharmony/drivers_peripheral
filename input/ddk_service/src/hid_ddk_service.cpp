@@ -209,7 +209,7 @@ int32_t HidDdkService::Write(const HidDeviceHandle& dev, const std::vector<uint8
         return HID_DDK_IO_ERROR;
     }
 
-    bytesWritten = ret;
+    bytesWritten = static_cast<uint32_t>(ret);
     return HID_DDK_SUCCESS;
 }
 

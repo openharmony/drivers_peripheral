@@ -227,6 +227,20 @@ HWTEST_F(AudioManagerInterfaceImplTest, SetDeviceObject_002, TestSize.Level1)
     DAudioDevEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
 }
+
+/**
+ * @tc.name: RegisterAudioHdfListener_001
+ * @tc.desc: Verify the RegisterAudioHdfListener function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioManagerInterfaceImplTest, RegisterAudioHdfListener_001, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    std::string adpName = "adpName";
+    sptr<IDAudioHdfCallback> callback = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioManagerInterfaceImpl_->RegisterAudioHdfListener(adpName, callback));
+}
 } // V1_0
 } // Audio
 } // Distributedaudio

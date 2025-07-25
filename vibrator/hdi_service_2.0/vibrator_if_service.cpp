@@ -601,6 +601,10 @@ int32_t VibratorIfService::PlayPatternBySessionId(
             hapticEventVdi.type = VDI_CONTINUOUS;
         } else if (event.type == TRANSIENT) {
             hapticEventVdi.type = VDI_TRANSIENT;
+        } else {
+            hapticEventVdi.type = VDI_UNKNOWN;
+            HDF_LOGE("%{public}s: Unknown event type %{public}d", __func__, event.type);
+            continue;
         }
         hapticEventVdi.time = event.time;
         hapticEventVdi.duration = event.duration;
@@ -623,7 +627,7 @@ int32_t VibratorIfService::PlayPatternBySessionId(
     FinishTrace(HITRACE_TAG_HDF);
     
     if (ret != HDF_SUCCESS) {
-        HDF_LOGI("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
+        HDF_LOGE("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
                  __func__, deviceVibratorInfo.deviceId, deviceVibratorInfo.vibratorId, ret);
     }
 
@@ -646,10 +650,13 @@ int32_t VibratorIfService::PlayPackageBySession(
         hapticPaketVdi.eventNum = pattern.eventNum;
         for (const auto &event : pattern.events) {
             HapticEventVdi hapticEventVdi;
-            if (event.type == CONTINUOUS) {
-                hapticEventVdi.type = VDI_CONTINUOUS;
-            } else if (event.type == TRANSIENT) {
-                hapticEventVdi.type = VDI_TRANSIENT;
+            switch (event.type) {
+                case CONTINUOUS: hapticEventVdi.type = VDI_CONTINUOUS; break;
+                case TRANSIENT: hapticEventVdi.type = VDI_TRANSIENT; break;
+                default:
+                    hapticEventVdi.type = VDI_UNKNOWN;
+                    HDF_LOGE("%{public}s: unknown event type %{public}d", __func__, event.type);
+                    continue;
             }
             hapticEventVdi.time = event.time;
             hapticEventVdi.duration = event.duration;
@@ -673,7 +680,7 @@ int32_t VibratorIfService::PlayPackageBySession(
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
-        HDF_LOGI("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
+        HDF_LOGE("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
                  __func__, deviceVibratorInfo.deviceId, deviceVibratorInfo.vibratorId, ret);
     }
 
@@ -691,7 +698,7 @@ int32_t VibratorIfService::StopVibrateBySessionId(
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
-        HDF_LOGI("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
+        HDF_LOGE("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
                  __func__, deviceVibratorInfo.deviceId, deviceVibratorInfo.vibratorId, ret);
     }
 

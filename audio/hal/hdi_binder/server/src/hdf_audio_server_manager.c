@@ -102,7 +102,10 @@ static int32_t AudioAdapterInfoInit(struct AudioInfoInAdapter *adapterManage, co
 int32_t AdapterManageInit(const struct AudioAdapterDescriptor *descs, int32_t num)
 {
     int32_t index = 0;
-
+    if (descs == NULL || num <= 0) {
+        HDF_LOGE("Invaild parameters: descs=%p, num=%d", descs, num);
+        return HDF_FAILURE;
+    }
     struct AudioInfoInAdapter *adapterManage = g_renderAndCaptureManage;
 
     for (index = 0; index < num; index++) {

@@ -1959,3 +1959,114 @@ TEST_F(UtestUSBCameraTest, camera_usb_0056)
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: single preview stream, output jpeg, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0057)
+{
+    cameraBase_->OpenUsbCamera();
+    cameraBase_->AchieveStreamOperator();
+    auto streamCustomerVideo = std::make_shared<StreamCustomer>();
+ 
+    uint32_t captureIdPreview = cameraBase_->CAPTURE_ID_PREVIEW;
+    uint32_t streamIdPreview = cameraBase_->STREAM_ID_PREVIEW;
+    std::vector<StreamInfo> streamInfos;
+    StreamInfo streamInfo = {};
+    streamInfo.streamId_ = streamIdPreview;
+    streamInfo.width_ = 1280; // 1280:picture width
+    streamInfo.height_ = 720; // 720:picture height
+    streamInfo.format_ = PIXEL_FMT_BLOB;
+    streamInfo.encodeType_ = ENCODE_TYPE_NULL;
+    streamInfo.dataspace_ = 8; // 8:picture dataspace
+    streamInfo.intent_ = PREVIEW;
+    streamInfo.tunneledMode_ = 5; // 5:tunnel mode
+    auto producer = streamCustomerVideo->CreateProducer();
+    streamInfo.bufferQueue_ = new (std::nothrow) BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
+    streamInfos.push_back(streamInfo);
+ 
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+ 
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    streamCustomerVideo->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
+        StoreFile(addr, size, "preview_mjpeg.jpeg");
+    });
+ 
+    CaptureInfo captureInfoPreview = {
+        .streamIds_ = {streamIdPreview},
+        .captureSetting_ = cameraBase_->ability_,
+        .enableShutterCallback_ = false,
+    };
+    std::cout << "start capture preview1" <<  std::endl;
+    CAMERA_LOGE("start capture preview1");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->Capture(captureIdPreview, captureInfoPreview, true);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+ 
+    std::cout << "cancel capture preview1" <<  std::endl;
+    CAMERA_LOGE("cancel capture preview1");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture(captureIdPreview);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+    
+    std::cout << "start capture preview2" <<  std::endl;
+    CAMERA_LOGE("start capture preview2");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->Capture(captureIdPreview, captureInfoPreview, true);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+ 
+    streamCustomerVideo->ReceiveFrameOff();
+ 
+    std::cout << "cancel capture preview2" <<  std::endl;
+    CAMERA_LOGE("cancel capture preview2");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture({captureIdPreview});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->ReleaseStreams({streamIdPreview});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+}
+ 
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0058)
+{
+    bool hasFormatMjpeg = false;
+    cameraBase_->OpenUsbCamera();
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry);
+    if (ret == 0 && entry.data.i32 != nullptr && entry.count > 0) {
+        std::cout << "print tag <OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value start." << std::endl;
+        std::cout << "count" << (entry.count - 1) << std::endl;
+        for (size_t i = 1; i < entry.count; i++) {
+            std::cout << entry.data.i32[i] << " ";
+            if (entry.data.i32[i] != -1) {
+                continue;
+            }
+            std::cout << std::endl;
+            if (entry.data.i32[i - 1] != -1 && entry.data.i32[i + 1] == OHOS_CAMERA_FORMAT_MJPEG) {
+                hasFormatMjpeg = true;
+            }
+        }
+        std::cout << "print tag <OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value end." << std::endl;
+    }
+    std::cout << "OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS has hasFormatMjpeg :" << hasFormatMjpeg
+        << std::endl;
+}

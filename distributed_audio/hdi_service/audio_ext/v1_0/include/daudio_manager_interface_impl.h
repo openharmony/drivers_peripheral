@@ -18,7 +18,7 @@
 
 #include <mutex>
 
-#include <v2_0/id_audio_manager.h>
+#include <v2_1/id_audio_manager.h>
 
 #include "audio_manager_interface_impl.h"
 
@@ -26,8 +26,8 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
+namespace V2_1 {
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
 
 class DAudioManagerInterfaceImpl : public IDAudioManager {
 public:
@@ -80,7 +80,7 @@ private:
     static DAudioManagerInterfaceImpl *dAudioMgr_;
     static std::mutex mgrMtx_;
 };
-} // V2_0
+} // V2_1
 } // AudioExt
 } // Distributedaudio
 } // HDI

@@ -41,7 +41,7 @@ void HosFileFormat::V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtD
         currentFormat.fmtdesc.width = frmSize.discrete.width;
         currentFormat.fmtdesc.height = frmSize.discrete.height;
         currentFormat.fmtdesc.fps.numerator = static_cast<int32_t>(fraMival.discrete.numerator);
-        currentFormat.fmtdesc.fps.denominator = fraMival.discrete.denominator;
+        currentFormat.fmtdesc.fps.denominator = static_cast<int32_t>(fraMival.discrete.denominator);
 
         fmtDesc.push_back(currentFormat);
 
@@ -299,8 +299,8 @@ RetCode HosFileFormat::V4L2GetCropCap(int fd, DeviceFormat& format)
     format.cropcap.defrect.top = cropcap.defrect.top;
     format.cropcap.defrect.width = cropcap.defrect.width;
 
-    format.cropcap.pixelaspect.denominator = cropcap.pixelaspect.denominator;
-    format.cropcap.pixelaspect.numerator = cropcap.pixelaspect.numerator;
+    format.cropcap.pixelaspect.denominator = static_cast<int32_t>(cropcap.pixelaspect.denominator);
+    format.cropcap.pixelaspect.numerator = static_cast<int32_t>(cropcap.pixelaspect.numerator);
 
     return RC_OK;
 }

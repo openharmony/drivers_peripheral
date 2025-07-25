@@ -729,6 +729,10 @@ ERROR:
 static void EcmProcessNotification(struct EcmDevice *ecm, unsigned char *buf)
 {
     (void)ecm;
+    if (buf == NULL) {
+        HDF_LOGE("%{public}s - invalid buffer", __func__);
+        return;
+    }
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
     switch (dr->bNotificationType) {
         case USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION:
