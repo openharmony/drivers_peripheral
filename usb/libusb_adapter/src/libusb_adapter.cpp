@@ -187,7 +187,9 @@ int32_t LibusbAdapter::GetUsbDevice(const UsbDev &dev, libusb_device **device)
         uint8_t devDusNum = libusb_get_bus_number(devs[i]);
         uint8_t devDevAddr = libusb_get_device_address(devs[i]);
         if (devDusNum == dev.busNum && devDevAddr == dev.devAddr) {
-            *device = devs[i];
+            if (device != nullptr) {
+                *device = libusb_ref_device(devs[i]);
+            }
             libusb_free_device_list(devs, 1);
             HDF_LOGD("%{public}s success leave", __func__);
             return HDF_SUCCESS;
@@ -271,6 +273,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         if (ret != HDF_SUCCESS || devHandle == nullptr) {
             HDF_LOGE("%{public}s:Opening device failed ret = %{public}d", __func__, ret);
             ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "Opening device failed", device);
+            libusb_unref_device(device);
             return HDF_FAILURE;
         }
         std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
@@ -282,6 +285,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
             it->second.count++;
         }
     }
+    libusb_unref_device(device);
     TransferInit(dev);
     BulkTransferInit(dev);
     int32_t currentConfig = -1;
@@ -349,9 +353,8 @@ int32_t LibusbAdapter::CloseDevice(const UsbDev &dev, bool isDetach)
 int32_t LibusbAdapter::ResetDevice(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s enter", __func__);
-    libusb_device *device = nullptr;
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:GetUsbDevice is failed ret=%{public}d", __func__, ret);
         return HDF_DEV_ERR_NO_DEVICE;
     }
@@ -383,8 +386,10 @@ int32_t LibusbAdapter::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_
     ret = libusb_get_device_descriptor(device, &desc);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: libusb_get_device_descriptor is failed ret=%{public}d", __func__, ret);
+        libusb_unref_device(device);
         return ret;
     }
+    libusb_unref_device(device);
     descriptor.resize(desc.bLength);
     ret = memcpy_s(descriptor.data(), descriptor.size(), &desc, desc.bLength);
     if (ret != EOK) {
@@ -404,12 +409,13 @@ int32_t LibusbAdapter::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, st
         HDF_LOGE("%{public}s: GetConfigDescriptor Find device failed", __func__);
         return HDF_FAILURE;
     }
-
     ret = GetConfigDescriptor(device, descId, descriptor);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Failed to copy configuration descriptor", __func__);
+        libusb_unref_device(device);
         return HDF_FAILURE;
     }
+    libusb_unref_device(device);
     HDF_LOGI("%{public}s is success leave", __func__);
     return HDF_SUCCESS;
 }
@@ -417,9 +423,8 @@ int32_t LibusbAdapter::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, st
 int32_t LibusbAdapter::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
 {
     HDF_LOGI("%{public}s enter", __func__);
-    libusb_device *device = nullptr;
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("Search device does not exist, ret=%{public}d", ret);
         return HDF_FAILURE;
     }
@@ -486,9 +491,8 @@ int32_t LibusbAdapter::GetConfig(const UsbDev &dev, uint8_t &configIndex)
 {
     HDF_LOGI("%{public}s enter", __func__);
     libusb_device_handle *devHandle = nullptr;
-    libusb_device *device = nullptr;
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Find device failed, ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
@@ -511,9 +515,8 @@ int32_t LibusbAdapter::GetConfig(const UsbDev &dev, uint8_t &configIndex)
 int32_t LibusbAdapter::ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable)
 {
     HDF_LOGI("%{public}s enter", __func__);
-    libusb_device *device = nullptr;
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: GetUsbDevice failed, ret=%{public}d", __func__, ret);
         return HDF_DEV_ERR_NO_DEVICE;
     }
@@ -823,12 +826,12 @@ int32_t LibusbAdapter::GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe,
     libusb_endpoint_descriptor **endpoint_desc, libusb_device_handle** deviceHandle)
 {
     HDF_LOGD("%{public}s enter", __func__);
-    libusb_device *device = nullptr;
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: LibusbFindDevice is failed, ret=%{public}d", __func__, ret);
         return HDF_DEV_ERR_NO_DEVICE;
     }
+
     libusb_device_handle *devHandle = nullptr;
     ret = FindHandleByDev(dev, &devHandle);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
@@ -943,10 +946,9 @@ int32_t LibusbAdapter::GetStringDescriptor(const UsbDev &dev, uint8_t descId, st
 {
     HDF_LOGI("%{public}s enter", __func__);
     libusb_device_handle *devHandle = nullptr;
-    libusb_device *device = nullptr;
     uint8_t data[USB_MAX_DESCRIPTOR_SIZE] = {0};
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: GetUsbDevice is failed, ret=%{public}d", __func__, ret);
         return HDF_DEV_ERR_NO_DEVICE;
     }
@@ -1143,9 +1145,8 @@ int32_t LibusbAdapter::DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfe
 int32_t LibusbAdapter::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
 {
     HDF_LOGI("%{public}s enter", __func__);
-    libusb_device *device = nullptr;
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("Search device does not exist, ret=%{public}d", ret);
         return HDF_FAILURE;
     }
@@ -1199,8 +1200,10 @@ int32_t LibusbAdapter::GetDeviceSpeed(const UsbDev &dev, uint8_t &speed)
     int deviceSpeed = libusb_get_device_speed(device);
     if (deviceSpeed < 0) {
         HDF_LOGE("%{public}s: Failed to get device speed, error: %{public}d", __func__, deviceSpeed);
+        libusb_unref_device(device);
         return HDF_FAILURE;
     }
+    libusb_unref_device(device);
     speed = static_cast<uint8_t>(deviceSpeed);
     HDF_LOGI("%{public}s Device speed retrieved successfully leave", __func__);
     return HDF_SUCCESS;
@@ -1209,13 +1212,11 @@ int32_t LibusbAdapter::GetDeviceSpeed(const UsbDev &dev, uint8_t &speed)
 int32_t LibusbAdapter::GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId, bool &unactivated)
 {
     HDF_LOGI("%{public}s enter", __func__);
-    libusb_device *device = nullptr;
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("GetUsbDevice failed, ret=%{public}d", ret);
         return HDF_DEV_ERR_NO_DEVICE;
     }
-
     libusb_device_handle *devHandle = nullptr;
     ret = FindHandleByDev(dev, &devHandle);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
@@ -1238,9 +1239,8 @@ int32_t LibusbAdapter::GetInterfaceActiveStatus(const UsbDev &dev, uint8_t inter
 int32_t LibusbAdapter::GetCurrentInterfaceSetting(const UsbDev &dev, uint8_t &settingIndex)
 {
     HDF_LOGI("%{public}s leave", __func__);
-    libusb_device *device = nullptr;
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("GetUsbDevice failed, ret=%{public}d", ret);
         return HDF_DEV_ERR_NO_DEVICE;
     }
@@ -1452,9 +1452,8 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
 int32_t LibusbAdapter::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
 {
     HDF_LOGI("%{public}s enter", __func__);
-    libusb_device *device = nullptr;
-    int32_t ret = GetUsbDevice(dev, &device);
-    if (ret != HDF_SUCCESS || device == nullptr) {
+    int32_t ret = GetUsbDevice(dev);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("Search device does not exist, ret=%{public}d", ret);
         return HDF_FAILURE;
     }
