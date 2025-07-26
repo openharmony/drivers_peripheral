@@ -16,6 +16,7 @@
 #include <cmath>
 #include <cstdio>
 #include <unistd.h>
+#include <cstdlib>
 #include <gtest/gtest.h>
 #include <securec.h>
 #include "hdf_base.h"
