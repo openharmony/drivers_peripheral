@@ -42,7 +42,7 @@ namespace Composer {
 
 const std::string BOOTEVENT_COMPOSER_HOST_READY = "bootevent.composer_host.ready";
 
-extern "C" V1_2::IDisplayComposer* DisplayComposerImplGetInstance(void)
+extern "C" V1_3::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
     return new (std::nothrow) DisplayComposerService();
 }
@@ -56,7 +56,8 @@ DisplayComposerService::DisplayComposerService()
     modeCb_(nullptr),
     seamlessChangeCb_(nullptr),
     refreshCb_(nullptr),
-    VBlankIdleCb_(nullptr)
+    VBlankIdleCb_(nullptr),
+    hwcEventCb_(nullptr)
 {
     int32_t ret = LoadVdiSo();
     if (ret != HDF_SUCCESS) {
@@ -264,6 +265,8 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<SetDisplayPerFrameParameterFunc>(dlsym(libHandle_, "SetDisplayPerFrameParameter"));
     vdiAdapter_->GetDisplayIdentificationData =
         reinterpret_cast<GetDisplayIdentificationDataFunc>(dlsym(libHandle_, "GetDisplayIdentificationData"));
+    vdiAdapter_->RegHwcEventCallback =
+        reinterpret_cast<RegHwcEventCallbackFunc>(dlsym(libHandle_, "RegHwcEventCallback"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -309,7 +312,7 @@ int32_t DisplayComposerService::DisplayComposerService::CreateResponser()
         DISPLAY_LOGI("%{public}s Enable Map", __func__);
         cacheMgr_->SetNeedMap(true);
     }
-    cmdResponser_ = V1_2::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
+    cmdResponser_ = V1_3::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
     CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     DISPLAY_LOGI("%{public}s out", __func__);
     return HDF_SUCCESS;
@@ -1013,6 +1016,34 @@ int32_t DisplayComposerService::FastPresent(uint32_t devId, const PresentParam& 
     int32_t ret = vdiAdapter_->FastPresent(devId, param, handles);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u", __func__, devId));
+    return ret;
+}
+
+void DisplayComposerService::OnHwcEvent(uint32_t devId, uint32_t eventId,
+    const std::vector<int32_t>& eventData, void *data)
+{
+    if (data == nullptr) {
+        DISPLAY_LOGE("cb data is nullptr");
+        return;
+    }
+
+    sptr<IHwcEventCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->hwcEventCb_;
+    if (remoteCb == nullptr) {
+        DISPLAY_LOGE("remoteCb is nullptr");
+        return;
+    }
+    remoteCb->OnHwcEvent(devId, eventId, eventData);
+}
+
+int32_t DisplayComposerService::RegHwcEventCallback(const sptr<IHwcEventCallback>& cb)
+{
+    DISPLAY_TRACE;
+    DISPLAY_CHK_RETURN(vdiAdapter_ == nullptr, HDF_ERR_NOT_SUPPORT);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->RegHwcEventCallback, HDF_ERR_NOT_SUPPORT);
+    hwcEventCb_ = cb;
+    int32_t ret = vdiAdapter_->RegHwcEventCallback(OnHwcEvent, this);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
 } // namespace Composer
