@@ -49,13 +49,11 @@ namespace {
     void SensorSetBatchTest::SetUpTestCase()
     {
         g_sensorInterface = V3_0::ISensorInterface::Get();
-        for (int i = 0; i < ::testing::GTEST_FLAG(command_line_flags).size(); i++) {
-            std::string flag = ::testing::GTEST_FLAG(command_line_flags)[i];
-            
-            if (flag == "--sensorType" && i + 1 < ::testing::GTEST_FLAG(command_line_flags).size()) {
-                g_deviceSensorInfo.sensorType = std::atoi(::testing::GTEST_FLAG(command_line_flags)[i + 1].c_str());
-            } else if (flag == "--samplingInterval" && i + 1 < ::testing::GTEST_FLAG(command_line_flags).size()) {
-                g_samplingInterval = std::atoi(::testing::GTEST_FLAG(command_line_flags)[i + 1].c_str());
+        for (int i = 1; i < __argc; ++i) {
+            if (std::strcmp(__argv[i], "--sensorType") == 0 && i + 1 < __argc) {
+                g_deviceSensorInfo.sensorType = std::atoi(__argv[i + 1]);
+            } else if (std::strcmp(__argv[i], "--samplingInterval") == 0 && i + 1 < __argc) {
+                g_samplingInterval = std::atoi(__argv[i + 1]);
             }
         }
     }
