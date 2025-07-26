@@ -33,6 +33,7 @@ hdc target mount
 hdc shell hilog -b D -D 0xD002516
 hdc file send SensorDataVolumePerSecondTest /data/SensorDataVolumePerSecondTest
 hdc shell chmod 777 /data/SensorDataVolumePerSecondTest
-
-start cmd /k "hdc shell 'testSensorType=1 testSamplingInterval=10000000 /data/SensorDataVolumePerSecondTest'"
+hdc shell "export testSensorType=1"
+hdc shell "export testSamplingInterval=10000000"
+hdc shell "/data/SensorDataVolumePerSecondTest"
 parse
