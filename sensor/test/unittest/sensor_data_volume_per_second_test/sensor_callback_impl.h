@@ -48,12 +48,15 @@ public:
     }
 
     static int32_t sensorDataCount;
+    static bool printDataFlag;
     void PrintData(const HdfSensorEvents &event)
     {
         std::string st = {0};
         DataToStr(st, event);
-        printf("%s: %s\n", __func__, st.c_str());
-        HDF_LOGI("%{public}s: testcase %{public}s\n", __func__, st.c_str());
+        if (printDataFlag) {
+            printf("%s: %s\n", __func__, st.c_str());
+            HDF_LOGI("%{public}s: testcase %{public}s\n", __func__, st.c_str());
+        }
     }
 
     void DataToStr(std::string &str, const HdfSensorEvents &event)

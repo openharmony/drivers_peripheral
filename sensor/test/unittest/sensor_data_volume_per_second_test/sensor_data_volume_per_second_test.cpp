@@ -31,6 +31,7 @@ using namespace OHOS::HDI::Sensor::V3_0;
 using namespace OHOS::HDI::Sensor;
 using namespace testing::ext;
 int32_t SensorCallbackImpl::sensorDataCount = 0;
+bool SensorCallbackImpl::printDataFlag = false;
 
 namespace {
     sptr<V3_0::ISensorInterface>  g_sensorInterface = nullptr;
@@ -52,11 +53,18 @@ namespace {
         g_sensorInterface = V3_0::ISensorInterface::Get();
         const char* testSensorType = std::getenv("testSensorType");
         if (testSensorType) {
+            printf("testSensorType=%s\r\n", testSensorType);
             g_deviceSensorInfo.sensorType = std::atoi(testSensorType);
         }
         const char* testSamplingInterval = std::getenv("testSamplingInterval");
         if (testSamplingInterval) {
+            printf("testSamplingInterval=%s\r\n", testSamplingInterval);
             g_samplingInterval = std::atoi(testSamplingInterval);
+        }
+        const char* testPrintDataFlag = std::getenv("testPrintDataFlag");
+        if (testPrintDataFlag) {
+            printf("testPrintDataFlag=%s\r\n", testPrintDataFlag);
+            SensorCallbackImpl::printDataFlag = std::atoi(testPrintDataFlag);
         }
     }
 
