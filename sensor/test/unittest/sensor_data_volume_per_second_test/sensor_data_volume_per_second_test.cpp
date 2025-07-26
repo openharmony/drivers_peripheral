@@ -50,17 +50,14 @@ namespace {
     void SensorSetBatchTest::SetUpTestCase()
     {
         g_sensorInterface = V3_0::ISensorInterface::Get();
-        const char* duration_env = std::getenv("TEST_DURATION");
-        if (duration_env) {
-            g_duration = std::atoi(duration_env);  // 转换为整数
+        const char* testSensorType = std::getenv("testSensorType");
+        if (testSensorType) {
+            g_deviceSensorInfo.sensorType = std::atoi(testSensorType);
         }
-        // for (int i = 1; i < __argc; ++i) {
-        //     if (std::strcmp(__argv[i], "--sensorType") == 0 && i + 1 < __argc) {
-        //         g_deviceSensorInfo.sensorType = std::atoi(__argv[i + 1]);
-        //     } else if (std::strcmp(__argv[i], "--samplingInterval") == 0 && i + 1 < __argc) {
-        //         g_samplingInterval = std::atoi(__argv[i + 1]);
-        //     }
-        // }
+        const char* testSamplingInterval = std::getenv("testSamplingInterval");
+        if (testSamplingInterval) {
+            g_samplingInterval = std::atoi(testSamplingInterval);
+        }
     }
 
     void SensorSetBatchTest::TearDownTestCase()
@@ -107,9 +104,4 @@ namespace {
         ret = g_sensorInterface->Unregister(0, g_traditionalCallback);
         EXPECT_EQ(ret, HDF_SUCCESS);
     }
-}
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
