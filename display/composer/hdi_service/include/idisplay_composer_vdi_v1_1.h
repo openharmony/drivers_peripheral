@@ -19,7 +19,7 @@
 #include <vector>
 #include <string>
 #include "idisplay_composer_vdi.h"
-#include "v1_2/display_composer_type.h"
+#include "v1_3/display_composer_type.h"
 #include "v1_1/imode_callback.h"
 #include "v1_1/iseamless_change_callback.h"
 
@@ -27,7 +27,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-using namespace OHOS::HDI::Display::Composer::V1_2;
+using namespace OHOS::HDI::Display::Composer::V1_3;
 
 class IDisplayComposerVdiV1_1 : public IDisplayComposerVdi {
     public:
