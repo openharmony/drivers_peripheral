@@ -50,13 +50,17 @@ namespace {
     void SensorSetBatchTest::SetUpTestCase()
     {
         g_sensorInterface = V3_0::ISensorInterface::Get();
-        for (int i = 1; i < __argc; ++i) {
-            if (std::strcmp(__argv[i], "--sensorType") == 0 && i + 1 < __argc) {
-                g_deviceSensorInfo.sensorType = std::atoi(__argv[i + 1]);
-            } else if (std::strcmp(__argv[i], "--samplingInterval") == 0 && i + 1 < __argc) {
-                g_samplingInterval = std::atoi(__argv[i + 1]);
-            }
+        const char* duration_env = std::getenv("TEST_DURATION");
+        if (duration_env) {
+            g_duration = std::atoi(duration_env);  // 转换为整数
         }
+        // for (int i = 1; i < __argc; ++i) {
+        //     if (std::strcmp(__argv[i], "--sensorType") == 0 && i + 1 < __argc) {
+        //         g_deviceSensorInfo.sensorType = std::atoi(__argv[i + 1]);
+        //     } else if (std::strcmp(__argv[i], "--samplingInterval") == 0 && i + 1 < __argc) {
+        //         g_samplingInterval = std::atoi(__argv[i + 1]);
+        //     }
+        // }
     }
 
     void SensorSetBatchTest::TearDownTestCase()
