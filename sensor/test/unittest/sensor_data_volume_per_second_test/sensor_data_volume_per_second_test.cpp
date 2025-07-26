@@ -38,7 +38,7 @@ namespace {
     sptr<V3_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     DeviceSensorInfo g_deviceSensorInfo = {-1, 1, 0, 1};
     int64_t g_samplingInterval = 10000000; // 10ms
-    int64_t g_testTime = 20000; // 20s
+    int64_t g_testTime = 5; // 5s
 
     class SensorSetBatchTest : public testing::Test {
     public:
@@ -65,6 +65,11 @@ namespace {
         if (testPrintDataFlag) {
             printf("testPrintDataFlag=%s\r\n", testPrintDataFlag);
             SensorCallbackImpl::printDataFlag = std::atoi(testPrintDataFlag);
+        }
+        const char* testTestTime = std::getenv("testTestTime");
+        if (testTestTime) {
+            printf("testTestTime=%s\r\n", testTestTime);
+            g_testTime = std::atoi(testTestTime);
         }
     }
 
