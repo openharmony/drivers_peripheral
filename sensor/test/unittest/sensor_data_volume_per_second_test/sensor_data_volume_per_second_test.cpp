@@ -103,3 +103,8 @@ namespace {
         EXPECT_EQ(ret, HDF_SUCCESS);
     }
 }
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
