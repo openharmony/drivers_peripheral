@@ -120,6 +120,7 @@ namespace {
                 printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m\r\n",
                     countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
+            fflush(stdout);
         }
 
         ret = g_sensorInterface->Disable(g_deviceSensorInfo);
