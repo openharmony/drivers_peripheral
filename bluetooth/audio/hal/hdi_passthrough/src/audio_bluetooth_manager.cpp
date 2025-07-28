@@ -546,10 +546,7 @@ int WriteFrameHearingAid(const uint8_t *data, uint32_t size, const HDI::Audio_Bl
     HDF_LOGD("%{public}s", __func__);
 #ifdef A2DP_HDI_SERVICE
     BTAudioStreamState state = getHearingAidStateFunc();
-    if (!g_allowAudioStart.load()) {
-        HDF_LOGE("not allow to start normal render, state=%{public}hhu", state);
-        return HDF_FAILURE;
-    } else if (state != BTAudioStreamState::STARTED) {
+    if (state != BTAudioStreamState::STARTED) {
         HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
         if (!startHearingAidFunc()) {
             HDF_LOGE("%{public}s: fail to startHearingAid", __func__);
@@ -558,15 +555,7 @@ int WriteFrameHearingAid(const uint8_t *data, uint32_t size, const HDI::Audio_Bl
     }
     return writeFrameHearingAidFunc(data, size);
 #else
-    if (!g_proxy_) {
-        HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
-        return RET_BAD_STATUS;
-    }
-    if (g_playState == A2DP_NOT_PLAYING) {
-        HDF_LOGE("%{public}s: playState is not Streaming", __func__);
-        return RET_BAD_STATUS;
-    }
-    return g_proxy_->WriteFrame(data, size);
+    return HDF_ERR_NOT_SUPPORT;
 #endif
 }
 
