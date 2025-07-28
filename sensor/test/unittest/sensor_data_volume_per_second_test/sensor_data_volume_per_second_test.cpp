@@ -39,7 +39,7 @@ namespace {
     sptr<V3_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     DeviceSensorInfo g_deviceSensorInfo = {-1, 1, 0, 1};
     int64_t g_samplingInterval = 10000000; // 10ms
-    int64_t g_testTime = 5; // 5s
+    int64_t g_testTime = 5000; // 5s
 
     class SensorSetBatchTest : public testing::Test {
     public:
