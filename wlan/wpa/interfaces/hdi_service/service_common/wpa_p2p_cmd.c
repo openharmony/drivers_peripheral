@@ -102,7 +102,7 @@ static void GetFlagInfo(char *res, struct HdiP2pNetworkInfo *info)
         HDF_LOGE("malloc flags failed!");
         return;
     }
-    info->flagsLen = falgLen + 1;
+    info->flagsLen = (unsigned int)(falgLen + 1);
     if (strcpy_s((char *)info->flags, falgLen + 1, res) != EOK) {
         HDF_LOGE("GetFlagInfo strcpy_s failed!");
     }
@@ -116,7 +116,7 @@ static void GetClientListInfo(char *res, struct HdiP2pNetworkInfo *info)
         HDF_LOGE("malloc client list failed!");
         return;
     }
-    info->clientListLen = clientLen + 1;
+    info->clientListLen = (unsigned int)(clientLen + 1);
     if (strcpy_s((char *)info->clientList, clientLen + 1, res) != EOK) {
         HDF_LOGE("GetClientListInfo strcpy_s failed!");
     }
@@ -140,7 +140,7 @@ void GetHalNetworkInfos(char *buf, struct HdiP2pNetworkInfo *info)
         return;
     }
     while (pos != NULL) {
-        if (i >= LIST_BUF_TYPE) {
+        if (i >= LIST_BUF_TYPE - 1) {
             break;
         }
         if (memcpy_s(res[i], LIST_BUF_LEN, tmp, pos - tmp) != EOK) {

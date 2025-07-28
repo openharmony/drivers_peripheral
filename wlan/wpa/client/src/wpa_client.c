@@ -43,7 +43,7 @@ int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, co
     int ifNameLen = 0;
 
     if (ifName != NULL) {
-        ifNameLen = strnlen(ifName, IFNAMSIZ + 1);
+        ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
     }
     if (onRecFunc == NULL || ifName == NULL || ifNameLen == (IFNAMSIZ + 1)) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);

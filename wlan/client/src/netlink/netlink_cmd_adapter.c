@@ -1048,7 +1048,7 @@ static bool NetLinkGetChipProp(void)
     char preValue[SUBCHIP_WIFI_PROP_LEN] = { 0 };
     int errCode = GetParameter(SUBCHIP_WIFI_PROP, 0, preValue, SUBCHIP_WIFI_PROP_LEN);
     if (errCode > 0) {
-        if (strncmp(preValue, SUPPORT_COEXCHIP, SUPPORT_COEXCHIP_LEN) == 0) {
+        if (strncmp(preValue, SUPPORT_COEXCHIP, strlen(SUPPORT_COEXCHIP)) == 0) {
             return true;
         }
     }
@@ -1501,7 +1501,7 @@ int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
         HILOG_ERROR(LOG_CORE, "%s: calloc failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    if (memcpy_s(*ifNames, IFNAMSIZ, "wlan0", IFNAMSIZ) != EOK) {
+    if (memcpy_s(*ifNames, IFNAMSIZ, "wlan0", strlen(STR_WLAN0) + 1) != EOK) {
         HILOG_ERROR(LOG_CORE, "%s: memcpy failed", __FUNCTION__);
         free(*ifNames);
         *ifNames = NULL;
