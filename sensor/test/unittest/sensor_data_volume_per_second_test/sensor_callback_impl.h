@@ -48,6 +48,7 @@ public:
     }
 
     static int32_t sensorDataCount;
+    static int32_t sensorDataCountOld;
     static bool printDataFlag;
     void PrintData(const HdfSensorEvents &event)
     {

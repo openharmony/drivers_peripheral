@@ -31,6 +31,7 @@ using namespace OHOS::HDI::Sensor::V3_0;
 using namespace OHOS::HDI::Sensor;
 using namespace testing::ext;
 int32_t SensorCallbackImpl::sensorDataCount = 0;
+int32_t SensorCallbackImpl::sensorDataCountOld = 0;
 bool SensorCallbackImpl::printDataFlag = false;
 
 namespace {
@@ -101,14 +102,19 @@ namespace {
         ret = g_sensorInterface->Enable(g_deviceSensorInfo);
         EXPECT_EQ(ret, HDF_SUCCESS);
 
+        int32_t expectedMinCount = 1000 / (g_samplingInterval / 1000000) / 2;
+        int32_t expectedMaxCount = 1000 / (g_samplingInterval / 1000000) * 3 / 2;
+
         for (int i = 0; i < g_testTime / 1000; i++) {
             OsalMSleep(1000);
-            if (SensorCallbackImpl::sensorDataCount > 10 && SensorCallbackImpl::sensorDataCount < 30) {
-                printf("\033[32mas expected, 2000ms get sensor data count is %d\033[0m\r\n",
-                    SensorCallbackImpl::sensorDataCount);
+            int32_t countPerSecond = SensorCallbackImpl::sensorDataCount - SensorCallbackImpl::sensorDataCountOld;
+            SensorCallbackImpl::sensorDataCountOld = SensorCallbackImpl::sensorDataCount;
+            if (countPerSecond > expectedMinCount && countPerSecond < expectedMaxCount) {
+                printf("\033[32mas expected, 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m\r\n",
+                    countPerSecond, SensorCallbackImpl::sensorDataCount);
             } else {
-                printf("\033[31m[ERROR] 2000ms get sensor data count is %d\033[0m\r\n",
-                    SensorCallbackImpl::sensorDataCount);
+                printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m\r\n",
+                    countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
         }
 
