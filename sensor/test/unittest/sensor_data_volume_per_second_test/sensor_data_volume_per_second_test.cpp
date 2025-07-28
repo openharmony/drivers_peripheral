@@ -109,6 +109,9 @@ namespace {
         int32_t expectedMinCount = 1000 / (g_samplingInterval / 1000000) / 2;
         int32_t expectedMaxCount = 1000 / (g_samplingInterval / 1000000) * 3 / 2;
 
+        printf("expectedMinCount is %s, expectedMaxCount is %s\r\n", std::to_string(expectedMinCount).c_str(),
+               std::to_string(expectedMaxCount).c_str());
+
         for (int i = 0; i < g_testTime / 1000; i++) {
             OsalMSleep(1000);
             int32_t countPerSecond = SensorCallbackImpl::sensorDataCount - SensorCallbackImpl::sensorDataCountOld;
