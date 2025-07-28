@@ -34,4 +34,4 @@ hdc shell hilog -b D -D 0xD002516
 hdc file send SensorDataVolumePerSecondTest /data/SensorDataVolumePerSecondTest
 hdc shell chmod 777 /data/SensorDataVolumePerSecondTest
 hdc shell "export testSensorType=1;export testSamplingInterval=10000000;export testPrintDataFlag=false;export testTestTime=20000;/data/SensorDataVolumePerSecondTest"
-parse
+pause
