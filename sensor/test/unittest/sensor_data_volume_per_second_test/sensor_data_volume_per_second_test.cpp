@@ -65,7 +65,11 @@ namespace {
         const char* testPrintDataFlag = std::getenv("testPrintDataFlag");
         if (testPrintDataFlag) {
             printf("testPrintDataFlag=%s\r\n", testPrintDataFlag);
-            SensorCallbackImpl::printDataFlag = std::atoi(testPrintDataFlag);
+            if (std::strcmp(testPrintDataFlag, "true") == 0) {
+                SensorCallbackImpl::printDataFlag = true;
+            } else {
+                SensorCallbackImpl::printDataFlag = false;
+            }
         }
         const char* testTestTime = std::getenv("testTestTime");
         if (testTestTime) {
