@@ -85,7 +85,9 @@ int32_t ICodecBuffer::FillThisBuffer(OmxCodecBuffer &codecBuffer)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "null component");
     CHECK_AND_RETURN_RET_LOG(omxBufHeader_ != nullptr, OMX_ErrorBadParameter, "null header");
-    (void)codecBuffer;
+    omxBufHeader_->nOffset = codecBuffer.offset;
+    omxBufHeader_->nFilledLen = codecBuffer.filledLen;
+    omxBufHeader_->nFlags = codecBuffer.flag;
     return OMX_FillThisBuffer(comp_, omxBufHeader_);
 }
 
