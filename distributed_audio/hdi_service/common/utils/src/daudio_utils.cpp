@@ -165,7 +165,7 @@ int64_t GetNowTimeUs()
 uint32_t CalculateFrameSize(uint32_t sampleRate, uint32_t channelCount,
     int32_t format, uint32_t timeInterval, bool isMMAP)
 {
-    uint64_t result = (static_cast<uint_64>(sampleRate) *
+    uint64_t result = (static_cast<uint64_t>(sampleRate) *
     channelCount * static_cast<uint32_t>(format) *
     timeInterval) / AUDIO_MS_PER_SECOND;
     return isMMAP ? (result > std::numeric_limits<uint32_t>::max() ? 0 : static_cast<uint32_t>(result)) :
