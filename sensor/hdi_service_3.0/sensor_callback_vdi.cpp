@@ -51,19 +51,6 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     return ret;
 }
 
-int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
-{
-    struct V3_0::HdfSensorEvents event3_0;
-    event3_0.version = event.version;
-    event3_0.timestamp = event.timestamp;
-    event3_0.option = event.option;
-    event3_0.mode = event.mode;
-    event3_0.data = event.data;
-    event3_0.dataLen = event.dataLen;
-    event3_0.deviceSensorInfo = {DEFAULT_DEVICE_ID, event.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
-    return OnDataEvent(event3_0);
-}
-
 int32_t SensorCallbackVdi::OnDataEvent(const V3_0::HdfSensorEvents& event)
 {
     SensorHandle sensorHandle = {event.deviceSensorInfo.deviceId, event.deviceSensorInfo.sensorType,
