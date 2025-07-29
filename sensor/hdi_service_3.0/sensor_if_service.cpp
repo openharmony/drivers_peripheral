@@ -591,7 +591,7 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<V3_0::HdfSensorInformation
     }
 
     if (sensorInfoVdi.empty()) {
-        HDF_LOGI("%{public}s no sensor info in list, sensorInfoVdi is empty", __func__);
+        HDF_LOGI("%{public}s empty", __func__);
     }
 
     for (const auto &it : sensorInfoVdi) {

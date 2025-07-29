@@ -234,7 +234,7 @@ void SensorClientsManager::UpdateClientPeriodCount(SensorHandle sensorHandle, in
             client.periodCountMap_[sensorHandle] = periodCount;
         }
     }
-    HDF_LOGI("%{public}s: %{public}s", __func__, result.c_str());
+    HDF_LOGI("%{public}s", result.c_str());
 }
 
 void SensorClientsManager::SetSensorBestConfig(SensorHandle sensorHandle, int64_t &samplingInterval,
