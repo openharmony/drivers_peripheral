@@ -18,7 +18,7 @@
 #include <securec.h>
 #include <unordered_map>
 
-#define HDF_LOG_TAG uhdf_sensor_callback_vdi
+#define HDF_LOG_TAG cb
 
 namespace OHOS {
 namespace HDI {
@@ -96,7 +96,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
     if (result) {
         std::string st = {0};
         DataToStr(st, event);
-        st += "sensorDataCount=" + std::to_string(dataCount);
+        st += "sampling=" + std::to_string(dataCount);
         st += reportResult;
         HDF_LOGI("%{public}s: %{public}s", __func__, st.c_str());
     }
@@ -137,8 +137,8 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
     }
 
     dataStr = arrayStr;
-    str = "sensorHandle: " + SENSOR_HANDLE_TO_STRING(event.deviceSensorInfo) + ", ts: " +
-        std::to_string(event.timestamp / 1e9) + ", data: " + dataStr;
+    str = SENSOR_HANDLE_TO_STRING(event.deviceSensorInfo) + "ts" +
+        std::to_string(event.timestamp) + "data" + dataStr;
 
     OsalMemFree(origin);
     return;

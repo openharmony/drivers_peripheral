@@ -18,7 +18,7 @@
 #include <cinttypes>
 #include <iproxy_broker.h>
 
-#define HDF_LOG_TAG uhdf_sensor_clients_manager
+#define HDF_LOG_TAG manager
 
 namespace OHOS {
 namespace HDI {
@@ -40,7 +40,7 @@ namespace {
     constexpr int64_t STOP_INTERVAL = 0;
     constexpr int32_t INIT_CUR_COUNT = 0;
     constexpr int32_t ZERO_PRINT_TIME = 0;
-    constexpr int32_t MAX_PRINT_TIME = 30;
+    constexpr int32_t MAX_PRINT_TIME = 5;
     constexpr int64_t INIT_REPORT_COUNT = 1;
 }
 
@@ -155,7 +155,6 @@ void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId,
 void SensorClientsManager::ReportDataCbOneWay(int groupId, int serviceId)
 {
     SENSOR_TRACE_PID;
-    HDF_LOGI("%{public}s: service: %{public}d", __func__, serviceId);
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGD("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
@@ -164,7 +163,7 @@ void SensorClientsManager::ReportDataCbOneWay(int groupId, int serviceId)
 
     auto it = clients_[groupId].find(serviceId);
     it->second.oneway = true;
-    HDF_LOGI("%{public}s: service: %{public}d set oneway = true", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     return;
 }
 
@@ -228,8 +227,8 @@ void SensorClientsManager::UpdateClientPeriodCount(SensorHandle sensorHandle, in
         if (client.sensorConfigMap_.find(sensorHandle) != client.sensorConfigMap_.end()) {
             int32_t periodCount =
                     client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval / samplingInterval;
-            result += " serviceId=" + std::to_string(entry.first) + ", sensorHandle=" +
-                    SENSOR_HANDLE_TO_STRING(sensorHandle) + ", periodCount=" +
+            result += " pid" + std::to_string(entry.first) +
+                    SENSOR_HANDLE_TO_STRING(sensorHandle) + "periodCount=" +
                       std::to_string(client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval)
                       + "/" + std::to_string(samplingInterval) + "=" + std::to_string(periodCount);
             client.periodCountMap_[sensorHandle] = periodCount;
@@ -500,7 +499,7 @@ std::set<int32_t> SensorClientsManager::GetServiceIds(SensorHandle sensorHandle)
 std::string SensorClientsManager::ReportEachClient(const V3_0::HdfSensorEvents& event)
 {
     SENSOR_TRACE;
-    std::string result = "services=";
+    std::string result = "report=";
     SensorHandle sensorHandle =  {event.deviceSensorInfo.deviceId, event.deviceSensorInfo.sensorType,
                                   event.deviceSensorInfo.sensorId, event.deviceSensorInfo.location};
     const std::set<int32_t> services = GetServiceIds(sensorHandle);

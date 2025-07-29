@@ -36,7 +36,7 @@ enum BatchSeniorMode {
         SDC = 1
 };
 
-#define HDF_LOG_TAG uhdf_sensor_service
+#define HDF_LOG_TAG hdi
 #define DEFAULT_SENSOR(sensorId) {0, sensorId, 0, 0}
 
 namespace OHOS {
@@ -144,8 +144,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle) + "mode " +
         std::to_string(mode) + "samplingInterval " + std::to_string(samplingInterval) + "reportInterval " +
         std::to_string(reportInterval));
-    HDF_LOGI("%{public}s: serviceId is %{public}d, sensorHandle is %{public}s, mode is %{public}d, samplingInterval "
-             "is %{public}s, reportInterval is %{public}s",
+    HDF_LOGI("%{public}s pid%{public}d%{public}smode%{public}dinterval%{public}s,%{public}s",
              __func__, serviceId, SENSOR_HANDLE_TO_C_STR(sensorHandle), mode, std::to_string(samplingInterval).c_str(),
              std::to_string(reportInterval).c_str());
 
@@ -269,7 +268,7 @@ int32_t SensorIfService::AddCallbackMap(int32_t groupId, const sptr<IRemoteObjec
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     auto groupCallBackIter = callbackMap.find(groupId);
     if (groupCallBackIter != callbackMap.end()) {
         auto iRemoteObjectIter =
@@ -300,7 +299,7 @@ int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId,
     const sptr<IRemoteObject> &iRemoteObject)
 {
     SENSOR_TRACE_PID;
-    HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
 
     if (!ValidateCallbackMap(groupId, iRemoteObject)) {
         return HDF_FAILURE;
@@ -399,7 +398,7 @@ int32_t SensorIfService::AddSensorDeathRecipient(const sptr<IRemoteObject> &iRem
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     if (iRemoteObject == nullptr) {
         HDF_LOGE("%{public}s: iRemoteObject is null", __func__);
         return HDF_FAILURE;
@@ -422,7 +421,7 @@ int32_t SensorIfService::RemoveSensorDeathRecipient(const sptr<IRemoteObject> &i
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     auto callBackDeathRecipientIter = g_callBackDeathRecipientMap.find(iRemoteObject.GetRefPtr());
     if (callBackDeathRecipientIter == g_callBackDeathRecipientMap.end()) {
         HDF_LOGE("%{public}s: not find recipient", __func__);
@@ -440,7 +439,7 @@ int32_t SensorIfService::RemoveSensorDeathRecipient(const sptr<IRemoteObject> &i
 void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
     SENSOR_TRACE_PID;
-    HDF_LOGI("%{public}s: service %{public}d", __func__, static_cast<uint32_t>(HdfRemoteGetCallingPid()));
+    HDF_LOGI("%{public}s pid%{public}d", __func__, static_cast<uint32_t>(HdfRemoteGetCallingPid()));
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     sptr<IRemoteObject> iRemoteObject = object.promote();
     if (iRemoteObject == nullptr) {
@@ -491,7 +490,7 @@ void SensorIfService::RemoveDeathNotice(int32_t groupId)
 {
     SENSOR_TRACE_PID_MSG("sensorType " + std::to_string(groupId));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: service %{public}d, groupId %{public}d", __func__, serviceId, groupId);
+    HDF_LOGI("%{public}s pid%{public}dgroupId%{public}d", __func__, serviceId, groupId);
     auto iter = callbackMap.find(groupId);
     if (iter != callbackMap.end()) {
         return;
@@ -575,7 +574,7 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<V3_0::HdfSensorInformation
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: serviceId = %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     if (sensorVdiImplV1_1_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -627,7 +626,7 @@ int32_t SensorIfService::Enable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo&
                                  deviceSensorInfo.location};
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: sensorHandle %{public}s, serviceId = %{public}d", __func__,
+    HDF_LOGI("%{public}s %{public}spid%{public}d", __func__,
              SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     SensorClientsManager::GetInstance()->ReSetSensorPrintTime(sensorHandle);
@@ -664,7 +663,7 @@ int32_t SensorIfService::Disable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo
                                  deviceSensorInfo.location};
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: sensorHandle %{public}s, serviceId = %{public}d", __func__,
+    HDF_LOGI("%{public}s %{public}s pid%{public}d", __func__,
              SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     return DisableSensor(sensorHandle, serviceId);
@@ -696,7 +695,7 @@ int32_t SensorIfService::SetMode(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo
                                  deviceSensorInfo.location};
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle) + "mode " + std::to_string(mode));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: sensorHandle is %{public}s, mode is %{public}d, serviceId = %{public}d", __func__,
+    HDF_LOGI("%{public}s %{public}smode%{public}dpid%{public}d", __func__,
              SENSOR_HANDLE_TO_C_STR(sensorHandle), mode,
              serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
@@ -726,7 +725,7 @@ int32_t SensorIfService::SetOption(const OHOS::HDI::Sensor::V3_0::DeviceSensorIn
                                  deviceSensorInfo.location};
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle) + "option " + std::to_string(option));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: sensorHandle is %{public}s, option is %{public}d, serviceId = %{public}d", __func__,
+    HDF_LOGI("%{public}s %{public}soption%{public}dpid%{public}d", __func__,
              SENSOR_HANDLE_TO_C_STR(sensorHandle),
              option, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
@@ -753,7 +752,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<V3_0::ISensorCallb
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: groupId %{public}d, service %{public}d", __func__, groupId, serviceId);
+    HDF_LOGI("%{public}s groupId%{public}dpid%{public}d", __func__, groupId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     int32_t ret = HDF_SUCCESS;
     const sptr<IRemoteObject> &iRemoteObject = OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(callbackObj);
@@ -794,7 +793,7 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<V3_0::ISensorCal
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: groupId %{public}d, service %{public}d", __func__, groupId, serviceId);
+    HDF_LOGI("%{public}s groupId%{public}dpid%{public}d", __func__, groupId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId >= SENSOR_GROUP_TYPE_MAX) {
         HDF_LOGE("%{public}s: groupId %{public}d is error", __func__, groupId);
@@ -842,7 +841,7 @@ int32_t SensorIfService::ReadData(const OHOS::HDI::Sensor::V3_0::DeviceSensorInf
                                  deviceSensorInfo.location};
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     if (sensorVdiImplV1_1_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
@@ -882,7 +881,7 @@ void SensorIfService::VoteInterval(const SensorHandle sensorHandle, uint32_t ser
         }
         samplingInterval = samplingInterval < it->second ? samplingInterval : it->second;
     }
-    HDF_LOGI("%{public}s: samplingInterval is %{public}s", __func__, std::to_string(samplingInterval).c_str());
+    HDF_LOGI("%{public}s interval%{public}s", __func__, std::to_string(samplingInterval).c_str());
 }
 
 int32_t SensorIfService::SetSdcSensor(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo, bool enabled,
@@ -893,7 +892,7 @@ int32_t SensorIfService::SetSdcSensor(const OHOS::HDI::Sensor::V3_0::DeviceSenso
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle) + "enabled " +
         std::to_string(enabled) + "rateLevel " + std::to_string(rateLevel));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: sensorHandle %{public}s, enabled %{public}u, rateLevel %{public}u, serviceId %{public}d",
+    HDF_LOGI("%{public}s %{public}senabled%{public}urateLevel%{public}upid%{public}d",
              __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), enabled, rateLevel, serviceId);
 
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
@@ -978,7 +977,7 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<V3_0::SdcSensorInfo>& sdcS
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: serviceId %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     if (sensorVdiImplV1_1_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -1019,7 +1018,7 @@ int32_t SensorIfService::RegisterAsync(int32_t groupId, const sptr<V3_0::ISensor
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: groupId %{public}d, service %{public}d", __func__, groupId, serviceId);
+    HDF_LOGI("%{public}s groupId%{public}dpid%{public}d", __func__, groupId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     int32_t ret = HDF_SUCCESS;
     const sptr<IRemoteObject> &iRemoteObject = OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(callbackObj);
@@ -1069,7 +1068,7 @@ int32_t SensorIfService::GetDeviceSensorInfo(int32_t deviceId, std::vector<V3_0:
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: serviceId = %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
 
     std::vector<OHOS::HDI::Sensor::V3_0::HdfSensorInformationVdi> sensorInfoVdi = {};
@@ -1079,13 +1078,13 @@ int32_t SensorIfService::GetDeviceSensorInfo(int32_t deviceId, std::vector<V3_0:
 #ifdef TV_FLAG
     ret = sensorVdiImplV1_1_->GetDeviceSensorInfo(deviceId, sensorInfoVdi);
 #else
-    HDF_LOGI("%{public}s: sensorVdiImplV1_1_ not support", __func__);
+    HDF_LOGI("%{public}s not support", __func__);
     ret = SENSOR_SUCCESS;
 #endif
     SENSOR_TRACE_FINISH;
 
     if (sensorInfoVdi.empty()) {
-        HDF_LOGI("%{public}s no sensor info in list, sensorInfoVdi is empty", __func__);
+        HDF_LOGI("%{public}s empty", __func__);
     }
 
     for (const auto &it : sensorInfoVdi) {
@@ -1116,7 +1115,7 @@ int32_t SensorIfService::RegSensorPlugCallBack(const sptr<V3_0::ISensorPlugCallb
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: serviceId = %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
 
     int32_t ret = SENSOR_FAILURE;
@@ -1124,7 +1123,7 @@ int32_t SensorIfService::RegSensorPlugCallBack(const sptr<V3_0::ISensorPlugCallb
 #ifdef TV_FLAG
     ret = sensorVdiImplV1_1_->RegSensorPlugCallBack(callbackObj);
 #else
-    HDF_LOGI("%{public}s: sensorVdiImplV1_1_ not support", __func__);
+    HDF_LOGI("%{public}s not support", __func__);
     ret = SENSOR_SUCCESS;
 #endif
     SENSOR_TRACE_FINISH;
@@ -1140,7 +1139,7 @@ int32_t SensorIfService::UnRegSensorPlugCallBack(const sptr<V3_0::ISensorPlugCal
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: serviceId = %{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
 
     int32_t ret = SENSOR_FAILURE;
@@ -1148,7 +1147,7 @@ int32_t SensorIfService::UnRegSensorPlugCallBack(const sptr<V3_0::ISensorPlugCal
 #ifdef TV_FLAG
     ret = sensorVdiImplV1_1_->UnRegSensorPlugCallBack(callbackObj);
 #else
-    HDF_LOGI("%{public}s: sensorVdiImplV1_1_ not support", __func__);
+    HDF_LOGI("%{public}s not support", __func__);
     ret = SENSOR_SUCCESS;
 #endif
     SENSOR_TRACE_FINISH;
