@@ -35,7 +35,6 @@ public:
     virtual ~SensorCallbackVdi() = default;
     explicit SensorCallbackVdi(sptr<V3_0::ISensorCallback> sensorCallback) : sensorCallback_(sensorCallback) {}
     int32_t OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi) override;
-    int32_t OnDataEvent(const V2_0::HdfSensorEvents& event) override;
     int32_t OnDataEvent(const V3_0::HdfSensorEvents& event) override;
     sptr<IRemoteObject> HandleCallbackDeath() override;
 private:
