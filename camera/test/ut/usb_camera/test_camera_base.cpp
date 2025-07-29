@@ -415,7 +415,7 @@ void TestCameraBase::Init()
 void TestCameraBase::UsbInit()
 {
     if (cameraHost == nullptr) {
-        constexpr const char *demoServiceName = "camera_service_usb";
+        constexpr const char *demoServiceName = "camera_service";
         cameraHost = ICameraHost::Get(demoServiceName, false);
         if (cameraHost == nullptr) {
             std::cout << "==========[test log] CreateCameraHost failed." << std::endl;
