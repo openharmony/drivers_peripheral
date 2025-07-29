@@ -118,10 +118,6 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         return ret;
     }
     ret = StaCliCmd(GetEthWpaInsCtrl(), cmd, buf, bufLen);
-    if (strncmp(cmd, "TERMINATE", strlen("TERMINATE")) == 0) {
-        ReleaseEthWpaGlobalInstance();
-        HDF_LOGI("%{public}s: call ReleaseEthWpaGlobalInstance finish", __func__);
-    }
     return ret;
 }
  
