@@ -228,7 +228,7 @@ void SensorClientsManager::UpdateClientPeriodCount(SensorHandle sensorHandle, in
             int32_t periodCount =
                     client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval / samplingInterval;
             result += " pid" + std::to_string(entry.first) +
-                    SENSOR_HANDLE_TO_STRING(sensorHandle) + "periodCount=" +
+                    SENSOR_HANDLE_TO_STRING(sensorHandle) + "count=" +
                       std::to_string(client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval)
                       + "/" + std::to_string(samplingInterval) + "=" + std::to_string(periodCount);
             client.periodCountMap_[sensorHandle] = periodCount;
