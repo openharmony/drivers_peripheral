@@ -1248,9 +1248,12 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const uint32_t devId, co
 sptr<IAudioCallback> AudioAdapterInterfaceImpl::GetRenderCallback(const uint32_t devId)
 {
     DHLOGI("GetRenderCallback enter.");
+    uint32_t devIdInt = devId;
     std::lock_guard<std::mutex> devLck(renderDevMtx_);
     auto renderDev = find_if(renderDevs_.begin(), renderDevs_.end(),
-        [devId](std::pair<int32_t, sptr<AudioRenderInterfaceImplBase>> item) { return item.first == devId; });
+        [devIdInt](std::pair<int32_t, sptr<AudioRenderInterfaceImplBase>> item) {
+            return item.first == static_cast<int32_t>(devIdInt);
+        });
     if (renderDev == renderDevs_.end()) {
         DHLOGE("Not find devId:%{public}d", devId);
         return nullptr;
