@@ -663,7 +663,7 @@ int32_t SensorIfService::Disable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo
                                  deviceSensorInfo.location};
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s %{public}s pid%{public}d", __func__,
+    HDF_LOGI("%{public}s %{public}spid%{public}d", __func__,
              SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     return DisableSensor(sensorHandle, serviceId);
