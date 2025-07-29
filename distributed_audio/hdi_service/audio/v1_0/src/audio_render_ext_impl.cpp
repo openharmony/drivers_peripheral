@@ -423,7 +423,9 @@ int32_t AudioRenderExtImpl::ReqMmapBuffer(int32_t reqSize, AudioMmapBufferDescri
     DHLOGI("ReqMmap buffer realsize : %{public}d, minsize: %{public}d, maxsize:%{public}d.",
         realSize, minSize, maxSize);
     desc.totalBufferFrames = realSize;
-    int64_t result = static_cast<int64_t>(realSize) * static_cast<int64_t>(devAttrs_.channelCount) * static_cast<int64_t>(devAttrs_.format);
+    int64_t result = static_cast<int64_t>(realSize) *
+        static_cast<int64_t>(devAttrs_.channelCount) *
+            static_cast<int64_t>(devAttrs_.format);
     CHECK_AND_RETURN_RET_LOG(result > INT32_MAX, HDF_FAILURE, "ashmemLength_ overflow");
     ashmemLength_ = static_cast<int32_t>(result);
     DHLOGI("Init ashmem real sample size : %{public}d, length: %{public}d.", realSize, ashmemLength_);
