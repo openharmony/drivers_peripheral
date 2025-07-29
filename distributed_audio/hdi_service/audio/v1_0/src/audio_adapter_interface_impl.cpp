@@ -1251,7 +1251,7 @@ bool AudioAdapterInterfaceImpl::IsPortsNoReg()
 
 inline bool AudioAdapterInterfaceImpl::IsIdValid(const uint32_t id)
 {
-    if (id >= MAX_AUDIO_STREAM_NUM) {
+    if (id >= static_cast<uint32_t>(MAX_AUDIO_STREAM_NUM)) {
         DHLOGE("Current id:%{public}u is not supported.", id);
         return false;
     }
