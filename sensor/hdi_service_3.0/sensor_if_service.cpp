@@ -144,7 +144,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle) + "mode " +
         std::to_string(mode) + "samplingInterval " + std::to_string(samplingInterval) + "reportInterval " +
         std::to_string(reportInterval));
-    HDF_LOGI("%{public}s %{public}spid%{public}dmode%{public}dinterval%{public}s,%{public}s",
+    HDF_LOGI("%{public}s %{public}spid%{public}dmode%{public}dinterval(%{public}s,%{public}s)",
              __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId, mode,
              std::to_string(samplingInterval / ONE_MILLION).c_str(),
              std::to_string(reportInterval / ONE_MILLION).c_str());
