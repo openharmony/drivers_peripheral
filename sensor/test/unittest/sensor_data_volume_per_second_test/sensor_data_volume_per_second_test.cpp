@@ -101,7 +101,8 @@ namespace {
         int32_t ret = g_sensorInterface->Register(0, g_traditionalCallback);
         EXPECT_EQ(ret, HDF_SUCCESS);
         ret = g_sensorInterface->SetBatch(g_deviceSensorInfo, g_samplingInterval, 0);
-        printf("SetBatch({%s}, 100000000, 0)\r\n", SENSOR_HANDLE_TO_C_STR(g_deviceSensorInfo));
+        printf("SetBatch({%s}, %s, 0)\r\n", SENSOR_HANDLE_TO_C_STR(g_deviceSensorInfo),
+            std::to_string(g_samplingInterval).c_str());
         EXPECT_EQ(ret, HDF_SUCCESS);
         ret = g_sensorInterface->Enable(g_deviceSensorInfo);
         EXPECT_EQ(ret, HDF_SUCCESS);
