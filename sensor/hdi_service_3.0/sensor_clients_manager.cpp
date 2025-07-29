@@ -217,7 +217,7 @@ void SensorClientsManager::UpdateClientPeriodCount(SensorHandle sensorHandle, in
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
         return;
     }
-    std::string result = "";
+    std::string result = SENSOR_HANDLE_TO_STRING(sensorHandle);
     for (auto &entry : clients_[groupId]) {
         auto &client = entry.second;
         if (client.curCountMap_.find(sensorHandle) == client.curCountMap_.end() ||
@@ -227,10 +227,9 @@ void SensorClientsManager::UpdateClientPeriodCount(SensorHandle sensorHandle, in
         if (client.sensorConfigMap_.find(sensorHandle) != client.sensorConfigMap_.end()) {
             int32_t periodCount =
                     client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval / samplingInterval;
-            result += " pid" + std::to_string(entry.first) +
-                    SENSOR_HANDLE_TO_STRING(sensorHandle) + "count=" +
-                      std::to_string(client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval)
-                      + "/" + std::to_string(samplingInterval) + "=" + std::to_string(periodCount);
+            result += " pid" + std::to_string(entry.first) + "count=" +
+                      std::to_string(client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval / ONE_MILLION)
+                      + "/" + std::to_string(samplingInterval / ONE_MILLION) + "=" + std::to_string(periodCount);
             client.periodCountMap_[sensorHandle] = periodCount;
         }
     }

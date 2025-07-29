@@ -145,8 +145,9 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
         std::to_string(mode) + "samplingInterval " + std::to_string(samplingInterval) + "reportInterval " +
         std::to_string(reportInterval));
     HDF_LOGI("%{public}s pid%{public}d%{public}smode%{public}dinterval%{public}s,%{public}s",
-             __func__, serviceId, SENSOR_HANDLE_TO_C_STR(sensorHandle), mode, std::to_string(samplingInterval).c_str(),
-             std::to_string(reportInterval).c_str());
+             __func__, serviceId, SENSOR_HANDLE_TO_C_STR(sensorHandle), mode,
+             std::to_string(samplingInterval / ONE_MILLION).c_str(),
+             std::to_string(reportInterval / ONE_MILLION).c_str());
 
     if (sensorVdiImplV1_1_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -881,7 +882,7 @@ void SensorIfService::VoteInterval(const SensorHandle sensorHandle, uint32_t ser
         }
         samplingInterval = samplingInterval < it->second ? samplingInterval : it->second;
     }
-    HDF_LOGI("%{public}s interval%{public}s", __func__, std::to_string(samplingInterval).c_str());
+    HDF_LOGI("%{public}s interval%{public}s", __func__, std::to_string(samplingInterval / ONE_MILLION).c_str());
 }
 
 int32_t SensorIfService::SetSdcSensor(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo, bool enabled,
