@@ -235,7 +235,13 @@ int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
         DHLOGD("Render has not been created, do not need destroy.");
         return HDF_SUCCESS;
     }
-
+    if (audioRender->GetRenderStatus() == AudioRenderStatus::RENDER_STATUS_CLOSE) {
+        DHLOGI("Render has been closed before.");
+        std::lock_guard<std::mutex> devLck(renderDevMtx_);
+        renderDevs_[renderId] = std::make_pair(0, sptr<AudioRenderInterfaceImplBase>(nullptr));
+        return HDF_SUCCESS;
+    }
+    audioRender->SetRenderStatus(AudioRenderStatus::RENDER_STATUS_CLOSE);
     int32_t ret = CloseRenderDevice(audioRender->GetRenderDesc(), extSpkCallback, dhId, renderId);
     if (ret != DH_SUCCESS) {
         DHLOGE("Close render device failed.");
@@ -245,6 +251,7 @@ int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
         renderDevs_[renderId] = std::make_pair(0, sptr<AudioRenderInterfaceImplBase>(nullptr));
     }
+    DHLOGI("Destroy render: %{public}u done", renderId);
     return HDF_SUCCESS;
 }
 
@@ -351,7 +358,13 @@ int32_t AudioAdapterInterfaceImpl::DestroyCapture(uint32_t captureId)
         DHLOGD("Capture has not been created, do not need destroy.");
         return HDF_SUCCESS;
     }
-
+    if (audioCapture->GetCaptureStatus() == AudioCaptureStatus::CAPTURE_STATUS_CLOSE) {
+        DHLOGI("Capture has been closed before.");
+        std::lock_guard<std::mutex> devLck(capDevMtx_);
+        captureDevs_[captureId] = std::make_pair(0, sptr<AudioCaptureInterfaceImplBase>(nullptr));
+        return HDF_SUCCESS;
+    }
+    audioCapture->SetCaptureStatus(AudioCaptureStatus::CAPTURE_STATUS_CLOSE);
     int32_t ret = CloseCaptureDevice(audioCapture->GetCaptureDesc(), extMicCallback, dhId);
     if (ret != DH_SUCCESS) {
         DHLOGE("Close capture device failed.");
@@ -649,12 +662,13 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
         DHLOGE("Callback is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
+    DHLOGI("DestroyStream start");
     int32_t ret = extSpkCallback->DestroyStream(renderId);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Close audio device failed.");
         return ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL;
     }
-
+    DHLOGI("DestroyStream  %{public}u done", renderId);
     ret = WaitForSANotify(renderId, EVENT_CLOSE_SPK);
     if (ret != DH_SUCCESS) {
         DHLOGE("Wait SA notify failed. ret: %{public}d.", ret);
@@ -1135,6 +1149,7 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const uint32_t streamId, cons
     if (event == EVENT_OPEN_SPK || event == EVENT_CLOSE_SPK) {
         spkNotifyFlag_ = false;
         std::unique_lock<std::mutex> lck(spkWaitMutex_);
+        DHLOGI("spkWaitCond wait start");
         auto status = spkWaitCond_.wait_for(lck, std::chrono::milliseconds(WAIT_MILLISECONDS),
             [this, streamId, event]() {
                 auto isSpkOpened = GetSpkStatus(streamId);
@@ -1152,12 +1167,14 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const uint32_t streamId, cons
             DHLOGE("Wait close render device failed.");
             return errCode_;
         }
+        DHLOGI("spkWaitCond wait end");
         return DH_SUCCESS;
     }
 
     if (event == EVENT_OPEN_MIC || event == EVENT_CLOSE_MIC) {
         micNotifyFlag_ = false;
         std::unique_lock<std::mutex> lck(micWaitMutex_);
+        DHLOGI("micWaitCond wait start");
         auto status = micWaitCond_.wait_for(lck, std::chrono::milliseconds(WAIT_MILLISECONDS), [this, event]() {
             return micNotifyFlag_ ||
                 (event == EVENT_OPEN_MIC && isMicOpened_) || (event == EVENT_CLOSE_MIC && !isMicOpened_);
@@ -1173,6 +1190,7 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const uint32_t streamId, cons
             DHLOGE("Wait close capture device failed.");
             return errCode_;
         }
+        DHLOGI("micWaitCond wait end");
         return DH_SUCCESS;
     }
     return DH_SUCCESS;
