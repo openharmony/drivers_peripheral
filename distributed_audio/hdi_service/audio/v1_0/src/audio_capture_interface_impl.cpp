@@ -147,6 +147,10 @@ int32_t AudioCaptureInterfaceImpl::Start()
 int32_t AudioCaptureInterfaceImpl::Stop()
 {
     DHLOGI("Stop capture.");
+    if (GetCaptureStatus() != CAPTURE_STATUS_START) {
+        DHLOGI("Capture has not been started.");
+        return HDF_SUCCESS;
+    }
     cJSON *jParam = cJSON_CreateObject();
     if (jParam == nullptr) {
         DHLOGE("Failed to create cJSON object.");
@@ -375,6 +379,20 @@ void AudioCaptureInterfaceImpl::SetAttrs(const std::string &adpName, const Audio
 void AudioCaptureInterfaceImpl::SetDumpFlagInner()
 {
     dumpFlag_ = true;
+}
+
+AudioCaptureStatus AudioCaptureInterfaceImpl::GetCaptureStatus()
+{
+    std::lock_guard<std::mutex> captureLck(captureMtx_);
+    DHLOGI("Get capture status = %{public}d", static_cast<int32_t>(captureStatus_));
+    return captureStatus_;
+}
+
+void AudioCaptureInterfaceImpl::SetCaptureStatus(AudioCaptureStatus status)
+{
+    std::lock_guard<std::mutex> captureLck(captureMtx_);
+    captureStatus_ = status;
+    DHLOGI("Set capture status = %{public}d", static_cast<int32_t>(captureStatus_));
 }
 
 const AudioDeviceDescriptor &AudioCaptureInterfaceImpl::GetCaptureDesc()
