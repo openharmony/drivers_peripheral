@@ -422,7 +422,7 @@ BENCHMARK_F(SensorBenchmarkTest, RegisterAsync)(benchmark::State &state)
         for (auto _ : state) {
             ret = g_sensorInterface->RegisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
-            ret = g_sensorInterface->UnregisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallbackTest);
+            ret = g_sensorInterface->UnregisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
