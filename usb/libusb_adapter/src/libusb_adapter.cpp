@@ -272,7 +272,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         ret = libusb_open(device, &devHandle);
         if (ret != HDF_SUCCESS || devHandle == nullptr) {
             HDF_LOGE("%{public}s:Opening device failed ret = %{public}d", __func__, ret);
-            ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "Opening device failed", device);
+            ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "Opening device failed");
             libusb_unref_device(device);
             return HDF_FAILURE;
         }
