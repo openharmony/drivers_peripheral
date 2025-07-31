@@ -47,6 +47,7 @@ namespace {
     constexpr int32_t SENSOR_WAIT_TIME = 10;
     constexpr uint32_t OPTION = 0;
     constexpr uint32_t SENSOR_DATA_FLAG = 1;
+    constexpr int32_t RATE_LEVEL = 50;
 
 class SensorBenchmarkTest : public benchmark::Fixture {
 public:
@@ -339,6 +340,118 @@ BENCHMARK_F(SensorBenchmarkTest, SetOption)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetOption)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_SetSdcSensor
+  * @tc.desc: Benchmarktest for interface SetSdcSensor
+  * Sets options for the specified sensor, including its measurement range and accuracy
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, SetSdcSensor)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+    EXPECT_GT(g_info.size(), 0);
+
+    int32_t ret;
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info) {
+        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
+                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
+                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
+                 iter.sensorName.c_str(), iter.power);
+        for (auto _ : state) {
+            ret = g_sensorInterface->SetSdcSensor({0, iter.deviceSensorInfo.sensorType, 0, 0}, true, RATE_LEVEL);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            OsalMSleep(SENSOR_WAIT_TIME);
+            ret = g_sensorInterface->SetSdcSensor({0, iter.deviceSensorInfo.sensorType, 0, 0}, false, RATE_LEVEL);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+        }
+    }
 }
 
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetSdcSensor)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_GetSdcSensorInfo
+  * @tc.desc: Benchmarktest for interface GetSdcSensorInfo
+  * Sets options for the specified sensor, including its measurement range and accuracy
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, GetSdcSensorInfo)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+    EXPECT_GT(g_info.size(), 0);
+
+    int32_t ret;
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info) {
+        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
+                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
+                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
+                 iter.sensorName.c_str(), iter.power);
+        for (auto _ : state) {
+            std::vector<OHOS::HDI::Sensor::V3_0::SdcSensorInfo> sdcSensorInfo;
+            ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfo);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+        }
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetSdcSensorInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_RegisterAsync
+  * @tc.desc: Benchmarktest for interface RegisterAsync
+  * Sets options for the specified sensor, including its measurement range and accuracy
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, RegisterAsync)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+    EXPECT_GT(g_info.size(), 0);
+
+    int32_t ret;
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info) {
+        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
+                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
+                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
+                 iter.sensorName.c_str(), iter.power);
+        for (auto _ : state) {
+            ret = g_sensorInterface->RegisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+            ret = g_sensorInterface->UnregisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+        }
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetSdcSensorInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_GetDeviceSensorInfo
+  * @tc.desc: Benchmarktest for interface GetDeviceSensorInfo
+  * Obtains information about all sensors in the system
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, GetDeviceSensorInfo)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret;
+
+    for (auto iter : g_info) {
+        for (auto _ : state) {
+            ret = g_sensorInterface->GetDeviceSensorInfo(iter.deviceSensorInfo.deviceId, g_info);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+        }
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetDeviceSensorInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+}
 BENCHMARK_MAIN();
