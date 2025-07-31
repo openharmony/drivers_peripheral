@@ -49,7 +49,6 @@ namespace HDI {
 namespace Thermal {
 namespace V1_1 {
 namespace {
-constexpr uint8_t LOG_INDEX_LEN = 4;
 constexpr int32_t MAX_FILE_NUM = 10;
 constexpr long int MAX_FILE_SIZE = 10 * 1024 * 1024;
 constexpr int32_t MAX_TIME_LEN = 20;
@@ -65,10 +64,8 @@ const std::string THERMAL_LOG_ENABLE = "persist.thermal.log.enable";
 const std::string THERMAL_LOG_WIDTH = "persist.thermal.log.width";
 const std::string THERMAL_LOG_INTERVAL = "persist.thermal.log.interval";
 const std::string DATA_FILE_PATH = "/data";
-uint32_t g_currentLogIndex = 0;
 bool g_firstReport = true;
 bool g_firstCreate = true;
-std::deque<std::string> g_saveLogFile;
 std::string g_outPath = "";
 std::string g_logTime = "";
 }
@@ -131,14 +128,6 @@ ThermalDfx::ThermalDfx() :
 ThermalDfx::~ThermalDfx()
 {
     enable_ = false;
-}
-
-std::string ThermalDfx::GetFileNameIndex(const uint32_t index)
-{
-    char res[LOG_INDEX_LEN];
-    (void)snprintf_s(res, sizeof(res), sizeof(res) - 1, "%03d", index % MAX_FILE_NUM);
-    std::string fileNameIndex(res);
-    return fileNameIndex;
 }
 
 std::string ThermalDfx::CanonicalizeSpecPath(const char* src)
@@ -215,7 +204,7 @@ void ThermalDfx::CompressFile()
     HitraceScopedEx trace(HITRACE_LEVEL_COMMERCIAL, HITRACE_TAG_POWER, "ThermalDfx_CompressFile");
 #endif
     THERMAL_HILOGD(COMP_HDI, "CompressFile start");
-    std::string unCompressFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) + "." + g_logTime;
+    std::string unCompressFile = g_outPath + "/thermal.000." + g_logTime;
 
     FILE* fp = fopen(unCompressFile.c_str(), "rb");
     if (fp == nullptr) {
@@ -241,8 +230,7 @@ void ThermalDfx::CompressFile()
         THERMAL_HILOGW(COMP_HDI, "fclose() failed");
     }
 
-    std::string compressFile =
-        g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) + "." + g_logTime + ".gz";
+    std::string compressFile = g_outPath + "/thermal.000." + g_logTime + ".gz";
     if (!Compress(unCompressFile, compressFile)) {
         THERMAL_HILOGE(COMP_HDI, "CompressFile fail");
         return;
@@ -252,16 +240,69 @@ void ThermalDfx::CompressFile()
         THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", unCompressFile.c_str());
     }
 
-    if (g_saveLogFile.size() >= MAX_FILE_NUM) {
-        if (remove(g_saveLogFile.front().c_str()) != 0) {
-            THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", compressFile.c_str());
-        }
-        g_saveLogFile.pop_front();
-    }
-    g_saveLogFile.push_back(compressFile);
-    g_currentLogIndex++;
+    RemoveLogFile();
     g_logTime = GetCurrentTime(TIME_FORMAT_1);
     THERMAL_HILOGD(COMP_HDI, "CompressFile done");
+}
+
+void ThermalDfx::RemoveLogFile()
+{
+    DIR* dir = opendir(g_outPath.c_str());
+    if (dir == nullptr) {
+        THERMAL_HILOGE(COMP_HDI, "Failed to open directory: %{public}s, errno = %{public}d",
+            g_outPath.c_str(), errno);
+        return;
+    }
+
+    struct dirent* entry;
+    std::vector<std::string> fileList;
+    while ((entry = readdir(dir)) != nullptr) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+        fileList.push_back(entry->d_name);
+    }
+    if (static_cast<int32_t>(fileList.size()) > MAX_FILE_NUM) {
+        std::sort(fileList.begin(), fileList.end());
+        for (size_t index = 0; index < (fileList.size() - MAX_FILE_NUM); index++) {
+            if (remove((g_outPath + "/" + fileList[index]).c_str()) != 0) {
+                THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", fileList[index].c_str());
+            }
+        }
+    }
+
+    closedir(dir);
+}
+
+void ThermalDfx::CompressAllFile()
+{
+    DIR* dir = opendir(g_outPath.c_str());
+    if (dir == nullptr) {
+        THERMAL_HILOGE(COMP_HDI, "Failed to open directory: %{public}s, errno = %{public}d",
+            g_outPath.c_str(), errno);
+        return;
+    }
+
+    std::string compressExtension = ".gz";
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+        std::string unCompressFile(entry->d_name);
+        if (unCompressFile.rfind(compressExtension) != std::string::npos) {
+            continue;
+        }
+        unCompressFile = g_outPath + "/" + unCompressFile;
+        std::string compressFile = unCompressFile + compressExtension;
+        if (!Compress(unCompressFile, compressFile)) {
+            THERMAL_HILOGE(COMP_HDI, "CompressFile fail");
+            return;
+        }
+        if (remove(unCompressFile.c_str()) != 0) {
+            THERMAL_HILOGW(COMP_HDI, "failed to remove file %{private}s", unCompressFile.c_str());
+        }
+    }
 }
 
 bool ThermalDfx::PrepareWriteDfxLog()
@@ -289,12 +330,12 @@ void ThermalDfx::CreateLogFile()
         return;
     }
     if (g_firstCreate) {
-        g_currentLogIndex = 0;
         g_logTime = GetCurrentTime(TIME_FORMAT_1);
+        RemoveLogFile();
+        CompressAllFile();
         g_firstCreate = false;
     }
-    std::string logFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
-        "." + g_logTime;
+    std::string logFile = g_outPath + "/thermal.000." + g_logTime;
     if (access(g_outPath.c_str(), 0) == -1) {
         auto ret = ForceCreateDirectory(g_outPath.c_str());
         if (!ret) {
