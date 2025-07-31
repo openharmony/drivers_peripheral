@@ -20,6 +20,7 @@ group("hdf_test_motion") {
     deps += [
       "fuzztest/motion_fuzzer:hdf_fuzztest_motion",
       "unittest/hdi:hdi_unittest_motion",
+      "benchmark/hdf_motion_benchmark_test",
     ]
   }
 }
