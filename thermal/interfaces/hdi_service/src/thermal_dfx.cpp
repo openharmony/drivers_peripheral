@@ -303,6 +303,8 @@ void ThermalDfx::CompressAllFile()
             THERMAL_HILOGW(COMP_HDI, "failed to remove file %{private}s", unCompressFile.c_str());
         }
     }
+
+    closedir(dir);
 }
 
 bool ThermalDfx::PrepareWriteDfxLog()
