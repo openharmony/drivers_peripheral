@@ -163,7 +163,7 @@ void SensorCallbackVdi::StatisticsCount(const SensorHandle& sensorHandle,
     if (sensorDataCountMap.find(sensorHandle) != sensorDataCountMap.end()) {
         nowDataCount = sensorDataCountMap.at(sensorHandle);
     }
-    if (lastPerSecondCountMap.find(sensorHandle) == perSecondCountStringMap.end()) {
+    if (lastPerSecondCountMap.find(sensorHandle) == lastPerSecondCountMap.end()) {
         lastPerSecondCountMap[sensorHandle] = 0;
     }
     if (perSecondCountStringMap.find(sensorHandle) == perSecondCountStringMap.end() || perSecondCountStringMap[sensorHandle] == "") {
