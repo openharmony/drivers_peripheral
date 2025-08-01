@@ -155,12 +155,11 @@ void SensorCallbackVdi::PrintCount(const std::unordered_map<SensorHandle, int64_
         recordTime = currentTime;
         for (const auto &entry : sensorDataCountMap) {
             HDF_LOGI("%{public}s: sensorHandle=%{public}s, dataCount=%{public}s",
-                     __func__, SENSOR_HANDLE_TO_C_STR(entry.first), std::to_string(entry.second));
+                     __func__, SENSOR_HANDLE_TO_C_STR(entry.first), std::to_string(entry.second).c_str());
         }
     }
 
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 60000) {
-        std::cout << "Task 2: 3000 ms passed, printing log B." << std::endl;
         printTime = currentTime;
     }
 
