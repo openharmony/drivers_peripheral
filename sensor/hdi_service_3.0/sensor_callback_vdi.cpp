@@ -153,7 +153,7 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     static std::unordered_map<SensorHandle, std::string> perSecondCountMap;
 
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 100) {
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 300) {
         recordTime = currentTime;
         if (perSecondCountMap.find(sensorHandle) == perSecondCountMap.end()) {
             perSecondCountMap[sensorHandle] = "";
@@ -163,7 +163,7 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
         }
     }
 
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 5000) {
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 6000) {
         printTime = currentTime;
         HDF_LOGI("%{public}s:%{public}s count %{public}s",
                     __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), perSecondCountMap[sensorHandle].c_str());
