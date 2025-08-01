@@ -179,9 +179,7 @@ void SensorCallbackVdi::PrintCount(
 {
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 300) {
         recordTime = currentTime;
-        if (sensorDataCountMap.find(sensorHandle) != sensorDataCountMap.end()) {
-            result += " " + std::to_string(dataCount);
-        }
+        result += " " + std::to_string(dataCount);
     }
 
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 6000) {
