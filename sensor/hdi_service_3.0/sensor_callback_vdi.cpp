@@ -79,6 +79,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
         it->second++;
         dataCount = it->second;
     }
+    PrintCount(sensorDataCountMap);
     bool result = isPrint;
     if (!isPrint) {
         if (firstTimestampMap_[sensorHandle] == 0) {
@@ -142,6 +143,28 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
 
     OsalMemFree(origin);
     return;
+}
+
+void SensorCallbackVdi::PrintCount(const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap)
+{
+    static std::chrono::steady_clock::time_point recordTime = std::chrono::steady_clock::now();
+    static std::chrono::steady_clock::time_point printTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 3000) {
+        recordTime = currentTime;
+        for (const auto &entry : sensorDataCountMap) {
+            HDF_LOGI("%{public}s: sensorHandle=%{public}s, dataCount=%{public}" PRId64,
+                     __func__, SENSOR_HANDLE_TO_C_STR(entry.first), entry.second);
+        }
+    }
+
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 60000) {
+        std::cout << "Task 2: 3000 ms passed, printing log B." << std::endl;
+        printTime = currentTime;
+    }
+
+    lastCallTime = currentTime;
 }
 
 sptr<IRemoteObject> SensorCallbackVdi::HandleCallbackDeath()
