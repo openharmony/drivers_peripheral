@@ -170,7 +170,7 @@ void SensorCallbackVdi::StatisticsCount(const SensorHandle& sensorHandle,
         perSecondCountStringMap[sensorHandle] = SENSOR_HANDLE_TO_STRING(sensorHandle);
     }
     int64_t perDataCount = nowDataCount - lastPerSecondCountMap[sensorHandle];
-    PrintCount(lastPerSecondCountMap[sensorHandle], lastPrintTimeMap[sensorHandle], currentTime, perDataCount,
+    PrintCount(lastRecordTimeMap[sensorHandle], lastPrintTimeMap[sensorHandle], currentTime, perDataCount,
         perSecondCountStringMap[sensorHandle]);
 }
 
