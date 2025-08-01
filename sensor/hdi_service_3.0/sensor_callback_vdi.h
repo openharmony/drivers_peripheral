@@ -42,8 +42,12 @@ private:
                    const SensorHandle& sensorHandle);
     void StatisticsCount(const SensorHandle& sensorHandle,
         const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap);
-    void PrintCount(const SensorHandle& sensorHandle,
-        const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap);
+    void PrintCount(
+        std::chrono::steady_clock::time_point &recordTime,
+        std::chrono::steady_clock::time_point &printTime,
+        std::chrono::steady_clock::time_point &currentTime,
+        int64_t &dataCount,
+        std::string &result);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
     SensorClientInfo sensorClientInfo_;
     sptr<V3_0::ISensorCallback> sensorCallback_;
