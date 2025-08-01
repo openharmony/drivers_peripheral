@@ -148,25 +148,30 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
 void SensorCallbackVdi::StatisticsCount(const SensorHandle& sensorHandle,
     const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap)
 {
-    static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> recordTimeMap;
-    static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> printTimeMap;
-    static std::unordered_map<SensorHandle, std::string> perSecondCountMap;
-    if (recordTimeMap.find(sensorHandle) == recordTimeMap.end()) {
-        recordTimeMap[sensorHandle] = std::chrono::steady_clock::now();
+    static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> lastRecordTimeMap;
+    static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> lastPrintTimeMap;
+    static std::unordered_map<SensorHandle, std::string> lastPerSecondCountMap;
+    static std::unordered_map<SensorHandle, std::string> perSecondCountStringMap;
+    if (lastRecordTimeMap.find(sensorHandle) == lastRecordTimeMap.end()) {
+        lastRecordTimeMap[sensorHandle] = std::chrono::steady_clock::now();
     }
-    if (printTimeMap.find(sensorHandle) == printTimeMap.end()) {
-        printTimeMap[sensorHandle] = std::chrono::steady_clock::now();
+    if (lastPrintTimeMap.find(sensorHandle) == lastPrintTimeMap.end()) {
+        lastPrintTimeMap[sensorHandle] = std::chrono::steady_clock::now();
     }
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-    int64_t dataCount = INIT_DATA_COUNT;
+    int64_t nowDataCount = INIT_DATA_COUNT;
     if (sensorDataCountMap.find(sensorHandle) != sensorDataCountMap.end()) {
-        dataCount = sensorDataCountMap.at(sensorHandle);
+        nowDataCount = sensorDataCountMap.at(sensorHandle);
     }
-    if (perSecondCountMap.find(sensorHandle) == perSecondCountMap.end() || perSecondCountMap[sensorHandle] == "") {
-        perSecondCountMap[sensorHandle] = SENSOR_HANDLE_TO_STRING(sensorHandle);
+    if (lastPerSecondCountMap.find(sensorHandle) == perSecondCountStringMap.end()) {
+        lastPerSecondCountMap[sensorHandle] = 0;
     }
-    PrintCount(recordTimeMap[sensorHandle], printTimeMap[sensorHandle], currentTime, dataCount,
-        perSecondCountMap[sensorHandle]);
+    if (perSecondCountStringMap.find(sensorHandle) == perSecondCountStringMap.end() || perSecondCountStringMap[sensorHandle] == "") {
+        perSecondCountStringMap[sensorHandle] = SENSOR_HANDLE_TO_STRING(sensorHandle);
+    }
+    int64_t perDataCount = nowDataCount - lastPerSecondCountMap[sensorHandle];
+    PrintCount(lastPerSecondCountMap[sensorHandle], lastPrintTimeMap[sensorHandle], currentTime, perDataCount,
+        perSecondCountStringMap[sensorHandle]);
 }
 
 
