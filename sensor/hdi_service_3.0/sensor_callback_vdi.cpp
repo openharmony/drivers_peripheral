@@ -154,8 +154,8 @@ void SensorCallbackVdi::PrintCount(const std::unordered_map<SensorHandle, int64_
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 3000) {
         recordTime = currentTime;
         for (const auto &entry : sensorDataCountMap) {
-            HDF_LOGI("%{public}s: sensorHandle=%{public}s, dataCount=%{public}" PRId64,
-                     __func__, SENSOR_HANDLE_TO_C_STR(entry.first), entry.second);
+            HDF_LOGI("%{public}s: sensorHandle=%{public}s, dataCount=%{public}s",
+                     __func__, SENSOR_HANDLE_TO_C_STR(entry.first), std::to_string(entry.second));
         }
     }
 
