@@ -301,9 +301,6 @@ BENCHMARK_F(VibratorBenchmarkTest, IsVibratorRunning)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(VibratorBenchmarkTest, IsVibratorRunning)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-}
-
-BENCHMARK_MAIN();
 
 /**
   * @tc.name: DriverSystem_VibratorBenchmark_PlayPatternBySessionId
@@ -327,6 +324,9 @@ BENCHMARK_F(VibratorBenchmarkTest, PlayPatternBySessionId)(benchmark::State &sta
     }
 }
 
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetEffectInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
 /**
   * @tc.name: DriverSystem_VibratorBenchmark_PlayPackageBySession
   * @tc.desc: Benchmarktest for interface PlayPackageBySession
@@ -349,3 +349,8 @@ BENCHMARK_F(VibratorBenchmarkTest, PlayPackageBySession)(benchmark::State &state
     }
 }
 
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetEffectInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+}
+
+BENCHMARK_MAIN();
