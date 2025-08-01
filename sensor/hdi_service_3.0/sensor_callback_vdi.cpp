@@ -162,7 +162,7 @@ void SensorCallbackVdi::StatisticsCount(const SensorHandle& sensorHandle,
     if (sensorDataCountMap.find(sensorHandle) != sensorDataCountMap.end()) {
         dataCount = sensorDataCountMap.at(sensorHandle);
     }
-    if (perSecondCountMap.find(sensorHandle) == perSecondCountMap.end()) {
+    if (perSecondCountMap.find(sensorHandle) == perSecondCountMap.end() || perSecondCountMap[sensorHandle] == "") {
         perSecondCountMap[sensorHandle] = SENSOR_HANDLE_TO_STRING(sensorHandle);
     }
     PrintCount(recordTimeMap[sensorHandle], printTimeMap[sensorHandle], currentTime, dataCount,
@@ -185,6 +185,7 @@ void SensorCallbackVdi::PrintCount(
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 6000) {
         printTime = currentTime;
         HDF_LOGI("%{public}s:%{public}s", __func__, result.c_str());
+        result = "";
     }
 }
 
