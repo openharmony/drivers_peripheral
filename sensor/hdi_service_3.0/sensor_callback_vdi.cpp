@@ -150,7 +150,7 @@ void SensorCallbackVdi::StatisticsCount(const SensorHandle& sensorHandle,
 {
     static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> lastRecordTimeMap;
     static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> lastPrintTimeMap;
-    static std::unordered_map<SensorHandle, std::string> lastPerSecondCountMap;
+    static std::unordered_map<SensorHandle, int64_t> lastPerSecondCountMap;
     static std::unordered_map<SensorHandle, std::string> perSecondCountStringMap;
     if (lastRecordTimeMap.find(sensorHandle) == lastRecordTimeMap.end()) {
         lastRecordTimeMap[sensorHandle] = std::chrono::steady_clock::now();
