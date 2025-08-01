@@ -162,8 +162,6 @@ void SensorCallbackVdi::PrintCount(const std::unordered_map<SensorHandle, int64_
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 60000) {
         printTime = currentTime;
     }
-
-    lastCallTime = currentTime;
 }
 
 sptr<IRemoteObject> SensorCallbackVdi::HandleCallbackDeath()
