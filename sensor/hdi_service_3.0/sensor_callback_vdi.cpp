@@ -145,22 +145,28 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
     return;
 }
 
-void SensorCallbackVdi::PrintCount(const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap)
+void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
+    const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap)
 {
     static std::chrono::steady_clock::time_point recordTime = std::chrono::steady_clock::now();
     static std::chrono::steady_clock::time_point printTime = std::chrono::steady_clock::now();
-    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    static std::unordered_map<SensorHandle, std::string> perSecondCountMap;
 
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 3000) {
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 100) {
         recordTime = currentTime;
-        for (const auto &entry : sensorDataCountMap) {
-            HDF_LOGI("%{public}s: sensorHandle=%{public}s, dataCount=%{public}s",
-                     __func__, SENSOR_HANDLE_TO_C_STR(entry.first), std::to_string(entry.second).c_str());
+        if (perSecondCountMap.find(sensorHandle) == perSecondCountMap.end()) {
+            perSecondCountMap[sensorHandle] = "";
+        }
+        if (sensorDataCountMap.find(sensorHandle) != sensorDataCountMap.end()) {
+            perSecondCountMap[sensorHandle] += std::to_string(sensorDataCountMap.at(sensorHandle)) + " ";
         }
     }
 
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 60000) {
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 5000) {
         printTime = currentTime;
+        HDF_LOGI("%{public}s:%{public}s count %{public}s",
+                    __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), perSecondCountMap[sensorHandle].c_str());
     }
 }
 
