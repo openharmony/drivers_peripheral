@@ -145,28 +145,51 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
     return;
 }
 
-void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
+void SensorCallbackVdi::StatisticsCount(const SensorHandle& sensorHandle,
     const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap)
 {
-    static std::chrono::steady_clock::time_point recordTime = std::chrono::steady_clock::now();
-    static std::chrono::steady_clock::time_point printTime = std::chrono::steady_clock::now();
+    static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> recordTimeMap;
+    static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> printTimeMap;
     static std::unordered_map<SensorHandle, std::string> perSecondCountMap;
-
+    if (recordTimeMap.find(sensorHandle) == recordTimeMap.end()) {
+        recordTimeMap[sensorHandle] = std::chrono::steady_clock::now();
+    }
+    if (printTimeMap.find(sensorHandle) == printTimeMap.end()) {
+        printTimeMap[sensorHandle] = std::chrono::steady_clock::now();
+    }
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    int64_t dataCount = INIT_DATA_COUNT;
+    if (sensorDataCountMap.find(sensorHandle) != sensorDataCountMap.end()) {
+        dataCount = sensorDataCountMap.at(sensorHandle);
+    }
+    if (perSecondCountMap.find(sensorHandle) == perSecondCountMap.end()) {
+        perSecondCountMap[sensorHandle] = SENSOR_HANDLE_TO_STRING(sensorHandle);
+    }
+    PrintCount(recordTimeMap[sensorHandle], printTimeMap[sensorHandle], currentTime, dataCount,
+        perSecondCountMap[sensorHandle]);
+}
+
+
+void SensorCallbackVdi::PrintCount(
+    std::chrono::steady_clock::time_point &recordTime,
+    std::chrono::steady_clock::time_point &printTime,
+    std::chrono::steady_clock::time_point &currentTime,
+    int64_t &dataCount,
+    std::string &result)
+{
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 300) {
         recordTime = currentTime;
         if (perSecondCountMap.find(sensorHandle) == perSecondCountMap.end()) {
             perSecondCountMap[sensorHandle] = "";
         }
         if (sensorDataCountMap.find(sensorHandle) != sensorDataCountMap.end()) {
-            perSecondCountMap[sensorHandle] += std::to_string(sensorDataCountMap.at(sensorHandle)) + " ";
+            result += " " + std::to_string(dataCount);
         }
     }
 
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 6000) {
         printTime = currentTime;
-        HDF_LOGI("%{public}s:%{public}s count %{public}s",
-                    __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), perSecondCountMap[sensorHandle].c_str());
+        HDF_LOGI("%{public}s:%{public}s", __func__, result.c_str());
     }
 }
 
