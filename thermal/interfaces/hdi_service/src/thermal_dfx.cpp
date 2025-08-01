@@ -297,6 +297,7 @@ void ThermalDfx::CompressAllFile()
         std::string compressFile = unCompressFile + compressExtension;
         if (!Compress(unCompressFile, compressFile)) {
             THERMAL_HILOGE(COMP_HDI, "CompressFile fail");
+            closedir(dir);
             return;
         }
         if (remove(unCompressFile.c_str()) != 0) {
