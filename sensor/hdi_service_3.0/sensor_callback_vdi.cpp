@@ -178,7 +178,7 @@ void SensorCallbackVdi::PrintCount(
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= 1000) {
         lastRecordTime += std::chrono::milliseconds(1000);
         int64_t perSecondCount = nowDataCount - lastSecondCount;
-        HDF_LOGI("%{public}s: perSecondCount: %lld, samplingInterval: %lld", __func__, perSecondCount, samplingInterval);
+        HDF_LOGI("%{public}s: perSecondCount: %{public}s, samplingInterval: %{public}s", __func__, std::to_string(perSecondCount).c_str(), std::to_string(samplingInterval).c_str());
         lastSecondCount = nowDataCount;
     }
 }
