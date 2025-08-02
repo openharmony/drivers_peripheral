@@ -170,7 +170,9 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
         targetCount = std::ceil(1000000000.0 / (double)samplingInterval);
     }
     int64_t acceptablError = targetCount / 10;
-
+    if (acceptablError == 0) {
+        acceptablError = 1; // Ensure there's always some tolerance
+    }
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= 1000) {
         lastRecordTime += std::chrono::milliseconds(1000);
         int64_t perSecondCount = nowDataCount - lastSecondCount;
