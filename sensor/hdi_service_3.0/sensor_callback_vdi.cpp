@@ -34,6 +34,12 @@ namespace {
     constexpr int32_t ONE_SECOND = 1000;
     static std::unordered_map<SensorHandle, int64_t> firstTimestampMap_;
     static std::unordered_map<SensorHandle, int64_t> lastTimestampMap_;
+    const std::vector<int32_t> needPrintCountSensor = {HDF_SENSOR_TYPE_ACCELEROMETER, HDF_SENSOR_TYPE_GYROSCOPE,
+                                                  HDF_SENSOR_TYPE_MAGNETIC_FIELD,
+                                                  HDF_SENSOR_TYPE_LINEAR_ACCELERATION, HDF_SENSOR_TYPE_ROTATION_VECTOR,
+                                                  HDF_SENSOR_TYPE_MAGNETIC_FIELD_UNCALIBRATED,
+                                                  HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED,
+                                                  HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED};
 }
 
 int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
@@ -84,7 +90,9 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
         it->second++;
         dataCount = it->second;
     }
-    PrintCount(sensorHandle, sensorDataCountMap, samplingInterval);
+    if (NeedPrintCount(sensorHandle)) {
+        PrintCount(sensorHandle, sensorDataCountMap, samplingInterval);
+    }
     bool result = isPrint;
     if (!isPrint) {
         if (firstTimestampMap_[sensorHandle] == 0) {
@@ -148,6 +156,11 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
 
     OsalMemFree(origin);
     return;
+}
+
+bool SensorCallbackVdi::NeedPrintCount(SensorHandle sensorHandle)
+{
+    return std::find(needPrintCountSensor.begin(), needPrintCountSensor.end(), sensorHandle.sensorType) != needPrintCountSensor.end();
 }
 
 void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
