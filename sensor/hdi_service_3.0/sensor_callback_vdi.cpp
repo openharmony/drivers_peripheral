@@ -167,7 +167,7 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     int64_t &lastSecondCount = lastSecondCountMap[sensorHandle];
     int64_t targetCount = 0;
     if (samplingInterval > 0) {
-        targetCount = 1000000000 / samplingInterval;
+        targetCount = std::ceil(1000000000.0 / samplingInterval);;
     }
     int64_t acceptablError = targetCount / 10;
 
