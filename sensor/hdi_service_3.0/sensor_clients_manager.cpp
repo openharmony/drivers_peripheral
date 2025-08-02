@@ -574,7 +574,7 @@ void SensorClientsManager::HdiReportData(const sptr<V3_0::ISensorCallback> &call
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s Sensor OnDataEvent failed, error code is %{public}d, "
             "sensorInfoId is (%{public}s,%{public}d)", __func__, ret,
-            SENSOR_INFO_ID_TO_STRING(sensorInfoId.sensorHandle).c_str(), sensorInfoId.serviceId);
+            SENSOR_HANDLE_TO_C_STR(sensorInfoId.sensorHandle), sensorInfoId.serviceId);
     } else {
         auto it = sensorReportCountMap[sensorInfoId.sensorHandle].find(sensorInfoId.serviceId);
         int64_t reportCount = INIT_REPORT_COUNT;
