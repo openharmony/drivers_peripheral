@@ -42,7 +42,7 @@ private:
                    const SensorHandle& sensorHandle, const int64_t &samplingInterval);
     void StatisticsCount(const SensorHandle& sensorHandle,
         const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap, const int64_t &samplingInterval);
-    void SensorCallbackVdi::PrintCount(
+    void PrintCount(
         std::chrono::steady_clock::time_point &lastRecordTime,
         std::chrono::steady_clock::time_point &currentTime,
         int64_t &lastSecondCount,
