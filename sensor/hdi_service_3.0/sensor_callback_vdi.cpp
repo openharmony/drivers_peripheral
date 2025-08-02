@@ -37,7 +37,6 @@ namespace {
     const std::vector<int32_t> needPrintCountSensor = {HDF_SENSOR_TYPE_ACCELEROMETER, HDF_SENSOR_TYPE_GYROSCOPE,
                                                   HDF_SENSOR_TYPE_MAGNETIC_FIELD,
                                                   HDF_SENSOR_TYPE_LINEAR_ACCELERATION, HDF_SENSOR_TYPE_ROTATION_VECTOR,
-                                                  HDF_SENSOR_TYPE_MAGNETIC_FIELD_UNCALIBRATED,
                                                   HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED,
                                                   HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED};
 }
