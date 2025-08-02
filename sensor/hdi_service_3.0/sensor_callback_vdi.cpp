@@ -28,6 +28,10 @@ namespace {
     constexpr int32_t DATA_LEN = 256;
     constexpr int64_t REPOPRT_TIME = 60000000000;
     constexpr int64_t INIT_DATA_COUNT = 1;
+    constexpr int64_t DEFAULT_ERROR_RATIO = 10;
+    constexpr int64_t DEFAULT_ACCEPTABLE_ERROR = 1;
+    constexpr double COMMON_REPORT_FREQUENCY = 1000000000.0;
+    constexpr int32_t ONE_SECOND = 1000;
     static std::unordered_map<SensorHandle, int64_t> firstTimestampMap_;
     static std::unordered_map<SensorHandle, int64_t> lastTimestampMap_;
 }
@@ -167,17 +171,23 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     int64_t &lastSecondCount = lastSecondCountMap[sensorHandle];
     int64_t targetCount = 0;
     if (samplingInterval > 0) {
-        targetCount = std::ceil(1000000000.0 / (double)samplingInterval);
+        targetCount = std::ceil(COMMON_REPORT_FREQUENCY / (double)samplingInterval);
     }
-    int64_t acceptablError = targetCount / 10;
+    int64_t acceptablError = targetCount / DEFAULT_ERROR_RATIO;
     if (acceptablError == 0) {
-        acceptablError = 1; // Ensure there's always some tolerance
+        acceptablError = DEFAULT_ACCEPTABLE_ERROR; // Ensure there's always some tolerance
     }
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= 1000) {
-        lastRecordTime += std::chrono::milliseconds(1000);
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= ONE_SECOND) {
+        lastRecordTime += std::chrono::milliseconds(ONE_SECOND);
         int64_t perSecondCount = nowDataCount - lastSecondCount;
-        HDF_LOGI("%{public}s: %{public}s perSecondCount %{public}s targetCount %{public}s~%{public}s samplingInterval %{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(perSecondCount).c_str(), std::to_string(targetCount - acceptablError).c_str(), std::to_string(targetCount + acceptablError).c_str(), std::to_string(samplingInterval / ONE_MILLION).c_str());
         lastSecondCount = nowDataCount;
+        if (targetCount - acceptablError < perSecondCount || perSecondCount > targetCount + acceptablError) {
+            return; // Skip logging if the count is within acceptable range
+        }
+        HDF_LOGI("%{public}s: %{public}s perSecondCount %{public}s targetCount %{public}s~%{public}s samplingInterval "
+            "%{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(perSecondCount).c_str(),
+            std::to_string(targetCount - acceptablError).c_str(), std::to_string(targetCount + acceptablError).c_str(),
+            std::to_string(samplingInterval / ONE_MILLION).c_str());
     }
 }
 
