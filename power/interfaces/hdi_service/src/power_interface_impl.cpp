@@ -102,6 +102,10 @@ static sptr<PowerInterfaceImpl::PowerDeathRecipientExt> g_deathRecipientExt = nu
 static bool g_isPowerHdiExtReg = false;
 #endif
 
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+static constexpr const int32_t REASON_MAX_RETRY_COUNT = 3;
+#endif
+
 extern "C" V1_3::IPowerInterface *PowerInterfaceImplGetInstance(void)
 {
     using OHOS::HDI::Power::V1_3::PowerInterfaceImpl;
@@ -219,6 +223,9 @@ void AutoSuspendLoop()
         DoSuspend();
         g_powerState = PowerHdfState::AWAKE;
         NotifyCallback(CMD_ON_WAKEUP);
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+        g_wakeupTag = WAKEUP_TAG_NONE;
+#endif
     }
     g_suspending = false;
     g_suspendRetry = false;
@@ -282,20 +289,23 @@ int32_t DoSuspendWithTag()
     }
 
     g_ulsr_loop++;
-    bool ret = SaveStringToFd(suspendStateFd, g_suspendTag);
+    // Copy str to avoid g_suspendTag being modified when SaveStringToFd
+    std::string g_suspendTagWrite = g_suspendTag;
+    bool ret = SaveStringToFd(suspendStateFd, g_suspendTagWrite);
     if (!ret) {
         waitTime_ = std::min(waitTime_ * WAIT_TIME_FACTOR, MAX_WAIT_TIME);
-        HDF_LOGE("SaveStringToFd fail, tag:%{public}s loop:%{public}d", g_suspendTag.c_str(), g_ulsr_loop);
+        HDF_LOGE("SaveStringToFd fail, tag:%{public}s loop:%{public}d", g_suspendTagWrite.c_str(), g_ulsr_loop);
         if (g_ulsr_loop >= MAX_RETRY_COUNT) {
-            HDF_LOGE("DoSuspendWithTag fail: %{public}s", g_suspendTag.c_str());
+            HDF_LOGE("DoSuspendWithTag fail: %{public}s", g_suspendTagWrite.c_str());
             g_suspendTag.clear();
             waitTime_ = DEFAULT_WAIT_TIME;
             return HDF_FAILURE;
         }
         return HDF_SUCCESS;
     }
-    HDF_LOGI("Do Suspend %{public}d: echo %{public}s > /sys/power/state", g_ulsr_loop, g_suspendTag.c_str());
+    HDF_LOGI("Do Suspend %{public}d: echo %{public}s > /sys/power/state", g_ulsr_loop, g_suspendTagWrite.c_str());
     g_suspendTag.clear();
+    g_wakeupTag = g_suspendTagWrite;
     waitTime_ = DEFAULT_WAIT_TIME;
     return HDF_SUCCESS;
 }
@@ -580,7 +590,20 @@ int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
 int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
 {
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
-    return GetPowerConfig("wakeuo_cause", reason);
+    int32_t retryCount = 0;
+    while (retryCount <= REASON_MAX_RETRY_COUNT) {
+        int32_t ret = GetPowerConfig("wakeuo_cause", reason);
+        // Retry reading wakeup reason when (or):
+        //   1. HDF_ERR_BAD_FD: open node failed
+        //   2. Reason is '0\n' (INVALID).
+        if (ret != HDF_ERR_BAD_FD && reason.substr(0, reason.find('\n')) != "0") {
+            return ret;
+        }
+        retryCount++;
+        HDF_LOGW("Wakeup cause read error! retry: %{public}d, max: %{public}d", retryCount, REASON_MAX_RETRY_COUNT);
+    }
+    HDF_LOGE("Wakeup cause read still FAILED after %{public}d retries!", REASON_MAX_RETRY_COUNT);
+    return HDF_FAILURE;
 #else
     HDF_LOGW("wakrup cause path not config");
     return HDF_FAILURE;
@@ -637,7 +660,7 @@ int32_t PowerInterfaceImpl::GetPowerConfig(const std::string &sceneName, std::st
     UniqueFd getValueFd = UniqueFd(TEMP_FAILURE_RETRY(open(getPath.c_str(), O_RDONLY | O_CLOEXEC)));
     if (getValueFd < 0) {
         HDF_LOGE("GetPowerConfig open failed");
-        return HDF_FAILURE;
+        return HDF_ERR_BAD_FD;
     }
     LoadStringFd(getValueFd, value);
     return HDF_SUCCESS;
