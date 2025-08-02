@@ -230,7 +230,8 @@ namespace {
         EXPECT_GT(g_info.size(), 0);
 
         for (auto iter : g_info) {
-            ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+            ret = g_sensorInterface->SetBatch(
+                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
@@ -278,7 +279,8 @@ namespace {
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         for (auto iter : g_info) {
-            ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL2, SENSOR_POLL_TIME);
+            ret = g_sensorInterface->SetBatch(
+                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL2, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
@@ -321,7 +323,8 @@ namespace {
             return;
         }
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, -1, SENSOR_POLL_TIME);
+            int32_t ret = g_sensorInterface->SetBatch(
+                {0, iter.deviceSensorInfo.sensorType, 0, 0}, -1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
         }
     }
@@ -340,7 +343,8 @@ namespace {
         }
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+            int32_t ret = g_sensorInterface->SetBatch(
+                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             if (iter.deviceSensorInfo.sensorType == SENSOR_TYPE_HALL) {
                 ret = g_sensorInterface->SetMode({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_MODE_ON_CHANGE);
@@ -389,7 +393,8 @@ namespace {
         }
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+            int32_t ret = g_sensorInterface->SetBatch(
+                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             ret = g_sensorInterface->SetMode({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_MODE_DEFAULT);
             EXPECT_EQ(SENSOR_FAILURE, ret);
@@ -470,7 +475,8 @@ namespace {
 
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->SetSdcSensor({0, iter.deviceSensorInfo.sensorType, 0, 0}, true, RATE_LEVEL);
+            int32_t ret = g_sensorInterface->SetSdcSensor(
+                {0, iter.deviceSensorInfo.sensorType, 0, 0}, true, RATE_LEVEL);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             OsalMSleep(SENSOR_WAIT_TIME);
             ret = g_sensorInterface->SetSdcSensor({0, iter.deviceSensorInfo.sensorType, 0, 0}, false, RATE_LEVEL);
@@ -713,7 +719,8 @@ namespace {
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         for (auto iter : g_info) {
-            ret = g_sensorInterface->SetBatch({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+            ret = g_sensorInterface->SetBatch(
+                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
