@@ -146,7 +146,7 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
     return;
 }
 
-void SensorCallbackVdi::StatisticsCount(const SensorHandle& sensorHandle,
+void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap, const int64_t &samplingInterval)
 {
     static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> lastRecordTimeMap;
@@ -165,20 +165,13 @@ void SensorCallbackVdi::StatisticsCount(const SensorHandle& sensorHandle,
     }
     PrintCount(lastRecordTimeMap[sensorHandle], currentTime, lastSecondCountMap[sensorHandle],
         nowDataCount, samplingInterval);
-}
+    std::chrono::steady_clock::time_point &lastRecordTime = lastRecordTimeMap[sensorHandle];
+    std::chrono::steady_clock::time_point &lastSecondCount = lastSecondCountMap[sensorHandle];
 
-
-void SensorCallbackVdi::PrintCount(
-    std::chrono::steady_clock::time_point &lastRecordTime,
-    std::chrono::steady_clock::time_point &currentTime,
-    int64_t &lastSecondCount,
-    int64_t &nowDataCount,
-    const int64_t &samplingInterval)
-{
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= 1000) {
         lastRecordTime += std::chrono::milliseconds(1000);
         int64_t perSecondCount = nowDataCount - lastSecondCount;
-        HDF_LOGI("%{public}s: perSecondCount: %{public}s, samplingInterval: %{public}s", __func__, std::to_string(perSecondCount).c_str(), std::to_string(samplingInterval).c_str());
+        HDF_LOGI("%{public}s: sensorHandle: %{public}s, perSecondCount: %{public}s, samplingInterval: %{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(perSecondCount).c_str(), std::to_string(samplingInterval).c_str());
         lastSecondCount = nowDataCount;
     }
 }

@@ -40,14 +40,8 @@ public:
 private:
     void PrintData(const HdfSensorEvents &event, const std::string &reportResult, bool &isPrint,
                    const SensorHandle& sensorHandle, const int64_t &samplingInterval);
-    void StatisticsCount(const SensorHandle& sensorHandle,
+    void PrintCount(const SensorHandle& sensorHandle,
         const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap, const int64_t &samplingInterval);
-    void PrintCount(
-        std::chrono::steady_clock::time_point &lastRecordTime,
-        std::chrono::steady_clock::time_point &currentTime,
-        int64_t &lastSecondCount,
-        int64_t &nowDataCount,
-        const int64_t &samplingInterval);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
     SensorClientInfo sensorClientInfo_;
     sptr<V3_0::ISensorCallback> sensorCallback_;
