@@ -184,8 +184,8 @@ void SensorCallbackVdi::PrintCount(
 {
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 300) {
         recordTime = currentTime;
-        HDF_LOGI("%{public}s1:%{public}s", __func__, result.c_str());
         result += " " + std::to_string(dataCount);
+        HDF_LOGI("%{public}s1:%{public}s", __func__, result.c_str());
     }
 
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 6000) {
