@@ -189,7 +189,7 @@ void SensorCallbackVdi::PrintCount(
 
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - printTime).count() >= 10000) {
         printTime += std::chrono::milliseconds(10000);
-        HDF_LOGI("%{public}s", __func__, result.c_str());
+        HDF_LOGI("%{public}s", result.c_str());
         result = "";
     }
 }
