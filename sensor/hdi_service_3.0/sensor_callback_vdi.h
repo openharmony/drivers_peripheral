@@ -40,6 +40,7 @@ public:
 private:
     void PrintData(const HdfSensorEvents &event, const std::string &reportResult, bool &isPrint,
                    const SensorHandle& sensorHandle, const int64_t &samplingInterval);
+    bool NeedPrintCount(SensorHandle sensorHandle);
     void PrintCount(const SensorHandle& sensorHandle,
         const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap, const int64_t &samplingInterval);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
