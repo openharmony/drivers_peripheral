@@ -184,6 +184,20 @@ void SensorCallbackVdi::PrintCount(
 {
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - recordTime).count() >= 300) {
         recordTime = currentTime;
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(recordTime.time_since_epoch());
+
+        // 获取总毫秒数
+        long long totalMilliseconds = duration.count();
+
+        // 计算小时、分钟、秒和毫秒
+        int hours = totalMilliseconds / 3600000;  // 1小时 = 3600000毫秒
+        int minutes = (totalMilliseconds % 3600000) / 60000;  // 1分钟 = 60000毫秒
+        int seconds = (totalMilliseconds % 60000) / 1000;  // 1秒 = 1000毫秒
+        int milliseconds = totalMilliseconds % 1000;  // 计算剩余的毫秒数
+
+        // 使用 printf 打印时分秒毫秒格式
+        HDF_LOGI("Current time: %{public}02d:%{public}02d:%{public}02d.%{public}03d\n", hours, minutes, seconds, milliseconds);
+
         result += " " + std::to_string(dataCount);
     }
 
