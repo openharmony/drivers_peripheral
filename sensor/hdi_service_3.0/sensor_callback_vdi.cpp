@@ -29,7 +29,7 @@ namespace {
     constexpr int64_t REPOPRT_TIME = 60000000000;
     constexpr int64_t INIT_DATA_COUNT = 1;
     constexpr int64_t DEFAULT_ERROR_RATIO = 10;
-    constexpr int64_t DEFAULT_ACCEPTABLE_ERROR = 1;
+    constexpr int64_t DEFAULT_ACCEPTABLE_ERROR = 2;
     constexpr double COMMON_REPORT_FREQUENCY = 1000000000.0;
     constexpr int32_t ONE_SECOND = 1000;
     static std::unordered_map<SensorHandle, int64_t> firstTimestampMap_;
