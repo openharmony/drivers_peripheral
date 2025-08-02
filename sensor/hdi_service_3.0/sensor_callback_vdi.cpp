@@ -80,7 +80,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
         it->second++;
         dataCount = it->second;
     }
-    StatisticsCount(sensorHandle, sensorDataCountMap, samplingInterval);
+    PrintCount(sensorHandle, sensorDataCountMap, samplingInterval);
     bool result = isPrint;
     if (!isPrint) {
         if (firstTimestampMap_[sensorHandle] == 0) {
