@@ -263,16 +263,16 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
 
 int32_t UsbdPort::SwitchFunction(int32_t dataRole)
 {
-    int32_t ret = HDF_FAILURE;
-    if (dataRole == DATA_ROLE_HOST) {
-        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_NONE);
+    int32_t ret = HDF_SUCCESS;
+    int32_t currentFuncs = UsbdFunction::UsbdGetFunction();
+    if (currentFuncs == USB_FUNCTION_HDC || currentFuncs == USB_FUNCTION_STORAGE) {
+        HDF_LOGI("%{public}s: skip, currentFuncs: %{public}d", __func__, currentFuncs);
+        return ret;
     }
-    if (dataRole == DATA_ROLE_DEVICE) {
-        if (UsbdFunction::IsHdcOpen()) {
-            ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_HDC);
-        } else {
-            ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_STORAGE);
-        }
+    if (UsbdFunction::IsHdcOpen()) {
+        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_HDC);
+    } else {
+        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_STORAGE);
     }
     return ret;
 }
