@@ -166,7 +166,7 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     PrintCount(lastRecordTimeMap[sensorHandle], currentTime, lastSecondCountMap[sensorHandle],
         nowDataCount, samplingInterval);
     std::chrono::steady_clock::time_point &lastRecordTime = lastRecordTimeMap[sensorHandle];
-    std::chrono::steady_clock::time_point &lastSecondCount = lastSecondCountMap[sensorHandle];
+    int64_t &lastSecondCount = lastSecondCountMap[sensorHandle];
 
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= 1000) {
         lastRecordTime += std::chrono::milliseconds(1000);
