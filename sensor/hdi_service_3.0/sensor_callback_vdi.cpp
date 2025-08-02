@@ -28,7 +28,7 @@ namespace {
     constexpr int32_t DATA_LEN = 256;
     constexpr int64_t REPOPRT_TIME = 60000000000;
     constexpr int64_t INIT_DATA_COUNT = 1;
-    constexpr int64_t DEFAULT_ERROR_RATIO = 10;
+    constexpr double DEFAULT_ERROR_RATIO = 0.1; // 10% error ratio
     constexpr int64_t DEFAULT_ACCEPTABLE_ERROR = 2;
     constexpr double COMMON_REPORT_FREQUENCY = 1000000000.0;
     constexpr int32_t ONE_SECOND = 1000;
@@ -185,7 +185,7 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     if (samplingInterval > 0) {
         targetCount = std::ceil(COMMON_REPORT_FREQUENCY / (double)samplingInterval);
     }
-    int64_t acceptablError = targetCount / DEFAULT_ERROR_RATIO;
+    int64_t acceptablError = targetCount * DEFAULT_ERROR_RATIO;
     if (acceptablError == 0) {
         acceptablError = DEFAULT_ACCEPTABLE_ERROR; // Ensure there's always some tolerance
     }
