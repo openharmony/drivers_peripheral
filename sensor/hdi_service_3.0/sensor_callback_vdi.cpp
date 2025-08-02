@@ -169,11 +169,12 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     if (samplingInterval > 0) {
         targetCount = 1000000000 / samplingInterval;
     }
-    
+    int64_t acceptablError = targetCount / 10;
+
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= 1000) {
         lastRecordTime += std::chrono::milliseconds(1000);
         int64_t perSecondCount = nowDataCount - lastSecondCount;
-        HDF_LOGI("%{public}s: sensorHandle: %{public}s, perSecondCount: %{public}s, targetCount: %{public}s, samplingInterval: %{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(perSecondCount).c_str(), std::to_string(targetCount).c_str(), std::to_string(samplingInterval / ONE_MILLION).c_str());
+        HDF_LOGI("%{public}s: %{public}s perSecondCount %{public}s targetCount %{public}s~%{public}s samplingInterval %{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(perSecondCount).c_str(), std::to_string(targetCount - acceptablError).c_str(), std::to_string(targetCount + acceptablError).c_str(), std::to_string(samplingInterval / ONE_MILLION).c_str());
         lastSecondCount = nowDataCount;
     }
 }
