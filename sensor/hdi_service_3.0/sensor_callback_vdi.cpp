@@ -163,8 +163,6 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     if (lastSecondCountMap.find(sensorHandle) == lastSecondCountMap.end()) {
         lastSecondCountMap[sensorHandle] = 0;
     }
-    PrintCount(lastRecordTimeMap[sensorHandle], currentTime, lastSecondCountMap[sensorHandle],
-        nowDataCount, samplingInterval);
     std::chrono::steady_clock::time_point &lastRecordTime = lastRecordTimeMap[sensorHandle];
     int64_t &lastSecondCount = lastSecondCountMap[sensorHandle];
     int64_t targetCount = 0;
