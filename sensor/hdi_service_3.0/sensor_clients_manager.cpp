@@ -302,6 +302,20 @@ void SensorClientsManager::GetSensorBestConfig(SensorHandle sensorHandle, int64_
     return;
 }
 
+int64_t SensorClientsManager::GetSensorBestSamplingInterval(SensorHandle sensorHandle)
+{
+    SENSOR_TRACE_PID;
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
+    auto it = sensorConfig_.find(sensorHandle);
+    if (it == sensorConfig_.end()) {
+        HDF_LOGD("%{public}s: sensorHandle: %{public}s has no best config", __func__,
+                 SENSOR_HANDLE_TO_C_STR(sensorHandle));
+        return STOP_INTERVAL;
+    }
+    
+    return it->second.samplingInterval;
+}
+
 void SensorClientsManager::EraseSdcSensorBestConfig(SensorHandle sensorHandle)
 {
     SENSOR_TRACE_PID;
