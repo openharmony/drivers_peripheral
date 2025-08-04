@@ -34,7 +34,7 @@ namespace {
     constexpr int32_t ONE_SECOND = 1000;
     static std::unordered_map<SensorHandle, int64_t> firstTimestampMap_;
     static std::unordered_map<SensorHandle, int64_t> lastTimestampMap_;
-    const std::vector<int32_t> needPrintCountSensor = {
+    constexpr std::vector<int32_t> NEED_PRINT_COUNT_SENSOR = {
         HDF_SENSOR_TYPE_ACCELEROMETER, HDF_SENSOR_TYPE_GYROSCOPE, HDF_SENSOR_TYPE_MAGNETIC_FIELD,
         HDF_SENSOR_TYPE_LINEAR_ACCELERATION, HDF_SENSOR_TYPE_ROTATION_VECTOR, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED,
         HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED};
@@ -158,29 +158,37 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
 
 bool SensorCallbackVdi::NeedPrintCount(SensorHandle sensorHandle)
 {
-    return std::find(needPrintCountSensor.begin(), needPrintCountSensor.end(),
-        sensorHandle.sensorType) != needPrintCountSensor.end();
+    return std::find(NEED_PRINT_COUNT_SENSOR.begin(), NEED_PRINT_COUNT_SENSOR.end(),
+        sensorHandle.sensorType) != NEED_PRINT_COUNT_SENSOR.end();
 }
 
 void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap, const int64_t &samplingInterval)
 {
     static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> lastRecordTimeMap;
-    static std::unordered_map<SensorHandle, int64_t> lastSecondCountMap;
+    static std::unordered_map<SensorHandle, int64_t> lastDataCountMap;
 
-    if (lastRecordTimeMap.find(sensorHandle) == lastRecordTimeMap.end()) {
-        lastRecordTimeMap[sensorHandle] = std::chrono::steady_clock::now();
+    //Get the last recorded time and number of records
+    auto lastRecordTimeIt = lastRecordTimeMap.find(sensorHandle);
+    if (lastRecordTimeIt == lastRecordTimeMap.end()) {
+        lastRecordTimeIt = lastRecordTimeMap.emplace(sensorHandle, std::chrono::steady_clock::now()).first;
     }
+    auto lastDataCountIt = lastDataCountMap.find(sensorHandle);
+    if (lastDataCountIt == lastDataCountMap.end()) {
+        lastDataCountIt = lastDataCountMap.emplace(sensorHandle, 0).first;
+    }
+    std::chrono::steady_clock::time_point &lastRecordTime = lastRecordTimeIt->second;
+    int64_t &lastDataCount = lastDataCountIt->second;
+
+    //Get the current record time and number of records
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-    int64_t nowDataCount = INIT_DATA_COUNT;
-    if (sensorDataCountMap.find(sensorHandle) != sensorDataCountMap.end()) {
-        nowDataCount = sensorDataCountMap.at(sensorHandle);
+    int64_t currentDataCount = 0;
+    auto sensorDataCountIt = sensorDataCountMap.find(sensorHandle);
+    if (sensorDataCountIt != sensorDataCountMap.end()) {
+        currentDataCount = sensorDataCountIt->second;
     }
-    if (lastSecondCountMap.find(sensorHandle) == lastSecondCountMap.end()) {
-        lastSecondCountMap[sensorHandle] = 0;
-    }
-    std::chrono::steady_clock::time_point &lastRecordTime = lastRecordTimeMap[sensorHandle];
-    int64_t &lastSecondCount = lastSecondCountMap[sensorHandle];
+
+    //Calculate the sensor data and allowable error that should be reported based on frequency
     int64_t targetCount = 0;
     if (samplingInterval > 0) {
         targetCount = std::ceil(COMMON_REPORT_FREQUENCY / (double)samplingInterval);
@@ -189,10 +197,14 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     if (acceptablError == 0) {
         acceptablError = DEFAULT_ACCEPTABLE_ERROR; // Ensure there's always some tolerance
     }
+    
+    //Check if the current record time exceeds one second
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= ONE_SECOND) {
+        int64_t perSecondCount = currentDataCount - lastDataCount;
+
         lastRecordTime += std::chrono::milliseconds(ONE_SECOND);
-        int64_t perSecondCount = nowDataCount - lastSecondCount;
-        lastSecondCount = nowDataCount;
+        lastDataCount = currentDataCount;
+
         if (perSecondCount >= targetCount - acceptablError && perSecondCount <= targetCount + acceptablError) {
             return; // Skip logging if the count is within acceptable range
         }
