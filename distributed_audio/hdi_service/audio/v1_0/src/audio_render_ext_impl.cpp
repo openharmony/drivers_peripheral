@@ -550,6 +550,20 @@ void AudioRenderExtImpl::SetDumpFlagInner()
     DHLOGD("Set dump flag, not support yet.");
 }
 
+AudioRenderStatus AudioRenderExtImpl::GetRenderStatus()
+{
+    std::lock_guard<std::mutex> renderLck(renderMtx_);
+    DHLOGI("Get renderstatus: %{public}d", static_cast<int32_t>(renderStatus_));
+    return renderStatus_;
+}
+
+void AudioRenderExtImpl::SetRenderStatus(AudioRenderStatus status)
+{
+    std::lock_guard<std::mutex> renderLck(renderMtx_);
+    renderStatus_ = status;
+    DHLOGI("Set renderstatus: %{public}d", static_cast<int32_t>(status));
+}
+
 AudioRenderInterfaceImplBase *GetRenderImplExt()
 {
     DHLOGI("Get low latency render impl.");

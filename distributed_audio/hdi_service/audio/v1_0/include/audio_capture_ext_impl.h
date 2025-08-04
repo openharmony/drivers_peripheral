@@ -78,6 +78,8 @@ public:
     void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
         const sptr<IDAudioCallback> &callback, const int32_t dhId) override;
     void SetDumpFlagInner() override;
+    AudioCaptureStatus GetCaptureStatus() override;
+    void SetCaptureStatus(AudioCaptureStatus status) override;
 
 private:
     int32_t InitAshmem(int32_t ashmemLength);
