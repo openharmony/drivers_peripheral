@@ -66,6 +66,7 @@ const std::string THERMAL_LOG_INTERVAL = "persist.thermal.log.interval";
 const std::string DATA_FILE_PATH = "/data";
 bool g_firstReport = true;
 bool g_firstCreate = true;
+std::deque<std::string> g_saveLogFile;
 std::string g_outPath = "";
 std::string g_logTime = "";
 }
@@ -240,7 +241,13 @@ void ThermalDfx::CompressFile()
         THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", unCompressFile.c_str());
     }
 
-    RemoveLogFile();
+    if (g_saveLogFile.size() >= MAX_FILE_NUM) {
+        if (remove(g_saveLogFile.front().c_str()) != 0) {
+            THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", compressFile.c_str());
+        }
+        g_saveLogFile.pop_front();
+    }
+    g_saveLogFile.push_back(compressFile);
     g_logTime = GetCurrentTime(TIME_FORMAT_1);
     THERMAL_HILOGD(COMP_HDI, "CompressFile done");
 }
@@ -255,20 +262,19 @@ void ThermalDfx::RemoveLogFile()
     }
 
     struct dirent* entry;
-    std::vector<std::string> fileList;
+    g_saveLogFile.clear();
     while ((entry = readdir(dir)) != nullptr) {
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
             continue;
         }
-        fileList.push_back(entry->d_name);
+        g_saveLogFile.push_back(g_outPath + "/" + entry->d_name);
     }
-    if (static_cast<int32_t>(fileList.size()) > MAX_FILE_NUM) {
-        std::sort(fileList.begin(), fileList.end());
-        for (size_t index = 0; index < (fileList.size() - MAX_FILE_NUM); index++) {
-            if (remove((g_outPath + "/" + fileList[index]).c_str()) != 0) {
-                THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", fileList[index].c_str());
-            }
+    std::sort(g_saveLogFile.begin(), g_saveLogFile.end());
+    while (static_cast<int32_t>(g_saveLogFile.size()) > MAX_FILE_NUM) {
+        if (remove(g_saveLogFile.front().c_str()) != 0) {
+            THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", g_saveLogFile.front().c_str());
         }
+        g_saveLogFile.pop_front();
     }
 
     closedir(dir);
@@ -276,36 +282,24 @@ void ThermalDfx::RemoveLogFile()
 
 void ThermalDfx::CompressAllFile()
 {
-    DIR* dir = opendir(g_outPath.c_str());
-    if (dir == nullptr) {
-        THERMAL_HILOGE(COMP_HDI, "Failed to open directory: %{public}s, errno = %{public}d",
-            g_outPath.c_str(), errno);
-        return;
-    }
-
     std::string compressExtension = ".gz";
-    struct dirent* entry;
-    while ((entry = readdir(dir)) != nullptr) {
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+    std::deque<std::string> compressFileList(g_saveLogFile);
+    g_saveLogFile.clear();
+    for (auto& originFile : compressFileList) {
+        if (originFile.rfind(compressExtension) != std::string::npos) {
+            g_saveLogFile.emplace_back(originFile);
             continue;
         }
-        std::string unCompressFile(entry->d_name);
-        if (unCompressFile.rfind(compressExtension) != std::string::npos) {
-            continue;
-        }
-        unCompressFile = g_outPath + "/" + unCompressFile;
-        std::string compressFile = unCompressFile + compressExtension;
-        if (!Compress(unCompressFile, compressFile)) {
+        std::string compressFile = originFile + compressExtension;
+        if (!Compress(originFile, compressFile)) {
             THERMAL_HILOGE(COMP_HDI, "CompressFile fail");
-            closedir(dir);
-            return;
+            continue;
         }
-        if (remove(unCompressFile.c_str()) != 0) {
-            THERMAL_HILOGW(COMP_HDI, "failed to remove file %{private}s", unCompressFile.c_str());
+        if (remove(originFile.c_str()) != 0) {
+            THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", originFile.c_str());
         }
+        g_saveLogFile.emplace_back(compressFile);
     }
-
-    closedir(dir);
 }
 
 bool ThermalDfx::PrepareWriteDfxLog()
