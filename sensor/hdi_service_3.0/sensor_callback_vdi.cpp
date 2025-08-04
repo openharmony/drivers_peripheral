@@ -193,7 +193,7 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     if (samplingInterval > 0) {
         targetCount = std::ceil(COMMON_REPORT_FREQUENCY / (double)samplingInterval);
     }
-    int64_t acceptablError = targetCount * DEFAULT_ERROR_RATIO;
+    int64_t acceptablError = std::ceil((double)targetCount * DEFAULT_ERROR_RATIO);
     if (acceptablError == 0) {
         acceptablError = DEFAULT_ACCEPTABLE_ERROR; // Ensure there's always some tolerance
     }
