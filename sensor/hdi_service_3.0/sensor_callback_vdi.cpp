@@ -34,7 +34,7 @@ namespace {
     constexpr int32_t ONE_SECOND = 1000;
     static std::unordered_map<SensorHandle, int64_t> firstTimestampMap_;
     static std::unordered_map<SensorHandle, int64_t> lastTimestampMap_;
-    constexpr std::vector<int32_t> NEED_PRINT_COUNT_SENSOR = {
+    const std::vector<int32_t> NEED_PRINT_COUNT_SENSOR = {
         HDF_SENSOR_TYPE_ACCELEROMETER, HDF_SENSOR_TYPE_GYROSCOPE, HDF_SENSOR_TYPE_MAGNETIC_FIELD,
         HDF_SENSOR_TYPE_LINEAR_ACCELERATION, HDF_SENSOR_TYPE_ROTATION_VECTOR, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED,
         HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED};
