@@ -58,6 +58,7 @@ AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
 {
     DHLOGI("Distributed audio manager destructed.");
+    ForceNotifyFwk();
     auto retryCount = WAIT_RECIPIENT_ERASED_RETRY_CNT;
     while (!IsAllClearRegisterRecipientErased() && retryCount--) {
         std::this_thread::sleep_for(std::chrono::seconds(WAIT_RECIPIENT_ERASED_TIME_SEC));
@@ -178,6 +179,7 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
             return ret;
         }
         mapAddFlags_.insert(std::make_pair(flagString, true));
+        notifyFwkMap_.insert(std::make_pair(flagString, event));
     }
     sptr<IRemoteObject> remote = GetRemote(adpName);
     if (remote != nullptr) {
@@ -203,20 +205,21 @@ int32_t AudioManagerInterfaceImpl::AddAudioDeviceInner(const uint32_t dhId, cons
 int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName, const uint32_t dhId)
 {
     DHLOGI("Remove audio device name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), dhId);
-    auto adapter = GetAdapterFromMap(adpName);
-    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDF_INVALID_OPERATION);
-
-    int32_t ret = adapter->RemoveAudioDevice(dhId);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Remove audio device failed, adapter return: %{public}d.", ret);
-        return ret;
-    }
     DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
-    ret = NotifyFwk(event);
+    int32_t ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
     }
     mapAddFlags_.erase(adpName + std::to_string(dhId));
+    notifyFwkMap_.erase(adpName + std::to_string(dhId));
+    auto adapter = GetAdapterFromMap(adpName);
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDF_INVALID_OPERATION);
+
+    ret = adapter->RemoveAudioDevice(dhId);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Remove audio device failed, adapter return: %{public}d.", ret);
+        return ret;
+    }
     {
         std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
         if (adapter->IsPortsNoReg()) {
@@ -227,7 +230,7 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
             }
             mapAudioCallback_.erase(adpName);
         }
-        DHLOGI("Remove audio device success, mapAudioAdapter size() is : %zu .", mapAudioAdapter_.size());
+        DHLOGI("Remove audio device success, mapAudioAdapter size() is: %{public}zu .", mapAudioAdapter_.size());
     }
     return DH_SUCCESS;
 }
@@ -330,6 +333,19 @@ void AudioManagerInterfaceImpl::SetDeviceObject(struct HdfDeviceObject *deviceOb
     deviceObject_ = deviceObject;
 }
 
+void AudioManagerInterfaceImpl::ForceNotifyFwk()
+{
+    std::lock_guard<std::mutex> lock(notifyFwkMtx_);
+    for (auto it : notifyFwkMap_) {
+        DAudioDevEvent event = it.second;
+        event.eventType = HDF_AUDIO_DEVICE_REMOVE;
+        NotifyFwk(event);
+        DHLOGI("Force notify fwk, dhId: %{public}u.", event.dhId);
+    }
+    notifyFwkMap_.clear();
+    DHLOGI("Force notify fwk success.");
+}
+
 int32_t AudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &serviceName,
     const sptr<IDAudioHdfCallback> &callbackObj)
 {
@@ -393,7 +409,11 @@ void AudioManagerInterfaceImpl::ClearRegisterRecipient::OnRemoteDied(const wptr<
 
 void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    DHLOGE("Exit the current process.");
+    DHLOGE("notifyFWK before Exit the current process");
+    auto audioMgr = AudioManagerInterfaceImpl::GetAudioManager();
+    if (audioMgr != nullptr) {
+        audioMgr->ForceNotifyFwk();
+    }
     _Exit(0);
 }
 

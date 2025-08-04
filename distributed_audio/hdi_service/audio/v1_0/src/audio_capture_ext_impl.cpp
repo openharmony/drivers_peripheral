@@ -397,6 +397,20 @@ void AudioCaptureExtImpl::SetDumpFlagInner()
     DHLOGI("Set dump flag, not support yet.");
 }
 
+AudioCaptureStatus AudioCaptureExtImpl::GetCaptureStatus()
+{
+    std::lock_guard<std::mutex> captureLck(captureMtx_);
+    DHLOGI("Get capture status = %{public}d", static_cast<int32_t>(captureStatus_));
+    return captureStatus_;
+}
+
+void AudioCaptureExtImpl::SetCaptureStatus(AudioCaptureStatus status)
+{
+    std::lock_guard<std::mutex> captureLck(captureMtx_);
+    captureStatus_ = status;
+    DHLOGI("Set capture status = %{public}d", static_cast<int32_t>(captureStatus_));
+}
+
 AudioCaptureInterfaceImplBase *GetCaptureImplExt()
 {
     DHLOGI("Get low latency capture impl.");

@@ -125,6 +125,33 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyRender_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: DestroyRender_002
+ * @tc.desc: Verify the DestroyRender function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, DestroyRender_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    AudioDeviceDescriptor devDesc;
+    AudioSampleAttributes attrs;
+    std::string adpterName = "adbcef";
+    int32_t dhId = 1;
+    sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
+    AdapterTest_->extCallbackMap_[dhId] = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+
+    devDesc.pins = PIN_OUT_DAUDIO_DEFAULT;
+    uint32_t renderId = 0;
+    AdapterTest_->spkPinInUse_ = 0;
+    AdapterTest_->renderDevs_[renderId] = std::make_pair(dhId,
+        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, devDesc, attrs, callback, renderId)));
+    AdapterTest_->renderDevs_[renderId].second->SetRenderStatus(AudioRenderStatus::RENDER_STATUS_START);
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyRender(renderId));
+}
+
+/**
  * @tc.name: CreateCapture_001
  * @tc.desc: Verify the CreateCapture function.
  * @tc.type: FUNC
@@ -177,6 +204,32 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyCapture_001, TestSize.Level1)
     capId = 10;
     EXPECT_EQ(HDF_FAILURE, AdapterTest_->DestroyCapture(capId));
     capId = 1;
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyCapture(capId));
+}
+
+/**
+ * @tc.name: CreateRender_002
+ * @tc.desc: Verify the DestroyCapture function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, DestroyCapture_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    AudioDeviceDescriptor devDesc;
+    AudioSampleAttributes attrs;
+    std::string adpterName = "adbcef";
+    sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->extCallbackMap_[dhId] = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+
+    devDesc.pins = PIN_OUT_DAUDIO_DEFAULT;
+    uint32_t capId = 0;
+    AdapterTest_->captureDevs_[capId] = std::make_pair(dhId,
+        new AudioCaptureInterfaceImpl(adpterName, devDesc, attrs, callback));
+    AdapterTest_->captureDevs_[capId].second->SetCaptureStatus(AudioCaptureStatus::CAPTURE_STATUS_START);
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyCapture(capId));
 }
 

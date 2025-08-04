@@ -286,6 +286,10 @@ int32_t AudioRenderInterfaceImpl::Start()
 int32_t AudioRenderInterfaceImpl::Stop()
 {
     DHLOGI("Stop render.");
+    if (GetRenderStatus() != RENDER_STATUS_START) {
+        DHLOGI("Render has not been started.");
+        return HDF_SUCCESS;
+    }
 #ifdef DAUDIO_SUPPORT_SHARED_BUFFER
     writeIndex_ = 0;
     writeNum_ = 0;
@@ -693,6 +697,20 @@ void AudioRenderInterfaceImpl::SetAttrs(const std::string &adpName, const AudioD
 void AudioRenderInterfaceImpl::SetDumpFlagInner()
 {
     dumpFlag_ = true;
+}
+
+AudioRenderStatus AudioRenderInterfaceImpl::GetRenderStatus()
+{
+    std::lock_guard<std::mutex> renderLck(renderMtx_);
+    DHLOGI("Get renderstatus: %{public}d", static_cast<int32_t>(renderStatus_));
+    return renderStatus_;
+}
+
+void AudioRenderInterfaceImpl::SetRenderStatus(AudioRenderStatus status)
+{
+    std::lock_guard<std::mutex> renderLck(renderMtx_);
+    renderStatus_ = status;
+    DHLOGI("Set renderstatus: %{public}d", static_cast<int32_t>(status));
 }
 } // V1_0
 } // Audio
