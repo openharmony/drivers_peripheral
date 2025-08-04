@@ -68,16 +68,17 @@ int32_t SensorCallbackVdi::OnDataEvent(const V3_0::HdfSensorEvents& event)
     const std::string reportResult = SensorClientsManager::GetInstance()->ReportEachClient(event);
     HDF_LOGD("%{public}s sensorHandle=%{public}s, %{public}s", __func__, SENSOR_HANDLE_TO_C_STR(event.deviceSensorInfo),
              reportResult.c_str());
-    bool isPrint = SensorClientsManager::GetInstance()->IsSensorNeedPrint(sensorHandle);
-    int64_t samplingInterval = SensorClientsManager::GetInstance()->GetSensorBestSamplingInterval(sensorHandle);
-    PrintData(event, reportResult, isPrint, sensorHandle, samplingInterval);
+    PrintData(event, reportResult, sensorHandle);
     return HDF_SUCCESS;
 }
 
-void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::string &reportResult, bool &isPrint,
-                                  const SensorHandle& sensorHandle, const int64_t &samplingInterval)
+void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::string &reportResult,
+                                  const SensorHandle& sensorHandle)
 {
     SENSOR_TRACE;
+    bool isPrint = SensorClientsManager::GetInstance()->IsSensorNeedPrint(sensorHandle);
+    int64_t samplingInterval = SensorClientsManager::GetInstance()->GetSensorBestSamplingInterval(sensorHandle);
+
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
     static std::unordered_map<SensorHandle, int64_t> sensorDataCountMap;
     auto it = sensorDataCountMap.find(sensorHandle);
