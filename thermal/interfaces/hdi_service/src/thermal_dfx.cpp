@@ -58,6 +58,8 @@ constexpr int32_t COMPRESS_READ_BUF_SIZE = 4096;
 constexpr int32_t DEFAULT_WIDTH = 20;
 constexpr int32_t DEFAULT_INTERVAL = 5000;
 constexpr int32_t MIN_INTERVAL = 100;
+constexpr int32_t LOG_COMPARE_START_INDEX = 13;
+constexpr int32_t LOG_COMPARE_SUB_LEN = 15;
 constexpr int64_t TWENTY_FOUR_HOURS = 60 * 60 * 24 * 1000;
 const std::string TIMESTAMP_TITLE = "timestamp";
 const std::string THERMAL_LOG_ENABLE = "persist.thermal.log.enable";
@@ -269,7 +271,10 @@ void ThermalDfx::RemoveLogFile()
         }
         g_saveLogFile.push_back(g_outPath + "/" + entry->d_name);
     }
-    std::sort(g_saveLogFile.begin(), g_saveLogFile.end());
+    std::sort(g_saveLogFile.begin(), g_saveLogFile.end(), [](const std::string &a, const std::string &b) {
+        return a.substr(g_outPath.length() + LOG_COMPARE_START_INDEX, LOG_COMPARE_SUB_LEN) <
+            b.substr(g_outPath.length() + LOG_COMPARE_START_INDEX, LOG_COMPARE_SUB_LEN);
+    });
     while (static_cast<int32_t>(g_saveLogFile.size()) > MAX_FILE_NUM) {
         if (remove(g_saveLogFile.front().c_str()) != 0) {
             THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", g_saveLogFile.front().c_str());
