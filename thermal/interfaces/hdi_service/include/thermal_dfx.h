@@ -54,13 +54,14 @@ private:
     double GetDeviceValidSize(const std::string& path);
     uint64_t GetDirectorySize(const std::string& directoryPath);
     bool PrepareWriteDfxLog();
-    std::string GetFileNameIndex(const uint32_t index);
     int32_t GetIntParameter(const std::string& key, const int32_t def, const int32_t minValue);
     bool GetBoolParameter(const std::string& key, const bool def);
     void WidthWatchCallback(const std::string& value);
     void IntervalWatchCallback(const std::string& value);
     void EnableWatchCallback(const std::string& value);
     static void InfoChangedCallback(const char* key, const char* value, void* context);
+    void RemoveLogFile();
+    void CompressAllFile();
 
     int64_t beginTimeMs_ = 0;
     std::atomic_uint8_t width_;
