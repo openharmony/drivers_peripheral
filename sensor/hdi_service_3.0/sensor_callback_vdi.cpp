@@ -196,7 +196,7 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
         if (perSecondCount >= targetCount - acceptablError && perSecondCount <= targetCount + acceptablError) {
             return; // Skip logging if the count is within acceptable range
         }
-        HDF_LOGI("%{public}s: %{public}s perSecondCount %{public}s targetCount %{public}s~%{public}s samplingInterval "
+        HDF_LOGE("%{public}s: %{public}s perSecondCount %{public}s targetCount %{public}s~%{public}s samplingInterval "
             "%{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(perSecondCount).c_str(),
             std::to_string(targetCount - acceptablError).c_str(), std::to_string(targetCount + acceptablError).c_str(),
             std::to_string(samplingInterval / ONE_MILLION).c_str());
