@@ -135,6 +135,10 @@ const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, struct UsbFnDes
     UsbFnChangeFunction(des, descriptor);
     ret = IsDescriptorOk(des);
     if (ret) {
+        if (descriptor->type == USBFN_DESC_DATA_TYPE_PROP && des != NULL) {
+            UsbFnMemFree(des);
+            des = NULL;
+        }
         return NULL;
     }
 

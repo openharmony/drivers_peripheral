@@ -1598,7 +1598,7 @@ int32_t UsbGetPipeInfo(
     OsalMutexLock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
     if (ifaceHdl->devHandle->dev == NULL) {
         OsalMutexUnlock((struct OsalMutex *)&ifaceHdl->devHandle->lock);
-        HDF_LOGE("%{public}s:%{publid}d ifaceHdl->devHandle->dev is null", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d ifaceHdl->devHandle->dev is null", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
 
