@@ -439,7 +439,7 @@ static int32_t ReadData(int32_t sensorId, struct SensorEvents *event)
     if (reply == NULL) {
         HDF_LOGE("%s: Sensor write id fail!", __func__);
         HdfSbufRecycle(msg);
-        return;
+        return SENSOR_FAILURE;
     }
     CHECK_NULL_PTR_RETURN_VALUE(reply, SENSOR_NULL_PTR);
 
