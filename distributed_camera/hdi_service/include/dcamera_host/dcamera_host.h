@@ -97,8 +97,6 @@ private:
     bool IsCameraIdInvalid(const std::string &cameraId);
     std::string GetCameraIdByDHBase(const DHBase &dhBase);
     size_t GetCamDevNum();
-    void AddDcameraId(const DHBase &dhBase, std::string &cameraId, const std::string &dCameraId);
-    std::string GetDcameraIdById(const std::string &cameraId);
 
     template<typename Callback, typename Device>
     int32_t OpenCameraImpl(const std::string &cameraId, const Callback &callbackObj, Device &device);
@@ -150,8 +148,6 @@ private:
     OHOS::sptr<HDI::Camera::V1_2::ICameraHostCallback> dCameraHostCallback_V1_2_;
     std::map<std::string, OHOS::sptr<DCameraDevice>> dCameraDeviceMap_;
     std::mutex deviceMapLock_;
-    std::map<std::string, std::string> dCameraIdMap_;
-    std::mutex dCameraIdMapLock_;
     std::map<std::string, sptr<IDCameraHdfCallback>> mapCameraHdfCallback_;
     std::mutex hdfCallbackMapMtx_;
 };
