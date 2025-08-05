@@ -137,8 +137,8 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
     }
 
     dataStr = arrayStr;
-    str = SENSOR_HANDLE_TO_STRING(event.deviceSensorInfo) + "ts" +
-        std::to_string(event.timestamp / 1e9) + "data" + dataStr;
+    str = SENSOR_HANDLE_TO_STRING(event.deviceSensorInfo) + " ts " +
+        std::to_string(event.timestamp / 1e9) + " data " + dataStr;
 
     OsalMemFree(origin);
     return;
