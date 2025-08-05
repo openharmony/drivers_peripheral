@@ -445,12 +445,12 @@ static int32_t ReadData(int32_t sensorId, struct SensorEvents *event)
 
     if (!HdfSbufWriteInt32(msg, sensorId)) {
         HDF_LOGE("%{public}s: Sensor write id failed", __func__);
-        goto Error;
+        goto ERROR;
     }
 
     if (!HdfSbufWriteInt32(msg, SENSOR_OPS_IO_CMD_READ_DATA)) {
         HDF_LOGE("%{public}s: Sensor write readData failed", __func__);
-        goto Error;
+        goto ERROR;
     }
 
     int32_t ret = SendSensorMsg(sensorId, msg, reply);
@@ -464,14 +464,14 @@ static int32_t ReadData(int32_t sensorId, struct SensorEvents *event)
     ret = GetSensorEvent(reply, event);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: Sensor get data from reply failed", __func__);
-        goto Error;
+        goto ERROR;
     }
 
     HdfSbufRecycle(reply);
     HdfSbufRecycle(msg);
     return HDF_SUCCESS;
 
-Error:
+ERROR:
     HdfSbufRecycle(reply);
     HdfSbufRecycle(msg);
     return HDF_FAILURE;
