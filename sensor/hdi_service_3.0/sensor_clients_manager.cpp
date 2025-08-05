@@ -163,7 +163,7 @@ void SensorClientsManager::ReportDataCbOneWay(int groupId, int serviceId)
 
     auto it = clients_[groupId].find(serviceId);
     it->second.oneway = true;
-    HDF_LOGI("%{public}s pid%{public}d", __func__, serviceId);
+    HDF_LOGI("%{public}s pid %{public}d", __func__, serviceId);
     return;
 }
 
