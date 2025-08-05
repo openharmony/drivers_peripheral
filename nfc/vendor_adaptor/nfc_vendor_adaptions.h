@@ -121,6 +121,7 @@ private:
     int VendorGetHistoryNci(void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal);
     void UpdateNfcOpenStatus(const std::string &status);
     bool CheckNfcBootloaderStatus(void);
+    void SetPriority();
 
     void *nfcHalHandle; // handle of nfc hal so
     NfcHalInterface nfcHalInf;
