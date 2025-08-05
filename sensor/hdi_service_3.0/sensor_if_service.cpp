@@ -753,7 +753,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<V3_0::ISensorCallb
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: groupId %{public}d pid %{public}d", __func__, groupId, serviceId);
+    HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d", __func__, groupId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     int32_t ret = HDF_SUCCESS;
     const sptr<IRemoteObject> &iRemoteObject = OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(callbackObj);
