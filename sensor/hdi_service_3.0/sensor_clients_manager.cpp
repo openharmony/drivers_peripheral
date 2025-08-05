@@ -498,7 +498,7 @@ std::set<int32_t> SensorClientsManager::GetServiceIds(SensorHandle sensorHandle)
 std::string SensorClientsManager::ReportEachClient(const V3_0::HdfSensorEvents& event)
 {
     SENSOR_TRACE;
-    std::string result = "report=";
+    std::string result = " report=";
     SensorHandle sensorHandle =  {event.deviceSensorInfo.deviceId, event.deviceSensorInfo.sensorType,
                                   event.deviceSensorInfo.sensorId, event.deviceSensorInfo.location};
     const std::set<int32_t> services = GetServiceIds(sensorHandle);
