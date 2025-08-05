@@ -40,7 +40,7 @@ namespace {
     constexpr int64_t STOP_INTERVAL = 0;
     constexpr int32_t INIT_CUR_COUNT = 0;
     constexpr int32_t ZERO_PRINT_TIME = 0;
-    constexpr int32_t MAX_PRINT_TIME = 5;
+    constexpr int32_t MAX_PRINT_TIME = 10;
     constexpr int64_t INIT_REPORT_COUNT = 1;
 }
 
@@ -227,7 +227,7 @@ void SensorClientsManager::UpdateClientPeriodCount(SensorHandle sensorHandle, in
         if (client.sensorConfigMap_.find(sensorHandle) != client.sensorConfigMap_.end()) {
             int32_t periodCount =
                     client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval / samplingInterval;
-            result += " pid" + std::to_string(entry.first) + "=" +
+            result += " pid" + std::to_string(entry.first) + " periodCount=" +
                       std::to_string(client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval / ONE_MILLION)
                       + "/" + std::to_string(samplingInterval / ONE_MILLION) + "=" + std::to_string(periodCount);
             client.periodCountMap_[sensorHandle] = periodCount;
