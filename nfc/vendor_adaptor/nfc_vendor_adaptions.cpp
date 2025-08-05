@@ -346,6 +346,7 @@ int NfcVendorAdaptions::VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallba
         return HDF_FAILURE;
     }
     std::lock_guard<std::mutex> lock(g_openMutex);
+    CheckFirmwareUpdate();
     int ret = nfcHalInf.nfcHalOpen(pCback, pDataCback);
     return ret;
 }
