@@ -58,8 +58,6 @@ void DcameraOpenCameraFuzzTest(const uint8_t* data, size_t size)
     if (dcameraDevice != nullptr) {
         DCameraHost::GetInstance()->dCameraDeviceMap_[cameraId] = dcameraDevice;
     }
-    std::string dCameraId;
-    DCameraHost::GetInstance()->AddDcameraId(dhBase, dCameraId, cameraId);
     DCameraHost::GetInstance()->OpenCamera(cameraId, callbackObj, demoCameraDevice);
     sptr<HDI::Camera::V1_1::ICameraDevice> demoCameraDevice_V1_1 = nullptr;
     DCameraHost::GetInstance()->OpenCamera_V1_1(cameraId, callbackObj, demoCameraDevice_V1_1);

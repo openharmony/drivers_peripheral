@@ -152,20 +152,6 @@ void DCameraPrelaunchWithOpModeFuzzTest(const uint8_t* data, size_t size)
     DCameraHost::GetInstance()->PrelaunchWithOpMode(config, operationMode);
 }
 
-void DCameraGetDcameraIdByIdFuzzTest(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-    std::string cameraId = fdp.ConsumeRandomLengthString(size);
-
-    DCameraHost::GetInstance()->GetDcameraIdById(cameraId);
-    std::string emptyCameraId = "";
-    DCameraHost::GetInstance()->GetDcameraIdById(emptyCameraId);
-}
-
 void DCameraAddClearRegisterRecipientFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -211,7 +197,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::DCameraNotifyDeviceStateChangeInfoFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraPreCameraSwitchFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraPrelaunchWithOpModeFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraGetDcameraIdByIdFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraAddClearRegisterRecipientFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraRemoveClearRegisterRecipientFuzzTest(data, size);
     return 0;
