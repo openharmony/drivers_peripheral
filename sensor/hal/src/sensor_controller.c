@@ -436,6 +436,11 @@ static int32_t ReadData(int32_t sensorId, struct SensorEvents *event)
     struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
     CHECK_NULL_PTR_RETURN_VALUE(msg, SENSOR_NULL_PTR);
     struct HdfSBuf *reply = HdfSbufObtain(HDF_SENSOR_EVENT_MAX_SIZE);
+    if (reply == NULL) } {
+        HDF_LOGE("{public}s: Sensor write id fail!", __func__);
+        HdfSbufRecycle(msg);
+        return;
+    }
     CHECK_NULL_PTR_RETURN_VALUE(reply, SENSOR_NULL_PTR);
 
     if (!HdfSbufWriteInt32(msg, sensorId)) {

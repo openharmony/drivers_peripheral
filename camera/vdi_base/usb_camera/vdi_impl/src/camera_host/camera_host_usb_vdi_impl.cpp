@@ -162,7 +162,7 @@ int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<IC
         CAMERA_LOGE("Camera device not found.");
         return INSUFFICIENT_RESOURCES;
     }
-    CAMERA_LOGI("OpenCamera cameraId find success. %{public}x", (void*)itr->second.get());
+    CAMERA_LOGI("OpenCamera cameraId find success. %{public}p", (void*)itr->second.get());
 
     std::shared_ptr<CameraDeviceVdiImpl> cameraDevice = itr->second;
     if (cameraDevice == nullptr) {
