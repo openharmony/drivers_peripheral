@@ -19,7 +19,7 @@
 #include <unordered_map>
 #include "sensor_uhdf_log.h"
 
-#define HDF_LOG_TAG uhdf_sensor_hdi_dump
+#define HDF_LOG_TAG dump
 
 constexpr int32_t GET_SENSORINFO = 0;
 constexpr int32_t DATA_LEN = 256;

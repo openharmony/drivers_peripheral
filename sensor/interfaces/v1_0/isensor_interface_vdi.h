@@ -68,12 +68,12 @@ namespace std {
     };
 }
 
-#define SENSOR_HANDLE_TO_STRING(sensorHandle) ("deviceId" + std::to_string((sensorHandle).deviceId) + "sensorType" + \
-    std::to_string((sensorHandle).sensorType) + "sensorId" + std::to_string((sensorHandle).sensorId) + "location" + \
-    std::to_string((sensorHandle).location))
-#define SENSOR_HANDLE_TO_C_STR(sensorHandle) ("deviceId" + std::to_string((sensorHandle).deviceId) + "sensorType" + \
-    std::to_string((sensorHandle).sensorType) + "sensorId" + std::to_string((sensorHandle).sensorId) + "location" + \
-    std::to_string((sensorHandle).location)).c_str()
+#define SENSOR_HANDLE_TO_STRING(sensorHandle) ("{" + std::to_string((sensorHandle).deviceId) + "," + \
+    std::to_string((sensorHandle).sensorType) + "," + std::to_string((sensorHandle).sensorId) + "," + \
+    std::to_string((sensorHandle).location) + "}")
+#define SENSOR_HANDLE_TO_C_STR(sensorHandle) ("{" + std::to_string((sensorHandle).deviceId) + "," + \
+    std::to_string((sensorHandle).sensorType) + "," + std::to_string((sensorHandle).sensorId) + "," + \
+    std::to_string((sensorHandle).location) + "}").c_str()
 
 namespace OHOS {
 namespace HDI {
