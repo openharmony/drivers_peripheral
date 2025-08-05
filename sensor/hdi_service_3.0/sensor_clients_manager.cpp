@@ -302,6 +302,20 @@ void SensorClientsManager::GetSensorBestConfig(SensorHandle sensorHandle, int64_
     return;
 }
 
+int64_t SensorClientsManager::GetSensorBestSamplingInterval(SensorHandle sensorHandle)
+{
+    SENSOR_TRACE_PID;
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
+    auto it = sensorConfig_.find(sensorHandle);
+    if (it == sensorConfig_.end()) {
+        HDF_LOGD("%{public}s: sensorHandle: %{public}s has no best config", __func__,
+                 SENSOR_HANDLE_TO_C_STR(sensorHandle));
+        return STOP_INTERVAL;
+    }
+    
+    return it->second.samplingInterval;
+}
+
 void SensorClientsManager::EraseSdcSensorBestConfig(SensorHandle sensorHandle)
 {
     SENSOR_TRACE_PID;
@@ -558,7 +572,9 @@ void SensorClientsManager::HdiReportData(const sptr<V3_0::ISensorCallback> &call
         ret = callbackObj->OnDataEvent(event);
     }
     if (ret != HDF_SUCCESS) {
-        HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s Sensor OnDataEvent failed, error code is %{public}d, "
+            "sensorInfoId is (%{public}s,%{public}d)", __func__, ret,
+            SENSOR_HANDLE_TO_C_STR(sensorInfoId.sensorHandle), sensorInfoId.serviceId);
     } else {
         auto it = sensorReportCountMap[sensorInfoId.sensorHandle].find(sensorInfoId.serviceId);
         int64_t reportCount = INIT_REPORT_COUNT;
