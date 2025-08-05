@@ -21,6 +21,9 @@
 #include <iostream>
 #include <pthread.h>
 #include <string>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <unistd.h>
 #include "securec.h"
 #include "hisysevent.h"
 
@@ -31,6 +34,8 @@
 #endif
 
 #define LOG_DOMAIN 0xD000306
+
+const int32_t PRIORITY = -20;
 
 using namespace std;
 namespace OHOS {
@@ -335,6 +340,15 @@ NfcVendorAdaptions::NfcVendorAdaptions()
 
 NfcVendorAdaptions::~NfcVendorAdaptions() {}
 
+void NfcVendorAdaptions::SetPriority()
+{
+    if (setpriority(PRIO_PROCESS, 0, PRIORITY) != 0) {
+        HDF_LOGE("setpriority err %{public}s", strerror(errno));
+        return;
+    }
+    HDF_LOGE("setpriority succeed.");
+}
+
 int NfcVendorAdaptions::VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback)
 {
     if (nfcHalInf.nfcHalOpen == nullptr) {
@@ -346,6 +360,7 @@ int NfcVendorAdaptions::VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallba
         return HDF_FAILURE;
     }
     std::lock_guard<std::mutex> lock(g_openMutex);
+    SetPriority();
     int ret = nfcHalInf.nfcHalOpen(pCback, pDataCback);
     return ret;
 }
