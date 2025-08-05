@@ -593,6 +593,7 @@ static int32_t AudioUpdateAudioRouteVdi(struct IAudioAdapter *adapter,
     }
 
 EXIT:
+    AudioCommonFreeVdiRouteVdi(&vdiRoute);
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;
 }
