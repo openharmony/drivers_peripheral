@@ -16,7 +16,7 @@
 #include "sensor_client_info.h"
 #include "sensor_uhdf_log.h"
 
-#define HDF_LOG_TAG uhdf_sensor_client_info
+#define HDF_LOG_TAG client
 
 namespace OHOS {
 namespace HDI {
