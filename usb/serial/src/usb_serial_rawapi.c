@@ -283,6 +283,10 @@ static void UsbReleaseInterfaces(struct AcmDevice *acm)
 
 static int32_t UsbAllocWriteRequests(struct AcmDevice *acm)
 {
+    if (acm == NULL || acm->dataOutEp == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_FAILURE;
+    }
     int32_t i;
 
     for (i = 0; i < ACM_NW; i++) {
@@ -1156,6 +1160,10 @@ static void AcmReadBulkCallback(const void *requestArg)
 
 static int32_t UsbAllocReadRequests(struct AcmDevice *acm)
 {
+    if (acm == NULL || acm->dataInEp == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_FAILURE;
+    }
     struct UsbRawFillRequestData reqData;
     uint32_t size = acm->dataInEp->maxPacketSize;
 
