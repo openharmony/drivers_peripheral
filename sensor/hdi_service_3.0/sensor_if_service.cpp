@@ -491,7 +491,7 @@ void SensorIfService::RemoveDeathNotice(int32_t groupId)
 {
     SENSOR_TRACE_PID_MSG("sensorType " + std::to_string(groupId));
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s:pid %{public}d groupid %{public}d", __func__, serviceId, groupId);
+    HDF_LOGI("%{public}s:pid %{public}d groupId %{public}d", __func__, serviceId, groupId);
     auto iter = callbackMap.find(groupId);
     if (iter != callbackMap.end()) {
         return;
@@ -753,7 +753,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<V3_0::ISensorCallb
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s: groupid %{public}d pid %{public}d", __func__, groupId, serviceId);
+    HDF_LOGI("%{public}s: groupId %{public}d pid %{public}d", __func__, groupId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     int32_t ret = HDF_SUCCESS;
     const sptr<IRemoteObject> &iRemoteObject = OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(callbackObj);
@@ -794,7 +794,7 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<V3_0::ISensorCal
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s:groupid %{public}d pid %{public}d", __func__, groupId, serviceId);
+    HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d", __func__, groupId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId >= SENSOR_GROUP_TYPE_MAX) {
         HDF_LOGE("%{public}s: groupId %{public}d is error", __func__, groupId);
@@ -1019,7 +1019,7 @@ int32_t SensorIfService::RegisterAsync(int32_t groupId, const sptr<V3_0::ISensor
 {
     SENSOR_TRACE_PID;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s:groupid %{public}d pid %{public}d", __func__, groupId, serviceId);
+    HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d", __func__, groupId, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     int32_t ret = HDF_SUCCESS;
     const sptr<IRemoteObject> &iRemoteObject = OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(callbackObj);
