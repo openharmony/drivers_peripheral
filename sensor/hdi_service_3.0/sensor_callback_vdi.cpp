@@ -28,8 +28,16 @@ namespace {
     constexpr int32_t DATA_LEN = 256;
     constexpr int64_t REPOPRT_TIME = 60000000000;
     constexpr int64_t INIT_DATA_COUNT = 1;
+    constexpr double DEFAULT_ERROR_RATIO = 0.1; // 10% error ratio
+    constexpr int64_t DEFAULT_ACCEPTABLE_ERROR = 2;
+    constexpr double COMMON_REPORT_FREQUENCY = 1000000000.0;
+    constexpr int32_t ONE_SECOND = 1000;
     static std::unordered_map<SensorHandle, int64_t> firstTimestampMap_;
     static std::unordered_map<SensorHandle, int64_t> lastTimestampMap_;
+    const std::vector<int32_t> NEED_PRINT_COUNT_SENSOR = {
+        HDF_SENSOR_TYPE_ACCELEROMETER, HDF_SENSOR_TYPE_GYROSCOPE, HDF_SENSOR_TYPE_MAGNETIC_FIELD,
+        HDF_SENSOR_TYPE_LINEAR_ACCELERATION, HDF_SENSOR_TYPE_ROTATION_VECTOR, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED,
+        HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED};
 }
 
 int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
@@ -60,15 +68,17 @@ int32_t SensorCallbackVdi::OnDataEvent(const V3_0::HdfSensorEvents& event)
     const std::string reportResult = SensorClientsManager::GetInstance()->ReportEachClient(event);
     HDF_LOGD("%{public}s sensorHandle=%{public}s, %{public}s", __func__, SENSOR_HANDLE_TO_C_STR(event.deviceSensorInfo),
              reportResult.c_str());
-    bool isPrint = SensorClientsManager::GetInstance()->IsSensorNeedPrint(sensorHandle);
-    PrintData(event, reportResult, isPrint, sensorHandle);
+    PrintData(event, reportResult, sensorHandle);
     return HDF_SUCCESS;
 }
 
-void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::string &reportResult, bool &isPrint,
+void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::string &reportResult,
                                   const SensorHandle& sensorHandle)
 {
     SENSOR_TRACE;
+    bool isPrint = SensorClientsManager::GetInstance()->IsSensorNeedPrint(sensorHandle);
+    int64_t samplingInterval = SensorClientsManager::GetInstance()->GetSensorBestSamplingInterval(sensorHandle);
+
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
     static std::unordered_map<SensorHandle, int64_t> sensorDataCountMap;
     auto it = sensorDataCountMap.find(sensorHandle);
@@ -78,6 +88,9 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
     } else {
         it->second++;
         dataCount = it->second;
+    }
+    if (NeedPrintCount(sensorHandle)) {
+        PrintCount(sensorHandle, sensorDataCountMap, samplingInterval);
     }
     bool result = isPrint;
     if (!isPrint) {
@@ -142,6 +155,65 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
 
     OsalMemFree(origin);
     return;
+}
+
+bool SensorCallbackVdi::NeedPrintCount(SensorHandle sensorHandle)
+{
+    return std::find(NEED_PRINT_COUNT_SENSOR.begin(), NEED_PRINT_COUNT_SENSOR.end(),
+        sensorHandle.sensorType) != NEED_PRINT_COUNT_SENSOR.end();
+}
+
+void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
+    const std::unordered_map<SensorHandle, int64_t> &sensorDataCountMap, const int64_t &samplingInterval)
+{
+    static std::unordered_map<SensorHandle, std::chrono::steady_clock::time_point> lastRecordTimeMap;
+    static std::unordered_map<SensorHandle, int64_t> lastDataCountMap;
+
+    //Get the last recorded time and number of records
+    auto lastRecordTimeIt = lastRecordTimeMap.find(sensorHandle);
+    if (lastRecordTimeIt == lastRecordTimeMap.end()) {
+        lastRecordTimeIt = lastRecordTimeMap.emplace(sensorHandle, std::chrono::steady_clock::now()).first;
+    }
+    auto lastDataCountIt = lastDataCountMap.find(sensorHandle);
+    if (lastDataCountIt == lastDataCountMap.end()) {
+        lastDataCountIt = lastDataCountMap.emplace(sensorHandle, 0).first;
+    }
+    std::chrono::steady_clock::time_point &lastRecordTime = lastRecordTimeIt->second;
+    int64_t &lastDataCount = lastDataCountIt->second;
+
+    //Get the current record time and number of records
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    int64_t currentDataCount = 0;
+    auto sensorDataCountIt = sensorDataCountMap.find(sensorHandle);
+    if (sensorDataCountIt != sensorDataCountMap.end()) {
+        currentDataCount = sensorDataCountIt->second;
+    }
+
+    //Calculate the sensor data and allowable error that should be reported based on frequency
+    int64_t targetCount = 0;
+    if (samplingInterval > 0) {
+        targetCount = std::ceil(COMMON_REPORT_FREQUENCY / (double)samplingInterval);
+    }
+    int64_t acceptablError = std::ceil((double)targetCount * DEFAULT_ERROR_RATIO);
+    if (acceptablError == 0) {
+        acceptablError = DEFAULT_ACCEPTABLE_ERROR; // Ensure there's always some tolerance
+    }
+    
+    //Check if the current record time exceeds one second
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= ONE_SECOND) {
+        int64_t perSecondCount = currentDataCount - lastDataCount;
+
+        lastRecordTime += std::chrono::milliseconds(ONE_SECOND);
+        lastDataCount = currentDataCount;
+
+        if (perSecondCount >= targetCount - acceptablError && perSecondCount <= targetCount + acceptablError) {
+            return; // Skip logging if the count is within acceptable range
+        }
+        HDF_LOGE("%{public}s: %{public}s perSecondCount %{public}s targetCount %{public}s~%{public}s samplingInterval "
+            "%{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(perSecondCount).c_str(),
+            std::to_string(targetCount - acceptablError).c_str(), std::to_string(targetCount + acceptablError).c_str(),
+            std::to_string(samplingInterval / ONE_MILLION).c_str());
+    }
 }
 
 sptr<IRemoteObject> SensorCallbackVdi::HandleCallbackDeath()

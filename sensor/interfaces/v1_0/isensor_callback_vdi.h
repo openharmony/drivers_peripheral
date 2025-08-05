@@ -26,6 +26,7 @@
 #define DEFAULT_DEVICE_ID (-1)
 #define DEFAULT_SENSOR_ID 0
 #define DEFAULT_LOCATION 1
+#define ONE_MILLION 1000000
 
 namespace OHOS {
 namespace HDI {
