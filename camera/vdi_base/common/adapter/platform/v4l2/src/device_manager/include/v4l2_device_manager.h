@@ -155,6 +155,7 @@ private:
     std::vector<HardwareConfiguration> hardwareList_;
     std::vector<std::shared_ptr<IManager>> managerList_;
     std::mutex mtx_;
+    std::vector<int32_t> streamAvailableExtendConfigurationsVector_;
 };
 } // namespace OHOS::Camera
 #endif
