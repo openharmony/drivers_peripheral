@@ -133,7 +133,7 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
         }
         uint32_t availableSize = (
             esInfo.size > 0 ? static_cast<uint32_t>(esInfo.size) : buffer->GetSize());
-            availableSize = availableSize < sb->GetSize() ? availableSize : sb->GetSize();
+        availableSize = availableSize < sb->GetSize() ? availableSize : sb->GetSize();
         CAMERA_LOGI("copy data from cb to sb, size = %{public}d", sb->GetSize());
         auto ret = memcpy_s(sb->GetVirAddr(), sb->GetSize(), buffer->GetVirAddress(), availableSize);
         if (ret != 0) {
