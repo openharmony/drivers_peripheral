@@ -103,7 +103,7 @@ int32_t AdapterManageInit(const struct AudioAdapterDescriptor *descs, int32_t nu
 {
     int32_t index = 0;
     if (descs == NULL || num <= 0) {
-        HDF_LOGE("Invaild parameters: descs=%p, num=%d", descs, num);
+        HDF_LOGE("Invaild parameters: num=%{public}d", num);
         return HDF_FAILURE;
     }
     struct AudioInfoInAdapter *adapterManage = g_renderAndCaptureManage;

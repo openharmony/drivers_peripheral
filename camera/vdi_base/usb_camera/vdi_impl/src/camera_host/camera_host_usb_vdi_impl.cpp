@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,7 +162,7 @@ int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<IC
         CAMERA_LOGE("Camera device not found.");
         return INSUFFICIENT_RESOURCES;
     }
-    CAMERA_LOGI("OpenCamera cameraId find success. %{public}x", (void*)itr->second.get());
+    CAMERA_LOGI("OpenCamera cameraId find success.");
 
     std::shared_ptr<CameraDeviceVdiImpl> cameraDevice = itr->second;
     if (cameraDevice == nullptr) {
