@@ -798,7 +798,7 @@ static void LogError(AudioHandle handle, int32_t errorCode, int reason)
 
     if (errorCode == WRITE_FRAME_ERROR_CODE) {
         hwRender->errorLog.errorDump[hwRender->errorLog.iter].errorCode = errorCode;
-        hwRender->errorLog.errorDump[hwRender->errorLog.iter].count = hwRender->errorLog.iter;
+        hwRender->errorLog.errorDump[hwRender->errorLog.iter].count = (uint32_t)hwRender->errorLog.iter;
         hwRender->errorLog.errorDump[hwRender->errorLog.iter].frames = hwRender->renderParam.frameRenderMode.frames;
         hwRender->errorLog.iter++;
     }

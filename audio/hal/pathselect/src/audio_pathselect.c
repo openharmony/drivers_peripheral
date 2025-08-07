@@ -224,7 +224,7 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
 }
 
 static int32_t SetRenderPathValue(
-    int32_t tpins, cJSON *renderObj, struct AudioHwRenderParam *renderParam, int32_t value)
+    uint32_t tpins, cJSON *renderObj, struct AudioHwRenderParam *renderParam, int32_t value)
 {
     if (renderObj == NULL || renderParam == NULL) {
         AUDIO_FUNC_LOGE("param Is NULL");
@@ -281,7 +281,7 @@ static int32_t SetRenderPathValue(
 }
 
 static int32_t SetMatchRenderDevicePath(
-    int32_t tpins, struct AudioHwRenderParam *renderParam, cJSON *cJsonObj, const char *deviceType, int32_t value)
+    uint32_t tpins, struct AudioHwRenderParam *renderParam, cJSON *cJsonObj, const char *deviceType, int32_t value)
 {
     if (cJsonObj == NULL || renderParam == NULL) {
         AUDIO_FUNC_LOGE("param Is NULL");
@@ -323,7 +323,7 @@ static int32_t SetMatchRenderDefaultDevicePath(struct AudioHwRenderParam *render
 }
 
 static int32_t SetMatchRenderOtherDevicePath(
-    int32_t tpins, struct AudioHwRenderParam *renderParam, cJSON *cJsonObj, int32_t value)
+    uint32_t tpins, struct AudioHwRenderParam *renderParam, cJSON *cJsonObj, int32_t value)
 {
     int32_t ret;
     if (cJsonObj == NULL || renderParam == NULL) {
@@ -351,7 +351,7 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
     }
     uint32_t pins = renderParam->renderMode.hwInfo.deviceDescript.pins;
 
-    int32_t tpins = pins & OUTPUT_MASK;
+    uint32_t tpins = pins & OUTPUT_MASK;
     if ((pins >> OUTPUT_OFFSET) != 0) {
         AUDIO_FUNC_LOGE("pins: %d, error!\n", pins);
         return HDF_FAILURE;
@@ -460,7 +460,7 @@ static int32_t AudioPathSelGetPlanRender(struct AudioHwRenderParam *renderParam)
 }
 
 static int32_t SetCapturePathValue(
-    int32_t tpins, cJSON *captureSwitchObj, struct AudioHwCaptureParam *captureParam, int32_t value)
+    uint32_t tpins, cJSON *captureSwitchObj, struct AudioHwCaptureParam *captureParam, int32_t value)
 {
     if (captureParam == NULL || captureSwitchObj == NULL) {
         AUDIO_FUNC_LOGE("param Is NULL");
@@ -517,7 +517,7 @@ static int32_t SetCapturePathValue(
 }
 
 static int32_t SetMatchCaptureDevicePath(
-    struct AudioHwCaptureParam *captureParam, cJSON *cJsonObj, int32_t tpins, char *deviceType, int32_t value)
+    struct AudioHwCaptureParam *captureParam, cJSON *cJsonObj, uint32_t tpins, char *deviceType, int32_t value)
 {
     if (captureParam == NULL || cJsonObj == NULL) {
         AUDIO_FUNC_LOGE("param Is NULL");
@@ -561,7 +561,7 @@ static int32_t SetMatchCaptureDefaultDevicePath(struct AudioHwCaptureParam *capt
 }
 
 static int32_t SetMatchCaptureOtherDevicePath(
-    struct AudioHwCaptureParam *captureParam, cJSON *cJsonObj, int32_t tpins, int32_t value)
+    struct AudioHwCaptureParam *captureParam, cJSON *cJsonObj, uint32_t tpins, int32_t value)
 {
     int32_t ret;
     uint32_t i;
@@ -600,7 +600,7 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
         return HDF_SUCCESS;
     }
 
-    int32_t tpins = pins & INPUT_MASK;
+    uint32_t tpins = pins & INPUT_MASK;
     switch (tpins) {
         case (1 << INPUT_OFFSET):
             /* pins = 0, parse default value */
