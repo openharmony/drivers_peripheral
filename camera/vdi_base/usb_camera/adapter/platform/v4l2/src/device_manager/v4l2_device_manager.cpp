@@ -22,6 +22,7 @@
 
 constexpr int ITEM_CAPACITY_SIZE = 30;
 constexpr int DATA_CAPACITY_SIZE = 2000;
+constexpr size_t MIN_EXT_CFG_VEC_SIZE = 8;
 
 namespace OHOS::Camera {
 IMPLEMENT_DEVICEMANAGER(V4L2DeviceManager);
@@ -333,8 +334,8 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
     std::vector<DeviceFormat>& deviceFormat, bool uvcState)
 {
     if (uvcState) {
-        if (deviceControl.empty() || deviceFormat.empty()) {
-            CAMERA_LOGI("V4L2DeviceManager::UvcCallBack %{public}s is empty", hardwareName.c_str());
+        if (deviceFormat.empty()) {
+            CAMERA_LOGI("V4L2DeviceManager::UvcCallBack %{public}s deviceFormat is empty", hardwareName.c_str());
             return;
         }
         CAMERA_LOGI("uvc plug in %{public}s begin", hardwareName.c_str());
@@ -348,12 +349,11 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         CHECK_IF_PTR_NULL_RETURN_VOID(GetManager(DM_M_SENSOR));
         RetCode rc = GetManager(DM_M_SENSOR)->CreateController(DM_C_SENSOR, hardwareName);
         CHECK_IF_EQUAL_RETURN_VOID(rc, RC_ERROR);
-        std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE,
-            DATA_CAPACITY_SIZE);
+        auto meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
         CHECK_IF_PTR_NULL_RETURN_VOID(meta);
         Convert(deviceControl, deviceFormat, meta);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
-
+        CHECK_IF_EQUAL_RETURN_VOID(streamAvailableExtendConfigurationsVector_.size() <= MIN_EXT_CFG_VEC_SIZE, true);
         uvcCb_(meta, uvcState, id, hardwareName);
         CAMERA_LOGI("uvc plug in %{public}s end", hardwareName.c_str());
     } else {
@@ -754,6 +754,11 @@ static std::vector<int32_t> GetFormatVector(const std::vector<struct FormatInfoI
                 it.width, it.height, it.minFps, it.maxFps);
             continue;
         }
+        if (!it.isYuv && format != OHOS_CAMERA_FORMAT_MJPEG) {
+            CAMERA_LOGI("this format not support yuv, %{public}d x %{public}d @fps[%{public}d, %{public}d]",
+                it.width, it.height, it.minFps, it.maxFps);
+            continue;
+        }
         formatVector.push_back(format);
         formatVector.push_back(it.width);
         formatVector.push_back(it.height);
@@ -793,6 +798,7 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
 
     streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
     CAMERA_LOGI("config is:%{public}s", VectorInt32ToString(streamAvailableExtendConfigurationsVector).c_str());
+    streamAvailableExtendConfigurationsVector_ = streamAvailableExtendConfigurationsVector;
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS,
                        streamAvailableExtendConfigurationsVector);
 }
