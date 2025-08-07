@@ -232,7 +232,7 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddressFile(co
     char buf[bufsize] = {0};
     char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
     bool readNVSucc = GetConstantAddress(addressStr, ADDRESS_STR_LEN + 1);
-    int newFd = open(path.c_str(), O_RDWR | O_CREAT, 00644);
+    int newFd = open(path.c_str(), O_RDWR | O_CREAT, 00600);
     HDF_LOGI("GetDeviceAddress open newFd %{public}d.", newFd);
     if (newFd < 0) {
         return ParseAddressToPtr(addressStr, ADDRESS_STR_LEN + 1);
