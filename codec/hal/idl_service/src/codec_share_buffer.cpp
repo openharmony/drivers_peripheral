@@ -33,7 +33,7 @@ sptr<ICodecBuffer> CodecShareBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t por
 
     int size = OHOS::AshmemGetSize(codecBuffer.fd->Get());
     CHECK_AND_RETURN_RET_LOG(size > 0, nullptr, "ashmem fd has invalid size");
-    codecBuffer.allocLen = size;
+    codecBuffer.allocLen = static_cast<uint32_t>(size);
 
     sptr<Ashmem> shMem = sptr<Ashmem>::MakeSptr(codecBuffer.fd->Release(), size);
     CHECK_AND_RETURN_RET_LOG(shMem != nullptr, nullptr, "create Ashmem failed");
