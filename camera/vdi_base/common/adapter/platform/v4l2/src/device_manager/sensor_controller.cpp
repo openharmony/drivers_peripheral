@@ -355,7 +355,7 @@ void SensorController::GetFocusMode(SensorController *sensorController,
     }
     uint8_t focusMode = value;
 
-    CAMERA_LOGI("Get CMD_FOCUS_MODE [%{public}]", focusMode);
+    CAMERA_LOGI("Get CMD_FOCUS_MODE [%{public}u]", focusMode);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
     meta->addEntry(OHOS_CONTROL_FOCUS_MODE, &focusMode, 1);
@@ -371,7 +371,7 @@ void SensorController::GetFocusState(SensorController *sensorController,
     }
     uint8_t focusState = value;
 
-    CAMERA_LOGI("Get CMD_FOCUS_SATE [%{public}]", focusState);
+    CAMERA_LOGI("Get CMD_FOCUS_SATE [%{public}u]", focusState);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
     meta->addEntry(OHOS_CONTROL_FOCUS_STATE, &focusState, 1);
@@ -386,7 +386,7 @@ void SensorController::GetExposureMode(SensorController *sensorController,
     }
     uint8_t exposureMode = value;
 
-    CAMERA_LOGI("Get CMD_FEXPOSURE_MODE [%{public}]", exposureMode);
+    CAMERA_LOGI("Get CMD_FEXPOSURE_MODE [%{public}u]", exposureMode);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
     meta->addEntry(OHOS_CONTROL_EXPOSURE_MODE, &exposureMode, 1);
@@ -401,7 +401,7 @@ void SensorController::GetExposureTime(SensorController *sensorController,
     }
     int64_t exposureTime = value;
 
-    CAMERA_LOGI("Get CMD_FEXPOSURE_TIME [%{public}]", exposureTime);
+    CAMERA_LOGI("Get CMD_FEXPOSURE_TIME [%{public}d]", exposureTime);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
     meta->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &exposureTime, 1);
@@ -416,7 +416,7 @@ void SensorController::GetExposureCompensation(SensorController *sensorControlle
     }
     int32_t exposureCompensation = value;
     constexpr uint32_t DATA_COUNT = 1;
-    CAMERA_LOGI("Get CMD_FEXPOSURE_COMPENSATION [%{public}]", exposureCompensation);
+    CAMERA_LOGI("Get CMD_FEXPOSURE_COMPENSATION [%{public}d]", exposureCompensation);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &exposureCompensation, DATA_COUNT);
@@ -435,7 +435,7 @@ void SensorController::GetMeterMode(SensorController *sensorController,
     }
     uint8_t meterMode = value;
 
-    CAMERA_LOGI("Get CMD_METER_MODE [%{public}]", meterMode);
+    CAMERA_LOGI("Get CMD_METER_MODE [%{public}u]", meterMode);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
     meta->addEntry(OHOS_CONTROL_METER_MODE, &meterMode, 1);
@@ -450,7 +450,7 @@ void SensorController::GetExposureState(SensorController *sensorController,
     }
     uint8_t exposureState = value;
 
-    CAMERA_LOGI("Get CMD_EXPOSURE_STATE [%{public}]", exposureState);
+    CAMERA_LOGI("Get CMD_EXPOSURE_STATE [%{public}u]", exposureState);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
     meta->addEntry(OHOS_CONTROL_EXPOSURE_STATE, &exposureState, 1);
@@ -465,7 +465,7 @@ void SensorController::GetFlashMode(SensorController *sensorController,
     }
     uint8_t flashMode = value;
 
-    CAMERA_LOGI("Get CMD_FLASH_MODE [%{public}]", flashMode);
+    CAMERA_LOGI("Get CMD_FLASH_MODE [%{public}u]", flashMode);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
     meta->addEntry(OHOS_CONTROL_FLASH_MODE, &flashMode, 1);
@@ -480,7 +480,7 @@ void SensorController::GetCaptureMirror(SensorController *sensorController,
     }
     uint8_t captureMirror = value;
 
-    CAMERA_LOGI("Get CMD_CAPTURE_MIRROR [%{public}]", captureMirror);
+    CAMERA_LOGI("Get CMD_CAPTURE_MIRROR [%{public}u]", captureMirror);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
     meta->addEntry(OHOS_CONTROL_CAPTURE_MIRROR, &captureMirror, 1);
