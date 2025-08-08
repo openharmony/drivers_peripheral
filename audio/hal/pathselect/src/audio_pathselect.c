@@ -369,6 +369,7 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
     if (ret != HDF_SUCCESS) {
         return ret;
     }
+    uint32_t pins = renderParam->renderMode.hwInfo.deviceDescript.pins;
     uint32_t tpins = pins & OUTPUT_MASK;
     switch (tpins) {
         case PIN_NONE:
