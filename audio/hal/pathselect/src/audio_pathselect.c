@@ -305,7 +305,7 @@ static int32_t SetMatchRenderDefaultDevicePath(struct AudioHwRenderParam *render
         return HDF_ERR_INVALID_PARAM;
     }
     for (uint32_t i = PIN_OUT_SPEAKER; i <= PIN_OUT_EARPIECE; i = i << 1) {
-        const char *deviceType = AudioPathSelGetDeviceType((int32_t)i);
+        const char *deviceType = AudioPathSelGetDeviceType(i);
         if (deviceType == NULL) {
             AUDIO_FUNC_LOGE("DeviceType not found.");
             return HDF_FAILURE;
@@ -373,7 +373,10 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
             ret = SetMatchRenderDevicePath(tpins, renderParam, cJsonObj, SPEAKER, AUDIO_DEV_ON);
 #ifndef ALSA_LIB_MODE
             /* 2.close headphones */
-            ret |= SetMatchRenderDevicePath(PIN_OUT_HEADSET, renderParam, cJsonObj, HEADPHONES, AUDIO_DEV_OFF);
+            if (SetMatchRenderDevicePath(PIN_OUT_HEADSET, renderParam, cJsonObj, HEADPHONES, AUDIO_DEV_OFF) ==
+                HDF_SUCCESS) {
+                ret = HDF_SUCCESS;
+            }
 #endif
             break;
         case PIN_OUT_HEADSET:
@@ -381,7 +384,10 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
             ret = SetMatchRenderDevicePath(tpins, renderParam, cJsonObj, HEADPHONES, AUDIO_DEV_ON);
 #ifndef ALSA_LIB_MODE
             /* 2、close speaker */
-            ret |= SetMatchRenderDevicePath(PIN_OUT_SPEAKER, renderParam, cJsonObj, SPEAKER, AUDIO_DEV_OFF);
+            if (SetMatchRenderDevicePath(PIN_OUT_SPEAKER, renderParam, cJsonObj, SPEAKER, AUDIO_DEV_OFF) ==
+                HDF_SUCCESS) {
+                ret = HDF_SUCCESS;
+            }
 #endif
             break;
         case PIN_OUT_EARPIECE:
@@ -611,7 +617,11 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
             ret = SetMatchCaptureDevicePath(captureParam, cJsonObj, tpins, MIC, AUDIO_DEV_ON);
 #ifndef ALSA_LIB_MODE
             /* 2.close headset mic */
-            ret |= SetMatchCaptureDevicePath(captureParam, cJsonObj, PIN_IN_HS_MIC, HS_MIC, AUDIO_DEV_OFF);
+            if (SetMatchCaptureDevicePath(captureParam, cJsonObj, PIN_IN_HS_MIC, HS_MIC, AUDIO_DEV_OFF) ==
+                HDF_SUCCESS)
+            {
+                ret = HDF_SUCCESS;
+            }
 #endif
             break;
         case PIN_IN_HS_MIC:
@@ -619,7 +629,10 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
             ret = SetMatchCaptureDevicePath(captureParam, cJsonObj, tpins, HS_MIC, AUDIO_DEV_ON);
 #ifndef ALSA_LIB_MODE
             /* 2、close main mic */
-            ret |= SetMatchCaptureDevicePath(captureParam, cJsonObj, PIN_IN_MIC, MIC, AUDIO_DEV_OFF);
+            if (SetMatchCaptureDevicePath(captureParam, cJsonObj, PIN_IN_MIC, MIC, AUDIO_DEV_OFF) ==
+                HDF_SUCCESS) {
+                ret = HDF_SUCCESS;
+            }
 #endif
             break;
         case PIN_IN_BLUETOOTH_SCO_HEADSET:
