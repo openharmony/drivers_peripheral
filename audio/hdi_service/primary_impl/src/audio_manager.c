@@ -536,12 +536,7 @@ int32_t AudioManagerLoadAdapter(
     }
 
     int32_t freePos = AudioManagerServiceGetFreeAdapterPos(manager, desc->adapterName);
-    if (freePos < 0) {
-        AUDIO_FUNC_LOGE("AudioManagerServiceGetFreeAdapterPos is negative!");
-        return HDF_FAILURE;
-    }
-    pos = (uint32_t)AudioManagerServiceGetFreeAdapterPos(manager, desc->adapterName);
-    if (pos >= SUPPORT_ADAPTER_NUM_MAX) {
+    if (freePos < 0 || freePos >= SUPPORT_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("AudioManagerServiceGetFreeAdapterPos failed!");
         return HDF_FAILURE;
     }
