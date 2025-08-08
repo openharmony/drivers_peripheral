@@ -350,8 +350,6 @@ static int32_t ParseRenderDevice(const cJSON *cJsonObj, const struct AudioHwRend
     }
 
     uint32_t pins = renderParam->renderMode.hwInfo.deviceDescript.pins;
-    uint32_t tpins = pins & OUTPUT_MASK;
-
     if ((pins >> OUTPUT_OFFSET) != 0) {
         AUDIO_FUNC_LOGE("pins: %d, error!\n", pins);
         return HDF_FAILURE;
@@ -371,7 +369,7 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
     if (ret != HDF_SUCCESS) {
         return ret;
     }
-
+    uint32_t tpins = pins & OUTPUT_MASK;
     switch (tpins) {
         case PIN_NONE:
             /* pins = 0, parse default value */
