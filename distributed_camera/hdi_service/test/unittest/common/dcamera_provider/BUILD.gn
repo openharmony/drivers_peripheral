@@ -34,6 +34,7 @@ config("module_private_config") {
 
 ohos_unittest("HdfDcameraProviderTest") {
   module_out_path = module_out_path
+  cflags = [ "-Dprivate=public" ]
 
   sources = [ "dcamera_provider_test.cpp" ]
 
