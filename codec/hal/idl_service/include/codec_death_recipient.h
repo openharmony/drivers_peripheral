@@ -30,6 +30,7 @@ void CleanResourceOfDiedService(sptr<IRemoteObject> remote, wptr<CodecComponentM
 void RegisterDeathRecipientService(const sptr<ICodecCallback> callback, uint32_t componentId,
                                    wptr<CodecComponentManagerService> service);
 void RemoveMapperOfDestoryedComponent(uint32_t componentId);
+bool CheckComponentIdOwnership(uint32_t componentId);
 
 class CodecDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
