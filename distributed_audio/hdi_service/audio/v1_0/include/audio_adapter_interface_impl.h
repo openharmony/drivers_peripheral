@@ -123,7 +123,7 @@ private:
     int32_t HandleSANotifyEvent(const uint32_t streamId, const DAudioEvent &event);
     int32_t WaitForSANotify(const uint32_t streamId, const AudioDeviceEvent &event);
     int32_t HandleDeviceClosed(const uint32_t streamId, const DAudioEvent &event);
-    int32_t HandleRenderCallback(const uint32_t devId, const DAudioEvent &event);
+    int32_t HandleRenderCallback(const uint32_t renderId, const DAudioEvent &event);
     int32_t getEventTypeFromCondition(const std::string& condition);
     sptr<AudioRenderInterfaceImplBase> CreateRenderImpl(const AudioDeviceDescriptor &desc,
         const AudioSampleAttributes &attrs, int32_t renderId);
@@ -147,7 +147,8 @@ private:
     sptr<AudioRenderInterfaceImplBase> GetRenderImpl(const std::string &content);
     void SetSpkStatus(const uint32_t streamId, bool status);
     bool GetSpkStatus(const uint32_t streamId);
-    sptr<IAudioCallback> GetRenderCallback(const uint32_t devId);
+    sptr<IAudioCallback> GetRenderCallback(const uint32_t renderId);
+    void DeleteRenderCallback(const uint32_t renderId);
 
 private:
     static constexpr uint32_t WAIT_MILLISECONDS = 8000;
@@ -165,6 +166,7 @@ private:
     std::mutex capDevMtx_;
     std::vector<std::pair<int32_t, sptr<AudioCaptureInterfaceImplBase>>> captureDevs_;
     AudioParameter captureParam_;
+    std::map<int32_t, sptr<AudioRenderInterfaceImplBase>> renderCallbacks_;
 
     std::mutex devMapMtx_;
     std::mutex captureOptMtx_;

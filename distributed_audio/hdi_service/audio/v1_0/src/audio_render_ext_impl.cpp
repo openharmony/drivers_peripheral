@@ -564,6 +564,11 @@ void AudioRenderExtImpl::SetRenderStatus(AudioRenderStatus status)
     DHLOGI("Set renderstatus: %{public}d", static_cast<int32_t>(status));
 }
 
+sptr<IAudioCallback> AudioRenderExtImpl::GetAudioCallback()
+{
+    return nullptr;
+}
+
 AudioRenderInterfaceImplBase *GetRenderImplExt()
 {
     DHLOGI("Get low latency render impl.");

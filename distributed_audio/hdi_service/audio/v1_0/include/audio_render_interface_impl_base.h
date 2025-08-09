@@ -56,6 +56,7 @@ public:
     virtual void SetDumpFlagInner() = 0;
     virtual AudioRenderStatus GetRenderStatus() = 0;
     virtual void SetRenderStatus(AudioRenderStatus status) = 0;
+    virtual sptr<IAudioCallback> GetAudioCallback() = 0;
 };
 } // V1_0
 } // Audio
