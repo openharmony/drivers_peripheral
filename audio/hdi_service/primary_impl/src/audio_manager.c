@@ -548,11 +548,11 @@ int32_t AudioManagerLoadAdapter(
         return ret;
     }
 
-    ret = AudioManagerServiceAddAdapter(manager, *adapter, pos);
+    ret = AudioManagerServiceAddAdapter(manager, *adapter, freePos);
     if (ret != AUDIO_SUCCESS) {
         AUDIO_FUNC_LOGE("Add adapter to list failed.");
-        AudioManagerEnforceClearRef(manager, pos);
-        AudioManagerServiceRemvAdapter(manager, pos);
+        AudioManagerEnforceClearRef(manager, (uint32_t)freePos);
+        AudioManagerServiceRemvAdapter(manager, (uint32_t)freePos);
         return ret;
     }
 
