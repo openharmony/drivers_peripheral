@@ -382,22 +382,6 @@ bool SensorClientsManager::IsNeedCloseSensor(SensorHandle sensorHandle, int serv
     return false;
 }
 
-void SensorClientsManager::EraseSensorBestConfig(SensorHandle sensorHandle)
-{
-    SENSOR_TRACE_PID;
-    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
-    auto it = sensorConfig_.find(sensorHandle);
-    if (it == sensorConfig_.end()) {
-        HDF_LOGD("%{public}s: sensorHandle: %{public}s SensorBestConfig not exist, not need erase", __func__,
-                 SENSOR_HANDLE_TO_C_STR(sensorHandle));
-        return;
-    }
-    sensorConfig_.erase(it);
-    HDF_LOGD("%{public}s: sensorHandle: %{public}s config has been erase from sensorConfig_", __func__,
-             SENSOR_HANDLE_TO_C_STR(sensorHandle));
-    return;
-}
-
 bool SensorClientsManager::IsExistSdcSensorEnable(SensorHandle sensorHandle)
 {
     SENSOR_TRACE_PID;
@@ -464,6 +448,22 @@ bool SensorClientsManager::GetBestSensorConfigMap(std::unordered_map<SensorHandl
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     map = sensorConfig_;
     return true;
+}
+
+void SensorClientsManager::EraseSensorBestConfig(SensorHandle sensorHandle)
+{
+    SENSOR_TRACE_PID;
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
+    auto it = sensorConfig_.find(sensorHandle);
+    if (it == sensorConfig_.end()) {
+        HDF_LOGD("%{public}s: sensorHandle: %{public}s SensorBestConfig not exist, not need erase", __func__,
+                 SENSOR_HANDLE_TO_C_STR(sensorHandle));
+        return;
+    }
+    sensorConfig_.erase(it);
+    HDF_LOGD("%{public}s: sensorHandle: %{public}s config has been erase from sensorConfig_", __func__,
+             SENSOR_HANDLE_TO_C_STR(sensorHandle));
+    return;
 }
 
 void SensorClientsManager::SetClientSenSorConfig(SensorHandle sensorHandle, int32_t serviceId, int64_t samplingInterval,
