@@ -371,6 +371,7 @@ void SensorIfService::DisableUnusedSensors(int serviceId)
         if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(iter.first, serviceId, DISABLE_SENSOR)) {
             continue;
         }
+
         SensorClientsManager::GetInstance()->EraseSensorBestConfig(iter.first);
         std::unordered_map<SensorHandle, std::set<int32_t>> sensorUsed =
             SensorClientsManager::GetInstance()->GetSensorUsed();
