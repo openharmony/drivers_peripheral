@@ -101,7 +101,7 @@ public:
     void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
         const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback, const int32_t dhId) override;
     void SetDumpFlagInner() override;
-    sptr<IAudioCallback> GetAudioCallback();
+    sptr<IAudioCallback> GetAudioCallback() override;
     AudioRenderStatus GetRenderStatus() override;
     void SetRenderStatus(AudioRenderStatus status) override;
 
