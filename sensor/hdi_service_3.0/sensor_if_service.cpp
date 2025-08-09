@@ -372,7 +372,6 @@ void SensorIfService::DisableUnusedSensors(int serviceId)
             continue;
         }
 
-        SensorClientsManager::GetInstance()->EraseSensorBestConfig(iter.first);
         std::unordered_map<SensorHandle, std::set<int32_t>> sensorUsed =
             SensorClientsManager::GetInstance()->GetSensorUsed();
         if (sensorUsed.find(iter.first) == sensorUsed.end()) {
@@ -515,7 +514,6 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
         HDF_LOGD("%{public}s There are still some services enable", __func__);
         return HDF_SUCCESS;
     }
-    SensorClientsManager::GetInstance()->EraseSensorBestConfig(sensorHandle);
 
     if (sensorVdiImplV1_1_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);

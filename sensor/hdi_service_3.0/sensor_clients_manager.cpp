@@ -343,6 +343,7 @@ void SensorClientsManager::OpenSensor(SensorHandle sensorHandle, int serviceId)
 bool SensorClientsManager::IsNeedOpenSensor(SensorHandle sensorHandle, int serviceId)
 {
     SENSOR_TRACE_PID;
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     auto it = sensorUsed_.find(sensorHandle);
     if (it == sensorUsed_.end()) {
         HDF_LOGD("%{public}s: sensorHandle %{public}s is enabled by service: %{public}d", __func__,
@@ -361,6 +362,7 @@ bool SensorClientsManager::IsNeedOpenSensor(SensorHandle sensorHandle, int servi
 bool SensorClientsManager::IsNeedCloseSensor(SensorHandle sensorHandle, int serviceId)
 {
     SENSOR_TRACE_PID;
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     auto it = sensorUsed_.find(sensorHandle);
     if (it == sensorUsed_.end()) {
         HDF_LOGE("%{public}s: sensorHandle %{public}s has been disabled  or not support", __func__,
@@ -412,11 +414,11 @@ bool SensorClientsManager::IsExistSdcSensorEnable(SensorHandle sensorHandle)
 bool SensorClientsManager::IsUpadateSensorState(SensorHandle sensorHandle, int serviceId, bool isOpen)
 {
     SENSOR_TRACE_PID;
-    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     if (isOpen && IsNeedOpenSensor(sensorHandle, serviceId)) {
         return true;
     }
     if (!isOpen && IsNeedCloseSensor(sensorHandle, serviceId)) {
+        EraseSensorBestConfig(sensorHandle);
         return true;
     }
     return false;
