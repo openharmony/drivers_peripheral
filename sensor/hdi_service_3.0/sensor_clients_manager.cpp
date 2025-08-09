@@ -370,7 +370,6 @@ bool SensorClientsManager::IsNeedCloseSensor(SensorHandle sensorHandle, int serv
     sensorUsed_[sensorHandle].erase(serviceId);
     if (sensorUsed_[sensorHandle].empty()) {
         sensorUsed_.erase(sensorHandle);
-        sensorConfig_.erase(sensorHandle);
         HDF_LOGD("%{public}s: disabled sensorHandle %{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle));
         return true;
     }
@@ -379,6 +378,22 @@ bool SensorClientsManager::IsNeedCloseSensor(SensorHandle sensorHandle, int serv
                  SENSOR_HANDLE_TO_C_STR(sensorHandle), sid);
     }
     return false;
+}
+
+void SensorClientsManager::EraseSensorBestConfig(SensorHandle sensorHandle)
+{
+    SENSOR_TRACE_PID;
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
+    auto it = sensorConfig_.find(sensorHandle);
+    if (it == sensorConfig_.end()) {
+        HDF_LOGD("%{public}s: sensorHandle: %{public}s SensorBestConfig not exist, not need erase", __func__,
+                 SENSOR_HANDLE_TO_C_STR(sensorHandle));
+        return;
+    }
+    sensorConfig_.erase(it);
+    HDF_LOGD("%{public}s: sensorHandle: %{public}s config has been erase from sensorConfig_", __func__,
+             SENSOR_HANDLE_TO_C_STR(sensorHandle));
+    return;
 }
 
 bool SensorClientsManager::IsExistSdcSensorEnable(SensorHandle sensorHandle)
