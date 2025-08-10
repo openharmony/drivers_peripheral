@@ -48,6 +48,7 @@ public:
     void GetSensorBestConfig(SensorHandle sensorHandle, int64_t &samplingInterval, int64_t &reportInterval);
     int64_t GetSensorBestSamplingInterval(SensorHandle sensorHandle);
     void EraseSdcSensorBestConfig(SensorHandle sensorHandle);
+    void EraseSensorBestConfig(SensorHandle sensorHandle);
     bool IsUpadateSensorState(SensorHandle sensorHandle, int serviceId, bool isOpen);
     static bool IsNotNeedReportData(SensorClientInfo &sensorClientInfo, const SensorHandle sensorHandle,
                                     const int32_t &serviceId);
