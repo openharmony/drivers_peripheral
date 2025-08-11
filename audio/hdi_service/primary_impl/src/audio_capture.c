@@ -722,7 +722,7 @@ static void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
     }
     if (errorCode == WRITE_FRAME_ERROR_CODE) {
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].errorCode = errorCode;
-        hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].count = hwCapture->errorLog.iter;
+        hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].count = (uint32_t)hwCapture->errorLog.iter;
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].frames =
             hwCapture->captureParam.frameCaptureMode.frames;
         hwCapture->errorLog.iter++;

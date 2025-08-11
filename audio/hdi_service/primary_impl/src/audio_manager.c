@@ -535,8 +535,8 @@ int32_t AudioManagerLoadAdapter(
         return AudioManagerIncreaseAdapterRef(manager, pos, adapter);
     }
 
-    pos = AudioManagerServiceGetFreeAdapterPos(manager, desc->adapterName);
-    if (pos >= SUPPORT_ADAPTER_NUM_MAX) {
+    int32_t freePos = AudioManagerServiceGetFreeAdapterPos(manager, desc->adapterName);
+    if (freePos < 0 || freePos >= SUPPORT_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("AudioManagerServiceGetFreeAdapterPos failed!");
         return HDF_FAILURE;
     }
@@ -548,11 +548,11 @@ int32_t AudioManagerLoadAdapter(
         return ret;
     }
 
-    ret = AudioManagerServiceAddAdapter(manager, *adapter, pos);
+    ret = AudioManagerServiceAddAdapter(manager, *adapter, freePos);
     if (ret != AUDIO_SUCCESS) {
         AUDIO_FUNC_LOGE("Add adapter to list failed.");
-        AudioManagerEnforceClearRef(manager, pos);
-        AudioManagerServiceRemvAdapter(manager, pos);
+        AudioManagerEnforceClearRef(manager, (uint32_t)freePos);
+        AudioManagerServiceRemvAdapter(manager, (uint32_t)freePos);
         return ret;
     }
 
