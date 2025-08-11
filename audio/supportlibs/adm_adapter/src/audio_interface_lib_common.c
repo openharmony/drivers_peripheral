@@ -360,7 +360,6 @@ static int32_t AudioReadCardPortToDesc(struct HdfSBuf *reply, struct AudioAdapte
             desc->ports[i].portName = strdup("AOIP");
         } else {
             AudioMemFree((void **)&desc->ports);
-            AUDIO_FUNC_LOGE("desc->ports[i].dir = %{public}d", desc->ports[i].dir);
             return HDF_FAILURE;
         }
         desc->ports[i].portId = portId;
