@@ -68,6 +68,9 @@ constexpr const char* TEST_ABILITY_VALUE = R"({"CodecType": ["avenc_mpeg4"],
                 "960*544", "880*720", "720*720", "720*480", "640*480", "352*288", "320*240"]
         }
     }})";
+
+constexpr int TEST_NORMAL_MODE = 0;
+constexpr int TEST_INVALID_MODE = 1;
 constexpr int TEST_STREAMID = 1001;
 constexpr int TEST_HEIGHT = 480;
 constexpr int TEST_WIDTH = 640;
@@ -121,6 +124,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_002, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
 
+    // normal stream
     OperationMode mode = NORMAL;
     std::vector<uint8_t> modeSetting;
     // Configure stream information
@@ -354,6 +358,631 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_008, TestSize.Level1)
     streamIds.push_back(streamInfo.streamId_);
     rc = dstreamOperator_->ReleaseStreams(streamIds);
     EXPECT_NE(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_009
+ * @tc.desc: Verify IsStreamsSupported
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_009, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+
+    // same streamId
+    OperationMode mode = NORMAL;
+    std::vector<uint8_t> modeSetting;
+    // Configure stream information
+    struct StreamInfo streamInfo1;
+    streamInfo1.streamId_ = TEST_STREAMID;
+    streamInfo1.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo1.height_ = TEST_HEIGHT;
+    streamInfo1.width_ = TEST_WIDTH;
+    streamInfo1.dataspace_ = TEST_DATASPACE;
+    streamInfo1.intent_ = StreamIntent::PREVIEW;
+    streamInfo1.tunneledMode_ = TEST_TUNNELEDMODE;
+    streamInfo1.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+    streamInfo1.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+
+    struct StreamInfo streamInfo2;
+    streamInfo2.streamId_ = TEST_STREAMID;
+    streamInfo2.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo2.height_ = TEST_HEIGHT;
+    streamInfo2.width_ = TEST_WIDTH;
+    streamInfo2.dataspace_ = TEST_DATASPACE;
+    streamInfo2.intent_ = StreamIntent::PREVIEW;
+    streamInfo2.tunneledMode_ = TEST_TUNNELEDMODE;
+    streamInfo2.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+    streamInfo2.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+
+    StreamSupportType pType;
+    std::vector<StreamInfo> stre;
+    stre.push_back(streamInfo1);
+    stre.push_back(streamInfo2);
+    int32_t rc = dstreamOperator_->IsStreamsSupported(mode, modeSetting, stre, pType);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+    EXPECT_EQ(pType, DYNAMIC_SUPPORTED);
+}
+
+/**
+ * @tc.name: dstream_operator_test_010
+ * @tc.desc: Verify IsStreamsSupported
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_010, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    // invalid stream
+    OperationMode mode = NORMAL;
+    std::vector<uint8_t> modeSetting;
+    StreamSupportType pType;
+    std::vector<StreamInfo> stre;
+    int32_t rc = dstreamOperator_->IsStreamsSupported(mode, modeSetting, stre, pType);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
+    EXPECT_EQ(pType, DYNAMIC_SUPPORTED);
+}
+
+/**
+ * @tc.name: dstream_operator_test_011
+ * @tc.desc: Verify IsStreamsSupported
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_011, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+
+    // invalid mode
+    OperationMode mode = static_cast<OperationMode>(TEST_INVALID_MODE);
+    std::vector<uint8_t> modeSetting = {0x01, 0x02};
+    // Configure stream information
+    struct StreamInfo streamInfo;
+    streamInfo.streamId_ = TEST_STREAMID;
+    streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo.height_ = TEST_HEIGHT;
+    streamInfo.width_ = TEST_WIDTH;
+    streamInfo.dataspace_ = TEST_DATASPACE;
+    streamInfo.intent_ = StreamIntent::PREVIEW;
+    streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+    streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+    StreamSupportType pType;
+    std::vector<StreamInfo> stre;
+    stre.push_back(streamInfo);
+    int32_t rc = dstreamOperator_->IsStreamsSupported(mode, modeSetting, stre, pType);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+    EXPECT_EQ(pType, DYNAMIC_SUPPORTED);
+}
+
+/**
+ * @tc.name: dstream_operator_test_012
+ * @tc.desc: Verify IsStreamsSupported
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_012, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+
+    // more streamId
+    OperationMode mode = NORMAL;
+    std::vector<uint8_t> modeSetting;
+    // Configure stream information
+    std::vector<StreamInfo> stre;
+    for (int i = 0; i < 100; i++) {
+        struct StreamInfo streamInfo;
+        streamInfo.streamId_ = i;
+        streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+        streamInfo.height_ = TEST_HEIGHT;
+        streamInfo.width_ = TEST_WIDTH;
+        streamInfo.dataspace_ = TEST_DATASPACE;
+        streamInfo.intent_ = StreamIntent::PREVIEW;
+        streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
+        streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+        streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+        stre.push_back(streamInfo);
+    }
+    StreamSupportType pType;
+    int32_t rc = dstreamOperator_->IsStreamsSupported(mode, modeSetting, stre, pType);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+    EXPECT_EQ(pType, DYNAMIC_SUPPORTED);
+}
+
+/**
+ * @tc.name: dstream_operator_test_013
+ * @tc.desc: Verify IsStreamsSupported_V1_1
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_013, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+
+    // normal stream
+    OperationMode_V1_1 mode = static_cast<OperationMode_V1_1>(TEST_NORMAL_MODE);
+    std::vector<uint8_t> modeSetting;
+    StreamInfo_V1_1 streamInfo_V1_1;
+    std::vector<StreamInfo_V1_1> infos;
+    // Configure stream information
+    struct StreamInfo streamInfo;
+    streamInfo.streamId_ = TEST_STREAMID;
+    streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo.height_ = TEST_HEIGHT;
+    streamInfo.width_ = TEST_WIDTH;
+    streamInfo.dataspace_ = TEST_DATASPACE;
+    streamInfo.intent_ = StreamIntent::PREVIEW;
+    streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+    streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+    streamInfo_V1_1.v1_0 = streamInfo;
+    infos.push_back(streamInfo_V1_1);
+    StreamSupportType pType;
+    int32_t rc = dstreamOperator_->IsStreamsSupported_V1_1(mode, modeSetting, infos, pType);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+    EXPECT_EQ(pType, DYNAMIC_SUPPORTED);
+}
+
+/**
+ * @tc.name: dstream_operator_test_014
+ * @tc.desc: Verify IsStreamsSupported_V1_1
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_014, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+
+    // same streamId
+    OperationMode_V1_1 mode = static_cast<OperationMode_V1_1>(TEST_NORMAL_MODE);
+    std::vector<uint8_t> modeSetting;
+    StreamInfo_V1_1 streamInfo_V1_1_a;
+    StreamInfo_V1_1 streamInfo_V1_1_b;
+    std::vector<StreamInfo_V1_1> infos;
+
+    // Configure stream information
+    struct StreamInfo streamInfo1;
+    streamInfo1.streamId_ = TEST_STREAMID;
+    streamInfo1.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo1.height_ = TEST_HEIGHT;
+    streamInfo1.width_ = TEST_WIDTH;
+    streamInfo1.dataspace_ = TEST_DATASPACE;
+    streamInfo1.intent_ = StreamIntent::PREVIEW;
+    streamInfo1.tunneledMode_ = TEST_TUNNELEDMODE;
+    streamInfo1.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+    streamInfo1.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+
+    struct StreamInfo streamInfo2;
+    streamInfo2.streamId_ = TEST_STREAMID;
+    streamInfo2.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo2.height_ = TEST_HEIGHT;
+    streamInfo2.width_ = TEST_WIDTH;
+    streamInfo2.dataspace_ = TEST_DATASPACE;
+    streamInfo2.intent_ = StreamIntent::PREVIEW;
+    streamInfo2.tunneledMode_ = TEST_TUNNELEDMODE;
+    streamInfo2.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+    streamInfo2.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+
+    streamInfo_V1_1_a.v1_0 = streamInfo1;
+    streamInfo_V1_1_b.v1_0 = streamInfo2;
+    infos.push_back(streamInfo_V1_1_a);
+    infos.push_back(streamInfo_V1_1_b);
+    StreamSupportType pType;
+    int32_t rc = dstreamOperator_->IsStreamsSupported_V1_1(mode, modeSetting, infos, pType);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+    EXPECT_EQ(pType, DYNAMIC_SUPPORTED);
+}
+
+/**
+ * @tc.name: dstream_operator_test_015
+ * @tc.desc: Verify IsStreamsSupported_V1_1
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_015, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+
+    // invalid stream
+    OperationMode_V1_1 mode = static_cast<OperationMode_V1_1>(TEST_NORMAL_MODE);
+    std::vector<uint8_t> modeSetting;
+    std::vector<StreamInfo_V1_1> infos;
+    StreamSupportType pType;
+    int32_t rc = dstreamOperator_->IsStreamsSupported_V1_1(mode, modeSetting, infos, pType);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
+    EXPECT_EQ(pType, DYNAMIC_SUPPORTED);
+}
+
+/**
+ * @tc.name: dstream_operator_test_016
+ * @tc.desc: Verify IsStreamsSupported_V1_1
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_016, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+
+    // invalid mode
+    OperationMode_V1_1 mode = static_cast<OperationMode_V1_1>(TEST_INVALID_MODE);
+    std::vector<uint8_t> modeSetting = {0x01, 0x02};
+    StreamInfo_V1_1 streamInfo_V1_1;
+    std::vector<StreamInfo_V1_1> infos;
+    // Configure stream information
+    struct StreamInfo streamInfo;
+    streamInfo.streamId_ = TEST_STREAMID;
+    streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo.height_ = TEST_HEIGHT;
+    streamInfo.width_ = TEST_WIDTH;
+    streamInfo.dataspace_ = TEST_DATASPACE;
+    streamInfo.intent_ = StreamIntent::PREVIEW;
+    streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+    streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+    streamInfo_V1_1.v1_0 = streamInfo;
+    infos.push_back(streamInfo_V1_1);
+    StreamSupportType pType;
+    int32_t rc = dstreamOperator_->IsStreamsSupported_V1_1(mode, modeSetting, infos, pType);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+    EXPECT_EQ(pType, DYNAMIC_SUPPORTED);
+}
+
+/**
+ * @tc.name: dstream_operator_test_017
+ * @tc.desc: Verify IsStreamsSupported_V1_1
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_017, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+
+    // more streamId
+    OperationMode_V1_1 mode = static_cast<OperationMode_V1_1>(TEST_NORMAL_MODE);
+    std::vector<uint8_t> modeSetting;
+    // Configure stream information
+    StreamInfo_V1_1 streamInfo_V1_1;
+    std::vector<StreamInfo> stre;
+    for (int i = 0; i < 100; i++) {
+        struct StreamInfo streamInfo;
+        streamInfo.streamId_ = i;
+        streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+        streamInfo.height_ = TEST_HEIGHT;
+        streamInfo.width_ = TEST_WIDTH;
+        streamInfo.dataspace_ = TEST_DATASPACE;
+        streamInfo.intent_ = StreamIntent::PREVIEW;
+        streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
+        streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+        streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+        stre.push_back(streamInfo);
+    }
+
+    std::vector<StreamInfo_V1_1> infos;
+    for (int i = 0; i < 100; i++) {
+        streamInfo_V1_1.v1_0 = stre[i];
+        infos.push_back(streamInfo_V1_1);
+    }
+    StreamSupportType pType;
+    int32_t rc = dstreamOperator_->IsStreamsSupported_V1_1(mode, modeSetting, infos, pType);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+    EXPECT_EQ(pType, DYNAMIC_SUPPORTED);
+}
+
+/**
+ * @tc.name: dstream_operator_test_018
+ * @tc.desc: Verify ExtractStreamInfo
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_018, TestSize.Level1)
+{
+    dstreamOperator_->dcStreamInfoMap_.clear();
+    std::vector<DCStreamInfo> dCameraStreams;
+    int32_t rc = dstreamOperator_->ExtractStreamInfo(dCameraStreams);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
+}
+
+/**
+ * @tc.name: dstream_operator_test_019
+ * @tc.desc: Verify ExtractStreamInfo
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_019, TestSize.Level1)
+{
+    dstreamOperator_->dcStreamInfoMap_.clear();
+    std::vector<DCStreamInfo> dCameraStreams;
+    std::shared_ptr<DCStreamInfo> dstStreamInfo1 = std::make_shared<DCStreamInfo>();
+    std::shared_ptr<DCStreamInfo> dstStreamInfo2 = std::make_shared<DCStreamInfo>();
+
+    dstStreamInfo1->streamId_ = TEST_STREAMID;
+    dstStreamInfo1->width_ = TEST_WIDTH;
+    dstStreamInfo1->height_ = TEST_HEIGHT;
+    dstStreamInfo1->stride_ = TEST_HEIGHT;
+    dstStreamInfo1->format_ = PIXEL_FMT_YCRCB_420_SP;
+    dstStreamInfo1->dataspace_ = TEST_DATASPACE;
+    dstStreamInfo1->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
+    dstStreamInfo1->type_ = DCStreamType::CONTINUOUS_FRAME;
+
+    dstStreamInfo2->streamId_ = TEST_STREAMID;
+    dstStreamInfo2->width_ = TEST_WIDTH;
+    dstStreamInfo2->height_ = TEST_HEIGHT;
+    dstStreamInfo2->stride_ = TEST_HEIGHT;
+    dstStreamInfo2->format_ = PIXEL_FMT_YCRCB_420_SP;
+    dstStreamInfo2->dataspace_ = TEST_DATASPACE;
+    dstStreamInfo2->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
+    dstStreamInfo2->type_ = DCStreamType::CONTINUOUS_FRAME;
+
+    dstreamOperator_->dcStreamInfoMap_.insert(std::make_pair(1, dstStreamInfo1));
+    dstreamOperator_->dcStreamInfoMap_.insert(std::make_pair(2, dstStreamInfo2));
+    int32_t rc = dstreamOperator_->ExtractStreamInfo(dCameraStreams);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_020
+ * @tc.desc: Verify ExtractStreamInfo
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_020, TestSize.Level1)
+{
+    dstreamOperator_->dcStreamInfoMap_.clear();
+    std::vector<DCStreamInfo> dCameraStreams;
+    std::shared_ptr<DCStreamInfo> dstStreamInfo1 = nullptr;
+    std::shared_ptr<DCStreamInfo> dstStreamInfo2 = std::make_shared<DCStreamInfo>();
+
+    dstStreamInfo2->streamId_ = TEST_STREAMID;
+    dstStreamInfo2->width_ = TEST_WIDTH;
+    dstStreamInfo2->height_ = TEST_HEIGHT;
+    dstStreamInfo2->stride_ = TEST_HEIGHT;
+    dstStreamInfo2->format_ = PIXEL_FMT_YCRCB_420_SP;
+    dstStreamInfo2->dataspace_ = TEST_DATASPACE;
+    dstStreamInfo2->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
+    dstStreamInfo2->type_ = DCStreamType::CONTINUOUS_FRAME;
+
+    dstreamOperator_->dcStreamInfoMap_.insert(std::make_pair(1, dstStreamInfo1));
+    dstreamOperator_->dcStreamInfoMap_.insert(std::make_pair(2, dstStreamInfo2));
+    int32_t rc = dstreamOperator_->ExtractStreamInfo(dCameraStreams);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_021
+ * @tc.desc: Verify ExtractStreamInfo
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_021, TestSize.Level1)
+{
+    dstreamOperator_->dcStreamInfoMap_.clear();
+    std::vector<DCStreamInfo> dCameraStreams;
+
+    for (int i = 0; i < 10; i++) {
+        std::shared_ptr<DCStreamInfo> dstStreamInfo = std::make_shared<DCStreamInfo>();
+        dstStreamInfo->streamId_ = TEST_STREAMID + i;
+        dstStreamInfo->width_ = TEST_WIDTH;
+        dstStreamInfo->height_ = TEST_HEIGHT;
+        dstStreamInfo->stride_ = TEST_HEIGHT;
+        dstStreamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+        dstStreamInfo->dataspace_ = TEST_DATASPACE;
+        dstStreamInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
+        dstStreamInfo->type_ = DCStreamType::CONTINUOUS_FRAME;
+        dstreamOperator_->dcStreamInfoMap_.insert(std::make_pair(i, dstStreamInfo));
+    }
+    int32_t rc = dstreamOperator_->ExtractStreamInfo(dCameraStreams);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_022
+ * @tc.desc: Verify UpdateStreams
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_022, TestSize.Level1)
+{
+    std::vector<StreamInfo_V1_1> streamInfos;
+    int32_t rc = dstreamOperator_->UpdateStreams(streamInfos);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_023
+ * @tc.desc: Verify UpdateStreams
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_023, TestSize.Level1)
+{
+    std::vector<StreamInfo_V1_1> streamInfos;
+    StreamInfo_V1_1 streamInfo_V1_1;
+    // Configure stream information
+    struct StreamInfo streamInfo;
+    streamInfo.streamId_ = TEST_STREAMID;
+    streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo.height_ = TEST_HEIGHT;
+    streamInfo.width_ = TEST_WIDTH;
+    streamInfo.dataspace_ = TEST_DATASPACE;
+    streamInfo.intent_ = StreamIntent::PREVIEW;
+    streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
+    streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+    streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+    streamInfo_V1_1.v1_0 = streamInfo;
+    streamInfos.push_back(streamInfo_V1_1);
+    int32_t rc = dstreamOperator_->UpdateStreams(streamInfos);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_024
+ * @tc.desc: Verify UpdateStreams
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_024, TestSize.Level1)
+{
+    std::vector<StreamInfo_V1_1> streamInfos;
+    // Configure stream information
+    StreamInfo_V1_1 streamInfo_V1_1;
+    std::vector<StreamInfo> stre;
+    for (int i = 0; i < 100; i++) {
+        struct StreamInfo streamInfo;
+        streamInfo.streamId_ = i;
+        streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+        streamInfo.height_ = TEST_HEIGHT;
+        streamInfo.width_ = TEST_WIDTH;
+        streamInfo.dataspace_ = TEST_DATASPACE;
+        streamInfo.intent_ = StreamIntent::PREVIEW;
+        streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
+        streamInfo.bufferQueue_ = sptr<BufferProducerSequenceable>(new BufferProducerSequenceable());
+        streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_H264;
+        stre.push_back(streamInfo);
+    }
+
+    for (int i = 0; i < 100; i++) {
+        streamInfo_V1_1.v1_0 = stre[i];
+        streamInfos.push_back(streamInfo_V1_1);
+    }
+    int32_t rc = dstreamOperator_->UpdateStreams(streamInfos);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_025
+ * @tc.desc: Verify ConfirmCapture
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_025, TestSize.Level1)
+{
+    int32_t cId = 0;
+    int32_t rc = dstreamOperator_->ConfirmCapture(cId);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_026
+ * @tc.desc: Verify CommitStreams_V1_1
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_026, TestSize.Level1)
+{
+    OperationMode_V1_1 mode = static_cast<OperationMode_V1_1>(TEST_NORMAL_MODE);
+    std::vector<uint8_t> modeSetting;
+    int32_t rc = dstreamOperator_->CommitStreams_V1_1(mode, modeSetting);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
+}
+
+/**
+ * @tc.name: dstream_operator_test_027
+ * @tc.desc: Verify CommitStreams_V1_1
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_027, TestSize.Level1)
+{
+    OperationMode_V1_1 mode = static_cast<OperationMode_V1_1>(TEST_NORMAL_MODE);
+    std::vector<uint8_t> modeSetting;
+    for (int i = 0; i <= METADATA_CAPACITY_MAX_SIZE; i++) {
+        modeSetting.push_back(0x01);
+    }
+    int32_t rc = dstreamOperator_->CommitStreams_V1_1(mode, modeSetting);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
+}
+
+/**
+ * @tc.name: dstream_operator_test_028
+ * @tc.desc: Verify CommitStreams_V1_1
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_028, TestSize.Level1)
+{
+    OperationMode_V1_1 mode = static_cast<OperationMode_V1_1>(TEST_NORMAL_MODE);
+    std::vector<uint8_t> modeSetting;
+    modeSetting.push_back(0x01);
+    int32_t rc = dstreamOperator_->CommitStreams_V1_1(mode, modeSetting);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
+}
+
+/**
+ * @tc.name: dstream_operator_test_029
+ * @tc.desc: Verify HalStreamCommit
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_029, TestSize.Level1)
+{
+    DCStreamInfo dstStreamInfo;
+    int32_t rc = dstreamOperator_->HalStreamCommit(dstStreamInfo);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_030
+ * @tc.desc: Verify HalStreamCommit
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_030, TestSize.Level1)
+{
+    DCStreamInfo dstStreamInfo;
+    dstStreamInfo.streamId_ = TEST_STREAMID;
+    dstStreamInfo.width_ = TEST_WIDTH;
+    dstStreamInfo.height_ = TEST_HEIGHT;
+    dstStreamInfo.stride_ = TEST_HEIGHT;
+    dstStreamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+    dstStreamInfo.dataspace_ = TEST_DATASPACE;
+    dstStreamInfo.encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
+    dstStreamInfo.type_ = DCStreamType::CONTINUOUS_FRAME;
+    int32_t rc = dstreamOperator_->HalStreamCommit(dstStreamInfo);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_031
+ * @tc.desc: Verify GetStreamAttributes
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_031, TestSize.Level1)
+{
+    std::vector<StreamAttribute> attributes;
+    int32_t rc = dstreamOperator_->GetStreamAttributes(attributes);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+}
+
+/**
+ * @tc.name: dstream_operator_test_032
+ * @tc.desc: Verify HalStreamCommit
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_032, TestSize.Level1)
+{
+    std::vector<StreamAttribute> attributes;
+    int32_t streamId = -1;
+    sptr<BufferProducerSequenceable> bufferProducer = new BufferProducerSequenceable();
+    int32_t rc = dstreamOperator_->AttachBufferQueue(streamId, bufferProducer);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
+}
+
+/**
+ * @tc.name: dstream_operator_test_033
+ * @tc.desc: Verify HalStreamCommit
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_033, TestSize.Level1)
+{
+    std::vector<StreamAttribute> attributes;
+    int32_t streamId = 0;
+    sptr<BufferProducerSequenceable> bufferProducer = nullptr;
+    int32_t rc = dstreamOperator_->AttachBufferQueue(streamId, bufferProducer);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
 }
 }
 }
