@@ -129,7 +129,7 @@ bool CheckComponentIdOwnership(uint32_t componentId)
     uint32_t remotePid = compRemote->second.remotePid;
     uint32_t curPid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     if (remotePid != curPid) {
-        CODEC_LOGE("componentId %{public}d is invalid for pid %{public}d", componentId, curPid);
+        CODEC_LOGE("componentId %{public}d do not belong to this pid %{public}d", componentId, curPid);
         return false;
     }
     return true;
