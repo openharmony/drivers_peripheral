@@ -71,6 +71,7 @@ ohos_unittest("HdfDstreamOperatorTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"HdfDstreamOperatorTest\"",
     "LOG_DOMAIN=0xD004150",
+    "private = public",
   ]
 
   install_images = [ chipset_base_dir ]
