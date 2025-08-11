@@ -158,6 +158,7 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
         audioRender = nullptr;
         return ret == ERR_DH_AUDIO_HDF_WAIT_TIMEOUT ? HDF_ERR_TIMEOUT : HDF_FAILURE;
     }
+    renderCallbacks_[renderId] = audioRender;
     render = audioRender;
     DHLOGI("Create render success, render ID is %{public}u.", renderId);
     return HDF_SUCCESS;
@@ -211,6 +212,7 @@ void AudioAdapterInterfaceImpl::DeleteRenderImpl(uint32_t renderId)
     }
     std::lock_guard<std::mutex> devLck(renderDevMtx_);
     renderDevs_[renderId] = std::make_pair(0, sptr<AudioRenderInterfaceImplBase>(nullptr));
+    DeleteRenderCallback(renderId);
     DHLOGE("Delete render success.");
     return;
 }
@@ -239,6 +241,7 @@ int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
         DHLOGI("Render has been closed before.");
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
         renderDevs_[renderId] = std::make_pair(0, sptr<AudioRenderInterfaceImplBase>(nullptr));
+        DeleteRenderCallback(renderId);
         return HDF_SUCCESS;
     }
     audioRender->SetRenderStatus(AudioRenderStatus::RENDER_STATUS_CLOSE);
@@ -250,6 +253,7 @@ int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
         renderDevs_[renderId] = std::make_pair(0, sptr<AudioRenderInterfaceImplBase>(nullptr));
+        DeleteRenderCallback(renderId);
     }
     DHLOGI("Destroy render: %{public}u done", renderId);
     return HDF_SUCCESS;
@@ -552,7 +556,7 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t s
             return HandleDeviceClosed(streamId, event);
         case HDF_AUDIO_EVENT_FULL:
         case HDF_AUDIO_EVENT_NEED_DATA:
-            return HandleRenderCallback(devId, event);
+            return HandleRenderCallback(streamId, event);
         default:
             DHLOGE("Audio event: %{public}d is undefined.", event.type);
             return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
@@ -1237,7 +1241,7 @@ int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const uint32_t streamId, c
     return DH_SUCCESS;
 }
 
-int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const uint32_t devId, const DAudioEvent &event)
+int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const uint32_t renderId, const DAudioEvent &event)
 {
     DHLOGI("Handle render callback, event type: %{public}d.", event.type);
     AudioCallbackType type = AUDIO_ERROR_OCCUR;
@@ -1249,7 +1253,7 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const uint32_t devId, co
     int8_t reserved = 0;
     int8_t cookie = 0;
 
-    auto renderCallback = GetRenderCallback(devId);
+    auto renderCallback = GetRenderCallback(renderId);
     if (renderCallback == nullptr) {
         DHLOGE("renderCallback is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
@@ -1263,35 +1267,30 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const uint32_t devId, co
     return DH_SUCCESS;
 }
 
-sptr<IAudioCallback> AudioAdapterInterfaceImpl::GetRenderCallback(const uint32_t devId)
+sptr<IAudioCallback> AudioAdapterInterfaceImpl::GetRenderCallback(const uint32_t renderId)
 {
-    DHLOGI("GetRenderCallback enter.");
-    uint32_t devIdInt = devId;
-    std::lock_guard<std::mutex> devLck(renderDevMtx_);
-    auto renderDev = find_if(renderDevs_.begin(), renderDevs_.end(),
-        [devIdInt](std::pair<int32_t, sptr<AudioRenderInterfaceImplBase>> item) {
-            return item.first == static_cast<int32_t>(devIdInt);
-        });
-    if (renderDev == renderDevs_.end()) {
-        DHLOGE("Not find devId:%{public}d", devId);
+    DHLOGI("GetRenderCallback enter, render Id:%{public}d", renderId);
+    auto iter = renderCallbacks_.find(renderId);
+    if (iter == renderCallbacks_.end()) {
+        DHLOGE("Not find renderId:%{public}d", renderId);
         return nullptr;
     }
-    AudioRenderInterfaceImplBase* basePtr = renderDev->second.GetRefPtr();
-    if (basePtr == nullptr) {
-        DHLOGE("BasePtr is null.");
+    if (iter->second == nullptr) {
+        DHLOGE("Render is null.");
         return nullptr;
     }
-    AudioRenderInterfaceImpl* implPtr = static_cast<AudioRenderInterfaceImpl*>(basePtr);
-    if (!implPtr) {
-        DHLOGE("Failed to cast interface");
-        return nullptr;
+    return iter->second->GetAudioCallback();
+}
+
+void AudioAdapterInterfaceImpl::DeleteRenderCallback(const uint32_t renderId)
+{
+    DHLOGI("DeleteRenderCallback enter, render Id:%{public}d", renderId);
+    auto iter = renderCallbacks_.find(renderId);
+    if (iter == renderCallbacks_.end()) {
+        DHLOGE("Not find renderId:%{public}d", renderId);
+        return;
     }
-    sptr<AudioRenderInterfaceImpl> audioRender(implPtr);
-    if (!audioRender) {
-        DHLOGE("Failed to cast interface");
-        return nullptr;
-    }
-    return audioRender->GetAudioCallback();
+    renderCallbacks_.erase(iter);
 }
 
 bool AudioAdapterInterfaceImpl::IsPortsNoReg()

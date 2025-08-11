@@ -93,6 +93,7 @@ public:
     void SetDumpFlagInner() override;
     AudioRenderStatus GetRenderStatus() override;
     void SetRenderStatus(AudioRenderStatus status) override;
+    sptr<IAudioCallback> GetAudioCallback() override;
 
 private:
     float GetFadeRate(uint32_t currentIndex, const uint32_t durationIndex);
