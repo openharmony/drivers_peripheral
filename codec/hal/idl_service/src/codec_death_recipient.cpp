@@ -100,7 +100,6 @@ void RemoveMapperOfDestoryedComponent(uint32_t componentId)
     remoteComps->second.erase(componentId);
     g_compRemoteMap.erase(compRemote);
     if (!remoteComps->second.empty()) {
-        CODEC_LOGI("remove component success!");
         return;
     }
 
@@ -124,13 +123,13 @@ bool CheckComponentIdOwnership(uint32_t componentId)
     std::unique_lock<std::mutex> lk(g_mutex);
     auto compRemote = g_compRemoteMap.find(componentId);
     if (compRemote == g_compRemoteMap.end()) {
-        CODEC_LOGI("invalid componentId %{public}d", componentId);
+        CODEC_LOGE("invalid componentId %{public}d", componentId);
         return false;
     }
     uint32_t remotePid = compRemote->second.remotePid;
     uint32_t curPid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     if (remotePid != curPid) {
-        CODEC_LOGI("componentId %{public}d is invalid for pid %{public}d", componentId, curPid);
+        CODEC_LOGE("componentId %{public}d is invalid for pid %{public}d", componentId, curPid);
         return false;
     }
     return true;
