@@ -23,10 +23,14 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace V4_0 {
+struct ComponentRemoteInfo {
+    IRemoteObject *remoteObj{nullptr};
+    uint32_t remotePid{0};
+};
 
 static std::map<IRemoteObject *, std::set<uint32_t>> g_remoteCompsMap;
 static std::map<IRemoteObject *, sptr<CodecDeathRecipient>> g_deathReciMap;
-static std::map<uint32_t, IRemoteObject *> g_compRemoteMap;
+static std::map<uint32_t, ComponentRemoteInfo> g_compRemoteMap;
 static std::mutex g_mutex;
 
 void CleanResourceOfDiedService(sptr<IRemoteObject> object, wptr<CodecComponentManagerService> managerService)
@@ -40,7 +44,6 @@ void CleanResourceOfDiedService(sptr<IRemoteObject> object, wptr<CodecComponentM
             return;
         }
         compIds = remoteComps->second;
-        g_remoteCompsMap.erase(remoteComps);
     }
 
     for (auto id = compIds.begin(); id != compIds.end(); id++) {
@@ -55,7 +58,9 @@ void RegisterDeathRecipientService(const sptr<ICodecCallback> callbacks, uint32_
     std::unique_lock<std::mutex> lk(g_mutex);
 
     const sptr<OHOS::IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ICodecCallback>(callbacks);
-    g_compRemoteMap.emplace(std::make_pair(componentId, remote.GetRefPtr()));
+    uint32_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    ComponentRemoteInfo compRemote {remote.GetRefPtr(), remotePid};
+    g_compRemoteMap.emplace(componentId, compRemote);
 
     auto remoteComps = g_remoteCompsMap.find(remote.GetRefPtr());
     if (remoteComps != g_remoteCompsMap.end()) {
@@ -87,17 +92,18 @@ void RemoveMapperOfDestoryedComponent(uint32_t componentId)
         return;
     }
 
-    IRemoteObject *remote = compRemote->second;
+    IRemoteObject *remote = compRemote->second.remoteObj;
     auto remoteComps = g_remoteCompsMap.find(remote);
     if (remoteComps == g_remoteCompsMap.end()) {
         return;
     }
     remoteComps->second.erase(componentId);
-    if (remoteComps->second.empty()) {
-        g_remoteCompsMap.erase(remoteComps);
-    }
     g_compRemoteMap.erase(compRemote);
+    if (!remoteComps->second.empty()) {
+        return;
+    }
 
+    g_remoteCompsMap.erase(remoteComps);
     auto deathReci = g_deathReciMap.find(remote);
     if (deathReci == g_deathReciMap.end()) {
         CODEC_LOGE("%{public}s: not find recipient", __func__);
@@ -110,6 +116,23 @@ void RemoveMapperOfDestoryedComponent(uint32_t componentId)
         return;
     }
     CODEC_LOGI("Remove mapper destoryedComponent success!");
+}
+
+bool CheckComponentIdOwnership(uint32_t componentId)
+{
+    std::unique_lock<std::mutex> lk(g_mutex);
+    auto compRemote = g_compRemoteMap.find(componentId);
+    if (compRemote == g_compRemoteMap.end()) {
+        CODEC_LOGE("invalid componentId %{public}d", componentId);
+        return false;
+    }
+    uint32_t remotePid = compRemote->second.remotePid;
+    uint32_t curPid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    if (remotePid != curPid) {
+        CODEC_LOGE("componentId %{public}d do not belong to this pid %{public}d", componentId, curPid);
+        return false;
+    }
+    return true;
 }
 }  // namespace V4_0
 }  // namespace Codec
