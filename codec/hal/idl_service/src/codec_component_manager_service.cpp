@@ -100,6 +100,9 @@ int32_t CodecComponentManagerService::DestroyComponent(uint32_t componentId)
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecDestroyComponent");
     std::unique_lock<std::mutex> autoLock(mutex_);
     CODEC_LOGI("componentId[%{public}d]", componentId);
+    if (!JudgePassThrouth() && !CheckComponentIdOwnership(componentId)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     auto iter = componentMap_.find(componentId);
     if (iter == componentMap_.end() || iter->second == nullptr) {
         CODEC_LOGE("can not find component service by componentId[%{public}d]", componentId);
