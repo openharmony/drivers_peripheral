@@ -444,7 +444,7 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buff
         return info.bufferId == bufferId && info.portIndex == portIndex;
     });
     if (iter == bufferPool_.end()) {
-        CODEC_LOGE("Can not find buffer");
+        CODEC_LOGE("Can not find buffer, port=%{public}u, id=%{public}u", portIndex, bufferId);
         return OMX_ErrorBadParameter;
     }
     sptr<ICodecBuffer> codecBuffer = iter->icodecBuf;
@@ -558,6 +558,7 @@ void ComponentNode::ReleaseOMXResource()
         bufferPool_.clear();
         WaitStateChange(CODEC_STATE_LOADED, status);
     }
+    bufferPool_.clear();
     HDF_LOGI("%{public}s: Release OMX Resource success!", __func__);
 }
 
