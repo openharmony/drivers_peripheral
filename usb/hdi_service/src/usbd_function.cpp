@@ -34,6 +34,7 @@
 #include "usbd_type.h"
 #include "usbfn_mtp_impl.h"
 #include "usbd_wrapper.h"
+#include "usbfn_device.h"
 #include "usb_report_sys_event.h"
 
 namespace OHOS {
@@ -41,6 +42,7 @@ namespace HDI {
 namespace Usb {
 namespace V1_2 {
 uint32_t UsbdFunction::currentFuncs_ = USB_FUNCTION_HDC;
+std::mutex UsbdFunction::setFunctionLock_;
 
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
 using OHOS::HDI::ServiceManager::V1_0::IServiceManager;
@@ -57,7 +59,7 @@ static std::string MTP_PTP_SERVICE_NAME {"usbfn_mtp_interface_service"};
 
 static void *g_libHandle = nullptr;
 static GetMtpImplFunc g_getMtpImpl = nullptr;
-OsalMutex UsbdFunction::setFunctionLock_;
+static struct UsbFnDevice *g_mtpDev = nullptr;
 
 static void InitGetMtpImpl()
 {
@@ -105,6 +107,75 @@ static IUsbfnMtpInterface *GetUsbfnMtpImpl()
     return nullptr;
 }
 
+static bool CreateMtpDeviceByHcs()
+{
+    struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
+    if (iface == nullptr || iface->GetRootNode == nullptr || iface->GetChildNode == nullptr ||
+        iface->GetString == nullptr) {
+        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed", __func__);
+        return false;
+    }
+
+    const struct DeviceResourceNode *rootNode = iface->GetRootNode();
+    if (rootNode == nullptr) {
+        HDF_LOGE("%{public}s: GetRootNode failed", __func__);
+        return false;
+    }
+
+    const struct DeviceResourceNode *fnConfigNode = iface->GetChildNode(rootNode, "usbfn_config");
+    if (fnConfigNode == nullptr) {
+        HDF_LOGE("%{public}s: GetChildNode failed", __func__);
+        return false;
+    }
+
+    const char *udcName;
+    if (iface->GetString(fnConfigNode, "udc_name", &udcName, "invalid_udc_name") != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get udc name failed", __func__);
+        return false;
+    }
+
+    struct UsbFnDescriptorData usbFnData = { .type = USBFN_DESC_DATA_TYPE_PROP, .functionMask = USB_FUNCTION_MTP };
+    usbFnData.property = fnConfigNode;
+
+    g_mtpDev = const_cast<struct UsbFnDevice *>(UsbFnCreateDefaultDevice(udcName, &usbFnData));
+    if (g_mtpDev == nullptr) {
+        HDF_LOGE("%{public}s: create mtp function device failed", __func__);
+        return false;
+    }
+    HDF_LOGI("%{public}s: create mtp function device success", __func__);
+    return true;
+}
+
+static bool DestroyMtpDevice()
+{
+    if (g_mtpDev == nullptr) {
+        HDF_LOGI("%{public}s: g_mtpDev is null", __func__);
+        return true;
+    }
+    if (UsbFnRemoveDevice(g_mtpDev) == HDF_SUCCESS) {
+        g_mtpDev = nullptr;
+        HDF_LOGI("%{public}s: remove mtp device success", __func__);
+        return true;
+    }
+    HDF_LOGE("%{public}s: remove mtp device failed", __func__);
+    return false;
+}
+
+static bool CancelMtpReady()
+{
+    if (!DestroyMtpDevice()) {
+        HDF_LOGE("%{public}s:DestroyMtpDevice failed", __func__);
+        return false;
+    }
+
+    int32_t status = SetParameter(SYS_USB_MTP_READY, SYS_USB_MTP_NOT_READY);
+    if (status != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:remove mtp config failed, error=%{public}d", __func__, status);
+        return false;
+    }
+    return true;
+}
+
 int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned char funcMask)
 {
     auto servMgr = IServiceManager::Get();
@@ -130,6 +201,11 @@ int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned c
 
     if (!data.WriteUint8(funcMask)) {
         HDF_LOGE("%{public}s: WriteInt8 failed: %{public}d", __func__, funcMask);
+        return HDF_FAILURE;
+    }
+
+    if(!data.WriteUint8(isActive)) {
+        HDF_LOGE("%{public}s: WriteUInt8 failed: %{public}d", __func__, isActive);
         return HDF_FAILURE;
     }
 
@@ -234,7 +310,19 @@ int32_t UsbdFunction::SetFunctionToRndis()
 
 int32_t UsbdFunction::SetFunctionToStorage()
 {
-    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE);
+    if (UsbdFuntion::SetDDKFunction(USB_FUNCTION_MTP, false) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:SetDDKFunction failed", __func__);
+        return HDF_FAILURE;
+    }
+    HDF_LOGE("%{public}s:add mtp function success", __func__);
+
+    int32_t status = SetParameter(SYS_USB_MTP_READY, SYS_USB_MTP_HAS_READY);
+    if (status != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:add mtp config failed, error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+
+    status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE);
     if (status != 0) {
         HDF_LOGE("%{public}s:add storage config error = %{public}d", __func__, status);
         return HDF_FAILURE;
@@ -267,7 +355,47 @@ int32_t UsbdFunction::SetFunctionToManufactureHdc()
     }
     return HDF_SUCCESS;
 }
- 
+
+int32_t UsbdFunction::SetFunctionToMtp()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_MTP);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add MTP config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToPtp()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_PTP);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add PTP config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToMtpHdc()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_MTP_HDC);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add MTP&HDC config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToPtpHdc()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_PTP_HDC);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add PTP&HDC config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbdFunction::SetFunctionToStorageHdc()
 {
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE_HDC);
@@ -357,7 +485,7 @@ int32_t UsbdFunction::SetFunctionToNone()
     return ret;
 }
 
-int32_t UsbdFunction::SetDDKFunction(uint32_t funcs)
+int32_t UsbdFunction::SetDDKFunction(uint32_t funcs, bool isActive)
 {
     HDF_LOGD("%{public}s: SetDDKFunction funcs=%{public}d", __func__, funcs);
     uint32_t ddkFuns = static_cast<uint32_t>(funcs) & USB_DDK_FUNCTION_SUPPORT;
@@ -370,7 +498,7 @@ int32_t UsbdFunction::SetDDKFunction(uint32_t funcs)
         HDF_LOGE("%{public}s: failed to register device", __func__);
         return ret;
     }
-    if (UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_ADD, ddkFuns)) {
+    if (UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_ADD, ddkFuns, isActive)) {
         HDF_LOGE("%{public}s: create dev error: %{public}d", __func__, ddkFuns);
         return HDF_FAILURE;
     }
@@ -580,6 +708,20 @@ int32_t UsbdFunction::UsbdInitDDKFunction(uint32_t funcs)
 
 int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
 {
+    switch (funcs) {
+        case USB_FUNCTION_MTP:
+            HDF_LOGI("%{public}s: set MTP", __func__);
+            return UsbdFunction::SetFunctionToMtp();
+        case USB_FUNCTION_PTP:
+            HDF_LOGI("%{public}s: set PTP", __func__);
+            return UsbdFunction::SetFunctionToPtp();
+        case USB_FUNCTION_MTP | USB_FUNCTION_HDC:
+            HDF_LOGI("%{public}s: set MTP&HDC", __func__);
+            return UsbdFunction::SetFunctionToMtpHdc();
+        case USB_FUNCTION_PTP | USB_FUNCTION_HDC:
+            HDF_LOGI("%{public}s: set PTP&HDC", __func__);
+            return UsbdFunction::SetFunctionToPtpHdc();
+    }
     switch (kfuns) {
         case USB_FUNCTION_HDC:
             HDF_LOGI("%{public}s: set hdc", __func__);
@@ -617,28 +759,31 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns, int32_t funcs)
     }
 }
 
-void UsbdFunction::UsbdInitLock()
-{
-    OsalMutexInit(&setFunctionLock_);
-}
+static bool g_isFirstBoot = true;
 
-void UsbdFunction::UsbdDestroyLock()
+int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
 {
-    OsalMutexDestroy(&setFunctionLock_);
-}
-
-int32_t UsbdFunction::UsbdInnerSetFunction(uint32_t funcs)
-{
-    HDF_LOGI("%{public}s: UsbdSetFunction funcs=%{public}d", __func__, funcs);
+    std::lock_guard<std::mutex> lock(setFunctionLock_);
+    HDF_LOGI("%{public}s: UsbdSetFunction funcs=%{public}d, currentFuncs=%{public}d", __func__, funcs, currentFuncs_);
+    if (funcs == currentFuncs_) {
+        return HDF_SUCCESS;
+    }
     if ((funcs | USB_FUNCTION_SUPPORT) != USB_FUNCTION_SUPPORT) {
         HDF_LOGE("%{public}s: funcs invalid", __func__);
         return HDF_ERR_NOT_SUPPORT;
     }
 
+    if (currentFuncs_ == USB_FUNCTION_STORAGE && !CancelMtpReady()) {
+        HDF_LOGE("%{public}s: CancelMtpReady failed", __func__);
+        return HDF_FAILURE;
+    }
+
     uint32_t kfuns = static_cast<uint32_t>(funcs) & (~USB_DDK_FUNCTION_SUPPORT);
-    if (UsbdFunction::SetFunctionToNone()) {
+    if (!g_isFirstBoot && UsbdFunction::SetFunctionToNone()) {
         HDF_LOGW("%{public}s: setFunctionToNone error", __func__);
     }
+
+    g_isFirstBoot = false;
 
     if (funcs == USB_FUNCTION_NONE) {
         HDF_LOGW("%{public}s: setFunctionToNone", __func__);
@@ -649,6 +794,7 @@ int32_t UsbdFunction::UsbdInnerSetFunction(uint32_t funcs)
         HDF_LOGE("%{public}s:SetDDKFunction error", __func__);
         UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdSetFunction", HDF_FAILURE, "SetDDKFunction error");
         SetFunctionToStorage();
+        currentFuncs_ = USB_FUNCTION_STORAGE;
         return HDF_FAILURE;
     }
 
@@ -670,6 +816,7 @@ int32_t UsbdFunction::UsbdInnerSetFunction(uint32_t funcs)
         HDF_LOGE("%{public}s, wait udc failed", __func__);
         UsbReportSysEvent::ReportUsbRecognitionFailSysEvent("UsbdSetFunction", HDF_FAILURE, "UsbdWaitUdc error");
         SetFunctionToStorage();
+        currentFuncs_ = USB_FUNCTION_STORAGE;
         return HDF_FAILURE;
     }
     if (UsbdInitDDKFunction(funcs) != HDF_SUCCESS) {
@@ -677,18 +824,11 @@ int32_t UsbdFunction::UsbdInnerSetFunction(uint32_t funcs)
         UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
         UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
         SetFunctionToStorage();
+        currentFuncs_ = USB_FUNCTION_STORAGE;
         return HDF_FAILURE;
     }
     currentFuncs_ = funcs;
     return HDF_SUCCESS;
-}
-
-int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
-{
-    OsalMutexLock(&setFunctionLock_);
-    int32_t ret = UsbdInnerSetFunction(funcs);
-    OsalMutexUnlock(&setFunctionLock_);
-    return ret;
 }
 
 int32_t UsbdFunction::UsbdGetFunction(void)
@@ -704,6 +844,16 @@ int32_t UsbdFunction::UsbdUpdateFunction(uint32_t funcs)
         return HDF_FAILURE;
     }
     currentFuncs_ = funcs;
+    if (funcs == USB_FUNCTION_STORAGE) {
+        if (!CreateMtpDeviceByHcs()) {
+            HDF_LOGE("%{public}s, CreateMtpDeviceByHcs failed", __func__);
+            return HDF_FAILURE;
+        }
+        if (SetParameter(SYS_USB_MTP_READY, SYS_USB_MTP_HAS_READY) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s, add mtp config failed", __func__);
+            return HDF_FAILURE;
+        }
+    }
     return HDF_SUCCESS;
 }
 
