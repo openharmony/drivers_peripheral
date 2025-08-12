@@ -32,11 +32,11 @@ struct UsbAccessoryUeventInfo {
 
 static void UsbAccessoryDispatchUevent(const struct UsbAccessoryUeventInfo *info)
 {
-    HDF_LOGD("%{public}s: devPath: %{public}s, accessory: %{public}s", __func__, info->devPath, info->accessory);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is NULL", __func__);
         return;
     }
+    HDF_LOGD("%{public}s: devPath: %{public}s, accessory: %{public}s", __func__, info->devPath, info->accessory);
     if (strcmp(info->devPath, g_usbAccessoryUeventPath) != 0) {
         return;
     }
