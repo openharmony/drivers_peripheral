@@ -47,13 +47,14 @@ namespace V1_0 {
 #define DIRECT_NUM 2
 #define TRANSFER_CONTROL_OUT_CODE 0x20
 #define TRANSFER_CONTROL_IN_CODE 0x21
-#define RETRY_TIMEOUT 10
 #define RETRY_NUM 5
 #define BUFFER_SIZE 256
 #define SERIAL_NUM 256
 #define ERR_CODE_IOEXCEPTION (-5)
 #define ERR_CODE_DEVICENOTOPEN (-6)
 #define OUTPUT_WIDTH 2
+
+#define RETRY_TIMEOUT 10
 
 static const std::string BUS_NUM_STR = "/busnum";
 static const std::string DEV_NUM_STR = "/devnum";
@@ -327,6 +328,7 @@ int32_t LibusbSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uin
     std::string tempHexBuff = VectorToHex(vec);
     HDF_LOGI("%{public}s: read msg : %{public}s", __func__, data.data());
     HDF_LOGI("%{public}s: read msg hex : %{public}s", __func__, tempHexBuff.c_str());
+
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     return actualLength;
@@ -367,6 +369,7 @@ int32_t LibusbSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& da
         libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
         return ret;
     }
+
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
     return actualLength;
@@ -504,7 +507,6 @@ int32_t LibusbSerial::HotplugCallback(libusb_context* ctx, libusb_device* device
 int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
 {
     HDF_LOGI("%{public}s: Device arrival detected.", __func__);
-
     struct libusb_device_descriptor desc;
     int ret = libusb_get_device_descriptor(device, &desc);
     if (ret < 0) {
@@ -515,7 +517,6 @@ int32_t LibusbSerial::HandleDeviceArrival(libusb_device* device)
         HDF_LOGE("%{public}s: hub device pass.", __func__);
         return HDF_FAILURE;
     }
-    
     std::lock_guard<std::mutex> lock(map_mutex_);
     int num = -1;
     int retry = RETRY_NUM;

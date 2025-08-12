@@ -1,17 +1,17 @@
 /*
-* Copyright (c) 2022-2025 Huawei Device Co., Ltd.
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include <iostream>
 #include <sstream>
 #include <regex>
@@ -29,9 +29,7 @@ namespace HDI {
 namespace Usb {
 namespace V1_2 {
 constexpr int32_t NONE = 0;
-constexpr int32_t SUPPORT_MODE_DRP = 1;
-constexpr int32_t SUPPORT_MODE_UFP = 2;
-constexpr int32_t SUPPORT_MODE_DFP = 3;
+constexpr int32_t SUPPORT_MODE = 1;
 constexpr int32_t STRING_PORT = 4;
 
 UsbdPorts &UsbdPorts::GetInstance()
@@ -47,7 +45,7 @@ UsbdPorts::UsbdPorts()
 
 void UsbdPorts::InitMap()
 {
-    portAttributeMap_[PORT_CONFIG_NONE] = NONE;
+    portAttributeMap_[PORT_NONE] = NONE;
     portAttributeMap_[PORT_MODE_UFP] = static_cast<int32_t>(Port::PortMode::UFP);
     portAttributeMap_[PORT_MODE_DFP] = static_cast<int32_t>(Port::PortMode::DFP);
     portAttributeMap_[PORT_MODE_DRP] = static_cast<int32_t>(Port::PortMode::DRP);
@@ -55,9 +53,7 @@ void UsbdPorts::InitMap()
     portAttributeMap_[POWER_ROLE_SINK] = static_cast<int32_t>(PowerRole::SINK);
     portAttributeMap_[DATA_ROLE_HOST] = static_cast<int32_t>(DataRole::HOST);
     portAttributeMap_[DATA_ROLE_DEVICE] = static_cast<int32_t>(DataRole::DEVICE);
-    portAttributeMap_[SUPPORTED_MODE_DRP] = SUPPORT_MODE_DRP;
-    portAttributeMap_[SUPPORTED_MODE_UFP] = SUPPORT_MODE_UFP;
-    portAttributeMap_[SUPPORTED_MODE_DFP] = SUPPORT_MODE_DFP;
+    portAttributeMap_[SUPPORTED_MODE] = SUPPORT_MODE;
 }
 
 void UsbdPorts::setPortPath(const std::string &path)

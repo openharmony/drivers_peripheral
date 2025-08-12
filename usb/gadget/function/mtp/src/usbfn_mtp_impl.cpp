@@ -178,10 +178,6 @@ void UsbfnMtpImpl::UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *r
     if (ret != HDF_SUCCESS) {
         HDF_LOGW("%{public}s: rx push failed: %{public}d, state=%{public}d", __func__, ret, mtpPort->mtpDev->mtpState);
     }
-    std::lock_guard<std::mutex> guard(asyncMutex_);
-    if (mtpPort->readStarted == 0 && mtpPort->writeStarted == 0 && mtpPort->mtpDev->mtpState == MTP_STATE_CANCELED) {
-        mtpPort->mtpDev->mtpState = MTP_STATE_READY;
-    }
     pthread_rwlock_unlock(&mtpRunrwLock_);
 }
 
@@ -252,9 +248,6 @@ void UsbfnMtpImpl::UsbFnRequestWriteComplete(uint8_t pipe, struct UsbFnRequest *
         HDF_LOGW("%{public}s: tx check failed(%{%{public}d/%{public}d}): %{public}d, state=%{public}hhu", __func__,
             mtpPort->readStarted, mtpPort->readAllocated, ret, mtpPort->mtpDev->mtpState);
     }
-    if (mtpPort->readStarted == 0 && mtpPort->writeStarted == 0 && mtpPort->mtpDev->mtpState == MTP_STATE_CANCELED) {
-        mtpPort->mtpDev->mtpState = MTP_STATE_READY;
-    }
     pthread_rwlock_unlock(&mtpRunrwLock_);
 }
 
@@ -292,7 +285,6 @@ void UsbfnMtpImpl::UsbFnRequestCtrlComplete(uint8_t pipe, struct UsbFnRequest *r
             break;
         default:
             HDF_LOGW("%{public}s: unexpected status %{public}d", __func__, req->status);
-            mtpDev->mtpState = MTP_STATE_ERROR;
             break;
     }
     DListInsertTail(&req->list, &mtpDev->ctrlPool);
@@ -322,7 +314,6 @@ int32_t UsbfnMtpImpl::UsbMtpPortTxReqCheck(struct UsbMtpPort *mtpPort, struct Us
             return HDF_DEV_ERR_NO_DEVICE;
         default:
             HDF_LOGW("%{public}s: unexpected status %{public}d", __func__, req->status);
-            mtpPort->mtpDev->mtpState = MTP_STATE_ERROR;
             sem_post(&asyncReq_);
             return HDF_ERR_IO;
     }
@@ -1189,7 +1180,6 @@ int32_t UsbfnMtpImpl::Release()
     }
     pthread_rwlock_unlock(&mtpRunrwLock_);
     pthread_rwlock_wrlock(&mtpRunrwLock_);
-
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
         HDF_LOGE("%{public}s: no init", __func__);
@@ -1560,7 +1550,6 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxCheckReq(struct UsbMtpPort *mtpPort, struct Us
             break;
         default:
             HDF_LOGE("%{public}s: unexpected status %{public}d", __func__, req->status);
-            mtpDev->mtpState = MTP_STATE_ERROR;
             return HDF_FAILURE;
     }
     if (req->actual == 0) {

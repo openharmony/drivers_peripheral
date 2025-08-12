@@ -1106,6 +1106,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
         if (AcmNotificationBufferProcess(req, acm, currentSize, expectedSize) != HDF_SUCCESS) {
             goto EXIT;
         }
+        dr = (struct UsbCdcNotification *)acm->notificationBuffer;
         currentSize = acm->nbIndex;
     }
     if (currentSize >= expectedSize) {
