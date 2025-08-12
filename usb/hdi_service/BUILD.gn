@@ -65,6 +65,7 @@ ohos_shared_library("libusb_interface_service_1.2") {
   public_configs = [ ":usbd_public_config" ]
 
   deps = [
+    "${usb_driver_path}/ddk:libusb_ddk_device",
     "${usb_driver_path}/ddk:libusb_ddk_host",
     "${usb_driver_path}/ddk:libusb_pnp_manager",
     "${usb_driver_path}/libusb_adapter:libusb_adapter",
@@ -73,8 +74,9 @@ ohos_shared_library("libusb_interface_service_1.2") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusb_stub_2.0",
       "drivers_interface_usb:usb_idl_headers_1.2",
-      "drivers_interface_usb:usb_idl_headers_2.0",
       "drivers_interface_usb:usbfn_mtp_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -95,11 +97,9 @@ ohos_shared_library("libusb_interface_service_1.2") {
         defines = [ "USB_ENABLE_HISYSEVENT" ]
       }
     }
-
     if (libusb_enable) {
       defines += [ "LIBUSB_ENABLE" ]
     }
-
     if (usb_samgr_enable) {
       external_deps += [ "samgr:samgr_proxy" ]
 
@@ -203,6 +203,7 @@ ohos_shared_library("libusb_port_interface_service_2.0") {
   public_configs = [ ":usbd_public_config" ]
 
   deps = [
+    "${usb_driver_path}/ddk:libusb_ddk_device",
     "${usb_driver_path}/ddk:libusb_ddk_host",
     "${usb_driver_path}/ddk:libusb_pnp_manager",
     "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
@@ -210,7 +211,8 @@ ohos_shared_library("libusb_port_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:usb_idl_headers_2.0",
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusb_stub_2.0",
       "drivers_interface_usb:usbfn_mtp_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -280,7 +282,6 @@ ohos_shared_library("libusb_port_driver") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_stub_2.0",
-      "drivers_interface_usb:libusb_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -331,13 +332,15 @@ ohos_shared_library("libusb_host_interface_service_2.0") {
   public_configs = [ ":usbd_public_config" ]
 
   deps = [
+    "${usb_driver_path}/ddk:libusb_ddk_device",
     "${usb_driver_path}/libusb_adapter:libusb_adapter",
     "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
   ]
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:usb_idl_headers_2.0",
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusb_stub_2.0",
       "drivers_interface_usb:usbfn_mtp_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -410,6 +413,7 @@ ohos_shared_library("libusb_device_interface_service_2.0") {
   public_configs = [ ":usbd_public_config" ]
 
   deps = [
+    "${usb_driver_path}/ddk:libusb_ddk_device",
     "${usb_driver_path}/ddk:libusb_ddk_host",
     "${usb_driver_path}/ddk:libusb_pnp_manager",
     "${usb_driver_path}/libusb_adapter:libusb_adapter",
@@ -418,7 +422,8 @@ ohos_shared_library("libusb_device_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:usb_idl_headers_2.0",
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusb_stub_2.0",
       "drivers_interface_usb:usbfn_mtp_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",

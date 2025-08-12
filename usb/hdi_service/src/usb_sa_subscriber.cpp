@@ -15,8 +15,8 @@
 
 #include <hdf_log.h>
 
-#include "usb_sa_subscriber.h"
 #include "usbd_wrapper.h"
+#include "usb_sa_subscriber.h"
 
 #define HDF_LOG_TAG UsbSaSubscriber
 
@@ -32,11 +32,11 @@ int32_t UsbSaSubscriber::LoadUsbSa(const int32_t &eventId)
 {
     if (eventId == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
         if (loadUsbService_.LoadService() != 0) {
-            HDF_LOGE("loadUsbService LoadService error");
+            HDF_LOGE("loadUsbService_ LoadService error");
             return HDF_FAILURE;
         }
         if (loadHdfEdm_.LoadService() != 0) {
-            HDF_LOGE("loadHdfEdm LoadService error");
+            HDF_LOGE("loadHdfEdm_ LoadService error");
             return HDF_FAILURE;
         }
     }

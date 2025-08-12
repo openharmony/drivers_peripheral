@@ -25,7 +25,7 @@ namespace fs = std::filesystem;
 class SysfsDevNode {
 public:
     SysfsDevNode(uint32_t busNum, uint32_t devNum, uint8_t intfNum, const std::string& prefix) noexcept;
-    int32_t FindPath(std::string& path);
+    int32_t FindPath(std::string& devNodePath);
 
 private:
     std::optional<std::string> GetContent(const std::string& filePath);

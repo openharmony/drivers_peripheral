@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "v1_0/scsi_peripheral_ddk_stub.h"
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_sbuf_ipc.h>
+#include "v1_0/scsi_peripheral_ddk_stub.h"
 #include "hdf_log.h"
 #include "usbd_wrapper.h"
 
@@ -66,8 +66,8 @@ static int HdfScsiDdkDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfScsiDdkHost->ioService.Dispatch = ScsiDdkDriverDispatch;
-    hdfScsiDdkHost->ioService.Open = NULL;
-    hdfScsiDdkHost->ioService.Release = NULL;
+    hdfScsiDdkHost->ioService.Open = nullptr;
+    hdfScsiDdkHost->ioService.Release = nullptr;
 
     auto serviceImpl = OHOS::HDI::Usb::ScsiDdk::V1_0::IScsiPeripheralDdk::Get(true);
     if (serviceImpl == nullptr) {

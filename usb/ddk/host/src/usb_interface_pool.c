@@ -369,7 +369,7 @@ static bool CheckInterfacePoolValid(struct UsbInterfacePool *interfacePoolPtr)
     return true;
 }
 
-bool FoundInterfacePool(struct UsbInterfacePool *interfacePoolPos, struct UsbPoolQueryPara queryPara, 
+bool FoundInterfacePool(struct UsbInterfacePool *interfacePoolPos, struct UsbPoolQueryPara queryPara,
     bool refCountFlag)
 {
     bool found = false;
@@ -1361,7 +1361,7 @@ UsbInterfaceHandle *UsbResetDevice(const struct UsbInterface *interfaceObj)
     
     ret = RawResetDevice(interfacePool->device->devHandle);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{piblic}s:%{public}d RawResetDevice failed, ret = %{public}d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d RawResetDevice failed, ret = %{public}d", __func__, __LINE__, ret);
         return NULL;
     }
 
@@ -1592,7 +1592,7 @@ int32_t UsbGetPipeInfo(
 
     if (interfaceHandle == NULL || pipeInfo == NULL || ifaceHdl == NULL || ifaceHdl->devHandle == NULL ||
         ifaceHdl->devHandle->dev == NULL) {
-        HDF_LOGE("%{public}s:%{publid}d invalid parameter", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     OsalMutexLock((struct OsalMutex *)&ifaceHdl->devHandle->lock);

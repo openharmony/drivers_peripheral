@@ -17,9 +17,7 @@ usb_driver_part_name = "usb_driver"
 declare_args() {
   drivers_peripheral_usb_feature_linux_native_model = false
   drivers_peripheral_usb_feature_emulator_mode = false
-}
 
-declare_args() {
   usb_hisysevent_enable = true
   usb_samgr_enable = true
   usb_c_utils_enable = true
