@@ -43,7 +43,3 @@ declare_args() {
 declare_args() {
   drivers_peripheral_camera_use_commom_usb_camera_host_config = false
 }
-
-declare_args() {
-  drivers_peripheral_camera_feature_open_test = false
-}
