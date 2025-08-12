@@ -598,6 +598,32 @@ ResultCode DestroyContextbyId(uint64_t contextId)
     return RESULT_SUCCESS;
 }
 
+IAM_STATIC ResultCode GetCredentialInfoByTemplateId(uint32_t authType, uint64_t templateId,
+    uint32_t verifierSensorHint, CredentialInfoHal *credentialInfo)
+{
+    CredentialCondition condition = {};
+    SetCredentialConditionAuthType(&condition, authType);
+    SetCredentialConditionTemplateId(&condition, templateId);
+    SetCredentialConditionExecutorSensorHint(&condition, verifierSensorHint);
+    SetCredentialConditionNeedAbandonPin(&condition);
+
+    LinkedList *credList = QueryCredentialLimit(&condition);
+    if (credList == NULL || credList->getSize(credList) != 1) {
+        LOG_ERROR("credList len is not 1");
+        DestroyLinkedList(credList);
+        return RESULT_GENERAL_ERROR;
+    }
+    if (credList->head == NULL || credList->head->data == NULL) {
+        LOG_ERROR("list node is invalid");
+        DestroyLinkedList(credList);
+        return RESULT_GENERAL_ERROR;
+    }
+
+    *credentialInfo = *((CredentialInfoHal *)credList->head->data);
+    DestroyLinkedList(credList);
+    return RESULT_SUCCESS;
+}
+
 IAM_STATIC const CoAuthSchedule *GetCoAuthScheduleFromContext(const UserAuthContext *context, uint64_t scheduleId)
 {
     if (context->scheduleList == NULL) {
@@ -659,6 +685,19 @@ IAM_STATIC ResultCode CheckAndSetContextUserId(UserAuthContext *context, uint64_
     return RESULT_SUCCESS;
 }
 
+IAM_STATIC bool CheckAbandonPinAuth(int32_t authIntent, CredentialInfoHal *credentialInfo)
+{
+    if (authIntent == ABANDONED_PIN_AUTH && !credentialInfo->isAbandoned) {
+        LOG_ERROR("credentialInfo is not abandoned");
+        return false;
+    }
+    if (authIntent != ABANDONED_PIN_AUTH && credentialInfo->isAbandoned) {
+        LOG_ERROR("credentialInfo is abandoned");
+        return false;
+    }
+    return true;
+}
+
 ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info,
     uint32_t authMode)
 {
@@ -676,30 +715,22 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
         LOG_ERROR("CheckAndSetContextAtl failed");
         return ret;
     }
-    ret = RESULT_UNKNOWN;
+    CredentialInfoHal credentialInfo = {};
     uint32_t verifierSensorHint = GetScheduleVerifierSensorHint(schedule);
-    CredentialCondition condition = {};
-    SetCredentialConditionAuthType(&condition, context->authType);
-    SetCredentialConditionTemplateId(&condition, info->templateId);
-    SetCredentialConditionExecutorSensorHint(&condition, verifierSensorHint);
-    SetCredentialConditionNeedAbandonPin(&condition);
-    LinkedList *credList = QueryCredentialLimit(&condition);
-    if (credList == NULL || credList->getSize(credList) != 1) {
-        LOG_ERROR("query credential failed");
-        goto EXIT;
+    ret = GetCredentialInfoByTemplateId(context->authType, info->templateId, verifierSensorHint, &credentialInfo);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get credential info failed");
+        return ret;
     }
-    if (credList->head == NULL || credList->head->data == NULL) {
-        LOG_ERROR("list node is invalid");
-        goto EXIT;
+    if (!CheckAbandonPinAuth(context->authIntent, &credentialInfo)) {
+        LOG_ERROR("check abandon pin auth fail");
+        return RESULT_GENERAL_ERROR;
     }
-    CredentialInfoHal *credentialNode = (CredentialInfoHal *)credList->head->data;
-    ret = CheckAndSetContextUserId(context, credentialNode->credentialId, authMode);
+    ret = CheckAndSetContextUserId(context, credentialInfo.credentialId, authMode);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("CheckAndSetContextUserId failed");
-        goto EXIT;
+        return ret;
     }
-    *credentialId = credentialNode->credentialId;
-EXIT:
-    DestroyLinkedList(credList);
-    return ret;
+    *credentialId = credentialInfo.credentialId;
+    return RESULT_SUCCESS;
 }
