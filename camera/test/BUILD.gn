@@ -16,7 +16,7 @@ import("../camera.gni")
 group("camera_hal_test") {
   testonly = true
   if (drivers_peripheral_camera_feature_usb == true) {
-    deps = [ "$test_path/ut/utils:camera_utils_ut" ]
+    deps = [ "$test_path/ut/usb_camera:camera_usb_test_ut" ]
   } else {
     deps = [
       "$test_path/benchmarktest/v1_0:hdf_camera_benchmark_test",
@@ -25,11 +25,11 @@ group("camera_hal_test") {
       "$test_path/hdi/sequenceable_test:camera_hdi_sequenceable_ut",
       "$test_path/hdi/v1_0:camera_test_at",
       "$test_path/ut/buffer_manager:camera_buffer_manager_ut",
-      "$test_path/ut/utils:camera_utils_ut",
+      "$test_path/ut/usb_camera:camera_usb_test_ut",
       "$test_path/ut/v4l2:camera_test_v4l2_ut",
     ]
   }
-  if (drivers_peripheral_camera_feature_open_test == true) {
-    deps += [ "$test_path/ut/usb_camera:camera_usb_test_ut" ]
-  }
+  deps += [
+    "$test_path/ut/utils:camera_utils_ut",    
+  ]
 }

@@ -14,8 +14,7 @@
     "subsystem": "hdf",
     "features": [
       "drivers_peripheral_camera_feature_usb",
-      "drivers_peripheral_camera_use_commom_usb_camera_host_config",
-      "drivers_peripheral_camera_feature_open_test"
+      "drivers_peripheral_camera_use_commom_usb_camera_host_config"
     ],
     "adapted_system_type": ["standard", "small"],
     "hisysevent_config": ["//drivers/peripheral/camera/hisysevent.yaml"],
