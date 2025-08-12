@@ -200,9 +200,9 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
 
     int32_t fd = open(pathBuf, mode | O_CLOEXEC);
     if (fd != HDF_FAILURE) {
+        HDF_LOGI("%{public}s: path: %{public}s, fd:%{public}d", __func__, pathBuf, fd);
         return fd;
     }
-    HDF_LOGI("%{public}s: path: %{public}s, fd:%{public}d", __func__, pathBuf, fd);
     usleep(SLEEP_TIME);
     switch (errno) {
         case ENOENT:
@@ -371,12 +371,12 @@ static int32_t OsInitDevice(struct UsbDevice *dev, uint8_t busNum, uint8_t devAd
     dev->descriptorsLength = 0;
     ret = OsReadDescriptors(dev);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsReadDescriptors failed ret = %{pubilc}d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsReadDescriptors failed ret = %{public}d", __func__, __LINE__, ret);
         return ret;
     }
     ret = OsParseConfigDescriptors(dev);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsParseConfigDescriptors failed ret = %{pubilc}d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsParseConfigDescriptors failed ret = %{public}d", __func__, __LINE__, ret);
         return ret;
     }
     ret =
@@ -459,6 +459,7 @@ static void OsFreeIsoUrbs(struct UsbHostRequest *request)
 
     RawUsbMemFree(request->isoUrbs);
     request->isoUrbs = NULL;
+    HDF_LOGI("%{public}s:%{public}d OsFreeIsoUrbs success", __func__, __LINE__);
 }
 
 static void OsDiscardUrbs(const struct UsbHostRequest *request, int32_t first, int32_t last)
@@ -1021,6 +1022,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 
     ret = OsInitDevice(dev, busNum, usbAddr);
     if (ret) {
+        HDF_LOGE("%{public}s:%{public}d failed to initialize device.", __func__, __LINE__);
         RawUsbMemFree(dev);
         dev = NULL;
         goto ERR;
@@ -1032,6 +1034,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
     OsalMutexLock(&session->lock);
     HdfSListAdd(&session->usbDevs, &dev->list);
     OsalMutexUnlock(&session->lock);
+    HDF_LOGI("%{public}s:%{public}d open device success", __func__, __LINE__);
 
     return handle;
 
@@ -1069,10 +1072,10 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
     RawUsbMemFree(dev);
     handle->dev = NULL;
     dev = NULL;
+    HDF_LOGI("%{public}s:close fd:%{public}d", __func__, handle->fd);
 
     close(handle->fd);
     close(handle->mmapFd);
-    HDF_LOGI("%{public}s:close fd:%{public}d", __func__, handle->fd);
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
     handle = NULL;
