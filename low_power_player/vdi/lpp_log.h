@@ -19,6 +19,14 @@
 #include <string>
 #include <map>
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD002B90
+
+#ifdef HDF_LOG_TAG
+#undef HDF_LOG_TAG
+#endif
 namespace OHOS {
 namespace HDI {
 namespace LowPowerPlayer {
