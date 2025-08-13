@@ -202,7 +202,7 @@ static void AcmWriteBufFree(struct AcmDevice *acm)
 static void AcmWriteBulk(struct UsbRequest * const req)
 {
     if (req == NULL) {
-        HDF_LOGE("%{public}s:%{pulib}d req is null!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d req is null!", __func__, __LINE__);
         goto EXIT;
     }
     int32_t status = req->compInfo.status;

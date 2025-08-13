@@ -789,6 +789,7 @@ static void EcmCtrlIrq(struct UsbRequest *req)
             }
             uint32_t allocSize = expectedSize;
             ecm->notificationBuffer = OsalMemCalloc(allocSize);
+            dr = (struct UsbCdcNotification *)ecm->notificationBuffer;
             if (!ecm->notificationBuffer) {
                 goto EXIT;
             }

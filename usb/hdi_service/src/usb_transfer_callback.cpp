@@ -14,8 +14,8 @@
  */
 
 #include <hdf_log.h>
-#include "usb_transfer_callback.h"
 #include "usbd_wrapper.h"
+#include "usb_transfer_callback.h"
 #define HDF_LOG_TAG UsbTransferCb
 
 namespace OHOS {
