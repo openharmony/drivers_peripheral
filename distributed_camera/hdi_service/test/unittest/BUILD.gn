@@ -18,5 +18,6 @@ group("hdf_service_test") {
     "common/dcamera_host:hdf_dcamera_host_test",
     "common/dcamera_provider:hdf_dcamera_provider_test",
     "common/dstream_operator:hdf_dstream_operator_test",
+    "common/utils:hdf_dcamera_test",
   ]
 }
