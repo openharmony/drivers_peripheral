@@ -28,8 +28,9 @@ namespace V1_0 {
 
 class LppSyncManagerAdapter : public ILppSyncManagerAdapter {
 public:
-    LppSyncManagerAdapter(uint32_t instanceId);
+    LppSyncManagerAdapter() = default;
     ~LppSyncManagerAdapter();
+    int32_t Init();
     int32_t SetVideoChannelId(uint32_t channelId);
     int32_t SetAudioChannelId(uint32_t channelId) { return 0; };
     int32_t StartRender();
@@ -41,24 +42,20 @@ public:
     int32_t Reset();
     int32_t Release();
     int32_t SetTunnelId(uint64_t tunnelId);
-    int32_t SetTargetStartFrame(uint64_t framePts, uint32_t timeoutMs);
+    int32_t SetTargetStartFrame(int64_t framePts, uint32_t timeoutMs);
     int32_t SetPlaybackSpeed(float mode);
     int32_t RegisterCallback(const sptr<ILppSyncManagerCallback>& syncCallback);
     int32_t GetShareBuffer(int32_t& fd);
     int32_t GetParameter(std::map<std::string, std::string>& parameter);
     int32_t SetParameter(const std::map<std::string, std::string>& parameter);
-    int32_t UpdateTimeAnchor(uint64_t anchorPts, uint64_t anchorClk);
+    int32_t UpdateTimeAnchor(int64_t anchorPts, uint64_t anchorClk);
     int32_t BindOutputBuffers(const std::map<uint32_t, sptr<NativeBuffer>>& outputBuffers);
     int32_t UnbindOutputBuffers();
+    int32_t GetLatestPts(int64_t& pts);
 
 private:
-    int32_t LoadVdi();
-    uint32_t instanceId_;
-    void *libHandle_;
-    std::mutex mutex_;
     ILowPowerPlayerVdi* vdiImpl_;
-    CreateLowPowerPlayerVdiFunc createVdi_;
-    DestroyLowPowerPlayerVdiFunc destroyVdi_;
+    static int32_t LoadVendorLib();
 };
 
 }  // namespace V1_0

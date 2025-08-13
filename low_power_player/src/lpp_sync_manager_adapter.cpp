@@ -22,131 +22,114 @@ namespace HDI {
 namespace LowPowerPlayer {
 namespace V1_0 {
 
-LppSyncManagerAdapter::LppSyncManagerAdapter(uint32_t instanceId)
-{
-    HDF_LOGI("LppSyncManagerAdapter %{public}s", __func__);
-    instanceId_ = instanceId;
-    int32_t ret = LoadVdi();
-    if (ret == HDF_SUCCESS) {
-        vdiImpl_ = createVdi_();
-        CHECK_NULLPOINTER_RETURN(vdiImpl_);
-    } else {
-        HDF_LOGE("%{public}s: Load LPP VDI failed", __func__);
-    }
-
-    ret = vdiImpl_->Init(instanceId);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Init failed", __func__);
-    }
-}
+static std::mutex mutex_;
+static std::shared_ptr<void> libHandle_ = nullptr;
+static CreateLowPowerPlayerVdiFunc createVdi_ = nullptr;
+static DestroyLowPowerPlayerVdiFunc destroyVdi_ = nullptr;
 
 LppSyncManagerAdapter::~LppSyncManagerAdapter()
 {
-    std::lock_guard<std::mutex> lck(mutex_);
-
-    if (vdiImpl_->Release(instanceId_) != 0) {
-        HDF_LOGE("LppSyncManagerAdapter Release failed");
-    }
-    if (destroyVdi_ != nullptr && vdiImpl_ != nullptr) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (vdiImpl_ != nullptr) {
         destroyVdi_(vdiImpl_);
         vdiImpl_ = nullptr;
-        destroyVdi_ = nullptr;
     }
 }
 
-int32_t LppSyncManagerAdapter::LoadVdi()
+int32_t LppSyncManagerAdapter::LoadVendorLib()
 {
-    const char* errStr = dlerror();
-    if (errStr != nullptr) {
-        HDF_LOGD("%{public}s: allocator load vdi, clear earlier dlerror: %{public}s", __func__, errStr);
-    }
-    libHandle_ = dlopen(LOW_POWER_PLAYER_VDI_LIBRARY, RTLD_LAZY);
     if (libHandle_ == nullptr) {
-        HDF_LOGE("lpp load vendor vdi default library failed: %{public}s", LOW_POWER_PLAYER_VDI_LIBRARY);
-    } else {
-        HDF_LOGD("lpp load vendor vdi library: %{public}s", LOW_POWER_PLAYER_VDI_LIBRARY);
+        void* handle = dlopen(LOW_POWER_PLAYER_VDI_LIBRARY, RTLD_LAZY);
+        CHECK_TRUE_RETURN_RET_LOG(handle == NULL, HDF_FAILURE, "dlopen failed, %{public}s", dlerror());
+        libHandle_ = std::shared_ptr<void>(handle, dlclose);
     }
-    CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
-    createVdi_ = reinterpret_cast<CreateLowPowerPlayerVdiFunc>(dlsym(libHandle_, "CreateLowPowerPlayerVdi"));
+
     if (createVdi_ == nullptr) {
-        errStr = dlerror();
-        if (errStr != nullptr) {
-            HDF_LOGE("%{public}s: allocator CreateLowPowerPlayerVdi dlsym error: %{public}s", __func__, errStr);
-        }
-        dlclose(libHandle_);
-        return HDF_FAILURE;
+        createVdi_ = reinterpret_cast<CreateLowPowerPlayerVdiFunc>(dlsym(libHandle_.get(), "CreateLowPowerPlayerVdi"));
+        CHECK_TRUE_RETURN_RET_LOG(createVdi_ == NULL, HDF_FAILURE, "createVdi_ dlsym failed, %{public}s", dlerror());
     }
-    destroyVdi_ = reinterpret_cast<DestroyLowPowerPlayerVdiFunc>(dlsym(libHandle_, "DestroyLowPowerPlayerVdi"));
+
     if (destroyVdi_ == nullptr) {
-        errStr = dlerror();
-        if (errStr != nullptr) {
-            HDF_LOGE("%{public}s: allocator DestroyLowPowerPlayerVdi dlsym error: %{public}s", __func__, errStr);
-        }
-        dlclose(libHandle_);
-        return HDF_FAILURE;
+        destroyVdi_ =
+            reinterpret_cast<DestroyLowPowerPlayerVdiFunc>(dlsym(libHandle_.get(), "DestroyLowPowerPlayerVdi"));
+        CHECK_TRUE_RETURN_RET_LOG(destroyVdi_ == NULL, HDF_FAILURE, "destroyVdi_ dlsym failed, %{public}s", dlerror());
     }
+    return HDF_SUCCESS;
+}
+
+int32_t LppSyncManagerAdapter::Init()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t ret = LoadVendorLib();
+    CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, HDF_FAILURE, "load vdi failed");
+
+    vdiImpl_ = createVdi_();
+    CHECK_TRUE_RETURN_RET_LOG(vdiImpl_ == NULL, HDF_FAILURE, "createVdi_ failed");
+
+    ret = vdiImpl_->Init();
+    CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, HDF_FAILURE, "Init failed");
     return HDF_SUCCESS;
 }
 
 int32_t LppSyncManagerAdapter::SetVideoChannelId(uint32_t channelId)
 {
-    int32_t ret = vdiImpl_->SetVideoChannelId(channelId, instanceId_);
+    int32_t ret = vdiImpl_->SetVideoChannelId(channelId);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "SetVideoChannelId failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::StartRender()
 {
-    int32_t ret = vdiImpl_->StartRender(instanceId_);
+    int32_t ret = vdiImpl_->StartRender();
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "StartRender failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::RenderNextFrame()
 {
-    int32_t ret = vdiImpl_->RenderNextFrame(instanceId_);
+    int32_t ret = vdiImpl_->RenderNextFrame();
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "RenderNextFrame failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::Pause()
 {
-    int32_t ret = vdiImpl_->Pause(instanceId_);
+    int32_t ret = vdiImpl_->Pause();
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "Pause failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::Resume()
 {
-    int32_t ret = vdiImpl_->Resume(instanceId_);
+    int32_t ret = vdiImpl_->Resume();
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "Resume failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::Flush()
 {
-    int32_t ret = vdiImpl_->Flush(instanceId_);
+    int32_t ret = vdiImpl_->Flush();
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "Flush failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::Stop()
 {
-    int32_t ret = vdiImpl_->Stop(instanceId_);
+    int32_t ret = vdiImpl_->Stop();
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "Stop failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::Reset()
 {
-    int32_t ret = vdiImpl_->Reset(instanceId_);
+    int32_t ret = vdiImpl_->Reset();
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "Reset failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::Release()
 {
-    int32_t ret = vdiImpl_->Release(instanceId_);
+    int32_t ret = vdiImpl_->Release();
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "Release failed.");
     return ret;
 }
@@ -154,71 +137,78 @@ int32_t LppSyncManagerAdapter::Release()
 
 int32_t LppSyncManagerAdapter::SetTunnelId(uint64_t tunnelId)
 {
-    int32_t ret = vdiImpl_->SetTunnelId(tunnelId, instanceId_);
+    int32_t ret = vdiImpl_->SetTunnelId(tunnelId);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "SetTunnelId failed.");
     return ret;
 }
 
-int32_t LppSyncManagerAdapter::SetTargetStartFrame(uint64_t framePts, uint32_t timeoutMs)
+int32_t LppSyncManagerAdapter::SetTargetStartFrame(int64_t framePts, uint32_t timeoutMs)
 {
-    int32_t ret = vdiImpl_->SetTargetStartFrame(framePts, timeoutMs, instanceId_);
+    int32_t ret = vdiImpl_->SetTargetStartFrame(framePts, timeoutMs);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "SetTargetStartFrame failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::SetPlaybackSpeed(float mode)
 {
-    int32_t ret = vdiImpl_->SetPlaybackSpeed(mode, instanceId_);
+    int32_t ret = vdiImpl_->SetPlaybackSpeed(mode);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "SetPlaybackSpeed failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::RegisterCallback(const sptr<ILppSyncManagerCallback>& syncCallback)
 {
-    HDF_LOGI("LppSyncManagerAdapter %{public}s", __func__);
-    vdiImpl_->RegisterCallback(syncCallback, instanceId_);
-    return HDF_SUCCESS;
+    int32_t ret = vdiImpl_->RegisterCallback(syncCallback);
+    CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "RegisterCallback failed.");
+    return ret;
 }
 
 int32_t LppSyncManagerAdapter::GetParameter(std::map<std::string, std::string>& parameter)
 {
-    int32_t ret = vdiImpl_->GetParameter(parameter, instanceId_);
+    int32_t ret = vdiImpl_->GetParameter(parameter);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "GetParameter failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::GetShareBuffer(int32_t& fd)
 {
-    int32_t ret = vdiImpl_->GetShareBuffer(fd, instanceId_);
+    int32_t ret = vdiImpl_->GetShareBuffer(fd);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "GetShareBuffer failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::SetParameter(const std::map<std::string, std::string>& parameter)
 {
-    int32_t ret = vdiImpl_->SetParameter(parameter, instanceId_);
+    int32_t ret = vdiImpl_->SetParameter(parameter);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "SetParameter failed.");
     return ret;
 }
 
-int32_t LppSyncManagerAdapter::UpdateTimeAnchor(uint64_t anchorPts, uint64_t anchorClk)
+int32_t LppSyncManagerAdapter::UpdateTimeAnchor(int64_t anchorPts, uint64_t anchorClk)
 {
-    int32_t ret = vdiImpl_->UpdateTimeAnchor(anchorPts, anchorClk, instanceId_);
+    int32_t ret = vdiImpl_->UpdateTimeAnchor(anchorPts, anchorClk);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "UpdateTimeAnchor failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::BindOutputBuffers(const std::map<uint32_t, sptr<NativeBuffer>>& outputBuffers)
 {
-    int32_t ret = vdiImpl_->BindOutputBuffers(outputBuffers, instanceId_);
+    int32_t ret = vdiImpl_->BindOutputBuffers(outputBuffers);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "BindOutputBuffers failed.");
     return ret;
 }
 
 int32_t LppSyncManagerAdapter::UnbindOutputBuffers()
 {
-    int32_t ret = vdiImpl_->UnbindOutputBuffers(instanceId_);
+    int32_t ret = vdiImpl_->UnbindOutputBuffers();
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "UnbindOutputBuffers failed.");
+    return ret;
+}
+
+int32_t LppSyncManagerAdapter::GetLatestPts(int64_t& pts)
+{
+    int32_t ret = vdiImpl_->GetLatestPts(pts);
+    CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != ret, HDF_FAILURE, "GetLatestPts failed.");
     return ret;
 }
 

@@ -19,7 +19,9 @@
 #include <map>
 #include <hdf_log.h>
 #include <base/native_buffer.h>
+#include "lpp_component_vdi.h"
 #include "v1_0/ilpp_sync_manager_callback.h"
+#include "v1_0/ilpp_types.h"
 
 namespace OHOS {
 namespace HDI {
@@ -31,31 +33,34 @@ namespace V1_0 {
 class ILowPowerPlayerVdi {
 public:
     virtual ~ILowPowerPlayerVdi() = default;
-    virtual int32_t Init(int32_t instanceId) = 0;
-    virtual int32_t SetVideoChannelId(uint32_t channelId, int32_t instanceId) = 0;
-    virtual int32_t StartRender(int32_t instanceId) = 0;
-    virtual int32_t RenderNextFrame(int32_t instanceId) = 0;
-    virtual int32_t Pause(int32_t instanceId) = 0;
-    virtual int32_t Resume(int32_t instanceId) = 0;
-    virtual int32_t Flush(int32_t instanceId) = 0;
-    virtual int32_t Stop(int32_t instanceId) = 0;
-    virtual int32_t Reset(int32_t instanceId) = 0;
-    virtual int32_t Release(int32_t instanceId) = 0;
-    virtual int32_t SetTunnelId(uint64_t& tunnelId, int32_t instanceId) = 0;
-    virtual int32_t SetPlaybackSpeed(float mode, int32_t instanceId) = 0;
-    virtual int32_t GetShareBuffer(int32_t& fd, int32_t instanceId) = 0;
-    virtual int32_t GetParameter(std::map<std::string, std::string>& parameter, int32_t instanceId) = 0;
-    virtual int32_t SetTargetStartFrame(uint64_t framePts, uint32_t timeoutMs, int32_t instanceId) = 0;
-    virtual int32_t RegisterCallback(const sptr<ILppSyncManagerCallback>& syncCallback, int32_t instanceId) = 0;
-    virtual int32_t SetParameter(const std::map<std::string, std::string>& parameter, int32_t instanceId) = 0;
-    virtual int32_t UpdateTimeAnchor(uint64_t anchorPts, uint64_t anchorClk, int32_t instanceId) = 0;
+    virtual int32_t Init() = 0;
+    virtual int32_t SetVideoChannelId(uint32_t channelId) = 0;
+    virtual int32_t StartRender() = 0;
+    virtual int32_t RenderNextFrame() = 0;
+    virtual int32_t Pause() = 0;
+    virtual int32_t Resume() = 0;
+    virtual int32_t Flush() = 0;
+    virtual int32_t Stop() = 0;
+    virtual int32_t Reset() = 0;
+    virtual int32_t Release() = 0;
+    virtual int32_t SetTunnelId(uint64_t& tunnelId) = 0;
+    virtual int32_t SetPlaybackSpeed(float mode) = 0;
+    virtual int32_t GetShareBuffer(int32_t& fd) = 0;
+    virtual int32_t GetParameter(std::map<std::string, std::string>& parameter) = 0;
+    virtual int32_t SetTargetStartFrame(uint64_t framePts, uint32_t timeoutMs) = 0;
+    virtual int32_t RegisterCallback(const sptr<ILppSyncManagerCallback>& syncCallback) = 0;
+    virtual int32_t SetParameter(const std::map<std::string, std::string>& parameter) = 0;
+    virtual int32_t UpdateTimeAnchor(uint64_t anchorPts, uint64_t anchorClk) = 0;
     virtual int32_t BindOutputBuffers(
-        const std::map<uint32_t, sptr<OHOS::HDI::Base::NativeBuffer>> &outputBuffers, int32_t instanceId) = 0;
-    virtual int32_t UnbindOutputBuffers(int32_t instanceId) = 0;
+        const std::map<uint32_t, sptr<OHOS::HDI::Base::NativeBuffer>> &outputBuffers) = 0;
+    virtual int32_t UnbindOutputBuffers() = 0;
+    virtual int32_t GetLatestPts(int64_t& pts) = 0;
 };
 
+using GetAVCapabilityFunc = int32_t (*)(LppAVCap&);
 using CreateLowPowerPlayerVdiFunc = ILowPowerPlayerVdi* (*)();
 using DestroyLowPowerPlayerVdiFunc = void (*)(ILowPowerPlayerVdi* vdi);
+extern "C" int32_t GetAVCapabilityVdi(LppAVCap&);
 extern "C" ILowPowerPlayerVdi* CreateLowPowerPlayerVdi();
 extern "C" void DestroyLowPowerPlayerVdi(ILowPowerPlayerVdi* vdi);
 

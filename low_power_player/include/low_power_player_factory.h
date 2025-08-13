@@ -16,12 +16,15 @@
 #ifndef OHOS_HDI_LPP_V1_0_LPPCOMPONENTFACTORY_H
 #define OHOS_HDI_LPP_V1_0_LPPCOMPONENTFACTORY_H
 
+#include <dlfcn.h>
 #include <hdf_log.h>
 #include <stdint.h>
+#include <mutex>
+#include "lpp_component_vdi.h"
 #include "v1_0/ilow_power_player_factory.h"
 #include "v1_0/ilpp_sync_manager_adapter.h"
 #include "v1_0/ilpp_audio_sink_adapter.h"
-
+#include "v1_0/ilpp_types.h"
 
 namespace OHOS {
 namespace HDI {
@@ -32,22 +35,12 @@ class LowPowerPlayerFactory : public ILowPowerPlayerFactory {
 public:
     LowPowerPlayerFactory() = default;
     ~LowPowerPlayerFactory() = default ;
-    int32_t CreateSyncMgr(sptr<ILppSyncManagerAdapter>& syncMgrAdapter, uint32_t& syncMgrId);
-    int32_t DestroySyncMgr(uint32_t syncMgrId);
-    int32_t CreateAudioSink(sptr<ILppAudioSinkAdapter>& audioSinkAdapter, uint32_t& audioSinkId);
-    int32_t DestroyAudioSink(uint32_t audioSinkId);
-
-private:
-    uint32_t syncMgrId_;
-    uint32_t audioSinkId_;
-    uint32_t GetNextMgrId();
-    uint32_t GetNextSinkId();
-    std::map<uint32_t, sptr<ILppSyncManagerAdapter>> syncMgrMap_;
-    std::map<uint32_t, sptr<ILppAudioSinkAdapter>> audioSinkMap_;
+    int32_t CreateSyncMgr(sptr<ILppSyncManagerAdapter>& syncMgrAdapter);
+    int32_t CreateAudioSink(sptr<ILppAudioSinkAdapter>& audioSinkAdapter);
+    int32_t GetAVCapability(LppAVCap& avCap);
 };
-
+}  // LowPowerPlayer
 }  // namespace V1_0
-}  // namespace LowPowerPlayer
 }  // namespace HDI
 }  // namespace OHOS
 
