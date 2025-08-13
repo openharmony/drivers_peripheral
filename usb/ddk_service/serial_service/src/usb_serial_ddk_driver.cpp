@@ -70,8 +70,8 @@ static int HdfUsbSerialDdkDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfUsbSerialDdkHost->ioService.Dispatch = UsbSerialDdkDriverDispatch;
-    hdfUsbSerialDdkHost->ioService.Open = NULL;
-    hdfUsbSerialDdkHost->ioService.Release = NULL;
+    hdfUsbSerialDdkHost->ioService.Open = nullptr;
+    hdfUsbSerialDdkHost->ioService.Release = nullptr;
 
     auto serviceImpl = OHOS::HDI::Usb::UsbSerialDdk::V1_0::IUsbSerialDdk::Get(true);
     if (serviceImpl == nullptr) {

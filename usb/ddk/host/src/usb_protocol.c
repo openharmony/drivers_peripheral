@@ -257,6 +257,7 @@ int32_t UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t bu
     if (ret != HDF_SUCCESS) {
         goto ERR;
     }
+    HDF_LOGI("%{public}s_%{public}d: activeConfig %{public}d", __func__, __LINE__, activeConfig);
 
     ret = RawGetConfigDescriptor(devHandle->dev, activeConfig, &config);
     if (ret != HDF_SUCCESS) {
