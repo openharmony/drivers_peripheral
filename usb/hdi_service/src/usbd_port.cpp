@@ -131,7 +131,18 @@ int32_t UsbdPort::WritePortFile(int32_t role, const std::string &subPath)
         HDF_LOGE("%{public}s: Write failed for: %{public}s, errno: %{public}d", __func__, modeStr.c_str(), errno);
         return HDF_FAILURE;
     }
-    
+
+    if (path_.find("/otg_default") == std::string::npos) {
+        return HDF_SUCCESS;
+    }
+
+    int32_t devRole = -1;
+    ret = ReadPortFile(devRole, subPath);
+    if (ret != HDF_SUCCESS || devRole != role) {
+        HDF_LOGE("%{public}s: target: %{public}d, device: %{public}d, subpath:%{public}s",
+            __func__, role, devRole, subPath.c_str());
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
