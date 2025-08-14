@@ -338,7 +338,7 @@ HWTEST_F(ContextManagerTest, TestFillInContext_003, TestSize.Level0)
     uint64_t credentialId = 10;
     ExecutorResultInfo info = {};
     info.scheduleId = 2135;
-    EXPECT_EQ(FillInContext(context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_UNKNOWN);
+    EXPECT_EQ(FillInContext(context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_GENERAL_ERROR);
 
     DestroyContextNode(context);
 }
@@ -366,7 +366,7 @@ HWTEST_F(ContextManagerTest, TestFillInContext_004, TestSize.Level0)
     ExecutorResultInfo info = {};
     info.scheduleId = 2135;
     info.templateId = 20;
-    EXPECT_EQ(FillInContext(context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_UNKNOWN);
+    EXPECT_EQ(FillInContext(context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_GENERAL_ERROR);
 
     DestroyContextNode(context);
 }
