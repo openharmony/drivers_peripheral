@@ -15,7 +15,6 @@
 
 #include "usbfn_io_mgr.h"
 #include "usbd_wrapper.h"
-#include "stdint.h"
 
 #define HDF_LOG_TAG usbfn_io_mgr
 
@@ -254,7 +253,7 @@ static int32_t HandleInit(struct UsbHandleMgr *handle, struct UsbFnInterfaceMgr 
 
     DListHeadInit(&handle->reqEntry);
     handle->numFd = interfaceMgr->interface.info.numPipes;
-    if (handle->numFd > INT32_MAX) {
+    if (handle->numFd > MAX_EP) {
         HDF_LOGE("%{public}s: Invalid numFd value", __func__);
         return HDF_ERR_IO;
     }
