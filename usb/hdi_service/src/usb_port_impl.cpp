@@ -36,7 +36,7 @@
 #include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG UsbPortImpl
-constexpr int32_t DEVICE = 2;
+constexpr int32_t DEFAULT_DEVICE_ROLE = 2;
 using namespace OHOS::HiviewDFX;
 bool g_productFlag = false;
 namespace OHOS {
@@ -106,7 +106,7 @@ int32_t UsbPortImpl::QueryPorts(std::vector<UsbPort>& portList)
             return ret;
         }
         if (!portList.empty()) {
-            portList[0].usbPortStatus.currentDataRole = DEVICE;
+            portList[0].usbPortStatus.currentDataRole = DEFAULT_DEVICE_ROLE;
         }
         return HDF_SUCCESS;
     }
