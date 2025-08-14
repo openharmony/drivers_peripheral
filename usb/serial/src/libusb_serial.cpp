@@ -54,7 +54,7 @@ namespace V1_0 {
 #define ERR_CODE_DEVICENOTOPEN (-6)
 #define OUTPUT_WIDTH 2
 
-#define RETRY_TIMEOUT 10
+constexpr int RETRY_TIMEOUT = 10;
 
 static const std::string BUS_NUM_STR = "/busnum";
 static const std::string DEV_NUM_STR = "/devnum";
