@@ -720,27 +720,19 @@ static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn,
 }
 
 static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
-    const std::vector<uint8_t> &scheduleResult, HdiAuthResultInfo &info, HdiEnrolledState &enrolledState)
+    Buffer *scheduleResultBuffer, HdiAuthResultInfo &info, HdiEnrolledState &enrolledState)
 {
-    IAM_LOGI("start");
-    if (scheduleResult.size() == 0) {
-        IAM_LOGE("param is invalid");
-        DestroyContextbyId(contextId);
-        return RESULT_BAD_PARAM;
-    }
-    Buffer *scheduleResultBuffer = CreateBufferByData(&scheduleResult[0], scheduleResult.size());
-    if (!IsBufferValid(scheduleResultBuffer)) {
-        IAM_LOGE("scheduleTokenBuffer is invalid");
-        DestroyContextbyId(contextId);
-        return RESULT_NO_MEMORY;
-    }
-    std::lock_guard<std::mutex> lock(g_mutex);
     UserAuthTokenHal authTokenHal = {};
     AuthResult authResult = {};
     int32_t funcRet = RESULT_GENERAL_ERROR;
     do {
+        UserAuthContext *userAuthContext = GetContext(contextId);
+        if (userAuthContext == NULL) {
+            IAM_LOGE("context is not found");
+            return RESULT_GENERAL_ERROR;
+        }
+        int32_t authIntent = userAuthContext->authIntent;
         int32_t ret = RequestAuthResultFunc(contextId, scheduleResultBuffer, &authTokenHal, &authResult);
-        DestoryBuffer(scheduleResultBuffer);
         if (ret != RESULT_SUCCESS) {
             IAM_LOGE("execute func failed");
             break;
@@ -754,6 +746,11 @@ static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
             IAM_LOGI("type not pin");
         } else {
             IAM_LOGI("type pin");
+            if (authIntent == ABANDONED_PIN_AUTH) {
+                IAM_LOGI("authIntent is old pin auth");
+                funcRet = RESULT_SUCCESS;
+                break;
+            }
             ret = CreateExecutorCommand(authResult.userId, info);
             if (ret != RESULT_SUCCESS) {
                 IAM_LOGE("create executor command failed");
@@ -771,7 +768,21 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
     const std::vector<uint8_t> &scheduleResult, HdiAuthResultInfo &info, HdiEnrolledState &enrolledState)
 {
     IAM_LOGI("start");
-    return UpdateAuthenticationResultInner(contextId, scheduleResult, info, enrolledState);
+    if (scheduleResult.size() == 0) {
+        IAM_LOGE("param is invalid");
+        DestroyContextbyId(contextId);
+        return RESULT_BAD_PARAM;
+    }
+    Buffer *scheduleResultBuffer = CreateBufferByData(&scheduleResult[0], scheduleResult.size());
+    if (!IsBufferValid(scheduleResultBuffer)) {
+        IAM_LOGE("scheduleTokenBuffer is invalid");
+        DestroyContextbyId(contextId);
+        return RESULT_NO_MEMORY;
+    }
+    std::lock_guard<std::mutex> lock(g_mutex);
+    int32_t ret = UpdateAuthenticationResultInner(contextId, scheduleResultBuffer, info, enrolledState);
+    DestoryBuffer(scheduleResultBuffer);
+    return ret;
 }
 
 int32_t UserAuthInterfaceService::CancelAuthentication(uint64_t contextId)
