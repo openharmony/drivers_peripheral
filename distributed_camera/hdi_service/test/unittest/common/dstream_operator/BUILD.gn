@@ -122,10 +122,54 @@ ohos_unittest("DcameraStreamTest") {
   part_name = "drivers_peripheral_distributed_camera"
 }
 
+ohos_unittest("DBufferManagerTest") {
+  module_out_path = module_out_path
+  cflags = [ "-Dprivate=public" ]
+
+  sources = [ "dbuffer_manager_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.1" ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "drivers_interface_camera:libbuffer_handle_sequenceable_1.0",
+    "drivers_interface_camera:libcamera_proxy_1.0",
+    "drivers_interface_camera:libmap_data_sequenceable_1.0",
+    "drivers_interface_camera:metadata",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.3",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "drivers_interface_display:libdisplay_composer_stub_1.0",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.1",
+    "graphic_surface:buffer_handle",
+    "graphic_surface:surface",
+    "graphic_surface:sync_fence",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"HdfDstreamOperatorTest\"",
+    "LOG_DOMAIN=0xD004150",
+  ]
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_distributed_camera"
+}
+
 group("hdf_dstream_operator_test") {
   testonly = true
   deps = [
     ":HdfDstreamOperatorTest",
     ":DcameraStreamTest",
+    ":DBufferManagerTest",
   ]
 }
