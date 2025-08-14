@@ -18,14 +18,19 @@
 #include <string>
 #include "hdf_base.h"
 #include "hdf_log.h"
-#include "usbd_function.h"
 #include "usbd_wrapper.h"
 #include "usb_report_sys_event.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_2 {
+
+constexpr int32_t USB_FUNCTION_NONE = 0;
+constexpr int32_t USB_FUNCTION_HDC = (1 << 2);
+constexpr int32_t USB_FUNCTION_STORAGE = (1 << 9);
+constexpr uint32_t PERSIST_CONFIG_NAME_MAX_LEN = 32;
 
 UsbdPort &UsbdPort::GetInstance()
 {
@@ -272,18 +277,58 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
     return HDF_SUCCESS;
 }
 
+bool UsbdPort::IsHdcOpen()
+{
+    char persistConfig[PERSIST_CONFIG_NAME_MAX_LEN] = {0};
+    int32_t ret = GetParameter("persist.sys.usb.config", "invalid", persistConfig, PERSIST_CONFIG_NAME_MAX_LEN);
+    if (ret <= 0) {
+        HDF_LOGE("%{public}s:GetPersistParameter failed", __func__);
+        return false;
+    }
+    const char HDC_SIGNATURE[] = "hdc";
+    if (strstr(persistConfig, HDC_SIGNATURE) != nullptr) {
+        HDF_LOGI("%{public}s:hdc is opening", __func__);
+        return true;
+    }
+    return false;
+}
+
+bool UsbdPort::IsDevInterfaceConn()
+{
+    if (usbDeviceInterface_ == nullptr) {
+        usbDeviceInterface_ = HDI::Usb::V2_0::IUsbDeviceInterface::Get(true);
+        if (usbDeviceInterface_ == nullptr) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+int32_t UsbdPort::UsbdSetFunction(int32_t func)
+{
+    if (!IsDevInterfaceConn()) {
+        return HDF_FAILURE;
+    }
+    return usbDeviceInterface_->SetCurrentFunctions(func);
+}
+
 int32_t UsbdPort::SwitchFunction(int32_t dataRole)
 {
     int32_t ret = HDF_SUCCESS;
-    int32_t currentFuncs = UsbdFunction::UsbdGetFunction();
+    if (!IsDevInterfaceConn()) {
+        return HDF_FAILURE;
+    }
+    int32_t currentFuncs = USB_FUNCTION_NONE;
+    ret = usbDeviceInterface_->GetCurrentFunctions(currentFuncs);
     if (currentFuncs == USB_FUNCTION_HDC || currentFuncs == USB_FUNCTION_STORAGE) {
         HDF_LOGI("%{public}s: skip, currentFuncs: %{public}d", __func__, currentFuncs);
         return ret;
     }
-    if (UsbdFunction::IsHdcOpen()) {
-        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_HDC);
+    if (IsHdcOpen()) {
+        ret = usbDeviceInterface_->SetCurrentFunctions(USB_FUNCTION_HDC);
     } else {
-        ret = UsbdFunction::UsbdSetFunction(USB_FUNCTION_STORAGE);
+        ret = usbDeviceInterface_->SetCurrentFunctions(USB_FUNCTION_STORAGE);
     }
     return ret;
 }
@@ -456,13 +501,13 @@ int32_t UsbdPort::WritePdPortFile(int32_t powerRole, int32_t dataRole)
     if (powerRole == POWER_ROLE_SOURCE && dataRole == DATA_ROLE_HOST) {
         mode = PORT_MODE_HOST;
         modeStr = DATA_ROLE_UFP_STR;
-        UsbdFunction::UsbdSetFunction(USB_FUNCTION_NONE);
+        UsbdSetFunction(USB_FUNCTION_NONE);
     }
  
     if (powerRole == POWER_ROLE_SINK && dataRole == DATA_ROLE_DEVICE) {
         mode = PORT_MODE_DEVICE;
         modeStr = DATA_ROLE_DFP_STR;
-        UsbdFunction::UsbdSetFunction(USB_FUNCTION_HDC);
+        UsbdSetFunction(USB_FUNCTION_HDC);
     }
     uint32_t len = modeStr.size();
     int32_t fd = OpenPortFile(O_WRONLY | O_TRUNC, "");
