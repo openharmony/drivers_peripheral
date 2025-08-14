@@ -373,7 +373,10 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
             ret = SetMatchRenderDevicePath(tpins, renderParam, cJsonObj, SPEAKER, AUDIO_DEV_ON);
 #ifndef ALSA_LIB_MODE
             /* 2.close headphones */
-            ret |= SetMatchRenderDevicePath(PIN_OUT_HEADSET, renderParam, cJsonObj, HEADPHONES, AUDIO_DEV_OFF);
+            if (SetMatchRenderDevicePath(PIN_OUT_HEADSET, renderParam, cJsonObj, HEADPHONES, AUDIO_DEV_OFF) ==
+                HDF_SUCCESS) {
+                ret = HDF_SUCCESS;
+            }
 #endif
             break;
         case PIN_OUT_HEADSET:
@@ -381,7 +384,10 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
             ret = SetMatchRenderDevicePath(tpins, renderParam, cJsonObj, HEADPHONES, AUDIO_DEV_ON);
 #ifndef ALSA_LIB_MODE
             /* 2、close speaker */
-            ret |= SetMatchRenderDevicePath(PIN_OUT_SPEAKER, renderParam, cJsonObj, SPEAKER, AUDIO_DEV_OFF);
+            if (SetMatchRenderDevicePath(PIN_OUT_SPEAKER, renderParam, cJsonObj, SPEAKER, AUDIO_DEV_OFF) ==
+                HDF_SUCCESS) {
+                ret = HDF_SUCCESS;
+            }
 #endif
             break;
         case PIN_OUT_EARPIECE:
