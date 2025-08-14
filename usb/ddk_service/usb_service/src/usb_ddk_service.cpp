@@ -13,11 +13,10 @@
  * limitations under the License.
  */
 
-#include "v1_1/usb_ddk_service.h"
-
 #include <hdf_base.h>
 #include <iproxy_broker.h>
 #include <shared_mutex>
+#include "v1_1/usb_ddk_service.h"
 
 #include "ddk_pnp_listener_mgr.h"
 #include "ipc_skeleton.h"
@@ -48,14 +47,14 @@ namespace V1_1 {
 
 #define MAX_BUFF_SIZE         16384
 #define MAX_CONTROL_BUFF_SIZE 1024
-#define DEVICE_DESCRIPROR_LENGTH 18
+constexpr size_t DEVICE_DESCRIPROR_LENGTH = 18;
 constexpr int32_t API_VERSION_ID_18 = 18;
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 #ifdef LIBUSB_ENABLE
 static std::shared_ptr<OHOS::HDI::Usb::V1_2::LibusbAdapter> g_DdkLibusbAdapter =
     V1_2::LibusbAdapter::GetInstance();
-constexpr uint8_t INTERFACE_ID_INVALID = 255;
+constexpr uint8_t  INTERFACE_ID_INVALID = 255;
 static std::unordered_map<uint64_t, uint8_t> g_InterfaceMap;
 std::shared_mutex g_MutexInterfaceMap;
 #endif // LIBUSB_ENABLE
@@ -239,6 +238,7 @@ static int32_t UsbdPnpEventHandler(void *priv, uint32_t id, HdfSBuf *data)
         std::vector<uint64_t> interfaceHandleList;
         if (UsbDdkGetAllRecords({0, infoTable->busNum, infoTable->devNum}, interfaceHandleList)) {
             for (auto interfaceHandle : interfaceHandleList) {
+                HDF_LOGD("%{public}s: need release interface, handle: %{public}llu", __func__, interfaceHandle);
                 ReleaseUsbInterface(interfaceHandle);
             }
         }
@@ -407,6 +407,7 @@ int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex,
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s hash failed %{public}d", __func__, ret);
     }
+    HDF_LOGD("%{public}s: claim handle: %{public}lu", __func__, interfaceHandle);
     return ret;
 #else
     int32_t ret = g_DdkLibusbAdapter->OpenDevice({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)});
@@ -437,6 +438,7 @@ int32_t UsbDdkService::ReleaseInterface(uint64_t interfaceHandle)
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
     }
+    HDF_LOGD("%{public}s: release handle: %{public}llu", __func__, interfaceHandle);
     return ReleaseUsbInterface(interfaceHandle);
 }
 

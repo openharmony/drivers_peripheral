@@ -58,8 +58,9 @@ constexpr uint8_t MAX_DEVICE_BUSNUM = 255;
 constexpr uint8_t MAX_ENDPOINT_ID = 158;
 constexpr uint8_t MAX_CANCEL_ENDPOINT_ID = 255;
 constexpr uint8_t MAX_INTERFACE_ID = 255;
+constexpr uint8_t LIBUSB_MAX_INTERFACEID = 0x80;
 constexpr uint8_t LIBUSB_INTERFACE_ID = 0x80;
-constexpr uint8_t LIBUSB_ENDPOINT_MASK = 0x80;
+constexpr uint8_t USB_ENDPOINT_MASK = 0x80;
 #endif
 namespace OHOS {
 namespace HDI {
@@ -99,7 +100,6 @@ UsbImpl::UsbImpl() : session_(nullptr), device_(nullptr)
 {
     HdfSListInit(&devList_);
     OsalMutexInit(&lock_);
-    V1_2::UsbdFunction::UsbdInitLock();
     if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
         loadUsbService_.LoadService();
     }
@@ -107,7 +107,6 @@ UsbImpl::UsbImpl() : session_(nullptr), device_(nullptr)
 
 UsbImpl::~UsbImpl()
 {
-    V1_2::UsbdFunction::UsbdDestroyLock();
     UsbdReleaseDevices();
 }
 
@@ -1239,7 +1238,7 @@ int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         return ret;
     }
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
+    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
     return HDF_SUCCESS;
 #else
     return LibusbAdapter::GetInstance()->GetDeviceDescriptor(dev, descriptor);
@@ -1268,7 +1267,7 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     }
 
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
+    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
     return HDF_SUCCESS;
 #else
     return LibusbAdapter::GetInstance()->GetStringDescriptor(dev, descId, descriptor);
@@ -1296,7 +1295,7 @@ int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     }
 
     descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
-    std::copy(buffer, buffer + std::min(USB_MAX_DESCRIPTOR_SIZE, static_cast<int>(length)), descriptor.begin());
+    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
     return HDF_SUCCESS;
 #else
     return LibusbAdapter::GetInstance()->GetConfigDescriptor(dev, descId, descriptor);
@@ -2094,8 +2093,8 @@ int32_t UsbImpl::RequestQueue(
     bufferAddr = nullptr;
     return ret;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2147,7 +2146,7 @@ int32_t UsbImpl::RequestWait(
     UsbdRequestASyncReleaseData(reqMsg);
     return ret;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2185,11 +2184,11 @@ int32_t UsbImpl::RequestCancel(const UsbDev &dev, const UsbPipe &pipe)
         return HDF_ERR_INVALID_PARAM;
     }
     if (pipe.intfId == MAX_INTERFACE_ID && pipe.endpointId == MAX_ENDPOINT_ID) {
-        HDF_LOGW("%{public}s: intfId = %{public}d, endpointId = %{public}d", __func__,
-            pipe.intfId, pipe.endpointId);
+        HDF_LOGW("%{public}s: intfId = %{public}d, endpointId = %{public}d",
+            __func__, pipe.intfId, pipe.endpointId);
         return HDF_SUCCESS;
     }
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
         (pipe.endpointId > MAX_CANCEL_ENDPOINT_ID) || (pipe.intfId > LIBUSB_INTERFACE_ID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -2238,7 +2237,7 @@ void UsbImpl::parsePortPath()
         UsbdPorts::GetInstance().setPortPath(path_);
         return;
     }
- 
+
     g_productFlag = false;
     UsbdPort::GetInstance().setPortPath(path_);
     return;
@@ -2269,7 +2268,7 @@ int32_t UsbImpl::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRol
     } else {
         ret = UsbdPort::GetInstance().QueryPort(portId, powerRole, dataRole, mode);
     }
-    
+
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:QueryPort failed, ret:%{public}d", __func__, ret);
         return ret;
@@ -2405,8 +2404,8 @@ int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const s
 
     return HDF_SUCCESS;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID) || (cb == nullptr)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID) || (cb == nullptr)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2431,8 +2430,8 @@ int32_t UsbImpl::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
     list->cb = nullptr;
     return HDF_SUCCESS;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2473,13 +2472,13 @@ int32_t UsbImpl::BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ash
 
     return ret;
 #else
-    if ((pipe.endpointId & LIBUSB_ENDPOINT_MASK) != LIBUSB_ENDPOINT_MASK) {
+    if ((pipe.endpointId & USB_ENDPOINT_MASK) != USB_ENDPOINT_MASK) {
         HDF_LOGE("%{public}s:EndpointId is invalid", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2520,8 +2519,8 @@ int32_t UsbImpl::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<As
 
     return ret;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -2551,8 +2550,8 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
     list->cb = tcb;
     return HDF_SUCCESS;
 #else
-    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_BUSNUM) ||
-        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_INTERFACE_ID)) {
+    if ((dev.devAddr >= MAX_DEVICE_ADDRESS) || (dev.busNum >= MAX_DEVICE_ADDRESS) ||
+        (pipe.endpointId >= MAX_ENDPOINT_ID) || (pipe.intfId >= LIBUSB_MAX_INTERFACEID)) {
         HDF_LOGE("%{public}s:Invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
