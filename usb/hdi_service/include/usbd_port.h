@@ -26,7 +26,7 @@
 #include "v1_0/iusbd_subscriber.h"
 #include "v1_2/usb_types.h"
 #include "v2_0/iusbd_subscriber.h"
-
+#include "v2_0/iusb_device_interface.h"
 #define DEFAULT_PORT_ID 1
 
 #define DATA_ROLE_NONE_STR "none"
@@ -121,12 +121,16 @@ private:
     void QueryPdPort(int32_t &powerRole, int32_t &dataRole, int32_t &mode);
     void UpdatePdPort(int32_t mode, const sptr<IUsbdSubscriber> &subscriber);
     void UpdatePdPorts(int32_t mode, const sptr<V2_0::IUsbdSubscriber> &subscriber);
+    bool IsHdcOpen();
+    bool IsDevInterfaceConn();
+    int32_t UsbdSetFunction(int32_t func);
     HDI::Usb::V1_2::PortInfo currentPortInfo_ = {DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE, PORT_MODE_DEVICE};
     HDI::Usb::V2_0::PortInfo currentPortInfos_ = {DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE, PORT_MODE_DEVICE};
     std::string path_;
     std::string PD_V2_0 = "/dev/check_usbmode";
     std::string DEFAULT_USB_MODE_PATH = "/data/service/el1/public/usb/mode";
     bool isPdV2_0 = false;
+    sptr<HDI::Usb::V2_0::IUsbDeviceInterface> usbDeviceInterface_ = nullptr;
 };
 } // namespace V1_2
 } // namespace Usb
