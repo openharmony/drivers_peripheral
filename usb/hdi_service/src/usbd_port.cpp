@@ -52,7 +52,7 @@ int32_t UsbdPort::IfCanSwitch(int32_t portId, int32_t powerRole, int32_t dataRol
     if (!isPdV2_0) {
         int32_t supported_modes = 0;
         int32_t ret = GetSupportedModes(supported_modes);
-        if (supported_modes == 0 && ret >= 0) {
+        if (ret >= 0 && supported_modes == 0) {
             HDF_LOGE("%{public}s: supported_modes is none not support", __func__);
             return HDF_ERR_NOT_SUPPORT;
         }
@@ -132,17 +132,6 @@ int32_t UsbdPort::WritePortFile(int32_t role, const std::string &subPath)
         return HDF_FAILURE;
     }
 
-    if (path_.find("/otg_default") == std::string::npos) {
-        return HDF_SUCCESS;
-    }
-
-    int32_t devRole = -1;
-    ret = ReadPortFile(devRole, subPath);
-    if (ret != HDF_SUCCESS || devRole != role) {
-        HDF_LOGE("%{public}s: target: %{public}d, device: %{public}d, subpath:%{public}s",
-            __func__, role, devRole, subPath.c_str());
-        return HDF_FAILURE;
-    }
     return HDF_SUCCESS;
 }
 
