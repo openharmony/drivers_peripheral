@@ -282,6 +282,7 @@ ohos_shared_library("libusb_port_driver") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_stub_2.0",
+      "drivers_interface_usb:libusb_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
