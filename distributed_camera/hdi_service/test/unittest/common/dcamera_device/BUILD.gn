@@ -35,7 +35,10 @@ config("module_private_config") {
 ohos_unittest("HdfDcameraDeviceTest") {
   module_out_path = module_out_path
 
-  sources = [ "dcamera_device_test.cpp" ]
+  sources = [
+    "dcamera_device_test.cpp",
+    "dmetadata_processor_test.cpp"
+  ]
 
   configs = [ ":module_private_config" ]
 
@@ -67,6 +70,9 @@ ohos_unittest("HdfDcameraDeviceTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"HdfDcameraDeviceTest\"",
     "LOG_DOMAIN=0xD004150",
+  ]
+  cflags = [
+    "-Dprivate=public",
   ]
 
   install_images = [ chipset_base_dir ]
