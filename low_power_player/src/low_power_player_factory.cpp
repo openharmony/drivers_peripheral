@@ -13,13 +13,18 @@
  * limitations under the License.
  */
 
+#include <dlfcn.h>
+#include "lpp_log.h"
 #include "low_power_player_factory.h"
 #include "lpp_sync_manager_adapter.h"
-
 namespace OHOS {
 namespace HDI {
 namespace LowPowerPlayer {
 namespace V1_0 {
+
+static std::mutex mutex_;
+static std::shared_ptr<void> libHandle_ = nullptr;
+static GetAVCapabilityFunc capVdi_ = nullptr;
 
 extern "C" ILowPowerPlayerFactory* LowPowerPlayerFactoryImplGetInstance(void)
 {
@@ -31,42 +36,35 @@ extern "C" void LowPowerPlayerFactoryImplRelease(void* ptr)
     delete (LowPowerPlayerFactory*)ptr;
 }
 
-int32_t LowPowerPlayerFactory::CreateSyncMgr(sptr<ILppSyncManagerAdapter> &lppAdapter, uint32_t &instanceId)
+int32_t LowPowerPlayerFactory::CreateSyncMgr(sptr<ILppSyncManagerAdapter> &lppAdapter)
 {
-    uint32_t componentId = GetNextMgrId();
-    sptr<ILppSyncManagerAdapter> lppInstance(new LppSyncManagerAdapter(componentId));
-    syncMgrMap_.emplace(std::make_pair(componentId, lppInstance));
+    sptr<LppSyncManagerAdapter> lppInstance = sptr<LppSyncManagerAdapter>::MakeSptr();
+    int32_t ret = lppInstance->Init();
+    CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, HDF_FAILURE, "create vdi failed");
     lppAdapter = lppInstance;
-    instanceId = componentId;
     return HDF_SUCCESS;
 }
 
-int32_t LowPowerPlayerFactory::DestroySyncMgr(uint32_t instanceId)
+int32_t LowPowerPlayerFactory::CreateAudioSink(sptr<ILppAudioSinkAdapter>& audioSinkAdapter)
 {
-    auto it = syncMgrMap_.find(instanceId);
-    if (it != syncMgrMap_.end()) {
-        syncMgrMap_.erase(it);
+    return HDF_SUCCESS;
+}
+
+int32_t LowPowerPlayerFactory::GetAVCapability(LppAVCap& avCap)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (libHandle_ == nullptr) {
+        void *handle = dlopen(LOW_POWER_PLAYER_VDI_LIBRARY, RTLD_LAZY);
+        CHECK_TRUE_RETURN_RET_LOG(handle == NULL, HDF_FAILURE, "dlopen failed, %{public}s", dlerror());
+        libHandle_ = std::shared_ptr<void>(handle, dlclose); // use smart pointer to manage library handle
     }
-    return HDF_SUCCESS;
-}
-
-int32_t LowPowerPlayerFactory::CreateAudioSink(sptr<ILppAudioSinkAdapter>& audioSinkAdapter, uint32_t& audioSinkId)
-{
-    return HDF_SUCCESS;
-}
-
-int32_t LowPowerPlayerFactory::DestroyAudioSink(uint32_t audioSinkId)
-{
-    return HDF_SUCCESS;
-}
-
-uint32_t LowPowerPlayerFactory::GetNextMgrId(void)
-{
-    uint32_t tempId = 0;
-    do {
-        tempId = ++syncMgrId_;
-    } while (syncMgrMap_.find(tempId) != syncMgrMap_.end());
-    return tempId;
+    if (capVdi_ == nullptr) {
+        capVdi_ = reinterpret_cast<GetAVCapabilityFunc>(dlsym(libHandle_.get(), "GetAVCapabilityVdi"));
+        CHECK_TRUE_RETURN_RET_LOG(capVdi_ == NULL, HDF_FAILURE, "createVdi_ dlsym failed, %{public}s", dlerror());
+    }
+    int32_t ret = capVdi_(avCap);
+    CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, HDF_FAILURE, "GetAVCapability failed, %{public}s", strerror(errno));
+    return ret;
 }
 
 }  // namespace V1_0
