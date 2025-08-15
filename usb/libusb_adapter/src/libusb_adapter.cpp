@@ -38,12 +38,29 @@
 #include "securec.h"
 #include "usbd_wrapper.h"
 #include "hitrace_meter.h"
+#include "v2.0/iusb_host_interface.h"
 
 using OHOS::HiviewDFX::HiSysEvent;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_2 {
+LibusbBulkTransfer::LibusbBulkTransfer()
+{
+    bulkTransferRef = libusb_alloc_transfer(0);
+    buikAshmemRef = nullptr;
+    bulkCbRef = nullptr;
+}
+
+LibusbBulkTransfer::~LibusbBulkTransfer()
+{
+    if (bulkTransferRef != nullptr) {
+        libusb_free_transfer(bulkTransferRef);
+        bulkTransferRef = nullptr;
+    }
+    bulkAshmenRef = nullptr;
+    bulkCbRef = nullptr;
+}
 namespace {
 constexpr uint8_t LIBUSB_MAX_INTERFACEID = 0x80;
 constexpr int32_t USB_MAX_INTERFACES = 32;
@@ -92,7 +109,6 @@ std::shared_mutex g_mapMutexUsbOpenFdMap;
 std::shared_mutex g_mapMutexHandleMap;
 static LibusbAsyncManager g_asyncManager;
 static LibusbBulkManager g_bulkManager;
-#define USB_CTRL_SET_TIMEOUT 5000
 
 static uint64_t ToDdkDeviceId(int32_t busNum, int32_t devNum)
 {
