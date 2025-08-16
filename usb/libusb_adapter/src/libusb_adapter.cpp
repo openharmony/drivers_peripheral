@@ -57,7 +57,7 @@ LibusbBulkTransfer::~LibusbBulkTransfer()
         libusb_free_transfer(bulkTransferRef);
         bulkTransferRef = nullptr;
     }
-    bulkAshmenRef = nullptr;
+    buikAshmemRef = nullptr;
     bulkCbRef = nullptr;
 }
 namespace {
