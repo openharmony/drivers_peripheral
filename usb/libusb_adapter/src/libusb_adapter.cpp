@@ -44,6 +44,22 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_2 {
+LibusbBulkTransfer::LibusbBulkTransfer()
+{
+    bulkTransferRef = libusb_alloc_transfer(0);
+    buikAshmemRef = nullptr;
+    bulkCbRef = nullptr;
+}
+
+LibusbBulkTransfer::~LibusbBulkTransfer()
+{
+    if (bulkTransferRef != nullptr) {
+        libusb_free_transfer(bulkTransferRef);
+        bulkTransferRef = nullptr;
+    }
+    buikAshmemRef = nullptr;
+    bulkCbRef = nullptr;
+}
 namespace {
 constexpr uint8_t LIBUSB_MAX_INTERFACEID = 0x80;
 constexpr int32_t USB_MAX_INTERFACES = 32;
