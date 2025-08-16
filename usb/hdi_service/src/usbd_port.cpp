@@ -18,6 +18,7 @@
 #include <string>
 #include "hdf_base.h"
 #include "hdf_log.h"
+#include "usbd_function.h"
 #include "usbd_wrapper.h"
 #include "usb_report_sys_event.h"
 #include "parameter.h"
@@ -27,9 +28,6 @@ namespace HDI {
 namespace Usb {
 namespace V1_2 {
 
-constexpr int32_t USB_FUNCTION_NONE = 0;
-constexpr int32_t USB_FUNCTION_HDC = (1 << 2);
-constexpr int32_t USB_FUNCTION_STORAGE = (1 << 9);
 constexpr uint32_t PERSIST_CONFIG_NAME_MAX_LEN = 32;
 
 UsbdPort &UsbdPort::GetInstance()
