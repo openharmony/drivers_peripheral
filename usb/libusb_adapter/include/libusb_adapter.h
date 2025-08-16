@@ -28,7 +28,6 @@
 
 #include "libusb_sa_subscriber.h"
 #include "v1_2/iusb_interface.h"
-#include "v2_0/iusb_host_interface.h"
 namespace OHOS {
 namespace HDI {
 namespace Usb {
