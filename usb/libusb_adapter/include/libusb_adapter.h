@@ -222,7 +222,7 @@ private:
     void LibUSBExit();
     void GetCurrentDeviceList(libusb_context *ctx, sptr<V2_0::IUsbdSubscriber> subscriber);
     void GetCurrentDevList(libusb_context *ctx, sptr<V1_2::LibUsbSaSubscriber> libUsbSaSubscriber);
-    int32_t GetUsbDevice(const UsbDev &dev, libusb_device **device = nullptr);
+    int32_t GetUsbDevice(const UsbDev &dev, libusb_device **device);
     int32_t FindHandleByDev(const UsbDev &dev, libusb_device_handle **handle);
     void DeleteSettingsMap(libusb_device_handle* handle);
     int32_t DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
@@ -239,6 +239,8 @@ private:
         int32_t extraLength);
     int32_t GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe, libusb_endpoint_descriptor **endpoint_desc,
         libusb_device_handle** deviceHandle);
+    int32_t GetEndpointDescFromInterface(const UsbPipe &pipe, const libusb_interface_descriptor *intf_desc,
+    libusb_endpoint_descriptor **endpoint_desc);
     int32_t DoSyncPipeTranfer(libusb_device_handle *dev_handle, unsigned char endpoint,
         unsigned char *buffer, SyncTranfer &syncTranfer);
     unsigned char *GetMmapBufferByFd(int32_t fd, size_t len);
