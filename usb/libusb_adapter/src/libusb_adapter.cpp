@@ -109,6 +109,7 @@ std::shared_mutex g_mapMutexUsbOpenFdMap;
 std::shared_mutex g_mapMutexHandleMap;
 static LibusbAsyncManager g_asyncManager;
 static LibusbBulkManager g_bulkManager;
+#define USB_CTRL_SET_TIMEOUT 5000
 
 static uint64_t ToDdkDeviceId(int32_t busNum, int32_t devNum)
 {
