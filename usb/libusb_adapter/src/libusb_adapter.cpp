@@ -38,7 +38,6 @@
 #include "securec.h"
 #include "usbd_wrapper.h"
 #include "hitrace_meter.h"
-#include "v2.0/iusb_host_interface.h"
 
 using OHOS::HiviewDFX::HiSysEvent;
 namespace OHOS {
