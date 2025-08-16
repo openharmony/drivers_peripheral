@@ -47,6 +47,7 @@ ohos_shared_library("libusb_adapter") {
       "hitrace:hitrace_meter",
       "ipc:ipc_single",
       "libusb:libusb",
+      "drivers_interface_usb:libusb_stub_2.0",
     ]
     if (usb_c_utils_enable) {
       external_deps += [ "c_utils:utils" ]

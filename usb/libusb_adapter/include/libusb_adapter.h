@@ -29,11 +29,21 @@
 #include "libusb_sa_subscriber.h"
 #include "v1_2/iusb_interface.h"
 #include "v2_0/iusb_host_interface.h"
-
+namespace OHOS {
+namespace HDI {
+namespace Usb {
+namespace V2_0 {
+class IUsbdSubscriber;
+class IUsbdBulkCallback;
+}
+}
+}
+}
 namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_2 {
+
 struct SyncTranfer {
     int length;
     int *transferred;
@@ -85,22 +95,8 @@ struct DeviceInfo {
 };
 
 struct LibusbBulkTransfer {
-    explicit LibusbBulkTransfer()
-    {
-        bulkTransferRef = libusb_alloc_transfer(0);
-        buikAshmemRef = nullptr;
-        bulkCbRef = nullptr;
-    }
-
-    ~LibusbBulkTransfer()
-    {
-        if (bulkTransferRef != nullptr) {
-            libusb_free_transfer(bulkTransferRef);
-            bulkTransferRef = nullptr;
-        }
-        buikAshmemRef = nullptr;
-        bulkCbRef = nullptr;
-    }
+    explicit LibusbBulkTransfer();
+    ~LibusbBulkTransfer();
 
     libusb_transfer *bulkTransferRef;
     sptr<Ashmem> buikAshmemRef;
