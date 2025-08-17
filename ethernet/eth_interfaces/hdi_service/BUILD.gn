@@ -46,10 +46,7 @@ if (is_standard_system) {
       "-fsigned-char",
       "-fno-common",
       "-fno-strict-aliasing",
-      "-DCONFIG_CTRL_IFACE",
-      "-DCONFIG_P2P",
-      "-DCONFIG_WEP",
-      "-DCONFIG_WPS",
+      "-fstack-protector-strong",
     ]
     cflags += [
       "-fdata-sections",
@@ -75,6 +72,7 @@ if (is_standard_system) {
     install_images = [
       chipset_base_dir,
     ]
+    version_script = "libethernet_hdi_service.map"
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_ethernet"
   }
@@ -103,6 +101,7 @@ if (is_standard_system) {
       "-fsigned-char",
       "-fno-common",
       "-fno-strict-aliasing",
+      "-fstack-protector-strong",
     ]
     cflags += [
       "-fdata-sections",
