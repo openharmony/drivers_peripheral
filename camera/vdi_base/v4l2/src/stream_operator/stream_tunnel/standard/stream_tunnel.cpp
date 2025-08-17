@@ -137,8 +137,7 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
         CAMERA_LOGI("copy data from cb to sb, size = %{public}d", sb->GetSize());
         auto ret = memcpy_s(sb->GetVirAddr(), sb->GetSize(), buffer->GetVirAddress(), availableSize);
         if (ret != 0) {
-            CAMERA_LOGE("PrepareBufferBeforeFlush memcpy_s fail, error = %{public}d,\
-                sb->GetSize() = %{public}d, buffer->GetSize() = %{public}d", ret, sb->GetSize(), buffer->GetSize());
+            CAMERA_LOGE("PrepareBufferBeforeFlush memcpy_s fail, error = %{public}d", ret);
         }
     }
     buffer->SetIsValidDataInSurfaceBuffer(false);
