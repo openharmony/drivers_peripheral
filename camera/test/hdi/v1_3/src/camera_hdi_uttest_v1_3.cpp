@@ -2293,3 +2293,28 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_054, TestSize.Level1)
         printf("deferred video enhance is not supported\r\n");
     }
 }
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_055
+ * @tc.desc:Camera_Device_Hdi_V1_3_055
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_055, TestSize.Level1)
+{
+    int32_t ret = cameraTest->DefferredImageExtTestInit();
+    ASSERT_EQ(ret, 0);
+    int32_t status = SetParameter("vendor.camera.resourcecost.enable", "true");
+    if (status != 0) {
+        HDF_LOGE("SetParameter error = %{public}d", status);
+        return;
+    }
+    OHOS::HDI::Camera::V1_3::CameraDeviceResourceCost resourceCost;
+    cameraTest->rc = cameraTest->serviceV1_3->GetResourceCost(cameraTest->cameraIds[0], resourceCost);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    status = SetParameter("vendor.camera.resourcecost.enable", "false");
+    if (status != 0) {
+        HDF_LOGE("SetParameter error = %{public}d", status);
+        return;
+    }
+}
