@@ -16,7 +16,7 @@
 #ifndef CAMERA_HOST_SELFKILL_H
 #define CAMERA_HOST_SELFKILL_H
 #include "thread"
-#include "stdint.h"
+#include "cstdint"
 #include "functional"
 #include "string"
 namespace OHOS::Camera {

@@ -145,7 +145,7 @@ void NodeUtils::BufferScaleFormatTransform(std::shared_ptr<IBuffer>& buffer, voi
     }
 }
 
-static void AddStrideToNV21(uint8_t* buffer, uint8_t* bufferMAX, int width, int height, int newStride)
+static void AddStrideToNV21(uint8_t* buffer, uint8_t* bufferMax, int width, int height, int newStride)
 {
     const int yPlaneSize = width * height;
     const int uvPlaneSize = yPlaneSize / 2;
@@ -160,12 +160,12 @@ static void AddStrideToNV21(uint8_t* buffer, uint8_t* bufferMAX, int width, int 
     for (int y = (height / 2) - 1; y >= 0; --y) {
         uint8_t* src = buffer + yPlaneSize + y * width;
         uint8_t* dst = buffer + newYPlaneSize + y * newStride;
-        if (memmove_s(dst, bufferMAX - dst, src, width) != 0) {
+        if (memmove_s(dst, bufferMax - dst, src, width) != 0) {
             CAMERA_LOGE("AddStrideToNV21 memmove_s Fail 1");
             return;
         }
         if (newStride > width) {
-            if (memset_s(dst + width, bufferMAX - (dst + width), 0, newStride - width)) {
+            if (memset_s(dst + width, bufferMax - (dst + width), 0, newStride - width)) {
                 CAMERA_LOGE("AddStrideToNV21 memset_s Fail 1");
                 return;
             }
@@ -176,12 +176,12 @@ static void AddStrideToNV21(uint8_t* buffer, uint8_t* bufferMAX, int width, int 
     for (int y = height - 1; y >= 0; --y) {
         uint8_t* src = buffer + y * width;
         uint8_t* dst = buffer + y * newStride;
-        if (memmove_s(dst, bufferMAX - dst, src, width) != 0) {
+        if (memmove_s(dst, bufferMax - dst, src, width) != 0) {
             CAMERA_LOGE("AddStrideToNV21 memmove_s Fail 2");
             return;
         }
         if (newStride > width) {
-            if (memset_s(dst + width, bufferMAX - (dst + width), 0, newStride - width)) {
+            if (memset_s(dst + width, bufferMax - (dst + width), 0, newStride - width)) {
                 CAMERA_LOGE("AddStrideToNV21 memset_s Fail 2");
                 return;
             }

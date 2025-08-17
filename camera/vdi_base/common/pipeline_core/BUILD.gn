@@ -169,8 +169,6 @@ ohos_shared_library("peripheral_camera_pipeline_core") {
     "ipc:ipc_single",
   ]
 
-  public_external_deps = [ "libjpeg-turbo:turbojpeg_static" ]
-
   public_configs = [ ":pipe_config" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

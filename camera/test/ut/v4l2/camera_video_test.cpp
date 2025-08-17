@@ -35,32 +35,32 @@ void CameraVideoTest::SetStreamInfo(StreamInfo &streamInfo, const std::shared_pt
     const int streamId, const StreamIntent intent)
 {
     sptr<OHOS::IBufferProducer> producer;
-    constexpr uint32_t dataSpace = 8;
-    constexpr uint32_t tunnelMode = 5;
-    constexpr uint32_t bufferQueueSize = 8;
-    constexpr uint32_t width = 1280;
-    constexpr uint32_t height = 960;
+    constexpr uint32_t DATA_SPACE = 8;
+    constexpr uint32_t TUNNEL_MODE = 5;
+    constexpr uint32_t BUFFER_QUEUE_SIZE = 8;
+    constexpr uint32_t WIDTH = 1280;
+    constexpr uint32_t HEIGHT = 960;
     if (intent == PREVIEW) {
         streamInfo.width_ = PREVIEW_WIDTH;
         streamInfo.height_ = PREVIEW_HEIGHT;
     } else if (intent == STILL_CAPTURE) {
-        streamInfo.width_ = width;
-        streamInfo.height_ = height;
+        streamInfo.width_ = WIDTH;
+        streamInfo.height_ = HEIGHT;
         streamInfo.encodeType_ = ENCODE_TYPE_JPEG;
     } else if (intent == VIDEO) {
-        streamInfo.width_ = width;
-        streamInfo.height_ = height;
+        streamInfo.width_ = WIDTH;
+        streamInfo.height_ = HEIGHT;
         streamInfo.encodeType_ = ENCODE_TYPE_H264;
     }
     streamInfo.format_ = PIXEL_FMT_RGBA_8888;
     streamInfo.streamId_ = streamId;
-    streamInfo.dataspace_ = dataSpace;
+    streamInfo.dataspace_ = DATA_SPACE;
     streamInfo.intent_ = intent;
-    streamInfo.tunneledMode_ = tunnelMode;
+    streamInfo.tunneledMode_ = TUNNEL_MODE;
     producer = streamCustomer->CreateProducer();
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
     ASSERT_NE(streamInfo.bufferQueue_, nullptr);
-    streamInfo.bufferQueue_->producer_->SetQueueSize(bufferQueueSize);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(BUFFER_QUEUE_SIZE);
 }
 
 void CameraVideoTest::CreateStream(int streamId, StreamIntent intent)
@@ -144,9 +144,9 @@ void CameraVideoTest::StartCapture(
 
 void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
 {
-    constexpr uint32_t timeForReceiveFrameOff = 1;
-    constexpr uint32_t timeForWaitImagePreview = 2;
-    sleep(timeForWaitImagePreview);
+    constexpr uint32_t TIME_FOR_RECEIVE_FRAME_OFF = 1;
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 2;
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
     if (captureIds.size() > 0) {
         for (const auto &captureId : captureIds) {
             if (captureId == cameraBase_->CAPTURE_ID_PREVIEW) {
@@ -155,7 +155,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
                 streamCustomerSnapshot_->ReceiveFrameOff();
             } else if (captureId == cameraBase_->CAPTURE_ID_VIDEO) {
                 streamCustomerVideo_->ReceiveFrameOff();
-                sleep(timeForReceiveFrameOff);
+                sleep(TIME_FOR_RECEIVE_FRAME_OFF);
             } else {
                 CAMERA_LOGE("StopStream ignore command.");
             }
@@ -163,7 +163,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
 
         for (auto &captureId : captureIds) {
             CamRetCode result = (CamRetCode)cameraBase_->streamOperator->CancelCapture(captureId);
-            sleep(timeForWaitImagePreview);
+            sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
             EXPECT_EQ(true, result == HDI::Camera::V1_0::NO_ERROR);
             if (result == HDI::Camera::V1_0::NO_ERROR) {
                 CAMERA_LOGI("check Capture: CancelCapture success, captureId = %{public}d", captureId);
@@ -173,7 +173,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
             }
         }
     }
-    sleep(timeForReceiveFrameOff);
+    sleep(TIME_FOR_RECEIVE_FRAME_OFF);
 }
 /**
   * @tc.name: Video
@@ -600,8 +600,8 @@ HWTEST_F(CameraVideoTest, camera_video_031, TestSize.Level1)
     captureInfo.enableShutterCallback_ = false;
     StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true, captureInfo);
 
-    constexpr uint32_t timeForWaitInitCaptureIds = 5;
-    sleep(timeForWaitInitCaptureIds);
+    constexpr uint32_t TIME_FOR_WAIT_INIT_CAPTUREIDS = 5;
+    sleep(TIME_FOR_WAIT_INIT_CAPTUREIDS);
     std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO,
         cameraBase_->CAPTURE_ID_CAPTURE};
     std::vector<int> streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO,
