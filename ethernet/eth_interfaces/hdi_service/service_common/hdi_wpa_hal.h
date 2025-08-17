@@ -40,7 +40,7 @@ struct EthWpaInstance {
     pthread_t tid;
     int (*wpaCliConnect)(EthWpaInstance *p);
     void (*wpaCliClose)(EthWpaInstance *p);
-    int (*wpaCliTerminate)();
+    int (*wpaCliTerminate)(EthWpaInstance *p);
     int (*wpaCliCmdSetNetwork)(EthWpaInstance *p, const char *ifName, const char *name, const char *value);
     int (*wpaCliCmdStaShellCmd)(EthWpaInstance *p, const char *ifName, const char *params);
 };

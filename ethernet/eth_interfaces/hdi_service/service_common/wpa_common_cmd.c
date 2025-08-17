@@ -225,7 +225,7 @@ static int32_t StopWpaSupplicant(void)
         HDF_LOGE("%{public}s: Get wpa global interface failed!", __func__);
         return HDF_FAILURE;
     }
-    int ret = pWpaInstance->wpaCliTerminate();
+    int ret = pWpaInstance->wpaCliTerminate(pWpaInstance);
     HDF_LOGI("%{public}s: wpaCliTerminate ret = %{public}d", __func__, ret);
     return HDF_SUCCESS;
 }
