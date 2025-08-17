@@ -71,10 +71,6 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
     int32_t timtCount = 0;
     OHOS::SurfaceError sfError = OHOS::SURFACE_ERROR_OK;
     auto tmpConfig = requestConfig_;
-    if (tmpConfig.format = PIXEL_FMT_BLOB) {
-        tmpConfig.width = BLOB_MAX_SIZE;
-        tmpConfig.height = 1;
-    }
     do {
         sfError = bufferQueue_->RequestBuffer(sb, fence, tmpConfig);
         if (sfError == OHOS::SURFACE_ERROR_NO_BUFFER) {
