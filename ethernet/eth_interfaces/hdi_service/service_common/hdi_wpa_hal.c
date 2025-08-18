@@ -161,7 +161,7 @@ static void WpaCliClose(EthWpaInstance *p)
     return;
 }
  
-static int WpaCliTerminate(void)
+static int WpaCliTerminate(EthWpaInstance *p)
 {
     HDF_LOGI("enter WpaCliTerminate.");
     char cmd[WPA_CMD_BUF_LEN] = {0};
