@@ -39,6 +39,7 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
       "-Wno-format",
       "-Wno-format-extra-args",
+      "-fstack-protector-strong",
     ]
  
     subsystem_name = "hdf"
