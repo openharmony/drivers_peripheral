@@ -99,7 +99,7 @@ public:
         static struct nla_policy freqPolicy[NL80211_FREQUENCY_ATTR_MAX + 1];
         freqPolicy[NL80211_FREQUENCY_ATTR_FREQ].type = NLA_U32;
         freqPolicy[NL80211_FREQUENCY_ATTR_MAX_TX_POWER].type = NLA_U32;
-        enum nl80211_dfs_state dfs_state;
+        enum nl80211_dfs_state dfsState;
 
         nla_for_each_nested(nlFreq, bands, i) {
             data = nla_data(nlFreq);
@@ -113,9 +113,9 @@ public:
             }
             bool isDfsChannel = false;
             if (attrFreq[NL80211_FREQUENCY_ATTR_DFS_STATE] != nullptr) {
-                dfs_state = static_cast<nl80211_dfs_state>(
+                dfsState = static_cast<nl80211_dfs_state>(
                     nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_DFS_STATE]));
-                isDfsChannel = (dfs_state == NL80211_DFS_USABLE || dfs_state == NL80211_DFS_AVAILABLE);
+                isDfsChannel = (dfsState == NL80211_DFS_USABLE || dfsState == NL80211_DFS_AVAILABLE);
             }
             freq = nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_FREQ]);
             AddFreqs(isDfsChannel, freq);
