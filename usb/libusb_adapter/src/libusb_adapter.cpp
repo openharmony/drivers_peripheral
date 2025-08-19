@@ -85,6 +85,7 @@ constexpr const char* USB_DEV_FS_PATH = "/dev/bus/usb";
 constexpr const char* LIBUSB_DEVICE_MMAP_PATH = "/data/service/el1/public/usb/";
 constexpr uint32_t MIN_NUM_OF_ISO_PACKAGE = 1;
 constexpr uint32_t SHIFT_32 = 32;
+constexpr unsigned int USB_CTRL_SET_TIMEOUT = 5000
 const uint8_t INVALID_NUM = 222;
 static libusb_context *g_libusb_context = nullptr;
 static std::shared_ptr<LibusbAdapter> g_LibusbAdapter = std::make_shared<LibusbAdapter>();
@@ -108,7 +109,6 @@ std::shared_mutex g_mapMutexUsbOpenFdMap;
 std::shared_mutex g_mapMutexHandleMap;
 static LibusbAsyncManager g_asyncManager;
 static LibusbBulkManager g_bulkManager;
-#define USB_CTRL_SET_TIMEOUT 5000
 
 static uint64_t ToDdkDeviceId(int32_t busNum, int32_t devNum)
 {
@@ -277,7 +277,6 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "GetUsbDevice failed");
         return HDF_DEV_ERR_NO_DEVICE;
     }
-
     libusb_device_handle* devHandle = nullptr;
     uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
         static_cast<uint32_t>(dev.devAddr);
@@ -1223,6 +1222,10 @@ int32_t LibusbAdapter::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
 int32_t LibusbAdapter::GetDeviceSpeed(const UsbDev &dev, uint8_t &speed)
 {
     HDF_LOGI("%{public}s enter", __func__);
+    if (g_libusb_context == nullptr) {
+        HDF_LOGE("%{public}s: g_libusb_context is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     libusb_device *device = nullptr;
     int32_t ret = GetUsbDevice(dev, &device);
     if (ret != HDF_SUCCESS || device == nullptr) {
@@ -2029,8 +2032,12 @@ void LibusbAdapter::LibusbEventHandling()
             if (rc != LIBUSB_SUCCESS) {
                 HDF_LOGE("%{public}s: libusb handle events failed: %{public}d", __func__, rc);
             }
+        } else {
+            HDF_LOGE("%{public}s: g_libusb_context is nullptr", __func__);
+            break;
         }
     }
+    HDF_LOGI("%{public}s: libusb event handling thread ended.", __func__);
 }
 
 int32_t LibusbAdapter::FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer, libusb_device_handle *devHandle,
@@ -2195,7 +2202,6 @@ void LibusbAdapter::DeleteTransferFromList(LibusbAsyncTransfer *asyncTransfer)
     }
     HDF_LOGI("%{public}s: enter delete transfer from list, bus num: %{public}d, dev addr: %{public}d",
         __func__, asyncTransfer->busNum, asyncTransfer->devAddr);
-
     std::lock_guard<std::mutex> managerLock(g_asyncManager.transferVecLock);
     LibusbAsyncWrapper *asyncWrapper = GetAsyncWrapper({asyncTransfer->busNum, asyncTransfer->devAddr});
     if (asyncWrapper == nullptr) {
@@ -2382,11 +2388,11 @@ int32_t LibusbAdapter::WriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, u
 int32_t LibusbAdapter::GetDevices(std::vector<struct DeviceInfo> &devices)
 {
     HDF_LOGD("%{public}s: enter", __func__);
+    libusb_device **devs = nullptr;
     if (g_libusb_context == nullptr) {
         HDF_LOGE("%{public}s: g_libusb_context is nullptr", __func__);
         return HDF_FAILURE;
     }
-    libusb_device **devs = nullptr;
     ssize_t count = libusb_get_device_list(g_libusb_context, &devs);
     HDF_LOGI("%{public}s: libusb_get_device_list return count: %{public}zu", __func__, count);
     for (ssize_t i = 0; i < count; ++i) {
@@ -3089,7 +3095,7 @@ int32_t LibusbAdapter::LoadUsbSaCallback(libusb_context* ctx, libusb_device* dev
     HDF_LOGI("%{public}s: enter.", __func__);
     if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
         if (libUsbSaSubscriber_ == nullptr) {
-            HDF_LOGE("%{public}s: libUsbSaSubscriber is nullptr", __func__);
+            HDF_LOGI("%{public}s: libUsbSaSubscriber is nullptr", __func__);
             return HDF_FAILURE;
         }
         libUsbSaSubscriber_->LoadUsbSa(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED);
