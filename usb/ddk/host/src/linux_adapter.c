@@ -24,6 +24,7 @@
 
 #define HDF_LOG_TAG USB_LINUX_ADAPTER
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define IS_VALID_ADDR(x) ((uint64_t)(x) & 0xfc00000000000000 == 0 ? true : false)
 
 #define PATH_LEN             50
 #define DESC_READ_LEN        256
@@ -1530,7 +1531,6 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
     struct UsbAdapterUrb *urb = NULL;
     struct UsbHostRequest *request = NULL;
     int32_t ret;
-
     if (devHandle == NULL || devHandle->dev == NULL) {
         HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -1544,10 +1544,8 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
         if (errno == ENODEV) {
             return HDF_DEV_ERR_NO_DEVICE;
         }
-
         return HDF_ERR_IO;
     }
-
     if (urb == NULL || urb->userContext == NULL) {
         HDF_LOGE("%{public}s:%{public}d urb is NULL or userContext is NULL", __func__, __LINE__);
         return HDF_ERR_IO;
@@ -1559,6 +1557,11 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
         HDF_LOGE("%{public}s:%{public}d reap discardurb", __func__, __LINE__);
         return HDF_FAILURE;
     }
+    if (!IS_VALID_ADDR(urb) || !IS_VALID_ADDR(request)) {
+        HDF_LOGE("%{public}s:%{public}d urb or request is freed");
+        return HDF_ERR_IO;
+    }
+    
     switch (request->requestType) {
         case USB_REQUEST_TYPE_CONTROL:
             ret = OsControlCompletion(request, urb);
@@ -1576,7 +1579,6 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
             ret = HDF_FAILURE;
             break;
     }
-
     return ret;
 }
 
