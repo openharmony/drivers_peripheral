@@ -33,6 +33,14 @@ bool UsbGetDeviceSpeedFuzzTest(const uint8_t *data, size_t size)
         HDF_LOGE("%{public}s: UsbFuzzTestHostModeInit failed", __func__);
         return false;
     }
+    unsigned seed = 0;
+    if (size < sizeof(unsigned)) {
+        errno_t ret = memcpy_s(&seed, sizeof(unsigned), data, sizeof(unsigned));
+        if (ret != UEC_OK) {
+            return false;
+        }
+        srand(seed);
+    }
 
     uint8_t speed;
     ret = usbInterface->GetDeviceSpeed(dev, speed);
