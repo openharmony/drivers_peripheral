@@ -64,10 +64,10 @@ bool UsbInterfaceAuthorizeFuzzTest(const uint8_t *data, size_t size)
     }
     auto ret = usbDeviceInterface_->UsbInterfaceAuthorize(
         dev, param.configId, param.interfaceId, param.authorized);
-
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: interface authorize succeed", __func__);
     }
+
     ret = usbHostInterface_->UnbindUsbdHostSubscriber(subscriber_);
     if (ret != 0) {
         HDF_LOGE("%{public}s: unbind usbd host subscriber_ failed", __func__);
