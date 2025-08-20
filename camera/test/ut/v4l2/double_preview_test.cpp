@@ -38,22 +38,22 @@ void DoublePreviewTest::SetStreamInfo(StreamInfo &streamInfo,
     const int streamId, const StreamIntent intent)
 {
     sptr<OHOS::IBufferProducer> producer;
-    constexpr uint32_t dataSpace = 8; // picture dataspace
-    constexpr uint32_t tunnelMode = 5; // tunnel mode
-    constexpr uint32_t bufferQueueSize = 8; // set bufferQueue size
+    constexpr uint32_t DATA_SPACE = 8; // picture dataspace
+    constexpr uint32_t TUNNEL_MODE = 5; // tunnel mode
+    constexpr uint32_t BUFFER_QUEUE_SIZE = 8; // set bufferQueue size
     if (intent == PREVIEW) {
         streamInfo.width_ = PREVIEW_WIDTH;
         streamInfo.height_ = PREVIEW_HEIGHT;
         streamInfo.format_ = PIXEL_FMT_RGBA_8888;
     }
     streamInfo.streamId_ = streamId;
-    streamInfo.dataspace_ = dataSpace;
+    streamInfo.dataspace_ = DATA_SPACE;
     streamInfo.intent_ = intent;
-    streamInfo.tunneledMode_ = tunnelMode;
+    streamInfo.tunneledMode_ = TUNNEL_MODE;
     producer = streamCustomer->CreateProducer();
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
     ASSERT_NE(streamInfo.bufferQueue_, nullptr);
-    streamInfo.bufferQueue_->producer_->SetQueueSize(bufferQueueSize);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(BUFFER_QUEUE_SIZE);
 }
 
 void DoublePreviewTest::CreateStream(int streamId, StreamIntent intent)

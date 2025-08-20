@@ -64,6 +64,7 @@ ohos_unittest("camera_test_hdi_V1_3") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest",
     "//third_party/googletest:gtest_main",
+    "//base/startup/init/interfaces/innerkits:libbegetutil",
   ]
   defines = [ "CAMERA_UT_TEST" ]
 
