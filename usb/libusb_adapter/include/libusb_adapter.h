@@ -192,6 +192,7 @@ public:
     int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
     int32_t GetCurrentInterfaceSetting(const UsbDev &dev, uint8_t &settingIndex);
     int32_t GetDeviceMemMapFd(const UsbDev &dev, int &fd);
+    int32_t GetDevices(std::vector<struct DeviceInfo> &devices);
     int32_t SetSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
     int32_t RemoveSubscriber(sptr<V2_0::IUsbdSubscriber> subscriber);
     void ReportUsbdRecognitionFailSysEvent(const std::string &operationType, int32_t code,
@@ -201,7 +202,6 @@ public:
     int32_t AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTransferInfo &info,
         const sptr<V1_2::IUsbdTransferCallback> &cb, const sptr<Ashmem> &ashmem);
     int32_t AsyncCancelTransfer(const UsbDev &dev, const int32_t endpoint);
-    int32_t GetDevices(std::vector<struct DeviceInfo> &devices);
 
     /* Bulk Transfer */
     int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem);
@@ -246,7 +246,6 @@ private:
     int32_t GetCurrentConfiguration(libusb_device_handle *handle, int32_t &currentConfig);
     int32_t RemoveInterfaceFromMap(const UsbDev &dev, libusb_device_handle *devHandle, uint8_t interfaceId);
     bool IsInterfaceIdByUsbDev(const UsbDev &dev, const uint8_t intfId);
-
     /* Async Transfer */
     void TransferInit(const UsbDev &dev);
     void TransferRelease(const UsbDev &dev);
