@@ -40,7 +40,7 @@ namespace {
     V1_2::HapticPaket g_pkg = {434, 1, {{V1_2::CONTINUOUS, 0, 149, 100, 50, 0, 4,
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
     V1_2::HapticPaket g_pkg1 = {434, 1, {{V1_2::TRANSIENT, 0, 149, 100, 50, 0, 4,
-        {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}}};
+        {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
     int32_t g_vibratorId = 0;
     std::vector<HdfWaveInformation> g_info;
     constexpr int32_t MIN_DURATION = 0;
