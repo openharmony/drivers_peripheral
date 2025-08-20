@@ -32,7 +32,8 @@
 #define USB_DEVICE_MMAP_PATH "/data/service/el1/public/usb/"
 #define MAX_RETRY_TIMES      10
 
-static bool IsInvalidAddress(void *ptr) {
+static bool IsInvalidAddress(void *ptr)
+{
     if (((uint64_t)(ptr) & 0xfc00000000000000) != 0) {
         return true;
     }
