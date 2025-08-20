@@ -267,6 +267,16 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<GetDisplayIdentificationDataFunc>(dlsym(libHandle_, "GetDisplayIdentificationData"));
     vdiAdapter_->RegHwcEventCallback =
         reinterpret_cast<RegHwcEventCallbackFunc>(dlsym(libHandle_, "RegHwcEventCallback"));
+    vdiAdapter_->GetSupportLayerType =
+        reinterpret_cast<GetSupportLayerTypeFunc>(dlsym(libHandle_, "GetSupportLayerType"));
+    vdiAdapter_->SetTunnelLayerId = reinterpret_cast<SetTunnelLayerIdFunc>(dlsym(libHandle_, "SetTunnelLayerId"));
+    vdiAdapter_->SetTunnelLayerProperty =
+        reinterpret_cast<SetTunnelLayerPropertyFunc>(dlsym(libHandle_, "SetTunnelLayerProperty"));
+    vdiAdapter_->SetTunnelLayerPosition =
+        reinterpret_cast<SetTunnelLayerPositionFunc>(dlsym(libHandle_, "SetTunnelLayerPosition"));
+    vdiAdapter_->SetTunnelLayerBuffer =
+        reinterpret_cast<SetTunnelLayerBufferFunc>(dlsym(libHandle_, "SetTunnelLayerBuffer"));
+    vdiAdapter_->CommitTunnelLayer = reinterpret_cast<CommitTunnelLayerFunc>(dlsym(libHandle_, "CommitTunnelLayer"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -819,6 +829,84 @@ int32_t DisplayComposerService::SetLayerPerFrameParameter(uint32_t devId, uint32
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u, layerId:%{public}u", __func__, devId, layerId));
+    return ret;
+}
+
+int32_t DisplayComposerService::GetSupportLayerType(uint32_t devId, std::vector<V1_0::LayerType>& types)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetSupportLayerType, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->GetSupportLayerType(devId, types);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail", __func__));
+    return ret;
+}
+
+int32_t DisplayComposerService::SetTunnelLayerId(uint32_t devId, uint32_t layerId, uint64_t tunnelId)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetTunnelLayerId, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->SetTunnelLayerId(devId, layerId, tunnelId);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail", __func__));
+    return ret;
+}
+
+int32_t DisplayComposerService::SetTunnelLayerProperty(uint32_t devId, uint32_t layerId, uint32_t property)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetTunnelLayerProperty, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->SetTunnelLayerProperty(devId, layerId, property);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail", __func__));
+    return ret;
+}
+
+int32_t DisplayComposerService::SetTunnelLayerPosition(uint32_t devId, uint64_t tunnelId, int32_t x, int32_t y)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetTunnelLayerPosition, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->SetTunnelLayerPosition(devId, tunnelId, x, y);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail", __func__));
+    return ret;
+}
+
+int32_t DisplayComposerService::SetTunnelLayerBuffer(
+    uint32_t devId, uint64_t tunnelId, const sptr<NativeBuffer>& inHandle, const sptr<HdifdParcelable>& acquireFence)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetTunnelLayerBuffer, HDF_ERR_NOT_SUPPORT);
+    CHECK_NULLPOINTER_RETURN_VALUE(acquireFence, HDF_FAILURE);
+    int32_t inFence = acquireFence->GetFd();
+    int32_t ret = vdiAdapter_->SetTunnelLayerBuffer(devId, tunnelId, inHandle->GetBufferHandle(), inFence);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail", __func__));
+    return ret;
+}
+
+int32_t DisplayComposerService::CommitTunnelLayer(uint32_t devId, uint64_t tunnelId,
+    sptr<HdifdParcelable>& releaseFence)
+{
+    DISPLAY_TRACE;
+    int32_t outFence;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->CommitTunnelLayer, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->CommitTunnelLayer(devId, tunnelId, outFence);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail", __func__));
+    releaseFence->Init(outFence);
     return ret;
 }
 
