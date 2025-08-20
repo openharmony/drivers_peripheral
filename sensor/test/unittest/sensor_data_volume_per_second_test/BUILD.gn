@@ -15,18 +15,9 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../sensor.gni")
 
-module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorTestMultiClients"
+module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorDataVolumePerSecondTest"
 
-group("SensorTestMultiClients") {
-  deps = []
-  testonly = true
-  deps += [
-    ":SensorSetBatchTest",
-    ":SensorSetSdcSensorTest",
-  ]
-}
-
-ohos_unittest("SensorSetBatchTest") {
+ohos_unittest("SensorDataVolumePerSecondTest") {
   module_out_path = module_output_path
 
   include_dirs = [
@@ -35,46 +26,7 @@ ohos_unittest("SensorSetBatchTest") {
     "../../../utils/include",
   ]
 
-  sources = [ "sensor_setbatch_test.cpp" ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "drivers_interface_sensor:libsensor_proxy_3.0",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_utils",
-      "hilog:libhilog",
-      "hitrace:hitrace_meter",
-      "ipc:ipc_single",
-    ]
-    if (c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
-    }
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
-  external_deps += [ "ipc:ipc_single" ]
-}
-
-
-ohos_unittest("SensorSetSdcSensorTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [
-    "../../../interfaces/include",
-    "../../../interfaces/v1_0",
-    "../../../utils/include",
-  ]
-
-  sources = [ "sensor_setsdcsensor_test.cpp" ]
+  sources = [ "sensor_data_volume_per_second_test.cpp" ]
 
   cflags = [
     "-Wall",
