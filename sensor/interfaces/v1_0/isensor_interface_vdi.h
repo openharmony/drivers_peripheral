@@ -61,7 +61,6 @@ namespace std {
             return h1 ^ h2 ^ h3 ^ h4;
 #else
             std::size_t h2 = std::hash<int64_t>{}(obj.sensorType);
-
             return h2;
 #endif
         }
@@ -79,8 +78,11 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_1 {
-
+#ifdef TV_FLAG
+#define HDI_SENSOR_VDI_LIBNAME "libhdi_product_sensor_impl.z.so"
+#else
 #define HDI_SENSOR_VDI_LIBNAME "libhdi_sensor_impl.z.so"
+#endif
 
 struct HdfSensorInformationVdi {
     std::string sensorName;
