@@ -24,7 +24,6 @@
 
 #define HDF_LOG_TAG USB_LINUX_ADAPTER
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define IS_VALID_ADDR(x) ((uint64_t)(x) & 0xfc00000000000000 == 0 ? true : false)
 
 #define PATH_LEN             50
 #define DESC_READ_LEN        256
@@ -32,6 +31,13 @@
 #define SLEEP_TIME           500000
 #define USB_DEVICE_MMAP_PATH "/data/service/el1/public/usb/"
 #define MAX_RETRY_TIMES      10
+
+static bool IsInvalidAddress(void *ptr) {
+    if (((uint64_t)(ptr) & 0xfc00000000000000) != 0) {
+        return true;
+    }
+    return false;
+}
 
 static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
 {
@@ -1546,22 +1552,17 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
         }
         return HDF_ERR_IO;
     }
-    if (urb == NULL || urb->userContext == NULL) {
-        HDF_LOGE("%{public}s:%{public}d urb is NULL or userContext is NULL", __func__, __LINE__);
-        return HDF_ERR_IO;
+    if (urb == NULL || urb->userContext == NULL || IsInvalidAddress(urb) || IsInvalidAddress(urb->userContext)) {
+            HDF_LOGE("%{public}s:%{public}d urb or userContext is invalid", __func__, __LINE__);
+            return HDF_ERR_IO;
     }
-
-    request = urb->userContext;
     if (devHandle->dev->discardFailedUrb == (void *)urb) {
         devHandle->dev->discardFailedUrb = NULL;
         HDF_LOGE("%{public}s:%{public}d reap discardurb", __func__, __LINE__);
         return HDF_FAILURE;
     }
-    if (!IS_VALID_ADDR(urb) || !IS_VALID_ADDR(request)) {
-        HDF_LOGE("%{public}s:%{public}d urb or request is freed");
-        return HDF_ERR_IO;
-    }
     
+    request = urb->userContext;
     switch (request->requestType) {
         case USB_REQUEST_TYPE_CONTROL:
             ret = OsControlCompletion(request, urb);
