@@ -251,6 +251,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_032, TestSize.Level2)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    EXPECT_NE(cameraBase, nullptr);
 }
 
 /**
@@ -275,6 +276,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_033, TestSize.Level2)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    EXPECT_NE(cameraBase, nullptr);
 }
 
 /**
@@ -897,6 +899,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_075, TestSize.Level2)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    EXPECT_NE(cameraBase, nullptr);
 }
 
 /**
