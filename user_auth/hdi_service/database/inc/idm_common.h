@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#define MAX_USER 5
+#define MAX_USER 32
 #define MAX_CREDENTIAL 100
 #define ROOT_SECRET_LEN 32
 #define NO_CHECK_PIN_EXPIRED_PERIOD 0
