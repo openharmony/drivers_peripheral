@@ -2307,7 +2307,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_055, TestSize.Level1)
     int32_t status = SetParameter("vendor.camera.resourcecost.enable", "true");
     if (status != 0) {
         HDF_LOGE("SetParameter error = %{public}d", status);
-        return;
+        GTEST_SKIP();
     }
     OHOS::HDI::Camera::V1_3::CameraDeviceResourceCost resourceCost;
     cameraTest->rc = cameraTest->serviceV1_3->GetResourceCost(cameraTest->cameraIds[0], resourceCost);
@@ -2315,6 +2315,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_055, TestSize.Level1)
     status = SetParameter("vendor.camera.resourcecost.enable", "false");
     if (status != 0) {
         HDF_LOGE("SetParameter error = %{public}d", status);
-        return;
+        GTEST_SKIP();
     }
 }

@@ -434,7 +434,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_008, TestSiz
         }
     } else {
         printf("get tag<OHOS_ABILITY_METER_MODES> failed.\n");
-        return;
+        GTEST_SKIP();
     }
 
     for (uint8_t i = 0;i < entry.count;i++) {
