@@ -119,7 +119,7 @@ HWTEST_F(HdiHostTest, Camera_Hdi_0030, TestSize.Level0)
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         if (Test_->rc != Camera::NO_ERROR || Test_->cameraDevice == nullptr) {
             std::cout << "==========[test log]Check hdi_host: OpenCamera failed." << std::endl;
-            return;
+            GTEST_SKIP();
         }
         std::cout << "==========[test log]Check hdi_host: OpenCamera success." << std::endl;
     }
