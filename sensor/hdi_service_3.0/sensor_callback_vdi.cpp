@@ -202,8 +202,25 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     //Check if the current record time exceeds one second
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= ONE_SECOND) {
         int64_t perSecondCount = currentDataCount - lastDataCount;
+        auto currentSeconds = std::chrono::duration_cast<std::chrono::seconds>(currentTime);
+            // 将 currentSeconds 转换为 std::time_t（即秒部分的时间戳）
+        std::time_t currentTimeT = currentSeconds.count();
+        
+        // 获取毫秒部分
+        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(currentSeconds) % 1000;
 
-        lastRecordTime += std::chrono::milliseconds(ONE_SECOND);
+        // 转换为当地时间
+        std::tm* localTime = std::localtime(&currentTimeT);
+        
+        // 构造格式化的时间字符串
+        std::ostringstream timeStream;
+        timeStream << std::put_time(localTime, "%Y-%m-%d %H:%M:%S") 
+                << "." 
+                << std::setw(3) << std::setfill('0') << milliseconds.count();  // 毫秒部分
+
+        // 打印日志，使用 HDF_LOGI
+        HDF_LOGI("%{public}s: current time: %{public}s", __func__, timeStream.str().c_str());
+        lastRecordTime = currentSeconds;
         lastDataCount = currentDataCount;
 
         if (perSecondCount >= targetCount - acceptablError && perSecondCount <= targetCount + acceptablError) {
