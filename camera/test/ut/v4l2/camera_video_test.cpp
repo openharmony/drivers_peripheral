@@ -197,7 +197,7 @@ HWTEST_F(CameraVideoTest, camera_video_001, TestSize.Level1)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase, nullptr);
+    EXPECT_NE(cameraBase_, nullptr);
 }
 
 /**
@@ -354,7 +354,7 @@ HWTEST_F(CameraVideoTest, camera_video_005, TestSize.Level1)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase, nullptr);
+    EXPECT_NE(cameraBase_, nullptr);
 }
 
 /**
@@ -380,7 +380,7 @@ HWTEST_F(CameraVideoTest, camera_video_010, TestSize.Level2)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase, nullptr);
+    EXPECT_NE(cameraBase_, nullptr);
     }
 }
 
@@ -410,7 +410,7 @@ HWTEST_F(CameraVideoTest, camera_video_011, TestSize.Level2)
         cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
         cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
         cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-        EXPECT_NE(cameraBase, nullptr);
+        EXPECT_NE(cameraBase_, nullptr);
     }
 }
 
