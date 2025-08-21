@@ -205,7 +205,7 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
         auto currentSeconds = std::chrono::time_point_cast<std::chrono::seconds>(currentTime);
 
         int64_t c1 = currentTime.time_since_epoch().count();
-        int64_t c2 = std::chrono::duration_cast<std::chrono::milliseconds>(currentSeconds).time_since_epoch().count();
+        int64_t c2 = std::chrono::duration_cast<std::chrono::milliseconds>(currentSeconds.time_since_epoch()).count();
         HDF_LOGI("%{public}s: c1 = %{public}s c2 = %{public}s", __func__, std::to_string(c1).c_str(), std::to_string(c2).c_str());
 
         lastRecordTime = currentSeconds;
