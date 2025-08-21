@@ -203,23 +203,11 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= ONE_SECOND) {
         int64_t perSecondCount = currentDataCount - lastDataCount;
         auto currentSeconds = std::chrono::duration_cast<std::chrono::seconds>(currentTime);
-            // 将 currentSeconds 转换为 std::time_t（即秒部分的时间戳）
-        std::time_t currentTimeT = currentSeconds.count();
-        
-        // 获取毫秒部分
-        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(currentSeconds) % 1000;
 
-        // 转换为当地时间
-        std::tm* localTime = std::localtime(&currentTimeT);
-        
-        // 构造格式化的时间字符串
-        std::ostringstream timeStream;
-        timeStream << std::put_time(localTime, "%Y-%m-%d %H:%M:%S") 
-                << "." 
-                << std::setw(3) << std::setfill('0') << milliseconds.count();  // 毫秒部分
+        int64_t c1 = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime).count();
+        int64_t c2 = std::chrono::duration_cast<std::chrono::milliseconds>(currentSeconds).count();
+        HDF_LOGI("%{public}s: c1 = %{public}s c2 = %{public}s", __func__, std::to_string(c1).c_str(), std::to_string(c2).c_str());
 
-        // 打印日志，使用 HDF_LOGI
-        HDF_LOGI("%{public}s: current time: %{public}s", __func__, timeStream.str().c_str());
         lastRecordTime = currentSeconds;
         lastDataCount = currentDataCount;
 
