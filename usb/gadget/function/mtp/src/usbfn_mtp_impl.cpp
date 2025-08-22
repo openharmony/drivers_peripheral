@@ -1225,10 +1225,15 @@ int32_t UsbfnMtpImpl::Start()
 
     pthread_rwlock_wrlock(&mtpRunrwLock_);
     std::lock_guard<std::mutex> guard(startMutex_);
+    int32_t ret = UsbMtpPortInitIo();
+    if (ret != HDF_SUCCESS) {
+        pthread_rwlock_unlock(&mtpRunrwLock_);
+        HDF_LOGE("%{public}s: request failed: %{public}d", __func__, ret);
+        return ret;
+    }
     mtpDev_->mtpState = MTP_STATE_READY;
     mtpPort_->startDelayed = true;
     mtpPort_->isActive = true;
-    int32_t ret = UsbMtpPortInitIo();
     pthread_rwlock_unlock(&mtpRunrwLock_);
     HDF_LOGI("%{public}s: end", __func__);
     return ret;
