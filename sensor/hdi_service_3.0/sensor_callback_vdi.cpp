@@ -200,7 +200,7 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     }
     
     //Check if the current record time exceeds one second
-    int64_t duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count();
     if (duration >= ONE_SECOND) {
         int64_t perSecondCount = currentDataCount - lastDataCount;
 
