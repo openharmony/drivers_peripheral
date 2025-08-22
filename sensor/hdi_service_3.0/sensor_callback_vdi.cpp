@@ -200,17 +200,23 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     }
     
     //Check if the current record time exceeds one second
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= ONE_SECOND) {
+    int64_t duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count();
+    if (duration >= ONE_SECOND) {
         int64_t perSecondCount = currentDataCount - lastDataCount;
 
-        lastRecordTime = std::chrono::time_point_cast<std::chrono::seconds>(currentTime);
-        lastDataCount = currentDataCount;
-
-        HDF_LOGI("%{public}s: lastRecordTime = %{public}s currentTime = %{public}s duration = %{public}lld",
+        HDF_LOGI("%{public}s: 111lastRecordTime = %{public}s currentTime = %{public}s duration = %{public}lld",
             __func__,
             std::to_string(lastRecordTime.time_since_epoch().count()).c_str(),
             std::to_string(currentTime.time_since_epoch().count()).c_str(),
-            std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count());
+            duration);
+        lastRecordTime = std::chrono::time_point_cast<std::chrono::seconds>(currentTime);
+        lastDataCount = currentDataCount;
+
+        HDF_LOGI("%{public}s: 222lastRecordTime = %{public}s currentTime = %{public}s duration = %{public}lld",
+            __func__,
+            std::to_string(lastRecordTime.time_since_epoch().count()).c_str(),
+            std::to_string(currentTime.time_since_epoch().count()).c_str(),
+            duration);
 
         if (perSecondCount >= targetCount - acceptablError && perSecondCount <= targetCount + acceptablError) {
             // return; // Skip logging if the count is within acceptable range
