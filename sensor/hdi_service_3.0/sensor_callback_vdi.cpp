@@ -206,7 +206,11 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
         lastRecordTime = std::chrono::time_point_cast<std::chrono::seconds>(currentTime);
         lastDataCount = currentDataCount;
 
-        HDF_LOGI("%{public}s: lastRecordTime = %{public}s", __func__, std::to_string(lastRecordTime.time_since_epoch().count()).c_str());
+        HDF_LOGI("%{public}s: lastRecordTime = %{public}s currentTime = %{public}s duration = %{public}lld",
+            __func__,
+            std::to_string(lastRecordTime.time_since_epoch().count()).c_str(),
+            std::to_string(currentTime.time_since_epoch().count()).c_str()),
+            std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count();
 
         if (perSecondCount >= targetCount - acceptablError && perSecondCount <= targetCount + acceptablError) {
             // return; // Skip logging if the count is within acceptable range
