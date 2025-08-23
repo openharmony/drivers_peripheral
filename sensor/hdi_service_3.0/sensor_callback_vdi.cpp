@@ -32,6 +32,7 @@ namespace {
     constexpr int64_t DEFAULT_ACCEPTABLE_ERROR = 2;
     constexpr double COMMON_REPORT_FREQUENCY = 1000000000.0;
     constexpr int32_t ONE_SECOND = 1000;
+    constexpr int32_t TWO_SECOND = 2000;
     static std::unordered_map<SensorHandle, int64_t> firstTimestampMap_;
     static std::unordered_map<SensorHandle, int64_t> lastTimestampMap_;
     const std::vector<int32_t> NEED_PRINT_COUNT_SENSOR = {
@@ -208,6 +209,9 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
         lastRecordTime = currentTime;
         lastDataCount = currentDataCount;
 
+        if (duration > TWO_SECOND) {
+            return; // Skip logging if the duration exceeds two seconds
+        }
         if (perSecondCount >= targetCount - acceptablError && perSecondCount <= targetCount + acceptablError) {
             return; // Skip logging if the count is within acceptable range
         }
