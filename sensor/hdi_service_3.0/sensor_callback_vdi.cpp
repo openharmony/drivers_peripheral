@@ -200,17 +200,21 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     }
     
     //Check if the current record time exceeds one second
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= ONE_SECOND) {
-        int64_t perSecondCount = currentDataCount - lastDataCount;
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count();
+    if (duration >= ONE_SECOND) {
+        int64_t durationCount = currentDataCount - lastDataCount;
+        int64_t perSecondCount = durationSensorCount / (duration / ONE_SECOND);
 
-        lastRecordTime = std::chrono::time_point_cast<std::chrono::seconds>(currentTime);
+        lastRecordTime = currentTime;
         lastDataCount = currentDataCount;
 
         if (perSecondCount >= targetCount - acceptablError && perSecondCount <= targetCount + acceptablError) {
             return; // Skip logging if the count is within acceptable range
         }
-        HDF_LOGE("%{public}s: %{public}s perSecondCount %{public}s targetCount %{public}s~%{public}s samplingInterval "
-            "%{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(perSecondCount).c_str(),
+        HDF_LOGE("%{public}s: %{public}s duration %{public}s durationCount %{public}s perSecondCount %{public}s "
+            "targetCount %{public}s~%{public}s samplingInterval %{public}s",
+            __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(duration).c_str(),
+            std::to_string(durationCount).c_str(), std::to_string(perSecondCount).c_str(),
             std::to_string(targetCount - acceptablError).c_str(), std::to_string(targetCount + acceptablError).c_str(),
             std::to_string(samplingInterval / ONE_MILLION).c_str());
     }
