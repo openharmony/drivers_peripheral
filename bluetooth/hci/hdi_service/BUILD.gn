@@ -19,6 +19,7 @@ declare_args() {
 root_path = "//drivers/peripheral/bluetooth/hci/hdi_service"
 
 ohos_shared_library("libhci_interface_service_1.0") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "$root_path",
     "$root_path/implement",
@@ -57,6 +58,7 @@ ohos_shared_library("libhci_interface_service_1.0") {
 }
 
 ohos_shared_library("libbluetooth_hci_hdi_driver") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [ "$root_path" ]
 
   sources = [ "$root_path/hci_interface_driver.cpp" ]
