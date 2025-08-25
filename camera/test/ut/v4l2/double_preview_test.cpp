@@ -121,7 +121,7 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
     } else {
         CAMERA_LOGE("StartCapture ignore command");
     }
-    sleep(timeForWaitImagePreview);
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 }
 
 void DoublePreviewTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
@@ -181,8 +181,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_001, TestSize.Level1)
     StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
     StartCapture(STREAMID_PREVIEW_DOUBLE, CAPTUREID_PREVIEW_DOUBLE, false, true);
 
-    constexpr uint32_t timeForWaitImagePreview = 10; // sleep ten second
-    sleep(timeForWaitImagePreview);
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 10; // sleep ten second
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 
     std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE};
     std::vector<int> streamIds = {cameraBase_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE};
@@ -243,8 +243,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_002, TestSize.Level1)
         cameraBase_->StoreImage(addr, size);
     });
 
-    constexpr uint32_t timeForWaitImagePreview = 5; // sleep five second
-    sleep(timeForWaitImagePreview);
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 5; // sleep five second
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 
     std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE,
         cameraBase_->CAPTURE_ID_CAPTURE};
@@ -276,8 +276,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_003, TestSize.Level1)
     StartCapture(STREAMID_PREVIEW_DOUBLE, CAPTUREID_PREVIEW_DOUBLE, false, true);
     cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
 
-    constexpr uint32_t timeForWaitImagePreview = 5; // sleep five second
-    sleep(timeForWaitImagePreview);
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 5; // sleep five second
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 
     std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE,
         cameraBase_->CAPTURE_ID_VIDEO};
