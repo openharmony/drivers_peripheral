@@ -50,4 +50,5 @@ TEST_F(UtestDeviceManagerTest, camera_devMan_0001)
     cameraBase->captureIds = {cameraBase->CAPTURE_ID_PREVIEW};
     cameraBase->streamIds = {cameraBase->STREAM_ID_PREVIEW};
     cameraBase->StopStream(cameraBase->captureIds, cameraBase->streamIds);
+    EXPECT_NE(cameraBase_, nullptr);
 }
