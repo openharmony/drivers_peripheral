@@ -102,7 +102,7 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
     captureInfo_.streamIds_ = {streamId};
     captureInfo_.captureSetting_ = cameraBase_->ability_;
     captureInfo_.enableShutterCallback_ = shutterCallback;
-    constexpr uint32_t timeForWaitImagePreview = 2; // sleep two second
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 2; // sleep two second
     result_ = (CamRetCode)cameraBase_->streamOperator->Capture(captureId, captureInfo_, isStreaming);
     EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
