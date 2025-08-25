@@ -80,7 +80,9 @@ int32_t SensorIfService::GetSensorVdiImplV1_1()
 {
     struct OHOS::HDI::Sensor::V1_1::WrapperSensorVdi *wrapperSensorVdi = nullptr;
     uint32_t version = 0;
+    HDF_LOGI("%{public}s: start HdfLoadVdi(%{public}s)", __func__, HDI_SENSOR_VDI_LIBNAME);
     vdi_ = HdfLoadVdi(HDI_SENSOR_VDI_LIBNAME);
+    HDF_LOGI("%{public}s: finish HdfLoadVdi(%{public}s)", __func__, HDI_SENSOR_VDI_LIBNAME);
     if (vdi_ == nullptr || vdi_->vdiBase == nullptr) {
         HDF_LOGE("%{public}s: load sensor vdi failed", __func__);
         return HDF_FAILURE;
