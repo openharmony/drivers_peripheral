@@ -16,6 +16,7 @@
 #ifndef CAMERA_HDI_UTTEST_V1_3_H
 #define CAMERA_HDI_UTTEST_V1_3_H
 
+#include "parameter.h"
 #include "hdi_common_v1_3.h"
 
 class CameraHdiUtTestV1_3 : public testing::Test {
