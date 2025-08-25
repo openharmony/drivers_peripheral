@@ -32,6 +32,7 @@ namespace {
     constexpr int64_t DEFAULT_ACCEPTABLE_ERROR = 2;
     constexpr double COMMON_REPORT_FREQUENCY = 1000000000.0;
     constexpr int32_t ONE_SECOND = 1000;
+    constexpr int32_t TWO_SECOND = 2000;
     static std::unordered_map<SensorHandle, int64_t> firstTimestampMap_;
     static std::unordered_map<SensorHandle, int64_t> lastTimestampMap_;
     const std::vector<int32_t> NEED_PRINT_COUNT_SENSOR = {
@@ -200,17 +201,24 @@ void SensorCallbackVdi::PrintCount(const SensorHandle& sensorHandle,
     }
     
     //Check if the current record time exceeds one second
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count() >= ONE_SECOND) {
-        int64_t perSecondCount = currentDataCount - lastDataCount;
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastRecordTime).count();
+    if (duration >= ONE_SECOND) {
+        int64_t durationCount = currentDataCount - lastDataCount;
+        int64_t perSecondCount = std::ceil((double)durationCount / ((double)duration / (double)ONE_SECOND));
 
-        lastRecordTime += std::chrono::milliseconds(ONE_SECOND);
+        lastRecordTime = currentTime;
         lastDataCount = currentDataCount;
 
+        if (duration > TWO_SECOND) {
+            return; // Skip logging if the duration exceeds two seconds
+        }
         if (perSecondCount >= targetCount - acceptablError && perSecondCount <= targetCount + acceptablError) {
             return; // Skip logging if the count is within acceptable range
         }
-        HDF_LOGE("%{public}s: %{public}s perSecondCount %{public}s targetCount %{public}s~%{public}s samplingInterval "
-            "%{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(perSecondCount).c_str(),
+        HDF_LOGE("%{public}s: %{public}s duration %{public}s durationCount %{public}s perSecondCount %{public}s "
+            "targetCount %{public}s~%{public}s samplingInterval %{public}s",
+            __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle), std::to_string(duration).c_str(),
+            std::to_string(durationCount).c_str(), std::to_string(perSecondCount).c_str(),
             std::to_string(targetCount - acceptablError).c_str(), std::to_string(targetCount + acceptablError).c_str(),
             std::to_string(samplingInterval / ONE_MILLION).c_str());
     }
