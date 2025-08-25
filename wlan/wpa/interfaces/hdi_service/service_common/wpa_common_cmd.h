@@ -117,6 +117,8 @@ pthread_mutex_t *GetInterfaceLock();
 
 bool IsUpdaterMode(void);
 
+void FreeWpaVendorInfo(struct WpaVendorInfo *info);
+
 struct StWpaMainParam {
     int argc;
     char argv[MAX_WPA_MAIN_ARGC_NUM][MAX_WPA_MAIN_ARGV_LEN];
