@@ -1312,7 +1312,11 @@ static void AudioRouteDevFreeByNum(const struct AudioRouteNode *routeNode, uint3
         AUDIO_FUNC_LOGI("routeNode has been freed");
         return;
     }
-
+    
+    if (num > 2) {
+        AUDIO_FUNC_LOGI("num is over");
+        return;
+    }
     for (nodeCnt = 0; nodeCnt < num; nodeCnt++) {
         if (routeNode[nodeCnt].type == AUDIO_PORT_DEVICE_TYPE) {
             AudioDevExtInfoFree((struct AudioDevExtInfo *)&routeNode[nodeCnt].ext.device, false);
