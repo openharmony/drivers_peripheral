@@ -18,6 +18,7 @@ ohos_shared_library("libsim_secure_element_interface_service_1.0") {
   include_dirs = [ "../vendor_sim_adaptor" ]
   sources = [ "secure_element_interface_service.cpp" ]
   public_deps = [ "../vendor_sim_adaptor:sim_se_vendor_adaptor" ]
+  branch_protector_ret = "pac_ret"
 
   cflags = []
 
@@ -38,6 +39,7 @@ ohos_shared_library("sim_se_hdi_driver") {
   include_dirs = [ "../vendor_sim_adaptor" ]
   sources = [ "secure_element_interface_driver.cpp" ]
   public_deps = [ "../vendor_sim_adaptor:sim_se_vendor_adaptor" ]
+  branch_protector_ret = "pac_ret"
 
   deps = [ ":libsim_secure_element_interface_service_1.0" ]
 
