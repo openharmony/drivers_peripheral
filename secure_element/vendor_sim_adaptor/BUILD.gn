@@ -16,6 +16,7 @@ import("../secure_element.gni")
 
 ohos_shared_library("sim_se_vendor_adaptor") {
   sources = [ "se_vendor_adaptions.cpp" ]
+  branch_protector_ret = "pac_ret"
 
   public_deps = []
 
