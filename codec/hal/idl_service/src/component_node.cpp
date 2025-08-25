@@ -438,19 +438,23 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
 
 int32_t ComponentNode::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer)
 {
-    std::unique_lock<std::shared_mutex> poolLock(poolMutex_);
-    uint32_t bufferId = buffer.bufferId;
-    auto iter = std::find_if(bufferPool_.begin(), bufferPool_.end(), [bufferId, portIndex](const BufferInfo& info) {
-        return info.bufferId == bufferId && info.portIndex == portIndex;
-    });
-    if (iter == bufferPool_.end()) {
-        CODEC_LOGE("Can not find buffer, port=%{public}u, id=%{public}u", portIndex, bufferId);
-        return OMX_ErrorBadParameter;
+    sptr<ICodecBuffer> codecBuffer = nullptr;
+    {
+        std::unique_lock<std::shared_mutex> poolLock(poolMutex_);
+        uint32_t bufferId = buffer.bufferId;
+        auto iter = std::find_if(bufferPool_.begin(), bufferPool_.end(), [bufferId, portIndex](const BufferInfo& info) {
+            return info.bufferId == bufferId && info.portIndex == portIndex;
+        });
+        if (iter == bufferPool_.end()) {
+            CODEC_LOGE("Can not find buffer, port=%{public}u, id=%{public}u", portIndex, bufferId);
+            return OMX_ErrorBadParameter;
+        }
+        codecBuffer = iter->icodecBuf;
+        bufferPool_.erase(iter);
     }
-    sptr<ICodecBuffer> codecBuffer = iter->icodecBuf;
-    CHECK_AND_RETURN_RET_LOG(codecBuffer != nullptr, OMX_ErrorBadParameter, "codecBuffer is null");
-    codecBuffer->FreeBuffer();
-    bufferPool_.erase(iter);
+    if (codecBuffer != nullptr) {
+        codecBuffer->FreeBuffer();
+    }
     return 0;
 }
 
