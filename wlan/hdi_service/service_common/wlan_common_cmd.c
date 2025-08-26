@@ -37,7 +37,7 @@ const uint32_t RESET_TIME = 3;
 #define WLAN_MAX_NUM_STA_WITH_AP 4
 #define ETH_ADDR_LEN 6
 #define MAX_SCAN_RESULTS 500
-#define MAX_CMD_DATA_LEN 1024
+#define MAX_PRIV_CMD_SIZE 4096
 
 struct HdfWlanStubData *HdfStubDriver(void)
 {
@@ -575,7 +575,7 @@ static int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t 
         HDF_LOGE("%{public}s: OsalMemCalloc fail!", __func__);
         return HDF_FAILURE;
     }
-    if (srcLen > MAX_CMD_DATA_LEN) {
+    if (srcLen > MAX_PRIV_CMD_SIZE) {
         HDF_LOGE("%{public}s: srcLen exceeds maximum buffer length!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1372,7 +1372,7 @@ int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const
     projectionScreenParam->cmdId = param->cmdId;
     projectionScreenParam->bufLen = param->bufLen;
 
-    if (param->bufLen > MAX_CMD_DATA_LEN) {
+    if (param->bufLen > MAX_PRIV_CMD_SIZE) {
         HDF_LOGE("%{public}s bufLen is invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
