@@ -21,6 +21,7 @@
 #include "wlan_extend_cmd.h"
 #include "v1_3/iwlan_callback.h"
 #include "v1_3/iwlan_interface.h"
+#include "wifi_ioctl.h"
 
 struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
