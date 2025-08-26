@@ -284,7 +284,7 @@ static int32_t MockGetDescriptor(struct EffectFactory *self, const char *uuid,
     struct EffectControllerDescriptorVdi *desc)
 {
     HDF_LOGD("enter to %{public}s", __func__);
-    if (self == NULL || uuid == NULL || desc == NULL) {
+    if (self == NULL || uuid == NULL || desc == NULL || g_mockEffectDescriptor.effectId == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
