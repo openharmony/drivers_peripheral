@@ -88,6 +88,13 @@ public:
         const std::vector<sptr<NativeBuffer>>& inHandles) override;
     int32_t GetDisplayIdentificationData(uint32_t devId, uint8_t& portId, std::vector<uint8_t>& edidData) override;
     int32_t RegHwcEventCallback(const sptr<IHwcEventCallback>& cb) override;
+    int32_t GetSupportLayerType(uint32_t devId, std::vector<V1_0::LayerType>& types) override;
+    int32_t SetTunnelLayerId(uint32_t devId, uint32_t layerId, uint64_t tunnelId) override;
+    int32_t SetTunnelLayerProperty(uint32_t devId, uint32_t layerId, uint32_t property) override;
+    int32_t SetTunnelLayerPosition(uint32_t devId, uint64_t tunnelId, int32_t x, int32_t y) override;
+    int32_t SetTunnelLayerBuffer(uint32_t devId, uint64_t tunnelId,
+        const sptr<NativeBuffer>& inHandle, const sptr<HdifdParcelable>& acquireFence) override;
+    int32_t CommitTunnelLayer(uint32_t devId, uint64_t tunnelId, sptr<HdifdParcelable>& releaseFence) override;
 
 private:
     void HidumperInit();
