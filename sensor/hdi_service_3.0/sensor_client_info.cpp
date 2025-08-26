@@ -36,7 +36,7 @@ SensorClientInfo::~SensorClientInfo()
 
 void SensorClientInfo::SetReportDataCb(const sptr<V3_0::ISensorCallback> &callbackObj)
 {
-    callbackV3_0 = callbackObj;
+    callbackObj_ = callbackObj;
 }
 
 void SensorClientInfo::PrintClientMapInfo(int32_t serviceId, SensorHandle sensorHandle)

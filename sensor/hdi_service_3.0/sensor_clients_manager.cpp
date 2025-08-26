@@ -103,7 +103,7 @@ int SensorClientsManager::GetServiceId(int groupId, const sptr<IRemoteObject> &i
     SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
     for (auto &iter : clients_[groupId]) {
-        if (OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(iter.second.callbackV3_0) == iRemoteObject) {
+        if (OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(iter.second.callbackObj_) == iRemoteObject) {
             return iter.first;
         }
     }
@@ -121,7 +121,7 @@ void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId,
             return;
         }
         SensorClientInfo sensorClientInfo;
-        sensorClientInfo.callbackV3_0 = callbackObj;
+        sensorClientInfo.callbackObj_ = callbackObj;
         sensorClientInfo.oneway = oneway;
         clients_[groupId].emplace(serviceId, sensorClientInfo);
         HDF_LOGD("%{public}s: service %{public}d insert the callback", __func__, serviceId);
@@ -129,7 +129,7 @@ void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId,
     }
 
     auto it = clients_[groupId].find(serviceId);
-    it -> second.callbackV3_0 = callbackObj;
+    it -> second.callbackObj_ = callbackObj;
     it -> second.oneway = oneway;
     HDF_LOGD("%{public}s: service %{public}d update the callback", __func__, serviceId);
 
@@ -548,7 +548,7 @@ std::string SensorClientsManager::ReportEachClient(const V3_0::HdfSensorEvents& 
         sensorInfoId.sensorHandle = sensorHandle;
         sensorInfoId.serviceId = serviceId;
 
-        sptr<V3_0::ISensorCallback> callbackV3_0 = nullptr;
+        sptr<V3_0::ISensorCallback> callbackObj = nullptr;
         {
             std::unique_lock<std::mutex> lock(clientsMutex_);
             if (clients_.find(groupId)->second.find(serviceId) == clients_.find(groupId)->second.end()) {
@@ -559,9 +559,9 @@ std::string SensorClientsManager::ReportEachClient(const V3_0::HdfSensorEvents& 
                 continue;
             }
             sensorInfoId.oneway = sensorClientInfo.oneway;
-            callbackV3_0 = sensorClientInfo.callbackV3_0;
+            callbackObj = sensorClientInfo.callbackObj_;
 
-            if (callbackV3_0 == nullptr) {
+            if (callbackObj == nullptr) {
                 HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, serviceId);
                 continue;
             }
@@ -569,7 +569,7 @@ std::string SensorClientsManager::ReportEachClient(const V3_0::HdfSensorEvents& 
         HITRACE_METER_FMT(HITRACE_TAG_HDF, "%s: serviceId %d, sensorHandle %s", __func__, serviceId,
                           SENSOR_HANDLE_TO_C_STR(event.deviceSensorInfo));
 
-        HdiReportData(callbackV3_0, event, result, sensorInfoId);
+        HdiReportData(callbackObj, event, result, sensorInfoId);
     }
     return result;
 }
