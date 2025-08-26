@@ -105,7 +105,7 @@ std::shared_ptr<HdiTestLayer> HdiTestDisplay::CreateHdiTestLayer(uint32_t w, uin
 {
     const int32_t BPP = 32;
 
-    LayerInfo info = {w, h, LAYER_TYPE_GRAPHIC, BPP, Composer::V1_0::PIXEL_FMT_RGBA_8888};
+    LayerInfo info = {w, h, Composer::V1_0::LAYER_TYPE_GRAPHIC, BPP, Composer::V1_0::PIXEL_FMT_RGBA_8888};
     return CreateHdiTestLayer(info);
 }
 
