@@ -71,7 +71,7 @@ class SensorIfService : public V3_0::ISensorInterface {
                                 std::vector<OHOS::HDI::Sensor::V3_0::HdfSensorInformation>& info) override;
     int32_t RegSensorPlugCallBack(const sptr<OHOS::HDI::Sensor::V3_0::ISensorPlugCallback>& callbackObj) override;
     int32_t UnRegSensorPlugCallBack(const sptr<OHOS::HDI::Sensor::V3_0::ISensorPlugCallback>& callbackObj) override;
-    int32_t GetSensorVdiImplV1_1();
+    int32_t GetSensorVdiImpl();
     void OnRemoteDied(const wptr<IRemoteObject> &object);
     std::mutex sensorServiceMutex_;
 private:
