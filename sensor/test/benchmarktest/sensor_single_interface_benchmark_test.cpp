@@ -45,6 +45,7 @@ namespace {
     constexpr int32_t REPETITION_FREQUENCY = 3;
     constexpr int32_t SENSOR_INTERVAL1 = 20;
     constexpr int32_t SENSOR_POLL_TIME = 3;
+    constexpr int32_t SENSOR_MODE_ON_CHANGE = 2;
     constexpr uint32_t OPTION = 0;
     constexpr DeviceSensorInfo SENSOR_HANDLE = {-1, 1, 0, 1};
     constexpr int32_t RATE_LEVEL = 50;
