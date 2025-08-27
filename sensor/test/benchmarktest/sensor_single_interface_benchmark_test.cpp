@@ -74,7 +74,7 @@ BENCHMARK_F(SensorBenchmarkTest, GetAllSensorInfo)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->GetAllSensorInfo(g_info);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -91,7 +91,7 @@ BENCHMARK_F(SensorBenchmarkTest, Register)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -108,7 +108,7 @@ BENCHMARK_F(SensorBenchmarkTest, RegisterAsync)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->RegisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -125,7 +125,7 @@ BENCHMARK_F(SensorBenchmarkTest, SetBatch)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->SetBatch(SENSOR_HANDLE, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -142,7 +142,7 @@ BENCHMARK_F(SensorBenchmarkTest, SetMode)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->SetMode(SENSOR_HANDLE, SENSOR_MODE_ON_CHANGE);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -159,7 +159,7 @@ BENCHMARK_F(SensorBenchmarkTest, SetOption)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->SetOption(SENSOR_HANDLE, OPTION);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -176,7 +176,7 @@ BENCHMARK_F(SensorBenchmarkTest, Unregister)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -193,7 +193,7 @@ BENCHMARK_F(SensorBenchmarkTest, UnregisterAsync)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->UnregisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -210,7 +210,7 @@ BENCHMARK_F(SensorBenchmarkTest, Enable)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->Enable(SENSOR_HANDLE);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -227,7 +227,7 @@ BENCHMARK_F(SensorBenchmarkTest, Disable)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->Disable(SENSOR_HANDLE);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -244,7 +244,7 @@ BENCHMARK_F(SensorBenchmarkTest, GetDeviceSensorInfo)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->GetDeviceSensorInfo(SENSOR_HANDLE.deviceId, g_info);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -261,7 +261,7 @@ BENCHMARK_F(SensorBenchmarkTest, ReadData)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->ReadData(SENSOR_HANDLE, g_events);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -278,7 +278,7 @@ BENCHMARK_F(SensorBenchmarkTest, SetSdcSensor)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->SetSdcSensor(SENSOR_HANDLE, true, RATE_LEVEL);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -295,7 +295,7 @@ BENCHMARK_F(SensorBenchmarkTest, GetSdcSensorInfo)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->GetSdcSensorInfo(g_sdcSensorInfo);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -312,7 +312,7 @@ BENCHMARK_F(SensorBenchmarkTest, RegSensorPlugCallBack)(benchmark::State &state)
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->RegSensorPlugCallBack(g_sensorPlugCallback);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -329,7 +329,7 @@ BENCHMARK_F(SensorBenchmarkTest, UnRegSensorPlugCallBack)(benchmark::State &stat
 {
     for (auto _ : state) {
         int32_t ret = g_sensorInterface->UnRegSensorPlugCallBack(g_sensorPlugCallback);
-        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
