@@ -196,9 +196,9 @@ RetCode FaceNode::CopyBuffer(uint8_t *sourceBuffer, std::shared_ptr<IBuffer>& ou
 RetCode FaceNode::CreateMetadataInfo()
 {
     const int ENTRY_CAPACITY = 30; // 30:entry capacity
-    const int DATA_CAPCITY = 2000; // 2000:data capacity
+    const int DATA_CAPACITY = 2000; // 2000:data capacity
     std::unique_lock <std::mutex> lock(mLock_);
-    metaData_ = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPCITY);
+    metaData_ = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     RetCode result = GetFaceDetectMetaData(metaData_);
     if (result  != RC_OK) {
         CAMERA_LOGE("GetFaceDetectMetaData failed\n");
