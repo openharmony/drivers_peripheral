@@ -37,7 +37,7 @@
 
 #define HDF_LOG_TAG UsbDeviceImpl
 namespace {
-constexpr const char* EDM_SYSTEM_CAPABILITY = "const.SystemCapability.Driver.ExternalDevice";  
+constexpr const char* EDM_SYSTEM_CAPABILITY = "const.SystemCapability.Driver.ExternalDevice";
 }
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
