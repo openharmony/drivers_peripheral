@@ -30,6 +30,7 @@ ohos_shared_library("libwlan_interface_service_1.3") {
     "../hal/include",
     "./service_common",
     "./service_extend",
+    "./wifi_hal,"
   ]
   sources = [
     "service_common/wlan_common_cmd.c",
