@@ -37,7 +37,6 @@ enum BatchSeniorMode {
 };
 
 #define HDF_LOG_TAG hdi
-#define DEFAULT_SENSOR(sensorId) {0, sensorId, 0, 0}
 
 namespace OHOS {
 namespace HDI {
@@ -52,7 +51,7 @@ namespace {
 
 SensorIfService::SensorIfService()
 {
-    int32_t ret = GetSensorVdiImplV1_1();
+    int32_t ret = GetSensorVdiImpl();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: get sensor vdi instance failed", __func__);
     }
@@ -76,7 +75,7 @@ void SensorIfService::RegisteDumpHost()
     return;
 }
 
-int32_t SensorIfService::GetSensorVdiImplV1_1()
+int32_t SensorIfService::GetSensorVdiImpl()
 {
     struct OHOS::HDI::Sensor::V1_1::WrapperSensorVdi *wrapperSensorVdi = nullptr;
     uint32_t version = 0;
@@ -921,7 +920,10 @@ int32_t SensorIfService::SetSdcSensor(const OHOS::HDI::Sensor::V3_0::DeviceSenso
 
 int64_t SensorIfService::CalculateSamplingInterval(int32_t rateLevel)
 {
-    return rateLevel == REPORT_INTERVAL ? REPORT_INTERVAL : COMMON_REPORT_FREQUENCY / rateLevel;
+    if (rateLevel == 0) {
+        return REPORT_INTERVAL;
+    }
+    return COMMON_REPORT_FREQUENCY / rateLevel;
 }
 
 int32_t SensorIfService::EnableSdcSensor(uint32_t serviceId, const SensorHandle& sensorHandle,
