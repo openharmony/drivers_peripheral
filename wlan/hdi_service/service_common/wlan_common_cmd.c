@@ -21,7 +21,6 @@
 #include "wlan_extend_cmd.h"
 #include "v1_3/iwlan_callback.h"
 #include "v1_3/iwlan_interface.h"
-#include "wifi_ioctl.h"
 
 struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
@@ -38,6 +37,7 @@ const uint32_t RESET_TIME = 3;
 #define WLAN_MAX_NUM_STA_WITH_AP 4
 #define ETH_ADDR_LEN 6
 #define MAX_SCAN_RESULTS 500
+#define MAX_PRIV_CMD_SIZE 4096
 
 struct HdfWlanStubData *HdfStubDriver(void)
 {
