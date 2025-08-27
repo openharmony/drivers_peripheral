@@ -295,7 +295,7 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
     uint32_t i;
     struct EffectFactory *factLib = NULL;
     struct ControllerManager *ctrlMgr = NULL;
-    if (self == NULL || uuid == NULL || desc == NULL) {
+    if (self == NULL || uuid == NULL || desc == NULL || g_cfgDescs == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
