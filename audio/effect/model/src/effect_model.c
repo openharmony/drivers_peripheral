@@ -150,9 +150,13 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
             HDF_LOGE("%{public}s: over effect max num", __func__);
             return HDF_FAILURE;
         }
-        if (g_libInfos[i] == NULL || g_libInfos[i]->libName == NULL) {
+        if (g_libInfos[i] == NULL) {
             index = i;
             break;
+        }
+        if (g_libInfos[i]->libName == NULL) {
+            HDF_LOGE("%{public}s: libName is null", __func__);
+            continue;
         }
         if (strcmp(g_libInfos[i]->libName, libName) != 0) {
             continue;
