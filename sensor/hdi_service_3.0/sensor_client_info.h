@@ -36,7 +36,7 @@ public:
     std::unordered_map<SensorHandle, int32_t> periodCountMap_;
     std::unordered_map<SensorHandle, int32_t> curCountMap_;
     void PrintClientMapInfo(int32_t serviceId, SensorHandle sensorHandle);
-    sptr<V3_0::ISensorCallback> callbackV3_0;
+    sptr<V3_0::ISensorCallback> callbackObj_;
     bool oneway = false;
 };
 
