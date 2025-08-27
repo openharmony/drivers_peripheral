@@ -25,7 +25,6 @@
 #include "osal_time.h"
 #include "sensor_callback_impl.h"
 #include "sensor_plug_callback_impl.h"
-#include "sensor_type.h"
 #include "sensor_uhdf_log.h"
 #include "v3_0/isensor_interface.h"
 
