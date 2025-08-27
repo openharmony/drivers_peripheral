@@ -1308,11 +1308,16 @@ static bool AudioRouteSourceBlockUnmarshalling(struct HdfSBuf *data, struct Audi
 static void AudioRouteDevFreeByNum(const struct AudioRouteNode *routeNode, uint32_t num)
 {
     uint32_t nodeCnt;
+    uint32_t NUM_MAX = 2;
     if (routeNode == NULL) {
         AUDIO_FUNC_LOGI("routeNode has been freed");
         return;
     }
 
+    if (num > NUM_MAX) {
+        AUDIO_FUNC_LOGI("num is over");
+        return;
+    }
     for (nodeCnt = 0; nodeCnt < num; nodeCnt++) {
         if (routeNode[nodeCnt].type == AUDIO_PORT_DEVICE_TYPE) {
             AudioDevExtInfoFree((struct AudioDevExtInfo *)&routeNode[nodeCnt].ext.device, false);
