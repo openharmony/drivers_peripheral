@@ -1769,6 +1769,9 @@ void StoreFile(const unsigned char *bufStart, const uint32_t size, const char* s
 TEST_F(UtestUSBCameraTest, camera_usb_0054)
 {
     cameraBase_->OpenUsbCamera();
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     cameraBase_->AchieveStreamOperator();
     auto streamCustomerVideo = std::make_shared<StreamCustomer>();
 
@@ -1841,6 +1844,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0054)
 TEST_F(UtestUSBCameraTest, camera_usb_0055)
 {
     cameraBase_->OpenUsbCamera();
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     cameraBase_->AchieveStreamOperator();
     auto streamCustomerVideo = std::make_shared<StreamCustomer>();
 
@@ -1970,6 +1976,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0056)
 TEST_F(UtestUSBCameraTest, camera_usb_0057)
 {
     cameraBase_->OpenUsbCamera();
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     cameraBase_->AchieveStreamOperator();
     auto streamCustomerVideo = std::make_shared<StreamCustomer>();
  
@@ -2046,6 +2055,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0058)
 {
     bool hasFormatMjpeg = false;
     cameraBase_->OpenUsbCamera();
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = cameraBase_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
