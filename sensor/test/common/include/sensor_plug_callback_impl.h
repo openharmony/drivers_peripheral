@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H
-#define OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H
+#ifndef OHOS_HDI_SENSOR_V3_0_SENSORPLUSCALLBACKIMPL_H
+#define OHOS_HDI_SENSOR_V3_0_SENSORPLUSCALLBACKIMPL_H
 
 #include <hdf_base.h>
 #include "v3_0/isensor_plug_callback.h"
@@ -38,4 +38,4 @@ public:
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H
+#endif // OHOS_HDI_SENSOR_V3_0_SENSORPLUSCALLBACKIMPL_H
