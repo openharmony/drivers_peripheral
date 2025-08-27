@@ -90,7 +90,7 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetAllSensorInfo)->
 BENCHMARK_F(SensorBenchmarkTest, Register)(benchmark::State &state)
 {
     for (auto _ : state) {
-        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        int32_t ret = g_sensorInterface->Register(HDF_TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -107,7 +107,7 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, Register)->
 BENCHMARK_F(SensorBenchmarkTest, RegisterAsync)(benchmark::State &state)
 {
     for (auto _ : state) {
-        int32_t ret = g_sensorInterface->RegisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        int32_t ret = g_sensorInterface->RegisterAsync(HDF_TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -175,7 +175,7 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetOption)->
 BENCHMARK_F(SensorBenchmarkTest, Unregister)(benchmark::State &state)
 {
     for (auto _ : state) {
-        int32_t ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        int32_t ret = g_sensorInterface->Unregister(HDF_TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -192,7 +192,7 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, Unregister)->
 BENCHMARK_F(SensorBenchmarkTest, UnregisterAsync)(benchmark::State &state)
 {
     for (auto _ : state) {
-        int32_t ret = g_sensorInterface->UnregisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        int32_t ret = g_sensorInterface->UnregisterAsync(HDF_TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
