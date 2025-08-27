@@ -53,6 +53,17 @@ public:
     void PrintDCameraMetadata(const common_metadata_header_t *metadata);
 
 private:
+    struct ResolutionFpsPair {
+        DCResolution resolution;
+        DCFps fps;
+        bool operator<(const ResolutionFpsPair& other) const
+        {
+            return resolution < other.resolution;
+        }
+    };
+    DCResolution ParseSingleResolution(cJSON* resolutionItem);
+    DCFps ParseSingleFps(cJSON* fpsItem);
+    
     DCamRetCode InitDCameraDefaultAbilityKeys(const std::string &sinkAbilityInfo);
     DCamRetCode InitDCameraOutputAbilityKeys(const std::string &sinkAbilityInfo);
     DCamRetCode AddAbilityEntry(uint32_t tag, const void *data, size_t size);
@@ -68,6 +79,9 @@ private:
     void ParsePhotoFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats);
     void ParsePreviewFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats);
     void ParseVideoFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats);
+    void ParseResolutionAndFpsPairs(std::vector<ResolutionFpsPair>& profilePairs, cJSON* resolutionArray,
+        cJSON* fpsArray, const DCFps& defaultFps);
+    void StoreSinkAndSrcFps(int format, const std::string rootNode, std::vector<DCFps> &fpsVec);
     void InitDcameraBaseAbility();
     void GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
         std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue);
@@ -79,9 +93,11 @@ private:
     void InitExtendConfigTag(std::map<int, std::vector<DCResolution>> &supportedFormats,
         std::vector<int32_t> &extendStreamConfigs);
     void AddConfigs(std::vector<int32_t> &sinkExtendStreamConfigs, int32_t format,
-        int32_t width, int32_t height, int32_t fps);
+        int32_t width, int32_t height, const DCFps& fpsInfo);
     void StoreSinkAndSrcConfig(int format, const std::string rootNode, std::vector<DCResolution> &resolutionVec);
     cJSON* GetFormatObj(const std::string rootNode, cJSON* rootValue, std::string& formatStr);
+    cJSON* GetNodeItemArray(const std::string& rootNode, const std::string& itemKey,
+        const std::string& formatStr, cJSON* rootValue);
     bool GetInfoFromJson(const std::string& sinkAbilityInfo);
     void InitOutputAbilityWithoutMode(const std::string &sinkAbilityInfo);
     void UpdateAbilityTag(std::vector<int32_t> &streamConfigs, std::vector<int32_t> &extendStreamConfigs);
@@ -111,6 +127,10 @@ private:
     std::map<int, std::vector<DCResolution>> sinkPhotoProfiles_;
     std::map<int, std::vector<DCResolution>> sinkPreviewProfiles_;
     std::map<int, std::vector<DCResolution>> sinkVideoProfiles_;
+
+    std::map<int, std::vector<DCFps>> sinkPhotoFps_;
+    std::map<int, std::vector<DCFps>> sinkPreviewFps_;
+    std::map<int, std::vector<DCFps>> sinkVideoFps_;
 
     // The latest result metadata that received from the sink device.
     std::shared_ptr<OHOS::Camera::CameraMetadata> latestProducerMetadataResult_;

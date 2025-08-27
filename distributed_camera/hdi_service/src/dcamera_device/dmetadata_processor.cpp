@@ -365,38 +365,51 @@ void DMetadataProcessor::InitExtendConfigTag(std::map<int, std::vector<DCResolut
     std::vector<int32_t> &extendStreamConfigs)
 {
     extendStreamConfigs.push_back(EXTEND_PREVIEW); // preview
-    std::map<int, std::vector<DCResolution>>::iterator previewIter;
-    for (previewIter = sinkPreviewProfiles_.begin(); previewIter != sinkPreviewProfiles_.end(); ++previewIter) {
-        std::vector<DCResolution> resolutionList = previewIter->second;
-        for (auto resolution : resolutionList) {
-            DHLOGI("sink extend supported preview formats: { format=%{public}d, width=%{public}d, height=%{public}d }",
-                previewIter->first, resolution.width_, resolution.height_);
-            AddConfigs(extendStreamConfigs, previewIter->first, resolution.width_, resolution.height_, PREVIEW_FPS);
+    for (auto const& [format, resolutionList] : sinkPreviewProfiles_) {
+        auto it = sinkPreviewFps_.find(format);
+        const std::vector<DCFps>& fpsList = (it != sinkPreviewFps_.end()) ? it->second : std::vector<DCFps>();
+
+        for (size_t i = 0; i < resolutionList.size(); ++i) {
+            const DCResolution& resolution = resolutionList[i];
+            const DCFps& fpsInfo = (i < fpsList.size()) ? fpsList[i] : DCFps(0, 0, 0);
+            DHLOGI("DMetadataProcessor: Add extend preview config: {format=%{public}d, width=%{public}d, "
+                   "height=%{public}d, fpsInfo={%{public}d, %{public}d, %{public}d}}",
+                   format, resolution.width_, resolution.height_, fpsInfo.fixedFps_, fpsInfo.minFps_, fpsInfo.maxFps_);
+            AddConfigs(extendStreamConfigs, format, resolution.width_, resolution.height_, fpsInfo);
         }
     }
     extendStreamConfigs.push_back(EXTEND_EOF); // preview eof
 
     extendStreamConfigs.push_back(EXTEND_VIDEO); // video
-    std::map<int, std::vector<DCResolution>>::iterator videoIter;
-    for (videoIter = sinkVideoProfiles_.begin(); videoIter != sinkVideoProfiles_.end(); ++videoIter) {
-        std::vector<DCResolution> resolutionList = videoIter->second;
-        for (auto resolution : resolutionList) {
-            DHLOGI("sink extend supported video formats: { format=%{public}d, width=%{public}d, height=%{public}d }",
-                videoIter->first, resolution.width_, resolution.height_);
-            AddConfigs(extendStreamConfigs, videoIter->first, resolution.width_, resolution.height_, VIDEO_FPS);
+    for (auto const& [format, resolutionList] : sinkVideoProfiles_) {
+        auto it = sinkVideoFps_.find(format);
+        const std::vector<DCFps>& fpsList = (it != sinkVideoFps_.end()) ? it->second : std::vector<DCFps>();
+
+        for (size_t i = 0; i < resolutionList.size(); ++i) {
+            const DCResolution& resolution = resolutionList[i];
+            const DCFps& fpsInfo = (i < fpsList.size()) ? fpsList[i] : DCFps(VIDEO_FPS, VIDEO_FPS, VIDEO_FPS);
+            DHLOGI("DMetadataProcessor: Add extend video config: {format=%{public}d, width=%{public}d, "
+                   "height=%{public}d, fpsInfo={%{public}d, %{public}d, %{public}d}}",
+                   format, resolution.width_, resolution.height_, fpsInfo.fixedFps_, fpsInfo.minFps_, fpsInfo.maxFps_);
+            AddConfigs(extendStreamConfigs, format, resolution.width_, resolution.height_, fpsInfo);
         }
     }
     extendStreamConfigs.push_back(EXTEND_EOF); // video eof
 
     if (!sinkPhotoProfiles_.empty()) {
         extendStreamConfigs.push_back(EXTEND_PHOTO); // photo
-        std::map<int, std::vector<DCResolution>>::iterator photoIter;
-        for (photoIter = sinkPhotoProfiles_.begin(); photoIter != sinkPhotoProfiles_.end(); ++photoIter) {
-            std::vector<DCResolution> resolutionList = photoIter->second;
-            for (auto resolution : resolutionList) {
-                DHLOGI("sink extend supported photo formats: {format=%{public}d, width=%{public}d, height=%{public}d}",
-                    photoIter->first, resolution.width_, resolution.height_);
-                AddConfigs(extendStreamConfigs, photoIter->first, resolution.width_, resolution.height_, PHOTO_FPS);
+        for (auto const& [format, resolutionList] : sinkPhotoProfiles_) {
+            auto it = sinkPhotoFps_.find(format);
+            const std::vector<DCFps>& fpsList = (it != sinkPhotoFps_.end()) ? it->second : std::vector<DCFps>();
+
+            for (size_t i = 0; i < resolutionList.size(); ++i) {
+                const DCResolution& resolution = resolutionList[i];
+                const DCFps& fpsInfo = (i < fpsList.size()) ? fpsList[i] : DCFps(0, 0, 0);
+                DHLOGI("DMetadataProcessor: Add extend photo config: {format=%{public}d, width=%{public}d, "
+                       "height=%{public}d, fpsInfo={%{public}d, %{public}d, %{public}d}}",
+                       format, resolution.width_, resolution.height_, fpsInfo.fixedFps_, fpsInfo.minFps_,
+                       fpsInfo.maxFps_);
+                AddConfigs(extendStreamConfigs, format, resolution.width_, resolution.height_, fpsInfo);
             }
         }
         extendStreamConfigs.push_back(EXTEND_EOF); // photo eof
@@ -404,15 +417,15 @@ void DMetadataProcessor::InitExtendConfigTag(std::map<int, std::vector<DCResolut
 }
 
 void DMetadataProcessor::AddConfigs(std::vector<int32_t> &sinkExtendStreamConfigs, int32_t format,
-    int32_t width, int32_t height, int32_t fps)
+    int32_t width, int32_t height, const DCFps& fpsInfo)
 {
     sinkExtendStreamConfigs.push_back(format);
     sinkExtendStreamConfigs.push_back(width);
     sinkExtendStreamConfigs.push_back(height);
-    sinkExtendStreamConfigs.push_back(fps); // fixedfps
-    sinkExtendStreamConfigs.push_back(fps); // minfps
-    sinkExtendStreamConfigs.push_back(fps); // maxfps
-    sinkExtendStreamConfigs.push_back(EXTEND_EOF); // eof
+    sinkExtendStreamConfigs.push_back(fpsInfo.fixedFps_);
+    sinkExtendStreamConfigs.push_back(fpsInfo.minFps_);
+    sinkExtendStreamConfigs.push_back(fpsInfo.maxFps_);
+    sinkExtendStreamConfigs.push_back(EXTEND_EOF);
 }
 
 DCamRetCode DMetadataProcessor::AddAbilityEntry(uint32_t tag, const void *data, size_t size)
@@ -737,7 +750,6 @@ void* DMetadataProcessor::GetMetadataItemData(const camera_metadata_item_t &item
         }
     }
 }
-
 cJSON* DMetadataProcessor::GetFormatObj(const std::string rootNode, cJSON* rootValue, std::string& formatStr)
 {
     cJSON* nodeObj = cJSON_GetObjectItemCaseSensitive(rootValue, rootNode.c_str());
@@ -757,6 +769,30 @@ cJSON* DMetadataProcessor::GetFormatObj(const std::string rootNode, cJSON* rootV
     return formatObj;
 }
 
+cJSON* DMetadataProcessor::GetNodeItemArray(const std::string& rootNode, const std::string& itemKey,
+    const std::string& formatStr, cJSON* rootValue)
+{
+    cJSON* nodeObj = cJSON_GetObjectItemCaseSensitive(rootValue, rootNode.c_str());
+    if (nodeObj == nullptr || !cJSON_IsObject(nodeObj)) {
+        return nullptr;
+    }
+
+    cJSON* itemObj = cJSON_GetObjectItemCaseSensitive(nodeObj, itemKey.c_str());
+    if (itemObj == nullptr || !cJSON_IsObject(itemObj)) {
+        return nullptr;
+    }
+
+    cJSON* formatArray = cJSON_GetObjectItemCaseSensitive(itemObj, formatStr.c_str());
+    if (formatArray == nullptr || !cJSON_IsArray(formatArray)) {
+        return nullptr;
+    }
+
+    if (static_cast<uint32_t>(cJSON_GetArraySize(formatArray)) > JSON_ARRAY_MAX_SIZE) {
+        return nullptr;
+    }
+    return formatArray;
+}
+
 void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
     std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue)
 {
@@ -771,51 +807,121 @@ void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& format
     }
 }
 
+DCResolution DMetadataProcessor::ParseSingleResolution(cJSON* resolutionItem)
+{
+    if (resolutionItem == nullptr || !cJSON_IsString(resolutionItem) || resolutionItem->valuestring == nullptr) {
+        DHLOGE("The resolution item is invalid.");
+        return DCResolution(0, 0);
+    }
+    std::string resoStr = std::string(resolutionItem->valuestring);
+    std::vector<std::string> reso;
+    SplitString(resoStr, reso, STAR_SEPARATOR);
+    if (reso.size() != SIZE_FMT_LEN) {
+        DHLOGE("The resolution format is invalid.");
+        return DCResolution(0, 0);
+    }
+    const size_t WIDTH_INDEX = 0;
+    const size_t HEIGHT_INDEX = 1;
+
+    uint32_t width = static_cast<uint32_t>(std::atoi(reso[WIDTH_INDEX].c_str()));
+    uint32_t height = static_cast<uint32_t>(std::atoi(reso[HEIGHT_INDEX].c_str()));
+    if (width == 0 || height == 0) {
+        DHLOGE("The resolution value is invalid.");
+        return DCResolution(0, 0);
+    }
+    return DCResolution(width, height);
+}
+
+DCFps DMetadataProcessor::ParseSingleFps(cJSON* fpsItem)
+{
+    const size_t EXPECTED_FPS_PARTS_COUNT = 3;
+
+    if (fpsItem == nullptr || !cJSON_IsString(fpsItem) || fpsItem->valuestring == nullptr) {
+        DHLOGE("The fps item is invalid.");
+        return DCFps();
+    }
+    std::string fpsValueStr = std::string(fpsItem->valuestring);
+    std::vector<std::string> fpsParts;
+    SplitString(fpsValueStr, fpsParts, " ");
+    if (fpsParts.size() < EXPECTED_FPS_PARTS_COUNT) {
+        DHLOGE("The fps format is invalid.");
+        return DCFps();
+    }
+    const size_t FPS_PART1_INDEX = 0;
+    const size_t FPS_PART2_INDEX = 1;
+    const size_t FPS_PART3_INDEX = 2;
+
+    return DCFps(std::atoi(fpsParts[FPS_PART1_INDEX].c_str()),
+                 std::atoi(fpsParts[FPS_PART2_INDEX].c_str()),
+                 std::atoi(fpsParts[FPS_PART3_INDEX].c_str()));
+}
+
+void DMetadataProcessor::ParseResolutionAndFpsPairs(std::vector<ResolutionFpsPair>& profilePairs,
+    cJSON* resolutionArray, cJSON* fpsArray, const DCFps& defaultFps)
+{
+    int32_t size = cJSON_GetArraySize(resolutionArray);
+    for (int32_t i = 0; i < size; i++) {
+        cJSON* resolutionItem = cJSON_GetArrayItem(resolutionArray, i);
+        DCResolution resolution = ParseSingleResolution(resolutionItem);
+        if (resolution.width_ == 0 || resolution.height_ == 0) {
+            continue;
+        }
+        DCFps fps = defaultFps;
+        if (fpsArray != nullptr && i < cJSON_GetArraySize(fpsArray)) {
+            cJSON* fpsItem = cJSON_GetArrayItem(fpsArray, i);
+            DCFps parsedFps = ParseSingleFps(fpsItem);
+            if (parsedFps.fixedFps_ != 0 || parsedFps.minFps_ != 0 || parsedFps.maxFps_ != 0) {
+                fps = parsedFps;
+            }
+        }
+        profilePairs.push_back({resolution, fps});
+    }
+}
+
 void DMetadataProcessor::GetNodeSupportedResolution(int format, const std::string rootNode,
     std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue)
 {
-    std::vector<DCResolution> resolutionVec;
     std::string formatStr = std::to_string(format);
-    cJSON* formatObj = GetFormatObj(rootNode, rootValue, formatStr);
-    if (formatObj == nullptr) {
+    cJSON* resolutionArray = GetNodeItemArray(rootNode, "Resolution", formatStr, rootValue);
+    if (resolutionArray == nullptr) {
         return;
     }
-    int32_t size = cJSON_GetArraySize(formatObj);
-    for (int32_t i = 0; i < size; i++) {
-        cJSON *item = cJSON_GetArrayItem(formatObj, i);
-        if (item == nullptr || !cJSON_IsString(item)) {
-            DHLOGE("Resolution %{public}s %{public}d ,is not string.", formatStr.c_str(), i);
-            continue;
-        }
-        std::string resoStr = std::string(item->valuestring);
-        std::vector<std::string> reso;
-        SplitString(resoStr, reso, STAR_SEPARATOR);
-        if (reso.size() != SIZE_FMT_LEN) {
-            continue;
-        }
-        uint32_t width = static_cast<uint32_t>(std::atoi(reso[0].c_str()));
-        uint32_t height = static_cast<uint32_t>(std::atoi(reso[1].c_str()));
-        if (height == 0 || width == 0 || ((rootNode == "Photo") &&
-            ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
+    cJSON* fpsArray = GetNodeItemArray(rootNode, "Fps", formatStr, rootValue);
+
+    DCFps defaultFps = (rootNode == "Video") ?
+        DCFps(VIDEO_FPS, VIDEO_FPS, VIDEO_FPS) : DCFps(0, 0, 0);
+    std::vector<ResolutionFpsPair> profilePairs;
+    ParseResolutionAndFpsPairs(profilePairs, resolutionArray, fpsArray, defaultFps);
+    if (profilePairs.empty()) {
+        return;
+    }
+    std::sort(profilePairs.begin(), profilePairs.end());
+    std::vector<DCResolution> resolutionVec;
+    std::vector<DCFps> fpsVec;
+    for (const auto& pair : profilePairs) {
+        uint32_t width = pair.resolution.width_;
+        uint32_t height = pair.resolution.height_;
+        if (((rootNode == "Photo") && ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
             ((rootNode != "Photo") && (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
             continue;
         }
-        DCResolution resolution(width, height);
-        resolutionVec.push_back(resolution);
+        resolutionVec.push_back(pair.resolution);
+        fpsVec.push_back(pair.fps);
     }
-    if (!resolutionVec.empty()) {
-        std::sort(resolutionVec.begin(), resolutionVec.end());
-        supportedFormats[format] = resolutionVec;
-        if ((rootNode != "Photo") && (maxPreviewResolution_ < resolutionVec[0])) {
-            maxPreviewResolution_.width_ = resolutionVec[0].width_;
-            maxPreviewResolution_.height_ = resolutionVec[0].height_;
-        }
-        if ((rootNode == "Photo") && (maxPhotoResolution_ < resolutionVec[0])) {
-            maxPhotoResolution_.width_ = resolutionVec[0].width_;
-            maxPhotoResolution_.height_ = resolutionVec[0].height_;
-        }
-        StoreSinkAndSrcConfig(format, rootNode, resolutionVec);
+    if (resolutionVec.empty()) {
+        DHLOGE("The resolution vector is empty.");
+        return;
     }
+    supportedFormats[format] = resolutionVec;
+    if ((rootNode != "Photo") && (maxPreviewResolution_ < resolutionVec[0])) {
+        maxPreviewResolution_ = resolutionVec[0];
+    }
+    if ((rootNode == "Photo") && (maxPhotoResolution_ < resolutionVec[0])) {
+        maxPhotoResolution_ = resolutionVec[0];
+    }
+
+    StoreSinkAndSrcConfig(format, rootNode, resolutionVec);
+    StoreSinkAndSrcFps(format, rootNode, fpsVec);
 }
 
 void DMetadataProcessor::StoreSinkAndSrcConfig(int format, const std::string rootNode,
@@ -829,7 +935,16 @@ void DMetadataProcessor::StoreSinkAndSrcConfig(int format, const std::string roo
         sinkVideoProfiles_[format] = resolutionVec;
     }
 }
-
+void DMetadataProcessor::StoreSinkAndSrcFps(int format, const std::string rootNode, std::vector<DCFps> &fpsVec)
+{
+    if (rootNode == "Photo") {
+        sinkPhotoFps_[format] = fpsVec;
+    } else if (rootNode == "Preview") {
+        sinkPreviewFps_[format] = fpsVec;
+    } else if (rootNode == "Video") {
+        sinkVideoFps_[format] = fpsVec;
+    }
+}
 std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupportedFormats(
     const std::string &abilityInfo)
 {
