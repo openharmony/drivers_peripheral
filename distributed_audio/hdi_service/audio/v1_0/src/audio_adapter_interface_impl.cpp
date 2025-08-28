@@ -168,8 +168,12 @@ sptr<IDAudioCallback> AudioAdapterInterfaceImpl::MatchStreamCallback(const Audio
     const AudioDeviceDescriptor &desc, int32_t &dhId)
 {
     dhId = static_cast<int32_t>(desc.pins);
-    if (desc.pins == DEFAULT_RENDER_ID && (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP)) {
-        dhId = LOW_LATENCY_RENDER_ID;
+    if (desc.pins == DEFAULT_RENDER_ID) {
+        if (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP) {
+            dhId = LOW_LATENCY_RENDER_ID;
+        } else if (attrs.type == AUDIO_OFFLOAD) {
+            dhId = OFFLOAD_RENDER_ID;
+        }
     }
 
     std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);

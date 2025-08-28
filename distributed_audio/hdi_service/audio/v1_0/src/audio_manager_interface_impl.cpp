@@ -312,7 +312,8 @@ int32_t AudioManagerInterfaceImpl::CreateAdapter(const std::string &adpName, con
         DHLOGE("Adapter callback is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
-    if (devId != DEFAULT_RENDER_ID && devId != DEFAULT_CAPTURE_ID && devId != LOW_LATENCY_RENDER_ID) {
+    if (devId != DEFAULT_RENDER_ID && devId != DEFAULT_CAPTURE_ID && devId != LOW_LATENCY_RENDER_ID &&
+        devId != OFFLOAD_RENDER_ID) {
         DHLOGE("Pin is not default, can not create audio adapter.");
         return ERR_DH_AUDIO_HDF_FAIL;
     }
