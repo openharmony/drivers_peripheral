@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,10 +24,8 @@
 #include "v5_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
-static int32_t THREAD_POOL_COUNT = 32;
 static pthread_mutex_t g_managerMutex;
 
-void SetMaxWorkThreadNum(int32_t);
 typedef struct IAudioManagerVdi* (*AudioManagerCreateIfInstanceVdi)(void);
 
 struct AudioManagerPrivVdi {
@@ -444,7 +442,7 @@ static int32_t AudioManagerVendorUnloadAdapterLocked(struct IAudioManager *manag
     priv->vdiManager->UnloadAdapter(priv->vdiManager, vdiAdapter);
     HdfAudioFinishTrace();
 
-    AUDIO_FUNC_LOGI("audio vdiManager unload vdiAdapter success, adapterName=[%{public}s]", adapterName);
+    AUDIO_FUNC_LOGD("audio vdiManager unload vdiAdapter success");
     return HDF_SUCCESS;
 }
 
@@ -516,14 +514,14 @@ static int32_t AudioManagerLoadVendorLib(struct AudioManagerPrivVdi *priv)
         return HDF_FAILURE;
     }
 
-    AUDIO_FUNC_LOGI("audio load vendor lib success");
+    AUDIO_FUNC_LOGD("audio load vendor lib success");
     return HDF_SUCCESS;
 }
 
 struct IAudioManager *AudioManagerCreateIfInstance(void)
 {
-    AUDIO_FUNC_LOGI("audio vdiManager create instance");
-    SetMaxWorkThreadNum(THREAD_POOL_COUNT);
+    AUDIO_FUNC_LOGD("audio vdiManager create instance");
+
     struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)OsalMemCalloc(sizeof(*priv));
     if (priv == NULL) {
         AUDIO_FUNC_LOGE("OsalMemCalloc AudioManagerPrivVdi failed");
@@ -562,9 +560,4 @@ int32_t AudioManagerDestroyIfInstance(struct IAudioManager *manager)
     int32_t ret = ReleaseAudioManagerVendorObject(manager);
     pthread_mutex_destroy(&g_managerMutex);
     return ret;
-}
-
-void SetMaxWorkThreadNum(int32_t count)
-{
-    OHOS::IPCSkeleton::GetInstance().SetMaxWorkThreadNum(count);
 }
