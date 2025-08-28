@@ -1675,8 +1675,30 @@ static int32_t ProcessEventWpaVendorExt(struct HdfWpaRemoteNode *node,
         ret = node->callbackObj->OnEventVendorCb(node->callbackObj, &wpaVendorInfo, ifName);
     }
     HDF_LOGI("%{public}s: res %{public}d!", __func__, ret);
+    FreeWpaVendorInfo(&wpaVendorInfo);
     return ret;
 }
+
+void FreeWpaVendorInfo(struct WpaVendorInfo *info)
+{
+    if (info->ssid) {
+        OsalMemFree(info->ssid);
+        info->ssid = NULL;
+    }
+    if (info->psk) {
+        OsalMemFree(info->psk);
+        info->psk = NULL;
+    }
+    if (info->devAddr) {
+        OsalMemFree(info->devAddr);
+        info->devAddr = NULL;
+    }
+    if (info->data) {
+        OsalMemFree(info->data);
+        info->data = NULL;
+    }
+}
+
 static int32_t HdfStaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
 {
     int32_t ret = HDF_FAILURE;
