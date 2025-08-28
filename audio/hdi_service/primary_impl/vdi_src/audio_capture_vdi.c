@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@ struct AudioCaptureInfo {
 };
 
 struct AudioCapturePrivVdi {
-    struct AudioCaptureInfo captureInfos[AUDIO_VDI_STREAM_NUM_MAX];
+    struct AudioCaptureInfo *captureInfos[AUDIO_VDI_STREAM_NUM_MAX];
     uint32_t captureCnt;
 };
 
@@ -57,7 +57,13 @@ pthread_rwlock_t* GetCaptureLock(void)
 
 struct IAudioCaptureVdi *AudioGetVdiCaptureByIdVdi(uint32_t captureId)
 {
-    return g_audioCapturePrivVdi.captureInfos[captureId].vdiCapture;
+    struct AudioCapturePrivVdi *priv = AudioCaptureGetPrivVdi();
+    if (priv->captureInfos[captureId] == NULL) {
+        AUDIO_FUNC_LOGE("not match capture");
+        return NULL;
+    }
+
+    return priv->captureInfos[captureId]->vdiCapture;
 }
 
 int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t *replyBytes)
@@ -96,7 +102,7 @@ int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct Audio
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frameInfo, HDF_ERR_INVALID_PARAM);
-
+ 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
@@ -108,7 +114,7 @@ int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct Audio
         AUDIO_FUNC_LOGE("audio capture FrameInfo To VdiFrameInfo fail");
         return ret;
     }
-
+ 
     HdfAudioStartTrace("Hdi:AudioCaptureFrameEcVdi", 0);
     ret = vdiCapture->CaptureFrameEc(vdiCapture, &frameInfoVdi);
     HdfAudioFinishTrace();
@@ -118,14 +124,14 @@ int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct Audio
         AUDIO_FUNC_LOGE("audio capture EC frame fail, ret=%{public}d", ret);
         return ret;
     }
-
+ 
     ret = AudioCommonVdiFrameInfoToFrameInfoVdi(&frameInfoVdi, frameInfo);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture VdiFrameInfo To FrameInfo fail");
     }
     OsalMemFree((void *)frameInfoVdi.frame);
     OsalMemFree((void *)frameInfoVdi.frameEc);
-
+ 
     return ret;
 }
 
@@ -828,7 +834,7 @@ static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
         capturePriv->captureCnt++;
     } else {
         for (uint32_t index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
-            if (capturePriv->captureInfos[index].vdiCapture == NULL) {
+            if (capturePriv->captureInfos[index] == NULL) {
                 captureId = index;
                 break;
             }
@@ -856,22 +862,29 @@ struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttribut
         return NULL;
     }
 
-    priv->captureInfos[*captureId].vdiCapture = vdiCapture;
-    priv->captureInfos[*captureId].streamType = attrs->type;
-    priv->captureInfos[*captureId].sampleRate = attrs->sampleRate;
-    priv->captureInfos[*captureId].channelCount = attrs->channelCount;
-    priv->captureInfos[*captureId].sourceType = attrs->sourceType;
-    priv->captureInfos[*captureId].desc.portId = desc->portId;
-    priv->captureInfos[*captureId].desc.pins = desc->pins;
-    priv->captureInfos[*captureId].desc.desc = strdup(desc->desc);
-    if (priv->captureInfos[*captureId]->desc.desc == NULL) {
-        AUDIO_FUNC_LOGE("strdup fail, desc->desc = %{public}s", desc->desc);
-        AudioDestoryCaptureByIdVdi(*captureId);
+    priv->captureInfos[*captureId] = (struct AudioCaptureInfo *)OsalMemCalloc(sizeof(struct AudioCaptureInfo));
+    if (priv->captureInfos[*captureId] == NULL) {
+        AUDIO_FUNC_LOGE("audio Vdicapture malloc captureInfos fail");
         return NULL;
     }
-    priv->captureInfos[*captureId].captureId = *captureId;
-    priv->captureInfos[*captureId].usrCount = 1;
-    capture = &(priv->captureInfos[*captureId].capture);
+
+    priv->captureInfos[*captureId]->vdiCapture = vdiCapture;
+    priv->captureInfos[*captureId]->streamType = attrs->type;
+    priv->captureInfos[*captureId]->sampleRate = attrs->sampleRate;
+    priv->captureInfos[*captureId]->channelCount = attrs->channelCount;
+    priv->captureInfos[*captureId]->sourceType = attrs->sourceType;
+    priv->captureInfos[*captureId]->desc.portId = desc->portId;
+    priv->captureInfos[*captureId]->desc.pins = desc->pins;
+    priv->captureInfos[*captureId]->desc.desc = strdup(desc->desc);
+    if (priv->captureInfos[*captureId]->desc.desc == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail, desc->desc = %{public}s", desc->desc);
+        OsalMemFree(priv->captureInfos[*captureId]);
+        priv->captureInfos[*captureId] = NULL;
+        return NULL;
+    }
+    priv->captureInfos[*captureId]->captureId = *captureId;
+    priv->captureInfos[*captureId]->usrCount = 1;
+    capture = &(priv->captureInfos[*captureId]->capture);
     AudioInitCaptureInstanceVdi(capture);
 
     AUDIO_FUNC_LOGD("audio create capture success");
@@ -891,11 +904,8 @@ uint32_t DecreaseCaptureUsrCount(uint32_t captureId)
         return usrCnt;
     }
 
-    priv->captureInfos[captureId].usrCount--;
-    if (priv->captureInfos[captureId].usrCount < 0) {
-        priv->captureInfos[captureId].usrCount = 0;
-    }
-    usrCnt = priv->captureInfos[captureId].usrCount;
+    priv->captureInfos[captureId]->usrCount--;
+    usrCnt = priv->captureInfos[captureId]->usrCount;
     return usrCnt;
 }
 
@@ -906,13 +916,19 @@ void AudioDestroyCaptureByIdVdi(uint32_t captureId)
         return;
     }
     struct AudioCapturePrivVdi *priv = AudioCaptureGetPrivVdi();
+    if (priv->captureInfos[captureId] == NULL) {
+        AUDIO_FUNC_LOGE("audio vdiCapture destroy capture index fail, captureId=%{public}d", captureId);
+        return;
+    }
 
-    OsalMemFree((void *)priv->captureInfos[captureId].desc.desc);
-    priv->captureInfos[captureId].vdiCapture = NULL;
-    priv->captureInfos[captureId].desc.desc = NULL;
-    priv->captureInfos[captureId].desc.portId = UINT_MAX;
-    priv->captureInfos[captureId].desc.pins = PIN_NONE;
-    StubCollectorRemoveObject(IAUDIOCAPTURE_INTERFACE_DESC, &(priv->captureInfos[captureId].capture));
+    OsalMemFree((void *)priv->captureInfos[captureId]->desc.desc);
+    priv->captureInfos[captureId]->vdiCapture = NULL;
+    priv->captureInfos[captureId]->desc.desc = NULL;
+    priv->captureInfos[captureId]->desc.portId = UINT_MAX;
+    priv->captureInfos[captureId]->desc.pins = PIN_NONE;
+    StubCollectorRemoveObject(IAUDIOCAPTURE_INTERFACE_DESC, &(priv->captureInfos[captureId]->capture));
 
+    OsalMemFree(priv->captureInfos[captureId]);
+    priv->captureInfos[captureId] = NULL;
     AUDIO_FUNC_LOGI("audio destroy capture success, captureId = [%{public}u]", captureId);
 }
