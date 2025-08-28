@@ -31,7 +31,7 @@ struct Parameters {
     uint8_t busNum;
     uint8_t devAddr;
     bool authorized;
-}
+};
 
 bool UsbDeviceAuthorizeFuzzTest(const uint8_t *data, size_t size)
 {
