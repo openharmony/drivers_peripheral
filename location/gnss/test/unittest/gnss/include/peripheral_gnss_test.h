@@ -35,6 +35,7 @@ namespace Location {
 namespace Gnss {
 namespace V2_0 {
 
+static const std::string SYSPARAM_GPS_SUPPORT = "const.location.gps.support";
 class PeripheralGnssTest : public testing::Test {
 public:
     void SetUp();
@@ -42,6 +43,7 @@ public:
     sptr<GnssInterfaceImpl> gnssInstance_;
     sptr<IGnssMeasurementCallback> gnssMeasurementCallback_;
     sptr<IGnssCallback> gnssCallback_;
+    bool isSupportGnss = false;
 };
 } // V2_0
 } // Gnss
