@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -407,7 +407,6 @@ int32_t AudioCommonRouteToVdiRouteVdi(const struct AudioRoute *route, struct Aud
         sourcesRet = AudioCommonSourceToVdiSourceVdi(route, vdiRoute);
         if (sourcesRet != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE(" source routeNode to vdiRouteNode fail");
-            return HDF_FAILURE;
         }
     }
 
@@ -492,7 +491,7 @@ int32_t AudioCommonFrameInfoToVdiFrameInfoVdi(const struct AudioFrameLen *frameL
 {
     CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frameInfoVdi, HDF_ERR_INVALID_PARAM);
-
+ 
     if (frameLen->frameLen <= 0 || frameLen->frameEcLen <= 0) {
         AUDIO_FUNC_LOGE("frameLen len err, frameLen = [%{public}u], frameEcLen = [%{public}u]",
             frameLen->frameLen, frameLen->frameEcLen);
@@ -511,10 +510,10 @@ int32_t AudioCommonFrameInfoToVdiFrameInfoVdi(const struct AudioFrameLen *frameL
         AUDIO_FUNC_LOGE("frameInfoVdi->frameEc null");
         return HDF_ERR_MALLOC_FAIL;
     }
-
+ 
     return HDF_SUCCESS;
 }
-
+ 
 int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *frameInfoVdi,
     struct AudioCaptureFrameInfo *frameInfo)
 {
@@ -541,7 +540,7 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
         AUDIO_FUNC_LOGE("memcpy_s frame fail");
         return HDF_FAILURE;
     }
-
+ 
     frameInfo->frameEc = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (frameInfo->frameEcLen));
     if (frameInfo->frameEc == NULL) {
         frameInfo->frameLen = 0;
@@ -558,7 +557,7 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
     }
     frameInfo->replyBytes = frameInfoVdi->replyBytes;
     frameInfo->replyBytesEc = frameInfoVdi->replyBytesEc;
-
+ 
     return HDF_SUCCESS;
 }
 
