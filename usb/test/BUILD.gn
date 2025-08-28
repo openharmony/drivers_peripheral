@@ -55,6 +55,8 @@ if (defined(ohos_lite)) {
       "fuzztest/usbserialsetparams_fuzzer:fuzztest",
       "fuzztest/usbserialsettimeout_fuzzer:fuzztest",
       "fuzztest/usbserialwrite_fuzzer:fuzztest",
+      "fuzztest/usbdeviceauthorize_fuzzer:fuzztest",
+      "fuzztest/usbinterfaceauthorize_fuzzer:fuzztest",
       "unittest/ddk_service:usb_ddk_service_test",
       "unittest/hal:hal_test",
       "unittest/mock:usb_mock_test",
