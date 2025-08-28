@@ -1,4 +1,4 @@
-
+{
     "name": "@ohos/drivers_peripheral_audio",
     "description": "audio device driver",
     "version": "4.0",
@@ -45,8 +45,7 @@
                 "hitrace",
                 "hicollie",
                 "alsa-lib",
-                "hisysevent",
-                "ipc"
+                "hisysevent"
             ],
             "third_party": []
         },
