@@ -24,9 +24,6 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V3_0 {
-enum CallbackVersion {
-    CallbackVersionV3_0,
-};
 class SensorClientInfo {
 public:
     SensorClientInfo();
