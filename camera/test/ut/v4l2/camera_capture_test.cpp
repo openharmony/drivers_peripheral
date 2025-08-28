@@ -41,6 +41,7 @@ void CameraCaptureTest::TearDown(void)
 HWTEST_F(CameraCaptureTest, camera_capture_001, TestSize.Level1)
 {
     // Get the stream manager
+    EXPECT_NE(cameraBase_, nullptr);
     cameraBase_->AchieveStreamOperator();
     // start stream
     cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
@@ -52,7 +53,6 @@ HWTEST_F(CameraCaptureTest, camera_capture_001, TestSize.Level1)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase_, nullptr);
 }
 
 /**
@@ -66,6 +66,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_002, TestSize.Level1)
 {
     CAMERA_LOGD("Preview + capture, then close camera, and preview + capture again.");
     // Get the stream manager
+    EXPECT_NE(cameraBase_, nullptr);
     cameraBase_->AchieveStreamOperator();
     // start stream
     cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
@@ -105,6 +106,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_003, TestSize.Level1)
 {
     CAMERA_LOGD("Capture with 3A, success.");
     // Get the stream manager
+    EXPECT_NE(cameraBase_, nullptr);
     cameraBase_->AchieveStreamOperator();
     // start stream
     cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
@@ -130,7 +132,6 @@ HWTEST_F(CameraCaptureTest, camera_capture_003, TestSize.Level1)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase_, nullptr);
 }
 
 /**
@@ -145,6 +146,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_004, TestSize.Level1)
     CAMERA_LOGD("Preview + capture, then switch to preview + video.");
     CAMERA_LOGD("First, create preview + capture.");
     // Get the stream manager
+    EXPECT_NE(cameraBase_, nullptr);
     cameraBase_->AchieveStreamOperator();
     // start stream
     cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
@@ -171,7 +173,6 @@ HWTEST_F(CameraCaptureTest, camera_capture_004, TestSize.Level1)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase_, nullptr);
 }
 
 /**
