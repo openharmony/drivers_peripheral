@@ -110,6 +110,7 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
 static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_002, TestSize.Level1)
 {
     // Get the stream manager
+    EXPECT_NE(cameraBase_, nullptr);
     cameraBase_->AchieveStreamOperator();
     // start stream
     cameraBase_->intents = {PREVIEW, ANALYZE};
@@ -122,5 +123,4 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_002, TestSize.Level1)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_ANALYZE};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_ANALYZE};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase_, nullptr);
 }
