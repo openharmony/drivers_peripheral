@@ -45,8 +45,7 @@
                 "hitrace",
                 "hicollie",
                 "alsa-lib",
-                "hisysevent",
-                "ipc"
+                "hisysevent"
             ],
             "third_party": []
         },
