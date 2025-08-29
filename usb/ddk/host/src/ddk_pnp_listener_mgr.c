@@ -41,8 +41,15 @@ struct UsbDdkDeviceHanldePriv {
     enum UsbPnpNotifyServiceCmd cmd;
 };
 
+enum UsbPortState {
+    NONE = 0,
+    HOST,
+    DEVICE,
+};
+
 static struct UsbDdkListenerList g_ddkListenerList = {.isInit = false};
 static bool g_hasCacheAccessory = false;
+static enum UsbPortState g_cachedPortState = NONE;
 
 static bool DdkListenerMgrIsExists(const struct HdfDevEventlistener *listener)
 {
@@ -117,6 +124,11 @@ void DdkListenerMgrNotifyAll(const struct UsbPnpNotifyMatchInfoTable *device, en
 
     OsalMutexLock(&g_ddkListenerList.listMutex);
     g_hasCacheAccessory = (cmd == USB_ACCESSORY_SEND);
+    if (cmd == USB_PNP_DRIVER_PORT_HOST) {
+        g_cachedPortState = HOST;
+    } else if (cmd == USB_PNP_DRIVER_PORT_DEVICE) {
+        g_cachedPortState = DEVICE;
+    }
     if (DListIsEmpty(&g_ddkListenerList.listenerList)) {
         HDF_LOGI("%{public}s: the listenerList is empty.", __func__);
         OsalMutexUnlock(&g_ddkListenerList.listMutex);
@@ -170,6 +182,15 @@ int32_t DdkListenerMgrAdd(struct HdfDevEventlistener *listener)
         struct UsbDdkDeviceHanldePriv accessoryPriv = {.listener = listener, .cmd = USB_ACCESSORY_SEND};
         HDF_LOGI("%{public}s:DdkDevMgrGetGadgetLinkStatusSafe notify cache accessory send", __func__);
         (void)DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&accessoryPriv);
+    }
+    if (g_cachedPortState == HOST) {
+        struct UsbDdkDeviceHanldePriv portPriv = {.listener = listener, .cmd = USB_PNP_DRIVER_PORT_HOST};
+        HDF_LOGI("%{public}s:DdkDevMgrGetGadgetLinkStatusSafe notify cache port host state send", __func__);
+        (void)DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&portPriv);
+    } else if (g_cachedPortState == DEVICE) {
+        struct UsbDdkDeviceHanldePriv portPriv = {.listener = listener, .cmd = USB_PNP_DRIVER_PORT_DEVICE};
+        HDF_LOGI("%{public}s:DdkDevMgrGetGadgetLinkStatusSafe notify cache port device state send", __func__);
+        (void)DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&portPriv);
     }
     OsalMutexUnlock(&g_ddkListenerList.listMutex);
     return ret;
