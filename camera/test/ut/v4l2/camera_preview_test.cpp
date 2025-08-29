@@ -240,6 +240,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_032, TestSize.Level2)
 {
     CAMERA_LOGD("CreateStreams, StreamInfo->StreamIntent = VIDEO, success.");
     // Create and get streamOperator information
+    EXPECT_NE(cameraBase_, nullptr);
     cameraBase_->AchieveStreamOperator();
     // start stream
     cameraBase_->intents = {PREVIEW, VIDEO};
@@ -251,7 +252,6 @@ HWTEST_F(CameraPreviewTest, camera_preview_032, TestSize.Level2)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase_, nullptr);
 }
 
 /**
@@ -265,6 +265,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_033, TestSize.Level2)
 {
     CAMERA_LOGD("CreateStreams, StreamInfo->StreamIntent = STILL_CAPTURE, success.");
     // Get the stream manager
+    EXPECT_NE(cameraBase_, nullptr);
     cameraBase_->AchieveStreamOperator();
     // start stream
     cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
@@ -276,7 +277,6 @@ HWTEST_F(CameraPreviewTest, camera_preview_033, TestSize.Level2)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase_, nullptr);
 }
 
 /**
@@ -889,6 +889,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_075, TestSize.Level2)
 {
     CAMERA_LOGD("Preview, Capture->captureInfo->enableShutterCallback = true, return success.");
     // Create and get streamOperator information
+    EXPECT_NE(cameraBase_, nullptr);
     cameraBase_->AchieveStreamOperator();
     // Create data stream
     cameraBase_->intents = {PREVIEW};
@@ -899,7 +900,6 @@ HWTEST_F(CameraPreviewTest, camera_preview_075, TestSize.Level2)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    EXPECT_NE(cameraBase_, nullptr);
 }
 
 /**
