@@ -99,6 +99,7 @@ constexpr const char *AUDIO_STREAM_TYPE = "AUDIO_STREAM_TYPE";
 constexpr int32_t LOW_LATENCY_RENDER_ID = 1 << 1 | 1 << 0;
 constexpr int32_t DEFAULT_RENDER_ID = 1;
 constexpr int32_t DEFAULT_CAPTURE_ID = 1 << 27 | 1 << 0;
+constexpr int32_t OFFLOAD_RENDER_ID = 1 << 2 | 1 << 0;
 } // DistributeHardware
 } // OHOS
 #endif // OHOS_DAUDIO_CONSTANTS_H

@@ -70,6 +70,9 @@ std::string GetChangeDevIdMap(int32_t devId)
         case DEFAULT_RENDER_ID:
             result = PRINT_SPK;
             break;
+        case OFFLOAD_RENDER_ID:
+            result = PRINT_SPK;
+            break;
         default:
             break;
     }
