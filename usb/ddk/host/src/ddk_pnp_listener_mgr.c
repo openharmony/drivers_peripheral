@@ -186,11 +186,11 @@ int32_t DdkListenerMgrAdd(struct HdfDevEventlistener *listener)
     if (g_cachedPortState == HOST) {
         struct UsbDdkDeviceHanldePriv portPriv = {.listener = listener, .cmd = USB_PNP_DRIVER_PORT_HOST};
         HDF_LOGI("%{public}s:DdkDevMgrGetGadgetLinkStatusSafe notify cache port host state send", __func__);
-        (void)DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&portPriv);//
+        (void)DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&portPriv);
     } else if (g_cachedPortState == DEVICE) {
         struct UsbDdkDeviceHanldePriv portPriv = {.listener = listener, .cmd = USB_PNP_DRIVER_PORT_DEVICE};
         HDF_LOGI("%{public}s:DdkDevMgrGetGadgetLinkStatusSafe notify cache port device state send", __func__);
-        (void)DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&portPriv);//
+        (void)DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&portPriv);
     }
     OsalMutexUnlock(&g_ddkListenerList.listMutex);
     return ret;
