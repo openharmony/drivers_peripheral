@@ -41,7 +41,7 @@ struct UsbDdkDeviceHanldePriv {
     enum UsbPnpNotifyServiceCmd cmd;
 };
 
-enum UsbPortState = {
+enum UsbPortState {
     NONE = 0,
     HOST,
     DEVICE,
