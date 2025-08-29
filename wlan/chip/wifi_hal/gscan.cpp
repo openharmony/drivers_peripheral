@@ -61,7 +61,7 @@ public:
     {
         switch (mBand) {
             case SCAN_BAND_24_GHZ:
-                if (freq > LOW_LITMIT_FREQ_2_4G && freq < HIGH_LIMIT_FREQ_2_4G) {
+                if (freq > LOW_LIMIT_FREQ_2_4G && freq < HIGH_LIMIT_FREQ_2_4G) {
                     mFreqs.push_back(freq);
                 }
                 break;
@@ -104,7 +104,10 @@ public:
         nla_for_each_nested(nlFreq, bands, i) {
             data = nla_data(nlFreq);
             len = nla_len(nlFreq);
-            nla_parse(attrFreq, NL80211_FREQUENCY_ATTR_MAX, (struct nlattr *)data, len, freqPolicy);
+            if (nla_parse(attrFreq, NL80211_FREQUENCY_ATTR_MAX, (struct nlattr *)data, len, freqPolicy) != 0) {
+                HDF_LOGE("GetCenterFreq parse failed");
+                continue;
+            }
             if (attrFreq[NL80211_FREQUENCY_ATTR_FREQ] == nullptr) {
                 continue;
             }

@@ -1,3 +1,6 @@
+http://sync.inhuawei.com/difference/detail
+drivers_peripheral drivers_interface
+wlan/client/src/netlink/netlink_cmd_adapter.c
 # Peripheral<a name="EN-US_TOPIC_0000001101652164"></a>
 
 -   [Introduction](#section11660541593)
