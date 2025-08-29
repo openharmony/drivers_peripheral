@@ -49,7 +49,7 @@ enum UsbPortState {
 
 static struct UsbDdkListenerList g_ddkListenerList = {.isInit = false};
 static bool g_hasCacheAccessory = false;
-static enum UsbPortState g_cachedPortState = None;
+static enum UsbPortState g_cachedPortState = NONE;
 
 static bool DdkListenerMgrIsExists(const struct HdfDevEventlistener *listener)
 {
