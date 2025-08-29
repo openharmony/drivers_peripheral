@@ -42,6 +42,7 @@ HWTEST_F(AdapterTest, Camera_Adapter_0001, TestSize.Level0)
 {
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
     // Start stream
+    EXPECT_NE(Test_, nullptr);
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
     // Get preview
@@ -51,5 +52,4 @@ HWTEST_F(AdapterTest, Camera_Adapter_0001, TestSize.Level0)
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
     Test_->StopConsumer(Test_->intents);
-    EXPECT_NE(Test_, nullptr);
 }
