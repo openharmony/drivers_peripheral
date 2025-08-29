@@ -1,12 +1,3 @@
-http://sync.inhuawei.com/difference/detail
-drivers_peripheral drivers_interface
-wlan/client/src/netlink/netlink_cmd_adapter.c
-删掉#include <netlink-private/types.h>
-将#define LOW_LITMIT_FREQ_2_4G      2400改成#define LOW_LIMIT_FREQ_2_4G      2400
-将static int32_t WaitStartActionLock(void)里的while (g_cookieStart == RET_CODE_FAILURE) {改成while (g_cookieStart == 0) {
-去掉469行的空格
-将if (freq > LOW_LITMIT_FREQ_2_4G && freq < HIGH_LIMIT_FREQ_2_4G) {的LOW_LITMIT_FREQ_2_4G改成LOW_LIMIT_FREQ_2_4G
-将3253行的if (WaitStartActionLock() == 0) {改成if (WaitStartActionLock() == RET_CODE_FAILURE) {
 # Peripheral<a name="EN-US_TOPIC_0000001101652164"></a>
 
 -   [Introduction](#section11660541593)
