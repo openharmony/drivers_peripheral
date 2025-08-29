@@ -140,6 +140,17 @@ struct DCResolution {
             (this->width_ == others.width_ && this->height_ < others.height_);
     }
 };
+
+struct DCFps {
+    int32_t fixedFps_;
+    int32_t minFps_;
+    int32_t maxFps_;
+
+    DCFps() : fixedFps_(0), minFps_(0), maxFps_(0) {}
+
+    DCFps(int32_t fixed, int32_t minVal, int32_t maxVal)
+        : fixedFps_(fixed), minFps_(minVal), maxFps_(maxVal) {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // DISTRIBUTED_CONSTANTS_H
