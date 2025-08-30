@@ -2037,7 +2037,7 @@ void LibusbAdapter::LibusbEventHandling()
             break;
         }
     }
-    HDF_LOGI("%{public}s: libusb event handling thread ended.", __func__);
+    HDF_LOGI("%{public}s:libusb event handling thread ended.", __func__);
 }
 
 int32_t LibusbAdapter::FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer, libusb_device_handle *devHandle,
