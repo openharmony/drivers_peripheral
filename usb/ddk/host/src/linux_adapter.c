@@ -32,6 +32,14 @@
 #define USB_DEVICE_MMAP_PATH "/data/service/el1/public/usb/"
 #define MAX_RETRY_TIMES      10
 
+static bool IsInvalidAddress(void *ptr)
+{
+    if (((uint64_t)(ptr) & 0xfc00000000000000) != 0) {
+        return true;
+    }
+    return false;
+}
+
 static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
 {
     void *mem = RawUsbMemAlloc(newSize);
@@ -1533,7 +1541,6 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
     struct UsbAdapterUrb *urb = NULL;
     struct UsbHostRequest *request = NULL;
     int32_t ret;
-
     if (devHandle == NULL || devHandle->dev == NULL) {
         HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -1547,21 +1554,19 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
         if (errno == ENODEV) {
             return HDF_DEV_ERR_NO_DEVICE;
         }
-
         return HDF_ERR_IO;
     }
-
-    if (urb == NULL || urb->userContext == NULL) {
-        HDF_LOGE("%{public}s:%{public}d urb is NULL or userContext is NULL", __func__, __LINE__);
+    if (urb == NULL || urb->userContext == NULL || IsInvalidAddress(urb) || IsInvalidAddress(urb->userContext)) {
+        HDF_LOGE("%{public}s:%{public}d urb or userContext is invalid", __func__, __LINE__);
         return HDF_ERR_IO;
     }
-
-    request = urb->userContext;
     if (devHandle->dev->discardFailedUrb == (void *)urb) {
         devHandle->dev->discardFailedUrb = NULL;
         HDF_LOGE("%{public}s:%{public}d reap discardurb", __func__, __LINE__);
         return HDF_FAILURE;
     }
+    
+    request = urb->userContext;
     switch (request->requestType) {
         case USB_REQUEST_TYPE_CONTROL:
             ret = OsControlCompletion(request, urb);
@@ -1579,7 +1584,6 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
             ret = HDF_FAILURE;
             break;
     }
-
     return ret;
 }
 
