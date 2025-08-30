@@ -80,7 +80,7 @@ private:
     sptr<MediaKeySystemServiceCallback> systemCallback_;
     std::mutex offlineKeyMutex_;
     std::map<std::string, std::string> offlineKeyIdAndKeyValueBase64_;
-    const char* offlineKeyFileName = "/data/local/traces/offline_key.txt";
+    const char* offlineKeyFileName = "/data/log/sanitizer/offline_key.txt";
     const int keyIdMaxLength = 255;
     const std::string currentSessionNumName = "currentSessionNum";
     const std::string versionName = "version";

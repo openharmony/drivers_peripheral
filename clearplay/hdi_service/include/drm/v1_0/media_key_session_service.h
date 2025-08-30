@@ -81,7 +81,7 @@ private:
     sptr<KeySessionServiceCallback> sessionCallback_;
     std::mutex offlineKeyMutex_;
     std::map<std::string, std::string> offlineKeyIdAndKeyValueBase64_;
-    const char* offlineKeyFileName = "/data/local/traces/offline_key.txt";
+    const char* offlineKeyFileName = "/data/log/sanitizer/offline_key.txt";
     const int keyIdMaxLength = 255;
     OHOS::sptr<MediaKeySessionCallbackService> vdiCallbackObj;
     static const int32_t topThree = 3;
