@@ -606,7 +606,7 @@ std::string GetTtyDevicePath(const std::string& ttyDevice)
     fs::path ttyPath(ttyPathStr);
     if (!fs::exists(ttyPath) || !fs::is_symlink(ttyPath)) {
         HDF_LOGE("%{public}s: path %{public}s not exist", __func__, ttyPath.string().c_str());
-        return NULL;
+        return "";
     }
     fs::path realPath = fs::read_symlink(ttyPath);
     std::string tempPath = ttyPath.parent_path().string() + "/" + realPath.string();
