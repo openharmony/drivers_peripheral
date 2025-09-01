@@ -1021,6 +1021,7 @@ static WifiError WifiAddIfaceHalInfo(wifiHandle handle, const char* ifname, bool
 {
     HalInfo *info = nullptr;
     int i = 0;
+    bool hasAdd = false;
 
     info = (HalInfo *)handle;
     if (info == nullptr) {
@@ -1050,10 +1051,18 @@ static WifiError WifiAddIfaceHalInfo(wifiHandle handle, const char* ifname, bool
             ifinfo->isVirtual = isVirtual;
             info->interfaces[i] = ifinfo;
             info->numInterfaces++;
+            hasAdd = true;
             HDF_LOGI("%{public}s: Added iface: %{public}s at the index %{public}d\n", __FUNCTION__, ifname, i);
             break;
         }
         i++;
+    }
+    if (!hasAdd && ifinfo != nullptr) {
+        free(ifinfo);
+        free(info->interfaces);
+        info->numInterfaces = 0;
+        HDF_LOGI("Added iface: %{public}s failed, not found", ifname);
+        return HAL_OUT_OF_MEMORY;
     }
     return HAL_SUCCESS;
 }

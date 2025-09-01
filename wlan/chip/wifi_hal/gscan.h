@@ -18,7 +18,7 @@
 
 #include "wifi_hal.h"
 
-#define LOW_LITMIT_FREQ_2_4G      2400
+#define LOW_LIMIT_FREQ_2_4G      2400
 #define HIGH_LIMIT_FREQ_2_4G      2500
 #define LOW_LIMIT_FREQ_5G         5100
 #define HIGH_LIMIT_FREQ_5G        5900

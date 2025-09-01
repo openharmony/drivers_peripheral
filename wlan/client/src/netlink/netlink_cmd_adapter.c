@@ -16,7 +16,6 @@
 #include <net/if.h>
 #include <arpa/inet.h>
 #include <dirent.h>
-#include <netlink-private/types.h>
 #include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
 #include <netlink/handlers.h>
@@ -79,7 +78,7 @@
 
 #define P2P_BUF_SIZE              64
 #define MAX_PRIV_CMD_SIZE         4096
-#define LOW_LITMIT_FREQ_2_4G      2400
+#define LOW_LIMIT_FREQ_2_4G      2400
 #define HIGH_LIMIT_FREQ_2_4G      2500
 #define LOW_LIMIT_FREQ_5G         5100
 #define HIGH_LIMIT_FREQ_5G        5900
@@ -434,7 +433,7 @@ static int32_t PthreadMutexLock(void)
 static int32_t WaitStartActionLock(void)
 {
     int32_t count = 0;
-    while (g_cookieStart == RET_CODE_FAILURE) {
+    while (g_cookieStart == 0) {
         if (count < RETRIES) {
             HILOG_DEBUG(LOG_CORE, "%{public}s: wait g_cookieStart %{public}d 5ms",
                 __FUNCTION__, count);
@@ -467,7 +466,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
         HILOG_ERROR(LOG_CORE, "%s: pthread trylock failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    
+
     /* try to set NETLINK_EXT_ACK to 1, ignoring errors */
     int32_t opt = 1;
     if (setsockopt(nl_socket_get_fd(g_wifiHalInfo.cmdSock), SOL_NETLINK, NETLINK_EXT_ACK, &opt, sizeof(opt)) < 0) {
@@ -954,7 +953,7 @@ static void GetCenterFreq(struct nlattr *bands, struct FreqInfoResult *result)
         switch (result->band) {
             case NL80211_BAND_2GHZ:
                 if (attrFreq[NL80211_FREQUENCY_ATTR_MAX_TX_POWER]) {
-                    if (freq > LOW_LITMIT_FREQ_2_4G && freq < HIGH_LIMIT_FREQ_2_4G) {
+                    if (freq > LOW_LIMIT_FREQ_2_4G && freq < HIGH_LIMIT_FREQ_2_4G) {
                         result->freqs[result->nums] = freq;
                         result->txPower[result->nums] = nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_MAX_TX_POWER]);
                         result->nums++;
@@ -3250,7 +3249,7 @@ void WifiEventTxStatus(const char *ifName, struct nlattr **attr)
         HILOG_ERROR(LOG_CORE, "%{public}s: is null", __FUNCTION__);
         return;
     }
-    if (WaitStartActionLock() == 0) {
+    if (WaitStartActionLock() == RET_CODE_FAILURE) {
         HILOG_ERROR(LOG_CORE, "%{public}s: WaitStartActionLock error", __FUNCTION__);
         return;
     }
