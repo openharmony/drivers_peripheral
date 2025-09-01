@@ -44,6 +44,7 @@
 #define TIMEVAL_USECOND         (100 * 1000)
 #define UEVENT_POLL_WAIT_TIME   100
 #define MAX_ERR_TIMES           10
+#define MAX_UEVENT_BIND_RETRY_TIMES 50
 
 static int DdkUeventOpen(int *fd)
 {
@@ -63,22 +64,21 @@ static int DdkUeventOpen(int *fd)
     }
 
     int buffSize = UEVENT_SOCKET_BUFF_SIZE;
-    int ret = 0;
-    if ((ret = setsockopt(socketfd, SOL_SOCKET, SO_RCVBUF, &buffSize, sizeof(buffSize))) != 0) {
-        HDF_LOGE("%{public}s: setsockopt failed! %{public}d:%{public}d", __func__, ret, errno);
+    if (setsockopt(socketfd, SOL_SOCKET, SO_RCVBUF, &buffSize, sizeof(buffSize)) != 0) {
+        HDF_LOGE("%{public}s: setsockopt failed! %{public}d", __func__, errno);
         close(socketfd);
         return HDF_FAILURE;
     }
 
     const int32_t on = 1; // turn on passcred
-    if ((ret = setsockopt(socketfd, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on))) != 0) {
-        HDF_LOGE("setsockopt failed! %{public}d:%{public}d", ret, errno);
+    if (setsockopt(socketfd, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on)) != 0) {
+        HDF_LOGE("setsockopt failed! %{public}d", errno);
         close(socketfd);
         return HDF_FAILURE;
     }
 
-    if ((ret = bind(socketfd, (struct sockaddr *)&addr, sizeof(addr))) < 0) {
-        HDF_LOGE("%{public}s: bind socketfd failed! %{public}d:%{public}d", __func__, ret, errno);
+    if (bind(socketfd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        HDF_LOGE("%{public}s: bind socketfd failed! %{public}d", __func__, errno);
         close(socketfd);
         return HDF_FAILURE;
     }
@@ -167,9 +167,13 @@ void *DdkUeventMain(void *param)
     (void)param;
     int errorTimes = 0;
     int socketfd = -1;
-    if (DdkUeventOpen(&socketfd) != HDF_SUCCESS) {
-        HDF_LOGE("DdkUeventOpen failed");
-        return NULL;
+    while (DdkUeventOpen(&socketfd) != HDF_SUCCESS) {
+        errorTimes++;
+        if (errorTimes > MAX_UEVENT_BIND_RETRY_TIMES) {
+            HDF_LOGE("DdkUeventOpen failed");
+            return NULL;
+        }
+        OsalMSleep(UEVENT_POLL_WAIT_TIME);
     }
 
     ssize_t rcvLen = 0;
@@ -179,6 +183,7 @@ void *DdkUeventMain(void *param)
     fd.fd = socketfd;
     fd.events = POLLIN | POLLERR;
     fd.revents = 0;
+    errorTimes = 0;
     do {
         if (poll(&fd, 1, -1) <= 0) {
             HDF_LOGE("usb event poll fail %{public}d", errno);
