@@ -27,7 +27,7 @@ namespace Chip {
 namespace V2_0 {
 
 const std::string VENDOR_HARDWARE_PATH = "libwifi_hal_hw.z.so";
-const std::string VENDOR_DAFAULT_PATH = "libwifi_hal_default.z.so";
+const std::string VENDOR_DEFAULT_PATH = "libwifi_hal_default.z.so";
 
 WifiVendorHalList::WifiVendorHalList(
     const std::weak_ptr<IfaceTool> ifaceTool)
@@ -50,7 +50,7 @@ std::vector<std::shared_ptr<WifiVendorHal>> WifiVendorHalList::GetHals()
 void WifiVendorHalList::InitVendorHalsDescriptorList()
 {
     WifiHalLibDesc desc;
-    std::string path = VENDOR_DAFAULT_PATH;
+    std::string path = VENDOR_DEFAULT_PATH;
     if (strncmp(HAL_SO_NAME, "hardware", strlen(HAL_SO_NAME)) == 0) {
         path = VENDOR_HARDWARE_PATH;
     }
