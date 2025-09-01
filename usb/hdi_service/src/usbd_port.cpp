@@ -18,6 +18,7 @@
 #include <string>
 #include "hdf_base.h"
 #include "hdf_log.h"
+#include "usbd_function.h"
 #include "usbd_wrapper.h"
 #include "usb_report_sys_event.h"
 #include "parameter.h"
@@ -27,9 +28,6 @@ namespace HDI {
 namespace Usb {
 namespace V1_2 {
 
-constexpr int32_t USB_FUNCTION_NONE = 0;
-constexpr int32_t USB_FUNCTION_HDC = (1 << 2);
-constexpr int32_t USB_FUNCTION_STORAGE = (1 << 9);
 constexpr uint32_t PERSIST_CONFIG_NAME_MAX_LEN = 32;
 
 UsbdPort &UsbdPort::GetInstance()
@@ -137,6 +135,17 @@ int32_t UsbdPort::WritePortFile(int32_t role, const std::string &subPath)
         return HDF_FAILURE;
     }
 
+    if (path_.find("/otg_default") == std::string::npos) {
+        return HDF_SUCCESS;
+    }
+
+    int32_t devRole = -1;
+    ret = ReadPortFile(devRole, subPath);
+    if (ret != HDF_SUCCESS || devRole != role) {
+        HDF_LOGE("%{public}s: target: %{public}d, device: %{public}d, subpath:%{public}s",
+            __func__, role, devRole, subPath.c_str());
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -310,9 +319,10 @@ int32_t UsbdPort::SwitchFunction(int32_t dataRole)
     }
     int32_t currentFuncs = USB_FUNCTION_NONE;
     ret = usbDeviceInterface_->GetCurrentFunctions(currentFuncs);
-    if (currentFuncs == USB_FUNCTION_HDC || currentFuncs == USB_FUNCTION_STORAGE) {
+    if (ret == HDF_SUCCESS &&
+    (currentFuncs == USB_FUNCTION_HDC || currentFuncs == USB_FUNCTION_STORAGE)) {
         HDF_LOGI("%{public}s: skip, currentFuncs: %{public}d", __func__, currentFuncs);
-        return ret;
+        return HDF_SUCCESS;
     }
     if (IsHdcOpen()) {
         ret = usbDeviceInterface_->SetCurrentFunctions(USB_FUNCTION_HDC);
