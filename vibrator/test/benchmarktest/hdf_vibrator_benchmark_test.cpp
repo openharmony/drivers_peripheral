@@ -301,9 +301,6 @@ BENCHMARK_F(VibratorBenchmarkTest, IsVibratorRunning)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(VibratorBenchmarkTest, IsVibratorRunning)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-}
-
-BENCHMARK_MAIN();
 
 /**
   * @tc.name: DriverSystem_VibratorBenchmark_PlayPatternBySessionId
