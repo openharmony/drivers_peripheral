@@ -301,56 +301,17 @@ BENCHMARK_F(VibratorBenchmarkTest, IsVibratorRunning)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(VibratorBenchmarkTest, IsVibratorRunning)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+}
+
+BENCHMARK_MAIN();
 
 /**
   * @tc.name: DriverSystem_VibratorBenchmark_PlayPatternBySessionId
   * @tc.desc: Benchmarktest for interface PlayPatternBySessionId
-  * Control vibrator perform
-  * @tc.type: FUNC
-  */
-BENCHMARK_F(VibratorBenchmarkTest, PlayPatternBySessionId)(benchmark::State &state)
-{
-    ASSERT_NE(nullptr, g_vibratorInterface);
-
-    int32_t startRet = 0;
-    for (auto _ : state) {
-        startRet = g_vibratorInterface->PlayPatternBySessionId(
-            {-1, 1}, g_sessionId, g_hapticPaket);
-    }
-    EXPECT_EQ(startRet, HDF_SUCCESS);
-}
-
-BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetEffectInfo)->
-    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-
-/**
-  * @tc.name: DriverSystem_VibratorBenchmark_PlayPackageBySession
-  * @tc.desc: Benchmarktest for interface PlayPackageBySession
-  * Control vibrator perform
-  * @tc.type: FUNC
-  */
-BENCHMARK_F(VibratorBenchmarkTest, PlayPackageBySession)(benchmark::State &state)
-{
-    ASSERT_NE(nullptr, g_vibratorInterface);
-
-    int32_t startRet = 0;
-    for (auto _ : state) {
-        startRet = g_vibratorInterface->PlayPackageBySession(
-            {-1, 1}, g_sessionId, g_vibPackage);
-    }
-    EXPECT_EQ(startRet, HDF_SUCCESS);
-}
-
-BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetEffectInfo)->
-    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-
-/**
-  * @tc.name: DriverSystem_VibratorBenchmark_StopVibrateBySessionId
-  * @tc.desc: Benchmarktest for interface StopVibrateBySessionId
   * Control vibrator perform and stop by sessionID
   * @tc.type: FUNC
   */
-BENCHMARK_F(VibratorBenchmarkTest, StopVibrateBySessionId)(benchmark::State &state)
+BENCHMARK_F(VibratorBenchmarkTest, PlayPatternBySessionId)(benchmark::State &state)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -366,6 +327,30 @@ BENCHMARK_F(VibratorBenchmarkTest, StopVibrateBySessionId)(benchmark::State &sta
     }
 }
 
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetEffectInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_PlayPackageBySession
+  * @tc.desc: Benchmarktest for interface PlayPackageBySession
+  * Control vibrator perform and stop by sessionID
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, PlayPackageBySession)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = 0;
+    int32_t endRet = 0;
+    for (auto _ : state) {
+        startRet = g_vibratorInterface->PlayPackageBySession(
+            {-1, 1}, g_sessionId, g_vibPackage);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+
+        endRet = g_vibratorInterface->StopVibrateBySessionId({-1, 1}, g_sessionId);
+        EXPECT_EQ(endRet, HDF_SUCCESS);
+    }
+}
 BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetEffectInfo)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }
