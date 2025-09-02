@@ -24,6 +24,7 @@ config("module_private_config") {
     "${distributedcamera_hdf_path}/hdi_service/include/dcamera_host",
     "${distributedcamera_hdf_path}/hdi_service/include/dcamera_provider",
     "${distributedcamera_hdf_path}/hdi_service/include/dstream_operator",
+    "${distributedcamera_hdf_path}/hdi_service/test/unittest/common/dstream_operator",
     "${distributedcamera_hdf_path}/hdi_service/include/utils",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/device",
