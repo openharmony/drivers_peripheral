@@ -28,8 +28,6 @@
 #include <netlink/object-api.h>
 #include <netlink/netlink.h>
 #include <netlink/socket.h>
-#include <netlink-private/object-api.h>
-#include <netlink-private/types.h>
 #include <unistd.h>
 #include "sync.h"
 #include "wifi_hal.h"
