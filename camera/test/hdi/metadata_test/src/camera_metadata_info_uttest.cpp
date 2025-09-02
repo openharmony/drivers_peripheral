@@ -241,14 +241,14 @@ HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_012, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Metedate_Info_014
+ * @tc.name: Camera_Metedate_Info_013
  * @tc.desc: index = 50, dataCount = 1, data = 0
  * @tc.size: MediumTest
  * @tc.type: Function
  */
 HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_013, TestSize.Level1)
 {
-    printf("CameraMetadataInfoTest Camera_Metedate_Info_014 start...\n");
+    printf("CameraMetadataInfoTest Camera_Metedate_Info_013 start...\n");
 
     int32_t ret;
     int32_t value = 0;
@@ -256,4 +256,51 @@ HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_013, TestSize.Level1)
 
     ret = cameraMetadata->updateEntry(OHOS_ABILITY_MOON_CAPTURE_BOOST, &value, 0);
     EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: Camera_Metedate_Info_014
+ * @tc.desc: test tag OHOS_ABILITY_PHOTO_QUALITY_PRIORITIZATION
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_014, TestSize.Level1)
+{
+    printf("CameraMetadataInfoTest Camera_Metedate_Info_014 start...\n");
+
+    CameraMetadata *cameraMetadata = new CameraMetadata(10, 40);
+
+    int32_t quality[15] = {0, 0, 1, -1, -1, 1, 0, 1, -1, -1, 2, 0, 1, -1, -1};
+    bool status = cameraMetadata->addEntry(OHOS_ABILITY_PHOTO_QUALITY_PRIORITIZATION,
+        &quality, sizeof(quality) / sizeof(quality[0]));
+    EXPECT_TRUE(status);
+
+    camera_metadata_item_t item;
+    int32_t res = OHOS::Camera::FindCameraMetadataItem(cameraMetadata->get(),
+        OHOS_ABILITY_PHOTO_QUALITY_PRIORITIZATION, &item);
+    EXPECT_EQ(res, CAM_META_SUCCESS);
+    printf("CameraMetadataInfoTest Camera_Metedate_Info_014 end...\n");
+}
+
+/**
+ * @tc.name: Camera_Metedate_Info_015
+ * @tc.desc: OHOS_CONTROL_PHOTO_QUALITY_PRIORITIZATION
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraMetadataInfoTest, Camera_Metedate_Info_015, TestSize.Level1)
+{
+    printf("CameraMetadataInfoTest Camera_Metedate_Info_015 start...\n");
+
+    CameraMetadata *cameraMetadata = new CameraMetadata(10, 40);
+
+    int32_t quality = 1;
+    bool status = cameraMetadata->addEntry(OHOS_CONTROL_PHOTO_QUALITY_PRIORITIZATION, &quality, 1);
+    EXPECT_TRUE(status);
+
+    camera_metadata_item_t item;
+    int32_t res = OHOS::Camera::FindCameraMetadataItem(cameraMetadata->get(),
+        OHOS_CONTROL_PHOTO_QUALITY_PRIORITIZATION, &item);
+    EXPECT_EQ(res, CAM_META_SUCCESS);
+    printf("CameraMetadataInfoTest Camera_Metedate_Info_015 end...\n");
 }
