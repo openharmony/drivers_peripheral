@@ -43,6 +43,7 @@ ohos_shared_library("libgeofence_interface_service_2.0") {
       "drivers_peripheral_location_gnss:libgnss_interface_service_2.0",
       "hilog:libhilog",
       "ipc:ipc_single",
+      "init:libbegetutil",
     ]
   } else {
     external_deps = [
@@ -82,6 +83,7 @@ ohos_shared_library("liblocation_geofence_hdi_driver") {
       "hdf_core:libhdi",
       "hilog:libhilog",
       "ipc:ipc_single",
+      "init:libbegetutil",
     ]
   } else {
     external_deps = [
