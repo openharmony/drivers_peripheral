@@ -21,7 +21,6 @@
 #include <map>
 #include <thread>
 #include <vector>
-#include <mutex>
 
 #include "wifi_hal.h"
 #include "iface_tool.h"
@@ -74,7 +73,6 @@ public:
     static void OnAsyncGscanFullResult(int event);
     static void OnAsyncRssiReport(int32_t index, int32_t c0Rssi, int32_t c1Rssi);
     static void OnAsyncWifiNetlinkMsgReport(uint32_t type, const std::vector<uint8_t>& recvMsg);
-    static void OnAsyncWifiNetlinkMsgExtReport(uint32_t type, const std::vector<uint8_t>& recvMsg);
     WifiError SetTxPower(const std::string& ifaceName, int mode);
     WifiError SendCmdToDriver(const std::string& ifaceName, int32_t cmdId,
         const std::vector<int8_t>& paramBuf, std::vector<int8_t>& result);
@@ -99,7 +97,6 @@ private:
     bool isPrimary_;
     static CallbackHandler<IChipIfaceCallback> vendorHalCbHandler_;
     static CallbackHandler<IChipIfaceCallback> vendorHalExtCbHandler_;
-    std::mutex vendorHalMutex;
 };
     
 } // namespace v2_0
