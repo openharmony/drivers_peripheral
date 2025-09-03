@@ -1066,7 +1066,7 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
         return ret;
     }
 
-    HILOG_INFO(LOG_CORE, "%{public}s: wifi iface num %{public}d", __FUNCTION__, result->nums);
+    HILOG_DEBUG(LOG_CORE, "%{public}s: wifi iface num %{public}d", __FUNCTION__, result->nums);
     for (i = 0; i < result->nums; ++i) {
         ret = memset_s(result->infos[i].supportMode, sizeof(result->infos[i].supportMode), 0,
             sizeof(result->infos[i].supportMode));

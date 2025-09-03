@@ -371,7 +371,7 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
             WifiEventDataFrameProcess(ifName, attr);
             break;
         default:
-            HILOG_INFO(LOG_CORE, "not supported cmd");
+            HILOG_DEBUG(LOG_CORE, "not supported cmd");
             break;
     }
     HILOG_DEBUG(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
@@ -440,7 +440,7 @@ static int HandleEvent(struct nl_sock *sock)
     }
 
     ret = nl_recvmsgs(sock, cb);
-    HILOG_INFO(LOG_CORE, "nl_recvmsgs ret:%{public}d, errno:%{public}d %{public}s", ret, errno, strerror(errno));
+    HILOG_DEBUG(LOG_CORE, "nl_recvmsgs ret:%{public}d, errno:%{public}d %{public}s", ret, errno, strerror(errno));
     nl_cb_put(cb);
     cb = NULL;
     HILOG_DEBUG(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
