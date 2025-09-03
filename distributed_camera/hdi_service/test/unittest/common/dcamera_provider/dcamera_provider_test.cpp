@@ -182,6 +182,7 @@ HWTEST_F(DcameraProviderTest, AcquireBuffer_001, TestSize.Level1)
     DHBase dhBase;
     int32_t streamId = 0;
     DCameraBuffer buffer;
+    DCameraHost::GetInstance()->dCameraDeviceMap_.clear();
     auto ret = DCameraProvider::GetInstance()->AcquireBuffer(dhBase, streamId, buffer);
     EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
 }
@@ -526,6 +527,82 @@ HWTEST_F(DcameraProviderTest, GetDCameraDevice_001, TestSize.Level1)
     DHBase dhBase;
     auto ret = DCameraProvider::GetInstance()->GetDCameraDevice(dhBase);
     EXPECT_EQ(ret, nullptr);
+}
+
+/**
+ * @tc.name: AcquireBuffer_004
+ * @tc.desc: Verify AcquireBuffer
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DcameraProviderTest, AcquireBuffer_004, TestSize.Level1)
+{
+    DHBase dhBase;
+    int32_t streamId = 1;
+    DCameraBuffer buffer;
+    dhBase.deviceId_ = "deviceId";
+    dhBase.dhId_ = "dhId";
+
+    OHOS::sptr<DCameraDevice> dCamera(new (std::nothrow) DCameraDevice(dhBase, "sinkAbilityInfo",
+        "sourceCodecInfo"));
+    dCamera->dCameraStreamOperator_ = nullptr;
+    std::string str = "deviceId__dhId";
+    DCameraHost::GetInstance()->dCameraDeviceMap_[str] = dCamera;
+    auto ret = DCameraProvider::GetInstance()->AcquireBuffer(dhBase, streamId, buffer);
+    EXPECT_NE(ret, DCamRetCode::SUCCESS);
+}
+
+/**
+ * @tc.name: ShutterBuffer_004
+ * @tc.desc: Verify ShutterBuffer
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DcameraProviderTest, ShutterBuffer_004, TestSize.Level1)
+{
+    DHBase dhBase;
+    int32_t streamId = 1;
+    DCameraBuffer buffer;
+    buffer.index_ = 1;
+    buffer.size_ = 1;
+    dhBase.deviceId_ = "deviceId";
+    dhBase.dhId_ = "dhId";
+    auto ret = DCameraProvider::GetInstance()->ShutterBuffer(dhBase, streamId, buffer);
+    EXPECT_EQ(ret, DCamRetCode::DEVICE_NOT_INIT);
+}
+
+/**
+ * @tc.name: OnSettingsResult_004
+ * @tc.desc: Verify OnSettingsResult
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DcameraProviderTest, OnSettingsResult_004, TestSize.Level1)
+{
+    DHBase dhBase;
+    DCameraSettings result;
+    dhBase.deviceId_ = "deviceId";
+    dhBase.dhId_ = "dhId";
+    result.value_ = "value";
+    auto ret = DCameraProvider::GetInstance()->OnSettingsResult(dhBase, result);
+    EXPECT_NE(ret, DCamRetCode::SUCCESS);
+}
+
+/**
+ * @tc.name: Notify_005
+ * @tc.desc: Verify Notify
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DcameraProviderTest, Notify_005, TestSize.Level1)
+{
+    DHBase dhBase;
+    DCameraHDFEvent event;
+    dhBase.deviceId_ = "deviceId";
+    dhBase.dhId_ = "dhId";
+    event.content_ = "content";
+    auto ret = DCameraProvider::GetInstance()->Notify(dhBase, event);
+    EXPECT_NE(ret, DCamRetCode::DEVICE_NOT_INIT);
 }
 }
 }
