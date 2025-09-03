@@ -883,7 +883,7 @@ void SensorIfService::VoteInterval(const SensorHandle sensorHandle, uint32_t ser
         }
         samplingInterval = samplingInterval < it->second ? samplingInterval : it->second;
     }
-    HDF_LOGI("%{public}s:interval %{public}s", __func__, std::to_string(samplingInterval / ONE_MILLION).c_str());
+    HDF_LOGD("%{public}s:interval %{public}s", __func__, std::to_string(samplingInterval / ONE_MILLION).c_str());
 }
 
 int32_t SensorIfService::SetSdcSensor(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo, bool enabled,
