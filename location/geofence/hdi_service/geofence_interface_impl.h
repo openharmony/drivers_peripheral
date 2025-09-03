@@ -49,6 +49,8 @@ private:
     int32_t RemoveGeofenceDeathRecipient(const sptr<IGeofenceCallback>& callbackObj);
 
     void ResetGeofenceDeathRecipient();
+	
+    bool IsSupportHighPowerFence();
 };
 class GeofenceCallBackDeathRecipient : public IRemoteObject::DeathRecipient {
 public:

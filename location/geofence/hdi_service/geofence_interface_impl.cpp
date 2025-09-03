@@ -25,7 +25,7 @@
 #include "securec.h"
 #include "location_vendor_interface.h"
 #include "location_vendor_lib.h"
-
+#include "parameters.h"
 namespace OHOS {
 namespace HDI {
 namespace Location {
@@ -39,6 +39,7 @@ sptr<IGeofenceCallback> g_geofenceCallBack;
 GeofenceDeathRecipientMap g_geofenceCallBackDeathRecipientMap;
 std::mutex g_mutex;
 std::mutex g_deathMutex;
+static const std::string SYSPARAM_HIGHPOWER_FENCE_SUPPORT  = "const.location.support_high_power_fence";
 } // namespace
 extern "C" IGeofenceInterface *GeofenceInterfaceImplGetInstance(void)
 {
@@ -109,6 +110,10 @@ void GetGeofenceCallbackMethods(GeofenceCallbackIfaces* device)
 
 int32_t GeofenceInterfaceImpl::SetGeofenceCallback(const sptr<IGeofenceCallback>& callbackObj)
 {
+    if (!IsSupportHighPowerFence()) {
+        HDF_LOGI("%{public}s:not support high power fence", __func__);
+        return HDF_SUCCESS;
+    }
     HDF_LOGI("%{public}s.", __func__);
     if (callbackObj == nullptr) {
         HDF_LOGE("%{public}s:invalid callbackObj", __func__);
@@ -143,6 +148,10 @@ int32_t GeofenceInterfaceImpl::SetGeofenceCallback(const sptr<IGeofenceCallback>
 
 int32_t GeofenceInterfaceImpl::AddGnssGeofence(const GeofenceInfo& fence, int monitorEvent)
 {
+    if (!IsSupportHighPowerFence()) {
+        HDF_LOGI("%{public}s:not support high power fence", __func__);
+        return HDF_SUCCESS;
+    }
     int moduleType = static_cast<int>(GnssModuleIfaceCategory::GNSS_GEOFENCING_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto geofenceInterface =
@@ -162,6 +171,10 @@ int32_t GeofenceInterfaceImpl::AddGnssGeofence(const GeofenceInfo& fence, int mo
 
 int32_t GeofenceInterfaceImpl::DeleteGnssGeofence(int32_t fenceIndex)
 {
+    if (!IsSupportHighPowerFence()) {
+        HDF_LOGI("%{public}s:not support high power fence", __func__);
+        return HDF_SUCCESS;
+    }
     int moduleType = static_cast<int>(GnssModuleIfaceCategory::GNSS_GEOFENCING_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto geofenceInterface =
@@ -238,6 +251,11 @@ void GeofenceInterfaceImpl::ResetGeofence()
     ResetGeofenceDeathRecipient();
     std::unique_lock<std::mutex> lock(g_mutex);
     g_geofenceCallBack = nullptr;
+}
+
+bool GeofenceInterfaceImpl::IsSupportHighPowerFence()
+{
+    return OHOS::system::GetBoolParameter(SYSPARAM_HIGHPOWER_FENCE_SUPPORT, false);
 }
 } // V2_0
 } // Geofence
