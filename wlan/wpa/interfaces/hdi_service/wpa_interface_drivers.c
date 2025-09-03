@@ -38,7 +38,7 @@ static int g_stop = 0;
 static int32_t WpaInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGI("WpaInterfaceDriverDispatch enter.");
+    HDF_LOGD("WpaInterfaceDriverDispatch enter.");
     pthread_rwlock_rdlock(&g_rwLock);
     if (g_stop == 1 || client == NULL || client->device == NULL ||
         client->device->service == NULL) {
