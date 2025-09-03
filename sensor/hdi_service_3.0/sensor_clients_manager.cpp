@@ -40,7 +40,7 @@ namespace {
     constexpr int64_t STOP_INTERVAL = 0;
     constexpr int32_t INIT_CUR_COUNT = 0;
     constexpr int32_t ZERO_PRINT_TIME = 0;
-    constexpr int32_t MAX_PRINT_TIME = 10;
+    constexpr int32_t MAX_PRINT_TIME = 3;
     constexpr int64_t INIT_REPORT_COUNT = 1;
 }
 
@@ -365,7 +365,7 @@ bool SensorClientsManager::IsNeedCloseSensor(SensorHandle sensorHandle, int serv
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     auto it = sensorUsed_.find(sensorHandle);
     if (it == sensorUsed_.end()) {
-        HDF_LOGE("%{public}s: sensorHandle %{public}s has been disabled  or not support", __func__,
+        HDF_LOGD("%{public}s: sensorHandle %{public}s has been disabled  or not support", __func__,
                  SENSOR_HANDLE_TO_C_STR(sensorHandle));
         return true;
     }
@@ -390,7 +390,7 @@ bool SensorClientsManager::IsExistSdcSensorEnable(SensorHandle sensorHandle)
     if (it == sdcSensorConfig_.end()) {
         return false;
     }
-    HDF_LOGE("%{public}s: sensorHandle %{public}s has been enabled by sdc service", __func__,
+    HDF_LOGD("%{public}s: sensorHandle %{public}s has been enabled by sdc service", __func__,
              SENSOR_HANDLE_TO_C_STR(sensorHandle));
     return true;
 }
@@ -478,7 +478,7 @@ void SensorClientsManager::SetClientSenSorConfig(SensorHandle sensorHandle, int3
 
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
-        HDF_LOGE("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
+        HDF_LOGD("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
         return;
     }
 
