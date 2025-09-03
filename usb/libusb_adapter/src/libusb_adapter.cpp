@@ -182,7 +182,7 @@ void LibusbAdapter::LibUSBExit()
     HDF_LOGI("%{public}s leave", __func__);
 }
 
-int32_t LibusbAdapter::GetUsbDevice(const UsbDev &dev, libusb_device **device)
+int32_t LibusbAdapter::GetUsbDevice(const UsbDev &dev, libusb_device **device, bool addRefCount)
 {
     HDF_LOGD("%{public}s enter", __func__);
     if (dev.busNum == 0 || dev.devAddr == 0) {
@@ -203,7 +203,12 @@ int32_t LibusbAdapter::GetUsbDevice(const UsbDev &dev, libusb_device **device)
         uint8_t devDusNum = libusb_get_bus_number(devs[i]);
         uint8_t devDevAddr = libusb_get_device_address(devs[i]);
         if (devDusNum == dev.busNum && devDevAddr == dev.devAddr) {
-            *device = devs[i];
+            if (addRefCount) {
+                *device = libusb_ref_device(devs[i]);
+            } else {
+                *device = devs[i];
+            }
+
             libusb_free_device_list(devs, 1);
             HDF_LOGD("%{public}s success leave", __func__);
             return HDF_SUCCESS;
@@ -271,7 +276,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         return HDF_FAILURE;
     }
     libusb_device *device = nullptr;
-    ret = GetUsbDevice(dev, &device);
+    ret = GetUsbDevice(dev, &device, true);
     if (ret != HDF_SUCCESS || device == nullptr) {
         HDF_LOGE("%{public}s:GetUsbDevice is failed ret=%{public}d", __func__, ret);
         ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "GetUsbDevice failed");
@@ -286,6 +291,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
         if (ret != HDF_SUCCESS || devHandle == nullptr) {
             HDF_LOGE("%{public}s:Opening device failed ret = %{public}d", __func__, ret);
             ReportUsbdRecognitionFailSysEvent("OpenDevice", ret, "Opening device failed");
+            libusb_unref_device(device);
             return HDF_FAILURE;
         }
         std::unique_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
@@ -297,6 +303,7 @@ int32_t LibusbAdapter::OpenDevice(const UsbDev &dev)
             it->second.count++;
         }
     }
+    libusb_unref_device(device);
     TransferInit(dev);
     BulkTransferInit(dev);
     int32_t currentConfig = -1;
