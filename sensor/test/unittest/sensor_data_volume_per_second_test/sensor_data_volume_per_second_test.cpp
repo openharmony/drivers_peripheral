@@ -60,7 +60,7 @@ namespace {
         const char* testSamplingInterval = std::getenv("testSamplingInterval");
         if (testSamplingInterval) {
             printf("testSamplingInterval=%s\r\n", testSamplingInterval);
-            g_samplingInterval = std::atoi(testSamplingInterval);
+            g_samplingInterval = strtoll(testSamplingInterval, nullptr, 10);
         }
         const char* testPrintDataFlag = std::getenv("testPrintDataFlag");
         if (testPrintDataFlag) {
