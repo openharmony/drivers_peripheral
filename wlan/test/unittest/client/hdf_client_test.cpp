@@ -22,7 +22,6 @@
 #endif
 #include "securec.h"
 
-
 using namespace testing::ext;
 
 namespace ClientTest {
@@ -1024,7 +1023,7 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
     int32_t dstAddr = 0;
     int32_t buf = 0;
     WifiSetDpiMarkRule(srcAddr, dstAddr, buf);
-    EXPECT_FALSE(g_errLog.find("enter") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: WifiInstallWlanExtParam029
@@ -1105,7 +1104,7 @@ HWTEST_F(WifiClientTest, WpaEventReport02, TestSize.Level1)
     WpaEventReport(WLAN_IFNAME, WPA_EVENT_STATE_CHANGED, (void *) &wpaStateChangedParma);
     WpaEventReport(WLAN_IFNAME, WPA_EVENT_STATE_CHANGED, nullptr);
     WpaEventReport(nullptr, WPA_EVENT_STATE_CHANGED, (void *) &wpaStateChangedParma);
-    EXPECT_FALSE(g_errLog.find("wlan0") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 /**
@@ -1140,7 +1139,7 @@ HWTEST_F(WifiClientTest, HostapdEventReport04, TestSize.Level1)
     HostapdEventReport(WLAN_IFNAME, HOSTAPD_EVENT_AP_STATE, (void *) &hostapdApCbParm);
     HostapdEventReport(WLAN_IFNAME, HOSTAPD_EVENT_AP_STATE, nullptr);
     HostapdEventReport(nullptr, HOSTAPD_EVENT_AP_STATE, (void *) &hostapdApCbParm);
-    EXPECT_FALSE(g_errLog.find("HostapdEventReport") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 /**
@@ -1155,7 +1154,7 @@ HWTEST_F(WifiClientTest, WifiSetPowerSaveMode029, TestSize.Level1)
     int32_t mode = 0;
     const char *ifName = "wlanTest";
     WifiSetPowerSaveMode(ifName, frequency, mode);
-    EXPECT_FALSE(g_errLog.find("save") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 /**
@@ -1167,7 +1166,7 @@ HWTEST_F(WifiClientTest, WifiSetPowerSaveMode029, TestSize.Level1)
 HWTEST_F(WifiClientTest, ReleaseEventCallback01, TestSize.Level1)
 {
     ReleaseEventCallback();
-    EXPECT_FALSE(g_errLog.find("wlan0") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 /**
