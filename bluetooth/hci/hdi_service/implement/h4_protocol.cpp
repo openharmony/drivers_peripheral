@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <syscall.h>
 #include <unistd.h>
+#include "hitrace_meter.h"
 
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN
@@ -59,6 +60,7 @@ void H4Protocol::SetRTSchedule()
 
 ssize_t H4Protocol::SendPacket(HciPacketType packetType, const std::vector<uint8_t> &packetData)
 {
+    HITRACE_METER_FMT(HITRACE_TAG_HDF, "SendPacket=%d", packetType);
     SetRTSchedule();
     uint8_t type = packetType;
     ssize_t writtenNumber = 0;
@@ -141,6 +143,7 @@ H4Protocol::~H4Protocol() {}
 
 void H4Protocol::PacketCallback()
 {
+    HITRACE_METER_FMT(HITRACE_TAG_HDF, "PacketCallback=%d", packetType_);
     SetRTSchedule();
     switch (packetType_) {
         case HCI_PACKET_TYPE_ACL_DATA:
