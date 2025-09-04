@@ -29,6 +29,9 @@ namespace Usb {
 namespace V1_2 {
 
 constexpr uint32_t PERSIST_CONFIG_NAME_MAX_LEN = 32;
+constexpr uint32_t POWER_SWITCH_TIMEOUT_SECOND = 2;
+constexpr uint32_t RETRY_INTERVAL_MS = 500;
+constexpr uint32_t RETRY_TIMES = 3;
 
 UsbdPort &UsbdPort::GetInstance()
 {
@@ -234,34 +237,113 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
         return HDF_SUCCESS;
     }
 
+    bool needSwitchDataRole = (currentPortInfo_.dataRole != dataRole);
     if (currentPortInfo_.powerRole != powerRole) {
         HDF_LOGI("%{public}s: powerRole switch from %{public}d to %{public}d", __func__,
             currentPortInfo_.powerRole, powerRole);
-        ret = WritePortFile(powerRole, POWER_ROLE_PATH);
+        ret = SetPowerRole(powerRole, needSwitchDataRole);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: write powerRole failed, ret: %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: switch powerRole failed, ret: %{public}d", __func__, ret);
             return ret;
         }
     }
-    if (currentPortInfo_.dataRole != dataRole) {
+    if (needSwitchDataRole) {
         HDF_LOGI("%{public}s: dataRole switch from %{public}d to %{public}d", __func__,
             currentPortInfo_.dataRole, dataRole);
-        ret = WritePortFile(dataRole, DATA_ROLE_PATH);
+        ret = SetDataRole(dataRole);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: write dataRole failed, ret: %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: switch dataRole failed, ret: %{public}d", __func__, ret);
             return ret;
-        }
-        if (currentPortInfo_.dataRole == DATA_ROLE_DEVICE && dataRole == DATA_ROLE_HOST) {
-            ret = SwitchFunction(DATA_ROLE_HOST);
-        }
-        if (currentPortInfo_.dataRole == DATA_ROLE_HOST && dataRole == DATA_ROLE_DEVICE) {
-            ret = SwitchFunction(DATA_ROLE_DEVICE);
         }
     }
     currentPortInfo_.portId = portId;
     currentPortInfo_.powerRole = powerRole;
     currentPortInfo_.dataRole = dataRole;
     return HDF_SUCCESS;
+}
+
+int32_t UsbdPort::SetPowerRole(int32_t powerRole, bool needSwitchDataRole)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    int32_t ret = WritePortFile(powerRole, POWER_ROLE_PATH);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write powerRole failed, ret: %{public}d", __func__, ret);
+        return ret;
+    }
+    if (!needSwitchDataRole || path_.find("/otg_default") != std::string::npos) {
+        // otg_default does not need to wait semaphore here
+        return HDF_SUCCESS;
+    }
+
+    // if going to switch data role, first we need to finish power role switching
+    waitPowerSwitch(POWER_SWITCH_TIMEOUT_SECOND);
+    int32_t devRole = -1;
+    ret = ReadPortFile(devRole, POWER_ROLE_PATH);
+    if (ret != HDF_SUCCESS || devRole != powerRole) {
+        HDF_LOGE("%{public}s: device power role %{public}d does not match target role %{public}d",
+            __func__, devRole, powerRole);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdPort::SetDataRole(int32_t dataRole)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    uint32_t retryTimes = RETRY_TIMES;
+    int32_t ret = -1;
+    int32_t devRole = -1;
+    
+    do {
+        ret = WritePortFile(dataRole, DATA_ROLE_PATH);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: write dataRole failed, ret: %{public}d", __func__, ret);
+            return ret;
+        }
+        ret = ReadPortFile(devRole, DATA_ROLE_PATH);
+        if (ret == HDF_SUCCESS && devRole == dataRole) {
+            break;
+        }
+        HDF_LOGE("%{public}s: device data role %{public}d does not match target role %{public}d",
+            __func__, devRole, dataRole);
+        std::this_thread::sleep_for(std::chrono::milliseconds(RETRY_INTERVAL_MS));
+    } while (--retryTimes > 0);
+
+    if (ret != HDF_SUCCESS || devRole != powerRole) {
+        HDF_LOGE("%{public}s: failed, no retryTimes left", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (currentPortInfo_.dataRole == DATA_ROLE_DEVICE && dataRole == DATA_ROLE_HOST) {
+        ret = SwitchFunction(DATA_ROLE_HOST);
+    }
+    if (currentPortInfo_.dataRole == DATA_ROLE_HOST && dataRole == DATA_ROLE_DEVICE) {
+        ret = SwitchFunction(DATA_ROLE_DEVICE);
+    }
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGW("%{public}s: switch function failed, ret = %{public}d", __func__, ret);
+    }
+    return HDF_SUCCESS;
+}
+
+void UsbdPort::waitPowerSwitch(uint32_t timeout)
+{
+    isPowerSwitching_ = true;
+    if (powerSwitchSemaphore_.try_acquire_for(std::chrono::seconds(timeout))) {
+        isPowerSwitching_ = false;
+        HDF_LOGI("%{public}s: powerRole switch finished", __func__);
+        return;
+    }
+    isPowerSwitching_ = false;
+    HDF_LOGE("%{public}s: failed to get powerRole switch callback", __func__);
+    return;
+}
+
+void UsbdPort::finishPowerSwitch()
+{
+    if (isPowerSwitching_) {
+        powerSwitchSemaphore_.release();
+    }
 }
 
 bool UsbdPort::IsHdcOpen()
