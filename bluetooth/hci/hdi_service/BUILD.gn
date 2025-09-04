@@ -46,9 +46,11 @@ ohos_shared_library("libhci_interface_service_1.0") {
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_core",
+      "hitrace:hitrace_meter",
     ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [ "hilog:libhilog",
+      "hitrace:hitrace_meter" ]
   }
 
   install_images = [ chipset_base_dir ]
