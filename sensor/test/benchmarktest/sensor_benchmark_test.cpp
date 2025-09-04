@@ -48,6 +48,9 @@ namespace {
     constexpr uint32_t OPTION = 0;
     constexpr uint32_t SENSOR_DATA_FLAG = 1;
     constexpr int32_t RATE_LEVEL = 50;
+    constexpr int32_t DEFAULT_SENSOR_ID = 0;
+    constexpr int32_t DEFAULT_LOCATION = 1;
+    constexpr int32_t DEFAULT_DEVICE_ID = -1;
 
 class SensorBenchmarkTest : public benchmark::Fixture {
 public:
@@ -360,10 +363,12 @@ BENCHMARK_F(SensorBenchmarkTest, SetSdcSensor)(benchmark::State &state)
                  iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
                  iter.sensorName.c_str(), iter.power);
         for (auto _ : state) {
-            ret = g_sensorInterface->SetSdcSensor({0, iter.deviceSensorInfo.sensorType, 0, 0}, true, RATE_LEVEL);
+            ret = g_sensorInterface->SetSdcSensor({DEFAULT_DEVICE_ID, iter.deviceSensorInfo.sensorType, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                true, RATE_LEVEL);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             OsalMSleep(SENSOR_WAIT_TIME);
-            ret = g_sensorInterface->SetSdcSensor({0, iter.deviceSensorInfo.sensorType, 0, 0}, false, RATE_LEVEL);
+            ret = g_sensorInterface->SetSdcSensor({DEFAULT_DEVICE_ID, iter.deviceSensorInfo.sensorType, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                false, RATE_LEVEL);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
@@ -385,16 +390,10 @@ BENCHMARK_F(SensorBenchmarkTest, GetSdcSensorInfo)(benchmark::State &state)
 
     int32_t ret;
     EXPECT_GT(g_info.size(), 0);
-    for (auto iter : g_info) {
-        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
-                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
-                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
-                 iter.sensorName.c_str(), iter.power);
-        for (auto _ : state) {
-            std::vector<OHOS::HDI::Sensor::V3_0::SdcSensorInfo> sdcSensorInfo;
-            ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfo);
-            EXPECT_EQ(SENSOR_SUCCESS, ret);
-        }
+    for (auto _ : state) {
+        std::vector<OHOS::HDI::Sensor::V3_0::SdcSensorInfo> sdcSensorInfo;
+        ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfo);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
 
@@ -410,25 +409,17 @@ BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetSdcSensorInfo)->
 BENCHMARK_F(SensorBenchmarkTest, RegisterAsync)(benchmark::State &state)
 {
     ASSERT_NE(nullptr, g_sensorInterface);
-    EXPECT_GT(g_info.size(), 0);
 
     int32_t ret;
-    EXPECT_GT(g_info.size(), 0);
-    for (auto iter : g_info) {
-        HDF_LOGI("deviceSensorInfo deviceId%{public}d sensorType%{public}d sensorId%{public}d location%{public}d, "
-                 "info name[%{public}s], power[%{public}f]\n\r", iter.deviceSensorInfo.deviceId,
-                 iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
-                 iter.sensorName.c_str(), iter.power);
-        for (auto _ : state) {
-            ret = g_sensorInterface->RegisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-            EXPECT_EQ(SENSOR_SUCCESS, ret);
-            ret = g_sensorInterface->UnregisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
-            EXPECT_EQ(SENSOR_SUCCESS, ret);
-        }
+    for (auto _ : state) {
+        ret = g_sensorInterface->RegisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        ret = g_sensorInterface->UnregisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
 
-BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetSdcSensorInfo)->
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, RegisterAsync)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
@@ -443,12 +434,13 @@ BENCHMARK_F(SensorBenchmarkTest, GetDeviceSensorInfo)(benchmark::State &state)
 
     int32_t ret;
 
-    for (auto iter : g_info) {
-        for (auto _ : state) {
+    for (auto _ : state) {
+        for (auto iter : g_info) {
             ret = g_sensorInterface->GetDeviceSensorInfo(iter.deviceSensorInfo.deviceId, g_info);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
+
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetDeviceSensorInfo)->
