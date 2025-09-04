@@ -20,6 +20,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <unordered_map>
+#include <semaphore.h>
+#include <thread>
 
 #include "usb_host_data.h"
 #include "usbd.h"
@@ -28,6 +30,7 @@
 #include "v2_0/iusbd_subscriber.h"
 #include "v2_0/iusb_device_interface.h"
 #define DEFAULT_PORT_ID 1
+#define MAX_SWITCH_SEM 10
 
 #define DATA_ROLE_NONE_STR "none"
 #define DATA_ROLE_UFP_STR   "host"
@@ -100,6 +103,8 @@ public:
     int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode);
     int32_t UpdatePort(int32_t mode, const sptr<HDI::Usb::V1_2::IUsbdSubscriber> &subscriber);
     int32_t UpdateUsbPort(int32_t mode, const sptr<HDI::Usb::V2_0::IUsbdSubscriber> &subscriber);
+    void waitPowerSwitch(uint32_t timeout);
+    void finishPowerSwitch();
     void setPortPath(const std::string &path);
     int32_t GetSupportedModes(int32_t &supported_modes);
 
@@ -118,6 +123,8 @@ private:
     int32_t ReadPortFile(int32_t &role, const std::string &subPath);
     int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole);
     int32_t WritePdPortFile(int32_t powerRole, int32_t dataRole);
+    int32_t SetPowerRole(int32_t powerRole, bool needSwitchDataRole);
+    int32_t SetDataRole(int32_t dataRole);
     void QueryPdPort(int32_t &powerRole, int32_t &dataRole, int32_t &mode);
     void UpdatePdPort(int32_t mode, const sptr<IUsbdSubscriber> &subscriber);
     void UpdatePdPorts(int32_t mode, const sptr<V2_0::IUsbdSubscriber> &subscriber);
@@ -131,6 +138,8 @@ private:
     std::string DEFAULT_USB_MODE_PATH = "/data/service/el1/public/usb/mode";
     bool isPdV2_0 = false;
     sptr<HDI::Usb::V2_0::IUsbDeviceInterface> usbDeviceInterface_ = nullptr;
+    std::counting_semaphore<MAX_SWITCH_SEM> powerSwitchSemaphore_{0};
+    bool isPowerSwitching_ = false;
 };
 } // namespace V1_2
 } // namespace Usb
