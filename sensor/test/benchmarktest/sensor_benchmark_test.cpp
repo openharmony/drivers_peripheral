@@ -363,11 +363,13 @@ BENCHMARK_F(SensorBenchmarkTest, SetSdcSensor)(benchmark::State &state)
                  iter.deviceSensorInfo.sensorType, iter.deviceSensorInfo.sensorId, iter.deviceSensorInfo.location,
                  iter.sensorName.c_str(), iter.power);
         for (auto _ : state) {
-            ret = g_sensorInterface->SetSdcSensor({DEFAULT_DEVICE_ID, iter.deviceSensorInfo.sensorType, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+            ret = g_sensorInterface->SetSdcSensor(
+                {DEFAULT_DEVICE_ID, iter.deviceSensorInfo.sensorType, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 true, RATE_LEVEL);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             OsalMSleep(SENSOR_WAIT_TIME);
-            ret = g_sensorInterface->SetSdcSensor({DEFAULT_DEVICE_ID, iter.deviceSensorInfo.sensorType, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+            ret = g_sensorInterface->SetSdcSensor(
+                {DEFAULT_DEVICE_ID, iter.deviceSensorInfo.sensorType, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 false, RATE_LEVEL);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
@@ -440,7 +442,6 @@ BENCHMARK_F(SensorBenchmarkTest, GetDeviceSensorInfo)(benchmark::State &state)
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
-
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetDeviceSensorInfo)->
