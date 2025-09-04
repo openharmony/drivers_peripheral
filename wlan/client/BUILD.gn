@@ -120,7 +120,6 @@ if (defined(ohos_lite)) {
       include_dirs = [
         "include",
         "$CLIENT_ROOT_DIR/interfaces/include",
-        "//third_party/libnl/libnl-3.7.0/include",
         "$root_out_dir/include",
         "$root_out_dir/lib",
       ]

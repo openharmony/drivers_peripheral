@@ -153,18 +153,6 @@ void WifiVendorHal::OnAsyncWifiNetlinkMsgReport(uint32_t type, const std::vector
     }
 }
 
-void WifiVendorHal::OnAsyncWifiNetlinkMsgExtReport(uint32_t type, const std::vector<uint8_t>& recvMsg)
-{
-    const auto lock = AcquireGlobalLock();
-
-    HDF_LOGD("OnAsyncWifiNetlinkMsgExtReport::OnWifiNetlinkMessage");
-    for (const auto& callback : vendorHalExtCbHandler_.GetCallbacks()) {
-        if (callback) {
-            callback->OnWifiNetlinkMessage(type, recvMsg);
-        }
-    }
-}
-
 WifiError WifiVendorHal::Stop(std::unique_lock<std::recursive_mutex>* lock,
     const std::function<void()>& onStopCompleteUserCallback)
 {
@@ -249,7 +237,6 @@ WifiError WifiVendorHal::CreateVirtualInterface(const std::string& ifname, HalIf
 
 WifiError WifiVendorHal::DeleteVirtualInterface(const std::string& ifname)
 {
-    std::unique_lock<std::mutex> lock(vendorHalMutex);
     WifiError status = globalFuncTable_.vendorHalDeleteIface(
         globalHandle_, ifname.c_str());
     return HandleIfaceChangeStatus(ifname, status);
@@ -406,7 +393,7 @@ WifiError WifiVendorHal::RegisterExtIfaceCallBack(const std::string& ifaceName,
     const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
     vendorHalExtCbHandler_.AddCallback(chipIfaceCallback);
-    WifiExtCallbackHandler handler = {OnAsyncWifiNetlinkMsgExtReport};
+    WifiExtCallbackHandler handler = {OnAsyncWifiNetlinkMsgReport};
     globalFuncTable_.registerExtIfaceCallBack(ifaceName.c_str(), handler);
     return HAL_SUCCESS;
 }

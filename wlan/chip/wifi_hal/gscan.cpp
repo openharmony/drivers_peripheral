@@ -57,6 +57,37 @@ public:
         return ret;
     }
 
+    void AddFreqs(bool& isDfsChannel, uint32_t& freq)
+    {
+        switch (mBand) {
+            case SCAN_BAND_24_GHZ:
+                if (freq > LOW_LIMIT_FREQ_2_4G && freq < HIGH_LIMIT_FREQ_2_4G) {
+                    mFreqs.push_back(freq);
+                }
+                break;
+            case SCAN_BAND_5_GHZ:
+                if (isDfsChannel) {
+                    break;
+                }
+                if (freq > LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
+                    mFreqs.push_back(freq);
+                }
+                break;
+            case SCAN_BAND_5_GHZ_DFS_ONLY:
+                if (isDfsChannel && freq > LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
+                    mFreqs.push_back(freq);
+                }
+                break;
+            case SCAN_BAND_5_GHZ_WITH_DFS:
+                if (freq > LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
+                    mFreqs.push_back(freq);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     void GetCenterFreq(struct nlattr *bands)
     {
         struct nlattr *attrFreq[NL80211_FREQUENCY_ATTR_MAX + 1];
@@ -68,32 +99,29 @@ public:
         static struct nla_policy freqPolicy[NL80211_FREQUENCY_ATTR_MAX + 1];
         freqPolicy[NL80211_FREQUENCY_ATTR_FREQ].type = NLA_U32;
         freqPolicy[NL80211_FREQUENCY_ATTR_MAX_TX_POWER].type = NLA_U32;
+        enum nl80211_dfs_state dfsState;
 
         nla_for_each_nested(nlFreq, bands, i) {
             data = nla_data(nlFreq);
             len = nla_len(nlFreq);
-            nla_parse(attrFreq, NL80211_FREQUENCY_ATTR_MAX, (struct nlattr *)data, len, freqPolicy);
+            if (nla_parse(attrFreq, NL80211_FREQUENCY_ATTR_MAX, (struct nlattr *)data, len, freqPolicy) != 0) {
+                HDF_LOGE("GetCenterFreq parse failed");
+                continue;
+            }
             if (attrFreq[NL80211_FREQUENCY_ATTR_FREQ] == nullptr) {
                 continue;
             }
             if (attrFreq[NL80211_FREQUENCY_ATTR_DISABLED] != nullptr) {
                 continue;
             }
-            freq = nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_FREQ]);
-            switch (mBand) {
-                case NL80211_BAND_2GHZ:
-                    if (freq > LOW_LITMIT_FREQ_2_4G && freq < HIGH_LIMIT_FREQ_2_4G) {
-                        mFreqs.push_back(freq);
-                    }
-                    break;
-                case NL80211_BAND_5GHZ:
-                    if (freq > LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
-                        mFreqs.push_back(freq);
-                    }
-                    break;
-                default:
-                    break;
+            bool isDfsChannel = false;
+            if (attrFreq[NL80211_FREQUENCY_ATTR_DFS_STATE] != nullptr) {
+                dfsState = static_cast<nl80211_dfs_state>(
+                    nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_DFS_STATE]));
+                isDfsChannel = (dfsState == NL80211_DFS_USABLE || dfsState == NL80211_DFS_AVAILABLE);
             }
+            freq = nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_FREQ]);
+            AddFreqs(isDfsChannel, freq);
         }
     }
 
@@ -140,10 +168,7 @@ WifiError VendorHalGetChannelsInBand(wifiInterfaceHandle handle,
         HDF_LOGE("Handle is null");
         return HAL_INVALID_ARGS;
     }
-    if (band > 0 && band <= IEEE80211_NUM_BANDS) {
-        band = band - 1;
-    }
-    if (band >= IEEE80211_NUM_BANDS) {
+    if (band > SCAN_BAND_BOTH_WITH_DFS || band <= SCAN_BAND_UNSPECIFIED) {
         HDF_LOGE("Invalid input parameter, band = %{public}d", band);
         return HAL_INVALID_ARGS;
     }
