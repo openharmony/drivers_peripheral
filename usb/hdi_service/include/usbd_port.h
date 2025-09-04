@@ -20,7 +20,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <unordered_map>
-#include <semaphore.h>
+#include <semaphore>
 #include <thread>
 
 #include "usb_host_data.h"
