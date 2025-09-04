@@ -309,7 +309,7 @@ int32_t UsbdPort::SetDataRole(int32_t dataRole)
         std::this_thread::sleep_for(std::chrono::milliseconds(RETRY_INTERVAL_MS));
     } while (--retryTimes > 0);
 
-    if (ret != HDF_SUCCESS || devRole != powerRole) {
+    if (ret != HDF_SUCCESS || devRole != dataRole) {
         HDF_LOGE("%{public}s: failed, no retryTimes left", __func__);
         return HDF_FAILURE;
     }
