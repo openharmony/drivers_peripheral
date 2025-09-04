@@ -30,7 +30,6 @@
 #include "v2_0/iusbd_subscriber.h"
 #include "v2_0/iusb_device_interface.h"
 #define DEFAULT_PORT_ID 1
-#define MAX_SWITCH_SEM 10
 
 #define DATA_ROLE_NONE_STR "none"
 #define DATA_ROLE_UFP_STR   "host"
@@ -138,7 +137,7 @@ private:
     std::string DEFAULT_USB_MODE_PATH = "/data/service/el1/public/usb/mode";
     bool isPdV2_0 = false;
     sptr<HDI::Usb::V2_0::IUsbDeviceInterface> usbDeviceInterface_ = nullptr;
-    std::counting_semaphore<MAX_SWITCH_SEM> powerSwitchSemaphore_{0};
+    std::binary_semaphore powerSwitchSemaphore_{0};
     bool isPowerSwitching_ = false;
 };
 } // namespace V1_2
