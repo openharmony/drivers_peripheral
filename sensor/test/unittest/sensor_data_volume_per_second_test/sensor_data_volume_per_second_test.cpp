@@ -40,6 +40,7 @@ namespace {
     DeviceSensorInfo g_deviceSensorInfo = {-1, 1, 0, 1};
     int64_t g_samplingInterval = 10000000; // 10ms
     int64_t g_testTime = 5000; // 5s
+    constexpr int32_t DECIMAL_NOTATION = 10;
 
     class SensorSetBatchTest : public testing::Test {
     public:
@@ -60,7 +61,7 @@ namespace {
         const char* testSamplingInterval = std::getenv("testSamplingInterval");
         if (testSamplingInterval) {
             printf("testSamplingInterval=%s\r\n", testSamplingInterval);
-            g_samplingInterval = strtoll(testSamplingInterval, nullptr, 10);
+            g_samplingInterval = strtoll(testSamplingInterval, nullptr, DECIMAL_NOTATION);
         }
         const char* testPrintDataFlag = std::getenv("testPrintDataFlag");
         if (testPrintDataFlag) {
