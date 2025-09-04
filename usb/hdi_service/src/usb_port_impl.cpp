@@ -168,14 +168,18 @@ int32_t UsbPortImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf
         if (g_productFlag) {
             return V1_2::UsbdPorts::GetInstance().UpdatePort(PORT_MODE_HOST, subscriber);
         } else {
-            return V1_2::UsbdPort::GetInstance().UpdateUsbPort(PORT_MODE_HOST, subscriber);
+            auto ret = V1_2::UsbdPort::GetInstance().UpdateUsbPort(PORT_MODE_HOST, subscriber);
+            V1_2::UsbdPort::GetInstance().finishPowerSwitch();
+            return ret;
         }
     } else if (id == USB_PNP_DRIVER_PORT_DEVICE) {
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_DEVICE");
         if (g_productFlag) {
             return V1_2::UsbdPorts::GetInstance().UpdatePort(PORT_MODE_DEVICE, subscriber);
         } else {
-            return V1_2::UsbdPort::GetInstance().UpdateUsbPort(PORT_MODE_DEVICE, subscriber);
+            auto ret = V1_2::UsbdPort::GetInstance().UpdateUsbPort(PORT_MODE_DEVICE, subscriber);
+            V1_2::UsbdPort::GetInstance().finishPowerSwitch();
+            return ret;
         }
     } else {
         HDF_LOGW("%{public}s: port not support this id %{public}u", __func__, id);
