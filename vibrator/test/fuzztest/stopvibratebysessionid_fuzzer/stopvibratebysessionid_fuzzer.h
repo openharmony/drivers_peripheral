@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef STOPVIBRATORBYSESSIONID_FUZZER_H
-#define STOPVIBRATORBYSESSIONID_FUZZER_H
+#ifndef STOPVIBRATEBYSESSIONID_FUZZER_H
+#define STOPVIBRATEBYSESSIONID_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "stopvibratebysessionid_fuzzer"
 

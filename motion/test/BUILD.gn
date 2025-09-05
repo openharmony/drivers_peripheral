@@ -18,9 +18,9 @@ group("hdf_test_motion") {
   if (drivers_peripheral_motion_feature_model) {
     testonly = true
     deps += [
+      "benchmark:hdf_motion_benchmark_test",
       "fuzztest/motion_fuzzer:hdf_fuzztest_motion",
       "unittest/hdi:hdi_unittest_motion",
-      "benchmark/hdf_motion_benchmark_test",
     ]
   }
 }
