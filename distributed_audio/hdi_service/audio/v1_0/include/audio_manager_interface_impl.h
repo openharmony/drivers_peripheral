@@ -86,7 +86,6 @@ private:
         const std::string &deviceId, uint32_t dhId);
     int32_t RemoveClearRegisterRecipient(sptr<IRemoteObject> &remote,
         const std::string &deviceId, uint32_t dhId);
-    bool IsAllClearRegisterRecipientErased();
 
 private:
     class Deletor {
@@ -95,6 +94,7 @@ private:
         {
             if (AudioManagerInterfaceImpl::audioManager_ != nullptr) {
                 delete AudioManagerInterfaceImpl::audioManager_;
+                AudioManagerInterfaceImpl::audioManager_ = nullptr;
             }
         };
     };
