@@ -92,6 +92,7 @@ int HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfAudioManagerHost;
+        hdfAudioManagerHost = nullptr;
         return HDF_FAILURE;
     }
 
@@ -100,6 +101,7 @@ int HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
     if (hdfAudioManagerHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfAudioManagerHost;
+        hdfAudioManagerHost = nullptr;
         return HDF_FAILURE;
     }
 
