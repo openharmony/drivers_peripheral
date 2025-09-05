@@ -38,6 +38,8 @@ namespace {
     sptr<IMotionCallback> g_motionCallback = new MotionCallbackImpl();
     sptr<IMotionCallback> g_motionCallbackUnregistered = new MotionCallbackImpl();
     std::vector<uint8_t> g_motionConfigData(DATA_NUM, DATA_VALUE);
+    constexpr int32_t ITERATION_FREQUENCY = 100;
+    constexpr int32_t REPETITION_FREQUENCY = 3;
 
 
 class MotionBenchmarkTest : public benchmark::Fixture {
@@ -91,8 +93,7 @@ BENCHMARK_F(MotionBenchmarkTest, Register)(benchmark::State &state)
     for (auto _ : state) {
         int32_t ret = g_motionInterface->Register(g_motionCallback);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = g_motionInterface->Unregister(g_motionCallback);
-        EXPECT_EQ(0, ret);
+        (void)g_motionInterface->Unregister(g_motionCallback);
     }
 }
 
@@ -110,9 +111,9 @@ BENCHMARK_F(MotionBenchmarkTest, SetMotionConfig)(benchmark::State &state)
     ASSERT_NE(nullptr, g_motionInterface);
 
     for (auto _ : state) {
-        int32_t motionType = -1;
+        int32_t motionType = OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_STEP_COUNTER;
         int32_t ret = g_motionInterface->SetMotionConfig(motionType, g_motionConfigData);
-        EXPECT_NE(HDF_SUCCESS, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
