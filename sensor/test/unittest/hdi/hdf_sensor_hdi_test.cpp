@@ -806,7 +806,7 @@ namespace {
         int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, true, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -824,7 +824,7 @@ namespace {
         int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, true, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -860,7 +860,7 @@ namespace {
         int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, true, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -878,7 +878,7 @@ namespace {
         int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -911,10 +911,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest3_2 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -929,10 +929,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest3_3 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }

@@ -13,19 +13,21 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("../../motion.gni")
+import("../../../sensor.gni")
 
-module_output_path = "drivers_peripheral_motion/drivers_peripheral_motion"
+module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorDataVolumePerSecondTest"
 
-ohos_benchmarktest("hdf_motion_benchmark_test") {
+ohos_unittest("SensorDataVolumePerSecondTest") {
   module_out_path = module_output_path
 
-  include_dirs = []
-
-  sources = [
-    "motion_benchmark_test.cpp",
-    "motion_callback_impl.cpp",
+  include_dirs = [
+    "../../../interfaces/include",
+    "../../../interfaces/v1_0",
+    "../../../utils/include",
   ]
+
+  sources = [ "sensor_data_volume_per_second_test.cpp" ]
+
   cflags = [
     "-Wall",
     "-Wextra",
@@ -37,16 +39,18 @@ ohos_benchmarktest("hdf_motion_benchmark_test") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_motion:libmotion_proxy_1.0",
-      "drivers_interface_motion:libmotion_proxy_1.1",
-      "googletest:gtest_main",
+      "drivers_interface_sensor:libsensor_proxy_3.0",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
+      "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
-    if (motion_c_utils_enable) {
+    if (c_utils_enable) {
       external_deps += [ "c_utils:utils" ]
     }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
   }
   external_deps += [ "ipc:ipc_single" ]
 }
