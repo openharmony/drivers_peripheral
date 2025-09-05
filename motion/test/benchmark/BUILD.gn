@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("../../../motion.gni")
+import("../../motion.gni")
 
 module_output_path = "drivers_peripheral_motion/drivers_peripheral_motion"
 
@@ -22,7 +22,10 @@ ohos_benchmarktest("hdf_motion_benchmark_test") {
 
   include_dirs = []
 
-  sources = [ "motion_benchmark_test.cpp" ]
+  sources = [
+    "motion_benchmark_test.cpp",
+    "motion_callback_impl.cpp",
+  ]
   cflags = [
     "-Wall",
     "-Wextra",
@@ -36,6 +39,7 @@ ohos_benchmarktest("hdf_motion_benchmark_test") {
     external_deps = [
       "drivers_interface_motion:libmotion_proxy_1.0",
       "drivers_interface_motion:libmotion_proxy_1.1",
+      "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
