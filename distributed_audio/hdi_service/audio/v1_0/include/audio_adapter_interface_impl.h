@@ -107,6 +107,7 @@ public:
     bool IsPortsNoReg();
 
 private:
+    int32_t SetStreamTypeChange(const std::string& condition, const std::string &value);
     int32_t OpenRenderDevice(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
         const sptr<IDAudioCallback> extSpkCallback, const int32_t dhId, const int32_t renderId = 0);
     int32_t CloseRenderDevice(const AudioDeviceDescriptor &desc, const sptr<IDAudioCallback> extSpkCallback,
