@@ -38,6 +38,7 @@ namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
 static constexpr uint32_t MAX_AUDIO_STREAM_NUM = 10;
+const std::string STREAM_TYPE_CHANGE = "stream_type_change";
 
 AudioAdapterInterfaceImpl::AudioAdapterInterfaceImpl(const AudioAdapterDescriptor &desc)
     : adpDescriptor_(desc)
@@ -461,6 +462,13 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
                 return HDF_FAILURE;
             }
             break;
+        case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_STATUS:
+            ret = SetStreamTypeChange(condition, value);
+            if (ret != DH_SUCCESS) {
+                DHLOGE("stream type change notify failed.");
+                return HDF_FAILURE;
+            }
+            break;
         default:
             DHLOGE("Parameter is invalid.");
             return HDF_ERR_INVALID_PARAM;
@@ -799,6 +807,35 @@ uint32_t AudioAdapterInterfaceImpl::GetInterruptGroup(const uint32_t devId)
         DHLOGE("Get interrupt group param failed, use default value, ret = %{public}d.", ret);
     }
     return iptGroup;
+}
+
+int32_t AudioAdapterInterfaceImpl::SetStreamTypeChange(const std::string& condition, const std::string &value)
+{
+    std::string content = value;
+    EXT_PARAM_EVENT eventType = HDF_AUDIO_EVENT_PARAM_UNKNOWN;
+    if (condition != STREAM_TYPE_CHANGE) {
+        DHLOGE("condition not satisfy.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    eventType = HDF_AUDIO_STREAMTYPE_CHANGED;
+    DAudioEvent event = { eventType, content };
+    {
+        std::lock_guard<std::mutex> devLck(renderDevMtx_);
+        for (uint32_t id = 0; id < MAX_AUDIO_STREAM_NUM; id++) {
+            const auto &item = renderDevs_[id];
+            std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+            sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[item.first]);
+            auto render = item.second;
+            if (render == nullptr || extSpkCallback == nullptr) {
+                continue;
+            }
+            if (extSpkCallback->NotifyEvent(id, event) != HDF_SUCCESS) {
+                DHLOGE("NotifyEvent failed.");
+                return ERR_DH_AUDIO_HDF_FAIL;
+            }
+        }
+    }
+    return DH_SUCCESS;
 }
 
 int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, const std::string &param)
