@@ -36,7 +36,6 @@ namespace {
     uint32_t g_duration = 100;
     int32_t g_intensity1 = 30;
     int32_t g_frequency1 = 200;
-    uint32_t g_sleepTime1 = 200;
     V2_0::HapticPaket g_hapticPaket = {434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
     V2_0::VibratorPackage g_vibPackage = {434, 149, {{434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
@@ -44,6 +43,9 @@ namespace {
     int32_t g_sessionId = 1;
     DeviceVibratorInfo g_deviceVibratorInfo = {-1, 1};
     uint16_t g_intensity = 50;
+    HapticPaket g_pkg = {434, 1, {{V2_0::CONTINUOUS, 0, 149, 100, 50, 0, 4,
+        {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
+    std::vector<HdfWaveInformation> g_info;
     std::string g_timeSequence = "haptic.clock.timer";
     std::string g_builtIn = "haptic.default.effect";
     sptr<IVibratorInterface> g_vibratorInterface = nullptr;
@@ -206,7 +208,6 @@ BENCHMARK_F(VibratorBenchmarkTest, EnableVibratorModulation)(benchmark::State &s
                 startRet = g_vibratorInterface->EnableVibratorModulation({it.deviceId, it.vibratorId}, g_duration,
                                                                          g_intensity1, g_frequency1);
                 EXPECT_EQ(startRet, HDF_SUCCESS);
-                OsalMSleep(g_sleepTime1);
                 startRet = g_vibratorInterface->Stop({it.deviceId, it.vibratorId}, HDF_VIBRATOR_MODE_ONCE);
                 EXPECT_EQ(startRet, HDF_SUCCESS);
             }
@@ -258,7 +259,6 @@ BENCHMARK_F(VibratorBenchmarkTest, EnableCompositeEffect)(benchmark::State &stat
         }
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
-    OsalMSleep(2);
 }
 
 BENCHMARK_REGISTER_F(VibratorBenchmarkTest, EnableCompositeEffect)->
@@ -345,7 +345,7 @@ BENCHMARK_F(VibratorBenchmarkTest, PlayPackageBySession)(benchmark::State &state
     EXPECT_EQ(startRet, HDF_SUCCESS);
 }
 
-BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetEffectInfo)->
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, PlayPackageBySession)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
@@ -370,7 +370,7 @@ BENCHMARK_F(VibratorBenchmarkTest, StopVibrateBySessionId)(benchmark::State &sta
     }
 }
 
-BENCHMARK_REGISTER_F(VibratorBenchmarkTest, PlayPackageBySession)->
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, StopVibrateBySessionId)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
@@ -425,7 +425,7 @@ BENCHMARK_F(VibratorBenchmarkTest, PlayHapticPattern)(benchmark::State &state)
 
     std::vector<HdfVibratorInfo> info;
     for (auto _ : state) {
-        int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_deviceVibratorInfo, info);
+        int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_deviceVibratorInfo, g_pkg);
         EXPECT_EQ(startRet, HDF_SUCCESS);
     }
 }
@@ -445,7 +445,10 @@ BENCHMARK_F(VibratorBenchmarkTest, GetHapticStartUpTime)(benchmark::State &state
 
     std::vector<HdfVibratorInfo> info;
     for (auto _ : state) {
-        int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(g_deviceVibratorInfo, info);
+
+        int32_t startUpTime = 0;
+        int32_t mode = 0;
+        int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(g_deviceVibratorInfo, mode, startUpTime);
         EXPECT_EQ(startRet, HDF_SUCCESS);
     }
 }
@@ -496,7 +499,7 @@ BENCHMARK_F(VibratorBenchmarkTest, GetAllWaveInfo)(benchmark::State &state)
 
     std::vector<HdfVibratorInfo> info;
     for (auto _ : state) {
-        int32_t startRet = g_vibratorInterface->GetAllWaveInfo(g_deviceVibratorInfo, info);
+        int32_t startRet = g_vibratorInterface->GetAllWaveInfo(g_deviceVibratorInfo, g_info);
         EXPECT_EQ(startRet, HDF_SUCCESS);
     }
 }
@@ -546,4 +549,3 @@ BENCHMARK_REGISTER_F(VibratorBenchmarkTest, UnRegVibratorPlugCallback)->
 }
 
 BENCHMARK_MAIN();
-
