@@ -23,6 +23,7 @@
 #include "hdf_base.h"
 #include "osal_time.h"
 #include "v2_0/ivibrator_interface.h"
+#include "vibrator_plug_callback_impl.h"
 
 using namespace OHOS::HDI::Vibrator;
 using namespace OHOS::HDI::Vibrator::V2_0;
@@ -41,9 +42,12 @@ namespace {
     V2_0::VibratorPackage g_vibPackage = {434, 149, {{434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}}}};
     int32_t g_sessionId = 1;
+    DeviceVibratorInfo g_deviceVibratorInfo = {-1, 1};
+    uint16_t g_intensity = 50;
     std::string g_timeSequence = "haptic.clock.timer";
     std::string g_builtIn = "haptic.default.effect";
     sptr<IVibratorInterface> g_vibratorInterface = nullptr;
+    sptr<IVibratorPlugCallback> g_vibratorPlugCallback = new VibratorPlugCallbackImpl();
     std::vector<HdfVibratorInfo> g_vibratorInfo;
 
 class VibratorBenchmarkTest : public benchmark::Fixture {
@@ -301,9 +305,6 @@ BENCHMARK_F(VibratorBenchmarkTest, IsVibratorRunning)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(VibratorBenchmarkTest, IsVibratorRunning)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-}
-
-BENCHMARK_MAIN();
 
 /**
   * @tc.name: DriverSystem_VibratorBenchmark_PlayPatternBySessionId
@@ -327,6 +328,9 @@ BENCHMARK_F(VibratorBenchmarkTest, PlayPatternBySessionId)(benchmark::State &sta
     }
 }
 
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, PlayPatternBySessionId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
 /**
   * @tc.name: DriverSystem_VibratorBenchmark_PlayPackageBySession
   * @tc.desc: Benchmarktest for interface PlayPackageBySession
@@ -348,4 +352,181 @@ BENCHMARK_F(VibratorBenchmarkTest, PlayPackageBySession)(benchmark::State &state
         EXPECT_EQ(endRet, HDF_SUCCESS);
     }
 }
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, PlayPackageBySession)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_GetDeviceVibratorInfo
+  * @tc.desc: Benchmarktest for interface GetDeviceVibratorInfo
+  * Controls this Performing Time Series Vibrator Effects
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, GetDeviceVibratorInfo)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+    for (auto _ : state) {
+        int32_t startRet = g_vibratorInterface->GetDeviceVibratorInfo(g_deviceVibratorInfo, info);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetDeviceVibratorInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_GetVibratorIdSingle
+  * @tc.desc: Benchmarktest for interface GetVibratorIdSingle
+  * Controls this Performing Time Series Vibrator Effects
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, GetVibratorIdSingle)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+    for (auto _ : state) {
+        int32_t startRet = g_vibratorInterface->GetVibratorIdSingle(g_deviceVibratorInfo, info);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetVibratorIdSingle)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_PlayHapticPattern
+  * @tc.desc: Benchmarktest for interface PlayHapticPattern
+  * Controls this Performing Time Series Vibrator Effects
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, PlayHapticPattern)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+    for (auto _ : state) {
+        int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_deviceVibratorInfo, info);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, PlayHapticPattern)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_GetHapticStartUpTime
+  * @tc.desc: Benchmarktest for interface GetHapticStartUpTime
+  * Controls this Performing Time Series Vibrator Effects
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, GetHapticStartUpTime)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+    for (auto _ : state) {
+        int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(g_deviceVibratorInfo, info);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetHapticStartUpTime)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_StartByIntensity
+  * @tc.desc: Benchmarktest for interface StartByIntensity
+  * Controls this Performing Time Series Vibrator Effects
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, StartByIntensity)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet;
+    int32_t endRet;
+    for (auto _ : state) {
+        for (auto it : g_vibratorInfo) {
+            HdfEffectInfo effectInfo;
+            g_vibratorInterface->GetEffectInfo({it.deviceId, it.vibratorId}, g_timeSequence, effectInfo);
+            if (effectInfo.isSupportEffect == true) {
+                startRet = g_vibratorInterface->StartByIntensity({it.deviceId, it.vibratorId}, g_timeSequence,
+                    g_intensity);
+                EXPECT_EQ(startRet, HDF_SUCCESS);
+
+                endRet = g_vibratorInterface->Stop({it.deviceId, it.vibratorId}, HDF_VIBRATOR_MODE_PRESET);
+                EXPECT_EQ(endRet, HDF_SUCCESS);
+            }
+        }
+    }
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, StartByIntensity)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_GetAllWaveInfo
+  * @tc.desc: Benchmarktest for interface GetAllWaveInfo
+  * Controls this Performing Time Series Vibrator Effects
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, GetAllWaveInfo)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+    for (auto _ : state) {
+        int32_t startRet = g_vibratorInterface->GetAllWaveInfo(g_deviceVibratorInfo, info);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetAllWaveInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_RegVibratorPlugCallback
+  * @tc.desc: Benchmarktest for interface RegVibratorPlugCallback
+  * Controls this Performing Time Series Vibrator Effects
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, RegVibratorPlugCallback)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+    for (auto _ : state) {
+        int32_t startRet = g_vibratorInterface->RegVibratorPlugCallback(g_vibratorPlugCallback);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, RegVibratorPlugCallback)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_VibratorBenchmark_UnRegVibratorPlugCallback
+  * @tc.desc: Benchmarktest for interface UnRegVibratorPlugCallback
+  * Controls this Performing Time Series Vibrator Effects
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, UnRegVibratorPlugCallback)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+    for (auto _ : state) {
+        int32_t startRet = g_vibratorInterface->UnRegVibratorPlugCallback(g_vibratorPlugCallback);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, UnRegVibratorPlugCallback)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+}
+
+BENCHMARK_MAIN();
 
