@@ -522,7 +522,7 @@ int32_t VibratorIfService::GetDeviceVibratorInfo(
 
     if (vibratorInfoVdi.empty()) {
         HDF_LOGE("%{public}s no vibrator info in list", __func__);
-        return HDF_FAILURE;
+        return HDF_SUCCESS;
     }
     for (const auto &iter : vibratorInfoVdi) {
         HdfVibratorInfo hdfVibratorInfo;
