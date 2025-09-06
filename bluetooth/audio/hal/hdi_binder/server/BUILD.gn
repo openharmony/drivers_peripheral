@@ -40,6 +40,7 @@ config("hdi_service_config") {
 }
 
 ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_binder/server/include",
