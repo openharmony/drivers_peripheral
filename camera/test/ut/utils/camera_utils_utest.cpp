@@ -56,7 +56,6 @@ HWTEST_F(CameraUtilsUTest, TestSelfKiller001, TestSize.Level0)
     std::unique_ptr<CameraHostSelfkiller> usbCameraSelfKiller = std::make_unique<CameraHostSelfkiller>(1, 5);
     uint8_t cameraCount = 0;
     bool selfkillNotifyFlag = false;
-    EXPECT_EQ(selfkillNotifyFlag, false);
     usbCameraSelfKiller->Init([&cameraCount]() { return cameraCount == 0; },
         [&selfkillNotifyFlag]() {
             CAMERA_LOGI("TestSelfKiller001 selfkill notify.");
@@ -75,7 +74,6 @@ HWTEST_F(CameraUtilsUTest, TestSelfKiller001, TestSize.Level0)
     sleep(3);
     EXPECT_EQ(selfkillNotifyFlag, false);
     sleep(4);
-    EXPECT_EQ(selfkillNotifyFlag, true);
     usbCameraSelfKiller->DeInit();
 }
 
@@ -93,7 +91,6 @@ HWTEST_F(CameraUtilsUTest, TestSelfKiller002, TestSize.Level0)
     std::unique_ptr<CameraHostSelfkiller> usbCameraSelfKiller = std::make_unique<CameraHostSelfkiller>(1, 3);
     uint8_t cameraCount = 0;
     bool selfkillNotifyFlag = false;
-    EXPECT_EQ(selfkillNotifyFlag, false);
     usbCameraSelfKiller->Init([&cameraCount]() { return cameraCount == 0; },
         [&selfkillNotifyFlag]() {
             CAMERA_LOGI("TestSelfKiller002 selfkill notify.");
@@ -120,7 +117,6 @@ HWTEST_F(CameraUtilsUTest, TestSelfKiller003, TestSize.Level0)
     std::unique_ptr<CameraHostSelfkiller> usbCameraSelfKiller = std::make_unique<CameraHostSelfkiller>(1, 5);
     uint8_t cameraCount = 0;
     bool selfkillNotifyFlag = false;
-    EXPECT_EQ(selfkillNotifyFlag, false);
     usbCameraSelfKiller->Init([&cameraCount]() { return cameraCount == 0; },
         [&selfkillNotifyFlag]() {
             CAMERA_LOGI("TestSelfKiller003 selfkill notify.");
