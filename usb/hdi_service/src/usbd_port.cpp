@@ -144,7 +144,7 @@ int32_t UsbdPort::WritePortFile(int32_t role, const std::string &subPath)
         if (ret == HDF_SUCCESS && devRole == role) {
             return HDF_SUCCESS;
         }
-        HDF_LOGE("%{public}s: target: %{public}d, device: %{public}d, subpath: %{public}, retry left: %{public}d",
+        HDF_LOGE("%{public}s: target: %{public}d, device: %{public}d, subpath: %{public}s, retry left: %{public}d",
             __func__, role, devRole, subPath.c_str(), retryTimes);
     }
     return HDF_FAILURE;
