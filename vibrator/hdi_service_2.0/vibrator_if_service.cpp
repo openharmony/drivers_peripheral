@@ -517,7 +517,7 @@ int32_t VibratorIfService::GetDeviceVibratorInfo(
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
                  __func__, deviceVibratorInfo.deviceId, deviceVibratorInfo.vibratorId, ret);
-        return ret;
+        return HDF_FAILURE;
     }
 
     if (vibratorInfoVdi.empty()) {
