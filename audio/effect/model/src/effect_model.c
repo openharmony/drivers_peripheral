@@ -50,7 +50,7 @@ static struct AudioEffectLibInfo* GetEffectLibInfoByName(const char *libName)
             HDF_LOGE("%{public}s: can not find %{public}s", __func__, libName);
             return NULL;
         }
-        if (g_libInfos[i] == NULL || strcmp(g_libInfos[i]->libName, libName) != 0) {
+        if (g_libInfos[i] == NULL || g_libInfos[i]->libName == NULL || strcmp(g_libInfos[i]->libName, libName) != 0) {
             continue;
         }
         libInfo = g_libInfos[i];
@@ -154,6 +154,10 @@ static int32_t LoadEffectLibrary(const char *libName, struct EffectFactory **fac
             index = i;
             break;
         }
+        if (g_libInfos[i]->libName == NULL) {
+            HDF_LOGE("%{public}s: libName is null", __func__);
+            continue;
+        }
         if (strcmp(g_libInfos[i]->libName, libName) != 0) {
             continue;
         }
@@ -189,7 +193,7 @@ static int32_t DeleteEffectLibrary(const char *libName)
             HDF_LOGE("%{public}s: fail to destroy effect, can not find %{public}s", __func__, libName);
             return HDF_FAILURE;
         }
-        if (g_libInfos[i] == NULL || strcmp(g_libInfos[i]->libName, libName) != 0) {
+        if (g_libInfos[i] == NULL || g_libInfos[i]->libName == NULL || strcmp(g_libInfos[i]->libName, libName) != 0) {
             continue;
         }
         if (g_libInfos[i]->effectCnt > 1) {
@@ -214,7 +218,15 @@ static int32_t IsSupplyEffect(const char *libName)
         HDF_LOGE("%{public}s: point is null!", __func__);
         return HDF_FAILURE;
     }
+    if (libName == NULL) {
+        HDF_LOGE("%{public}s: libName is null!", __func__);
+        return HDF_FAILURE;
+    }
     for (uint32_t i = 0; i < g_cfgDescs->effectNum; i++) {
+        if (g_cfgDescs->effectCfgDescs[i].library == NULL) {
+            HDF_LOGE("%{public}s: library is null!", __func__);
+            continue;
+        }
         if (strcmp(g_cfgDescs->effectCfgDescs[i].library, libName) == 0) {
             return HDF_SUCCESS;
         }
@@ -237,8 +249,6 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
                                                   struct EffectControllerDescriptor *descs, uint32_t *descsLen)
 {
     HDF_LOGD("enter to %{public}s", __func__);
-    int32_t ret;
-    uint32_t i;
     uint32_t descNum = 0;
     struct EffectFactory *factLib = NULL;
     struct ControllerManager *ctrlMgr = NULL;
@@ -254,8 +264,8 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
     }
     struct EffectControllerDescriptorVdi *descsVdi = (struct EffectControllerDescriptorVdi *)descs;
     pthread_rwlock_wrlock(&g_rwEffectLock);
-    for (i = 0; i < g_cfgDescs->effectNum; i++) {
-        ret = LoadEffectLibrary(g_cfgDescs->effectCfgDescs[i].library, &factLib, &ctrlMgr);
+    for (uint32_t i = 0; i < g_cfgDescs->effectNum; i++) {
+        int32_t ret = LoadEffectLibrary(g_cfgDescs->effectCfgDescs[i].library, &factLib, &ctrlMgr);
         if (ret != HDF_SUCCESS || factLib == NULL) {
             HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
             continue;
@@ -289,12 +299,16 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
     uint32_t i;
     struct EffectFactory *factLib = NULL;
     struct ControllerManager *ctrlMgr = NULL;
-    if (self == NULL || uuid == NULL || desc == NULL) {
+    if (self == NULL || uuid == NULL || desc == NULL || g_cfgDescs == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct EffectControllerDescriptorVdi *descVdi = (struct EffectControllerDescriptorVdi *)desc;
     for (i = 0; i < g_cfgDescs->effectNum; i++) {
+        if (g_cfgDescs->effectCfgDescs[i].effectId == NULL) {
+            HDF_LOGE("%{public}s: effectId is null", __func__);
+            continue;
+        }
         if (strcmp(uuid, g_cfgDescs->effectCfgDescs[i].effectId) != 0) {
             continue;
         }
@@ -329,7 +343,7 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
 static int32_t CreateEffectController(const struct EffectInfo *info, struct IEffectControl **contoller,
     struct ControllerId *contollerId, struct IEffectControlVdi *ctrlOps)
 {
-    if (info == NULL || contoller == NULL || contollerId == NULL) {
+    if (info == NULL || contoller == NULL || contollerId == NULL || ctrlOps == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -495,6 +509,9 @@ void ModelInit(void)
     if (cfgDesc == NULL || cfgDesc->effectCfgDescs == NULL || cfgDesc->libCfgDescs == NULL) {
         HDF_LOGE("cfgDesc is null!");
         return;
+    }
+    if (g_cfgDescs != NULL) {
+        OsalMemFree(g_cfgDescs);
     }
     g_cfgDescs = cfgDesc;
     HDF_LOGD("%{public}s end!", __func__);
