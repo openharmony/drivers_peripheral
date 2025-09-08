@@ -46,6 +46,10 @@ static void TestPnpWriteLog(char *strTmp)
     gettimeofday(&time, NULL);
 
     fp = fopen("/data/usbhost_pnp_xts", "a+");
+    if (fp == NULL) {
+        HDF_LOGE("%{public}s:%{public}d fopen failed", __func__, __LINE__);
+        return;
+    }
 
     int32_t ret = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, %s\n",
         time.tv_sec, time.tv_usec, strTmp);
