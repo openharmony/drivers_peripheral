@@ -385,7 +385,10 @@ BENCHMARK_F(VibratorBenchmarkTest, GetDeviceVibratorInfo)(benchmark::State &stat
 
     std::vector<HdfVibratorInfo> info;
     for (auto _ : state) {
-        (void)g_vibratorInterface->GetDeviceVibratorInfo(g_deviceVibratorInfo, info);
+        int32_t startRet = g_vibratorInterface->GetDeviceVibratorInfo(g_deviceVibratorInfo, info);
+#ifdef TV_FLAG
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+#endif
     }
 }
 
