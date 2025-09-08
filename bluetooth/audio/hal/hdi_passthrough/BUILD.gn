@@ -45,6 +45,7 @@ config("hdi_audio_config") {
 }
 
 ohos_shared_library("hdi_audio_bluetooth") {
+  branch_protector_ret = "pac_ret"
   if (drivers_peripheral_bluetooth_a2dp_hdi) {
     defines = [ "A2DP_HDI_SERVICE" ]
   }
