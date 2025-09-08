@@ -72,6 +72,7 @@ typedef enum AudioExtParamEvent {
     HDF_AUDIO_EVENT_NEED_DATA = 24,
     HDF_AUDIO_EVENT_SPEED_CHANGE = 25,
     HDF_AUDIO_OFFLOAD_BUF_SIZE_CHANGE = 26,
+    HDF_AUDIO_STREAMTYPE_CHANGED = 27,
 } EXT_PARAM_EVENT;
 
 typedef enum AudioVolumeEvent {
