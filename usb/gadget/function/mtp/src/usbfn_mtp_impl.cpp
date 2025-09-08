@@ -1650,7 +1650,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxPush(struct UsbMtpPort *mtpPort, struct UsbFnR
         }
         mtpDev->asyncRecvFileActual += static_cast<uint64_t>(req->actual);
     }
-    if (mtpDev->asyncXferFile == ASYNC_XFER_FILE_DONE) {
+    if (mtpDev->asyncXferFile == ASYNC_XFER_FILE_DONE && mtpDev->asyncRecvWriteTempContent) {
         ssize_t writeRet = write(mtpDev->xferFd, static_cast<void *>(mtpDev->asyncRecvWriteTempContent),
             static_cast<size_t>(mtpDev->asyncRecvWriteTempCount));
         if (writeRet != static_cast<ssize_t>(mtpDev->asyncRecvWriteTempCount)) {

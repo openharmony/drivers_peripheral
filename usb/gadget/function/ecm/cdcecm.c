@@ -94,6 +94,10 @@ static int32_t UsbEcmStartTx(struct UsbEcm *port)
 
 static uint32_t UsbEcmStartRx(struct UsbEcm *port)
 {
+    if (port == NULL || port->ecm == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return 0;
+    }
     struct DListHead *pool = &port->readPool;
     struct UsbEcmPipe *out = &port->ecm->dataOutPipe;
 

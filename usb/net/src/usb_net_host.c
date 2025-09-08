@@ -253,12 +253,12 @@ static int32_t UsbnetHostSnedbufToUrb(struct UsbnetHost *usbNet,  struct HdfSBuf
         return HDF_ERR_INVALID_PARAM;
     }
     size = bufSize;
-    HARCH_INFO_PRINT("buf size = %{public}d, usbNet->dataOutEp->maxPacketSize = %{public}d",
-        bufSize, usbNet->dataOutEp->maxPacketSize);
 
     printf_char_buffer((char *)buf, CPU_TO_LE32(bufSize), false);
     UsbnetWriteLog((char *)buf, CPU_TO_LE32(bufSize), false);
     if (usbNet->dataOutEp != NULL) {
+        HARCH_INFO_PRINT("buf size = %{public}d, usbNet->dataOutEp->maxPacketSize = %{public}d",
+            bufSize, usbNet->dataOutEp->maxPacketSize);
         size = (size > usbNet->dataOutEp->maxPacketSize) ? usbNet->dataOutEp->maxPacketSize : size;
         if (memcpy_s(wb->buf, usbNet->dataOutEp->maxPacketSize, buf, size) != EOK) {
             HDF_LOGE("%{public}s: memcpy_s fail", __func__);
