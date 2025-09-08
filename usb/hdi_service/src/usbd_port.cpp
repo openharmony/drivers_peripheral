@@ -130,7 +130,7 @@ int32_t UsbdPort::WritePortFile(int32_t role, const std::string &subPath)
         if (fd < 0) {
             return HDF_FAILURE;
         }
-        int32_t ret = write(fd, modeStr.c_str(), modeStr.size());
+        ret = write(fd, modeStr.c_str(), modeStr.size());
         fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         if (ret < 0) {
             HDF_LOGE("%{public}s: Write failed for: %{public}s, errno: %{public}d", __func__, modeStr.c_str(), errno);
@@ -144,7 +144,7 @@ int32_t UsbdPort::WritePortFile(int32_t role, const std::string &subPath)
         if (ret == HDF_SUCCESS && devRole == role) {
             return HDF_SUCCESS;
         }
-        HDF_LOGE("%{public}s: target: %{public}d, device: %{public}d, subpath: %{public}s, retry left: %{public}d",
+        HDF_LOGE("%{public}s: target: %{public}d, device: %{public}d, subpath:%{public}s, retry left: %{public}d",
             __func__, role, devRole, subPath.c_str(), retryTimes);
     }
     return HDF_FAILURE;
