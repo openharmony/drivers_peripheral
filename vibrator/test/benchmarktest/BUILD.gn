@@ -31,6 +31,10 @@ ohos_benchmarktest("hdf_vibrator_benchmark_test") {
     "-fno-strict-aliasing",
   ]
 
+  if (drivers_peripheral_vibrator_feature_tv_flag) {
+    defines = ["TV_FLAG"]
+  }
+
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_vibrator:libvibrator_proxy_2.0",
