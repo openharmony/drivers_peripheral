@@ -906,7 +906,6 @@ int32_t DisplayComposerService::CommitTunnelLayer(uint32_t devId, uint64_t tunne
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail", __func__));
-    releaseFence->Init(outFence);
     return ret;
 }
 
