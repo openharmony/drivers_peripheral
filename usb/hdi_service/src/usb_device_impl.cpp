@@ -55,6 +55,7 @@ V1_2::UsbdLoadService UsbDeviceImpl::loadHdfEdm_ = {HDF_EXTERNAL_DEVICE_MANAGER_
 UsbdSubscriber UsbDeviceImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbDeviceImpl::isGadgetConnected_ = false;
 bool UsbDeviceImpl::isEdmExist_ = false;
+constexpr uint32_t HUB_PREFIX_LENGTH = 3;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 constexpr uint32_t MAX_BUFFER = 256;
 constexpr const char* DISABLE_AUTH_STR = "0";
@@ -502,9 +503,9 @@ std::string UsbDeviceImpl::GetInterfaceDirName(
     if (deviceStr.length() == 0) {
         return "";
     }
-    if (deviceStr.substr(0, 3) == "usb") {
+    if (deviceStr.substr(0, HUB_PREFIX_LENGTH) == "usb") {
         // root hub is named "usbx", the iface folders begin with "x-0:"
-        ifaceStr = deviceStr.substr(3) + "-0:" + ifaceStr;
+        ifaceStr = deviceStr.substr(HUB_PREFIX_LENGTH) + "-0:" + ifaceStr;
     } else {
         ifaceStr = deviceStr + ":" + ifaceStr;
     }
