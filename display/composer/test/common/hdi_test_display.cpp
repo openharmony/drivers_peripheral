@@ -121,7 +121,9 @@ int32_t HdiTestDisplay::RefreshLayersCompType()
     for (uint32_t i = 0; i < layers.size(); i++) {
         DISPLAY_TEST_LOGD(" the layer id %{public}u ", layers[i]);
         std::shared_ptr<HdiTestLayer> layer = GetLayerFromId(layers[i]);
-        layer->SetCompType(static_cast<Composer::V1_0::CompositionType>(types[i]));
+        if (layer != nullptr) {
+            layer->SetCompType(static_cast<Composer::V1_0::CompositionType>(types[i]));
+        }
     }
     return DISPLAY_SUCCESS;
 }
@@ -138,7 +140,9 @@ int32_t HdiTestDisplay::GetLayersReleaseFence()
     for (uint32_t i = 0; i < layers.size(); i++) {
         DISPLAY_TEST_LOGD(" the layer id %{public}u, fence: 0x%x", layers[i], fences[i]);
         std::shared_ptr<HdiTestLayer> layer = GetLayerFromId(layers[i]);
-        layer->SetReleaseFence(fences[i]);
+        if (layer != nullptr) {
+            layer->SetReleaseFence(fences[i]);
+        }
     }
     return DISPLAY_SUCCESS;
 }
