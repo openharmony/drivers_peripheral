@@ -55,11 +55,6 @@ AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
 {
     DHLOGI("Distributed audio manager destructed.");
-    ForceNotifyFwk();
-    if (AudioManagerInterfaceImpl::audioManager_ != nullptr) {
-        delete AudioManagerInterfaceImpl::audioManager_;
-        AudioManagerInterfaceImpl::audioManager_ = nullptr;
-    }
 }
 
 int32_t AudioManagerInterfaceImpl::GetAllAdapters(std::vector<AudioAdapterDescriptor> &descs)
@@ -396,22 +391,12 @@ int32_t AudioManagerInterfaceImpl::UnRegisterAudioHdfListener(const std::string 
 
 void AudioManagerInterfaceImpl::ClearRegisterRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    DHLOGI("Remote died, remote daudio device begin.");
-    auto audioMgr = AudioManagerInterfaceImpl::GetAudioManager();
-    if (audioMgr != nullptr) {
-        audioMgr->RemoveAudioDevice(deviceId_, dhId_);
-    }
-    needErase_ = true;
-    DHLOGI("Remote died, remote daudio device end.");
+    DHLOGI("ClearRegisterRecipient::OnRemoteDied.");
 }
 
 void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    DHLOGE("notifyFWK before Exit the current process");
-    auto audioMgr = AudioManagerInterfaceImpl::GetAudioManager();
-    if (audioMgr != nullptr) {
-        audioMgr->ForceNotifyFwk();
-    }
+    DHLOGE("AudioManagerRecipient::OnRemoteDied");
     _Exit(0);
 }
 
