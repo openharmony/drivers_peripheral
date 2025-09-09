@@ -154,14 +154,14 @@ int32_t UsbdPort::ReadPortFile(int32_t &role, const std::string &subPath)
 {
     int32_t fd = OpenPortFile(O_RDONLY, subPath);
     if (fd < 0) {
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
     char modeBuf[PATH_MAX] = {'\0'};
     int32_t ret = read(fd, modeBuf, sizeof(modeBuf) - 1);
     fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (ret <= 0) {
         HDF_LOGE("%{public}s: Read failed for: %{public}s, errno: %{public}d", __func__, path_.c_str(), errno);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
     std::string modeStr = std::string(modeBuf).substr(0, ret); // Trim to actual read length
     modeStr.erase(modeStr.find_last_not_of(" \n\r\t") + 1); // Trim whitespace
@@ -200,7 +200,6 @@ int32_t UsbdPort::ReadPortFile(int32_t &role, const std::string &subPath)
 
 void UsbdPort::setPortPath(const std::string &path)
 {
-    path_ = DEFAULT_USB_MODE_PATH;
     if (path == DEFAULT_USB_MODE_PATH) {
         isPdV2_0 = true;
         HDF_LOGE("%{public}s: not support", __func__);
@@ -212,6 +211,7 @@ void UsbdPort::setPortPath(const std::string &path)
         HDF_LOGE("%{public}s: default path", __func__);
         return;
     }
+    path_ = path;
     DIR *dir = opendir(path.c_str());
     if (dir == nullptr) {
         HDF_LOGE("%{public}s: Failed to open directory: %{public}s", __func__, path.c_str());
@@ -371,11 +371,6 @@ int32_t UsbdPort::SetUsbPort(int32_t portId, int32_t powerRole, int32_t dataRole
 
 int32_t UsbdPort::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode)
 {
-    if (path_ == DEFAULT_USB_MODE_PATH) {
-        HDF_LOGE("%{public}s: not support", __func__);
-        return HDF_SUCCESS;
-    }
-
     portId = currentPortInfo_.portId;
     if (isPdV2_0) {
         QueryPdPort(powerRole, dataRole, mode);
@@ -384,17 +379,17 @@ int32_t UsbdPort::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRo
     int32_t ret = ReadPortFile(powerRole, POWER_ROLE_PATH);
     if (ret < 0) {
         HDF_LOGE("%{public}s: read power_role failed ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
     ret = ReadPortFile(dataRole, DATA_ROLE_PATH);
     if (ret < 0) {
         HDF_LOGE("%{public}s: read data_role failed ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
     ret = ReadPortFile(mode, MODE_PATH);
     if (ret < 0) {
         HDF_LOGE("%{public}s: read mode failed ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
     return HDF_SUCCESS;
 }
