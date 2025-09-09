@@ -416,7 +416,7 @@ int32_t UsbDeviceImpl::UsbInterfaceAuthorize(
         }
         return ret;
     }
-    HDF_LOGE("%{public}s: failed to reach interface: %{public}s", __func__, ifaceDir.c_str());
+    HDF_LOGE("%{public}s: failed to reach interface", __func__);
     return HDF_ERR_INVALID_PARAM;
 }
 
@@ -547,7 +547,7 @@ int32_t UsbDeviceImpl::SetDefaultAuthorize(bool authorized)
     struct dirent *entry;
     DIR *dir = opendir(SYSFS_DEVICES_DIR);
     if (dir == nullptr) {
-        HDF_LOGE("%{public}s: dir is empty");
+        HDF_LOGE("%{public}s: dir is empty", __func__);
         return HDF_FAILURE;
     }
     while ((entry = readdir(dir)) != nullptr) {
