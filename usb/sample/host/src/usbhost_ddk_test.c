@@ -164,16 +164,14 @@ static void TestModuleWriteLog(int32_t cmdType, const char *str)
             default:
                 ret = HDF_SUCCESS;
         }
-        if (fp == NULL) {
-            HDF_LOGE("%{public}s:%{public}d fopen failed", __func__, __LINE__);
-            return;
-        }
-        if (ret != HDF_SUCCESS) {
+        if (fp != NULL) {
+            if (ret != HDF_SUCCESS) {
+                (void)fclose(fp);
+                return;
+            }
+            (void)fwrite(buffer, strlen(buffer), 1, fp);
             (void)fclose(fp);
-            return;
         }
-        (void)fwrite(buffer, strlen(buffer), 1, fp);
-        (void)fclose(fp);
     }
 }
 
