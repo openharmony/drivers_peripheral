@@ -542,6 +542,7 @@ int32_t UsbDeviceImpl::SetAuthorize(const std::string &filePath, bool authorized
 int32_t UsbDeviceImpl::SetDefaultAuthorize(bool authorized)
 {
     int32_t ret = SetGlobalDefaultAuthorize(authorized);
+    std::string dev_dir;
     struct dirent *entry;
     DIR *dir = opendir(SYSFS_DEVICES_DIR);
     if (dir == nullptr) {
@@ -565,13 +566,17 @@ int32_t UsbDeviceImpl::SetGlobalDefaultAuthorize(bool authorized)
     int32_t ret;
     std::string content = (authorized)? "-1" : "0";
     fd = open("/sys/module/usbcore/parameters/authorized_default", O_WRONLY | O_TRUNC);
+    if (fd < 0) {
+        HDF_LOGE("%{public}s: failed to reach authorized_default, errno = %{public}d", __func__, errno);
+        return HDF_FAILURE;
+    }
     ret = write(fd, content.c_str(), content.length());
     close(fd);
     if (ret < 0) {
         HDF_LOGE("%{public}s: failed to set usb default authorize, errno = %{public}d", __func__, errno);
         return HDF_FAILURE;
     }
-    HDF_LOGI("%{public}s: usb %{public}s write default authorize %{public}s finished", __func__, content.c_str());
+    HDF_LOGI("%{public}s: write global default authorize %{public}s finished", __func__, content.c_str());
     return HDF_SUCCESS;
 }
 
