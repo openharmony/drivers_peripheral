@@ -169,7 +169,7 @@ ohos_benchmarktest("hdi_usb_benchmark_driver_test") {
 }
 
 ohos_benchmarktest("hdf_usb_benchmark_authorize_test") {
-  module_out_path = module_out_path
+  module_out_path = module_output_path
 
   include_dirs = ["../UsbSubscriberTest"]
 
