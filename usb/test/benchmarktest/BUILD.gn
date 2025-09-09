@@ -179,8 +179,8 @@ ohos_benchmarktest("hdf_usb_benchmark_authorize_test") {
   ]
 
   deps = [
-    "",
-    "",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
   ]
 
   if (is_standard_system) {
