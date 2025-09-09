@@ -79,7 +79,9 @@ int32_t SensorIfService::GetSensorVdiImpl()
 {
     struct OHOS::HDI::Sensor::V1_1::WrapperSensorVdi *wrapperSensorVdi = nullptr;
     uint32_t version = 0;
+    HDF_LOGI("%{public}s: start HdfLoadVdi(%{public}s)", __func__, HDI_SENSOR_VDI_LIBNAME);
     vdi_ = HdfLoadVdi(HDI_SENSOR_VDI_LIBNAME);
+    HDF_LOGI("%{public}s: finish HdfLoadVdi(%{public}s)", __func__, HDI_SENSOR_VDI_LIBNAME);
     if (vdi_ == nullptr || vdi_->vdiBase == nullptr) {
         HDF_LOGE("%{public}s: load sensor vdi failed", __func__);
         return HDF_FAILURE;
@@ -881,7 +883,7 @@ void SensorIfService::VoteInterval(const SensorHandle sensorHandle, uint32_t ser
         }
         samplingInterval = samplingInterval < it->second ? samplingInterval : it->second;
     }
-    HDF_LOGI("%{public}s:interval %{public}s", __func__, std::to_string(samplingInterval / ONE_MILLION).c_str());
+    HDF_LOGD("%{public}s:interval %{public}s", __func__, std::to_string(samplingInterval / ONE_MILLION).c_str());
 }
 
 int32_t SensorIfService::SetSdcSensor(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo, bool enabled,

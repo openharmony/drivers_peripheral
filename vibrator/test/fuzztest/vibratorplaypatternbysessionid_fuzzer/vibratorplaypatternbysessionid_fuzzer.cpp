@@ -78,7 +78,7 @@ namespace OHOS {
         hapticEvent.points.push_back(std::move(curvePoint));
 
         hapticPaket.events.push_back(std::move(hapticEvent));
-        int32_t ret = !g_vibratorInterface->PlayPatternBySessionId({-1, 1}, 1, hapticPaket);
+        int32_t ret = g_vibratorInterface->PlayPatternBySessionId({-1, 1}, 1, hapticPaket);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetConfig failed, ret is [%{public}x]\n", __func__, ret);
             return false;

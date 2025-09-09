@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../sensor.gni")
 
-module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor"
+module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorTestThreeClients"
 
 group("SensorTestThreeClients") {
     deps = []

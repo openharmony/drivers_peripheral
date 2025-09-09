@@ -656,7 +656,7 @@ int32_t VibratorIfService::PlayPackageBySession(
                 default:
                     hapticEventVdi.type = VDI_UNKNOWN;
                     HDF_LOGE("%{public}s: unknown event type %{public}d", __func__, event.type);
-                    continue;
+                    break;
             }
             hapticEventVdi.time = event.time;
             hapticEventVdi.duration = event.duration;
