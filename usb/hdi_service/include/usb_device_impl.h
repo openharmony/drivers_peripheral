@@ -74,6 +74,8 @@ private:
     std::string GetDeviceDirName(uint8_t devNum, uint8_t devAddr);
     std::string GetInterfaceDirName(uint8_t devNum, uint8_t devAddr, uint8_t configId, uint8_t interfaceId);
     int32_t SetAuthorize(const std::string &filePath, bool authorized);
+    int32_t SetDefaultAuthorize(bool authorized);
+    int32_t SetGlobalDefaultAuthorize(bool authorized);
     static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];
     static bool isGadgetConnected_;
     static bool isEdmExist_;
