@@ -117,6 +117,10 @@ HWTEST_F(AudioCaptureInterfaceImplTest, Start_001, TestSize.Level1)
 {
     audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->Start());
+    audioCaptureInterfaceImpl_->SetCaptureStatus(CAPTURE_STATUS_CLOSE);
+    EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->Start());
+    audioCaptureInterfaceImpl_->SetCaptureStatus(CAPTURE_STATUS_OPEN);
+    EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->Start());
 }
 
 /**
