@@ -53,9 +53,9 @@ public:
     int32_t GetAccessoryInfo(std::vector<std::string> &accessoryInfo) override;
     int32_t OpenAccessory(int32_t &fd) override;
     int32_t CloseAccessory(int32_t fd) override;
-    int32_t UsbDeviceAuthorize(uint8_t devNum, uint8_t devAddr, bool authorized);
+    int32_t UsbDeviceAuthorize(uint8_t devNum, uint8_t devAddr, bool authorized) override;
     int32_t UsbInterfaceAuthorize(
-        const UsbDev &dev, uint8_t configId, uint8_t interfaceId, bool authorized);
+        const UsbDev &dev, uint8_t configId, uint8_t interfaceId, bool authorized) override;
     static int32_t UsbdEventHandle(void);
     static int32_t UsbdEventHandleRelease(void);
     class UsbDeathRecipient : public IRemoteObject::DeathRecipient {
