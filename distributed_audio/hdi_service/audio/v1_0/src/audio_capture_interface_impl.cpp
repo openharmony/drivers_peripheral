@@ -132,6 +132,10 @@ int32_t AudioCaptureInterfaceImpl::Start()
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
     }
+    if (GetCaptureStatus() == CAPTURE_STATUS_CLOSE) {
+        DHLOGI("Capture status wrong, return false.");
+        return HDF_FAILURE;
+    }
     if (audioExtCallback_->NotifyEvent(captureId_, event) != HDF_SUCCESS) {
         DHLOGE("Notify start event failed.");
         return HDF_FAILURE;
