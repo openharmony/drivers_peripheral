@@ -324,7 +324,7 @@ ohos_unittest("test_deviceauthorize") {
   } else {
     external_deps += [ "hilog:libhilog" ]
   }
-  module_out_path = module_out_path
+  module_out_path = module_output_path
 }
 
 ohos_unittest("test_interfaceauthorize") {
@@ -367,7 +367,7 @@ ohos_unittest("test_interfaceauthorize") {
   } else {
     external_deps += [ "hilog:libhilog" ]
   }
-  module_out_path = module_out_path
+  module_out_path = module_output_path
 }
 
 ohos_unittest("test_manageinterface") {
