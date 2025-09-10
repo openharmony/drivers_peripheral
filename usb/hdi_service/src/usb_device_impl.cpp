@@ -518,7 +518,7 @@ int32_t UsbDeviceImpl::SetAuthorize(const std::string &filePath, bool authorized
     int32_t ret;
     std::string content = (authorized)? ENABLE_AUTH_STR : DISABLE_AUTH_STR;
     char realPathStr[MAX_BUFFER] = {'\0'};
-    if (filePath.length() >= MAX_BUFFER || realpath(filePath.c_str(), realPathStr) == nullptr)
+    if (filePath.length() >= MAX_BUFFER || realpath(filePath.c_str(), realPathStr) == nullptr) {
         HDF_LOGE("%{public}s: realpath failed. ret = %{public}s", __func__, strerror(errno));
         return HDF_FAILURE;
     }
