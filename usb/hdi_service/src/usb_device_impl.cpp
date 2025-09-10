@@ -427,7 +427,7 @@ std::string UsbDeviceImpl::UsbGetAttribute(const std::string &devDir, const std:
     char realPathStr[MAX_BUFFER] = {'\0'};
     std::string s = "";
     int32_t ret;
-    if (realpath(attrFilePath.c_str(), realPathStr) == nullptr) {
+    if (attrFilePath.length() >= MAX_BUFFER || realpath(attrFilePath.c_str(), realPathStr) == nullptr) {
         HDF_LOGE("%{public}s: realpath railed. ret = %{public}s", __func__, strerror(errno));
         return "";
     }
@@ -518,7 +518,7 @@ int32_t UsbDeviceImpl::SetAuthorize(const std::string &filePath, bool authorized
     int32_t ret;
     std::string content = (authorized)? ENABLE_AUTH_STR : DISABLE_AUTH_STR;
     char realPathStr[MAX_BUFFER] = {'\0'};
-    if (realpath(filePath.c_str(), realPathStr) == nullptr) {
+    if (filePath.length() >= MAX_BUFFER || realpath(filePath.c_str(), realPathStr) == nullptr)
         HDF_LOGE("%{public}s: realpath failed. ret = %{public}s", __func__, strerror(errno));
         return HDF_FAILURE;
     }
