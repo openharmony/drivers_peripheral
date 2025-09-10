@@ -59,7 +59,7 @@ bool UsbDeviceImpl::isEdmExist_ = false;
 constexpr uint32_t HUB_PREFIX_LENGTH = 3;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 constexpr uint32_t MAX_BUFFER = 256;
-constexpr uint32_t RE_CONFIGURATION_INTERVAL = 50;
+constexpr uint32_t RE_CONFIGURATION_INTERVAL_MS = 50;
 constexpr const char* DISABLE_AUTH_STR = "0";
 constexpr const char* ENABLE_AUTH_STR = "1";
 constexpr const char* BUS_NUM = "busnum";   // filename of bus number
@@ -411,7 +411,7 @@ int32_t UsbDeviceImpl::UsbInterfaceAuthorize(
             // need to disable & re-enable device to bind the interface driver (due to the limit of kernel)
             HDF_LOGI("%{public}s: re-enable device to bind the interface driver", __func__);
             (void)UsbDeviceAuthorize(busNum, devAddr, false);
-            std::this_thread::sleep_for(std::chrono::milliseconds(RE_CONFIGURATION_INTERVAL));
+            std::this_thread::sleep_for(std::chrono::milliseconds(RE_CONFIGURATION_INTERVAL_MS));
             (void)UsbDeviceAuthorize(busNum, devAddr, true);
         }
         return ret;
