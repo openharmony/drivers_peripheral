@@ -29,6 +29,7 @@ enum AudioCriBuffStatus {
     CIR_BUFF_NORMAL = -1,
     CIR_BUFF_FULL   = -2,
     CIR_BUFF_EMPTY  = -3,
+    CIR_BUFF_STOP   = -4,
 };
 
 struct AudioCtlElemId {
