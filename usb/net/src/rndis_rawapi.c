@@ -459,6 +459,10 @@ static void HostRndisSetmacAddrByBp(struct UsbnetHost **ppUsbNet, int32_t *retva
 
 static void HostRndisSetmacAddr(struct UsbnetHost **ppUsbNet, int32_t *retval)
 {
+    if (ppUsbNet == NULL || *ppUsbNet == NULL || retval == NULL) {
+        HDF_LOGE("[%{public}s]: invalid param", __func__);
+        return;
+    }
     __le32 *phym = NULL;
     __le32 phym_unspec;
     int replyLen = sizeof(__le32);
