@@ -57,6 +57,10 @@ sptr<IAudioCallback> AudioRenderInterfaceImpl::GetAudioCallback()
 
 int32_t AudioRenderInterfaceImpl::GetLatency(uint32_t &ms)
 {
+    if (GetRenderStatus() == RENDER_STATUS_CLOSE) {
+        DHLOGI("Render status wrong, return false.");
+        return HDF_FAILURE;
+    }
     DHLOGD("Get render device latency.");
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
@@ -157,6 +161,10 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
 int32_t AudioRenderInterfaceImpl::GetRenderPosition(uint64_t &frames, AudioTimeStamp &time)
 {
     DHLOGI("Get render position.");
+    if (GetRenderStatus() == RENDER_STATUS_CLOSE) {
+        DHLOGI("Render status wrong, return false.");
+        return HDF_FAILURE;
+    }
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
@@ -177,6 +185,10 @@ int32_t AudioRenderInterfaceImpl::GetRenderPosition(uint64_t &frames, AudioTimeS
 int32_t AudioRenderInterfaceImpl::SetRenderSpeed(float speed)
 {
     DHLOGI("Set render speed.");
+    if (GetRenderStatus() == RENDER_STATUS_CLOSE) {
+        DHLOGI("Render status wrong, return false.");
+        return HDF_FAILURE;
+    }
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
@@ -238,6 +250,10 @@ int32_t AudioRenderInterfaceImpl::IsSupportsDrain(bool &support)
 int32_t AudioRenderInterfaceImpl::Start()
 {
     DHLOGI("Start render.");
+    if (GetRenderStatus() == RENDER_STATUS_CLOSE) {
+        DHLOGI("Render status wrong, return false.");
+        return HDF_FAILURE;
+    }
     if (firstOpenFlag_) {
         firstOpenFlag_ = false;
     } else {
@@ -341,6 +357,10 @@ int32_t AudioRenderInterfaceImpl::Resume()
 int32_t AudioRenderInterfaceImpl::Flush()
 {
     DHLOGI("Flush.");
+    if (GetRenderStatus() == RENDER_STATUS_CLOSE) {
+        DHLOGI("Render status wrong, return false.");
+        return HDF_FAILURE;
+    }
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
@@ -409,6 +429,10 @@ int32_t AudioRenderInterfaceImpl::GetMute(bool &mute)
 int32_t AudioRenderInterfaceImpl::SetVolume(float volume)
 {
     DHLOGI("Set volume.");
+    if (GetRenderStatus() == RENDER_STATUS_CLOSE) {
+        DHLOGI("Render status wrong, return false.");
+        return HDF_FAILURE;
+    }
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
@@ -553,6 +577,10 @@ int32_t AudioRenderInterfaceImpl::NotifyFirstChangeEvent(EXT_PARAM_EVENT evetTyp
 {
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Ext callback is null.");
+        return HDF_FAILURE;
+    }
+    if (GetRenderStatus() == RENDER_STATUS_CLOSE) {
+        DHLOGI("Render status wrong, return false.");
         return HDF_FAILURE;
     }
     std::string content;
