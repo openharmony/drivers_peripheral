@@ -112,6 +112,10 @@ private:
         const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealCameraFoldScreenType(
         const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
+    RetCode DealSensorOrientationVariable(
+        const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
+    RetCode DealFoldStateSensorOrientationMap(
+        const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
 #endif
 
 private:
