@@ -45,6 +45,9 @@ public:
     void Start();
     void Stop();
     bool IsMute();
+#ifdef V4L2_EMULATOR
+    int32_t GetRotateAngle();
+#endif
 
 private:
     MetadataController();
@@ -87,6 +90,9 @@ private:
     std::thread *notifyChangedMetadata_ = nullptr;
     bool isInit_ = false;
     bool isMute_ = false;
+#ifdef V4L2_EMULATOR
+    int32_t rotateAngle_ = 0;
+#endif
 };
 } // namespace Camera
 } // namespace OHOS
