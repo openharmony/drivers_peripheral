@@ -86,6 +86,9 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetLatency_003, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     uint32_t ms = 12;
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_CLOSE);
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetLatency(ms));
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetLatency(ms));
 }
@@ -177,6 +180,9 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetRenderPosition_003, TestSize.Level1)
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     uint64_t frames = 0;
     AudioTimeStamp time;
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_CLOSE);
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->GetRenderPosition(frames, time));
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetRenderPosition(frames, time));
 }
@@ -219,6 +225,9 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetRenderSpeed_003, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     float speed = 0;
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_CLOSE);
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetRenderSpeed(speed));
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetRenderSpeed(speed));
 }
@@ -310,6 +319,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, IsSupportsDrain_001, TestSize.Level1)
 HWTEST_F(AudioRenderInterfaceImplTest, Start_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
 }
 
@@ -323,6 +333,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_002, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     audioRenderInterfaceImpl_->firstOpenFlag_ = false;
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
 }
@@ -337,6 +348,9 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_003, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     audioRenderInterfaceImpl_->firstOpenFlag_ = false;
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_CLOSE);
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Start());
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
 }
@@ -416,6 +430,9 @@ HWTEST_F(AudioRenderInterfaceImplTest, Flush_002, TestSize.Level1)
 HWTEST_F(AudioRenderInterfaceImplTest, Flush_003, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_CLOSE);
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Flush());
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Flush());
 }
@@ -551,6 +568,9 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetVolume_003, TestSize.Level1)
 {
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     float volume = 0;
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_CLOSE);
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetVolume(volume));
+    audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetVolume(volume));
 }
