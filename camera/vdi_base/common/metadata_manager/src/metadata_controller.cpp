@@ -36,6 +36,9 @@ const std::vector<int32_t> DATA_BASE = {
     OHOS_CONTROL_VIDEO_STABILIZATION_MODE,
     OHOS_CONTROL_FOCUS_STATE,
     OHOS_CONTROL_EXPOSURE_STATE,
+#ifdef V4L2_EMULATOR
+    OHOS_CONTROL_ROTATE_ANGLE,
+#endif
 };
 
 MetadataController::MetadataController() {}
@@ -179,10 +182,37 @@ bool MetadataController::IsMute()
     return isMute_;
 }
 
+#ifdef V4L2_EMULATOR
+static int32_t UpdateRotateAngle(const std::shared_ptr<CameraMetadata>& metadata, int32_t oldAngle)
+{
+    int32_t newAngle = oldAngle;
+    common_metadata_header_t *data = metadata->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_ROTATE_ANGLE, &entry);
+    if (ret == 0) {
+        if (entry.count == 1) {
+            newAngle = *entry.data.i32;
+            CAMERA_LOGI("update rotate angle, %{public}d -> %{public}d", oldAngle, newAngle);
+        } else {
+            CAMERA_LOGE("OHOS_CONTROL_ROTATE_ANGLE tag, size error %{public}d", entry.count);
+        }
+    }
+    return newAngle;
+}
+
+int32_t MetadataController::GetRotateAngle()
+{
+    return rotateAngle_;
+}
+#endif
+
 bool MetadataController::UpdateSettingsConfig(const std::shared_ptr<CameraMetadata> &meta)
 {
     bool result = false;
     isMute_ = UpdateMuteMode(meta, isMute_);
+#ifdef V4L2_EMULATOR
+    rotateAngle_ = UpdateRotateAngle(meta, rotateAngle_);
+#endif
     int32_t streamId = GetStreamId(meta);
     if (streamId < 0) {
         CAMERA_LOGE("streamId is invalid %{public}d", streamId);
