@@ -518,21 +518,19 @@ std::string UsbDeviceImpl::GetInterfaceDirName(
 
 int32_t UsbDeviceImpl::SetAuthorize(const std::string &filePath, bool authorized)
 {
-    int32_t fd;
-    int32_t ret;
     std::string content = (authorized)? ENABLE_AUTH_STR : DISABLE_AUTH_STR;
     char realPathStr[MAX_BUFFER] = {'\0'};
     if (filePath.length() >= MAX_BUFFER || realpath(filePath.c_str(), realPathStr) == nullptr) {
         HDF_LOGE("%{public}s: realpath failed. ret = %{public}s", __func__, strerror(errno));
         return HDF_FAILURE;
     }
-    fd = open(realPathStr, O_WRONLY | O_TRUNC);
+    int32_t fd = open(realPathStr, O_WRONLY | O_TRUNC);
     if (fd < 0) {
         HDF_LOGE("%{public}s: failed to reach %{public}s, errno = %{public}d",
             __func__, filePath.c_str(), errno);
         return HDF_FAILURE;
     }
-    ret = write(fd, content.c_str(), content.length());
+    int32_t ret = write(fd, content.c_str(), content.length());
     close(fd);
     if (ret < 0) {
         HDF_LOGE("%{public}s: failed to authorize usb %{public}s, errno = %{public}d",
@@ -569,15 +567,13 @@ int32_t UsbDeviceImpl::SetDefaultAuthorize(bool authorized)
 
 int32_t UsbDeviceImpl::SetGlobalDefaultAuthorize(bool authorized)
 {
-    int32_t fd;
-    int32_t ret;
     std::string content = (authorized)? "-1" : "0";
-    fd = open("/sys/module/usbcore/parameters/authorized_default", O_WRONLY | O_TRUNC);
+    int32_t fd = open("/sys/module/usbcore/parameters/authorized_default", O_WRONLY | O_TRUNC);
     if (fd < 0) {
         HDF_LOGE("%{public}s: failed to reach authorized_default, errno = %{public}d", __func__, errno);
         return HDF_FAILURE;
     }
-    ret = write(fd, content.c_str(), content.length());
+    int32_t ret = write(fd, content.c_str(), content.length());
     close(fd);
     if (ret < 0) {
         HDF_LOGE("%{public}s: failed to set usb default authorize, errno = %{public}d", __func__, errno);
