@@ -80,8 +80,8 @@ void OnGeofenceEventChange(int32_t geofenceId,  GnssLocation* location, int32_t 
     locationNew.speedAccuracy = location->speedAccuracy;
     locationNew.bearingAccuracy = location->bearingAccuracy;
     locationNew.timeForFix = location->timeForFix;
-    locationNew.timeSinceBoot = location->timeSinceBoot;
-    locationNew.timeUncertainty = location->timeUncertainty;
+    locationNew.timeSinceBoot = (int64_t)location->timeSinceBoot;
+    locationNew.timeUncertainty = (int64_t)location->timeUncertainty;
     if (g_geofenceCallBack != nullptr) {
         g_geofenceCallBack->ReportGeofenceEvent(geofenceId, locationNew, static_cast<GeofenceEvent>(event), timestamp);
     }
