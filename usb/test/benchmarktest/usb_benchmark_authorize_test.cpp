@@ -17,9 +17,9 @@
 #include <gtest/gtest.h>
 #include "hdf_log.h"
 #include "UsbSubscriberV2Test.h"
-#include "V2_0/iusb_device_interface.h"
-#include "V2_0/iusb_host_interface.h"
-#include "V2_0/usb_types.h"
+#include "v2_0/iusb_device_interface.h"
+#include "v2_0/iusb_host_interface.h"
+#include "v2_0/usb_types.h"
 
 using namespace OHOS;
 using namespace OHOS::HDI::Usb::V2_0;
