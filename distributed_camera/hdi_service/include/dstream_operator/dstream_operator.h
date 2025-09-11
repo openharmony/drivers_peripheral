@@ -43,6 +43,33 @@ using namespace OHOS::HDI::Camera::V1_0;
 using HDI::Camera::V1_1::OperationMode_V1_1;
 using HDI::Camera::V1_1::StreamInfo_V1_1;
 class DCameraProvider;
+struct ResolutionCandidate {
+    int srcWidth;
+    int srcHeight;
+    int targetWidth;
+    int targetHeight;
+    double ratio;
+    double area;
+    double diffRatio;
+    bool isSameRatio;
+    bool isAboveTarget;
+    bool isBelowTarget;
+    bool isMixed;
+
+    ResolutionCandidate(int srcWidth, int srcHeight, int targetWidth, int targetHeight)
+        : srcWidth(srcWidth), srcHeight(srcHeight), targetWidth(targetWidth), targetHeight(targetHeight)
+    {
+        area = static_cast<double>(srcWidth * srcHeight);
+        ratio = srcHeight == 0 ? 0 : static_cast<double>(srcWidth) / srcHeight;
+        double targetRatio = targetHeight == 0 ? 0 : static_cast<double>(targetWidth) / targetHeight;
+        diffRatio = std::abs(ratio - targetRatio);
+        isSameRatio = std::abs(ratio - targetRatio) < 1e-6;
+
+        isAboveTarget = (srcWidth >= targetWidth && srcHeight >= targetHeight);
+        isBelowTarget = (srcWidth <= targetWidth && srcHeight <= targetHeight);
+        isMixed = !(isAboveTarget || isBelowTarget);
+    }
+};
 class DStreamOperator : public HDI::Camera::V1_3::IStreamOperator {
 public:
     explicit DStreamOperator(std::shared_ptr<DMetadataProcessor> &dMetadataProcessor);
@@ -102,6 +129,9 @@ private:
     void ChooseSuitableFormat(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
         std::shared_ptr<DCCaptureInfo> &captureInfo);
     void ChooseSuitableResolution(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
+        std::shared_ptr<DCCaptureInfo> &captureInfo);
+    bool CompareCandidates(const ResolutionCandidate& src1, const ResolutionCandidate& src2);
+    void ResolutionAlignment(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
         std::shared_ptr<DCCaptureInfo> &captureInfo);
     void ChooseSuitableDataSpace(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
         std::shared_ptr<DCCaptureInfo> &captureInfo);

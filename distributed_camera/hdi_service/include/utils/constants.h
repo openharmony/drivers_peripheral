@@ -68,6 +68,7 @@ const std::string META_DATA_KEY = "MetaData";
 const std::string CAMERA_SUPPORT_MODE = "Mode";
 constexpr int32_t LOG_MAX_LEN = 4096;
 constexpr uint64_t SEC_TO_NSEC_TIMES = 1000000000;
+const uint32_t OHOS_CONTROL_REQUEST_CAMERA_SWITCH = 268566549;
 
 typedef enum {
     OHOS_CAMERA_FORMAT_INVALID = 0,
@@ -82,6 +83,7 @@ typedef enum {
     DCAMERA_OPERATION = 1,
     DCAMERA_SINK_STOP = 2,
     DCAMERE_GETFULLCAP = 3,
+    DCAMERE_FORCE_SWITCH = 4,
 } DCameraEventType;
 
 typedef enum {
