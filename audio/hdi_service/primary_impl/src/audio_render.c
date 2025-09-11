@@ -823,6 +823,11 @@ static int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
 
     int32_t ret =
         (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTL_WRITE);
+    if (ret == HDF_ERR_DEVICE_BUSY) {
+        int32_t retStart =
+            (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_START);
+        AUDIO_FUNC_LOGI("DMA Stopped restart again ret:%{public}d!", retStart);
+    }
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Render Frame FAIL!");
         LogError((AudioHandle)hwRender, WRITE_FRAME_ERROR_CODE, ret);
