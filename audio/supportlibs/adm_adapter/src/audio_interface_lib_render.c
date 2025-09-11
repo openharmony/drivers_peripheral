@@ -899,7 +899,10 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
             AUDIO_FUNC_LOGE("Failed to Get buffStatus!");
             return HDF_FAILURE;
         }
-
+        if (buffStatus == CIR_BUFF_STOP) {
+            AUDIO_FUNC_LOGW("DMA Stopped Failed to write buff!");
+            return HDF_ERR_DEVICE_BUSY;
+        }
         if (buffStatus != CIR_BUFF_NORMAL) {
             (void)AudioCallbackModeStatus(handleData, AUDIO_RENDER_FULL);
             tryNum--;
@@ -952,7 +955,7 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("AudioOutputRenderWriteFrame is Fail!");
         AudioFreeHdfSBuf(&sBuf, &reply);
-        return HDF_FAILURE;
+        return ret;
     }
 
     AudioFreeHdfSBuf(&sBuf, &reply);
