@@ -148,7 +148,7 @@ BENCHMARK_REGISTER_F(UsbBenchmarkFunctionTest, QueryPort)->
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
- 
+
 BENCHMARK_F(UsbBenchmarkFunctionTest, QueryPorts)(benchmark::State &state)
 {
     sptr<HDI::Usb::V2_0::IUsbPortInterface> usbPortInterface_ = nullptr;

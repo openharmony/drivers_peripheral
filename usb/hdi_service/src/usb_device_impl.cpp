@@ -22,6 +22,12 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <cctype>
+#include <string>
+#include <charconv>
+#include <thread>
 
 #include "ddk_device_manager.h"
 #include "ddk_pnp_listener_mgr.h"
@@ -50,7 +56,15 @@ V1_2::UsbdLoadService UsbDeviceImpl::loadHdfEdm_ = {HDF_EXTERNAL_DEVICE_MANAGER_
 UsbdSubscriber UsbDeviceImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbDeviceImpl::isGadgetConnected_ = false;
 bool UsbDeviceImpl::isEdmExist_ = false;
+constexpr uint32_t HUB_PREFIX_LENGTH = 3;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
+constexpr uint32_t MAX_BUFFER = 256;
+constexpr uint32_t RE_CONFIGURATION_INTERVAL_MS = 50;
+constexpr const char* DISABLE_AUTH_STR = "0";
+constexpr const char* ENABLE_AUTH_STR = "1";
+constexpr const char* BUS_NUM = "busnum";   // filename of bus number
+constexpr const char* DEV_ADDR = "devnum";  // filename of devive address
+static const std::filesystem::path AUTH_PATH("authorized");
 static const std::map<std::string, uint32_t> configMap = {
     {HDC_CONFIG_OFF, USB_FUNCTION_NONE},
     {HDC_CONFIG_HDC, USB_FUNCTION_HDC},
@@ -341,6 +355,191 @@ int32_t UsbDeviceImpl::UsbdEventHandleRelease(void)
     listenerForLoadService_.priv = nullptr;
     return ret;
 }
+
+int32_t UsbDeviceImpl::UsbDeviceAuthorize(uint8_t busNum, uint8_t devAddr, bool authorized)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    std::string dev_dirname = GetDeviceDirName(busNum, devAddr);
+    if (dev_dirname.length() == 0) {
+        HDF_LOGE("%{public}s: failed to reach busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    auto dev_dir = std::filesystem::path(SYSFS_DEVICES_DIR) / std::filesystem::path(dev_dirname);
+    dev_dir /= AUTH_PATH;
+    return SetAuthorize(dev_dir.generic_string(), authorized);
+}
+
+static bool ConvertToInt32(const std::string& str, int32_t& value)
+{
+    auto [ptr, errCode] = std::from_chars(str.data(), str.data() + str.size(), value);
+    bool ret = (errCode == std::errc{});
+    return ret;
+}
+
+int32_t UsbDeviceImpl::UsbInterfaceAuthorize(
+    const UsbDev &dev, uint8_t configId, uint8_t interfaceId, bool authorized)
+{
+    HDF_LOGI("%{public}s: enter", __func__);
+    uint8_t busNum = dev.busNum;
+    uint8_t devAddr = dev.devAddr;
+    std::string ifaceDirName = GetInterfaceDirName(busNum, devAddr, configId, interfaceId);
+    if (ifaceDirName.length() != 0) {
+        auto ifaceDir = std::filesystem::path(SYSFS_DEVICES_DIR) / std::filesystem::path(ifaceDirName);
+        if (!std::filesystem::is_directory(ifaceDir)) {
+            HDF_LOGE("%{public}s: failed to reach interface: %{public}s", __func__, ifaceDir.c_str());
+            return HDF_ERR_INVALID_PARAM;
+        }
+        ifaceDir /= AUTH_PATH;
+        auto lastState = UsbGetAttribute(ifaceDirName, AUTH_PATH.c_str());
+        if (lastState.length() == 0) {
+            HDF_LOGE("%{public}s: failed to get state of interface: %{public}s", __func__, ifaceDir.c_str());
+            return HDF_ERR_INVALID_PARAM;
+        }
+        int32_t lastStateInteger = 0;
+        if (!ConvertToInt32(lastState, lastStateInteger)) {
+            HDF_LOGE("%{public}s: failed to convert authorize to integer", __func__);
+            return HDF_ERR_INVALID_PARAM;
+        }
+        int32_t ret = SetAuthorize(ifaceDir.generic_string(), authorized);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: failed to authorize interface: %{public}s ret = %{public}d",
+                __func__, ifaceDir.c_str(), ret);
+            return ret;
+        }
+        // use lastState to check whether the interface "authorized" changed from 0 to 1
+        if (authorized && lastStateInteger == 0) {
+            // need to disable & re-enable device to bind the interface driver (due to the limit of kernel)
+            HDF_LOGI("%{public}s: re-enable device to bind the interface driver", __func__);
+            (void)UsbDeviceAuthorize(busNum, devAddr, false);
+            std::this_thread::sleep_for(std::chrono::milliseconds(RE_CONFIGURATION_INTERVAL_MS));
+            (void)UsbDeviceAuthorize(busNum, devAddr, true);
+        }
+        return ret;
+    }
+    HDF_LOGE("%{public}s: failed to reach interface", __func__);
+    return HDF_ERR_INVALID_PARAM;
+}
+
+std::string UsbDeviceImpl::UsbGetAttribute(const std::string &devDir, const std::string &attrName)
+{
+    auto attrFilePath = SYSFS_DEVICES_DIR + devDir + "/" + attrName;
+    char buf[MAX_BUFFER] = {'\0'};
+    char realPathStr[MAX_BUFFER] = {'\0'};
+    std::string s = "";
+    int32_t ret;
+    if (attrFilePath.length() >= MAX_BUFFER || realpath(attrFilePath.c_str(), realPathStr) == nullptr) {
+        HDF_LOGE("%{public}s: realpath railed. ret = %{public}s", __func__, strerror(errno));
+        return "";
+    }
+    int32_t fd = open(realPathStr, O_RDONLY);
+    if (fd >= 0) {
+        ret = read(fd, buf, sizeof(buf) - 1);
+        if (ret > 0) {
+            s = buf;
+        }
+    }
+    close(fd);
+    return s;
+}
+
+static bool ConvertToUint64(const std::string &str, uint64_t& value)
+{
+    auto [ptr, errCode] = std::from_chars(str.data(), str.data() + str.size(), value);
+    bool ret = (errCode == std::errc{});
+    return ret;
+}
+
+std::string UsbDeviceImpl::GetDeviceDirName(uint8_t busNum, uint8_t devAddr)
+{
+    std::string busNumStr = "";
+    std::string devAddrStr = "";
+    std::string deviceDir = "";
+    struct dirent *entry;
+    DIR *dir = opendir(SYSFS_DEVICES_DIR);
+    if (dir == nullptr) {
+        HDF_LOGE("%{public}s: dir is empty", __func__);
+        return "";
+    }
+    while ((entry = readdir(dir)) != nullptr) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+        deviceDir = std::string(entry->d_name);
+        busNumStr = UsbGetAttribute(deviceDir, BUS_NUM);
+        devAddrStr = UsbGetAttribute(deviceDir, DEV_ADDR);
+        uint64_t busNumConverted;
+        uint64_t devAddrConverted;
+        bool busNumResult = ConvertToUint64(busNumStr, busNumConverted);
+        bool devAddrResult = ConvertToUint64(devAddrStr, devAddrConverted);
+        if (!busNumResult || !devAddrResult) {
+            HDF_LOGE("%{public}s: failed to convert busNumStr: %{public}s or devAddrStr: %{public}s",
+                __func__, busNumStr.c_str(), devAddrStr.c_str());
+            deviceDir = "";
+            continue;
+        }
+        if (busNumConverted > UINT8_MAX || devAddrConverted > UINT8_MAX) {
+            HDF_LOGE("%{public}s: value out of range: busNum=%{public}llu, devAddr=%{public}llu",
+                __func__, busNumConverted, devAddrConverted);
+            deviceDir = "";
+            continue;
+        }
+        if (busNumStr.length() > 0 && devAddrStr.length() > 0 &&
+            static_cast<uint8_t>(busNumConverted) == busNum &&
+            static_cast<uint8_t>(devAddrConverted) == devAddr) {
+            break;
+        } else {
+            deviceDir = "";
+        }
+    }
+    closedir(dir);
+    return deviceDir;
+}
+
+std::string UsbDeviceImpl::GetInterfaceDirName(
+    uint8_t busNum, uint8_t devAddr, uint8_t configId, uint8_t interfaceId)
+{
+    auto ifaceStr = std::to_string(configId) + "." + std::to_string(interfaceId);
+    auto deviceStr = GetDeviceDirName(busNum, devAddr);
+    if (deviceStr.length() == 0) {
+        return "";
+    }
+    if (deviceStr.substr(0, HUB_PREFIX_LENGTH) == "usb") {
+        // root hub is named "usbx", the iface folders begin with "x-0:"
+        ifaceStr = deviceStr.substr(HUB_PREFIX_LENGTH) + "-0:" + ifaceStr;
+    } else {
+        ifaceStr = deviceStr + ":" + ifaceStr;
+    }
+    return deviceStr + "/" + ifaceStr;
+}
+
+int32_t UsbDeviceImpl::SetAuthorize(const std::string &filePath, bool authorized)
+{
+    int32_t fd;
+    int32_t ret;
+    std::string content = (authorized)? ENABLE_AUTH_STR : DISABLE_AUTH_STR;
+    char realPathStr[MAX_BUFFER] = {'\0'};
+    if (filePath.length() >= MAX_BUFFER || realpath(filePath.c_str(), realPathStr) == nullptr) {
+        HDF_LOGE("%{public}s: realpath failed. ret = %{public}s", __func__, strerror(errno));
+        return HDF_FAILURE;
+    }
+    fd = open(realPathStr, O_WRONLY | O_TRUNC);
+    if (fd < 0) {
+        HDF_LOGE("%{public}s: failed to reach %{public}s, errno = %{public}d",
+            __func__, filePath.c_str(), errno);
+        return HDF_FAILURE;
+    }
+    ret = write(fd, content.c_str(), content.length());
+    close(fd);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: failed to authorize usb %{public}s, errno = %{public}d",
+            __func__, filePath.c_str(), errno);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("%{public}s: usb %{public}s write %{public}s finished", __func__,
+        filePath.c_str(), content.c_str());
+    return HDF_SUCCESS;
+}
+
 } // namespace v2_0
 } // namespace Usb
 } // namespace HDI

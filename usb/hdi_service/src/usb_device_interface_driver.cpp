@@ -87,7 +87,7 @@ static int HdfUsbDeviceInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfUsbDeviceInterfaceHost;
-        hdfUsbDeviceInterfaceHost =nullptr;
+        hdfUsbDeviceInterfaceHost = nullptr;
         return HDF_FAILURE;
     }
 

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "usbdeviceauthorize_fuzzer.h"
+#include "usbinterfaceauthorize_fuzzer.h"
 #include <unistd.h>
 #include "hdf_log.h"
 #include "securec.h"
@@ -31,7 +31,7 @@ struct Parameters {
     uint8_t configId;
     uint8_t interfaceId;
     bool authorized;
-}
+};
 
 bool UsbInterfaceAuthorizeFuzzTest(const uint8_t *data, size_t size)
 {

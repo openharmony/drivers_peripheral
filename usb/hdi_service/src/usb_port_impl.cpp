@@ -110,6 +110,7 @@ int32_t UsbPortImpl::QueryPorts(std::vector<UsbPort>& portList)
         }
         return HDF_SUCCESS;
     }
+
     int32_t portId = 0;
     int32_t powerRole = 0;
     int32_t dataRole = 0;
