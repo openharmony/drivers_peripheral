@@ -187,6 +187,8 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
 #ifdef V4L2_EMULATOR
     DealCameraFoldStatus(node, metadata);
     DealCameraFoldScreenType(node, metadata);
+    DealSensorOrientationVariable(node, metadata);
+    DealFoldStateSensorOrientationMap(node, metadata);
 #endif
     cameraMetadataMap_.insert(std::make_pair(cameraId, metadata));
     return RC_OK;
@@ -1050,5 +1052,66 @@ RetCode HcsDeal::DealCameraFoldScreenType(
     CAMERA_LOGI("cameraFoldScreenType add success");
     return RC_OK;
 }
+
+RetCode HcsDeal::DealSensorOrientationVariable(
+    const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    const char *nodeValue = nullptr;
+    int32_t sensorOrientationVariable;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "sensorOrientationVariable", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get sensorOrientationVariable failed");
+        return RC_ERROR;
+    }
+
+    sensorOrientationVariable = (int32_t)strtol(nodeValue, NULL, STRTOL_BASE);
+    CAMERA_LOGI("sensorOrientationVariable  = %{public}d", sensorOrientationVariable);
+
+    constexpr uint32_t DATA_COUNT = 1;
+    bool ret = metadata->addEntry(OHOS_ABILITY_SENSOR_ORIENTATION_VARIABLE,
+        static_cast<const void *>(&sensorOrientationVariable), DATA_COUNT);
+    if (!ret) {
+        CAMERA_LOGE("sensorOrientationVariable add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("sensorOrientationVariable add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealFoldStateSensorOrientationMap(
+    const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, "foldStateSensorOrientationMap");
+    CAMERA_LOGD("elemNum = %{public}d", elemNum);
+    if (elemNum <= 0) {
+        CAMERA_LOGD("elemNum <= 0");
+        return RC_ERROR;
+    }
+
+    int hcbRet;
+    uint32_t nodeValue;
+    std::vector<int32_t> foldStateSensorOrientationMapInt32s;
+
+    for (int i = 0; i < elemNum; i++) {
+        hcbRet = pDevResIns->GetUint32ArrayElem(&metadataNode, "foldStateSensorOrientationMap", i, &nodeValue, -1);
+        if (hcbRet != 0 && nodeValue != UINT32_MAX) {
+            CAMERA_LOGE("get foldStateSensorOrientationMap failed");
+            continue;
+        }
+        foldStateSensorOrientationMapInt32s.push_back(static_cast<int32_t>(nodeValue));
+        CAMERA_LOGD("nodeValue = %{public}u", nodeValue);
+    }
+
+    bool ret = metadata->addEntry(OHOS_FOLD_STATE_SENSOR_ORIENTATION_MAP,
+        foldStateSensorOrientationMapInt32s.data(), foldStateSensorOrientationMapInt32s.size());
+    if (!ret) {
+        CAMERA_LOGD("foldStateSensorOrientationMap add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("foldStateSensorOrientationMap add success");
+    return RC_OK;
+}
+
 #endif
 } // namespace OHOS::Camera
