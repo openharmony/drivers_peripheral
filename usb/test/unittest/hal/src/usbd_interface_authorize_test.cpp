@@ -33,11 +33,11 @@ namespace OHOS {
 namespace USB {
 namespace UsbInterfaceAuthorize {
 const uint8_t BUS_NUM_INVALID = 255;
-cosnt uint8_t DEV_ADDR_INVALID = 255;
-cosnt uint8_t CONFIG_ID_OK = 1;
-cosnt uint8_t CONFIG_ID_INVALID = 255;
-cosnt uint8_t INTERFACEID_OK_NEW = 0;
-cosnt uint8_t INTERFACEID_INVALID = 255;
+const uint8_t DEV_ADDR_INVALID = 255;
+const uint8_t CONFIG_ID_OK = 1;
+const uint8_t CONFIG_ID_INVALID = 255;
+const uint8_t INTERFACEID_OK_NEW = 0;
+const uint8_t INTERFACEID_INVALID = 255;
 uint8_t g_configId = CONFIG_ID_OK;
 uint8_t g_interfaceId = INTERFACEID_OK_NEW;
 UsbDev dev_ = {0, 0};
@@ -48,7 +48,7 @@ sptr<IUsbDeviceInterface> g_usbDeviceInterface = nullptr;
 void UsbdInterfaceAuthorizeTest::SetUpTestCase(void)
 {
     g_usbHostInterface = IUsbHostInterface::Get(true);
-    g_usbDeviceInterface = IUsbHostInterface::Get();
+    g_usbDeviceInterface = IUsbDeviceInterface::Get();
     if (g_usbHostInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbHostInterface::Get() failed.", __func__);
         exit(0);
@@ -63,7 +63,6 @@ void UsbdInterfaceAuthorizeTest::SetUpTestCase(void)
         HDF_LOGE("%{public}s: bind usbd subscriber_ failed", __func__);
         exit(0);
     }
-
     std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
@@ -412,7 +411,7 @@ HWTEST_F(UsbdInterfaceAuthorizeTest, UsbdInterfaceAuthorize016, TestSize.Level1)
  * @tc.name: UsbdInterfaceAuthorize017
  * @tc.desc: Test functions to UsbInterfaceAuthorize
  * @tc.desc: int32_t UsbInterfaceAuthorize(const UsbDev &dev, uint8_t configId, uint8_t interfaceId, bool authorized);
- * @tc.desc: Negative test: parameters correctly, authorized = true
+ * @tc.desc: Positive test: parameters correctly, authorized = true
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdInterfaceAuthorizeTest, UsbdInterfaceAuthorize017, TestSize.Level1)
@@ -424,7 +423,7 @@ HWTEST_F(UsbdInterfaceAuthorizeTest, UsbdInterfaceAuthorize017, TestSize.Level1)
     HDF_LOGI(
         "UsbdInterfaceAuthorizeTest::UsbdInterfaceAuthorize017 %{public}d UsbInterfaceAuthorize=%{public}d",
         __LINE__, ret);
-    EXPECT_NE(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 } // UsbInterfaceAuthorize
