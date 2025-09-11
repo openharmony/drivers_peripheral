@@ -359,14 +359,18 @@ int32_t UsbDeviceImpl::UsbdEventHandleRelease(void)
 int32_t UsbDeviceImpl::UsbDeviceAuthorize(uint8_t busNum, uint8_t devAddr, bool authorized)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    std::string dev_dirname = GetDeviceDirName(busNum, devAddr);
-    if (dev_dirname.length() == 0) {
+    if (busNum == 0 && devAddr == 0) {
+        return SetDefaultAuthorize(authorized);
+    }
+
+    std::string devDirname = GetDeviceDirName(busNum, devAddr);
+    if (devDirname.length() == 0) {
         HDF_LOGE("%{public}s: failed to reach busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
         return HDF_ERR_INVALID_PARAM;
     }
-    auto dev_dir = std::filesystem::path(SYSFS_DEVICES_DIR) / std::filesystem::path(dev_dirname);
-    dev_dir /= AUTH_PATH;
-    return SetAuthorize(dev_dir.generic_string(), authorized);
+    auto devDir = std::filesystem::path(SYSFS_DEVICES_DIR) / std::filesystem::path(devDirname);
+    devDir /= AUTH_PATH;
+    return SetAuthorize(devDir.generic_string(), authorized);
 }
 
 static bool ConvertToInt32(const std::string& str, int32_t& value)
@@ -537,6 +541,49 @@ int32_t UsbDeviceImpl::SetAuthorize(const std::string &filePath, bool authorized
     }
     HDF_LOGI("%{public}s: usb %{public}s write %{public}s finished", __func__,
         filePath.c_str(), content.c_str());
+    return HDF_SUCCESS;
+}
+
+int32_t UsbDeviceImpl::SetDefaultAuthorize(bool authorized)
+{
+    int32_t ret = SetGlobalDefaultAuthorize(authorized);
+    std::string hubDir;
+    struct dirent *entry;
+    DIR *dir = opendir(SYSFS_DEVICES_DIR);
+    if (dir == nullptr) {
+        HDF_LOGE("%{public}s: dir is empty", __func__);
+        return HDF_FAILURE;
+    }
+    while ((entry = readdir(dir)) != nullptr) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+        hubDir = std::string(entry->d_name);
+        // set all authorized values (hubs have "authorized_default" attribute), and just ignore any failure here
+        (void)SetAuthorize(SYSFS_DEVICES_DIR + hubDir + "/authorized_default", authorized);
+        (void)SetAuthorize(SYSFS_DEVICES_DIR + hubDir + "/authorized_default", authorized);
+    }
+    closedir(dir);
+    return ret;
+}
+
+int32_t UsbDeviceImpl::SetGlobalDefaultAuthorize(bool authorized)
+{
+    int32_t fd;
+    int32_t ret;
+    std::string content = (authorized)? "-1" : "0";
+    fd = open("/sys/module/usbcore/parameters/authorized_default", O_WRONLY | O_TRUNC);
+    if (fd < 0) {
+        HDF_LOGE("%{public}s: failed to reach authorized_default, errno = %{public}d", __func__, errno);
+        return HDF_FAILURE;
+    }
+    ret = write(fd, content.c_str(), content.length());
+    close(fd);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: failed to set usb default authorize, errno = %{public}d", __func__, errno);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("%{public}s: set usb global default authorize %{public}s finished", __func__, content.c_str());
     return HDF_SUCCESS;
 }
 

@@ -34,7 +34,7 @@ namespace OHOS {
 namespace USB {
 namespace UsbDeviceAuthorize {
 const uint8_t BUS_NUM_INVALID = 255;
-cosnt uint8_t DEV_ADDR_INVALID = 255;
+const uint8_t DEV_ADDR_INVALID = 255;
 UsbDev dev_ = {0, 0};
 sptr<OHOS::USB::UsbSubscriberTest> UsbdDeviceAuthorizeTest::subscriber_ = nullptr;
 sptr<HDI::Usb::V2_0::IUsbHostInterface> g_usbHostInterface = nullptr;
@@ -43,7 +43,7 @@ sptr<HDI::Usb::V2_0::IUsbDeviceInterface> g_usbDeviceInterface = nullptr;
 void UsbdDeviceAuthorizeTest::SetUpTestCase(void)
 {
     g_usbHostInterface = HDI::Usb::V2_0::IUsbHostInterface::Get();
-    g_usbDeviceInterface = HDI::Usb::V2_0::IUsbHostInterface::Get();
+    g_usbDeviceInterface = HDI::Usb::V2_0::IUsbDeviceInterface::Get();
     if (g_usbHostInterface == nullptr) {
         HDF_LOGE("%{public}s:IUsbHostInterface::Get() failed.", __func__);
         exit(0);
@@ -58,7 +58,6 @@ void UsbdDeviceAuthorizeTest::SetUpTestCase(void)
         HDF_LOGE("%{public}s: bind usbd subscriber_ failed", __func__);
         exit(0);
     }
-
     std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
@@ -103,7 +102,7 @@ HWTEST_F(UsbdDeviceAuthorizeTest, UsbdDeviceAuthorize001, TestSize.Level1)
  * @tc.name: UsbdDeviceAuthorize002
  * @tc.desc: Test functions to UsbDeviceAuthorize
  * @tc.desc: int32_t UsbDeviceAuthorize(uint8_t devNum, uint8_t devAddr, bool authorized);
- * @tc.desc: Positive test: parameters exception, busNum error
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdDeviceAuthorizeTest, UsbdDeviceAuthorize002, TestSize.Level1)
@@ -120,7 +119,7 @@ HWTEST_F(UsbdDeviceAuthorizeTest, UsbdDeviceAuthorize002, TestSize.Level1)
  * @tc.name: UsbdDeviceAuthorize003
  * @tc.desc: Test functions to UsbDeviceAuthorize
  * @tc.desc: int32_t UsbDeviceAuthorize(uint8_t devNum, uint8_t devAddr, bool authorized);
- * @tc.desc: Positive test: parameters exception, devAddr error
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdDeviceAuthorizeTest, UsbdDeviceAuthorize003, TestSize.Level1)
@@ -137,7 +136,7 @@ HWTEST_F(UsbdDeviceAuthorizeTest, UsbdDeviceAuthorize003, TestSize.Level1)
  * @tc.name: UsbdDeviceAuthorize004
  * @tc.desc: Test functions to UsbDeviceAuthorize
  * @tc.desc: int32_t UsbDeviceAuthorize(uint8_t devNum, uint8_t devAddr, bool authorized);
- * @tc.desc: Positive test: parameters exception, busNum && devAddr error
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdDeviceAuthorizeTest, UsbdDeviceAuthorize004, TestSize.Level1)
