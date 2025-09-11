@@ -17,6 +17,7 @@
 #define OHOS_HDI_USB_V2_0_USB_DEVICE_IMPL_H
 
 #include <iostream>
+#include <filesystem>
 
 #include "hdf_slist.h"
 #include "hdf_usb_pnp_manage.h"
@@ -28,6 +29,10 @@
 #include "usbd_load_usb_service.h"
 #include "usbd_port.h"
 #include "v2_0/iusb_device_interface.h"
+
+#ifndef SYSFS_DEVICES_DIR
+#define SYSFS_DEVICES_DIR "/sys/bus/usb/devices/"
+#endif
 
 #define BASE_CLASS_HUB 0x09
 constexpr uint8_t MAX_INTERFACEID = 0xFF;
@@ -48,6 +53,9 @@ public:
     int32_t GetAccessoryInfo(std::vector<std::string> &accessoryInfo) override;
     int32_t OpenAccessory(int32_t &fd) override;
     int32_t CloseAccessory(int32_t fd) override;
+    int32_t UsbDeviceAuthorize(uint8_t devNum, uint8_t devAddr, bool authorized) override;
+    int32_t UsbInterfaceAuthorize(
+        const UsbDev &dev, uint8_t configId, uint8_t interfaceId, bool authorized) override;
     static int32_t UsbdEventHandle(void);
     static int32_t UsbdEventHandleRelease(void);
     class UsbDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -62,6 +70,10 @@ private:
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
     static void UpdateFunctionStatus(void);
+    std::string UsbGetAttribute(const std::string &devDir, const std::string &attrName);
+    std::string GetDeviceDirName(uint8_t devNum, uint8_t devAddr);
+    std::string GetInterfaceDirName(uint8_t devNum, uint8_t devAddr, uint8_t configId, uint8_t interfaceId);
+    int32_t SetAuthorize(const std::string &filePath, bool authorized);
     static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];
     static bool isGadgetConnected_;
     static bool isEdmExist_;
