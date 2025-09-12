@@ -280,7 +280,7 @@ std::string V4L2DeviceManager::CameraIdToHardware(CameraId cameraId, ManagerId m
             return (*iter).hardwareName;
         }
     }
-    return nullptr;
+    return "";
 }
 
 CameraId V4L2DeviceManager::HardwareToCameraId(std::string hardwareName)
