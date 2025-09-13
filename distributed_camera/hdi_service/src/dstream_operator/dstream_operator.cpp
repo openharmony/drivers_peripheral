@@ -242,6 +242,13 @@ int32_t DStreamOperator::CommitStreams_V1_1(OperationMode_V1_1 mode, const std::
         DHLOGE("DCameraProvider not init.");
         return CamRetCode::DEVICE_ERROR;
     }
+    bool isForceSwitch = dProvider->IsForceSwitch();
+    DHLOGI("IsForceSwitch: %{public}d", isForceSwitch);
+    if (isForceSwitch) {
+        DCameraHDFEvent dCameraEvent;
+        dCameraEvent.type_ = DCameraEventType::DCAMERE_FORCE_SWITCH;
+        dProvider->Notify(dhBase_, dCameraEvent);
+    }
     ret = dProvider->ConfigureStreams(dhBase_, dCameraStreams);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("Commit distributed camera streams failed.");
@@ -1126,13 +1133,96 @@ DCamRetCode DStreamOperator::GetInputCaptureInfo(const CaptureInfo& srcCaptureIn
     return DCamRetCode::SUCCESS;
 }
 
+bool DStreamOperator::CompareCandidates(const ResolutionCandidate& src1, const ResolutionCandidate& src2)
+{
+    DHLOGI("Start CompareCandidates");
+    if (src1.isSameRatio != src2.isSameRatio) {
+        DHLOGI("Priority for the same aspect ratio");
+        return src1.isSameRatio;
+    }
+    if (src1.isSameRatio) {
+        if (src1.isAboveTarget && src2.isAboveTarget) {
+            DHLOGI("First Priority: Both width and height are >= target, with the smallest area.");
+            return src1.area < src2.area;
+        }
+        if (src1.isBelowTarget && src2.isBelowTarget) {
+            DHLOGI("Second priority: Both width and height are <= target, with the largest area.");
+            return src1.area > src2.area;
+        }
+        DHLOGI("Prioritize those with the same aspect ratio, and choose the larger one.");
+        return src1.isAboveTarget ? true : false;
+    }
+    if (src1.diffRatio != src2.diffRatio) {
+        DHLOGI("Aspect ratios vary; sorted by proximity to the target aspect ratio.");
+        return src1.diffRatio < src2.diffRatio;
+    }
+    if (src1.isAboveTarget && src2.isAboveTarget) {
+        DHLOGI("Third Priority: Aspect ratios differ but are both >= target, with the smallest area.");
+        return src1.area < src2.area;
+    }
+    if (src1.isBelowTarget && src2.isBelowTarget) {
+        DHLOGI("Priority Four: Aspect ratios differ but are all <= target, with the largest area.");
+        return src1.area > src2.area;
+    }
+    DHLOGI("Priority Five: Different aspect ratios, some larger and some smaller, based on the closest area.");
+    return std::abs(src1.area - src1.targetWidth * src1.targetHeight) <
+           std::abs(src2.area - src2.targetWidth * src2.targetHeight);
+}
+
+void DStreamOperator::ResolutionAlignment(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
+    std::shared_ptr<DCCaptureInfo> &captureInfo)
+{
+    DHLOGI("Start ResolutionAlignment");
+    if (captureInfo == nullptr) {
+        DHLOGE("DStreamOperator::ChooseSuitableResolution, captureInfo is null.");
+        return;
+    }
+    std::vector<DCResolution> supportedResolutionList;
+    if ((streamInfo.at(0))->type_ == DCStreamType::CONTINUOUS_FRAME) {
+        supportedResolutionList = dcSupportedPreviewResolutionMap_[captureInfo->format_];
+    } else {
+        supportedResolutionList = dcSupportedPhotoResolutionMap_[captureInfo->format_];
+    }
+
+    for (auto stream : streamInfo) {
+        captureInfo->streamIds_.push_back(stream->streamId_);
+    }
+
+    std::lock_guard<std::mutex> autoLock(streamAttrLock_);
+    std::vector<ResolutionCandidate> candidates;
+    for (auto& profile : supportedResolutionList) {
+        candidates.emplace_back(profile.width_, profile.height_, streamInfo.at(0)->width_, streamInfo.at(0)->height_);
+    }
+    std::sort(candidates.begin(), candidates.end(),
+        [this](const ResolutionCandidate& src1, const ResolutionCandidate& src2) {
+        return this->CompareCandidates(src1, src2);
+    });
+    if (candidates.size() > 0) {
+        DHLOGI("ResolutionAlignment resolusion change: %{public}d x %{public}d -> %{public}d x %{public}d",
+            captureInfo->width_, captureInfo->height_, candidates[0].srcWidth, candidates[0].srcHeight);
+        captureInfo->width_ = candidates[0].srcWidth;
+        captureInfo->height_ = candidates[0].srcHeight;
+    }
+}
+
 std::shared_ptr<DCCaptureInfo> DStreamOperator::BuildSuitableCaptureInfo(const CaptureInfo& srcCaptureInfo,
     std::vector<std::shared_ptr<DCStreamInfo>> &srcStreamInfo)
 {
     std::shared_ptr<DCCaptureInfo> captureInfo = std::make_shared<DCCaptureInfo>();
 
     ChooseSuitableFormat(srcStreamInfo, captureInfo);
-    ChooseSuitableResolution(srcStreamInfo, captureInfo);
+    OHOS::sptr<DCameraProvider> dProvider = DCameraProvider::GetInstance();
+    if (dProvider == nullptr) {
+        DHLOGE("DCameraProvider not init.");
+        return captureInfo;
+    }
+    bool isForceSwitch = dProvider->IsForceSwitch();
+    DHLOGI("BuildSuitableCaptureInfo ForceSwitch: %{public}d", isForceSwitch);
+    if (isForceSwitch) {
+        ResolutionAlignment(srcStreamInfo, captureInfo);
+    } else {
+        ChooseSuitableResolution(srcStreamInfo, captureInfo);
+    }
     ChooseSuitableDataSpace(srcStreamInfo, captureInfo);
     ChooseSuitableEncodeType(srcStreamInfo, captureInfo);
 

@@ -236,6 +236,12 @@ int32_t DCameraProvider::Notify(const DHBase& dhBase, const DCameraHDFEvent& eve
     DHLOGI("DCameraProvider::Notify for {devId: %{public}s, dhId: %{public}s}.",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
+    if (event.type_ == DCAMERE_FORCE_SWITCH) {
+        sptr<IDCameraProviderCallback> callback = GetCallbackBydhBase(dhBase);
+        callback->NotifyEvent(dhBase, event);
+        return DCamRetCode::SUCCESS;
+    }
+
     OHOS::sptr<DCameraDevice> device = GetDCameraDevice(dhBase);
     if (device == nullptr) {
         DHLOGE("DCameraProvider::Notify failed, dcamera device not found.");
@@ -410,6 +416,17 @@ int32_t DCameraProvider::UpdateSettings(const DHBase &dhBase, const std::vector<
     }
 
     return callback->UpdateSettings(dhBase, settings);
+}
+
+bool DCameraProvider::IsForceSwitch()
+{
+    return isForceSwitch_;
+}
+
+int32_t DCameraProvider::SetForceSwitch(bool forceSwitch)
+{
+    isForceSwitch_ = forceSwitch;
+    return DCamRetCode::SUCCESS;
 }
 
 bool DCameraProvider::IsDCameraSettingsInvalid(const DCameraSettings& result)
