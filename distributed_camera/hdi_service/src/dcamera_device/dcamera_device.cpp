@@ -235,7 +235,15 @@ int32_t DCameraDevice::UpdateSettings(const std::vector<uint8_t>& settings)
         DHLOGE("Distributed camera provider instance is null.");
         return CamRetCode::DEVICE_ERROR;
     }
-    int32_t ret = provider->UpdateSettings(dhBase_, dcSettings);
+    camera_metadata_item_t forceSwitchItem;
+    int32_t ret = OHOS::Camera::FindCameraMetadataItem(updateSettings->get(),
+        OHOS_CONTROL_REQUEST_CAMERA_SWITCH, &forceSwitchItem);
+    if (ret == CAM_META_SUCCESS) {
+        bool isForceSwitch = (bool)forceSwitchItem.data.u8[0];
+        DHLOGI("isForceSwitch: %{public}d", isForceSwitch);
+        provider->SetForceSwitch(isForceSwitch);
+    }
+    ret = provider->UpdateSettings(dhBase_, dcSettings);
 
     return MapToExternalRetCode(static_cast<DCamRetCode>(ret));
 }
@@ -361,6 +369,7 @@ int32_t DCameraDevice::Close()
         dCameraStreamOperator_ = nullptr;
     }
     if (provider != nullptr) {
+        provider->SetForceSwitch(false);
         provider->CloseSession(dhBase_);
     }
     if (dMetadataProcessor_ != nullptr) {
