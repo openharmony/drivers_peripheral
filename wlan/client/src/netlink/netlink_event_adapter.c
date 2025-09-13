@@ -462,12 +462,34 @@ static int32_t CtrlNoSeqCheck(struct nl_msg *msg, void *arg)
         HILOG_ERROR(LOG_CORE, "%s: failed to get frame data", __FUNCTION__);
         return NL_OK;
     }
-
-    WifiActionData actionData;
-    actionData.data = nla_data(attr[NL80211_ATTR_FRAME]);
-    actionData.dataLen = (uint32_t)nla_len(attr[NL80211_ATTR_FRAME]);
-    HILOG_INFO(LOG_CORE, "%s: receive data len = %{public}d", __FUNCTION__, actionData.dataLen);
-    WifiEventReport("p2p0", WIFI_EVENT_ACTION_RECEIVED, &actionData);
+    uint32_t dataLen = (uint32_t)nla_len(attr[NL80211_ATTR_FRAME]);
+    if (dataLen == 0 || dataLen > BUFSIZE) {
+        return NL_OK;
+    }
+    uint8_t *tempData = OsalMemCalloc(dataLen + 1);
+    if (tempData == NULL) {
+        return NL_OK;
+    }
+    (void)memset_s(tempData, dataLen + 1, 0, dataLen + 1);
+    do {
+        if (memcpy_s(tempData, dataLen + 1, nla_data(attr[NL80211_ATTR_FRAME]), dataLen) != EOK) {
+            break;
+        }
+        uint32_t rssi = 0;
+        if (attr[NL80211_ATTR_RX_SIGNAL_DBM]) {
+            rssi = nla_get_u32(attr[NL80211_ATTR_RX_SIGNAL_DBM]);
+            uint8_t tempRssi = (uint8_t)(rssi & 0xFF);
+            tempData[dataLen] = tempRssi;
+        }
+        WifiActionData actionData;
+        actionData.data = tempData;
+        actionData.dataLen = dataLen + 1;
+        HILOG_INFO(LOG_CORE, "%s: receive data len = %{public}d, rssi = %{public}d", __FUNCTION__,
+            actionData.dataLen, rssi);
+        WifiEventReport("p2p0", WIFI_EVENT_ACTION_RECEIVED, &actionData);
+    } while (0);
+    OsalMemFree(tempData);
+    tempData = NULL;
     return NL_OK;
 }
 
