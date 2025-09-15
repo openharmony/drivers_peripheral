@@ -796,12 +796,14 @@ static bool IsNotMock()
  */
 HWTEST_F(HdiServiceTest, ProviderIsNotNull, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "ProviderIsNotNull function start!");
     ASSERT_TRUE(giver_ != nullptr);
     if (!IsNotMock()) {
         giver_->SetSysFilePath(MOCK_BATTERY_PATH);
         BATTERY_HILOGI(LABEL_TEST, "Is mock test");
     }
     giver_->InitPowerSupplySysfs();
+    BATTERY_HILOGI(LABEL_TEST, "ProviderIsNotNull function end!");
 }
 
 /**
@@ -811,6 +813,7 @@ HWTEST_F(HdiServiceTest, ProviderIsNotNull, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService001, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService001 function start!");
     int32_t temperature = 0;
     if (IsNotMock()) {
         giver_->ParseTemperature(&temperature);
@@ -824,6 +827,7 @@ HWTEST_F(HdiServiceTest, HdiService001, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "HdiService001::temperature=%{public}d.", temperature);
         ASSERT_TRUE(temperature == 567);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService001 function end!");
 }
 
 /**
@@ -833,6 +837,7 @@ HWTEST_F(HdiServiceTest, HdiService001, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService002, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService002 function start!");
     int32_t voltage = 0;
     if (IsNotMock()) {
         giver_->ParseVoltage(&voltage);
@@ -846,6 +851,7 @@ HWTEST_F(HdiServiceTest, HdiService002, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService002::voltage=%{public}d", voltage);
         ASSERT_TRUE(voltage == 4123456);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService002 function end!");
 }
 
 /**
@@ -855,6 +861,7 @@ HWTEST_F(HdiServiceTest, HdiService002, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService003, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService003 function start!");
     int32_t capacity = -1;
     if (IsNotMock()) {
         giver_->ParseCapacity(&capacity);
@@ -868,6 +875,7 @@ HWTEST_F(HdiServiceTest, HdiService003, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "HdiService003::capacity=%{public}d", capacity);
         ASSERT_TRUE(capacity == 11);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService003 function end!");
 }
 
 /**
@@ -877,6 +885,7 @@ HWTEST_F(HdiServiceTest, HdiService003, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService004, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService004 function start!");
     int32_t healthState = -1;
     if (IsNotMock()) {
         giver_->ParseHealthState(&healthState);
@@ -891,6 +900,7 @@ HWTEST_F(HdiServiceTest, HdiService004, TestSize.Level0)
         ASSERT_TRUE(PowerSupplyProvider::BatteryHealthState(healthState) ==
             PowerSupplyProvider::BatteryHealthState::BATTERY_HEALTH_GOOD);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService004 function end!");
 }
 
 /**
@@ -900,6 +910,7 @@ HWTEST_F(HdiServiceTest, HdiService004, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService005, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService005 function start!");
     int32_t pluggedType = PowerSupplyProvider::PLUGGED_TYPE_NONE;
     if (IsNotMock()) {
         giver_->ParsePluggedType(&pluggedType);
@@ -915,6 +926,7 @@ HWTEST_F(HdiServiceTest, HdiService005, TestSize.Level0)
         ASSERT_TRUE(PowerSupplyProvider::BatteryPluggedType(pluggedType) ==
             PowerSupplyProvider::BatteryPluggedType::PLUGGED_TYPE_WIRELESS);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService005 function end!");
 }
 
 /**
@@ -924,6 +936,7 @@ HWTEST_F(HdiServiceTest, HdiService005, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService006, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService006 function start!");
     int32_t chargeState = PowerSupplyProvider::CHARGE_STATE_RESERVED;
     if (IsNotMock()) {
         giver_->ParseChargeState(&chargeState);
@@ -938,6 +951,7 @@ HWTEST_F(HdiServiceTest, HdiService006, TestSize.Level0)
         ASSERT_TRUE(PowerSupplyProvider::BatteryChargeState(chargeState) ==
             PowerSupplyProvider::BatteryChargeState::CHARGE_STATE_DISABLE);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService006 function end!");
 }
 
 /**
@@ -947,6 +961,7 @@ HWTEST_F(HdiServiceTest, HdiService006, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService007, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService007 function start!");
     int32_t chargeCounter = -1;
     if (IsNotMock()) {
         giver_->ParseChargeCounter(&chargeCounter);
@@ -960,6 +975,7 @@ HWTEST_F(HdiServiceTest, HdiService007, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "HdiService007::chargeCounter=%{public}d.", chargeCounter);
         ASSERT_TRUE(chargeCounter == 12345);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService007 function end!");
 }
 
 /**
@@ -969,6 +985,7 @@ HWTEST_F(HdiServiceTest, HdiService007, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService008, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService008 function start!");
     int8_t present = -1;
     if (IsNotMock()) {
         giver_->ParsePresent(&present);
@@ -981,6 +998,7 @@ HWTEST_F(HdiServiceTest, HdiService008, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "HdiService008::present=%{public}d.", present);
         ASSERT_TRUE(present == 1);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService008 function end!");
 }
 
 /**
@@ -990,6 +1008,7 @@ HWTEST_F(HdiServiceTest, HdiService008, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService009, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService009 function start!");
     std::string technology = "invalid";
     if (IsNotMock()) {
         giver_->ParseTechnology(technology);
@@ -1004,6 +1023,7 @@ HWTEST_F(HdiServiceTest, HdiService009, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "HdiService009::technology=%{public}s.", technology.c_str());
         ASSERT_TRUE(technology == "Li");
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService009 function end!");
 }
 
 /**
@@ -1013,6 +1033,7 @@ HWTEST_F(HdiServiceTest, HdiService009, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService010, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService010 function start!");
     using namespace OHOS::HDI::Battery::V2_0;
 
     BatteryThread bt;
@@ -1021,6 +1042,7 @@ HWTEST_F(HdiServiceTest, HdiService010, TestSize.Level0)
 
     ASSERT_TRUE(fd > 0);
     close(fd);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService010 function end!");
 }
 
 /**
@@ -1030,6 +1052,7 @@ HWTEST_F(HdiServiceTest, HdiService010, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService011, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService011 function start!");
     const int32_t CHARGE_STATE_ENABLE = 1;
     BatteryThread bt;
 
@@ -1038,6 +1061,7 @@ HWTEST_F(HdiServiceTest, HdiService011, TestSize.Level0)
     BATTERY_HILOGI(LABEL_TEST, "HdiService011::epollInterval=%{public}d.", epollInterval);
 
     ASSERT_TRUE(epollInterval == 2000);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService011 function end!");
 }
 
 /**
@@ -1047,6 +1071,7 @@ HWTEST_F(HdiServiceTest, HdiService011, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService012, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService012 function start!");
     const int32_t CHARGE_STATE_NONE = 0;
     BatteryThread bt;
 
@@ -1055,6 +1080,7 @@ HWTEST_F(HdiServiceTest, HdiService012, TestSize.Level0)
     BATTERY_HILOGI(LABEL_TEST, "HdiService012::epollInterval=%{public}d.", epollInterval);
 
     ASSERT_TRUE(epollInterval == -1);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService012 function end!");
 }
 
 /**
@@ -1064,6 +1090,7 @@ HWTEST_F(HdiServiceTest, HdiService012, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService013, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService013 function start!");
     void* service = nullptr;
     BatteryThread bt;
 
@@ -1073,6 +1100,7 @@ HWTEST_F(HdiServiceTest, HdiService013, TestSize.Level0)
     BATTERY_HILOGI(LABEL_TEST, "HdiService013::epollFd=%{public}d", epollFd);
 
     ASSERT_TRUE(epollFd > 0);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService013 function end!");
 }
 
 /**
@@ -1082,6 +1110,7 @@ HWTEST_F(HdiServiceTest, HdiService013, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService023, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService023 function start!");
     int32_t totalEnergy = 0;
     if (IsNotMock()) {
         giver_->ParseTotalEnergy(&totalEnergy);
@@ -1095,6 +1124,7 @@ HWTEST_F(HdiServiceTest, HdiService023, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "HdiService023::totalEnergy=%{public}d.", totalEnergy);
         ASSERT_TRUE(totalEnergy == 4000000);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService023 function end!");
 }
 
 /**
@@ -1104,6 +1134,7 @@ HWTEST_F(HdiServiceTest, HdiService023, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService024, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService024 function start!");
     int32_t currentAvg = HDF_FAILURE;
     if (IsNotMock()) {
         giver_->ParseCurrentAverage(&currentAvg);
@@ -1117,6 +1148,7 @@ HWTEST_F(HdiServiceTest, HdiService024, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "HdiService024::currentAvg=%{public}d.", currentAvg);
         ASSERT_TRUE(currentAvg == 1000);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService024 function end!");
 }
 
 /**
@@ -1126,6 +1158,7 @@ HWTEST_F(HdiServiceTest, HdiService024, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService025, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService025 function start!");
     int32_t currentNow = 0;
     if (IsNotMock()) {
         giver_->ParseCurrentNow(&currentNow);
@@ -1139,6 +1172,7 @@ HWTEST_F(HdiServiceTest, HdiService025, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "HdiService025::currentNow=%{public}d.", currentNow);
         ASSERT_TRUE(currentNow == 1000);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService025 function end!");
 }
 
 /**
@@ -1148,6 +1182,7 @@ HWTEST_F(HdiServiceTest, HdiService025, TestSize.Level0)
  */
 HWTEST_F(HdiServiceTest, HdiService026, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiService026 function start!");
     int32_t chargeNow = 0;
     if (IsNotMock()) {
         giver_->ParseRemainEnergy(&chargeNow);
@@ -1161,5 +1196,6 @@ HWTEST_F(HdiServiceTest, HdiService026, TestSize.Level0)
         BATTERY_HILOGI(LABEL_TEST, "HdiService026::chargeNow=%{public}d.", chargeNow);
         ASSERT_TRUE(chargeNow == 1000);
     }
+    BATTERY_HILOGI(LABEL_TEST, "HdiService026 function end!");
 }
 } // namespace HdiServiceTest

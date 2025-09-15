@@ -199,6 +199,7 @@ int32_t BatteryInterfaceImpl::GetRemainEnergy(int32_t& remainEnergy)
 int32_t BatteryInterfaceImpl::GetBatteryInfo(BatteryInfo& info)
 {
     if (powerSupplyProvider_ == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "GetBatteryInfo powerSupplyProvider_ is nullptr");
         return HDF_FAILURE;
     }
 
@@ -227,6 +228,10 @@ int32_t BatteryInterfaceImpl::SetChargingLimit(const std::vector<ChargingLimit>&
     auto& batteryConfig = BatteryConfig::GetInstance();
     BatteryConfig::ChargerConfig chargerConfig = batteryConfig.GetChargerConfig();
 
+    if (powerSupplyProvider_ == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "SetChargingLimit powerSupplyProvider_ is nullptr");
+        return HDF_FAILURE;
+    }
     return powerSupplyProvider_->SetChargingLimit(chargingLimit, chargerConfig.currentPath, chargerConfig.voltagePath);
 }
 
@@ -236,6 +241,10 @@ int32_t BatteryInterfaceImpl::GetChargeType(ChargeType& chargeType)
     BatteryConfig::ChargerConfig chargerConfig = batteryConfig.GetChargerConfig();
 
     int32_t type = static_cast<int32_t>(CHARGE_TYPE_NONE);
+    if (powerSupplyProvider_ == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "GetChargeType powerSupplyProvider_ is nullptr");
+        return HDF_FAILURE;
+    }
     int32_t ret = powerSupplyProvider_->ParseChargeType(&type, chargerConfig.chargeTypePath);
     if (ret != HDF_SUCCESS) {
         return ret;
@@ -248,6 +257,11 @@ int32_t BatteryInterfaceImpl::GetChargeType(ChargeType& chargeType)
 int32_t BatteryInterfaceImpl::SetBatteryConfig(const std::string& sceneName, const std::string& value)
 {
     Battery::BatteryXCollie batteryXcollie("Battery_SetBatteryConfig");
+    if (powerSupplyProvider_ == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "SetBatteryConfig powerSupplyProvider_ is nullptr");
+        return HDF_FAILURE;
+    }
+
     auto& batteryConfig = BatteryConfig::GetInstance();
     std::map<std::string, BatteryConfig::ChargeSceneConfig>
         chargeSceneConfigMap = batteryConfig.GetChargeSceneConfigMap();
@@ -269,6 +283,12 @@ int32_t BatteryInterfaceImpl::SetBatteryConfig(const std::string& sceneName, con
 int32_t BatteryInterfaceImpl::GetBatteryConfig(const std::string& sceneName, std::string& value)
 {
     Battery::BatteryXCollie batteryXcollie("Battery_GetBatteryConfig");
+    if (powerSupplyProvider_ == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "GetBatteryConfig powerSupplyProvider_ is nullptr");
+        value = "";
+        return HDF_FAILURE;
+    }
+
     auto& batteryConfig = BatteryConfig::GetInstance();
     std::map<std::string, BatteryConfig::ChargeSceneConfig>
         chargeSceneConfigMap = batteryConfig.GetChargeSceneConfigMap();
@@ -292,6 +312,12 @@ int32_t BatteryInterfaceImpl::GetBatteryConfig(const std::string& sceneName, std
 int32_t BatteryInterfaceImpl::IsBatteryConfigSupported(const std::string& sceneName, bool& value)
 {
     Battery::BatteryXCollie batteryXcollie("Battery_IsBatteryConfigSupported");
+    if (powerSupplyProvider_ == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "IsBatteryConfigSupported powerSupplyProvider_ is nullptr");
+        value = false;
+        return HDF_FAILURE;
+    }
+
     auto& batteryConfig = BatteryConfig::GetInstance();
     std::map<std::string, BatteryConfig::ChargeSceneConfig>
         chargeSceneConfigMap = batteryConfig.GetChargeSceneConfigMap();
@@ -329,6 +355,10 @@ int32_t BatteryInterfaceImpl::IsBatteryConfigSupported(const std::string& sceneN
 
 int32_t BatteryInterfaceImpl::AddBatteryDeathRecipient(const sptr<IBatteryCallback>& callback)
 {
+    if (callback == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "AddBatteryDeathRecipient callback is nullptr");
+        return HDF_FAILURE;
+    }
     const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IBatteryCallback>(callback);
     bool result = remote->AddDeathRecipient(g_deathRecipient);
     if (!result) {
@@ -357,6 +387,10 @@ int32_t BatteryInterfaceImpl::RemoveBatteryDeathRecipient(const sptr<IBatteryCal
 
 void BatteryInterfaceImpl::BatteryDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& object)
 {
+    if (interfaceImpl_ == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "OnRemoteDied interfaceImpl_ is nullptr");
+        return;
+    }
     interfaceImpl_->UnRegister();
 }
 }  // namespace V2_0
