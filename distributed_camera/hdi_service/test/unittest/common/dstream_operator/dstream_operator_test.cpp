@@ -1412,5 +1412,188 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_058, TestSize.Level1)
     EXPECT_EQ(res, DCamRetCode::SUCCESS);
     cJSON_Delete(root);
 }
+
+/**
+ * @tc.name: dstream_operator_test_059
+ * @tc.desc: Verify FindStreamCaptureBufferNum
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_059, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    std::pair<int, int> streamPair = {1, 2};
+    dstreamOperator_->acceptedBufferNum_[streamPair] = 5;
+    int32_t result = dstreamOperator_->FindStreamCaptureBufferNum(streamPair);
+    EXPECT_EQ(result, 5);
+}
+
+/**
+ * @tc.name: dstream_operator_test_060
+ * @tc.desc: Verify FindStreamCaptureBufferNum
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_060, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    std::pair<int, int> streamPair = {3, 4};
+    int32_t result = dstreamOperator_->FindStreamCaptureBufferNum(streamPair);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.name: dstream_operator_test_061
+ * @tc.desc: Verify AddStreamCaptureBufferNum
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_061, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    std::pair<int, int> streamPair = {1, 2};
+    dstreamOperator_->acceptedBufferNum_[streamPair] = 5;
+    dstreamOperator_->AddStreamCaptureBufferNum(streamPair);
+    EXPECT_EQ(dstreamOperator_->acceptedBufferNum_[streamPair], 6);
+}
+
+/**
+ * @tc.name: dstream_operator_test_062
+ * @tc.desc: Verify AddStreamCaptureBufferNum
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_062, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    std::pair<int, int> streamPair = {3, 4};
+    dstreamOperator_->AddStreamCaptureBufferNum(streamPair);
+    EXPECT_EQ(dstreamOperator_->acceptedBufferNum_[streamPair], 1);
+}
+
+/**
+ * @tc.name: dstream_operator_test_063
+ * @tc.desc: Verify AddStreamCaptureBufferNum
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_063, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    std::pair<int, int> streamPair = {1, 2};
+    dstreamOperator_->acceptedBufferNum_[streamPair] = 5;
+    dstreamOperator_->EraseStreamCaptureBufferNum(streamPair);
+    EXPECT_EQ(dstreamOperator_->acceptedBufferNum_.find(streamPair) == dstreamOperator_->acceptedBufferNum_.end(),
+                true);
+}
+
+/**
+ * @tc.name: dstream_operator_test_064
+ * @tc.desc: Verify AddStreamCaptureBufferNum
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_064, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    std::pair<int, int> streamPair = {3, 4};
+    dstreamOperator_->AddStreamCaptureBufferNum(streamPair);
+    EXPECT_EQ(dstreamOperator_->acceptedBufferNum_[streamPair], 0);
+}
+
+/**
+ * @tc.name: dstream_operator_test_065
+ * @tc.desc: Verify InsertNotifyCaptureMap
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_065, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    int32_t streamId = 1;
+    dstreamOperator_->InsertNotifyCaptureMap(streamId);
+    EXPECT_EQ(
+        dstreamOperator_->notifyCaptureStartedMap_.find(streamId) != dstreamOperator_->notifyCaptureStartedMap_.end(),
+                true);
+    EXPECT_EQ(dstreamOperator_->notifyCaptureStartedMap_[streamId], false);
+}
+
+/**
+ * @tc.name: dstream_operator_test_066
+ * @tc.desc: Verify InsertNotifyCaptureMap
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_066, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    int32_t streamId = 1;
+    dstreamOperator_->notifyCaptureStartedMap_[streamId] = true;
+    dstreamOperator_->InsertNotifyCaptureMap(streamId);
+    EXPECT_EQ(dstreamOperator_->notifyCaptureStartedMap_[streamId], true);
+}
+
+/**
+ * @tc.name: dstream_operator_test_067
+ * @tc.desc: Verify EraseNotifyCaptureMap
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_067, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    int32_t streamId = 1;
+    dstreamOperator_->notifyCaptureStartedMap_[streamId] = true;
+    dstreamOperator_->EraseNotifyCaptureMap(streamId);
+    EXPECT_EQ(
+        dstreamOperator_->notifyCaptureStartedMap_.find(streamId) == dstreamOperator_->notifyCaptureStartedMap_.end(),
+        true);
+}
+
+/**
+ * @tc.name: dstream_operator_test_068
+ * @tc.desc: Verify EraseNotifyCaptureMap
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_068, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    int32_t streamId = 1;
+    dstreamOperator_->EraseNotifyCaptureMap(streamId);
+    EXPECT_EQ(dstreamOperator_->notifyCaptureStartedMap_.size(), 0);
+}
+
+/**
+ * @tc.name: dstream_operator_test_069
+ * @tc.desc: Verify FindCaptureInfoById
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_069, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    int32_t captureId = 1;
+    auto captureInfo = std::make_shared<CaptureInfo>();
+    captureInfo->streamIds_.push_back(1);
+    dstreamOperator_->halCaptureInfoMap_[captureId] = captureInfo;
+    auto result = dstreamOperator_->FindCaptureInfoById(captureId);
+    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result->streamIds_[0], 1);
+}
+
+/**
+ * @tc.name: dstream_operator_test_070
+ * @tc.desc: Verify FindCaptureInfoById
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_070, TestSize.Level1)
+{
+    EXPECT_EQ(false, dstreamOperator_ == nullptr);
+    int32_t captureId = 2;
+    auto result = dstreamOperator_->FindCaptureInfoById(captureId);
+    EXPECT_EQ(result, nullptr);
+}
 }
 }
