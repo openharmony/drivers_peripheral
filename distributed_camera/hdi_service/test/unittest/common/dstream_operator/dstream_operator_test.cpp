@@ -1423,7 +1423,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_059, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
     std::pair<int, int> streamPair = {1, 2};
-    dStreamOperator_->acceptedBufferNum_[streamPair] = 5;
+    dstreamOperator_->acceptedBufferNum_[streamPair] = 5;
     int32_t result = dstreamOperator_->FindStreamCaptureBufferNum(streamPair);
     EXPECT_EQ(result, 5);
 }
@@ -1451,8 +1451,8 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_060, TestSize.Level1)
 HWTEST_F(DStreamOperatorTest, dstream_operator_test_061, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
-    std::pair<int,int> streamPair = {1, 2};
-    dStreamOperator_->acceptedBufferNum_[streamPair] = 5;
+    std::pair<int, int> streamPair = {1, 2};
+    dstreamOperator_->acceptedBufferNum_[streamPair] = 5;
     dstreamOperator_->AddStreamCaptureBufferNum(streamPair);
     EXPECT_EQ(dstreamOperator_->acceptedBufferNum_[streamPair], 6);
 }
@@ -1466,7 +1466,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_061, TestSize.Level1)
 HWTEST_F(DStreamOperatorTest, dstream_operator_test_062, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
-    std::pair<int,int> streamPair = {3, 4};
+    std::pair<int, int> streamPair = {3, 4};
     dstreamOperator_->AddStreamCaptureBufferNum(streamPair);
     EXPECT_EQ(dstreamOperator_->acceptedBufferNum_[streamPair], 1);
 }
@@ -1480,8 +1480,8 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_062, TestSize.Level1)
 HWTEST_F(DStreamOperatorTest, dstream_operator_test_063, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
-    std::pair<int,int> streamPair = {1, 2};
-    dStreamOperator_->acceptedBufferNum_[streamPair] = 5;
+    std::pair<int, int> streamPair = {1, 2};
+    dstreamOperator_->acceptedBufferNum_[streamPair] = 5;
     dstreamOperator_->EraseStreamCaptureBufferNum(streamPair);
     EXPECT_EQ(dstreamOperator_->acceptedBufferNum_.find(streamPair) == dstreamOperator_->acceptedBufferNum_.end(),
                 true);
@@ -1496,7 +1496,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_063, TestSize.Level1)
 HWTEST_F(DStreamOperatorTest, dstream_operator_test_064, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
-    std::pair<int,int> streamPair = {3, 4};
+    std::pair<int, int> streamPair = {3, 4};
     dstreamOperator_->AddStreamCaptureBufferNum(streamPair);
     EXPECT_EQ(dstreamOperator_->acceptedBufferNum_[streamPair], 0);
 }
@@ -1575,8 +1575,8 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_069, TestSize.Level1)
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
     int32_t captureId = 1;
     auto captureInfo = std::make_shared<CaptureInfo>();
-    captureInfo->streamIds_.push.back(1);
-    dstreamOperator_->halCaptureInfoMap_Map[captureId] = captureInfo;
+    captureInfo->streamIds_.push_back(1);
+    dstreamOperator_->halCaptureInfoMap_[captureId] = captureInfo;
     auto result = dstreamOperator_->FindCaptureInfoById(captureId);
     EXPECT_NE(result, nullptr);
     EXPECT_EQ(result->streamIds_[0], 1);
@@ -1591,7 +1591,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_069, TestSize.Level1)
 HWTEST_F(DStreamOperatorTest, dstream_operator_test_070, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
-    int32_t CaptureId = 2;
+    int32_t captureId = 2;
     auto result = dstreamOperator_->FindCaptureInfoById(captureId);
     EXPECT_EQ(result, nullptr);
 }
