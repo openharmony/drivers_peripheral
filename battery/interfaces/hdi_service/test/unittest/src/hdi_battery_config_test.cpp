@@ -16,6 +16,7 @@
 #include "hdi_battery_config_test.h"
 
 #include "battery_config.h"
+#include "battery_log.h"
 
 using namespace OHOS::HDI::Battery;
 using namespace OHOS::HDI::Battery::V2_0;
@@ -50,6 +51,7 @@ namespace {
  */
 HWTEST_F(HdiBatteryConfigTest, HdiBatteryConfigTest001, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiBatteryConfigTest001 function start!");
     std::string jsonStr = R"({"current_limit": {"path": "/test/current_limit"}})";
     cJSON* parseResult = cJSON_Parse(jsonStr.c_str());
     ASSERT_TRUE(parseResult);
@@ -70,5 +72,6 @@ HWTEST_F(HdiBatteryConfigTest, HdiBatteryConfigTest001, TestSize.Level0)
     g_configTest.ParseChargerConfig(parseResult);
     EXPECT_TRUE(g_configTest.chargerConfig_.chargeTypePath == "/test/type");
     DestroyJsonValue(parseResult);
+    BATTERY_HILOGI(LABEL_TEST, "HdiBatteryConfigTest001 function end!");
 }
 }
