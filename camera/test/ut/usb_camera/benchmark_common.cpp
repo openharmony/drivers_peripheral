@@ -358,7 +358,6 @@ void HdiCommon::DefaultCapture(std::shared_ptr<StreamInfo> &infos)
     infos->height_ = captureHeight;
     infos->format_ = snapshotFormat;
     infos->dataspace_ = UT_DATA_SIZE;
-    infos->intent_ = StreamIntent::STILL_CAPTURE;
     infos->tunneledMode_ = UT_TUNNEL_MODE;
 }
 
@@ -393,7 +392,6 @@ void HdiCommon::DefaultInfosVideo(std::shared_ptr<StreamInfo> &infos)
     infos->height_ = videoHeight;
     infos->format_ = videoFormat;
     infos->dataspace_ = UT_DATA_SIZE;
-    infos->intent_ = StreamIntent::VIDEO;
     infos->encodeType_ = static_cast<OHOS::HDI::Camera::V1_0::EncodeType>(videoEncodeType);
     infos->tunneledMode_ = UT_TUNNEL_MODE;
     std::shared_ptr<OHOS::Camera::HdiCommon::StreamConsumer> consumer_video =
