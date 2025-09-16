@@ -171,7 +171,7 @@ bool DoHeifDecode(const uint8_t *data, size_t size)
     }
     sptr<NativeBuffer> output = nullptr;
     ret = CreateNativeBuffer(output, decInfo);
-    if(ret) {
+    if (ret) {
         auto err = image->DoHeifDecode(inputs, output, decInfo);
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: DoHeifDecode return %{public}d", __func__, err);
