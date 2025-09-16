@@ -15,8 +15,8 @@
 
 #include <dlfcn.h>
 #include "lpp_log.h"
-#include "low_power_player_factory.h"
 #include "lpp_sync_manager_adapter.h"
+#include "low_power_player_factory.h"
 namespace OHOS {
 namespace HDI {
 namespace LowPowerPlayer {
@@ -55,12 +55,12 @@ int32_t LowPowerPlayerFactory::GetAVCapability(LppAVCap& avCap)
     std::lock_guard<std::mutex> lock(mutex_);
     if (libHandle_ == nullptr) {
         void *handle = dlopen(LOW_POWER_PLAYER_VDI_LIBRARY, RTLD_LAZY);
-        CHECK_TRUE_RETURN_RET_LOG(handle == NULL, HDF_FAILURE, "dlopen failed, %{public}s", dlerror());
+        CHECK_TRUE_RETURN_RET_LOG(handle == nullptr, HDF_FAILURE, "dlopen failed, %{public}s", dlerror());
         libHandle_ = std::shared_ptr<void>(handle, dlclose); // use smart pointer to manage library handle
     }
     if (capVdi_ == nullptr) {
         capVdi_ = reinterpret_cast<GetAVCapabilityFunc>(dlsym(libHandle_.get(), "GetAVCapabilityVdi"));
-        CHECK_TRUE_RETURN_RET_LOG(capVdi_ == NULL, HDF_FAILURE, "createVdi_ dlsym failed, %{public}s", dlerror());
+        CHECK_TRUE_RETURN_RET_LOG(capVdi_ == nullptr, HDF_FAILURE, "createVdi_ dlsym failed, %{public}s", dlerror());
     }
     int32_t ret = capVdi_(avCap);
     CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, HDF_FAILURE, "GetAVCapability failed, %{public}s", strerror(errno));
