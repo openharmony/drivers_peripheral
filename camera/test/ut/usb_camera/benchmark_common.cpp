@@ -186,7 +186,6 @@ void HdiCommonV1_2::DefaultSketch(
     infos->v1_0.height_ = sketchHeight;
     infos->v1_0.format_ = previewFormat;
     infos->v1_0.dataspace_ = UT_DATA_SIZE;
-    infos->v1_0.intent_ = StreamIntent::PREVIEW;
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
 }
 
