@@ -14,7 +14,6 @@
  */
 
 #include <hdf_log.h>
-#include <image_auto_initer.h>
 #include <securec.h>
 #include <vector>
 #include "ashmem.h"
@@ -24,6 +23,7 @@
 #include "v1_2/include/idisplay_buffer.h"
 #include "imagedoheifdecode_fuzzer.h"
 
+#define HDF_LOG_TAG codec_heif_decoder
 using namespace OHOS::HDI::Codec::Image::V2_1;
 using namespace OHOS::HDI::Display::Buffer::V1_2;
 using namespace OHOS::HDI::Display::Composer::V1_2;
@@ -125,7 +125,6 @@ static bool FillHeifDecInfo(CodecHeifDecInfo &decInfo, uint8_t *data, size_t siz
         return false;
     }
     constexpr uint32_t SIZE_FACTOR = 8192;
-    constexpr uint32_t ROW_COL_FACTOR = 1024;
     constexpr uint32_t SAMPLE_FACTOR = 20;
     constexpr uint8_t EVEN_FACTOR = 2;
     uint8_t *currentPos = data;
@@ -134,8 +133,15 @@ static bool FillHeifDecInfo(CodecHeifDecInfo &decInfo, uint8_t *data, size_t siz
     decInfo.gridInfo.enableGrid = *currentPos % EVEN_FACTOR;
     decInfo.gridInfo.tileWidth = GetUInt32AndMove(data, currentPos, size) % SIZE_FACTOR;
     decInfo.gridInfo.tileHeight = GetUInt32AndMove(data, currentPos, size) % SIZE_FACTOR;
-    decInfo.gridInfo.cols = GetUInt32AndMove(data, currentPos, size) % ROW_COL_FACTOR;
-    decInfo.gridInfo.rows = GetUInt32AndMove(data, currentPos, size) % ROW_COL_FACTOR;
+    if (decInfo.gridInfo.tileWidth == 0) {
+        decInfo.gridInfo.tileWidth = 1;
+    }
+    if (decInfo.gridInfo.tileHeight == 0) {
+        decInfo.gridInfo.tileHeight = 1;
+    }
+    decInfo.gridInfo.cols = ceil(decInfo.gridInfo.displayWidth / decInfo.gridInfo.tileWidth);
+    decInfo.gridInfo.rows = ceil(decInfo.gridInfo.displayHeight / decInfo.gridInfo.tileHeight);
+
     decInfo.sampleSize = GetUInt32AndMove(data, currentPos, size) % SAMPLE_FACTOR;
 
     return true;
@@ -152,30 +158,30 @@ bool DoHeifDecode(const uint8_t *data, size_t size)
         HDF_LOGE("%{public}s: get ICodecImage failed\n", __func__);
         return false;
     }
-    CodecImageRole role = CodecImageRole(*data);
-    ImageAutoIniter autoIniter(image, role);
-
     uint8_t *rawData = const_cast<uint8_t *>(data);
 
     CodecHeifDecInfo decInfo;
     if (!FillHeifDecInfo(decInfo, rawData, size)) {
         return false;
     }
-
     std::vector<sptr<Ashmem>> inputs;
-    CreateAshmem(decInfo, inputs, rawData, size);
+    bool ret = CreateAshmem(decInfo, inputs, rawData, size);
+    if (!ret) {
+        return false;
+    }
     sptr<NativeBuffer> output = nullptr;
-    CreateNativeBuffer(output, decInfo);
-
-    auto err = image->DoHeifDecode(inputs, output, decInfo);
-    if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: DoHeifDecode return %{public}d", __func__, err);
+    ret = CreateNativeBuffer(output, decInfo);
+    if (ret) {
+        auto err = image->DoHeifDecode(inputs, output, decInfo);
+        if (err != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: DoHeifDecode return %{public}d", __func__, err);
+        }
+        return (ret == HDF_SUCCESS);
     }
     for (auto &input : inputs) {
         CloseAshmem(input);
     }
-
-    return true;
+    return false;
 }
 }  // namespace Image
 }  // namespace Codec
