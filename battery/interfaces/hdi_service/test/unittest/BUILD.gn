@@ -73,6 +73,8 @@ ohos_unittest("hdi_unittest_battery") {
 
   configs = [ ":module_private_config" ]
 
+  deps = [ "../..:libbattery_interface_service_2.0" ]
+
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_battery:libbattery_proxy_2.0",
@@ -86,6 +88,8 @@ ohos_unittest("hdi_unittest_battery") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+
+  defines = [ "GTEST" ]
 }
 
 group("unittest") {

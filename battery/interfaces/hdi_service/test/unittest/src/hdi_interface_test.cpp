@@ -15,10 +15,15 @@
 
 #include "hdi_interface_test.h"
 
+#ifdef GTEST
+#define private   public
+#define protected public
+#endif
 #include <fstream>
 #include "v2_0/battery_interface_proxy.h"
 #include "v2_0/types.h"
 #include "battery_log.h"
+#include "battery_interface_impl.h"
 
 using namespace OHOS::HDI::Battery;
 using namespace OHOS::HDI::Battery::V2_0;
@@ -70,6 +75,7 @@ namespace {
  */
 HWTEST_F (HdiInterfaceTest, HdiInterfaceTest001, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest001 function start!");
     std::string currentPath = "/data/service/el0/battery/current_limit";
     CreateFile(currentPath, "");
     ChargingLimit scLimit;
@@ -97,6 +103,7 @@ HWTEST_F (HdiInterfaceTest, HdiInterfaceTest001, TestSize.Level0)
         }
     }
     EXPECT_EQ(true, chargeLimitStr == writeChargeInfo);
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest001 function end!");
 }
 
 /**
@@ -106,6 +113,7 @@ HWTEST_F (HdiInterfaceTest, HdiInterfaceTest001, TestSize.Level0)
  */
 HWTEST_F (HdiInterfaceTest, HdiInterfaceTest002, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest002 function start!");
     std::string voltagePath = "/data/service/el0/battery/voltage_limit";
     CreateFile(voltagePath, "");
     ChargingLimit scLimit;
@@ -133,6 +141,7 @@ HWTEST_F (HdiInterfaceTest, HdiInterfaceTest002, TestSize.Level0)
         }
     }
     EXPECT_EQ(true, voltageLimitStr == writeVoltageInfo);
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest002 function end!");
 }
 
 /**
@@ -142,9 +151,83 @@ HWTEST_F (HdiInterfaceTest, HdiInterfaceTest002, TestSize.Level0)
  */
 HWTEST_F (HdiInterfaceTest, HdiInterfaceTest003, TestSize.Level0)
 {
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest003 function start!");
     string sceneName = "testScene";
     string value = "";
     int32_t result = g_batteryInterface->SetBatteryConfig(sceneName, value);
     EXPECT_EQ(true, result == HDF_ERR_NOT_SUPPORT);
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest003 function end!");
+}
+
+/**
+ * @tc.name: HdiInterfaceTest004
+ * @tc.desc: Test BatteryInterface nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F (HdiInterfaceTest, HdiInterfaceTest004, TestSize.Level0)
+{
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest004 function start!");
+    BatteryInterfaceImpl *service = nullptr;
+    service = new (std::nothrow) BatteryInterfaceImpl();
+    if (service != nullptr) {
+        service->powerSupplyProvider_ = nullptr;
+        std::string voltagePath = "/data/service/el0/battery/voltage_limit";
+        CreateFile(voltagePath, "");
+        ChargingLimit scLimit;
+        scLimit.type = TYPE_VOLTAGE;
+        scLimit.protocol = "sc";
+        scLimit.value = 2000;
+        ChargingLimit buckLimit;
+        buckLimit.type = TYPE_VOLTAGE;
+        buckLimit.protocol = "buck";
+        buckLimit.value = 3000;
+        std::vector<ChargingLimit> chargeLimitList;
+        chargeLimitList.push_back(scLimit);
+        chargeLimitList.push_back(buckLimit);
+        int32_t result = service->SetChargingLimit(chargeLimitList);
+        EXPECT_EQ(HDF_FAILURE, result);
+        V2_0::BatteryInfo event;
+        result = service->GetBatteryInfo(event);
+        EXPECT_EQ(HDF_FAILURE, result);
+        ChargeType chargeType = ChargeType::CHARGE_TYPE_WIRED_SUPER_QUICK;
+        result = service->GetChargeType(chargeType);
+        EXPECT_EQ(HDF_FAILURE, result);
+        result = service->AddBatteryDeathRecipient(nullptr);
+        EXPECT_EQ(HDF_FAILURE, result);
+    }
+    sptr<BatteryInterfaceImpl::BatteryDeathRecipient> deathRecipient = nullptr;
+    deathRecipient = new BatteryInterfaceImpl::BatteryDeathRecipient(nullptr);
+    if (deathRecipient != nullptr) {
+        wptr<IRemoteObject> remoteObj = nullptr;
+        deathRecipient->OnRemoteDied(remoteObj);
+    }
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest004 function end!");
+}
+
+/**
+ * @tc.name: HdiInterfaceTest005
+ * @tc.desc: Test BatteryInterface nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F (HdiInterfaceTest, HdiInterfaceTest005, TestSize.Level0)
+{
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest005 function start!");
+    BatteryInterfaceImpl *service = nullptr;
+    service = new (std::nothrow) BatteryInterfaceImpl();
+    if (service != nullptr) {
+        service->powerSupplyProvider_ = nullptr;
+        std::string sceneName = "testScene";
+        std::string value = "";
+        int32_t result = service->SetBatteryConfig(sceneName, value);
+        EXPECT_EQ(HDF_FAILURE, result);
+        result = service->GetBatteryConfig(sceneName, value);
+        EXPECT_EQ("", value);
+        EXPECT_EQ(HDF_FAILURE, result);
+        bool flag = true;
+        result = service->IsBatteryConfigSupported(sceneName, flag);
+        EXPECT_EQ(false, flag);
+        EXPECT_EQ(HDF_FAILURE, result);
+    }
+    BATTERY_HILOGI(LABEL_TEST, "HdiInterfaceTest005 function end!");
 }
 }
