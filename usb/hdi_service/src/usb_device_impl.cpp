@@ -88,6 +88,12 @@ extern "C" IUsbDeviceInterface *UsbDeviceInterfaceImplGetInstance(void)
 UsbDeviceImpl::UsbDeviceImpl()
 {
     V1_2::UsbdFunction::UsbdInitLock();
+    if (OHOS::system::GetParameter("const.edm.is_enterprise_device", "false") == "true") {
+        int32_t ret = SetDefaultAuthorize(true);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: failed to set default authorize", __func__);
+        }
+    }
     if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
         loadUsbService_.LoadService();
     }
@@ -359,10 +365,6 @@ int32_t UsbDeviceImpl::UsbdEventHandleRelease(void)
 int32_t UsbDeviceImpl::UsbDeviceAuthorize(uint8_t busNum, uint8_t devAddr, bool authorized)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    if (busNum == 0 && devAddr == 0) {
-        return SetDefaultAuthorize(authorized);
-    }
-
     std::string devDirname = GetDeviceDirName(busNum, devAddr);
     if (devDirname.length() == 0) {
         HDF_LOGE("%{public}s: failed to reach busNum: %{public}d, devAddr: %{public}d", __func__, busNum, devAddr);
@@ -559,7 +561,7 @@ int32_t UsbDeviceImpl::SetDefaultAuthorize(bool authorized)
         hubDir = std::string(entry->d_name);
         // set all authorized values (hubs have "authorized_default" attribute), and just ignore any failure here
         (void)SetAuthorize(SYSFS_DEVICES_DIR + hubDir + "/authorized_default", authorized);
-        (void)SetAuthorize(SYSFS_DEVICES_DIR + hubDir + "/authorized_default", authorized);
+        (void)SetAuthorize(SYSFS_DEVICES_DIR + hubDir + "/authorized", authorized);
     }
     closedir(dir);
     return ret;

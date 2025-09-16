@@ -32,7 +32,7 @@
 
 #ifndef SYSFS_DEVICES_DIR
 #define SYSFS_DEVICES_DIR "/sys/bus/usb/devices/"
-#endif
+#endif // SYSFS_DEVICES_DIR
 
 #define BASE_CLASS_HUB 0x09
 constexpr uint8_t MAX_INTERFACEID = 0xFF;
