@@ -20,7 +20,7 @@
 #include "v5_0/iaudio_capture.h"
 #include <pthread.h>
 
-pthread_rwlock_t* GetCaptureLock(void);
+pthread_rwlock_t* GetCaptureLock(uint32_t indexId);
 struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *captureId,
     struct IAudioCaptureVdi *vdiCapture, const struct AudioDeviceDescriptor *desc);
 void AudioDestroyCaptureByIdVdi(uint32_t captureId);
