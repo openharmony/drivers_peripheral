@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "display_buffer_xts.h"
+#include "display_buffer_ut.h"
 #include <securec.h>
 
 #include "gtest/gtest.h"
