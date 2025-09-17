@@ -16,6 +16,7 @@
 #include "usbfn_mtp_impl.h"
 #include <unistd.h>
 #include <cinttypes>
+#include <string>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -23,12 +24,14 @@
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_log.h"
+#include "hitrace_meter.h"
 #include "scope_guard.h"
 
 #define HDF_LOG_TAG usbfn_mtp_impl
 #define UDC_NAME "invalid_udc_name"
 #undef  LOG_DOMAIN
 #define LOG_DOMAIN 0xD002518
+#define MTP_FUNCTION ("MTP_" + std::string(__func__))
 
 /* Compatible: Microsoft MTP OS String */
 static uint8_t g_mtpOsString[] = {18, /* sizeof(mtp_os_string) */
@@ -154,6 +157,8 @@ void UsbfnMtpImpl::UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *r
         HDF_LOGE("%{public}s: invalid param", __func__);
         return;
     }
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION + " " + std::to_string(req->reqId));
+    FinishAsyncTrace(HITRACE_TAG_HDF, "asyncIO", req->reqId);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     struct UsbMtpPort *mtpPort = static_cast<struct UsbMtpPort *>(req->context);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr ||
@@ -229,6 +234,8 @@ void UsbfnMtpImpl::UsbFnRequestWriteComplete(uint8_t pipe, struct UsbFnRequest *
         HDF_LOGE("%{public}s: invalid param", __func__);
         return;
     }
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION + " " + std::to_string(req->reqId));
+    FinishAsyncTrace(HITRACE_TAG_HDF, "asyncIO", req->reqId);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     struct UsbMtpPort *mtpPort = static_cast<struct UsbMtpPort *>(req->context);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr ||
@@ -253,6 +260,7 @@ void UsbfnMtpImpl::UsbFnRequestWriteComplete(uint8_t pipe, struct UsbFnRequest *
 
 void UsbfnMtpImpl::UsbFnRequestNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     (void)pipe;
     if (req == nullptr || req->context == nullptr) {
         HDF_LOGE("%{public}s: invalid param", __func__);
@@ -267,6 +275,7 @@ void UsbfnMtpImpl::UsbFnRequestCtrlComplete(uint8_t pipe, struct UsbFnRequest *r
         HDF_LOGE("%{public}s: invalid param", __func__);
         return;
     }
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION + " " + std::to_string(req->reqId));
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     struct CtrlInfo *ctrlInfo = static_cast<struct CtrlInfo *>(req->context);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr ||
@@ -326,6 +335,8 @@ int32_t UsbfnMtpImpl::UsbMtpPortProcessLastTxPacket(struct UsbMtpPort *mtpPort, 
     if (mtpPort->mtpDev->needZLP == ZLP_NEED) {
         mtpPort->mtpDev->needZLP = ZLP_TRY;
         req->length = 0;
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "MTP_UsbFnSubmitRequestAsync " + std::to_string(req->reqId));
+        StartAsyncTrace(HITRACE_TAG_HDF, "asyncIO", req->reqId);
         ret = UsbFnSubmitRequestAsync(req);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: submit bulk-in zlp req error: %{public}d", __func__, ret);
@@ -338,6 +349,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortProcessLastTxPacket(struct UsbMtpPort *mtpPort, 
 
 int32_t UsbfnMtpImpl::UsbMtpPortSubmitAsyncTxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     ssize_t readRet = read(mtpPort->mtpDev->xferFd, req->buf, static_cast<size_t>(req->length));
     if (readRet != static_cast<ssize_t>(req->length)) {
         HDF_LOGE("%{public}s: read failed: %{public}zd < %{public}u", __func__, readRet, req->length);
@@ -349,6 +361,8 @@ int32_t UsbfnMtpImpl::UsbMtpPortSubmitAsyncTxReq(struct UsbMtpPort *mtpPort, str
         HDF_LOGE("%{public}s: The node prev or next is NULL", __func__);
     }
     DListInsertTail(&req->list, &mtpPort->writeQueue);
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "MTP_UsbFnSubmitRequestAsync " + std::to_string(req->reqId));
+    StartAsyncTrace(HITRACE_TAG_HDF, "asyncIO", req->reqId);
     int32_t ret = UsbFnSubmitRequestAsync(req);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: submit bulk-in req error: %{public}d", __func__, ret);
@@ -366,6 +380,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSubmitAsyncTxReq(struct UsbMtpPort *mtpPort, str
 
 int32_t UsbfnMtpImpl::UsbMtpPortStartTxAsync(struct UsbMtpPort *mtpPort, bool callByComplete)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     if (mtpPort == nullptr || mtpPort->mtpDev == nullptr) {
         HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -425,6 +440,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceAllocCtrlRequests(int32_t num)
         }
         req->complete = UsbFnRequestCtrlComplete;
         req->context = ctrlInfo;
+        req->reqId = i;
         DListInsertTail(&req->list, head);
         mtpDev_->ctrlReqNum++;
     }
@@ -476,6 +492,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortAllocReadWriteRequests(int32_t readSize, int32_t
         }
         req->complete = UsbFnRequestReadComplete;
         req->context = mtpPort_;
+        req->reqId = i;
         DListInsertTail(&req->list, &mtpPort_->readPool);
         mtpPort_->readAllocated++;
     }
@@ -494,6 +511,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortAllocReadWriteRequests(int32_t readSize, int32_t
         }
         req->complete = UsbFnRequestWriteComplete;
         req->context = mtpPort_;
+        req->reqId = i + readSize;
         DListInsertTail(&req->list, &mtpPort_->writePool);
         mtpPort_->writeAllocated++;
     }
@@ -502,6 +520,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortAllocReadWriteRequests(int32_t readSize, int32_t
 
 int32_t UsbfnMtpImpl::UsbMtpPortInitIo()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     int32_t ret = HDF_SUCCESS;
     if (mtpPort_->readAllocated == 0 || mtpPort_->writeAllocated == 0) {
         HDF_LOGI("%{public}s: rx_req=%{public}d tx_req=%{public}d, alloc req", __func__, mtpPort_->readAllocated,
@@ -572,6 +591,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelPlusFreeIo(struct UsbMtpPort *mtpPort, boo
 
 int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     DListHead *queueHead = &(mtpPort->readQueue);
     if (!DListIsEmpty(queueHead)) {
         HDF_LOGD("%{public}s: readQueue is not empty", __func__);
@@ -603,6 +623,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortCancelRequest(struct UsbMtpPort *mtpPort)
 
 int32_t UsbfnMtpImpl::UsbMtpPortReleaseIo()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     return UsbMtpPortCancelPlusFreeIo(mtpPort_, true);
 }
 
@@ -752,6 +773,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceSetup(struct UsbMtpDevice *mtpDev, struct UsbF
     ctrlInfo->mtpDev = mtpDev;
     if (responseBytes >= 0) {
         req->length = static_cast<uint32_t>(responseBytes);
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "MTP_UsbFnSubmitRequestAsync " + std::to_string(req->reqId));
         int32_t ret = UsbFnSubmitRequestAsync(req);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: mtpDev send setup response error", __func__);
@@ -988,6 +1010,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceParseEachIface(struct UsbFnDevice *fnDev)
 
 int32_t UsbfnMtpImpl::UsbMtpDeviceCreateFuncDevice()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == NULL) {
         HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed", __func__);
@@ -1023,6 +1046,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceCreateFuncDevice()
 
 int32_t UsbfnMtpImpl::UsbMtpDeviceReleaseFuncDevice()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     if (mtpDev_->fnDev == nullptr) {
         HDF_LOGE("%{public}s: fnDev is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1098,6 +1122,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceFree()
 
 int32_t UsbfnMtpImpl::Init()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     HDF_LOGI("%{public}s: Init", __func__);
     pthread_rwlock_wrlock(&mtpRunrwLock_);
     if (mtpDev_ != nullptr) {
@@ -1139,6 +1164,7 @@ ERR:
 
 int32_t UsbfnMtpImpl::InitMtpPort()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     /* init mtpPort */
     int32_t ret = UsbMtpDeviceAlloc();
     if (ret != HDF_SUCCESS) {
@@ -1165,6 +1191,7 @@ int32_t UsbfnMtpImpl::InitMtpPort()
 
 int32_t UsbfnMtpImpl::Release()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     HDF_LOGI("%{public}s: Release", __func__);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
@@ -1207,6 +1234,7 @@ int32_t UsbfnMtpImpl::Release()
 
 int32_t UsbfnMtpImpl::Start()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     HDF_LOGI("%{public}s: start", __func__);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
@@ -1241,6 +1269,7 @@ int32_t UsbfnMtpImpl::Start()
 
 int32_t UsbfnMtpImpl::Stop()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     HDF_LOGI("%{public}s: start", __func__);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr) {
@@ -1285,6 +1314,7 @@ uint32_t UsbfnMtpImpl::BufCopyFromVector(
 
 int32_t UsbfnMtpImpl::Read(std::vector<uint8_t> &data)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
@@ -1328,6 +1358,7 @@ void UsbfnMtpImpl::ReadZLP(uint32_t length, uint32_t actual)
     if (actual != length || actual != MTP_BUFFER_SIZE) {
         return;
     }
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     struct DListHead *pool = &mtpPort_->readPool;
     if (pool == nullptr || DListIsEmpty(pool)) {
         HDF_LOGE("%{public}s: invalid readPool", __func__);
@@ -1348,6 +1379,7 @@ void UsbfnMtpImpl::ReadZLP(uint32_t length, uint32_t actual)
 
 int32_t UsbfnMtpImpl::ReadImpl(std::vector<uint8_t> &data)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     int32_t ret = HDF_FAILURE;
     struct UsbFnRequest *req = nullptr;
     if (mtpPort_->standbyReq != nullptr && mtpPort_->standbyReq->actual >= REQ_ACTUAL_MININUM_LENGTH) {
@@ -1396,6 +1428,7 @@ int32_t UsbfnMtpImpl::ReadImpl(std::vector<uint8_t> &data)
 
 int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP, uint32_t &xferActual)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     struct DListHead *pool = &mtpPort_->writePool;
     struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
     RemoveReqFromList(req);
@@ -1415,6 +1448,7 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
             break;
         }
         (void)BufCopyFromVector(req->buf, req->length, data, xferActual);
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "MTP_UsbFnSubmitRequestSync");
         ret = UsbFnSubmitRequestSync(req, BULK_IN_TIMEOUT_JIFFIES);
         if (needZLP == ZLP_TRY) {
             HDF_LOGE("%{public}s: send zero packet done: %{public}d", __func__, ret);
@@ -1458,6 +1492,7 @@ uint32_t UsbfnMtpImpl::getActualLength(const std::vector<uint8_t> &data)
 
 int32_t UsbfnMtpImpl::WriteSplitPacket(const std::vector<uint8_t> &data)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     if (data.size() > WRITE_SPLIT_MININUM_LENGTH && writeActualLen_ == 0) {
         uint32_t writeLen = getActualLength(data);
         if (writeLen > data.size()) {
@@ -1509,6 +1544,7 @@ int32_t UsbfnMtpImpl::WriteSplitPacket(const std::vector<uint8_t> &data)
 
 int32_t UsbfnMtpImpl::Write(const std::vector<uint8_t> &data)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
@@ -1594,6 +1630,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxCheckReq(struct UsbMtpPort *mtpPort, struct Us
 
 int32_t UsbfnMtpImpl::UsbMtpPortProcessAsyncRxDone(struct UsbMtpPort *mtpPort)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     struct UsbMtpDevice *mtpDev = mtpPort->mtpDev;
     HDF_LOGD("%{public}s: recv done, ignore other packet(%{public}d/%{public}d):%{public}" PRIu64 "/%{public}" PRIu64
         "/%{public}" PRIu64 "", __func__, mtpPort->readStarted, mtpPort->readAllocated, mtpDev->asyncRecvFileExpect,
@@ -1618,6 +1655,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortProcessAsyncRxDone(struct UsbMtpPort *mtpPort)
 
 int32_t UsbfnMtpImpl::UsbMtpPortRxPush(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     if (mtpPort == nullptr || mtpPort->mtpDev == nullptr) {
         HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1670,6 +1708,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxPush(struct UsbMtpPort *mtpPort, struct UsbFnR
 
 int32_t UsbfnMtpImpl::UsbMtpPortStartSubmitRxReq(struct UsbMtpPort *mtpPort, bool needZLP)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     struct DListHead *pool = &mtpPort->readPool;
     struct UsbMtpDevice *mtpDev = mtpPort->mtpDev;
     struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
@@ -1687,6 +1726,8 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartSubmitRxReq(struct UsbMtpPort *mtpPort, boo
     }
     RemoveReqFromList(req);
     DListInsertTail(&req->list, &mtpPort->readQueue);
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "MTP_UsbFnSubmitRequestAsync " + std::to_string(req->reqId));
+    StartAsyncTrace(HITRACE_TAG_HDF, "asyncIO", req->reqId);
     int32_t ret = UsbFnSubmitRequestAsync(req);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: submit bulk-out req error %{public}d", __func__, ret);
@@ -1705,6 +1746,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartSubmitRxReq(struct UsbMtpPort *mtpPort, boo
 
 int32_t UsbfnMtpImpl::UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     std::lock_guard<std::mutex> guard(asyncMutex_);
     struct DListHead *pool = &mtpPort->readPool;
     struct UsbMtpDevice *mtpDev = mtpPort->mtpDev;
@@ -1744,6 +1786,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort)
 
 int32_t UsbfnMtpImpl::ReceiveFileEx()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     sem_init(&asyncReq_, 1, 0);
     mtpDev_->asyncXferFile = ASYNC_XFER_FILE_NORMAL;
     mtpDev_->asyncRecvWriteTempContent = static_cast<uint8_t *>(OsalMemCalloc(WRITE_FILE_TEMP_SLICE));
@@ -1773,6 +1816,7 @@ int32_t UsbfnMtpImpl::ReceiveFileEx()
 
 int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     ON_SCOPE_EXIT(release) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
@@ -1823,6 +1867,7 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
 
 int32_t UsbfnMtpImpl::UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, uint64_t &oneReqLeft)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     uint64_t hdrSize = static_cast<uint64_t>((mtpDev_->xferSendHeader == 1) ? sizeof(struct UsbMtpDataHeader) : 0);
     uint64_t needXferCount = mtpDev_->xferFileLength + hdrSize;
     uint64_t reqMax = static_cast<uint64_t>(MTP_BUFFER_SIZE);
@@ -1850,6 +1895,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, u
 
 int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     if (DListIsEmpty(&mtpPort_->writePool)) {
         HDF_LOGE("%{public}s: writePool is empty.", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
@@ -1899,6 +1945,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
 
 int32_t UsbfnMtpImpl::UsbMtpPortSendFileLeftAsync(uint64_t oneReqLeft)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     mtpDev_->xferFileLength -= oneReqLeft;
     mtpDev_->asyncSendFileActual = 0;
     mtpDev_->asyncSendFileExpect = 0;
@@ -1930,6 +1977,7 @@ void UsbfnMtpImpl::UsbMtpSendFileParamSet(const UsbFnMtpFileSlice &mfs)
 
 int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     ON_SCOPE_EXIT(release) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
@@ -1980,6 +2028,7 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
 
 int32_t UsbfnMtpImpl::SendEvent(const std::vector<uint8_t> &eventData)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
     pthread_rwlock_rdlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr || !mtpDev_->initFlag) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
@@ -2016,6 +2065,7 @@ int32_t UsbfnMtpImpl::SendEvent(const std::vector<uint8_t> &eventData)
         return HDF_FAILURE;
     }
     req->length = static_cast<uint32_t>(eventData.size());
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "MTP_UsbFnSubmitRequestSync");
     int32_t ret = UsbFnSubmitRequestSync(req, INTR_IN_TIMEOUT_JIFFIES);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: send notify sync request failed: %{public}d", __func__, ret);
