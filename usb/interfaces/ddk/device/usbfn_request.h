@@ -61,6 +61,8 @@ struct UsbFnRequest {
     void (*complete)(uint8_t pipe, struct UsbFnRequest *req);
     /** Pointer to the context for the callback */
     void             *context;
+    /** Request id for trace */
+    int32_t          reqId;
 };
 
 #ifdef __cplusplus
