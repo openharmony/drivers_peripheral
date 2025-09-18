@@ -40,19 +40,20 @@ int32_t LppSyncManagerAdapter::LoadVendorLib()
 {
     if (libHandle_ == nullptr) {
         void* handle = dlopen(LOW_POWER_PLAYER_VDI_LIBRARY, RTLD_LAZY);
-        CHECK_TRUE_RETURN_RET_LOG(handle == NULL, HDF_FAILURE, "dlopen failed, %{public}s", dlerror());
+        CHECK_TRUE_RETURN_RET_LOG(handle == nullptr, HDF_FAILURE, "dlopen failed, %{public}s", dlerror());
         libHandle_ = std::shared_ptr<void>(handle, dlclose);
     }
 
     if (createVdi_ == nullptr) {
         createVdi_ = reinterpret_cast<CreateLowPowerPlayerVdiFunc>(dlsym(libHandle_.get(), "CreateLowPowerPlayerVdi"));
-        CHECK_TRUE_RETURN_RET_LOG(createVdi_ == NULL, HDF_FAILURE, "createVdi_ dlsym failed, %{public}s", dlerror());
+        CHECK_TRUE_RETURN_RET_LOG(createVdi_ == nullptr, HDF_FAILURE, "createVdi_ dlsym failed, %{public}s", dlerror());
     }
 
     if (destroyVdi_ == nullptr) {
         destroyVdi_ =
             reinterpret_cast<DestroyLowPowerPlayerVdiFunc>(dlsym(libHandle_.get(), "DestroyLowPowerPlayerVdi"));
-        CHECK_TRUE_RETURN_RET_LOG(destroyVdi_ == NULL, HDF_FAILURE, "destroyVdi_ dlsym failed, %{public}s", dlerror());
+        CHECK_TRUE_RETURN_RET_LOG(
+            destroyVdi_ == nullptr, HDF_FAILURE, "destroyVdi_ dlsym failed, %{public}s", dlerror());
     }
     return HDF_SUCCESS;
 }
@@ -64,7 +65,7 @@ int32_t LppSyncManagerAdapter::Init()
     CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, HDF_FAILURE, "load vdi failed");
 
     vdiImpl_ = createVdi_();
-    CHECK_TRUE_RETURN_RET_LOG(vdiImpl_ == NULL, HDF_FAILURE, "createVdi_ failed");
+    CHECK_TRUE_RETURN_RET_LOG(vdiImpl_ == nullptr, HDF_FAILURE, "createVdi_ failed");
 
     ret = vdiImpl_->Init();
     CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, HDF_FAILURE, "Init failed");
