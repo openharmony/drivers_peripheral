@@ -184,7 +184,7 @@ int32_t WifiStaIface::GetSignalPollInfo(SignalPollResult& signalPollResult)
 int32_t WifiStaIface::EnablePowerMode(int32_t mode)
 {
     HDF_LOGD("EnablePowerMode");
-    if (ifaceUtil_.lock()->GetUpState(ifname_)) {
+    if (!ifaceUtil_.lock()->GetUpState(ifname_)) {
         HDF_LOGE("EnablePowerMode interface state is not OK.");
         return HDF_FAILURE;
     }
