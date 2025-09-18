@@ -201,6 +201,11 @@ uint32_t ExifUtils::IsJpegPicture(unsigned char *dataBuffer, int32_t dataBufferS
         return RC_ERROR;
     }
 
+    if (dataBufferSize <= 10) {
+        CAMERA_LOGE("%{public}s data buffer size is too small to check EXIF header", __FUNCTION__);
+        return RC_ERROR;
+    }
+
     if (!(dataBuffer[0] == 0xFF && dataBuffer[1] == 0xD8)) {
         CAMERA_LOGE("%{public}s not jpeg file,won't add exif for it.", __FUNCTION__);
         return RC_ERROR;
