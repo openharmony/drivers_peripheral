@@ -34,6 +34,7 @@ static const unsigned int EXIF_HEADER_LENGTH = sizeof(EXIF_HEADER);
 constexpr uint32_t DEGREE_INDEX = 0; // Index
 constexpr uint32_t MINUTE_INDEX = 1; // Index
 constexpr uint32_t SECOND_INDEX = 2; // Index
+constexpr int32_t MAXSIZE = 10;
 
 #define FILE_BYTE_ORDER EXIF_BYTE_ORDER_INTEL
 
@@ -198,6 +199,11 @@ uint32_t ExifUtils::IsJpegPicture(unsigned char *dataBuffer, int32_t dataBufferS
     }
     if (memcpy_s(dataBuffer, dataBufferSize, address, dataBufferSize) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
+        return RC_ERROR;
+    }
+
+    if (dataBufferSize < MAXSIZE) {
+        CAMERA_LOGE("%{public}s data buffer size is too small to check EXIF header", __FUNCTION__);
         return RC_ERROR;
     }
 
