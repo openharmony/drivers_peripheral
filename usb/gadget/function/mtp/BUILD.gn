@@ -44,6 +44,7 @@ ohos_shared_library("libusbfn_mtp_interface_service_1.0") {
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
+      "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
     if (usb_c_utils_enable) {
