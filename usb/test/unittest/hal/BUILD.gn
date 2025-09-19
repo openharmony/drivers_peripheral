@@ -305,7 +305,6 @@ ohos_unittest("test_deviceauthorize") {
       "googletest:gtest_main",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
@@ -348,7 +347,6 @@ ohos_unittest("test_interfaceauthorize") {
       "googletest:gtest_main",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
     ]
 
     if (usb_samgr_enable) {
