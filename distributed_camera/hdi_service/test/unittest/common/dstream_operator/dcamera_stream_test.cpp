@@ -224,7 +224,7 @@ HWTEST_F(DCameraStreamTest, SurfaceBufferToDImageBuffer_003, TestSize.Level1)
     ASSERT_NE(nullptr, dcStream);
     OHOS::sptr<OHOS::IBufferProducer> producer = nullptr;
     dcStream->dcStreamProducer_ = OHOS::Surface::CreateSurfaceAsProducer(producer);
-    dcStream->dcStreamInfo_ = nullptr; 
+    dcStream->dcStreamInfo_ = nullptr;
     OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = OHOS::SurfaceBuffer::Create();
     OHOS::sptr<OGOS::SyncFence> syncFence = new OHOS::SyncFence(-1);
     auto ret = dcStream->SurfaceBufferToDImageBuffer(surfaceBuffer, syncFence);
