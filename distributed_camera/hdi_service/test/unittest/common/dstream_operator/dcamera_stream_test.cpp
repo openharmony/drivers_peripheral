@@ -208,7 +208,7 @@ HWTEST_F(DCameraStreamTest, SurfaceBufferToDImageBuffer_002, TestSize.Level1)
     dcStream->dcStreamInfo_ = std::make_shared<StreamInfo>();
     dcStream->dcStreamInfo_->streamId_ = 1;
     OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = OHOS::SurfaceBuffer::Create();
-    OHOS::sptr<OGOS::SyncFence> syncFence = nullptr;
+    OHOS::sptr<OHOS::SyncFence> syncFence = nullptr;
     auto ret = dcStream->SurfaceBufferToDImageBuffer(surfaceBuffer, syncFence);
     EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
 }
@@ -226,7 +226,7 @@ HWTEST_F(DCameraStreamTest, SurfaceBufferToDImageBuffer_003, TestSize.Level1)
     dcStream->dcStreamProducer_ = OHOS::Surface::CreateSurfaceAsProducer(producer);
     dcStream->dcStreamInfo_ = nullptr;
     OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = OHOS::SurfaceBuffer::Create();
-    OHOS::sptr<OGOS::SyncFence> syncFence = new OHOS::SyncFence(-1);
+    OHOS::sptr<OHOS::SyncFence> syncFence = new OHOS::SyncFence(-1);
     auto ret = dcStream->SurfaceBufferToDImageBuffer(surfaceBuffer, syncFence);
     EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
 }
@@ -245,7 +245,7 @@ HWTEST_F(DCameraStreamTest, SurfaceBufferToDImageBuffer_004, TestSize.Level1)
     dcStream->dcStreamInfo_ = std::make_shared<StreamInfo>();
     dcStream->dcStreamInfo_->streamId_ = 1;
     OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = OHOS::SurfaceBuffer::Create();
-    OHOS::sptr<OGOS::SyncFence> syncFence = new OHOS::SyncFence(-1);
+    OHOS::sptr<OHOS::SyncFence> syncFence = new OHOS::SyncFence(-1);
     dcStream->dcStreamBufferMgr_ = nullptr;
     auto ret = dcStream->SurfaceBufferToDImageBuffer(surfaceBuffer, syncFence);
     EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
