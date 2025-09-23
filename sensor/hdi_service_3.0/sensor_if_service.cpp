@@ -1164,6 +1164,183 @@ int32_t SensorIfService::UnRegSensorPlugCallBack(const sptr<V3_0::ISensorPlugCal
     return ret;
 }
 
+int32_t SensorIfService::EnableWithCallbackId(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo,
+    uint32_t callbackId)
+{
+    SensorHandle sensorHandle = {deviceSensorInfo.deviceId, deviceSensorInfo.sensorType, deviceSensorInfo.sensorId,
+                                 deviceSensorInfo.location};
+    SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle));
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    HDF_LOGI("%{public}s:%{public}s pid %{public}d cbId %{public}d", __func__,
+             SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId, callbackId);
+    if (callbackId <= CALLBACK_ID_BEGIN || callbackId >= CALLBACK_ID_END) {
+        HDF_LOGE("%{public}s: callbackId %{public}d is invalid", __func__, callbackId);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+    SensorClientsManager::GetInstance()->ReSetSensorPrintTime(sensorHandle);
+    if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, callbackId, ENABLE_SENSOR)) {
+        return HDF_SUCCESS;
+    }
+
+    if (sensorVdiImplV1_1_ == nullptr) {
+        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    SensorClientsManager::GetInstance()->OpenSensor(sensorHandle, callbackId);
+    int32_t ret = HDF_FAILURE;
+    SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
+#ifdef TV_FLAG
+    ret = sensorVdiImplV1_1_->Enable(sensorHandle);
+#else
+    ret = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
+#endif
+    SENSOR_TRACE_FINISH;
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, callbackId = %{public}d",
+                 __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), callbackId);
+        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, callbackId, DISABLE_SENSOR);
+    }
+
+    return ret;
+}
+
+int32_t SensorIfService::DisableWithCallbackId(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo,
+    uint32_t callbackId)
+{
+    SensorHandle sensorHandle = {deviceSensorInfo.deviceId, deviceSensorInfo.sensorType, deviceSensorInfo.sensorId,
+                                 deviceSensorInfo.location};
+    SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle));
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    HDF_LOGI("%{public}s:%{public}s pid %{public}d cbId %{public}d", __func__,
+             SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId, callbackId);
+    if (callbackId <= CALLBACK_ID_BEGIN || callbackId >= CALLBACK_ID_END) {
+        HDF_LOGE("%{public}s: callbackId %{public}d is invalid", __func__, callbackId);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+    return DisableSensor(sensorHandle, callbackId);
+}
+
+int32_t SensorIfService::SetBatchWithCallbackId(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo,
+    uint32_t callbackId, int64_t samplingInterval, int64_t reportInterval)
+{
+    SensorHandle sensorHandle = {deviceSensorInfo.deviceId, deviceSensorInfo.sensorType, deviceSensorInfo.sensorId,
+                                 deviceSensorInfo.location};
+    SENSOR_TRACE;
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    HDF_LOGI("%{public}s:pid %{public}d cbId %{public}d", __func__, serviceId, callbackId);
+    if (callbackId <= CALLBACK_ID_BEGIN || callbackId >= CALLBACK_ID_END) {
+        HDF_LOGE("%{public}s: callbackId %{public}d is invalid", __func__, callbackId);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+
+    int32_t ret = SetBatchSenior(callbackId, sensorHandle, SA, samplingInterval, reportInterval);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
+    }
+
+    return ret;
+}
+
+int32_t SensorIfService::RegisterWithCallbackId(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj,
+    uint32_t callbackId)
+{
+    SENSOR_TRACE_PID;
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d cbId %{public}d", __func__, groupId, serviceId, callbackId);
+    if (callbackId <= CALLBACK_ID_BEGIN || callbackId >= CALLBACK_ID_END) {
+        HDF_LOGE("%{public}s: callbackId %{public}d is invalid", __func__, callbackId);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+    int32_t ret = HDF_SUCCESS;
+    const sptr<IRemoteObject> &iRemoteObject = OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(callbackObj);
+    int32_t result = AddCallbackMap(groupId, iRemoteObject);
+    if (result != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s: AddCallbackMap failed groupId[%{public}d]", __func__, groupId);
+    }
+    if (SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
+        if (sensorVdiImplV1_1_ == nullptr) {
+            HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+            return HDF_FAILURE;
+        }
+        sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, callbackObj, REGISTER_SENSOR);
+        if (sensorCb == nullptr) {
+            HDF_LOGE("%{public}s: get sensorcb fail, groupId[%{public}d]", __func__, groupId);
+            return HDF_FAILURE;
+        }
+        SENSOR_TRACE_START("sensorVdiImplV1_1_->Register");
+        ret = sensorVdiImplV1_1_->Register(groupId, sensorCb);
+        SENSOR_TRACE_FINISH;
+        if (ret != SENSOR_SUCCESS) {
+            HDF_LOGE("%{public}s Register failed, error code is %{public}d", __func__, ret);
+            int32_t removeResult = RemoveSensorDeathRecipient(iRemoteObject);
+            if (removeResult != SENSOR_SUCCESS) {
+                HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]",
+                         __func__, groupId);
+            }
+        } else {
+            SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, callbackId, callbackObj, false);
+        }
+    } else {
+        SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, callbackId, callbackObj, false);
+    }
+    return ret;
+}
+
+int32_t SensorIfService::UnregisterWithCallbackId(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj,
+    uint32_t callbackId)
+{
+    SENSOR_TRACE_PID;
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d cbId %{public}d", __func__, groupId, serviceId, callbackId);
+    if (callbackId <= CALLBACK_ID_BEGIN || callbackId >= CALLBACK_ID_END) {
+        HDF_LOGE("%{public}s: callbackId %{public}d is invalid", __func__, callbackId);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+    if (groupId < TRADITIONAL_SENSOR_TYPE || groupId >= SENSOR_GROUP_TYPE_MAX) {
+        HDF_LOGE("%{public}s: groupId %{public}d is error", __func__, groupId);
+        return SENSOR_INVALID_PARAM;
+    }
+    const sptr<IRemoteObject> &iRemoteObject = OHOS::HDI::hdi_objcast<V3_0::ISensorCallback>(callbackObj);
+    int32_t result = RemoveCallbackMap(groupId, callbackId, iRemoteObject);
+    if (result !=SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s: RemoveCallbackMap failed groupId[%{public}d]", __func__, groupId);
+    }
+    SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, callbackId, callbackObj);
+    if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
+        HDF_LOGD("%{public}s: clients is not empty, do not unregister", __func__);
+        return HDF_SUCCESS;
+    }
+    if (!SensorClientsManager::GetInstance()->IsNoSensorUsed()) {
+        HDF_LOGD("%{public}s: sensorUsed is not empty, do not unregister", __func__);
+        return HDF_SUCCESS;
+    }
+
+    if (sensorVdiImplV1_1_ == nullptr) {
+        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, callbackObj, UNREGISTER_SENSOR);
+    if (sensorCb == nullptr) {
+        HDF_LOGE("%{public}s: get sensorcb fail, groupId[%{public}d]", __func__, groupId);
+        return HDF_FAILURE;
+    }
+    SENSOR_TRACE_START("sensorVdiImplV1_1_->Unregister");
+    int32_t ret = sensorVdiImplV1_1_->Unregister(groupId, sensorCb);
+    SENSOR_TRACE_FINISH;
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s: Unregister failed, error code is %{public}d", __func__, ret);
+    }
+
+    return ret;
+}
+
 } // namespace V3_0
 } // namespace Sensor
 } // namespace HDI

@@ -25,7 +25,7 @@ ohos_static_library("libsensor_vdi_config") {
   public_configs = [ ":sensor_vdi_config" ]
 }
 
-ohos_shared_library("libsensor_interface_service_3.0") {
+ohos_shared_library("libsensor_interface_service_3.1") {
   defines = []
   if (build_variant == "root") {
     defines += [ "SENSOR_DEBUG" ]
@@ -61,6 +61,7 @@ ohos_shared_library("libsensor_interface_service_3.0") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_sensor:libsensor_stub_3.0",
+      "drivers_interface_sensor:libsensor_stub_3.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -102,6 +103,7 @@ ohos_shared_library("libsensor_driver") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_sensor:libsensor_stub_3.0",
+      "drivers_interface_sensor:libsensor_stub_3.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -128,6 +130,6 @@ ohos_shared_library("libsensor_driver") {
 group("hdi_sensor_service_3.0") {
   deps = [
     ":libsensor_driver",
-    ":libsensor_interface_service_3.0",
+    ":libsensor_interface_service_3.1",
   ]
 }
