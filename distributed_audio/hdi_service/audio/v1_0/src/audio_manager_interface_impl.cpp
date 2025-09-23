@@ -181,10 +181,13 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     return DH_SUCCESS;
 }
 
-int32_t AudioManagerInterfaceImpl::AddAudioDeviceInner(const uint32_t dhId, const DAudioDevEvent &event)
+int32_t AudioManagerInterfaceImpl::AddAudioDeviceInner(const uint32_t dhId, DAudioDevEvent &event)
 {
     int32_t ret = DH_SUCCESS;
     if (dhId != LOW_LATENCY_RENDER_ID) {
+        if (dhId == OFFLOAD_RENDER_ID) {
+            event.dhId = DEFAULT_RENDER_ID;
+        }
         int32_t ret = NotifyFwk(event);
         if (ret != DH_SUCCESS) {
             DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);

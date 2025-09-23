@@ -81,7 +81,7 @@ private:
     int32_t CreateAdapter(const std::string &adpName, const uint32_t devId, const sptr<IDAudioCallback> &callback);
     sptr<IRemoteObject> GetRemote(const std::string &adpName);
     sptr<AudioAdapterInterfaceImpl> GetAdapterFromMap(const std::string &adpName);
-    int32_t AddAudioDeviceInner(const uint32_t dhId, const DAudioDevEvent &event);
+    int32_t AddAudioDeviceInner(const uint32_t dhId, DAudioDevEvent &event);
     int32_t AddClearRegisterRecipient(sptr<IRemoteObject> &remote,
         const std::string &deviceId, uint32_t dhId);
     int32_t RemoveClearRegisterRecipient(sptr<IRemoteObject> &remote,
