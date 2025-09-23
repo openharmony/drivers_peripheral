@@ -18,6 +18,7 @@
 
 #include <map>
 #include "v3_0/isensor_interface.h"
+#include "v3_1/isensor_interface.h"
 #include "sensor_callback_vdi.h"
 #include "sensor_client_info.h"
 #include "sensor_clients_manager.h"
@@ -29,10 +30,11 @@ namespace Sensor {
 namespace V3_0 {
 using namespace OHOS::HDI::Sensor;
 using namespace OHOS::HDI::Sensor::V1_1;
+using namespace OHOS::HDI::Sensor::V3_1;
 
 using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<IRemoteObject>>>;
 
-class SensorIfService : public V3_0::ISensorInterface {
+class SensorIfService : public V3_1::ISensorInterface {
 //V3_0 interface
     public:
     SensorIfService();
@@ -71,6 +73,17 @@ class SensorIfService : public V3_0::ISensorInterface {
                                 std::vector<OHOS::HDI::Sensor::V3_0::HdfSensorInformation>& info) override;
     int32_t RegSensorPlugCallBack(const sptr<OHOS::HDI::Sensor::V3_0::ISensorPlugCallback>& callbackObj) override;
     int32_t UnRegSensorPlugCallBack(const sptr<OHOS::HDI::Sensor::V3_0::ISensorPlugCallback>& callbackObj) override;
+    int32_t EnableWithCallbackId(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo,
+        uint32_t callbackId) override;
+    int32_t DisableWithCallbackId(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo,
+        uint32_t callbackId) override;
+    int32_t SetBatchWithCallbackId(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo,
+        uint32_t callbackId, int64_t samplingInterval, int64_t reportInterval) override;
+    int32_t RegisterWithCallbackId(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj,
+        uint32_t callbackId) override;
+    int32_t UnregisterWithCallbackId(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj,
+        uint32_t callbackId) override;
+
     int32_t GetSensorVdiImpl();
     void OnRemoteDied(const wptr<IRemoteObject> &object);
     std::mutex sensorServiceMutex_;
