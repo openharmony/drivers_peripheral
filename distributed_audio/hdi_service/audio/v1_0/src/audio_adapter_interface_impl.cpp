@@ -174,7 +174,10 @@ sptr<IDAudioCallback> AudioAdapterInterfaceImpl::MatchStreamCallback(const Audio
         if (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP) {
             dhId = LOW_LATENCY_RENDER_ID;
         } else if (attrs.type == AUDIO_OFFLOAD) {
-            dhId = OFFLOAD_RENDER_ID;
+            std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+            if (extCallbackMap_.find(OFFLOAD_RENDER_ID) != extCallbackMap_.end()) {
+                dhId = OFFLOAD_RENDER_ID;
+            }
         }
     }
 
