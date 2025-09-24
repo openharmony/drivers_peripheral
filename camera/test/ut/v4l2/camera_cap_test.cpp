@@ -350,7 +350,6 @@ HWTEST_F(CameraCaptureTest, camera_capture_021, TestSize.Level1)
     display_->streamInfo.height_ = 960; // 640:picture height
     display_->streamInfo.format_ = PIXEL_FMT_RGBA_8888;
     display_->streamInfo.dataspace_ = 8; // 8:picture dataspace
-    display_->streamInfo.intent_ = STILL_CAPTURE;
     display_->streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo.encodeType_ = ENCODE_TYPE_JPEG;
     display_->streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
@@ -410,7 +409,6 @@ HWTEST_F(CameraCaptureTest, Camera_Capture_022, TestSize.Level1)
     streamInfo_capture->height_ = 480;
     streamInfo_capture->format_ = PIXEL_FMT_YCRCB_420_SP;
     streamInfo_capture->dataspace_ = 8;
-    streamInfo_capture->intent_ = HDI::Camera::V1_0::STILL_CAPTURE;
     streamInfo_capture->tunneledMode_ = 5;
 
     // Query whether the IsStreamsSupported interface supports
