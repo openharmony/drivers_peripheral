@@ -1300,6 +1300,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_001, TestSize.Level1)
 
     DAudioEvent event = {HDF_AUDIO_EVENT_OPEN_SPK_RESULT, "RENDER_STATE_CHANGE_EVENT"};
     uint32_t streamId = 0;
+    AdapterTest_->HandleSPKEvent(streamId, true, event);
+    AdapterTest_->HandleMICEvent(true, event);
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleSANotifyEvent(streamId, event));
 }
 
@@ -1316,6 +1318,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_002, TestSize.Level1)
 
     DAudioEvent event = {HDF_AUDIO_EVENT_OPEN_SPK_RESULT, HDF_EVENT_RESULT_SUCCESS};
     uint32_t streamId = 0;
+    AdapterTest_->HandleSPKEvent(streamId, true, event);
+    AdapterTest_->HandleMICEvent(true, event);
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleSANotifyEvent(streamId, event));
 }
 

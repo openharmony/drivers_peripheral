@@ -1098,41 +1098,47 @@ int32_t AudioAdapterInterfaceImpl::ConvertMsg2Code(const std::string &msg)
     }
 }
 
+void AudioAdapterInterfaceImpl::HandleSPKEvent(const uint32_t streamId, bool spkStatus, const DAudioEvent &event)
+{
+    std::unique_lock<std::mutex> lck(spkWaitMutex_);
+    DHLOGI("spk notify_all start.");
+    if (event.content == HDF_EVENT_RESULT_SUCCESS) {
+        SetSpkStatus(streamId, spkStatus);
+    }
+    errCode_ = ConvertMsg2Code(event.content);
+    spkNotifyFlag_ = true;
+    spkWaitCond_.notify_all();
+    DHLOGI("spk notify_all end.");
+}
+
+void AudioAdapterInterfaceImpl::HandleMICEvent(bool micStatus, const DAudioEvent &event)
+{
+    std::unique_lock<std::mutex> lck(micWaitMutex_);
+    DHLOGI("mic notify_all start.");
+    if (event.content == HDF_EVENT_RESULT_SUCCESS) {
+        isMicOpened_ = micStatus;
+    }
+    errCode_ = ConvertMsg2Code(event.content);
+    micNotifyFlag_ = true;
+    micWaitCond_.notify_all();
+    DHLOGI("mic notify_all end.");
+}
+
 int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const uint32_t streamId, const DAudioEvent &event)
 {
-    DHLOGD("Notify event type %{public}d, event content: %{public}s.", event.type, event.content.c_str());
+    DHLOGI("Notify event type %{public}d, event content: %{public}s.", event.type, event.content.c_str());
     switch (event.type) {
         case HDF_AUDIO_EVENT_OPEN_SPK_RESULT:
-            if (event.content == HDF_EVENT_RESULT_SUCCESS) {
-                SetSpkStatus(streamId, true);
-            }
-            errCode_ = ConvertMsg2Code(event.content);
-            spkNotifyFlag_ = true;
-            spkWaitCond_.notify_all();
+            HandleSPKEvent(streamId, true, event);
             break;
         case HDF_AUDIO_EVENT_CLOSE_SPK_RESULT:
-            if (event.content == HDF_EVENT_RESULT_SUCCESS) {
-                SetSpkStatus(streamId, false);
-            }
-            errCode_ = ConvertMsg2Code(event.content);
-            spkNotifyFlag_ = true;
-            spkWaitCond_.notify_all();
+            HandleSPKEvent(streamId, false, event);
             break;
         case HDF_AUDIO_EVENT_OPEN_MIC_RESULT:
-            if (event.content == HDF_EVENT_RESULT_SUCCESS) {
-                isMicOpened_ = true;
-            }
-            errCode_ = ConvertMsg2Code(event.content);
-            micNotifyFlag_ = true;
-            micWaitCond_.notify_all();
+            HandleMICEvent(true, event);
             break;
         case HDF_AUDIO_EVENT_CLOSE_MIC_RESULT:
-            if (event.content == HDF_EVENT_RESULT_SUCCESS) {
-                isMicOpened_ = false;
-            }
-            errCode_ = ConvertMsg2Code(event.content);
-            micNotifyFlag_ = true;
-            micWaitCond_.notify_all();
+            HandleMICEvent(false, event);
             break;
         case HDF_AUDIO_EVENT_SPK_DUMP:
             SetDumpFlag(true);
