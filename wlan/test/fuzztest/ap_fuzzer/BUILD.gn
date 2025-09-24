@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 TEST_ROOT_DIR = "../../.."
 
@@ -34,6 +33,7 @@ ohos_fuzztest("ApFuzzTest") {
     "drivers_interface_wlan:libwlan_proxy_1.3",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "bounds_checking_function:libsec_shared",
   ]
 
   cflags = [
@@ -42,8 +42,6 @@ ohos_fuzztest("ApFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   sources = [
     "$TEST_ROOT_DIR/test/fuzztest/wlan_common_fuzzer.cpp",

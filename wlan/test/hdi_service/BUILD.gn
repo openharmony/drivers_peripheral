@@ -32,8 +32,6 @@ ohos_unittest("WlanHdiServiceTestC") {
 
   deps = [
     "$TEST_ROOT_DIR/hdi_service:hdi_wlan_service",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   include_dirs = [ "include" ]
@@ -51,6 +49,11 @@ ohos_unittest("WlanHdiServiceTestC") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+ 
+  external_deps += [
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+  ]
 }
 
 ###########################end###########################
