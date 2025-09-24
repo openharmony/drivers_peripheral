@@ -35,7 +35,7 @@ static std::mutex g_mutex;
 
 static void InitVerifyAccessToken()
 {
-    if (g_verifyAccessToken != nullptr) {
+    if (g_verifyAccessToken != nullptr && g_getApiVersion != nullptr) {
         return;
     }
 
