@@ -48,7 +48,7 @@ int32_t EthEapClientRegisterCallback(struct IEthernetCallback* callback, const c
     uint32_t i;
     int ifNameLen = 0;
     if (ifName != NULL) {
-        ifNameLen = strnlen(ifName, IFNAMSIZE + 1);
+        ifNameLen = (int)strnlen(ifName, IFNAMSIZE + 1);
     }
     if (callback == NULL || ifName == NULL || ifNameLen == (IFNAMSIZE + 1)) {
         HDF_LOGE("%s: input param invalid", __FUNCTION__);
