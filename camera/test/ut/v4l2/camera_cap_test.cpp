@@ -296,7 +296,6 @@ HWTEST_F(CameraCaptureTest, camera_capture_020, TestSize.Level1)
     display_->streamInfo.height_ = 960; // picture height
     display_->streamInfo.format_ = PIXEL_FMT_RGBA_8888;
     display_->streamInfo.dataspace_ = 8; // picture dataspace
-    display_->streamInfo.intent_ = STILL_CAPTURE;
     display_->streamInfo.tunneledMode_ = 5; // tunnel mode
     display_->streamInfo.encodeType_ = ENCODE_TYPE_JPEG;
     display_->streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
