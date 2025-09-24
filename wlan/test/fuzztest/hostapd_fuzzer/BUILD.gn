@@ -12,8 +12,6 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
-import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 TEST_ROOT_DIR = "../../.."
 
@@ -30,8 +28,6 @@ ohos_fuzztest("HostapdFuzzTest") {
     "$TEST_ROOT_DIR/test/fuzztest",
     "./service_common",
     "../../client/include",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/hostapd",
   ]
 
   deps = [ "$TEST_ROOT_DIR/hdi_service:hdi_wlan_service" ]
@@ -50,6 +46,7 @@ ohos_fuzztest("HostapdFuzzTest") {
     "hdf_core:libpub_utils",
     "hilog:libhilog",
     "wpa_supplicant:wpa",
+    "bounds_checking_function:libsec_shared",
   ]
 
   cflags = [
@@ -62,8 +59,6 @@ ohos_fuzztest("HostapdFuzzTest") {
     "-DCONFIG_WEP",
     "-DCONFIG_WPS",
   ]
-
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   sources = [
     "$TEST_ROOT_DIR/test/fuzztest/hostapd_common_fuzzer.cpp",

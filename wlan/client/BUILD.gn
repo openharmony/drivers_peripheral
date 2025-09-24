@@ -132,6 +132,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
         "init:libbegetutil",
+        "libnl:libnl_share",
       ]
 
       defines = [ "__OHOS__USER__" ]
