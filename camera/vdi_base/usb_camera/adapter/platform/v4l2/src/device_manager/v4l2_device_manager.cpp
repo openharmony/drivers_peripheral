@@ -823,7 +823,7 @@ void V4L2DeviceManager::AddDefaultAbilityMuteModes(std::shared_ptr<CameraMetadat
 
 void V4L2DeviceManager::AddDefaultAbilityConcurrentCameras(std::shared_ptr<CameraMetadata> metadata)
 {
-    std::vector<uint8_t> concurrentList = {1, 2, 3, 4, 5, 6, 7};
+    std::vector<int32_t> concurrentList = {1, 2, 3, 4, 5, 6, 7};
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_CONCURRENT_SUPPORTED_CAMERAS, concurrentList);
 }
 
