@@ -412,12 +412,12 @@ The core functions of this repository are as follows:
 
 ## Repositories Involved<a name="section1371113476307"></a>
 
-[Driver Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/driver.md)
+[Driver Subsystem](https://gitcode.com/openharmony/docs/blob/master/en/readme/driver.md)
 
-[drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README.md)
+[drivers\_framework](https://gitcode.com/openharmony/drivers_framework/blob/master/README.md)
 
-[drivers\_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README.md)
+[drivers\_adapter](https://gitcode.com/openharmony/drivers_adapter/blob/master/README.md)
 
-[drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README.md)
+[drivers\_adapter\_khdf\_linux](https://gitcode.com/openharmony/drivers_adapter_khdf_linux/blob/master/README.md)
 
-[drivers\_peripheral](https://gitee.com/openharmony/drivers_peripheral)
+[drivers\_peripheral](https://gitcode.com/openharmony/drivers_peripheral)

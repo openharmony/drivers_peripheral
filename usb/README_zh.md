@@ -412,13 +412,13 @@ USB Device DDK提供设备管理、IO管理、配置管理，主要功能有：�
 
 ## 相关仓<a name="section1371113476307"></a>
 
-[驱动子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
+[驱动子系统](https://gitcode.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-[drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README_zh.md)
+[drivers\_framework](https://gitcode.com/openharmony/drivers_framework/blob/master/README_zh.md)
 
-[drivers\_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README_zh.md)
+[drivers\_adapter](https://gitcode.com/openharmony/drivers_adapter/blob/master/README_zh.md)
 
-[drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
+[drivers\_adapter\_khdf\_linux](https://gitcode.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
 
-[drivers\_peripheral](https://gitee.com/openharmony/drivers_peripheral)
+[drivers\_peripheral](https://gitcode.com/openharmony/drivers_peripheral)
 
