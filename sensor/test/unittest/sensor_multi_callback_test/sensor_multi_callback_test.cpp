@@ -124,6 +124,15 @@ namespace {
 
     void SensorSetBatchTest::CallbackTestPerSecond1()
     {
+        int32_t expectedMinCount = g_oneSecond / (g_samplingInterval / g_oneMillion) / 2;
+        int32_t expectedMaxCount = g_oneSecond / (g_samplingInterval / g_oneMillion) * 3 / 2;
+        int32_t expectedMinCount3 = g_oneSecond / (g_samplingInterval3 / g_oneMillion) / 2;
+        int32_t expectedMaxCount3 = g_oneSecond / (g_samplingInterval3 / g_oneMillion) * 3 / 2;
+        printf("\033[92mCallback1 expectedMinCount is %s, expectedMaxCount is %s\033[0m\r\n",
+            std::to_string(expectedMinCount).c_str(), std::to_string(expectedMaxCount).c_str());
+
+        printf("\033[93mCallback3 expectedMinCount3 is %s, expectedMaxCount3 is %s\033[0m\r\n",
+            std::to_string(expectedMinCount3).c_str(), std::to_string(expectedMaxCount3).c_str());
         for (int i = 0; i < g_testTime / g_oneSecond; i++) {
             OsalMSleep(g_oneSecond);
             int32_t countPerSecond = SensorCallbackImpl::sensorDataCount - SensorCallbackImpl::sensorDataCountOld;
@@ -157,45 +166,40 @@ namespace {
         sptr<V3_1::ISensorInterface>  g_sensorInterface = V3_1::ISensorInterface::Get();
         sptr<V3_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
         sptr<V3_0::ISensorCallback> g_traditionalCallback3 = new SensorCallbackImpl3();
-        int32_t callbackId1 = 65537;
-        int32_t callbackId3 = 65538;
-        int32_t ret = g_sensorInterface->Register(0, g_traditionalCallback, callbackId1);
-        ret = g_sensorInterface->Register(0, g_traditionalCallback3, callbackId3);
+        int32_t callbackId1 = GPS_CALLBACK_ID_BEGIN;
+        int32_t callbackId3 = GPS_CALLBACK_ID_BEGIN + 2;
+        int32_t ret = g_sensorInterface->RegisterWithCallbackId(0, g_traditionalCallback, callbackId1);
+        ret = g_sensorInterface->RegisterWithCallbackId(0, g_traditionalCallback3, callbackId3);
         EXPECT_EQ(ret, HDF_SUCCESS);
-        ret = g_sensorInterface->SetBatch(g_deviceSensorInfo, callbackId1, g_samplingInterval, 0);
-        ret = g_sensorInterface->SetBatch(g_deviceSensorInfo2, callbackId3, g_samplingInterval3, 0);
+        ret = g_sensorInterface->SetBatchWithCallbackId(g_deviceSensorInfo, callbackId1, g_samplingInterval, 0);
+        ret = g_sensorInterface->SetBatchWithCallbackId(g_deviceSensorInfo2, callbackId3, g_samplingInterval3, 0);
         printf("\033[92mCallback1 SetBatch({%s}, %s, 0)\033[0m\r\n", SENSOR_HANDLE_TO_C_STR(g_deviceSensorInfo),
             std::to_string(g_samplingInterval).c_str());
         printf("\033[93mCallback3 SetBatch({%s}, %s, 0)\033[0m\r\n", SENSOR_HANDLE_TO_C_STR(g_deviceSensorInfo2),
             std::to_string(g_samplingInterval3).c_str());
         EXPECT_EQ(ret, HDF_SUCCESS);
-        ret = g_sensorInterface->Enable(g_deviceSensorInfo, callbackId1);
-        ret = g_sensorInterface->Enable(g_deviceSensorInfo2, callbackId3);
+        ret = g_sensorInterface->EnableWithCallbackId(g_deviceSensorInfo, callbackId1);
+        ret = g_sensorInterface->EnableWithCallbackId(g_deviceSensorInfo2, callbackId3);
         EXPECT_EQ(ret, HDF_SUCCESS);
-
-        int32_t expectedMinCount = g_oneSecond / (g_samplingInterval / g_oneMillion) / 2;
-        int32_t expectedMaxCount = g_oneSecond / (g_samplingInterval / g_oneMillion) * 3 / 2;
-
-        printf("\033[92mCallback1 expectedMinCount is %s, expectedMaxCount is %s\033[0m\r\n",
-            std::to_string(expectedMinCount).c_str(), std::to_string(expectedMaxCount).c_str());
-
-        int32_t expectedMinCount3 = g_oneSecond / (g_samplingInterval3 / g_oneMillion) / 2;
-        int32_t expectedMaxCount3 = g_oneSecond / (g_samplingInterval3 / g_oneMillion) * 3 / 2;
-
-        printf("\033[93mCallback3 expectedMinCount3 is %s, expectedMaxCount3 is %s\033[0m\r\n",
-            std::to_string(expectedMinCount3).c_str(), std::to_string(expectedMaxCount3).c_str());
         CallbackTestPerSecond1();
-
-        ret = g_sensorInterface->Disable(g_deviceSensorInfo, callbackId1);
-        ret = g_sensorInterface->Disable(g_deviceSensorInfo2, callbackId3);
+        ret = g_sensorInterface->DisableWithCallbackId(g_deviceSensorInfo, callbackId1);
+        ret = g_sensorInterface->DisableWithCallbackId(g_deviceSensorInfo2, callbackId3);
         EXPECT_EQ(ret, HDF_SUCCESS);
-        ret = g_sensorInterface->Unregister(0, g_traditionalCallback, callbackId1);
-        ret = g_sensorInterface->Unregister(0, g_traditionalCallback3, callbackId3);
+        ret = g_sensorInterface->UnregisterWithCallbackId(0, g_traditionalCallback, callbackId1);
+        ret = g_sensorInterface->UnregisterWithCallbackId(0, g_traditionalCallback3, callbackId3);
         EXPECT_EQ(ret, HDF_SUCCESS);
     }
 
     void SensorSetBatchTest::CallbackTestPerSecond2()
     {
+        int32_t expectedMinCount2 = g_oneSecond / (g_samplingInterval2 / g_oneMillion) / 2;
+        int32_t expectedMaxCount2 = g_oneSecond / (g_samplingInterval2 / g_oneMillion) * 3 / 2;
+        int32_t expectedMinCount4 = g_oneSecond / (g_samplingInterval4 / g_oneMillion) / 2;
+        int32_t expectedMaxCount4 = g_oneSecond / (g_samplingInterval4 / g_oneMillion) * 3 / 2;
+        printf("\033[94mexpectedMinCount2 is %s, expectedMaxCount2 is %s\033[0m\r\n",
+            std::to_string(expectedMinCount2).c_str(), std::to_string(expectedMaxCount2).c_str());
+        printf("\033[96mexpectedMinCount4 is %s, expectedMaxCount4 is %s\033[0m\r\n",
+            std::to_string(expectedMinCount4).c_str(), std::to_string(expectedMaxCount4).c_str());
         for (int i = 0; i < g_testTime / g_oneSecond; i++) {
             OsalMSleep(g_oneSecond);
             int32_t countPerSecond2 = SensorCallbackImpl2::sensorDataCount - SensorCallbackImpl2::sensorDataCountOld;
@@ -229,38 +233,28 @@ namespace {
         sptr<V3_1::ISensorInterface>  g_sensorInterface = V3_1::ISensorInterface::Get();
         sptr<V3_0::ISensorCallback> g_traditionalCallback2 = new SensorCallbackImpl2();
         sptr<V3_0::ISensorCallback> g_traditionalCallback4 = new SensorCallbackImpl4();
-        int32_t callbackId2 = 75537;
-        int32_t callbackId4 = 75538;
-        int32_t ret = g_sensorInterface->Register(0, g_traditionalCallback2, callbackId2);
-        ret = g_sensorInterface->Register(0, g_traditionalCallback4, callbackId4);
+        int32_t callbackId2 = GPS_CALLBACK_ID_BEGIN + 1;
+        int32_t callbackId4 = GPS_CALLBACK_ID_BEGIN + 3;
+        int32_t ret = g_sensorInterface->RegisterWithCallbackId(0, g_traditionalCallback2, callbackId2);
+        ret = g_sensorInterface->RegisterWithCallbackId(0, g_traditionalCallback4, callbackId4);
         EXPECT_EQ(ret, HDF_SUCCESS);
-        ret = g_sensorInterface->SetBatch(g_deviceSensorInfo, callbackId2, g_samplingInterval2, 0);
-        ret = g_sensorInterface->SetBatch(g_deviceSensorInfo2, callbackId4, g_samplingInterval4, 0);
+        ret = g_sensorInterface->SetBatchWithCallbackId(g_deviceSensorInfo, callbackId2, g_samplingInterval2, 0);
+        ret = g_sensorInterface->SetBatchWithCallbackId(g_deviceSensorInfo2, callbackId4, g_samplingInterval4, 0);
         printf("\033[94mCallback2 SetBatch({%s}, %s, 0)\033[0m\r\n", SENSOR_HANDLE_TO_C_STR(g_deviceSensorInfo),
             std::to_string(g_samplingInterval2).c_str());
         printf("\033[96mCallback4 SetBatch({%s}, %s, 0)\033[0m\r\n", SENSOR_HANDLE_TO_C_STR(g_deviceSensorInfo2),
             std::to_string(g_samplingInterval4).c_str());
         EXPECT_EQ(ret, HDF_SUCCESS);
-        ret = g_sensorInterface->Enable(g_deviceSensorInfo, callbackId2);
-        ret = g_sensorInterface->Enable(g_deviceSensorInfo2, callbackId4);
+        ret = g_sensorInterface->EnableWithCallbackId(g_deviceSensorInfo, callbackId2);
+        ret = g_sensorInterface->EnableWithCallbackId(g_deviceSensorInfo2, callbackId4);
         EXPECT_EQ(ret, HDF_SUCCESS);
-
-        int32_t expectedMinCount2 = g_oneSecond / (g_samplingInterval2 / g_oneMillion) / 2;
-        int32_t expectedMaxCount2 = g_oneSecond / (g_samplingInterval2 / g_oneMillion) * 3 / 2;
-        int32_t expectedMinCount4 = g_oneSecond / (g_samplingInterval4 / g_oneMillion) / 2;
-        int32_t expectedMaxCount4 = g_oneSecond / (g_samplingInterval4 / g_oneMillion) * 3 / 2;
-
-        printf("\033[94mexpectedMinCount2 is %s, expectedMaxCount2 is %s\033[0m\r\n",
-            std::to_string(expectedMinCount2).c_str(), std::to_string(expectedMaxCount2).c_str());
-        printf("\033[96mexpectedMinCount4 is %s, expectedMaxCount4 is %s\033[0m\r\n",
-            std::to_string(expectedMinCount4).c_str(), std::to_string(expectedMaxCount4).c_str());
         CallbackTestPerSecond2();
 
-        ret = g_sensorInterface->Disable(g_deviceSensorInfo, callbackId2);
-        ret = g_sensorInterface->Disable(g_deviceSensorInfo2, callbackId4);
+        ret = g_sensorInterface->DisableWithCallbackId(g_deviceSensorInfo, callbackId2);
+        ret = g_sensorInterface->DisableWithCallbackId(g_deviceSensorInfo2, callbackId4);
         EXPECT_EQ(ret, HDF_SUCCESS);
-        ret = g_sensorInterface->Unregister(0, g_traditionalCallback2, callbackId2);
-        ret = g_sensorInterface->Unregister(0, g_traditionalCallback4, callbackId4);
+        ret = g_sensorInterface->UnregisterWithCallbackId(0, g_traditionalCallback2, callbackId2);
+        ret = g_sensorInterface->UnregisterWithCallbackId(0, g_traditionalCallback4, callbackId4);
         EXPECT_EQ(ret, HDF_SUCCESS);
     }
     /**
