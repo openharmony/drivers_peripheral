@@ -41,6 +41,8 @@ namespace {
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
     V1_2::HapticPaket g_pkg1 = {434, 1, {{V1_2::TRANSIENT, 0, 149, 100, 50, 0, 4,
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
+    V1_2::HapticPaket g_pkg2 = {600, 1, {{V1_2::TRANSIENT, 0, 149, 100, 120, 0, 4,
+        {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
     int32_t g_vibratorId = 0;
     std::vector<HdfWaveInformation> g_info;
     constexpr int32_t MIN_DURATION = 0;
@@ -445,6 +447,80 @@ HWTEST_F(HdfVibratorHdiTest, EnableVibratorModulation_004, TestSize.Level1)
 }
 
 /**
+  * @tc.name: EnableVibratorModulation_005
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, EnableVibratorModulation_005, TestSize.Level1)
+{
+    uint32_t majorVer;
+    uint32_t minorVer;
+    if (g_vibratorInterface->GetVersion(majorVer, minorVer) != HDF_SUCCESS) {
+        printf("get version failed!\n\t");
+        return;
+    }
+
+    if (majorVer > 0 && minorVer <= 0) {
+        printf("version not support!\n\t");
+        return;
+    }
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+
+    int32_t startRet = g_vibratorInterface->GetVibratorInfo(info);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    if ((info[0].isSupportIntensity == 1) || (info[0].isSupportFrequency == 1)) {
+        startRet = g_vibratorInterface->EnableVibratorModulation(g_noDuration, g_intensity2, g_frequency2);
+        EXPECT_EQ(startRet, VIBRATOR_NOT_FREQUENCY);
+    }
+}
+
+/**
+  * @tc.name: EnableVibratorModulation_006
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, EnableVibratorModulation_006, TestSize.Level1)
+{
+    uint32_t majorVer;
+    uint32_t minorVer;
+    if (g_vibratorInterface->GetVersion(majorVer, minorVer) != HDF_SUCCESS) {
+        printf("get version failed!\n\t");
+        return;
+    }
+
+    if (majorVer > 0 && minorVer <= 0) {
+        printf("version not support!\n\t");
+        return;
+    }
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+
+    int32_t startRet = g_vibratorInterface->GetVibratorInfo(info);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    if ((info[0].isSupportIntensity == 1) || (info[0].isSupportFrequency == 1)) {
+        EXPECT_GT(g_noDuration, 0);
+        EXPECT_GE(g_intensity1, info[0].intensityMinValue);
+        EXPECT_LE(g_intensity1, info[0].intensityMaxValue);
+        EXPECT_GE(g_frequency1, info[0].frequencyMinValue);
+        EXPECT_LE(g_frequency1, info[0].frequencyMaxValue);
+
+        startRet = g_vibratorInterface->EnableVibratorModulation(g_noDuration, g_intensity1, g_frequency1);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+        OsalMSleep(g_sleepTime1);
+        startRet = g_vibratorInterface->StopV1_2(HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_ONCE);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+/**
   * @tc.name: GetEffectInfo_001
   * @tc.desc: Get effect information with the given effect type.
   * @tc.type: FUNC
@@ -516,6 +592,23 @@ HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern_001, TestSize.Level1)
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_pkg1);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    int32_t endRet = g_vibratorInterface->StopV1_2(HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_ONCE);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
+}
+
+/**
+  * @tc.name: PlayHapticPattern_002
+  * @tc.desc: HD vibration data packet delivery.
+  * @tc.type: FUNC
+  * @tc.require:#I8BZ5H
+  */
+HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_pkg2);
     EXPECT_EQ(startRet, HDF_SUCCESS);
 
     int32_t endRet = g_vibratorInterface->StopV1_2(HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_ONCE);
