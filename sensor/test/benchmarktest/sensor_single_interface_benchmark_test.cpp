@@ -27,14 +27,16 @@
 #include "sensor_plug_callback_impl.h"
 #include "sensor_uhdf_log.h"
 #include "v3_0/isensor_interface.h"
+#include "v3_1/isensor_interface.h"
 
 using namespace OHOS::HDI::Sensor::V3_0;
+using OHOS::HDI::Sensor::V3_1::GPS_CALLBACK_ID_BEGIN;
 using namespace OHOS::HDI::Sensor;
 using namespace testing::ext;
 using namespace std;
 
 namespace {
-    sptr<ISensorInterface>  g_sensorInterface = nullptr;
+    sptr<V3_1::ISensorInterface>  g_sensorInterface = nullptr;
     sptr<V3_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     sptr<V3_0::ISensorPlugCallback> g_sensorPlugCallback = new SensorPlugCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
@@ -58,7 +60,7 @@ public:
 
 void SensorBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
-    g_sensorInterface = ISensorInterface::Get();
+    g_sensorInterface = V3_1::ISensorInterface::Get();
 }
 
 void SensorBenchmarkTest::TearDown(const ::benchmark::State &state)
@@ -335,6 +337,94 @@ BENCHMARK_F(SensorBenchmarkTest, UnRegSensorPlugCallBack)(benchmark::State &stat
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, UnRegSensorPlugCallBack)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_EnableWithCallbackId
+  * @tc.desc: Benchmarktest for interface EnableWithCallbackId
+  * Unregisters a callback function for sensor plug events
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, EnableWithCallbackId)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->EnableWithCallbackId(SENSOR_HANDLE, GPS_CALLBACK_ID_BEGIN);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, EnableWithCallbackId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_DisableWithCallbackId
+  * @tc.desc: Benchmarktest for interface DisableWithCallbackId
+  * Unregisters a callback function for sensor plug events
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, DisableWithCallbackId)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->DisableWithCallbackId(SENSOR_HANDLE, GPS_CALLBACK_ID_BEGIN);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, DisableWithCallbackId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_SetBatchWithCallbackId
+  * @tc.desc: Benchmarktest for interface SetBatchWithCallbackId
+  * Unregisters a callback function for sensor plug events
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, SetBatchWithCallbackId)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->SetBatchWithCallbackId(SENSOR_HANDLE, GPS_CALLBACK_ID_BEGIN,
+                SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetBatchWithCallbackId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_RegisterWithCallbackId
+  * @tc.desc: Benchmarktest for interface RegisterWithCallbackId
+  * Unregisters a callback function for sensor plug events
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, RegisterWithCallbackId)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->RegisterWithCallbackId(HDF_TRADITIONAL_SENSOR_TYPE, g_traditionalCallback,
+            GPS_CALLBACK_ID_BEGIN);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, RegisterWithCallbackId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_UnregisterWithCallbackId
+  * @tc.desc: Benchmarktest for interface UnregisterWithCallbackId
+  * Unregisters a callback function for sensor plug events
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, UnregisterWithCallbackId)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        int32_t ret = g_sensorInterface->UnregisterWithCallbackId(HDF_TRADITIONAL_SENSOR_TYPE, g_traditionalCallback,
+            GPS_CALLBACK_ID_BEGIN);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, UnregisterWithCallbackId)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }
 
