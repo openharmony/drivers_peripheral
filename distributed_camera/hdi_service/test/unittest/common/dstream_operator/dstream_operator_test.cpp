@@ -1489,25 +1489,11 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_063, TestSize.Level1)
 
 /**
  * @tc.name: dstream_operator_test_064
- * @tc.desc: Verify AddStreamCaptureBufferNum
- * @tc.type: FUNC
- * @tc.require: AR
- */
-HWTEST_F(DStreamOperatorTest, dstream_operator_test_064, TestSize.Level1)
-{
-    EXPECT_EQ(false, dstreamOperator_ == nullptr);
-    std::pair<int, int> streamPair = {3, 4};
-    dstreamOperator_->AddStreamCaptureBufferNum(streamPair);
-    EXPECT_EQ(dstreamOperator_->acceptedBufferNum_[streamPair], 0);
-}
-
-/**
- * @tc.name: dstream_operator_test_065
  * @tc.desc: Verify InsertNotifyCaptureMap
  * @tc.type: FUNC
  * @tc.require: AR
  */
-HWTEST_F(DStreamOperatorTest, dstream_operator_test_065, TestSize.Level1)
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_064, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
     int32_t streamId = 1;
@@ -1519,12 +1505,12 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_065, TestSize.Level1)
 }
 
 /**
- * @tc.name: dstream_operator_test_066
+ * @tc.name: dstream_operator_test_065
  * @tc.desc: Verify InsertNotifyCaptureMap
  * @tc.type: FUNC
  * @tc.require: AR
  */
-HWTEST_F(DStreamOperatorTest, dstream_operator_test_066, TestSize.Level1)
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_065, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
     int32_t streamId = 1;
@@ -1539,7 +1525,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_066, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR
  */
-HWTEST_F(DStreamOperatorTest, dstream_operator_test_067, TestSize.Level1)
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_066, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
     int32_t streamId = 1;
@@ -1556,7 +1542,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_067, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR
  */
-HWTEST_F(DStreamOperatorTest, dstream_operator_test_068, TestSize.Level1)
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_067, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
     int32_t streamId = 1;
@@ -1570,7 +1556,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_068, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR
  */
-HWTEST_F(DStreamOperatorTest, dstream_operator_test_069, TestSize.Level1)
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_068, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
     int32_t captureId = 1;
@@ -1588,7 +1574,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_069, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR
  */
-HWTEST_F(DStreamOperatorTest, dstream_operator_test_070, TestSize.Level1)
+HWTEST_F(DStreamOperatorTest, dstream_operator_test_069, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
     int32_t captureId = 2;
