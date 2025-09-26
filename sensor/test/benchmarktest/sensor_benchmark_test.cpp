@@ -27,14 +27,16 @@
 #include "sensor_type.h"
 #include "sensor_uhdf_log.h"
 #include "v3_0/isensor_interface.h"
+#include "v3_1/isensor_interface.h"
 
 using namespace OHOS::HDI::Sensor::V3_0;
+using OHOS::HDI::Sensor::V3_1::GPS_CALLBACK_ID_BEGIN;
 using namespace OHOS::HDI::Sensor;
 using namespace testing::ext;
 using namespace std;
 
 namespace {
-    sptr<ISensorInterface>  g_sensorInterface = nullptr;
+    sptr<V3_1::ISensorInterface>  g_sensorInterface = nullptr;
     sptr<V3_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     sptr<V3_0::ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
@@ -60,7 +62,7 @@ public:
 
 void SensorBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
-    g_sensorInterface = ISensorInterface::Get();
+    g_sensorInterface = V3_1::ISensorInterface::Get();
 }
 
 void SensorBenchmarkTest::TearDown(const ::benchmark::State &state)
@@ -447,4 +449,118 @@ BENCHMARK_F(SensorBenchmarkTest, GetDeviceSensorInfo)(benchmark::State &state)
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, GetDeviceSensorInfo)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_EnableWithCallbackId
+  * @tc.desc: Benchmarktest for interface EnableWithCallbackId
+  * Enables a sensor with the specified ID
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, EnableWithCallbackId)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret;
+
+    for (auto _ : state) {
+        for (auto iter : g_info) {
+            ret = g_sensorInterface->EnableWithCallbackId(iter.deviceSensorInfo, GPS_CALLBACK_ID_BEGIN);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+        }
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, EnableWithCallbackId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_DisableWithCallbackId
+  * @tc.desc: Benchmarktest for interface DisableWithCallbackId
+  * Disables a sensor with the specified ID
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, DisableWithCallbackId)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret;
+
+    for (auto _ : state) {
+        for (auto iter : g_info) {
+            ret = g_sensorInterface->DisableWithCallbackId(iter.deviceSensorInfo, GPS_CALLBACK_ID_BEGIN);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+        }
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, DisableWithCallbackId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_SetBatchWithCallbackId
+  * @tc.desc: Benchmarktest for interface SetBatchWithCallbackId
+  * SetBatch a sensor with the specified ID
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, SetBatchWithCallbackId)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret;
+
+    for (auto _ : state) {
+        for (auto iter : g_info) {
+            ret = g_sensorInterface->SetBatchWithCallbackId(iter.deviceSensorInfo, GPS_CALLBACK_ID_BEGIN,
+                SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
+        }
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, SetBatchWithCallbackId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_RegisterWithCallbackId
+  * @tc.desc: Benchmarktest for interface RegisterWithCallbackId
+  * SetBatch a sensor with the specified ID
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, RegisterWithCallbackId)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret;
+
+    for (auto _ : state) {
+        ret = g_sensorInterface->RegisterWithCallbackId(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback,
+            GPS_CALLBACK_ID_BEGIN);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, RegisterWithCallbackId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_UnregisterWithCallbackId
+  * @tc.desc: Benchmarktest for interface UnregisterWithCallbackId
+  * SetBatch a sensor with the specified ID
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, UnregisterWithCallbackId)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret;
+
+    for (auto _ : state) {
+        ret = g_sensorInterface->UnregisterWithCallbackId(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback,
+            GPS_CALLBACK_ID_BEGIN);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, UnregisterWithCallbackId)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 BENCHMARK_MAIN();
