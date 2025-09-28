@@ -2107,6 +2107,11 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
         if (transfer->type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
             transfer->actual_length = transfer->length;
         }
+        std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
+        if (!IsExistAsyncTransfer(asyncTransfer)) {
+            HDF_LOGE("%{public}s: invalid asyncTransfer", __func__);
+            return;
+        }
         int32_t ret = WriteAshmem(asyncTransfer->ashmemRef, transfer->actual_length, transfer->buffer);
         if (ret != HDF_SUCCESS) {
             HandleAsyncFailure(transfer);
@@ -2122,6 +2127,26 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
     }
     DeleteTransferFromList(asyncTransfer);
     HDF_LOGI("%{public}s: handle async transfer result success", __func__);
+}
+
+bool IsExistAsyncTransfer(LibusbAsyncTransfer *asyncTransfer)
+{
+    int32_t number = static_cast<int32_t>(g_asyncManager.transferVec.size());
+    for (int32_t i = 0; i < number; ++i) {
+        LibusbAsyncWrapper *asyncWrapper = g_asyncManager.transferVec[i].second;
+        if (asyncWrapper == nullptr || asyncWrapper->transferList.size() <= 0) {
+            continue;
+        }
+        for (auto &asyncTransferTmp : asyncWrapper->transferList) {
+            if (asyncTransferTmp == nullptr) {
+                continue;
+            }
+            if (asyncTransferTmp == asyncTransfer) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void LibusbAdapter::FeedbackToBase(struct libusb_transfer *transfer)
