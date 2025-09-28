@@ -16,6 +16,7 @@
 #include "audio_adapter_interface_impl.h"
 
 #include <algorithm>
+#include <charconv>
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include <sstream>
@@ -37,8 +38,30 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
+namespace {
 static constexpr uint32_t MAX_AUDIO_STREAM_NUM = 10;
 const std::string STREAM_TYPE_CHANGE = "stream_type_change";
+const std::string STREAM_USAGE_CHANGE = "stream_usage_change";
+
+struct StreamStatusNoifyResult {
+    uint32_t renderId = 0;
+    std::string streamInfoVal;
+    std::from_chars_result res;
+};
+/**
+ * @brief help to split the value into a render id and a string "x-y" -> int x and string y
+ */
+StreamStatusNoifyResult ParseValueString(const std::string &val)
+{
+    StreamStatusNoifyResult ret{};
+    ret.res = std::from_chars(val.data(), val.data() + val.size(), ret.renderId);
+    if (ret.res.ec != std::errc()) {
+        return ret;
+    }
+    ret.streamInfoVal = val.substr(ret.res.ptr - val.data() + 1);
+    return ret;
+}
+}
 
 AudioAdapterInterfaceImpl::AudioAdapterInterfaceImpl(const AudioAdapterDescriptor &desc)
     : adpDescriptor_(desc)
@@ -468,9 +491,9 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
             }
             break;
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_STATUS:
-            ret = SetStreamTypeChange(condition, value);
+            ret = SetStreamStatusChange(condition, value);
             if (ret != DH_SUCCESS) {
-                DHLOGE("stream type change notify failed.");
+                DHLOGE("stream status change notify failed.");
                 return HDF_FAILURE;
             }
             break;
@@ -814,30 +837,38 @@ uint32_t AudioAdapterInterfaceImpl::GetInterruptGroup(const uint32_t devId)
     return iptGroup;
 }
 
-int32_t AudioAdapterInterfaceImpl::SetStreamTypeChange(const std::string& condition, const std::string &value)
+int32_t AudioAdapterInterfaceImpl::SetStreamStatusChange(const std::string &condition, const std::string &value)
 {
-    std::string content = value;
-    EXT_PARAM_EVENT eventType = HDF_AUDIO_EVENT_PARAM_UNKNOWN;
-    if (condition != STREAM_TYPE_CHANGE) {
-        DHLOGE("condition not satisfy.");
+    DHLOGI("start SetStreamStatusChange, %{public}s-%{public}s", condition.c_str(), value.c_str());
+    DAudioEvent event = {
+        .type = HDF_AUDIO_EVENT_PARAM_UNKNOWN,
+        .content = value,
+    };
+    if (condition == STREAM_TYPE_CHANGE) {
+        event.type = HDF_AUDIO_STREAMTYPE_CHANGED;
+    } else if (condition == STREAM_USAGE_CHANGE) {
+        event.type = HDF_AUDIO_STREAMUSAGE_CHANGED;
+    } else {
+        DHLOGE("condition not satisfy");
         return ERR_DH_AUDIO_HDF_FAIL;
     }
-    eventType = HDF_AUDIO_STREAMTYPE_CHANGED;
-    DAudioEvent event = { eventType, content };
+    StreamStatusNoifyResult convertRes = ParseValueString(value);
+    if (convertRes.res.ec != std::errc()) {
+        DHLOGE("convert the value failed");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    event.content = convertRes.streamInfoVal;
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
-        for (uint32_t id = 0; id < MAX_AUDIO_STREAM_NUM; id++) {
-            const auto &item = renderDevs_[id];
-            std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
-            sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[item.first]);
-            auto render = item.second;
-            if (render == nullptr || extSpkCallback == nullptr) {
-                continue;
-            }
-            if (extSpkCallback->NotifyEvent(id, event) != HDF_SUCCESS) {
-                DHLOGE("NotifyEvent failed.");
-                return ERR_DH_AUDIO_HDF_FAIL;
-            }
+        int32_t hdid = renderDevs_[convertRes.renderId].first;
+        auto render = renderDevs_[convertRes.renderId].second;
+        std::lock_guard<std::mutex> callback(extCallbackMtx_);
+        const auto &extSpkCallback = extCallbackMap_[hdid];
+        if (render == nullptr
+            || extSpkCallback == nullptr
+            || extSpkCallback->NotifyEvent(convertRes.renderId, event) != HDF_SUCCESS) {
+            DHLOGE("noitfy failed");
+            return ERR_DH_AUDIO_HDF_FAIL;
         }
     }
     return DH_SUCCESS;
