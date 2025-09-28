@@ -2129,7 +2129,7 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
     HDF_LOGI("%{public}s: handle async transfer result success", __func__);
 }
 
-bool IsExistAsyncTransfer(LibusbAsyncTransfer *asyncTransfer)
+bool LibusbAdapter::IsExistAsyncTransfer(LibusbAsyncTransfer *asyncTransfer)
 {
     int32_t number = static_cast<int32_t>(g_asyncManager.transferVec.size());
     for (int32_t i = 0; i < number; ++i) {
