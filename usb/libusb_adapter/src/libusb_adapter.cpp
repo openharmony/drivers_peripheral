@@ -2132,7 +2132,7 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
 bool LibusbAdapter::IsExistAsyncTransfer(LibusbAsyncTransfer *asyncTransfer)
 {
     int32_t number = static_cast<int32_t>(g_asyncManager.transferVec.size());
-    for (int32_t i = 0; i < number; ++i) {
+    for (auto i = 0; i < number; ++i) {
         LibusbAsyncWrapper *asyncWrapper = g_asyncManager.transferVec[i].second;
         if (asyncWrapper == nullptr || asyncWrapper->transferList.size() <= 0) {
             continue;
