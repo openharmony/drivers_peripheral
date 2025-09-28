@@ -2450,6 +2450,7 @@ void LibusbAdapter::DeleteBulkTransferFromList(LibusbBulkTransfer *bulkTransfer)
     HDF_LOGI("%{public}s: enter delete transfer, bus num: %{public}d, dev addr: %{public}d", __func__,
         bulkTransfer->busNum, bulkTransfer->devAddr);
 
+    std::lock_guard<std::mutex> vecLock(g_bulkManager.bulkTransferVecLock);
     LibusbBulkWrapper *bulkWrapper = GetBulkWrapper({bulkTransfer->busNum, bulkTransfer->devAddr});
     if (bulkWrapper == nullptr) {
         HDF_LOGE("%{public}s: bulkWrapper is nullptr", __func__);
@@ -2470,7 +2471,6 @@ void LibusbAdapter::DeleteBulkTransferFromList(LibusbBulkTransfer *bulkTransfer)
 LibusbBulkWrapper *LibusbAdapter::GetBulkWrapper(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
     LibusbBulkWrapper *bulkWrapper = nullptr;
 
     for (size_t i = 0; i < g_bulkManager.bulktransferVec.size(); ++i) {
