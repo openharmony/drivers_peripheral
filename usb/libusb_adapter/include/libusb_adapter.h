@@ -265,6 +265,7 @@ private:
     static void ParseIsoPacketDesc(libusb_transfer *transfer, std::vector<V1_2::UsbIsoPacketDescriptor> &isoPkgDescs);
     static int32_t ReadAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer);
     static int32_t WriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer);
+    static bool IsExistAsyncTransfer(LibusbAsyncTransfer *asyncTransfer);
     static void LIBUSB_CALL HandleAsyncResult(struct libusb_transfer *transfer);
 
     /* Bulk Transfer */
