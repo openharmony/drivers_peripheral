@@ -33,6 +33,7 @@ using namespace OHOS::HDI::Vibrator::V2_0;
 
 namespace {
     uint32_t g_duration = 2000;
+    uint32_t g_duration1 = 1000;
     std::string g_effect1 = "haptic.long_press.light";
     HapticPaket g_pkg = {434, 1, {{V2_0::CONTINUOUS, 0, 149, 100, 50, 0, 4,
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}};
@@ -43,6 +44,7 @@ namespace {
     V2_0::VibratorPackage g_vibPackage = {434, 149, {{434, 1, {{V2_0::TRANSIENT, 0, 149, 100, 50, 0, 4,
         {{0, 0, 0}, {1, 1, 0}, {32, 1, -39}, {149, 0, -39}}}}}}};
     int32_t g_intensity = 60;
+    int32_t g_intensity1 = 30;
     int32_t g_sessionId = 1 ;
     std::vector<HdfWaveInformation> g_info;
     const std::vector<std::string> g_effect{"haptic.long_press.light", "haptic.slide.light", \
@@ -121,6 +123,30 @@ HWTEST_F(HdiUnitTestVibrator, VibratorStartTest001, TestSize.Level1)
     HDF_LOGD("ret:%{public}d", ret);
     EXPECT_EQ(HDF_SUCCESS, ret);
     OsalMSleep(2000);
+}
+
+/**
+  * @tc.name: VibratorStartTest002
+  * @tc.desc: Start periodic vibration with preset effect.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestVibrator, VibratorStartTest002, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    HdfEffectInfo effectInfo;
+    for (auto iter : g_effect) {
+        g_vibratorInterface->GetEffectInfo({0, 0}, iter, effectInfo);
+        if (effectInfo.isSupportEffect == true) {
+            printf("VibratorStart : %s\n", iter.c_str());
+            int32_t ret = g_vibratorInterface->Start({0, 0}, iter);
+            HDF_LOGD("ret:%{public}d", ret);
+            EXPECT_EQ(HDF_SUCCESS, ret);
+            OsalMSleep(1000);
+        }
+    }
 }
 
 /**
@@ -420,6 +446,32 @@ HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_002, TestSize.Level1)
 }
 
 /**
+  * @tc.name: EnableVibratorModulation_003
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestVibrator, EnableVibratorModulation_003, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_vibratorInterface);
+    std::vector<HdfVibratorInfo> info;
+
+    int32_t startRet = g_vibratorInterface->GetVibratorInfo(info);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    if ((info[0].isSupportIntensity == 1) || (info[0].isSupportFrequency == 1)) {
+        uint32_t duration = 2000;
+        int32_t intensity = 30;
+        int32_t frequency = 200;
+        startRet = g_vibratorInterface->EnableVibratorModulation({0, 0}, duration, intensity, frequency);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+        startRet = g_vibratorInterface->Stop({0, 0}, HdfVibratorMode::HDF_VIBRATOR_MODE_ONCE);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+/**
   * @tc.name: VibratorStartTest011
   * @tc.desc: Start periodic vibration with preset effect.
   * @tc.type: FUNC
@@ -645,6 +697,68 @@ HWTEST_F(HdiUnitTestVibrator, StopTest, TestSize.Level1)
             endRet = g_vibratorInterface->Stop({0, 0}, HdfVibratorMode::HDF_VIBRATOR_MODE_PRESET);
             EXPECT_EQ(endRet, HDF_SUCCESS);
             OsalMSleep(g_duration);
+        }
+    }
+}
+
+/**
+  * @tc.name: StartByIntensityTest_001
+  * @tc.desc: Controls this Performing Time Series Vibrator Effects.
+  * Controls this vibrator to stop the vibrator
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestVibrator, StartByIntensityTest_001, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    for (auto iter : g_effect) {
+        HdfEffectInfo effectInfo;
+        g_vibratorInterface->GetEffectInfo({0, 0}, iter, effectInfo);
+        if (effectInfo.isSupportEffect == true) {
+            printf("VibratorStart : %s\n", iter.c_str());
+
+            int32_t startRet = g_vibratorInterface->StartByIntensity({0, 0}, iter, g_intensity1);
+            EXPECT_EQ(startRet, HDF_SUCCESS);
+
+            int32_t endRet = g_vibratorInterface->Stop({0, 0}, HdfVibratorMode::HDF_VIBRATOR_MODE_PRESET);
+            EXPECT_EQ(endRet, HDF_SUCCESS);
+            OsalMSleep(2000);
+        }
+    }
+}
+
+/**
+  * @tc.name: StopTest_001
+  * @tc.desc: Controls this Performing Time Series Vibrator Effects.
+  * Controls this vibrator to stop the vibrator
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestVibrator, StopTest_001, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = g_vibratorInterface->StartOnce({0, 0}, g_duration1);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+    int32_t endRet = g_vibratorInterface->Stop({0, 0}, HdfVibratorMode::HDF_VIBRATOR_MODE_ONCE);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
+    OsalMSleep(g_duration1);
+
+    for (auto iter : g_effect) {
+        HdfEffectInfo effectInfo;
+        g_vibratorInterface->GetEffectInfo({0, 0}, iter, effectInfo);
+        if (effectInfo.isSupportEffect == true) {
+            printf("VibratorStart : %s\n", iter.c_str());
+
+            startRet = g_vibratorInterface->StartByIntensity({0, 0}, iter, g_intensity1);
+            EXPECT_EQ(startRet, HDF_SUCCESS);
+
+            endRet = g_vibratorInterface->Stop({0, 0}, HdfVibratorMode::HDF_VIBRATOR_MODE_PRESET);
+            EXPECT_EQ(endRet, HDF_SUCCESS);
+            OsalMSleep(g_duration1);
         }
     }
 }
