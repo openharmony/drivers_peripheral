@@ -2081,9 +2081,9 @@ int32_t LibusbAdapter::FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer,
 void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transfer)
 {
     HDF_LOGI("%{public}s: start handle async transfer result", __func__);
-    std::lock_guard<std::mutex> managerLock(g_asyncManager.transferVecLock);
+    std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
     if (!IsExistTransfer(transfer)) {
-        HDF_LOGI("%{public}s: invalid transfer", __func__);
+        HDF_LOGE("%{public}s: invalid transfer", __func__);
         return;
     }
     if (transfer == nullptr || transfer->user_data == nullptr) {
@@ -2111,11 +2111,6 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
         HDF_LOGI("%{public}s: write data to ashmem", __func__);
         if (transfer->type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
             transfer->actual_length = transfer->length;
-        }
-        std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
-        if (!IsExistAsyncTransfer(asyncTransfer)) {
-            HDF_LOGE("%{public}s: invalid asyncTransfer", __func__);
-            return;
         }
         int32_t ret = WriteAshmem(asyncTransfer->ashmemRef, transfer->actual_length, transfer->buffer);
         if (ret != HDF_SUCCESS) {
@@ -2555,10 +2550,10 @@ void LibusbAdapter::BulkFeedbackToBase(struct libusb_transfer *transfer)
 
 bool LibusbAdapter::IsExistBulkTransfer(struct libusb_transfer *transfer)
 {
-    if (g_bulkManager.bulkTransferVec.size() <= 0) {
+    if (g_bulkManager.bulktransferVec.size() <= 0) {
         return false;
     }
-    for (auto& itWrapper : g_bulkManager.bulkTransferVec) {
+    for (auto& itWrapper : g_bulkManager.bulktransferVec) {
         LibusbBulkWrapper *bulkWrapper = itWrapper.second;
         if (bulkWrapper == nullptr || bulkWrapper->bulkTransferList.size() <= 0) {
             continue;
@@ -2577,7 +2572,7 @@ void LIBUSB_CALL LibusbAdapter::HandleBulkResult(struct libusb_transfer *transfe
     HDF_LOGI("%{public}s: enter", __func__);
     std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
     if (!IsExistBulkTransfer(transfer)) {
-        HDF_LOGI("%{public}s: invalid transfer", __func__);
+        HDF_LOGE("%{public}s: invalid transfer", __func__);
         return;
     }
     if (transfer == nullptr || transfer->user_data == nullptr) {
