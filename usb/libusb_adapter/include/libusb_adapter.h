@@ -265,7 +265,7 @@ private:
     static void ParseIsoPacketDesc(libusb_transfer *transfer, std::vector<V1_2::UsbIsoPacketDescriptor> &isoPkgDescs);
     static int32_t ReadAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer);
     static int32_t WriteAshmem(const sptr<Ashmem> &ashmem, int32_t length, uint8_t *buffer);
-    static bool IsExistTransfer(LibusbAsyncTransfer *asyncTransfer);
+    static bool IsExistTransfer(struct libusb_transfer *transfer);
     static void LIBUSB_CALL HandleAsyncResult(struct libusb_transfer *transfer);
 
     /* Bulk Transfer */
@@ -282,7 +282,7 @@ private:
     void ClearBulkTranfer(LibusbBulkWrapper *bulkWrapper);
     static LibusbBulkWrapper *GetBulkWrapper(const UsbDev &dev);
     LibusbBulkTransfer *FindBulkTransfer(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem);
-    static bool IsExistBulkTransfer(LibusbAsyncTransfer *asyncTransfer);
+    static bool IsExistBulkTransfer(struct libusb_transfer *transfer);
 
     static int HotplugCallback(libusb_context* ctx, libusb_device* device,
         libusb_hotplug_event event, void* user_data);
