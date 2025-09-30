@@ -41,6 +41,7 @@ AudioRenderInterfaceImpl::AudioRenderInterfaceImpl(const std::string &adpName, c
 {
     devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
         AUDIO_NORMAL_INTERVAL, false);
+    dumpPath_ = std::to_string(renderId) + "_" + DUMP_HDF_RENDER_To_SA;
     DHLOGD("Distributed audio render constructed, period(%{public}d), frameSize(%{public}d).",
         attrs.period, devAttrs_.frameSize);
 }
@@ -113,8 +114,9 @@ int32_t AudioRenderInterfaceImpl::FadeInProcess(const uint32_t durationFrame,
 
 int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, uint64_t &replyBytes)
 {
-    DHLOGD("Render frame[sampleRate: %{public}u, channelCount: %{public}u, format: %{public}d, frameSize: %{public}u].",
-        devAttrs_.sampleRate, devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);
+    DHLOGD("Render frame[sampleRate: %{public}u, channelCount: %{public}u, format: %{public}d, "
+        "frameSize: %{public}u, renderId: %{public}d].",
+        devAttrs_.sampleRate, devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize, renderId_);
 
     int64_t startTime = GetNowTimeUs();
     std::lock_guard<std::mutex> renderLck(renderMtx_);
@@ -295,7 +297,7 @@ int32_t AudioRenderInterfaceImpl::Start()
     renderStatus_ = RENDER_STATUS_START;
     currentFrame_ = CUR_FRAME_INIT_VALUE;
     frameIndex_ = 0;
-    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_HDF_RENDER_To_SA, &dumpFile_);
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, dumpPath_, &dumpFile_);
     return HDF_SUCCESS;
 }
 
