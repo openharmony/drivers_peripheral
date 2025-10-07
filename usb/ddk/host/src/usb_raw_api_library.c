@@ -1603,8 +1603,14 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
     }
 
     struct HdfSBuf *pnpData = HdfSbufObtainDefaultSize();
+    if (pnpData == NULL) {
+        ret = HDF_FAILURE;
+        HDF_LOGE("%{public}s:%{public}d GetService err", __func__, __LINE__);
+        goto ERR_SBUF;
+    }
     struct HdfSBuf *pnpReply = HdfSbufObtainDefaultSize();
-    if (pnpData == NULL || pnpReply == NULL) {
+    if (pnpReply == NULL) {
+        HdfSbufRecycle(pnpData);
         ret = HDF_FAILURE;
         HDF_LOGE("%{public}s:%{public}d GetService err", __func__, __LINE__);
         goto ERR_SBUF;
