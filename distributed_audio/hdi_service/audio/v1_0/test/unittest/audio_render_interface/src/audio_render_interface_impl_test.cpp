@@ -721,6 +721,73 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SetExtraParams_002
+ * @tc.desc: Verify the SetExtraParams function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    std::string keyValueList = "offloadParams=";
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+/**
+ * @tc.name: SetExtraParams_003
+ * @tc.desc: Verify the SetExtraParams function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    std::string keyValueList = "offloadParams=48,1,8,1559";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+/**
+ * @tc.name: SetOffloadParamsChange_001
+ * @tc.desc: Verify the SetOffloadParamsChange function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetOffloadParamsChange_001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    std::string offloadParams = "";
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetOffloadParamsChange(offloadParams));
+}
+
+/**
+ * @tc.name: SetOffloadParamsChange_002
+ * @tc.desc: Verify the SetOffloadParamsChange function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetOffloadParamsChange_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    std::string offloadParams = "offloadParams=48,1,8,1559";
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetOffloadParamsChange(offloadParams));
+}
+
+/**
+ * @tc.name: SetOffloadParamsChange_003
+ * @tc.desc: Verify the SetOffloadParamsChange function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetOffloadParamsChange_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    std::string offloadParams = "offloadParams=48,1,8,1559";
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetOffloadParamsChange(offloadParams));
+}
+
+/**
  * @tc.name: GetExtraParams_001
  * @tc.desc: Verify the GetExtraParams function.
  * @tc.type: FUNC

@@ -108,6 +108,7 @@ public:
 private:
     float GetFadeRate(uint32_t currentIndex, const uint32_t durationIndex);
     int32_t FadeInProcess(const uint32_t durationFrame, int8_t* frameData, const size_t frameLength);
+    int32_t SetOffloadParamsChange(const std::string &offloadParams);
 #ifdef DAUDIO_SUPPORT_SHARED_BUFFER
     int32_t CreateAshmem(int32_t ashmemLength);
     int32_t WriteToShmem(const AudioData &data);
