@@ -42,7 +42,6 @@ namespace {
 static constexpr uint32_t MAX_AUDIO_STREAM_NUM = 10;
 const std::string STREAM_TYPE_CHANGE = "stream_type_change";
 const std::string STREAM_USAGE_CHANGE = "stream_usage_change";
-const std::string STREAM_OFFLOAD_PARAMS_CHANGE = "stream_offload_params_change";
 
 struct StreamStatusNoifyResult {
     uint32_t renderId = 0;
@@ -849,8 +848,6 @@ int32_t AudioAdapterInterfaceImpl::SetStreamStatusChange(const std::string &cond
         event.type = HDF_AUDIO_STREAMTYPE_CHANGED;
     } else if (condition == STREAM_USAGE_CHANGE) {
         event.type = HDF_AUDIO_STREAMUSAGE_CHANGED;
-    } else if (condition == STREAM_OFFLOAD_PARAMS_CHANGE) {
-        event.type = HDF_AUDIO_STREAM_OFFLOAD_PARAMS_CHANGED;
     } else {
         DHLOGE("condition not satisfy");
         return ERR_DH_AUDIO_HDF_FAIL;
@@ -866,10 +863,6 @@ int32_t AudioAdapterInterfaceImpl::SetStreamStatusChange(const std::string &cond
         int32_t hdid = renderDevs_[convertRes.renderId].first;
         auto render = renderDevs_[convertRes.renderId].second;
         std::lock_guard<std::mutex> callback(extCallbackMtx_);
-        if (condition == STREAM_OFFLOAD_PARAMS_CHANGE &&
-            extCallbackMap_.find(OFFLOAD_RENDER_ID) != extCallbackMap_.end()) {
-            dhId = OFFLOAD_RENDER_ID;
-        }
         const auto &extSpkCallback = extCallbackMap_[hdid];
         if (render == nullptr
             || extSpkCallback == nullptr
