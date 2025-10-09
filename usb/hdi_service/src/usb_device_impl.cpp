@@ -375,13 +375,6 @@ int32_t UsbDeviceImpl::UsbDeviceAuthorize(uint8_t busNum, uint8_t devAddr, bool 
     return SetAuthorize(devDir.generic_string(), authorized);
 }
 
-static bool ConvertToInt32(const std::string& str, int32_t& value)
-{
-    auto [ptr, errCode] = std::from_chars(str.data(), str.data() + str.size(), value);
-    bool ret = (errCode == std::errc{});
-    return ret;
-}
-
 int32_t UsbDeviceImpl::UsbInterfaceAuthorize(
     const UsbDev &dev, uint8_t configId, uint8_t interfaceId, bool authorized)
 {
@@ -396,29 +389,10 @@ int32_t UsbDeviceImpl::UsbInterfaceAuthorize(
             return HDF_ERR_INVALID_PARAM;
         }
         ifaceDir /= AUTH_PATH;
-        auto lastState = UsbGetAttribute(ifaceDirName, AUTH_PATH.c_str());
-        if (lastState.length() == 0) {
-            HDF_LOGE("%{public}s: failed to get state of interface: %{public}s", __func__, ifaceDir.c_str());
-            return HDF_ERR_INVALID_PARAM;
-        }
-        int32_t lastStateInteger = 0;
-        if (!ConvertToInt32(lastState, lastStateInteger)) {
-            HDF_LOGE("%{public}s: failed to convert authorize to integer", __func__);
-            return HDF_ERR_INVALID_PARAM;
-        }
         int32_t ret = SetAuthorize(ifaceDir.generic_string(), authorized);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: failed to authorize interface: %{public}s ret = %{public}d",
                 __func__, ifaceDir.c_str(), ret);
-            return ret;
-        }
-        // use lastState to check whether the interface "authorized" changed from 0 to 1
-        if (authorized && lastStateInteger == 0) {
-            // need to disable & re-enable device to bind the interface driver (due to the limit of kernel)
-            HDF_LOGI("%{public}s: re-enable device to bind the interface driver", __func__);
-            (void)UsbDeviceAuthorize(busNum, devAddr, false);
-            std::this_thread::sleep_for(std::chrono::milliseconds(RE_CONFIGURATION_INTERVAL_MS));
-            (void)UsbDeviceAuthorize(busNum, devAddr, true);
         }
         return ret;
     }
