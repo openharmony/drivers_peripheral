@@ -59,7 +59,6 @@ bool UsbDeviceImpl::isEdmExist_ = false;
 constexpr uint32_t HUB_PREFIX_LENGTH = 3;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 constexpr uint32_t MAX_BUFFER = 256;
-constexpr uint32_t RE_CONFIGURATION_INTERVAL_MS = 50;
 constexpr const char* DISABLE_AUTH_STR = "0";
 constexpr const char* ENABLE_AUTH_STR = "1";
 constexpr const char* BUS_NUM = "busnum";   // filename of bus number
