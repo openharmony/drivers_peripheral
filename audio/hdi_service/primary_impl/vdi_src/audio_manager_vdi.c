@@ -22,6 +22,7 @@
 #include "audio_adapter_vdi.h"
 #include "audio_dfx.h"
 #include "v5_0/iaudio_adapter.h"
+#include "audio_common_vdi.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 static int32_t THREAD_POOL_COUNT = 32;
@@ -367,6 +368,7 @@ static struct IAudioAdapter* VendorLoadAdapter(struct IAudioManagerVdi *vdiManag
 int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc,
     struct IAudioAdapter **adapter)
 {
+    SetThreadPriority();
     CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
