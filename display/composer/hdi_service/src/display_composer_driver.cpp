@@ -29,6 +29,12 @@
 #define LOG_DOMAIN 0xD002515
 #define HICOLLIE_TIMEOUT 8
 
+void CmdTimeOut(void* data)
+{
+    uint32_t* cmdid = static_cast<uint32_t*>(data);
+    HDF_LOGE("%{public}s: The client sends cmd to the server cmdid: %{public}u:timeout", __func__, *cmdid);
+}
+
 struct HdfDisplayComposerHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
@@ -67,7 +73,7 @@ static int32_t DisplayComposerDriverDispatch(
     }
 #ifdef DISPLAY_HICOLLIE_ENABLE
     int32_t id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer("HDI::Display::Composer::SendRequest",
-        HICOLLIE_TIMEOUT, nullptr, nullptr, OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+        HICOLLIE_TIMEOUT, &CmdTimeOut, &cmdId, OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_NOOP);
 #endif
     int32_t ret = hdfDisplayComposerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 #ifdef DISPLAY_HICOLLIE_ENABLE
