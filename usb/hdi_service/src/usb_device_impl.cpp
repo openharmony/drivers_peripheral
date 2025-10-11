@@ -392,6 +392,21 @@ int32_t UsbDeviceImpl::UsbInterfaceAuthorize(
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: failed to authorize interface: %{public}s ret = %{public}d",
                 __func__, ifaceDir.c_str(), ret);
+            return ret;
+        }
+        // manage interface driver by libusb
+        const V1_2::UsbDev &usbDev_ = reinterpret_cast<const V1_2::UsbDev &>(dev);
+        auto libusb = V1_2::LibusbAdapter::GetInstance();
+        ret = libusb->OpenDevice(usbDev_);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: failed to open device", __func__);
+            return ret;
+        }
+        ret = libusb->ManageInterface(usbDev_, interfaceId, !authorized);
+        (void)libusb->CloseDevice(usbDev_);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: failed to authorize interface: %{public}s ret = %{public}d",
+                __func__, ifaceDir.c_str(), ret);
         }
         return ret;
     }
