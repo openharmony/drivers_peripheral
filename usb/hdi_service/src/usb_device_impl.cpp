@@ -404,10 +404,6 @@ int32_t UsbDeviceImpl::UsbInterfaceAuthorize(
         }
         ret = libusb->ManageInterface(usbDev_, interfaceId, !authorized);
         (void)libusb->CloseDevice(usbDev_);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: failed to authorize interface: %{public}s ret = %{public}d",
-                __func__, ifaceDir.c_str(), ret);
-        }
         return ret;
     }
     HDF_LOGE("%{public}s: failed to reach interface", __func__);
