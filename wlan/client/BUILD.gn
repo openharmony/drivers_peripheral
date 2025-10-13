@@ -125,13 +125,13 @@ if (defined(ohos_lite)) {
       ]
 
       public_configs = [ ":wifi_driver_hdi_client_public_config" ]
-      deps = [ "//third_party/libnl:libnl_share" ]
       external_deps = [
         "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
         "init:libbegetutil",
+        "libnl:libnl_share",
       ]
 
       defines = [ "__OHOS__USER__" ]
