@@ -56,7 +56,7 @@ if (defined(ohos_lite)) {
     ]
     external_deps = [
       "hilog_lite:hilog_shared",
-      "test_common:libhdf_test_common",
+      "hdf_core:libhdf_test_common",
     ]
 
     cflags = configFlag
