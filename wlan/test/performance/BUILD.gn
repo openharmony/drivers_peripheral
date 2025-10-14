@@ -12,6 +12,7 @@
 # limitations under the License.
 
 TEST_ROOT_DIR = "../.."
+HDF_CORE_DIR = "../../../.."
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
