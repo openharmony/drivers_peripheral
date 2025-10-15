@@ -1126,6 +1126,11 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
     }
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
+    if (ifName != NULL) {
+        int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
+        memcpy_s(newRemoteNode->ifName, IFNAMSIZ, ifName, ifNameLen);
+        newRemoteNode->ifName[ifNameLen] = '\0';
+    }
     DListInsertTail(&newRemoteNode->node, head);
     if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0 && !IsUpdaterMode()) {
         AddDeathRecipientForService(self);
@@ -1850,6 +1855,12 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
         if (pos->service == NULL) {
             HDF_LOGW("%{public}s: pos->service NULL", __func__);
             continue;
+        }
+        if (ifName != NULL) {
+            int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
+            if (strncmp(ifName, pos->ifName, ifNameLen) != 0) {
+                continue;
+            }
         }
         if (strncmp(ifName, "wlan", strlen("wlan")) == 0 || strncmp(ifName, "common", strlen("common")) == 0) {
             ret = HdfStaDealEvent(event, pos, data, ifName);

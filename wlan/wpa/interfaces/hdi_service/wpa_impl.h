@@ -29,11 +29,14 @@
 
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD001566
-
+#ifndef IFNAMSIZ
+#define IFNAMSIZ 16
+#endif
 struct HdfWpaRemoteNode {
     struct IWpaCallback *callbackObj;
     struct HdfRemoteService *service;
     struct DListHead node;
+    char ifName[IFNAMSIZ + 1];
 };
 
 struct HdfWpaStubData {
