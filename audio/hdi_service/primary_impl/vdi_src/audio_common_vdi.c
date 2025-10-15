@@ -564,9 +564,14 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
 
 void SetThreadPriority(void)
 {
+    static __thread bool hasSetThreadPriority = false;
+    if (hasSetThreadPriority) {
+        return;
+    }
     struct sched_param param;
     param.sched_priority = 1;
     if (sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
         AUDIO_FUNC_LOGE("failed to set thread priority");
     }
+    hasSetThreadPriority = true;
 }
