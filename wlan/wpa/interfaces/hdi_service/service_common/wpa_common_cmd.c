@@ -1860,7 +1860,7 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
         }
         if (ifName != NULL) {
             int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
-            if (strncmp(ifName, pos->ifName, ifNameLen) != 0) {
+            if (strncmp(ifName, "wlan", strlen("wlan")) == 0 && strncmp(ifName, pos->ifName, ifNameLen) != 0) {
                 continue;
             }
         }
