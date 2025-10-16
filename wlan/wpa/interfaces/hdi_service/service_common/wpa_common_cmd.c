@@ -1129,7 +1129,7 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
     if (ifName != NULL) {
         int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
         if (memcpy_s(newRemoteNode->ifName, IFNAMSIZ, ifName, ifNameLen) != EOK) {
-            HDF_LOGE("%{public}s memcpy failed", __func__);;
+            HDF_LOGE("%{public}s memcpy failed", __func__);
         }
         newRemoteNode->ifName[ifNameLen] = '\0';
     }
