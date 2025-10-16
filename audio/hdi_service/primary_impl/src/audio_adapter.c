@@ -401,6 +401,7 @@ void AudioReleaseRenderHandle(struct AudioHwRender *hwRender)
         (*pCloseRenderService)(hwRender->devCtlHandle);
         hwRender->devCtlHandle = NULL;
     }
+    StubCollectorRemoveObject(IAUDIOADAPTER_INTERFACE_DESC, &hwRender->common);
 }
 
 int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
@@ -802,6 +803,7 @@ void AudioReleaseCaptureHandle(struct AudioHwCapture *hwCapture)
         (*pCloseCaptureService)(hwCapture->devCtlHandle);
         hwCapture->devCtlHandle = NULL;
     }
+    StubCollectorRemoveObject(IAUDIOADAPTER_INTERFACE_DESC, &hwCapture->common);
 }
 
 int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
