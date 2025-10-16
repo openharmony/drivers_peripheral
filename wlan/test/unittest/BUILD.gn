@@ -120,7 +120,7 @@ if (defined(ohos_lite)) {
         "$HDF_CORE_DIR/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
-    deps = [	
+    deps = [
       "$HDF_CORE_DIR/hdf_core/adapter/build/test_common:libhdf_test_common",
     ]
     if (is_standard_system) {
