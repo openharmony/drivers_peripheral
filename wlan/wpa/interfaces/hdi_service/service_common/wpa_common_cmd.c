@@ -1857,6 +1857,7 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
             continue;
         }
         if (ifName != NULL) {
+            HDF_LOGI("HdfWpaCallbackFun ifName: %{public}s; pos->ifName: %{public}s", ifName, pos->ifName);
             int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
             if (strncmp(ifName, pos->ifName, ifNameLen) != 0) {
                 continue;
