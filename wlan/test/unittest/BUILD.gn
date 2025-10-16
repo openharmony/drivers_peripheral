@@ -50,14 +50,12 @@ if (defined(ohos_lite)) {
       "common/hdf_net_device_test.cpp",
     ]
     public_deps = [
+      "$HDF_CORE_DIR/hdf_core/adapter/build/test_common:libhdf_test_common",
       "$HDF_CORE_DIR/hdf_core/adapter/uhdf/manager:hdf_core",
       "$HDF_CORE_DIR/hdf_core/adapter/uhdf/platform:hdf_platform",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [
-      "hilog_lite:hilog_shared",
-      "hdf_core:libhdf_test_common",
-    ]
+    external_deps = [ "hilog_lite:hilog_shared" ]
 
     cflags = configFlag
   }
@@ -122,7 +120,9 @@ if (defined(ohos_lite)) {
         "$HDF_CORE_DIR/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
-
+    deps = [	
+      "$HDF_CORE_DIR/hdf_core/adapter/build/test_common:libhdf_test_common",
+    ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
