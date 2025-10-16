@@ -1128,7 +1128,9 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
     newRemoteNode->service = self->AsObject(self);
     if (ifName != NULL) {
         int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
-        memcpy_s(newRemoteNode->ifName, IFNAMSIZ, ifName, ifNameLen);
+        if (memcpy_s(newRemoteNode->ifName, IFNAMSIZ, ifName, ifNameLen) != EOK) {
+            HDF_LOGE("%{public}s memcpy failed", __func__);;
+        }
         newRemoteNode->ifName[ifNameLen] = '\0';
     }
     DListInsertTail(&newRemoteNode->node, head);
@@ -1857,7 +1859,6 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
             continue;
         }
         if (ifName != NULL) {
-            HDF_LOGI("HdfWpaCallbackFun ifName: %{public}s; pos->ifName: %{public}s", ifName, pos->ifName);
             int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
             if (strncmp(ifName, pos->ifName, ifNameLen) != 0) {
                 continue;
@@ -1874,7 +1875,7 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
             HDF_LOGE("%{public}s: ifName is error %{public}s", __func__, ifName);
         }
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: dispatch code failed, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
