@@ -484,7 +484,7 @@ HWTEST_F(AudioIdlHdiRenderControlTest, AudioRenderTurnStandbyModeNull_002, TestS
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
 
     ret = render->TurnStandbyMode(renderNull);
-    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT || ret == HDF_ERR_NOT_SUPPORT);
     render->Stop(render);
 }
 

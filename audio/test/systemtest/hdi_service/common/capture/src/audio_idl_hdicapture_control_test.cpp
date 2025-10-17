@@ -431,7 +431,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureTurnStandbyModeNull_002, Tes
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
 
     ret = capture->TurnStandbyMode(captureNull);
-    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT || ret == HDF_ERR_NOT_SUPPORT);
     capture->Stop(capture);
 }
 

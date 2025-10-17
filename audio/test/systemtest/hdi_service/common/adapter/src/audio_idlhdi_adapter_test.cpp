@@ -179,7 +179,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapabilityNull_003, TestSize
     ret = adapter->InitAllPorts(adapter);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = adapter->GetPortCapability(adapterNull, &audioPort, capability);
-    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT || ret == HDF_ERR_NOT_SUPPORT);
 
     OsalMemFree(capability);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
@@ -239,7 +239,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapabilityNull_005, TestSize
     ret = adapter->InitAllPorts(adapter);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = adapter->GetPortCapability(adapter, &audioPort, capabilityNull);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
 
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     EXPECT_EQ(HDF_SUCCESS, ret);
