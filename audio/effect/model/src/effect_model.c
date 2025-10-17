@@ -481,7 +481,7 @@ int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const stru
     }
 
     /* call the lib destroy method，then free controller manager */
-    StubCollectorRemoveObject(IAUDIOADAPTER_INTERFACE_DESC, &ctrlMgr->ctrlImpls);
+    StubCollectorRemoveObject(IEFFECTCONTROL_INTERFACE_DESC, &ctrlMgr->ctrlImpls);
     lib->DestroyController(lib, ctrlMgr->ctrlOps);
     DeleteEffectLibrary(contollerId->libName);
     pthread_rwlock_unlock(&g_rwEffectLock);
@@ -548,7 +548,7 @@ void EffectModelImplRelease(struct IEffectModel *instance)
     if (service == NULL) {
         return;
     }
-    StubCollectorRemoveObject(IAUDIOADAPTER_INTERFACE_DESC, instance);
+    StubCollectorRemoveObject(IEFFECTMODEL_INTERFACE_DESC, instance);
     OsalMemFree(service);
     service = NULL;
 }
