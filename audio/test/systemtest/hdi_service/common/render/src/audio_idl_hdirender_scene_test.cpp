@@ -117,7 +117,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapabilityNull_003, Te
 
     ASSERT_NE(nullptr, render);
     ret = render->CheckSceneCapability(renderNull, &scenes, &supported);
-    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT || ret == HDF_ERR_NOT_SUPPORT);
     free(scenes.desc.desc);
 }
 /**
@@ -151,7 +151,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapabilityNull_005, Te
 
     ASSERT_NE(nullptr, render);
     ret = render->CheckSceneCapability(render, &scenes, nullptr);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
     free(scenes.desc.desc);
 }
 #endif

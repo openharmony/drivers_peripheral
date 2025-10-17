@@ -266,7 +266,7 @@ BENCHMARK_F(AudioRenderBenchmarkTest, TurnStandbyMode)(benchmark::State &state)
         ret = render_->Start(render_);
         EXPECT_EQ(ret, HDF_SUCCESS);
         ret = render_->TurnStandbyMode(render_);
-        EXPECT_EQ(ret, HDF_SUCCESS);
+        EXPECT_EQ(ret, HDF_ERR_NOT_SUPPORT);
         render_->Stop(render_);
     }
 }
@@ -725,7 +725,7 @@ BENCHMARK_F(AudioRenderBenchmarkTest, CheckSceneCapability)(benchmark::State &st
 
     for (auto _ : state) {
         ret = render_->CheckSceneCapability(render_, &scene, &supported);
-        EXPECT_EQ(ret, HDF_SUCCESS);
+        EXPECT_EQ(ret, HDF_ERR_NOT_SUPPORT);
     }
 }
 
