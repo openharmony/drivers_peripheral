@@ -1126,6 +1126,13 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
     }
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
+    if (ifName != NULL) {
+        int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
+        if (memcpy_s(newRemoteNode->ifName, ifNameLen, ifName, ifNameLen) != EOK) {
+            HDF_LOGE("%{public}s memcpy failed", __func__);
+        }
+        newRemoteNode->ifName[ifNameLen] = '\0';
+    }
     DListInsertTail(&newRemoteNode->node, head);
     if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0 && !IsUpdaterMode()) {
         AddDeathRecipientForService(self);
@@ -1851,6 +1858,12 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
             HDF_LOGW("%{public}s: pos->service NULL", __func__);
             continue;
         }
+        if (ifName != NULL) {
+            int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
+            if (strncmp(ifName, "wlan", strlen("wlan")) == 0 && strncmp(ifName, pos->ifName, ifNameLen) != 0) {
+                continue;
+            }
+        }
         if (strncmp(ifName, "wlan", strlen("wlan")) == 0 || strncmp(ifName, "common", strlen("common")) == 0) {
             ret = HdfStaDealEvent(event, pos, data, ifName);
         } else if (strncmp(ifName, "chba", strlen("chba")) == 0 ||
@@ -1862,7 +1875,7 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
             HDF_LOGE("%{public}s: ifName is error %{public}s", __func__, ifName);
         }
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: dispatch code failed, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
