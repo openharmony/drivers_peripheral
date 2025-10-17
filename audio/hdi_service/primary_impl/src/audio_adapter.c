@@ -1035,7 +1035,7 @@ int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, uint32_t captu
     }
     struct IAudioCapture *capture = (struct IAudioCapture *)hwAdapter->infos.captureServicePtr[captureId];
 
-    StubCollectorRemoveObject(IAUDIOADAPTER_INTERFACE_DESC, capture);
+    StubCollectorRemoveObject(IAUDIOCAPTURE_INTERFACE_DESC, capture);
 
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL) {
