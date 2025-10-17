@@ -21,6 +21,7 @@
 #include <stub_collector.h>
 #include "v5_0/iaudio_manager.h"
 #include "audio_uhdf_log.h"
+#include <sched.h>
 
 #define HDF_LOG_TAG HDF_AUDIO_PRIMARY_DRV
 
@@ -71,6 +72,15 @@ static int32_t HdfAudioManagerDriverInit(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
+static void SetThreadPriority(void)
+{
+    struct sched_param param;
+    param.sched_priority = 1;
+    if (sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
+        AUDIO_FUNC_LOGE("failed to set thread priority");
+    }
+}
+
 static int32_t HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s:bind enter", __func__);
@@ -113,6 +123,7 @@ static int32_t HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
     audiomanagerHost->service = serviceImpl;
     audiomanagerHost->stubObject = stubObj;
     deviceObject->service = &audiomanagerHost->ioService;
+    SetThreadPriority();
     HDF_LOGI("%{public}s:bind success", __func__);
     return HDF_SUCCESS;
 }
