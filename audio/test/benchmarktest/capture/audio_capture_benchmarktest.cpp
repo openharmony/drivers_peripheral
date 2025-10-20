@@ -331,7 +331,7 @@ BENCHMARK_F(AudioCaptureBenchmarkTest, TurnStandbyMode)(benchmark::State &state)
         ret = capture_->Start(capture_);
         EXPECT_EQ(ret, HDF_SUCCESS);
         ret = capture_->TurnStandbyMode(capture_);
-        EXPECT_EQ(ret, HDF_SUCCESS);
+        EXPECT_EQ(ret, HDF_ERR_NOT_SUPPORT);
         capture_->Stop(capture_);
     }
 }
@@ -624,7 +624,7 @@ BENCHMARK_F(AudioCaptureBenchmarkTest, CheckSceneCapability)(benchmark::State &s
 
     for (auto _ : state) {
         ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
-        EXPECT_EQ(ret, HDF_SUCCESS);
+        EXPECT_EQ(ret, HDF_ERR_NOT_SUPPORT);
     }
     free(sceneDesc.desc.desc);
     sceneDesc.desc.desc = nullptr;

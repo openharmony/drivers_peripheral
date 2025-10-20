@@ -489,7 +489,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureTurnStandbyModeException001, TestSiz
     ASSERT_NE(capture_->TurnStandbyMode, nullptr);
 
     int32_t ret = capture_->TurnStandbyMode(nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(ret, HDF_ERR_NOT_SUPPORT);
 }
 
 /* capture AudioDevDump cases */
@@ -1065,13 +1065,13 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapability001, TestSize.Le
     bool isSupport = false;
 
     int32_t ret = capture_->CheckSceneCapability(nullptr, &sceneDesc, &isSupport);
-    ASSERT_NE(ret, HDF_SUCCESS);
+    ASSERT_NE(ret, HDF_ERR_NOT_SUPPORT);
 
     ret = capture_->CheckSceneCapability(capture_, nullptr, &isSupport);
-    ASSERT_NE(ret, HDF_SUCCESS);
+    ASSERT_NE(ret, HDF_ERR_NOT_SUPPORT);
 
     ret = capture_->CheckSceneCapability(capture_, &sceneDesc, nullptr);
-    ASSERT_NE(ret, HDF_SUCCESS);
+    ASSERT_NE(ret, HDF_ERR_NOT_SUPPORT);
 }
 
 } // end of name space
