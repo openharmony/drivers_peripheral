@@ -195,8 +195,8 @@ static int32_t FindNextDescriptor(const uint8_t *buffer, size_t size)
         if (h->bDescriptorType == USB_DDK_DT_INTERFACE || h->bDescriptorType == USB_DDK_DT_ENDPOINT) {
             break;
         }
-        if (h->bLength <= 0) {
-            HDF_LOGE("%{public}s: bLength = %{public}d", __func__, h->bLength);
+        if (h->bLength <= 0 || h->bLength > size) {
+            HDF_LOGE("%{public}s: bLength = %{public}d, size=%{public}zu", __func__, h->bLength, size);
             break;
         }
         buffer += h->bLength;
@@ -493,7 +493,7 @@ static int32_t ParseInterfaceEndpoint(struct UsbRawInterfaceDescriptor *ifp, con
     return ret;
 }
 
-static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_t *buffer, int32_t size)
+static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_t *buffer, int32_t size, uint8_t nAlt)
 {
     const uint8_t *buffer0 = buffer;
     int32_t interfaceNumber = -1; // initial value of interfaceNumber is -1
@@ -505,7 +505,7 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
         return HDF_DEV_ERR_NORANGE;
     }
 
-    while (size >= USB_DDK_DT_INTERFACE_SIZE) {
+    while (size >= USB_DDK_DT_INTERFACE_SIZE && usbInterface->numAltsetting < nAlt) {
         ifp = (struct UsbRawInterfaceDescriptor *)(usbInterface->altsetting + usbInterface->numAltsetting);
         int32_t ret = RawParseDescriptor(size, buffer, USB_RAW_INTERFACE_DESCRIPTOR_TYPE, ifp);
         if (ret == HDF_FAILURE) {
@@ -549,15 +549,21 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
         }
     }
 
+    if (usbInterface->numAltsetting != nAlt) {
+        HDF_LOGW("%{public}s: numAltsetting=%{public}d,nAlt=%{public}d", __func__, usbInterface->numAltsetting, nAlt);
+    }
+
     return buffer - buffer0;
 }
 
 static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, const uint8_t *buffer, int32_t size,
-    struct UsbRawInterface *usbInterface, const uint8_t *nIntf)
+    const uint8_t *nAlts, const uint8_t *nIntf)
 {
     HDF_LOGI("%{public}s_%{public}d: size %{public}d *nIntf %{public}ud", __func__, __LINE__, size, *nIntf);
     int32_t ret, len;
     uint8_t i;
+    struct UsbRawInterface *usbInterface = NULL;
+    uint8_t nAlt;
 
     len = FindNextDescriptor(buffer, size);
     if (len != 0) {
@@ -590,10 +596,11 @@ static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, cons
         for (i = 0; i < config->configDescriptor.bNumInterfaces; ++i) {
             if (nIntf[i] == ifDesc->bInterfaceNumber) {
                 usbInterface = (struct UsbRawInterface *)config->interface[i];
+                nAlt = nAlts[i];
                 break;
             }
         }
-        ret = ParseInterface(usbInterface, buffer, size);
+        ret = ParseInterface(usbInterface, buffer, size, nAlt);
         HDF_LOGI("%{public}s_%{public}d: size %{public}d ret %{public}d", __func__, __LINE__, size, ret);
         if (ret <= 0) {
             RawClearConfiguration(config);
@@ -649,7 +656,7 @@ static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const u
     buffer += config->configDescriptor.bLength;
     size -= (int32_t)config->configDescriptor.bLength;
 
-    return ParseConfigurationDes(config, buffer, size, usbInterface, nIntf);
+    return ParseConfigurationDes(config, buffer, size, nAlts, nIntf);
 }
 
 static int32_t DescToConfig(const uint8_t *buf, int32_t size, struct UsbRawConfigDescriptor ** const config)
