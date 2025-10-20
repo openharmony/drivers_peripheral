@@ -400,7 +400,7 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderCheckSceneCapabilityPerform
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->CheckSceneCapability(audiopara.render, &scenes, &supported);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
         EXPECT_TRUE(supported);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);

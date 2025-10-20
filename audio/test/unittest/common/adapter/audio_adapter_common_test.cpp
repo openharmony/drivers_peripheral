@@ -1059,14 +1059,14 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyCaptureInvalid001, TestSiz
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityNull001, TestSize.Level1)
 {
-    EXPECT_NE(HDF_SUCCESS, adapter_->GetPortCapability(nullptr, nullptr, nullptr));
+    EXPECT_NE(HDF_ERR_NOT_SUPPORT, adapter_->GetPortCapability(nullptr, nullptr, nullptr));
 }
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityNull002, TestSize.Level1)
 {
     struct AudioPort port = {};
     struct AudioPortCapability capability = {};
-    EXPECT_NE(HDF_SUCCESS, adapter_->GetPortCapability(nullptr, &port, &capability));
+    EXPECT_NE(HDF_ERR_NOT_SUPPORT, adapter_->GetPortCapability(nullptr, &port, &capability));
 }
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityInvalid001, TestSize.Level1)

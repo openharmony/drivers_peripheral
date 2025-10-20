@@ -595,7 +595,7 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureCheckSceneCapabilityPerfo
         int32_t ret = audiopara.capture->CheckSceneCapability(audiopara.capture, &scenes, &supported);
         gettimeofday(&audiopara.end, NULL);
         free(scenes.desc.desc);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;

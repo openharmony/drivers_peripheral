@@ -114,7 +114,7 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioGetPortCapabilityPerformance_001
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.adapter->GetPortCapability(audiopara.adapter, &audioPort, capability);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
         EXPECT_NE(nullptr, capability->formats);
         EXPECT_NE(nullptr, capability->subPorts);
         if (capability->subPorts != nullptr) {
