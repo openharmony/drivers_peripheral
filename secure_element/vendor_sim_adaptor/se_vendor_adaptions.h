@@ -64,6 +64,7 @@ public:
         OHOS::HDI::SecureElement::SimSecureElement::V1_0::SecureElementStatus& status);
 
     int32_t reset(OHOS::HDI::SecureElement::SimSecureElement::V1_0::SecureElementStatus& status);
+    int32_t setAccessSimSlot(uint8_t slotId);
 private:
     void OnRemoteDied(const wptr<IRemoteObject> &object);
     int32_t AddSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj);
@@ -110,6 +111,7 @@ private:
     using VendorSimSecureElementCloseChannelT = int (*)(uint32_t channelNum, int *status);
     using VendorSimSecureElementTransmitT = int (*)(uint8_t *cmd, uint32_t cmdLen, uint8_t *rsp,
         uint32_t *rspLen, int *status);
+    using VendorSimSecureElementSetAccessSimSlotT = int (*)(uint8_t slotId);
     const char *const LIB_NAME = "libsim_secure_element.z.so";
     const char *const SIM_INIT_SYMBOL = "VendorSimSecureElementInit";
     const char *const SIM_UNINIT_SYMBOL = "VendorSimSecureElementUninit";
@@ -119,6 +121,7 @@ private:
     const char *const SIM_OPEN_BASIC_SYMBOL = "VendorSimSecureElementOpenBasicChannel";
     const char *const SIM_CLOSE_SYMBOL = "VendorSimSecureElementCloseChannel";
     const char *const SIM_TRANS_SYMBOL = "VendorSimSecureElementTransmit";
+    const char *const SIM_SET_SIM_SLOT_SYMBOL = "VendorSimSecureElementSetAccessSimSlot";
 
     void InitFunc();
     VendorSimSecureElementInitT vendorSimSecureElementInitFunc_{nullptr};
@@ -129,6 +132,7 @@ private:
     VendorSimSecureElementOpenBasicChannelT vendorSimSecureElementOpenBasicChannelFunc_{nullptr};
     VendorSimSecureElementCloseChannelT vendorSimSecureElementCloseChannelFunc_{nullptr};
     VendorSimSecureElementTransmitT vendorSimSecureElementTransmitFunc_{nullptr};
+    VendorSimSecureElementSetAccessSimSlotT vendorSimSecureElementSetAccessSimSlotFunc_{nullptr};
     static inline std::unique_ptr<DynamicLoad> loader_;
 
     int VendorSimSecureElementInit();

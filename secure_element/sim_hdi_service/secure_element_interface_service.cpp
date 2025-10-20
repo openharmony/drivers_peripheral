@@ -75,6 +75,11 @@ int32_t SecureElementInterfaceService::reset(
 {
     return adaptor_.reset(status);
 }
+
+int32_t SecureElementInterfaceService::SetAccessSimSlot(uint8_t slotId)
+{
+    return adaptor_.setAccessSimSlot(slotId);
+}
 } // V1_0
 } // SimSecureElement
 } // SecureElement
