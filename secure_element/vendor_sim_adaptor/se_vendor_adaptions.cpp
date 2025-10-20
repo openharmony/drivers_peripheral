@@ -116,6 +116,8 @@ void SimSeVendorAdaptions::InitFunc()
     vendorSimSecureElementCloseChannelFunc_ =
         loader_->FindTheFunc<VendorSimSecureElementCloseChannelT>(SIM_CLOSE_SYMBOL);
     vendorSimSecureElementTransmitFunc_ = loader_->FindTheFunc<VendorSimSecureElementTransmitT>(SIM_TRANS_SYMBOL);
+    vendorSimSecureElementSetAccessSimSlotFunc_ =
+        loader_->FindTheFunc<VendorSimSecureElementSetAccessSimSlotT>(SIM_SET_SIM_SLOT_SYMBOL);
     g_initFuncFlag = true;
     HDF_LOGE("SimSeVendorAdaptions::InitFunc exit!");
 }
@@ -368,6 +370,12 @@ int32_t SimSeVendorAdaptions::reset(SecureElementStatus& status)
     HDF_LOGE("reset is not support");
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
+}
+
+int32_t SimSeVendorAdaptions::setAccessSimSlot(uint8_t slotId)
+{
+    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    SIM_FUNCTION_INVOKE_RETURN(vendorSimSecureElementSetAccessSimSlotFunc_, slotId);
 }
 
 void SimSeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)

@@ -50,6 +50,7 @@ public:
          OHOS::HDI::SecureElement::SimSecureElement::V1_0::SecureElementStatus& status) override;
 
     int32_t reset(OHOS::HDI::SecureElement::SimSecureElement::V1_0::SecureElementStatus& status) override;
+    int32_t SetAccessSimSlot(uint8_t slotId) override;
 private:
     SimSeVendorAdaptions adaptor_;
 };
