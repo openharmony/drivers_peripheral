@@ -22,6 +22,7 @@
 #include "osal_mem.h"
 #include "parse_effect_config.h"
 #include "audio_uhdf_log.h"
+#include "stub_collector.h"
 
 #define AUDIO_EFFECT_PLAFORM_CONFIG HDF_CONFIG_DIR"/audio_effect.json"
 #define AUDIO_EFFECT_PRODUCT_CONFIG HDF_CHIP_PROD_CONFIG_DIR"/audio_effect.json"
@@ -480,6 +481,7 @@ int32_t EffectModelDestroyEffectController(struct IEffectModel *self, const stru
     }
 
     /* call the lib destroy method，then free controller manager */
+    StubCollectorRemoveObject(IEFFECTCONTROL_INTERFACE_DESC, &ctrlMgr->ctrlImpls);
     lib->DestroyController(lib, ctrlMgr->ctrlOps);
     DeleteEffectLibrary(contollerId->libName);
     pthread_rwlock_unlock(&g_rwEffectLock);
@@ -546,6 +548,7 @@ void EffectModelImplRelease(struct IEffectModel *instance)
     if (service == NULL) {
         return;
     }
+    StubCollectorRemoveObject(IEFFECTMODEL_INTERFACE_DESC, instance);
     OsalMemFree(service);
     service = NULL;
 }
