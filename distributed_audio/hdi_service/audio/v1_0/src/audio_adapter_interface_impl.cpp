@@ -90,10 +90,6 @@ void AudioAdapterInterfaceImpl::SetSpeakerCallback(const int32_t dhId, const spt
         return;
     }
     std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
-    if (extCallbackMap_.find(dhId) != extCallbackMap_.end()) {
-        DHLOGI("The callback of daudio is already set.");
-        return;
-    }
     extCallbackMap_[dhId] = spkCallback;
 }
 
