@@ -141,6 +141,7 @@ private:
     sptr<IDAudioCallback> audioExtCallback_ = nullptr;
     sptr<IAudioCallback> renderCallback_ = nullptr;
     FILE *dumpFile_ = nullptr;
+    std::string dumpPath_ = "";
 
 #ifdef DAUDIO_SUPPORT_SHARED_BUFFER
     OHOS::sptr<OHOS::Ashmem> ashmem_ = nullptr;
