@@ -33,8 +33,9 @@ using HdfGetPipelineSpecsModuleConfigRootFunc = const struct HdfConfigPipelineSp
 extern "C" void* GetHandle()
 {
     static void* handle = ::dlopen(PIPELINE_CONFIG_LIB_PATH, RTLD_NOW);
-    char* errStr = dlerror();
-    if (errStr) {
+    if (!handle) {
+        char* errStr = dlerror();
+        CAMERA_LOGE("dlopen failed, errStr: %{public}s", errStr);
         return nullptr;
     }
     return handle;
@@ -55,10 +56,12 @@ extern "C" const struct HdfConfigRoot* HdfGetModuleConfigRoot(void)
         if (!handle) {
             return &defaultConfigRoot;
         }
+        dlerror();
         HdfGetModuleConfigRootFunc HdfGetModuleConfigRootF =
             reinterpret_cast<HdfGetModuleConfigRootFunc>(dlsym(handle, "HdfGetModuleConfigRoot"));
         char* errStr = dlerror();
         if (errStr) {
+            CAMERA_LOGE("dlsym failed, errStr: %{public}s", errStr);
             return &defaultConfigRoot;
         }
         pHdfConfigRoot = HdfGetModuleConfigRootF();

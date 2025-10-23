@@ -21,7 +21,11 @@ public:
     template<typename T>
     std::string CheckIdExsit(const int32_t& mode, T&& info, const int32_t& size) const
     {
-        std::string result;
+        std::string result = "";
+        if (!info) {
+            CAMERA_LOGE("CheckIdExsit failed, info is null");
+            return result;
+        }
         for (int i = 0; i < size; i++) {
             if (info[i].id == mode) {
                 result = std::string(info[i].name);
