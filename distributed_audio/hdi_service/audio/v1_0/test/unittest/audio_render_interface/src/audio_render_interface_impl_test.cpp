@@ -784,7 +784,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetOffloadParamsChange_003, TestSize.Leve
     ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
     std::string offloadParams = "offloadParams=48,1,8,1559";
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
-    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetOffloadParamsChange(offloadParams));
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetOffloadParamsChange(offloadParams));
 }
 
 /**
