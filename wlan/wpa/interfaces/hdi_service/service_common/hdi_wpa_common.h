@@ -49,6 +49,7 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen);
 int Hex2Dec(const char *str);
 void TrimQuotationMark(char *str, char c);
 int IsSockRemoved(const char *ifName, int len);
+void HandleWpaTimeOut(void);
 
 #ifdef __cplusplus
 }
