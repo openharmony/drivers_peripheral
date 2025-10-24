@@ -1,0 +1,49 @@
+import("//build/ohos.gni")
+ohos_static_library("libwpa_dump_backtrace") {
+  sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = false  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
+      debug = false
+    }
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+  cflags += [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Os",
+    "-fno-merge-all-constants",
+  ]
+  ldflags = [
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+  ]
+    
+  sources = ["./stacktrace/dump_backtrace.cpp"]
+  include_dirs = ["./stacktrace"]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_wlan"
+  external_deps = [
+    "faultloggerd:libbacktrace_local", 
+    "hilog:libhilog",
+    "hdf_core:libhdf_utils",
+  ]
+  log_domainid = "0xD001566"
+  log_tag = "WpaDumpBackTrace"
+
+  defines = [
+    "LOG_TAG=\"$log_tag\"",        
+    "LOG_DOMAIN=$log_domainid"     
+  ]
+  
+}
