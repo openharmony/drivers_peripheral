@@ -19,6 +19,7 @@
 #include "common/wpa_ctrl.h"
 #include "hdi_wpa_hal.h"
 #include "wpa_common_cmd.h"
+#include "dump_backtrace.h"
 
 #undef LOG_TAG
 #define LOG_TAG "HdiHalWpaCommon"
@@ -26,6 +27,8 @@
 #define HEX_TO_DEC_MOVING 4
 #define DEC_MAX_SCOPE 10
 #define WPA_CMD_RETURN_TIMEOUT (-2)
+#define WPA_MAX_TIME_OUT_TIMES 3
+int g_wpaTimeOutTimes = 0;
 
 int Hex2Dec(const char *str)
 {
@@ -122,6 +125,7 @@ static int StaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret == WPA_CMD_RETURN_TIMEOUT) {
         HDF_LOGE("[%{private}s] command timed out.", cmd);
+        HandleWpaTimeOut();
         return WPA_CMD_RETURN_TIMEOUT;
     } else if (ret < 0) {
         HDF_LOGE("[%{private}s] command failed.", cmd);
@@ -134,6 +138,7 @@ static int StaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
         HDF_LOGE("%{private}s request success, but response %{public}s", cmd, buf);
         return -1;
     }
+    g_wpaTimeOutTimes = 0;
     return 0;
 }
 
@@ -149,6 +154,7 @@ static int P2pCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret == WPA_CMD_RETURN_TIMEOUT) {
         HDF_LOGE("[%{private}s] command timed out.", cmd);
+        HandleWpaTimeOut();
         return WPA_CMD_RETURN_TIMEOUT;
     } else if (ret < 0) {
         HDF_LOGE("[%{private}s] command failed.", cmd);
@@ -161,6 +167,7 @@ static int P2pCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
         HDF_LOGE("%{private}s request success, but response %{public}s", cmd, buf);
         return -1;
     }
+    g_wpaTimeOutTimes = 0;
     return 0;
 }
 
@@ -176,6 +183,7 @@ static int ChbaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret == WPA_CMD_RETURN_TIMEOUT) {
         HDF_LOGE("[%{private}s] command timed out.", cmd);
+        HandleWpaTimeOut();
         return WPA_CMD_RETURN_TIMEOUT;
     } else if (ret < 0) {
         HDF_LOGE("[%{private}s] command failed.", cmd);
@@ -188,6 +196,7 @@ static int ChbaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
         HDF_LOGE("%{private}s request success, but response %{public}s", cmd, buf);
         return -1;
     }
+    g_wpaTimeOutTimes = 0;
     return 0;
 }
 
@@ -203,6 +212,7 @@ static int CommonCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret == WPA_CMD_RETURN_TIMEOUT) {
         HDF_LOGE("[%{private}s] command timed out.", cmd);
+        HandleWpaTimeOut();
         return WPA_CMD_RETURN_TIMEOUT;
     } else if (ret < 0) {
         HDF_LOGE("[%{private}s] command failed.", cmd);
@@ -215,6 +225,7 @@ static int CommonCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen
         HDF_LOGE("%{private}s request success, but response %{public}s", cmd, buf);
         return -1;
     }
+    g_wpaTimeOutTimes = 0;
     return 0;
 }
 
@@ -282,4 +293,15 @@ int IsSockRemoved(const char *ifName, int len)
         }
     }
     return ret;
+}
+
+void HandleWpaTimeOut(void)
+{
+    g_wpaTimeOutTimes++;
+    if (g_wpaTimeOutTimes == WPA_MAX_TIME_OUT_TIMES) {
+        Dumpbacktrace();
+        HDF_LOGE("force exit wpa.");
+        exit(EXIT_FAILURE);
+    }
+    return;
 }

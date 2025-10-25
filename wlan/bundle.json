@@ -32,7 +32,8 @@
         "wpa_supplicant",
         "init",
         "libnl",
-        "ipc"
+        "ipc",
+        "faultloggerd"
       ],
       "third_party": [ ]
     },

@@ -28,6 +28,7 @@ if (is_standard_system) {
     include_dirs = [
       "./service_common",
       "../../client/include",
+      "./backtrace/stacktrace"
     ]
     sources = [
       "service_common/hdi_wpa_common.c",
@@ -41,8 +42,10 @@ if (is_standard_system) {
       "wpa_interface_service.c",
     ]
 
-    deps = [ "../../client:wpa_hdi_client" ]
-
+    deps = [
+      "../../client:wpa_hdi_client",
+      "./backtrace:libwpa_dump_backtrace",
+    ]
     defines = [ "__OHOS__USER__" ]
 
     cflags = [
