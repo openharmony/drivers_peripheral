@@ -442,7 +442,7 @@ int32_t DisplayComposerService::SetDisplayMode(uint32_t devId, uint32_t modeId)
 
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret =  vdiAdapter_->SetDisplayMode(devId, modeId);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
+    DISPLAY_CHECK(ret == HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u, modeId:%{public}u", __func__, devId, modeId));
     return ret;
 }
