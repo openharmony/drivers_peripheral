@@ -85,6 +85,12 @@ namespace {
     constexpr int64_t SENSOR_INTERVAL3 = 40000000;
     constexpr int64_t SENSOR_INTERVAL4 = 20000000;
     constexpr int64_t SENSOR_INTERVAL5 = 50000000;
+    constexpr int64_t SENSOR_INTERVAL6 = 60000000;
+    constexpr int64_t SENSOR_INTERVAL7 = 70000000;
+    constexpr int64_t SENSOR_INTERVAL8 = 80000000;
+    constexpr int64_t SENSOR_INTERVAL9 = 90000000;
+    constexpr int64_t SENSOR_INTERVAL10 = 10000000;
+    constexpr int64_t SENSOR_INTERVAL11 = 30000000;
     constexpr int32_t SENSOR_POLL_TIME = 1;
     constexpr int32_t SENSOR_WAIT_TIME = 100;
     constexpr int32_t SENSOR_WAIT_TIME2 = 1000;
@@ -608,6 +614,258 @@ namespace {
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
         ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL4, SENSOR_INTERVAL1);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        OsalMSleep(SENSOR_WAIT_TIME2);
+
+        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+        SensorCallbackImpl::sensorDataFlag = 1;
+    }
+
+    /**
+     * @tc.name: ReportFrequencyTest0004
+     * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0004, TestSize.Level1)
+    {
+        HDF_LOGI("enter the ReportFrequencyTest0004 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_GT(g_info.size(), 0);
+        int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
+        HDF_LOGI("sensorId is %{public}d", sensorId);
+
+        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL11, SENSOR_INTERVAL1);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        OsalMSleep(SENSOR_WAIT_TIME2);
+
+        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+        SensorCallbackImpl::sensorDataFlag = 1;
+    }
+
+    /**
+     * @tc.name: ReportFrequencyTest0005
+     * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0005, TestSize.Level1)
+    {
+        HDF_LOGI("enter the ReportFrequencyTest0005 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_GT(g_info.size(), 0);
+        int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
+        HDF_LOGI("sensorId is %{public}d", sensorId);
+
+        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL5, SENSOR_INTERVAL1);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        OsalMSleep(SENSOR_WAIT_TIME2);
+
+        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+        SensorCallbackImpl::sensorDataFlag = 1;
+    }
+
+    /**
+     * @tc.name: ReportFrequencyTest0006
+     * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0006, TestSize.Level1)
+    {
+        HDF_LOGI("enter the ReportFrequencyTest0006 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_GT(g_info.size(), 0);
+        int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
+        HDF_LOGI("sensorId is %{public}d", sensorId);
+
+        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL6, SENSOR_INTERVAL1);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        OsalMSleep(SENSOR_WAIT_TIME2);
+
+        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+        SensorCallbackImpl::sensorDataFlag = 1;
+    }
+
+    /**
+     * @tc.name: ReportFrequencyTest0007
+     * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0007, TestSize.Level1)
+    {
+        HDF_LOGI("enter the ReportFrequencyTest0007 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_GT(g_info.size(), 0);
+        int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
+        HDF_LOGI("sensorId is %{public}d", sensorId);
+
+        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL7, SENSOR_INTERVAL1);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        OsalMSleep(SENSOR_WAIT_TIME2);
+
+        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+        SensorCallbackImpl::sensorDataFlag = 1;
+    }
+
+    /**
+     * @tc.name: ReportFrequencyTest0008
+     * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0008, TestSize.Level1)
+    {
+        HDF_LOGI("enter the ReportFrequencyTest0008 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_GT(g_info.size(), 0);
+        int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
+        HDF_LOGI("sensorId is %{public}d", sensorId);
+
+        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL8, SENSOR_INTERVAL1);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        OsalMSleep(SENSOR_WAIT_TIME2);
+
+        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+        SensorCallbackImpl::sensorDataFlag = 1;
+    }
+
+    /**
+     * @tc.name: ReportFrequencyTest0009
+     * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0009, TestSize.Level1)
+    {
+        HDF_LOGI("enter the ReportFrequencyTest0009 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_GT(g_info.size(), 0);
+        int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
+        HDF_LOGI("sensorId is %{public}d", sensorId);
+
+        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL9, SENSOR_INTERVAL1);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        OsalMSleep(SENSOR_WAIT_TIME2);
+
+        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+        SensorCallbackImpl::sensorDataFlag = 1;
+    }
+
+    /**
+     * @tc.name: ReportFrequencyTest0010
+     * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+     * @tc.type: FUNC
+     * @tc.require: #I4L3LF
+     */
+    HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0010, TestSize.Level1)
+    {
+        HDF_LOGI("enter the ReportFrequencyTest0010 function");
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_GT(g_info.size(), 0);
+        int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
+        HDF_LOGI("sensorId is %{public}d", sensorId);
+
+        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL10, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
