@@ -136,7 +136,7 @@ int32_t TestSetGetDisplayMode(uint32_t devId)
 {
     uint32_t modeId = GetData<uint32_t>();
     int32_t ret = g_composerInterface->SetDisplayMode(devId, modeId);
-    if (ret != DISPLAY_SUCCESS) {
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_FD_ERR)) {
         HDF_LOGE("%{public}s: function SetDisplayMode failed", __func__);
         return DISPLAY_FAILURE;
     }

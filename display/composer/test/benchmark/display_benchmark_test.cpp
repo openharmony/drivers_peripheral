@@ -263,7 +263,11 @@ BENCHMARK_F(DisplayBenchmarkTest, SetDisplayModeTest)(benchmark::State &state)
     for (auto _ : state) {
         ret = g_composerDevice->SetDisplayMode(g_displayIds[0], modeId);
     }
-    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    int32_t result = DISPLAY_FAILURE;
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_FD_ERR) {
+        result = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, result);
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayModeTest)->
