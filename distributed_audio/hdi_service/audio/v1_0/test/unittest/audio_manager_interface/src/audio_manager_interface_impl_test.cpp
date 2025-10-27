@@ -133,6 +133,8 @@ HWTEST_F(AudioManagerInterfaceImplTest, AddAudioDevice_001, TestSize.Level1)
     sptr<IDAudioCallback> callback = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->AddAudioDevice(adpName, devId, caps, callback));
     EXPECT_EQ(ERR_DH_AUDIO_HDF_INVALID_OPERATION, audioManagerInterfaceImpl_->RemoveAudioDevice(adpName, devId));
+    devId = 3;
+    EXPECT_EQ(HDF_SUCCESS, audioManagerInterfaceImpl_->RemoveAudioDevice(adpName, devId));
 }
 
 /**
