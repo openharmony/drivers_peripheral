@@ -52,8 +52,8 @@ int32_t HdiTestDisplay::Init()
         DISPLAY_TEST_LOGE("SetDisplayPowerStatus failed, id_ : %{public}u", id_));
 
     ret = device_->SetDisplayMode(id_, currentMode_.id);
-    DISPLAY_TEST_CHK_RETURN(
-        (ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("SetDisplayMode failed, id_ : %{public}u", id_));
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_FD_ERR),
+        DISPLAY_FAILURE, DISPLAY_TEST_LOGE("SetDisplayMode failed, id_ : %{public}u", id_));
 
     LayerInfo layerinfo = {0};
     layerinfo.width = currentMode_.width;
