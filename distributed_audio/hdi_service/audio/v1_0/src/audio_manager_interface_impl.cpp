@@ -200,6 +200,10 @@ int32_t AudioManagerInterfaceImpl::AddAudioDeviceInner(const uint32_t dhId, DAud
 int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName, const uint32_t dhId)
 {
     DHLOGI("Remove audio device name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), dhId);
+    if (dhId == LOW_LATENCY_RENDER_ID) {
+        DHLOGI("Not support low latency id");
+        return DH_SUCCESS;
+    }
     DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
     int32_t ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
