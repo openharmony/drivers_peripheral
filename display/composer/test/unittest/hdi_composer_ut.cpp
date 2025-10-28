@@ -278,7 +278,7 @@ HWTEST_F(DeviceTest, test_SetDisplayMode, TestSize.Level1)
     const uint32_t MODE = 0;
     auto ret = g_composerDevice->SetDisplayMode(g_displayIds[0], MODE);
     int32_t result = DISPLAY_FAILURE;
-    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_FD_ERR) {
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         result = DISPLAY_SUCCESS;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, result);

@@ -264,7 +264,7 @@ BENCHMARK_F(DisplayBenchmarkTest, SetDisplayModeTest)(benchmark::State &state)
         ret = g_composerDevice->SetDisplayMode(g_displayIds[0], modeId);
     }
     int32_t result = DISPLAY_FAILURE;
-    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_FD_ERR) {
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         result = DISPLAY_SUCCESS;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, result);
