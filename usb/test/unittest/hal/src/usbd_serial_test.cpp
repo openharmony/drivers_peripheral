@@ -270,6 +270,586 @@ HWTEST_F(SerialTest, SerialSetAttribute_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SerialSetAttribute_003
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_003, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_50;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_004
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_004, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_75;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_005
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_005, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_110;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_006
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_006, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_134;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_007
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_007, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_150;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_008
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_008, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_200;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_009
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_009, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_300;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_010
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_010, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_600;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_011
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_011, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_1200;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_012
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_012, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_1800;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_013
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_013, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_2400;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_014
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_014, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_4800;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_015
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_015, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_9600;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_016
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_016, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_19200;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_017
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_017, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_38400;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_018
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_018, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_57600;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_019
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_019, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_115200;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_020
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_020, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_230400;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_021
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_021, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_460800;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_022
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_022, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_500000;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_024
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_024, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_921600;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_025
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_025, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_1000000;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_026
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_026, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_1152000;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_027
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_027, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_1500000;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_028
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_028, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_2000000;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_029
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_029, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_2500000;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_030
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_030, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_3000000;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_031
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_031, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_3500000;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
+ * @tc.name: SerialSetAttribute_032
+ * @tc.desc: Test functions to int32_t SerialSetAttribute(int32_t portId,
+ *           const OHOS::HDI::Usb::Serial::V1_0::SerialAttribute& attributeInfo)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SerialTest, SerialSetAttribute_032, TestSize.Level1)
+{
+    g_serialInterface->SerialClose(VALID_PORTID);
+    g_serialInterface->SerialOpen(VALID_PORTID);
+    OHOS::HDI::Usb::Serial::V1_0::SerialAttribute attributeInfo;
+    attributeInfo.baudrate = OHOS::HDI::Usb::Serial::V1_0::BAUDRATE_4000000;
+    attributeInfo.dataBits = DATA_BITS_SIX;
+    attributeInfo.parity = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_PARITY_ODD;
+    attributeInfo.stopBits = OHOS::HDI::Usb::Serial::V1_0::USB_ATTR_STOPBIT_2;
+    int32_t ret = g_serialInterface->SerialSetAttribute(VALID_PORTID, attributeInfo);
+    EXPECT_EQ(ret, OK);
+    g_serialInterface->SerialClose(VALID_PORTID);
+}
+
+/**
  * @tc.name: SerialClose_001
  * @tc.desc: Test functions to int32_t SerialClose(int32_t portId)
  * @tc.type: FUNC
