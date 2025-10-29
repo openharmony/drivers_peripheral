@@ -123,13 +123,15 @@ static int WpaCliCmdStatus(WifiWpaStaInterface *this, const char*ifName, struct 
         return -1;
     }
     char buf[REPLY_BUF_LENGTH] = {0};
-    if (WpaCliCmd(cmd, buf, REPLY_BUF_LENGTH) != 0) {
-        return -1;
-    }
+    if (WpaCliCmd(cmd, buf, REPLY_BUF_LENGTH) != 0) { return -1; }
     char *savedPtr = NULL;
     char *key = strtok_r(buf, "=", &savedPtr);
     while (key != NULL) {
         char *value = strtok_r(NULL, "\n", &savedPtr);
+        if (value == NULL) {
+            HDF_LOGE("%{public}s strtok_r returned NULL for value.", __func__);
+            return -1;
+        }
         if (strcmp(key, "bssid") == 0) {
             if (strcpy_s(pcmd->bssid, sizeof(pcmd->bssid), value) != EOK) {
                 HDF_LOGE("%{public}s strcpy failed", __func__);
@@ -155,12 +157,8 @@ static int WpaCliCmdStatus(WifiWpaStaInterface *this, const char*ifName, struct 
 
         key = strtok_r(NULL, "=", &savedPtr);
     }
-    if (strcmp(pcmd->address, "") == 0) {
-        return -1;
-    }
-    if (strcmp(pcmd->bssid, "") == 0) {
-        return 1;
-    }
+    if (strcmp(pcmd->address, "") == 0) { return -1; }
+    if (strcmp(pcmd->bssid, "") == 0) { return 1; }
     return 0;
 }
 
@@ -549,6 +547,10 @@ static int WpaCliCmdGetConnectionCapabilities(WifiWpaStaInterface *this, struct 
     char *key = strtok_r(buf, "=", &savedPtr);
     while (key != NULL) {
         char *value = strtok_r(NULL, "\n", &savedPtr);
+        if (value == NULL) {
+            HDF_LOGE("%{public}s strtok_r returned NULL for value.", __func__);
+            return -1;
+        }
         if (strcmp(key, "technology") == 0) {
             connectionCap->technology = atoi(value);
         } else if (strcmp(key, "channelBandwidth") == 0) {
@@ -587,6 +589,10 @@ static int WpaCliCmdGetRequirePmf(WifiWpaStaInterface *this, int *enable)
     char *key = strtok_r(buf, "=", &savedPtr);
     while (key != NULL) {
         char *value = strtok_r(NULL, "\n", &savedPtr);
+        if (value == NULL) {
+            HDF_LOGE("%{public}s strtok_r returned NULL for value.", __func__);
+            return -1;
+        }
         if (strcmp(key, "require_pmf") == 0) {
             *enable = atoi(value);
         }
@@ -646,6 +652,10 @@ static int WpaCliCmdWepKey(WifiWpaStaInterface *this, int keyIdx, unsigned char 
     char *key = strtok_r(buf, "=", &savedPtr);
     while (key != NULL) {
         char *value = strtok_r(NULL, "\n", &savedPtr);
+        if (value == NULL) {
+            HDF_LOGE("%{public}s strtok_r returned NULL for value.", __func__);
+            return -1;
+        }
         if (strcmp(key, "wep_key") == 0) {
             if (strncpy_s((char *)wepKey, strlen(value), value, strlen(value)) != 0) {
                 HDF_LOGE("copy wep_key failed!");
@@ -679,6 +689,10 @@ static int WpaCliCmdGetPsk(WifiWpaStaInterface *this, unsigned char *psk, unsign
     char *key = strtok_r(buf, "=", &savedPtr);
     while (key != NULL) {
         char *value = strtok_r(NULL, "\n", &savedPtr);
+        if (value == NULL) {
+            HDF_LOGE("%{public}s strtok_r returned NULL for value.", __func__);
+            return -1;
+        }
         if (strcmp(key, "psk") == 0) {
             if (strncpy_s((char *)psk, strlen(value), value, strlen(value)) != 0) {
                 HDF_LOGE("copy psk failed!");
@@ -712,6 +726,10 @@ static int WpaCliCmdGetPskPassphrase(WifiWpaStaInterface *this, char *psk, unsig
     char *key = strtok_r(buf, "=", &savedPtr);
     while (key != NULL) {
         char *value = strtok_r(NULL, "\n", &savedPtr);
+        if (value == NULL) {
+            HDF_LOGE("%{public}s strtok_r returned NULL for value.", __func__);
+            return -1;
+        }
         if (strcmp(key, "passphrase") == 0) {
             if (strncpy_s((char *)psk, (int)pskLen, value, strlen(value)) != 0) {
                 HDF_LOGE("copy passphrase failed!");
@@ -1465,6 +1483,16 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, unsigned char *resultBuf
     return 0;
 }
 
+static int CheckTokenAndLog(char *token, char *buf)
+{
+    if (token == NULL) {
+        HDF_LOGE("strtok_r returned NULL at line %{public}d", __LINE__);
+        free(buf);
+        return -1;
+    }
+    return 0;
+}
+
 static int WpaCliCmdGetSignalInfo(WifiWpaStaInterface *this, WpaSignalInfo *info)
 {
     if (this == NULL || info == NULL) {
@@ -1488,15 +1516,19 @@ static int WpaCliCmdGetSignalInfo(WifiWpaStaInterface *this, WpaSignalInfo *info
     while (token != NULL) {
         if (strcmp(token, "RSSI") == 0) {
             token = strtok_r(NULL, "\n", &savedPtr);
+            if (CheckTokenAndLog(token, buf) != 0) { return -1; }
             info->signal = atoi(token);
         } else if (strcmp(token, "LINKSPEED") == 0) {
             token = strtok_r(NULL, "\n", &savedPtr);
+            if (CheckTokenAndLog(token, buf) != 0) { return -1; }
             info->txrate = atoi(token);
         } else if (strcmp(token, "NOISE") == 0) {
             token = strtok_r(NULL, "\n", &savedPtr);
+            if (CheckTokenAndLog(token, buf) != 0) { return -1; }
             info->noise = atoi(token);
         } else if (strcmp(token, "FREQUENCY") == 0) {
             token = strtok_r(NULL, "\n", &savedPtr);
+            if (CheckTokenAndLog(token, buf) != 0) { return -1; }
             info->frequency = atoi(token);
         } else {
             strtok_r(NULL, "\n", &savedPtr);

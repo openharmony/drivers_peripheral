@@ -248,7 +248,11 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
     } else {
         ifName = "common";
     }
-
+    if (ifName == NULL) {
+        HDF_LOGE("WpaCliCmd: ifName is NULL!");
+        return -1;
+    }
+    
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
         ret = StaCliCmd(GetStaCtrl(), cmd, buf, bufLen);
     } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
