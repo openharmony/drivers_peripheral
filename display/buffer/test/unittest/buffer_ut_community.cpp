@@ -426,6 +426,201 @@ void DisplayBufferUt::MetadataTest(BufferHandle& handle)
         EXPECT_TRUE(ret != DISPLAY_SUCCESS);
     }
 }
+
+int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
+{
+    int ret;
+    BufferHandle *buffer = nullptr;
+    const int TEST_COUNT = 40; // test 40 times
+    for (int i = 0; i < TEST_COUNT; i++) {
+        ret = displayBuffer_->AllocMem(info, buffer);
+        if (ret == DISPLAY_NOT_SUPPORT) {
+            HDF_LOGE("%{public}s: AllocMem not support, ret=%{public}d", __func__, ret);
+            return DISPLAY_SUCCESS;
+        }
+        if (ret != DISPLAY_SUCCESS || buffer == nullptr) {
+            HDF_LOGE("AllocMem failed");
+            return ret;
+        }
+        MetadataTest(*buffer);
+        void *vAddr = displayBuffer_->Mmap(*buffer);
+        if (vAddr == nullptr) {
+            HDF_LOGE("Mmap failed");
+            displayBuffer_->FreeMem(*buffer);
+            return DISPLAY_FAILURE;
+        }
+        if (info.usage & (HBM_USE_CPU_READ | HBM_USE_CPU_WRITE)) {
+            ret = displayBuffer_->InvalidateCache(*buffer);
+            if (ret != DISPLAY_SUCCESS) {
+                HDF_LOGE("InvalidateCache failed");
+                displayBuffer_->Unmap(*buffer);
+                displayBuffer_->FreeMem(*buffer);
+                return ret;
+            }
+        }
+        if (memset_s(vAddr, buffer->size, 0, buffer->size) != EOK) {
+            HDF_LOGE("Insufficient memory");
+            displayBuffer_->Unmap(*buffer);
+            displayBuffer_->FreeMem(*buffer);
+            return DISPLAY_NOMEM;
+        }
+        if (info.usage & (HBM_USE_CPU_READ | HBM_USE_CPU_WRITE)) {
+            ret = displayBuffer_->FlushCache(*buffer);
+            if (ret != DISPLAY_SUCCESS) {
+                HDF_LOGE("FlushCache failed");
+                displayBuffer_->Unmap(*buffer);
+                displayBuffer_->FreeMem(*buffer);
+                return ret;
+            }
+        }
+        displayBuffer_->Unmap(*buffer);
+        displayBuffer_->FreeMem(*buffer);
+    }
+    return DISPLAY_SUCCESS;
+}
+
+TEST_P(DisplayBufferUt, DisplayBufferUt)
+{
+    AllocInfo params = GetParam();
+    int ret = AllocMemTest(params);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+INSTANTIATE_TEST_SUITE_P(AllocTest, DisplayBufferUt, ::testing::ValuesIn(DISPLAY_BUFFER_TEST_SETS));
+
+HWTEST_F(DisplayBufferUt, test_ReAllocMemTest001, TestSize.Level1)
+{
+    int ret;
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_YCBCR_420_P
+    };
+    BufferHandle* inBuffer = nullptr;
+    ret = displayBuffer_->AllocMem(info, inBuffer);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
+    EXPECT_NE(inBuffer, nullptr);
+
+    BufferHandle* outBuffer = nullptr;
+    AllocInfo newInfo = {
+        .width = ALLOC_SIZE_1920,
+        .height = ALLOC_SIZE_1080,
+        .usage = HBM_USE_MEM_DMA | Composer::V1_0::HBM_USE_VIDEO_DECODER | Composer::V1_0::HBM_USE_HW_COMPOSER,
+        .format = PIXEL_FMT_YCBCR_420_P
+    };
+
+    ret = displayBuffer_->ReAllocMem(newInfo, *inBuffer, outBuffer);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
+    EXPECT_NE(inBuffer, nullptr);
+    EXPECT_NE(outBuffer, nullptr);
+
+    AllocInfo nullInfo;
+    ret = displayBuffer_->ReAllocMem(nullInfo, *inBuffer, outBuffer);
+    EXPECT_TRUE(ret != DISPLAY_SUCCESS);
+
+    displayBuffer_->FreeMem(*inBuffer);
+    displayBuffer_->FreeMem(*outBuffer);
+}
+
+HWTEST_F(DisplayBufferUt, test_ReAllocMemTest002, TestSize.Level1)
+{
+    int ret;
+    AllocInfo info = {
+        .width = ALLOC_SIZE_720,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_YCBCR_420_P
+    };
+    BufferHandle* inBuffer = nullptr;
+    ret = displayBuffer_->AllocMem(info, inBuffer);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
+    EXPECT_NE(inBuffer, nullptr);
+
+    BufferHandle* outBuffer = nullptr;
+    AllocInfo newInfo = {
+        .width = ALLOC_SIZE_1920,
+        .height = ALLOC_SIZE_1080,
+        .usage = HBM_USE_MEM_DMA | Composer::V1_0::HBM_USE_VIDEO_DECODER | Composer::V1_0::HBM_USE_HW_COMPOSER,
+        .format = PIXEL_FMT_YCBCR_420_P
+    };
+
+    ret = displayBuffer_->ReAllocMem(newInfo, *inBuffer, outBuffer);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
+    EXPECT_NE(inBuffer, nullptr);
+    EXPECT_NE(outBuffer, nullptr);
+
+    AllocInfo nullInfo;
+    ret = displayBuffer_->ReAllocMem(nullInfo, *inBuffer, outBuffer);
+    EXPECT_TRUE(ret != DISPLAY_SUCCESS);
+
+    displayBuffer_->FreeMem(*inBuffer);
+    displayBuffer_->FreeMem(*outBuffer);
+}
+
+HWTEST_F(DisplayBufferUt, test_ReAllocMemTest003, TestSize.Level1)
+{
+    int ret;
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1280,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_YCBCR_420_P
+    };
+    BufferHandle* inBuffer = nullptr;
+    ret = displayBuffer_->AllocMem(info, inBuffer);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
+    EXPECT_NE(inBuffer, nullptr);
+
+    BufferHandle* outBuffer = nullptr;
+    AllocInfo newInfo = {
+        .width = ALLOC_SIZE_1920,
+        .height = ALLOC_SIZE_1080,
+        .usage = HBM_USE_MEM_DMA | Composer::V1_0::HBM_USE_VIDEO_DECODER | Composer::V1_0::HBM_USE_HW_COMPOSER,
+        .format = PIXEL_FMT_YCBCR_420_P
+    };
+
+    ret = displayBuffer_->ReAllocMem(newInfo, *inBuffer, outBuffer);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
+    EXPECT_NE(inBuffer, nullptr);
+    EXPECT_NE(outBuffer, nullptr);
+
+    AllocInfo nullInfo;
+    ret = displayBuffer_->ReAllocMem(nullInfo, *inBuffer, outBuffer);
+    EXPECT_TRUE(ret != DISPLAY_SUCCESS);
+
+    displayBuffer_->FreeMem(*inBuffer);
+    displayBuffer_->FreeMem(*outBuffer);
+}
+
+int32_t DisplayBufferUt::PassthroughTest(AllocInfo& info)
+{
+    int ret;
+    BufferHandle *buffer = nullptr;
+    ret = displayBuffer_->AllocMem(info, buffer);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        HDF_LOGE("%{public}s: AllocMem not support, ret=%{public}d", __func__, ret);
+        return DISPLAY_SUCCESS;
+    }
+    if (ret != DISPLAY_SUCCESS || buffer == nullptr) {
+        HDF_LOGE("AllocMem failed");
+        return ret;
+    }
+    displayBuffer_->FreeMem(*buffer);
+    return DISPLAY_SUCCESS;
+}
+
+HWTEST_F(DisplayBufferUt, test_PassthroughTest, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = TEST_INFO,
+        .format = PIXEL_FMT_YCBCR_420_P
+    };
+    int ret = PassthroughTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
 } // OHOS
 } // HDI
 } // DISPLAY
