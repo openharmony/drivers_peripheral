@@ -1141,7 +1141,6 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
     if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0 && !IsUpdaterMode()) {
         AddDeathRecipientForService(self);
     }
-    OsalMemFree(newRemoteNode);
     return HDF_SUCCESS;
 }
 
