@@ -64,6 +64,7 @@ const uint32_t ALLOC_SIZE_1080 = 1080; // alloc size 1080
 const uint32_t ALLOC_SIZE_1920 = 1920; // alloc size 1920
 const uint32_t ALLOC_SIZE_1280 = 1280; // alloc size 1280
 const uint32_t ALLOC_SIZE_720 = 720; // alloc size 720
+const int TEST_COUNT = 40; // test 40 times
 
 const AllocInfo DISPLAY_BUFFER_TEST_SETS[] = {
     // num0
@@ -431,7 +432,6 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
 {
     int ret;
     BufferHandle *buffer = nullptr;
-    const int TEST_COUNT = 40; // test 40 times
     for (int i = 0; i < TEST_COUNT; i++) {
         ret = displayBuffer_->AllocMem(info, buffer);
         if (ret == DISPLAY_NOT_SUPPORT) {
