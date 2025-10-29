@@ -78,7 +78,7 @@ int32_t DAudioManagerInterfaceImpl::UnRegisterAudioDevice(const std::string &adp
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;
     }
-    std::lock_guard<std::mutex> lock(mgrMtx_);
+
     int32_t ret = audioMgr_->RemoveAudioDevice(adpName, devId);
     if (ret != DH_SUCCESS) {
         DHLOGE("UnRegister audio devcie failed. ret = %{public}d", ret);
@@ -96,7 +96,7 @@ int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int3
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;
     }
-    std::lock_guard<std::mutex> lock(mgrMtx_);
+
     DHLOGI("Notify event. event type = %{public}d", event.type);
     int32_t ret = audioMgr_->Notify(adpName, devId, streamId, event);
     if (ret != DH_SUCCESS) {
@@ -138,7 +138,7 @@ int32_t DAudioManagerInterfaceImpl::UnRegisterAudioHdfListener(const std::string
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;
     }
-    std::lock_guard<std::mutex> lock(mgrMtx_);
+
     int32_t ret = audioMgr_->UnRegisterAudioHdfListener(serviceName);
     if (ret != DH_SUCCESS) {
         DHLOGE("Unregister audio HDF listener failed. ret = %{public}d", ret);
