@@ -16,8 +16,9 @@
 #include "serialgetportlist_fuzzer.h"
 #include "v1_0/serial_types.h"
 #include "v1_0/iserial_interface.h"
-#include "usb_errors.h"
 
+#include <cerrno>
+#include <string>
 #include <vector>
 
 using namespace OHOS::HDI::Usb::Serial::V1_0;
