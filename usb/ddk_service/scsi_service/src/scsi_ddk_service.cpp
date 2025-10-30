@@ -80,7 +80,7 @@ constexpr uint8_t CDB_LENGTH_SIX = 6;
 constexpr uint8_t CDB_LENGTH_TEN = 10;
 constexpr uint32_t MAX_TRANSFER_BYTES = UINT32_MAX;
 constexpr uint32_t MAX_MEM_MAP_SIZE = UINT32_MAX;
-constexpr const char* SCSIPERIPHERAL_DEVICE_MMAP_PATH = "/data/service/el1/public/usb/scsi";
+constexpr const char* SCSIPERIPHERAL_DEVICE_MMAP_PATH = "/data/chipset/el1/public/usb/scsi";
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_SCSI_PERIPHERAL";
 std::mutex g_memMapMutex;
 
