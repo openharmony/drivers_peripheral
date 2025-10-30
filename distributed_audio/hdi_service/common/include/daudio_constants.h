@@ -87,6 +87,7 @@ constexpr int32_t DAUDIO_MIN_ASHMEM_LEN = 10;
 
 constexpr const char *AUDIOCATEGORY = "AUDIOCATEGORY";
 constexpr const char *KEY_DH_ID = "dhId";
+constexpr const char *KEY_RENDER_ID = "renderId";
 constexpr const char *KEY_STATE = "STATE";
 constexpr const char *IS_UPDATEUI = "IS_UPDATEUI";
 constexpr const char *VOLUME_CHANAGE = "VOLUME_CHANAGE";
