@@ -118,7 +118,7 @@ private:
         const int32_t dhId, const int32_t captureId = 0);
     int32_t SetAudioVolume(const std::string& condition, const std::string &param);
     int32_t GetAudioVolume(const std::string& condition, std::string &param);
-    int32_t HandleFocusChangeEvent(const DAudioEvent &event);
+    int32_t HandleFocusChangeEvent(const uint32_t streamId, const DAudioEvent &event, const uint32_t devId);
     int32_t HandleRenderStateChangeEvent(const DAudioEvent &event);
     int32_t HandleVolumeChangeEvent(const DAudioEvent &event);
     int32_t HandleSANotifyEvent(const uint32_t streamId, const DAudioEvent &event);
