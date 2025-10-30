@@ -16,6 +16,7 @@
 #include "serialgetportlist_fuzzer.h"
 #include "v1_0/serial_types.h"
 #include "v1_0/iserial_interface.h"
+#include "usb_errors.h"
 
 #include <vector>
 
@@ -29,6 +30,14 @@ namespace OHOS {
 namespace SERIAL {
     bool SerialGetPortListFuzzTest(const uint8_t* data, size_t size)
     {
+        unsigned seed = 0;
+        if (size >= sizeof(unsigned)) {
+            errno_t ret = memcpy_s(&seed, sizeof(unsigned), data, sizeof(unsigned));
+            if (ret != UEC_OK) {
+                return false;
+            }
+            srand(seed);
+        }
         auto serialInterface = ISerialInterface::Get("serial_interface_service", true);
         std::vector<SerialPort> portInfo;
         if (serialInterface->SerialGetPortList(portInfo) != OK || portInfo.size() == 0) {
