@@ -576,7 +576,7 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t s
             return HandleVolumeChangeEvent(event);
         case HDF_AUDIO_EVENT_FOCUS_CHANGE:
             DHLOGI("Notify event: FOCUS_CHANGE, event content: %{public}s.", event.content.c_str());
-            return HandleFocusChangeEvent(event);
+            return HandleFocusChangeEvent(streamId, event, devId);
         case HDF_AUDIO_EVENT_RENDER_STATE_CHANGE:
             DHLOGI("Notify event: RENDER_STATE_CHANGE, event content: %{public}s.", event.content.c_str());
             return HandleRenderStateChangeEvent(event);
@@ -1107,19 +1107,31 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
     return DH_SUCCESS;
 }
 
-int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const DAudioEvent &event)
+int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const uint32_t streamId, const DAudioEvent &event,
+    const uint32_t devId)
 {
     DHLOGI("Focus change (%{public}s).", event.content.c_str());
     if (paramCallback_ == nullptr) {
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
+
+    uint32_t renderId = streamId;
+    auto renderDev = find_if(renderDevs_.begin(), renderDevs_.end(),
+        [devId](std::pair<int32_t, sptr<AudioRenderInterfaceImplBase>> item) {
+            return item.first == static_cast<int32_t>(devId);
+        });
+    if (renderDev != renderDevs_.end()) {
+        renderId = static_cast<uint32_t>(std::distance(renderDevs_.begin(), renderDev));
+    }
+
     std::stringstream ss;
     ss << INTERRUPT_EVENT << ";"
         << VOLUME_EVENT_TYPE << "=" << ParseStringFromArgs(event.content, VOLUME_EVENT_TYPE.c_str()) << ";"
         << FORCE_TYPE << "=" << ParseStringFromArgs(event.content, FORCE_TYPE) << ";"
         << HINT_TYPE << "=" << ParseStringFromArgs(event.content, HINT_TYPE) << ";"
         << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";"
+        << KEY_RENDER_ID << "=" << renderId << ";"
         << AUDIOCATEGORY << "=" << ParseStringFromArgs(event.content, AUDIOCATEGORY) << ";";
     DHLOGI("get ss : %{public}s", ss.str().c_str());
     int8_t reserved = 0;

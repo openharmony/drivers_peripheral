@@ -1226,10 +1226,12 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleFocusChangeEvent_001, TestSize.Leve
 
     DAudioEvent event = {HDF_AUDIO_EVENT_FOCUS_CHANGE,
         "INTERRUPT_EVENT;EVENT_TYPE=1;VOLUME_LEVEL=1;FORCE_TYPE=1;HINT_TYPE=1;"};
+    uint32_t devId = 64;
+    uint32_t streamId = 0;
 
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleFocusChangeEvent(event));
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleFocusChangeEvent(streamId, event, devId));
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleFocusChangeEvent(event));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleFocusChangeEvent(streamId, event, devId));
 }
 
 /**
@@ -1245,9 +1247,11 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleFocusChangeEvent_002, TestSize.Leve
 
     DAudioEvent event = {HDF_AUDIO_EVENT_FOCUS_CHANGE,
         "INTERRUPT_EVENT;EVENT_TYPE=1;VOLUME_LEVEL=1;FORCE_TYPE=1;HINT_TYPE=1;"};
+    uint32_t devId = 64;
+    uint32_t streamId = 0;
 
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockRevertIAudioParamCallback());
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleFocusChangeEvent(event));
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleFocusChangeEvent(streamId, event, devId));
 }
 
 /**
