@@ -339,6 +339,32 @@ HWTEST_F(HdfLightHdiCommonTest, TurnOnLightRedshort_001, TestSize.Level1)
 }
 
 /**
+  * @tc.name: TurnOnLightRedshort002
+  * @tc.desc: Turn on the battery light blinking red.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightRedshort_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect;
+    InitConfig(effect);
+    effect.lightColor.colorValue.rgbColor.r = MAX_VALUE;
+    effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BLINK;
+    effect.flashEffect.onTime = ON_TIME;
+    effect.flashEffect.offTime = OFF_TIME;
+
+    int32_t ret = g_lightInterface->TurnOnLight(LIGHT_ID_BATTERY, effect);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    OsalSleep(g_sleepTime_s);
+
+    ret = g_lightInterface->TurnOffLight(LIGHT_ID_BATTERY);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
   * @tc.name: TurnOnLightGreenshort001
   * @tc.desc: Turn on the light always on green.
   * @tc.type: FUNC
@@ -362,6 +388,31 @@ HWTEST_F(HdfLightHdiCommonTest, TurnOnLightGreenshort_001, TestSize.Level1)
 }
 
 /**
+  * @tc.name: TurnOnLightGreenshort002
+  * @tc.desc: Turn on the light always on green.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightGreenshort_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect;
+    InitConfig(effect);
+    effect.lightColor.colorValue.rgbColor.g = MAX_VALUE;
+    effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BLINK;
+    effect.flashEffect.onTime = ON_TIME;
+    effect.flashEffect.offTime = OFF_TIME;
+    int32_t ret = g_lightInterface->TurnOnLight(LIGHT_ID_BATTERY, effect);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    OsalSleep(g_sleepTime_s);
+
+    ret = g_lightInterface->TurnOffLight(LIGHT_ID_BATTERY);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
   * @tc.name: TurnOnLightBlueshort001
   * @tc.desc: Turn on the light always on blue.
   * @tc.type: FUNC
@@ -381,6 +432,31 @@ HWTEST_F(HdfLightHdiCommonTest, TurnOnLightBlueshort_001, TestSize.Level1)
     OsalSleep(g_sleepTime_s);
 
     ret = g_lightInterface->TurnOffLight(g_info[0].lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnLightBlueshort002
+  * @tc.desc: Turn on the battery light blinking blue.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightBlueshort_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect;
+    InitConfig(effect);
+    effect.lightColor.colorValue.rgbColor.b = MAX_VALUE;
+    effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BLINK;
+    effect.flashEffect.onTime = ON_TIME;
+    effect.flashEffect.offTime = OFF_TIME;
+    int32_t ret = g_lightInterface->TurnOnLight(LIGHT_ID_BATTERY, effect);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    OsalSleep(g_sleepTime_s);
+
+    ret = g_lightInterface->TurnOffLight(LIGHT_ID_BATTERY);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -466,6 +542,66 @@ HWTEST_F(HdfLightHdiCommonTest, TurnOnLightAbnormal_004, TestSize.Level1)
     InitConfig(effect);
     effect.lightColor.colorValue.rgbColor.r = MAX_VALUE;
     effect.lightColor.colorValue.rgbColor.g = MAX_VALUE;
+    effect.lightColor.colorValue.rgbColor.b = MAX_VALUE;
+
+    int32_t ret = g_lightInterface->TurnOnLight(LIGHT_ID_BUTT, effect);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnLightAbnormal005
+  * @tc.desc: Abnormal lightID.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightAbnormal_005, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect;
+    InitConfig(effect);
+    effect.lightColor.colorValue.rgbColor.r = MAX_VALUE;
+    effect.lightColor.colorValue.rgbColor.g = MIN_VALUE;
+    effect.lightColor.colorValue.rgbColor.b = MIN_VALUE;
+
+    int32_t ret = g_lightInterface->TurnOnLight(LIGHT_ID_BUTT, effect);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnLightAbnormal006
+  * @tc.desc: Abnormal lightID.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightAbnormal_006, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect;
+    InitConfig(effect);
+    effect.lightColor.colorValue.rgbColor.r = MIN_VALUE;
+    effect.lightColor.colorValue.rgbColor.g = MAX_VALUE;
+    effect.lightColor.colorValue.rgbColor.b = MIN_VALUE;
+
+    int32_t ret = g_lightInterface->TurnOnLight(LIGHT_ID_BUTT, effect);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnLightAbnormal007
+  * @tc.desc: Abnormal lightID.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightAbnormal_007, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect;
+    InitConfig(effect);
+    effect.lightColor.colorValue.rgbColor.r = MIN_VALUE;
+    effect.lightColor.colorValue.rgbColor.g = MIN_VALUE;
     effect.lightColor.colorValue.rgbColor.b = MAX_VALUE;
 
     int32_t ret = g_lightInterface->TurnOnLight(LIGHT_ID_BUTT, effect);

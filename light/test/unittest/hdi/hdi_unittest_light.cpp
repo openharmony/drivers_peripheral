@@ -610,6 +610,86 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGradientWhite001, TestSize.Le
 }
 
 /**
+  * @tc.name: TurnOnLightNotificationsRed001
+  * @tc.desc: Notification light red.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsRed001, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect = {
+        .lightColor.colorValue.rgbColor.r = 255,
+        .lightColor.colorValue.rgbColor.g = 0,
+        .lightColor.colorValue.rgbColor.b = 0,
+    };
+
+    LightTest(HDF_LIGHT_ID_NOTIFICATIONS, HDF_LIGHT_FLASH_GRADIENT, effect);
+}
+
+/**
+  * @tc.name: TurnOnLightNotificationsGreen001
+  * @tc.desc: Notification light green.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsGreen001, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect = {
+        .lightColor.colorValue.rgbColor.r = 0,
+        .lightColor.colorValue.rgbColor.g = 255,
+        .lightColor.colorValue.rgbColor.b = 0,
+    };
+
+    LightTest(HDF_LIGHT_ID_NOTIFICATIONS, HDF_LIGHT_FLASH_GRADIENT, effect);
+}
+
+/**
+  * @tc.name: TurnOnLightNotificationsBlue001
+  * @tc.desc: Notification light blue.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsBlue001, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect = {
+        .lightColor.colorValue.rgbColor.r = 0,
+        .lightColor.colorValue.rgbColor.g = 0,
+        .lightColor.colorValue.rgbColor.b = 255,
+    };
+
+    LightTest(HDF_LIGHT_ID_NOTIFICATIONS, HDF_LIGHT_FLASH_GRADIENT, effect);
+}
+
+/**
+  * @tc.name: TurnOnLightNotificationsWhite001
+  * @tc.desc: Notification light white.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestLight, TurnOnLightNotificationsWhite001, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect = {
+        .lightColor.colorValue.rgbColor.r = 255,
+        .lightColor.colorValue.rgbColor.g = 255,
+        .lightColor.colorValue.rgbColor.b = 255,
+    };
+
+    LightTest(HDF_LIGHT_ID_NOTIFICATIONS, HDF_LIGHT_FLASH_GRADIENT, effect);
+}
+
+/**
   * @tc.name: TurnOnLightAttention001
   * @tc.desc: The reserved indicator is not supported currently.
   * @tc.type: FUNC
