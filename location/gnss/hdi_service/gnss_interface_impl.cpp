@@ -521,6 +521,7 @@ int32_t GnssInterfaceImpl::SetPredictGnssData(const std::string& data)
 
 int32_t GnssInterfaceImpl::GetCachedGnssLocationsSize(int32_t& size)
 {
+    HDF_LOGI("%{public}s.", __func__);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
@@ -536,6 +537,7 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocationsSize(int32_t& size)
 
 int32_t GnssInterfaceImpl::GetCachedGnssLocations()
 {
+    HDF_LOGI("%{public}s.", __func__);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
