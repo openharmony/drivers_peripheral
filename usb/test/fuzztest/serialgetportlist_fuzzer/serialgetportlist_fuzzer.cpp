@@ -16,9 +16,10 @@
 #include "serialgetportlist_fuzzer.h"
 #include "v1_0/serial_types.h"
 #include "v1_0/iserial_interface.h"
+#include "securec.h"
 
-#include <cerrno>
-#include <string>
+#include <cstring>
+#include <memory>
 #include <vector>
 
 using namespace OHOS::HDI::Usb::Serial::V1_0;
