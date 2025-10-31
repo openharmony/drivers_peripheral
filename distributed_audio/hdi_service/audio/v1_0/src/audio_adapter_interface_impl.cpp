@@ -853,6 +853,10 @@ int32_t AudioAdapterInterfaceImpl::SetStreamStatusChange(const std::string &cond
         DHLOGE("convert the value failed");
         return ERR_DH_AUDIO_HDF_FAIL;
     }
+    if (!IsIdValid(convertRes.renderId)) {
+        DHLOGE("the renderId is invalid");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
     event.content = convertRes.streamInfoVal;
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
