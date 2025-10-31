@@ -211,10 +211,10 @@ static int CommonCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen
     size_t len = bufLen - 1;
     HDF_LOGD("wpa_ctrl_request -> cmd: %{private}s", cmd);
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
-    if (ret == WPA_CMD_RETURN_TIMEOUT) {
-        HDF_LOGE("[%{private}s] command timed out.", cmd);
+    if (ret == WPA_CMD_RETURN_TIMEOUT || ret == WPA_CMD_RETURN_FAILED) {
+        HDF_LOGE("[%{private}s] command %{public}d[-2:time out, -1:failed].", cmd, ret);
         HandleWpaTimeOut();
-        return WPA_CMD_RETURN_TIMEOUT;
+        return ret;
     } else if (ret < 0) {
         HDF_LOGE("[%{private}s] command failed.", cmd);
         return -1;
