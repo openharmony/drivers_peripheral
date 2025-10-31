@@ -1643,6 +1643,11 @@ static int32_t GetCmdWithCarryDate(char *cmd, const char *ifName,
                 "IFNAME=%s CREATE_TEMP_GROUP %s", ifName, carryData);
             break;
         }
+        case P2P_CANCEL_WPS_PBC: {
+            ret = snprintf_s(cmd, MAX_CMD_SIZE, MAX_CMD_SIZE - 1,
+                "IFNAME=%s WPS_CANCEL %s", ifName, carryData);
+            break;
+        }
         default: {
             ret = snprintf_s(cmd, MAX_CMD_SIZE, MAX_CMD_SIZE - 1,
                 "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s",
