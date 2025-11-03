@@ -35,27 +35,29 @@ void CreateCaptureFuzzTest(const uint8_t* data, size_t size)
 
     AudioAdapterDescriptor desc;
     auto audioAdapter = std::make_shared<AudioAdapterInterfaceImpl>(desc);
+    uint32_t offset = sizeof(uint32_t);
+    uint32_t i = 0;
 
     AudioDeviceDescriptor deviceDes = {
-        .portId = *(reinterpret_cast<const uint32_t*>(data)),
-        .pins = *(reinterpret_cast<const AudioPortPin*>(data)),
-        .desc = std::string(reinterpret_cast<const char*>(data), size),
+        .portId = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .pins = *(reinterpret_cast<const AudioPortPin*>(data + (i++ * offset))),
+        .desc = std::string(reinterpret_cast<const char*>(data + (i++ * offset)), size),
     };
 
     AudioSampleAttributes sampleAttr = {
-        .type = *(reinterpret_cast<const AudioCategory*>(data)),
-        .interleaved = *(reinterpret_cast<const uint32_t*>(data)),
-        .format = *(reinterpret_cast<const AudioFormat*>(data)),
-        .sampleRate = *(reinterpret_cast<const uint32_t*>(data)),
-        .channelCount = *(reinterpret_cast<const uint32_t*>(data)),
-        .period = *(reinterpret_cast<const uint32_t*>(data)),
-        .frameSize = *(reinterpret_cast<const uint32_t*>(data)),
-        .isBigEndian = *(reinterpret_cast<const uint32_t*>(data)),
-        .isSignedData = *(reinterpret_cast<const uint32_t*>(data)),
-        .startThreshold = *(reinterpret_cast<const uint32_t*>(data)),
-        .stopThreshold = *(reinterpret_cast<const uint32_t*>(data)),
-        .silenceThreshold = *(reinterpret_cast<const uint32_t*>(data)),
-        .streamId = *(reinterpret_cast<const uint32_t*>(data)),
+        .type = *(reinterpret_cast<const AudioCategory*>(data + (i++ * offset))),
+        .interleaved = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .format = *(reinterpret_cast<const AudioFormat*>(data + (i++ * offset))),
+        .sampleRate = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .channelCount = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .period = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .frameSize = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .isBigEndian = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .isSignedData = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .startThreshold = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .stopThreshold = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .silenceThreshold = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
+        .streamId = *(reinterpret_cast<const uint32_t*>(data + (i++ * offset))),
     };
 
     sptr<IAudioCapture> capture;
