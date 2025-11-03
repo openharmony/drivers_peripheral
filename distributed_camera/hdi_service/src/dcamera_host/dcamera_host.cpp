@@ -136,6 +136,10 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
             break;
         }
         for (uint32_t index = 0; index < item.count; index += UNIT_LENGTH) {
+            if (item.data.i32 == nullptr) {
+                DHLOGE("Invalid stream configuration data");
+                continue;
+            }
             int32_t format = item.data.i32[index];
             int32_t width = item.data.i32[index + WIDTH_OFFSET];
             int32_t height = item.data.i32[index + HEIGHT_OFFSET];
@@ -386,7 +390,6 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         dCameraDeviceMap_.erase(dCameraId);
     }
-
     if (dCameraHostCallback_ != nullptr) {
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
@@ -394,7 +397,6 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
     if (dCameraHostCallback_V1_2_ != nullptr) {
         dCameraHostCallback_V1_2_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
-
     DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %{public}s",
         GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
