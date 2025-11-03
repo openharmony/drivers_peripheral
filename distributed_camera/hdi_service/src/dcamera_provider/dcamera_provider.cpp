@@ -238,6 +238,8 @@ int32_t DCameraProvider::Notify(const DHBase& dhBase, const DCameraHDFEvent& eve
 
     if (event.type_ == DCAMERE_FORCE_SWITCH) {
         sptr<IDCameraProviderCallback> callback = GetCallbackBydhBase(dhBase);
+        CHECK_NULL_RETURN_LOG(callback, DCamRetCode::INVALID_ARGUMENT,
+            "DCameraProvider::Notify failed, dcamera provider callback not found.");
         callback->NotifyEvent(dhBase, event);
         return DCamRetCode::SUCCESS;
     }
