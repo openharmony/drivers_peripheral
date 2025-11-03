@@ -398,6 +398,9 @@ int TestGetDisplaySupportedModesExt(uint32_t devId)
 
 void TestModeCallback(uint32_t modeId, uint64_t vBlankPeriod, void* data)
 {
+    if (data == nullptr) {
+        HDF_LOGW("%{public}s: data is nullptr", __func__);
+    }
 }
 
 int TestSetDisplayModeAsync(uint32_t devId)
@@ -422,6 +425,9 @@ int TestGetDisplayVBlankPeriod(uint32_t devId)
 
 void TestSeamlessChangeCallback(uint32_t devId, void* data)
 {
+    if (data == nullptr) {
+        HDF_LOGW("%{public}s: data is nullptr", __func__);
+    }
 }
 
 int TestRegSeamlessChangeCallback(uint32_t devId)
@@ -456,6 +462,9 @@ int TestSetDisplayOverlayResolution(uint32_t devId)
 
 static void TestRefreshCallback(uint32_t devId, void* data)
 {
+    if (data == nullptr) {
+        HDF_LOGW("%{public}s: data is nullptr", __func__);
+    }
 }
 
 int TestRegRefreshCallback(uint32_t devId)
@@ -502,6 +511,9 @@ int TestGetDisplayIdentificationData(uint32_t devId)
 
 void TestHwcEventCallback(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void* data)
 {
+    if (data == nullptr) {
+        HDF_LOGW("%{public}s: data is NULL", __func__);
+    }
 }
 
 int TestRegHwcEventCallback(uint32_t devId)

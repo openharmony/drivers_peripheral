@@ -59,18 +59,24 @@ static int32_t InitScene(const struct AudioSceneDescriptor *scene)
     return HDF_SUCCESS;
 }
 
-void AudioRenderReqMmapBuffer(struct IAudioRender *&render, uint8_t *&data)
+void AudioRenderReqMmapBuffer(struct IAudioRender *&render, uint8_t *&data, size_t size)
 {
     int32_t temp = *(reinterpret_cast<int32_t *>(data));
+    uint32_t offsetaddress = 0;
+    uint32_t offsetlen = offsetaddress + sizeof(int8_t);
+    uint32_t offsetpath = offsetlen + sizeof(uint32_t);
+    if (offsetpath > size) {
+        return;
+    }
     struct AudioMmapBufferDescriptor desc = {
-        .memoryAddress = reinterpret_cast<int8_t *>(data),
-        .memoryAddressLen = *(reinterpret_cast<uint32_t *>(data)),
+        .memoryAddress = reinterpret_cast<int8_t *>(data + offsetaddress),
+        .memoryAddressLen = *(reinterpret_cast<uint32_t *>(data + offsetlen)),
         .memoryFd = temp,
         .totalBufferFrames = temp,
         .transferFrameSize = temp,
         .isShareable = temp,
         .offset = temp,
-        .filePath = reinterpret_cast<char *>(data),
+        .filePath = reinterpret_cast<char *>(data + offsetpath),
     };
     render->ReqMmapBuffer(render, temp, &desc);
 }
@@ -107,7 +113,7 @@ void RenderFucSwitch(struct IAudioRender *&render, uint32_t cmd, const uint8_t *
             render->SetExtraParams(render, reinterpret_cast<const char *>(rawData));
             break;
         case AUDIO_RENDER_REQ_MMAP_BUFFER: {
-            AudioRenderReqMmapBuffer(render, data);
+            AudioRenderReqMmapBuffer(render, data, size);
             break;
         }
         case AUDIO_RENDER_SET_CHANNEL_MODE:
