@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,10 +14,10 @@
  */
 
 #include "dcameraclosesession_fuzzer.h"
-
+#include "fuzzer/FuzzedDataProvider.h"
 #include <cstddef>
 #include <cstdint>
-
+#include <string>
 #include "dcamera_provider.h"
 #include "v1_1/dcamera_types.h"
 
@@ -25,12 +25,13 @@ namespace OHOS {
 namespace DistributedHardware {
 void DcameraCloseSessionFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    size_t deviceIdLength = fdp.ConsumeIntegralInRange<size_t>(0, fdp.remaining_bytes() / 2);
+    std::string deviceId = fdp.ConsumeBytesAsString(deviceIdLength);
+
+    std::string dhId = fdp.ConsumeRemainingBytesAsString();
+    
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
@@ -40,11 +41,8 @@ void DcameraCloseSessionFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::DcameraCloseSessionFuzzTest(data, size);
     return 0;
 }
-
