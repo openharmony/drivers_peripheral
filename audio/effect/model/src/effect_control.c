@@ -35,8 +35,9 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
         "%{public}s: invailid input params", __func__);
 
     struct ControllerManager *manager = (struct ControllerManager *)self;
-    CHECK_TRUE_RETURN_RET_LOG(manager->ctrlOps == NULL || manager->ctrlOps->EffectProcess == NULL,
-        HDF_FAILURE, "%{public}s: controller has no options", __func__);
+    CHECK_TRUE_RETURN_RET_LOG(
+        manager->ctrlOps == NULL || manager->ctrlOps->EffectProcess == NULL || manager->libName == NULL, HDF_FAILURE,
+        "%{public}s: controller has no options", __func__);
     if (strcmp(manager->libName, "libmock_effect_lib") != 0) {
         output->frameCount = input->frameCount;
         output->datatag = input->datatag;
