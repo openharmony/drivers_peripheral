@@ -174,7 +174,8 @@ HWTEST_F(CameraHdiTestV1_3, SUB_Driver_Camera_Moon_0300, TestSize.Level1)
  */
 HWTEST_F(CameraHdiTestV1_3, SUB_Driver_Camera_SlowMotion_0300, TestSize.Level1)
 {
-    if (!g_isTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::HIGH_FRAME_RATE)) {
+    if (!g_isTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES
+            OHOS::HDI::Camera::V1_3::HIGH_FRAME_RATE)) {
         GTEST_SKIP() << "skip this test, because HIGH_FRAME_RATE not in OHOS_ABILITY_CAMERA_MODES" << std::endl;
         return;
     }
