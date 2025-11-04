@@ -25,6 +25,9 @@
 #include "v1_3/display_command/display_cmd_responser.h"
 #include "v1_3/idisplay_composer.h"
 #include "v1_3/display_composer_type.h"
+#include "v1_4/display_command/display_cmd_responser.h"
+#include "v1_4/idisplay_composer.h"
+#include "v1_4/display_composer_type.h"
 #include "common/include/display_vdi_adapter_interface.h"
 #include <mutex>
 
@@ -32,9 +35,9 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-using namespace OHOS::HDI::Display::Composer::V1_3;
+using namespace OHOS::HDI::Display::Composer::V1_4;
 
-class DisplayComposerService : public V1_3::IDisplayComposer {
+class DisplayComposerService : public V1_4::IDisplayComposer {
 public:
     DisplayComposerService();
     virtual ~DisplayComposerService();
@@ -46,6 +49,7 @@ public:
     int32_t SetDisplayMode(uint32_t devId, uint32_t modeId) override;
     int32_t GetDisplayPowerStatus(uint32_t devId, V1_0::DispPowerStatus& status) override;
     int32_t SetDisplayPowerStatus(uint32_t devId, V1_0::DispPowerStatus status) override;
+    int32_t GetPanelPowerStatus(uint32_t devId, V1_4::PanelPowerStatus& status) override;
     int32_t GetDisplayBacklight(uint32_t devId, uint32_t& level) override;
     int32_t SetDisplayBacklight(uint32_t devId, uint32_t level) override;
     int32_t GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t& value) override;
@@ -124,7 +128,7 @@ private:
     sptr<IVBlankCallback> vBlankCb_;
     sptr<IModeCallback> modeCb_;
     sptr<ISeamlessChangeCallback> seamlessChangeCb_;
-    std::unique_ptr<V1_3::HdiDisplayCmdResponser> cmdResponser_;
+    std::unique_ptr<V1_4::HdiDisplayCmdResponser> cmdResponser_;
     sptr<IRefreshCallback> refreshCb_;
     sptr<IVBlankIdleCallback> VBlankIdleCb_;
     sptr<IHwcEventCallback> hwcEventCb_;

@@ -42,7 +42,7 @@ namespace Composer {
 
 const std::string BOOTEVENT_COMPOSER_HOST_READY = "bootevent.composer_host.ready";
 
-extern "C" V1_3::IDisplayComposer* DisplayComposerImplGetInstance(void)
+extern "C" V1_4::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
     return new (std::nothrow) DisplayComposerService();
 }
@@ -277,6 +277,10 @@ void DisplayComposerService::LoadVdiFuncPart3()
     vdiAdapter_->SetTunnelLayerBuffer =
         reinterpret_cast<SetTunnelLayerBufferFunc>(dlsym(libHandle_, "SetTunnelLayerBuffer"));
     vdiAdapter_->CommitTunnelLayer = reinterpret_cast<CommitTunnelLayerFunc>(dlsym(libHandle_, "CommitTunnelLayer"));
+    vdiAdapter_->RegHwcEventCallback =
+        reinterpret_cast<RegHwcEventCallbackFunc>(dlsym(libHandle_, "RegHwcEventCallback"));
+    vdiAdapter_->GetPanelPowerStatus =
+        reinterpret_cast<GetPanelPowerStatusFunc>(dlsym(libHandle_, "GetPanelPowerStatus"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -322,7 +326,7 @@ int32_t DisplayComposerService::DisplayComposerService::CreateResponser()
         DISPLAY_LOGI("%{public}s Enable Map", __func__);
         cacheMgr_->SetNeedMap(true);
     }
-    cmdResponser_ = V1_3::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
+    cmdResponser_ = V1_4::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
     CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     DISPLAY_LOGI("%{public}s out", __func__);
     return HDF_SUCCESS;
@@ -455,6 +459,18 @@ int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, V1_0::Disp
     int32_t ret = vdiAdapter_->GetDisplayPowerStatus(devId, status);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u, status:%{public}u", __func__, devId, status));
+    return ret;
+}
+
+int32_t DisplayComposerService::GetPanelPowerStatus(uint32_t devId, V1_4::PanelPowerStatus& status)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetPanelPowerStatus, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->GetPanelPowerStatus(devId, status);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail ret:%{public}d", __func__, ret));
     return ret;
 }
 
@@ -1125,11 +1141,11 @@ void DisplayComposerService::OnHwcEvent(uint32_t devId, uint32_t eventId,
 int32_t DisplayComposerService::RegHwcEventCallback(const sptr<IHwcEventCallback>& cb)
 {
     DISPLAY_TRACE;
-    DISPLAY_CHK_RETURN(vdiAdapter_ == nullptr, HDF_ERR_NOT_SUPPORT);
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->RegHwcEventCallback, HDF_ERR_NOT_SUPPORT);
     hwcEventCb_ = cb;
     int32_t ret = vdiAdapter_->RegHwcEventCallback(OnHwcEvent, this);
-    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
