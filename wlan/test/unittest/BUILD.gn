@@ -18,7 +18,6 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("$HDF_CORE_DIR/hdf_core/adapter/uhdf2/uhdf.gni")
   import("$TEST_ROOT_DIR/wlan.gni")
 }
 
