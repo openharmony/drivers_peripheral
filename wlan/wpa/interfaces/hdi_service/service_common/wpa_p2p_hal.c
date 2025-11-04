@@ -770,10 +770,10 @@ static P2pSupplicantErrCode WpaP2pCliCmdGroupAdd(WifiWpaP2pInterface *this, int 
         //if networkId equal AX_NET_ID, p2p go will enable 11ax
         if (networkId == AX_NET_ID) {
             res = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_GROUP_ADD freq=%d he",
-            this->ifName, freq);
+                this->ifName, freq);
         } else {
             res = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_GROUP_ADD freq=%d",
-            this->ifName, freq);
+                this->ifName, freq);
         }
     }
     if (res < 0) {
