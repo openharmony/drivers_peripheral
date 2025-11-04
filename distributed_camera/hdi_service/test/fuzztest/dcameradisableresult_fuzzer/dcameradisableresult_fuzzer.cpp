@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,29 +17,37 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 #include "dcamera_device.h"
 #include "dcamera_host.h"
 #include "v1_1/dcamera_types.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void DcameraDisableResultFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
+
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
     std::vector<int32_t> results;
-    results.push_back(*(reinterpret_cast<const int*>(data)));
+    const size_t maxResultsVectorSize = 16;
+    size_t numResults = fdp.ConsumeIntegralInRange<size_t>(0, maxResultsVectorSize);
+    for (size_t i = 0; i < numResults; ++i) {
+        results.push_back(fdp.ConsumeIntegral<int32_t>());
+    }
 
-    const std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    const std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString();
+    std::string srcAbilityInfo = fdp.ConsumeRemainingBytesAsString();
+
     OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
     if (dcameraDevice == nullptr) {
         return;
@@ -49,11 +57,8 @@ void DcameraDisableResultFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::DcameraDisableResultFuzzTest(data, size);
     return 0;
 }
-

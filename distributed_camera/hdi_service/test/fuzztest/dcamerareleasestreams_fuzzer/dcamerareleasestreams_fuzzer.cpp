@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,26 +14,29 @@
  */
 
 #include "dcamerareleasestreams_fuzzer.h"
-
 #include <cstddef>
 #include <cstdint>
-
+#include <vector>
+#include <string>
 #include "dcamera_provider.h"
 #include "v1_1/dcamera_types.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void DcameraReleaseStreamsFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
+    FuzzedDataProvider fdp(data, size);
+
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
+
+    std::vector<int> streamIds;
+    size_t numStreams = fdp.ConsumeIntegralInRange<size_t>(0, 10);
+    for (size_t i = 0; i < numStreams; ++i) {
+        streamIds.push_back(fdp.ConsumeIntegral<int>());
     }
 
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    int32_t streamId = *(reinterpret_cast<const int32_t*>(data));
-    std::vector<int> streamIds;
-    streamIds.push_back(streamId);
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
@@ -43,11 +46,8 @@ void DcameraReleaseStreamsFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::DcameraReleaseStreamsFuzzTest(data, size);
     return 0;
 }
-

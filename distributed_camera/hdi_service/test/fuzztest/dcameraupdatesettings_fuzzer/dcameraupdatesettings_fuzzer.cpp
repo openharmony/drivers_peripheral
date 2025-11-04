@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,47 +17,72 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 #include "dcamera_provider.h"
+#include "dcamera_host.h"
+#include "dcamera_device.h"
 #include "v1_1/dcamera_types.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const uint32_t DC_TYPE_SIZE = 7;
-const DCSettingsType dcTypeFuzz[DC_TYPE_SIZE] = {
+const DCSettingsType DC_VALID_TYPES[] = {
     DCSettingsType::UPDATE_METADATA, DCSettingsType::ENABLE_METADATA, DCSettingsType::DISABLE_METADATA,
     DCSettingsType::METADATA_RESULT, DCSettingsType::SET_FLASH_LIGHT, DCSettingsType::FPS_RANGE,
     DCSettingsType::UPDATE_FRAME_METADATA
 };
-}
+
+constexpr size_t MAX_ID_LEN = 64;
+constexpr size_t MAX_URL_LEN = 1024;
+constexpr size_t MAX_SETTING_VALUE_LEN = 256;
+constexpr size_t MAX_SETTINGS_COUNT = 10;
+constexpr const char* CAM_ID_SEPARATOR = "__";
+
+} // namespace
+
 void DcameraUpdateSettingsFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    FuzzedDataProvider fdp(data, size);
+    auto host = DCameraHost::GetInstance();
+    auto provider = DCameraProvider::GetInstance();
+    if (host == nullptr || provider == nullptr) {
         return;
     }
+    host->dCameraDeviceMap_.clear();
 
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    DHBase dhBase;
-    dhBase.deviceId_ = deviceId;
-    dhBase.dhId_ = dhId;
+    DHBase dhBaseToUpdate;
+    dhBaseToUpdate.deviceId_ = fdp.ConsumeRandomLengthString(MAX_ID_LEN);
+    dhBaseToUpdate.dhId_ = fdp.ConsumeRandomLengthString(MAX_ID_LEN);
+
+    if (fdp.ConsumeBool()) {
+        std::string sink = fdp.ConsumeRandomLengthString(MAX_URL_LEN);
+        std::string source = fdp.ConsumeRandomLengthString(MAX_URL_LEN);
+        std::string camId = dhBaseToUpdate.deviceId_ + CAM_ID_SEPARATOR + dhBaseToUpdate.dhId_;
+
+        OHOS::sptr<DCameraDevice> dev(new (std::nothrow) DCameraDevice(dhBaseToUpdate, sink, source));
+        if (dev != nullptr) {
+            host->dCameraDeviceMap_.emplace(camId, dev);
+        }
+    }
     std::vector<DCameraSettings> settings;
-    DCameraSettings setting;
-    setting.type_ = dcTypeFuzz[data[0] % DC_TYPE_SIZE];
-    setting.value_ = std::string(reinterpret_cast<const char*>(data), size);
-    settings.push_back(setting);
+    size_t settingsCount = fdp.ConsumeIntegralInRange<size_t>(0, MAX_SETTINGS_COUNT);
+    
+    for (size_t i = 0; i < settingsCount; ++i) {
+        DCameraSettings setting;
+        setting.type_ = fdp.PickValueInArray(DC_VALID_TYPES);
+        setting.value_ = fdp.ConsumeRandomLengthString(MAX_SETTING_VALUE_LEN);
+        settings.push_back(setting);
+    }
+    provider->UpdateSettings(dhBaseToUpdate, settings);
+}
+} // namespace DistributedHardware
+} // namespace OHOS
 
-    DCameraProvider::GetInstance()->UpdateSettings(dhBase, settings);
-}
-}
-}
-
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::DcameraUpdateSettingsFuzzTest(data, size);
     return 0;
 }
-

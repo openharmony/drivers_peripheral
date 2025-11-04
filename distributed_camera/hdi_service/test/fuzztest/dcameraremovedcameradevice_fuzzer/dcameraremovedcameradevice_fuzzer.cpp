@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,33 +14,37 @@
  */
 
 #include "dcameraremovedcameradevice_fuzzer.h"
-
 #include <cstddef>
 #include <cstdint>
-
+#include <string>
 #include "dcamera_host.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
 void DcameraRemoveDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    std::string deviceId = "1";
-    std::string dhId = "2";
+    FuzzedDataProvider fdp(data, size);
+
+    std::string deviceId = fdp.ConsumeRandomLengthString(fdp.remaining_bytes() / 4);
+    std::string dhId = fdp.ConsumeRandomLengthString(fdp.remaining_bytes() / 3);
+
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
-    std::string cameraId = "1__2";
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string sourceAbilityInfo(reinterpret_cast<const char*>(data), size);
+
+    std::string cameraId = deviceId + "__" + dhId;
+
+    std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(fdp.remaining_bytes() / 2);
+    std::string sourceAbilityInfo = fdp.ConsumeRemainingBytesAsString();
+    
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
         sourceAbilityInfo));
     if (dcameraDevice == nullptr) {
         return;
     }
+
     DCameraHost::GetInstance()->dCameraDeviceMap_.emplace(cameraId, dcameraDevice);
 
     DCameraHost::GetInstance()->RemoveDCameraDevice(dhBase);
@@ -48,10 +52,8 @@ void DcameraRemoveDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::DcameraRemoveDCameraDeviceFuzzTest(data, size);
     return 0;
 }
