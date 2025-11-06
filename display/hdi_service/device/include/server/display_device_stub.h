@@ -110,7 +110,7 @@ public:
 private:
     static inline const std::u16string metaDescriptor_ = IDisplayDevice::GetDescriptor();
     int32_t SetCallBackObject(sptr<IRemoteObject> callbackRemote);
-    sptr<DisplayDeviceCallbackProxy> callbackRemote_;
+    sptr<DisplayRegisterCallbackBase> callbackRemote_;
     std::unique_ptr<DisplayDeviceService> device_;
 };
 
