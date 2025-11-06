@@ -376,7 +376,10 @@ int32_t DCameraDevice::Close()
         dMetadataProcessor_->ResetEnableResults();
     }
     dCameraDeviceCallback_ = nullptr;
-    isOpenSessFailed_ = false;
+    {
+        unique_lock<mutex> lock(isOpenSessFailedlock_);
+        isOpenSessFailed_ = false;
+    }
     isOpened_ = false;
     return CamRetCode::NO_ERROR;
 }
