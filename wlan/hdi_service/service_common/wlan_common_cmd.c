@@ -990,7 +990,7 @@ int32_t WlanInterfaceUnregisterEventCallback(struct IWlanInterface *self, struct
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
     if (!DListIsEmpty(&HdfStubDriver()->remoteListHead)) {
         (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
-        return;
+        return HDF_FAILURE;
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
 
