@@ -24,7 +24,9 @@ namespace OHOS {
     bool StopVibrateBySessionIdFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
-
+        if (data == nullptr) {
+            return false;
+        }
         OHOS::HDI::Vibrator::V2_0::HapticPaket hapticPaket;
         sptr<IVibratorInterface> g_vibratorInterface = IVibratorInterface::Get();
         if (!g_vibratorInterface->PlayPatternBySessionId({-1, 1}, 1, hapticPaket)) {
