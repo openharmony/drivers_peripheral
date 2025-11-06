@@ -57,9 +57,15 @@ static int32_t InitDevDesc(const struct AudioDeviceDescriptor *devDesc)
     return HDF_SUCCESS;
 }
 
-static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const uint8_t *&rawData)
+static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const uint8_t *&rawData, size_t rawDataSize)
 {
     uint8_t *data = const_cast<uint8_t *>(rawData);
+    uint32_t offset = 0;
+    uint32_t offsetport = offset + sizeof(AudioPortDirection);
+    uint32_t offsetname = offsetport + sizeof(uint32_t);
+    if (offsetname > rawDataSize) {
+        return;
+    }
     switch (cmd) {
         case AUDIO_ADAPTER_CREAT_RENDER: {
             struct IAudioRender *render = nullptr;
@@ -86,18 +92,18 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
         case AUDIO_ADAPTER_GET_PORT_CAPABILITY: {
             struct AudioPortCapability capability = {};
             struct AudioPort port = {
-                .dir = *(reinterpret_cast<AudioPortDirection *>(data)),
-                .portId = *(reinterpret_cast<uint32_t *>(data)),
-                .portName = reinterpret_cast<char *>(data),
+                .dir = *(reinterpret_cast<AudioPortDirection *>(data + offset)),
+                .portId = *(reinterpret_cast<uint32_t *>(data + offsetport)),
+                .portName = reinterpret_cast<char *>(data + offsetname),
             };
             adapter->GetPortCapability(adapter, &port, &capability);
             break;
         }
         case AUDIO_ADAPTER_SET_PASSTHROUGH_MODE: {
             struct AudioPort port = {
-                .dir = *(reinterpret_cast<AudioPortDirection *>(data)),
-                .portId = *(reinterpret_cast<uint32_t *>(data)),
-                .portName = reinterpret_cast<char *>(data),
+                .dir = *(reinterpret_cast<AudioPortDirection *>(data + offset)),
+                .portId = *(reinterpret_cast<uint32_t *>(data + offsetport)),
+                .portName = reinterpret_cast<char *>(data + offsetname),
             };
             adapter->SetPassthroughMode(adapter, &port, *(reinterpret_cast<const AudioPortPassthroughMode *>(rawData)));
             break;
@@ -105,9 +111,9 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
         case AUDIO_ADAPTER_GET_PASSTHROUGH_MODE: {
             AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
             struct AudioPort port = {
-                .dir = *(reinterpret_cast<AudioPortDirection *>(data)),
-                .portId = *(reinterpret_cast<uint32_t *>(data)),
-                .portName = reinterpret_cast<char *>(data),
+                .dir = *(reinterpret_cast<AudioPortDirection *>(data + offset)),
+                .portId = *(reinterpret_cast<uint32_t *>(data + offsetport)),
+                .portName = reinterpret_cast<char *>(data + offsetname),
             };
             adapter->GetPassthroughMode(adapter, &port, &mode);
             break;
@@ -134,12 +140,11 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     if (ret != HDF_SUCCESS) {
         return false;
     }
-    AdapterFucSwitch(adapter, cmd, rawData);
+    AdapterFucSwitch(adapter, cmd, rawData, size);
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     IAudioManagerRelease(manager, false);
     return true;
 }
-
 }
 }
 

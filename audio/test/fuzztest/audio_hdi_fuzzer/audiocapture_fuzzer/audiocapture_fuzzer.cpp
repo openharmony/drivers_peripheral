@@ -58,23 +58,29 @@ static int32_t InitScene(const struct AudioSceneDescriptor *scene)
     return HDF_SUCCESS;
 }
 
-void AudioCaptureReqMmapBuffer(struct IAudioCapture *&capture, uint8_t *&data)
+void AudioCaptureReqMmapBuffer(struct IAudioCapture *&capture, uint8_t *&data, size_t size)
 {
     int32_t temp = *(reinterpret_cast<int32_t *>(data));
+    uint32_t offsetaddress = 0;
+    uint32_t offsetlen = offsetaddress + sizeof(int8_t);
+    uint32_t offsetpath = offsetlen + sizeof(uint32_t);
+    if (offsetpath > size) {
+        return;
+    }
     struct AudioMmapBufferDescriptor desc = {
-        .memoryAddress = reinterpret_cast<int8_t *>(data),
-        .memoryAddressLen = *(reinterpret_cast<uint32_t *>(data)),
+        .memoryAddress = reinterpret_cast<int8_t *>(data + offsetaddress),
+        .memoryAddressLen = *(reinterpret_cast<uint32_t *>(data + offsetlen)),
         .memoryFd = temp,
         .totalBufferFrames = temp,
         .transferFrameSize = temp,
         .isShareable = temp,
         .offset = temp,
-        .filePath = reinterpret_cast<char *>(data),
+        .filePath = reinterpret_cast<char *>(data + offsetpath),
     };
     capture->ReqMmapBuffer(capture, temp, &desc);
 }
 
-void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_t *&rawData)
+void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_t *&rawData, size_t size)
 {
     uint8_t *data = const_cast<uint8_t *>(rawData);
     switch (cmd) {
@@ -108,7 +114,7 @@ void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_
             capture->SetExtraParams(capture, reinterpret_cast<const char *>(rawData));
             break;
         case AUDIO_CAPTURE_REQ_MMAP_BUFFER: {
-            AudioCaptureReqMmapBuffer(capture, data);
+            AudioCaptureReqMmapBuffer(capture, data, size);
             break;
         }
         case AUDIO_CAPTURE_DEV_DUMP: {
@@ -140,7 +146,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     if (ret != HDF_SUCCESS) {
         return false;
     }
-    CaptureFucSwitch(capture, cmd, rawData);
+    CaptureFucSwitch(capture, cmd, rawData, size);
     adapter->DestroyCapture(adapter, captureId);
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     IAudioManagerRelease(manager, false);
