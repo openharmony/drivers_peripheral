@@ -382,6 +382,27 @@ bool SensorClientsManager::IsNeedCloseSensor(SensorHandle sensorHandle, int serv
     return false;
 }
 
+void SensorClientsManager::AddServiceToReportQueue(SensorHandle sensorHandle, int serviceId)
+{
+    SENSOR_TRACE_PID;
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
+    auto it = sensorUsed_.find(sensorHandle);
+    if (it == sensorUsed_.end()) {
+        std::set<int> service = {serviceId};
+        sensorUsed_.emplace(sensorHandle, service);
+        HDF_LOGD("%{public}s: sensorHandle %{public}s is enabled by service: %{public}d", __func__,
+                 SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
+        return;
+    }
+    auto service = sensorUsed_[sensorHandle].find(serviceId);
+    if (service == sensorUsed_[sensorHandle].end()) {
+        sensorUsed_[sensorHandle].insert(serviceId);
+        HDF_LOGD("%{public}s: service: %{public}d is enabled sensorHandle: %{public}s", __func__, serviceId,
+                 SENSOR_HANDLE_TO_C_STR(sensorHandle));
+    }
+    return;
+}
+
 bool SensorClientsManager::IsExistSdcSensorEnable(SensorHandle sensorHandle)
 {
     SENSOR_TRACE_PID;
