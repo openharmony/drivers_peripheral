@@ -45,21 +45,17 @@ namespace Battery {
 
 namespace {
 // Battery manager reserved domain id range
-constexpr unsigned int BATTERY_DOMAIN_ID_START = 0xD002920;
-constexpr unsigned int BATTERY_DOMAIN_ID_END = BATTERY_DOMAIN_ID_START + 32;
+constexpr unsigned int BATTERY_HDI_DOMAIN_ID_START = 0xD002923;
+constexpr unsigned int BATTERY_DOMAIN_ID_END = 0xD002940;
 constexpr unsigned int TEST_DOMAIN_ID = 0xD000F00;
 } // namespace
 
 enum BatteryManagerLogLabel {
     // Component labels, you can add if needed
-    COMP_APP = 0,
-    COMP_FWK = 1,
-    COMP_SVC = 2,
-    COMP_HDI = 3,
+    COMP_HDI = 0,
     // Write to kmsg log
-    COMP_DRV = 4,
+    COMP_DRV = 1,
     // Feature labels, use to mark major features
-    FEATURE_CHARGING,
     FEATURE_BATT_INFO,
     // Test label
     LABEL_TEST,
@@ -68,44 +64,50 @@ enum BatteryManagerLogLabel {
 };
 
 enum BatteryManagerLogDomain {
-    DOMAIN_APP = BATTERY_DOMAIN_ID_START + COMP_APP, // 0xD002920
-    DOMAIN_FRAMEWORK,                                // 0xD002921
-    DOMAIN_SERVICE,                                  // 0xD002922
-    DOMAIN_HDI,                                      // 0xD002923
-    DOMAIN_DRIVER,                                   // 0xD002924
-    DOMAIN_FEATURE_CHARGING,
-    DOMAIN_FEATURE_BATT_INFO,
+    DOMAIN_HDI = BATTERY_HDI_DOMAIN_ID_START, // 0xD002923
     DOMAIN_TEST = TEST_DOMAIN_ID,       // 0xD000F00
     DOMAIN_END = BATTERY_DOMAIN_ID_END, // Max to 0xD002940, keep the sequence and length same as BatteryManagerLogLabel
 };
 
-struct BatteryManagerLogLabelDomain {
-    uint32_t domainId;
+struct BatteryManagerLogLabelTag {
+    uint32_t logLabel;
     const char* tag;
 };
 
-// Keep the sequence and length same as BatteryManagerLogDomain
-static const BatteryManagerLogLabelDomain BATTERY_LABEL[LABEL_END] = {
-    {DOMAIN_APP,               "BatteryApp"     },
-    {DOMAIN_FRAMEWORK,         "BatteryFwk"     },
-    {DOMAIN_SERVICE,           "BatterySvc"     },
-    {DOMAIN_HDI,               "BatteryHdi"     },
-    {DOMAIN_DRIVER,            "BatteryDrv"     },
-    {DOMAIN_FEATURE_CHARGING,  "BatteryCharging"},
-    {DOMAIN_FEATURE_BATT_INFO, "BatteryInfo"    },
-    {DOMAIN_TEST,              "BatteryTest"    },
+static constexpr BatteryManagerLogLabelTag BATTERY_LABEL_TAG[LABEL_END] = {
+    {COMP_HDI,              "BatteryHdi"     },
+    {COMP_DRV,              "BatteryDrv"     },
+    {FEATURE_BATT_INFO,     "BatteryInfo"    },
+    {LABEL_TEST,            "BatteryTest"    },
+};
+
+struct BatteryManagerLogLabelDomain {
+    uint32_t logLabel;
+    uint32_t domainId;
+};
+
+static constexpr BatteryManagerLogLabelDomain BATTERY_LABEL_DOMAIN[LABEL_END] = {
+    {COMP_HDI,              DOMAIN_HDI},
+    {COMP_DRV,              DOMAIN_HDI},
+    {FEATURE_BATT_INFO,     DOMAIN_HDI},
+    {LABEL_TEST,            DOMAIN_TEST},
 };
 
 #define BATTERY_HILOGF(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_FATAL, BATTERY_LABEL[domain].domainId, BATTERY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_FATAL, BATTERY_LABEL_DOMAIN[domain].domainId, BATTERY_LABEL_TAG[domain].tag,   \
+    ##__VA_ARGS__))
 #define BATTERY_HILOGE(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_ERROR, BATTERY_LABEL[domain].domainId, BATTERY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_ERROR, BATTERY_LABEL_DOMAIN[domain].domainId, BATTERY_LABEL_TAG[domain].tag,   \
+    ##__VA_ARGS__))
 #define BATTERY_HILOGW(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_WARN, BATTERY_LABEL[domain].domainId, BATTERY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_WARN, BATTERY_LABEL_DOMAIN[domain].domainId, BATTERY_LABEL_TAG[domain].tag,    \
+    ##__VA_ARGS__))
 #define BATTERY_HILOGI(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_INFO, BATTERY_LABEL[domain].domainId, BATTERY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_INFO, BATTERY_LABEL_DOMAIN[domain].domainId, BATTERY_LABEL_TAG[domain].tag,    \
+    ##__VA_ARGS__))
 #define BATTERY_HILOGD(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_DEBUG, BATTERY_LABEL[domain].domainId, BATTERY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_DEBUG, BATTERY_LABEL_DOMAIN[domain].domainId, BATTERY_LABEL_TAG[domain].tag,   \
+    ##__VA_ARGS__))
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS
