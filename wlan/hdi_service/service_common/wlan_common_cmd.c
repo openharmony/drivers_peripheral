@@ -535,17 +535,20 @@ int32_t WlanInterfaceGetSupportFeature(struct IWlanInterface *self, uint8_t *sup
 
 static int32_t HdfWlanAddRemoteObj(struct IWlanCallback *self)
 {
+    (void)OsalMutexLock(&HdfStubDriver()->mutex);
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
 
     if (self == NULL) {
         HDF_LOGE("%{public}s:self == NULL", __func__);
+        (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!DListIsEmpty(head)) {
         DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
             if (pos->service == self->AsObject(self)) {
                 HDF_LOGE("%{public}s: pos->service == self", __func__);
+                (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
                 return HDF_FAILURE;
             }
         }
@@ -555,12 +558,14 @@ static int32_t HdfWlanAddRemoteObj(struct IWlanCallback *self)
         (struct HdfWlanRemoteNode *)OsalMemCalloc(sizeof(struct HdfWlanRemoteNode));
     if (newRemoteNode == NULL) {
         HDF_LOGE("%{public}s:newRemoteNode is NULL", __func__);
+        (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
         return HDF_FAILURE;
     }
 
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
     DListInsertTail(&newRemoteNode->node, head);
+    (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
     return HDF_SUCCESS;
 }
 
@@ -909,6 +914,7 @@ static int32_t HdfWlanNetlinkCallbackFun(const uint8_t *recvMsg, uint32_t recvMs
 
 static void HdfWlanDelRemoteObj(struct IWlanCallback *self)
 {
+    (void)OsalMutexLock(&HdfStubDriver()->mutex);
     struct HdfWlanRemoteNode *pos = NULL;
     struct HdfWlanRemoteNode *tmp = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
@@ -922,6 +928,7 @@ static void HdfWlanDelRemoteObj(struct IWlanCallback *self)
         }
     }
     IWlanCallbackRelease(self);
+    (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
 }
 
 int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct IWlanCallback *cbFunc,
@@ -938,7 +945,6 @@ int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct I
         HDF_LOGE("%{public}s g_wifi or g_wifi->registerEventCallback is NULL!", __func__);
         return HDF_FAILURE;
     }
-    (void)OsalMutexLock(&HdfStubDriver()->mutex);
 
     do {
         ret = HdfWlanAddRemoteObj(cbFunc);
@@ -960,7 +966,6 @@ int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct I
         }
     } while (0);
 
-    (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
     HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
@@ -980,19 +985,23 @@ int32_t WlanInterfaceUnregisterEventCallback(struct IWlanInterface *self, struct
         HDF_LOGE("%{public}s g_wifi or g_wifi->unregisterEventCallback is NULL!", __func__);
         return HDF_FAILURE;
     }
-    (void)OsalMutexLock(&HdfStubDriver()->mutex);
+
     HdfWlanDelRemoteObj(cbFunc);
-    if (DListIsEmpty(&HdfStubDriver()->remoteListHead)) {
-        ret = g_wifi->unregisterEventCallback(HdfWLanCallbackFun, ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
-        }
-        ret = WlanInterfaceUnregisterHid2dCallback(HdfWlanNetlinkCallbackFun, ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: Unregister Hid2dCallback failed!, error code: %{public}d", __func__, ret);
-        }
+    (void)OsalMutexLock(&HdfStubDriver()->mutex);
+    if (!DListIsEmpty(&HdfStubDriver()->remoteListHead)) {
+        (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
+        return HDF_SUCCESS;
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
+
+    ret = g_wifi->unregisterEventCallback(HdfWLanCallbackFun, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
+    }
+    ret = WlanInterfaceUnregisterHid2dCallback(HdfWlanNetlinkCallbackFun, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Unregister Hid2dCallback failed!, error code: %{public}d", __func__, ret);
+    }
     HDF_LOGI("hal exit %{public}s", __FUNCTION__);
     return HDF_SUCCESS;
 }
