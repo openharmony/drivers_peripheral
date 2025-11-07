@@ -53,6 +53,7 @@ int32_t DCameraHost::SetCallback(const sptr<HDI::Camera::V1_0::ICameraHostCallba
         DHLOGE("DCameraHost::SetCallback, input camera host callback is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
+    std::lock_guard<std::mutex> autoLock(deviceMapLock_);
     dCameraHostCallback_ = callbackObj;
     return CamRetCode::NO_ERROR;
 }
@@ -63,6 +64,7 @@ int32_t DCameraHost::SetCallback_V1_2(const sptr<HDI::Camera::V1_2::ICameraHostC
         DHLOGE("DCameraHost::SetCallback_V1_2, input camera host callback is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
+    std::lock_guard<std::mutex> autoLock(deviceMapLock_);
     dCameraHostCallback_V1_2_ = callbackObj;
     return CamRetCode::NO_ERROR;
 }
@@ -314,18 +316,35 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         return DCamRetCode::INVALID_ARGUMENT;
     }
     std::string dCameraId = dhBase.deviceId_ + "__" + dhBase.dhId_;
-    {
-        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
-        if (dCameraDeviceMap_.find(dCameraId) != dCameraDeviceMap_.end()) {
-            if (dCameraDeviceMap_[dCameraId] == nullptr) {
-                DHLOGI("AddDCameraDevice device is null");
-                return DCamRetCode::INVALID_ARGUMENT;
-            }
-            dCameraDeviceMap_[dCameraId]->SetDcameraAbility(sinkAbilityInfo);
-            DHLOGI("AddDCameraDevice refresh data success");
-            return DCamRetCode::SUCCESS;
-        }
+
+    std::optional<DCamRetCode> refreshStatus = HandleExistingDCamera(dCameraId, sinkAbilityInfo);
+    if (refreshStatus.has_value()) {
+        return refreshStatus.value();
     }
+    return HandleNewDCamera(dhBase, sinkAbilityInfo, sourceCodecInfo, callback);
+}
+
+std::optional<DCamRetCode> DCameraHost::HandleExistingDCamera(const std::string& dCameraId,
+    const std::string& sinkAbilityInfo)
+{
+    std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+    auto iter = dCameraDeviceMap_.find(dCameraId);
+    if (iter == dCameraDeviceMap_.end()) {
+        return std::nullopt;
+    }
+    if (iter->second == nullptr) {
+        DHLOGI("AddDCameraDevice device is null");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    iter->second->SetDcameraAbility(sinkAbilityInfo);
+    DHLOGI("AddDCameraDevice refresh data success");
+    return DCamRetCode::SUCCESS;
+}
+
+DCamRetCode DCameraHost::HandleNewDCamera(const DHBase &dhBase, const std::string& sinkAbilityInfo,
+    const std::string &sourceCodecInfo, const sptr<IDCameraProviderCallback> &callback)
+{
+    std::string dCameraId = dhBase.deviceId_ + "__" + dhBase.dhId_;
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
         sourceCodecInfo));
     if (dcameraDevice == nullptr) {
@@ -341,11 +360,18 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         return DCamRetCode::INVALID_ARGUMENT;
     }
     dcameraDevice->SetProviderCallback(callback);
-    if (dCameraHostCallback_ != nullptr) {
-        dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
+    sptr<HDI::Camera::V1_0::ICameraHostCallback> callback_v1_0 = nullptr;
+    sptr<HDI::Camera::V1_2::ICameraHostCallback> callback_v1_2 = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+        callback_v1_0 = dCameraHostCallback_;
+        callback_v1_2 = dCameraHostCallback_V1_2_;
     }
-    if (dCameraHostCallback_V1_2_ != nullptr) {
-        dCameraHostCallback_V1_2_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
+    if (callback_v1_0 != nullptr) {
+        callback_v1_0->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
+    }
+    if (callback_v1_2 != nullptr) {
+        callback_v1_2->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
     }
     sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
     if (remote != nullptr) {
@@ -390,12 +416,19 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         dCameraDeviceMap_.erase(dCameraId);
     }
-    if (dCameraHostCallback_ != nullptr) {
-        dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
+    sptr<HDI::Camera::V1_0::ICameraHostCallback> callback_v1_0 = nullptr;
+    sptr<HDI::Camera::V1_2::ICameraHostCallback> callback_v1_2 = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+        callback_v1_0 = dCameraHostCallback_;
+        callback_v1_2 = dCameraHostCallback_V1_2_;
+    }
+    if (callback_v1_0 != nullptr) {
+        callback_v1_0->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
 
-    if (dCameraHostCallback_V1_2_ != nullptr) {
-        dCameraHostCallback_V1_2_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
+    if (callback_v1_2 != nullptr) {
+        callback_v1_2->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
     DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %{public}s",
         GetAnonyString(dCameraId).c_str());
@@ -449,11 +482,18 @@ void DCameraHost::NotifyDCameraStatus(const DHBase &dhBase, int32_t result)
         DHLOGE("DCameraHost::NotifyDCameraStatus, dhBase not exist.");
         return;
     }
-    if (dCameraHostCallback_ != nullptr) {
-        dCameraHostCallback_->OnCameraStatus(dCameraId, CameraStatus::UN_AVAILABLE);
+    sptr<HDI::Camera::V1_0::ICameraHostCallback> callback_v1_0 = nullptr;
+    sptr<HDI::Camera::V1_2::ICameraHostCallback> callback_v1_2 = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+        callback_v1_0 = dCameraHostCallback_;
+        callback_v1_2 = dCameraHostCallback_V1_2_;
     }
-    if (dCameraHostCallback_V1_2_ != nullptr) {
-        dCameraHostCallback_V1_2_->OnCameraStatus(dCameraId, CameraStatus::UN_AVAILABLE);
+    if (callback_v1_0 != nullptr) {
+        callback_v1_0->OnCameraStatus(dCameraId, CameraStatus::UN_AVAILABLE);
+    }
+    if (callback_v1_2 != nullptr) {
+        callback_v1_2->OnCameraStatus(dCameraId, CameraStatus::UN_AVAILABLE);
     }
 }
 

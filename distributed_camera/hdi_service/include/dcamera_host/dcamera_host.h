@@ -150,6 +150,10 @@ private:
     std::mutex deviceMapLock_;
     std::map<std::string, sptr<IDCameraHdfCallback>> mapCameraHdfCallback_;
     std::mutex hdfCallbackMapMtx_;
+    std::optional<DCamRetCode> HandleExistingDCamera(const std::string& dCameraId,
+            const std::string& sinkAbilityInfo);
+    DCamRetCode HandleNewDCamera(const DHBase &dhBase, const std::string& sinkAbilityInfo,
+        const std::string &sourceCodecInfo, const sptr<IDCameraProviderCallback> &callback);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
