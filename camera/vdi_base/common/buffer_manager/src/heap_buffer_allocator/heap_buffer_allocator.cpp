@@ -34,6 +34,7 @@ std::shared_ptr<IBuffer> HeapBufferAllocator::AllocBuffer(const uint32_t width,
                                                           const uint64_t cameraUsage,
                                                           const uint32_t cameraFormat)
 {
+    CAMERA_LOGI("HeapBufferAllocator::AllocBuffer");
     uint32_t size = CalculateSize(width, height, cameraUsage, cameraFormat);
     char* heap = nullptr;
     if (size > 0) {
@@ -63,6 +64,7 @@ std::shared_ptr<IBuffer> HeapBufferAllocator::AllocBuffer(const uint32_t width,
 
 RetCode HeapBufferAllocator::FreeBuffer(std::shared_ptr<IBuffer>& buffer)
 {
+    CAMERA_LOGI("HeapBufferAllocator::FreeBuffer");
     if (buffer->GetSourceType() != sourceType_) {
         return RC_ERROR;
     }
