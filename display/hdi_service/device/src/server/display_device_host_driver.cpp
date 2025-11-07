@@ -952,9 +952,9 @@ int32_t DisplayDeviceServerStub::FileTest(MessageParcel *data, MessageParcel *re
 
 int32_t DisplayDeviceServerStub::SetCallBackObject(sptr<IRemoteObject> callbackRemote)
 {
-    callbackRemote_ = iface_cast<DisplayDeviceCallbackProxy>(callbackRemote);
+    callbackRemote_ = iface_cast<DisplayRegisterCallbackBase>(callbackRemote);
     if (callbackRemote_ == nullptr) {
-        HDF_LOGE("failed to iface_cast DisplayDeviceCallbackProxy");
+        HDF_LOGE("failed to iface_cast DisplayRegisterCallbackBase");
         return HDF_ERR_INVALID_OBJECT;
     }
 
