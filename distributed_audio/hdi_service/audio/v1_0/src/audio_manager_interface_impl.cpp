@@ -399,6 +399,12 @@ int32_t AudioManagerInterfaceImpl::UnRegisterAudioHdfListener(const std::string 
 void AudioManagerInterfaceImpl::ClearRegisterRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     DHLOGI("ClearRegisterRecipient::OnRemoteDied.");
+    std::lock_guard<std::mutex> lock(audioManagerMtx_);
+    auto audioMgr = AudioManagerInterfaceImpl::GetAudioManager();
+    if (audioMgr != nullptr) {
+        audioMgr->RemoveAudioDevice(deviceId_, dhId_);
+    }
+    DHLOGI("Remote died, remote daudio device end.");
 }
 
 void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
