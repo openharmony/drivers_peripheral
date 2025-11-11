@@ -161,6 +161,11 @@ public:
     {
         return NOT_SUPPORT;
     }
+
+    virtual int32_t CloneDmaBufferHandle(const BufferHandle& inHandle, BufferHandle*& outHandle) const
+    {
+        return NOT_SUPPORT;
+    }
 };
 
 using CreateDisplayBufferVdiFunc = IDisplayBufferVdi* (*)();
