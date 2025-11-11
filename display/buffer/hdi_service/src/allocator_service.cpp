@@ -165,6 +165,42 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
     });
     return HDF_SUCCESS;
 }
+
+int32_t AllocatorService::CloneDmaBufferHandle(const sptr<NativeBuffer>& inBuffer, sptr<NativeBuffer>& outBuffer)
+{
+    pid_t remotePid = HdfRemoteGetCallingPid();
+    HITRACE_METER_FMT(HITRACE_TAG_HDF, "%s: remotePid %d", __func__, remotePid);
+
+    CHECK_NULLPOINTER_RETURN_VALUE(inBuffer, HDF_FAILURE);
+    DisplayBufferDfx dfxIns("HDI:Display:AllocatorService:remotePid:" + std::to_string(remotePid));
+    dfxIns.SetTimer();
+    dfxIns.StartTimeStamp();
+    BufferHandle* inHandle = inBuffer->GetBufferHandle();
+    BufferHandle* outHandle = nullptr;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    HdfTrace traceOne("CloneDmaBufferHandle-VDI", "HDI:VDI:");
+    int32_t ec = vdiImpl_->CloneDmaBufferHandle(*inHandle, outHandle);
+    if (ec != HDF_SUCCESS && ec != HDF_ERR_NOT_SUPPORT) {
+        HDF_LOGE("%{public}s: CloneDmaBufferHandle failed, ec = %{public}d", __func__, ec);
+        return ec;
+    }
+
+    CHECK_NULLPOINTER_RETURN_VALUE(outHandle, HDF_DEV_ERR_NO_MEMORY);
+    WriteAllocPidToDma(outHandle->fd, remotePid);
+
+    outBuffer = new NativeBuffer();
+    if (outBuffer == nullptr) {
+        HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
+        FreeMemVdi(outHandle);
+        return HDF_FAILURE;
+    }
+
+    outBuffer->SetBufferHandle(outHandle, true, [this](BufferHandle* freeBuffer) {
+        FreeMemVdi(freeBuffer);
+    });
+    return HDF_SUCCESS;
+}
 } // namespace V1_0
 } // namespace Buffer
 } // namespace Display

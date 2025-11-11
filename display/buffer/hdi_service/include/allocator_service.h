@@ -18,7 +18,7 @@
 
 #include "idisplay_buffer_vdi.h"
 #include "v1_0/display_buffer_type.h"
-#include "v1_0/iallocator.h"
+#include "v1_4/iallocator.h"
 #include <mutex>
 
 namespace OHOS {
@@ -26,11 +26,12 @@ namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-class AllocatorService : public IAllocator {
+class AllocatorService : public OHOS::HDI::Display::Buffer::V1_4::IAllocator {
 public:
     AllocatorService();
     virtual ~AllocatorService();
     int32_t AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle) override;
+    int32_t CloneDmaBufferHandle(const sptr<NativeBuffer>& inHandle, sptr<NativeBuffer>& outHandle) override;
 
 private:
     int32_t LoadVdi();

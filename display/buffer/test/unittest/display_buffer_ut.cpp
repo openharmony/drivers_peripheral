@@ -621,6 +621,59 @@ HWTEST_F(DisplayBufferUt, test_PassthroughTest, TestSize.Level1)
     int ret = PassthroughTest(info);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS);
 }
+
+int32_t DisplayBufferUt::CloneDmaBufferHandleTest(AllocInfo& info)
+{
+    int ret;
+    BufferHandle *inBuffer = nullptr;
+    ret = displayBuffer_->AllocMem(info, buffer);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        HDF_LOGE("%{public}s: AllocMem not support, ret=%{public}d", __func__, ret);
+        return DISPLAY_SUCCESS;
+    }
+    if (ret != DISPLAY_SUCCESS || buffer == nullptr) {
+        HDF_LOGE("AllocMem failed");
+        return ret;
+    }
+    BufferHandle* outBuffer = nullptr;
+    ret = displayBuffer_->CloneDmaBufferHandleTest(*inBuffer, outBuffer);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        HDF_LOGE("%{public}s: CloneDmaBufferHandleTest not support, ret=%{public}d", __func__, ret);
+        displayBuffer_->FreeMem(*inBuffer);
+        return DISPLAY_SUCCESS;
+    }
+    if (ret != DISPLAY_SUCCESS || outBuffer == nullptr) {
+        HDF_LOGE("CloneDmaBufferHandleTest failed");
+        displayBuffer_->FreeMem(*inBuffer);
+        return ret;
+    }
+    displayBuffer_->FreeMem(*inBuffer);
+    return DISPLAY_SUCCESS;
+}
+
+HWTEST_F(DisplayBufferUt, test_CloneDmaBufferHandle001, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = TEST_INFO,
+        .format = PIXEL_FMT_YCBCR_420_P
+    };
+    int ret = CloneDmaBufferHandleTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_CloneDmaBufferHandle002, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBA_1010102
+    };
+    int ret = CloneDmaBufferHandleTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
 } // OHOS
 } // HDI
 } // DISPLAY
