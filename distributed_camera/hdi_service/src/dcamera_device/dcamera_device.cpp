@@ -219,6 +219,8 @@ int32_t DCameraDevice::UpdateSettings(const std::vector<uint8_t>& settings)
 
     std::shared_ptr<OHOS::Camera::CameraMetadata> updateSettings = nullptr;
     OHOS::Camera::MetadataUtils::ConvertVecToMetadata(settings, updateSettings);
+    CHECK_AND_RETURN_RET_LOG(updateSettings == nullptr, CamRetCode::INVALID_ARGUMENT,
+        "ConvertVecToMetadata failed in UpdateSettings.");
     std::string abilityString = OHOS::Camera::MetadataUtils::EncodeToString(updateSettings);
     std::string encodeString = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
         abilityString.length());

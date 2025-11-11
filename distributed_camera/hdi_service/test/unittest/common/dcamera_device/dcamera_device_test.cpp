@@ -234,7 +234,7 @@ HWTEST_F(DCameraDeviceTest, dcamera_device_test_008, TestSize.Level1)
     int32_t rc = dcameraDevice_->UpdateSettings(settings);
 
     // Verify
-    EXPECT_NE(rc, CamRetCode::CAMERA_CLOSED);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
 }
 
 /**
