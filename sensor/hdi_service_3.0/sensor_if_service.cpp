@@ -511,14 +511,14 @@ void SensorIfService::RemoveDeathNotice(int32_t groupId)
 int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t serviceId)
 {
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle));
-    if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, serviceId, DISABLE_SENSOR)) {
-        HDF_LOGD("%{public}s There are still some services enable", __func__);
-        return HDF_SUCCESS;
-    }
-
     if (sensorVdiImplV1_1_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
+    }
+
+    if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, serviceId, DISABLE_SENSOR)) {
+        HDF_LOGD("%{public}s There are still some services enable", __func__);
+        return HDF_SUCCESS;
     }
 
     int32_t ret = SENSOR_SUCCESS;
@@ -533,6 +533,7 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetSaBatch failed, error code is %{public}d, sensorHandle = %{public}s, serviceId = "
                      "%{public}d", __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
+            SensorClientsManager::GetInstance()->AddServiceToReportQueue(sensorHandle, serviceId);
             return ret;
         }
         return HDF_SUCCESS;
@@ -549,6 +550,7 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, serviceId = %{public}d",
                  __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
+        SensorClientsManager::GetInstance()->AddServiceToReportQueue(sensorHandle, serviceId);
     }
 
     return ret;
