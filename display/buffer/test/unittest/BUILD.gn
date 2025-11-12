@@ -39,6 +39,29 @@ ohos_unittest("hdf_disp_buffer_unittest") {
   part_name = "drivers_peripheral_display"
 }
 
+ohos_unittest("hdf_buffer_community_unittest") {
+  defines = []
+  defines += display_defines
+  module_out_path = module_output_path
+  sources = [ "buffer_ut_community.cpp" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_3",
+    "drivers_interface_display:libdisplay_buffer_proxy_1.0",
+    "drivers_interface_display:libdisplay_buffer_proxy_1.1",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "googletest:gtest",
+    "graphic_surface:buffer_handle",
+    "hdf_core:libhdf_utils",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+  ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_display"
+}
+
 ohos_unittest("buffer_death_test") {
   defines = []
   defines += display_defines
