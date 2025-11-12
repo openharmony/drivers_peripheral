@@ -411,6 +411,83 @@ HWTEST_F(HdfLightHdiTest, TurnOnMultiLights_001, TestSize.Level1)
 }
 
 /**
+  * @tc.name: TurnOnMultiLights002
+  * @tc.desc: TurnOnMultiLights.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiTest, TurnOnMultiLights_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.r = MAX_VALUE;
+    light.colorValue.rgbColor.g = MIN_VALUE;
+    light.colorValue.rgbColor.b = MIN_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    OsalSleep(g_sleepTime);
+
+    ret = g_lightInterface->TurnOffLight(LIGHT_ID_BATTERY);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnMultiLights003
+  * @tc.desc: TurnOnMultiLights.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiTest, TurnOnMultiLights_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.r = MIN_VALUE;
+    light.colorValue.rgbColor.g = MAX_VALUE;
+    light.colorValue.rgbColor.b = MIN_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    OsalSleep(g_sleepTime);
+
+    ret = g_lightInterface->TurnOffLight(LIGHT_ID_BATTERY);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnMultiLights004
+  * @tc.desc: TurnOnMultiLights.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiTest, TurnOnMultiLights_004, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.r = MIN_VALUE;
+    light.colorValue.rgbColor.g = MIN_VALUE;
+    light.colorValue.rgbColor.b = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    OsalSleep(g_sleepTime);
+
+    ret = g_lightInterface->TurnOffLight(LIGHT_ID_BATTERY);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+/**
   * @tc.name: NewLightInterfaceInstance
   * @tc.desc: create lightInterfaceInstance
   * @tc.type: FUNC

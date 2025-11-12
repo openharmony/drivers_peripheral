@@ -846,6 +846,105 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException002, TestSize.Level1)
 }
 
 /**
+  * @tc.name: TurnOnLightBlinkException003
+  * @tc.desc: The offtime setting is abnormal in blinking mode.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestLight, TurnOnLightBlinkException003, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
+    HdfLightEffect effect = {
+        .lightColor.colorValue.rgbColor.r = 255,
+        .lightColor.colorValue.rgbColor.g = 255,
+        .lightColor.colorValue.rgbColor.b = 255,
+        .flashEffect.onTime = ON_TIME,
+        .flashEffect.offTime = -1,
+        .flashEffect.flashMode = HDF_LIGHT_FLASH_BLINK,
+    };
+
+    int32_t ret = IsSupportedLightId(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = g_lightInterface->TurnOnLight(lightId, effect);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+
+    OsalSleep(g_sleepTime);
+
+    ret = g_lightInterface->TurnOffLight(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnredLightBlinkException001
+  * @tc.desc: The ontime setting is abnormal in blinking mode.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestLight, TurnOnredLightBlinkException001, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
+    HdfLightEffect effect = {
+        .lightColor.colorValue.rgbColor.r = 255,
+        .lightColor.colorValue.rgbColor.g = 0,
+        .lightColor.colorValue.rgbColor.b = 0,
+        .flashEffect.onTime = -1,
+        .flashEffect.offTime = OFF_TIME,
+        .flashEffect.flashMode = HDF_LIGHT_FLASH_BLINK,
+    };
+
+    int32_t ret = IsSupportedLightId(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = g_lightInterface->TurnOnLight(lightId, effect);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+
+    OsalSleep(g_sleepTime);
+
+    ret = g_lightInterface->TurnOffLight(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnLightGradient001
+  * @tc.desc: The ontime setting is abnormal in gradient mode.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestLight, TurnOnLightGradient001, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
+    HdfLightEffect effect = {
+        .lightColor.colorValue.rgbColor.r = 255,
+        .lightColor.colorValue.rgbColor.g = 255,
+        .lightColor.colorValue.rgbColor.b = 255,
+        .flashEffect.onTime = -1,
+        .flashEffect.offTime = OFF_TIME,
+        .flashEffect.flashMode = HDF_LIGHT_FLASH_GRADIENT,
+    };
+
+    int32_t ret = IsSupportedLightId(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = g_lightInterface->TurnOnLight(lightId, effect);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+
+    OsalSleep(g_sleepTime);
+
+    ret = g_lightInterface->TurnOffLight(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
   * @tc.name: TurnOnLightGradientException001
   * @tc.desc: The ontime setting is abnormal in gradient mode.
   * @tc.type: FUNC
@@ -995,6 +1094,72 @@ HWTEST_F(HdiUnitTestLight, TurnOnLightGradientException005, TestSize.Level1)
         .lightColor.colorValue.rgbColor.b = 255,
         .flashEffect.onTime = ON_TIME,
         .flashEffect.offTime = -1,
+        .flashEffect.flashMode = HDF_LIGHT_FLASH_GRADIENT,
+    };
+
+    int32_t ret = IsSupportedLightId(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = g_lightInterface->TurnOnLight(lightId, effect);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+
+    OsalSleep(g_sleepTime);
+
+    ret = g_lightInterface->TurnOffLight(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnLightGradientException006
+  * @tc.desc: The offtime setting is abnormal in gradient mode.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestLight, TurnOnLightGradientException006, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
+    HdfLightEffect effect = {
+        .lightColor.colorValue.rgbColor.r = 255,
+        .lightColor.colorValue.rgbColor.g = 255,
+        .lightColor.colorValue.rgbColor.b = 255,
+        .flashEffect.onTime = ON_TIME,
+        .flashEffect.offTime = -1,
+        .flashEffect.flashMode = HDF_LIGHT_FLASH_GRADIENT,
+    };
+
+    int32_t ret = IsSupportedLightId(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = g_lightInterface->TurnOnLight(lightId, effect);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+
+    OsalSleep(g_sleepTime);
+
+    ret = g_lightInterface->TurnOffLight(lightId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: TurnOnLightGradientException007
+  * @tc.desc: The ontime setting is abnormal in gradient mode.
+  * @tc.type: FUNC
+  * @tc.require: #IAU5KS
+  */
+HWTEST_F(HdiUnitTestLight, TurnOnLightGradientException007, TestSize.Level1)
+{
+    TEST_FUNC_IN;
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    int32_t lightId = HDF_LIGHT_ID_NOTIFICATIONS;
+    HdfLightEffect effect = {
+        .lightColor.colorValue.rgbColor.r = 0,
+        .lightColor.colorValue.rgbColor.g = 0,
+        .lightColor.colorValue.rgbColor.b = 255,
+        .flashEffect.onTime = -1,
+        .flashEffect.offTime = OFF_TIME,
         .flashEffect.flashMode = HDF_LIGHT_FLASH_GRADIENT,
     };
 
