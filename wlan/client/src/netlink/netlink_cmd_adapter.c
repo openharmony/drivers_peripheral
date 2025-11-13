@@ -3207,7 +3207,7 @@ static unsigned char ConvertStrChar(char ch)
     if (ch >= 'a' && ch <= 'f') {
         return (ch - 'a' + numDiffForHexAlphabet);
     }
-    return 0;  
+    return 0;
 }
 
 void MacStrToArray(const char* strMac, unsigned char [ETH_ADDR_LEN])
@@ -3284,7 +3284,7 @@ static int32_t GetOtherSignalPollInfo(const char *ifNameAndMacAddr, struct Signa
         HILOG_ERROR(LOG_CORE, "%{public}s: invalid length of ifNameAndMacAddr", __FUNCTION__);
         return ret;
     }
-    memset_s(assocMacAddr, MAC_ADDR_LENGTH, 0, MAC_ADDR_LENGTH + 1);
+    memset_s(assocMacAddr, MAC_ADDR_LENGTH + 1, 0, MAC_ADDR_LENGTH + 1);
     if (memcpy_s(assocMacAddr, MAC_ADDR_LENGTH, delimiterPos + 1, MAC_ADDR_LENGTH) != EOK) {
         HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s assocMacAddr failed", __FUNCTION__);
         return ret;
