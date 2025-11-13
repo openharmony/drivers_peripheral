@@ -130,6 +130,7 @@ static inline uint32_t BIT(uint8_t x)
 #define SOL_NETLINK 270
 #define RECV_MAX_COUNT 100
 #define NETLINK_BUFF_LENGTH 262144
+#define MAC_ADDR_LENGTH 17
 
 // vendor attr
 enum AndrWifiAttr {
@@ -3194,28 +3195,49 @@ int32_t ClientGetApBandwidth(const char *ifName, uint8_t *bandwidth)
     return RET_CODE_SUCCESS;
 }
 
-int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
+static unsigned char ConvertStrChar(char ch)
+{
+    int numDiffForHexAlphabet = 10;
+    if (ch >= '0' && ch <= '9') {
+        return (ch - '0');
+    }
+    if (ch >= 'A' && ch <= 'F') {
+        return (ch - 'A' + numDiffForHexAlphabet);
+    }
+    if (ch >= 'a' && ch <= 'f') {
+        return (ch - 'a' + numDiffForHexAlphabet);
+    }
+    return 0;    
+}
+
+void MacStrToArray(const char* strMac, unsigned char [ETH_ADDR_LEN])
+{
+    if(strMac == NULL) {
+        return;
+    }
+    int strMacLen = 18;
+    char tempArray[18] = { 0 };
+    errno_t ret = memcpy_s(tempArray, strMacLen, strMac, strMacLen);
+    if (ret != EOK) {
+        return;
+    }
+
+    int idx = 0;
+    int bitWidth = 4;
+    char *ptr = NULL;
+    char *p = strtok_s(tempArray, ":", &ptr);
+    while ((p != NULL) && (idx < ETH_ADDR_LEN)) {
+        mac[idx++] = ConvertStrChar(*p) << bitWidth |ConvertStrChar(*(p + 1));
+        p = strtok_s(NULL, ":", &ptr);
+    }
+    return;
+}
+
+static int32_t GetSignalInfo(const uint32_t interfaceId, const uint8_t associatedBssid[ETH_ADDR_LEN],
+                             struct SignalResult *signalResult)
 {
     struct nl_msg *msg = NULL;
-    uint32_t interfaceId;
     int32_t ret = RET_CODE_FAILURE;
-    AssociatedInfo associatedInfo;
-    (void)memset_s(&associatedInfo, sizeof(associatedInfo), 0, sizeof(associatedInfo));
-
-    if (ifName == NULL || signalResult == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-    interfaceId = if_nametoindex(ifName);
-    if (interfaceId == 0) {
-        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-    if (WifiGetAssociatedInfo(ifName, &associatedInfo) != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: WifiGetAssociatedInfo failed", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-    signalResult->associatedFreq = (int32_t)(associatedInfo.associatedFreq);
     msg = nlmsg_alloc();
     if (msg == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
@@ -3231,7 +3253,7 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
             break;
         }
         if (nla_put(msg, NL80211_ATTR_MAC, ETH_ADDR_LEN, associatedInfo.associatedBssid) != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId faile", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%s: nla_put associatedBssid faile", __FUNCTION__);
             break;
         }
         ret = NetlinkSendCmdSync(msg, SignalInfoHandler, signalResult);
@@ -3241,6 +3263,70 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
     } while (0);
     nlmsg_free(msg);
     return ret;
+}
+
+static int32_t GetOtherSignalPollInfo(const char *ifNameAndMacAddr, struct SignalResult *signalResult,
+                                      const char* delimiterPos)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    uint32_t interfaceId;
+    uint32_t ifNameSize = delimiterPos - ifNameAndMacAddr;
+    char ifName[ifNameSize + 1];
+    memset_s(ifName, ifNameSize + 1, 0, ifNameSize + 1);
+    if (memcpy_s(ifName, ifNameSize, ifNameAndMacAddr, ifNameSize) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s ifName failed", __FUNCTION__);
+        return ret;
+    }
+    ifName[ifNameSize] = '\0';
+
+    char assocMacAddr[MAC_ADDR_LENGTH + 1];
+    if (strlen(delimiterPos + 1) != MAC_ADDR_LENGTH) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: invalid length of ifNameAndMacAddr", __FUNCTION__);
+        return ret;
+    }
+    memset_s(assocMacAddr, MAC_ADDR_LENGTH + 1, 0, MAC_ADDR_LENGTH + 1);
+    if (memcpy_s(assocMacAddr, MAC_ADDR_LENGTH, delimiterPos + 1, MAC_ADDR_LENGTH) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s assocMacAddr failed", __FUNCTION__);
+        return ret;
+    }
+    assocMacAddr[MAC_ADDR_LENGTH] = '\0';
+
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: if_nametoindex failed", __FUNCTION__);
+        return ret; 
+    }
+
+    uint8_t associatedBssid[ETH_ADDR_LEN];
+    MacStrToArray(assocMacAddr, associatedBssid);
+    return GetSignalInfo(interfaceId, associatedBssid, signalResult);
+}
+
+int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
+{
+    uint32_t interfaceId;
+    int32_t ret = RET_CODE_FAILURE;
+    AssociatedInfo associatedInfo;
+    (void)memset_s(&associatedInfo, sizeof(associatedInfo), 0, sizeof(associatedInfo));
+    if (ifName == NULL || signalResult == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    const char *delimiterPos = strchr(ifName, '_');
+    if (delimiterPos != NULL) {
+        return GetOtherSignalPollInfo(ifName, signalResult, delimiterPos);
+    }
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (WifiGetAssociatedInfo(ifName, &associatedInfo) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: WifiGetAssociatedInfo failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    signalResult->associatedFreq = (int32_t)(associatedInfo.associatedFreq);
+    return GetSignalInfo(interfaceId, associatedInfo.associatedBssid, signalResult);
 }
 
 void WifiEventTxStatus(const char *ifName, struct nlattr **attr)
