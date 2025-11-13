@@ -1563,16 +1563,26 @@ int32_t WlanInterfaceGetSignalPollInfo(struct IWlanInterface *self, const char *
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_staFeature == NULL || g_staFeature->getSignalPollInfo == NULL) {
-        HDF_LOGE("%{public}s g_staFeature or g_staFeature->getSignalPollInfo is NULL!", __func__);
-        return HDF_FAILURE;
+
+    const char* delimiterPos = strchr(ifName, '_');
+    if (delimiterPos != NULL) {
+        if (g_wifi == NULL || g_wifi->getSignalPollInfo == NULL) {
+            HDF_LOGE("%{public}s g_wifi or g_wifi->getSignalPollInfo is NULL!", __func__);
+            return HDF_FAILURE;
+        }
+        ret = g_wifi->getSignalPollInfo(ifName, (struct SignalResult *)signalResult);
+    } else {
+        if (g_staFeature == NULL || g_staFeature->getSignalPollInfo == NULL) {
+            HDF_LOGE("%{public}s g_staFeature or g_staFeature->getSignalPollInfo is NULL!", __func__);
+            return HDF_FAILURE;
+        }
+        ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifName);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
+            return HDF_FAILURE;
+        }
+        ret = g_staFeature->getSignalPollInfo(ifName, (struct SignalResult *)signalResult);
     }
-    ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifName);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-    ret = g_staFeature->getSignalPollInfo(ifName, (struct SignalResult *)signalResult);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: get signal information failed!, error code: %{public}d", __func__, ret);
     }
