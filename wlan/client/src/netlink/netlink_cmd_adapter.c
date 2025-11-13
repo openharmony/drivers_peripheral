@@ -3207,17 +3207,17 @@ static unsigned char ConvertStrChar(char ch)
     if (ch >= 'a' && ch <= 'f') {
         return (ch - 'a' + numDiffForHexAlphabet);
     }
-    return 0;    
+    return 0;  
 }
 
 void MacStrToArray(const char* strMac, unsigned char [ETH_ADDR_LEN])
 {
-    if(strMac == NULL) {
+    if (strMac == NULL) {
         return;
     }
     int strMacLen = 18;
     char tempArray[18] = { 0 };
-    errno_t ret = memcpy_s(tempArray, strMacLen, strMac, strMacLen);
+    errno_t ret = memcpy_s(tempArray, sizeof(tempArray), strMac, strMacLen);
     if (ret != EOK) {
         return;
     }
@@ -3227,7 +3227,7 @@ void MacStrToArray(const char* strMac, unsigned char [ETH_ADDR_LEN])
     char *ptr = NULL;
     char *p = strtok_s(tempArray, ":", &ptr);
     while ((p != NULL) && (idx < ETH_ADDR_LEN)) {
-        mac[idx++] = ConvertStrChar(*p) << bitWidth |ConvertStrChar(*(p + 1));
+        mac[idx++] = (ConvertStrChar(*p) << bitWidth) | ConvertStrChar(*(p + 1));
         p = strtok_s(NULL, ":", &ptr);
     }
     return;
@@ -3284,7 +3284,7 @@ static int32_t GetOtherSignalPollInfo(const char *ifNameAndMacAddr, struct Signa
         HILOG_ERROR(LOG_CORE, "%{public}s: invalid length of ifNameAndMacAddr", __FUNCTION__);
         return ret;
     }
-    memset_s(assocMacAddr, MAC_ADDR_LENGTH + 1, 0, MAC_ADDR_LENGTH + 1);
+    memset_s(assocMacAddr, MAC_ADDR_LENGTH, 0, MAC_ADDR_LENGTH + 1);
     if (memcpy_s(assocMacAddr, MAC_ADDR_LENGTH, delimiterPos + 1, MAC_ADDR_LENGTH) != EOK) {
         HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s assocMacAddr failed", __FUNCTION__);
         return ret;
@@ -3294,7 +3294,7 @@ static int32_t GetOtherSignalPollInfo(const char *ifNameAndMacAddr, struct Signa
     interfaceId = if_nametoindex(ifName);
     if (interfaceId == 0) {
         HILOG_ERROR(LOG_CORE, "%{public}s: if_nametoindex failed", __FUNCTION__);
-        return ret; 
+        return ret;
     }
 
     uint8_t associatedBssid[ETH_ADDR_LEN];
