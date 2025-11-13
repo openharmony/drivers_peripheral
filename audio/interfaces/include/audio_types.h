@@ -199,22 +199,11 @@ enum AudioSampleRatesMask {
     AUDIO_SAMPLE_RATE_MASK_INVALID = 0xFFFFFFFFu, /**< Invalid sampling rate */
 };
 enum AudioInputType {
-    AUDIO_INPUT_DEFAULT_TYPE             = 0,      /**< Assigned default input type */
-    AUDIO_INPUT_MIC_TYPE                 = 1 << 0, /**< Assigned mic input type */
-    AUDIO_INPUT_SPEECH_WAKEUP_TYPE       = 1 << 1, /**< Assigned speech wakeup input type */
-    AUDIO_INPUT_VOICE_COMMUNICATION_TYPE = 1 << 2, /**< Assigned voice communication input type */
-    AUDIO_INPUT_VOICE_RECOGNITION_TYPE   = 1 << 3, /**< Assigned voice recognition input type */
-    AUDIO_INPUT_VOICE_UPLINK_TYPE        = 1 << 4, /**< Assigned voice uplink input type */
-    AUDIO_INPUT_VOICE_DOWNLINK_TYPE      = 1 << 5, /**< Assigned voice downlink input type */
-    AUDIO_INPUT_VOICE_CALL_TYPE          = 1 << 6, /**< Assigned voice call input type */
-    AUDIO_INPUT_CAMCORDER_TYPE           = 1 << 7, /**< Assigned camcorder input type */
-    AUDIO_INPUT_EC_TYPE                  = 1 << 8, /**< Assigned EC input type */
-    AUDIO_INPUT_NOISE_REDUCTION_TYPE     = 1 << 9, /**< Assigned noise reduction input type */
-    AUDIO_INPUT_RAW_TYPE                 = 1 << 10, /**< Assigned raw input type */
-    AUDIO_INPUT_LIVE_TYPE                = 1 << 11, /**< Assigned live input type */
-    AUDIO_INPUT_VOICE_TRANSCRIPTION      = 1 << 12, /**< Assigned voice transcription input type */
-    AUDIO_INPUT_OFFLOAD_CAPTURE_TYPE     = 1 << 13, /**< Assigned offload capture input type */
-    AUDIO_INPUT_ULTRASONIC_TYPE          = 1 << 14, /**< Assigned ultrasonic input type */
+    AUDIO_INPUT_DEFAULT_TYPE             = 0,
+    AUDIO_INPUT_MIC_TYPE                 = 1 << 0,
+    AUDIO_INPUT_SPEECH_WAKEUP_TYPE       = 1 << 1,
+    AUDIO_INPUT_VOICE_COMMUNICATION_TYPE = 1 << 2,
+    AUDIO_INPUT_VOICE_RECOGNITION_TYPE   = 1 << 3,
 };
 /**
  * @brief Defines audio sampling attributes.
