@@ -60,14 +60,16 @@ int32_t HdiTestDisplay::Init()
     layerinfo.height = currentMode_.height;
     layerinfo.pixFormat = Composer::V1_0::PIXEL_FMT_BGRA_8888;
     const uint32_t CLIENT_LAYER_ID = 0xffffffff; // invalid id
-    clientLayer_ = std::make_unique<HdiTestLayer>(layerinfo, CLIENT_LAYER_ID, id_);
-    ret = clientLayer_->Init();
-    DISPLAY_TEST_CHK_RETURN(
-        (ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("the client layer can not be created"));
+    if (id_ == 0) {
+        clientLayer_ = std::make_unique<HdiTestLayer>(layerinfo, CLIENT_LAYER_ID, id_);
+        ret = clientLayer_->Init();
+        DISPLAY_TEST_CHK_RETURN(
+            (ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("the client layer can not be created"));
 
-    ret = device_->SetClientBufferCacheCount(id_, clientLayer_->GetLayerBuffercount());
-    DISPLAY_TEST_CHK_RETURN(
-        (ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("setClientBufferCount error"));
+        ret = device_->SetClientBufferCacheCount(id_, clientLayer_->GetLayerBuffercount());
+        DISPLAY_TEST_CHK_RETURN(
+            (ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("setClientBufferCount error"));
+    }
     return DISPLAY_SUCCESS;
 }
 
