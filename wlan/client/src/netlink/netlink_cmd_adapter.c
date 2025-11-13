@@ -3252,7 +3252,7 @@ static int32_t GetSignalInfo(const uint32_t interfaceId, const uint8_t associate
             HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId faile", __FUNCTION__);
             break;
         }
-        if (nla_put(msg, NL80211_ATTR_MAC, ETH_ADDR_LEN, associatedInfo.associatedBssid) != RET_CODE_SUCCESS) {
+        if (nla_put(msg, NL80211_ATTR_MAC, ETH_ADDR_LEN, associatedBssid) != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%s: nla_put associatedBssid faile", __FUNCTION__);
             break;
         }
