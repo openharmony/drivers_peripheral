@@ -452,8 +452,8 @@ std::string UsbDeviceImpl::GetDeviceDirName(uint8_t busNum, uint8_t devAddr)
             continue;
         }
         if (busNumConverted > UINT8_MAX || devAddrConverted > UINT8_MAX) {
-            HDF_LOGE("%{public}s: value out of range: busNum=%{public}zu, devAddr=%{public}zu",
-                __func__, busNumConverted, devAddrConverted);
+            HDF_LOGE("%{public}s: value out of range: busNum=%{public}lu, devAddr=%{public}lu",
+                __func__, (unsigned long)busNumConverted, (unsigned long)devAddrConverted);
             deviceDir = "";
             continue;
         }
