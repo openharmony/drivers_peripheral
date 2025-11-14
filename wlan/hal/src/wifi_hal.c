@@ -407,7 +407,7 @@ static int32_t SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
 static int32_t GetSignalPollInfoInner(const char *ifName, struct SignalResult *signalResult)
 {
     if (ifName == NULL || signalResult == NULL) {
-        HDF_LOGE("%s: input parameter invalid, line: d%", __FUNCTION__, __LINE__);
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     return HalCmdGetSignalPollInfo(ifName, signalResult);
