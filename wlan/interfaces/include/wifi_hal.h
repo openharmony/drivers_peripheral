@@ -408,7 +408,7 @@ struct IWiFi {
     int32_t (*setDpiMarkRule)(int32_t uid, int32_t protocol, int32_t enable);
 
     /**
-    * @brief wlan hal get hml/p2p signal information.
+    * @brief wlan hal get p2p signal information.
     *
     * @param ifName interface name or interface name with assoc mac address combied by '_'.
     * @param signalResult signal informatiton obtained.
