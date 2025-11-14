@@ -19,6 +19,11 @@
 #include <cstdio>
 #include <hdf_log.h>
 
+#undef LOG_TAG
+#define LOG_TAG "DISP_HDI_COMP"
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD002515
+
 #ifdef __cplusplus
 extern "C" {
 #endif

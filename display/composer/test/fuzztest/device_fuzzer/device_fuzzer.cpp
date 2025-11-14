@@ -24,9 +24,9 @@
 
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_3;
+using namespace OHOS::HDI::Display::Composer::V1_4;
 
-static sptr<Composer::V1_3::IDisplayComposerInterface> g_composerInterface = nullptr;
+static sptr<Composer::V1_4::IDisplayComposerInterface> g_composerInterface = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_bufferInterface = nullptr;
 
 static bool g_isInit = false;
@@ -165,6 +165,17 @@ int32_t TestSetGetDisplayPowerStatus(uint32_t devId)
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetDisplayPowerStatus failed", __func__);
         return DISPLAY_FAILURE;
+    }
+    return ret;
+}
+
+int32_t TestGetPanelPowerStatus(uint32_t devId)
+{
+    PanelPowerStatus status;
+
+    int32_t ret = g_composerInterface->GetPanelPowerStatus(devId, status);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: function TestGetPanelPowerStatus failed, %{public}d", __func__, ret);
     }
     return ret;
 }
@@ -532,6 +543,7 @@ TestFuncs g_testFuncs = {
     TestGetDisplaySupportedModes,
     TestSetGetDisplayMode,
     TestSetGetDisplayPowerStatus,
+    TestGetPanelPowerStatus,
     TestPrepareDisplayLayers,
     TestSetGetDisplayBacklight,
     TestGetDisplayProperty,
@@ -569,7 +581,7 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
     // initialize service
     if (!g_isInit) {
         g_isInit = true;
-        g_composerInterface = Composer::V1_3::IDisplayComposerInterface::Get();
+        g_composerInterface = Composer::V1_4::IDisplayComposerInterface::Get();
         if (g_composerInterface == nullptr) {
             HDF_LOGE("%{public}s: get IDisplayComposerInterface failed", __func__);
             return false;
