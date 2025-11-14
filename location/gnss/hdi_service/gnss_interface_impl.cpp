@@ -524,7 +524,7 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocationsSize(int32_t& size)
     HDF_LOGI("%{public}s.", __func__);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
-        HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
+        HDF_LOGE("%{public}s:GetGnssVendorInterface gnssInterface nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (gnssInterface->getCachedLocationsSize == nullptr) {
@@ -540,7 +540,7 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocations()
     HDF_LOGI("%{public}s.", __func__);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
-        HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
+        HDF_LOGE("%{public}s:GetGnssVendorInterface gnssInterface nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (gnssInterface->flushCachedGnssLocations == nullptr) {
