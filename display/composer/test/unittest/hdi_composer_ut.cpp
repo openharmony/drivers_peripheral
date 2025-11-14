@@ -18,8 +18,8 @@
 #include <chrono>
 #include <cinttypes>
 #include <algorithm>
-#include "v1_3/include/idisplay_composer_interface.h"
-#include "v1_3/display_composer_type.h"
+#include "v1_4/include/idisplay_composer_interface.h"
+#include "v1_4/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
 #include "display_test_utils.h"
@@ -32,11 +32,11 @@
 #include "hdi_composer_ut.h"
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_3;
+using namespace OHOS::HDI::Display::Composer::V1_4;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-static sptr<Composer::V1_3::IDisplayComposerInterface> g_composerDevice = nullptr;
+static sptr<Composer::V1_4::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
 const int SLEEP_CONT_10 = 10;
@@ -299,6 +299,17 @@ HWTEST_F(DeviceTest, test_SetDisplayPowerStatus, TestSize.Level1)
 
     ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], Composer::V1_0::DispPowerStatus::POWER_STATUS_ON);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_GetPanelPowerStatus, TestSize.Level1)
+{
+    PanelPowerStatus powerStatus;
+    auto ret = g_composerDevice->GetPanelPowerStatus(g_displayIds[0], powerStatus);
+    int32_t result = DISPLAY_FAILURE;
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        result = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, result);
 }
 
 #ifdef DISPLAY_COMMUNITY
