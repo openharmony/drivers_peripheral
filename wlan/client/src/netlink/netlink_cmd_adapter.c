@@ -3271,9 +3271,9 @@ static int32_t GetOtherSignalPollInfo(const char *ifNameAndMacAddr, struct Signa
     int32_t ret = RET_CODE_FAILURE;
     uint32_t interfaceId;
     uint32_t ifNameSize = delimiterPos - ifNameAndMacAddr;
+
     char ifName[ifNameSize + 1];
-    memset_s(ifName, ifNameSize + 1, 0, ifNameSize + 1);
-    if (memcpy_s(ifName, ifNameSize, ifNameAndMacAddr, ifNameSize) != EOK) {
+    if (memcpy_s(ifName, ifNameSize + 1, ifNameAndMacAddr, ifNameSize) != EOK) {
         HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s ifName failed", __FUNCTION__);
         return ret;
     }
@@ -3284,8 +3284,7 @@ static int32_t GetOtherSignalPollInfo(const char *ifNameAndMacAddr, struct Signa
         HILOG_ERROR(LOG_CORE, "%{public}s: invalid length of ifNameAndMacAddr", __FUNCTION__);
         return ret;
     }
-    memset_s(assocMacAddr, MAC_ADDR_LENGTH + 1, 0, MAC_ADDR_LENGTH + 1);
-    if (memcpy_s(assocMacAddr, MAC_ADDR_LENGTH, delimiterPos + 1, MAC_ADDR_LENGTH) != EOK) {
+    if (memcpy_s(assocMacAddr, MAC_ADDR_LENGTH + 1, delimiterPos + 1, MAC_ADDR_LENGTH) != EOK) {
         HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s assocMacAddr failed", __FUNCTION__);
         return ret;
     }
