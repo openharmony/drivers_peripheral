@@ -40,7 +40,7 @@ ohos_fuzztest("AllocatorFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "metadata_fuzzer.cpp" ]
+  sources = [ "allocator_fuzzer.cpp" ]
 }
 
 group("fuzztest") {
