@@ -20,6 +20,7 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "display_common_fuzzer.h"
+#include "v1_4/include/idisplay_buffer.h"
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer;
 using namespace OHOS::HDI::Display::Buffer::V1_4;
@@ -98,6 +99,8 @@ void TestCloneDmaBufferHandle(const BufferHandle& handle)
         (void)g_bufferInterface->FreeMem(*outHandle);
     }
 }
+
+typedef void (*TestFuncs[])(const BufferHandle&);
 
 TestFuncs g_testFuncs = { TestCloneDmaBufferHandle };
 
