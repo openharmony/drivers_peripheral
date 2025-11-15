@@ -73,7 +73,7 @@ static int32_t GetAllocInfo(OHOS::HDI::Display::Buffer::V1_0::AllocInfo& info)
 
 BufferHandle* UsingAllocmem()
 {
-    AllocInfo info = { 0 };
+    OHOS::HDI::Display::Buffer::V1_0::AllocInfo info = { 0 };
     int32_t ret = GetAllocInfo(info);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetAllocInfo failed", __func__);
