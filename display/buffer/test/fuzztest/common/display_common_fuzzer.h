@@ -18,12 +18,12 @@
 
 #include "v1_0/display_composer_type.h"
 #include "v1_2/display_buffer_type.h"
-#include "v1_2/include/idisplay_buffer.h"
+#include "v1_4/include/idisplay_buffer.h"
 #include "buffer_handle.h"
 #include "hdf_log.h"
 
 namespace OHOS {
-using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS::HDI::Display::Buffer::V1_4;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 const size_t THRESHOLD = 10;
 const int32_t ALPHA_VALUE_RANGE = 256; // ranging from 0 to 255
