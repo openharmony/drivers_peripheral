@@ -16,7 +16,7 @@
 #ifndef OHOS_HDI_DISPLAY_BUFFER_V1_4_ALLOCATOR_SERVICE_H
 #define OHOS_HDI_DISPLAY_BUFFER_V1_4_ALLOCATOR_SERVICE_H
 
-#include "mapper_service_1_2.h"
+#include "allocator_service.h"
 
 namespace OHOS {
 namespace HDI {
