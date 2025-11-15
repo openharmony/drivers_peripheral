@@ -1043,6 +1043,48 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid023, TestSize
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
 }
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid024, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_VOICE_TRANSCRIPTION;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid025, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_OFFLOAD_CAPTURE_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid026, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_ULTRASONIC_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
 
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyCaptureNull001, TestSize.Level1)
