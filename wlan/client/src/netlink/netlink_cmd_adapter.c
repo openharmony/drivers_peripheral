@@ -3304,7 +3304,6 @@ static int32_t GetOtherSignalPollInfo(const char *ifNameAndMacAddr, struct Signa
 int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
 {
     uint32_t interfaceId;
-    int32_t ret = RET_CODE_FAILURE;
     AssociatedInfo associatedInfo;
     (void)memset_s(&associatedInfo, sizeof(associatedInfo), 0, sizeof(associatedInfo));
     if (ifName == NULL || signalResult == NULL) {
