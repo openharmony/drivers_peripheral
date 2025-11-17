@@ -487,7 +487,7 @@ HWTEST_F(WifiClientTest, WifiGetSignalPollInfo001, TestSize.Level1)
     EXPECT_EQ(RET_CODE_FAILURE, ret);
     ret = WifiGetSignalPollInfo(ifNameInvalid, &signalResult);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    ret = WifiGetSignalPollInfo(ifNameInvalid, &signalResult);
+    ret = WifiGetSignalPollInfo(ifNameAndMacAddrInvalid, &signalResult);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
 
