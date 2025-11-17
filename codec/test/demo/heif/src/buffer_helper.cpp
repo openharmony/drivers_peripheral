@@ -87,8 +87,8 @@ bool BufferHelper::CopyYuvData(BufferHandle *handle, ifstream &ifs, PixelFileInf
                         layout.planes[PLANE_U].offset :
                         layout.planes[PLANE_V].offset;
     dst = reinterpret_cast<char*>(handle->virAddr) + uvOffset;
-    for (uint32_t i = 0; i < pixelInfo.displayHeight / UV_SAMPLE_RATE; i++) {
-        ifs.read(dst, pixelInfo.alignedWidth * BYTES_PER_PIXEL_YUV);
+    for (uint32_t i = 0; i < (pixelInfo.displayHeight + 1) / UV_SAMPLE_RATE; i++) {
+        ifs.read(dst, (pixelInfo.alignedWidth + 1) / 2 * 2 * BYTES_PER_PIXEL_YUV);
         dst += handle->stride;
     }
     return true;
