@@ -3210,7 +3210,7 @@ static unsigned char ConvertStrChar(char ch)
     return 0;
 }
 
-void MacStrToArray(const char* strMac, unsigned char [ETH_ADDR_LEN])
+void MacStrToArray(const char* strMac, unsigned char mac[ETH_ADDR_LEN])
 {
     if (strMac == NULL) {
         return;
