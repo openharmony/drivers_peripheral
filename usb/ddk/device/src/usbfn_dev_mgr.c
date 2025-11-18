@@ -368,14 +368,13 @@ static void CollectEventHandle(struct UsbFnEventAll *event, struct UsbFnDeviceMg
         funcMgr = devMgr->funcMgr + i;
 
         if (funcMgr->fd > 0 && funcMgr->callback != NULL) {
-            if (event->ep0Num >= MAX_EP0_NUM) {
-                HDF_LOGE("%{public}s:%{public}d event->ep0Num: %{public}d.", __func__, __LINE__, event->ep0Num);
-                event->ep0Num = MAX_EP0_NUM;
-                break;  // jump out of the loop to avoid ep index overflow
-            }
             event->ep0[event->ep0Num] = funcMgr->fd;
             event->ep0Event[event->ep0Num].type = USB_EP0_INVALID;
             event->ep0Num++;
+            if (event->ep0Num >= MAX_EP0_NUM) {
+                HDF_LOGE("%{public}s:%{public}d event->ep0Num: %{public}d.", __func__, __LINE__, event->ep0Num);
+                break;  // jump out of the loop to avoid ep index overflow
+            }
         }
     }
     for (i = 0; i < devMgr->fnDev.numInterfaces; i++) {
@@ -388,15 +387,14 @@ static void CollectEventHandle(struct UsbFnEventAll *event, struct UsbFnDeviceMg
             if (handle->fds[j] <= 0) {
                 continue;
             }
-            if (event->epNum >= MAX_EP) {
-                HDF_LOGE("%{public}s:%{public}d event->epNum: %{public}d.", __func__, __LINE__, event->epNum);
-                event->epNum = MAX_EP;
-                return; // jump out of the DOUBLE loop to avoid index overflow => use "return" here
-            }
             event->epx[event->epNum] = handle->fds[j];
             event->reqEvent[event->epNum] = handle->reqEvent[j];
             event->numEvent[event->epNum] = 0;
             event->epNum++;
+            if (event->epNum >= MAX_EP) {
+                HDF_LOGE("%{public}s:%{public}d event->epNum: %{public}d.", __func__, __LINE__, event->epNum);
+                return; // jump out of the DOUBLE loop to avoid index overflow => use "return" here
+            }
         }
     }
 }
