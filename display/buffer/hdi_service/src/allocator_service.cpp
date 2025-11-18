@@ -181,7 +181,8 @@ int32_t AllocatorService::CloneDmaBufferHandle(const sptr<NativeBuffer>& inBuffe
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     HdfTrace traceOne("CloneDmaBufferHandle-VDI", "HDI:VDI:");
     int32_t ec = vdiImpl_->CloneDmaBufferHandle(*inHandle, outHandle);
-    if (ec != HDF_SUCCESS && ec != HDF_ERR_NOT_SUPPORT) {
+    FreeMemVdi(inHandle);
+    if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CloneDmaBufferHandle failed, ec = %{public}d", __func__, ec);
         return ec;
     }
