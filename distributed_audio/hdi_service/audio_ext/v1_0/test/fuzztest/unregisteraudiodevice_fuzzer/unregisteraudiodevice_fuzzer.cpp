@@ -27,9 +27,10 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
 namespace V2_1 {
+const uint32_t VAR_NUM = 2;
 void UnRegisterAudioDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
+    if ((data == nullptr) || (size < (sizeof(int32_t)) * VAR_NUM)) {
         return;
     }
     uint32_t offset = 0;

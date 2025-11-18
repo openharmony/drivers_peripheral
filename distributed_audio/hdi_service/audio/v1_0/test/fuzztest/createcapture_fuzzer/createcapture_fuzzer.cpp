@@ -27,9 +27,10 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
+const uint32_t VAR_NUM = 16;
 void CreateCaptureFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
+    if ((data == nullptr) || (size < (sizeof(int32_t)) * VAR_NUM)) {
         return;
     }
 
