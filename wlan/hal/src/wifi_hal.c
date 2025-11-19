@@ -404,6 +404,23 @@ static int32_t SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
     return ret;
 }
 
+static int32_t GetSignalPollInfoInner(const char *ifName, struct SignalResult *signalResult)
+{
+    if (ifName == NULL || signalResult == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HalCmdGetSignalPollInfo(ifName, signalResult);
+}
+
+static int32_t GetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
+{
+    HalMutexLock();
+    int32_t ret = GetSignalPollInfoInner(ifName, signalResult);
+    HalMutexUnlock();
+    return ret;
+}
+
 static int32_t Start(struct IWiFi *iwifi)
 {
     HDF_LOGI("hal enter %{public}s", __FUNCTION__);
@@ -660,6 +677,7 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.registerActionFrameReceiver = RegisterActionFrameReceiver;
         singleWifiInstance.setPowerSaveMode = SetPowerSaveMode;
         singleWifiInstance.setDpiMarkRule = SetDpiMarkRule;
+        singleWifiInstance.getSignalPollInfo = GetSignalPollInfo;
         InitIWiFiList();
         isInited = true;
     }
