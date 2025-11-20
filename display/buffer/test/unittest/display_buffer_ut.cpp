@@ -486,6 +486,126 @@ TEST_P(DisplayBufferUt, DisplayBufferUt)
     ASSERT_TRUE(ret == DISPLAY_SUCCESS);
 }
 
+HWTEST_F(DisplayBufferUt, test_AllocMemTest001, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1920,
+        .height = ALLOC_SIZE_1080,
+        .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBX_8888
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_AllocMemTest002, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_YCBCR_420_SP
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_AllocMemTest003, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_MEM_DMA,
+        .format = PIXEL_FMT_RGBX_8888
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_AllocMemTest004, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ,
+        .format = PIXEL_FMT_RGBX_8888
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_AllocMemTest005, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1920,
+        .height = ALLOC_SIZE_1080,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBX_8888
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_AllocMemTest006, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH,
+        .format = PIXEL_FMT_RGBX_8888
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_AllocMemTest007, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1920,
+        .height = ALLOC_SIZE_1080,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBX_8888
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_AllocMemTest008, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = TEST_INFO,
+        .format = PIXEL_FMT_YCBCR_420_P
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_AllocMemTest009, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = 0,
+        .height = 0,
+        .usage = 0,
+        .format = 0
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret != DISPLAY_SUCCESS);
+}
+
+HWTEST_F(DisplayBufferUt, test_AllocMemTest010, TestSize.Level1)
+{
+    AllocInfo info = {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_BGRA_5551
+    };
+    int ret = AllocMemTest(info);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+}
+
 INSTANTIATE_TEST_SUITE_P(AllocTest, DisplayBufferUt, ::testing::ValuesIn(DISPLAY_BUFFER_TEST_SETS));
 
 HWTEST_F(DisplayBufferUt, test_ReAllocMemTest001, TestSize.Level1)
