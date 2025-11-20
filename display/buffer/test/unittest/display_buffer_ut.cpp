@@ -627,7 +627,7 @@ int32_t DisplayBufferUt::CloneDmaBufferHandleTest(AllocInfo& info)
     int ret;
     BufferHandle *inBuffer = nullptr;
     ret = displayBuffer_->AllocMem(info, inBuffer);
-    if (ret == DISPLAY_NOT_SUPPORT) {
+    if (ret == HDF_ERR_NOT_SUPPORT) {
         HDF_LOGE("%{public}s: AllocMem not support, ret=%{public}d", __func__, ret);
         return DISPLAY_SUCCESS;
     }
@@ -637,7 +637,7 @@ int32_t DisplayBufferUt::CloneDmaBufferHandleTest(AllocInfo& info)
     }
     BufferHandle* outBuffer = nullptr;
     ret = displayBuffer_->CloneDmaBufferHandle(*inBuffer, outBuffer);
-    if (ret == DISPLAY_NOT_SUPPORT) {
+    if (ret == HDF_ERR_NOT_SUPPORT) {
         HDF_LOGE("%{public}s: CloneDmaBufferHandle not support, ret=%{public}d", __func__, ret);
         displayBuffer_->FreeMem(*inBuffer);
         return DISPLAY_SUCCESS;
