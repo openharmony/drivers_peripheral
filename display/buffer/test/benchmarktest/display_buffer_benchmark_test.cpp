@@ -300,11 +300,11 @@ BENCHMARK_F(DisplayBenchmarkTest, CloneDmaBufferHandleTest)(benchmark::State &st
     int32_t ret;
     BufferHandle* inHandle = nullptr;
     ret = g_gralloc->AllocMem(g_allocInfo, inHandle);
-    EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     BufferHandle* outHandle = nullptr;
     for (auto _ : state) {
         ret = g_gralloc->CloneDmaBufferHandle(*inHandle, outHandle);
-        EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
+        EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
         if (outHandle != nullptr) {
             g_gralloc->FreeMem(*outHandle);
         }
