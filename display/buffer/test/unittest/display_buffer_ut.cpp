@@ -632,7 +632,7 @@ int32_t DisplayBufferUt::CloneDmaBufferHandleTest(AllocInfo& info)
         return DISPLAY_SUCCESS;
     }
     if (ret != DISPLAY_SUCCESS || inBuffer == nullptr) {
-        HDF_LOGE("AllocMem failed");
+        HDF_LOGE("%{public}s: AllocMem failed", __func__);
         return ret;
     }
     BufferHandle* outBuffer = nullptr;
@@ -643,7 +643,7 @@ int32_t DisplayBufferUt::CloneDmaBufferHandleTest(AllocInfo& info)
         return DISPLAY_SUCCESS;
     }
     if (ret != DISPLAY_SUCCESS || outBuffer == nullptr) {
-        HDF_LOGE("CloneDmaBufferHandle failed");
+        HDF_LOGE("%{public}s: CloneDmaBufferHandle failed", __func__);
         displayBuffer_->FreeMem(*inBuffer);
         return ret;
     }
@@ -654,9 +654,9 @@ int32_t DisplayBufferUt::CloneDmaBufferHandleTest(AllocInfo& info)
 HWTEST_F(DisplayBufferUt, test_CloneDmaBufferHandle001, TestSize.Level1)
 {
     AllocInfo info = {
-        .width = ALLOC_SIZE_1080,
+        .width = ALLOC_SIZE_1280,
         .height = ALLOC_SIZE_1920,
-        .usage = TEST_INFO,
+        .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_YCBCR_420_P
     };
     int ret = CloneDmaBufferHandleTest(info);
@@ -668,8 +668,8 @@ HWTEST_F(DisplayBufferUt, test_CloneDmaBufferHandle002, TestSize.Level1)
     AllocInfo info = {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
-        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_WRITE,
-        .format = PIXEL_FMT_RGBA_1010102
+        .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGB_888
     };
     int ret = CloneDmaBufferHandleTest(info);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS);
