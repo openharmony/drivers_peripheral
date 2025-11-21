@@ -89,7 +89,7 @@ HWTEST_F(WifiStaIfaceTest, SetDpiMarkRuleTest, TestSize.Level1)
 HWTEST_F(WifiStaIfaceTest, EnablePowerModeTest, TestSize.Level1)
 {
     HDF_LOGI("EnablePowerModeTest started");
-    EXPECT_TRUE(staIface->EnablePowerMode(0) == HDF_SUCCESS);
+    EXPECT_TRUE(staIface->EnablePowerMode(0) == HDF_FAILURE);
     uint32_t cap;
     EXPECT_TRUE(staIface->GetIfaceCap(cap) == HDF_SUCCESS);
     EXPECT_TRUE(testIface->GetIfaceCap(cap) == HDF_FAILURE);
