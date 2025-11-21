@@ -35,6 +35,7 @@
 #include "v1_3/istream_operator_callback.h"
 #include "v1_0/types.h"
 #include "v1_1/types.h"
+#include "v1_1/display_composer_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -42,6 +43,7 @@ using namespace std;
 using namespace OHOS::HDI::Camera::V1_0;
 using HDI::Camera::V1_1::OperationMode_V1_1;
 using HDI::Camera::V1_1::StreamInfo_V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 class DCameraProvider;
 struct ResolutionCandidate {
     int srcWidth;
