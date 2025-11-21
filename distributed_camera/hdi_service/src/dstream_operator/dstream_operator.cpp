@@ -798,6 +798,7 @@ DCamRetCode DStreamOperator::ParsePreviewFormats(cJSON* rootValue)
     for (int32_t i = 0; i < size; i++) {
         cJSON* item = cJSON_GetArrayItem(formatObj, i);
         if (item != nullptr && cJSON_IsNumber(item)) {
+            DHLOGI("ParsePreviewFormats supported format: %{public}d", item->valueint);
             previewFormats.push_back(item->valueint);
         }
     }
@@ -1029,9 +1030,9 @@ void DStreamOperator::ConvertStreamInfo(const StreamInfo &srcInfo, std::shared_p
 
     if ((srcInfo.intent_ == STILL_CAPTURE) || (srcInfo.intent_ == POST_VIEW)) {
         dstInfo->type_ = DCStreamType::SNAPSHOT_FRAME;
-        if (srcInfo.format_ == PIXEL_FMT_RGBA_8888) {
+        if (srcInfo.format_ == OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGBA_8888) {
             dstInfo->format_ = OHOS_CAMERA_FORMAT_RGBA_8888;
-        } else if (srcInfo.format_ == PIXEL_FMT_YCRCB_420_SP) {
+        } else if (srcInfo.format_ == OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCRCB_420_SP) {
             dstInfo->format_ = OHOS_CAMERA_FORMAT_JPEG;
         } else if (dstInfo->encodeType_ == DCEncodeType::ENCODE_TYPE_NULL) {
             dstInfo->format_ = OHOS_CAMERA_FORMAT_YCRCB_420_SP;
@@ -1041,7 +1042,8 @@ void DStreamOperator::ConvertStreamInfo(const StreamInfo &srcInfo, std::shared_p
         dstInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_NULL;
         dstInfo->type_ = DCStreamType::CONTINUOUS_FRAME;
         dstInfo->format_ =
-            static_cast<int>(DBufferManager::PixelFormatToDCameraFormat(static_cast<PixelFormat>(srcInfo.format_)));
+            static_cast<int>(DBufferManager::PixelFormatToDCameraFormat(
+                static_cast<OHOS::HDI::Display::Composer::V1_1::PixelFormat>(srcInfo.format_)));
     }
 }
 

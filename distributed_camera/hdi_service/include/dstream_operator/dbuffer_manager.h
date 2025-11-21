@@ -25,12 +25,12 @@
 #include "surface_buffer.h"
 
 #include "v1_1/dcamera_types.h"
-#include "v1_0/display_composer_type.h"
+#include "v1_1/display_composer_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_1;
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 class DBufferManager {
 public:
     DBufferManager() = default;
@@ -50,7 +50,7 @@ public:
     static RetCode DImageBufferToDCameraBuffer(const std::shared_ptr<DImageBuffer> &imageBuffer,
         DCameraBuffer &buffer);
     static uint64_t CameraUsageToGrallocUsage(const uint64_t cameraUsage);
-    static uint32_t PixelFormatToDCameraFormat(const PixelFormat format);
+    static uint32_t PixelFormatToDCameraFormat(const OHOS::HDI::Display::Composer::V1_1::PixelFormat format);
 
 private:
     std::mutex lock_;
