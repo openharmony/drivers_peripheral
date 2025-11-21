@@ -123,7 +123,7 @@ private:
     static void OnRefresh(uint32_t devId, void *data);
     static void OnVBlankIdleCallback(uint32_t devId, uint64_t ns, void* data);
     static void OnHwcEvent(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void *data);
-    static void PrepareParallelResponser(uint32_t outputId, bool connected, void* data)
+    static void PrepareParallelResponser(uint32_t outputId, bool connected, void* data);
 private:
     /* Common */
     void* libHandle_;
