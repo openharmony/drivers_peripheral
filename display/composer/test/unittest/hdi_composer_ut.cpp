@@ -1253,3 +1253,14 @@ HWTEST_F(DeviceTest, test_HdifdParcelable_Dump, TestSize.Level1)
     EXPECT_EQ("fd: {" + std::to_string(VALID_HDI_FD) + "}\n", dumpFd);
     (void)hdiFd2.Move(); // avoid call close()
 }
+
+HWTEST_F(DeviceTest, test_GetDisplayConnectionType, TestSize.Level1)
+{
+    GetDisplayConnectionType connectionType;
+    auto ret = g_composerDevice->GetDisplayConnectionType(g_displayIds[0], connectionType);
+    int32_t result = DISPLAY_FAILURE;
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        result = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, result);
+}

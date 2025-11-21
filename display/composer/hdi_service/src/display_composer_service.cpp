@@ -281,6 +281,8 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<RegHwcEventCallbackFunc>(dlsym(libHandle_, "RegHwcEventCallback"));
     vdiAdapter_->GetPanelPowerStatus =
         reinterpret_cast<GetPanelPowerStatusFunc>(dlsym(libHandle_, "GetPanelPowerStatus"));
+    vdiAdapter_->GetDisplayConnectionType =
+        reinterpret_cast<GetDisplayConnectionTypeFunc>(dlsym(libHandle_, "GetDisplayConnectionType"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -1147,6 +1149,18 @@ int32_t DisplayComposerService::RegHwcEventCallback(const sptr<IHwcEventCallback
     hwcEventCb_ = cb;
     int32_t ret = vdiAdapter_->RegHwcEventCallback(OnHwcEvent, this);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+int32_t DisplayComposerService::GetDisplayConnectionType(uint32_t devId, V1_4::DisplayConnectionType& outType)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayConnectionType, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->GetDisplayConnectionType(devId, outType);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail ret:%{public}d", __func__, ret));
     return ret;
 }
 } // namespace Composer

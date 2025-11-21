@@ -99,6 +99,7 @@ public:
     int32_t SetTunnelLayerBuffer(uint32_t devId, uint64_t tunnelId,
         const sptr<NativeBuffer>& inHandle, const sptr<HdifdParcelable>& acquireFence) override;
     int32_t CommitTunnelLayer(uint32_t devId, uint64_t tunnelId, sptr<HdifdParcelable>& releaseFence) override;
+    int32_t GetDisplayConnectionType(uint32_t devId, V1_4::DisplayConnectionType& outType) override;
 
 private:
     void HidumperInit();
