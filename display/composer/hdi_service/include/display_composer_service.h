@@ -123,6 +123,7 @@ private:
     static void OnRefresh(uint32_t devId, void *data);
     static void OnVBlankIdleCallback(uint32_t devId, uint64_t ns, void* data);
     static void OnHwcEvent(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void *data);
+    static void PrepareParallelResponser(uint32_t outputId, bool connected, void* data)
 private:
     /* Common */
     void* libHandle_;
@@ -137,7 +138,7 @@ private:
     sptr<IRefreshCallback> refreshCb_;
     sptr<IVBlankIdleCallback> VBlankIdleCb_;
     sptr<IHwcEventCallback> hwcEventCb_;
-    std::mutex respMapMutex_;
+    static std::mutex respMapMutex_;
     std::shared_ptr<V1_4::HdiDisplayCmdResponser> cmdResponser_;
     std::unordered_map<uint32_t, std::shared_ptr<V1_4::HdiDisplayCmdResponser>> cmdResponserMap_;
 };

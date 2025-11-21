@@ -47,6 +47,8 @@ extern "C" V1_4::IDisplayComposer* DisplayComposerImplGetInstance(void)
     return new (std::nothrow) DisplayComposerService();
 }
 
+std::mutex DisplayComposerService::respMapMutex_;
+
 DisplayComposerService::DisplayComposerService()
     : libHandle_(nullptr),
     vdiAdapter_(new(std::nothrow) DisplayComposerVdiAdapter),
@@ -349,12 +351,6 @@ void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* 
         if (cacheMgr->AddDeviceCache(outputId) != HDF_SUCCESS) {
             DISPLAY_LOGE("Add device cache failed outputId:%{public}u, connected:%{public}d", outputId, connected);
         }
-    } else {
-        auto& cmdResponserMap = reinterpret_cast<DisplayComposerService*>(data)->cmdResponserMap_;
-        auto respItem = cmdResponserMap.find(outputId);
-        if (respItem != cmdResponserMap.end()) {
-            cmdResponserMap.erase(respItem);
-        }
     }
 
     sptr<IHotPlugCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->hotPlugCb_;
@@ -363,6 +359,30 @@ void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* 
         return;
     }
     remoteCb->OnHotPlug(outputId, connected);
+    PrepareParallelResponser(outputId, connected, data);
+}
+
+void DisplayComposerService::PrepareParallelResponser(uint32_t outputId, bool connected, void* data)
+{
+    if (!GetEnableParallel()) {
+        return;
+    }
+
+    auto cmdResponser = reinterpret_cast<DisplayComposerService*>(data)->cmdResponser_;
+    auto& cmdResponserMap = reinterpret_cast<DisplayComposerService*>(data)->cmdResponserMap_;
+    std::lock_guard<std::mutex> lock(respMapMutex_);
+    if (connected) {
+        if ((cmdResponser != nullptr) && (cmdResponserMap.size() == 1)) {
+            cmdResponserMap.insert({outputId, cmdResponser});
+        }
+    } else {
+        auto respItem = cmdResponserMap.find(outputId);
+        if (respItem != cmdResponserMap.end()) {
+            cmdResponserMap.erase(respItem);
+        }
+    }
+
+    DISPLAY_LOGI("%{public}s: the size of respMap_: %{public}zu", __func__, cmdResponserMap.size());
 }
 
 void DisplayComposerService::OnVBlank(unsigned int sequence, uint64_t ns, void* data)
