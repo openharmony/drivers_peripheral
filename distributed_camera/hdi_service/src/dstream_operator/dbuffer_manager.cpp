@@ -87,7 +87,8 @@ RetCode DBufferManager::SurfaceBufferToDImageBuffer(const OHOS::sptr<OHOS::Surfa
     buffer->SetStride(bufHandle->stride);
     buffer->SetWidth(bufHandle->width);
     buffer->SetHeight(bufHandle->height);
-    buffer->SetFormat(PixelFormatToDCameraFormat(static_cast<OHOS::HDI::Display::Composer::V1_1::PixelFormat>(bufHandle->format)));
+    buffer->SetFormat(PixelFormatToDCameraFormat(
+        static_cast<OHOS::HDI::Display::Composer::V1_1::PixelFormat>(bufHandle->format)));
     buffer->SetUsage(CameraUsageToGrallocUsage(bufHandle->usage));
     buffer->SetSize(static_cast<uint32_t>(bufHandle->size));
     buffer->SetBufferHandle(bufHandle);
