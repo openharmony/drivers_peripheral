@@ -207,7 +207,7 @@ void *DdkUeventMain(void *param)
             } else {
                 OsalMSleep(UEVENT_POLL_WAIT_TIME);
             }
-            HDF_LOGE("usb event poll error");
+            HDF_LOGE("usb event poll error, fd.revents is %{public}hd", fd.revents);
         }
     } while (true);
 
