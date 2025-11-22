@@ -247,6 +247,7 @@ int32_t DStreamOperator::CommitStreams_V1_1(OperationMode_V1_1 mode, const std::
     if (isForceSwitch) {
         DCameraHDFEvent dCameraEvent;
         dCameraEvent.type_ = DCameraEventType::DCAMERE_FORCE_SWITCH;
+        dCameraEvent.result_ = dProvider->GetSystemSwitchRotation();
         dProvider->Notify(dhBase_, dCameraEvent);
     }
     ret = dProvider->ConfigureStreams(dhBase_, dCameraStreams);
