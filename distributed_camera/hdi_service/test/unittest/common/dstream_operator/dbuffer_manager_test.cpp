@@ -104,21 +104,26 @@ HWTEST_F(DBufferManagerTest, PixelFormatToDCameraFormat_001, TestSize.Level1)
 {
     std::shared_ptr<DBufferManager> dbMgr = std::make_shared<DBufferManager>();
     ASSERT_NE(nullptr, dbMgr);
-    PixelFormat format = PIXEL_FMT_RGBA_8888;
+    OHOS::HDI::Display::Composer::V1_1::PixelFormat format =
+        OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGBA_8888;
     auto ret = dbMgr->PixelFormatToDCameraFormat(format);
     EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_RGBA_8888);
 
-    format = PIXEL_FMT_YCBCR_420_SP;
+    format = OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCBCR_420_SP;
     ret = dbMgr->PixelFormatToDCameraFormat(format);
     EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_YCBCR_420_888);
 
-    format = PIXEL_FMT_YCRCB_420_SP;
+    format = OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCRCB_420_SP;
     ret = dbMgr->PixelFormatToDCameraFormat(format);
     EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_YCRCB_420_SP);
     
-    format = PIXEL_FMT_CLUT8;
+    format = OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_CLUT8;
     ret = dbMgr->PixelFormatToDCameraFormat(format);
     EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_INVALID);
+
+    format = OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCRCB_P010;
+    ret = dbMgr->PixelFormatToDCameraFormat(format);
+    EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_YCBCB_P010);
 }
 
 /**
