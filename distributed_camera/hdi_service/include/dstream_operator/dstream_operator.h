@@ -42,7 +42,6 @@ using namespace std;
 using namespace OHOS::HDI::Camera::V1_0;
 using HDI::Camera::V1_1::OperationMode_V1_1;
 using HDI::Camera::V1_1::StreamInfo_V1_1;
-using namespace OHOS::HDI::Display::Composer::V1_1;
 class DCameraProvider;
 struct ResolutionCandidate {
     int srcWidth;
