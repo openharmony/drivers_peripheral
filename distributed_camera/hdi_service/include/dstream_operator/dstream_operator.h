@@ -35,7 +35,6 @@
 #include "v1_3/istream_operator_callback.h"
 #include "v1_0/types.h"
 #include "v1_1/types.h"
-#include "v1_1/display_composer_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
