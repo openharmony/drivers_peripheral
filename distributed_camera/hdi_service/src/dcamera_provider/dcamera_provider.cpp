@@ -422,12 +422,18 @@ int32_t DCameraProvider::UpdateSettings(const DHBase &dhBase, const std::vector<
 
 bool DCameraProvider::IsForceSwitch()
 {
-    return isForceSwitch_;
+    return isSystemSwitch_;
 }
 
-int32_t DCameraProvider::SetForceSwitch(bool forceSwitch)
+int32_t DCameraProvider::GetSystemSwitchRotation()
 {
-    isForceSwitch_ = forceSwitch;
+    return systemSwitchRotation_;
+}
+
+int32_t DCameraProvider::SetForceSwitch(bool isSystemSwitch, int32_t systemSwitchRotation)
+{
+    isSystemSwitch_ = isSystemSwitch;
+    systemSwitchRotation_ = systemSwitchRotation;
     return DCamRetCode::SUCCESS;
 }
 

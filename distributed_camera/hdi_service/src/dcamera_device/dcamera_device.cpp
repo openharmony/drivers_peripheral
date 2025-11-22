@@ -204,6 +204,36 @@ int32_t DCameraDevice::GetDefaultSettings(std::vector<uint8_t> &settings)
     return CamRetCode::NO_ERROR;
 }
 
+void TrySetForceSwitch(std::shared_ptr<OHOS::Camera::CameraMetadata> updateSettings,
+    OHOS::sptr<DCameraProvider> provider)
+{
+    if (updateSettings == nullptr) {
+        return;
+    }
+    camera_metadata_item_t forceSwitchItem;
+    int32_t result = OHOS::Camera::FindCameraMetadataItem(updateSettings->get(),
+        OHOS_CONTROL_REQUEST_CAMERA_SWITCH, &forceSwitchItem);
+    bool isForceSwitch = false;
+    if (result == CAM_META_SUCCESS) {
+        isForceSwitch = (bool)forceSwitchItem.data.u8[0];
+    }
+    if (!isForceSwitch) {
+        DHLOGI("current stream is not system switch");
+        return;
+    }
+    camera_metadata_item_t switchInfoItem;
+    result = OHOS::Camera::FindCameraMetadataItem(updateSettings->get(),
+        OHOS_CONTROL_CAMERA_SWITCH_INFOS, &switchInfoItem);
+    int32_t rotation = 0;
+    if (result == CAM_META_SUCCESS) {
+        rotation = switchInfoItem.data.i32[0];
+    }
+    DHLOGI("isForceSwitch: %{public}d, rotation: %{public}d", isForceSwitch, rotation);
+    if (isForceSwitch) {
+        provider->SetForceSwitch(isForceSwitch, rotation);
+    }
+}
+
 int32_t DCameraDevice::UpdateSettings(const std::vector<uint8_t>& settings)
 {
     if (settings.empty() || settings.size() > METADATA_CAPACITY_MAX_SIZE) {
@@ -237,15 +267,8 @@ int32_t DCameraDevice::UpdateSettings(const std::vector<uint8_t>& settings)
         DHLOGE("Distributed camera provider instance is null.");
         return CamRetCode::DEVICE_ERROR;
     }
-    camera_metadata_item_t forceSwitchItem;
-    int32_t ret = OHOS::Camera::FindCameraMetadataItem(updateSettings->get(),
-        OHOS_CONTROL_REQUEST_CAMERA_SWITCH, &forceSwitchItem);
-    if (ret == CAM_META_SUCCESS) {
-        bool isForceSwitch = (bool)forceSwitchItem.data.u8[0];
-        DHLOGI("isForceSwitch: %{public}d", isForceSwitch);
-        provider->SetForceSwitch(isForceSwitch);
-    }
-    ret = provider->UpdateSettings(dhBase_, dcSettings);
+    TrySetForceSwitch(updateSettings, provider);
+    int32_t ret = provider->UpdateSettings(dhBase_, dcSettings);
 
     return MapToExternalRetCode(static_cast<DCamRetCode>(ret));
 }
@@ -371,7 +394,7 @@ int32_t DCameraDevice::Close()
         dCameraStreamOperator_ = nullptr;
     }
     if (provider != nullptr) {
-        provider->SetForceSwitch(false);
+        provider->SetForceSwitch(false, 0);
         provider->CloseSession(dhBase_);
     }
     if (dMetadataProcessor_ != nullptr) {
