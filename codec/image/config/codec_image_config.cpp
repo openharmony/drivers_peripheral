@@ -14,12 +14,14 @@
  */
 
 #include <array>
+#include <unistd.h>
 #include "codec_image_config.h"
 #include "codec_log_wrapper.h"
 namespace {
     constexpr char NODE_IMAGE_HARDWARE_ENCODERS[] = "ImageHwEncoders";
     constexpr char NODE_IMAGE_HARDWARE_DECODERS[] = "ImageHwDecoders";
 
+    constexpr char CODEC_CONFIG_KEY_DEV_PATH[] = "devPath";
     constexpr char CODEC_CONFIG_KEY_ROLE[] = "role";
     constexpr char CODEC_CONFIG_KEY_TYPE[] = "type";
     constexpr char CODEC_CONFIG_KEY_NAME[] = "name";
@@ -98,6 +100,13 @@ int32_t CodecImageConfig::GetGroupCapabilities(const std::string &nodeName)
 
     DEV_RES_NODE_FOR_EACH_CHILD_NODE(codecGroupNode, childNode)
     {
+        const char *devPath = nullptr;
+        if (iface->GetString(childNode, CODEC_CONFIG_KEY_DEV_PATH, &devPath, "") == HDF_SUCCESS &&
+            devPath != nullptr && strlen(devPath) != 0 && access(devPath, F_OK) != 0) {
+            CODEC_LOGE("access %{public}s failed", devPath);
+            continue;
+        }
+
         CodecImageCapability cap;
         if (GetOneCapability(*iface, *childNode, cap) != HDF_SUCCESS) {
             CODEC_LOGE("GetOneCapability failed, name is %{public}s!", cap.name.c_str());
