@@ -56,7 +56,8 @@ public:
     int32_t StopCapture(const DHBase &dhBase, const std::vector<int> &streamIds);
     int32_t UpdateSettings(const DHBase &dhBase, const std::vector<DCameraSettings> &settings);
     bool IsForceSwitch();
-    int32_t SetForceSwitch(bool forceSwitch);
+    int32_t GetSystemSwitchRotation();
+    int32_t SetForceSwitch(bool isSystemSwitch, int32_t systemSwitchRotation);
 
 private:
     bool IsDCameraSettingsInvalid(const DCameraSettings& result);
@@ -79,7 +80,8 @@ private:
     };
     static AutoRelease autoRelease_;
     static OHOS::sptr<DCameraProvider> instance_;
-    bool isForceSwitch_ = false;
+    bool isSystemSwitch_;
+    int32_t systemSwitchRotation_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
