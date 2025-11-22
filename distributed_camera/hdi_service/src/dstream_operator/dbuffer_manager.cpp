@@ -87,7 +87,8 @@ RetCode DBufferManager::SurfaceBufferToDImageBuffer(const OHOS::sptr<OHOS::Surfa
     buffer->SetStride(bufHandle->stride);
     buffer->SetWidth(bufHandle->width);
     buffer->SetHeight(bufHandle->height);
-    buffer->SetFormat(PixelFormatToDCameraFormat(static_cast<PixelFormat>(bufHandle->format)));
+    buffer->SetFormat(PixelFormatToDCameraFormat(
+        static_cast<OHOS::HDI::Display::Composer::V1_1::PixelFormat>(bufHandle->format)));
     buffer->SetUsage(CameraUsageToGrallocUsage(bufHandle->usage));
     buffer->SetSize(static_cast<uint32_t>(bufHandle->size));
     buffer->SetBufferHandle(bufHandle);
@@ -119,18 +120,21 @@ uint64_t DBufferManager::CameraUsageToGrallocUsage(const uint64_t cameraUsage)
     return grallocUsage;
 }
 
-uint32_t DBufferManager::PixelFormatToDCameraFormat(const PixelFormat format)
+uint32_t DBufferManager::PixelFormatToDCameraFormat(const OHOS::HDI::Display::Composer::V1_1::PixelFormat format)
 {
     uint32_t cameraFormat = OHOS_CAMERA_FORMAT_INVALID;
     switch (format) {
-        case PIXEL_FMT_RGBA_8888:
+        case OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGBA_8888:
             cameraFormat = OHOS_CAMERA_FORMAT_RGBA_8888;
             break;
-        case PIXEL_FMT_YCBCR_420_SP:
+        case OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCBCR_420_SP:
             cameraFormat = OHOS_CAMERA_FORMAT_YCBCR_420_888;
             break;
-        case PIXEL_FMT_YCRCB_420_SP:
+        case OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCRCB_420_SP:
             cameraFormat = OHOS_CAMERA_FORMAT_YCRCB_420_SP;
+            break;
+        case OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCRCB_P010:
+            cameraFormat = OHOS_CAMERA_FORMAT_YCBCB_P010;
             break;
         default:
             cameraFormat = OHOS_CAMERA_FORMAT_INVALID;
