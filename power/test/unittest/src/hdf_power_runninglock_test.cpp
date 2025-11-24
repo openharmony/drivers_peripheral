@@ -51,13 +51,12 @@ namespace {
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest001, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = "";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
 
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo));
 }
 
 /**
@@ -68,13 +67,12 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest001, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest002, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = runnninglockNameLabel + "normal.2";
     runinglockInfo.type = static_cast<RunningLockType>(DEFAULT_RUNNINGLOCK_INVALID_TYPE);
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
 
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo));
 }
 
 /**
@@ -123,7 +121,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest005, TestSize.Level0)
     RunningLockType errorLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     std::string errorLockName = runnninglockNameLabel + "phone.error.5";
 
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = setLockNameOne;
     runinglockInfo.type = setLockType;
@@ -131,15 +128,15 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest005, TestSize.Level0)
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
 
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
     // runninglock type and same & timeoutMs < 0, hold lock failed
-    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo));
 
     runinglockInfo.name = setLockNameTwo;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
     // unhold a non-existent lock, return success
@@ -176,7 +173,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest006, TestSize.Level0)
     RunningLockType errorLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     std::string errorLockName = runnninglockNameLabel + "notify.error.6";
 
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = setLockNameOne;
     runinglockInfo.type = setLockType;
@@ -184,15 +180,15 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest006, TestSize.Level0)
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
 
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
     // runninglock type and same & timeoutMs < 0, hold lock failed
-    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo));
 
     runinglockInfo.name = setLockNameTwo;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
     // unhold a non-existent lock, return success
@@ -229,7 +225,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest007, TestSize.Level0)
     RunningLockType errorLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     std::string errorLockName = runnninglockNameLabel + "audio.error.7";
 
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = setLockNameOne;
     runinglockInfo.type = setLockType;
@@ -237,15 +232,15 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest007, TestSize.Level0)
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
 
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
     // runninglock type and same & timeoutMs < 0, hold lock failed
-    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo));
 
     runinglockInfo.name = setLockNameTwo;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
     // unhold a non-existent lock, return success
@@ -282,7 +277,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest008, TestSize.Level0)
     RunningLockType errorLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     std::string errorLockName = runnninglockNameLabel + "sport.error.8";
 
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = setLockNameOne;
     runinglockInfo.type = setLockType;
@@ -290,15 +284,15 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest008, TestSize.Level0)
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
 
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
     // runninglock type and same & timeoutMs < 0, hold lock failed
-    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo));
 
     runinglockInfo.name = setLockNameTwo;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
     // unhold a non-existent lock, return success
@@ -335,7 +329,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest009, TestSize.Level0)
     RunningLockType errorLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     std::string errorLockName = runnninglockNameLabel + "navi.error.0";
 
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = setLockNameOne;
     runinglockInfo.type = setLockType;
@@ -343,15 +336,15 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest009, TestSize.Level0)
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
 
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
     // runninglock type and same & timeoutMs < 0, hold lock failed
-    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo));
 
     runinglockInfo.name = setLockNameTwo;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
     // unhold a non-existent lock, return success
@@ -388,7 +381,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest010, TestSize.Level0)
     RunningLockType errorLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
     std::string errorLockName = runnninglockNameLabel + "task.error.10";
 
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = setLockNameOne;
     runinglockInfo.type = setLockType;
@@ -396,15 +388,15 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest010, TestSize.Level0)
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
 
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
     // runninglock type and same & timeoutMs < 0, hold lock failed
-    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo));
 
     runinglockInfo.name = setLockNameTwo;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
     // unhold a non-existent lock, return success
@@ -439,14 +431,13 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest011, TestSize.Level0)
     std::string setLockName = runnninglockNameLabel + "zero.11";
     RunningLockType defaultLockType = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
 
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = setLockName;
     runinglockInfo.type = setLockType;
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
     uint32_t originCount = RunningLockImpl::GetCount(defaultLockType);
 
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(defaultLockType));
 
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
@@ -461,7 +452,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest011, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest012, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::SLEEP;
     std::string setLockName = runnninglockNameLabel + "sleep.12";
 
     RunningLockInfo runinglockInfo {};
@@ -469,21 +459,21 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest012, TestSize.Level0)
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 }
 
@@ -495,7 +485,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest012, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::INACTIVE;
     std::string setLockName = runnninglockNameLabel + "inactive.13";
 
     RunningLockInfo runinglockInfo {};
@@ -504,23 +493,23 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level0)
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
     runinglockInfo.name = setLockName + "sport.13";
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION;
     runinglockInfo.name = setLockName + "navigation.13";
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     runinglockInfo.name = setLockName + "task.13";
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.name = setLockName + "phone.13";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     EXPECT_EQ(originCount, RunningLockImpl::GetCount(runinglockInfo.type));
@@ -528,7 +517,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level0)
     runinglockInfo.name = setLockName + "notification.13";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION;
     originCount = RunningLockImpl::GetCount(runinglockInfo.type);
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     EXPECT_EQ(originCount, RunningLockImpl::GetCount(runinglockInfo.type));
@@ -536,7 +525,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level0)
     runinglockInfo.name = setLockName + "audio.13";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO;
     originCount = RunningLockImpl::GetCount(runinglockInfo.type);
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     EXPECT_EQ(originCount, RunningLockImpl::GetCount(runinglockInfo.type));
@@ -550,7 +539,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest014, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
     uint32_t waitTimeOutMs = DEFAULT_TIMEOUT_FOR_TEST_MS + 10;
@@ -562,21 +550,21 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest014, TestSize.Level0)
     runinglockInfo.name = runnninglockNameLabel + "phone.14";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriPhoneCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
     runinglockInfo.name = runnninglockNameLabel + "notify.14";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION;
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriNotifyCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
   
     runinglockInfo.name = runnninglockNameLabel + "audio.14";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO;
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriAudioCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
@@ -613,7 +601,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest014, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest015, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
     uint32_t waitTimeOutMs = DEFAULT_TIMEOUT_FOR_TEST_MS + 10;
@@ -625,21 +612,21 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest015, TestSize.Level0)
     runinglockInfo.name = runnninglockNameLabel + "sport.15";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriSportCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
     runinglockInfo.name = runnninglockNameLabel + "navi.15";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION;
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriNaviCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
     runinglockInfo.name = runnninglockNameLabel + "task.15";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriTaskCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
@@ -676,7 +663,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest015, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest016, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_DEFAULT;
     uint32_t waitTimeOutMs = DEFAULT_TIMEOUT_FOR_TEST_MS + 10;
@@ -693,17 +679,17 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest016, TestSize.Level0)
 
     runinglockInfo.name = runnninglockNameLabel + "phone.16";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriPhoneCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     runinglockInfo.name = runnninglockNameLabel + "notify.16";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriNotifyCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
   
     runinglockInfo.name = runnninglockNameLabel + "audio.16";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriAudioCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(
@@ -734,7 +720,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest016, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest017, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_DEFAULT;
     uint32_t waitTimeOutMs = DEFAULT_TIMEOUT_FOR_TEST_MS + 10;
@@ -751,17 +736,17 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest017, TestSize.Level0)
 
     runinglockInfo.name = runnninglockNameLabel + "sport.16";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriSportCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     runinglockInfo.name = runnninglockNameLabel + "navi.16";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriNaviCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     runinglockInfo.name = runnninglockNameLabel + "task.16";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriTaskCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(
@@ -792,7 +777,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest017, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest018, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_SET_BASE_MS;
     uint32_t timeoutIntervalMs = 10;
@@ -808,37 +792,37 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest018, TestSize.Level0)
     runinglockInfo.name = runnninglockNameLabel + "phone.17";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
     runinglockInfo.timeoutMs += timeoutIntervalMs;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriPhoneCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     runinglockInfo.name = runnninglockNameLabel + "notify.17";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION;
     runinglockInfo.timeoutMs += timeoutIntervalMs;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriNotifyCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
   
     runinglockInfo.name = runnninglockNameLabel + "audio.17";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO;
     runinglockInfo.timeoutMs += timeoutIntervalMs;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriAudioCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     runinglockInfo.name = runnninglockNameLabel + "sport.17";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
     runinglockInfo.timeoutMs += timeoutIntervalMs;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriSportCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     runinglockInfo.name = runnninglockNameLabel + "navi.17";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION;
     runinglockInfo.timeoutMs += timeoutIntervalMs;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriNaviCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     runinglockInfo.name = runnninglockNameLabel + "task.17";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     runinglockInfo.timeoutMs += timeoutIntervalMs;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(oriTaskCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     usleep(waitTimeOutMs * US_PER_MS);
@@ -859,7 +843,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest018, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest019, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = runnninglockNameLabel + "phone.18";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
@@ -868,14 +851,14 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest019, TestSize.Level0)
 
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
 
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     usleep(waitTimeOutMs * US_PER_MS);
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
  
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_DEFAULT;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     usleep(waitTimeOutMs * US_PER_MS);
@@ -890,7 +873,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest019, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest020, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = runnninglockNameLabel + "audio.19";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO;
@@ -900,11 +882,11 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest020, TestSize.Level0)
 
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
 
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     runinglockInfo.timeoutMs = updateTimeOutMs;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     usleep(waitTimeOutMs * US_PER_MS);
@@ -919,7 +901,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest020, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest021, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo {};
     runinglockInfo.name = runnninglockNameLabel + "sport.20";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
@@ -929,7 +910,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest021, TestSize.Level0)
 
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
 
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     usleep(manualUnholdTimeMs * US_PER_MS);
@@ -938,7 +919,7 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest021, TestSize.Level0)
     EXPECT_EQ(originCount, RunningLockImpl::GetCount(runinglockInfo.type));
 
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
 
     usleep(waitTimeOutMs * US_PER_MS);
@@ -956,21 +937,19 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest021, TestSize.Level0)
   */
 HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest022, TestSize.Level0)
 {
-    PowerHdfState powerState = PowerHdfState::AWAKE;
     RunningLockInfo runinglockInfo1 {};
     runinglockInfo1.name = runnninglockNameLabel + "task.22";
     runinglockInfo1.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo1));
 
     RunningLockInfo runinglockInfo2 {};
     runinglockInfo2.name = "";
     runinglockInfo2.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo2, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo2));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo2));
 
-    powerState = PowerHdfState::SLEEP;
-    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo1));
 }
 }

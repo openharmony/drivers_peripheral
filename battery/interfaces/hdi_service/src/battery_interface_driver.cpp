@@ -31,6 +31,10 @@ struct HdfBatteryInterfaceHost {
 static int32_t BatteryInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
+    if (client == nullptr || client->device == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "BatteryInterfaceDriverDispatch not initted");
+        return HDF_ERR_INVALID_PARAM;
+    }
     auto *hdfBatteryInterfaceHost = CONTAINER_OF(client->device->service, struct HdfBatteryInterfaceHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
@@ -56,6 +60,10 @@ static int32_t HdfBatteryInterfaceDriverInit([[maybe_unused]] struct HdfDeviceOb
 
 static int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
+    if (!deviceObject) {
+        BATTERY_HILOGE(COMP_HDI, "HdfBatteryInterfaceDriverBind not initted");
+        return HDF_FAILURE;
+    }
     auto *hdfBatteryInterfaceHost = new (std::nothrow) HdfBatteryInterfaceHost;
     if (hdfBatteryInterfaceHost == nullptr) {
         BATTERY_HILOGE(COMP_HDI, "%{public}s: failed to create HdfBatteryInterfaceHost object", __func__);
@@ -87,7 +95,7 @@ static int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObjec
 
 static void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    if (deviceObject->service == nullptr) {
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
         BATTERY_HILOGE(COMP_HDI, "HdfBatteryInterfaceDriverRelease not initted");
         return;
     }
