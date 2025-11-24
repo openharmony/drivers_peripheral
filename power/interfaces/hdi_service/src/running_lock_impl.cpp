@@ -40,7 +40,7 @@ std::unique_ptr<RunningLockTimerHandler> RunningLockImpl::timerHandler_ = nullpt
 std::map<RunningLockType, std::shared_ptr<RunningLockCounter>> RunningLockImpl::lockCounters_ = {};
 sptr<IPowerRunningLockCallback> g_iPowerRunningLockCallback = nullptr;
 
-int32_t RunningLockImpl::Hold(const RunningLockInfo &info, PowerHdfState state,
+int32_t RunningLockImpl::Hold(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -49,8 +49,8 @@ int32_t RunningLockImpl::Hold(const RunningLockInfo &info, PowerHdfState state,
         return HDF_ERR_INVALID_PARAM;
     }
     RunningLockInfo filledInfo = FillRunningLockInfo(info);
-    if (!IsValidType(filledInfo.type, state)) {
-        HDF_LOGW("Runninglock hold failed, type=%{public}d or state=%{public}d is invalid", filledInfo.type, state);
+    if (!IsValidType(filledInfo.type)) {
+        HDF_LOGW("Runninglock hold failed, type=%{public}d", filledInfo.type);
         return HDF_ERR_INVALID_PARAM;
     }
     auto iterator = lockCounters_.find(filledInfo.type);
@@ -107,12 +107,12 @@ int32_t RunningLockImpl::Unhold(const RunningLockInfo &info,
     return status;
 }
 
-int32_t RunningLockImpl::HoldLock(const RunningLockInfo &info, PowerHdfState state,
+int32_t RunningLockImpl::HoldLock(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (!IsValidType(info.type, state)) {
-        HDF_LOGW("HoldLock failed, type=%{public}d or state=%{public}d is invalid", info.type, state);
+    if (!IsValidType(info.type)) {
+        HDF_LOGW("HoldLock failed, type=%{public}d", info.type);
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t status = SystemOperation::WriteWakeLock(GetRunningLockTagInner(info.type));

@@ -65,6 +65,7 @@ public:
         wptr<BatteryInterfaceImpl> interfaceImpl_;
     };
 private:
+    std::mutex mutex_;
     std::unique_ptr<OHOS::HDI::Battery::V2_0::PowerSupplyProvider> powerSupplyProvider_ = nullptr;
     std::unique_ptr<OHOS::HDI::Battery::V2_0::BatteryThread> loop_ = nullptr;
     sptr<IBatteryCallback> batteryCallback_ = nullptr;
