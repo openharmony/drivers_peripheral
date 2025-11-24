@@ -171,7 +171,7 @@ bool BatteryConfig::OpenFile(std::ifstream& ifsConf, const std::string& configPa
 
     ifsConf.open(SYSTEM_BATTERY_CONFIG_PATH);
     isOpen = ifsConf.is_open();
-    BATTERY_HILOGI(FEATURE_CHARGING, "open then system battery_config.json is %{public}d", isOpen);
+    BATTERY_HILOGI(COMP_HDI, "open then system battery_config.json is %{public}d", isOpen);
     return isOpen;
 }
 
@@ -405,12 +405,12 @@ void BatteryConfig::ParseUeventConfig(const cJSON* ueventConfig)
         cJSON* subChild = nullptr;
         cJSON_ArrayForEach(subChild, valueObj) {
             if (subChild->string == nullptr) {
-                BATTERY_HILOGW(COMP_SVC, "Found null key in uevent conf");
+                BATTERY_HILOGW(COMP_HDI, "Found null key in uevent conf");
                 continue;
             }
             const std::string event = subChild->string;
             if (!HdfBatteryJsonUtils::IsValidJsonString(subChild)) {
-                BATTERY_HILOGW(COMP_SVC, "The uevent conf is invalid, key=%{public}s", key.c_str());
+                BATTERY_HILOGW(COMP_HDI, "The uevent conf is invalid, key=%{public}s", key.c_str());
                 continue;
             }
             std::string act = subChild->valuestring;
