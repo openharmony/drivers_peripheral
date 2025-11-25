@@ -908,7 +908,7 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, RegHwcEventCallbackTest)->
   * @tc.name: GetDisplayConnectionTypeTest
   * @tc.desc: Benchmarktest for interface GetDisplayConnectionType.
   */
-BENCHMARK_F(DisplayBenchmarkTest, GetDisplayConnectionTypeTest)(benchmark::State &state)
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplayConnectionTypeTest)(benchmark::State& state)
 {
     int32_t ret = 0;
     DisplayConnectionType connectionType;
