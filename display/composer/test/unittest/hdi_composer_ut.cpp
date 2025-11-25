@@ -1257,7 +1257,7 @@ HWTEST_F(DeviceTest, test_HdifdParcelable_Dump, TestSize.Level1)
 HWTEST_F(DeviceTest, test_GetDisplayConnectionType, TestSize.Level1)
 {
     int32_t result = DISPLAY_FAILURE;
-    GetDisplayConnectionType connectionType;
+    DisplayConnectionType connectionType;
     auto ret = g_composerDevice->GetDisplayConnectionType(g_displayIds[0], connectionType);
     if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         result = DISPLAY_SUCCESS;
