@@ -1249,7 +1249,7 @@ int32_t DisplayComposerService::GetDisplayConnectionType(uint32_t devId, V1_4::D
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayConnectionType, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiAdapter_->GetDisplayConnectionType(devId, outType);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
-        DISPLAY_LOGE("%{public}s fail ret:%{public}d", __func__, ret));
+        DISPLAY_LOGE("%{public}s fail ret:%{public}d, devId:%{public}u", __func__, ret, devId));
     return ret;
 }
 } // namespace Composer
