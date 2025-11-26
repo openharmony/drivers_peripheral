@@ -45,6 +45,8 @@ ohos_shared_library("liballocator_service_1.0") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_buffer_stub_1.2",
+    "drivers_interface_display:libdisplay_buffer_stub_1.3",
+    "drivers_interface_display:libdisplay_buffer_stub_1.4",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
