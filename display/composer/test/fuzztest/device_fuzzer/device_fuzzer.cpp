@@ -536,6 +536,16 @@ int TestRegHwcEventCallback(uint32_t devId)
     return ret;
 }
 
+int32_t TestGetDisplayConnectionType(uint32_t devId)
+{
+    DisplayConnectionType connectionType;
+    int32_t ret = g_composerInterface->GetDisplayConnectionType(devId, connectionType);
+    if (ret != DISPLAY_SUCCESS && ret != DISPLAY_NOT_SUPPORT) {
+        HDF_LOGE("%{public}s: failed, ret:%{public}d, devId:%{public}u", __func__, ret, devId);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -570,6 +580,7 @@ TestFuncs g_testFuncs = {
     TestCommit,
     TestGetDisplayIdentificationData,
     TestRegHwcEventCallback,
+    TestGetDisplayConnectionType,
 };
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
