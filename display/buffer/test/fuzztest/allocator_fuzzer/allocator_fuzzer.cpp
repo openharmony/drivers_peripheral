@@ -41,11 +41,10 @@ T GetData()
 {
     T object {};
     size_t objectSize = sizeof(object);
-    FuzzedDataProvider provider(g_data, g_dataSize);
-    if (provider.ConsumeIntegral<int>() == nullptr || objectSize > g_dataSize - g_pos) {
+    if (g_data == nullptr || objectSize > g_dataSize - g_pos) {
         return object;
     }
-    errno_t ret = memcpy_s(&object, objectSize, provider.ConsumeIntegral<int>() + g_pos, objectSize);
+    errno_t ret = memcpy_s(&object, objectSize, g_data + g_pos, objectSize);
     if (ret != EOK) {
         return {};
     }
@@ -66,10 +65,11 @@ static int32_t GetAllocInfo(OHOS::HDI::Display::Buffer::V1_0::AllocInfo& info)
         return DISPLAY_FAILURE;
     }
 
-    info.width = GetData<uint32_t>() % WIDTH;
-    info.height = GetData<uint32_t>() % HEIGHT;
-    info.usage = CONVERT_TABLE_USAGE[GetData<uint32_t>() % lenUsage];
-    info.format = CONVERT_TABLE_FORMAT[GetData<uint32_t>() % lenFormat];
+    FuzzedDataProvider provider(g_data, g_dataSize);
+    info.width = provider.ConsumeIntegral<int>() % WIDTH;
+    info.height = provider.ConsumeIntegral<int>() % HEIGHT;
+    info.usage = CONVERT_TABLE_USAGE[provider.ConsumeIntegral<int>() % lenUsage];
+    info.format = CONVERT_TABLE_FORMAT[provider.ConsumeIntegral<int>() % lenFormat];
     info.expectedSize = info.width * info.height;
     return DISPLAY_SUCCESS;
 }
