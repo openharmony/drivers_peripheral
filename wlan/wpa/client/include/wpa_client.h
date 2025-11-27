@@ -194,7 +194,7 @@ struct P2pProvisionDiscoveryCompletedParam {
     int provDiscStatusCode;
     int configMethods;
     unsigned char p2pDeviceAddress[ETH_ADDR_LEN];
-    unsigned char generatedPin[WIFI_PIN_CODE_LENGTH];
+    unsigned char generatedPin[WIFI_PIN_CODE_LENGTH + 1];
 };
 
 struct P2pServDiscRespParam {
