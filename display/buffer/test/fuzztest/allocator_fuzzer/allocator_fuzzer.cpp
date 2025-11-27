@@ -29,6 +29,7 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 static std::shared_ptr<OHOS::HDI::Display::Buffer::V1_4::IDisplayBuffer> g_bufferInterface = nullptr;
 
 static bool g_isInit = false;
+static const uint8_t* g_data = nullptr;
 static size_t g_dataSize = 0;
 static size_t g_pos;
 /*
@@ -40,6 +41,7 @@ T GetData()
 {
     T object {};
     size_t objectSize = sizeof(object);
+    FuzzedDataProvider provider(g_data, g_dataSize);
     if (provider.ConsumeIntegral<int>() == nullptr || objectSize > g_dataSize - g_pos) {
         return object;
     }
@@ -118,9 +120,9 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
             return false;
         }
     }
-    FuzzedDataProvider provider(rawData, size);
 
     // initialize data
+    g_data = rawData;
     g_dataSize = size;
     g_pos = 0;
     BufferHandle* buffer = UsingAllocmem();
