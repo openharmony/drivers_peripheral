@@ -178,6 +178,7 @@ int32_t AllocatorService::CloneDmaBufferHandle(const sptr<NativeBuffer>& inBuffe
     BufferHandle* inHandle = inBuffer->GetBufferHandle();
     BufferHandle* outHandle = nullptr;
 
+    CHECK_NULLPOINTER_RETURN_VALUE(inHandle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     HdfTrace traceOne("CloneDmaBufferHandle-VDI", "HDI:VDI:");
     int32_t ec = vdiImpl_->CloneDmaBufferHandle(*inHandle, outHandle);

@@ -21,6 +21,7 @@
 #include "hdf_base.h"
 #include "display_common_fuzzer.h"
 #include "v1_4/include/idisplay_buffer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer;
 using namespace OHOS::HDI::Display::Buffer::V1_4;
@@ -118,9 +119,10 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
             return false;
         }
     }
+    FuzzedDataProvider provider(rawData, size);
 
     // initialize data
-    g_data = rawData;
+    g_data = provider.ConsumeIntegral<int>();
     g_dataSize = size;
     g_pos = 0;
     BufferHandle* buffer = UsingAllocmem();
