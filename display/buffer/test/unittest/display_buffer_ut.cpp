@@ -670,7 +670,7 @@ HWTEST_F(DisplayBufferUt, test_CloneDmaBufferHandle002, TestSize.Level1)
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_RGBA_1010102
-    },
+    };
     int ret = CloneDmaBufferHandleTest(info);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS);
 }
