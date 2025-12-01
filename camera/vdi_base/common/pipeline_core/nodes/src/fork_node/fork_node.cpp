@@ -124,10 +124,11 @@ static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared
             CAMERA_LOGE("PcForkNode::DeliverBuffer error,  buffer->GetSize() == 0");
             return;
         }
-        auto bufferAddr = malloc(bufferSize);
+        auto [bufferAddr, dmaFd] = buffer->AllocateDmaBuffer(bufferSize);
         if (bufferAddr != nullptr) {
             forkBuffer->SetVirAddress(bufferAddr);
             forkBuffer->SetSize(bufferSize);
+            buffer->SetDmaBufFd(dmaFd);
         } else {
             CAMERA_LOGE("ForkNode::DeliverBuffer malloc buffer fail");
         }
