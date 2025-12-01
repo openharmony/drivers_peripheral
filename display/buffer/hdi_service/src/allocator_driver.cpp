@@ -17,14 +17,14 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/allocator_stub.h"
+#include "v1_4/allocator_stub.h"
 
 #undef LOG_TAG
 #define LOG_TAG "ALLOC_DRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
 
-using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS::HDI::Display::Buffer::V1_4;
 
 struct HdfAllocatorHost {
     struct IDeviceIoService ioService;
@@ -77,15 +77,15 @@ static int HdfAllocatorDriverBind(struct HdfDeviceObject* deviceObject)
 
     hdfAllocatorHost->ioService.Release = NULL;
 
-    auto serviceImpl = IAllocator::Get(true);
+    auto serviceImpl = OHOS::HDI::Display::Buffer::V1_4::IAllocator::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get the implement of service", __func__);
         delete hdfAllocatorHost;
         return HDF_FAILURE;
     }
 
-    hdfAllocatorHost->stub =
-        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IAllocator::GetDescriptor());
+    hdfAllocatorHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        OHOS::HDI::Display::Buffer::V1_4::IAllocator::GetDescriptor());
     if (hdfAllocatorHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfAllocatorHost;
