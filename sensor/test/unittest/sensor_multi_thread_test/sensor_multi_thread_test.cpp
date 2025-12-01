@@ -33,14 +33,291 @@ using namespace OHOS::HDI::Sensor::V3_1;
 using namespace OHOS::HDI::Sensor;
 using namespace testing::ext;
 namespace {
+    std::vector<std::vector<SubscribedSensor>> g_subscribedSensors{
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {10*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {20*ONE_MILLION, 0}
+            },
+        },
+    };
+
+    std::vector<std::vector<SubscribedSensor>> g_subscribedSensors1{
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {10*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {10*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {20*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {20*ONE_MILLION, 0}
+            },
+        },
+    };
+
+    std::vector<std::vector<SubscribedSensor>> g_subscribedSensors2{
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {10*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {10*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {20*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {20*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {30*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {30*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {40*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {40*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {50*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {50*ONE_MILLION, 0}
+            },
+        },
+    };
+
+    std::vector<std::vector<SubscribedSensor>> g_subscribedSensors3{
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {10*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {10*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {10*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {10*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {20*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {20*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {20*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {20*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {30*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {30*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {30*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {30*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {40*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {40*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {40*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {40*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {50*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {50*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {50*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {50*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {60*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {60*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {60*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {60*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {70*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {70*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {70*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {70*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {80*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {80*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {80*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {80*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {90*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {90*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {90*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {90*ONE_MILLION, 0}
+            },
+        },
+        {
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {100*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {100*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {100*ONE_MILLION, 0}
+            },
+            {
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {100*ONE_MILLION, 0}
+            },
+        },
+    };
+
     int32_t g_oneSecond = 1000;
     int32_t g_testTime = 10000;
+    float g_minMultiple = 0.5f;
+    float g_maxMultiple = 1.5f;
     class SensorSetBatchTest : public testing::Test {
     public:
         static void SetUpTestCase();
         static void TearDownTestCase();
         void SetUp();
         void TearDown();
+        static void TestGetSensorDatas(std::vector<std::vector<SubscribedSensor>> subscribedSensors);
         static void TestGetSensorData(int threadId, std::vector<SubscribedSensor> subscribedSensors);
         static void PerSecond(sptr<SensorCallbackImpl> sensorCallbackImpl);
     };
@@ -64,8 +341,8 @@ namespace {
     void SensorSetBatchTest::PerSecond(sptr<SensorCallbackImpl> sensorCallbackImpl)
     {
         for (auto& it : sensorCallbackImpl->subscribedSensors) {
-            it.expectedMinCount = g_oneSecond / (it.sensorInterval.samplingInterval / ONE_MILLION) / 2;
-            it.expectedMaxCount = g_oneSecond / (it.sensorInterval.samplingInterval / ONE_MILLION) * 3 / 2;
+            it.expectedMinCount = g_oneSecond / (it.sensorInterval.samplingInterval / ONE_MILLION) * g_minMultiple;
+            it.expectedMaxCount = g_oneSecond / (it.sensorInterval.samplingInterval / ONE_MILLION) * g_maxMultiple;
             printf("\033[92mcallbackId %d {%s} expectedMinCount is %s, expectedMaxCount is %s\033[0m\r\n",
                 sensorCallbackImpl->callbackId, SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo),
                 std::to_string(it.expectedMinCount).c_str(), std::to_string(it.expectedMaxCount).c_str());
@@ -76,12 +353,12 @@ namespace {
                 int32_t countPerSecond = it.sensorDataCount - it.sensorDataCountOld;
                 it.sensorDataCountOld = it.sensorDataCount;
                 if (countPerSecond > it.expectedMinCount && countPerSecond < it.expectedMaxCount) {
-                    printf("\033[92mCallbackId %d, as expected, 1000ms get sensor %s data count is %d, sensorDataCount is "
-                        "%d\033[0m\r\n", sensorCallbackImpl->callbackId,
+                    printf("\033[92mCallbackId %d, as expected, 1000ms get sensor %s data count is %d, "
+                        "sensorDataCount is %d\033[0m\r\n", sensorCallbackImpl->callbackId,
                         SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), countPerSecond, it.sensorDataCount);
                 } else {
-                    printf("\033[91mCallbackId %d, [ERROR] 1000ms get sensor %s data count is %d, sensorDataCount is "
-                        "%d\033[0m\r\n", sensorCallbackImpl->callbackId,
+                    printf("\033[91mCallbackId %d, [ERROR] 1000ms get sensor %s data count is %d, "
+                        "sensorDataCount is %d\033[0m\r\n", sensorCallbackImpl->callbackId,
                         SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), countPerSecond, it.sensorDataCount);
                 }
                 fflush(stdout);
@@ -125,6 +402,18 @@ namespace {
         EXPECT_EQ(ret, HDF_SUCCESS);
     }
 
+    void SensorSetBatchTest::TestGetSensorDatas(std::vector<std::vector<SubscribedSensor>> subscribedSensors)
+    {
+        std::vector<std::thread> threads;
+        for (int i = 0; i < g_subscribedSensors.size(); i++) {
+            std::thread t(TestGetSensorData, i, g_subscribedSensors[i]);
+            threads.push_back(std::move(t));
+        }
+        for (int i = 0; i < threads.size(); i++) {
+            threads[i].join();
+        }
+    }
+
     /**
      * @tc.name: TestGetSensorDataCase
      * @tc.desc: 2个线程，每个线程分别1个传感器.
@@ -133,24 +422,7 @@ namespace {
      */
     HWTEST_F(SensorSetBatchTest, TestGetSensorDataCase, TestSize.Level1)
     {
-        std::vector<SubscribedSensor> subscribedSensors{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors1{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
-            },
-        };
-
-        std::thread t(TestGetSensorData, 0, subscribedSensors);
-        std::thread t1(TestGetSensorData, 1, subscribedSensors1);
-
-        t.join();
-        t1.join();
+        TestGetSensorDatas(g_subscribedSensors);
     }
 
     /**
@@ -161,32 +433,7 @@ namespace {
      */
     HWTEST_F(SensorSetBatchTest, TestGetSensorDataCase1, TestSize.Level1)
     {
-        std::vector<SubscribedSensor> subscribedSensors{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors1{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
-            },
-        };
-
-        std::thread t(TestGetSensorData, 0, subscribedSensors);
-        std::thread t1(TestGetSensorData, 1, subscribedSensors1);
-
-        t.join();
-        t1.join();
+        TestGetSensorDatas(g_subscribedSensors1);
     }
 
     /**
@@ -197,68 +444,7 @@ namespace {
      */
     HWTEST_F(SensorSetBatchTest, TestGetSensorDataCase2, TestSize.Level1)
     {
-        std::vector<SubscribedSensor> subscribedSensors{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors1{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors2{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors3{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors4{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
-            },
-        };
-
-        std::thread t(TestGetSensorData, 0, subscribedSensors);
-        std::thread t1(TestGetSensorData, 1, subscribedSensors1);
-        std::thread t2(TestGetSensorData, 2, subscribedSensors2);
-        std::thread t3(TestGetSensorData, 3, subscribedSensors3);
-        std::thread t4(TestGetSensorData, 4, subscribedSensors4);
-
-        t.join();
-        t1.join();
-        t2.join();
-        t3.join();
-        t4.join();
+        TestGetSensorDatas(g_subscribedSensors2);
     }
 
     /**
@@ -269,207 +455,6 @@ namespace {
      */
     HWTEST_F(SensorSetBatchTest, TestGetSensorDataCase3, TestSize.Level1)
     {
-        std::vector<SubscribedSensor> subscribedSensors{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors1{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors2{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors3{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors4{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors5{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {60*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {60*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {60*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {60*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors6{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {70*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {70*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {70*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {70*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors7{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {80*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {80*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {80*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {80*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors8{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {90*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {90*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {90*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {90*ONE_MILLION, 0}
-            },
-        };
-        std::vector<SubscribedSensor> subscribedSensors9{
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {100*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {100*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {100*ONE_MILLION, 0}
-            },
-            {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {100*ONE_MILLION, 0}
-            },
-        };
-
-        std::thread t(TestGetSensorData, 0, subscribedSensors);
-        std::thread t1(TestGetSensorData, 1, subscribedSensors1);
-        std::thread t2(TestGetSensorData, 2, subscribedSensors2);
-        std::thread t3(TestGetSensorData, 3, subscribedSensors3);
-        std::thread t4(TestGetSensorData, 4, subscribedSensors4);
-        std::thread t5(TestGetSensorData, 5, subscribedSensors5);
-        std::thread t6(TestGetSensorData, 6, subscribedSensors6);
-        std::thread t7(TestGetSensorData, 7, subscribedSensors7);
-        std::thread t8(TestGetSensorData, 8, subscribedSensors8);
-        std::thread t9(TestGetSensorData, 9, subscribedSensors9);
-
-        t.join();
-        t1.join();
-        t2.join();
-        t3.join();
-        t4.join();
-        t5.join();
-        t6.join();
-        t7.join();
-        t8.join();
-        t9.join();
+        TestGetSensorDatas(g_subscribedSensors3);
     }
 }
