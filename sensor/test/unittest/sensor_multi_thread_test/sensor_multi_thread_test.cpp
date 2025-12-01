@@ -84,7 +84,7 @@ namespace {
         },
         {
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {20*ONE_MILLION, 0}
             },
             {
@@ -98,13 +98,13 @@ namespace {
                 {30*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {30*ONE_MILLION, 0}
             },
         },
         {
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {40*ONE_MILLION, 0}
             },
             {
@@ -139,7 +139,7 @@ namespace {
                 {10*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {10*ONE_MILLION, 0}
             },
         },
@@ -157,7 +157,7 @@ namespace {
                 {20*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {20*ONE_MILLION, 0}
             },
         },
@@ -175,7 +175,7 @@ namespace {
                 {30*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {30*ONE_MILLION, 0}
             },
         },
@@ -193,7 +193,7 @@ namespace {
                 {40*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {40*ONE_MILLION, 0}
             },
         },
@@ -211,7 +211,7 @@ namespace {
                 {50*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {50*ONE_MILLION, 0}
             },
         },
@@ -229,7 +229,7 @@ namespace {
                 {60*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {60*ONE_MILLION, 0}
             },
         },
@@ -247,7 +247,7 @@ namespace {
                 {70*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {70*ONE_MILLION, 0}
             },
         },
@@ -265,7 +265,7 @@ namespace {
                 {80*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {80*ONE_MILLION, 0}
             },
         },
@@ -283,7 +283,7 @@ namespace {
                 {90*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {90*ONE_MILLION, 0}
             },
         },
@@ -301,7 +301,7 @@ namespace {
                 {100*ONE_MILLION, 0}
             },
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {100*ONE_MILLION, 0}
             },
         },
@@ -343,9 +343,6 @@ namespace {
         for (auto& it : sensorCallbackImpl->subscribedSensors) {
             it.expectedMinCount = g_oneSecond / (it.sensorInterval.samplingInterval / ONE_MILLION) * g_minMultiple;
             it.expectedMaxCount = g_oneSecond / (it.sensorInterval.samplingInterval / ONE_MILLION) * g_maxMultiple;
-            printf("\033[92mcallbackId %d {%s} expectedMinCount is %s, expectedMaxCount is %s\033[0m\r\n",
-                sensorCallbackImpl->callbackId, SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo),
-                std::to_string(it.expectedMinCount).c_str(), std::to_string(it.expectedMaxCount).c_str());
         }
         for (int i = 0; i < g_testTime / g_oneSecond; i++) {
             OsalMSleep(g_oneSecond);
@@ -353,13 +350,19 @@ namespace {
                 int32_t countPerSecond = it.sensorDataCount - it.sensorDataCountOld;
                 it.sensorDataCountOld = it.sensorDataCount;
                 if (countPerSecond > it.expectedMinCount && countPerSecond < it.expectedMaxCount) {
-                    printf("\033[92mCallbackId %d, as expected, 1000ms get sensor %s data count is %d, "
-                        "sensorDataCount is %d\033[0m\r\n", sensorCallbackImpl->callbackId,
-                        SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), countPerSecond, it.sensorDataCount);
+                    printf("\033[92mCallbackId %d, as expected, 1000ms get sensor %s data count is %d,"
+                        " between (%d~%d) samplingInterval is %d, sensorDataCount is %d\033[0m\r\n",
+                        sensorCallbackImpl->callbackId,
+                        SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), countPerSecond,
+                        it.expectedMinCount, it.expectedMaxCount,
+                        (int32_t)(it.sensorInterval.samplingInterval / ONE_MILLION), it.sensorDataCount);
                 } else {
-                    printf("\033[91mCallbackId %d, [ERROR] 1000ms get sensor %s data count is %d, "
-                        "sensorDataCount is %d\033[0m\r\n", sensorCallbackImpl->callbackId,
-                        SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), countPerSecond, it.sensorDataCount);
+                    printf("\033[91mCallbackId %d, [ERROR] 1000ms get sensor %s data count is %d,"
+                        " between (%d~%d) samplingInterval is %d, sensorDataCount is %d\033[0m\r\n",
+                        sensorCallbackImpl->callbackId,
+                        SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), countPerSecond,
+                        it.expectedMinCount, it.expectedMaxCount,
+                        (int32_t)(it.sensorInterval.samplingInterval / ONE_MILLION), it.sensorDataCount);
                 }
                 fflush(stdout);
             }
