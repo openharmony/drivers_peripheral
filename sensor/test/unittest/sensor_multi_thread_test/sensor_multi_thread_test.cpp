@@ -405,8 +405,8 @@ namespace {
     void SensorSetBatchTest::TestGetSensorDatas(std::vector<std::vector<SubscribedSensor>> subscribedSensors)
     {
         std::vector<std::thread> threads;
-        for (int i = 0; i < g_subscribedSensors.size(); i++) {
-            std::thread t(TestGetSensorData, i, g_subscribedSensors[i]);
+        for (int i = 0; i < subscribedSensors.size(); i++) {
+            std::thread t(TestGetSensorData, i, subscribedSensors[i]);
             threads.push_back(std::move(t));
         }
         for (int i = 0; i < threads.size(); i++) {
