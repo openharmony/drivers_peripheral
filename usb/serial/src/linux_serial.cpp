@@ -235,15 +235,16 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
     }
     fdsan_exchange_owner_tag(serialPortList_[index].fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
-    if (tcgetattr(serialPortList_[index].fd, &options_) == -1) {
+    struct termios options = {};
+    if (tcgetattr(serialPortList_[index].fd, &options) == -1) {
         fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
         serialPortList_.erase(serialPortList_.begin() + index);
         return HDF_FAILURE;
     }
-    options_.c_lflag &= ~ICANON;
-    options_.c_lflag &= ~ECHO;
-    if (tcsetattr(serialPortList_[index].fd, TCSANOW, &options_) == -1) {
+    options.c_lflag &= ~ICANON;
+    options.c_lflag &= ~ECHO;
+    if (tcsetattr(serialPortList_[index].fd, TCSANOW, &options) == -1) {
         fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         HDF_LOGE("%{public}s: set attribute failed %{public}d.", __func__, errno);
         serialPortList_.erase(serialPortList_.begin() + index);
@@ -375,18 +376,19 @@ int32_t LinuxSerial::SerialGetAttribute(int32_t portId, SerialAttribute& attribu
     if (fd < 0) {
         return ERR_CODE_IOEXCEPTION;
     }
-    if (tcgetattr(fd, &options_) == -1) {
+    struct termios options = {};
+    if (tcgetattr(fd, &options) == -1) {
         HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
         return HDF_FAILURE;
     }
 
     for (const auto& pair : g_baudratePairs) {
-        if (static_cast<unsigned int>(pair.second) == cfgetispeed(&options_)) {
+        if (static_cast<unsigned int>(pair.second) == cfgetispeed(&options)) {
             attribute.baudrate = static_cast<unsigned int>(pair.first);
         }
     }
 
-    auto databits = options_.c_cflag & CSIZE;
+    auto databits = options.c_cflag & CSIZE;
 
     switch (databits) {
         case CS5:
@@ -406,13 +408,13 @@ int32_t LinuxSerial::SerialGetAttribute(int32_t portId, SerialAttribute& attribu
             return HDF_FAILURE;
     }
 
-    if (options_.c_cflag & PARENB) {
-        TranslateParity(options_.c_cflag, attribute);
+    if (options.c_cflag & PARENB) {
+        TranslateParity(options.c_cflag, attribute);
     } else {
         attribute.parity = USB_ATTR_PARITY_NONE;
     }
     
-    attribute.stopBits = (options_.c_cflag & CSTOPB) ? USB_ATTR_STOPBIT_2 : USB_ATTR_STOPBIT_1;
+    attribute.stopBits = (options.c_cflag & CSTOPB) ? USB_ATTR_STOPBIT_2 : USB_ATTR_STOPBIT_1;
     return HDF_SUCCESS;
 }
 
@@ -426,40 +428,41 @@ int32_t LinuxSerial::SerialSetAttribute(int32_t portId, const SerialAttribute& a
         return ERR_CODE_IOEXCEPTION;
     }
 
-    if (tcgetattr(fd, &options_) == -1) {
+    struct termios options = {};
+    if (tcgetattr(fd, &options) == -1) {
         HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
         return HDF_FAILURE;
     }
 
-    int ret = GetStopbits(options_.c_cflag, attribute.stopBits);
+    int ret = GetStopbits(options.c_cflag, attribute.stopBits);
     if (ret < 0) {
         HDF_LOGE("%{public}s: stopBits set fail.", __func__);
         return HDF_FAILURE;
     }
 
-    ret = GetParity(options_.c_cflag, attribute.parity);
+    ret = GetParity(options.c_cflag, attribute.parity);
     if (ret < 0) {
         HDF_LOGE("%{public}s:parity set fail.", __func__);
         return ret;
     }
 
-    options_.c_cflag &= ~CSIZE;
-    if (GetDatabits(attribute.dataBits, options_.c_cflag) < 0) {
+    options.c_cflag &= ~CSIZE;
+    if (GetDatabits(attribute.dataBits, options.c_cflag) < 0) {
         HDF_LOGE("%{public}s: dataBits set fail.", __func__);
         return HDF_FAILURE;
     }
     
-    options_.c_cflag |= (CLOCAL | CREAD);
+    options.c_cflag |= (CLOCAL | CREAD);
     if (GetBaudrate(attribute.baudrate) < 0) {
         HDF_LOGE("%{public}s: baudrate set fail.", __func__);
         return HDF_FAILURE;
     }
 
-    cfsetispeed(&options_, GetBaudrate(attribute.baudrate));
-    cfsetospeed(&options_, GetBaudrate(attribute.baudrate));
+    cfsetispeed(&options, GetBaudrate(attribute.baudrate));
+    cfsetospeed(&options, GetBaudrate(attribute.baudrate));
     while (retry-- > 0) {
         //dev/ttyUSB0
-        if (tcsetattr(fd, TCSANOW, &options_) == 0) {
+        if (tcsetattr(fd, TCSANOW, &options) == 0) {
             break;
         } else {
             HDF_LOGE("%{public}s: tcsetattr failed.", __func__);

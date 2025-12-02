@@ -72,7 +72,6 @@ private:
 private:
     std::mutex portMutex_;
     std::vector<Serialfd> serialPortList_;
-    struct termios options_ = {};
 };
 } // V1_0
 } // Serial
