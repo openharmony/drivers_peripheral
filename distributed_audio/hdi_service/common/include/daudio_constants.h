@@ -97,6 +97,7 @@ constexpr const char *FORCE_TYPE = "FORCE_TYPE";
 constexpr const char *HINT_TYPE = "HINT_TYPE";
 constexpr const char *RENDER_STATE_CHANGE_EVENT = "RENDER_STATE_CHANGE_EVENT";
 constexpr const char *AUDIO_STREAM_TYPE = "AUDIO_STREAM_TYPE";
+constexpr const char *KEY_INFO = "info";
 constexpr int32_t LOW_LATENCY_RENDER_ID = 1 << 1 | 1 << 0;
 constexpr int32_t DEFAULT_RENDER_ID = 1;
 constexpr int32_t DEFAULT_CAPTURE_ID = 1 << 27 | 1 << 0;

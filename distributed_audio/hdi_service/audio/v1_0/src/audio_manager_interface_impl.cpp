@@ -272,6 +272,32 @@ int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint
     return DH_SUCCESS;
 }
 
+void AudioManagerInterfaceImpl::HandleCaps(const std::string &capability, std::string &info, std::string &caps)
+{
+    cJSON *jParam = cJSON_Parse(capability.c_str());
+    if (jParam == nullptr) {
+        DHLOGE("Failed to parse JSON: %{public}s", cJSON_GetErrorPtr());
+        return;
+    }
+    cJSON *infoItem = cJSON_GetObjectItem(jParam, KEY_INFO);
+    if (infoItem == NULL || !cJSON_IsString(infoItem)) {
+        DHLOGE("Not found the keys of dhId.");
+        cJSON_Delete(jParam);
+        return;
+    }
+    info = infoItem->valuestring;
+    cJSON_DeleteItemFromObject(jParam, KEY_INFO);
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return;
+    }
+    caps = std::string(jsonData);
+    cJSON_free(jsonData);
+    cJSON_Delete(jParam);
+}
+
 int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
 {
     DHLOGD("Notify audio fwk event(type:%{public}d, adapter:%{public}s, pin:%{public}d).", event.eventType,
@@ -279,12 +305,23 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
     std::stringstream ss;
     ss << "EVENT_TYPE=" << event.eventType << ";NID=" << event.adapterName << ";PIN=" << event.dhId << ";VID=" <<
         event.volGroupId << ";IID=" << event.iptGroupId;
-
-    std::stringstream temp(ss.str());
-    temp << ";CAPS=" << event.caps;
-    std::string tempStr = temp.str();
-    if (strlen(tempStr.c_str()) <= SERVICE_INFO_LEN_MAX) {
-        ss << ";CAPS=" << event.caps;
+    if (event.caps.find(KEY_INFO) != event.caps.npos) {
+        std::string info = "";
+        std::string caps = "";
+        HandleCaps(event.caps, info, caps);
+        std::stringstream temp(ss.str());
+        temp << ";CAPS=" << caps << ";INFO=" << info;
+        std::string tempStr = temp.str();
+        if (strlen(tempStr.c_str()) <= SERVICE_INFO_LEN_MAX) {
+            ss << ";CAPS=" << caps << ";INFO=" << info;
+        }
+    } else {
+        std::stringstream temp(ss.str());
+        temp << ";CAPS=" << event.caps;
+        std::string tempStr = temp.str();
+        if (strlen(tempStr.c_str()) <= SERVICE_INFO_LEN_MAX) {
+            ss << ";CAPS=" << event.caps;
+        }
     }
 
     std::string eventInfo = ss.str();

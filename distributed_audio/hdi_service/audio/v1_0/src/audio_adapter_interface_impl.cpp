@@ -95,6 +95,7 @@ void AudioAdapterInterfaceImpl::SetSpeakerCallback(const int32_t dhId, const spt
         return;
     }
     extCallbackMap_[dhId] = spkCallback;
+    sinkDhId_ = dhId;
 }
 
 void AudioAdapterInterfaceImpl::SetMicCallback(const int32_t dhId, const sptr<IDAudioCallback> &micCallback)
@@ -447,14 +448,26 @@ int32_t AudioAdapterInterfaceImpl::GetDeviceStatus(AudioDeviceStatus& status)
 
 int32_t AudioAdapterInterfaceImpl::UpdateAudioRoute(const AudioRoute &route, int32_t &routeHandle)
 {
-    (void) route;
-    (void) routeHandle;
+    CHECK_AND_RETURN_RET_LOG(route.sinks.size() == 0, HDF_FAILURE, "route sinks is empty!");
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+    auto iter = extCallbackMap_.find(sinkDhId_);
+    CHECK_AND_RETURN_RET_LOG(iter == extCallbackMap_.end(), HDF_FAILURE, "cant't find callback.");
+    DAudioEvent event = { HDF_AUDIO_UPDATE_AUDIO_ROUTE, "" };
+    CHECK_AND_RETURN_RET_LOG(iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE,
+        "Update audio route failed.");
+    ++routeHandle;
     return HDF_SUCCESS;
 }
 
 int32_t AudioAdapterInterfaceImpl::ReleaseAudioRoute(int32_t routeHandle)
 {
     (void) routeHandle;
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+    auto iter = extCallbackMap_.find(sinkDhId_);
+    CHECK_AND_RETURN_RET_LOG(iter == extCallbackMap_.end(), HDF_FAILURE, "cant't find callback.");
+    DAudioEvent event = { HDF_AUDIO_RELEASE_AUDIO_ROUTE, "" };
+    CHECK_AND_RETURN_RET_LOG(iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE,
+        "Release audio route failed.");
     return HDF_SUCCESS;
 }
 
