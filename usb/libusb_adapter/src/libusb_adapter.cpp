@@ -647,7 +647,7 @@ int32_t LibusbAdapter::BulkTransferReadwithLength(const UsbDev &dev,
         HDF_LOGE("%{public}s interfaceId is invalid", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (length <= 0) {
+    if (length < 0) {
         HDF_LOGE("%{public}s: invalid length param, length: %{public}d.", __func__, length);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1110,7 +1110,7 @@ int32_t LibusbAdapter::ControlTransferReadwithLength(
         HDF_LOGE("%{public}s: this function is read, not write", __func__);
         return HDF_FAILURE;
     }
-    int32_t size = (ctrlParams.length <= 0 || ctrlParams.length > MAX_CONTROL_BUFF_SIZE)
+    int32_t size = (ctrlParams.length < 0 || ctrlParams.length > MAX_CONTROL_BUFF_SIZE)
         ? MAX_CONTROL_BUFF_SIZE : ctrlParams.length;
     std::vector<uint8_t> buffer(size);
 
@@ -1957,7 +1957,7 @@ int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTra
     }
     // 2.get buffer
     unsigned char *buffer = AllocAsyncBuffer(info, ashmem);
-    if (buffer == nullptr) {
+    if (buffer == nullptr && info.length != 0) {
         HDF_LOGE("%{public}s: alloc async buffer failed", __func__);
         return LIBUSB_ERROR_NO_MEM;
     }
@@ -2107,7 +2107,8 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
         return;
     }
     // write data to ashmem when direction is in
-    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN) {
+    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN &&
+        transfer->actual_length > 0) {
         HDF_LOGI("%{public}s: write data to ashmem", __func__);
         if (transfer->type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
             transfer->actual_length = transfer->length;
@@ -2268,14 +2269,14 @@ LibusbAsyncWrapper *LibusbAdapter::GetAsyncWrapper(const UsbDev &dev)
 
 uint8_t *LibusbAdapter::AllocAsyncBuffer(const V1_2::USBTransferInfo &info, const sptr<Ashmem> &ashmem)
 {
-    if (info.length <= 0) {
+    if (info.length < 0) {
         HDF_LOGE("%{public}s: invalid buffer length", __func__);
         return nullptr;
     }
     HDF_LOGI("%{public}s: malloc buffer", __func__);
     uint8_t *buffer = static_cast<uint8_t *>(OsalMemCalloc(info.length));
     if (buffer == nullptr) {
-        HDF_LOGE("%{public}s: malloc buffer failed", __func__);
+        HDF_LOGE("%{public}s: malloc buffer is nullptr", __func__);
         return nullptr;
     }
     uint32_t endpointId = static_cast<uint32_t>(info.endpoint) & LIBUSB_ENDPOINT_DIR_MASK;
