@@ -22,7 +22,7 @@
 #include "iam_logger.h"
 
 #include "user_auth_hdi.h"
-#include "v4_0/user_auth_interface_service.h"
+#include "v4_1/user_auth_interface_service.h"
 
 #undef LOG_TAG
 #define LOG_TAG "USER_AUTH_HDI"
@@ -31,7 +31,7 @@
 
 using namespace std;
 using namespace OHOS::UserIam::Common;
-using namespace OHOS::HDI::UserAuth::V4_0;
+using namespace OHOS::HDI::UserAuth::V4_1;
 
 namespace OHOS {
 namespace HDI {
@@ -105,7 +105,7 @@ void FillFuzzAuthParamBase(Parcel &parcel, AuthParamBase &authParamBase)
     IAM_LOGI("success");
 }
 
-void FillFuzzAuthParam(Parcel &parcel, AuthParam &authParam)
+void FillFuzzAuthParam(Parcel &parcel, AuthParamExt &authParam)
 {
     FillFuzzAuthParamBase(parcel, authParam.baseParam);
     authParam.authType = static_cast<AuthType>(parcel.ReadInt32());
@@ -181,7 +181,7 @@ void FillFuzzIdentifyResultInfo(Parcel &parcel, IdentifyResultInfo &identifyResu
     IAM_LOGI("success");
 }
 
-void FillFuzzEnrollParam(Parcel &parcel, EnrollParam &enrollParam)
+void FillFuzzEnrollParam(Parcel &parcel, EnrollParamExt &enrollParam)
 {
     enrollParam.authType = static_cast<AuthType>(parcel.ReadInt32());
     enrollParam.executorSensorHint = parcel.ReadUint32();
@@ -290,10 +290,13 @@ void FuzzBeginEnrollment(Parcel &parcel)
     IAM_LOGI("begin");
     std::vector<uint8_t> authToken;
     FillFuzzUint8Vector(parcel, authToken);
-    EnrollParam param;
-    FillFuzzEnrollParam(parcel, param);
+    EnrollParamExt paramExt;
+    FillFuzzEnrollParam(parcel, paramExt);
     ScheduleInfo info;
     FillFuzzScheduleInfo(parcel, info);
+    g_service.BeginEnrollmentExt(authToken, paramExt, info);
+
+    EnrollParam param;
     g_service.BeginEnrollment(authToken, param, info);
     IAM_LOGI("end");
 }
@@ -383,10 +386,13 @@ void FuzzBeginAuthentication(Parcel &parcel)
 {
     IAM_LOGI("begin");
     uint64_t contextId = parcel.ReadUint64();
-    AuthParam param;
-    FillFuzzAuthParam(parcel, param);
+    AuthParamExt paramExt;
+    FillFuzzAuthParam(parcel, paramExt);
     std::vector<ScheduleInfo> scheduleInfos;
     FillFuzzScheduleInfoVector(parcel, scheduleInfos);
+    g_service.BeginAuthenticationExt(contextId, paramExt, scheduleInfos);
+
+    AuthParam param;
     g_service.BeginAuthentication(contextId, param, scheduleInfos);
     IAM_LOGI("end");
 }

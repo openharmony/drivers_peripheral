@@ -16,45 +16,46 @@
 #ifndef USER_AUTH_HDI
 #define USER_AUTH_HDI
 
-#include "v4_0/iuser_auth_interface.h"
-#include "v4_0/user_auth_types.h"
-#include "v4_0/user_auth_interface_service.h"
+#include "v4_1/iuser_auth_interface.h"
+#include "v4_1/user_auth_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace UserAuth {
-using IUserAuthInterface = OHOS::HDI::UserAuth::V4_0::IUserAuthInterface;
-using UserAuthInterfaceService = OHOS::HDI::UserAuth::V4_0::UserAuthInterfaceService;
+using IUserAuthInterface = OHOS::HDI::UserAuth::V4_1::IUserAuthInterface;
+using UserAuthInterfaceService = OHOS::HDI::UserAuth::V4_1::UserAuthInterfaceService;
 
-using HdiAuthType = OHOS::HDI::UserAuth::V4_0::AuthType;
-using HdiExecutorRole = OHOS::HDI::UserAuth::V4_0::ExecutorRole;
-using HdiExecutorSecureLevel = OHOS::HDI::UserAuth::V4_0::ExecutorSecureLevel;
-using HdiPinSubType = OHOS::HDI::UserAuth::V4_0::PinSubType;
-using HdiScheduleMode = OHOS::HDI::UserAuth::V4_0::ScheduleMode;
-using HdiExecutorRegisterInfo = OHOS::HDI::UserAuth::V4_0::ExecutorRegisterInfo;
-using HdiExecutorInfo = OHOS::HDI::UserAuth::V4_0::ExecutorInfo;
-using HdiScheduleInfo = OHOS::HDI::UserAuth::V4_0::ScheduleInfo;
-using HdiAuthParam = OHOS::HDI::UserAuth::V4_0::AuthParam;
-using HdiExecutorSendMsg = OHOS::HDI::UserAuth::V4_0::ExecutorSendMsg;
-using HdiAuthResultInfo = OHOS::HDI::UserAuth::V4_0::AuthResultInfo;
-using HdiIdentifyResultInfo = OHOS::HDI::UserAuth::V4_0::IdentifyResultInfo;
-using HdiEnrollParam = OHOS::HDI::UserAuth::V4_0::EnrollParam;
-using HdiCredentialInfo = OHOS::HDI::UserAuth::V4_0::CredentialInfo;
-using HdiEnrolledInfo = OHOS::HDI::UserAuth::V4_0::EnrolledInfo;
-using HdiEnrollResultInfo = OHOS::HDI::UserAuth::V4_0::EnrollResultInfo;
-using HdiEnrolledState = OHOS::HDI::UserAuth::V4_0::EnrolledState;
-using HdiReuseUnlockInfo = OHOS::HDI::UserAuth::V4_0::ReuseUnlockInfo;
-using HdiReuseUnlockParam = OHOS::HDI::UserAuth::V4_0::ReuseUnlockParam;
-using HdiIMessageCallback = OHOS::HDI::UserAuth::V4_0::IMessageCallback;
-using HdiUserInfo = OHOS::HDI::UserAuth::V4_0::UserInfo;
-using HdiExtUserInfo = OHOS::HDI::UserAuth::V4_0::ExtUserInfo;
-using HdiAuthIntent = OHOS::HDI::UserAuth::V4_0::AuthIntent;
-using HdiGlobalConfigType = OHOS::HDI::UserAuth::V4_0::GlobalConfigType;
-using HdiGlobalConfigValue= OHOS::HDI::UserAuth::V4_0::GlobalConfigValue;
-using HdiGlobalConfigParam = OHOS::HDI::UserAuth::V4_0::GlobalConfigParam;
-using HdiUserAuthTokenPlain = OHOS::HDI::UserAuth::V4_0::UserAuthTokenPlain;
-using HdiCredentialOperateType = OHOS::HDI::UserAuth::V4_0::CredentialOperateType;
-using HdiCredentialOperateResult = OHOS::HDI::UserAuth::V4_0::CredentialOperateResult;
+using HdiAuthType = OHOS::HDI::UserAuth::V4_1::AuthType;
+using HdiExecutorRole = OHOS::HDI::UserAuth::V4_1::ExecutorRole;
+using HdiExecutorSecureLevel = OHOS::HDI::UserAuth::V4_1::ExecutorSecureLevel;
+using HdiPinSubType = OHOS::HDI::UserAuth::V4_1::PinSubType;
+using HdiScheduleMode = OHOS::HDI::UserAuth::V4_1::ScheduleMode;
+using HdiExecutorRegisterInfo = OHOS::HDI::UserAuth::V4_1::ExecutorRegisterInfo;
+using HdiExecutorInfo = OHOS::HDI::UserAuth::V4_1::ExecutorInfo;
+using HdiScheduleInfo = OHOS::HDI::UserAuth::V4_1::ScheduleInfo;
+using HdiAuthParam = OHOS::HDI::UserAuth::V4_1::AuthParam;
+using HdiAuthParamExt = OHOS::HDI::UserAuth::V4_1::AuthParamExt;
+using HdiExecutorSendMsg = OHOS::HDI::UserAuth::V4_1::ExecutorSendMsg;
+using HdiAuthResultInfo = OHOS::HDI::UserAuth::V4_1::AuthResultInfo;
+using HdiIdentifyResultInfo = OHOS::HDI::UserAuth::V4_1::IdentifyResultInfo;
+using HdiEnrollParam = OHOS::HDI::UserAuth::V4_1::EnrollParam;
+using HdiEnrollParamExt = OHOS::HDI::UserAuth::V4_1::EnrollParamExt;
+using HdiCredentialInfo = OHOS::HDI::UserAuth::V4_1::CredentialInfo;
+using HdiEnrolledInfo = OHOS::HDI::UserAuth::V4_1::EnrolledInfo;
+using HdiEnrollResultInfo = OHOS::HDI::UserAuth::V4_1::EnrollResultInfo;
+using HdiEnrolledState = OHOS::HDI::UserAuth::V4_1::EnrolledState;
+using HdiReuseUnlockInfo = OHOS::HDI::UserAuth::V4_1::ReuseUnlockInfo;
+using HdiReuseUnlockParam = OHOS::HDI::UserAuth::V4_1::ReuseUnlockParam;
+using HdiIMessageCallback = OHOS::HDI::UserAuth::V4_1::IMessageCallback;
+using HdiUserInfo = OHOS::HDI::UserAuth::V4_1::UserInfo;
+using HdiExtUserInfo = OHOS::HDI::UserAuth::V4_1::ExtUserInfo;
+using HdiAuthIntent = OHOS::HDI::UserAuth::V4_1::AuthIntent;
+using HdiGlobalConfigType = OHOS::HDI::UserAuth::V4_1::GlobalConfigType;
+using HdiGlobalConfigValue= OHOS::HDI::UserAuth::V4_1::GlobalConfigValue;
+using HdiGlobalConfigParam = OHOS::HDI::UserAuth::V4_1::GlobalConfigParam;
+using HdiUserAuthTokenPlain = OHOS::HDI::UserAuth::V4_1::UserAuthTokenPlain;
+using HdiCredentialOperateType = OHOS::HDI::UserAuth::V4_1::CredentialOperateType;
+using HdiCredentialOperateResult = OHOS::HDI::UserAuth::V4_1::CredentialOperateResult;
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS
