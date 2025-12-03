@@ -86,6 +86,7 @@ private:
         const std::string &deviceId, uint32_t dhId);
     int32_t RemoveClearRegisterRecipient(sptr<IRemoteObject> &remote,
         const std::string &deviceId, uint32_t dhId);
+    void HandleCaps(const std::string &capability, std::string &info, std::string &caps);
 
 private:
     class Deletor {
