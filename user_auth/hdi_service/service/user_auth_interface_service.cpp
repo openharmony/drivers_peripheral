@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v4_0/user_auth_interface_service.h"
+#include "v4_1/user_auth_interface_service.h"
 
 #include <cinttypes>
 #include <mutex>
@@ -524,7 +524,7 @@ static bool CopyAuthScheduleInfo(AuthParamHal paramHal, const CoAuthSchedule *in
     return true;
 }
 
-static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
+static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParamExt &param,
     AuthParamHal &paramHal)
 {
     paramHal.contextId = contextId;
@@ -558,10 +558,9 @@ static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const HdiAuthParam &param,
+static int32_t BeginAuthenticationInner(uint64_t contextId, const HdiAuthParamExt &param,
     std::vector<HdiScheduleInfo> &infos)
 {
-    IAM_LOGI("start");
     infos.clear();
     AuthParamHal paramHal = {};
     int32_t ret = CopyAuthParamToHal(contextId, param, paramHal);
@@ -600,6 +599,36 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     }
     DestroyLinkedList(schedulesGet);
     return ret;
+}
+
+int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const HdiAuthParam &param,
+    std::vector<HdiScheduleInfo> &infos)
+{
+    IAM_LOGI("start");
+    HdiAuthParamExt paramExt = {
+        .baseParam = {
+            .userId = param.baseParam.userId,
+            .authTrustLevel = param.baseParam.authTrustLevel,
+            .executorSensorHint = param.baseParam.executorSensorHint,
+            .challenge = param.baseParam.challenge,
+            .callerName = param.baseParam.callerName,
+            .callerType = param.baseParam.callerType,
+            .apiVersion = param.baseParam.apiVersion,
+        },
+        .authType = param.authType,
+        .authIntent = param.authIntent,
+        .isOsAccountVerified = param.isOsAccountVerified,
+        .collectorUdid = param.collectorUdid,
+        .credentialIdList = {},
+    };
+    return BeginAuthenticationInner(contextId, paramExt, infos);
+}
+
+int32_t UserAuthInterfaceService::BeginAuthenticationExt(uint64_t contextId, const HdiAuthParamExt &param,
+    std::vector<HdiScheduleInfo> &infos)
+{
+    IAM_LOGI("start");
+    return BeginAuthenticationInner(contextId, param, infos);
 }
 
 int32_t UserAuthInterfaceService::GetAllUserInfo(std::vector<UserInfo> &userInfos)
@@ -926,7 +955,7 @@ int32_t UserAuthInterfaceService::CloseSession(int32_t userId)
     return CloseEditSession();
 }
 
-static int32_t CheckOperatePermission(const std::vector<uint8_t> &authToken, const HdiEnrollParam &param,
+static int32_t CheckOperatePermission(const std::vector<uint8_t> &authToken, const HdiEnrollParamExt &param,
     PermissionCheckParam *checkParam, ScheduleType *scheduleType)
 {
     IAM_LOGI("start");
@@ -964,10 +993,9 @@ static int32_t CheckOperatePermission(const std::vector<uint8_t> &authToken, con
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::BeginEnrollment(
-    const std::vector<uint8_t> &authToken, const HdiEnrollParam &param, HdiScheduleInfo &info)
+static int32_t BeginEnrollmentInner(
+    const std::vector<uint8_t> &authToken, const HdiEnrollParamExt &param, HdiScheduleInfo &info)
 {
-    IAM_LOGI("start");
     PermissionCheckParam checkParam = {};
     ScheduleType scheduleType = SCHEDULE_TYPE_ENROLL;
     int32_t ret = CheckOperatePermission(authToken, param, &checkParam, &scheduleType);
@@ -995,6 +1023,31 @@ int32_t UserAuthInterfaceService::BeginEnrollment(
     DestroyCoAuthSchedule(scheduleInfo);
     IAM_LOGI("end");
     return ret;
+}
+
+int32_t UserAuthInterfaceService::BeginEnrollment(
+    const std::vector<uint8_t> &authToken, const HdiEnrollParam &param, HdiScheduleInfo &info)
+{
+    IAM_LOGI("start");
+    HdiEnrollParamExt paramExt = {
+        .authType = param.authType,
+        .executorSensorHint = param.executorSensorHint,
+        .callerName = param.callerName,
+        .callerType = param.callerType,
+        .apiVersion = param.apiVersion,
+        .userId = param.userId,
+        .userType = param.userType,
+        .authSubType = param.authSubType,
+        .additionalInfo = "",
+    };
+    return BeginEnrollmentInner(authToken, paramExt, info);
+}
+
+int32_t UserAuthInterfaceService::BeginEnrollmentExt(
+    const std::vector<uint8_t> &authToken, const HdiEnrollParamExt &param, HdiScheduleInfo &info)
+{
+    IAM_LOGI("start");
+    return BeginEnrollmentInner(authToken, param, info);
 }
 
 int32_t UserAuthInterfaceService::CancelEnrollment(int32_t userId)
