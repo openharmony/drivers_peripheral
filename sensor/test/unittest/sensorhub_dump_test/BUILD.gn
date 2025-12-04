@@ -17,8 +17,8 @@ import("../../../sensor.gni")
 
 module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorHubDumpTest"
 
-ohos_unittest(SensorHubDumpTest) {
-    module_out_path = module_output_path
+ohos_unittest("SensorHubDumpTest") {
+  module_out_path = module_output_path
 
   include_dirs = [
     "../../../interfaces/include",
