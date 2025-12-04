@@ -108,11 +108,11 @@ namespace {
      *@tc.type: FUNC
      *@tc.require:#I4L3LF
      */
-    HWTEST_F(SensorSetBatchTest, SensorSetBatchTest1, TestSize.level1)
+    HWTEST_F(SensorSetBatchTest, SensorSetBatchTest1, TestSize.Level1)
     {
         int32_t ret = g_sensorInterface->Register(0, g_traditionalCallback);
         EXPECT_EQ(ret, HDF_SUCCESS);
-        ret = g_sensorInterface->setBatch(g_deviceSensorInfo, g_samplingInterval, 0);
+        ret = g_sensorInterface->SetBatch(g_deviceSensorInfo, g_samplingInterval, 0);
         printf("SetBatch{%s}, %s, 0", SENSOR_HANDLE_TO_C_STR(g_deviceSensorInfo),
             std::to_string(g_samplingInterval).c_str());
         EXPECT_EQ(ret, HDF_SUCCESS);
