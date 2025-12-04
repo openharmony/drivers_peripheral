@@ -35,9 +35,9 @@ int32_t SensorCallbackImpl::sensorDataCountOld = 0;
 bool SensorCallbackImpl::printDataFlag = false;
 
 namespace {
-    sptr<V3_0::ISensor_interface> g_sensorInterface = nullptr;
+    sptr<V3_0::ISensorInterface> g_sensorInterface = nullptr;
     sptr<V3_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
-    deviceSensorInfo g_deviceSensorInfo = {-1, 1, 0, 1};
+    DeviceSensorInfo g_deviceSensorInfo = {-1, 1, 0, 1};
     int64_t g_samplingInterval = 10000000;
     int64_t g_testTime = 10000;
     int64_t g_testTime2 = 120000;
@@ -55,7 +55,7 @@ namespace {
     {
         g_sensorInterface = V3_0::ISensorInterface::Get();
 
-        const char* testSensotType = std::getenv("testSensorType");
+        const char* testSensorType = std::getenv("testSensorType");
         if (testSensorType) {
             printf("testSensorType=%s\r\n", testSensorType);
             g_deviceSensorInfo.sensorType = std::atoi(testSensorType);
@@ -136,7 +136,7 @@ namespace {
                 printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
                     countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
-            printf("pless execute sensorhub dump.bat within %ld seconds\r\n", (g_testTime / 1000 - i));
+            printf("pless execute sensorhub dump.bat within %lld seconds\r\n", (g_testTime / 1000 - i));
             fflush(stdout);
         }
         
@@ -156,7 +156,7 @@ namespace {
                 printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
                     countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
-            printf("pless execute sensorhub dump.bat within %ld seconds\r\n", (g_testTime / 1000 - i));
+            printf("pless execute sensorhub dump.bat within %lld seconds\r\n", (g_testTime / 1000 - i));
             fflush(stdout);
         }
 
