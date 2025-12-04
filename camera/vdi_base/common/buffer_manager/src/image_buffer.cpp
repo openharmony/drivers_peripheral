@@ -262,7 +262,7 @@ void ImageBuffer::SetUsage(const uint64_t usage)
 void ImageBuffer::SetVirAddress(const void* addr)
 {
     std::lock_guard<std::mutex> l(l_);
-    CAMERA_LOGI("ImageBuffer::SetVirAddress");
+    CAMERA_LOGI("ImageBuffer::SetVirAddress, streamId = %{public}d, index = %{public}d", streamId_, index_);
     virAddr_ = const_cast<void*>(addr);
     return;
 }
