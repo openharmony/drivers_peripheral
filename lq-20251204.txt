@@ -1,0 +1,456 @@
+diff --git a/camera/test/BUILD.gn b/camera/test/BUILD.gn
+index 9b83d7861..d9062981a 100644
+--- a/camera/test/BUILD.gn
++++ b/camera/test/BUILD.gn
+@@ -29,9 +29,9 @@ group("camera_hal_test") {
+       "$test_path/ut/v4l2:camera_test_v4l2_ut",
+       "$test_path/ut/camera_vendor_tag:camera_vendor_tag_hdi_test",
+       "$test_path/benchmarktest/metadata:hdf_camera_vendor_tag_benchmark_test",
+-      "$test_path/fuzztest/getvendortagname:get_vendor_tag_name_fuzz",
+-      "$test_path/fuzztest/getvendortagtype:get_vendor_tag_type_fuzz",
+-      "$test_path/fuzztest/getallvendortags:get_all_vendor_tags_fuzz",
++      "$test_path/fuzztest/getvendortagname_fuzzer:fuzztest",
++      "$test_path/fuzztest/getvendortagtype_fuzzer:fuzztest",
++      "$test_path/fuzztest/getallvendortags_fuzzer:fuzztest",
+     ]
+   }
+   deps += [
+diff --git a/camera/test/fuzztest/BUILD.gn b/camera/test/fuzztest/BUILD.gn
+index ccc524984..a9420078a 100644
+--- a/camera/test/fuzztest/BUILD.gn
++++ b/camera/test/fuzztest/BUILD.gn
+@@ -81,8 +81,5 @@ group("camera_hdi_fuzztest") {
+     "camera_host:fuzztest",
+     "defferred_delivery_image:fuzztest",
+     "stream_operator:fuzztest",
+-    "getallvendortags:fuzztest",
+-    "getvendortagname:fuzztest",
+-    "getvendortagtype:fuzztest",
+   ]
+ }
+diff --git a/camera/test/fuzztest/getallvendortags/BUILD.gn b/camera/test/fuzztest/getallvendortags_fuzzer/BUILD.gn
+similarity index 51%
+rename from camera/test/fuzztest/getallvendortags/BUILD.gn
+rename to camera/test/fuzztest/getallvendortags_fuzzer/BUILD.gn
+index e53439c55..747dded53 100644
+--- a/camera/test/fuzztest/getallvendortags/BUILD.gn
++++ b/camera/test/fuzztest/getallvendortags_fuzzer/BUILD.gn
+@@ -1,4 +1,4 @@
+-# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
++# Copyright (c) 2025 Huawei Device Co., Ltd.
+ # Licensed under the Apache License, Version 2.0 (the "License");
+ # you may not use this file except in compliance with the License.
+ # You may obtain a copy of the License at
+@@ -11,32 +11,15 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+
+-import("../../../camera.gni")
+-
++import("//build/config/features.gni")
+ import("//build/ohos.gni")
+ import("//build/test.gni")
+-
+ module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
+
+-config("camhdi_host_config") {
+-  visibility = [ ":*" ]
+-  cflags_cc = [
+-    "-DGST_DISABLE_DEPRECATED",
+-    "-DHAVE_CONFIG_H",
+-    "-DCOLORSPACE=\"videoconvert\"",
+-  ]
+-}
+-
+-ohos_fuzztest("get_all_vendor_tags_fuzz") {
+-  testonly = true
++ohos_fuzztest("GetAllVendorTagsFuzzTest") {
+   module_out_path = module_output_path
+-  fuzz_config_file = "$camera_path/../../test/fuzztest/camera_host"
+-  sources = [
+-    "./getallvendortags_fuzz_test.cpp",
+-  ]
+
+-  include_dirs = [
+-  ]
++  fuzz_config_file = "../getallvendortags_fuzzer"
+
+   cflags = [
+     "-g",
+@@ -45,31 +28,22 @@ ohos_fuzztest("get_all_vendor_tags_fuzz") {
+     "-fno-omit-frame-pointer",
+   ]
+
+-  if (is_standard_system) {
+-    external_deps = [
+-      "c_utils:utils",
+-      "hdf_core:libhdf_host",
+-      "hdf_core:libhdf_ipc_adapter",
+-      "hdf_core:libhdf_utils",
+-      "hdf_core:libhdi",
+-      "hilog:libhilog",
+-      "ipc:ipc_single",
+-    ]
+-  } else {
+-    external_deps = [ "hilog:libhilog" ]
+-  }
++  sources = [ "getallvendortags_fuzzer.cpp" ]
+
+-  external_deps += [
++  external_deps = [
++    "c_utils:utils",
+     "drivers_interface_camera:libcamera_vendor_tag_proxy_1.0",
++    "hdf_core:libhdf_utils",
++    "hilog:libhilog",
++    "ipc:ipc_single",
+   ]
+-  public_configs = [ ":camhdi_host_config" ]
+ }
+
+ group("fuzztest") {
+   testonly = true
+   deps = []
+   deps += [
+-    # dep file
+-    ":get_all_vendor_tags_fuzz",
++    # deps file
++    ":GetAllVendorTagsFuzzTest",
+   ]
+ }
+diff --git a/camera/test/fuzztest/getallvendortags/corpus/init b/camera/test/fuzztest/getallvendortags_fuzzer/corpus/init
+similarity index 100%
+rename from camera/test/fuzztest/getallvendortags/corpus/init
+rename to camera/test/fuzztest/getallvendortags_fuzzer/corpus/init
+diff --git a/camera/test/fuzztest/getallvendortags/getallvendortags_fuzz_test.cpp b/camera/test/fuzztest/getallvendortags_fuzzer/getallvendortags_fuzzer.cpp
+similarity index 97%
+rename from camera/test/fuzztest/getallvendortags/getallvendortags_fuzz_test.cpp
+rename to camera/test/fuzztest/getallvendortags_fuzzer/getallvendortags_fuzzer.cpp
+index a5ebba6cf..b2d07dbc2 100644
+--- a/camera/test/fuzztest/getallvendortags/getallvendortags_fuzz_test.cpp
++++ b/camera/test/fuzztest/getallvendortags_fuzzer/getallvendortags_fuzzer.cpp
+@@ -13,7 +13,7 @@
+  * limitations under the License.
+  */
+
+-#include "getallvendortags_fuzz_test.h"
++#include "getallvendortags_fuzzer.h"
+ #include <cstddef>
+ #include <cstdint>
+ #include "hdf_log.h"
+diff --git a/camera/test/fuzztest/getvendortagtype/getvendortagtype_fuzz_test.h b/camera/test/fuzztest/getallvendortags_fuzzer/getallvendortags_fuzzer.h
+similarity index 69%
+rename from camera/test/fuzztest/getvendortagtype/getvendortagtype_fuzz_test.h
+rename to camera/test/fuzztest/getallvendortags_fuzzer/getallvendortags_fuzzer.h
+index 80391c204..f0c5a1902 100644
+--- a/camera/test/fuzztest/getvendortagtype/getvendortagtype_fuzz_test.h
++++ b/camera/test/fuzztest/getallvendortags_fuzzer/getallvendortags_fuzzer.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2022 Huawei Device Co., Ltd.
++ * Copyright (c) 2025 Huawei Device Co., Ltd.
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+@@ -13,9 +13,9 @@
+  * limitations under the License.
+  */
+
+-#ifndef OHOS_CAMERA_VENDOR_TAG_FUZZ_TEST_H
+-#define OHOS_CAMERA_VENDOR_TAG_FUZZ_TEST_H
++#ifndef GETALLVENDORTAGS_FUZZ_TEST_H
++#define GETALLVENDORTAGS_FUZZ_TEST_H
+
+-#define FUZZ_PROJECT_NAME "camera_vendor_tag_fuzz_test"
++#define FUZZ_PROJECT_NAME "getallvendortags_fuzz_test"
+
+-#endif // OHOS_CAMERA_VENDOR_TAG_FUZZ_TEST_H
+\ No newline at end of file
++#endif // GETALLVENDORTAGS_FUZZ_TEST_H
+diff --git a/camera/test/fuzztest/getallvendortags/project.xml b/camera/test/fuzztest/getallvendortags_fuzzer/project.xml
+similarity index 100%
+rename from camera/test/fuzztest/getallvendortags/project.xml
+rename to camera/test/fuzztest/getallvendortags_fuzzer/project.xml
+diff --git a/camera/test/fuzztest/getvendortagtype/BUILD.gn b/camera/test/fuzztest/getvendortagname_fuzzer/BUILD.gn
+similarity index 51%
+rename from camera/test/fuzztest/getvendortagtype/BUILD.gn
+rename to camera/test/fuzztest/getvendortagname_fuzzer/BUILD.gn
+index a37f11947..57a3c195d 100644
+--- a/camera/test/fuzztest/getvendortagtype/BUILD.gn
++++ b/camera/test/fuzztest/getvendortagname_fuzzer/BUILD.gn
+@@ -1,4 +1,4 @@
+-# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
++# Copyright (c) 2025 Huawei Device Co., Ltd.
+ # Licensed under the Apache License, Version 2.0 (the "License");
+ # you may not use this file except in compliance with the License.
+ # You may obtain a copy of the License at
+@@ -11,32 +11,15 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+
+-import("../../../camera.gni")
+-
++import("//build/config/features.gni")
+ import("//build/ohos.gni")
+ import("//build/test.gni")
+-
+ module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
+
+-config("camhdi_host_config") {
+-  visibility = [ ":*" ]
+-  cflags_cc = [
+-    "-DGST_DISABLE_DEPRECATED",
+-    "-DHAVE_CONFIG_H",
+-    "-DCOLORSPACE=\"videoconvert\"",
+-  ]
+-}
+-
+-ohos_fuzztest("get_vendor_tag_type_fuzz") {
+-  testonly = true
++ohos_fuzztest("GetVendorTagNameFuzzTest") {
+   module_out_path = module_output_path
+-  fuzz_config_file = "$camera_path/../../test/fuzztest/camera_host"
+-  sources = [
+-    "./getvendortagtype_fuzz_test.cpp",
+-  ]
+
+-  include_dirs = [
+-  ]
++  fuzz_config_file = "../getvendortagname_fuzzer"
+
+   cflags = [
+     "-g",
+@@ -45,31 +28,22 @@ ohos_fuzztest("get_vendor_tag_type_fuzz") {
+     "-fno-omit-frame-pointer",
+   ]
+
+-  if (is_standard_system) {
+-    external_deps = [
+-      "c_utils:utils",
+-      "hdf_core:libhdf_host",
+-      "hdf_core:libhdf_ipc_adapter",
+-      "hdf_core:libhdf_utils",
+-      "hdf_core:libhdi",
+-      "hilog:libhilog",
+-      "ipc:ipc_single",
+-    ]
+-  } else {
+-    external_deps = [ "hilog:libhilog" ]
+-  }
++  sources = [ "getvendortagname_fuzzer.cpp" ]
+
+-  external_deps += [
++  external_deps = [
++    "c_utils:utils",
+     "drivers_interface_camera:libcamera_vendor_tag_proxy_1.0",
++    "hdf_core:libhdf_utils",
++    "hilog:libhilog",
++    "ipc:ipc_single",
+   ]
+-  public_configs = [ ":camhdi_host_config" ]
+ }
+
+ group("fuzztest") {
+   testonly = true
+   deps = []
+   deps += [
+-    # dep file
+-    ":get_vendor_tag_type_fuzz",
++    # deps file
++    ":GetVendorTagNameFuzzTest",
+   ]
+ }
+diff --git a/camera/test/fuzztest/getvendortagname/corpus/init b/camera/test/fuzztest/getvendortagname_fuzzer/corpus/init
+similarity index 100%
+rename from camera/test/fuzztest/getvendortagname/corpus/init
+rename to camera/test/fuzztest/getvendortagname_fuzzer/corpus/init
+diff --git a/camera/test/fuzztest/getvendortagname/getvendortagname_fuzz_test.cpp b/camera/test/fuzztest/getvendortagname_fuzzer/getvendortagname_fuzzer.cpp
+similarity index 97%
+rename from camera/test/fuzztest/getvendortagname/getvendortagname_fuzz_test.cpp
+rename to camera/test/fuzztest/getvendortagname_fuzzer/getvendortagname_fuzzer.cpp
+index 523c9cf1d..89997c436 100644
+--- a/camera/test/fuzztest/getvendortagname/getvendortagname_fuzz_test.cpp
++++ b/camera/test/fuzztest/getvendortagname_fuzzer/getvendortagname_fuzzer.cpp
+@@ -13,7 +13,7 @@
+  * limitations under the License.
+  */
+
+-#include "getvendortagname_fuzz_test.h"
++#include "getvendortagname_fuzzer.h"
+ #include <cstddef>
+ #include <cstdint>
+ #include "hdf_log.h"
+diff --git a/camera/test/fuzztest/getallvendortags/getallvendortags_fuzz_test.h b/camera/test/fuzztest/getvendortagname_fuzzer/getvendortagname_fuzzer.h
+similarity index 69%
+rename from camera/test/fuzztest/getallvendortags/getallvendortags_fuzz_test.h
+rename to camera/test/fuzztest/getvendortagname_fuzzer/getvendortagname_fuzzer.h
+index 80391c204..6d8dbc311 100644
+--- a/camera/test/fuzztest/getallvendortags/getallvendortags_fuzz_test.h
++++ b/camera/test/fuzztest/getvendortagname_fuzzer/getvendortagname_fuzzer.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2022 Huawei Device Co., Ltd.
++ * Copyright (c) 2025 Huawei Device Co., Ltd.
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+@@ -13,9 +13,9 @@
+  * limitations under the License.
+  */
+
+-#ifndef OHOS_CAMERA_VENDOR_TAG_FUZZ_TEST_H
+-#define OHOS_CAMERA_VENDOR_TAG_FUZZ_TEST_H
++#ifndef GETVENDORTAGNAME_FUZZ_TEST_H
++#define GETVENDORTAGNAME_FUZZ_TEST_H
+
+-#define FUZZ_PROJECT_NAME "camera_vendor_tag_fuzz_test"
++#define FUZZ_PROJECT_NAME "getvendortagname_fuzz_test"
+
+-#endif // OHOS_CAMERA_VENDOR_TAG_FUZZ_TEST_H
+\ No newline at end of file
++#endif // GETVENDORTAGNAME_FUZZ_TEST_H
+diff --git a/camera/test/fuzztest/getvendortagname/project.xml b/camera/test/fuzztest/getvendortagname_fuzzer/project.xml
+similarity index 100%
+rename from camera/test/fuzztest/getvendortagname/project.xml
+rename to camera/test/fuzztest/getvendortagname_fuzzer/project.xml
+diff --git a/camera/test/fuzztest/getvendortagname/BUILD.gn b/camera/test/fuzztest/getvendortagtype_fuzzer/BUILD.gn
+similarity index 51%
+rename from camera/test/fuzztest/getvendortagname/BUILD.gn
+rename to camera/test/fuzztest/getvendortagtype_fuzzer/BUILD.gn
+index 89ee13c64..60cb37de0 100644
+--- a/camera/test/fuzztest/getvendortagname/BUILD.gn
++++ b/camera/test/fuzztest/getvendortagtype_fuzzer/BUILD.gn
+@@ -1,4 +1,4 @@
+-# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
++# Copyright (c) 2025 Huawei Device Co., Ltd.
+ # Licensed under the Apache License, Version 2.0 (the "License");
+ # you may not use this file except in compliance with the License.
+ # You may obtain a copy of the License at
+@@ -11,32 +11,15 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+
+-import("../../../camera.gni")
+-
++import("//build/config/features.gni")
+ import("//build/ohos.gni")
+ import("//build/test.gni")
+-
+ module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
+
+-config("camhdi_host_config") {
+-  visibility = [ ":*" ]
+-  cflags_cc = [
+-    "-DGST_DISABLE_DEPRECATED",
+-    "-DHAVE_CONFIG_H",
+-    "-DCOLORSPACE=\"videoconvert\"",
+-  ]
+-}
+-
+-ohos_fuzztest("get_vendor_tag_name_fuzz") {
+-  testonly = true
++ohos_fuzztest("GetVendorTagTypeFuzzTest") {
+   module_out_path = module_output_path
+-  fuzz_config_file = "$camera_path/../../test/fuzztest/camera_host"
+-  sources = [
+-    "./getvendortagname_fuzz_test.cpp",
+-  ]
+
+-  include_dirs = [
+-  ]
++  fuzz_config_file = "../getvendortagtype_fuzzer"
+
+   cflags = [
+     "-g",
+@@ -45,31 +28,22 @@ ohos_fuzztest("get_vendor_tag_name_fuzz") {
+     "-fno-omit-frame-pointer",
+   ]
+
+-  if (is_standard_system) {
+-    external_deps = [
+-      "c_utils:utils",
+-      "hdf_core:libhdf_host",
+-      "hdf_core:libhdf_ipc_adapter",
+-      "hdf_core:libhdf_utils",
+-      "hdf_core:libhdi",
+-      "hilog:libhilog",
+-      "ipc:ipc_single",
+-    ]
+-  } else {
+-    external_deps = [ "hilog:libhilog" ]
+-  }
++  sources = [ "getvendortagtype_fuzzer.cpp" ]
+
+-  external_deps += [
++  external_deps = [
++    "c_utils:utils",
+     "drivers_interface_camera:libcamera_vendor_tag_proxy_1.0",
++    "hdf_core:libhdf_utils",
++    "hilog:libhilog",
++    "ipc:ipc_single",
+   ]
+-  public_configs = [ ":camhdi_host_config" ]
+ }
+
+ group("fuzztest") {
+   testonly = true
+   deps = []
+   deps += [
+-    # dep file
+-    ":get_vendor_tag_name_fuzz",
++    # deps file
++    ":GetVendorTagTypeFuzzTest",
+   ]
+ }
+diff --git a/camera/test/fuzztest/getvendortagtype/corpus/init b/camera/test/fuzztest/getvendortagtype_fuzzer/corpus/init
+similarity index 100%
+rename from camera/test/fuzztest/getvendortagtype/corpus/init
+rename to camera/test/fuzztest/getvendortagtype_fuzzer/corpus/init
+diff --git a/camera/test/fuzztest/getvendortagtype/getvendortagtype_fuzz_test.cpp b/camera/test/fuzztest/getvendortagtype_fuzzer/getvendortagtype_fuzzer.cpp
+similarity index 97%
+rename from camera/test/fuzztest/getvendortagtype/getvendortagtype_fuzz_test.cpp
+rename to camera/test/fuzztest/getvendortagtype_fuzzer/getvendortagtype_fuzzer.cpp
+index 390cfc4fb..1054cb55d 100644
+--- a/camera/test/fuzztest/getvendortagtype/getvendortagtype_fuzz_test.cpp
++++ b/camera/test/fuzztest/getvendortagtype_fuzzer/getvendortagtype_fuzzer.cpp
+@@ -13,7 +13,7 @@
+  * limitations under the License.
+  */
+
+-#include "getvendortagtype_fuzz_test.h"
++#include "getvendortagtype_fuzzer.h"
+ #include <cstddef>
+ #include <cstdint>
+ #include "hdf_log.h"
+diff --git a/camera/test/fuzztest/getvendortagname/getvendortagname_fuzz_test.h b/camera/test/fuzztest/getvendortagtype_fuzzer/getvendortagtype_fuzzer.h
+similarity index 69%
+rename from camera/test/fuzztest/getvendortagname/getvendortagname_fuzz_test.h
+rename to camera/test/fuzztest/getvendortagtype_fuzzer/getvendortagtype_fuzzer.h
+index 80391c204..92675fb9b 100644
+--- a/camera/test/fuzztest/getvendortagname/getvendortagname_fuzz_test.h
++++ b/camera/test/fuzztest/getvendortagtype_fuzzer/getvendortagtype_fuzzer.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2022 Huawei Device Co., Ltd.
++ * Copyright (c) 2025 Huawei Device Co., Ltd.
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+@@ -13,9 +13,9 @@
+  * limitations under the License.
+  */
+
+-#ifndef OHOS_CAMERA_VENDOR_TAG_FUZZ_TEST_H
+-#define OHOS_CAMERA_VENDOR_TAG_FUZZ_TEST_H
++#ifndef GETVENDORTAGTYPE_FUZZ_TEST_H
++#define GETVENDORTAGTYPE_FUZZ_TEST_H
+
+-#define FUZZ_PROJECT_NAME "camera_vendor_tag_fuzz_test"
++#define FUZZ_PROJECT_NAME "getvendortagtype_fuzz_test"
+
+-#endif // OHOS_CAMERA_VENDOR_TAG_FUZZ_TEST_H
+\ No newline at end of file
++#endif // GETVENDORTAGTYPE_FUZZ_TEST_H
+diff --git a/camera/test/fuzztest/getvendortagtype/project.xml b/camera/test/fuzztest/getvendortagtype_fuzzer/project.xml
+similarity index 100%
+rename from camera/test/fuzztest/getvendortagtype/project.xml
+rename to camera/test/fuzztest/getvendortagtype_fuzzer/project.xml
