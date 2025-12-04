@@ -122,7 +122,7 @@ namespace {
         int32_t expectedMinCount = 1000 / (g_samplingInterval / 1000000) / 2;
         int32_t expectedMaxCount = 1000 / (g_samplingInterval / 1000000) * 3 / 2;
 
-        printf("expectedMinCount is %s, expectedMaxCount is %s\r\n", std::to_string(expectedMinCount).c_str(), 
+        printf("expectedMinCount is %s, expectedMaxCount is %s\r\n", std::to_string(expectedMinCount).c_str(),
             std::to_string(expectedMaxCount).c_str());
 
         for (int i = 0; i < g_testTime / 1000; i++) {
@@ -130,9 +130,11 @@ namespace {
             int32_t countPerSecond = SensorCallbackImpl::sensorDataCount - SensorCallbackImpl::sensorDataCountOld;
             SensorCallbackImpl::sensorDataCountOld = SensorCallbackImpl::sensorDataCount;
             if (countPerSecond > expectedMinCount && countPerSecond < expectedMaxCount) {
-                printf("\033[32mas expected, 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ", countPerSecond, SensorCallbackImpl::sensorDataCount);
+                printf("\033[32mas expected, 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
+                    countPerSecond, SensorCallbackImpl::sensorDataCount);
             } else {
-                printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ", countPerSecond, SensorCallbackImpl::sensorDataCount);
+                printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
+                    countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
             printf("pless execute sensorhub dump.bat within %ld seconds\r\n", (g_testTime / 1000 - i));
             fflush(stdout);
@@ -148,10 +150,10 @@ namespace {
             int32_t countPerSecond = SensorCallbackImpl::sensorDataCount - SensorCallbackImpl::sensorDataCountOld;
             SensorCallbackImpl::sensorDataCountOld = SensorCallbackImpl::sensorDataCount;
             if (countPerSecond > expectedMinCount && countPerSecond < expectedMaxCount) {
-                printf("\033[32mas expected, 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ", 
+                printf("\033[32mas expected, 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
                     countPerSecond, SensorCallbackImpl::sensorDataCount);
             } else {
-                printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ", 
+                printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
                     countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
             printf("pless execute sensorhub dump.bat within %ld seconds\r\n", (g_testTime / 1000 - i));
