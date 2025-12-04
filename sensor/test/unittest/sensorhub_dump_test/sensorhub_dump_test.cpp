@@ -108,7 +108,7 @@ namespace {
      *@tc.type: FUNC
      *@tc.require:#I4L3LF
      */
-    HwTEST_F(SensorSetBatchTest, SensorSetBatchTest1, TestSize.level1)
+    HWTEST_F(SensorSetBatchTest, SensorSetBatchTest1, TestSize.level1)
     {
         int32_t ret = g_sensorInterface->Register(0, g_traditionalCallback);
         EXPECT_EQ(ret, HDF_SUCCESS);
