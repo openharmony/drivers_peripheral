@@ -32,18 +32,25 @@
 using namespace OHOS::HDI::Sensor::V3_1;
 using namespace OHOS::HDI::Sensor;
 using namespace testing::ext;
+
+#ifdef COMMUNITY_TEST
+#define TEST_MULTIPLE 4
+#else
+#define TEST_MULTIPLE 1
+#endif
+
 namespace {
     std::vector<std::vector<SubscribedSensor>> g_subscribedSensors{
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
+                {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
+                {20*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
     };
@@ -52,21 +59,21 @@ namespace {
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
+                {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
+                {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
+                {20*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
+                {20*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
     };
@@ -75,51 +82,51 @@ namespace {
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
+                {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
+                {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
+                {20*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
+                {20*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
+                {30*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
+                {30*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
+                {40*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
+                {40*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
+                {50*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
+                {50*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
     };
@@ -128,181 +135,181 @@ namespace {
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
+                {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
+                {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
+                {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {10*ONE_MILLION, 0}
+                {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
+                {20*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
+                {20*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
+                {20*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {20*ONE_MILLION, 0}
+                {20*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
+                {30*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
+                {30*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
+                {30*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {30*ONE_MILLION, 0}
+                {30*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
+                {40*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
+                {40*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
+                {40*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {40*ONE_MILLION, 0}
+                {40*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
+                {50*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
+                {50*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
+                {50*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {50*ONE_MILLION, 0}
+                {50*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {60*ONE_MILLION, 0}
+                {60*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {60*ONE_MILLION, 0}
+                {60*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {60*ONE_MILLION, 0}
+                {60*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {60*ONE_MILLION, 0}
+                {60*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {70*ONE_MILLION, 0}
+                {70*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {70*ONE_MILLION, 0}
+                {70*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {70*ONE_MILLION, 0}
+                {70*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {70*ONE_MILLION, 0}
+                {70*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {80*ONE_MILLION, 0}
+                {80*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {80*ONE_MILLION, 0}
+                {80*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {80*ONE_MILLION, 0}
+                {80*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {80*ONE_MILLION, 0}
+                {80*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {90*ONE_MILLION, 0}
+                {90*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {90*ONE_MILLION, 0}
+                {90*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {90*ONE_MILLION, 0}
+                {90*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {90*ONE_MILLION, 0}
+                {90*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
         {
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ACCELEROMETER, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {100*ONE_MILLION, 0}
+                {100*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GYROSCOPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {100*ONE_MILLION, 0}
+                {100*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_MAGNETIC_FIELD, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {100*ONE_MILLION, 0}
+                {100*ONE_MILLION*TEST_MULTIPLE, 0}
             },
             {
                 {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_GRAVITY, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
-                {100*ONE_MILLION, 0}
+                {100*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
     };
@@ -311,6 +318,9 @@ namespace {
     int32_t g_testTime = 10000;
     float g_minMultiple = 0.5f;
     float g_maxMultiple = 1.5f;
+    sptr<V3_1::ISensorInterface> g_sensorInterface = nullptr;
+    std::vector<HdfSensorInformation> g_info;
+
     class SensorSetBatchTest : public testing::Test {
     public:
         static void SetUpTestCase();
@@ -320,10 +330,27 @@ namespace {
         static void TestGetSensorDatas(std::vector<std::vector<SubscribedSensor>> subscribedSensors);
         static void TestGetSensorData(int threadId, std::vector<SubscribedSensor> subscribedSensors);
         static void PerSecond(sptr<SensorCallbackImpl> sensorCallbackImpl);
+    
+        static bool IsSuppprtedSensor(DeviceSensorInfo deviceSensorInfo)
+        {
+            for (auto iter : g_info) {
+                if (iter.deviceSensorInfo.deviceId == deviceSensorInfo.deviceId &&
+                    iter.deviceSensorInfo.sensorType == deviceSensorInfo.sensorType &&
+                    iter.deviceSensorInfo.sensorId == deviceSensorInfo.sensorId &&
+                    iter.deviceSensorInfo.location == deviceSensorInfo.location) {
+                    return true;
+                }
+            }
+            return false;
+        }
     };
 
     void SensorSetBatchTest::SetUpTestCase()
     {
+        g_sensorInterface = V3_1::ISensorInterface::Get();
+        if (g_sensorInterface != nullptr) {
+            g_sensorInterface->GetAllSensorInfo(g_info);
+        }
     }
 
     void SensorSetBatchTest::TearDownTestCase()
@@ -347,18 +374,23 @@ namespace {
         for (int i = 0; i < g_testTime / g_oneSecond; i++) {
             OsalMSleep(g_oneSecond);
             for (auto& it : sensorCallbackImpl->subscribedSensors) {
+                if (!IsSuppprtedSensor(it.deviceSensorInfo)) {
+                    printf("\033[96m[  SKIPED  ] mcurrent device not support this sensor(%s, %d)\033[0m\n",
+                        SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), sensorCallbackImpl->callbackId);
+                    continue;
+                }
                 int32_t countPerSecond = it.sensorDataCount - it.sensorDataCountOld;
                 it.sensorDataCountOld = it.sensorDataCount;
-                if (countPerSecond > it.expectedMinCount && countPerSecond < it.expectedMaxCount) {
-                    printf("\033[92mCallbackId %d, as expected, 1000ms get sensor %s data count is %d,"
-                        " between (%d~%d) samplingInterval is %d, sensorDataCount is %d\033[0m\r\n",
+                if (countPerSecond >= it.expectedMinCount && countPerSecond <= it.expectedMaxCount) {
+                    printf("\033[92m[       OK ] CallbackId %d, as expected, 1000ms get sensor %s data count is %d,"
+                        " between (%d~%d) samplingInterval is %d, sensorDataCount is %d\033[0m\n",
                         sensorCallbackImpl->callbackId,
                         SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), countPerSecond,
                         it.expectedMinCount, it.expectedMaxCount,
                         (int32_t)(it.sensorInterval.samplingInterval / ONE_MILLION), it.sensorDataCount);
                 } else {
-                    printf("\033[91mCallbackId %d, [ERROR] 1000ms get sensor %s data count is %d,"
-                        " between (%d~%d) samplingInterval is %d, sensorDataCount is %d\033[0m\r\n",
+                    printf("\033[91m[  FAILED  ] CallbackId %d, [ERROR] 1000ms get sensor %s data count is %d,"
+                        " between (%d~%d) samplingInterval is %d, sensorDataCount is %d\033[0m\n",
                         sensorCallbackImpl->callbackId,
                         SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), countPerSecond,
                         it.expectedMinCount, it.expectedMaxCount,
@@ -371,37 +403,47 @@ namespace {
 
     void SensorSetBatchTest::TestGetSensorData(int threadId, std::vector<SubscribedSensor> subscribedSensors)
     {
-        sptr<V3_1::ISensorInterface>  sensorInterface = V3_1::ISensorInterface::Get();
+        ASSERT_NE(nullptr, g_sensorInterface);
         sptr<SensorCallbackImpl> sensorCallbackImpl = new SensorCallbackImpl();
         sensorCallbackImpl->subscribedSensors = subscribedSensors;
 
         int32_t callbackId = GPS_CALLBACK_ID_BEGIN + threadId;
         sensorCallbackImpl->callbackId = callbackId;
-        printf("RegisterWithCallbackId(sensorCallbackImpl, %d)\r\n", callbackId);
-        int32_t ret = sensorInterface->RegisterWithCallbackId(0, sensorCallbackImpl, callbackId);
+        printf("RegisterWithCallbackId(sensorCallbackImpl, %d)\n", callbackId);
+        int32_t ret = g_sensorInterface->RegisterWithCallbackId(0, sensorCallbackImpl, callbackId);
         EXPECT_EQ(ret, HDF_SUCCESS);
         for (auto it : subscribedSensors) {
-            printf("SetBatchWithCallbackId({%s}, %d, %s, %s)\r\n",
+            if (!IsSuppprtedSensor(it.deviceSensorInfo)) {
+                printf("\033[96m[  SKIPED  ] mcurrent device not support this sensor(%s, %d)\033[0m\n",
+                    SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), callbackId);
+                continue;
+            }
+            printf("SetBatchWithCallbackId(%s, %d, %s, %s)\n",
                 SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), callbackId,
                 std::to_string(it.sensorInterval.samplingInterval / ONE_MILLION).c_str(),
                 std::to_string(it.sensorInterval.reportInterval / ONE_MILLION).c_str());
-            ret = sensorInterface->SetBatchWithCallbackId(it.deviceSensorInfo, callbackId,
+            ret = g_sensorInterface->SetBatchWithCallbackId(it.deviceSensorInfo, callbackId,
                 it.sensorInterval.samplingInterval, it.sensorInterval.reportInterval);
             EXPECT_EQ(ret, HDF_SUCCESS);
-            printf("EnableWithCallbackId({%s}, %d)\r\n",
+            printf("EnableWithCallbackId(%s, %d)\n",
                 SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), callbackId);
-            ret = sensorInterface->EnableWithCallbackId(it.deviceSensorInfo, callbackId);
+            ret = g_sensorInterface->EnableWithCallbackId(it.deviceSensorInfo, callbackId);
             EXPECT_EQ(ret, HDF_SUCCESS);
         }
         PerSecond(sensorCallbackImpl);
         for (auto it : subscribedSensors) {
-            printf("DisableWithCallbackId({%s}, %d)\r\n",
+            if (!IsSuppprtedSensor(it.deviceSensorInfo)) {
+                printf("\033[96m[  SKIPED  ] mcurrent device not support this sensor(%s, %d)\033[0m\n",
+                    SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), callbackId);
+                continue;
+            }
+            printf("DisableWithCallbackId(%s, %d)\n",
                 SENSOR_HANDLE_TO_C_STR(it.deviceSensorInfo), callbackId);
-            ret = sensorInterface->DisableWithCallbackId(it.deviceSensorInfo, callbackId);
+            ret = g_sensorInterface->DisableWithCallbackId(it.deviceSensorInfo, callbackId);
             EXPECT_EQ(ret, HDF_SUCCESS);
         }
-        printf("UnregisterWithCallbackId(sensorCallbackImpl, %d)\r\n", callbackId);
-        ret = sensorInterface->UnregisterWithCallbackId(0, sensorCallbackImpl, callbackId);
+        printf("UnregisterWithCallbackId(sensorCallbackImpl, %d)\n", callbackId);
+        ret = g_sensorInterface->UnregisterWithCallbackId(0, sensorCallbackImpl, callbackId);
         EXPECT_EQ(ret, HDF_SUCCESS);
     }
 

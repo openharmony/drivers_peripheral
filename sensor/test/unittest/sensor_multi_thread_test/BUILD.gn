@@ -28,6 +28,11 @@ ohos_unittest("SensorMultiThreadTest") {
 
   sources = [ "sensor_multi_thread_test.cpp" ]
 
+  defines = []
+  if (drivers_peripheral_sensor_feature_community) {
+    defines += ["COMMUNITY_TEST"]
+  }
+
   cflags = [
     "-Wall",
     "-Wextra",
