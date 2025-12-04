@@ -2078,7 +2078,7 @@ static int32_t WpaFillP2pProvisionDiscoveryCompletedParam(struct P2pProvisionDis
         }
         if (FillData(&hdiP2pProvisionDiscoveryCompletedParam->generatedPin,
             &hdiP2pProvisionDiscoveryCompletedParam->generatedPinLen,
-            provisionDiscoveryCompletedParam->generatedPin, WIFI_PIN_CODE_LENGTH) != HDF_SUCCESS) {
+            provisionDiscoveryCompletedParam->generatedPin, WIFI_PIN_CODE_LENGTH + 1) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: fill ssid fail!", __func__);
             ret = HDF_FAILURE;
         }
