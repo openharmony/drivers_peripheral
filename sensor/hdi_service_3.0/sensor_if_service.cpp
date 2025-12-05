@@ -616,6 +616,7 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<V3_0::HdfSensorInformation
         sensorInfo.minDelay = it.minDelay;
         sensorInfo.maxDelay = it.maxDelay;
         sensorInfo.fifoMaxEventCount = it.fifoMaxEventCount;
+        sensorInfo.reserved = it.reserved;
         info.push_back(std::move(sensorInfo));
     }
 

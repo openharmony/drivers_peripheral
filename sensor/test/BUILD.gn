@@ -40,6 +40,7 @@ if (defined(ohos_lite)) {
         #"unittest/dump:dump_unittest_sensor",
         "unittest/hdi:hdi_unittest_sensor",
         "unittest/sensor_data_volume_per_second_test:SensorDataVolumePerSecondTest",
+        "unittest/sensorhub_dump_test:SensorHubDumpTest",
         "unittest/sensor_multi_th_callback_test:SensorMultiThCallbackTest",
         "unittest/sensor_multi_thread_test:SensorMultiThreadTest",
         "unittest/sensor_test_five_clients:SensorTestFiveClients",

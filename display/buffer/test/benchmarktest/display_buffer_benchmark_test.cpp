@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,9 +24,9 @@
 #include "hdf_log.h"
 #include "v1_2/display_composer_type.h"
 #include "v1_2/display_buffer_type.h"
-#include "v1_3/include/idisplay_buffer.h"
+#include "v1_4/include/idisplay_buffer.h"
 using namespace OHOS::HDI::Display::Buffer;
-using namespace OHOS::HDI::Display::Buffer::V1_3;
+using namespace OHOS::HDI::Display::Buffer::V1_4;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace testing::ext;
 using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
@@ -34,7 +34,7 @@ using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
 const uint32_t ALLOC_SIZE_1080 = 1080; // alloc size 1080
 const uint32_t ALLOC_SIZE_1920 = 1920; // alloc size 1920
 
-static std::shared_ptr<V1_3::IDisplayBuffer> g_gralloc = nullptr;
+static std::shared_ptr<V1_4::IDisplayBuffer> g_gralloc = nullptr;
 static BufferHandle* g_bufferHandle = nullptr;
 static AllocInfo g_allocInfo = {
     .width = ALLOC_SIZE_1920,
@@ -52,7 +52,7 @@ public:
 
 void DisplayBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
-    g_gralloc.reset(V1_3::IDisplayBuffer::Get());
+    g_gralloc.reset(V1_4::IDisplayBuffer::Get());
     if (g_gralloc == nullptr) {
         HDF_LOGE("IDisplayBuffer get failed");
         ASSERT_TRUE(0);
@@ -255,6 +255,9 @@ BENCHMARK_F(DisplayBenchmarkTest, IsSupportAllocPassthroughTest)(benchmark::Stat
     for (auto _ : state) {
         ret = g_gralloc->AllocMem(g_allocInfo, handle);
         EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
+        if (handle != nullptr) {
+            g_gralloc->FreeMem(*handle);
+        }
     }
 }
 
@@ -276,10 +279,42 @@ BENCHMARK_F(DisplayBenchmarkTest, ReAllocMemTest)(benchmark::State &state)
     for (auto _ : state) {
         ret = g_gralloc->ReAllocMem(g_allocInfo, *inHandle, outHandle);
         EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
+        if (outHandle != nullptr) {
+            g_gralloc->FreeMem(*outHandle);
+        }
+    }
+    if (inHandle != nullptr) {
+        g_gralloc->FreeMem(*inHandle);
     }
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ReAllocMemTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: CloneDmaBufferHandleTest
+  * @tc.desc: Benchmarktest for interface CloneDmaBufferHandleTest.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, CloneDmaBufferHandleTest)(benchmark::State &state)
+{
+    int32_t ret;
+    BufferHandle* inHandle = nullptr;
+    ret = g_gralloc->AllocMem(g_allocInfo, inHandle);
+    EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    BufferHandle* outHandle = nullptr;
+    for (auto _ : state) {
+        ret = g_gralloc->CloneDmaBufferHandle(*inHandle, outHandle);
+        EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+        if (outHandle != nullptr) {
+            g_gralloc->FreeMem(*outHandle);
+        }
+    }
+    if (inHandle != nullptr) {
+        g_gralloc->FreeMem(*inHandle);
+    }
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, CloneDmaBufferHandleTest)->
     Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
 } // namespace
 BENCHMARK_MAIN();
