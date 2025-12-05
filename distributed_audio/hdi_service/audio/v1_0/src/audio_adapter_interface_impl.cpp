@@ -862,18 +862,20 @@ int32_t AudioAdapterInterfaceImpl::SetStreamStatusChange(const std::string &cond
         return ERR_DH_AUDIO_HDF_FAIL;
     }
     event.content = convertRes.streamInfoVal;
+    int32_t hdid = 0;
+    sptr<AudioRenderInterfaceImplBase> render(nullptr);
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
-        int32_t hdid = renderDevs_[convertRes.renderId].first;
-        auto render = renderDevs_[convertRes.renderId].second;
-        std::lock_guard<std::mutex> callback(extCallbackMtx_);
-        const auto &extSpkCallback = extCallbackMap_[hdid];
-        if (render == nullptr
-            || extSpkCallback == nullptr
-            || extSpkCallback->NotifyEvent(convertRes.renderId, event) != HDF_SUCCESS) {
-            DHLOGE("noitfy failed");
-            return ERR_DH_AUDIO_HDF_FAIL;
-        }
+        hdid = renderDevs_[convertRes.renderId].first;
+        render = renderDevs_[convertRes.renderId].second;
+    }
+    std::lock_guard<std::mutex> callback(extCallbackMtx_);
+    const auto &extSpkCallback = extCallbackMap_[hdid];
+    if (render == nullptr
+        || extSpkCallback == nullptr
+        || extSpkCallback->NotifyEvent(convertRes.renderId, event) != HDF_SUCCESS) {
+        DHLOGE("noitfy failed");
+        return ERR_DH_AUDIO_HDF_FAIL;
     }
     return DH_SUCCESS;
 }
@@ -903,14 +905,18 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
     DAudioEvent event = { eventType, content };
 
     {
-        std::lock_guard<std::mutex> devLck(renderDevMtx_);
         for (uint32_t id = 0; id < MAX_AUDIO_STREAM_NUM; id++) {
-            const auto &item = renderDevs_[id];
+            sptr<AudioRenderInterfaceImplBase> audioRender(nullptr);
+            int32_t hdid = 0;
+            {
+                std::lock_guard<std::mutex> devLck(renderDevMtx_);
+                hdid = renderDevs_[id].first;
+                audioRender = renderDevs_[id].second;
+            }
             std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
-            sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[item.first]);
-            SetAudioParamStr(event.content, "dhId", std::to_string(item.first));
-            auto render = item.second;
-            if (render == nullptr || extSpkCallback == nullptr) {
+            sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[hdid]);
+            SetAudioParamStr(event.content, "dhId", std::to_string(hdid));
+            if (audioRender == nullptr || extSpkCallback == nullptr) {
                 continue;
             }
             if (extSpkCallback->NotifyEvent(id, event) != HDF_SUCCESS) {
