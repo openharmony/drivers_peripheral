@@ -27,6 +27,11 @@ group("camera_hal_test") {
       "$test_path/ut/buffer_manager:camera_buffer_manager_ut",
       "$test_path/ut/usb_camera:camera_usb_test_ut",
       "$test_path/ut/v4l2:camera_test_v4l2_ut",
+      "$test_path/ut/camera_vendor_tag:camera_vendor_tag_hdi_test",
+      "$test_path/benchmarktest/metadata:hdf_camera_vendor_tag_benchmark_test",
+      "$test_path/fuzztest/getvendortagname_fuzzer:fuzztest",
+      "$test_path/fuzztest/getvendortagtype_fuzzer:fuzztest",
+      "$test_path/fuzztest/getallvendortags_fuzzer:fuzztest",
     ]
   }
   deps += [
