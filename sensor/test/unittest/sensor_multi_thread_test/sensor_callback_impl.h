@@ -27,6 +27,17 @@
 
 #define DATA_LEN 256
 
+using OHOS::HDI::Sensor::V3_0::DeviceSensorInfo;
+using OHOS::HDI::Sensor::V1_1::SensorInterval;
+struct SubscribedSensor {
+    DeviceSensorInfo deviceSensorInfo;
+    SensorInterval sensorInterval;
+    int32_t sensorDataCount = 0;
+    int32_t sensorDataCountOld = 0;
+    int32_t expectedMinCount = 0;
+    int32_t expectedMaxCount = 0;
+};
+
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
@@ -35,10 +46,18 @@ class SensorCallbackImpl : public ISensorCallback {
 public:
     virtual ~SensorCallbackImpl() {}
 
+    int32_t callbackId = 0;
+    std::vector<SubscribedSensor> subscribedSensors;
+    bool printDataFlag = false;
+
     int32_t OnDataEvent(const HdfSensorEvents& event) override
     {
         PrintData(event);
-        sensorDataCount++;
+        for (auto& it : subscribedSensors) {
+            if (it.deviceSensorInfo.sensorType == event.deviceSensorInfo.sensorType) {
+                it.sensorDataCount++;
+            }
+        }
         return HDF_SUCCESS;
     }
 
@@ -47,9 +66,6 @@ public:
         return HDF_SUCCESS;
     }
 
-    static int32_t sensorDataCount;
-    static int32_t sensorDataCountOld;
-    static bool printDataFlag;
     void PrintData(const HdfSensorEvents &event)
     {
         std::string st = {0};
