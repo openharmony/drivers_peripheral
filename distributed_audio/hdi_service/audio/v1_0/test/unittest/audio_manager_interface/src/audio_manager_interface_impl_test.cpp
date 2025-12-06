@@ -186,6 +186,25 @@ HWTEST_F(AudioManagerInterfaceImplTest, NotifyFwk_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: NotifyFwk_002
+ * @tc.desc: Verify the NotifyFwk function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioManagerInterfaceImplTest, NotifyFwk_002, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    std::string capability = R"({"INTERRUPT_GROUP_ID": 1, "VOLUME_GROUP_ID": 1, "info": "1234, 00A, 1"})";
+    std::string info = "";
+    std::string caps = "";
+    audioManagerInterfaceImpl_->HandleCaps(capability, info, caps);
+    DAudioDevEvent event = { "123", 1, HDF_AUDIO_DEVICE_ADD, 0, 1, 2, capability };
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
+    event.caps = R"({"INTERRUPT_GROUP_ID": 1, "VOLUME_GROUP_ID": 1})";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
+}
+
+/**
  * @tc.name: CreateAdapter_001
  * @tc.desc: Verify the CreateAdapter function.
  * @tc.type: FUNC
