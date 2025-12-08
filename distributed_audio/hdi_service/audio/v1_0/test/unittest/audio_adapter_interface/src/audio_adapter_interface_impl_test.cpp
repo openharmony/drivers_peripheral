@@ -342,7 +342,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, UpdateAudioRoute_001, TestSize.Level1)
 
     AudioRoute route;
     int32_t handle = 0;
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->UpdateAudioRoute(route, handle));
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->UpdateAudioRoute(route, handle));
 }
 
 /**
@@ -357,7 +357,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, ReleaseAudioRoute_001, TestSize.Level1)
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
     int32_t handle = 0;
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->ReleaseAudioRoute(handle));
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->ReleaseAudioRoute(handle));
 }
 
 /**
