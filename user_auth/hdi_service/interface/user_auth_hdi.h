@@ -18,6 +18,7 @@
 
 #include "v4_1/iuser_auth_interface.h"
 #include "v4_1/user_auth_types.h"
+#include "v4_1/user_auth_interface_service.h"
 
 namespace OHOS {
 namespace HDI {
