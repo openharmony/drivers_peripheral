@@ -132,14 +132,12 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     const std::string &caps, const sptr<IDAudioCallback> &callback)
 {
     DHLOGI("Add audio device name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), dhId);
+    CHECK_AND_RETURN_RET_LOG(dhId == LOW_LATENCY_RENDER_ID, DH_SUCCESS, "Not support low latency id");
     std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
     auto adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end()) {
-        int32_t ret = CreateAdapter(adpName, dhId, callback);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Create audio adapter failed.");
-            return ERR_DH_AUDIO_HDF_FAIL;
-        }
+        CHECK_AND_RETURN_RET_LOG(CreateAdapter(adpName, dhId, callback) != DH_SUCCESS, ERR_DH_AUDIO_HDF_FAIL,
+            "Create audio adapter failed.");
     }
     adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end() || adp->second == nullptr) {
@@ -200,10 +198,7 @@ int32_t AudioManagerInterfaceImpl::AddAudioDeviceInner(const uint32_t dhId, DAud
 int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName, const uint32_t dhId)
 {
     DHLOGI("Remove audio device name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), dhId);
-    if (dhId == LOW_LATENCY_RENDER_ID) {
-        DHLOGI("Not support low latency id");
-        return DH_SUCCESS;
-    }
+    CHECK_AND_RETURN_RET_LOG(dhId == LOW_LATENCY_RENDER_ID, DH_SUCCESS, "Not support low latency id");
     DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
     int32_t ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
@@ -221,12 +216,12 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
     }
     {
         std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
+        sptr<IRemoteObject> remote = GetRemote(adpName);
+        if (remote != nullptr) {
+            RemoveClearRegisterRecipient(remote, adpName, dhId);
+        }
         if (adapter->IsPortsNoReg()) {
             mapAudioAdapter_.erase(adpName);
-            sptr<IRemoteObject> remote = GetRemote(adpName);
-            if (remote != nullptr) {
-                RemoveClearRegisterRecipient(remote, adpName, dhId);
-            }
             mapAudioCallback_.erase(adpName);
         }
         DHLOGI("Remove audio device success, mapAudioAdapter size() is: %{public}zu .", mapAudioAdapter_.size());
