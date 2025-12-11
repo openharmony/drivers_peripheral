@@ -378,7 +378,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
                 iter = hardwareList_.erase(iter);
             }
         }
-        CAMERA_LOGI("uvc plug out %{public}s end", hardwareName.c_str());
+        CAMERA_LOGI("uvc plug out %{public}s %{public}s end", uvcState ? "in" : "out", hardwareName.c_str());
     }
 }
 

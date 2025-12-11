@@ -69,6 +69,7 @@ RetCode HosV4L2Dev::start(const std::string& cameraID)
     bufferType_ = static_cast<enum v4l2_buf_type>(myFileFormat_->V4L2SearchBufType(fd));
     if (bufferType_ == V4L2_BUF_TYPE_PRIVATE) {
         CAMERA_LOGE("error:myFileFormat_->V4L2SearchBufType bufferType_ == 0\n");
+        myFileFormat_->V4L2CloseDevice(fd);
         return RC_ERROR;
     }
 
