@@ -51,7 +51,11 @@
 #define EXT_PARAMS_MAXLEN               107
 #define ONE_MS                          1000
 #define BITS_TO_FROMAT                  3
+#define AUDIO_CHANNEL_LAYOUT            3
+#define AUDIO_FRAME_SIZE                4
+#define AUDIO_SOURCE_TYPE               4
 #define AUDIO_CAPTURE_VOIP_STREAM_ID    22
+#define AUDIO_PORT_ID                   12
 #define AUDIO_ROUTE_NODE_LEN            1
 
 struct IAudioAdapter *g_adapter = NULL;
@@ -168,18 +172,18 @@ static int32_t InitVoipAttrsCapture(struct AudioSampleAttributes *captureAttrs)
     /* Initialization of audio parameters for playback */
     captureAttrs->format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     captureAttrs->channelCount = AUDIO_CHANNELCOUNT;
-    captureAttrs->channelLayout = 3;
+    captureAttrs->channelLayout = AUDIO_CHANNEL_LAYOUT;
     captureAttrs->sampleRate = AUDIO_SAMPLE_RATE_16K;
-    captureAttrs->interleaved = 1;
+    captureAttrs->interleaved = true;
     captureAttrs->type = AUDIO_MMAP_VOIP;
     captureAttrs->period = 0;
-    captureAttrs->frameSize = 4;
+    captureAttrs->frameSize = AUDIO_FRAME_SIZE;
     captureAttrs->isBigEndian = false;
     captureAttrs->isSignedData = true;
     captureAttrs->startThreshold = 0;
     captureAttrs->stopThreshold = INT_32_MAX;
     captureAttrs->streamId = AUDIO_CAPTURE_VOIP_STREAM_ID;
-    captureAttrs->sourceType = 4;
+    captureAttrs->sourceType = AUDIO_SOURCE_TYPE;
     return 0;
 }
 
@@ -189,7 +193,7 @@ static int32_t InitDevDescCapture(struct AudioDeviceDescriptor *devDesc, uint32_
         return HDF_FAILURE;
     }
     /* Initialization of audio parameters for playback */
-    devDesc->portId = 12;
+    devDesc->portId = AUDIO_PORT_ID;
     devDesc->pins = PIN_IN_MIC;
     devDesc->desc = strdup("devName");
     return HDF_SUCCESS;
@@ -597,27 +601,6 @@ static int32_t StartButtonCapture(struct IAudioCapture **captureS)
     }
     *captureS = capture;
     printf("Start Successful\n");
-    return HDF_SUCCESS;
-}
-
-static int32_t SelectAudioInputType(void)
-{
-    system("clear");
-    int choice = 0;
-    g_voiceCallType = 0;
-
-    PrintAudioInputTypeMenu();
-    printf("Please enter your choice: ");
-
-    int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-
-    if ((choice >= 0) && (choice <= 7)) { // 7. the max value of audio input type
-        g_voiceCallType = 1 << choice;
-    }
-
     return HDF_SUCCESS;
 }
 
