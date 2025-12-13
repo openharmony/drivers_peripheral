@@ -46,7 +46,6 @@ ohos_fuzztest("SerialSetAttributeFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_usb:libserial_proxy_1.0",
-    "drivers_interface_usb:libserial_stub_1.0",
   ]
 
   sources = [ "serialsetattribute_fuzzer.cpp" ]
