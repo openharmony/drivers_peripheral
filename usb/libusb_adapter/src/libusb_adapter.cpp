@@ -1152,16 +1152,8 @@ int32_t LibusbAdapter::DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfe
     uint16_t wIndex = static_cast<uint16_t>(ctrl.index);
     unsigned char *wData = (unsigned char *)data.data();
     uint16_t wLength = static_cast<uint16_t>(data.size());
-    HDF_LOGD("%{public}s: wLength=%{public}d", __func__, wLength);
-    if (ctrl.requestCmd == LIBUSB_REQUEST_SYNCH_FRAME) {
-        wIndex = reqType | LIBUSB_RECIPIENT_ENDPOINT;
-    }
-
-    if (reqType == LIBUSB_ENDPOINT_OUT) {
-        reqType = LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_STANDARD | LIBUSB_RECIPIENT_DEVICE;
-    } else if ((reqType & LIBUSB_RECIPIENT_ENDPOINT) == LIBUSB_RECIPIENT_ENDPOINT) {
-        wIndex = reqType;
-    }
+    HDF_LOGI("%{public}s: wLength=%{public}d, reqType=%{public}d, reqCmd=%{public}d, wIndex=%{public}d",
+        __func__, wLength, reqType, reqCmd, wIndex);
 
     ret = libusb_control_transfer(devHandle, reqType, reqCmd, wValue, wIndex, wData, wLength, ctrl.timeout);
     if (ret < 0) {
