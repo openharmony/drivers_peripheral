@@ -471,7 +471,7 @@ static int32_t RecordingAudioInitFile(void)
         return HDF_FAILURE;
     }
 
-    if(memcpy_s(g_path, PATH_MAX, pathBuf, PATH_MAX) != EOK) {
+    if (memcpy_s(g_path, PATH_MAX, pathBuf, PATH_MAX) != EOK) {
         AUDIO_FUNC_LOGE("memcpy failed.");
         return HDF_FAILURE;
     }
