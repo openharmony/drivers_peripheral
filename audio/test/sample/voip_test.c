@@ -78,13 +78,10 @@ enum AudioCaptureMode {
 };
 
 int g_captureModeFlag = CAPTURE_POLL;
-
-#ifndef __LITEOS__
 int g_receiveFrameCount = 0;
 uint64_t g_totalSize = 0;
 struct ISvcMgrIoservice *g_servmgr = NULL;
 struct ServiceStatusListener *g_listener = NULL;
-#endif
 
 enum CaptureMenuId {
     CAPTURE_START = 1,
@@ -197,13 +194,6 @@ static int32_t InitDevDescCapture(struct AudioDeviceDescriptor *devDesc, uint32_
     devDesc->pins = PIN_IN_MIC;
     devDesc->desc = strdup("devName");
     return HDF_SUCCESS;
-}
-
-void StreamClose(int32_t sig)
-{
-    /* allow the stream to be closed gracefully */
-    (void)signal(sig, SIG_IGN);
-    g_closeEnd = 1;
 }
 
 static uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
