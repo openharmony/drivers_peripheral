@@ -687,7 +687,6 @@ ohos_unittest("test_serial") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libserial_proxy_1.0",
-      "drivers_interface_usb:libserial_stub_1.0",
       "googletest:gtest_main",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
