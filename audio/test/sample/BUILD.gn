@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -126,14 +126,58 @@ if (defined(ohos_lite)) {
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
   }
+
+  ohos_shared_library("libaudio_ipc_test") {
+    include_dirs = [ "./" ]
+
+    sources = [
+      "framework_common.c",
+      "audio_ipc_test.c",
+    ]
+    defines = [ "IDL_SAMPLE" ]
+    external_deps = [
+      "drivers_interface_audio:libaudio_proxy_5.0",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+    ]
+    if (enable_c_utils) {
+      external_deps += [ "c_utils:utils" ]
+    }
+
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_audio"
+  }
+
+  ohos_executable("hdf_sbuf_test") {
+    include_dirs = [ "./" ]
+
+    sources = [
+      "hdf_sbuf_test.c",
+    ]
+    defines = [ "IDL_SAMPLE" ]
+
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+    ]
+    if (enable_c_utils) {
+      external_deps += [ "c_utils:utils" ]
+    }
+
+    install_enable = true
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_audio"
+  }
 }
 
 group("idl_audio_sample") {
   if (!defined(ohos_lite)) {
     if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       deps = [
-        ":idl_capture",
-        ":idl_render",
+        ":libaudio_ipc_test",
+        ":hdf_sbuf_test",
       ]
     }
   }
