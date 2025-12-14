@@ -199,15 +199,7 @@ void ThermalHdfConfig::ParsePollingSubNode(xmlNodePtr node, XMLThermalNodeInfo& 
 
 void ThermalHdfConfig::ParseTracingNode(xmlNodePtr node)
 {
-    xmlChar* xmlOutpath = xmlGetProp(node, BAD_CAST"outpath");
-    if (xmlOutpath != nullptr) {
-        if (strcmp(reinterpret_cast<char *>(xmlOutpath), "/data/log/thermal/thermal-log") == 0) {
-            this->traceConfig_.outPath = std::string(reinterpret_cast<char *>(xmlOutpath));
-            xmlFree(xmlOutpath);
-        } else {
-            THERMAL_HILOGE(COMP_HDI, "xmlOutpath is not /data/log/thermal/thermal-log");
-        }
-    }
+    this->traceConfig_.outPath = "/data/vendor/log/thermal/thermal-log";
 
     auto cur  = node->xmlChildrenNode;
     while (cur != nullptr) {
