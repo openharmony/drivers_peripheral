@@ -38,7 +38,6 @@ const int32_t MAX_PATH = 256;
 const int32_t MAX_BUF_PATH = 256;
 const std::string SIM_CPU_FREQ_PATH = "/data/service/el0/thermal/cooling/cpu/freq";
 const std::string GPU_FREQ_PATH = "/data/service/el0/thermal/cooling/gpu/freq";
-const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/service/el0/thermal/cooling/charger/current";
 const std::string SIM_BATTERY_CURRENT_PATH = "/data/service/el0/thermal/cooling/battery/current";
 const std::string BATTERY_VOLTAGE_PATH = "/data/service/el0/thermal/cooling/battery/voltage";
 const std::string ACTUAL_BATTERY_CURRENT_PATH = "/sys/class/power_supply/battery/input_current_limited";
