@@ -1107,6 +1107,10 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
     struct HdfWpaRemoteNode *pos = NULL;
     struct DListHead *head = &HdfWpaStubDriver()->remoteListHead;
  
+    if (ifName == NULL) {
+        HDF_LOGE("%{public}s: ifName is NULL", __func__);
+        return HDF_FAILURE;
+    }
     if (self == NULL) {
         HDF_LOGE("%{public}s:self == NULL", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1126,18 +1130,12 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self, const char *ifName)
     }
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
-    if (ifName != NULL) {
-        int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
-        if (memcpy_s(newRemoteNode->ifName, ifNameLen, ifName, ifNameLen) != EOK) {
-            HDF_LOGE("%{public}s memcpy failed", __func__);
-        }
-        newRemoteNode->ifName[ifNameLen] = '\0';
+    int ifNameLen = (int)strnlen(ifName, IFNAMSIZ + 1);
+    if (memcpy_s(newRemoteNode->ifName, ifNameLen, ifName, ifNameLen) != EOK) {
+        HDF_LOGE("%{public}s memcpy failed", __func__);
     }
+    newRemoteNode->ifName[ifNameLen] = '\0';
     DListInsertTail(&newRemoteNode->node, head);
-    if (ifName == NULL) {
-        HDF_LOGE("%{public}s: ifName is NULL", __func__);
-        return HDF_FAILURE;
-    }
     if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0 && !IsUpdaterMode()) {
         AddDeathRecipientForService(self);
     }
