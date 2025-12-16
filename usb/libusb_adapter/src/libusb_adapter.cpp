@@ -1961,7 +1961,10 @@ int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTra
         buffer = nullptr;
         return LIBUSB_ERROR_NO_MEM;
     }
-    // 4.fill and submit libusb transfer
+    // 4.save transfer
+    AddTransferToList(asyncTransfer);
+
+    // 5.fill and submit libusb transfer
     StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB, "FillAndSubmitTransfer");
     ret = FillAndSubmitTransfer(asyncTransfer, devHandle, buffer, info);
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
@@ -1969,17 +1972,15 @@ int32_t LibusbAdapter::AsyncSubmitTransfer(const UsbDev &dev, const V1_2::USBTra
         HDF_LOGE("%{public}s: libusb submit transfer failed, ret: %{public}d", __func__, ret);
         OsalMemFree(buffer);
         buffer = nullptr;
-        delete asyncTransfer;
+        DeleteTransferFromList(asyncTransfer);
         asyncTransfer = nullptr;
         return ret;
     }
-    // 5.create thread, handle asynchronous transfer completion events
+    // 6.create thread, handle asynchronous transfer completion events
     if (!isRunning && !eventThread.joinable()) {
         isRunning = true;
         eventThread = std::thread(&LibusbAdapter::LibusbEventHandling, this);
     }
-    // 6.save transfer
-    AddTransferToList(asyncTransfer);
     HDF_LOGI("%{public}s: handle async transfer success", __func__);
     return LIBUSB_SUCCESS;
 }
