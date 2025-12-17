@@ -55,7 +55,6 @@ if (defined(ohos_lite)) {
     ]
     external_deps = [
       "hilog_lite:hilog_shared",
-      "hdf_core:libhdf_test_common",
       "bounds_checking_function:libsec_shared"
     ]
 
