@@ -30,10 +30,10 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [ "include" ]
-
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-
-    external_deps = [ "hdf_core:libhdf_utils" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "bounds_checking_function:libsec_shared"
+    ]
     defines = [ "__USER__" ]
 
     cflags = [

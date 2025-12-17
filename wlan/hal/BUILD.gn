@@ -30,13 +30,11 @@ if (defined(ohos_lite)) {
       "include",
       "$HAL_ROOT_DIR/interfaces/include",
       "$HAL_ROOT_DIR/client/include",
-      "//third_party/bounds_checking_function/include",
     ]
-
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [
       "hdf_core:hdf_posix_osal",
       "hdf_core:libhdf_utils",
+      "bounds_checking_function:libsec_shared"
     ]
     defines = [ "__USER__" ]
 
