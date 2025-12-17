@@ -25,6 +25,8 @@ if (defined(ohos_lite)) {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
+      "//third_party/googletest/googletest/include",
+      "//third_party/bounds_checking_function/include",
       "$TEST_ROOT_DIR/client/include",
       "$TEST_ROOT_DIR/hal/include",
       "$TEST_ROOT_DIR/interfaces/include",
@@ -40,9 +42,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "hdf_core:hdf_posix_osal",
       "hilog_lite:hilog_shared",
-      "bounds_checking_function:libsec_shared",
-      "googletest:gmock_main",
-      "googletest:gtest_main",
+      "bounds_checking_function:libsec_shared"
     ]
 
     cflags = [
