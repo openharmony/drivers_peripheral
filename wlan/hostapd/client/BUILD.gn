@@ -24,7 +24,11 @@ if (defined(ohos_lite)) {
 
     include_dirs = [ "include" ]
 
-    external_deps = [ "hdf_core:libhdf_utils" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_lite:hilog_shared"
+    ]
+
     defines = [ "__USER__" ]
 
     cflags = [

@@ -33,7 +33,9 @@
         "init",
         "libnl",
         "ipc",
-        "faultloggerd"
+        "faultloggerd",
+        "hilog_lite",
+        "bounds_checking_function"
       ],
       "third_party": [ ]
     },
