@@ -59,16 +59,16 @@
 #define AUDIO_ROUTE_NODE_LEN            1
 
 struct IAudioAdapter *g_adapter = NULL;
-struct AudioDeviceDescriptor g_devDesc;
-struct AudioSampleAttributes g_attrs;
+struct AudioDeviceDescriptor g_devDesc = {0};
+struct AudioSampleAttributes g_attrs = {0};
 struct IAudioCapture *g_capture = NULL;
 static struct IAudioManager *g_audioManager = NULL;
-static struct StrParaCapture g_str;
+static struct StrParaCapture g_str = {0};
 uint32_t g_captureId = 0;
 
-pthread_t g_tids;
-FILE *g_file;
-char *g_frame;
+pthread_t g_tids = 0;
+FILE *g_file = NULL;
+char *g_frame = NULL;
 char g_path[PATH_MAX] = {'\0'};
 char g_adapterName[PATH_LEN] = {0};
 
