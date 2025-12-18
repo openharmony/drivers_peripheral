@@ -27,6 +27,7 @@
       "components": [
         "hdf_core",
         "hilog",
+        "bounds_checking_function",
         "c_utils",
         "drivers_interface_wlan",
         "wpa_supplicant",
