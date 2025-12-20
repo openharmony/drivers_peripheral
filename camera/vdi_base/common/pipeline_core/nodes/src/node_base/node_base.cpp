@@ -204,6 +204,10 @@ std::vector<std::shared_ptr<IPort>> NodeBase::GetOutPorts()
 
 std::shared_ptr<IPort> NodeBase::GetOutPortById(const int32_t id)
 {
+    if (id < 0) {
+        CAMERA_LOGE("Invalid id");
+        return nullptr;
+    }
     auto ports = GetOutPorts();
     if (ports.size() <= id) {
         return nullptr;
