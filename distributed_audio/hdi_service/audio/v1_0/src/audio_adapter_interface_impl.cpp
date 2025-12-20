@@ -610,6 +610,8 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t s
         case HDF_AUDIO_EVENT_FULL:
         case HDF_AUDIO_EVENT_NEED_DATA:
             return HandleRenderCallback(streamId, event);
+        case HDF_AUDIO_EVENT_WAUDIO_ENABLE:
+            return HandleWaudioEnable(event);
         default:
             DHLOGE("Audio event: %{public}d is undefined.", event.type);
             return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
@@ -1190,6 +1192,22 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderStateChangeEvent(const DAudioEven
         DHLOGE("Notify render state failed.");
         return ERR_DH_AUDIO_HDF_FAIL;
     }
+    return DH_SUCCESS;
+}
+
+int32_t AudioAdapterInterfaceImpl::HandleWaudioEnable(const DAudioEvent &event)
+{
+    DHLOGI("Waudio enable (%{public}s).", event.content.c_str());
+    CHECK_AND_RETURN_RET_LOG(paramCallback_ == nullptr, ERR_DH_AUDIO_HDF_NULLPTR, "Audio param observer is null.");
+    std::stringstream ss;
+    ss << "ERR_EVENT;DEVICE_TYPE=" << ParseStringFromArgs(event.content, AUDIO_DEVICE_TYPE) << ";"
+        << ROUTE_ENABLE << "=" << ParseStringFromArgs(event.content, ROUTE_ENABLE) << ";";
+    DHLOGI("get ss : %{public}s", ss.str().c_str());
+    int8_t reserved = 0;
+    int8_t cookie = 0;
+    int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(), "", reserved, cookie);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_HDF_FAIL, "Notify waudio enable failed.");
+    DHLOGI("Waudio enable success.");
     return DH_SUCCESS;
 }
 
