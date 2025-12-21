@@ -155,7 +155,9 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
             DHLOGE("DhId is illegal, devType is unknow.");
             return ERR_DH_AUDIO_HDF_FAIL;
     }
-    int32_t ret = adp->second->AddAudioDevice(dhId, caps);
+    std::string capability = caps.substr(0, caps.find_first_of(";"));
+
+    int32_t ret = adp->second->AddAudioDevice(dhId, capability);
     if (ret != DH_SUCCESS) {
         DHLOGE("Add audio device failed, adapter return: %{public}d.", ret);
         return ERR_DH_AUDIO_HDF_FAIL;
@@ -311,11 +313,16 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
             ss << ";CAPS=" << caps << ";INFO=" << info;
         }
     } else {
+        std::string protocol = "";
+        std::string::size_type position = event.caps.find_first_of(";");
+        if (position != std::string::npos) {
+            protocol = event.caps.substr(position + 1);
+        }
         std::stringstream temp(ss.str());
-        temp << ";CAPS=" << event.caps;
+        temp << ";" << protocol;
         std::string tempStr = temp.str();
         if (strlen(tempStr.c_str()) <= SERVICE_INFO_LEN_MAX) {
-            ss << ";CAPS=" << event.caps;
+            ss << ";" << protocol;
         }
     }
 
