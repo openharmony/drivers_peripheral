@@ -531,6 +531,9 @@ int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const st
                 return HDF_FAILURE;
             }
             break;
+        case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_CAPABILITY:
+            value = capability_;
+            break;
         default:
             DHLOGE("Parameter is invalid.");
             return HDF_ERR_INVALID_PARAM;
@@ -591,6 +594,9 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t s
         case HDF_AUDIO_EVENT_VOLUME_CHANGE:
             DHLOGI("Notify event: VOLUME_CHANGE, event content: %{public}s.", event.content.c_str());
             return HandleVolumeChangeEvent(event);
+        case HDF_AUDIO_EVNET_MUTE_SET:
+            DHLOGI("Notify event: MUTE_SET, event content: %{public}s.", event.content.c_str());
+            return HandleMuteSetEvent(event);
         case HDF_AUDIO_EVENT_FOCUS_CHANGE:
             DHLOGI("Notify event: FOCUS_CHANGE, event content: %{public}s.", event.content.c_str());
             return HandleFocusChangeEvent(streamId, event, devId);
@@ -629,6 +635,7 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
         return DH_SUCCESS;
     }
     mapAudioDevice_.insert(std::make_pair(devId, caps));
+    capability_ = caps;
 
     DHLOGI("Add audio device success.");
     return DH_SUCCESS;
@@ -900,6 +907,7 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
     std::string content = condition;
     int32_t type = getEventTypeFromCondition(content);
     EXT_PARAM_EVENT eventType;
+    bool isControlRemote = (condition.find(CONTROL) != std::string::npos);
 
     if (type == VolumeEventType::EVENT_IS_STREAM_MUTE) {
         if (param == IS_MUTE_STATUS) {
@@ -934,9 +942,13 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
             if (audioRender == nullptr || extSpkCallback == nullptr) {
                 continue;
             }
-            if (extSpkCallback->NotifyEvent(id, event) != HDF_SUCCESS) {
-                DHLOGE("NotifyEvent failed.");
-                return ERR_DH_AUDIO_HDF_FAIL;
+            if ((isControlRemote ? extSpkCallback->NotifyEvent(-1, event) :
+                extSpkCallback->NotifyEvent(id, event)) != HDF_SUCCESS) {
+                    DHLOGE("NotifyEvent failed.");
+                    return ERR_DH_AUDIO_HDF_FAIL;
+            }
+            if (isControlRemote) {
+                break;
             }
         }
     }
@@ -1133,6 +1145,40 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
     }
     vol = std::atoi(val.c_str());
     cJSON_Delete(jParam);
+    return DH_SUCCESS;
+}
+
+int32_t AudioAdapterInterfaceImpl::HandleMuteSetEvent(const DAudioEvent &event)
+{
+    DHLOGI("Mute set event (%{public}s).", event.content.c_str());
+    sptr<AudioRenderInterfaceImplBase> audioRender = GetRenderImpl(event.content);
+    if (audioRender == nullptr) {
+        DHLOGE("Render is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
+    int32_t isMute = 0;
+    int32_t ret = GetVolFromEvent(event.content, STREAM_MUTE_STATUS, isMute);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Get mute status failed.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+
+    std::stringstream ss;
+    ss << MUTE_CHANGE << ";"
+        << AUDIO_STREAM_TYPE << "=" << ParseStringFromArgs(event.content, AUDIO_STREAM_TYPE) << ";"
+        << STREAM_MUTE_STATUS << "=" << ParseStringFromArgs(event.content, STREAM_MUTE_STATUS.c_str()) << ";"
+        << IS_UPDATEUI << "=" << ParseStringFromArgs(event.content, IS_UPDATEUI) << ";"
+        << VOLUME_GROUP_ID << "=" << ParseStringFromArgs(event.content, VOLUME_GROUP_ID.c_str()) << ";"
+        << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
+    DHLOGI("get ss : %{public}s", ss.str().c_str());
+    int8_t reserved = 0;
+    int8_t cookie = 0;
+    ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_VOLUME, ss.str(), std::to_string(isMute),
+        reserved, cookie);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Notify mute failed.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
     return DH_SUCCESS;
 }
 

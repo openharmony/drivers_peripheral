@@ -121,6 +121,7 @@ private:
     int32_t HandleFocusChangeEvent(const uint32_t streamId, const DAudioEvent &event, const uint32_t devId);
     int32_t HandleRenderStateChangeEvent(const DAudioEvent &event);
     int32_t HandleVolumeChangeEvent(const DAudioEvent &event);
+    int32_t HandleMuteSetEvent(const DAudioEvent &event);
     int32_t HandleSANotifyEvent(const uint32_t streamId, const DAudioEvent &event);
     int32_t WaitForSANotify(const uint32_t streamId, const AudioDeviceEvent &event);
     int32_t HandleDeviceClosed(const uint32_t streamId, const DAudioEvent &event);
@@ -159,6 +160,7 @@ private:
     static constexpr int32_t MAX_EVENT_DIGITS = 3;
     AudioAdapterDescriptor adpDescriptor_;
     AudioAdapterStatus status_ = STATUS_OFFLINE;
+    std::string capability_;
 
     std::mutex extCallbackMtx_;
     /**
