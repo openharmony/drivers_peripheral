@@ -21,6 +21,7 @@ ohos_shared_library("libhuks_hdi_service_1.1") {
   ]
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_huks:huks_idl_headers_1.1",
       "hdf_core:libhdf_utils",
