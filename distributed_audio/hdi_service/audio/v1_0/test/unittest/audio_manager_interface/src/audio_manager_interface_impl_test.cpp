@@ -205,6 +205,23 @@ HWTEST_F(AudioManagerInterfaceImplTest, NotifyFwk_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: NotifyFwk_003
+ * @tc.desc: Verify the NotifyFwk function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioManagerInterfaceImplTest, NotifyFwk_003, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    std::string capability = R"({"stream_info": "123", "support_remote_volume": true, "init_volume": 30,
+        "init_mute_status": 0};PROTOCOL=0)";
+    DAudioDevEvent event = { "123", 1, HDF_AUDIO_DEVICE_ADD, 0, 1, 2, capability };
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
+    event.caps = R"({"stream_info": "123", "support_remote_volume": true, "init_volume": 30, "init_mute_status": 0})";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
+}
+
+/**
  * @tc.name: CreateAdapter_001
  * @tc.desc: Verify the CreateAdapter function.
  * @tc.type: FUNC
