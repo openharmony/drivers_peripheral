@@ -559,7 +559,7 @@ ResultCode GetExecutorInfoLinkedList(uint32_t authType, uint32_t executorRole, L
             return RESULT_UNKNOWN;
         }
         ExecutorInfoHal *copiedExecutorInfo = CopyExecutorInfo(executorInfo);
-        if (executorInfo == NULL) {
+        if (copiedExecutorInfo == NULL) {
             LOG_ERROR("copiedExecutorInfo is invalid");
             DestroyLinkedList(executorList);
             return RESULT_UNKNOWN;
