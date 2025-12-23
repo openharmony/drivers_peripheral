@@ -68,11 +68,6 @@ public:
         return tzInfoList_;
     }
 
-    int32_t ConvertInt(const std::string &value)
-    {
-        return std::stoi(value.c_str());
-    }
-
     void SetThermalEventCb(const sptr<IThermalCallback> &thermalCb)
     {
         thermalCb_ = thermalCb;
