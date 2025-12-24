@@ -164,4 +164,202 @@ HWTEST_F(HdfAudioUtAdapterMultiTest, HdfAudioAdapterMultchannelCreateRenderIsval
     EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
 }
 
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid002, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_NONE;
+    InitMultchannelAttrs(attrs);
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid003, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_HEADSET;
+    InitMultchannelAttrs(attrs);
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid004, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_LINEOUT;
+    InitMultchannelAttrs(attrs);
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid005, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_HDMI;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid006, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_USB;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid007, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_USB_EXT;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid008, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_EARPIECE;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid009, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_BLUETOOTH_SCO;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid010, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_DAUDIO_DEFAULT;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid011, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_HEADPHONE;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid012, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_USB_HEADSET;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid013, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_BLUETOOTH_A2DP;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid014, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = strdup("");
+    devicedesc.pins = PIN_OUT_DP;
+    
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_NOT_SUPPORT);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+
 }
