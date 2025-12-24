@@ -369,6 +369,116 @@ HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid001, TestSize.Level1)
     free(scene.desc.desc);
 }
 
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid002, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = INVALID_SCENE_ID;
+    scene.desc.pins = PIN_OUT_LINEOUT;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid003, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = INVALID_SCENE_ID;
+    scene.desc.pins = PIN_OUT_HDMI;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid004, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = INVALID_SCENE_ID;
+    scene.desc.pins = PIN_OUT_USB;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid005, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = PIN_OUT_USB_EXT;
+    scene.desc.pins = PIN_OUT_USB;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid011, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = PIN_OUT_EARPIECE;
+    scene.desc.pins = PIN_OUT_USB;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid006, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = PIN_OUT_EARPIECE;
+    scene.desc.pins = PIN_OUT_BLUETOOTH_SCO;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid007, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = PIN_OUT_EARPIECE;
+    scene.desc.pins = PIN_OUT_DAUDIO_DEFAULT;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid008, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = PIN_OUT_EARPIECE;
+    scene.desc.pins = PIN_OUT_HEADPHONE;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid009, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = PIN_OUT_EARPIECE;
+    scene.desc.pins = PIN_OUT_USB_HEADSET;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid010, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = PIN_OUT_EARPIECE;
+    scene.desc.pins = PIN_OUT_BLUETOOTH_A2DP;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
+}
+
 HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid001, TestSize.Level0)
 {
     struct AudioSceneDescriptor scene;
