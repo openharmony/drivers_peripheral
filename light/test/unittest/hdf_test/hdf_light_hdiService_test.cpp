@@ -27,8 +27,8 @@ using namespace testing::ext;
 
 namespace {
     constexpr uint32_t g_sleepTime = 3;
-    constexpr int32_t g_minLightId = HDF_LIGHT_ID_BATTERY;
-    constexpr int32_t g_maxLightId = HDF_LIGHT_ID_ATTENTION;
+    constexpr int32_t MIN_LIGHT_ID = HDF_LIGHT_ID_BATTERY;
+    constexpr int32_t MAX_LIGHT_ID = HDF_LIGHT_ID_ATTENTION;
     constexpr int32_t MAX_VALUE = 255;
     constexpr int32_t MIN_VALUE = 0;
     constexpr int32_t ON_TIME = 500;
@@ -95,8 +95,8 @@ HWTEST_F(HdfLightHdiServiceTest, SUB_Driver_Sensor_HdiLight_0200, Function | Med
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
     }
 }
 
@@ -116,8 +116,8 @@ HWTEST_F(HdfLightHdiServiceTest, SUB_Driver_Sensor_HdiLight_0300, Function | Med
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
         effect.lightColor.colorValue.rgbColor.r = 255;
@@ -148,8 +148,8 @@ HWTEST_F(HdfLightHdiServiceTest, SUB_Driver_Sensor_HdiLight_0400, Function | Med
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
         effect.lightColor.colorValue.rgbColor.r = 255;
@@ -177,8 +177,8 @@ HWTEST_F(HdfLightHdiServiceTest, SUB_Driver_Sensor_HdiLight_0500, Function | Med
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
         effect.lightColor.colorValue.rgbColor.r = 255;
@@ -211,8 +211,8 @@ HWTEST_F(HdfLightHdiServiceTest, SUB_Driver_Sensor_HdiLight_0600, Function | Med
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
         effect.lightColor.colorValue.rgbColor.r = 255;
@@ -273,8 +273,8 @@ HWTEST_F(HdfLightHdiServiceTest, SUB_Driver_Sensor_HdiLight_0900, Function | Med
     EXPECT_EQ(0, ret);
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
         std::vector<HdfLightColor> lightColor;
         struct HdfLightColor light;
         light.colorValue.rgbColor.b = 0;
