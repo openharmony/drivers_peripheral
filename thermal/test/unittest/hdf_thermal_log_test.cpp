@@ -216,7 +216,7 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest008, TestSize.Level0)
     dataSize = hdfLog.GetDeviceValidSize("");
     EXPECT_EQ(dataSize, 0);
 
-    uint64_t getDirectorySize = hdfLog.GetDirectorySize("/data/log/thermal/thermal-log");
+    uint64_t getDirectorySize = hdfLog.GetDirectorySize("/data/vendor/log/thermal/thermal-log");
     EXPECT_NE(getDirectorySize, 0);
     getDirectorySize = hdfLog.GetDirectorySize("");
     EXPECT_EQ(getDirectorySize, 0);

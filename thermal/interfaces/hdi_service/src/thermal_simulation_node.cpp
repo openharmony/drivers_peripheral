@@ -96,6 +96,7 @@ int32_t ThermalSimulationNode::CreateNodeFile(std::string filePath)
 
 int32_t ThermalSimulationNode::AddSensorTypeTemp()
 {
+    THERMAL_HILOGD(COMP_HDI, "AddSensorTypeTemp enter");
     std::vector<std::string> vFile = {"type", "temp"};
     std::map<std::string, int32_t> sensor;
     char nodeBuf[MAX_PATH] = {0};
