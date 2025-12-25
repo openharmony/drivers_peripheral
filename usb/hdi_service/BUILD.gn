@@ -208,7 +208,6 @@ ohos_shared_library("libusb_port_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_proxy_2.0",
       "drivers_interface_usb:libusb_stub_2.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -333,7 +332,6 @@ ohos_shared_library("libusb_host_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_proxy_2.0",
       "drivers_interface_usb:libusb_stub_2.0",
       "drivers_interface_usb:usbfn_mtp_idl_headers",
       "hdf_core:libhdf_host",
