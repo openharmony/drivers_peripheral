@@ -24,7 +24,6 @@ namespace Power {
 namespace V1_2 {
 namespace {
 constexpr const char* POWER_CONFIG_PATH = "etc/power_config/power_config.json";
-constexpr const char* SYSTEM_POWER_CONFIG_PATH = "/system/etc/power_config/power_config.json";
 constexpr const char* VENDOR_POWER_CONFIG_PATH = "/vendor/etc/power_config/power_config.json";
 constexpr const char* POWER_CONFIG_EXCEPTION_PATH = "";
 constexpr int32_t MAP_KEY_INDEX = 0;
@@ -107,8 +106,7 @@ bool PowerConfig::OpenFile(std::ifstream& ifsConf, const std::string& configPath
     if (!configPath.empty()) {
         ifsConf.open(configPath);
         isOpen = ifsConf.is_open();
-        HDF_LOGI("path is %{public}s", configPath.c_str());
-        HDF_LOGI("open file is %{public}d", isOpen);
+        HDF_LOGI("open file from GetOneCfgFile, is open=%{public}d", isOpen);
     }
     if (isOpen) {
         return true;
@@ -116,15 +114,7 @@ bool PowerConfig::OpenFile(std::ifstream& ifsConf, const std::string& configPath
 
     ifsConf.open(VENDOR_POWER_CONFIG_PATH);
     isOpen = ifsConf.is_open();
-    HDF_LOGI("open then vendor battery_config.json is %{public}d", isOpen);
-
-    if (isOpen) {
-        return true;
-    }
-
-    ifsConf.open(SYSTEM_POWER_CONFIG_PATH);
-    isOpen = ifsConf.is_open();
-    HDF_LOGI("open then system battery_config.json is %{public}d", isOpen);
+    HDF_LOGI("open vendor power_config.json, is open=%{public}d", isOpen);
     return isOpen;
 }
 
