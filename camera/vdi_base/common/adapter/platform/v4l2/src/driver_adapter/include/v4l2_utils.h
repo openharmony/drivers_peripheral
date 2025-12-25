@@ -45,7 +45,7 @@ public:
         auto it = ohos_mapPixFmtHal2V4l2.find(halPixfmt);
         if (it == ohos_mapPixFmtHal2V4l2.end()) {
             CAMERA_LOGI("The halPixfmt is not find in ohos_mapPixFmtHal2V4l2");
-            return V4L2_PIX_FMT_YUV420; // default value
+            return V4L2_PIX_FMT_NV12; // default value
         }
         return it->second;
     }

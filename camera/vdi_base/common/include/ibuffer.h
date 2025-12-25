@@ -87,6 +87,8 @@ public:
     virtual void SetEsFrameNum(const int32_t frameNum) = 0;
     virtual void SetStreamId(const int32_t streamId) = 0;
     virtual void SetIsValidDataInSurfaceBuffer(const bool isValid) = 0;
+    virtual void SetDmaBufFd(const int32_t fd) = 0;
+    virtual std::pair<void*, int> AllocateDmaBuffer(const uint32_t size) = 0;
 
     virtual void Free() = 0;
 

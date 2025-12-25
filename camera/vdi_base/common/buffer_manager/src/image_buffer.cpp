@@ -378,12 +378,52 @@ void ImageBuffer::SetIsValidDataInSurfaceBuffer(const bool isValid)
     isDataValidInSurfaceBuffer_ = isValid;
 }
 
+void ImageBuffer::SetDmaBufFd(const int32_t fd)
+{
+    std::lock_guard<std::mutex> l(l_);
+    dmaBufFd_ = fd;
+}
+
+std::pair<void*, int> ImageBuffer::AllocateDmaBuffer(const uint32_t size)
+{
+    std::lock_guard<std::mutex> l(l_);
+    int dmaHeapFd = open("/dev/dma_heap/system-uncached-dma32", O_RDWR);
+    if (dmaHeapFd < 0) {
+        CAMERA_LOGE("Failed to open DMA heap device %{public}s", strerror(errno));
+        return {nullptr, -1};
+    }
+
+    struct dma_heap_allocation_data allocData = {
+        .len = size,
+        .fd_flags = O_RDWR | O_CLOEXEC,
+    };
+
+    int ret = ioctl(dmaHeapFd, DMA_HEAP_IOCTL_ALLOC, &allocData);
+    if (ret < 0) {
+        CAMERA_LOGE("Failed to allocate DMA buffer %{public}s", strerror(errno));
+        close(dmaHeapFd);
+        return {nullptr, -1};
+    }
+
+    void* virAddr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, allocData.fd, 0);
+    if (virAddr == MAP_FAILED) {
+        CAMERA_LOGE("Failed to mmap DMA buffer %{public}s", strerror(errno));
+        close(allocData.fd);
+        close(dmaHeapFd);
+        return {nullptr, -1};
+    }
+    close(dmaHeapFd);
+
+    return {virAddr, allocData.fd};
+}
+
 void ImageBuffer::Free()
 {
     std::lock_guard<std::mutex> l(l_);
     if (virAddr_ != sbAddr_ && virAddr_ != nullptr) {
         CAMERA_LOGI("Free VirtualAddr, streamId = %{public}d, index = %{public}d", streamId_, index_);
-        free(virAddr_);
+        munmap(virAddr_, size_);
+        close(dmaBufFd_);
     }
     virAddr_ = nullptr;
     index_ = -1;

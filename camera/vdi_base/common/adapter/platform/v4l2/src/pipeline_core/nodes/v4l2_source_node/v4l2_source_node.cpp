@@ -229,7 +229,7 @@ void V4L2SourceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
     CAMERA_LOGI("V4L2SourceNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]",
         buffer->GetStreamId(), buffer->GetIndex());
-    buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_P);
+    buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_SP);
     buffer->SetCurWidth(wide_);
     buffer->SetCurHeight(high_);
     SourceNode::DeliverBuffer(buffer);
