@@ -18,6 +18,13 @@
 
 #include "ibuffer.h"
 #include <mutex>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <linux/dma-heap.h>
+#include <unordered_map>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <cstring>
 
 namespace OHOS::Camera {
 class ImageBuffer : public IBuffer {
@@ -89,6 +96,8 @@ public:
     void SetEsFrameNum(const int32_t frameNum) override;
     void SetStreamId(const int32_t streamId) override;
     void SetIsValidDataInSurfaceBuffer(const bool isValid) override;
+    void SetDmaBufFd(const int32_t fd) override;
+    std::pair<void*, int> AllocateDmaBuffer(const uint32_t size) override;
 
     void Free() override;
     bool operator==(const IBuffer& u) override;
@@ -122,6 +131,7 @@ private:
     EsFrameInfo esInfo_ = {-1, -1, -1, -1, -1};
     int32_t streamId_ = -1;
     std::mutex l_;
+    int32_t dmaBufFd_ = -1;
 };
 } // namespace OHOS::Camera
 #endif

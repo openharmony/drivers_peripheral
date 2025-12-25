@@ -271,9 +271,10 @@ void SourceNode::PortHandler::CollectBuffers()
                 buffer->GetStreamId(), buffer->GetIndex(), buffer->GetSize(), bufferSize);
 
     if (buffer->GetVirAddress() == buffer->GetSuffaceBufferAddr()) {
-        CAMERA_LOGI("CollectBuffers begin malloc buffer");
-        auto bufferAddr = malloc(bufferSize);
+        CAMERA_LOGI("CollectBuffers begin allocate buffer");
+        auto [bufferAddr, dmaFd] = buffer->AllocateDmaBuffer(bufferSize);
         if (bufferAddr != nullptr) {
+            buffer->SetDmaBufFd(dmaFd);
             buffer->SetVirAddress(bufferAddr);
             buffer->SetSize(bufferSize);
 #ifdef V4L2_EMULATOR
@@ -283,7 +284,7 @@ void SourceNode::PortHandler::CollectBuffers()
             buffer->SetCurFormat(CaptureFormatInit);
 #endif
         } else {
-            CAMERA_LOGE("CollectBuffers malloc buffer fail");
+            CAMERA_LOGE("CollectBuffers allocate buffer fail");
         }
     }
     frameSpec->buffer_ = buffer;
