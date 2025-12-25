@@ -16,13 +16,13 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "drivers_peripheral_motion/drivers_peripheral_motion"
 
-ohos_fuzztest("DisableMotionFuzzTest") {
+ohos_fuzztest("UnregisterFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "../disablemotion_fuzzer"
+  fuzz_config_file = "../Unregister_fuzzer"
 
   include_dirs = [
-    "../disablemotion_fuzzer",
+    "../Unregister_fuzzer",
     "../../../hdi_service",
   ]
 
@@ -33,7 +33,7 @@ ohos_fuzztest("DisableMotionFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "disablemotion_fuzzer.cpp" ]
+  sources = [ "unregister_fuzzer.cpp" ]
 
   deps = [ "../../../hal:hdi_motion" ]
 
@@ -50,6 +50,6 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":DisableMotionFuzzTest",
+    ":UnregisterFuzzTest",
   ]
 }
