@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-#include "enablemotion_fuzzer.h"
+#include "disablemotion_fuzzer.h"
 #include "hdf_base.h"
 #include "v1_0/motion_interface_proxy.h"
 
 using namespace OHOS::HDI::Motion::V1_0;
 
 namespace OHOS {
-    bool EnableMotionFuzzTest(const uint8_t* data, size_t size)
+    bool DisableMotionFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         sptr<IMotionInterface> g_sensorInterface = IMotionInterface::Get();
-        if (!g_sensorInterface->EnableMotion(*(int32_t *)data)) {
+        if (!g_sensorInterface->DisableMotion(*(int32_t *)data)) {
             result = true;
         }
         return result;
@@ -40,7 +40,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size < sizeof(int32_t)) {
         return 0;
     }
-    OHOS::EnableMotionFuzzTest(data, size);
+    OHOS::DisableMotionFuzzTest(data, size);
     return 0;
 }
 
