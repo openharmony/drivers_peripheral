@@ -225,7 +225,7 @@ ohos_unittest("test_feature_usbfnmtp") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.1",
-      "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
+      "drivers_interface_usb:libusbfn_mtp_proxy_2.0",
       "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_host",
