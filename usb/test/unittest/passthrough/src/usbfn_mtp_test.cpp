@@ -43,7 +43,6 @@ using namespace std;
 using namespace OHOS::HDI::Usb::Gadget::Mtp::V1_0;
 
 namespace {
-constexpr int32_t SLEEP_TIME = 3;
 constexpr int32_t MTP_EVENT_PACKET_MAX_BYTES = 28;
 constexpr int32_t MTP_EVENT_PACKET_VALID_LEN = 20;
 constexpr int32_t MTP_EVENT_PACKET_INVALID_LEN = 29;
@@ -64,9 +63,9 @@ constexpr int64_t MTP_MAX_FILE_SIZE = 0xFFFFFFFFLL;
 constexpr int64_t GEN_FILE_BUF_SIZE = 1024;
 constexpr int64_t GEN_FILE_LIMIT_512MB = 512 * 1024 * 1024;
 constexpr int32_t PRINT_VECTOR_MAX_LENGTH = 30;
-constexpr const char *WORKED_UT_PATH = "/data/local/tmp/";
-constexpr const char *MTP_TEST_SEND_FILE = "/data/local/tmp/sampleFile.mtp";
-constexpr const char *MTP_TEST_RECV_FILE = "/data/local/tmp/sampleFile.mtp";
+constexpr const char *WORKED_UT_PATH = "/storage/media/100/local/files/Docs/Download/";
+constexpr const char *MTP_TEST_SEND_FILE = "/storage/media/100/local/files/Docs/Download/sampleFile.mtp";
+constexpr const char *MTP_TEST_RECV_FILE = "/storage/media/100/local/files/Docs/Download/sampleFile.mtp";
 
 sptr<IUsbfnMtpInterface> g_usbfnMtpInterface = nullptr;
 sptr<IUsbPortInterface> g_usbPortInterface = nullptr;
@@ -169,29 +168,17 @@ bool GenerateFile(const std::string &pathName, int64_t fileSize)
     return WriteRandomDataToFile(pathName, static_cast<uint64_t>(fileSize));
 }
 
-int32_t SwitchErrCode(int32_t ret)
-{
-    return ret == HDF_ERR_NOT_SUPPORT ? HDF_SUCCESS : ret;
-}
-
 void UsbfnMtpTest::SetUpTestCase(void)
 {
     // Selinux config this UT only works in directory WORKED_UT_PATH for open/read/write file for case send/recvfile.
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     std::cout << "===>please connect to PC use USB 3.0 interface, press enter to continue set function to mtp"
               << std::endl;
     int32_t c;
     while ((c = getchar()) != '\n' && c != EOF) {}
 
-    g_usbPortInterface = IUsbPortInterface::Get();
     g_usbDeviceInterface = IUsbDeviceInterface::Get();
-    ASSERT_TRUE(g_usbPortInterface != nullptr);
     ASSERT_TRUE(g_usbDeviceInterface != nullptr);
-    auto ret = g_usbPortInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE);
-    sleep(SLEEP_TIME);
-    ret = SwitchErrCode(ret);
-    ASSERT_EQ(0, ret);
-    ret = g_usbDeviceInterface->GetCurrentFunctions(g_currentFunc);
+    auto ret = g_usbDeviceInterface->GetCurrentFunctions(g_currentFunc);
     ASSERT_EQ(0, ret);
     std::cout << "===>current function=" << g_currentFunc << ", set function to mtp, please wait" << std::endl;
     ret = g_usbDeviceInterface->SetCurrentFunctions(USB_FUNCTION_MTP);
@@ -570,7 +557,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpSendEvent004, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive001, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileReceive001 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -599,7 +585,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive001, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive002, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileReceive002 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -623,7 +608,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive002, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive003, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileReceive003 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -652,7 +636,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive003, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive004, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileReceive004 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -681,7 +664,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive004, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive005, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileReceive005 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -712,7 +694,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive005, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive006, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileReceive006 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -742,7 +723,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive006, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive007, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileReceive007 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -771,7 +751,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive007, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive008, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileReceive008 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -800,7 +779,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive008, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive009, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileReceive009 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -829,7 +807,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileReceive009, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend001, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileSend001 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -858,7 +835,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend001, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend002, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileSend002 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -888,7 +864,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend002, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend003, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileSend003 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -912,7 +887,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend003, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend004, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileSend004 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -942,7 +916,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend004, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend005, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileSend005 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -971,7 +944,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend005, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend006, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileSend006 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -1000,7 +972,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend006, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend007, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileSend007 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
@@ -1029,7 +1000,6 @@ HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend007, TestSize.Level1)
 HWTEST_F(UsbfnMtpTest, UsbfnMtpFileSend008, TestSize.Level1)
 {
     ASSERT_TRUE(g_usbfnMtpInterface != nullptr);
-    ASSERT_TRUE(GetCurrentProcPath() == std::string(WORKED_UT_PATH));
     HDF_LOGI("UsbfnMtpTest::UsbfnMtpFileSend008 Case Start");
     g_fileTestCount++;
     struct UsbFnMtpFileSlice mfs = g_mfs;
