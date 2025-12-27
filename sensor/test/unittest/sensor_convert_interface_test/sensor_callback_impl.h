@@ -79,7 +79,7 @@ public:
             return HDF_FAILURE;
         }
         std::vector<uint32_t> reserve;
-        HdfDeviceStatusPolicy  HdfDeviceStatusPolicy {0, 0, reserve};
+        HdfDeviceStatusPolicy  HdfDeviceStatusPolicy {4, 0, reserve};
         HdfSensorData inSensorData{
             .sensorTypeId = event.deviceSensorInfo.sensorType,
             .version = event.version,
