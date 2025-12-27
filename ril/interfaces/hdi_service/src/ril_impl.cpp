@@ -611,7 +611,8 @@ int32_t RilImpl::SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const s
     return TaskSchedule(&Telephony::HRilManager::SimOpenLogicalChannel, slotId, serialId, appID, p2);
 }
 
-int32_t RilImpl::SimOpenLogicalChannelWithPort(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2, int32_t portIndex)
+int32_t RilImpl::SimOpenLogicalChannelWithPort(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2,
+    int32_t portIndex)
 {
     return TaskSchedule(&Telephony::HRilManager::SimOpenLogicalChannelWithPort, slotId, serialId, appID, p2, portIndex);
 }
