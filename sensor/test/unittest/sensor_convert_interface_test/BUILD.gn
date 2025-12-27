@@ -15,9 +15,9 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../sensor.gni")
 
-module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorTransformInterfaceTest"
+module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorConvertInterfaceTest"
 
-ohos_unittest("SensorTransformInterfaceTest") {
+ohos_unittest("SensorConvertInterfaceTest") {
   module_out_path = module_output_path
 
   include_dirs = [
@@ -26,7 +26,7 @@ ohos_unittest("SensorTransformInterfaceTest") {
     "../../../utils/include",
   ]
 
-  sources = [ "sensor_transform_interface_test.cpp" ]
+  sources = [ "sensor_convert_interface_test.cpp" ]
 
   cflags = [
     "-Wall",
@@ -40,7 +40,7 @@ ohos_unittest("SensorTransformInterfaceTest") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_sensor:libsensor_proxy_3.1",
-      "drivers_interface_sensor:libsensor_transform_proxy_1.0",
+      "drivers_interface_sensor:libsensor_convert_proxy_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
