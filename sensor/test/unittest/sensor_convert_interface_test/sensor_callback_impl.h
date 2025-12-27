@@ -22,6 +22,7 @@
 #include <securec.h>
 #include "sensor_uhdf_log.h"
 #include "isensor_interface_vdi.h"
+#include "convert/v1_0/isensor_convert_interfaces.h"
 
 #define HDF_LOG_TAG uhdf_sensor_testcase
 
@@ -42,19 +43,22 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V3_0 {
+
+using namespace OHOS::HDI::Sensor::Convert::V1_0;
+
 class SensorCallbackImpl : public ISensorCallback {
 public:
     virtual ~SensorCallbackImpl() {}
 
     int32_t callbackId = 0;
     std::vector<SubscribedSensor> subscribedSensors;
-    sptr<OHOS::HDI::Sensor::Transform::V1_0::ISensorTransformInterfaces> sensorTransformInterfaces = nullptr;
-    bool printDataFlag = false;
+    sptr<OHOS::HDI::Sensor::Convert::V1_0::ISensorConvertInterfaces> sensorConvertInterfaces = nullptr;
+    bool printDataFlag = true;
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override
     {
         PrintData(event);
-        TransformSensorDataTest(event);
+        ConvertSensorDataTest(event);
         for (auto& it : subscribedSensors) {
             if (it.deviceSensorInfo.sensorType == event.deviceSensorInfo.sensorType) {
                 it.sensorDataCount++;
@@ -68,31 +72,37 @@ public:
         return HDF_SUCCESS;
     }
 
-    int32_t TransformSensorDataTest(const HdfSensorEvents& event)
+    int32_t ConvertSensorDataTest(const HdfSensorEvents& event)
     {
-        if (sensorTransformInterfaces == nullptr) {
-            printf("\033[96m[  SKIPED  ] sensorTransformInterfaces == nullptr\033[0m\n");
+        if (sensorConvertInterfaces == nullptr) {
+            printf("\033[96m[  SKIPED  ] sensorConvertInterfaces == nullptr\033[0m\n");
             return HDF_FAILURE;
         }
-        HdfDeviceStatus hdfDeviceStatus{0, 0};
+        std::vector<uint32_t> reserve;
+        HdfDeviceStatusPolicy  HdfDeviceStatusPolicy {0, 0, reserve};
         HdfSensorData inSensorData{
-            .sensorTypeId = event.deviceSensorInfo.sensorType;
-            .version = event.version;
-            .timestamp = event.timestamp;
-            .option = event.option;
-            .mode = event.mode;
-            .data = event.data;
-            .dataLen = event.dataLen;
-            .deviceId = event.deviceSensorInfo.deviceId;
-            .sensorId = event.deviceSensorInfo.sensorId;
-            .location = event.deviceSensorInfo.location;
+            .sensorTypeId = event.deviceSensorInfo.sensorType,
+            .version = event.version,
+            .timestamp = event.timestamp,
+            .option = event.option,
+            .mode = event.mode,
+            .data = event.data,
+            .deviceId = event.deviceSensorInfo.deviceId,
+            .sensorId = event.deviceSensorInfo.sensorId,
+            .location = event.deviceSensorInfo.location,
         };
         HdfSensorData outSensorData;
-        int32_t ret = sensorTransformInterfaces->TransformSensorData(hdfDeviceStatus, inSensorData, outSensorData);
+        int32_t ret = sensorConvertInterfaces->ConvertSensorData(HdfDeviceStatusPolicy, inSensorData, outSensorData);
         if (ret == HDF_SUCCESS) {
-            printf("\033[92m[       OK ] TransformSensorDataTest SUCCESS\033[0m\n");
+            printf("\033[92m[       OK ] ConvertSensorDataTest SUCCESS\033[0m\n");
+            if (printDataFlag) {
+                std::string st = {0};
+                DataToStr(st, event);
+                printf("%s: %s\n", __func__, st.c_str());
+                HDF_LOGI("%{public}s: testcase %{public}s\n", __func__, st.c_str());
+            }
         } else {
-            printf("\033[91m[  FAILED  ] TransformSensorDataTest HDF_FAILURE\033[0m\n");
+            printf("\033[91m[  FAILED  ] ConvertSensorDataTest HDF_FAILURE\033[0m\n");
         }
         return HDF_SUCCESS;
     }
