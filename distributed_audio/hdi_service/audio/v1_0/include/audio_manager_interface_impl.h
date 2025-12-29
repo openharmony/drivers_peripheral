@@ -74,6 +74,7 @@ public:
     int32_t RegisterAudioHdfListener(const std::string &serviceName, const sptr<IDAudioHdfCallback> &callbackObj);
     int32_t UnRegisterAudioHdfListener(const std::string &serviceName);
     void ForceNotifyFwk();
+    bool GetAudioMgrState();
 
 private:
     AudioManagerInterfaceImpl();
@@ -144,6 +145,7 @@ private:
     std::map<std::string, sptr<IDAudioHdfCallback>> mapAudioHdfCallback_;
     std::mutex notifyFwkMtx_;
     std::map<std::string, DAudioDevEvent> notifyFwkMap_;
+    std::atomic<bool> isDestruct_ = false;
 };
 } // V1_0
 } // Audio
