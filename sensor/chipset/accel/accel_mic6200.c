@@ -243,7 +243,7 @@ static int32_t Mic6200InitDriver(struct HdfDeviceObject *device)
         return HDF_ERR_NOT_SUPPORT;
     }
 
-    ops.Init = InitMic6200;
+    ops.Init = NULL;
     ops.ReadData = ReadMic6200Data;
     ret = AccelRegisterChipOps(&ops);
     if (ret != HDF_SUCCESS) {
