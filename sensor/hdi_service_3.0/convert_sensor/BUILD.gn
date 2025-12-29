@@ -16,10 +16,10 @@ import("//build/config/components/hdi/hdi.gni")
 
 ohos_shared_library("libsensor_convert_interfaces_service_1.0") {
   include_dirs = [
-     "./include",
+     "./hdi_impl/include",
   ]
   sources = [
-    "src/sensor_convert_impl.cpp",
+    "hdi_impl/src/sensor_convert_impl.cpp",
   ]
   cflags_cc = [
     "-fstack-protector-strong",
