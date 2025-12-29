@@ -1401,15 +1401,18 @@ int32_t LibusbAdapter::CloseMmapBuffer(void *mmapBuf, size_t length)
     return HDF_SUCCESS;
 }
 
-int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpointAddr, uint32_t size,
+int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, const UsbPipe &pipe, uint32_t size,
     uint32_t &transferedLength, unsigned int timeout)
 {
     HDF_LOGI("%{public}s enter", __func__);
     int actlength = 0;
     libusb_device_handle *devHandle = nullptr;
-    int32_t ret = FindHandleByDev(dev, &devHandle);
+    libusb_endpoint_descriptor *endpointDes = nullptr;
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB, "GetEndpointDesc");
+    int32_t ret = GetEndpointDesc(dev, pipe, &endpointDes, &devHandle);
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
-        HDF_LOGE("%{public}s:FindHandleByDev failed, ret=%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
     int32_t mmapFd = HDF_FAILURE;
@@ -1420,7 +1423,7 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpoint
         return HDF_FAILURE;
     }
     SyncTranfer syncTranfer = {size, &actlength, timeout};
-    ret = DoSyncPipeTranfer(devHandle, endpointAddr, buffer, syncTranfer);
+    ret = DoSyncPipeTranfer(devHandle, endpointDes, buffer, syncTranfer);
     if (ret < 0) {
         if (ret != LIBUSB_ERROR_OVERFLOW) {
             ret = HDF_FAILURE;
@@ -1442,15 +1445,18 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, unsigned char endpoint
     return ret;
 }
 
-int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned char endpointAddr,
+int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPipe &pipe,
     SendRequestAshmemParameter sendRequestAshmemParameter, uint32_t &transferredLength, unsigned int timeout)
 {
     HDF_LOGI("%{public}s enter", __func__);
     int actlength = 0;
     libusb_device_handle *devHandle = nullptr;
-    int32_t ret = FindHandleByDev(dev, &devHandle);
+    libusb_endpoint_descriptor *endpointDes = nullptr;
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB, "GetEndpointDesc");
+    int32_t ret = GetEndpointDesc(dev, pipe, &endpointDes, &devHandle);
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
-        HDF_LOGE("%{public}s:FindHandleByDev failed, ret=%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
 
@@ -1461,7 +1467,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, unsigned cha
         return HDF_FAILURE;
     }
     SyncTranfer syncTranfer = {sendRequestAshmemParameter.ashmemSize, &actlength, timeout};
-    ret = DoSyncPipeTranfer(devHandle, endpointAddr, buffer, syncTranfer);
+    ret = DoSyncPipeTranfer(devHandle, endpointDes, buffer, syncTranfer);
     HDF_LOGI("SendPipeRequestWithAshmem DoSyncPipeTranfer ret :%{public}d", ret);
     if (ret < 0) {
         if (ret != LIBUSB_ERROR_OVERFLOW) {
@@ -1792,19 +1798,19 @@ void LibusbAdapter::ProcessExtraData(std::vector<uint8_t> &descriptor, size_t &c
     HDF_LOGD("%{public}s leave", __func__);
 }
 
-int32_t LibusbAdapter::DoSyncPipeTranfer(libusb_device_handle *devHandle, unsigned char endpoint,
+int32_t LibusbAdapter::DoSyncPipeTranfer(libusb_device_handle *devHandle, libusb_endpoint_descriptor *endpointDes,
     unsigned char *buffer, SyncTranfer &syncTranfer)
 {
     HDF_LOGD("%{public}s enter", __func__);
     int32_t ret = HDF_FAILURE;
-    uint32_t endpointAttributes = endpoint & LIBUSB_TRANSFER_TYPE_INTERRUPT;
+    uint32_t endpointAttributes = endpointDes->bmAttributes & LIBUSB_TRANSFER_TYPE_INTERRUPT;
     if (endpointAttributes == LIBUSB_TRANSFER_TYPE_INTERRUPT) {
         HDF_LOGD("%{public}s: DoSyncPipeTranfer call libusb_interrupt_transfer", __func__);
-        ret = libusb_interrupt_transfer(devHandle, endpoint, buffer, syncTranfer.length,
+        ret = libusb_interrupt_transfer(devHandle, endpointDes->bEndpointAddress, buffer, syncTranfer.length,
             syncTranfer.transferred, syncTranfer.timeout);
     } else {
         HDF_LOGD("%{public}s: DoSyncPipeTranfer call libusb_bulk_transfer", __func__);
-        ret = libusb_bulk_transfer(devHandle, endpoint, buffer,
+        ret = libusb_bulk_transfer(devHandle, endpointDes->bEndpointAddress, buffer,
             syncTranfer.length, syncTranfer.transferred, syncTranfer.timeout);
     }
 
