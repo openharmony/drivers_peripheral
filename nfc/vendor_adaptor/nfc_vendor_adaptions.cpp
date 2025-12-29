@@ -53,7 +53,7 @@ static void WriteEvent(const std::string& eventType, OHOS::HiviewDFX::HiSysEvent
     if (ret != 0) {
         HDF_LOGE("Write event fail: %{public}s", eventType.c_str());
     } else {
-        HDF_LOGI("%{public}s success!", __func__);
+        HDF_LOGI("WriteEvent success!");
     }
 }
 
@@ -63,7 +63,7 @@ static void WriteBootloaderHiSysEvent(uint16_t errorCode)
     WriteEvent("ACCESS_SE_FAILED", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
                "CHANNEL_TYPE", bootloaderStatusType,
                "ERROR_CODE", errorCode);
-    HDF_LOGI("%{public}s value:%{public}d", __func__, errorCode);
+    HDF_LOGI("WriteBootloaderHiSysEvent value:%{public}d", errorCode);
 }
 
 static string GetNfcHalSoName(const std::string &chipType)
@@ -77,7 +77,7 @@ string NfcVendorAdaptions::GetChipType(void)
     string nfcChipType = "";
     nfcExtHandle = dlopen(VENDOR_NFC_EXT_SERVICE_LIB.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if (nfcExtHandle == nullptr) {
-        HDF_LOGE("%{public}s: fail to get nfc ext service handle.", __func__);
+        HDF_LOGE("GetChipType: fail to get nfc ext service handle.");
         return nfcChipType;
     }
     nfcExtInf.getNfcChipType = reinterpret_cast<const char* (*)()>
@@ -86,7 +86,7 @@ string NfcVendorAdaptions::GetChipType(void)
         (dlsym(nfcExtHandle, EXT_GET_SUFFIX_FUNC_NAME.c_str()));
 
     if (nfcExtInf.getNfcChipType == nullptr || nfcExtInf.getNfcHalFuncNameSuffix == nullptr) {
-        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        HDF_LOGE("GetChipType: fail to init func ptr.");
         return nfcChipType;
     }
     nfcChipType = string(nfcExtInf.getNfcChipType());
@@ -97,13 +97,13 @@ void NfcVendorAdaptions::CheckFirmwareUpdate(void)
 {
     nfcExtHandle = dlopen(VENDOR_NFC_EXT_SERVICE_LIB.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if (nfcExtHandle == nullptr) {
-        HDF_LOGE("%{public}s: fail to get nfc ext service handle.", __func__);
+        HDF_LOGE("CheckFirmwareUpdate: fail to get nfc ext service handle.");
         return;
     }
     nfcExtInf.checkFirmwareUpdate = reinterpret_cast<void (*)()>
         (dlsym(nfcExtHandle, EXT_SET_FW_UPDATE_CONFIG_FUNC_NAME.c_str()));
     if (nfcExtInf.checkFirmwareUpdate == nullptr) {
-        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        HDF_LOGE("CheckFirmwareUpdate: fail to init func ptr.");
         dlclose(nfcExtHandle);
         nfcExtHandle = nullptr;
         return;
@@ -117,19 +117,19 @@ void NfcVendorAdaptions::UpdateNfcOpenStatus(const std::string &status)
 {
     nfcExtHandle = dlopen(VENDOR_NFC_EXT_SERVICE_LIB.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if (nfcExtHandle == nullptr) {
-        HDF_LOGE("%{public}s: fail to get nfc ext service handle.", __func__);
+        HDF_LOGE("UpdateNfcOpenStatus: fail to get nfc ext service handle.");
         return;
     }
     nfcExtInf.updateNfcOpenStatus = reinterpret_cast<void (*)(const char*, int)>
         (dlsym(nfcExtHandle, EXT_UPDATE_NFC_OPEN_STATUS.c_str()));
     if (nfcExtInf.updateNfcOpenStatus == nullptr) {
-        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        HDF_LOGE("UpdateNfcOpenStatus: fail to init func ptr.");
         dlclose(nfcExtHandle);
         nfcExtHandle = nullptr;
         return;
     }
     nfcExtInf.updateNfcOpenStatus(status.c_str(), status.length());
-    HDF_LOGI("%{public}s: status [%{public}s].", __func__, status.c_str());
+    HDF_LOGI("UpdateNfcOpenStatus: status [%{public}s].", status.c_str());
     dlclose(nfcExtHandle);
     nfcExtHandle = nullptr;
 }
@@ -142,13 +142,13 @@ bool NfcVendorAdaptions::CheckNfcBootloaderStatus(void)
 {
     nfcExtHandle = dlopen(VENDOR_NFC_EXT_SERVICE_LIB.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if (nfcExtHandle == nullptr) {
-        HDF_LOGE("%{public}s: fail to get nfc ext service handle.", __func__);
+        HDF_LOGE("CheckNfcBootloaderStatus: fail to get nfc ext service handle.");
         return false;
     }
     nfcExtInf.checkNfcBootloaderStatus = reinterpret_cast<int (*)()>
         (dlsym(nfcExtHandle, EXT_CHECK_NFC_BOOTLOADER_STATUS.c_str()));
     if (nfcExtInf.checkNfcBootloaderStatus == nullptr) {
-        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        HDF_LOGE("CheckNfcBootloaderStatus: fail to init func ptr.");
         dlclose(nfcExtHandle);
         nfcExtHandle = nullptr;
         return false;
@@ -156,12 +156,12 @@ bool NfcVendorAdaptions::CheckNfcBootloaderStatus(void)
     if (nfcExtInf.checkNfcBootloaderStatus() == 0) {
         dlclose(nfcExtHandle);
         nfcExtHandle = nullptr;
-        HDF_LOGE("%{public}s: NFC in bootloader status", __func__);
+        HDF_LOGE("CheckNfcBootloaderStatus: NFC in bootloader status");
         return true;
     }
     dlclose(nfcExtHandle);
     nfcExtHandle = nullptr;
-    HDF_LOGI("%{public}s: NFC in normal status", __func__);
+    HDF_LOGI("CheckNfcBootloaderStatus: NFC in normal status");
     return false;
 }
 
@@ -202,11 +202,11 @@ void* NfcVendorAdaptions::DoHalPreOpen(void* arg)
         return nullptr;
     }
     NfcVendorAdaptions *mVendorAdapter = static_cast<NfcVendorAdaptions*>(arg);
-    HDF_LOGI("%{public}s: enter.", __func__);
+    HDF_LOGI("DoHalPreOpen: enter.");
     mVendorAdapter->isNfcPreDone = true;
     if (mVendorAdapter->nfcHalInf.nfcHalMinOpen == nullptr ||
         mVendorAdapter->nfcHalInf.nfcHalMinClose == nullptr) {
-        HDF_LOGE("%{public}s: function is null", __func__);
+        HDF_LOGE("DoHalPreOpen: function is null");
         return nullptr;
     }
     std::lock_guard<std::mutex> lock(g_openMutex);
@@ -214,14 +214,14 @@ void* NfcVendorAdaptions::DoHalPreOpen(void* arg)
         mVendorAdapter->UpdateNfcOpenStatus(NFC_OPENING_STATUS);
         status = mVendorAdapter->nfcHalInf.nfcHalMinOpen(true);
         if (status != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: nfcHalMinOpen is fail", __func__);
+            HDF_LOGE("DoHalPreOpen: nfcHalMinOpen is fail");
             mVendorAdapter->UpdateNfcOpenStatus(NFC_CLOSE_STATUS);
             WriteBootloaderHiSysEvent(BOOTLOADER_STATUS_RECOVER_FAILED);
             return nullptr;
         }
         status = mVendorAdapter->nfcHalInf.nfcHalMinClose();
         if (status != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: nfcHalMinClose is fail", __func__);
+            HDF_LOGE("DoHalPreOpen: nfcHalMinClose is fail");
             mVendorAdapter->UpdateNfcOpenStatus(NFC_OPEN_STATUS);
             WriteBootloaderHiSysEvent(BOOTLOADER_STATUS_RECOVER_FAILED);
             return nullptr;
@@ -229,7 +229,7 @@ void* NfcVendorAdaptions::DoHalPreOpen(void* arg)
         mVendorAdapter->UpdateNfcOpenStatus(NFC_CLOSE_STATUS);
         WriteBootloaderHiSysEvent(BOOTLOADER_STATUS_RECOVER_SUCCESS);
     }
-    HDF_LOGI("%{public}s: exit.", __func__);
+    HDF_LOGI("DoHalPreOpen: exit.");
     return nullptr;
 }
 
@@ -237,14 +237,14 @@ void NfcVendorAdaptions::HalPreOpen(void)
 {
     int ret = HDF_SUCCESS;
     pthread_t pthread;
-    HDF_LOGI("%{public}s: enter.", __func__);
+    HDF_LOGI("HalPreOpen: enter.");
     if (!isNfcPreDone) {
         ret = pthread_create(&pthread, nullptr, NfcVendorAdaptions::DoHalPreOpen, this);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: pthread_create is fail", __func__);
+            HDF_LOGE("HalPreOpen: pthread_create is fail");
         }
     }
-    HDF_LOGI("%{public}s: exit.", __func__);
+    HDF_LOGI("HalPreOpen: exit.");
 }
 
 int8_t NfcVendorAdaptions::PreInitNfcHalInterfaces(string nfcHalSoName, string suffix)
@@ -253,13 +253,13 @@ int8_t NfcVendorAdaptions::PreInitNfcHalInterfaces(string nfcHalSoName, string s
         nfcHalHandle = dlopen(nfcHalSoName.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     }
     if (nfcHalHandle == nullptr) {
-        HDF_LOGE("%{public}s: invalid input path, opening default hal lib", __func__);
+        HDF_LOGE("PreInitNfcHalInterfaces: invalid input path, opening default hal lib");
         nfcHalSoName = NFC_HAL_SO_DEFAULT_NAME;
         suffix = DEFAULT_FUNC_NAME_SUFFIX;
         nfcHalHandle = dlopen(nfcHalSoName.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     }
     if (nfcHalHandle == nullptr) {
-        HDF_LOGE("%{public}s: fail to open hal path.", __func__);
+        HDF_LOGE("PreInitNfcHalInterfaces: fail to open hal path.");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -316,10 +316,10 @@ int8_t NfcVendorAdaptions::InitNfcHalInterfaces(string nfcHalSoName, string suff
         nfcHalInf.nfcHalPowerCycle == nullptr || nfcHalInf.nfcHalIoctl == nullptr ||
         nfcHalInf.nfcHalGetConfig == nullptr || nfcHalInf.nfcHalFactoryReset == nullptr ||
         nfcHalInf.nfcHalShutdownCase == nullptr) {
-        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        HDF_LOGE("InitNfcHalInterfaces: fail to init func ptr.");
         return HDF_FAILURE;
     }
-    HDF_LOGI("%{public}s: init nfc hal inf successfully.", __func__);
+    HDF_LOGI("InitNfcHalInterfaces: init nfc hal inf successfully.");
     return HDF_SUCCESS;
 }
 
@@ -332,7 +332,7 @@ NfcVendorAdaptions::NfcVendorAdaptions()
         string nfcHalSoName = GetNfcHalSoName(chipType);
         string nfcHalFuncNameSuffix = GetNfcHalFuncNameSuffix(chipType);
         if (InitNfcHalInterfaces(nfcHalSoName, nfcHalFuncNameSuffix) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: fail to init hal inf.", __func__);
+            HDF_LOGE("InitNfcHalInterfaces: fail to init hal inf.");
         }
         HalPreOpen();
     }
@@ -352,11 +352,11 @@ void NfcVendorAdaptions::SetPriority()
 int NfcVendorAdaptions::VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback)
 {
     if (nfcHalInf.nfcHalOpen == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("InitNfcHalInterfaces: Function null.");
         return HDF_FAILURE;
     }
     if (pCback == nullptr || pDataCback == nullptr) {
-        HDF_LOGE("%{public}s: input param null.", __func__);
+        HDF_LOGE("InitNfcHalInterfaces: input param null.");
         return HDF_FAILURE;
     }
     std::lock_guard<std::mutex> lock(g_openMutex);
@@ -369,11 +369,11 @@ int NfcVendorAdaptions::VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallba
 int NfcVendorAdaptions::VendorCoreInitialized(uint16_t coreInitRspLen, uint8_t *pCoreInitRspParams)
 {
     if (nfcHalInf.nfcHalCoreInitialized == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorCoreInitialized: Function null.");
         return HDF_FAILURE;
     }
     if (pCoreInitRspParams == nullptr) {
-        HDF_LOGE("%{public}s: input param null.", __func__);
+        HDF_LOGE("VendorCoreInitialized: input param null.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalCoreInitialized(coreInitRspLen, pCoreInitRspParams);
@@ -383,11 +383,11 @@ int NfcVendorAdaptions::VendorCoreInitialized(uint16_t coreInitRspLen, uint8_t *
 int NfcVendorAdaptions::VendorWrite(uint16_t dataLen, const uint8_t *pData)
 {
     if (nfcHalInf.nfcHalWrite == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorWrite: Function null.");
         return HDF_FAILURE;
     }
     if (pData == nullptr) {
-        HDF_LOGE("%{public}s: input param null.", __func__);
+        HDF_LOGE("VendorWrite: input param null.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalWrite(dataLen, pData);
@@ -397,7 +397,7 @@ int NfcVendorAdaptions::VendorWrite(uint16_t dataLen, const uint8_t *pData)
 int NfcVendorAdaptions::VendorPrediscover(void)
 {
     if (nfcHalInf.nfcHalPrediscover == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorPrediscover: Function null.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalPrediscover();
@@ -407,7 +407,7 @@ int NfcVendorAdaptions::VendorPrediscover(void)
 int NfcVendorAdaptions::VendorClose(bool bShutdown)
 {
     if (nfcHalInf.nfcHalClose == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorClose: Function null.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalClose(bShutdown);
@@ -417,7 +417,7 @@ int NfcVendorAdaptions::VendorClose(bool bShutdown)
 int NfcVendorAdaptions::VendorControlGranted(void)
 {
     if (nfcHalInf.nfcHalControlGranted == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorControlGranted: Function null.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalControlGranted();
@@ -427,7 +427,7 @@ int NfcVendorAdaptions::VendorControlGranted(void)
 int NfcVendorAdaptions::VendorPowerCycle(void)
 {
     if (nfcHalInf.nfcHalPowerCycle == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorPowerCycle: Function null.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalPowerCycle();
@@ -437,11 +437,11 @@ int NfcVendorAdaptions::VendorPowerCycle(void)
 int NfcVendorAdaptions::VendorIoctl(long arg, void *pData)
 {
     if (nfcHalInf.nfcHalIoctl == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorIoctl: Function null.");
         return HDF_FAILURE;
     }
     if (pData == nullptr) {
-        HDF_LOGE("%{public}s: input param null.", __func__);
+        HDF_LOGE("VendorIoctl: input param null.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalIoctl(arg, pData);
@@ -451,24 +451,24 @@ int NfcVendorAdaptions::VendorIoctl(long arg, void *pData)
 int NfcVendorAdaptions::VendorIoctlWithResponse(long arg, void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal)
 {
     if (nfcHalInf.nfcHalIoctl == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorIoctlWithResponse: Function null.");
         return HDF_FAILURE;
     }
     if (pData == nullptr) {
-        HDF_LOGE("%{public}s: input param null.", __func__);
+        HDF_LOGE("VendorIoctlWithResponse: input param null.");
         return HDF_FAILURE;
     }
     if (arg == VENDOR_GET_HISTORY_NCI_CMD) {
-        HDF_LOGI("%{public}s: getting history nci from vendor!", __func__);
+        HDF_LOGI("VendorIoctlWithResponse: getting history nci from vendor!");
         return VendorGetHistoryNci(pData, dataLen, pRetVal);
     }
     if (dataLen < VENDOR_IOCTL_INPUT_MIN_LEN || dataLen > VENDOR_IOCTL_TOTAL_LEN) {
-        HDF_LOGE("%{public}s: dataLen is invalid!", __func__);
+        HDF_LOGE("VendorIoctlWithResponse: dataLen is invalid!");
         return HDF_ERR_INVALID_PARAM;
     }
     uint8_t inOutData[VENDOR_IOCTL_TOTAL_LEN] = { 0 };
     if (memcpy_s(inOutData, VENDOR_IOCTL_TOTAL_LEN, pData, VENDOR_IOCTL_INOUT_DATA_LEN) != EOK) {
-        HDF_LOGE("%{public}s: memcpy_s pData failed.", __func__);
+        HDF_LOGE("VendorIoctlWithResponse: memcpy_s pData failed.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalIoctl(arg, inOutData);
@@ -485,12 +485,12 @@ int NfcVendorAdaptions::VendorIoctlWithResponse(long arg, void *pData, uint16_t 
 int NfcVendorAdaptions::VendorGetHistoryNci(void *pData, uint16_t dataLen, std::vector<uint8_t> &pRetVal)
 {
     if (dataLen != VENDOR_IOCTL_INPUT_DATA_LEN) {
-        HDF_LOGE("%{public}s: input param data len err.", __func__);
+        HDF_LOGE("VendorGetHistoryNci: input param data len err.");
         return HDF_FAILURE;
     }
     std::vector<uint8_t> inOutData(VENDOR_IOCTL_TOTAL_LENGTH, 0);
     if (memcpy_s(&inOutData[0], inOutData.size(), pData, dataLen) != EOK) {
-        HDF_LOGE("%{public}s: memcpy_s pData failed.", __func__);
+        HDF_LOGE("VendorGetHistoryNci: memcpy_s pData failed.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalIoctl(VENDOR_GET_HISTORY_NCI_CMD, &inOutData[0]);
@@ -504,9 +504,9 @@ int NfcVendorAdaptions::VendorGetHistoryNci(void *pData, uint16_t dataLen, std::
 
 int NfcVendorAdaptions::VendorGetConfig(V1_1::NfcVendorConfig &config)
 {
-    HDF_LOGD("%{public}s: start.", __func__);
+    HDF_LOGD("VendorGetConfig: start.");
     if (nfcHalInf.nfcHalGetConfig == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorGetConfig: Function null.");
         return HDF_FAILURE;
     }
     nfcHalInf.nfcHalGetConfig(config);
@@ -515,9 +515,9 @@ int NfcVendorAdaptions::VendorGetConfig(V1_1::NfcVendorConfig &config)
 
 int NfcVendorAdaptions::VendorFactoryReset(void)
 {
-    HDF_LOGD("%{public}s: start.", __func__);
+    HDF_LOGD("VendorGetConfig: start.");
     if (nfcHalInf.nfcHalFactoryReset == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorGetConfig: Function null.");
         return HDF_FAILURE;
     }
     nfcHalInf.nfcHalFactoryReset();
@@ -526,9 +526,9 @@ int NfcVendorAdaptions::VendorFactoryReset(void)
 
 int NfcVendorAdaptions::VendorShutdownCase(void)
 {
-    HDF_LOGD("%{public}s: start.", __func__);
+    HDF_LOGD("VendorShutdownCase: start.");
     if (nfcHalInf.nfcHalShutdownCase == nullptr) {
-        HDF_LOGE("%{public}s: Function null.", __func__);
+        HDF_LOGE("VendorShutdownCase: Function null.");
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalShutdownCase();

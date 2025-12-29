@@ -171,6 +171,10 @@ int SimSeVendorAdaptions::VendorSimSecureElementOpenLogicalChannel(
     }
     if (vendorSimSecureElementOpenLogicalChannelFunc_) {
         ret = vendorSimSecureElementOpenLogicalChannelFunc_(arrAid, aidLen, p2, rsp, &rspLen, channelNum, status);
+        if (rspLen > RES_BUFFER_MAX_LENGTH) {
+            HDF_LOGE("VendorSimSecureElementOpenLogicalChannel: rspLen:%{public}u error", rspLen);
+            return SIM_SECURE_ELEMENT_RET_CONTEXT_FAIL;
+        }
         if (!ret && rspLen) {
             for (i = 0; i < rspLen; i++) {
                 response.push_back(rsp[i]);
@@ -202,7 +206,7 @@ int32_t SimSeVendorAdaptions::init(
     const sptr<OHOS::HDI::SecureElement::SimSecureElement::V1_0::ISecureElementCallback>& clientCallback,
     OHOS::HDI::SecureElement::SimSecureElement::V1_0::SecureElementStatus& status)
 {
-    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SimSeVendorAdaptions:init!");
     if (clientCallback == nullptr) {
         HDF_LOGE("init failed, clientCallback is null");
         status = SecureElementStatus::SE_NULL_POINTER_ERROR;
@@ -225,13 +229,17 @@ int32_t SimSeVendorAdaptions::init(
 
 int32_t SimSeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
 {
-    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SimSeVendorAdaptions:getAtr!");
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
     int ret = VendorSimSecureElementGetAtr(res, &resLen);
     if (ret != SIM_SECURE_ELEMENT_RET_OK) {
         HDF_LOGE("getAtr failed ret %{public}u", ret);
         return HDF_SUCCESS;
+    }
+    if (resLen > RES_BUFFER_MAX_LENGTH) {
+        HDF_LOGE("getAtr: resLen:%{public}u error", resLen);
+        return HDF_FAILURE;
     }
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
@@ -241,7 +249,7 @@ int32_t SimSeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
 
 int32_t SimSeVendorAdaptions::isSecureElementPresent(bool& present)
 {
-    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SimSeVendorAdaptions:isSecureElementPresent!");
     present = vendorSimSecureElementIsCardPresentFunc_();
     return HDF_SUCCESS;
 }
@@ -250,7 +258,7 @@ int32_t SimSeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid
     std::vector<uint8_t>& response, uint8_t& channelNumber, SecureElementStatus& status)
 {
     int tmpStatus;
-    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SimSeVendorAdaptions:openLogicalChannel!");
     if (aid.empty()) {
         HDF_LOGE("aid is null");
         status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
@@ -290,7 +298,7 @@ int32_t SimSeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, 
     std::vector<uint8_t>& response, SecureElementStatus& status)
 {
     int tmpStatus;
-    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SimSeVendorAdaptions:openBasicChannel!");
     if (aid.empty()) {
         HDF_LOGE("aid is null");
         status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
@@ -310,6 +318,10 @@ int32_t SimSeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, 
     }
     status = (SecureElementStatus)tmpStatus;
     response.clear();
+    if (resLen > RES_BUFFER_MAX_LENGTH) {
+        HDF_LOGE("openBasicChannel: resLen:%{public}u error", resLen);
+        return HDF_FAILURE;
+    }
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
@@ -325,7 +337,7 @@ int32_t SimSeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, 
 int32_t SimSeVendorAdaptions::closeChannel(uint8_t channelNumber, SecureElementStatus& status)
 {
     int tmpStatus;
-    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SimSeVendorAdaptions:closeChannel!");
     int ret = VendorSimSecureElementCloseChannel(channelNumber, &tmpStatus);
     status = (SecureElementStatus)tmpStatus;
     if (ret != SIM_SECURE_ELEMENT_RET_OK) {
@@ -348,14 +360,23 @@ int32_t SimSeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std:
     SecureElementStatus& status)
 {
     int tmpStatus;
-    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SimSeVendorAdaptions:transmit!");
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
+    if (command.empty()) {
+        HDF_LOGE("transmit command is empty");
+        status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
+        return HDF_ERR_INVALID_PARAM;
+    }
     int ret = VendorSimSecureElementTransmit(
         (uint8_t *)&command[0], command.size(), res, &resLen, &tmpStatus);
     if (ret != SIM_SECURE_ELEMENT_RET_OK) {
         HDF_LOGE("transmit failed ret %{public}u, tmpStatus = %{public}d", ret, tmpStatus);
         return HDF_SUCCESS;
+    }
+    if (resLen > RES_BUFFER_MAX_LENGTH) {
+        HDF_LOGE("transmit: resLen:%{public}u error", resLen);
+        return HDF_FAILURE;
     }
     status = (SecureElementStatus)tmpStatus;
     for (uint32_t i = 0; i < resLen; i++) {
@@ -366,7 +387,7 @@ int32_t SimSeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std:
 
 int32_t SimSeVendorAdaptions::reset(SecureElementStatus& status)
 {
-    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SimSeVendorAdaptions:reset!");
     HDF_LOGE("reset is not support");
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
@@ -374,7 +395,7 @@ int32_t SimSeVendorAdaptions::reset(SecureElementStatus& status)
 
 int32_t SimSeVendorAdaptions::setAccessSimSlot(uint8_t slotId)
 {
-    HDF_LOGI("SimSeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SimSeVendorAdaptions:setAccessSimSlot!");
     SIM_FUNCTION_INVOKE_RETURN(vendorSimSecureElementSetAccessSimSlotFunc_, slotId);
 }
 
@@ -399,6 +420,10 @@ int32_t SimSeVendorAdaptions::AddSecureElementDeathRecipient(const sptr<ISecureE
         return HDF_FAILURE;
     }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
+    if (remote == nullptr) {
+        HDF_LOGE("SimSeVendorAdaptions AddSecureElementDeathRecipient remote is null!");
+        return HDF_FAILURE;
+    }
     bool result = remote->AddDeathRecipient(remoteDeathRecipient_);
     if (!result) {
         HDF_LOGE("SimSeVendorAdaptions AddDeathRecipient failed!");
@@ -414,6 +439,10 @@ int32_t SimSeVendorAdaptions::RemoveSecureElementDeathRecipient(const sptr<ISecu
         return HDF_FAILURE;
     }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
+    if (remote == nullptr) {
+        HDF_LOGE("SimSeVendorAdaptions RemoveSecureElementDeathRecipient remote is null!");
+        return HDF_FAILURE;
+    }
     bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
     if (!result) {
         HDF_LOGE("SimSeVendorAdaptions RemoveDeathRecipient failed!");
