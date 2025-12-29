@@ -35,15 +35,17 @@ using namespace testing::ext;
 
 #ifdef COMMUNITY_TEST
 #define TEST_MULTIPLE 4
+#define TEST_SENSOR_TYPE HDF_SENSOR_TYPE_ACCELEROMETER
 #else
 #define TEST_MULTIPLE 1
+#define TEST_SENSOR_TYPE HDF_SENSOR_TYPE_ORIENTATION
 #endif
 
 namespace {
     std::vector<std::vector<SubscribedSensor>> g_subscribedSensors{
         {
             {
-                {DEFAULT_DEVICE_ID, HDF_SENSOR_TYPE_ORIENTATION, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
+                {DEFAULT_DEVICE_ID, TEST_SENSOR_TYPE, DEFAULT_SENSOR_ID, DEFAULT_LOCATION},
                 {10*ONE_MILLION*TEST_MULTIPLE, 0}
             },
         },
