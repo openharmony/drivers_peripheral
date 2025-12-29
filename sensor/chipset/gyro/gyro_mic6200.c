@@ -15,6 +15,7 @@
 #include "sensor_device_manager.h"
 
 #define HDF_LOG_TAG    khdf_sensor_gyro_driver
+#define SHIFT_8BIT 8
 
 static struct Mic6200DrvData *g_mic6200DrvData = NULL;
 
@@ -27,6 +28,9 @@ static int32_t ReadMic6200GyroRawData(struct SensorCfgData *data, struct GyroDat
 {
     uint8_t reg[GYRO_AXIS_BUTT];
     OsalTimespec time;
+    int16_t x;
+    int16_t y;
+    int16_t z;
 
     (void)memset_s(&time, sizeof(time), 0, sizeof(time));
     (void)memset_s(reg, sizeof(reg), 0, sizeof(reg));
@@ -38,31 +42,17 @@ static int32_t ReadMic6200GyroRawData(struct SensorCfgData *data, struct GyroDat
         return HDF_FAILURE;
     }
     *timestamp = time.sec * SENSOR_SECOND_CONVERT_NANOSECOND + time.usec * SENSOR_CONVERT_UNIT; /* unit nanosecond */
-
-    int32_t ret = ReadSensor(&data->busCfg, MIC6200_GYRO_X_LSB_ADDR, &reg[GYRO_X_AXIS_LSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    ret = ReadSensor(&data->busCfg, MIC6200_GYRO_X_MSB_ADDR, &reg[GYRO_X_AXIS_MSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    ret = ReadSensor(&data->busCfg, MIC6200_GYRO_Y_LSB_ADDR, &reg[GYRO_Y_AXIS_LSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    ret = ReadSensor(&data->busCfg, MIC6200_GYRO_Y_MSB_ADDR, &reg[GYRO_Y_AXIS_MSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    ret = ReadSensor(&data->busCfg, MIC6200_GYRO_Z_LSB_ADDR, &reg[GYRO_Z_AXIS_LSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    ret = ReadSensor(&data->busCfg, MIC6200_GYRO_Z_MSB_ADDR, &reg[GYRO_Z_AXIS_MSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    rawData->x = (int16_t)(SENSOR_DATA_SHIFT_LEFT(reg[GYRO_X_AXIS_MSB], SENSOR_DATA_WIDTH_8_BIT) |
-        reg[GYRO_X_AXIS_LSB]);
-    rawData->y = (int16_t)(SENSOR_DATA_SHIFT_LEFT(reg[GYRO_Y_AXIS_MSB], SENSOR_DATA_WIDTH_8_BIT) |
-        reg[GYRO_Y_AXIS_LSB]);
-    rawData->z = (int16_t)(SENSOR_DATA_SHIFT_LEFT(reg[GYRO_Z_AXIS_MSB], SENSOR_DATA_WIDTH_8_BIT) |
-        reg[GYRO_Z_AXIS_LSB]);
+    int32_t ret = ReadSensor(&data->busCfg, MIC6200_GYRO_X_LSB_ADDR, &reg[GYRO_X_AXIS_LSB], sizeof(reg));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: read data failed, ret [%d]", __func__, ret);
+        return HDF_FAILURE;
+    }
+    x = reg[GYRO_X_AXIS_LSB] | (reg[GYRO_X_AXIS_MSB] << SHIFT_8BIT);
+    y = reg[GYRO_Y_AXIS_LSB] | (reg[GYRO_Y_AXIS_MSB] << SHIFT_8BIT);
+    z = reg[GYRO_Z_AXIS_LSB] | (reg[GYRO_Z_AXIS_MSB] << SHIFT_8BIT);
+    rawData->x = (int32_t)x;
+    rawData->y = (int32_t)y;
+    rawData->z = (int32_t)z;
 
     return ret;
 }
@@ -196,7 +186,7 @@ static int32_t Mic6200InitDriver(struct HdfDeviceObject *device)
         return HDF_ERR_NOT_SUPPORT;
     }
 
-    ops.Init = InitMic6200;
+    ops.Init = NULL;
     ops.ReadData = ReadMic6200GyroData;
     ret = GyroRegisterChipOps(&ops);
     if (ret != HDF_SUCCESS) {
