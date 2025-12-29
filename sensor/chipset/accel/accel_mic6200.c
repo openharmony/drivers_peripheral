@@ -176,43 +176,6 @@ static int32_t Mic6200WriteRegister(struct SensorBusCfg *busCfg, uint8_t regAddr
     return WriteSensor(busCfg, writeData, sizeof(writeData));
 }
 
-static int32_t Mic6200HardwareInit(struct SensorBusCfg *busCfg)
-{
-    int32_t ret;
-    
-    // Power domain reset
-    ret = Mic6200WriteRegister(busCfg, 0xFF, 0x00);
-    if (ret != HDF_SUCCESS) return ret;
-    
-    // Accelerometer setup - full initialization sequence from original driver
-    static const struct {
-        uint8_t reg;
-        uint8_t val;
-    } initRegs[] = {
-        {0xFF, 0x00}, {0x40, 0x33}, {0x23, 0x80}, {0x40, 0x33}, {0x23, 0x77},
-        {0x23, 0x03}, {0x23, 0x0B}, {0x49, 0xC8}, {0x4B, 0x00}, {0x4C, 0x0B},
-        {0x4D, 0x0B}, {0x4E, 0x0B}, {0x52, 0xA7}, {0x56, 0x5A}, {0x59, 0x84},
-        {0x5C, 0x00}, {0x5B, 0x50}, {0xE7, 0xAA}, {0x7E, 0x03}, {0xF4, 0xA2},
-        {0xF5, 0x1C}, {0xF7, 0x55}, {0xF8, 0x55}, {0xD8, 0x10}, {0xDC, 0x18},
-        {0xDB, 0x3F}, {0xE6, 0x0F}, {0xE1, 0x47}, {0xE3, 0x7E}, {0xE0, 0x50},
-        {0xFF, 0x02}, {0x9E, 0xF0}, {0xAF, 0x10}, {0xA1, 0xA4}, {0xA6, 0x20},
-        {0xC8, 0x3F}, {0xFF, 0x00}, {0x57, 0x08}, {0x57, 0x88}, {0x57, 0x08},
-        {0x54, 0x23}, {0x54, 0x2B}, {0x54, 0x23}, {0x50, 0x81}, {0x40, 0x00},
-        {0x1D, 0x04}, {0x53, 0xD3}, {0xF6, 0x29}, {0xF9, 0xA2}, {0x47, 0x20}
-    };
-    
-    size_t i;
-    for (i = 0; i < sizeof(initRegs) / sizeof(initRegs[0]); i++) {
-        ret = Mic6200WriteRegister(busCfg, initRegs[i].reg, initRegs[i].val);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: Write register 0x%02X failed", __func__, initRegs[i].reg);
-            return ret;
-        }
-    }
-    
-    return HDF_SUCCESS;
-}
-
 static int32_t InitMic6200(struct SensorCfgData *data)
 {
     int32_t ret;
@@ -230,12 +193,6 @@ static int32_t InitMic6200(struct SensorCfgData *data)
     ret = VerifyMic6200Id(data);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: MIC6200 chip verification failed", __func__);
-        return HDF_FAILURE;
-    }
-    // Use driver code if HCS config is not available
-    ret = Mic6200HardwareInit(&data->busCfg);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: MIC6200 hardware init failed", __func__);
         return HDF_FAILURE;
     }
 
