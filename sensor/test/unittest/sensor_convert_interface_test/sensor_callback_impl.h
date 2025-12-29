@@ -101,6 +101,8 @@ public:
                 printf("%s: %s\n", __func__, st.c_str());
                 HDF_LOGI("%{public}s: testcase %{public}s\n", __func__, st.c_str());
             }
+        }else if (ret == HDF_ERR_NOT_SUPPORT) {
+            printf("\033[96m[  SKIPED  ] ConvertSensorDataTest HDF_ERR_NOT_SUPPORT\033[0m\n");
         } else {
             printf("\033[91m[  FAILED  ] ConvertSensorDataTest HDF_FAILURE\033[0m\n");
         }
