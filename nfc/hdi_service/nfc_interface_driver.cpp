@@ -38,6 +38,10 @@ struct HdfNfcInterfaceHost {
 static int32_t NfcInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
+    if (client == nullptr || client->device == nullptr || data == nullptr) {
+        HDF_LOGE("NfcInterfaceDriverDispatc, invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
     auto *hdfNfcInterfaceHost =
         CONTAINER_OF(client->device->service, struct HdfNfcInterfaceHost, ioservice);
 
@@ -46,7 +50,7 @@ static int32_t NfcInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int 
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("NfcInterfaceDriverDispatc, invalid data sbuf object to dispatch");
+        HDF_LOGE("NfcInterfaceDriverDispatch, invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
@@ -54,6 +58,10 @@ static int32_t NfcInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int 
         return HDF_ERR_INVALID_PARAM;
     }
 
+    if (hdfNfcInterfaceHost == nullptr || hdfNfcInterfaceHost->stub == nullptr) {
+        HDF_LOGE("NfcInterfaceDriverDispatch, hdfNfcInterfaceHost stub is null");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return hdfNfcInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
@@ -66,6 +74,10 @@ static int HdfNfcInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfNfcInterfaceDriverBind enter");
+    if (deviceObject == nullptr) {
+        HDF_LOGE("HdfNfcInterfaceDriverBind, param deviceObject is null!");
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     auto *hdfNfcInterfaceHost = new (std::nothrow) HdfNfcInterfaceHost;
     if (hdfNfcInterfaceHost == nullptr) {
@@ -100,15 +112,17 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfNfcInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfNfcInterfaceDriverRelease enter");
-    if (deviceObject->service == nullptr) {
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
         HDF_LOGE("HdfNfcInterfaceDriverRelease not initted");
         return;
     }
 
     auto *hdfNfcInterfaceHost =
         CONTAINER_OF(deviceObject->service, struct HdfNfcInterfaceHost, ioservice);
-    delete hdfNfcInterfaceHost;
-    HDF_LOGI("HdfNfcInterfaceDriverRelease Success");
+    if (hdfNfcInterfaceHost != nullptr) {
+        delete hdfNfcInterfaceHost;
+        HDF_LOGI("HdfNfcInterfaceDriverRelease Success");
+    }
 }
 
 static struct HdfDriverEntry g_nfcinterfaceDriverEntry = {
