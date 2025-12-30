@@ -106,7 +106,7 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
     tmp[MAGNETIC_Y_AXIS] = (rawData.y * sign[MAGNETIC_Y_AXIS] - MMC5617_16BIT_OFFSET);
     tmp[MAGNETIC_Z_AXIS] = (rawData.z * sign[MAGNETIC_Z_AXIS] - MMC5617_16BIT_OFFSET);
 
-    ret = SensorRawDataToRemapData(data->direction, tmp, sizeof(tmp) / sizeof(tmp[0]));
+    ret = SensorRawDataToRemapData(data->direction, tmp, (sizeof(int32_t) * MAGNETIC_AXIS_NUM) / sizeof(int32_t));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: MMC5617 convert raw data failed", __func__);
         return HDF_FAILURE;
