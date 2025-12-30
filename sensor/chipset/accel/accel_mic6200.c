@@ -135,7 +135,7 @@ static int32_t ReadMic6200Data(struct SensorCfgData *cfg, struct SensorReportEve
     tmp[ACCEL_Y_AXIS] = (rawData.y * SENSOR_CONVERT_UNIT) / SENSOR_CONVERT_UNIT;
     tmp[ACCEL_Z_AXIS] = (rawData.z * SENSOR_CONVERT_UNIT) / SENSOR_CONVERT_UNIT;
 
-    ret = SensorRawDataToRemapData(cfg->direction, tmp, sizeof(tmp) / sizeof(tmp[0]));
+    ret = SensorRawDataToRemapData(cfg->direction, tmp, (sizeof(int32_t) * ACCEL_AXIS_NUM) / sizeof(int32_t));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: MIC6200 convert raw data failed", __func__);
         return HDF_FAILURE;
