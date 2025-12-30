@@ -51,9 +51,9 @@ static int32_t ReadMn7991xData(struct SensorCfgData *data)
     event.mode = SENSOR_WORK_MODE_ON_CHANGE;
 
     if (rawData.stateFlag <= MN7991X_PROXIMITY_THRESHOLD) {
-        tmp = PROXIMITY_STATE_FAR;
+        *tmp = PROXIMITY_STATE_FAR;
     } else {
-        tmp = PROXIMITY_STATE_NEAR;
+        *tmp = PROXIMITY_STATE_NEAR;
     }
 
     event.dataLen = sizeof(*tmp);
