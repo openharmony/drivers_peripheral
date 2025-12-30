@@ -88,7 +88,7 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
         return HDF_ERR_MALLOC_FAIL;
     }
     (void)memset_s(&event, sizeof(event), 0, sizeof(event));
-    (void)memset_s(tmp, sizeof(tmp), 0, sizeof(tmp));
+    (void)memset_s(tmp, (sizeof(int32_t) * MAGNETIC_AXIS_NUM), 0, (sizeof(int32_t) * MAGNETIC_AXIS_NUM));
 
     CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
 
