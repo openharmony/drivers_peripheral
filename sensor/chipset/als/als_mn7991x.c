@@ -36,6 +36,7 @@ static int32_t ReadMn7991xData(struct SensorCfgData *data, struct SensorReportEv
     ret = ReadSensor(&data->busCfg, DEVREG_IR_DATAL, reg_value, sizeof(reg_value));
     if (ret < 0) {
         HDF_LOGE("%s: light read data error!  1 ret = %d.", __func__, ret);
+        return HDF_FAILURE;
     }
 
     ir = ((reg_value[REG_BYTE_OFFSET_1] << SHIFT_8BIT) | (reg_value[REG_BYTE_OFFSET_0]));
