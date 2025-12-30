@@ -31,7 +31,7 @@ static int32_t ReadMn7991xData(struct SensorCfgData *data, struct SensorReportEv
     uint8_t reg_value[4];
     uint16_t als = 0;
     uint16_t ir = 0;
-    static struct AlsReportData reportData = { 0, 0, 0 };
+    static struct AlsReportData *reportData = (struct AlsReportData *)OsalMemCalloc(sizeof(struct AlsReportData));
 
     ret = ReadSensor(&data->busCfg, DEVREG_IR_DATAL, reg_value, sizeof(reg_value));
     if (ret < 0) {
@@ -53,8 +53,8 @@ static int32_t ReadMn7991xData(struct SensorCfgData *data, struct SensorReportEv
     event->mode = SENSOR_WORK_MODE_REALTIME;
 
     reportData.als = als * SENSOR_CONVERT_UNIT;
-    event->dataLen = sizeof(reportData);
-    event->data = (uint8_t *)&reportData;
+    event->dataLen = sizeof(*reportData);
+    event->data = (uint8_t *)reportData;
 
     return ret;
 }
