@@ -47,6 +47,7 @@ static int32_t ReadMmc5617RawData(struct SensorCfgData *data, struct MagneticDat
     while (!(drdy & 0x01) && retry < MAX_RETRY_ATTEMPTS) {
         ReadSensor(&data->busCfg, MMC5617_STATUS_ADDR, &drdy, sizeof(uint8_t));
         retry++;
+        OsalSleep(1);
     }
 
     ret = ReadSensor(&data->busCfg, MMC5617_MAGNETIC_X_MSB_ADDR, &reg[MAGNETIC_X_AXIS_MSB], sizeof(uint8_t));
@@ -80,7 +81,6 @@ static int32_t ReadMmc5617RawData(struct SensorCfgData *data, struct MagneticDat
 int32_t ReadMmc5617Data(struct SensorCfgData *data)
 {
     struct MagneticData rawData = { 0, 0, 0 };
-    int32_t tmp[MAGNETIC_AXIS_NUM];
     struct SensorReportEvent event;
     int8_t sign[MAGNETIC_AXIS_NUM] = {1, -1, -1};
 
@@ -88,6 +88,11 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
     (void)memset_s(tmp, sizeof(tmp), 0, sizeof(tmp));
 
     CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
+
+    int32_t *tmp = (int32_t *)OsalMemCalloc(sizeof(int32_t) * MAGNETIC_AXIS_NUM);
+    if (tmp == NULL) {
+        return HDF_ERR_MALLOC_FAIL;
+    }
 
     int32_t ret = ReadMmc5617RawData(data, &rawData, &event.timestamp);
     if (ret != HDF_SUCCESS) {
@@ -109,7 +114,7 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
         return HDF_FAILURE;
     }
 
-    event.dataLen = sizeof(tmp);
+    event.dataLen = sizeof(int32_t) * MAGNETIC_AXIS_NUM;
     event.data = (uint8_t *)&tmp;
     ret = ReportSensorEvent(&event);
     if (ret != HDF_SUCCESS) {
