@@ -30,7 +30,7 @@ static int32_t ReadMn7991xData(struct SensorCfgData *data)
     uint8_t reg_value[10];
     struct SensorReportEvent event;
     OsalTimespec time;
-	int32_t *tmp = (int32_t *)OsalMemCalloc(sizeof(int32_t));
+    int32_t *tmp = (int32_t *)OsalMemCalloc(sizeof(int32_t));
     if (tmp == NULL) {
         return HDF_ERR_MALLOC_FAIL;
     }
