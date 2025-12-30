@@ -34,7 +34,7 @@ static int32_t ReadMn7991xData(struct SensorCfgData *data, struct SensorReportEv
     struct AlsReportData *reportData = NULL;
 
 	reportData = (struct AlsReportData *)OsalMemCalloc(sizeof(struct AlsReportData));
-	if (reportData == NULL) {
+    if (reportData == NULL) {
         HDF_LOGE("%s: Malloc Mn7991x reportData fail", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
