@@ -61,9 +61,11 @@ static int32_t ReadMic6200GyroData(struct SensorCfgData *data)
 {
     int32_t ret;
     struct GyroData rawData = { 0, 0, 0 };
-    int32_t tmp[GYRO_AXIS_NUM];
     struct SensorReportEvent event;
-
+	int32_t *tmp = (int32_t *)OsalMemCalloc(sizeof(int32_t) * GYRO_AXIS_NUM);
+	if (tmp == NULL) {
+		return HDF_ERR_MALLOC_FAIL;
+	}
     (void)memset_s(&event, sizeof(event), 0, sizeof(event));
 
     ret = ReadMic6200GyroRawData(data, &rawData, &event.timestamp);
@@ -86,8 +88,8 @@ static int32_t ReadMic6200GyroData(struct SensorCfgData *data)
         return HDF_FAILURE;
     }
 
-    event.dataLen = sizeof(tmp);
-    event.data = (uint8_t *)&tmp;
+    event.dataLen = sizeof(int32_t) * GYRO_AXIS_NUM;
+    event.data = (uint8_t *)tmp;
     ret = ReportSensorEvent(&event);
     return ret;
 }
