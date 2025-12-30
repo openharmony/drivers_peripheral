@@ -64,7 +64,7 @@ static int32_t ReadMic6200GyroData(struct SensorCfgData *data)
     struct SensorReportEvent event;
     int32_t *tmp = (int32_t *)OsalMemCalloc(sizeof(int32_t) * GYRO_AXIS_NUM);
 	if (tmp == NULL) {
-		return HDF_ERR_MALLOC_FAIL;
+        return HDF_ERR_MALLOC_FAIL;
 	}
     (void)memset_s(&event, sizeof(event), 0, sizeof(event));
 
