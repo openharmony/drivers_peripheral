@@ -94,9 +94,9 @@ static int32_t ReadMic6200RawData(struct SensorCfgData *data, struct AccelData *
         return HDF_FAILURE;
     }
 
-    x = reg[MIC6200_REG_BYTE_OFFSET_0] | (reg[MIC6200_REG_BYTE_OFFSET_1] << SHIFT_8BIT);
-    y = reg[MIC6200_REG_BYTE_OFFSET_2] | (reg[MIC6200_REG_BYTE_OFFSET_3] << SHIFT_8BIT);
-    z = reg[MIC6200_REG_BYTE_OFFSET_4] | (reg[MIC6200_REG_BYTE_OFFSET_5] << SHIFT_8BIT);
+    x = (int16_t)((uint16_t)reg[MIC6200_REG_BYTE_OFFSET_1] << SHIFT_8BIT) | reg[MIC6200_REG_BYTE_OFFSET_0];
+    y = (int16_t)((uint16_t)reg[MIC6200_REG_BYTE_OFFSET_3] << SHIFT_8BIT) | reg[MIC6200_REG_BYTE_OFFSET_2];
+    z = (int16_t)((uint16_t)reg[MIC6200_REG_BYTE_OFFSET_5] << SHIFT_8BIT) | reg[MIC6200_REG_BYTE_OFFSET_4];
     rawData->x = (int32_t)x;
     rawData->y = (int32_t)y;
     rawData->z = (int32_t)z;
