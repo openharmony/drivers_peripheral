@@ -115,7 +115,7 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
     }
 
     event.dataLen = sizeof(int32_t) * MAGNETIC_AXIS_NUM;
-    event.data = (uint8_t *)&tmp;
+    event.data = (uint8_t *)tmp;
     ret = ReportSensorEvent(&event);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: MMC5617 report data failed", __func__);
