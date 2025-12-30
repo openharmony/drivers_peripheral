@@ -83,16 +83,14 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
     struct MagneticData rawData = { 0, 0, 0 };
     struct SensorReportEvent event;
     int8_t sign[MAGNETIC_AXIS_NUM] = {1, -1, -1};
-
-    (void)memset_s(&event, sizeof(event), 0, sizeof(event));
-    (void)memset_s(tmp, sizeof(tmp), 0, sizeof(tmp));
-
-    CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
-
     int32_t *tmp = (int32_t *)OsalMemCalloc(sizeof(int32_t) * MAGNETIC_AXIS_NUM);
     if (tmp == NULL) {
         return HDF_ERR_MALLOC_FAIL;
     }
+    (void)memset_s(&event, sizeof(event), 0, sizeof(event));
+    (void)memset_s(tmp, sizeof(tmp), 0, sizeof(tmp));
+
+    CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
 
     int32_t ret = ReadMmc5617RawData(data, &rawData, &event.timestamp);
     if (ret != HDF_SUCCESS) {
