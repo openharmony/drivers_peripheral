@@ -110,9 +110,9 @@ static int32_t ReadMic6200Data(struct SensorCfgData *cfg, struct SensorReportEve
     struct AccelData rawData = { 0, 0, 0 };
     static uint32_t readCount = 0;
     int32_t *tmp = (int32_t *)OsalMemCalloc(sizeof(int32_t) * ACCEL_AXIS_NUM);
-	if (tmp == NULL) {
+    if (tmp == NULL) {
         return HDF_ERR_MALLOC_FAIL;
-	}
+    }
 
     CHECK_NULL_PTR_RETURN_VALUE(cfg, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(event, HDF_ERR_INVALID_PARAM);
