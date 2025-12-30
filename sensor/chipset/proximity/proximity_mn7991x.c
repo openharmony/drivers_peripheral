@@ -26,12 +26,14 @@ static struct Mn7991xDrvData *g_mn7991xDrvData = NULL;
 static int32_t ReadMn7991xData(struct SensorCfgData *data)
 {
     int32_t ret;
-    int32_t tmp;
     struct ProximityData rawData = { 5 };
     uint8_t reg_value[10];
     struct SensorReportEvent event;
     OsalTimespec time;
-
+	int32_t *tmp = (int32_t *)OsalMemCalloc(sizeof(int32_t));
+	if (tmp == NULL) {
+		return HDF_ERR_MALLOC_FAIL;
+	}
     (void)memset_s(&event, sizeof(event), 0, sizeof(event));
     ret = ReadSensor(&data->busCfg, MN7991X_PROX_RAW_DATA_REG_L, reg_value, sizeof(reg_value));
     if (ret < 0) {
@@ -54,8 +56,8 @@ static int32_t ReadMn7991xData(struct SensorCfgData *data)
         tmp = PROXIMITY_STATE_NEAR;
     }
 
-    event.dataLen = sizeof(tmp);
-    event.data = (uint8_t *)&tmp;
+    event.dataLen = sizeof(*tmp);
+    event.data = (uint8_t *)tmp;
     ret = ReportSensorEvent(&event);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: Mn7991x report data failed", __func__);
