@@ -82,7 +82,7 @@ static int32_t ReadMic6200GyroData(struct SensorCfgData *data)
     tmp[GYRO_Y_AXIS] = (rawData.y * MIC6200_GYRO_SENSITIVITY_2000DPS_NUM) / MIC6200_GYRO_SENSITIVITY_2000DPS_DEN;
     tmp[GYRO_Z_AXIS] = (rawData.z * MIC6200_GYRO_SENSITIVITY_2000DPS_NUM) / MIC6200_GYRO_SENSITIVITY_2000DPS_DEN;
 
-    ret = SensorRawDataToRemapData(data->direction, tmp, sizeof(tmp) / sizeof(tmp[0]));
+    ret = SensorRawDataToRemapData(data->direction, tmp, (sizeof(int32_t) * GYRO_AXIS_NUM) / sizeof(int32_t));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: MIC6200 convert raw data failed", __func__);
         return HDF_FAILURE;
