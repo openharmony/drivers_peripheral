@@ -26,22 +26,13 @@ namespace Convert {
 namespace V1_0 {
 using namespace OHOS::HDI::Sensor::Convert::V1_0;
 using namespace OHOS::HDI::Sensor::V3_0;
-enum HdfDMDeviceStatus {
-     UNKNOWN = 0,
-     STATUS_FOLDED,
-     STATUS_TENT_HOVER,
-     STATUS_TENT,
-     STATUS_GLOBAL_FULL
- };
-
 class SensorConvertImpl : public ISensorConvertInterfaces {
 public:
     SensorConvertImpl();
     virtual ~SensorConvertImpl() {};
     int32_t Init();
     int32_t ConvertSensorData(const HdfDeviceStatusPolicy& status,
-         const HdfSensorData& inSensorData, HdfSensorData& outSensorData) override;
-
+        const HdfSensorData& inSensorData, HdfSensorData& outSensorData) override;
 };
 } // namespace V1_0
 } // namespace Convert
