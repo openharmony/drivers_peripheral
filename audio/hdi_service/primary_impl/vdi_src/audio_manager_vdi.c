@@ -215,9 +215,13 @@ static int32_t AudioManagerVdiDescsToDescs(struct AudioAdapterDescriptorVdi *vdi
             AUDIO_FUNC_LOGE("audio vdiManager port fail");
             return HDF_FAILURE;
         }
+        if (vdiDescs[i].adapterName == NULL) {
+            AUDIO_FUNC_LOGE("adapterName == NULL");
+            return HDF_FAILURE;
+        }
         descs[i].adapterName = strdup(vdiDescs[i].adapterName); // audio stub free adapterName
         if (descs[i].adapterName == NULL) {
-            AUDIO_FUNC_LOGE("strdup fail, descs[%{public}d].adapterName = %{public}s", i, descs[i].adapterName);
+            AUDIO_FUNC_LOGE("strdup fail, vdiDescs[%{public}d].adapterName = %{public}s", i, vdiDescs[i].adapterName);
             return HDF_FAILURE;
         }
         AUDIO_FUNC_LOGI("audio vdiManager get adapterName=%{public}s", descs[i].adapterName);
