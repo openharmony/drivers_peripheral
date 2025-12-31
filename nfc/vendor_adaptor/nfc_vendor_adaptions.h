@@ -112,7 +112,7 @@ public:
     int VendorShutdownCase(void) override;
     static void *DoHalPreOpen(void *arg);
     void HalPreOpen(void);
-    bool VendorIoctlExt(log arg, const std::vector<uint8_t> &data, std::vector<uint8_t> &response);
+    bool VendorIoctlExt(long arg, const std::vector<uint8_t> &data, std::vector<uint8_t> &response);
 
 private:
     std::string GetChipType(void);
