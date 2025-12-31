@@ -29,8 +29,8 @@ void DcameraDeviceUpdateSettingsFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     FuzzedDataProvider fdp(data, size);
-    std::string deviceId = fdp.ConsumeRandomLengthString(size);
-    std::string dhId = fdp.ConsumeRandomLengthString(size);
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
 
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
@@ -39,8 +39,8 @@ void DcameraDeviceUpdateSettingsFuzzTest(const uint8_t* data, size_t size)
     std::vector<uint8_t> results;
     results.push_back(*(reinterpret_cast<const uint8_t*>(data)));
 
-    std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(size);
-    std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(size);
+    std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString();
+    std::string srcAbilityInfo = fdp.ConsumeRandomLengthString();
 
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
     if (dcameraDevice == nullptr) {
