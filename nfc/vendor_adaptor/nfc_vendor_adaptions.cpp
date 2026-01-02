@@ -515,9 +515,9 @@ int NfcVendorAdaptions::VendorGetConfig(V1_1::NfcVendorConfig &config)
 
 int NfcVendorAdaptions::VendorFactoryReset(void)
 {
-    HDF_LOGD("VendorGetConfig: start.");
+    HDF_LOGD("VendorFactoryReset: start.");
     if (nfcHalInf.nfcHalFactoryReset == nullptr) {
-        HDF_LOGE("VendorGetConfig: Function null.");
+        HDF_LOGE("VendorFactoryReset: Function null.");
         return HDF_FAILURE;
     }
     nfcHalInf.nfcHalFactoryReset();
