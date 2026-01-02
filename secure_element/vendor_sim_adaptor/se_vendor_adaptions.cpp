@@ -171,11 +171,7 @@ int SimSeVendorAdaptions::VendorSimSecureElementOpenLogicalChannel(
     }
     if (vendorSimSecureElementOpenLogicalChannelFunc_) {
         ret = vendorSimSecureElementOpenLogicalChannelFunc_(arrAid, aidLen, p2, rsp, &rspLen, channelNum, status);
-        if (rspLen > RES_BUFFER_MAX_LENGTH) {
-            HDF_LOGE("VendorSimSecureElementOpenLogicalChannel: rspLen:%{public}u error", rspLen);
-            return SIM_SECURE_ELEMENT_RET_CONTEXT_FAIL;
-        }
-        if (!ret && rspLen) {
+        if (!ret && rspLen > 0 && rspLen <= RES_BUFFER_MAX_LENGTH) {
             for (i = 0; i < rspLen; i++) {
                 response.push_back(rsp[i]);
             }
@@ -237,12 +233,10 @@ int32_t SimSeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
         HDF_LOGE("getAtr failed ret %{public}u", ret);
         return HDF_SUCCESS;
     }
-    if (resLen > RES_BUFFER_MAX_LENGTH) {
-        HDF_LOGE("getAtr: resLen:%{public}u error", resLen);
-        return HDF_FAILURE;
-    }
-    for (uint32_t i = 0; i < resLen; i++) {
-        response.push_back(res[i]);
+    if (resLen <= RES_BUFFER_MAX_LENGTH) {
+        for (uint32_t i = 0; i < resLen; i++) {
+            response.push_back(res[i]);
+        }
     }
     return HDF_SUCCESS;
 }
@@ -318,12 +312,10 @@ int32_t SimSeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, 
     }
     status = (SecureElementStatus)tmpStatus;
     response.clear();
-    if (resLen > RES_BUFFER_MAX_LENGTH) {
-        HDF_LOGE("openBasicChannel: resLen:%{public}u error", resLen);
-        return HDF_FAILURE;
-    }
-    for (uint32_t i = 0; i < resLen; i++) {
-        response.push_back(res[i]);
+    if (resLen <= RES_BUFFER_MAX_LENGTH) {
+        for (uint32_t i = 0; i < resLen; i++) {
+            response.push_back(res[i]);
+        }
     }
     if (ret == SIM_SECURE_ELEMENT_RET_OK && resLen >= SW1_OFFSET && !g_openedChannels[0]) {
         if (response[resLen - SW1_OFFSET] == 0x90 && response[resLen - SW2_OFFSET] == 0x00) {
@@ -366,7 +358,7 @@ int32_t SimSeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std:
     if (command.empty()) {
         HDF_LOGE("transmit command is empty");
         status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_FAILURE;
     }
     int ret = VendorSimSecureElementTransmit(
         (uint8_t *)&command[0], command.size(), res, &resLen, &tmpStatus);
@@ -374,13 +366,11 @@ int32_t SimSeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std:
         HDF_LOGE("transmit failed ret %{public}u, tmpStatus = %{public}d", ret, tmpStatus);
         return HDF_SUCCESS;
     }
-    if (resLen > RES_BUFFER_MAX_LENGTH) {
-        HDF_LOGE("transmit: resLen:%{public}u error", resLen);
-        return HDF_FAILURE;
-    }
     status = (SecureElementStatus)tmpStatus;
-    for (uint32_t i = 0; i < resLen; i++) {
-        response.push_back(res[i]);
+    if (resLen <= RES_BUFFER_MAX_LENGTH) {
+        for (uint32_t i = 0; i < resLen; i++) {
+            response.push_back(res[i]);
+        }
     }
     return HDF_SUCCESS;
 }

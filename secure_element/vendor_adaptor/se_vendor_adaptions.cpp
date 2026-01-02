@@ -85,12 +85,10 @@ int32_t SeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaGetAtr(res, &resLen);
-    if (resLen > RES_BUFFER_MAX_LENGTH) {
-        HDF_LOGE("getAtr: resLen:%{public}u error", resLen);
-        return HDF_FAILURE;
-    }
-    for (uint32_t i = 0; i < resLen; i++) {
-        response.push_back(res[i]);
+    if (resLen <= RES_BUFFER_MAX_LENGTH) {
+        for (uint32_t i = 0; i < resLen; i++) {
+            response.push_back(res[i]);
+        }
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         HDF_LOGE("getAtr failed ret %{public}u", ret);
@@ -127,12 +125,10 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
     uint32_t channelCreated = MAX_CHANNEL_SIZE + 1;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaOpenLogicalChannel(
         (uint8_t *)&aid[0], aid.size(), p2, res, &resLen, &channelCreated);
-    if (resLen > RES_BUFFER_MAX_LENGTH) {
-        HDF_LOGE("openLogicalChannel: resLen:%{public}u error", resLen);
-        return HDF_FAILURE;
-    }
-    for (uint32_t i = 0; i < resLen; i++) {
-        response.push_back(res[i]);
+    if (resLen <= RES_BUFFER_MAX_LENGTH) {
+        for (uint32_t i = 0; i < resLen; i++) {
+            response.push_back(res[i]);
+        }
     }
     if ((ret != SECURE_ELEMENT_CA_RET_OK) || (resLen < MIN_RES_LEN)) {
         HDF_LOGE("openLogicalChannel failed ret %{public}u", ret);
@@ -179,12 +175,10 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaOpenBasicChannel(
         (uint8_t *)&aid[0], aid.size(), res, &resLen);
-    if (resLen > RES_BUFFER_MAX_LENGTH) {
-        HDF_LOGE("openBasicChannel: resLen:%{public}u error", resLen);
-        return HDF_FAILURE;
-    }
-    for (uint32_t i = 0; i < resLen; i++) {
-        response.push_back(res[i]);
+    if (resLen <= RES_BUFFER_MAX_LENGTH) {
+        for (uint32_t i = 0; i < resLen; i++) {
+            response.push_back(res[i]);
+        }
     }
     if ((ret != SECURE_ELEMENT_CA_RET_OK) || (resLen < MIN_RES_LEN)) {
         HDF_LOGE("openBasicChannel failed ret %{public}u", ret);
@@ -248,16 +242,14 @@ int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::ve
     if (command.empty()) {
         HDF_LOGE("transmit command is empty");
         status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_FAILURE;
     }
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaTransmit(
         (uint8_t *)&command[0], command.size(), res, &resLen);
-    if (resLen > RES_BUFFER_MAX_LENGTH) {
-        HDF_LOGE("transmit: resLen:%{public}u error", resLen);
-        return HDF_FAILURE;
-    }
-    for (uint32_t i = 0; i < resLen; i++) {
-        response.push_back(res[i]);
+    if (resLen <= RES_BUFFER_MAX_LENGTH) {
+        for (uint32_t i = 0; i < resLen; i++) {
+            response.push_back(res[i]);
+        }
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         HDF_LOGE("transmit failed ret %{public}u", ret);
