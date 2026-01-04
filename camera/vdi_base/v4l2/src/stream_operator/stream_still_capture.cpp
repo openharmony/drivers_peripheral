@@ -31,6 +31,15 @@ StreamStillCapture::~StreamStillCapture()
     CAMERA_LOGV("enter");
 }
 
+uint32_t StreamStillCapture::GetBufferCount()
+{
+#ifdef PHOTO_BUFFER_NUM
+    return PHOTO_BUFFER_NUM; // buffer count
+#else
+    return 3;
+#endif
+}
+
 void StreamStillCapture::HandleResult(std::shared_ptr<IBuffer>& buffer)
 {
     if (state_ == STREAM_STATE_OFFLINE) {

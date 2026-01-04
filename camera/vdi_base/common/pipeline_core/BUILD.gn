@@ -27,6 +27,28 @@ config("pipe_config") {
     defines += [ "__ARCH64__" ]
   }
 
+  if ((drivers_peripheral_camera_feature_Distribute_timeout > 500) && (drivers_peripheral_camera_feature_Distribute_timeout <= 5000)) {
+    defines += [
+      "DISTRIBUTE_TIMEOUT=$drivers_peripheral_camera_feature_Distribute_timeout",
+    ]
+  } else {
+    defines += [
+      "DISTRIBUTE_TIMEOUT=500",
+    ]
+  }
+
+  if (drivers_peripheral_camera_feature_batch_buffers) {
+    defines += [ "BATCH_CREATE_BUFFERS" ]
+  }
+
+  if (drivers_peripheral_camera_feature_fork_dma) {
+    defines += [ "FORK_DMA" ]
+  }
+
+  if (drivers_peripheral_camera_feature_host_codec) {
+    defines += [ "YUV420SP_FORK_STREAM_HOST_CODEC" ]
+  }
+
   cflags_cc = [
     "-Wall",
     "-Wextra",
@@ -139,10 +161,19 @@ ohos_shared_library("peripheral_camera_pipeline_core") {
     "$camera_path/adapter/platform/v4l2/src/device_manager/include",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node",
-    "$camera_path/adapter/platform/v4l2/src/driver_adapter/include/",
     "$camera_path/dump/include",
     "$camera_path/../interfaces",
   ]
+
+  if (drivers_peripheral_camera_feature_board_config) {
+    include_dirs += [
+      "//device/board/${product_company}/${product_name}/camera/vdi_impl/v4l2/driver_adapter/include",
+    ]
+  } else {
+    include_dirs += [
+      "$camera_path/adapter/platform/v4l2/src/driver_adapter/include/",
+    ]
+  }
 
   deps = [
     "$camera_path/buffer_manager:peripheral_camera_buffer_manager",

@@ -37,7 +37,6 @@ V4L2SourceNode::V4L2SourceNode(const std::string& name, const std::string& type,
     meta_ = std::make_shared<CameraMetadata>(itemCapacitySize, dataCapacitySize);
 }
 
-#ifdef V4L2_EMULATOR
 struct MetadataTag {
     std::string cameraIdStr = "lcam001";
     CameraId cameraIdNum = CAMERA_FIRST;
@@ -47,18 +46,15 @@ const MetadataTag OHOS_MAP_CAMERA_ID[] = {
     { "lcam001", CAMERA_FIRST },
     { "lcam002", CAMERA_SECOND }
 };
-#endif
 
 RetCode V4L2SourceNode::GetDeviceController()
 {
     CameraId cameraId = CAMERA_FIRST;
-#ifdef V4L2_EMULATOR
     for (auto metaTag : OHOS_MAP_CAMERA_ID) {
         if (metaTag.cameraIdStr == cameraId_) {
             cameraId = metaTag.cameraIdNum;
         }
     }
-#endif
     sensorController_ = std::static_pointer_cast<SensorController>
         (deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
     if (sensorController_ == nullptr) {
@@ -196,6 +192,20 @@ void V4L2SourceNode::SetBufferCallback()
             OnPackBuffer(frameSpec);
     });
     return;
+}
+
+RetCode V4L2SourceNode::CreateBuffers()
+{
+    CAMERA_LOGI("V4L2SourceNode CreateBuffers enter.");
+#ifdef BATCH_CREATE_BUFFERS
+    if (sensorController_->CreateBuffers() == RC_OK) {
+        CAMERA_LOGI("CreateBuffers success ");
+        return RC_OK;
+    }
+    return RC_ERROR;
+#else
+    return RC_OK;
+#endif
 }
 
 RetCode V4L2SourceNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)

@@ -124,18 +124,28 @@ static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared
             CAMERA_LOGE("PcForkNode::DeliverBuffer error,  buffer->GetSize() == 0");
             return;
         }
+#ifdef FORK_DMA
         auto [bufferAddr, dmaFd] = buffer->AllocateDmaBuffer(bufferSize);
+#else
+        auto bufferAddr = malloc(bufferSize);
+#endif
         if (bufferAddr != nullptr) {
             forkBuffer->SetVirAddress(bufferAddr);
             forkBuffer->SetSize(bufferSize);
+#ifdef FORK_DMA
             buffer->SetDmaBufFd(dmaFd);
+#endif
         } else {
             CAMERA_LOGE("ForkNode::DeliverBuffer malloc buffer fail");
         }
     }
     if (forkBuffer->GetVirAddress() != forkBuffer->GetSuffaceBufferAddr()) {
+        size_t datasize = buffer->GetSize();
+#ifdef YUV420SP_FORK_STREAM_HOST_CODEC
+        datasize = forkBuffer->GetSize();
+#endif
         auto err = memcpy_s(forkBuffer->GetVirAddress(), forkBuffer->GetSize(),
-            buffer->GetVirAddress(), buffer->GetSize());
+            buffer->GetVirAddress(), datasize);
         if (err != EOK) {
             CAMERA_LOGE("ForkNode::DeliverBuffer memcpy_s is fail");
         }
@@ -152,6 +162,13 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
         std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
         if (forkBuffer != nullptr) {
+#ifdef YUV420SP_FORK_STREAM_HOST_CODEC
+            const int YCRCB_420_SP_SIZE_SCALE = 3;
+            const int YCRCB_420_SP_SIZE_FACTOR = 2;
+            size_t size = buffer->GetCurWidth() * buffer->GetCurHeight() *
+                YCRCB_420_SP_SIZE_SCALE / YCRCB_420_SP_SIZE_FACTOR;
+            forkBuffer->SetSize(size);
+#endif
             CopyBufferToForkBuffer(buffer, forkBuffer);
             forkBuffer->SetCurFormat(buffer->GetCurFormat());
             forkBuffer->SetCurWidth(buffer->GetCurWidth());
