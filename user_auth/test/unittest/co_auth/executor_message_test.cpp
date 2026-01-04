@@ -37,15 +37,15 @@ extern "C" {
     extern Attribute *CreateAttributeFromExecutorMsg(const Uint8Array msg, SignParam signParam);
     extern void GetRootSecretFromAttribute(const Attribute *attribute, ExecutorResultInfo *resultInfo);
     extern ResultCode GetExecutorResultInfoFromAttribute(const Attribute *attribute, ExecutorResultInfo *resultInfo);
-    extern Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode,
-        const Uint64Array *templateIds);
+    extern Buffer *CreateExecutorMsg(
+        uint32_t executorAuthType, const CreateExecutorMsgInfo *createInfo, const Uint64Array *templateIds);
     extern void DestoryExecutorMsg(void *data);
     extern ResultCode GetExecutorTemplateList(
         int32_t userId, const ExecutorInfoHal *executorNode, Uint64Array *templateIds);
     extern ResultCode AssemblyMessage(
-        int32_t userId, const ExecutorInfoHal *executorNode, uint32_t authPropertyMode, LinkedList *executorMsg);
+        const CreateExecutorMsgInfo *createInfo, const ExecutorInfoHal *executorNode, LinkedList *executorMsg);
     extern ResultCode TraverseExecutor(
-        int32_t userId, uint32_t executorRole, uint32_t authPropertyMode, LinkedList *executorMsg);
+        const CreateExecutorMsgInfo *createInfo, uint32_t executorRole, LinkedList *executorMsg);
 }
 
 namespace OHOS {
@@ -384,12 +384,12 @@ HWTEST_F(ExecutorMessageTest, TestDestroyExecutorResultInfo, TestSize.Level0)
 
 HWTEST_F(ExecutorMessageTest, TestCreateExecutorMsg, TestSize.Level0)
 {
-    EXPECT_EQ(CreateExecutorMsg(1, 0, nullptr), nullptr);
+    CreateExecutorMsgInfo createInfo = {};
     constexpr uint32_t dataLen = 1;
     Uint64Array array = {};
     array.len = dataLen;
     array.data = nullptr;
-    EXPECT_EQ(CreateExecutorMsg(1, 0, &array), nullptr);
+    EXPECT_EQ(CreateExecutorMsg(1, &createInfo, &array), nullptr);
 }
 
 HWTEST_F(ExecutorMessageTest, TestDestoryExecutorMsg, TestSize.Level0)
@@ -436,10 +436,11 @@ HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_001, TestSize.Level0)
     constexpr uint32_t authType = 2;
     constexpr uint32_t executorSensorHint = 10;
     g_userInfoList = nullptr;
+    CreateExecutorMsgInfo createInfo = {};
     ExecutorInfoHal info = {};
     info.authType = authType;
     info.executorSensorHint = executorSensorHint;
-    EXPECT_EQ(AssemblyMessage(0, &info, 2, nullptr), RESULT_UNKNOWN);
+    EXPECT_EQ(AssemblyMessage(&createInfo, &info, nullptr), RESULT_UNKNOWN);
 }
 
 HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_002, TestSize.Level0)
@@ -463,16 +464,17 @@ HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_002, TestSize.Level0)
     userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
 
+    CreateExecutorMsgInfo createInfo = {};
     ExecutorInfoHal info = {};
     info.authType = authType;
     info.executorSensorHint = executorSensorHint_2;
     LinkedList *executorMsg = CreateLinkedList(DestoryExecutorMsg);
-    EXPECT_EQ(AssemblyMessage(0, &info, 2, executorMsg), RESULT_SUCCESS);
+    EXPECT_EQ(AssemblyMessage(&createInfo, &info, executorMsg), RESULT_SUCCESS);
     DestroyLinkedList(executorMsg);
 
     executorMsg = CreateLinkedList(DestoryExecutorMsg);
     info.executorSensorHint = executorSensorHint_1;
-    EXPECT_EQ(AssemblyMessage(0, &info, 2, executorMsg), RESULT_SUCCESS);
+    EXPECT_EQ(AssemblyMessage(&createInfo, &info, executorMsg), RESULT_SUCCESS);
     DestroyLinkedList(executorMsg);
     DestroyUserInfoList();
 }
@@ -482,14 +484,15 @@ HWTEST_F(ExecutorMessageTest, TestTraverseExecutor, TestSize.Level0)
     constexpr uint32_t authType = 2;
     g_poolList = nullptr;
     g_userInfoList = nullptr;
-    EXPECT_EQ(TraverseExecutor(0, 1, 0, nullptr), RESULT_UNKNOWN);
+    CreateExecutorMsgInfo createInfo = {};
+    EXPECT_EQ(TraverseExecutor(&createInfo, 0, nullptr), RESULT_UNKNOWN);
     InitResourcePool();
     ExecutorInfoHal info = {};
     info.executorRole = VERIFIER;
     info.authType = authType;
     g_poolList->insert(g_poolList, static_cast<void *>(&info));
     LinkedList *executorMsg = new LinkedList();
-    EXPECT_EQ(TraverseExecutor(0, 2, 0, executorMsg), RESULT_UNKNOWN);
+    EXPECT_EQ(TraverseExecutor(&createInfo, VERIFIER, executorMsg), RESULT_UNKNOWN);
     delete executorMsg;
 }
 
@@ -498,15 +501,16 @@ HWTEST_F(ExecutorMessageTest, TestGetExecutorMsgList, TestSize.Level0)
     constexpr uint32_t authType = 1;
     g_poolList = nullptr;
     g_userInfoList = nullptr;
-    EXPECT_EQ(GetExecutorMsgList(1, 2, nullptr), RESULT_BAD_PARAM);
+    CreateExecutorMsgInfo createInfo = {};
+    EXPECT_EQ(GetExecutorMsgList(&createInfo, nullptr), RESULT_BAD_PARAM);
     LinkedList *executorMsg = nullptr;
-    EXPECT_EQ(GetExecutorMsgList(1, 0, &executorMsg), RESULT_UNKNOWN);
+    EXPECT_EQ(GetExecutorMsgList(&createInfo, &executorMsg), RESULT_UNKNOWN);
     InitResourcePool();
     ExecutorInfoHal info = {};
     info.executorRole = VERIFIER;
     info.authType = authType;
     g_poolList->insert(g_poolList, static_cast<void *>(&info));
-    EXPECT_EQ(GetExecutorMsgList(1, 4, &executorMsg), RESULT_SUCCESS);
+    EXPECT_EQ(GetExecutorMsgList(&createInfo, &executorMsg), RESULT_SUCCESS);
 }
 
 HWTEST_F(ExecutorMessageTest, TestGetOldRootSecretFromAttribute_001, TestSize.Level0)
