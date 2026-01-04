@@ -39,6 +39,7 @@ public:
     RetCode Start(int buffCont, DeviceFormat& format);
     RetCode Stop();
 
+    RetCode CreateBuffers();
     RetCode SendFrameBuffer(std::shared_ptr<FrameSpec> buffer);
 
     void SetNodeCallBack(const NodeBufferCb cb);
