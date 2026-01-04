@@ -39,7 +39,7 @@
 /* add For Capture Bytes To Frames */
 int32_t AudioCaptureStart(struct IAudioCapture *handle)
 {
-    AUDIO_FUNC_LOGD("Enter.");
+    AUDIO_FUNC_LOGD("AudioCaptureStart Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("The hwCapture is NULL");
@@ -51,11 +51,14 @@ int32_t AudioCaptureStart(struct IAudioCapture *handle)
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_ERR_INTERNAL;
     }
+    pthread_mutex_lock(&hwCapture->captureParam.frameCaptureMode.mutex);
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("IAudioCapture already start!");
         return AUDIO_SUCCESS; // capture is busy now
     }
     if (hwCapture->devDataHandle == NULL) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("CaptureStart Bind Fail!");
         return AUDIO_ERR_INTERNAL;
     }
@@ -63,17 +66,20 @@ int32_t AudioCaptureStart(struct IAudioCapture *handle)
     int32_t ret = (*pInterfaceLibModeCapture)(
         hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTRL_START_CAPTURE);
     if (ret < 0) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("AudioCaptureStart SetParams FAIL");
         return AUDIO_ERR_INTERNAL;
     }
 
     char *tbuffer = (char *)OsalMemCalloc(FRAME_DATA);
     if (tbuffer == NULL) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("Calloc Capture tbuffer Fail!");
         return AUDIO_ERR_MALLOC_FAIL;
     }
 
     hwCapture->captureParam.frameCaptureMode.buffer = tbuffer;
+    pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
 
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Capture Start");
     return AUDIO_SUCCESS;
@@ -91,15 +97,18 @@ int32_t AudioCaptureStop(struct IAudioCapture *handle)
         AUDIO_FUNC_LOGE("CaptureStart Bind Fail!");
         return AUDIO_ERR_INTERNAL;
     }
+    pthread_mutex_lock(&hwCapture->captureParam.frameCaptureMode.mutex);
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
         AudioMemFree((void **)&hwCapture->captureParam.frameCaptureMode.buffer);
     } else {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("Repeat invalid stop operation!");
         return AUDIO_SUCCESS;
     }
 
     InterfaceLibModeCapturePassthrough *pInterfaceLibModeCapture = AudioPassthroughGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_ERR_INTERNAL;
     }
@@ -107,10 +116,12 @@ int32_t AudioCaptureStop(struct IAudioCapture *handle)
     int32_t ret = (*pInterfaceLibModeCapture)(
         hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTRL_STOP_CAPTURE);
     if (ret < 0) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("AudioCaptureStop SetParams FAIL");
         return AUDIO_ERR_INTERNAL;
     }
 
+    pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Capture Stop");
     return AUDIO_SUCCESS;
 }
@@ -733,7 +744,8 @@ int32_t AudioCaptureCaptureFrame(
     struct IAudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t *replyBytes)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    if (hwCapture == NULL || frame == NULL || frameLen == NULL ||
+    pthread_mutex_lock(&hwCapture->captureParam.frameCaptureMode.mutex);
+    if (hwCapture == NULL || frame == NULL || frameLen == NULL || hwCapture->devDataHandle == NULL ||
         hwCapture->captureParam.frameCaptureMode.buffer == NULL) {
         AUDIO_FUNC_LOGE("Param is NULL Fail!");
         return AUDIO_ERR_INVALID_PARAM;
@@ -741,21 +753,21 @@ int32_t AudioCaptureCaptureFrame(
 
     InterfaceLibModeCapturePassthrough *pInterfaceLibModeCapture = AudioPassthroughGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
-        return AUDIO_ERR_INTERNAL;
-    }
-    if (hwCapture->devDataHandle == NULL) {
         return AUDIO_ERR_INTERNAL;
     }
 
     int32_t ret =
         (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_READ);
     if (ret < 0) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("Capture Frame FAIL!");
         LogErrorCapture(capture, WRITE_FRAME_ERROR_CODE, ret);
         return AUDIO_ERR_INTERNAL;
     }
     if (*frameLen < hwCapture->captureParam.frameCaptureMode.bufferSize) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("Capture Frame frameLen too little!");
         return AUDIO_ERR_INTERNAL;
     }
@@ -763,6 +775,7 @@ int32_t AudioCaptureCaptureFrame(
     ret = memcpy_s(frame, (size_t)*frameLen, hwCapture->captureParam.frameCaptureMode.buffer,
         (size_t)hwCapture->captureParam.frameCaptureMode.bufferSize);
     if (ret != EOK) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("memcpy_s fail");
         return AUDIO_ERR_INTERNAL;
     }
@@ -771,15 +784,18 @@ int32_t AudioCaptureCaptureFrame(
 
     hwCapture->captureParam.frameCaptureMode.frames += hwCapture->captureParam.frameCaptureMode.bufferFrameSize;
     if (hwCapture->captureParam.frameCaptureMode.attrs.sampleRate == 0) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_ERR_INTERNAL;
     }
     if (TimeToAudioTimeStamp(hwCapture->captureParam.frameCaptureMode.bufferFrameSize,
         &hwCapture->captureParam.frameCaptureMode.time,
         hwCapture->captureParam.frameCaptureMode.attrs.sampleRate) == HDF_FAILURE) {
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         AUDIO_FUNC_LOGE("Frame is NULL");
         return AUDIO_ERR_INTERNAL;
     }
+    pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
     return AUDIO_SUCCESS;
 }
 
