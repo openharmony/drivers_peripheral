@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 #include "audiomanager_fuzzer.h"
-#include "v5_0/iaudio_manager.h"
-#include "v5_0/audio_types.h"
+#include "v6_0/iaudio_manager.h"
+#include "v6_0/audio_types.h"
 #include "hdi_service_common.h"
 
 using namespace std;
