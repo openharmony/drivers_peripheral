@@ -253,6 +253,7 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
         ret = strncpy_s(*pValue, len, renderSwVal->valuestring, len - 1);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("strncpy_s failed!");
+            OsalMemFree(*pValue);
             return HDF_FAILURE;
         }
         renderDevNum++;
@@ -300,7 +301,7 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
             OsalMemFree(*pValue);
         }
         int32_t len = strlen(captureSwVal->valuestring) + 1;
-        *pValue = (char *)OsalMemCalloc(strlen(captureSwVal->valuestring) + 1);
+        *pValue = (char *)OsalMemCalloc(len);
         if (*pValue == NULL) {
             AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
             return HDF_FAILURE;
@@ -308,6 +309,7 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
         ret = strncpy_s(*pValue, len, captureSwVal->valuestring, len - 1);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("strncpy_s failed!");
+            OsalMemFree(*pValue);
             return HDF_FAILURE;
         }
         devNum++;
