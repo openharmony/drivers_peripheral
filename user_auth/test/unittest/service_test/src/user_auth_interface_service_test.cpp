@@ -37,6 +37,7 @@ constexpr int32_t ATL1 = 10000;
 uint64_t g_pinIndex = 0;
 uint64_t g_faceIndex = 0;
 uint64_t g_fingerprintIndex = 0;
+uint64_t g_companionDeviceIndex = 0;
 } // namespace
 
 void UserAuthInterfaceServiceTest::SetUpTestCase()
@@ -84,6 +85,7 @@ void RegisterAllExecutor(const std::shared_ptr<UserAuthInterfaceService> &servic
     EXPECT_EQ(DoOnceExecutorRegister(service, AuthType::PIN, g_pinIndex), 0);
     EXPECT_EQ(DoOnceExecutorRegister(service, AuthType::FACE, g_faceIndex), 0);
     EXPECT_EQ(DoOnceExecutorRegister(service, AuthType::FINGERPRINT, g_fingerprintIndex), 0);
+    EXPECT_EQ(DoOnceExecutorRegister(service, static_cast<AuthType>(COMPANION_DEVICE_AUTH), g_companionDeviceIndex), 0);
 }
 
 void DeleteAllExecutor(const std::shared_ptr<UserAuthInterfaceService> &service)
@@ -91,6 +93,7 @@ void DeleteAllExecutor(const std::shared_ptr<UserAuthInterfaceService> &service)
     EXPECT_EQ(service->DeleteExecutor(g_pinIndex), 0);
     EXPECT_EQ(service->DeleteExecutor(g_faceIndex), 0);
     EXPECT_EQ(service->DeleteExecutor(g_fingerprintIndex), 0);
+    EXPECT_EQ(service->DeleteExecutor(g_companionDeviceIndex), 0);
 }
 
 void DoOnceEnroll(const std::shared_ptr<UserAuthInterfaceService> &service, int32_t userId, AuthType authType,
@@ -1326,6 +1329,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCheckReuseUnlockResult_001, TestSize.
     param.authTypes.push_back(static_cast<AuthType>(PIN));
     param.authTypes.push_back(static_cast<AuthType>(FACE));
     param.authTypes.push_back(static_cast<AuthType>(FINGERPRINT));
+    param.authTypes.push_back(static_cast<AuthType>(COMPANION_DEVICE_AUTH));
     param.authTypes.push_back(static_cast<AuthType>(0));
     EXPECT_EQ(service->CheckReuseUnlockResult(param, info), RESULT_BAD_PARAM);
     param.authTypes.pop_back();
