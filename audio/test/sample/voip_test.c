@@ -32,8 +32,8 @@
 #include "ioservstat_listener.h"
 #include "osal_mem.h"
 #include "svcmgr_ioservice.h"
-#include "v5_0/iaudio_manager.h"
-#include "v5_0/audio_types.h"
+#include "v6_0/iaudio_manager.h"
+#include "v6_0/audio_types.h"
 
 #define AUDIO_CHANNELCOUNT              2
 #define AUDIO_SAMPLE_RATE_16K           16000
