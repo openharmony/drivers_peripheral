@@ -36,6 +36,8 @@
 #define INT_32_MAX                      0x7fffffff
 #define SHIFT_RIGHT_31_BITS             31
 
+uint32_t renderId_ = 0;
+
 static int32_t AudioHwRenderInit(struct AudioHwRender *hwRender)
 {
     if (hwRender == NULL) {
@@ -125,6 +127,7 @@ int32_t CheckParaAttr(const struct AudioSampleAttributes *attrs)
     }
 
     enum AudioCategory audioCategory = attrs->type;
+    AUDIO_FUNC_LOGI("Audio category audioCategory: %{public}d!", audioCategory);
     if (audioCategory < AUDIO_IN_MEDIA || audioCategory > AUDIO_MMAP_NOIRQ) {
         AUDIO_FUNC_LOGE("Audio category error!");
         return HDF_ERR_NOT_SUPPORT;
@@ -481,13 +484,20 @@ static int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
 
 int32_t AudioCtrlRenderClose(struct AudioHwRender *hwRender, InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender)
 {
+    int32_t ret;
     if (hwRender == NULL || hwRender->devDataHandle == NULL || pInterfaceLibModeRender == NULL ||
         *pInterfaceLibModeRender == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return HDF_FAILURE;
     }
 
-    int32_t ret =
+    ret =
+        (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIODRV_CTL_IOCTL_DEV_VOICE_CLOSE);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Audio DEV_VOICE DEVICE CLOSE FAIL");
+    }
+
+    ret =
         (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Audio render close fail, ret is %{public}d", ret);
@@ -527,6 +537,13 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
         }
     }
 #endif
+    // new add write param to turning
+    ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
+                                     AUDIODRV_CTL_IOCTL_DEV_TURNING_WRITE);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("IAudioRender write param to turning fail");
+    }
+
     /* set Attr Para */
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTL_HW_PARAMS);
     if (ret < 0) {
@@ -549,6 +566,12 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
         AUDIO_FUNC_LOGE("IAudioRender perpare FAIL");
         (void)AudioCtrlRenderClose(hwRender, pInterfaceLibModeRender);
         return HDF_FAILURE;
+    }
+    // new add read voice param from audio_pipe_voice
+    ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
+                                     AUDIODRV_CTL_IOCTL_DEV_VOICE_READ);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("IAudioRender read voice param form audio_pipe_voice fail");
     }
     return HDF_SUCCESS;
 }
@@ -640,6 +663,8 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
     }
 
     *renderId = GetAvailableRenderID(hwAdapter);
+    renderId_ = *renderId;
+    AUDIO_FUNC_LOGI("AudioAdapterCreateRender renderId: %{public}d", *renderId);
     if (*renderId == MAX_AUDIO_STREAM_NUM) {
         AUDIO_FUNC_LOGE("there is no available renderId");
         AudioReleaseRenderHandle(hwRender);
@@ -685,6 +710,11 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
         return HDF_FAILURE;
     }
     ret =
+        (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIODRV_CTL_IOCTL_DEV_VOICE_CLOSE);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Audio DEV_VOICE DEVICE CLOSE FAIL");
+    }
+    ret =
         (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Audio RENDER_CLOSE FAIL");
@@ -697,8 +727,92 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
         AudioMemFree((void **)&hwRender->errorLog.errorDump[i].reason);
         AudioMemFree((void **)&hwRender->errorLog.errorDump[i].currentTime);
     }
+    for (int i = 0; i < PATHPLAN_COUNT; i++) {
+        AudioMemFree((void **)&hwRender->renderParam.renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
+    }
     AudioMemFree((void **)&render);
     hwAdapter->infos.renderServicePtr[renderId] = NULL;
+    return AUDIO_SUCCESS;
+}
+
+int32_t AudioAdapterUpdateAudioRoute(
+    struct IAudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle)
+{
+    AUDIO_FUNC_LOGI("Enter.");
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL) {
+        AUDIO_FUNC_LOGE("AudioAdapterUpdateAudioRoute Invalid input param!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+   
+    AUDIO_FUNC_LOGI("AudioAdapterUpdateAudioRoute renderId_: %{public}d", renderId_);
+    struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr[renderId_];
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL) {
+        AUDIO_FUNC_LOGE("hwRender is NULL!");
+        return AUDIO_ERR_INTERNAL;
+    }
+
+    if (hwRender->devCtlHandle == NULL) {
+        AUDIO_FUNC_LOGE("RenderSetVoiceVolume Bind Fail!");
+        return AUDIO_ERR_INTERNAL;
+    }
+
+    InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
+    if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+        AUDIO_FUNC_LOGE("InterfaceLibModeRender not exist");
+        return HDF_FAILURE;
+    }
+
+    int32_t ret =
+        (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam, AUDIODRV_CTL_IOCTL_UPDATE_ROUTER);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Audio RENDER_CLOSE FAIL");
+    }
+
+    return AUDIO_SUCCESS;
+}
+
+int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
+{
+    AUDIO_FUNC_LOGD("AudioAdapterSetVoiceVolume Enter.");
+    int32_t ret = 0;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL) {
+        AUDIO_FUNC_LOGE("AudioAdapterSetVoiceVolume Invalid input param!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+
+    AUDIO_FUNC_LOGI("AudioAdapterSetVoiceVolume renderId_: %{public}d", renderId_);
+    struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr[renderId_];
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL) {
+        AUDIO_FUNC_LOGE("hwRender is NULL!");
+        return AUDIO_ERR_INTERNAL;
+    }
+
+    if (volume < 0 || volume > 1) {
+        AUDIO_FUNC_LOGE("AudioAdapterSetVoiceVolume volume param Is error!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    if (hwRender->devCtlHandle == NULL) {
+        AUDIO_FUNC_LOGE("RenderSetVoiceVolume Bind Fail!");
+        return AUDIO_ERR_INTERNAL;
+    }
+
+    InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
+    if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+        AUDIO_FUNC_LOGE("InterfaceLibModeRender not exist");
+        return HDF_FAILURE;
+    }
+
+    hwRender->renderParam.renderMode.ctlParam.voiceVolume = volume;
+
+    ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
+                                     AUDIODRV_CTL_IOCTL_VOICE_VOLUME_WRITTE);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Audio RENDER_CLOSE FAIL");
+    }
     return AUDIO_SUCCESS;
 }
 
@@ -779,6 +893,7 @@ int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioD
     hwCapture->captureParam.frameCaptureMode.attrs.silenceThreshold = attrs->silenceThreshold;
     hwCapture->captureParam.frameCaptureMode.attrs.isBigEndian = attrs->isBigEndian;
     hwCapture->captureParam.frameCaptureMode.attrs.isSignedData = attrs->isSignedData;
+    pthread_mutex_init(&hwCapture->captureParam.frameCaptureMode.mutex, NULL);
     return HDF_SUCCESS;
 }
 
@@ -1042,8 +1157,10 @@ int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, uint32_t captu
         AUDIO_FUNC_LOGE("hwCapture is NULL!");
         return AUDIO_ERR_INTERNAL;
     }
+    pthread_mutex_lock(&hwCapture->captureParam.frameCaptureMode.mutex);
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
         ret = capture->Stop((AudioHandle)capture);
+        pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("capture Stop failed");
         }
@@ -1060,9 +1177,14 @@ int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, uint32_t captu
     }
     AudioReleaseCaptureHandle(hwCapture);
     AudioMemFree((void **)&hwCapture->captureParam.frameCaptureMode.buffer);
+    pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
+    pthread_mutex_destroy(&hwCapture->captureParam.frameCaptureMode.mutex);
     for (int i = 0; i < ERROR_LOG_MAX_NUM; i++) {
         AudioMemFree((void **)&hwCapture->errorLog.errorDump[i].reason);
         AudioMemFree((void **)&hwCapture->errorLog.errorDump[i].currentTime);
+    }
+    for (int i = 0; i < PATHPLAN_COUNT; i++) {
+        AudioMemFree((void **)&hwCapture->captureParam.captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
     }
     AudioMemFree((void **)&capture);
     hwAdapter->infos.captureServicePtr[captureId] = NULL;

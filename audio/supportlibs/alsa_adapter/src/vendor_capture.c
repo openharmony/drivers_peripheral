@@ -48,8 +48,7 @@ static int32_t CaptureInitImpl(struct AlsaCapture* captureIns)
     return HDF_SUCCESS;
 }
 
-static int32_t CaptureSelectSceneImpl(struct AlsaCapture *captureIns, enum AudioPortPin descPins,
-    const struct PathDeviceInfo *deviceInfo)
+static int32_t CaptureSelectSceneImpl(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData)
 {
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
     captureIns->descPins = descPins;
@@ -159,7 +158,7 @@ static int32_t CaptureSetMuteImpl(struct AlsaCapture *captureIns, bool muteFlag)
     return HDF_SUCCESS;
 }
 
-static int32_t CaptureStartImpl(struct AlsaCapture *captureIns)
+static int32_t CaptureStartImpl(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData)
 {
     return HDF_SUCCESS;
 }

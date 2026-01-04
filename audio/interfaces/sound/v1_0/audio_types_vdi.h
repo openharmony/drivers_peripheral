@@ -310,6 +310,7 @@ enum AudioInputTypeVdi {
     AUDIO_VDI_INPUT_VOICE_TRANSCRIPTION      = 1 << 12,
     AUDIO_VDI_INPUT_OFFLOAD_CAPTURE_TYPE     = 1 << 13,
     AUDIO_VDI_INPUT_ULTRASONIC_TYPE          = 1 << 14,
+    AUDIO_VDI_INPUT_RAW_AI_TYPE              = 1 << 15,
 };
 
 struct AudioOffloadInfoVdi {
