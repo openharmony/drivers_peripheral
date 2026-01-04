@@ -131,36 +131,61 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
 static int32_t InitDeviceSwitchValue(char **switchValue, cJSON *swVal, int32_t value)
 {
     AUDIO_FUNC_LOGI("InitDeviceSwitchValue enter");
-    int32_t ret = -1;
-#ifdef ALSA_LIB_MODE
-    /* alsa Adaptation */
-    if (*switchValue != NULL) {
-        OsalMemFree(*switchValue);
+    if (switchValue == NULL) {
+        AUDIO_FUNC_LOGE("switchValue is NULL");
+        return HDF_ERR_INVALID_PARAM;
     }
-    int32_t len = strlen(swVal->valuestring) + 1;
-    *switchValue = (char *)OsalMemCalloc(sizeof(char) * len);
+    *switchValue = NULL;
+
+#ifdef ALSA_LIB_MODE
+
+    if (swVal == NULL || !cJSON_IsString(swVal)) {
+        AUDIO_FUNC_LOGE("swVal is invalid or not a string");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    const char *srcStr = swVal->valuestring;
+    if (srcStr == NULL) {
+        AUDIO_FUNC_LOGE("swVal->valuestring is NULL");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    size_t len = strlen(srcStr) + 1;
+    *switchValue = (char *)OsalMemCalloc(len);
     if (*switchValue == NULL) {
         AUDIO_FUNC_LOGE("OsalMemCalloc failed");
         return HDF_FAILURE;
     }
-    ret = strncpy_s(*switchValue, len, swVal->valuestring, len - 1);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("strncpy_s failed!");
+
+    errno_t err = strncpy_s(*switchValue, len, srcStr, len - 1);
+    if (err != EOK) {
+        AUDIO_FUNC_LOGE("strncpy_s failed with error: %{public}d", err);
+        OsalMemFree(*switchValue);
+        *switchValue = NULL;
         return HDF_FAILURE;
     }
+
 #else
+#ifndef ADM_VALUE_SIZE
+#error "ADM_VALUE_SIZE must be defined in non-ALSA mode"
+#endif
+
     *switchValue = (char *)OsalMemCalloc(ADM_VALUE_SIZE);
     if (*switchValue == NULL) {
         AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
         return HDF_FAILURE;
     }
-    ret = sprintf_s(*switchValue, ADM_VALUE_SIZE, "%d", value);
+
+    int ret = snprintf_s(*switchValue, ADM_VALUE_SIZE, ADM_VALUE_SIZE - 1, "%d", value);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("sprintf_s failed ret:%{public}d!", ret);
+        AUDIO_FUNC_LOGE("snprintf_s failed ret: %{public}d!", ret);
+        OsalMemFree(*switchValue);
+        *switchValue = NULL;
         return HDF_FAILURE;
     }
 #endif
-    AUDIO_FUNC_LOGI("InitDeviceSwitchValue end switchValue:%{public}s", *switchValue);
+
+    AUDIO_FUNC_LOGI("InitDeviceSwitchValue end switchValue: %{public}s", *switchValue);
     return HDF_SUCCESS;
 }
 
