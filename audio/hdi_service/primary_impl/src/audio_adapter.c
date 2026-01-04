@@ -744,7 +744,7 @@ int32_t AudioAdapterUpdateAudioRoute(
         AUDIO_FUNC_LOGE("AudioAdapterUpdateAudioRoute Invalid input param!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    if (renderId_ <= -1 || renderId_ > MAX_AUDIO_STREAM_NUM) {
+    if (renderId_ <= -1 || renderId_ >= MAX_AUDIO_STREAM_NUM) {
         AUDIO_FUNC_LOGE("render is Invalid");
         return AUDIO_ERR_INVALID_PARAM;
     }
@@ -785,7 +785,7 @@ int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
         AUDIO_FUNC_LOGE("AudioAdapterSetVoiceVolume Invalid input param!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    if (renderId_ <= -1 || renderId_ > MAX_AUDIO_STREAM_NUM) {
+    if (renderId_ <= -1 || renderId_ >= MAX_AUDIO_STREAM_NUM) {
         AUDIO_FUNC_LOGE("render is Invalid");
         return AUDIO_ERR_INVALID_PARAM;
     }
