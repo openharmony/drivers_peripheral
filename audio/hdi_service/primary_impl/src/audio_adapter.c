@@ -36,7 +36,7 @@
 #define INT_32_MAX                      0x7fffffff
 #define SHIFT_RIGHT_31_BITS             31
 
-uint32_t renderId_ = 0;
+uint32_t renderId_ = -1;
 
 static int32_t AudioHwRenderInit(struct AudioHwRender *hwRender)
 {
@@ -744,7 +744,10 @@ int32_t AudioAdapterUpdateAudioRoute(
         AUDIO_FUNC_LOGE("AudioAdapterUpdateAudioRoute Invalid input param!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-   
+    if (renderId_ <= -1 || renderId_ > MAX_AUDIO_STREAM_NUM) {
+        AUDIO_FUNC_LOGE("render is Invalid");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
     AUDIO_FUNC_LOGI("AudioAdapterUpdateAudioRoute renderId_: %{public}d", renderId_);
     struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr[renderId_];
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
@@ -782,7 +785,10 @@ int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
         AUDIO_FUNC_LOGE("AudioAdapterSetVoiceVolume Invalid input param!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-
+    if (renderId_ <= -1 || renderId_ > MAX_AUDIO_STREAM_NUM) {
+        AUDIO_FUNC_LOGE("render is Invalid");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
     AUDIO_FUNC_LOGI("AudioAdapterSetVoiceVolume renderId_: %{public}d", renderId_);
     struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr[renderId_];
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
