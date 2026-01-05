@@ -124,8 +124,8 @@ static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared
             CAMERA_LOGE("PcForkNode::DeliverBuffer error,  buffer->GetSize() == 0");
             return;
         }
-        const uint32_t MAX_BUFFER_SIZE = 268435456;
-        if (bufferSize > MAX_BUFFER_SIZE) {
+        const uint32_t maxBufferSize = 268435456;
+        if (bufferSize > maxBufferSize) {
             CAMERA_LOGE("PcorkNode::DeliverBuffer error,  buffer->GetSize() > MAX_BUFFER_SIZE");
             return;
         }
