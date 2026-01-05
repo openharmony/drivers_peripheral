@@ -16,6 +16,7 @@
 #include "alsa_lib_render.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_RENDER
+pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int32_t AudioCtlRenderSetVolume(
     const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
@@ -166,13 +167,110 @@ int32_t AudioCtlRenderSceneSelect(
 
     descPins = handleData->renderMode.hwInfo.deviceDescript.pins;
     deviceInfo = &handleData->renderMode.hwInfo.pathSelect.deviceInfo;
-    ret = renderIns->SelectScene(renderIns, descPins, deviceInfo);
+    ret = renderIns->SelectScene(renderIns, handleData);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render select scene pin: (0x%{public}x) failed!", descPins);
         return HDF_FAILURE;
     }
 
     AUDIO_FUNC_LOGD("Render scene select pin: (0x%{public}x) success", descPins);
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCtlRenderSetVoiceVolume(
+    const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
+{
+    AUDIO_FUNC_LOGI("AudioCtlRenderSetVoiceVolume enter");
+    int32_t ret;
+    struct AlsaRender *renderIns = NULL;
+    CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
+
+    renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
+
+    float volume = handleData->renderMode.ctlParam.voiceVolume;
+    
+    ret = renderIns->SetVoiceVolume(renderIns, volume);
+    if (ret != AUDIO_SUCCESS) {
+        AUDIO_FUNC_LOGE("set voice volume FAIL!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCtlRenderWriteToDevTurnings(
+    const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
+{
+    AUDIO_FUNC_LOGI("AudioCtlRenderWriteToDevTurnings enter");
+    int32_t ret;
+    struct AlsaRender *renderIns = NULL;
+    CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
+
+    renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
+
+    ret = renderIns->SetTurning();
+    if (ret != AUDIO_SUCCESS) {
+        AUDIO_FUNC_LOGE("load profile param from turnings FAIL!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCtlRenderReadFromDevVoice(
+    const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
+{
+    AUDIO_FUNC_LOGI("AudioCtlRenderReadFromDevVoice enter");
+    int32_t ret;
+    struct AlsaRender *renderIns = NULL;
+    CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
+
+    renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
+
+    ret = renderIns->ReadFromVoice(renderIns, handleData->renderMode.hwInfo.adapterName);
+    if (ret != AUDIO_SUCCESS) {
+        AUDIO_FUNC_LOGE("read voice param from dev/audio_pipe_voice faild!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCtlRenderDevVoiceClose(
+    const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
+{
+    AUDIO_FUNC_LOGI("AudioCtlRenderDevVoiceClose enter");
+    int32_t ret;
+    struct AlsaRender *renderIns = NULL;
+    CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
+
+    renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
+
+    ret = renderIns->CloseVoice(renderIns);
+    if (ret != AUDIO_SUCCESS) {
+        AUDIO_FUNC_LOGE("read voice param from dev/audio_pipe_voice faild!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCtlRenderUpdateRouter(
+    const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
+{
+    AUDIO_FUNC_LOGI("AudioCtlRenderUpdateRouter enter");
+    int32_t ret;
+    struct AlsaRender *renderIns = NULL;
+    CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
+
+    renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
+
+    ret = renderIns->UpdateRouter(renderIns, handleData);
+    if (ret != AUDIO_SUCCESS) {
+        AUDIO_FUNC_LOGE("update router FAIL!");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -292,6 +390,16 @@ int32_t AudioInterfaceLibCtlRender(
             return (AudioCtlRenderSceneGetGainThreshold(handle, cmdId, handleData));
         case AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ:
             return (AudioCtlRenderGetVolThreshold(handle, cmdId, handleData));
+        case AUDIODRV_CTL_IOCTL_VOICE_VOLUME_WRITTE:
+            return (AudioCtlRenderSetVoiceVolume(handle, cmdId, handleData));
+        case AUDIODRV_CTL_IOCTL_DEV_TURNING_WRITE:
+            return (AudioCtlRenderWriteToDevTurnings(handle, cmdId, handleData));
+        case AUDIODRV_CTL_IOCTL_DEV_VOICE_READ:
+            return (AudioCtlRenderReadFromDevVoice(handle, cmdId, handleData));
+        case AUDIODRV_CTL_IOCTL_DEV_VOICE_CLOSE:
+            return (AudioCtlRenderDevVoiceClose(handle, cmdId, handleData));
+        case AUDIODRV_CTL_IOCTL_UPDATE_ROUTER:
+            return (AudioCtlRenderUpdateRouter(handle, cmdId, handleData));
         default:
             AUDIO_FUNC_LOGE("Output Mode not support!");
             break;
@@ -316,7 +424,7 @@ int32_t AudioOutputRenderHwParams(
         return HDF_FAILURE;
     }
 
-    ret = RenderSetParams(renderIns, handleData);
+    ret = renderIns->SetParams(renderIns, handleData);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render set parameters failed!");
         return HDF_FAILURE;
@@ -335,9 +443,15 @@ int32_t AudioOutputRenderOpen(
 {
     int32_t ret;
     struct AlsaRender *renderIns = NULL;
+    enum AudioCategory scene;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 
-    renderIns = RenderCreateInstance(handleData->renderMode.hwInfo.adapterName);
+    scene = handleData->frameRenderMode.attrs.type;
+    AUDIO_FUNC_LOGI("AudioOutputRenderOpen scene:%{public}d.", scene);
+    if (scene < AUDIO_IN_MEDIA || scene > AUDIO_MMAP_NOIRQ) {
+        scene = AUDIO_IN_MEDIA;
+    }
+    renderIns = RenderCreateInstance(handleData->renderMode.hwInfo.adapterName, scene);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
     ret = renderIns->Open(renderIns);
@@ -404,7 +518,7 @@ int32_t AudioOutputRenderStart(
     renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
-    ret = renderIns->Start(renderIns);
+    ret = renderIns->Start(renderIns, handleData);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render start failed!");
         return ret;
@@ -490,16 +604,24 @@ int32_t AudioInterfaceLibOutputRender(
 
     switch (cmdId) {
         case AUDIO_DRV_PCM_IOCTL_HW_PARAMS:
+            pthread_mutex_lock(&g_mutex);
             ret = AudioOutputRenderHwParams(handle, cmdId, handleData);
+            pthread_mutex_unlock(&g_mutex);
             break;
         case AUDIO_DRV_PCM_IOCTL_WRITE:
+            pthread_mutex_lock(&g_mutex);
             ret = AudioOutputRenderWrite(handle, cmdId, handleData);
+            pthread_mutex_unlock(&g_mutex);
             break;
         case AUDIO_DRV_PCM_IOCTRL_STOP:
+            pthread_mutex_lock(&g_mutex);
             ret = AudioOutputRenderStop(handle, cmdId, handleData);
+            pthread_mutex_unlock(&g_mutex);
             break;
         case AUDIO_DRV_PCM_IOCTRL_START:
+            pthread_mutex_lock(&g_mutex);
             ret = AudioOutputRenderStart(handle, cmdId, handleData);
+            pthread_mutex_unlock(&g_mutex);
             break;
         case AUDIO_DRV_PCM_IOCTL_PREPARE:
             ret = AudioOutputRenderPrepare(handle, cmdId, handleData);
@@ -556,6 +678,11 @@ int32_t AudioInterfaceLibModeRender(
         case AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE:
         case AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ:
         case AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ:
+        case AUDIODRV_CTL_IOCTL_VOICE_VOLUME_WRITTE:
+        case AUDIODRV_CTL_IOCTL_DEV_TURNING_WRITE:
+        case AUDIODRV_CTL_IOCTL_DEV_VOICE_READ:
+        case AUDIODRV_CTL_IOCTL_DEV_VOICE_CLOSE:
+        case AUDIODRV_CTL_IOCTL_UPDATE_ROUTER:
             return (AudioInterfaceLibCtlRender(handle, cmdId, handleData));
         default:
             AUDIO_FUNC_LOGE("Mode Error!");
