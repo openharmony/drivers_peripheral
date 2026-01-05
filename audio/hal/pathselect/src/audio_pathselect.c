@@ -243,6 +243,7 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
         char **pValue = &renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].value;
         if (*pValue != NULL) {
             OsalMemFree(*pValue);
+            *pValue = NULL;
         }
         int32_t len = strlen(renderSwVal->valuestring) + 1;
         *pValue = (char *)OsalMemCalloc(len);
@@ -254,6 +255,7 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
         if (ret < 0) {
             AUDIO_FUNC_LOGE("strncpy_s failed!");
             OsalMemFree(*pValue);
+            *pValue = NULL;
             return HDF_FAILURE;
         }
         renderDevNum++;
@@ -299,6 +301,7 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
         char **pValue = &captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value;
         if (*pValue != NULL) {
             OsalMemFree(*pValue);
+            *pValue = NULL;
         }
         int32_t len = strlen(captureSwVal->valuestring) + 1;
         *pValue = (char *)OsalMemCalloc(len);
@@ -310,6 +313,7 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
         if (ret < 0) {
             AUDIO_FUNC_LOGE("strncpy_s failed!");
             OsalMemFree(*pValue);
+            *pValue = NULL;
             return HDF_FAILURE;
         }
         devNum++;
@@ -827,6 +831,7 @@ static void FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo)
     for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
         if (deviceInfo != NULL) {
             AudioMemFree((void **)&(deviceInfo->deviceSwitchs[i].value));
+            deviceInfo->deviceSwitchs[i].value = NULL;
         }
     }
 }

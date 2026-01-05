@@ -729,6 +729,7 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
     }
     for (int i = 0; i < PATHPLAN_COUNT; i++) {
         AudioMemFree((void **)&hwRender->renderParam.renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
+        hwRender->renderParam.renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value = NULL;
     }
     AudioMemFree((void **)&render);
     hwAdapter->infos.renderServicePtr[renderId] = NULL;
