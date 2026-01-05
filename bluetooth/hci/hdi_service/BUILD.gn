@@ -48,6 +48,7 @@ ohos_shared_library("libhci_interface_service_1.0") {
       "hilog:libhilog",
       "ipc:ipc_core",
       "hitrace:hitrace_meter",
+      "ipc:ipc_single",
     ]
   } else {
     external_deps = [ "hilog:libhilog",
