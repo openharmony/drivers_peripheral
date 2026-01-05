@@ -42,7 +42,7 @@ extern "C" {
 #define PERIOD_COUNT          2
 #define FRAME_DATA            (8192 * 2)
 #define PATHPLAN_LEN          64
-#define PATHPLAN_COUNT        32
+#define PATHPLAN_COUNT        (32 * 4)
 #define PATH_NAME_LEN         128
 #define VOLUME_CHANGE         100
 #define SEC_TO_NSEC           1000000000
@@ -180,6 +180,7 @@ struct AudioCtlParam {
     bool stop;
     bool mutexFlag;
     float volume;
+    float voiceVolume;
     float speed;
     pthread_mutex_t mutex;
     pthread_cond_t functionCond;
@@ -202,7 +203,7 @@ struct PathPlan {
 
 struct PathDeviceSwitch {
     char deviceSwitch[PATHPLAN_LEN];
-    int32_t value;
+    char *value;
 };
 
 struct PathDeviceInfo {
@@ -283,6 +284,7 @@ struct AudioFrameCaptureMode {
     uint32_t stopThreshold;
     uint32_t silenceThreshold;
     uint32_t silenceSize;
+    pthread_mutex_t mutex;
     char *buffer;
     uint64_t bufferFrameSize;
     uint64_t bufferSize;
@@ -467,6 +469,9 @@ int32_t AudioAdapterSetPassthroughMode(
 int32_t AudioAdapterGetPassthroughMode(
     struct IAudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode *mode);
 int32_t AudioAdapterGetDeviceStatus(struct IAudioAdapter *adapter, struct AudioDeviceStatus *status);
+int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume);
+int32_t AudioAdapterUpdateAudioRoute(struct IAudioAdapter *adapter, const struct AudioRoute *route,
+                                     int32_t *routeHandle);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
 int32_t AudioRenderStart(struct IAudioRender *handle);
 int32_t AudioRenderStop(struct IAudioRender *handle);
