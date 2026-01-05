@@ -990,6 +990,8 @@ HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
     param.authTypeNum = 1;
     param.authTypes[0] = 1;
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
+    param.authTypes[0] = COMPANION_DEVICE_AUTH;
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
     param.authTypeNum = MAX_AUTH_TYPE_LEN + 1;
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_BAD_PARAM);
