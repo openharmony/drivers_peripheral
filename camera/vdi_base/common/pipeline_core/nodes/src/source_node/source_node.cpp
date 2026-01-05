@@ -199,6 +199,17 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
         cltRun = true;
     }
 
+    auto node = port->GetNode();
+    if (node == nullptr) {
+        CAMERA_LOGI("SourceNode::PortHandler::StartCollectBuffers node null");
+        return RC_ERROR;
+    }
+#ifdef BATCH_CREATE_BUFFERS
+    if (node->CreateBuffers() != RC_OK) {
+        CAMERA_LOGI("SourceNode::PortHandler::StartCollectBuffers node create buffer error");
+        return RC_ERROR;
+    }
+#endif
     collector = std::make_unique<std::thread>([this, &streamId] {
         std::string name = "collect#" + std::to_string(streamId);
         prctl(PR_SET_NAME, name.c_str());
@@ -215,7 +226,6 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
         }
         CAMERA_LOGI("StartCollectBuffers thread end, name = %{public}s", name.c_str());
     });
-
     return RC_OK;
 }
 
@@ -272,9 +282,15 @@ void SourceNode::PortHandler::CollectBuffers()
 
     if (buffer->GetVirAddress() == buffer->GetSuffaceBufferAddr()) {
         CAMERA_LOGI("CollectBuffers begin allocate buffer");
+#ifdef FORK_DMA
         auto [bufferAddr, dmaFd] = buffer->AllocateDmaBuffer(bufferSize);
+#else
+        auto bufferAddr = malloc(bufferSize);
+#endif
         if (bufferAddr != nullptr) {
+#ifdef FORK_DMA
             buffer->SetDmaBufFd(dmaFd);
+#endif
             buffer->SetVirAddress(bufferAddr);
             buffer->SetSize(bufferSize);
 #ifdef V4L2_EMULATOR
@@ -363,7 +379,13 @@ void SourceNode::PortHandler::DistributeBuffers()
     std::shared_ptr<IBuffer> buffer = nullptr;
     {
         std::unique_lock<std::mutex> l(rblock);
-        auto timeout = std::chrono::system_clock::now() + std::chrono::milliseconds(500); // 500ms
+#ifdef DISTRIBUTE_TIMEOUT
+        // default:500ms,valid range (500, 5000], data can be defined via config.json
+        auto timeout = std::chrono::system_clock::now() + std::chrono::milliseconds(DISTRIBUTE_TIMEOUT);
+#else
+        // default:500ms
+        auto timeout = std::chrono::system_clock::now() + std::chrono::milliseconds(500);
+#endif
         if (!rbcv.wait_until(l, timeout, [this] {
             return (!dbtRun || !respondBufferList.empty());
             })) {
