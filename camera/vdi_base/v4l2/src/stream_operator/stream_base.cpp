@@ -563,7 +563,8 @@ uint32_t StreamBase::GetBufferCount()
 #ifdef PREVIEW_BUFFER_NUM
     return PREVIEW_BUFFER_NUM; // buffer count
 #else
-    return 3;
+    const uint32_t DEFAULT_BUFFER_COUNT = 3;
+    return DEFAULT_BUFFER_COUNT;
 #endif
 }
 
