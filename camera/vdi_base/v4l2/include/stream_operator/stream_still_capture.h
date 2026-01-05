@@ -29,6 +29,7 @@ public:
     virtual ~StreamStillCapture();
 
 public:
+    uint32_t GetBufferCount() override;
     void HandleResult(std::shared_ptr<IBuffer>& buffer) override;
     RetCode Capture(const std::shared_ptr<CaptureRequest>& request) override;
     RetCode ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream) override;

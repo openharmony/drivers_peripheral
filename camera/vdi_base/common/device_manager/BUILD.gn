@@ -66,8 +66,21 @@ ohos_shared_library("peripheral_camera_device_manager") {
   include_dirs = [
     "$camera_path/utils/event",
     "$camera_path/adapter/platform/v4l2/src/device_manager/include",
-    "$camera_path/adapter/platform/v4l2/src/driver_adapter/include/",
   ]
+
+  if (drivers_peripheral_camera_feature_board_config) {
+    include_dirs += [
+      "//device/board/${product_company}/${product_name}/camera/vdi_impl/v4l2/driver_adapter/include",
+    ]
+  } else {
+    include_dirs += [
+      "$camera_path/adapter/platform/v4l2/src/driver_adapter/include/",
+    ]
+  }
+
+  if (drivers_peripheral_camera_feature_batch_buffers) {
+    defines = [ "BATCH_CREATE_BUFFERS" ]
+  }
 
   deps = [ "$camera_path/adapter/platform/v4l2/src/driver_adapter:peripheral_camera_v4l2_adapter" ]
 
