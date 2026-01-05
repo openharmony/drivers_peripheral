@@ -36,8 +36,8 @@ uint32_t StreamStillCapture::GetBufferCount()
 #ifdef PHOTO_BUFFER_NUM
     return PHOTO_BUFFER_NUM; // buffer count
 #else
-    const uint32_t DEFAULT_BUFFER_COUNT = 3;
-    return DEFAULT_BUFFER_COUNT;
+    constexpr uint32_t defaultBufferCount = 3;
+    return defaultBufferCount;
 #endif
 }
 

@@ -552,7 +552,8 @@ RetCode StreamBase::ChangeToOfflineStream(std::shared_ptr<OfflineStream> offline
 uint64_t StreamBase::GetUsage()
 {
 #ifdef BUFFER_PARTIAL_USAGE
-    return CAMERA_USAGE_SW_WRITE_OFTEN | CAMERA_USAGE_MEM_DMA;//Used to solve the problem of flashing stripes in unisoc camera preview screen
+    // Used to solve the problem of flashing stripes in unisoc camera preview screen
+    return CAMERA_USAGE_SW_WRITE_OFTEN | CAMERA_USAGE_MEM_DMA;
 #else
     return CAMERA_USAGE_SW_WRITE_OFTEN | CAMERA_USAGE_SW_READ_OFTEN | CAMERA_USAGE_MEM_DMA;
 #endif
@@ -563,8 +564,8 @@ uint32_t StreamBase::GetBufferCount()
 #ifdef PREVIEW_BUFFER_NUM
     return PREVIEW_BUFFER_NUM; // buffer count
 #else
-    const uint32_t DEFAULT_BUFFER_COUNT = 3;
-    return DEFAULT_BUFFER_COUNT;
+    constexpr uint32_t defaultBufferCount = 3;
+    return defaultBufferCount;
 #endif
 }
 
