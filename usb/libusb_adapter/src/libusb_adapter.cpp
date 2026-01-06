@@ -150,6 +150,45 @@ void GetApiVersion(int32_t &apiVersion)
     apiVersion = info.apiVersion;
 }
 
+static void LibusbLogCallback(libusb_context *ctx, enum libusb_log_level level, const char *message)
+{
+    if (message == nullptr) {
+        HDF_LOGW("%{public}s message is null.", __func__);
+        return;
+    }
+    char *logInfo = strdup(message);
+    if (logInfo == nullptr) {
+        HDF_LOGW("%{public}s strdup message failed. ", __func__);
+        return;
+    }
+
+    char *validLog = strstr(logInfo, "libusb");
+    if (validLog == nullptr) {
+        validLog = logInfo;
+    }
+
+    switch (level) {
+        case LIBUSB_LOG_LEVEL_NONE:
+        case LIBUSB_LOG_LEVEL_DEBUG:
+            HDF_LOGD("%{public}s", validLog);
+            break;
+        case LIBUSB_LOG_LEVEL_INFO:
+            HDF_LOGI("%{public}s", validLog);
+            break;
+        case LIBUSB_LOG_LEVEL_WARNING:
+            HDF_LOGW("%{public}s", validLog);
+            break;
+        case LIBUSB_LOG_LEVEL_ERROR:
+            HDF_LOGE("%{public}s", validLog);
+            break;
+        default:
+            HDF_LOGW("%{public}s", validLog);
+            break;
+    }
+    free(logInfo);
+    return;
+}
+
 int32_t LibusbAdapter::LibUSBInit()
 {
     HDF_LOGI("%{public}s enter", __func__);
@@ -163,6 +202,11 @@ int32_t LibusbAdapter::LibUSBInit()
         HDF_LOGE("%{public}s libusb_init is error", __func__);
         return HDF_FAILURE;
     }
+    ret = libusb_set_option(g_libusb_context, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_DEBUG);
+    if (ret < 0) {
+        HDF_LOGW("%{public}s failed to set libusb log level, ret: %{public}d.", __func__, ret);
+    }
+    libusb_set_log_cb(g_libusb_context, LibusbLogCallback, LIBUSB_LOG_CB_CONTEXT);
     HDF_LOGI("%{public}s leave", __func__);
     return HDF_SUCCESS;
 }
