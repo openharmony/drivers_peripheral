@@ -513,7 +513,7 @@ void ModelInit(void)
         return;
     }
     if (g_cfgDescs != NULL) {
-        OsalMemFree(g_cfgDescs);
+        AudioEffectReleaseCfgDesc(g_cfgDescs);
     }
     g_cfgDescs = cfgDesc;
     HDF_LOGD("%{public}s end!", __func__);
