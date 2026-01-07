@@ -28,6 +28,11 @@ ohos_unittest("SensorConvertInterfaceTest") {
 
   sources = [ "sensor_convert_interface_test.cpp" ]
 
+  defines = []
+  if (drivers_peripheral_sensor_feature_community) {
+    defines += ["COMMUNITY_TEST"]
+  }
+
   cflags = [
     "-Wall",
     "-Wextra",

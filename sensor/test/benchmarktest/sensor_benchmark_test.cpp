@@ -607,4 +607,4 @@ BENCHMARK_F(SensorBenchmarkTest, ConvertSensorData)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, ConvertSensorData)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-ENCHMARK_MAIN();
+BENCHMARK_MAIN();
