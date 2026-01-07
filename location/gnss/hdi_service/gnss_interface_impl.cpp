@@ -34,8 +34,6 @@ namespace Location {
 namespace Gnss {
 namespace V2_0 {
 const int MAX_CACHED_LOCATION_LENGTH = 1000;
-static const std::string SYSPARAM_DEVICE_TYPE = "const.product.devicetype";
-static const std::string DEVICE_TYPE_WEARABLE = "wearable";
 namespace {
 using LocationCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGnssCallback>>;
 #ifndef EMULATOR_ENABLED
@@ -530,10 +528,6 @@ int32_t GnssInterfaceImpl::SetPredictGnssData(const std::string& data)
 int32_t GnssInterfaceImpl::GetCachedGnssLocationsSize(int32_t& size)
 {
     HDF_LOGI("%{public}s.", __func__);
-    if (!IsSupportBatching()) {
-        HDF_LOGE("GetCachedGnssLocationsSize: Is Not Support Batching");
-        return HDF_ERR_NOT_SUPPORT;
-    }
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface gnssInterface nullptr.", __func__);
@@ -550,10 +544,6 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocationsSize(int32_t& size)
 int32_t GnssInterfaceImpl::GetCachedGnssLocations()
 {
     HDF_LOGI("%{public}s.", __func__);
-    if (!IsSupportBatching()) {
-        HDF_LOGE("GetCachedGnssLocations: Is Not Support Batching");
-        return HDF_ERR_NOT_SUPPORT;
-    }
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface gnssInterface nullptr.", __func__);
@@ -711,15 +701,6 @@ void GnssInterfaceImpl::ResetGnss()
     ResetGnssDeathRecipient();
     StopGnss(GNSS_START_TYPE_NORMAL);
     DisableGnssMeasurement();
-}
-
-bool GnssInterfaceImpl::IsSupportBatching()
-{
-    std::string deviceType = system::GetParameter(SYSPARAM_DEVICE_TYPE, "");
-    if (deviceType != DEVICE_TYPE_WEARABLE) {
-        return false;
-    }
-    return true;
 }
 } // V2_0
 } // Gnss
