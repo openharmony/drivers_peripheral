@@ -26,6 +26,8 @@
 #include <unistd.h>
 #include "securec.h"
 #include "hisysevent.h"
+#include "string_ex.h"
+#include "parameter.h"
 
 #define HDF_LOG_TAG hdf_nfc_dal
 
@@ -36,6 +38,8 @@
 #define LOG_DOMAIN 0xD000306
 
 const int32_t PRIORITY = -20;
+const uint8_t PARAM_SPLIT_PART = 2;
+const uint16_t PROPERTY_VALUE_MAX = 64;
 
 using namespace std;
 namespace OHOS {
@@ -533,6 +537,61 @@ int NfcVendorAdaptions::VendorShutdownCase(void)
     }
     int ret = nfcHalInf.nfcHalShutdownCase();
     return ret;
+}
+
+bool NfcVendorAdaptions::VendorIoctlExt(long arg, const std::vector<uint8_t> &data, std::vector<uint8_t> &response)
+{
+    HDF_LOGI("cmd=0x%{public}lx", arg);
+    switch (arg) {
+        case VENDOR_NFC_IOCTL_SET_SYS_PARAM:
+            return SetNfcParam(data, response);
+        case VENDOR_NFC_IOCTL_GET_SYS_PARAM:
+            return GetNfcParam(data, response);
+        default:
+            HDF_LOGE("unknown cmd.");
+    }
+    return false;
+}
+ 
+static bool GetNfcParamStr(const std::string &paramName, std::string &paramValue)
+{
+    char param[PROPERTY_VALUE_MAX] = {0};
+    int len = GetParameter(paramName.c_str(), "", param, PROPERTY_VALUE_MAX);
+    if (len > 0) {
+        HDF_LOGI("%{public}s = %{public}s", paramName.c_str(), param);
+        paramValue = std::string(param);
+        return true;
+    }
+    HDF_LOGE("failed to get param");
+    return false;
+}
+ 
+static void SetNfcParamStr(const std::string &paramName, const std::string &paramValue)
+{
+    HDF_LOGI("set %{public}s as %{public}s", paramName.c_str(), paramValue.c_str());
+    SetParameter(paramName.c_str(), paramValue.c_str());
+}
+ 
+bool NfcVendorAdaptions::GetNfcParam(const std::vector<uint8_t> &param, std::vector<uint8_t> &value)
+{
+    std::string paramStr(param.begin(), param.end());
+    std::string valueStr = "";
+    bool ret = GetNfcParamStr(paramStr, valueStr);
+    value = std::vector<uint8_t>(valueStr.begin(), valueStr.end());
+    return ret;
+}
+ 
+bool NfcVendorAdaptions::SetNfcParam(const std::vector<uint8_t> &param, const std::vector<uint8_t> &value)
+{
+    std::string paramStr(param.begin(), param.end());
+    std::vector<std::string> paramVec {};
+    SplitStr(paramStr, "|", paramVec);
+    if (paramVec.size() != PARAM_SPLIT_PART) {
+        HDF_LOGE("invalid input param");
+        return false;
+    }
+    SetNfcParamStr(paramVec[0], paramVec[1]);
+    return true;
 }
 } // Nfc
 } // HDI
