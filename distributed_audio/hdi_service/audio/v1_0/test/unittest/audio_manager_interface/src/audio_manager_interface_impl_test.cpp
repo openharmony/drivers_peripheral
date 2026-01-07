@@ -173,6 +173,31 @@ HWTEST_F(AudioManagerInterfaceImplTest, Notify_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: Notify_003
+ * @tc.desc: Verify the Notify function.
+ * @tc.type: FUNC
+ * @tc.require: AR20250715266770
+ */
+HWTEST_F(AudioManagerInterfaceImplTest, Notify_003, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    std::string adpName = "adpName";
+    uint32_t devId = 0;
+    uint32_t streamId = 0;
+
+    DAudioEvent event = { HDF_AUDIO_SET_TASK_ID,
+        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" };
+    AudioAdapterDescriptor desc;
+    sptr<AudioAdapterInterfaceImpl> AudioAdapter = sptr<AudioAdapterInterfaceImpl>(new AudioAdapterInterfaceImpl(desc));
+    audioManagerInterfaceImpl_->mapAudioAdapter_.insert(std::make_pair(adpName, AudioAdapter));
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->Notify(adpName, devId, streamId, event));
+    
+    event = { HDF_AUDIO_SET_TASK_ID, "1" };
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->Notify(adpName, devId, streamId, event));
+}
+/**
  * @tc.name: NotifyFwk_001
  * @tc.desc: Verify the NotifyFwk function.
  * @tc.type: FUNC

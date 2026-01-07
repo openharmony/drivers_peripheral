@@ -22,6 +22,9 @@
 #include "iproxy_broker.h"
 #include "iservmgr_hdi.h"
 #include <sstream>
+#include <cstdio>
+#include <cstring>
+#include <securec.h>
 
 #include "daudio_constants.h"
 #include "daudio_errcode.h"
@@ -248,6 +251,18 @@ int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint
 {
     DHLOGI("Notify event, adapter name: %{public}s. event type: %{public}d", GetAnonyString(adpName).c_str(),
         event.type);
+    if (static_cast<AudioExtParamEvent>(event.type) == HDF_AUDIO_SET_TASK_ID) {
+        DHLOGI("Notify event: SET_TASK_ID, event content: %{public}s", event.content.c_str());
+        char value[SERVICE_INFO_LEN_MAX];
+        (void)memset_s(value, SERVICE_INFO_LEN_MAX, 0, SERVICE_INFO_LEN_MAX);
+        if (snprintf_s(value, SERVICE_INFO_LEN_MAX, SERVICE_INFO_LEN_MAX - 1, "{\"taskId\":%s,\"INFO\":\"taskId\"}",
+            event.content.c_str()) < 0) {
+            DHLOGE("set task id snprintf_s failed.");
+            return ERR_DH_AUDIO_HDF_FAIL;
+        }
+        DAudioDevEvent devEvent = { adpName, 1, HDF_AUDIO_DEVICE_ADD, 0, 0, 0, value };
+        return NotifyFwk(devEvent);
+    }
     sptr<AudioAdapterInterfaceImpl> adp = nullptr;
     {
         std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
