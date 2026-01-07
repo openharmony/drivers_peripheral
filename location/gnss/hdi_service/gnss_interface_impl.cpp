@@ -26,7 +26,6 @@
 #include "location_vendor_interface.h"
 #include "location_vendor_lib.h"
 #include "string_utils.h"
-#include "parameters.h"
 
 namespace OHOS {
 namespace HDI {
