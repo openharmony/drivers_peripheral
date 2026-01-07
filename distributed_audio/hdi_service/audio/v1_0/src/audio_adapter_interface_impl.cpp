@@ -265,8 +265,11 @@ int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
         audioRender = renderDevs_[renderId].second;
         dhId = renderDevs_[renderId].first;
     }
-    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
-    sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[dhId]);
+    sptr<IDAudioCallback> extSpkCallback(nullptr);
+    {
+        std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+        extSpkCallback = extCallbackMap_[dhId];
+    }
     if (audioRender == nullptr) {
         DHLOGD("Render has not been created, do not need destroy.");
         return HDF_SUCCESS;
@@ -391,8 +394,11 @@ int32_t AudioAdapterInterfaceImpl::DestroyCapture(uint32_t captureId)
         audioCapture = captureDevs_[captureId].second;
         dhId = captureDevs_[captureId].first;
     }
-    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
-    sptr<IDAudioCallback> extMicCallback(extCallbackMap_[dhId]);
+    sptr<IDAudioCallback> extMicCallback(nullptr);
+    {
+        std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+        extMicCallback = extCallbackMap_[dhId];
+    }
     if (audioCapture == nullptr) {
         DHLOGD("Capture has not been created, do not need destroy.");
         return HDF_SUCCESS;
