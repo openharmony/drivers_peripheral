@@ -66,6 +66,8 @@ const unsigned int VENDOR_IOCTL_OUTPUT_DATA_START_INDEX = 288;
 const unsigned int VENDOR_IOCTL_OUTPUT_DATA_LEN = 4128;
 const unsigned int VENDOR_IOCTL_TOTAL_LENGTH = VENDOR_IOCTL_INPUT_DATA_LEN + VENDOR_IOCTL_OUTPUT_DATA_LEN;
 const long VENDOR_GET_HISTORY_NCI_CMD = 112;
+const long VENDOR_NFC_IOCTL_SET_SYS_PARAM = 117;
+const long VENDOR_NFC_IOCTL_GET_SYS_PARAM = 118;
 
 struct NfcHalInterface {
     int (*nfcHalOpen)(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback);
@@ -110,6 +112,7 @@ public:
     int VendorShutdownCase(void) override;
     static void *DoHalPreOpen(void *arg);
     void HalPreOpen(void);
+    bool VendorIoctlExt(long arg, const std::vector<uint8_t> &data, std::vector<uint8_t> &response);
 
 private:
     std::string GetChipType(void);
@@ -122,6 +125,8 @@ private:
     void UpdateNfcOpenStatus(const std::string &status);
     bool CheckNfcBootloaderStatus(void);
     void SetPriority();
+    bool GetNfcParam(const std::vector<uint8_t> &param, std::vector<uint8_t> &value);
+    bool SetNfcParam(const std::vector<uint8_t> &param, const std::vector<uint8_t> &value);
 
     void *nfcHalHandle; // handle of nfc hal so
     NfcHalInterface nfcHalInf;

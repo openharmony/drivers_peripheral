@@ -20,7 +20,8 @@
           "hilog",
           "c_utils",
           "drivers_interface_nfc",
-          "hisysevent"
+          "hisysevent",
+          "init"
         ],
         "third_party": []
       },
