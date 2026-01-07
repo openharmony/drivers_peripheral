@@ -370,14 +370,18 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
 {
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    int32_t dhId = 1;
+    AdapterTest_->extCallbackMap_[dhId] = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    AdapterTest_->sinkDhId_ = dhId;
 
-    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME;
     std::string condition = "{\"dhId\":\"1\"}";
     std::string value = "world";
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, AdapterTest_->SetExtraParams(key, condition, value));
-    key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME;
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
     key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_LOWPOWER;
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
+    key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    condition = "zone_id_change";
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
 }
 
@@ -1735,6 +1739,33 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderCallback_003, TestSize.Level1
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
     uint32_t devId = 0;
     EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleRenderCallback(devId, event));
+}
+
+/**
+ * @tc.name: SetUsualParamChange_001
+ * @tc.desc: Verify the SetUsualParamChange function.
+ * @tc.type: FUNC
+ * @tc.require: AR20250715266770
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetUsualParamChange_001, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string condition = "abcddd";
+    std::string param = "zone1";
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetUsualParamChange(condition, param));
+
+    condition = "zone_id_change";
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetUsualParamChange(condition, param));
+    
+    int32_t dhid = 1;
+    AdapterTest_->extCallbackMap_[dhid] =  sptr<IDAudioCallback>(new MockIDAudioCallback());
+    AdapterTest_->sinkDhId_ = 0;
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetUsualParamChange(condition, param));
+    
+    AdapterTest_->sinkDhId_ = dhid;
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetUsualParamChange(condition, param));
 }
 } // V1_0
 } // Audio
