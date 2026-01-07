@@ -26,6 +26,7 @@
 #include "location_vendor_interface.h"
 #include "location_vendor_lib.h"
 #include "string_utils.h"
+#include "parameters.h"
 
 namespace OHOS {
 namespace HDI {
@@ -530,7 +531,7 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocationsSize(int32_t& size)
 {
     HDF_LOGI("%{public}s.", __func__);
     if (!IsSupportBatching()) {
-        HDF_LOGE(GNSS, "GetCachedGnssLocationsSize: Is Not Support Batching");
+        HDF_LOGE("GetCachedGnssLocationsSize: Is Not Support Batching");
         return HDF_ERR_NOT_SUPPORT;
     }
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
@@ -550,7 +551,7 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocations()
 {
     HDF_LOGI("%{public}s.", __func__);
     if (!IsSupportBatching()) {
-        HDF_LOGE(GNSS, "GetCachedGnssLocationsSize: Is Not Support Batching");
+        HDF_LOGE("GetCachedGnssLocations: Is Not Support Batching");
         return HDF_ERR_NOT_SUPPORT;
     }
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
