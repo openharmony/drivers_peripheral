@@ -55,12 +55,13 @@ SeVendorAdaptions::SeVendorAdaptions()
 
 SeVendorAdaptions::~SeVendorAdaptions()
 {
+    std::lock_guard<std::mutex> lock(g_mutex);
     RemoveSecureElementDeathRecipient(g_callbackV1_0);
 }
 
 int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallback, SecureElementStatus& status)
 {
-    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:init!");
     std::lock_guard<std::mutex> lock(g_mutex);
     if (clientCallback == nullptr) {
         HDF_LOGE("init failed, clientCallback is null");
@@ -79,11 +80,15 @@ int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallba
 
 int32_t SeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
 {
-    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:getAtr!");
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaGetAtr(res, &resLen);
+    if (resLen > RES_BUFFER_MAX_LENGTH) {
+        HDF_LOGE("getAtr: resLen:%{public}u error", resLen);
+        return HDF_FAILURE;
+    }
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
@@ -96,7 +101,7 @@ int32_t SeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
 
 int32_t SeVendorAdaptions::isSecureElementPresent(bool& present)
 {
-    HDF_LOGD("SeVendorAdaptDons:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptDons:isSecureElementPresent!");
     std::lock_guard<std::mutex> lock(g_mutex);
     if (g_callbackV1_0 == nullptr) {
         present = false;
@@ -109,7 +114,7 @@ int32_t SeVendorAdaptions::isSecureElementPresent(bool& present)
 int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, uint8_t p2,
     std::vector<uint8_t>& response, uint8_t& channelNumber, SecureElementStatus& status)
 {
-    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:openLogicalChannel!");
     std::lock_guard<std::mutex> lock(g_mutex);
     if (aid.empty()) {
         HDF_LOGE("aid is null");
@@ -122,6 +127,10 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
     uint32_t channelCreated = MAX_CHANNEL_SIZE + 1;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaOpenLogicalChannel(
         (uint8_t *)&aid[0], aid.size(), p2, res, &resLen, &channelCreated);
+    if (resLen > RES_BUFFER_MAX_LENGTH) {
+        HDF_LOGE("openLogicalChannel: resLen:%{public}u error", resLen);
+        return HDF_FAILURE;
+    }
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
@@ -158,7 +167,7 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
 int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uint8_t p2, std::vector<uint8_t>& response,
     SecureElementStatus& status)
 {
-    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:openBasicChannel!");
     std::lock_guard<std::mutex> lock(g_mutex);
     if (aid.empty()) {
         HDF_LOGE("aid is null");
@@ -170,6 +179,10 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaOpenBasicChannel(
         (uint8_t *)&aid[0], aid.size(), res, &resLen);
+    if (resLen > RES_BUFFER_MAX_LENGTH) {
+        HDF_LOGE("openBasicChannel: resLen:%{public}u error", resLen);
+        return HDF_FAILURE;
+    }
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
@@ -199,7 +212,7 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
 
 int32_t SeVendorAdaptions::closeChannel(uint8_t channelNumber, SecureElementStatus& status)
 {
-    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:closeChannel!");
     std::lock_guard<std::mutex> lock(g_mutex);
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaCloseChannel(channelNumber);
@@ -227,13 +240,22 @@ int32_t SeVendorAdaptions::closeChannel(uint8_t channelNumber, SecureElementStat
 int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::vector<uint8_t>& response,
     SecureElementStatus& status)
 {
-    HDF_LOGD("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGD("SeVendorAdaptions:transmit!");
     std::lock_guard<std::mutex> lock(g_mutex);
 #ifdef SE_VENDOR_ADAPTION_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
+    if (command.empty()) {
+        HDF_LOGE("transmit command is empty");
+        status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
+        return HDF_ERR_INVALID_PARAM;
+    }
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaTransmit(
         (uint8_t *)&command[0], command.size(), res, &resLen);
+    if (resLen > RES_BUFFER_MAX_LENGTH) {
+        HDF_LOGE("transmit: resLen:%{public}u error", resLen);
+        return HDF_FAILURE;
+    }
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
@@ -253,7 +275,7 @@ int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::ve
 
 int32_t SeVendorAdaptions::reset(SecureElementStatus& status)
 {
-    HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+    HDF_LOGI("SeVendorAdaptions:reset!");
     HDF_LOGE("reset is not support");
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
@@ -302,6 +324,10 @@ int32_t SeVendorAdaptions::AddSecureElementDeathRecipient(const sptr<ISecureElem
         return HDF_FAILURE;
     }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
+    if (remote == nullptr) {
+        HDF_LOGE("SeVendorAdaptions AddSecureElementDeathRecipient remote is null!");
+        return HDF_FAILURE;
+    }
     bool result = remote->AddDeathRecipient(remoteDeathRecipient_);
     if (!result) {
         HDF_LOGE("SeVendorAdaptions AddDeathRecipient failed!");
@@ -317,6 +343,10 @@ int32_t SeVendorAdaptions::RemoveSecureElementDeathRecipient(const sptr<ISecureE
         return HDF_FAILURE;
     }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
+    if (remote == nullptr) {
+        HDF_LOGE("SeVendorAdaptions RemoveSecureElementDeathRecipient remote is null!");
+        return HDF_FAILURE;
+    }
     bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
     if (!result) {
         HDF_LOGE("SeVendorAdaptions RemoveDeathRecipient failed!");

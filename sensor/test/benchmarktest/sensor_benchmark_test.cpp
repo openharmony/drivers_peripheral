@@ -28,15 +28,19 @@
 #include "sensor_uhdf_log.h"
 #include "v3_0/isensor_interface.h"
 #include "v3_1/isensor_interface.h"
+#include "convert/v1_0/isensor_convert_interfaces.h"
 
 using namespace OHOS::HDI::Sensor::V3_0;
 using OHOS::HDI::Sensor::V3_1::GPS_CALLBACK_ID_BEGIN;
+using namespace OHOS::HDI::Sensor::Convert::V1_0;
 using namespace OHOS::HDI::Sensor;
 using namespace testing::ext;
 using namespace std;
+#define MIN_SENSOR_DATA_LEN 16
 
 namespace {
     sptr<V3_1::ISensorInterface>  g_sensorInterface = nullptr;
+    sptr<ISensorConvertInterfaces> sensorConvertInterfaces = nullptr;
     sptr<V3_0::ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     sptr<V3_0::ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
@@ -63,6 +67,7 @@ public:
 void SensorBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
     g_sensorInterface = V3_1::ISensorInterface::Get();
+    sensorConvertInterfaces = ISensorConvertInterfaces::Get(true);
 }
 
 void SensorBenchmarkTest::TearDown(const ::benchmark::State &state)
@@ -563,4 +568,43 @@ BENCHMARK_F(SensorBenchmarkTest, UnregisterWithCallbackId)(benchmark::State &sta
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, UnregisterWithCallbackId)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-BENCHMARK_MAIN();
+
+/**
+  * @tc.name: DriverSystem_SensorBenchmark_ConvertSensorData
+  * @tc.desc: Benchmarktest for interface ConvertSensorData
+  * SetBatch a sensor with the specified ID
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(SensorBenchmarkTest, ConvertSensorData)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, sensorConvertInterfaces);
+
+    int32_t ret;
+    std::vector<uint32_t> reserve{};
+    std::vector<uint8_t> sensorData;
+
+    while (sensorData.size() < MIN_SENSOR_DATA_LEN) {
+        sensorData.push_back(0);
+    }
+    HdfDeviceStatusPolicy  hdfDeviceStatusPolicy {0, 1, reserve};
+    HdfSensorData inSensorData{
+        .sensorTypeId = HDF_SENSOR_TYPE_ORIENTATION,
+        .version = 0,
+        .timestamp = 0,
+        .option = 0,
+        .mode = 0,
+        .data = sensorData,
+        .deviceId = 0,
+        .sensorId = 0,
+        .location = 0,
+    };
+    HdfSensorData outSensorData;
+    for (auto _ : state) {
+        ret = sensorConvertInterfaces->ConvertSensorData(hdfDeviceStatusPolicy, inSensorData, outSensorData);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+}
+
+BENCHMARK_REGISTER_F(SensorBenchmarkTest, ConvertSensorData)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+ENCHMARK_MAIN();

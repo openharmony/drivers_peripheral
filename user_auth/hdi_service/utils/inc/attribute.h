@@ -99,7 +99,11 @@ typedef enum {
     /* old pin root secret */
     ATTR_OLD_ROOT_SECRET = 100068,
     /* auth purpose */
-    ATTR_AUTH_PURPOSE = 100069
+    ATTR_AUTH_PURPOSE = 100069,
+    /* lock state auth type */
+    ATTR_LOCK_STATE_AUTH_TYPE = 100075,
+    /* auth trust level */
+    ATTR_AUTH_TRUST_LEVEL = 100089
 } AttributeKey;
 
 #define MAX_SUB_MSG_NUM 10

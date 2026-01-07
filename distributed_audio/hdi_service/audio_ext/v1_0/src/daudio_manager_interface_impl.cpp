@@ -74,8 +74,8 @@ int32_t DAudioManagerInterfaceImpl::UnRegisterAudioDevice(const std::string &adp
 {
     DHLOGI("UnRegister audio device, name: %{public}s, device: %{public}s.", GetAnonyString(adpName).c_str(),
         GetChangeDevIdMap(devId).c_str());
-    if (audioMgr_ == nullptr) {
-        DHLOGE("Audio manager is null.");
+    if (audioMgr_ == nullptr || audioMgr_->GetAudioMgrState()) {
+        DHLOGE("Audio manager is null or destructing...");
         return HDF_FAILURE;
     }
 
@@ -92,8 +92,8 @@ int32_t DAudioManagerInterfaceImpl::UnRegisterAudioDevice(const std::string &adp
 int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int32_t devId,
     int32_t streamId, const DAudioEvent &event)
 {
-    if (audioMgr_ == nullptr) {
-        DHLOGE("Audio manager is null.");
+    if (audioMgr_ == nullptr || audioMgr_->GetAudioMgrState()) {
+        DHLOGE("Audio manager is null or destructing...");
         return HDF_FAILURE;
     }
 

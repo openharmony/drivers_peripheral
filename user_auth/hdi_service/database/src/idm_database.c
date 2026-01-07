@@ -1365,7 +1365,8 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
 
 IAM_STATIC bool CheckAuthType(uint32_t authType)
 {
-    if (authType != PIN_AUTH && authType != FACE_AUTH && authType != FINGER_AUTH && authType != RECOVERY_KEY) {
+    if (authType != PIN_AUTH && authType != FACE_AUTH && authType != FINGER_AUTH &&
+        authType != RECOVERY_KEY && authType != COMPANION_DEVICE_AUTH) {
         LOG_ERROR("bad authType %{public}u", authType);
         return false;
     }

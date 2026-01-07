@@ -15,7 +15,7 @@
 
 
 #include <gtest/gtest.h>
-#include "v5_0/audio_types.h"
+#include "v6_0/audio_types.h"
 
 using namespace std;
 using namespace testing::ext;

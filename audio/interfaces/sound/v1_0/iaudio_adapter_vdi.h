@@ -56,6 +56,11 @@ struct IAudioAdapterVdi {
         char *value, uint32_t valueLen);
     int32_t (*RegExtraParamObserver)(struct IAudioAdapterVdi *self,
         struct IAudioCallbackVdi *audioCallback, int8_t cookie);
+    int32_t (*CreateCognitionStream)(struct IAudioAdapterVdi *self, const struct AudioSampleAttributesVdi *attrs,
+        int32_t *cogStreamId, struct AudioMmapBufferDescriptorVdi *desc);
+    int32_t (*DestroyCognitionStream)(struct IAudioAdapterVdi *self, int32_t cogStreamId);
+    int32_t (*NotifyCognitionData)(struct IAudioAdapterVdi *self,
+        int32_t cogStreamId, uint32_t size, uint32_t offset);
 };
 
 #ifdef __cplusplus

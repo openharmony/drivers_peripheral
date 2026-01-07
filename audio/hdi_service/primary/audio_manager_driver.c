@@ -19,7 +19,7 @@
 #include <hdf_remote_service.h>
 #include <osal_mem.h>
 #include <stub_collector.h>
-#include "v5_0/iaudio_manager.h"
+#include "v6_0/iaudio_manager.h"
 #include "audio_uhdf_log.h"
 #include <sched.h>
 
