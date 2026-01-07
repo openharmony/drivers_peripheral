@@ -154,6 +154,7 @@ private:
     void HandleSPKEvent(const uint32_t streamId, bool spkStatus, const DAudioEvent &event);
     void HandleMICEvent(bool micStatus, const DAudioEvent &event);
     int32_t HandleWaudioEnable(const DAudioEvent &event);
+    int32_t SetUsualParamChange(const std::string &condition, const std::string &value);
 private:
     static constexpr uint32_t WAIT_MILLISECONDS = 8000;
     static constexpr int32_t TYPE_CONDITION = 11;
