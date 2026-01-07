@@ -80,8 +80,6 @@ private:
     int32_t RemoveGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj);
 
     void ResetGnssDeathRecipient();
-
-    bool IsSupportBatching();
 };
 
 class GnssCallBackDeathRecipient : public IRemoteObject::DeathRecipient {
