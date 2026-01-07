@@ -24,7 +24,8 @@
           "ipc",
           "hdf_core",
           "hilog",
-          "samgr"
+          "samgr",
+          "init"
         ],
         "third_party": []
       },
