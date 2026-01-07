@@ -42,6 +42,13 @@ typedef struct ExecutorResultInfo {
     Buffer *oldRootSecret;
 } ExecutorResultInfo;
 
+typedef struct CreateExecutorMsgInfo {
+    int32_t userId;
+    uint32_t authPropertyMode;
+    uint32_t triggerAuthType;
+    uint32_t authTrustLevel;
+} CreateExecutorMsgInfo;
+
 typedef struct ExecutorMsg {
     uint64_t executorIndex;
     Buffer *msg;
@@ -50,7 +57,7 @@ typedef struct ExecutorMsg {
 ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *tlv);
 ResultCode GetAttributeExecutorMsg(const Attribute *attribute, Uint8Array *retMsg, SignParam signParam);
 void DestroyExecutorResultInfo(ExecutorResultInfo *result);
-ResultCode GetExecutorMsgList(int32_t userId, uint32_t authPropertyMode, LinkedList **executorMsg);
+ResultCode GetExecutorMsgList(const CreateExecutorMsgInfo *createInfo, LinkedList **executorMsg);
 
 bool CheckRemoteExecutorInfo(const Buffer *tlv, ExecutorInfoHal *infoToCheck);
 ResultCode CreateScheduleInfo(const Buffer *tlv, Uint8Array peerUdid, ScheduleInfoParam *scheduleInfo);

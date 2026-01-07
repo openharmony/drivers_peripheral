@@ -54,6 +54,7 @@ AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
 {
+    isDestruct_.store(true);
     DHLOGI("Distributed audio manager destructed.");
 }
 
@@ -383,6 +384,11 @@ void AudioManagerInterfaceImpl::ForceNotifyFwk()
     }
     notifyFwkMap_.clear();
     DHLOGI("Force notify fwk success.");
+}
+
+bool AudioManagerInterfaceImpl::GetAudioMgrState()
+{
+    return isDestruct_.load();
 }
 
 int32_t AudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &serviceName,

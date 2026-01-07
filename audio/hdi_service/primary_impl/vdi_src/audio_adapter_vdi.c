@@ -24,7 +24,7 @@
 #include "audio_common_vdi.h"
 #include "audio_render_vdi.h"
 #include "audio_dfx.h"
-#include "v5_0/iaudio_callback.h"
+#include "v6_0/iaudio_callback.h"
 #include "stub_collector.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -775,6 +775,118 @@ EXIT:
     return ret;
 }
 
+int32_t AudioCreateCognitionStreamVdi(struct IAudioAdapter *adapter, const struct AudioSampleAttributes *attrs,
+    int32_t *cogStreamId, struct AudioMmapBufferDescriptor *desc)
+{
+    int ret = HDF_SUCCESS;
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
+
+    if (adapter == NULL || attrs == NULL || desc == NULL || cogStreamId == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    pthread_rwlock_rdlock(&g_rwAdapterLock);
+    struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
+    if (vdiAdapter == NULL
+        || vdiAdapter->CreateCognitionStream == NULL
+        || vdiAdapter->DestroyCognitionStream == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        ret = HDF_ERR_NOT_SUPPORT;
+        goto EXIT;
+    }
+
+    struct AudioSampleAttributesVdi vdiAttrs;
+    AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
+    struct AudioMmapBufferDescriptorVdi vdiDesc = {0};
+    ret = vdiAdapter->CreateCognitionStream(vdiAdapter, &vdiAttrs, cogStreamId, &vdiDesc);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio adapter CreateCognitionStream fail, ret=%{public}d", ret);
+        goto EXIT;
+    }
+
+    desc->memoryAddress = NULL;
+    desc->memoryFd = vdiDesc.memoryFd;
+    desc->totalBufferFrames = vdiDesc.totalBufferFrames;
+    desc->transferFrameSize = vdiDesc.transferFrameSize;
+    desc->isShareable = vdiDesc.isShareable;
+    desc->offset = vdiDesc.offset;
+    desc->syncInfoSize = vdiDesc.syncInfoSize;
+    desc->filePath = strdup("");
+    if (desc->filePath == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail");
+        ret = HDF_FAILURE;
+        goto EXIT;
+    }
+    AUDIO_FUNC_LOGD("%{public}s Success", __func__);
+EXIT:
+    pthread_rwlock_unlock(&g_rwAdapterLock);
+    return ret;
+}
+
+int32_t AudioDestroyCognitionStreamVdi(struct IAudioAdapter *adapter, int32_t cogStreamId)
+{
+    int ret = HDF_SUCCESS;
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
+
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    pthread_rwlock_rdlock(&g_rwAdapterLock);
+    struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
+    if (vdiAdapter == NULL
+        || vdiAdapter->CreateCognitionStream == NULL
+        || vdiAdapter->DestroyCognitionStream == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        ret = HDF_ERR_NOT_SUPPORT;
+        goto EXIT;
+    }
+
+    ret = vdiAdapter->DestroyCognitionStream(vdiAdapter, cogStreamId);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio adapter DestroyCognitionStream fail, ret=%{public}d", ret);
+        goto EXIT;
+    }
+
+    AUDIO_FUNC_LOGD("%{public}s Success", __func__);
+EXIT:
+    pthread_rwlock_unlock(&g_rwAdapterLock);
+    return ret;
+}
+
+int32_t AudioNotifyCognitionDataVdi(struct IAudioAdapter *adapter,
+    int32_t cogStreamId, uint32_t size, uint32_t offset)
+{
+    int ret = HDF_SUCCESS;
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
+
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    pthread_rwlock_rdlock(&g_rwAdapterLock);
+    struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
+    if (vdiAdapter == NULL || vdiAdapter->NotifyCognitionData == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        ret = HDF_ERR_NOT_SUPPORT;
+        goto EXIT;
+    }
+
+    ret = vdiAdapter->NotifyCognitionData(vdiAdapter, cogStreamId, size, offset);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio adapter NotifyCognitionData fail, ret=%{public}d", ret);
+        goto EXIT;
+    }
+
+    AUDIO_FUNC_LOGD("%{public}s Success", __func__);
+EXIT:
+    pthread_rwlock_unlock(&g_rwAdapterLock);
+    return ret;
+}
+
 static void AudioInitAdapterInstanceVdi(struct IAudioAdapter *adapter)
 {
     adapter->InitAllPorts = AudioInitAllPortsVdi;
@@ -796,6 +908,9 @@ static void AudioInitAdapterInstanceVdi(struct IAudioAdapter *adapter)
     adapter->SetExtraParams = AudioSetExtraParamsVdi;
 
     adapter->GetExtraParams = AudioGetExtraParamsVdi;
+    adapter->CreateCognitionStream = AudioCreateCognitionStreamVdi;
+    adapter->DestroyCognitionStream = AudioDestroyCognitionStreamVdi;
+    adapter->NotifyCognitionData = AudioNotifyCognitionDataVdi;
 }
 
 uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex)
