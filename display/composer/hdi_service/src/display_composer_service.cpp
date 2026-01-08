@@ -283,6 +283,8 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<GetPanelPowerStatusFunc>(dlsym(libHandle_, "GetPanelPowerStatus"));
     vdiAdapter_->GetDisplayConnectionType =
         reinterpret_cast<GetDisplayConnectionTypeFunc>(dlsym(libHandle_, "GetDisplayConnectionType"));
+    vdiAdapter_->GetDisplayClientTargetProperty =
+        reinterpret_cast<GetDisplayClientTargetPropertyFunc>(dlsym(libHandle_, "GetDisplayClientTargetProperty"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -1250,6 +1252,17 @@ int32_t DisplayComposerService::GetDisplayConnectionType(uint32_t devId, V1_4::D
     int32_t ret = vdiAdapter_->GetDisplayConnectionType(devId, outType);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail ret:%{public}d, devId:%{public}u", __func__, ret, devId));
+    return ret;
+}
+
+int32_t DisplayComposerService::GetDisplayClientTargetProperty(uint32_t devId, int32_t& pixelFormat, int32_t& dataspace)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayClientTargetProperty, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->GetDisplayClientTargetProperty(devId, pixelFormat, dataspace);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
 } // namespace Composer

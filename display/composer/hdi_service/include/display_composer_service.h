@@ -106,6 +106,7 @@ public:
     int32_t CommitTunnelLayer(uint32_t devId, uint64_t tunnelId, sptr<HdifdParcelable>& releaseFence) override;
     int32_t RegHwcEventCallback(const sptr<IHwcEventCallback>& cb) override;
     int32_t GetDisplayConnectionType(uint32_t devId, V1_4::DisplayConnectionType& outType) override;
+    int32_t GetDisplayClientTargetProperty(uint32_t devId, int32_t& pixelFormat, int32_t& dataspace) override;
 
 private:
     void HidumperInit();

@@ -1264,3 +1264,15 @@ HWTEST_F(DeviceTest, test_GetDisplayConnectionType, TestSize.Level1)
     }
     EXPECT_EQ(DISPLAY_SUCCESS, result);
 }
+
+HWTEST_F(DeviceTest, test_GetDisplayClientTargetProperty, TestSize.Level1)
+{
+    int32_t pixelFormat = 0;
+    int32_t dataspace = 0;
+    int32_t result = DISPLAY_FAILURE;
+    auto ret = g_composerDevice->GetDisplayClientTargetProperty(g_displayIds[0], pixelFormat, dataspace);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        result = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, result);
+}
