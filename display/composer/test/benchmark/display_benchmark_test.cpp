@@ -908,7 +908,7 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, RegHwcEventCallbackTest)->
   * @tc.name: GetDisplayConnectionTypeTest
   * @tc.desc: Benchmarktest for interface GetDisplayConnectionType.
   */
-BENCHMARK_F(DisplayBenchmarkTest, GetDisplayConnectionTypeTest)(benchmark::State& state)
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplayConnectionTypeTest)(benchmark::State &state)
 {
     int32_t ret = 0;
     DisplayConnectionType connectionType;
@@ -924,6 +924,26 @@ BENCHMARK_F(DisplayBenchmarkTest, GetDisplayConnectionTypeTest)(benchmark::State
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayConnectionTypeTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 
+/**
+  * @tc.name: GetDisplayClientTargetPropertyTest
+  * @tc.desc: Benchmarktest for interface GetDisplayClientTargetProperty.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplayClientTargetPropertyTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    int32_t pixelFormat = 0;
+    int32_t dataspace = 0;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetDisplayClientTargetProperty(g_displayIds[0], pixelFormat, dataspace);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayClientTargetPropertyTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 } // namespace
 
 int main(int argc, char** argv)
