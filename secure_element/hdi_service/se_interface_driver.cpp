@@ -85,7 +85,7 @@ static int HdfSeInterfaceDriverBind(struct HdfDeviceObject* deviceObject)
 {
     if (deviceObject == nullptr) {
         HDF_LOGE("HdfSeInterfaceDriverBind: invalid deviceObject");
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_FAILURE;
     }
     auto* hdfSeInterfaceHost = new (std::nothrow) HdfSeInterfaceHost;
     if (hdfSeInterfaceHost == nullptr) {

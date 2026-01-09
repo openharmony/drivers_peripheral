@@ -70,7 +70,7 @@ static int HdfSecureElementInterfaceDriverBind(struct HdfDeviceObject* deviceObj
     HDF_LOGI("HdfSecureElementInterfaceDriverBind: driver bind start");
     if (deviceObject == nullptr) {
         HDF_LOGE("HdfSecureElementInterfaceDriverBind: invalid deviceObject");
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_FAILURE;
     }
     auto* hdfSecureElementInterfaceHost = new (std::nothrow) HdfSecureElementInterfaceHost;
     if (hdfSecureElementInterfaceHost == nullptr) {
@@ -84,7 +84,7 @@ static int HdfSecureElementInterfaceDriverBind(struct HdfDeviceObject* deviceObj
 
     sptr<OHOS::HDI::SecureElement::SimSecureElement::V1_0::ISecureElementInterface> serviceImpl =
         new (std::nothrow) SecureElementInterfaceService();
-    HDF_LOGE("HdfSecureElementInterfaceDriverBind :serviceImpl fzj");
+    HDF_LOGE("HdfSecureElementInterfaceDriverBind :serviceImpl");
     if (serviceImpl == nullptr) {
         HDF_LOGE("HdfSecureElementInterfaceDriverBind: failed to get of implement service");
         delete hdfSecureElementInterfaceHost;

@@ -76,7 +76,7 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     HDF_LOGI("HdfNfcInterfaceDriverBind enter");
     if (deviceObject == nullptr) {
         HDF_LOGE("HdfNfcInterfaceDriverBind, param deviceObject is null!");
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_FAILURE;
     }
 
     auto *hdfNfcInterfaceHost = new (std::nothrow) HdfNfcInterfaceHost;
