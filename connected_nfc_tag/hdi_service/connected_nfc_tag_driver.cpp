@@ -35,8 +35,16 @@ struct HdfConnectedNfcTagHost {
 static int32_t ConnectedNfcTagDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
+    if (client == nullptr || client->device == nullptr || data == nullptr || reply == nullptr) {
+        HDF_LOGE("%{public}s: nullptr", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     auto *hdfConnectedNfcTagHost =
         CONTAINER_OF(client->device->service, struct HdfConnectedNfcTagHost, ioService);
+    if (hdfConnectedNfcTagHost == nullptr || hdfConnectedNfcTagHost->stub == nullptr) {
+        HDF_LOGE("%{public}s: hdfConnectedNfcTagHost nullptr", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -63,7 +71,10 @@ static int HdfConnectedNfcTagDriverInit(struct HdfDeviceObject *deviceObject)
 static int HdfConnectedNfcTagDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: driver bind start", __func__);
-
+    if (deviceObject == nullptr) {
+        HDF_LOGE("%{public}s: nullptr", __func__);
+        return HDF_FAILURE;
+    }
     auto *hdfConnectedNfcTagHost = new (std::nothrow) HdfConnectedNfcTagHost;
     if (hdfConnectedNfcTagHost == nullptr) {
         HDF_LOGE("%{public}s: failed to create HdfConnectedNfcTagHost Object!", __func__);
@@ -97,8 +108,8 @@ static int HdfConnectedNfcTagDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfConnectedNfcTagDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: driver release start", __func__);
-    if (deviceObject->service == nullptr) {
-        HDF_LOGE("HdfConnectedNfcTagDriverRelease not inited");
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
+        HDF_LOGE("%{public}s: nullptr", __func__);
         return;
     }
 
