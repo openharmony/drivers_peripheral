@@ -1852,7 +1852,7 @@ int32_t LibusbAdapter::DoSyncPipeTranfer(libusb_device_handle *devHandle, libusb
     std::shared_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
     bool isDeviceExist = false;
     for (auto &it : g_handleMap) {
-        if (it->second.handle == devHandle) {
+        if (it.second.handle == devHandle) {
             isDeviceExist = true;
             break;
         }
@@ -1861,7 +1861,6 @@ int32_t LibusbAdapter::DoSyncPipeTranfer(libusb_device_handle *devHandle, libusb
         HDF_LOGE("%{public}s: failed to find the handle", __func__);
         return HDF_FAILURE;
     }
-    HDF_LOGE("%{public}s Search handle failed leave", __func__);
 
     if (endpointAttributes == LIBUSB_TRANSFER_TYPE_INTERRUPT) {
         HDF_LOGD("%{public}s: DoSyncPipeTranfer call libusb_interrupt_transfer", __func__);
