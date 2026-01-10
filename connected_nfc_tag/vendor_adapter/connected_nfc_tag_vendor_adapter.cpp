@@ -79,6 +79,16 @@ std::string GetNfcChipType(void)
     return strChipType;
 }
 
+bool CheckNfcChipType(const std::string &type)
+{
+    static const std::string ALL_CHIP_TYPES[] = {
+        "t000", "t001", "t002", "t003", "t004", "t005", "t006", "t007", "t008", "t009",
+        "t010", "t011", "t012", "t013", "t014", "t015", "t016", "t017", "t018", "t019"
+    };
+    auto it = std::find(std::begin(ALL_CHIP_TYPES), std::end(ALL_CHIP_TYPES), type);
+    return it != std::end(ALL_CHIP_TYPES);
+}
+
 ConnectedNfcTagVendorAdapter::ConnectedNfcTagVendorAdapter(): halHandle(nullptr)
 {
     infHandle.init = nullptr;
@@ -149,6 +159,10 @@ int32_t ConnectedNfcTagVendorAdapter::Init()
     std::string nfcChipType = GetNfcChipType();
     if (nfcChipType == "") {
         HDF_LOGE("nfcChipType empty");
+        return -1;
+    }
+    if (!CheckNfcChipType(nfcChipType)) {
+        HDF_LOGE("nfcChipType not allowed");
         return -1;
     }
 
