@@ -1848,6 +1848,17 @@ int32_t LibusbAdapter::DoSyncPipeTranfer(libusb_device_handle *devHandle, libusb
     HDF_LOGD("%{public}s enter", __func__);
     int32_t ret = HDF_FAILURE;
     uint32_t endpointAttributes = endpointDes->bmAttributes & LIBUSB_TRANSFER_TYPE_INTERRUPT;
+    uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
+            static_cast<uint32_t>(dev.devAddr);
+    // check if the handle is released
+    std::shared_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
+    auto it = g_handleMap.find(result);
+    if (it == g_handleMap.end()) {
+        HDF_LOGE("%{public}s: failed to find the handle", __func__);
+        return HDF_FAILURE;
+    }
+    HDF_LOGE("%{public}s Search handle failed leave", __func__);
+
     if (endpointAttributes == LIBUSB_TRANSFER_TYPE_INTERRUPT) {
         HDF_LOGD("%{public}s: DoSyncPipeTranfer call libusb_interrupt_transfer", __func__);
         ret = libusb_interrupt_transfer(devHandle, endpointDes->bEndpointAddress, buffer, syncTranfer.length,
