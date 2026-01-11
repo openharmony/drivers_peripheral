@@ -36,7 +36,7 @@
 #define INT_32_MAX                      0x7fffffff
 #define SHIFT_RIGHT_31_BITS             31
 
-uint32_t renderId_ = -1;
+static int32_t renderId_ = -1;
 
 static int32_t AudioHwRenderInit(struct AudioHwRender *hwRender)
 {
@@ -739,17 +739,17 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
 int32_t AudioAdapterUpdateAudioRoute(
     struct IAudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle)
 {
-    AUDIO_FUNC_LOGI("Enter.");
+    AUDIO_FUNC_LOGI("AudioAdapterUpdateAudioRoute Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (hwAdapter == NULL) {
+    if (hwAdapter == NULL || route == NULL) {
         AUDIO_FUNC_LOGE("AudioAdapterUpdateAudioRoute Invalid input param!");
         return AUDIO_ERR_INVALID_PARAM;
     }
+    AUDIO_FUNC_LOGI("AudioAdapterUpdateAudioRoute renderId_: %{public}d", renderId_);
     if (renderId_ <= -1 || renderId_ >= MAX_AUDIO_STREAM_NUM) {
-        AUDIO_FUNC_LOGE("render is Invalid");
+        AUDIO_FUNC_LOGE("renderId_ is Invalid");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    AUDIO_FUNC_LOGI("AudioAdapterUpdateAudioRoute renderId_: %{public}d", renderId_);
     struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr[renderId_];
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
@@ -761,6 +761,23 @@ int32_t AudioAdapterUpdateAudioRoute(
         AUDIO_FUNC_LOGE("RenderSetVoiceVolume Bind Fail!");
         return AUDIO_ERR_INTERNAL;
     }
+
+#ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
+    PathSelAnalysisJson *pPathSelAnalysisJson = AudioPassthroughGetPathSelAnalysisJson();
+    if (pPathSelAnalysisJson == NULL) {
+        AUDIO_FUNC_LOGE("pPathSelAnalysisJson Is NULL!");
+        return AUDIO_ERR_NOT_SUPPORT;
+    }
+    enum AudioPortPin descPins = hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins;
+
+    hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins = route->sinks[0].ext.device.type;
+    AUDIO_FUNC_LOGI("AudioAdapterUpdateAudioRoute deviceType: %{public}d", route->sinks[0].ext.device.type);
+    if ((*pPathSelAnalysisJson)((void *)&hwRender->renderParam, RENDER_PATH_SELECT) < 0) {
+        AUDIO_FUNC_LOGE("AudioAdapterUpdateAudioRoute get router fail!");
+        hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins = descPins;
+        return AUDIO_ERR_INTERNAL;
+    }
+#endif
 
     InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
@@ -786,11 +803,11 @@ int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
         AUDIO_FUNC_LOGE("AudioAdapterSetVoiceVolume Invalid input param!");
         return AUDIO_ERR_INVALID_PARAM;
     }
+    AUDIO_FUNC_LOGI("AudioAdapterSetVoiceVolume renderId_: %{public}d", renderId_);
     if (renderId_ <= -1 || renderId_ >= MAX_AUDIO_STREAM_NUM) {
         AUDIO_FUNC_LOGE("render is Invalid");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    AUDIO_FUNC_LOGI("AudioAdapterSetVoiceVolume renderId_: %{public}d", renderId_);
     struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr[renderId_];
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
