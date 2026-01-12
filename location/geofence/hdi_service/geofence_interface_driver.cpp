@@ -43,7 +43,7 @@ static int32_t GeofenceInterfaceDriverDispatch(struct HdfDeviceIoClient *client,
     }
     auto *hdfGeofenceInterfaceHost = CONTAINER_OF(client->device->service, struct HdfGeofenceInterfaceHost, ioService);
 
-    if (hdfGnssInterfaceHost == nullptr || hdfGnssInterfaceHost->stub == nullptr) {
+    if (hdfGeofenceInterfaceHost == nullptr || hdfGeofenceInterfaceHost->stub == nullptr) {
         HDF_LOGE("hdfGnssInterfaceHost is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
