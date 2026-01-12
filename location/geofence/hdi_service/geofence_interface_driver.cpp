@@ -37,7 +37,16 @@ struct HdfGeofenceInterfaceHost {
 static int32_t GeofenceInterfaceDriverDispatch(struct HdfDeviceIoClient *client,
     int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (client == nullptr || data == nullptr || reply == nullptr || client->device == nullptr) {
+        HDF_LOGE("GeofenceInterfaceDriverDispatch invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
     auto *hdfGeofenceInterfaceHost = CONTAINER_OF(client->device->service, struct HdfGeofenceInterfaceHost, ioService);
+
+    if (hdfGnssInterfaceHost == nullptr || hdfGnssInterfaceHost->stub == nullptr) {
+        HDF_LOGE("hdfGnssInterfaceHost is nullptr");
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -49,6 +58,10 @@ static int32_t GeofenceInterfaceDriverDispatch(struct HdfDeviceIoClient *client,
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (dataParcel == nullptr || replyParcel == nullptr) {
+        HDF_LOGE("GeofenceInterfaceDriverDispatch Parcel is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -64,6 +77,10 @@ static int HdfGeofenceInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 static int HdfGeofenceInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfGeofenceInterfaceDriverBind enter");
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
+        HDF_LOGE("deviceObject is nullptr");
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     auto *hdfGeofenceInterfaceHost = new (std::nothrow) HdfGeofenceInterfaceHost;
     if (hdfGeofenceInterfaceHost == nullptr) {
@@ -95,7 +112,7 @@ static int HdfGeofenceInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfGeofenceInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfGeofenceInterfaceDriverRelease enter");
-    if (deviceObject->service == nullptr) {
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
         HDF_LOGE("HdfGeofenceInterfaceDriverRelease not initted");
         return;
     }
