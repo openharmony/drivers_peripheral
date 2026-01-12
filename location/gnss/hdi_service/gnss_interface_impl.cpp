@@ -530,7 +530,7 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocationsSize(int32_t& size)
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface gnssInterface nullptr.", __func__);
-        return HDF_ERR_NOT_SUPPORT;
+        return HDF_FAILURE;
     }
     if (gnssInterface->getCachedLocationsSize == nullptr) {
         HDF_LOGE("%{public}s:getCachedLocationsSize return nullptr.", __func__);
@@ -546,7 +546,7 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocations()
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface gnssInterface nullptr.", __func__);
-        return HDF_ERR_NOT_SUPPORT;
+        return HDF_FAILURE;
     }
     if (gnssInterface->flushCachedGnssLocations == nullptr) {
         HDF_LOGE("%{public}s:flushCachedGnssLocations return nullptr.", __func__);
