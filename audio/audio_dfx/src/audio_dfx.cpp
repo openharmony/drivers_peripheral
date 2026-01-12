@@ -91,8 +91,10 @@ int32_t AudioDfxSysEventError(const char* desc, struct timeval startTime, int ti
     if (runTime > timeThreshold) {
         AUDIO_FUNC_LOGE("%{public}s, ovet time [%{public}d]", desc, runTime);
 #ifdef AUDIO_HISYSEVENT_ENABLE
+    if (runTime > timeThreshold * TIME_10) {
         HiSysEventWrite(HiSysEvent::Domain::AUDIO, "HDF_AUDIO_ERROR_EVENT", HiSysEvent::EventType::FAULT,
             "ERROR_DESC", desc, "ERROR_CODE", err, "OVER_TIME", runTime);
+    }
 #endif
     }
     return HDF_SUCCESS;
