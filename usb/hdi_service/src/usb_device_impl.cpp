@@ -93,9 +93,6 @@ UsbDeviceImpl::UsbDeviceImpl()
             HDF_LOGE("%{public}s: failed to set default authorize", __func__);
         }
     }
-    if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
-        loadUsbService_.LoadService();
-    }
 }
 
 UsbDeviceImpl::~UsbDeviceImpl()
