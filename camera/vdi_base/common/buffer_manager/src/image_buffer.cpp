@@ -422,8 +422,12 @@ void ImageBuffer::Free()
     std::lock_guard<std::mutex> l(l_);
     if (virAddr_ != sbAddr_ && virAddr_ != nullptr) {
         CAMERA_LOGI("Free VirtualAddr, streamId = %{public}d, index = %{public}d", streamId_, index_);
+#ifdef FORK_DMA
         munmap(virAddr_, size_);
         close(dmaBufFd_);
+#else
+        free(virAddr_);
+#endif
     }
     virAddr_ = nullptr;
     index_ = -1;
