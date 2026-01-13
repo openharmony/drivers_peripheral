@@ -48,7 +48,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
   }
 
@@ -79,7 +79,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
   }
 
@@ -110,7 +110,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
   }
 
@@ -133,7 +133,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
   }
 
   moduletest("usb_device_serial_func_test") {
@@ -155,7 +155,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
   }
 
   group("hdf_peripheral_usb_test_module") {
