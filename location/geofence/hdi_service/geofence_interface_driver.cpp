@@ -77,7 +77,7 @@ static int HdfGeofenceInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 static int HdfGeofenceInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfGeofenceInterfaceDriverBind enter");
-    if (deviceObject == nullptr || deviceObject->service == nullptr) {
+    if (deviceObject == nullptr) {
         HDF_LOGE("deviceObject is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
