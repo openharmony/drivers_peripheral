@@ -38,6 +38,7 @@
 #define LOG_TAG "HdiHostapdHal"
 
 #define CONFIG_ROOR_DIR "/data/service/el1/public/wifi"
+#define CONFIG_ROOR_SOCKET_DIR "/data/service/el1/public/wifi/sockets"
 
 #define CONFIG_DENY_MAC_FILE_NAME "deny_mac.conf"
 #define SLEEP_TIME_100_MS (100 * 1000)
