@@ -37,13 +37,10 @@ if (defined(ohos_lite)) {
       "$hdf_audio_test_path/adm/audio_adm_interface/include",
     ]
 
-    public_deps = [
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-    ]
-
-    external_deps = [
-      "bounds_checking_function:libsec_shared"
+    public_deps = [	 
+       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",	 
+       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",	 
+       "//third_party/bounds_checking_function:libsec_shared",
     ]
   }
 } else {
