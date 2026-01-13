@@ -28,20 +28,20 @@ if (defined(ohos_lite)) {
       "$hdf_audio_test_path/common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_adm_interface_test.cpp",
     ]
-    include_dirs = [	 
-       "$hdf_audio_path/hal/hdi_passthrough/include",	 
-       "$hdf_audio_path/interfaces/include",	 
-       "//third_party/bounds_checking_function/include", 
-       "$hdf_audio_test_path/common/adm_common/include",	 
-       "$hdf_audio_test_path/common/hdi_common/include",	 
-       "//third_party/googletest/googletest/include/gtest",	 
-       "$hdf_audio_test_path/adm/audio_adm_interface/include",	 
-     ]
+    include_dirs = [
+      "$hdf_audio_path/hal/hdi_passthrough/include",
+      "$hdf_audio_path/interfaces/include",
+      "//third_party/bounds_checking_function/include",
+      "$hdf_audio_test_path/common/adm_common/include",
+      "$hdf_audio_test_path/common/hdi_common/include",
+      "//third_party/googletest/googletest/include/gtest",
+      "$hdf_audio_test_path/adm/audio_adm_interface/include",
+    ]
 
-    public_deps = [	 
-       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",	 
-       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",	 
-       "//third_party/bounds_checking_function:libsec_shared",	 
+    public_deps = [
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//third_party/bounds_checking_function:libsec_shared",
     ]
   }
 } else {
