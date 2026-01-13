@@ -48,7 +48,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    if (defined(external_deps)) {
+    if (external_deps != []) {
       external_deps += [ "bounds_checking_function:libsec_shared" ]
     } else {
       external_deps = [ "bounds_checking_function:libsec_shared" ]
@@ -83,7 +83,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    if (defined(external_deps)) {
+    if (external_deps != []) {
       external_deps += [ "bounds_checking_function:libsec_shared" ]
     } else {
       external_deps = [ "bounds_checking_function:libsec_shared" ]
@@ -118,7 +118,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    if (defined(external_deps)) {
+    if (external_deps != []) {
       external_deps += [ "bounds_checking_function:libsec_shared" ]
     } else {
       external_deps = [ "bounds_checking_function:libsec_shared" ]
@@ -145,7 +145,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    if (defined(external_deps)) {
+    if (external_deps != []) {
       external_deps += [ "bounds_checking_function:libsec_shared" ]
     } else {
       external_deps = [ "bounds_checking_function:libsec_shared" ]
@@ -171,7 +171,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
     ]
-    if (defined(external_deps)) {
+    if (external_deps != []) {
       external_deps += [ "bounds_checking_function:libsec_shared" ]
     } else {
       external_deps = [ "bounds_checking_function:libsec_shared" ]
