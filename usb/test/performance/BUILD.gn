@@ -37,11 +37,7 @@ if (defined(ohos_lite)) {
       "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "./../../../../hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
     ]
-    if (external_deps != []) {
-      external_deps += [ "bounds_checking_function:libsec_shared" ]
-    } else {
-      external_deps = [ "bounds_checking_function:libsec_shared" ]
-    }
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
     cflags = [
       "-Wall",
       "-Wextra",
