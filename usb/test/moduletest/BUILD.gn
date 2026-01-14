@@ -28,7 +28,6 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include",
       "./../../sample/host/include",
       "./../../../../hdf_core/adapter/khdf/liteos/model/usb/host/include",
-      "//third_party/bounds_checking_function/include",
       "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "./../../serial/include",
       "./../../ddk/common/include",
@@ -59,7 +58,6 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include",
       "./../../sample/host/include",
       "./../../../../hdf_core/adapter/khdf/liteos/model/usb/host/include",
-      "//third_party/bounds_checking_function/include",
       "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "./../../serial/include",
       "./../../ddk/common/include",
@@ -90,7 +88,6 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include",
       "./../../sample/host/include",
       "./../../../../hdf_core/adapter/khdf/liteos/model/usb/host/include",
-      "//third_party/bounds_checking_function/include",
       "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "./../../serial/include",
       "./../../ddk/common/include",
@@ -120,7 +117,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "./../../sample/device/liteos/lib/include",
-      "//third_party/bounds_checking_function/include",
       "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "common",
     ]
@@ -142,7 +138,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "./../../sample/device/liteos/lib/include",
-      "//third_party/bounds_checking_function/include",
       "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "common",
     ]
