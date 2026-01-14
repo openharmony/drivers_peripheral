@@ -39,7 +39,8 @@
                 "drivers_interface_usb",
                 "hisysevent",
                 "access_token",
-                "libusb"
+                "libusb",
+                "bounds_checking_function"
             ],
             "third_party": []
         },
