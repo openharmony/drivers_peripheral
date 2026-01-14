@@ -32,6 +32,7 @@ namespace HDI {
 namespace Location {
 namespace Gnss {
 namespace V2_0 {
+const int MAX_CACHED_LOCATION_LENGTH = 1000;
 namespace {
 using LocationCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGnssCallback>>;
 #ifndef EMULATOR_ENABLED
@@ -254,6 +255,10 @@ void NmeaCallback(int64_t timestamp, const char* nmea, int length)
 
 void CachedLocationUpdate(const GnssLocation** locationArray, size_t arrayLength)
 {
+    if (arrayLength >= MAX_CACHED_LOCATION_LENGTH) {
+        HDF_LOGE("cachedLocation length exceed the maximum value.");
+        return;
+    }
     std::vector<LocationInfo> locationArrayNew;
     for (size_t i = 0; i < arrayLength; i++) {
         if (locationArray[i] == nullptr) {
@@ -529,7 +534,7 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocationsSize(int32_t& size)
     }
     if (gnssInterface->getCachedLocationsSize == nullptr) {
         HDF_LOGE("%{public}s:getCachedLocationsSize return nullptr.", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_ERR_NOT_SUPPORT;
     }
     size = gnssInterface->getCachedLocationsSize();
     return HDF_SUCCESS;
@@ -545,7 +550,7 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocations()
     }
     if (gnssInterface->flushCachedGnssLocations == nullptr) {
         HDF_LOGE("%{public}s:flushCachedGnssLocations return nullptr.", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_ERR_NOT_SUPPORT;
     }
     gnssInterface->flushCachedGnssLocations();
     return HDF_SUCCESS;

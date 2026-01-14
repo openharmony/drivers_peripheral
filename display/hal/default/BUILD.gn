@@ -24,8 +24,10 @@ ohos_static_library("def_display_layer") {
     "../../interfaces/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
   ]
-  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  external_deps = [ "hdf_core:libhdf_utils" ]
+  external_deps = [ 
+    "hdf_core:libhdf_utils",
+    "bounds_checking_function:libsec_shared",
+  ]
   defines = [ "__USER__" ]
   cflags = [
     "-Wall",
@@ -48,8 +50,10 @@ ohos_shared_library("def_display_gralloc") {
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
   ]
 
-  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  external_deps = [ "hdf_core:libhdf_utils" ]
+  external_deps = [ 
+    "hdf_core:libhdf_utils",
+    "bounds_checking_function:libsec_shared",
+  ]
   cflags = [
     "-Wall",
     "-Wextra",
@@ -71,8 +75,10 @@ ohos_shared_library("def_display_gfx") {
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
   ]
 
-  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  external_deps = [ "hdf_core:libhdf_utils" ]
+  external_deps = [ 
+    "hdf_core:libhdf_utils",
+    "bounds_checking_function:libsec_shared",
+  ]
   cflags = [
     "-Wall",
     "-Wextra",
