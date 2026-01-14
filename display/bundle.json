@@ -31,7 +31,8 @@
         "init",
         "hitrace",
         "libdrm",
-        "hicollie"
+        "hicollie",
+        "bounds_checking_function"
       ],
       "third_party": []
     },
