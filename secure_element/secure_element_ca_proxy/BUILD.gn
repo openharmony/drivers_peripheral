@@ -18,6 +18,13 @@ config("exported_ca_header") {
 }
 
 ohos_shared_library("secure_element_ca_proxy") {
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = []
   sources = [ "secure_element_ca_proxy.cpp" ]
   branch_protector_ret = "pac_ret"
