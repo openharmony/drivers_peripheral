@@ -1337,9 +1337,9 @@ HWTEST_F(IdmDatabaseTest, TestCalcCredentialValidPeriod_001, TestSize.Level0)
     credentialInfo.abandonedSysTime = 0;
     EXPECT_EQ(CalcCredentialValidPeriod(&credentialInfo), -1);
     credentialInfo.isAbandoned = true;
-    credentialInfo.abandonedSysTime = GetReeTime();
+    credentialInfo.abandonedSysTime = GetRtcTime();
     EXPECT_NE(CalcCredentialValidPeriod(&credentialInfo), 0);
-    credentialInfo.abandonedSysTime = GetReeTime() + 1;
+    credentialInfo.abandonedSysTime = GetRtcTime() + 1;
     EXPECT_EQ(CalcCredentialValidPeriod(&credentialInfo), 0);
 }
 } // namespace UserAuth
