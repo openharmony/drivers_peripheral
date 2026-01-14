@@ -26,7 +26,9 @@
 #include <sys/time.h>
 
 #define TIME_1000 1000
-#define TIME_THRESHOLD 300
+#define TIME_THRESHOLD 30
+#define TIME_10 10
+#define MANAGE_TIMETHRESHOLD 200
 
 #ifdef __cplusplus
 extern "C" {

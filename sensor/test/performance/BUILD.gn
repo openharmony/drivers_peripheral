@@ -39,7 +39,9 @@ unittest("hdf_peripheral_sensor_test_performance") {
     "$HDF_CORE_PATH/adapter/uhdf/posix:hdf_posix_osal",
     "$HDF_CORE_PATH/adapter/uhdf/test/unittest/common:hdf_test_common",
     "../../hal:hdi_sensor",
-    "//third_party/bounds_checking_function:libsec_shared",
   ]
-  external_deps = [ "hilog_lite:hilog_shared" ]
+  external_deps = [
+    "hilog_lite:hilog_shared",
+    "bounds_checking_function:libsec_shared",
+  ]
 }
