@@ -19,4 +19,11 @@ group("nfc_entry") {
     "hdi_service:hdi_nfc_service",
     "vendor_adaptor:nfc_vendor_adaptor",
   ]
+
+  if (defined(global_parts_info) &&
+    defined(global_parts_info.soc_p7885_nfc_hdiimpl)) {
+    external_deps = [
+      "nfc_hdiimpl:nfc_hdiimpl",
+    ]
+  }
 }
