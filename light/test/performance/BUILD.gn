@@ -26,7 +26,6 @@ if (defined(ohos_lite)) {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
-      "//third_party/bounds_checking_function/include",
       "../../interfaces/include",
     ]
 
@@ -44,11 +43,11 @@ if (defined(ohos_lite)) {
       "$HDF_CORE_PATH/adapter/uhdf/manager:hdf_core",
       "$HDF_CORE_PATH/adapter/uhdf/posix:hdf_posix_osal",
       "../../hal:hdi_light",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
     external_deps = [
       "drivers_interface_light:liblight_proxy_1.0",
       "hilog_lite:hilog_shared",
+      "bounds_checking_function:libsec_shared",
     ]
   }
 } else {
