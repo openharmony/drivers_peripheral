@@ -15,6 +15,13 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../secure_element.gni")
 
 ohos_shared_library("libsim_secure_element_interface_service_1.0") {
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [ "../vendor_sim_adaptor" ]
   sources = [ "secure_element_interface_service.cpp" ]
   public_deps = [ "../vendor_sim_adaptor:sim_se_vendor_adaptor" ]
@@ -36,6 +43,13 @@ ohos_shared_library("libsim_secure_element_interface_service_1.0") {
 }
 
 ohos_shared_library("sim_se_hdi_driver") {
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [ "../vendor_sim_adaptor" ]
   sources = [ "secure_element_interface_driver.cpp" ]
   public_deps = [ "../vendor_sim_adaptor:sim_se_vendor_adaptor" ]
