@@ -17,8 +17,36 @@
 #define HDF_LOG_TAG    hdf_sensor_magnetic
 
 #define MAX_RETRY_ATTEMPTS 5
+#define BUFFER_NUM 2
+#define GAUSS_THRESHOLD    10
+#define SLEEP_DURATION_1MS    1
+#define SLEEP_DURATION_8MS    8
+#define SLEEP_DURATION_15MS    15
+
+#define SHIFT_8BIT 8
+#define MMC5617_REG_BYTE_OFFSET_0    0
+#define MMC5617_REG_BYTE_OFFSET_1    1
+#define MMC5617_REG_BYTE_OFFSET_2    2
+#define MMC5617_REG_BYTE_OFFSET_3    3
+#define MMC5617_REG_BYTE_OFFSET_4    4
+#define MMC5617_REG_BYTE_OFFSET_5    5
+#define X_INDEX    0
+#define Y_INDEX    1
+#define Z_INDEX    2
+#define SENSOR_STATE_NORMAL    1
+#define SENSOR_STATE_STANDBY    2
+#define REG_COUNT    3
+#define MID_POINT    128
+#define SCALE_FACTOR    32
+#define DIVISOR    5
+
 
 static struct Mmc5617DrvData *g_mmc5617DrvData = NULL;
+
+/* Indicate working mode of sensor */
+static uint8_t g_sensorState = 1;
+static uint16_t mmc56xx_sensitivity = 1024;
+const int SLEEP_DURATION_MS = 8;
 
 struct Mmc5617DrvData *Mmc5617GetDrvData(void)
 {
@@ -27,14 +55,13 @@ struct Mmc5617DrvData *Mmc5617GetDrvData(void)
 
 static int32_t ReadMmc5617RawData(struct SensorCfgData *data, struct MagneticData *rawData, uint64_t *timestamp)
 {
-    uint8_t drdy = 0;
-    uint8_t reg[MAGNETIC_AXIS_BUTT];
+    uint8_t regValue[6];
+    int32_t raw_data[3];
     OsalTimespec time;
     int32_t ret;
-    int32_t retry = 0;
 
     (void)memset_s(&time, sizeof(time), 0, sizeof(time));
-    (void)memset_s(reg, sizeof(reg), 0, sizeof(reg));
+    (void)memset_s(regValue, sizeof(regValue), 0, sizeof(regValue));
 
     CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
 
@@ -44,36 +71,32 @@ static int32_t ReadMmc5617RawData(struct SensorCfgData *data, struct MagneticDat
     }
     *timestamp = time.sec * SENSOR_SECOND_CONVERT_NANOSECOND + time.usec * SENSOR_CONVERT_UNIT; /* unit nanosecond */
 
-    while (!(drdy & 0x01) && retry < MAX_RETRY_ATTEMPTS) {
-        ReadSensor(&data->busCfg, MMC5617_STATUS_ADDR, &drdy, sizeof(uint8_t));
-        retry++;
-        OsalSleep(1);
+    /* Read 6 bytes of magnetic data from reg 0x00-0x05 */
+    ret = ReadSensor(&data->busCfg, MMC5617_MAGNETIC_X_MSB_ADDR, regValue, sizeof(regValue));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 read data failed", __func__);
+        return HDF_FAILURE;
     }
 
-    ret = ReadSensor(&data->busCfg, MMC5617_MAGNETIC_X_MSB_ADDR, &reg[MAGNETIC_X_AXIS_MSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
+    /* Combine MSB and LSB, then subtract offset (32768 for 16-bit mode) */
+    raw_data[X_INDEX] = (int32_t)(((regValue[MMC5617_REG_BYTE_OFFSET_0] << SHIFT_8BIT) |
+                                	regValue[MMC5617_REG_BYTE_OFFSET_1]) - MMC5617_16BIT_OFFSET);
+    raw_data[Y_INDEX] = (int32_t)(((regValue[MMC5617_REG_BYTE_OFFSET_2] << SHIFT_8BIT) |
+    	                            regValue[MMC5617_REG_BYTE_OFFSET_3]) - MMC5617_16BIT_OFFSET);
+    raw_data[Z_INDEX] = (int32_t)(((regValue[MMC5617_REG_BYTE_OFFSET_4] << SHIFT_8BIT) |
+	                                regValue[MMC5617_REG_BYTE_OFFSET_5]) - MMC5617_16BIT_OFFSET);
+    HDF_LOGI("%s: raw_data (%d, %d, %d)", __func__, raw_data[X_INDEX], raw_data[Y_INDEX], raw_data[Z_INDEX]);
 
-    ret = ReadSensor(&data->busCfg, MMC5617_MAGNETIC_X_LSB_ADDR, &reg[MAGNETIC_X_AXIS_LSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
+    /* Remap data based on sensor direction configuration */
+    ret = SensorRawDataToRemapData(data->direction, (int32_t *)raw_data, MAGNETIC_AXIS_NUM);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 remap data failed", __func__);
+        return HDF_FAILURE;
+    }
 
-    ret = ReadSensor(&data->busCfg, MMC5617_MAGNETIC_Y_MSB_ADDR, &reg[MAGNETIC_Y_AXIS_MSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    ret = ReadSensor(&data->busCfg, MMC5617_MAGNETIC_Y_LSB_ADDR, &reg[MAGNETIC_Y_AXIS_LSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    ret = ReadSensor(&data->busCfg, MMC5617_MAGNETIC_Z_MSB_ADDR, &reg[MAGNETIC_Z_AXIS_MSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    ret = ReadSensor(&data->busCfg, MMC5617_MAGNETIC_Z_LSB_ADDR, &reg[MAGNETIC_Z_AXIS_LSB], sizeof(uint8_t));
-    CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
-
-    rawData->x = (int16_t)(SENSOR_DATA_SHIFT_LEFT(reg[MAGNETIC_X_AXIS_MSB], SENSOR_DATA_WIDTH_8_BIT) |
-        reg[MAGNETIC_X_AXIS_LSB]);
-    rawData->y = (int16_t)(SENSOR_DATA_SHIFT_LEFT(reg[MAGNETIC_Y_AXIS_MSB], SENSOR_DATA_WIDTH_8_BIT) |
-        reg[MAGNETIC_Y_AXIS_LSB]);
-    rawData->z = (int16_t)(SENSOR_DATA_SHIFT_LEFT(reg[MAGNETIC_Z_AXIS_MSB], SENSOR_DATA_WIDTH_8_BIT) |
-        reg[MAGNETIC_Z_AXIS_LSB]);
+    rawData->x = raw_data[X_INDEX];
+    rawData->y = raw_data[Y_INDEX];
+    rawData->z = raw_data[Z_INDEX];
 
     return HDF_SUCCESS;
 }
@@ -82,13 +105,9 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
 {
     struct MagneticData rawData = { 0, 0, 0 };
     struct SensorReportEvent event;
-    int8_t sign[MAGNETIC_AXIS_NUM] = {1, -1, -1};
-    int32_t *tmp = (int32_t *)OsalMemCalloc(sizeof(int32_t) * MAGNETIC_AXIS_NUM);
-    if (tmp == NULL) {
-        return HDF_ERR_MALLOC_FAIL;
-    }
+    int32_t tmp[MAGNETIC_AXIS_NUM];
+
     (void)memset_s(&event, sizeof(event), 0, sizeof(event));
-    (void)memset_s(tmp, (sizeof(int32_t) * MAGNETIC_AXIS_NUM), 0, (sizeof(int32_t) * MAGNETIC_AXIS_NUM));
 
     CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
 
@@ -102,14 +121,15 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
     event.option = 0;
     event.mode = SENSOR_WORK_MODE_REALTIME;
 
-    tmp[MAGNETIC_X_AXIS] = (rawData.x * sign[MAGNETIC_X_AXIS] - MMC5617_16BIT_OFFSET);
-    tmp[MAGNETIC_Y_AXIS] = (rawData.y * sign[MAGNETIC_Y_AXIS] - MMC5617_16BIT_OFFSET);
-    tmp[MAGNETIC_Z_AXIS] = (rawData.z * sign[MAGNETIC_Z_AXIS] - MMC5617_16BIT_OFFSET);
+    tmp[MAGNETIC_X_AXIS] = rawData.x;
+    tmp[MAGNETIC_Y_AXIS] = rawData.y;
+    tmp[MAGNETIC_Z_AXIS] = rawData.z;
+    HDF_LOGI("%s: tmp x=%d y=%d z=%d", __func__, tmp[MAGNETIC_X_AXIS], tmp[MAGNETIC_Y_AXIS], tmp[MAGNETIC_Z_AXIS]);
 
-    ret = SensorRawDataToRemapData(data->direction, tmp, (sizeof(int32_t) * MAGNETIC_AXIS_NUM) / sizeof(int32_t));
+    /* Auto switch between continuous mode and single mode based on magnetic field strength */
+    ret = Mmc56xxAutoSwitch(data, tmp);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: MMC5617 convert raw data failed", __func__);
-        return HDF_FAILURE;
+        HDF_LOGE("%s: MMC5617 auto switch failed", __func__);
     }
 
     event.dataLen = sizeof(int32_t) * MAGNETIC_AXIS_NUM;
@@ -122,15 +142,338 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
     return ret;
 }
 
+static int32_t Mmc56xxAutoSelftestConfiguration(struct SensorCfgData *data)
+{
+    int32_t ret;
+    uint8_t regValue[MAGNETIC_AXIS_NUM];
+    uint8_t writeBuffer[BUFFER_NUM];
+    int i;
+
+    CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
+
+    /* Read trim data from reg 0x27-0x29 */
+    ret = ReadSensor(&data->busCfg, 0x27, regValue, sizeof(regValue));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 read ST VALUE failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    /* Calculate and write threshold to reg 0x1E-0x20 */
+    for (i = 0; i < REG_COUNT; i++) {
+        int16_t stThrData = (int16_t)(regValue[i] - MID_POINT) * SCALE_FACTOR;
+        if (stThrData < 0) {
+            stThrData = -stThrData;
+        }
+        int16_t stThrNew = stThrData - stThrData / DIVISOR;
+        int16_t stThd = stThrNew / 8;
+        uint8_t stThdReg = (stThd > 255) ? 0xFF : (uint8_t)stThd;
+
+        writeBuffer[0] = 0x1E + i;
+        writeBuffer[1] = stThdReg;
+        ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: MMC5617 write REG %d THRESHOLD failed", __func__, i);
+            return HDF_FAILURE;
+        }
+        uint8_t readBack;
+        ret = ReadSensor(&data->busCfg, writeBuffer[0], &readBack, 1);
+        if (ret == HDF_SUCCESS) {
+            HDF_LOGI("%s: Read back reg 0x%02X value=0x%02X", __func__, writeBuffer[0], readBack);
+        } else {
+            HDF_LOGE("%s: Failed to read back reg 0x%02X", __func__, writeBuffer[0]);
+        }
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t Mmc56xxSetOperation(struct SensorCfgData *data)
+{
+    int32_t ret;
+    uint8_t writeBuffer[2];
+
+    CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
+
+    /* Write 0x08 to register 0x1B to do SET operation */
+    writeBuffer[0] = 0x1B;
+    writeBuffer[1] = 0x08;
+    ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 SET failed", __func__);
+        return HDF_FAILURE;
+    }
+    OsalMSleep(SLEEP_DURATION_1MS);
+
+    return HDF_SUCCESS;
+}
+
+static int32_t Mmc56xxContinuousModeWithAuto_Sr(struct SensorCfgData *data)
+{
+    int32_t ret;
+    uint8_t writeBuffer[2];
+
+    CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
+
+    /* Write reg 0x1C, Set BW<1:0> = 0x01 */
+    writeBuffer[0] = 0x1C;
+    writeBuffer[1] = 0x01;
+    ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 Continuous Mode reg 0x1C failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    /* Write reg 0x1A, set ODR = 120 (0x78) */
+    writeBuffer[0] = 0x1A;
+    writeBuffer[1] = 0x78;
+    ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 Continuous Mode reg 0x1A failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    /* Write reg 0x1B, set CMM_FREQ_EN and AUTO_SR_EN (0xA0) */
+    writeBuffer[0] = 0x1B;
+    writeBuffer[1] = 0xA0;
+    ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 Continuous Mode reg 0x1B failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t Mmc56xxAutoSelfTest(struct SensorCfgData *data)
+{
+    int32_t ret;
+    uint8_t writeBuffer[2];
+    uint8_t regValue;
+
+    CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
+
+    /* Write 0x40 to register 0x1B, set Auto_st_en bit high */
+    writeBuffer[0] = MMC5617_REG_CTRL0;
+    writeBuffer[1] = MMC5617_CMD_AUTO_ST;
+    ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 auto selftest failed", __func__);
+        return HDF_FAILURE;
+    }
+    OsalMSleep(SLEEP_DURATION_15MS); /* Delay 15ms to finish the selftest process */
+
+    /* Read register 0x18, check Sat_sensor bit */
+    ret = ReadSensor(&data->busCfg, MMC5617_REG_STATUS1, &regValue, 1);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 read STATUS1 failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    if ((regValue & MMC5617_SAT_SENSOR)) {
+        HDF_LOGE("%s: MMC5617 sensor is saturated", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+/*********************************************************************************
+* description: Saturation checking - periodically run selftest to detect saturation
+*********************************************************************************/
+static int32_t Mmc56xxSaturationChecking(struct SensorCfgData *data)
+{
+    int32_t ret;
+    uint8_t writeBuffer[2];
+    /* If sampling rate is 50Hz, then do saturation checking every 250 loops, i.e. 5 seconds */
+    static int gSamplesNum = 250;
+    static int gCountNum = 0;
+
+    CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
+
+    if ((gCountNum++) >= gSamplesNum) {
+        gCountNum = 0;
+
+        ret = Mmc56xxAutoSelfTest(data);
+        if (ret != HDF_SUCCESS) {
+            /* Sensor is saturated, need to do SET operation */
+            HDF_LOGI("%s: Sensor saturated, doing SET operation", __func__);
+            ret = Mmc56xxSetOperation(data);
+            if (ret != HDF_SUCCESS) {
+                HDF_LOGE("%s: MMC5617 SET operation failed", __func__);
+                return ret;
+            }
+        }
+
+        /* Do TM_M after selftest operation */
+        writeBuffer[0] = MMC5617_REG_CTRL0;
+        writeBuffer[1] = MMC5617_CMD_TMM;
+        ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: MMC5617 TM_M after selftest operation failed", __func__);
+            return ret;
+        }
+        OsalMSleep(SLEEP_DURATION_8MS); /* Delay 8ms to finish the TM_M operation */
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t WriteSensorRegister(struct SensorCfgData *data, uint8_t reg, uint8_t value)
+{
+    uint8_t writeBuffer[2] = {reg, value};
+    return WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+}
+
+static int32_t CheckAndSwitchToSingleMode(struct SensorCfgData *data, int32_t mag_out[3])
+{
+    uint8_t writeBuffer[2];
+    int32_t ret;
+    
+    /* If X or Y axis output exceed 10 Gauss, then switch to single mode */
+    if ((abs(mag_out[X_INDEX]) > GAUSS_THRESHOLD * mmc56xx_sensitivity) ||
+        (abs(mag_out[Y_INDEX]) > GAUSS_THRESHOLD * mmc56xx_sensitivity)) {
+        g_sensorState = SENSOR_STATE_STANDBY;
+
+        /* Disable continuous mode */
+        writeBuffer[0] = MMC56XX_ENABLE_REG;
+        writeBuffer[1] = MMC56XX_DISABLE_VALUE;
+        ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: MMC5617 disable continuous mode failed", __func__);
+            return ret;
+        }
+        OsalMSleep(SLEEP_DURATION_15MS);
+
+        /* Do SET operation */
+        ret = Mmc56xxSetOperation(data);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: MMC5617 SET operation failed", __func__);
+            return ret;
+        }
+        OsalMSleep(SLEEP_DURATION_1MS);
+
+        /* Do TM_M before next data reading */
+        writeBuffer[0] = MMC5617_REG_CTRL0;
+        writeBuffer[1] = MMC56XX_ENABLE_VALUE;
+        ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: MMC5617 CTRL0 TMM failed", __func__);
+            return ret;
+        }
+        OsalMSleep(SLEEP_DURATION_8MS);
+    }
+    
+    return HDF_SUCCESS;
+}
+
+static int32_t CheckAndSwitchToContinuousMode(struct SensorCfgData *data, int32_t mag_out[3])
+{
+    uint8_t writeBuffer[2];
+    int32_t ret;
+    
+    /* If both of X and Y axis output less than 8 Gauss, then switch to continuous mode with Auto_SR */
+    if ((abs(mag_out[X_INDEX]) < SHIFT_8BIT * mmc56xx_sensitivity) &&
+        (abs(mag_out[Y_INDEX]) < SHIFT_8BIT * mmc56xx_sensitivity)) {
+        g_sensorState = SENSOR_STATE_NORMAL;
+
+        /* Enable continuous mode with Auto_SR */
+        writeBuffer[0] = MMC5617_REG_CTRL0;
+        writeBuffer[1] = MMC56XX_VAL_ATUO_SR;
+        ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: MMC5617 CTRL0 AUTO_SR failed", __func__);
+            return ret;
+        }
+
+        writeBuffer[0] = MMC56XX_ENABLE_REG;
+        writeBuffer[1] = MMC56XX_ENABLE_VALUE;
+        ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: MMC5617 CTRL2 CMM_EN failed", __func__);
+            return ret;
+        }
+        
+        return HDF_SUCCESS;
+    }
+    
+    return HDF_FAILURE;
+}
+
+static int32_t HandleStandbyModeOperation(struct SensorCfgData *data)
+{
+    uint8_t writeBuffer[2];
+    int32_t ret;
+    
+    /* Sensor checking */
+    ret = Mmc56xxSaturationChecking(data);
+    if (ret == HDF_SUCCESS) {
+        /* Do TM_M before next data reading */
+        writeBuffer[0] = MMC5617_REG_CTRL0;
+        writeBuffer[1] = MMC5617_CMD_TMM;
+        ret = WriteSensor(&data->busCfg, writeBuffer, sizeof(writeBuffer));
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: MMC5617 CTRL0 TMM failed", __func__);
+            return ret;
+        }
+        OsalMSleep(SLEEP_DURATION_8MS);
+    }
+    
+    return HDF_SUCCESS;
+}
+
+/*********************************************************************************
+* description: Auto switch the working mode between Auto_SR and SETonly
+*********************************************************************************/
+static int32_t Mmc56xxAutoSwitch(struct SensorCfgData *data, int32_t mag[3])
+{
+    int32_t ret;
+    int32_t mag_out[3];
+
+    mag_out[X_INDEX] = mag[X_INDEX];
+    mag_out[Y_INDEX] = mag[Y_INDEX];
+    mag_out[Z_INDEX] = mag[Z_INDEX];
+
+    if (g_sensorState == SENSOR_STATE_NORMAL) {
+        ret = CheckAndSwitchToSingleMode(data, mag_out);
+        if (ret != HDF_SUCCESS) {
+            return ret;
+        }
+    } else if (g_sensorState == SENSOR_STATE_STANDBY) {
+        ret = CheckAndSwitchToContinuousMode(data, mag_out);
+        if (ret == HDF_FAILURE) {
+            ret = HandleStandbyModeOperation(data);
+            if (ret != HDF_SUCCESS) {
+                return ret;
+            }
+        } else if (ret != HDF_SUCCESS) {
+            return ret;
+        }
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t InitMmc5617(struct SensorCfgData *data)
 {
     int32_t ret;
 
     CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
 
-    ret = SetSensorRegCfgArray(&data->busCfg, data->regCfgGroup[SENSOR_INIT_GROUP]);
+    ret = Mmc56xxAutoSelftestConfiguration(data);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: MMC5617 sensor init config failed", __func__);
+        HDF_LOGE("%s: MMC5617 SelfTest Configuration failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = Mmc56xxSetOperation(data);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 SET failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = Mmc56xxContinuousModeWithAuto_Sr(data);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: MMC5617 Continuous Mode failed", __func__);
         return HDF_FAILURE;
     }
 
