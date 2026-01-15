@@ -233,10 +233,10 @@ private:
     struct libusb_config_descriptor* FindConfigDescriptorById(libusb_device *dev, uint8_t descId);
     void ProcessExtraData(std::vector<uint8_t> &descriptor, size_t &currentOffset, const unsigned char *extra,
         int32_t extraLength);
-    int32_t GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe, libusb_endpoint_descriptor **endpoint_desc,
+    int32_t GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe, libusb_endpoint_descriptor *endpoint_desc,
         libusb_device_handle** deviceHandle);
     int32_t GetEndpointDescFromInterface(const UsbPipe &pipe, const libusb_interface_descriptor *intf_desc,
-    libusb_endpoint_descriptor **endpoint_desc);
+    libusb_endpoint_descriptor *endpoint_desc);
     int32_t DoSyncPipeTranfer(libusb_device_handle *dev_handle, libusb_endpoint_descriptor *endpointDes,
         unsigned char *buffer, SyncTranfer &syncTranfer);
     unsigned char *GetMmapBufferByFd(int32_t fd, size_t len);
