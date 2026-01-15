@@ -2357,13 +2357,20 @@ void LibusbAdapter::TransferInit(const UsbDev &dev)
 {
     // init LibusbAsyncManager
     HDF_LOGI("%{public}s: start init libusb async manager", __func__);
+    std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
+    for (auto iter = g_asyncManager.transferVec.begin();
+        iter != g_asyncManager.transferVec.end(); iter++) {
+        if (iter->first.busNum == dev.busNum && iter->first.devAddr == dev.devAddr) {
+            HDF_LOGI("%{public}s: transfer init.", __func__);
+            return;
+        }
+    }
     LibusbAsyncWrapper *asyncWrapper = new(std::nothrow) LibusbAsyncWrapper();
     if (asyncWrapper == nullptr) {
         HDF_LOGE("%{public}s:create libusb async manager failed", __func__);
         return;
     }
     std::pair<UsbDev, LibusbAsyncWrapper*> asyncWrapperPair = std::make_pair(dev, asyncWrapper);
-    std::lock_guard<std::mutex> lock(g_asyncManager.transferVecLock);
     g_asyncManager.transferVec.push_back(asyncWrapperPair);
 }
 
@@ -2783,13 +2790,20 @@ int32_t LibusbAdapter::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
 void LibusbAdapter::BulkTransferInit(const UsbDev &dev)
 {
     HDF_LOGI("%{public}s: enter", __func__);
+    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
+    for (auto iter = g_bulkManager.bulktransferVec.begin();
+        iter != g_bulkManager.bulktransferVec.end(); iter++) {
+        if (iter->first.busNum == dev.busNum && iter->first.devAddr == dev.devAddr) {
+            HDF_LOGI("%{public}s: bulk transfer init.", __func__);
+            return;
+        }
+    }
     LibusbBulkWrapper *bulkWrapper = new(std::nothrow) LibusbBulkWrapper();
     if (bulkWrapper == nullptr) {
         HDF_LOGE("%{public}s:bulkWrapper is nullptr", __func__);
         return;
     }
     std::pair<UsbDev, LibusbBulkWrapper*> bulkWrapperPair = std::make_pair(dev, bulkWrapper);
-    std::lock_guard<std::mutex> lock(g_bulkManager.bulkTransferVecLock);
     g_bulkManager.bulktransferVec.push_back(bulkWrapperPair);
 }
 
