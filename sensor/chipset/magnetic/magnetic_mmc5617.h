@@ -28,9 +28,24 @@
 
 #define MMC5617_SENSITIVITY    1024
 
+/* CONTROL REGISTER ADDR */
+#define MMC5617_REG_CTRL0         0x1B
+#define MMC56XX_VAL_ATUO_SR       0xA0
+#define MMC56XX_ENABLE_REG        0x1D
+#define MMC56XX_ENABLE_VALUE      0x10
+#define MMC56XX_DISABLE_VALUE     0x00
+#define MMC56XX_ENABLE_VALUE      0x01
+#define MMC5617_REG_STATUS1       0x18
+
+/* CONTROL REGISTER VALUES */
+#define MMC5617_CMD_AUTO_ST       0x40
+#define MMC5617_CMD_TMM           0x01
+#define MMC5617_SAT_SENSOR        0x20
+
 
 int32_t DetectMagneticMmc5617Chip(struct SensorCfgData *data);
 int32_t ReadMmc5617Data(struct SensorCfgData *data);
+static int32_t Mmc56xxAutoSwitch(struct SensorCfgData *data, int32_t mag[3]);
 
 struct Mmc5617DrvData {
     struct IDeviceIoService ioService;
