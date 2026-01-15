@@ -254,25 +254,6 @@ static void RemoveLostCtrl(void)
         }
     }
     closedir(dir);
-    dir = opendir(CONFIG_ROOR_SOCKET_DIR);
-    if (dir == NULL) {
-        HDF_LOGE("can not open wifi dir");
-        return;
-    }
-    while ((entry = readdir(dir)) != NULL) {
-        if (strncmp(entry->d_name, "wpa_ctrl_", strlen("wpa_ctrl_")) != 0) {
-            continue;
-        }
-        int ret = sprintf_s(path, sizeof(path), "%s/%s", CONFIG_ROOR_DIR, entry->d_name);
-        if (ret == -1) {
-            HDF_LOGE("sprintf_s dir name fail");
-            break;
-        }
-        if (entry->d_type != DT_DIR) {
-            remove(path);
-        }
-    }
-    closedir(dir);
 }
 
 int32_t WpaInterfaceStart(struct IWpaInterface *self)
