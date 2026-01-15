@@ -32,6 +32,7 @@ namespace {
     const int32_t ON_TIME = 500;
     const int32_t OFF_TIME = 500;
     const int32_t LIGHT_WAIT_TIME = 2;
+    const int32_t SHORT_WAIT_TIME = 1;
     const int32_t MIN_LIGHT_ID = LIGHT_ID_NONE;
     const int32_t MAX_LIGHT_ID = LIGHT_ID_BUTT;
 }
@@ -216,6 +217,95 @@ HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
 }
 
 /**
+  * @tc.name: ShortEnableLight001
+  * @tc.desc: Enables the light available in the light list based on the specified light id.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
+  */
+HWTEST_F(HdfLightTest, ShortEnableLight001, TestSize.Level1)
+{
+    uint32_t i;
+    struct LightEffect effect;
+    effect.flashEffect.flashMode = LIGHT_FLASH_NONE;
+    effect.flashEffect.onTime = 0;
+    effect.flashEffect.offTime = 0;
+
+    for (i = 0; i < g_count; ++i) {
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        int32_t ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(SHORT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+
+        effect.lightColor.colorValue.rgbColor.r = 0;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(SHORT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+    }
+}
+
+/**
+  * @tc.name: ShortEnableLight002
+  * @tc.desc: Enables the light available in the light list based on the specified light id.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
+  */
+HWTEST_F(HdfLightTest, ShortEnableLight002, TestSize.Level1)
+{
+    uint32_t i;
+    struct LightEffect effect;
+    effect.flashEffect.flashMode = LIGHT_FLASH_BLINK;
+    effect.flashEffect.onTime = ON_TIME;
+    effect.flashEffect.offTime = OFF_TIME;
+
+    for (i = 0; i < g_count; ++i) {
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        int32_t ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(SHORT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+
+        effect.lightColor.colorValue.rgbColor.r = 0;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(SHORT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(SHORT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+    }
+}
+
+/**
   * @tc.name: EnableLight003
   * @tc.desc: Enables the light available in the light list based on the specified light id.
   * @tc.type: FUNC
@@ -234,6 +324,133 @@ HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
     for (i = 0; i < g_count; ++i) {
         effect.lightColor.colorValue.rgbColor.r = 255;
         effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        effect.flashEffect.flashMode = LIGHT_FLASH_BUTT;
+        effect.flashEffect.onTime = ON_TIME;
+        effect.flashEffect.offTime = OFF_TIME;
+
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(LIGHT_NOT_FLASH, ret);
+
+        effect.flashEffect.flashMode = LIGHT_FLASH_GRADIENT;
+        effect.flashEffect.onTime = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(LIGHT_NOT_FLASH, ret);
+
+        effect.flashEffect.onTime = ON_TIME;
+        effect.flashEffect.offTime = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(LIGHT_NOT_FLASH, ret);
+    }
+}
+/**
+  * @tc.name: EnableLight004
+  * @tc.desc: Enables the light available in the light list based on the specified light id.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
+  */
+HWTEST_F(HdfLightTest, EnableLight004, TestSize.Level1)
+{
+    uint32_t i;
+    struct LightEffect effect;
+    effect.flashEffect.flashMode = LIGHT_FLASH_NONE;
+    effect.flashEffect.onTime = 0;
+    effect.flashEffect.offTime = 0;
+
+    for (i = 0; i < g_count; ++i) {
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        int32_t ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(LIGHT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+
+        effect.lightColor.colorValue.rgbColor.r = 0;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(LIGHT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+    }
+}
+
+/**
+  * @tc.name: EnableLight005
+  * @tc.desc: Enables the light available in the light list based on the specified light id.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
+  */
+HWTEST_F(HdfLightTest, EnableLight005, TestSize.Level1)
+{
+    uint32_t i;
+    struct LightEffect effect;
+    effect.flashEffect.flashMode = LIGHT_FLASH_BLINK;
+    effect.flashEffect.onTime = ON_TIME;
+    effect.flashEffect.offTime = OFF_TIME;
+
+    for (i = 0; i < g_count; ++i) {
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        int32_t ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(LIGHT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+
+        effect.lightColor.colorValue.rgbColor.r = 0;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(LIGHT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(LIGHT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+    }
+}
+
+/**
+  * @tc.name: EnableLight006
+  * @tc.desc: Enables the light available in the light list based on the specified light id.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
+  */
+HWTEST_F(HdfLightTest, EnableLight006, TestSize.Level1)
+{
+    uint32_t i;
+    int32_t ret;
+    uint32_t lightId = LIGHT_ID_BUTT;
+    struct LightEffect effect;
+
+    ret = g_lightDev->TurnOnLight(lightId, &effect);
+    EXPECT_EQ(LIGHT_NOT_SUPPORT, ret);
+
+    for (i = 0; i < g_count; ++i) {
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 255;
         effect.lightColor.colorValue.rgbColor.b = 0;
         effect.flashEffect.flashMode = LIGHT_FLASH_BUTT;
         effect.flashEffect.onTime = ON_TIME;

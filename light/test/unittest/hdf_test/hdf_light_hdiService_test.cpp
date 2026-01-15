@@ -919,6 +919,58 @@ HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOnMultiLightsRedMAX
 }
 
 /* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0400
+ * @tc.name  : testhdiServiceTurnOffButt001
+ * @tc.desc  : Turn Off Light.
+ *//* *
+ * @tc.number: SUB_Driver_Light_TurnOnMultiLights_0200
+ * @tc.name  : testhdiServiceTurnOnMultiLightsBlueMAX00
+ * @tc.desc  : Turn on the light Abnormal lightid.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOnMultiLightsBlueMAX001, Function | MediumTest | Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.b = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_NOTIFICATIONS);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0400
+ * @tc.name  : testhdiServiceTurnOffButt001
+ * @tc.desc  : Turn Off Light.
+ *//* *
+ * @tc.number: SUB_Driver_Light_TurnOnMultiLights_0200
+ * @tc.name  : testhdiServiceTurnOnMultiLightsGreenMAX00
+ * @tc.desc  : Turn on the light Abnormal lightid.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOnMultiLightsGreenMAX001, Function | MediumTest | Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.g = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_NOTIFICATIONS);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
  * @tc.number: SUB_Driver_Light_TurnOnMultiLights_0300
  * @tc.name  : testhdiServiceTurnOnMultiLightsTimes001
  * @tc.desc  : Turn on the light lightid 10 times.
@@ -1011,6 +1063,216 @@ HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffAttention001, Fu
 }
 
 /* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0300
+ * @tc.name  : testhdiServiceTurnOffAttention002
+ * @tc.desc  : Turn Off Light.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffAttention002, Function | MediumTest | Level2)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.g = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_ATTENTION);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0300
+ * @tc.name  : testhdiServiceTurnOffAttention003
+ * @tc.desc  : Turn Off Light.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffAttention003, Function | MediumTest | Level2)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.b = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_ATTENTION);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOnMultiLights_0300
+ * @tc.name  : testhdiServiceTurnOnMultiLightsTimes002
+ * @tc.desc  : Turn on the light lightid 10 times.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOnMultiLightsTimes002, Function | MediumTest | Level1)
+{
+    int32_t ret;
+
+    ASSERT_NE(nullptr, g_lightInterface);
+    for (int i = 0; i < 10; i++) {
+        std::vector<HdfLightColor> lightColor;
+        struct HdfLightColor light;
+        light.colorValue.rgbColor.r = MIN_VALUE;
+        light.colorValue.rgbColor.g = MAX_VALUE;
+        light.colorValue.rgbColor.b = MIN_VALUE;
+        lightColor.push_back(light);
+        ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(SLEEPTIME);
+
+        ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BATTERY);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOnMultiLights_0300
+ * @tc.name  : testhdiServiceTurnOnMultiLightsTimes003
+ * @tc.desc  : Turn on the light lightid 10 times.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOnMultiLightsTimes003, Function | MediumTest | Level1)
+{
+    int32_t ret;
+
+    ASSERT_NE(nullptr, g_lightInterface);
+    for (int i = 0; i < 10; i++) {
+        std::vector<HdfLightColor> lightColor;
+        struct HdfLightColor light;
+        light.colorValue.rgbColor.r = MIN_VALUE;
+        light.colorValue.rgbColor.g = MIN_VALUE;
+        light.colorValue.rgbColor.b = MAX_VALUE;
+        lightColor.push_back(light);
+        ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(SLEEPTIME);
+
+        ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BATTERY);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOnMultiLights_0300
+ * @tc.name  : testhdiServiceTurnOnMultiLightsTimes004
+ * @tc.desc  : Turn on the light lightid 10 times.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOnMultiLightsTimes004, Function | MediumTest | Level1)
+{
+    int32_t ret;
+
+    ASSERT_NE(nullptr, g_lightInterface);
+    for (int i = 0; i < 10; i++) {
+        std::vector<HdfLightColor> lightColor;
+        struct HdfLightColor light;
+        light.colorValue.rgbColor.r = MAX_VALUE;
+        light.colorValue.rgbColor.g = MAX_VALUE;
+        light.colorValue.rgbColor.b = MAX_VALUE;
+        lightColor.push_back(light);
+        ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(SLEEPTIME);
+
+        ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BATTERY);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0100
+ * @tc.name  : testhdiServiceTurnOffBattery002
+ * @tc.desc  : Turn Off Light.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffBattery002, Function | MediumTest | Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.g = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BATTERY);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0100
+ * @tc.name  : testhdiServiceTurnOffBattery003
+ * @tc.desc  : Turn Off Light.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffBattery003, Function | MediumTest | Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.b = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BATTERY);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0200
+ * @tc.name  : testhdiServiceTurnOffNotifications002
+ * @tc.desc  : Turn Off Light.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffNotifications002, Function | MediumTest | Level2)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.g = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_NOTIFICATIONS);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0200
+ * @tc.name  : testhdiServiceTurnOffNotifications003
+ * @tc.desc  : Turn Off Light.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffNotifications003, Function | MediumTest | Level2)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.b = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BATTERY, lightColor);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_NOTIFICATIONS);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
  * @tc.number: SUB_Driver_Light_TurnOffLight_0400
  * @tc.name  : testhdiServiceTurnOffButt001
  * @tc.desc  : Turn Off Light.
@@ -1033,6 +1295,50 @@ HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffButt001, Functio
 }
 
 /* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0400
+ * @tc.name  : testhdiServiceTurnOffButt002
+ * @tc.desc  : Turn Off Light.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffButt002, Function | MediumTest | Level2)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.b = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BUTT, lightColor);
+    EXPECT_EQ(-2, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BUTT);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0400
+ * @tc.name  : testhdiServiceTurnOffButt003
+ * @tc.desc  : Turn Off Light.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffButt003, Function | MediumTest | Level2)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.g = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOnMultiLights(HDF_LIGHT_ID_BUTT, lightColor);
+    EXPECT_EQ(-2, ret);
+    OsalSleep(SLEEPTIME);
+
+    ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BUTT);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
  * @tc.number: SUB_Driver_Light_TurnOffLight_0500
  * @tc.name  : testhdiServiceTurnOffNoOn001
  * @tc.desc  : Turn it off when it's not on.
@@ -1044,6 +1350,42 @@ HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffNoOn001, Functio
     std::vector<HdfLightColor> lightColor;
     struct HdfLightColor light;
     light.colorValue.rgbColor.r = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BUTT);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0500
+ * @tc.name  : testhdiServiceTurnOffNoOn002
+ * @tc.desc  : Turn it off when it's not on.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffNoOn002, Function | MediumTest | Level2)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.g = MAX_VALUE;
+    lightColor.push_back(light);
+
+    int32_t ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BUTT);
+    EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+/* *
+ * @tc.number: SUB_Driver_Light_TurnOffLight_0500
+ * @tc.name  : testhdiServiceTurnOffNoOn003
+ * @tc.desc  : Turn it off when it's not on.
+ */
+HWTEST_F(HatsHdfLightCommonTestAdditional, testhdiServiceTurnOffNoOn003, Function | MediumTest | Level2)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.b = MAX_VALUE;
     lightColor.push_back(light);
 
     int32_t ret = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BUTT);
