@@ -105,7 +105,7 @@ int32_t ReadMmc5617Data(struct SensorCfgData *data)
 {
     struct MagneticData rawData = { 0, 0, 0 };
     struct SensorReportEvent event;
-    int32_t tmp[MAGNETIC_AXIS_NUM];
+    static int32_t tmp[MAGNETIC_AXIS_NUM];
 
     (void)memset_s(&event, sizeof(event), 0, sizeof(event));
 
