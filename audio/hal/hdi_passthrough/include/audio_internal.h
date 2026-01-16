@@ -445,6 +445,7 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
                                        enum AudioPortPassthroughMode *mode);
 int32_t AudioAdapterUpdateAudioRoute(struct AudioAdapter *adapter, const struct AudioRoute *route,
                                      int32_t *routeHandle);
+int32_t AudidoAdapterSetMicMute(struct AudioAdapter *adapter, bool isMute);
 int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t routeHandle);
 int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
                                    const char *condition, const char *value);
