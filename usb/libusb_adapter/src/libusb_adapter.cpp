@@ -929,7 +929,7 @@ int32_t LibusbAdapter::GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe,
     libusb_config_descriptor *config_desc = nullptr;
     ret = libusb_get_active_config_descriptor(libusb_get_device(devHandle), &config_desc);
     if (ret < 0) {
-        // if ret== 0, then config is released by libusb;
+        // if ret < 0, then config_desc is released by libusb, no need to free here;
         HDF_LOGE("%{public}s: libusb_get_active_config_descriptor failed ret=%{public}d", __func__, ret);
         return HDF_ERR_INVALID_PARAM;
     }
