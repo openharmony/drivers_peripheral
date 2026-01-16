@@ -726,6 +726,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     ret = GetInterfaceInfoByVal(pipe.interfaceHandle, infoTemp);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s infoTemp failed", __func__);
+        close(ashmem.ashmemFd);
         return HDF_FAILURE;
     }
     uint8_t intfId = GetInterfaceId(pipe.interfaceHandle);
