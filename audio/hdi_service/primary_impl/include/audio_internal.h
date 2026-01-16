@@ -472,6 +472,7 @@ int32_t AudioAdapterGetDeviceStatus(struct IAudioAdapter *adapter, struct AudioD
 int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume);
 int32_t AudioAdapterUpdateAudioRoute(struct IAudioAdapter *adapter, const struct AudioRoute *route,
                                      int32_t *routeHandle);
+int32_t AudidoAdapterSetMicMute(struct IAudioAdapter *adapter, bool isMute);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
 int32_t AudioRenderStart(struct IAudioRender *handle);
 int32_t AudioRenderStop(struct IAudioRender *handle);

@@ -840,6 +840,52 @@ int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
     return AUDIO_SUCCESS;
 }
 
+int32_t AudidoAdapterSetMicMute(struct IAudioAdapter *adapter, bool isMute)
+{
+    AUDIO_FUNC_LOGI("AudidoAdapterSetMicMute Enter isMute: %{public}d.", isMute);
+    int32_t ret = 0;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL) {
+        AUDIO_FUNC_LOGE("AudidoAdapterSetMicMute Invalid input param!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    AUDIO_FUNC_LOGI("AudidoAdapterSetMicMute renderId_: %{public}d, MAX_AUDIO_STREAM_NUM: %{public}d",
+        renderId_, MAX_AUDIO_STREAM_NUM);
+    if (renderId_ <= -1 || renderId_ >= MAX_AUDIO_STREAM_NUM) {
+        AUDIO_FUNC_LOGE("render is Invalid");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr[renderId_];
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL) {
+        AUDIO_FUNC_LOGE("hwRender is NULL!");
+        return AUDIO_ERR_INTERNAL;
+    }
+
+    if (hwRender->devCtlHandle == NULL) {
+        AUDIO_FUNC_LOGE("AudidoAdapterSetMicMute Bind Fail!");
+        return AUDIO_ERR_INTERNAL;
+    }
+
+    InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
+    if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+        AUDIO_FUNC_LOGE("InterfaceLibModeRender not exist");
+        return HDF_FAILURE;
+    }
+
+    bool muteStatus = hwRender->renderParam.renderMode.ctlParam.mute;
+    hwRender->renderParam.renderMode.ctlParam.mute = isMute;
+
+    ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
+                                     AUDIODRV_CTL_IOCTL_MUTE_WRITE);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("SetMute SetParams FAIL");
+        hwRender->renderParam.renderMode.ctlParam.mute = muteStatus;
+        return AUDIO_ERR_INTERNAL;
+    }
+    return AUDIO_SUCCESS;
+}
+
 static int32_t AudioHwCaptureInit(struct AudioHwCapture *hwCapture)
 {
     if (hwCapture == NULL) {
