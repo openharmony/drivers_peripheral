@@ -184,7 +184,7 @@ HWTEST_F(SeImplTest, closeChannel001, TestSize.Level1)
  */
 HWTEST_F(SeImplTest, transmit001, TestSize.Level1)
 {
-    const std::vector<uint8_t> command;
+    const std::vector<uint8_t> command = {1};
     std::vector<uint8_t> response;
     SecureElementStatus status;
     std::shared_ptr<SeImpl> seImpl = std::make_shared<SeImpl>();
