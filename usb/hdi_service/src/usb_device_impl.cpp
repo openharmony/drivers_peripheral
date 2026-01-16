@@ -403,13 +403,16 @@ std::string UsbDeviceImpl::UsbGetAttribute(const std::string &devDir, const std:
         return "";
     }
     int32_t fd = open(realPathStr, O_RDONLY);
-    if (fd >= 0) {
-        ret = read(fd, buf, sizeof(buf) - 1);
-        if (ret > 0) {
-            s = buf;
-        }
+    if (fd < 0) {
+        HDF_LOGE("%{public}s: open %{public}s failed  errno:%{public}d", __func__, realPathStr, errno);
+        return s;
     }
-    close(fd);
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    ret = read(fd, buf, sizeof(buf) - 1);
+    if (ret > 0) {
+        s = buf;
+    }
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     return s;
 }
 
@@ -497,8 +500,9 @@ int32_t UsbDeviceImpl::SetAuthorize(const std::string &filePath, bool authorized
             __func__, filePath.c_str(), errno);
         return HDF_FAILURE;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     int32_t ret = write(fd, content.c_str(), content.length());
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (ret < 0) {
         HDF_LOGE("%{public}s: failed to authorize usb %{public}s, errno = %{public}d",
             __func__, filePath.c_str(), errno);
@@ -540,8 +544,9 @@ int32_t UsbDeviceImpl::SetGlobalDefaultAuthorize(bool authorized)
         HDF_LOGE("%{public}s: failed to reach authorized_default, errno = %{public}d", __func__, errno);
         return HDF_FAILURE;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     int32_t ret = write(fd, content.c_str(), content.length());
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (ret < 0) {
         HDF_LOGE("%{public}s: failed to set usb default authorize, errno = %{public}d", __func__, errno);
         return HDF_FAILURE;
