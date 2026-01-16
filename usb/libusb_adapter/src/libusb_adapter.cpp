@@ -929,12 +929,14 @@ int32_t LibusbAdapter::GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe,
     libusb_config_descriptor *config_desc = nullptr;
     ret = libusb_get_active_config_descriptor(libusb_get_device(devHandle), &config_desc);
     if (ret < 0) {
+        // if ret== 0, then config is released by libusb;
         HDF_LOGE("%{public}s: libusb_get_active_config_descriptor failed ret=%{public}d", __func__, ret);
         return HDF_ERR_INVALID_PARAM;
     }
     if (pipe.intfId < 0 || pipe.intfId >= USB_MAX_INTERFACES) {
         HDF_LOGE("%{public}s: pipe.intfId is failed, intfId: %{public}d, enpointId:%{public}d",
             __func__, pipe.intfId, pipe.endpointId);
+        libusb_free_config_descriptor(config_desc);
         return HDF_FAILURE;
     }
 
@@ -944,7 +946,7 @@ int32_t LibusbAdapter::GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe,
             const libusb_interface_descriptor *intf_desc = &intf->altsetting[j];
             ret = GetEndpointDescFromInterface(pipe, intf_desc, endpoint_desc);
             if (ret == HDF_SUCCESS) {
-                free(config_desc);
+                libusb_free_config_descriptor(config_desc);
                 return HDF_SUCCESS;
             }
         }
@@ -952,7 +954,7 @@ int32_t LibusbAdapter::GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe,
 
     HDF_LOGE("%{public}s: get desc failed, intfId: %{public}d, epid:%{public}d",
         __func__, pipe.intfId, pipe.endpointId);
-    free(config_desc);
+    libusb_free_config_descriptor(config_desc);
     return HDF_FAILURE;
 }
 
