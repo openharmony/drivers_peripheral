@@ -78,6 +78,7 @@ static int32_t SerialReadProperty(const char *deviceDir, const char *propName, i
         HDF_LOGE("%{public}s: open file failed path:%{public}s, errno:%{public}d", __func__, path, errno);
         return HDF_ERR_IO;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     int32_t ret = HDF_SUCCESS;
     do {
         char buf[PROPERTY_MAX_LEN] = {0};
@@ -103,7 +104,7 @@ static int32_t SerialReadProperty(const char *deviceDir, const char *propName, i
         *value = res;
     } while (0);
 
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     return ret;
 }
 
@@ -127,6 +128,7 @@ static std::string SerialGetSerialNo(const char *deviceDir)
         HDF_LOGE("%{public}s: open file failed path:%{public}s, errno:%{public}d", __func__, path, errno);
         return serialNo;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     char buf[PROPERTY_MAX_LEN] = {0};
     do {
         ssize_t numRead = read(fd, buf, PROPERTY_MAX_LEN);
@@ -142,7 +144,7 @@ static std::string SerialGetSerialNo(const char *deviceDir)
         serialNo = std::string(buf);
     } while (0);
 
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     return serialNo;
 }
 
