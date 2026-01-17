@@ -83,7 +83,7 @@ public:
     int32_t CloseOutputPort(uint32_t portId) override;
     int32_t SendMidiMessages(uint32_t portId, const std::vector<MidiMessage> &messages) override;
 
-private: 
+private:
     struct InputContext {
         std::atomic<bool> quit{false};
         snd_rawmidi_t *rawmidi = nullptr;
@@ -109,10 +109,17 @@ class EpollHandler {
     int32_t epollFd_ = InvaildFD;
 
 public:
-    EpollHandler() { epollFd_ = ::epoll_create1(0); }
-    ~EpollHandler() { finalize(); } // Ensure close on destruct
+    EpollHandler()
+    {
+        epollFd_ = ::epoll_create1(0);
+    }
+    ~EpollHandler()
+    {
+        finalize();
+    } // Ensure close on destruct
 
-    void finalize() {
+    void finalize()
+    {
         if (epollFd_ != InvaildFD) {
             ::close(epollFd_);
             epollFd_ = InvaildFD;
@@ -199,7 +206,7 @@ public:
     int32_t SendMidiMessages(int64_t deviceId, uint32_t portId, const std::vector<MidiMessage> &messages);
 
 private:
-    void EnumerationDeviceMidi1();
+    void EnumerationMidi1();
     void CleanupDeviceInputPorts(int64_t deviceId);
     void CleanupRemovedDevices(const std::vector<DeviceInfo> &oldDeviceList);
     std::shared_ptr<MidiDeviceBase> GetDeviceDriver(int64_t deviceId);

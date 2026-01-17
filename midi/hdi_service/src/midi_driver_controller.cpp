@@ -137,10 +137,10 @@ static void ConvertUmpToMidi1(const uint32_t* umpData, size_t count, std::vector
         uint32_t ump = umpData[i];
         uint8_t mt = (ump >> 28) & 0xF; // Message Type
 
-        if (mt == 0x2) { 
+        if (mt == 0x2) {
             // Type 2: MIDI 1.0 Channel Voice Messages (32-bit)
             // Format: [4b MT][4b Group][4b Status][4b Channel] [8b Note/Data1][8b Vel/Data2]
-            // Note: In UMP, Status includes Channel. UMP: 0x2GSCDD       
+            // Note: In UMP, Status includes Channel. UMP: 0x2GSCDD
             uint8_t status = (ump >> 16) & 0xFF;
             uint8_t data1 = (ump >> 8) & 0xFF;
             uint8_t data2 = ump & 0xFF;
@@ -186,13 +186,14 @@ static void ConvertUmpToMidi1(const uint32_t* umpData, size_t count, std::vector
                     // No data bytes
                     break;
                 default:
-                    // 0xF0 (Sysex Start) and 0xF7 (Sysex End) are handled in Type 3 usually, 
+                    // 0xF0 (Sysex Start) and 0xF7 (Sysex End) are handled in Type 3 usually,
                     // but simple 1-packet sysex might appear here.
                     break;
             }
         }
     }
 }
+
 static int64_t GetCurNano()
 {
     int64_t result = -1; // -1 for bad result.
@@ -209,7 +210,8 @@ static int64_t GetCurNano()
 
 static MidiDriverController *g_instance = nullptr;
 
-Midi1Device::~Midi1Device() {
+Midi1Device::~Midi1Device()
+{
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto& pair : inputs_) {
         // Stop threads safely
@@ -229,7 +231,8 @@ Midi1Device::~Midi1Device() {
     }
 }
 
-int32_t Midi1Device::OpenInputPort(uint32_t portId, const sptr<IMidiCallback> &callback) {
+int32_t Midi1Device::OpenInputPort(uint32_t portId, const sptr<IMidiCallback> &callback)
+{
     std::lock_guard<std::mutex> lock(mutex_);
 
     if (portId < info_.outputPorts.size()) return HDF_FAILURE;
@@ -238,7 +241,7 @@ int32_t Midi1Device::OpenInputPort(uint32_t portId, const sptr<IMidiCallback> &c
     if (inputs_.find(portId) != inputs_.end()) return HDF_FAILURE;
 
     const auto& port = info_.inputPorts[portId];
-    snd_rawmidi_t * rawmidi;
+    snd_rawmidi_t *rawmidi;
     auto hwname = MakeHwName(port.card, port.device, port.subdevice);
     auto result = ::snd_rawmidi_open(&rawmidi, nullptr, hwname.c_str(), SND_RAWMIDI_NONBLOCK);
     if (result < 0) {
@@ -274,7 +277,8 @@ int32_t Midi1Device::OpenInputPort(uint32_t portId, const sptr<IMidiCallback> &c
     return HDF_SUCCESS;
 }
 
-int32_t Midi1Device::CloseInputPort(uint32_t portId) {
+int32_t Midi1Device::CloseInputPort(uint32_t portId)
+{
     std::lock_guard<std::mutex> lock(mutex_);
     auto it = inputs_.find(portId);
     if (it == inputs_.end()) return HDF_SUCCESS;
@@ -296,7 +300,8 @@ int32_t Midi1Device::CloseInputPort(uint32_t portId) {
     return HDF_SUCCESS;
 }
 
-int32_t Midi1Device::OpenOutputPort(uint32_t portId) {
+int32_t Midi1Device::OpenOutputPort(uint32_t portId)
+{
     std::lock_guard<std::mutex> lock(mutex_);
     if (portId >= info_.outputPorts.size()) return HDF_FAILURE;
     if (outputs_.find(portId) != outputs_.end()) return HDF_SUCCESS;
@@ -313,7 +318,8 @@ int32_t Midi1Device::OpenOutputPort(uint32_t portId) {
     return HDF_SUCCESS;
 }
 
-int32_t Midi1Device::CloseOutputPort(uint32_t portId) {
+int32_t Midi1Device::CloseOutputPort(uint32_t portId)
+{
     std::lock_guard<std::mutex> lock(mutex_);
     auto it = outputs_.find(portId);
     if (it == outputs_.end()) return HDF_SUCCESS;
@@ -323,7 +329,8 @@ int32_t Midi1Device::CloseOutputPort(uint32_t portId) {
     return HDF_SUCCESS;
 }
 
-int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMessage> &messages) {
+int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMessage> &messages)
+{
     std::lock_guard<std::mutex> lock(mutex_);
     auto it = outputs_.find(portId);
     if (it == outputs_.end()) return HDF_FAILURE;
@@ -374,8 +381,7 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
                 ctx->quit = true;
                 return;
             }
-            if (len == 0) 
-            {
+            if (len == 0) {
                 return;
             }
             std::ostringstream midiStream;
@@ -386,7 +392,7 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
             if (len == 1 && src[0] == 0xF8) {
                 return;
             }
-            UmpProcessor processor; 
+            UmpProcessor processor;
             std::vector<UmpPacket> results;
             processor.ProcessBytes(src.get(), static_cast<size_t>(len), [&](const UmpPacket &p) {
                 results.push_back(p);
@@ -436,7 +442,7 @@ void MidiDriverController::CleanupRemovedDevices(const std::vector<DeviceInfo> &
     }
     for (const auto &oldDevice : oldDeviceList) {
         if (currentDeviceIds.find(oldDevice.deviceId) == currentDeviceIds.end()) {
-            HDF_LOGI("%{public}s: Device detected removal: %{public}lld (Card: %{public}d, Device: %{public}d)", 
+            HDF_LOGI("%{public}s: Device detected removal: %{public}lld (Card: %{public}d, Device: %{public}d)",
                 __func__, (long long)oldDevice.deviceId, oldDevice.card, oldDevice.device);
             CleanupDeviceInputPorts(oldDevice.deviceId);
         }
@@ -455,9 +461,9 @@ void MidiDriverController::CleanupDeviceInputPorts(int64_t deviceId)
     }
 }
 
-void MidiDriverController::EnumerationDeviceMidi1()
+void MidiDriverController::EnumerationMidi1()
 {
-    HDF_LOGI("%{public}s EnumerationDeviceMidi1 Start,", __func__);
+    HDF_LOGI("%{public}s EnumerationMidi1 Start,", __func__);
     int32_t card = -1;
     while (1) {
         if (::snd_card_next(&card) < 0 || card < 0) {
@@ -529,13 +535,14 @@ int32_t MidiDriverController::GetDeviceList(std::vector<MidiDeviceInfo> &deviceL
     std::vector<DeviceInfo> oldDeviceList = deviceList_;
     deviceList_.clear();
     std::vector<MidiDeviceInfo> deviceInfos;
-    EnumerationDeviceMidi1();
+    EnumerationMidi1();
     deviceList = MakeMidiDeviceInfos(deviceList_);
     CleanupRemovedDevices(oldDeviceList);
     return HDF_SUCCESS;
 }
 
-std::shared_ptr<MidiDeviceBase> MidiDriverController::GetDeviceDriver(int64_t deviceId) {
+std::shared_ptr<MidiDeviceBase> MidiDriverController::GetDeviceDriver(int64_t deviceId)
+{
     std::lock_guard<std::mutex> lock(deviceMapMutex_);
     // 1. 已加载则返回
     auto it = activeDrivers_.find(deviceId);
@@ -550,7 +557,7 @@ int32_t MidiDriverController::OpenDevice(int64_t deviceId)
     std::lock_guard<std::mutex> listLock(deviceListMutex_);
     std::lock_guard<std::mutex> mapLock(deviceMapMutex_);
     if (activeDrivers_.find(deviceId) != activeDrivers_.end()) {
-         return HDF_FAILURE; // Already open
+        return HDF_FAILURE; // Already open
     }
     int devIndex = -1;
     for (size_t i = 0; i < deviceList_.size(); i++) {
@@ -559,8 +566,9 @@ int32_t MidiDriverController::OpenDevice(int64_t deviceId)
             break;
         }
     }
-    if (devIndex == -1) return HDF_FAILURE;
-
+    if (devIndex == -1) {
+        return HDF_FAILURE;
+    }
     const auto& info = deviceList_[devIndex];
     std::shared_ptr<MidiDeviceBase> driver;
     if (info.is_ump) {
@@ -583,32 +591,39 @@ int32_t MidiDriverController::CloseDevice(int64_t deviceId)
     return HDF_SUCCESS;
 }
 
-int32_t MidiDriverController::OpenInputPort(int64_t deviceId, uint32_t portId, const sptr<IMidiCallback> &dataCallback) {
+int32_t MidiDriverController::OpenInputPort(int64_t deviceId, uint32_t portId,
+    const sptr<IMidiCallback> &dataCallback)
+{
     auto driver = GetDeviceDriver(deviceId);
     if (!driver) return HDF_FAILURE;
     return driver->OpenInputPort(portId, dataCallback);
 }
-int32_t MidiDriverController::CloseInputPort(int64_t deviceId, uint32_t portId) {
+int32_t MidiDriverController::CloseInputPort(int64_t deviceId, uint32_t portId)
+{
     std::lock_guard<std::mutex> lock(deviceMapMutex_);
     auto it = activeDrivers_.find(deviceId);
     if (it == activeDrivers_.end()) return HDF_FAILURE;
     return it->second->CloseInputPort(portId);
 }
 
-int32_t MidiDriverController::OpenOutputPort(int64_t deviceId, uint32_t portId) {
+int32_t MidiDriverController::OpenOutputPort(int64_t deviceId, uint32_t portId)
+{
     auto driver = GetDeviceDriver(deviceId);
     if (!driver) return HDF_FAILURE;
     return driver->OpenOutputPort(portId);
 }
 
-int32_t MidiDriverController::CloseOutputPort(int64_t deviceId, uint32_t portId) {
+int32_t MidiDriverController::CloseOutputPort(int64_t deviceId, uint32_t portId)
+{
     std::lock_guard<std::mutex> lock(deviceMapMutex_);
     auto it = activeDrivers_.find(deviceId);
     if (it == activeDrivers_.end()) return HDF_FAILURE;
     return it->second->CloseOutputPort(portId);
 }
 
-int32_t MidiDriverController::SendMidiMessages(int64_t deviceId, uint32_t portId, const std::vector<MidiMessage> &messages) {
+int32_t MidiDriverController::SendMidiMessages(int64_t deviceId, uint32_t portId,
+    const std::vector<MidiMessage> &messages)
+{
     std::lock_guard<std::mutex> lock(deviceMapMutex_);
     auto it = activeDrivers_.find(deviceId);
     if (it == activeDrivers_.end()) return HDF_FAILURE;

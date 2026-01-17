@@ -1,20 +1,27 @@
 #include "ump_processor.h"
 
 UmpProcessor::UmpProcessor() 
-    : group_(0), 
+    : group_(0),
       cv_pos_(0), running_status_(0), expected_len_(0),
-      in_sysex_(false), sysex_pos_(0), sysex_has_started_(false) 
+      in_sysex_(false), sysex_pos_(0), sysex_has_started_(false)
 {
     // Initialize buffers to zero
-    for(auto& b : cv_buffer_) b = 0;
-    for(auto& b : sysex_buffer_) b = 0;
+    for(auto& b : cv_buffer_) {
+        b = 0;
+    }
+    for(auto& b : sysex_buffer_) {
+        b = 0;
+    }
 }
 
-void UmpProcessor::SetGroup(uint8_t group) {
+void UmpProcessor::SetGroup(uint8_t group)
+{
     if (group <= 0x0F) group_ = group;
 }
 
-void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len, UmpCallback callback) {
+void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len,
+    UmpCallback callback)
+{
     for (size_t i = 0; i < len; ++i) {
         uint8_t b = data[i];
 
@@ -23,13 +30,13 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len, UmpCallback cal
         if (b >= 0xF8) {
             uint32_t mt1 = (0x1U << 28) | (static_cast<uint32_t>(group_) << 24) | (static_cast<uint32_t>(b) << 16);
             callback({ mt1 });
-            continue; 
+            continue;
         }
 
         // 2. Handle Status Bytes
         if (b >= 0x80) {
             // New status always interrupts Running Status accumulation
-            cv_pos_ = 0; 
+            cv_pos_ = 0;
 
             // -- Handle SysEx Start (0xF0) --
             if (b == 0xF0) {
@@ -46,7 +53,7 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len, UmpCallback cal
                     FinalizeSysEx(callback);
                     in_sysex_ = false;
                 }
-                running_status_ = 0; 
+                running_status_ = 0;
                 continue; // F7 is stripped
             }
 
@@ -69,15 +76,11 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len, UmpCallback cal
                 DispatchChannelMessage(callback);
                 cv_pos_ = 0;
             }
-        }
-        // 3. Handle Data Bytes
-        else {
+        } else { // 3. Handle Data Bytes 
             // -- SysEx Mode --
             if (in_sysex_) {
                 ProcessSysExData(b, callback);
-            }
-            // -- Channel/Common Mode --
-            else {
+            } else {             // -- Channel/Common Mode --
                 // Recover Running Status if buffer is empty
                 if (cv_pos_ == 0 && running_status_ != 0) {
                     cv_buffer_[0] = running_status_;
@@ -87,8 +90,7 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len, UmpCallback cal
                 } 
                 else if (cv_pos_ > 0 && cv_pos_ < 3) {
                     cv_buffer_[cv_pos_++] = b;
-                }
-                else {
+                } else {
                     // Orphaned data byte, ignore
                     continue;
                 }
@@ -105,7 +107,8 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len, UmpCallback cal
 
 // --- Helper Functions ---
 
-int UmpProcessor::GetExpectedDataLength(uint8_t status) {
+int UmpProcessor::GetExpectedDataLength(uint8_t status)
+{
     if (status < 0xF0) {
         uint8_t type = status & 0xF0;
         if (type == 0xC0 || type == 0xD0) return 1;
@@ -119,7 +122,8 @@ int UmpProcessor::GetExpectedDataLength(uint8_t status) {
     }
 }
 
-void UmpProcessor::DispatchChannelMessage(UmpCallback callback) {
+void UmpProcessor::DispatchChannelMessage(UmpCallback callback)
+{
     uint8_t status = cv_buffer_[0];
     uint32_t mt = (status < 0xF0) ? 0x2U : 0x1U; // MT=2 for Channel, MT=1 for System
     
@@ -135,7 +139,8 @@ void UmpProcessor::DispatchChannelMessage(UmpCallback callback) {
 
 // --- SysEx Logic (MT=3) ---
 
-void UmpProcessor::ProcessSysExData(uint8_t byte, UmpCallback callback) {
+void UmpProcessor::ProcessSysExData(uint8_t byte, UmpCallback callback)
+{
     if (sysex_pos_ < 6) {
         sysex_buffer_[sysex_pos_++] = byte;
     }
@@ -151,7 +156,8 @@ void UmpProcessor::ProcessSysExData(uint8_t byte, UmpCallback callback) {
     }
 }
 
-void UmpProcessor::FinalizeSysEx(UmpCallback callback) {
+void UmpProcessor::FinalizeSysEx(UmpCallback callback)
+{
     // Determine Status:
     // If we haven't sent a Start packet yet -> 0x0 (Complete)
     // If we have sent a Start packet -> 0x3 (End)
@@ -163,10 +169,11 @@ void UmpProcessor::FinalizeSysEx(UmpCallback callback) {
     sysex_has_started_ = false;
 }
 
-void UmpProcessor::DispatchSysExPacket(UmpCallback callback, uint8_t status_code, uint8_t byte_count) {
+void UmpProcessor::DispatchSysExPacket(UmpCallback callback, uint8_t status_code, uint8_t byte_count)
+{
     // Word 0: [MT=3 (4b)] [Group (4b)] [Status (4b)] [Count (4b)] [Data0 (8b)] [Data1 (8b)]
-    uint32_t w0 = (0x3U << 28) | (static_cast<uint32_t>(group_) << 24) | 
-                  (static_cast<uint32_t>(status_code) << 20) | 
+    uint32_t w0 = (0x3U << 28) | (static_cast<uint32_t>(group_) << 24) |
+                  (static_cast<uint32_t>(status_code) << 20) |
                   (static_cast<uint32_t>(byte_count) << 16);
     
     if (byte_count > 0) w0 |= (static_cast<uint32_t>(sysex_buffer_[0]) << 8);
