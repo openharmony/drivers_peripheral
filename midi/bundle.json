@@ -1,0 +1,39 @@
+{
+    "name": "@ohos/drivers_peripheral_midi",
+    "description": "midi device driver",
+    "version": "6.1",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+      "destPath": "drivers/peripheral/midi"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+      "name": "drivers_peripheral_midi",
+      "subsystem": "hdf",
+      "adapted_system_type": ["standard"],
+      "rom": "675KB",
+      "ram": "7400KB",
+      "deps": {
+        "components": [
+          "alsa-lib",
+          "hilog",
+          "c_utils",
+          "hdf_core",
+          "drivers_interface_midi"
+        ],
+        "third_party": []
+      },
+      "build": {
+        "sub_component": [
+          "//drivers/peripheral/midi:midi_entry"
+        ],
+        "test": [
+          "//drivers/peripheral/midi/test:midi_hdi_test"
+        ],
+        "inner_kits": []
+      }
+    }
+  }
+  

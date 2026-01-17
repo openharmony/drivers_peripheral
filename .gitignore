@@ -4,3 +4,5 @@
 *.d
 *.cmd
 .vscode
+
+.codemate
