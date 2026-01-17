@@ -234,7 +234,7 @@ int32_t UsbdPorts::OpenFile(const std::string& path, int32_t flags)
         return HDF_FAILURE;
     }
     int32_t fd = open(realpathStr, flags);
-    if (fd < 0 ) {
+    if (fd < 0) {
         HDF_LOGE("%{public}s : failed to open file:%{public}s. errno = %{public}s",
             __func__, realpathStr, strerror(errno));
         return fd;
