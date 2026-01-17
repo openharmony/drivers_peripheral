@@ -1,6 +1,6 @@
-/adapter 
-*.o 
-*.a 
-*.d 
-*.cmd 
+/adapter
+*.o
+*.a
+*.d
+*.cmd
 .vscode
