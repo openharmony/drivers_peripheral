@@ -50,6 +50,7 @@ class IDisplayComposerVdiV1_1 : public IDisplayComposerVdi {
     virtual int32_t SetDisplayActiveRegion(uint32_t devId, const IRect& rect) = 0;
     virtual int32_t FastPresent(uint32_t devId, const PresentParam& param,
         const std::vector<BufferHandle*>& inHandles) = 0;
+    virtual int32_t SetDisplayColorGamut(uint32_t devId, ColorGamut gamut) = 0;
 };
 
 using CreateComposerVdiFuncV1_1 = IDisplayComposerVdiV1_1* (*)();
