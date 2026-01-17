@@ -39,7 +39,6 @@
 /* add For Capture Bytes To Frames */
 int32_t AudioCaptureStart(struct IAudioCapture *handle)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("The hwCapture is NULL");
@@ -74,14 +73,14 @@ int32_t AudioCaptureStart(struct IAudioCapture *handle)
     }
 
     hwCapture->captureParam.frameCaptureMode.buffer = tbuffer;
-
+    AUDIO_FUNC_LOGI("Enter. tbuffer address=%{public}p, buff=%{public}d", tbuffer, FRAME_DATA);
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Capture Start");
     return AUDIO_SUCCESS;
 }
 
 int32_t AudioCaptureStop(struct IAudioCapture *handle)
 {
-    AUDIO_FUNC_LOGD("Enter.");
+    AUDIO_FUNC_LOGI("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is null");
@@ -117,7 +116,6 @@ int32_t AudioCaptureStop(struct IAudioCapture *handle)
 
 int32_t AudioCapturePause(struct IAudioCapture *handle)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is empty");
@@ -152,14 +150,14 @@ int32_t AudioCapturePause(struct IAudioCapture *handle)
         hwCapture->captureParam.captureMode.ctlParam.pause = pauseStatus;
         return AUDIO_ERR_INTERNAL;
     }
-
+    AUDIO_FUNC_LOGI("Enter. pauseStatus= %{public}d", pauseStatus);
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Capture Pause");
     return AUDIO_SUCCESS;
 }
 
 int32_t AudioCaptureResume(struct IAudioCapture *handle)
 {
-    AUDIO_FUNC_LOGD("Enter.");
+    AUDIO_FUNC_LOGI("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is empty");
@@ -208,7 +206,6 @@ int32_t AudioCaptureFlush(struct IAudioCapture *handle)
 
 int32_t AudioCaptureGetFrameSize(struct IAudioCapture *handle, uint64_t *size)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || size == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -225,12 +222,12 @@ int32_t AudioCaptureGetFrameSize(struct IAudioCapture *handle, uint64_t *size)
     }
 
     *size = FRAME_SIZE * channelCount * (formatBitsCapture >> BITS_TO_FROMAT);
+    AUDIO_FUNC_LOGI("Enter. FrameSize= %{public}llu", *size);
     return AUDIO_SUCCESS;
 }
 
 int32_t AudioCaptureGetFrameCount(struct IAudioCapture *handle, uint64_t *count)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || count == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -238,6 +235,7 @@ int32_t AudioCaptureGetFrameCount(struct IAudioCapture *handle, uint64_t *count)
     }
 
     *count = hwCapture->captureParam.frameCaptureMode.frames;
+    AUDIO_FUNC_LOGI("Enter. FrameCount= %{public}llu", *count);
     return AUDIO_SUCCESS;
 }
 
@@ -282,24 +280,36 @@ int32_t AudioCaptureSetSampleAttributes(struct IAudioCapture *handle, const stru
 
 int32_t AudioCaptureGetSampleAttributes(struct IAudioCapture *handle, struct AudioSampleAttributes *attrs)
 {
-    AUDIO_FUNC_LOGD("Enter.");
+    AUDIO_FUNC_LOGI("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || attrs == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
     attrs->format = hwCapture->captureParam.frameCaptureMode.attrs.format;
+    AUDIO_FUNC_LOGI("Format: %{public}d", attrs->format);
     attrs->sampleRate = hwCapture->captureParam.frameCaptureMode.attrs.sampleRate;
+    AUDIO_FUNC_LOGI("Sample Rate: %{public}u", attrs->sampleRate);
     attrs->channelCount = hwCapture->captureParam.frameCaptureMode.attrs.channelCount;
+    AUDIO_FUNC_LOGI("Channel Count: %{public}u", attrs->channelCount);
     attrs->interleaved = hwCapture->captureParam.frameCaptureMode.attrs.interleaved;
+    AUDIO_FUNC_LOGI("Interleaved: %{public}s", attrs->interleaved ? "true" : "false");
     attrs->type = hwCapture->captureParam.frameCaptureMode.attrs.type;
+    AUDIO_FUNC_LOGI("Type: %{public}d", attrs->type);
     attrs->period = hwCapture->captureParam.frameCaptureMode.attrs.period;
+    AUDIO_FUNC_LOGI("Period: %{public}u", attrs->period);
     attrs->frameSize = hwCapture->captureParam.frameCaptureMode.attrs.frameSize;
+    AUDIO_FUNC_LOGI("Frame Size: %{public}u", attrs->frameSize);
     attrs->isBigEndian = hwCapture->captureParam.frameCaptureMode.attrs.isBigEndian;
+    AUDIO_FUNC_LOGI("IsBigEndian: %{public}s", attrs->isBigEndian ? "true" : "false");
     attrs->isSignedData = hwCapture->captureParam.frameCaptureMode.attrs.isSignedData;
+    AUDIO_FUNC_LOGI("IsSignedData: %{public}s", attrs->isSignedData ? "true" : "false");
     attrs->startThreshold = hwCapture->captureParam.frameCaptureMode.attrs.startThreshold;
+    AUDIO_FUNC_LOGI("StartThreshold: %{public}u", attrs->startThreshold);
     attrs->stopThreshold = hwCapture->captureParam.frameCaptureMode.attrs.stopThreshold;
+    AUDIO_FUNC_LOGI("StopThreshold: %{public}u", attrs->stopThreshold);
     attrs->silenceThreshold = hwCapture->captureParam.frameCaptureMode.attrs.silenceThreshold;
+    AUDIO_FUNC_LOGI("SilenceThreshold: %{public}u", attrs->silenceThreshold);
     return AUDIO_SUCCESS;
 }
 
@@ -476,7 +486,6 @@ int32_t AudioCaptureGetMute(struct IAudioCapture *handle, bool *mute)
 
 int32_t AudioCaptureSetVolume(struct IAudioCapture *handle, float volume)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -519,12 +528,13 @@ int32_t AudioCaptureSetVolume(struct IAudioCapture *handle, float volume)
         hwCapture->captureParam.captureMode.ctlParam.volume = volumeTemp;
         return AUDIO_ERR_INTERNAL;
     }
+    AUDIO_FUNC_LOGI("Enter. volumeTemp= %{public}f, volMax= %{public}f, volMin= %{public}f, volTemp= %{public}f",
+                    volumeTemp, volMax, volMin, volTemp);
     return AUDIO_SUCCESS;
 }
 
 int32_t AudioCaptureGetVolume(struct IAudioCapture *handle, float *volume)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || volume == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -561,6 +571,8 @@ int32_t AudioCaptureGetVolume(struct IAudioCapture *handle, float *volume)
     int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + DECIMAL_PART) / INTEGER_TO_DEC); // delet 0.X num
 
     *volume = (float)volumeT / INTEGER_TO_DEC;                                               // get volume (0-1)
+    AUDIO_FUNC_LOGI("Enter. volumeTemp= %{public}f, volMax= %{public}f, volMin= %{public}f, *volume= %{public}f",
+                    volumeTemp, volMax, volMin, *volume);
     return AUDIO_SUCCESS;
 }
 
