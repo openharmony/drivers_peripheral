@@ -27,6 +27,7 @@
 #include "thermal_log.h"
 #include "thermal_hdf_config.h"
 
+#define DRIVERS_PERIPHERAL_THERMAL_FDSAN_TAG 0XD002943
 #define HDF_LOG_TAG ThermalDeviceMitigation
 
 namespace OHOS {
@@ -60,7 +61,7 @@ int32_t ThermalDeviceMitigation::WriteSysfsFd(int32_t fd, std::string buf, size_
 int32_t ThermalDeviceMitigation::OpenSysfsFile(std::string filePath, int32_t flags)
 {
     int32_t ret;
-
+    constexpr uint64_t FDSAN_PARAM = 0;
     if (filePath.empty()) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -70,6 +71,7 @@ int32_t ThermalDeviceMitigation::OpenSysfsFile(std::string filePath, int32_t fla
         THERMAL_HILOGE(COMP_HDI, "failed to open file");
         return ret;
     }
+    fdsan_exchange_owner_tag(ret, FDSAN_PARAM, DRIVERS_PERIPHERAL_THERMAL_FDSAN_TAG);
     return ret;
 }
 
@@ -83,7 +85,7 @@ int32_t ThermalDeviceMitigation::WriteSysfsFile(std::string filePath, std::strin
         return HDF_ERR_IO;
     }
     int32_t ret = WriteSysfsFd(fd, buf.c_str(), bytesSize);
-    close(fd);
+    fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_THERMAL_FDSAN_TAG);
     return ret;
 }
 
