@@ -24,6 +24,8 @@
 #include "battery_config.h"
 #include "battery_log.h"
 
+#define DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG 0XD002923
+
 namespace OHOS {
 namespace HDI {
 namespace Battery {
@@ -45,6 +47,7 @@ BatteryThread::~BatteryThread()
     if (batteryThread_ != nullptr && batteryThread_->joinable()) {
         batteryThread_->join();
     }
+    fdsan_close_with_tag(ueventFd_, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
 }
 
 void BatteryThread::InitCallback(const sptr<IBatteryCallback>& callback)
@@ -55,6 +58,7 @@ void BatteryThread::InitCallback(const sptr<IBatteryCallback>& callback)
 int32_t BatteryThread::OpenUeventSocket()
 {
     int32_t bufferSize = UEVENT_BUFF_SIZE;
+    constexpr uint64_t FDSAN_PARAM = 0;
     struct sockaddr_nl address = {
         .nl_family = AF_NETLINK,
         .nl_pid = getpid(),
@@ -66,18 +70,18 @@ int32_t BatteryThread::OpenUeventSocket()
         BATTERY_HILOGE(COMP_HDI, "open uevent socket failed, fd is invalid");
         return INVALID_FD;
     }
-
+    fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
     int32_t ret = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     if (ret < 0) {
         BATTERY_HILOGE(COMP_HDI, "set socket opt failed, ret: %{public}d", ret);
-        close(fd);
+        fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
         return INVALID_FD;
     }
 
     ret = bind(fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(struct sockaddr_nl));
     if (ret < 0) {
         BATTERY_HILOGE(COMP_HDI, "bind socket address failed, ret: %{public}d", ret);
-        close(fd);
+        fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
         return INVALID_FD;
     }
     return fd;
