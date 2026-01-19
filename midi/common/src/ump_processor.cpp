@@ -1,15 +1,30 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "ump_processor.h"
 
-UmpProcessor::UmpProcessor() 
+UmpProcessor::UmpProcessor()
     : group_(0),
       cv_pos_(0), running_status_(0), expected_len_(0),
       in_sysex_(false), sysex_pos_(0), sysex_has_started_(false)
 {
     // Initialize buffers to zero
-    for(auto& b : cv_buffer_) {
+    for (auto &b : cv_buffer_) {
         b = 0;
     }
-    for(auto& b : sysex_buffer_) {
+    for (auto &b : sysex_buffer_) {
         b = 0;
     }
 }
@@ -76,7 +91,7 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len,
                 DispatchChannelMessage(callback);
                 cv_pos_ = 0;
             }
-        } else { // 3. Handle Data Bytes 
+        } else { // 3. Handle Data Bytes
             // -- SysEx Mode --
             if (in_sysex_) {
                 ProcessSysExData(b, callback);
@@ -87,8 +102,7 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len,
                     cv_buffer_[1] = b;
                     cv_pos_ = 2;
                     expected_len_ = GetExpectedDataLength(running_status_);
-                } 
-                else if (cv_pos_ > 0 && cv_pos_ < 3) {
+                } else if (cv_pos_ > 0 && cv_pos_ < 3) {
                     cv_buffer_[cv_pos_++] = b;
                 } else {
                     // Orphaned data byte, ignore

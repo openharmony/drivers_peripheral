@@ -34,7 +34,7 @@ namespace OHOS {
 namespace HDI {
 namespace Midi {
 namespace V1_0 {
-static constexpr size_t WorkBufferSize = sizeof(uint32_t) * 256;
+static constexpr size_t WORK_BUFFER_SIZE = sizeof(uint32_t) * 256;
 static constexpr int64_t MIDI_NS_PER_SECOND = 1000000000;
 static void ReadVendorIdAndProductId(int32_t card, std::string &idVendor, std::string &idProduct)
 {
@@ -49,13 +49,13 @@ static void ReadVendorIdAndProductId(int32_t card, std::string &idVendor, std::s
     if (!std::getline(file, line)) {
         return;
     }
-    size_t colon_pos = line.find(':');
-    if (colon_pos == std::string::npos) {
+    size_t colonPos= line.find(':');
+    if (colonPos== std::string::npos) {
         return;
     }
 
     idVendor = line.substr(0, colon_pos);
-    idProduct = line.substr(colon_pos + 1);
+    idProduct = line.substr(colonPos+ 1);
 }
 
 static void ReadUsbBus(int32_t card, std::string &bus)
@@ -157,8 +157,7 @@ static void ConvertUmpToMidi1(const uint32_t* umpData, size_t count, std::vector
                 midi1Bytes.push_back(data1);
                 midi1Bytes.push_back(data2);
             }
-        } 
-        else if (mt == 0x1) {
+        } else if (mt == 0x1) {
             // Type 1: System Common / Real Time Messages (32-bit)
             // Format: [4b MT][4b Group][8b Status][8b Data1][8b Data2]
             uint8_t status = (ump >> 16) & 0xFF;
@@ -363,7 +362,7 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
     struct epoll_event evWakeup;
     epoll.add(ctx->eventFd, evWakeup, EPOLLIN, &ctx->eventFd); // Use ptr to identify
 
-    auto src = std::make_unique<uint8_t[]>(WorkBufferSize);
+    auto src = std::make_unique<uint8_t[]>(WORK_BUFFER_SIZE);
     std::vector<MidiMessage> eventList;
     while (!ctx->quit) {
         epoll.poll([&](void *ptr, int32_t) {
@@ -375,7 +374,7 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
                 read(ctx->eventFd, &u, sizeof(uint64_t));
                 return; // Just wake up loop to check ctx->quit
             }
-            auto len = ::snd_rawmidi_read(ctx->rawmidi, src.get(), WorkBufferSize);
+            auto len = ::snd_rawmidi_read(ctx->rawmidi, src.get(), WORK_BUFFER_SIZE);
             if (len < 0) {
                 HDF_LOGI("%{public}s snd_rawmidi_read error : %{public}ld", __func__, len);
                 ctx->quit = true;
@@ -476,10 +475,7 @@ void MidiDriverController::EnumerationMidi1()
             continue;
         }
         int32_t device = -1;
-        while (1) {
-            if (::snd_ctl_rawmidi_next_device(ctl, &device) < 0 || device < 0) {
-                break;
-            }
+        while (::snd_ctl_rawmidi_next_device(ctl, &device) >= 0 && device >= 0) {
             DeviceInfo devinfo;
             devinfo.deviceId = MakeDeviceId(card);
             devinfo.devfile = MakeDeviceFileName(card, device);
