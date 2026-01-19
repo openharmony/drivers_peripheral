@@ -23,6 +23,7 @@
  */
 class UmpPacket {
 public:
+    static constexpr size_t MAX_WORD_COUNT = 4;
     /**
      * @brief Optimized constructor for single-word packets (MT=1, MT=2).
      * Usage: UmpPacket(0x20903C64)
@@ -39,6 +40,6 @@ public:
     uint8_t WordCount() const;
 
 private:
-    uint32_t data_[4] = { 0 }; // Zero-initialized by default
+    uint32_t data_[MAX_WORD_COUNT] = { 0 }; // Zero-initialized by default
     uint8_t word_count_ = 0;
 };

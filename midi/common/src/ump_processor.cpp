@@ -15,13 +15,19 @@
 
 #include "ump_processor.h"
 namespace {
-    // Fix G.CNS.02: Magic Numbers replacements
+    // --- MIDI 1.0 Constants ---
     constexpr uint8_t MIDI_REALTIME_START = 0xF8;
     constexpr uint8_t MIDI_STATUS_START = 0x80;
     constexpr uint8_t MIDI_SYSEX_START = 0xF0;
     constexpr uint8_t MIDI_SYSEX_END = 0xF7;
     constexpr uint8_t MIDI_SYSTEM_COMMON_END = 0xF0;
+    constexpr uint8_t MIDI_STATUS_PROG_CHANGE = 0xC0;
+    constexpr uint8_t MIDI_STATUS_CHAN_PRESSURE = 0xD0;
+    constexpr uint8_t MIDI_COMMON_MTC_QUARTER = 0xF1;
+    constexpr uint8_t MIDI_COMMON_SONG_POS = 0xF2;
+    constexpr uint8_t MIDI_COMMON_SONG_SEL = 0xF3;
     
+    // --- UMP Constants ---
     constexpr uint8_t UMP_MT_SYSTEM = 0x1;
     constexpr uint8_t UMP_MT_CHANNEL = 0x2;
     constexpr uint8_t UMP_MT_DATA = 0x3;
@@ -31,12 +37,29 @@ namespace {
     constexpr uint8_t SYSEX_STATUS_CONTINUE = 0x2;
     constexpr uint8_t SYSEX_STATUS_END = 0x3;
 
-    constexpr uint32_t UMP_SHIFT_MT = 28;
-    constexpr uint32_t UMP_SHIFT_GROUP = 24;
-    constexpr uint32_t UMP_SHIFT_STATUS = 16;
-    constexpr uint32_t UMP_SHIFT_DATA1 = 8;
-    
-    constexpr size_t SYSEX_BUFFER_SIZE = 6;
+    constexpr uint8_t MAX_GROUP_ID = 0x0F;
+    // --- Bit Shifts ---
+    constexpr uint32_t SHIFT_MT = 28;
+    constexpr uint32_t SHIFT_GROUP = 24;
+    constexpr uint32_t SHIFT_STATUS = 20; // For SysEx Status (MT=3)
+    constexpr uint32_t SHIFT_COUNT = 16;  // For SysEx Count
+    constexpr uint32_t SHIFT_BYTE_0 = 16; // For MT=1/2 Status
+    constexpr uint32_t SHIFT_BYTE_1 = 8;
+    constexpr uint32_t SHIFT_BYTE_2 = 0;
+    constexpr uint32_t SHIFT_BYTE_3 = 24; // In Word 1
+    constexpr uint32_t SHIFT_BYTE_4 = 16; // In Word 1
+    constexpr uint32_t SHIFT_BYTE_5 = 8;  // In Word 1
+    constexpr uint32_t SHIFT_BYTE_6 = 0;  // In Word 1
+
+    // --- Buffer Index Constants (Fix for 2, 3, 4, 5 magic numbers) ---
+    constexpr uint8_t INDEX_0 = 0;
+    constexpr uint8_t INDEX_1 = 1;
+    constexpr uint8_t INDEX_2 = 2;
+    constexpr uint8_t INDEX_3 = 3;
+    constexpr uint8_t INDEX_4 = 4;
+    constexpr uint8_t INDEX_5 = 5;
+
+    constexpr int DATA_LEN_2 = 2;
 }
 
 UmpProcessor::UmpProcessor()
@@ -55,7 +78,90 @@ UmpProcessor::UmpProcessor()
 
 void UmpProcessor::SetGroup(uint8_t group)
 {
-    if (group <= 0x0F) group_ = group;
+    if (group <= MAX_GROUP_ID) group_ = group;
+}
+
+bool UmpProcessor::HandleRealTime(uint8_t byte, UmpCallback callback)
+{
+    if (byte < MIDI_REALTIME_START) {
+        return false;
+    }
+    // 1. Handle Real-Time Messages (MT=1) - Priority High
+    // These can interrupt anything, including SysEx, without changing state.
+    uint32_t mt1 = (static_cast<uint32_t>(UMP_MT_SYSTEM) << SHIFT_MT) |
+                   (static_cast<uint32_t>(group_) << SHIFT_GROUP) |
+                   (static_cast<uint32_t>(byte) << SHIFT_BYTE_0);
+    callback({ mt1 });
+    return true;
+}
+
+void UmpProcessor::HandleStatusByte(uint8_t byte, UmpCallback callback)
+{
+    cv_pos_ = 0; // New status interrupts accumulation
+
+    if (byte == MIDI_SYSEX_START) {
+        in_sysex_ = true;
+        sysex_pos_ = 0;
+        sysex_has_started_ = false;
+        running_status_ = 0;
+        return;
+    }
+
+    if (byte == MIDI_SYSEX_END) {
+        if (in_sysex_) {
+            FinalizeSysEx(callback);
+            in_sysex_ = false;
+        }
+        running_status_ = 0;
+        return;
+    }
+
+    // Normal Channel Voice or System Common
+    in_sysex_ = false;
+    cv_buffer_[0] = byte;
+    cv_pos_ = 1;
+    expected_len_ = static_cast<uint8_t>(GetExpectedDataLength(byte));
+
+    if (byte < MIDI_SYSTEM_COMMON_END) {
+        running_status_ = byte;
+    } else {
+        running_status_ = 0;
+    }
+
+    if (expected_len_ == 0) {
+        DispatchChannelMessage(callback);
+        cv_pos_ = 0;
+    }
+
+}
+
+void UmpProcessor::HandleChannelData(uint8_t byte, UmpCallback callback)
+{
+    // Recover Running Status
+    if (cv_pos_ == 0 && running_status_ != 0) {
+        cv_buffer_[0] = running_status_;
+        cv_buffer_[1] = byte;
+        cv_pos_ = INDEX_2;
+        expected_len_ = static_cast<uint8_t>(GetExpectedDataLength(running_status_));
+    } else if (cv_pos_ > 0 && cv_pos_ < CV_BUFFER_SIZE) {
+        cv_buffer_[cv_pos_++] = byte;
+    } else {
+        return; // Orphaned byte
+    }
+
+    if (cv_pos_ == (expected_len_ + 1)) {
+        DispatchChannelMessage(callback);
+        cv_pos_ = 0;
+    }
+}
+
+void UmpProcessor::HandleDataByte(uint8_t byte, UmpCallback callback)
+{
+    if (in_sysex_) {
+        ProcessSysExData(byte, callback);
+    } else {
+        HandleChannelData(byte, callback);
+    }
 }
 
 void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len,
@@ -64,100 +170,35 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len,
     for (size_t i = 0; i < len; ++i) {
         uint8_t b = data[i];
 
-        // 1. Handle Real-Time Messages (MT=1) - Priority High
-        // These can interrupt anything, including SysEx, without changing state.
-        if (b >= MIDI_REALTIME_START) {
-            uint32_t mt1 = (static_cast<uint32_t>(UMP_MT_SYSTEM) <<  UMP_SHIFT_MT) | 
-                           (static_cast<uint32_t>(group_) << UMP_SHIFT_GROUP ) | 
-                           (static_cast<uint32_t>(b) << UMP_SHIFT_STATUS);
-            callback({ mt1 });
-            continue; 
+        if (HandleRealTime(b, callback)) {
+            continue;
         }
 
-        // 2. Handle Status Bytes
         if (b >= MIDI_STATUS_START) {
-            // New status always interrupts Running Status accumulation
-            cv_pos_ = 0; 
-            // -- Handle SysEx Start (0xF0) --
-            if (b == MIDI_SYSEX_START) {
-                in_sysex_ = true;
-                sysex_pos_ = 0;
-                sysex_has_started_ = false;
-                running_status_ = 0; // SysEx clears running status
-                continue; // F0 is stripped, not added to data
-            }
-
-            // -- Handle SysEx End (0xF7) --
-            if (b == MIDI_SYSEX_END) {
-                if (in_sysex_) {
-                    FinalizeSysEx(callback);
-                    in_sysex_ = false;
-                }
-                running_status_ = 0; 
-                continue;
-            }
-
-            // -- Handle Channel Voice / System Common --
-            in_sysex_ = false; // Any non-realtime status breaks SysEx
-            
-            // F1-F6 are System Common, 80-EF are Channel Voice
-            cv_buffer_[0] = b;
-            cv_pos_ = 1;
-            expected_len_ = GetExpectedDataLength(b);
-
-            if (b < MIDI_SYSTEM_COMMON_END) {
-                running_status_ = b;
-            } else {
-                running_status_ = 0; // System Common clears running status
-            }
-
-            // Edge case: Some System messages might have 0 data bytes (e.g. Tune Request F6)
-            if (expected_len_ == 0) {
-                DispatchChannelMessage(callback);
-                cv_pos_ = 0;
-            }
-        } else { // 3. Handle Data Bytes
-            // -- SysEx Mode --
-            if (in_sysex_) {
-                ProcessSysExData(b, callback);
-            } else {             // -- Channel/Common Mode --
-                // Recover Running Status if buffer is empty
-                if (cv_pos_ == 0 && running_status_ != 0) {
-                    cv_buffer_[0] = running_status_;
-                    cv_buffer_[1] = b;
-                    cv_pos_ = 2;
-                    expected_len_ = GetExpectedDataLength(running_status_);
-                } else if (cv_pos_ > 0 && cv_pos_ < 3) {
-                    cv_buffer_[cv_pos_++] = b;
-                } else {
-                    // Orphaned data byte, ignore
-                    continue;
-                }
-
-                // Check completion
-                if (cv_pos_ == (expected_len_ + 1)) {
-                    DispatchChannelMessage(callback);
-                    cv_pos_ = 0; // Reset for next message (keeping running_status_)
-                }
-            }
+            HandleStatusByte(b, callback);
+        } else {
+            HandleDataByte(b, callback);
         }
     }
 }
 
-// --- Helper Functions ---
-
 int UmpProcessor::GetExpectedDataLength(uint8_t status)
 {
-    if (status < 0xF0) {
+    // Fix G.CNS.02: Use constants
+    if (status < MIDI_SYSTEM_COMMON_END) {
         uint8_t type = status & 0xF0;
-        if (type == 0xC0 || type == 0xD0) return 1;
-        return 2;
+        if (type == MIDI_STATUS_PROG_CHANGE || type == MIDI_STATUS_CHAN_PRESSURE) return 1;
+        return DATA_LEN_2;
     }
-    // System Common
+
     switch (status) {
-        case 0xF1: case 0xF3: return 1;
-        case 0xF2: return 2;
-        default: return 0; // F6, etc.
+        case MIDI_COMMON_MTC_QUARTER:
+        case MIDI_COMMON_SONG_SEL:
+            return 1;
+        case MIDI_COMMON_SONG_POS: 
+            return DATA_LEN_2;
+        default:
+            return 0;
     }
 }
 
@@ -166,30 +207,32 @@ void UmpProcessor::DispatchChannelMessage(UmpCallback callback)
     uint8_t status = cv_buffer_[0];
     uint32_t mt = (status < MIDI_SYSTEM_COMMON_END) ? UMP_MT_CHANNEL : UMP_MT_SYSTEM;
     
-    uint32_t w0 = (mt <<  UMP_SHIFT_MT) | (static_cast<uint32_t>(group_) << UMP_SHIFT_GROUP ) | (static_cast<uint32_t>(status) << UMP_SHIFT_STATUS);
-    
-    if (expected_len_ >= 1) w0 |= (static_cast<uint32_t>(cv_buffer_[1]) << UMP_SHIFT_DATA1);
-    if (expected_len_ == 2) w0 |= (static_cast<uint32_t>(cv_buffer_[2]));
+    uint32_t w0 = (mt << SHIFT_MT) | (static_cast<uint32_t>(group_) << SHIFT_GROUP) |
+                  (static_cast<uint32_t>(status) << SHIFT_BYTE_0);
+
+    if (expected_len_ >= 1) w0 |= (static_cast<uint32_t>(cv_buffer_[1]) << SHIFT_BYTE_1);
+    if (expected_len_ == INDEX_2) w0 |= (static_cast<uint32_t>(cv_buffer_[INDEX_2]) << SHIFT_BYTE_2);
 
     callback({ w0 });
 }
 
 // --- SysEx Logic (MT=3) ---
-
-void UmpProcessor::ProcessSysExData(uint8_t byte, UmpCallback callback) {
+void UmpProcessor::ProcessSysExData(uint8_t byte, UmpCallback callback)
+{
     if (sysex_pos_ < SYSEX_BUFFER_SIZE) {
         sysex_buffer_[sysex_pos_++] = byte;
     }
 
     if (sysex_pos_ == SYSEX_BUFFER_SIZE) {
         uint8_t status = sysex_has_started_ ? SYSEX_STATUS_CONTINUE : SYSEX_STATUS_START;
-        DispatchSysExPacket(callback, status, SYSEX_BUFFER_SIZE);
+        DispatchSysExPacket(callback, status, static_cast<uint8_t>(SYSEX_BUFFER_SIZE));
         sysex_pos_ = 0;
         sysex_has_started_ = true;
     }
 }
 
-void UmpProcessor::FinalizeSysEx(UmpCallback callback) {
+void UmpProcessor::FinalizeSysEx(UmpCallback callback)
+{
     uint8_t status = sysex_has_started_ ? SYSEX_STATUS_END : SYSEX_STATUS_COMPLETE;
     DispatchSysExPacket(callback, status, sysex_pos_);
     sysex_pos_ = 0;
@@ -198,20 +241,36 @@ void UmpProcessor::FinalizeSysEx(UmpCallback callback) {
 
 void UmpProcessor::DispatchSysExPacket(UmpCallback callback, uint8_t status_code, uint8_t byte_count)
 {
-    // Word 0: [MT=3 (4b)] [Group (4b)] [Status (4b)] [Count (4b)] [Data0 (8b)] [Data1 (8b)]
-    uint32_t w0 = (static_cast<uint32_t>(UMP_MT_DATA) <<  UMP_SHIFT_MT) | 
-                  (static_cast<uint32_t>(group_) << UMP_SHIFT_GROUP ) | 
-                  (static_cast<uint32_t>(status_code) << 20) | 
-                  (static_cast<uint32_t>(byte_count) << 16);
-    
-    if (byte_count > 0) w0 |= (static_cast<uint32_t>(sysex_buffer_[0]) << UMP_SHIFT_DATA1);
-    if (byte_count > 1) w0 |= (static_cast<uint32_t>(sysex_buffer_[1]));
+    /**
+     * UMP MIDI 1.0 System Exclusive (MT=3):
+     * Word 0: [MT(4bit:3)] [Group(4bit)] [Status(4bit)] [Count(4bit)] [Data1(8bit)] [Data2(8bit)]
+     * Word 1: [Data3(8bit)] [Data4(8bit)] [Data5(8bit)] [Data6(8bit)]
+     */
 
+    uint32_t w0 = (static_cast<uint32_t>(UMP_MT_DATA) << SHIFT_MT) |
+                  (static_cast<uint32_t>(group_) << SHIFT_GROUP) |
+                  (static_cast<uint32_t>(status_code) << SHIFT_STATUS) |
+                  (static_cast<uint32_t>(byte_count) << SHIFT_COUNT);
+    
+    if (byte_count > INDEX_0) {
+        w0 |= (static_cast<uint32_t>(sysex_buffer_[INDEX_0]) << SHIFT_BYTE_1);
+    }
+    if (byte_count > INDEX_1) {
+        w0 |= (static_cast<uint32_t>(sysex_buffer_[INDEX_1]) << SHIFT_BYTE_2);
+    }
     uint32_t w1 = 0;
-    if (byte_count > 2) w1 |= (static_cast<uint32_t>(sysex_buffer_[2]) << 24);
-    if (byte_count > 3) w1 |= (static_cast<uint32_t>(sysex_buffer_[3]) << 16);
-    if (byte_count > 4) w1 |= (static_cast<uint32_t>(sysex_buffer_[4]) << 8);
-    if (byte_count > 5) w1 |= (static_cast<uint32_t>(sysex_buffer_[5]));
+    if (byte_count > INDEX_2) {
+        w1 |= (static_cast<uint32_t>(sysex_buffer_[INDEX_2]) << SHIFT_BYTE_3);
+    }
+    if (byte_count > INDEX_3) {
+        w1 |= (static_cast<uint32_t>(sysex_buffer_[INDEX_3]) << SHIFT_BYTE_4);
+    }
+    if (byte_count > INDEX_4) {
+        w1 |= (static_cast<uint32_t>(sysex_buffer_[INDEX_4]) << SHIFT_BYTE_5);
+    }
+    if (byte_count > INDEX_5) {
+        w1 |= (static_cast<uint32_t>(sysex_buffer_[INDEX_5]) << SHIFT_BYTE_6);
+    }
 
     callback({ w0, w1 });
 }
