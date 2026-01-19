@@ -1264,7 +1264,7 @@ int32_t DisplayComposerService::GetDisplayClientTargetProperty(uint32_t devId, i
     return ret;
 }
 
-int32_t DisplayComposerService::SetDisplayColorGamut(uint32_t devId,ColorGamut gamut)
+int32_t DisplayComposerService::SetDisplayColorGamut(uint32_t devId, ColorGamut gamut)
 {
     DISPLAY_TRACE;
 
