@@ -30,13 +30,13 @@ UmpPacket::UmpPacket(std::initializer_list<uint32_t> words)
     
     size_t i = 0;
     for (uint32_t w : words) {
-        if (i < 4) data_[i++] = w;
+        if (i < MAX_WORD_COUNT) data_[i++] = w;
     }
 }
 
 uint32_t UmpPacket::Word(size_t index) const
 {
-    return (index < 4) ? data_[index] : 0;
+    return (index < MAX_WORD_COUNT) ? data_[index] : 0;
 }
 
 uint8_t UmpPacket::WordCount() const

@@ -28,6 +28,7 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <cinttypes>
 
 namespace OHOS {
 namespace HDI {
@@ -83,7 +84,7 @@ public:
     int32_t CloseOutputPort(uint32_t portId) override;
     int32_t SendMidiMessages(uint32_t portId, const std::vector<MidiMessage> &messages) override;
 
-private: 
+private:
     struct InputContext {
         std::atomic<bool> quit{false};
         snd_rawmidi_t *rawmidi = nullptr;

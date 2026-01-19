@@ -66,7 +66,7 @@ static void ReadVendorIdAndProductId(int32_t card, std::string &idVendor, std::s
     if (!std::getline(file, line)) {
         return;
     }
-    size_t colonPos=  line.find(':');
+    size_t colonPos =  line.find(':');
     if (colonPos == std::string::npos) {
         return;
     }
@@ -157,7 +157,7 @@ static void ConvertUmpToMidi1(const uint32_t* umpData, size_t count, std::vector
         if (mt == UMP_MT_CHANNEL_VOICE) {
             // Type 2: MIDI 1.0 Channel Voice Messages (32-bit)
             // Format: [4b MT][4b Group][4b Status][4b Channel] [8b Note/Data1][8b Vel/Data2]
-            // Note: In UMP, Status includes Channel. UMP: 0x2GSCDD       
+            // Note: In UMP, Status includes Channel. UMP: 0x2GSCDD
             uint8_t status = (ump >> UMP_SHIFT_STATUS) & UMP_MASK_BYTE;
             uint8_t data1 = (ump >> UMP_SHIFT_DATA1) & UMP_MASK_BYTE;
             uint8_t data2 = ump & UMP_MASK_BYTE;
@@ -201,7 +201,7 @@ static void ConvertUmpToMidi1(const uint32_t* umpData, size_t count, std::vector
                     // No data bytes
                     break;
                 default:
-                    // 0xF0 (Sysex Start) and 0xF7 (Sysex End) are handled in Type 3 usually, 
+                    // 0xF0 (Sysex Start) and 0xF7 (Sysex End) are handled in Type 3 usually,
                     // but simple 1-packet sysex might appear here.
                     break;
             }
@@ -356,7 +356,7 @@ int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMes
         if (!midi1Buffer.empty()) {
             long written = ::snd_rawmidi_write(it->second->rawmidi, midi1Buffer.data(), midi1Buffer.size());
             if (written < 0) {
-                HDF_LOGE("%{public}s snd_rawmidi_write failed: %{public}ld", __func__, written);
+                HDF_LOGE("%{public}s snd_rawmidi_write failed: %{public}" PRId64, __func__, written);
                 return HDF_FAILURE;
             }
         }
@@ -374,7 +374,7 @@ void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* 
     if (len == 1 && buffer[0] == MIDI_CLOCK) {
         return;
     }
-    UmpProcessor processor; 
+    UmpProcessor processor;
     std::vector<UmpPacket> results;
     processor.ProcessBytes(buffer, static_cast<size_t>(len), [&](const UmpPacket &p) {
         results.push_back(p);
@@ -428,7 +428,7 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
             // ALSA Event
             auto len = ::snd_rawmidi_read(ctx->rawmidi, src.get(), WORK_BUFFER_SIZE);
             if (len < 0) {
-                HDF_LOGI("%{public}s snd_rawmidi_read error : %{public}ld", __func__, len);
+                HDF_LOGI("%{public}s snd_rawmidi_read error : %{public}" PRId64, __func__, len);
                 ctx->quit = true;
                 return;
             }
@@ -460,8 +460,8 @@ void MidiDriverController::CleanupRemovedDevices(const std::vector<DeviceInfo> &
     }
     for (const auto &oldDevice : oldDeviceList) {
         if (currentDeviceIds.find(oldDevice.deviceId) == currentDeviceIds.end()) {
-            HDF_LOGI("%{public}s: Device detected removal: %{public}lld (Card: %{public}d, Device: %{public}d)",
-                __func__, (long long)oldDevice.deviceId, oldDevice.card, oldDevice.device);
+            HDF_LOGI("%{public}s: Device detected removal: %{public}" PRId64 "(Card: %{public}d, Device: %{public}d)",
+                __func__, oldDevice.deviceId, oldDevice.card, oldDevice.device);
             CleanupDeviceInputPorts(oldDevice.deviceId);
         }
     }
@@ -472,10 +472,10 @@ void MidiDriverController::CleanupDeviceInputPorts(int64_t deviceId)
     std::lock_guard<std::mutex> lock(deviceMapMutex_);
     auto it = activeDrivers_.find(deviceId);
     if (it != activeDrivers_.end()) {
-        HDF_LOGI("%{public}s: Removing driver resources for device %{public}lld", __func__, (long long)deviceId);
+        HDF_LOGI("%{public}s: Removing driver resources for device %{public}" PRId64, __func__, deviceId);
         activeDrivers_.erase(it);
     } else {
-        HDF_LOGD("%{public}s: Device %{public}lld was not active, no cleanup needed.", __func__, (long long)deviceId);
+        HDF_LOGD("%{public}s: Device %{public}" PRId64 " was not active, no cleanup needed.", __func__, deviceId);
     }
 }
 void MidiDriverController::PopulateMidi1Ports(snd_ctl_t *ctl, int32_t device, DeviceInfo &devInfo)
@@ -543,7 +543,6 @@ void MidiDriverController::ProcessMidi1Card(int32_t card)
         ProcessMidi1Device(ctl, card, device);
     }
     ::snd_ctl_close(ctl);
-
 }
 
 void MidiDriverController::EnumerationDeviceMidi1()
