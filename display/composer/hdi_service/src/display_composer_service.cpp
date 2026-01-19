@@ -285,7 +285,7 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<GetDisplayConnectionTypeFunc>(dlsym(libHandle_, "GetDisplayConnectionType"));
     vdiAdapter_->GetDisplayClientTargetProperty =
         reinterpret_cast<GetDisplayClientTargetPropertyFunc>(dlsym(libHandle_, "GetDisplayClientTargetProperty"));
-    vdiAdapter_->GetDisplaySupportedColorGamuts =
+    vdiAdapter_->SetDisplayColorGamut =
         reinterpret_cast<SetDisplayColorGamutFunc>(dlsym(libHandle_, "SetDisplayColorGamut"));
 }
 
