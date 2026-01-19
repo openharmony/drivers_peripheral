@@ -83,7 +83,7 @@ public:
     int32_t CloseOutputPort(uint32_t portId) override;
     int32_t SendMidiMessages(uint32_t portId, const std::vector<MidiMessage> &messages) override;
 
-private:
+private: 
     struct InputContext {
         std::atomic<bool> quit{false};
         snd_rawmidi_t *rawmidi = nullptr;
@@ -97,6 +97,7 @@ private:
         snd_rawmidi_t *rawmidi = nullptr;
     };
     void InputThreadLoop(std::shared_ptr<InputContext> ctx);
+    void ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t bufferSize);
 
     std::mutex mutex_;
     std::map<uint32_t, std::shared_ptr<InputContext>> inputs_;
@@ -206,10 +207,13 @@ public:
     int32_t SendMidiMessages(int64_t deviceId, uint32_t portId, const std::vector<MidiMessage> &messages);
 
 private:
-    void EnumerationMidi1();
+    void EnumerationDeviceMidi1();
     void CleanupDeviceInputPorts(int64_t deviceId);
     void CleanupRemovedDevices(const std::vector<DeviceInfo> &oldDeviceList);
     std::shared_ptr<MidiDeviceBase> GetDeviceDriver(int64_t deviceId);
+    void ProcessMidi1Card(int32_t card);
+    void ProcessMidi1Device(snd_ctl_t *ctl, int32_t card, int32_t device);
+    void PopulateMidi1Ports(snd_ctl_t *ctl, int32_t device, DeviceInfo &devInfo);
     std::vector<DeviceInfo> deviceList_;
     std::mutex deviceListMutex_;
     std::map<int64_t, std::shared_ptr<MidiDeviceBase>> activeDrivers_;

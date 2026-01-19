@@ -14,6 +14,30 @@
  */
 
 #include "ump_processor.h"
+namespace {
+    // Fix G.CNS.02: Magic Numbers replacements
+    constexpr uint8_t MIDI_REALTIME_START = 0xF8;
+    constexpr uint8_t MIDI_STATUS_START = 0x80;
+    constexpr uint8_t MIDI_SYSEX_START = 0xF0;
+    constexpr uint8_t MIDI_SYSEX_END = 0xF7;
+    constexpr uint8_t MIDI_SYSTEM_COMMON_END = 0xF0;
+    
+    constexpr uint8_t UMP_MT_SYSTEM = 0x1;
+    constexpr uint8_t UMP_MT_CHANNEL = 0x2;
+    constexpr uint8_t UMP_MT_DATA = 0x3;
+    
+    constexpr uint8_t SYSEX_STATUS_COMPLETE = 0x0;
+    constexpr uint8_t SYSEX_STATUS_START = 0x1;
+    constexpr uint8_t SYSEX_STATUS_CONTINUE = 0x2;
+    constexpr uint8_t SYSEX_STATUS_END = 0x3;
+
+    constexpr uint32_t UMP_SHIFT_MT = 28;
+    constexpr uint32_t UMP_SHIFT_GROUP = 24;
+    constexpr uint32_t UMP_SHIFT_STATUS = 16;
+    constexpr uint32_t UMP_SHIFT_DATA1 = 8;
+    
+    constexpr size_t SYSEX_BUFFER_SIZE = 6;
+}
 
 UmpProcessor::UmpProcessor()
     : group_(0),
@@ -42,19 +66,20 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len,
 
         // 1. Handle Real-Time Messages (MT=1) - Priority High
         // These can interrupt anything, including SysEx, without changing state.
-        if (b >= 0xF8) {
-            uint32_t mt1 = (0x1U << 28) | (static_cast<uint32_t>(group_) << 24) | (static_cast<uint32_t>(b) << 16);
+        if (b >= MIDI_REALTIME_START) {
+            uint32_t mt1 = (static_cast<uint32_t>(UMP_MT_SYSTEM) <<  UMP_SHIFT_MT) | 
+                           (static_cast<uint32_t>(group_) << UMP_SHIFT_GROUP ) | 
+                           (static_cast<uint32_t>(b) << UMP_SHIFT_STATUS);
             callback({ mt1 });
-            continue;
+            continue; 
         }
 
         // 2. Handle Status Bytes
-        if (b >= 0x80) {
+        if (b >= MIDI_STATUS_START) {
             // New status always interrupts Running Status accumulation
-            cv_pos_ = 0;
-
+            cv_pos_ = 0; 
             // -- Handle SysEx Start (0xF0) --
-            if (b == 0xF0) {
+            if (b == MIDI_SYSEX_START) {
                 in_sysex_ = true;
                 sysex_pos_ = 0;
                 sysex_has_started_ = false;
@@ -63,13 +88,13 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len,
             }
 
             // -- Handle SysEx End (0xF7) --
-            if (b == 0xF7) {
+            if (b == MIDI_SYSEX_END) {
                 if (in_sysex_) {
                     FinalizeSysEx(callback);
                     in_sysex_ = false;
                 }
-                running_status_ = 0;
-                continue; // F7 is stripped
+                running_status_ = 0; 
+                continue;
             }
 
             // -- Handle Channel Voice / System Common --
@@ -80,7 +105,7 @@ void UmpProcessor::ProcessBytes(const uint8_t* data, size_t len,
             cv_pos_ = 1;
             expected_len_ = GetExpectedDataLength(b);
 
-            if (b < 0xF0) {
+            if (b < MIDI_SYSTEM_COMMON_END) {
                 running_status_ = b;
             } else {
                 running_status_ = 0; // System Common clears running status
@@ -139,13 +164,11 @@ int UmpProcessor::GetExpectedDataLength(uint8_t status)
 void UmpProcessor::DispatchChannelMessage(UmpCallback callback)
 {
     uint8_t status = cv_buffer_[0];
-    uint32_t mt = (status < 0xF0) ? 0x2U : 0x1U; // MT=2 for Channel, MT=1 for System
+    uint32_t mt = (status < MIDI_SYSTEM_COMMON_END) ? UMP_MT_CHANNEL : UMP_MT_SYSTEM;
     
-    uint32_t w0 = (mt << 28) | (static_cast<uint32_t>(group_) << 24) | (static_cast<uint32_t>(status) << 16);
+    uint32_t w0 = (mt <<  UMP_SHIFT_MT) | (static_cast<uint32_t>(group_) << UMP_SHIFT_GROUP ) | (static_cast<uint32_t>(status) << UMP_SHIFT_STATUS);
     
-    // Add Data Byte 1
-    if (expected_len_ >= 1) w0 |= (static_cast<uint32_t>(cv_buffer_[1]) << 8);
-    // Add Data Byte 2
+    if (expected_len_ >= 1) w0 |= (static_cast<uint32_t>(cv_buffer_[1]) << UMP_SHIFT_DATA1);
     if (expected_len_ == 2) w0 |= (static_cast<uint32_t>(cv_buffer_[2]));
 
     callback({ w0 });
@@ -153,32 +176,22 @@ void UmpProcessor::DispatchChannelMessage(UmpCallback callback)
 
 // --- SysEx Logic (MT=3) ---
 
-void UmpProcessor::ProcessSysExData(uint8_t byte, UmpCallback callback)
-{
-    if (sysex_pos_ < 6) {
+void UmpProcessor::ProcessSysExData(uint8_t byte, UmpCallback callback) {
+    if (sysex_pos_ < SYSEX_BUFFER_SIZE) {
         sysex_buffer_[sysex_pos_++] = byte;
     }
 
-    // Buffer full? Dispatch intermediate packet
-    if (sysex_pos_ == 6) {
-        // Status: 0x1 (Start) if first packet, else 0x2 (Continue)
-        uint8_t status = sysex_has_started_ ? 0x2 : 0x1;
-        DispatchSysExPacket(callback, status, 6);
-        
+    if (sysex_pos_ == SYSEX_BUFFER_SIZE) {
+        uint8_t status = sysex_has_started_ ? SYSEX_STATUS_CONTINUE : SYSEX_STATUS_START;
+        DispatchSysExPacket(callback, status, SYSEX_BUFFER_SIZE);
         sysex_pos_ = 0;
         sysex_has_started_ = true;
     }
 }
 
-void UmpProcessor::FinalizeSysEx(UmpCallback callback)
-{
-    // Determine Status:
-    // If we haven't sent a Start packet yet -> 0x0 (Complete)
-    // If we have sent a Start packet -> 0x3 (End)
-    uint8_t status = sysex_has_started_ ? 0x3 : 0x0;
-    
+void UmpProcessor::FinalizeSysEx(UmpCallback callback) {
+    uint8_t status = sysex_has_started_ ? SYSEX_STATUS_END : SYSEX_STATUS_COMPLETE;
     DispatchSysExPacket(callback, status, sysex_pos_);
-    
     sysex_pos_ = 0;
     sysex_has_started_ = false;
 }
@@ -186,14 +199,14 @@ void UmpProcessor::FinalizeSysEx(UmpCallback callback)
 void UmpProcessor::DispatchSysExPacket(UmpCallback callback, uint8_t status_code, uint8_t byte_count)
 {
     // Word 0: [MT=3 (4b)] [Group (4b)] [Status (4b)] [Count (4b)] [Data0 (8b)] [Data1 (8b)]
-    uint32_t w0 = (0x3U << 28) | (static_cast<uint32_t>(group_) << 24) |
-                  (static_cast<uint32_t>(status_code) << 20) |
+    uint32_t w0 = (static_cast<uint32_t>(UMP_MT_DATA) <<  UMP_SHIFT_MT) | 
+                  (static_cast<uint32_t>(group_) << UMP_SHIFT_GROUP ) | 
+                  (static_cast<uint32_t>(status_code) << 20) | 
                   (static_cast<uint32_t>(byte_count) << 16);
     
-    if (byte_count > 0) w0 |= (static_cast<uint32_t>(sysex_buffer_[0]) << 8);
+    if (byte_count > 0) w0 |= (static_cast<uint32_t>(sysex_buffer_[0]) << UMP_SHIFT_DATA1);
     if (byte_count > 1) w0 |= (static_cast<uint32_t>(sysex_buffer_[1]));
 
-    // Word 1: [Data2] [Data3] [Data4] [Data5]
     uint32_t w1 = 0;
     if (byte_count > 2) w1 |= (static_cast<uint32_t>(sysex_buffer_[2]) << 24);
     if (byte_count > 3) w1 |= (static_cast<uint32_t>(sysex_buffer_[3]) << 16);

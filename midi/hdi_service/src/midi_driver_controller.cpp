@@ -34,8 +34,25 @@ namespace OHOS {
 namespace HDI {
 namespace Midi {
 namespace V1_0 {
-static constexpr size_t WORK_BUFFER_SIZE = sizeof(uint32_t) * 256;
-static constexpr int64_t MIDI_NS_PER_SECOND = 1000000000;
+namespace {
+    constexpr int32_t MAX_WORK_BUFFER_WORDS = 256;
+    constexpr size_t WORK_BUFFER_SIZE = sizeof(uint32_t) * MAX_WORK_BUFFER_WORDS;
+    constexpr int32_t MIDI_DEV_NAME_LEN = 128;
+    constexpr int32_t CARD_NAME_LEN = 32;
+    constexpr uint8_t UMP_MT_SYSTEM = 0x1;
+    constexpr uint8_t UMP_MT_CHANNEL_VOICE = 0x2;
+    constexpr uint32_t UMP_SHIFT_MT = 28;
+    constexpr uint32_t UMP_SHIFT_STATUS = 16;
+    constexpr uint32_t UMP_SHIFT_DATA1 = 8;
+    constexpr uint32_t UMP_MASK_NIBBLE = 0xF;
+    constexpr uint32_t UMP_MASK_BYTE = 0xFF;
+    constexpr uint8_t STATUS_PROG_CHANGE = 0xC0;
+    constexpr uint8_t STATUS_CHAN_PRESSURE = 0xD0;
+    constexpr uint8_t STATUS_MASK_CMD = 0xF0;
+    constexpr uint8_t MIDI_CLOCK = 0xF8;
+    constexpr int64_t NSEC_PER_SEC = 1000000000;
+}
+
 static void ReadVendorIdAndProductId(int32_t card, std::string &idVendor, std::string &idProduct)
 {
     std::string path = "/proc/asound/card" + std::to_string(card) + "/usbid";
@@ -49,13 +66,13 @@ static void ReadVendorIdAndProductId(int32_t card, std::string &idVendor, std::s
     if (!std::getline(file, line)) {
         return;
     }
-    size_t colonPos= line.find(':');
-    if (colonPos== std::string::npos) {
+    size_t colonPos=  line.find(':');
+    if (colonPos == std::string::npos) {
         return;
     }
 
-    idVendor = line.substr(0, colon_pos);
-    idProduct = line.substr(colonPos+ 1);
+    idVendor = line.substr(0, colonPos);
+    idProduct = line.substr(colonPos + 1);
 }
 
 static void ReadUsbBus(int32_t card, std::string &bus)
@@ -84,7 +101,7 @@ static int64_t MakeDeviceId(int32_t card)
 
 static std::string MakeDeviceFileName(int32_t card, int32_t device)
 {
-    char devfile[128];
+    char devfile[MIDI_DEV_NAME_LEN];
     ::snprintf(devfile, sizeof(devfile), "midiC%dD%d", card, device);
     return devfile;
 }
@@ -135,34 +152,33 @@ static void ConvertUmpToMidi1(const uint32_t* umpData, size_t count, std::vector
 {
     for (size_t i = 0; i < count; ++i) {
         uint32_t ump = umpData[i];
-        uint8_t mt = (ump >> 28) & 0xF; // Message Type
+        uint8_t mt = (ump >> UMP_SHIFT_MT) & UMP_MASK_NIBBLE; // Message Type
 
-        if (mt == 0x2) {
+        if (mt == UMP_MT_CHANNEL_VOICE) {
             // Type 2: MIDI 1.0 Channel Voice Messages (32-bit)
             // Format: [4b MT][4b Group][4b Status][4b Channel] [8b Note/Data1][8b Vel/Data2]
-            // Note: In UMP, Status includes Channel. UMP: 0x2GSCDD
-            uint8_t status = (ump >> 16) & 0xFF;
-            uint8_t data1 = (ump >> 8) & 0xFF;
-            uint8_t data2 = ump & 0xFF;
-            
-            uint8_t cmd = status & 0xF0;
+            // Note: In UMP, Status includes Channel. UMP: 0x2GSCDD       
+            uint8_t status = (ump >> UMP_SHIFT_STATUS) & UMP_MASK_BYTE;
+            uint8_t data1 = (ump >> UMP_SHIFT_DATA1) & UMP_MASK_BYTE;
+            uint8_t data2 = ump & UMP_MASK_BYTE;
+            uint8_t cmd = status & STATUS_MASK_CMD;
 
             midi1Bytes.push_back(status);
             
             // Program Change (0xC0) and Channel Pressure (0xD0) are 2 bytes
-            if (cmd == 0xC0 || cmd == 0xD0) {
+            if (cmd == STATUS_PROG_CHANGE || cmd == STATUS_CHAN_PRESSURE) {
                 midi1Bytes.push_back(data1);
             } else {
                 // Note On, Note Off, Poly Pressure, Control Change, Pitch Bend are 3 bytes
                 midi1Bytes.push_back(data1);
                 midi1Bytes.push_back(data2);
             }
-        } else if (mt == 0x1) {
+        } else if (mt == UMP_MT_SYSTEM) {
             // Type 1: System Common / Real Time Messages (32-bit)
             // Format: [4b MT][4b Group][8b Status][8b Data1][8b Data2]
-            uint8_t status = (ump >> 16) & 0xFF;
-            uint8_t data1 = (ump >> 8) & 0xFF;
-            uint8_t data2 = ump & 0xFF;
+            uint8_t status = (ump >> UMP_SHIFT_STATUS) & UMP_MASK_BYTE;
+            uint8_t data1 = (ump >> UMP_SHIFT_DATA1) & UMP_MASK_BYTE;
+            uint8_t data2 = ump & UMP_MASK_BYTE;
 
             midi1Bytes.push_back(status);
 
@@ -185,7 +201,7 @@ static void ConvertUmpToMidi1(const uint32_t* umpData, size_t count, std::vector
                     // No data bytes
                     break;
                 default:
-                    // 0xF0 (Sysex Start) and 0xF7 (Sysex End) are handled in Type 3 usually,
+                    // 0xF0 (Sysex Start) and 0xF7 (Sysex End) are handled in Type 3 usually, 
                     // but simple 1-packet sysex might appear here.
                     break;
             }
@@ -203,7 +219,7 @@ static int64_t GetCurNano()
         HDF_LOGI("%{public}s GetCurNanoTime fail, result:%{public}d", __func__, ret);
         return result;
     }
-    result = (time.tv_sec * MIDI_NS_PER_SECOND) + time.tv_nsec;
+    result = (time.tv_sec * NSEC_PER_SEC) + time.tv_nsec;
     return result;
 }
 
@@ -348,6 +364,43 @@ int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMes
     return HDF_SUCCESS;
 }
 
+void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t len)
+{
+    std::ostringstream midiStream;
+    for (size_t i = 0; i < static_cast<size_t>(len); i++) {
+        midiStream << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(buffer[i]) << " ";
+    }
+    HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
+    if (len == 1 && buffer[0] == MIDI_CLOCK) {
+        return;
+    }
+    UmpProcessor processor; 
+    std::vector<UmpPacket> results;
+    processor.ProcessBytes(buffer, static_cast<size_t>(len), [&](const UmpPacket &p) {
+        results.push_back(p);
+    });
+    for (auto p : results) {
+        std::ostringstream umpStream;
+        for (uint8_t i = 0; i < p.WordCount(); i++) {
+            umpStream << std::hex << std::setw(8) << std::setfill('0') << p.Word(i) << " ";
+        }
+        HDF_LOGI("%{public}s umpStream 1.0: %{public}s", __func__, umpStream.str().c_str());
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (ctx->dataCallback && !results.empty()) {
+        std::vector<MidiMessage> eventList;
+        MidiMessage message;
+        message.timestamp = GetCurNano();
+        for (auto p : results) {
+            for (uint8_t i = 0; i < p.WordCount(); i++) {
+                message.data.push_back(p.Word(i));
+            }
+        }
+        eventList.push_back(message);
+        ctx->dataCallback->OnMidiDataReceived(eventList);
+    }
+}
+
 void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
 {
     HDF_LOGI("%{public}s enter", __func__);
@@ -363,58 +416,24 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
     epoll.add(ctx->eventFd, evWakeup, EPOLLIN, &ctx->eventFd); // Use ptr to identify
 
     auto src = std::make_unique<uint8_t[]>(WORK_BUFFER_SIZE);
-    std::vector<MidiMessage> eventList;
     while (!ctx->quit) {
         epoll.poll([&](void *ptr, int32_t) {
             if (ctx->quit) return;
-
             // Check if it's the wakeup event
             if (ptr == &ctx->eventFd) {
                 uint64_t u;
                 read(ctx->eventFd, &u, sizeof(uint64_t));
                 return; // Just wake up loop to check ctx->quit
             }
+            // ALSA Event
             auto len = ::snd_rawmidi_read(ctx->rawmidi, src.get(), WORK_BUFFER_SIZE);
             if (len < 0) {
                 HDF_LOGI("%{public}s snd_rawmidi_read error : %{public}ld", __func__, len);
                 ctx->quit = true;
                 return;
             }
-            if (len == 0) {
-                return;
-            }
-            std::ostringstream midiStream;
-            for (size_t i = 0; i < static_cast<size_t>(len); i++) {
-                midiStream << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(src[i]) << " ";
-            }
-            HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
-            if (len == 1 && src[0] == 0xF8) {
-                return;
-            }
-            UmpProcessor processor;
-            std::vector<UmpPacket> results;
-            processor.ProcessBytes(src.get(), static_cast<size_t>(len), [&](const UmpPacket &p) {
-                results.push_back(p);
-            });
-            for (auto p : results) {
-                std::ostringstream umpStream;
-                for (uint8_t i = 0; i < p.WordCount(); i++) {
-                    umpStream << std::hex << std::setw(8) << std::setfill('0') << p.Word(i) << " ";
-                }
-                HDF_LOGI("%{public}s umpStream 1.0: %{public}s", __func__, umpStream.str().c_str());
-            }
-            std::lock_guard<std::mutex> lock(mutex_);
-            if (ctx->dataCallback && !results.empty()) {
-                MidiMessage message;
-                message.timestamp = GetCurNano();
-                for (auto p : results) {
-                    for (uint8_t i = 0; i < p.WordCount(); i++) {
-                        message.data.push_back(p.Word(i));
-                    }
-                }
-                eventList.push_back(message);
-                ctx->dataCallback->OnMidiDataReceived(eventList);
-                eventList.clear();
+            if (len > 0) {
+                ProcessInputEvent(ctx, src.get(), static_cast<size_t>(len));
             }
         });
     }
@@ -459,69 +478,80 @@ void MidiDriverController::CleanupDeviceInputPorts(int64_t deviceId)
         HDF_LOGD("%{public}s: Device %{public}lld was not active, no cleanup needed.", __func__, (long long)deviceId);
     }
 }
-
-void MidiDriverController::EnumerationMidi1()
+void MidiDriverController::PopulateMidi1Ports(snd_ctl_t *ctl, int32_t device, DeviceInfo &devInfo)
 {
-    HDF_LOGI("%{public}s EnumerationMidi1 Start,", __func__);
-    int32_t card = -1;
-    while (1) {
-        if (::snd_card_next(&card) < 0 || card < 0) {
-            break;
-        }
-        char card_name[32];
-        ::snprintf(card_name, sizeof(card_name), "hw:%d", card);
-        snd_ctl_t *ctl = nullptr;
-        if (::snd_ctl_open(&ctl, card_name, 0) < 0) {
+    for (auto direction = 0; direction < 2; ++direction) { // 0 : output, 1 : input
+        snd_rawmidi_info_t *info;
+        snd_rawmidi_info_alloca(&info);
+        ::snd_rawmidi_info_set_device(info, device);
+        ::snd_rawmidi_info_set_stream(info, static_cast<snd_rawmidi_stream_t>(direction));
+        ::snd_rawmidi_info_set_subdevice(info, 0);
+        if (::snd_ctl_rawmidi_info(ctl, info) < 0) {
             continue;
         }
-        int32_t device = -1;
-        while (::snd_ctl_rawmidi_next_device(ctl, &device) >= 0 && device >= 0) {
-            DeviceInfo devinfo;
-            devinfo.deviceId = MakeDeviceId(card);
-            devinfo.devfile = MakeDeviceFileName(card, device);
-            devinfo.card = card;
-            devinfo.device = device;
-            devinfo.is_ump = false;
-            ReadVendorIdAndProductId(card, devinfo.idVendor, devinfo.idProduct);
+        std::string devname = ::snd_rawmidi_info_get_name(info);
+        int32_t subdevices_count = ::snd_rawmidi_info_get_subdevices_count(info);
 
-            for (auto direction = 0; direction < 2; ++direction) { // 0 : output, 1 : input
-                snd_rawmidi_info_t *info;
-                snd_rawmidi_info_alloca(&info);
-                ::snd_rawmidi_info_set_device(info, device);
-                ::snd_rawmidi_info_set_stream(info, static_cast<snd_rawmidi_stream_t>(direction));
-                ::snd_rawmidi_info_set_subdevice(info, 0);
-                if (::snd_ctl_rawmidi_info(ctl, info) < 0) {
-                    continue;
-                }
-                std::string devname = ::snd_rawmidi_info_get_name(info);
-                int32_t subdevices_count = ::snd_rawmidi_info_get_subdevices_count(info);
-
-                for (int32_t sub = 0; sub < subdevices_count; ++sub) {
-                    ::snd_rawmidi_info_set_subdevice(info, sub);
-                    if (::snd_ctl_rawmidi_info(ctl, info) < 0) {
-                        continue;
-                    }
-                    PortInfo portInfo;
-                    const char *name = ::snd_rawmidi_info_get_subdevice_name(info);
-                    portInfo.name = name != nullptr ? name : devname + " " + std::to_string(sub);
-                    portInfo.card = card;
-                    portInfo.device = device;
-                    portInfo.subdevice = sub;
-                    portInfo.groups = 0;
-                    portInfo.umpStartGroup = 0;
-                    portInfo.numUmpGroupsSpanned = 0;
-                    if (direction == 0) {
-                        devinfo.outputPorts.push_back(portInfo);
-                    } else {
-                        devinfo.inputPorts.push_back(portInfo);
-                    }
-                }
+        for (int32_t sub = 0; sub < subdevices_count; ++sub) {
+            ::snd_rawmidi_info_set_subdevice(info, sub);
+            if (::snd_ctl_rawmidi_info(ctl, info) < 0) {
+                continue;
             }
-            HDF_LOGI("%{public}s Card: %{public}d, device:%{public}d idVendor:%{public}s, idProduct:%{public}s,",
-                __func__, devinfo.card, devinfo.device, devinfo.idVendor.c_str(), devinfo.idProduct.c_str());
-            deviceList_.push_back(devinfo);
+            PortInfo portInfo;
+            const char *name = ::snd_rawmidi_info_get_subdevice_name(info);
+            portInfo.name = name != nullptr ? name : devname + " " + std::to_string(sub);
+            portInfo.card = devInfo.card;
+            portInfo.device = device;
+            portInfo.subdevice = sub;
+            portInfo.groups = 0;
+            portInfo.umpStartGroup = 0;
+            portInfo.numUmpGroupsSpanned = 0;
+            if (direction == 0) {
+                devInfo.outputPorts.push_back(portInfo);
+            } else {
+                devInfo.inputPorts.push_back(portInfo);
+            }
         }
-        ::snd_ctl_close(ctl);
+    }
+}
+
+void MidiDriverController::ProcessMidi1Device(snd_ctl_t *ctl, int32_t card, int32_t device)
+{
+    DeviceInfo devInfo;
+    devInfo.deviceId = MakeDeviceId(card);
+    devInfo.devfile = MakeDeviceFileName(card, device);
+    devInfo.card = card;
+    devInfo.device = device;
+    devInfo.is_ump = false;
+    ReadVendorIdAndProductId(card, devInfo.idVendor, devInfo.idProduct);
+    PopulateMidi1Ports(ctl, device, devInfo);
+    HDF_LOGI("%{public}s Card: %{public}d, device:%{public}d idVendor:%{public}s, idProduct:%{public}s,",
+        __func__, devInfo.card, devInfo.device, devInfo.idVendor.c_str(), devInfo.idProduct.c_str());
+    deviceList_.push_back(devInfo);
+}
+
+void MidiDriverController::ProcessMidi1Card(int32_t card)
+{
+    char card_name[CARD_NAME_LEN];
+    ::snprintf(card_name, sizeof(card_name), "hw:%d", card);
+    
+    snd_ctl_t *ctl = nullptr;
+    if (::snd_ctl_open(&ctl, card_name, 0) < 0) return;
+
+    int32_t device = -1;
+    while (::snd_ctl_rawmidi_next_device(ctl, &device) >= 0 && device >= 0) {
+        ProcessMidi1Device(ctl, card, device);
+    }
+    ::snd_ctl_close(ctl);
+
+}
+
+void MidiDriverController::EnumerationDeviceMidi1()
+{
+    HDF_LOGI("%{public}s EnumerationDeviceMidi1 Start,", __func__);
+    int32_t card = -1;
+    while (::snd_card_next(&card) >= 0 && card >= 0) {
+        ProcessMidi1Card(card);
     }
 }
 
@@ -531,7 +561,7 @@ int32_t MidiDriverController::GetDeviceList(std::vector<MidiDeviceInfo> &deviceL
     std::vector<DeviceInfo> oldDeviceList = deviceList_;
     deviceList_.clear();
     std::vector<MidiDeviceInfo> deviceInfos;
-    EnumerationMidi1();
+    EnumerationDeviceMidi1();
     deviceList = MakeMidiDeviceInfos(deviceList_);
     CleanupRemovedDevices(oldDeviceList);
     return HDF_SUCCESS;
@@ -594,6 +624,7 @@ int32_t MidiDriverController::OpenInputPort(int64_t deviceId, uint32_t portId,
     if (!driver) return HDF_FAILURE;
     return driver->OpenInputPort(portId, dataCallback);
 }
+
 int32_t MidiDriverController::CloseInputPort(int64_t deviceId, uint32_t portId)
 {
     std::lock_guard<std::mutex> lock(deviceMapMutex_);
