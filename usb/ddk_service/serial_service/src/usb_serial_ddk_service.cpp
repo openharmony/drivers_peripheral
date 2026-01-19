@@ -130,7 +130,7 @@ int32_t UsbSerialDdkService::Close(const OHOS::HDI::Usb::UsbSerialDdk::V1_0::Usb
     }
 
     int32_t fd = static_cast<int32_t>(dev.fd);
-    int_t ret = fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    int32_t ret = fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (ret != 0) {
         HDF_LOGE("Failed to close device: %{public}s.\n", strerror(errno));
         if (errno == EBADF) {
