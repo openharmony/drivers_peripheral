@@ -242,6 +242,7 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
         serialPortList_.erase(serialPortList_.begin() + index);
         return HDF_FAILURE;
     }
+    cfmakeraw(&options);
     options.c_lflag &= ~ICANON;
     options.c_lflag &= ~ECHO;
     if (tcsetattr(serialPortList_[index].fd, TCSANOW, &options) == -1) {
