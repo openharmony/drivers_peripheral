@@ -52,6 +52,9 @@ namespace {
     constexpr uint8_t STATUS_MASK_CMD = 0xF0;
     constexpr uint8_t MIDI_CLOCK = 0xF8;
     constexpr int64_t NSEC_PER_SEC = 1000000000;
+    constexpr int32_t MIDI_BYTE_HEX_WIDTH = 2;
+    constexpr int32_t MIDI_PORT_DIRECTION_COUNT = 2;
+    constexpr int32_t UMP_WORD_HEX_WIDTH = 8;
 }
 
 static void ReadVendorIdAndProductId(int32_t card, std::string &idVendor, std::string &idProduct)
@@ -372,7 +375,8 @@ void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* 
 {
     std::ostringstream midiStream;
     for (size_t i = 0; i < static_cast<size_t>(len); i++) {
-        midiStream << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(buffer[i]) << " ";
+        midiStream << std::hex << std::setw(MIDI_BYTE_HEX_WIDTH) << std::setfill('0') <<
+            static_cast<uint32_t>(buffer[i]) << " ";
     }
     HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
     if (len == 1 && buffer[0] == MIDI_CLOCK) {
@@ -386,7 +390,7 @@ void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* 
     for (auto p : results) {
         std::ostringstream umpStream;
         for (uint8_t i = 0; i < p.WordCount(); i++) {
-            umpStream << std::hex << std::setw(8) << std::setfill('0') << p.Word(i) << " ";
+            umpStream << std::hex << std::setw(UMP_WORD_HEX_WIDTH) << std::setfill('0') << p.Word(i) << " ";
         }
         HDF_LOGI("%{public}s umpStream 1.0: %{public}s", __func__, umpStream.str().c_str());
     }
@@ -484,7 +488,7 @@ void MidiDriverController::CleanupDeviceInputPorts(int64_t deviceId)
 }
 void MidiDriverController::PopulateMidi1Ports(snd_ctl_t *ctl, int32_t device, DeviceInfo &devInfo)
 {
-    for (auto direction = 0; direction < 2; ++direction) { // 0 : output, 1 : input
+    for (auto direction = 0; direction < MIDI_PORT_DIRECTION_COUNT; ++direction) { // 0 : output, 1 : input
         snd_rawmidi_info_t *info;
         snd_rawmidi_info_alloca(&info);
         ::snd_rawmidi_info_set_device(info, device);
