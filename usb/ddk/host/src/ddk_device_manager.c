@@ -272,10 +272,11 @@ int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *pri
         HDF_LOGE("%{public}s: open %{public}s failed  errno:%{public}d", __func__, g_gadgetStatePath, errno);
         return HDF_ERR_IO;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     char buf[STATE_STRING_LENGTH] = {0};
     ssize_t numRead = read(fd, buf, STATE_STRING_LENGTH);
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (numRead <= 0) {
         HDF_LOGE("%{public}s: read state failed errno:%{public}d", __func__, errno);
         return HDF_ERR_IO;
@@ -309,10 +310,11 @@ bool DdkDevMgrGetGadgetLinkStatus()
         HDF_LOGE("%{public}s: open %{public}s failed  errno:%{public}d", __func__, g_gadgetStatePath, errno);
         return false;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     char buf[STATE_STRING_LENGTH] = {0};
     ssize_t numRead = read(fd, buf, STATE_STRING_LENGTH);
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (numRead <= 0) {
         HDF_LOGE("%{public}s: read state failed errno:%{public}d", __func__, errno);
         return false;
