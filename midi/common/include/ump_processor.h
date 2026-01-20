@@ -73,5 +73,4 @@ private:
     void HandleDataByte(uint8_t byte, UmpCallback callback);
     void HandleChannelData(uint8_t byte, UmpCallback callback);
 };
-
-#endif 
+#endif

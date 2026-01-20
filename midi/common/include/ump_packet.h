@@ -44,5 +44,4 @@ private:
     uint32_t data_[MAX_WORD_COUNT] = { 0 }; // Zero-initialized by default
     uint8_t word_count_ = 0;
 };
-
-#endif 
+#endif

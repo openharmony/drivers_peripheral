@@ -132,7 +132,6 @@ void UmpProcessor::HandleStatusByte(uint8_t byte, UmpCallback callback)
         DispatchChannelMessage(callback);
         cv_pos_ = 0;
     }
-
 }
 
 void UmpProcessor::HandleChannelData(uint8_t byte, UmpCallback callback)
