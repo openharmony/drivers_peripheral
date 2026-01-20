@@ -1505,6 +1505,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPip
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_USB);
     if (ret != HDF_SUCCESS || devHandle == nullptr) {
         HDF_LOGE("%{public}s:GetEndpointDesc failed ret:%{public}d", __func__, ret);
+        close(sendRequestAshmemParameter.ashmemFd);
         return HDF_FAILURE;
     }
 
@@ -1512,6 +1513,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPip
         sendRequestAshmemParameter.ashmemSize);
     if (buffer == nullptr) {
         HDF_LOGE("%{public}s: GetMmapBufferByFd failed",  __func__);
+        close(sendRequestAshmemParameter.ashmemFd);
         return HDF_FAILURE;
     }
     SyncTranfer syncTranfer = {sendRequestAshmemParameter.ashmemSize, &actlength, timeout};

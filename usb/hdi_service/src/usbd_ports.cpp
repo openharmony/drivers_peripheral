@@ -205,7 +205,7 @@ int32_t UsbdPorts::ReadPortInfo(const std::string& portId, V2_0::UsbPort& usbPor
         }
 
         ret = read(fd, buff, PATH_MAX - 1);
-        close(fd);
+        fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         if (ret < 0) {
             HDF_LOGE("%{public}s: read error: %{public}s", __func__, portAttributeFile.c_str());
             return HDF_FAILURE;
@@ -233,7 +233,14 @@ int32_t UsbdPorts::OpenFile(const std::string& path, int32_t flags)
         HDF_LOGE("%{public}s : realpath failed. ret = %{public}s", __func__, strerror(errno));
         return HDF_FAILURE;
     }
-    return open(realpathStr, flags);
+    int32_t fd = open(realpathStr, flags);
+    if (fd < 0) {
+        HDF_LOGE("%{public}s : failed to open file:%{public}s. errno = %{public}s",
+            __func__, realpathStr, strerror(errno));
+        return fd;
+    }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    return fd;
 }
 
 int32_t UsbdPorts::ParsePortAttribute(const std::string& portAttributeFileName,
@@ -408,7 +415,7 @@ int32_t UsbdPorts::WritePortInfo(const std::string& portId, const std::string& p
     }
 
     int32_t ret = write(fd, data.c_str(), data.size());
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (ret <= 0) {
         HDF_LOGE("%{public}s: write file failed! ret:%{public}d path: %{public}s",
             __func__, ret, writePath.c_str());
