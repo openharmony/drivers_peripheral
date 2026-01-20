@@ -15,6 +15,13 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../secure_element.gni")
 
 ohos_shared_library("sim_se_vendor_adaptor") {
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [ "se_vendor_adaptions.cpp" ]
   branch_protector_ret = "pac_ret"
 
