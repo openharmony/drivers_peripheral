@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef UMP_PACKET_H
+#define UMP_PACKET_H
 #include <cstdint>
 #include <initializer_list>
 #include <algorithm>
@@ -43,3 +44,5 @@ private:
     uint32_t data_[MAX_WORD_COUNT] = { 0 }; // Zero-initialized by default
     uint8_t word_count_ = 0;
 };
+
+#endif 

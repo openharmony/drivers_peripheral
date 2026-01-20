@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#pragma once
+#ifndef UMP_PROCESSOR_H
+#define UMP_PROCESSOR_H
 #include <cstdint>
 #include <functional>
 #include "ump_packet.h"
@@ -73,3 +73,5 @@ private:
     void HandleDataByte(uint8_t byte, UmpCallback callback);
     void HandleChannelData(uint8_t byte, UmpCallback callback);
 };
+
+#endif 
