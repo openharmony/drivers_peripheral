@@ -14,6 +14,13 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libnfc_interface_service_1.1") {
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "//drivers/peripheral/nfc/hdi_service",
     "//drivers/peripheral/nfc/vendor_adaptor",
@@ -39,6 +46,13 @@ ohos_shared_library("libnfc_interface_service_1.1") {
 }
 
 ohos_shared_library("nfc_hdi_driver") {
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "//drivers/peripheral/nfc/hdi_service",
     "//drivers/peripheral/nfc/vendor_adaptor",

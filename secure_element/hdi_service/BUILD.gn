@@ -15,6 +15,13 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../secure_element.gni")
 
 ohos_shared_library("libsecure_element_interface_service_1.0") {
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [ "../vendor_adaptor" ]
   sources = [ "se_impl.cpp" ]
   branch_protector_ret = "pac_ret"
@@ -36,6 +43,13 @@ ohos_shared_library("libsecure_element_interface_service_1.0") {
 }
 
 ohos_shared_library("se_hdi_driver") {
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [ "se_interface_driver.cpp" ]
   branch_protector_ret = "pac_ret"
 
