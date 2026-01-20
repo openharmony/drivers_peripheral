@@ -27,6 +27,7 @@
 #include <unordered_set>
 #include <iomanip>
 #include <ctime>
+#include "securec.h"
 
 #define HDF_LOG_TAG midi_driver_controller
 
@@ -102,7 +103,10 @@ static int64_t MakeDeviceId(int32_t card)
 static std::string MakeDeviceFileName(int32_t card, int32_t device)
 {
     char devfile[MIDI_DEV_NAME_LEN];
-    ::snprintf(devfile, sizeof(devfile), "midiC%dD%d", card, device);
+    int32_t result = snprintf_s(devfile, sizeof(devfile), sizeof(devfile) - 1, "midiC%dD%d", card, device);
+    if (result != 0) {
+        return "";
+    }
     return devfile;
 }
 
@@ -533,8 +537,10 @@ void MidiDriverController::ProcessMidi1Device(snd_ctl_t *ctl, int32_t card, int3
 void MidiDriverController::ProcessMidi1Card(int32_t card)
 {
     char card_name[CARD_NAME_LEN];
-    ::snprintf(card_name, sizeof(card_name), "hw:%d", card);
-    
+    int32_t result = snprintf_s(card_name, sizeof(card_name), sizeof(card_name) - 1, "hw:%d", card);
+    if (result != 0) {
+        return;
+    }
     snd_ctl_t *ctl = nullptr;
     if (::snd_ctl_open(&ctl, card_name, 0) < 0) return;
 

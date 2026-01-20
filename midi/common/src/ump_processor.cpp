@@ -195,7 +195,7 @@ int UmpProcessor::GetExpectedDataLength(uint8_t status)
         case MIDI_COMMON_MTC_QUARTER:
         case MIDI_COMMON_SONG_SEL:
             return 1;
-        case MIDI_COMMON_SONG_POS: 
+        case MIDI_COMMON_SONG_POS:
             return DATA_LEN_2;
         default:
             return 0;
