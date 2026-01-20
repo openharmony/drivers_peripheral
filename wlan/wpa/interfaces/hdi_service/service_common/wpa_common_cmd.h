@@ -44,7 +44,6 @@
 #define WPA_CMD_BUF_LEN 256
 #define WPA_SUPPLICANT_NAME "wpa_supplicant"
 #define CONFIG_ROOR_DIR "/data/service/el1/public/wifi"
-#define CONFIG_ROOR_SOCKET_DIR "/data/service/el1/public/wifi/sockets"
 #define START_CMD "wpa_supplicant -c"CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf"\
     " -g@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
 #define CONFIG_ROOR_DIR_UPDATER "/tmp/service/el1/public/wifi"
