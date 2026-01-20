@@ -77,11 +77,10 @@ void FuncCancelCapture(const uint8_t *rawData)
     cameraTest->rc = cameraTest->streamOperator->Capture(*rawData, *cameraTest->captureInfo, isStreaming);
     OHOS::sptr<OHOS::HDI::Camera::V1_0::IStreamOperatorCallback> streamOperatorCallback =
         new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
-    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 
     cameraTest->rc = cameraTest->streamOperator->ChangeToOfflineStream(
-        {cameraTest->streamInfoSnapshot->streamId_}, streamOperatorCallback, offlineStreamOperator);
-    cameraTest->rc = offlineStreamOperator->CancelCapture(*rawData);
+        {cameraTest->streamInfoSnapshot->streamId_}, streamOperatorCallback, cameraTest->offlineStreamOperator);
+    cameraTest->rc = cameraTest->offlineStreamOperator->CancelCapture(*rawData);
 }
 
 void FuncReleaseStreams(const uint8_t *rawData)
@@ -97,11 +96,10 @@ void FuncReleaseStreams(const uint8_t *rawData)
     int32_t data = static_cast<int32_t>(ConvertInt32(rawData));
     OHOS::sptr<OHOS::HDI::Camera::V1_0::IStreamOperatorCallback> streamOperatorCallback =
         new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
-    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 
     cameraTest->rc = cameraTest->streamOperator->ChangeToOfflineStream(
-        {data}, streamOperatorCallback, offlineStreamOperator);
-    cameraTest->rc = offlineStreamOperator->ReleaseStreams({data});
+        {data}, streamOperatorCallback, cameraTest->offlineStreamOperator);
+    cameraTest->rc = cameraTest->offlineStreamOperator->ReleaseStreams({data});
 }
 
 void FuncRelease()
@@ -111,11 +109,10 @@ void FuncRelease()
     cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
     OHOS::sptr<OHOS::HDI::Camera::V1_0::IStreamOperatorCallback> streamOperatorCallback =
         new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
-    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 
     cameraTest->rc = cameraTest->streamOperator->ChangeToOfflineStream(
-        {cameraTest->streamInfoSnapshot->streamId_}, streamOperatorCallback, offlineStreamOperator);
-    cameraTest->rc = offlineStreamOperator->Release();
+        {cameraTest->streamInfoSnapshot->streamId_}, streamOperatorCallback, cameraTest->offlineStreamOperator);
+    cameraTest->rc = cameraTest->offlineStreamOperator->Release();
 }
 
 static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)

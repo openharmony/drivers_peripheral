@@ -87,6 +87,7 @@ public:
     std::shared_ptr<StreamInfo> streamInfoPre = nullptr;
     std::shared_ptr<StreamInfo> streamInfoVideo = nullptr;
     std::shared_ptr<CaptureInfo> captureInfo = nullptr;
+    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
     int previewFormat = PIXEL_FMT_YCRCB_420_SP;
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
     int snapshotFormat = PIXEL_FMT_YCRCB_420_SP;
