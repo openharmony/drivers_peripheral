@@ -224,5 +224,4 @@ private:
 } // namespace Midi
 } // namespace HDI
 } // namespace OHOS
-
 #endif // OHOS_HDI_MIDI_V1_0_MIDIDRIVERCONTROLLER_H

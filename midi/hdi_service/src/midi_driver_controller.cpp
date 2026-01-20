@@ -361,9 +361,9 @@ int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMes
         std::vector<uint8_t> midi1Buffer;
         ConvertUmpToMidi1(msg.data.data(), msg.data.size(), midi1Buffer);
         if (!midi1Buffer.empty()) {
-            long written = ::snd_rawmidi_write(it->second->rawmidi, midi1Buffer.data(), midi1Buffer.size());
+            int64_t written = ::snd_rawmidi_write(it->second->rawmidi, midi1Buffer.data(), midi1Buffer.size());
             if (written < 0) {
-                HDF_LOGE("%{public}s snd_rawmidi_write failed: %{public}" PRIdMAX, __func__, written);
+                HDF_LOGE("%{public}s snd_rawmidi_write failed: %{public}" PRId64, __func__, written);
                 return HDF_FAILURE;
             }
         }
@@ -434,9 +434,9 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
                 return; // Just wake up loop to check ctx->quit
             }
             // ALSA Event
-            auto len = ::snd_rawmidi_read(ctx->rawmidi, src.get(), WORK_BUFFER_SIZE);
+            int64_t len = ::snd_rawmidi_read(ctx->rawmidi, src.get(), WORK_BUFFER_SIZE);
             if (len < 0) {
-                HDF_LOGI("%{public}s snd_rawmidi_read error : %{public}" PRIdMAX, __func__, len);
+                HDF_LOGI("%{public}s snd_rawmidi_read error : %{public}" PRId64, __func__, len);
                 ctx->quit = true;
                 return;
             }
@@ -543,6 +543,7 @@ void MidiDriverController::ProcessMidi1Card(int32_t card)
     char card_name[CARD_NAME_LEN];
     int32_t result = snprintf_s(card_name, sizeof(card_name), sizeof(card_name) - 1, "hw:%d", card);
     if (result != 0) {
+
         return;
     }
     snd_ctl_t *ctl = nullptr;
