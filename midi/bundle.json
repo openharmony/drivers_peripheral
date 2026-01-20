@@ -12,7 +12,11 @@
     "component": {
       "name": "drivers_peripheral_midi",
       "subsystem": "hdf",
-      "adapted_system_type": ["standard"],
+      "adapted_system_type": [
+        "standard",
+        "small",
+        "mini"
+      ],
       "rom": "675KB",
       "ram": "7400KB",
       "deps": {
