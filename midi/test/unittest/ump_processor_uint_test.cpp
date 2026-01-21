@@ -183,10 +183,10 @@ HWTEST_F(UmpProcessorUnitTest, TestSysEx_MultiPacket, TestSize.Level1)
 
     // 9 bytes of data + F0/F7 = 11 bytes total
     uint8_t input[] = { 
-        0xF0, 
+        0xF0,
         0x01, 0x02, 0x03, 0x04, 0x05, 0x06, // Packet 1 payload
         0x07, 0x08,                         // Packet 2 payload
-        0xF7 
+        0xF7
     };
 
     processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
@@ -284,7 +284,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_ClearedBySysEx, TestSize.Level1
 {
     std::vector<UmpPacket> results;
 
-    uint8_t input[] = { 
+    uint8_t input[] = {
         0x90, 0x3C, 0x64,                   // Note On
         0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7, // SysEx (Identity Request)
         0x3C, 0x64                          // Orphaned data
@@ -298,8 +298,9 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_ClearedBySysEx, TestSize.Level1
     ASSERT_GE(results.size(), 2);
     EXPECT_EQ(results[0].Word(0), 0x20903C64U);
     
-    // Verify that the packet after SysEx is NOT 0x20903C64 (which would indicate the orphan data was processed as Note On)
-    for(size_t i = 1; i < results.size(); ++i) {
+    // Verify that the packet after SysEx is NOT 0x20903C64
+    // (which would indicate the orphan data was processed as Note On)
+    for (size_t i = 1; i < results.size(); ++i) {
         EXPECT_NE(results[i].Word(0), 0x20903C64U);
     }
 }
@@ -430,7 +431,7 @@ HWTEST_F(UmpProcessorUnitTest, TestSysEx_Streaming, TestSize.Level1)
     uint8_t chunk3[] = { 0x07, 0x08, 0xF7 };
     processor_.ProcessBytes(chunk3, 3, cb);
 
-    // Expected: 
+    // Expected:
     // Packet 1: Start (01 02 03 04 05 06)
     // Packet 2: End (07 08)
     ASSERT_GE(results.size(), 2);
