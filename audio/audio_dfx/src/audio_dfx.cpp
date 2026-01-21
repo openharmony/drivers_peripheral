@@ -24,10 +24,21 @@
 #ifdef AUDIO_HISYSEVENT_ENABLE
 #include "hisysevent.h"
 #endif
+#include <mutex>
+#include <cstdint>
+#include <iostream>
+#include <fstream>
 
 using namespace OHOS::HiviewDFX;
 
 #define HICOLLIE_TIMEOUT 8
+
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+#define HICOLLIE_TIMEOUT_CALLBACK 120
+#define INVALID_TIMER_ID (-1)
+#define TIMER_CALLBACK "ReclaimMemoryCallback"
+#define RECLAIM_FILEPAGE_STRING "3"
+#endif
 
 void HdfAudioStartTrace(const char* value, int valueLen)
 {
@@ -99,3 +110,90 @@ int32_t AudioDfxSysEventError(const char* desc, struct timeval startTime, int ti
     }
     return HDF_SUCCESS;
 }
+
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+class Counter {
+public:
+    bool TryIncrement()
+    {
+        if (value_ == MAX_VALUE) {
+            AUDIO_FUNC_LOGE("invalid increment");
+            return false;
+        }
+        ++value_;
+        return true;
+    }
+
+    bool TryDecrement()
+    {
+        if (value_ == 0) {
+            AUDIO_FUNC_LOGE("invalid decrement");
+            return false;
+        }
+        --value_;
+        return true;
+    }
+
+    uint32_t Get() const
+    {
+        return value_;
+    }
+private:
+    uint32_t value_{0};
+    static constexpr uint32_t MAX_VALUE = UINT32_MAX;
+};
+
+Counter g_counter;
+std::mutex g_mtx;
+int32_t g_TimerId = INVALID_TIMER_ID;
+
+void AudioXClollieCallback(void *param)
+{
+    std::lock_guard<std::mutex> lock(g_mtx);
+    g_TimerId = INVALID_TIMER_ID;
+    if (g_counter.Get() != 0) {
+        return;
+    }
+    std::string path = "/proc/" + std::tostring(getpid()) + "/reclaim";
+    std::string content = RECLAIM_FILEPAGE_STRING;
+    std::ofstream outfile(path);
+    if (outfile.is_open()) {
+        outfile << countent;
+        outfile.close();
+        AUDIO_FUNC_LOGI("reclaim memory");
+    } else {
+        AUDIO_FUNC_LOGW("can't open file");
+    }
+}
+
+int32_t SetCallbackTimer()
+{
+    int32_t id = INVALID_TIMER_ID;
+#ifdef AUDIO_HICOLLIE_ENABLE
+    id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer(TIMER_CALLBACK, HICOLLIE_TIMEOUT_CALLBACK, AudioXClollieCallback, nullptr,
+        OHOS::HiviewDFX::XCOLLIE_FLAG_NOOP);
+#endif
+    return id;
+}
+
+void IncreaseCounter()
+{
+    std::lock_guard<std::mutex> lock(g_mtx);
+    g_counter.TryIncrement();
+    if (g_TimerId > 0) {
+        CancelTimer(g_TimerId);
+        g_TimerId = INVALID_TIMER_ID;
+    }
+}
+
+void DecreaseCounter()
+{
+    std::lock_guard<std::mutex> lock(g_mtx);
+    if (g_counter.TryDecrement() && (g_counter.Get() == 0)) {
+        if (g_TimerId > 0) {
+            CancelTimer(g_TimerId);
+        }
+        g_TimerId = SetCallbackTimer();
+    }
+}
+#endif
