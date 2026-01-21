@@ -147,14 +147,14 @@ Counter g_counter;
 std::mutex g_mtx;
 int32_t g_TimerId = INVALID_TIMER_ID;
 
-void AudioXClollieCallback(void *param)
+void AudioXCollieCallback(void *param)
 {
     std::lock_guard<std::mutex> lock(g_mtx);
     g_TimerId = INVALID_TIMER_ID;
     if (g_counter.Get() != 0) {
         return;
     }
-    std::string path = "/proc/" + std::tostring(getpid()) + "/reclaim";
+    std::string path = "/proc/" + std::to_string(getpid()) + "/reclaim";
     std::string content = RECLAIM_FILEPAGE_STRING;
     std::ofstream outfile(path);
     if (outfile.is_open()) {
@@ -170,7 +170,7 @@ int32_t SetCallbackTimer()
 {
     int32_t id = INVALID_TIMER_ID;
 #ifdef AUDIO_HICOLLIE_ENABLE
-    id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer(TIMER_CALLBACK, HICOLLIE_TIMEOUT_CALLBACK, AudioXClollieCallback, nullptr,
+    id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer(TIMER_CALLBACK, HICOLLIE_TIMEOUT_CALLBACK, AudioXCollieCallback, nullptr,
         OHOS::HiviewDFX::XCOLLIE_FLAG_NOOP);
 #endif
     return id;
