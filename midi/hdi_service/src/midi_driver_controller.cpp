@@ -38,8 +38,6 @@ namespace V1_0 {
 namespace {
     constexpr int32_t MAX_WORK_BUFFER_WORDS = 256;
     constexpr size_t WORK_BUFFER_SIZE = sizeof(uint32_t) * MAX_WORK_BUFFER_WORDS;
-    constexpr int32_t MIDI_DEV_NAME_LEN = 128;
-    constexpr int32_t CARD_NAME_LEN = 32;
     constexpr uint8_t UMP_MT_SYSTEM = 0x1;
     constexpr uint8_t UMP_MT_CHANNEL_VOICE = 0x2;
     constexpr uint32_t UMP_SHIFT_MT = 28;
@@ -105,12 +103,7 @@ static int64_t MakeDeviceId(int32_t card)
 
 static std::string MakeDeviceFileName(int32_t card, int32_t device)
 {
-    char devfile[MIDI_DEV_NAME_LEN];
-    int32_t result = snprintf_s(devfile, sizeof(devfile), sizeof(devfile) - 1, "midiC%dD%d", card, device);
-    if (result != 0) {
-        return "";
-    }
-    return devfile;
+    return "midiC" + std::to_string(card) + "D" + std::to_string(device);
 }
 
 static std::string MakeHwName(int32_t card, int32_t device, int32_t subdevice)
@@ -525,34 +518,58 @@ void MidiDriverController::PopulateMidi1Ports(snd_ctl_t *ctl, int32_t device, De
 
 void MidiDriverController::ProcessMidi1Device(snd_ctl_t *ctl, int32_t card, int32_t device)
 {
+    HDF_LOGI("%{public}s: Start processing MIDI1 device - Card: %{public}d, Device: %{public}d",
+             __func__, card, device);
     DeviceInfo devInfo;
     devInfo.deviceId = MakeDeviceId(card);
+    HDF_LOGD("%{public}s: Generated device ID: %{public}" PRId64, __func__, devInfo.deviceId);
     devInfo.devfile = MakeDeviceFileName(card, device);
+    HDF_LOGD("%{public}s: Device file: %{public}s", __func__, devInfo.devfile.c_str());
     devInfo.card = card;
     devInfo.device = device;
     devInfo.is_ump = false;
+
     ReadVendorIdAndProductId(card, devInfo.idVendor, devInfo.idProduct);
+    HDF_LOGD("%{public}s: Vendor ID: %{public}s, Product ID: %{public}s",
+             __func__, devInfo.idVendor.c_str(), devInfo.idProduct.c_str());
+
     PopulateMidi1Ports(ctl, device, devInfo);
+
+    deviceList_.push_back(devInfo);
+    HDF_LOGI("%{public}s: Added device to list - Total devices: %{public}zu",
+             __func__, deviceList_.size());
+
     HDF_LOGI("%{public}s Card: %{public}d, device:%{public}d idVendor:%{public}s, idProduct:%{public}s,",
         __func__, devInfo.card, devInfo.device, devInfo.idVendor.c_str(), devInfo.idProduct.c_str());
-    deviceList_.push_back(devInfo);
 }
 
 void MidiDriverController::ProcessMidi1Card(int32_t card)
 {
-    char card_name[CARD_NAME_LEN];
-    int32_t result = snprintf_s(card_name, sizeof(card_name), sizeof(card_name) - 1, "hw:%d", card);
-    if (result != 0) {
+    HDF_LOGI("%{public}s: Start processing MIDI1 card: %{public}d", __func__, card);
+    std::string card_str = "hw:" + std::to_string(card);
+    HDF_LOGD("%{public}s: Opening ALSA control for card: %{public}s", __func__, card_str.c_str());
+    snd_ctl_t *ctl = nullptr;
+    int openResult = ::snd_ctl_open(&ctl, card_str.c_str(), 0);
+    if (openResult < 0) {
+        HDF_LOGE("%{public}s: Failed to open ALSA control for card %{public}s, error: %{public}d",
+                 __func__, card_str.c_str(), openResult);
         return;
     }
-    snd_ctl_t *ctl = nullptr;
-    if (::snd_ctl_open(&ctl, card_name, 0) < 0) return;
-
+    HDF_LOGD("%{public}s: Successfully opened ALSA control", __func__);
     int32_t device = -1;
+    int deviceCount = 0;
     while (::snd_ctl_rawmidi_next_device(ctl, &device) >= 0 && device >= 0) {
+        HDF_LOGD("%{public}s: Processing device %{public}d on card %{public}d",
+                 __func__, device, card);
         ProcessMidi1Device(ctl, card, device);
+        deviceCount++;
     }
+
+    HDF_LOGD("%{public}s: Found %{public}d MIDI devices on card %{public}d",
+             __func__, deviceCount, card);
     ::snd_ctl_close(ctl);
+    HDF_LOGI("%{public}s: Finished processing MIDI1 card: %{public}d, total devices: %{public}d",
+             __func__, card, deviceCount);
 }
 
 void MidiDriverController::EnumerationDeviceMidi1()
