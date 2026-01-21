@@ -17,6 +17,8 @@
 #include "audio_internal.h"
 #include "audio_bluetooth_manager.h"
 #include "fast_audio_render.h"
+#include "bluetooth_def.h"
+#include "bluetooth_host.h"
 namespace OHOS::HDI::Audio_Bluetooth {
 int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
                                    struct AudioAdapterDescriptor **descs,
@@ -125,6 +127,7 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
     HDF_LOGI("%s call bluetooth DeRegisterObserver interface", __func__);
 #ifndef A2DP_HDI_SERVICE
     OHOS::Bluetooth::DeRegisterObserver();
+    OHOS::Bluetooth::BluetoothHost::GetDefaultHost().Close();
 #else
     if (isFastAdapter) {
         OHOS::Bluetooth::FastTearDown();
