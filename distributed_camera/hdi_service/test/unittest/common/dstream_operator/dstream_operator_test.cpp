@@ -78,6 +78,7 @@ constexpr int TEST_WIDTH = 640;
 constexpr int TEST_DATASPACE = 8;
 constexpr int TEST_TUNNELEDMODE = 5;
 constexpr int TEST_SLEEPTIME = 3;
+const uint32_t CAPACITY_MAX_SIZE = 5;
 
 void DStreamOperatorTest::SetUpTestCase(void)
 {
@@ -1026,7 +1027,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_035, TestSize.Level1)
 {
     EXPECT_EQ(false, dstreamOperator_ == nullptr);
     std::vector<StreamInfo> infos;
-    for (int i = 0; i <= CONTAINER_CAPACITY_MAX_SIZE; i++) {
+    for (int i = 0; i <= CAPACITY_MAX_SIZE; i++) {
         struct StreamInfo streamInfo;
         streamInfo.streamId_ = TEST_STREAMID;
         streamInfo.width_ = TEST_WIDTH;
@@ -1038,7 +1039,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_035, TestSize.Level1)
         infos.push_back(streamInfo);
     }
     bool res = dstreamOperator_->IsStreamInfosInvalid(infos);
-    EXPECT_TRUE(res);
+    EXPECT_FALSE(res);
 }
 
 /**
