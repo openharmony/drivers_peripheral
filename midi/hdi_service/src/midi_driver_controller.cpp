@@ -543,7 +543,6 @@ void MidiDriverController::ProcessMidi1Card(int32_t card)
     char card_name[CARD_NAME_LEN];
     int32_t result = snprintf_s(card_name, sizeof(card_name), sizeof(card_name) - 1, "hw:%d", card);
     if (result != 0) {
-
         return;
     }
     snd_ctl_t *ctl = nullptr;
