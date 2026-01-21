@@ -557,6 +557,17 @@ int TestGetDisplayClientTargetProperty(uint32_t devId)
     return ret;
 }
 
+int TestSetDisplayColorGamut(uint32_t devId)
+{
+    int32_t gamut = 4;
+    devId = 1;
+    int32_t ret = g_composerInterface->SetDisplayColorGamut(devId, gamut);
+    if (ret != DISPLAY_SUCCESS && ret != DISPLAY_NOT_SUPPORT) {
+        HDF_LOGE("%{public}s: failed, ret:%{public}d, devId:%{public}u", __func__, ret, devId);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -593,6 +604,7 @@ TestFuncs g_testFuncs = {
     TestRegHwcEventCallback,
     TestGetDisplayConnectionType,
     TestGetDisplayClientTargetProperty,
+    TestSetDisplayColorGamut,
 };
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
