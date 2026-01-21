@@ -40,6 +40,10 @@ int32_t SetTimer(const char* name);
 void CancelTimer(int32_t id);
 struct timeval AudioDfxSysEventGetTimeStamp(void);
 int32_t AudioDfxSysEventError(const char* log, struct timeval startTime, int timeThreshold, int err);
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+void IncreaseCounter();
+void DecreaseCounter();
+#endif
 #ifdef __cplusplus
 }
 #endif
