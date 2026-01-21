@@ -1276,3 +1276,15 @@ HWTEST_F(DeviceTest, test_GetDisplayClientTargetProperty, TestSize.Level1)
     }
     EXPECT_EQ(DISPLAY_SUCCESS, result);
 }
+
+HWTEST_F(DeviceTest, test_SetDisplayColorGamut, TestSize.Level1)
+{
+    int gamut = 4;
+    uint32_t devId = 1;
+    int32_t result = DISPLAY_FAILURE;
+    auto ret = g_composerDevice->SetDisplayColorGamut(devId, gamut);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        result = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, result);
+}
