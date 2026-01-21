@@ -952,7 +952,7 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayClientTargetPropertyTest)->
 BENCHMARK_F(DisplayBenchmarkTest, SetDisplayColorGamutTest)(benchmark::State &state)
 {
     int32_t ret = 0;
-    int32_t gamut = 4;
+    ColorGamut gamut = COLOR_GAMUT_SRGB;
     uint32_t devId = 1;
     for (auto _ : state) {
         ret = g_composerDevice->SetDisplayColorGamut(devId, gamut);
