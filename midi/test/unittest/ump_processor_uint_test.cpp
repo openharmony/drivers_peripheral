@@ -182,7 +182,7 @@ HWTEST_F(UmpProcessorUnitTest, TestSysEx_MultiPacket, TestSize.Level1)
     std::vector<UmpPacket> results;
 
     // 9 bytes of data + F0/F7 = 11 bytes total
-    uint8_t input[] = { 
+    uint8_t input[] = {
         0xF0,
         0x01, 0x02, 0x03, 0x04, 0x05, 0x06, // Packet 1 payload
         0x07, 0x08,                         // Packet 2 payload
@@ -335,7 +335,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_SwitchingTypes, TestSize.Level1
 {
     std::vector<UmpPacket> results;
 
-    uint8_t input[] = { 
+    uint8_t input[] = {
         0x90, 0x3C, 0x64, // Note On (3C)
         0x3E, 0x64,       // Note On (3E) - Running Status
         0xB0, 0x07, 0x7F, // CC 7 (Volume)
@@ -362,7 +362,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_Reestablishment, TestSize.Level
 {
     std::vector<UmpPacket> results;
 
-    uint8_t input[] = { 
+    uint8_t input[] = {
         0x90, 0x3C, 0x64, // Note On
         0xF6,             // System Common - Clears Running Status
         0x3E, 0x64,       // ORPHAN DATA (Should be dropped)
