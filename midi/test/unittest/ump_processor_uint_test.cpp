@@ -417,7 +417,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRealTime_Interruption, TestSize.Level1)
 HWTEST_F(UmpProcessorUnitTest, TestSysEx_Streaming, TestSize.Level1)
 {
     std::vector<UmpPacket> results;
-    auto cb = [&](const UmpPacket& p) { results.push_back(p); };
+    auto cb = [&results](const UmpPacket& p) { results.push_back(p); };
 
     // Call 1: Start SysEx
     uint8_t chunk1[] = { 0xF0, 0x01, 0x02 };
@@ -489,7 +489,7 @@ HWTEST_F(UmpProcessorUnitTest, TestStream_SelfHealing, TestSize.Level1)
 HWTEST_F(UmpProcessorUnitTest, TestStream_SplitNoteOn, TestSize.Level1)
 {
     std::vector<UmpPacket> results;
-    auto cb = [&](const UmpPacket& p) { results.push_back(p); };
+    auto cb = [&results](const UmpPacket& p) { results.push_back(p); };
 
     // 1. 发送前两个字节
     uint8_t part1[] = { 0x90, 0x3C };
@@ -512,7 +512,7 @@ HWTEST_F(UmpProcessorUnitTest, TestStream_SplitNoteOn, TestSize.Level1)
 HWTEST_F(UmpProcessorUnitTest, TestStream_SplitProgramChange, TestSize.Level1)
 {
     std::vector<UmpPacket> results;
-    auto cb = [&](const UmpPacket& p) { results.push_back(p); };
+    auto cb = [&results](const UmpPacket& p) { results.push_back(p); };
 
     // 1. 发送状态位
     uint8_t part1[] = { 0xC0 };
@@ -534,7 +534,7 @@ HWTEST_F(UmpProcessorUnitTest, TestStream_SplitProgramChange, TestSize.Level1)
 HWTEST_F(UmpProcessorUnitTest, TestStream_ComplexFragmentation, TestSize.Level1)
 {
     std::vector<UmpPacket> results;
-    auto cb = [&](const UmpPacket& p) { results.push_back(p); };
+    auto cb = [&results](const UmpPacket& p) { results.push_back(p); };
 
     // Call 1: Partial Note On
     uint8_t chunk1[] = { 0x90, 0x3C };
