@@ -944,6 +944,27 @@ BENCHMARK_F(DisplayBenchmarkTest, GetDisplayClientTargetPropertyTest)(benchmark:
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayClientTargetPropertyTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetDisplayColorGamutTest
+  * @tc.desc: Benchmarktest for interface SetDisplayColorGamut.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetDisplayColorGamutTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    ColorGamut gamut = COLOR_GAMUT_SRGB;
+    uint32_t devId = 1;
+    for (auto _ : state) {
+        ret = g_composerDevice->SetDisplayColorGamut(devId, gamut);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayColorGamutTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 } // namespace
 
 int main(int argc, char** argv)
