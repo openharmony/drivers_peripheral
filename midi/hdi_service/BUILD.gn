@@ -32,7 +32,7 @@ ohos_shared_library("midi_interface_service_1.0") {
       "drivers_interface_midi:midi_idl_headers_1.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
-      "alsa-lib:libasound",
+      "alsa-lib:libalsa_midi",
     ]
   } else {
     external_deps = [
