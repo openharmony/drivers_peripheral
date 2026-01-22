@@ -19,7 +19,7 @@
 #include "input_uhdf_log.h"
 
 #define HDF_LOG_TAG emit_event_manager
-
+using namespace OHOS::HDI::Input::Ddk::V1_1;
 namespace OHOS {
 namespace ExternalDeviceManager {
 constexpr uint16_t MAX_VIRTUAL_DEVICE_NUM = 200;

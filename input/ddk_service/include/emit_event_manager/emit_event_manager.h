@@ -16,8 +16,7 @@
 #ifndef INPUT_EMIT_EVENT_EMIT_EVENT_MANAGER_H
 #define INPUT_EMIT_EVENT_EMIT_EVENT_MANAGER_H
 #include <inttypes.h>
-
-#include "v1_0/hid_ddk_types.h"
+#include "v1_1/hid_ddk_types.h"
 #include "virtual_device_inject.h"
 
 namespace OHOS {
