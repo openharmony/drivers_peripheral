@@ -20,24 +20,22 @@ ohos_shared_library("midi_interface_service_1.0") {
     "../common/include",
   ]
   sources = [
-    "src/midi_interface_impl.cpp",
-    "src/midi_driver_controller.cpp",
     "../common/src/ump_packet.cpp",
     "../common/src/ump_processor.cpp",
+    "src/midi_interface_impl.cpp",
+    "src/midi_driver_controller.cpp",
   ]
 
   if (is_standard_system) {
     external_deps = [
+      "alsa-lib:libalsa_midi",
       "c_utils:utils",
       "drivers_interface_midi:midi_idl_headers_1.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
-      "alsa-lib:libalsa_midi",
     ]
   } else {
-    external_deps = [
-      "hilog:libhilog"
-    ]
+    external_deps = [ "hilog:libhilog" ]
   }
 
   install_images = [ chipset_base_dir ]
