@@ -285,6 +285,8 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<GetDisplayConnectionTypeFunc>(dlsym(libHandle_, "GetDisplayConnectionType"));
     vdiAdapter_->GetDisplayClientTargetProperty =
         reinterpret_cast<GetDisplayClientTargetPropertyFunc>(dlsym(libHandle_, "GetDisplayClientTargetProperty"));
+    vdiAdapter_->SetDisplayColorGamut =
+        reinterpret_cast<SetDisplayColorGamutFunc>(dlsym(libHandle_, "SetDisplayColorGamut"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -1259,6 +1261,19 @@ int32_t DisplayComposerService::GetDisplayClientTargetProperty(uint32_t devId, i
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayClientTargetProperty, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiAdapter_->GetDisplayClientTargetProperty(devId, pixelFormat, dataspace);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+int32_t DisplayComposerService::SetDisplayColorGamut(uint32_t devId, ColorGamut gamut)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetDisplayColorGamut, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->SetDisplayColorGamut(devId, gamut);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail devId:%{public}u", __func__, devId));
     return ret;
 }
 } // namespace Composer
