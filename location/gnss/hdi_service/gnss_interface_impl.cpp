@@ -356,7 +356,7 @@ int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
         return HDF_ERR_INVALID_PARAM;
     }
     int ret;
-    if (para.gnssBasic.gnssMode < GNSS_WORKING_MODE_STANDALONE) {
+    if (!IsGnssBasicConfigValid(para.gnssBasic.gnssMode)) {
         g_configPara.startCategory = static_cast<uint32_t>(GnssStartCategory::GNSS_START_CATEGORY_GNSS_CACHE);
         g_configPara.u.gnssCacheConfig.interval = para.gnssCaching.interval;
         g_configPara.u.gnssCacheConfig.fifoFullNotify = para.gnssCaching.fifoFullNotify;
@@ -371,6 +371,14 @@ int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
         HDF_LOGI("%{public}s, gnss ret=%{public}d", __func__, ret);
     }
     return ret;
+}
+
+bool GnssInterfaceImpl::IsGnssBasicConfigValid(int gnssMode)
+{
+    if (gnssMode < GNSS_WORKING_MODE_STANDALONE) {
+        return false;
+    }
+    return true;
 }
 
 int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
