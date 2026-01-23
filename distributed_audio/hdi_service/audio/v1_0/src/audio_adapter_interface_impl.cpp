@@ -184,7 +184,10 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
         audioRender = nullptr;
         return ret == ERR_DH_AUDIO_HDF_WAIT_TIMEOUT ? HDF_ERR_TIMEOUT : HDF_FAILURE;
     }
-    renderCallbacks_[renderId] = audioRender;
+    {
+        std::lock_guard<std::mutex> callLck(renderCallMtx_);
+        renderCallbacks_[renderId] = audioRender;
+    }
     render = audioRender;
     audioRender->SetRenderStatus(AudioRenderStatus::RENDER_STATUS_OPEN);
     DHLOGI("Create render success, render ID is %{public}u.", renderId);
@@ -460,6 +463,7 @@ int32_t AudioAdapterInterfaceImpl::UpdateAudioRoute(const AudioRoute &route, int
     auto iter = extCallbackMap_.find(sinkDhId_);
     CHECK_AND_RETURN_RET_LOG(iter == extCallbackMap_.end(), HDF_FAILURE, "cant't find callback.");
     DAudioEvent event = { HDF_AUDIO_UPDATE_AUDIO_ROUTE, "" };
+    CHECK_AND_RETURN_RET_LOG(iter->second == nullptr, ERR_DH_AUDIO_HDF_NULLPTR, "extcallback is null.");
     CHECK_AND_RETURN_RET_LOG(iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE,
         "Update audio route failed.");
     ++routeHandle;
@@ -473,6 +477,7 @@ int32_t AudioAdapterInterfaceImpl::ReleaseAudioRoute(int32_t routeHandle)
     auto iter = extCallbackMap_.find(sinkDhId_);
     CHECK_AND_RETURN_RET_LOG(iter == extCallbackMap_.end(), HDF_FAILURE, "cant't find callback.");
     DAudioEvent event = { HDF_AUDIO_RELEASE_AUDIO_ROUTE, "" };
+    CHECK_AND_RETURN_RET_LOG(iter->second == nullptr, ERR_DH_AUDIO_HDF_NULLPTR, "extcallback is null.");
     CHECK_AND_RETURN_RET_LOG(iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE,
         "Release audio route failed.");
     return HDF_SUCCESS;
@@ -1187,6 +1192,7 @@ int32_t AudioAdapterInterfaceImpl::HandleMuteSetEvent(const DAudioEvent &event)
     DHLOGI("get ss : %{public}s", ss.str().c_str());
     int8_t reserved = 0;
     int8_t cookie = 0;
+    CHECK_AND_RETURN_RET_LOG(paramCallback_ == nullptr, ERR_DH_AUDIO_HDF_NULLPTR, "Audio param observer is null.");
     ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_VOLUME, ss.str(), std::to_string(isMute),
         reserved, cookie);
     if (ret != DH_SUCCESS) {
@@ -1466,6 +1472,7 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderCallback(const uint32_t renderId,
 sptr<IAudioCallback> AudioAdapterInterfaceImpl::GetRenderCallback(const uint32_t renderId)
 {
     DHLOGI("GetRenderCallback enter, render Id:%{public}d", renderId);
+    std::lock_guard<std::mutex> callLck(renderCallMtx_);
     auto iter = renderCallbacks_.find(renderId);
     if (iter == renderCallbacks_.end()) {
         DHLOGE("Not find renderId:%{public}d", renderId);
@@ -1481,6 +1488,7 @@ sptr<IAudioCallback> AudioAdapterInterfaceImpl::GetRenderCallback(const uint32_t
 void AudioAdapterInterfaceImpl::DeleteRenderCallback(const uint32_t renderId)
 {
     DHLOGI("DeleteRenderCallback enter, render Id:%{public}d", renderId);
+    std::lock_guard<std::mutex> callLck(renderCallMtx_);
     auto iter = renderCallbacks_.find(renderId);
     if (iter == renderCallbacks_.end()) {
         DHLOGE("Not find renderId:%{public}d", renderId);
@@ -1591,6 +1599,7 @@ int32_t AudioAdapterInterfaceImpl::SetUsualParamChange(const std::string &condit
     std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
     auto iter = extCallbackMap_.find(sinkDhId_);
     CHECK_AND_RETURN_RET_LOG(iter == extCallbackMap_.end(), HDF_FAILURE, "can't find callback.");
+    CHECK_AND_RETURN_RET_LOG(iter->second == nullptr, ERR_DH_AUDIO_HDF_NULLPTR, "extcallback is null.");
     CHECK_AND_RETURN_RET_LOG(iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE,
         "set usual param change failed.");
     return DH_SUCCESS;
