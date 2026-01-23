@@ -161,7 +161,7 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
         attrs.format, static_cast<int32_t>(attrs.type));
     render = nullptr;
     sptr<AudioRenderInterfaceImplBase> audioRender = nullptr;
-    if (!CheckDevCapability(desc)) {
+    if (!CheckDevCapability(desc, attrs)) {
         DHLOGE("Can not find device, create render failed.");
         return HDF_FAILURE;
     }
@@ -296,10 +296,17 @@ int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
     return HDF_SUCCESS;
 }
 
-bool AudioAdapterInterfaceImpl::CheckDevCapability(const AudioDeviceDescriptor &desc)
+bool AudioAdapterInterfaceImpl::CheckDevCapability(const AudioDeviceDescriptor &desc,
+    const AudioSampleAttributes &attrs)
 {
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     if (mapAudioDevice_.find(desc.pins) == mapAudioDevice_.end()) {
+        if (attrs.type == AUDIO_OFFLOAD) {
+ 	        if (extCallbackMap_.find(OFFLOAD_RENDER_ID) != extCallbackMap_.end() &&
+ 	            mapAudioDevice_.find(static_cast<uint32_t>(OFFLOAD_RENDER_ID)) != mapAudioDevice_.end()) {
+ 	            return true;
+ 	        }
+ 	    }
         DHLOGE("Can not find device, create render failed.");
         return false;
     }
@@ -313,7 +320,7 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
         ", formats: %{public}d}.", desc.pins, attrs.sampleRate, attrs.channelCount, attrs.format);
     capture = nullptr;
     sptr<AudioCaptureInterfaceImplBase> audioCapture(nullptr);
-    if (!CheckDevCapability(desc)) {
+    if (!CheckDevCapability(desc, attrs)) {
         DHLOGE("Can not find device, create capture failed.");
         return HDF_FAILURE;
     }
