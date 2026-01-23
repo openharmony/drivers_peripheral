@@ -25,9 +25,7 @@ ohos_unittest("midi_hdi_unittest") {
     "../../hdi_service/include",
   ]
 
-  sources = [
-    "ump_processor_uint_test.cpp"
-  ]
+  sources = [ "ump_processor_uint_test.cpp" ]
 
   cflags = [
     "-Wall",
