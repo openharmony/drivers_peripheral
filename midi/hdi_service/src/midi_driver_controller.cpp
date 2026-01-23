@@ -596,7 +596,6 @@ int32_t MidiDriverController::GetDeviceList(std::vector<MidiDeviceInfo> &deviceL
 std::shared_ptr<MidiDeviceBase> MidiDriverController::GetDeviceDriver(int64_t deviceId)
 {
     std::lock_guard<std::mutex> lock(deviceMapMutex_);
-    // 1. 已加载则返回
     auto it = activeDrivers_.find(deviceId);
     if (it != activeDrivers_.end()) {
         return it->second;

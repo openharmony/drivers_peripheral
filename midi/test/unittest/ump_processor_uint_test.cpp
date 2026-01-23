@@ -30,7 +30,6 @@ public:
     void TearDown() override {}
 
 protected:
-    // 每次测试都会重新构造，确保状态隔离
     UmpProcessor processor_;
 };
 
@@ -491,12 +490,10 @@ HWTEST_F(UmpProcessorUnitTest, TestStream_SplitNoteOn, TestSize.Level1)
     std::vector<UmpPacket> results;
     auto cb = [&results](const UmpPacket& p) { results.push_back(p); };
 
-    // 1. 发送前两个字节
     uint8_t part1[] = { 0x90, 0x3C };
     processor_.ProcessBytes(part1, 2, cb);
     ASSERT_EQ(results.size(), 0); // Should not dispatch UMP for incomplete message.
 
-    // 2. 发送最后一个字节
     uint8_t part2[] = { 0x64 };
     processor_.ProcessBytes(part2, 1, cb);
     
@@ -514,11 +511,9 @@ HWTEST_F(UmpProcessorUnitTest, TestStream_SplitProgramChange, TestSize.Level1)
     std::vector<UmpPacket> results;
     auto cb = [&results](const UmpPacket& p) { results.push_back(p); };
 
-    // 1. 发送状态位
     uint8_t part1[] = { 0xC0 };
     processor_.ProcessBytes(part1, 1, cb);
 
-    // 2. 发送数据位
     uint8_t part2[] = { 0x05 };
     processor_.ProcessBytes(part2, 1, cb);
 
