@@ -508,10 +508,6 @@ void ModelInit(void)
         return;
     }
 
-    if (cfgDesc == NULL || cfgDesc->effectCfgDescs == NULL || cfgDesc->libCfgDescs == NULL) {
-        HDF_LOGE("cfgDesc is null!");
-        return;
-    }
     if (g_cfgDescs != NULL) {
         AudioEffectReleaseCfgDesc(g_cfgDescs);
     }
