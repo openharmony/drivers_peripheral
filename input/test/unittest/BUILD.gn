@@ -27,6 +27,7 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/googletest/googletest/include",
+      "//third_party/bounds_checking_function/include",
       "$INPUT_ROOT_DIR/hal/include",
       "$INPUT_ROOT_DIR/interfaces/include",
       "$INPUT_ROOT_DIR/utils/include",
@@ -49,11 +50,11 @@ if (defined(ohos_lite)) {
     }
     public_deps = [
       "$INPUT_ROOT_DIR/hal:hdi_input",
+      "//third_party/bounds_checking_function:libsec_shared",
     ]
     external_deps = [
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
-      "bounds_checking_function:libsec_shared",
     ]
   }
 } else {
