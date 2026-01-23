@@ -15,6 +15,5 @@ import("//build/test.gni")
 
 group("midi_hdi_fuzztest") {
   testonly = true
-  deps = [
-  ]
+  deps = []
 }
