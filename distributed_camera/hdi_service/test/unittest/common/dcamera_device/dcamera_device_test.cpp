@@ -556,10 +556,7 @@ HWTEST_F(DCameraDeviceTest, dcamera_device_test_023, TestSize.Level1)
     metaData->addEntry(OHOS_CONTROL_CAMERA_SWITCH_INFOS, rotate, 1);
     dcameraDevice_->isOpened_ = true;
     bool ret = OHOS::Camera::MetadataUtils::ConvertMetadataToVec(metaData, settings);
-    if (!ret) {
-        EXPECT_EQ(ret, CamRetCode::NO_ERROR);
-        return;
-    }
+    ASSERT_TRUE(ret);
     int32_t rc = dcameraDevice_->UpdateSettings(settings);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
