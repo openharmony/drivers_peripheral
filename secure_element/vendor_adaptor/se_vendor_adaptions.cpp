@@ -37,7 +37,7 @@ namespace SecureElement {
 static sptr<ISecureElementCallback> g_callbackV1_0 = nullptr;
 static std::mutex g_mutex {};
 #ifdef SE_VENDOR_ADAPTION_USE_CA
-static const int RES_BUFFER_MAX_LENGTH = 512;
+static const int RES_BUFFER_MAX_LENGTH = 4096;
 static const uint16_t SW1_OFFSET = 2;
 static const uint16_t SW2_OFFSET = 1;
 static const uint16_t MAX_CHANNEL_NUM = 4;
@@ -82,9 +82,9 @@ int32_t SeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
 {
     HDF_LOGD("SeVendorAdaptions:getAtr!");
 #ifdef SE_VENDOR_ADAPTION_USE_CA
-    uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
+    std::vector<uint8_t> res(RES_BUFFER_MAX_LENGTH);
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
-    int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaGetAtr(res, &resLen);
+    int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaGetAtr(res.data(), &resLen);
     if (resLen <= RES_BUFFER_MAX_LENGTH) {
         for (uint32_t i = 0; i < resLen; i++) {
             response.push_back(res[i]);
@@ -120,11 +120,11 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
         return HDF_ERR_INVALID_PARAM;
     }
 #ifdef SE_VENDOR_ADAPTION_USE_CA
-    uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
+    std::vector<uint8_t> res(RES_BUFFER_MAX_LENGTH);
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
     uint32_t channelCreated = MAX_CHANNEL_SIZE + 1;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaOpenLogicalChannel(
-        (uint8_t *)&aid[0], aid.size(), p2, res, &resLen, &channelCreated);
+        (uint8_t *)&aid[0], aid.size(), p2, res.data(), &resLen, &channelCreated);
     if (resLen <= RES_BUFFER_MAX_LENGTH) {
         for (uint32_t i = 0; i < resLen; i++) {
             response.push_back(res[i]);
@@ -171,10 +171,10 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
         return HDF_ERR_INVALID_PARAM;
     }
 #ifdef SE_VENDOR_ADAPTION_USE_CA
-    uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
+    std::vector<uint8_t> res(RES_BUFFER_MAX_LENGTH);
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaOpenBasicChannel(
-        (uint8_t *)&aid[0], aid.size(), res, &resLen);
+        (uint8_t *)&aid[0], aid.size(), res.data(), &resLen);
     if (resLen <= RES_BUFFER_MAX_LENGTH) {
         for (uint32_t i = 0; i < resLen; i++) {
             response.push_back(res[i]);
@@ -237,7 +237,7 @@ int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::ve
     HDF_LOGD("SeVendorAdaptions:transmit!");
     std::lock_guard<std::mutex> lock(g_mutex);
 #ifdef SE_VENDOR_ADAPTION_USE_CA
-    uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
+    std::vector<uint8_t> res(RES_BUFFER_MAX_LENGTH);
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
     if (command.empty()) {
         HDF_LOGE("transmit command is empty");
@@ -245,7 +245,7 @@ int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::ve
         return HDF_FAILURE;
     }
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaTransmit(
-        (uint8_t *)&command[0], command.size(), res, &resLen);
+        (uint8_t *)&command[0], command.size(), res.data(), &resLen);
     if (resLen <= RES_BUFFER_MAX_LENGTH) {
         for (uint32_t i = 0; i < resLen; i++) {
             response.push_back(res[i]);
