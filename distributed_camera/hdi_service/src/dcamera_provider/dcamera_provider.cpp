@@ -238,6 +238,8 @@ int32_t DCameraProvider::Notify(const DHBase& dhBase, const DCameraHDFEvent& eve
 
     if (event.type_ == DCAMERE_FORCE_SWITCH) {
         sptr<IDCameraProviderCallback> callback = GetCallbackBydhBase(dhBase);
+        CHECK_NULL_RETURN_LOG(callback, DCamRetCode::INVALID_ARGUMENT,
+            "DCameraProvider::Notify failed, dcamera provider callback not found.");
         callback->NotifyEvent(dhBase, event);
         return DCamRetCode::SUCCESS;
     }
@@ -420,12 +422,18 @@ int32_t DCameraProvider::UpdateSettings(const DHBase &dhBase, const std::vector<
 
 bool DCameraProvider::IsForceSwitch()
 {
-    return isForceSwitch_;
+    return isSystemSwitch_;
 }
 
-int32_t DCameraProvider::SetForceSwitch(bool forceSwitch)
+int32_t DCameraProvider::GetSystemSwitchRotation()
 {
-    isForceSwitch_ = forceSwitch;
+    return systemSwitchRotation_;
+}
+
+int32_t DCameraProvider::SetForceSwitch(bool isSystemSwitch, int32_t systemSwitchRotation)
+{
+    isSystemSwitch_ = isSystemSwitch;
+    systemSwitchRotation_ = systemSwitchRotation;
     return DCamRetCode::SUCCESS;
 }
 

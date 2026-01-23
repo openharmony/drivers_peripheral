@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL3_H
-#define OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL3_H
+#ifndef OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H
+#define OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H
 
 #include <hdf_base.h>
 #include "v3_0/isensor_callback.h"
@@ -27,18 +27,37 @@
 
 #define DATA_LEN 256
 
+using OHOS::HDI::Sensor::V3_0::DeviceSensorInfo;
+using OHOS::HDI::Sensor::V1_1::SensorInterval;
+struct SubscribedSensor {
+    DeviceSensorInfo deviceSensorInfo;
+    SensorInterval sensorInterval;
+    int32_t sensorDataCount = 0;
+    int32_t sensorDataCountOld = 0;
+    int32_t expectedMinCount = 0;
+    int32_t expectedMaxCount = 0;
+};
+
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V3_0 {
-class SensorCallbackImpl3 : public ISensorCallback {
+class SensorCallbackImpl : public ISensorCallback {
 public:
-    virtual ~SensorCallbackImpl3() {}
+    virtual ~SensorCallbackImpl() {}
+
+    int32_t callbackId = 0;
+    std::vector<SubscribedSensor> subscribedSensors;
+    bool printDataFlag = false;
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override
     {
         PrintData(event);
-        sensorDataCount++;
+        for (auto& it : subscribedSensors) {
+            if (it.deviceSensorInfo.sensorType == event.deviceSensorInfo.sensorType) {
+                it.sensorDataCount++;
+            }
+        }
         return HDF_SUCCESS;
     }
 
@@ -47,16 +66,13 @@ public:
         return HDF_SUCCESS;
     }
 
-    static int32_t sensorDataCount;
-    static int32_t sensorDataCountOld;
-    static bool printDataFlag;
     void PrintData(const HdfSensorEvents &event)
     {
         std::string st = {0};
         DataToStr(st, event);
         if (printDataFlag) {
             printf("%s: %s\n", __func__, st.c_str());
-            HDF_LOGI("%{public}s: testcase3 %{public}s\n", __func__, st.c_str());
+            HDF_LOGI("%{public}s: testcase %{public}s\n", __func__, st.c_str());
         }
     }
 
@@ -97,4 +113,4 @@ public:
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V1_1_SENSORCALLBACKIMPL3_H
+#endif // OHOS_HDI_SENSOR_V1_1_SENSORCALLBACKIMPL_H

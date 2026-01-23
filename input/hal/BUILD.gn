@@ -20,7 +20,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "include",
       "$INPUT_ROOT_DIR/interfaces/include",
-      "//third_party/bounds_checking_function/include",
     ]
   }
 
@@ -35,10 +34,10 @@ if (defined(ohos_lite)) {
     public_configs = [ ":input_hdi_public_config" ]
     include_dirs = []
 
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
+      "bounds_checking_function:libsec_shared",
     ]
     defines = [ "__USER__" ]
 

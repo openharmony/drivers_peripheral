@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v4_0/user_auth_interface_service.h"
+#include "v4_1/user_auth_interface_service.h"
 
 #include <cinttypes>
 #include <mutex>
@@ -311,7 +311,8 @@ static int32_t SetAttributeToVerifierExecMsg(AuthParamHal paramHal, HdiScheduleI
     return ret;
 }
 
-static int32_t SetAttributeToExtraInfo(HdiScheduleInfo &info, uint32_t capabilityLevel, uint64_t scheduleId)
+static int32_t SetAttributeToExtraInfo(
+    const std::vector<uint8_t> &authToken, HdiScheduleInfo &info, uint32_t capabilityLevel, uint64_t scheduleId)
 {
     Attribute *attribute = CreateEmptyAttribute();
     IF_TRUE_LOGE_AND_RETURN_VAL(attribute == nullptr, RESULT_GENERAL_ERROR);
@@ -327,6 +328,14 @@ static int32_t SetAttributeToExtraInfo(HdiScheduleInfo &info, uint32_t capabilit
             SetAttributeUint32(attribute, ATTR_CAPABILITY_LEVEL, capabilityLevel) != RESULT_SUCCESS) {
             IAM_LOGE("SetAttributeUint32 capabilityLevel failed");
             break;
+        }
+        if (authToken.size() == sizeof(UserAuthTokenHal)) {
+            const UserAuthTokenHal *userAuthTokenHal = (const UserAuthTokenHal *)(authToken.data());
+            if (SetAttributeUint32(attribute, ATTR_AUTH_TRUST_LEVEL, userAuthTokenHal->tokenDataPlain.authTrustLevel) !=
+                RESULT_SUCCESS) {
+                IAM_LOGE("SetAttributeUint32 authTrustLevel failed");
+                break;
+            }
         }
         if (SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, scheduleId) != RESULT_SUCCESS) {
             IAM_LOGE("SetAttributeUint64 scheduleId failed");
@@ -350,59 +359,71 @@ static int32_t SetAttributeToExtraInfo(HdiScheduleInfo &info, uint32_t capabilit
     return ret;
 }
 
-static int32_t SetAttributeToAllInOneExecMsg(AuthParamHal paramHal, HdiScheduleInfo &info, Uint8Array *retExtraInfo)
+static int32_t SetExecutoAttributes(AuthParamHal &paramHal, HdiScheduleInfo &info, Attribute *attribute)
 {
+    Uint64Array templateIdsIn = {info.templateIds.data(), info.templateIds.size()};
+    if (SetAttributeUint64Array(attribute, ATTR_TEMPLATE_ID_LIST, templateIdsIn) != RESULT_SUCCESS) {
+        IAM_LOGE("SetAttributeUint64Array templateIdsIn failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
     uint32_t capabilityLevel = INVALID_CAPABILITY_LEVEL;
     int32_t result = GetCapabilityLevel(paramHal.userId, info, capabilityLevel);
     if (result != RESULT_SUCCESS) {
         IAM_LOGE("GetCapabilityLevel fail");
         return result;
     }
+    if (capabilityLevel != INVALID_CAPABILITY_LEVEL &&
+        SetAttributeUint32(attribute, ATTR_CAPABILITY_LEVEL, capabilityLevel) != RESULT_SUCCESS) {
+        IAM_LOGE("SetAttributeUint32 capabilityLevel failed");
+        return RESULT_GENERAL_ERROR;
+    }
 
+    if (SetAttributeUint32(attribute, ATTR_AUTH_TRUST_LEVEL, paramHal.authTrustLevel) != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint32 authTrustLevel failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    if (SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, info.scheduleId) != RESULT_SUCCESS) {
+        IAM_LOGE("SetAttributeUint64 scheduleId failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    if (SetAttributeUint64(attribute, ATTR_EXPIRED_SYS_TIME, GetExpiredSysTime(paramHal)) != RESULT_SUCCESS) {
+        IAM_LOGE("SetAttributeUint64 authExpiredSysTime failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    Uint8Array challenge = { paramHal.challenge, CHALLENGE_LEN };
+    if (SetAttributeUint8Array(attribute, ATTR_CHALLENGE, challenge) != RESULT_SUCCESS) {
+        IAM_LOGE("SetAttributeUint8Array challenge failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    if (SetAttributeInt32(attribute, ATTR_AUTH_PURPOSE, paramHal.authIntent) != RESULT_SUCCESS) {
+        IAM_LOGE("SetAttributeInt32 auth purpose failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
+}
+
+static int32_t SetAttributeToAllInOneExecMsg(AuthParamHal paramHal, HdiScheduleInfo &info, Uint8Array *retExtraInfo)
+{
     Attribute *attribute = CreateEmptyAttribute();
     IF_TRUE_LOGE_AND_RETURN_VAL(attribute == nullptr, RESULT_GENERAL_ERROR);
-
-    ResultCode ret = RESULT_GENERAL_ERROR;
-    do {
-        Uint64Array templateIdsIn = {info.templateIds.data(), info.templateIds.size()};
-        if (SetAttributeUint64Array(attribute, ATTR_TEMPLATE_ID_LIST, templateIdsIn) != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint64Array templateIdsIn failed");
-            break;
-        }
-        if (capabilityLevel != INVALID_CAPABILITY_LEVEL &&
-            SetAttributeUint32(attribute, ATTR_CAPABILITY_LEVEL, capabilityLevel) != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint32 capabilityLevel failed");
-            break;
-        }
-        if (SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, info.scheduleId) != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint64 scheduleId failed");
-            break;
-        }
-
-        if (SetAttributeUint64(attribute, ATTR_EXPIRED_SYS_TIME, GetExpiredSysTime(paramHal)) != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint64 authExpiredSysTime failed");
-            break;
-        }
-
-        Uint8Array challenge = { paramHal.challenge, CHALLENGE_LEN };
-        if (SetAttributeUint8Array(attribute, ATTR_CHALLENGE, challenge) != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint8Array challenge failed");
-            break;
-        }
-        if (SetAttributeInt32(attribute, ATTR_AUTH_PURPOSE, paramHal.authIntent) != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint32 auth purpose failed");
-            break;
-        }
-        SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
-        if (GetAttributeExecutorMsg(attribute, retExtraInfo, signParam) != RESULT_SUCCESS) {
-            IAM_LOGE("GetAttributeExecutorMsg failed");
-            break;
-        }
-        ret = RESULT_SUCCESS;
-    } while (0);
-
+    if (SetExecutoAttributes(paramHal, info, attribute) != RESULT_SUCCESS) {
+        IAM_LOGE("SetExecutoAttributes failed");
+        FreeAttribute(&attribute);
+        return RESULT_GENERAL_ERROR;
+    }
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+    if (GetAttributeExecutorMsg(attribute, retExtraInfo, signParam) != RESULT_SUCCESS) {
+        IAM_LOGE("GetAttributeExecutorMsg failed");
+        FreeAttribute(&attribute);
+        return RESULT_GENERAL_ERROR;
+    }
     FreeAttribute(&attribute);
-    return ret;
+    return RESULT_SUCCESS;
 }
 
 static int32_t GetAuthExecutorMsg(uint32_t executorRole, AuthParamHal paramHal,
@@ -524,8 +545,7 @@ static bool CopyAuthScheduleInfo(AuthParamHal paramHal, const CoAuthSchedule *in
     return true;
 }
 
-static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
-    AuthParamHal &paramHal)
+static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParamExt &param, AuthParamHal &paramHal)
 {
     paramHal.contextId = contextId;
     paramHal.userId = param.baseParam.userId;
@@ -558,10 +578,9 @@ static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const HdiAuthParam &param,
+static int32_t BeginAuthenticationInner(uint64_t contextId, const HdiAuthParamExt &param,
     std::vector<HdiScheduleInfo> &infos)
 {
-    IAM_LOGI("start");
     infos.clear();
     AuthParamHal paramHal = {};
     int32_t ret = CopyAuthParamToHal(contextId, param, paramHal);
@@ -602,6 +621,36 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     return ret;
 }
 
+int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const HdiAuthParam &param,
+    std::vector<HdiScheduleInfo> &infos)
+{
+    IAM_LOGI("start");
+    HdiAuthParamExt paramExt = {
+        .baseParam = {
+            .userId = param.baseParam.userId,
+            .authTrustLevel = param.baseParam.authTrustLevel,
+            .executorSensorHint = param.baseParam.executorSensorHint,
+            .challenge = param.baseParam.challenge,
+            .callerName = param.baseParam.callerName,
+            .callerType = param.baseParam.callerType,
+            .apiVersion = param.baseParam.apiVersion,
+        },
+        .authType = param.authType,
+        .authIntent = param.authIntent,
+        .isOsAccountVerified = param.isOsAccountVerified,
+        .collectorUdid = param.collectorUdid,
+        .credentialIdList = {},
+    };
+    return BeginAuthenticationInner(contextId, paramExt, infos);
+}
+
+int32_t UserAuthInterfaceService::BeginAuthenticationExt(uint64_t contextId, const HdiAuthParamExt &param,
+    std::vector<HdiScheduleInfo> &infos)
+{
+    IAM_LOGI("start");
+    return BeginAuthenticationInner(contextId, param, infos);
+}
+
 int32_t UserAuthInterfaceService::GetAllUserInfo(std::vector<UserInfo> &userInfos)
 {
     IAM_LOGI("GetAllUserInfo mock start");
@@ -610,7 +659,38 @@ int32_t UserAuthInterfaceService::GetAllUserInfo(std::vector<UserInfo> &userInfo
     return RESULT_SUCCESS;
 }
 
-static int32_t CreateExecutorCommand(int32_t userId, HdiAuthResultInfo &info)
+static ResultCode SetExecutorMsgToResult(
+    AuthPropertyMode authPropMode, LinkedList *executorSendMsg, HdiAuthResultInfo &info)
+{
+    LinkedListNode *temp = executorSendMsg->head;
+    while (temp != nullptr) {
+        if (temp->data == nullptr) {
+            IAM_LOGE("list node is invalid");
+            return RESULT_UNKNOWN;
+        }
+        auto nodeData = static_cast<ExecutorMsg *>(temp->data);
+        Buffer *nodeMsgBuffer = nodeData->msg;
+        if (!IsBufferValid(nodeMsgBuffer)) {
+            IAM_LOGE("node's buffer invalid");
+            return RESULT_UNKNOWN;
+        }
+        HdiExecutorSendMsg msg = {};
+        msg.executorIndex = nodeData->executorIndex;
+        msg.commandId = static_cast<int32_t>(authPropMode);
+        msg.msg.resize(nodeMsgBuffer->contentSize);
+        if (memcpy_s(msg.msg.data(), msg.msg.size(), nodeMsgBuffer->buf, nodeMsgBuffer->contentSize) != EOK) {
+            IAM_LOGE("copy failed");
+            msg.msg.clear();
+            return RESULT_BAD_COPY;
+        }
+        info.msgs.push_back(msg);
+        temp = temp->next;
+    }
+    return RESULT_SUCCESS;
+}
+
+static int32_t CreateExecutorCommand(int32_t userId, uint32_t authType, uint32_t authTrustLevel,
+    HdiAuthResultInfo &info)
 {
     LinkedList *executorSendMsg = nullptr;
     AuthPropertyMode authPropMode;
@@ -621,38 +701,22 @@ static int32_t CreateExecutorCommand(int32_t userId, HdiAuthResultInfo &info)
     } else {
         return RESULT_SUCCESS;
     }
-    ResultCode ret = GetExecutorMsgList(userId, authPropMode, &executorSendMsg);
+    CreateExecutorMsgInfo createInfo = {
+        .userId = userId,
+        .authPropertyMode = authPropMode,
+        .triggerAuthType = authType,
+        .authTrustLevel = authTrustLevel,
+    };
+    ResultCode ret = GetExecutorMsgList(&createInfo, &executorSendMsg);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("get executor msg failed");
         return ret;
     }
-
-    LinkedListNode *temp = executorSendMsg->head;
-    while (temp != nullptr) {
-        if (temp->data == nullptr) {
-            IAM_LOGE("list node is invalid");
-            DestroyLinkedList(executorSendMsg);
-            return RESULT_UNKNOWN;
-        }
-        auto nodeData = static_cast<ExecutorMsg *>(temp->data);
-        Buffer *nodeMsgBuffer = nodeData->msg;
-        if (!IsBufferValid(nodeMsgBuffer)) {
-            IAM_LOGE("node's buffer invalid");
-            DestroyLinkedList(executorSendMsg);
-            return RESULT_UNKNOWN;
-        }
-        HdiExecutorSendMsg msg = {};
-        msg.executorIndex = nodeData->executorIndex;
-        msg.commandId = static_cast<int32_t>(authPropMode);
-        msg.msg.resize(nodeMsgBuffer->contentSize);
-        if (memcpy_s(msg.msg.data(), msg.msg.size(), nodeMsgBuffer->buf, nodeMsgBuffer->contentSize) != EOK) {
-            IAM_LOGE("copy failed");
-            msg.msg.clear();
-            DestroyLinkedList(executorSendMsg);
-            return RESULT_BAD_COPY;
-        }
-        info.msgs.push_back(msg);
-        temp = temp->next;
+    ret = SetExecutorMsgToResult(authPropMode, executorSendMsg, info);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("set executor msg to result failed");
+        DestroyLinkedList(executorSendMsg);
+        return ret;
     }
     DestroyLinkedList(executorSendMsg);
     return RESULT_SUCCESS;
@@ -738,7 +802,8 @@ static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
                 funcRet = RESULT_SUCCESS;
                 break;
             }
-            ret = CreateExecutorCommand(authResult.userId, info);
+            uint32_t authTrustLevel = authTokenHal.tokenDataPlain.authTrustLevel;
+            ret = CreateExecutorCommand(authResult.userId, authResult.authType, authTrustLevel, info);
             if (ret != RESULT_SUCCESS) {
                 IAM_LOGE("create executor command failed");
                 break;
@@ -926,7 +991,7 @@ int32_t UserAuthInterfaceService::CloseSession(int32_t userId)
     return CloseEditSession();
 }
 
-static int32_t CheckOperatePermission(const std::vector<uint8_t> &authToken, const HdiEnrollParam &param,
+static int32_t CheckOperatePermission(const std::vector<uint8_t> &authToken, const HdiEnrollParamExt &param,
     PermissionCheckParam *checkParam, ScheduleType *scheduleType)
 {
     IAM_LOGI("start");
@@ -964,10 +1029,9 @@ static int32_t CheckOperatePermission(const std::vector<uint8_t> &authToken, con
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::BeginEnrollment(
-    const std::vector<uint8_t> &authToken, const HdiEnrollParam &param, HdiScheduleInfo &info)
+static int32_t BeginEnrollmentInner(
+    const std::vector<uint8_t> &authToken, const HdiEnrollParamExt &param, HdiScheduleInfo &info)
 {
-    IAM_LOGI("start");
     PermissionCheckParam checkParam = {};
     ScheduleType scheduleType = SCHEDULE_TYPE_ENROLL;
     int32_t ret = CheckOperatePermission(authToken, param, &checkParam, &scheduleType);
@@ -987,7 +1051,7 @@ int32_t UserAuthInterfaceService::BeginEnrollment(
         BreakOffCoauthSchedule();
         return RESULT_BAD_COPY;
     }
-    ret = SetAttributeToExtraInfo(info, INVALID_CAPABILITY_LEVEL, scheduleInfo->scheduleId);
+    ret = SetAttributeToExtraInfo(authToken, info, INVALID_CAPABILITY_LEVEL, scheduleInfo->scheduleId);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetAttributeToExtraInfo failed");
         BreakOffCoauthSchedule();
@@ -995,6 +1059,31 @@ int32_t UserAuthInterfaceService::BeginEnrollment(
     DestroyCoAuthSchedule(scheduleInfo);
     IAM_LOGI("end");
     return ret;
+}
+
+int32_t UserAuthInterfaceService::BeginEnrollment(
+    const std::vector<uint8_t> &authToken, const HdiEnrollParam &param, HdiScheduleInfo &info)
+{
+    IAM_LOGI("start");
+    HdiEnrollParamExt paramExt = {
+        .authType = param.authType,
+        .executorSensorHint = param.executorSensorHint,
+        .callerName = param.callerName,
+        .callerType = param.callerType,
+        .apiVersion = param.apiVersion,
+        .userId = param.userId,
+        .userType = param.userType,
+        .authSubType = param.authSubType,
+        .additionalInfo = "",
+    };
+    return BeginEnrollmentInner(authToken, paramExt, info);
+}
+
+int32_t UserAuthInterfaceService::BeginEnrollmentExt(
+    const std::vector<uint8_t> &authToken, const HdiEnrollParamExt &param, HdiScheduleInfo &info)
+{
+    IAM_LOGI("start");
+    return BeginEnrollmentInner(authToken, param, info);
 }
 
 int32_t UserAuthInterfaceService::CancelEnrollment(int32_t userId)
@@ -1761,8 +1850,8 @@ static void DestroyAuthResultParam(AuthResultParam *result)
     Free(result);
 }
 
-int32_t UserAuthInterfaceService::GetAuthResultFromMessage(const std::string& remoteUdid,
-    const std::vector<uint8_t>& message, HdiAuthResultInfo& authResultInfo)
+int32_t UserAuthInterfaceService::GetAuthResultFromMessage(const std::string &remoteUdid,
+    const std::vector<uint8_t> &message, HdiAuthResultInfo &authResultInfo)
 {
     IAM_LOGI("GetAuthResultFromMessage start");
     if ((g_localUdid.empty()) || (remoteUdid.empty()) || (message.size() == 0)) {
@@ -1782,7 +1871,6 @@ int32_t UserAuthInterfaceService::GetAuthResultFromMessage(const std::string& re
         return RESULT_GENERAL_ERROR;
     }
 
-    int32_t funcRet = RESULT_GENERAL_ERROR;
     int32_t ret = RESULT_GENERAL_ERROR;
     if (memcpy_s(authResultParam->localUdid, sizeof(authResultParam->localUdid), g_localUdid.c_str(),
         g_localUdid.length()) != EOK) {
@@ -1805,13 +1893,7 @@ int32_t UserAuthInterfaceService::GetAuthResultFromMessage(const std::string& re
         IAM_LOGE("copy authResult info failed");
         goto FAIL;
     }
-    ret = CreateExecutorCommand(authResultInfo.userId, authResultInfo);
-    if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("CreateExecutorCommand failed");
-        goto FAIL;
-    }
 
-    funcRet = RESULT_SUCCESS;
 FAIL:
     DestoryBuffer(messageBuffer);
     DestroyAuthResultParam(authResultParam);

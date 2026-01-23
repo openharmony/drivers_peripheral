@@ -13,5 +13,8 @@
 
 group("hdf_disp_buffer_fuzztest") {
   testonly = true
-  deps = [ "metadata_fuzzer:fuzztest" ]
+  deps = [ 
+    "metadata_fuzzer:fuzztest",
+    "allocator_fuzzer:fuzztest",
+]
 }

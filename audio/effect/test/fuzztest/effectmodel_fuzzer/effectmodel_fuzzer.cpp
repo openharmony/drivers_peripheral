@@ -51,6 +51,10 @@ static uint32_t Convert2Uint32(const uint8_t *ptr)
 void EffectModelFucSwitch(struct IEffectModel *&model, uint32_t cmd, const uint8_t *&rawData, size_t size)
 {
     uint8_t *data = const_cast<uint8_t *>(rawData);
+    uint32_t offset = 0;
+    if (offset + sizeof(char) > size) {
+        return;
+    }
     switch (cmd) {
         case EFFECT_MODEL_IS_SUPPLY_LIBS: {
             bool isSupport = false;
@@ -66,24 +70,36 @@ void EffectModelFucSwitch(struct IEffectModel *&model, uint32_t cmd, const uint8
         case EFFECT_MODEL_CREATE_EFFECT_CONTROLLER: {
             struct IEffectControl *contoller = nullptr;
             struct ControllerId contollerId;
-            struct EffectInfo info = {
-                .libName = reinterpret_cast<char *>(data),
-                .effectId = reinterpret_cast<char *>(data),
-                .ioDirection = 1,
-    };
+            struct EffectInfo info;
+            if (size < sizeof(info.libName) || size < sizeof(info.effectId)) {
+                return;
+            }
+            info.libName = reinterpret_cast<char *>(data + offset);
+            offset += sizeof(char);
+            info.effectId = reinterpret_cast<char *>(data + offset);
+            info.ioDirection = 1;
             model->CreateEffectController(model, &info, &contoller, &contollerId);
             break;
         }
         case EFFECT_MODEL_DESTROY_EFFECT_CONTROLLER: {
-            struct ControllerId contollerId{
-                .libName = reinterpret_cast<char *>(data),
-                .effectId = reinterpret_cast<char *>(data),
-            };
+            if (size < sizeof(ControllerId)) {
+                return;
+            }
+            struct ControllerId contollerId;
+            if (size < sizeof(contollerId.libName) || size < sizeof(contollerId.effectId)) {
+                return;
+            }
+            contollerId.libName = reinterpret_cast<char *>(data + offset);
+            offset += sizeof(char);
+            contollerId.effectId = reinterpret_cast<char *>(data + offset);
             model->DestroyEffectController(model, &contollerId);
             break;
         }
         case EFFECT_MODEL_GET_EFFECT_DESCRIPTOR: {
             struct EffectControllerDescriptor desc;
+            if (size < sizeof(desc)) {
+                return;
+            }
             model->GetEffectDescriptor(model, reinterpret_cast<const char *>(data), &desc);
             break;
         }
@@ -125,7 +141,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    for (int i = 0; i < size - 1; i++) {
+    for (int i = 0; i < static_cast<int>(size - 1); i++) {
         if (data[i] == '\0') {
             return 0;
         }

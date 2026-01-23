@@ -16,8 +16,8 @@
 #include <gtest/gtest.h>
 #include <climits>
 #include "osal_mem.h"
-#include "v5_0/iaudio_capture.h"
-#include "v5_0/iaudio_manager.h"
+#include "v6_0/iaudio_capture.h"
+#include "v6_0/iaudio_manager.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -916,6 +916,71 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectSceneInValid001, TestSize.Leve
     free(sceneDesc.desc.desc);
 }
 
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectSceneInValid002, TestSize.Level0)
+{
+    ASSERT_NE(capture_->SelectScene, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    sceneDesc.desc.pins = PIN_IN_HS_MIC;
+    sceneDesc.desc.desc = strdup("");
+
+    int32_t ret = capture_->SelectScene(capture_, &sceneDesc);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectSceneInValid003, TestSize.Level0)
+{
+    ASSERT_NE(capture_->SelectScene, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    sceneDesc.desc.pins = PIN_IN_LINEIN;
+    sceneDesc.desc.desc = strdup("");
+
+    int32_t ret = capture_->SelectScene(capture_, &sceneDesc);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectSceneInValid004, TestSize.Level0)
+{
+    ASSERT_NE(capture_->SelectScene, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    sceneDesc.desc.pins = PIN_IN_USB_EXT;
+    sceneDesc.desc.desc = strdup("");
+
+    int32_t ret = capture_->SelectScene(capture_, &sceneDesc);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectSceneInValid005, TestSize.Level0)
+{
+    ASSERT_NE(capture_->SelectScene, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    sceneDesc.desc.pins = PIN_IN_BLUETOOTH_SCO_HEADSET;
+    sceneDesc.desc.desc = strdup("");
+
+    int32_t ret = capture_->SelectScene(capture_, &sceneDesc);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectSceneInValid006, TestSize.Level0)
+{
+    ASSERT_NE(capture_->SelectScene, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    sceneDesc.desc.pins = PIN_IN_USB_HEADSET;
+    sceneDesc.desc.desc = strdup("");
+
+    int32_t ret = capture_->SelectScene(capture_, &sceneDesc);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
 /* capture get version cases */
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetVersion001, TestSize.Level0)
 {
@@ -1043,12 +1108,152 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityException001, Te
     free(sceneDesc.desc.desc);
 }
 
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityException002, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_HS_MIC;
+    sceneDesc.desc.desc = strdup("");
+    sceneDesc.scene.id = AUDIO_IN_COMMUNICATION;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityException003, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_LINEIN;
+    sceneDesc.desc.desc = strdup("");
+    sceneDesc.scene.id = AUDIO_IN_COMMUNICATION;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityException004, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_USB_EXT;
+    sceneDesc.desc.desc = strdup("");
+    sceneDesc.scene.id = AUDIO_IN_COMMUNICATION;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityException005, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_BLUETOOTH_SCO_HEADSET;
+    sceneDesc.desc.desc = strdup("");
+    sceneDesc.scene.id = AUDIO_IN_COMMUNICATION;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityException006, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_USB_HEADSET;
+    sceneDesc.desc.desc = strdup("");
+    sceneDesc.scene.id = AUDIO_IN_COMMUNICATION;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    free(sceneDesc.desc.desc);
+}
+
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityInValid001, TestSize.Level0)
 {
     ASSERT_NE(capture_->CheckSceneCapability, nullptr);
     struct AudioSceneDescriptor sceneDesc = {};
     sceneDesc.desc.pins = PIN_IN_MIC;
     sceneDesc.desc.desc = strdup("mic");
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityInValid002, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_HS_MIC;
+    sceneDesc.desc.desc = strdup("");
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityInValid003, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_LINEIN;
+    sceneDesc.desc.desc = strdup("");
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityInValid004, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_BLUETOOTH_SCO_HEADSET;
+    sceneDesc.desc.desc = strdup("");
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityInValid005, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_USB_EXT;
+    sceneDesc.desc.desc = strdup("");
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityInValid006, TestSize.Level0)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_USB_HEADSET;
+    sceneDesc.desc.desc = strdup("");
     sceneDesc.scene.id = INVALID_SCENE_ID;
     bool isSupport = false;
 

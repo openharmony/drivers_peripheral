@@ -42,6 +42,7 @@ namespace {
 static constexpr uint32_t MAX_AUDIO_STREAM_NUM = 10;
 const std::string STREAM_TYPE_CHANGE = "stream_type_change";
 const std::string STREAM_USAGE_CHANGE = "stream_usage_change";
+const std::string ZONE_ID_CHANGE = "zone_id_change";
 
 struct StreamStatusNoifyResult {
     uint32_t renderId = 0;
@@ -90,7 +91,12 @@ void AudioAdapterInterfaceImpl::SetSpeakerCallback(const int32_t dhId, const spt
         return;
     }
     std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+    if (extCallbackMap_.find(dhId) != extCallbackMap_.end()) {
+        DHLOGI("The callback of daudio is already set.");
+        return;
+    }
     extCallbackMap_[dhId] = spkCallback;
+    sinkDhId_ = dhId;
 }
 
 void AudioAdapterInterfaceImpl::SetMicCallback(const int32_t dhId, const sptr<IDAudioCallback> &micCallback)
@@ -259,8 +265,11 @@ int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
         audioRender = renderDevs_[renderId].second;
         dhId = renderDevs_[renderId].first;
     }
-    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
-    sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[dhId]);
+    sptr<IDAudioCallback> extSpkCallback(nullptr);
+    {
+        std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+        extSpkCallback = extCallbackMap_[dhId];
+    }
     if (audioRender == nullptr) {
         DHLOGD("Render has not been created, do not need destroy.");
         return HDF_SUCCESS;
@@ -385,8 +394,11 @@ int32_t AudioAdapterInterfaceImpl::DestroyCapture(uint32_t captureId)
         audioCapture = captureDevs_[captureId].second;
         dhId = captureDevs_[captureId].first;
     }
-    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
-    sptr<IDAudioCallback> extMicCallback(extCallbackMap_[dhId]);
+    sptr<IDAudioCallback> extMicCallback(nullptr);
+    {
+        std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+        extMicCallback = extCallbackMap_[dhId];
+    }
     if (audioCapture == nullptr) {
         DHLOGD("Capture has not been created, do not need destroy.");
         return HDF_SUCCESS;
@@ -443,14 +455,26 @@ int32_t AudioAdapterInterfaceImpl::GetDeviceStatus(AudioDeviceStatus& status)
 
 int32_t AudioAdapterInterfaceImpl::UpdateAudioRoute(const AudioRoute &route, int32_t &routeHandle)
 {
-    (void) route;
-    (void) routeHandle;
+    CHECK_AND_RETURN_RET_LOG(route.sinks.size() == 0, HDF_FAILURE, "route sinks is empty!");
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+    auto iter = extCallbackMap_.find(sinkDhId_);
+    CHECK_AND_RETURN_RET_LOG(iter == extCallbackMap_.end(), HDF_FAILURE, "cant't find callback.");
+    DAudioEvent event = { HDF_AUDIO_UPDATE_AUDIO_ROUTE, "" };
+    CHECK_AND_RETURN_RET_LOG(iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE,
+        "Update audio route failed.");
+    ++routeHandle;
     return HDF_SUCCESS;
 }
 
 int32_t AudioAdapterInterfaceImpl::ReleaseAudioRoute(int32_t routeHandle)
 {
     (void) routeHandle;
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+    auto iter = extCallbackMap_.find(sinkDhId_);
+    CHECK_AND_RETURN_RET_LOG(iter == extCallbackMap_.end(), HDF_FAILURE, "cant't find callback.");
+    DAudioEvent event = { HDF_AUDIO_RELEASE_AUDIO_ROUTE, "" };
+    CHECK_AND_RETURN_RET_LOG(iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE,
+        "Release audio route failed.");
     return HDF_SUCCESS;
 }
 
@@ -493,6 +517,13 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
                 return HDF_FAILURE;
             }
             break;
+        case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE:
+            ret = SetUsualParamChange(condition, value);
+            if (ret != DH_SUCCESS) {
+                DHLOGE("set usual param notify failed.");
+                return HDF_FAILURE;
+            }
+            break;
         default:
             DHLOGE("Parameter is invalid.");
             return HDF_ERR_INVALID_PARAM;
@@ -513,6 +544,9 @@ int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const st
                 DHLOGE("Get audio parameters failed.");
                 return HDF_FAILURE;
             }
+            break;
+        case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_CAPABILITY:
+            value = capability_;
             break;
         default:
             DHLOGE("Parameter is invalid.");
@@ -574,6 +608,9 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t s
         case HDF_AUDIO_EVENT_VOLUME_CHANGE:
             DHLOGI("Notify event: VOLUME_CHANGE, event content: %{public}s.", event.content.c_str());
             return HandleVolumeChangeEvent(event);
+        case HDF_AUDIO_EVNET_MUTE_SET:
+            DHLOGI("Notify event: MUTE_SET, event content: %{public}s.", event.content.c_str());
+            return HandleMuteSetEvent(event);
         case HDF_AUDIO_EVENT_FOCUS_CHANGE:
             DHLOGI("Notify event: FOCUS_CHANGE, event content: %{public}s.", event.content.c_str());
             return HandleFocusChangeEvent(streamId, event, devId);
@@ -593,6 +630,8 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t s
         case HDF_AUDIO_EVENT_FULL:
         case HDF_AUDIO_EVENT_NEED_DATA:
             return HandleRenderCallback(streamId, event);
+        case HDF_AUDIO_EVENT_WAUDIO_ENABLE:
+            return HandleWaudioEnable(event);
         default:
             DHLOGE("Audio event: %{public}d is undefined.", event.type);
             return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
@@ -610,6 +649,7 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
         return DH_SUCCESS;
     }
     mapAudioDevice_.insert(std::make_pair(devId, caps));
+    capability_ = caps;
 
     DHLOGI("Add audio device success.");
     return DH_SUCCESS;
@@ -853,19 +893,25 @@ int32_t AudioAdapterInterfaceImpl::SetStreamStatusChange(const std::string &cond
         DHLOGE("convert the value failed");
         return ERR_DH_AUDIO_HDF_FAIL;
     }
+    if (!IsIdValid(convertRes.renderId)) {
+        DHLOGE("the renderId is invalid");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
     event.content = convertRes.streamInfoVal;
+    int32_t hdid = 0;
+    sptr<AudioRenderInterfaceImplBase> render(nullptr);
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
-        int32_t hdid = renderDevs_[convertRes.renderId].first;
-        auto render = renderDevs_[convertRes.renderId].second;
-        std::lock_guard<std::mutex> callback(extCallbackMtx_);
-        const auto &extSpkCallback = extCallbackMap_[hdid];
-        if (render == nullptr
-            || extSpkCallback == nullptr
-            || extSpkCallback->NotifyEvent(convertRes.renderId, event) != HDF_SUCCESS) {
-            DHLOGE("noitfy failed");
-            return ERR_DH_AUDIO_HDF_FAIL;
-        }
+        hdid = renderDevs_[convertRes.renderId].first;
+        render = renderDevs_[convertRes.renderId].second;
+    }
+    std::lock_guard<std::mutex> callback(extCallbackMtx_);
+    const auto &extSpkCallback = extCallbackMap_[hdid];
+    if (render == nullptr
+        || extSpkCallback == nullptr
+        || extSpkCallback->NotifyEvent(convertRes.renderId, event) != HDF_SUCCESS) {
+        DHLOGE("noitfy failed");
+        return ERR_DH_AUDIO_HDF_FAIL;
     }
     return DH_SUCCESS;
 }
@@ -875,6 +921,7 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
     std::string content = condition;
     int32_t type = getEventTypeFromCondition(content);
     EXT_PARAM_EVENT eventType;
+    bool isControlRemote = (condition.find(CONTROL) != std::string::npos);
 
     if (type == VolumeEventType::EVENT_IS_STREAM_MUTE) {
         if (param == IS_MUTE_STATUS) {
@@ -895,19 +942,27 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
     DAudioEvent event = { eventType, content };
 
     {
-        std::lock_guard<std::mutex> devLck(renderDevMtx_);
         for (uint32_t id = 0; id < MAX_AUDIO_STREAM_NUM; id++) {
-            const auto &item = renderDevs_[id];
+            sptr<AudioRenderInterfaceImplBase> audioRender(nullptr);
+            int32_t hdid = 0;
+            {
+                std::lock_guard<std::mutex> devLck(renderDevMtx_);
+                hdid = renderDevs_[id].first;
+                audioRender = renderDevs_[id].second;
+            }
             std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
-            sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[item.first]);
-            SetAudioParamStr(event.content, "dhId", std::to_string(item.first));
-            auto render = item.second;
-            if (render == nullptr || extSpkCallback == nullptr) {
+            sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[hdid]);
+            SetAudioParamStr(event.content, "dhId", std::to_string(hdid));
+            if (audioRender == nullptr || extSpkCallback == nullptr) {
                 continue;
             }
-            if (extSpkCallback->NotifyEvent(id, event) != HDF_SUCCESS) {
-                DHLOGE("NotifyEvent failed.");
-                return ERR_DH_AUDIO_HDF_FAIL;
+            if ((isControlRemote ? extSpkCallback->NotifyEvent(-1, event) :
+                extSpkCallback->NotifyEvent(id, event)) != HDF_SUCCESS) {
+                    DHLOGE("NotifyEvent failed.");
+                    return ERR_DH_AUDIO_HDF_FAIL;
+            }
+            if (isControlRemote) {
+                break;
             }
         }
     }
@@ -1107,6 +1162,40 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
     return DH_SUCCESS;
 }
 
+int32_t AudioAdapterInterfaceImpl::HandleMuteSetEvent(const DAudioEvent &event)
+{
+    DHLOGI("Mute set event (%{public}s).", event.content.c_str());
+    sptr<AudioRenderInterfaceImplBase> audioRender = GetRenderImpl(event.content);
+    if (audioRender == nullptr) {
+        DHLOGE("Render is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
+    int32_t isMute = 0;
+    int32_t ret = GetVolFromEvent(event.content, STREAM_MUTE_STATUS, isMute);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Get mute status failed.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+
+    std::stringstream ss;
+    ss << MUTE_CHANGE << ";"
+        << AUDIO_STREAM_TYPE << "=" << ParseStringFromArgs(event.content, AUDIO_STREAM_TYPE) << ";"
+        << STREAM_MUTE_STATUS << "=" << ParseStringFromArgs(event.content, STREAM_MUTE_STATUS.c_str()) << ";"
+        << IS_UPDATEUI << "=" << ParseStringFromArgs(event.content, IS_UPDATEUI) << ";"
+        << VOLUME_GROUP_ID << "=" << ParseStringFromArgs(event.content, VOLUME_GROUP_ID.c_str()) << ";"
+        << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
+    DHLOGI("get ss : %{public}s", ss.str().c_str());
+    int8_t reserved = 0;
+    int8_t cookie = 0;
+    ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_VOLUME, ss.str(), std::to_string(isMute),
+        reserved, cookie);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Notify mute failed.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    return DH_SUCCESS;
+}
+
 int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const uint32_t streamId, const DAudioEvent &event,
     const uint32_t devId)
 {
@@ -1163,6 +1252,22 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderStateChangeEvent(const DAudioEven
         DHLOGE("Notify render state failed.");
         return ERR_DH_AUDIO_HDF_FAIL;
     }
+    return DH_SUCCESS;
+}
+
+int32_t AudioAdapterInterfaceImpl::HandleWaudioEnable(const DAudioEvent &event)
+{
+    DHLOGI("Waudio enable (%{public}s).", event.content.c_str());
+    CHECK_AND_RETURN_RET_LOG(paramCallback_ == nullptr, ERR_DH_AUDIO_HDF_NULLPTR, "Audio param observer is null.");
+    std::stringstream ss;
+    ss << "ERR_EVENT;DEVICE_TYPE=" << ParseStringFromArgs(event.content, AUDIO_DEVICE_TYPE) << ";"
+        << ROUTE_ENABLE << "=" << ParseStringFromArgs(event.content, ROUTE_ENABLE) << ";";
+    DHLOGI("get ss : %{public}s", ss.str().c_str());
+    int8_t reserved = 0;
+    int8_t cookie = 0;
+    int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(), "", reserved, cookie);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_HDF_FAIL, "Notify waudio enable failed.");
+    DHLOGI("Waudio enable success.");
     return DH_SUCCESS;
 }
 
@@ -1470,6 +1575,26 @@ bool AudioAdapterInterfaceImpl::GetSpkStatus(const uint32_t streamId)
     return spkStatus_[streamId];
 }
 
+int32_t AudioAdapterInterfaceImpl::SetUsualParamChange(const std::string &condition, const std::string &value)
+{
+    DHLOGD("start SetUsualParamChange, %{public}s-%{public}s", condition.c_str(), value.c_str());
+    DAudioEvent event = {
+        .type = HDF_AUDIO_EVENT_PARAM_UNKNOWN,
+        .content = value
+    };
+    if (condition == ZONE_ID_CHANGE) {
+        event.type = HDF_AUDIO_ZONE_ID_CHANGE;
+    } else {
+        DHLOGE("condition not satisfy.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+    auto iter = extCallbackMap_.find(sinkDhId_);
+    CHECK_AND_RETURN_RET_LOG(iter == extCallbackMap_.end(), HDF_FAILURE, "can't find callback.");
+    CHECK_AND_RETURN_RET_LOG(iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE,
+        "set usual param change failed.");
+    return DH_SUCCESS;
+}
 } // V1_0
 } // Audio
 } // Distributedaudio

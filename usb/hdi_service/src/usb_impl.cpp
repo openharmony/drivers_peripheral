@@ -100,9 +100,6 @@ UsbImpl::UsbImpl() : session_(nullptr), device_(nullptr)
 {
     HdfSListInit(&devList_);
     OsalMutexInit(&lock_);
-    if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
-        loadUsbService_.LoadService();
-    }
 }
 
 UsbImpl::~UsbImpl()

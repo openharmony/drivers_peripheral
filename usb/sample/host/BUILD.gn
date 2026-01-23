@@ -16,7 +16,6 @@ if (defined(ohos_lite)) {
 
   ohos_executable("usbhost_ddk_test") {
     include_dirs = [
-      "//third_party/bounds_checking_function/include",
       "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "./include",
       "./../../ddk/common/include",
@@ -34,7 +33,10 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [ "./../../../../../base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "hdf_core:libhdf_utils",
+    ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
 
     install_enable = false

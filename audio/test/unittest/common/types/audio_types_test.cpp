@@ -15,7 +15,7 @@
 
 
 #include <gtest/gtest.h>
-#include "v5_0/audio_types.h"
+#include "v6_0/audio_types.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -269,5 +269,8 @@ HWTEST_F(HdfAudioUtTypesTest, HdfAudioTypesAudioInputType001, TestSize.Level0)
     EXPECT_EQ(AUDIO_INPUT_NOISE_REDUCTION_TYPE, (AudioInputType)(1 << 9));
     EXPECT_EQ(AUDIO_INPUT_RAW_TYPE, (AudioInputType)(1 << 10));
     EXPECT_EQ(AUDIO_INPUT_LIVE_TYPE, (AudioInputType)(1 << 11));
+    EXPECT_EQ(AUDIO_INPUT_VOICE_TRANSCRIPTION, (AudioInputType)(1 << 12));
+    EXPECT_EQ(AUDIO_INPUT_OFFLOAD_CAPTURE_TYPE, (AudioInputType)(1 << 13));
+    EXPECT_EQ(AUDIO_INPUT_ULTRASONIC_TYPE, (AudioInputType)(1 << 14));
 }
 }

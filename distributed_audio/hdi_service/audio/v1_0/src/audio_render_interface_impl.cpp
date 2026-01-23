@@ -514,18 +514,8 @@ int32_t AudioRenderInterfaceImpl::GetCurrentChannelId(uint32_t &channelId)
 int32_t AudioRenderInterfaceImpl::SetExtraParams(const std::string &keyValueList)
 {
     DHLOGI("Set extra parameters, keyValueList: %{public}s", keyValueList.c_str());
-    const std::string startStr = "offloadParams=";
-    if (keyValueList.compare(0, startStr.length(), startStr) == 0) {
-        return SetOffloadParamsChange(keyValueList.substr(startStr.length()));
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t AudioRenderInterfaceImpl::SetOffloadParamsChange(const std::string &offloadParams)
-{
-    DHLOGI("Set offload parameters change, offloadParams: %{public}s", offloadParams.c_str());
-    if (offloadParams.empty()) {
-        DHLOGE("offload params is empty.");
+    if (keyValueList.empty()) {
+        DHLOGE("Extra params is empty.");
         return HDF_FAILURE;
     }
 
@@ -534,10 +524,10 @@ int32_t AudioRenderInterfaceImpl::SetOffloadParamsChange(const std::string &offl
         return HDF_FAILURE;
     }
 
-    DAudioEvent event = { HDF_AUDIO_STREAM_OFFLOAD_PARAMS_CHANGED, offloadParams };
+    DAudioEvent event = { HDF_AUDIO_STREAM_CUSTOM_PARAMS_CHANGED, keyValueList };
     int32_t ret = audioExtCallback_->NotifyEvent(renderId_, event);
     if (ret != HDF_SUCCESS) {
-        DHLOGE("Set offload parameters failed.");
+        DHLOGE("Set Extra parameters failed.");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

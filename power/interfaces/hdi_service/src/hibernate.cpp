@@ -39,6 +39,8 @@
 #include <file_ex.h>
 #include "power_hdf_log.h"
 
+#define DRIVERS_PERIPHERAL_POWER_FDSAN_TAG 0XD002903
+
 namespace OHOS {
 namespace HDI {
 namespace Power {
@@ -64,6 +66,7 @@ constexpr uint32_t SWAP_FILE_MODE = 0600;
 constexpr int32_t UUID_VERSION_OFFSET = 6;
 constexpr int32_t UUID_CLOCK_OFFSET = 8;
 constexpr int32_t UUID_BUF_LEN = 16;
+constexpr uint64_t FDSAN_PARAM = 0;
 constexpr unsigned char UUID_VERSION_OPERAND1 = 0x0F;
 constexpr unsigned char UUID_VERSION_OPERAND2 = 0x40;
 constexpr unsigned char UUID_CLOCK_OPERAND1 = 0x3F;
@@ -173,6 +176,7 @@ int32_t Hibernate::MkSwap()
         HDF_LOGE("open swap file failed when mkswap");
         return HDF_FAILURE;
     }
+    fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
     int32_t retvalue = HDF_FAILURE;
     do {
         int pagesize = sysconf(_SC_PAGE_SIZE);
@@ -215,7 +219,7 @@ int32_t Hibernate::MkSwap()
         retvalue = HDF_SUCCESS;
         HDF_LOGI("mkswap success");
     } while (0);
-    close(fd);
+    fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
     return retvalue;
 }
 
@@ -283,13 +287,14 @@ int32_t Hibernate::CreateSwapFile()
         HDF_LOGE("open swap file failed, errno=%{public}d", errno);
         return HDF_FAILURE;
     }
+    fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
     int ret = ioctl(fd, HMFS_IOC_SWAPFILE_PREALLOC, &cfg);
     if (ret != 0) {
         HDF_LOGE("ioctl failed, ret=%{public}d", ret);
-        close(fd);
+        fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
         return HDF_FAILURE;
     }
-    close(fd);
+    fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
     HDF_LOGI("CreateSwapFile success.");
     return HDF_SUCCESS;
 }
@@ -447,12 +452,12 @@ int32_t Hibernate::GetResumeOffset(uint64_t &resumeOffset)
         HDF_LOGE("open swap file failed, errno=%{public}d", errno);
         return HDF_FAILURE;
     }
-
+    fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
     struct stat fileStat;
     int rc = stat(SWAP_FILE_PATH, &fileStat);
     if (rc != 0) {
         HDF_LOGE("stat swap file failed, errno=%{public}d", errno);
-        close(fd);
+        fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
         return HDF_FAILURE;
     }
 
@@ -463,7 +468,7 @@ int32_t Hibernate::GetResumeOffset(uint64_t &resumeOffset)
     unsigned int count = (sizeof(buf) - sizeof(*swapFileFiemap)) / sizeof(struct fiemap_extent);
 
     if (memset_s(swapFileFiemap, sizeof(buf), 0, sizeof(struct fiemap)) != EOK) {
-        close(fd);
+        fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
         return HDF_FAILURE;
     }
 
@@ -474,13 +479,13 @@ int32_t Hibernate::GetResumeOffset(uint64_t &resumeOffset)
     rc = ioctl(fd, FS_IOC_FIEMAP, reinterpret_cast<unsigned long>(swapFileFiemap));
     if (rc != 0) {
         HDF_LOGE("get swap file physical blk fail, rc=%{public}d", rc);
-        close(fd);
+        fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
         return HDF_FAILURE;
     }
 
     resumeOffset = swapFileFmExt[0].fe_physical >> UlongLen(fileStat.st_blksize);
     HDF_LOGI("resume offset size: %{public}lld", static_cast<long long>(resumeOffset));
-    close(fd);
+    fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
     return HDF_SUCCESS;
 }
 } // namespace V1_2

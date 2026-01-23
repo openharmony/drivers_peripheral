@@ -22,7 +22,10 @@ group("sensor_entry") {
       "hdi_service_3.0:hdi_sensor_service_3.0",
     ]
     if (drivers_peripheral_sensor_feature_community) {
-      deps += [ "hdi_impl:libhdi_sensor_impl" ]
+      deps += [
+        "hdi_service_3.0/convert_sensor:libsensor_convert_interfaces_service_1.0",
+        "hdi_impl:libhdi_sensor_impl"
+        ]
     }
   }
 }

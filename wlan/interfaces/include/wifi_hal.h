@@ -406,6 +406,19 @@ struct IWiFi {
      * @version 1.2
      */
     int32_t (*setDpiMarkRule)(int32_t uid, int32_t protocol, int32_t enable);
+
+    /**
+    * @brief wlan hal get p2p signal information.
+    *
+    * @param ifName interface name or interface name with assoc mac address combied by '_'.
+    * @param signalResult signal informatiton obtained.
+    *
+    * @return Returns <b>0</b> if gettubg signal information is successfully; returns a negative value otherwise.
+    *
+    * @since 4.1
+    * @version 1.0
+    */
+    int32_t (*getSignalPollInfo)(const char *ifName, struct SignalResult *signalResult);
 };
 
 /**

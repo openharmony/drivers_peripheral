@@ -18,7 +18,7 @@ group("display_composer_hdi_service") {
   deps = [
     ":composer_host.para.dac",
     ":libdisplay_composer_driver_1.0",
-    ":libdisplay_composer_service_1.3",
+    ":libdisplay_composer_service_1.4",
   ]
 }
 
@@ -30,7 +30,7 @@ ohos_prebuilt_etc("composer_host.para.dac") {
   part_name = "drivers_peripheral_display"
 }
 
-ohos_shared_library("libdisplay_composer_service_1.3") {
+ohos_shared_library("libdisplay_composer_service_1.4") {
   defines = []
   defines += display_defines
   include_dirs = [
@@ -45,11 +45,12 @@ ohos_shared_library("libdisplay_composer_service_1.3") {
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_buffer_stub_1.1",
     "drivers_interface_display:libdisplay_buffer_stub_1.2",
-    "drivers_interface_display:libdisplay_composer_hdi_impl_1.3",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.4",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
     "drivers_interface_display:libdisplay_composer_stub_1.1",
     "drivers_interface_display:libdisplay_composer_stub_1.2",
     "drivers_interface_display:libdisplay_composer_stub_1.3",
+    "drivers_interface_display:libdisplay_composer_stub_1.4",
     "drivers_interface_display:libhdifd_parcelable",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_ipc_adapter",
@@ -94,6 +95,7 @@ ohos_shared_library("libdisplay_composer_driver_1.0") {
     "drivers_interface_display:libdisplay_composer_stub_1.1",
     "drivers_interface_display:libdisplay_composer_stub_1.2",
     "drivers_interface_display:libdisplay_composer_stub_1.3",
+    "drivers_interface_display:libdisplay_composer_stub_1.4",
     "drivers_interface_display:libhdifd_parcelable",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",

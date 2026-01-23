@@ -20,6 +20,7 @@ ImageBuffer::ImageBuffer() {}
 
 ImageBuffer::ImageBuffer(const int32_t source)
 {
+    CAMERA_LOGI("ImageBuffer::ImageBuffer(source: %{public}d)", source);
     sourceType_ = source;
 }
 
@@ -29,6 +30,7 @@ ImageBuffer::ImageBuffer(const int32_t source,
                          const uint64_t usage,
                          const uint32_t format)
 {
+    CAMERA_LOGI("ImageBuffer::ImageBuffer(source: %{public}d)", source);
     sourceType_ = source;
     width_ = width;
     height_ = height;
@@ -103,6 +105,7 @@ uint64_t ImageBuffer::GetUsage() const
 
 void* ImageBuffer::GetVirAddress() const
 {
+    CAMERA_LOGI("ImageBuffer::GetVirAddress()");
     return virAddr_;
 }
 
@@ -259,6 +262,7 @@ void ImageBuffer::SetUsage(const uint64_t usage)
 void ImageBuffer::SetVirAddress(const void* addr)
 {
     std::lock_guard<std::mutex> l(l_);
+    CAMERA_LOGI("ImageBuffer::SetVirAddress, streamId = %{public}d, index = %{public}d", streamId_, index_);
     virAddr_ = const_cast<void*>(addr);
     return;
 }

@@ -125,7 +125,7 @@ HWTEST_F(SeVendorAdaptionsTest, closeChannel001, TestSize.Level1)
  */
 HWTEST_F(SeVendorAdaptionsTest, transmit001, TestSize.Level1)
 {
-    const std::vector<uint8_t> command;
+    const std::vector<uint8_t> command = {1};
     std::vector<uint8_t> response;
     SecureElementStatus status;
     std::shared_ptr<SeVendorAdaptions> seVendorAdaptions = std::make_shared<SeVendorAdaptions>();

@@ -17,102 +17,50 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 #include "dcamera_host.h"
 #include "v1_1/id_camera_provider_callback.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
-class MockDCameraProviderCallbackImpl : public IDCameraProviderCallback {
-public:
-    MockDCameraProviderCallbackImpl(const std::string& devId, const std::string& dhId) : devId_(devId), dhId_(dhId)
-    {
-    }
-    ~MockDCameraProviderCallbackImpl() = default;
-
-    int32_t OpenSession(const DHBase& dhBase)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t CloseSession(const DHBase& dhBase)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t ConfigureStreams(const DHBase& dhBase, const std::vector<DCStreamInfo>& streamInfos)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t ReleaseStreams(const DHBase& dhBase, const std::vector<int>& streamIds)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t StartCapture(const DHBase& dhBase, const std::vector<DCCaptureInfo>& captureInfos)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t StopCapture(const DHBase& dhBase, const std::vector<int>& streamIds)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t UpdateSettings(const DHBase& dhBase, const std::vector<DCameraSettings>& settings)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-    int32_t NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event)
-    {
-        return DCamRetCode::SUCCESS;
-    }
-
-private:
-
-    std::string devId_;
-    std::string dhId_;
-};
-
 void DcameraAddDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    std::string deviceId = "1";
-    std::string dhId = "2";
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+
+    size_t deviceIdLen = fdp.ConsumeIntegralInRange<size_t>(0, 64);
+    std::string deviceId = fdp.ConsumeBytesAsString(deviceIdLen);
+
+    size_t dhIdLen = fdp.ConsumeIntegralInRange<size_t>(0, 64);
+    std::string dhId = fdp.ConsumeBytesAsString(dhIdLen);
+
+    std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(2048);
+    std::string srcAbilityInfo = fdp.ConsumeRemainingBytesAsString();
+
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-    sptr<IDCameraProviderCallback> callback;
+    sptr<IDCameraProviderCallback> callback = nullptr;
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
     if (dcameraDevice == nullptr) {
         return;
     }
 
-    std::string cameraId = dhBase.deviceId_ + "__" + dhBase.dhId_;
     auto temp = DCameraHost::GetInstance();
-    temp->dCameraDeviceMap_[cameraId] = dcameraDevice;
-    temp->AddDCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
-    std::string sourceCodecInfo = "";
-    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, sourceCodecInfo, callback);
-    sinkAbilityInfo = "";
-    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
-    dhBase.deviceId_ = "";
-    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
     temp->dCameraDeviceMap_.clear();
+
+    // Call target APIs with fully fuzzed data
     temp->AddDCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
-    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, sourceCodecInfo, callback);
-    temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
     temp->AddDeviceParamCheck(dhBase, sinkAbilityInfo, srcAbilityInfo, callback);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::DcameraAddDCameraDeviceFuzzTest(data, size);
     return 0;
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,41 +16,44 @@
 #include "dcameradevicegetsettings_fuzzer.h"
 
 #include "dcamera_device.h"
-#include "dcamera_host.h"
 #include "v1_1/dcamera_types.h"
+#include "fuzzer/FuzzedDataProvider.h"
+#include <string>
+#include <vector>
 
 namespace OHOS {
 namespace DistributedHardware {
+
+namespace {
+    constexpr size_t MAX_ID_LENGTH = 64;
+    constexpr size_t MAX_ABILITY_LENGTH = 1024;
+}
+
 void DcameraDeviceGetSettingsFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint8_t))) {
-        return;
-    }
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string deviceId = fdp.ConsumeRandomLengthString(MAX_ID_LENGTH);
+    std::string dhId = fdp.ConsumeRandomLengthString(MAX_ID_LENGTH);
+
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-    std::vector<uint8_t> results;
-    results.push_back(*(reinterpret_cast<const uint8_t*>(data)));
+    std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(MAX_ABILITY_LENGTH);
+    std::string srcAbilityInfo = fdp.ConsumeRandomLengthString(MAX_ABILITY_LENGTH);
 
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
+    OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
     if (dcameraDevice == nullptr) {
         return;
     }
+    std::vector<uint8_t> results;
     dcameraDevice->GetSettings(results);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::DcameraDeviceGetSettingsFuzzTest(data, size);
     return 0;
 }
-

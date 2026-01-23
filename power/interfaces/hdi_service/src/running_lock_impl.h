@@ -32,11 +32,11 @@ namespace Power {
 namespace V1_2 {
 class RunningLockImpl {
 public:
-    static int32_t Hold(const RunningLockInfo &info, PowerHdfState state,
+    static int32_t Hold(const RunningLockInfo &info,
         uint64_t lockid = 0, const std::string &bundleName = "");
     static int32_t Unhold(const RunningLockInfo &info,
         uint64_t lockid = 0, const std::string &bundleName = "");
-    static int32_t HoldLock(const RunningLockInfo &info, PowerHdfState state,
+    static int32_t HoldLock(const RunningLockInfo &info,
         uint64_t lockid = 0, const std::string &bundleName = "");
     static int32_t UnholdLock(const RunningLockInfo &info,
         uint64_t lockid = 0, const std::string &bundleName = "");

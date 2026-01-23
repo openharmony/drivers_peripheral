@@ -22,6 +22,9 @@
 #include "iproxy_broker.h"
 #include "iservmgr_hdi.h"
 #include <sstream>
+#include <cstdio>
+#include <cstring>
+#include <securec.h>
 
 #include "daudio_constants.h"
 #include "daudio_errcode.h"
@@ -54,6 +57,7 @@ AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
 {
+    isDestruct_.store(true);
     DHLOGI("Distributed audio manager destructed.");
 }
 
@@ -132,14 +136,12 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     const std::string &caps, const sptr<IDAudioCallback> &callback)
 {
     DHLOGI("Add audio device name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), dhId);
+    CHECK_AND_RETURN_RET_LOG(dhId == LOW_LATENCY_RENDER_ID, DH_SUCCESS, "Not support low latency id");
     std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
     auto adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end()) {
-        int32_t ret = CreateAdapter(adpName, dhId, callback);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Create audio adapter failed.");
-            return ERR_DH_AUDIO_HDF_FAIL;
-        }
+        CHECK_AND_RETURN_RET_LOG(CreateAdapter(adpName, dhId, callback) != DH_SUCCESS, ERR_DH_AUDIO_HDF_FAIL,
+            "Create audio adapter failed.");
     }
     adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end() || adp->second == nullptr) {
@@ -157,7 +159,9 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
             DHLOGE("DhId is illegal, devType is unknow.");
             return ERR_DH_AUDIO_HDF_FAIL;
     }
-    int32_t ret = adp->second->AddAudioDevice(dhId, caps);
+    std::string capability = caps.substr(0, caps.find_first_of(";"));
+
+    int32_t ret = adp->second->AddAudioDevice(dhId, capability);
     if (ret != DH_SUCCESS) {
         DHLOGE("Add audio device failed, adapter return: %{public}d.", ret);
         return ERR_DH_AUDIO_HDF_FAIL;
@@ -200,10 +204,7 @@ int32_t AudioManagerInterfaceImpl::AddAudioDeviceInner(const uint32_t dhId, DAud
 int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName, const uint32_t dhId)
 {
     DHLOGI("Remove audio device name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), dhId);
-    if (dhId == LOW_LATENCY_RENDER_ID) {
-        DHLOGI("Not support low latency id");
-        return DH_SUCCESS;
-    }
+    CHECK_AND_RETURN_RET_LOG(dhId == LOW_LATENCY_RENDER_ID, DH_SUCCESS, "Not support low latency id");
     DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
     int32_t ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
@@ -221,12 +222,12 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
     }
     {
         std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
+        sptr<IRemoteObject> remote = GetRemote(adpName);
+        if (remote != nullptr) {
+            RemoveClearRegisterRecipient(remote, adpName, dhId);
+        }
         if (adapter->IsPortsNoReg()) {
             mapAudioAdapter_.erase(adpName);
-            sptr<IRemoteObject> remote = GetRemote(adpName);
-            if (remote != nullptr) {
-                RemoveClearRegisterRecipient(remote, adpName, dhId);
-            }
             mapAudioCallback_.erase(adpName);
         }
         DHLOGI("Remove audio device success, mapAudioAdapter size() is: %{public}zu .", mapAudioAdapter_.size());
@@ -250,6 +251,18 @@ int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint
 {
     DHLOGI("Notify event, adapter name: %{public}s. event type: %{public}d", GetAnonyString(adpName).c_str(),
         event.type);
+    if (static_cast<AudioExtParamEvent>(event.type) == HDF_AUDIO_SET_TASK_ID) {
+        DHLOGI("Notify event: SET_TASK_ID, event content: %{public}s", event.content.c_str());
+        char value[SERVICE_INFO_LEN_MAX];
+        (void)memset_s(value, SERVICE_INFO_LEN_MAX, 0, SERVICE_INFO_LEN_MAX);
+        if (snprintf_s(value, SERVICE_INFO_LEN_MAX, SERVICE_INFO_LEN_MAX - 1, "{\"taskId\":%s,\"INFO\":\"taskId\"}",
+            event.content.c_str()) < 0) {
+            DHLOGE("set task id snprintf_s failed.");
+            return ERR_DH_AUDIO_HDF_FAIL;
+        }
+        DAudioDevEvent devEvent = { adpName, 1, HDF_AUDIO_DEVICE_ADD, 0, 0, 0, value };
+        return NotifyFwk(devEvent);
+    }
     sptr<AudioAdapterInterfaceImpl> adp = nullptr;
     {
         std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
@@ -272,6 +285,32 @@ int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint
     return DH_SUCCESS;
 }
 
+void AudioManagerInterfaceImpl::HandleCaps(const std::string &capability, std::string &info, std::string &caps)
+{
+    cJSON *jParam = cJSON_Parse(capability.c_str());
+    if (jParam == nullptr) {
+        DHLOGE("Failed to parse JSON: %{public}s", cJSON_GetErrorPtr());
+        return;
+    }
+    cJSON *infoItem = cJSON_GetObjectItem(jParam, KEY_INFO);
+    if (infoItem == NULL || !cJSON_IsString(infoItem)) {
+        DHLOGE("Not found the keys of dhId.");
+        cJSON_Delete(jParam);
+        return;
+    }
+    info = infoItem->valuestring;
+    cJSON_DeleteItemFromObject(jParam, KEY_INFO);
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return;
+    }
+    caps = std::string(jsonData);
+    cJSON_free(jsonData);
+    cJSON_Delete(jParam);
+}
+
 int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
 {
     DHLOGD("Notify audio fwk event(type:%{public}d, adapter:%{public}s, pin:%{public}d).", event.eventType,
@@ -279,12 +318,28 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
     std::stringstream ss;
     ss << "EVENT_TYPE=" << event.eventType << ";NID=" << event.adapterName << ";PIN=" << event.dhId << ";VID=" <<
         event.volGroupId << ";IID=" << event.iptGroupId;
-
-    std::stringstream temp(ss.str());
-    temp << ";CAPS=" << event.caps;
-    std::string tempStr = temp.str();
-    if (strlen(tempStr.c_str()) <= SERVICE_INFO_LEN_MAX) {
-        ss << ";CAPS=" << event.caps;
+    if (event.caps.find(KEY_INFO) != event.caps.npos) {
+        std::string info = "";
+        std::string caps = "";
+        HandleCaps(event.caps, info, caps);
+        std::stringstream temp(ss.str());
+        temp << ";CAPS=" << caps << ";INFO=" << info;
+        std::string tempStr = temp.str();
+        if (strlen(tempStr.c_str()) <= SERVICE_INFO_LEN_MAX) {
+            ss << ";CAPS=" << caps << ";INFO=" << info;
+        }
+    } else {
+        std::string protocol = "";
+        std::string::size_type position = event.caps.find_first_of(";");
+        if (position != std::string::npos) {
+            protocol = event.caps.substr(position + 1);
+        }
+        std::stringstream temp(ss.str());
+        temp << ";" << protocol;
+        std::string tempStr = temp.str();
+        if (strlen(tempStr.c_str()) <= SERVICE_INFO_LEN_MAX) {
+            ss << ";" << protocol;
+        }
     }
 
     std::string eventInfo = ss.str();
@@ -346,6 +401,11 @@ void AudioManagerInterfaceImpl::ForceNotifyFwk()
     DHLOGI("Force notify fwk success.");
 }
 
+bool AudioManagerInterfaceImpl::GetAudioMgrState()
+{
+    return isDestruct_.load();
+}
+
 int32_t AudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &serviceName,
     const sptr<IDAudioHdfCallback> &callbackObj)
 {
@@ -399,6 +459,12 @@ int32_t AudioManagerInterfaceImpl::UnRegisterAudioHdfListener(const std::string 
 void AudioManagerInterfaceImpl::ClearRegisterRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     DHLOGI("ClearRegisterRecipient::OnRemoteDied.");
+    std::lock_guard<std::mutex> lock(audioManagerMtx_);
+    auto audioMgr = AudioManagerInterfaceImpl::GetAudioManager();
+    if (audioMgr != nullptr) {
+        audioMgr->RemoveAudioDevice(deviceId_, dhId_);
+    }
+    DHLOGI("Remote died, remote daudio device end.");
 }
 
 void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)

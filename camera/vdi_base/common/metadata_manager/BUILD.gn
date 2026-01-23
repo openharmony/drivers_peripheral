@@ -100,4 +100,40 @@ if (!defined(ohos_lite)) {
     part_name = "drivers_peripheral_camera"
     subsystem_name = "hdf"
   }
+
+  ohos_shared_library("camera_vendor_tag_service_1.0") {
+    include_dirs = [
+      "./include",
+      "../include",
+    ]
+
+    sources = [
+      "src/camera_vendor_tag_service.cpp",
+    ]
+
+    if (is_standard_system) {
+      external_deps = [
+        "c_utils:utils",
+        "hdf_core:libhdf_utils",
+        "hilog:libhilog",
+        "ipc:ipc_single",
+        "drivers_interface_camera:metadata",
+        "drivers_interface_camera:camera_vendor_tag_idl_headers_1.0",
+      ]
+    } else {
+      external_deps = [
+        "hilog:libhilog",
+        "ipc:ipc_single",
+        "drivers_interface_camera:metadata",
+      ]
+    }
+
+    innerapi_tags = [ "passthrough" ]
+
+    install_images = [ chipset_base_dir ]
+
+    subsystem_name = "hdf"
+
+    part_name = "drivers_peripheral_camera"
+  }
 }

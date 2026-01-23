@@ -15,9 +15,9 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../sensor.gni")
 
-module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorMultiCallbackTest"
+module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorMultiThreadTest"
 
-ohos_unittest("SensorMultiCallbackTest") {
+ohos_unittest("SensorMultiThreadTest") {
   module_out_path = module_output_path
 
   include_dirs = [
@@ -26,7 +26,12 @@ ohos_unittest("SensorMultiCallbackTest") {
     "../../../utils/include",
   ]
 
-  sources = [ "sensor_multi_callback_test.cpp" ]
+  sources = [ "sensor_multi_thread_test.cpp" ]
+
+  defines = []
+  if (drivers_peripheral_sensor_feature_community) {
+    defines += ["COMMUNITY_TEST"]
+  }
 
   cflags = [
     "-Wall",

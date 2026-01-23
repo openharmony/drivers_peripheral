@@ -21,7 +21,7 @@
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
 #include "audio_dfx.h"
-#include "v5_0/iaudio_adapter.h"
+#include "v6_0/iaudio_adapter.h"
 #include "audio_common_vdi.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -215,9 +215,13 @@ static int32_t AudioManagerVdiDescsToDescs(struct AudioAdapterDescriptorVdi *vdi
             AUDIO_FUNC_LOGE("audio vdiManager port fail");
             return HDF_FAILURE;
         }
+        if (vdiDescs[i].adapterName == NULL) {
+            AUDIO_FUNC_LOGE("adapterName == NULL");
+            return HDF_FAILURE;
+        }
         descs[i].adapterName = strdup(vdiDescs[i].adapterName); // audio stub free adapterName
         if (descs[i].adapterName == NULL) {
-            AUDIO_FUNC_LOGE("strdup fail, descs[%{public}d].adapterName = %{public}s", i, descs[i].adapterName);
+            AUDIO_FUNC_LOGE("strdup fail, vdiDescs[%{public}d].adapterName = %{public}s", i, vdiDescs[i].adapterName);
             return HDF_FAILURE;
         }
         AUDIO_FUNC_LOGI("audio vdiManager get adapterName=%{public}s", descs[i].adapterName);
@@ -346,7 +350,7 @@ static struct IAudioAdapter* VendorLoadAdapter(struct IAudioManagerVdi *vdiManag
     HdfAudioStartTrace("Hdi:AudioManagerVendorLoadAdapter", 0);
     struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     ret = vdiManager->LoadAdapter(vdiManager, vdiDesc, &vdiAdapter);
-    AudioDfxSysEventError("LoadAdapter", startTime, TIME_THRESHOLD, ret);
+    AudioDfxSysEventError("LoadAdapter", startTime, MANAGE_TIMETHRESHOLD, ret);
     HdfAudioFinishTrace();
     CancelTimer(id);
 

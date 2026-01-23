@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 #include "audiomanager_fuzzer.h"
-#include "v5_0/iaudio_manager.h"
-#include "v5_0/audio_types.h"
+#include "v6_0/iaudio_manager.h"
+#include "v6_0/audio_types.h"
 #include "hdi_service_common.h"
 
 using namespace std;
@@ -51,12 +51,18 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         return false;
     }
     uint8_t *data = const_cast<uint8_t *>(rawData);
+    uint32_t offset = 0;
+    uint32_t offsetport = offset + sizeof(AudioPortDirection);
+    uint32_t offsetname = offsetport + sizeof(uint32_t);
+    if (offsetname > size) {
+        return false;
+    }
     switch (cmd) {
         case AUDIO_MANAGER_LOAD_ADAPTER: {
             struct AudioPort port = {
-                .dir = *(reinterpret_cast<AudioPortDirection *>(data)),
-                .portId = *(reinterpret_cast<uint32_t *>(data)),
-                .portName = reinterpret_cast<char *>(data),
+                .dir = *(reinterpret_cast<AudioPortDirection *>(data + offset)),
+                .portId = *(reinterpret_cast<uint32_t *>(data + offset)),
+                .portName = reinterpret_cast<char *>(data + offset),
             };
             struct AudioAdapterDescriptor desc = {
                 .adapterName = reinterpret_cast<char *>(data),

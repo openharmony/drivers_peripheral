@@ -477,6 +477,7 @@ HWTEST_F(WifiClientTest, WifiGetSignalPollInfo001, TestSize.Level1)
 {
     int32_t ret;
     const char *ifNameInvalid = "wlanTest";
+    const char *ifNameAndMacAddrInvalid = "test_22:33:44:55:66:77";
     struct SignalResult signalResult;
     (void)memset_s(&signalResult, sizeof(signalResult), 0, sizeof(signalResult));
 
@@ -485,6 +486,8 @@ HWTEST_F(WifiClientTest, WifiGetSignalPollInfo001, TestSize.Level1)
     ret = WifiGetSignalPollInfo(ifNameInvalid, nullptr);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
     ret = WifiGetSignalPollInfo(ifNameInvalid, &signalResult);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiGetSignalPollInfo(ifNameAndMacAddrInvalid, &signalResult);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
 

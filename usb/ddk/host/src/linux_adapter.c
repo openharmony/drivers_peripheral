@@ -29,7 +29,7 @@
 #define DESC_READ_LEN        256
 #define EP_NUM_MAX           30
 #define SLEEP_TIME           500000
-#define USB_DEVICE_MMAP_PATH "/data/service/el1/public/usb/"
+#define USB_DEVICE_MMAP_PATH "/data/chipset/el1/public/usb/"
 #define MAX_RETRY_TIMES      10
 
 static bool IsInvalidAddress(void *ptr)

@@ -371,9 +371,9 @@ static void CollectEventHandle(struct UsbFnEventAll *event, struct UsbFnDeviceMg
             event->ep0[event->ep0Num] = funcMgr->fd;
             event->ep0Event[event->ep0Num].type = USB_EP0_INVALID;
             event->ep0Num++;
-            if (event->ep0Num > MAX_EP0_NUM) {
+            if (event->ep0Num >= MAX_EP0_NUM) {
                 HDF_LOGE("%{public}s:%{public}d event->ep0Num: %{public}d.", __func__, __LINE__, event->ep0Num);
-                break;
+                break;  // jump out of the loop to avoid ep index overflow
             }
         }
     }
@@ -391,9 +391,9 @@ static void CollectEventHandle(struct UsbFnEventAll *event, struct UsbFnDeviceMg
             event->reqEvent[event->epNum] = handle->reqEvent[j];
             event->numEvent[event->epNum] = 0;
             event->epNum++;
-            if (event->epNum > MAX_EP) {
+            if (event->epNum >= MAX_EP) {
                 HDF_LOGE("%{public}s:%{public}d event->epNum: %{public}d.", __func__, __LINE__, event->epNum);
-                break;
+                return; // jump out of the DOUBLE loop to avoid index overflow => use "return" here
             }
         }
     }

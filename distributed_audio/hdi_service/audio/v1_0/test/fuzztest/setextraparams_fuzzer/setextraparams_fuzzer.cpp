@@ -27,17 +27,21 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
+const uint32_t VAR_NUM = 3;
 void SetExtraParamsFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
+    if ((data == nullptr) || (size < (sizeof(int32_t)) * VAR_NUM)) {
         return;
     }
 
     AudioAdapterDescriptor desc;
+    uint32_t offset = 0;
     auto audioAdapter = std::make_shared<AudioAdapterInterfaceImpl>(desc);
-    AudioExtParamKey key = *(reinterpret_cast<const AudioExtParamKey*>(data));
-    std::string condition(reinterpret_cast<const char*>(data), size);
-    std::string value(reinterpret_cast<const char*>(data), size);
+    AudioExtParamKey key = *(reinterpret_cast<const AudioExtParamKey*>(data + offset));
+    offset += sizeof(char);
+    std::string condition(reinterpret_cast<const char*>(data + offset), size);
+    offset += sizeof(char);
+    std::string value(reinterpret_cast<const char*>(data + offset), size);
 
     audioAdapter->SetExtraParams(key, condition, value);
 }

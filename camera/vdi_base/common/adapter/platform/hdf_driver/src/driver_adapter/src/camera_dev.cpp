@@ -21,10 +21,9 @@ namespace OHOS::Camera {
 CameraDev::CameraDev() {}
 CameraDev::~CameraDev() {}
 
-char *CameraDev::GetCameraName(const std::string &cameraId)
+RetCode CameraDev::GetCameraName(const std::string &cameraId, char* deviceName)
 {
     int32_t cameraIdList = 0;
-    char deviceName[DEVICE_NAME_NUM] = {0};
 
     for (auto iter = hardware.cbegin(); iter != hardware.cend(); iter++) {
         hardwareLists_.push_back(*iter);
@@ -38,10 +37,10 @@ char *CameraDev::GetCameraName(const std::string &cameraId)
 
     if (snprintf_s(deviceName, DEVICE_NAME_NUM, DEVICE_NAME_NUM - 1, "camera%d", cameraIdList) < 0) {
         CAMERA_LOGE("error: get deviceName failed! cameraDevice id = %{public}d\n", cameraIdList);
-        return nullptr;
+        return RC_ERROR;
     }
 
-    return deviceName;
+    return RC_OK;
 }
 
 RetCode CameraDev::Start(const std::string &cameraId)
@@ -58,8 +57,8 @@ RetCode CameraDev::Start(const std::string &cameraId)
         }
     }
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -88,8 +87,8 @@ RetCode CameraDev::Stop(const std::string &cameraId)
         }
     }
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -123,8 +122,8 @@ RetCode CameraDev::Init(std::vector<std::string> &cameraIds)
     }
     std::shared_ptr<CameraDev> mydev_ = std::make_shared<CameraDev>();
     for (auto &it : cameraIds) {
-        if (strncpy_s(deviceName, DEVICE_NAME_NUM, mydev_->GetCameraName(it), DEVICE_NAME_NUM) != 0) {
-            CAMERA_LOGE("strncpy_s error!");
+        if (GetCameraName(cameraId, deviceName) != RC_OK) {
+            CAMERA_LOGE("GetCameraName failed!");
             return RC_ERROR;
         }
         CAMERA_LOGD("deviceName: %{public}s\n", deviceName);
@@ -151,8 +150,8 @@ RetCode CameraDev::PowerUp(const std::string &cameraId, int type)
         }
     }
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -181,8 +180,8 @@ RetCode CameraDev::PowerDown(const std::string &cameraId, int type)
         }
     }
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -203,8 +202,8 @@ RetCode CameraDev::ReqBuffers(const std::string &cameraId, int type, unsigned in
     char deviceName[DEVICE_NAME_NUM] = {0};
     struct CameraFeature feature = {};
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -243,8 +242,8 @@ RetCode CameraDev::CreatBuffer(const std::string &cameraId, int type, const std:
     }
     CAMERA_LOGD("frameSpec->buffer index == %{public}d\n", frameSpec->buffer_->GetIndex());
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -276,8 +275,8 @@ RetCode CameraDev::QueueBuffer(const std::string &cameraId, int type, const std:
         return RC_ERROR;
     }
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -307,8 +306,8 @@ RetCode CameraDev::ReleaseBuffers(const std::string &cameraId, int type)
         }
     }
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -334,9 +333,9 @@ void CameraDev::LoopBuffers(const std::string &cameraId, int type)
         return;
     }
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
-        return;
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
+        return RC_ERROR;
     }
 
     int32_t ret = SetDeviceInfo(&feature, cameraId, type, deviceName, true);
@@ -361,8 +360,8 @@ RetCode CameraDev::StartStream(const std::string &cameraId, int type)
     char deviceName[DEVICE_NAME_NUM] = {0};
     struct CameraFeature feature = {};
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
     if (myStreams_ == nullptr) {
@@ -418,8 +417,8 @@ RetCode CameraDev::StopStream(const std::string &cameraId, int type)
         streamThread_->join();
     }
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -451,8 +450,8 @@ RetCode CameraDev::GetControls(const std::string &cameraId, int type, CameraCtrl
             return RC_ERROR;
         }
     }
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -480,8 +479,8 @@ RetCode CameraDev::UpdateSetting(const std::string &cameraId, int type, CameraCt
             return RC_ERROR;
         }
     }
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -509,8 +508,8 @@ RetCode CameraDev::QuerySetting(const std::string &cameraId, int type, CameraCtr
             return RC_ERROR;
         }
     }
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -539,8 +538,8 @@ RetCode CameraDev::CameraGetNumberConfig(const std::string &cameraId,
             return RC_ERROR;
         }
     }
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -563,8 +562,8 @@ RetCode CameraDev::CameraSetNumberConfig(const std::string &cameraId, int type, 
             return RC_ERROR;
         }
     }
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -587,8 +586,8 @@ RetCode CameraDev::GetFmtDescs(const std::string &cameraId, int type, std::vecto
             return RC_ERROR;
         }
     }
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -616,8 +615,8 @@ RetCode CameraDev::ConfigSys(const std::string &cameraId, int type, CameraFmtCmd
             return RC_ERROR;
         }
     }
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -667,8 +666,8 @@ RetCode CameraDev::GetDeviceAbility(const std::string &cameraId, int type)
             return RC_ERROR;
         }
     }
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -698,8 +697,8 @@ RetCode CameraDev::EnumDevices(const std::string &cameraId, int type, struct Dev
         }
     }
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
 
@@ -737,8 +736,8 @@ RetCode CameraDev::Flush(const std::string &cameraId)
     int32_t ret;
     char deviceName[DEVICE_NAME_NUM] = {0};
 
-    if (strncpy_s(deviceName, DEVICE_NAME_NUM, GetCameraName(cameraId), DEVICE_NAME_NUM) != 0) {
-        CAMERA_LOGE("strncpy_s error!");
+    if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        CAMERA_LOGE("GetCameraName failed!");
         return RC_ERROR;
     }
     if (myBuffers_ == nullptr) {
