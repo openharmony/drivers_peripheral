@@ -175,7 +175,6 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
             return ret;
         }
         mapAddFlags_.insert(std::make_pair(flagString, true));
-        notifyFwkMap_.insert(std::make_pair(flagString, event));
     }
     sptr<IRemoteObject> remote = GetRemote(adpName);
     if (remote != nullptr) {
@@ -211,7 +210,6 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
         DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
     }
     mapAddFlags_.erase(adpName + std::to_string(dhId));
-    notifyFwkMap_.erase(adpName + std::to_string(dhId));
     auto adapter = GetAdapterFromMap(adpName);
     CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDF_INVALID_OPERATION);
 
@@ -386,19 +384,6 @@ int32_t AudioManagerInterfaceImpl::CreateAdapter(const std::string &adpName, con
 void AudioManagerInterfaceImpl::SetDeviceObject(struct HdfDeviceObject *deviceObject)
 {
     deviceObject_ = deviceObject;
-}
-
-void AudioManagerInterfaceImpl::ForceNotifyFwk()
-{
-    std::lock_guard<std::mutex> lock(notifyFwkMtx_);
-    for (auto it : notifyFwkMap_) {
-        DAudioDevEvent event = it.second;
-        event.eventType = HDF_AUDIO_DEVICE_REMOVE;
-        NotifyFwk(event);
-        DHLOGI("Force notify fwk, dhId: %{public}u.", event.dhId);
-    }
-    notifyFwkMap_.clear();
-    DHLOGI("Force notify fwk success.");
 }
 
 bool AudioManagerInterfaceImpl::GetAudioMgrState()
