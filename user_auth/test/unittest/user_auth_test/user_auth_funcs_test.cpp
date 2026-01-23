@@ -239,7 +239,7 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc003, TestSize.Level0)
     userAuthTokenCached.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
     CacheAnyAuthResult(userIdCached, 1, &userAuthTokenCached);
 
-    UserInfo user = {};
+    static UserInfo user = {};
     user.userId = 0;
     user.secUid = 999;
     g_currentUser = &user;

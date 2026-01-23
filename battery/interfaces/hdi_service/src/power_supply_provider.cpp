@@ -25,6 +25,8 @@
 #include "battery_config.h"
 #include "osal_mem.h"
 
+#define DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG 0XD002923
+
 namespace OHOS {
 namespace HDI {
 namespace Battery {
@@ -80,7 +82,7 @@ PowerSupplyProvider::~PowerSupplyProvider()
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto it = nodeCacheFiles_.begin(); it != nodeCacheFiles_.end();) {
         int32_t fd = it->second;
-        close(fd);
+        fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
         it++;
     }
     nodeCacheFiles_.clear();
@@ -280,7 +282,7 @@ void PowerSupplyProvider::FormatSysfsPaths()
 int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t size)
 {
     int32_t fd = -1;
-
+    constexpr uint64_t FDSAN_PARAM = 0;
     {
         std::lock_guard<std::mutex> lock(mutex_);
         auto item = nodeCacheFiles_.find(path);
@@ -301,7 +303,7 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
         BATTERY_HILOGD(FEATURE_BATT_INFO, "failed to open file %{public}s, errno: %{public}d", path, errno);
         return HDF_ERR_IO;
     }
-
+    fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
     ssize_t readSize = read(fd, buf, size - 1);
     buf[readSize] = '\0';
     Trim(buf);
@@ -1032,6 +1034,7 @@ int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std:
 {
     BATTERY_HILOGI(FEATURE_BATT_INFO, "SetConfigByPath enter, path: %{public}s, value:%{public}s",
         path.c_str(), value.c_str());
+    constexpr uint64_t FDSAN_PARAM = 0;
     if (path.empty()) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "the featurePath is empty");
         return HDF_ERR_INVALID_PARAM;
@@ -1043,15 +1046,15 @@ int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std:
             path.c_str(), errno);
         return HDF_ERR_IO;
     }
-
+    fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
     ssize_t size = static_cast<ssize_t>(value.length());
     if (write(fd, value.c_str(), size) != size) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to write file %{public}s, errno: %{public}d",
             path.c_str(), errno);
-        close(fd);
+        fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
         return HDF_ERR_IO;
     }
-    close(fd);
+    fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
 
     BATTERY_HILOGD(FEATURE_BATT_INFO, "SetConfigByPath exit");
     return HDF_SUCCESS;

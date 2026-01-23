@@ -13,7 +13,6 @@
 
 import("//build/test.gni")
 import("//drivers/peripheral/wlan/wlan.gni")
-import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 TEST_ROOT_DIR = "../../.."
 
@@ -35,8 +34,6 @@ ohos_fuzztest("ChipFuzzTest") {
     "../../../chip/hdi_service:libchip_controller_chip_interface_service_2.0",
   ]
 
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-
   external_deps = [
     "c_utils:utils",
     "drivers_interface_wlan:libchip_stub_2.0",
@@ -45,6 +42,7 @@ ohos_fuzztest("ChipFuzzTest") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "init:libbegetutil",
+    "bounds_checking_function:libsec_shared",
   ]
 
   cflags = [

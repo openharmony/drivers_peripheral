@@ -14,44 +14,47 @@
  */
 
 #include "dcameragetcameraability_fuzzer.h"
-
 #include <cstddef>
 #include <cstdint>
-
 #include "dcamera_host.h"
+#include "fuzzer/FuzzedDataProvider.h"
+#include <string>
+#include <vector>
 
 namespace OHOS {
 namespace DistributedHardware {
 void DcameraGetCameraAbilityFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint8_t))) {
-        return;
+    FuzzedDataProvider fdp(data, size);
+    auto temp = DCameraHost::GetInstance();
+    temp->dCameraDeviceMap_.clear();
+
+    std::string cameraId = fdp.ConsumeRandomLengthString(64);
+    if (fdp.ConsumeBool()) {
+        std::string deviceId = fdp.ConsumeRandomLengthString(64);
+        std::string dhId = fdp.ConsumeRandomLengthString(64);
+        DHBase dhBase;
+        dhBase.deviceId_ = deviceId;
+        dhBase.dhId_ = dhId;
+
+        std::string sinkAbilityInfo = fdp.ConsumeRandomLengthString(1024);
+        std::string sourceAbilityInfo = fdp.ConsumeRandomLengthString(1024);
+
+        OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase,
+            sinkAbilityInfo, sourceAbilityInfo));
+        
+        if (dcameraDevice != nullptr) {
+            temp->dCameraDeviceMap_[cameraId] = dcameraDevice;
+        }
     }
-    std::string deviceId = "1";
-    std::string dhId = "2";
-    std::string cameraId = "1__2";
     std::vector<uint8_t> cameraAbility;
-    cameraAbility.push_back(* data);
-    DHBase dhBase;
-    dhBase.deviceId_ = deviceId;
-    dhBase.dhId_ = dhId;
-    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string sourceAbilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
-        sourceAbilityInfo));
-    if (dcameraDevice != nullptr) {
-        DCameraHost::GetInstance()->dCameraDeviceMap_[cameraId] = dcameraDevice;
-    }
-    DCameraHost::GetInstance()->GetCameraAbility(cameraId, cameraAbility);
+    temp->GetCameraAbility(cameraId, cameraAbility);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::DcameraGetCameraAbilityFuzzTest(data, size);
     return 0;
 }
-

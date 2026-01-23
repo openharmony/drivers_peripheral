@@ -41,6 +41,10 @@ struct HdfSeInterfaceHost {
 static int32_t SeInterfaceDriverDispatch(struct HdfDeviceIoClient* client, int cmdId, struct HdfSBuf* data,
     struct HdfSBuf* reply)
 {
+    if (client == nullptr || client->device == nullptr || data == nullptr) {
+        HDF_LOGE("SeInterfaceDriverDispatch:invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
     auto* hdfSeInterfaceHost =
         CONTAINER_OF(client->device->service, struct HdfSeInterfaceHost, ioservice);
 
@@ -49,24 +53,28 @@ static int32_t SeInterfaceDriverDispatch(struct HdfDeviceIoClient* client, int c
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        HDF_LOGE("SeInterfaceDriverDispatch:invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        HDF_LOGE("SeInterfaceDriverDispatch:invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
+    if (hdfSeInterfaceHost == nullptr || hdfSeInterfaceHost->stub == nullptr) {
+        HDF_LOGE("SeInterfaceDriverDispatch, hdfNfcInterfaceHost stub is null");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return hdfSeInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
 static int HdfSeInterfaceDriverInit(struct HdfDeviceObject* deviceObject)
 {
-    HDF_LOGE("%{public}s: Enter", __func__);
+    HDF_LOGE("HdfSeInterfaceDriverInit: Enter");
 #ifdef SE_DRIVER_USE_CA
     int ret = OHOS::HDI::SecureElement::SecureElementCaProxy::GetInstance().VendorSecureElementCaOnStart();
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
-        HDF_LOGE("%{public}s: Failed", __func__);
+        HDF_LOGE("HdfSeInterfaceDriverInit: Failed");
         return HDF_ERR_INVALID_PARAM;
     }
 #endif
@@ -75,9 +83,13 @@ static int HdfSeInterfaceDriverInit(struct HdfDeviceObject* deviceObject)
 
 static int HdfSeInterfaceDriverBind(struct HdfDeviceObject* deviceObject)
 {
+    if (deviceObject == nullptr) {
+        HDF_LOGE("HdfSeInterfaceDriverBind: invalid deviceObject");
+        return HDF_FAILURE;
+    }
     auto* hdfSeInterfaceHost = new (std::nothrow) HdfSeInterfaceHost;
     if (hdfSeInterfaceHost == nullptr) {
-        HDF_LOGE("%{public}s: failed to create HdfSeInterfaceDriverBind Object!", __func__);
+        HDF_LOGE("HdfSeInterfaceDriverBind: failed to create HdfSeInterfaceDriverBind Object!");
         return HDF_FAILURE;
     }
 
@@ -87,7 +99,7 @@ static int HdfSeInterfaceDriverBind(struct HdfDeviceObject* deviceObject)
 
     auto serviceImpl = ISecureElementInterface::Get(true);
     if (serviceImpl == nullptr) {
-        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        HDF_LOGE("HdfSeInterfaceDriverBind: failed to get of implement service");
         delete hdfSeInterfaceHost;
         return HDF_FAILURE;
     }
@@ -95,7 +107,7 @@ static int HdfSeInterfaceDriverBind(struct HdfDeviceObject* deviceObject)
     hdfSeInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         ISecureElementInterface::GetDescriptor());
     if (hdfSeInterfaceHost->stub == nullptr) {
-        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        HDF_LOGE("HdfSeInterfaceDriverBind: failed to get stub object");
         delete hdfSeInterfaceHost;
         return HDF_FAILURE;
     }
@@ -106,14 +118,16 @@ static int HdfSeInterfaceDriverBind(struct HdfDeviceObject* deviceObject)
 
 static void HdfSeInterfaceDriverRelease(struct HdfDeviceObject* deviceObject)
 {
-    if (deviceObject->service == nullptr) {
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
         HDF_LOGE("HdfSeInterfaceDriverRelease not initted");
         return;
     }
 
     auto* hdfSeInterfaceHost =
         CONTAINER_OF(deviceObject->service, struct HdfSeInterfaceHost, ioservice);
-    delete hdfSeInterfaceHost;
+    if (hdfSeInterfaceHost != nullptr) {
+        delete hdfSeInterfaceHost;
+    }
 }
 
 static struct HdfDriverEntry g_seInterfaceDriverEntry = {

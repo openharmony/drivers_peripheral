@@ -32,6 +32,10 @@ struct HdfSecureElementInterfaceHost {
 static int32_t SecureElementInterfaceDriverDispatch(struct HdfDeviceIoClient* client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
+    if (client == nullptr || client->device == nullptr || data == nullptr) {
+        HDF_LOGE("SecureElementInterfaceDriverDispatch:invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
     auto* hdfSecureElementInterfaceHost =
         CONTAINER_OF(client->device->service, struct HdfSecureElementInterfaceHost, ioService);
 
@@ -40,29 +44,37 @@ static int32_t SecureElementInterfaceDriverDispatch(struct HdfDeviceIoClient* cl
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: invalid data sbuf object to dispatch", __func__);
+        HDF_LOGE("SecureElementInterfaceDriverDispatch: invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: invalid reply sbuf object to dispatch", __func__);
+        HDF_LOGE("SecureElementInterfaceDriverDispatch: invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
+    if (hdfSecureElementInterfaceHost == nullptr || hdfSecureElementInterfaceHost->stub == nullptr) {
+        HDF_LOGE("SecureElementInterfaceDriverDispatch, hdfSecureElementInterfaceHost stub is null");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return hdfSecureElementInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
 static int HdfSecureElementInterfaceDriverInit(struct HdfDeviceObject* deviceObject)
 {
-    HDF_LOGI("%{public}s: driver init start", __func__);
+    HDF_LOGI("HdfSecureElementInterfaceDriverInit: driver init start");
     return HDF_SUCCESS;
 }
 
 static int HdfSecureElementInterfaceDriverBind(struct HdfDeviceObject* deviceObject)
 {
-    HDF_LOGI("%{public}s: driver bind start", __func__);
+    HDF_LOGI("HdfSecureElementInterfaceDriverBind: driver bind start");
+    if (deviceObject == nullptr) {
+        HDF_LOGE("HdfSecureElementInterfaceDriverBind: invalid deviceObject");
+        return HDF_FAILURE;
+    }
     auto* hdfSecureElementInterfaceHost = new (std::nothrow) HdfSecureElementInterfaceHost;
     if (hdfSecureElementInterfaceHost == nullptr) {
-        HDF_LOGE("%{public}s: failed to create hdfSecureElementInterfaceHost object!", __func__);
+        HDF_LOGE("HdfSecureElementInterfaceDriverBind: failed to create hdfSecureElementInterfaceHost object!");
         return HDF_FAILURE;
     }
 
@@ -72,9 +84,9 @@ static int HdfSecureElementInterfaceDriverBind(struct HdfDeviceObject* deviceObj
 
     sptr<OHOS::HDI::SecureElement::SimSecureElement::V1_0::ISecureElementInterface> serviceImpl =
         new (std::nothrow) SecureElementInterfaceService();
-    HDF_LOGE("%{public}s :serviceImpl fzj", __func__);
+    HDF_LOGE("HdfSecureElementInterfaceDriverBind :serviceImpl");
     if (serviceImpl == nullptr) {
-        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        HDF_LOGE("HdfSecureElementInterfaceDriverBind: failed to get of implement service");
         delete hdfSecureElementInterfaceHost;
         return HDF_FAILURE;
     }
@@ -82,7 +94,7 @@ static int HdfSecureElementInterfaceDriverBind(struct HdfDeviceObject* deviceObj
     hdfSecureElementInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         OHOS::HDI::SecureElement::SimSecureElement::V1_0::ISecureElementInterface::GetDescriptor());
     if (hdfSecureElementInterfaceHost->stub == nullptr) {
-        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        HDF_LOGE("HdfSecureElementInterfaceDriverBind: failed to get stub object");
         delete hdfSecureElementInterfaceHost;
         return HDF_FAILURE;
     }
@@ -93,7 +105,7 @@ static int HdfSecureElementInterfaceDriverBind(struct HdfDeviceObject* deviceObj
 
 static void HdfSecureElementInterfaceDriverRelease(struct HdfDeviceObject* deviceObject)
 {
-    if (deviceObject->service == nullptr) {
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
         HDF_LOGE("HdfSecureElementInterfaceDriverRelease not initted");
         return;
     }

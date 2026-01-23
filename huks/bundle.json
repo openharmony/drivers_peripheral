@@ -17,6 +17,7 @@
       "ram": "7400KB",
       "deps": {
         "components": [
+          "bounds_checking_function",
           "hilog",
           "c_utils",
           "hdf_core",

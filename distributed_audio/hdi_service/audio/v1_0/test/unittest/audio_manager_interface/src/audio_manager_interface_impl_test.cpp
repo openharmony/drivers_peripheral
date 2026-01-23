@@ -173,6 +173,31 @@ HWTEST_F(AudioManagerInterfaceImplTest, Notify_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: Notify_003
+ * @tc.desc: Verify the Notify function.
+ * @tc.type: FUNC
+ * @tc.require: AR20250715266770
+ */
+HWTEST_F(AudioManagerInterfaceImplTest, Notify_003, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    std::string adpName = "adpName";
+    uint32_t devId = 0;
+    uint32_t streamId = 0;
+
+    DAudioEvent event = { HDF_AUDIO_SET_TASK_ID,
+        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" };
+    AudioAdapterDescriptor desc;
+    sptr<AudioAdapterInterfaceImpl> AudioAdapter = sptr<AudioAdapterInterfaceImpl>(new AudioAdapterInterfaceImpl(desc));
+    audioManagerInterfaceImpl_->mapAudioAdapter_.insert(std::make_pair(adpName, AudioAdapter));
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->Notify(adpName, devId, streamId, event));
+    
+    event = { HDF_AUDIO_SET_TASK_ID, "1" };
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->Notify(adpName, devId, streamId, event));
+}
+/**
  * @tc.name: NotifyFwk_001
  * @tc.desc: Verify the NotifyFwk function.
  * @tc.type: FUNC
@@ -182,6 +207,42 @@ HWTEST_F(AudioManagerInterfaceImplTest, NotifyFwk_001, TestSize.Level1)
 {
     audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     DAudioDevEvent event;
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
+}
+
+/**
+ * @tc.name: NotifyFwk_002
+ * @tc.desc: Verify the NotifyFwk function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioManagerInterfaceImplTest, NotifyFwk_002, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    std::string capability = R"({"INTERRUPT_GROUP_ID": 1, "VOLUME_GROUP_ID": 1, "info": "1234, 00A, 1"})";
+    std::string info = "";
+    std::string caps = "";
+    audioManagerInterfaceImpl_->HandleCaps(capability, info, caps);
+    DAudioDevEvent event = { "123", 1, HDF_AUDIO_DEVICE_ADD, 0, 1, 2, capability };
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
+    event.caps = R"({"INTERRUPT_GROUP_ID": 1, "VOLUME_GROUP_ID": 1})";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
+}
+
+/**
+ * @tc.name: NotifyFwk_003
+ * @tc.desc: Verify the NotifyFwk function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioManagerInterfaceImplTest, NotifyFwk_003, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    std::string capability = R"({"stream_info": "123", "support_remote_volume": true, "init_volume": 30,
+        "init_mute_status": 0};PROTOCOL=0)";
+    DAudioDevEvent event = { "123", 1, HDF_AUDIO_DEVICE_ADD, 0, 1, 2, capability };
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
+    event.caps = R"({"stream_info": "123", "support_remote_volume": true, "init_volume": 30, "init_mute_status": 0})";
     EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
 }
 

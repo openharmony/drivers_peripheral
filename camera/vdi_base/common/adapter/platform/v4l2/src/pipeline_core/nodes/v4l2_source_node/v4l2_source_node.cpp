@@ -45,7 +45,8 @@ struct MetadataTag {
 
 const MetadataTag OHOS_MAP_CAMERA_ID[] = {
     { "lcam001", CAMERA_FIRST },
-    { "lcam002", CAMERA_SECOND }
+    { "lcam002", CAMERA_SECOND },
+    { "lcam003", CAMERA_THIRD }
 };
 #endif
 

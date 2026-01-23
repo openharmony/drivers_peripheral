@@ -24,9 +24,9 @@
 
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_3;
+using namespace OHOS::HDI::Display::Composer::V1_4;
 
-static sptr<Composer::V1_3::IDisplayComposerInterface> g_composerInterface = nullptr;
+static sptr<Composer::V1_4::IDisplayComposerInterface> g_composerInterface = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_bufferInterface = nullptr;
 
 static bool g_isInit = false;
@@ -165,6 +165,17 @@ int32_t TestSetGetDisplayPowerStatus(uint32_t devId)
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetDisplayPowerStatus failed", __func__);
         return DISPLAY_FAILURE;
+    }
+    return ret;
+}
+
+int32_t TestGetPanelPowerStatus(uint32_t devId)
+{
+    PanelPowerStatus status;
+
+    int32_t ret = g_composerInterface->GetPanelPowerStatus(devId, status);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: function TestGetPanelPowerStatus failed, %{public}d", __func__, ret);
     }
     return ret;
 }
@@ -398,6 +409,9 @@ int TestGetDisplaySupportedModesExt(uint32_t devId)
 
 void TestModeCallback(uint32_t modeId, uint64_t vBlankPeriod, void* data)
 {
+    if (data == nullptr) {
+        HDF_LOGW("%{public}s: data is nullptr", __func__);
+    }
 }
 
 int TestSetDisplayModeAsync(uint32_t devId)
@@ -422,6 +436,9 @@ int TestGetDisplayVBlankPeriod(uint32_t devId)
 
 void TestSeamlessChangeCallback(uint32_t devId, void* data)
 {
+    if (data == nullptr) {
+        HDF_LOGW("%{public}s: data is nullptr", __func__);
+    }
 }
 
 int TestRegSeamlessChangeCallback(uint32_t devId)
@@ -456,6 +473,9 @@ int TestSetDisplayOverlayResolution(uint32_t devId)
 
 static void TestRefreshCallback(uint32_t devId, void* data)
 {
+    if (data == nullptr) {
+        HDF_LOGW("%{public}s: data is nullptr", __func__);
+    }
 }
 
 int TestRegRefreshCallback(uint32_t devId)
@@ -502,6 +522,9 @@ int TestGetDisplayIdentificationData(uint32_t devId)
 
 void TestHwcEventCallback(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void* data)
 {
+    if (data == nullptr) {
+        HDF_LOGW("%{public}s: data is NULL", __func__);
+    }
 }
 
 int TestRegHwcEventCallback(uint32_t devId)
@@ -513,6 +536,38 @@ int TestRegHwcEventCallback(uint32_t devId)
     return ret;
 }
 
+int32_t TestGetDisplayConnectionType(uint32_t devId)
+{
+    DisplayConnectionType connectionType;
+    int32_t ret = g_composerInterface->GetDisplayConnectionType(devId, connectionType);
+    if (ret != DISPLAY_SUCCESS && ret != DISPLAY_NOT_SUPPORT) {
+        HDF_LOGE("%{public}s: failed, ret:%{public}d, devId:%{public}u", __func__, ret, devId);
+    }
+    return ret;
+}
+
+int TestGetDisplayClientTargetProperty(uint32_t devId)
+{
+    int32_t pixelFormat = 0;
+    int32_t dataspace = 0;
+    int32_t ret = g_composerInterface->GetDisplayClientTargetProperty(devId, pixelFormat, dataspace);
+    if (ret != DISPLAY_SUCCESS && ret != DISPLAY_NOT_SUPPORT) {
+        HDF_LOGE("%{public}s: failed, ret:%{public}d, devId:%{public}u", __func__, ret, devId);
+    }
+    return ret;
+}
+
+int TestSetDisplayColorGamut(uint32_t devId)
+{
+    devId = 1;
+    ColorGamut gamut = COLOR_GAMUT_SRGB;
+    int32_t ret = g_composerInterface->SetDisplayColorGamut(devId, gamut);
+    if (ret != DISPLAY_SUCCESS && ret != DISPLAY_NOT_SUPPORT) {
+        HDF_LOGE("%{public}s: failed, ret:%{public}d, devId:%{public}u", __func__, ret, devId);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -520,6 +575,7 @@ TestFuncs g_testFuncs = {
     TestGetDisplaySupportedModes,
     TestSetGetDisplayMode,
     TestSetGetDisplayPowerStatus,
+    TestGetPanelPowerStatus,
     TestPrepareDisplayLayers,
     TestSetGetDisplayBacklight,
     TestGetDisplayProperty,
@@ -546,6 +602,9 @@ TestFuncs g_testFuncs = {
     TestCommit,
     TestGetDisplayIdentificationData,
     TestRegHwcEventCallback,
+    TestGetDisplayConnectionType,
+    TestGetDisplayClientTargetProperty,
+    TestSetDisplayColorGamut,
 };
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
@@ -557,7 +616,7 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
     // initialize service
     if (!g_isInit) {
         g_isInit = true;
-        g_composerInterface = Composer::V1_3::IDisplayComposerInterface::Get();
+        g_composerInterface = Composer::V1_4::IDisplayComposerInterface::Get();
         if (g_composerInterface == nullptr) {
             HDF_LOGE("%{public}s: get IDisplayComposerInterface failed", __func__);
             return false;

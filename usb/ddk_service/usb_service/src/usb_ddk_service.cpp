@@ -662,7 +662,8 @@ FINISHED:
         HDF_LOGE("%{public}s infoTemp failed", __func__);
         return HDF_FAILURE;
     }
-    return g_DdkLibusbAdapter->SendPipeRequest({infoTemp.busNum, infoTemp.devNum}, pipe.endpoint, size,
+    uint8_t intfId = GetInterfaceId(pipe.interfaceHandle);
+    return g_DdkLibusbAdapter->SendPipeRequest({infoTemp.busNum, infoTemp.devNum}, {intfId, pipe.endpoint}, size,
         transferedLength, pipe.timeout);
 #endif // LIBUSB_ENABLE
 }
@@ -725,9 +726,11 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     ret = GetInterfaceInfoByVal(pipe.interfaceHandle, infoTemp);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s infoTemp failed", __func__);
+        close(ashmem.ashmemFd);
         return HDF_FAILURE;
     }
-    return g_DdkLibusbAdapter->SendPipeRequestWithAshmem({infoTemp.busNum, infoTemp.devNum}, pipe.endpoint,
+    uint8_t intfId = GetInterfaceId(pipe.interfaceHandle);
+    return g_DdkLibusbAdapter->SendPipeRequestWithAshmem({infoTemp.busNum, infoTemp.devNum}, {intfId, pipe.endpoint},
         {ashmem.ashmemFd, ashmem.size}, transferredLength, pipe.timeout);
 #endif // LIBUSB_ENABLE
 }

@@ -26,6 +26,8 @@
 #include "securec.h"
 #include "thermal_log.h"
 
+#define DRIVERS_PERIPHERAL_THERMAL_FDSAN_TAG 0XD002943
+
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
@@ -81,13 +83,15 @@ int32_t ThermalSimulationNode::CreateNodeDir(std::string dir)
 
 int32_t ThermalSimulationNode::CreateNodeFile(std::string filePath)
 {
+    constexpr uint64_t FDSAN_PARAM = 0;
     if (access(filePath.c_str(), 0) != 0) {
         int32_t fd = open(filePath.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP| S_IROTH);
         if (fd < NUM_ZERO) {
             THERMAL_HILOGE(COMP_HDI, "open failed to file.");
             return fd;
         }
-        close(fd);
+        fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_THERMAL_FDSAN_TAG);
+        fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_THERMAL_FDSAN_TAG);
     } else {
         THERMAL_HILOGD(COMP_HDI, "the file already exists.");
     }
@@ -96,6 +100,7 @@ int32_t ThermalSimulationNode::CreateNodeFile(std::string filePath)
 
 int32_t ThermalSimulationNode::AddSensorTypeTemp()
 {
+    THERMAL_HILOGD(COMP_HDI, "AddSensorTypeTemp enter");
     std::vector<std::string> vFile = {"type", "temp"};
     std::map<std::string, int32_t> sensor;
     char nodeBuf[MAX_PATH] = {0};
@@ -229,12 +234,14 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
 
 int32_t ThermalSimulationNode::WriteFile(std::string path, std::string buf, size_t size)
 {
+    constexpr uint64_t FDSAN_PARAM = 0;
     int32_t fd = open(path.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
         THERMAL_HILOGE(COMP_HDI, "open failed to file.");
     }
+    fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_THERMAL_FDSAN_TAG);
     write(fd, buf.c_str(), size);
-    close(fd);
+    fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_THERMAL_FDSAN_TAG);
     return HDF_SUCCESS;
 }
 } // V1_1

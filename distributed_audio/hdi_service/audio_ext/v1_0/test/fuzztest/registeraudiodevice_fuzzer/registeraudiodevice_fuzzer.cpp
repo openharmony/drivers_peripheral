@@ -27,15 +27,18 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
 namespace V2_1 {
+const uint32_t VAR_NUM = 3;
 void RegisterAudioDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
+    if ((data == nullptr) || (size < (sizeof(int32_t)) * VAR_NUM)) {
         return;
     }
-
+    uint32_t offset = 0;
     std::string adpName(reinterpret_cast<const char*>(data), size);
-    int32_t devId = *(reinterpret_cast<const int32_t*>(data));
-    std::string capability(reinterpret_cast<const char*>(data), size);
+    offset += sizeof(int32_t);
+    int32_t devId = *(reinterpret_cast<const int32_t*>(data + offset));
+    offset += sizeof(char);
+    std::string capability(reinterpret_cast<const char*>(data + offset), size);
     sptr<IDAudioCallback> callbackObj = nullptr;
 
     DAudioManagerInterfaceImpl::GetDAudioManager()->RegisterAudioDevice(adpName, devId, capability, callbackObj);

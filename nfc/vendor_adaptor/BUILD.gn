@@ -14,6 +14,13 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("nfc_vendor_adaptor") {
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [ "//drivers/peripheral/nfc/vendor_adaptor" ]
   sources = [ "nfc_vendor_adaptions.cpp" ]
   branch_protector_ret = "pac_ret"
@@ -25,6 +32,7 @@ ohos_shared_library("nfc_vendor_adaptor") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "init:libbegetutil",
     "ipc:ipc_single",
   ]
 

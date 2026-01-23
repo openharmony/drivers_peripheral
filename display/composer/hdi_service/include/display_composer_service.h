@@ -25,6 +25,10 @@
 #include "v1_3/display_command/display_cmd_responser.h"
 #include "v1_3/idisplay_composer.h"
 #include "v1_3/display_composer_type.h"
+#include "v1_4/display_command/display_cmd_responser.h"
+#include "v1_4/idisplay_composer.h"
+#include "v1_4/display_composer_type.h"
+#include "common/include/display_config.h"
 #include "common/include/display_vdi_adapter_interface.h"
 #include <mutex>
 
@@ -32,9 +36,9 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-using namespace OHOS::HDI::Display::Composer::V1_3;
+using namespace OHOS::HDI::Display::Composer::V1_4;
 
-class DisplayComposerService : public V1_3::IDisplayComposer {
+class DisplayComposerService : public V1_4::IDisplayComposer {
 public:
     DisplayComposerService();
     virtual ~DisplayComposerService();
@@ -46,6 +50,7 @@ public:
     int32_t SetDisplayMode(uint32_t devId, uint32_t modeId) override;
     int32_t GetDisplayPowerStatus(uint32_t devId, V1_0::DispPowerStatus& status) override;
     int32_t SetDisplayPowerStatus(uint32_t devId, V1_0::DispPowerStatus status) override;
+    int32_t GetPanelPowerStatus(uint32_t devId, V1_4::PanelPowerStatus& status) override;
     int32_t GetDisplayBacklight(uint32_t devId, uint32_t& level) override;
     int32_t SetDisplayBacklight(uint32_t devId, uint32_t level) override;
     int32_t GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t& value) override;
@@ -69,6 +74,11 @@ public:
         std::vector<HdifdInfo>& outFds) override;
     int32_t GetCmdReply(std::shared_ptr<SharedMemQueue<int32_t>>& reply) override;
 
+    int32_t InitSMQInfo(uint32_t devId, const std::shared_ptr<SharedMemQueue<int32_t>>& request,
+        std::shared_ptr<SharedMemQueue<int32_t>>& reply) override;
+    int32_t DoCmdRequest(uint32_t devId, uint32_t inEleCnt, const std::vector<HdifdInfo>& inFds, uint32_t& outEleCnt,
+        std::vector<HdifdInfo>& outFds) override;
+
     int32_t RegSeamlessChangeCallback(const sptr<ISeamlessChangeCallback>& cb) override;
     int32_t GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes) override;
     int32_t SetDisplayModeAsync(uint32_t devId, uint32_t modeId, const sptr<IModeCallback>& cb) override;
@@ -87,7 +97,6 @@ public:
     int32_t FastPresent(uint32_t devId, const PresentParam& param,
         const std::vector<sptr<NativeBuffer>>& inHandles) override;
     int32_t GetDisplayIdentificationData(uint32_t devId, uint8_t& portId, std::vector<uint8_t>& edidData) override;
-    int32_t RegHwcEventCallback(const sptr<IHwcEventCallback>& cb) override;
     int32_t GetSupportLayerType(uint32_t devId, std::vector<V1_0::LayerType>& types) override;
     int32_t SetTunnelLayerId(uint32_t devId, uint32_t layerId, uint64_t tunnelId) override;
     int32_t SetTunnelLayerProperty(uint32_t devId, uint32_t layerId, uint32_t property) override;
@@ -95,6 +104,10 @@ public:
     int32_t SetTunnelLayerBuffer(uint32_t devId, uint64_t tunnelId,
         const sptr<NativeBuffer>& inHandle, const sptr<HdifdParcelable>& acquireFence) override;
     int32_t CommitTunnelLayer(uint32_t devId, uint64_t tunnelId, sptr<HdifdParcelable>& releaseFence) override;
+    int32_t RegHwcEventCallback(const sptr<IHwcEventCallback>& cb) override;
+    int32_t GetDisplayConnectionType(uint32_t devId, V1_4::DisplayConnectionType& outType) override;
+    int32_t GetDisplayClientTargetProperty(uint32_t devId, int32_t& pixelFormat, int32_t& dataspace) override;
+    int32_t SetDisplayColorGamut(uint32_t devId, ColorGamut gamut) override;
 
 private:
     void HidumperInit();
@@ -105,6 +118,7 @@ private:
     void LoadVdiFuncPart3();
     void ExitService();
     int32_t CreateResponser();
+    std::shared_ptr<V1_4::HdiDisplayCmdResponser> GetResponser(uint32_t devId);
     static void OnHotPlug(uint32_t outputId, bool connected, void* data);
     static void OnVBlank(unsigned int sequence, uint64_t ns, void* data);
     static void OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data);
@@ -112,22 +126,24 @@ private:
     static void OnRefresh(uint32_t devId, void *data);
     static void OnVBlankIdleCallback(uint32_t devId, uint64_t ns, void* data);
     static void OnHwcEvent(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void *data);
+    static void PrepareParallelResponser(uint32_t outputId, bool connected, void* data);
 private:
     /* Common */
     void* libHandle_;
     DisplayComposerVdiAdapter* vdiAdapter_;
     std::mutex mutex_;
     std::shared_ptr<DeviceCacheManager> cacheMgr_;
-    std::unordered_map<uint32_t, uint32_t> currentBacklightLevel_;
     std::unordered_map<uint32_t, bool> vsyncEnableStatus_;
     sptr<IHotPlugCallback> hotPlugCb_;
     sptr<IVBlankCallback> vBlankCb_;
     sptr<IModeCallback> modeCb_;
     sptr<ISeamlessChangeCallback> seamlessChangeCb_;
-    std::unique_ptr<V1_3::HdiDisplayCmdResponser> cmdResponser_;
     sptr<IRefreshCallback> refreshCb_;
     sptr<IVBlankIdleCallback> VBlankIdleCb_;
     sptr<IHwcEventCallback> hwcEventCb_;
+    static std::mutex respMapMutex_;
+    std::shared_ptr<V1_4::HdiDisplayCmdResponser> cmdResponser_;
+    std::unordered_map<uint32_t, std::shared_ptr<V1_4::HdiDisplayCmdResponser>> cmdResponserMap_;
 };
 } // namespace Composer
 } // namespace Display

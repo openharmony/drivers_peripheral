@@ -121,6 +121,7 @@ private:
     int32_t HandleFocusChangeEvent(const uint32_t streamId, const DAudioEvent &event, const uint32_t devId);
     int32_t HandleRenderStateChangeEvent(const DAudioEvent &event);
     int32_t HandleVolumeChangeEvent(const DAudioEvent &event);
+    int32_t HandleMuteSetEvent(const DAudioEvent &event);
     int32_t HandleSANotifyEvent(const uint32_t streamId, const DAudioEvent &event);
     int32_t WaitForSANotify(const uint32_t streamId, const AudioDeviceEvent &event);
     int32_t HandleDeviceClosed(const uint32_t streamId, const DAudioEvent &event);
@@ -152,12 +153,15 @@ private:
     void DeleteRenderCallback(const uint32_t renderId);
     void HandleSPKEvent(const uint32_t streamId, bool spkStatus, const DAudioEvent &event);
     void HandleMICEvent(bool micStatus, const DAudioEvent &event);
+    int32_t HandleWaudioEnable(const DAudioEvent &event);
+    int32_t SetUsualParamChange(const std::string &condition, const std::string &value);
 private:
     static constexpr uint32_t WAIT_MILLISECONDS = 8000;
     static constexpr int32_t TYPE_CONDITION = 11;
     static constexpr int32_t MAX_EVENT_DIGITS = 3;
     AudioAdapterDescriptor adpDescriptor_;
     AudioAdapterStatus status_ = STATUS_OFFLINE;
+    std::string capability_;
 
     std::mutex extCallbackMtx_;
     /**
@@ -198,6 +202,7 @@ private:
     uint32_t spkPinInUse_ = 0;
     uint32_t micPinInUse_ = 0;
     uint32_t streamMuteStatus_ = 0;
+    uint32_t sinkDhId_ = 0;
 
     // mmap param
     PortOperationMode renderFlags_ = Audioext::V2_1::NORMAL_MODE;

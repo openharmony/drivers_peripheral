@@ -32,6 +32,7 @@ namespace HDI {
 namespace Location {
 namespace Gnss {
 namespace V2_0 {
+const int MAX_CACHED_LOCATION_LENGTH = 1000;
 namespace {
 using LocationCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGnssCallback>>;
 #ifndef EMULATOR_ENABLED
@@ -252,6 +253,42 @@ void NmeaCallback(int64_t timestamp, const char* nmea, int length)
     }
 }
 
+void CachedLocationUpdate(const GnssLocation** locationArray, size_t arrayLength)
+{
+    if (arrayLength >= MAX_CACHED_LOCATION_LENGTH) {
+        HDF_LOGE("cachedLocation length exceed the maximum value.");
+        return;
+    }
+    std::vector<LocationInfo> locationArrayNew;
+    for (size_t i = 0; i < arrayLength; i++) {
+        if (locationArray[i] == nullptr) {
+            continue;
+        }
+        LocationInfo locationNew;
+        locationNew.fieldValidity = locationArray[i]->fieldValidity;
+        locationNew.latitude = locationArray[i]->latitude;
+        locationNew.longitude = locationArray[i]->longitude;
+        locationNew.altitude = locationArray[i]->altitude;
+        locationNew.horizontalAccuracy = locationArray[i]->horizontalAccuracy;
+        locationNew.speed = locationArray[i]->speed;
+        locationNew.bearing = locationArray[i]->bearing;
+        locationNew.verticalAccuracy = locationArray[i]->verticalAccuracy;
+        locationNew.speedAccuracy = locationArray[i]->speedAccuracy;
+        locationNew.bearingAccuracy = locationArray[i]->bearingAccuracy;
+        locationNew.timeForFix = locationArray[i]->timeForFix;
+        locationNew.timeSinceBoot = locationArray[i]->timeSinceBoot;
+        locationNew.timeUncertainty = locationArray[i]->timeUncertainty;
+        locationArrayNew.push_back(locationNew);
+    }
+    std::unique_lock<std::mutex> lock(g_mutex);
+    for (const auto& iter : g_locationCallBackMap) {
+        auto& callback = iter.second;
+        if (callback != nullptr) {
+            callback->ReportCachedLocation(locationArrayNew);
+        }
+    }
+}
+
 void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces* device)
 {
     if (device == nullptr) {
@@ -272,8 +309,8 @@ void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces* device)
     if (device == nullptr) {
         return;
     }
-    device->size = 0;
-    device->cachedLocationUpdate = nullptr;
+    device->size = sizeof(GnssCacheCallbackIfaces);
+    device->cachedLocationUpdate = CachedLocationUpdate;
 }
 
 void GetGnssCallbackMethods(GnssCallbackStruct* device)
@@ -318,12 +355,30 @@ int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    g_configPara.startCategory = static_cast<uint32_t>(GnssStartCategory::GNSS_START_CATEGORY_NORMAL);
-    g_configPara.u.gnssBasicConfig.gnssMode = para.gnssBasic.gnssMode;
-    g_configPara.u.gnssBasicConfig.size = sizeof(GnssBasicConfigPara);
-    int ret = gnssInterface->setGnssConfigPara(&g_configPara);
-    HDF_LOGI("%{public}s, ret=%{public}d", __func__, ret);
+    int ret;
+    if (!IsGnssBasicConfigValid(para.gnssBasic.gnssMode)) {
+        g_configPara.startCategory = static_cast<uint32_t>(GnssStartCategory::GNSS_START_CATEGORY_GNSS_CACHE);
+        g_configPara.u.gnssCacheConfig.interval = para.gnssCaching.interval;
+        g_configPara.u.gnssCacheConfig.fifoFullNotify = para.gnssCaching.fifoFullNotify;
+        g_configPara.u.gnssCacheConfig.size = sizeof(GnssCachingConfig);
+        ret = gnssInterface->setGnssConfigPara(&g_configPara);
+        HDF_LOGI("%{public}s, cache ret=%{public}d", __func__, ret);
+    } else {
+        g_configPara.startCategory = static_cast<uint32_t>(GnssStartCategory::GNSS_START_CATEGORY_NORMAL);
+        g_configPara.u.gnssBasicConfig.gnssMode = para.gnssBasic.gnssMode;
+        g_configPara.u.gnssBasicConfig.size = sizeof(GnssBasicConfigPara);
+        ret = gnssInterface->setGnssConfigPara(&g_configPara);
+        HDF_LOGI("%{public}s, gnss ret=%{public}d", __func__, ret);
+    }
     return ret;
+}
+
+bool GnssInterfaceImpl::IsGnssBasicConfigValid(int gnssMode)
+{
+    if (gnssMode < GNSS_WORKING_MODE_STANDALONE) {
+        return false;
+    }
+    return true;
 }
 
 int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
@@ -480,12 +535,32 @@ int32_t GnssInterfaceImpl::SetPredictGnssData(const std::string& data)
 int32_t GnssInterfaceImpl::GetCachedGnssLocationsSize(int32_t& size)
 {
     HDF_LOGI("%{public}s.", __func__);
+    auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
+    if (gnssInterface == nullptr) {
+        HDF_LOGE("%{public}s:GetGnssVendorInterface gnssInterface nullptr.", __func__);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    if (gnssInterface->getCachedLocationsSize == nullptr) {
+        HDF_LOGE("%{public}s:getCachedLocationsSize return nullptr.", __func__);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    size = gnssInterface->getCachedLocationsSize();
     return HDF_SUCCESS;
 }
 
 int32_t GnssInterfaceImpl::GetCachedGnssLocations()
 {
     HDF_LOGI("%{public}s.", __func__);
+    auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
+    if (gnssInterface == nullptr) {
+        HDF_LOGE("%{public}s:GetGnssVendorInterface gnssInterface nullptr.", __func__);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    if (gnssInterface->flushCachedGnssLocations == nullptr) {
+        HDF_LOGE("%{public}s:flushCachedGnssLocations return nullptr.", __func__);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    gnssInterface->flushCachedGnssLocations();
     return HDF_SUCCESS;
 }
 

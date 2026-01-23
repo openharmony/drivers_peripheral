@@ -510,7 +510,7 @@ int32_t UsbdPort::WritePdPortFile(int32_t powerRole, int32_t dataRole)
         return HDF_FAILURE;
     }
     int32_t ret = write(fd, modeStr.c_str(), len);
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (ret < 0) {
         HDF_LOGE("%{public}s: write  error", __func__);
         return HDF_FAILURE;
@@ -530,7 +530,7 @@ void UsbdPort::QueryPdPort(int32_t &powerRole, int32_t &dataRole, int32_t &mode)
     }
     char modeBuf[PATH_MAX] = {'\0'};
     int32_t ret = read(fd, modeBuf, PATH_MAX - 1);
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
  
     if (ret < 0) {
         HDF_LOGE("%{public}s: read error: %{public}s", __func__, path_.c_str());

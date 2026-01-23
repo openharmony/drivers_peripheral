@@ -1365,7 +1365,8 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
 
 IAM_STATIC bool CheckAuthType(uint32_t authType)
 {
-    if (authType != PIN_AUTH && authType != FACE_AUTH && authType != FINGER_AUTH && authType != RECOVERY_KEY) {
+    if (authType != PIN_AUTH && authType != FACE_AUTH && authType != FINGER_AUTH &&
+        authType != RECOVERY_KEY && authType != COMPANION_DEVICE_AUTH) {
         LOG_ERROR("bad authType %{public}u", authType);
         return false;
     }
@@ -1639,7 +1640,7 @@ ResultCode UpdateAbandonResultForReset(int32_t userId, bool *isDelete, Credentia
     *isDelete = true;
     *credentialInfo = *curCredential;
     uint64_t abandonTime = oldCredential->abandonedSysTime;
-    oldCredential->abandonedSysTime = GetReeTime();
+    oldCredential->abandonedSysTime = GetRtcTime();
     curCredential->authType = DEFAULT_AUTH_TYPE;
     newCredential->authType = PIN_AUTH;
     SwitchSubType(user);
@@ -1676,7 +1677,7 @@ ResultCode UpdateAbandonResultForUpdate(int32_t userId, bool *isDelete, Credenti
     }
     newCredential->authType = PIN_AUTH;
     curCredential->isAbandoned = true;
-    curCredential->abandonedSysTime = GetReeTime();
+    curCredential->abandonedSysTime = GetRtcTime();
     if (oldCredential != NULL) {
         *isDelete = true;
         *credentialInfo = *oldCredential;
@@ -1709,7 +1710,7 @@ bool IsAbandonCredentialExpired(const CredentialInfoHal *credentialInfo)
         return false;
     }
 
-    uint64_t currentTime = GetReeTime();
+    uint64_t currentTime = GetRtcTime();
     if (currentTime < credentialInfo->abandonedSysTime) {
         LOG_INFO("crdential abandoned time is error");
         return true;
@@ -1733,7 +1734,7 @@ int64_t CalcAbandonCredentialValidPeriod(const CredentialInfoHal *credentialInfo
     }
 
     if (credentialInfo->abandonedSysTime + ABANDON_PIN_VALID_PERIOD <= UINT64_MAX) {
-        return credentialInfo->abandonedSysTime + ABANDON_PIN_VALID_PERIOD - GetReeTime();
+        return credentialInfo->abandonedSysTime + ABANDON_PIN_VALID_PERIOD - GetRtcTime();
     }
 
     return ABANDON_PIN_VALID_PERIOD;

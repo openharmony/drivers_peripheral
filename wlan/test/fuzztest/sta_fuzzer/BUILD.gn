@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 TEST_ROOT_DIR = "../../.."
 
@@ -30,12 +29,11 @@ ohos_fuzztest("StaFuzzTest") {
 
   deps = [ "$TEST_ROOT_DIR/hdi_service:hdi_wlan_service" ]
 
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-
   external_deps = [
     "drivers_interface_wlan:libwlan_proxy_1.3",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "bounds_checking_function:libsec_shared",
   ]
 
   cflags = [

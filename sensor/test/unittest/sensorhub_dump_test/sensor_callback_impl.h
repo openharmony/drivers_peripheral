@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL4_H
-#define OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL4_H
+#ifndef OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H
+#define OHOS_HDI_SENSOR_V3_0_SENSORCALLBACKIMPL_H
 
 #include <hdf_base.h>
 #include "v3_0/isensor_callback.h"
@@ -31,9 +31,9 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V3_0 {
-class SensorCallbackImpl4 : public ISensorCallback {
+class SensorCallbackImpl : public ISensorCallback {
 public:
-    virtual ~SensorCallbackImpl4() {}
+    virtual ~SensorCallbackImpl() {}
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override
     {
@@ -56,7 +56,7 @@ public:
         DataToStr(st, event);
         if (printDataFlag) {
             printf("%s: %s\n", __func__, st.c_str());
-            HDF_LOGI("%{public}s: testcase4 %{public}s\n", __func__, st.c_str());
+            HDF_LOGI("%{public}s: testcase %{public}s\n", __func__, st.c_str());
         }
     }
 
@@ -97,4 +97,4 @@ public:
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V1_1_SENSORCALLBACKIMPL4_H
+#endif // OHOS_HDI_SENSOR_V1_1_SENSORCALLBACKIMPL_H

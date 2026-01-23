@@ -86,7 +86,7 @@ int32_t EthEapClientRegisterCallback(struct IEthernetCallback* callback, const c
         }
     }
     pthread_rwlock_unlock(&g_eapCallbackMutex);
-    free(callback);
+    free(ethEapCallback);
     HDF_LOGE("%s fail", __FUNCTION__);
     return HDF_FAILURE;
 }

@@ -21,7 +21,7 @@
 #include <benchmark/benchmark.h>
 #include <thread>
 #include "gtest/gtest.h"
-#include "v1_3/include/idisplay_composer_interface.h"
+#include "v1_4/include/idisplay_composer_interface.h"
 #include "v1_1/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
@@ -33,11 +33,11 @@
 #include "hdi_test_render_utils.h"
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_3;
+using namespace OHOS::HDI::Display::Composer::V1_4;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-static sptr<Composer::V1_3::IDisplayComposerInterface> g_composerDevice = nullptr;
+static sptr<Composer::V1_4::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
 const int SLEEP_CONT_100 = 100;
@@ -271,6 +271,26 @@ BENCHMARK_F(DisplayBenchmarkTest, SetDisplayModeTest)(benchmark::State &state)
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayModeTest)->
+    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetPanelPowerStatusTest
+  * @tc.desc: Benchmarktest for interface GetPanelPowerStatus.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetPanelPowerStatusTest)(benchmark::State &state)
+{
+    int32_t ret;
+    PanelPowerStatus powerStatus;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetPanelPowerStatus(g_displayIds[0], powerStatus);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetPanelPowerStatusTest)->
     Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
 
 /**
@@ -883,7 +903,68 @@ BENCHMARK_F(DisplayBenchmarkTest, RegHwcEventCallbackTest)(benchmark::State &sta
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, RegHwcEventCallbackTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
-    
+
+/**
+  * @tc.name: GetDisplayConnectionTypeTest
+  * @tc.desc: Benchmarktest for interface GetDisplayConnectionType.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplayConnectionTypeTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    DisplayConnectionType connectionType;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetDisplayConnectionType(g_displayIds[0], connectionType);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayConnectionTypeTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetDisplayClientTargetPropertyTest
+  * @tc.desc: Benchmarktest for interface GetDisplayClientTargetProperty.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplayClientTargetPropertyTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    int32_t pixelFormat = 0;
+    int32_t dataspace = 0;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetDisplayClientTargetProperty(g_displayIds[0], pixelFormat, dataspace);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayClientTargetPropertyTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetDisplayColorGamutTest
+  * @tc.desc: Benchmarktest for interface SetDisplayColorGamut.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetDisplayColorGamutTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    ColorGamut gamut = COLOR_GAMUT_SRGB;
+    uint32_t devId = 1;
+    for (auto _ : state) {
+        ret = g_composerDevice->SetDisplayColorGamut(devId, gamut);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayColorGamutTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 } // namespace
 
 int main(int argc, char** argv)

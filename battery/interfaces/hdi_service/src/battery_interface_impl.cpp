@@ -24,7 +24,7 @@ namespace Battery {
 namespace V2_0 {
 namespace {
 sptr<BatteryInterfaceImpl::BatteryDeathRecipient> g_deathRecipient = nullptr;
-bool g_isHdiStart = false;
+std::atomic_bool g_isHdiStart = false;
 }
 
 extern "C" IBatteryInterface *BatteryInterfaceImplGetInstance(void)
@@ -74,6 +74,7 @@ int32_t BatteryInterfaceImpl::Init()
 
 int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& callback)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (callback == nullptr) {
         BATTERY_HILOGW(FEATURE_BATT_INFO, "callback is nullptr");
         return HDF_ERR_INVALID_PARAM;
@@ -95,6 +96,7 @@ int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& callback)
 
 int32_t BatteryInterfaceImpl::UnRegister()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RemoveBatteryDeathRecipient(batteryCallback_);
     batteryCallback_ = nullptr;
     g_isHdiStart = false;

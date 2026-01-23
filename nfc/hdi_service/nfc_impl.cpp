@@ -203,6 +203,10 @@ int32_t NfcImpl::IoctlWithResponse(NfcCommand cmd, const std::vector<uint8_t> &d
         HDF_LOGE("NfcImpl::IoctlWithResponse, data is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
+    if (adaptor_.VendorIoctlExt(cmd, data, response)) {
+        status = NfcStatus::OK;
+        return HDF_SUCCESS;
+    }
     int ret = adaptor_.VendorIoctlWithResponse(cmd, (void*)&data[0], data.size(), response);
     if (ret == 0) {
         status = NfcStatus::OK;

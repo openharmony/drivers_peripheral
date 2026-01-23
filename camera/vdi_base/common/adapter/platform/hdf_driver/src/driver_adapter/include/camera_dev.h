@@ -77,7 +77,7 @@ public:
     static RetCode Init(std::vector<std::string> &cameraIds);
 
 private:
-    char *GetCameraName(const std::string &cameraId);
+    RetCode GetCameraName(const std::string &cameraId, char* deviceName);
     void LoopBuffers(const std::string &cameraId, int type);
     int32_t SetDeviceInfo(struct CameraFeature *feature,
         const std::string &cameraId, int type, char *deviceName, bool state);

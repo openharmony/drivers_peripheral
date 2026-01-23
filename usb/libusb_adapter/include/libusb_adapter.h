@@ -185,9 +185,9 @@ public:
     int32_t GetFileDescriptor(const UsbDev &dev, int32_t &fd);
     int32_t GetDeviceSpeed(const UsbDev &dev, uint8_t &speed);
     int32_t GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId, bool &unactivated);
-    int32_t SendPipeRequestWithAshmem(const UsbDev &dev, unsigned char endpointAddr,
+    int32_t SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPipe &pipe,
         SendRequestAshmemParameter sendRequestAshmemParameter, uint32_t &transferredLength, unsigned int timeout);
-    int32_t SendPipeRequest(const UsbDev &dev, unsigned char endpointAddr, uint32_t size,
+    int32_t SendPipeRequest(const UsbDev &dev, const UsbPipe &pipe, uint32_t size,
         uint32_t &transferedLength, unsigned int timeout);
     int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
     int32_t GetCurrentInterfaceSetting(const UsbDev &dev, uint8_t &settingIndex);
@@ -233,11 +233,11 @@ private:
     struct libusb_config_descriptor* FindConfigDescriptorById(libusb_device *dev, uint8_t descId);
     void ProcessExtraData(std::vector<uint8_t> &descriptor, size_t &currentOffset, const unsigned char *extra,
         int32_t extraLength);
-    int32_t GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe, libusb_endpoint_descriptor **endpoint_desc,
+    int32_t GetEndpointDesc(const UsbDev &dev, const UsbPipe &pipe, libusb_endpoint_descriptor *endpoint_desc,
         libusb_device_handle** deviceHandle);
     int32_t GetEndpointDescFromInterface(const UsbPipe &pipe, const libusb_interface_descriptor *intf_desc,
-    libusb_endpoint_descriptor **endpoint_desc);
-    int32_t DoSyncPipeTranfer(libusb_device_handle *dev_handle, unsigned char endpoint,
+    libusb_endpoint_descriptor *endpoint_desc);
+    int32_t DoSyncPipeTranfer(libusb_device_handle *dev_handle, libusb_endpoint_descriptor *endpointDes,
         unsigned char *buffer, SyncTranfer &syncTranfer);
     unsigned char *GetMmapBufferByFd(int32_t fd, size_t len);
     unsigned char *GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busAddress, int32_t &fd, size_t len);

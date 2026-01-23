@@ -990,6 +990,8 @@ HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
     param.authTypeNum = 1;
     param.authTypes[0] = 1;
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
+    param.authTypes[0] = COMPANION_DEVICE_AUTH;
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
     param.authTypeNum = MAX_AUTH_TYPE_LEN + 1;
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_BAD_PARAM);
@@ -1335,9 +1337,9 @@ HWTEST_F(IdmDatabaseTest, TestCalcCredentialValidPeriod_001, TestSize.Level0)
     credentialInfo.abandonedSysTime = 0;
     EXPECT_EQ(CalcCredentialValidPeriod(&credentialInfo), -1);
     credentialInfo.isAbandoned = true;
-    credentialInfo.abandonedSysTime = GetReeTime();
+    credentialInfo.abandonedSysTime = GetRtcTime();
     EXPECT_NE(CalcCredentialValidPeriod(&credentialInfo), 0);
-    credentialInfo.abandonedSysTime = GetReeTime() + 1;
+    credentialInfo.abandonedSysTime = GetRtcTime() + 1;
     EXPECT_EQ(CalcCredentialValidPeriod(&credentialInfo), 0);
 }
 } // namespace UserAuth

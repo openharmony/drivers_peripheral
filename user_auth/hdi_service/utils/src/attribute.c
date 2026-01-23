@@ -71,6 +71,8 @@ AttributeKey g_attributeKeyArray[] = {
     ATTR_EXPIRED_SYS_TIME,
     ATTR_OLD_ROOT_SECRET,
     ATTR_AUTH_PURPOSE,
+    ATTR_LOCK_STATE_AUTH_TYPE,
+    ATTR_AUTH_TRUST_LEVEL,
 };
 
 #define ARRAY_LENGTH(array) (uint32_t)(sizeof(array) / sizeof((array)[0]))

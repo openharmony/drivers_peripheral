@@ -16,7 +16,10 @@
 #include "serialgetportlist_fuzzer.h"
 #include "v1_0/serial_types.h"
 #include "v1_0/iserial_interface.h"
+#include "securec.h"
 
+#include <cstring>
+#include <memory>
 #include <vector>
 
 using namespace OHOS::HDI::Usb::Serial::V1_0;
@@ -29,6 +32,14 @@ namespace OHOS {
 namespace SERIAL {
     bool SerialGetPortListFuzzTest(const uint8_t* data, size_t size)
     {
+        unsigned seed = 0;
+        if (size >= sizeof(unsigned)) {
+            errno_t ret = memcpy_s(&seed, sizeof(unsigned), data, sizeof(unsigned));
+            if (ret != HDF_SUCCESS) {
+                return false;
+            }
+            srand(seed);
+        }
         auto serialInterface = ISerialInterface::Get("serial_interface_service", true);
         std::vector<SerialPort> portInfo;
         if (serialInterface->SerialGetPortList(portInfo) != OK || portInfo.size() == 0) {

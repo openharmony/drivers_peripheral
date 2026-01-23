@@ -18,7 +18,6 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("$HDF_CORE_DIR/hdf_core/adapter/uhdf2/uhdf.gni")
   import("$TEST_ROOT_DIR/wlan.gni")
 }
 
@@ -36,7 +35,6 @@ if (defined(ohos_lite)) {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
-      "//third_party/bounds_checking_function/include",
       "$HDF_CORE_DIR/hdf_core/framework/include/platform",
       "$HDF_CORE_DIR/hdf_core/framework/include/core",
       "$HDF_CORE_DIR/hdf_core/framework/include",
@@ -54,9 +52,11 @@ if (defined(ohos_lite)) {
       "$HDF_CORE_DIR/hdf_core/adapter/build/test_common:libhdf_test_common",
       "$HDF_CORE_DIR/hdf_core/adapter/uhdf/manager:hdf_core",
       "$HDF_CORE_DIR/hdf_core/adapter/uhdf/platform:hdf_platform",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "hilog_lite:hilog_shared" ]
+    external_deps = [
+      "hilog_lite:hilog_shared",
+      "bounds_checking_function:libsec_shared"
+    ]
 
     cflags = configFlag
   }
@@ -65,7 +65,6 @@ if (defined(ohos_lite)) {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
-      "//third_party/bounds_checking_function/include",
       "$TEST_ROOT_DIR/client/include",
       "$TEST_ROOT_DIR/hal/include",
       "$TEST_ROOT_DIR/interfaces/include",
@@ -75,9 +74,11 @@ if (defined(ohos_lite)) {
     public_deps = [
       "$TEST_ROOT_DIR/client:wifi_driver_client",
       "$TEST_ROOT_DIR/hal:wifi_hal",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "hdf_core:hdf_posix_osal" ]
+    external_deps = [
+      "hdf_core:hdf_posix_osal",
+      "bounds_checking_function:libsec_shared"
+    ]
 
     cflags = configFlag
   }
@@ -86,7 +87,6 @@ if (defined(ohos_lite)) {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
-      "//third_party/bounds_checking_function/include",
       "$TEST_ROOT_DIR/client/include",
       "$TEST_ROOT_DIR/hal/include",
       "$TEST_ROOT_DIR/interfaces/include",
@@ -95,9 +95,11 @@ if (defined(ohos_lite)) {
     sources = [ "client/hdf_client_test.cpp" ]
     public_deps = [
       "$TEST_ROOT_DIR/client:wifi_driver_client",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "hdf_core:hdf_posix_osal" ]
+    external_deps = [
+      "hdf_core:hdf_posix_osal",
+      "bounds_checking_function:libsec_shared"
+    ]
 
     cflags = configFlag
   }

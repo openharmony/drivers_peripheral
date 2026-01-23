@@ -80,7 +80,7 @@ constexpr uint8_t CDB_LENGTH_SIX = 6;
 constexpr uint8_t CDB_LENGTH_TEN = 10;
 constexpr uint32_t MAX_TRANSFER_BYTES = UINT32_MAX;
 constexpr uint32_t MAX_MEM_MAP_SIZE = UINT32_MAX;
-constexpr const char* SCSIPERIPHERAL_DEVICE_MMAP_PATH = "/data/service/el1/public/usb/scsi";
+constexpr const char* SCSIPERIPHERAL_DEVICE_MMAP_PATH = "/data/chipset/el1/public/usb/scsi";
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_SCSI_PERIPHERAL";
 std::mutex g_memMapMutex;
 
@@ -264,6 +264,7 @@ int32_t ScsiDdkService::Open(uint64_t deviceId, uint8_t interfaceIndex, ScsiPeri
         HDF_LOGE("%{public}s open failed, path=%{public}s, errno=%{public}d", __func__, path.c_str(), errno);
         return SCSIPERIPHERAL_DDK_IO_ERROR;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     dev.devFd = fd;
     HDF_LOGD("Open success, dev.devFd=%{public}d, path.c_str()=%{public}s", dev.devFd, path.c_str());
@@ -304,7 +305,7 @@ int32_t ScsiDdkService::Close(const ScsiPeripheralDevice& dev)
     }
 
     int32_t ret = TrackTime([&]() {
-        return close(dev.devFd);
+        return fdsan_close_with_tag(dev.devFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     }, __func__);
     if (ret == -1) {
         HDF_LOGE("%{public}s close failed", __func__);
@@ -312,7 +313,7 @@ int32_t ScsiDdkService::Close(const ScsiPeripheralDevice& dev)
     }
 
     ret = TrackTime([&]() {
-        return close(dev.memMapFd);
+        return fdsan_close_with_tag(dev.memMapFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     }, __func__);
     if (ret < 0) {
         HDF_LOGE("%{public}s: close failed, memMapFd=%{public}d, errno=%{public}d", __func__, dev.memMapFd, errno);
@@ -727,6 +728,7 @@ int32_t ScsiDdkService::GetDeviceMemMapFd(uint16_t busNum, uint16_t devAddr, uin
         HDF_LOGE("%{public}s: open error, path=%{public}s, errno=%{public}d", __func__, path, errno);
         return SCSIPERIPHERAL_DDK_IO_ERROR;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     memMapFd = fd;
     HDF_LOGD("%{public}s: memMapFd:%{public}d", __func__, memMapFd);

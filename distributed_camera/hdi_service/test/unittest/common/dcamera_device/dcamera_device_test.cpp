@@ -26,6 +26,7 @@
 #include "mock_dcamera_provider_callback.h"
 #include "dcamera_host.h"
 #include "v1_3/types.h"
+#include "metadata_utils.h"
 using namespace testing::ext;
 
 namespace OHOS {
@@ -234,7 +235,7 @@ HWTEST_F(DCameraDeviceTest, dcamera_device_test_008, TestSize.Level1)
     int32_t rc = dcameraDevice_->UpdateSettings(settings);
 
     // Verify
-    EXPECT_NE(rc, CamRetCode::CAMERA_CLOSED);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
 }
 
 /**
@@ -516,6 +517,57 @@ HWTEST_F(DCameraDeviceTest, dcamera_device_test_022, TestSize.Level1)
     std::vector<int32_t> oversizedResults(METADATA_CAPACITY_MAX_SIZE + 1, 0);
     int32_t ret = dcameraDevice_->DisableResult(oversizedResults);
     EXPECT_EQ(ret, CamRetCode::DEVICE_ERROR);
+}
+
+/**
+ * @tc.name: dcamera_device_test_023
+ * @tc.desc: Verify UpdateSettings when system switch
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DCameraDeviceTest, dcamera_device_test_023, TestSize.Level1)
+{
+    ASSERT_NE(dcameraDevice_, nullptr);
+    std::vector<uint8_t> settings;
+    auto metaData = make_shared<OHOS::Camera::CameraMetadata>(100, 200);
+    int8_t cameraType[] = {10, 30};
+    int32_t cameraFpsRange[] = {10, 30};
+    uint32_t cameraMesureExposureTime[] = {10};
+    int64_t sensorExposeTime[] = {30};
+    float sensorInfoPhysicalSize[] = {0.1};
+    float jpegGpsCoordinates[] = {0.1, 0.1};
+    bool switchFlag[] = {true};
+    int32_t rotate[] = {90};
+
+    camera_rational_t controlAeCompenstationStep[] = {{1, 3}};
+    metaData->addEntry(OHOS_ABILITY_CAMERA_TYPE, cameraType, 1);
+    metaData->addEntry(OHOS_ABILITY_FPS_RANGES, cameraFpsRange, 2);
+    metaData->addEntry(OHOS_CONTROL_MANUAL_EXPOSURE_TIME, cameraMesureExposureTime, 1);
+    metaData->addEntry(OHOS_SENSOR_EXPOSURE_TIME, sensorExposeTime, 1);
+    metaData->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, sensorInfoPhysicalSize, 1);
+    metaData->addEntry(OHOS_JPEG_GPS_COORDINATES, jpegGpsCoordinates, 1);
+    metaData->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP, controlAeCompenstationStep, 1);
+    metaData->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP + 1, controlAeCompenstationStep, 1);
+    metaData->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP + 2, controlAeCompenstationStep, 1);
+    metaData->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP + 3, controlAeCompenstationStep, 1);
+    metaData->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP + 4, controlAeCompenstationStep, 1);
+    metaData->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP + 5, controlAeCompenstationStep, 1);
+    metaData->addEntry(OHOS_CONTROL_REQUEST_CAMERA_SWITCH, switchFlag, 1);
+    metaData->addEntry(OHOS_CONTROL_CAMERA_SWITCH_INFOS, rotate, 1);
+    dcameraDevice_->isOpened_ = true;
+    bool ret = OHOS::Camera::MetadataUtils::ConvertMetadataToVec(metaData, settings);
+    if (!ret) {
+        EXPECT_EQ(ret, CamRetCode::NO_ERROR);
+        return;
+    }
+    int32_t rc = dcameraDevice_->UpdateSettings(settings);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+
+    switchFlag[0] = false;
+    metaData->updateEntry(OHOS_CONTROL_REQUEST_CAMERA_SWITCH, switchFlag, 1);
+
+    rc = dcameraDevice_->UpdateSettings(settings);
+    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 }
 }
 }

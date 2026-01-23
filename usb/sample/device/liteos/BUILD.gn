@@ -16,7 +16,6 @@ import("./../../../usb.gni")
 
 ohos_executable("usb_dev_test") {
   include_dirs = [
-    "//third_party/bounds_checking_function/include",
     "${usb_driver_path}/utils/include",
   ]
 
@@ -31,9 +30,9 @@ ohos_executable("usb_dev_test") {
   public_deps = [
     "./../../../../../hdf_core/adapter/uhdf/manager:hdf_core",
     "./../../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-    "//third_party/bounds_checking_function:libsec_shared",
   ]
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "hdf_core:libhdf_utils",
     "hilog_lite:hilog_shared",
   ]

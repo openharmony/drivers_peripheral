@@ -87,6 +87,7 @@ typedef enum AuthType {
     FACE_AUTH = 2,
     FINGER_AUTH = 4,
     RECOVERY_KEY = 8,
+    COMPANION_DEVICE_AUTH = 64,
 } AuthType;
 
 typedef enum ScheduleMode {

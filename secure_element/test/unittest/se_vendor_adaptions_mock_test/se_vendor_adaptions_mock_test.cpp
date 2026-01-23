@@ -141,7 +141,7 @@ HWTEST_F(SeVendorAdaptionsTest, transmit001, TestSize.Level1)
 {
     EXPECT_CALL(mockTee_, VendorSecureElementCaTransmit(_, _, _, _))
         .WillOnce(Return(0));
-    const std::vector<uint8_t> command;
+    const std::vector<uint8_t> command = {1};
     std::vector<uint8_t> response;
     SecureElementStatus status;
     std::shared_ptr<SeVendorAdaptions> seVendorAdaptions = std::make_shared<SeVendorAdaptions>();

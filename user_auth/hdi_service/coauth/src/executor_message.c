@@ -436,17 +436,22 @@ void DestroyExecutorResultInfo(ExecutorResultInfo *result)
     Free(result);
 }
 
-IAM_STATIC ResultCode SetExecutorMsgToAttribute(uint32_t authType, uint32_t authPropertyMode,
+IAM_STATIC ResultCode SetExecutorMsgToAttribute(uint32_t executorAuthType, const CreateExecutorMsgInfo *createInfo,
     const Uint64Array *templateIds, Attribute *attribute)
 {
-    ResultCode result = SetAttributeUint32(attribute, ATTR_PROPERTY_MODE, authPropertyMode);
+    ResultCode result = SetAttributeUint32(attribute, ATTR_PROPERTY_MODE, createInfo->authPropertyMode);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("SetAttributeUint32 propertyMode failed");
         return RESULT_GENERAL_ERROR;
     }
-    result = SetAttributeUint32(attribute, ATTR_TYPE, authType);
+    result = SetAttributeUint32(attribute, ATTR_TYPE, executorAuthType);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("SetAttributeUint32 authType failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    result = SetAttributeUint32(attribute, ATTR_LOCK_STATE_AUTH_TYPE, createInfo->triggerAuthType);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint32 lockStateAuthType failed");
         return RESULT_GENERAL_ERROR;
     }
     Uint64Array templateIdsIn = { templateIds->data, templateIds->len };
@@ -461,17 +466,22 @@ IAM_STATIC ResultCode SetExecutorMsgToAttribute(uint32_t authType, uint32_t auth
         LOG_ERROR("SetAttributeUint64 time failed");
         return RESULT_GENERAL_ERROR;
     }
-
+    result = SetAttributeInt32(attribute, ATTR_USER_ID, createInfo->userId);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeInt32 userId failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    result = SetAttributeUint32(attribute, ATTR_AUTH_TRUST_LEVEL, createInfo->authTrustLevel);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint32 authTrustLevel failed");
+        return RESULT_GENERAL_ERROR;
+    }
     return RESULT_SUCCESS;
 }
 
-
-IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode, const Uint64Array *templateIds)
+IAM_STATIC Buffer *CreateExecutorMsg(
+    uint32_t executorAuthType, const CreateExecutorMsgInfo *createInfo, const Uint64Array *templateIds)
 {
-    if (templateIds == NULL) {
-        LOG_ERROR("templateIds is null");
-        return NULL;
-    }
     Buffer *retBuffer = NULL;
     Uint8Array retInfo = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
     Attribute *attribute = CreateEmptyAttribute();
@@ -480,13 +490,13 @@ IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMod
         goto FAIL;
     }
 
-    ResultCode result = SetExecutorMsgToAttribute(authType, authPropertyMode, templateIds, attribute);
+    ResultCode result = SetExecutorMsgToAttribute(executorAuthType, createInfo, templateIds, attribute);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("set msg to attribute failed");
         goto FAIL;
     }
 
-    if (authPropertyMode == PROPERTY_MODE_UNFREEZE) {
+    if (createInfo->authPropertyMode == PROPERTY_MODE_UNFREEZE) {
         SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
         result = GetAttributeExecutorMsg(attribute, &retInfo, signParam);
     } else {
@@ -573,16 +583,13 @@ IAM_STATIC ResultCode GetExecutorTemplateList(
 }
 
 IAM_STATIC ResultCode AssemblyMessage(
-    int32_t userId, const ExecutorInfoHal *executorNode, uint32_t authPropertyMode, LinkedList *executorMsg)
+    const CreateExecutorMsgInfo *createInfo, const ExecutorInfoHal *executorNode, LinkedList *executorMsg)
 {
     Uint64Array templateIds;
-    ResultCode ret = GetExecutorTemplateList(userId, executorNode, &templateIds);
+    ResultCode ret = GetExecutorTemplateList(createInfo->userId, executorNode, &templateIds);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get template list failed");
         return ret;
-    }
-    if (templateIds.len == 0) {
-        return RESULT_SUCCESS;
     }
     ExecutorMsg *msg = (ExecutorMsg *)Malloc(sizeof(ExecutorMsg));
     if (msg == NULL) {
@@ -591,7 +598,7 @@ IAM_STATIC ResultCode AssemblyMessage(
         return RESULT_NO_MEMORY;
     }
     msg->executorIndex = executorNode->executorIndex;
-    msg->msg = CreateExecutorMsg(executorNode->authType, authPropertyMode, &templateIds);
+    msg->msg = CreateExecutorMsg(executorNode->authType, createInfo, &templateIds);
     if (msg->msg == NULL) {
         LOG_ERROR("msg's msg is null");
         Free(templateIds.data);
@@ -608,7 +615,7 @@ IAM_STATIC ResultCode AssemblyMessage(
 }
 
 IAM_STATIC ResultCode TraverseExecutor(
-    int32_t userId, uint32_t executorRole, uint32_t authPropertyMode, LinkedList *executorMsg)
+    const CreateExecutorMsgInfo *createInfo, uint32_t executorRole, LinkedList *executorMsg)
 {
     ExecutorCondition condition = {};
     SetExecutorConditionExecutorRole(&condition, executorRole);
@@ -626,7 +633,7 @@ IAM_STATIC ResultCode TraverseExecutor(
         }
         ExecutorInfoHal *executorNode = (ExecutorInfoHal *)temp->data;
         if (executorNode->authType != PIN_AUTH) {
-            ResultCode ret = AssemblyMessage(userId, executorNode, authPropertyMode, executorMsg);
+            ResultCode ret = AssemblyMessage(createInfo, executorNode, executorMsg);
             if (ret != RESULT_SUCCESS) {
                 LOG_ERROR("assembly message failed");
                 DestroyLinkedList(executors);
@@ -639,10 +646,10 @@ IAM_STATIC ResultCode TraverseExecutor(
     return RESULT_SUCCESS;
 }
 
-ResultCode GetExecutorMsgList(int32_t userId, uint32_t authPropertyMode, LinkedList **executorMsg)
+ResultCode GetExecutorMsgList(const CreateExecutorMsgInfo *createInfo, LinkedList **executorMsg)
 {
-    if (executorMsg == NULL) {
-        LOG_ERROR("executorMsg is null");
+    if (createInfo == NULL || executorMsg == NULL) {
+        LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
     *executorMsg = CreateLinkedList(DestoryExecutorMsg);
@@ -650,7 +657,7 @@ ResultCode GetExecutorMsgList(int32_t userId, uint32_t authPropertyMode, LinkedL
         LOG_ERROR("create list failed");
         return RESULT_NO_MEMORY;
     }
-    ResultCode ret = TraverseExecutor(userId, ALL_IN_ONE, authPropertyMode, *executorMsg);
+    ResultCode ret = TraverseExecutor(createInfo, ALL_IN_ONE, *executorMsg);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("traverse allInOne executor failed");
         DestroyLinkedList(*executorMsg);

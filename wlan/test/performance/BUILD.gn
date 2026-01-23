@@ -18,7 +18,6 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("$HDF_CORE_DIR/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {
@@ -39,11 +38,11 @@ if (defined(ohos_lite)) {
       "$HDF_CORE_DIR/hdf_core/adapter/uhdf/platform:hdf_platform",
       "$TEST_ROOT_DIR/client:wifi_driver_client",
       "$TEST_ROOT_DIR/hal:wifi_hal",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
     external_deps = [
       "hdf_core:hdf_posix_osal",
       "hilog_lite:hilog_shared",
+      "bounds_checking_function:libsec_shared"
     ]
 
     cflags = [

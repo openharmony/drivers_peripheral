@@ -74,6 +74,7 @@ public:
     int32_t RegisterAudioHdfListener(const std::string &serviceName, const sptr<IDAudioHdfCallback> &callbackObj);
     int32_t UnRegisterAudioHdfListener(const std::string &serviceName);
     void ForceNotifyFwk();
+    bool GetAudioMgrState();
 
 private:
     AudioManagerInterfaceImpl();
@@ -86,6 +87,7 @@ private:
         const std::string &deviceId, uint32_t dhId);
     int32_t RemoveClearRegisterRecipient(sptr<IRemoteObject> &remote,
         const std::string &deviceId, uint32_t dhId);
+    void HandleCaps(const std::string &capability, std::string &info, std::string &caps);
 
 private:
     class Deletor {
@@ -143,6 +145,7 @@ private:
     std::map<std::string, sptr<IDAudioHdfCallback>> mapAudioHdfCallback_;
     std::mutex notifyFwkMtx_;
     std::map<std::string, DAudioDevEvent> notifyFwkMap_;
+    std::atomic<bool> isDestruct_ = false;
 };
 } // V1_0
 } // Audio

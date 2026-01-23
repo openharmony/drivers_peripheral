@@ -27,7 +27,6 @@ namespace Battery {
 namespace V2_0 {
 namespace {
 constexpr const char* BATTERY_CONFIG_PATH = "etc/battery/battery_config.json";
-constexpr const char* SYSTEM_BATTERY_CONFIG_PATH = "/system/etc/battery/battery_config.json";
 constexpr const char* VENDOR_BATTERY_CONFIG_PATH = "/vendor/etc/battery/battery_config.json";
 constexpr const char* VENDOR_BATTERY_SPLIT_CONFIG_PATH = "/vendor/etc/battery/charge_config.json";
 constexpr const char* BATTERY_CONFIG_EXCEPTION_PATH = "";
@@ -155,23 +154,14 @@ bool BatteryConfig::OpenFile(std::ifstream& ifsConf, const std::string& configPa
     if (!configPath.empty()) {
         ifsConf.open(configPath);
         isOpen = ifsConf.is_open();
-        BATTERY_HILOGD(COMP_HDI, "open file is %{public}d", isOpen);
+        BATTERY_HILOGI(COMP_HDI, "open file from GetOneCfgFile, isopen=%{public}d", isOpen);
     }
     if (isOpen) {
         return true;
     }
-
     ifsConf.open(VENDOR_BATTERY_CONFIG_PATH);
     isOpen = ifsConf.is_open();
-    BATTERY_HILOGI(COMP_HDI, "open then vendor battery_config.json is %{public}d", isOpen);
-
-    if (isOpen) {
-        return true;
-    }
-
-    ifsConf.open(SYSTEM_BATTERY_CONFIG_PATH);
-    isOpen = ifsConf.is_open();
-    BATTERY_HILOGI(FEATURE_CHARGING, "open then system battery_config.json is %{public}d", isOpen);
+    BATTERY_HILOGI(COMP_HDI, "open vendor battery_config.json, isopen=%{public}d", isOpen);
     return isOpen;
 }
 
@@ -405,12 +395,12 @@ void BatteryConfig::ParseUeventConfig(const cJSON* ueventConfig)
         cJSON* subChild = nullptr;
         cJSON_ArrayForEach(subChild, valueObj) {
             if (subChild->string == nullptr) {
-                BATTERY_HILOGW(COMP_SVC, "Found null key in uevent conf");
+                BATTERY_HILOGW(COMP_HDI, "Found null key in uevent conf");
                 continue;
             }
             const std::string event = subChild->string;
             if (!HdfBatteryJsonUtils::IsValidJsonString(subChild)) {
-                BATTERY_HILOGW(COMP_SVC, "The uevent conf is invalid, key=%{public}s", key.c_str());
+                BATTERY_HILOGW(COMP_HDI, "The uevent conf is invalid, key=%{public}s", key.c_str());
                 continue;
             }
             std::string act = subChild->valuestring;
