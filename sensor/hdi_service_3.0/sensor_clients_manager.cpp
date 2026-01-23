@@ -19,6 +19,7 @@
 #include <iproxy_broker.h>
 
 #define HDF_LOG_TAG manager
+#define SENSOR_CLIENT_INFO_MAX 1000
 
 namespace OHOS {
 namespace HDI {
@@ -115,6 +116,20 @@ void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId,
 {
     SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
+    if (groupId < HDF_TRADITIONAL_SENSOR_TYPE || groupId >= HDF_SENSOR_GROUP_TYPE_MAX) {
+        HDF_LOGE("%{public}s: sensor groupId error", __func__);
+        return;
+    }
+    auto clientsIt = clients_.find(groupId);
+    if (clientsIt != clients_.end()) {
+        auto& clients = clientsIt->second;
+        if (clients.find(serviceId) == clients.end() && clients.size() >= SENSOR_CLIENT_INFO_MAX) {
+            HDF_LOGE("%{public}s: sensor client information size has exceeded the maximum value", __func__);
+            return;
+        } else {
+            HDF_LOGI("%{public}s: sensor client information size is %{public}zu", __func__, clients.size());
+        }
+    }
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         if (callbackObj == nullptr) {
             HDF_LOGE("%{public}s: the callback of service %{public}d is null", __func__, serviceId);
