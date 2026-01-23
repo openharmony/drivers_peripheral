@@ -223,7 +223,7 @@ void* NfcVendorAdaptions::DoHalPreOpen(void* arg)
             WriteBootloaderHiSysEvent(BOOTLOADER_STATUS_RECOVER_FAILED);
             return nullptr;
         }
-        status = static_cast<NFCSTATUS>(mVendorAdapter->nfcHalInf.nfcHalMinClose()));
+        status = static_cast<NFCSTATUS>(mVendorAdapter->nfcHalInf.nfcHalMinClose());
         if (status != HDF_SUCCESS) {
             HDF_LOGE("DoHalPreOpen: nfcHalMinClose is fail");
             mVendorAdapter->UpdateNfcOpenStatus(NFC_OPEN_STATUS);
