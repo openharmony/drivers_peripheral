@@ -216,14 +216,14 @@ void* NfcVendorAdaptions::DoHalPreOpen(void* arg)
     std::lock_guard<std::mutex> lock(g_openMutex);
     if (mVendorAdapter->CheckNfcBootloaderStatus()) {
         mVendorAdapter->UpdateNfcOpenStatus(NFC_OPENING_STATUS);
-        status = mVendorAdapter->nfcHalInf.nfcHalMinOpen(true);
+        status = static_cast<NFCSTATUS>(mVendorAdapter->nfcHalInf.nfcHalMinOpen(true));
         if (status != HDF_SUCCESS) {
             HDF_LOGE("DoHalPreOpen: nfcHalMinOpen is fail");
             mVendorAdapter->UpdateNfcOpenStatus(NFC_CLOSE_STATUS);
             WriteBootloaderHiSysEvent(BOOTLOADER_STATUS_RECOVER_FAILED);
             return nullptr;
         }
-        status = mVendorAdapter->nfcHalInf.nfcHalMinClose();
+        status = static_cast<NFCSTATUS>(mVendorAdapter->nfcHalInf.nfcHalMinClose()));
         if (status != HDF_SUCCESS) {
             HDF_LOGE("DoHalPreOpen: nfcHalMinClose is fail");
             mVendorAdapter->UpdateNfcOpenStatus(NFC_OPEN_STATUS);
@@ -308,10 +308,10 @@ int8_t NfcVendorAdaptions::InitNfcHalInterfaces(string nfcHalSoName, string suff
     nfcHalInf.nfcHalShutdownCase = reinterpret_cast<int (*)()>
         (dlsym(nfcHalHandle, (HAL_SHUTDOWN_CASE_FUNC_NAME + suffix).c_str()));
 
-    nfcHalInf.nfcHalMinOpen = reinterpret_cast<NFCSTATUS (*)(bool)>
+    nfcHalInf.nfcHalMinOpen = reinterpret_cast<int (*)(bool)>
         (dlsym(nfcHalHandle, (HAL_MIN_OPEN_FUNC_NAME + suffix).c_str()));
 
-    nfcHalInf.nfcHalMinClose = reinterpret_cast<NFCSTATUS (*)()>
+    nfcHalInf.nfcHalMinClose = reinterpret_cast<int (*)()>
         (dlsym(nfcHalHandle, (HAL_MIN_CLOSE_FUNC_NAME + suffix).c_str()));
 
     if (nfcHalInf.nfcHalOpen == nullptr || nfcHalInf.nfcHalWrite == nullptr ||
