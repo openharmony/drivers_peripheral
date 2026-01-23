@@ -1256,7 +1256,7 @@ int32_t SensorIfService::RegisterWithCallbackId(int32_t groupId, const sptr<V3_0
     HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d cbId %{public}d", __func__, groupId, serviceId, callbackId);
     if (callbackId <= CALLBACK_ID_BEGIN || callbackId >= CALLBACK_ID_END) {
         HDF_LOGE("%{public}s: callbackId %{public}d is invalid", __func__, callbackId);
-        return HDF_ERR_INVALID_PARAM;
+        // return HDF_ERR_INVALID_PARAM;
     }
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     int32_t ret = HDF_SUCCESS;
