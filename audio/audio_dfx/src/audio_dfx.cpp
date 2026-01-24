@@ -158,7 +158,7 @@ void AudioXCollieCallback(void *param)
     std::string content = RECLAIM_FILEPAGE_STRING;
     std::ofstream outfile(path);
     if (outfile.is_open()) {
-        outfile << countent;
+        outfile << content;
         outfile.close();
         AUDIO_FUNC_LOGI("reclaim memory");
     } else {
