@@ -32,18 +32,26 @@ struct HdfRilHost {
 static int32_t RilDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (client == nullptr && client->device == nullptr && client->device->service == nullptr) {
+        HDF_LOGE("RilDriverDispatch is not initted");
+        return HDF_ERR_INVALID_PARAM;
+    }
     auto *hdfRilHost = CONTAINER_OF(client->device->service, struct HdfRilHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
 
-    if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
+    if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS || dataParcel == nullptr) {
         HDF_LOGE("invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
-    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
+    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS || replyParcel == nullptr) {
         HDF_LOGE("invalid reply sbuf object to dispatch");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (hdfRilHost == nullptr && hdfRilHost->stub == nullptr) {
+        HDF_LOGE("hdfRilHost is nullptr or hdfRilHost->stub is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = hdfRilHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
