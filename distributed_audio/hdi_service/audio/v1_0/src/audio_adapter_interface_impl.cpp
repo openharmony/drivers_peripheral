@@ -302,11 +302,11 @@ bool AudioAdapterInterfaceImpl::CheckDevCapability(const AudioDeviceDescriptor &
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     if (mapAudioDevice_.find(desc.pins) == mapAudioDevice_.end()) {
         if (attrs.type == AUDIO_OFFLOAD) {
- 	        if (extCallbackMap_.find(OFFLOAD_RENDER_ID) != extCallbackMap_.end() &&
- 	            mapAudioDevice_.find(static_cast<uint32_t>(OFFLOAD_RENDER_ID)) != mapAudioDevice_.end()) {
- 	            return true;
- 	        }
- 	    }
+            if (extCallbackMap_.find(OFFLOAD_RENDER_ID) != extCallbackMap_.end() &&
+                mapAudioDevice_.find(static_cast<uint32_t>(OFFLOAD_RENDER_ID)) != mapAudioDevice_.end()) {
+                return true;
+            }
+        }
         DHLOGE("Can not find device, create render failed.");
         return false;
     }
