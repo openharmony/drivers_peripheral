@@ -32,7 +32,7 @@ struct HdfRilHost {
 static int32_t RilDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    if (client == nullptr && client->device == nullptr && client->device->service == nullptr) {
+    if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
         HDF_LOGE("RilDriverDispatch is not initted");
         return HDF_ERR_INVALID_PARAM;
     }
