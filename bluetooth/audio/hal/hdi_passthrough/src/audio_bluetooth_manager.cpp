@@ -19,6 +19,7 @@
 #include "audio_internal.h"
 #include "i_bluetooth_a2dp_src.h"
 #include "i_bluetooth_host.h"
+#include "bluetooth_host_proxy.h"
 #include "bluetooth_a2dp_src_observer.h"
 #include "bluetooth_def.h"
 #include "iservice_registry.h"
@@ -162,7 +163,7 @@ void GetProxy()
         return;
     }
 
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
+    sptr<IBluetoothHost> hostProxy = new BluetoothHostProxy(hostRemote);
     if (!hostProxy) {
         HDF_LOGE("%{public}s: error: host no proxy", __func__);
         return;
