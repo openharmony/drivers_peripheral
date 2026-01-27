@@ -50,7 +50,7 @@ static int32_t RilDriverDispatch(
         HDF_LOGE("invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
-    if (hdfRilHost == nullptr && hdfRilHost->stub == nullptr) {
+    if (hdfRilHost == nullptr || hdfRilHost->stub == nullptr) {
         HDF_LOGE("hdfRilHost is nullptr or hdfRilHost->stub is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
