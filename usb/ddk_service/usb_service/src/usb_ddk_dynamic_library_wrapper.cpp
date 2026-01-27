@@ -22,13 +22,13 @@ extern "C" {
 int VerifyAccessToken(uint32_t callerToken, const std::string &permissionName)
 {
     return static_cast<int>(
-        OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName));
+        OHOS::Security::AccessToken::AccessTokenCompatKit::VerifyAccessToken(callerToken, permissionName));
 }
 
 int GetApiVersion(uint32_t callerToken, int32_t &apiVersion)
 {
     OHOS::Security::AccessToken::HapTokenInfoCompat hapInfo;
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callerToken, hapInfo);
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenCompatKit::GetHapTokenInfo(callerToken, hapInfo);
     apiVersion = hapInfo.apiVersion;
     return ret;
 }

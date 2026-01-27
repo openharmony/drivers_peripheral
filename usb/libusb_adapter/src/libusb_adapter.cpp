@@ -142,7 +142,7 @@ void GetApiVersion(int32_t &apiVersion)
 {
     uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
     OHOS::Security::AccessToken::HapTokenInfoCompat info;
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callerToken, info);
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenCompatKit::GetHapTokenInfo(callerToken, info);
     if (ret < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: get hapInfo failed", __func__);
         return;
