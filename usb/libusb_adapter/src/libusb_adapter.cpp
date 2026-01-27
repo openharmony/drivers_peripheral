@@ -30,7 +30,7 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 
-#include "accesstoken_kit.h"
+#include "accesstoken_compat_kit.h"
 #include "hap_token_info.h"
 #include "hisysevent.h"
 #include "ipc_skeleton.h"
@@ -141,7 +141,7 @@ LibusbAdapter::~LibusbAdapter()
 void GetApiVersion(int32_t &apiVersion)
 {
     uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
-    OHOS::Security::AccessToken::HapTokenInfo info;
+    OHOS::Security::AccessToken::HapTokenInfoCompat info;
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callerToken, info);
     if (ret < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: get hapInfo failed", __func__);

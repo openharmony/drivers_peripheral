@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include <unistd.h>
 #include "usb_device_info_parser.h"
-#include "accesstoken_kit.h"
+#include "accesstoken_compat_kit.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
