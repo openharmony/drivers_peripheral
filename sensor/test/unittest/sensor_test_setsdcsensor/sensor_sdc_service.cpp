@@ -1,8 +1,18 @@
 /*
-* Copyright (c) Huawei Technologies Co., Ltd. 2025-2025. All rights reserved.
-* Description: ai hold posture for phone.
-* Create: 2025-02-06
-*/
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "sensor_sdc_service.h"
 #include <map>
 #include "parameters.h"
@@ -182,21 +192,24 @@ bool SignalAIService::InitNetwork(const std::string& filePath, const std::vector
     }
 }
 
-int SignalAIService::findBufferStartIdx(int lastStartIdx, int lastEndIdx, long long timestamp,
+int SignalAIService::FindBufferStartIdx(int lastStartIdx, int lastEndIdx, long long timestamp,
     ImuSensorData (&sensorBuffer)[SENSOR_BUFF_LEN])
 {
     int sampleNum = GetBufferIdxIntervalNum(lastStartIdx, lastEndIdx, SENSOR_BUFF_LEN);
     for (int i = 0; i < sampleNum - 1; ++i) {
-        int nextIdx = bufferIndexWrap(lastStartIdx + i + 1, SENSOR_BUFF_LEN);
+        int nextIdx = BufferIndexWrap(lastStartIdx + i + 1, SENSOR_BUFF_LEN);
         if (sensorBuffer[nextIdx].timestamp >= timestamp) {
-            return bufferIndexWrap(lastStartIdx + i, SENSOR_BUFF_LEN);
+            return BufferIndexWrap(lastStartIdx + i, SENSOR_BUFF_LEN);
         }
     }
-    return bufferIndexWrap(lastEndIdx - 1, SENSOR_BUFF_LEN);
+    return BufferIndexWrap(lastEndIdx - 1, SENSOR_BUFF_LEN);
 }
 
-int SignalAIService::bufferIndexWrap(long curIdx, long bufferSize)
+int SignalAIService::BufferIndexWrap(long curIdx, long bufferSize)
 {
+    if (bufferSize == 0) {
+        return -1;
+    }
     curIdx = curIdx % bufferSize;
     // 如果 curIdx 为负数，加上 bufferSize 使其变为正数
     if (curIdx < 0) {
@@ -208,8 +221,8 @@ int SignalAIService::bufferIndexWrap(long curIdx, long bufferSize)
 void SignalAIService::LinearInterpolationSinglePoint(int interpIdx, long long timestamp, int leftIdx,
     ImuSensorData (&sensorBuffer)[SENSOR_BUFF_LEN], ImuSensorData (&interpolationBuffer)[SAMPLE_NUM])
 {
-    leftIdx = bufferIndexWrap(leftIdx, SENSOR_BUFF_LEN);
-    int rightIdx = bufferIndexWrap(leftIdx + 1, SENSOR_BUFF_LEN);
+    leftIdx = BufferIndexWrap(leftIdx, SENSOR_BUFF_LEN);
+    int rightIdx = BufferIndexWrap(leftIdx + 1, SENSOR_BUFF_LEN);
     long long leftTimestamp = sensorBuffer[leftIdx].timestamp;
     long long rightTimestamp = sensorBuffer[rightIdx].timestamp;
 
@@ -218,7 +231,7 @@ void SignalAIService::LinearInterpolationSinglePoint(int interpIdx, long long ti
         // 如果时间戳相同，直接使用 leftIdx 对应的数据点
         interpolationBuffer[interpIdx] = sensorBuffer[leftIdx];
     } else {
-        double fraction = (double)(timestamp - leftTimestamp) / (rightTimestamp - leftTimestamp);
+        double fraction = static_cast<double>(timestamp - leftTimestamp) / (rightTimestamp - leftTimestamp);
         interpolationBuffer[interpIdx].timestamp = timestamp;
         interpolationBuffer[interpIdx].x =
             sensorBuffer[leftIdx].x + (sensorBuffer[rightIdx].x - sensorBuffer[leftIdx].x) * fraction;
@@ -229,7 +242,7 @@ void SignalAIService::LinearInterpolationSinglePoint(int interpIdx, long long ti
     }
 }
 
-int SignalAIService::findSegment(int startIdx, int offset, long long baselineTimestamp,
+int SignalAIService::FindSegment(int startIdx, int offset, long long baselineTimestamp,
     ImuSensorData (&sensorBuffer)[SENSOR_BUFF_LEN], int sampleNum)
 {
     int i = offset;
@@ -237,7 +250,7 @@ int SignalAIService::findSegment(int startIdx, int offset, long long baselineTim
     int curIdx;
     for (; i < sampleNum - 1; ++i) {
         curIdx = startIdx + i;
-        nextIdx = bufferIndexWrap(curIdx + 1, SENSOR_BUFF_LEN);
+        nextIdx = BufferIndexWrap(curIdx + 1, SENSOR_BUFF_LEN);
         if (baselineTimestamp < sensorBuffer[nextIdx].timestamp) {
             return i;
         }
@@ -270,12 +283,12 @@ HoldPostureErrorCode SignalAIService::LinearInterpolation(
     int accOffset = 0;
     int gyrOffset = 0;
     for (int i = 0; i < SAMPLE_NUM; i++) {
-        accOffset = findSegment(accStartIdx, accOffset, baselineTimestamp, acceFrame_.sensorBuffer, accSampleNum);
+        accOffset = FindSegment(accStartIdx, accOffset, baselineTimestamp, acceFrame_.sensorBuffer, accSampleNum);
 
         LinearInterpolationSinglePoint(i, baselineTimestamp, accStartIdx + accOffset, acceFrame_.sensorBuffer,
             acceInterpolationFrame_.sensorBuffer);
 
-        gyrOffset = findSegment(gyrStartIdx, gyrOffset, baselineTimestamp, gyroFrame_.sensorBuffer, gyrSampleNum);
+        gyrOffset = FindSegment(gyrStartIdx, gyrOffset, baselineTimestamp, gyroFrame_.sensorBuffer, gyrSampleNum);
 
         LinearInterpolationSinglePoint(i, baselineTimestamp, gyrStartIdx + gyrOffset, gyroFrame_.sensorBuffer,
             gyroInterpolationFrame_.sensorBuffer);
@@ -338,7 +351,7 @@ HoldPostureErrorCode SignalAIService::HandleAccGyrData(int &frameStartIdx, Buffe
     long curBufferIdx = 0;
     SdcDataVec3 *dataVec = nullptr;
     for (long i = 0; i < dataNum; ++i) {  // 读取每个数据
-        curReadIndex = bufferIndexWrap(bufInfo.lastWriteIdx + i, bufInfo.fifoCount);
+        curReadIndex = BufferIndexWrap(bufInfo.lastWriteIdx + i, bufInfo.fifoCount);
         dataVec = ReadSingleDataByIdx(bufInfo.addrOffset, curReadIndex);
         // 处理acce数据
         curBufferIdx = frame.count;  // buffer当前的指针位置
@@ -457,9 +470,9 @@ HoldPostureErrorCode SignalAIService::Preprocess(int accFrameEndIdx, int gyrFram
             : gyroFrame_.sensorBuffer[gyrFrameEndIdx].timestamp;
     frameStartTimestampNs_ = frameEndTimestampNs_ - (FRAME_DURATION_TIME_MS + FRAME_EXTRA_MS) * TIME_UNIT_MS_TO_NS;
     accFrameStartIdx_ =
-        findBufferStartIdx(accFrameStartIdx_, accFrameEndIdx, frameStartTimestampNs_, acceFrame_.sensorBuffer);
+        FindBufferStartIdx(accFrameStartIdx_, accFrameEndIdx, frameStartTimestampNs_, acceFrame_.sensorBuffer);
     gyrFrameStartIdx_ =
-        findBufferStartIdx(gyrFrameStartIdx_, gyrFrameEndIdx, frameStartTimestampNs_, gyroFrame_.sensorBuffer);
+        FindBufferStartIdx(gyrFrameStartIdx_, gyrFrameEndIdx, frameStartTimestampNs_, gyroFrame_.sensorBuffer);
 
     // 找到插值时的初始时间戳
     long long baselineTimestamp;
@@ -525,8 +538,8 @@ HoldPostureErrorCode SignalAIService::JudgeInfer(int &finalResult)
         printf("SIGNALAI:Service: init buffer warm up");
         return HoldPostureErrorCode::SUCCESS;
     }
-    int accFrameEndIdx = bufferIndexWrap(acceFrame_.count - 1, SENSOR_BUFF_LEN);
-    int gyrFrameEndIdx = bufferIndexWrap(gyroFrame_.count - 1, SENSOR_BUFF_LEN);
+    int accFrameEndIdx = BufferIndexWrap(acceFrame_.count - 1, SENSOR_BUFF_LEN);
+    int gyrFrameEndIdx = BufferIndexWrap(gyroFrame_.count - 1, SENSOR_BUFF_LEN);
     if (acceFrame_.sensorBuffer[accFrameEndIdx].timestamp - acceFrame_.sensorBuffer[accFrameStartIdx_].timestamp >=
         (FRAME_DURATION_TIME_MS + FRAME_EXTRA_MS) * TIME_UNIT_MS_TO_NS &&
         gyroFrame_.sensorBuffer[gyrFrameEndIdx].timestamp - gyroFrame_.sensorBuffer[gyrFrameStartIdx_].timestamp >=
@@ -583,7 +596,7 @@ void SignalAIService::GetFrameSlideIdx(long long startTimestamp, long long endTi
     SdcDataVec3 *dataVec;
     for (int i = 0; i < frameSlideNum; ++i) {
         for (long j = offset; j < dataNum; ++j) {
-            long idx = bufferIndexWrap(bufInfo.curWriteIdx - j, bufInfo.fifoCount);
+            long idx = BufferIndexWrap(bufInfo.curWriteIdx - j, bufInfo.fifoCount);
             dataVec = ReadSingleDataByIdx(bufInfo.addrOffset, idx);
             if (dataVec->timestamp <= endTimestamp) {
                 offset = j;
@@ -595,7 +608,7 @@ void SignalAIService::GetFrameSlideIdx(long long startTimestamp, long long endTi
     }
     // 获取第一个元素的索引
     for (long j = offset; j < dataNum; ++j) {
-        long idx = bufferIndexWrap(bufInfo.curWriteIdx - j, bufInfo.fifoCount);
+        long idx = BufferIndexWrap(bufInfo.curWriteIdx - j, bufInfo.fifoCount);
         dataVec = ReadSingleDataByIdx(bufInfo.addrOffset, idx);
         if (dataVec->timestamp <= startTimestamp) {
             bufInfo.lastWriteIdx = idx;
@@ -608,8 +621,6 @@ HoldPostureErrorCode SignalAIService::HandleMultiShotWithCache(long long accEndT
     int frameSlideNum, int &finalResult)
 {
     HoldPostureErrorCode ret = HoldPostureErrorCode::SUCCESS;
-    // long accCurReadIdx = 0;
-    // long gyrCurReadIdx = 0;
     std::vector<long> accIdxList;
     std::vector<long> gyrIdxList;
     long long accStartTimestamp = accEndTimestamp - FRAME_DURATION_TIME_MS * TIME_UNIT_MS_TO_NS -
@@ -636,8 +647,8 @@ HoldPostureErrorCode SignalAIService::HandleMultiShotWithCache(long long accEndT
         if (ret != HoldPostureErrorCode::SUCCESS) {
             return ret;
         }
-        int accFrameEndIdx = bufferIndexWrap(acceFrame_.count - 1, SENSOR_BUFF_LEN);
-        int gyrFrameEndIdx = bufferIndexWrap(gyroFrame_.count - 1, SENSOR_BUFF_LEN);
+        int accFrameEndIdx = BufferIndexWrap(acceFrame_.count - 1, SENSOR_BUFF_LEN);
+        int gyrFrameEndIdx = BufferIndexWrap(gyroFrame_.count - 1, SENSOR_BUFF_LEN);
         ret = Preprocess(accFrameEndIdx, gyrFrameEndIdx);
         if (ret != HoldPostureErrorCode::SUCCESS) {
             return ret;
@@ -687,8 +698,8 @@ HoldPostureErrorCode SignalAIService::HandleFirstRunWithCache(int &finalResult)
         return ret;
     } else if (now - lastFifoWriteIdxSetTime_ > WARM_UP_TIME_INTERVAL) {  // 缓存的数据足够多次计算
         frameSlideNum = accumulatedNum_;
-        accBufInfo_.lastWriteIdx = bufferIndexWrap(accBufInfo_.curWriteIdx + 1, accBufInfo_.fifoCount);  // 向前可回溯的最远索引
-        gyrBufInfo_.lastWriteIdx = bufferIndexWrap(gyrBufInfo_.curWriteIdx + 1, gyrBufInfo_.fifoCount);
+        accBufInfo_.lastWriteIdx = BufferIndexWrap(accBufInfo_.curWriteIdx + 1, accBufInfo_.fifoCount);  // 向前可回溯的最远索引
+        gyrBufInfo_.lastWriteIdx = BufferIndexWrap(gyrBufInfo_.curWriteIdx + 1, gyrBufInfo_.fifoCount);
     }
     printf("SIGNALAI:Service:get enough data for multi-shot slide=%d", frameSlideNum);
     return HandleMultiShotWithCache(accEndTimestamp, gyrEndTimestamp, frameSlideNum, finalResult);
@@ -703,14 +714,14 @@ HoldPostureErrorCode SignalAIService::DecodeMemory(int &finalResult)
     // sensor数据不更新
     if (accWriteIdxUnwrap_ == lastAccWriteIdxUnWrap_ || gyrWriteIdxUnwrap_ == lastGyrWriteIdxUnWrap_) {
         printf("SIGNALAI:Service:sensor data not update, "
-            "accWriteIdx=%d,last=%d,gyrWriteIdx=%d,last=%d",
+            "accWriteIdx=%d,last=%u,gyrWriteIdx=%d,last=%d",
             accWriteIdxUnwrap_, lastAccWriteIdxUnWrap_, gyrWriteIdxUnwrap_, lastGyrWriteIdxUnWrap_);
         return HoldPostureErrorCode::SENSOR_DATA_NOT_UPDATE;
     }
     lastAccWriteIdxUnWrap_ = accWriteIdxUnwrap_;
     lastGyrWriteIdxUnWrap_ = gyrWriteIdxUnwrap_;
-    accBufInfo_.curWriteIdx = bufferIndexWrap(accWriteIdxUnwrap_ - 1, accBufInfo_.fifoCount);  // 取当前写指针的前一个防止当前还未写入
-    gyrBufInfo_.curWriteIdx = bufferIndexWrap(gyrWriteIdxUnwrap_ - 1, gyrBufInfo_.fifoCount);
+    accBufInfo_.curWriteIdx = BufferIndexWrap(accWriteIdxUnwrap_ - 1, accBufInfo_.fifoCount);  // 取当前写指针的前一个防止当前还未写入
+    gyrBufInfo_.curWriteIdx = BufferIndexWrap(gyrWriteIdxUnwrap_ - 1, gyrBufInfo_.fifoCount);
 
     recorder_.SetCurWriteIdx(accWriteIdxUnwrap_, gyrWriteIdxUnwrap_, false);
 
@@ -743,12 +754,11 @@ void SignalAIService::SetLastFifoWriteIdx(unsigned int accLastWriteIdx, unsigned
     recorder_.PreSetInfo(accFifoCount, gyrFifoCount, accLastWriteIdx, gyrLastWriteIdx);
     lastAccWriteIdxUnWrap_ = accLastWriteIdx;
     lastGyrWriteIdxUnWrap_ = gyrLastWriteIdx;
-    accBufInfo_.lastWriteIdx = bufferIndexWrap(accLastWriteIdx, accBufInfo_.fifoCount);
-    gyrBufInfo_.lastWriteIdx = bufferIndexWrap(gyrLastWriteIdx, gyrBufInfo_.fifoCount);
+    accBufInfo_.lastWriteIdx = BufferIndexWrap(accLastWriteIdx, accBufInfo_.fifoCount);
+    gyrBufInfo_.lastWriteIdx = BufferIndexWrap(gyrLastWriteIdx, gyrBufInfo_.fifoCount);
     lastFifoWriteIdxSetTime_ = fifoWriteIdxSetTime;
-    printf(
-        "SIGNALAI:Service:SetLastFifoWriteIdx lastAccWriteIdxUnWrap=%d, lastGyrWriteIdxUnWrap=%d,"
-        "accFifoCount=%d, gyrFifoCount=%d.",
+    printf("SIGNALAI:Service:SetLastFifoWriteIdx lastAccWriteIdxUnWrap=%d, lastGyrWriteIdxUnWrap=%d,"
+        "accFifoCount=%u, gyrFifoCount=%u.",
         lastAccWriteIdxUnWrap_, lastGyrWriteIdxUnWrap_, accFifoCount, gyrFifoCount);
 }
 

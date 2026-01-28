@@ -1,8 +1,18 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2025-2025. All rights reserved.
- * Description: ai hold posture sensor process.
- * Create: 2025-02-06
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 #ifndef SIGNALAI_SERVICE_H
 #define SIGNALAI_SERVICE_H
 
@@ -55,12 +65,12 @@ public:
 private:
     void LinearInterpolationSinglePoint(int interpIdx, long long timestamp, int leftIdx,
         ImuSensorData (&sensorBuffer)[SENSOR_BUFF_LEN], ImuSensorData (&interpolationBuffer)[SAMPLE_NUM]);
-    int findSegment(int curIdx, int sampleNum, long long baselineTimestamp,
+    int FindSegment(int curIdx, int sampleNum, long long baselineTimestamp,
         ImuSensorData (&sensorBuffer)[SENSOR_BUFF_LEN], int num);
     HoldPostureErrorCode LinearInterpolation(long long baselineTimestamp, int accStartIdx, int accEndIdx,
                                 int gyrStartIdx, int gyrEndIdx);
-    int bufferIndexWrap(long curIdx, long bufferSize);
-    int findBufferStartIdx(int lastStartIdx, int lastEndIdx, long long timestamp,
+    int BufferIndexWrap(long curIdx, long bufferSize);
+    int FindBufferStartIdx(int lastStartIdx, int lastEndIdx, long long timestamp,
         ImuSensorData (&sensorBuffer)[SENSOR_BUFF_LEN]);
     int GetOrientation();
     long GetReadDataNum(long curWriteIdx, long lastWriteIdx, unsigned int bufferCount);

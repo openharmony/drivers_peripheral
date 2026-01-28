@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,7 +43,6 @@ int32_t SensorCallbackImpl::sensorDataCount = 0;
 int32_t SensorCallbackImpl::sensorDataCountOld = 0;
 bool SensorCallbackImpl::printDataFlag = false;
 
-//hdc shell "export g_testRegisterTimes=2000;/data/test/SensorTestRegisterManyTimes"
 namespace {
     sptr<V3_1::ISensorInterface>  g_sensorInterface = nullptr;
     SignalAIAdapter* g_signalAIAdapter = nullptr;
