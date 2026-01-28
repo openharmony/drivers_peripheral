@@ -1,11 +1,23 @@
-/**
- * Copyright (c) Huawei Technologies Co., Ltd. 2025-2025. All rights reserved.
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 #ifndef MS_HEADER_C_H
 #define MS_HEADER_C_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include <cstdint.h>
+#include <cstddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,13 +36,13 @@ typedef void *Model;
 typedef void *Tensor;
 
 typedef struct CallbackInfo {
-  char *callbackName;
-  char *callbackType;
+    char *callbackName;
+    char *callbackType;
 } CallbackInfo;
 
 typedef struct TensorInfo {
-  size_t num;
-  Tensor *list;
+    size_t num;
+    Tensor *list;
 } TensorInfo;
 
 typedef bool (*CallbackFun)(const TensorInfo inputTensor, const TensorInfo outputTensor,
@@ -69,10 +81,6 @@ MS_LITE_API int MSModelPredict(Model model, const TensorInfo inputTensor, Tensor
 
 // 获取tensor内数据
 MS_LITE_API const void *MSTensorGetData(const Tensor tensor);
-
-// 创建tensor
-MS_LITE_API Tensor MSTensorCreate(const char *name, int type, const int64_t *shape, size_t shapeNum, const void*data,
-    size_t dataLen);
 
 #ifdef __cplusplus
 }
