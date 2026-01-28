@@ -79,7 +79,7 @@ int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode,
 
 int32_t AudioRenderStart(struct IAudioRender *handle)
 {
-    AUDIO_FUNC_LOGD("Enter.");
+    AUDIO_FUNC_LOGI("Enter.");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("The pointer is null");
@@ -127,7 +127,7 @@ int32_t AudioRenderStart(struct IAudioRender *handle)
 
 int32_t AudioRenderStop(struct IAudioRender *handle)
 {
-    AUDIO_FUNC_LOGD("Enter.");
+    AUDIO_FUNC_LOGI("Enter.");
     int32_t ret = AUDIO_SUCCESS;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
@@ -172,7 +172,6 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
 
 int32_t AudioRenderPause(struct IAudioRender *handle)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is null");
@@ -211,13 +210,13 @@ int32_t AudioRenderPause(struct IAudioRender *handle)
         return AUDIO_ERR_INTERNAL;
     }
 
+    AUDIO_FUNC_LOGI("Enter. pauseStatus= %{public}d", pauseStatus);
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Render Pause");
     return AUDIO_SUCCESS;
 }
 
 int32_t AudioRenderResume(struct IAudioRender *handle)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("Param is error");
@@ -249,6 +248,7 @@ int32_t AudioRenderResume(struct IAudioRender *handle)
         return AUDIO_ERR_INTERNAL;
     }
 
+    AUDIO_FUNC_LOGI("Enter. resumeStatus= %{public}d", resumeStatus);
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Render Resume");
     return AUDIO_SUCCESS;
 }
@@ -271,7 +271,6 @@ int32_t AudioRenderFlush(struct IAudioRender *handle)
 
 int32_t AudioRenderGetFrameSize(struct IAudioRender *handle, uint64_t *size)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || size == NULL) {
         AUDIO_FUNC_LOGE("Param is error");
@@ -287,18 +286,19 @@ int32_t AudioRenderGetFrameSize(struct IAudioRender *handle, uint64_t *size)
         return ret;
     }
     *size = FRAME_SIZE * channelCount * (formatBits >> BITS_TO_FROMAT);
+    AUDIO_FUNC_LOGI("Enter. FrameSize= %{public}llu", *size);
     return AUDIO_SUCCESS;
 }
 
 int32_t AudioRenderGetFrameCount(struct IAudioRender *handle, uint64_t *count)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || count == NULL) {
         AUDIO_FUNC_LOGE("Param is error");
         return AUDIO_ERR_INVALID_PARAM;
     }
     *count = hwRender->renderParam.frameRenderMode.frames;
+    AUDIO_FUNC_LOGI("Enter. FrameCount= %{public}llu", *count);
     return AUDIO_SUCCESS;
 }
 
@@ -338,7 +338,7 @@ int32_t AudioRenderSetSampleAttributes(struct IAudioRender *handle, const struct
 
 int32_t AudioRenderGetSampleAttributes(struct IAudioRender *handle, struct AudioSampleAttributes *attrs)
 {
-    AUDIO_FUNC_LOGD("Enter.");
+    AUDIO_FUNC_LOGI("Enter.");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || attrs == NULL) {
         AUDIO_FUNC_LOGE("Param is error");
@@ -346,17 +346,29 @@ int32_t AudioRenderGetSampleAttributes(struct IAudioRender *handle, struct Audio
     }
 
     attrs->format = hwRender->renderParam.frameRenderMode.attrs.format;
+    AUDIO_FUNC_LOGI("Format: %{public}d", attrs->format);
     attrs->sampleRate = hwRender->renderParam.frameRenderMode.attrs.sampleRate;
+    AUDIO_FUNC_LOGI("Sample Rate: %{public}u", attrs->sampleRate);
     attrs->channelCount = hwRender->renderParam.frameRenderMode.attrs.channelCount;
+    AUDIO_FUNC_LOGI("Channel Count: %{public}u", attrs->channelCount);
     attrs->type = hwRender->renderParam.frameRenderMode.attrs.type;
+    AUDIO_FUNC_LOGI("Type: %{public}d", attrs->type);
     attrs->interleaved = hwRender->renderParam.frameRenderMode.attrs.interleaved;
+    AUDIO_FUNC_LOGI("Interleaved: %{public}s", attrs->interleaved ? "true" : "false");
     attrs->period = hwRender->renderParam.frameRenderMode.attrs.period;
+    AUDIO_FUNC_LOGI("Period: %{public}u", attrs->period);
     attrs->frameSize = hwRender->renderParam.frameRenderMode.attrs.frameSize;
+    AUDIO_FUNC_LOGI("Frame Size: %{public}u", attrs->frameSize);
     attrs->isBigEndian = hwRender->renderParam.frameRenderMode.attrs.isBigEndian;
+    AUDIO_FUNC_LOGI("IsBigEndian: %{public}s", attrs->isBigEndian ? "true" : "false");
     attrs->isSignedData = hwRender->renderParam.frameRenderMode.attrs.isSignedData;
+    AUDIO_FUNC_LOGI("IsSignedData: %{public}s", attrs->isSignedData ? "true" : "false");
     attrs->startThreshold = hwRender->renderParam.frameRenderMode.attrs.startThreshold;
+    AUDIO_FUNC_LOGI("StartThreshold: %{public}u", attrs->startThreshold);
     attrs->stopThreshold = hwRender->renderParam.frameRenderMode.attrs.stopThreshold;
+    AUDIO_FUNC_LOGI("StopThreshold: %{public}u", attrs->stopThreshold);
     attrs->silenceThreshold = hwRender->renderParam.frameRenderMode.attrs.silenceThreshold;
+    AUDIO_FUNC_LOGI("SilenceThreshold: %{public}u", attrs->silenceThreshold);
     return AUDIO_SUCCESS;
 }
 
@@ -528,7 +540,6 @@ int32_t AudioRenderGetMute(struct IAudioRender *handle, bool *mute)
 
 int32_t AudioRenderSetVolume(struct IAudioRender *handle, float volume)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is error");
@@ -569,12 +580,13 @@ int32_t AudioRenderSetVolume(struct IAudioRender *handle, float volume)
         hwRender->renderParam.renderMode.ctlParam.volume = volumeTemp;
         return AUDIO_ERR_INTERNAL;
     }
+    AUDIO_FUNC_LOGI("Enter. volumeTemp= %{public}f, volMax= %{public}f, volMin= %{public}f, volTemp= %{public}f",
+                    volumeTemp, volMax, volMin, volTemp);
     return AUDIO_SUCCESS;
 }
 
 int32_t AudioRenderGetVolume(struct IAudioRender *handle, float *volume)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || volume == NULL) {
         AUDIO_FUNC_LOGE("Param is error");
@@ -611,6 +623,8 @@ int32_t AudioRenderGetVolume(struct IAudioRender *handle, float *volume)
     int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + DECIMAL_PART) / INTEGER_TO_DEC); // delet 0.X num
 
     *volume = (float)volumeT / INTEGER_TO_DEC;                                               // get volume (0-1)
+    AUDIO_FUNC_LOGI("Enter. volumeTemp= %{public}f, volMax= %{public}f, volMin= %{public}f, *volume= %{public}f",
+                    volumeTemp, volMax, volMin, *volume);
     return AUDIO_SUCCESS;
 }
 
@@ -710,7 +724,6 @@ int32_t AudioRenderSetGain(struct IAudioRender *handle, float gain)
 
 int32_t AudioRenderGetLatency(struct IAudioRender *render, uint32_t *ms)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwRender *impl = (struct AudioHwRender *)render;
     if (impl == NULL || ms == NULL) {
         AUDIO_FUNC_LOGE("impl or ms is null!");
@@ -726,6 +739,7 @@ int32_t AudioRenderGetLatency(struct IAudioRender *render, uint32_t *ms)
     }
 
     *ms = (periodSize * SEC_TO_MILLSEC) / (byteRate * RENDER_2_CHS * PCM_16_BIT / PCM_8_BIT);
+    AUDIO_FUNC_LOGI("Enter. GetLatency: %{public}u ms", *ms);
     return AUDIO_SUCCESS;
 }
 
