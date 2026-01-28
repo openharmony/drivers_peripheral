@@ -47,8 +47,8 @@
       },
       "build": {
         "sub_component": [
-          "//drivers/peripheral/power/etc/para:power_para"
-          "//drivers/peripheral/power/etc/para:power_para_dac"
+          "//drivers/peripheral/power/etc/para:power_para",
+          "//drivers/peripheral/power/etc/para:power_para_dac",
           "//drivers/peripheral/power:power_entry"
         ],
         "test": [
