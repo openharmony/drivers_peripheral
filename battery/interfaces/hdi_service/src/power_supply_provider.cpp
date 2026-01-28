@@ -405,7 +405,7 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent)
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
     std::string currentMaxNode = POWER_SUPPLY_BATTERY;
-
+    std::lock_guard<std::mutex> lock(nodeNamePathMapMutex_);
     const auto& item = nodeNamePathMap_.find("current_max");
     if (item != nodeNamePathMap_.end()) {
         currentMaxNode = item->second;
@@ -427,7 +427,7 @@ int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage)
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
     std::string voltageMaxNode = POWER_SUPPLY_BATTERY;
-
+    std::lock_guard<std::mutex> lock(nodeNamePathMapMutex_);
     const auto& item = nodeNamePathMap_.find("voltage_max");
     if (item != nodeNamePathMap_.end()) {
         voltageMaxNode = item->second;
