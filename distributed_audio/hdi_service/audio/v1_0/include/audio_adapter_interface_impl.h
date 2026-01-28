@@ -191,6 +191,7 @@ private:
     std::condition_variable spkWaitCond_;
     std::mutex micWaitMutex_;
     std::condition_variable micWaitCond_;
+    std::mutex renderCallMtx_;
 
     std::mutex spkStatusMutex_;
     std::vector<bool> spkStatus_;
