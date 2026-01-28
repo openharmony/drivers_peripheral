@@ -714,7 +714,7 @@ HoldPostureErrorCode SignalAIService::DecodeMemory(int &finalResult)
     // sensor数据不更新
     if (accWriteIdxUnwrap_ == lastAccWriteIdxUnWrap_ || gyrWriteIdxUnwrap_ == lastGyrWriteIdxUnWrap_) {
         printf("SIGNALAI:Service:sensor data not update, "
-            "accWriteIdx=%d,last=%u,gyrWriteIdx=%d,last=%d",
+            "accWriteIdx=%u,last=%u,gyrWriteIdx=%u,last=%u",
             accWriteIdxUnwrap_, lastAccWriteIdxUnWrap_, gyrWriteIdxUnwrap_, lastGyrWriteIdxUnWrap_);
         return HoldPostureErrorCode::SENSOR_DATA_NOT_UPDATE;
     }
@@ -757,7 +757,7 @@ void SignalAIService::SetLastFifoWriteIdx(unsigned int accLastWriteIdx, unsigned
     accBufInfo_.lastWriteIdx = BufferIndexWrap(accLastWriteIdx, accBufInfo_.fifoCount);
     gyrBufInfo_.lastWriteIdx = BufferIndexWrap(gyrLastWriteIdx, gyrBufInfo_.fifoCount);
     lastFifoWriteIdxSetTime_ = fifoWriteIdxSetTime;
-    printf("SIGNALAI:Service:SetLastFifoWriteIdx lastAccWriteIdxUnWrap=%d, lastGyrWriteIdxUnWrap=%d,"
+    printf("SIGNALAI:Service:SetLastFifoWriteIdx lastAccWriteIdxUnWrap=%u, lastGyrWriteIdxUnWrap=%u,"
         "accFifoCount=%u, gyrFifoCount=%u.",
         lastAccWriteIdxUnWrap_, lastGyrWriteIdxUnWrap_, accFifoCount, gyrFifoCount);
 }
