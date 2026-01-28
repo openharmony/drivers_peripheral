@@ -170,8 +170,8 @@ int32_t SetCallbackTimer()
 {
     int32_t id = INVALID_TIMER_ID;
 #ifdef AUDIO_HICOLLIE_ENABLE
-    id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer(TIMER_CALLBACK, HICOLLIE_TIMEOUT_CALLBACK, AudioXCollieCallback, nullptr,
-        OHOS::HiviewDFX::XCOLLIE_FLAG_NOOP);
+    id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer(TIMER_CALLBACK, HICOLLIE_TIMEOUT_CALLBACK,
+        AudioXCollieCallback, nullptr, OHOS::HiviewDFX::XCOLLIE_FLAG_NOOP);
 #endif
     return id;
 }
