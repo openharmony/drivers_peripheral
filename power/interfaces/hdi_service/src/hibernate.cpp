@@ -37,6 +37,7 @@
 #include <unique_fd.h>
 #include <hdf_base.h>
 #include <file_ex.h>
+#include "parameters.h"
 #include "power_hdf_log.h"
 
 #define DRIVERS_PERIPHERAL_POWER_FDSAN_TAG 0XD002903
@@ -72,8 +73,8 @@ constexpr unsigned char UUID_VERSION_OPERAND2 = 0x40;
 constexpr unsigned char UUID_CLOCK_OPERAND1 = 0x3F;
 constexpr unsigned char UUID_CLOCK_OPERAND2 = 0x80;
 
-constexpr const char * const SWAP_FILE_PATH = "/data/power/swapfile";
-constexpr const char * const SWAP_DIR_PATH = "/data/power";
+const std::string SWAP_FILE_PATH = OHOS::system::GetParameter("const.power.swap_file_path", "/data/power/swapfile");
+const std::string SWAP_DIR_PATH = OHOS::system::GetParameter("const.power.swap_dir_path", "/data/power");
 constexpr const char * const HIBERNATE_RESUME = "/sys/hibernate/resume";
 constexpr const char * const SYS_POWER_RESUME = "/sys/power/resume";
 constexpr const char * const SYS_POWER_RESUME_OFFSET = "/sys/power/resume_offset";
@@ -171,7 +172,7 @@ void Hibernate::InitSwap()
 
 int32_t Hibernate::MkSwap()
 {
-    int fd = open(SWAP_FILE_PATH, O_RDWR);
+    int fd = open(SWAP_FILE_PATH.c_str(), O_RDWR);
     if (fd < 0) {
         HDF_LOGE("open swap file failed when mkswap");
         return HDF_FAILURE;
@@ -248,14 +249,14 @@ int32_t Hibernate::CheckSwapFile(bool &needToCreateSwapFile)
 
 bool Hibernate::IsSwapFileExist()
 {
-    return access(SWAP_FILE_PATH, F_OK) == 0;
+    return access(SWAP_FILE_PATH.c_str(), F_OK) == 0;
 }
 
 int32_t Hibernate::CheckSwapFileSize(bool &isRightSize)
 {
     HDF_LOGI("CheckSwapFileSize begin.");
     struct stat swapFileStat;
-    auto ret = stat(SWAP_FILE_PATH, &swapFileStat);
+    auto ret = stat(SWAP_FILE_PATH.c_str(), &swapFileStat);
     if (ret != 0) {
         HDF_LOGE("stat swap file failed, errno=%{public}d", errno);
         return HDF_FAILURE;
@@ -274,7 +275,7 @@ int32_t Hibernate::CheckSwapFileSize(bool &isRightSize)
 int32_t Hibernate::CreateSwapFile()
 {
     HDF_LOGI("CreateSwapFile begin.");
-    if (access(SWAP_DIR_PATH, F_OK) != 0) {
+    if (access(SWAP_DIR_PATH.c_str(), F_OK) != 0) {
         HDF_LOGE("the swap dir not exist.");
         return HDF_FAILURE;
     }
@@ -282,7 +283,7 @@ int32_t Hibernate::CreateSwapFile()
     struct SwapfileCfg cfg;
     cfg.len = SWAP_FILE_SIZE;
 
-    int fd = open(SWAP_FILE_PATH, O_RDONLY | O_LARGEFILE | O_EXCL | O_CREAT, SWAP_FILE_MODE);
+    int fd = open(SWAP_FILE_PATH.c_str(), O_RDONLY | O_LARGEFILE | O_EXCL | O_CREAT, SWAP_FILE_MODE);
     if (fd == -1) {
         HDF_LOGE("open swap file failed, errno=%{public}d", errno);
         return HDF_FAILURE;
@@ -301,11 +302,11 @@ int32_t Hibernate::CreateSwapFile()
 
 int32_t Hibernate::RemoveSwapFile()
 {
-    if (swapoff(SWAP_FILE_PATH) != 0) {
+    if (swapoff(SWAP_FILE_PATH.c_str()) != 0) {
         HDF_LOGE("swap off failed when remove swap file, errno=%{public}d", errno);
     }
 
-    if (remove(SWAP_FILE_PATH) != 0) {
+    if (remove(SWAP_FILE_PATH.c_str()) != 0) {
         HDF_LOGE("remove swap file failed, errno=%{public}d", errno);
         return HDF_FAILURE;
     }
@@ -317,7 +318,7 @@ int32_t Hibernate::RemoveSwapFile()
 int32_t Hibernate::EnableSwap()
 {
     HDF_LOGI("swapon begin.");
-    int ret = swapon(SWAP_FILE_PATH, 0);
+    int ret = swapon(SWAP_FILE_PATH.c_str(), 0);
     if (ret < 0) {
         HDF_LOGE("swapon failed, ret=%{public}d, errno=%{public}d", ret, errno);
         return HDF_FAILURE;
@@ -439,7 +440,7 @@ int32_t Hibernate::DoHibernate()
             break;
         }
     } while (0);
-    if (swapoff(SWAP_FILE_PATH) != 0) {
+    if (swapoff(SWAP_FILE_PATH.c_str()) != 0) {
         HDF_LOGE("swap off failed, errno=%{public}d", errno);
     }
     return ret;
@@ -447,14 +448,14 @@ int32_t Hibernate::DoHibernate()
 
 int32_t Hibernate::GetResumeOffset(uint64_t &resumeOffset)
 {
-    int fd = open(SWAP_FILE_PATH, O_RDONLY);
+    int fd = open(SWAP_FILE_PATH.c_str(), O_RDONLY);
     if (fd < 0) {
         HDF_LOGE("open swap file failed, errno=%{public}d", errno);
         return HDF_FAILURE;
     }
     fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
     struct stat fileStat;
-    int rc = stat(SWAP_FILE_PATH, &fileStat);
+    int rc = stat(SWAP_FILE_PATH.c_str(), &fileStat);
     if (rc != 0) {
         HDF_LOGE("stat swap file failed, errno=%{public}d", errno);
         fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
