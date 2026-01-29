@@ -747,8 +747,8 @@ int32_t RilImpl::SendRilAck()
 int32_t RilImpl::AddRilDeathRecipient(const sptr<IRilCallback> &callback)
 {
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IRilCallback>(callback);
-    if (!remote->AddDeathRecipient(g_deathRecipient)) {
-        HDF_LOGE("AddRilDeathRecipient fail");
+    if (remote == nullptr || !remote->AddDeathRecipient(g_deathRecipient)) {
+        HDF_LOGE("remote is nullptr or AddRilDeathRecipient fail");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -760,8 +760,8 @@ int32_t RilImpl::RemoveRilDeathRecipient(const sptr<IRilCallback> &callback)
         return HDF_FAILURE;
     }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IRilCallback>(callback);
-    if (!remote->RemoveDeathRecipient(g_deathRecipient)) {
-        HDF_LOGI("RemoveRilDeathRecipient fail");
+    if (remote == nullptr || !remote->RemoveDeathRecipient(g_deathRecipient)) {
+        HDF_LOGI("remote is nullptr or RemoveRilDeathRecipient fail");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -769,8 +769,16 @@ int32_t RilImpl::RemoveRilDeathRecipient(const sptr<IRilCallback> &callback)
 
 void RilImpl::RilDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
-    if (rilInterfaceImpl_ == nullptr) {
-        HDF_LOGE("RilImpl::RilDeathRecipient::OnRemoteDied fail rilInterfaceImpl_ is null");
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto rilInterfaceImpl = rilInterfaceImpl_.promote();
+    auto callbackObject = object.promote();
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IRilCallback>(callback_);
+    if (rilInterfaceImpl == nullptr || callbackObject == nullptr || remote == nullptr) {
+        HDF_LOGE("RilImpl::RilDeathRecipient::OnRemoteDied fail rilInterfaceImpl or remote is null");
+        return;
+    }
+    if (callbackObject != remote) {
+        HDF_LOGE("RilImpl::RilDeathRecipient::OnRemoteDied fail object does not match callback_");
         return;
     }
     rilInterfaceImpl_->UnRegister();
