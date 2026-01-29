@@ -38,7 +38,7 @@
 #define BUFF_SIZE 50
 #define SYSFS_PATH_LEN   128
 #define RETRY_NUM 5
-#define MAX_TRANS_DATA_SIZE 8 * 1024
+#define MAX_TRANS_DATA_SIZE 64 * 1024
 
 
 #define ERR_CODE_IOEXCEPTION (-5)
