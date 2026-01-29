@@ -179,15 +179,13 @@ HWTEST_F(PeripheralGnssTest, NiNotifyCallbackTest001, TestSize.Level1)
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, NiNotifyCallbackTest001, TestSize.Level1";
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
-    if (gnssInterface != nullptr) { 
+    if (gnssInterface != nullptr) {
         sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         sptr<IRemoteObject> saObject = samgr->CheckSystemAbility(LOCATION_LOCATOR_SA_ID);
         auto gnssCallback_ = new (std::nothrow) GnssEventCallbackMock(saObject);
-
         auto ret = gnssInstance_->EnableGnss(gnssCallback_);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        
         NiNotifyCallback(nullptr);
         OHOS::HDI::Location::GnssNiNotificationRequest notification;
         NiNotifyCallback(&notification);
@@ -261,7 +259,7 @@ HWTEST_F(PeripheralGnssTest, DisableGnssMeasurementTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "PeripheralGnssTest, DisableGnssMeasurementTest001, TestSize.Level1";
-    EXPECT_NE(nullptr, gnssInstance_);    
+    EXPECT_NE(nullptr, gnssInstance_);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface != nullptr) {
         sptr<ISystemAbilityManager> samgr =
@@ -329,7 +327,6 @@ HWTEST_F(PeripheralGnssTest, SetPredictGnssDataTest001, TestSize.Level1)
             EXPECT_EQ(HDF_SUCCESS, ret);
         }
     }
-
 }
 
 HWTEST_F(PeripheralGnssTest, GetCachedGnssLocationsSizeTest001, TestSize.Level1)
