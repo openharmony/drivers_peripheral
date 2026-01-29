@@ -73,8 +73,8 @@ constexpr unsigned char UUID_VERSION_OPERAND2 = 0x40;
 constexpr unsigned char UUID_CLOCK_OPERAND1 = 0x3F;
 constexpr unsigned char UUID_CLOCK_OPERAND2 = 0x80;
 
-const std::string SWAP_FILE_PATH = OHOS::system::GetParameter("const.power.swap_file_path", "/data/power/swapfile");
-const std::string SWAP_DIR_PATH = OHOS::system::GetParameter("const.power.swap_dir_path", "/data/power");
+const std::string SWAP_FILE_PATH = OHOS::system::GetParameter("const.hdi_power.swap_file_path", "/data/power/swapfile");
+const std::string SWAP_DIR_PATH = OHOS::system::GetParameter("const.hdi_power.swap_dir_path", "/data/power");
 constexpr const char * const HIBERNATE_RESUME = "/sys/hibernate/resume";
 constexpr const char * const SYS_POWER_RESUME = "/sys/power/resume";
 constexpr const char * const SYS_POWER_RESUME_OFFSET = "/sys/power/resume_offset";
