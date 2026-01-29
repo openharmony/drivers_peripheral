@@ -45,6 +45,7 @@ struct IAudioRenderVdi {
     int32_t (*SetMute)(struct IAudioRenderVdi *self, bool mute);
     int32_t (*GetMute)(struct IAudioRenderVdi *self, bool *mute);
     int32_t (*SetVolume)(struct IAudioRenderVdi *self, float volume);
+    int32_t (*SetVolumeWithRamp)(struct IAudioRenderVdi *self, float volume, uint32_t duration);
     int32_t (*GetVolume)(struct IAudioRenderVdi *self, float *volume);
     int32_t (*GetGainThreshold)(struct IAudioRenderVdi *self, float *min, float *max);
     int32_t (*GetGain)(struct IAudioRenderVdi *self, float *gain);
