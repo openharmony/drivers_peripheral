@@ -748,6 +748,9 @@ int32_t AudioRenderGetFrameBufferSizeVdi(struct IAudioRender *render, uint64_t *
 
 int32_t AudioRenderStartVdi(struct IAudioRender *render)
 {
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+    IncreaseCounter();
+#endif
     AUDIO_FUNC_LOGI("hdi start enter");
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     pthread_rwlock_rdlock(&g_rwVdiRenderLock);
@@ -789,13 +792,14 @@ int32_t AudioRenderStopVdi(struct IAudioRender *render)
     int32_t ret = vdiRender->Stop(vdiRender);
     AudioDfxSysEventError("Render Stop", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
+    pthread_rwlock_unlock(&g_rwVdiRenderLock);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render Stop fail, ret=%{public}d", ret);
-        pthread_rwlock_unlock(&g_rwVdiRenderLock);
-        return ret;
     }
-    pthread_rwlock_unlock(&g_rwVdiRenderLock);
-    return HDF_SUCCESS;
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+    DecreaseCounter();
+#endif
+    return ret;
 }
 
 int32_t AudioRenderPauseVdi(struct IAudioRender *render)
