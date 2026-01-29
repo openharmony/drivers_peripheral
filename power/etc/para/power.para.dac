@@ -11,5 +11,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-const.power.swap_file_path = power_host:power_host:0444
-const.power.swap_dir_path = power_host:power_host:0444
+const.hdi_power.swap_file_path = power_host:power_host:0444
+const.hdi_power.swap_dir_path = power_host:power_host:0444
