@@ -404,6 +404,25 @@ int32_t AudioRenderSetVolumeVdi(struct IAudioRender *render, float volume)
     return HDF_SUCCESS;
 }
 
+int32_t AudioRenderSetVolumeWithRampVdi(struct IAudioRender *render, float volume, uint32_t duration)
+{
+    AUDIO_FUNC_LOGI("AudioRenderSetVolumeWithRampVdi in, volume=%{public}f, duration=%{public}u", volume, duration);
+    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
+
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
+    CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(vdiRender->SetVolumeWithRamp, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = vdiRender->SetVolumeWithRamp(vdiRender, volume, duration);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio render SetVolumeWithRamp fail, ret=%{public}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
 int32_t AudioRenderGetVolumeVdi(struct IAudioRender *render, float *volume)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
@@ -917,6 +936,7 @@ static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
     render->SetMute = AudioRenderSetMuteVdi;
     render->GetMute = AudioRenderGetMuteVdi;
     render->SetVolume = AudioRenderSetVolumeVdi;
+    render->SetVolumeWithRamp = AudioRenderSetVolumeWithRampVdi;
     render->GetVolume = AudioRenderGetVolumeVdi;
     render->GetGainThreshold = AudioRenderGetGainThresholdVdi;
     render->GetGain = AudioRenderGetGainVdi;
