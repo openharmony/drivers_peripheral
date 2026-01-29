@@ -635,6 +635,9 @@ int32_t AudioCaptureGetFrameBufferSizeVdi(struct IAudioCapture *capture, uint64_
 
 int32_t AudioCaptureStartVdi(struct IAudioCapture *capture)
 {
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+    IncreaseCounter();
+#endif
     AUDIO_FUNC_LOGI("hdi start enter");
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -698,6 +701,9 @@ int32_t AudioCaptureStopVdi(struct IAudioCapture *capture)
     AudioDfxSysEventError("Capture Stop", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+    DecreaseCounter();
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture Stop fail, ret=%{public}d", ret);
         return HDF_ERR_NOT_SUPPORT;
