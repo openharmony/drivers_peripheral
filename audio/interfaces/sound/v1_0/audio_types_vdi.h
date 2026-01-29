@@ -339,6 +339,12 @@ struct EcSampleAttributesVdi {
     uint32_t ecSilenceThreshold;
 };
 
+struct RawSampleAttributesVdi {
+    enum AudioFormatVdi rawFormat;
+    unsigned int rawSampleRate;
+    unsigned long rawChannelLayout;
+};
+
 struct AudioCaptureFrameInfoVdi {
     int8_t* frame;
     uint32_t frameLen;
@@ -366,6 +372,7 @@ struct AudioSampleAttributesVdi {
     int32_t sourceType;
     struct AudioOffloadInfoVdi offloadInfo;
     struct EcSampleAttributesVdi ecSampleAttributes;
+    struct RawSampleAttributesVdi rawSampleAttributes;
 } __attribute__ ((aligned(8)));
 
 struct AudioTimeStampVdi {

@@ -85,6 +85,9 @@ void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, st
     vdiAttrs->ecSampleAttributes.ecStartThreshold = attrs->ecSampleAttributes.ecStartThreshold;
     vdiAttrs->ecSampleAttributes.ecStopThreshold = attrs->ecSampleAttributes.ecStopThreshold;
     vdiAttrs->ecSampleAttributes.ecSilenceThreshold = attrs->ecSampleAttributes.ecSilenceThreshold;
+    vdiAttrs->rawSampleAttributes.rawFormat = (enum AudioFormatVdi)attrs->rawSampleAttributes.rawFormat;
+    vdiAttrs->rawSampleAttributes.rawSampleRate = attrs->rawSampleAttributes.rawSampleRate;
+    vdiAttrs->rawSampleAttributes.rawChannelLayout = attrs->rawSampleAttributes.rawChannelLayout;
 }
 
 int32_t AudioCommonPortToVdiPortVdi(const struct AudioPort *port, struct AudioPortVdi *vdiPort)
@@ -461,6 +464,9 @@ int32_t AudioCommonSampleAttrToVdiSampleAttrVdi(const struct AudioSampleAttribut
         vdiAttrs->offloadInfo.offloadBufferSize = attrs->offloadInfo.offloadBufferSize;
         vdiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
     }
+    vdiAttrs->rawSampleAttributes.rawFormat = (enum AudioFormatVdi)attrs->rawSampleAttributes.rawFormat;
+    vdiAttrs->rawSampleAttributes.rawSampleRate = attrs->rawSampleAttributes.rawSampleRate;
+    vdiAttrs->rawSampleAttributes.rawChannelLayout = attrs->rawSampleAttributes.rawChannelLayout;
     return HDF_SUCCESS;
 }
 
@@ -483,6 +489,9 @@ int32_t AudioCommonVdiSampleAttrToSampleAttrVdi(const struct AudioSampleAttribut
     attrs->stopThreshold = vdiAttrs->stopThreshold;
     attrs->silenceThreshold = vdiAttrs->silenceThreshold;
     attrs->streamId = vdiAttrs->streamId;
+    attrs->rawSampleAttributes.rawFormat = (enum AudioFormat)vdiAttrs->rawSampleAttributes.rawFormat;
+    attrs->rawSampleAttributes.rawSampleRate = vdiAttrs->rawSampleAttributes.rawSampleRate;
+    attrs->rawSampleAttributes.rawChannelLayout = vdiAttrs->rawSampleAttributes.rawChannelLayout;
 
     return HDF_SUCCESS;
 }
