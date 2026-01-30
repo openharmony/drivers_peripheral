@@ -1275,7 +1275,7 @@ HWTEST_F(DeviceTest, test_GetDisplayClientTargetProperty, TestSize.Level1)
         result = DISPLAY_SUCCESS;
         EXPECT_EQ(DISPLAY_SUCCESS, result);
     } else {
-        resutl = DISPLAY_FAILURE;
+        result = DISPLAY_FAILURE;
         EXPECT_EQ(DISPLAY_FAILURE, result);
     }
 }
