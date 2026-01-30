@@ -104,7 +104,7 @@ ohos_shared_library("usb_ddk_dynamic_library_wrapper") {
 
   sources = [ "src/usb_ddk_dynamic_library_wrapper.cpp" ]
 
-  external_deps = [ "access_token:libaccesstoken_sdk" ]
+  external_deps = [ "access_token:libaccesstoken_compat_sdk" ]
   if (usb_c_utils_enable) {
     external_deps += [ "c_utils:utils" ]
   }
