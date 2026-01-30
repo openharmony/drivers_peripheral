@@ -23,7 +23,7 @@
 #include "defines.h"
 #include "file_manager_utils.h"
 
-#define GLOBAL_CONFIG_INFO "/data/service/el1/public/userauth/globalConfigInfo"
+#define GLOBAL_CONFIG_INFO "/data/chipset/el1/public/userauth/globalConfigInfo"
 #define VERSION 0
 
 #ifdef IAM_TEST_ENABLE
