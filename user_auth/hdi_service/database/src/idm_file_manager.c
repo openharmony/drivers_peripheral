@@ -24,7 +24,7 @@
 #include "file_manager_utils.h"
 #include "idm_common.h"
 
-#define IDM_USER_INFO "/data/service/el1/public/userauth/userinfo"
+#define IDM_USER_INFO "/data/chipset/el1/public/userauth/userinfo"
 #define PRE_APPLY_LEN 2048
 #define VERSION 0
 
