@@ -273,7 +273,8 @@ int32_t InputDeviceManager::GetInputDeviceInfo(int32_t fd, InputDeviceInfo *deta
 uint32_t GetInputDeviceTypeInfo(const string &devName)
 {
     uint32_t type {INDEV_TYPE_UNKNOWN};
-    if (devName.find("input_mt_wrapper") != std::string::npos) {
+    if ((devName.find("input_mt_wrapper") != std::string::npos) ||
+        (devName.find("touchscreen") != std::string::npos)) {
         type = INDEV_TYPE_TOUCH;
     } else if ((devName.find("Keyboard") != std::string::npos) &&
                (devName.find("Headset") == std::string::npos)) {
