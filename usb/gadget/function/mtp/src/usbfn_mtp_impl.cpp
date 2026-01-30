@@ -1887,7 +1887,8 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, u
     oneReqLeft = (hdrSize + mtpDev_->xferFileLength < reqMax) ? mtpDev_->xferFileLength : reqMax - hdrSize;
     ssize_t readRet = read(mtpDev_->xferFd, static_cast<void *>(bufOffset), static_cast<size_t>(oneReqLeft));
     if (readRet != static_cast<ssize_t>(oneReqLeft)) {
-        HDF_LOGE("%{public}s: read failed: %{public}zd vs %{public}" PRId64 "", __func__, readRet, oneReqLeft);
+        HDF_LOGE("%{public}s: read failed: error: %{public}d, %{public}zd vs %{public}" PRId64 "",
+            __func__, errno, readRet, oneReqLeft);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -1912,6 +1913,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSendFileEx()
     int32_t ret = UsbMtpPortSendFileFillFirstReq(req, oneReqLeft);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: fill first sync bulk-in req failed: %{public}d", __func__, ret);
+        RemoveReqFromList(req);
         DListInsertTail(&req->list, pool);
         return ret;
     }
