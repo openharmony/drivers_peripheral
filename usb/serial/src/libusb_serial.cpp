@@ -41,7 +41,7 @@ namespace Serial {
 namespace V1_0 {
 
 #define TARGET_INTERFACE 0xFF
-#define MAX_TRANS_DATA_SIZE 8192
+#define MAX_TRANS_DATA_SIZE 65536
 #define ENABLE_UNREF 1
 #define TRANSFER_TIMEOUT 1000
 #define DIRECT_NUM 2
