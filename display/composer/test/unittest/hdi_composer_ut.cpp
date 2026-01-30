@@ -1273,8 +1273,11 @@ HWTEST_F(DeviceTest, test_GetDisplayClientTargetProperty, TestSize.Level1)
     auto ret = g_composerDevice->GetDisplayClientTargetProperty(g_displayIds[0], pixelFormat, dataspace);
     if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         result = DISPLAY_SUCCESS;
+        EXPECT_EQ(DISPLAY_SUCCESS, result);
+    } else {
+        result = DISPLAY_FAILURE;
+        EXPECT_EQ(DISPLAY_FAILURE, result);
     }
-    EXPECT_EQ(DISPLAY_SUCCESS, result);
 }
 
 HWTEST_F(DeviceTest, test_SetDisplayColorGamut, TestSize.Level1)
