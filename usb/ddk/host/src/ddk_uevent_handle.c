@@ -62,24 +62,25 @@ static int DdkUeventOpen(int *fd)
         HDF_LOGE("%{public}s: socketfd failed! ret = %{public}d, errno:%{public}d", __func__, socketfd, errno);
         return HDF_FAILURE;
     }
+    fdsan_exchange_owner_tag(socketfd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     int buffSize = UEVENT_SOCKET_BUFF_SIZE;
     if (setsockopt(socketfd, SOL_SOCKET, SO_RCVBUF, &buffSize, sizeof(buffSize)) != 0) {
         HDF_LOGE("%{public}s: setsockopt failed! %{public}d", __func__, errno);
-        close(socketfd);
+        fdsan_close_with_tag(socketfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return HDF_FAILURE;
     }
 
     const int32_t on = 1; // turn on passcred
     if (setsockopt(socketfd, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on)) != 0) {
         HDF_LOGE("setsockopt failed! %{public}d", errno);
-        close(socketfd);
+        fdsan_close_with_tag(socketfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return HDF_FAILURE;
     }
 
     if (bind(socketfd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
         HDF_LOGE("%{public}s: bind socketfd failed! %{public}d", __func__, errno);
-        close(socketfd);
+        fdsan_close_with_tag(socketfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return HDF_FAILURE;
     }
     *fd = socketfd;
@@ -211,7 +212,7 @@ void *DdkUeventMain(void *param)
         }
     } while (true);
 
-    close(socketfd);
+    fdsan_close_with_tag(socketfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     return NULL;
 }
 
