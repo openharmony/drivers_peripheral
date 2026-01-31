@@ -20,6 +20,7 @@
 #include "system_ability_definition.h"
 #include "peripheral_agnss_test.h"
 #include "agnss_interface_impl.h"
+#include "location_vendor_interface.h"
 #include <iproxy_broker.h>
 #include <v2_0/ia_gnss_callback.h>
 
@@ -90,12 +91,18 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1)
     GTEST_LOG_(INFO)
         << "PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1";
     EXPECT_NE(nullptr, agnssInstance_);
-    if (agnssInstance_ != nullptr) {
-        AGnssServerInfo server;
-        server.type = AGNSS_TYPE_SUPL;
-        server.port = 8700;
-        int32_t ret = agnssInstance_->SetAgnssServer(server);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
+    LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
+    auto agnssInterface =
+        static_cast<const AgnssModuleInterface*>(interface->GetModuleInterface(moduleType));
+    if (agnssInterface != nullptr) {
+        if (agnssInstance_ != nullptr) {
+            AGnssServerInfo server;
+            server.type = AGNSS_TYPE_SUPL;
+            server.port = 8700;
+            int32_t ret = agnssInstance_->SetAgnssServer(server);
+            EXPECT_EQ(HDF_SUCCESS, ret);
+        }
     }
 }
 
