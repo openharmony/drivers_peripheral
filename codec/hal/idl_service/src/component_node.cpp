@@ -207,15 +207,9 @@ int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<i
         CODEC_LOGE("null bufferhandle");
         return OMX_ErrorBadParameter;
     }
-    BufferHandle* handle = inBuffer.bufferhandle->GetBufferHandle();
-    if (handle == nullptr) {
-        CODEC_LOGE("null bufferhandle");
-        return OMX_ErrorBadParameter;
-    }
-    int ret = Mmap(inBuffer.bufferhandle);
-    if (ret != 0) {
+    if (inBuffer.bufferhandle->Map() != GSERROR_OK) {
         CODEC_LOGE("mmap failed");
-        return ret;
+        return OMX_ErrorBadParameter;
     }
     auto paramSrc = reinterpret_cast<const HDI::Codec::V4_0::CodecParamOverlay *>(paramStruct.data());
     CodecParamOverlayBuffer paramDst {
@@ -225,7 +219,7 @@ int32_t ComponentNode::SetParameterWithBuffer(int32_t index, const std::vector<i
         .dstY = paramSrc->dstY,
         .dstW = paramSrc->dstW,
         .dstH = paramSrc->dstH,
-        .bufferHandle = handle,
+        .bufferHandle = inBuffer.bufferhandle->GetBufferHandle(),
     };
     auto err = OMX_SetParameter(comp_, static_cast<OMX_INDEXTYPE>(OMX_IndexParamOverlayBuffer),
         reinterpret_cast<int8_t *>(&paramDst));
