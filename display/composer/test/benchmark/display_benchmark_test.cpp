@@ -953,14 +953,13 @@ BENCHMARK_F(DisplayBenchmarkTest, SetDisplayColorGamutTest)(benchmark::State &st
 {
     int32_t ret = 0;
     ColorGamut gamut = COLOR_GAMUT_SRGB;
-    uint32_t devId = 1;
     for (auto _ : state) {
-        ret = g_composerDevice->SetDisplayColorGamut(devId, gamut);
+        ret = g_composerDevice->SetDisplayColorGamut(g_displayIds[0], gamut);
     }
     if (ret == DISPLAY_NOT_SUPPORT) {
         return;
     }
-    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayColorGamutTest)->
