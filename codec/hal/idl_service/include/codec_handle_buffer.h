@@ -30,11 +30,11 @@ public:
     int32_t FillThisBuffer(OmxCodecBuffer &codecBuffer) override;
 
 protected:
-    CodecHandleBuffer(const InitInfo& info, sptr<HDI::Base::NativeBuffer> nativebuffer)
+    CodecHandleBuffer(const InitInfo& info, sptr<SurfaceBuffer> nativebuffer)
         : ICodecBuffer(info), buffer_(nativebuffer) {}
 
 private:
-    sptr<HDI::Base::NativeBuffer> buffer_;
+    sptr<SurfaceBuffer> buffer_;
 };
 }  // namespace Omx
 }  // namespace Codec
