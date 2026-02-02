@@ -66,4 +66,5 @@ sptr<SurfaceBuffer> ReWrap(const sptr<NativeBuffer>& src)
     buf->SetBufferHandle(handle);
     return buf;
 }
+
 }
