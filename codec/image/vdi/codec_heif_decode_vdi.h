@@ -18,7 +18,7 @@
 
 #include <vector>
 #include "ashmem.h"
-#include "native_buffer.h"
+#include "surface_buffer.h"
 #include "v2_1/codec_image_type.h"
 
 #ifdef __cplusplus
@@ -29,7 +29,7 @@ extern "C" {
 
 struct ICodecHeifDecodeHwi {
     int32_t (*DoHeifDecode)(const std::vector<OHOS::sptr<OHOS::Ashmem>>& inputs,
-                            const OHOS::sptr<OHOS::HDI::Base::NativeBuffer>& output,
+                            const OHOS::sptr<OHOS::SurfaceBuffer>& output,
                             const OHOS::HDI::Codec::Image::V2_1::CodecHeifDecInfo& decInfo);
 };
 
