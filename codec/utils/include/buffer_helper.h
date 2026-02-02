@@ -35,8 +35,6 @@ private:
 };
 
 sptr<SurfaceBuffer> ReWrap(const sptr<NativeBuffer>& src);
-int32_t Mmap(const sptr<NativeBuffer>& handle);
-int32_t Unmap(const sptr<NativeBuffer>& handle);
 
 }
 #endif
