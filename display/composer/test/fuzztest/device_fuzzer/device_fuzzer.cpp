@@ -559,7 +559,6 @@ int TestGetDisplayClientTargetProperty(uint32_t devId)
 
 int TestSetDisplayColorGamut(uint32_t devId)
 {
-    devId = 1;
     ColorGamut gamut = COLOR_GAMUT_SRGB;
     int32_t ret = g_composerInterface->SetDisplayColorGamut(devId, gamut);
     if (ret != DISPLAY_SUCCESS && ret != DISPLAY_NOT_SUPPORT) {
