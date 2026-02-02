@@ -53,6 +53,8 @@ int UniqueFd::Release()
 sptr<SurfaceBuffer> ReWrap(const sptr<NativeBuffer>& src)
 {
     if (src == nullptr) {
+        return nullptr;
+    }
     sptr<SurfaceBuffer> buf = SurfaceBuffer::Create();
     if (buf == nullptr) {
         return nullptr;
