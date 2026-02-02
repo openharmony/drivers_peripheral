@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <base/native_buffer.h>
+#include "surface_buffer.h"
 
 namespace OHOS::Codec::Omx {
 using HDI::Base::NativeBuffer;
@@ -33,7 +34,7 @@ private:
     int fd_ = -1;
 };
 
-sptr<NativeBuffer> ReWrap(const sptr<NativeBuffer>& src, bool isIpcMode);
+sptr<SurfaceBuffer> ReWrap(const sptr<NativeBuffer>& src);
 int32_t Mmap(const sptr<NativeBuffer>& handle);
 int32_t Unmap(const sptr<NativeBuffer>& handle);
 
