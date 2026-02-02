@@ -38,7 +38,7 @@ sptr<ICodecBuffer> CodecHandleBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t po
         CODEC_LOGE("OMX_UseBuffer ret = [%{public}x]", err);
         return nullptr;
     }
-    sptr<HDI::Base::NativeBuffer> nativebuffer = codecBuffer.bufferhandle;
+    sptr<SurfaceBuffer> nativebuffer = codecBuffer.bufferhandle;
     codecBuffer.bufferhandle = nullptr;
     codecBuffer.fd.reset();
     codecBuffer.fenceFd.reset();
