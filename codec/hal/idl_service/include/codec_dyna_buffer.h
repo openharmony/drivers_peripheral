@@ -34,7 +34,7 @@ protected:
 
 private:
     std::shared_ptr<DynamicBuffer> dynaBuffer_;
-    sptr<HDI::Base::NativeBuffer> buffer_;
+    sptr<SurfaceBuffer> buffer_;
 };
 }  // namespace Omx
 }  // namespace Codec
