@@ -75,7 +75,7 @@ int32_t CodecHeifDecodeService::DoHeifDecode(const std::vector<sptr<Ashmem>>& in
     if (!LoadVendorLib()) {
         return HDF_FAILURE;
     }
-    sptr<NativeBuffer> registered = OHOS::Codec::Omx::ReWrap(output, true);
+    sptr<SurfaceBuffer> registered = OHOS::Codec::Omx::ReWrap(output);
     return (heifDecodeHwi_->DoHeifDecode)(inputs, registered, decInfo);
 }
 } // V2_1
