@@ -16,9 +16,6 @@
 #include "codec_log_wrapper.h"
 #include "codec_image_service.h"
 #include "hitrace_meter.h"
-#include "v1_0/display_composer_type.h"
-#include "v1_0/imapper.h"
-#include "v1_1/imetadata.h"
 #include <unistd.h>
 
 namespace OHOS {
