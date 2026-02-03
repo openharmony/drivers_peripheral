@@ -770,8 +770,10 @@ int32_t AudioAdapterUpdateAudioRoute(
     }
     enum AudioPortPin descPins = hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins;
 
-    hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins = route->sinks[0].ext.device.type;
-    AUDIO_FUNC_LOGI("AudioAdapterUpdateAudioRoute deviceType: %{public}d", route->sinks[0].ext.device.type);
+    if (route->sinks != NULL) {
+        hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins = route->sinks[0].ext.device.type;
+        AUDIO_FUNC_LOGI("AudioAdapterUpdateAudioRoute deviceType: %{public}d", route->sinks[0].ext.device.type);
+    }
     if ((*pPathSelAnalysisJson)((void *)&hwRender->renderParam, RENDER_PATH_SELECT) < 0) {
         AUDIO_FUNC_LOGE("AudioAdapterUpdateAudioRoute get router fail!");
         hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins = descPins;
@@ -789,6 +791,7 @@ int32_t AudioAdapterUpdateAudioRoute(
         (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam, AUDIODRV_CTL_IOCTL_UPDATE_ROUTER);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Audio RENDER_CLOSE FAIL");
+        return HDF_FAILURE;
     }
 
     return AUDIO_SUCCESS;
