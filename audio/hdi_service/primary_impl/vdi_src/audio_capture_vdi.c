@@ -25,7 +25,6 @@
 #include "stub_collector.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
-static pthread_rwlock_t g_rwVdiCaptureLock = PTHREAD_RWLOCK_INITIALIZER;
 struct AudioCaptureInfo {
     struct IAudioCapture capture;
     struct AudioDeviceDescriptor desc;
@@ -43,7 +42,8 @@ struct AudioCapturePrivVdi {
     uint32_t captureCnt;
 };
 
-static pthread_rwlock_t g_rwVdiCaptureLock[AUDIO_VDI_STREAM_NUM_MAX] = {
+static pthread_rwlock_t g_rwVdiCaptureLock[AUDIO_VDI_STREAM_NUM_MAX + 1] = {
+    PTHREAD_RWLOCK_INITIALIZER,
     PTHREAD_RWLOCK_INITIALIZER,
     PTHREAD_RWLOCK_INITIALIZER,
     PTHREAD_RWLOCK_INITIALIZER,
@@ -70,7 +70,8 @@ pthread_rwlock_t* GetCaptureLock(uint32_t indexId)
 
 struct IAudioCaptureVdi *AudioGetVdiCaptureByIdVdi(uint32_t captureId)
 {
-    return g_audioCapturePrivVdi.captureInfos[captureId].vdiCapture;
+    struct AudioCapturePrivVdi *priv = AudioCaptureGetPrivVdi();
+    return priv->captureInfos[captureId].vdiCapture;
 }
 
 int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t *replyBytes)
@@ -635,9 +636,6 @@ int32_t AudioCaptureGetFrameBufferSizeVdi(struct IAudioCapture *capture, uint64_
 
 int32_t AudioCaptureStartVdi(struct IAudioCapture *capture)
 {
-#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
-    IncreaseCounter();
-#endif
     AUDIO_FUNC_LOGI("hdi start enter");
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -701,9 +699,6 @@ int32_t AudioCaptureStopVdi(struct IAudioCapture *capture)
     AudioDfxSysEventError("Capture Stop", startTime, TIME_THRESHOLD, ret);
     HdfAudioFinishTrace();
     pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
-#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
-    DecreaseCounter();
-#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture Stop fail, ret=%{public}d", ret);
         return HDF_ERR_NOT_SUPPORT;
@@ -893,7 +888,7 @@ static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
         AUDIO_FUNC_LOGE("Parameter error!");
         return captureId;
     }
-
+    pthread_rwlock_wrlock(&g_rwVdiCaptureLock[AUDIO_VDI_STREAM_NUM_MAX]);
     if (capturePriv->captureCnt < AUDIO_VDI_STREAM_NUM_MAX) {
         captureId = capturePriv->captureCnt;
         capturePriv->captureCnt++;
@@ -905,7 +900,7 @@ static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
             }
         }
     }
-
+    pthread_rwlock_unlock(&g_rwVdiCaptureLock[AUDIO_VDI_STREAM_NUM_MAX]);
     return captureId;
 }
 
@@ -926,7 +921,7 @@ struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttribut
         AUDIO_FUNC_LOGE("audio vdicapture capture capture index fail, captureId=%{public}d", *captureId);
         return NULL;
     }
-    pthread_rwlock_rdlock(&g_rwVdiCaptureLock[*captureId]);
+    pthread_rwlock_wrlock(&g_rwVdiCaptureLock[*captureId]);
     if (priv->captureInfos[*captureId].vdiCapture != NULL) {
         pthread_rwlock_unlock(&g_rwVdiCaptureLock[*captureId]);
         AUDIO_FUNC_LOGE("vdiCapture already exist  %{public}u", *captureId);
@@ -940,9 +935,9 @@ struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttribut
     priv->captureInfos[*captureId].desc.portId = desc->portId;
     priv->captureInfos[*captureId].desc.pins = desc->pins;
     priv->captureInfos[*captureId].desc.desc = strdup(desc->desc);
-    if (priv->captureInfos[*captureId]->desc.desc == NULL) {
+    if (priv->captureInfos[*captureId].desc.desc == NULL) {
         AUDIO_FUNC_LOGE("strdup fail, desc->desc = %{public}s", desc->desc);
-        AudioDestoryCaptureByIdVdi(*captureId);
+        AudioDestroyCaptureByIdVdi(*captureId);
         pthread_rwlock_unlock(&g_rwVdiCaptureLock[*captureId]);
         return NULL;
     }
