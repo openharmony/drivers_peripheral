@@ -284,6 +284,7 @@ static void WifiEventScanResultProcess(const char *ifName)
     }
     if (InitScanResults(&scanResults) != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: InitScanResults failed",  __FUNCTION__);
+        nlmsg_free(msg);
         return;
     }
     arg.scanResults = &scanResults;
