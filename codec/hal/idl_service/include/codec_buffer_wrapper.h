@@ -24,7 +24,7 @@ namespace CodecHDI = OHOS::HDI::Codec::V4_0;
 struct OmxCodecBuffer {
     uint32_t bufferId;
     uint32_t bufferType;
-    sptr<NativeBuffer> bufferhandle;
+    sptr<SurfaceBuffer> bufferhandle;
     std::shared_ptr<UniqueFd> fd;
     uint32_t allocLen;
     uint32_t filledLen;

@@ -40,7 +40,7 @@ inline SharedBuffer ConvertSharedBuffer(const ImageHDI::SharedBuffer& src)
 struct ImageItem {
     std::string itemName;
     uint32_t id;
-    OHOS::sptr<OHOS::HDI::Base::NativeBuffer> pixelBuffer;
+    OHOS::sptr<OHOS::SurfaceBuffer> pixelBuffer;
     SharedBuffer pixelSharedBuffer;
     bool isPrimary;
     bool isHidden;
@@ -53,7 +53,7 @@ struct ImageItem {
 inline ImageItem ConvertImageItem(const ImageHDI::ImageItem& src)
 {
     return ImageItem {.itemName = src.itemName, .id = src.id,
-        .pixelBuffer = OHOS::Codec::Omx::ReWrap(src.pixelBuffer, true),
+        .pixelBuffer = OHOS::Codec::Omx::ReWrap(src.pixelBuffer),
         .pixelSharedBuffer = ConvertSharedBuffer(src.pixelSharedBuffer),
         .isPrimary = src.isPrimary,
         .isHidden = src.isHidden,
