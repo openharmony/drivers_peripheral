@@ -19,7 +19,16 @@ declare_args() {
 root_path = "//drivers/peripheral/bluetooth/hci/hdi_service"
 
 ohos_shared_library("libhci_interface_service_1.0") {
-  branch_protector_ret = "pac_ret"
+  branch_protector_ret = "pac_ret" # Enable PAC CFI
+
+  sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+  }
   include_dirs = [
     "$root_path",
     "$root_path/implement",
@@ -61,7 +70,16 @@ ohos_shared_library("libhci_interface_service_1.0") {
 }
 
 ohos_shared_library("libbluetooth_hci_hdi_driver") {
-  branch_protector_ret = "pac_ret"
+  branch_protector_ret = "pac_ret" # Enable PAC CFI
+
+  sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+  }
   include_dirs = [ "$root_path" ]
 
   sources = [ "$root_path/hci_interface_driver.cpp" ]

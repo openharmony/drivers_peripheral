@@ -40,7 +40,16 @@ config("hdi_service_config") {
 }
 
 ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
-  branch_protector_ret = "pac_ret"
+  branch_protector_ret = "pac_ret" # Enable PAC CFI
+
+  sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+  }
   include_dirs = [
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_binder/server/include",
