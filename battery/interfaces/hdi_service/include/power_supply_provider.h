@@ -163,6 +163,7 @@ private:
     std::string path_;
     int32_t index_;
     std::mutex mutex_;
+    std::mutex nodeNamePathMapMutex_;
 };
 }  // namespace V2_0
 }  // namespace Battery
