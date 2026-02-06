@@ -295,8 +295,8 @@ CameraId V4L2DeviceManager::HardwareToCameraId(std::string hardwareName)
                 return (*iter).cameraId;
             }
         }
-        return CAMERA_MAX;
     }
+    return CAMERA_MAX;
 }
 
 void V4L2DeviceManager::SetHotplugDevCallBack(HotplugDevCb cb)
@@ -333,12 +333,13 @@ void V4L2DeviceManager::AddHardware(CameraId id, const std::string hardwareName)
 void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
     std::vector<DeviceFormat>& deviceFormat, bool uvcState)
 {
+    CAMERA_LOGI("uvc plug in %{public}s %{public}s begin", uvcState ? "in" : "out", hardwareName.c_str());
+    CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
     if (uvcState) {
         if (deviceFormat.empty()) {
             CAMERA_LOGI("V4L2DeviceManager::UvcCallBack %{public}s deviceFormat is empty", hardwareName.c_str());
             return;
         }
-        CAMERA_LOGI("uvc plug in %{public}s begin", hardwareName.c_str());
         CameraId id = ReturnEnableCameraId("");
         CHECK_IF_EQUAL_RETURN_VOID(id, CAMERA_MAX);
         AddHardware(id, hardwareName);
@@ -352,34 +353,34 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         auto meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
         CHECK_IF_PTR_NULL_RETURN_VOID(meta);
         Convert(deviceControl, deviceFormat, meta);
-        CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
         CHECK_IF_EQUAL_RETURN_VOID(streamAvailableExtendConfigurationsVector_.size() <= MIN_EXT_CFG_VEC_SIZE, true);
         uvcCb_(meta, uvcState, id, hardwareName);
-        CAMERA_LOGI("uvc plug in %{public}s end", hardwareName.c_str());
     } else {
-        CAMERA_LOGI("uvc plug out %{public}s begin", hardwareName.c_str());
         CameraId id = ReturnEnableCameraId(hardwareName);
         CHECK_IF_EQUAL_RETURN_VOID(id, CAMERA_MAX);
-        CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
 
         for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend();) {
             if ((*iter).cameraId != id) {
                 iter++;
                 continue;
             }
-            if ((*iter).hardwareName == hardwareName) {
+            auto SensorManager = GetManager(DM_M_SENSOR);
+            if ((*iter).hardwareName == hardwareName && SensorManager != nullptr) {
                 std::shared_ptr<CameraMetadata> meta =
                     std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
                 CHECK_IF_PTR_NULL_RETURN_VOID(meta);
                 uvcCb_(meta, uvcState, id, hardwareName);
+                RetCode rc = SensorManager->DestroyController(DM_C_SENSOR, hardwareName);
+                CHECK_IF_EQUAL_RETURN_VOID(rc, RC_ERROR);
             }
             {
                 std::lock_guard<std::mutex> l(mtx_);
+                CAMERA_LOGD("erase %{public}s:%{public}d", (*iter).hardwareName.c_str(), (*iter).cameraId);
                 iter = hardwareList_.erase(iter);
             }
         }
-        CAMERA_LOGI("uvc plug out %{public}s %{public}s end", uvcState ? "in" : "out", hardwareName.c_str());
     }
+    CAMERA_LOGI("uvc plug out %{public}s %{public}s end", uvcState ? "in" : "out", hardwareName.c_str());
 }
 
 CameraId V4L2DeviceManager::ReturnEnableCameraId(std::string hardwareName)
@@ -397,6 +398,8 @@ CameraId V4L2DeviceManager::ReturnEnableCameraId(std::string hardwareName)
         for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
             if ((*iter).cameraId == id) {
                 enable = false;
+                CAMERA_LOGI("ReturnEnableCameraId name = %{public}s, id = %{public}d",
+                    (*iter).hardwareName.c_str(), id);
                 break;
             } else {
                 enable = true;
@@ -676,7 +679,6 @@ std::string VectorInt32ToString(std::vector<int> vec)
 PS: '虚化'为OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES, '滤镜'为OHOS_ABILITY_SCENE_FILTER_TYPES,
     '美颜'为OHOS_ABILITY_SCENE_BEAUTY_TYPES。
 */
-
 // {0, 3, 9, -1, 2, 3, 9, -1, 1, 3, -1} for pc
 std::vector<int> g_defaultUsbCameraStreamFormatConfig = {
     PREVIEW_STREAM, OHOS_CAMERA_FORMAT_YCRCB_420_SP, OHOS_CAMERA_FORMAT_422_YUYV, OHOS_CAMERA_FORMAT_MJPEG, -1,

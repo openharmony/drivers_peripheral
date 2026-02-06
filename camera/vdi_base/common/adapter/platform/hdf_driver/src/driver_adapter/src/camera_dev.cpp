@@ -122,7 +122,7 @@ RetCode CameraDev::Init(std::vector<std::string> &cameraIds)
     }
     std::shared_ptr<CameraDev> mydev_ = std::make_shared<CameraDev>();
     for (auto &it : cameraIds) {
-        if (GetCameraName(cameraId, deviceName) != RC_OK) {
+        if (GetCameraName(it, deviceName) != RC_OK) {
             CAMERA_LOGE("GetCameraName failed!");
             return RC_ERROR;
         }
