@@ -71,6 +71,10 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
     int32_t timtCount = 0;
     OHOS::SurfaceError sfError = OHOS::SURFACE_ERROR_OK;
     auto tmpConfig = requestConfig_;
+    if (tmpConfig.format == PIXEL_FMT_BLOB) {
+        tmpConfig.width = BLOB_MAX_SIZE;
+        tmpConfig.height = 1;
+    }
     do {
         sfError = bufferQueue_->RequestBuffer(sb, fence, tmpConfig);
         if (sfError == OHOS::SURFACE_ERROR_NO_BUFFER) {
@@ -137,7 +141,8 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
         CAMERA_LOGI("copy data from cb to sb, size = %{public}d", sb->GetSize());
         auto ret = memcpy_s(sb->GetVirAddr(), sb->GetSize(), buffer->GetVirAddress(), availableSize);
         if (ret != 0) {
-            CAMERA_LOGE("PrepareBufferBeforeFlush memcpy_s fail, error = %{public}d", ret);
+            CAMERA_LOGE("PrepareBufferBeforeFlush memcpy_s fail, error = %{public}d,\
+                sb->GetSize() = %{public}d, buffer->GetSize() = %{public}d", ret, sb->GetSize(), buffer->GetSize());
         }
     }
     buffer->SetIsValidDataInSurfaceBuffer(false);
@@ -263,7 +268,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetCameraBufferAndUpdateInfo(OHOS::sptr<O
     {
         std::lock_guard<std::mutex> l(lock_);
         for (auto it = buffers.begin(); it != buffers.end(); it++) {
-            if (it->second == sb) {
+            if (it->second != nullptr && sb != nullptr && it->second->GetSeqNum() == sb->GetSeqNum()) {
                 cb = it->first;
                 CAMERA_LOGD("GetCameraBufferAndUpdateInfo, found sb in buffers");
             }
