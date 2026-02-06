@@ -45,7 +45,6 @@ ohos_unittest("test_feature_transfer") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -93,7 +92,6 @@ ohos_unittest("test_feature_device") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -134,7 +132,6 @@ ohos_unittest("test_feature_function") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
@@ -184,7 +181,6 @@ ohos_unittest("test_feature_request") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -219,14 +215,13 @@ ohos_unittest("test_feature_usbfnmtp") {
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
     "${usb_driver_path}/gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
-    "${usb_driver_path}/hdi_service:libusb_interface_service_1.2",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
   ]
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_usb:libusb_proxy_1.1",
-      "drivers_interface_usb:libusbfn_mtp_proxy_2.0",
-      "eventhandler:libeventhandler",
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusbfn_mtp_proxy_1.0",
       "googletest:gtest_main",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
@@ -261,7 +256,6 @@ ohos_unittest("test_feature_manageinterface") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -307,7 +301,6 @@ ohos_unittest("test_feature_devicestatus") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -352,7 +345,6 @@ ohos_unittest("test_feature_accessory") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -398,7 +390,6 @@ ohos_unittest("test_feature_interrupt_transfer") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -445,7 +436,6 @@ ohos_unittest("test_feature_asynctransfer") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_2.0",
-      "eventhandler:libeventhandler",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",

@@ -172,7 +172,7 @@ void UsbfnMtpTest::SetUpTestCase(void)
 {
     // Selinux config this UT only works in directory WORKED_UT_PATH for open/read/write file for case send/recvfile.
     std::cout << "===>please connect to PC use USB 3.0 interface, press enter to continue set function to mtp"
-              << std::endl;
+              << WORKED_UT_PATH << std::endl;
     int32_t c;
     while ((c = getchar()) != '\n' && c != EOF) {}
 
