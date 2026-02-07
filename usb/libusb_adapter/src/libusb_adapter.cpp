@@ -1193,6 +1193,19 @@ int32_t LibusbAdapter::DoControlTransfer(const UsbDev &dev, const UsbCtrlTransfe
         ReportUsbdRecognitionFailSysEvent("DoControlTransfer", ret, "FindUsbHandle failed");
         return HDF_FAILURE;
     }
+    // check if the handle is released
+    std::shared_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
+    bool isDeviceExist = false;
+    for (auto &it : g_handleMap) {
+        if (it.second.handle == devHandle) {
+            isDeviceExist = true;
+            break;
+        }
+    }
+    if (!isDeviceExist) {
+        HDF_LOGE("%{public}s: failed to find the handle", __func__);
+        return HDF_FAILURE;
+    }
 
     uint8_t reqType = static_cast<uint8_t>(ctrl.requestType);
     uint8_t reqCmd = static_cast<uint8_t>(ctrl.requestCmd);
