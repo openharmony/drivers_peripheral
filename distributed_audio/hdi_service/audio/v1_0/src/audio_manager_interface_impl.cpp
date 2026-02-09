@@ -57,7 +57,6 @@ AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
 {
-    isDestruct_.store(true);
     DHLOGI("Distributed audio manager destructed.");
 }
 
@@ -384,11 +383,6 @@ int32_t AudioManagerInterfaceImpl::CreateAdapter(const std::string &adpName, con
 void AudioManagerInterfaceImpl::SetDeviceObject(struct HdfDeviceObject *deviceObject)
 {
     deviceObject_ = deviceObject;
-}
-
-bool AudioManagerInterfaceImpl::GetAudioMgrState()
-{
-    return isDestruct_.load();
 }
 
 int32_t AudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &serviceName,

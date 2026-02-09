@@ -189,6 +189,7 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
         renderCallbacks_[renderId] = audioRender;
     }
     render = audioRender;
+    CHECK_NULL_RETURN(audioRender, HDF_FAILURE);
     audioRender->SetRenderStatus(AudioRenderStatus::RENDER_STATUS_OPEN);
     DHLOGI("Create render success, render ID is %{public}u.", renderId);
     return HDF_SUCCESS;
@@ -382,6 +383,7 @@ int32_t AudioAdapterInterfaceImpl::InsertCapImpl(const sptr<AudioCaptureInterfac
         if (captureDevs_[i].second == nullptr) {
             captureId = i;
             captureDevs_[captureId] = std::make_pair(dhId, audioCapture);
+            CHECK_NULL_RETURN(audioCapture, HDF_FAILURE);
             audioCapture->SetCaptureStatus(AudioCaptureStatus::CAPTURE_STATUS_OPEN);
             return HDF_SUCCESS;
         }
