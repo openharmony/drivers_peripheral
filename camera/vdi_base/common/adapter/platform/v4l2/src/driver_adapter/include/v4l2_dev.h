@@ -23,6 +23,7 @@
 #include <sys/epoll.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
+#include <shared_mutex>
 #include <unistd.h>
 #include <sys/eventfd.h>
 #include "v4l2_buffer.h"
@@ -123,7 +124,7 @@ private:
     int epollFd_ = 0;
     std::vector<epoll_event> epollEvent_;
     std::mutex epollLock_;
-    std::mutex streamLock_;
+    std::shared_mutex streamLock_;
 
     std::shared_ptr<HosV4L2Buffers> myBuffers_ = nullptr;
     std::shared_ptr<HosV4L2Streams> myStreams_ = nullptr;
