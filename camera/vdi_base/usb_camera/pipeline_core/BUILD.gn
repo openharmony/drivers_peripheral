@@ -161,7 +161,7 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "hisysevent:libhisysevent",
     "ipc:ipc_single",
     "libexif:libexif",
-    "libjpeg-turbo:turbojpeg",
+    "libjpeg-turbo:turbojpeg_static",
   ]
 
   public_configs = [ ":pipe_config" ]

@@ -160,8 +160,10 @@ void SensorManager::SetMetaDataCallBack(const MetaDataCb cb, std::string hardwar
 
 RetCode SensorManager::DestroyController(ControllerId controllerId, std::string hardwareName)
 {
+    CAMERA_LOGI("DestroyController hardwareName = %{public}s", hardwareName.c_str());
     if (controllerId == DM_C_SENSOR) {
         for (auto iter = sensorList_.cbegin(); iter != sensorList_.cend(); iter++) {
+            CAMERA_LOGI("DestroyController (*iter)->GetName() = %{public}s", (*iter)->GetName().c_str());
             if ((*iter)->GetName() == hardwareName) {
                 sensorList_.erase(iter);
                 return RC_OK;

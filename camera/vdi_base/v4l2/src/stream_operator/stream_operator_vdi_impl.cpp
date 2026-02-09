@@ -315,7 +315,6 @@ RetCode StreamOperatorVdiImpl::ReleaseStreams()
     for (auto it : streamMap_) {
         ids.push_back(it.first);
     }
-
     ReleaseStreams(ids);
     return RC_OK;
 }
@@ -507,7 +506,11 @@ int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const VdiCaptureInfo &
     request->SetFirstRequest(!isStreaming);
     for (auto id : info.streamIds_) {
         std::lock_guard<std::mutex> l(streamLock_);
-        if (streamMap_[id] == nullptr || streamMap_[id]->AddRequest(request)) {
+        if (streamMap_.find(id) == streamMap_.end()) {
+            return DEVICE_ERROR;
+        }
+        RetCode rc = streamMap_[id]->AddRequest(request);
+        if (rc != RC_OK) {
             return DEVICE_ERROR;
         }
     }
