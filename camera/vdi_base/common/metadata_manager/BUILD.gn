@@ -102,6 +102,8 @@ if (!defined(ohos_lite)) {
   }
 
   ohos_shared_library("camera_vendor_tag_service_1.0") {
+    install_enable = false
+
     include_dirs = [
       "./include",
       "../include",

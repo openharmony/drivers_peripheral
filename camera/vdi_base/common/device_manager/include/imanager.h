@@ -55,6 +55,12 @@ public:
         (void)hardwareName;
         return RC_OK;
     }
+    virtual RetCode DestroyController(ControllerId controllerId, std::string hardwareName)
+    {
+        (void)controllerId;
+        (void)hardwareName;
+        return RC_OK;
+    }
     virtual RetCode PowerUp(CameraId cameraId)
     {
         (void)cameraId;
