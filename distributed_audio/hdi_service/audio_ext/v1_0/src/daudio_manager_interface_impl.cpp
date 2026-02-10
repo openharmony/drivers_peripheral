@@ -96,7 +96,6 @@ int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int3
         DHLOGE("Audio manager is null or destructing...");
         return HDF_FAILURE;
     }
-
     DHLOGI("Notify event. event type = %{public}d", event.type);
     int32_t ret = audioMgr_->Notify(adpName, devId, streamId, event);
     if (ret != DH_SUCCESS) {
