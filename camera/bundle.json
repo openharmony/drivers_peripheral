@@ -27,6 +27,7 @@
         "samgr",
         "init",
         "ipc",
+        "drivers_tools",
         "drivers_interface_camera",
         "graphic_surface",
         "c_utils",
