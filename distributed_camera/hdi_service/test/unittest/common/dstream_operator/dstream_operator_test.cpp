@@ -201,6 +201,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_004, TestSize.Level1)
     streamInfos.push_back(streamInfo);
     int32_t rc = dstreamOperator_->CreateStreams(streamInfos);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+
     // release stream
     std::vector<int> streamIds;
     streamIds.push_back(streamInfo.streamId_);
@@ -1521,7 +1522,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_065, TestSize.Level1)
 }
 
 /**
- * @tc.name: dstream_operator_test_067
+ * @tc.name: dstream_operator_test_066
  * @tc.desc: Verify EraseNotifyCaptureMap
  * @tc.type: FUNC
  * @tc.require: AR
@@ -1538,7 +1539,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_066, TestSize.Level1)
 }
 
 /**
- * @tc.name: dstream_operator_test_068
+ * @tc.name: dstream_operator_test_067
  * @tc.desc: Verify EraseNotifyCaptureMap
  * @tc.type: FUNC
  * @tc.require: AR
@@ -1552,7 +1553,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_067, TestSize.Level1)
 }
 
 /**
- * @tc.name: dstream_operator_test_069
+ * @tc.name: dstream_operator_test_068
  * @tc.desc: Verify FindCaptureInfoById
  * @tc.type: FUNC
  * @tc.require: AR
@@ -1570,7 +1571,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_068, TestSize.Level1)
 }
 
 /**
- * @tc.name: dstream_operator_test_070
+ * @tc.name: dstream_operator_test_069
  * @tc.desc: Verify FindCaptureInfoById
  * @tc.type: FUNC
  * @tc.require: AR
