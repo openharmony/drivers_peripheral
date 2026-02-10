@@ -298,8 +298,13 @@ bool DrmConnector::HandleHotplug(IdMapPtr<DrmEncoder> &encoders,
         DISPLAY_LOGE("drm atomic alloc failed errno %{public}d", errno));
 
     drmModeConnectorPtr c = drmModeGetConnector(drmFd, mId);
-    DISPLAY_CHK_RETURN((c == nullptr), false, DISPLAY_LOGE("can not get connector"));
+    if (c == nullptr) {
+        DISPLAY_LOGE("can not get connector");
+        drmModeAtomicFree(pset);
+        return false;
+    }
     if (mConnectState == c->connection) {
+        drmModeAtomicFree(pset);
         drmModeFreeConnector(c);
         return false;
     } else {
