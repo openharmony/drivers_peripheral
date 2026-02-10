@@ -242,7 +242,10 @@ void HosV4L2Dev::dequeueBuffers()
     RetCode rc;
     struct epoll_event events[MAXSTREAMCOUNT];
     nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);
-    CAMERA_LOGI("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %{public}d\n", nfds, streamNumber_);
+    {
+        std::shared_lock<std::shared_mutex> lock(streamLock_);
+        CAMERA_LOGI("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %{public}d\n", nfds, streamNumber_);
+    }
 
     for (int n = 0; nfds > 0; ++n, --nfds) {
         if ((events[n].events & EPOLLIN) && (events[n].data.fd != eventFd_)) {
@@ -263,18 +266,24 @@ void HosV4L2Dev::dequeueBuffers()
 void HosV4L2Dev::loopBuffers()
 {
 #ifndef V4L2_EMULATOR
-    CAMERA_LOGI("!!! loopBuffers enter, streamNumber_=%{public}d\n", streamNumber_);
+    {
+        std::shared_lock<std::shared_mutex> lock(streamLock_);
+        CAMERA_LOGI("!!! loopBuffers enter, streamNumber_=%{public}d\n", streamNumber_);
+    }
 #else
     int rc;
     int fd = deviceFd_;
 
-    CAMERA_LOGI("!!! loopBuffers enter, streamNumber_=%{public}d, fd = %d", streamNumber_, fd);
+    {
+        std::shared_lock<std::shared_mutex> lock(streamLock_);
+        CAMERA_LOGI("!!! loopBuffers enter, streamNumber_=%{public}d, fd = %d", streamNumber_, fd);
+    }
 #endif
     prctl(PR_SET_NAME, "v4l2_loopbuffer");
 
     while (true) {
         {
-            std::lock_guard<std::mutex> l(streamLock_);
+            std::shared_lock<std::shared_mutex> lock(streamLock_);
             if (streamNumber_ <= 0) {
                 break;
             }
@@ -291,7 +300,10 @@ void HosV4L2Dev::loopBuffers()
         usleep(SleepTimeUs);
 #endif
     }
-    CAMERA_LOGI("!!! loopBuffers exit, streamNumber_=%{public}d\n", streamNumber_);
+    {
+        std::shared_lock<std::shared_mutex> lock(streamLock_);
+        CAMERA_LOGI("!!! loopBuffers exit, streamNumber_=%{public}d\n", streamNumber_);
+    }
 }
 
 RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
@@ -390,20 +402,26 @@ RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
         return RC_ERROR;
     }
 
-    rc = CreateEpoll(fd, streamNumber_);
+    {
+        std::shared_lock<std::shared_mutex> lock(streamLock_);
+        rc = CreateEpoll(fd, streamNumber_);
+    }
     if (rc == RC_ERROR) {
         CAMERA_LOGE("StartStream: CreateEpoll error\n");
         return RC_ERROR;
     }
 
-    if (streamNumber_ == 0) {
-        streamNumber_++;
-        CAMERA_LOGI("go start thread loopBuffers, streamNumber_=%{public}d\n", streamNumber_);
-        streamThread_ = new (std::nothrow) std::thread([this] {this->loopBuffers();});
-        if (streamThread_ == nullptr) {
-            CAMERA_LOGE("V4L2 StartStream start thread failed\n");
-            streamNumber_--;
-            return RC_ERROR;
+    {
+        std::unique_lock<std::shared_mutex> lock(streamLock_);
+        if (streamNumber_ == 0) {
+            streamNumber_++;
+            CAMERA_LOGI("go start thread loopBuffers, streamNumber_=%{public}d\n", streamNumber_);
+            streamThread_ = new (std::nothrow) std::thread([this] {this->loopBuffers();});
+            if (streamThread_ == nullptr) {
+                CAMERA_LOGE("V4L2 StartStream start thread failed\n");
+                streamNumber_--;
+                return RC_ERROR;
+            }
         }
     }
     CAMERA_LOGI("StartStream out, cameraID = %{public}s\n", cameraID.c_str());
@@ -426,7 +444,7 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
 
     unsigned int streamNum = 0;
     {
-        std::lock_guard<std::mutex> l(streamLock_);
+        std::unique_lock<std::shared_mutex> lock(streamLock_);
         streamNum = --streamNumber_;
         CAMERA_LOGI("HosV4L2Dev::StopStream streamNumber_ = %{public}d\n", streamNumber_);
     }
@@ -450,7 +468,7 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
 
     EraseEpoll(fd);
     {
-        std::lock_guard<std::mutex> l(streamLock_);
+        std::shared_lock<std::shared_mutex> lock(streamLock_);
         if (streamNumber_ == 0) {
             close(epollFd_);
             delete streamThread_;
