@@ -386,9 +386,9 @@ void AudioManagerInterfaceImpl::SetDeviceObject(struct HdfDeviceObject *deviceOb
     deviceObject_ = deviceObject;
 }
 
-bool AudioManagerInterfaceImpl::GetAudioMgrState() 
-{ 
-    return isDestruct_.load(); 
+bool AudioManagerInterfaceImpl::GetAudioMgrState()
+{
+    return isDestruct_.load();
 }
 
 int32_t AudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &serviceName,
