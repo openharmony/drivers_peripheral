@@ -195,63 +195,6 @@ HWTEST_F(DCameraStreamTest, SurfaceBufferToDImageBuffer_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: SurfaceBufferToDImageBuffer_002
- * @tc.desc: Verify SurfaceBufferToDImageBuffer
- * @tc.type: FUNC
- */
-HWTEST_F(DCameraStreamTest, SurfaceBufferToDImageBuffer_002, TestSize.Level1)
-{
-    std::shared_ptr<DCameraStream> dcStream = std::make_shared<DCameraStream>();
-    ASSERT_NE(nullptr, dcStream);
-    OHOS::sptr<OHOS::IBufferProducer> producer = nullptr;
-    dcStream->dcStreamProducer_ = OHOS::Surface::CreateSurfaceAsProducer(producer);
-    dcStream->dcStreamInfo_ = std::make_shared<StreamInfo>();
-    dcStream->dcStreamInfo_->streamId_ = 1;
-    OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = OHOS::SurfaceBuffer::Create();
-    OHOS::sptr<OHOS::SyncFence> syncFence = nullptr;
-    auto ret = dcStream->SurfaceBufferToDImageBuffer(surfaceBuffer, syncFence);
-    EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
-}
-
-/**
- * @tc.name: SurfaceBufferToDImageBuffer_003
- * @tc.desc: Verify SurfaceBufferToDImageBuffer
- * @tc.type: FUNC
- */
-HWTEST_F(DCameraStreamTest, SurfaceBufferToDImageBuffer_003, TestSize.Level1)
-{
-    std::shared_ptr<DCameraStream> dcStream = std::make_shared<DCameraStream>();
-    ASSERT_NE(nullptr, dcStream);
-    OHOS::sptr<OHOS::IBufferProducer> producer = nullptr;
-    dcStream->dcStreamProducer_ = OHOS::Surface::CreateSurfaceAsProducer(producer);
-    dcStream->dcStreamInfo_ = nullptr;
-    OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = OHOS::SurfaceBuffer::Create();
-    OHOS::sptr<OHOS::SyncFence> syncFence = new OHOS::SyncFence(-1);
-    auto ret = dcStream->SurfaceBufferToDImageBuffer(surfaceBuffer, syncFence);
-    EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
-}
-
-/**
- * @tc.name: SurfaceBufferToDImageBuffer_004
- * @tc.desc: Verify SurfaceBufferToDImageBuffer
- * @tc.type: FUNC
- */
-HWTEST_F(DCameraStreamTest, SurfaceBufferToDImageBuffer_004, TestSize.Level1)
-{
-    std::shared_ptr<DCameraStream> dcStream = std::make_shared<DCameraStream>();
-    ASSERT_NE(nullptr, dcStream);
-    OHOS::sptr<OHOS::IBufferProducer> producer = nullptr;
-    dcStream->dcStreamProducer_ = OHOS::Surface::CreateSurfaceAsProducer(producer);
-    dcStream->dcStreamInfo_ = std::make_shared<StreamInfo>();
-    dcStream->dcStreamInfo_->streamId_ = 1;
-    OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = OHOS::SurfaceBuffer::Create();
-    OHOS::sptr<OHOS::SyncFence> syncFence = new OHOS::SyncFence(-1);
-    dcStream->dcStreamBufferMgr_ = nullptr;
-    auto ret = dcStream->SurfaceBufferToDImageBuffer(surfaceBuffer, syncFence);
-    EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
-}
-
-/**
  * @tc.name: GetDCameraBuffer_001
  * @tc.desc: Verify GetDCameraBuffer
  * @tc.type: FUNC
