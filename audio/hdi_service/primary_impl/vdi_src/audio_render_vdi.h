@@ -20,10 +20,10 @@
 #include "v6_0/iaudio_render.h"
 #include <pthread.h>
 
-pthread_rwlock_t* GetRenderLock(void);
+pthread_rwlock_t* GetRenderLock(uint32_t index);
 struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
     struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc, char *adapterName);
-void AudioDestroyRenderByIdVdi(uint32_t renderId);
+void AudioDestroyRenderByIdVdiLocked(uint32_t renderId);
 struct IAudioRenderVdi *AudioGetVdiRenderByIdVdi(uint32_t renderId);
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
     uint32_t *rendrId, const char *adapterName);
