@@ -747,7 +747,7 @@ void AudioRenderInterfaceImpl::SetDumpFlagInner()
 AudioRenderStatus AudioRenderInterfaceImpl::GetRenderStatus()
 {
     std::lock_guard<std::mutex> renderLck(renderMtx_);
-    DHLOGI("Get renderstatus: %{public}d", static_cast<int32_t>(renderStatus_));
+    DHLOGD("Get renderstatus: %{public}d", static_cast<int32_t>(renderStatus_));
     return renderStatus_;
 }
 
