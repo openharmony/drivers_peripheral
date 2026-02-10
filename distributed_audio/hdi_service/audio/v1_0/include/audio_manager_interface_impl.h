@@ -73,6 +73,7 @@ public:
     void SetDeviceObject(struct HdfDeviceObject *deviceObject);
     int32_t RegisterAudioHdfListener(const std::string &serviceName, const sptr<IDAudioHdfCallback> &callbackObj);
     int32_t UnRegisterAudioHdfListener(const std::string &serviceName);
+    bool GetAudioMgrState();
 
 private:
     AudioManagerInterfaceImpl();
@@ -141,6 +142,7 @@ private:
     std::map<std::string, bool> mapAddFlags_;
     std::mutex hdfCallbackMapMtx_;
     std::map<std::string, sptr<IDAudioHdfCallback>> mapAudioHdfCallback_;
+    std::atomic<bool> isDestruct_ = false;
 };
 } // V1_0
 } // Audio
