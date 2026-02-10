@@ -115,6 +115,10 @@ if (defined(ohos_lite)) {
 
     defines = []
 
+    if (drivers_peripheral_camera_feature_fork_dma) {
+      defines += [ "FORK_DMA" ]
+    }
+
     if (enable_camera_device_utest) {
       defines += [ "CAMERA_DEVICE_UTEST" ]
     }
