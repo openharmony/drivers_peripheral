@@ -27,6 +27,7 @@
 #define HDF_LOG_TAG uhdf_sensor_testcase
 
 #define DATA_LEN 256
+#define MIN_SENSOR_DATA_LEN 16
 
 using OHOS::HDI::Sensor::V3_0::DeviceSensorInfo;
 using OHOS::HDI::Sensor::V1_1::SensorInterval;
@@ -79,7 +80,7 @@ public:
             return HDF_FAILURE;
         }
         std::vector<uint32_t> reserve;
-        HdfDeviceStatusPolicy  HdfDeviceStatusPolicy {4, 0, reserve};
+        HdfDeviceStatusPolicy  HdfDeviceStatusPolicy {4, 1, reserve};
         HdfSensorData inSensorData{
             .sensorTypeId = event.deviceSensorInfo.sensorType,
             .version = event.version,
@@ -91,6 +92,9 @@ public:
             .sensorId = event.deviceSensorInfo.sensorId,
             .location = event.deviceSensorInfo.location,
         };
+        while (inSensorData.data.size() < MIN_SENSOR_DATA_LEN) {
+            inSensorData.data.push_back(0u);
+        }
         HdfSensorData outSensorData;
         int32_t ret = sensorConvertInterfaces->ConvertSensorData(HdfDeviceStatusPolicy, inSensorData, outSensorData);
         if (ret == HDF_SUCCESS) {

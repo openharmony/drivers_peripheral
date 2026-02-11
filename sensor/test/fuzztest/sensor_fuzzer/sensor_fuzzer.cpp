@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "v3_0/sensor_interface_stub.h"
+#include "v3_0/sensor_interface_proxy.h"
 
 using namespace OHOS::HDI::Sensor::V3_0;
 
@@ -65,12 +65,12 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* rawData, size_t size)
         HDF_LOGE("%{public}s:ISensorInterface::Get() failed.", __func__);
         return false;
     }
-    sptr<SensorInterfaceStub> sensorInterface = new SensorInterfaceStub(g_sensorInterface);
-    if (sensorInterface == nullptr) {
-        HDF_LOGE("%{public}s:new SensorInterfaceStub failed.", __func__);
+    sptr<IRemoteObject> remote = hdi_objcast<ISensorInterface>(g_sensorInterface);
+    if (remote == nullptr) {
+        HDF_LOGE("%{public}s:get remote failed.", __func__);
         return false;
     }
-    sensorInterface->OnRemoteRequest(code, data, reply, option);
+    remote->SendRequest(code, data, reply, option);
 
     return true;
 }

@@ -19,10 +19,10 @@ module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor"
 ohos_fuzztest("SensorDisableWithCallbackIdFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "../sensordisable_fuzzer"
+  fuzz_config_file = "../sensordisablewithcallbackid_fuzzer"
 
   include_dirs = [
-    "../sensordisable_fuzzer",
+    "../sensordisablewithcallbackid_fuzzer",
     "../../../hdi_service",
     "../../../interfaces/v1_0",
     "../../../utils/include",
@@ -35,7 +35,7 @@ ohos_fuzztest("SensorDisableWithCallbackIdFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "sensordisable_fuzzer.cpp" ]
+  sources = [ "sensordisablewithcallbackid_fuzzer.cpp" ]
 
   deps = [ "../../../hal:hdi_sensor" ]
 
