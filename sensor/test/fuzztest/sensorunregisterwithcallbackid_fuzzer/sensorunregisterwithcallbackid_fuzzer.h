@@ -16,7 +16,7 @@
 #ifndef SENSOR_UNREGISTER_CALLBACK_FUZZER_H
 #define SENSOR_UNREGISTER_CALLBACK_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "sensorregisterandunregistercallback_fuzzer"
+#define FUZZ_PROJECT_NAME "sensorunregisterwithcallbackid_fuzzer"
 
 #include <hdf_base.h>
 #include "v3_0/isensor_callback.h"

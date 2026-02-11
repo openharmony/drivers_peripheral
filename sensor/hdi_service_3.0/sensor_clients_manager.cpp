@@ -19,6 +19,7 @@
 #include <iproxy_broker.h>
 
 #define HDF_LOG_TAG manager
+#define SENSOR_CLIENT_INFO_MAX 1000
 
 namespace OHOS {
 namespace HDI {
@@ -40,7 +41,7 @@ namespace {
     constexpr int64_t STOP_INTERVAL = 0;
     constexpr int32_t INIT_CUR_COUNT = 0;
     constexpr int32_t ZERO_PRINT_TIME = 0;
-    constexpr int32_t MAX_PRINT_TIME = 3;
+    constexpr int32_t MAX_PRINT_TIME = 1;
     constexpr int64_t INIT_REPORT_COUNT = 1;
 }
 
@@ -115,6 +116,18 @@ void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId,
 {
     SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
+    if (groupId < HDF_TRADITIONAL_SENSOR_TYPE || groupId >= HDF_SENSOR_GROUP_TYPE_MAX) {
+        HDF_LOGE("%{public}s: sensor groupId error", __func__);
+        return;
+    }
+    auto clientsIt = clients_.find(groupId);
+    if (clientsIt != clients_.end()) {
+        auto& clients = clientsIt->second;
+        if (clients.find(serviceId) == clients.end() && clients.size() >= SENSOR_CLIENT_INFO_MAX) {
+            HDF_LOGE("%{public}s: sensor client information size has exceeded the maximum value", __func__);
+            return;
+        }
+    }
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         if (callbackObj == nullptr) {
             HDF_LOGE("%{public}s: the callback of service %{public}d is null", __func__, serviceId);
@@ -227,7 +240,7 @@ void SensorClientsManager::UpdateClientPeriodCount(SensorHandle sensorHandle, in
         if (client.sensorConfigMap_.find(sensorHandle) != client.sensorConfigMap_.end()) {
             int32_t periodCount =
                     client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval / samplingInterval;
-            result += " pid " + std::to_string(entry.first) + " periodCount " +
+            result += " " + std::to_string(entry.first) + "-" +
                       std::to_string(client.sensorConfigMap_.find(sensorHandle)->second.samplingInterval / ONE_MILLION)
                       + "/" + std::to_string(samplingInterval / ONE_MILLION) + "=" + std::to_string(periodCount);
             client.periodCountMap_[sensorHandle] = periodCount;
@@ -397,7 +410,7 @@ void SensorClientsManager::AddServiceToReportQueue(SensorHandle sensorHandle, in
     auto service = sensorUsed_[sensorHandle].find(serviceId);
     if (service == sensorUsed_[sensorHandle].end()) {
         sensorUsed_[sensorHandle].insert(serviceId);
-        HDF_LOGD("%{public}s: service: %{public}d is enabled sensorHandle: %{public}s", __func__, serviceId,
+        HDF_LOGD("%{public}s: service: %{public}d enabled sensorHandle %{public}s", __func__,  serviceId,
                  SENSOR_HANDLE_TO_C_STR(sensorHandle));
     }
     return;
@@ -550,7 +563,7 @@ std::set<int32_t> SensorClientsManager::GetServiceIds(SensorHandle sensorHandle)
 std::string SensorClientsManager::ReportEachClient(const V3_0::HdfSensorEvents& event)
 {
     SENSOR_TRACE;
-    std::string result = " report=";
+    std::string result = " r=";
     SensorHandle sensorHandle =  {event.deviceSensorInfo.deviceId, event.deviceSensorInfo.sensorType,
                                   event.deviceSensorInfo.sensorId, event.deviceSensorInfo.location};
     const std::set<int32_t> services = GetServiceIds(sensorHandle);
