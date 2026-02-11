@@ -333,7 +333,7 @@ void V4L2DeviceManager::AddHardware(CameraId id, const std::string hardwareName)
 void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
     std::vector<DeviceFormat>& deviceFormat, bool uvcState)
 {
-    CAMERA_LOGI("uvc plug in %{public}s %{public}s begin", uvcState ? "in" : "out", hardwareName.c_str());
+    CAMERA_LOGI("uvc plug %{public}s %{public}s begin", uvcState ? "in" : "out", hardwareName.c_str());
     CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
     if (uvcState) {
         if (deviceFormat.empty()) {
@@ -364,13 +364,13 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
                 iter++;
                 continue;
             }
-            auto SensorManager = GetManager(DM_M_SENSOR);
-            if ((*iter).hardwareName == hardwareName && SensorManager != nullptr) {
+            auto sensorManager = GetManager(DM_M_SENSOR);
+            if ((*iter).hardwareName == hardwareName && sensorManager != nullptr) {
                 std::shared_ptr<CameraMetadata> meta =
                     std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
                 CHECK_IF_PTR_NULL_RETURN_VOID(meta);
                 uvcCb_(meta, uvcState, id, hardwareName);
-                RetCode rc = SensorManager->DestroyController(DM_C_SENSOR, hardwareName);
+                RetCode rc = sensorManager->DestroyController(DM_C_SENSOR, hardwareName);
                 CHECK_IF_EQUAL_RETURN_VOID(rc, RC_ERROR);
             }
             {
@@ -380,7 +380,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
             }
         }
     }
-    CAMERA_LOGI("uvc plug out %{public}s %{public}s end", uvcState ? "in" : "out", hardwareName.c_str());
+    CAMERA_LOGI("uvc plug %{public}s %{public}s end", uvcState ? "in" : "out", hardwareName.c_str());
 }
 
 CameraId V4L2DeviceManager::ReturnEnableCameraId(std::string hardwareName)
