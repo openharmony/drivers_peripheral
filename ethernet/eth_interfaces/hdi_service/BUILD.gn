@@ -46,7 +46,6 @@ if (is_standard_system) {
       "-fsigned-char",
       "-fno-common",
       "-fno-strict-aliasing",
-      "-fstack-protector-strong",
     ]
     cflags += [
       "-fdata-sections",
@@ -101,7 +100,6 @@ if (is_standard_system) {
       "-fsigned-char",
       "-fno-common",
       "-fno-strict-aliasing",
-      "-fstack-protector-strong",
     ]
     cflags += [
       "-fdata-sections",
