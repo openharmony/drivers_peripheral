@@ -36,7 +36,6 @@
         "libexif",
         "libjpeg-turbo",
         "ffmpeg",
-        "googletest",
         "hicollie"
       ],
       "third_party": []
