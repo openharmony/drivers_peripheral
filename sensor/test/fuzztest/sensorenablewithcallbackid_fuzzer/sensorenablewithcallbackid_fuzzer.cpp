@@ -13,23 +13,26 @@
  * limitations under the License.
  */
 
-#include "sensordisable_fuzzer.h"
+#include "sensorenablewithcallbackid_fuzzer.h"
 #include "hdf_base.h"
 #include "v3_0/sensor_interface_proxy.h"
 #include "v3_1/sensor_interface_proxy.h"
+#include "sensor_callback_impl.h"
 
 using namespace OHOS::HDI::Sensor::V3_0;
 using OHOS::HDI::Sensor::V3_1::GPS_CALLBACK_ID_BEGIN;
+
+int32_t SensorCallbackImpl::sensorDataCount = 0;
+int32_t SensorCallbackImpl::sensorDataCountOld = 0;
+bool SensorCallbackImpl::printDataFlag = false;
 namespace OHOS {
-    bool SensorDisableFuzzTest(const uint8_t* data, size_t size)
+    bool SensorEnableFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         sptr<OHOS::HDI::Sensor::V3_1::ISensorInterface> g_sensorInterface =
             OHOS::HDI::Sensor::V3_1::ISensorInterface::Get();
+        sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
         if (!g_sensorInterface->EnableWithCallbackId({0, *(int32_t *)data, 0, 0}, GPS_CALLBACK_ID_BEGIN)) {
-            result = true;
-        }
-        if (!g_sensorInterface->DisableWithCallbackId({0, *(int32_t *)data, 0, 0}, GPS_CALLBACK_ID_BEGIN)) {
             result = true;
         }
         return result;
@@ -45,7 +48,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size < sizeof(int32_t)) {
         return 0;
     }
-    OHOS::SensorDisableFuzzTest(data, size);
+    OHOS::SensorEnableFuzzTest(data, size);
     return 0;
 }
 

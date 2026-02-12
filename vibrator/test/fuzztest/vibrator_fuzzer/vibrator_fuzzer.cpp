@@ -18,7 +18,7 @@
 #include <cstdint>
 #include "hdf_log.h"
 #include "v2_0/vibrator_interface_proxy.h"
-#include "v2_0/vibrator_interface_stub.h"
+#include "v2_0/vibrator_interface_proxy.h"
 
 using namespace OHOS::HDI::Vibrator::V2_0;
 
@@ -66,12 +66,12 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* rawData, size_t size)
         HDF_LOGE("%{public}s:IVibratorInterface::Get() failed.", __func__);
         return false;
     }
-    sptr<VibratorInterfaceStub> vibratorInterface = new VibratorInterfaceStub(g_vibratorInterface);
-    if (vibratorInterface == nullptr) {
-        HDF_LOGE("%{public}s:new VibratorInterfaceStub failed.", __func__);
+    sptr<IRemoteObject> remote = hdi_objcast<IVibratorInterface>(g_vibratorInterface);
+    if (remote == nullptr) {
+        HDF_LOGE("%{public}s:get remote failed.", __func__);
         return false;
     }
-    vibratorInterface->OnRemoteRequest(code, data, reply, option);
+    remote->SendRequest(code, data, reply, option);
 
     return true;
 }
