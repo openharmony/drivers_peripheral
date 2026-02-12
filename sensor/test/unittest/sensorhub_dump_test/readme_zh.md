@@ -3,7 +3,6 @@ hdc target mount & hdc shell "mv /system/lib64/libsensor_service.z.so /system/li
 然后重启手机，手机开机不要亮屏，啥都不要操作，直接执行测试用例
  
 然后执行测试用例达到预期图片结果
-![image](/uploads/de7065aa-2693-426b-98e3-3bd0a89cbfbf/1770107699968.png '1770107699968.png')
  
 # 执行方法：
 hdc target mount
@@ -16,4 +15,3 @@ parse
  
  
 反例：
-![image](/uploads/3a03bae1-30aa-45c1-803d-3d7007d359fc/1770107713830.png '1770107713830.png')
