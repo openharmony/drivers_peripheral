@@ -2161,6 +2161,7 @@ static int32_t InitInstallWlanParam(const char *ifName, uint32_t interfaceId,
     if (*keyMsg == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
         nlmsg_free(*msg);
+        *msg = NULL;
         return RET_CODE_NOMEM;
     }
     return RET_CODE_SUCCESS;
