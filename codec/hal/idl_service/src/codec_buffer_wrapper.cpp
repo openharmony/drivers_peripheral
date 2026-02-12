@@ -22,7 +22,7 @@ OmxCodecBuffer Convert(const CodecHDI::OmxCodecBuffer& src, bool isIpcMode)
     return OmxCodecBuffer {
         .bufferId = src.bufferId,
         .bufferType = src.bufferType,
-        .bufferhandle = ReWrap(src.bufferhandle, isIpcMode),
+        .bufferhandle = ReWrap(src.bufferhandle),
         .fd = UniqueFd::Create(src.fd, isIpcMode),
         .allocLen = src.allocLen,
         .filledLen = src.filledLen,
@@ -40,7 +40,8 @@ CodecHDI::OmxCodecBuffer Convert(const OmxCodecBuffer& src, bool isIpcMode)
     return CodecHDI::OmxCodecBuffer {
         .bufferId = src.bufferId,
         .bufferType = src.bufferType,
-        .bufferhandle = src.bufferhandle,
+        .bufferhandle = src.bufferhandle ?
+            (sptr<NativeBuffer>::MakeSptr(src.bufferhandle->GetBufferHandle())) : nullptr,
         .fd = src.fd ? (isIpcMode ? src.fd->Get() : dup(src.fd->Get())) : -1,
         .allocLen = src.allocLen,
         .filledLen = src.filledLen,
