@@ -46,6 +46,7 @@ ohos_shared_library("libgnss_interface_service_2.0") {
       "c_utils:utils",
       "drivers_interface_location_gnss:location_gnss_idl_headers",
       "hdf_core:libhdi",
+      "hdf_core:libpub_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
