@@ -48,6 +48,7 @@ namespace {
     int64_t g_samplingInterval = 10000000; // 10ms
     int64_t g_testTime = 5000; // 5s
     int64_t g_testTime2 = 120000; // 120s
+    int64_t g_dumpTimes = 10;
     constexpr int32_t DECIMAL_NOTATION = 10;
 
     class SensorSetBatchTest : public testing::Test {
@@ -58,6 +59,7 @@ namespace {
         void TearDown();
         static std::string ExecShellCommand(const std::string& command);
         static std::string ExecShellCommandTenTimes(const std::string& command);
+        static void WaitForSensorData(int64_t testTime, int32_t expectedMinCount, int32_t expectedMaxCount);
     };
 
     void SensorSetBatchTest::SetUpTestCase()
@@ -110,9 +112,10 @@ namespace {
             result += buffer;
         }
 
-        int return_code = pclose(pipe);
-        if (return_code != 0) {
-            std::cerr << "Warning: Command '" << command << "' returned non-zero exit code: " << return_code << std::endl;
+        int returnCode = pclose(pipe);
+        if (returnCode != 0) {
+            std::cerr << "Warning: Command '" << command <<
+                "' returned non-zero exit code: " << returnCode << std::endl;
         }
         result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
         result.erase(std::remove(result.begin(), result.end(), '\r'), result.end());
@@ -125,11 +128,29 @@ namespace {
     std::string SensorSetBatchTest::ExecShellCommandTenTimes(const std::string& command)
     {
         SENSOR_TRACE;
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < g_dumpTimes; ++i) {
             std::string result = ExecShellCommand(command);
         }
 
         return "";
+    }
+
+    void SensorSetBatchTest::WaitForSensorData(int64_t testTime, int32_t expectedMinCount, int32_t expectedMaxCount)
+    {
+        for (int i = 0; i < testTime / 1000; i++) {
+            OsalMSleep(1000);
+            int32_t countPerSecond = SensorCallbackImpl::sensorDataCount - SensorCallbackImpl::sensorDataCountOld;
+            SensorCallbackImpl::sensorDataCountOld = SensorCallbackImpl::sensorDataCount;
+            if (countPerSecond > expectedMinCount && countPerSecond < expectedMaxCount) {
+                printf("\033[32mas expected, 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
+                    countPerSecond, SensorCallbackImpl::sensorDataCount);
+            } else {
+                printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
+                    countPerSecond, SensorCallbackImpl::sensorDataCount);
+            }
+            printf("The script will end in %ld seconds.\n", (testTime / 1000 - i));
+            fflush(stdout);
+        }
     }
 
     void SensorSetBatchTest::TearDownTestCase()
@@ -196,20 +217,7 @@ namespace {
         printf("SetBatch({%s}, %s, 0)\n", SENSOR_HANDLE_TO_C_STR(g_deviceSensorInfo),
             std::to_string(g_samplingInterval).c_str());
         EXPECT_EQ(ret, HDF_SUCCESS);
-        for (int i = 0; i < g_testTime2 / 1000; i++) {
-            OsalMSleep(1000);
-            int32_t countPerSecond = SensorCallbackImpl::sensorDataCount - SensorCallbackImpl::sensorDataCountOld;
-            SensorCallbackImpl::sensorDataCountOld = SensorCallbackImpl::sensorDataCount;
-            if (countPerSecond > expectedMinCount && countPerSecond < expectedMaxCount) {
-                printf("\033[32mas expected, 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
-                    countPerSecond, SensorCallbackImpl::sensorDataCount);
-            } else {
-                printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
-                    countPerSecond, SensorCallbackImpl::sensorDataCount);
-            }
-            printf("The script will end in %ld seconds.\n", (g_testTime2 / 1000 - i));
-            fflush(stdout);
-        }
+        WaitForSensorData(g_testTime2, expectedMinCount, expectedMaxCount);
         ret = g_sensorInterface->Unregister(0, g_traditionalCallback);
         EXPECT_EQ(ret, HDF_SUCCESS);
     }
