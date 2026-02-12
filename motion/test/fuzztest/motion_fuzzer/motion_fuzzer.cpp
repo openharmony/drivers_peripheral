@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "v1_1/motion_interface_stub.h"
+#include "v1_1/motion_interface_proxy.h"
 
 using namespace OHOS::HDI::Motion::V1_1;
 
@@ -67,13 +67,12 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* rawData, size_t size)
         HDF_LOGE("%{public}s:IMotionInterface::Get() failed.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::Motion::V1_1::MotionInterfaceStub> motionInterface =
-        new OHOS::HDI::Motion::V1_1::MotionInterfaceStub(g_motionInterface);
-    if (motionInterface == nullptr) {
-        HDF_LOGE("%{public}s:new MotionInterfaceStub failed.", __func__);
+    sptr<IRemoteObject> remote = hdi_objcast<OHOS::HDI::Motion::V1_1::IMotionInterface>(g_motionInterface);
+    if (remote == nullptr) {
+        HDF_LOGE("%{public}s:get remote failed.", __func__);
         return false;
     }
-    motionInterface->OnRemoteRequest(code, data, reply, option);
+    remote->SendRequest(code, data, reply, option);
 
     return true;
 }

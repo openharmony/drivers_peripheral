@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,9 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef SENSOR_ENABLE_FUZZER_H
-#define SENSOR_ENABLE_FUZZER_H
+#include "motion_callback_impl.h"
+#include <hdf_base.h>
 
-#define FUZZ_PROJECT_NAME "sensorenable_fuzzer"
-
-#endif
+namespace OHOS {
+namespace HDI {
+namespace Motion {
+namespace V1_0 {
+int32_t MotionCallbackImpl::OnDataEvent(const HdfMotionEvent &event)
+{
+    printf("moton :[%d], result[%d]:, status[%d]\n\r", event.motion, event.result, event.status);
+    return HDF_SUCCESS;
+}
+} // V1_0
+} // Motion
+} // HDI
+} // OHOS

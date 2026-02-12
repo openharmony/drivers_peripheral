@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef SENSOR_DISABLE_FUZZER_H
-#define SENSOR_DISABLE_FUZZER_H
+#ifndef SENSOR_ENABLE_FUZZER_H
+#define SENSOR_ENABLE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "sensordisable_fuzzer"
+#define FUZZ_PROJECT_NAME "sensorenablewithcallbackid_fuzzer"
 
 #endif
-

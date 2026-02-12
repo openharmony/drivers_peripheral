@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "sensorsetbatch_fuzzer.h"
+#include "sensorsetbatchwithcallbackid_fuzzer.h"
 #include "hdf_base.h"
 #include "v3_0/sensor_interface_proxy.h"
 #include "v3_1/sensor_interface_proxy.h"
