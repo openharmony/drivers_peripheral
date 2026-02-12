@@ -20,6 +20,7 @@
 #include "system_ability_definition.h"
 #include "peripheral_agnss_test.h"
 #include "agnss_interface_impl.h"
+#include "location_vendor_interface.h"
 #include <iproxy_broker.h>
 #include <v2_0/ia_gnss_callback.h>
 
