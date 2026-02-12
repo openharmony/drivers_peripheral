@@ -17,7 +17,7 @@
 #define PERIPHERAL_AGNSS_TEST_H
 
 #include <gtest/gtest.h>
-#include <v2_0/ia_gnss_interface.h>
+#include <v2_1/ia_gnss_interface.h>
 #include "agnss_interface_impl.h"
 #include "agnss_event_callback_mock.h"
 
@@ -25,16 +25,16 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Agnss {
-namespace V2_0 {
+namespace V2_1 {
 
-using OHOS::HDI::Location::Agnss::V2_0::IAGnssInterface;
+using OHOS::HDI::Location::Agnss::V2_1::IAGnssInterface;
 class PeripheralAGnssTest : public testing::Test {
 public:
     void SetUp();
     void TearDown();
     sptr<AGnssInterfaceImpl> agnssInstance_;
 };
-} // V2_0
+} // V2_1
 } // Agnss
 } // Location
 } // HDI

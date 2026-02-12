@@ -20,7 +20,6 @@
 #include "system_ability_definition.h"
 #include "peripheral_agnss_test.h"
 #include "agnss_interface_impl.h"
-#include "location_vendor_interface.h"
 #include <iproxy_broker.h>
 #include <v2_0/ia_gnss_callback.h>
 
@@ -30,11 +29,12 @@ using OHOS::HDI::Location::Agnss::V2_0::IAGnssCallback;
 using OHOS::HDI::Location::Agnss::V2_0::AGNSS_TYPE_SUPL;
 using OHOS::HDI::Location::Agnss::V2_0::AGnssServerInfo;
 using OHOS::HDI::Location::Agnss::V2_0::AGnssRefInfo;
+using OHOS::HDI::Location::Agnss::V2_1::AGnssReferenceInfo;
 namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Agnss {
-namespace V2_0 {
+namespace V2_1 {
 
 void PeripheralAGnssTest::SetUp()
 {
@@ -91,18 +91,12 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1)
     GTEST_LOG_(INFO)
         << "PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1";
     EXPECT_NE(nullptr, agnssInstance_);
-    int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
-    LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
-    auto agnssInterface =
-        static_cast<const AgnssModuleInterface*>(interface->GetModuleInterface(moduleType));
-    if (agnssInterface != nullptr) {
-        if (agnssInstance_ != nullptr) {
-            AGnssServerInfo server;
-            server.type = AGNSS_TYPE_SUPL;
-            server.port = 8700;
-            int32_t ret = agnssInstance_->SetAgnssServer(server);
-            EXPECT_EQ(HDF_SUCCESS, ret);
-        }
+    if (agnssInstance_ != nullptr) {
+        AGnssServerInfo server;
+        server.type = AGNSS_TYPE_SUPL;
+        server.port = 8700;
+        int32_t ret = agnssInstance_->SetAgnssServer(server);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -117,6 +111,29 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssRefInfoTest001, TestSize.Level1)
     if (agnssInstance_ != nullptr) {
         GetRefLocationidCb(2);
         agnssInstance_->SetAgnssRefInfo(refInfo);
+        GetRefLocationidCb(1);
+        refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_GSM;
+        agnssInstance_->SetAgnssRefInfo(refInfo);
+        refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_UMTS;
+        agnssInstance_->SetAgnssRefInfo(refInfo);
+        refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_NR;
+        agnssInstance_->SetAgnssRefInfo(refInfo);
+        refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_LTE;
+        agnssInstance_->SetAgnssRefInfo(refInfo);
+    }
+}
+
+HWTEST_F(PeripheralAGnssTest, SetAgnssRefInfoTest002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)
+        << "PeripheralAGnssTest, SetAgnssRefInfoTest001, TestSize.Level1";
+    EXPECT_NE(nullptr, agnssInstance_);
+    AGnssReferenceInfo refInfo;
+    refInfo.type = HDI::Location::Agnss::V2_0::ANSS_REF_INFO_TYPE_CELLID;
+    refInfo.mac.mac = {2, 2, 2, 2, 21, 1};
+    if (agnssInstance_ != nullptr) {
+        GetRefLocationidCb(2);
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
         GetRefLocationidCb(1);
         refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_GSM;
         agnssInstance_->SetAgnssRefInfo(refInfo);
@@ -149,7 +166,7 @@ HWTEST_F(PeripheralAGnssTest, ResetAgnssTest001, TestSize.Level1)
     agnssInstance_->ResetAgnss();
 }
 
-} // V2_0
+} // V2_1
 } // Gnss
 } // Location
 } // HDI

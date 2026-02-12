@@ -330,6 +330,37 @@ typedef struct {
 } CellId;
 
 /*
+ * Definition of Cell ID structure.
+ */
+typedef struct {
+    size_t size;
+
+    /* See CellIdCategory for the definition of category. */
+    uint32_t category;
+
+    /* Mobile Country Code. */
+    uint32_t mcc;
+
+    /* Mobile Network Code. */
+    uint32_t mnc;
+
+    /* Location Area Code. */
+    uint32_t lac;
+
+    /* 2G:Cell id. 3G:Utran Cell id. LTE:Cell Global Id EUTRA. */
+    uint32_t cid;
+
+    /* Tracking Area Code. */
+    uint32_t tac;
+
+    /* Physical Cell id. */
+    uint32_t pcid;
+
+    /* NR cell id */
+    uint64_t nci;
+} CellId2_1;
+
+/*
  * WiFi MAC information.
  */
 typedef struct {
@@ -351,6 +382,21 @@ typedef struct {
         MacInfo mac;
     } u;
 } AgnssReferenceInfo;
+
+/*
+ * AGNSS reference information.
+ */
+typedef struct {
+    size_t size;
+
+    /* See AgnssRefInfoCategory for the definition of category. */
+    uint32_t category;
+
+    union {
+        CellId2_1 cellId;
+        MacInfo mac;
+    } u;
+} AgnssReferenceInfo2_1;
 
 /*
  * Data service network state.
@@ -757,6 +803,12 @@ typedef struct {
 
     /* Used to receive network state changes. */
     void (*onNetworkStateChange)(const NetworkState* state);
+
+    /* Used to receive network state changes. */
+    void (*setSuplDnsResult)(const char* ipAddr);
+
+    /* Sets the AGNSS reference information. */
+    bool (*setAgnssReferenceInfo2_1)(const AgnssReferenceInfo2_1* cellId);
 } AgnssModuleInterface;
 
 /*

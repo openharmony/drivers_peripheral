@@ -17,9 +17,9 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v2_0/agnss_interface_stub.h"
+#include "v2_1/agnss_interface_stub.h"
 
-using namespace OHOS::HDI::Location::Agnss::V2_0;
+using namespace OHOS::HDI::Location::Agnss::V2_1;
 
 struct HdfAGnssInterfaceHost {
     struct IDeviceIoService ioService;
@@ -73,7 +73,7 @@ static int HdfAGnssInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     hdfAGnssInterfaceHost->ioService.Dispatch = AGnssInterfaceDriverDispatch;
 
-    auto serviceImpl = IAGnssInterface::Get(true);
+    auto serviceImpl = OHOS::HDI::Location::Agnss::V2_1::IAGnssInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfAGnssInterfaceHost;
@@ -81,7 +81,7 @@ static int HdfAGnssInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfAGnssInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        IAGnssInterface::GetDescriptor());
+        OHOS::HDI::Location::Agnss::V2_1::IAGnssInterface::GetDescriptor());
     if (hdfAGnssInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfAGnssInterfaceHost;

@@ -30,7 +30,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Agnss {
-namespace V2_0 {
+namespace V2_1 {
 namespace {
 using AgnssCallBackMap = std::unordered_map<IRemoteObject*, sptr<IAGnssCallback>>;
 using AgnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
@@ -218,6 +218,58 @@ int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
         loc.u.cellId.nci = refInfo.cellId.nci;
     }
     bool ret = agnssInterface->setAgnssReferenceInfo(&loc);
+    if (!ret) {
+        HDF_LOGE("setAgnssReferenceInfo failed.");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t AGnssInterfaceImpl::SetAgnssReferenceInfo(const AGnssReferenceInfo& refInfo)
+{
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
+    LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
+    auto agnssInterface =
+        static_cast<const AgnssModuleInterface*>(interface->GetModuleInterface(moduleType));
+    if (agnssInterface == nullptr) {
+        HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    HDF_LOGI("%{public}s, g_refInfoType=%{public}d", __func__, refInfo.type);
+    AgnssReferenceInfo2_1 loc;
+    loc.category = g_refInfoType;
+    if (loc.category == static_cast<uint32_t>(AgnssRefInfoCategory::AGNSS_REF_INFO_CATEGORY_MAC)) {
+        for (size_t i = 0; i < MAC_LEN; i++) {
+            loc.u.mac.mac[i] = refInfo.mac.mac[i];
+        }
+        loc.u.mac.size = MAC_LEN;
+    } else if (loc.category == static_cast<uint32_t>(AgnssRefInfoCategory::AGNSS_REF_INFO_CATEGORY_CELLID)) {
+        switch (refInfo.cellId.type) {
+            case CELLID_TYPE_GSM:
+                loc.u.cellId.category = static_cast<uint16_t>(CellIdCategory::CELLID_CATEGORY_GSM);
+                break;
+            case CELLID_TYPE_UMTS:
+                loc.u.cellId.category = static_cast<uint16_t>(CellIdCategory::CELLID_CATEGORY_UMTS);
+                break;
+            case CELLID_TYPE_LTE:
+                loc.u.cellId.category = static_cast<uint16_t>(CellIdCategory::CELLID_CATEGORY_LTE);
+                break;
+            case CELLID_TYPE_NR:
+                loc.u.cellId.category = static_cast<uint16_t>(CellIdCategory::CELLID_CATEGORY_NR);
+                break;
+            default:
+                HDF_LOGE("%{public}s wrong cellType.", __func__);
+                return HDF_ERR_INVALID_PARAM;
+        }
+        loc.u.cellId.mcc = refInfo.cellId.mcc;
+        loc.u.cellId.mnc = refInfo.cellId.mnc;
+        loc.u.cellId.lac = refInfo.cellId.lac;
+        loc.u.cellId.cid = refInfo.cellId.cid;
+        loc.u.cellId.tac = refInfo.cellId.tac;
+        loc.u.cellId.pcid = refInfo.cellId.pcid;
+        loc.u.cellId.nci = refInfo.cellId.nci;
+    }
+    bool ret = agnssInterface->setAgnssReferenceInfo2_1(&loc);
     if (!ret) {
         HDF_LOGE("setAgnssReferenceInfo failed.");
         return HDF_FAILURE;
