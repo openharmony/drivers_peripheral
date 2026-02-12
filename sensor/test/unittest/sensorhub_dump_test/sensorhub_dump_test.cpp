@@ -49,6 +49,7 @@ namespace {
     int64_t g_testTime = 5000; // 5s
     int64_t g_testTime2 = 120000; // 120s
     int64_t g_dumpTimes = 10;
+    int64_t g_oneSecond = 1000;
     constexpr int32_t DECIMAL_NOTATION = 10;
 
     class SensorSetBatchTest : public testing::Test {
@@ -137,8 +138,8 @@ namespace {
 
     void SensorSetBatchTest::WaitForSensorData(int64_t testTime, int32_t expectedMinCount, int32_t expectedMaxCount)
     {
-        for (int i = 0; i < testTime / 1000; i++) {
-            OsalMSleep(1000);
+        for (int i = 0; i < testTime / g_oneSecond; i++) {
+            OsalMSleep(g_oneSecond);
             int32_t countPerSecond = SensorCallbackImpl::sensorDataCount - SensorCallbackImpl::sensorDataCountOld;
             SensorCallbackImpl::sensorDataCountOld = SensorCallbackImpl::sensorDataCount;
             if (countPerSecond > expectedMinCount && countPerSecond < expectedMaxCount) {
@@ -148,7 +149,7 @@ namespace {
                 printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
                     countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
-            printf("The script will end in %ld seconds.\n", (testTime / 1000 - i));
+            printf("The script will end in %ld seconds.\n", (testTime / g_oneSecond - i));
             fflush(stdout);
         }
     }
@@ -183,14 +184,14 @@ namespace {
         ret = g_sensorInterface->Enable(g_deviceSensorInfo);
         EXPECT_EQ(ret, HDF_SUCCESS);
 
-        int32_t expectedMinCount = 1000 / (g_samplingInterval / 1000000) / 2;
-        int32_t expectedMaxCount = 1000 / (g_samplingInterval / 1000000) * 3 / 2;
+        int32_t expectedMinCount = g_oneSecond / (g_samplingInterval / ONE_MILLION) / 2;
+        int32_t expectedMaxCount = g_oneSecond / (g_samplingInterval / ONE_MILLION) * 3 / 2;
 
         printf("expectedMinCount is %s, expectedMaxCount is %s\n", std::to_string(expectedMinCount).c_str(),
                std::to_string(expectedMaxCount).c_str());
 
-        for (int i = 0; i < g_testTime / 1000; i++) {
-            OsalMSleep(1000);
+        for (int i = 0; i < g_testTime / g_oneSecond; i++) {
+            OsalMSleep(g_oneSecond);
             int32_t countPerSecond = SensorCallbackImpl::sensorDataCount - SensorCallbackImpl::sensorDataCountOld;
             SensorCallbackImpl::sensorDataCountOld = SensorCallbackImpl::sensorDataCount;
             if (countPerSecond > expectedMinCount && countPerSecond < expectedMaxCount) {
@@ -200,7 +201,7 @@ namespace {
                 printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
                     countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
-            printf("please execute sensorhub dump.bat within %ld seconds\n", (g_testTime / 1000 - i));
+            printf("please execute sensorhub dump.bat within %ld seconds\n", (g_testTime / g_oneSecond - i));
             fflush(stdout);
         }
         printf("now execute cat /sys/class/sensors/sensorhub_dump\n");
@@ -212,7 +213,7 @@ namespace {
             ret = g_sensorInterface->Disable(g_deviceSensorInfo);
             printf("now execute g_sensorInterface->Disable ret = %d\n", ret);
         }
-        OsalMSleep(1000);
+        OsalMSleep(g_oneSecond);
         ret = g_sensorInterface->SetBatch(g_deviceSensorInfo, g_samplingInterval, 0);
         printf("SetBatch({%s}, %s, 0)\n", SENSOR_HANDLE_TO_C_STR(g_deviceSensorInfo),
             std::to_string(g_samplingInterval).c_str());
