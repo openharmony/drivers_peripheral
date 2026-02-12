@@ -86,24 +86,24 @@ HWTEST_F(PeripheralAGnssTest, RequestSetupAgnssDataConnectionTest001, TestSize.L
     RequestSetupAgnssDataConnection(&status);
 }
 
-HWTEST_F(PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1)	 
-{	 
-    GTEST_LOG_(INFO)	 
-        << "PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1";	 
-    EXPECT_NE(nullptr, agnssInstance_);	 
-    int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);	 
-    LocationVendorInterface* interface = LocationVendorInterface::GetInstance();	 
-    auto agnssInterface =	 
-        static_cast<const AgnssModuleInterface*>(interface->GetModuleInterface(moduleType));	 
-    if (agnssInterface != nullptr) {	 
-        if (agnssInstance_ != nullptr) {	 
-            AGnssServerInfo server; 
-            server.type = AGNSS_TYPE_SUPL; 
-            server.port = 8700; 
+HWTEST_F(PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)
+        << "PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1";
+    EXPECT_NE(nullptr, agnssInstance_);
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
+    LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
+    auto agnssInterface =
+        static_cast<const AgnssModuleInterface*>(interface->GetModuleInterface(moduleType));
+    if (agnssInterface != nullptr) {
+        if (agnssInstance_ != nullptr) {
+            AGnssServerInfo server;
+            server.type = AGNSS_TYPE_SUPL;
+            server.port = 8700;
             int32_t ret = agnssInstance_->SetAgnssServer(server); 
-            EXPECT_EQ(HDF_SUCCESS, ret); 
-        } 
-    }	 
+            EXPECT_EQ(HDF_SUCCESS, ret);
+        }
+    }
 }
 
 HWTEST_F(PeripheralAGnssTest, SetAgnssRefInfoTest001, TestSize.Level1)
