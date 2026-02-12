@@ -143,13 +143,13 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssRefInfoTest002, TestSize.Level1)
         agnssInstance_->SetAgnssReferenceInfo(refInfo);
         GetRefLocationidCb(1);
         refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_GSM;
-        agnssInstance_->SetAgnssRefInfo(refInfo);
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
         refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_UMTS;
-        agnssInstance_->SetAgnssRefInfo(refInfo);
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
         refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_NR;
-        agnssInstance_->SetAgnssRefInfo(refInfo);
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
         refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_LTE;
-        agnssInstance_->SetAgnssRefInfo(refInfo);
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
     }
 }
 
