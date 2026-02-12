@@ -101,7 +101,7 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssServerTest001, TestSize.Level1)
             AGnssServerInfo server;
             server.type = AGNSS_TYPE_SUPL;
             server.port = 8700;
-            int32_t ret = agnssInstance_->SetAgnssServer(server); 
+            int32_t ret = agnssInstance_->SetAgnssServer(server);
             EXPECT_EQ(HDF_SUCCESS, ret);
         }
     }
