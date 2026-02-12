@@ -37,7 +37,6 @@ ohos_shared_library("libagnss_interface_service_2.1") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_location_agnss:location_agnss_idl_headers",
       "drivers_interface_location_agnss:location_agnss_idl_headers_2.1",
       "hdf_core:libhdi",
       "hilog:libhilog",
