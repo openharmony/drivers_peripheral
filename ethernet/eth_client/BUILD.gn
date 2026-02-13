@@ -39,8 +39,8 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
       "-Wno-format",
       "-Wno-format-extra-args",
-      "-fstack-protector-strong",
     ]
+    branch_protector_ret = "pac_ret"
  
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_ethernet"
