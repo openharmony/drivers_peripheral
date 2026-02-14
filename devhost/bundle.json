@@ -1,16 +1,16 @@
 {
-    "name": "@ohos/drivers_adapter",
-    "description": "hdf framework adapter components",
+    "name": "@ohos/drivers_devhost",
+    "description": "hdf framework devhost components",
     "version": "6.0",
     "license": "Apache License 2.0",
     "publishAs": "code-segment",
     "segment": {
-        "destPath": "drivers/peripheral/adapter"
+        "destPath": "drivers/peripheral/devhost"
     },
     "dirs": {},
     "scripts": {},
     "component": {
-        "name": "drivers_adapter",
+        "name": "drivers_devhost",
         "subsystem": "hdf",
         "features": [],
         "adapted_system_type": ["standard"],
@@ -28,7 +28,7 @@
         },
         "build": {
             "sub_component": [
-                "//drivers/peripheral/adapter:entry"
+                "//drivers/peripheral/devhost:entry"
             ],
             "inner_kits": [],
             "test": []
