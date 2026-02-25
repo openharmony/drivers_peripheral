@@ -63,10 +63,50 @@ void FuzzSetBufferProducer(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzSetCameraController(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    sptr<ICameraControllerCallback> cameraControllerCallback = nullptr;
+    g_faceAuthInterfaceService.SetCameraController(cameraControllerCallback);
+    IAM_LOGI("end");
+}
+
+void FuzzGetCameraSettings(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    uint64_t scheduleId = parcel.ReadUint64();
+    std::vector<uint8_t> cameraAbility;
+    std::vector<uint8_t> cameraSettings;
+    g_faceAuthInterfaceService.GetCameraSettings(scheduleId, cameraAbility, cameraSettings);
+    IAM_LOGI("end");
+}
+
+void FuzzSetCameraSecureSeqId(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    uint64_t scheduleId = parcel.ReadUint64();
+    uint64_t secureSeqId = parcel.ReadUint64();
+    g_faceAuthInterfaceService.SetCameraSecureSeqId(scheduleId, secureSeqId);
+    IAM_LOGI("end");
+}
+
+void FuzzOnCameraError(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    uint64_t scheduleId  = parcel.ReadUint64();
+    int32_t resultCode  = parcel.ReadInt32();
+    g_faceAuthInterfaceService.OnCameraError(scheduleId, resultCode);
+    IAM_LOGI("end");
+}
+
 using FuzzFunc = decltype(FuzzGetExecutorList);
 FuzzFunc *g_fuzzFuncs[] = {
     FuzzGetExecutorList,
     FuzzSetBufferProducer,
+    FuzzSetCameraController,
+    FuzzGetCameraSettings,
+    FuzzSetCameraSecureSeqId,
+    FuzzOnCameraError,
 };
 
 void FaceAuthInterfaceServiceFuzzTest(const uint8_t *data, size_t size)
