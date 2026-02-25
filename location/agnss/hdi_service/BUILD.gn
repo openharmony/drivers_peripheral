@@ -12,7 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
-ohos_shared_library("libagnss_interface_service_2.0") {
+ohos_shared_library("libagnss_interface_service_2.1") {
   include_dirs = [
     "//drivers/peripheral/location/agnss/hdi_service",
   ]
@@ -37,8 +37,10 @@ ohos_shared_library("libagnss_interface_service_2.0") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_location_agnss:location_agnss_idl_headers",
+      "drivers_interface_location_agnss:location_agnss_idl_headers_2.1",
       "hdf_core:libhdi",
+      "hdf_core:libpub_utils",
+      "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
@@ -96,7 +98,8 @@ ohos_shared_library("liblocation_agnss_hdi_driver") {
   }
 
   external_deps +=
-      [ "drivers_interface_location_agnss:liblocation_agnss_stub_2.0" ]
+      [ "drivers_interface_location_agnss:liblocation_agnss_stub_2.0",
+      "drivers_interface_location_agnss:liblocation_agnss_stub_2.1" ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
@@ -106,7 +109,7 @@ ohos_shared_library("liblocation_agnss_hdi_driver") {
 
 group("hdi_location_agnss_service") {
   deps = [
-    ":libagnss_interface_service_2.0",
+    ":libagnss_interface_service_2.1",
     ":liblocation_agnss_hdi_driver",
   ]
 }

@@ -30,11 +30,12 @@ using OHOS::HDI::Location::Agnss::V2_0::IAGnssCallback;
 using OHOS::HDI::Location::Agnss::V2_0::AGNSS_TYPE_SUPL;
 using OHOS::HDI::Location::Agnss::V2_0::AGnssServerInfo;
 using OHOS::HDI::Location::Agnss::V2_0::AGnssRefInfo;
+using OHOS::HDI::Location::Agnss::V2_1::AGnssReferenceInfo;
 namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Agnss {
-namespace V2_0 {
+namespace V2_1 {
 
 void PeripheralAGnssTest::SetUp()
 {
@@ -129,6 +130,29 @@ HWTEST_F(PeripheralAGnssTest, SetAgnssRefInfoTest001, TestSize.Level1)
     }
 }
 
+HWTEST_F(PeripheralAGnssTest, SetAgnssRefInfoTest002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)
+        << "PeripheralAGnssTest, SetAgnssRefInfoTest001, TestSize.Level1";
+    EXPECT_NE(nullptr, agnssInstance_);
+    AGnssReferenceInfo refInfo;
+    refInfo.type = HDI::Location::Agnss::V2_0::ANSS_REF_INFO_TYPE_CELLID;
+    refInfo.mac.mac = {2, 2, 2, 2, 21, 1};
+    if (agnssInstance_ != nullptr) {
+        GetRefLocationidCb(2);
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
+        GetRefLocationidCb(1);
+        refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_GSM;
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
+        refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_UMTS;
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
+        refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_NR;
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
+        refInfo.cellId.type = HDI::Location::Agnss::V2_0::CELLID_TYPE_LTE;
+        agnssInstance_->SetAgnssReferenceInfo(refInfo);
+    }
+}
+
 HWTEST_F(PeripheralAGnssTest, SetSubscriberSetIdTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
@@ -149,7 +173,7 @@ HWTEST_F(PeripheralAGnssTest, ResetAgnssTest001, TestSize.Level1)
     agnssInstance_->ResetAgnss();
 }
 
-} // V2_0
+} // V2_1
 } // Gnss
 } // Location
 } // HDI
