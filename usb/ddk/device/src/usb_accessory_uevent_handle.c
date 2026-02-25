@@ -20,6 +20,7 @@
 #include "ddk_pnp_listener_mgr.h"
 
 #define HDF_LOG_TAG usb_accessory_uevent
+#define UEVENT_MSG_LEN          2048
 
 char *g_usbAccessoryUeventPath = "invalid_path";
 
@@ -50,7 +51,7 @@ static void UsbAccessoryDispatchUevent(const struct UsbAccessoryUeventInfo *info
 void UsbAccessoryUeventHandle(const char msg[], ssize_t rcvLen)
 {
     HDF_LOGD("%{public}s: msg: %{public}s, len: %{public}zd", __func__, msg, rcvLen);
-    if (rcvLen <= 0) {
+    if (rcvLen <= 0 || rcvLen > UEVENT_MSG_LEN) {
         HDF_LOGE("%{public}s: rcvLen is invalid: %{public}zd", __func__, rcvLen);
         return;
     }
