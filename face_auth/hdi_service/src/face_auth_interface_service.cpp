@@ -63,6 +63,41 @@ int32_t FaceAuthInterfaceService::SetBufferProducer(const sptr<BufferProducerSeq
         UserIam::Common::GetPointerNullStateString(bufferProducer.GetRefPtr()).c_str());
     return HDF_SUCCESS;
 }
+
+int32_t FaceAuthInterfaceService::SetCameraController(const sptr<ICameraControllerCallback>& cameraController)
+{
+    IAM_LOGI("interface mock start set camera controller %{public}s",
+        UserIam::Common::GetPointerNullStateString(cameraController.GetRefPtr()).c_str());
+    return HDF_SUCCESS;
+}
+
+int32_t FaceAuthInterfaceService::GetCameraSettings(uint64_t scheduleId, const std::vector<uint8_t>& cameraAbility,
+    std::vector<uint8_t>& cameraSettings)
+{
+    IAM_LOGI("interface mock start get camera settings start, ability len %{public}zu, settings len %{public}zu",
+        cameraAbility.size(), cameraSettings.size());
+    static_cast<void>(scheduleId);
+    IAM_LOGI("interface mock start get camera settings end");
+    return HDF_SUCCESS;
+}
+
+int32_t FaceAuthInterfaceService::SetCameraSecureSeqId(uint64_t scheduleId, uint64_t secureSeqId)
+{
+    IAM_LOGI("interface mock start set camera secure seq id start");
+    static_cast<void>(scheduleId);
+    static_cast<void>(secureSeqId);
+    IAM_LOGI("interface mock start set camera secure seq id end");
+    return HDF_SUCCESS;
+}
+
+int32_t FaceAuthInterfaceService::OnCameraError(uint64_t scheduleId, int32_t resultCode)
+{
+    IAM_LOGI("interface mock start received camera error start");
+    static_cast<void>(scheduleId);
+    static_cast<void>(resultCode);
+    IAM_LOGI("interface mock start received camera error end");
+    return HDF_SUCCESS;
+}
 } // namespace FaceAuth
 } // namespace HDI
 } // namespace OHOS

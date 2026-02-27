@@ -30,6 +30,11 @@ public:
 
     int32_t GetExecutorList(std::vector<sptr<IAllInOneExecutor>> &executorList) override;
     int32_t SetBufferProducer(const sptr<BufferProducerSequenceable> &bufferProducer) override;
+    int32_t SetCameraController(const sptr<ICameraControllerCallback>& cameraController) override;
+    int32_t GetCameraSettings(uint64_t scheduleId, const std::vector<uint8_t>& cameraAbility,
+         std::vector<uint8_t>& cameraSettings) override;
+    int32_t SetCameraSecureSeqId(uint64_t scheduleId, uint64_t secureSeqId) override;
+    int32_t OnCameraError(uint64_t scheduleId, int32_t resultCode) override;
 
 private:
     std::vector<sptr<IAllInOneExecutor>> executorList_;

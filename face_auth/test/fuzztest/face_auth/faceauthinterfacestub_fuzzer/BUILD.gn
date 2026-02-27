@@ -34,8 +34,8 @@ ohos_fuzztest("FaceAuthInterfaceStubFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
-    "drivers_interface_face_auth:libface_auth_proxy_2.0",
-    "drivers_interface_face_auth:libface_auth_stub_2.0",
+    "drivers_interface_face_auth:libface_auth_proxy_3.0",
+    "drivers_interface_face_auth:libface_auth_stub_3.0",
     "graphic_surface:surface",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
