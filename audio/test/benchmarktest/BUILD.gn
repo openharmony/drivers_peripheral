@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("./../../audio.gni")
 
-module_output_path = "drivers_peripheral_audio/audio"
+module_output_path = "drivers_peripheral_audio/drivers_peripheral_audio"
 
 ohos_benchmarktest("hdf_audio_benchmark_test") {
   module_out_path = module_output_path
