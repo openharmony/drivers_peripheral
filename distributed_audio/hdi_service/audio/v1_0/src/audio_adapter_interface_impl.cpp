@@ -688,7 +688,7 @@ int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
             DestroyCapture(capId);
         }
     }
-    spkPinInUse_ = 0;
+
     DHLOGI("Remove audio device success.");
     return DH_SUCCESS;
 }
