@@ -766,8 +766,7 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
         DHLOGE("Wait SA notify failed. ret: %{public}d.", ret);
         return ret;
     }
-    spkPinInUse_ = 0;
-    DHLOGI("Close render device success.");
+    DHLOGI("Close render device success, renderId: %{public}d.", renderId);
     return DH_SUCCESS;
 }
 
