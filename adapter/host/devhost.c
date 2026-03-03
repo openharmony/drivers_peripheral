@@ -85,7 +85,7 @@ typedef int32_t (*CommandFunc)(const char *key, const char *value, HostConfig *c
 typedef struct CommandToFunc {
     const char *opt;
     CommandFunc func;
-}CommandToFunc;
+} CommandToFunc;
 
 static int32_t CommandIFunc(const char *key, const char *value, HostConfig *config)
 {
@@ -146,9 +146,11 @@ static int32_t CommandNumFunc(const char *key, const char *value, HostConfig *co
     int32_t malloptValue = 0;
     if (!HdfStringToInt(value, &malloptValue)) {
         HDF_LOGE("Invalid value: %{public}s", value);
+        return HDF_FAILURE;
     }
     if (!HdfStringToInt(key, &malloptKey)) {
         HDF_LOGE("Invalid key: %{public}s", key);
+        return HDF_FAILURE;
     }
     SetMallopt(malloptKey, malloptValue);
     return HDF_SUCCESS;
@@ -196,17 +198,17 @@ static void SetProcTitle(char **argv, const char *newTitle)
         HDF_LOGE("failed because newTitle is NULL");
         return;
     }
-    size_t len = strlen(argv[0]); // 获取原始进程标题的长度
-    if (strlen(newTitle) > len) { // 如果新标题的长度超过原始标题的长度
-        HDF_LOGE("failed to set new process title because the '%{public}s' is too long", newTitle); // 打印错误日志
-        return; // 退出函数
+    size_t len = strlen(argv[0]);
+    if (strlen(newTitle) > len) {
+        HDF_LOGE("failed to set new process title because the '%{public}s' is too long", newTitle);
+        return;
     }
-    (void)memset_s(argv[0], len, 0, len); // 将原始标题的内存清零
-    if (strcpy_s(argv[0], len + 1, newTitle) != EOK) { // 将新标题复制到原始标题的位置
-        HDF_LOGE("failed to set new process title"); // 如果复制失败，打印错误日志
-        return; // 退出函数
+    (void)memset_s(argv[0], len, 0, len);
+    if (strcpy_s(argv[0], len + 1, newTitle) != EOK) {
+        HDF_LOGE("failed to set new process title");
+        return;
     }
-    prctl(PR_SET_NAME, newTitle); // 使用 prctl 系统调用设置进程的名字
+    prctl(PR_SET_NAME, newTitle);
 }
 
 static void HdfSetProcPriority(int32_t procPriority, int32_t schedPriority)
@@ -232,7 +234,7 @@ static int FindFunc(const char* arg, const char* value, HostConfig *config)
         }
     }
     HDF_LOGE("FindFunc failed: %{public}s", arg);
-    return HDF_ERR_INVALID_PARAM;
+    return HDF_FAILURE;
 }
 
 static int ParseCommandLineArgs(int argc, char **argv, HostConfig *config)
@@ -247,7 +249,7 @@ static int ParseCommandLineArgs(int argc, char **argv, HostConfig *config)
 
         int valueIndex = i + 1;
         if (valueIndex >= argc) {
-            HDF_LOGE("Missing argument for -%{public}s", arg);
+            HDF_LOGE("Missing argument for %{public}s", arg);
             continue;
         }
         const char* value = argv[valueIndex];
@@ -255,8 +257,8 @@ static int ParseCommandLineArgs(int argc, char **argv, HostConfig *config)
             HDF_LOGE("NULL argument: value");
             continue;
         }
-        if (FindFunc(arg, value, config) != HDF_SUCCESS) {
-            HDF_LOGE("argument Parse failed for -%s", arg);
+        if (FindFunc(arg, value, config) == HDF_ERR_INVALID_PARAM) {
+            return HDF_ERR_INVALID_PARAM;
         }
     }
     return HDF_SUCCESS;
