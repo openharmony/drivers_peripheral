@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#undef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002BD0
 #include "midi_driver_controller.h"
-#include "ump_packet.h"
-#include "ump_processor.h"
+
+#include <ctime>
+#include <iomanip>
 #include <fstream>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <iostream>
 #include <sstream>
-#include <sys/eventfd.h>
 #include <unordered_set>
-#include <iomanip>
-#include <ctime>
+#include <sys/eventfd.h>
+
+#include "ump_packet.h"
+#include "ump_processor.h"
 #include "securec.h"
 
 #define HDF_LOG_TAG midi_driver_controller
@@ -364,20 +364,20 @@ int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMes
     return HDF_SUCCESS;
 }
 
-void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t len)
+void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t bufferSize)
 {
     std::ostringstream midiStream;
-    for (size_t i = 0; i < static_cast<size_t>(len); i++) {
+    for (size_t i = 0; i < static_cast<size_t>(bufferSize); i++) {
         midiStream << std::hex << std::setw(MIDI_BYTE_HEX_WIDTH) << std::setfill('0') <<
             static_cast<uint32_t>(buffer[i]) << " ";
     }
     HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
-    if (len == 1 && buffer[0] == MIDI_CLOCK) {
+    if (bufferSize == 1 && buffer[0] == MIDI_CLOCK) {
         return;
     }
     UmpProcessor processor;
     std::vector<UmpPacket> results;
-    processor.ProcessBytes(buffer, static_cast<size_t>(len), [&](const UmpPacket &p) {
+    processor.ProcessBytes(buffer, static_cast<size_t>(bufferSize), [&](const UmpPacket &p) {
         results.push_back(p);
     });
     for (auto p : results) {
