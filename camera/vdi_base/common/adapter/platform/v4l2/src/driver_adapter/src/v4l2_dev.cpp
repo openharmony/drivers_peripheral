@@ -327,6 +327,11 @@ RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
         epollEvent_.push_back(epollevent);
 
         eventFd_ = eventfd(0, 0);
+        if (eventFd_ < 0) {
+            CAMERA_LOGE("CreateEpoll eventfd error\n");
+            return RC_ERROR;
+        }
+        fdsan_exchange_owner_tag(eventFd_, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         epollevent = {};
         epollevent.events = EPOLLIN;
         epollevent.data.fd = eventFd_;
@@ -457,7 +462,7 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
             CAMERA_LOGE("HosV4L2Dev::StopStream write fd: %{public}d, failed, ret = %{public}zd\n", eventFd_, ret);
         }
         streamThread_->join();
-        close(eventFd_);
+        fdsan_close_with_tag(eventFd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         CAMERA_LOGI("waiting loopBuffers exit\n");
     }
 
@@ -470,7 +475,7 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
     {
         std::shared_lock<std::shared_mutex> lock(streamLock_);
         if (streamNumber_ == 0) {
-            close(epollFd_);
+            fdsan_close_with_tag(epollFd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             delete streamThread_;
             streamThread_ = nullptr;
         }

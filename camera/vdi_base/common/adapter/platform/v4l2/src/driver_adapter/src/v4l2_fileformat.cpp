@@ -321,6 +321,7 @@ int HosFileFormat::V4L2OpenDevice(const std::string& deviceName)
         return RCERRORFD;
     }
     rc = open(devName, O_RDWR | O_NONBLOCK, 0);
+    fdsan_exchange_owner_tag(rc, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     CAMERA_LOGD("V4L2OpenDevice %s\n", devName);
 
@@ -329,7 +330,7 @@ int HosFileFormat::V4L2OpenDevice(const std::string& deviceName)
 
 void HosFileFormat::V4L2CloseDevice(int fd)
 {
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 }
 
 void HosFileFormat::V4L2MatchDevice(const std::vector<std::string>& cameraIDs)
@@ -357,15 +358,16 @@ void HosFileFormat::V4L2MatchDevice(const std::vector<std::string>& cameraIDs)
             if (fd == -1) {
                 continue;
             }
+            fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
             RetCode rc = 0;
             rc = V4L2GetCapability(fd, devName, it);
             if (rc == RC_ERROR) {
-                close(fd);
+                fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
                 continue;
             }
 
-            close(fd);
+            fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             break;
         }
     }
