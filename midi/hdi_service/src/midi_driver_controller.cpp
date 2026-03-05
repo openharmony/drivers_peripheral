@@ -324,6 +324,9 @@ int32_t Midi1Device::CloseInputPort(uint32_t portId)
     // 4. Clean up resources
     if (ctx->rawmidi) snd_rawmidi_close(ctx->rawmidi);
     if (ctx->eventFd != -1) close(ctx->eventFd);
+    if (ctx->processor) {
+        ctx->processor = nullptr;
+    }
     inputs_.erase(it);
     return HDF_SUCCESS;
 }
@@ -386,6 +389,11 @@ void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* 
     }
     HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
     if (bufferSize == 1 && buffer[0] == MIDI_CLOCK) {
+        return;
+    }
+    if (ctx->processor == nullptr) {
+        HDF_LOGI("%{public}s processor is nullptr" PRId64, __func__);
+        ctx->quit = true;
         return;
     }
     std::vector<UmpPacket> results;
