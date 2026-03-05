@@ -568,8 +568,8 @@ static bool GetNfcParamStr(const std::string &paramName, std::string &paramValue
  
 static void SetNfcParamStr(const std::string &paramName, const std::string &paramValue)
 {
-    HDF_LOGI("set %{public}s as %{public}s", paramName.c_str(), paramValue.c_str());
-    SetParameter(paramName.c_str(), paramValue.c_str());
+    int ret = SetParameter(paramName.c_str(), paramValue.c_str());
+    HDF_LOGI("set %{public}s as %{public}s, result:%{public}d", paramName.c_str(), paramValue.c_str(), ret);
 }
  
 bool NfcVendorAdaptions::GetNfcParam(const std::vector<uint8_t> &param, std::vector<uint8_t> &value)
