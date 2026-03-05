@@ -316,6 +316,7 @@ RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
             CAMERA_LOGE("V4L2 StartStream create_epoll failed\n");
             return RC_ERROR;
         }
+        fdsan_exchange_owner_tag(epollFd_, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         epollevent.events = EPOLLIN;
         epollevent.data.fd = fd;
         int ret = epoll_ctl(epollFd_, EPOLL_CTL_ADD, fd, &epollevent);
