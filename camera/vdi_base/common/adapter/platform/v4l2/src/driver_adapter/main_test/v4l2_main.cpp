@@ -92,9 +92,10 @@ void StoreImage(const unsigned char *bufStart, const unsigned int size, const in
     }
 
     imgFD = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
-    if (imgFD == -1) {
+    if (imgFD < 0) {
         CAMERA_LOGE("open image file error %s.....\n", strerror(errno));
     }
+    fdsan_exchange_owner_tag(imgFD, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     CAMERA_LOGD("store_image size == %d index %d\n", size, index);
 
@@ -103,7 +104,7 @@ void StoreImage(const unsigned char *bufStart, const unsigned int size, const in
         CAMERA_LOGE("write image file error %s.....\n", strerror(errno));
     }
 
-    close(imgFD);
+    fdsan_close_with_tag(imgFD, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 }
 
 int DoFbMunmap(unsigned char* addr)
@@ -174,7 +175,7 @@ void FBUninit()
 
     if (--g_fbInitCont == 0) {
         DoFbMunmap(g_displayBuf);
-        close(g_fbFd);
+        fdsan_close_with_tag(g_fbFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         g_fbFd = 0;
     }
 }
@@ -191,16 +192,17 @@ RetCode FBInit()
         CAMERA_LOGE("main test:cannot open framebuffer %s file node\n", "/dev/fb0");
         return RC_ERROR;
     }
+    fdsan_exchange_owner_tag(g_fbFd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     if (ioctl(g_fbFd, FBIOGET_VSCREENINFO, &g_vInfo) < 0) {
         CAMERA_LOGE("main test:cannot retrieve vscreenInfo!\n");
-        close(g_fbFd);
+        fdsan_close_with_tag(g_fbFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return RC_ERROR;
     }
 
     if (ioctl(g_fbFd, FBIOGET_FSCREENINFO, &g_fInfo) < 0) {
         CAMERA_LOGE("main test:can't retrieve fscreenInfo!\n");
-        close(g_fbFd);
+        fdsan_close_with_tag(g_fbFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return RC_ERROR;
     }
 
@@ -210,7 +212,7 @@ RetCode FBInit()
     g_displayBuf = DoFbMmap(g_fbFd);
     if (g_displayBuf == nullptr) {
         CAMERA_LOGE("main test:error g_displayBuf mmap error\n");
-        close(g_fbFd);
+        fdsan_close_with_tag(g_fbFd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return RC_ERROR;
     }
     g_fbFd = -1;
@@ -808,6 +810,7 @@ void StartVideo()
             devName = TEST_SENSOR_NAME;
             g_camFrameV4l2Exit = 0;
             g_videoFd = open("video.h264", O_RDWR | O_CREAT, 00766); // 00766:file operate permission
+            fdsan_exchange_owner_tag(g_videoFd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             pthread_create(&g_previewThreadId, nullptr, V4L2FrameThread, reinterpret_cast<void*>(*devName.c_str()));
         }
 
@@ -816,6 +819,7 @@ void StartVideo()
             g_isVideoOnUvc = true;
             g_camFrameV4l2Exit2 = 0;
             g_videoFdUvc = open("uvc.h264", O_RDWR | O_CREAT, 00766); // 00766:file operate permission
+            fdsan_exchange_owner_tag(g_videoFd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread,
                 reinterpret_cast<void*>(*g_devNameUvc.c_str()));
         }

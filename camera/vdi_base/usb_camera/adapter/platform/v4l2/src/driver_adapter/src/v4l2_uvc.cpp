@@ -52,6 +52,7 @@ void HosV4L2UVC::V4L2UvcSearchCapability(const std::string devName, const std::s
             CAMERA_LOGE("UVC:V4L2UvcSearchCapability open %{public}s name %{public}s error fd %{public}d\n",
                 v4l2Device.c_str(), devName.c_str(), fd);
         } else {
+            fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             std::shared_ptr<HosFileFormat> fileFormat = nullptr;
             fileFormat = std::make_shared<HosFileFormat>();
             if (fileFormat == nullptr) {
@@ -67,7 +68,7 @@ void HosV4L2UVC::V4L2UvcSearchCapability(const std::string devName, const std::s
             } else {
                 control->V4L2GetControls(fd, control_);
             }
-            close(fd);
+            fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         }
     }
 }
@@ -180,14 +181,15 @@ RetCode HosV4L2UVC::V4L2UvcGetCap(const std::string v4l2Device, struct v4l2_capa
         CAMERA_LOGE("UVC:ERROR opening V4L2 interface for %{public}s\n", v4l2Device.c_str());
         return RC_ERROR;
     }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     rc = ioctl(fd, VIDIOC_QUERYCAP, &cap);
     if (rc < 0) {
         CAMERA_LOGE("UVC:%{public}s V4L2EnmeDevices VIDIOC_QUERYCAP error\n", v4l2Device.c_str());
-        close(fd);
+        fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         return RC_ERROR;
     }
-    close(fd);
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     if (!((cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) && (cap.capabilities & V4L2_CAP_STREAMING))) {
         return RC_ERROR;
@@ -246,17 +248,18 @@ void HosV4L2UVC::V4L2UvcEnmeDevices()
         }
 
         fd = open(devName, O_RDWR | O_NONBLOCK, 0);
-        if (fd == -1) {
+        if (fd < 0) {
             continue;
         }
+        fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
         rc = V4L2UVCGetCapability(fd, devName, cameraId);
         if (rc == RC_ERROR) {
-            close(fd);
+            fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             continue;
         }
 
-        close(fd);
+        fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     }
 }
 
@@ -423,8 +426,8 @@ void HosV4L2UVC::V4L2UvcDetectUnInit()
         CAMERA_LOGD("UVC:failed to write eventfd: %{public}d\n", rc);
     }
 
-    close(uDevFd_);
-    close(eventFd_);
+    fdsan_close_with_tag(uDevFd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    fdsan_close_with_tag(eventFd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     {
         /*
@@ -456,6 +459,7 @@ RetCode HosV4L2UVC::V4L2UvcDetectInit(UvcCallback cb)
         CAMERA_LOGE("UVC:V4L2Detect socket() error\n");
         return RC_ERROR;
     }
+    fdsan_exchange_owner_tag(uDevFd_, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     memset_s(&nls, sizeof(nls), 0, sizeof(nls));
     nls.nl_family = AF_NETLINK;
@@ -472,6 +476,7 @@ RetCode HosV4L2UVC::V4L2UvcDetectInit(UvcCallback cb)
         CAMERA_LOGE("UVC:V4L2Detect eventfd error\n");
         goto error;
     }
+    fdsan_exchange_owner_tag(eventFd_, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     g_uvcDetectEnable = true;
     uvcDetectEnable_ = 1;
@@ -485,10 +490,10 @@ RetCode HosV4L2UVC::V4L2UvcDetectInit(UvcCallback cb)
     return RC_OK;
 
 error1:
-    close (eventFd_);
+    fdsan_close_with_tag(eventFd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     uvcCallbackFun_ = nullptr;
 error:
-    close (uDevFd_);
+    fdsan_close_with_tag(uDevFd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
     return RC_ERROR;
 }
