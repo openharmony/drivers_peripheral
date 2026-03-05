@@ -81,8 +81,8 @@ struct NfcHalInterface {
     void (*nfcHalGetConfig)(V1_1::NfcVendorConfig &config);
     void (*nfcHalFactoryReset)(void);
     int (*nfcHalShutdownCase)(void);
-    NFCSTATUS (*nfcHalMinOpen)(bool isHalPreOpen);
-    NFCSTATUS (*nfcHalMinClose)(void);
+    int (*nfcHalMinOpen)(bool isHalPreOpen);
+    int (*nfcHalMinClose)(void);
 };
 
 struct NfcExtInterface {
