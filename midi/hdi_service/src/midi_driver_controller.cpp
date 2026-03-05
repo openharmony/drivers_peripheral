@@ -152,8 +152,9 @@ static std::vector<MidiDeviceInfo> MakeMidiDeviceInfos(const std::vector<DeviceI
     for (const auto &device : deviceInfos) {
         MidiDeviceInfo dev;
         dev.deviceId = device.deviceId;
-        dev.productName = device.idProduct;
-        dev.vendorName = device.idVendor;
+        dev.productId = device.idProduct;
+        dev.vendorId = device.idVendor;
+        dev.deviceName = device.deviceName;
         dev.protocol = device.is_ump ? MIDI_PROTOCOL_2_0 : MIDI_PROTOCOL_1_0;
         dev.ports = MakeMidiPortInfos(device);
         devices.push_back(dev);
