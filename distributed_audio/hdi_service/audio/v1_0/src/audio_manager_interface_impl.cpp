@@ -205,6 +205,9 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
     DHLOGI("Remove audio device name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), dhId);
     CHECK_AND_RETURN_RET_LOG(dhId == LOW_LATENCY_RENDER_ID, DH_SUCCESS, "Not support low latency id");
     DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
+    if (dhId == OFFLOAD_RENDER_ID) {
+        event.dhId = DEFAULT_RENDER_ID;
+    }
     int32_t ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
