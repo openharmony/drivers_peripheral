@@ -293,6 +293,10 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
 
     if (fd != -1) {
         ssize_t readSize = pread(fd, buf, size - 1, 0);
+        if (readSize < 0) {
+            BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to read file %{public}s, errno: %{public}d", path, errno);
+            return HDF_ERR_IO;
+        }
         buf[readSize] = '\0';
         Trim(buf);
         return HDF_SUCCESS;
@@ -305,6 +309,10 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
     }
     fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG);
     ssize_t readSize = read(fd, buf, size - 1);
+    if (readSize < 0) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to read file %{public}s, errno: %{public}d", path, errno);
+        return HDF_ERR_IO;
+    }
     buf[readSize] = '\0';
     Trim(buf);
     {
