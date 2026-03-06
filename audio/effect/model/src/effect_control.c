@@ -43,8 +43,7 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
         output->datatag = input->datatag;
         output->rawDataLen = input->rawDataLen;
         output->rawData = (int8_t *)OsalMemCalloc(sizeof(int8_t) * output->rawDataLen);
-        CHECK_TRUE_RETURN_RET_LOG(output->rawData == NULL, HDF_FAILURE,
-            "%{public}s: OsalMemCalloc fail", __func__);
+        CHECK_TRUE_RETURN_RET_LOG(output->rawData == NULL, HDF_FAILURE, "%{public}s: OsalMemCalloc fail", __func__);
     }
     struct AudioEffectBufferVdi *inputVdi = (struct AudioEffectBufferVdi *)input;
     struct AudioEffectBufferVdi *outputVdi = (struct AudioEffectBufferVdi *)output;
@@ -59,17 +58,18 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
     int32_t ret = manager->ctrlOps->EffectProcess(manager->ctrlOps, inputVdi, outputVdi);
     HdfAudioFinishTrace();
 
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+    TrigerMemoryReclaim();
+#endif
     res = OsalGetTime(&end);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalGetTime end failed.");
 
     res = OsalDiffTime(&start, &end, &diff);
     CHECK_TRUE_RETURN_RET_LOG(HDF_SUCCESS != res, HDF_FAILURE, "OsalDiffTime failed.");
 
-    HDF_LOGI("EffectProcess cost time %{public}" PRIu64 " us",
-        (HDF_KILO_UNIT * HDF_KILO_UNIT) * diff.sec + diff.usec);
+    HDF_LOGI("EffectProcess cost time %{public}" PRIu64 " us", (HDF_KILO_UNIT * HDF_KILO_UNIT) * diff.sec + diff.usec);
 
-    CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, ret,
-        "AudioEffectProcess failed, ret=%{public}d", ret);
+    CHECK_TRUE_RETURN_RET_LOG(ret != HDF_SUCCESS, ret, "AudioEffectProcess failed, ret=%{public}d", ret);
 
     output = (struct AudioEffectBuffer *)outputVdi;
     return ret;
@@ -91,6 +91,9 @@ int32_t EffectControlSendCommand(struct IEffectControl *self, enum EffectCommand
     enum EffectCommandTableIndexVdi cmdIdVdi = (enum EffectCommandTableIndexVdi)cmdId;
     int32_t ret = manager->ctrlOps->SendCommand(manager->ctrlOps, cmdIdVdi, (void *)cmdData, cmdDataLen,
                                          (void *)replyData, replyDataLen);
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+    TrigerMemoryReclaim();
+#endif
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("SendCommand failed, ret=%{public}d", ret);
         return ret;
@@ -100,6 +103,9 @@ int32_t EffectControlSendCommand(struct IEffectControl *self, enum EffectCommand
 
 int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControllerDescriptor *desc)
 {
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+    TrigerMemoryReclaim();
+#endif
     CHECK_TRUE_RETURN_RET_LOG(self == NULL || desc == NULL, HDF_ERR_INVALID_PARAM,
         "%{public}s: invailid input params", __func__);
 
