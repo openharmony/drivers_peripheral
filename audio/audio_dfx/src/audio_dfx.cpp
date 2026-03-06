@@ -196,4 +196,16 @@ void DecreaseCounter()
         g_TimerId = SetCallbackTimer();
     }
 }
+ 	 
+void TrigerMemoryReclaim()
+{
+    std::lock_guard<std::mutex> lock(g_mtx);
+    if (g_counter.Get() > 0) {
+        return;
+    }
+    if (g_TimerId > 0) {
+        CancelTimer(g_TimerId);
+    }
+    g_TimerId = SetCallbackTimer();
+}
 #endif
