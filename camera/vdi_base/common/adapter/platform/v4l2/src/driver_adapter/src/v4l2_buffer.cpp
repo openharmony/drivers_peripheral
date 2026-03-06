@@ -470,13 +470,14 @@ RetCode HosV4L2Buffers::SetDmabufOn(struct v4l2_buffer &buf, const std::shared_p
         CAMERA_LOGE("heapfd open err.\n");
         return RC_ERROR;
     }
+    fdsan_exchange_owner_tag(heapfd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     struct dma_heap_allocation_data data = {
         .len = buf.m.planes[0].length,
         .fd_flags = O_RDWR | O_CLOEXEC,
     };
     ret = ioctl(heapfd, DMA_HEAP_IOCTL_ALLOC, &data);
     if (ret < 0) {
-        close(heapfd);
+        fdsan_close_with_tag(heapfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         CAMERA_LOGE("DMA_HEAP_IOCTL_ALLOC err.\n");
         return RC_ERROR;
     }
@@ -485,7 +486,8 @@ RetCode HosV4L2Buffers::SetDmabufOn(struct v4l2_buffer &buf, const std::shared_p
     adapterBufferMap_[index].start = mmap(NULL, adapterBufferMap_[index].length, PROT_READ | PROT_WRITE,
         MAP_SHARED, adapterBufferMap_[index].dmafd, 0);
     if (adapterBufferMap_[index].start == MAP_FAILED) {
-        close(adapterBufferMap_[index].heapfd);
+        fdsan_close_with_tag(
+            adapterBufferMap_[index].heapfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         CAMERA_LOGE("SetDmabufOn dmabuf mmap err.\n");
         return RC_ERROR;
     }
@@ -496,8 +498,10 @@ RetCode HosV4L2Buffers::SetDmabufOn(struct v4l2_buffer &buf, const std::shared_p
         if (munmap(adapterBufferMap_[index].start, adapterBufferMap_[index].length) < 0) {
             CAMERA_LOGE("SetDmabufOn munmap err.\n");
         }
-        close(adapterBufferMap_[index].dmafd);
-        close(adapterBufferMap_[index].heapfd);
+        fdsan_close_with_tag(
+            adapterBufferMap_[index].dmafd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        fdsan_close_with_tag(
+            adapterBufferMap_[index].heapfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         CAMERA_LOGE("DMA_BUF_IOCTL_SYNC err.\n");
         return RC_ERROR;
     }
@@ -531,10 +535,10 @@ RetCode HosV4L2Buffers::V4L2ReleaseBuffers(int fd)
             }
         }
         if (mem.second.dmafd > 0) {
-            close(mem.second.dmafd);
+            fdsan_close_with_tag(mem.second.dmafd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         }
         if (mem.second.heapfd > 0) {
-            close(mem.second.heapfd);
+            fdsan_close_with_tag(mem.second.heapfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         }
     }
     adapterBufferMap_.clear();
