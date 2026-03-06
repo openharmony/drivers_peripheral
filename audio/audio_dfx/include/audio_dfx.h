@@ -43,6 +43,7 @@ int32_t AudioDfxSysEventError(const char* log, struct timeval startTime, int tim
 #ifdef AUDIO_RECLAIM_MEMORY_ENABLE
 void IncreaseCounter();
 void DecreaseCounter();
+void TrigerMemoryReclaim();
 #endif
 #ifdef __cplusplus
 }
