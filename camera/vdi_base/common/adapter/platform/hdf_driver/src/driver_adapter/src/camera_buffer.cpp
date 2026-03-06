@@ -155,6 +155,7 @@ RetCode CameraBuffer::CameraAllocBuffer(struct CameraFeature feature, const std:
                 CAMERA_LOGE("error: open fd failed\n");
                 return RC_ERROR;
             }
+            fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             lengthArray_[bufferId] = buf.planes[0].length;
             offArray_[bufferId] = buf.planes[0].memory.offset;
             mmapArray_[bufferId] = mmap(NULL, buf.planes[0].length, PROT_READ|PROT_WRITE, MAP_SHARED,
