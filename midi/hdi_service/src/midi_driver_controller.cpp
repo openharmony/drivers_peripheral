@@ -553,7 +553,7 @@ void MidiDriverController::ProcessMidi1Device(snd_ctl_t *ctl, int32_t card, int3
     ReadVendorIdAndProductId(card, devInfo.idVendor, devInfo.idProduct);
     HDF_LOGD("%{public}s: Vendor ID: %{public}s, Product ID: %{public}s",
              __func__, devInfo.idVendor.c_str(), devInfo.idProduct.c_str());
-    ReadDeviceName(devInfo.deviceName);
+    ReadDeviceName(card, devInfo.deviceName);
     PopulateMidi1Ports(ctl, device, devInfo);
 
     deviceList_.push_back(devInfo);
