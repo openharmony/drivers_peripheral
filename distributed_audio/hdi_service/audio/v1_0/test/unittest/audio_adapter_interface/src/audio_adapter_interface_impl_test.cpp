@@ -826,7 +826,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseRenderDevice_001, TestSize.Level1)
     callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
     callback = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
 }
 
 /**
