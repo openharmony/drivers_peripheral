@@ -20,7 +20,6 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//build/test.gni")
-  import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {

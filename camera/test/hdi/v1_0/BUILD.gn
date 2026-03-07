@@ -15,7 +15,6 @@ import("../../../camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("../../../../../hdf_core/adapter/uhdf/uhdf.gni")
 
   config("camhdi_at_test_config") {
     visibility = [ ":*" ]
@@ -72,13 +71,13 @@ if (defined(ohos_lite)) {
 
     public_deps = [
       "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0",
-      "$hdf_uhdf_path/utils:libhdf_utils",
       "../../../../hdf_core/adapter/uhdf/manager:hdf_core",
     ]
     external_deps = [
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:metadata",
       "graphic_surface:surface",
+      "hdf_core:libhdf_utils",
       "hdf_core:hdf_platform",
       "hdf_core:hdf_posix_osal",
       "hilog_lite:hilog_shared",

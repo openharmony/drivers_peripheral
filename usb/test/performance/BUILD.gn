@@ -16,7 +16,6 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/config/sanitizers/sanitizers.gni")
   import("//build/test.gni")
-  import("./../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {
