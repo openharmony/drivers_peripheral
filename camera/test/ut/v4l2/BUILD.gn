@@ -17,7 +17,6 @@ ut_root_path = ".."
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("../../../../../hdf_core/adapter/uhdf/uhdf.gni")
 
   config("camera_ut_test_config") {
     visibility = [ ":*" ]

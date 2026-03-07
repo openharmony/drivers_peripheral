@@ -14,7 +14,6 @@
 HDF_CORE_PATH = "../../../../../hdf_core"
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "hdf/light"
 
