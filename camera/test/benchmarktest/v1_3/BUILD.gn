@@ -18,7 +18,6 @@ import("//build/test.gni")
 import("../../../camera.gni")
 
 # NOSORT
-import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
 module_output_path = "drivers_peripheral_camera/camera"
 
 config("hdf_camera_benchmark_test_config") {
