@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/components/hdi/hdi.gni")
 import("//build/ohos.gni")
 import("./../usb.gni")
 
@@ -77,10 +76,6 @@ ohos_shared_library("libusb_ddk_host") {
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_usb"
-}
-
-config("public_headers") {
-  include_dirs = [ "//drivers/hdf_core/framework/model/usb/include" ]
 }
 
 ohos_shared_library("libusb_pnp_manager") {

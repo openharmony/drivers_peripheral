@@ -15,7 +15,6 @@ import("../../camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("../../../../hdf_core/adapter/uhdf/uhdf.gni")
 
   config("cameraTest_config") {
     visibility = [ ":*" ]
@@ -102,7 +101,6 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//build/test.gni")
-  import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   module_output_path = "hdf/camera"
 

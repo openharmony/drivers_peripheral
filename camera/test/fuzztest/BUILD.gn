@@ -14,7 +14,6 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../camera.gni")
 
 include_dirs = [ "$camera_path/include" ]
