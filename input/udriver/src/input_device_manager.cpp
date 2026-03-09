@@ -607,6 +607,7 @@ int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyF
             uint64_t ownerTag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DRIVERS_PERIPHERAL_INPUT_FDSAN_TAG);
             fdsan_exchange_owner_tag(tmpFd, 0, ownerTag);
             if (nodePath.find("event") == std::string::npos) {
+                fdsan_close_with_tag(tmpFd, ownerTag);
                 break;
             }
             DoWithEventDeviceAdd(epollFd, tmpFd, nodePath);
