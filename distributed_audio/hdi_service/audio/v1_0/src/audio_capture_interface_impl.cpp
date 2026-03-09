@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 AudioCaptureInterfaceImpl::AudioCaptureInterfaceImpl(const std::string &adpName, const AudioDeviceDescriptor &desc,
     const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
     : adapterName_(adpName), devDesc_(desc), devAttrs_(attrs), audioExtCallback_(callback)
@@ -106,6 +106,14 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
             endTime - startTime, startTime - lastCaptureStartTime_);
     }
     lastCaptureStartTime_ = startTime;
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCaptureInterfaceImpl::CaptureFrameEc(const AudioFrameLen &frameLen, AudioCaptureFrameInfo &frameInfo)
+{
+    DHLOGI("CaptureFrameEc not support in low-latency capture");
+    (void)frameLen;
+    (void)frameInfo;
     return HDF_SUCCESS;
 }
 

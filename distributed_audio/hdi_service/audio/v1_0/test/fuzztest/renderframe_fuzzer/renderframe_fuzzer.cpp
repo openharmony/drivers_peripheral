@@ -27,7 +27,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 void RenderFrameFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < (sizeof(uint64_t)))) {
@@ -46,7 +46,7 @@ void RenderFrameFuzzTest(const uint8_t* data, size_t size)
     uint64_t replyBytes = fdp.ConsumeIntegral<uint64_t>();
     audioRender->RenderFrame(frame, replyBytes);
 }
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI
@@ -56,7 +56,7 @@ void RenderFrameFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::DistributedAudio::Audio::V1_0::RenderFrameFuzzTest(data, size);
+    OHOS::HDI::DistributedAudio::Audio::V2_0::RenderFrameFuzzTest(data, size);
     return 0;
 }
 

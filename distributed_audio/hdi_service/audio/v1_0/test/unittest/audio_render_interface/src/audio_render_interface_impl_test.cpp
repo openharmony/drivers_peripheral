@@ -28,7 +28,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 void AudioRenderInterfaceImplTest::SetUpTestCase(void) {}
 
 void AudioRenderInterfaceImplTest::TearDownTestCase(void) {}
@@ -971,7 +971,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, FadeInProcess_001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, audioRenderInterfaceImpl_->FadeInProcess(durationFrame, frameData, errLength));
     delete[] frameData;
 }
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI

@@ -27,20 +27,20 @@
 #endif
 #include "audio_render_interface_impl_base.h"
 
-#include <v1_0/audio_types.h>
-#include <v1_0/iaudio_render.h>
-#include <v2_1/id_audio_manager.h>
+#include <v2_0/audio_types.h>
+#include <v2_0/iaudio_render.h>
+#include <v3_0/id_audio_manager.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::CurrentTime;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
 
 constexpr uint32_t DURATION_FRAMES = 100;
 constexpr uint32_t DURATION_FRAMES_MINUS = 99;
@@ -67,6 +67,8 @@ public:
     int32_t SetMute(bool mute) override;
     int32_t GetMute(bool &mute) override;
     int32_t SetVolume(float volume) override;
+    int32_t SetVolumeWithRamp(float volume, uint32_t duration) override;
+    int32_t SetBufferSize(uint32_t size) override;
     int32_t GetVolume(float &volume) override;
     int32_t GetGainThreshold(float &min, float &max) override;
     int32_t SetGain(float gain) override;
@@ -155,7 +157,7 @@ private:
     uint64_t writeNum_ = 0;
 #endif
 };
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI

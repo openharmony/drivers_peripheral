@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,19 +21,19 @@
 
 #include "audio_capture_interface_impl_base.h"
 
-#include <v1_0/audio_types.h>
-#include <v1_0/iaudio_capture.h>
-#include <v2_1/id_audio_manager.h>
+#include <v2_0/audio_types.h>
+#include <v2_0/iaudio_capture.h>
+#include <v3_0/id_audio_manager.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
 
 class AudioCaptureInterfaceImpl : public AudioCaptureInterfaceImplBase {
 public:
@@ -42,6 +42,7 @@ public:
     ~AudioCaptureInterfaceImpl() override;
 
     int32_t CaptureFrame(std::vector<int8_t> &frame, uint64_t &replyBytes) override;
+    int32_t CaptureFrameEc(const AudioFrameLen &frameLen, AudioCaptureFrameInfo &frameInfo) override;
     int32_t GetCapturePosition(uint64_t &frames, AudioTimeStamp &time) override;
     int32_t CheckSceneCapability(const AudioSceneDescriptor &scene, bool &supported) override;
     int32_t SelectScene(const AudioSceneDescriptor &scene) override;
@@ -98,7 +99,7 @@ private:
     sptr<IDAudioCallback> audioExtCallback_ = nullptr;
     FILE *dumpFile_ = nullptr;
 };
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI

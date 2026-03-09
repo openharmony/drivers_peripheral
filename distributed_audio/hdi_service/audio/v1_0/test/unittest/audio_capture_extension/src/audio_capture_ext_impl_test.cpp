@@ -29,7 +29,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 void AudioCaptureExtImplTest::SetUpTestCase(void) {}
 
 void AudioCaptureExtImplTest::TearDownTestCase(void) {}
@@ -247,7 +247,7 @@ HWTEST_F(AudioCaptureExtImplTest, SetMute_001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, audioCapturelatencyImpl_->RemoveAudioEffect(size));
     EXPECT_EQ(HDF_SUCCESS, audioCapturelatencyImpl_->GetFrameBufferSize(size));
 }
-} // namspace V1_0
+} // namspace V2_0
 } // namspace Audio
 } // namspace Distributedaudio
 } // namspace HDI

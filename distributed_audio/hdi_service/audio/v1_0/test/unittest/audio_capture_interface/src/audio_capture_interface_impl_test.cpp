@@ -28,7 +28,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 void AudioCaptureInterfaceImplTest::SetUpTestCase(void) {}
 
 void AudioCaptureInterfaceImplTest::TearDownTestCase(void) {}
@@ -513,7 +513,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetCaptureDesc_001, TestSize.Level1)
     EXPECT_EQ(desc_.pins, descriptorTmp.pins);
     EXPECT_EQ(desc_.desc, descriptorTmp.desc);
 }
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI

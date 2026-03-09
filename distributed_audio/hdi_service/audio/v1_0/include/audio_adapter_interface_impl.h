@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,9 +20,9 @@
 #include <map>
 #include <mutex>
 
-#include <v1_0/iaudio_adapter.h>
-#include <v1_0/audio_types.h>
-#include <v2_1/id_audio_manager.h>
+#include <v2_0/iaudio_adapter.h>
+#include <v2_0/audio_types.h>
+#include <v3_0/id_audio_manager.h>
 
 #include "audio_capture_interface_impl.h"
 #include "audio_capture_interface_impl_base.h"
@@ -37,12 +37,12 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::PortOperationMode;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortPin;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::PortOperationMode;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioPortPin;
 
 typedef enum {
     STATUS_ONLINE = 0,
@@ -91,6 +91,10 @@ public:
     int32_t SetExtraParams(AudioExtParamKey key, const std::string &condition, const std::string &value) override;
     int32_t GetExtraParams(AudioExtParamKey key, const std::string &condition, std::string &value) override;
     int32_t RegExtraParamObserver(const sptr<IAudioCallback> &audioCallback, int8_t cookie) override;
+    int32_t CreateCognitionStream(const AudioSampleAttributes &attrs, int32_t &cogStreamId,
+        AudioMmapBufferDescriptor &desc) override;
+    int32_t DestroyCognitionStream(int32_t cogStreamId) override;
+    int32_t NotifyCognitionData(int32_t cogStreamId, uint32_t size, uint32_t offset) override;
 
 public:
     void SetSpeakerCallback(const int32_t dhId, const sptr<IDAudioCallback> &speakerCallback);
@@ -206,13 +210,13 @@ private:
     uint32_t sinkDhId_ = 0;
 
     // mmap param
-    PortOperationMode renderFlags_ = Audioext::V2_1::NORMAL_MODE;
-    PortOperationMode capturerFlags_ = Audioext::V2_1::NORMAL_MODE;
+    PortOperationMode renderFlags_ = Audioext::V3_0::NORMAL_MODE;
+    PortOperationMode capturerFlags_ = Audioext::V3_0::NORMAL_MODE;
 
     const std::string NOT_MUTE_STATUS = "0";
     const std::string IS_MUTE_STATUS = "1";
 };
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI
