@@ -276,6 +276,7 @@ int32_t AudioOutputCaptureHwParams(
 
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
+    CHECK_NULL_PTR_RETURN_DEFAULT(captureIns->soundCard.pcmHandle);
 
     if (SndGetRunState(&captureIns->soundCard) >= SND_PCM_STATE_RUNNING) {
         AUDIO_FUNC_LOGE("Unable to set parameters during playback!");
