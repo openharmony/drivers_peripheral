@@ -67,6 +67,7 @@ ohos_shared_library("usb_camera_v4l2_adapter") {
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "ipc:ipc_single",
   ]
   public_configs = [ ":v4l2_config" ]
   install_images = [ chipset_base_dir ]
