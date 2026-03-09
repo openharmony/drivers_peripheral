@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,8 @@
 
 #include "hdf_device_desc.h"
 #include "iremote_object.h"
-#include <v1_0/iaudio_manager.h>
-#include <v2_1/id_audio_manager.h>
+#include <v2_0/iaudio_manager.h>
+#include <v3_0/id_audio_manager.h>
 
 #include "audio_adapter_interface_impl.h"
 
@@ -31,10 +31,10 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioHdfCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioHdfCallback;
 
 typedef struct {
     std::string adapterName;
@@ -144,7 +144,7 @@ private:
     std::map<std::string, sptr<IDAudioHdfCallback>> mapAudioHdfCallback_;
     std::atomic<bool> isDestruct_ = false;
 };
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI

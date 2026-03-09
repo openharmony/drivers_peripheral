@@ -41,11 +41,11 @@ ohos_fuzztest("SetExtraParamsFuzzTest") {
     "${common_path}/include",
   ]
 
-  deps = [ "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0" ]
+  deps = [ "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_2.0" ]
 
   external_deps = [
-    "drivers_interface_distributed_audio:libdaudio_stub_1.0",
-    "drivers_interface_distributed_audio:libdaudioext_stub_2.1",
+    "drivers_interface_distributed_audio:libdaudio_stub_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_3.0",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

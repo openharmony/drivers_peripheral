@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,20 +24,20 @@
 #include "audio_render_interface_impl_base.h"
 #include "daudio_utils.h"
 
-#include <v1_0/audio_types.h>
-#include <v1_0/iaudio_render.h>
-#include <v2_1/id_audio_manager.h>
+#include <v2_0/audio_types.h>
+#include <v2_0/iaudio_render.h>
+#include <v3_0/id_audio_manager.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::CurrentTime;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
 class AudioRenderExtImpl : public AudioRenderInterfaceImplBase {
 public:
     AudioRenderExtImpl();
@@ -58,6 +58,8 @@ public:
     int32_t SetMute(bool mute) override;
     int32_t GetMute(bool &mute) override;
     int32_t SetVolume(float volume) override;
+    int32_t SetVolumeWithRamp(float volume, uint32_t duration) override;
+    int32_t SetBufferSize(uint32_t size) override;
     int32_t GetVolume(float &volume) override;
     int32_t GetGainThreshold(float &min, float &max) override;
     int32_t SetGain(float gain) override;
@@ -136,7 +138,7 @@ __attribute__((visibility("default"))) AudioRenderInterfaceImplBase *GetRenderIm
 #ifdef __cplusplus
 }
 #endif
-} // namespace V1_0
+} // namespace V2_0
 } // namespace Audio
 } // namespace DistributedAudio
 } // namespace HDI

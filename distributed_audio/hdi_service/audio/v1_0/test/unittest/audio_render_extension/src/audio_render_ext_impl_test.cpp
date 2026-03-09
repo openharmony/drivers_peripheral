@@ -29,7 +29,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 void AudioRenderExtImplTest::SetUpTestCase(void) {}
 
 void AudioRenderExtImplTest::TearDownTestCase(void) {}
@@ -288,7 +288,7 @@ HWTEST_F(AudioRenderExtImplTest, ReqMmapBuffer_002, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, audioRenderlatencyImpl_->ReqMmapBuffer(reqSize, desc));
     audioRenderlatencyImpl_->UnInitAshmem();
 }
-} // namspace V1_0
+} // namspace V2_0
 } // namspace Audio
 } // namspace Distributedaudio
 } // namspace HDI

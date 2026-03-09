@@ -33,7 +33,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 AudioRenderExtImpl::AudioRenderExtImpl()
 {
     DHLOGI("Distributed lowlatency render constructed.");
@@ -333,6 +333,21 @@ int32_t AudioRenderExtImpl::SetVolume(float volume)
     return HDF_SUCCESS;
 }
 
+int32_t AudioRenderExtImpl::SetVolumeWithRamp(float volume, uint32_t duration)
+{
+    DHLOGD("Can not set vol with ramp not by this interface.");
+    (void)volume;
+    (void)duration;
+    return HDF_SUCCESS;
+}
+
+int32_t AudioRenderExtImpl::SetBufferSize(uint32_t size)
+{
+    DHLOGD("Can not set buffer size not by this interface.");
+    (void)size;
+    return HDF_SUCCESS;
+}
+
 int32_t AudioRenderExtImpl::GetVolume(float &volume)
 {
     DHLOGD("Can not get vol not by this interface.");
@@ -578,7 +593,7 @@ AudioRenderInterfaceImplBase *GetRenderImplExt()
     }
     return implBase;
 }
-} // namespace V1_0
+} // namespace V2_0
 } // namespace Audio
 } // namespace Distributedaudio
 } // namespace HDI

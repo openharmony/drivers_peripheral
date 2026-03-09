@@ -26,7 +26,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_1 {
+namespace V3_0 {
 const uint32_t VAR_NUM = 3;
 void RegisterAudioDeviceFuzzTest(const uint8_t* data, size_t size)
 {
@@ -43,7 +43,7 @@ void RegisterAudioDeviceFuzzTest(const uint8_t* data, size_t size)
 
     DAudioManagerInterfaceImpl::GetDAudioManager()->RegisterAudioDevice(adpName, devId, capability, callbackObj);
 }
-} // V2_1
+} // V3_0
 } // AudioExt
 } // Distributedaudio
 } // HDI
@@ -53,7 +53,7 @@ void RegisterAudioDeviceFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::DistributedAudio::Audioext::V2_1::RegisterAudioDeviceFuzzTest(data, size);
+    OHOS::HDI::DistributedAudio::Audioext::V3_0::RegisterAudioDeviceFuzzTest(data, size);
     return 0;
 }
 

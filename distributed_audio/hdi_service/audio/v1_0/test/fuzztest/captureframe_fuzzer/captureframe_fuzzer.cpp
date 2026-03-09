@@ -27,7 +27,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 void CaptureFrameFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < (sizeof(uint64_t)))) {
@@ -45,7 +45,7 @@ void CaptureFrameFuzzTest(const uint8_t* data, size_t size)
 
     audioCapture->CaptureFrame(frame, requestBytes);
 }
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI
@@ -55,7 +55,7 @@ void CaptureFrameFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::DistributedAudio::Audio::V1_0::CaptureFrameFuzzTest(data, size);
+    OHOS::HDI::DistributedAudio::Audio::V2_0::CaptureFrameFuzzTest(data, size);
     return 0;
 }
 

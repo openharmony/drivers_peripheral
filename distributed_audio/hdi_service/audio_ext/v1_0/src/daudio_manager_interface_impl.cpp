@@ -25,13 +25,13 @@
 #define DH_LOG_TAG "DAudioManagerInterfaceImpl"
 
 using namespace OHOS::DistributedHardware;
-using namespace OHOS::HDI::DistributedAudio::Audio::V1_0;
+using namespace OHOS::HDI::DistributedAudio::Audio::V2_0;
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_1 {
+namespace V3_0 {
 DAudioManagerInterfaceImpl *DAudioManagerInterfaceImpl::dAudioMgr_ = nullptr;
 std::mutex DAudioManagerInterfaceImpl::mgrMtx_;
 extern "C" IDAudioManager *DAudioManagerImplGetInstance(void)
@@ -148,7 +148,7 @@ int32_t DAudioManagerInterfaceImpl::UnRegisterAudioHdfListener(const std::string
     DHLOGI("Unregister audio HDF listener success.");
     return HDF_SUCCESS;
 }
-} // v2_1
+} // v3_0
 } // AudioExt
 } // Daudio
 } // HDI

@@ -20,9 +20,9 @@
 #include <mutex>
 #include <string>
 
-#include <v1_0/audio_types.h>
-#include <v1_0/iaudio_capture.h>
-#include <v2_1/id_audio_manager.h>
+#include <v2_0/audio_types.h>
+#include <v2_0/iaudio_capture.h>
+#include <v3_0/id_audio_manager.h>
 
 #include "ashmem.h"
 #include "audio_capture_interface_impl_base.h"
@@ -32,18 +32,19 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::CurrentTime;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
 class AudioCaptureExtImpl : public AudioCaptureInterfaceImplBase {
 public:
     AudioCaptureExtImpl();
     ~AudioCaptureExtImpl() override;
 
     int32_t CaptureFrame(std::vector<int8_t> &frame, uint64_t &replyBytes) override;
+    int32_t CaptureFrameEc(const AudioFrameLen &frameLen, AudioCaptureFrameInfo &frameInfo) override;
     int32_t GetCapturePosition(uint64_t &frames, AudioTimeStamp &time) override;
     int32_t CheckSceneCapability(const AudioSceneDescriptor &scene, bool &supported) override;
     int32_t SelectScene(const AudioSceneDescriptor &scene) override;
@@ -110,7 +111,7 @@ __attribute__((visibility("default"))) AudioCaptureInterfaceImplBase *GetCapture
 #ifdef __cplusplus
 }
 #endif
-} // namespace V1_0
+} // namespace V2_0
 } // namespace Audio
 } // namespace DistributedAudio
 } // namespace HDI
