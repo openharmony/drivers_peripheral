@@ -594,13 +594,13 @@ int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyF
     for (p = InfoBuf; p < InfoBuf + result;) {
         event = (struct inotify_event *)(p);
         auto nodePath = devPath_ + "/" + string(event->name);
-        if (nodePath.find("event") == std::string::npos) {
-            break;
-        }
         if (event->mask & IN_CREATE) {
             if (realpath(nodePath.c_str(), nodeRealPath) == nullptr) {
                 HDF_LOGE("%{public}s: The absolute path does not exist.", __func__);
                 return INPUT_FAILURE;
+            }
+            if (nodePath.find("event") == std::string::npos) {
+                break;
             }
             tmpFd = open(nodeRealPath, O_RDWR);
             if (tmpFd == INPUT_FAILURE) {
