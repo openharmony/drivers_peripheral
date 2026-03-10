@@ -25,6 +25,7 @@
           "hilog",
           "c_utils",
           "hdf_core",
+          "hitrace",
           "drivers_interface_midi"
         ],
         "third_party": []
