@@ -13,14 +13,13 @@
  * limitations under the License.
  */
 
-#undef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002BD0
-#include "midi_interface_impl.h"
 #include "midi_driver_controller.h"
+
 #include <hdf_base.h>
-#include <hdf_log.h>
+#include "midi_interface_impl.h"
 
-
+#include "securec.h"
+#include "midi_log.h"
 #define HDF_LOG_TAG midi_interface_impl
 
 namespace OHOS {
