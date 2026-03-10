@@ -819,7 +819,7 @@ void StartVideo()
             g_isVideoOnUvc = true;
             g_camFrameV4l2Exit2 = 0;
             g_videoFdUvc = open("uvc.h264", O_RDWR | O_CREAT, 00766); // 00766:file operate permission
-            fdsan_exchange_owner_tag(g_videoFd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+            fdsan_exchange_owner_tag(g_videoFdUvc, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread,
                 reinterpret_cast<void*>(*g_devNameUvc.c_str()));
         }
