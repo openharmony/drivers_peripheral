@@ -57,6 +57,7 @@ enum AudioPortPinVdi {
     PIN_VDI_IN_PENCIL = 1 << 27 | 1 << 7,
     PIN_VDI_IN_UWB = 1 << 27 | 1 << 8,
     PIN_VDI_IN_NEARLINK = 1 << 27 | 1 << 9,
+    PIN_VDI_IN_REAR_MIC = 1 << 27 | 1 << 10,
     PIN_VDI_IN_BUTT,
 };
 
