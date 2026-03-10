@@ -594,6 +594,9 @@ int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyF
     for (p = InfoBuf; p < InfoBuf + result;) {
         event = (struct inotify_event *)(p);
         auto nodePath = devPath_ + "/" + string(event->name);
+        if (nodePath.find("event") == std::string::npos) {
+            break;
+        }
         if (event->mask & IN_CREATE) {
             if (realpath(nodePath.c_str(), nodeRealPath) == nullptr) {
                 HDF_LOGE("%{public}s: The absolute path does not exist.", __func__);
@@ -606,10 +609,6 @@ int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyF
             }
             uint64_t ownerTag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DRIVERS_PERIPHERAL_INPUT_FDSAN_TAG);
             fdsan_exchange_owner_tag(tmpFd, 0, ownerTag);
-            if (nodePath.find("event") == std::string::npos) {
-                fdsan_close_with_tag(tmpFd, ownerTag);
-                break;
-            }
             DoWithEventDeviceAdd(epollFd, tmpFd, nodePath);
         } else if (event->mask & IN_DELETE) {
             for (auto &inputDev : inputDevList_) {
