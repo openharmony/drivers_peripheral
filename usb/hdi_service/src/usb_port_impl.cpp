@@ -62,7 +62,8 @@ UsbPortImpl::~UsbPortImpl() {}
 
 int32_t UsbPortImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
+    HDF_LOGI("%{public}s: enter: portId: %{public}d, powerRole: %{public}d, dataRole: %{public}d",
+        __func__, portId, powerRole, dataRole);
     int32_t ret = 0;
     if (g_productFlag) {
         ret = V1_2::UsbdPorts::GetInstance().SetPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);

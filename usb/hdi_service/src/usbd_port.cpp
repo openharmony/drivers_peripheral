@@ -245,19 +245,20 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
         currentPortInfo_.portId = portId;
         return HDF_SUCCESS;
     }
+    HDF_LOGI("%{public}s: powerRole switch from %{public}d to %{public}d", __func__,
+        currentPortInfo_.powerRole, powerRole);
 
     if (currentPortInfo_.powerRole != powerRole) {
-        HDF_LOGI("%{public}s: powerRole switch from %{public}d to %{public}d", __func__,
-            currentPortInfo_.powerRole, powerRole);
         ret = WritePortFile(powerRole, POWER_ROLE_PATH);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: write powerRole failed, ret: %{public}d", __func__, ret);
             return ret;
         }
     }
+    HDF_LOGI("%{public}s: dataRole switch from %{public}d to %{public}d", __func__,
+        currentPortInfo_.dataRole, dataRole);
+
     if (currentPortInfo_.dataRole != dataRole) {
-        HDF_LOGI("%{public}s: dataRole switch from %{public}d to %{public}d", __func__,
-            currentPortInfo_.dataRole, dataRole);
         ret = WritePortFile(dataRole, DATA_ROLE_PATH);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: write dataRole failed, ret: %{public}d", __func__, ret);
@@ -450,6 +451,8 @@ int32_t UsbdPort::UpdatePort(int32_t mode, const sptr<IUsbdSubscriber> &subscrib
             return HDF_FAILURE;
         }
         currentPortInfo_.mode = mode;
+        HDF_LOGE("%{public}s: id: %{public}d, powerRole: %{public}d, dataRole: %{public}d, mode: %{public}d", __func__,
+            currentPortInfo_.portId, currentPortInfo_.powerRole, currentPortInfo_.dataRole, currentPortInfo_.mode);
     } else {
         HDF_LOGE("%{public}s invalid mode:%{public}d", __func__, mode);
         return HDF_FAILURE;
