@@ -29,6 +29,8 @@
 #include <map>
 #include <mutex>
 #include <cinttypes>
+#include "ump_packet.h"
+#include "ump_processor.h"
 
 namespace OHOS {
 namespace HDI {
@@ -51,6 +53,7 @@ struct DeviceInfo {
     int32_t device;
     std::string idVendor;
     std::string idProduct;
+    std::string deviceName;
     bool is_ump;
     std::vector<PortInfo> outputPorts;
     std::vector<PortInfo> inputPorts;
@@ -90,6 +93,7 @@ private:
         snd_rawmidi_t *rawmidi = nullptr;
         std::vector<struct pollfd> pfds;
         sptr<IMidiCallback> dataCallback;
+        std::shared_ptr<UmpProcessor> processor;
         std::thread thread;
         int eventFd = -1; // 用于唤醒 epoll
     };
