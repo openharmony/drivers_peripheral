@@ -1233,6 +1233,17 @@ std::shared_ptr<DCCaptureInfo> DStreamOperator::BuildSuitableCaptureInfo(const C
     dcSetting.type_ = DCSettingsType::UPDATE_METADATA;
     std::shared_ptr<OHOS::Camera::CameraMetadata> captureSetting = nullptr;
     OHOS::Camera::MetadataUtils::ConvertVecToMetadata(srcCaptureInfo.captureSetting_, captureSetting);
+    camera_metadata_item_t fpsItem;
+    int32_t val = OHOS::Camera::FindCameraMetadataItem(captureSetting->get(), OHOS_CONTROL_FPS_RANGES, &fpsItem);
+    if (val == CAM_META_SUCCESS) {
+        uint32_t fpscount = fpsItem.count;
+        DHLOGI("find fps ranges fpscount: %{public}d", fpscount);
+        for (uint32_t i = 0; i < fpscount; i++) {
+            DHLOGI("fps ranges val i: %{public}d, fps: %{public}d", i, fpsItem.data.i32[i]);
+        }
+    } else {
+        DHLOGI("find fps ranges failed, ret: %{public}d", val);
+    }
     std::string settingStr = OHOS::Camera::MetadataUtils::EncodeToString(captureSetting);
     dcSetting.value_ = Base64Encode(reinterpret_cast<const unsigned char *>(settingStr.c_str()), settingStr.length());
 
