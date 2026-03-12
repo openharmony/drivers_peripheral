@@ -810,6 +810,104 @@ int32_t UsbDdkService::RemoveDriverInfo(const std::string &driverUid)
     }
     return HDF_FAILURE;
 }
+
+int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlRequestSetup &setupPacket, uint32_t timeout,
+    std::vector<uint8_t> &data, uint32_t &transferredLength)
+{
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+#ifndef LIBUSB_ENABLE
+    return HDF_ERR_NOT_SUPPORT;
+#else
+    if (g_DdkLibusbAdapter == nullptr) {
+        HDF_LOGE("%{public}s g_DdkLibusbAdapter is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    uint8_t direction = GET_CTRL_REQ_DIR(setupPacket.requestType);
+    UsbDev dev = {GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)};
+    uint32_t length = setupPacket.length > MAX_CONTROL_BUFF_SIZE ? MAX_CONTROL_BUFF_SIZE : setupPacket.length;
+
+    if (direction == USB_REQUEST_DIR_FROM_DEVICE) {
+        UsbCtrlTransferParams ctrlParams = {
+            static_cast<uint8_t>(setupPacket.requestType),
+            static_cast<uint8_t>(setupPacket.requestCmd),
+            setupPacket.value,
+            setupPacket.index,
+            length,
+            timeout
+        };
+        int32_t ret = g_DdkLibusbAdapter->ControlTransferReadwithLength(dev, ctrlParams, data);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s control transfer read failed: %{public}d", __func__, ret);
+            return ret;
+        }
+        transferredLength = data.size();
+    } else {
+        UsbCtrlTransfer ctrl = {
+            static_cast<uint8_t>(setupPacket.requestType),
+            static_cast<uint8_t>(setupPacket.requestCmd),
+            setupPacket.value,
+            setupPacket.index,
+            timeout
+        };
+        int32_t ret = g_DdkLibusbAdapter->ControlTransferWrite(dev, ctrl, data);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s control transfer write failed: %{public}d", __func__, ret);
+            return ret;
+        }
+        transferredLength = data.size();
+    }
+
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
+}
+
+int32_t UsbDdkService::GetNonRootHubs(std::vector<uint64_t> &nonRootHubIds)
+{
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+#ifndef LIBUSB_ENABLE
+    return HDF_ERR_NOT_SUPPORT;
+#else
+    if (g_DdkLibusbAdapter == nullptr) {
+        HDF_LOGE("%{public}s g_DdkLibusbAdapter is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    std::vector<struct OHOS::HDI::Usb::V1_2::DeviceInfo> devices;
+    g_DdkLibusbAdapter->GetDevices(devices);
+    if (devices.empty()) {
+        HDF_LOGW("%{public}s: devices is empty", __func__);
+        return HDF_SUCCESS;
+    }
+
+    constexpr uint8_t USB_CLASS_HUB = 0x09;
+    constexpr uint8_t ROOT_HUB_DEV_ADDR = 1;
+
+    for (const auto &device : devices) {
+        uint8_t busNum = GET_BUS_NUM(device.deviceId);
+        uint8_t devAddr = GET_DEV_NUM(device.deviceId);
+
+        UsbDeviceDescriptor desc;
+        int32_t ret = GetDeviceDescriptor(device.deviceId, desc);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s: get device descriptor failed for device %{public}" PRIu64, __func__, device.deviceId);
+            continue;
+        }
+
+        if (desc.bDeviceClass == USB_CLASS_HUB && devAddr != ROOT_HUB_DEV_ADDR) {
+            nonRootHubIds.push_back(device.deviceId);
+        }
+    }
+
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
+}
 } // namespace V1_1
 } // namespace Ddk
 } // namespace Usb

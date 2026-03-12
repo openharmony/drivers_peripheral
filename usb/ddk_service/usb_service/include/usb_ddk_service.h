@@ -63,6 +63,11 @@ public:
     int32_t UpdateDriverInfo(const DriverAbilityInfo &driverInfo) override;
 
     int32_t RemoveDriverInfo(const std::string &driverUid) override;
+
+    int32_t ControlTransfer(uint64_t deviceId, const UsbControlRequestSetup &setupPacket, uint32_t timeout,
+        std::vector<uint8_t> &data, uint32_t &transferredLength) override;
+
+    int32_t GetNonRootHubs(std::vector<uint64_t> &nonRootHubIds) override;
 };
 } // namespace V1_1
 } // namespace Ddk
