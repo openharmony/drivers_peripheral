@@ -38,9 +38,9 @@ struct AlsaRender {
 
     /* render scene */
     int32_t (*Init)(struct AlsaRender*);
-    int32_t (*SelectScene)(struct AlsaRender *, enum AudioPortPin, const struct PathDeviceInfo *);
+    int32_t (*SelectScene)(struct AlsaRender *, const struct AudioHwRenderParam *);
     int32_t (*Open)(struct AlsaRender *);
-    int32_t (*Start)(struct AlsaRender *);
+    int32_t (*Start)(struct AlsaRender *, const struct AudioHwRenderParam *);
     int32_t (*Stop)(struct AlsaRender *);
     int32_t (*Close)(struct AlsaRender *);
     int32_t (*Write)(struct AlsaRender *, const struct AudioHwRenderParam *);
@@ -51,6 +51,13 @@ struct AlsaRender {
     int32_t (*GetVolThreshold)(struct AlsaRender *, long *, long *);
     int32_t (*GetVolume)(struct AlsaRender *, long *);
     int32_t (*SetVolume)(struct AlsaRender *, long);
+    /* call operation */
+    int32_t (*SetParams)(struct AlsaRender *, const struct AudioHwRenderParam *);
+    int32_t (*SetTurning)();
+    int32_t (*ReadFromVoice)(struct AlsaRender *, const char *);
+    int32_t (*CloseVoice)(struct AlsaRender *);
+    int32_t (*SetVoiceVolume)(struct AlsaRender *, float);
+    int32_t (*UpdateRouter)(struct AlsaRender *, const struct AudioHwRenderParam *);
 
     /* gain operation */
     int32_t (*GetGainThreshold)(struct AlsaRender *, float *, float *);
@@ -69,9 +76,8 @@ struct AlsaRender {
     int32_t (*SetPauseState)(struct AlsaRender *, bool);
 };
 
-struct AlsaRender *RenderCreateInstance(const char* adapterName);
+struct AlsaRender *RenderCreateInstance(const char* adapterName, enum AudioCategory scene);
 struct AlsaRender *RenderGetInstance(const char *adapterName);
-int32_t RenderSetParams(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData);
 void  RenderSetPriData(struct AlsaRender *renderIns, RenderPriData data);
 RenderPriData RenderGetPriData(struct AlsaRender *renderIns);
 
@@ -79,6 +85,7 @@ RenderPriData RenderGetPriData(struct AlsaRender *renderIns);
     Different platforms implement this function rewriting render implementation
  */
 int32_t RenderOverrideFunc(struct AlsaRender *renderIns);
+int32_t RenderGetSceneDev(enum AudioCategory scene);
 
 #ifdef __cplusplus
 }
