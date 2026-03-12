@@ -26,7 +26,7 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_1 {
+namespace V1_2 {
 UsbDriverManager& UsbDriverManager::GetInstance(void)
 {
     static UsbDriverManager instance;
@@ -89,7 +89,7 @@ bool UsbDriverManager::QueryDriverInfo(uint32_t tokenId, DriverAbilityInfo &driv
     }
     return false;
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI

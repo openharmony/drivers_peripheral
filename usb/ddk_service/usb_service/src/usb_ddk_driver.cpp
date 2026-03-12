@@ -17,7 +17,7 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_1/usb_ddk_stub.h"
+#include "v1_2/usb_ddk_stub.h"
 #include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG usb_ddk_driver
@@ -69,7 +69,7 @@ static int HdfUsbDdkDriverBind(struct HdfDeviceObject *deviceObject)
     hdfUsbDdkHost->ioService.Open = NULL;
     hdfUsbDdkHost->ioService.Release = NULL;
 
-    auto serviceImpl = V1_1::IUsbDdk::Get(true);
+    auto serviceImpl = V1_2::IUsbDdk::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfUsbDdkHost;
@@ -77,7 +77,7 @@ static int HdfUsbDdkDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfUsbDdkHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(
-        serviceImpl, V1_1::IUsbDdk::GetDescriptor());
+        serviceImpl, V1_2::IUsbDdk::GetDescriptor());
     if (hdfUsbDdkHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfUsbDdkHost;

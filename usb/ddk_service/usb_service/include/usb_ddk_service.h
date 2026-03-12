@@ -16,13 +16,13 @@
 #ifndef USB_DDK_SERVICE_H
 #define USB_DDK_SERVICE_H
 
-#include "v1_1/iusb_ddk.h"
+#include "v1_2/iusb_ddk.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_1 {
+namespace V1_2 {
 class UsbDdkService : public IUsbDdk {
 public:
     UsbDdkService() = default;
@@ -69,7 +69,7 @@ public:
 
     int32_t GetNonRootHubs(std::vector<uint64_t> &nonRootHubIds) override;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI

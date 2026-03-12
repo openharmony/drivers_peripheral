@@ -16,7 +16,7 @@
 #include <hdf_base.h>
 #include <iproxy_broker.h>
 #include <shared_mutex>
-#include "v1_1/usb_ddk_service.h"
+#include "v1_2/usb_ddk_service.h"
 
 #include "ddk_pnp_listener_mgr.h"
 #include "ipc_skeleton.h"
@@ -33,7 +33,7 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_1 {
+namespace V1_2 {
 // 32 means size of uint32_t
 #define GET_BUS_NUM(devHandle)          ((uint8_t)((devHandle) >> 32))
 #define GET_DEV_NUM(devHandle)          ((uint8_t)((devHandle)&0xFFFFFFFF))
@@ -908,7 +908,7 @@ int32_t UsbDdkService::GetNonRootHubs(std::vector<uint64_t> &nonRootHubIds)
     return HDF_SUCCESS;
 #endif // LIBUSB_ENABLE
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI

@@ -19,13 +19,13 @@
 #include <map>
 #include <mutex>
 
-#include "v1_1/usb_ddk_types.h"
+#include "v1_2/usb_ddk_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_1 {
+namespace V1_2 {
 class UsbDriverManager final {
 public:
     static UsbDriverManager& GetInstance();
@@ -44,7 +44,7 @@ private:
     std::mutex mutex_;
     std::map<uint32_t, std::unique_ptr<DriverAbilityInfo>> driverMap_;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI
