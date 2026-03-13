@@ -599,6 +599,9 @@ int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyF
                 HDF_LOGE("%{public}s: The absolute path does not exist.", __func__);
                 return INPUT_FAILURE;
             }
+            if (nodePath.find("event") == std::string::npos) {
+                break;
+            }
             tmpFd = open(nodeRealPath, O_RDWR);
             if (tmpFd == INPUT_FAILURE) {
                 HDF_LOGE("%{public}s: open file failure: %{public}s", __func__, nodeRealPath);
@@ -606,9 +609,6 @@ int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyF
             }
             uint64_t ownerTag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DRIVERS_PERIPHERAL_INPUT_FDSAN_TAG);
             fdsan_exchange_owner_tag(tmpFd, 0, ownerTag);
-            if (nodePath.find("event") == std::string::npos) {
-                break;
-            }
             DoWithEventDeviceAdd(epollFd, tmpFd, nodePath);
         } else if (event->mask & IN_DELETE) {
             for (auto &inputDev : inputDevList_) {
