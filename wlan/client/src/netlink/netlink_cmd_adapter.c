@@ -314,6 +314,9 @@ static int32_t ConnectCmdSocket(void)
         HILOG_ERROR(LOG_CORE, "%s: fail to open cmd socket", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
+    if (nl_socket_set_buffer_size(g_wifiHalInfo.cmdSock, NETLINK_BUFF_LENGTH + NETLINK_BUFF_LENGTH, 0) < 0) {
+        HILOG_ERROR(LOG_CORE, "%s: fail to set buffer size", __FUNCTION__);
+    }
 
     nl_socket_disable_seq_check(g_wifiHalInfo.cmdSock);
     // send find familyId result to Controller
