@@ -770,9 +770,6 @@ int32_t AudioCaptureCaptureFrame(
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_ERR_INTERNAL;
     }
-    if (hwCapture->devDataHandle == NULL) {
-        return AUDIO_ERR_INTERNAL;
-    }
 
     int32_t ret =
         (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_READ);
