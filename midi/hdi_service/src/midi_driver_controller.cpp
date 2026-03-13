@@ -46,11 +46,26 @@ namespace {
     constexpr uint8_t STATUS_PROG_CHANGE = 0xC0;
     constexpr uint8_t STATUS_CHAN_PRESSURE = 0xD0;
     constexpr uint8_t STATUS_MASK_CMD = 0xF0;
-    constexpr uint8_t MIDI_CLOCK = 0xF8;
+    constexpr uint8_t MIDI_TIMING_CLOCK = 0xF8;
     constexpr int64_t NSEC_PER_SEC = 1000000000;
     constexpr int32_t MIDI_BYTE_HEX_WIDTH = 2;
     constexpr int32_t MIDI_PORT_DIRECTION_COUNT = 2;
     constexpr int32_t UMP_WORD_HEX_WIDTH = 8;
+
+    bool IsMidiClockMessage(uint8_t byte)
+    {
+        return byte == MIDI_TIMING_CLOCK;
+    }
+
+    bool IsUmpClockMessage(const UmpPacket &packet)
+    {
+        uint8_t mt = (packet.Word(0) >> UMP_SHIFT_MT) & UMP_MASK_NIBBLE;
+        if (mt == UMP_MT_SYSTEM) {
+            uint8_t status = (packet.Word(0) >> UMP_SHIFT_STATUS) & UMP_MASK_BYTE;
+            return IsMidiClockMessage(status);
+        }
+        return false;
+    }
 }
 
 static void ReadVendorIdAndProductId(int32_t card, std::string &idVendor, std::string &idProduct)
@@ -383,14 +398,16 @@ int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMes
 
 void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t bufferSize)
 {
+    // Filter timing clock messages (0xF8) for midiStream log
     std::ostringstream midiStream;
     for (size_t i = 0; i < static_cast<size_t>(bufferSize); i++) {
-        midiStream << std::hex << std::setw(MIDI_BYTE_HEX_WIDTH) << std::setfill('0') <<
-            static_cast<uint32_t>(buffer[i]) << " ";
+        if (!IsMidiClockMessage(buffer[i])) {
+            midiStream << std::hex << std::setw(MIDI_BYTE_HEX_WIDTH) << std::setfill('0') <<
+                static_cast<uint32_t>(buffer[i]) << " ";
+        }
     }
-    HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
-    if (bufferSize == 1 && buffer[0] == MIDI_CLOCK) {
-        return;
+    if (!midiStream.str().empty()) {
+        HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
     }
     if (ctx->processor == nullptr) {
         HDF_LOGI("%{public}s processor is nullptr" PRId64, __func__);
@@ -402,11 +419,14 @@ void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* 
         results.push_back(p);
     });
     for (auto p : results) {
-        std::ostringstream umpStream;
-        for (uint8_t i = 0; i < p.WordCount(); i++) {
-            umpStream << std::hex << std::setw(UMP_WORD_HEX_WIDTH) << std::setfill('0') << p.Word(i) << " ";
+        // Filter clock messages for umpStream log
+        if (!IsUmpClockMessage(p)) {
+            std::ostringstream umpStream;
+            for (uint8_t i = 0; i < p.WordCount(); i++) {
+                umpStream << std::hex << std::setw(UMP_WORD_HEX_WIDTH) << std::setfill('0') << p.Word(i) << " ";
+            }
+            HDF_LOGe("%{public}s umpStream 1.0: %{public}s", __func__, umpStream.str().c_str());
         }
-        HDF_LOGI("%{public}s umpStream 1.0: %{public}s", __func__, umpStream.str().c_str());
     }
     std::lock_guard<std::mutex> lock(mutex_);
     if (ctx->dataCallback && !results.empty()) {
