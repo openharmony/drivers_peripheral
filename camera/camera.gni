@@ -42,4 +42,9 @@ declare_args() {
 
 declare_args() {
   drivers_peripheral_camera_use_commom_usb_camera_host_config = false
+  drivers_peripheral_camera_feature_board_config = false
+  drivers_peripheral_camera_feature_host_codec = false
+  drivers_peripheral_camera_feature_fork_dma = true
+  drivers_peripheral_camera_feature_batch_buffers = false
+  drivers_peripheral_camera_feature_Distribute_timeout = 500
 }

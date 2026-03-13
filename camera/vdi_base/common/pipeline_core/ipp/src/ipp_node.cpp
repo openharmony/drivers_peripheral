@@ -191,6 +191,15 @@ void IppNode::PrintExposureState(const common_metadata_header_t *data)
     CAMERA_LOGI("exposureState =%{public}d", exposureState);
 }
 
+struct MetadataTag {
+    std::string cameraIdStr = "lcam001";
+    CameraId cameraIdNum = CAMERA_FIRST;
+};
+
+const MetadataTag OHOS_MAP_CAMERA_ID[] = {
+    { "lcam001", CAMERA_FIRST },
+    { "lcam002", CAMERA_SECOND }
+};
 RetCode IppNode::GetDeviceController()
 {
     deviceManager_ = IDeviceManager::GetInstance();
@@ -199,6 +208,11 @@ RetCode IppNode::GetDeviceController()
         return RC_ERROR;
     }
     CameraId cameraId = CAMERA_FIRST;
+    for (auto metaTag : OHOS_MAP_CAMERA_ID) {
+        if (metaTag.cameraIdStr == cameraId_) {
+            cameraId = metaTag.cameraIdNum;
+        }
+    }
     sensorController_ = std::static_pointer_cast<IController>
         (deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
     if (sensorController_ == nullptr) {
