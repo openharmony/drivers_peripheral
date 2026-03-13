@@ -14,6 +14,11 @@
     "subsystem": "hdf",
     "features": [
       "drivers_peripheral_camera_feature_usb",
+      "drivers_peripheral_camera_feature_Distribute_timeout",
+      "drivers_peripheral_camera_feature_batch_buffers",
+      "drivers_peripheral_camera_feature_board_config",
+      "drivers_peripheral_camera_feature_host_codec",
+      "drivers_peripheral_camera_feature_fork_dma",
       "drivers_peripheral_camera_use_commom_usb_camera_host_config"
     ],
     "adapted_system_type": ["standard", "small"],
