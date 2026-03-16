@@ -50,19 +50,19 @@ void UsbDdkServiceTest::TearDown()
 
 HWTEST_F(UsbDdkServiceTest, UpdateDriverInfo001, TestSize.Level1)
 {
-    V1_1::DriverAbilityInfo driverInfo;
+    V1_2::DriverAbilityInfo driverInfo;
     driverInfo.driverUid = "driverUid12345";
-    bool ret = V1_1::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
+    bool ret = V1_2::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
     EXPECT_FALSE(ret);
 
     driverInfo.driverUid = "driverUid-12345";
     driverInfo.vids = { 1001 };
-    ret = V1_1::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
     EXPECT_TRUE(ret);
 
     uint32_t tokenId = 12345;
-    V1_1::DriverAbilityInfo queriedDriverInfo;
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    V1_2::DriverAbilityInfo queriedDriverInfo;
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_TRUE(ret);
     EXPECT_EQ(driverInfo.driverUid, queriedDriverInfo.driverUid);
     auto iter = std::find(queriedDriverInfo.vids.begin(), queriedDriverInfo.vids.end(), 1001);
@@ -71,23 +71,23 @@ HWTEST_F(UsbDdkServiceTest, UpdateDriverInfo001, TestSize.Level1)
 
 HWTEST_F(UsbDdkServiceTest, UpdateDriverInfo002, TestSize.Level1)
 {
-    V1_1::DriverAbilityInfo driverInfo;
+    V1_2::DriverAbilityInfo driverInfo;
     driverInfo.driverUid = "driverUid-12345";
     driverInfo.vids = { 1001 };
-    bool ret = V1_1::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
+    bool ret = V1_2::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
     EXPECT_TRUE(ret);
 
     uint32_t tokenId = 12345;
-    V1_1::DriverAbilityInfo queriedDriverInfo;
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    V1_2::DriverAbilityInfo queriedDriverInfo;
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_TRUE(ret);
     EXPECT_EQ(1, queriedDriverInfo.vids.size());
 
     driverInfo.vids = { 1001, 1002 };
-    ret = V1_1::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
     EXPECT_TRUE(ret);
 
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_TRUE(ret);
     EXPECT_EQ(2, queriedDriverInfo.vids.size());
     auto iter = std::find(queriedDriverInfo.vids.begin(), queriedDriverInfo.vids.end(), 1002);
@@ -96,69 +96,69 @@ HWTEST_F(UsbDdkServiceTest, UpdateDriverInfo002, TestSize.Level1)
 
 HWTEST_F(UsbDdkServiceTest, RemoveDriverInfo001, TestSize.Level1)
 {
-    V1_1::DriverAbilityInfo driverInfo;
+    V1_2::DriverAbilityInfo driverInfo;
     driverInfo.driverUid = "driverUid-12345";
-    bool ret = V1_1::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
+    bool ret = V1_2::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
     EXPECT_TRUE(ret);
     uint32_t tokenId = 12345;
-    V1_1::DriverAbilityInfo queriedDriverInfo;
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    V1_2::DriverAbilityInfo queriedDriverInfo;
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_TRUE(ret);
 
     std::string driverUid = "driverUid12345";
-    ret = V1_1::UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
+    ret = V1_2::UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
     EXPECT_FALSE(ret);
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_TRUE(ret);
 
     driverUid = "driverUid-12345";
-    ret = V1_1::UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
+    ret = V1_2::UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
     EXPECT_TRUE(ret);
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_FALSE(ret);
 }
 
 HWTEST_F(UsbDdkServiceTest, RemoveDriverInfo002, TestSize.Level1)
 {
-    V1_1::DriverAbilityInfo driverInfo;
+    V1_2::DriverAbilityInfo driverInfo;
     driverInfo.driverUid = "driverUid-12345";
-    bool ret = V1_1::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
+    bool ret = V1_2::UsbDriverManager::GetInstance().UpdateDriverInfo(driverInfo);
     EXPECT_TRUE(ret);
     uint32_t tokenId = 12345;
-    V1_1::DriverAbilityInfo queriedDriverInfo;
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    V1_2::DriverAbilityInfo queriedDriverInfo;
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_TRUE(ret);
 
     std::string driverUid = "driverUid-11111";
-    ret = V1_1::UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
+    ret = V1_2::UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
     EXPECT_TRUE(ret);
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_TRUE(ret);
 
     driverUid = "driverUid-12345";
-    ret = V1_1::UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
+    ret = V1_2::UsbDriverManager::GetInstance().RemoveDriverInfo(driverUid);
     EXPECT_TRUE(ret);
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_FALSE(ret);
 }
 
 HWTEST_F(UsbDdkServiceTest, QueryDriverInfo001, TestSize.Level1)
 {
-    V1_1::DriverAbilityInfo queriedDriverInfo;
-    bool ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(11111, queriedDriverInfo);
+    V1_2::DriverAbilityInfo queriedDriverInfo;
+    bool ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(11111, queriedDriverInfo);
     EXPECT_FALSE(ret);
 
-    V1_1::DriverAbilityInfo updateDriverInfo;
+    V1_2::DriverAbilityInfo updateDriverInfo;
     updateDriverInfo.driverUid = "driverUid-11111";
-    ret = V1_1::UsbDriverManager::GetInstance().UpdateDriverInfo(updateDriverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().UpdateDriverInfo(updateDriverInfo);
     EXPECT_TRUE(ret);
 
     uint32_t tokenId = 22222;
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_FALSE(ret);
 
     tokenId = 11111;
-    ret = V1_1::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
+    ret = V1_2::UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, queriedDriverInfo);
     EXPECT_TRUE(ret);
     EXPECT_EQ(updateDriverInfo.driverUid, queriedDriverInfo.driverUid);
 }
