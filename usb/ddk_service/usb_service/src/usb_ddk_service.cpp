@@ -53,7 +53,7 @@ static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 #ifdef LIBUSB_ENABLE
 static std::shared_ptr<OHOS::HDI::Usb::V1_2::LibusbAdapter> g_DdkLibusbAdapter =
-    V1_2::LibusbAdapter::GetInstance();
+    OHOS::HDI::Usb::V1_2::LibusbAdapter::GetInstance();
 constexpr uint8_t  INTERFACE_ID_INVALID = 255;
 static std::unordered_map<uint64_t, uint8_t> g_InterfaceMap;
 std::shared_mutex g_MutexInterfaceMap;
@@ -827,11 +827,11 @@ int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlReques
     }
 
     uint8_t direction = GET_CTRL_REQ_DIR(setupPacket.requestType);
-    UsbDev dev = {GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)};
+    OHOS::HDI::Usb::V1_0::UsbDev dev = {GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)};
     uint32_t length = setupPacket.length > MAX_CONTROL_BUFF_SIZE ? MAX_CONTROL_BUFF_SIZE : setupPacket.length;
 
     if (direction == USB_REQUEST_DIR_FROM_DEVICE) {
-        UsbCtrlTransferParams ctrlParams = {
+        OHOS::HDI::Usb::V1_1::UsbCtrlTransferParams ctrlParams = {
             static_cast<uint8_t>(setupPacket.requestType),
             static_cast<uint8_t>(setupPacket.requestCmd),
             setupPacket.value,
@@ -846,7 +846,7 @@ int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlReques
         }
         transferredLength = data.size();
     } else {
-        UsbCtrlTransfer ctrl = {
+        OHOS::HDI::Usb::V1_0::UsbCtrlTransfer ctrl = {
             static_cast<uint8_t>(setupPacket.requestType),
             static_cast<uint8_t>(setupPacket.requestCmd),
             setupPacket.value,

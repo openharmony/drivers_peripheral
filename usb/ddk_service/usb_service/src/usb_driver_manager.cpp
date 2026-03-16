@@ -50,7 +50,7 @@ static bool ConvertDriverUid2TokenId(const std::string &driverUid, uint32_t &tok
     return true;
 }
 
-bool UsbDriverManager::UpdateDriverInfo(const DriverAbilityInfo &driverInfo)
+bool UsbDriverManager::UpdateDriverInfo(const V1_1::DriverAbilityInfo &driverInfo)
 {
     uint32_t tokenId;
     if (!ConvertDriverUid2TokenId(driverInfo.driverUid, tokenId)) {
@@ -59,7 +59,7 @@ bool UsbDriverManager::UpdateDriverInfo(const DriverAbilityInfo &driverInfo)
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
-    driverMap_[tokenId] = std::make_unique<DriverAbilityInfo>(driverInfo);
+    driverMap_[tokenId] = std::make_unique<V1_1::DriverAbilityInfo>(driverInfo);
     return true;
 }
 
@@ -79,7 +79,7 @@ bool UsbDriverManager::RemoveDriverInfo(const std::string &driverUid)
     return true;
 }
 
-bool UsbDriverManager::QueryDriverInfo(uint32_t tokenId, DriverAbilityInfo &driverInfo)
+bool UsbDriverManager::QueryDriverInfo(uint32_t tokenId, V1_1::DriverAbilityInfo &driverInfo)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     auto it = driverMap_.find(tokenId);
