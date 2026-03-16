@@ -890,7 +890,6 @@ int32_t UsbDdkService::GetNonRootHubs(std::vector<uint64_t> &nonRootHubIds)
     constexpr uint8_t ROOT_HUB_DEV_ADDR = 1;
 
     for (const auto &device : devices) {
-        uint8_t busNum = GET_BUS_NUM(device.deviceId);
         uint8_t devAddr = GET_DEV_NUM(device.deviceId);
 
         UsbDeviceDescriptor desc;
