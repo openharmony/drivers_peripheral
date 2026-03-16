@@ -24,7 +24,7 @@ config("ddk_public_config") {
   ]
 }
 
-ohos_shared_library("libusb_ddk_service_1.1") {
+ohos_shared_library("libusb_ddk_service_1.2") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -131,6 +131,7 @@ ohos_shared_library("libusb_ddk_driver") {
     external_deps = [
       "drivers_interface_usb:libusb_ddk_stub_1.0",
       "drivers_interface_usb:libusb_ddk_stub_1.1",
+      "drivers_interface_usb:libusb_ddk_stub_1.2",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -155,7 +156,7 @@ ohos_shared_library("libusb_ddk_driver") {
 group("usb_ddk_target") {
   deps = [
     ":libusb_ddk_driver",
-    ":libusb_ddk_service_1.1",
+    ":libusb_ddk_service_1.2",
     ":usb_ddk_dynamic_library_wrapper",
   ]
 }
