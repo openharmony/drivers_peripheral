@@ -271,7 +271,7 @@ Midi1Device::~Midi1Device()
             if (ctx->eventFd != -1) {
                 uint64_t u = 1;
                 write(ctx->eventFd, &u, sizeof(uint64_t));
-                HDF_LOGI("%{public}s wrote to eventFd to wake up input thread, portId: %{public}u", __func__, pair.first);
+                HDF_LOGI("%{public}s wake up input thread, portId: %{public}u", __func__, pair.first);
             }
             inputsToClose.push_back(ctx);
         }
