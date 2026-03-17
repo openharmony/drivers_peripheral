@@ -13,21 +13,19 @@
  * limitations under the License.
  */
 
-#undef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002BD0
 #include "midi_driver_controller.h"
-#include "ump_packet.h"
-#include "ump_processor.h"
+
+#include <ctime>
+#include <iomanip>
 #include <fstream>
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include <iostream>
 #include <sstream>
-#include <sys/eventfd.h>
 #include <unordered_set>
-#include <iomanip>
-#include <ctime>
+#include <sys/eventfd.h>
+
 #include "securec.h"
+#include "midi_log.h"
 
 #define HDF_LOG_TAG midi_driver_controller
 
@@ -75,6 +73,21 @@ static void ReadVendorIdAndProductId(int32_t card, std::string &idVendor, std::s
 
     idVendor = line.substr(0, colonPos);
     idProduct = line.substr(colonPos + 1);
+}
+
+static void ReadDeviceName(int32_t card, std::string &deviceName)
+{
+    std::string path = "/proc/asound/card" + std::to_string(card) + "/id";
+    std::ifstream file(path);
+    deviceName = "";
+    if (!file.is_open()) {
+        return;
+    }
+    std::string line;
+    if (!std::getline(file, line)) {
+        return;
+    }
+    deviceName = line;
 }
 
 static void ReadUsbBus(int32_t card, std::string &bus)
@@ -139,8 +152,9 @@ static std::vector<MidiDeviceInfo> MakeMidiDeviceInfos(const std::vector<DeviceI
     for (const auto &device : deviceInfos) {
         MidiDeviceInfo dev;
         dev.deviceId = device.deviceId;
-        dev.productName = device.idProduct;
-        dev.vendorName = device.idVendor;
+        dev.productId = device.idProduct;
+        dev.vendorId = device.idVendor;
+        dev.deviceName = device.deviceName;
         dev.protocol = device.is_ump ? MIDI_PROTOCOL_2_0 : MIDI_PROTOCOL_1_0;
         dev.ports = MakeMidiPortInfos(device);
         devices.push_back(dev);
@@ -278,7 +292,7 @@ int32_t Midi1Device::OpenInputPort(uint32_t portId, const sptr<IMidiCallback> &c
     ctx->rawmidi = rawmidi;
     ctx->pfds = pfds;
     ctx->dataCallback = callback;
-    
+    ctx->processor = std::make_shared<UmpProcessor>();
     // Create EventFD for wake-up
     ctx->eventFd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if (ctx->eventFd == -1) {
@@ -311,6 +325,9 @@ int32_t Midi1Device::CloseInputPort(uint32_t portId)
     // 4. Clean up resources
     if (ctx->rawmidi) snd_rawmidi_close(ctx->rawmidi);
     if (ctx->eventFd != -1) close(ctx->eventFd);
+    if (ctx->processor) {
+        ctx->processor = nullptr;
+    }
     inputs_.erase(it);
     return HDF_SUCCESS;
 }
@@ -364,20 +381,24 @@ int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMes
     return HDF_SUCCESS;
 }
 
-void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t len)
+void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t bufferSize)
 {
     std::ostringstream midiStream;
-    for (size_t i = 0; i < static_cast<size_t>(len); i++) {
+    for (size_t i = 0; i < static_cast<size_t>(bufferSize); i++) {
         midiStream << std::hex << std::setw(MIDI_BYTE_HEX_WIDTH) << std::setfill('0') <<
             static_cast<uint32_t>(buffer[i]) << " ";
     }
     HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
-    if (len == 1 && buffer[0] == MIDI_CLOCK) {
+    if (bufferSize == 1 && buffer[0] == MIDI_CLOCK) {
         return;
     }
-    UmpProcessor processor;
+    if (ctx->processor == nullptr) {
+        HDF_LOGI("%{public}s processor is nullptr" PRId64, __func__);
+        ctx->quit = true;
+        return;
+    }
     std::vector<UmpPacket> results;
-    processor.ProcessBytes(buffer, static_cast<size_t>(len), [&](const UmpPacket &p) {
+    ctx->processor->ProcessBytes(buffer, static_cast<size_t>(bufferSize), [&](const UmpPacket &p) {
         results.push_back(p);
     });
     for (auto p : results) {
@@ -532,7 +553,7 @@ void MidiDriverController::ProcessMidi1Device(snd_ctl_t *ctl, int32_t card, int3
     ReadVendorIdAndProductId(card, devInfo.idVendor, devInfo.idProduct);
     HDF_LOGD("%{public}s: Vendor ID: %{public}s, Product ID: %{public}s",
              __func__, devInfo.idVendor.c_str(), devInfo.idProduct.c_str());
-
+    ReadDeviceName(card, devInfo.deviceName);
     PopulateMidi1Ports(ctl, device, devInfo);
 
     deviceList_.push_back(devInfo);

@@ -286,7 +286,7 @@ int32_t AudioRenderGetFrameSize(struct IAudioRender *handle, uint64_t *size)
         return ret;
     }
     *size = FRAME_SIZE * channelCount * (formatBits >> BITS_TO_FROMAT);
-    AUDIO_FUNC_LOGI("Enter. FrameSize= %{public}llu", *size);
+    AUDIO_FUNC_LOGI("Enter. FrameSize= %{public}llu", (unsigned long long)(*size));
     return AUDIO_SUCCESS;
 }
 
@@ -298,7 +298,7 @@ int32_t AudioRenderGetFrameCount(struct IAudioRender *handle, uint64_t *count)
         return AUDIO_ERR_INVALID_PARAM;
     }
     *count = hwRender->renderParam.frameRenderMode.frames;
-    AUDIO_FUNC_LOGI("Enter. FrameCount= %{public}llu", *count);
+    AUDIO_FUNC_LOGI("Enter. FrameCount= %{public}llu", (unsigned long long)(*count));
     return AUDIO_SUCCESS;
 }
 
