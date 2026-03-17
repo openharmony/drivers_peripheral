@@ -94,11 +94,6 @@ void FuncReleaseStreams(const uint8_t *rawData)
         cameraTest->streamOperator);
 
     int32_t data = static_cast<int32_t>(ConvertInt32(rawData));
-    OHOS::sptr<OHOS::HDI::Camera::V1_0::IStreamOperatorCallback> streamOperatorCallback =
-        new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
-
-    cameraTest->rc = cameraTest->streamOperator->ChangeToOfflineStream(
-        {data}, streamOperatorCallback, cameraTest->offlineStreamOperator);
     cameraTest->rc = cameraTest->offlineStreamOperator->ReleaseStreams({data});
 }
 
@@ -107,11 +102,6 @@ void FuncRelease()
     cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_0::StreamInfo>();
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
-    OHOS::sptr<OHOS::HDI::Camera::V1_0::IStreamOperatorCallback> streamOperatorCallback =
-        new OHOS::Camera::HdiCommon::TestStreamOperatorCallback();
-
-    cameraTest->rc = cameraTest->streamOperator->ChangeToOfflineStream(
-        {cameraTest->streamInfoSnapshot->streamId_}, streamOperatorCallback, cameraTest->offlineStreamOperator);
     cameraTest->rc = cameraTest->offlineStreamOperator->Release();
 }
 

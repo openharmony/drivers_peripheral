@@ -992,4 +992,7 @@ void AudioDestroyCaptureByIdVdi(uint32_t captureId)
     StubCollectorRemoveObject(IAUDIOCAPTURE_INTERFACE_DESC, &(priv->captureInfos[captureId].capture));
 
     AUDIO_FUNC_LOGI("audio destroy capture success, captureId = [%{public}u]", captureId);
+#ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+    TrigerMemoryReclaim();
+#endif
 }
