@@ -41,7 +41,10 @@ ohos_fuzztest("DestroyCaptureFuzzTest") {
     "${common_path}/include",
   ]
 
-  deps = [ "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0" ]
+  deps = [
+    "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0",
+    "${hdf_service_path}/hdi_service/common:libdaudio_hdf_utils",
+  ]
 
   external_deps = [
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
