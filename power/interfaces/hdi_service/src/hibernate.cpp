@@ -32,6 +32,7 @@
 #include <linux/fiemap.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <sys/sysinfo.h>
 #include <mntent.h>
 
 #include <unique_fd.h>
@@ -73,6 +74,12 @@ constexpr unsigned char UUID_VERSION_OPERAND2 = 0x40;
 constexpr unsigned char UUID_CLOCK_OPERAND1 = 0x3F;
 constexpr unsigned char UUID_CLOCK_OPERAND2 = 0x80;
 
+constexpr int32_t B_PER_KB = 1024;
+constexpr int32_t KB_PER_MB = 1024;
+constexpr int32_t MB_PER_GB = 1024;
+constexpr int32_t EVEN_FACTOR = 2;
+constexpr int32_t SWAP_FACTOR = 2;
+
 const std::string SWAP_FILE_PATH = OHOS::system::GetParameter("const.hdi_power.swap_file_path", "/data/power/swapfile");
 const std::string SWAP_DIR_PATH = OHOS::system::GetParameter("const.hdi_power.swap_dir_path", "/data/power");
 constexpr const char * const HIBERNATE_RESUME = "/sys/hibernate/resume";
@@ -101,6 +108,49 @@ void Hibernate::Init()
     HDF_LOGI("hibernate init begin.");
     auto myThread = std::thread([this] { this->InitSwap(); });
     myThread.detach();
+}
+
+int ConvertMemKB2GB(const unsigned long long memKB)
+{
+    if (memKB == 0) {
+        // memKB must >= 1
+        HDF_LOGE("memKB check failed");
+        return 0;
+    }
+
+    // convert KB to larger GB
+    int memGB = (memKB - 1) / KB_PER_MB / MB_PER_GB + 1;
+    if (memGB % EVEN_FACTOR) {
+        // convert larger GB to larger even GB
+        memGB++;
+    }
+
+    return memGB;
+}
+
+unsigned long long GetSwapFileSize()
+{
+    static unsigned long long swapFileSize = 0;
+    if (swapFileSize) {
+        HDF_LOGI("GetSwapFileSize, swap file size is %{public}llu KB", swapFileSize);
+        return swapFileSize;
+    }
+
+    struct sysinfo info;
+    int ret = sysinfo(&info);
+    if (ret != 0) {
+        HDF_LOGE("GetSwapFileSize, get system memory size error");
+        swapFileSize = SWAP_FILE_SIZE;
+        return swapFileSize;
+    }
+
+    // For example, get info.totalram 24927047680B for 23.2GB
+    // Firstly, convert 24927047680B to larger even GB for 24GB
+    // Then, the swap file size is the half size for 12884901888B
+    int memGB = ConvertMemKB2GB(static_cast<unsigned long long>(info.totalram / B_PER_KB));
+    swapFileSize = static_cast<unsigned long long>(memGB / SWAP_FACTOR) * MB_PER_GB * KB_PER_MB * B_PER_KB;
+    HDF_LOGI("GetSwapFileSize, mem size is %{public}d GB, swap file size is %{public}llu KB", memGB, swapFileSize);
+    return swapFileSize;
 }
 
 int32_t Hibernate::GetResumeInfo(std::string &resumeInfo)
@@ -179,17 +229,22 @@ int32_t Hibernate::MkSwap()
     }
     fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
     int32_t retvalue = HDF_FAILURE;
+    unsigned long long swapFileSize = GetSwapFileSize();
     do {
         int pagesize = sysconf(_SC_PAGE_SIZE);
         if (pagesize == 0) {
             break;
         }
-        unsigned int pages = (SWAP_FILE_SIZE / static_cast<unsigned int>(pagesize)) - 1;
+        unsigned int pages = (swapFileSize / static_cast<unsigned int>(pagesize));
+        if (pages <= 1) {
+            HDF_LOGE("pages failed when mkswap.");
+            break;
+        }
         char buff[SWAP_HEADER_BUF_LEN];
         uint32_t *swap = reinterpret_cast<uint32_t *>(buff);
 
         swap[0] = SWAP_HEADER_INFO_VERSION;
-        swap[1] = pages;
+        swap[1] = pages - 1;
         if (lseek(fd, SWAP_HEADER_INFO_BOOTBITS_SIZE, SEEK_SET) < 0) {
             HDF_LOGE("skip bootbits failed when mkswap.");
             break;
@@ -263,9 +318,10 @@ int32_t Hibernate::CheckSwapFileSize(bool &isRightSize)
     }
 
     isRightSize = true;
-    if (swapFileStat.st_size != SWAP_FILE_SIZE) {
+    unsigned long long swapFileSize = GetSwapFileSize();
+    if (swapFileStat.st_size != swapFileSize) {
         HDF_LOGE("swap file size error, actual_size=%{public}lld expected_size=%{public}lld",
-            static_cast<long long>(swapFileStat.st_size), static_cast<long long>(SWAP_FILE_SIZE));
+            static_cast<long long>(swapFileStat.st_size), static_cast<long long>(swapFileSize));
         isRightSize = false;
     }
     HDF_LOGI("CheckSwapFileSize end.");
@@ -281,7 +337,7 @@ int32_t Hibernate::CreateSwapFile()
     }
 
     struct SwapfileCfg cfg;
-    cfg.len = SWAP_FILE_SIZE;
+    cfg.len = GetSwapFileSize();
 
     int fd = open(SWAP_FILE_PATH.c_str(), O_RDONLY | O_LARGEFILE | O_EXCL | O_CREAT, SWAP_FILE_MODE);
     if (fd == -1) {
