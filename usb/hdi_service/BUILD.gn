@@ -139,7 +139,7 @@ ohos_shared_library("libusb_driver") {
 
   sources = [ "src/usb_interface_driver.cpp" ]
 
-  public_deps = [ ":libusb_interface_service_1.2" ]
+  deps = [ ":libusb_interface_service_1.2" ]
 
   shlib_type = "hdi"
 
@@ -266,7 +266,7 @@ ohos_shared_library("libusb_port_driver") {
 
   sources = [ "src/usb_port_interface_driver.cpp" ]
 
-  public_deps = [ ":libusb_port_interface_service_2.0" ]
+  deps = [ ":libusb_port_interface_service_2.0" ]
 
   shlib_type = "hdi"
 
@@ -474,7 +474,7 @@ ohos_shared_library("libusb_device_driver") {
 
   sources = [ "src/usb_device_interface_driver.cpp" ]
 
-  public_deps = [ ":libusb_device_interface_service_2.0" ]
+  deps = [ ":libusb_device_interface_service_2.0" ]
 
   shlib_type = "hdi"
 
