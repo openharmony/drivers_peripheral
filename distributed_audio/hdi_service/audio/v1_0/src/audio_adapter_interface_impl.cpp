@@ -157,7 +157,7 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
     const AudioSampleAttributes &attrs, sptr<IAudioRender> &render, uint32_t &renderId)
 {
     DHLOGI("Create distributed audio render, {pin: %{public}d, sampleRate: %{public}d, channel: %{public}d,"
-        "formats: %{public}d, type: %{public}d, channelLayout: %{public}lu}.", desc.pins, attrs.sampleRate,
+        "formats: %{public}d, type: %{public}d, channelLayout: %{public}" PRIu64"}.", desc.pins, attrs.sampleRate,
         attrs.channelCount, attrs.format, static_cast<int32_t>(attrs.type), attrs.channelLayout);
     render = nullptr;
     sptr<AudioRenderInterfaceImplBase> audioRender = nullptr;
