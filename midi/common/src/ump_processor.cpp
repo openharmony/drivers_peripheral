@@ -456,12 +456,12 @@ void UmpProcessor::ProcessUmpType3(uint32_t word0, uint32_t word1, Midi1Callback
 
     // Extract 6 bytes of data
     uint8_t data[SYSEX_DATA_BYTES_PER_PACKET];
-    data[0] = (word0 >> SHIFT_BYTE_1) & 0xFF;
-    data[1] = (word0 >> SHIFT_BYTE_2) & 0xFF;
-    data[2] = (word1 >> SHIFT_BYTE_3) & 0xFF;
-    data[3] = (word1 >> SHIFT_BYTE_4) & 0xFF;
-    data[4] = (word1 >> SHIFT_BYTE_5) & 0xFF;
-    data[5] = (word1 >> SHIFT_BYTE_6) & 0xFF;
+    data[INDEX_0] = (word0 >> SHIFT_BYTE_1) & 0xFF;
+    data[INDEX_1] = (word0 >> SHIFT_BYTE_2) & 0xFF;
+    data[INDEX_2] = (word1 >> SHIFT_BYTE_3) & 0xFF;
+    data[INDEX_3] = (word1 >> SHIFT_BYTE_4) & 0xFF;
+    data[INDEX_4] = (word1 >> SHIFT_BYTE_5) & 0xFF;
+    data[INDEX_5] = (word1 >> SHIFT_BYTE_6) & 0xFF;
 
     std::vector<uint8_t> output;
 
