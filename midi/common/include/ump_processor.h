@@ -64,11 +64,6 @@ public:
      * @param packets Array of UMP word data (32-bit words).
      * @param wordCount Number of 32-bit words in the array.
      * @param callback Function called with MIDI 1.0 byte output.
-     *
-     * Supports:
-     * - MT=0x1: System Common/Real-Time Messages
-     * - MT=0x2: Channel Voice Messages
-     * - MT=0x3: SysEx Data Messages (with cross-packet reassembly)
      */
     void ProcessUmp(const uint32_t* packets, size_t wordCount, Midi1Callback callback);
 

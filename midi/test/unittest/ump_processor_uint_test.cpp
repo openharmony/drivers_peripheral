@@ -47,7 +47,7 @@ HWTEST_F(UmpProcessorUnitTest, TestChannelVoice_NoteOn, TestSize.Level1)
     std::vector<UmpPacket> results;
     uint8_t input[] = { 0x90, 0x3C, 0x64 };
 
-    processor_.ProcessBytes(input, 3, [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, 3, [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -66,7 +66,7 @@ HWTEST_F(UmpProcessorUnitTest, TestChannelVoice_ProgramChange, TestSize.Level1)
     std::vector<UmpPacket> results;
     uint8_t input[] = { 0xC0, 0x05 };
 
-    processor_.ProcessBytes(input, 2, [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, 2, [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -89,7 +89,7 @@ HWTEST_F(UmpProcessorUnitTest, TestSystemRealTime_Clock, TestSize.Level1)
     std::vector<UmpPacket> results;
     uint8_t input[] = { 0xF8 };
 
-    processor_.ProcessBytes(input, 1, [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, 1, [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -112,7 +112,7 @@ HWTEST_F(UmpProcessorUnitTest, TestSystemCommon_SongSelect, TestSize.Level1)
     std::vector<UmpPacket> results;
     uint8_t input[] = { 0xF3, 0x12 }; // Select Song 0x12
 
-    processor_.ProcessBytes(input, 2, [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, 2, [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -131,7 +131,7 @@ HWTEST_F(UmpProcessorUnitTest, TestSystemCommon_TuneRequest, TestSize.Level1)
     std::vector<UmpPacket> results;
     uint8_t input[] = { 0xF6 };
 
-    processor_.ProcessBytes(input, 1, [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, 1, [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -153,7 +153,7 @@ HWTEST_F(UmpProcessorUnitTest, TestSysEx_SmallComplete, TestSize.Level1)
     std::vector<UmpPacket> results;
     uint8_t input[] = { 0xF0, 0x01, 0x02, 0x03, 0xF7 };
 
-    processor_.ProcessBytes(input, 5, [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, 5, [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -188,7 +188,7 @@ HWTEST_F(UmpProcessorUnitTest, TestSysEx_MultiPacket, TestSize.Level1)
         0xF7
     };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -223,7 +223,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_Basic, TestSize.Level1)
     std::vector<UmpPacket> results;
     uint8_t input[] = { 0x90, 0x3C, 0x64, 0x3E, 0x64 };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -244,7 +244,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_ProgramChange, TestSize.Level1)
     std::vector<UmpPacket> results;
     uint8_t input[] = { 0xC0, 0x05, 0x06 };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -264,7 +264,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_RealTimeInterruption, TestSize.
     // Note On -> Clock -> Note On (Running Status)
     uint8_t input[] = { 0x90, 0x3C, 0x64, 0xF8, 0x3E, 0x64 };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -289,7 +289,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_ClearedBySysEx, TestSize.Level1
         0x3C, 0x64                          // Orphaned data
     };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -316,7 +316,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_ClearedBySystemCommon, TestSize
     // Note On -> Song Select -> Attempted Running Status Note (should be dropped)
     uint8_t input[] = { 0x90, 0x3C, 0x64, 0xF3, 0x01, 0x3E, 0x64 };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -341,7 +341,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_SwitchingTypes, TestSize.Level1
         0x0A, 0x40        // CC 10 (Pan) - New Running Status
     };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -369,7 +369,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRunningStatus_Reestablishment, TestSize.Level
         0x3E, 0x00        // Note Off (Running Status)
     };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -397,7 +397,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRealTime_Interruption, TestSize.Level1)
     // Note On (Status + Data1) -> Clock -> Note On (Data2)
     uint8_t input[] = { 0x90, 0x3C, 0xF8, 0x64 };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -447,7 +447,7 @@ HWTEST_F(UmpProcessorUnitTest, TestControl_AllNotesOff, TestSize.Level1)
     std::vector<UmpPacket> results;
 
     uint8_t input[] = { 0xB0, 0x7B, 0x00 };
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -467,7 +467,7 @@ HWTEST_F(UmpProcessorUnitTest, TestStream_SelfHealing, TestSize.Level1)
     // Partial Note On (90 3C) interrupted by a fresh Note On (90 3E 64)
     uint8_t input[] = { 0x90, 0x3C, 0x90, 0x3E, 0x64 };
 
-    processor_.ProcessBytes(input, sizeof(input), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(input, sizeof(input), [&results](const UmpPacket& p) {
         results.push_back(p);
     });
 
@@ -563,7 +563,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_NoteOn, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x20903C64U; // MT=2, Group=0, Status=0x90, Data1=0x3C, Data2=0x64
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -585,7 +585,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_NoteOff, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x20803C00U; // MT=2, Group=0, Status=0x80, Data1=0x3C, Data2=0x00
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -607,7 +607,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_ProgramChange, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x20C00500U; // MT=2, Group=0, Status=0xC0, Data1=0x05
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -628,7 +628,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_ChannelPressure, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x20D04000U; // MT=2, Group=0, Status=0xD0, Data1=0x40
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -649,7 +649,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_PitchBend, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x20E00040U; // MT=2, Group=0, Status=0xE0, Data1=0x00, Data2=0x40
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -671,7 +671,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_ControlChange, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x20B00740U; // MT=2, Group=0, Status=0xB0, Data1=0x07, Data2=0x40
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -697,7 +697,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_TimingClock, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x10F80000U; // MT=1, Group=0, Status=0xF8
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -717,7 +717,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_Start, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x10FA0000U; // MT=1, Group=0, Status=0xFA
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -737,7 +737,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_Stop, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x10FC0000U; // MT=1, Group=0, Status=0xFC
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -757,7 +757,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SongPositionPointer, TestSize.Leve
     std::vector<uint8_t> output;
     uint32_t ump = 0x10F21234U; // MT=1, Group=0, Status=0xF2, Data1=0x12, Data2=0x34
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -779,7 +779,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SongSelect, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x10F30500U; // MT=1, Group=0, Status=0xF3, Data1=0x05
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -800,7 +800,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_TuneRequest, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x10F60000U; // MT=1, Group=0, Status=0xF6
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -825,7 +825,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_Complete, TestSize.Level1)
     // MT=3, Group=0, Status=0 (Complete), Count=3, Data=[01,02,03]
     uint32_t ump[] = { 0x30030102U, 0x03000000U };
 
-    processor_.ProcessUmp(ump, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -851,7 +851,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_Complete_6Bytes, TestSize.Le
     // MT=3, Group=0, Status=0 (Complete), Count=6, Data=[01,02,03,04,05,06]
     uint32_t ump[] = { 0x30060102U, 0x03040506U };
 
-    processor_.ProcessUmp(ump, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -880,7 +880,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_EmptyComplete, TestSize.Leve
     // MT=3, Group=0, Status=0 (Complete), Count=0
     uint32_t ump[] = { 0x30000000U, 0x00000000U };
 
-    processor_.ProcessUmp(ump, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -906,7 +906,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_StartEnd, TestSize.Level1)
     // Packet 2: End, Status=3, Count=2, Data=[07,08]
     uint32_t ump2[] = { 0x30320708U, 0x00000000U };
 
-    auto cb = [&](const uint8_t* data, size_t len) {
+    auto cb = [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -945,7 +945,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_StartContinueEnd, TestSize.L
     // Packet 3: End, Status=3, Count=2, Data=[0D,0E]
     uint32_t ump3[] = { 0x30320D0EU, 0x00000000U };
 
-    auto cb = [&](const uint8_t* data, size_t len) {
+    auto cb = [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -983,7 +983,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_LargeMultiPacket, TestSize.L
     // Packet 4: End, Count=2
     uint32_t ump4[] = { 0x30321314U, 0x00000000U };
 
-    auto cb = [&](const uint8_t* data, size_t len) {
+    auto cb = [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1020,7 +1020,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_MultipleMessageTypes, TestSize.Lev
         0x30030102U, 0x03000000U  // SysEx Complete
     };
 
-    processor_.ProcessUmp(ump, 4, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump, 4, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1058,7 +1058,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysExInterrupted, TestSize.Level1)
     // Packet 3: End, Count=2, Data=AC AD
     uint32_t ump3[] = { 0x3032ACADU, 0x00000000U };
 
-    auto cb = [&](const uint8_t* data, size_t len) {
+    auto cb = [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1101,7 +1101,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_UnknownMessageType, TestSize.Level
         0x20903C64U     // Note On
     };
 
-    processor_.ProcessUmp(ump, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1125,7 +1125,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_ResetClearsSysEx, TestSize.Level1)
 
     // Start a SysEx
     uint32_t ump1[] = { 0x30160102U, 0x03040506U };
-    processor_.ProcessUmp(ump1, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump1, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1137,7 +1137,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_ResetClearsSysEx, TestSize.Level1)
     // Continue after reset should produce nothing (state was cleared)
     output.clear();
     uint32_t ump2[] = { 0x30220708U, 0x00000000U };
-    processor_.ProcessUmp(ump2, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump2, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1156,7 +1156,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_EmptyInput, TestSize.Level1)
 {
     std::vector<uint8_t> output;
 
-    processor_.ProcessUmp(nullptr, 0, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(nullptr, 0, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1166,7 +1166,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_EmptyInput, TestSize.Level1)
 
     // Also test with valid pointer but zero count
     uint32_t dummy = 0;
-    processor_.ProcessUmp(&dummy, 0, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&dummy, 0, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1191,14 +1191,14 @@ HWTEST_F(UmpProcessorUnitTest, TestRoundTrip_ChannelVoice, TestSize.Level1)
 
     // Step 1: MIDI 1.0 -> UMP
     std::vector<UmpPacket> umpResults;
-    processor_.ProcessBytes(original, 3, [&](const UmpPacket& p) {
+    processor_.ProcessBytes(original, 3, [&umpResults](const UmpPacket& p) {
         umpResults.push_back(p);
     });
     ASSERT_EQ(umpResults.size(), 1);
 
     // Step 2: UMP -> MIDI 1.0
     std::vector<uint8_t> midi1Results;
-    processor_.ProcessUmpPacket(umpResults[0], [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmpPacket(umpResults[0], [&midi1Results](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             midi1Results.push_back(data[i]);
         }
@@ -1226,7 +1226,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRoundTrip_SysEx_Complete, TestSize.Level1)
 
     // Step 1: MIDI 1.0 -> UMP
     std::vector<UmpPacket> umpResults;
-    processor_.ProcessBytes(original, 5, [&](const UmpPacket& p) {
+    processor_.ProcessBytes(original, 5, [&umpResults](const UmpPacket& p) {
         umpResults.push_back(p);
     });
     ASSERT_EQ(umpResults.size(), 1);
@@ -1234,7 +1234,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRoundTrip_SysEx_Complete, TestSize.Level1)
     // Step 2: UMP -> MIDI 1.0
     processor_.Reset();
     std::vector<uint8_t> midi1Results;
-    processor_.ProcessUmpPacket(umpResults[0], [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmpPacket(umpResults[0], [&midi1Results](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             midi1Results.push_back(data[i]);
         }
@@ -1263,7 +1263,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_ContinueWithoutStart, TestSi
     // Continue packet without any prior Start
     uint32_t ump[] = { 0x30260102U, 0x03040506U };
 
-    processor_.ProcessUmp(ump, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1285,7 +1285,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_EndWithoutStart, TestSize.Le
     // End packet without any prior Start
     uint32_t ump[] = { 0x30320102U, 0x00000000U };
 
-    processor_.ProcessUmp(ump, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1311,7 +1311,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_CountBoundary, TestSize.Leve
 
     // Start with count=0
     uint32_t ump1[] = { 0x30100000U, 0x00000000U };
-    processor_.ProcessUmp(ump1, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump1, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1324,7 +1324,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_SysEx_CountBoundary, TestSize.Leve
     // End with count=0
     output.clear();
     uint32_t ump2[] = { 0x30300000U, 0x00000000U };
-    processor_.ProcessUmp(ump2, 2, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(ump2, 2, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
@@ -1354,7 +1354,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRoundTrip_SysEx_MultiPacket, TestSize.Level1)
 
     // Step 1: MIDI 1.0 -> UMP
     std::vector<UmpPacket> umpResults;
-    processor_.ProcessBytes(original, sizeof(original), [&](const UmpPacket& p) {
+    processor_.ProcessBytes(original, sizeof(original), [&umpResults](const UmpPacket& p) {
         umpResults.push_back(p);
     });
     ASSERT_EQ(umpResults.size(), 2);
@@ -1363,7 +1363,7 @@ HWTEST_F(UmpProcessorUnitTest, TestRoundTrip_SysEx_MultiPacket, TestSize.Level1)
     processor_.Reset();
     std::vector<uint8_t> midi1Results;
     for (const auto& p : umpResults) {
-        processor_.ProcessUmpPacket(p, [&](const uint8_t* data, size_t len) {
+        processor_.ProcessUmpPacket(p, [&midi1Results](const uint8_t* data, size_t len) {
             for (size_t i = 0; i < len; ++i) {
                 midi1Results.push_back(data[i]);
             }
@@ -1387,7 +1387,7 @@ HWTEST_F(UmpProcessorUnitTest, TestUmpToMidi1_MTCQuarterFrame, TestSize.Level1)
     std::vector<uint8_t> output;
     uint32_t ump = 0x10F11200U; // MT=1, Group=0, Status=0xF1, Data1=0x12
 
-    processor_.ProcessUmp(&ump, 1, [&](const uint8_t* data, size_t len) {
+    processor_.ProcessUmp(&ump, 1, [&output](const uint8_t* data, size_t len) {
         for (size_t i = 0; i < len; ++i) {
             output.push_back(data[i]);
         }
