@@ -100,6 +100,7 @@ private:
         
     struct OutputContext {
         snd_rawmidi_t *rawmidi = nullptr;
+        std::shared_ptr<UmpProcessor> processor;
     };
     void InputThreadLoop(std::shared_ptr<InputContext> ctx);
     void ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t bufferSize);
