@@ -14,6 +14,7 @@
  */
 
 #include "ump_processor.h"
+#include <vector>
 namespace {
     // --- MIDI 1.0 Constants ---
     constexpr uint8_t MIDI_REALTIME_START = 0xF8;
@@ -65,7 +66,8 @@ namespace {
 UmpProcessor::UmpProcessor()
     : group_(0),
       cv_pos_(0), running_status_(0), expected_len_(0),
-      in_sysex_(false), sysex_pos_(0), sysex_has_started_(false)
+      in_sysex_(false), sysex_pos_(0), sysex_has_started_(false),
+      reverse_sysex_active_(false)
 {
     // Initialize buffers to zero
     for (auto &b : cv_buffer_) {
@@ -272,4 +274,237 @@ void UmpProcessor::DispatchSysExPacket(UmpCallback callback, uint8_t status_code
     }
 
     callback({ w0, w1 });
+}
+
+// ============================================================
+// Part 4: UMP -> MIDI 1.0 (New Implementation)
+// ============================================================
+
+void UmpProcessor::Reset()
+{
+    // Clear MIDI 1.0 -> UMP state
+    cv_pos_ = 0;
+    running_status_ = 0;
+    expected_len_ = 0;
+    in_sysex_ = false;
+    sysex_pos_ = 0;
+    sysex_has_started_ = false;
+
+    for (auto &b : cv_buffer_) {
+        b = 0;
+    }
+    for (auto &b : sysex_buffer_) {
+        b = 0;
+    }
+
+    // Clear UMP -> MIDI 1.0 state
+    reverse_sysex_active_ = false;
+}
+
+void UmpProcessor::ProcessUmp(const uint32_t* packets, size_t wordCount, Midi1Callback callback)
+{
+    if (packets == nullptr || wordCount == 0) {
+        return;
+    }
+
+    for (size_t i = 0; i < wordCount;) {
+        uint32_t word0 = packets[i];
+        uint8_t mt = (word0 >> SHIFT_MT) & 0x0F;
+
+        switch (mt) {
+            case UMP_MT_SYSTEM: // MT=0x1
+                ProcessUmpType1(word0, callback);
+                i += 1;
+                break;
+            case UMP_MT_CHANNEL: // MT=0x2
+                ProcessUmpType2(word0, callback);
+                i += 1;
+                break;
+            case UMP_MT_DATA: // MT=0x3
+                if (i + 1 < wordCount) {
+                    ProcessUmpType3(word0, packets[i + 1], callback);
+                    i += 2;
+                } else {
+                    // Incomplete MT=3 packet (missing word1), skip with zero word1
+                    ProcessUmpType3(word0, 0, callback);
+                    i += 1;
+                }
+                break;
+            default:
+                // Unknown message type, skip one word
+                i += 1;
+                break;
+        }
+    }
+}
+
+void UmpProcessor::ProcessUmpPacket(const UmpPacket& packet, Midi1Callback callback)
+{
+    uint8_t wordCount = packet.WordCount();
+    if (wordCount == 0) {
+        return;
+    }
+
+    // Extract words from UmpPacket
+    uint32_t words[4] = {0};
+    for (uint8_t i = 0; i < wordCount && i < 4; ++i) {
+        words[i] = packet.Word(i);
+    }
+
+    ProcessUmp(words, wordCount, callback);
+}
+
+void UmpProcessor::ProcessUmpType1(uint32_t word0, Midi1Callback callback)
+{
+    /**
+     * MT=0x1: System Common / Real-Time Messages (32-bit)
+     * Word 0 Layout:
+     * [MT:4][Group:4][Status:8][Data1:8][Data2:8]
+     *  28     24-27    16-23     8-15     0-7
+     */
+    uint8_t status = (word0 >> SHIFT_BYTE_0) & 0xFF;
+    uint8_t data1 = (word0 >> SHIFT_BYTE_1) & 0xFF;
+    uint8_t data2 = (word0 >> SHIFT_BYTE_2) & 0xFF;
+
+    std::vector<uint8_t> output;
+
+    switch (status) {
+        case 0xF1: // MTC Quarter Frame - 2 bytes
+            output.push_back(status);
+            output.push_back(data1);
+            break;
+        case 0xF2: // Song Position Pointer - 3 bytes
+            output.push_back(status);
+            output.push_back(data1);
+            output.push_back(data2);
+            break;
+        case 0xF3: // Song Select - 2 bytes
+            output.push_back(status);
+            output.push_back(data1);
+            break;
+        case 0xF6: // Tune Request - 1 byte
+            output.push_back(status);
+            break;
+        case 0xF8: // Timing Clock - 1 byte
+        case 0xF9: // Measure End (Undefined/MSB)
+        case 0xFA: // Start - 1 byte
+        case 0xFB: // Continue - 1 byte
+        case 0xFC: // Stop - 1 byte
+        case 0xFD: // Undefined
+        case 0xFE: // Active Sensing - 1 byte
+        case 0xFF: // System Reset - 1 byte
+            output.push_back(status);
+            break;
+        default:
+            // Unknown system message, ignore
+            break;
+    }
+
+    if (!output.empty()) {
+        callback(output.data(), output.size());
+    }
+}
+
+void UmpProcessor::ProcessUmpType2(uint32_t word0, Midi1Callback callback)
+{
+    /**
+     * MT=0x2: Channel Voice Messages (32-bit)
+     * Word 0 Layout:
+     * [MT:4][Group:4][Status:8][Data1:8][Data2:8]
+     *  28     24-27    16-23     8-15     0-7
+     */
+    uint8_t status = (word0 >> SHIFT_BYTE_0) & 0xFF;
+    uint8_t data1 = (word0 >> SHIFT_BYTE_1) & 0xFF;
+    uint8_t data2 = (word0 >> SHIFT_BYTE_2) & 0xFF;
+
+    std::vector<uint8_t> output;
+    output.push_back(status);
+
+    uint8_t cmd = status & 0xF0;
+
+    if (cmd == MIDI_STATUS_PROG_CHANGE || cmd == MIDI_STATUS_CHAN_PRESSURE) {
+        // 2-byte messages (status + 1 data byte)
+        output.push_back(data1);
+    } else {
+        // 3-byte messages (status + 2 data bytes)
+        output.push_back(data1);
+        output.push_back(data2);
+    }
+
+    callback(output.data(), output.size());
+}
+
+void UmpProcessor::ProcessUmpType3(uint32_t word0, uint32_t word1, Midi1Callback callback)
+{
+    /**
+     * MT=0x3: SysEx Data Messages (64-bit)
+     * Word 0 Layout:
+     * [MT:4][Group:4][Status:4][Count:4][Data1:8][Data2:8]
+     *  28     24-27    20-23    16-19    8-15     0-7
+     *
+     * Word 1 Layout:
+     * [Data3:8][Data4:8][Data5:8][Data6:8]
+     *   24-31    16-23     8-15     0-7
+     */
+    uint8_t status = (word0 >> SHIFT_STATUS) & 0x0F;
+    uint8_t count = (word0 >> SHIFT_COUNT) & 0x0F;
+
+    // Extract 6 bytes of data
+    uint8_t data[6];
+    data[0] = (word0 >> SHIFT_BYTE_1) & 0xFF;
+    data[1] = (word0 >> SHIFT_BYTE_2) & 0xFF;
+    data[2] = (word1 >> SHIFT_BYTE_3) & 0xFF;
+    data[3] = (word1 >> SHIFT_BYTE_4) & 0xFF;
+    data[4] = (word1 >> SHIFT_BYTE_5) & 0xFF;
+    data[5] = (word1 >> SHIFT_BYTE_6) & 0xFF;
+
+    std::vector<uint8_t> output;
+
+    switch (status) {
+        case SYSEX_STATUS_COMPLETE: // 0x0
+            // Complete single-packet SysEx: F0 + data[0..count-1] + F7
+            output.push_back(MIDI_SYSEX_START);
+            for (uint8_t i = 0; i < count && i < 6; ++i) {
+                output.push_back(data[i]);
+            }
+            output.push_back(MIDI_SYSEX_END);
+            reverse_sysex_active_ = false;
+            break;
+
+        case SYSEX_STATUS_START: // 0x1
+            // Multi-packet start: F0 + data[0..count-1]
+            output.push_back(MIDI_SYSEX_START);
+            for (uint8_t i = 0; i < count && i < 6; ++i) {
+                output.push_back(data[i]);
+            }
+            reverse_sysex_active_ = true;
+            break;
+
+        case SYSEX_STATUS_CONTINUE: // 0x2
+            // Multi-packet continue: output data[0..count-1]
+            if (reverse_sysex_active_) {
+                for (uint8_t i = 0; i < count && i < 6; ++i) {
+                    output.push_back(data[i]);
+                }
+            }
+            break;
+
+        case SYSEX_STATUS_END: // 0x3
+            // Multi-packet end: data[0..count-1] + F7
+            for (uint8_t i = 0; i < count && i < 6; ++i) {
+                output.push_back(data[i]);
+            }
+            output.push_back(MIDI_SYSEX_END);
+            reverse_sysex_active_ = false;
+            break;
+
+        default:
+            // Unknown status, reset state
+            reverse_sysex_active_ = false;
+            break;
+    }
+
+    if (!output.empty()) {
+        callback(output.data(), output.size());
+    }
 }
