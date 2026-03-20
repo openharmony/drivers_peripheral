@@ -61,6 +61,11 @@ namespace {
     constexpr uint8_t INDEX_5 = 5;
 
     constexpr int DATA_LEN_2 = 2;
+
+    // --- UMP Packet Word Constants ---
+    constexpr uint8_t UMP_WORD_COUNT_MT3 = 2;            // MT=3 packets use 2 words
+    constexpr uint8_t UMP_PACKET_MAX_WORDS = 4;          // Maximum words in an UmpPacket
+    constexpr uint8_t SYSEX_DATA_BYTES_PER_PACKET = 6;   // Max SysEx data bytes per UMP packet
 }
 
 UmpProcessor::UmpProcessor()
@@ -323,7 +328,7 @@ void UmpProcessor::ProcessUmp(const uint32_t* packets, size_t wordCount, Midi1Ca
             case UMP_MT_DATA: // MT=0x3
                 if (i + 1 < wordCount) {
                     ProcessUmpType3(word0, packets[i + 1], callback);
-                    i += 2;
+                    i += UMP_WORD_COUNT_MT3;
                 } else {
                     // Incomplete MT=3 packet (missing word1), skip with zero word1
                     ProcessUmpType3(word0, 0, callback);
@@ -346,8 +351,8 @@ void UmpProcessor::ProcessUmpPacket(const UmpPacket& packet, Midi1Callback callb
     }
 
     // Extract words from UmpPacket
-    uint32_t words[4] = {0};
-    for (uint8_t i = 0; i < wordCount && i < 4; ++i) {
+    uint32_t words[UMP_PACKET_MAX_WORDS] = {0};
+    for (uint8_t i = 0; i < wordCount && i < UMP_PACKET_MAX_WORDS; ++i) {
         words[i] = packet.Word(i);
     }
 
@@ -450,7 +455,7 @@ void UmpProcessor::ProcessUmpType3(uint32_t word0, uint32_t word1, Midi1Callback
     uint8_t count = (word0 >> SHIFT_COUNT) & 0x0F;
 
     // Extract 6 bytes of data
-    uint8_t data[6];
+    uint8_t data[SYSEX_DATA_BYTES_PER_PACKET];
     data[0] = (word0 >> SHIFT_BYTE_1) & 0xFF;
     data[1] = (word0 >> SHIFT_BYTE_2) & 0xFF;
     data[2] = (word1 >> SHIFT_BYTE_3) & 0xFF;
@@ -464,7 +469,7 @@ void UmpProcessor::ProcessUmpType3(uint32_t word0, uint32_t word1, Midi1Callback
         case SYSEX_STATUS_COMPLETE: // 0x0
             // Complete single-packet SysEx: F0 + data[0..count-1] + F7
             output.push_back(MIDI_SYSEX_START);
-            for (uint8_t i = 0; i < count && i < 6; ++i) {
+            for (uint8_t i = 0; i < count && i < SYSEX_DATA_BYTES_PER_PACKET; ++i) {
                 output.push_back(data[i]);
             }
             output.push_back(MIDI_SYSEX_END);
@@ -474,7 +479,7 @@ void UmpProcessor::ProcessUmpType3(uint32_t word0, uint32_t word1, Midi1Callback
         case SYSEX_STATUS_START: // 0x1
             // Multi-packet start: F0 + data[0..count-1]
             output.push_back(MIDI_SYSEX_START);
-            for (uint8_t i = 0; i < count && i < 6; ++i) {
+            for (uint8_t i = 0; i < count && i < SYSEX_DATA_BYTES_PER_PACKET; ++i) {
                 output.push_back(data[i]);
             }
             reverse_sysex_active_ = true;
@@ -483,7 +488,7 @@ void UmpProcessor::ProcessUmpType3(uint32_t word0, uint32_t word1, Midi1Callback
         case SYSEX_STATUS_CONTINUE: // 0x2
             // Multi-packet continue: output data[0..count-1]
             if (reverse_sysex_active_) {
-                for (uint8_t i = 0; i < count && i < 6; ++i) {
+                for (uint8_t i = 0; i < count && i < SYSEX_DATA_BYTES_PER_PACKET; ++i) {
                     output.push_back(data[i]);
                 }
             }
@@ -491,7 +496,7 @@ void UmpProcessor::ProcessUmpType3(uint32_t word0, uint32_t word1, Midi1Callback
 
         case SYSEX_STATUS_END: // 0x3
             // Multi-packet end: data[0..count-1] + F7
-            for (uint8_t i = 0; i < count && i < 6; ++i) {
+            for (uint8_t i = 0; i < count && i < SYSEX_DATA_BYTES_PER_PACKET; ++i) {
                 output.push_back(data[i]);
             }
             output.push_back(MIDI_SYSEX_END);
