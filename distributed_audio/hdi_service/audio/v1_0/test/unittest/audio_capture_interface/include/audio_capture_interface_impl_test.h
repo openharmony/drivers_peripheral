@@ -18,8 +18,8 @@
 
 #include <gtest/gtest.h>
 
-#include <v1_0/iaudio_capture.h>
-#include <v2_1/id_audio_manager.h>
+#include <v2_0/iaudio_capture.h>
+#include <v3_0/id_audio_manager.h>
 
 #include "audio_test_utils.h"
 #define private public
@@ -30,10 +30,10 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
 
 class AudioCaptureInterfaceImplTest : public testing::Test {
 public:
@@ -50,7 +50,7 @@ public:
     static constexpr uint32_t SAMPLE_RATE = 48000;
     static constexpr uint32_t CHANNEL_COUNT = 1;
 };
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI

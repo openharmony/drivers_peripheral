@@ -26,7 +26,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 void DestroyRenderFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
@@ -39,7 +39,7 @@ void DestroyRenderFuzzTest(const uint8_t* data, size_t size)
     uint32_t renderId = *(reinterpret_cast<const uint32_t*>(data));
     audioAdapter->DestroyRender(renderId);
 }
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI
@@ -49,7 +49,7 @@ void DestroyRenderFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::DistributedAudio::Audio::V1_0::DestroyRenderFuzzTest(data, size);
+    OHOS::HDI::DistributedAudio::Audio::V2_0::DestroyRenderFuzzTest(data, size);
     return 0;
 }
 

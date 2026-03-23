@@ -26,7 +26,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 void GetAllAdaptersFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
@@ -40,7 +40,7 @@ void GetAllAdaptersFuzzTest(const uint8_t* data, size_t size)
     descriptors.push_back(desc);
     AudioManagerInterfaceImpl::GetAudioManager()->GetAllAdapters(descriptors);
 }
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI
@@ -50,7 +50,7 @@ void GetAllAdaptersFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::DistributedAudio::Audio::V1_0::GetAllAdaptersFuzzTest(data, size);
+    OHOS::HDI::DistributedAudio::Audio::V2_0::GetAllAdaptersFuzzTest(data, size);
     return 0;
 }
 

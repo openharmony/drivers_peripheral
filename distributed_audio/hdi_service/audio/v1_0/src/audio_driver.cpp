@@ -17,12 +17,12 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include <v1_0/audio_manager_stub.h>
+#include <v2_0/audio_manager_stub.h>
 
 #include "audio_manager_interface_impl.h"
 #include <shared_mutex>
 
-using namespace OHOS::HDI::DistributedAudio::Audio::V1_0;
+using namespace OHOS::HDI::DistributedAudio::Audio::V2_0;
 
 namespace {
     std::shared_mutex mutex_;

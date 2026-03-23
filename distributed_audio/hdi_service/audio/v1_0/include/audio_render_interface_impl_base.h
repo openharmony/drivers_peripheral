@@ -20,18 +20,18 @@
 #include <string>
 #include <cmath>
 
-#include <v1_0/audio_types.h>
-#include <v1_0/iaudio_render.h>
-#include <v2_1/id_audio_manager.h>
+#include <v2_0/audio_types.h>
+#include <v2_0/iaudio_render.h>
+#include <v3_0/id_audio_manager.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
 typedef enum {
     RENDER_STATUS_OPEN = 0,
     RENDER_STATUS_CLOSE,
@@ -58,7 +58,7 @@ public:
     virtual void SetRenderStatus(AudioRenderStatus status) = 0;
     virtual sptr<IAudioCallback> GetAudioCallback() = 0;
 };
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI

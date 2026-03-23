@@ -25,7 +25,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 static constexpr int32_t DEFAULT_CAPTURE_ID = 1 << 27 | 1 << 0;
 
 void AudioAdapterInterfaceImpTest::SetUpTestCase(void) {}
@@ -1767,7 +1767,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetUsualParamChange_001, TestSize.Level1)
     AdapterTest_->sinkDhId_ = dhid;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetUsualParamChange(condition, param));
 }
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI

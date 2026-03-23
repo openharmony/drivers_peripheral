@@ -32,7 +32,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
+namespace V2_0 {
 void AudioManagerInterfaceImplTest::SetUpTestCase(void) {}
 
 void AudioManagerInterfaceImplTest::TearDownTestCase(void) {}
@@ -304,7 +304,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, RegisterAudioHdfListener_001, TestSize.L
     sptr<IDAudioHdfCallback> callback = nullptr;
     EXPECT_EQ(HDF_FAILURE, audioManagerInterfaceImpl_->RegisterAudioHdfListener(adpName, callback));
 }
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI
