@@ -32,10 +32,10 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
 
 class AudioAdapterInterfaceImpTest : public testing::Test {
 public:
@@ -47,7 +47,7 @@ public:
     sptr<IDAudioCallback> callback_ = nullptr;
     std::shared_ptr<AudioAdapterInterfaceImpl> AdapterTest_ = nullptr;
 };
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI

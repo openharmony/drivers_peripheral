@@ -26,7 +26,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V2_1 {
+namespace V3_0 {
 void UnRegisterAudioHdfListenerFuzzTest(const uint8_t* data, size_t size)
 {
     if (data == nullptr) {
@@ -36,7 +36,7 @@ void UnRegisterAudioHdfListenerFuzzTest(const uint8_t* data, size_t size)
     std::string adpName(reinterpret_cast<const char*>(data), size);
     DAudioManagerInterfaceImpl::GetDAudioManager()->UnRegisterAudioHdfListener(adpName);
 }
-} // V2_1
+} // V3_0
 } // AudioExt
 } // Distributedaudio
 } // HDI
@@ -46,7 +46,7 @@ void UnRegisterAudioHdfListenerFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::DistributedAudio::Audioext::V2_1::UnRegisterAudioHdfListenerFuzzTest(data, size);
+    OHOS::HDI::DistributedAudio::Audioext::V3_0::UnRegisterAudioHdfListenerFuzzTest(data, size);
     return 0;
 }
 

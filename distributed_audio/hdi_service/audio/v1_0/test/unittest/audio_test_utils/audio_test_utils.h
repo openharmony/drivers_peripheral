@@ -19,10 +19,10 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <v1_0/iaudio_callback.h>
-#include <v1_0/iaudio_capture.h>
-#include <v1_0/iaudio_render.h>
-#include <v2_1/id_audio_callback.h>
+#include <v2_0/iaudio_callback.h>
+#include <v2_0/iaudio_capture.h>
+#include <v2_0/iaudio_render.h>
+#include <v3_0/id_audio_callback.h>
 
 #include "daudio_errcode.h"
 
@@ -30,13 +30,13 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::CurrentTime;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::IAudioCallback;
 class MockIDAudioCallback : public IDAudioCallback {
 public:
     MockIDAudioCallback() {}
@@ -173,6 +173,16 @@ public:
         return DistributedHardware::DH_SUCCESS;
     }
 
+    int32_t SetVolumeWithRamp(float volume, uint32_t duration) override
+    {
+        return DistributedHardware::DH_SUCCESS;
+    }
+
+    int32_t SetBufferSize(uint32_t size) override
+    {
+        return DistributedHardware::DH_SUCCESS;
+    }
+
     int32_t GetVolume(float &volume) override
     {
         return DistributedHardware::DH_SUCCESS;
@@ -300,6 +310,11 @@ public:
     ~MockIAudioCapture() {}
 
     int32_t CaptureFrame(std::vector<int8_t> &frame, uint64_t &replyBytes) override
+    {
+        return DistributedHardware::DH_SUCCESS;
+    }
+
+    int32_t CaptureFrameEc(const AudioFrameLen &frameLen, AudioCaptureFrameInfo &frameInfo) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
@@ -544,7 +559,7 @@ public:
         return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
 };
-} // V1_0
+} // V2_0
 } // AudioExt
 } // Distributedaudio
 } // HDI

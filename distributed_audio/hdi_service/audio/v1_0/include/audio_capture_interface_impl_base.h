@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,17 +18,17 @@
 
 #include <string>
 
-#include <v1_0/iaudio_capture.h>
-#include <v2_1/id_audio_manager.h>
+#include <v2_0/iaudio_capture.h>
+#include <v3_0/id_audio_manager.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
 typedef enum {
     CAPTURE_STATUS_OPEN = 0,
     CAPTURE_STATUS_CLOSE,
@@ -49,7 +49,7 @@ public:
     virtual AudioCaptureStatus GetCaptureStatus() = 0;
     virtual void SetCaptureStatus(AudioCaptureStatus status) = 0;
 };
-} // V1_0
+} // V2_0
 } // Audio
 } // Distributedaudio
 } // HDI
