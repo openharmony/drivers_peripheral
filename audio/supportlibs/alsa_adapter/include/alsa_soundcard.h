@@ -25,7 +25,6 @@
 #include "hdf_sbuf.h"
 #include "audio_uhdf_log.h"
 #include "securec.h"
-#include "local.h"
 
 #ifdef __cplusplus
 extern "C" {
