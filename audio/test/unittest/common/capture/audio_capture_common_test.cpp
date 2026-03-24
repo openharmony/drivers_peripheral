@@ -1279,4 +1279,21 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapability001, TestSize.Le
     ASSERT_NE(ret, HDF_ERR_NOT_SUPPORT);
 }
 
+HWTEST_F(AudioUtCaptureTest, CaptureGetFrameCountNull001, TestSize.Level1)
+{
+    uint64_t frameCount = 0;
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, capture_->GetFrameCount(nullptr, &frameCount));
+}
+
+HWTEST_F(AudioUtCaptureTest, CaptureGetFrameCountNull002, TestSize.Level1)
+{
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, capture_->GetFrameCount(capture_, nullptr));
+}
+
+HWTEST_F(AudioUtCaptureTest, CaptureGetFrameCountIsValid001, TestSize.Level0)
+{
+    uint64_t frameCount = 0;
+    EXPECT_EQ(HDF_SUCCESS, capture_->GetFrameCount(capture_, &frameCount));
+}
+
 } // end of name space
