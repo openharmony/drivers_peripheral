@@ -35,7 +35,7 @@ using namespace testing::ext;
 namespace {
 static const uint32_t g_audioAdapterNumMax = 5;
 const int32_t AUDIO_ADAPTER_BUF_TEST = 1024;
-
+const int32_t INVALID_ID = -1;
 class HdfAudioUtAdapterTest : public testing::Test {
 public:
     struct IAudioManager *manager_ = nullptr;
@@ -1588,12 +1588,69 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterUpdateAudioRouteNull001, TestSize
     EXPECT_NE(HDF_SUCCESS, adapter_->UpdateAudioRoute(nullptr, &route, &routeHandle));
 }
 
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterUpdateAudioRouteNull002, TestSize.Level1)
+{
+    struct AudioRoute route = {};
+    EXPECT_NE(HDF_SUCCESS, adapter_->UpdateAudioRoute(adapter_, &route, nullptr));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterUpdateAudioRouteNull003, TestSize.Level1)
+{
+    int32_t routeHandle = 0;
+    EXPECT_NE(HDF_SUCCESS, adapter_->UpdateAudioRoute(adapter_, nullptr, &routeHandle));
+}
+
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterUpdateAudioRouteIsvalid001, TestSize.Level1)
 {
     struct AudioRoute route = {};
     int32_t routeHandle = 0;
     int32_t ret = adapter_->UpdateAudioRoute(adapter_, &route, &routeHandle);
     ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCognitionStreamNull001, TestSize.Level0)
+{
+    int32_t ret = adapter_->CreateCognitionStream(nullptr, nullptr, nullptr, nullptr);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCognitionStreamNull002, TestSize.Level0)
+{
+    int32_t cogStreamId = INVALID_ID;
+    int32_t ret = adapter_->CreateCognitionStream(nullptr, nullptr, &cogStreamId, nullptr);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCognitionStreamNull003, TestSize.Level0)
+{
+    int32_t cogStreamId = INVALID_ID;
+    struct AudioMmapBufferDescriptor desc = {0};
+    int32_t ret = adapter_->CreateCognitionStream(nullptr, nullptr, &cogStreamId, &desc);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCognitionStreamNull004, TestSize.Level0)
+{
+    int32_t cogStreamId = INVALID_ID;
+    struct AudioMmapBufferDescriptor desc = {0};
+    struct AudioSampleAttributes attrs = {};
+    int32_t ret = adapter_->CreateCognitionStream(nullptr, &attrs, &cogStreamId, &desc);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCognitionStream001, TestSize.Level0)
+{
+    int32_t cogStreamId = INVALID_ID;
+    struct AudioMmapBufferDescriptor desc = {0};
+    struct AudioSampleAttributes attrs = {};
+    InitAttrs(attrs);
+
+    int32_t ret = adapter_->CreateCognitionStream(adapter_, &attrs, &cogStreamId, &desc);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_SUCCESS);
+    if (ret == HDF_SUCCESS && cogStreamId >= 0) {
+        ret = adapter_-> DestroyCognitionStream(adapter_, cogStreamId);
+        ASSERT_TRUE(ret == HDF_SUCCESS);
+    }
 }
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterReleaseAudioRouteNull001, TestSize.Level1)
