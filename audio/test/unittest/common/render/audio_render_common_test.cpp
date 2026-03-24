@@ -347,6 +347,46 @@ HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityIsValid001, TestSize.Level
     EXPECT_EQ(HDF_SUCCESS, render_->CheckSceneCapability(render_, &scene, &supported));
 }
 
+HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityIsValid002, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    bool supported = false;
+    scene.scene.id = AUDIO_IN_COMMUNICATION;
+    scene.desc = devDescRender_;
+    int32_t ret = render_->CheckSceneCapability(render_, &scene, &supported);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityIsValid003, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    bool supported = false;
+    scene.scene.id = AUDIO_IN_RINGTONE;
+    scene.desc = devDescRender_;
+    int32_t ret = render_->CheckSceneCapability(render_, &scene, &supported);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityIsValid004, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    bool supported = false;
+    scene.scene.id = AUDIO_IN_CALL;
+    scene.desc = devDescRender_;
+    int32_t ret = render_->CheckSceneCapability(render_, &scene, &supported);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityIsValid005, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    bool supported = false;
+    scene.scene.id = AUDIO_MMAP_NOIRQ;
+    scene.desc = devDescRender_;
+    int32_t ret = render_->CheckSceneCapability(render_, &scene, &supported);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
 HWTEST_F(AudioUtRenderTest, RenderSelectSceneNull001, TestSize.Level1)
 {
     struct AudioSceneDescriptor scene;
@@ -488,6 +528,156 @@ HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid001, TestSize.Level0)
     EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
     scene.desc.pins = PIN_OUT_SPEAKER;
     EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid002, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_LINEOUT;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid003, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_HDMI;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid004, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_USB;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid005, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_USB_EXT;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid006, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_EARPIECE;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid007, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_BLUETOOTH_SCO;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid008, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_DAUDIO_DEFAULT;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid009, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_HEADPHONE;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid010, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_USB_HEADSET;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
+    free(scene.desc.desc);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid011, TestSize.Level0)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_BLUETOOTH_A2DP;
+    scene.desc.desc = strdup("mic");
+
+    int32_t ret = render_->SelectScene(render_, &scene);
+    if (ret != HDF_SUCCESS) {
+        scene.desc.pins = PIN_OUT_HEADSET;
+        EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
+    }
     free(scene.desc.desc);
 }
 
@@ -797,6 +987,52 @@ HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid001, TestSize.Level0)
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
+HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid002, TestSize.Level0)
+{
+    AudioChannelMode mode = AUDIO_CHANNEL_BOTH_LEFT;
+    int32_t ret = render_->SetChannelMode(render_, mode);
+
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid003, TestSize.Level0)
+{
+    AudioChannelMode mode = AUDIO_CHANNEL_BOTH_RIGHT;
+    int32_t ret = render_->SetChannelMode(render_, mode);
+
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid004, TestSize.Level0)
+{
+    AudioChannelMode mode = AUDIO_CHANNEL_EXCHANGE;
+    ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid005, TestSize.Level0)
+{
+    AudioChannelMode mode = AUDIO_CHANNEL_MIX;
+    ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid006, TestSize.Level0)
+{
+    AudioChannelMode mode = AUDIO_CHANNEL_LEFT_MUTE;
+    ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid007, TestSize.Level0)
+{
+    AudioChannelMode mode = AUDIO_CHANNEL_RIGHT_MUTE;
+    ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid008, TestSize.Level0)
+{
+    AudioChannelMode mode = AUDIO_CHANNEL_BOTH_MUTE;
+    ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+}
+
 HWTEST_F(AudioUtRenderTest, RenderSetGainNull001, TestSize.Level1)
 {
     float gain = 1.0;
@@ -863,6 +1099,89 @@ HWTEST_F(AudioUtRenderTest, RenderSetVolumeIsValid001, TestSize.Level1)
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
+HWTEST_F(AudioUtRenderTest, RenderSetVolumeWithRamp001, TestSize.Level1)
+{
+    float volume = 0.2;
+    uint32_t duration = 10;
+    int32_t ret = render_->SetVolumeWithRamp(render_, volume, duration);
+
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetVolumeWithRamp002, TestSize.Level1)
+{
+    float volume = 0.0;
+    uint32_t duration = 10;
+    int32_t ret = render_->SetVolumeWithRamp(render_, volume, duration);
+
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetVolumeWithRamp003, TestSize.Level1)
+{
+    float volume = 2.0;
+    uint32_t duration = 10;
+
+    ASSERT_NE(HDF_SUCCESS, render_->SetVolumeWithRamp(render_, volume, duration));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetVolumeWithRamp004, TestSize.Level1)
+{
+    float volume = -1.0;
+    uint32_t duration = 10;
+
+    ASSERT_NE(HDF_SUCCESS, render_->SetVolumeWithRamp(render_, volume, duration));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetVolumeWithRampNull001, TestSize.Level1)
+{
+    float volume = 0.2;
+    uint32_t duration = 10;
+    int32_t ret = render_->SetVolumeWithRamp(nullptr, volume, duration);
+
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_OBJECT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetAndGetVolumeWithRamp001, TestSize.Level1)
+{
+    float targetvolume = 0.2;
+    uint32_t duration = 10;
+    int32_t ret = render_->SetVolumeWithRamp(render_, targetvolume, duration);
+
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+
+    float val = 0.0;
+    ret = render_->GetVolume(render_, &val);
+
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetAndGetVolumeWithRampNull001, TestSize.Level1)
+{
+    float targetvolume = 0.2;
+    uint32_t duration = 10;
+    int32_t ret = render_->SetVolumeWithRamp(nullptr, targetvolume, duration);
+
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_OBJECT || ret == HDF_ERR_NOT_SUPPORT);
+
+    float val = 0.0;
+    ret = render_->GetVolume(nullptr, &val);
+
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSetAndGetVolumeWithRampNull002, TestSize.Level1)
+{
+    float targetvolume = 0.2;
+    uint32_t duration = 10;
+    int32_t ret = render_->SetVolumeWithRamp(nullptr, targetvolume, duration);
+
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_OBJECT || ret == HDF_ERR_NOT_SUPPORT);
+
+    ret = render_->GetVolume(render_, NULL);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
+}
+
 HWTEST_F(AudioUtRenderTest, RenderGetRenderSpeedIsInValid001, TestSize.Level0)
 {
     float speed = 0.0;
@@ -890,9 +1209,128 @@ HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid001, TestSize.Level1)
     ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 }
 
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid002, TestSize.Level1)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_BOTH_LEFT;
+    int32_t ret = render_->GetChannelMode(nullptr, &channelMode);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->GetChannelMode(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid003, TestSize.Level1)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_BOTH_RIGHT;
+    int32_t ret = render_->GetChannelMode(nullptr, &channelMode);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->GetChannelMode(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid004, TestSize.Level1)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_EXCHANGE;
+    int32_t ret = render_->GetChannelMode(nullptr, &channelMode);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->GetChannelMode(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid005, TestSize.Level1)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_MIX;
+    int32_t ret = render_->GetChannelMode(nullptr, &channelMode);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->GetChannelMode(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid006, TestSize.Level1)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_LEFT_MUTE;
+    int32_t ret = render_->GetChannelMode(nullptr, &channelMode);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->GetChannelMode(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid007, TestSize.Level1)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_RIGHT_MUTE;
+    int32_t ret = render_->GetChannelMode(nullptr, &channelMode);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->GetChannelMode(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid008, TestSize.Level1)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_BOTH_MUTE;
+    int32_t ret = render_->GetChannelMode(nullptr, &channelMode);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->GetChannelMode(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
+}
+
 HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid001, TestSize.Level0)
 {
     enum AudioChannelMode channelMode = AUDIO_CHANNEL_NORMAL;
+    int32_t ret = render_->GetChannelMode(render_, &channelMode);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid002, TestSize.Level0)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_BOTH_LEFT;
+    int32_t ret = render_->GetChannelMode(render_, &channelMode);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid003, TestSize.Level0)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_BOTH_RIGHT;
+    int32_t ret = render_->GetChannelMode(render_, &channelMode);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid004, TestSize.Level0)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_EXCHANGE;
+    int32_t ret = render_->GetChannelMode(render_, &channelMode);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid005, TestSize.Level0)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_MIX;
+    int32_t ret = render_->GetChannelMode(render_, &channelMode);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid006, TestSize.Level0)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_LEFT_MUTE;
+    int32_t ret = render_->GetChannelMode(render_, &channelMode);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid007, TestSize.Level0)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_RIGHT_MUTE;
+    int32_t ret = render_->GetChannelMode(render_, &channelMode);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid008, TestSize.Level0)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_BOTH_MUTE;
     int32_t ret = render_->GetChannelMode(render_, &channelMode);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
