@@ -830,6 +830,11 @@ int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlReques
     OHOS::HDI::Usb::V1_0::UsbDev dev = {GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)};
     uint32_t length = setupPacket.length > MAX_CONTROL_BUFF_SIZE ? MAX_CONTROL_BUFF_SIZE : setupPacket.length;
 
+    int32_t ret = g_DdkLibusbAdapter->OpenDevice(dev);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("OpenDevice is error");
+        return HDF_FAILURE;
+    }
     if (direction == USB_REQUEST_DIR_FROM_DEVICE) {
         OHOS::HDI::Usb::V1_1::UsbCtrlTransferParams ctrlParams = {
             static_cast<uint8_t>(setupPacket.requestType),
@@ -861,6 +866,7 @@ int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlReques
         transferredLength = data.size();
     }
 
+    (void) g_DdkLibusbAdapter->CloseDevice(dev);
     return HDF_SUCCESS;
 #endif // LIBUSB_ENABLE
 }
