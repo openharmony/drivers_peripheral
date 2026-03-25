@@ -17,6 +17,7 @@
 #include <cstring>
 #include <gtest/gtest.h>
 
+#include "v1_2/iusb_ddk.h"
 #include "usb_driver_manager.h"
 
 using namespace std;
