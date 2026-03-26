@@ -32,39 +32,6 @@ CodecHeifEncodeService::CodecHeifEncodeService()
     isIPCMode_ = (HdfRemoteGetCallingPid() == getpid() ? false : true);
 }
 
-CodecHeifEncodeService::~CodecHeifEncodeService()
-{
-    heifHwi_ = nullptr;
-    libHeif_ = nullptr;
-}
-
-bool CodecHeifEncodeService::LoadVendorLib()
-{
-    std::lock_guard<std::mutex> lk(mutex_);
-    if (heifHwi_) {
-        return true;
-    }
-    if (libHeif_ == nullptr) {
-        void *handle = dlopen(CODEC_HEIF_VDI_LIB_NAME, RTLD_LAZY);
-        if (handle == nullptr) {
-            CODEC_LOGE("failed to load vendor lib");
-            return false;
-        }
-        libHeif_ = std::shared_ptr<void>(handle, dlclose);
-    }
-    auto func = reinterpret_cast<GetCodecHeifHwi>(dlsym(libHeif_.get(), "GetCodecHeifHwi"));
-    if (func == nullptr) {
-        CODEC_LOGE("failed to load symbol from vendor lib");
-        return false;
-    }
-    heifHwi_ = func();
-    if (heifHwi_ == nullptr) {
-        CODEC_LOGE("failed to create heif hardware encoder");
-        return false;
-    }
-    return true;
-}
-
 int32_t CodecHeifEncodeService::DoHeifEncode(const std::vector<ImageItem>& inputImgs,
                                              const std::vector<MetaItem>& inputMetas,
                                              const std::vector<ItemRef>& refs,
