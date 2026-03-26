@@ -149,8 +149,8 @@ unsigned long long Hibernate::GetSwapFileSize()
     // Firstly, convert 24927047680B to larger even GB for 24GB
     // Then, the swap file size is the half size for 12884901888B
     int memGB = ConvertMemKB2GB(static_cast<unsigned long long>(info.totalram / B_PER_KB));
-    Hibernate::staticSwapFileSize = static_cast<unsigned long long>(memGB / SWAP_FACTOR)
-        * MB_PER_GB * KB_PER_MB * B_PER_KB;
+    Hibernate::staticSwapFileSize = static_cast<unsigned long long>(memGB / SWAP_FACTOR) *
+        MB_PER_GB * KB_PER_MB * B_PER_KB;
     HDF_LOGI("GetSwapFileSize, mem size is %{public}d GB, swap file size is %{public}llu KB",
         memGB, Hibernate::staticSwapFileSize);
     return Hibernate::staticSwapFileSize;
