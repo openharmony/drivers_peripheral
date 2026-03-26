@@ -35,6 +35,23 @@ extern "C" {
 static struct WpaCallbackEvent *g_wpaCallbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 static pthread_rwlock_t g_wpaCallbackMutex = PTHREAD_RWLOCK_INITIALIZER;
 
+bool HasRegisterCallback(const char *ifName, int nameLen)
+{
+    if (ifName == NULL || nameLen > IFNAMSIZ) {
+        return false;
+    }
+
+    pthread_rwlock_rdlock(&g_wpaCallbackMutex);
+    for (int i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_wpaCallbackEventMap[i] != NULL &&
+            (strncmp(g_wpaCallbackEventMap[i]->ifName, ifName, nameLen) == 0)) {
+            pthread_rwlock_unlock(&g_wpaCallbackMutex);
+            return true;
+        }
+    }
+    pthread_rwlock_unlock(&g_wpaCallbackMutex);
+    return false;
+}
 
 int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
 {
@@ -51,7 +68,7 @@ int32_t WpaRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, co
     }
     pthread_rwlock_wrlock(&g_wpaCallbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_wpaCallbackEventMap[i] != NULL  &&(strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0)
+        if (g_wpaCallbackEventMap[i] != NULL && (strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0)
             && g_wpaCallbackEventMap[i]->onRecFunc == onRecFunc) {
             HDF_LOGI("%s the onRecFunc has been registered!", __FUNCTION__);
             pthread_rwlock_unlock(&g_wpaCallbackMutex);
