@@ -36,7 +36,7 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
     int32_t err = HDF_ERR_INVALID_PARAM;
     std::lock_guard<std::mutex> lk(mutex_);
 
-   auto iter = compName2libName_.find(componentName);
+    auto iter = compName2libName_.find(componentName);
     if (iter == compName2libName_.end()) {
         CODEC_LOGE("can not find component[%{public}s] in core", componentName);
         return HDF_ERR_NOT_SUPPORT;
@@ -128,7 +128,7 @@ void ComponentMgr::CleanComponent()
     }
     components_.clear();
 
-   for (auto& [libName, core] : permanentLibs_) {
+    for (auto& [libName, core] : permanentLibs_) {
         core->DeInit();
     }
     permanentLibs_.clear();
@@ -137,7 +137,7 @@ void ComponentMgr::CleanComponent()
 int32_t ComponentMgr::GetCoreOfComponent(CodecOMXCore* &core, const std::string compName)
 {
     std::lock_guard<std::mutex> lk(mutex_);
-       auto iter = std::find_if(components_.begin(), components_.end(), [&compName](OMXComponent& comp) {
+    auto iter = std::find_if(components_.begin(), components_.end(), [&compName](OMXComponent& comp) {
         return comp.name == compName;
     });
     if (iter == components_.end()) {
