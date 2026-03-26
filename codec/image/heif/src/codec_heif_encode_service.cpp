@@ -51,11 +51,24 @@ int32_t CodecHeifEncodeService::DoHeifEncode(const std::vector<ImageItem>& input
 
     OHOS::VDI::HEIF::SharedBuffer outputToReturn = OHOS::VDI::HEIF::ConvertSharedBuffer(output);
 
-    if (!LoadVendorLib()) {
+    void *handle = dlopen(CODEC_HEIF_VDI_LIB_NAME, RTLD_LAZY);
+    if (handle == nullptr) {
+        CODEC_LOGE("failed to load vendor lib");
+        return HDF_FAILURE;
+    }
+    std::shared_ptr<void> libHeif = std::shared_ptr<void>(handle, dlclose);
+    auto func = reinterpret_cast<GetCodecHeifHwi>(dlsym(handle, "GetCodecHeifHwi"));
+    if (func == nullptr) {
+        CODEC_LOGE("failed to load symbol from vendor lib");
+        return HDF_FAILURE;
+    }
+    OHOS::VDI::HEIF::ICodecHeifHwi* heifHwi = func();
+    if (heifHwi == nullptr) {
+        CODEC_LOGE("failed to create heif hardware encoder");
         return HDF_FAILURE;
     }
 
-    int32_t ret = (heifHwi_->DoHeifEncode)(inputImgsInternal, inputMetasInternal, refs, outputToReturn);
+    int32_t ret = (heifHwi->DoHeifEncode)(inputImgsInternal, inputMetasInternal, refs, outputToReturn);
     filledLen = outputToReturn.filledLen;
     return ret;
 }
