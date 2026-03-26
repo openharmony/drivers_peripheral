@@ -49,6 +49,8 @@ namespace V1_2 {
 #define MAX_CONTROL_BUFF_SIZE 1024
 constexpr size_t DEVICE_DESCRIPROR_LENGTH = 18;
 constexpr int32_t API_VERSION_ID_18 = 18;
+constexpr uint8_t USB_CLASS_HUB = 0x09;
+constexpr uint8_t ROOT_HUB_DEV_ADDR = 1;
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 #ifdef LIBUSB_ENABLE
@@ -825,47 +827,40 @@ int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlReques
         HDF_LOGE("%{public}s g_DdkLibusbAdapter is nullptr", __func__);
         return HDF_FAILURE;
     }
-
     uint8_t direction = GET_CTRL_REQ_DIR(setupPacket.requestType);
     OHOS::HDI::Usb::V1_0::UsbDev dev = {GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)};
     uint32_t length = setupPacket.length > MAX_CONTROL_BUFF_SIZE ? MAX_CONTROL_BUFF_SIZE : setupPacket.length;
 
     int32_t ret = g_DdkLibusbAdapter->OpenDevice(dev);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("OpenDevice is error");
+        HDF_LOGE("%{public}s OpenDevice failed: ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
     if (direction == USB_REQUEST_DIR_FROM_DEVICE) {
         OHOS::HDI::Usb::V1_1::UsbCtrlTransferParams ctrlParams = {
-            static_cast<uint8_t>(setupPacket.requestType),
-            static_cast<uint8_t>(setupPacket.requestCmd),
-            setupPacket.value,
-            setupPacket.index,
-            length,
-            timeout
+            static_cast<uint8_t>(setupPacket.requestType), static_cast<uint8_t>(setupPacket.requestCmd),
+            setupPacket.value, setupPacket.index, length, timeout
         };
         int32_t ret = g_DdkLibusbAdapter->ControlTransferReadwithLength(dev, ctrlParams, data);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s control transfer read failed: %{public}d", __func__, ret);
+            (void) g_DdkLibusbAdapter->CloseDevice(dev);
             return ret;
         }
-        transferredLength = data.size();
+        transferredLength = length;
     } else {
         OHOS::HDI::Usb::V1_0::UsbCtrlTransfer ctrl = {
-            static_cast<uint8_t>(setupPacket.requestType),
-            static_cast<uint8_t>(setupPacket.requestCmd),
-            setupPacket.value,
-            setupPacket.index,
-            timeout
+            static_cast<uint8_t>(setupPacket.requestType), static_cast<uint8_t>(setupPacket.requestCmd),
+            setupPacket.value, setupPacket.index, timeout
         };
         int32_t ret = g_DdkLibusbAdapter->ControlTransferWrite(dev, ctrl, data);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s control transfer write failed: %{public}d", __func__, ret);
+            (void) g_DdkLibusbAdapter->CloseDevice(dev);
             return ret;
         }
         transferredLength = data.size();
     }
-
     (void) g_DdkLibusbAdapter->CloseDevice(dev);
     return HDF_SUCCESS;
 #endif // LIBUSB_ENABLE
@@ -891,9 +886,6 @@ int32_t UsbDdkService::GetNonRootHubs(std::vector<uint64_t> &nonRootHubIds)
         HDF_LOGW("%{public}s: devices is empty", __func__);
         return HDF_SUCCESS;
     }
-
-    constexpr uint8_t USB_CLASS_HUB = 0x09;
-    constexpr uint8_t ROOT_HUB_DEV_ADDR = 1;
 
     for (const auto &device : devices) {
         uint8_t devAddr = GET_DEV_NUM(device.deviceId);
