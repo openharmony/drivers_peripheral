@@ -164,6 +164,8 @@ ohos_benchmarktest("hdi_usb_benchmark_driver_test") {
     "c_utils:utils",
     "drivers_interface_usb:libusb_ddk_proxy_1.2",
     "googletest:gtest_main",
+    "hdf_core:libhdi_base",
+    "hdf_core:libpub_utils",
     "hilog:libhilog",
   ]
 }

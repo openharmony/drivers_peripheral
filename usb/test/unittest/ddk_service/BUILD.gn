@@ -27,6 +27,8 @@ ohos_unittest("usb_ddk_service_test") {
     "drivers_interface_usb:usb_ddk_idl_headers",
     "drivers_interface_usb:libusb_ddk_proxy_1.2",
     "googletest:gtest_main",
+    "hdf_core:libhdi_base",
+    "hdf_core:libpub_utils",
     "hilog:libhilog",
   ]
   module_out_path = module_output_path
