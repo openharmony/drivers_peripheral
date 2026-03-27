@@ -25,7 +25,11 @@ ohos_fuzztest("UsbGetDevicesFuzzTest") {
   include_dirs = [ "../usbgetdevices_fuzzer" ]
 
   deps = [ "../../../ddk:libusb_core" ]
-  external_deps = [ "drivers_interface_usb:libusb_ddk_proxy_1.1" ]
+  external_deps = [
+    "drivers_interface_usb:libusb_ddk_proxy_1.2",
+    "hdf_core:libhdi_base",
+    "hdf_core:libpub_utils",
+  ]
   external_deps += usb_test_fuzzer_external_deps
 
   cflags = [

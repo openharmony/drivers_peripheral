@@ -16,7 +16,7 @@
 #include <benchmark/benchmark.h>
 #include <gtest/gtest.h>
 #include "hdf_log.h"
-#include "v1_1/iusb_ddk.h"
+#include "v1_2/iusb_ddk.h"
 #include "usbd_wrapper.h"
 
 using namespace OHOS::HDI::Usb::Ddk;
@@ -24,8 +24,8 @@ using namespace testing::ext;
 using namespace std;
 
 namespace {
-    V1_1::DriverAbilityInfo g_driverInfo;
-    OHOS::sptr<V1_1::IUsbDdk> g_usbDdk = nullptr;
+    V1_2::DriverAbilityInfo g_driverInfo;
+    OHOS::sptr<V1_2::IUsbDdk> g_usbDdk = nullptr;
 
     constexpr int32_t ITERATION_FREQUENCY = 100;
     constexpr int32_t REPETITION_FREQUENCY = 3;
@@ -38,7 +38,7 @@ public:
 
 void UsbBenchmarkDriverTest::SetUp(const ::benchmark::State &state)
 {
-    g_usbDdk = V1_1::IUsbDdk::Get();
+    g_usbDdk = V1_2::IUsbDdk::Get();
     ASSERT_NE(g_usbDdk, nullptr);
 }
 

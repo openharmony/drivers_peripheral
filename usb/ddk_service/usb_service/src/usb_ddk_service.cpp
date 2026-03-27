@@ -16,7 +16,7 @@
 #include <hdf_base.h>
 #include <iproxy_broker.h>
 #include <shared_mutex>
-#include "v1_1/usb_ddk_service.h"
+#include "v1_2/usb_ddk_service.h"
 
 #include "ddk_pnp_listener_mgr.h"
 #include "ipc_skeleton.h"
@@ -33,7 +33,7 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_1 {
+namespace V1_2 {
 // 32 means size of uint32_t
 #define GET_BUS_NUM(devHandle)          ((uint8_t)((devHandle) >> 32))
 #define GET_DEV_NUM(devHandle)          ((uint8_t)((devHandle)&0xFFFFFFFF))
@@ -49,11 +49,13 @@ namespace V1_1 {
 #define MAX_CONTROL_BUFF_SIZE 1024
 constexpr size_t DEVICE_DESCRIPROR_LENGTH = 18;
 constexpr int32_t API_VERSION_ID_18 = 18;
+constexpr uint8_t USB_CLASS_HUB = 0x09;
+constexpr uint8_t ROOT_HUB_DEV_ADDR = 1;
 static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 #ifdef LIBUSB_ENABLE
 static std::shared_ptr<OHOS::HDI::Usb::V1_2::LibusbAdapter> g_DdkLibusbAdapter =
-    V1_2::LibusbAdapter::GetInstance();
+    OHOS::HDI::Usb::V1_2::LibusbAdapter::GetInstance();
 constexpr uint8_t  INTERFACE_ID_INVALID = 255;
 static std::unordered_map<uint64_t, uint8_t> g_InterfaceMap;
 std::shared_mutex g_MutexInterfaceMap;
@@ -810,7 +812,100 @@ int32_t UsbDdkService::RemoveDriverInfo(const std::string &driverUid)
     }
     return HDF_FAILURE;
 }
-} // namespace V1_1
+
+int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlRequestSetup &setupPacket, uint32_t timeout,
+    std::vector<uint8_t> &data, uint32_t &transferredLength)
+{
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+#ifndef LIBUSB_ENABLE
+    return HDF_ERR_NOT_SUPPORT;
+#else
+    if (g_DdkLibusbAdapter == nullptr) {
+        HDF_LOGE("%{public}s g_DdkLibusbAdapter is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    uint8_t direction = GET_CTRL_REQ_DIR(setupPacket.requestType);
+    OHOS::HDI::Usb::V1_0::UsbDev dev = {GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)};
+    uint32_t length = setupPacket.length > MAX_CONTROL_BUFF_SIZE ? MAX_CONTROL_BUFF_SIZE : setupPacket.length;
+
+    int32_t ret = g_DdkLibusbAdapter->OpenDevice(dev);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s OpenDevice failed: ret = %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    if (direction == USB_REQUEST_DIR_FROM_DEVICE) {
+        OHOS::HDI::Usb::V1_1::UsbCtrlTransferParams ctrlParams = {
+            static_cast<uint8_t>(setupPacket.requestType), static_cast<uint8_t>(setupPacket.requestCmd),
+            setupPacket.value, setupPacket.index, length, timeout
+        };
+        int32_t ret = g_DdkLibusbAdapter->ControlTransferReadwithLength(dev, ctrlParams, data);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s control transfer read failed: %{public}d", __func__, ret);
+            (void) g_DdkLibusbAdapter->CloseDevice(dev);
+            return ret;
+        }
+        transferredLength = length;
+    } else {
+        OHOS::HDI::Usb::V1_0::UsbCtrlTransfer ctrl = {
+            static_cast<uint8_t>(setupPacket.requestType), static_cast<uint8_t>(setupPacket.requestCmd),
+            setupPacket.value, setupPacket.index, timeout
+        };
+        int32_t ret = g_DdkLibusbAdapter->ControlTransferWrite(dev, ctrl, data);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s control transfer write failed: %{public}d", __func__, ret);
+            (void) g_DdkLibusbAdapter->CloseDevice(dev);
+            return ret;
+        }
+        transferredLength = data.size();
+    }
+    (void) g_DdkLibusbAdapter->CloseDevice(dev);
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
+}
+
+int32_t UsbDdkService::GetNonRootHubs(std::vector<uint64_t> &nonRootHubIds)
+{
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+#ifndef LIBUSB_ENABLE
+    return HDF_ERR_NOT_SUPPORT;
+#else
+    if (g_DdkLibusbAdapter == nullptr) {
+        HDF_LOGE("%{public}s g_DdkLibusbAdapter is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    std::vector<struct OHOS::HDI::Usb::V1_2::DeviceInfo> devices;
+    g_DdkLibusbAdapter->GetDevices(devices);
+    if (devices.empty()) {
+        HDF_LOGW("%{public}s: devices is empty", __func__);
+        return HDF_SUCCESS;
+    }
+
+    for (const auto &device : devices) {
+        uint8_t devAddr = GET_DEV_NUM(device.deviceId);
+
+        UsbDeviceDescriptor desc;
+        int32_t ret = GetDeviceDescriptor(device.deviceId, desc);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s: get device descriptor failed for device %{public}" PRIu64, __func__, device.deviceId);
+            continue;
+        }
+
+        if (desc.bDeviceClass == USB_CLASS_HUB && devAddr != ROOT_HUB_DEV_ADDR) {
+            nonRootHubIds.push_back(device.deviceId);
+        }
+    }
+
+    return HDF_SUCCESS;
+#endif // LIBUSB_ENABLE
+}
+} // namespace V1_2
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI
