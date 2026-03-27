@@ -16,7 +16,7 @@
 #include "usbgetdevices_fuzzer.h"
 #include "hdf_log.h"
 #include "securec.h"
-#include "v1_1/iusb_ddk.h"
+#include "v1_2/iusb_ddk.h"
 
 using namespace OHOS::HDI::Usb::Ddk;
 
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace USB {
 bool UsbGetDevicesTest(const uint8_t *data, size_t size)
 {
-    sptr<V1_1::IUsbDdk> usbDdk = V1_1::IUsbDdk::Get();
+    sptr<V1_2::IUsbDdk> usbDdk = V1_2::IUsbDdk::Get();
     if (usbDdk == nullptr) {
         return false;
     }

@@ -25,14 +25,15 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace Ddk {
-namespace V1_1 {
+namespace V1_2 {
+
 class UsbDriverManager final {
 public:
     static UsbDriverManager& GetInstance();
 
-    bool UpdateDriverInfo(const DriverAbilityInfo &driverInfo);
+    bool UpdateDriverInfo(const V1_1::DriverAbilityInfo &driverInfo);
     bool RemoveDriverInfo(const std::string &driverUid);
-    bool QueryDriverInfo(uint32_t tokenId, DriverAbilityInfo &driverInfo);
+    bool QueryDriverInfo(uint32_t tokenId, V1_1::DriverAbilityInfo &driverInfo);
 
 private:
     UsbDriverManager() = default;
@@ -42,9 +43,9 @@ private:
     UsbDriverManager(UsbDriverManager &&) = delete;
     UsbDriverManager &operator=(UsbDriverManager &&) = delete;
     std::mutex mutex_;
-    std::map<uint32_t, std::unique_ptr<DriverAbilityInfo>> driverMap_;
+    std::map<uint32_t, std::unique_ptr<V1_1::DriverAbilityInfo>> driverMap_;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Ddk
 } // namespace Usb
 } // namespace HDI
