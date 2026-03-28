@@ -88,6 +88,8 @@ constexpr const char * const SYS_POWER_RESUME_OFFSET = "/sys/power/resume_offset
 constexpr const char * const HIBERNATE_STATE_PATH = "/sys/power/state";
 constexpr const char * const HIBERNATE_STATE = "disk";
 
+unsigned long long Hibernate::staticSwapFileSize = 0;
+
 struct SwapfileCfg {
     unsigned long long len;
 };
@@ -110,7 +112,7 @@ void Hibernate::Init()
     myThread.detach();
 }
 
-int ConvertMemKB2GB(const unsigned long long memKB)
+int Hibernate::ConvertMemKB2GB(const unsigned long long memKB)
 {
     if (memKB == 0) {
         // memKB must >= 1
@@ -128,29 +130,30 @@ int ConvertMemKB2GB(const unsigned long long memKB)
     return memGB;
 }
 
-unsigned long long GetSwapFileSize()
+unsigned long long Hibernate::GetSwapFileSize()
 {
-    static unsigned long long swapFileSize = 0;
-    if (swapFileSize) {
-        HDF_LOGI("GetSwapFileSize, swap file size is %{public}llu KB", swapFileSize);
-        return swapFileSize;
+    if (Hibernate::staticSwapFileSize) {
+        HDF_LOGI("GetSwapFileSize, swap file size is %{public}llu KB", Hibernate::staticSwapFileSize);
+        return Hibernate::staticSwapFileSize;
     }
 
     struct sysinfo info;
     int ret = sysinfo(&info);
     if (ret != 0) {
         HDF_LOGE("GetSwapFileSize, get system memory size error");
-        swapFileSize = SWAP_FILE_SIZE;
-        return swapFileSize;
+        Hibernate::staticSwapFileSize = SWAP_FILE_SIZE;
+        return Hibernate::staticSwapFileSize;
     }
 
     // For example, get info.totalram 24927047680B for 23.2GB
     // Firstly, convert 24927047680B to larger even GB for 24GB
     // Then, the swap file size is the half size for 12884901888B
     int memGB = ConvertMemKB2GB(static_cast<unsigned long long>(info.totalram / B_PER_KB));
-    swapFileSize = static_cast<unsigned long long>(memGB / SWAP_FACTOR) * MB_PER_GB * KB_PER_MB * B_PER_KB;
-    HDF_LOGI("GetSwapFileSize, mem size is %{public}d GB, swap file size is %{public}llu KB", memGB, swapFileSize);
-    return swapFileSize;
+    Hibernate::staticSwapFileSize = static_cast<unsigned long long>(memGB / SWAP_FACTOR) *
+        MB_PER_GB * KB_PER_MB * B_PER_KB;
+    HDF_LOGI("GetSwapFileSize, mem size is %{public}d GB, swap file size is %{public}llu KB",
+        memGB, Hibernate::staticSwapFileSize);
+    return Hibernate::staticSwapFileSize;
 }
 
 int32_t Hibernate::GetResumeInfo(std::string &resumeInfo)
@@ -237,7 +240,7 @@ int32_t Hibernate::MkSwap()
         }
         unsigned int pages = (swapFileSize / static_cast<unsigned int>(pagesize));
         if (pages <= 1) {
-            HDF_LOGE("pages failed when mkswap.");
+            HDF_LOGE("pages failed when mkswap, swapFileSize=%{public}llu.", swapFileSize);
             break;
         }
         char buff[SWAP_HEADER_BUF_LEN];
@@ -347,7 +350,7 @@ int32_t Hibernate::CreateSwapFile()
     fdsan_exchange_owner_tag(fd, FDSAN_PARAM, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
     int ret = ioctl(fd, HMFS_IOC_SWAPFILE_PREALLOC, &cfg);
     if (ret != 0) {
-        HDF_LOGE("ioctl failed, ret=%{public}d", ret);
+        HDF_LOGE("ioctl failed, ret=%{public}d, cfg.len=%{public}llu", ret, cfg.len);
         fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
         return HDF_FAILURE;
     }
