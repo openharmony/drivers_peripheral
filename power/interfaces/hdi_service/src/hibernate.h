@@ -57,9 +57,12 @@ private:
     int32_t WriteOffset();
     int32_t WriteResume();
     int32_t WritePowerState();
+    int ConvertMemKB2GB(const unsigned long long memKB);
+    unsigned long long GetSwapFileSize();
 
     std::atomic_bool swapFileReady_ {false};
     std::mutex initMutex_;
+    static unsigned long long staticSwapFileSize;
 };
 } // namespace V1_2
 } // namespace Power

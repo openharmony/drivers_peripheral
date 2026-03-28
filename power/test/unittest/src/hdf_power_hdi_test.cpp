@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define private public
+#define protected public
 
 #include <fstream>
 #include <gtest/gtest.h>
@@ -20,6 +22,7 @@
 #include "v1_3/ipower_interface.h"
 #include "v1_2/power_types.h"
 #include "v1_2/running_lock_types.h"
+#include "hibernate.h"
 
 using namespace OHOS::HDI::Power;
 using namespace OHOS::HDI::Power::V1_2;
@@ -34,6 +37,7 @@ const std::string SUSPEND_STATE = "mem";
 const std::string SUSPEND_STATE_PATH = "/sys/power/state";
 const std::string LOCK_PATH = "/sys/power/wake_lock";
 const std::string UNLOCK_PATH = "/sys/power/wake_unlock";
+
 class HdfPowerHdiTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -200,5 +204,30 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest009, TestSize.Level0)
     std::string testName = "HdfPowerHdiTest009";
     int32_t ret = g_powerInterface->SetPowerConfig("123", "345");
     EXPECT_NE(0, ret);
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest010
+  * @tc.desc: check GetSwapFileSize
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest010, TestSize.Level0)
+{
+    Hibernate::staticSwapFileSize = 1024LL * 1024 * 1024;
+    EXPECT_EQ(Hibernate::GetInstance().GetSwapFileSize(), 1024LL * 1024 * 1024);
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest011
+  * @tc.desc: check ConvertMemKB2GB
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest011, TestSize.Level0)
+{
+    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(0), 0);
+    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(1), 2);
+    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(2* 1024 * 1024), 2);
+    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(2* 1024 * 1024 + 1), 4);
+    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(11* 1024 * 1024), 12);
 }
 }
