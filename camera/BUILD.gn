@@ -57,7 +57,10 @@ if (defined(ohos_lite)) {
     } else {
       testonly = true
       if (drivers_peripheral_camera_feature_usb == true) {
-        deps = [ "test/ut/usb_camera:camera_usb_test_ut" ]
+        deps = [
+          "test/ut/usb_camera:camera_usb_test_ut",
+          "test/ut/usb_camera/mjpeg_decoder:mjpeg_decoder_test",
+        ]
       } else {
         deps = [
           # acceptance unit test

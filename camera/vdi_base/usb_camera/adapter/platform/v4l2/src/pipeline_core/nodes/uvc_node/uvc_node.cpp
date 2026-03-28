@@ -12,13 +12,14 @@
  */
 
 #include "uvc_node.h"
-#include <unistd.h>
 #include "metadata_controller.h"
+#include "mjpeg_decoder.h"
+#include <unistd.h>
 
 constexpr int PIXEL_SPACE = 2;
 
 namespace OHOS::Camera {
-UvcNode::UvcNode(const std::string& name, const std::string& type, const std::string &cameraId)
+UvcNode::UvcNode(const std::string &name, const std::string &type, const std::string &cameraId)
     : NodeBase(name, type, cameraId), SourceNode(name, type, cameraId)
 {
     CAMERA_LOGI("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
@@ -61,8 +62,8 @@ RetCode UvcNode::GetDeviceController()
 {
     CameraId cameraId = ConvertCameraId(cameraId_);
     CAMERA_LOGI("GetDeviceController, cameraId = %{public}d, cameraId_ = %{public}s", cameraId, cameraId_.c_str());
-    sensorController_ = std::static_pointer_cast<SensorController>
-        (deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
+    sensorController_ =
+        std::static_pointer_cast<SensorController>(deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
     if (sensorController_ == nullptr) {
         CAMERA_LOGE("Get device controller failed");
         return RC_ERROR;
@@ -93,18 +94,24 @@ RetCode UvcNode::Start(const int32_t streamId)
 {
     RetCode rc = RC_OK;
     std::vector<std::shared_ptr<IPort>> outPorts = GetOutPorts();
-    for (const auto& it : outPorts) {
+    for (const auto &it : outPorts) {
         DeviceFormat format;
         if (it->format_.format_ < 0) {
             CAMERA_LOGE("it->format_.format_ is negative");
             return RC_ERROR;
         }
         cameraformat_ = static_cast<uint32_t>(it->format_.format_);
-        format.fmtdesc.pixelformat = (cameraformat_ == CAMERA_FORMAT_BLOB ? V4L2_PIX_FMT_MJPEG : V4L2_PIX_FMT_YUYV);
+        uvcSourcePixformat_ = (cameraformat_ == CAMERA_FORMAT_BLOB ? V4L2_PIX_FMT_MJPEG : V4L2_PIX_FMT_YUYV);
+        if (deviceManager_->CheckFormatSupportMjpeg(ConvertCameraId(cameraId_), wide_, high_)) {
+            uvcSourcePixformat_ = V4L2_PIX_FMT_MJPEG;
+        }
+        format.fmtdesc.pixelformat = uvcSourcePixformat_;
         format.fmtdesc.width = static_cast<uint32_t>(wide_);
         format.fmtdesc.height = static_cast<uint32_t>(high_);
-        CAMERA_LOGI("UvcNode::Start width: %{public}d, height: %{public}d, format: %{public}u, pixelformat: %{public}s",
-            wide_, high_, it->format_.format_, format.fmtdesc.pixelformat == V4L2_PIX_FMT_YUYV ? "yuv" : "mjpeg");
+        auto pixFmtStr = format.fmtdesc.pixelformat == V4L2_PIX_FMT_MJPEG ? "mjpeg" : "yuv";
+        auto cameraFmtStr = cameraformat_ == CAMERA_FORMAT_BLOB ? "blob" : "yuv";
+        CAMERA_LOGI("UvcNode::Start w:%{public}d h:%{public}d fmt:%{public}u pix:%{public}s cam:%{public}s", wide_,
+            high_, it->format_.format_, pixFmtStr, cameraFmtStr);
         int bufCnt = static_cast<int>(it->format_.bufferCount_);
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
@@ -157,7 +164,7 @@ int32_t UvcNode::GetStreamId(const CaptureMeta &meta)
     return streamId;
 }
 
-void UvcNode::GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata)
+void UvcNode::GetUpdateFps(const std::shared_ptr<CameraMetadata> &metadata)
 {
     common_metadata_header_t *data = metadata->get();
     camera_metadata_item_t entry;
@@ -171,7 +178,7 @@ void UvcNode::GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata)
     }
 }
 
-void UvcNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
+void UvcNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata> &metadata)
 {
     if (metadata == nullptr) {
         CAMERA_LOGE("Meta is nullptr");
@@ -213,14 +220,14 @@ static void SetImageAllBlack(uint8_t *buf, size_t bufferSize, uint32_t format)
     }
 }
 
-void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
+void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
 {
     if (buffer == nullptr) {
         CAMERA_LOGE("UvcNode::DeliverBuffer frameSpec is null");
         return;
     }
-    CAMERA_LOGI("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]",
-        buffer->GetStreamId(), buffer->GetIndex());
+    CAMERA_LOGI("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]", buffer->GetStreamId(),
+        buffer->GetIndex());
 
     buffer->SetCurWidth(wide_);
     buffer->SetCurHeight(high_);
@@ -228,7 +235,54 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         SetImageAllBlack((uint8_t *)buffer->GetVirAddress(), buffer->GetSize(), buffer->GetCurFormat());
     }
 
+    struct timespec tsBegin;
+    clock_gettime(CLOCK_MONOTONIC, &tsBegin);
+
+    // MJPEG 解码：如果源格式是 MJPEG 且目标格式不是 BLOB，则需要解码
+    if (uvcSourcePixformat_ == V4L2_PIX_FMT_MJPEG && cameraformat_ != CAMERA_FORMAT_BLOB) {
+        // 静态缓存解码器实例 (避免重复创建)
+        static auto decoder = MjpegDecoderFactory::Create();
+        static std::once_flag logFlag;
+        std::call_once(logFlag, []() {
+            CAMERA_LOGI("MJPEG decoder initialized: %{public}s", MjpegDecoderFactory::GetAvailableDecoderName());
+        });
+
+        size_t mjpegSize = (size_t)buffer->GetEsFrameInfo().size;
+        uint8_t *mjpegBuf = (uint8_t *)malloc(mjpegSize);
+        if (mjpegBuf != nullptr) {
+            memcpy_s(mjpegBuf, mjpegSize, (uint8_t *)buffer->GetVirAddress(), mjpegSize);
+
+            struct timespec ts0;
+            struct timespec ts1;
+            clock_gettime(CLOCK_MONOTONIC, &ts0);
+
+            bool ret = decoder->Decode({mjpegBuf, mjpegSize, wide_, high_,
+                static_cast<uint8_t *>(buffer->GetVirAddress()), buffer->GetSize()});
+
+            clock_gettime(CLOCK_MONOTONIC, &ts1);
+            double decodeDuration =
+                (ts1.tv_sec * 1000.0 + ts1.tv_nsec / 1e6) - (ts0.tv_sec * 1000.0 + ts0.tv_nsec / 1e6);
+
+            CAMERA_LOGI("MJPEG decode done, ret=%{public}d, dec=%{public}s, sz=%{public}d, T=%{public}0.2fms",
+                ret ? 1 : 0, decoder->GetName(), mjpegSize, decodeDuration);
+
+            if (ret) {
+                buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_SP);
+                buffer->SetEsFrameSize(-1);
+                // MJPEG 解码后数据在 VirAddr，不在 SurfBufAddr
+                buffer->SetIsValidDataInSurfaceBuffer(false);
+            }
+            free(mjpegBuf);
+        }
+    }
+
     SourceNode::DeliverBuffer(buffer);
+
+    struct timespec tsEnd;
+    clock_gettime(CLOCK_MONOTONIC, &tsEnd);
+    double totalDuration =
+        (tsEnd.tv_sec * 1000.0 + tsEnd.tv_nsec / 1e6) - (tsBegin.tv_sec * 1000.0 + tsBegin.tv_nsec / 1e6);
+    CAMERA_LOGI("DeliverBuffer Done, T=%{public}0.2fms", totalDuration);
     return;
 }
 
@@ -236,7 +290,7 @@ RetCode UvcNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
     CAMERA_LOGI("UvcNode::ProvideBuffers enter. %{public}s", sensorController_->GetName().c_str());
     frameSpec->buffer_->SetCurFormat(
-        cameraformat_ == CAMERA_FORMAT_BLOB ? CAMERA_FORMAT_BLOB : CAMERA_FORMAT_YUYV_422_PKG);
+        uvcSourcePixformat_ == V4L2_PIX_FMT_YUYV ? CAMERA_FORMAT_YUYV_422_PKG : CAMERA_FORMAT_BLOB);
     if (sensorController_->SendFrameBuffer(frameSpec) == RC_OK) {
         CAMERA_LOGD("Sendframebuffer success bufferpool id = %llu", frameSpec->bufferPoolId_);
         return RC_OK;
