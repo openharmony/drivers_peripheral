@@ -49,6 +49,7 @@ private:
     std::shared_ptr<IDeviceManager> deviceManager_ = nullptr;
     std::shared_ptr<CameraMetadata> meta_ = nullptr;
     uint32_t cameraformat_ = 0;
+    uint32_t uvcSourcePixformat_ = 0;
 };
 } // namespace OHOS::Camera
 #endif

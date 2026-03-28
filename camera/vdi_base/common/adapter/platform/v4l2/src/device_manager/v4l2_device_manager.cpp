@@ -311,6 +311,14 @@ std::string V4L2DeviceManager::CameraIdToHardware(CameraId cameraId, ManagerId m
     return nullptr;
 }
 
+bool V4L2DeviceManager::CheckFormatSupportMjpeg(CameraId cameraId, int width, int height)
+{
+    (void)cameraId;
+    (void)width;
+    (void)height;
+    return false; // common version: default not supported
+}
+
 void V4L2DeviceManager::SetHotplugDevCallBack(HotplugDevCb cb)
 {
     uvcCb_ = cb;
