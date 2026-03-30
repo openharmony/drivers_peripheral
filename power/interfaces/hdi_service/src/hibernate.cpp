@@ -140,7 +140,7 @@ unsigned long long Hibernate::GetSwapFileSize()
     struct sysinfo info;
     int ret = sysinfo(&info);
     if (ret != 0) {
-        HDF_LOGE("GetSwapFileSize, get system memory size error");
+        HDF_LOGE("GetSwapFileSize, get system memory size error, errno=%{public}d", errno);
         Hibernate::staticSwapFileSize = SWAP_FILE_SIZE;
         return Hibernate::staticSwapFileSize;
     }
