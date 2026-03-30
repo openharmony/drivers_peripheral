@@ -44,6 +44,20 @@ static std::vector<FormatInfoInner>& GetCachedFormatList()
 }
 
 static std::vector<FormatInfoInner>& ConvertDeviceFormat(const std::vector<DeviceFormat>&);
+
+// 辅助函数：更新/清除 FormatList（仅 USB VDI 使用）
+static void UpdateFormatListForCamera(CameraId id, std::mutex& mtx)
+{
+    std::lock_guard<std::mutex> lock(mtx);
+    g_allCameraFormats[id] = std::make_shared<std::vector<FormatInfoInner>>(GetCachedFormatList());
+}
+
+static void ClearFormatListForCamera(CameraId id, std::mutex& mtx)
+{
+    std::lock_guard<std::mutex> l(mtx);
+    g_allCameraFormats[id] = nullptr;
+}
+
 V4L2DeviceManager::V4L2DeviceManager() {}
 
 V4L2DeviceManager::~V4L2DeviceManager() {}
@@ -323,6 +337,8 @@ bool V4L2DeviceManager::CheckFormatSupportMjpeg(CameraId cameraId, int width, in
     if (cameraId >= CAMERA_MAX) {
         return false;
     }
+    // C-06: 加锁保护 g_allCameraFormats 读取，避免与热插拔回调并发
+    std::lock_guard<std::mutex> lock(mtx_);
     auto formatList = g_allCameraFormats[cameraId];
     if (formatList == nullptr) {
         CAMERA_LOGE("CheckFormatSupportMjpeg, no formatList find");
@@ -334,6 +350,7 @@ bool V4L2DeviceManager::CheckFormatSupportMjpeg(CameraId cameraId, int width, in
         });
     return fmt != formatList->end();
 }
+
 void V4L2DeviceManager::SetHotplugDevCallBack(HotplugDevCb cb)
 {
     uvcCb_ = cb;
@@ -387,7 +404,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         auto meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
         CHECK_IF_PTR_NULL_RETURN_VOID(meta);
         Convert(deviceControl, deviceFormat, meta);
-        g_allCameraFormats[id] = std::make_shared<std::vector<FormatInfoInner>>(GetCachedFormatList());
+        UpdateFormatListForCamera(id, mtx_);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
         CHECK_IF_EQUAL_RETURN_VOID(streamAvailableExtendConfigurationsVector_.size() <= MIN_EXT_CFG_VEC_SIZE, true);
         uvcCb_(meta, uvcState, id, hardwareName);
@@ -412,8 +429,8 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
             {
                 std::lock_guard<std::mutex> l(mtx_);
                 iter = hardwareList_.erase(iter);
-                g_allCameraFormats[id] = nullptr;
             }
+            ClearFormatListForCamera(id, mtx_);
         }
         CAMERA_LOGI("uvc plug out %{public}s %{public}s end", uvcState ? "in" : "out", hardwareName.c_str());
     }
@@ -783,8 +800,9 @@ static std::vector<int32_t> GetFormatVector(const std::vector<struct FormatInfoI
                 it.width, it.height, it.minFps, it.maxFps);
             continue;
         }
-        if (!it.isYuv && format != OHOS_CAMERA_FORMAT_MJPEG) {
-            CAMERA_LOGI("this format not support yuv, %{public}d x %{public}d @fps[%{public}d, %{public}d]",
+        // YUV 格式请求：设备支持 YUV 或 MJPEG(可解码) 都可上报
+        if (!it.isYuv && !it.isMjpeg && format != OHOS_CAMERA_FORMAT_MJPEG) {
+            CAMERA_LOGI("this format not support yuv/mjpeg, %{public}d x %{public}d @fps[%{public}d, %{public}d]",
                 it.width, it.height, it.minFps, it.maxFps);
             continue;
         }

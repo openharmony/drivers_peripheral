@@ -17,6 +17,7 @@
 #include "test_utils.h"
 #include <chrono>
 #include <cmath>
+#include <future>
 #include <gtest/gtest.h>
 
 // Test constants - 测试常量
@@ -25,251 +26,389 @@ constexpr uint32_t DEFAULT_WIDTH = 640;
 constexpr uint32_t DEFAULT_HEIGHT = 480;
 constexpr uint32_t QCIF_WIDTH = 176;
 constexpr uint32_t QCIF_HEIGHT = 144;
-constexpr uint32_t QVGA_WIDTH = 320;
-constexpr uint32_t QVGA_HEIGHT = 240;
-constexpr uint32_t VGA_WIDTH = 640;
-constexpr uint32_t VGA_HEIGHT = 480;
-constexpr uint32_t SVGA_WIDTH = 800;
-constexpr uint32_t SVGA_HEIGHT = 600;
 constexpr uint32_t HD720P_WIDTH = 1280;
 constexpr uint32_t HD720P_HEIGHT = 720;
 
-// NV21 format constants - NV21 格式常量
-// NV21 = Y plane (100%) + UV plane (50%) = 1.5 bytes per pixel
 // Performance test constants - 性能测试常量
-constexpr uint32_t MAX_DECODE_TIME_MS = 2000;
 constexpr uint32_t MAX_DECODE_TIME_MS_PERF = 1000;
-constexpr int32_t FFMPEG_MAX_DECODE_TIME_MS = 2000;
-constexpr int32_t LIBYUV_MAX_DECODE_TIME_MS = 1000;
-constexpr size_t MIN_OUTPUT_BUFFER_SIZE = 100;
-constexpr int DEFAULT_JPEG_QUALITY = 85;
 
 using namespace OHOS::Camera;
 
 // ==================== FfmpegMjpegDecoder Tests ====================
 
+std::shared_ptr<FfmpegMjpegDecoder> g_ffmpegDecoder = nullptr;
+
 class FfmpegMjpegDecoderTest : public ::testing::Test {
 protected:
-    static std::shared_ptr<FfmpegMjpegDecoder> decoder_;
-
-    static void SetUpTestSuite()
+    static void SetUpTestCase(void)
     {
-        decoder_ = std::make_shared<FfmpegMjpegDecoder>();
-        if (!decoder_->IsAvailable()) {
-            GTEST_SKIP() << "FFmpeg decoder not available";
+        std::cout << "==========[test log] FfmpegMjpegDecoderTest SetUpTestCase" << std::endl;
+        g_ffmpegDecoder = std::make_shared<FfmpegMjpegDecoder>();
+        if (!g_ffmpegDecoder->IsAvailable()) {
+            std::cout << "==========[test log] FFmpeg decoder not available, skip tests" << std::endl;
         }
     }
 
-    static void TearDownTestSuite()
+    static void TearDownTestCase(void)
     {
-        decoder_.reset(); // 显式释放 decoder
+        std::cout << "==========[test log] FfmpegMjpegDecoderTest TearDownTestCase" << std::endl;
+        g_ffmpegDecoder.reset();
     }
 };
 
-std::shared_ptr<FfmpegMjpegDecoder> FfmpegMjpegDecoderTest::decoder_ = nullptr;
-
-// TC-001: 使用 libjpeg-turbo 生成的数据测试
-TEST_F(FfmpegMjpegDecoderTest, Decode_WithValidMJPEG_Success)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Decode with valid MJPEG data using FFmpeg, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0001)
 {
-    // 使用 libjpeg-turbo 在内存中生成测试 JPEG 图像
+    if (!g_ffmpegDecoder->IsAvailable()) {
+        GTEST_SKIP() << "FFmpeg decoder not available" << std::endl;
+    }
+
+    std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
     auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
-    bool result = decoder_->Decode(
+    std::cout << "==========[test log] 3. Execute decode." << std::endl;
+    bool result = g_ffmpegDecoder->Decode(
         {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
 
+    std::cout << "==========[test log] 4. Verify decode result." << std::endl;
     EXPECT_TRUE(result);
     if (result) {
         EXPECT_FALSE(IsAllZeros(output));
     }
 }
 
-// TC-002: 无效 MJPEG 数据
-TEST_F(FfmpegMjpegDecoderTest, Decode_InvalidData_Failure)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Decode with invalid MJPEG data using FFmpeg, expected failure.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0002)
 {
-    std::vector<uint8_t> invalidData = {0x00, 0x01, 0x02, 0x03};
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    if (!g_ffmpegDecoder->IsAvailable()) {
+        GTEST_SKIP() << "FFmpeg decoder not available" << std::endl;
+    }
 
-    bool result = decoder_->Decode(
+    std::cout << "==========[test log] 1. Prepare invalid MJPEG data." << std::endl;
+    std::vector<uint8_t> invalidData = {0x00, 0x01, 0x02, 0x03};
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+
+    std::cout << "==========[test log] 2. Execute decode with invalid data." << std::endl;
+    bool result = g_ffmpegDecoder->Decode(
         {invalidData.data(), invalidData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
 
+    std::cout << "==========[test log] 3. Verify decode result." << std::endl;
     EXPECT_FALSE(result);
 }
 
-// TC-003: 空数据
-TEST_F(FfmpegMjpegDecoderTest, Decode_EmptyData_Failure)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Decode with empty data using FFmpeg, expected failure.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0003)
 {
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    if (!g_ffmpegDecoder->IsAvailable()) {
+        GTEST_SKIP() << "FFmpeg decoder not available" << std::endl;
+    }
 
-    bool result = decoder_->Decode({nullptr, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+    std::cout << "==========[test log] 1. Prepare empty data." << std::endl;
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
+    std::cout << "==========[test log] 2. Execute decode with empty data." << std::endl;
+    bool result = g_ffmpegDecoder->Decode({nullptr, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+
+    std::cout << "==========[test log] 3. Verify decode result." << std::endl;
     EXPECT_FALSE(result);
 }
 
-// TC-004: 输出缓冲区为空
-TEST_F(FfmpegMjpegDecoderTest, Decode_NullOutputBuffer_Failure)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Decode with null output buffer using FFmpeg, expected failure.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0004)
 {
+    if (!g_ffmpegDecoder->IsAvailable()) {
+        GTEST_SKIP() << "FFmpeg decoder not available" << std::endl;
+    }
+
+    std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
     auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
-    bool result = decoder_->Decode({mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, nullptr, 1000});
+    std::cout << "==========[test log] 2. Execute decode with null output buffer." << std::endl;
+    bool result = g_ffmpegDecoder->Decode({
+        mjpegData.data(), mjpegData.size(),
+        DEFAULT_WIDTH, DEFAULT_HEIGHT,
+        nullptr, 1000
+    });
 
+    std::cout << "==========[test log] 3. Verify decode result." << std::endl;
     EXPECT_FALSE(result);
 }
 
-// TC-005: 输出缓冲区过小（边界测试）
-// 注意：此测试检查解码器是否正常初始化并可以解码
-TEST_F(FfmpegMjpegDecoderTest, Decode_IsAvailable)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Verify FFmpeg decoder IsAvailable returns true.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0005)
 {
-    // 验证解码器已正确初始化
-    EXPECT_TRUE(decoder_->IsAvailable()) << "Decoder should be available";
+    if (!g_ffmpegDecoder->IsAvailable()) {
+        GTEST_SKIP() << "FFmpeg decoder not available" << std::endl;
+    }
 
-    // 使用 libjpeg-turbo 生成真实 JPEG 数据
+    std::cout << "==========[test log] 1. Verify decoder is available." << std::endl;
+    EXPECT_TRUE(g_ffmpegDecoder->IsAvailable()) << "Decoder should be available";
+
+    std::cout << "==========[test log] 2. Generate test MJPEG data (QCIF resolution)." << std::endl;
     auto mjpegData = GenerateTestMJPEG(QCIF_WIDTH, QCIF_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
-    // 分配足够大的输出缓冲区
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(QCIF_WIDTH, QCIF_HEIGHT));
+    std::cout << "==========[test log] 3. Allocate output buffer." << std::endl;
+    std::vector<uint8_t> output(NV21BufferSize(QCIF_WIDTH, QCIF_HEIGHT));
 
-    // 解码应该成功
-    bool result =
-        decoder_->Decode({mjpegData.data(), mjpegData.size(), QCIF_WIDTH, QCIF_HEIGHT, output.data(), output.size()});
+    std::cout << "==========[test log] 4. Execute decode." << std::endl;
+    bool result = g_ffmpegDecoder->Decode(
+        {mjpegData.data(), mjpegData.size(), QCIF_WIDTH, QCIF_HEIGHT, output.data(), output.size()});
 
+    std::cout << "==========[test log] 5. Verify decode result." << std::endl;
     EXPECT_TRUE(result) << "Decoder should successfully decode valid MJPEG data";
     EXPECT_FALSE(IsAllZeros(output)) << "Decoded output should not be all zeros";
 }
 
-// TC-006: 解码器名称验证
-TEST_F(FfmpegMjpegDecoderTest, GetName_ReturnsFFmpeg)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Verify FFmpeg decoder GetName returns correct name.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0006)
 {
-    EXPECT_STREQ(decoder_->GetName(), "FFmpeg");
+    if (!g_ffmpegDecoder->IsAvailable()) {
+        GTEST_SKIP() << "FFmpeg decoder not available" << std::endl;
+    }
+
+    std::cout << "==========[test log] 1. Verify decoder name." << std::endl;
+    EXPECT_STREQ(g_ffmpegDecoder->GetName(), "FFmpeg");
 }
 
-// TC-007: 多次解码验证（解码器复用）
-TEST_F(FfmpegMjpegDecoderTest, Decode_MultipleTimes_Success)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Decode multiple times with same decoder instance, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0007)
 {
-    // 使用 libjpeg-turbo 生成真实 JPEG 数据
+    if (!g_ffmpegDecoder->IsAvailable()) {
+        GTEST_SKIP() << "FFmpeg decoder not available" << std::endl;
+    }
+
+    std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
     auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
-    // 第一次解码
-    bool result1 = decoder_->Decode(
+    std::cout << "==========[test log] 3. First decode." << std::endl;
+    bool result1 = g_ffmpegDecoder->Decode(
         {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
     EXPECT_TRUE(result1);
 
-    // 第二次解码（复用同一个解码器）
-    bool result2 = decoder_->Decode(
+    std::cout << "==========[test log] 4. Second decode (reuse decoder)." << std::endl;
+    bool result2 = g_ffmpegDecoder->Decode(
         {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
     EXPECT_TRUE(result2);
 }
 
 // ==================== LibyuvMjpegDecoder Tests ====================
 
+std::shared_ptr<LibyuvMjpegDecoder> g_libyuvDecoder = nullptr;
+
 class LibyuvMjpegDecoderTest : public ::testing::Test {
 protected:
-    static std::shared_ptr<LibyuvMjpegDecoder> decoder_;
-
-    static void SetUpTestSuite()
+    static void SetUpTestCase(void)
     {
-        decoder_ = std::make_shared<LibyuvMjpegDecoder>();
-        if (!decoder_->IsAvailable()) {
-            GTEST_SKIP() << "Libyuv decoder not available";
+        std::cout << "==========[test log] LibyuvMjpegDecoderTest SetUpTestCase" << std::endl;
+        g_libyuvDecoder = std::make_shared<LibyuvMjpegDecoder>();
+        if (!g_libyuvDecoder->IsAvailable()) {
+            std::cout << "==========[test log] Libyuv decoder not available, skip tests" << std::endl;
         }
     }
 
-    static void TearDownTestSuite()
+    static void TearDownTestCase(void)
     {
-        decoder_.reset(); // 显式释放 decoder
+        std::cout << "==========[test log] LibyuvMjpegDecoderTest TearDownTestCase" << std::endl;
+        g_libyuvDecoder.reset();
     }
 };
 
-std::shared_ptr<LibyuvMjpegDecoder> LibyuvMjpegDecoderTest::decoder_ = nullptr;
-
-// TC-008: Libyuv 解码（如果可用）
-TEST_F(LibyuvMjpegDecoderTest, Decode_WithValidMJPEG_Success)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Decode with valid MJPEG data using Libyuv, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(LibyuvMjpegDecoderTest, camera_mjpeg_0008)
 {
-    // 使用 libjpeg-turbo 生成真实 JPEG 数据
+    if (!g_libyuvDecoder->IsAvailable()) {
+        GTEST_SKIP() << "Libyuv decoder not available" << std::endl;
+    }
+
+    std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
     auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
-    bool result = decoder_->Decode(
+    std::cout << "==========[test log] 3. Execute decode." << std::endl;
+    bool result = g_libyuvDecoder->Decode(
         {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
 
+    std::cout << "==========[test log] 4. Verify decode result." << std::endl;
     EXPECT_TRUE(result);
     if (result) {
         EXPECT_FALSE(IsAllZeros(output));
     }
 }
 
-// TC-009: Libyuv 无效数据
-TEST_F(LibyuvMjpegDecoderTest, Decode_InvalidData_Failure)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Decode with invalid MJPEG data using Libyuv, expected failure.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(LibyuvMjpegDecoderTest, camera_mjpeg_0009)
 {
-    std::vector<uint8_t> invalidData = {0x00, 0x01, 0x02, 0x03};
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    if (!g_libyuvDecoder->IsAvailable()) {
+        GTEST_SKIP() << "Libyuv decoder not available" << std::endl;
+    }
 
-    bool result = decoder_->Decode(
+    std::cout << "==========[test log] 1. Prepare invalid MJPEG data." << std::endl;
+    std::vector<uint8_t> invalidData = {0x00, 0x01, 0x02, 0x03};
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+
+    std::cout << "==========[test log] 2. Execute decode with invalid data." << std::endl;
+    bool result = g_libyuvDecoder->Decode(
         {invalidData.data(), invalidData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
 
+    std::cout << "==========[test log] 3. Verify decode result." << std::endl;
     EXPECT_FALSE(result);
 }
 
-// TC-010: Libyuv 解码器名称验证
-TEST_F(LibyuvMjpegDecoderTest, GetName_ReturnsLibyuv)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Verify Libyuv decoder GetName returns correct name.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(LibyuvMjpegDecoderTest, camera_mjpeg_0010)
 {
-    EXPECT_STREQ(decoder_->GetName(), "Libyuv");
+    if (!g_libyuvDecoder->IsAvailable()) {
+        GTEST_SKIP() << "Libyuv decoder not available" << std::endl;
+    }
+
+    std::cout << "==========[test log] 1. Verify decoder name." << std::endl;
+    EXPECT_STREQ(g_libyuvDecoder->GetName(), "Libyuv");
 }
 
 // ==================== MjpegDecoderFactory Tests ====================
 
 class MjpegDecoderFactoryTest : public ::testing::Test {};
 
-// TC-011: 工厂创建解码器
-TEST_F(MjpegDecoderFactoryTest, Create_ReturnsValidDecoder)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Factory Create returns valid decoder.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(MjpegDecoderFactoryTest, camera_mjpeg_0011)
 {
+    std::cout << "==========[test log] 1. Create decoder via factory." << std::endl;
     auto decoder = MjpegDecoderFactory::Create();
 
+    std::cout << "==========[test log] 2. Verify decoder is not null." << std::endl;
     EXPECT_NE(decoder, nullptr);
+
+    std::cout << "==========[test log] 3. Verify decoder is available." << std::endl;
     EXPECT_TRUE(decoder->IsAvailable());
 }
 
-// TC-012: 工厂返回正确的解码器名称
-TEST_F(MjpegDecoderFactoryTest, GetAvailableDecoderName_NotNone)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Factory GetAvailableDecoderName returns valid name.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(MjpegDecoderFactoryTest, camera_mjpeg_0012)
 {
+    std::cout << "==========[test log] 1. Get available decoder name." << std::endl;
     const char *name = MjpegDecoderFactory::GetAvailableDecoderName();
 
+    std::cout << "==========[test log] 2. Verify decoder name is valid." << std::endl;
     EXPECT_NE(name, nullptr);
     EXPECT_STRNE(name, "None");
 
-    // 应该是 Libyuv 或 FFmpeg
     bool validName = (strcmp(name, "Libyuv") == 0 || strcmp(name, "FFmpeg") == 0);
     EXPECT_TRUE(validName) << "Unexpected decoder name: " << name;
 }
 
-// TC-013: 工厂创建的解码器可以重复使用
-TEST_F(MjpegDecoderFactoryTest, Create_ReuseDecoder)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Factory created decoder can decode multiple times.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(MjpegDecoderFactoryTest, camera_mjpeg_0013)
 {
+    std::cout << "==========[test log] 1. Create decoder via factory." << std::endl;
     auto decoder = MjpegDecoderFactory::Create();
     ASSERT_NE(decoder, nullptr);
 
+    std::cout << "==========[test log] 2. Generate test MJPEG data." << std::endl;
     auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     if (mjpegData.empty()) {
-        GTEST_SKIP() << "Test file not available";
+        GTEST_SKIP() << "Test file not available" << std::endl;
     }
 
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::cout << "==========[test log] 3. Allocate output buffer." << std::endl;
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
-    // 第一次解码
+    std::cout << "==========[test log] 4. First decode." << std::endl;
     bool result1 = decoder->Decode(
         {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
     EXPECT_TRUE(result1);
 
-    // 第二次解码（复用同一个解码器）
+    std::cout << "==========[test log] 5. Second decode (reuse decoder)." << std::endl;
     bool result2 = decoder->Decode(
         {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
     EXPECT_TRUE(result2);
@@ -277,104 +416,82 @@ TEST_F(MjpegDecoderFactoryTest, Create_ReuseDecoder)
 
 // ==================== Performance Benchmark Tests ====================
 
+std::shared_ptr<FfmpegMjpegDecoder> g_benchmarkDecoder = nullptr;
+std::vector<uint8_t> g_benchmarkMjpegData;
+std::vector<uint8_t> g_benchmarkOutput;
+
 class MjpegDecoderBenchmarkTest : public ::testing::Test {
 protected:
-    static std::shared_ptr<FfmpegMjpegDecoder> decoder_;
-
-    static void SetUpTestSuite()
+    static void SetUpTestCase(void)
     {
-        decoder_ = std::make_shared<FfmpegMjpegDecoder>();
-        if (!decoder_->IsAvailable()) {
-            GTEST_SKIP() << "FFmpeg decoder not available for benchmarks";
+        std::cout << "==========[test log] MjpegDecoderBenchmarkTest SetUpTestCase" << std::endl;
+        g_benchmarkDecoder = std::make_shared<FfmpegMjpegDecoder>();
+        if (!g_benchmarkDecoder->IsAvailable()) {
+            std::cout << "==========[test log] FFmpeg decoder not available for benchmarks" << std::endl;
+            return;
         }
-        mjpegData_ = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-        if (mjpegData_.empty()) {
-            GTEST_SKIP() << "Test file not available, skipping benchmark";
+        g_benchmarkMjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        if (g_benchmarkMjpegData.empty()) {
+            std::cout << "==========[test log] Test file not available, skipping benchmark" << std::endl;
+            return;
         }
-        output_.resize(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        g_benchmarkOutput.resize(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     }
 
-    static void TearDownTestSuite()
+    static void TearDownTestCase(void)
     {
-        decoder_.reset();
+        std::cout << "==========[test log] MjpegDecoderBenchmarkTest TearDownTestCase" << std::endl;
+        g_benchmarkDecoder.reset();
     }
-
-    static std::vector<uint8_t> mjpegData_;
-    static std::vector<uint8_t> output_;
 };
 
-std::shared_ptr<FfmpegMjpegDecoder> MjpegDecoderBenchmarkTest::decoder_ = nullptr;
-std::vector<uint8_t> MjpegDecoderBenchmarkTest::mjpegData_;
-std::vector<uint8_t> MjpegDecoderBenchmarkTest::output_;
-
-// TC-014: FFmpeg 解码性能基准 - 已禁用，基准测试不适合 UT
-TEST_F(MjpegDecoderBenchmarkTest, DISABLED_Ffmpeg_DecodePerformance)
-{
-    const int iterations = 10; // 减少迭代次数以适应设备
-    auto start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < iterations; i++) {
-        bool result = decoder_->Decode(
-            {mjpegData_.data(), mjpegData_.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output_.data(), output_.size()});
-        EXPECT_TRUE(result);
-    }
-
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-
-    std::cout << "FFmpeg decode " << iterations << " frames in " << duration.count() << " ms ("
-              << duration.count() / iterations << " ms/frame)" << std::endl;
-
-    EXPECT_LT(duration.count(), FFMPEG_MAX_DECODE_TIME_MS);
-}
-
-// TC-015: Libyuv 解码性能基准
-TEST_F(MjpegDecoderBenchmarkTest, Libyuv_DecodePerformance)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Libyuv decode performance benchmark.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(MjpegDecoderBenchmarkTest, camera_mjpeg_0014)
 {
     auto decoder = std::make_shared<LibyuvMjpegDecoder>();
     if (!decoder->IsAvailable()) {
-        GTEST_SKIP() << "Libyuv decoder not available";
+        GTEST_SKIP() << "Libyuv decoder not available" << std::endl;
     }
 
+    std::cout << "==========[test log] 1. Start performance test." << std::endl;
     const int iterations = 10;
     auto start = std::chrono::high_resolution_clock::now();
 
+    std::cout << "==========[test log] 2. Execute decode " << iterations << " times." << std::endl;
     for (int i = 0; i < iterations; i++) {
         bool result = decoder->Decode(
-            {mjpegData_.data(), mjpegData_.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output_.data(), output_.size()});
+            {g_benchmarkMjpegData.data(), g_benchmarkMjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT,
+             g_benchmarkOutput.data(), g_benchmarkOutput.size()});
         EXPECT_TRUE(result);
     }
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-    std::cout << "Libyuv decode " << iterations << " frames in " << duration.count() << " ms ("
+    std::cout << "==========[test log] Libyuv decode " << iterations << " frames in " << duration.count() << " ms ("
               << duration.count() / iterations << " ms/frame)" << std::endl;
 
-    EXPECT_LT(duration.count(), LIBYUV_MAX_DECODE_TIME_MS);
+    EXPECT_LT(duration.count(), MAX_DECODE_TIME_MS_PERF);
 }
 
 // ==================== Cross-Decoder Consistency Tests ====================
 
-class MjpegDecodeResultTest : public ::testing::Test {
-protected:
-    void SetUp() override
-    {
-        mjpegData_ = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-        if (mjpegData_.empty()) {
-            GTEST_SKIP() << "Test file not available";
-        }
-        outputFfmpeg_.resize(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT) / PIXEL_COMPONENTS);
-        outputLibyuv_.resize(NV21_BUFFER_SIZE(DEFAULT_WIDTH, DEFAULT_HEIGHT) / PIXEL_COMPONENTS);
-    }
+class MjpegDecodeResultTest : public ::testing::Test {};
 
-    std::vector<uint8_t> mjpegData_;
-    std::vector<uint8_t> outputFfmpeg_;
-    std::vector<uint8_t> outputLibyuv_;
-};
-
-// TC-016: 两种解码器输出结果一致性
-TEST_F(MjpegDecodeResultTest, DecoderOutputConsistency)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Verify FFmpeg and Libyuv decoder output consistency.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(MjpegDecodeResultTest, camera_mjpeg_0015)
 {
     auto ffmpegDecoder = std::make_shared<FfmpegMjpegDecoder>();
     auto libyuvDecoder = std::make_shared<LibyuvMjpegDecoder>();
@@ -382,90 +499,178 @@ TEST_F(MjpegDecodeResultTest, DecoderOutputConsistency)
     bool ffmpegAvailable = ffmpegDecoder->IsAvailable();
     bool libyuvAvailable = libyuvDecoder->IsAvailable();
     if (!ffmpegAvailable || !libyuvAvailable) {
-        GTEST_SKIP() << "Both decoders must be available for consistency test";
+        GTEST_SKIP() << "Both decoders must be available for consistency test" << std::endl;
     }
 
-    // FFmpeg 解码
-    bool result1 = ffmpegDecoder->Decode({mjpegData_.data(), mjpegData_.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT,
-        outputFfmpeg_.data(), outputFfmpeg_.size()});
+    std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
+    auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    if (mjpegData.empty()) {
+        GTEST_SKIP() << "Test file not available" << std::endl;
+    }
+
+    std::vector<uint8_t> outputFfmpeg(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::vector<uint8_t> outputLibyuv(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+
+    std::cout << "==========[test log] 2. FFmpeg decode." << std::endl;
+    bool result1 = ffmpegDecoder->Decode(
+        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, outputFfmpeg.data(), outputFfmpeg.size()});
     EXPECT_TRUE(result1);
 
-    // Libyuv 解码
-    bool result2 = libyuvDecoder->Decode({mjpegData_.data(), mjpegData_.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT,
-        outputLibyuv_.data(), outputLibyuv_.size()});
+    std::cout << "==========[test log] 3. Libyuv decode." << std::endl;
+    bool result2 = libyuvDecoder->Decode(
+        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, outputLibyuv.data(), outputLibyuv.size()});
     EXPECT_TRUE(result2);
 
     if (result1 && result2) {
-        bool consistent = CompareYUVData(outputFfmpeg_.data(), outputLibyuv_.data(), outputFfmpeg_.size(), 5, 1);
+        std::cout << "==========[test log] 4. Compare decoder outputs." << std::endl;
+        bool consistent = CompareYUVData(outputFfmpeg.data(), outputLibyuv.data(), outputFfmpeg.size(), 5, 1);
         EXPECT_TRUE(consistent) << "Decoder outputs differ significantly";
     }
 }
 
 // ==================== Edge Cases ====================
 
+std::shared_ptr<IMjpegDecoder> g_edgeCaseDecoder = nullptr;
+
 class MjpegDecoderEdgeCaseTest : public ::testing::Test {
 protected:
-    static std::shared_ptr<IMjpegDecoder> decoder_;
-
-    static void SetUpTestSuite()
+    static void SetUpTestCase(void)
     {
-        decoder_ = MjpegDecoderFactory::Create();
+        std::cout << "==========[test log] MjpegDecoderEdgeCaseTest SetUpTestCase" << std::endl;
+        g_edgeCaseDecoder = MjpegDecoderFactory::Create();
     }
 
-    static void TearDownTestSuite()
+    static void TearDownTestCase(void)
     {
-        decoder_.reset();
+        std::cout << "==========[test log] MjpegDecoderEdgeCaseTest TearDownTestCase" << std::endl;
+        g_edgeCaseDecoder.reset();
     }
 };
 
-std::shared_ptr<IMjpegDecoder> MjpegDecoderEdgeCaseTest::decoder_ = nullptr;
-
-// TC-017: 极端分辨率测试 (小分辨率)
-TEST_F(MjpegDecoderEdgeCaseTest, Decode_ExtremeResolution)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Decode with extreme small resolution (QCIF), expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(MjpegDecoderEdgeCaseTest, camera_mjpeg_0016)
 {
-    if (!decoder_->IsAvailable()) {
-        GTEST_SKIP() << "No decoder available";
+    if (!g_edgeCaseDecoder->IsAvailable()) {
+        GTEST_SKIP() << "No decoder available" << std::endl;
     }
 
-    // 尝试解码 160x120 图像 (QCIF 格式)
+    std::cout << "==========[test log] 1. Generate test MJPEG data (QCIF resolution)." << std::endl;
     auto mjpegData = GenerateTestMJPEG(QCIF_WIDTH, QCIF_HEIGHT);
     if (mjpegData.empty()) {
-        GTEST_SKIP() << "160x120 test file not available";
+        GTEST_SKIP() << "QCIF test file not available" << std::endl;
     }
 
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(QCIF_WIDTH, QCIF_HEIGHT));
-    bool result =
-        decoder_->Decode({mjpegData.data(), mjpegData.size(), QCIF_WIDTH, QCIF_HEIGHT, output.data(), output.size()});
+    std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
+    std::vector<uint8_t> output(NV21BufferSize(QCIF_WIDTH, QCIF_HEIGHT));
 
+    std::cout << "==========[test log] 3. Execute decode." << std::endl;
+    bool result = g_edgeCaseDecoder->Decode(
+        {mjpegData.data(), mjpegData.size(), QCIF_WIDTH, QCIF_HEIGHT, output.data(), output.size()});
+
+    std::cout << "==========[test log] 4. Verify decode result." << std::endl;
     EXPECT_TRUE(result);
 }
 
-// TC-018: 大尺寸图像测试
-TEST_F(MjpegDecoderEdgeCaseTest, Decode_LargeResolution)
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Decode with large resolution (720P), expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(MjpegDecoderEdgeCaseTest, camera_mjpeg_0017)
 {
-    if (!decoder_->IsAvailable()) {
-        GTEST_SKIP() << "No decoder available";
+    if (!g_edgeCaseDecoder->IsAvailable()) {
+        GTEST_SKIP() << "No decoder available" << std::endl;
     }
 
-    // 尝试解码 1280x720 图像
+    std::cout << "==========[test log] 1. Generate test MJPEG data (720P resolution)." << std::endl;
     auto mjpegData = GenerateTestMJPEG(HD720P_WIDTH, HD720P_HEIGHT);
     if (mjpegData.empty()) {
-        GTEST_SKIP() << "1280x720 test file not available";
+        GTEST_SKIP() << "720P test file not available" << std::endl;
     }
 
-    std::vector<uint8_t> output(NV21_BUFFER_SIZE(HD720P_WIDTH, HD720P_HEIGHT));
-    bool result = decoder_->Decode(
+    std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
+    std::vector<uint8_t> output(NV21BufferSize(HD720P_WIDTH, HD720P_HEIGHT));
+
+    std::cout << "==========[test log] 3. Execute decode." << std::endl;
+    bool result = g_edgeCaseDecoder->Decode(
         {mjpegData.data(), mjpegData.size(), HD720P_WIDTH, HD720P_HEIGHT, output.data(), output.size()});
 
+    std::cout << "==========[test log] 4. Verify decode result." << std::endl;
     EXPECT_TRUE(result);
+}
+
+// ==================== Multi-thread Safety Tests ====================
+
+std::shared_ptr<IMjpegDecoder> g_threadSafetyDecoder = nullptr;
+
+class MjpegDecoderThreadSafetyTest : public ::testing::Test {
+protected:
+    static void SetUpTestCase(void)
+    {
+        std::cout << "==========[test log] MjpegDecoderThreadSafetyTest SetUpTestCase" << std::endl;
+    }
+
+    static void TearDownTestCase(void)
+    {
+        std::cout << "==========[test log] MjpegDecoderThreadSafetyTest TearDownTestCase" << std::endl;
+    }
+};
+
+/**
+  * @tc.name: MJPEG Decoder
+  * @tc.desc: Verify decoder thread safety with concurrent decode requests.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(MjpegDecoderThreadSafetyTest, camera_mjpeg_0018)
+{
+    std::cout << "==========[test log] 1. Create multiple decoder instances." << std::endl;
+    const int numThreads = 4;
+    std::vector<std::shared_ptr<IMjpegDecoder>> decoders;
+
+    for (int i = 0; i < numThreads; i++) {
+        decoders.push_back(MjpegDecoderFactory::Create());
+    }
+
+    std::cout << "==========[test log] 2. Generate test MJPEG data." << std::endl;
+    auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    if (mjpegData.empty()) {
+        GTEST_SKIP() << "Test file not available" << std::endl;
+    }
+
+    std::cout << "==========[test log] 3. Execute concurrent decode." << std::endl;
+    std::vector<std::future<bool>> futures;
+    for (int i = 0; i < numThreads; i++) {
+        futures.push_back(std::async(std::launch::async, [decoder = decoders[i], &mjpegData]() {
+            std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+            return decoder->Decode(
+                {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+        }));
+    }
+
+    std::cout << "==========[test log] 4. Verify all decode results." << std::endl;
+    for (int i = 0; i < numThreads; i++) {
+        EXPECT_TRUE(futures[i].get()) << "Thread " << i << " decode failed";
+    }
 }
 
 // 主函数
 int main(int argc, char **argv)
 {
+    std::cout << "==========[test log] MJPEG Decoder UT Start" << std::endl;
     ::testing::InitGoogleTest(&argc, argv);
     int ret = RUN_ALL_TESTS();
-    // 直接退出，避免 gtest teardown 阶段的 Signal 11
-    // 这是因为 FFmpeg decoder 在静态单例模式下，gtest 清理时可能与 FFmpeg 内部状态冲突
-    _exit(ret);
+    std::cout << "==========[test log] MJPEG Decoder UT Finished, ret=" << ret << std::endl;
+    // 使用 quick_exit 避免 FFmpeg 和 gtest 清理冲突
+    // FFmpeg 的 AVCodecContext 在 atexit 清理时可能与 gtest 的清理顺序冲突
+    std::quick_exit(ret);
 }

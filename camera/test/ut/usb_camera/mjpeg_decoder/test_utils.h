@@ -62,8 +62,11 @@ constexpr int NV21_BYTES_PER_PIXEL_NUMERATOR = 3;
 constexpr int NV21_BYTES_PER_PIXEL_DENOMINATOR = 2;
 constexpr int PIXEL_COMPONENTS = 3;
 
-// Helper macro for NV21 buffer size calculation
-#define NV21_BUFFER_SIZE(w, h) (((w) * (h) * NV21_BYTES_PER_PIXEL_NUMERATOR) / NV21_BYTES_PER_PIXEL_DENOMINATOR)
+// Helper function for NV21 buffer size calculation (replaces macro NV21_BUFFER_SIZE)
+constexpr size_t NV21BufferSize(int32_t w, int32_t h)
+{
+    return static_cast<size_t>(w) * h * NV21_BYTES_PER_PIXEL_NUMERATOR / NV21_BYTES_PER_PIXEL_DENOMINATOR;
+}
 
 // Calculation constants - 计算常量
 constexpr int PERCENT_FACTOR = 100;
@@ -191,19 +194,7 @@ inline std::vector<uint8_t> GenerateTestMJPEG(int width = DEFAULT_IMAGE_WIDTH, i
  * @return std::vector<uint8_t> JPEG数据
  */
 
-
-/**
- * @brief 生成简单的占位 MJPEG 数据（用于基础测试）
- * @param width 宽度
- * @param height 高度
- * @return std::vector<uint8_t> MJPEG数据
- * @deprecated 请使用 GenerateTestMJPEG 替代
- */
-inline std::vector<uint8_t> GenerateSimpleMJPEG(int width, int height)
-{
-    return GenerateTestMJPEG(width, height);
-}
-
+ 
 /**
  * @brief 获取预生成的 640x480 JPEG 测试图像数据
  * @return std::vector<uint8_t> JPEG数据
