@@ -15,7 +15,9 @@
 #include "metadata_controller.h"
 #include "mjpeg_decoder.h"
 #include <unistd.h>
+#include <vector>
 
+// YUYV 格式每个像素占用 2 字节（Y-U-Y-V 采样，每两个像素共享 UV 分量）
 constexpr int PIXEL_SPACE = 2;
 
 namespace OHOS::Camera {
@@ -220,13 +222,61 @@ static void SetImageAllBlack(uint8_t *buf, size_t bufferSize, uint32_t format)
     }
 }
 
+// 辅助函数：MJPEG 解码（仅 USB VDI 使用）
+static void DecodeMjpegBuffer(std::shared_ptr<IBuffer>& buffer, uint32_t wide, uint32_t high,
+    std::shared_ptr<IMjpegDecoder>& mjpegDecoder_, const std::string& cameraId)
+{
+    if (mjpegDecoder_ == nullptr) {
+        mjpegDecoder_ = MjpegDecoderFactory::Create();
+        CAMERA_LOGI("UvcNode[%{public}s]: MJPEG decoder initialized: %{public}s", cameraId.c_str(),
+            MjpegDecoderFactory::GetAvailableDecoderName());
+    }
+
+    thread_local static std::vector<uint8_t> s_mjpegBuffer;
+    size_t mjpegSize = static_cast<size_t>(buffer->GetEsFrameInfo().size);
+    if (s_mjpegBuffer.size() < mjpegSize) {
+        s_mjpegBuffer.resize(mjpegSize);
+    }
+
+    if (memcpy_s(s_mjpegBuffer.data(), mjpegSize, buffer->GetVirAddress(), mjpegSize) != EOK) {
+        CAMERA_LOGE("UvcNode: memcpy_s failed");
+        return;
+    }
+
+    struct timespec ts0;
+    struct timespec ts1;
+    clock_gettime(CLOCK_MONOTONIC, &ts0);
+
+    bool ret = mjpegDecoder_->Decode({
+        s_mjpegBuffer.data(), mjpegSize,
+        wide, high,
+        static_cast<uint8_t*>(buffer->GetVirAddress()), buffer->GetSize()
+    });
+
+    clock_gettime(CLOCK_MONOTONIC, &ts1);
+    double decodeDuration =
+        (ts1.tv_sec * 1000.0 + ts1.tv_nsec / 1e6) - (ts0.tv_sec * 1000.0 + ts0.tv_nsec / 1e6);
+
+    if (ret) {
+        buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_SP);
+        buffer->SetEsFrameSize(-1);
+        buffer->SetIsValidDataInSurfaceBuffer(false);
+        CAMERA_LOGD("MJPEG decode done, dec=%{public}s, sz=%{public}zu, T=%{public}0.2fms",
+            mjpegDecoder_->GetName(), mjpegSize, decodeDuration);
+    } else {
+        CAMERA_LOGE("MJPEG decode failed, dec=%{public}s, sz=%{public}zu, T=%{public}0.2fms",
+            mjpegDecoder_->GetName(), mjpegSize, decodeDuration);
+            buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP);
+    }
+}
+
 void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
 {
     if (buffer == nullptr) {
         CAMERA_LOGE("UvcNode::DeliverBuffer frameSpec is null");
         return;
     }
-    CAMERA_LOGI("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]", buffer->GetStreamId(),
+    CAMERA_LOGD("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]", buffer->GetStreamId(),
         buffer->GetIndex());
 
     buffer->SetCurWidth(wide_);
@@ -240,40 +290,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
 
     // MJPEG 解码：如果源格式是 MJPEG 且目标格式不是 BLOB，则需要解码
     if (uvcSourcePixformat_ == V4L2_PIX_FMT_MJPEG && cameraformat_ != CAMERA_FORMAT_BLOB) {
-        // 静态缓存解码器实例 (避免重复创建)
-        static auto decoder = MjpegDecoderFactory::Create();
-        static std::once_flag logFlag;
-        std::call_once(logFlag, []() {
-            CAMERA_LOGI("MJPEG decoder initialized: %{public}s", MjpegDecoderFactory::GetAvailableDecoderName());
-        });
-
-        size_t mjpegSize = (size_t)buffer->GetEsFrameInfo().size;
-        uint8_t *mjpegBuf = (uint8_t *)malloc(mjpegSize);
-        if (mjpegBuf != nullptr) {
-            memcpy_s(mjpegBuf, mjpegSize, (uint8_t *)buffer->GetVirAddress(), mjpegSize);
-
-            struct timespec ts0;
-            struct timespec ts1;
-            clock_gettime(CLOCK_MONOTONIC, &ts0);
-
-            bool ret = decoder->Decode({mjpegBuf, mjpegSize, wide_, high_,
-                static_cast<uint8_t *>(buffer->GetVirAddress()), buffer->GetSize()});
-
-            clock_gettime(CLOCK_MONOTONIC, &ts1);
-            double decodeDuration =
-                (ts1.tv_sec * 1000.0 + ts1.tv_nsec / 1e6) - (ts0.tv_sec * 1000.0 + ts0.tv_nsec / 1e6);
-
-            CAMERA_LOGI("MJPEG decode done, ret=%{public}d, dec=%{public}s, sz=%{public}d, T=%{public}0.2fms",
-                ret ? 1 : 0, decoder->GetName(), mjpegSize, decodeDuration);
-
-            if (ret) {
-                buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_SP);
-                buffer->SetEsFrameSize(-1);
-                // MJPEG 解码后数据在 VirAddr，不在 SurfBufAddr
-                buffer->SetIsValidDataInSurfaceBuffer(false);
-            }
-            free(mjpegBuf);
-        }
+        DecodeMjpegBuffer(buffer, wide_, high_, mjpegDecoder_, cameraId_);
     }
 
     SourceNode::DeliverBuffer(buffer);
@@ -282,7 +299,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
     clock_gettime(CLOCK_MONOTONIC, &tsEnd);
     double totalDuration =
         (tsEnd.tv_sec * 1000.0 + tsEnd.tv_nsec / 1e6) - (tsBegin.tv_sec * 1000.0 + tsBegin.tv_nsec / 1e6);
-    CAMERA_LOGI("DeliverBuffer Done, T=%{public}0.2fms", totalDuration);
+    CAMERA_LOGD("DeliverBuffer Done, T=%{public}0.2fms", totalDuration);
     return;
 }
 

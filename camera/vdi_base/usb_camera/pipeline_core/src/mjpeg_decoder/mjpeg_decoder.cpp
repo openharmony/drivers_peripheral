@@ -193,8 +193,20 @@ bool FfmpegMjpegDecoder::Decode(const DecodeParams& params)
         CAMERA_LOGE("FfmpegMjpegDecoder not initialized");
         return false;
     }
+    // C-04: 参数校验 - 检查宽高有效性
+    if (params.width <= 0 || params.height <= 0) {
+        CAMERA_LOGE("FfmpegMjpegDecoder: Invalid resolution %dx%d", params.width, params.height);
+        return false;
+    }
     if (!params.mjpegData || params.size == 0 || !params.outputBuffer || params.outputSize == 0) {
         CAMERA_LOGE("FfmpegMjpegDecoder invalid parameters");
+        return false;
+    }
+    // 检查输出 buffer 大小是否足够 (NV21: width * height * 1.5)
+    size_t requiredSize = static_cast<size_t>(params.width) * static_cast<size_t>(params.height) * 3 / 2;
+    if (params.outputSize < requiredSize) {
+        CAMERA_LOGE("FfmpegMjpegDecoder: Output buffer too small, need %{public}zu, got %{public}zu",
+            requiredSize, params.outputSize);
         return false;
     }
 #ifdef DEVICE_USAGE_FFMPEG_ENABLE
@@ -236,51 +248,75 @@ bool FfmpegMjpegDecoder::Decode(const DecodeParams& params)
 
 // ==================== LibyuvMjpegDecoder ====================
 
+// C-03: 全局 once_flag 用于保护 dlopen 的线程安全
+static std::once_flag g_libyuvInitOnce;
+static bool g_libyuvAvailable = false;
+static void *g_libyuvHandle = nullptr;
+
+// Libyuv 函数指针类型别名（在 Impl 外部定义）
+using LibyuvMJPGSizeFunc = int(const uint8_t *, size_t, int *, int *);
+using LibyuvMJPGToNV21Func = int(const uint8_t *, size_t, uint8_t *, int, uint8_t *, int, int, int, int, int);
+
+static LibyuvMJPGSizeFunc *g_mjpgSize = nullptr;
+static LibyuvMJPGToNV21Func *g_mjpgToNv21 = nullptr;
+
 struct LibyuvMjpegDecoder::Impl {
     void *libyuvHandle = nullptr;
 
-    // Libyuv 函数指针类型
-    using MJPGSizeFunc = int(const uint8_t *, size_t, int *, int *);
-    using MJPGToNV21Func = int(const uint8_t *, size_t, uint8_t *, int, uint8_t *, int, int, int, int, int);
+    // 使用外部定义的类型别名
+    using MJPGSizeFunc = LibyuvMJPGSizeFunc;
+    using MJPGToNV21Func = LibyuvMJPGToNV21Func;
 
     MJPGSizeFunc *mjpgSize = nullptr;
     MJPGToNV21Func *mjpgToNv21 = nullptr;
     bool isAvailable = false;
 
-    bool Init()
+    // C-03: 线程安全的初始化函数
+    static void InitLibyuvOnce()
     {
         // 尝试加载 libyuv 库
-        libyuvHandle = dlopen("libyuv.z.so", RTLD_LAZY);
-        if (!libyuvHandle) {
-            libyuvHandle = dlopen("libyuv.so.0", RTLD_LAZY);
+        void *handle = dlopen("libyuv.z.so", RTLD_LAZY);
+        if (!handle) {
+            handle = dlopen("libyuv.so.0", RTLD_LAZY);
         }
 
-        if (!libyuvHandle) {
+        if (!handle) {
             CAMERA_LOGI("LibyuvMjpegDecoder: libyuv library not found");
-            return false;
+            g_libyuvAvailable = false;
+            return;
         }
 
         // 加载函数指针
-        mjpgSize = (MJPGSizeFunc *)dlsym(libyuvHandle, "MJPGSize");
-        mjpgToNv21 = (MJPGToNV21Func *)dlsym(libyuvHandle, "MJPGToNV21");
-        if (!mjpgSize || !mjpgToNv21) {
+        auto *sizeFunc = (MJPGSizeFunc *)dlsym(handle, "MJPGSize");
+        auto *convertFunc = (MJPGToNV21Func *)dlsym(handle, "MJPGToNV21");
+        if (!sizeFunc || !convertFunc) {
             CAMERA_LOGI("LibyuvMjpegDecoder: MJPG functions not found in libyuv");
-            dlclose(libyuvHandle);
-            libyuvHandle = nullptr;
-            return false;
+            dlclose(handle);
+            g_libyuvAvailable = false;
+            return;
         }
 
-        isAvailable = true;
+        g_libyuvHandle = handle;
+        g_mjpgSize = sizeFunc;
+        g_mjpgToNv21 = convertFunc;
+        g_libyuvAvailable = true;
         CAMERA_LOGI("LibyuvMjpegDecoder: libyuv loaded successfully");
-        return true;
+    }
+
+    bool Init()
+    {
+        // C-03: 使用 std::call_once 确保只初始化一次
+        std::call_once(g_libyuvInitOnce, InitLibyuvOnce);
+        
+        mjpgSize = g_mjpgSize;
+        mjpgToNv21 = g_mjpgToNv21;
+        isAvailable = g_libyuvAvailable;
+        return isAvailable;
     }
 
     ~Impl()
     {
-        if (libyuvHandle) {
-            dlclose(libyuvHandle);
-            libyuvHandle = nullptr;
-        }
+        // 注意：不关闭动态库，因为可能被其他实例使用
     }
 };
 
@@ -306,9 +342,20 @@ bool LibyuvMjpegDecoder::Decode(const DecodeParams& params)
         CAMERA_LOGE("LibyuvMjpegDecoder not available");
         return false;
     }
-
+    // C-04: 参数校验 - 检查宽高有效性
+    if (params.width <= 0 || params.height <= 0) {
+        CAMERA_LOGE("LibyuvMjpegDecoder: Invalid resolution %dx%d", params.width, params.height);
+        return false;
+    }
     if (!params.mjpegData || params.size == 0 || !params.outputBuffer || params.outputSize == 0) {
         CAMERA_LOGE("LibyuvMjpegDecoder invalid parameters");
+        return false;
+    }
+    // 检查输出 buffer 大小是否足够 (NV21: width * height * 1.5)
+    size_t requiredSize = static_cast<size_t>(params.width) * static_cast<size_t>(params.height) * 3 / 2;
+    if (params.outputSize < requiredSize) {
+        CAMERA_LOGE("LibyuvMjpegDecoder: Output buffer too small, need %{public}zu, got %{public}zu",
+            requiredSize, params.outputSize);
         return false;
     }
 
