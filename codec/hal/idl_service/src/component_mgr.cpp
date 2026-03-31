@@ -36,12 +36,21 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
     int32_t err = HDF_ERR_INVALID_PARAM;
     std::lock_guard<std::mutex> lk(mutex_);
 
-    auto iter = compoentsCore_.find(componentName);
-    if (iter == compoentsCore_.end() || iter->second == nullptr) {
+    auto iter = compName2libName_.find(componentName);
+    if (iter == compName2libName_.end()) {
         CODEC_LOGE("can not find component[%{public}s] in core", componentName);
         return HDF_ERR_NOT_SUPPORT;
     }
-    auto core = iter->second;
+    std::string libName = iter->second;
+ 
+    std::shared_ptr<CodecOMXCore> core;
+    auto iter2 = permanentLibs_.find(libName);
+    if (iter2 == permanentLibs_.end()) {
+        core = std::make_shared<CodecOMXCore>();
+        core->Init(libName);
+    } else {
+        core = iter2->second;
+    }
     if (core == nullptr) {
         CODEC_LOGE("can not find core of comonentName");
         return HDF_FAILURE;
@@ -51,6 +60,7 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
     err = core->GetHandle(handle, name, appData, *callbacks);
     if (err == OMX_ErrorNone && handle) {
         OMXComponent comp;
+        comp.name = name;
         comp.core = core;
         *component = reinterpret_cast<OMX_COMPONENTTYPE *>(handle);
         comp.handle = handle;
@@ -82,14 +92,14 @@ int32_t ComponentMgr::GetRolesForComponent(const char *componentName, std::vecto
 
 void ComponentMgr::AddVendorComponent()
 {
-    AddComponentByLibName("libOMX_Core.z.so");
-    AddComponentByLibName("libomx_audio_codec.z.so");
+    AddComponentByLibName("libOMX_Core.z.so", true);
+    AddComponentByLibName("libomx_audio_codec.z.so", false);
 }
 
 void ComponentMgr::AddSoftComponent()
 {}
 
-void ComponentMgr::AddComponentByLibName(const char *libName)
+void ComponentMgr::AddComponentByLibName(const char *libName, bool permanent)
 {
     auto core = std::make_shared<CodecOMXCore>();
     if (core == nullptr) {
@@ -98,12 +108,15 @@ void ComponentMgr::AddComponentByLibName(const char *libName)
     }
     core->Init(libName);
     std::lock_guard<std::mutex> lk(mutex_);
-    cores_.emplace_back(core);
+    std::string libNameStr(libName);
+    if (permanent) {
+        permanentLibs_[libNameStr] = core;
+    }
     std::string name("");
     uint32_t index = 0;
     while (HDF_SUCCESS == core->ComponentNameEnum(name, index)) {
         ++index;
-        compoentsCore_.emplace(std::make_pair(name, core));
+        compName2libName_[name] = libNameStr;
     }
 }
 
@@ -115,23 +128,23 @@ void ComponentMgr::CleanComponent()
     }
     components_.clear();
 
-    for (size_t i = 0; i < cores_.size(); i++) {
-        cores_[i]->DeInit();
+    for (auto& [libName, core] : permanentLibs_) {
+        core->DeInit();
     }
-    cores_.clear();
-
-    compoentsCore_.clear();
+    permanentLibs_.clear();
 }
 
 int32_t ComponentMgr::GetCoreOfComponent(CodecOMXCore* &core, const std::string compName)
 {
     std::lock_guard<std::mutex> lk(mutex_);
-    auto iter = compoentsCore_.find(compName);
-    if (iter == compoentsCore_.end() || iter->second == nullptr) {
+    auto iter = std::find_if(components_.begin(), components_.end(), [&compName](OMXComponent& comp) {
+        return comp.name == compName;
+    });
+    if (iter == components_.end()) {
         CODEC_LOGE("can not find component[%{public}s] in core", compName.c_str());
         return HDF_FAILURE;
     }
-    core = iter->second.get();
+    core = iter->core.get();
     return HDF_SUCCESS;
 }
 }  // namespace Omx
