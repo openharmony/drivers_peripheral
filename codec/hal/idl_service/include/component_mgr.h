@@ -29,6 +29,7 @@ namespace Omx {
 class ComponentMgr : public IComponentMgr {
 public:
     using OMXComponent = struct {
+        std::string name;
         OMX_HANDLETYPE handle;
         std::shared_ptr<CodecOMXCore> core;
     };
@@ -51,14 +52,14 @@ public:
 private:
     void AddVendorComponent();
     void AddSoftComponent();
-    void AddComponentByLibName(const char *libName);
+    void AddComponentByLibName(const char *libName, bool permanent);
     void CleanComponent();
 
 private:
-    std::vector<std::shared_ptr<CodecOMXCore>> cores_;                    // save all the core
-    std::map<std::string, std::shared_ptr<CodecOMXCore>> compoentsCore_;  // save the compoentname<--> core
-    std::vector<OMXComponent> components_;                                // save the opened compoents
     std::mutex mutex_;
+    std::map<std::string, std::string> compName2libName_;
+    std::map<std::string, std::shared_ptr<CodecOMXCore>> permanentLibs_;  // libname -> CodecOMXCore
+    std::vector<OMXComponent> components_;  // created
 };
 }  // namespace Omx
 }  // namespace Codec
