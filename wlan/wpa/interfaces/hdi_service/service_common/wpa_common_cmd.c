@@ -1063,6 +1063,8 @@ static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct
     HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
     ReleaseWifiStaInterface(0);
     HDF_LOGI("%{public}s: call ReleaseWifiStaInterface finish", __func__);
+    ReleaseEventCallback();
+    ClearHdfWpaRemoteObj();
     pthread_mutex_unlock(&g_interfaceLock);
 }
 
@@ -1901,6 +1903,11 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
         pthread_mutex_unlock(&g_interfaceLock);
         HDF_LOGE("invalid opt");
         return HDF_FAILURE;
+    }
+    if (HasRegisterCallback(ifName, nameLen)) {
+        HDF_LOGE("callback has registed");
+        pthread_mutex_unlock(&g_interfaceLock);
+        return HDF_SUCCESS;
     }
     do {
         HDF_LOGE("%{public}s: call HdfWpaAddRemoteObj", __func__);
