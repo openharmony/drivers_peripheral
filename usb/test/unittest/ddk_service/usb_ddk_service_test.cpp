@@ -163,4 +163,130 @@ HWTEST_F(UsbDdkServiceTest, QueryDriverInfo001, TestSize.Level1)
     EXPECT_TRUE(ret);
     EXPECT_EQ(updateDriverInfo.driverUid, queriedDriverInfo.driverUid);
 }
+
+HWTEST_F(UsbDdkServiceTest, ControlTransferTest001, TestSize.Level1)
+{
+    OHOS::sptr<V1_2::IUsbDdk> usbDdk = V1_2::IUsbDdk::Get();
+    ASSERT_NE(usbDdk, nullptr);
+
+    uint64_t deviceId = 0;
+    V1_2::UsbControlRequestSetup setup;
+    std::vector<uint8_t> data;
+    uint32_t timeout = 1000;
+    uint32_t transferredLength = 0;
+
+    setup.requestType = 0x80;
+    setup.requestCmd = 0x06;
+    setup.value = 0x0100;
+    setup.index = 0x0000;
+    setup.length = 0x0012;
+
+    int32_t ret = usbDdk->ControlTransfer(deviceId, setup, timeout, data, transferredLength);
+    EXPECT_NE(ret, 0);
+}
+
+HWTEST_F(UsbDdkServiceTest, ControlTransferTest002, TestSize.Level1)
+{
+    OHOS::sptr<V1_2::IUsbDdk> usbDdk = V1_2::IUsbDdk::Get();
+    ASSERT_NE(usbDdk, nullptr);
+
+    uint64_t deviceId = 0xFFFFFFFFFFFFFFFF;
+    V1_2::UsbControlRequestSetup setup;
+    std::vector<uint8_t> data;
+    uint32_t timeout = 1000;
+    uint32_t transferredLength = 0;
+
+    setup.requestType = 0x80;
+    setup.requestCmd = 0x06;
+    setup.value = 0x0100;
+    setup.index = 0x0000;
+    setup.length = 0x0012;
+
+    int32_t ret = usbDdk->ControlTransfer(deviceId, setup, timeout, data, transferredLength);
+    EXPECT_NE(ret, 0);
+}
+
+HWTEST_F(UsbDdkServiceTest, GetNonRootHubsTest001, TestSize.Level1)
+{
+    OHOS::sptr<V1_2::IUsbDdk> usbDdk = V1_2::IUsbDdk::Get();
+    ASSERT_NE(usbDdk, nullptr);
+
+    std::vector<uint64_t> nonRootHubIds;
+    int32_t ret = usbDdk->GetNonRootHubs(nonRootHubIds);
+    EXPECT_EQ(ret, HDF_ERR_NOPERM);
+    EXPECT_GE(nonRootHubIds.size(), 0);
+}
+
+HWTEST_F(UsbDdkServiceTest, GetNonRootHubsTest002, TestSize.Level1)
+{
+    OHOS::sptr<V1_2::IUsbDdk> usbDdk = V1_2::IUsbDdk::Get();
+    ASSERT_NE(usbDdk, nullptr);
+
+    std::vector<uint64_t> nonRootHubIds1;
+    std::vector<uint64_t> nonRootHubIds2;
+
+    int32_t ret1 = usbDdk->GetNonRootHubs(nonRootHubIds1);
+    int32_t ret2 = usbDdk->GetNonRootHubs(nonRootHubIds2);
+
+    EXPECT_EQ(ret1, HDF_ERR_NOPERM);
+    EXPECT_EQ(ret2, HDF_ERR_NOPERM);
+    EXPECT_EQ(nonRootHubIds1.size(), nonRootHubIds2.size());
+}
+
+HWTEST_F(UsbDdkServiceTest, ControlTransferDifferentRequestTypesTest001, TestSize.Level1)
+{
+    OHOS::sptr<V1_2::IUsbDdk> usbDdk = V1_2::IUsbDdk::Get();
+    ASSERT_NE(usbDdk, nullptr);
+
+    uint64_t deviceId = 0;
+    uint32_t timeout = 1000;
+    uint32_t transferredLength = 0;
+
+    V1_2::UsbControlRequestSetup setup;
+    std::vector<uint8_t> data;
+
+    setup.requestType = 0x80;
+    setup.requestCmd = 0x08;
+    setup.value = 0x0000;
+    setup.index = 0x0000;
+    setup.length = 0x0001;
+
+    int32_t ret = usbDdk->ControlTransfer(deviceId, setup, timeout, data, transferredLength);
+    EXPECT_NE(ret, 0);
+
+    setup.requestType = 0x80;
+    setup.requestCmd = 0x00;
+    setup.value = 0x0000;
+    setup.index = 0x0000;
+    setup.length = 0x0001;
+
+    ret = usbDdk->ControlTransfer(deviceId, setup, timeout, data, transferredLength);
+    EXPECT_NE(ret, 0);
+}
+
+HWTEST_F(UsbDdkServiceTest, ControlTransferTimeoutTest001, TestSize.Level1)
+{
+    OHOS::sptr<V1_2::IUsbDdk> usbDdk = V1_2::IUsbDdk::Get();
+    ASSERT_NE(usbDdk, nullptr);
+
+    uint64_t deviceId = 0;
+    V1_2::UsbControlRequestSetup setup;
+    std::vector<uint8_t> data;
+    uint32_t transferredLength = 0;
+
+    setup.requestType = 0x80;
+    setup.requestCmd = 0x06;
+    setup.value = 0x0100;
+    setup.index = 0x0000;
+    setup.length = 0x0012;
+
+    int32_t ret = usbDdk->ControlTransfer(deviceId, setup, 0, data, transferredLength);
+    EXPECT_NE(ret, 0);
+
+    ret = usbDdk->ControlTransfer(deviceId, setup, 10, data, transferredLength);
+    EXPECT_NE(ret, 0);
+
+    ret = usbDdk->ControlTransfer(deviceId, setup, 10000, data, transferredLength);
+    EXPECT_NE(ret, 0);
+}
 }
