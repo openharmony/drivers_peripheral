@@ -45,6 +45,7 @@ if (defined(ohos_lite)) {
       "fuzztest/serialsetattribute_fuzzer:fuzztest",
       "fuzztest/serialwrite_fuzzer:fuzztest",
       "fuzztest/usbgetdevices_fuzzer:fuzztest",
+      "fuzztest/usbgetnonroothubs_fuzzer:fuzztest",
       "fuzztest/usbserialddk_fuzzer:fuzztest",
       "fuzztest/usbserialflush_fuzzer:fuzztest",
       "fuzztest/usbserialflushinput_fuzzer:fuzztest",
