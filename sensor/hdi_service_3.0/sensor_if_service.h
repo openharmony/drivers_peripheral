@@ -43,6 +43,7 @@ class SensorIfService : public V3_1::ISensorInterface {
     int32_t GetAllSensorInfo(std::vector<V3_0::HdfSensorInformation> &info) override;
     int32_t Enable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo) override;
     int32_t Disable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo) override;
+    void SetNewBatch(const SensorHandle sensorHandle);
     int32_t DisableSensor(const SensorHandle sensorHandle, uint32_t serviceId);
     int32_t SetBatch(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo, int64_t samplingInterval,
                      int64_t reportInterval) override;
