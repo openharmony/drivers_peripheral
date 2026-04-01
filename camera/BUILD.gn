@@ -38,7 +38,6 @@ if (defined(ohos_lite)) {
         "vdi_base/common/metadata_manager:camera_example_vendor_tag_impl",
         "vdi_base/common/metadata_manager:camera_vendor_tag_service_1.0",
         "vdi_base/common/utils:peripheral_camera_utils",
-        "vdi_base/usb_camera:usb_camera_vdi_impl",
       ]
       if (drivers_peripheral_camera_feature_usb == false) {
         deps += [
@@ -47,6 +46,10 @@ if (defined(ohos_lite)) {
           "vdi_base/common/device_manager:peripheral_camera_device_manager",
           "vdi_base/common/metadata_manager:peripheral_camera_metadata_manager",
           "vdi_base/common/pipeline_core:peripheral_camera_pipeline_core",
+        ]
+      } else {
+        deps += [
+          "vdi_base/usb_camera:usb_camera_vdi_impl",
         ]
       }
     }
