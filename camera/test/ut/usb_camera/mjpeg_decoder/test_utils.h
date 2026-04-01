@@ -24,9 +24,7 @@
 #include <string>
 #include <vector>
 
-// turbojpeg header
-
-// NV21 format constants
+// NV21 格式常量
 constexpr uint32_t NV21_SCALE_FACTOR = 3;
 constexpr uint32_t NV21_DIVISOR = 2;
 extern "C" {
@@ -35,7 +33,7 @@ extern "C" {
 
 namespace OHOS::Camera {
 
-// Image format constants - 图像格式常量
+// 图像格式常量
 constexpr uint32_t DEFAULT_IMAGE_WIDTH = 640;
 constexpr uint32_t DEFAULT_IMAGE_HEIGHT = 480;
 constexpr uint32_t QCIF_IMAGE_WIDTH = 176;
@@ -47,28 +45,25 @@ constexpr uint32_t SVGA_IMAGE_HEIGHT = 600;
 constexpr uint32_t HD720P_IMAGE_WIDTH = 1280;
 constexpr uint32_t HD720P_IMAGE_HEIGHT = 720;
 
-// JPEG constants - JPEG 相关常量
 constexpr int DEFAULT_JPEG_QUALITY = 85;
 constexpr int MIN_JPEG_QUALITY = 1;
 constexpr int MAX_JPEG_QUALITY = 100;
 constexpr uint8_t PIXEL_MAX_VALUE = 255;
 constexpr uint8_t YUV_DEFAULT_VALUE = 128; // UV 平面中性值
 
-// NV21 format constants - NV21 格式常量
+// NV21 格式常量
 constexpr int NV21_BITS_PER_PIXEL = 12;
 // NV21: Y(1) + UV(0.5) = 1.5 bytes per pixel
-// Use integer math: (width * height * 3) / 2
 constexpr int NV21_BYTES_PER_PIXEL_NUMERATOR = 3;
 constexpr int NV21_BYTES_PER_PIXEL_DENOMINATOR = 2;
 constexpr int PIXEL_COMPONENTS = 3;
 
-// Helper function for NV21 buffer size calculation (replaces macro NV21_BUFFER_SIZE)
+// 计算 NV21 缓冲区大小
 constexpr size_t NV21BufferSize(int32_t w, int32_t h)
 {
     return static_cast<size_t>(w) * h * NV21_BYTES_PER_PIXEL_NUMERATOR / NV21_BYTES_PER_PIXEL_DENOMINATOR;
 }
 
-// Calculation constants - 计算常量
 constexpr int PERCENT_FACTOR = 100;
 
 /**
@@ -186,32 +181,6 @@ inline std::vector<uint8_t> GenerateTestMJPEG(int width = DEFAULT_IMAGE_WIDTH, i
 {
     return GenerateJPEGWithTurboJpeg(width, height, DEFAULT_JPEG_QUALITY);
 }
-
-/**
- * @brief 获取指定分辨率的测试 JPEG 数据
- * @param width 期望宽度
- * @param height 期望高度
- * @return std::vector<uint8_t> JPEG数据
- */
-
- 
-/**
- * @brief 获取预生成的 640x480 JPEG 测试图像数据
- * @return std::vector<uint8_t> JPEG数据
- */
-
-
-/**
- * @brief 获取预生成的 160x120 JPEG 测试图像数据
- * @return std::vector<uint8_t> JPEG数据
- */
-
-
-/**
- * @brief 获取预生成的 1280x720 JPEG 测试图像数据
- * @return std::vector<uint8_t> JPEG数据
- */
-
 
 } // namespace OHOS::Camera
 

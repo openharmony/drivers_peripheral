@@ -32,7 +32,6 @@ namespace OHOS::Camera {
 
 // ==================== FfmpegMjpegDecoder ====================
 
-// Helper function: Process color range conversion (YUVJ* to YUV*)
 static void ProcessColorRange(AVFrame *srcFrame)
 {
     int newPixFmt = srcFrame->format;
@@ -55,14 +54,12 @@ static void ProcessColorRange(AVFrame *srcFrame)
     }
 }
 
-// Helper function: Setup or get cached SwsContext
 static SwsContext *SetupSwsContext(SwsContext *swsCtx, AVFrame *srcFrame, int width, int height)
 {
     return sws_getCachedContext(swsCtx, srcFrame->width, srcFrame->height, (AVPixelFormat)srcFrame->format, width,
         height, AV_PIX_FMT_NV21, SWS_BILINEAR, nullptr, nullptr, nullptr);
 }
 
-// Helper function: Fill destination arrays and execute scaling
 static bool FillAndScale(SwsContext *swsCtx, AVFrame *srcFrame, uint8_t *outputBuffer, int width, int height)
 {
     uint8_t *dstData[4] = {nullptr};
@@ -87,24 +84,20 @@ struct FfmpegMjpegDecoder::Impl {
     bool Init()
     {
 #ifdef DEVICE_USAGE_FFMPEG_ENABLE
-        // 抑制 FFmpeg 警告输出
         av_log_set_level(AV_LOG_ERROR);
 
-        // 查找 MJPEG 解码器
         const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
         if (!codec) {
             CAMERA_LOGE("FfmpegMjpegDecoder: MJPEG codec not found");
             return false;
         }
 
-        // 分配编解码器上下文
         codecCtx = avcodec_alloc_context3(codec);
         if (!codecCtx) {
             CAMERA_LOGE("FfmpegMjpegDecoder: Could not allocate codec context");
             return false;
         }
 
-        // 打开编解码器
         if (avcodec_open2(codecCtx, codec, nullptr) < 0) {
             CAMERA_LOGE("FfmpegMjpegDecoder: Could not open codec");
             avcodec_free_context(&codecCtx);
@@ -112,7 +105,6 @@ struct FfmpegMjpegDecoder::Impl {
             return false;
         }
 
-        // 分配 packet 和 frame
         packet = av_packet_alloc();
         if (!packet) {
             CAMERA_LOGE("FfmpegMjpegDecoder: Could not allocate packet");
@@ -193,7 +185,6 @@ bool FfmpegMjpegDecoder::Decode(const DecodeParams& params)
         CAMERA_LOGE("FfmpegMjpegDecoder not initialized");
         return false;
     }
-    // C-04: 参数校验 - 检查宽高有效性
     if (params.width <= 0 || params.height <= 0) {
         CAMERA_LOGE("FfmpegMjpegDecoder: Invalid resolution %dx%d", params.width, params.height);
         return false;
@@ -202,7 +193,6 @@ bool FfmpegMjpegDecoder::Decode(const DecodeParams& params)
         CAMERA_LOGE("FfmpegMjpegDecoder invalid parameters");
         return false;
     }
-    // 检查输出 buffer 大小是否足够 (NV21: width * height * 1.5)
     size_t requiredSize = static_cast<size_t>(params.width) * static_cast<size_t>(params.height) * 3 / 2;
     if (params.outputSize < requiredSize) {
         CAMERA_LOGE("FfmpegMjpegDecoder: Output buffer too small, need %{public}zu, got %{public}zu",
@@ -210,30 +200,24 @@ bool FfmpegMjpegDecoder::Decode(const DecodeParams& params)
         return false;
     }
 #ifdef DEVICE_USAGE_FFMPEG_ENABLE
-    // 设置输入数据
     pimpl_->packet->data = const_cast<uint8_t*>(params.mjpegData);
     pimpl_->packet->size = static_cast<int>(params.size);
-    // 发送数据包到解码器
     int ret = avcodec_send_packet(pimpl_->codecCtx, pimpl_->packet);
     if (ret < 0) {
         CAMERA_LOGE("FfmpegMjpegDecoder: Error sending packet for decoding, ret=%{public}d", ret);
         return false;
     }
-    // 接收解码后的帧
     ret = avcodec_receive_frame(pimpl_->codecCtx, pimpl_->srcFrame);
     if (ret < 0) {
         CAMERA_LOGE("FfmpegMjpegDecoder: Error during decoding, ret=%{public}d", ret);
         return false;
     }
-    // 处理颜色范围 (YUVJ* 格式转 YUV*)
     ProcessColorRange(pimpl_->srcFrame);
-    // 获取或创建 SwsContext
     pimpl_->swsCtx = SetupSwsContext(pimpl_->swsCtx, pimpl_->srcFrame, params.width, params.height);
     if (!pimpl_->swsCtx) {
         CAMERA_LOGE("FfmpegMjpegDecoder: Could not initialize sws context");
         return false;
     }
-    // 填充目标 frame 并执行缩放
     if (!FillAndScale(pimpl_->swsCtx, pimpl_->srcFrame, params.outputBuffer, params.width, params.height)) {
         return false;
     }
@@ -241,19 +225,17 @@ bool FfmpegMjpegDecoder::Decode(const DecodeParams& params)
     return true;
 #else
     (void)params;
-
     return false;
 #endif
 }
 
 // ==================== LibyuvMjpegDecoder ====================
 
-// C-03: 全局 once_flag 用于保护 dlopen 的线程安全
+// 全局 once_flag 用于保护 dlopen 的线程安全
 static std::once_flag g_libyuvInitOnce;
 static bool g_libyuvAvailable = false;
 static void *g_libyuvHandle = nullptr;
 
-// Libyuv 函数指针类型别名（在 Impl 外部定义）
 using LibyuvMJPGSizeFunc = int(const uint8_t *, size_t, int *, int *);
 using LibyuvMJPGToNV21Func = int(const uint8_t *, size_t, uint8_t *, int, uint8_t *, int, int, int, int, int);
 
@@ -263,7 +245,6 @@ static LibyuvMJPGToNV21Func *g_mjpgToNv21 = nullptr;
 struct LibyuvMjpegDecoder::Impl {
     void *libyuvHandle = nullptr;
 
-    // 使用外部定义的类型别名
     using MJPGSizeFunc = LibyuvMJPGSizeFunc;
     using MJPGToNV21Func = LibyuvMJPGToNV21Func;
 
@@ -271,10 +252,8 @@ struct LibyuvMjpegDecoder::Impl {
     MJPGToNV21Func *mjpgToNv21 = nullptr;
     bool isAvailable = false;
 
-    // C-03: 线程安全的初始化函数
     static void InitLibyuvOnce()
     {
-        // 尝试加载 libyuv 库
         void *handle = dlopen("libyuv.z.so", RTLD_LAZY);
         if (!handle) {
             handle = dlopen("libyuv.so.0", RTLD_LAZY);
@@ -286,7 +265,6 @@ struct LibyuvMjpegDecoder::Impl {
             return;
         }
 
-        // 加载函数指针
         auto *sizeFunc = (MJPGSizeFunc *)dlsym(handle, "MJPGSize");
         auto *convertFunc = (MJPGToNV21Func *)dlsym(handle, "MJPGToNV21");
         if (!sizeFunc || !convertFunc) {
@@ -305,9 +283,8 @@ struct LibyuvMjpegDecoder::Impl {
 
     bool Init()
     {
-        // C-03: 使用 std::call_once 确保只初始化一次
         std::call_once(g_libyuvInitOnce, InitLibyuvOnce);
-        
+
         mjpgSize = g_mjpgSize;
         mjpgToNv21 = g_mjpgToNv21;
         isAvailable = g_libyuvAvailable;
@@ -316,7 +293,7 @@ struct LibyuvMjpegDecoder::Impl {
 
     ~Impl()
     {
-        // 注意：不关闭动态库，因为可能被其他实例使用
+        // 不关闭动态库，可能被其他实例使用
     }
 };
 
@@ -342,7 +319,6 @@ bool LibyuvMjpegDecoder::Decode(const DecodeParams& params)
         CAMERA_LOGE("LibyuvMjpegDecoder not available");
         return false;
     }
-    // C-04: 参数校验 - 检查宽高有效性
     if (params.width <= 0 || params.height <= 0) {
         CAMERA_LOGE("LibyuvMjpegDecoder: Invalid resolution %dx%d", params.width, params.height);
         return false;
@@ -351,7 +327,6 @@ bool LibyuvMjpegDecoder::Decode(const DecodeParams& params)
         CAMERA_LOGE("LibyuvMjpegDecoder invalid parameters");
         return false;
     }
-    // 检查输出 buffer 大小是否足够 (NV21: width * height * 1.5)
     size_t requiredSize = static_cast<size_t>(params.width) * static_cast<size_t>(params.height) * 3 / 2;
     if (params.outputSize < requiredSize) {
         CAMERA_LOGE("LibyuvMjpegDecoder: Output buffer too small, need %{public}zu, got %{public}zu",
@@ -359,7 +334,6 @@ bool LibyuvMjpegDecoder::Decode(const DecodeParams& params)
         return false;
     }
 
-    // 获取 MJPEG 原始尺寸
     int srcWidth = 0;
     int srcHeight = 0;
     int ret = pimpl_->mjpgSize(params.mjpegData, params.size, &srcWidth, &srcHeight);
@@ -368,7 +342,6 @@ bool LibyuvMjpegDecoder::Decode(const DecodeParams& params)
         return false;
     }
 
-    // 执行 MJPEG 到 NV21 的转换
     ret = pimpl_->mjpgToNv21(params.mjpegData, params.size,
         params.outputBuffer, params.width,
         params.outputBuffer + params.width * params.height, params.width,
@@ -386,27 +359,23 @@ bool LibyuvMjpegDecoder::Decode(const DecodeParams& params)
 
 std::shared_ptr<IMjpegDecoder> MjpegDecoderFactory::Create()
 {
-    // 优先尝试 Libyuv (性能更好)
     auto libyuvDecoder = std::make_shared<LibyuvMjpegDecoder>();
     if (libyuvDecoder->IsAvailable()) {
         CAMERA_LOGI("MjpegDecoderFactory: Using Libyuv decoder");
         return libyuvDecoder;
     }
 
-    // Fallback 到 FFmpeg (兼容性更好)
     CAMERA_LOGI("MjpegDecoderFactory: Fallback to FFmpeg decoder");
     return std::make_shared<FfmpegMjpegDecoder>();
 }
 
 const char *MjpegDecoderFactory::GetAvailableDecoderName()
 {
-    // 尝试检查 Libyuv 是否可用
     LibyuvMjpegDecoder testLibyuv;
     if (testLibyuv.IsAvailable()) {
         return "Libyuv";
     }
 
-    // 检查 FFmpeg 是否可用
     FfmpegMjpegDecoder testFfmpeg;
     if (testFfmpeg.IsAvailable()) {
         return "FFmpeg";

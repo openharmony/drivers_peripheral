@@ -222,7 +222,6 @@ static void SetImageAllBlack(uint8_t *buf, size_t bufferSize, uint32_t format)
     }
 }
 
-// 辅助函数：MJPEG 解码（仅 USB VDI 使用）
 static void DecodeMjpegBuffer(std::shared_ptr<IBuffer>& buffer, uint32_t wide, uint32_t high,
     std::shared_ptr<IMjpegDecoder>& mjpegDecoder_, const std::string& cameraId)
 {
@@ -288,7 +287,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
     struct timespec tsBegin;
     clock_gettime(CLOCK_MONOTONIC, &tsBegin);
 
-    // MJPEG 解码：如果源格式是 MJPEG 且目标格式不是 BLOB，则需要解码
+    // MJPEG 源格式且非 BLOB 目标时需要解码
     if (uvcSourcePixformat_ == V4L2_PIX_FMT_MJPEG && cameraformat_ != CAMERA_FORMAT_BLOB) {
         DecodeMjpegBuffer(buffer, wide_, high_, mjpegDecoder_, cameraId_);
     }
