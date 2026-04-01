@@ -157,7 +157,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
 
     if (mode == SA) {
         SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorHandle, serviceId, samplingInterval,
-                                                                reportInterval);
+                                                                   reportInterval);
     }
 
     SensorInterval sensorInterval = {samplingInterval, reportInterval};
