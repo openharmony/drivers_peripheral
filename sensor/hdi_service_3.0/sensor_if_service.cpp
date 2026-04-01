@@ -155,8 +155,10 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
         return HDF_FAILURE;
     }
 
-    SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorHandle, serviceId, samplingInterval,
-                                                               reportInterval);
+    if (mode == SA) {
+        SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorHandle, serviceId, samplingInterval,
+                                                                   reportInterval);
+    }
 
     SensorInterval sensorInterval = {samplingInterval, reportInterval};
     SensorInterval saSensorInterval = {samplingInterval, reportInterval};
@@ -176,8 +178,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
 void SensorIfService::AdjustSensorConfig(const SensorHandle &sensorHandle, SensorInterval &sensorInterval,
                                          SensorInterval &saSensorInterval, SensorInterval &sdcSensorInterval)
 {
-    SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorHandle, saSensorInterval.samplingInterval,
-                                                             saSensorInterval.reportInterval);
+    saSensorInterval = SensorClientsManager::GetInstance()->GetClientSenSorBestConfig(sensorHandle);
     SensorClientsManager::GetInstance()->SetSdcSensorBestConfig(sensorHandle, sdcSensorInterval.samplingInterval,
                                                                 sdcSensorInterval.reportInterval);
 
@@ -208,8 +209,7 @@ void SensorIfService::UpdateSensorModeConfig(const SensorHandle &sensorHandle, i
 {
     if (mode == SA) {
         SetDelay(sensorHandle, saSensorInterval.samplingInterval, saSensorInterval.reportInterval);
-        SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorHandle, saSensorInterval.samplingInterval,
-                                                                saSensorInterval.reportInterval);
+        SensorClientsManager::GetInstance()->UpdateNewSensorConfig(sensorHandle, saSensorInterval);
         SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorHandle, saSensorInterval.samplingInterval,
                                                                      saSensorInterval.reportInterval);
     }
@@ -508,6 +508,12 @@ void SensorIfService::RemoveDeathNotice(int32_t groupId)
     }
 }
 
+void SensorIfService::SetNewBatch(const SensorHandle sensorHandle)
+{
+    SensorInterval sensorInterval = SensorClientsManager::GetInstance()->GetClientSenSorBestConfig(sensorHandle);
+    SensorClientsManager::GetInstance()->UpdateNewSensorConfig(sensorHandle, sensorInterval);
+}
+
 int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t serviceId)
 {
     SENSOR_TRACE_PID_MSG("sensorHandle " + SENSOR_HANDLE_TO_STRING(sensorHandle));
@@ -517,7 +523,9 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
     }
 
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, serviceId, DISABLE_SENSOR)) {
+        SensorClientsManager::GetInstance()->DeleteClientSenSorConfig(sensorHandle, serviceId);
         HDF_LOGD("%{public}s There are still some services enable", __func__);
+        SetNewBatch(sensorHandle);
         return HDF_SUCCESS;
     }
 
@@ -536,6 +544,7 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
             SensorClientsManager::GetInstance()->AddServiceToReportQueue(sensorHandle, serviceId);
             return ret;
         }
+        SensorClientsManager::GetInstance()->DeleteClientSenSorConfig(sensorHandle, serviceId);
         return HDF_SUCCESS;
     }
 
@@ -552,6 +561,7 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
                  __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
         SensorClientsManager::GetInstance()->AddServiceToReportQueue(sensorHandle, serviceId);
     }
+    SensorClientsManager::GetInstance()->DeleteClientSenSorConfig(sensorHandle, serviceId);
 
     return ret;
 }
