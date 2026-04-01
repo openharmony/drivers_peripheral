@@ -28,6 +28,7 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V3_0 {
+using namespace OHOS::HDI::Sensor::V1_1;
 
 constexpr uint32_t MAX_DUMP_DATA_SIZE = 10;
 
@@ -65,6 +66,7 @@ public:
     bool IsExistSdcSensorEnable(SensorHandle sensorHandle);
     void OpenSensor(SensorHandle sensorHandle, int serviceId);
     void UpdateSensorConfig(SensorHandle sensorHandle, int64_t samplingInterval, int64_t reportInterval);
+    void UpdateNewSensorConfig(SensorHandle sensorHandle, SensorInterval sensorInterval);
     void UpdateSdcSensorConfig(SensorHandle sensorHandle, int64_t samplingInterval, int64_t reportInterval);
     int GetServiceId(int groupId, const sptr<IRemoteObject> &iRemoteObject);
     static SensorClientsManager* GetInstance();
@@ -82,6 +84,8 @@ public:
     };
     void SetClientSenSorConfig(SensorHandle sensorHandle, int32_t serviceId, int64_t samplingInterval,
                                int64_t &reportInterval);
+    void DeleteClientSenSorConfig(SensorHandle sensorHandle, int32_t serviceId);
+    SensorInterval GetClientSenSorBestConfig(SensorHandle sensorHandle);
     static bool IsSensorContinues(SensorHandle sensorHandle);
     void UpdateClientPeriodCount(SensorHandle sensorHandle, int64_t samplingInterval, int64_t reportInterval);
     void CopySensorInfo(std::vector<V3_0::HdfSensorInformation> &info, bool cFlag);
