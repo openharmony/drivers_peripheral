@@ -137,7 +137,6 @@ void ReleaseEventCallback(void)
             g_wpaCallbackEventMap[i]->onRecFunc = NULL;
             free(g_wpaCallbackEventMap[i]);
             g_wpaCallbackEventMap[i] = NULL;
-            break;
         }
     }
     pthread_rwlock_unlock(&g_wpaCallbackMutex);
