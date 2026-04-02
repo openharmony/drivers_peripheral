@@ -24,14 +24,16 @@
 #include <string>
 #include <vector>
 
-// NV21 格式常量
+namespace OHOS::Camera {
+
+// NV21 格式常量 - 统一定义在 namespace 内
 constexpr uint32_t NV21_SCALE_FACTOR = 3;
 constexpr uint32_t NV21_DIVISOR = 2;
-extern "C" {
-#include <turbojpeg.h>
-}
-
-namespace OHOS::Camera {
+constexpr int NV21_BITS_PER_PIXEL = 12;
+// NV21: Y(1) + UV(0.5) = 1.5 bytes per pixel
+constexpr int NV21_BYTES_PER_PIXEL_NUMERATOR = 3;
+constexpr int NV21_BYTES_PER_PIXEL_DENOMINATOR = 2;
+constexpr int PIXEL_COMPONENTS = 3;
 
 // 图像格式常量
 constexpr uint32_t DEFAULT_IMAGE_WIDTH = 640;
@@ -51,20 +53,13 @@ constexpr int MAX_JPEG_QUALITY = 100;
 constexpr uint8_t PIXEL_MAX_VALUE = 255;
 constexpr uint8_t YUV_DEFAULT_VALUE = 128; // UV 平面中性值
 
-// NV21 格式常量
-constexpr int NV21_BITS_PER_PIXEL = 12;
-// NV21: Y(1) + UV(0.5) = 1.5 bytes per pixel
-constexpr int NV21_BYTES_PER_PIXEL_NUMERATOR = 3;
-constexpr int NV21_BYTES_PER_PIXEL_DENOMINATOR = 2;
-constexpr int PIXEL_COMPONENTS = 3;
+constexpr int PERCENT_FACTOR = 100;
 
 // 计算 NV21 缓冲区大小
 constexpr size_t NV21BufferSize(int32_t w, int32_t h)
 {
     return static_cast<size_t>(w) * h * NV21_BYTES_PER_PIXEL_NUMERATOR / NV21_BYTES_PER_PIXEL_DENOMINATOR;
 }
-
-constexpr int PERCENT_FACTOR = 100;
 
 /**
  * @brief 从文件加载二进制数据（可选，用于外部测试资源）
@@ -158,15 +153,15 @@ inline std::vector<uint8_t> GetTestJpeg(int width, int height)
 {
     return GenerateJPEGWithTurboJpeg(width, height, DEFAULT_JPEG_QUALITY);
 }
-inline std::vector<uint8_t> GetTestJpeg_640x480()
+inline std::vector<uint8_t> GetTestJpeg640x480()
 {
     return GenerateJPEGWithTurboJpeg(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, DEFAULT_JPEG_QUALITY);
 }
-inline std::vector<uint8_t> GetTestJpeg_160x120()
+inline std::vector<uint8_t> GetTestJpeg160x120()
 {
     return GenerateJPEGWithTurboJpeg(QCIF_IMAGE_WIDTH, QCIF_IMAGE_HEIGHT, DEFAULT_JPEG_QUALITY);
 }
-inline std::vector<uint8_t> GetTestJpeg_1280x720()
+inline std::vector<uint8_t> GetTestJpeg1280x720()
 {
     return GenerateJPEGWithTurboJpeg(HD720P_IMAGE_WIDTH, HD720P_IMAGE_HEIGHT, DEFAULT_JPEG_QUALITY);
 }

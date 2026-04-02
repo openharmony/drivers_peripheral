@@ -20,16 +20,6 @@
 #include <future>
 #include <gtest/gtest.h>
 
-// Test constants - 测试常量
-// Image resolution constants - 图像分辨率常量
-constexpr uint32_t DEFAULT_WIDTH = 640;
-constexpr uint32_t DEFAULT_HEIGHT = 480;
-constexpr uint32_t QCIF_WIDTH = 176;
-constexpr uint32_t QCIF_HEIGHT = 144;
-constexpr uint32_t HD720P_WIDTH = 1280;
-constexpr uint32_t HD720P_HEIGHT = 720;
-
-// Performance test constants - 性能测试常量
 constexpr uint32_t MAX_DECODE_TIME_MS_PERF = 1000;
 
 using namespace OHOS::Camera;
@@ -70,15 +60,15 @@ TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0001)
     }
 
     std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
     std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
-    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 3. Execute decode." << std::endl;
     bool result = g_ffmpegDecoder->Decode(
-        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+        {mjpegData.data(), mjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, output.data(), output.size()});
 
     std::cout << "==========[test log] 4. Verify decode result." << std::endl;
     EXPECT_TRUE(result);
@@ -102,11 +92,12 @@ TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0002)
 
     std::cout << "==========[test log] 1. Prepare invalid MJPEG data." << std::endl;
     std::vector<uint8_t> invalidData = {0x00, 0x01, 0x02, 0x03};
-    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 2. Execute decode with invalid data." << std::endl;
     bool result = g_ffmpegDecoder->Decode(
-        {invalidData.data(), invalidData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+        {invalidData.data(), invalidData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT,
+         output.data(), output.size()});
 
     std::cout << "==========[test log] 3. Verify decode result." << std::endl;
     EXPECT_FALSE(result);
@@ -126,10 +117,11 @@ TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0003)
     }
 
     std::cout << "==========[test log] 1. Prepare empty data." << std::endl;
-    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 2. Execute decode with empty data." << std::endl;
-    bool result = g_ffmpegDecoder->Decode({nullptr, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+    bool result = g_ffmpegDecoder->Decode(
+        {nullptr, 0, DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, output.data(), output.size()});
 
     std::cout << "==========[test log] 3. Verify decode result." << std::endl;
     EXPECT_FALSE(result);
@@ -149,13 +141,13 @@ TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0004)
     }
 
     std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
     std::cout << "==========[test log] 2. Execute decode with null output buffer." << std::endl;
     bool result = g_ffmpegDecoder->Decode({
         mjpegData.data(), mjpegData.size(),
-        DEFAULT_WIDTH, DEFAULT_HEIGHT,
+        DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT,
         nullptr, 1000
     });
 
@@ -180,15 +172,15 @@ TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0005)
     EXPECT_TRUE(g_ffmpegDecoder->IsAvailable()) << "Decoder should be available";
 
     std::cout << "==========[test log] 2. Generate test MJPEG data (QCIF resolution)." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(QCIF_WIDTH, QCIF_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(QCIF_IMAGE_WIDTH, QCIF_IMAGE_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
     std::cout << "==========[test log] 3. Allocate output buffer." << std::endl;
-    std::vector<uint8_t> output(NV21BufferSize(QCIF_WIDTH, QCIF_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(QCIF_IMAGE_WIDTH, QCIF_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 4. Execute decode." << std::endl;
     bool result = g_ffmpegDecoder->Decode(
-        {mjpegData.data(), mjpegData.size(), QCIF_WIDTH, QCIF_HEIGHT, output.data(), output.size()});
+        {mjpegData.data(), mjpegData.size(), QCIF_IMAGE_WIDTH, QCIF_IMAGE_HEIGHT, output.data(), output.size()});
 
     std::cout << "==========[test log] 5. Verify decode result." << std::endl;
     EXPECT_TRUE(result) << "Decoder should successfully decode valid MJPEG data";
@@ -226,20 +218,20 @@ TEST_F(FfmpegMjpegDecoderTest, camera_mjpeg_0007)
     }
 
     std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
     std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
-    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 3. First decode." << std::endl;
     bool result1 = g_ffmpegDecoder->Decode(
-        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+        {mjpegData.data(), mjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, output.data(), output.size()});
     EXPECT_TRUE(result1);
 
     std::cout << "==========[test log] 4. Second decode (reuse decoder)." << std::endl;
     bool result2 = g_ffmpegDecoder->Decode(
-        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+        {mjpegData.data(), mjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, output.data(), output.size()});
     EXPECT_TRUE(result2);
 }
 
@@ -279,15 +271,15 @@ TEST_F(LibyuvMjpegDecoderTest, camera_mjpeg_0008)
     }
 
     std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
     EXPECT_FALSE(mjpegData.empty()) << "Failed to generate test JPEG";
 
     std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
-    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 3. Execute decode." << std::endl;
     bool result = g_libyuvDecoder->Decode(
-        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+        {mjpegData.data(), mjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, output.data(), output.size()});
 
     std::cout << "==========[test log] 4. Verify decode result." << std::endl;
     EXPECT_TRUE(result);
@@ -311,11 +303,12 @@ TEST_F(LibyuvMjpegDecoderTest, camera_mjpeg_0009)
 
     std::cout << "==========[test log] 1. Prepare invalid MJPEG data." << std::endl;
     std::vector<uint8_t> invalidData = {0x00, 0x01, 0x02, 0x03};
-    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 2. Execute decode with invalid data." << std::endl;
     bool result = g_libyuvDecoder->Decode(
-        {invalidData.data(), invalidData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+        {invalidData.data(), invalidData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT,
+         output.data(), output.size()});
 
     std::cout << "==========[test log] 3. Verify decode result." << std::endl;
     EXPECT_FALSE(result);
@@ -395,22 +388,22 @@ TEST_F(MjpegDecoderFactoryTest, camera_mjpeg_0013)
     ASSERT_NE(decoder, nullptr);
 
     std::cout << "==========[test log] 2. Generate test MJPEG data." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
     if (mjpegData.empty()) {
         GTEST_SKIP() << "Test file not available" << std::endl;
     }
 
     std::cout << "==========[test log] 3. Allocate output buffer." << std::endl;
-    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 4. First decode." << std::endl;
     bool result1 = decoder->Decode(
-        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+        {mjpegData.data(), mjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, output.data(), output.size()});
     EXPECT_TRUE(result1);
 
     std::cout << "==========[test log] 5. Second decode (reuse decoder)." << std::endl;
     bool result2 = decoder->Decode(
-        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+        {mjpegData.data(), mjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, output.data(), output.size()});
     EXPECT_TRUE(result2);
 }
 
@@ -430,12 +423,12 @@ protected:
             std::cout << "==========[test log] FFmpeg decoder not available for benchmarks" << std::endl;
             return;
         }
-        g_benchmarkMjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        g_benchmarkMjpegData = GenerateTestMJPEG(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
         if (g_benchmarkMjpegData.empty()) {
             std::cout << "==========[test log] Test file not available, skipping benchmark" << std::endl;
             return;
         }
-        g_benchmarkOutput.resize(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        g_benchmarkOutput.resize(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
     }
 
     static void TearDownTestCase(void)
@@ -466,7 +459,7 @@ TEST_F(MjpegDecoderBenchmarkTest, camera_mjpeg_0014)
     std::cout << "==========[test log] 2. Execute decode " << iterations << " times." << std::endl;
     for (int i = 0; i < iterations; i++) {
         bool result = decoder->Decode(
-            {g_benchmarkMjpegData.data(), g_benchmarkMjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT,
+            {g_benchmarkMjpegData.data(), g_benchmarkMjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT,
              g_benchmarkOutput.data(), g_benchmarkOutput.size()});
         EXPECT_TRUE(result);
     }
@@ -503,22 +496,24 @@ TEST_F(MjpegDecodeResultTest, camera_mjpeg_0015)
     }
 
     std::cout << "==========[test log] 1. Generate test MJPEG data." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
     if (mjpegData.empty()) {
         GTEST_SKIP() << "Test file not available" << std::endl;
     }
 
-    std::vector<uint8_t> outputFfmpeg(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
-    std::vector<uint8_t> outputLibyuv(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    std::vector<uint8_t> outputFfmpeg(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
+    std::vector<uint8_t> outputLibyuv(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 2. FFmpeg decode." << std::endl;
     bool result1 = ffmpegDecoder->Decode(
-        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, outputFfmpeg.data(), outputFfmpeg.size()});
+        {mjpegData.data(), mjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT,
+         outputFfmpeg.data(), outputFfmpeg.size()});
     EXPECT_TRUE(result1);
 
     std::cout << "==========[test log] 3. Libyuv decode." << std::endl;
     bool result2 = libyuvDecoder->Decode(
-        {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, outputLibyuv.data(), outputLibyuv.size()});
+        {mjpegData.data(), mjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT,
+         outputLibyuv.data(), outputLibyuv.size()});
     EXPECT_TRUE(result2);
 
     if (result1 && result2) {
@@ -561,17 +556,17 @@ TEST_F(MjpegDecoderEdgeCaseTest, camera_mjpeg_0016)
     }
 
     std::cout << "==========[test log] 1. Generate test MJPEG data (QCIF resolution)." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(QCIF_WIDTH, QCIF_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(QCIF_IMAGE_WIDTH, QCIF_IMAGE_HEIGHT);
     if (mjpegData.empty()) {
         GTEST_SKIP() << "QCIF test file not available" << std::endl;
     }
 
     std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
-    std::vector<uint8_t> output(NV21BufferSize(QCIF_WIDTH, QCIF_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(QCIF_IMAGE_WIDTH, QCIF_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 3. Execute decode." << std::endl;
     bool result = g_edgeCaseDecoder->Decode(
-        {mjpegData.data(), mjpegData.size(), QCIF_WIDTH, QCIF_HEIGHT, output.data(), output.size()});
+        {mjpegData.data(), mjpegData.size(), QCIF_IMAGE_WIDTH, QCIF_IMAGE_HEIGHT, output.data(), output.size()});
 
     std::cout << "==========[test log] 4. Verify decode result." << std::endl;
     EXPECT_TRUE(result);
@@ -591,17 +586,17 @@ TEST_F(MjpegDecoderEdgeCaseTest, camera_mjpeg_0017)
     }
 
     std::cout << "==========[test log] 1. Generate test MJPEG data (720P resolution)." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(HD720P_WIDTH, HD720P_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(HD720P_IMAGE_WIDTH, HD720P_IMAGE_HEIGHT);
     if (mjpegData.empty()) {
         GTEST_SKIP() << "720P test file not available" << std::endl;
     }
 
     std::cout << "==========[test log] 2. Allocate output buffer." << std::endl;
-    std::vector<uint8_t> output(NV21BufferSize(HD720P_WIDTH, HD720P_HEIGHT));
+    std::vector<uint8_t> output(NV21BufferSize(HD720P_IMAGE_WIDTH, HD720P_IMAGE_HEIGHT));
 
     std::cout << "==========[test log] 3. Execute decode." << std::endl;
     bool result = g_edgeCaseDecoder->Decode(
-        {mjpegData.data(), mjpegData.size(), HD720P_WIDTH, HD720P_HEIGHT, output.data(), output.size()});
+        {mjpegData.data(), mjpegData.size(), HD720P_IMAGE_WIDTH, HD720P_IMAGE_HEIGHT, output.data(), output.size()});
 
     std::cout << "==========[test log] 4. Verify decode result." << std::endl;
     EXPECT_TRUE(result);
@@ -642,7 +637,7 @@ TEST_F(MjpegDecoderThreadSafetyTest, camera_mjpeg_0018)
     }
 
     std::cout << "==========[test log] 2. Generate test MJPEG data." << std::endl;
-    auto mjpegData = GenerateTestMJPEG(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    auto mjpegData = GenerateTestMJPEG(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
     if (mjpegData.empty()) {
         GTEST_SKIP() << "Test file not available" << std::endl;
     }
@@ -651,9 +646,10 @@ TEST_F(MjpegDecoderThreadSafetyTest, camera_mjpeg_0018)
     std::vector<std::future<bool>> futures;
     for (int i = 0; i < numThreads; i++) {
         futures.push_back(std::async(std::launch::async, [decoder = decoders[i], &mjpegData]() {
-            std::vector<uint8_t> output(NV21BufferSize(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+            std::vector<uint8_t> output(NV21BufferSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT));
             return decoder->Decode(
-                {mjpegData.data(), mjpegData.size(), DEFAULT_WIDTH, DEFAULT_HEIGHT, output.data(), output.size()});
+                {mjpegData.data(), mjpegData.size(), DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT,
+                 output.data(), output.size()});
         }));
     }
 

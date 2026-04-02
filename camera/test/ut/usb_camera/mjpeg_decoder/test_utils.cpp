@@ -17,12 +17,11 @@
 #include <cmath>
 #include <iostream>
 
-namespace OHOS::Camera {
-
-#ifdef DEVICE_USAGE_FFMPEG_ENABLE
 extern "C" {
 #include <turbojpeg.h>
 }
+
+namespace OHOS::Camera {
 
 std::vector<uint8_t> GenerateJPEGWithTurboJpeg(int width, int height, int quality)
 {
@@ -60,11 +59,5 @@ std::vector<uint8_t> GenerateJPEGWithTurboJpeg(int width, int height, int qualit
     tjDestroy(tjInstance);
     return jpegData;
 }
-#else
-std::vector<uint8_t> GenerateJPEGWithTurboJpeg(int, int, int)
-{
-    return {};
-}
-#endif
 
 } // namespace OHOS::Camera

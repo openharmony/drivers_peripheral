@@ -49,9 +49,6 @@ ohos_unittest("mjpeg_decoder_test") {
     "${camera_path_usb}/../../interfaces/include",
     "${camera_path_usb}/../../interfaces/hdi_ipc",
     "${camera_path_usb}/../../interfaces/hdi_ipc/utils/include",
-    
-    # libjpeg-turbo includes
-    "${root_gen_dir}/third_party/libjpeg-turbo/libjpeg-turbo-3.1.0/src",
   ]
 
   deps = [

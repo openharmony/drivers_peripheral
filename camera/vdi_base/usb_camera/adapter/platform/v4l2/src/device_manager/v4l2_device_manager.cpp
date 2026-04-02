@@ -37,6 +37,9 @@ struct FormatInfoInner {
 
 std::shared_ptr<std::vector<FormatInfoInner>> g_allCameraFormats[CAMERA_MAX] = {nullptr};
 
+// 保护 ConvertDeviceFormat 中 static 缓存的互斥锁
+static std::mutex g_formatCacheMutex;
+
 static std::vector<FormatInfoInner>& GetCachedFormatList()
 {
     static std::vector<FormatInfoInner> formatList = {};
@@ -45,15 +48,15 @@ static std::vector<FormatInfoInner>& GetCachedFormatList()
 
 static std::vector<FormatInfoInner>& ConvertDeviceFormat(const std::vector<DeviceFormat>&);
 
-static void UpdateFormatListForCamera(CameraId id, std::mutex& mtx)
+static void UpdateFormatListForCamera(CameraId id)
 {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard<std::mutex> lock(g_formatCacheMutex);
     g_allCameraFormats[id] = std::make_shared<std::vector<FormatInfoInner>>(GetCachedFormatList());
 }
 
-static void ClearFormatListForCamera(CameraId id, std::mutex& mtx)
+static void ClearFormatListForCamera(CameraId id)
 {
-    std::lock_guard<std::mutex> l(mtx);
+    std::lock_guard<std::mutex> l(g_formatCacheMutex);
     g_allCameraFormats[id] = nullptr;
 }
 
@@ -326,8 +329,8 @@ CameraId V4L2DeviceManager::HardwareToCameraId(std::string hardwareName)
                 return (*iter).cameraId;
             }
         }
-        return CAMERA_MAX;
     }
+    return CAMERA_MAX;
 }
 
 
@@ -336,8 +339,7 @@ bool V4L2DeviceManager::CheckFormatSupportMjpeg(CameraId cameraId, int width, in
     if (cameraId >= CAMERA_MAX) {
         return false;
     }
-    // 加锁保护 g_allCameraFormats 读取，避免与热插拔回调并发
-    std::lock_guard<std::mutex> lock(mtx_);
+    std::lock_guard<std::mutex> lock(g_formatCacheMutex);
     auto formatList = g_allCameraFormats[cameraId];
     if (formatList == nullptr) {
         CAMERA_LOGE("CheckFormatSupportMjpeg, no formatList find");
@@ -403,7 +405,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         auto meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
         CHECK_IF_PTR_NULL_RETURN_VOID(meta);
         Convert(deviceControl, deviceFormat, meta);
-        UpdateFormatListForCamera(id, mtx_);
+        UpdateFormatListForCamera(id);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
         CHECK_IF_EQUAL_RETURN_VOID(streamAvailableExtendConfigurationsVector_.size() <= MIN_EXT_CFG_VEC_SIZE, true);
         uvcCb_(meta, uvcState, id, hardwareName);
@@ -429,7 +431,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
                 std::lock_guard<std::mutex> l(mtx_);
                 iter = hardwareList_.erase(iter);
             }
-            ClearFormatListForCamera(id, mtx_);
+            ClearFormatListForCamera(id);
         }
         CAMERA_LOGI("uvc plug out %{public}s %{public}s end", uvcState ? "in" : "out", hardwareName.c_str());
     }
@@ -740,6 +742,8 @@ std::vector<int> g_defaultUsbCameraStreamFormatConfig = {
 
 static std::vector<struct FormatInfoInner>& ConvertDeviceFormat(const std::vector<DeviceFormat>& deviceFormat)
 {
+    // 加锁保护 static 缓存，避免多线程并发修改
+    std::lock_guard<std::mutex> lock(g_formatCacheMutex);
     auto& formatList = GetCachedFormatList();
     formatList.clear();
     const std::string nameYuv = "YUYV 4:2:2";
