@@ -114,6 +114,12 @@ RetCode UvcNode::Start(const int32_t streamId)
         auto cameraFmtStr = cameraformat_ == CAMERA_FORMAT_BLOB ? "blob" : "yuv";
         CAMERA_LOGI("UvcNode::Start w:%{public}d h:%{public}d fmt:%{public}u pix:%{public}s cam:%{public}s", wide_,
             high_, it->format_.format_, pixFmtStr, cameraFmtStr);
+        // 预初始化 MJPEG 解码器（当源格式为 MJPEG 且目标非 BLOB 时）
+        if (uvcSourcePixformat_ == V4L2_PIX_FMT_MJPEG && cameraformat_ != CAMERA_FORMAT_BLOB) {
+            mjpegDecoder_ = MjpegDecoderFactory::Create();
+            CAMERA_LOGI("UvcNode[%{public}s]: MJPEG decoder pre-initialized: %{public}s",
+                cameraId_.c_str(), MjpegDecoderFactory::GetAvailableDecoderName());
+        }
         int bufCnt = static_cast<int>(it->format_.bufferCount_);
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
@@ -222,12 +228,12 @@ static void SetImageAllBlack(uint8_t *buf, size_t bufferSize, uint32_t format)
     }
 }
 
-static void DecodeMjpegBuffer(std::shared_ptr<IBuffer>& buffer, uint32_t wide, uint32_t high,
-    std::shared_ptr<IMjpegDecoder>& mjpegDecoder_, const std::string& cameraId)
+void UvcNode::DecodeMjpegBuffer(std::shared_ptr<IBuffer>& buffer)
 {
+    // 解码器应在 Start() 中预初始化，此处仅做防御性检查
     if (mjpegDecoder_ == nullptr) {
         mjpegDecoder_ = MjpegDecoderFactory::Create();
-        CAMERA_LOGI("UvcNode[%{public}s]: MJPEG decoder initialized: %{public}s", cameraId.c_str(),
+        CAMERA_LOGI("UvcNode[%{public}s]: MJPEG decoder initialized: %{public}s", cameraId_.c_str(),
             MjpegDecoderFactory::GetAvailableDecoderName());
     }
 
@@ -248,7 +254,7 @@ static void DecodeMjpegBuffer(std::shared_ptr<IBuffer>& buffer, uint32_t wide, u
 
     bool ret = mjpegDecoder_->Decode({
         s_mjpegBuffer.data(), mjpegSize,
-        wide, high,
+        wide_, high_,
         static_cast<uint8_t*>(buffer->GetVirAddress()), buffer->GetSize()
     });
 
@@ -289,7 +295,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
 
     // MJPEG 源格式且非 BLOB 目标时需要解码
     if (uvcSourcePixformat_ == V4L2_PIX_FMT_MJPEG && cameraformat_ != CAMERA_FORMAT_BLOB) {
-        DecodeMjpegBuffer(buffer, wide_, high_, mjpegDecoder_, cameraId_);
+        DecodeMjpegBuffer(buffer);
     }
 
     SourceNode::DeliverBuffer(buffer);
