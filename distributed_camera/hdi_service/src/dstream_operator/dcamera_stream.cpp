@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -115,6 +115,7 @@ DCamRetCode DCameraStream::SetDCameraBufferQueue(const OHOS::sptr<BufferProducer
 
 DCamRetCode DCameraStream::ReleaseDCameraBufferQueue()
 {
+    DHLOGI("ReleaseDCameraBufferQueue start.");
     DCamRetCode ret = CancelDCameraBuffer();
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("Release distributed camera buffer queue failed.");
@@ -183,11 +184,11 @@ DCamRetCode DCameraStream::GetNextRequest()
     if (CheckRequestParam() != DCamRetCode::SUCCESS) {
         return DCamRetCode::INVALID_ARGUMENT;
     }
-
     OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = nullptr;
     OHOS::sptr<OHOS::SyncFence> syncFence = nullptr;
     int32_t usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
     CHECK_AND_RETURN_RET_LOG(dcStreamInfo_ == nullptr, DCamRetCode::INVALID_ARGUMENT, "dcStreamInfo_ is nullptr");
+    DHLOGI("GetNextRequest, streamId = %{public}d", dcStreamInfo_->streamId_);
     OHOS::BufferRequestConfig config = {
         .width = dcStreamInfo_->width_,
         .height = dcStreamInfo_->height_,
@@ -251,7 +252,7 @@ DCamRetCode DCameraStream::SurfaceBufferToDImageBuffer(OHOS::sptr<OHOS::SurfaceB
         dcStreamProducer_->CancelBuffer(surfaceBuffer);
         return DCamRetCode::EXCEED_MAX_NUMBER;
     }
-    DHLOGD("Add new image buffer success: index = %{public}d, fenceFd = %{public}d", imageBuffer->GetIndex(),
+    DHLOGI("Add new image buffer success: index = %{public}d, fenceFd = %{public}d", imageBuffer->GetIndex(),
         syncFence->Get());
     auto itr = bufferConfigMap_.find(imageBuffer);
     if (itr == bufferConfigMap_.end()) {
@@ -307,6 +308,7 @@ DCamRetCode DCameraStream::GetDCameraBuffer(DCameraBuffer &buffer)
 
 DCamRetCode DCameraStream::FlushDCameraBuffer(const DCameraBuffer &buffer)
 {
+    DHLOGI("Flush buffer start, buffer index = %{public}d.", buffer.index_);
     std::lock_guard<std::mutex> lockBuffer(bufferQueueMutex_);
     shared_ptr<DImageBuffer> imageBuffer = nullptr;
     for (auto iter = bufferConfigMap_.begin(); iter != bufferConfigMap_.end(); ++iter) {
@@ -460,6 +462,7 @@ DCamRetCode DCameraStream::CancelDCameraBuffer()
     {
         std::lock_guard<std::mutex> lockBuffer(bufferQueueMutex_);
         while (true) {
+            DHLOGI("find buffer cancel");
             std::shared_ptr<DImageBuffer> imageBuffer = dcStreamBufferMgr_->AcquireBuffer();
             if (imageBuffer != nullptr) {
                 auto bufCfg = bufferConfigMap_.find(imageBuffer);
