@@ -158,7 +158,7 @@ public:
     int32_t nonblock(int32_t fd, int32_t sw)
     {
         int32_t ret = ::fcntl(fd, F_GETFL);
-        if (ret == -1) {
+        if (ret < 0) {
             return -1;
         }
         size_t flag = static_cast<size_t>(ret);
@@ -170,7 +170,7 @@ public:
         } else {
             newFlag = flag & ~static_cast<size_t>(O_NONBLOCK);
         }
-        if (::fcntl(fd, F_SETFL, static_cast<int32_t>(newFlag)) == -1) {
+        if (::fcntl(fd, F_SETFL, static_cast<int32_t>(newFlag)) < 0) {
             return -1;
         }
         return static_cast<int32_t>(oldStatus);
