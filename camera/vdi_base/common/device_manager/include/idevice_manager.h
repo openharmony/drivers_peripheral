@@ -145,6 +145,13 @@ public:
         (void)hardwareName;
         return CAMERA_MAX;
     }
+    virtual bool CheckFormatSupportMjpeg(CameraId cameraId, int width, int height)
+    {
+        (void)cameraId;
+        (void)width;
+        (void)height;
+        return false;
+    }
 };
 } // namespace Camera
 } // namespace OHOS

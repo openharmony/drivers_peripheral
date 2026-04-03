@@ -16,7 +16,10 @@ import("../camera.gni")
 group("camera_hal_test") {
   testonly = true
   if (drivers_peripheral_camera_feature_usb == true) {
-    deps = [ "$test_path/ut/usb_camera:camera_usb_test_ut" ]
+    deps = [
+      "$test_path/ut/usb_camera:camera_usb_test_ut",
+      "$test_path/ut/usb_camera/mjpeg_decoder:mjpeg_decoder_test",
+    ]
   } else {
     deps = [
       "$test_path/benchmarktest/v1_0:hdf_camera_benchmark_test",

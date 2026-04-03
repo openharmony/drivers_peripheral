@@ -50,6 +50,7 @@ public:
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag);
     void SetMemoryType(uint8_t &memType);
     CameraId HardwareToCameraId(std::string hardwareName) override;
+    bool CheckFormatSupportMjpeg(CameraId cameraId, int width, int height) override;
 
 private:
     void AddHardware(CameraId id, const std::string hardwareName);

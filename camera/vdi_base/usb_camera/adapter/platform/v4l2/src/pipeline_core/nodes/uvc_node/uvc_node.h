@@ -21,6 +21,7 @@
 #include "source_node.h"
 #include "sensor_controller.h"
 #include "sensor_manager.h"
+#include "mjpeg_decoder.h"
 
 namespace OHOS::Camera {
 class UvcNode : public SourceNode {
@@ -41,6 +42,7 @@ private:
     void OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata);
     int32_t GetStreamId(const CaptureMeta &meta);
     void GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata);
+    void DecodeMjpegBuffer(std::shared_ptr<IBuffer>& buffer);
 
 private:
     std::mutex requestLock_;
@@ -49,6 +51,8 @@ private:
     std::shared_ptr<IDeviceManager> deviceManager_ = nullptr;
     std::shared_ptr<CameraMetadata> meta_ = nullptr;
     uint32_t cameraformat_ = 0;
+    uint32_t uvcSourcePixformat_ = 0;
+    std::shared_ptr<IMjpegDecoder> mjpegDecoder_;  // 每实例独立解码器，支持多线程并发
 };
 } // namespace OHOS::Camera
 #endif
