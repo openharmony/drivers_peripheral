@@ -12,16 +12,17 @@
  */
 
 #include "node_utils.h"
-#include "map"
 #include "camera.h"
-extern "C" {
+#include "map"
+
 #ifdef DEVICE_USAGE_FFMPEG_ENABLE
+extern "C" {
 #include "libavutil/frame.h"
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 #include "libavutil/imgutils.h"
-#endif // DEVICE_USAGE_FFMPEG_ENABLE
 }
+#endif
 
 namespace OHOS::Camera {
 using namespace std;
@@ -30,6 +31,7 @@ const int32_t INVALID_ARGUMENT = -1;
 
 static enum AVPixelFormat ConvertOhosFormat2AVPixelFormat(uint32_t format)
 {
+#ifdef DEVICE_USAGE_FFMPEG_ENABLE
     static map<uint32_t, enum AVPixelFormat> ohosFormat2AVPixelFormatMap = {
         {CAMERA_FORMAT_RGBA_8888,    AV_PIX_FMT_RGBA},
         {CAMERA_FORMAT_RGB_888,      AV_PIX_FMT_RGB24},
@@ -41,11 +43,13 @@ static enum AVPixelFormat ConvertOhosFormat2AVPixelFormat(uint32_t format)
     if (it != ohosFormat2AVPixelFormatMap.end()) {
         return it->second;
     }
+#endif
     return AV_PIX_FMT_NONE;
 }
 
 int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBufferInfo &dstBufferInfo)
 {
+#ifdef DEVICE_USAGE_FFMPEG_ENABLE
     static uint32_t convertCount = 0;
     uint32_t id = convertCount++;
     auto srcAVFmt = ConvertOhosFormat2AVPixelFormat(srcBufferInfo.format);
@@ -92,6 +96,12 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
     CAMERA_LOGD("NodeUtils::ImageFormatConvert End [%{public}d] ====== %{public}d", ret, id);
 
     return 0;
+#else
+    (void)srcBufferInfo;
+    (void)dstBufferInfo;
+    CAMERA_LOGE("NodeUtils::ImageFormatConvert: FFmpeg not enabled");
+    return INVALID_ARGUMENT;
+#endif
 }
 
 void NodeUtils::BufferScaleFormatTransform(std::shared_ptr<IBuffer>& buffer, void *dstBuffer, uint32_t dstBufferSize)
@@ -207,9 +217,9 @@ void NodeUtils::BufferTransformForStride(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGI("buffer->GetWidth() == buffer->GetStride(), no need stride");
         return;
     }
-
+    
     if (buffer->GetIsValidDataInSurfaceBuffer()) {
-        CAMERA_LOGE("IsValidDataInSurfaceBuffer true");
+        CAMERA_LOGD("IsValidDataInSurfaceBuffer true");
         if (memcpy_s(buffer->GetVirAddress(), buffer->GetSize(),
             buffer->GetSuffaceBufferAddr(), buffer->GetSuffaceBufferSize()) != 0) {
             CAMERA_LOGE("BufferScaleFormatTransform Fail, memcpy_s error");
@@ -217,8 +227,8 @@ void NodeUtils::BufferTransformForStride(std::shared_ptr<IBuffer>& buffer)
         }
     }
 
-    uint8_t* bufferForStride = (uint8_t*)buffer->GetSuffaceBufferAddr();
-    uint8_t* bufferForStrideMax = bufferForStride + buffer->GetSuffaceBufferSize();
+    uint8_t* bufferForStride = (uint8_t*)buffer->GetVirAddress();
+    uint8_t* bufferForStrideMax = bufferForStride + buffer->GetSize();
     auto dstAVFmt = ConvertOhosFormat2AVPixelFormat(buffer->GetFormat());
     if (dstAVFmt == AV_PIX_FMT_NV21 || dstAVFmt == AV_PIX_FMT_NV12) {
         AddStrideToNV21(bufferForStride, bufferForStrideMax,
@@ -227,4 +237,5 @@ void NodeUtils::BufferTransformForStride(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGE("format not supported for stride, format = %{public}d", buffer->GetFormat());
     }
 }
-};
+
+}  // namespace OHOS::Camera
