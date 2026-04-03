@@ -162,8 +162,6 @@ public:
             return -1;
         }
         size_t flag = static_cast<size_t>(ret);
-        size_t oldStatus = (flag & O_NONBLOCK) ? 1 : 0;
-
         size_t newFlag;
         if (sw) {
             newFlag = flag | static_cast<size_t>(O_NONBLOCK);
@@ -173,7 +171,8 @@ public:
         if (::fcntl(fd, F_SETFL, static_cast<int32_t>(newFlag)) < 0) {
             return -1;
         }
-        return static_cast<int32_t>(oldStatus);
+        size_t status = flag & static_cast<size_t>(O_NONBLOCK);
+        return static_cast<int32_t>(status);
     }
 
     int32_t add(int32_t fd, struct epoll_event &ev, uint32_t events, void *user_data = nullptr)
