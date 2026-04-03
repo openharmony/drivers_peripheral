@@ -163,7 +163,7 @@ public:
         }
         size_t flag = static_cast<size_t>(ret);
         size_t newFlag;
-        if (sw) {
+        if (sw != 0) {
             newFlag = flag | static_cast<size_t>(O_NONBLOCK);
         } else {
             newFlag = flag & ~static_cast<size_t>(O_NONBLOCK);
