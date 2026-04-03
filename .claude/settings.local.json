@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//usr/include/alsa/**)",
+      "Read(//usr/include/**)",
+      "WebSearch",
+      "Bash"
+    ]
+  }
+}
