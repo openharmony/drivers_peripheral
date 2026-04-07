@@ -517,12 +517,33 @@ static void HandleEp0Event(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEven
     }
 }
 
+static void HandleReqEvent(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEventAll event)
+{
+    struct UsbHandleMgr *handle = NULL;
+    for (uint8_t i = 0; i < event.epNum; i++) {
+        handle = GetHandleMgr(devMgr, event.epx[i]);
+        if (handle == NULL) {
+            HDF_LOGE("%{public}s:%{public}d handle is null", __func__, __LINE__);
+            continue;
+        }
+        (void)OsalMutexLock(&handle->lock);
+        if (handle->closing) {
+            HDF_LOGE("%{public}s:%{public}d handle is closed", __func__, __LINE__);
+            (void)OsalMutexUnlock(&handle->lock);
+            continue;
+        }
+        for (uint8_t j = 0; j < event.numEvent[i]; j++) {
+            HandleEpsIoEvent(&event.reqEvent[i][j], handle);
+        }
+        (void)OsalMutexUnlock(&handle->lock);
+    }
+}
+
 static int32_t UsbFnEventProcess(void *arg)
 {
     struct UsbFnDeviceMgr *devMgr = (struct UsbFnDeviceMgr *)arg;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnEventAll event;
-    struct UsbHandleMgr *handle = NULL;
     int32_t timeout = SLEEP_TIME_OUT;
     if (devMgr) {
         devMgr->running = true;
@@ -552,23 +573,7 @@ static int32_t UsbFnEventProcess(void *arg)
             continue;
         }
         HandleEp0Event(devMgr, event);
-        for (uint8_t i = 0; i < event.epNum; i++) {
-            handle = GetHandleMgr(devMgr, event.epx[i]);
-            if (handle == NULL) {
-                HDF_LOGE("%{public}s:%{public}d handle is null", __func__, __LINE__);
-                continue;
-            }
-            (void)OsalMutexLock(&handle->lock);
-            if (handle->closing) {
-                HDF_LOGE("%{public}s:%{public}d handle is closed", __func__, __LINE__);
-                (void)OsalMutexUnlock(&handle->lock);
-                continue;
-            }
-            for (uint8_t j = 0; j < event.numEvent[i]; j++) {
-                HandleEpsIoEvent(&event.reqEvent[i][j], handle);
-            }
-            (void)OsalMutexUnlock(&handle->lock);
-        }
+        HandleReqEvent(devMgr, event);
     }
     if (devMgr) {
         devMgr->running = false;
