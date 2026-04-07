@@ -37,7 +37,6 @@ struct UsbFnDeviceMgr {
     struct OsalThread          thread;
     bool                       running;
     bool                       stopping;
-    struct OsalMutex           lock;
 };
 
 const struct UsbFnDeviceMgr *UsbFnMgrDeviceCreate(const char *udcName,
