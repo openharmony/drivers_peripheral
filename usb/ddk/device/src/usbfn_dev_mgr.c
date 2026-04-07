@@ -539,7 +539,6 @@ static int32_t UsbFnEventProcess(void *arg)
         }
 
         CollectEventHandle(&event, devMgr);
-
         if (event.ep0Num + event.epNum == 0) {
             continue;
         }
@@ -553,7 +552,6 @@ static int32_t UsbFnEventProcess(void *arg)
             continue;
         }
         HandleEp0Event(devMgr, event);
-
         for (uint8_t i = 0; i < event.epNum; i++) {
             handle = GetHandleMgr(devMgr, event.epx[i]);
             if (handle == NULL) {
