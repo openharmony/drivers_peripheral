@@ -15,6 +15,7 @@
 
 #include "usbfn_io_mgr.h"
 #include "usbd_wrapper.h"
+#include "osal_mutex.h"
 
 #define HDF_LOG_TAG usbfn_io_mgr
 
@@ -253,19 +254,30 @@ static int32_t HandleInit(struct UsbHandleMgr *handle, struct UsbFnInterfaceMgr 
 
     DListHeadInit(&handle->reqEntry);
     handle->numFd = interfaceMgr->interface.info.numPipes;
+    handle->closing = false;
+
+    ret = OsalMutexInit(&handle->lock);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: OsalMutexInit failed, ret = %{public}d", __func__, ret);
+        return HDF_ERR_IO;
+    }
+
     if (handle->numFd > MAX_EP) {
         HDF_LOGE("%{public}s: Invalid numFd value", __func__);
+        (void)OsalMutexDestroy(&handle->lock);
         return HDF_ERR_IO;
     }
     for (i = 0; i < handle->numFd; i++) {
         handle->fds[i] = fnOps->openPipe(interfaceMgr->funcMgr->name, interfaceMgr->startEpId + i);
         if (handle->fds[i] <= 0) {
+            (void)OsalMutexDestroy(&handle->lock);
             return HDF_ERR_IO;
         }
 
         ret = fnOps->queueInit(handle->fds[i]);
         if (ret) {
             HDF_LOGE("%{public}s: queueInit failed ret = %{public}d", __func__, ret);
+            (void)OsalMutexDestroy(&handle->lock);
             return HDF_ERR_IO;
         }
 
@@ -282,6 +294,7 @@ FREE_EVENT:
     for (j = 0; j < i; j++) {
         UsbFnMemFree(handle->reqEvent[j]);
     }
+    (void)OsalMutexDestroy(&handle->lock);
     return HDF_ERR_IO;
 }
 
@@ -327,6 +340,13 @@ int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
         HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+
+    (void)OsalMutexLock(&handle->lock);
+    handle->closing = true;
+    (void)OsalMutexUnlock(&handle->lock);
+
+    OsalMSleep(20);
+
     for (uint32_t i = 0; i < handle->numFd; i++) {
         int32_t ret = fnOps->queueDel(handle->fds[i]);
         if (ret) {
@@ -344,6 +364,7 @@ int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
         handle->reqEvent[i] = NULL;
     }
 
+    (void)OsalMutexDestroy(&handle->lock);
     UsbFnMemFree(handle);
     handle = NULL;
     interfaceMgr->isOpen = false;
