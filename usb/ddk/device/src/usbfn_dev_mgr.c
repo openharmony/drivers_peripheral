@@ -218,12 +218,6 @@ const struct UsbFnDeviceMgr *UsbFnMgrDeviceCreate(
         return NULL;
     }
 
-    ret = OsalMutexInit(&fnDevMgr->lock);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: OsalMutexInit failed, ret = %{public}d", __func__, ret);
-        goto FREE_DEVMGR;
-    }
-
     ret = CreatDev(udcName, des, fnDevMgr);
     if (ret) {
         HDF_LOGE("%{public}s CreatDev failed", __func__);
@@ -310,7 +304,6 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
         UsbFnCfgMgrFreeUsbFnDeviceDesc(fnDevMgr->des);
         fnDevMgr->des = NULL;
     }
-    (void)OsalMutexDestroy(&fnDevMgr->lock);
     UsbFnMemFree(fnDevMgr);
     fnDevMgr = NULL;
     HDF_LOGE("%{public}s: dev remove success", __func__);
@@ -536,23 +529,16 @@ static int32_t UsbFnEventProcess(void *arg)
     }
     HDF_LOGI("%{public}s, start.", __func__);
     while (true) {
-        if (devMgr == NULL || devMgr->stopping) {
+        if (devMgr == NULL || devMgr->stopping || fnOps == NULL) {
             HDF_LOGW("%{public}s:%{public}d is null", __func__, __LINE__);
             break;
-        }
-        if (fnOps == NULL) {
-            HDF_LOGE("%{public}s:%{public}d fnOps is null", __func__, __LINE__);
-            OsalMSleep(10);
-            continue;
         }
         if (memset_s(&event, sizeof(event), 0, sizeof(event)) != EOK) {
             HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
             break;
         }
 
-        (void)OsalMutexLock(&devMgr->lock);
         CollectEventHandle(&event, devMgr);
-        (void)OsalMutexUnlock(&devMgr->lock);
 
         if (event.ep0Num + event.epNum == 0) {
             continue;
@@ -566,13 +552,12 @@ static int32_t UsbFnEventProcess(void *arg)
             OsalMSleep(1);
             continue;
         }
-        (void)OsalMutexLock(&devMgr->lock);
         HandleEp0Event(devMgr, event);
-        (void)OsalMutexUnlock(&devMgr->lock);
 
         for (uint8_t i = 0; i < event.epNum; i++) {
             handle = GetHandleMgr(devMgr, event.epx[i]);
             if (handle == NULL) {
+                HDF_LOGE("%{public}s:%{public}d hand is null", __func__, __LINE__);
                 continue;
             }
             (void)OsalMutexLock(&handle->lock);
