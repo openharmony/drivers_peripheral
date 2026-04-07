@@ -18,6 +18,7 @@
 #include "osal_mutex.h"
 
 #define HDF_LOG_TAG usbfn_io_mgr
+#define WAIT_20_MS 20
 
 static int32_t ReqToIoData(struct UsbFnRequest *req, struct IoData *ioData, uint32_t aio, uint32_t timeout)
 {
@@ -345,7 +346,7 @@ int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
     handle->closing = true;
     (void)OsalMutexUnlock(&handle->lock);
 
-    OsalMSleep(20);
+    OsalMSleep(WAIT_20_MS);
 
     for (uint32_t i = 0; i < handle->numFd; i++) {
         int32_t ret = fnOps->queueDel(handle->fds[i]);
