@@ -613,7 +613,6 @@ static bool InitHalInfo()
 
 static WifiError WifiPreInitialize(void)
 {
-    srand(getpid());
     wifiHandle handle;
 
     HDF_LOGI("WifiPreInitialize");
