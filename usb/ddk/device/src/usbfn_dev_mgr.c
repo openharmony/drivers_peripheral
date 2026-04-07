@@ -555,11 +555,12 @@ static int32_t UsbFnEventProcess(void *arg)
         for (uint8_t i = 0; i < event.epNum; i++) {
             handle = GetHandleMgr(devMgr, event.epx[i]);
             if (handle == NULL) {
-                HDF_LOGE("%{public}s:%{public}d hand is null", __func__, __LINE__);
+                HDF_LOGE("%{public}s:%{public}d handle is null", __func__, __LINE__);
                 continue;
             }
             (void)OsalMutexLock(&handle->lock);
             if (handle->closing) {
+                HDF_LOGE("%{public}s:%{public}d handle is closed", __func__, __LINE__);
                 (void)OsalMutexUnlock(&handle->lock);
                 continue;
             }
