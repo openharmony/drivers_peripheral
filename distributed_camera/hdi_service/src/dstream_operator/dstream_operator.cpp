@@ -128,6 +128,7 @@ int32_t DStreamOperator::ReleaseStreams(const std::vector<int32_t> &streamIds)
     }
 
     for (int id : streamIds) {
+        DHLOGI("DStreamOperator::ReleaseStreams, streamId=%{public}d.", id);
         auto stream = FindHalStreamById(id);
         if (stream != nullptr) {
             DCamRetCode ret = stream->ReleaseDCameraBufferQueue();
@@ -836,6 +837,7 @@ DCamRetCode DStreamOperator::ParseVideoFormats(cJSON* rootValue)
 
 DCamRetCode DStreamOperator::AcquireBuffer(int streamId, DCameraBuffer &buffer)
 {
+    DHLOGI("AcquireBuffer streamId:%{public}d", streamId);
     if (!IsCapturing()) {
         DHLOGE("Not in capturing state, can not acquire buffer.");
         return DCamRetCode::CAMERA_OFFLINE;
@@ -858,7 +860,7 @@ DCamRetCode DStreamOperator::AcquireBuffer(int streamId, DCameraBuffer &buffer)
 
 DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &buffer)
 {
-    DHLOGD("DStreamOperator::ShutterBuffer begin shutter buffer for streamId = %{public}d", streamId);
+    DHLOGI("DStreamOperator::ShutterBuffer begin shutter buffer for streamId = %{public}d", streamId);
 
     int32_t captureId = FindCaptureIdByStreamId(streamId);
     if (captureId == -1) {
@@ -961,7 +963,7 @@ void DStreamOperator::SnapShotStreamOnCaptureEnded(int32_t captureId, int stream
     std::vector<int> streamIds = halCaptureInfo->streamIds_;
     uint64_t resultTimestamp = GetCurrentLocalTimeStamp();
     dcStreamOperatorCallback__V1_3->OnCaptureReady(captureId, streamIds, resultTimestamp);
-    DHLOGD("snapshot stream successfully reported captureId = %{public}d streamId = %{public}d.", captureId, streamId);
+    DHLOGI("snapshot stream successfully reported captureId = %{public}d streamId = %{public}d.", captureId, streamId);
 }
 
 void DStreamOperator::Release()
