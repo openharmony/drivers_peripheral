@@ -226,8 +226,8 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest011, TestSize.Level0)
 {
     EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(0), 0);
     EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(1), 2);
-    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(2* 1024 * 1024), 2);
-    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(2* 1024 * 1024 + 1), 4);
-    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(11* 1024 * 1024), 12);
+    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(2 * 1024 * 1024), 2);
+    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(2 * 1024 * 1024 + 1), 4);
+    EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(11 * 1024 * 1024), 12);
 }
 }
