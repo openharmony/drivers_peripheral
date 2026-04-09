@@ -126,7 +126,7 @@ static int64_t MakeDeviceId(int32_t card)
     ReadVendorIdAndProductId(card, idVendor, idProduct);
     ReadUsbBus(card, usbbus);
     std::hash<std::string> hasher;
-    return hasher(idVendor + idProduct + usbbus);
+    return static_cast<int64_t>(hasher(idVendor + idProduct + usbbus));
 }
 
 static std::string MakeDeviceFileName(int32_t card, int32_t device)
@@ -618,9 +618,9 @@ void MidiDriverController::PopulateMidi1Ports(snd_ctl_t *ctl, int32_t device, De
             continue;
         }
         std::string devname = ::snd_rawmidi_info_get_name(info);
-        int32_t subdevices_count = ::snd_rawmidi_info_get_subdevices_count(info);
+        uint32_t subdevices_count = ::snd_rawmidi_info_get_subdevices_count(info);
 
-        for (int32_t sub = 0; sub < subdevices_count; ++sub) {
+        for (uint32_t sub = 0; sub < subdevices_count; ++sub) {
             ::snd_rawmidi_info_set_subdevice(info, sub);
             if (::snd_ctl_rawmidi_info(ctl, info) < 0) {
                 continue;
@@ -737,17 +737,17 @@ int32_t MidiDriverController::OpenDevice(int64_t deviceId)
     if (activeDrivers_.find(deviceId) != activeDrivers_.end()) {
         return HDF_FAILURE; // Already open
     }
-    int devIndex = -1;
+    ssize_t devIndex = -1;
     for (size_t i = 0; i < deviceList_.size(); i++) {
         if (deviceList_[i].deviceId == deviceId) {
-            devIndex = i;
+            devIndex = static_cast<ssize_t>(i);
             break;
         }
     }
     if (devIndex == -1) {
         return HDF_FAILURE;
     }
-    const auto& info = deviceList_[devIndex];
+    const auto& info = deviceList_[static_cast<size_t>(devIndex)];
     std::shared_ptr<MidiDeviceBase> driver;
     if (info.is_ump) {
         return HDF_FAILURE;

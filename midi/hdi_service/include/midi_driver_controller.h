@@ -157,13 +157,22 @@ public:
 
     int32_t nonblock(int32_t fd, int32_t sw)
     {
-        int32_t flag = ::fcntl(fd, F_GETFL);
-        if (sw) {
-            ::fcntl(fd, F_SETFL, flag | O_NONBLOCK);
-        } else {
-            ::fcntl(fd, F_SETFL, flag & ~O_NONBLOCK);
+        int32_t ret = ::fcntl(fd, F_GETFL);
+        if (ret < 0) {
+            return -1;
         }
-        return (flag & O_NONBLOCK);
+        size_t flag = static_cast<size_t>(ret);
+        size_t newFlag;
+        if (sw != 0) {
+            newFlag = flag | static_cast<size_t>(O_NONBLOCK);
+        } else {
+            newFlag = flag & ~static_cast<size_t>(O_NONBLOCK);
+        }
+        if (::fcntl(fd, F_SETFL, static_cast<int32_t>(newFlag)) < 0) {
+            return -1;
+        }
+        size_t status = flag & static_cast<size_t>(O_NONBLOCK);
+        return static_cast<int32_t>(status);
     }
 
     int32_t add(int32_t fd, struct epoll_event &ev, uint32_t events, void *user_data = nullptr)
