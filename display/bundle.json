@@ -45,13 +45,12 @@
       ],
       "inner_kits": [
         {
-          "name": "//drivers/peripheral/display/hdi_service/gralloc/client:hdi_gralloc_client",
+          "name": "//drivers/peripheral/display:hdi_gralloc_client",
             "header": {
               "header_files": [
-                "idisplay_gralloc.h",
-                "parcel_utils.h"
+                "display_type.h"
               ],
-              "header_base": "//drivers/peripheral/display/hdi_service/gralloc/include"
+              "header_base": "//drivers/peripheral/display/interfaces/include"
           }
         },
         {

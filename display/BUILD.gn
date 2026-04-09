@@ -29,6 +29,14 @@ ohos_static_library("display_composer_vdi_config") {
   public_configs = [ ":composer_vdi_config" ]
 }
 
+ohos_static_library("hdi_gralloc_client") {
+  include_dirs = [
+    "./interfaces/include",
+  ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_display"
+}
+
 if (defined(ohos_lite)) {
   group("display_entry") {
     deps = [ "hal:hdi_display" ]
