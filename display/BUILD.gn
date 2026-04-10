@@ -21,7 +21,7 @@ config("composer_vdi_config") {
   include_dirs = [ "./composer/hdi_service/include" ]
 }
 
-ohos_static_library("gralloc_client_public_config") {
+config("gralloc_client_public_config") {
   include_dirs = [ "./interfaces/include" ]
 }
 
