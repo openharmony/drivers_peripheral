@@ -21,6 +21,10 @@ config("composer_vdi_config") {
   include_dirs = [ "./composer/hdi_service/include" ]
 }
 
+ohos_static_library("gralloc_client_public_config") {
+  include_dirs = [ "./interfaces/include" ]
+}
+
 ohos_static_library("display_buffer_vdi_config") {
   public_configs = [ ":buffer_vdi_config" ]
 }
@@ -30,9 +34,7 @@ ohos_static_library("display_composer_vdi_config") {
 }
 
 ohos_static_library("hdi_gralloc_client") {
-  include_dirs = [
-    "./interfaces/include",
-  ]
+  public_configs = [ ":gralloc_client_public_config" ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"
 }
