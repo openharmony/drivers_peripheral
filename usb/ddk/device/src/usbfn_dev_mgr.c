@@ -56,6 +56,7 @@ static void GetInterfaceInfo(const struct UsbInterfaceDescriptor *intf, struct U
         devMgr->interfaceMgr[g_intfCnt].interface.object = &devMgr->fnDev.object;
         devMgr->interfaceMgr[g_intfCnt].funcMgr = &devMgr->funcMgr[fnCnt];
         devMgr->interfaceMgr[g_intfCnt].startEpId = (uint8_t)g_epCnt;
+        OsalMutexInit(&devMgr->interfaceMgr[g_intfCnt].handleLock);
         g_epCnt += intf->bNumEndpoints;
         g_intfCnt++;
     }
@@ -297,6 +298,9 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
         fnDevMgr->funcMgr = NULL;
     }
     if (fnDevMgr->interfaceMgr != NULL) {
+        for (int i = 0; i < fnDevMgr->fnDev.numInterfaces; i++) {
+            (void)OsalMutexDestroy(&fnDevMgr->interfaceMgr[i].handleLock);
+        }
         UsbFnMemFree(fnDevMgr->interfaceMgr);
         fnDevMgr->interfaceMgr = NULL;
     }
@@ -474,29 +478,18 @@ static struct UsbFnFuncMgr *GetFuncMgr(const struct UsbFnDeviceMgr *devMgr, int3
     return funcMgr;
 }
 
-static struct UsbHandleMgr *GetHandleMgr(const struct UsbFnDeviceMgr *devMgr, int32_t epx)
+static struct UsbHandleMgr *GetHandleMgr(const struct UsbFnInterfaceMgr *intfMgr, int32_t epx)
 {
-    uint8_t i, j;
+    uint8_t j;
     struct UsbHandleMgr *handle = NULL;
-    struct UsbFnInterfaceMgr *intfMgr = NULL;
 
-    if (devMgr == NULL) {
-        HDF_LOGE("%{public}s:%{public}d devMgr is null.", __func__, __LINE__);
-        return NULL;
-    }
-    for (i = 0; i < devMgr->fnDev.numInterfaces; i++) {
-        intfMgr = devMgr->interfaceMgr + i;
-        if (!intfMgr->isOpen) {
-            continue;
-        }
-        handle = intfMgr->handle;
-        for (j = 0; j < handle->numFd; j++) {
-            if (epx == handle->fds[j]) {
-                return handle;
-            }
+    handle = intfMgr->handle;
+    for (j = 0; j < handle->numFd; j++) {
+        if (epx == handle->fds[j]) {
+            return handle;
         }
     }
-    return handle;
+    return NULL;
 }
 
 static void HandleEp0Event(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEventAll event)
@@ -519,23 +512,30 @@ static void HandleEp0Event(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEven
 
 static void HandleReqEvent(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEventAll event)
 {
+    if (devMgr == NULL) {
+        HDF_LOGE("%{public}s:%{public}d devMgr is null.", __func__, __LINE__);
+        return;
+    }
     struct UsbHandleMgr *handle = NULL;
     for (uint8_t i = 0; i < event.epNum; i++) {
-        handle = GetHandleMgr(devMgr, event.epx[i]);
-        if (handle == NULL) {
-            HDF_LOGE("%{public}s:%{public}d handle is null", __func__, __LINE__);
-            continue;
+        struct UsbFnInterfaceMgr *intfMgr = NULL;
+        for (j = 0; j < devMgr->fnDev.numInterfaces; j++) {
+            intfMgr = devMgr->interfaceMgr + j;
+            if (!intfMgr->isOpen) {
+                continue;
+            }
+            (void)OsalMutexLock(&intfMgr->handleLock);
+            handle = GetHandleMgr(intfMgr, event.epx[i]);
+            if (handle == NULL) {
+                HDF_LOGE("%{public}s:%{public}d handle is null", __func__, __LINE__);
+                (void)OsalMutexUnlock(&intfMgr->handleLock);
+                continue;
+            }
+            for (uint8_t k = 0; k < event.numEvent[k]; k++) {
+                HandleEpsIoEvent(&event.reqEvent[i][k], handle);
+            }
+            (void)OsalMutexUnlock(&intfMgr->handleLock);
         }
-        (void)OsalMutexLock(&handle->lock);
-        if (handle->closing) {
-            HDF_LOGE("%{public}s:%{public}d handle is closed", __func__, __LINE__);
-            (void)OsalMutexUnlock(&handle->lock);
-            continue;
-        }
-        for (uint8_t j = 0; j < event.numEvent[i]; j++) {
-            HandleEpsIoEvent(&event.reqEvent[i][j], handle);
-        }
-        (void)OsalMutexUnlock(&handle->lock);
     }
 }
 

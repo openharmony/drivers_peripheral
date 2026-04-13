@@ -42,8 +42,6 @@ struct UsbHandleMgr {
     struct UsbFnInterfaceMgr *intfMgr;
     struct DListHead         reqEntry;
     struct UsbFnReqEvent     *reqEvent[MAX_EP];
-    struct OsalMutex         lock;
-    bool                     closing;
 };
 
 struct UsbFnFuncMgr {
@@ -62,6 +60,7 @@ struct UsbFnInterfaceMgr {
     struct UsbHandleMgr    *handle;
     uint8_t                startEpId;
     bool                   isOpen;
+    struct OsalMutex       handleLock;
 };
 
 struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t pipe, uint32_t len);
