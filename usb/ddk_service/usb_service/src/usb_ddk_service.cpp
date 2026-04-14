@@ -834,7 +834,7 @@ int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlReques
     int32_t ret = g_DdkLibusbAdapter->OpenDevice(dev);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s OpenDevice failed: ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
+        return HDF_ERR_INVALID_PARAM;
     }
     if (direction == USB_REQUEST_DIR_FROM_DEVICE) {
         OHOS::HDI::Usb::V1_1::UsbCtrlTransferParams ctrlParams = {
