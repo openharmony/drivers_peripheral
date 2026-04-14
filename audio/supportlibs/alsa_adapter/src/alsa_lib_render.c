@@ -164,15 +164,16 @@ int32_t AudioCtlRenderSceneSelect(
 
     renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
-
+    pthread_mutex_lock(&g_mutex);
     descPins = handleData->renderMode.hwInfo.deviceDescript.pins;
     deviceInfo = &handleData->renderMode.hwInfo.pathSelect.deviceInfo;
     ret = renderIns->SelectScene(renderIns, handleData);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render select scene pin: (0x%{public}x) failed!", descPins);
+        pthread_mutex_unlock(&g_mutex);
         return HDF_FAILURE;
     }
-
+    pthread_mutex_unlock(&g_mutex);
     AUDIO_FUNC_LOGD("Render scene select pin: (0x%{public}x) success", descPins);
     return HDF_SUCCESS;
 }
