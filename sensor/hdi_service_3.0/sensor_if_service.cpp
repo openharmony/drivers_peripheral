@@ -158,6 +158,8 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
     if (mode == SA) {
         SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorHandle, serviceId, samplingInterval,
                                                                    reportInterval);
+        SensorClientsManager::GetInstance()->AddServiceToBatchUsed(sensorHandle, serviceId);
+        SensorClientsManager::GetInstance()->ReSetSensorPrintTime(sensorHandle);
     }
 
     SensorInterval sensorInterval = {samplingInterval, reportInterval};
@@ -167,6 +169,8 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
 
     int32_t ret = SetBatchConfig(sensorHandle, sensorInterval.samplingInterval, sensorInterval.reportInterval);
     if (ret != SENSOR_SUCCESS) {
+        SensorClientsManager::GetInstance()->DeleteClientSenSorConfig(sensorHandle, serviceId);
+        SensorClientsManager::GetInstance()->RemoveServiceFromBatchUsed(sensorHandle, serviceId);
         return ret;
     }
 
@@ -368,14 +372,22 @@ void SensorIfService::DisableUnusedSensors(int serviceId)
         if (iter.second.find(serviceId) == iter.second.end()) {
             continue;
         }
+        SensorClientsManager::GetInstance()->IsUpadateSensorState(iter.first, serviceId, DISABLE_SENSOR);
+    }
 
-        if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(iter.first, serviceId, DISABLE_SENSOR)) {
+    std::unordered_map<SensorHandle, std::set<int32_t>> sensorBatchUsed =
+        SensorClientsManager::GetInstance()->GetSensorBatchUsed();
+
+    for (auto iter : sensorBatchUsed) {
+        if (iter.second.find(serviceId) == iter.second.end()) {
             continue;
         }
 
-        std::unordered_map<SensorHandle, std::set<int32_t>> sensorUsed =
-            SensorClientsManager::GetInstance()->GetSensorUsed();
-        if (sensorUsed.find(iter.first) == sensorUsed.end()) {
+        SensorClientsManager::GetInstance()->RemoveServiceFromBatchUsed(iter.first, serviceId);
+
+        std::unordered_map<SensorHandle, std::set<int32_t>> sensorBatchUsedAfter =
+            SensorClientsManager::GetInstance()->GetSensorBatchUsed();
+        if (sensorBatchUsedAfter.find(iter.first) == sensorBatchUsedAfter.end()) {
             DisableSensorHandle(iter.first);
         }
     }
@@ -460,15 +472,16 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
         });
         if (callBackIter != callbackMap[groupId].end()) {
             int32_t serviceId = SensorClientsManager::GetInstance()->GetServiceId(groupId, iRemoteObject);
+            const sptr<V3_0::ISensorCallback> &cb = OHOS::HDI::hdi_facecast<V3_0::ISensorCallback>(*callBackIter);
             int32_t ret = RemoveCallbackMap(groupId, serviceId, iRemoteObject);
             if (ret != SENSOR_SUCCESS) {
                 HDF_LOGE("%{public}s: Unregister failed groupId[%{public}d]", __func__, groupId);
             }
+            SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, serviceId, cb);
             if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
                 HDF_LOGD("%{public}s: clients is not empty, do not unregister", __func__);
                 continue;
             }
-            const sptr<V3_0::ISensorCallback> &cb = OHOS::HDI::hdi_facecast<V3_0::ISensorCallback>(*callBackIter);
             sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, cb, UNREGISTER_SENSOR);
             if (sensorCb == nullptr) {
                 HDF_LOGE("%{public}s: get sensorcb fail, groupId[%{public}d]", __func__, groupId);
@@ -522,8 +535,12 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
         return HDF_FAILURE;
     }
 
-    if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, serviceId, DISABLE_SENSOR)) {
-        SensorClientsManager::GetInstance()->DeleteClientSenSorConfig(sensorHandle, serviceId);
+    SensorClientsManager::GetInstance()->DeleteClientSenSorConfig(sensorHandle, serviceId);
+    (void)SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, serviceId, DISABLE_SENSOR);
+    SensorClientsManager::GetInstance()->RemoveServiceFromBatchUsed(sensorHandle, serviceId);
+
+    std::set<int32_t> batchUsed = SensorClientsManager::GetInstance()->GetBatchUsedServices(sensorHandle);
+    if (!batchUsed.empty()) {
         HDF_LOGD("%{public}s There are still some services enable", __func__);
         SetNewBatch(sensorHandle);
         return HDF_SUCCESS;
@@ -542,9 +559,9 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
             HDF_LOGE("%{public}s SetSaBatch failed, error code is %{public}d, sensorHandle = %{public}s, serviceId = "
                      "%{public}d", __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
             SensorClientsManager::GetInstance()->AddServiceToReportQueue(sensorHandle, serviceId);
+            SensorClientsManager::GetInstance()->AddServiceToBatchUsed(sensorHandle, serviceId);
             return ret;
         }
-        SensorClientsManager::GetInstance()->DeleteClientSenSorConfig(sensorHandle, serviceId);
         return HDF_SUCCESS;
     }
 
@@ -560,8 +577,8 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
         HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, serviceId = %{public}d",
                  __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
         SensorClientsManager::GetInstance()->AddServiceToReportQueue(sensorHandle, serviceId);
+        SensorClientsManager::GetInstance()->AddServiceToBatchUsed(sensorHandle, serviceId);
     }
-    SensorClientsManager::GetInstance()->DeleteClientSenSorConfig(sensorHandle, serviceId);
 
     return ret;
 }
