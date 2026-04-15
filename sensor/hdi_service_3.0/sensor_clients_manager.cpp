@@ -192,6 +192,10 @@ void SensorClientsManager::UpdateSensorConfig(SensorHandle sensorHandle, int64_t
         it->second.reportInterval = reportInterval <= it->second.reportInterval ? reportInterval
          : it->second.reportInterval;
     } else {
+        if (sensorConfig_.size() >= SENSOR_CLIENT_INFO_MAX) {
+            HDF_LOGE("%{public}s: sensorConfig_ size has exceeded the maximum value", __func__);
+            return;
+        }
         BestSensorConfig config = {samplingInterval, reportInterval};
         sensorConfig_.emplace(sensorHandle, config);
     }
@@ -201,6 +205,10 @@ void SensorClientsManager::UpdateNewSensorConfig(SensorHandle sensorHandle, Sens
 {
     SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
+    if (sensorConfig_.find(sensorHandle) == sensorConfig_.end() && sensorConfig_.size() >= SENSOR_CLIENT_INFO_MAX) {
+        HDF_LOGE("%{public}s: sensorConfig_ size has exceeded the maximum value", __func__);
+        return;
+    }
     sensorConfig_[sensorHandle].samplingInterval = sensorInterval.samplingInterval;
     sensorConfig_[sensorHandle].reportInterval = sensorInterval.reportInterval;
 }
@@ -217,6 +225,10 @@ void SensorClientsManager::UpdateSdcSensorConfig(SensorHandle sensorHandle, int6
         it->second.reportInterval = reportInterval <= it->second.reportInterval ? reportInterval
          : it->second.reportInterval;
     } else {
+        if (sdcSensorConfig_.size() >= SENSOR_CLIENT_INFO_MAX) {
+            HDF_LOGE("%{public}s: sdcSensorConfig_ size has exceeded the maximum value", __func__);
+            return;
+        }
         BestSensorConfig config = {samplingInterval, reportInterval};
         sdcSensorConfig_.emplace(sensorHandle, config);
     }
@@ -355,6 +367,10 @@ void SensorClientsManager::OpenSensor(SensorHandle sensorHandle, int serviceId)
 {
     SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
+    if (sensorUsed_.find(sensorHandle) == sensorUsed_.end() && sensorUsed_.size() >= SENSOR_CLIENT_INFO_MAX) {
+        HDF_LOGE("%{public}s: sensorUsed_ size has exceeded the maximum value", __func__);
+        return;
+    }
     std::set<int> service = {serviceId};
     sensorUsed_.emplace(sensorHandle, service);
     HDF_LOGD("%{public}s: service: %{public}d enabled sensorHandle %{public}s", __func__,  serviceId,
@@ -409,6 +425,10 @@ void SensorClientsManager::AddServiceToReportQueue(SensorHandle sensorHandle, in
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     auto it = sensorUsed_.find(sensorHandle);
     if (it == sensorUsed_.end()) {
+        if (sensorUsed_.size() >= SENSOR_CLIENT_INFO_MAX) {
+            HDF_LOGE("%{public}s: sensorUsed_ size has exceeded the maximum value", __func__);
+            return;
+        }
         std::set<int> service = {serviceId};
         sensorUsed_.emplace(sensorHandle, service);
         HDF_LOGD("%{public}s: sensorHandle %{public}s is enabled by service: %{public}d", __func__,
@@ -688,6 +708,11 @@ void SensorClientsManager::HdiReportData(const sptr<V3_0::ISensorCallback> &call
             "sensorInfoId is (%{public}s,%{public}d)", __func__, ret,
             SENSOR_HANDLE_TO_C_STR(sensorInfoId.sensorHandle), sensorInfoId.serviceId);
     } else {
+        if (sensorReportCountMap.find(sensorInfoId.sensorHandle) == sensorReportCountMap.end() &&
+            sensorReportCountMap.size() >= SENSOR_CLIENT_INFO_MAX) {
+            HDF_LOGE("%{public}s: sensorReportCountMap size has exceeded the maximum value", __func__);
+            return;
+        }
         auto it = sensorReportCountMap[sensorInfoId.sensorHandle].find(sensorInfoId.serviceId);
         int64_t reportCount = INIT_REPORT_COUNT;
         if (it == sensorReportCountMap[sensorInfoId.sensorHandle].end()) {
@@ -710,6 +735,11 @@ void SensorClientsManager::ReSetSensorPrintTime(SensorHandle sensorHandle)
 {
     SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(sensorPrintTimesMutex_);
+    if (sensorPrintTimes_.find(sensorHandle) == sensorPrintTimes_.end() &&
+        sensorPrintTimes_.size() >= SENSOR_CLIENT_INFO_MAX) {
+        HDF_LOGE("%{public}s: sensorPrintTimes_ size has exceeded the maximum value", __func__);
+        return;
+    }
     sensorPrintTimes_[sensorHandle] = ZERO_PRINT_TIME;
 }
 
