@@ -280,11 +280,9 @@ void SourceNode::PortHandler::CollectBuffers()
     uint32_t bufferSize = static_cast<uint32_t>(maxWide_) * static_cast<uint32_t>(maxHigh_) * NewBufferBytePrePiex;
     CAMERA_LOGI("streamId[%{public}d], bufferIndex[%{public}d], Size %{public}d => %{public}d",
                 buffer->GetStreamId(), buffer->GetIndex(), buffer->GetSize(), bufferSize);
-
     if (buffer->GetVirAddress() == buffer->GetSuffaceBufferAddr()) {
         CAMERA_LOGI("CollectBuffers begin malloc buffer");
         auto bufferAddr = malloc(bufferSize);
-
         if (bufferAddr != nullptr) {
             buffer->SetVirAddress(bufferAddr);
             buffer->SetSize(bufferSize);
