@@ -129,17 +129,12 @@ static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared
             CAMERA_LOGE("PcorkNode::DeliverBuffer error,  buffer->GetSize() > MAX_BUFFER_SIZE");
             return;
         }
-#ifdef FORK_DMA
-        auto [bufferAddr, dmaFd] = buffer->AllocateDmaBuffer(bufferSize);
-#else
+
         auto bufferAddr = malloc(bufferSize);
-#endif
+
         if (bufferAddr != nullptr) {
             forkBuffer->SetVirAddress(bufferAddr);
             forkBuffer->SetSize(bufferSize);
-#ifdef FORK_DMA
-            buffer->SetDmaBufFd(dmaFd);
-#endif
         } else {
             CAMERA_LOGE("ForkNode::DeliverBuffer malloc buffer fail");
         }

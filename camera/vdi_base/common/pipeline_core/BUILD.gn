@@ -41,10 +41,6 @@ config("pipe_config") {
     defines += [ "BATCH_CREATE_BUFFERS" ]
   }
 
-  if (drivers_peripheral_camera_feature_fork_dma) {
-    defines += [ "FORK_DMA" ]
-  }
-
   if (drivers_peripheral_camera_feature_host_codec) {
     defines += [ "YUV420SP_FORK_STREAM_HOST_CODEC" ]
   }
