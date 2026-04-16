@@ -845,7 +845,7 @@ int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlReques
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s control transfer read failed: %{public}d", __func__, ret);
             (void) g_DdkLibusbAdapter->CloseDevice(dev);
-            return ret;
+            return (ret == HDF_ERR_TIMEOUT)? HDF_ERR_TIMEOUT : HDF_ERR_IO;  // avoid to expose too many errcodes
         }
         transferredLength = length;
     } else {
@@ -857,7 +857,7 @@ int32_t UsbDdkService::ControlTransfer(uint64_t deviceId, const UsbControlReques
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s control transfer write failed: %{public}d", __func__, ret);
             (void) g_DdkLibusbAdapter->CloseDevice(dev);
-            return ret;
+            return (ret == HDF_ERR_TIMEOUT)? HDF_ERR_TIMEOUT : HDF_ERR_IO;  // avoid to expose too many errcodes
         }
         transferredLength = data.size();
     }
