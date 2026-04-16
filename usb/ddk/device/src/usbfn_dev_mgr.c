@@ -265,7 +265,7 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
 
     fnDevMgr->stopping = true;
-    while (int32_t i = 0; fnDevMgr->running; i++) {
+    for (int32_t i = 0; fnDevMgr->running; i++) {
         OsalMSleep(SLEEP_TIME_OUT);
         if (i > SLEEP_TIMES) {
             HDF_LOGE("%{public}s: wait thread exit timeout", __func__);
