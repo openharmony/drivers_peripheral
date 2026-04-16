@@ -324,11 +324,15 @@ int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
 
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnInterfaceMgr *interfaceMgr = handle->intfMgr;
-    if (interfaceMgr == NULL || interfaceMgr->isOpen == false) {
+    if (interfaceMgr == NULL) {
         HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     (void)OsalMutexLock(&interfaceMgr->handleLock);
+    if (interfaceMgr->isOpen == false) {
+        HDF_LOGE("%{public}s interface has been closed", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     for (uint32_t i = 0; i < handle->numFd; i++) {
         int32_t ret = fnOps->queueDel(handle->fds[i]);
         if (ret) {
@@ -350,9 +354,9 @@ int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
 
     UsbFnMemFree(handle);
     handle = NULL;
-    (void)OsalMutexUnlock(&interfaceMgr->handleLock);
     interfaceMgr->isOpen = false;
     interfaceMgr->handle = NULL;
+    (void)OsalMutexUnlock(&interfaceMgr->handleLock);
     return 0;
 }
 

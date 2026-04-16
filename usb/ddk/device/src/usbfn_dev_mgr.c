@@ -258,8 +258,6 @@ FREE_DEVMGR:
 
 int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
 {
-    int32_t ret;
-    int32_t i = 0;
     if (fnDevice == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -267,8 +265,7 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
 
     fnDevMgr->stopping = true;
-    while (fnDevMgr->running) {
-        i++;
+    while (int32_t i = 0; fnDevMgr->running; i++) {
         OsalMSleep(SLEEP_TIME_OUT);
         if (i > SLEEP_TIMES) {
             HDF_LOGE("%{public}s: wait thread exit timeout", __func__);
@@ -276,7 +273,7 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
         }
     }
 
-    ret = OsalThreadDestroy(&fnDevMgr->thread);
+    int32_t ret = OsalThreadDestroy(&fnDevMgr->thread);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy failed, ret = %{public}d", __func__, __LINE__, ret);
         return ret;
@@ -519,9 +516,9 @@ static void HandleReqEvent(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEven
     struct UsbHandleMgr *handle = NULL;
     for (uint8_t i = 0; i < event.epNum; i++) {
         struct UsbFnInterfaceMgr *intfMgr = NULL;
-        for (j = 0; j < devMgr->fnDev.numInterfaces; j++) {
+        for (uint8_t j = 0; j < devMgr->fnDev.numInterfaces; j++) {
             intfMgr = devMgr->interfaceMgr + j;
-            if (!intfMgr->isOpen) {
+            if (intfMgr == NULL || !intfMgr->isOpen) {
                 continue;
             }
             (void)OsalMutexLock(&intfMgr->handleLock);
@@ -531,10 +528,11 @@ static void HandleReqEvent(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEven
                 (void)OsalMutexUnlock(&intfMgr->handleLock);
                 continue;
             }
-            for (uint8_t k = 0; k < event.numEvent[k]; k++) {
+            for (uint8_t k = 0; k < event.numEvent[i]; k++) {
                 HandleEpsIoEvent(&event.reqEvent[i][k], handle);
             }
             (void)OsalMutexUnlock(&intfMgr->handleLock);
+            break;
         }
     }
 }
