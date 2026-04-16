@@ -129,9 +129,7 @@ static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared
             CAMERA_LOGE("PcorkNode::DeliverBuffer error,  buffer->GetSize() > MAX_BUFFER_SIZE");
             return;
         }
-
         auto bufferAddr = malloc(bufferSize);
-
         if (bufferAddr != nullptr) {
             forkBuffer->SetVirAddress(bufferAddr);
             forkBuffer->SetSize(bufferSize);
