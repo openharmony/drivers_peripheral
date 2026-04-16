@@ -15,6 +15,7 @@
 
 #include "usbfn_io_mgr.h"
 #include "usbd_wrapper.h"
+#include "osal_mutex.h"
 
 #define HDF_LOG_TAG usbfn_io_mgr
 
@@ -323,20 +324,27 @@ int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
 
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnInterfaceMgr *interfaceMgr = handle->intfMgr;
-    if (interfaceMgr == NULL || interfaceMgr->isOpen == false) {
+    if (interfaceMgr == NULL) {
         HDF_LOGE("%{public}s invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    (void)OsalMutexLock(&interfaceMgr->handleLock);
+    if (interfaceMgr->isOpen == false) {
+        HDF_LOGE("%{public}s interface has been closed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     for (uint32_t i = 0; i < handle->numFd; i++) {
         int32_t ret = fnOps->queueDel(handle->fds[i]);
         if (ret) {
             HDF_LOGE("%{public}s:%{public}d queueDel failed, ret=%{public}d ", __func__, __LINE__, ret);
+            (void)OsalMutexUnlock(&interfaceMgr->handleLock);
             return HDF_ERR_DEVICE_BUSY;
         }
 
         ret = fnOps->closePipe(handle->fds[i]);
         if (ret) {
             HDF_LOGE("%{public}s:%{public}d closePipe failed, ret=%{public}d ", __func__, __LINE__, ret);
+            (void)OsalMutexUnlock(&interfaceMgr->handleLock);
             return HDF_ERR_DEVICE_BUSY;
         }
         handle->fds[i] = -1;
@@ -348,6 +356,7 @@ int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
     handle = NULL;
     interfaceMgr->isOpen = false;
     interfaceMgr->handle = NULL;
+    (void)OsalMutexUnlock(&interfaceMgr->handleLock);
     return 0;
 }
 
