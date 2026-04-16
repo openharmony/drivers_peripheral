@@ -283,15 +283,9 @@ void SourceNode::PortHandler::CollectBuffers()
 
     if (buffer->GetVirAddress() == buffer->GetSuffaceBufferAddr()) {
         CAMERA_LOGI("CollectBuffers begin malloc buffer");
-#ifdef FORK_DMA
-        auto [bufferAddr, dmaFd] = buffer->AllocateDmaBuffer(bufferSize);
-#else
         auto bufferAddr = malloc(bufferSize);
-#endif
+
         if (bufferAddr != nullptr) {
-#ifdef FORK_DMA
-            buffer->SetDmaBufFd(dmaFd);
-#endif
             buffer->SetVirAddress(bufferAddr);
             buffer->SetSize(bufferSize);
 #ifdef V4L2_EMULATOR
