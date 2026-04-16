@@ -532,10 +532,10 @@ void SensorIfService::SetNewBatch(const SensorHandle sensorHandle)
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
 #ifdef TV_FLAG
     int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, sensorInterval.samplingInterval,
-                                                  sensorInterval.reportInterval);
+                                                 sensorInterval.reportInterval);
 #else
     int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, sensorInterval.samplingInterval,
-                                                  sensorInterval.reportInterval);
+                                                 sensorInterval.reportInterval);
 #endif
     SENSOR_TRACE_FINISH;
 
