@@ -527,7 +527,7 @@ void SensorIfService::SetNewBatch(const SensorHandle sensorHandle)
     SetDelay(sensorHandle, sensorInterval.samplingInterval, sensorInterval.reportInterval);
     SensorClientsManager::GetInstance()->UpdateNewSensorConfig(sensorHandle, sensorInterval);
     SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorHandle, sensorInterval.samplingInterval,
-                                                                  sensorInterval.reportInterval);
+                                                                 sensorInterval.reportInterval);
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
 #ifdef TV_FLAG
