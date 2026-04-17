@@ -524,7 +524,24 @@ void SensorIfService::RemoveDeathNotice(int32_t groupId)
 void SensorIfService::SetNewBatch(const SensorHandle sensorHandle)
 {
     SensorInterval sensorInterval = SensorClientsManager::GetInstance()->GetClientSenSorBestConfig(sensorHandle);
+    SetDelay(sensorHandle, sensorInterval.samplingInterval, sensorInterval.reportInterval);
     SensorClientsManager::GetInstance()->UpdateNewSensorConfig(sensorHandle, sensorInterval);
+    SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorHandle, sensorInterval.samplingInterval,
+                                                                 sensorInterval.reportInterval);
+
+    SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
+#ifdef TV_FLAG
+    int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, sensorInterval.samplingInterval,
+                                                 sensorInterval.reportInterval);
+#else
+    int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, sensorInterval.samplingInterval,
+                                                 sensorInterval.reportInterval);
+#endif
+    SENSOR_TRACE_FINISH;
+
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s SetSaBatch failed, error code is %{public}d", __func__, ret);
+    }
 }
 
 int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t serviceId)
