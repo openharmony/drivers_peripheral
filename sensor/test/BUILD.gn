@@ -48,6 +48,7 @@ if (defined(ohos_lite)) {
         "unittest/sensor_test_register_many_times:SensorTestRegisterManyTimes",
         "unittest/sensor_test_three_clients:SensorTestThreeClients",
         "unittest/sensor_convert_interface_test:SensorConvertInterfaceTest",
+        "unittest/simulation_gps_get_data_test:SimulationGpsGetDataTest",
       ]
     }
   }
