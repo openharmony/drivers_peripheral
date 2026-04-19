@@ -1,0 +1,40 @@
+{
+    "name": "@ohos/drivers_peripheral_serial",
+    "description": "serials_hdf",
+    "version": "7.0",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+      "destPath": "drivers/peripheral/serials"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+      "name": "drivers_peripheral_serial",
+      "subsystem": "hdf",
+      "syscap": [],
+      "features": ["drivers_peripheral_serial_is_implemented"],
+      "adapted_system_type": ["standard"],
+      "rom": "60KB",
+      "ram": "100KB",
+      "deps": {
+        "components": [
+          "ipc",
+          "hdf_core",
+          "hilog",
+          "c_utils",
+          "drivers_interface_serial"
+        ],
+        "third_party": []
+      },
+      "build": {
+        "sub_component": [
+          "//drivers/peripheral/serials:hdf_serials"
+        ],
+        "test": [
+          "//drivers/peripheral/serials/test:hdf_test_serial"
+        ],
+        "inner_kits": []
+      }
+    }
+  }
