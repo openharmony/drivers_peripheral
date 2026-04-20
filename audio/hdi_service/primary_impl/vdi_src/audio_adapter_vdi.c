@@ -28,6 +28,7 @@
 #include "stub_collector.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
+#define VALUE_LEN      32
 static pthread_rwlock_t g_rwAdapterLock = PTHREAD_RWLOCK_INITIALIZER;
 
 struct AudioAdapterInfo {
@@ -199,8 +200,11 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         goto EXIT;
     }
 
+    const char* condition = "support_muti_stream";
+    char value[VALUE_LEN + 1] = {0};
+    ret = vdiAdapter -> GetExtraParams(vdiAdapter, 0, condition, value, VALUE_LEN);
     char *adapterName = AudioGetAdapterNameVdi(adapter);
-    *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName);
+    *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName, value);
     if (*render != NULL) {
         AUDIO_FUNC_LOGE("already created");
         ret = HDF_SUCCESS;
