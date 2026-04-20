@@ -1024,7 +1024,7 @@ static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
 }
 
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    uint32_t *rendrId, const char *adapterName)
+    uint32_t *rendrId, const char *adapterName, const char *value)
 {
     if (attrs->type == AUDIO_MMAP_NOIRQ) {
         AUDIO_FUNC_LOGI("render type is mmap");
@@ -1047,7 +1047,9 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
             (attrs->type == AUDIO_IN_MEDIA || attrs->type == AUDIO_MULTI_CHANNEL) &&
             (renderPriv->renderInfos[index].streamType == attrs->type) &&
             (strcmp(renderPriv->renderInfos[index].adapterName, adapterName) == 0)) {
-            *rendrId = renderPriv->renderInfos[index].renderId;
+            if (strcmp(value, "support") == 0) {
+                return NULL;
+            }
             renderPriv->renderInfos[index].usrCount++;
             return &renderPriv->renderInfos[index].render;
         }

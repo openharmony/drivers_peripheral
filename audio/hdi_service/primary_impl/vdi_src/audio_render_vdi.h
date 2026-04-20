@@ -26,7 +26,7 @@ struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes
 void AudioDestroyRenderByIdVdiLocked(uint32_t renderId);
 struct IAudioRenderVdi *AudioGetVdiRenderByIdVdi(uint32_t renderId);
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    uint32_t *rendrId, const char *adapterName);
+    uint32_t *rendrId, const char *adapterName, const char *value);
 uint32_t DecreaseRenderUsrCount(uint32_t renderId);
 
 #endif // AUDIO_RENDER_VDI_H
