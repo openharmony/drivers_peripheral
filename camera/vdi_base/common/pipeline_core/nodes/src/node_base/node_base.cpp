@@ -154,6 +154,11 @@ RetCode NodeBase::SetCallback()
     return RC_OK;
 }
 
+RetCode NodeBase::CreateBuffers()
+{
+    return RC_OK;
+}
+
 RetCode NodeBase::Stop(const int32_t streamId)
 {
     (void)streamId;

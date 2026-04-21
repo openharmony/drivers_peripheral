@@ -38,7 +38,8 @@ const std::unordered_map<PixelFormat, uint32_t> pixelFormatToCameraFormat_ = {
     {PIXEL_FMT_UYVY_422_PKG, CAMERA_FORMAT_UYVY_422_PKG},
     {PIXEL_FMT_YVYU_422_PKG, CAMERA_FORMAT_YVYU_422_PKG},
     {PIXEL_FMT_VYUY_422_PKG, CAMERA_FORMAT_VYUY_422_PKG},
-    {PIXEL_FMT_RGBA_8888,    CAMERA_FORMAT_RGBA_8888}
+    {PIXEL_FMT_RGBA_8888,    CAMERA_FORMAT_RGBA_8888},
+    {PIXEL_FMT_BLOB,         CAMERA_FORMAT_YCRCB_420_SP}
 };
 
 const std::unordered_map<uint32_t, PixelFormat> cameraFormatToPixelFormat_ = {
