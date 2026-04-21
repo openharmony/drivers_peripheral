@@ -54,7 +54,7 @@ namespace {
         fflush(stdout);
         g_sensorInterface = V3_0::ISensorInterface::Get();
         printf("[Client3] ISensorInterface::Get() returned %p\n", (void*)g_sensorInterface.GetRefPtr());
-        fflush(stdout);
+        (void)fflush(stdout);
     }
 
     void SimulationGpsClient3Test::TearDownTestCase()
@@ -77,7 +77,7 @@ namespace {
      */
     HWTEST_F(SimulationGpsClient3Test, SimulationGpsClient3Test1, TestSize.Level1)
     {
-        setvbuf(stdout, NULL, _IONBF, 0);
+        setvbuf(stdout, nullptr, _IONBF, 0);
         ASSERT_NE(nullptr, g_sensorInterface);
 
         printf("[Client3] calling SetSdcSensor(enable=true, rateLevel=%d)\n", CLIENT3_SDC_RATE_LEVEL);
