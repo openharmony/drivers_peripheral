@@ -86,7 +86,7 @@ namespace {
         printf("[Client2] Register ret=%d\n", ret);
         EXPECT_EQ(ret, HDF_SUCCESS);
 
-        printf("[Client2] calling SetBatch interval=%sns\n", std::to_string(CCLIENT2_SAMPLING_INTERVAL).c_str());
+        printf("[Client2] calling SetBatch interval=%sns\n", std::to_string(CLIENT2_SAMPLING_INTERVAL).c_str());
         ret = g_sensorInterface->SetBatch(g_deviceSensorInfo, CLIENT2_SAMPLING_INTERVAL, 0);
         printf("[Client2] SetBatch ret=%d\n", ret);
         EXPECT_EQ(ret, HDF_SUCCESS);
