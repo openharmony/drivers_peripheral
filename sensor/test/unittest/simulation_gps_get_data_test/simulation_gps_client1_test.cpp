@@ -56,7 +56,7 @@ namespace {
         fflush(stdout);
         g_sensorInterface = V3_0::ISensorInterface::Get();
         printf("[Client1] ISensorInterface::Get() returned %p\n", (void*)g_sensorInterface.GetRefPtr());
-        fflush(stdout);
+        (void)fflush(stdout);
     }
 
     void SimulationGpsClient1Test::TearDownTestCase()
@@ -79,7 +79,7 @@ namespace {
      */
     HWTEST_F(SimulationGpsClient1Test, SimulationGpsClient1Test1, TestSize.Level1)
     {
-        setvbuf(stdout, NULL, _IONBF, 0);
+        setvbuf(stdout, nullptr, _IONBF, 0);
         ASSERT_NE(nullptr, g_sensorInterface);
 
         printf("[Client1] calling Register\n");
@@ -88,7 +88,7 @@ namespace {
         printf("[Client1] Register ret=%d\n", ret);
         EXPECT_EQ(ret, HDF_SUCCESS);
 
-        printf("[Client1] calling SetBatch interval=%lldns\n", (long long)CLIENT1_SAMPLING_INTERVAL);
+        printf("[Client1] calling SetBatch interval=%sns\n", std::to_string(CLIENT1_SAMPLING_INTERVAL).c_str());
         ret = g_sensorInterface->SetBatch(g_deviceSensorInfo, CLIENT1_SAMPLING_INTERVAL, 0);
         printf("[Client1] SetBatch ret=%d\n", ret);
         EXPECT_EQ(ret, HDF_SUCCESS);
