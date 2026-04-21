@@ -581,8 +581,6 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
         }
         return HDF_SUCCESS;
     }
-
-    ret = HDF_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Disable");
 #ifdef TV_FLAG
     ret = sensorVdiImplV1_1_->Disable(sensorHandle);
