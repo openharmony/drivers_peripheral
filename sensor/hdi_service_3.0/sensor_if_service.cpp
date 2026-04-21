@@ -595,6 +595,7 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
                  __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
         SensorClientsManager::GetInstance()->AddServiceToReportQueue(sensorHandle, serviceId);
         SensorClientsManager::GetInstance()->AddServiceToBatchUsed(sensorHandle, serviceId);
+        return ret;
     }
 
     return ret;
