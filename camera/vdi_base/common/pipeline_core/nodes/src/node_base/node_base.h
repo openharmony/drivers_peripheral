@@ -78,6 +78,7 @@ public:
     std::vector<std::shared_ptr<IPort>> GetOutPorts() override;
     std::shared_ptr<IPort> GetOutPortById(const int32_t id) override;
     void SetCallBack(BufferCb c) override;
+    RetCode CreateBuffers() override;
     void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
     void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
 

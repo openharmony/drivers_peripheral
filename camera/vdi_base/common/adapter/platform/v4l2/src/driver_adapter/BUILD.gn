@@ -22,6 +22,28 @@ config("v4l2_config") {
     "-DHAVE_CONFIG_H",
     "-DCOLORSPACE=\"videoconvert\"",
   ]
+  if (drivers_peripheral_camera_feature_board_config) {
+    cflags += [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-error",
+      "-fno-strict-aliasing",
+      "-Wno-sign-compare",
+      "-Wno-builtin-requires-header",
+      "-Wno-unused-variable",
+      "-Wno-unused-label",
+      "-Wno-implicit-function-declaration",
+      "-Wno-format",
+      "-Wno-int-conversion",
+      "-Wno-unused-function",
+      "-Wno-thread-safety-attributes",
+      "-Wno-inconsistent-missing-override",
+      "-fno-exceptions",
+      "-ffunction-sections",
+      "-fdata-sections",
+    ]
+  }
 
   if (enable_camera_device_utest) {
     cflags += [
@@ -31,26 +53,38 @@ config("v4l2_config") {
 
     ldflags = [ "--coverage" ]
   }
-
-  include_dirs = [ "./include" ]
+  if (drivers_peripheral_camera_feature_board_config) {
+    include_dirs = [ "//device/board/${product_company}/${product_name}/camera/vdi_impl/v4l2/driver_adapter/include" ]
+  } else {
+    include_dirs = [ "./include" ]
+  }
 }
 
 ohos_shared_library("peripheral_camera_v4l2_adapter") {
-  if (!is_emulator) {
-    defines = []
-  }
+  defines = []
   if (drivers_peripheral_camera_feature_usb) {
     defines += [ "CAMERA_BUILT_ON_USB" ]
   }
-  sources = [
-    "$camera_path/dump/src/camera_dump.cpp",
-    "src/v4l2_buffer.cpp",
-    "src/v4l2_control.cpp",
-    "src/v4l2_dev.cpp",
-    "src/v4l2_fileformat.cpp",
-    "src/v4l2_stream.cpp",
-    "src/v4l2_uvc.cpp",
-  ]
+  if (drivers_peripheral_camera_feature_board_config) {
+    sources = [
+      "//device/board/${product_company}/${product_name}/camera/vdi_impl/v4l2/driver_adapter/src/v4l2_buffer.cpp",
+      "//device/board/${product_company}/${product_name}/camera/vdi_impl/v4l2/driver_adapter/src/v4l2_control.cpp",
+      "//device/board/${product_company}/${product_name}/camera/vdi_impl/v4l2/driver_adapter/src/v4l2_dev.cpp",
+      "//device/board/${product_company}/${product_name}/camera/vdi_impl/v4l2/driver_adapter/src/v4l2_fileformat.cpp",
+      "//device/board/${product_company}/${product_name}/camera/vdi_impl/v4l2/driver_adapter/src/v4l2_stream.cpp",
+      "//device/board/${product_company}/${product_name}/camera/vdi_impl/v4l2/driver_adapter/src/v4l2_uvc.cpp",
+    ]
+  } else {
+    sources = [
+      "$camera_path/dump/src/camera_dump.cpp",
+      "src/v4l2_buffer.cpp",
+      "src/v4l2_control.cpp",
+      "src/v4l2_dev.cpp",
+      "src/v4l2_fileformat.cpp",
+      "src/v4l2_stream.cpp",
+      "src/v4l2_uvc.cpp",
+    ]
+  }
 
   include_dirs = [
     "$camera_path/include",
