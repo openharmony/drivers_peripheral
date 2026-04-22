@@ -646,7 +646,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterControlTransferRead002, TestSize.Level1
 /**
  * @tc.name: LibusbAdapterControlTransferWrite001
  * @tc.desc: Test functions to ControlTransferWrite
- * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &ctrl, const std::vector<uint8_t> &data);
+ * @tc.desc: int32_t ControlTransferWrite;
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -684,7 +684,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterControlTransferWrite002, TestSize.Level
 /**
  * @tc.name: LibusbAdapterBulkTransferRead001
  * @tc.desc: Test functions to BulkTransferRead
- * @tc.desc: int32_t BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
+ * @tc.desc: int32_t BulkTransferRead;
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -814,7 +814,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterInterruptTransferWrite001, TestSize.Lev
 /**
  * @tc.name: LibusbAdapterIsoTransferRead001
  * @tc.desc: Test functions to IsoTransferRead
- * @tc.desc: int32_t IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
+ * @tc.desc: int32_t IsoTransferRead;
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
