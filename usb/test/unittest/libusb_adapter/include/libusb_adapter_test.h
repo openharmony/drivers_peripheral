@@ -22,14 +22,13 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_2 {
-struct LibusbAdapterTest : public testing::Test {
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    void SetUp(void) override;
-    void TearDown(void) override;
-
-    static struct UsbDev dev_;
-};
+    struct LibusbAdapterTest : public testing::Test {
+        static void SetUpTestCase(void);
+        static void TearDownTestCase(void);
+        void SetUp(void) override;
+        void TearDown(void) override;
+        static struct UsbDev dev_;
+    };
 } 
 } 
 } 
