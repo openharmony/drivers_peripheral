@@ -290,7 +290,7 @@ static int32_t CreateLayer(uint32_t devId, const LayerInfo *layerInfo, uint32_t 
     priv->pitch = layerInfo->width * BITS_PER_PIXEL / BITS_TO_BYTE;
     priv->fbSize = ((priv->pitch * priv->height) + 0xfff) & (~0xfff);
     priv->fbAddr = (void *)mmap(NULL, priv->fbSize, PROT_READ | PROT_WRITE, MAP_SHARED, priv->fd, 0);
-    if (priv->fbAddr == NULL) {
+    if (priv->fbAddr == MAP_FAILED) {
         HDF_LOGE("%s: mmap fb address failure, errno: %d", __func__, errno);
         close(priv->fd);
         priv->fd = -1;
