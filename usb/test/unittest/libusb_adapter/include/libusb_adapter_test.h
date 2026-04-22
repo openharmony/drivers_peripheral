@@ -29,9 +29,9 @@ namespace V1_2 {
         void TearDown(void) override;
         static struct UsbDev dev_;
     };
-} 
-} 
-} 
-} 
+}
+}
+}
+}
 
 #endif // LIBUSB_ADAPTER_TEST_H
