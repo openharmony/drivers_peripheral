@@ -59,9 +59,6 @@ void LibusbAdapterTest::SetUpTestCase(void)
         exit(0);
     }
     std::cout << "please connect device, press enter to continue" << std::endl;
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF) {}
-    dev_ = {1, 2};
 }
 
 void LibusbAdapterTest::TearDownTestCase(void)
@@ -543,7 +540,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterGetFileDescriptor001, TestSize.Level1)
     struct UsbDev dev = dev_;
     int32_t fd = -1;
     auto ret = g_libusbAdapter->GetFileDescriptor(dev, fd);
-    HDF_LOGI("LibusbAdapterTest:: Line:%{public}d GetFileDescriptor result=%{public}d, fd=%{public}d", __LINE__, ret, fd);
+    HDF_LOGI("LibusbAdapterTest:: GetFileDescriptor result=%{public}d, fd=%{public}d", ret, fd);
     EXPECT_EQ(0, ret);
     EXPECT_GE(fd, 0);
     if (fd >= 0) {
@@ -670,7 +667,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterControlTransferWrite001, TestSize.Level
 /**
  * @tc.name: LibusbAdapterControlTransferWrite002
  * @tc.desc: Test functions to ControlTransferWrite
- * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &ctrl, const std::vector<uint8_t> &data);
+ * @tc.desc: int32_t ControlTransferWrite;
  * @tc.desc: Negative test: invalid device
  * @tc.type: FUNC
  */
@@ -711,7 +708,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterBulkTransferRead001, TestSize.Level1)
 /**
  * @tc.name: LibusbAdapterBulkTransferRead002
  * @tc.desc: Test functions to BulkTransferRead
- * @tc.desc: int32_t BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
+ * @tc.desc: int32_t BulkTransferRead;
  * @tc.desc: Negative test: invalid interface id
  * @tc.type: FUNC
  */
@@ -728,7 +725,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterBulkTransferRead002, TestSize.Level1)
 /**
  * @tc.name: LibusbAdapterBulkTransferWrite001
  * @tc.desc: Test functions to BulkTransferWrite
- * @tc.desc: int32_t BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data);
+ * @tc.desc: int32_t BulkTransferWrite;
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -752,7 +749,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterBulkTransferWrite001, TestSize.Level1)
 /**
  * @tc.name: LibusbAdapterBulkTransferWrite002
  * @tc.desc: Test functions to BulkTransferWrite
- * @tc.desc: int32_t BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data);
+ * @tc.desc: int32_t BulkTransferWrite);
  * @tc.desc: Negative test: invalid interface id
  * @tc.type: FUNC
  */
@@ -769,7 +766,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterBulkTransferWrite002, TestSize.Level1)
 /**
  * @tc.name: LibusbAdapterInterruptTransferRead001
  * @tc.desc: Test functions to InterruptTransferRead
- * @tc.desc: int32_t InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
+ * @tc.desc: int32_t InterruptTransferRead;
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -793,7 +790,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterInterruptTransferRead001, TestSize.Leve
 /**
  * @tc.name: LibusbAdapterInterruptTransferWrite001
  * @tc.desc: Test functions to InterruptTransferWrite
- * @tc.desc: int32_t InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data);
+ * @tc.desc: int32_t InterruptTransferWrite;
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -841,7 +838,7 @@ HWTEST_F(LibusbAdapterTest, LibusbAdapterIsoTransferRead001, TestSize.Level1)
 /**
  * @tc.name: LibusbAdapterIsoTransferWrite001
  * @tc.desc: Test functions to IsoTransferWrite
- * @tc.desc: int32_t IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data);
+ * @tc.desc: int32_t IsoTransferWrite;
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
