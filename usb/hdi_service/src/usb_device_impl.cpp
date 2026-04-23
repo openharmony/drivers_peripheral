@@ -49,7 +49,7 @@ using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V2_0 {
+namespace V2_1 {
 HdfDevEventlistener UsbDeviceImpl::listenerForLoadService_ = {nullptr};
 V1_2::UsbdLoadService UsbDeviceImpl::loadUsbService_ = {USB_SYSTEM_ABILITY_ID};
 V1_2::UsbdLoadService UsbDeviceImpl::loadHdfEdm_ = {HDF_EXTERNAL_DEVICE_MANAGER_SA_ID};
@@ -63,6 +63,7 @@ constexpr const char* DISABLE_AUTH_STR = "0";
 constexpr const char* ENABLE_AUTH_STR = "1";
 constexpr const char* BUS_NUM = "busnum";   // filename of bus number
 constexpr const char* DEV_ADDR = "devnum";  // filename of devive address
+const char *ACCESSORY_DRIVER_NAME = "/dev/usb_accessory";
 static const std::filesystem::path AUTH_PATH("authorized");
 static const std::map<std::string, uint32_t> configMap = {
     {HDC_CONFIG_OFF, USB_FUNCTION_NONE},
@@ -76,7 +77,7 @@ static const std::map<std::string, uint32_t> configMap = {
 };
 extern "C" IUsbDeviceInterface *UsbDeviceInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Usb::V2_0::UsbDeviceImpl;
+    using OHOS::HDI::Usb::V2_1::UsbDeviceImpl;
     UsbDeviceImpl *service = new (std::nothrow) UsbDeviceImpl();
     if (service == nullptr) {
         return nullptr;
@@ -177,6 +178,14 @@ int32_t UsbDeviceImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSB
         }
         HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_ACCESSORY_SEND");
         USBDeviceInfo info = {ACT_ACCESSORYSEND, 0, 0};
+        ret = subscriber->DeviceEvent(info);
+    } else if (id == USB_CUSTOM_CONTROL_REQUEST) {
+        if (subscriber == nullptr) {
+            HDF_LOGE("%{public}s: subsciber is nullptr, %{public}d", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_CUSTOM_CONTROL_REQUEST");
+        USBDeviceInfo info = {ACT_CUSTOMCONTROLREQUEST, 0, 0};
         ret = subscriber->DeviceEvent(info);
     } else {
         HDF_LOGW("%{public}s: device not support this id:%{public}u , %{public}d", __func__, id, __LINE__);
@@ -555,7 +564,33 @@ int32_t UsbDeviceImpl::SetGlobalDefaultAuthorize(bool authorized)
     return HDF_SUCCESS;
 }
 
-} // namespace v2_0
+int32_t UsbDeviceImpl::GetControlTransferData(int32_t eventId, std::vector<uint8_t> &data)
+{
+    HDF_LOGI("%{public}s: enter, ueventId=%{public}d", __func__, eventId);
+    if (eventId == ACT_CUSTOMCONTROLREQUEST) {
+        int32_t fd = open(ACCESSORY_DRIVER_NAME, O_RDONLY);
+        if (fd < 0) {
+            HDF_LOGE("%{public}s: failed to open /dev/usb_custom_uevent, errno=%{public}d", __func__, errno);
+            return HDF_FAILURE;
+        }
+        fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+
+        uint8_t buffer[MAX_BUFFER] = {0};
+        int32_t ret = ioctl(fd, USB_GET_EXTRA_DATA, buffer);
+        fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        if (ret < 0) {
+            HDF_LOGE("%{public}s: failed to read uevent data, errno=%{public}d", __func__, errno);
+            return HDF_FAILURE;
+        }
+
+        data.assign(buffer, buffer + ret);
+        HDF_LOGI("%{public}s: success, read %{public}d bytes", __func__, ret);
+    }
+
+    return HDF_SUCCESS;
+}
+
+} // namespace v2_1
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
