@@ -26,6 +26,7 @@
 #include <sys/un.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
+#include <sys/file.h>
 #include <dirent.h>
 #include <sys/select.h>
 #include "usbd_wrapper.h"
@@ -202,6 +203,27 @@ int32_t LinuxSerial::GetFdByPortId(int32_t portId)
     return serialPortList_[index].fd;
 }
 
+int32_t LinuxSerial::ConfigPort(int32_t index)
+{
+    struct termios options = {};
+    if (tcgetattr(serialPortList_[index].fd, &options) == -1) {
+        fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
+        serialPortList_.erase(serialPortList_.begin() + index);
+        return HDF_FAILURE;
+    }
+    cfmakeraw(&options);
+    options.c_lflag &= ~ICANON;
+    options.c_lflag &= ~ECHO;
+    if (tcsetattr(serialPortList_[index].fd, TCSANOW, &options) == -1) {
+        fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        HDF_LOGE("%{public}s: set attribute failed %{public}d.", __func__, errno);
+        serialPortList_.erase(serialPortList_.begin() + index);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t LinuxSerial::SerialOpen(int32_t portId)
 {
     std::lock_guard<std::mutex> lock(portMutex_);
@@ -234,24 +256,14 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
         return HDF_FAILURE;
     }
     fdsan_exchange_owner_tag(serialPortList_[index].fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    if (flock(serialPortList_[index].fd, LOCK_EX | LOCK_NB) < 0) {
+        fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        HDF_LOGE("%{public}s: flock fd failed %{public}d.", __func__, errno);
+        serialPortList_.erase(serialPortList_.begin() + index);
+        return HDF_ERR_DEVICE_BUSY;
+    }
 
-    struct termios options = {};
-    if (tcgetattr(serialPortList_[index].fd, &options) == -1) {
-        fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-        HDF_LOGE("%{public}s: get attribute failed %{public}d.", __func__, errno);
-        serialPortList_.erase(serialPortList_.begin() + index);
-        return HDF_FAILURE;
-    }
-    cfmakeraw(&options);
-    options.c_lflag &= ~ICANON;
-    options.c_lflag &= ~ECHO;
-    if (tcsetattr(serialPortList_[index].fd, TCSANOW, &options) == -1) {
-        fdsan_close_with_tag(serialPortList_[index].fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
-        HDF_LOGE("%{public}s: set attribute failed %{public}d.", __func__, errno);
-        serialPortList_.erase(serialPortList_.begin() + index);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
+    return ConfigPort(index);
 }
 
 int32_t LinuxSerial::SerialClose(int32_t portId)
