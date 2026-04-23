@@ -439,13 +439,13 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
         value, index, (unsigned char *)&attribute, length, TRANSFER_TIMEOUT);
     libusb_release_interface(deviceHandleInfo.handle, deviceHandleInfo.interface);
     libusb_attach_kernel_driver(deviceHandleInfo.handle, deviceHandleInfo.interface);
-    HDF_LOGI("%{public}s: getattribute baudrate :%{public}d"
-        "databit :%{public}d stop :%{public}d parity :%{public}d", __func__, attribute.baudrate,
-        attribute.dataBits, attribute.stopBits, attribute.parity);
-    if (ret < 0) {
+    if (ret < length) {
         HDF_LOGE("%{public}s: libusb get attribute failed, ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    HDF_LOGI("%{public}s: getattribute baudrate :%{public}d"
+        "databit :%{public}d stop :%{public}d parity :%{public}d", __func__, attribute.baudrate,
+        attribute.dataBits, attribute.stopBits, attribute.parity);
     return HDF_SUCCESS;
 }
 
