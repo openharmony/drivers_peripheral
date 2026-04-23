@@ -233,8 +233,8 @@ ResultCode CheckSessionTimeout(void)
     if (currentTime - g_session->time > SESSION_VALIDITY_PERIOD) {
         LOG_ERROR("timeout, currentTime: %{public}" PRIu64 ", sessionTime: %{public}" PRIu64,
             currentTime, g_session->time);
-        DestoryBuffer(g_session->oldRootSecret);
         ClearCachePin(g_session->userId);
+        CloseEditSession();
         return RESULT_TIMEOUT;
     }
     return RESULT_SUCCESS;
