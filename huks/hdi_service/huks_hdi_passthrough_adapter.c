@@ -341,3 +341,26 @@ struct HuksHdi *HuksGetCoreEngine(void)
 {
     return g_coreEngine;
 }
+
+int32_t HuksHdiAdapterEncapsulate(const struct HksParamSet *paramSet,
+    const struct HksParamSet *sharedKeyParamSet, struct HksEncapsulationResult *encapResult)
+{
+    HUKS_HDI_IF_NOT_SUCC_RETURN(HuksInitHuksCoreEngine(), HUKS_ERROR_NULL_POINTER)
+
+    HUKS_HDI_IF_NULL_LOGE_RETURN(g_coreEngine->HuksHdiEncapsulate, HUKS_ERROR_NULL_POINTER,
+        "Encapsulate function is null pointer")
+
+    return g_coreEngine->HuksHdiEncapsulate(paramSet, sharedKeyParamSet, encapResult);
+}
+
+int32_t HuksHdiAdapterDecapsulate(const struct HksParamSet *paramSet,
+    const struct HksParamSet *sharedKeyParamSet, const struct HksBlob *encapsulatedData,
+    struct HksBlob *sharedSecret)
+{
+    HUKS_HDI_IF_NOT_SUCC_RETURN(HuksInitHuksCoreEngine(), HUKS_ERROR_NULL_POINTER)
+
+    HUKS_HDI_IF_NULL_LOGE_RETURN(g_coreEngine->HuksHdiDecapsulate, HUKS_ERROR_NULL_POINTER,
+        "Decapsulate function is null pointer")
+
+    return g_coreEngine->HuksHdiDecapsulate(paramSet, sharedKeyParamSet, encapsulatedData, sharedSecret);
+}

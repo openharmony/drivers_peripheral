@@ -330,4 +330,42 @@ if ((OBJECT) == HUKS_NULL_POINTER) { \
     return (ERROR_CODE); \
 }
 
+#define HDI_CONVERTER_PARAM_IN_ENCAPSULATIONRESULT(fromHuksEncapResPtr, toHksEncapResPtr)  \
+    if ((fromHuksEncapResPtr) != NULL && (toHksEncapResPtr) != NULL) {      \
+        HDI_CONVERTER_PARAM_IN_BLOB(&(fromHuksEncapResPtr)->encapsulatedData, &(toHksEncapResPtr)->encapsulatedData) \
+        HDI_CONVERTER_PARAM_IN_BLOB(&(fromHuksEncapResPtr)->sharedSecret, &(toHksEncapResPtr)->sharedSecret) \
+    }
+
+#define HDI_CONVERTER_PARAM_OUT_ENCAPSULATIONRESULT(fromHksEncapResPtr, toHuksEncapResPtr) \
+    if ((fromHksEncapResPtr) != NULL && (toHuksEncapResPtr) != NULL) {      \
+        HDI_CONVERTER_PARAM_OUT_BLOB(&(fromHksEncapResPtr)->encapsulatedData, &(toHuksEncapResPtr)->encapsulatedData)  \
+        HDI_CONVERTER_PARAM_OUT_BLOB(&(fromHksEncapResPtr)->sharedSecret, &(toHuksEncapResPtr)->sharedSecret) \
+    }
+
+#define HDI_CONVERTER_FUNC_ENCAPSULATE(paramSet, sharedKeyParamSet, encapResult, ret, func)  \
+    TargetParamSet *paramSetCore = NULL;  \
+    TargetParamSet *sharedKeyParamSetCore = NULL;  \
+    struct HksEncapsulationResult encapResultCore = {0};  \
+    HDI_CONVERTER_PARAM_IN_PARAMSET(paramSet, paramSetCore)  \
+    HDI_CONVERTER_PARAM_IN_PARAMSET(sharedKeyParamSet, sharedKeyParamSetCore)  \
+    HDI_CONVERTER_PARAM_IN_ENCAPSULATIONRESULT(encapResult, &encapResultCore)  \
+    ret = (func)(HDI_ADAPTER_PARAM(paramSet, paramSetCore),  \
+                 HDI_ADAPTER_PARAM(sharedKeyParamSet, sharedKeyParamSetCore),  \
+                 HDI_ADAPTER_PARAM(encapResult, &encapResultCore));  \
+    HDI_CONVERTER_PARAM_OUT_ENCAPSULATIONRESULT(&encapResultCore, encapResult)
+
+#define HDI_CONVERTER_FUNC_DECAPSULATE(paramSet, sharedKeyParamSet, encapsulatedData, sharedSecret, ret, func)  \
+    TargetParamSet *paramSetCore = NULL;  \
+    TargetParamSet *sharedKeyParamSetCore = NULL;  \
+    TargetBlob encapsulatedDataCore = {0};  \
+    TargetBlob sharedSecretCore = {0};  \
+    HDI_CONVERTER_PARAM_IN_PARAMSET(paramSet, paramSetCore)  \
+    HDI_CONVERTER_PARAM_IN_PARAMSET(sharedKeyParamSet, sharedKeyParamSetCore)  \
+    HDI_CONVERTER_PARAM_IN_BLOB(encapsulatedData, &encapsulatedDataCore)  \
+    ret = (func)(HDI_ADAPTER_PARAM(paramSet, paramSetCore),  \
+                 HDI_ADAPTER_PARAM(sharedKeyParamSet, sharedKeyParamSetCore),  \
+                 HDI_ADAPTER_PARAM(encapsulatedData, &encapsulatedDataCore),  \
+                 &sharedSecretCore);  \
+    HDI_CONVERTER_PARAM_OUT_BLOB(&sharedSecretCore, sharedSecret)
+
 #endif

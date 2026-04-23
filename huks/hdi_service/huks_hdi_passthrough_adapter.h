@@ -92,6 +92,13 @@ int32_t HuksReleaseCoreEngine(void);
 
 struct HuksHdi *HuksGetCoreEngine(void);
 
+int32_t HuksHdiAdapterEncapsulate(const struct HksParamSet *paramSet,
+    const struct HksParamSet *sharedKeyParamSet, struct HksEncapsulationResult *encapResult);
+
+int32_t HuksHdiAdapterDecapsulate(const struct HksParamSet *paramSet,
+    const struct HksParamSet *sharedKeyParamSet, const struct HksBlob *encapsulatedData,
+    struct HksBlob *sharedSecret);
+
 #ifdef __cplusplus
 }
 #endif
