@@ -19,6 +19,7 @@
 #include "v1_0/serial_types.h"
 #include "hdf_log.h"
 #include <cstdint>
+#include <cstdlib>
 #include <vector>
 #include <string>
 
@@ -58,7 +59,8 @@ inline int32_t GetValidBaudRate(int32_t index)
     if (len == 0) {
         return 115200;
     }
-    return VALID_BAUD_RATES[index % len];
+    uint32_t safeIndex = static_cast<uint32_t>(std::abs(index)) % len;
+    return VALID_BAUD_RATES[safeIndex];
 }
 
 inline int32_t GetValidDataBits(int32_t index)
@@ -67,7 +69,8 @@ inline int32_t GetValidDataBits(int32_t index)
     if (len == 0) {
         return 8;
     }
-    return VALID_DATA_BITS[index % len];
+    uint32_t safeIndex = static_cast<uint32_t>(std::abs(index)) % len;
+    return VALID_DATA_BITS[safeIndex];
 }
 
 inline int32_t GetValidStopBits(int32_t index)
@@ -76,7 +79,8 @@ inline int32_t GetValidStopBits(int32_t index)
     if (len == 0) {
         return 1;
     }
-    return VALID_STOP_BITS[index % len];
+    uint32_t safeIndex = static_cast<uint32_t>(std::abs(index)) % len;
+    return VALID_STOP_BITS[safeIndex];
 }
 
 inline int32_t GetValidParity(int32_t index)
@@ -85,7 +89,8 @@ inline int32_t GetValidParity(int32_t index)
     if (len == 0) {
         return 0;
     }
-    return VALID_PARITY[index % len];
+    uint32_t safeIndex = static_cast<uint32_t>(std::abs(index)) % len;
+    return VALID_PARITY[safeIndex];
 }
 
 inline SerialConfig GetDefaultConfig()
