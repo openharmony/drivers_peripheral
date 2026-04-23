@@ -1,0 +1,43 @@
+{
+    "name": "@ohos/drivers_peripheral_nnrt",
+    "description": "Neural network runtime device driver",
+    "version": "4.0",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "drivers/peripheral/nnrt"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+        "name": "drivers_peripheral_nnrt",
+        "subsystem": "hdf",
+        "syscap": [],
+        "adapter_system_type": ["standard"],
+        "rom": "1024KB",
+        "ram": "2048KB",
+        "deps": {
+          "components": [
+            "init",
+            "hitrace",
+            "hilog",
+            "ipc",
+            "hdf_core",
+            "c_utils",
+            "drivers_interface_nnrt"
+          ],
+          "third_part": [
+            "bounds_checking_function"
+          ]
+        },
+        "build": {
+          "sub_component": [
+            "//drivers/peripheral/nnrt:nnrt_entry"
+          ],
+          "test": [
+          ],
+          "inner_kits": [
+          ]
+        }
+    }
+}
