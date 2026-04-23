@@ -43,12 +43,12 @@ constexpr size_t MAX_BUSNUM_LEN = 10;
 constexpr size_t MAX_TASK_NUM = 100000;
 #define HDF_LOG_TAG usb_ddk_uevent_queue
 struct DdkUeventTaskInfo {
-    char action[MAX_ACTION_LEN];
-    char devPath[MAX_DEVPATH_LEN];
-    char subSystem[MAX_SUBSYSTEM_LEN];
-    char devType[MAX_DEVTYPE_LEN];
-    char devNum[MAX_DEVNUM_LEN];
-    char busNum[MAX_BUSNUM_LEN];
+    char action[MAX_ACTION_LEN + 1];
+    char devPath[MAX_DEVPATH_LEN + 1];
+    char subSystem[MAX_SUBSYSTEM_LEN + 1];
+    char devType[MAX_DEVTYPE_LEN + 1];
+    char devNum[MAX_DEVNUM_LEN + 1];
+    char busNum[MAX_BUSNUM_LEN + 1];
 };
 
 class TaskQueue {
