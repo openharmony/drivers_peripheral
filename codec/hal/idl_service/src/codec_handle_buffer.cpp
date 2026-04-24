@@ -53,7 +53,7 @@ sptr<ICodecBuffer> CodecHandleBuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32
  
     OMXBufferAppPrivateData priv{};
     int32_t err = OMX_AllocateBuffer(comp, &header, portIndex, &priv, codecBuffer.allocLen);
-    if (err != OMX_ErrorNone || header != nullptr) {
+    if (err != OMX_ErrorNone || header == nullptr) {
         CODEC_LOGE("OMX_AllocateBuffer error, err = %{public}x", err);
         return nullptr;
     }
