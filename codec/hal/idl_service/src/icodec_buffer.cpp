@@ -53,6 +53,8 @@ sptr<ICodecBuffer> ICodecBuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32_t po
             return CodecShareBuffer::AllocateBuffer(comp, portIndex, codecBuffer, header);
         case CODEC_BUFFER_TYPE_DMA_MEM_FD:
             return CodecDMABuffer::AllocateBuffer(comp, portIndex, codecBuffer, header);
+        case CODEC_BUFFER_TYPE_HANDLE:
+            return CodecHandleBuffer::AllocateBuffer(comp, portIndex, codecBuffer, header);
         default:
             CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
             return nullptr;
