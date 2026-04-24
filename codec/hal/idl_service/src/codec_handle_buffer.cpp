@@ -17,6 +17,7 @@
 #include <hdf_base.h>
 #include <securec.h>
 #include <unistd.h>
+#include "base/buffer_util.h"
 #include "codec_log_wrapper.h"
 #include "v4_0/codec_types.h"
 using namespace OHOS::HDI::Codec::V4_0;
@@ -43,6 +44,32 @@ sptr<ICodecBuffer> CodecHandleBuffer::UseBuffer(OMX_HANDLETYPE comp, uint32_t po
     codecBuffer.fd.reset();
     codecBuffer.fenceFd.reset();
     return sptr<ICodecBuffer>(new CodecHandleBuffer(InitInfo{comp, portIndex, codecBuffer, header}, nativebuffer));
+}
+
+sptr<ICodecBuffer> CodecHandleBuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+    OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
+{
+    CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
+ 
+    OMXBufferAppPrivateData priv{};
+    int32_t err = OMX_AllocateBuffer(comp, &header, portIndex, &priv, codecBuffer.allocLen);
+    if (err != OMX_ErrorNone || header == nullptr) {
+        CODEC_LOGE("OMX_AllocateBuffer error, err = %{public}x", err);
+        return nullptr;
+    }
+    BufferHandle* bufferHandle = reinterpret_cast<BufferHandle*>(header->pBuffer);
+    BufferHandle* cloned = CloneNativeBufferHandle(bufferHandle);
+    if (cloned == nullptr) {
+        CODEC_LOGE("CloneNativeBufferHandle failed");
+        return nullptr;
+    }
+    sptr<SurfaceBuffer> surfaceBuffer = SurfaceBuffer::Create();
+    surfaceBuffer->SetBufferHandle(cloned);
+    codecBuffer.bufferhandle = surfaceBuffer;
+    codecBuffer.fd.reset();
+    codecBuffer.fenceFd.reset();
+ 
+    return sptr<ICodecBuffer>(new CodecHandleBuffer(InitInfo{comp, portIndex, codecBuffer, header}, surfaceBuffer));
 }
 
 int32_t CodecHandleBuffer::FillThisBuffer(OmxCodecBuffer &codecBuffer)
