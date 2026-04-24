@@ -26,6 +26,8 @@ public:
     ~CodecHandleBuffer() = default;
     static sptr<ICodecBuffer> UseBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
         OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header);
+    static sptr<ICodecBuffer> AllocateBuffer(OMX_HANDLETYPE comp, uint32_t portIndex,
+        OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header);
     int32_t EmptyThisBuffer(OmxCodecBuffer &codecBuffer) override;
     int32_t FillThisBuffer(OmxCodecBuffer &codecBuffer) override;
 
