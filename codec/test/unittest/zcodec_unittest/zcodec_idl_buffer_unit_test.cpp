@@ -69,7 +69,6 @@ public:
     static constexpr uint32_t width = 176;
     static constexpr uint32_t height = 144;
     static constexpr char INPUT_FILE_PATH[] = "/data/test/media/176x144.yuv";
-
 };
 
 /**

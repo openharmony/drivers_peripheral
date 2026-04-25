@@ -25,7 +25,6 @@ namespace OHOS::HDI::Codec::Zcodec::V1_0 {
 
 extern "C" HdiZFactory *HdiZFactoryImplGetInstance(void)
 {
-    // LOGI(">>");
     return new (std::nothrow) HdiZFactoryService();
 }
 
