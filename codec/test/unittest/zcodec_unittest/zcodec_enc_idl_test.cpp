@@ -916,7 +916,7 @@ HWTEST_P(ZCodecHdiEncTest, ZCodecHdiTest_GetParam_002, TestSize.Level1)
     ret = instance->GetParam(keys, paramOut);
     ASSERT_TRUE(ret == 0);
     Resolution resoOut {};
-    paramOut->Get(KEY_RESOLUTION, resoOut); 
+    paramOut->Get(KEY_RESOLUTION, resoOut);
     ASSERT_TRUE(resoOut.w == resoIn.w && resoOut.h == resoIn.h);
 }
 

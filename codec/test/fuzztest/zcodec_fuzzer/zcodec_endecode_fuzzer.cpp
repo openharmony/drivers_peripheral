@@ -347,7 +347,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
         CODEC_LOGE("%s: Stop return %d", __func__, ret);
     } else {
         CODEC_LOGI("%s: EnDecode succeed, codec_std=%d, res=%ux%u, frameRate=%u, frames=%u",
-                 __func__, static_cast<int>(codecStandard), width, height, frameRate, processedFrames);
+            __func__, static_cast<int>(codecStandard), width, height, frameRate, processedFrames);
     }
 
     return true;

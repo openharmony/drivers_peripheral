@@ -468,7 +468,8 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_QueueInputBuffers_InvalidId_
     ASSERT_TRUE(ret == 0);
 
     vector<HdiZBufferInfo> infos;
-    infos.push_back(HdiZBufferInfo {.id = UINT_MAX, .offset = 0, .filledLen = 1024, .pts = 0, .flag = 0, .alongParam = ParcelableParam::Create()});
+    infos.push_back(HdiZBufferInfo {.id = UINT_MAX, .offset = 0, .filledLen = 1024,
+                                    .pts = 0, .flag = 0, .alongParam = ParcelableParam::Create()});
     vector<int32_t> errCodes;
     ret = instance->QueueInputBuffers(infos, errCodes);
     ASSERT_TRUE(ret != 0);

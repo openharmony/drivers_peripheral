@@ -30,11 +30,13 @@ public:
     int32_t GetCapabilities(std::vector<OHOS::HDI::Codec::Zcodec::V1_0::HdiCapability>& caps) override;
 
     int32_t CreateByStandard(int32_t standard, bool isEncoder,
-        const sptr<OHOS::HDI::Codec::Zcodec::V1_0::HdiZCallback>& cb, const sptr<OHOS::HDI::Codec::ParcelableParam>& param,
+        const sptr<OHOS::HDI::Codec::Zcodec::V1_0::HdiZCallback>& cb,
+        const sptr<OHOS::HDI::Codec::ParcelableParam>& param,
         sptr<OHOS::HDI::Codec::Zcodec::V1_0::HdiZComponent>& instance) override;
 
     int32_t CreateByName(const std::string& name, const sptr<OHOS::HDI::Codec::Zcodec::V1_0::HdiZCallback>& cb,
-        const sptr<OHOS::HDI::Codec::ParcelableParam>& param, sptr<OHOS::HDI::Codec::Zcodec::V1_0::HdiZComponent>& instance) override;
+        const sptr<OHOS::HDI::Codec::ParcelableParam>& param,
+        sptr<OHOS::HDI::Codec::Zcodec::V1_0::HdiZComponent>& instance) override;
 private:
     std::mutex mtx_;
     void* vdiHandle_ = nullptr;

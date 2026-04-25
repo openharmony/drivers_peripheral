@@ -253,7 +253,10 @@ uint32_t TestZEncoder::ReadOneFrameYUV420P(std::ifstream& src, sptr<SurfaceBuffe
     // copy Y
     for (uint32_t i = 0; i < h; i++) {
         src.read(dst, w);
-        if (IsEos(src, w)) { CODEC_LOGI("no more data"); return 0; }
+        if (IsEos(src, w)) {
+            CODEC_LOGI("no more data");
+            return 0;
+        }
         dst += stride;
     }
     // copy U
@@ -432,7 +435,8 @@ void TestZEncoder::InputLoop()
         info.alongParam->Set(KEY_RESOLUTION, mReso);
 
         CODEC_LOGI("frameNo=%{public}u, %{public}ux%{public}u, pts=%{public}" PRId64 ", id=%{public}lu, fd=%{public}d",
-              mCurrInputSampleCnt, imageBuf->GetWidth(), imageBuf->GetHeight(), info.pts, info.id, imageBuf->GetFileDescriptor());
+            mCurrInputSampleCnt, imageBuf->GetWidth(), imageBuf->GetHeight(),
+            info.pts, info.id, imageBuf->GetFileDescriptor());
         std::vector<int32_t> errCodes {};
         int ret = mZCodec->QueueInputBuffers({info}, errCodes);
         if (ret != 0) {
