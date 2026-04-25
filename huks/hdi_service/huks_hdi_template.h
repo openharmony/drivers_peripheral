@@ -84,10 +84,10 @@ typedef struct HksParamSet TargetParamSet;
     HDI_CONVERTER_PARAM_IN_BLOB(wrappedKeyData, &wrappedKeyDataCore)  \
     HDI_CONVERTER_PARAM_IN_BLOB(keyOut, &keyOutCore)  \
     ret = (func)(HDI_ADAPTER_PARAM((wrappingKeyAlias), (&wrappingKeyAliasCore)),  \
-                 HDI_ADAPTER_PARAM(key, &keyCore),  \
-                 HDI_ADAPTER_PARAM(wrappedKeyData, &wrappedKeyDataCore),  \
-                 HDI_ADAPTER_PARAM(paramSet, paramSetCore),  \
-                 HDI_ADAPTER_PARAM(keyOut, &keyOutCore));  \
+                 HDI_ADAPTER_PARAM((key), (&keyCore)),  \
+                 HDI_ADAPTER_PARAM((wrappedKeyData), (&wrappedKeyDataCore)),  \
+                 HDI_ADAPTER_PARAM((paramSet), (paramSetCore)),  \
+                 HDI_ADAPTER_PARAM((keyOut), (&keyOutCore)));  \
     HDI_CONVERTER_PARAM_OUT_BLOB(&keyOutCore, keyOut)
 
 #define HDI_CONVERTER_FUNC_EXPORTPUBLICKEY(key, paramSet, keyOut, ret, func)  \
