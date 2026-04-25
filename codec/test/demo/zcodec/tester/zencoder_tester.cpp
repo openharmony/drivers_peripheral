@@ -188,7 +188,7 @@ int32_t TestZEncoder::ThreadFunInner()
             mInputBufferPool[buf.first] = buf.second;
             mInAvaliableBuffers.push_back(buf.first);
             CODEC_LOGI("alloc succ, id=%{public}lu, fd=%{public}d, now pool size=%{public}zu",
-                    buf.first, buf.second->GetFileDescriptor(), mInputBufferPool.size());
+                buf.first, buf.second->GetFileDescriptor(), mInputBufferPool.size());
         }
 
         ret = mZCodec->Start();
@@ -259,13 +259,19 @@ uint32_t TestZEncoder::ReadOneFrameYUV420P(std::ifstream& src, sptr<SurfaceBuffe
     // copy U
     for (uint32_t i = 0; i < h / SAMPLE_RATIO; i++) {
         src.read(dst, w / SAMPLE_RATIO);
-        if (IsEos(src, w / SAMPLE_RATIO)) { CODEC_LOGI("no more data"); return 0; }
+        if (IsEos(src, w / SAMPLE_RATIO)) {
+            CODEC_LOGI("no more data");
+            return 0;
+        }
         dst += stride / SAMPLE_RATIO;
     }
     // copy V
     for (uint32_t i = 0; i < h / SAMPLE_RATIO; i++) {
         src.read(dst, w / SAMPLE_RATIO);
-        if (IsEos(src, w / SAMPLE_RATIO)) { CODEC_LOGI("no more data"); return 0; }
+        if (IsEos(src, w / SAMPLE_RATIO)) {
+            CODEC_LOGI("no more data");
+            return 0;
+        }
         dst += stride / SAMPLE_RATIO;
     }
     return dst - start;
@@ -282,13 +288,19 @@ uint32_t TestZEncoder::ReadOneFrameYUV420SP(std::ifstream& src, sptr<SurfaceBuff
     // copy Y
     for (uint32_t i = 0; i < h; i++) {
         src.read(dst, w * bytesPerPixel);
-        if (IsEos(src, w * bytesPerPixel)) { CODEC_LOGI("no more data"); return 0; }
+        if (IsEos(src, w * bytesPerPixel)) {
+            CODEC_LOGI("no more data");
+            return 0;
+        }
         dst += stride;
     }
     // copy UV
     for (uint32_t i = 0; i < h / SAMPLE_RATIO; i++) {
         src.read(dst, w * bytesPerPixel);
-        if (IsEos(src, w * bytesPerPixel)) { CODEC_LOGI("no more data"); return 0; }
+        if (IsEos(src, w * bytesPerPixel)) {
+            CODEC_LOGI("no more data");
+            return 0;
+        }
         dst += stride;
     }
     return dst - start;
@@ -305,7 +317,10 @@ uint32_t TestZEncoder::ReadOneFrameRGBA(std::ifstream& src, sptr<SurfaceBuffer>&
     char* start = dst;
     for (uint32_t i = 0; i < h; i++) {
         src.read(dst, w * BYTES_PER_PIXEL_RBGA);
-        if (IsEos(src, w * BYTES_PER_PIXEL_RBGA)) { CODEC_LOGI("no more data"); return 0; }
+        if (IsEos(src, w * BYTES_PER_PIXEL_RBGA)) {
+            CODEC_LOGI("no more data");
+            return 0;
+        }
         dst += stride;
     }
     return dst - start;
@@ -389,7 +404,7 @@ void TestZEncoder::InputLoop()
                 mInputBufferPool[buf.first] = buf.second;
                 mInAvaliableBuffers.push_back(buf.first);
                 CODEC_LOGI("alloc succ, id=%{public}lu, fd=%{public}d, now pool size=%{public}lu",
-                      buf.first, buf.second->GetFileDescriptor(), mInputBufferPool.size());
+                    buf.first, buf.second->GetFileDescriptor(), mInputBufferPool.size());
                 continue;
             }
             info.id = mInAvaliableBuffers.front();

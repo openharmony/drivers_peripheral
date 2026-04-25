@@ -93,7 +93,6 @@ public:
     sptr<HdiZCallback> zcb;
     static constexpr int32_t width = 1280;
     static constexpr int32_t height = 720;
-
 };
 
 sptr<HdiZFactory> ZCodecHdiDecTest::fac = nullptr;

@@ -94,7 +94,6 @@ public:
     sptr<HdiZCallback> zcb;
     static constexpr int32_t width = 1280;
     static constexpr int32_t height = 720;
-
 };
 
 sptr<HdiZFactory> ZCodecHdiEdgeTest::fac = nullptr;
@@ -112,10 +111,10 @@ int32_t ZCodecHdiEdgeTest::CreateZCodecByType(CodecType type, sptr<HdiZComponent
     return ret;
 }
 
-int32_t ZCodecHdiEdgeTest::StandardStart(sptr<HdiZComponent>& instance, int32_t width, int32_t height)
+int32_t ZCodecHdiEdgeTest::StandardStart(sptr<HdiZComponent>& instance, int32_t w, int32_t h)
 {
     sptr<ParcelableParam> param = ParcelableParam::Create();
-    Resolution reso {width, height};
+    Resolution reso {w, h};
     param->Set(KEY_RESOLUTION, reso);
     int32_t ret = instance->SetParam(param);
     if (ret != 0) {

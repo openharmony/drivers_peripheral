@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef OHOS_HDI_VIDEO_ZCODEC_V1_0_HDIZCODECVDI_H
+#define OHOS_HDI_VIDEO_ZCODEC_V1_0_HDIZCODECVDI_H
 #include "v1_0/hdi_z_factory.h"
 
 namespace OHOS::HDI::Codec::Zcodec::V1_0 {
@@ -29,3 +32,4 @@ using CreateZCodecByNameFunc = int32_t (*)(const std::string& name,
         const sptr<HdiZCallback>&, const sptr<ParcelableParam>&, sptr<HdiZComponent>&);
 
 }
+#endif

@@ -101,7 +101,8 @@ private:
         ZDecoderCallback(TestZDecoder* tester) : tester_(tester) {}
         virtual ~ZDecoderCallback() = default;
 
-        int32_t OnEvent(int32_t event, const sptr<ParcelableParam>& param) override {
+        int32_t OnEvent(int32_t event, const sptr<ParcelableParam>& param) override
+        {
             (void)param;
             if (event != OK) {
                 CODEC_LOGE("[inst_%{public}u] hardware vdec report error(%{public}d), force stop",
@@ -111,7 +112,8 @@ private:
             return 0;
         }
 
-        int32_t OnBuffersBinded(const std::vector<HdiBufferWithId>& bufs) override {
+        int32_t OnBuffersBinded(const std::vector<HdiBufferWithId>& bufs) override
+        {
             {
                 std::lock_guard<std::mutex> lk(tester_->outMtx_);
                 for (const HdiBufferWithId& buf : bufs) {
@@ -123,7 +125,8 @@ private:
             return 0;
         }
 
-        int32_t OnBuffersUnbinded(const std::vector<ZBufferId>& ids) override {
+        int32_t OnBuffersUnbinded(const std::vector<ZBufferId>& ids) override
+        {
             {
                 std::lock_guard<std::mutex> lk(tester_->outMtx_);
                 for (const ZBufferId& id : ids) {
@@ -146,7 +149,8 @@ private:
             return 0;
         }
 
-        int32_t OnOutputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override {
+        int32_t OnOutputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override
+        {
             {
                 std::lock_guard<std::mutex> lk(tester_->outMtx_);
                 for (const HdiZBufferInfo& info : infos) {
@@ -157,7 +161,8 @@ private:
             return 0;
         }
 
-        int32_t OnInputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override {
+        int32_t OnInputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override
+        {
             {
                 std::lock_guard<std::mutex> lk(tester_->inMtx_);
                 for (const HdiZBufferInfo& info : infos) {

@@ -92,7 +92,6 @@ public:
     sptr<HdiZCallback> zcb;
     static constexpr int32_t width = 1280;
     static constexpr int32_t height = 720;
-
 };
 
 sptr<HdiZFactory> ZCodecHdiEncTest::fac = nullptr;
@@ -790,7 +789,7 @@ HWTEST_P(ZCodecHdiEncTest, ZCodecHdiTest_SetParam_ColorAspects_001, TestSize.Lev
     ASSERT_TRUE(ret == 0);
     ColorAspects aspectsOut {};
     paramOut->Get(KEY_COLOR_ASPECTS, aspectsOut);
-    ASSERT_TRUE(aspectsOut.range == aspects.range && 
+    ASSERT_TRUE(aspectsOut.range == aspects.range &&
                 aspectsOut.primaries == aspects.primaries &&
                 aspectsOut.transfer == aspects.transfer &&
                 aspectsOut.matrixCoeffs == aspects.matrixCoeffs);

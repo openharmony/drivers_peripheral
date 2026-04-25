@@ -81,13 +81,15 @@ public:
     EnDecodeCodecCallback() : inputDone_(false), outputDone_(false) {}
     virtual ~EnDecodeCodecCallback() = default;
 
-    int32_t OnEvent(int32_t event, const sptr<ParcelableParam>& param) override {
+    int32_t OnEvent(int32_t event, const sptr<ParcelableParam>& param) override
+    {
         (void)event;
         (void)param;
         return 0;
     }
 
-    int32_t OnBuffersBinded(const std::vector<HdiBufferWithId>& bufs) override {
+    int32_t OnBuffersBinded(const std::vector<HdiBufferWithId>& bufs) override
+    {
         lock_guard<mutex> lk(mtx_);
         for (const auto& buf : bufs) {
             outputBufferIds_.push_back(buf.id);
@@ -97,7 +99,8 @@ public:
         return 0;
     }
 
-    int32_t OnBuffersUnbinded(const std::vector<uint64_t>& ids) override {
+    int32_t OnBuffersUnbinded(const std::vector<uint64_t>& ids) override
+    {
         lock_guard<mutex> lk(mtx_);
         for (const auto& id : ids) {
             outputBufferPool_.erase(id);
@@ -105,7 +108,8 @@ public:
         return 0;
     }
 
-    int32_t OnOutputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override {
+    int32_t OnOutputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override
+    {
         lock_guard<mutex> lk(mtx_);
         for (const auto& info : infos) {
             availableOutputBuffers_.push_back(info.id);
@@ -115,7 +119,8 @@ public:
         return 0;
     }
 
-    int32_t OnInputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override {
+    int32_t OnInputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override
+    {
         lock_guard<mutex> lk(mtx_);
         for (const auto& info : infos) {
             availableInputBuffers_.push_back(info.id);
@@ -187,8 +192,8 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
     // 使用CreateByStandard接口
     sptr<ParcelableParam> paramForCreate = ParcelableParam::Create();
     ret = fac->CreateByStandard(codecStandard, isEncoder, cb, paramForCreate, zCodec);
-    CODEC_LOGI("%s: Using CreateByStandard, standard=%d, isEncoder=%d\n", __func__, 
-                static_cast<int>(codecStandard), isEncoder);
+    CODEC_LOGI("%s: Using CreateByStandard, standard=%d, isEncoder=%d\n", __func__,
+        static_cast<int>(codecStandard), isEncoder);
 
     if (ret != OK || zCodec == nullptr) {
         CODEC_LOGE("%s: Create failed, ret=%d\n", __func__, ret);
@@ -341,7 +346,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
     if (ret != OK) {
         CODEC_LOGE("%s: Stop return %d", __func__, ret);
     } else {
-        CODEC_LOGI("%s: EnDecode succeed, codec_std=%d, res=%ux%u, frameRate=%u, frames=%u", 
+        CODEC_LOGI("%s: EnDecode succeed, codec_std=%d, res=%ux%u, frameRate=%u, frames=%u",
                  __func__, static_cast<int>(codecStandard), width, height, frameRate, processedFrames);
     }
 

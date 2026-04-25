@@ -53,7 +53,6 @@ int32_t HdiZFactoryService::CreateByStandard(int32_t standard, bool isEncoder,
         vdiHandle_ = dlopen(SONAME, RTLD_LAZY);
     }
     if (vdiHandle_ == nullptr) {
-        // HDF_LOGE("dlopen %s failed, dlerror=%s", SONAME, dlerror());
         return HDF_FAILURE;
     }
     auto fun = reinterpret_cast<CreateZCodecByStdFunc>(dlsym(vdiHandle_, CREATE_ZCODEC_BY_STD_FUNC));
@@ -74,23 +73,19 @@ int32_t HdiZFactoryService::CreateByName(const std::string& name,
         vdiHandle_ = dlopen(SONAME, RTLD_LAZY);
     }
     if (vdiHandle_ == nullptr) {
-        // LOGE("dlopen %s failed, dlerror=%s", SONAME, dlerror());
         return HDF_FAILURE;
     }
     auto fun = reinterpret_cast<CreateZCodecByNameFunc>(dlsym(vdiHandle_, CREATE_ZCODEC_BY_NAME_FUNC));
     if (fun == nullptr) {
-        // LOGE("dlsym %s failed, dlerror=%s", CREATE_ZCODEC_FUNC_NAME, dlerror());
         return HDF_FAILURE;
     }
     int32_t ret = fun(name, cb, param, instance);
-    // LOGI("ret=%d", ret);
     return ret;
 }
 
 HdiZFactoryService::~HdiZFactoryService()
 {
     std::lock_guard<std::mutex> lk(mtx_);
-    // LOGI(">>");
     if (vdiHandle_) {
         dlclose(vdiHandle_);
         vdiHandle_ = nullptr;

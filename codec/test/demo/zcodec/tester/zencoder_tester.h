@@ -92,7 +92,8 @@ private:
         virtual ~MyCallback() = default;
         int32_t OnEvent(int32_t event, const sptr<ParcelableParam>& param) override { return 0; }
 
-        int32_t OnBuffersBinded(const std::vector<HdiBufferWithId>& bufs) override {
+        int32_t OnBuffersBinded(const std::vector<HdiBufferWithId>& bufs) override
+        {
             lock_guard<mutex> lk(mTester->mOutMtx);
             for (const HdiBufferWithId& buf : bufs) {
                 CODEC_LOGI("id = %{public}lu", buf.id);
@@ -101,7 +102,8 @@ private:
             return 0;
         }
 
-        int32_t OnBuffersUnbinded(const std::vector<ZBufferId>& ids) override {
+        int32_t OnBuffersUnbinded(const std::vector<ZBufferId>& ids) override
+        {
             lock_guard<mutex> lk(mTester->mOutMtx);
             for (ZBufferId id : ids) {
                 CODEC_LOGI("id = %{public}lu", id);
@@ -110,7 +112,8 @@ private:
             return 0;
         }
 
-        int32_t OnInputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override {
+        int32_t OnInputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override
+        {
             {
                 lock_guard<mutex> lk(mTester->mInMtx);
                 for (const HdiZBufferInfo& info : infos) {
@@ -122,7 +125,8 @@ private:
             return 0;
         }
 
-        int32_t OnOutputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override {
+        int32_t OnOutputBuffersDone(const std::vector<HdiZBufferInfo>& infos) override
+        {
             {
                 lock_guard<mutex> lk(mTester->mOutMtx);
                 for (const HdiZBufferInfo& info : infos) {
