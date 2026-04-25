@@ -19,5 +19,6 @@ group("hdf_media_codec") {
     "hal:codec_hdi_omx",
     "hal/idl_service:codec_idl_omx_service",
     "image:codec_image_service",
+    "zcodec:zcodec_idl_service",
   ]
 }

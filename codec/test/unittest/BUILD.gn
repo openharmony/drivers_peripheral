@@ -19,4 +19,9 @@ group("hdf_unittest_codec") {
     "hdi_image:codec_hdi_image_test",
     "idl_omx:codec_idl_2.0_test",
   ]
+  if (!drivers_peripheral_codec_feature_support_omx_extend_test) {
+    deps += [
+      "zcodec_unittest:zcodec_idl_1.0_test"
+    ]
+  }
 }
