@@ -72,20 +72,20 @@ int32_t SerialDevice::Open()
 
         return HDF_ERR_IO;
     }
-
+    fdsan_exchange_owner_tag(fd_, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (flock(fd_, LOCK_EX | LOCK_NB) < 0) {
-        HDF_LOGE("get fd lock failed.%{public}s - errno=%d (%s)\n", portName_.c_str(), errno, strerror(errno));
-        close(fd_);
+        HDF_LOGE("lock failed.%{public}s-err=%{public}d (%{public}s)\n", portName_.c_str(), errno, strerror(errno));
+        fdsan_close_with_tag(fd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         fd_ = INVALID_FD;
         return HDF_ERR_IO;
     }
     if (ConfigurePort() != HDF_SUCCESS) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         fd_ = INVALID_FD;
         return HDF_ERR_IO;
     }
     if (InitPipes() != HDF_SUCCESS) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         fd_ = INVALID_FD;
         return HDF_ERR_IO;
     }
@@ -145,7 +145,7 @@ int32_t SerialDevice::Close()
     }
     if (fd_ >= 0) {
         flock(fd_, LOCK_UN);
-        close(fd_);
+        fdsan_close_with_tag(fd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         fd_ = INVALID_FD;
     }
     ClosePipes();
@@ -293,7 +293,7 @@ int32_t SerialDevice::SetParityInternal(struct termios& options)
 
 int32_t SerialDevice::SetBaudRateInternal(struct termios& options)
 {
-    if (currentConfig_.baudRate < 0) {
+    if (currentConfig_.baudRate <= 0) {
         HDF_LOGE("baudRate:%{public}d invalid!", currentConfig_.baudRate);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -626,33 +626,37 @@ int32_t SerialDevice::InitPipes()
         HDF_LOGE("stopPipe create failed, errno=%{public}d", errno);
         return HDF_FAILURE;
     }
+    fdsan_exchange_owner_tag(stopPipe_[PIPE_READ_IDX], 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    fdsan_exchange_owner_tag(stopPipe_[PIPE_WRITE_IDX], 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     if (pipe(closePipe_) != 0) {
         HDF_LOGE("closePipe create failed, errno=%{public}d", errno);
-        close(stopPipe_[PIPE_READ_IDX]);
-        close(stopPipe_[PIPE_WRITE_IDX]);
+        fdsan_close_with_tag(stopPipe_[PIPE_READ_IDX], fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        fdsan_close_with_tag(stopPipe_[PIPE_WRITE_IDX], fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         stopPipe_[PIPE_READ_IDX] = INVALID_FD;
         stopPipe_[PIPE_WRITE_IDX] = INVALID_FD;
         return HDF_FAILURE;
     }
+    fdsan_exchange_owner_tag(closePipe_[PIPE_READ_IDX], 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    fdsan_exchange_owner_tag(closePipe_[PIPE_WRITE_IDX], 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
     return HDF_SUCCESS;
 }
 
 void SerialDevice::ClosePipes()
 {
     if (stopPipe_[PIPE_READ_IDX] >= 0) {
-        close(stopPipe_[PIPE_READ_IDX]);
+        fdsan_close_with_tag(stopPipe_[PIPE_READ_IDX], fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         stopPipe_[PIPE_READ_IDX] = INVALID_FD;
     }
     if (stopPipe_[PIPE_WRITE_IDX] >= 0) {
-        close(stopPipe_[PIPE_WRITE_IDX]);
+        fdsan_close_with_tag(stopPipe_[PIPE_WRITE_IDX], fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         stopPipe_[PIPE_WRITE_IDX] = INVALID_FD;
     }
     if (closePipe_[PIPE_READ_IDX] >= 0) {
-        close(closePipe_[PIPE_READ_IDX]);
+        fdsan_close_with_tag(closePipe_[PIPE_READ_IDX], fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         closePipe_[PIPE_READ_IDX] = INVALID_FD;
     }
     if (closePipe_[PIPE_WRITE_IDX] >= 0) {
-        close(closePipe_[PIPE_WRITE_IDX]);
+        fdsan_close_with_tag(closePipe_[PIPE_WRITE_IDX], fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         closePipe_[PIPE_WRITE_IDX] = INVALID_FD;
     }
 }

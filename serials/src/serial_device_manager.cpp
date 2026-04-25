@@ -225,7 +225,7 @@ int32_t SerialDeviceManager::QueryDevices(std::vector<SerialDeviceInfo>& devices
         if (name.find("ttyUSB") == 0) {
             std::string fullPath = std::string(devPath) + "/" + name;
             AddVirtualUsbDevice(devices, name, fullPath);
-        } else if (name.find("ttyHW") == 0) {
+        } else {
             std::string fullPath = std::string(devPath) + "/" + name;
             AddNormalSerialDevice(devices, fullPath);
         }

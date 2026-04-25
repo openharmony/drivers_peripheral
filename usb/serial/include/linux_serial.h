@@ -69,6 +69,7 @@ private:
     int32_t GetStopbits(tcflag_t& cflag, unsigned char stopBits);
     void HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds,
         std::string targetPath);
+    int32_t ConfigPort(int32_t index);
 private:
     std::mutex portMutex_;
     std::vector<Serialfd> serialPortList_;
