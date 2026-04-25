@@ -30,7 +30,8 @@
         "drivers_interface_bluetooth",
         "hitrace",
         "cJSON",
-        "bluetooth"
+        "bluetooth",
+        "init"
       ]
     },
     "build": {
