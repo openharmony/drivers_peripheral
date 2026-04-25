@@ -38,7 +38,7 @@ using HciPacketType = OHOS::HDI::Bluetooth::Hci::HciPacketType;
 #ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
 namespace {
 const char* BLUETOOTH_EMPLACE_ENABLE_STATE = "bluetooth.emplace_enable.state";
-const char* BLUETOOTH_EMPLACE_NO_NEED_ENABLE_BT = "0"
+const char* BLUETOOTH_EMPLACE_NO_NEED_ENABLE_BT = "0";
 }
 #endif
 
