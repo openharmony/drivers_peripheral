@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Copyright (c) 2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,14 +17,13 @@ import("//build/test.gni")
 import("./../fuzztest.gni")
 module_output_path = "drivers_peripheral_usb/drivers_peripheral_usb"
 
-ohos_fuzztest("UsbDeviceAuthorizeFuzzTest") {
+ohos_fuzztest("UsbGetControlTransferDataFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "./../usbdeviceauthorize_fuzzer"
+  fuzz_config_file = "./../usbgetcontroltransferdata_fuzzer"
 
   include_dirs = [
-    "../usbdeviceauthorize_fuzzer",
-    "../../UsbSubscriberTest",
+    "../usbgetcontroltransferdata_fuzzer",
     "./../../../hdi_service/include",
   ]
 
@@ -35,7 +34,7 @@ ohos_fuzztest("UsbDeviceAuthorizeFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_usb:libusb_proxy_2.0",
+    "drivers_interface_usb:libusb_proxy_2.1",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
@@ -49,15 +48,11 @@ ohos_fuzztest("UsbDeviceAuthorizeFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [
-    "../../UsbSubscriberTest/UsbSubscriberV2Test.cpp",
-    "../usbcommonfunction_fuzzer/usbcommonfunction_fuzzer.cpp",
-    "usbdeviceauthorize_fuzzer.cpp",
-  ]
+  sources = [ "usbgetcontroltransferdata_fuzzer.cpp" ]
 }
 
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":UsbDeviceAuthorizeFuzzTest" ]
+  deps += [ ":UsbGetControlTransferDataFuzzTest" ]
 }

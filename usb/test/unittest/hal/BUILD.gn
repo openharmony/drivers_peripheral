@@ -70,13 +70,9 @@ ohos_unittest("test_transfer") {
 }
 
 ohos_unittest("test_hubdevice") {
-  sources = [
-    "src/usbd_hub_device_test.cpp",
-  ]
+  sources = [ "src/usbd_hub_device_test.cpp" ]
 
-  include_dirs = [
-    "${usb_driver_path}/utils/include",
-  ]
+  include_dirs = [ "${usb_driver_path}/utils/include" ]
 
   configs = [ ":module_private_config" ]
 
@@ -88,11 +84,11 @@ ohos_unittest("test_hubdevice") {
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_usb:libusb_proxy_1.2",
+      "drivers_interface_usb:libusb_proxy_2.0",
       "googletest:gtest_main",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "drivers_interface_usb:libusb_proxy_2.0",
     ]
 
     if (usb_samgr_enable) {
@@ -295,7 +291,7 @@ ohos_unittest("test_deviceauthorize") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.1",
     "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
   ]
 
@@ -337,7 +333,7 @@ ohos_unittest("test_interfaceauthorize") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.1",
     "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
   ]
 
@@ -709,6 +705,44 @@ ohos_unittest("test_serial") {
     }
   } else {
     external_deps = [ "hilog:libhilog" ]
+  }
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_feature_getcontroltransferdata") {
+  sources = [ "src/usbd_getcontroltransferdata_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.1",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_proxy_2.0",
+      "drivers_interface_usb:libusb_proxy_2.1",
+      "googletest:gtest_main",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps += [ "hilog:libhilog" ]
   }
   module_out_path = module_output_path
 }

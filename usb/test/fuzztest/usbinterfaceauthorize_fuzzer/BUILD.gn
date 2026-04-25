@@ -29,7 +29,7 @@ ohos_fuzztest("UsbInterfaceAuthorizeFuzzTest") {
   ]
 
   deps = [
-    "../../../hdi_service:libusb_device_interface_service_2.0",
+    "../../../hdi_service:libusb_device_interface_service_2.1",
     "../../../hdi_service:libusb_host_interface_service_2.0",
   ]
 

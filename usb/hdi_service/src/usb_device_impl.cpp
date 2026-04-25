@@ -59,11 +59,11 @@ bool UsbDeviceImpl::isEdmExist_ = false;
 constexpr uint32_t HUB_PREFIX_LENGTH = 3;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 constexpr uint32_t MAX_BUFFER = 256;
+constexpr const char *ACCESSORY_DRIVER_NAME = "/dev/usb_accessory";
 constexpr const char* DISABLE_AUTH_STR = "0";
 constexpr const char* ENABLE_AUTH_STR = "1";
 constexpr const char* BUS_NUM = "busnum";   // filename of bus number
 constexpr const char* DEV_ADDR = "devnum";  // filename of devive address
-const char *ACCESSORY_DRIVER_NAME = "/dev/usb_accessory";
 static const std::filesystem::path AUTH_PATH("authorized");
 static const std::map<std::string, uint32_t> configMap = {
     {HDC_CONFIG_OFF, USB_FUNCTION_NONE},
@@ -75,6 +75,7 @@ static const std::map<std::string, uint32_t> configMap = {
     {HDC_CONFIG_STORAGE_HDC, USB_FUNCTION_HDC + USB_FUNCTION_STORAGE},
     {HDC_CONFIG_MANUFACTURE_HDC, USB_FUNCTION_MANUFACTURE}
 };
+
 extern "C" IUsbDeviceInterface *UsbDeviceInterfaceImplGetInstance(void)
 {
     using OHOS::HDI::Usb::V2_1::UsbDeviceImpl;
@@ -576,7 +577,7 @@ int32_t UsbDeviceImpl::GetControlTransferData(int32_t eventId, std::vector<uint8
         fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
 
         uint8_t buffer[MAX_BUFFER] = {0};
-        int32_t ret = ioctl(fd, USB_GET_EXTRA_DATA, buffer);
+        int32_t ret = ioctl(fd, HISUITE_GET_EXTRA_DATA, buffer);
         fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         if (ret < 0) {
             HDF_LOGE("%{public}s: failed to read uevent data, errno=%{public}d", __func__, errno);

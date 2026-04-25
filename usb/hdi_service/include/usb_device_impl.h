@@ -34,8 +34,8 @@
 #define SYSFS_DEVICES_DIR "/sys/bus/usb/devices/"
 #endif // SYSFS_DEVICES_DIR
 
-#define USB_IOCTL_EXTRA_DATA                0xC4
-#define USB_GET_EXTRA_DATA                  _IOW('M', USB_IOCTL_EXTRA_DATA, char[256])
+#define HISUITE_IOCTL_EXTRA_DATA                0xC4
+#define HISUITE_GET_EXTRA_DATA                  _IOW('M', HISUITE_IOCTL_EXTRA_DATA, char[256])
 
 #define BASE_CLASS_HUB 0x09
 constexpr uint8_t MAX_INTERFACEID = 0xFF;

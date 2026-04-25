@@ -499,6 +499,7 @@ ohos_shared_library("libusb_device_driver") {
     }
   } else {
     external_deps = [
+      "drivers_interface_usb:libusb_stub_2.0",
       "drivers_interface_usb:libusb_stub_2.1",
       "hilog:libhilog",
       "ipc:ipc_single",
