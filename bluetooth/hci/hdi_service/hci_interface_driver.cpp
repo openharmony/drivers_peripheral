@@ -37,7 +37,7 @@ const std::string BLUETOOTH_CHIP_UNSUPPORTED_PATH = "/proc/connectivity/wifi_chi
 const char* BLUETOOTH_PLUGGABLE_STATE = "persist.bluetooth.pluggable.state";
 const char* BLUETOOTH_PLUGGABLE_STATE_EXTRACT = "0";
 const char* BLUETOOTH_PLUGGABLE_STATE_EMPLACE = "1";
-const char* BLUETOOTH_EMPLACE_ENABLE_STATE = "bluetooth.emplace.enable.state";
+const char* BLUETOOTH_EMPLACE_ENABLE_STATE = "bluetooth.emplace_enable.state";
 const char* BLUETOOTH_EMPLACE_NEED_ENABLE_BT = "1";
 }
 #endif
