@@ -18,6 +18,7 @@
 
 #include <fstream>
 #include <map>
+#include <sched.h>
 #include <string>
 
 #include "cJSON.h"
@@ -74,6 +75,8 @@ bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::stri
 std::string ParseStringFromArgs(const std::string &args, const char *key);
 
 bool CheckIsNum(const std::string &jsonString);
+
+int32_t SetThreadPriority(int32_t priority);
 
 template <typename T>
 bool GetSysPara(const char *key, T &value);
