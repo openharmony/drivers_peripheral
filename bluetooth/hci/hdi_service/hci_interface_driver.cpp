@@ -89,7 +89,7 @@ static bool CheckNeedAutoEnableBluetooth()
     int32_t res = system::GetStringParameter(BLUETOOTH_PLUGGABLE_STATE, persistState,
         BLUETOOTH_PLUGGABLE_STATE_EXTRACT);
     if (res != 0) {
-        HDF_LOGE("%{public}s: read last Bt supported state failed, res: %{public}d", res);
+        HDF_LOGE("%{public}s: read last Bt supported state failed, res: %{public}d", __func__, res);
     }
     bool lastBtSupportedState = (res == 0 && persistState == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
     bool curBtSupportedState = IsBluetoothSupported();
