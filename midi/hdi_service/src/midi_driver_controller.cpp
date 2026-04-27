@@ -129,7 +129,7 @@ static std::string MakeDeviceFileName(int32_t card, int32_t device)
     return "midiC" + std::to_string(card) + "D" + std::to_string(device);
 }
 
-static std::string MakeHwName(int32_t card, int32_t device, int32_t subdevice)
+static std::string MakeHwName(int32_t card, int32_t device, uint32_t subdevice)
 {
     return "hw:" + std::to_string(card) + "," + std::to_string(device) + "," + std::to_string(subdevice);
 }

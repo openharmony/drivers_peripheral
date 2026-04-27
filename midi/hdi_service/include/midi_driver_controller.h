@@ -40,7 +40,7 @@ struct PortInfo {
     std::string name;
     int32_t card;
     int32_t device;
-    int32_t subdevice;
+    uint32_t subdevice;
     size_t groups;
     uint8_t umpStartGroup;
     uint8_t numUmpGroupsSpanned;
