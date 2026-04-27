@@ -192,7 +192,6 @@ CommandOpt Parse(int argc, char *argv[])
                 }
                 parts.push_back(aspectsStr);
                 if (parts.size() == 4) { // 4: 颜色四元素
-                int32_t index = 0;
                     opt.colorAspects = opt.ParseColorAspects(parts[0].c_str(), parts[1].c_str(),
                                                              parts[2].c_str(), parts[3].c_str()); // 2,3: 颜色四元组
                 }

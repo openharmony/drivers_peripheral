@@ -113,7 +113,7 @@ int32_t ZCodecHdiDecEdgeTest::CreateZCodecByType(CodecType type, sptr<HdiZCompon
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_CreateByStandard_InvalidStandard_001, TestSize.Level1)
 {
     sptr<ParcelableParam> param = ParcelableParam::Create();
-    int32_t ret = fac->CreateByStandard(static_cast<Standard>(999), false, zcb, param, instance);
+    int32_t ret = fac->CreateByStandard(static_cast<Codec::Standard>(999), false, zcb, param, instance);
     ASSERT_TRUE(instance == nullptr && ret != 0);
 }
 
