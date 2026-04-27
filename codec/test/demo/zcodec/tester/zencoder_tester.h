@@ -88,7 +88,7 @@ private:
 
     class MyCallback : public HdiZCallback {
     public:
-        MyCallback(TestZEncoder* tester) : mTester(tester) {}
+        explicit MyCallback(TestZEncoder* tester) : mTester(tester) {}
         virtual ~MyCallback() = default;
         int32_t OnEvent(int32_t event, const sptr<ParcelableParam>& param) override { return 0; }
 

@@ -123,8 +123,9 @@ int32_t ZCodecHdiEdgeTest::StandardStart(sptr<HdiZComponent>& instance, int32_t 
     return instance->Start();
     }
     
-    /**
-     * @tc.name: ZCodecHdiEdgeTest_CreateByName_InvalidName_001 * @tc.desc: try to create zcodec instance with invalid component name
+/**
+ * @tc.name: ZCodecHdiEdgeTest_CreateByName_InvalidName_001
+ * @tc.desc: try to create zcodec instance with invalid component name
  * @tc.type: FUNC
  */
 HWTEST_P(ZCodecHdiEdgeTest, ZCodecHdiEdgeTest_CreateByName_InvalidName_001, TestSize.Level1)

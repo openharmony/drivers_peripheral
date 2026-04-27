@@ -73,7 +73,7 @@ static bool GetBoolFromData(const uint8_t *data, size_t size, size_t offset)
     if (size <= offset) {
         return false;
     }
-    return (data[offset] % 2) == 1;
+    return (data[offset] % 2) == 1; // 2: 判断奇偶
 }
 
 class EnDecodeCodecCallback : public HdiZCallback {
@@ -171,9 +171,9 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
     uint32_t height = SUPPORTED_RESOLUTIONS[resolutionIndex].height;
 
     // 允许fuzz输入自定义分辨率（50%概率）
-    if (GetBoolFromData(data, size, 6) && size >= 12) {
-        width = GetUint32FromData(data, size, 7, 160, 7680);
-        height = GetUint32FromData(data, size, 11, 120, 4320);
+    if (GetBoolFromData(data, size, 6) && size >= 12) { // offset 6, 随机数size > 12
+        width = GetUint32FromData(data, size, 7, 176, 7680); // offset 7, width range 176-7680
+        height = GetUint32FromData(data, size, 11, 144, 4320); // offset 8, height range 144-4320
     }
 
     // 获取HDI工厂实例
@@ -186,9 +186,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
     sptr<EnDecodeCodecCallback> cb = sptr<EnDecodeCodecCallback>(new EnDecodeCodecCallback());
     sptr<HdiZComponent> zCodec = nullptr;
 
-    // 支持两种创建方式：CreateByName和CreateByStandard
     int32_t ret = OK;
-
     // 使用CreateByStandard接口
     sptr<ParcelableParam> paramForCreate = ParcelableParam::Create();
     ret = fac->CreateByStandard(codecStandard, isEncoder, cb, paramForCreate, zCodec);
@@ -210,8 +208,8 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
     param->Set(KEY_FRAME_RATE, frameRate);
 
     // 编码器专用的随机参数
-    uint32_t iFrameInterval = 30;  // 默认I帧间隔
-    if (isEncoder && (size >= 32)) {
+    uint32_t iFrameInterval = 30;  // 30: 默认I帧间隔
+    if (isEncoder && (size >= 32)) { // 32: 随机数size
         // 随机码率：100Kbps - 50Mbps
         uint32_t bitrate = GetUint32FromData(data, size, 20, 100000, 50000000);
         param->Set(KEY_TARGET_BITRATE, bitrate);
@@ -219,18 +217,16 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
         // 随机Profile档次（直接使用uint32_t值，避免枚举运算）
         uint32_t profile = 0;
         if (codecStandard == Standard::HEVC) {
-            profile = (data[24] % 2 == 0) ? 3 : 4;  // HEVC_PROFILE_MAIN=3, HEVC_PROFILE_MAIN_10=4
+            profile = (data[24] % 2 == 0) ? 3 : 4;  // 24: offset, HEVC_PROFILE_MAIN=3, HEVC_PROFILE_MAIN_10=4
         } else {
-            profile = data[24] % 3;  // AVC_PROFILE_BASELINE=0, AVC_PROFILE_MAIN=1, AVC_PROFILE_HIGH=2
+            profile = data[24] % 3;  // 24: offset, AVC_PROFILE_BASELINE=0, AVC_PROFILE_MAIN=1, AVC_PROFILE_HIGH=2
         }
         param->Set(KEY_PROFILE, profile);
 
-        // 随机I帧间隔：1-60帧
-        iFrameInterval = GetUint32FromData(data, size, 26, 1, 60);
+        iFrameInterval = GetUint32FromData(data, size, 26, 1, 60); // 26: offset, 随机I帧间隔：1-60帧
         param->Set(KEY_I_FRAME_INTERVAL, static_cast<int32_t>(iFrameInterval));
 
-        // 随机QP值：-30到50
-        int32_t targetQp = -30 + static_cast<int32_t>(data[27] % 81);
+        int32_t targetQp = -30 + static_cast<int32_t>(data[27] % 81); // 27: offset, 随机QP值：-30到50
         param->Set(KEY_TARGET_QP, targetQp);
     }
 
@@ -241,14 +237,14 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
     }
 
     // 动态分配缓冲区
-    const uint32_t inputBufferCount = GetUint32FromData(data, size, 28, 2, 5);
+    const uint32_t inputBufferCount = GetUint32FromData(data, size, 28, 2, 5); // 28: offset, 分配2-5个buffer
     map<uint64_t, sptr<ParcelableBuffer>> inputBufferPool;
     list<uint64_t> availableInputBuffers;
 
     for (uint32_t i = 0; i < inputBufferCount; ++i) {
         HdiBufferAllocInfo info {};
         info.isImage = isEncoder;
-        info.capacity = width * height * 3 / 2;
+        info.capacity = width * height * 3 / 2; // 1.5倍wxh
         info.width = width;
         info.height = height;
         info.format = 0;  // 使用默认格式
@@ -274,8 +270,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
         return false;
     }
 
-    // 等待输出缓冲区绑定
-    cb->WaitForOutputBuffer(200);
+    cb->WaitForOutputBuffer(200); // 200: 等待输出缓冲区绑定200ms
 
     // 随机帧数处理：1-100帧
     uint32_t frameCount = GetUint32FromData(data, size, 29, 1, 5);
@@ -284,7 +279,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
     for (uint32_t frame = 0; frame < frameCount; frame++) {
         // 获取可用的输入缓冲区
         if (availableInputBuffers.empty()) {
-            cb->WaitForInputBuffer(100);
+            cb->WaitForInputBuffer(100); // 100: 等待100ms
             if (availableInputBuffers.empty()) {
                 break;
             }
@@ -297,9 +292,12 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
         HdiZBufferInfo inputInfo {};
         inputInfo.id = inputId;
         inputInfo.offset = 0;
+        // offset: 33 + frame % 20, min: 128, max: width * height * 2
         inputInfo.filledLen = GetUint32FromData(data, size, 33 + frame % 20, 128, width * height * 2);
-        inputInfo.pts = frame * (1000000 / (frameRate > 0 ? frameRate : 30));  // 根据帧率计算准确时间戳
-        inputInfo.flag = (frame == 0 || (frame % iFrameInterval == 0 && isEncoder)) ? 1 : 0;
+        inputInfo.pts = frame * (1000000 / (frameRate > 0 ? frameRate : 30));  // 1000000: 根据帧率计算准确时间戳, 30: 默认
+        if (iFrameInterval != 0) {
+            inputInfo.flag = (frame == 0 || (frame % iFrameInterval == 0 && isEncoder)) ? 1 : 0;
+        }
         inputInfo.alongParam = nullptr;
         inputInfo.fence = nullptr;
 
@@ -332,7 +330,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
         }
 
         // 根据情况添加暂停/恢复测试
-        if (frame == 5 && GetBoolFromData(data, size, 53)) {
+        if (GetBoolFromData(data, size, 53)) { // 53: 偏移53随机获取bool，以进行FLush+Start
             zCodec->Flush();
             zCodec->Start();
         }

@@ -98,7 +98,7 @@ private:
 
     class ZDecoderCallback : public HdiZCallback {
     public:
-        ZDecoderCallback(TestZDecoder* tester) : tester_(tester) {}
+        explicit ZDecoderCallback(TestZDecoder* tester) : tester_(tester) {}
         virtual ~ZDecoderCallback() = default;
 
         int32_t OnEvent(int32_t event, const sptr<ParcelableParam>& param) override

@@ -30,7 +30,7 @@ class ZCodecHdiEncBufferTest : public testing::TestWithParam<bool> {
 public:
     static void SetUpTestCase()
     {
-        ASSERT_TRUE(CreateFakeYuv(INPUT_FILE_PATH, width, height, 4));
+        ASSERT_TRUE(CreateFakeYuv(INPUT_FILE_PATH, width, height, 4)); // 4: frameCnt
     }
 
     static void TearDownTestCase()

@@ -191,8 +191,10 @@ CommandOpt Parse(int argc, char *argv[])
                     aspectsStr.erase(0, pos + 1);
                 }
                 parts.push_back(aspectsStr);
-                if (parts.size() == 4) {
-                    opt.colorAspects = opt.ParseColorAspects(parts[0].c_str(), parts[1].c_str(), parts[2].c_str(), parts[3].c_str());
+                if (parts.size() == 4) { // 4: 颜色四元素
+                int32_t index = 0;
+                    opt.colorAspects = opt.ParseColorAspects(parts[0].c_str(), parts[1].c_str(),
+                                                             parts[2].c_str(), parts[3].c_str()); // 2,3: 颜色四元组
                 }
                 break;
             }
@@ -283,12 +285,15 @@ void CommandOpt::Print() const
     cout << "pixfmt:          " << GetPixFmtPrintInfo() << endl;
     if (isEncoder) {
         cout << "profile:         " << GetProfilePrintInfo() << endl;
-        if (iFrameInterval.has_value())
+        if (iFrameInterval.has_value()) {
             cout << "iFrameInterval:  " << iFrameInterval.value() << endl;
-        if (bitrateControlMode.has_value())
+        }
+        if (bitrateControlMode.has_value()) {
             cout << "bitrateMode:     " << GetBitrateControlModePrintInfo() << endl;
-        if (targetBitrate.has_value())
+        }
+        if (targetBitrate.has_value()) {
             cout << "targetBitrate:   " << targetBitrate.value() << " bps" << endl;
+        }
         if (targetQuality.has_value()) {
             cout << "targetQuality:   " << targetQuality.value() << endl;
         }
@@ -335,7 +340,8 @@ OHOS::HDI::Codec::BitrateControlMode CommandOpt::ParseBitrateControlMode(const c
     return OHOS::HDI::Codec::VBR; // default
 }
 
-OHOS::HDI::Codec::ColorAspects CommandOpt::ParseColorAspects(const char* range, const char* primaries, const char* transfer, const char* matrix)
+OHOS::HDI::Codec::ColorAspects CommandOpt::ParseColorAspects(const char* range, const char* primaries,
+                                                             const char* transfer, const char* matrix)
 {
     OHOS::HDI::Codec::ColorAspects aspects{};
     aspects.range = (std::string(range) == "1");

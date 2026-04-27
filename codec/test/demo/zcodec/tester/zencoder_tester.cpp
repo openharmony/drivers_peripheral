@@ -180,7 +180,7 @@ int32_t TestZEncoder::ThreadFunInner()
             return ret;
         }
 
-        for (int32_t index = 0; index < 2; ++index) {
+        for (int32_t index = 0; index < 2; ++index) { // 2: 先申请2个buffer
             std::pair<ZBufferId, sptr<SurfaceBuffer>> buf = CreateOneBuffer();
             if (buf.second == nullptr) {
                 return -1;
@@ -228,7 +228,8 @@ void TestZEncoder::SaveOneSample(uint8_t* va, uint32_t filledLen)
         string protocol = (mOpt.protocol == CodeType::H264) ? "h264" : "h265";
         // 输出文件名格式: input.instanceN.runM.h264/h265
         // 其中 N 是实例ID，M 是当前循环次数
-        string outputFile = mOpt.inputFile + ".instance" + to_string(mInstanceId) + ".run" + to_string(mCurrentRunIdx) + "." + protocol;
+        string outputFile = mOpt.inputFile + ".instance" + to_string(mInstanceId) + ".run" +
+                            to_string(mCurrentRunIdx) + "." + protocol;
         mOfstream.open(outputFile, std::ios::binary | std::ios::trunc);
         CODEC_LOGI("open output file: %{public}s", outputFile.c_str());
     }
@@ -236,7 +237,7 @@ void TestZEncoder::SaveOneSample(uint8_t* va, uint32_t filledLen)
     if (mOfstream.is_open() && va != nullptr && filledLen > 0) {
         mOfstream.write(reinterpret_cast<char*>(va), filledLen);
         mSampleCount++;
-        if (mSampleCount % 100 == 0) {
+        if (mSampleCount % 100 == 0) { // 100: 每100帧
             CODEC_LOGI("saved %{public}d samples", mSampleCount);
         }
     }
@@ -395,7 +396,7 @@ void TestZEncoder::InputLoop()
             }
             if (!bret) {
                 CODEC_LOGI("wait timeout, try create one");
-                if (mInputBufferPool.size() >= 4) {
+                if (mInputBufferPool.size() >= 4) { // 4: 限制最大4个输入
                     continue;
                 }
                 lk.unlock();

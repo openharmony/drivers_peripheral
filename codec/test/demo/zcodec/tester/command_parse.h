@@ -70,7 +70,8 @@ struct CommandOpt {
     std::string GetProfilePrintInfo() const;
     std::string GetDumpOutputFile(int32_t instanceId, int32_t runTimesId) const;
     OHOS::HDI::Codec::BitrateControlMode ParseBitrateControlMode(const char *cmd);
-    OHOS::HDI::Codec::ColorAspects ParseColorAspects(const char* range, const char* primaries, const char* transfer, const char* matrix);
+    OHOS::HDI::Codec::ColorAspects ParseColorAspects(const char* range, const char* primaries,
+                                                     const char* transfer, const char* matrix);
     std::string GetLevelPrintInfo() const;
     std::string GetBitrateControlModePrintInfo() const;
 };
