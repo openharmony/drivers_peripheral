@@ -186,8 +186,6 @@ static int64_t GetCurNano()
     return result;
 }
 
-static MidiDriverController *g_instance = nullptr;
-
 Midi1Device::~Midi1Device()
 {
     HDF_LOGI("%{public}s enter, deviceId: %{public}" PRId64, __func__, info_.deviceId);
@@ -277,7 +275,7 @@ int32_t Midi1Device::OpenInputPort(uint32_t portId, const sptr<IMidiCallback> &c
     }
 
     std::vector<struct pollfd> pfds {static_cast<std::size_t>(count)};
-    ::snd_rawmidi_poll_descriptors(rawmidi, &pfds[0], POLLIN);
+    ::snd_rawmidi_poll_descriptors(rawmidi, &pfds[0], count);
     auto ctx = std::make_shared<InputContext>();
     ctx->quit = false;
     ctx->rawmidi = rawmidi;
@@ -431,13 +429,14 @@ void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* 
     if (!midiStream.str().empty()) {
         HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
     }
-    if (ctx->processor == nullptr) {
+    auto processor = ctx->processor;
+    if (processor == nullptr) {
         HDF_LOGE("%{public}s processor is nullptr, setting quit flag", __func__);
         ctx->quit = true;
         return;
     }
     std::vector<UmpPacket> results;
-    ctx->processor->ProcessBytes(buffer, static_cast<size_t>(bufferSize), [&](const UmpPacket &p) {
+    processor->ProcessBytes(buffer, static_cast<size_t>(bufferSize), [&](const UmpPacket &p) {
         results.push_back(p);
     });
     HDF_LOGD("%{public}s processed %{public}zu UMP packets", __func__, results.size());
@@ -473,6 +472,10 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
 {
     HDF_LOGI("%{public}s enter, deviceId: %{public}" PRId64, __func__, info_.deviceId);
     EpollHandler epoll;
+    if (!epoll.init()) {
+        HDF_LOGE("%{public}s epoll create failed", __func__);
+        return;
+    }
     struct epoll_event event[ctx->pfds.size() + 1]; // +1 for eventFd
     // Add ALSA fds
     HDF_LOGI("%{public}s adding %{public}zu ALSA fds to epoll", __func__, ctx->pfds.size());
@@ -520,10 +523,8 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
 
 MidiDriverController *MidiDriverController::GetInstance()
 {
-    if (g_instance == nullptr) {
-        g_instance = new MidiDriverController();
-    }
-    return g_instance;
+    static MidiDriverController instance;
+    return &instance;
 }
 
 void MidiDriverController::CleanupRemovedDevices(const std::vector<DeviceInfo> &oldDeviceList)
