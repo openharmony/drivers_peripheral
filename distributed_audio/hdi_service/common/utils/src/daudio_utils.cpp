@@ -35,6 +35,17 @@ constexpr size_t INT32_PLAINTEXT_LENGTH = 4;
 constexpr size_t INT32_MIN_ID_LENGTH = 3;
 constexpr uint8_t MAX_KEY_DH_ID_LEN = 20;
 
+int32_t SetThreadPriority(int32_t priority)
+{
+    struct sched_param threadParam;
+    threadParam.sched_priority = priority;
+    if (sched_setscheduler(0, SCHED_FIFO, &threadParam) != 0) {
+        DHLOGE("Set thread priority failed");
+        return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
+    }
+    return DH_SUCCESS;
+}
+
 std::string GetAnonyString(const std::string &value)
 {
     std::string res;

@@ -117,7 +117,9 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     DHLOGD("Render frame[sampleRate: %{public}u, channelCount: %{public}u, format: %{public}d, "
         "frameSize: %{public}u, renderId: %{public}d].",
         devAttrs_.sampleRate, devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize, renderId_);
-
+    if (SetThreadPriority(1) != HDF_SUCCESS) {
+        DHLOGE("Set thread priority failed.");
+    }
     int64_t startTime = GetNowTimeUs();
     std::lock_guard<std::mutex> renderLck(renderMtx_);
     if (renderStatus_ != RENDER_STATUS_START) {
