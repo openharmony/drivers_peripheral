@@ -173,7 +173,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
     // 允许fuzz输入自定义分辨率（50%概率）
     if (GetBoolFromData(data, size, 6) && size >= 12) { // offset 6, 随机数size > 12
         width = GetUint32FromData(data, size, 7, 176, 7680); // offset 7, width range 176-7680
-        height = GetUint32FromData(data, size, 11, 144, 4320); // offset 8, height range 144-4320
+        height = GetUint32FromData(data, size, 11, 144, 4320); // offset 11, height range 144-4320
     }
 
     // 获取HDI工厂实例
@@ -219,7 +219,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
         if (codecStandard == Standard::HEVC) {
             profile = (data[24] % 2 == 0) ? 3 : 4;  // 24: offset, HEVC_PROFILE_MAIN=3, HEVC_PROFILE_MAIN_10=4
         } else {
-            profile = data[24] % 3;  // 24: offset, AVC_PROFILE_BASELINE=0, AVC_PROFILE_MAIN=1, AVC_PROFILE_HIGH=2
+            profile = data[24] % 3;  // 24: offset, 3: 3个profile
         }
         param->Set(KEY_PROFILE, profile);
 
@@ -294,7 +294,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
         inputInfo.offset = 0;
         // offset: 33 + frame % 20, min: 128, max: width * height * 2
         inputInfo.filledLen = GetUint32FromData(data, size, 33 + frame % 20, 128, width * height * 2);
-        inputInfo.pts = frame * (1000000 / (frameRate > 0 ? frameRate : 30));  // 1000000: 根据帧率计算准确时间戳, 30: 默认
+        inputInfo.pts = frame * (1000000 / (frameRate > 0 ? frameRate : 30)); // 1000000: 根据帧率计算准确时间戳, 30: 默认
         if (iFrameInterval != 0) {
             inputInfo.flag = (frame == 0 || (frame % iFrameInterval == 0 && isEncoder)) ? 1 : 0;
         }
@@ -319,7 +319,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
             outputInfo.id = outputId;
             outputInfo.offset = 0;
             outputInfo.filledLen = 0;
-            outputInfo.pts = frame * (1000000 / (frameRate > 0 ? frameRate : 30));
+            outputInfo.pts = frame * (1000000 / (frameRate > 0 ? frameRate : 30)); // 1000000: 根据帧率计算准确时间戳, 30: 默认
             outputInfo.flag = 0;
             outputInfo.alongParam = nullptr;
             outputInfo.fence = nullptr;
