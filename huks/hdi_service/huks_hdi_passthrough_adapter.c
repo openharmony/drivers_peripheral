@@ -329,6 +329,10 @@ int32_t HuksReleaseCoreEngine(void)
     }
 
     HalDestroyHandle halDestroyHandle = (HalDestroyHandle)dlsym(g_coreEngineHandle, "HuksDestoryHdiDevicePtr");
+    if (halDestroyHandle == NULL) {
+        HDF_LOGE("HUKS halDestroyHandle is NULL!");
+        return HUKS_ERROR_NULL_POINTER;
+    }
     (*halDestroyHandle)(g_coreEngine);
     g_coreEngine = NULL;
 
