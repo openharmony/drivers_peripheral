@@ -244,7 +244,7 @@ bool EnDecodeFuzzer(const uint8_t *data, size_t size)
     for (uint32_t i = 0; i < inputBufferCount; ++i) {
         HdiBufferAllocInfo info {};
         info.isImage = isEncoder;
-        info.capacity = width * height * 3 / 2; // 1.5倍wxh
+        info.capacity = width * height * 3 / 2; // 3 / 2: 1.5倍wxh
         info.width = width;
         info.height = height;
         info.format = 0;  // 使用默认格式
