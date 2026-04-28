@@ -41,10 +41,6 @@ if (defined(ohos_lite)) {
     ]
     sources = [ "vibrator_if_service.cpp" ]
 
-    if (drivers_peripheral_vibrator_feature_tv_flag) {
-      defines = ["TV_FLAG"]
-    }
-
     cflags = [
       "-Wall",
       "-Wextra",

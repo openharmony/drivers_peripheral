@@ -79,12 +79,20 @@ int32_t SensorIfService::GetSensorVdiImpl()
 {
     struct OHOS::HDI::Sensor::V1_1::WrapperSensorVdi *wrapperSensorVdi = nullptr;
     uint32_t version = 0;
-    HDF_LOGI("%{public}s: start HdfLoadVdi(%{public}s)", __func__, HDI_SENSOR_VDI_LIBNAME);
-    vdi_ = HdfLoadVdi(HDI_SENSOR_VDI_LIBNAME);
-    HDF_LOGI("%{public}s: finish HdfLoadVdi(%{public}s)", __func__, HDI_SENSOR_VDI_LIBNAME);
-    if (vdi_ == nullptr || vdi_->vdiBase == nullptr) {
-        HDF_LOGE("%{public}s: load sensor vdi failed", __func__);
-        return HDF_FAILURE;
+    HDF_LOGI("%{public}s: start HdfLoadVdi(%{public}s)", __func__, HDI_SENSOR_PRODUCT_VDI_LIBNAME);
+    vdi_ = HdfLoadVdi(HDI_SENSOR_PRODUCT_VDI_LIBNAME);
+    if (vdi_ != nullptr && vdi_->vdiBase != nullptr) {
+        HDF_LOGI("%{public}s: loaded product sensor vdi", __func__);
+        GetSensorProductMode() = true;
+    } else {
+        HDF_LOGI("%{public}s: load product sensor vdi failed, try HdfLoadVdi(%{public}s)", __func__,
+                 HDI_SENSOR_VDI_LIBNAME);
+        vdi_ = HdfLoadVdi(HDI_SENSOR_VDI_LIBNAME);
+        if (vdi_ == nullptr || vdi_->vdiBase == nullptr) {
+            HDF_LOGE("%{public}s: load sensor vdi failed", __func__);
+            return HDF_FAILURE;
+        }
+        GetSensorProductMode() = false;
     }
 
     version = HdfGetVdiVersion(vdi_);
@@ -194,11 +202,12 @@ int32_t SensorIfService::SetBatchConfig(const SensorHandle &sensorHandle, int64_
                                         int64_t reportInterval)
 {
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetBatch");
-#ifdef TV_FLAG
-    int32_t ret = sensorVdiImplV1_1_->SetBatch(sensorHandle, samplingInterval, reportInterval);
-#else
-    int32_t ret = sensorVdiImplV1_1_->SetBatch(sensorHandle.sensorType, samplingInterval, reportInterval);
-#endif
+    int32_t ret;
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->SetBatch(sensorHandle, samplingInterval, reportInterval);
+    } else {
+        ret = sensorVdiImplV1_1_->SetBatch(sensorHandle.sensorType, samplingInterval, reportInterval);
+    }
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {
@@ -226,13 +235,14 @@ void SensorIfService::UpdateSensorModeConfig(const SensorHandle &sensorHandle, i
                                                              saSensorInterval.reportInterval);
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
-#ifdef TV_FLAG
-    int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, saSensorInterval.samplingInterval,
-                                                 saSensorInterval.reportInterval);
-#else
-    int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, saSensorInterval.samplingInterval,
-                                                 saSensorInterval.reportInterval);
-#endif
+    int32_t ret;
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, saSensorInterval.samplingInterval,
+                                             saSensorInterval.reportInterval);
+    } else {
+        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, saSensorInterval.samplingInterval,
+                                             saSensorInterval.reportInterval);
+    }
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {
@@ -396,11 +406,12 @@ void SensorIfService::DisableUnusedSensors(int serviceId)
 void SensorIfService::DisableSensorHandle(const SensorHandle &sensorHandle)
 {
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Disable");
-#ifdef TV_FLAG
-    int32_t ret = sensorVdiImplV1_1_->Disable(sensorHandle);
-#else
-    int32_t ret = sensorVdiImplV1_1_->Disable(sensorHandle.sensorType);
-#endif
+    int32_t ret;
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->Disable(sensorHandle);
+    } else {
+        ret = sensorVdiImplV1_1_->Disable(sensorHandle.sensorType);
+    }
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {
@@ -488,11 +499,7 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
                 continue;
             }
             SENSOR_TRACE_START("sensorVdiImplV1_1_->Unregister");
-#ifdef TV_FLAG
             ret = sensorVdiImplV1_1_->Unregister(groupId, sensorCb);
-#else
-            ret = sensorVdiImplV1_1_->Unregister(groupId, sensorCb);
-#endif
             SENSOR_TRACE_FINISH;
             if (ret != SENSOR_SUCCESS) {
                 HDF_LOGE("%{public}s: Unregister failed, error code is %{public}d", __func__, ret);
@@ -530,13 +537,14 @@ void SensorIfService::SetNewBatch(const SensorHandle sensorHandle)
                                                                  sensorInterval.reportInterval);
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
-#ifdef TV_FLAG
-    int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, sensorInterval.samplingInterval,
-                                                 sensorInterval.reportInterval);
-#else
-    int32_t ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, sensorInterval.samplingInterval,
-                                                 sensorInterval.reportInterval);
-#endif
+    int32_t ret;
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, sensorInterval.samplingInterval,
+                                             sensorInterval.reportInterval);
+    } else {
+        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, sensorInterval.samplingInterval,
+                                             sensorInterval.reportInterval);
+    }
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {
@@ -566,11 +574,11 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
     int32_t ret = SENSOR_SUCCESS;
     if (SensorClientsManager::GetInstance()->IsExistSdcSensorEnable(sensorHandle)) {
         SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
-#ifdef TV_FLAG
-        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, REPORT_INTERVAL, REPORT_INTERVAL);
-#else
-        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, REPORT_INTERVAL, REPORT_INTERVAL);
-#endif
+        if (GetSensorProductMode()) {
+            ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, REPORT_INTERVAL, REPORT_INTERVAL);
+        } else {
+            ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, REPORT_INTERVAL, REPORT_INTERVAL);
+        }
         SENSOR_TRACE_FINISH;
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetSaBatch failed, error code is %{public}d, sensorHandle = %{public}s, serviceId = "
@@ -582,11 +590,11 @@ int32_t SensorIfService::DisableSensor(const SensorHandle sensorHandle, uint32_t
         return HDF_SUCCESS;
     }
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Disable");
-#ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->Disable(sensorHandle);
-#else
-    ret = sensorVdiImplV1_1_->Disable(sensorHandle.sensorType);
-#endif
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->Disable(sensorHandle);
+    } else {
+        ret = sensorVdiImplV1_1_->Disable(sensorHandle.sensorType);
+    }
     SENSOR_TRACE_FINISH;
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, serviceId = %{public}d",
@@ -648,12 +656,12 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<V3_0::HdfSensorInformation
         sensorInfo.firmwareVersion = it.firmwareVersion;
         sensorInfo.hardwareVersion = it.hardwareVersion;
         sensorInfo.maxRange = it.maxRange;
-#ifdef TV_FLAG
-        sensorInfo.deviceSensorInfo = {it.sensorHandle.deviceId, it.sensorHandle.sensorType, it.sensorHandle.sensorId,
-                                       it.sensorHandle.location};
-#else
-        sensorInfo.deviceSensorInfo = {DEFAULT_DEVICE_ID, it.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
-#endif
+        if (GetSensorProductMode()) {
+            sensorInfo.deviceSensorInfo = {it.sensorHandle.deviceId, it.sensorHandle.sensorType,
+                                           it.sensorHandle.sensorId, it.sensorHandle.location};
+        } else {
+            sensorInfo.deviceSensorInfo = {DEFAULT_DEVICE_ID, it.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
+        }
         sensorInfo.accuracy = it.accuracy;
         sensorInfo.power = it.power;
         sensorInfo.minDelay = it.minDelay;
@@ -690,11 +698,11 @@ int32_t SensorIfService::Enable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo&
     SensorClientsManager::GetInstance()->OpenSensor(sensorHandle, serviceId);
     int32_t ret = HDF_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
-#ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->Enable(sensorHandle);
-#else
-    ret = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
-#endif
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->Enable(sensorHandle);
+    } else {
+        ret = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
+    }
     SENSOR_TRACE_FINISH;
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, serviceId = %{public}d",
@@ -754,11 +762,11 @@ int32_t SensorIfService::SetMode(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo
 
     int32_t ret = HDF_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetMode");
-#ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->SetMode(sensorHandle, mode);
-#else
-    ret = sensorVdiImplV1_1_->SetMode(sensorHandle.sensorType, mode);
-#endif
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->SetMode(sensorHandle, mode);
+    } else {
+        ret = sensorVdiImplV1_1_->SetMode(sensorHandle.sensorType, mode);
+    }
     SENSOR_TRACE_FINISH;
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s SetMode failed, error code is %{public}d", __func__, ret);
@@ -783,11 +791,12 @@ int32_t SensorIfService::SetOption(const OHOS::HDI::Sensor::V3_0::DeviceSensorIn
     }
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetOption");
-#ifdef TV_FLAG
-    int32_t ret = sensorVdiImplV1_1_->SetOption(sensorHandle, option);
-#else
-    int32_t ret = sensorVdiImplV1_1_->SetOption(sensorHandle.sensorType, option);
-#endif
+    int32_t ret;
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->SetOption(sensorHandle, option);
+    } else {
+        ret = sensorVdiImplV1_1_->SetOption(sensorHandle.sensorType, option);
+    }
     SENSOR_TRACE_FINISH;
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s SetOption failed, error code is %{public}d", __func__, ret);
@@ -982,11 +991,11 @@ int32_t SensorIfService::EnableSdcSensor(uint32_t serviceId, const SensorHandle&
     }
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
-#ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->Enable(sensorHandle);
-#else
-    ret = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
-#endif
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->Enable(sensorHandle);
+    } else {
+        ret = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
+    }
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {
@@ -1010,11 +1019,11 @@ int32_t SensorIfService::DisableSdcSensor(uint32_t serviceId, const SensorHandle
     SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorHandle, samplingInterval, reportInterval);
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
-#ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, samplingInterval, reportInterval);
-#else
-    ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, samplingInterval, reportInterval);
-#endif
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, samplingInterval, reportInterval);
+    } else {
+        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, samplingInterval, reportInterval);
+    }
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {
@@ -1046,14 +1055,14 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<V3_0::SdcSensorInfo>& sdcS
     for (auto infoVdi : sdcSensorInfoVdi1_1) {
         V3_0::SdcSensorInfo info;
         info.offset = infoVdi.offset;
-#ifdef TV_FLAG
-        info.deviceSensorInfo = {infoVdi.sensorHandle.deviceId, infoVdi.sensorHandle.sensorType,
-                                 infoVdi.sensorHandle.sensorId,
-                                 infoVdi.sensorHandle.location};
-#else
-        info.deviceSensorInfo = {DEFAULT_DEVICE_ID, infoVdi.sensorId, DEFAULT_SENSOR_ID,
-                                 DEFAULT_LOCATION};
-#endif
+        if (GetSensorProductMode()) {
+            info.deviceSensorInfo = {infoVdi.sensorHandle.deviceId, infoVdi.sensorHandle.sensorType,
+                                     infoVdi.sensorHandle.sensorId,
+                                     infoVdi.sensorHandle.location};
+        } else {
+            info.deviceSensorInfo = {DEFAULT_DEVICE_ID, infoVdi.sensorId, DEFAULT_SENSOR_ID,
+                                     DEFAULT_LOCATION};
+        }
         info.ddrSize = infoVdi.ddrSize;
         info.minRateLevel = infoVdi.minRateLevel;
         info.maxRateLevel = infoVdi.maxRateLevel;
@@ -1088,11 +1097,7 @@ int32_t SensorIfService::RegisterAsync(int32_t groupId, const sptr<V3_0::ISensor
             return HDF_FAILURE;
         }
         SENSOR_TRACE_START("sensorVdiImplV1_1_->Register");
-#ifdef TV_FLAG
         ret = sensorVdiImplV1_1_->Register(groupId, sensorCb);
-#else
-        ret = sensorVdiImplV1_1_->Register(groupId, sensorCb);
-#endif
         SENSOR_TRACE_FINISH;
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s Register failed, error code is %{public}d", __func__, ret);
@@ -1126,12 +1131,12 @@ int32_t SensorIfService::GetDeviceSensorInfo(int32_t deviceId, std::vector<V3_0:
 
     int32_t ret = SENSOR_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->GetAllSensorInfo");
-#ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->GetDeviceSensorInfo(deviceId, sensorInfoVdi);
-#else
-    HDF_LOGI("%{public}s:not support", __func__);
-    ret = SENSOR_SUCCESS;
-#endif
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->GetDeviceSensorInfo(deviceId, sensorInfoVdi);
+    } else {
+        HDF_LOGI("%{public}s:not support", __func__);
+        ret = SENSOR_SUCCESS;
+    }
     SENSOR_TRACE_FINISH;
 
     if (sensorInfoVdi.empty()) {
@@ -1145,12 +1150,12 @@ int32_t SensorIfService::GetDeviceSensorInfo(int32_t deviceId, std::vector<V3_0:
         sensorInfo.firmwareVersion = it.firmwareVersion;
         sensorInfo.hardwareVersion = it.hardwareVersion;
         sensorInfo.maxRange = it.maxRange;
-#ifdef TV_FLAG
-        sensorInfo.deviceSensorInfo = {it.sensorHandle.deviceId, it.sensorHandle.sensorType, it.sensorHandle.sensorId,
-                                       it.sensorHandle.location};
-#else
-        sensorInfo.deviceSensorInfo = {DEFAULT_DEVICE_ID, it.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
-#endif
+        if (GetSensorProductMode()) {
+            sensorInfo.deviceSensorInfo = {it.sensorHandle.deviceId, it.sensorHandle.sensorType, it.sensorHandle.sensorId,
+                                           it.sensorHandle.location};
+        } else {
+            sensorInfo.deviceSensorInfo = {DEFAULT_DEVICE_ID, it.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
+        }
         sensorInfo.accuracy = it.accuracy;
         sensorInfo.power = it.power;
         sensorInfo.minDelay = it.minDelay;
@@ -1171,12 +1176,12 @@ int32_t SensorIfService::RegSensorPlugCallBack(const sptr<V3_0::ISensorPlugCallb
 
     int32_t ret = SENSOR_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->RegSensorPlugCallBack");
-#ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->RegSensorPlugCallBack(callbackObj);
-#else
-    HDF_LOGI("%{public}s:not support", __func__);
-    ret = SENSOR_SUCCESS;
-#endif
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->RegSensorPlugCallBack(callbackObj);
+    } else {
+        HDF_LOGI("%{public}s:not support", __func__);
+        ret = SENSOR_SUCCESS;
+    }
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {
@@ -1195,12 +1200,12 @@ int32_t SensorIfService::UnRegSensorPlugCallBack(const sptr<V3_0::ISensorPlugCal
 
     int32_t ret = SENSOR_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->UnRegSensorPlugCallBack");
-#ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->UnRegSensorPlugCallBack(callbackObj);
-#else
-    HDF_LOGI("%{public}s:not support", __func__);
-    ret = SENSOR_SUCCESS;
-#endif
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->UnRegSensorPlugCallBack(callbackObj);
+    } else {
+        HDF_LOGI("%{public}s:not support", __func__);
+        ret = SENSOR_SUCCESS;
+    }
     SENSOR_TRACE_FINISH;
 
     if (ret != SENSOR_SUCCESS) {
@@ -1237,11 +1242,11 @@ int32_t SensorIfService::EnableWithCallbackId(const OHOS::HDI::Sensor::V3_0::Dev
     SensorClientsManager::GetInstance()->OpenSensor(sensorHandle, callbackId);
     int32_t ret = HDF_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
-#ifdef TV_FLAG
-    ret = sensorVdiImplV1_1_->Enable(sensorHandle);
-#else
-    ret = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
-#endif
+    if (GetSensorProductMode()) {
+        ret = sensorVdiImplV1_1_->Enable(sensorHandle);
+    } else {
+        ret = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
+    }
     SENSOR_TRACE_FINISH;
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, callbackId = %{public}d",
