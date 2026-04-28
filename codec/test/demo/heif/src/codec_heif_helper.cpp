@@ -247,6 +247,17 @@ bool HeifEncoderHelper::AssembleParamForOtherImg(uint32_t primaryImgId)
             .from = itemAuxlImg.id,
             .to = {primaryImgId}
         });
+        if (encodeOpt_.xmpForAuxiliary.length() > 0) {
+            MetaItem metaXmpAux;
+            IF_TRUE_RETURN_VAL(!FillMetaItem(encodeOpt_.xmpForAuxiliary, XMP_DATA, metaXmpAux), false);
+            inputMetas_.emplace_back(metaXmpAux);
+            refs_.emplace_back(ItemRef {
+                .type = CDSC,
+                .auxType = "",
+                .from = metaXmpAux.id,
+                .to = {itemAuxlImg.id}
+            });
+        }
     }
     if (encodeOpt_.thumbnailImgPath.length() > 0) {
         ImageItem itemThmbImg;
@@ -258,6 +269,17 @@ bool HeifEncoderHelper::AssembleParamForOtherImg(uint32_t primaryImgId)
             .from = itemThmbImg.id,
             .to = {primaryImgId}
         });
+        if (encodeOpt_.xmpForThumbnail.length() > 0) {
+            MetaItem metaXmpThumb;
+            IF_TRUE_RETURN_VAL(!FillMetaItem(encodeOpt_.xmpForThumbnail, XMP_DATA, metaXmpThumb), false);
+            inputMetas_.emplace_back(metaXmpThumb);
+            refs_.emplace_back(ItemRef {
+                .type = CDSC,
+                .auxType = "",
+                .from = metaXmpThumb.id,
+                .to = {itemThmbImg.id}
+            });
+        }
     }
     return true;
 }
@@ -279,6 +301,17 @@ bool HeifEncoderHelper::AssembleParamForTmap()
         .from = itemTmap.id,
         .to = {itemPrimaryImg.id, itemGainMap.id}
     });
+    if (encodeOpt_.xmpForGainMap.length() > 0) {
+        MetaItem metaXmpGainMap;
+        IF_TRUE_RETURN_VAL(!FillMetaItem(encodeOpt_.xmpForGainMap, XMP_DATA, metaXmpGainMap), false);
+        inputMetas_.emplace_back(metaXmpGainMap);
+        refs_.emplace_back(ItemRef {
+            .type = CDSC,
+            .auxType = "",
+            .from = metaXmpGainMap.id,
+            .to = {itemGainMap.id}
+        });
+    }
     if (AssembleParamForOtherImg(itemPrimaryImg.id)) {
         return AssembleParamForMetaData(itemPrimaryImg.id);
     }
@@ -312,6 +345,9 @@ bool HeifEncoderHelper::FillMetaItem(const string& metaFile, MetaType type, Meta
     } else if (type == EXIF_DATA) {
         static constexpr char EXIF_LABEL[] = "exif";
         item.itemName = EXIF_LABEL;
+    } else if (type == XMP_DATA) {
+        static constexpr char XMP_LABEL[] = "xmp";
+        item.itemName = XMP_LABEL;
     }
     item.data = bufferHelper_.CreateSharedBuffer(metaFile);
     return (item.data.fd >= 0);
@@ -341,6 +377,17 @@ bool HeifEncoderHelper::AssembleParamForMetaData(uint32_t primaryImgId)
             .type = CDSC,
             .auxType = "",
             .from = metaUserData.id,
+            .to = {primaryImgId}
+        });
+    }
+    if (encodeOpt_.xmpForPrimary.length() > 0) {
+        MetaItem metaXmpPrimary;
+        IF_TRUE_RETURN_VAL(!FillMetaItem(encodeOpt_.xmpForPrimary, XMP_DATA, metaXmpPrimary), false);
+        inputMetas_.emplace_back(metaXmpPrimary);
+        refs_.emplace_back(ItemRef {
+            .type = CDSC,
+            .auxType = "",
+            .from = metaXmpPrimary.id,
             .to = {primaryImgId}
         });
     }

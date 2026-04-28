@@ -74,10 +74,10 @@ void ShowUsage()
     std::cout << " --help               help info." << std::endl;
     std::cout << " --isEncoder          codec type. 0: decoder, 1: encoder" << std::endl;
     std::cout << "Heif Hardware encode Demo Options:" << std::endl;
-    std::cout << " --primaryImg         full path for primary image file." << std::endl;
-    std::cout << " --auxiliaryImg       (optional) full path for auxiliary image file." << std::endl;
-    std::cout << " --thumbnailImg       (optional) full path for thumbnail image file." << std::endl;
-    std::cout << " --gainMap            (optional) full path for gainMap file." << std::endl;
+    std::cout << " --primaryImg         full path for primary image file. Optional: append XMP with comma (e.g., image.yuv,xmp.xml)" << std::endl;
+    std::cout << " --auxiliaryImg       (optional) full path for auxiliary image file. Optional: append XMP with comma" << std::endl;
+    std::cout << " --thumbnailImg       (optional) full path for thumbnail image file. Optional: append XMP with comma" << std::endl;
+    std::cout << " --gainMap            (optional) full path for gainMap file. Optional: append XMP with comma" << std::endl;
     std::cout << " --exifData           (optional) full path for exifData file." << std::endl;
     std::cout << " --userData           (optional) full path for userData file." << std::endl;
     std::cout << " --iccProfile         (optional) full path for iccProfile file." << std::endl;
@@ -97,16 +97,52 @@ static void AnalyzeParamForEncoder(ShortOption c, CommandOpt& opt)
 {
     switch (c) {
         case ShortOption::OPT_PRIMARY_IMG:
-            opt.primaryImgPath = string(optarg);
+            {
+                string param(optarg);
+                size_t commaPos = param.find(',');
+                if (commaPos != string::npos) {
+                    opt.primaryImgPath = param.substr(0, commaPos);
+                    opt.xmpForPrimary = param.substr(commaPos + 1);
+                } else {
+                    opt.primaryImgPath = param;
+                }
+            }
             break;
         case ShortOption::OPT_AUXILIARY_IMG:
-            opt.auxiliaryImgPath = string(optarg);
+            {
+                string param(optarg);
+                size_t commaPos = param.find(',');
+                if (commaPos != string::npos) {
+                    opt.auxiliaryImgPath = param.substr(0, commaPos);
+                    opt.xmpForAuxiliary = param.substr(commaPos + 1);
+                } else {
+                    opt.auxiliaryImgPath = param;
+                }
+            }
             break;
         case ShortOption::OPT_THUMBNAIL_IMG:
-            opt.thumbnailImgPath = string(optarg);
+            {
+                string param(optarg);
+                size_t commaPos = param.find(',');
+                if (commaPos != string::npos) {
+                    opt.thumbnailImgPath = param.substr(0, commaPos);
+                    opt.xmpForThumbnail = param.substr(commaPos + 1);
+                } else {
+                    opt.thumbnailImgPath = param;
+                }
+            }
             break;
         case ShortOption::OPT_GAIN_MAP:
-            opt.gainMapPath = string(optarg);
+            {
+                string param(optarg);
+                size_t commaPos = param.find(',');
+                if (commaPos != string::npos) {
+                    opt.gainMapPath = param.substr(0, commaPos);
+                    opt.xmpForGainMap = param.substr(commaPos + 1);
+                } else {
+                    opt.gainMapPath = param;
+                }
+            }
             break;
         case ShortOption::OPT_EXIF_DATA:
             opt.exifDataPath = string(optarg);
@@ -220,6 +256,10 @@ void CommandOpt::PrintEncoderParam() const
     std::cout << " thumbnailImgPath : " << thumbnailImgPath << endl;
     std::cout << "      gainMapPath : " << gainMapPath << endl;
     std::cout << "     exifDataPath : " << exifDataPath << endl;
+    std::cout << "    xmpForPrimary : " << xmpForPrimary << endl;
+    std::cout << "  xmpForAuxiliary : " << xmpForAuxiliary << endl;
+    std::cout << "  xmpForThumbnail : " << xmpForThumbnail << endl;
+    std::cout << "    xmpForGainMap : " << xmpForGainMap << endl;
     std::cout << "     userDataPath : " << userDataPath << endl;
     std::cout << "   iccProfilePath : " << iccProfilePath << endl;
     std::cout << "         it35Path : " << it35Path << endl;
