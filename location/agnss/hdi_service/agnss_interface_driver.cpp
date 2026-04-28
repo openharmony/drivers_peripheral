@@ -15,8 +15,8 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
+#include "agnss_hdf_log.h"
 #include "v2_1/agnss_interface_stub.h"
 
 using namespace OHOS::HDI::Location::Agnss::V2_1;
