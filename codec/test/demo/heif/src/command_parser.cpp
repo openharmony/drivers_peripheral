@@ -74,10 +74,14 @@ void ShowUsage()
     std::cout << " --help               help info." << std::endl;
     std::cout << " --isEncoder          codec type. 0: decoder, 1: encoder" << std::endl;
     std::cout << "Heif Hardware encode Demo Options:" << std::endl;
-    std::cout << " --primaryImg         full path for primary image file. Optional: append XMP with comma (e.g., image.yuv,xmp.xml)" << std::endl;
-    std::cout << " --auxiliaryImg       (optional) full path for auxiliary image file. Optional: append XMP with comma" << std::endl;
-    std::cout << " --thumbnailImg       (optional) full path for thumbnail image file. Optional: append XMP with comma" << std::endl;
-    std::cout << " --gainMap            (optional) full path for gainMap file. Optional: append XMP with comma" << std::endl;
+    std::cout << " --primaryImg         full path for primary image file. Optional:
+        append XMP with comma (e.g., image.yuv,xmp.xml)" << std::endl;
+    std::cout << " --auxiliaryImg       (optional) full path for auxiliary image file. Optional:
+        append XMP with comma" << std::endl;
+    std::cout << " --thumbnailImg       (optional) full path for thumbnail image file. Optional:
+        append XMP with comma" << std::endl;
+    std::cout << " --gainMap            (optional) full path for gainMap file. Optional:
+        append XMP with comma" << std::endl;
     std::cout << " --exifData           (optional) full path for exifData file." << std::endl;
     std::cout << " --userData           (optional) full path for userData file." << std::endl;
     std::cout << " --iccProfile         (optional) full path for iccProfile file." << std::endl;
