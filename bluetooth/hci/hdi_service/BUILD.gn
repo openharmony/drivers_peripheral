@@ -34,10 +34,6 @@ ohos_shared_library("libhci_interface_service_1.0") {
     "$root_path/implement",
   ]
 
-  if (drivers_peripheral_bluetooth_mac_update) {
-    defines = [ "BT_MAC_UPDATE" ]
-  }
-
   sources = [
     "$root_path/hci_interface_impl.cpp",
     "$root_path/implement/bluetooth_address.cpp",
@@ -62,6 +58,14 @@ ohos_shared_library("libhci_interface_service_1.0") {
   } else {
     external_deps = [ "hilog:libhilog",
       "hitrace:hitrace_meter" ]
+  }
+
+  if (drivers_peripheral_bluetooth_mac_update) {
+    defines = [ 
+      "BT_MAC_UPDATE",
+      "BLUETOOTH_PLUGGABLE_SUPPORTED"
+    ]
+    external_deps += [ "init:libbegetutil" ]
   }
 
   install_images = [ chipset_base_dir ]
@@ -103,15 +107,47 @@ ohos_shared_library("libbluetooth_hci_hdi_driver") {
 
   external_deps += [ "drivers_interface_bluetooth:libbluetooth_hci_stub_1.0" ]
 
+  if (drivers_peripheral_bluetooth_mac_update) {
+    defines = [ "BLUETOOTH_PLUGGABLE_SUPPORTED" ]
+    external_deps += [ "init:libbegetutil" ]
+  }
+
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_bluetooth"
 }
 
-group("hdi_bluetooth_hci_service") {
-  deps = [
-    ":libbluetooth_hci_hdi_driver",
-    ":libhci_interface_service_1.0",
-  ]
+if (drivers_peripheral_bluetooth_mac_update) {
+  ohos_prebuilt_etc("blue_host.para") {
+    source = "param/blue_host.para"
+    relative_install_dir = "param"
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_bluetooth"
+  }
+
+  ohos_prebuilt_etc("blue_host.para.dac") {
+    source = "param/blue_host.para.dac"
+    relative_install_dir = "param"
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_bluetooth"
+  }
+
+  group("hdi_bluetooth_hci_service") {
+    deps = [
+      ":libbluetooth_hci_hdi_driver",
+      ":libhci_interface_service_1.0",
+      ":blue_host.para",
+      ":blue_host.para.dac",
+    ]
+  }
+} else {
+  group("hdi_bluetooth_hci_service") {
+    deps = [
+      ":libbluetooth_hci_hdi_driver",
+      ":libhci_interface_service_1.0",
+    ]
+  }
 }
