@@ -57,7 +57,6 @@ SensorClientsManager::~SensorClientsManager()
 {
     clients_.clear();
     sensorUsed_.clear();
-    sensorBatchUsed_.clear();
     sensorConfig_.clear();
     sdcSensorConfig_.clear();
 }
@@ -413,11 +412,10 @@ bool SensorClientsManager::IsNeedCloseSensor(SensorHandle sensorHandle, int serv
         HDF_LOGD("%{public}s: disabled sensorHandle %{public}s", __func__, SENSOR_HANDLE_TO_C_STR(sensorHandle));
         return true;
     }
-    std::string services;
     for (auto sid : sensorUsed_[sensorHandle]) {
-        services += std::to_string(sid) + " ";
+        HDF_LOGD("%{public}s: sensorHandle %{public}s also is enable by service %{public}d", __func__,
+                 SENSOR_HANDLE_TO_C_STR(sensorHandle), sid);
     }
-    HDF_LOGD("%{public}s: remain: %{public}s", __func__, services.c_str());
     return false;
 }
 
@@ -567,7 +565,7 @@ void SensorClientsManager::DeleteClientSenSorConfig(SensorHandle sensorHandle, i
     auto &client = clients_[groupId].find(serviceId)->second;
     auto sensorConfigIt = client.sensorConfigMap_.find(sensorHandle);
     if (sensorConfigIt != client.sensorConfigMap_.end()) {
-        HDF_LOGD("%{public}s: service %{public}d erase sensorHandle %{public}s config", __func__, serviceId,
+        HDF_LOGI("%{public}s: service %{public}d erase sensorHandle %{public}s config", __func__, serviceId,
                  SENSOR_HANDLE_TO_C_STR(sensorHandle));
         client.sensorConfigMap_.erase(sensorConfigIt);
     }
@@ -636,13 +634,13 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
 std::set<int32_t> SensorClientsManager::GetServiceIds(SensorHandle sensorHandle)
 {
     SENSOR_TRACE;
-    std::unique_lock<std::mutex> lock(sensorBatchUsedMutex_);
-    if (sensorBatchUsed_.find(sensorHandle) == sensorBatchUsed_.end()) {
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
+    if (sensorUsed_.find(sensorHandle) == sensorUsed_.end()) {
         HDF_LOGD("%{public}s sensorHandle %{public}s is not enabled by anyone", __func__,
                  SENSOR_HANDLE_TO_C_STR(sensorHandle));
         return std::set<int32_t>();
     }
-    return sensorBatchUsed_.find(sensorHandle)->second;
+    return sensorUsed_.find(sensorHandle)->second;
 }
 
 std::string SensorClientsManager::ReportEachClient(const V3_0::HdfSensorEvents& event)
@@ -733,12 +731,6 @@ std::unordered_map<SensorHandle, std::set<int32_t>> SensorClientsManager::GetSen
     return sensorUsed_;
 }
 
-std::unordered_map<SensorHandle, std::set<int32_t>> SensorClientsManager::GetSensorBatchUsed()
-{
-    std::unique_lock<std::mutex> lock(sensorBatchUsedMutex_);
-    return sensorBatchUsed_;
-}
-
 void SensorClientsManager::ReSetSensorPrintTime(SensorHandle sensorHandle)
 {
     SENSOR_TRACE;
@@ -761,63 +753,6 @@ bool SensorClientsManager::IsSensorNeedPrint(SensorHandle sensorHandle)
     }
     it->second++;
     return true;
-}
-
-void SensorClientsManager::AddServiceToBatchUsed(SensorHandle sensorHandle, int serviceId)
-{
-    SENSOR_TRACE_PID;
-    std::unique_lock<std::mutex> lock(sensorBatchUsedMutex_);
-    auto it = sensorBatchUsed_.find(sensorHandle);
-    if (it == sensorBatchUsed_.end()) {
-        std::set<int> service = {serviceId};
-        sensorBatchUsed_.emplace(sensorHandle, service);
-        HDF_LOGD("%{public}s: service: %{public}d added to sensorBatchUsed_ for sensorHandle %{public}s", __func__,
-                 serviceId, SENSOR_HANDLE_TO_C_STR(sensorHandle));
-        return;
-    }
-    auto service = sensorBatchUsed_[sensorHandle].find(serviceId);
-    if (service == sensorBatchUsed_[sensorHandle].end()) {
-        sensorBatchUsed_[sensorHandle].insert(serviceId);
-        HDF_LOGD("%{public}s: service: %{public}d added to sensorBatchUsed_ for sensorHandle %{public}s", __func__,
-                 serviceId, SENSOR_HANDLE_TO_C_STR(sensorHandle));
-    }
-}
-
-void SensorClientsManager::RemoveServiceFromBatchUsed(SensorHandle sensorHandle, int serviceId)
-{
-    SENSOR_TRACE_PID;
-    std::unique_lock<std::mutex> lock(sensorBatchUsedMutex_);
-    auto it = sensorBatchUsed_.find(sensorHandle);
-    if (it == sensorBatchUsed_.end()) {
-        HDF_LOGD("%{public}s: sensorHandle %{public}s not found in sensorBatchUsed_", __func__,
-                 SENSOR_HANDLE_TO_C_STR(sensorHandle));
-        return;
-    }
-    sensorBatchUsed_[sensorHandle].erase(serviceId);
-    if (sensorBatchUsed_[sensorHandle].empty()) {
-        sensorBatchUsed_.erase(sensorHandle);
-        HDF_LOGD("%{public}s: sensorHandle %{public}s removed from sensorBatchUsed_", __func__,
-                 SENSOR_HANDLE_TO_C_STR(sensorHandle));
-    } else {
-        std::string services;
-        for (auto sid : sensorBatchUsed_[sensorHandle]) {
-            services += std::to_string(sid) + " ";
-        }
-        HDF_LOGI("remain: %{public}s", services.c_str());
-    }
-}
-
-std::set<int32_t> SensorClientsManager::GetBatchUsedServices(SensorHandle sensorHandle)
-{
-    SENSOR_TRACE_PID;
-    std::unique_lock<std::mutex> lock(sensorBatchUsedMutex_);
-    auto it = sensorBatchUsed_.find(sensorHandle);
-    if (it == sensorBatchUsed_.end()) {
-        HDF_LOGD("%{public}s: sensorHandle %{public}s not found in sensorBatchUsed_", __func__,
-                 SENSOR_HANDLE_TO_C_STR(sensorHandle));
-        return std::set<int32_t>();
-    }
-    return sensorBatchUsed_.find(sensorHandle)->second;
 }
 
 SensorClientsManager* SensorClientsManager::GetInstance()
