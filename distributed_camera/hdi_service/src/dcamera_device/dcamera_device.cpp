@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -405,6 +405,7 @@ int32_t DCameraDevice::Close()
         unique_lock<mutex> lock(isOpenSessFailedlock_);
         isOpenSessFailed_ = false;
     }
+    openSessNotified_.store(false);
     isOpened_ = false;
     return CamRetCode::NO_ERROR;
 }
@@ -422,6 +423,8 @@ CamRetCode DCameraDevice::OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &c
         DHLOGE("Get distributed camera provider instance is null.");
         return CamRetCode::DEVICE_ERROR;
     }
+    DHLOGI("DCameraDevice::OpenDCamera, distributed camera: %{public}s", GetAnonyString(dCameraId_).c_str());
+    openSessNotified_.store(false);
     int32_t ret = provider->OpenSession(dhBase_);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("Open distributed camera control session failed, ret = %{public}d.", ret);
@@ -429,8 +432,10 @@ CamRetCode DCameraDevice::OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &c
     }
 
     unique_lock<mutex> lock(openSesslock_);
-    auto st = openSessCV_.wait_for(lock, chrono::seconds(WAIT_OPEN_TIMEOUT_SEC));
-    if (st == cv_status::timeout) {
+    auto st = openSessCV_.wait_for(lock, chrono::seconds(WAIT_OPEN_TIMEOUT_SEC), [this]() {
+        return openSessNotified_.load();
+    });
+    if (!st) {
         DHLOGE("Wait for distributed camera session open timeout.");
         return CamRetCode::DEVICE_ERROR;
     }
@@ -613,6 +618,7 @@ void DCameraDevice::IsOpenSessFailedState(bool state)
         unique_lock<mutex> lock(isOpenSessFailedlock_);
         isOpenSessFailed_ = state;
     }
+    openSessNotified_.store(true);
     openSessCV_.notify_one();
 }
 
