@@ -78,7 +78,7 @@ IAM_STATIC bool StreamWriteGlobalConfig(Buffer *parcel, GlobalConfigInfo *config
 
 IAM_STATIC bool CheckGlobalConfigType(int32_t type)
 {
-    if (type != PIN_EXPIRED_PERIOD && type != ENABLE_STATUS) {
+    if (type != PIN_EXPIRED_PERIOD && type != ENABLE_STATUS && type != PIN_ALGO_TYPE) {
         LOG_ERROR("skip type %{public}d, and delete the globalConfig", type);
         return false;
     }

@@ -77,11 +77,13 @@ typedef struct {
 enum GlobalConfigTypeHal : int32_t {
     PIN_EXPIRED_PERIOD = 1,
     ENABLE_STATUS = 2,
+    PIN_ALGO_TYPE = 3,
 };
 
 union GlobalConfigValueHal {
     int64_t pinExpiredPeriod;
     bool enableStatus;
+    uint32_t pinAlgoType;
 };
 
 typedef struct {

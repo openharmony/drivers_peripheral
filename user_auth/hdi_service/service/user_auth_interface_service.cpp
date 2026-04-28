@@ -1902,6 +1902,8 @@ FAIL:
 
 static int32_t CopyGlobalConfigParam(const HdiGlobalConfigParam &param, GlobalConfigParamHal &paramHal)
 {
+    const int32_t pinAlgoAes = 3;
+    const int32_t pinAlgoSM4 = 4;
     switch (param.type) {
         case PIN_EXPIRED_PERIOD:
             paramHal.value.pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
@@ -1912,11 +1914,21 @@ static int32_t CopyGlobalConfigParam(const HdiGlobalConfigParam &param, GlobalCo
         case ENABLE_STATUS:
             paramHal.value.enableStatus = param.value.enableStatus;
             break;
+        case pinAlgoAes:
+            paramHal.value.pinAlgoType = 0;
+            break;
+        case pinAlgoSM4:
+            paramHal.value.pinAlgoType = 1;
+            break;
         default:
             IAM_LOGE("bad global config type");
             return RESULT_BAD_PARAM;
     }
-    paramHal.type = static_cast<GlobalConfigTypeHal>(param.type);
+    if (param.type == pinAlgoAes || param.type == pinAlgoSM4) {
+        paramHal.type = GlobalConfigTypeHal::PIN_ALGO_TYPE;
+    } else {
+        paramHal.type = static_cast<GlobalConfigTypeHal>(param.type);
+    }
 
     for (uint32_t i = 0; i < param.userIds.size(); i++) {
         paramHal.userIds[i] = param.userIds[i];

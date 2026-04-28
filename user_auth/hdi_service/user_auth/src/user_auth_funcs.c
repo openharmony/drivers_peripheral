@@ -460,7 +460,8 @@ ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlo
 ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param)
 {
     if (param == NULL || param->userIdNum > MAX_USER || param->authTypeNum > MAX_AUTH_TYPE_LEN ||
-        param->authTypeNum == 0 || (param->type != PIN_EXPIRED_PERIOD && param->type != ENABLE_STATUS)) {
+        param->authTypeNum == 0 || (param->type != PIN_EXPIRED_PERIOD && param->type != ENABLE_STATUS &&
+        param->type != PIN_ALGO_TYPE)) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }

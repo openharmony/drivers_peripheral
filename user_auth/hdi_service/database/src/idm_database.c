@@ -1347,6 +1347,9 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
         case ENABLE_STATUS:
             g_globalConfigArray[infoIndex].value.enableStatus = param->value.enableStatus;
             break;
+        case PIN_ALGO_TYPE:
+            g_globalConfigArray[infoIndex].value.pinAlgoType = param->value.pinAlgoType;
+            break;
         default:
             LOG_ERROR("globalConfigType not support, type:%{public}d.", param->type);
             return RESULT_BAD_PARAM;
