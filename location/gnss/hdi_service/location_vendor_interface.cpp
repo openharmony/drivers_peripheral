@@ -16,8 +16,7 @@
 #include "location_vendor_interface.h"
 
 #include <dlfcn.h>
-#include <hdf_log.h>
-
+#include "gnss_hdf_log.h"
 #include "gnss_interface_impl.h"
 
 namespace OHOS {

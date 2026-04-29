@@ -16,11 +16,10 @@
 #include "gnss_interface_impl.h"
 
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include <iproxy_broker.h>
 #include <mutex>
 #include <unordered_map>
-
+#include "gnss_hdf_log.h"
 #include "idevmgr_hdi.h"
 
 #include "location_vendor_interface.h"

@@ -15,8 +15,8 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
+#include "geofence_hdf_log.h"
 #include "v2_0/geofence_interface_stub.h"
 
 using namespace OHOS::HDI::Location::Geofence::V2_0;
