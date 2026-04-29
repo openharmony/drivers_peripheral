@@ -93,6 +93,7 @@ private:
         snd_rawmidi_t *rawmidi = nullptr;
         std::vector<struct pollfd> pfds;
         sptr<IMidiCallback> dataCallback;
+        // NOT protected by mutex_ -- safety relies on thread lifecycle (join barrier)
         std::shared_ptr<UmpProcessor> processor;
         std::thread thread;
         int eventFd = -1; // 用于唤醒 epoll
@@ -100,6 +101,7 @@ private:
         
     struct OutputContext {
         snd_rawmidi_t *rawmidi = nullptr;
+        std::shared_ptr<UmpProcessor> processor;
     };
     void InputThreadLoop(std::shared_ptr<InputContext> ctx);
     void ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t bufferSize);
@@ -117,8 +119,14 @@ class EpollHandler {
 public:
     EpollHandler()
     {
-        epollFd_ = ::epoll_create1(0);
+        epollFd_ = ::epoll_create1(EPOLL_CLOEXEC);
     }
+
+    bool init()
+    {
+        return epollFd_ != InvaildFD;
+    }
+
     ~EpollHandler()
     {
         finalize();

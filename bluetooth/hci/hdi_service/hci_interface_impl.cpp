@@ -18,6 +18,9 @@
 #include <hdf_log.h>
 #include <iproxy_broker.h>
 #include "vendor_interface.h"
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
+#include "parameter.h"
+#endif
 
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN
@@ -31,6 +34,13 @@ namespace Hci {
 namespace V1_0 {
 using VendorInterface = OHOS::HDI::Bluetooth::Hci::V1_0::VendorInterface;
 using HciPacketType = OHOS::HDI::Bluetooth::Hci::HciPacketType;
+
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
+namespace {
+const char* BLUETOOTH_EMPLACE_ENABLE_STATE = "bluetooth.emplace_enable.state";
+const char* BLUETOOTH_EMPLACE_NO_NEED_ENABLE_BT = "0";
+}
+#endif
 
 extern "C" IHciInterface *HciInterfaceImplGetInstance(void)
 {
@@ -58,6 +68,9 @@ int32_t HciInterfaceImpl::Init(const sptr<IHciCallback>& callbackObj)
         HDF_LOGE("HciInterfaceImpl %{public}s callbackObj null", __func__);
         return HDF_FAILURE;
     }
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
+    SetParameter(BLUETOOTH_EMPLACE_ENABLE_STATE, BLUETOOTH_EMPLACE_NO_NEED_ENABLE_BT);
+#endif
 
     AddHciDeathRecipient(callbackObj);
     callbacks_ = callbackObj;

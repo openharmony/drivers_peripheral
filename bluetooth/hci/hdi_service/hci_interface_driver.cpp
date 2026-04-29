@@ -18,6 +18,11 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/hci_interface_stub.h"
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
+#include "file_ex.h"
+#include "parameter.h"
+#include "param_wrapper.h"
+#endif
 
 using namespace OHOS::HDI::Bluetooth::Hci::V1_0;
 
@@ -25,6 +30,17 @@ using namespace OHOS::HDI::Bluetooth::Hci::V1_0;
 #undef LOG_DOMAIN
 #endif
 #define LOG_DOMAIN 0xD000105
+
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
+namespace {
+const std::string BLUETOOTH_CHIP_UNSUPPORTED_PATH = "/proc/connectivity/wifi_chip_no_support";
+const char* BLUETOOTH_PLUGGABLE_STATE = "persist.bluetooth.pluggable.state";
+const char* BLUETOOTH_PLUGGABLE_STATE_EXTRACT = "0";
+const char* BLUETOOTH_PLUGGABLE_STATE_EMPLACE = "1";
+const char* BLUETOOTH_EMPLACE_ENABLE_STATE = "bluetooth.emplace_enable.state";
+const char* BLUETOOTH_EMPLACE_NEED_ENABLE_BT = "1";
+}
+#endif
 
 struct HdfHciInterfaceHost {
     struct IDeviceIoService ioService;
@@ -59,10 +75,42 @@ static int32_t HciInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int 
     return hdfHciInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
+static bool IsBluetoothSupported()
+{
+    std::string content;
+    bool res = LoadStringFromFile(BLUETOOTH_CHIP_UNSUPPORTED_PATH, content);
+    return !(res && content == "1"); // 蓝牙模组不在位才将节点写为“1”
+}
+
+static bool CheckNeedAutoEnableBluetooth()
+{
+    std::string persistState = BLUETOOTH_PLUGGABLE_STATE_EXTRACT;
+    int32_t res = system::GetStringParameter(BLUETOOTH_PLUGGABLE_STATE, persistState,
+        BLUETOOTH_PLUGGABLE_STATE_EXTRACT);
+    if (res != 0) {
+        HDF_LOGE("%{public}s: read last Bt supported state failed, res: %{public}d", __func__, res);
+    }
+    bool lastBtSupportedState = (res == 0 && persistState == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
+    bool curBtSupportedState = IsBluetoothSupported();
+    SetParameter(BLUETOOTH_PLUGGABLE_STATE, curBtSupportedState ?
+        BLUETOOTH_PLUGGABLE_STATE_EMPLACE : BLUETOOTH_PLUGGABLE_STATE_EXTRACT);
+    if (!lastBtSupportedState && curBtSupportedState) {
+        return true;
+    }
+    return false;
+}
+#endif
+
 static int HdfHciInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     (void)deviceObject;
     HDF_LOGI("HdfHciInterfaceDriverInit enter");
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
+    if (CheckNeedAutoEnableBluetooth()) {
+        SetParameter(BLUETOOTH_EMPLACE_ENABLE_STATE, BLUETOOTH_EMPLACE_NEED_ENABLE_BT);
+    }
+#endif
     return HDF_SUCCESS;
 }
 

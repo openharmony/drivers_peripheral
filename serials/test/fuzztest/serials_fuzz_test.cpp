@@ -59,7 +59,7 @@ T GetData()
 {
     T object {};
     size_t objectSize = sizeof(object);
-    if (g_data == nullptr || objectSize > g_dataSize - g_pos) {
+    if (g_data == nullptr || g_pos >= g_dataSize || objectSize > g_dataSize - g_pos) {
         return object;
     }
     errno_t ret = memcpy_s(&object, objectSize, g_data + g_pos, objectSize);
@@ -104,7 +104,7 @@ static sptr<ISerialDevice> GetFuzzDevice(FuzzedDataProvider& provider, sptr<ISer
         return device;
     }
 
-    int32_t index = provider.ConsumeIntegral<int32_t>() % static_cast<int32_t>(devices.size());
+    int32_t index = std::abs(provider.ConsumeIntegral<int32_t>()) % static_cast<int32_t>(devices.size());
     SerialConfig config = GetFuzzConfig(provider);
     callback = new SerialDeviceCallbackFuzz();
     sptr<ISerialDevice> device;

@@ -37,15 +37,10 @@ namespace {
     constexpr int32_t MAX_WORK_BUFFER_WORDS = 256;
     constexpr size_t WORK_BUFFER_SIZE = sizeof(uint32_t) * MAX_WORK_BUFFER_WORDS;
     constexpr uint8_t UMP_MT_SYSTEM = 0x1;
-    constexpr uint8_t UMP_MT_CHANNEL_VOICE = 0x2;
     constexpr uint32_t UMP_SHIFT_MT = 28;
     constexpr uint32_t UMP_SHIFT_STATUS = 16;
-    constexpr uint32_t UMP_SHIFT_DATA1 = 8;
     constexpr uint32_t UMP_MASK_NIBBLE = 0xF;
     constexpr uint32_t UMP_MASK_BYTE = 0xFF;
-    constexpr uint8_t STATUS_PROG_CHANGE = 0xC0;
-    constexpr uint8_t STATUS_CHAN_PRESSURE = 0xD0;
-    constexpr uint8_t STATUS_MASK_CMD = 0xF0;
     constexpr uint8_t MIDI_TIMING_CLOCK = 0xF8;
     constexpr int64_t NSEC_PER_SEC = 1000000000;
     constexpr int32_t MIDI_BYTE_HEX_WIDTH = 2;
@@ -177,67 +172,6 @@ static std::vector<MidiDeviceInfo> MakeMidiDeviceInfos(const std::vector<DeviceI
     return devices;
 }
 
-static void ConvertUmpToMidi1(const uint32_t* umpData, size_t count, std::vector<uint8_t>& midi1Bytes)
-{
-    for (size_t i = 0; i < count; ++i) {
-        uint32_t ump = umpData[i];
-        uint8_t mt = (ump >> UMP_SHIFT_MT) & UMP_MASK_NIBBLE; // Message Type
-
-        if (mt == UMP_MT_CHANNEL_VOICE) {
-            // Type 2: MIDI 1.0 Channel Voice Messages (32-bit)
-            // Format: [4b MT][4b Group][4b Status][4b Channel] [8b Note/Data1][8b Vel/Data2]
-            // Note: In UMP, Status includes Channel. UMP: 0x2GSCDD
-            uint8_t status = (ump >> UMP_SHIFT_STATUS) & UMP_MASK_BYTE;
-            uint8_t data1 = (ump >> UMP_SHIFT_DATA1) & UMP_MASK_BYTE;
-            uint8_t data2 = ump & UMP_MASK_BYTE;
-            uint8_t cmd = status & STATUS_MASK_CMD;
-
-            midi1Bytes.push_back(status);
-            
-            // Program Change (0xC0) and Channel Pressure (0xD0) are 2 bytes
-            if (cmd == STATUS_PROG_CHANGE || cmd == STATUS_CHAN_PRESSURE) {
-                midi1Bytes.push_back(data1);
-            } else {
-                // Note On, Note Off, Poly Pressure, Control Change, Pitch Bend are 3 bytes
-                midi1Bytes.push_back(data1);
-                midi1Bytes.push_back(data2);
-            }
-        } else if (mt == UMP_MT_SYSTEM) {
-            // Type 1: System Common / Real Time Messages (32-bit)
-            // Format: [4b MT][4b Group][8b Status][8b Data1][8b Data2]
-            uint8_t status = (ump >> UMP_SHIFT_STATUS) & UMP_MASK_BYTE;
-            uint8_t data1 = (ump >> UMP_SHIFT_DATA1) & UMP_MASK_BYTE;
-            uint8_t data2 = ump & UMP_MASK_BYTE;
-
-            midi1Bytes.push_back(status);
-
-            switch (status) {
-                case 0xF1: // MIDI Time Code Quarter Frame (2 bytes)
-                case 0xF3: // Song Select (2 bytes)
-                    midi1Bytes.push_back(data1);
-                    break;
-                case 0xF2: // Song Position Pointer (3 bytes)
-                    midi1Bytes.push_back(data1);
-                    midi1Bytes.push_back(data2);
-                    break;
-                case 0xF6: // Tune Request (1 byte)
-                case 0xF8: // Timing Clock (1 byte)
-                case 0xFA: // Start (1 byte)
-                case 0xFB: // Continue (1 byte)
-                case 0xFC: // Stop (1 byte)
-                case 0xFE: // Active Sensing (1 byte)
-                case 0xFF: // Reset (1 byte)
-                    // No data bytes
-                    break;
-                default:
-                    // 0xF0 (Sysex Start) and 0xF7 (Sysex End) are handled in Type 3 usually,
-                    // but simple 1-packet sysex might appear here.
-                    break;
-            }
-        }
-    }
-}
-
 static int64_t GetCurNano()
 {
     int64_t result = -1; // -1 for bad result.
@@ -251,8 +185,6 @@ static int64_t GetCurNano()
     result = (time.tv_sec * NSEC_PER_SEC) + time.tv_nsec;
     return result;
 }
-
-static MidiDriverController *g_instance = nullptr;
 
 Midi1Device::~Midi1Device()
 {
@@ -343,7 +275,7 @@ int32_t Midi1Device::OpenInputPort(uint32_t portId, const sptr<IMidiCallback> &c
     }
 
     std::vector<struct pollfd> pfds {static_cast<std::size_t>(count)};
-    ::snd_rawmidi_poll_descriptors(rawmidi, &pfds[0], POLLIN);
+    ::snd_rawmidi_poll_descriptors(rawmidi, &pfds[0], count);
     auto ctx = std::make_shared<InputContext>();
     ctx->quit = false;
     ctx->rawmidi = rawmidi;
@@ -424,7 +356,8 @@ int32_t Midi1Device::OpenOutputPort(uint32_t portId)
 
     const auto& portInfo = info_.outputPorts[portId];
     auto ctx = std::make_shared<OutputContext>();
-    
+    ctx->processor = std::make_shared<UmpProcessor>();
+
     std::string hwname = MakeHwName(portInfo.card, portInfo.device, portInfo.subdevice);
     if (snd_rawmidi_open(nullptr, &ctx->rawmidi, hwname.c_str(), 0) < 0) {
         HDF_LOGE("Midi1Device: Failed to open output rawmidi");
@@ -442,8 +375,9 @@ int32_t Midi1Device::CloseOutputPort(uint32_t portId)
         HDF_LOGI("%{public}s output port %{public}u not found, already closed", __func__, portId);
         return HDF_SUCCESS;
     }
-    
+
     if (it->second->rawmidi) snd_rawmidi_close(it->second->rawmidi);
+    it->second->processor = nullptr;
     outputs_.erase(it);
     return HDF_SUCCESS;
 }
@@ -457,9 +391,19 @@ int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMes
         return HDF_FAILURE;
     }
 
+    if (it->second->processor == nullptr) {
+        HDF_LOGE("%{public}s processor is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
     for (const auto& msg : messages) {
         std::vector<uint8_t> midi1Buffer;
-        ConvertUmpToMidi1(msg.data.data(), msg.data.size(), midi1Buffer);
+        it->second->processor->ProcessUmp(msg.data.data(), msg.data.size(),
+            [&midi1Buffer](const uint8_t* data, size_t len) {
+                for (size_t i = 0; i < len; ++i) {
+                    midi1Buffer.push_back(data[i]);
+                }
+            });
         if (!midi1Buffer.empty()) {
             int64_t written = ::snd_rawmidi_write(it->second->rawmidi, midi1Buffer.data(), midi1Buffer.size());
             if (written < 0) {
@@ -485,13 +429,14 @@ void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* 
     if (!midiStream.str().empty()) {
         HDF_LOGI("%{public}s midiStream 1.0: %{public}s", __func__, midiStream.str().c_str());
     }
-    if (ctx->processor == nullptr) {
+    auto processor = ctx->processor;
+    if (processor == nullptr) {
         HDF_LOGE("%{public}s processor is nullptr, setting quit flag", __func__);
         ctx->quit = true;
         return;
     }
     std::vector<UmpPacket> results;
-    ctx->processor->ProcessBytes(buffer, static_cast<size_t>(bufferSize), [&](const UmpPacket &p) {
+    processor->ProcessBytes(buffer, static_cast<size_t>(bufferSize), [&](const UmpPacket &p) {
         results.push_back(p);
     });
     HDF_LOGD("%{public}s processed %{public}zu UMP packets", __func__, results.size());
@@ -527,6 +472,10 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
 {
     HDF_LOGI("%{public}s enter, deviceId: %{public}" PRId64, __func__, info_.deviceId);
     EpollHandler epoll;
+    if (!epoll.init()) {
+        HDF_LOGE("%{public}s epoll create failed", __func__);
+        return;
+    }
     struct epoll_event event[ctx->pfds.size() + 1]; // +1 for eventFd
     // Add ALSA fds
     HDF_LOGI("%{public}s adding %{public}zu ALSA fds to epoll", __func__, ctx->pfds.size());
@@ -574,10 +523,8 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
 
 MidiDriverController *MidiDriverController::GetInstance()
 {
-    if (g_instance == nullptr) {
-        g_instance = new MidiDriverController();
-    }
-    return g_instance;
+    static MidiDriverController instance;
+    return &instance;
 }
 
 void MidiDriverController::CleanupRemovedDevices(const std::vector<DeviceInfo> &oldDeviceList)
