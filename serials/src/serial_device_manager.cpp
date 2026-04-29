@@ -106,9 +106,6 @@ int32_t SerialDeviceManager::Deinit()
 
 void SerialDeviceManager::OnUeventReceived(const SerialUeventInfo& info)
 {
-    HDF_LOGI("%{public}s: action=%{public}s, devName=%{public}s, subSystem=%{public}s",
-        __func__, info.action.c_str(), info.devName.c_str(), info.subSystem.c_str());
-
     if (info.action.empty() || info.devName.empty()) {
         return;
     }
@@ -116,7 +113,8 @@ void SerialDeviceManager::OnUeventReceived(const SerialUeventInfo& info)
     if (info.action != "remove" && info.devType != "usb_device") {
         return;
     }
-
+    HDF_LOGI("%{public}s: action=%{public}s, devName=%{public}s, subSystem=%{public}s",
+        __func__, info.action.c_str(), info.devName.c_str(), info.subSystem.c_str());
     std::lock_guard<std::mutex> lock(mutex_);
     std::string portName = "/dev/" + info.devName;
     auto elem = openDevices_.find(portName);
@@ -196,7 +194,7 @@ void SerialDeviceManager::AddNormalSerialDevice(std::vector<SerialDeviceInfo>& d
 {
     auto elem = supportTtyhws_.find(fullPath);
     if (elem == supportTtyhws_.end()) {
-        HDF_LOGW("not support this device:%{public}s!", fullPath.c_str());
+        HDF_LOGD("not support this device:%{public}s!", fullPath.c_str());
         return;
     }
     struct stat st;

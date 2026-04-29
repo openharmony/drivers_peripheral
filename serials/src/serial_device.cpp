@@ -311,15 +311,27 @@ int32_t SerialDevice::SetBaudRateInternal(struct termios& options)
 
     for (size_t i = 0; i < sizeof(baudTable) / sizeof(baudTable[0]); i++) {
         if (currentConfig_.baudRate == baudTable[i].baud) {
-            cfsetispeed(&options, baudTable[i].speed);
-            cfsetospeed(&options, baudTable[i].speed);
+            if (cfsetispeed(&options, baudTable[i].speed) < 0) {
+                HDF_LOGE("cfsetispeed:%{public}d failed!", currentConfig_.baudRate);
+                return HDF_FAILURE;
+            }
+            if (cfsetospeed(&options, baudTable[i].speed) < 0) {
+                HDF_LOGE("cfsetospeed:%{public}d failed!", currentConfig_.baudRate);
+                return HDF_FAILURE;
+            }
             return HDF_SUCCESS;
         }
     }
     options.c_cflag &= ~CBAUD;
     options.c_cflag |= BOTHER;
-    cfsetispeed(&options, currentConfig_.baudRate);
-    cfsetospeed(&options, currentConfig_.baudRate);
+    if (cfsetispeed(&options, currentConfig_.baudRate) < 0) {
+        HDF_LOGE("cfsetispeed:%{public}d failed!", currentConfig_.baudRate);
+        return HDF_FAILURE;
+    }
+    if (cfsetospeed(&options, currentConfig_.baudRate) < 0) {
+        HDF_LOGE("cfsetospeed:%{public}d failed!", currentConfig_.baudRate);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
