@@ -80,6 +80,7 @@ typedef enum AudioExtParamEvent {
     HDF_AUDIO_EVENT_WAUDIO_ENABLE = 32,
     HDF_AUDIO_SET_TASK_ID = 33,
     HDF_AUDIO_ZONE_ID_CHANGE = 34,
+    HDF_AUDIO_EVENT_ENHANC = 35,
 } EXT_PARAM_EVENT;
 
 typedef enum AudioVolumeEvent {
