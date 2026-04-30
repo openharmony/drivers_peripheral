@@ -172,7 +172,40 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, const SensorHandle se
 
     UpdateSensorModeConfig(sensorHandle, mode, saSensorInterval, sdcSensorInterval);
 
+    if (mode == SA) {
+        int32_t enableRet = EnableSensorInternal(sensorHandle, serviceId);
+        if (enableRet != HDF_SUCCESS) {
+            return enableRet;
+        }
+    }
+
     return ret;
+}
+
+int32_t SensorIfService::EnableSensorInternal(const SensorHandle sensorHandle, int32_t serviceId)
+{
+    SensorClientsManager::GetInstance()->ReSetSensorPrintTime(sensorHandle);
+    if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, serviceId, ENABLE_SENSOR)) {
+        return HDF_SUCCESS;
+    }
+
+    SensorClientsManager::GetInstance()->OpenSensor(sensorHandle, serviceId);
+    int32_t enableRet = HDF_FAILURE;
+    SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
+#ifdef TV_FLAG
+    enableRet = sensorVdiImplV1_1_->Enable(sensorHandle);
+#else
+    enableRet = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
+#endif
+    SENSOR_TRACE_FINISH;
+    if (enableRet != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s Enable failed, error code is %{public}d, sensorHandle = %{public}s, "
+                 "serviceId = %{public}d",
+                 __func__, enableRet, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
+        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, serviceId, DISABLE_SENSOR);
+    }
+
+    return enableRet;
 }
 
 void SensorIfService::AdjustSensorConfig(const SensorHandle &sensorHandle, SensorInterval &sensorInterval,
@@ -660,17 +693,12 @@ int32_t SensorIfService::Enable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo&
     HDF_LOGI("%{public}s:%{public}s pid %{public}d", __func__,
              SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
-    SensorClientsManager::GetInstance()->ReSetSensorPrintTime(sensorHandle);
-    if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, serviceId, ENABLE_SENSOR)) {
-        return HDF_SUCCESS;
-    }
 
     if (sensorVdiImplV1_1_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
     }
 
-    SensorClientsManager::GetInstance()->OpenSensor(sensorHandle, serviceId);
     int32_t ret = HDF_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
 #ifdef TV_FLAG
@@ -682,7 +710,6 @@ int32_t SensorIfService::Enable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo&
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, serviceId = %{public}d",
                  __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
-        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, serviceId, DISABLE_SENSOR);
     }
 
     return ret;
@@ -1207,17 +1234,12 @@ int32_t SensorIfService::EnableWithCallbackId(const OHOS::HDI::Sensor::V3_0::Dev
         return HDF_ERR_INVALID_PARAM;
     }
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
-    SensorClientsManager::GetInstance()->ReSetSensorPrintTime(sensorHandle);
-    if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, callbackId, ENABLE_SENSOR)) {
-        return HDF_SUCCESS;
-    }
 
     if (sensorVdiImplV1_1_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
     }
 
-    SensorClientsManager::GetInstance()->OpenSensor(sensorHandle, callbackId);
     int32_t ret = HDF_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
 #ifdef TV_FLAG
@@ -1229,7 +1251,6 @@ int32_t SensorIfService::EnableWithCallbackId(const OHOS::HDI::Sensor::V3_0::Dev
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, callbackId = %{public}d",
                  __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), callbackId);
-        SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorHandle, callbackId, DISABLE_SENSOR);
     }
 
     return ret;

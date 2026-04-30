@@ -98,6 +98,7 @@ private:
     bool RemoveCallbackFromMap(int32_t groupId, const sptr<IRemoteObject> &iRemoteObject);
     void DisableUnusedSensors(int serviceId);
     void DisableSensorHandle(const SensorHandle &sensorHandle);
+    int32_t EnableSensorInternal(const SensorHandle sensorHandle, int32_t serviceId);
     sptr<SensorCallbackVdi> GetSensorCb(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj, bool cbFlag);
     void VoteEnable(const SensorHandle sensorHandle, uint32_t serviceId, bool& enabled);
     void VoteInterval(const SensorHandle sensorHandle, uint32_t serviceId, int64_t &samplingInterval, bool &enabled);
