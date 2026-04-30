@@ -162,11 +162,14 @@ bool CompareBuffer(const Buffer *buffer1, const Buffer *buffer2)
         return false;
     }
 
-    if (memcmp(buffer1->buf, buffer2->buf, buffer1->contentSize) == 0) {
-        return true;
+    bool result = true;
+    for (size_t i = 0; i < buffer1->contentSize; i++) {
+        if (buffer1->buf[i] != buffer2->buf[i]) {
+            result = false;
+        }
     }
 
-    return false;
+    return result;
 }
 
 ResultCode GetBufferData(const Buffer *buffer, uint8_t *data, uint32_t *dataSize)
