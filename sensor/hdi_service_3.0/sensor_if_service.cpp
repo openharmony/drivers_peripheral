@@ -1151,8 +1151,8 @@ int32_t SensorIfService::GetDeviceSensorInfo(int32_t deviceId, std::vector<V3_0:
         sensorInfo.hardwareVersion = it.hardwareVersion;
         sensorInfo.maxRange = it.maxRange;
         if (GetSensorProductMode()) {
-            sensorInfo.deviceSensorInfo = {it.sensorHandle.deviceId, it.sensorHandle.sensorType, it.sensorHandle.sensorId,
-                                           it.sensorHandle.location};
+            sensorInfo.deviceSensorInfo = {it.sensorHandle.deviceId, it.sensorHandle.sensorType,
+                                           it.sensorHandle.sensorId, it.sensorHandle.location};
         } else {
             sensorInfo.deviceSensorInfo = {DEFAULT_DEVICE_ID, it.sensorId, DEFAULT_SENSOR_ID, DEFAULT_LOCATION};
         }
