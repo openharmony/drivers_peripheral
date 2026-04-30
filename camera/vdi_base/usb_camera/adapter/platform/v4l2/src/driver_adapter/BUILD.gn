@@ -49,6 +49,7 @@ ohos_shared_library("usb_camera_v4l2_adapter") {
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/src/v4l2_fileformat.cpp",
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/src/v4l2_stream.cpp",
     "$camera_path_vdi/dump/src/camera_dump.cpp",
+    "$camera_path_vdi/../common/utils/src/usb_device_filter.cpp",
     "src/v4l2_uvc.cpp",
   ]
 
@@ -57,6 +58,7 @@ ohos_shared_library("usb_camera_v4l2_adapter") {
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/include",
     "$camera_path_vdi/dump/include",
     "$camera_path_vdi/../interfaces",
+    "$camera_path_vdi/../common/utils/src",
   ]
 
   external_deps = [
@@ -67,6 +69,7 @@ ohos_shared_library("usb_camera_v4l2_adapter") {
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
   ]
   public_configs = [ ":v4l2_config" ]

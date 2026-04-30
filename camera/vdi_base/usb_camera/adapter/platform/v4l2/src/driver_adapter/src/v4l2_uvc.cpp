@@ -20,6 +20,7 @@
 #include "v4l2_fileformat.h"
 #include "v4l2_dev.h"
 #include "v4l2_uvc.h"
+#include "usb_device_filter.h"
 
 constexpr int NAME_START_POS = 2;
 
@@ -122,6 +123,15 @@ static std::string GetCameraDevNameByCap(struct v4l2_capability& cap)
 
 void HosV4L2UVC::V4L2UvcMatchDev(const std::string name, const std::string v4l2Device, bool inOut)
 {
+    // USB device filter: check if this device should be blocked
+    if (inOut) {
+        if (UsbDeviceFilter::GetInstance().IsBlockedByVideoPath(v4l2Device)) {
+            CAMERA_LOGI("UVC:V4L2UvcMatchDev device %{public}s is blocked by USB filter, skipping\n",
+                v4l2Device.c_str());
+            return;
+        }
+    }
+
     std::pair<std::map<std::string, std::string>::iterator, bool> iter;
     constexpr uint32_t nameSize = 128;
     char devName[nameSize] = {0};
