@@ -30,9 +30,29 @@
 
 namespace OHOS::Camera {
 
+// Static member initialization for uevent processing
+std::map<std::string, std::string> UsbDeviceFilter::usbInterfaceProductMap_;
+std::mutex UsbDeviceFilter::usbInterfaceMapLock_;
+
 namespace {
 constexpr uint8_t HEX_DIGIT_SHIFT = 4;
 constexpr uint8_t HEX_DIGIT_OFFSET = 10;
+
+// Helper: get value from uevent buffer
+static const char* GetUeventValue(const char* key, const char* str, int len)
+{
+    if (key == nullptr || str == nullptr || len <= 0 || static_cast<int>(strlen(key)) > len) {
+        return nullptr;
+    }
+    const char* pos = strstr(str, key);
+    if (pos == nullptr) {
+        return nullptr;
+    }
+    if (pos + strlen(key) - str > len) {
+        return nullptr;
+    }
+    return pos + strlen(key);
+}
 } // anonymous namespace
 
 UsbDeviceFilter& UsbDeviceFilter::GetInstance()
@@ -198,8 +218,178 @@ bool UsbDeviceFilter::IsBlockedByVideoPath(const std::string& videoPath)
     }
 
     // Log VID/PID for every detected USB camera for debugging
-    CAMERA_LOGI("USB camera detected: VID=0x%{public}04x, PID=0x%{public}04x", vid, pid);
+    CAMERA_LOGI("USB camera detected (sysfs): VID=0x%{public}04x, PID=0x%{public}04x", vid, pid);
     return IsBlocked(vid, pid);
+}
+
+std::pair<uint16_t, uint16_t> UsbDeviceFilter::ParseProductString(const std::string& product)
+{
+    // Parse PRODUCT format: "vid/pid/bcd" (e.g. "46d/825/12", "1908/2311/100")
+    if (product.empty()) {
+        return {0, 0};
+    }
+
+    size_t firstSlash = product.find('/');
+    size_t secondSlash = product.find('/', firstSlash + 1);
+    if (firstSlash == std::string::npos || secondSlash == std::string::npos) {
+        CAMERA_LOGW("Invalid PRODUCT format: %{public}s", product.c_str());
+        return {0, 0};
+    }
+
+    std::string vidStr = product.substr(0, firstSlash);
+    std::string pidStr = product.substr(firstSlash + 1, secondSlash - firstSlash - 1);
+
+    uint16_t vid = HexToUint16(vidStr);
+    uint16_t pid = HexToUint16(pidStr);
+    if (vid == 0 && pid == 0) {
+        CAMERA_LOGD("Could not parse VID/PID from PRODUCT %{public}s", product.c_str());
+    }
+
+    return {vid, pid};
+}
+
+bool UsbDeviceFilter::IsBlockedByProduct(const std::string& product)
+{
+    auto [vid, pid] = ParseProductString(product);
+    if (vid == 0 && pid == 0) {
+        CAMERA_LOGD("Could not parse VID/PID from PRODUCT %{public}s", product.c_str());
+        return false;
+    }
+
+    CAMERA_LOGI("USB camera detected (uevent): VID=0x%{public}04x, PID=0x%{public}04x", vid, pid);
+    return IsBlocked(vid, pid);
+}
+
+// === Uevent processing static functions ===
+
+std::string UsbDeviceFilter::ParseUeventAction(char* buf, unsigned int len)
+{
+    if (buf == nullptr || len == 0) {
+        return "";
+    }
+    uint32_t lineLen = strlen(buf);
+    uint32_t pos = 0;
+    while (pos + lineLen < len && lineLen) {
+        const char* retVal = GetUeventValue("ACTION=", buf + pos, lineLen);
+        if (retVal != nullptr) {
+            return std::string(retVal);
+        }
+        pos += lineLen + 1;
+        lineLen = strlen(buf + pos);
+    }
+    // Fallback: extract from first line format "action@/path"
+    const char* atPos = strchr(buf, '@');
+    if (atPos != nullptr && atPos > buf) {
+        return std::string(buf, atPos - buf);
+    }
+    return "";
+}
+
+bool UsbDeviceFilter::CheckUeventField(char* buf, unsigned int len, const std::string& field)
+{
+    if (buf == nullptr || len == 0) {
+        return false;
+    }
+    uint32_t lineLen = strlen(buf);
+    uint32_t pos = 0;
+    while (pos + lineLen < len && lineLen) {
+        if (strstr(buf + pos, field.c_str()) == buf + pos) {
+            return true;
+        }
+        pos += lineLen + 1;
+        lineLen = strlen(buf + pos);
+    }
+    return false;
+}
+
+std::string UsbDeviceFilter::ParseUeventDevPath(char* buf, unsigned int len)
+{
+    if (buf == nullptr || len == 0) {
+        return "";
+    }
+    uint32_t lineLen = strlen(buf);
+    uint32_t pos = 0;
+    while (pos + lineLen < len && lineLen) {
+        const char* retVal = GetUeventValue("DEVPATH=", buf + pos, lineLen);
+        if (retVal != nullptr) {
+            return std::string(retVal);
+        }
+        pos += lineLen + 1;
+        lineLen = strlen(buf + pos);
+    }
+    return "";
+}
+
+std::string UsbDeviceFilter::GetProductFromInterfaceMapping(const std::string& devPath)
+{
+    if (devPath.empty()) {
+        return "";
+    }
+    // DEVPATH: "/devices/.../2-1/2-1:1.0/video4linux/video12"
+    size_t video4linuxPos = devPath.find("/video4linux");
+    if (video4linuxPos == std::string::npos) {
+        return "";
+    }
+    std::string beforeVideo = devPath.substr(0, video4linuxPos);
+    size_t lastSlash = beforeVideo.find_last_of('/');
+    if (lastSlash == std::string::npos) {
+        return "";
+    }
+    std::string interfacePath = beforeVideo.substr(lastSlash + 1);
+
+    std::lock_guard<std::mutex> l(usbInterfaceMapLock_);
+    auto it = usbInterfaceProductMap_.find(interfacePath);
+    if (it != usbInterfaceProductMap_.end()) {
+        CAMERA_LOGI("USB:Got PRODUCT from mapping: interface=%{public}s, PRODUCT=%{public}s",
+            interfacePath.c_str(), it->second.c_str());
+        return it->second;
+    }
+    return "";
+}
+
+void UsbDeviceFilter::ProcessUsbInterfaceUevent(char* buf, unsigned int len, const std::string& action)
+{
+    if (buf == nullptr || len == 0) {
+        return;
+    }
+    std::string product;
+    std::string devPath;
+    uint32_t lineLen = strlen(buf);
+    uint32_t pos = 0;
+
+    while (pos + lineLen < len && lineLen) {
+        const char* retVal = GetUeventValue("PRODUCT=", buf + pos, lineLen);
+        if (retVal != nullptr) {
+            product = std::string(retVal);
+        }
+        retVal = GetUeventValue("DEVPATH=", buf + pos, lineLen);
+        if (retVal != nullptr) {
+            devPath = std::string(retVal);
+        }
+        pos += lineLen + 1;
+        lineLen = strlen(buf + pos);
+    }
+
+    // Extract interface path from DEVPATH (last segment)
+    size_t lastSlash = devPath.find_last_of('/');
+    if (lastSlash == std::string::npos) {
+        return;
+    }
+    std::string interfacePath = devPath.substr(lastSlash + 1);
+
+    std::lock_guard<std::mutex> l(usbInterfaceMapLock_);
+    if (action == "remove" || action == "unbind") {
+        auto it = usbInterfaceProductMap_.find(interfacePath);
+        if (it != usbInterfaceProductMap_.end()) {
+            CAMERA_LOGI("USB:Interface removed, clearing mapping: interface=%{public}s, PRODUCT=%{public}s",
+                interfacePath.c_str(), it->second.c_str());
+            usbInterfaceProductMap_.erase(it);
+        }
+    } else if (!product.empty() && (action == "add" || action == "bind")) {
+        CAMERA_LOGI("USB:Interface added, storing mapping: interface=%{public}s, PRODUCT=%{public}s",
+            interfacePath.c_str(), product.c_str());
+        usbInterfaceProductMap_[interfacePath] = product;
+    }
 }
 
 void UsbDeviceFilter::Reset()

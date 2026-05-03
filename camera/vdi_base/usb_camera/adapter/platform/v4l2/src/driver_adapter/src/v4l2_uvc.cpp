@@ -373,16 +373,31 @@ int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)
 {
     constexpr int32_t UVC_DETECT_ENABLE = 0;
     constexpr int32_t UVC_DETECT_DISABLE = -1;
+
+    std::string action = UsbDeviceFilter::ParseUeventAction(buf, len);
+    bool isUsbInterface = UsbDeviceFilter::CheckUeventField(buf, len, "DEVTYPE=usb_interface") &&
+                          UsbDeviceFilter::CheckUeventField(buf, len, "SUBSYSTEM=usb");
+    if (isUsbInterface) {
+        UsbDeviceFilter::ProcessUsbInterfaceUevent(buf, len, action);
+        return UVC_DETECT_ENABLE;
+    }
     if (len > 0 && (strstr(buf, "video4linux") != nullptr)) {
         std::lock_guard<std::mutex> lock(g_uvcDetectLock);
         if (!g_uvcDetectEnable) {
             return UVC_DETECT_DISABLE;
         }
-        std::string action = "";
         std::string subsystem = "";
         std::string devnode = "";
         CAMERA_LOGI("CheckBuf video4linux, %{public}s", buf);
         V4L2GetUsbString(action, subsystem, devnode, buf, len);
+
+        std::string ueventProduct = UsbDeviceFilter::GetProductFromInterfaceMapping(
+            UsbDeviceFilter::ParseUeventDevPath(buf, len));
+        if (!ueventProduct.empty() && UsbDeviceFilter::GetInstance().IsBlockedByProduct(ueventProduct)) {
+            CAMERA_LOGI("UVC:device %{public}s blocked by USB filter (uevent)", devnode.c_str());
+            return UVC_DETECT_ENABLE;
+        }
+
         UpdateV4L2UvcMatchDev(action, subsystem, devnode);
     }
     return UVC_DETECT_ENABLE;

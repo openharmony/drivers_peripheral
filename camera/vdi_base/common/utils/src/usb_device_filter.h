@@ -20,6 +20,7 @@
 #include <vector>
 #include <cstdint>
 #include <mutex>
+#include <map>
 
 namespace OHOS::Camera {
 
@@ -37,8 +38,19 @@ public:
     // Check if device with given VID/PID should be blocked
     bool IsBlocked(uint16_t vid, uint16_t pid);
 
+    // Check device by uevent PRODUCT string (format: "vid/pid/bcd")
+    // This is the uevent-based approach, no sysfs access needed
+    bool IsBlockedByProduct(const std::string& product);
+
     // Convenience method: check device by video device path (e.g. /dev/video0)
     bool IsBlockedByVideoPath(const std::string& videoPath);
+
+    // Uevent processing functions (static, thread-safe)
+    static void ProcessUsbInterfaceUevent(char* buf, unsigned int len, const std::string& action);
+    static std::string GetProductFromInterfaceMapping(const std::string& devPath);
+    static std::string ParseUeventAction(char* buf, unsigned int len);
+    static bool CheckUeventField(char* buf, unsigned int len, const std::string& field);
+    static std::string ParseUeventDevPath(char* buf, unsigned int len);
 
     // For unit test: reset filter list and cached config
     void Reset();
@@ -53,6 +65,13 @@ private:
 
     // Get sysfs device path from video device path
     std::string GetSysfsDevicePath(const std::string& videoPath);
+
+    // Parse PRODUCT string "vid/pid/bcd" to vid/pid pair
+    std::pair<uint16_t, uint16_t> ParseProductString(const std::string& product);
+
+    // Private static members for uevent processing
+    static std::map<std::string, std::string> usbInterfaceProductMap_;
+    static std::mutex usbInterfaceMapLock_;
 
     std::vector<std::pair<uint16_t, uint16_t>> filterList_;
     std::mutex mutex_;
