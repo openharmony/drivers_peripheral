@@ -23,6 +23,7 @@
 #include <sys/file.h>
 #include "securec.h"
 #include "serial_consts.h"
+#include "hdf_trace.h"
 
 #undef LOG_TAG
 #define LOG_TAG "SERIAL_IMPL"
@@ -61,6 +62,7 @@ int32_t SerialDevice::Open()
         HDF_LOGW("device already open.%{public}s", portName_.c_str());
         return HDF_ERR_DEVICE_BUSY;
     }
+    HdfTrace openTrace("Serial::Open");
     fd_ = open(portName_.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     if (fd_ < 0) {
         if (errno == ENODEV) {
@@ -166,6 +168,7 @@ int32_t SerialDevice::NotifyDeviceOffline()
 
 int32_t SerialDevice::ConfigurePort()
 {
+    HdfTrace openTrace("Serial::ConfigurePort");
     struct termios options;
     int32_t ret = tcgetattr(fd_, &options);
     if (ret != 0) {
@@ -351,6 +354,7 @@ int32_t SerialDevice::Write(const std::vector<uint8_t>& data, int32_t timeout, i
     }
 
     size_t written = 0;
+    HdfTrace openTrace("Serial::DoWriteLoop");
     int32_t ret = DoWriteLoop(data.data(), data.size(), timeout, written);
     bytesWritten = static_cast<int32_t>(written);
     return ret;
@@ -459,7 +463,7 @@ int32_t SerialDevice::Drain()
     }
 
     if (tcdrain(fd_) != 0) {
-        HDF_LOGE("%{public}s, tcdrain failed!", __func__);
+        HDF_LOGE("%{public}s, tcdrain failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
         return HDF_FAILURE;
     }
 
@@ -476,8 +480,9 @@ int32_t SerialDevice::SendBrkSignal()
         return HDF_ERR_INVALID_OBJECT;
     }
 
+    HdfTrace openTrace("Serial::tcsendbreak");
     if (tcsendbreak(fd_, 0) != 0) {
-        HDF_LOGE("%{public}s, tcsendbreak failed!", __func__);
+        HDF_LOGE("%{public}s, tcsendbreak failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
         return HDF_FAILURE;
     }
 
@@ -488,7 +493,7 @@ int32_t SerialDevice::SetRtsSignal(bool rts)
 {
     HDF_LOGD("%{public}s called, rts=%{public}d!", __func__, rts);
     std::shared_lock lock(mutex_);
-
+    HdfTrace openTrace("Serial::SetRtsSignal");
     if (!isOpen_.load() || fd_ < 0) {
         HDF_LOGE("%{public}s, device not open!", __func__);
         return HDF_ERR_INVALID_OBJECT;
@@ -496,7 +501,7 @@ int32_t SerialDevice::SetRtsSignal(bool rts)
 
     int flags;
     if (ioctl(fd_, TIOCMGET, &flags) != 0) {
-        HDF_LOGE("%{public}s, TIOCMGET failed!", __func__);
+        HDF_LOGE("%{public}s, TIOCMGET failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
         return HDF_FAILURE;
     }
 
@@ -507,7 +512,7 @@ int32_t SerialDevice::SetRtsSignal(bool rts)
     }
 
     if (ioctl(fd_, TIOCMSET, &flags) != 0) {
-        HDF_LOGE("%{public}s, TIOCMSET failed!", __func__);
+        HDF_LOGE("%{public}s, TIOCMSET failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
         return HDF_FAILURE;
     }
 
@@ -518,7 +523,7 @@ int32_t SerialDevice::GetCtsSignal(bool& cts)
 {
     HDF_LOGD("%{public}s called!", __func__);
     std::shared_lock lock(mutex_);
-
+    HdfTrace openTrace("Serial::GetCtsSignal");
     if (!isOpen_.load() || fd_ < 0) {
         HDF_LOGE("%{public}s, device not open!", __func__);
         return HDF_ERR_INVALID_OBJECT;
@@ -526,7 +531,7 @@ int32_t SerialDevice::GetCtsSignal(bool& cts)
 
     int flags;
     if (ioctl(fd_, TIOCMGET, &flags) != 0) {
-        HDF_LOGE("%{public}s, TIOCMGET failed!", __func__);
+        HDF_LOGE("%{public}s, TIOCMGET failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
         return HDF_FAILURE;
     }
 

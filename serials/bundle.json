@@ -22,6 +22,7 @@
           "ipc",
           "hdf_core",
           "hilog",
+          "hitrace",
           "c_utils",
           "drivers_interface_serial"
         ],
