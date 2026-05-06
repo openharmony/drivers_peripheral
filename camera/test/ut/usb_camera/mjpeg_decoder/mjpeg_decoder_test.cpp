@@ -658,15 +658,3 @@ TEST_F(MjpegDecoderThreadSafetyTest, camera_mjpeg_0018)
         EXPECT_TRUE(futures[i].get()) << "Thread " << i << " decode failed";
     }
 }
-
-// 主函数
-int main(int argc, char **argv)
-{
-    std::cout << "==========[test log] MJPEG Decoder UT Start" << std::endl;
-    ::testing::InitGoogleTest(&argc, argv);
-    int ret = RUN_ALL_TESTS();
-    std::cout << "==========[test log] MJPEG Decoder UT Finished, ret=" << ret << std::endl;
-    // 使用 quick_exit 避免 FFmpeg 和 gtest 清理冲突
-    // FFmpeg 的 AVCodecContext 在 atexit 清理时可能与 gtest 的清理顺序冲突
-    std::quick_exit(ret);
-}

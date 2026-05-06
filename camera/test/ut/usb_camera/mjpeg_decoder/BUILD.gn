@@ -24,41 +24,17 @@ ohos_unittest("mjpeg_decoder_test") {
   sources = [
     "test_utils.cpp",
     "mjpeg_decoder_test.cpp",
+    # 直接编译 mjpeg_decoder 源文件，避免引入不必要的依赖
+    "${camera_path_usb}/pipeline_core/src/mjpeg_decoder/mjpeg_decoder.cpp",
   ]
 
   include_dirs = [
     # MJPEG decoder include
     "${camera_path_usb}/pipeline_core/src/mjpeg_decoder",
-    
-    # USB camera includes
-    "${camera_path_usb}/buffer_manager/include",
-    "${camera_path_usb}/buffer_manager/src/buffer_adapter/standard",
-    "${camera_path_usb}/device_manager/include",
-    "${camera_path_usb}/pipeline_core",
-    "${camera_path_usb}/pipeline_core/src/node",
-    
-    # VDI includes
-    "${camera_path_vdi}/include",
-    "${camera_path_vdi}/device_manager/include",
-    "${camera_path_vdi}/buffer_manager/include",
-    "${camera_path_vdi}/pipeline_core",
-    "${camera_path_vdi}/pipeline_core/nodes/include",
-    "${camera_path_vdi}/pipeline_core/utils",
-    
-    # Interface includes
-    "${camera_path_usb}/../../interfaces/include",
-    "${camera_path_usb}/../../interfaces/hdi_ipc",
-    "${camera_path_usb}/../../interfaces/hdi_ipc/utils/include",
-  ]
 
-  deps = [
-    # MJPEG decoder library
-    "${camera_path_usb}/pipeline_core:usb_camera_pipeline_core",
-    
-    # USB camera libraries
-    "${camera_path_usb}/buffer_manager:usb_camera_buffer_manager",
-    "${camera_path_usb}/device_manager:usb_camera_device_manager",
-    "${camera_path_usb}/vdi_impl:camera_daemon_static",
+    # Camera common includes (mjpeg_decoder.cpp 需要)
+    "${camera_path_vdi}/include",
+    "${camera_path_usb}/../../interfaces/include",
   ]
 
   external_deps = [
@@ -73,13 +49,11 @@ ohos_unittest("mjpeg_decoder_test") {
   # 条件编译 FFmpeg 支持
   if (drivers_peripheral_camera_feature_usb) {
     defines = [ "DEVICE_USAGE_FFMPEG_ENABLE" ]
-    
+
     external_deps += [
       "ffmpeg:libohosffmpeg",
     ]
   }
-
-  # 测试使用 libjpeg-turbo 动态生成 MJPEG 数据，无需额外资源文件
 }
 
 # 测试套件分组
