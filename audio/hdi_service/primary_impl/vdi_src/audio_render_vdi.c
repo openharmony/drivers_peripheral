@@ -1050,6 +1050,7 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
             if (strcmp(value, "support") == 0) {
                 return NULL;
             }
+            *rendrId = renderPriv->renderInfos[index].renderId;
             renderPriv->renderInfos[index].usrCount++;
             return &renderPriv->renderInfos[index].render;
         }
