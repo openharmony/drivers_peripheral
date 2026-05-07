@@ -73,6 +73,7 @@ enum AudioCategoryVdi {
     AUDIO_VDI_MMAP_VOIP = 8,
     AUDIO_VDI_IN_NAVIGATION = 9,
     AUDIO_VDI_DIRECT = 10,
+    AUDIO_VDI_TTS = 11,
     AUDIO_VDI_CATEGORY_BUTT,
 };
 
@@ -93,6 +94,11 @@ enum AudioFormatVdi {
     AUDIO_VDI_FORMAT_TYPE_G711A = 1 << 25 | 1 << 0,
     AUDIO_VDI_FORMAT_TYPE_G711U = 1 << 25 | 1 << 1,
     AUDIO_VDI_FORMAT_TYPE_G726 = 1 << 25 | 1 << 1 | 1 << 0,
+    AUDIO_VDI_FORMAT_TYPE_AC3 = 1 << 25 | 1 << 2,
+    AUDIO_VDI_FORMAT_TYPE_TRUE_HD = 1 << 25 | 1 << 2 | 1 << 1,
+    AUDIO_VDI_FORMAT_TYPE_DTS_HD = 1 << 25 | 1 << 2 | 1 << 1 | 1 << 0,
+    AUDIO_VDI_FORMAT_TYPE_DTS_X = 1 << 25 | 1 << 3,
+    AUDIO_VDI_FORMAT_TYPE_AV3A = 1 << 25 | 1 << 3 | 1 << 2,
     AUDIO_VDI_FORMAT_TYPE_BUTT,
 };
 
