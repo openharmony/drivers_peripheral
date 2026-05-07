@@ -18,11 +18,11 @@
 #include <hdf_device_desc.h>
 #include <hdf_sbuf_ipc.h>
 #include "usb_device_impl.h"
-#include "v2_0/usb_device_interface_stub.h"
+#include "v2_1/usb_device_interface_stub.h"
 
 #define HDF_LOG_TAG    usb_device_interface_driver
 
-using namespace OHOS::HDI::Usb::V2_0;
+using namespace OHOS::HDI::Usb::V2_1;
 
 struct HdfUsbDeviceInterfaceHost {
     struct IDeviceIoService ioService;
@@ -83,7 +83,7 @@ static int HdfUsbDeviceInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfUsbDeviceInterfaceHost->ioService.Open = nullptr;
     hdfUsbDeviceInterfaceHost->ioService.Release = nullptr;
 
-    auto serviceImpl = OHOS::HDI::Usb::V2_0::IUsbDeviceInterface::Get(true);
+    auto serviceImpl = OHOS::HDI::Usb::V2_1::IUsbDeviceInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfUsbDeviceInterfaceHost;
@@ -92,7 +92,7 @@ static int HdfUsbDeviceInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfUsbDeviceInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        OHOS::HDI::Usb::V2_0::IUsbDeviceInterface::GetDescriptor());
+        OHOS::HDI::Usb::V2_1::IUsbDeviceInterface::GetDescriptor());
     if (hdfUsbDeviceInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfUsbDeviceInterfaceHost;

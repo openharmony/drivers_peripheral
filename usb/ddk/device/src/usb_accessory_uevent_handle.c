@@ -45,6 +45,8 @@ static void UsbAccessoryDispatchUevent(const struct UsbAccessoryUeventInfo *info
         DdkListenerMgrNotifyAll(NULL, USB_ACCESSORY_START);
     } else if (strcmp(info->accessory, "SEND") == 0) {
         DdkListenerMgrNotifyAll(NULL, USB_ACCESSORY_SEND);
+    } else if (strcmp(info->accessory, "SENDHISUITESTRING") == 0) {
+        DdkListenerMgrNotifyAll(NULL, USB_CUSTOM_CONTROL_REQUEST);
     }
 }
 

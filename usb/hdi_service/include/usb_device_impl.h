@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_USB_V2_0_USB_DEVICE_IMPL_H
-#define OHOS_HDI_USB_V2_0_USB_DEVICE_IMPL_H
+#ifndef OHOS_HDI_USB_V2_1_USB_DEVICE_IMPL_H
+#define OHOS_HDI_USB_V2_1_USB_DEVICE_IMPL_H
 
 #include <iostream>
 #include <filesystem>
@@ -28,18 +28,21 @@
 #include "usbd_function.h"
 #include "usbd_load_usb_service.h"
 #include "usbd_port.h"
-#include "v2_0/iusb_device_interface.h"
+#include "v2_1/iusb_device_interface.h"
 
 #ifndef SYSFS_DEVICES_DIR
 #define SYSFS_DEVICES_DIR "/sys/bus/usb/devices/"
 #endif // SYSFS_DEVICES_DIR
+
+#define HISUITE_IOCTL_EXTRA_DATA                0xC4
+#define HISUITE_GET_EXTRA_DATA                  _IOW('M', HISUITE_IOCTL_EXTRA_DATA, char[256])
 
 #define BASE_CLASS_HUB 0x09
 constexpr uint8_t MAX_INTERFACEID = 0xFF;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V2_0 {
+namespace V2_1 {
 using namespace OHOS;
 class UsbDeviceImpl : public IUsbDeviceInterface {
 public:
@@ -56,6 +59,7 @@ public:
     int32_t UsbDeviceAuthorize(uint8_t devNum, uint8_t devAddr, bool authorized) override;
     int32_t UsbInterfaceAuthorize(
         const UsbDev &dev, uint8_t configId, uint8_t interfaceId, bool authorized) override;
+    int32_t GetControlTransferData(int32_t eventId, std::vector<uint8_t> &data) override;
     static int32_t UsbdEventHandle(void);
     static int32_t UsbdEventHandleRelease(void);
     class UsbDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -83,8 +87,8 @@ private:
     static V1_2::UsbdLoadService loadUsbService_;
     static V1_2::UsbdLoadService loadHdfEdm_;
 };
-} // namespace v2_0
+} // namespace v2_1
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_USB_V2_0_USB_DEVICE_IMPL_H
+#endif // OHOS_HDI_USB_V2_1_USB_DEVICE_IMPL_H

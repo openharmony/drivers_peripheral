@@ -38,7 +38,7 @@ ohos_unittest("test_feature_transfer") {
 
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
-    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.1",
     "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
   ]
 
@@ -85,7 +85,7 @@ ohos_unittest("test_feature_device") {
 
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
-    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.1",
     "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
   ]
 
@@ -125,7 +125,7 @@ ohos_unittest("test_feature_function") {
 
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
-    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.1",
     "${usb_driver_path}/hdi_service:libusb_port_interface_service_2.0",
   ]
 
@@ -215,7 +215,7 @@ ohos_unittest("test_feature_usbfnmtp") {
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
     "${usb_driver_path}/gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
-    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.1",
   ]
 
   if (is_standard_system) {
@@ -294,7 +294,7 @@ ohos_unittest("test_feature_devicestatus") {
 
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
-    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.1",
     "${usb_driver_path}/hdi_service:libusb_host_interface_service_2.0",
   ]
 
@@ -339,7 +339,7 @@ ohos_unittest("test_feature_accessory") {
 
   deps = [
     "${usb_driver_path}/ddk:libusb_core",
-    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.0",
+    "${usb_driver_path}/hdi_service:libusb_device_interface_service_2.1",
   ]
 
   if (is_standard_system) {
