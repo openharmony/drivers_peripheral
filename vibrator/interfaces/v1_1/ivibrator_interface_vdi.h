@@ -134,7 +134,14 @@ struct HapticCapacityVdi {
     int32_t reserved1;
 };
 
+inline bool& GetVibratorProductMode()
+{
+    static bool isProductMode = false;
+    return isProductMode;
+}
+
 #define HDI_VIBRATOR_VDI_LIBNAME "libhdi_vibrator_impl.z.so"
+#define HDI_VIBRATOR_PRODUCT_VDI_LIBNAME "libhdi_product_vibrator_impl.z.so"
 
 class IVibratorInterfaceVdi {
 public:

@@ -49,10 +49,19 @@ int32_t VibratorIfService::GetVibratorVdiImpl()
 {
     struct OHOS::HDI::Vibrator::V1_1::VdiWrapperVibrator *vdiWrapperVibrator = nullptr;
     uint32_t version = 0;
-    vdi_ = HdfLoadVdi(HDI_VIBRATOR_VDI_LIBNAME);
-    if (vdi_ == nullptr || vdi_->vdiBase == nullptr) {
-        HDF_LOGE("%{public}s: load vibrator vdi failed", __func__);
-        return HDF_FAILURE;
+    vdi_ = HdfLoadVdi(HDI_VIBRATOR_PRODUCT_VDI_LIBNAME);
+    if (vdi_ != nullptr && vdi_->vdiBase != nullptr) {
+        HDF_LOGI("%{public}s: loaded product vibrator vdi", __func__);
+        GetVibratorProductMode() = true;
+    } else {
+        HDF_LOGI("%{public}s: load product vibrator vdi failed, try HdfLoadVdi(%{public}s)", __func__,
+                 HDI_VIBRATOR_VDI_LIBNAME);
+        vdi_ = HdfLoadVdi(HDI_VIBRATOR_VDI_LIBNAME);
+        if (vdi_ == nullptr || vdi_->vdiBase == nullptr) {
+            HDF_LOGE("%{public}s: load vibrator vdi failed", __func__);
+            return HDF_FAILURE;
+        }
+        GetVibratorProductMode() = false;
     }
 
     version = HdfGetVdiVersion(vdi_);
@@ -93,11 +102,12 @@ int32_t VibratorIfService::StartOnce(const OHOS::HDI::Vibrator::V2_0::DeviceVibr
     HDF_LOGD("%{public}s: Enter the StartOnce function duration is %{public}u", __func__, duration);
 
     StartTrace(HITRACE_TAG_HDF, "StartOnce");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->StartOnce(deviceVibratorInfo, duration);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->StartOnce(duration);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->StartOnce(deviceVibratorInfo, duration);
+    } else {
+        ret = vibratorVdiImplV1_1_->StartOnce(duration);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -114,11 +124,12 @@ int32_t VibratorIfService::Start(const OHOS::HDI::Vibrator::V2_0::DeviceVibrator
     HDF_LOGD("%{public}s: Enter the Start function", __func__);
 
     StartTrace(HITRACE_TAG_HDF, "Start");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->Start(deviceVibratorInfo, effectType);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->Start(effectType);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->Start(deviceVibratorInfo, effectType);
+    } else {
+        ret = vibratorVdiImplV1_1_->Start(effectType);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -149,11 +160,12 @@ int32_t VibratorIfService::Stop(const OHOS::HDI::Vibrator::V2_0::DeviceVibratorI
     }
 
     StartTrace(HITRACE_TAG_HDF, "Stop");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->Stop(deviceVibratorInfo, vibratorMode);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->Stop(vibratorMode);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->Stop(deviceVibratorInfo, vibratorMode);
+    } else {
+        ret = vibratorVdiImplV1_1_->Stop(vibratorMode);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -190,17 +202,17 @@ int32_t VibratorIfService::GetVibratorInfo(std::vector<V2_0::HdfVibratorInfo> &v
         hdfVibratorInfo.intensityMinValue = iter.intensityMinValue;
         hdfVibratorInfo.frequencyMaxValue = iter.frequencyMaxValue;
         hdfVibratorInfo.frequencyMinValue = iter.frequencyMinValue;
-#ifdef TV_FLAG
-        hdfVibratorInfo.deviceId = iter.deviceId;
-        hdfVibratorInfo.vibratorId = iter.vibratorId;
-        hdfVibratorInfo.position = iter.position;
-        hdfVibratorInfo.isLocal = iter.isLocal;
-#else
-        hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
-        hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
-        hdfVibratorInfo.position = DEFAULT_POSITION;
-        hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
-#endif
+        if (GetVibratorProductMode()) {
+            hdfVibratorInfo.deviceId = iter.deviceId;
+            hdfVibratorInfo.vibratorId = iter.vibratorId;
+            hdfVibratorInfo.position = iter.position;
+            hdfVibratorInfo.isLocal = iter.isLocal;
+        } else {
+            hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
+            hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
+            hdfVibratorInfo.position = DEFAULT_POSITION;
+            hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
+        }
         vibratorInfo.push_back(std::move(hdfVibratorInfo));
     }
 
@@ -215,12 +227,12 @@ int32_t VibratorIfService::GetVibratorIdSingle(const OHOS::HDI::Vibrator::V2_0::
     std::vector<OHOS::HDI::Vibrator::V1_1::HdfVibratorInfoVdi> vibratorInfoVdi;
     int32_t ret = HDF_FAILURE;
     StartTrace(HITRACE_TAG_HDF, "GetVibratorInfo");
-#ifdef TV_FLAG
-    ret = vibratorVdiImplV1_1_->GetVibratorIdSingle(deviceVibratorInfo, vibratorInfoVdi);
-#else
-    HDF_LOGI("%{public}s: sensorVdiImplV1_1_ not support", __func__);
-    ret =  HDF_SUCCESS;
-#endif
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->GetVibratorIdSingle(deviceVibratorInfo, vibratorInfoVdi);
+    } else {
+        HDF_LOGI("%{public}s: sensorVdiImplV1_1_ not support", __func__);
+        ret = HDF_SUCCESS;
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -240,17 +252,17 @@ int32_t VibratorIfService::GetVibratorIdSingle(const OHOS::HDI::Vibrator::V2_0::
         hdfVibratorInfo.intensityMinValue = iter.intensityMinValue;
         hdfVibratorInfo.frequencyMaxValue = iter.frequencyMaxValue;
         hdfVibratorInfo.frequencyMinValue = iter.frequencyMinValue;
-#ifdef TV_FLAG
-        hdfVibratorInfo.deviceId = iter.deviceId;
-        hdfVibratorInfo.vibratorId = iter.vibratorId;
-        hdfVibratorInfo.position = iter.position;
-        hdfVibratorInfo.isLocal = iter.isLocal;
-#else
-        hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
-        hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
-        hdfVibratorInfo.position = DEFAULT_POSITION;
-        hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
-#endif
+        if (GetVibratorProductMode()) {
+            hdfVibratorInfo.deviceId = iter.deviceId;
+            hdfVibratorInfo.vibratorId = iter.vibratorId;
+            hdfVibratorInfo.position = iter.position;
+            hdfVibratorInfo.isLocal = iter.isLocal;
+        } else {
+            hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
+            hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
+            hdfVibratorInfo.position = DEFAULT_POSITION;
+            hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
+        }
         vibratorInfo.push_back(std::move(hdfVibratorInfo));
     }
 
@@ -265,11 +277,12 @@ int32_t VibratorIfService::EnableVibratorModulation(
         __func__, duration, intensity, frequency);
 
     StartTrace(HITRACE_TAG_HDF, "EnableVibratorModulation");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->EnableVibratorModulation(deviceVibratorInfo, duration, intensity, frequency);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->EnableVibratorModulation(duration, intensity, frequency);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->EnableVibratorModulation(deviceVibratorInfo, duration, intensity, frequency);
+    } else {
+        ret = vibratorVdiImplV1_1_->EnableVibratorModulation(duration, intensity, frequency);
+    }
     FinishTrace(HITRACE_TAG_HDF);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
@@ -305,11 +318,12 @@ int32_t VibratorIfService::EnableCompositeEffect(
     compositeEffectVdi.effects = effectVdi;
 
     StartTrace(HITRACE_TAG_HDF, "EnableCompositeEffect");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->EnableCompositeEffect(deviceVibratorInfo, compositeEffectVdi);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->EnableCompositeEffect(compositeEffectVdi);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->EnableCompositeEffect(deviceVibratorInfo, compositeEffectVdi);
+    } else {
+        ret = vibratorVdiImplV1_1_->EnableCompositeEffect(compositeEffectVdi);
+    }
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
                  __func__, deviceVibratorInfo.deviceId, deviceVibratorInfo.vibratorId, ret);
@@ -326,11 +340,12 @@ int32_t VibratorIfService::GetEffectInfo(const OHOS::HDI::Vibrator::V2_0::Device
 
     HdfEffectInfoVdi effectInfoVdi = {0, false};
     StartTrace(HITRACE_TAG_HDF, "GetEffectInfo");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->GetEffectInfo(deviceVibratorInfo, effectType, effectInfoVdi);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->GetEffectInfo(effectType, effectInfoVdi);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->GetEffectInfo(deviceVibratorInfo, effectType, effectInfoVdi);
+    } else {
+        ret = vibratorVdiImplV1_1_->GetEffectInfo(effectType, effectInfoVdi);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -350,11 +365,12 @@ int32_t VibratorIfService::IsVibratorRunning(const OHOS::HDI::Vibrator::V2_0::De
     HDF_LOGD("%{public}s: Enter the IsVibratorRunning function", __func__);
 
     StartTrace(HITRACE_TAG_HDF, "IsVibratorRunning");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->IsVibratorRunning(deviceVibratorInfo, state);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->IsVibratorRunning(state);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->IsVibratorRunning(deviceVibratorInfo, state);
+    } else {
+        ret = vibratorVdiImplV1_1_->IsVibratorRunning(state);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -397,11 +413,12 @@ int32_t VibratorIfService::PlayHapticPattern(const OHOS::HDI::Vibrator::V2_0::De
     }
 
     StartTrace(HITRACE_TAG_HDF, "PlayHapticPattern");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->PlayHapticPattern(deviceVibratorInfo, hapticPaketVdi);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->PlayHapticPattern(hapticPaketVdi);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->PlayHapticPattern(deviceVibratorInfo, hapticPaketVdi);
+    } else {
+        ret = vibratorVdiImplV1_1_->PlayHapticPattern(hapticPaketVdi);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -419,11 +436,12 @@ int32_t VibratorIfService::GetHapticCapacity(const OHOS::HDI::Vibrator::V2_0::De
 
     HapticCapacityVdi hapticCapacityVdi = {false, false, false, 0, false, 0};
     StartTrace(HITRACE_TAG_HDF, "GetHapticCapacity");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->GetHapticCapacity(deviceVibratorInfo, hapticCapacityVdi);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->GetHapticCapacity(hapticCapacityVdi);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->GetHapticCapacity(deviceVibratorInfo, hapticCapacityVdi);
+    } else {
+        ret = vibratorVdiImplV1_1_->GetHapticCapacity(hapticCapacityVdi);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -443,11 +461,12 @@ int32_t VibratorIfService::GetHapticStartUpTime(const OHOS::HDI::Vibrator::V2_0:
     HDF_LOGD("%{public}s: Enter the GetHapticStartUpTime function", __func__);
 
     StartTrace(HITRACE_TAG_HDF, "GetHapticStartUpTime");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->GetHapticStartUpTime(deviceVibratorInfo, mode, startUpTime);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->GetHapticStartUpTime(mode, startUpTime);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->GetHapticStartUpTime(deviceVibratorInfo, mode, startUpTime);
+    } else {
+        ret = vibratorVdiImplV1_1_->GetHapticStartUpTime(mode, startUpTime);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -464,11 +483,12 @@ int32_t VibratorIfService::StartByIntensity(const OHOS::HDI::Vibrator::V2_0::Dev
     HDF_LOGD("%{public}s: Enter the StartByIntensity function", __func__);
 
     StartTrace(HITRACE_TAG_HDF, "StartByIntensity");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->StartByIntensity(deviceVibratorInfo, effectType, intensity);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->StartByIntensity(effectType, intensity);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->StartByIntensity(deviceVibratorInfo, effectType, intensity);
+    } else {
+        ret = vibratorVdiImplV1_1_->StartByIntensity(effectType, intensity);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -485,11 +505,12 @@ int32_t VibratorIfService::GetAllWaveInfo(const OHOS::HDI::Vibrator::V2_0::Devic
     HDF_LOGD("%{public}s: Enter the GetAllWaveInfo function", __func__);
 
     StartTrace(HITRACE_TAG_HDF, "GetAllWaveInfo");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->GetAllWaveInfo(deviceVibratorInfo, info);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->GetAllWaveInfo(deviceVibratorInfo.vibratorId, info);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->GetAllWaveInfo(deviceVibratorInfo, info);
+    } else {
+        ret = vibratorVdiImplV1_1_->GetAllWaveInfo(deviceVibratorInfo.vibratorId, info);
+    }
     FinishTrace(HITRACE_TAG_HDF);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed, deviceId %{public}d, vibratorId %{public}d, error code is %{public}d",
@@ -507,11 +528,12 @@ int32_t VibratorIfService::GetDeviceVibratorInfo(
 
     std::vector<HdfVibratorInfoVdi> vibratorInfoVdi;
     StartTrace(HITRACE_TAG_HDF, "GetDeviceVibratorInfo");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->GetDeviceVibratorInfo(deviceVibratorInfo, vibratorInfoVdi);
-#else
-    int32_t ret = vibratorVdiImplV1_1_->GetDeviceVibratorInfo(vibratorInfoVdi);
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->GetDeviceVibratorInfo(deviceVibratorInfo, vibratorInfoVdi);
+    } else {
+        ret = vibratorVdiImplV1_1_->GetDeviceVibratorInfo(vibratorInfoVdi);
+    }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (ret != HDF_SUCCESS) {
@@ -532,17 +554,17 @@ int32_t VibratorIfService::GetDeviceVibratorInfo(
         hdfVibratorInfo.intensityMinValue = iter.intensityMinValue;
         hdfVibratorInfo.frequencyMaxValue = iter.frequencyMaxValue;
         hdfVibratorInfo.frequencyMinValue = iter.frequencyMinValue;
-#ifdef TV_FLAG
-        hdfVibratorInfo.deviceId = iter.deviceId;
-        hdfVibratorInfo.vibratorId = iter.vibratorId;
-        hdfVibratorInfo.position = iter.position;
-        hdfVibratorInfo.isLocal = iter.isLocal;
-#else
-        hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
-        hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
-        hdfVibratorInfo.position = DEFAULT_POSITION;
-        hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
-#endif
+        if (GetVibratorProductMode()) {
+            hdfVibratorInfo.deviceId = iter.deviceId;
+            hdfVibratorInfo.vibratorId = iter.vibratorId;
+            hdfVibratorInfo.position = iter.position;
+            hdfVibratorInfo.isLocal = iter.isLocal;
+        } else {
+            hdfVibratorInfo.deviceId = DEFAULT_DEVICE_ID;
+            hdfVibratorInfo.vibratorId = DEFAULT_VIBRATOR_ID;
+            hdfVibratorInfo.position = DEFAULT_POSITION;
+            hdfVibratorInfo.isLocal = DEFAULT_IS_LOCAL;
+        }
         vibratorInfo.push_back(std::move(hdfVibratorInfo));
     }
 
@@ -554,11 +576,12 @@ int32_t VibratorIfService::RegVibratorPlugCallback(const sptr<V2_0::IVibratorPlu
     HDF_LOGD("%{public}s: Enter the RegVibratorPlugCallback function", __func__);
 
     StartTrace(HITRACE_TAG_HDF, "RegVibratorPlugCallback");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->RegVibratorPlugCallback(callbackObj);
-#else
-    int32_t ret = HDF_SUCCESS;
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->RegVibratorPlugCallback(callbackObj);
+    } else {
+        ret = HDF_SUCCESS;
+    }
     FinishTrace(HITRACE_TAG_HDF);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: RegVibratorPlugCallback failed, error code is %{public}d", __func__, ret);
@@ -572,11 +595,12 @@ int32_t VibratorIfService::UnRegVibratorPlugCallback(const sptr<V2_0::IVibratorP
     HDF_LOGD("%{public}s: Enter the UnRegVibratorPlugCallback function", __func__);
 
     StartTrace(HITRACE_TAG_HDF, "UnRegVibratorPlugCallback");
-#ifdef TV_FLAG
-    int32_t ret = vibratorVdiImplV1_1_->UnRegVibratorPlugCallback(callbackObj);
-#else
-    int32_t ret = HDF_SUCCESS;
-#endif
+    int32_t ret;
+    if (GetVibratorProductMode()) {
+        ret = vibratorVdiImplV1_1_->UnRegVibratorPlugCallback(callbackObj);
+    } else {
+        ret = HDF_SUCCESS;
+    }
     FinishTrace(HITRACE_TAG_HDF);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UnRegVibratorPlugCallback failed, error code is %{public}d", __func__, ret);

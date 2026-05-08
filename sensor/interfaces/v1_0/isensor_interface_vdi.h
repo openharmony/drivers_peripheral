@@ -21,15 +21,21 @@
 #include "v3_0/isensor_interface.h"
 #include "hdf_log.h"
 
+inline bool& GetSensorProductMode()
+{
+    static bool isProductMode = false;
+    return isProductMode;
+}
+
 struct SensorHandle : public OHOS::HDI::Sensor::V3_0::DeviceSensorInfo {
     bool operator == (const SensorHandle& other) const
     {
-#ifdef TV_FLAG
-        return deviceId == other.deviceId && sensorType == other.sensorType && sensorId == other.sensorId &&
-                location == other.location;
-#else
-        return sensorType == other.sensorType;
-#endif
+        if (GetSensorProductMode()) {
+            return deviceId == other.deviceId && sensorType == other.sensorType && sensorId == other.sensorId &&
+                    location == other.location;
+        } else {
+            return sensorType == other.sensorType;
+        }
     }
 
     bool operator < (const SensorHandle& other) const
@@ -52,17 +58,17 @@ namespace std {
     struct hash<SensorHandle> {
         std::size_t operator()(const SensorHandle& obj) const
         {
-#ifdef TV_FLAG
-            std::size_t h1 = std::hash<int64_t>{}(obj.deviceId);
-            std::size_t h2 = std::hash<int64_t>{}(obj.sensorType);
-            std::size_t h3 = std::hash<int64_t>{}(obj.sensorId);
-            std::size_t h4 = std::hash<int64_t>{}(obj.location);
+            if (GetSensorProductMode()) {
+                std::size_t h1 = std::hash<int64_t>{}(obj.deviceId);
+                std::size_t h2 = std::hash<int64_t>{}(obj.sensorType);
+                std::size_t h3 = std::hash<int64_t>{}(obj.sensorId);
+                std::size_t h4 = std::hash<int64_t>{}(obj.location);
 
-            return h1 ^ h2 ^ h3 ^ h4;
-#else
-            std::size_t h2 = std::hash<int64_t>{}(obj.sensorType);
-            return h2;
-#endif
+                return h1 ^ h2 ^ h3 ^ h4;
+            } else {
+                std::size_t h2 = std::hash<int64_t>{}(obj.sensorType);
+                return h2;
+            }
         }
     };
 }
@@ -78,11 +84,8 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_1 {
-#ifdef TV_FLAG
-#define HDI_SENSOR_VDI_LIBNAME "libhdi_product_sensor_impl.z.so"
-#else
+#define HDI_SENSOR_PRODUCT_VDI_LIBNAME "libhdi_product_sensor_impl.z.so"
 #define HDI_SENSOR_VDI_LIBNAME "libhdi_sensor_impl.z.so"
-#endif
 
 struct HdfSensorInformationVdi {
     std::string sensorName;
