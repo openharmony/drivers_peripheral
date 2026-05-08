@@ -60,6 +60,9 @@ private:
     void OnRemoteDied(const wptr<IRemoteObject>& object);
     int32_t AddWifiDeathRecipient(const sptr<IChipControllerCallback>& eventCallback);
     int32_t RemoveWifiDeathRecipient(const sptr<IChipControllerCallback>& eventCallback);
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+    static void IsWlanSupported();
+#endif
 
     std::shared_ptr<IfaceTool> ifaceTool_;
     std::shared_ptr<WifiVendorHalList> vendorHalList_;

@@ -18,7 +18,8 @@
       "drivers_peripheral_wlan_feature_enable_HDF_WLAN_EXTEND_VDI",
       "drivers_peripheral_wlan_feature_vendor",
       "drivers_peripheral_wlan_feature_emulator",
-      "drivers_peripheral_wlan_p2p_name"
+      "drivers_peripheral_wlan_p2p_name",
+      "driver_peripheral_wlan_feature_pluggable"
     ],
     "adapted_system_type": ["standard", "small"],
     "rom": "660KB",
