@@ -1904,7 +1904,7 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
         HDF_LOGE("invalid opt");
         return HDF_FAILURE;
     }
-    if (HasRegisterCallback(ifName, nameLen)) {
+    if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0 && HasRegisterCallback(ifName, nameLen)) {
         HDF_LOGE("callback has registed");
         pthread_mutex_unlock(&g_interfaceLock);
         return HDF_SUCCESS;
