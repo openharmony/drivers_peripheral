@@ -25,7 +25,7 @@ namespace OHOS {
         bool result = false;
         sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
 
-        if (!g_sensorInterface->SetMode({0, *(int32_t *)data, 0, 0}, *(int32_t *)data)) {
+        if (!g_sensorInterface->SetMode({-1, *(int32_t *)data, 0, 1}, *(int32_t *)data)) {
             result = true;
         }
         return result;

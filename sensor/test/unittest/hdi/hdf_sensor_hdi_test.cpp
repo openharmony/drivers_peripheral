@@ -237,12 +237,12 @@ namespace {
 
         for (auto iter : g_info) {
             ret = g_sensorInterface->SetBatch(
-                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+                {-1, iter.deviceSensorInfo.sensorType, 0, 1}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
-            ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Enable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             OsalMSleep(SENSOR_WAIT_TIME);
-            ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Disable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -263,9 +263,9 @@ namespace {
             ASSERT_NE(nullptr, g_sensorInterface);
             return;
         }
-        int32_t ret = g_sensorInterface->Enable({0, ABNORMAL_SENSORID, 0, 0});
+        int32_t ret = g_sensorInterface->Enable({-1, ABNORMAL_SENSORID, 0, 1});
         EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
-        ret = g_sensorInterface->Disable({0, ABNORMAL_SENSORID, 0, 0});
+        ret = g_sensorInterface->Disable({-1, ABNORMAL_SENSORID, 0, 1});
         EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
     }
 
@@ -286,12 +286,12 @@ namespace {
 
         for (auto iter : g_info) {
             ret = g_sensorInterface->SetBatch(
-                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL2, SENSOR_POLL_TIME);
+                {-1, iter.deviceSensorInfo.sensorType, 0, 1}, SENSOR_INTERVAL2, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
-            ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Enable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             OsalMSleep(SENSOR_WAIT_TIME);
-            ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Disable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
 
@@ -312,7 +312,7 @@ namespace {
             ASSERT_NE(nullptr, g_sensorInterface);
             return;
         }
-        int32_t ret = g_sensorInterface->SetBatch({0, ABNORMAL_SENSORID, 0, 0}, 0, 0);
+        int32_t ret = g_sensorInterface->SetBatch({-1, ABNORMAL_SENSORID, 0, 1}, 0, 0);
         EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
     }
 
@@ -330,7 +330,7 @@ namespace {
         }
         for (auto iter : g_info) {
             int32_t ret = g_sensorInterface->SetBatch(
-                {0, iter.deviceSensorInfo.sensorType, 0, 0}, -1, SENSOR_POLL_TIME);
+                {-1, iter.deviceSensorInfo.sensorType, 0, 1}, -1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
         }
     }
@@ -350,19 +350,19 @@ namespace {
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
             int32_t ret = g_sensorInterface->SetBatch(
-                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+                {-1, iter.deviceSensorInfo.sensorType, 0, 1}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             if (iter.deviceSensorInfo.sensorType == SENSOR_TYPE_HALL) {
-                ret = g_sensorInterface->SetMode({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_MODE_ON_CHANGE);
+                ret = g_sensorInterface->SetMode({-1, iter.deviceSensorInfo.sensorType, 0, 1}, SENSOR_MODE_ON_CHANGE);
                 EXPECT_EQ(SENSOR_SUCCESS, ret);
             } else {
-                ret = g_sensorInterface->SetMode({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_MODE_REALTIME);
+                ret = g_sensorInterface->SetMode({-1, iter.deviceSensorInfo.sensorType, 0, 1}, SENSOR_MODE_REALTIME);
                 EXPECT_EQ(SENSOR_SUCCESS, ret);
             }
-            ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Enable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             OsalMSleep(SENSOR_WAIT_TIME);
-            ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Disable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
@@ -380,7 +380,7 @@ namespace {
             ASSERT_NE(nullptr, g_sensorInterface);
             return;
         }
-        int32_t ret = g_sensorInterface->SetMode({0, ABNORMAL_SENSORID, 0, 0}, SENSOR_MODE_REALTIME);
+        int32_t ret = g_sensorInterface->SetMode({-1, ABNORMAL_SENSORID, 0, 1}, SENSOR_MODE_REALTIME);
         EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
     }
 
@@ -400,14 +400,14 @@ namespace {
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
             int32_t ret = g_sensorInterface->SetBatch(
-                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+                {-1, iter.deviceSensorInfo.sensorType, 0, 1}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
-            ret = g_sensorInterface->SetMode({0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_MODE_DEFAULT);
+            ret = g_sensorInterface->SetMode({-1, iter.deviceSensorInfo.sensorType, 0, 1}, SENSOR_MODE_DEFAULT);
             EXPECT_EQ(SENSOR_FAILURE, ret);
-            ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Enable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             OsalMSleep(SENSOR_WAIT_TIME);
-            ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Disable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
@@ -426,7 +426,7 @@ namespace {
         }
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->SetOption({0, iter.deviceSensorInfo.sensorType, 0, 0}, 0);
+            int32_t ret = g_sensorInterface->SetOption({-1, iter.deviceSensorInfo.sensorType, 0, 1}, 0);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
@@ -443,7 +443,7 @@ namespace {
             ASSERT_NE(nullptr, g_sensorInterface);
             return;
         }
-        int32_t ret = g_sensorInterface->SetOption({0, ABNORMAL_SENSORID, 0, 0}, 0);
+        int32_t ret = g_sensorInterface->SetOption({-1, ABNORMAL_SENSORID, 0, 1}, 0);
         EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
     }
 
@@ -459,12 +459,12 @@ namespace {
 
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            int32_t ret = g_sensorInterface->Enable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             OsalMSleep(SENSOR_WAIT_TIME);
-            ret = g_sensorInterface->ReadData({0, iter.deviceSensorInfo.sensorType, 0, 0}, g_events);
+            ret = g_sensorInterface->ReadData({-1, iter.deviceSensorInfo.sensorType, 0, 1}, g_events);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
-            ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Disable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
@@ -482,10 +482,10 @@ namespace {
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
             int32_t ret = g_sensorInterface->SetSdcSensor(
-                {0, iter.deviceSensorInfo.sensorType, 0, 0}, true, RATE_LEVEL);
+                {-1, iter.deviceSensorInfo.sensorType, 0, 1}, true, RATE_LEVEL);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
             OsalMSleep(SENSOR_WAIT_TIME);
-            ret = g_sensorInterface->SetSdcSensor({0, iter.deviceSensorInfo.sensorType, 0, 0}, false, RATE_LEVEL);
+            ret = g_sensorInterface->SetSdcSensor({-1, iter.deviceSensorInfo.sensorType, 0, 1}, false, RATE_LEVEL);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
@@ -541,15 +541,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL1, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL1, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -577,15 +577,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL3, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL3, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -613,15 +613,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL4, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL4, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -649,15 +649,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL11, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL11, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -685,15 +685,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL5, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL5, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -721,15 +721,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL6, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL6, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -757,15 +757,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL7, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL7, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -793,15 +793,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL8, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL8, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -829,15 +829,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL9, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL9, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -865,15 +865,15 @@ namespace {
         int32_t sensorId = g_info[0].deviceSensorInfo.sensorType;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL10, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL10, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -897,11 +897,11 @@ namespace {
         int32_t ret;
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
-            ret = g_sensorInterface->SetSdcSensor({0, iter.deviceSensorInfo.sensorType, 0, 0}, true, RATE_LEVEL);
+            ret = g_sensorInterface->SetSdcSensor({-1, iter.deviceSensorInfo.sensorType, 0, 1}, true, RATE_LEVEL);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
-            ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Disable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
-            ret = g_sensorInterface->SetSdcSensor({0, iter.deviceSensorInfo.sensorType, 0, 0}, false, RATE_LEVEL);
+            ret = g_sensorInterface->SetSdcSensor({-1, iter.deviceSensorInfo.sensorType, 0, 1}, false, RATE_LEVEL);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
@@ -922,14 +922,14 @@ namespace {
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            int32_t ret = g_sensorInterface->Enable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(SENSOR_WAIT_TIME2);
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            int32_t ret = g_sensorInterface->Disable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
     }
@@ -950,12 +950,12 @@ namespace {
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         EXPECT_GT(g_info.size(), 0);
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            int32_t ret = g_sensorInterface->Enable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
         OsalMSleep(SENSOR_WAIT_TIME2);
         for (auto iter : g_info) {
-            int32_t ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            int32_t ret = g_sensorInterface->Disable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -978,16 +978,16 @@ namespace {
 
         for (auto iter : g_info) {
             ret = g_sensorInterface->SetBatch(
-                {0, iter.deviceSensorInfo.sensorType, 0, 0}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+                {-1, iter.deviceSensorInfo.sensorType, 0, 1}, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
-            ret = g_sensorInterface->Enable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Enable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
 
         OsalMSleep(SENSOR_WAIT_TIME2);
 
         for (auto iter : g_info) {
-            ret = g_sensorInterface->Disable({0, iter.deviceSensorInfo.sensorType, 0, 0});
+            ret = g_sensorInterface->Disable({-1, iter.deviceSensorInfo.sensorType, 0, 1});
             EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
         ret = g_sensorInterface->UnregisterAsync(TRADITIONAL_SENSOR_TYPE, g_traditionalCallbackTest);
@@ -1014,15 +1014,15 @@ namespace {
         int32_t sensorId = 1;
         HDF_LOGI("sensorId is %{public}d", sensorId);
 
-        ret = g_sensorInterface->SetBatch({0, sensorId, 0, 0}, SENSOR_INTERVAL5, SENSOR_INTERVAL1);
+        ret = g_sensorInterface->SetBatch({-1, sensorId, 0, 1}, SENSOR_INTERVAL5, SENSOR_INTERVAL1);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-        ret = g_sensorInterface->Enable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Enable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         OsalMSleep(SENSOR_WAIT_TIME3);
 
-        ret = g_sensorInterface->Disable({0, sensorId, 0, 0});
+        ret = g_sensorInterface->Disable({-1, sensorId, 0, 1});
         EXPECT_EQ(SENSOR_SUCCESS, ret);
 
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -1043,10 +1043,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest1_1 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, true, 10);
+        int32_t ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, true, 10);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 10);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -1061,10 +1061,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest1_2 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, true, 20);
+        int32_t ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, true, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 20);
+        ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -1079,10 +1079,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest1_3 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, true, 50);
+        int32_t ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, true, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
+        ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -1097,10 +1097,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest2_1 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, true, 10);
+        int32_t ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, true, 10);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 10);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -1115,10 +1115,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest2_2 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, true, 20);
+        int32_t ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, true, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 20);
+        ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -1133,10 +1133,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest2_3 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
+        int32_t ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
+        ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -1151,10 +1151,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest3_1 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        int32_t ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 10);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 10);
+        ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 10);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -1169,10 +1169,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest3_2 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 20);
+        int32_t ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 20);
+        ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 20);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 
@@ -1187,10 +1187,10 @@ namespace {
         HDF_LOGI("enter the SetSdcSensorTest3_3 function");
         ASSERT_NE(nullptr, g_sensorInterface);
 
-        int32_t ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
+        int32_t ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(2000);
-        ret = g_sensorInterface->SetSdcSensor({0, 1, 0, 0}, false, 50);
+        ret = g_sensorInterface->SetSdcSensor({-1, 1, 0, 1}, false, 50);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }

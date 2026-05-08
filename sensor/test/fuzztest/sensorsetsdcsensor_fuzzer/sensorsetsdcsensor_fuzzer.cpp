@@ -27,7 +27,7 @@ namespace OHOS {
         bool result = false;
         sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
         
-        if (!g_sensorInterface->SetSdcSensor({0, *(int32_t *)data, 0, 0}, *(bool *)data, *(int32_t *)data)) {
+        if (!g_sensorInterface->SetSdcSensor({-1, *(int32_t *)data, 0, 1}, *(bool *)data, *(int32_t *)data)) {
             result = true;
         }
         return result;
