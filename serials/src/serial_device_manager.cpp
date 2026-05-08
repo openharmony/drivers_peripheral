@@ -176,11 +176,6 @@ void SerialDeviceManager::AddVirtualUsbDevice(std::vector<SerialDeviceInfo>& dev
     std::string serialNumber = ReadSysfsFile(basePath + "serial");
     std::string vendorId = ReadSysfsFile(basePath + "idVendor");
     std::string productId = ReadSysfsFile(basePath + "idProduct");
-    HDF_LOGI(" [MF: %{public}s, SN: %{public}s, VID: 0x%{public}s, PID: 0x%{public}s]",
-        manufacturer.empty() ? "UN" : manufacturer.c_str(),
-        serialNumber.empty() ? "UN" : serialNumber.c_str(),
-        vendorId.empty() ? "UN" : vendorId.c_str(),
-        productId.empty() ? "UN" : productId.c_str());
 
     SerialDeviceInfo info{fullPath, manufacturer, serialNumber, 0, 0};
     HexStrToInt(productId, info.productId);
