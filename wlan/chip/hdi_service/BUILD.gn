@@ -48,7 +48,7 @@ ohos_shared_library("libchip_controller_chip_interface_service_2.0") {
     "HAL_SO_NAME=\"$drivers_peripheral_wlan_feature_vendor\"",
   ]
 
-  if (driver_peripheral_wlan_feature_pluggable) {
+  if (drivers_peripheral_wlan_feature_pluggable) {
     defines += ["WLAN_PLUGGABLE_SUPPORTED"]
   }
 

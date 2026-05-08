@@ -289,12 +289,13 @@ void Wifi::IsWlanSupported()
     HDF_LOGI("IsWlanSupported");
     std::string content;
     bool res = LoadStringFromFile(WLAN_CHIP_UNSUPPORTED_PATH, content);
+    // 节点文件存在且为1时表示模组不在位
     if (res && content == WLAN_PLUGGABLE_STATE_EMPLACE) {
+        HDF_LOGI("IsWlanSupported wlan pluggable extract");
+        SetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EXTRACT);
+    } else {
         HDF_LOGI("IsWlanSupported wlan pluggable emplace");
         SetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EMPLACE);
-    } else {
-        HDF_LOGI("IsWlanSupported wlan pluggable extrace");
-        SetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EXTRACT);
     }
     return;
 }
