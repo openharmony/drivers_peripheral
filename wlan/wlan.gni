@@ -18,5 +18,5 @@ declare_args() {
   drivers_peripheral_wlan_feature_emulator = false
   drivers_peripheral_wlan_feature_vendor = "hardware"
   drivers_peripheral_wlan_p2p_name = "p2p0"
-  driver_peripheral_wlan_feature_pluggable = false
+  drivers_peripheral_wlan_feature_pluggable = false
 }
