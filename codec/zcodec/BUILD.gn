@@ -1,0 +1,44 @@
+import("//build/ohos.gni")
+
+ohos_shared_library("libzcodec_driver") {
+    sources = [ "hdi_z_factory_driver.cpp" ]
+    external_deps = [
+        "c_utils:utils",
+        "drivers_interface_codec:video_parcel_headers",
+        "drivers_interface_codec:libzcodec_stub_1.0",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
+        "hilog:libhilog",
+        "ipc:ipc_single",
+    ]
+
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_codec"
+}
+
+ohos_shared_library("libhdi_z_factory_service_1.0") {
+    sources = [ "hdi_z_factory_service.cpp" ]
+    external_deps = [
+        "c_utils:utils",
+        "drivers_interface_codec:video_parcel_headers",
+        "drivers_interface_codec:libzcodec_stub_1.0",
+        "hdf_core:libhdi",
+        "hdf_core:libhdf_utils",
+        "hilog:libhilog",
+        "ipc:ipc_core",
+    ]
+
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_codec"
+}
+
+group("zcodec_idl_service") {
+  deps = [
+    ":libzcodec_driver",
+    ":libhdi_z_factory_service_1.0",
+  ]
+}

@@ -1,0 +1,110 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+ohos_unittest("zcodec_enc_idl_unit_test") {
+  testonly = true
+  module_out_path = "drivers_peripheral_codec/drivers_peripheral_codec"
+  sources = [
+    "zcodec_enc_idl_test.cpp",
+    "zcodec_enc_idl_edge_test.cpp",
+  ]
+  external_deps = [
+      "c_utils:utils",
+      "drivers_interface_codec:video_parcel_headers",
+      "drivers_interface_codec:zcodec_idl_headers",
+      "drivers_interface_codec:libzcodec_proxy_1.0",
+      "hdf_core:libhdi",
+      "hdf_core:libhdf_utils",
+      "graphic_surface:buffer_handle",
+      "graphic_surface:surface",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+  ]
+  include_dirs = [
+      "../../../utils/include",
+  ]
+  install_images = [ "vendor" ]
+  part_name = "video"
+}
+
+ohos_unittest("zcodec_dec_idl_unit_test") {
+  testonly = true
+  module_out_path = "drivers_peripheral_codec/drivers_peripheral_codec"
+  sources = [
+    "zcodec_dec_idl_test.cpp",
+    "zcodec_dec_idl_edge_test.cpp"
+  ]
+  external_deps = [
+      "c_utils:utils",
+      "drivers_interface_codec:video_parcel_headers",
+      "drivers_interface_codec:zcodec_idl_headers",
+      "drivers_interface_codec:libzcodec_proxy_1.0",
+      "hdf_core:libhdi",
+      "hdf_core:libhdf_utils",
+      "graphic_surface:buffer_handle",
+      "graphic_surface:surface",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+  ]
+  include_dirs = [
+      "../../../utils/include",
+  ]
+  install_images = [ "vendor" ]
+  part_name = "video"
+}
+
+ohos_unittest("zcodec_idl_buffer_unit_test") {
+  testonly = true
+  module_out_path = "drivers_peripheral_codec/drivers_peripheral_codec"
+  sources = [
+    "zcodec_idl_buffer_unit_test.cpp",
+  ]
+
+  deps = [
+    "../../demo/zcodec/tester:libzencoder_tester",
+    "../../demo/zcodec/tester:libzdecoder_tester"
+  ]
+
+  external_deps = [
+      "c_utils:utils",
+      "drivers_interface_codec:video_parcel_headers",
+      "drivers_interface_codec:zcodec_idl_headers",
+      "hdf_core:libhdi",
+      "hdf_core:libhdf_utils",
+      "graphic_surface:buffer_handle",
+      "graphic_surface:surface",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+  ]
+  include_dirs = [
+    "../../demo/zcodec/tester",
+    "../../../utils/include",
+  ]
+  install_images = [ "vendor" ]
+  part_name = "video"
+
+  resource_config_file =
+      "../resources/ohos_test.xml"
+}
+
+group("zcodec_idl_1.0_test") {
+  testonly = true
+  deps = [
+    ":zcodec_idl_buffer_unit_test",
+    ":zcodec_enc_idl_unit_test",
+    ":zcodec_dec_idl_unit_test",
+  ]
+}

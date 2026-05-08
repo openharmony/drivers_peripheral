@@ -1,0 +1,54 @@
+import("//build/ohos.gni")
+
+# 编码器静态库：供其他模块调用 TestZEncoder
+ohos_static_library("libzencoder_tester") {
+    sources = [
+        "command_parse.cpp",
+        "zencoder_tester.cpp",
+    ]
+    include_dirs = [
+        "../../../../utils/include",
+    ]
+    external_deps = [
+        "c_utils:utils",
+        "drivers_interface_codec:video_parcel_headers",
+        "drivers_interface_codec:zcodec_idl_headers",
+        "drivers_interface_codec:libzcodec_proxy_1.0",
+        "hdf_core:libhdi",
+        "hdf_core:libhdf_utils",
+        "hilog:libhilog",
+        "ipc:ipc_single",
+        "graphic_surface:buffer_handle",
+        "graphic_surface:surface",
+    ]
+
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_codec"
+}
+
+# 解码器静态库：供其他模块调用 TestZDecoder
+ohos_static_library("libzdecoder_tester") {
+    sources = [
+        "command_parse.cpp",
+        "zdecoder_tester.cpp",
+        "start_code_detector.cpp",
+    ]
+    include_dirs = [
+        "../../../../utils/include",
+    ]
+    external_deps = [
+        "c_utils:utils",
+        "drivers_interface_codec:video_parcel_headers",
+        "drivers_interface_codec:zcodec_idl_headers",
+        "drivers_interface_codec:libzcodec_proxy_1.0",
+        "hdf_core:libhdi",
+        "hdf_core:libhdf_utils",
+        "hilog:libhilog",
+        "ipc:ipc_single",
+        "graphic_surface:buffer_handle",
+        "graphic_surface:surface",
+    ]
+
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_codec"
+}

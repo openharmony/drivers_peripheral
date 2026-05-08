@@ -1,0 +1,63 @@
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+ohos_executable("zencoder_hdi_demo") {
+    sources = [
+        "zencoder_demo.cpp",
+    ]
+    include_dirs = [
+        "../../../utils/include",
+        "./tester"
+    ]
+
+    deps = [
+        "./tester:libzencoder_tester",
+    ]
+    external_deps = [
+        "c_utils:utils",
+        "drivers_interface_codec:video_parcel_headers",
+        "drivers_interface_codec:zcodec_idl_headers",
+        "hdf_core:libhdi",
+        "hdf_core:libhdf_utils",
+        "graphic_surface:buffer_handle",
+        "graphic_surface:surface",
+        "hilog:libhilog",
+        "ipc:ipc_single",
+    ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_codec"
+}
+
+ohos_executable("zdecoder_hdi_demo") {
+    sources = [
+        "zdecoder_demo.cpp",
+    ]
+    include_dirs = [
+        "../../../utils/include",
+        "./tester"
+    ]
+
+    deps = [
+        "./tester:libzdecoder_tester",
+    ]
+    external_deps = [
+        "c_utils:utils",
+        "drivers_interface_codec:video_parcel_headers",
+        "drivers_interface_codec:zcodec_idl_headers",
+        "hdf_core:libhdi",
+        "hdf_core:libhdf_utils",
+        "graphic_surface:buffer_handle",
+        "graphic_surface:surface",
+        "hilog:libhilog",
+        "ipc:ipc_single",
+    ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_codec"
+}
+
+group("zcodec_hdi_demo") {
+  deps = [
+    ":zencoder_hdi_demo",
+    ":zdecoder_hdi_demo",
+  ]
+}

@@ -20,4 +20,9 @@ group("hdf_demo_codec") {
     "idl:codec_idl_omx_demo",
     "jpeg:codec_hdi_jpeg_demo",
   ]
+  if (!drivers_peripheral_codec_feature_support_omx_extend_test) {
+    deps += [
+      "zcodec:zcodec_hdi_demo",
+    ]
+  }
 }
