@@ -474,7 +474,6 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
 
     // Send empty callback at thread startup to trigger framework-level thread priority elevation
     {
-        std::lock_guard<std::mutex> lock(mutex_);
         if (ctx->dataCallback) {
             std::vector<MidiMessage> emptyEventList;
             ctx->dataCallback->OnMidiDataReceived(emptyEventList);
