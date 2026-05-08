@@ -495,7 +495,6 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
     // Add Wakeup fd
     struct epoll_event evWakeup;
     epoll.add(ctx->eventFd, evWakeup, EPOLLIN, &ctx->eventFd); // Use ptr to identify
-    HDF_LOGI("%{public}s epoll setup complete, entering main loop", __func__);
 
     auto src = std::make_unique<uint8_t[]>(WORK_BUFFER_SIZE);
     while (!ctx->quit) {
