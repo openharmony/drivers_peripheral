@@ -69,8 +69,8 @@ private:
 
     std::atomic_uint32_t count_ = 0;
     unsigned int halfMinFifoCount_ = 1;
-    SdcBufferInfo accBufInfo_ = {-1, 1, 0, 0};
-    SdcBufferInfo gyrBufInfo_ = {-1, 1, 0, 0};
+    SdcBufferInfo accBufInfo_ = {-1, 1, 0, 1};
+    SdcBufferInfo gyrBufInfo_ = {-1, 1, 0, 1};
     bool isBeta_ = false;
     std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
     uint8_t* sensorShareAddr_ = nullptr;
