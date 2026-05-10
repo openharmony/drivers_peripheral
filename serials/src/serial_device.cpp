@@ -82,10 +82,11 @@ int32_t SerialDevice::Open()
         fd_ = INVALID_FD;
         return HDF_ERR_IO;
     }
-    if (ConfigurePort() != HDF_SUCCESS) {
+    int ret = HDF_SUCCESS;
+    if ((ret = ConfigurePort()) != HDF_SUCCESS) {
         fdsan_close_with_tag(fd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         fd_ = INVALID_FD;
-        return HDF_ERR_IO;
+        return ret;
     }
     if (InitPipes() != HDF_SUCCESS) {
         fdsan_close_with_tag(fd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
