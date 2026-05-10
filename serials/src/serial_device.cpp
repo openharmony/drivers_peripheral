@@ -69,7 +69,8 @@ int32_t SerialDevice::Open()
             HDF_LOGW("device not exist.%{public}s", portName_.c_str());
             return HDF_DEV_ERR_NO_DEVICE;
         } else {
-            HDF_LOGE("open failed.%{public}s - errno=%d (%s)\n", portName_.c_str(), errno, strerror(errno));
+            HDF_LOGE("open failed.%{public}s - errno=%{public}d (%{public}s)\n",
+                portName_.c_str(), errno, strerror(errno));
         }
 
         return HDF_ERR_IO;
