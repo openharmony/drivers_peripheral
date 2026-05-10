@@ -333,15 +333,20 @@ int32_t SerialDevice::SetBaudRateInternal(struct termios& options)
             return HDF_SUCCESS;
         }
     }
-    options.c_cflag &= ~CBAUD;
-    options.c_cflag |= BOTHER;
-    if (cfsetispeed(&options, currentConfig_.baudRate) < 0) {
-        HDF_LOGE("cfsetispeed:%{public}d failed!", currentConfig_.baudRate);
-        return HDF_ERR_INVALID_PARAM;
+    struct termios2 tio;
+    if (ioctl(fd_, TCGETS2, &tio) < 0) {
+        HDF_LOGE("ioctl TCGETS2 failed!errno:%{public}d", errno);
+        return HDF_FAILURE;
     }
-    if (cfsetospeed(&options, currentConfig_.baudRate) < 0) {
-        HDF_LOGE("cfsetospeed:%{public}d failed!", currentConfig_.baudRate);
-        return HDF_ERR_INVALID_PARAM;
+
+    tio.c_cflag &= ~CBAUD;
+    tio.c_cflag |= BOTHER;
+    tio.c_ispeed = currentConfig_.baudRate;
+    tio.c_ospeed = currentConfig_.baudRate;
+
+    if (ioctl(fd_, TCSETS2, &tio) < 0) {
+        HDF_LOGE("ioctl TCSETS2 failed!errno:%{public}d", errno);
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
