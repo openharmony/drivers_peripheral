@@ -291,7 +291,9 @@ int32_t SerialDevice::SetParityInternal(struct termios& options)
             options.c_cflag |= (PARENB | PARODD | CMSPAR);
             break;
         case FLAG_PARITY_4:
-            options.c_cflag |= (PARENB | CMSPAR);
+            options.c_cflag |= PARENB;
+            options.c_cflag |= CMSPAR;
+            options.c_cflag &= ~PARODD;
             break;
         default:
             HDF_LOGE("invalid parity:%{public}d\n", currentConfig_.parity);
@@ -322,11 +324,11 @@ int32_t SerialDevice::SetBaudRateInternal(struct termios& options)
         if (currentConfig_.baudRate == baudTable[i].baud) {
             if (cfsetispeed(&options, baudTable[i].speed) < 0) {
                 HDF_LOGE("cfsetispeed:%{public}d failed!", currentConfig_.baudRate);
-                return HDF_FAILURE;
+                return HDF_ERR_INVALID_PARAM;
             }
             if (cfsetospeed(&options, baudTable[i].speed) < 0) {
                 HDF_LOGE("cfsetospeed:%{public}d failed!", currentConfig_.baudRate);
-                return HDF_FAILURE;
+                return HDF_ERR_INVALID_PARAM;
             }
             return HDF_SUCCESS;
         }
@@ -335,11 +337,11 @@ int32_t SerialDevice::SetBaudRateInternal(struct termios& options)
     options.c_cflag |= BOTHER;
     if (cfsetispeed(&options, currentConfig_.baudRate) < 0) {
         HDF_LOGE("cfsetispeed:%{public}d failed!", currentConfig_.baudRate);
-        return HDF_FAILURE;
+        return HDF_ERR_INVALID_PARAM;
     }
     if (cfsetospeed(&options, currentConfig_.baudRate) < 0) {
         HDF_LOGE("cfsetospeed:%{public}d failed!", currentConfig_.baudRate);
-        return HDF_FAILURE;
+        return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
 }
