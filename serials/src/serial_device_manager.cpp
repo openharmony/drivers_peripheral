@@ -192,15 +192,10 @@ void SerialDeviceManager::AddNormalSerialDevice(std::vector<SerialDeviceInfo>& d
         HDF_LOGD("not support this device:%{public}s!", fullPath.c_str());
         return;
     }
-    struct stat st;
-    if (stat(fullPath.c_str(), &st) == 0 && S_ISCHR(st.st_mode)) {
-        SerialDeviceInfo info{fullPath, "", "", 0, 0};
-        devices.push_back(info);
-        availableDevices_[fullPath] = info;
-        HDF_LOGI("found device:%{public}s!", fullPath.c_str());
-    } else {
-        HDF_LOGW("found device:%{public}s, errno:%{public}d!", fullPath.c_str(), errno);
-    }
+    SerialDeviceInfo info{fullPath, "", "", 0, 0};
+    devices.push_back(info);
+    availableDevices_[fullPath] = info;
+    HDF_LOGI("found device:%{public}s!", fullPath.c_str());
 }
 
 int32_t SerialDeviceManager::QueryDevices(std::vector<SerialDeviceInfo>& devices)
