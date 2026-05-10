@@ -286,6 +286,11 @@ int32_t SerialDevice::SetParityInternal(struct termios& options)
         case FLAG_PARITY_2:
             options.c_cflag |= PARENB;
             options.c_cflag &= ~PARODD;
+        case FLAG_PARITY_3:
+            options.c_cflag |= (PARENB | PARODD | CMSPAR);
+            break;
+        case FLAG_PARITY_4:
+            options.c_cflag |= (PARENB | CMSPAR);
             break;
         default:
             HDF_LOGE("invalid parity:%{public}d\n", currentConfig_.parity);
