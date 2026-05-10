@@ -333,6 +333,7 @@ int32_t SerialDevice::SetBaudRateInternal(struct termios& options)
             return HDF_SUCCESS;
         }
     }
+    HDF_LOGE("invalid baud:%{public}d!", currentConfig_.baudRate);
     return HDF_ERR_INVALID_PARAM;
 }
 
