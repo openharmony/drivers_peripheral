@@ -333,22 +333,7 @@ int32_t SerialDevice::SetBaudRateInternal(struct termios& options)
             return HDF_SUCCESS;
         }
     }
-    struct termios2 tio;
-    if (ioctl(fd_, TCGETS2, &tio) < 0) {
-        HDF_LOGE("ioctl TCGETS2 failed!errno:%{public}d", errno);
-        return HDF_FAILURE;
-    }
-
-    tio.c_cflag &= ~CBAUD;
-    tio.c_cflag |= BOTHER;
-    tio.c_ispeed = currentConfig_.baudRate;
-    tio.c_ospeed = currentConfig_.baudRate;
-
-    if (ioctl(fd_, TCSETS2, &tio) < 0) {
-        HDF_LOGE("ioctl TCSETS2 failed!errno:%{public}d", errno);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
+    return HDF_ERR_INVALID_PARAM;
 }
 
 int32_t SerialDevice::Write(const std::vector<uint8_t>& data, int32_t timeout, int32_t& bytesWritten)
