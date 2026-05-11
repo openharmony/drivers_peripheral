@@ -43,7 +43,7 @@ static const std::string HOST_CONFIG_PATH = HDF_CONFIG_DIR;
 static const std::string HOST_CHIP_PROD_CONFIG_PATH = HDF_CHIP_PROD_CONFIG_DIR;
 static constexpr int32_t PRODUCT_NAME_MAX = 128;
 
-static bool GetConfigFilePath(const char *productName, char *configPath, size_t configPathLen)
+static bool GetConfigFilePath(std::string& productName, char *configPath, size_t configPathLen)
 {
     static const std::string adapterConfigPath[] = {
         HOST_CHIP_PROD_CONFIG_PATH,
@@ -52,12 +52,8 @@ static bool GetConfigFilePath(const char *productName, char *configPath, size_t 
 
     size_t pathNum = sizeof(adapterConfigPath) / sizeof(adapterConfigPath[0]);
     for (size_t i = 0; i < pathNum; ++i) {
-        if (sprintf_s(configPath, configPathLen - 1, "%s/hdf_%s.hcb", adapterConfigPath[i].c_str(), productName) < 0) {
-            HDF_LOGE("failed to generate file path");
-            continue;
-        }
-
-        if (access(configPath, F_OK | R_OK) == 0) {
+        std::string configPath = adapterConfigPath[i] + "/hdf_" + productName + ".hcb";
+        if (access(configPath.c_str(), F_OK | R_OK) == 0) {
             return true;
         }
         HDF_LOGD("invalid config file path or permission:%{public}s", configPath);
@@ -67,13 +63,8 @@ static bool GetConfigFilePath(const char *productName, char *configPath, size_t 
 
 const struct DeviceResourceNode *HdfGetHcsRootNode()
 {
-    char productName[PRODUCT_NAME_MAX] = { 0 };
     char configPath[PATH_MAX] = { 0 };
-
-    int ret = strcpy_s(productName, PRODUCT_NAME_MAX, "default");
-    if (ret != HDF_SUCCESS) {
-        return nullptr;
-    }
+    std::string productName = "default";
 
     if (!GetConfigFilePath(productName, configPath, PATH_MAX)) {
         HDF_LOGE("failed to get config file path");
