@@ -260,6 +260,7 @@ int32_t SerialDevice::SetRtsCtsInternal(struct termios& options)
 
 int32_t SerialDevice::SetXonXoffInternal(struct termios& options)
 {
+    options.c_cflag |= (CLOCAL | CREAD);
     options.c_iflag &= ~(IXON | IXOFF | IXANY);
 
     if (currentConfig_.xon) {
@@ -277,8 +278,8 @@ int32_t SerialDevice::SetXonXoffInternal(struct termios& options)
 
 int32_t SerialDevice::SetParityInternal(struct termios& options)
 {
-    options.c_iflag &= ~IGNPAR;
-    options.c_iflag &= ~PARMRK;
+    options.c_cflag &= ~(PARENB | PARODD);
+    options.c_iflag &= ~(IGNPAR | PARMRK | INPCK);
     switch (currentConfig_.parity) {
         case FLAG_PARITY_0:
             options.c_cflag &= ~PARENB;
