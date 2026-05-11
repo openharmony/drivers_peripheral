@@ -283,11 +283,12 @@ int32_t SerialDevice::SetParityInternal(struct termios& options)
             options.c_cflag &= ~PARENB;
             break;
         case FLAG_PARITY_1:
-            options.c_cflag |= (PARENB | PARODD);
-            break;
-        case FLAG_PARITY_2:
             options.c_cflag |= PARENB;
             options.c_cflag &= ~PARODD;
+            break;
+        case FLAG_PARITY_2:
+            options.c_cflag |= (PARENB | PARODD);
+            break;
         case FLAG_PARITY_3:
             options.c_cflag |= (PARENB | PARODD | CMSPAR);
             break;
