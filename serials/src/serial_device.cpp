@@ -69,7 +69,8 @@ int32_t SerialDevice::Open()
             HDF_LOGW("device not exist.%{public}s", portName_.c_str());
             return HDF_DEV_ERR_NO_DEVICE;
         } else {
-            HDF_LOGE("open failed.%{public}s - errno=%d (%s)\n", portName_.c_str(), errno, strerror(errno));
+            HDF_LOGE("open failed.%{public}s - errno=%{public}d (%{public}s)\n",
+                portName_.c_str(), errno, strerror(errno));
         }
 
         return HDF_ERR_IO;
@@ -81,10 +82,11 @@ int32_t SerialDevice::Open()
         fd_ = INVALID_FD;
         return HDF_ERR_IO;
     }
-    if (ConfigurePort() != HDF_SUCCESS) {
+    int ret = HDF_SUCCESS;
+    if ((ret = ConfigurePort()) != HDF_SUCCESS) {
         fdsan_close_with_tag(fd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
         fd_ = INVALID_FD;
-        return HDF_ERR_IO;
+        return ret;
     }
     if (InitPipes() != HDF_SUCCESS) {
         fdsan_close_with_tag(fd_, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
@@ -286,6 +288,13 @@ int32_t SerialDevice::SetParityInternal(struct termios& options)
         case FLAG_PARITY_2:
             options.c_cflag |= PARENB;
             options.c_cflag &= ~PARODD;
+        case FLAG_PARITY_3:
+            options.c_cflag |= (PARENB | PARODD | CMSPAR);
+            break;
+        case FLAG_PARITY_4:
+            options.c_cflag |= PARENB;
+            options.c_cflag |= CMSPAR;
+            options.c_cflag &= ~PARODD;
             break;
         default:
             HDF_LOGE("invalid parity:%{public}d\n", currentConfig_.parity);
@@ -316,26 +325,17 @@ int32_t SerialDevice::SetBaudRateInternal(struct termios& options)
         if (currentConfig_.baudRate == baudTable[i].baud) {
             if (cfsetispeed(&options, baudTable[i].speed) < 0) {
                 HDF_LOGE("cfsetispeed:%{public}d failed!", currentConfig_.baudRate);
-                return HDF_FAILURE;
+                return HDF_ERR_INVALID_PARAM;
             }
             if (cfsetospeed(&options, baudTable[i].speed) < 0) {
                 HDF_LOGE("cfsetospeed:%{public}d failed!", currentConfig_.baudRate);
-                return HDF_FAILURE;
+                return HDF_ERR_INVALID_PARAM;
             }
             return HDF_SUCCESS;
         }
     }
-    options.c_cflag &= ~CBAUD;
-    options.c_cflag |= BOTHER;
-    if (cfsetispeed(&options, currentConfig_.baudRate) < 0) {
-        HDF_LOGE("cfsetispeed:%{public}d failed!", currentConfig_.baudRate);
-        return HDF_FAILURE;
-    }
-    if (cfsetospeed(&options, currentConfig_.baudRate) < 0) {
-        HDF_LOGE("cfsetospeed:%{public}d failed!", currentConfig_.baudRate);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
+    HDF_LOGE("invalid baud:%{public}d!", currentConfig_.baudRate);
+    return HDF_ERR_INVALID_PARAM;
 }
 
 int32_t SerialDevice::Write(const std::vector<uint8_t>& data, int32_t timeout, int32_t& bytesWritten)
