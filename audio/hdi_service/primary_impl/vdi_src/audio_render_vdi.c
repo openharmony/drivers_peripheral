@@ -1059,6 +1059,9 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
             (renderPriv->renderInfos[index].streamType == attrs->type) &&
             (renderPriv->renderInfos[index].sampleRate == attrs->sampleRate) &&
             (renderPriv->renderInfos[index].channelCount == attrs->channelCount)) {
+            if ((attrs->type == AUDIO_VDI_OFFLOAD) && (strcmp(value, "support") == 0)) {
+                return NULL;
+            }
             *rendrId = renderPriv->renderInfos[index].renderId;
             renderPriv->renderInfos[index].usrCount++;
             return &renderPriv->renderInfos[index].render;
