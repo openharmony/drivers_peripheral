@@ -14,9 +14,18 @@
  */
 
 #include "mjpeg_decoder.h"
-#include "camera.h"
 #include <cstring>
 #include <dlfcn.h>
+
+#ifdef CAMERA_BUILT_ON_USB
+#include "camera.h"
+#else
+// 直接使用 hilog，避免 camera.h 依赖链
+#include "hilog/log.h"
+#define CAMERA_LOGE(fmt, ...) HILOG_ERROR(LOG_CORE, fmt, ##__VA_ARGS__)
+#define CAMERA_LOGI(fmt, ...) HILOG_INFO(LOG_CORE, fmt, ##__VA_ARGS__)
+#define CAMERA_LOGD(fmt, ...) HILOG_DEBUG(LOG_CORE, fmt, ##__VA_ARGS__)
+#endif
 
 extern "C" {
 #ifdef DEVICE_USAGE_FFMPEG_ENABLE
