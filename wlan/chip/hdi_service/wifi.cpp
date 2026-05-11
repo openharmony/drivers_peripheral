@@ -287,15 +287,19 @@ int32_t Wifi::RemoveWifiDeathRecipient(const sptr<IChipControllerCallback>& even
 void Wifi::IsWlanSupported()
 {
     HDF_LOGI("IsWlanSupported");
+    int ret = 0;
     std::string content;
     bool res = LoadStringFromFile(WLAN_CHIP_UNSUPPORTED_PATH, content);
     // 节点文件存在且为1时表示模组不在位
     if (res && content == WLAN_PLUGGABLE_STATE_EMPLACE) {
         HDF_LOGI("IsWlanSupported wlan pluggable extract");
-        SetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EXTRACT);
+        ret = SetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EXTRACT);
     } else {
         HDF_LOGI("IsWlanSupported wlan pluggable emplace");
-        SetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EMPLACE);
+        ret = SetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EMPLACE);
+    }
+    if (ret != 0) {
+        HDF_LOGE("IsWlanSupported set wlan pluggable state fail!");
     }
     return;
 }
