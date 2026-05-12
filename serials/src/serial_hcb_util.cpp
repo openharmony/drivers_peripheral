@@ -39,25 +39,24 @@ namespace HDI {
 namespace Serials {
 namespace V1_0 {
 static constexpr int32_t MAX_SERIALS_NUMBER = 128;
-static const std::string HOST_CONFIG_PATH = HDF_CONFIG_DIR;
-static const std::string HOST_CHIP_PROD_CONFIG_PATH = HDF_CHIP_PROD_CONFIG_DIR;
-static constexpr int32_t PRODUCT_NAME_MAX = 128;
+static const char* HOST_CONFIG_PATH = HDF_CONFIG_DIR "/hdf_default.hcb";
+static const char* HOST_CHIP_PROD_CONFIG_PATH = HDF_CHIP_PROD_CONFIG_DIR "/hdf_default.hcb";
 
 const struct DeviceResourceNode *HdfGetHcsRootNode()
 {
-    static const std::string adapterConfigPath[] = {
-        HOST_CHIP_PROD_CONFIG_PATH + "/hdf_default.hcb",
-        HOST_CONFIG_PATH + "/hdf_default.hcb",
+    static const char* adapterConfigPath[] = {
+        HOST_CHIP_PROD_CONFIG_PATH,
+        HOST_CONFIG_PATH,
     };
 
     size_t pathNum = sizeof(adapterConfigPath) / sizeof(adapterConfigPath[0]);
     for (size_t i = 0; i < pathNum; ++i) {
-        if (access(adapterConfigPath[i].c_str(), F_OK | R_OK) == 0) {
-            SetHcsBlobPath(adapterConfigPath[i].c_str());
+        if (access(adapterConfigPath[i], F_OK | R_OK) == 0) {
+            SetHcsBlobPath(adapterConfigPath[i]);
             const struct DeviceResourceNode *mgrRoot = HcsGetRootNode();
             return mgrRoot;
         }
-        HDF_LOGD("invalid config file path or permission:%{public}s", adapterConfigPath[i].c_str());
+        HDF_LOGD("invalid config file path or permission:%{public}s", adapterConfigPath[i]);
     }
     HDF_LOGW("no hcb file found!");
     return nullptr;
