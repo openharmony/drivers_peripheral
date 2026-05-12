@@ -200,7 +200,7 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         goto EXIT;
     }
 
-    const char* condition = "support_muti_stream";
+    const char* condition = "support_multi_stream";
     char value[VALUE_LEN + 1] = {0};
     ret = vdiAdapter -> GetExtraParams(vdiAdapter, 0, condition, value, VALUE_LEN);
     char *adapterName = AudioGetAdapterNameVdi(adapter);
