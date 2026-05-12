@@ -43,37 +43,24 @@ static const std::string HOST_CONFIG_PATH = HDF_CONFIG_DIR;
 static const std::string HOST_CHIP_PROD_CONFIG_PATH = HDF_CHIP_PROD_CONFIG_DIR;
 static constexpr int32_t PRODUCT_NAME_MAX = 128;
 
-static bool GetConfigFilePath(std::string& productName, char *configPath, size_t configPathLen)
+const struct DeviceResourceNode *HdfGetHcsRootNode()
 {
     static const std::string adapterConfigPath[] = {
-        HOST_CHIP_PROD_CONFIG_PATH,
-        HOST_CONFIG_PATH,
+        HOST_CHIP_PROD_CONFIG_PATH + "/hdf_default.hcb",
+        HOST_CONFIG_PATH + "/hdf_default.hcb",
     };
 
     size_t pathNum = sizeof(adapterConfigPath) / sizeof(adapterConfigPath[0]);
     for (size_t i = 0; i < pathNum; ++i) {
-        std::string configPath = adapterConfigPath[i] + "/hdf_" + productName + ".hcb";
-        if (access(configPath.c_str(), F_OK | R_OK) == 0) {
-            return true;
+        if (access(adapterConfigPath[i].c_str(), F_OK | R_OK) == 0) {
+            SetHcsBlobPath(adapterConfigPath[i].c_str());
+            const struct DeviceResourceNode *mgrRoot = HcsGetRootNode();
+            return mgrRoot;
         }
-        HDF_LOGD("invalid config file path or permission:%{public}s", configPath);
+        HDF_LOGD("invalid config file path or permission:%{public}s", adapterConfigPath[i].c_str());
     }
-    return false;
-}
-
-const struct DeviceResourceNode *HdfGetHcsRootNode()
-{
-    char configPath[PATH_MAX] = { 0 };
-    std::string productName = "default";
-
-    if (!GetConfigFilePath(productName, configPath, PATH_MAX)) {
-        HDF_LOGE("failed to get config file path");
-        return nullptr;
-    }
-
-    SetHcsBlobPath(configPath);
-    const struct DeviceResourceNode *mgrRoot = HcsGetRootNode();
-    return mgrRoot;
+    HDF_LOGW("no hcb file found!");
+    return nullptr;
 }
 
 static int32_t LoadOnboardSerialList(struct DeviceResourceIface *devResInstance,
