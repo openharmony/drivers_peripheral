@@ -213,7 +213,6 @@ int32_t SerialDevice::ConfigurePort()
         HDF_LOGE("%{public}s, tcsetattr failed!", __func__);
         return HDF_FAILURE;
     }
-
     return HDF_SUCCESS;
 }
 
@@ -278,29 +277,24 @@ int32_t SerialDevice::SetXonXoffInternal(struct termios& options)
 
 int32_t SerialDevice::SetParityInternal(struct termios& options)
 {
+    options.c_cflag &= ~(PARENB | PARODD | CMSPAR);
     switch (currentConfig_.parity) {
         case FLAG_PARITY_0:
             options.c_cflag &= ~PARENB;
-            options.c_iflag &= ~INPCK;
             break;
         case FLAG_PARITY_1:
             options.c_cflag |= PARENB;
             options.c_cflag &= ~PARODD;
-            options.c_iflag |= INPCK;
             break;
         case FLAG_PARITY_2:
             options.c_cflag |= (PARENB | PARODD);
-            options.c_iflag |= INPCK;
             break;
         case FLAG_PARITY_3:
             options.c_cflag |= (PARENB | PARODD | CMSPAR);
-            options.c_iflag |= INPCK;
             break;
         case FLAG_PARITY_4:
-            options.c_cflag |= PARENB;
-            options.c_cflag |= CMSPAR;
+            options.c_cflag |= (PARENB | CMSPAR);
             options.c_cflag &= ~PARODD;
-            options.c_iflag |= INPCK;
             break;
         default:
             HDF_LOGE("invalid parity:%{public}d\n", currentConfig_.parity);
