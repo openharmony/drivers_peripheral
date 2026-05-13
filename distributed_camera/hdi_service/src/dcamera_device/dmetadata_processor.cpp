@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -584,10 +584,8 @@ void DMetadataProcessor::UpdateAllResult(const uint64_t &resultTimestamp)
 void DMetadataProcessor::UpdateOnChanged(const uint64_t &resultTimestamp)
 {
     bool needReturn = false;
-    if (latestProducerMetadataResult_ == nullptr || latestConsumerMetadataResult_ == nullptr) {
-        DHLOGD("DMetadataProcessor::UpdateResultMetadata latest producer metadata result is null");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(latestProducerMetadataResult_ == nullptr || latestConsumerMetadataResult_ == nullptr,
+        "DMetadataProcessor::UpdateResultMetadata latest producer metadata result is null");
     uint32_t itemCap = OHOS::Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
     uint32_t dataSize = OHOS::Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
     DHLOGD("DMetadataProcessor::UpdateOnChanged itemCapacity: %{public}u, dataSize: %{public}u", itemCap, dataSize);
@@ -613,7 +611,11 @@ void DMetadataProcessor::UpdateOnChanged(const uint64_t &resultTimestamp)
             }
             uint32_t size = GetDataSize(item.data_type);
             DHLOGD("DMetadataProcessor::UpdateOnChanged data size: %{public}u", size);
-            for (uint32_t i = 0; i < (size * static_cast<uint32_t>(item.count)); i++) {
+            uint64_t totalSize = static_cast<uint64_t>(size) * static_cast<uint64_t>(item.count);
+            if (size == 0 || totalSize > UINT32_MAX) {
+                continue;
+            }
+            for (uint32_t i = 0; i < totalSize; i++) {
                 if (*(item.data.u8 + i) != *(anoItem.data.u8 + i)) {
                     needReturn = true;
                     result->addEntry(tag, GetMetadataItemData(item), item.count);

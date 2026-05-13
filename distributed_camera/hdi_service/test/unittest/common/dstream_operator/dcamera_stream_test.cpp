@@ -246,7 +246,7 @@ HWTEST_F(DCameraStreamTest, ReturnDCameraBuffer_001, TestSize.Level1)
     DCameraBuffer buffer;
     dcStream->bufferConfigMap_.clear();
     auto ret = dcStream->ReturnDCameraBuffer(buffer);
-    EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
+    EXPECT_EQ(ret, DCamRetCode::SUCCESS);
 }
 
 /**

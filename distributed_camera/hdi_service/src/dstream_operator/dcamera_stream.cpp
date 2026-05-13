@@ -361,7 +361,6 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
     DCamRetCode ret = FlushDCameraBuffer(buffer);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("Flush Buffer failed, ret: %{public}d", ret);
-        return ret;
     }
 
     {
