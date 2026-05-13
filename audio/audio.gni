@@ -25,6 +25,7 @@ declare_args() {
   drivers_peripheral_audio_feature_hisysevent_enable = true
   drivers_peripheral_audio_feature_frame_ec = false
   drivers_peripheral_audio_feature_reclaim_memory = false
+  drivers_peripheral_audio_vendor_alsa_path = ""
 }
 
 if (defined(ohos_lite)) {
