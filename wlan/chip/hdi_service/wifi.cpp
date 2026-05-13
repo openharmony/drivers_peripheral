@@ -19,6 +19,10 @@
 #include "wifi_hal.h"
 #include "hdi_sync_util.h"
 #include "iproxy_broker.h"
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+#include "file_ex.h"
+#include "parameter.h"
+#endif
 
 namespace OHOS {
 namespace HDI {
@@ -33,6 +37,13 @@ const int CHIP_ID_AP = 3;
 
 static constexpr int32_t K_PRIMARY_CHIP_ID = 0;
 static std::mutex g_chipMutex;
+
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+const std::string WLAN_CHIP_UNSUPPORTED_PATH = "/proc/connectivity/wifi_chip_no_support";
+const char* WLAN_PLUGGABLE_STATE = "persist.wlan.pluggable.state";
+const char* WLAN_PLUGGABLE_STATE_EXTRACT = "0";
+const char* WLAN_PLUGGABLE_STATE_EMPLACE = "1";
+#endif
 
 extern "C" IChipController *ChipControllerImplGetInstance(void)
 {
@@ -88,6 +99,9 @@ int32_t Wifi::Init()
     } else if (runState_ == RunState::STOPPING) {
         return HDF_FAILURE;
     }
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+    IsWlanSupported();
+#endif
     ErrorCode res = InitializVendorHal();
     if (res == ErrorCode::SUCCESS) {
         const auto& onVendorHalRestartCallback =
@@ -268,6 +282,28 @@ int32_t Wifi::RemoveWifiDeathRecipient(const sptr<IChipControllerCallback>& even
     }
     return HDF_SUCCESS;
 }
+
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+void Wifi::IsWlanSupported()
+{
+    HDF_LOGI("IsWlanSupported");
+    int ret = 0;
+    std::string content;
+    bool res = LoadStringFromFile(WLAN_CHIP_UNSUPPORTED_PATH, content);
+    // 节点文件存在且为1时表示模组不在位
+    if (res && content == WLAN_PLUGGABLE_STATE_EMPLACE) {
+        HDF_LOGI("IsWlanSupported wlan pluggable extract");
+        ret = SetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EXTRACT);
+    } else {
+        HDF_LOGI("IsWlanSupported wlan pluggable emplace");
+        ret = SetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EMPLACE);
+    }
+    if (ret != 0) {
+        HDF_LOGE("IsWlanSupported set wlan pluggable state fail!");
+    }
+    return;
+}
+#endif
     
 } // namespace V2_0
 } // namespace Chip
