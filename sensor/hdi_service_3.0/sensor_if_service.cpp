@@ -551,19 +551,30 @@ void SensorIfService::RemoveDeathNotice(int32_t groupId)
 void SensorIfService::SetNewBatch(const SensorHandle sensorHandle)
 {
     SensorInterval sensorInterval = SensorClientsManager::GetInstance()->GetClientSenSorBestConfig(sensorHandle);
-    SetDelay(sensorHandle, sensorInterval.samplingInterval, sensorInterval.reportInterval);
-    SensorClientsManager::GetInstance()->UpdateNewSensorConfig(sensorHandle, sensorInterval);
-    SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorHandle, sensorInterval.samplingInterval,
-                                                                 sensorInterval.reportInterval);
+    SensorInterval saSensorInterval = sensorInterval;
+    SensorInterval sdcSensorInterval = sensorInterval;
+    AdjustSensorConfig(sensorHandle, sensorInterval, saSensorInterval, sdcSensorInterval);
+
+    int32_t ret = SetBatchConfig(sensorHandle, sensorInterval.samplingInterval, sensorInterval.reportInterval);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
+    }
+
+    SetDelay(sensorHandle, saSensorInterval.samplingInterval, saSensorInterval.reportInterval);
+    SensorClientsManager::GetInstance()->UpdateNewSensorConfig(sensorHandle, saSensorInterval);
+    SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorHandle, saSensorInterval.samplingInterval,
+                                                                 saSensorInterval.reportInterval);
+
+    SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorHandle, saSensorInterval.samplingInterval,
+                                                             saSensorInterval.reportInterval);
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
-    int32_t ret;
     if (GetSensorProductMode()) {
-        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, sensorInterval.samplingInterval,
-                                             sensorInterval.reportInterval);
+        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle, saSensorInterval.samplingInterval,
+                                             saSensorInterval.reportInterval);
     } else {
-        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, sensorInterval.samplingInterval,
-                                             sensorInterval.reportInterval);
+        ret = sensorVdiImplV1_1_->SetSaBatch(sensorHandle.sensorType, saSensorInterval.samplingInterval,
+                                             saSensorInterval.reportInterval);
     }
     SENSOR_TRACE_FINISH;
 
