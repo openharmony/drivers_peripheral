@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("../../intelligent_voice.gni")
 
-ohos_shared_library("intell_voice_engine_manager_service_1.2") {
+ohos_shared_library("intell_voice_engine_manager_service_1.3") {
   include_dirs = [
     "../../interfaces",
     "../../utils",
@@ -31,6 +31,7 @@ ohos_shared_library("intell_voice_engine_manager_service_1.2") {
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.0",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.1",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.2",
+      "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.3",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
@@ -44,7 +45,7 @@ ohos_shared_library("intell_voice_engine_manager_service_1.2") {
     cflags_cc = [ "-DONLY_SECOND_STAGE" ]
   }
 
-  version_script = "libengine_manager_service_1_2.versionscript"
+  version_script = "libengine_manager_service_1_3.versionscript"
 
   install_enable = true
   install_images = [ chipset_base_dir ]
@@ -63,6 +64,7 @@ ohos_shared_library("intell_voice_engine_driver") {
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.0",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.1",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.2",
+      "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.3",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -87,7 +89,7 @@ ohos_shared_library("intell_voice_engine_driver") {
 group("hdi_intell_voice_engine_service") {
   deps = [
     ":intell_voice_engine_driver",
-    ":intell_voice_engine_manager_service_1.2",
+    ":intell_voice_engine_manager_service_1.3",
     "etc:intelligent_voice_engine_cfg",
   ]
 
