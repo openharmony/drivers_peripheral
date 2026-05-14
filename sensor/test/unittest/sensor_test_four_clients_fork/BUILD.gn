@@ -17,7 +17,18 @@ import("../../../sensor.gni")
 
 module_output_path = "drivers_peripheral_sensor/drivers_peripheral_sensor/SensorTestFourClientsFork"
 
-ohos_unittest("SensorTestFourClientsFork") {
+group("SensorTestFourClientsFork") {
+  deps = []
+  testonly = true
+  deps += [
+    ":SensorFourClientsClient1Test",
+    ":SensorFourClientsClient2Test",
+    ":SensorFourClientsClient3Test",
+    ":SensorFourClientsClient4Test",
+  ]
+}
+
+ohos_unittest("SensorFourClientsClient1Test") {
   module_out_path = module_output_path
 
   include_dirs = [
@@ -26,7 +37,121 @@ ohos_unittest("SensorTestFourClientsFork") {
     "../../../utils/include",
   ]
 
-  sources = [ "sensor_four_clients_fork_test.cpp" ]
+  sources = [ "sensor_four_clients_client1_test.cpp" ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_sensor:libsensor_proxy_3.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
+      "ipc:ipc_single",
+    ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [ "ipc:ipc_single" ]
+}
+
+ohos_unittest("SensorFourClientsClient2Test") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "../../../interfaces/include",
+    "../../../interfaces/v1_0",
+    "../../../utils/include",
+  ]
+
+  sources = [ "sensor_four_clients_client2_test.cpp" ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_sensor:libsensor_proxy_3.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
+      "ipc:ipc_single",
+    ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [ "ipc:ipc_single" ]
+}
+
+ohos_unittest("SensorFourClientsClient3Test") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "../../../interfaces/include",
+    "../../../interfaces/v1_0",
+    "../../../utils/include",
+  ]
+
+  sources = [ "sensor_four_clients_client3_test.cpp" ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_sensor:libsensor_proxy_3.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
+      "ipc:ipc_single",
+    ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [ "ipc:ipc_single" ]
+}
+
+ohos_unittest("SensorFourClientsClient4Test") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "../../../interfaces/include",
+    "../../../interfaces/v1_0",
+    "../../../utils/include",
+  ]
+
+  sources = [ "sensor_four_clients_client4_test.cpp" ]
 
   cflags = [
     "-Wall",
