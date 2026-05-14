@@ -462,6 +462,11 @@ struct AudioEventVdi {
     uint32_t deviceType;
 } __attribute__ ((aligned(8)));
 
+enum SceneTypeVdi {
+    AUDIO_VDI_SCENE_TYPE_MODEM = 0,
+    AUDIO_VDI_SCENE_TYPE_TRANSFER = 1,
+};
+
 /**
  * @brief Called when an event defined in {@link AudioCallbackType} occurs.
  *

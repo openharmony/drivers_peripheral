@@ -24,7 +24,7 @@
 #include "audio_common_vdi.h"
 #include "audio_render_vdi.h"
 #include "audio_dfx.h"
-#include "v6_0/iaudio_callback.h"
+#include "v6_1/iaudio_callback.h"
 #include "stub_collector.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
@@ -886,6 +886,67 @@ EXIT:
     return ret;
 }
 
+int32_t AudioCreateCallTransferVdi(struct IAudioAdapter *adapter)
+{
+    int ret = HDF_SUCCESS;
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
+
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    pthread_rwlock_rdlock(&g_rwAdapterLock);
+    struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
+    if (vdiAdapter == NULL || vdiAdapter->CreateCallTransfer == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        ret = HDF_ERR_NOT_SUPPORT;
+        goto EXIT;
+    }
+
+    ret = vdiAdapter->CreateCallTransfer(vdiAdapter);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio adapter CreateCallTransfer fail, ret=%{public}d", ret);
+        goto EXIT;
+    }
+
+    AUDIO_FUNC_LOGD("%{public}s Success", __func__);
+EXIT:
+    pthread_rwlock_unlock(&g_rwAdapterLock);
+    return ret;
+}
+
+int32_t AudioSetPhoneCallSceneVdi(struct IAudioAdapter *adapter, enum SceneType type)
+{
+    int ret = HDF_SUCCESS;
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
+
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    pthread_rwlock_rdlock(&g_rwAdapterLock);
+    struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
+    if (vdiAdapter == NULL || vdiAdapter->SetPhoneCallScene == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        ret = HDF_ERR_NOT_SUPPORT;
+        goto EXIT;
+    }
+
+    ret = vdiAdapter->SetPhoneCallScene(vdiAdapter, (enum SceneTypeVdi)type);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio adapter SetPhoneCallScene fail, ret=%{public}d,"
+            "type: %{public}d", ret, type);
+        goto EXIT;
+    }
+
+    AUDIO_FUNC_LOGD("%{public}s Success", __func__);
+EXIT:
+    pthread_rwlock_unlock(&g_rwAdapterLock);
+    return ret;
+}
+
 static void AudioInitAdapterInstanceVdi(struct IAudioAdapter *adapter)
 {
     adapter->InitAllPorts = AudioInitAllPortsVdi;
@@ -910,6 +971,8 @@ static void AudioInitAdapterInstanceVdi(struct IAudioAdapter *adapter)
     adapter->CreateCognitionStream = AudioCreateCognitionStreamVdi;
     adapter->DestroyCognitionStream = AudioDestroyCognitionStreamVdi;
     adapter->NotifyCognitionData = AudioNotifyCognitionDataVdi;
+    adapter->CreateCallTransfer = AudioCreateCallTransferVdi;
+    adapter->SetPhoneCallScene = AudioSetPhoneCallSceneVdi;
 }
 
 uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex)

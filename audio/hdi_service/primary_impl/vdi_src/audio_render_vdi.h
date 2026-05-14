@@ -17,7 +17,7 @@
 #define AUDIO_RENDER_VDI_H
 
 #include "iaudio_render_vdi.h"
-#include "v6_0/iaudio_render.h"
+#include "v6_1/iaudio_render.h"
 #include <pthread.h>
 
 pthread_rwlock_t* GetRenderLock(uint32_t index);
