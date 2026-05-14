@@ -20,16 +20,17 @@
 #include <mutex>
 #include <string>
 
+#include "v1_3/intell_voice_engine_types.h"
 #include "v1_2/intell_voice_engine_types.h"
 #include "v1_1/intell_voice_engine_types.h"
-#include "v1_2/iintell_voice_engine_manager.h"
+#include "v1_3/iintell_voice_engine_manager.h"
 #include "v1_1/iintell_voice_data_opr_callback.h"
 #include "i_engine.h"
 
 namespace OHOS {
 namespace IntelligentVoice {
 namespace Engine {
-using OHOS::HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineManager;
+using OHOS::HDI::IntelligentVoice::Engine::V1_3::IIntellVoiceEngineManager;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineAdapter;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterType;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterDescriptor;
@@ -67,6 +68,9 @@ public:
     int32_t SetDataOprCallback(const sptr<IIntellVoiceDataOprCallback> &dataOprCallback) override;
     int32_t GetUploadFiles(int32_t numMax, std::vector<UploadHdiFile> &files) override;
     int32_t CreateAdapter_V_2(const IntellVoiceEngineAdapterDescriptor &descriptor,
+        sptr<HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineAdapter> &adapter) override;
+    int32_t CreateAdapter_V_3(
+        const HDI::IntelligentVoice::Engine::V1_3::IntellVoiceEngineAdapterDescriptor &descriptor,
         sptr<HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineAdapter> &adapter) override;
     int32_t GetCloneFilesList(std::vector<std::string> &cloneFiles) override;
     int32_t GetCloneFile(const std::string &filePath, std::vector<uint8_t> &buffer) override;

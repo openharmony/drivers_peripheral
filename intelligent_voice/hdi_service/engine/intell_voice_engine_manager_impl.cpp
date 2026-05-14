@@ -115,6 +115,16 @@ int32_t IntellVoiceEngineManagerImpl::CreateAdapter_V_2(const IntellVoiceEngineA
     return CreateAdapterInner(descriptor, adapter);
 }
 
+int32_t IntellVoiceEngineManagerImpl::CreateAdapter_V_3(
+    const HDI::IntelligentVoice::Engine::V1_3::IntellVoiceEngineAdapterDescriptor &descriptor,
+    sptr<HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineAdapter> &adapter)
+{
+    IntellVoiceEngineAdapterDescriptor desc;
+    desc.adapterType
+        = static_cast<HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterType>(descriptor.adapterType);
+    return CreateAdapterInner(desc, adapter);
+}
+
 template<typename T>
 int32_t IntellVoiceEngineManagerImpl::CreateAdapterInner(const IntellVoiceEngineAdapterDescriptor &descriptor,
     sptr<T> &adapter)
