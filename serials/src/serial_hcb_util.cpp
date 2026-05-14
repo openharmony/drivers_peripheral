@@ -39,50 +39,27 @@ namespace HDI {
 namespace Serials {
 namespace V1_0 {
 static constexpr int32_t MAX_SERIALS_NUMBER = 128;
-static const std::string HOST_CONFIG_PATH = HDF_CONFIG_DIR;
-static const std::string HOST_CHIP_PROD_CONFIG_PATH = HDF_CHIP_PROD_CONFIG_DIR;
-static constexpr int32_t PRODUCT_NAME_MAX = 128;
+static const char* HOST_CONFIG_PATH = HDF_CONFIG_DIR "/hdf_default.hcb";
+static const char* HOST_CHIP_PROD_CONFIG_PATH = HDF_CHIP_PROD_CONFIG_DIR "/hdf_default.hcb";
 
-static bool GetConfigFilePath(const char *productName, char *configPath, size_t configPathLen)
+const struct DeviceResourceNode *HdfGetHcsRootNode()
 {
-    static const std::string adapterConfigPath[] = {
+    static const char* adapterConfigPath[] = {
         HOST_CHIP_PROD_CONFIG_PATH,
         HOST_CONFIG_PATH,
     };
 
     size_t pathNum = sizeof(adapterConfigPath) / sizeof(adapterConfigPath[0]);
     for (size_t i = 0; i < pathNum; ++i) {
-        if (sprintf_s(configPath, configPathLen - 1, "%s/hdf_%s.hcb", adapterConfigPath[i].c_str(), productName) < 0) {
-            HDF_LOGE("failed to generate file path");
-            continue;
+        if (access(adapterConfigPath[i], F_OK | R_OK) == 0) {
+            SetHcsBlobPath(adapterConfigPath[i]);
+            const struct DeviceResourceNode *mgrRoot = HcsGetRootNode();
+            return mgrRoot;
         }
-
-        if (access(configPath, F_OK | R_OK) == 0) {
-            return true;
-        }
-        HDF_LOGD("invalid config file path or permission:%{public}s", configPath);
+        HDF_LOGD("invalid config file path or permission:%{public}s", adapterConfigPath[i]);
     }
-    return false;
-}
-
-const struct DeviceResourceNode *HdfGetHcsRootNode()
-{
-    char productName[PRODUCT_NAME_MAX] = { 0 };
-    char configPath[PATH_MAX] = { 0 };
-
-    int ret = strcpy_s(productName, PRODUCT_NAME_MAX, "default");
-    if (ret != HDF_SUCCESS) {
-        return nullptr;
-    }
-
-    if (!GetConfigFilePath(productName, configPath, PATH_MAX)) {
-        HDF_LOGE("failed to get config file path");
-        return nullptr;
-    }
-
-    SetHcsBlobPath(configPath);
-    const struct DeviceResourceNode *mgrRoot = HcsGetRootNode();
-    return mgrRoot;
+    HDF_LOGW("no hcb file found!");
+    return nullptr;
 }
 
 static int32_t LoadOnboardSerialList(struct DeviceResourceIface *devResInstance,
