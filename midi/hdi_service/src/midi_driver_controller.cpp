@@ -471,6 +471,15 @@ void Midi1Device::ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* 
 void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
 {
     HDF_LOGI("%{public}s enter, deviceId: %{public}" PRId64, __func__, info_.deviceId);
+
+    // Send empty callback at thread startup to trigger framework-level thread priority elevation
+    {
+        if (ctx->dataCallback) {
+            std::vector<MidiMessage> emptyEventList;
+            ctx->dataCallback->OnMidiDataReceived(emptyEventList);
+        }
+    }
+
     EpollHandler epoll;
     if (!epoll.init()) {
         HDF_LOGE("%{public}s epoll create failed", __func__);
@@ -486,7 +495,6 @@ void Midi1Device::InputThreadLoop(std::shared_ptr<InputContext> ctx)
     // Add Wakeup fd
     struct epoll_event evWakeup;
     epoll.add(ctx->eventFd, evWakeup, EPOLLIN, &ctx->eventFd); // Use ptr to identify
-    HDF_LOGI("%{public}s epoll setup complete, entering main loop", __func__);
 
     auto src = std::make_unique<uint8_t[]>(WORK_BUFFER_SIZE);
     while (!ctx->quit) {
