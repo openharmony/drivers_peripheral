@@ -18,8 +18,8 @@
 #include <gtest/gtest.h>
 #include "hdf_base.h"
 #include "osal_mem.h"
-#include "v6_0/iaudio_capture.h"
-#include "v6_0/iaudio_manager.h"
+#include "v6_1/iaudio_capture.h"
+#include "v6_1/iaudio_manager.h"
 
 using namespace std;
 using namespace testing::ext;

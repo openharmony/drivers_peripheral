@@ -28,8 +28,8 @@
 #include "hdf_base.h"
 #include "inttypes.h"
 #include "osal_mem.h"
-#include "v6_0/audio_types.h"
-#include "v6_0/iaudio_manager.h"
+#include "v6_1/audio_types.h"
+#include "v6_1/iaudio_manager.h"
 
 #define MAX_AUDIO_ADAPTER_DESC         5
 #define AUDIO_CHANNELCOUNT             2

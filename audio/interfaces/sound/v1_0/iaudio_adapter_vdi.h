@@ -61,6 +61,10 @@ struct IAudioAdapterVdi {
     int32_t (*DestroyCognitionStream)(struct IAudioAdapterVdi *self, int32_t cogStreamId);
     int32_t (*NotifyCognitionData)(struct IAudioAdapterVdi *self,
         int32_t cogStreamId, uint32_t size, uint32_t offset);
+
+    int32_t (*CreateCallTransfer)(struct IAudioAdapterVdi *self);
+
+    int32_t (*SetPhoneCallScene)(struct IAudioAdapterVdi *self, enum SceneTypeVdi type);
 };
 
 #ifdef __cplusplus

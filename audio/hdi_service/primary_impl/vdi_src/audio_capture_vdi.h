@@ -17,7 +17,7 @@
 #define AUDIO_CAPTURE_VDI_H
 
 #include "iaudio_capture_vdi.h"
-#include "v6_0/iaudio_capture.h"
+#include "v6_1/iaudio_capture.h"
 #include <pthread.h>
 
 pthread_rwlock_t* GetCaptureLock(uint32_t indexId);
