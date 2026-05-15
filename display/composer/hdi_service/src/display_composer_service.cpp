@@ -1005,7 +1005,7 @@ int32_t DisplayComposerService::CommitTunnelLayer(uint32_t devId, uint64_t tunne
 {
     DISPLAY_TRACE;
 
-    int32_t outFence = -1;
+    int32_t outFence = INVALID_FD;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->CommitTunnelLayer, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiAdapter_->CommitTunnelLayer(devId, tunnelId, outFence);
