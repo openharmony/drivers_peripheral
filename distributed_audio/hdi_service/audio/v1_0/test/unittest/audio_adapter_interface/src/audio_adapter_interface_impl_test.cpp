@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <thread>
 #include <chrono>
+#include <thread>
 
 #include "audio_adapter_interface_impl_test.h"
 #include "daudio_constants.h"
@@ -28,11 +28,11 @@ namespace Audio {
 namespace V2_0 {
 static constexpr int32_t DEFAULT_CAPTURE_ID = 1 << 27 | 1 << 0;
 
-void AudioAdapterInterfaceImpTest::SetUpTestCase(void) {}
+void AudioAdapterInterfaceImpTest::SetUpTestCase(void) { }
 
-void AudioAdapterInterfaceImpTest::TearDownTestCase(void) {}
+void AudioAdapterInterfaceImpTest::TearDownTestCase(void) { }
 
-void AudioAdapterInterfaceImpTest::SetUp(void) {}
+void AudioAdapterInterfaceImpTest::SetUp(void) { }
 
 void AudioAdapterInterfaceImpTest::TearDown(void)
 {
@@ -197,8 +197,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyCapture_001, TestSize.Level1)
 
     devDesc.pins = PIN_OUT_DAUDIO_DEFAULT;
     uint32_t capId = 0;
-    AdapterTest_->captureDevs_[capId] = std::make_pair(dhId,
-        new AudioCaptureInterfaceImpl(adpterName, devDesc, attrs, callback));
+    AdapterTest_->captureDevs_[capId] =
+        std::make_pair(dhId, new AudioCaptureInterfaceImpl(adpterName, devDesc, attrs, callback));
 
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyCapture(capId));
     capId = 10;
@@ -227,8 +227,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyCapture_002, TestSize.Level1)
 
     devDesc.pins = PIN_OUT_DAUDIO_DEFAULT;
     uint32_t capId = 0;
-    AdapterTest_->captureDevs_[capId] = std::make_pair(dhId,
-        new AudioCaptureInterfaceImpl(adpterName, devDesc, attrs, callback));
+    AdapterTest_->captureDevs_[capId] =
+        std::make_pair(dhId, new AudioCaptureInterfaceImpl(adpterName, devDesc, attrs, callback));
     AdapterTest_->captureDevs_[capId].second->SetCaptureStatus(AudioCaptureStatus::CAPTURE_STATUS_START);
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyCapture(capId));
 }
@@ -383,6 +383,50 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
     key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
     condition = "zone_id_change";
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_002
+ * @tc.desc: Verify the SetExtraParams function with RECORD_VALUE.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "test_condition";
+    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_003
+ * @tc.desc: Verify the SetExtraParams function with RECORD_VALUE but callback failed.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_003, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "test_condition";
+    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
 }
 
 /**
@@ -726,7 +770,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_001, TestSize.Level1)
 
 /**
  * @tc.name: AddAudioDevice_002
- * @tc.desc: Verify the AddAudioDevice function.
+ * @tc.desc: Verify the AddAudioDevice function with valid JSON.
  * @tc.type: FUNC
  * @tc.require: AR000H0E6H
  */
@@ -736,7 +780,123 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_002, TestSize.Level1)
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
     uint32_t devId = 64;
-    std::string caps = "hello";
+    std::string caps = "{\\\"tokenId\\\":100}";
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_003
+ * @tc.desc: Verify the AddAudioDevice function with valid JSON containing tokenId with outer quotes.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_003, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 64;
+    std::string caps = "\"{\\\"tokenId\\\":12345}\"";
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_004
+ * @tc.desc: Verify the AddAudioDevice function with JSON containing tokenId but tokenId is not a number.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_004, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 64;
+    std::string caps = "\"{\\\"tokenId\\\":\\\"invalid\\\"}\"";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->AddAudioDevice(devId, caps));
+}
+
+/**
+ * @tc.name: AddAudioDevice_004_1
+ * @tc.desc: Verify the AddAudioDevice function with JSON without tokenId field (should success).
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_004_1, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 64;
+    std::string caps = "\"{\\\"otherField\\\":12345}\"";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_005
+ * @tc.desc: Verify the AddAudioDevice function with tokenId as string type directly in JSON.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_005, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 64;
+    std::string caps = "{\"tokenId\":\"invalid_string\"}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->AddAudioDevice(devId, caps));
+}
+
+/**
+ * @tc.name: AddAudioDevice_006
+ * @tc.desc: Verify the AddAudioDevice function with invalid JSON containing tokenId (should fail).
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_006, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 64;
+    std::string caps = "\"{\\\"tokenId\\\":invalid}\"";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->AddAudioDevice(devId, caps));
+}
+
+/**
+ * @tc.name: AddAudioDevice_006_1
+ * @tc.desc: Verify the AddAudioDevice function with invalid JSON without tokenId (should success).
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_006_1, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 64;
+    std::string caps = "\"{invalid json}\"";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_007
+ * @tc.desc: Verify the AddAudioDevice function with pure JSON without escape sequences.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_007, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 64;
+    std::string caps = "{\"tokenId\":100}";
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
 }
@@ -779,11 +939,11 @@ HWTEST_F(AudioAdapterInterfaceImpTest, OpenRenderDevice_001, TestSize.Level1)
     int32_t dhId = 1;
     uint32_t renderId = 0;
     AdapterTest_->extCallbackMap_[dhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->OpenRenderDevice(devDesc, attrs,
-        AdapterTest_->extCallbackMap_[dhId], dhId, renderId));
+    EXPECT_NE(HDF_SUCCESS,
+        AdapterTest_->OpenRenderDevice(devDesc, attrs, AdapterTest_->extCallbackMap_[dhId], dhId, renderId));
     AdapterTest_->spkStatus_[renderId] = true;
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->OpenRenderDevice(devDesc, attrs,
-        AdapterTest_->extCallbackMap_[dhId], dhId, renderId));
+    EXPECT_EQ(HDF_SUCCESS,
+        AdapterTest_->OpenRenderDevice(devDesc, attrs, AdapterTest_->extCallbackMap_[dhId], dhId, renderId));
 }
 /**
  * @tc.name: OpenRenderDevice_002
@@ -802,8 +962,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, OpenRenderDevice_002, TestSize.Level1)
     uint32_t renderId = 0;
     AdapterTest_->extCallbackMap_[dhId] = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
     AdapterTest_->spkStatus_[renderId] = false;
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->OpenRenderDevice(devDesc, attrs,
-        AdapterTest_->extCallbackMap_[dhId], dhId, renderId));
+    EXPECT_NE(HDF_SUCCESS,
+        AdapterTest_->OpenRenderDevice(devDesc, attrs, AdapterTest_->extCallbackMap_[dhId], dhId, renderId));
 }
 
 /**
@@ -820,9 +980,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseRenderDevice_001, TestSize.Level1)
     AudioDeviceDescriptor devDesc;
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback(nullptr);
-    AdapterTest_->spkPinInUse_  = 0;
+    AdapterTest_->spkPinInUse_ = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
-    AdapterTest_->spkPinInUse_  = 1;
+    AdapterTest_->spkPinInUse_ = 1;
     callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
     callback = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
@@ -864,7 +1024,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseCaptureDevice_001, TestSize.Level1)
     int32_t dhId = DEFAULT_CAPTURE_ID;
     sptr<IDAudioCallback> callback(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseCaptureDevice(devDesc, callback, dhId));
-    AdapterTest_->micPinInUse_  = 1;
+    AdapterTest_->micPinInUse_ = 1;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseCaptureDevice(devDesc, callback, dhId));
 }
 
@@ -925,8 +1085,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetAudioVolume_001, TestSize.Level1)
     AudioSampleAttributes attrs;
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
     param = "0";
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
@@ -955,8 +1115,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_001, TestSize.Level1)
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=1;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
@@ -980,8 +1140,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_002, TestSize.Level1)
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=3;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
@@ -1005,8 +1165,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_003, TestSize.Level1)
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=2;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
@@ -1030,14 +1190,13 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_004, TestSize.Level1)
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=4;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->GetAudioVolume(condition, param));
 }
-
 
 /**
  * @tc.name: GetAudioVolume_005
@@ -1056,8 +1215,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_005, TestSize.Level1)
     int32_t dhId = 0;
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
 
     std::string condition = "EVENT_TYPE=66;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
@@ -1174,8 +1333,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetRenderImpl_001, TestSize.Level1)
     AudioSampleAttributes attrs;
     const int dhId = 1;
     const std::string adpName = "abc";
-    auto audioRender = sptr<AudioRenderInterfaceImplBase>(new AudioRenderInterfaceImpl(adpName,
-        desc, attrs, nullptr, 0));
+    auto audioRender =
+        sptr<AudioRenderInterfaceImplBase>(new AudioRenderInterfaceImpl(adpName, desc, attrs, nullptr, 0));
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId, audioRender);
     EXPECT_NE(nullptr, AdapterTest_->GetRenderImpl(content));
 }
@@ -1202,8 +1361,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_001, TestSize.Lev
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId, nullptr);
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
@@ -1227,8 +1386,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_002, TestSize.Lev
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleVolumeChangeEvent(event));
 }
 
@@ -1250,8 +1409,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_003, TestSize.Lev
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
 }
 
@@ -1277,8 +1436,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleMuteSetEvent_001, TestSize.Level1)
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId, nullptr);
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
@@ -1302,8 +1461,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleMuteSetEvent_002, TestSize.Level1)
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
-    AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
-        sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
+    AdapterTest_->renderDevs_[0] = std::make_pair(
+        dhId, sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback, 0)));
     EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleVolumeChangeEvent(event));
 }
 
@@ -1318,8 +1477,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleFocusChangeEvent_001, TestSize.Leve
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
-    DAudioEvent event = {HDF_AUDIO_EVENT_FOCUS_CHANGE,
-        "INTERRUPT_EVENT;EVENT_TYPE=1;VOLUME_LEVEL=1;FORCE_TYPE=1;HINT_TYPE=1;"};
+    DAudioEvent event = {
+        HDF_AUDIO_EVENT_FOCUS_CHANGE, "INTERRUPT_EVENT;EVENT_TYPE=1;VOLUME_LEVEL=1;FORCE_TYPE=1;HINT_TYPE=1;"};
     uint32_t devId = 64;
     uint32_t streamId = 0;
 
@@ -1339,8 +1498,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleFocusChangeEvent_002, TestSize.Leve
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
-    DAudioEvent event = {HDF_AUDIO_EVENT_FOCUS_CHANGE,
-        "INTERRUPT_EVENT;EVENT_TYPE=1;VOLUME_LEVEL=1;FORCE_TYPE=1;HINT_TYPE=1;"};
+    DAudioEvent event = {
+        HDF_AUDIO_EVENT_FOCUS_CHANGE, "INTERRUPT_EVENT;EVENT_TYPE=1;VOLUME_LEVEL=1;FORCE_TYPE=1;HINT_TYPE=1;"};
     uint32_t devId = 64;
     uint32_t streamId = 0;
 
@@ -1359,8 +1518,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderStateChangeEvent_001, TestSiz
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
-    DAudioEvent event = {HDF_AUDIO_EVENT_RENDER_STATE_CHANGE,
-        "RENDER_STATE_CHANGE_EVENT;STATE=0;"};
+    DAudioEvent event = {HDF_AUDIO_EVENT_RENDER_STATE_CHANGE, "RENDER_STATE_CHANGE_EVENT;STATE=0;"};
 
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleRenderStateChangeEvent(event));
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockIAudioParamCallback());
@@ -1378,8 +1536,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderStateChangeEvent_002, TestSiz
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
-    DAudioEvent event = {HDF_AUDIO_EVENT_RENDER_STATE_CHANGE,
-        "RENDER_STATE_CHANGE_EVENT;STATE=0;"};
+    DAudioEvent event = {HDF_AUDIO_EVENT_RENDER_STATE_CHANGE, "RENDER_STATE_CHANGE_EVENT;STATE=0;"};
 
     AdapterTest_->paramCallback_ = sptr<IAudioCallback>(new MockRevertIAudioParamCallback());
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleRenderStateChangeEvent(event));
@@ -1432,8 +1589,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_003, TestSize.Level1)
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
-    DAudioEvent event = {HDF_AUDIO_EVENT_CLOSE_SPK_RESULT,
-        HDF_EVENT_RESULT_SUCCESS};
+    DAudioEvent event = {HDF_AUDIO_EVENT_CLOSE_SPK_RESULT, HDF_EVENT_RESULT_SUCCESS};
     uint32_t streamId = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleSANotifyEvent(streamId, event));
     DAudioEvent event1 = {HDF_AUDIO_EVENT_CLOSE_SPK_RESULT, "RENDER_STATE_CHANGE"};
@@ -1451,8 +1607,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_004, TestSize.Level1)
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
-    DAudioEvent event = {HDF_AUDIO_EVENT_OPEN_MIC_RESULT,
-        HDF_EVENT_RESULT_SUCCESS};
+    DAudioEvent event = {HDF_AUDIO_EVENT_OPEN_MIC_RESULT, HDF_EVENT_RESULT_SUCCESS};
     uint32_t streamId = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleSANotifyEvent(streamId, event));
     DAudioEvent event1 = {HDF_AUDIO_EVENT_OPEN_MIC_RESULT, "RENDER_STATE_CHANGE"};
@@ -1512,11 +1667,12 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_001, TestSize.Level1)
             std::this_thread::sleep_for(std::chrono::seconds(2));
             AdapterTest_->spkNotifyFlag_ = true;
             AdapterTest_->spkWaitCond_.notify_one();
-        }});
-    AudioDeviceEvent  event = EVENT_OPEN_SPK;
+        }
+    });
+    AudioDeviceEvent event = EVENT_OPEN_SPK;
     AdapterTest_->spkStatus_[streamId] = true;
     EXPECT_EQ(DH_SUCCESS, AdapterTest_->WaitForSANotify(streamId, event));
-    AudioDeviceEvent event1 = EVENT_CLOSE_SPK ;
+    AudioDeviceEvent event1 = EVENT_CLOSE_SPK;
     AdapterTest_->spkStatus_[streamId] = false;
     EXPECT_EQ(DH_SUCCESS, AdapterTest_->WaitForSANotify(streamId, event1));
     flag = 0;
@@ -1542,8 +1698,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_002, TestSize.Level1)
             std::this_thread::sleep_for(std::chrono::seconds(2));
             AdapterTest_->spkNotifyFlag_ = true;
             AdapterTest_->spkWaitCond_.notify_one();
-        }});
-    AudioDeviceEvent  event = EVENT_OPEN_SPK;
+        }
+    });
+    AudioDeviceEvent event = EVENT_OPEN_SPK;
     uint32_t streamId = 0;
     AdapterTest_->spkStatus_[streamId] = true;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(streamId, event));
@@ -1571,12 +1728,13 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_003, TestSize.Level1)
             std::this_thread::sleep_for(std::chrono::seconds(2));
             AdapterTest_->micNotifyFlag_ = true;
             AdapterTest_->micWaitCond_.notify_one();
-        }});
-    AudioDeviceEvent  event = EVENT_OPEN_MIC;
+        }
+    });
+    AudioDeviceEvent event = EVENT_OPEN_MIC;
     AdapterTest_->isMicOpened_ = true;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(captureId, event));
 
-    AudioDeviceEvent  event1 = EVENT_CLOSE_MIC;
+    AudioDeviceEvent event1 = EVENT_CLOSE_MIC;
     AdapterTest_->isMicOpened_ = false;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(captureId, event1));
     flag = 0;
@@ -1601,11 +1759,13 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_004, TestSize.Level1)
     std::thread th([&]() {
         while (flag) {
             std::this_thread::sleep_for(std::chrono::seconds(2));
-                AdapterTest_->micNotifyFlag_ = true;
+            AdapterTest_->micNotifyFlag_ = true;
             AdapterTest_->micWaitCond_.notify_one();
-        }});
-    AudioDeviceEvent  event = EVENT_OPEN_MIC;
-    AdapterTest_->isMicOpened_ = true;;
+        }
+    });
+    AudioDeviceEvent event = EVENT_OPEN_MIC;
+    AdapterTest_->isMicOpened_ = true;
+    ;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(captureId, event));
     flag = 0;
     if (th.joinable()) {
@@ -1624,7 +1784,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_005, TestSize.Level1)
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
-    AudioDeviceEvent  event = EVENT_DEV_CLOSED;
+    AudioDeviceEvent event = EVENT_DEV_CLOSED;
     uint32_t captureId = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(captureId, event));
 }
@@ -1758,17 +1918,655 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetUsualParamChange_001, TestSize.Level1)
 
     condition = "zone_id_change";
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetUsualParamChange(condition, param));
-    
+
     int32_t dhid = 1;
-    AdapterTest_->extCallbackMap_[dhid] =  sptr<IDAudioCallback>(new MockIDAudioCallback());
+    AdapterTest_->extCallbackMap_[dhid] = sptr<IDAudioCallback>(new MockIDAudioCallback());
     AdapterTest_->sinkDhId_ = 0;
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetUsualParamChange(condition, param));
-    
+
     AdapterTest_->sinkDhId_ = dhid;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetUsualParamChange(condition, param));
 }
-} // V2_0
-} // Audio
-} // Distributedaudio
-} // HDI
-} // OHOS
+
+/**
+ * @tc.name: SetEnhanceParam_001
+ * @tc.desc: Verify the SetEnhanceParam function when value equals RECORD_VALUE.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_001, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string condition = "test_condition";
+    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->SetEnhanceParam(condition, value));
+}
+
+/**
+ * @tc.name: SetEnhanceParam_002
+ * @tc.desc: Verify the SetEnhanceParam function when value not equals RECORD_VALUE.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string condition = "test_condition";
+    std::string value = "other_value";
+    int32_t micEnhanDhId = 1;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->sinkDhId_ = 2;
+    AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->SetEnhanceParam(condition, value));
+}
+
+/**
+ * @tc.name: SetEnhanceParam_003
+ * @tc.desc: Verify the SetEnhanceParam function when callback not found.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_003, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string condition = "test_condition";
+    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
+
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetEnhanceParam(condition, value));
+}
+
+/**
+ * @tc.name: SetEnhanceParam_004
+ * @tc.desc: Verify the SetEnhanceParam function when callback is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_004, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string condition = "test_condition";
+    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->extCallbackMap_[micEnhanDhId] = nullptr;
+
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->SetEnhanceParam(condition, value));
+}
+
+/**
+ * @tc.name: SetEnhanceParam_005
+ * @tc.desc: Verify the SetEnhanceParam function when NotifyEvent failed.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_005, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string condition = "test_condition";
+    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetEnhanceParam(condition, value));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_001
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with empty string.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_001, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_002
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with only quotes.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "\"\"";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_003
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId equals 0.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_003, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":0}";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_004
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId equals UINT32_MAX.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_004, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":4294967295}";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_005
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with multiple escaped quotes.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_005, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "\"{\\\"tokenId\\\":100,\\\"name\\\":\\\"test\\\"}\"";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_006
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with JSON containing other fields and tokenId.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_006, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"deviceId\":1,\"tokenId\":12345,\"name\":\"audio\"}";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_007
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with outer quotes and escaped content.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_007, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "\"{\\\"tokenId\\\":999}\"";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_008
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with invalid JSON.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_008, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{invalid json}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_009
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId as negative number.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_009, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":-1}";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_010
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with JSON not containing tokenId field.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_010, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"deviceId\":1,\"name\":\"audio\"}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_011
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId as string type.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_011, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":\"invalid_string\"}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_012
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId as boolean type.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_012, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":true}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_013
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId as null.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_013, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":null}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_014
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId as float number.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_014, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":123.45}";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_015
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId exceeding uint32 max.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_015, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":5000000000}";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_016
+ * @tc.desc: Verify the HandleTokenIdFromCapability
+ * function with outer left quote and missing inner right quote (invalid JSON).
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_016, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "\"{\"tokenId\":100}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_016_1
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with valid JSON wrapped in outer quotes.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_016_1, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "\"{\"tokenId\":100}\"";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_017
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with missing closing brace (invalid JSON).
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_017, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":100\"";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_018
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with
+ * valid JSON followed by extra quote (cJSON parses successfully).
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_018, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":100}\"";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_019
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId as JSON object.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_019, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":{\"value\":100}}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_019
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId as array.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_020, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    std::string capability = "{\"tokenId\":[100]}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(capability));
+}
+
+/**
+ * @tc.name: AddAudioDevice_008
+ * @tc.desc: Verify the AddAudioDevice function when adding device for first time without tokenId.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_008, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 100;
+    std::string caps = "{\"deviceId\":1,\"name\":\"speaker\"}";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(caps, AdapterTest_->GetDeviceCapabilitys(devId));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_009
+ * @tc.desc: Verify the AddAudioDevice function when adding device for first time with empty caps.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_009, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 200;
+    std::string caps = "";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(caps, AdapterTest_->GetDeviceCapabilitys(devId));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_010
+ * @tc.desc: Verify the AddAudioDevice function when adding device for first time with tokenId at boundary.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_010, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 300;
+    std::string caps = "{\"tokenId\":0}";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_011
+ * @tc.desc: Verify the AddAudioDevice function with tokenId as UINT32_MAX.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_011, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 301;
+    std::string caps = "{\"tokenId\":4294967295}";
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_012
+ * @tc.desc: Verify the AddAudioDevice function when re-adding existing device with different caps.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_012, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 302;
+    std::string caps1 = "{\"deviceId\":1}";
+    std::string caps2 = "{\"deviceId\":2,\"tokenId\":100}";
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps1));
+    EXPECT_EQ(caps1, AdapterTest_->GetDeviceCapabilitys(devId));
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps2));
+    EXPECT_EQ(caps2, AdapterTest_->GetDeviceCapabilitys(devId));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_013
+ * @tc.desc: Verify the AddAudioDevice function when re-adding existing device with same caps containing tokenId.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_013, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 303;
+    std::string caps = "{\"tokenId\":200}";
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_014
+ * @tc.desc: Verify the AddAudioDevice function with multiple devices simultaneously.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_014, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId1 = 400;
+    uint32_t devId2 = 401;
+    uint32_t devId3 = 402;
+    std::string caps1 = "{\"tokenId\":100}";
+    std::string caps2 = "{\"deviceId\":2}";
+    std::string caps3 = "";
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId1, caps1));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId2, caps2));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId3, caps3));
+
+    EXPECT_EQ(caps1, AdapterTest_->GetDeviceCapabilitys(devId1));
+    EXPECT_EQ(caps2, AdapterTest_->GetDeviceCapabilitys(devId2));
+    EXPECT_EQ(caps3, AdapterTest_->GetDeviceCapabilitys(devId3));
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId1));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId2));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId3));
+}
+
+/**
+ * @tc.name: AddAudioDevice_015
+ * @tc.desc: Verify the AddAudioDevice function with capability_ member variable update.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_015, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 500;
+    std::string caps = "{\"tokenId\":300,\"name\":\"test\"}";
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(caps, AdapterTest_->capability_);
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_016
+ * @tc.desc: Verify the AddAudioDevice function with tokenId containing escape sequences and outer quotes.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_016, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 501;
+    std::string caps = "\"{\\\"tokenId\\\":400,\\\"name\\\":\\\"audio\\\"}\"";
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_017
+ * @tc.desc: Verify the AddAudioDevice function with tokenId exceeding uint32 range.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_017, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 502;
+    std::string caps = "{\"tokenId\":5000000000}";
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_018
+ * @tc.desc: Verify the AddAudioDevice function with tokenId as negative number.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_018, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 503;
+    std::string caps = "{\"tokenId\":-100}";
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+} // namespace V2_0
+} // namespace Audio
+} // namespace DistributedAudio
+} // namespace HDI
+} // namespace OHOS

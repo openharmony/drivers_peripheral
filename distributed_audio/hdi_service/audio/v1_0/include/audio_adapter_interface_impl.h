@@ -159,6 +159,8 @@ private:
     void HandleMICEvent(bool micStatus, const DAudioEvent &event);
     int32_t HandleWaudioEnable(const DAudioEvent &event);
     int32_t SetUsualParamChange(const std::string &condition, const std::string &value);
+    int32_t SetEnhanceParam(const std::string &condition, const std::string &value);
+    int32_t HandleTokenIdFromCapability(const std::string &capability);
 private:
     static constexpr uint32_t WAIT_MILLISECONDS = 8000;
     static constexpr int32_t TYPE_CONDITION = 11;
@@ -208,6 +210,7 @@ private:
     uint32_t micPinInUse_ = 0;
     uint32_t streamMuteStatus_ = 0;
     uint32_t sinkDhId_ = 0;
+    uint32_t micEnhanDhId_ = 0;
 
     // mmap param
     PortOperationMode renderFlags_ = Audioext::V3_0::NORMAL_MODE;

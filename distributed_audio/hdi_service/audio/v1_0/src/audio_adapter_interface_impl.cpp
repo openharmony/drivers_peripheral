@@ -39,10 +39,15 @@ namespace DistributedAudio {
 namespace Audio {
 namespace V2_0 {
 namespace {
+static constexpr size_t MIN_SIZE = 2;
 static constexpr uint32_t MAX_AUDIO_STREAM_NUM = 10;
 const std::string STREAM_TYPE_CHANGE = "stream_type_change";
 const std::string STREAM_USAGE_CHANGE = "stream_usage_change";
 const std::string ZONE_ID_CHANGE = "zone_id_change";
+const std::string RECORD_KEY = "audio_effect";
+const std::string RECORD_VALUE = "{\"SCENE\":\"high-definition-record\"}";
+const std::string RECORD_SCENE = "SCENE";
+const std::string RECORD_SCENE_VALUE = "high-definition-record";
 
 struct StreamStatusNoifyResult {
     uint32_t renderId = 0;
@@ -111,6 +116,7 @@ void AudioAdapterInterfaceImpl::SetMicCallback(const int32_t dhId, const sptr<ID
         return;
     }
     extCallbackMap_[dhId] = micCallback;
+    micEnhanDhId_ = dhId;
 }
 
 int32_t AudioAdapterInterfaceImpl::InitAllPorts()
@@ -530,6 +536,15 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
             }
             break;
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE:
+            if (value == RECORD_VALUE) {
+                DHLOGI("value equal RECORD_VALUE.");
+                ret = SetEnhanceParam(condition, value);
+                if (ret != DH_SUCCESS) {
+                    DHLOGE("set enhance param notify failed.");
+                    return HDF_FAILURE;
+                }
+                break;
+            }
             ret = SetUsualParamChange(condition, value);
             if (ret != DH_SUCCESS) {
                 DHLOGE("set usual param notify failed.");
@@ -688,8 +703,53 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
     }
     mapAudioDevice_.insert(std::make_pair(devId, caps));
     capability_ = caps;
-
+    DHLOGI("Add distributed audio capability_: %{public}s.", GetAnonyString(capability_).c_str());
+    if (capability_.find("tokenId") != std::string::npos) {
+        int32_t ret = HandleTokenIdFromCapability(capability_);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Handle tokenId from capability failed.");
+            return ret;
+        }
+    }
     DHLOGI("Add audio device success.");
+    return DH_SUCCESS;
+}
+
+int32_t AudioAdapterInterfaceImpl::HandleTokenIdFromCapability(const std::string &capability)
+{
+    DHLOGI("Handle tokenId from capability.");
+    std::string input = capability;
+    if (input.size() >= MIN_SIZE && input.front() == '"' && input.back() == '"') {
+        input = input.substr(1, input.size() - MIN_SIZE);
+    }
+    std::string result;
+    for (size_t i = 0; i < input.size(); ++i) {
+        if (input[i] == '\\' && i + 1 < input.size() && input[i + 1] == '"') {
+            result += '"';
+            ++i;
+        } else {
+            result += input[i];
+        }
+    }
+    cJSON *root = cJSON_Parse(result.c_str());
+    if (root == nullptr) {
+        DHLOGE("Failed to parse caps JSON.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    cJSON *tokenIdItem = cJSON_GetObjectItemCaseSensitive(root, "tokenId");
+    if (tokenIdItem == nullptr) {
+        DHLOGE("tokenId is nullptr.");
+        cJSON_Delete(root);
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    if (!cJSON_IsNumber(tokenIdItem)) {
+        DHLOGE("tokenId is not number.");
+        cJSON_Delete(root);
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    uint32_t tokenId = static_cast<uint32_t>(tokenIdItem->valuedouble);
+    DHLOGI("Parsed tokenId: %{public}s.", GetAnonyString(std::to_string(tokenId)).c_str());
+    cJSON_Delete(root);
     return DH_SUCCESS;
 }
 
@@ -1635,6 +1695,38 @@ int32_t AudioAdapterInterfaceImpl::SetUsualParamChange(const std::string &condit
     CHECK_AND_RETURN_RET_LOG(iter->second == nullptr, ERR_DH_AUDIO_HDF_NULLPTR, "extcallback is null.");
     CHECK_AND_RETURN_RET_LOG(iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE,
         "set usual param change failed.");
+    return DH_SUCCESS;
+}
+
+int32_t AudioAdapterInterfaceImpl::SetEnhanceParam(const std::string &condition, const std::string &value)
+{
+    DHLOGI("start SetEnhanceParam, value: %{public}s", value.c_str());
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create json object.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    cJSON *audio_effect = cJSON_CreateObject();
+    cJSON_AddStringToObject(audio_effect, RECORD_SCENE.c_str(), RECORD_SCENE_VALUE.c_str());
+    cJSON_AddItemToObject(jParam, RECORD_KEY.c_str(), audio_effect);
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(micEnhanDhId_).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to print json.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    std::string content1(jsonData);
+    DHLOGI("cJSON_AddStringToObject content: %{public}s.", content1.c_str());
+    cJSON_free(jsonData);
+    cJSON_Delete(jParam);
+    DAudioEvent event = {.type = HDF_AUDIO_EVENT_ENHANC, .content = content1};
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
+    auto iter = extCallbackMap_.find(micEnhanDhId_);
+    CHECK_AND_RETURN_RET_LOG(iter == extCallbackMap_.end(), HDF_FAILURE, "can't find callback.");
+    CHECK_AND_RETURN_RET_LOG(iter->second == nullptr, ERR_DH_AUDIO_HDF_NULLPTR, "extcallback is null.");
+    CHECK_AND_RETURN_RET_LOG(
+        iter->second->NotifyEvent(-1, event) != HDF_SUCCESS, HDF_FAILURE, "set enhance param failed.");
     return DH_SUCCESS;
 }
 } // V2_0
