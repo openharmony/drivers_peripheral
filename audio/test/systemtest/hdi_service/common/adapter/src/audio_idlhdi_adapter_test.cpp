@@ -1080,4 +1080,43 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyRenderNull_002, TestSize.Level1)
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     IAudioAdapterRelease(adapter, IS_STUB);
 }
+
+/**
+    * @tc.name  AudioAdapterCreateCallTransfer_001
+    * @tc.desc  Test AudioAdapter CreateCallTransfer.
+    * @tc.type: FUNC
+*/
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterCreateCallTransfer_001, TestSize.Level1)
+{
+    int32_t ret;
+    struct IAudioAdapter *adapter = nullptr;
+    ASSERT_NE(nullptr, manager);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, adapter);
+    ret = adapter->CreateCallTransfer(adapter);
+    ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    IAudioAdapterRelease(adapter, IS_STUB);
+}
+
+/**
+    * @tc.name  AudioAdapterSetPhoneCallScene_001
+    * @tc.desc  Test AudioAdapter SetPhoneCallScene.
+    * @tc.type: FUNC
+*/
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterSetPhoneCallScene_001, TestSize.Level1)
+{
+    int32_t ret;
+    struct IAudioAdapter *adapter = nullptr;
+    ASSERT_NE(nullptr, manager);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, adapter);
+    ret = adapter->SetPhoneCallScene(adapter, SCENE_TYPE_TRANSFER);
+    ret = adapter->SetPhoneCallScene(adapter, SCENE_TYPE_MODEM);
+    ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    IAudioAdapterRelease(adapter, IS_STUB);
+}
 }
