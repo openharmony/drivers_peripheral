@@ -45,9 +45,11 @@ const std::string STREAM_TYPE_CHANGE = "stream_type_change";
 const std::string STREAM_USAGE_CHANGE = "stream_usage_change";
 const std::string ZONE_ID_CHANGE = "zone_id_change";
 const std::string RECORD_KEY = "audio_effect";
+const std::string SCENE_VALUE = "SCENE=high-definition-record";
 const std::string RECORD_VALUE = "{\"SCENE\":\"high-definition-record\"}";
 const std::string RECORD_SCENE = "SCENE";
 const std::string RECORD_SCENE_VALUE = "high-definition-record";
+const std::string TOKEN_ID = "tokenId";
 
 struct StreamStatusNoifyResult {
     uint32_t renderId = 0;
@@ -536,9 +538,9 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
             }
             break;
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE:
-            if (value == RECORD_VALUE) {
-                DHLOGI("value equal RECORD_VALUE.");
-                ret = SetEnhanceParam(condition, value);
+            if (value == SCENE_VALUE) {
+                DHLOGI("value equal SCENE_VALUE.");
+                ret = SetEnhanceParam(condition, RECORD_VALUE);
                 if (ret != DH_SUCCESS) {
                     DHLOGE("set enhance param notify failed.");
                     return HDF_FAILURE;
@@ -573,7 +575,7 @@ int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const st
             }
             break;
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_CAPABILITY:
-            value = capability_;
+            value = audioExtraCap;
             break;
         default:
             DHLOGE("Parameter is invalid.");
@@ -704,7 +706,7 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
     mapAudioDevice_.insert(std::make_pair(devId, caps));
     capability_ = caps;
     DHLOGI("Add distributed audio capability_: %{public}s.", GetAnonyString(capability_).c_str());
-    if (capability_.find("tokenId") != std::string::npos) {
+    if (capability_.find(TOKEN_ID) != std::string::npos) {
         int32_t ret = HandleTokenIdFromCapability(capability_);
         if (ret != DH_SUCCESS) {
             DHLOGE("Handle tokenId from capability failed.");
@@ -731,12 +733,13 @@ int32_t AudioAdapterInterfaceImpl::HandleTokenIdFromCapability(const std::string
             result += input[i];
         }
     }
+    audioExtraCap_ = result;
     cJSON *root = cJSON_Parse(result.c_str());
     if (root == nullptr) {
         DHLOGE("Failed to parse caps JSON.");
         return ERR_DH_AUDIO_HDF_FAIL;
     }
-    cJSON *tokenIdItem = cJSON_GetObjectItemCaseSensitive(root, "tokenId");
+    cJSON *tokenIdItem = cJSON_GetObjectItemCaseSensitive(root, TOKEN_ID.c_str());
     if (tokenIdItem == nullptr) {
         DHLOGE("tokenId is nullptr.");
         cJSON_Delete(root);

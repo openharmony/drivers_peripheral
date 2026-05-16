@@ -387,7 +387,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
 
 /**
  * @tc.name: SetExtraParams_002
- * @tc.desc: Verify the SetExtraParams function with RECORD_VALUE.
+ * @tc.desc: Verify the SetExtraParams function with SCENE_VALUE.
  * @tc.type: FUNC
  * @tc.require: AR000H0E6H
  */
@@ -403,13 +403,13 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_002, TestSize.Level1)
 
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
     std::string condition = "test_condition";
-    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    std::string value = "SCENE=high-definition-record";
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
 }
 
 /**
  * @tc.name: SetExtraParams_003
- * @tc.desc: Verify the SetExtraParams function with RECORD_VALUE but callback failed.
+ * @tc.desc: Verify the SetExtraParams function with SCENE_VALUE but callback failed.
  * @tc.type: FUNC
  * @tc.require: AR000H0E6H
  */
@@ -425,7 +425,81 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_003, TestSize.Level1)
 
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
     std::string condition = "test_condition";
-    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    std::string value = "SCENE=high-definition-record";
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_004
+ * @tc.desc: Verify the SetExtraParams function with AUDIO_EXT_PARAM_KEY_STATUS.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_004, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_STATUS;
+    std::string condition = "stream_type_change";
+    std::string value = "invalid_value";
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_005
+ * @tc.desc: Verify the SetExtraParams function with AUDIO_EXT_PARAM_KEY_STATUS invalid condition.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_005, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_STATUS;
+    std::string condition = "invalid_condition";
+    std::string value = "1-MUSIC";
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_006
+ * @tc.desc: Verify the SetExtraParams function with AUDIO_EXT_PARAM_KEY_NONE zone_id_change success.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_006, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    int32_t dhId = 1;
+    AdapterTest_->extCallbackMap_[dhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
+    AdapterTest_->sinkDhId_ = dhId;
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "zone_id_change";
+    std::string value = "test_value";
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_007
+ * @tc.desc: Verify the SetExtraParams function with AUDIO_EXT_PARAM_KEY_NONE invalid condition.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_007, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    int32_t dhId = 1;
+    AdapterTest_->extCallbackMap_[dhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
+    AdapterTest_->sinkDhId_ = dhId;
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "invalid_condition";
+    std::string value = "test_value";
     EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
 }
 
