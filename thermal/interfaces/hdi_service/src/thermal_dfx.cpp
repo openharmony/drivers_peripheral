@@ -136,7 +136,7 @@ ThermalDfx::~ThermalDfx()
 std::string ThermalDfx::CanonicalizeSpecPath(const char* src)
 {
     if (src == nullptr || strlen(src) >= PATH_MAX) {
-        fprintf(stderr, "Error: CanonicalizeSpecPath %s failed", src);
+        fprintf(stderr, "Error: CanonicalizeSpecPath failed, invalid path");
         return "";
     }
     char resolvedPath[PATH_MAX] = { 0 };
