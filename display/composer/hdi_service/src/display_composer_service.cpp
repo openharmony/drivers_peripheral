@@ -602,7 +602,7 @@ int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enab
             __func__, devId, vsyncEnableStatus_[devId]);
         return HDF_SUCCESS;
     }
-	
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->SetDisplayVsyncEnabled(devId, enabled);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
@@ -884,7 +884,7 @@ int32_t DisplayComposerService::InitSMQInfo(uint32_t devId, const std::shared_pt
     ret = cmdResponserCur->InitCmdRequest(request);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s InitCmdRequest devId[%{public}u] fail", __func__, devId));
-    
+
     ret = cmdResponserCur->GetCmdReply(reply);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s GetCmdReply devId[%{public}u], fail", __func__, devId));
@@ -1005,10 +1005,11 @@ int32_t DisplayComposerService::CommitTunnelLayer(uint32_t devId, uint64_t tunne
 {
     DISPLAY_TRACE;
 
-    int32_t outFence;
+    int32_t outFence = INVALID_FD;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->CommitTunnelLayer, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiAdapter_->CommitTunnelLayer(devId, tunnelId, outFence);
+    releaseFence = new HdifdParcelable(outFence);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail", __func__));
@@ -1117,7 +1118,7 @@ void DisplayComposerService::OnVBlankIdleCallback(uint32_t devId, uint64_t ns, v
 int32_t DisplayComposerService::RegDisplayVBlankIdleCallback(const sptr<IVBlankIdleCallback>& cb)
 {
     DISPLAY_TRACE;
-    
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->RegDisplayVBlankIdleCallback, HDF_ERR_NOT_SUPPORT);
     VBlankIdleCb_ = cb;
@@ -1189,7 +1190,7 @@ int32_t DisplayComposerService::FastPresent(uint32_t devId, const PresentParam& 
     const std::vector<sptr<NativeBuffer>>& inHandles)
 {
     DISPLAY_TRACE;
-    
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->FastPresent, HDF_ERR_NOT_SUPPORT);
 
