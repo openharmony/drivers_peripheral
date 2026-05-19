@@ -1,0 +1,13 @@
+{
+    "description": "Config for hypium test cases",
+    "environment": [
+        {
+            "type": "device",
+            "label": "phone"
+        }
+    ],
+    "driver": {
+        "type": "DeviceTest",
+        "py_file": ["DRIVERS_PERIPHERAL_SENSOR_0100.py"]
+    }
+}
