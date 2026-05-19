@@ -61,6 +61,7 @@ struct IAudioCaptureVdi {
     int32_t (*TurnStandbyMode)(struct IAudioCaptureVdi *self);
     int32_t (*AudioDevDump)(struct IAudioCaptureVdi *self, int32_t range, int32_t fd);
     int32_t (*IsSupportsPauseAndResume)(struct IAudioCaptureVdi *self, bool *supportPause, bool *supportResume);
+    int32_t (*RegCallback)(struct IAudioCaptureVdi *self, CaptureCallbackVdi cb, void *cookie);
 };
 
 #ifdef __cplusplus

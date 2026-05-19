@@ -320,6 +320,10 @@ enum AudioInputTypeVdi {
     AUDIO_VDI_INPUT_RAW_AI_TYPE              = 1 << 15,
 };
 
+enum AudioCaptureCallbackTypeVdi {
+    AUDIO_VDI_CAMCORDER_METADATA = 0,
+};
+
 struct AudioOffloadInfoVdi {
     uint32_t sampleRate;
     uint32_t channelCount;
@@ -490,6 +494,9 @@ typedef int32_t (*RenderCallbackVdi)(enum AudioCallbackTypeVdi, void *reserved, 
  */
 typedef int32_t (*ParamCallbackVdi)(enum AudioExtParamKeyVdi key, const char *condition, const char *value,
     void *reserved, void *cookie);
+
+typedef int32_t (*CaptureCallbackVdi)(
+    enum AudioCaptureCallbackTypeVdi type, unsigned char* data, uint32_t len, void *cookie);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
