@@ -78,12 +78,12 @@ typedef struct HksParamSet TargetParamSet;
     TargetBlob wrappedKeyDataCore = {0};  \
     TargetParamSet *paramSetCore = NULL;  \
     TargetBlob keyOutCore = {0};  \
-    HDI_CONVERTER_PARAM_IN_BLOB(wrappingKeyAlias, &wrappingKeyAliasCore)  \
+    HDI_CONVERTER_PARAM_IN_BLOB(wrappedKeyAlias, &wrappingKeyAliasCore)  \
     HDI_CONVERTER_PARAM_IN_PARAMSET(paramSet, paramSetCore)  \
     HDI_CONVERTER_PARAM_IN_BLOB(key, &keyCore)  \
     HDI_CONVERTER_PARAM_IN_BLOB(wrappedKeyData, &wrappedKeyDataCore)  \
     HDI_CONVERTER_PARAM_IN_BLOB(keyOut, &keyOutCore)  \
-    ret = (func)(HDI_ADAPTER_PARAM(wrappingKeyAlias, &wrappingKeyAliasCore),  \
+    ret = (func)(HDI_ADAPTER_PARAM(wrappedKeyAlias, &wrappingKeyAliasCore),  \
                  HDI_ADAPTER_PARAM(key, &keyCore),  \
                  HDI_ADAPTER_PARAM(wrappedKeyData, &wrappedKeyDataCore),  \
                  HDI_ADAPTER_PARAM(paramSet, paramSetCore),  \
