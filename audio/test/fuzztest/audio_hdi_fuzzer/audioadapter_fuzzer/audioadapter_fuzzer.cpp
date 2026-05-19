@@ -31,6 +31,8 @@ enum AdapterCmdId {
     AUDIO_ADAPTER_GET_PORT_CAPABILITY,
     AUDIO_ADAPTER_SET_PASSTHROUGH_MODE,
     AUDIO_ADAPTER_GET_PASSTHROUGH_MODE,
+    AUDIO_ADAPTER_CREATE_CALL_TRANSFER,
+    AUDIO_ADAPTER_SET_PHONE_CALL_SCENE,
 };
 static uint32_t Convert2Uint32(const uint8_t *ptr)
 {
@@ -116,6 +118,15 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
                 .portName = reinterpret_cast<char *>(data + offsetname),
             };
             adapter->GetPassthroughMode(adapter, &port, &mode);
+            break;
+        }
+        case AUDIO_ADAPTER_CREATE_CALL_TRANSFER: {
+            adapter->CreateCallTransfer(adapter);
+            break;
+        }
+        case AUDIO_ADAPTER_SET_PHONE_CALL_SCENE: {
+            uint32_t sceneType = Convert2Uint32(rawData);
+            adapter->SetPhoneCallScene(adapter, static_cast<enum SceneType>(sceneType));
             break;
         }
         default:
