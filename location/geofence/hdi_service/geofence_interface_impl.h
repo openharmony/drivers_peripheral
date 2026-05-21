@@ -16,7 +16,7 @@
 #ifndef OHOS_HDI_LOCATION_LOCATION_GEOFENCE_V2_0_GEOFENCEINTERFACEIMPL_H
 #define OHOS_HDI_LOCATION_LOCATION_GEOFENCE_V2_0_GEOFENCEINTERFACEIMPL_H
 
-#include "v2_0/igeofence_interface.h"
+#include "v3_0/igeofence_interface.h"
 #include "iremote_object.h"
 #include "location_vendor_lib.h"
 
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Geofence {
-namespace V2_0 {
+namespace V3_0 {
 
 void OnGeofenceAvailabilityChange(bool isAvailable);
 void OnGeofenceEventChange(int32_t geofenceId,  GnssLocation* location, int32_t event, int64_t timestamp);
