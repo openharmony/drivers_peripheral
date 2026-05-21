@@ -35,6 +35,8 @@ struct AudioCaptureInfo {
     struct IAudioCaptureVdi *vdiCapture;
     uint32_t captureId;
     unsigned int usrCount;
+    struct IAudioCaptureCallback *callback;
+    bool isRegCb;
 };
 
 struct AudioCapturePrivVdi {
@@ -845,6 +847,61 @@ int32_t AudioCaptureIsSupportsPauseAndResumeVdi(struct IAudioCapture *capture, b
     return HDF_SUCCESS;
 }
 
+static int32_t AudioCaptureCallbackVdi(
+    enum AudioCaptureCallbackTypeVdi type, unsigned char* data, uint32_t len, void *cookie)
+{
+    AUDIO_FUNC_LOGD("AudioCaptureCallbackVdi enter, len=%{public}d, type=%{public}d", len, type);
+    CHECK_NULL_PTR_RETURN_VALUE(cookie, HDF_ERR_INVALID_PARAM);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)cookie;
+    if (!captureInfo->isRegCb) {
+        AUDIO_FUNC_LOGE("audio capture callback is not reg");
+        return HDF_FAILURE;
+    }
+    struct IAudioCaptureCallback *cb = captureInfo->callback;
+    CHECK_NULL_PTR_RETURN_VALUE(cb, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(cb->CaptureCallback, HDF_ERR_INVALID_PARAM);
+    int32_t ret = cb->CaptureCallback(cb, (enum AudioCaptureCallbackType)type, data, len);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture AudioCaptureCallbackVdi fail, ret=%{public}d", ret);
+        return HDF_FAILURE;
+    }
+    AUDIO_FUNC_LOGD("AudioCaptureCallbackVdi success");
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCaptureRegCallbackVdi(struct IAudioCapture *capture, struct IAudioCaptureCallback *audioCallback)
+{
+    AUDIO_FUNC_LOGI("AudioCaptureRegCallbackVdi hdi RegCallback enter");
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(audioCallback, HDF_ERR_INVALID_PARAM);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct IAudioCaptureVdi *vdicapture = captureInfo->vdiCapture;
+    uint32_t captureId = captureInfo->captureId;
+    if (captureId >= AUDIO_VDI_STREAM_NUM_MAX) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    pthread_rwlock_rdlock(&g_rwVdiCaptureLock[captureId]);
+    if (capture != &(g_audioCapturePrivVdi.captureInfos[captureId].capture)) {
+        pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    CHECK_NULL_PTR_RETURN_VALUE(vdicapture->RegCallback, HDF_ERR_INVALID_PARAM);
+    int32_t ret = vdicapture->RegCallback(vdicapture, AudioCaptureCallbackVdi, (void *)captureInfo);
+    if (ret != HDF_SUCCESS) {
+        pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
+        AUDIO_FUNC_LOGE("audio capture regCallback fail, ret=%{public}d", ret);
+        return ret;
+    }
+    captureInfo->callback = audioCallback;
+    captureInfo->isRegCb = true;
+    pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
+    AUDIO_FUNC_LOGI("AudioCaptureRegCallbackVdi hdi RegCallback success");
+    return HDF_SUCCESS;
+}
+
 static void AudioInitCaptureInstanceVdi(struct IAudioCapture *capture)
 {
     capture->CaptureFrame = AudioCaptureFrameVdi;
@@ -879,6 +936,7 @@ static void AudioInitCaptureInstanceVdi(struct IAudioCapture *capture)
     capture->TurnStandbyMode = AudioCaptureTurnStandbyModeVdi;
     capture->AudioDevDump = AudioCaptureAudioDevDumpVdi;
     capture->IsSupportsPauseAndResume = AudioCaptureIsSupportsPauseAndResumeVdi;
+    capture->RegCallback = AudioCaptureRegCallbackVdi;
 }
 
 static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
