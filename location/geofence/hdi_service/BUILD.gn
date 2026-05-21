@@ -100,7 +100,7 @@ ohos_shared_library("liblocation_geofence_hdi_driver") {
   }
 
   external_deps +=
-      [ "drivers_interface_location_geofence:liblocation_geofence_stub_2.0" ]
+      [ "drivers_interface_location_geofence:liblocation_geofence_stub_3.0" ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
