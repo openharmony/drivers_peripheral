@@ -36,8 +36,7 @@ private:
     };
     enum MetaType {
         EXIF_DATA,
-        USER_DATA,
-        XMP_DATA
+        USER_DATA
     };
 private:
     void Reset();
