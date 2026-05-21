@@ -91,7 +91,7 @@ void OnGeofenceOperateResultChange(int32_t geofenceId, int32_t operateCategory, 
     HDF_LOGI("%{public}s.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     if (g_geofenceCallBack != nullptr) {
-        g_geofenceCallBack->ReportGeofenceOperateResult(geofenceId, operateCategory,result);
+        g_geofenceCallBack->ReportGeofenceOperateResult(geofenceId, operateCategory, result);
     }
 }
 
