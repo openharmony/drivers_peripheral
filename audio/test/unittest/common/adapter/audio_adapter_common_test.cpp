@@ -1685,7 +1685,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCallTransferNull001, TestSi
 {
     int32_t ret = adapter_->CreateCallTransfer(nullptr);
     if (ret == HDF_ERR_NOT_SUPPORT) {
-        GTEST_SKIP()<< "CreateCallTransfer not support" << std::endl;
+        GTEST_SKIP() << "CreateCallTransfer not support" << std::endl;
     }
     ASSERT_TRUE(HDF_SUCCESS != ret);
 }
@@ -1694,7 +1694,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCallTransferIsvalid001, Tes
 {
     int32_t ret = adapter_->CreateCallTransfer(adapter_);
     if (ret == HDF_ERR_NOT_SUPPORT) {
-        GTEST_SKIP()<< "CreateCallTransfer not support" << std::endl;
+        GTEST_SKIP() << "CreateCallTransfer not support" << std::endl;
     }
     ASSERT_TRUE(ret == HDF_SUCCESS);
 }
@@ -1703,7 +1703,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetPhoneCallSceneNull001, TestSiz
 {
     int32_t ret = adapter_->SetPhoneCallScene(nullptr, SCENE_TYPE_TRANSFER);
     if (ret == HDF_ERR_NOT_SUPPORT) {
-        GTEST_SKIP()<< "SetPhoneCallScene not support" << std::endl;
+        GTEST_SKIP() << "SetPhoneCallScene not support" << std::endl;
     }
     ASSERT_TRUE(HDF_SUCCESS != ret);
 }
@@ -1712,7 +1712,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetPhoneCallSceneIsvalid001, Test
 {
     int32_t ret = adapter_->SetPhoneCallScene(adapter_, SCENE_TYPE_TRANSFER);
     if (ret == HDF_ERR_NOT_SUPPORT) {
-        GTEST_SKIP()<< "SetPhoneCallScene not support" << std::endl;
+        GTEST_SKIP() << "SetPhoneCallScene not support" << std::endl;
     }
     ASSERT_TRUE(ret == HDF_SUCCESS);
 }
@@ -1721,7 +1721,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetPhoneCallSceneIsvalid002, Test
 {
     int32_t ret = adapter_->SetPhoneCallScene(adapter_, SCENE_TYPE_MODEM);
     if (ret == HDF_ERR_NOT_SUPPORT) {
-        GTEST_SKIP()<< "SetPhoneCallScene not support" << std::endl;
+        GTEST_SKIP() << "SetPhoneCallScene not support" << std::endl;
     }
     ASSERT_TRUE(ret == HDF_SUCCESS);
 }
