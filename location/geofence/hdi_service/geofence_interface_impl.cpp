@@ -29,7 +29,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Geofence {
-namespace V2_0 {
+namespace V3_0 {
 namespace {
 using GeofenceCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGeofenceCallback>>;
 using GeofenceDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;

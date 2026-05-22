@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Geofence {
-namespace V2_0 {
+namespace V3_0 {
 
 void OnGeofenceAvailabilityChange(bool isAvailable);
 void OnGeofenceEventChange(int32_t geofenceId,  GnssLocation* location, int32_t event, int64_t timestamp);
