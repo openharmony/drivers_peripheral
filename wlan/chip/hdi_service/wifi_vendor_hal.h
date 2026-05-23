@@ -80,6 +80,8 @@ public:
     WifiError RegisterActionFrameReceiver(const std::string& ifaceName, const std::vector<uint8_t>& match);
     WifiError GetCoexictenceChannelList(const std::string& ifaceName, std::vector<uint8_t>& paramBuf);
     WifiError SetProjectionScreenParam(const std::string& ifaceName, const ProjectionScreenCmdParam& param);
+    WifiError SendP2pCmdToDriver(const std::string& ifaceName, const std::string &interfaceName, int32_t cmdId,
+        const std::vector<int8_t> &paramBuf, std::vector<int8_t> &result);
 
 private:
     WifiError RetrieveIfaceHandles();
