@@ -575,7 +575,7 @@ int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const st
             }
             break;
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_CAPABILITY:
-            value = audioExtraCap;
+            value = audioExtraCap_;
             break;
         default:
             DHLOGE("Parameter is invalid.");
