@@ -1285,7 +1285,7 @@ HWTEST_F(DeviceTest, test_SetDisplayColorGamut, TestSize.Level1)
     ColorGamut gamut = COLOR_GAMUT_SRGB;
     int32_t result = DISPLAY_FAILURE;
     auto ret = g_composerDevice->SetDisplayColorGamut(g_displayIds[0], gamut);
-    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+    if (ret == DISPLAY_SUCCESS) {
         result = DISPLAY_SUCCESS;
     }
     EXPECT_EQ(DISPLAY_FAILURE, result);
