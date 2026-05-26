@@ -93,17 +93,16 @@ static int StaCliCmd(WpaCtrl *ctrl, const char *cmd, char *buf, size_t bufLen)
         return -1;
     }
     size_t len = bufLen - 1;
-    HDF_LOGI("wpa_ctrl_request -> cmd: %{public}s", cmd);
+    HDF_LOGI("wpa_ctrl_request -> cmd: %{private}s", cmd);
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret < 0) {
-        HDF_LOGE("[%{public}s] command failed.", cmd);
+        HDF_LOGE("wpa_ctrl_request fail");
         return -1;
     }
     buf[len] = '\0';
     HDF_LOGI("wpa_ctrl_request -> buf: %{public}s", buf);
     if (strncmp(buf, "FAIL\n", strlen("FAIL\n")) == 0 ||
         strncmp(buf, "UNKNOWN COMMAND\n", strlen("UNKNOWN COMMAND\n")) == 0) {
-        HDF_LOGE("%{public}s request success, but response %{public}s", cmd, buf);
         return -1;
     }
     return 0;
@@ -186,11 +185,47 @@ static int WpaCliCmdSetNetwork(EthWpaInstance *p, const char *ifName, const char
     }
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }
+
+static int WpaCliCmdReAuth(EthWpaInstance *p, const char *ifName)
+{
+    char cmd[CMD_BUFFER_SIZE] = {0};
+    char buf[REPLY_BUF_SMALL_LENGTH] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s REAUTHENTICATE", ifName) < 0) {
+        HDF_LOGE("WpaCliCmdReAuth printf err");
+        return -1;
+    }
+    if (WpaCliCmd(cmd, buf, sizeof(buf)) < 0) {
+        HDF_LOGE("WpaCliCmdReAuth err");
+        return -1;
+    }
+    HDF_LOGI("WpaCliCmdReAuth succ");
+    return 0;
+}
  
 static int WpaCliCmdStaShellCmd(EthWpaInstance *p, const char *ifName, const char *params)
 {
     if (params == NULL) {
         return -1;
+    }
+    HDF_LOGI("%{public}s params = %{private}s", __func__, params);
+    if (strstr(params, "SET_NETWORK ") == params) {
+        const char *networkParams = params + strlen("SET_NETWORK ");
+        char *savePtr1 = NULL;
+        char *line = strtok_r((char *)networkParams, "\n", &savePtr1);
+        int ret = 0;
+        while (line != NULL) {
+            char *equalPos = strchr(line, '=');
+            if (equalPos != NULL) {
+                *equalPos = '\0';
+                const char *name = line;
+                const char *value = equalPos + 1;
+                ret |= WpaCliCmdSetNetwork(p, ifName, name, value);
+            }
+            line = strtok_r(NULL, "\n", &savePtr1);
+        }
+        return ret;
+    } else if (strstr(params, "REAUTHENTICATE") == params) {
+        return WpaCliCmdReAuth(p, ifName);
     }
     char cmd[CMD_BUFFER_SIZE] = {0};
     char buf[REPLY_BUF_SMALL_LENGTH] = {0};
