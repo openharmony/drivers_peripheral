@@ -168,6 +168,7 @@ private:
     AudioAdapterDescriptor adpDescriptor_;
     AudioAdapterStatus status_ = STATUS_OFFLINE;
     std::string capability_;
+    std::string audioExtraCap_;
 
     std::mutex extCallbackMtx_;
     /**
