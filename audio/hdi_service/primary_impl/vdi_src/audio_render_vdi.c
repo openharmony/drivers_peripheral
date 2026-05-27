@@ -1183,7 +1183,6 @@ void AudioDestroyRenderByIdVdiLocked(uint32_t renderId)
     priv->renderInfos[renderId].channelCount = 0;
     priv->renderInfos[renderId].renderId = 0;
     priv->renderInfos[renderId].usrCount = 0;
-    StubCollectorRemoveObject(IAUDIORENDER_INTERFACE_DESC, &(priv->renderInfos[renderId].render));
     AUDIO_FUNC_LOGI("audio destroy render success, renderId = [%{public}u]", renderId);
 #ifdef AUDIO_RECLAIM_MEMORY_ENABLE
     TrigerMemoryReclaim();
