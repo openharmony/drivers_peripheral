@@ -15,7 +15,7 @@
 
 #ifndef HDI_COMPOSER_UT_H
 #define HDI_COMPOSER_UT_H
-#include "v1_4/display_composer_type.h"
+#include "v1_5/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test_utils.h"
 #include "gtest/gtest.h"

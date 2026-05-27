@@ -18,8 +18,8 @@
 #include <chrono>
 #include <cinttypes>
 #include <algorithm>
-#include "v1_4/include/idisplay_composer_interface.h"
-#include "v1_4/display_composer_type.h"
+#include "v1_5/include/idisplay_composer_interface.h"
+#include "v1_5/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
 #include "display_test_utils.h"
@@ -36,7 +36,7 @@ using namespace OHOS::HDI::Display::Composer::V1_4;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-static sptr<Composer::V1_4::IDisplayComposerInterface> g_composerDevice = nullptr;
+static sptr<Composer::V1_5::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
 const int SLEEP_CONT_10 = 10;
@@ -1285,6 +1285,34 @@ HWTEST_F(DeviceTest, test_SetDisplayColorGamut, TestSize.Level1)
     ColorGamut gamut = COLOR_GAMUT_SRGB;
     int32_t result = DISPLAY_FAILURE;
     auto ret = g_composerDevice->SetDisplayColorGamut(g_displayIds[0], gamut);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        result = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, result);
+}
+
+HWTEST_F(DeviceTest, test_GetDisplayVCPFeature, TestSize.Level1)
+{
+    int32_t result = DISPLAY_FAILURE;
+    uint8_t vcpCode = 0x10;
+    uint16_t currentValue = 0;
+    uint16_t maximumValue = 0;
+    int32_t replyErrorCode = 0;
+    auto ret = g_composerDevice->GetDisplayVCPFeature(
+        g_displayIds[0], vcpCode, currentValue, maximumValue, replyErrorCode);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        result = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, result);
+}
+
+HWTEST_F(DeviceTest, test_SetDisplayVCPFeature, TestSize.Level1)
+{
+    int32_t result = DISPLAY_FAILURE;
+    uint8_t vcpCode = 0x10;
+    uint16_t currentValue = 0;
+    auto ret = g_composerDevice->SetDisplayVCPFeature(
+        g_displayIds[0], vcpCode, currentValue);
     if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         result = DISPLAY_SUCCESS;
     }

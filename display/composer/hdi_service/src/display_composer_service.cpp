@@ -42,7 +42,7 @@ namespace Composer {
 
 const std::string BOOTEVENT_COMPOSER_HOST_READY = "bootevent.composer_host.ready";
 
-extern "C" V1_4::IDisplayComposer* DisplayComposerImplGetInstance(void)
+extern "C" V1_5::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
     return new (std::nothrow) DisplayComposerService();
 }
@@ -287,6 +287,10 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<GetDisplayClientTargetPropertyFunc>(dlsym(libHandle_, "GetDisplayClientTargetProperty"));
     vdiAdapter_->SetDisplayColorGamut =
         reinterpret_cast<SetDisplayColorGamutFunc>(dlsym(libHandle_, "SetDisplayColorGamut"));
+    vdiAdapter_->GetDisplayVCPFeature =
+        reinterpret_cast<GetDisplayVCPFeatureFunc>(dlsym(libHandle_, "GetDisplayVCPFeature"));
+    vdiAdapter_->SetDisplayVCPFeature =
+        reinterpret_cast<SetDisplayVCPFeatureFunc>(dlsym(libHandle_, "SetDisplayVCPFeature"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -328,7 +332,7 @@ int32_t DisplayComposerService::CreateResponser()
     cacheMgr_ = DeviceCacheManager::GetInstance();
     CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
-    cmdResponser_ = V1_4::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
+    cmdResponser_ = V1_5::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
     CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     DISPLAY_LOGI("%{public}s out", __func__);
     return HDF_SUCCESS;
@@ -870,9 +874,9 @@ int32_t DisplayComposerService::InitSMQInfo(uint32_t devId, const std::shared_pt
     DISPLAY_CHK_RETURN(vdiAdapter_ == nullptr, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail, vdiAdapter_ == nullptr, devId[%{public}u]", __func__, devId));
 
-    std::shared_ptr<V1_4::HdiDisplayCmdResponser> cmdResponserCur =
+    std::shared_ptr<V1_5::HdiDisplayCmdResponser> cmdResponserCur =
         (devId == UINT32_MAX) || (cmdResponserMap_.size() == 1) ? cmdResponser_ :
-        V1_4::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
+        V1_5::HdiDisplayCmdResponser::Create(vdiAdapter_, cacheMgr_);
     DISPLAY_CHK_RETURN(cmdResponserCur == nullptr, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail, cmdResponserCur == nullptr, devId[%{public}u]", __func__, devId));
 
@@ -896,7 +900,7 @@ int32_t DisplayComposerService::DoCmdRequest(uint32_t devId,
     uint32_t inEleCnt, const std::vector<HdifdInfo>& inFds, uint32_t& outEleCnt, std::vector<HdifdInfo>& outFds)
 {
     int32_t ret = HDF_FAILURE;
-    std::shared_ptr<V1_4::HdiDisplayCmdResponser> respCur = GetResponser(devId);
+    std::shared_ptr<V1_5::HdiDisplayCmdResponser> respCur = GetResponser(devId);
     if (respCur != nullptr) {
         ret = respCur->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
     }
@@ -906,7 +910,7 @@ int32_t DisplayComposerService::DoCmdRequest(uint32_t devId,
     return ret;
 }
 
-std::shared_ptr<V1_4::HdiDisplayCmdResponser> DisplayComposerService::GetResponser(uint32_t devId)
+std::shared_ptr<V1_5::HdiDisplayCmdResponser> DisplayComposerService::GetResponser(uint32_t devId)
 {
     if (!GetEnableParallel()) {
         return cmdResponser_;
@@ -1275,6 +1279,32 @@ int32_t DisplayComposerService::SetDisplayColorGamut(uint32_t devId, ColorGamut 
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u", __func__, devId));
+    return ret;
+}
+
+
+int32_t DisplayComposerService::GetDisplayVCPFeature(uint32_t devId, uint8_t vcpCode,
+    uint16_t& currentValue, uint16_t& maximumValue, int32_t& replyErrorCode)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetDisplayVCPFeature, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->GetDisplayVCPFeature(devId, vcpCode, currentValue, maximumValue, replyErrorCode);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail ret:%{public}d, devId:%{public}u", __func__, ret, devId));
+    return ret;
+}
+
+int32_t DisplayComposerService::SetDisplayVCPFeature(uint32_t devId, uint8_t vcpCode, uint16_t currentValue)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetDisplayVCPFeature, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->SetDisplayVCPFeature(devId, vcpCode, currentValue);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail ret:%{public}d, devId:%{public}u", __func__, ret, devId));
     return ret;
 }
 } // namespace Composer

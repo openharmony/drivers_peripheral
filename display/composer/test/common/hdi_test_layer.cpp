@@ -18,7 +18,7 @@
 #include "hdi_test_device.h"
 #include "v1_0/include/idisplay_buffer.h"
 #include "v1_0/display_buffer_type.h"
-#include "v1_4/display_composer_type.h"
+#include "v1_5/display_composer_type.h"
 
 namespace OHOS {
 namespace HDI {
