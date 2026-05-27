@@ -1047,7 +1047,6 @@ void AudioDestroyCaptureByIdVdi(uint32_t captureId)
     priv->captureInfos[captureId].sourceType = 0;
     priv->captureInfos[captureId].captureId = AUDIO_VDI_STREAM_NUM_MAX;
     priv->captureInfos[captureId].usrCount = 0;
-    StubCollectorRemoveObject(IAUDIOCAPTURE_INTERFACE_DESC, &(priv->captureInfos[captureId].capture));
 
     AUDIO_FUNC_LOGI("audio destroy capture success, captureId = [%{public}u]", captureId);
 #ifdef AUDIO_RECLAIM_MEMORY_ENABLE
