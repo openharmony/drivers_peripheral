@@ -28,6 +28,9 @@
 #include "v1_4/display_command/display_cmd_responser.h"
 #include "v1_4/idisplay_composer.h"
 #include "v1_4/display_composer_type.h"
+#include "v1_5/display_command/display_cmd_responser.h"
+#include "v1_5/idisplay_composer.h"
+#include "v1_5/display_composer_type.h"
 #include "common/include/display_config.h"
 #include "common/include/display_vdi_adapter_interface.h"
 #include <mutex>
@@ -36,9 +39,9 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-using namespace OHOS::HDI::Display::Composer::V1_4;
+using namespace OHOS::HDI::Display::Composer::V1_5;
 
-class DisplayComposerService : public V1_4::IDisplayComposer {
+class DisplayComposerService : public V1_5::IDisplayComposer {
 public:
     DisplayComposerService();
     virtual ~DisplayComposerService();
@@ -53,6 +56,9 @@ public:
     int32_t GetPanelPowerStatus(uint32_t devId, V1_4::PanelPowerStatus& status) override;
     int32_t GetDisplayBacklight(uint32_t devId, uint32_t& level) override;
     int32_t SetDisplayBacklight(uint32_t devId, uint32_t level) override;
+    int32_t GetDisplayVCPFeature(uint32_t devId, uint8_t vcpCode,
+        uint16_t& currentValue, uint16_t& maximumValue, int32_t& replyErrorCode) override;
+    int32_t SetDisplayVCPFeature(uint32_t devId, uint8_t vcpCode, uint16_t currentValue) override;
     int32_t GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t& value) override;
     int32_t UpdateHardwareCursor(uint32_t devId, int32_t x, int32_t y, const sptr<NativeBuffer>& buffer) override;
     int32_t EnableHardwareCursorStats(uint32_t devId, bool enable) override;
@@ -118,7 +124,7 @@ private:
     void LoadVdiFuncPart3();
     void ExitService();
     int32_t CreateResponser();
-    std::shared_ptr<V1_4::HdiDisplayCmdResponser> GetResponser(uint32_t devId);
+    std::shared_ptr<V1_5::HdiDisplayCmdResponser> GetResponser(uint32_t devId);
     static void OnHotPlug(uint32_t outputId, bool connected, void* data);
     static void OnVBlank(unsigned int sequence, uint64_t ns, void* data);
     static void OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data);
@@ -142,8 +148,8 @@ private:
     sptr<IVBlankIdleCallback> VBlankIdleCb_;
     sptr<IHwcEventCallback> hwcEventCb_;
     static std::mutex respMapMutex_;
-    std::shared_ptr<V1_4::HdiDisplayCmdResponser> cmdResponser_;
-    std::unordered_map<uint32_t, std::shared_ptr<V1_4::HdiDisplayCmdResponser>> cmdResponserMap_;
+    std::shared_ptr<V1_5::HdiDisplayCmdResponser> cmdResponser_;
+    std::unordered_map<uint32_t, std::shared_ptr<V1_5::HdiDisplayCmdResponser>> cmdResponserMap_;
 };
 } // namespace Composer
 } // namespace Display
