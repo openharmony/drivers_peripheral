@@ -438,6 +438,13 @@ WifiError WifiVendorHal::SetProjectionScreenParam(const std::string& ifaceName, 
 {
     return globalFuncTable_.setProjectionScreenParam(GetIfaceHandle(ifaceName), param);
 }
+
+WifiError WifiVendorHal::SendP2pCmdToDriver(const std::string &ifaceName, const std::string &interfaceName,
+    int32_t cmdId, const std::vector<int8_t> &paramBuf, std::vector<int8_t> &result)
+{
+    return globalFuncTable_.sendP2pCmdToDriver(GetIfaceHandle(ifaceName), interfaceName.c_str(), cmdId, paramBuf,
+        result);
+}
 } // namespace v2_0
 } // namespace Chip
 } // namespace Wlan

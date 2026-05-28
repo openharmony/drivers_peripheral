@@ -87,6 +87,8 @@ static void CheckWhetherAddIface(wifiHandle handle, const char* ifname);
 WifiError IsSupportCoex(bool& isCoex);
 static WifiError SendCmdToDriver(const char *ifaceName, int32_t commandId,
     const std::vector<int8_t>& paramData, std::vector<int8_t>& result);
+static WifiError SendP2pCmdToDriver(wifiInterfaceHandle handle, const char *interfaceName, int32_t commandId,
+    const std::vector<int8_t> &paramData, std::vector<int8_t> &result);
 
 typedef enum WifiAttr {
     HAL_INVALID                    = 0,
@@ -167,6 +169,7 @@ WifiError InitWifiVendorHalFuncTable(WifiHalFn *fn)
     fn->getChipCaps = GetChipCaps;
     fn->isSupportCoex = IsSupportCoex;
     fn->sendCmdToDriver = SendCmdToDriver;
+    fn->sendP2pCmdToDriver = SendP2pCmdToDriver;
     return HAL_SUCCESS;
 }
 
@@ -1627,4 +1630,10 @@ static WifiError SendCmdToDriver(const char *ifaceName, int32_t commandId,
     const std::vector<int8_t>& paramData, std::vector<int8_t>& result)
 {
     return HAL_SUCCESS;
+}
+
+static WifiError SendP2pCmdToDriver(wifiInterfaceHandle handle, const char *interfaceName, int32_t commandId,
+    const std::vector<int8_t> &paramData, std::vector<int8_t> &result)
+{
+    return HAL_UNKNOWN;
 }

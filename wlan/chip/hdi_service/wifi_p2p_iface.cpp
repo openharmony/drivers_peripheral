@@ -155,7 +155,7 @@ int32_t WifiP2pIface::SetIfaceState(bool state)
 int32_t WifiP2pIface::SendCmdToDriver(const std::string& ifName, int32_t cmdId,
     const std::vector<int8_t>& paramBuf, std::vector<int8_t>& result)
 {
-    WifiError status = vendorHal_.lock()->SendCmdToDriver(ifName, cmdId, paramBuf, result);
+    WifiError status = vendorHal_.lock()->SendP2pCmdToDriver(ifname_, ifName, cmdId, paramBuf, result);
     if (status == HAL_SUCCESS) {
         return HDF_SUCCESS;
     }
