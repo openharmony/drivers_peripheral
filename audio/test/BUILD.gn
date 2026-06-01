@@ -24,7 +24,6 @@ if (defined(ohos_lite)) {
       testonly = true
       deps = [
         "benchmarktest:hdf_audio_benchmark_test",
-        "systemtest:systemtest",
         "unittest:audiotest",
       ]
 
