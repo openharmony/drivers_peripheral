@@ -57,6 +57,10 @@ public:
 
     int32_t GetCtsSignal(bool& cts) override;
 
+    int32_t SetDtrSignal(bool dtr) override;
+
+    int32_t GetDsrSignal(bool& dsr) override;
+
     int32_t Open();
 
     int32_t NotifyDeviceOffline();
