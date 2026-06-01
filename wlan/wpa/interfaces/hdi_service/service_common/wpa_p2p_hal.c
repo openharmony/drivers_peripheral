@@ -27,7 +27,6 @@
 #define P2P_REPLY_BUF_LENGTH 4096
 #define P2P_REPLY_BUF_SMALL_LENGTH 64
 #define P2P_CMD_BUF_LENGTH 256
-#define P2P_PIN_CODE_LEN 8
 #define P2P_REMOVE_ALL_NETWORK_CMD (-1)
 #define P2P_CONNECT_JOIN_LEN 20
 #define P2P_CONNECT_MODE_LEN 16
@@ -579,9 +578,9 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
     if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL || argv->resp == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    unsigned nameLen = strlen((char *) argv->name);
-    unsigned queryLen = strlen((char *) argv->query);
-    unsigned respLen = strlen((char *) argv->resp);
+    unsigned nameLen = argv->nameLen;
+    unsigned queryLen = argv->queryLen;
+    unsigned respLen = argv->respLen;
     if ((argv->mode == 0 && nameLen == 0) || (argv->mode != 0 && (queryLen == 0 || respLen == 0))) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
@@ -624,8 +623,8 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, co
     if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    unsigned nameLen = strlen((char *) argv->name);
-    unsigned queryLen = strlen((char *) argv->query);
+    unsigned nameLen = argv->nameLen;
+    unsigned queryLen = argv->queryLen;
     if ((argv->mode == 0 && nameLen == 0) || (argv->mode == 1 && queryLen == 0)) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }

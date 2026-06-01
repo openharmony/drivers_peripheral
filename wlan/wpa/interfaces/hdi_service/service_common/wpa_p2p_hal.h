@@ -36,6 +36,7 @@ extern "C" {
 #define AX_NET_ID 1
 #define P2P_INTERFACE_CREATED "P2P-INTERFACE-CREATED "
 #define CTRL_EVENT_DISCONNECTED "CTRL-EVENT-DISCONNECTED"
+#define P2P_PIN_CODE_LEN 8
 
 typedef struct StWifiWpaP2pInterface WifiWpaP2pInterface;
 struct StWifiWpaP2pInterface {

@@ -1032,6 +1032,19 @@ int32_t WpaInterfaceP2pRespServerDiscovery(struct IWpaInterface *self, const cha
     return HDF_SUCCESS;
 }
 
+static bool IsAllZeroPin(const struct HdiP2pConnectInfo *info)
+{
+    if (info == NULL || info->pin == NULL || info->pinLen != (P2P_PIN_CODE_LEN + 1)) {
+        return false;
+    }
+    for (int i = 0; i < info->pinLen; i++) {
+        if (info->pin[i] != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, const struct HdiP2pConnectInfo *info,
     char *replyPin, uint32_t replyPinLen)
 {
@@ -1091,7 +1104,7 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
         if (strcpy_s(mode, sizeof(mode), " keypad") != EOK) {
             HDF_LOGE("%{public}s strcpy failed", __func__);
         }
-    } else if (info->provdisc == P2P_WPS_METHOD_PBC && info->pin != NULL && strlen((char *)info->pin) == 0) {
+    } else if (info->provdisc == P2P_WPS_METHOD_PBC && IsAllZeroPin(info)) {
         if (strcpy_s(pin, CMD_SIZE, "pbc") != EOK) {
             HDF_LOGE("%{public}s strcpy failed", __func__);
         }
