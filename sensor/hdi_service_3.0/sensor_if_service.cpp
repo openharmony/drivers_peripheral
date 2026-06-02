@@ -200,11 +200,11 @@ int32_t SensorIfService::EnableSensorInternal(const SensorHandle sensorHandle, i
     SensorClientsManager::GetInstance()->OpenSensor(sensorHandle, serviceId);
     int32_t enableRet = HDF_FAILURE;
     SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
-#ifdef TV_FLAG
-    enableRet = sensorVdiImplV1_1_->Enable(sensorHandle);
-#else
-    enableRet = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
-#endif
+    if (GetSensorProductMode()) {
+        enableRet = sensorVdiImplV1_1_->Enable(sensorHandle);
+    } else {
+        enableRet = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
+    }
     SENSOR_TRACE_FINISH;
     if (enableRet != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s Enable failed, error code is %{public}d, sensorHandle = %{public}s, "
