@@ -551,11 +551,10 @@ void SensorIfService::RemoveDeathNotice(int32_t groupId)
 void SensorIfService::SetNewBatch(const SensorHandle sensorHandle)
 {
     SensorInterval saSensorInterval = SensorClientsManager::GetInstance()->GetClientSenSorBestConfig(sensorHandle);
-    SensorInterval sdcSensorInterval = {std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::max()};
+    SensorInterval sdcSensorInterval = {std::numeric_limits<int64_t>::max(), saSensorInterval.reportInterval};
 
     auto sdcIt = sdcIntervalMap_.find(sensorHandle);
     if (sdcIt != sdcIntervalMap_.end() && !sdcIt->second.empty()) {
-        sdcSensorInterval.reportInterval = REPORT_INTERVAL;
         for (auto &entry : sdcIt->second) {
             sdcSensorInterval.samplingInterval = std::min(sdcSensorInterval.samplingInterval, entry.second);
         }
@@ -578,9 +577,6 @@ void SensorIfService::SetNewBatch(const SensorHandle sensorHandle)
     SensorClientsManager::GetInstance()->UpdateNewSensorConfig(sensorHandle, saSensorInterval);
     SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorHandle, saSensorInterval.samplingInterval,
                                                                  saSensorInterval.reportInterval);
-
-    SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorHandle, saSensorInterval.samplingInterval,
-                                                             saSensorInterval.reportInterval);
 
     SENSOR_TRACE_START("sensorVdiImplV1_1_->SetSaBatch");
     if (GetSensorProductMode()) {

@@ -9,53 +9,53 @@ hdc shell chmod 777 /data/SensorFourClientsClient2Test
 hdc shell chmod 777 /data/SensorFourClientsClient3Test
 hdc shell chmod 777 /data/SensorFourClientsClient4Test
 
-echo [Main] t=0s: Starting Client1 (1s interval, runs 14s) ...
+echo [Main] t=0s: 启动 Client1（间隔1s，运行14s）...
 start cmd /k "hdc shell /data/SensorFourClientsClient1Test"
-echo [Main] Client1 launched
+echo [Main] Client1 已启动
 
-echo [Main] t=0s~2s: waiting 2 seconds ...
+echo [Main] t=0s~2s: 等待 2 秒...
 timeout /t 2 /nobreak >nul
 
-echo [Main] t=2s: Starting Client2 (100ms interval, runs 10s) ...
+echo [Main] t=2s: 启动 Client2（间隔100ms，运行10s）...
 start cmd /k "hdc shell /data/SensorFourClientsClient2Test"
-echo [Main] Client2 launched
+echo [Main] Client2 已启动
 
-echo [Main] t=2s~4s: waiting 2 seconds ...
+echo [Main] t=2s~4s: 等待 2 秒...
 timeout /t 2 /nobreak >nul
 
-echo [Main] t=4s: Starting Client3 (10ms interval, runs 6s) ...
+echo [Main] t=4s: 启动 Client3（间隔10ms，运行6s）...
 start cmd /k "hdc shell /data/SensorFourClientsClient3Test"
-echo [Main] Client3 launched
+echo [Main] Client3 已启动
 
-echo [Main] t=4s~6s: waiting 2 seconds ...
+echo [Main] t=4s~6s: 等待 2 秒...
 timeout /t 2 /nobreak >nul
 
-echo [Main] t=6s: Starting Client4 (5ms interval, runs 2s) ...
+echo [Main] t=6s: 启动 Client4（间隔5ms，运行2s）...
 start cmd /k "hdc shell /data/SensorFourClientsClient4Test"
-echo [Main] Client4 launched
+echo [Main] Client4 已启动
 
-echo [Main] t=6s~8s: waiting 2 seconds (Client4 will disable at t=8s) ...
+echo [Main] t=6s~8s: 等待 2 秒（Client4 将在 t=8s 时停止）...
 timeout /t 2 /nobreak >nul
 
-echo [Main] t=8s: Client4 should have disabled
+echo [Main] t=8s: Client4 应已停止
 
-echo [Main] t=8s~10s: waiting 2 seconds (Client3 will disable at t=10s) ...
+echo [Main] t=8s~10s: 等待 2 秒（Client3 将在 t=10s 时停止）...
 timeout /t 2 /nobreak >nul
 
-echo [Main] t=10s: Client3 should have disabled
+echo [Main] t=10s: Client3 应已停止
 
-echo [Main] t=10s~12s: waiting 2 seconds (Client2 will disable at t=12s) ...
+echo [Main] t=10s~12s: 等待 2 秒（Client2 将在 t=12s 时停止）...
 timeout /t 2 /nobreak >nul
 
-echo [Main] t=12s: Client2 should have disabled
+echo [Main] t=12s: Client2 应已停止
 
-echo [Main] t=12s~14s: waiting 2 seconds (Client1 will disable at t=14s) ...
+echo [Main] t=12s~14s: 等待 2 秒（Client1 将在 t=14s 时停止）...
 timeout /t 2 /nobreak >nul
 
-echo [Main] t=14s: Client1 should have disabled
+echo [Main] t=14s: Client1 应已停止
 
 echo [Main] ============================================
-echo [Main] SensorTestFourClientsFork End
+echo [Main] SensorTestFourClientsFork 测试结束
 echo [Main] ============================================
 
 endlocal
