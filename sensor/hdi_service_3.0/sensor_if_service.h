@@ -109,6 +109,7 @@ private:
     sptr<SensorCallbackVdi> traditionalCb = nullptr;
     sptr<SensorCallbackVdi> medicalCb = nullptr;
     std::vector<V3_0::HdfSensorInformation> hdfSensorInformations;
+    std::map<SensorHandle, std::map<uint32_t, int64_t>> sdcIntervalMap_;
     int32_t SetDelay(const SensorHandle sensorHandle, int64_t &samplingInterval, int64_t &reportInterval);
 };
 } // V3_0

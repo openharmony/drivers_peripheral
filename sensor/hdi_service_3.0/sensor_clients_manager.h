@@ -68,6 +68,7 @@ public:
     void UpdateSensorConfig(SensorHandle sensorHandle, int64_t samplingInterval, int64_t reportInterval);
     void UpdateNewSensorConfig(SensorHandle sensorHandle, SensorInterval sensorInterval);
     void UpdateSdcSensorConfig(SensorHandle sensorHandle, int64_t samplingInterval, int64_t reportInterval);
+    void UpdateNewSdcSensorConfig(SensorHandle sensorHandle, SensorInterval sensorInterval);
     int GetServiceId(int groupId, const sptr<IRemoteObject> &iRemoteObject);
     static SensorClientsManager* GetInstance();
     std::mutex clientsMutex_;

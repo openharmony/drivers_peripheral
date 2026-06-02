@@ -234,6 +234,19 @@ void SensorClientsManager::UpdateSdcSensorConfig(SensorHandle sensorHandle, int6
     }
 }
 
+void SensorClientsManager::UpdateNewSdcSensorConfig(SensorHandle sensorHandle, SensorInterval sensorInterval)
+{
+    SENSOR_TRACE_PID;
+    std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
+    if (sdcSensorConfig_.find(sensorHandle) == sdcSensorConfig_.end() &&
+        sdcSensorConfig_.size() >= SENSOR_CLIENT_INFO_MAX) {
+        HDF_LOGE("%{public}s: sdcSensorConfig_ size has exceeded the maximum value", __func__);
+        return;
+    }
+    sdcSensorConfig_[sensorHandle].samplingInterval = sensorInterval.samplingInterval;
+    sdcSensorConfig_[sensorHandle].reportInterval = sensorInterval.reportInterval;
+}
+
 void SensorClientsManager::UpdateClientPeriodCount(SensorHandle sensorHandle, int64_t samplingInterval,
                                                    int64_t reportInterval)
 {

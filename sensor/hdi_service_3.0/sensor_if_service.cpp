@@ -550,14 +550,28 @@ void SensorIfService::RemoveDeathNotice(int32_t groupId)
 
 void SensorIfService::SetNewBatch(const SensorHandle sensorHandle)
 {
-    SensorInterval sensorInterval = SensorClientsManager::GetInstance()->GetClientSenSorBestConfig(sensorHandle);
-    SensorInterval saSensorInterval = sensorInterval;
-    SensorInterval sdcSensorInterval = sensorInterval;
-    AdjustSensorConfig(sensorHandle, sensorInterval, saSensorInterval, sdcSensorInterval);
+    SensorInterval saSensorInterval = SensorClientsManager::GetInstance()->GetClientSenSorBestConfig(sensorHandle);
+    SensorInterval sdcSensorInterval = {std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::max()};
+
+    auto sdcIt = sdcIntervalMap_.find(sensorHandle);
+    if (sdcIt != sdcIntervalMap_.end() && !sdcIt->second.empty()) {
+        sdcSensorInterval.reportInterval = REPORT_INTERVAL;
+        for (auto &entry : sdcIt->second) {
+            sdcSensorInterval.samplingInterval = std::min(sdcSensorInterval.samplingInterval, entry.second);
+        }
+    }
+
+    SensorInterval sensorInterval;
+    sensorInterval.samplingInterval = std::min(saSensorInterval.samplingInterval, sdcSensorInterval.samplingInterval);
+    sensorInterval.reportInterval = std::min(saSensorInterval.reportInterval, sdcSensorInterval.reportInterval);
 
     int32_t ret = SetBatchConfig(sensorHandle, sensorInterval.samplingInterval, sensorInterval.reportInterval);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
+    }
+
+    if (sdcIt != sdcIntervalMap_.end() && !sdcIt->second.empty()) {
+        SensorClientsManager::GetInstance()->UpdateNewSdcSensorConfig(sensorHandle, sdcSensorInterval);
     }
 
     SetDelay(sensorHandle, saSensorInterval.samplingInterval, saSensorInterval.reportInterval);
@@ -946,14 +960,13 @@ void SensorIfService::VoteEnable(const SensorHandle sensorHandle, uint32_t servi
 void SensorIfService::VoteInterval(const SensorHandle sensorHandle, uint32_t serviceId,
     int64_t &samplingInterval, bool &enabled)
 {
-    static std::map<SensorHandle, std::map<uint32_t, int64_t>> sdcIntervalMap;
     if (enabled) {
-        sdcIntervalMap[sensorHandle][serviceId] = samplingInterval;
+        sdcIntervalMap_[sensorHandle][serviceId] = samplingInterval;
     } else {
         samplingInterval = 0;
-        sdcIntervalMap[sensorHandle].erase(serviceId);
+        sdcIntervalMap_[sensorHandle].erase(serviceId);
     }
-    for (auto it = sdcIntervalMap[sensorHandle].begin(); it != sdcIntervalMap[sensorHandle].end(); ++it) {
+    for (auto it = sdcIntervalMap_[sensorHandle].begin(); it != sdcIntervalMap_[sensorHandle].end(); ++it) {
         if (samplingInterval == 0) {
             samplingInterval = it->second;
         }
