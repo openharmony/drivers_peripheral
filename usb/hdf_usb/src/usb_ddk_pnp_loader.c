@@ -771,6 +771,9 @@ static int32_t UsbDdkPnpLoaderrAddPnpDevice(struct HdfDeviceObject *usbPnpManage
     if ((deviceListTable != NULL) && (deviceListTable->status != USB_PNP_REMOVE_STATUS)) {
         return HDF_SUCCESS;
     }
+    if (idTable->interfaceLength > USB_PNP_INFO_MAX_INTERFACES) {
+        return HDF_FAILURE;
+    }
 
     struct UsbPnpNotifyServiceInfo serviceInfo;
     serviceInfo.length =
