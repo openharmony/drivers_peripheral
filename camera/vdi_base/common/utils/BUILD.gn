@@ -50,7 +50,6 @@ if (defined(ohos_lite)) {
       "exif",
       "watchdog",
       "selfkiller",
-      "src",
     ]
   }
   ohos_shared_library("peripheral_camera_utils") {
