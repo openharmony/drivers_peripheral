@@ -89,8 +89,10 @@ private:
     DCamRetCode CreateDStreamOperator();
     std::string GenerateCameraId(const DHBase &dhBase);
     void NotifyStartCaptureError();
-    void NotifyCameraError(const ErrorType type);
+    void NotifyCameraError(const ErrorType type, int32_t code);
     void IsOpenSessFailedState(bool state);
+    int32_t ParseSubcode(const std::string &content);
+    void HandleEventResult(int32_t result, int32_t subcode);
     CamRetCode TriggerGetFullCaps();
     void SetRefreshFlag(bool flag);
     bool GetRefreshFlag();

@@ -572,7 +572,25 @@ DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
         DHLOGE("Invalid distributed camera event type = %{public}d.", event->type_);
         return DCamRetCode::INVALID_ARGUMENT;
     }
-    switch (event->result_) {
+    int32_t subcode = ParseSubcode(event->content_);
+    HandleEventResult(event->result_, subcode);
+    return SUCCESS;
+}
+
+int32_t DCameraDevice::ParseSubcode(const std::string &content)
+{
+    int32_t subcode = 0;
+    std::string subcodePrefix = "subcode: ";
+    size_t pos = content.find(subcodePrefix);
+    if (pos != std::string::npos) {
+        subcode = std::atoi(content.substr(pos + subcodePrefix.size()).c_str());
+    }
+    return subcode;
+}
+
+void DCameraDevice::HandleEventResult(int32_t result, int32_t subcode)
+{
+    switch (result) {
         case DCameraEventResult::DCAMERA_EVENT_CHANNEL_CONNECTED: {
             IsOpenSessFailedState(false);
             break;
@@ -582,7 +600,7 @@ DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_CHANNEL_DISCONNECTED: {
-            NotifyCameraError(ErrorType::DEVICE_DISCONNECT);
+            NotifyCameraError(ErrorType::DEVICE_DISCONNECT, subcode);
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_CONFIG_STREAMS_ERROR:
@@ -591,25 +609,24 @@ DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_DEVICE_ERROR: {
-            NotifyCameraError(ErrorType::DRIVER_ERROR);
+            NotifyCameraError(ErrorType::DRIVER_ERROR, subcode);
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_DEVICE_PREEMPT: {
-            NotifyCameraError(ErrorType::DEVICE_PREEMPT);
+            NotifyCameraError(ErrorType::DEVICE_PREEMPT, subcode);
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_DEVICE_IN_USE: {
-            NotifyCameraError(ErrorType::DCAMERA_ERROR_DEVICE_IN_USE);
+            NotifyCameraError(ErrorType::DCAMERA_ERROR_DEVICE_IN_USE, subcode);
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_NO_PERMISSION: {
-            NotifyCameraError(ErrorType::DCAMERA_ERROR_NO_PERMISSION);
+            NotifyCameraError(ErrorType::DCAMERA_ERROR_NO_PERMISSION, subcode);
             break;
         }
         default:
             break;
     }
-    return SUCCESS;
 }
 
 void DCameraDevice::IsOpenSessFailedState(bool state)
@@ -637,11 +654,14 @@ void DCameraDevice::NotifyStartCaptureError()
     }
 }
 
-void DCameraDevice::NotifyCameraError(const ErrorType type)
+void DCameraDevice::NotifyCameraError(const ErrorType type, int32_t code)
 {
+    DHLOGI("DCameraDevice::NotifyCameraError type = %{public}d, code = %{public}d.", type, code);
     if (dCameraDeviceCallback_ != nullptr) {
-        dCameraDeviceCallback_->OnError(type, 0);
-        Close();
+        dCameraDeviceCallback_->OnError(type, code);
+        if (code == 0) {
+            Close();
+        }
     }
 }
 
