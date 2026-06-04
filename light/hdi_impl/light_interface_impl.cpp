@@ -21,6 +21,7 @@
 #include "light_if.h"
 
 #define HDF_LOG_TAG     uhdf_light_service
+#define MAX_LIGHT_COUNT 32
 
 namespace OHOS {
 namespace HDI {
@@ -54,6 +55,11 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfoVdi>& info)
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
+    }
+
+    if (count > MAX_LIGHT_COUNT) {
+        HDF_LOGE("%{public}s: count %{public}u exceeds max limit %{public}d", __func__, count, MAX_LIGHT_COUNT);
+        return HDF_FAILURE;
     }
 
     while (count--) {
