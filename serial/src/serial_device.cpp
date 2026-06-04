@@ -525,6 +525,56 @@ int32_t SerialDevice::GetCtsSignal(bool& cts)
     return HDF_SUCCESS;
 }
 
+int32_t SerialDevice::SetDtrSignal(bool dtr)
+{
+    HDF_LOGD("%{public}s called, dtr=%{public}d!", __func__, dtr);
+    std::shared_lock lock(mutex_);
+    HdfTrace openTrace("Serial::SetDtrSignal");
+    if (!isOpen_.load() || fd_ < 0) {
+        HDF_LOGE("%{public}s, device not open!", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+
+    int flags;
+    if (ioctl(fd_, TIOCMGET, &flags) != 0) {
+        HDF_LOGE("%{public}s, TIOCMGET failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
+        return HDF_FAILURE;
+    }
+
+    if (dtr) {
+        flags |= TIOCM_DTR;
+    } else {
+        flags &= ~TIOCM_DTR;
+    }
+
+    if (ioctl(fd_, TIOCMSET, &flags) != 0) {
+        HDF_LOGE("%{public}s, TIOCMSET failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t SerialDevice::GetDsrSignal(bool& dsr)
+{
+    HDF_LOGD("%{public}s called!", __func__);
+    std::shared_lock lock(mutex_);
+    HdfTrace openTrace("Serial::GetDsrSignal");
+    if (!isOpen_.load() || fd_ < 0) {
+        HDF_LOGE("%{public}s, device not open!", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+
+    int flags;
+    if (ioctl(fd_, TIOCMGET, &flags) != 0) {
+        HDF_LOGE("%{public}s, TIOCMGET failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
+        return HDF_FAILURE;
+    }
+
+    dsr = (flags & TIOCM_DSR) != 0;
+    return HDF_SUCCESS;
+}
+
 void SerialDevice::ReadThread(int32_t timeout)
 {
     std::vector<int8_t> buffer(MAX_BUFFER_LEN);
