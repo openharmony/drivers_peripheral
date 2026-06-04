@@ -199,12 +199,12 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
         cltRun = true;
     }
 
+#ifdef BATCH_CREATE_BUFFERS
     auto node = port->GetNode();
     if (node == nullptr) {
         CAMERA_LOGI("SourceNode::PortHandler::StartCollectBuffers node null");
         return RC_ERROR;
     }
-#ifdef BATCH_CREATE_BUFFERS
     if (node->CreateBuffers() != RC_OK) {
         CAMERA_LOGI("SourceNode::PortHandler::StartCollectBuffers node create buffer error");
         return RC_ERROR;
