@@ -428,18 +428,16 @@ static void GetHeaderStr(struct UsbFnStrings ** const strings, struct UsbFunctio
 {
     uint32_t i, j;
     uint32_t langCount = 0;
-    uint32_t strCount = 0;
     uint32_t len = 0;
     for (i = 0; strings[i] != NULL; i++) {
         langCount++;
         for (j = 0; strings[i]->strings[j].s; j++) {
             len += strlen(strings[i]->strings[j].s) + sizeof(char);
         }
-        strCount = j;
+        strings[i]->strCount = j;
     }
     headerStr->magic = htole32(FUNCTIONFS_STRINGS_MAGIC);
     headerStr->length = htole32(sizeof(struct UsbFunctionfsStringsHead) + langCount * sizeof(uint16_t) + len);
-    headerStr->strCount = strCount;
     headerStr->langCount = langCount;
 }
 
@@ -470,7 +468,7 @@ static int32_t UsbFnWriteStrings(int32_t ep0, struct UsbFnStrings ** const strin
             goto ERR;
         }
         whereDec += sizeof(uint16_t);
-        for (j = 0; j < headerStr.strCount; j++) {
+        for (j = 0; j < strings[i]->strCount; j++) {
             if (strlen(strings[i]->strings[j].s)) {
                 ret = memcpy_s(whereDec, headerStr.length - (whereDec - str), strings[i]->strings[j].s,
                     strlen(strings[i]->strings[j].s));
