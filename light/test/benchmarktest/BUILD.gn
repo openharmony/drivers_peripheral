@@ -47,6 +47,7 @@ ohos_benchmarktest("hdf_light_benchmark_test") {
   }
   external_deps += [
     "googletest:gmock_main",
+    "googletest:gtest_main",
     "ipc:ipc_single",
   ]
 }
