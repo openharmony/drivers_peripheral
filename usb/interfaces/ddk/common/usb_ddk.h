@@ -269,6 +269,7 @@ struct UsbInterfaceAssocDescriptor {
 struct UsbFunctionfsStringsHead {
     uint32_t magic;
     uint32_t length;
+    uint32_t strCount;
     uint32_t langCount;
 } __attribute__((packed));
 
