@@ -826,7 +826,7 @@ static int32_t AudioPathSelCaptureChkScene(struct AudioHwCaptureParam *captureSc
     return AudioPathSelGetPlanCapture(captureSceneParam);
 }
 
-static void FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo) 
+static void FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo)
 {
     for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
         if (deviceInfo != NULL) {
