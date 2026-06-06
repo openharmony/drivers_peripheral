@@ -827,13 +827,13 @@ static int32_t AudioPathSelCaptureChkScene(struct AudioHwCaptureParam *captureSc
 }
 
 static void FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo) 
-{ 
-    for (int i = 0; i < HDF_PATH_NUM_MAX; i++) { 
-        if (deviceInfo != NULL) { 
-            AudioMemFree((void **)&(deviceInfo->deviceSwitchs[i].value)); 
-            deviceInfo->deviceSwitchs[i].value = NULL; 
-        } 
-    } 
+{
+    for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
+        if (deviceInfo != NULL) {
+            AudioMemFree((void **)&(deviceInfo->deviceSwitchs[i].value));
+            deviceInfo->deviceSwitchs[i].value = NULL;
+        }
+    }
 }
 
 int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType)
