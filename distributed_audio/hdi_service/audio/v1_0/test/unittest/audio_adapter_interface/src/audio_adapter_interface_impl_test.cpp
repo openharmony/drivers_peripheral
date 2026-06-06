@@ -1871,7 +1871,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_001, TestSize.Level1)
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
     std::string condition = "test_condition";
-    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    std::string value = "{\"RECORD_SCENE\":\"high-definition-record\"}";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
@@ -1913,7 +1913,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_003, TestSize.Level1)
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
     std::string condition = "test_condition";
-    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    std::string value = "{\"RECORD_SCENE\":\"high-definition-record\"}";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
@@ -1933,7 +1933,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_004, TestSize.Level1)
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
     std::string condition = "test_condition";
-    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    std::string value = "{\"RECORD_SCENE\":\"high-definition-record\"}";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
@@ -1954,13 +1954,99 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_005, TestSize.Level1)
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
     std::string condition = "test_condition";
-    std::string value = "{\"SCENE\":\"high-definition-record\"}";
+    std::string value = "{\"RECORD_SCENE\":\"high-definition-record\"}";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
 
     EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetEnhanceParam(condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_001
+ * @tc.desc: Verify the SetExtraParams function when value equals SCENE_VALUE.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "test_condition";
+    std::string value = "RECORD_SCENE=high-definition-record";
+    int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
+
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_002
+ * @tc.desc: Verify the SetExtraParams function when value not equals SCENE_VALUE.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "zone_id_change";
+    std::string value = "other_value";
+    int32_t dhId = 1;
+    AdapterTest_->sinkDhId_ = dhId;
+    AdapterTest_->extCallbackMap_[dhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
+
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_003
+ * @tc.desc: Verify the SetExtraParams function when value equals SCENE_VALUE but callback is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_003, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "test_condition";
+    std::string value = "RECORD_SCENE=high-definition-record";
+    int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->extCallbackMap_[micEnhanDhId] = nullptr;
+
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+/**
+ * @tc.name: SetExtraParams_004
+ * @tc.desc: Verify the SetExtraParams function when value equals SCENE_VALUE but callback not found.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_004, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "test_condition";
+    std::string value = "RECORD_SCENE=high-definition-record";
+    int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
+    AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
+    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
+
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
 }
 
 /**
