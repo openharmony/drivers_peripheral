@@ -224,7 +224,7 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
         cJSON *tmpValue = cJSON_GetArrayItem(renderSwObj, i);
         cJSON *renderSwName = tmpValue->child;
         cJSON *renderSwVal = renderSwName->next;
-        if (renderSwVal == NULL || renderSwName->valuestring == NULL) {
+        if (renderSwVal == NULL || renderSwName->valuestring == NULL || renderSwVal->valuestring == NULL) {
             AUDIO_FUNC_LOGE("renderSwName or valuestring is null!");
             return HDF_FAILURE;
         }
@@ -282,7 +282,7 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
         cJSON *tmpValue = cJSON_GetArrayItem(captureSwObj, i);
         cJSON *captureSwName = tmpValue->child;
         cJSON *captureSwVal = captureSwName->next;
-        if (captureSwVal == NULL || captureSwName->valuestring == NULL) {
+        if (captureSwVal == NULL || captureSwName->valuestring == NULL || captureSwVal->valuestring == NULL) {
             AUDIO_FUNC_LOGE("captureSwName or valuestring is null!");
             return HDF_FAILURE;
         }
