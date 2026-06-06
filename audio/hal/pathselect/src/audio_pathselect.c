@@ -826,6 +826,16 @@ static int32_t AudioPathSelCaptureChkScene(struct AudioHwCaptureParam *captureSc
     return AudioPathSelGetPlanCapture(captureSceneParam);
 }
 
+static void FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo) 
+{ 
+    for (int i = 0; i < HDF_PATH_NUM_MAX; i++) { 
+        if (deviceInfo != NULL) { 
+            AudioMemFree((void **)&(deviceInfo->deviceSwitchs[i].value)); 
+            deviceInfo->deviceSwitchs[i].value = NULL; 
+        } 
+    } 
+}
+
 int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType)
 {
     AUDIO_FUNC_LOGI();
@@ -845,6 +855,7 @@ int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdapt
                 strcasecmp(renderParam->renderMode.hwInfo.adapterName, HDMI) == 0) {
                 return HDF_SUCCESS;
             }
+            FreeAllDeviceSwitchsValue(&renderParam->renderMode.hwInfo.pathSelect.deviceInfo);
             return (AudioPathSelGetPlanRender(renderParam));
         case CAPTURE_PATH_SELECT:
             captureParam = (struct AudioHwCaptureParam *)adapterParam;
