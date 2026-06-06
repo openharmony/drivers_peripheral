@@ -45,9 +45,9 @@ const std::string STREAM_TYPE_CHANGE = "stream_type_change";
 const std::string STREAM_USAGE_CHANGE = "stream_usage_change";
 const std::string ZONE_ID_CHANGE = "zone_id_change";
 const std::string RECORD_KEY = "audio_effect";
-const std::string SCENE_VALUE = "SCENE=high-definition-record";
-const std::string RECORD_VALUE = "{\"SCENE\":\"high-definition-record\"}";
-const std::string RECORD_SCENE = "SCENE";
+const std::string SCENE_VALUE = "RECORD_SCENE=high-definition-record";
+const std::string RECORD_VALUE = "{\"RECORD_SCENE\":\"high-definition-record\"}";
+const std::string RECORD_SCENE = "RECORD_SCENE";
 const std::string RECORD_SCENE_VALUE = "high-definition-record";
 const std::string TOKEN_ID = "tokenId";
 
