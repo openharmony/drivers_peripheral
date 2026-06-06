@@ -41,6 +41,11 @@ enum AudioInterfaceLibRenderCtrl {
     AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE, // scene selsect
     AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ, // scene threshold
     AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ,  // get VolThreshold
+    AUDIODRV_CTL_IOCTL_VOICE_VOLUME_WRITTE,  // set voice volume
+    AUDIODRV_CTL_IOCTL_DEV_TURNING_WRITE, // write param to turning
+    AUDIODRV_CTL_IOCTL_DEV_VOICE_READ,  // read param fram audio_pipe_voice
+    AUDIODRV_CTL_IOCTL_DEV_VOICE_CLOSE,  // close audio_pipe_voice
+    AUDIODRV_CTL_IOCTL_UPDATE_ROUTER,       //update router
 };
 
 int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
