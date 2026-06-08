@@ -77,6 +77,8 @@ struct UsbFnStrings {
     uint16_t language;
     /** Pointer to USB strings */
     struct UsbString *strings;
+    /** Count of USB strings */
+    uint32_t strCount;
 };
 
 /**
