@@ -18,7 +18,8 @@
     "features": [
       "drivers_peripheral_display_community",
       "drivers_peripheral_display_vdi_default",
-      "drivers_peripheral_display_hicollie_enable"
+      "drivers_peripheral_display_hicollie_enable",
+      "drivers_peripheral_display_bootstrap_hotplug"
     ],
     "deps": {
       "components": [

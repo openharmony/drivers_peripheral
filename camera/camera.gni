@@ -32,7 +32,11 @@ if (defined(ohos_lite)) {
   defines += [ "CAMERA_BUILT_ON_OHOS_LITE" ]
 }
 
-if (is_emulator) {
+declare_args() {
+  drivers_peripheral_camera_v4l2_emulator = is_emulator
+}
+
+if (drivers_peripheral_camera_v4l2_emulator) {
   defines = [ "V4L2_EMULATOR" ]
 }
 

@@ -77,6 +77,10 @@ ohos_shared_library("libdisplay_composer_service_1.5") {
     ]
   }
 
+  if (drivers_peripheral_display_bootstrap_hotplug) {
+    defines += [ "DISPLAY_COMSPOER_BOOTSTRAP_HOTPLUG" ]
+  }
+
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"

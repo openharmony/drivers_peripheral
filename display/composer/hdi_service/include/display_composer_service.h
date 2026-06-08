@@ -124,6 +124,7 @@ private:
     void LoadVdiFuncPart3();
     void ExitService();
     int32_t CreateResponser();
+    void BootstrapDisplayDiscovery();
     std::shared_ptr<V1_5::HdiDisplayCmdResponser> GetResponser(uint32_t devId);
     static void OnHotPlug(uint32_t outputId, bool connected, void* data);
     static void OnVBlank(unsigned int sequence, uint64_t ns, void* data);

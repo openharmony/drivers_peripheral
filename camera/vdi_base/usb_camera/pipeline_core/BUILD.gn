@@ -53,7 +53,7 @@ config("pipe_config") {
 
 # weak dependency of ffmpeg
 config("weak_ffmpeg") {
-  if (is_emulator) {
+  if (defined(defines)) {
     defines += [ "DEVICE_USAGE_FFMPEG_ENABLE" ]
   } else {
     defines = [ "DEVICE_USAGE_FFMPEG_ENABLE" ]
