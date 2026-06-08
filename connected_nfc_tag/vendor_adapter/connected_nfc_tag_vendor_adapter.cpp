@@ -179,11 +179,19 @@ int32_t ConnectedNfcTagVendorAdapter::Init()
     }
     
     if (GetInterfaceFromHal() != 0) {
+        if (halHandle != nullptr) {
+            dlclose(halHandle);
+            halHandle = nullptr;
+        }
         return -1;
     }
 
     if (infHandle.init() != 0) {
         HDF_LOGE("%{public}s: init Fail", __func__);
+        if (halHandle != nullptr) {
+            dlclose(halHandle);
+            halHandle = nullptr;
+        }
         return -1;
     }
 
@@ -246,6 +254,9 @@ int32_t ConnectedNfcTagVendorAdapter::ReadNdefData(std::vector<uint8_t>& ndefDat
         return -1;
     }
 
+    if (buffLen > sizeof(buff)) {
+        HDF_LOGE("%{public}s: buffLen exceeds buffer size", __func__);
+    }
     std::vector<uint8_t> data(buff, buff + buffLen);
     ndefData = data;
     return 0;
