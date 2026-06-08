@@ -87,6 +87,7 @@ int32_t SysfsDevNode::FindPath(std::string& devNodePath)
                 return HDF_SUCCESS;
             }
         }
+        HDF_LOGE("Error: no target file found in %{public}s", intfDirName.c_str());
     }
 
     return HDF_FAILURE;

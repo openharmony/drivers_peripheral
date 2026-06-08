@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <optional>
 #include <regex>
+#include "usbd_wrapper.h"
 
 namespace fs = std::filesystem;
 
