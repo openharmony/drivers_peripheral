@@ -256,6 +256,7 @@ int32_t ConnectedNfcTagVendorAdapter::ReadNdefData(std::vector<uint8_t>& ndefDat
 
     if (buffLen > sizeof(buff)) {
         HDF_LOGE("%{public}s: buffLen exceeds buffer size", __func__);
+        return -1;
     }
     std::vector<uint8_t> data(buff, buff + buffLen);
     ndefData = data;
