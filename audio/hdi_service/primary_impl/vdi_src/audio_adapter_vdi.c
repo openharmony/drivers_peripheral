@@ -308,7 +308,7 @@ static int32_t CreateCapturePre(struct IAudioAdapterVdi *vdiAdapter, struct IAud
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateCapture fail, ret=%{public}d", ret);
-        return HDF_FAILURE;
+        return ret;
     }
     vdiCapture->AddAudioEffect = NULL;
     vdiCapture->RemoveAudioEffect = NULL;
