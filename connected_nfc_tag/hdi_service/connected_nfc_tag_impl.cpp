@@ -34,7 +34,7 @@ static sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback> g_callba
 
 static int EventCallback(uint8_t event, uint8_t *buff, uint32_t buffLen)
 {
-    if (g_callbackV1_1 != nullptr) {
+    if (g_callbackV1_1 != nullptr && buff != nullptr && buffLen > 0) {
         std::vector<uint8_t> data(buff, buff + buffLen);
         g_callbackV1_1->OnChipEvent((ConnectedNfcTagEvent)event, data);
     }
