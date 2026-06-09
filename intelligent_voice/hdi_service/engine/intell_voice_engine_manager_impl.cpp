@@ -30,6 +30,9 @@ namespace OHOS {
 namespace IntelligentVoice {
 namespace Engine {
 
+static const std::string WAKEUP_FILE_PATH_PREFIX = "/data/service/el0/intelligent_voice/wakeup";
+static const std::string PARENT_PATH_PREFIX = "../";
+
 #define CROSS_PROCESS_BUF_SIZE_LIMIT (256 *1024)
 
 extern "C" IIntellVoiceEngineManager *IntellVoiceEngineManagerImplGetInstance(void)
@@ -81,6 +84,9 @@ int32_t IntellVoiceEngineManagerImpl::LoadVendorLib()
 
 void IntellVoiceEngineManagerImpl::UnloadVendorLib()
 {
+    if (engineManagerPriv_.handle != nullptr) {
+        dlclose(engineManagerPriv_.handle);
+    }
     engineManagerPriv_.handle = nullptr;
 }
 
@@ -282,6 +288,11 @@ int32_t DataOprListener::FillOprDataFromAshmem(const sptr<Ashmem> &ashmem, OprDa
         INTELLIGENT_VOICE_LOGE("ashmem is nullptr");
         return HDF_FAILURE;
     }
+    // check not negative before convert uint32 num
+    if (ashmem->GetAshmemSize() < 0) {
+        INTELLIGENT_VOICE_LOGE("size error");
+        return HDF_FAILURE;
+    }
 
     uint32_t size = static_cast<uint32_t>(ashmem->GetAshmemSize());
     if (size == 0) {
@@ -306,7 +317,11 @@ int32_t DataOprListener::FillOprDataFromAshmem(const sptr<Ashmem> &ashmem, OprDa
         return HDF_FAILURE;
     }
 
-    (void)memcpy_s(data.data.get(), size, mem, size);
+    int32_t ret = memcpy_s(data.data.get(), size, mem, size);
+    if (ret != 0) {
+        INTELLIGENT_VOICE_LOGE("memcpy err");
+        return HDF_FAILURE;
+    }
     data.size = size;
     return HDF_SUCCESS;
 }
@@ -342,6 +357,18 @@ int32_t IntellVoiceEngineManagerImpl::GetCloneFile(const std::string &filePath, 
         return HDF_FAILURE;
     }
 
+    if (filePath.empty()) {
+        INTELLIGENT_VOICE_LOGE("file path is empty");
+        return HDF_FAILURE;
+    }
+ 
+    uint64_t pathlen = WAKEUP_FILE_PATH_PREFIX.size();
+    if (filePath.size() < pathlen || filePath.substr(0, pathlen) != WAKEUP_FILE_PATH_PREFIX
+        || filePath.find(PARENT_PATH_PREFIX) != std::string::npos) {
+        INTELLIGENT_VOICE_LOGE("filePath error");
+        return HDF_FAILURE;
+    }
+
     std::shared_ptr<uint8_t> data = nullptr;
     uint32_t size = 0;
 
@@ -349,11 +376,6 @@ int32_t IntellVoiceEngineManagerImpl::GetCloneFile(const std::string &filePath, 
     if (ret != 0) {
         INTELLIGENT_VOICE_LOGE("get clone file fail");
         return ret;
-    }
-
-    if (filePath.empty()) {
-        INTELLIGENT_VOICE_LOGE("file path is empty");
-        return HDF_FAILURE;
     }
 
     if (data == nullptr) {
@@ -385,6 +407,13 @@ int32_t IntellVoiceEngineManagerImpl::SendCloneFile(const std::string &filePath,
 
     if (filePath.empty()) {
         INTELLIGENT_VOICE_LOGE("file path is empty");
+        return HDF_FAILURE;
+    }
+
+    uint64_t pathlen = WAKEUP_FILE_PATH_PREFIX.size();
+    if (filePath.size() < pathlen || filePath.substr(0, pathlen) != WAKEUP_FILE_PATH_PREFIX
+        || filePath.find(PARENT_PATH_PREFIX) != std::string::npos) {
+        INTELLIGENT_VOICE_LOGE("filePath error");
         return HDF_FAILURE;
     }
 
