@@ -578,17 +578,15 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
     if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL || argv->resp == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    unsigned nameLen = argv->nameLen;
-    unsigned queryLen = argv->queryLen;
-    unsigned respLen = argv->respLen;
-    if ((argv->mode == 0 && nameLen == 0) || (argv->mode != 0 && (queryLen == 0 || respLen == 0))) {
+
+    if ((argv->mode == 0 && argv->nameLen == 0) || (argv->mode != 0 && (argv->queryLen == 0 || argv->respLen == 0))) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     unsigned cmdLen;
     if (argv->mode == 0) {
-        cmdLen = strlen("P2P_SERVICE_ADD") + 1 + strlen("upnp") + 1 + CMD_INT_MAX_LEN + 1 + nameLen;
+        cmdLen = strlen("P2P_SERVICE_ADD") + 1 + strlen("upnp") + 1 + CMD_INT_MAX_LEN + 1 + argv->nameLen;
     } else {
-        cmdLen = strlen("P2P_SERVICE_ADD") + 1 + strlen("bonjour") + 1 + queryLen + 1 + respLen;
+        cmdLen = strlen("P2P_SERVICE_ADD") + 1 + strlen("bonjour") + 1 + argv->queryLen + 1 + argv->respLen;
     }
     cmdLen += strlen("IFNAME=") + strlen(this->ifName) + 1;
     char *cmd = (char *)calloc(cmdLen + 1, sizeof(char));
@@ -623,16 +621,15 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, co
     if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-    unsigned nameLen = argv->nameLen;
-    unsigned queryLen = argv->queryLen;
-    if ((argv->mode == 0 && nameLen == 0) || (argv->mode == 1 && queryLen == 0)) {
+
+    if ((argv->mode == 0 && argv->nameLen == 0) || (argv->mode == 1 && argv->queryLen == 0)) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
     unsigned cmdLen;
     if (argv->mode == 0) {
-        cmdLen = strlen("P2P_SERVICE_DEL") + 1 + strlen("upnp") + 1 + CMD_INT_MAX_LEN + 1 + nameLen;
+        cmdLen = strlen("P2P_SERVICE_DEL") + 1 + strlen("upnp") + 1 + CMD_INT_MAX_LEN + 1 + argv->nameLen;
     } else {
-        cmdLen = strlen("P2P_SERVICE_DEL") + 1 + strlen("bonjour") + 1 + queryLen;
+        cmdLen = strlen("P2P_SERVICE_DEL") + 1 + strlen("bonjour") + 1 + argv->queryLen;
     }
     cmdLen += strlen("IFNAME=") + strlen(this->ifName) + 1;
     char *cmd = (char *)calloc(cmdLen + 1, sizeof(char));
