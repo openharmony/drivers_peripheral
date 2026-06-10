@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -340,19 +340,24 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
 
 void HosV4L2UVC::loopUvcDevice()
 {
-    fd_set fds;
     constexpr uint32_t delayTime = 200000;
+    constexpr uint32_t fallbackPollSec = 2;
     CAMERA_LOGI("UVC:loopUVCDevice fd = %{public}d getuid() = %{public}d\n", uDevFd_, getuid());
     V4L2UvcEnmeDevices();
     int uDevFd = uDevFd_;
     int eventFd = eventFd_;
+    int nfds = ((uDevFd_ > eventFd_) ? uDevFd_ : eventFd_) + 1; 
 
-    FD_ZERO(&fds);
-    FD_SET(uDevFd, &fds);
-    FD_SET(eventFd, &fds);
     prctl(PR_SET_NAME, "loopUvcDevice");
     while (g_uvcDetectEnable) {
-        int rc = select(((uDevFd > eventFd) ? uDevFd : eventFd) + 1, &fds, &fds, nullptr, nullptr);
+        V4L2UvcEnmeDevices();
+        fd_set fds;
+        FD_ZERO(&fds);
+        FD_SET(uDevFd, &fds);
+        FD_SET(eventFd, &fds);
+        struct timeeval timeout = {fallbackPollSec, 0};
+        int rc = select(nfds, &fds, nullptr, nullptr, &timeout);
+        CAMERA_LOGI("g_uvcDetectEnable = true, select rc = %{public}d\n", rc);
         if (rc > 0 && FD_ISSET(uDevFd, &fds)) {
             usleep(delayTime);
             constexpr uint32_t buffSize = 4096;
