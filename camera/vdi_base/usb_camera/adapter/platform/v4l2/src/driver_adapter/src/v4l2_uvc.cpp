@@ -346,7 +346,7 @@ void HosV4L2UVC::loopUvcDevice()
     V4L2UvcEnmeDevices();
     int uDevFd = uDevFd_;
     int eventFd = eventFd_;
-    int nfds = ((uDevFd_ > eventFd_) ? uDevFd_ : eventFd_) + 1; 
+    int nfds = ((uDevFd > eventFd) ? uDevFd : eventFd) + 1;
 
     prctl(PR_SET_NAME, "loopUvcDevice");
     while (g_uvcDetectEnable) {
@@ -355,7 +355,7 @@ void HosV4L2UVC::loopUvcDevice()
         FD_ZERO(&fds);
         FD_SET(uDevFd, &fds);
         FD_SET(eventFd, &fds);
-        struct timeeval timeout = {fallbackPollSec, 0};
+        struct timeval timeout = {fallbackPollSec, 0};
         int rc = select(nfds, &fds, nullptr, nullptr, &timeout);
         CAMERA_LOGI("g_uvcDetectEnable = true, select rc = %{public}d\n", rc);
         if (rc > 0 && FD_ISSET(uDevFd, &fds)) {
