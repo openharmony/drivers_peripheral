@@ -192,7 +192,7 @@ int32_t FormatDemuxerPrepare(const FormatHandle handle);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerGetFileInfo(const FormatHandle handle, FileInfo *info);
+int32_t FormatDemuxerGetFileInfo(const FormatHandle handle, FormatFileInfo *info);
 
 /**
  * @brief Selects a specified media track.
@@ -475,7 +475,7 @@ int32_t FormatMuxerSetFileSplitDuration(const FormatHandle handle, ManualSplitTy
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerStart(FormatHandle handle);
+int32_t FormatMuxerStart(const FormatHandle handle);
 
 /**
  * @brief Writes data frames into the muxer.

@@ -30,6 +30,18 @@
 
 InputDevManager *GetDevManager(void);
 
+static void ProcessNullPackage(InputDevManager *manager, struct HdfIoService *service,
+    InputEventPackage **pkgs, int32_t count)
+{
+    DeviceInfoNode *pos = NULL;
+    DeviceInfoNode *next = NULL;
+    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
+        if (pos->service == service) {
+            pos->eventCb->EventPkgCallback((const InputEventPackage **)pkgs, count, pos->payload.devIndex);
+        }
+    }
+}
+
 static int32_t EventListenerCallback(struct HdfDevEventlistener *listener, struct HdfIoService *service,
     uint32_t id, struct HdfSBuf *data)
 {
@@ -38,8 +50,6 @@ static int32_t EventListenerCallback(struct HdfDevEventlistener *listener, struc
     int32_t count = 0;
     uint32_t len = 0;
     InputEventPackage *pkgs[MAX_EVENT_PKG_NUM] = {0};
-    DeviceInfoNode *pos = NULL;
-    DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
 
     if (service == NULL || data == NULL) {
@@ -53,30 +63,17 @@ static int32_t EventListenerCallback(struct HdfDevEventlistener *listener, struc
         return INPUT_NULL_PTR;
     }
 
-    while (true) {
-        if (count >= MAX_EVENT_PKG_NUM) {
-            break;
-        }
-
+    while (count < MAX_EVENT_PKG_NUM) {
         if (!HdfSbufReadBuffer(data, (const void **)&pkgs[count], &len)) {
             HDF_LOGE("%s: sbuf read finished", __func__);
             break;
         }
-
         if (pkgs[count] == NULL) {
-            break;
+            ProcessNullPackage(manager, service, pkgs, count);
+            count = 0;
+            continue;
         }
         count++;
-    }
-
-    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
-        if (pos->service == service) {
-            if (pos->eventCb == NULL) {
-                HDF_LOGE("%s: param is null", __func__);
-                return INPUT_NULL_PTR;
-            }
-            pos->eventCb->EventPkgCallback((const InputEventPackage **)pkgs, count, pos->payload.devIndex);
-        }
     }
     return INPUT_SUCCESS;
 }

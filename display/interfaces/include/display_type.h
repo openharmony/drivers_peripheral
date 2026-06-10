@@ -290,6 +290,7 @@ typedef struct {
     LayerType type;             /**< Layer type, which can be a graphic layer, overlay layer, or sideband layer */
     int32_t bpp;                /**< Number of bits occupied by each pixel */
     PixelFormat pixFormat;      /**< Pixel format of the layer */
+    int32_t fps;                /**< fps of the layer */
 } LayerInfo;
 
 /**
@@ -682,6 +683,14 @@ typedef struct {
     size_t uvStride;             /**< Stride of UV */
     size_t uvStep;               /**< Step of UV */
 } __attribute__((__packed__)) YUVDescInfo;
+
+typedef enum {
+    OVERLAYER_CMD_VO_BIND_VPSS,
+    OVERLAYER_CMD_VO_UNBIND_VPSS,
+    OVERLAYER_CMD_VPSS_BING_VDEC,
+    OVERLAYER_CMD_VPSS_UNBING_VDEC,
+    OVERLAYER_CMD_MAX,
+} OverlayerCmdType;
 #ifdef __cplusplus
 }
 #endif

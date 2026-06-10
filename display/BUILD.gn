@@ -35,7 +35,9 @@ if (defined(ohos_lite)) {
   }
   group("display_test_entry") {
     testonly = true
-    deps = [ "test:hdf_test_display" ]
+    if (board_name != "hispark_aifly" && board_name != "hispark_aiflylite") {
+      deps = [ "test:hdf_test_display" ]
+    }
   }
 } else {
   group("display_entry") {

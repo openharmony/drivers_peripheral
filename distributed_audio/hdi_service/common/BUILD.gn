@@ -12,7 +12,34 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+if (defined(ohos_lite)) {
+shared_library("libdaudio_hdf_utils") {
+  include_dirs = [
+    "include",
+    "log/include",
+    "utils/include",
+    "//third_party/cJSON",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/kits"
+  ]
 
+  sources = [
+    "log/src/daudio_log.cpp",
+    "utils/src/daudio_utils.cpp",
+  ]
+
+  deps = [
+    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//build/lite/config/component/cJSON:cjson_shared",
+    "//base/startup/init/interfaces/innerkits:libbegetutil"
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "LOG_DOMAIN=0xD004100",
+  ]
+}
+} else {
 ohos_shared_library("libdaudio_hdf_utils") {
   sanitize = {
     boundary_sanitize = true
@@ -55,4 +82,5 @@ ohos_shared_library("libdaudio_hdf_utils") {
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_distributed_audio"
+}
 }
