@@ -80,6 +80,7 @@ DisplayComposerService::DisplayComposerService()
     }
 
     HidumperInit();
+    BootstrapDisplayDiscovery();
 
     OHOS::system::SetParameter(BOOTEVENT_COMPOSER_HOST_READY.c_str(), "true");
 }
@@ -338,6 +339,22 @@ int32_t DisplayComposerService::CreateResponser()
     return HDF_SUCCESS;
 }
 
+void DisplayComposerService::BootstrapDisplayDiscovery()
+{
+#ifdef DISPLAY_COMSPOER_BOOTSTRAP_HOTPLUG
+    CHECK_NULLPOINTER_RETURN(vdiAdapter_);
+    if (vdiAdapter_->RegHotPlugCallback == nullptr) {
+        DISPLAY_LOGE("%{public}s RegHotPlugCallback is nullptr", __func__);
+        return;
+    }
+    int32_t ret = vdiAdapter_->RegHotPlugCallback(OnHotPlug, this);
+    if (ret != HDF_SUCCESS) {
+        DISPLAY_LOGE("%{public}s failed ret:%{public}d", __func__, ret);
+        return;
+    }
+#endif
+}
+
 void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* data)
 {
     if (data == nullptr) {
@@ -361,7 +378,8 @@ void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* 
 
     sptr<IHotPlugCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->hotPlugCb_;
     if (remoteCb == nullptr) {
-        DISPLAY_LOGE("hotPlugCb_ is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected);
+        DISPLAY_LOGI("hotPlugCb_ is nullptr during bootstrap outputId:%{public}u, connected:%{public}d",
+            outputId, connected);
         return;
     }
     remoteCb->OnHotPlug(outputId, connected);
