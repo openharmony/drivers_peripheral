@@ -409,26 +409,35 @@ int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMes
                 }
             });
         if (!midi1Buffer.empty()) {
-            int64_t written = -1;
-            for (int32_t retry = 0; retry < MIDI_WRITE_RETRY_COUNT; ++retry) {
-                written = ::snd_rawmidi_write(it->second->rawmidi, midi1Buffer.data(), midi1Buffer.size());
-                if (written >= 0) {
-                    break;
-                }
-                if (-written == EAGAIN) {
-                    HDF_LOGD("%{public}s snd_rawmidi_write EAGAIN, retry %{public}d/%{public}d",
-                             __func__, retry + 1, MIDI_WRITE_RETRY_COUNT);
-                    std::this_thread::sleep_for(std::chrono::microseconds(MIDI_WRITE_RETRY_DELAY_US));
-                    continue;
-                }
-                HDF_LOGE("%{public}s snd_rawmidi_write failed: %{public}" PRId64, __func__, written);
-                return HDF_FAILURE;
-            }
-            if (written < 0) {
-                HDF_LOGE("%{public}s snd_rawmidi_write failed after retries: %{public}" PRId64, __func__, written);
+            int32_t ret = WriteToRawMidi(it->second->rawmidi, midi1Buffer);
+            if (ret != HDF_SUCCESS) {
                 return HDF_FAILURE;
             }
         }
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t Midi1Device::WriteToRawMidi(snd_rawmidi_t *rawmidi, const std::vector<uint8_t> &buffer)
+{
+    int64_t written = -1;
+    for (int32_t retry = 0; retry < MIDI_WRITE_RETRY_COUNT; ++retry) {
+        written = ::snd_rawmidi_write(rawmidi, buffer.data(), buffer.size());
+        if (written >= 0) {
+            break;
+        }
+        if (-written == EAGAIN) {
+            HDF_LOGD("%{public}s snd_rawmidi_write EAGAIN, retry %{public}d/%{public}d",
+                     __func__, retry + 1, MIDI_WRITE_RETRY_COUNT);
+            std::this_thread::sleep_for(std::chrono::microseconds(MIDI_WRITE_RETRY_DELAY_US));
+            continue;
+        }
+        HDF_LOGE("%{public}s snd_rawmidi_write failed: %{public}" PRId64, __func__, written);
+        return HDF_FAILURE;
+    }
+    if (written < 0) {
+        HDF_LOGE("%{public}s snd_rawmidi_write failed after retries: %{public}" PRId64, __func__, written);
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }

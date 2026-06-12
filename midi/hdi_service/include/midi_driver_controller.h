@@ -105,6 +105,7 @@ private:
     };
     void InputThreadLoop(std::shared_ptr<InputContext> ctx);
     void ProcessInputEvent(std::shared_ptr<InputContext> ctx, uint8_t* buffer, size_t bufferSize);
+    int32_t WriteToRawMidi(snd_rawmidi_t *rawmidi, const std::vector<uint8_t> &buffer);
 
     std::mutex mutex_;
     std::map<uint32_t, std::shared_ptr<InputContext>> inputs_;
