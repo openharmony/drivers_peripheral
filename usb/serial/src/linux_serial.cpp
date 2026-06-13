@@ -638,7 +638,7 @@ int32_t LinuxSerial::ScanAcmDevices(std::vector<SerialPort>& portIds)
         fs::path realPath = fs::read_symlink(ttyPath);
         std::string tempPath = ttyPath.parent_path().string() + "/" + realPath.string();
         realPath = fs::weakly_canonical(fs::path(tempPath));
-        std::string targetPath = realPath.parent_path().string();
+        std::string targetPath = realPath.parent_path().parent_path().parent_path().string();
         status = DevMgrInitDevice(device);
         if (status != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: init device failed:%{public}d", __func__, status);
