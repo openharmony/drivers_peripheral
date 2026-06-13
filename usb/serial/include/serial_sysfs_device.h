@@ -20,6 +20,8 @@
 
 #define SERIAL_MAX_INTERFACES     32
 #define SYSFS_DEVICES_DIR "/sys/bus/usb-serial/devices/"
+#define SYSFS_ACM_DEVICES_DIR "/sys/class/tty/"
+#define ACM_PORT_ID_OFFSET 1000
 
 namespace OHOS {
 namespace HDI {

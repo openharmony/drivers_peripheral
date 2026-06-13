@@ -46,6 +46,7 @@ private:
     SerialDeviceManager();
     ~SerialDeviceManager();
     std::string ReadSysfsFile(const std::string& path);
+    std::string FindUsbDeviceSysfsPath(const std::string& name);
     void AddVirtualUsbDevice(
         std::vector<SerialDeviceInfo>& devices, const std::string& name, const std::string& fullPath);
     void AddNormalSerialDevice(std::vector<SerialDeviceInfo>& devices, const std::string& fullPath);

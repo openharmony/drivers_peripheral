@@ -53,6 +53,7 @@ namespace Serial {
 namespace V1_0 {
 
 static const std::string SERIAL_TYPE_NAME = "ttyUSB";
+static const std::string SERIAL_ACM_TYPE_NAME = "ttyACM";
 static const int32_t ERR_NO = -1;
 static const uint8_t DATABITS_FIVE = 5;
 static const uint8_t DATABITS_SIX = 6;
@@ -245,7 +246,13 @@ int32_t LinuxSerial::SerialOpen(int32_t portId)
         return HDF_FAILURE;
     }
     int32_t ret = 0;
-    ret = snprintf_s(path, sizeof(path), sizeof(path)-1, "/dev/ttyUSB%d", portId);
+    const std::string& typeName = serialPortList_[index].devName.empty()
+        ? SERIAL_TYPE_NAME : serialPortList_[index].devName;
+    int32_t rawPortId = portId;
+    if (serialPortList_[index].devName == SERIAL_ACM_TYPE_NAME) {
+        rawPortId -= ACM_PORT_ID_OFFSET;
+    }
+    ret = snprintf_s(path, sizeof(path), sizeof(path)-1, "/dev/%s%d", typeName.c_str(), rawPortId);
     if (ret < 0) {
         HDF_LOGE("%{public}s: sprintf_s path failed, ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -508,6 +515,16 @@ void LinuxSerial::HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, 
         serialPort.portId = num;
         serialPortId.portId = num;
         serialPortId.fd = -1;
+        serialPortId.devName = SERIAL_TYPE_NAME;
+    }
+    pos = devnameStr.find(SERIAL_ACM_TYPE_NAME);
+    if (pos != std::string::npos) {
+        std::string numStr = devnameStr.substr(pos + SERIAL_ACM_TYPE_NAME.length());
+        int num = atoi(numStr.c_str());
+        serialPort.portId = num + ACM_PORT_ID_OFFSET;
+        serialPortId.portId = num + ACM_PORT_ID_OFFSET;
+        serialPortId.fd = -1;
+        serialPortId.devName = SERIAL_ACM_TYPE_NAME;
     }
     serialPort.deviceInfo.busNum = static_cast<uint8_t>(device->busNum);
     serialPort.deviceInfo.devAddr = static_cast<uint8_t>(device->devNum);
@@ -537,6 +554,15 @@ static int32_t DevMgrInitDevice(struct UsbDdkDeviceInfo *deviceInfo)
 }
 
 int32_t LinuxSerial::SerialGetPortList(std::vector<SerialPort>& portIds)
+{
+    int32_t status = ScanUsbSerialDevices(portIds);
+    if (status != HDF_SUCCESS) {
+        return status;
+    }
+    return ScanAcmDevices(portIds);
+}
+
+int32_t LinuxSerial::ScanUsbSerialDevices(std::vector<SerialPort>& portIds)
 {
     DIR *dir = opendir(SYSFS_DEVICES_DIR);
     if (dir == NULL) {
@@ -577,6 +603,53 @@ int32_t LinuxSerial::SerialGetPortList(std::vector<SerialPort>& portIds)
             break;
         }
         HandleDevListEntry(&device->info, portIds, ttyPath.string());
+    }
+
+    OsalMemFree(device);
+    closedir(dir);
+    return HDF_SUCCESS;
+}
+
+int32_t LinuxSerial::ScanAcmDevices(std::vector<SerialPort>& portIds)
+{
+    DIR *dir = opendir(SYSFS_ACM_DEVICES_DIR);
+    if (dir == NULL) {
+        HDF_LOGE("%{public}s: opendir failed:%{public}s", __func__, SYSFS_ACM_DEVICES_DIR);
+        return HDF_FAILURE;
+    }
+
+    struct UsbDdkDeviceInfo *device = (struct UsbDdkDeviceInfo *)OsalMemCalloc(sizeof(struct UsbDdkDeviceInfo));
+    if (device == NULL) {
+        HDF_LOGE("%{public}s: init device failed", __func__);
+        closedir(dir);
+        return HDF_FAILURE;
+    }
+    int32_t status = HDF_SUCCESS;
+    struct dirent *devHandle;
+    while ((devHandle = readdir(dir))) {
+        std::string name(devHandle->d_name);
+        if (name.find(SERIAL_ACM_TYPE_NAME) != 0) {
+            continue;
+        }
+        fs::path ttyPath(std::string(SYSFS_ACM_DEVICES_DIR) + name);
+        if (!fs::exists(ttyPath) || !fs::is_symlink(ttyPath)) {
+            continue;
+        }
+        fs::path realPath = fs::read_symlink(ttyPath);
+        std::string tempPath = ttyPath.parent_path().string() + "/" + realPath.string();
+        realPath = fs::weakly_canonical(fs::path(tempPath));
+        std::string targetPath = realPath.parent_path().string();
+        status = DevMgrInitDevice(device);
+        if (status != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: init device failed:%{public}d", __func__, status);
+            break;
+        }
+        status = SerialGetDevice(targetPath.c_str(), &device->info);
+        if (status != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: sysfs get device failed:%{public}d", __func__, status);
+            break;
+        }
+        HandleDevListEntry(&device->info, portIds, name);
     }
 
     OsalMemFree(device);

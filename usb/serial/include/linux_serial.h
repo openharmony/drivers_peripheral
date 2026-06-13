@@ -39,6 +39,7 @@ namespace V1_0 {
 struct Serialfd {
     int32_t fd;
     int32_t portId;
+    std::string devName;
 };
 
 struct UsbDdkDeviceInfo {
@@ -69,6 +70,8 @@ private:
     int32_t GetStopbits(tcflag_t& cflag, unsigned char stopBits);
     void HandleDevListEntry(struct UsbPnpNotifyMatchInfoTable *device, std::vector<SerialPort>& portIds,
         std::string targetPath);
+    int32_t ScanUsbSerialDevices(std::vector<SerialPort>& portIds);
+    int32_t ScanAcmDevices(std::vector<SerialPort>& portIds);
     int32_t ConfigPort(int32_t index);
 private:
     std::mutex portMutex_;

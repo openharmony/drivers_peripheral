@@ -41,6 +41,7 @@ namespace Serial {
 namespace V1_0 {
 
 #define TARGET_INTERFACE 0xFF
+#define TARGET_INTERFACE_ACM 0x02
 #define MAX_TRANS_DATA_SIZE 65536
 #define ENABLE_UNREF 1
 #define TRANSFER_TIMEOUT 1000
@@ -59,7 +60,9 @@ constexpr int RETRY_TIMEOUT = 10;
 static const std::string BUS_NUM_STR = "/busnum";
 static const std::string DEV_NUM_STR = "/devnum";
 static const std::string DEV_FILENAME_PREFIX = "ttyUSB";
+static const std::string DEV_ACM_FILENAME_PREFIX = "ttyACM";
 static const std::string DEV_PATH_PREFIX = "/sys/bus/usb-serial/devices";
+static const std::string DEV_ACM_PATH_PREFIX = "/sys/class/tty";
 static const std::string TTYUSB_PATH = "/sys/class/tty";
 static const std::string THREAD_NAME = "serialHotPlug";
 
@@ -385,7 +388,8 @@ int LibusbSerial::GetEndPoint(DeviceHandleInfo *deviceHandleInfo)
     for (int j = 0; j < config->bNumInterfaces; j++) {
         const struct libusb_interface *interface = &config->interface[j];
         const struct libusb_interface_descriptor *interfaceDesc = interface->altsetting;
-        if (interfaceDesc->bInterfaceClass != TARGET_INTERFACE) {
+        if (interfaceDesc->bInterfaceClass != TARGET_INTERFACE &&
+            interfaceDesc->bInterfaceClass != TARGET_INTERFACE_ACM) {
             continue;
         }
         for (int k = 0; k < interfaceDesc->bNumEndpoints; k++) {
@@ -661,14 +665,24 @@ bool CheckTtyDeviceInfo(std::string ttyUsbPath, libusb_device* device)
 int32_t LibusbSerial::GetPortIdByDevice(libusb_device* device)
 {
     HDF_LOGI("%{public}s : enter GetPortIdByDevice.", __func__);
-    DIR* dir = opendir(DEV_PATH_PREFIX.c_str());
+    int32_t portId = GetPortIdByPrefixAndPath(device, DEV_FILENAME_PREFIX, DEV_PATH_PREFIX, 0);
+    if (portId >= 0) {
+        return portId;
+    }
+    return GetPortIdByPrefixAndPath(device, DEV_ACM_FILENAME_PREFIX, DEV_ACM_PATH_PREFIX, ACM_PORT_ID_OFFSET);
+}
+
+int32_t LibusbSerial::GetPortIdByPrefixAndPath(
+    libusb_device* device, const std::string& prefix, const std::string& path, int32_t offset)
+{
+    DIR* dir = opendir(path.c_str());
     if (dir == nullptr) {
         HDF_LOGI("%{public}s : dir is not existed %{public}s", __func__, strerror(errno));
         return -1;
     }
     struct dirent* entry = nullptr;
     while ((entry = readdir(dir)) != nullptr) {
-        if (strncmp(entry->d_name, DEV_FILENAME_PREFIX.c_str(), DEV_FILENAME_PREFIX.size()) == 0) {
+        if (strncmp(entry->d_name, prefix.c_str(), prefix.size()) == 0) {
             std::string devName = entry->d_name;
             std::string targetPath = GetTtyDevicePath(devName);
             if (targetPath.size() == 0) {
@@ -676,13 +690,12 @@ int32_t LibusbSerial::GetPortIdByDevice(libusb_device* device)
             }
             if (CheckTtyDeviceInfo(targetPath, device)) {
                 closedir(dir);
-                int32_t target = atoi(devName.substr(DEV_FILENAME_PREFIX.size()).c_str());
+                int32_t target = atoi(devName.substr(prefix.size()).c_str()) + offset;
                 return target;
             }
         }
     }
     closedir(dir);
-    HDF_LOGI("%{public}s : it's not a serial device", __func__);
     return -1;
 }
 } // V1_0
