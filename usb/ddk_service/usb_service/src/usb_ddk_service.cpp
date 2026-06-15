@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -753,6 +753,10 @@ int32_t UsbDdkService::GetDeviceMemMapFd(uint64_t deviceId, int &fd)
     HDF_LOGI("%{public}s:%{public}d fd:%{public}d", __func__, __LINE__, fd);
     return HDF_SUCCESS;
 #else
+    if (g_DdkLibusbAdapter == nullptr) {
+        HDF_LOGE("%{public}s: g_DdkLibusbAdapter is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     return g_DdkLibusbAdapter->GetDeviceMemMapFd({GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, fd);
 #endif // LIBUSB_ENABLE
 }
@@ -777,6 +781,10 @@ int32_t UsbDdkService::GetDevices(std::vector<uint64_t> &deviceIds)
     }
     vendorIds = driverInfo.vids;
 
+    if (g_DdkLibusbAdapter == nullptr) {
+        HDF_LOGE("%{public}s: g_DdkLibusbAdapter is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     std::vector<struct OHOS::HDI::Usb::V1_2::DeviceInfo> devices;
     g_DdkLibusbAdapter->GetDevices(devices);
     if (devices.empty()) {
