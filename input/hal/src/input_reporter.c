@@ -196,7 +196,7 @@ static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener
     GET_MANAGER_CHECK_RETURN(manager);
 
     ret = HdfSbufReadBuffer(data, (const void **)&event, &len);
-    if (!ret) {
+    if (!ret || len < sizeof(InputHotPlugEvent)) {
         HDF_LOGE("%s: read sbuf failed", __func__);
         return INPUT_FAILURE;
     }

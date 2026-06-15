@@ -51,7 +51,7 @@ ohos_benchmarktest("hdf_input_benchmark_test") {
   }
   external_deps += [
     "benchmark:benchmark",
-    "googletest:gmock_main",
+    "googletest:gtest_main",
     "ipc:ipc_single",
   ]
 }
