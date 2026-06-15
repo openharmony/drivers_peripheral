@@ -522,6 +522,11 @@ static void HandleReqEvent(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEven
                 continue;
             }
             (void)OsalMutexLock(&intfMgr->handleLock);
+            if (!intfMgr->isOpen) {
+                HDF_LOGE("%{public}s:%{public}d close collect event", __func__, __LINE__);
+                (void)OsalMutexUnlock(&intfMgr->handleLock);
+                continue;
+            }
             handle = GetHandleMgr(intfMgr, event.epx[i]);
             if (handle == NULL) {
                 HDF_LOGE("%{public}s:%{public}d handle is null", __func__, __LINE__);
