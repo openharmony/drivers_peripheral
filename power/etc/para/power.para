@@ -13,3 +13,4 @@
 
 const.hdi_power.swap_file_path = "/data/power/swapfile"
 const.hdi_power.swap_dir_path = "/data/power"
+persist.hdi_power.ulsr_result = ""
