@@ -1006,6 +1006,8 @@ struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttribut
     }
     priv->captureInfos[*captureId].captureId = *captureId;
     priv->captureInfos[*captureId].usrCount = 1;
+    priv->captureInfos[*captureId].callback = NULL;
+    priv->captureInfos[*captureId].isRegCb = false;
     capture = &(priv->captureInfos[*captureId].capture);
     AudioInitCaptureInstanceVdi(capture);
     pthread_rwlock_unlock(&g_rwVdiCaptureLock[*captureId]);
@@ -1052,6 +1054,8 @@ void AudioDestroyCaptureByIdVdi(uint32_t captureId)
     priv->captureInfos[captureId].sourceType = 0;
     priv->captureInfos[captureId].captureId = AUDIO_VDI_STREAM_NUM_MAX;
     priv->captureInfos[captureId].usrCount = 0;
+    priv->captureInfos[captureId].callback = NULL;
+    priv->captureInfos[captureId].isRegCb = false;
 
     AUDIO_FUNC_LOGI("audio destroy capture success, captureId = [%{public}u]", captureId);
 #ifdef AUDIO_RECLAIM_MEMORY_ENABLE
