@@ -18,6 +18,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <climits>
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "serial_hcb_util.h"
@@ -168,10 +169,37 @@ static void HexStrToInt(const std::string& hexStr, int32_t& result)
     }
 }
 
+std::string SerialDeviceManager::FindUsbDeviceSysfsPath(const std::string& name)
+{
+    std::string devicePath = "/sys/class/tty/" + name + "/device";
+    char realPath[PATH_MAX] = {0};
+    if (realpath(devicePath.c_str(), realPath) == nullptr) {
+        HDF_LOGE("%{public}s: realpath failed for %{public}s, errno=%{public}d", __func__, devicePath.c_str(), errno);
+        return "";
+    }
+
+    std::string current = realPath;
+    while (!current.empty() && current != "/") {
+        if (access((current + "/manufacturer").c_str(), F_OK) == 0) {
+            if (current.back() != '/') {
+                current += '/';
+            }
+            return current;
+        }
+        size_t pos = current.rfind('/');
+        if (pos == std::string::npos) {
+            break;
+        }
+        current = current.substr(0, pos);
+    }
+    HDF_LOGE("%{public}s: cannot find usb device sysfs path for %{public}s", __func__, name.c_str());
+    return "";
+}
+
 void SerialDeviceManager::AddVirtualUsbDevice(std::vector<SerialDeviceInfo>& devices,
     const std::string& name, const std::string& fullPath)
 {
-    std::string basePath = "/sys/class/tty/" + name + "/device/../../";
+    std::string basePath = FindUsbDeviceSysfsPath(name);
     std::string manufacturer = ReadSysfsFile(basePath + "manufacturer");
     std::string serialNumber = ReadSysfsFile(basePath + "serial");
     std::string vendorId = ReadSysfsFile(basePath + "idVendor");
@@ -198,6 +226,11 @@ void SerialDeviceManager::AddNormalSerialDevice(std::vector<SerialDeviceInfo>& d
     HDF_LOGI("found device:%{public}s!", fullPath.c_str());
 }
 
+static bool IsUsbSerialName(const std::string& name)
+{
+    return (name.find("ttyUSB") == 0 || name.find("ttyACM") == 0);
+}
+
 int32_t SerialDeviceManager::QueryDevices(std::vector<SerialDeviceInfo>& devices)
 {
     HDF_LOGD("%{public}s called!", __func__);
@@ -212,7 +245,7 @@ int32_t SerialDeviceManager::QueryDevices(std::vector<SerialDeviceInfo>& devices
     struct dirent* entry;
     while ((entry = readdir(dir)) != NULL) {
         std::string name = entry->d_name;
-        if (name.find("ttyUSB") == 0) {
+        if (IsUsbSerialName(name)) {
             std::string fullPath = std::string(devPath) + "/" + name;
             AddVirtualUsbDevice(devices, name, fullPath);
         } else {
