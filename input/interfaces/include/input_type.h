@@ -87,7 +87,7 @@ extern "C" {
 /** Length of the vendor name */
 #define VENDOR_NAME_LEN 10
 /** Length of the input device name */
-#define DEV_NAME_LEN 64
+#define DEV_NAME_LEN 128
 /** Length of the self-test result name */
 #define SELF_TEST_RESULT_LEN 20
 /** Name of the input device manager service */
