@@ -276,7 +276,7 @@ uint32_t GetInputDeviceTypeInfo(const string &devName)
     if ((devName.find("input_mt_wrapper") != std::string::npos) ||
         (devName.find("touchscreen") != std::string::npos)) {
         type = INDEV_TYPE_TOUCH;
-    } else if ((devName.find("eyboard") != std::string::npos) &&
+    } else if ((devName.find("Keyboard") != std::string::npos) &&
                (devName.find("Headset") == std::string::npos)) {
         type = INDEV_TYPE_KEYBOARD;
     } else if (devName.find("Mouse") != std::string::npos) {
@@ -514,7 +514,7 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
             ++it;
         }
     }
-    if (sDevName.find("eyboard") != std::string::npos) {
+    if (sDevName.find("Keyboard") != std::string::npos) {
         detailInfo->devType = INDEV_TYPE_KEYBOARD;
     }
     if (sDevName.find("Mouse") != std::string::npos) {
@@ -563,7 +563,7 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t &epollFd, uint32_t &index)
 
     // hot plug evnets happened
     auto sDevName = string(inputDevList_[index].detailInfo.attrSet.devName);
-    if (sDevName.find("eyboard") != std::string::npos) {
+    if (sDevName.find("Keyboard") != std::string::npos) {
         type = INDEV_TYPE_KEYBOARD;
     }
     if (sDevName.find("Mouse") != std::string::npos) {
