@@ -153,6 +153,7 @@ void UsbPortImpl::UsbDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &obj
     UsbPortImpl::subscribers_[i].subscriber = nullptr;
     subscribers_[i].remote = nullptr;
     subscribers_[i].deathRecipient = nullptr;
+    HDF_LOGI("%{public}s: remote died, unbind port subscriber, index: %{public}d.", __func__, i);
     if (DdkListenerMgrRemove(&UsbPortImpl::subscribers_[i].usbPnpListener) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: remove listener failed", __func__);
     }
@@ -265,6 +266,7 @@ int32_t UsbPortImpl::UnbindUsbdPortSubscriber(const sptr<IUsbdSubscriber> &subsc
     subscribers_[i].subscriber = nullptr;
     subscribers_[i].remote = nullptr;
     subscribers_[i].deathRecipient = nullptr;
+    HDF_LOGI("%{public}s: unbind port subscriber, index: %{public}d.", __func__, i);
     if (DdkListenerMgrRemove(&subscribers_[i].usbPnpListener) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: remove listener failed", __func__);
         return HDF_FAILURE;
