@@ -633,9 +633,8 @@ int32_t DisplayComposerService::GetDisplayReleaseFence(
     int32_t ret = vdiAdapter_->GetDisplayReleaseFence(devId, layers, outFences);
     for (uint i = 0; i < outFences.size(); i++) {
         int32_t dupFd = outFences[i];
-        sptr<HdifdParcelable> hdifd(new HdifdParcelable());
+        sptr<HdifdParcelable> hdifd(new HdifdParcelable(dupFd));
         CHECK_NULLPOINTER_RETURN_VALUE(hdifd, HDF_FAILURE);
-        hdifd->Init(dupFd);
         fences.push_back(hdifd);
     }
     return ret;
