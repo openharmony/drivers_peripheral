@@ -31,7 +31,8 @@
         "hitrace",
         "cJSON",
         "bluetooth",
-        "init"
+        "init",
+        "bounds_checking_function"
       ]
     },
     "build": {
