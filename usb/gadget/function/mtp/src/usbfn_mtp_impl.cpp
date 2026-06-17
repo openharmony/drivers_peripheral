@@ -1472,6 +1472,10 @@ int32_t UsbfnMtpImpl::WriteEx(const std::vector<uint8_t> &data, uint8_t needZLP,
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: bulk-in req failed: %{public}d", __func__, ret);
             break;
+        } else if (!mtpDev_->initFlag) {
+            HDF_LOGE("%{public}s: initFlag is false now.", __func__);
+            ret = HDF_DEV_ERR_DEV_INIT_FAIL;
+            break;
         }
     }
     RemoveReqFromList(req);
