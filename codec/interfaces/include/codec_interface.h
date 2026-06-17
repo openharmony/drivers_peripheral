@@ -207,7 +207,7 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType);
 /**
  * @brief Queues input data.
  *
- * This function works with {@link CodecDequeInput} to implement input data transmission.
+ * This function works with {@link CodecDequeueInput} to implement input data transmission.
  *
  * @param handle Indicates the handle of the codec component.
  * @param inputData Indicates the pointer to the input data.
@@ -226,7 +226,7 @@ int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const InputInfo *inputData, uin
  * @param inputData Indicates the pointer to the input data that is used.
  * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
  */
-int32_t CodecDequeInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, InputInfo *inputData);
+int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, InputInfo *inputData);
 
 /**
  * @brief Queues output data.
