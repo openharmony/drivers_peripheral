@@ -219,7 +219,7 @@ static int WpaCliCmdStaShellCmd(EthWpaInstance *p, const char *ifName, const cha
                 *equalPos = '\0';
                 const char *name = line;
                 const char *value = equalPos + 1;
-                ret |= WpaCliCmdSetNetwork(p, ifName, name, value);
+                ret += WpaCliCmdSetNetwork(p, ifName, name, value);
             }
             line = strtok_r(NULL, "\n", &savePtr1);
         }
