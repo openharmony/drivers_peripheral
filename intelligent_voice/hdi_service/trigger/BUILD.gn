@@ -40,6 +40,7 @@ ohos_shared_library("intell_voice_trigger_manager_service_1.1") {
       "drivers_interface_intelligent_voice:libintell_voice_trigger_stub_1.1",
       "drivers_interface_intelligent_voice:libintell_voice_trigger_stub_1.2",
       "hilog:libhilog",
+      "hdf_core:libhdf_utils",
       "ipc:ipc_single",
     ]
   } else {

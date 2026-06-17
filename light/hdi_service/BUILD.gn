@@ -48,6 +48,7 @@ ohos_shared_library("liblight_interface_service_1.0") {
     external_deps = [
       "drivers_interface_light:liblight_stub_1.0",
       "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "hitrace:hitrace_meter",
     ]
