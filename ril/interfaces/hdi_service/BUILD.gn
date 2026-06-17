@@ -27,6 +27,7 @@ ohos_shared_library("libril_service_1.5") {
       "drivers_interface_power:libpower_proxy_1.2",
       "drivers_interface_ril:libril_stub_1.5",
       "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
       "ril_adapter:hril",

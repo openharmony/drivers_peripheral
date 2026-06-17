@@ -42,6 +42,7 @@ ohos_shared_library("libgeofence_interface_service_2.0") {
       "drivers_interface_location_geofence:location_geofence_idl_headers",
       "drivers_peripheral_location_gnss:libgnss_interface_service_2.0",
       "hilog:libhilog",
+      "hdf_core:libhdf_utils",
       "ipc:ipc_single",
       "init:libbegetutil",
     ]

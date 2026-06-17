@@ -54,6 +54,7 @@ if (defined(ohos_lite)) {
       external_deps = [
         "drivers_interface_vibrator:libvibrator_stub_2.0",
         "hdf_core:libhdf_host",
+        "hdf_core:libhdf_utils",
         "hilog:libhilog",
         "hitrace:hitrace_meter",
         "ipc:ipc_single",
