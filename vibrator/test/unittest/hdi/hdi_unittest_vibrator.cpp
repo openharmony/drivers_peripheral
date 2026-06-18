@@ -81,7 +81,7 @@ void HdiUnitTestVibrator::SetUp()
     }
     int32_t ret = g_vibratorInterface->GetVibratorInfo(g_hdfVibratorInfo);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    if (g_info.size() == 0) {
+    if (g_hdfVibratorInfo.size() == 0) {
         printf("Vibrator is not supported ");
         GTEST_SKIP() << "Vibrator is not supported" << std::endl;
         return;
