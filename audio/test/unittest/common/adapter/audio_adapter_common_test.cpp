@@ -1502,6 +1502,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetMicMuteIsvalid001, TestSize.Le
 #else
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
+#endif
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetMicMuteNull001, TestSize.Level1)
 {
@@ -1536,6 +1537,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetVoiceVolumeIsvalid001, TestSiz
 #else
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
+#endif
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetExtraParamsNull001, TestSize.Level1)
 {
