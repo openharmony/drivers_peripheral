@@ -52,6 +52,7 @@ namespace {
         "haptic.common.success", "haptic.charging", "haptic.long_press.heavy"};
     HapticCapacity g_hapticCapacity;
     sptr<V2_0::IVibratorInterface> g_vibratorInterface = nullptr;
+    std::vector<HdfVibratorInfo> g_hdfVibratorInfo;
 } // namespace
 
 class HdiUnitTestVibrator : public testing::Test {
@@ -73,6 +74,18 @@ void HdiUnitTestVibrator::TearDownTestSuite()
 
 void HdiUnitTestVibrator::SetUp()
 {
+    if (g_vibratorInterface == nullptr) {
+        printf("Failed to get IVibratorInterface instance");
+        GTEST_SKIP() << "Failed to get IVibratorInterface instance" << std::endl;
+        return;
+    }
+    int32_t ret = g_vibratorInterface->GetVibratorInfo(g_hdfVibratorInfo);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    if (g_hdfVibratorInfo.size() == 0) {
+        printf("Vibrator is not supported ");
+        GTEST_SKIP() << "Vibrator is not supported" << std::endl;
+        return;
+    }
 }
 
 void HdiUnitTestVibrator::TearDown()
