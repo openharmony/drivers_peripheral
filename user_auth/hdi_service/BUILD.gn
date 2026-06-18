@@ -73,6 +73,7 @@ ohos_shared_library("libuser_auth_interface_service_4.1") {
     "utils/src/linked_list.c",
   ]
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_user_auth:libuser_auth_stub_4.0",
     "drivers_interface_user_auth:libuser_auth_stub_4.1",

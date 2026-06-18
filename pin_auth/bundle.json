@@ -21,6 +21,7 @@
     "ram": "1000KB",
     "deps": {
       "components": [
+        "bounds_checking_function",
         "ipc",
         "hdf_core",
         "hilog",
