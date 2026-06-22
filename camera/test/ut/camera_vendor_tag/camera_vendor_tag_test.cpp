@@ -96,7 +96,7 @@ HWTEST_F(CameraVendorTagTest, GetVendorTagType001, TestSize.Level0)
             ASSERT_NE(-1, hdiDataType);
             ASSERT_EQ(item.tagType, hdiDataType);
         }
-    }  
+    }
 }
 
 /**
