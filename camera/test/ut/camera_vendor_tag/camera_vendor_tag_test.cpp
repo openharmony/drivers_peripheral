@@ -33,6 +33,9 @@ public:
 void CameraVendorTagTest::SetUpTestCase()
 {
     g_cameraVendorTagService = OHOS::HDI::Camera::Metadata::V1_0::ICameraVendorTag::Get(true);
+    if (g_cameraVendorTagService == nullptr) {
+        CAMERA_LOGE("Camera::Builder SetUpTestCase g_cameraVendorTagService is nullptr");
+    }
 }
 
 void CameraVendorTagTest::TearDownTestCase()
@@ -56,20 +59,19 @@ void CameraVendorTagTest::TearDown()
  */
 HWTEST_F(CameraVendorTagTest, GetVendorTagName001, TestSize.Level0)
 {
-    if (g_cameraVendorTagService == nullptr) {
-        return;
-    }
-    std::vector<OHOS::HDI::Camera::Metadata::V1_0::VendorTag> g_hdiTagVec;
-    auto ret = g_cameraVendorTagService->GetAllVendorTags(g_hdiTagVec);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    for (auto item : g_hdiTagVec) {
-        void* tagName = nullptr;
-        ret = g_cameraVendorTagService->GetVendorTagName(item.tagId, tagName);
+    if (g_cameraVendorTagService) {
+        std::vector<OHOS::HDI::Camera::Metadata::V1_0::VendorTag> g_hdiTagVec;
+        auto ret = g_cameraVendorTagService->GetAllVendorTags(g_hdiTagVec);
         ASSERT_EQ(HDF_SUCCESS, ret);
-        ASSERT_NE(nullptr, tagName);
-        std::string tagNameByGetAllVendorTags(reinterpret_cast<const char*>(item.tagName));
-        std::string tagNameByGetVendorTagName(reinterpret_cast<const char*>(tagName));
-        ASSERT_EQ(tagNameByGetAllVendorTags, tagNameByGetVendorTagName);
+        for (auto item : g_hdiTagVec) {
+            void* tagName = nullptr;
+            ret = g_cameraVendorTagService->GetVendorTagName(item.tagId, tagName);
+            ASSERT_EQ(HDF_SUCCESS, ret);
+            ASSERT_NE(nullptr, tagName);
+            std::string tagNameByGetAllVendorTags(reinterpret_cast<const char*>(item.tagName));
+            std::string tagNameByGetVendorTagName(reinterpret_cast<const char*>(tagName));
+            ASSERT_EQ(tagNameByGetAllVendorTags, tagNameByGetVendorTagName);
+        }
     }
 }
 
@@ -82,19 +84,18 @@ HWTEST_F(CameraVendorTagTest, GetVendorTagName001, TestSize.Level0)
  */
 HWTEST_F(CameraVendorTagTest, GetVendorTagType001, TestSize.Level0)
 {
-    if (g_cameraVendorTagService == nullptr) {
-        return;
-    }
-    std::vector<OHOS::HDI::Camera::Metadata::V1_0::VendorTag> g_hdiTagVec;
-    auto ret = g_cameraVendorTagService->GetAllVendorTags(g_hdiTagVec);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    for (auto item : g_hdiTagVec) {
-        int8_t hdiDataType = -1;
-        ret = g_cameraVendorTagService->GetVendorTagType(item.tagId, hdiDataType);
+    if (g_cameraVendorTagService) {
+        std::vector<OHOS::HDI::Camera::Metadata::V1_0::VendorTag> g_hdiTagVec;
+        auto ret = g_cameraVendorTagService->GetAllVendorTags(g_hdiTagVec);
         ASSERT_EQ(HDF_SUCCESS, ret);
-        ASSERT_NE(-1, hdiDataType);
-        ASSERT_EQ(item.tagType, hdiDataType);
-    }
+        for (auto item : g_hdiTagVec) {
+            int8_t hdiDataType = -1;
+            ret = g_cameraVendorTagService->GetVendorTagType(item.tagId, hdiDataType);
+            ASSERT_EQ(HDF_SUCCESS, ret);
+            ASSERT_NE(-1, hdiDataType);
+            ASSERT_EQ(item.tagType, hdiDataType);
+        }
+    }  
 }
 
 /**
@@ -106,10 +107,9 @@ HWTEST_F(CameraVendorTagTest, GetVendorTagType001, TestSize.Level0)
  */
 HWTEST_F(CameraVendorTagTest, GetAllVendorTags001, TestSize.Level0)
 {
-    if (g_cameraVendorTagService == nullptr) {
-        return;
+    if (g_cameraVendorTagService) {
+        std::vector<OHOS::HDI::Camera::Metadata::V1_0::VendorTag> g_hdiTagVec;
+        auto ret = g_cameraVendorTagService->GetAllVendorTags(g_hdiTagVec);
+        ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    std::vector<OHOS::HDI::Camera::Metadata::V1_0::VendorTag> g_hdiTagVec;
-    auto ret = g_cameraVendorTagService->GetAllVendorTags(g_hdiTagVec);
-    ASSERT_EQ(HDF_SUCCESS, ret);
 }
