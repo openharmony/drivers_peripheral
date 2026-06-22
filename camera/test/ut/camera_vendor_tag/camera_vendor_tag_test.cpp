@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <iostream>
 #include <vector>
 #include "v1_0/icamera_vendor_tag.h"
 
@@ -34,7 +35,7 @@ void CameraVendorTagTest::SetUpTestCase()
 {
     g_cameraVendorTagService = OHOS::HDI::Camera::Metadata::V1_0::ICameraVendorTag::Get(true);
     if (g_cameraVendorTagService == nullptr) {
-        CAMERA_LOGE("Camera::Builder SetUpTestCase g_cameraVendorTagService is nullptr");
+        std::cout << "SetUpTestCase g_cameraVendorTagService is nullptr" << std::endl;
     }
 }
 
