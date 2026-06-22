@@ -59,6 +59,7 @@ ohos_shared_library("libpin_auth_interface_service_3.0") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_pin_auth:libpin_auth_stub_3.0",
     "hdf_core:libhdf_utils",
