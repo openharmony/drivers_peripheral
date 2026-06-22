@@ -196,10 +196,9 @@ static int32_t CfgSaveAdapterStruct(cJSON *adapter, struct AlsaAdapterCfgInfo *i
         AUDIO_FUNC_LOGE("adapter name is null!");
         return HDF_FAILURE;
     }
-    size_t valLen = strnlen(item->valuestring, MAX_CARD_NAME_LEN - 1);
-    int32_t ret = memcpy_s(info->adapterName, MAX_CARD_NAME_LEN, item->valuestring, valLen + 1);
+    int32_t ret = strncpy_s(info->adapterName, MAX_CARD_NAME_LEN, item->valuestring, MAX_CARD_NAME_LEN - 1);
     if (ret != EOK) {
-        AUDIO_FUNC_LOGE("memcpy_s adapterName fail!");
+        AUDIO_FUNC_LOGE("strncpy_s adapterName fail!");
         return HDF_FAILURE;
     }
 
@@ -215,10 +214,9 @@ static int32_t CfgSaveAdapterStruct(cJSON *adapter, struct AlsaAdapterCfgInfo *i
         AUDIO_FUNC_LOGE("cardName is null!");
         return HDF_FAILURE;
     }
-    valLen = strnlen(item->valuestring, MAX_CARD_NAME_LEN - 1);
-    ret = memcpy_s(info->cardName, MAX_CARD_NAME_LEN, item->valuestring, valLen + 1);
+    ret = strncpy_s(info->cardName, MAX_CARD_NAME_LEN, item->valuestring, MAX_CARD_NAME_LEN - 1);
     if (ret != EOK) {
-        AUDIO_FUNC_LOGE("memcpy_s cardName fail!");
+        AUDIO_FUNC_LOGE("strncpy_s cardName fail!");
         return HDF_FAILURE;
     }
 
