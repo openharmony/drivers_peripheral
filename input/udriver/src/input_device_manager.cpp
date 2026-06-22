@@ -675,13 +675,13 @@ RetStatus InputDeviceManager::ScanDevice(InputDevDesc *staArr, uint32_t arrLen)
         return INPUT_NULL_PTR;
     }
 
-    auto scanCount = (arrLen >= inputDevList_.size() ? inputDevList_.size() : arrLen);
+    auto scanCount = (arrLen > inputDevList_.size() ? inputDevList_.size() : arrLen - 1);
     if (inputDevList_.size() == 0) {
         HDF_LOGE("%{public}s: inputDevList_.size is 0", __func__);
         return INPUT_FAILURE;
     }
 
-    for (size_t i = 0; i < scanCount; i++) {
+    for (size_t i = 0; i <= scanCount; i++) {
         (staArr + i)->devIndex = inputDevList_[i].index;
         (staArr + i)->devType = inputDevList_[i].detailInfo.devType;
     }
