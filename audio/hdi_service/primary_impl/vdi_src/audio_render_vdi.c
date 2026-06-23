@@ -103,8 +103,8 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
     CHECK_NULL_PTR_RETURN_VALUE(frame, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(replyBytes, HDF_ERR_INVALID_PARAM);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
-    uint32_t renderId = renderInfo->rendrId;
-    if (rendrId >= AUDIO_VDI_STREAM_NUM_MAX) {
+    uint32_t renderId = renderInfo->renderId;
+    if (renderId >= AUDIO_VDI_STREAM_NUM_MAX) {
         AUDIO_FUNC_LOGE("invalid param");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -770,11 +770,11 @@ int32_t AudioRenderGetFrameBufferSizeVdi(struct IAudioRender *render, uint64_t *
 
 int32_t AudioRenderStartVdi(struct IAudioRender *render)
 {
-    AUDIO_FUNC_LOGI("hdi start enter");
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
-    uint32_t rendrId = renderInfo->renderId;
-    if (rendrId >= AUDIO_VDI_STREAM_NUM_MAX) {
+    uint32_t renderId = renderInfo->renderId;
+    AUDIO_FUNC_LOGI("hdi start enter, renderId=%{public}u", renderId);
+    if (renderId >= AUDIO_VDI_STREAM_NUM_MAX) {
         AUDIO_FUNC_LOGE("invalid param");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -805,11 +805,11 @@ int32_t AudioRenderStartVdi(struct IAudioRender *render)
 
 int32_t AudioRenderStopVdi(struct IAudioRender *render)
 {
-    AUDIO_FUNC_LOGI("hdi stop enter");
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
-    uint32_t rendrId = renderInfo->renderId;
-    if (rendrId >= AUDIO_VDI_STREAM_NUM_MAX) {
+    uint32_t renderId = renderInfo->renderId;
+    AUDIO_FUNC_LOGI("hdi stop enter, renderId=%{public}u", renderId);
+    if (renderId >= AUDIO_VDI_STREAM_NUM_MAX) {
         AUDIO_FUNC_LOGE("invalid param");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -842,8 +842,8 @@ int32_t AudioRenderPauseVdi(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
-    uint32_t rendrId = renderInfo->renderId;
-    if (rendrId >= AUDIO_VDI_STREAM_NUM_MAX) {
+    uint32_t renderId = renderInfo->renderId;
+    if (renderId >= AUDIO_VDI_STREAM_NUM_MAX) {
         AUDIO_FUNC_LOGE("invalid param");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -873,8 +873,8 @@ int32_t AudioRenderResumeVdi(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
-    uint32_t rendrId = renderInfo->renderId;
-    if (rendrId >= AUDIO_VDI_STREAM_NUM_MAX) {
+    uint32_t renderId = renderInfo->renderId;
+    if (renderId >= AUDIO_VDI_STREAM_NUM_MAX) {
         AUDIO_FUNC_LOGE("invalid param");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1150,11 +1150,11 @@ uint32_t DecreaseRenderUsrCount(uint32_t renderId)
         return usrCnt;
     }
     struct AudioRenderPrivVdi *priv = AudioRenderGetPrivVdi();
-    if (priv->renderInfos[rendrId].vdiRender == NULL) {
+    if (priv->renderInfos[renderId].vdiRender == NULL) {
         AUDIO_FUNC_LOGE("audio check render index fail, descIndex=%{public}d", renderId);
         return usrCnt;
     }
-    if (priv->renderInfos[rendrId].usrCount > 0) {
+    if (priv->renderInfos[renderId].usrCount > 0) {
         priv->renderInfos[renderId].usrCount--;
     }
     usrCnt = priv->renderInfos[renderId].usrCount;
