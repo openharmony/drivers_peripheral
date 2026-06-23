@@ -28,6 +28,7 @@
 
 #define SYSFS_PATH_LEN   128
 #define PROPERTY_MAX_LEN 128
+#define PROPERTY_NULL_DEFAULT_VALUE 0
 #define HDF_LOG_TAG      usb_ddk_sysfs_dev
 
 const int DEC_BASE = 10;
@@ -77,11 +78,72 @@ static int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName,
         char buf[PROPERTY_MAX_LEN] = {0};
         ssize_t numRead = read(fd, buf, PROPERTY_MAX_LEN);
         if (numRead <= 0) {
-            HDF_LOGE("%{public}s: read prop failed path:%{public}s, errno:%{public}d", __func__, path, errno);
+            HDF_LOGE("%{public}s: read prop failed path:%{public}s, ret %{public}d, errno:%{public}d",
+                __func__, path, ret, errno);
             ret = HDF_ERR_IO;
             break;
         }
 
+        // convert string to int64_t
+        if (buf[numRead - 1] != '\n') {
+            HDF_LOGE("%{public}s: prop is not end with newline path:%{public}s", __func__, path);
+            ret = HDF_ERR_INVALID_PARAM;
+            break;
+        }
+
+        buf[numRead - 1] = '\0';
+        int64_t res = strtoll(buf, NULL, DdkSysfsGetBase(propName));
+        if (res == LLONG_MAX || res == LLONG_MIN || res > (int64_t)maxVal) {
+            HDF_LOGE("%{public}s: convert failed path:%{public}s, res:%{public}" PRId64 "", __func__, path, res);
+            ret = HDF_ERR_INVALID_PARAM;
+            break;
+        }
+
+        *value = res;
+    } while (0);
+
+    fdsan_close_with_tag(fd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    return ret;
+}
+
+static int32_t DdkSysfsReadNullProperty(const char *deviceDir, const char *propName, int64_t *value, uint64_t maxVal)
+{
+    char pathTmp[SYSFS_PATH_LEN] = {0};
+    int32_t num = sprintf_s(pathTmp, SYSFS_PATH_LEN, "%s%s/%s", SYSFS_DEVICES_DIR, deviceDir, propName);
+    if (num <= 0) {
+        return HDF_FAILURE;
+    }
+
+    char normalizedPath[PATH_MAX] = {'\0'};
+    if (realpath(pathTmp, normalizedPath) == NULL) {
+        HDF_LOGE("%{public}s: failed to normalize path: %{public}s, errno: %{public}d", __func__, pathTmp, errno);
+        return HDF_FAILURE;
+    }
+    // read string  from file
+    char *path = normalizedPath;
+    int32_t fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd == -1) {
+        HDF_LOGE("%{public}s: open file failed path:%{public}s, errno:%{public}d", __func__, path, errno);
+        return HDF_ERR_IO;
+    }
+    fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+
+    int32_t ret = HDF_SUCCESS;
+    do {
+        char buf[PROPERTY_MAX_LEN] = {0};
+        ssize_t numRead = read(fd, buf, PROPERTY_MAX_LEN);
+        if (numRead < 0) {
+            HDF_LOGE("%{public}s: read prop failed path:%{public}s, ret %{public}d, errno:%{public}d",
+                __func__, path, ret, errno);
+            ret = HDF_ERR_IO;
+            break;
+        } else if (numRead == 0) {
+            HDF_LOGE("%{public}s: read prop failed path:%{public}s, read size zero.", __func__, path);
+            *value = PROPERTY_NULL_DEFAULT_VALUE;
+            ret = HDF_SUCCESS;
+            break;
+        }
+        
         // convert string to int64_t
         if (buf[numRead - 1] != '\n') {
             HDF_LOGE("%{public}s: prop is not end with newline path:%{public}s", __func__, path);
@@ -201,7 +263,7 @@ int32_t DdkSysfsGetDevice(const char *deviceDir, struct UsbPnpNotifyMatchInfoTab
     device->devNum = (int32_t)value;
     ret += DdkSysfsReadProperty(deviceDir, "busnum", &value, INT32_MAX);
     device->busNum = (int32_t)value;
-    ret += DdkSysfsReadProperty(deviceDir, "bNumInterfaces", &value, UINT8_MAX);
+    ret += DdkSysfsReadNullProperty(deviceDir, "bNumInterfaces", &value, UINT8_MAX);
     device->numInfos = (uint8_t)value;
 
     struct UsbPnpNotifyDeviceInfo *devInfo = &device->deviceInfo;
