@@ -34,12 +34,14 @@ CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::
     node_ = node;
     mgr_  = mgr;
     isIPCMode_ = (HdfRemoteGetCallingPid() == getpid() ? false : true);
+    isDestroying_ = false;
 #ifdef SUPPORT_ROLE
     SetComponentRole();
 #endif
 }
 CodecComponentService::~CodecComponentService()
 {
+    isDestroying_ = true;
     std::lock_guard<std::mutex> lock(nodeMutex_);
     if (node_ != nullptr) {
         node_->ReleaseOMXResource();
@@ -253,6 +255,10 @@ int32_t CodecComponentService::ComponentDeInit()
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecComponentDeInit");
     CODEC_LOGI("ComponentDeInit");
     std::lock_guard<std::mutex> lock(nodeMutex_);
+    if (isDestroying_) {
+        CODEC_LOGE("ComponentDeInit failed: component is being destroyed");
+        return HDF_ERR_DEVICE_BUSY;
+    }
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
     return node_->ComponentDeInit();
 }
