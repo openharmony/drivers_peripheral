@@ -876,6 +876,16 @@ static int32_t AudioCaptureCallbackVdi(
     return HDF_SUCCESS;
 }
 
+static int32_t AudioCaptureGetVersionV6_1Vdi(struct IAudioCapture *self, uint32_t* majorVer, uint32_t minorVer)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(majorVer, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(minorVer, HDF_ERR_INVALID_PARAM);
+    *majorVer = IAUDIO_CAPTURE_MAJOR_VERSION;
+    *minorVer = IAUDIO_CAPTURE_MINOR_VERSION;
+    AUDIO_FUNC_LOGD("AudioCaptureGetVersionV6_1Vdi majorVer:%{public}u, minorVer:%{public}u", *majorVer, *minorVer);
+     return HDF_SUCCESS;
+}
+
 static int32_t AudioCaptureRegCallbackVdi(struct IAudioCapture *capture, struct IAudioCaptureCallback *audioCallback)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
