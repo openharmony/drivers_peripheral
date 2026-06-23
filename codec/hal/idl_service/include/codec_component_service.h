@@ -65,6 +65,7 @@ private:
     std::mutex nodeMutex_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentNode> node_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
+    std::atomic<bool> isDestroying_;
 };
 
 }  // namespace V4_0
