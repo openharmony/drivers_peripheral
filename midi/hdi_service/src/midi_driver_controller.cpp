@@ -15,12 +15,14 @@
 
 #include "midi_driver_controller.h"
 
+#include <cerrno>
 #include <ctime>
 #include <iomanip>
 #include <fstream>
 #include <hdf_base.h>
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <unordered_set>
 #include <sys/eventfd.h>
 
@@ -46,6 +48,8 @@ namespace {
     constexpr int32_t MIDI_BYTE_HEX_WIDTH = 2;
     constexpr int32_t MIDI_PORT_DIRECTION_COUNT = 2;
     constexpr int32_t UMP_WORD_HEX_WIDTH = 8;
+    constexpr int32_t MIDI_WRITE_RETRY_COUNT = 3;
+    constexpr int32_t MIDI_WRITE_RETRY_DELAY_US = 1000; // 1ms
 
     bool IsMidiClockMessage(uint8_t byte)
     {
@@ -359,7 +363,7 @@ int32_t Midi1Device::OpenOutputPort(uint32_t portId)
     ctx->processor = std::make_shared<UmpProcessor>();
 
     std::string hwname = MakeHwName(portInfo.card, portInfo.device, portInfo.subdevice);
-    if (snd_rawmidi_open(nullptr, &ctx->rawmidi, hwname.c_str(), 0) < 0) {
+    if (snd_rawmidi_open(nullptr, &ctx->rawmidi, hwname.c_str(), SND_RAWMIDI_NONBLOCK) < 0) {
         HDF_LOGE("Midi1Device: Failed to open output rawmidi");
         return HDF_FAILURE;
     }
@@ -405,12 +409,35 @@ int32_t Midi1Device::SendMidiMessages(uint32_t portId, const std::vector<MidiMes
                 }
             });
         if (!midi1Buffer.empty()) {
-            int64_t written = ::snd_rawmidi_write(it->second->rawmidi, midi1Buffer.data(), midi1Buffer.size());
-            if (written < 0) {
-                HDF_LOGE("%{public}s snd_rawmidi_write failed: %{public}" PRId64, __func__, written);
+            int32_t ret = WriteToRawMidi(it->second->rawmidi, midi1Buffer);
+            if (ret != HDF_SUCCESS) {
                 return HDF_FAILURE;
             }
         }
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t Midi1Device::WriteToRawMidi(snd_rawmidi_t *rawmidi, const std::vector<uint8_t> &buffer)
+{
+    int64_t written = -1;
+    for (int32_t retry = 0; retry < MIDI_WRITE_RETRY_COUNT; ++retry) {
+        written = ::snd_rawmidi_write(rawmidi, buffer.data(), buffer.size());
+        if (written >= 0) {
+            break;
+        }
+        if (-written == EAGAIN) {
+            HDF_LOGD("%{public}s snd_rawmidi_write EAGAIN, retry %{public}d/%{public}d",
+                     __func__, retry + 1, MIDI_WRITE_RETRY_COUNT);
+            std::this_thread::sleep_for(std::chrono::microseconds(MIDI_WRITE_RETRY_DELAY_US));
+            continue;
+        }
+        HDF_LOGE("%{public}s snd_rawmidi_write failed: %{public}" PRId64, __func__, written);
+        return HDF_FAILURE;
+    }
+    if (written < 0) {
+        HDF_LOGE("%{public}s snd_rawmidi_write failed after retries: %{public}" PRId64, __func__, written);
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
@@ -631,7 +658,7 @@ void MidiDriverController::ProcessMidi1Card(int32_t card)
     std::string card_str = "hw:" + std::to_string(card);
     HDF_LOGD("%{public}s: Opening ALSA control for card: %{public}s", __func__, card_str.c_str());
     snd_ctl_t *ctl = nullptr;
-    int openResult = ::snd_ctl_open(&ctl, card_str.c_str(), 0);
+    int openResult = ::snd_ctl_open(&ctl, card_str.c_str(), SND_CTL_NONBLOCK);
     if (openResult < 0) {
         HDF_LOGE("%{public}s: Failed to open ALSA control for card %{public}s, error: %{public}d",
                  __func__, card_str.c_str(), openResult);
