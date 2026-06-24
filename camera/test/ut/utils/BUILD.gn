@@ -43,6 +43,7 @@ if (defined(ohos_lite)) {
       "drivers_interface_camera:metadata",
       "hdf_core:libhdf_utils",
       "init:libbegetutil",
+      "bounds_checking_function:libsec_shared"
     ]
   }
 } else {
@@ -86,6 +87,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
         "init:libbegetutil",
+        "bounds_checking_function:libsec_shared"
       ]
       public_configs = [ ":camera_ut_test_config" ]
     }

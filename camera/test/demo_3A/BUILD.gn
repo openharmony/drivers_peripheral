@@ -78,6 +78,7 @@ if (defined(ohos_lite)) {
       "graphic_surface:surface",
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
+      "bounds_checking_function:libsec_shared"
     ]
     public_configs = [ ":ohos_camera_demo_config" ]
     install_enable = false
@@ -155,6 +156,7 @@ if (defined(ohos_lite)) {
       "graphic_surface:surface",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
+      "bounds_checking_function:libsec_shared"
     ]
 
     public_configs = [ ":ohos_camera_demo_config" ]
