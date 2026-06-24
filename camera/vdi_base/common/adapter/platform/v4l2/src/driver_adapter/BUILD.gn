@@ -1,4 +1,4 @@
-# Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2021 - 2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -74,6 +74,7 @@ ohos_shared_library("peripheral_camera_v4l2_adapter") {
   external_deps += [
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
+    "bounds_checking_function:libsec_shared"
   ]
   public_configs = [ ":v4l2_config" ]
   install_images = [ chipset_base_dir ]
