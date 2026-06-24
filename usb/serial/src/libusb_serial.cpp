@@ -442,13 +442,10 @@ int32_t LibusbSerial::SerialGetAttribute(int32_t portId, struct SerialAttribute&
     HDF_LOGI("%{public}s: getattribute baudrate :%{public}d"
         "databit :%{public}d stop :%{public}d parity :%{public}d", __func__, attribute.baudrate,
         attribute.dataBits, attribute.stopBits, attribute.parity);
-    if (ret < length) {
+    if (ret < 0) {
         HDF_LOGE("%{public}s: libusb get attribute failed, ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    HDF_LOGI("%{public}s: getattribute baudrate :%{public}d"
-        "databit :%{public}d stop :%{public}d parity :%{public}d", __func__, attribute.baudrate,
-        attribute.dataBits, attribute.stopBits, attribute.parity);
     return HDF_SUCCESS;
 }
 
