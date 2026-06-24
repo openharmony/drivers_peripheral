@@ -48,6 +48,7 @@ ohos_shared_library("libusb_serial_ddk_service_1.0") {
 
   external_deps = [
     "access_token:libaccesstoken_compat_sdk",
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_usb:libusb_serial_ddk_proxy_1.0",
     "hdf_core:libhdf_utils",
@@ -75,6 +76,7 @@ ohos_shared_library("libusb_serial_ddk_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_usb:libusb_serial_ddk_stub_1.0",
       "hdf_core:libhdf_host",

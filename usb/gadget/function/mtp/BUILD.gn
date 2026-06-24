@@ -48,7 +48,10 @@ ohos_shared_library("libusbfn_mtp_interface_service_1.0") {
       "ipc:ipc_single",
     ]
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils" 
+      ]
     }
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -89,7 +92,10 @@ ohos_shared_library("libusbfn_mtp_driver") {
       "ipc:ipc_single",
     ]
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [ "hilog:libhilog" ]

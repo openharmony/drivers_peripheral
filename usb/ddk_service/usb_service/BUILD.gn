@@ -74,7 +74,10 @@ ohos_shared_library("libusb_ddk_service_1.2") {
       external_deps += [ "hisysevent:libhisysevent" ]
     }
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -106,7 +109,10 @@ ohos_shared_library("usb_ddk_dynamic_library_wrapper") {
 
   external_deps = [ "access_token:libaccesstoken_compat_sdk" ]
   if (usb_c_utils_enable) {
-    external_deps += [ "c_utils:utils" ]
+    external_deps += [ 
+      "bounds_checking_function:libsec_shared",
+      "c_utils:utils"
+    ]
   }
 
   install_images = [ chipset_base_dir ]
@@ -140,7 +146,10 @@ ohos_shared_library("libusb_ddk_driver") {
       "ipc:ipc_single",
     ]
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [ "hilog:libhilog" ]
