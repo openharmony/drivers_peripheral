@@ -43,6 +43,7 @@ ohos_shared_library("libmotion_interface_service_1.1") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "drivers_interface_motion:libmotion_stub_1.0",
       "drivers_interface_motion:libmotion_stub_1.1",
       "hdf_core:libhdf_host",
@@ -77,6 +78,7 @@ ohos_shared_library("libmotion_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "drivers_interface_motion:libmotion_stub_1.0",
       "drivers_interface_motion:libmotion_stub_1.1",
       "hdf_core:libhdf_host",

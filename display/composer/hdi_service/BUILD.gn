@@ -40,6 +40,7 @@ ohos_shared_library("libdisplay_composer_service_1.5") {
   sources = [ "src/display_composer_service.cpp" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_display:libcomposer_buffer_cache",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
@@ -93,6 +94,7 @@ ohos_shared_library("libdisplay_composer_driver_1.0") {
   sources = [ "src/display_composer_driver.cpp" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_composer_stub_1.0",

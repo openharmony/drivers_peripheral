@@ -74,6 +74,7 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_vibrator"
     if (is_standard_system) {
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]

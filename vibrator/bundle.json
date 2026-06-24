@@ -24,6 +24,7 @@
     "ram": "7400KB",
     "deps": {
       "components": [
+        "bounds_checking_function",
         "ipc",
         "hdf_core",
         "hilog",
@@ -32,9 +33,7 @@
         "drivers_interface_vibrator",
         "hilog_lite"
       ],
-      "third_party": [
-        "bounds_checking_function"
-      ]
+      "third_party": []
     },
     "build": {
       "sub_component": [
