@@ -111,7 +111,10 @@ ohos_shared_library("libusb_interface_service_1.2") {
     }
 
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [
@@ -161,7 +164,10 @@ ohos_shared_library("libusb_driver") {
       "samgr:samgr_proxy",
     ]
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [
@@ -238,7 +244,10 @@ ohos_shared_library("libusb_port_interface_service_2.0") {
     }
 
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [
@@ -286,7 +295,10 @@ ohos_shared_library("libusb_port_driver") {
       "samgr:samgr_proxy",
     ]
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [
@@ -364,7 +376,10 @@ ohos_shared_library("libusb_host_interface_service_2.0") {
     }
 
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [
@@ -446,7 +461,10 @@ ohos_shared_library("libusb_device_interface_service_2.1") {
     }
 
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils" 
+      ]
     }
   } else {
     external_deps = [
@@ -495,7 +513,10 @@ ohos_shared_library("libusb_device_driver") {
       "samgr:samgr_proxy",
     ]
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [

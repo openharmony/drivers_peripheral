@@ -67,7 +67,10 @@ ohos_shared_library("libusb_ddk_host") {
     ]
 
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -142,7 +145,10 @@ ohos_shared_library("libusb_pnp_manager") {
       }
     }
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -187,7 +193,10 @@ ohos_shared_library("libusb_ddk_device") {
       "hilog:libhilog",
     ]
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils"
+      ]
     }
   } else {
     external_deps = [ "hilog:libhilog" ]

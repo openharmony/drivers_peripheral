@@ -41,7 +41,10 @@ ohos_executable("usb_dev_test") {
       "hilog:libhilog",
     ]
     if (usb_c_utils_enable) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [ 
+        "bounds_checking_function:libsec_shared",
+        "c_utils:utils" 
+      ]
     }
   } else {
     external_deps = [ "hilog:libhilog" ]
