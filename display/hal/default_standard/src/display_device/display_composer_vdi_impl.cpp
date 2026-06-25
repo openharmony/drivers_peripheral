@@ -138,7 +138,7 @@ int32_t DisplayComposerVdiImpl::GetDisplayCompChange(uint32_t devId, std::vector
         typesHoler);
     if (ec == HDF_SUCCESS && num != 0) {
         if (num > MAX_DISPLAY_LAYERS || num > MAX_DISPLAY_TYPES) {
-            DISPLAY_LOGE("mode count exceeds maxnum limit: %u > %u or %u", num, MAX_DISPLAY_LAYERS, MAX_DISPLAY_TYPES);
+            DISPLAY_LOGE("layer/type count exceeds maxnum limit: %u > %u or %u", num, MAX_DISPLAY_LAYERS, MAX_DISPLAY_TYPES);
             return HDF_ERR_INVALID_PARAM;
         }
         layers.resize(num);
@@ -197,7 +197,7 @@ int32_t DisplayComposerVdiImpl::GetDisplayReleaseFence(uint32_t devId, std::vect
         typesHoler);
     if (ec == HDF_SUCCESS && num != 0) {
         if (num > MAX_DISPLAY_LAYERS || num > MAX_DISPLAY_FENCES) {
-            DISPLAY_LOGE("mode count exceeds maxnum limit: %u > %u or %u", num, MAX_DISPLAY_LAYERS, MAX_DISPLAY_FENCES);
+            DISPLAY_LOGE("layer/fence count exceeds maxnum limit: %u > %u or %u", num, MAX_DISPLAY_LAYERS, MAX_DISPLAY_FENCES);
             return HDF_ERR_INVALID_PARAM;
         }
         layers.resize(num);
