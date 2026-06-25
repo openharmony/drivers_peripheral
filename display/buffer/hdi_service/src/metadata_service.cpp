@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -171,7 +171,7 @@ int32_t MetadataService::EraseMetadataKey(const sptr<NativeBuffer>& handle, uint
     BufferHandle* buffer = handle->GetBufferHandle();
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     int32_t ret = vdiImpl_->EraseMetadataKey(*buffer, key);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGD(" fail"));
     return HDF_SUCCESS;
 }
 
