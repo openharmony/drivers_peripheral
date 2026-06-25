@@ -39,13 +39,13 @@ AllInOneExecutorImpl::AllInOneExecutorImpl()
     executorInfo_ = {
         .sensorId = SENSOR_ID,
         .executorMatcher = EXECUTOR_TYPE,
+        .maxTemplateAcl = FACE_CAPABILITY_LEVEL,
         .executorRole = ExecutorRole::ALL_IN_ONE,
         .authType = AuthType::FACE,
+        .esl = ExecutorSecureLevel::ESL2,
         .publicKey = std::vector<uint8_t>(PUBLIC_KEY_LEN, 0),
         .extraInfo = {},
         // esl and maxTemplateAcl are for example only. Should be implemented in trusted environment.
-        .esl = ExecutorSecureLevel::ESL2,
-        .maxTemplateAcl = FACE_CAPABILITY_LEVEL,
     };
 }
 
