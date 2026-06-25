@@ -858,25 +858,20 @@ static int32_t AudioCaptureCallbackVdi(
         AUDIO_FUNC_LOGE("invalid param");
         return HDF_ERR_INVALID_PARAM;
     }
-    pthread_rwlock_rdlock(&g_rwVdiCaptureLock[captureId]);
     if (!captureInfo->isRegCb) {
-        pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
         AUDIO_FUNC_LOGE("audio capture callback is not reg");
         return HDF_FAILURE;
     }
     struct IAudioCaptureCallback *cb = captureInfo->callback;
     if (cb == NULL || cb->CaptureCallback == NULL) {
-        pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
         AUDIO_FUNC_LOGE("invalid param");
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = cb->CaptureCallback(cb, (enum AudioCaptureCallbackType)type, data, len);
     if (ret != HDF_SUCCESS) {
-        pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
         AUDIO_FUNC_LOGE("audio capture AudioCaptureCallbackVdi fail, ret=%{public}d", ret);
         return HDF_FAILURE;
     }
-    pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
     AUDIO_FUNC_LOGD("AudioCaptureCallbackVdi success");
     return HDF_SUCCESS;
 }
