@@ -17,6 +17,7 @@
 #define IAM_LOGGER_H
 
 #include "hilog/log.h"
+
 namespace OHOS {
 namespace UserIam {
 namespace Common {
