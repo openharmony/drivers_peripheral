@@ -21,6 +21,11 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
+const uint32_t MAX_DISPLAY_MODES =  100;
+const uint32_t MAX_DISPLAY_LAYERS = 100;
+const uint32_t MAX_DISPLAY_TYPES =  100;
+const uint32_t MAX_DISPLAY_FENCES = 100;
+
 DisplayComposerVdiImpl::DisplayComposerVdiImpl()
 {
 }
@@ -53,6 +58,10 @@ int32_t DisplayComposerVdiImpl::GetDisplaySupportedModes(uint32_t devId, std::ve
         return HDF_FAILURE;
     }
     if (num != 0) {
+        if (num > MAX_DISPLAY_MODES) {
+            DISPLAY_LOGE("mode count exceeds maxnum limit: %u > %u", num, MAX_DISPLAY_MODES);
+            return HDF_ERR_INVALID_PARAM;
+        }
         modes.resize(num);
         ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplaySupportedModes, &num,
             modes.data());
@@ -118,6 +127,10 @@ int32_t DisplayComposerVdiImpl::GetDisplayCompChange(uint32_t devId, std::vector
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayCompChange, &num,
         layersHoler, typesHoler);
     if (ec == HDF_SUCCESS && num != 0) {
+        if (num > MAX_DISPLAY_LAYERS || num > MAX_DISPLAY_TYPES) {
+            DISPLAY_LOGE("mode count exceeds maxnum limit: %u > %u or %u", num, MAX_DISPLAY_LAYERS, MAX_DISPLAY_TYPES);
+            return HDF_ERR_INVALID_PARAM;
+        }
         layers.resize(num);
         types.resize(num);
         ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayCompChange, &num,
@@ -170,6 +183,10 @@ int32_t DisplayComposerVdiImpl::GetDisplayReleaseFence(uint32_t devId, std::vect
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayReleaseFence, &num,
         layersHoler, typesHoler);
     if (ec == HDF_SUCCESS && num != 0) {
+        if (num > MAX_DISPLAY_LAYERS || num > MAX_DISPLAY_FENCES) {
+            DISPLAY_LOGE("mode count exceeds maxnum limit: %u > %u or %u", num, MAX_DISPLAY_LAYERS, MAX_DISPLAY_FENCES);
+            return HDF_ERR_INVALID_PARAM;
+        }
         layers.resize(num);
         fences.resize(num);
         ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayReleaseFence, &num,

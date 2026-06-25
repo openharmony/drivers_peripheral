@@ -80,7 +80,12 @@ std::string SensorHdiDump::SensorInfoDataToString(const float *data,
     char arrayStr[DATA_LEN] = {0};
 
     for (int32_t i = 0; i < dataDimension; i++) {
-        if (sprintf_s(arrayStr + strlen(arrayStr), DATA_LEN, "[%f]", data[i]) < 0) {
+        size_t currentLen = strlen(arrayStr);
+        if (currentLen >= DATA_LEN) {
+            HDF_LOGE("%{public}s: buffer overflow", __func__);
+            break;
+        }
+        if (sprintf_s(arrayStr + currentLen, DATA_LEN - currentLen, "[%f]", data[i]) < 0) {
             HDF_LOGE("%{public}s: sprintf_s failed", __func__);
             return st;
         }
