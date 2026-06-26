@@ -783,7 +783,7 @@ int32_t AudioCaptureCaptureFrame(
     }
     if (*frameLen < hwCapture->captureParam.frameCaptureMode.bufferSize) {
         pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
-        AUDIO_FUNC_LOGI("CaptureframeLen too little! frameLen=%{public}" PRIu64 ", bufferSize=%{public}" PRIu64,
+        AUDIO_FUNC_LOGI("CaptureframeLen too little! frameLen=%{public}u, bufferSize=%{public}" PRIu64,
             *frameLen, hwCapture->captureParam.frameCaptureMode.bufferSize);
         return AUDIO_ERR_INTERNAL;
     }
