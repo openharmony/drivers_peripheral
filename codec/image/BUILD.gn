@@ -47,8 +47,9 @@ ohos_shared_library("libcodec_image_service_2.1") {
       "ipc:ipc_single",
     ]
   } else {
-    external_deps = [ "hilog:libhilog",
-                      "bounds_checking_function:libsec_shared"
+    external_deps = [ 
+      "bounds_checking_function:libsec_shared",
+      "hilog:libhilog"                
     ]
   }
 
