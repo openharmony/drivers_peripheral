@@ -777,14 +777,13 @@ int32_t AudioCaptureCaptureFrame(
         (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_READ);
     if (ret < 0) {
         pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
-        AUDIO_FUNC_LOGE("Capture Frame FAIL! ret=%{public}d", ret);
+        AUDIO_FUNC_LOGI("Capture Frame FAIL! ret=%{public}d", ret);
         LogErrorCapture(capture, WRITE_FRAME_ERROR_CODE, ret);
         return AUDIO_ERR_INTERNAL;
     }
     if (*frameLen < hwCapture->captureParam.frameCaptureMode.bufferSize) {
         pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
-        AUDIO_FUNC_LOGE(
-            "Capture Frame frameLen too little! frameLen=%{public}" PRIu64 ", bufferSize=%{public}" PRIu64,
+        AUDIO_FUNC_LOGI("CaptureframeLen too little! frameLen=%{public}" PRIu64 ", bufferSize=%{public}" PRIu64,
             *frameLen, hwCapture->captureParam.frameCaptureMode.bufferSize);
         return AUDIO_ERR_INTERNAL;
     }
