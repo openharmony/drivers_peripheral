@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 
-ohos_shared_library("libhuks_hdi_service_1.1") {
+ohos_shared_library("libhuks_hdi_service_1.2") {
   defines = []
   sources = [
     "huks_hdi_passthrough_adapter.c",
@@ -23,18 +23,18 @@ ohos_shared_library("libhuks_hdi_service_1.1") {
     external_deps = [
       "bounds_checking_function:libsec_shared",
       "c_utils:utils",
-      "drivers_interface_huks:huks_idl_headers_1.1",
+      "drivers_interface_huks:huks_idl_headers_1.2",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
   }
 
   install_images = [ chipset_base_dir ]
-  innerapi_tags = [ "passthrough_indirect" ]
+  innerapi_tags = [ "passthrough" ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_huks"
 }
 
 group("huks_hdi_service") {
-  deps = [ ":libhuks_hdi_service_1.1" ]
+  deps = [ ":libhuks_hdi_service_1.2" ]
 }

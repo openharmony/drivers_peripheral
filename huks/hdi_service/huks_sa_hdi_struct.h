@@ -291,6 +291,31 @@ struct HuksHdi {
      * @return error code, see huks_sa_type.h
      */
     int32_t (*HuksHdiGetStatInfo)(struct HksBlob *statInfo);
+
+    /**
+     * @brief ML-KEM encapsulation operation.
+     * @param keyAlias key alias
+     * @param paramSet required parameter set
+     * @param sharedKeyAlias shared key alias
+     * @param sharedKeyParamSet shared key parameter set
+     * @param encapResult encapsulation result
+     * @return error code, see huks_sa_type.h
+     */
+    int32_t (*HuksHdiEncapsulate)(const struct HksParamSet *paramSet,
+        const struct HksParamSet *sharedKeyParamSet, struct HksEncapsulationResult *encapResult);
+
+    /**
+     * @brief ML-KEM decapsulation operation.
+     * @param keyAlias private key alias
+     * @param paramSet parameter set for decapsulation
+     * @param sharedKeyParamSet parameter set for the output shared secret
+     * @param encapsulatedData ciphertext to decapsulate (input)
+     * @param sharedSecret output shared secret (HDI allocates memory)
+     * @return error code, see huks_sa_type.h
+     */
+    int32_t (*HuksHdiDecapsulate)(const struct HksParamSet *paramSet,
+        const struct HksParamSet *sharedKeyParamSet, const struct HksBlob *encapsulatedData,
+        struct HksBlob *sharedSecret);
 };
 
 #endif
