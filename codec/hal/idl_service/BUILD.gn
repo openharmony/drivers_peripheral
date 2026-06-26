@@ -57,8 +57,9 @@ ohos_shared_library("libcodec_component_manager_service_4.0") {
       "ipc:ipc_single",
     ]
   }
-  external_deps += [ "openmax:libopenmax_static",
-                     "bounds_checking_function:libsec_shared"
+  external_deps += [ 
+    "bounds_checking_function:libsec_shared",
+    "openmax:libopenmax_static"            
   ]
   defines = [ "__OHOS_USER__" ]
 
