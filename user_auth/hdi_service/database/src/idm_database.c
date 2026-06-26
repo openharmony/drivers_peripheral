@@ -602,6 +602,11 @@ IAM_STATIC bool MatchEnrolledInfoByType(const void *data, const void *condition)
 IAM_STATIC void RemoveCachePin(UserInfo *user, bool *isRemoved)
 {
     LOG_INFO("RemoveCachePin start");
+    if (user == NULL || user->credentialInfoList == NULL) {
+        LOG_INFO("RemoveCachePin invalid user or empty credentialInfoList");
+        *isRemoved = false;
+        return;
+    }
     LinkedListNode *temp = user->credentialInfoList->head;
     CredentialInfoHal *credentialInfoCache = NULL;
     while (temp != NULL) {
