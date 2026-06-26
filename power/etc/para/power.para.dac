@@ -13,3 +13,4 @@
 
 const.hdi_power.swap_file_path = power_host:power_host:0444
 const.hdi_power.swap_dir_path = power_host:power_host:0444
+persist.hdi_power.ulsr_result = power_host:power_host:0774
