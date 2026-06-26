@@ -15,9 +15,11 @@
 
 #include "midi_driver_controller.h"
 
+#include <alsa/ohos_config.h>
 #include <hdf_base.h>
-#include "midi_interface_impl.h"
+#include <mutex>
 
+#include "midi_interface_impl.h"
 #include "securec.h"
 #include "midi_log.h"
 #define HDF_LOG_TAG midi_interface_impl
@@ -26,8 +28,22 @@ namespace OHOS {
 namespace HDI {
 namespace Midi {
 namespace V1_0 {
+namespace {
+void EnableAlsaGlobalConfig()
+{
+    static std::once_flag onceFlag;
+    std::call_once(onceFlag, []() {
+        int ret = ::snd_ohos_enable_global_config();
+        if (ret < 0) {
+            HDF_LOGE("%{public}s: enable ALSA global config failed, ret=%{public}d", __func__, ret);
+        }
+    });
+}
+} // namespace
+
 extern "C" IMidiInterface *MidiInterfaceImplGetInstance(void)
 {
+    EnableAlsaGlobalConfig();
     return new (std::nothrow) MidiInterfaceImpl();
 }
 
