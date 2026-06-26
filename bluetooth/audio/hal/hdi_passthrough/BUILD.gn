@@ -98,6 +98,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
+    "bounds_checking_function:libsec_shared",
   ]
 
   if (!drivers_peripheral_bluetooth_a2dp_hdi) {

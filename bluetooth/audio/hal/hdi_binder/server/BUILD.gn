@@ -77,7 +77,10 @@ ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "c_utils:utils" ]
+  external_deps += [
+    "c_utils:utils",
+    "bounds_checking_function:libsec_shared",
+  ]
 
   public_configs = [ ":hdi_service_config" ]
 
