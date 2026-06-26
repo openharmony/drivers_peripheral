@@ -14,6 +14,8 @@
  */
 
 #include <math.h>
+#include <inttypes.h>
+#include <stdint.h>
 #include <sys/mman.h>
 #include "hdf_types.h"
 #include "osal_mem.h"
@@ -781,7 +783,8 @@ int32_t AudioCaptureCaptureFrame(
     }
     if (*frameLen < hwCapture->captureParam.frameCaptureMode.bufferSize) {
         pthread_mutex_unlock(&hwCapture->captureParam.frameCaptureMode.mutex);
-        AUDIO_FUNC_LOGE("Capture Frame frameLen too little! frameLen=%{public}u, bufferSize=%{public}llu",
+        AUDIO_FUNC_LOGE(
+            "Capture Frame frameLen too little! frameLen=%{public}" PRIu64 ", bufferSize=%{public}" PRIu64,
             *frameLen, hwCapture->captureParam.frameCaptureMode.bufferSize);
         return AUDIO_ERR_INTERNAL;
     }
