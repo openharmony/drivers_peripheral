@@ -342,7 +342,7 @@ int32_t ComponentNode::ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t in
 
 int32_t ComponentNode::ComponentDeInit()
 {
-    std::unique_lock<std::shared_mutex> lk(deinitMutex_)
+    std::unique_lock<std::shared_mutex> lk(deinitMutex_);
 
     if (comp_ == nullptr) {
         CODEC_LOGW("comp_ is already null");

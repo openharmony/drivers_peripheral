@@ -272,7 +272,7 @@ int32_t CodecComponentService::ComponentDeInit()
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
 
     CodecStateType state = CODEC_STATE_INVALID;
-    node->GetState(state);
+    node_->GetState(state);
     if (state == CODEC_STATE_INVALID) {
         CODEC_LOGW("Component is in Invalid state, try to recover");
         std::vector<int8_t> cmdData;
