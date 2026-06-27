@@ -91,6 +91,7 @@ private:
     sptr<ICodecCallback> omxCallback_;
     int64_t appData_;
     std::shared_mutex poolMutex_;
+    std::shared_mutex deinitMutex_;
     std::vector<BufferInfo> bufferPool_;
     uint32_t bufferIdCount_;
     std::shared_ptr<ComponentMgr> mgr_;

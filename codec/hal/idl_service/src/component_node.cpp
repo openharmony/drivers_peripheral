@@ -97,6 +97,9 @@ ComponentNode::~ComponentNode()
     omxCallback_ = nullptr;
     bufferPool_.clear();
     bufferIdCount_ = 0;
+    if (comp_ != nullptr) {
+        CloseHandle();
+    }
     comp_ = nullptr;
     mgr_ = nullptr;
 }
@@ -339,12 +342,25 @@ int32_t ComponentNode::ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t in
 
 int32_t ComponentNode::ComponentDeInit()
 {
-    CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
+    std::unique_lock<std::shared_mutex> lk(deinitMutex_)
+
+    if (comp_ == nullptr) {
+        CODEC_LOGW("comp_ is already null");
+        return OMX_ErrorNone;
+    }
+
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
+    if (comType == nullptr || comType->ComponentDeInit == nullptr) {
+        CODEC_LOGE("comType or ComponentDeInit is null");
+        comp_ = nullptr;
+        return OMX_ErrorInvalidComponent;
+    }
+
     auto err = comType->ComponentDeInit(comp_);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("ComponentDeInit err = %{public}x ", err);
     }
+    comp_ = nullptr;
     return err;
 }
 
