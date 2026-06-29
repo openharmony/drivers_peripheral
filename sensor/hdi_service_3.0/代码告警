@@ -1,0 +1,292 @@
+超大深度函数[C++]
+修改点个数 1
+the depth of the method {SensorIfService::Register()} is 5, it is over 4
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+834
+}
+835
+836
+return ret;
+837
+}
+838
+839
+int32_t SensorIfService::Register(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj)
+840
+{
+841
+SENSOR_TRACE_PID;
+842
+uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+843
+HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d", __func__, groupId, serviceId);
+844
+std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+
+超大深度函数[C++]
+修改点个数 1
+the depth of the method {SensorIfService::RegisterWithCallbackId()} is 5, it is over 4
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+1344
+}
+1345
+1346
+return ret;
+1347
+}
+1348
+1349
+int32_t SensorIfService::RegisterWithCallbackId(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj,
+1350
+uint32_t callbackId)
+1351
+{
+1352
+SENSOR_TRACE_PID;
+1353
+uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+1354
+HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d cbId %{public}d", __func__, groupId, serviceId, callbackId);
+
+G.FUD.05 函数要简短--函数嵌套层次【C】
+修改点个数 1
+Avoid nesting a code block more than four times within a function.Function nesting depth is 5. Function name is : SensorIfService::RegisterWithCallbackId .
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+1383
+auto iRemoteObjectIter = std::find_if(callbackMap[groupId].begin(),
+1384
+callbackMap[groupId].end(),
+1385
+[&iRemoteObject](const sptr<IRemoteObject> &obj) {
+1386
+return iRemoteObject == obj;
+1387
+});
+1388
+if (iRemoteObjectIter != callbackMap[groupId].end()) {
+1389
+callbackMap[groupId].erase(iRemoteObjectIter);
+1390
+}
+1391
+} else {
+1392
+callbackMap.erase(groupId);
+1393
+}
+
+超大深度函数[C++]
+修改点个数 1
+the depth of the method {SensorIfService::RegisterAsync()} is 5, it is over 4
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+1115
+}
+1116
+1117
+return ret;
+1118
+}
+1119
+1120
+int32_t SensorIfService::RegisterAsync(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj)
+1121
+{
+1122
+SENSOR_TRACE_PID;
+1123
+uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+1124
+HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d", __func__, groupId, serviceId);
+1125
+std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+
+G.FUD.05 函数要简短--函数嵌套层次【C】
+修改点个数 1
+Avoid nesting a code block more than four times within a function.Function nesting depth is 5. Function name is : SensorIfService::RegisterAsync .
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+1149
+auto iRemoteObjectIter = std::find_if(callbackMap[groupId].begin(),
+1150
+callbackMap[groupId].end(),
+1151
+[&iRemoteObject](const sptr<IRemoteObject> &obj) {
+1152
+return iRemoteObject == obj;
+1153
+});
+1154
+if (iRemoteObjectIter != callbackMap[groupId].end()) {
+1155
+callbackMap[groupId].erase(iRemoteObjectIter);
+1156
+}
+1157
+} else {
+1158
+callbackMap.erase(groupId);
+1159
+}
+
+超大函数[C++]
+修改点个数 1
+the nbnc line of the method {SensorIfService::RegisterAsync()} is 52, it is over 50
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+1115
+}
+1116
+1117
+return ret;
+1118
+}
+1119
+1120
+int32_t SensorIfService::RegisterAsync(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj)
+1121
+{
+1122
+SENSOR_TRACE_PID;
+1123
+uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+1124
+HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d", __func__, groupId, serviceId);
+1125
+std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+
+G.FUD.05 函数要简短--函数大小【C】
+修改点个数 1
+Avoid long functions and ensure that functions contain no more than 50 lines (not including blank lines and comments).Function has 54 lines.
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+1344
+}
+1345
+1346
+return ret;
+1347
+}
+1348
+1349
+int32_t SensorIfService::RegisterWithCallbackId(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj,
+1350
+uint32_t callbackId)
+1351
+{
+1352
+SENSOR_TRACE_PID;
+1353
+uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+1354
+HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d cbId %{public}d", __func__, groupId, serviceId, callbackId);
+sensor/hdi_service_3.0/sensor_if_service.cpp
+超大函数[C++]
+修改点个数 1
+the nbnc line of the method {SensorIfService::RegisterWithCallbackId()} is 56, it is over 50
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+1344
+}
+1345
+1346
+return ret;
+1347
+}
+1348
+1349
+int32_t SensorIfService::RegisterWithCallbackId(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj,
+1350
+uint32_t callbackId)
+1351
+{
+1352
+SENSOR_TRACE_PID;
+1353
+uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+1354
+HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d cbId %{public}d", __func__, groupId, serviceId, callbackId);
+sensor/hdi_service_3.0/sensor_if_service.cpp
+G.FUD.05 函数要简短--函数嵌套层次【C】
+修改点个数 1
+Avoid nesting a code block more than four times within a function.Function nesting depth is 5. Function name is : SensorIfService::Register .
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+868
+auto iRemoteObjectIter = std::find_if(callbackMap[groupId].begin(),
+869
+callbackMap[groupId].end(),
+870
+[&iRemoteObject](const sptr<IRemoteObject> &obj) {
+871
+return iRemoteObject == obj;
+872
+});
+873
+if (iRemoteObjectIter != callbackMap[groupId].end()) {
+874
+callbackMap[groupId].erase(iRemoteObjectIter);
+875
+}
+876
+} else {
+877
+callbackMap.erase(groupId);
+878
+}
+
+超大函数[C++]
+修改点个数 1
+the nbnc line of the method {SensorIfService::Register()} is 52, it is over 50
+ 一般
+未解决
+ 规则详情
+ AI修改建议
+834
+}
+835
+836
+return ret;
+837
+}
+838
+839
+int32_t SensorIfService::Register(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj)
+840
+{
+841
+SENSOR_TRACE_PID;
+842
+uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+843
+HDF_LOGI("%{public}s:groupId %{public}d pid %{public}d", __func__, groupId, serviceId);
+844
+std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+
+
+
+
+
+
+
