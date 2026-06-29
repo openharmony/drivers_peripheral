@@ -55,7 +55,7 @@ if (defined(ohos_lite)) {
     module_out_path = module_output_path
     sources = []
     include_dirs = []
-    if (drivers_peripheral_audio_feature_alsa_lib) {
+    if (!drivers_peripheral_audio_feature_alsa_lib) {
       sources += [ "./src/audio_alsa_if_lib_capture_test.cpp" ]
       include_dirs += [
         "$hdf_audio_path/supportlibs/alsa_adapter/include",
