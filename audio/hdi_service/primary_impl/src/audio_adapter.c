@@ -754,7 +754,7 @@ int32_t AudioAdapterUpdateAudioRoute(
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is NULL!");
-        return AUDIO_ERR_INTERNAL;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
 
     if (hwRender->devCtlHandle == NULL) {
@@ -813,7 +813,7 @@ int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is NULL!");
-        return AUDIO_ERR_INTERNAL;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
 
     if (volume < 0 || volume > 1) {
@@ -860,7 +860,7 @@ int32_t AudidoAdapterSetMicMute(struct IAudioAdapter *adapter, bool isMute)
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is NULL!");
-        return AUDIO_ERR_INTERNAL;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
 
     if (hwRender->devCtlHandle == NULL) {

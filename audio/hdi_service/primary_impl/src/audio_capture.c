@@ -160,7 +160,7 @@ int32_t AudioCapturePause(struct IAudioCapture *handle)
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Audio Capture Pause FAIL!");
         hwCapture->captureParam.captureMode.ctlParam.pause = pauseStatus;
-        return AUDIO_ERR_INTERNAL;
+        return HDF_ERR_NOT_SUPPORT;
     }
     AUDIO_FUNC_LOGI("Enter. pauseStatus= %{public}d", pauseStatus);
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Capture Pause");
