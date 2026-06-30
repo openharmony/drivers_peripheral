@@ -894,7 +894,7 @@ int32_t AudidoAdapterSetMicMute(struct IAudioAdapter *adapter, bool isMute)
         return AUDIO_ERR_INTERNAL;
     }
     return AUDIO_SUCCESS;
-#else 
+#else
     return HDF_ERR_NOT_SUPPORT;
 #endif
 }
