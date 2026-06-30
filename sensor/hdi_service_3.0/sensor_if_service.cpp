@@ -494,7 +494,7 @@ void SensorIfService::RemoveDeathNotice(int32_t groupId)
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGI("%{public}s:pid %{public}d groupId %{public}d", __func__, serviceId, groupId);
     auto iter = callbackMap.find(groupId);
-    if (iter != callbackMap.end()) {
+    if (iter == callbackMap.end()) {
         return;
     }
     for (const auto &iRemoteObject : callbackMap[groupId]) {
@@ -753,6 +753,27 @@ int32_t SensorIfService::SetOption(const OHOS::HDI::Sensor::V3_0::DeviceSensorIn
     return ret;
 }
 
+void SensorIfService::RollbackRegisterFailure(int32_t groupId, const sptr<IRemoteObject> &iRemoteObject)
+{
+    if (callbackMap[groupId].size() > CALLBACK_CTOUNT_THRESHOLD) {
+        auto iter = std::find_if(callbackMap[groupId].begin(),
+            callbackMap[groupId].end(),
+            [&iRemoteObject](const sptr<IRemoteObject> &obj) {
+                return iRemoteObject == obj;
+            });
+        if (iter != callbackMap[groupId].end()) {
+            callbackMap[groupId].erase(iter);
+        }
+    } else {
+        callbackMap.erase(groupId);
+    }
+    int32_t removeResult = RemoveSensorDeathRecipient(iRemoteObject);
+    if (removeResult != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]",
+                 __func__, groupId);
+    }
+}
+
 int32_t SensorIfService::Register(int32_t groupId, const sptr<V3_0::ISensorCallback> &callbackObj)
 {
     SENSOR_TRACE_PID;
@@ -764,6 +785,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<V3_0::ISensorCallb
     int32_t result = AddCallbackMap(groupId, iRemoteObject);
     if (result != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: AddCallbackMap failed groupId[%{public}d]", __func__, groupId);
+        return result;
     }
     if (SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
         if (sensorVdiImplV1_1_ == nullptr) {
@@ -780,11 +802,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<V3_0::ISensorCallb
         SENSOR_TRACE_FINISH;
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s Register failed, error code is %{public}d", __func__, ret);
-            int32_t removeResult = RemoveSensorDeathRecipient(iRemoteObject);
-            if (removeResult != SENSOR_SUCCESS) {
-                HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]",
-                         __func__, groupId);
-            }
+            RollbackRegisterFailure(groupId, iRemoteObject);
         } else {
             SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, serviceId, callbackObj, false);
         }
@@ -1033,6 +1051,7 @@ int32_t SensorIfService::RegisterAsync(int32_t groupId, const sptr<V3_0::ISensor
     int32_t result = AddCallbackMap(groupId, iRemoteObject);
     if (result != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: AddCallbackMap failed groupId[%{public}d]", __func__, groupId);
+        return result;
     }
     if (SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
         if (sensorVdiImplV1_1_ == nullptr) {
@@ -1053,11 +1072,7 @@ int32_t SensorIfService::RegisterAsync(int32_t groupId, const sptr<V3_0::ISensor
         SENSOR_TRACE_FINISH;
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s Register failed, error code is %{public}d", __func__, ret);
-            int32_t removeResult = RemoveSensorDeathRecipient(iRemoteObject);
-            if (removeResult != SENSOR_SUCCESS) {
-                HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]",
-                         __func__, groupId);
-            }
+            RollbackRegisterFailure(groupId, iRemoteObject);
         } else {
             SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, serviceId, callbackObj, true);
         }
@@ -1264,6 +1279,7 @@ int32_t SensorIfService::RegisterWithCallbackId(int32_t groupId, const sptr<V3_0
     int32_t result = AddCallbackMap(groupId, iRemoteObject);
     if (result != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: AddCallbackMap failed groupId[%{public}d]", __func__, groupId);
+        return result;
     }
     if (SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
         if (sensorVdiImplV1_1_ == nullptr) {
@@ -1280,11 +1296,7 @@ int32_t SensorIfService::RegisterWithCallbackId(int32_t groupId, const sptr<V3_0
         SENSOR_TRACE_FINISH;
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s Register failed, error code is %{public}d", __func__, ret);
-            int32_t removeResult = RemoveSensorDeathRecipient(iRemoteObject);
-            if (removeResult != SENSOR_SUCCESS) {
-                HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]",
-                         __func__, groupId);
-            }
+            RollbackRegisterFailure(groupId, iRemoteObject);
         } else {
             SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, callbackId, callbackObj, false);
         }
