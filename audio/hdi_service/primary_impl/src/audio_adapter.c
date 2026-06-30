@@ -739,7 +739,7 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
 int32_t AudioAdapterUpdateAudioRoute(
     struct IAudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle)
 {
-#ifndef ALSA_LIB_MODE
+#ifdef ALSA_LIB_MODE
     AUDIO_FUNC_LOGI("AudioAdapterUpdateAudioRoute Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || route == NULL) {
@@ -801,7 +801,7 @@ int32_t AudioAdapterUpdateAudioRoute(
 
 int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
 {
-#ifndef ALSA_LIB_MODE
+#ifdef ALSA_LIB_MODE
     AUDIO_FUNC_LOGD("AudioAdapterSetVoiceVolume Enter.");
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -851,7 +851,7 @@ int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
 
 int32_t AudidoAdapterSetMicMute(struct IAudioAdapter *adapter, bool isMute)
 {
-#ifndef ALSA_LIB_MODE
+#ifdef ALSA_LIB_MODE
     AUDIO_FUNC_LOGI("AudidoAdapterSetMicMute Enter isMute: %{public}d.", isMute);
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
