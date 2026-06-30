@@ -39,6 +39,10 @@ ohos_shared_library("audio_primary_impl_vendor") {
     if (drivers_peripheral_audio_feature_hal_notsupport_pathselect) {
       defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
     }
+
+    if (drivers_peripheral_audio_feature_alsa_lib == true) {
+      defines += [ "ALSA_LIB_MODE" ]
+    }
   } else {
     sources = [
       "vdi_src/audio_adapter_vdi.c",
