@@ -685,6 +685,7 @@ static int32_t CaptureReadImpl(struct AlsaCapture *captureIns, struct AudioHwCap
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)captureIns;
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns->pcmHandle);
 
     if (cardIns->pauseState) {
         AUDIO_FUNC_LOGE("Currently in pause, please check!");
