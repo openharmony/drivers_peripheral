@@ -96,6 +96,7 @@ private:
     int32_t RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<IRemoteObject> &iRemoteObject);
     bool ValidateCallbackMap(int32_t groupId, const sptr<IRemoteObject> &iRemoteObject);
     bool RemoveCallbackFromMap(int32_t groupId, const sptr<IRemoteObject> &iRemoteObject);
+    void RollbackRegisterFailure(int32_t groupId, const sptr<IRemoteObject> &iRemoteObject);
     void DisableUnusedSensors(int serviceId);
     void DisableSensorHandle(const SensorHandle &sensorHandle);
     int32_t EnableSensorInternal(const SensorHandle sensorHandle, int32_t serviceId);
