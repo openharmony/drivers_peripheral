@@ -52,14 +52,6 @@ struct HksParamSet {
 };
 
 /**
- * @brief Defines a struct for the return value of a HUKS KEM algorithm.
- */
-struct HksEncapsulationResult {
-    struct HksBlob encapsulatedData;
-    struct HksBlob sharedSecret;
-};
-
-/**
  * @brief hks chipset platform decrypt scene should be same with huks sa
  */
 enum HksChipsetPlatformDecryptScene {

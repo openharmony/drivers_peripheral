@@ -14,10 +14,9 @@
  */
 
 #include <securec.h>
-#include <stdint.h>
 
-#include "v1_2/ihuks.h"
-#include "v1_2/ihuks_types.h"
+#include "v1_1/ihuks.h"
+#include "v1_1/ihuks_types.h"
 
 #include "huks_hdi_passthrough_adapter.h"
 #include "huks_hdi_template.h"
@@ -245,47 +244,6 @@ static int32_t HuksGetVersion(struct IHuks *self, uint32_t *majorVer, uint32_t *
     return HUKS_SUCCESS;
 }
 
-static int32_t HuksEncapsulate(struct IHuks *self, const struct HuksParamSet *paramSet,
-    const struct HuksParamSet *sharedKeyParamSet, struct HuksEncapsulationResult *encapResult)
-{
-    (void)self;
-    int32_t ret = HUKS_FAILURE;
-    HDI_CONVERTER_FUNC_ENCAPSULATE(paramSet, sharedKeyParamSet, encapResult, ret,
-        HuksHdiAdapterEncapsulate)
-    return ret;
-}
-
-static int32_t HuksDecapsulate(struct IHuks *self, const struct HuksParamSet *paramSet,
-    const struct HuksParamSet *sharedKeyParamSet, const struct HuksBlob *encapsulatedData,
-    struct HuksBlob *sharedSecret)
-{
-    (void)self;
-    int32_t ret = HUKS_FAILURE;
-    HDI_CONVERTER_FUNC_DECAPSULATE(paramSet, sharedKeyParamSet, encapsulatedData, sharedSecret, ret,
-        HuksHdiAdapterDecapsulate)
-    return ret;
-}
-
-static int32_t WrapKey(struct IHuks *self, const struct HuksBlob *key, const struct HuksParamSet *paramSet,
-    struct HuksBlob *wrappedKey)
-{
-    (void)self;
-    (void)key;
-    (void)paramSet;
-    (void)wrappedKey;
-    return HUKS_ERROR_API_NOT_SUPPORTED;
-}
-
-static int32_t UnwrapKey(struct IHuks *self, const struct HuksParamSet *paramSet, const struct HuksBlob *wrappedKey,
-    struct HuksBlob *keyOut)
-{
-    (void)self;
-    (void)keyOut;
-    (void)paramSet;
-    (void)wrappedKey;
-    return HUKS_ERROR_API_NOT_SUPPORTED;
-}
-
 struct IHuks *HuksImplGetInstance(void)
 {
     struct HuksService *service = (struct HuksService *)malloc(sizeof(struct HuksService));
@@ -318,11 +276,6 @@ struct IHuks *HuksImplGetInstance(void)
     service->interface.GetStatInfo = HuksGetStatInfo;
     service->interface.UpgradeKey = HuksUpgradeKey;
     service->interface.GetVersion = HuksGetVersion;
-    service->interface.Encapsulate = HuksEncapsulate;
-    service->interface.Decapsulate = HuksDecapsulate;
-    service->interface.GetVersionV1_1 = HuksGetVersion;
-    service->interface.WrapKey = WrapKey;
-    service->interface.UnwrapKey = UnwrapKey;
     return &service->interface;
 }
 
