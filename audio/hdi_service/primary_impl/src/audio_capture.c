@@ -524,6 +524,9 @@ int32_t AudioCaptureSetVolume(struct IAudioCapture *handle, float volume)
         return AUDIO_ERR_INTERNAL;
     }
 
+#ifdef AUDIO_HAL_P7885
+    float volTemp = (float)volume * INTEGER_TO_DEC;
+#else
     volume = (volume == 0) ? 1 : (volume * VOLUME_CHANGE);
 
     /* change volume to db */
@@ -532,7 +535,7 @@ int32_t AudioCaptureSetVolume(struct IAudioCapture *handle, float volume)
         AUDIO_FUNC_LOGE("volTemp fail");
         return AUDIO_ERR_INTERNAL;
     }
-
+#endif
     hwCapture->captureParam.captureMode.ctlParam.volume = volTemp;
 
     int32_t ret = (*pInterfaceLibModeCapture)(
@@ -580,11 +583,13 @@ int32_t AudioCaptureGetVolume(struct IAudioCapture *handle, float *volume)
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_ERR_INTERNAL;
     }
+#ifdef AUDIO_HAL_P7885
+    *volume = (float)volumeTemp / INTEGER_TO_DEC;
+#else
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
-
     int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + DECIMAL_PART) / INTEGER_TO_DEC); // delet 0.X num
-
     *volume = (float)volumeT / INTEGER_TO_DEC;                                               // get volume (0-1)
+#endif
     AUDIO_FUNC_LOGI("Enter. volumeTemp= %{public}f, volMax= %{public}f, volMin= %{public}f, *volume= %{public}f",
                     volumeTemp, volMax, volMin, *volume);
     return AUDIO_SUCCESS;
