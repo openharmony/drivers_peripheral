@@ -534,7 +534,11 @@ int32_t StreamOperatorVdiImpl::CancelCapture(int32_t captureId)
     auto itr = requestMap_.find(captureId);
     if (itr == requestMap_.end()) {
         CAMERA_LOGE("can't cancel capture [id = %{public}d], this capture doesn't exist", captureId);
+#ifdef STILLCAPTURE_DISCONTINUOUS
+        return VDI::Camera::V1_0::NO_ERROR;
+#else
         return INVALID_ARGUMENT;
+#endif
     }
 
     RetCode rc = itr->second->Cancel();

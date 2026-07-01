@@ -116,6 +116,13 @@ bool CaptureRequest::IsContinous() const
     return isContinuous_;
 }
 
+#ifdef STILLCAPTURE_DISCONTINUOUS
+void CaptureRequest::SetContinous(bool isContinuous)
+{
+    isContinuous_ = isContinuous;
+}
+#endif
+
 int32_t CaptureRequest::GetCaptureId() const
 {
     return captureId_;

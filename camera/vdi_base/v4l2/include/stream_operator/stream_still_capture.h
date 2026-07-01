@@ -35,6 +35,9 @@ public:
     RetCode ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream) override;
     RetCode StopStream() override;
     bool IsRunning() const override;
+#ifdef STILLCAPTURE_DISCONTINUOUS
+    RetCode AddRequest(std::shared_ptr<CaptureRequest>& request) override;
+#endif
 
 private:
     std::weak_ptr<OfflineStream> offlineStream;
