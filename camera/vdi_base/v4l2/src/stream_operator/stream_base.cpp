@@ -230,6 +230,9 @@ RetCode StreamBase::AddRequest(std::shared_ptr<CaptureRequest>& request)
     CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
     request->AddOwner(shared_from_this());
 
+#ifdef STILLCAPTURE_DISCONTINUOUS
+    request->SetFirstRequest(false);
+#endif
     if (isFirstRequest) {
         RetCode rc = StartStream();
         if (rc != RC_OK) {

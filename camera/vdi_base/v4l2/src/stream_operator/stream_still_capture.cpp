@@ -166,5 +166,14 @@ bool StreamStillCapture::IsRunning() const
     return state_ == STREAM_STATE_BUSY || state_ == STREAM_STATE_OFFLINE;
 }
 
+#ifdef STILLCAPTURE_DISCONTINUOUS
+RetCode StreamStillCapture::AddRequest(std::shared_ptr<CaptureRequest>& request)
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
+    request->SetContinous(false);
+    return StreamBase::AddRequest(request);
+}
+#endif
+
 REGISTERSTREAM(StreamStillCapture, {"STILL_CAPTURE"});
 } // namespace OHOS::Camera

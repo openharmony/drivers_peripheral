@@ -50,7 +50,7 @@ RetCode OfflinePipeline::StartProcess()
             }
             HandleBuffers();
         }
-        CAMERA_LOGI("offlinepipeline thread start");
+        CAMERA_LOGI("offlinepipeline thread end");
     });
 
     if (processThread_ == nullptr) {
