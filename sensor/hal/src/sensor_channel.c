@@ -141,8 +141,9 @@ static int OnSensorEventReceived(struct HdfDevEventlistener *listener,
     (void)id;
 
     (void)OsalMutexLock(&manager->eventMutex);
-    if (!HdfSbufReadBuffer(data, (const void **)&event, &len) || event == NULL) {
-        HDF_LOGE("%{public}s: Read sensor event fail!", __func__);
+    if (!HdfSbufReadBuffer(data, (const void **)&event, &len) || event == NULL ||
+        len < sizeof(struct SensorEvents)) {
+        HDF_LOGE("%{public}s: Read sensor event fail or invalid size!", __func__);
         (void)OsalMutexUnlock(&manager->eventMutex);
         return SENSOR_FAILURE;
     }

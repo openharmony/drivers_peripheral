@@ -113,8 +113,9 @@ static int32_t GetSensorInfoFromReply(struct HdfSBuf *reply)
         (sizeof(pos->maxRange) + sizeof(pos->accuracy) + sizeof(pos->power));
 
     for (int32_t i = 0; i < count; i++) {
-        if (!HdfSbufReadBuffer(reply, (const void **)&buf, &len) || buf == NULL) {
-            HDF_LOGE("%{public}s: Sensor read reply info failed", __func__);
+        if (!HdfSbufReadBuffer(reply, (const void **)&buf, &len) || buf == NULL ||
+            len < sizeof(struct SensorBasicInformation)) {
+            HDF_LOGE("%{public}s: Sensor read reply info failed or invalid size", __func__);
             break;
         }
 
@@ -402,8 +403,9 @@ static int32_t GetSensorEvent(struct HdfSBuf *reply, struct SensorEvents *sensor
     uint32_t len = 0;
     uint32_t length = 0;
 
-    if (!HdfSbufReadBuffer(reply, (const void **)&events, &len) || sensorEvent == NULL) {
-        HDF_LOGE("%{public}s: Read sensor event fail!", __func__);
+    if (!HdfSbufReadBuffer(reply, (const void **)&events, &len) || sensorEvent == NULL ||
+        len < sizeof(struct SensorEvents)) {
+        HDF_LOGE("%{public}s: Read sensor event fail or invalid size!", __func__);
         return SENSOR_FAILURE;
     }
 
