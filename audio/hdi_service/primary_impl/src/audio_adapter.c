@@ -802,7 +802,7 @@ int32_t AudioAdapterUpdateAudioRoute(
 int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
 {
 #ifdef ALSA_LIB_MODE
-    AUDIO_FUNC_LOGD("AudioAdapterSetVoiceVolume Enter.");
+    AUDIO_FUNC_LOGI("AudioAdapterSetVoiceVolume Enter. volume= %{public}f", volume);
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {
@@ -822,7 +822,7 @@ int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume)
     }
 
     if (volume < 0 || volume > 1) {
-        AUDIO_FUNC_LOGE("AudioAdapterSetVoiceVolume volume param Is error!");
+        AUDIO_FUNC_LOGE("AudioAdapterSetVoiceVolume volume param Is error! volume= %{public}f", volume);
         return AUDIO_ERR_INVALID_PARAM;
     }
     if (hwRender->devCtlHandle == NULL) {
