@@ -22,13 +22,11 @@
 #include "v4l2_uvc.h"
 #include "usb_device_filter.h"
 
-#define UVC_LOOP_COUNT 10
-
 constexpr int NAME_START_POS = 2;
 
 namespace OHOS::Camera {
 static bool g_uvcDetectEnable = false;
-static int g_detectUvcLoopCounter = UVC_LOOP_COUNT;
+static bool g_detectUvcDevices = true;
 static std::mutex g_uvcDetectLock;
 HosV4L2UVC::HosV4L2UVC() {}
 HosV4L2UVC::~HosV4L2UVC() {}
@@ -354,8 +352,9 @@ void HosV4L2UVC::loopUvcDevice()
 
     prctl(PR_SET_NAME, "loopUvcDevice");
     while (g_uvcDetectEnable) {
-        if (g_detectUvcLoopCounter-- > 0) {
+        if (g_detectUvcDevices) {
             V4L2UvcEnmeDevices();
+            g_detectUvcDevices = false;
         }
         FD_ZERO(&fds);
         FD_SET(uDevFd, &fds);
@@ -383,7 +382,7 @@ int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)
 {
     constexpr int32_t UVC_DETECT_ENABLE = 0;
     constexpr int32_t UVC_DETECT_DISABLE = -1;
-    if (len > 0 && (strstr(buf, "video4linux") != nullptr)) {
+    if (len > 0 && (strstr(buf, "video4linux") != nullptr || strstr(buf, "bind") != nullptr)) {
         std::lock_guard<std::mutex> lock(g_uvcDetectLock);
         if (!g_uvcDetectEnable) {
             return UVC_DETECT_DISABLE;
@@ -429,7 +428,7 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
         CAMERA_LOGI("UVC:ACTION = %{public}s, SUBSYSTEM = %{public}s, DEVNAME = %{public}s\n",
             action.c_str(), subsystem.c_str(), devnode.c_str());
         if (action == "bind") {
-            g_detectUvcLoopCounter = UVC_LOOP_COUNT;
+            g_detectUvcDevices = true;
         }
     }
 }
