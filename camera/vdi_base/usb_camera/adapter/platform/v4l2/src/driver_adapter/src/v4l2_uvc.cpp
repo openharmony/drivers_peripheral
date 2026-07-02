@@ -22,10 +22,13 @@
 #include "v4l2_uvc.h"
 #include "usb_device_filter.h"
 
+#define UVC_LOOP_COUNT 10
+
 constexpr int NAME_START_POS = 2;
 
 namespace OHOS::Camera {
 static bool g_uvcDetectEnable = false;
+static int g_detectUvcLoopCounter = UVC_LOOP_COUNT;
 static std::mutex g_uvcDetectLock;
 HosV4L2UVC::HosV4L2UVC() {}
 HosV4L2UVC::~HosV4L2UVC() {}
@@ -340,6 +343,7 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
 
 void HosV4L2UVC::loopUvcDevice()
 {
+    fd_set fds;
     constexpr uint32_t delayTime = 200000;
     constexpr uint32_t fallbackPollSec = 2;
     CAMERA_LOGI("UVC:loopUVCDevice fd = %{public}d getuid() = %{public}d\n", uDevFd_, getuid());
@@ -350,8 +354,9 @@ void HosV4L2UVC::loopUvcDevice()
 
     prctl(PR_SET_NAME, "loopUvcDevice");
     while (g_uvcDetectEnable) {
-        V4L2UvcEnmeDevices();
-        fd_set fds;
+        if (g_detectUvcLoopCounter > 0) {
+            V4L2UvcEnmeDevices();
+        }
         FD_ZERO(&fds);
         FD_SET(uDevFd, &fds);
         FD_SET(eventFd, &fds);
@@ -419,6 +424,12 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
             }
             CAMERA_LOGI("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
             V4L2UvcMatchDev(GetCameraDevNameByCap(cap), devName, true);
+        } else if (subsystem == "usb") {
+            CAMERA_LOGI("UVC:ACTION = %{public}s, SUBSYSTEM = %{public}s, DEVNAME = %{public}s\n",
+                action.c_str(), subsystem.c_str(), devnode.c_str());
+            if (action == "bind") {
+                g_detectUvcLoopCounter = UVC_LOOP_COUNT;
+            }
         }
     }
 }
