@@ -19,6 +19,7 @@
             <option name="target" value="mount"/>
             <option name="shell" value="service_control stop render_service"/>
             <option name="shell" value="kill -9 `pidof composer_host`"/>
+            <option name="shell" value="sleep 1"/>
         </preparer>
         <cleaner>
             <option name="shell" value="service_control start render_service"/>
@@ -31,6 +32,7 @@
             <option name="target" value="mount"/>
             <option name="shell" value="service_control stop render_service"/>
             <option name="shell" value="kill -9 `pidof composer_host`"/>
+            <option name="shell" value="sleep 1"/>
         </preparer>
         <cleaner>
             <option name="shell" value="service_control start render_service"/>
@@ -43,6 +45,7 @@
             <option name="target" value="mount"/>
             <option name="shell" value="service_control stop render_service"/>
             <option name="shell" value="kill -9 `pidof composer_host`"/>
+            <option name="shell" value="sleep 1"/>
         </preparer>
         <cleaner>
             <option name="shell" value="service_control start render_service"/>
@@ -55,6 +58,7 @@
             <option name="target" value="mount"/>
             <option name="shell" value="service_control stop render_service"/>
             <option name="shell" value="kill -9 `pidof composer_host`"/>
+            <option name="shell" value="sleep 1"/>
         </preparer>
         <cleaner>
             <option name="shell" value="service_control start render_service"/>
