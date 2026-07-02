@@ -118,6 +118,20 @@ int32_t CodecGetCapability(AvCodecMime mime, CodecType type, uint32_t flags, Cod
 int32_t CodecCreate(const char* name, const Param *attr, int len, CODEC_HANDLETYPE *handle);
 
 /**
+ * @brief Creates a specific codec component by codec type and codec format,
+ * returns the component context through a handle.
+ *
+ * You can adjust the parameters required for creating a component based on service requirements.
+ *
+ * @param type Indicates the codec type, for example, <b>VIDEO_DECODER</b>.
+ * @param mime Indicates the codec format, for example, <b>MEDIA_MIMETYPE_VIDEO_AVC</b>.
+ * @param handle Indicates the pointer to the codec handle returned.
+ * @return Returns <b>0</b> if the codec component is created and the handle is available;
+ * returns a non-zero value otherwise.
+ */
+int32_t CodecCreateByType(CodecType type, AvCodecMime mime, CODEC_HANDLETYPE *handle);
+
+/**
  * @brief Destroys a codec component.
  *
  * @param handle Indicates the handle of the codec component.
