@@ -354,7 +354,7 @@ void HosV4L2UVC::loopUvcDevice()
 
     prctl(PR_SET_NAME, "loopUvcDevice");
     while (g_uvcDetectEnable) {
-        if (g_detectUvcLoopCounter > 0) {
+        if (g_detectUvcLoopCounter-- > 0) {
             V4L2UvcEnmeDevices();
         }
         FD_ZERO(&fds);
