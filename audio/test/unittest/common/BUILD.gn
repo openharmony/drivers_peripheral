@@ -52,12 +52,12 @@ ohos_unittest("audio_ut_common_test") {
     external_deps += [ "c_utils:utils" ]
   }
 
+  defines = []
   if (drivers_peripheral_audio_feature_alsa_lib) {
     cflags_cc = [ "-DALSA_SUPPORT_FEATURE" ]
     defines += [ "ALSA_SUPPORT" ]
   }
 
-  defines = []
   if (drivers_peripheral_audio_feature_community) {
     defines += [ "AUDIO_FEATURE_COMMUNITY" ]
   }
