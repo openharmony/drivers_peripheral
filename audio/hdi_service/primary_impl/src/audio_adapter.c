@@ -695,13 +695,13 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
         AUDIO_FUNC_LOGE("hwRender is NULL!");
         return AUDIO_ERR_INTERNAL;
     }
-    pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         ret = render->Stop((AudioHandle)render);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("render Stop failed");
         }
     }
+    pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
 
     InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
