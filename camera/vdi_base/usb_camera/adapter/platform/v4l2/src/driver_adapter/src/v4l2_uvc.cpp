@@ -26,6 +26,7 @@ constexpr int NAME_START_POS = 2;
 
 namespace OHOS::Camera {
 static bool g_uvcDetectEnable = false;
+static bool g_detectUvcDevices = true;
 static std::mutex g_uvcDetectLock;
 HosV4L2UVC::HosV4L2UVC() {}
 HosV4L2UVC::~HosV4L2UVC() {}
@@ -340,6 +341,7 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
 
 void HosV4L2UVC::loopUvcDevice()
 {
+    fd_set fds;
     constexpr uint32_t delayTime = 200000;
     constexpr uint32_t fallbackPollSec = 2;
     CAMERA_LOGI("UVC:loopUVCDevice fd = %{public}d getuid() = %{public}d\n", uDevFd_, getuid());
@@ -350,8 +352,10 @@ void HosV4L2UVC::loopUvcDevice()
 
     prctl(PR_SET_NAME, "loopUvcDevice");
     while (g_uvcDetectEnable) {
-        V4L2UvcEnmeDevices();
-        fd_set fds;
+        if (g_detectUvcDevices) {
+            V4L2UvcEnmeDevices();
+            g_detectUvcDevices = false;
+        }
         FD_ZERO(&fds);
         FD_SET(uDevFd, &fds);
         FD_SET(eventFd, &fds);
@@ -378,7 +382,7 @@ int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)
 {
     constexpr int32_t UVC_DETECT_ENABLE = 0;
     constexpr int32_t UVC_DETECT_DISABLE = -1;
-    if (len > 0 && (strstr(buf, "video4linux") != nullptr)) {
+    if (len > 0 && (strstr(buf, "video4linux") != nullptr || strstr(buf, "bind") != nullptr)) {
         std::lock_guard<std::mutex> lock(g_uvcDetectLock);
         if (!g_uvcDetectEnable) {
             return UVC_DETECT_DISABLE;
@@ -419,6 +423,12 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
             }
             CAMERA_LOGI("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
             V4L2UvcMatchDev(GetCameraDevNameByCap(cap), devName, true);
+        }
+    } else if (subsystem == "usb") {
+        CAMERA_LOGI("UVC:ACTION = %{public}s, SUBSYSTEM = %{public}s, DEVNAME = %{public}s\n",
+            action.c_str(), subsystem.c_str(), devnode.c_str());
+        if (action == "bind") {
+            g_detectUvcDevices = true;
         }
     }
 }
