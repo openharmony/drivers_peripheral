@@ -426,11 +426,10 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
             V4L2UvcMatchDev(GetCameraDevNameByCap(cap), devName, true);
         }
     } else if (subsystem == "usb") {
-            CAMERA_LOGI("UVC:ACTION = %{public}s, SUBSYSTEM = %{public}s, DEVNAME = %{public}s\n",
-                action.c_str(), subsystem.c_str(), devnode.c_str());
-            if (action == "bind") {
-                g_detectUvcLoopCounter = UVC_LOOP_COUNT;
-            }
+        CAMERA_LOGI("UVC:ACTION = %{public}s, SUBSYSTEM = %{public}s, DEVNAME = %{public}s\n",
+            action.c_str(), subsystem.c_str(), devnode.c_str());
+        if (action == "bind") {
+            g_detectUvcLoopCounter = UVC_LOOP_COUNT;
         }
     }
 }
