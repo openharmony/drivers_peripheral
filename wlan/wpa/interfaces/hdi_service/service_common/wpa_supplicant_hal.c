@@ -1357,7 +1357,7 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
     int lenValue = 2;
     int lastLength = 3;
     int remainingLength = length - start;
-    int infoElemsSize = 0;
+    unsigned int infoElemsSize = 0;
     struct NeedParseIe iesNeedParse = {NULL};
     ScanInfoElem* infoElemsTemp = (ScanInfoElem *)calloc(MAX_INFO_ELEMS_SIZE, sizeof(ScanInfoElem));
     if (infoElemsTemp == NULL) {

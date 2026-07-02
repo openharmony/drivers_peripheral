@@ -1037,7 +1037,7 @@ static bool IsAllZeroPin(const struct HdiP2pConnectInfo *info)
     if (info == NULL || info->pin == NULL || info->pinLen != (P2P_PIN_CODE_LEN + 1)) {
         return false;
     }
-    for (int i = 0; i < info->pinLen; i++) {
+    for (uint32_t i = 0; i < info->pinLen; i++) {
         if (info->pin[i] != 0) {
             return false;
         }
