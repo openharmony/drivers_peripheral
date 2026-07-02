@@ -424,7 +424,8 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
             }
             CAMERA_LOGI("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
             V4L2UvcMatchDev(GetCameraDevNameByCap(cap), devName, true);
-        } else if (subsystem == "usb") {
+        }
+    } else if (subsystem == "usb") {
             CAMERA_LOGI("UVC:ACTION = %{public}s, SUBSYSTEM = %{public}s, DEVNAME = %{public}s\n",
                 action.c_str(), subsystem.c_str(), devnode.c_str());
             if (action == "bind") {
