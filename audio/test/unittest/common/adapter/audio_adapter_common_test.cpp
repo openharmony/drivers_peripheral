@@ -1497,7 +1497,9 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetMicMuteIsvalid001, TestSize.Le
 {
     bool mute = false;
     int32_t ret = adapter_->SetMicMute(adapter_, mute);
-#ifdef AUDIO_FEATURE_COMMUNITY
+#ifdef ALSA_SUPPORT
+    EXPECT_EQ(ret, HDF_SUCCESS);
+#elif defined(AUDIO_FEATURE_COMMUNITY)
     EXPECT_NE(ret, HDF_SUCCESS);
 #else
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
@@ -1532,7 +1534,9 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetVoiceVolumeIsvalid001, TestSiz
 {
     float volume = 0;
     int32_t ret = adapter_->SetVoiceVolume(adapter_, volume);
-#ifdef AUDIO_FEATURE_COMMUNITY
+#ifdef ALSA_SUPPORT
+    EXPECT_EQ(ret, HDF_SUCCESS);
+#elif defined(AUDIO_FEATURE_COMMUNITY)
     EXPECT_NE(ret, HDF_SUCCESS);
 #else
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
