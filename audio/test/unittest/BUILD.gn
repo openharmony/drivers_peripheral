@@ -21,7 +21,7 @@ if (defined(ohos_lite)) {
 group("audiotest") {
   if (!defined(ohos_lite)) {
     testonly = true
-  }1
+  }
   deps = [ "common:hdi_base_common" ]
 
   # hal ut
