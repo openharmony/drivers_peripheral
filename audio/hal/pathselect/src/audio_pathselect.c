@@ -25,7 +25,6 @@
 #else
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 #endif
-
 #define SPEAKER                   "Speaker"
 #define HEADPHONES                "Headphones"
 #define MIC                       "Mic"
@@ -100,9 +99,16 @@ int32_t AudioPathSelGetConfToJsonObj(void)
 
 static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
 {
+    AUDIO_FUNC_LOGE("AudioPathSelGetDeviceType pin: %{public}x", pin);
+#ifdef AUDIO_HAL_P7885
+    if (pin < PIN_NONE || pin > PIN_IN_BLUETOOTH_SCO_HEADSET) {
+        return NULL;
+    }
+#else
     if (pin < PIN_OUT_SPEAKER || pin > PIN_IN_BLUETOOTH_SCO_HEADSET) {
         return NULL;
     }
+#endif
     switch (pin) {
         case PIN_OUT_SPEAKER:
         case PIN_OUT_BLUETOOTH_A2DP:
@@ -120,6 +126,11 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
         case PIN_OUT_HEADSET:
         case PIN_OUT_HEADPHONE:
             return HEADPHONES;
+#ifdef AUDIO_HAL_P7885
+        case PIN_NONE:
+        case PIN_OUT_LINEOUT:
+            return SPEAKER;
+#endif
         case PIN_OUT_DAUDIO_DEFAULT:
         default:
             AUDIO_FUNC_LOGE("UseCase not support!");
@@ -404,7 +415,11 @@ static int32_t SetMatchRenderDefaultDevicePath(struct AudioHwRenderParam *render
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
+#ifdef UDIO_HAL_P7885
+    for (uint32_t i = PIN_NONE; i <= PIN_OUT_EARPIECE; i = i << 1) {
+#else
     for (uint32_t i = PIN_OUT_SPEAKER; i <= PIN_OUT_EARPIECE; i = i << 1) {
+#endif
         const char *deviceType = AudioPathSelGetDeviceType(i);
         if (deviceType == NULL) {
             AUDIO_FUNC_LOGE("DeviceType not found.");
@@ -453,7 +468,7 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
 
     uint32_t tpins = pins & OUTPUT_MASK;
     if ((pins >> OUTPUT_OFFSET) != 0) {
-        AUDIO_FUNC_LOGE("pins: %d, error!\n", pins);
+        AUDIO_FUNC_LOGE("pins: %{public}x, %{public}x error!", pins, (pins >> OUTPUT_OFFSET) );
         return HDF_FAILURE;
     }
 

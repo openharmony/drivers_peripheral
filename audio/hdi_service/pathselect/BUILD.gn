@@ -29,6 +29,9 @@ ohos_shared_library("audio_path_select") {
   ]
 
   defines = [ "IDL_MODE" ]
+  if (drivers_peripheral_audio_feature_p7885) {
+    defines += [ "AUDIO_HAL_P7885" ]
+  }
   if (enable_audio_hal_hdf_log) {
     defines += [ "AUDIO_HDF_LOG" ]
   }
