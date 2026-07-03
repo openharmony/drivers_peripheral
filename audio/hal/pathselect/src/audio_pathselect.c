@@ -128,7 +128,10 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
             return HEADPHONES;
 #ifdef AUDIO_HAL_P7885
         case PIN_NONE:
+        case PIN_OUT_HDMI:
         case PIN_OUT_LINEOUT:
+        case PIN_OUT_USB:
+        case PIN_OUT_USB_EXT:
             return SPEAKER;
 #endif
         case PIN_OUT_DAUDIO_DEFAULT:
