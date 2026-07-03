@@ -325,7 +325,11 @@ int32_t UsbDdkService::GetDeviceDescriptor(uint64_t deviceId, UsbDeviceDescripto
         HDF_LOGE("%{public}s get device descriptor failed", __func__);
         return HDF_FAILURE;
     }
-    ret = memcpy_s(&desc, sizeof(desc), descriptor.data(), sizeof(desc));
+    if (descriptor.size() > sizeof(desc)) {
+        HDF_LOGE("%{public}s invalid device descriptor length %{public}zu", __func__, descriptor.size());
+        return HDF_FAILURE;
+    }
+    ret = memcpy_s(&desc, sizeof(desc), descriptor.data(), descriptor.size());
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memcpy_s failed", __func__);
         return HDF_FAILURE;
