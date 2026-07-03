@@ -850,6 +850,7 @@ static int32_t CaptureSetPauseStateImpl(struct AlsaCapture *captureIns, bool pau
     int32_t ret = HDF_SUCCESS;
     int pause = pauseFlag ? AUDIO_ALSALIB_IOCTRL_PAUSE : AUDIO_ALSALIB_IOCTRL_RESUME;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)captureIns;
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns->pcmHandle);
 
     if (cardIns->canPause) {
         ret = snd_pcm_pause(cardIns->pcmHandle, pause);
