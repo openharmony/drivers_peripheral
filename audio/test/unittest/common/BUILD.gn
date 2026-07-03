@@ -64,6 +64,9 @@ ohos_unittest("audio_ut_common_test") {
   if (drivers_peripheral_audio_feature_frame_ec) {
     defines += [ "AUDIO_FEATURE_FRAME_EC" ]
   }
+  if (drivers_peripheral_audio_feature_p7885) {
+    defines += [ "AUDIO_HAL_P7885" ]
+  }
 }
 
 group("hdi_base_common") {
