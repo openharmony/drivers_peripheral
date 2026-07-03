@@ -418,7 +418,7 @@ static int32_t SetMatchRenderDefaultDevicePath(struct AudioHwRenderParam *render
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-#ifdef UDIO_HAL_P7885
+#ifdef AUDIO_HAL_P7885
     for (uint32_t i = PIN_NONE; i <= PIN_OUT_EARPIECE; i = i << 1) {
 #else
     for (uint32_t i = PIN_OUT_SPEAKER; i <= PIN_OUT_EARPIECE; i = i << 1) {
