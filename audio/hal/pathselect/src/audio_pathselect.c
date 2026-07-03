@@ -99,7 +99,7 @@ int32_t AudioPathSelGetConfToJsonObj(void)
 
 static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
 {
-    AUDIO_FUNC_LOGE("AudioPathSelGetDeviceType pin: %{public}x", pin);
+    AUDIO_FUNC_LOGI("AudioPathSelGetDeviceType pin: %{public}x", pin);
 #ifdef AUDIO_HAL_P7885
     if (pin < PIN_NONE || pin > PIN_IN_BLUETOOTH_SCO_HEADSET) {
         return NULL;
