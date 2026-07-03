@@ -575,7 +575,7 @@ int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const st
             }
             break;
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_CAPABILITY:
-            value = audioExtraCap_;
+            value = capability_;
             break;
         default:
             DHLOGE("Parameter is invalid.");
@@ -733,7 +733,7 @@ int32_t AudioAdapterInterfaceImpl::HandleTokenIdFromCapability(const std::string
             result += input[i];
         }
     }
-    audioExtraCap_ = result;
+    capability_ = result;
     cJSON *root = cJSON_Parse(result.c_str());
     if (root == nullptr) {
         DHLOGE("Failed to parse caps JSON.");
