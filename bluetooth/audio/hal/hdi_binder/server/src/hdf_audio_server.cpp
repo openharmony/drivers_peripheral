@@ -135,7 +135,7 @@ static int32_t HdiServiceLoadAdapter(const struct HdfDeviceIoClient *client,
         HDF_LOGE("%{public}s: adapter need Load!", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    AudioPortDirection port = (AudioPortDirection)tempDir;
+    AudioPortDirection port = static_cast<AudioPortDirection>(tempDir);
     struct AudioManager *manager = g_serverManager;
     if (adapterName == NULL || manager == NULL || g_descs == NULL) {
         HDF_LOGE("%{public}s: Point is NULL!", __func__);
@@ -241,7 +241,7 @@ static int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *clien
     if (!HdfSbufReadUint32(data, &tempDir)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    port.dir = (AudioPortDirection)tempDir;
+    port.dir = static_cast<AudioPortDirection>(tempDir);
     if (!HdfSbufReadUint32(data, &port.portId)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -284,7 +284,7 @@ static int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *clie
     if (!HdfSbufReadUint32(data, &tempDir)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    port.dir = (AudioPortDirection)tempDir;
+    port.dir = static_cast<AudioPortDirection>(tempDir);
     HDF_LOGE("port.dir = %{public}d", port.dir);
     if (!HdfSbufReadUint32(data, &port.portId)) {
         return AUDIO_HAL_ERR_INTERNAL;
@@ -298,7 +298,7 @@ static int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *clie
     if (!HdfSbufReadUint32(data, &tempMode)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    mode = (AudioPortPassthroughMode)tempMode;
+    mode = static_cast<AudioPortPassthroughMode>(tempMode);
     HDF_LOGE("%{public}s: ready in,mode = %{public}d", __func__, mode);
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
         HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
@@ -330,7 +330,7 @@ static int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *clie
     if (!HdfSbufReadUint32(data, &tempDir)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    port.dir = (AudioPortDirection)tempDir;
+    port.dir = static_cast<AudioPortDirection>(tempDir);
     if (!HdfSbufReadUint32(data, &port.portId)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -351,7 +351,7 @@ static int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *clie
         HDF_LOGE("%{public}s: GetPassthroughMode ret failed", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t tempMode = (uint32_t)mode;
+    uint32_t tempMode = static_cast<uint32_t>(mode);
     if (!HdfSbufWriteUint32(reply, tempMode)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -360,7 +360,7 @@ static int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *clie
 
 /*****************************end*************************/
 struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
-    {AUDIO_HDI_MGR_GET_FUNCS, (AudioAllfunc)HdiServiceGetFuncs},
+    {AUDIO_HDI_MGR_GET_FUNCS, reinterpret_cast<AudioAllfunc>(HdiServiceGetFuncs)},
     {AUDIO_HDI_MGR_GET_ALL_ADAPTER, HdiServiceGetAllAdapter},
     {AUDIO_HDI_MGR_LOAD_ADAPTER, HdiServiceLoadAdapter},
     {AUDIO_HDI_MGR_UNLOAD_ADAPTER, HdiServiceUnloadAdapter},

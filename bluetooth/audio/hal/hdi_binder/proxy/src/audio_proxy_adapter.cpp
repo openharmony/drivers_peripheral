@@ -25,11 +25,11 @@ int32_t AudioProxyCommonInitAttrs(struct HdfSBuf *data, const struct AudioSample
         HDF_LOGE("data == NULL || attrs == NULL");
         return HDF_FAILURE;
     }
-    uint32_t tempAtrr = (uint32_t)attrs->interleaved;
+    uint32_t tempAtrr = static_cast<uint32_t>(attrs->interleaved);
     if (!HdfSbufWriteUint32(data, tempAtrr)) {
         return HDF_FAILURE;
     }
-    tempAtrr = (uint32_t)attrs->type;
+    tempAtrr = static_cast<uint32_t>(attrs->type);
     if (!HdfSbufWriteUint32(data, tempAtrr)) {
         return HDF_FAILURE;
     }
@@ -50,11 +50,11 @@ int32_t AudioProxyCommonInitAttrs(struct HdfSBuf *data, const struct AudioSample
     if (!HdfSbufWriteUint32(data, attrs->silenceThreshold)) {
         return HDF_FAILURE;
     }
-    tempAtrr = (uint32_t)attrs->isBigEndian;
+    tempAtrr = static_cast<uint32_t>(attrs->isBigEndian);
     if (!HdfSbufWriteUint32(data, tempAtrr)) {
         return HDF_FAILURE;
     }
-    tempAtrr = (uint32_t)attrs->isSignedData;
+    tempAtrr = static_cast<uint32_t>(attrs->isSignedData);
     if (!HdfSbufWriteUint32(data, tempAtrr)) {
         return HDF_FAILURE;
     }
@@ -80,7 +80,7 @@ int32_t AudioProxyCommonInitCreateData(struct HdfSBuf *data, const struct AudioH
     if (!HdfSbufWriteInt32(data, pid)) {
         return HDF_FAILURE;
     }
-    uint32_t tempAtrr = (uint32_t)attrs->format;
+    uint32_t tempAtrr = static_cast<uint32_t>(attrs->format);
     if (!HdfSbufWriteUint32(data, tempAtrr)) {
         return HDF_FAILURE;
     }
@@ -96,7 +96,7 @@ int32_t AudioProxyCommonInitCreateData(struct HdfSBuf *data, const struct AudioH
     if (!HdfSbufWriteUint32(data, desc->portId)) {
         return HDF_FAILURE;
     }
-    uint32_t tempDesc = (uint32_t)desc->pins;
+    uint32_t tempDesc = static_cast<uint32_t>(desc->pins);
     if (!HdfSbufWriteUint32(data, tempDesc)) {
         return HDF_FAILURE;
     }
@@ -535,7 +535,7 @@ int32_t AudioProxyAdapterWritePortCapability(const struct AudioHwAdapter *hwAdap
     if (!HdfSbufWriteString(data, adapterName)) {
         return HDF_FAILURE;
     }
-    uint32_t tempDir = (uint32_t)port->dir;
+    uint32_t tempDir = static_cast<uint32_t>(port->dir);
     if (!HdfSbufWriteUint32(data, tempDir)) {
         return HDF_FAILURE;
     }
@@ -652,7 +652,7 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t tempMode = (uint32_t)mode;
+    uint32_t tempMode = static_cast<uint32_t>(mode);
     if (!HdfSbufWriteUint32(data, tempMode)) {
         HDF_LOGE("Mode Write Fail");
         AudioProxyBufReplyRecycle(data, reply);
@@ -711,7 +711,7 @@ int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    *mode = (AudioPortPassthroughMode)tempMode;
+    *mode = static_cast<AudioPortPassthroughMode>(tempMode);
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
 }

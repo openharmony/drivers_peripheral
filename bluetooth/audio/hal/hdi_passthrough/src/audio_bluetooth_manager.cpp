@@ -208,13 +208,13 @@ void DeRegisterObserver()
 }
 
 #ifdef A2DP_HDI_SERVICE
-#define GET_SYM_ERRPR_RET(handle, funcType, funcPtr, funcStr)       \
-    do {                                                            \
-        funcPtr = (funcType)dlsym(handle, funcStr);                 \
-        if (funcPtr == nullptr) {                                   \
-            HDF_LOGE("%{public}s: lib so func not found", funcStr); \
-            return false;                                           \
-        }                                                           \
+#define GET_SYM_ERRPR_RET(handle, funcType, funcPtr, funcStr)         \
+    do {                                                              \
+        funcPtr = reinterpret_cast<funcType>(dlsym(handle, funcStr)); \
+        if (funcPtr == nullptr) {                                     \
+            HDF_LOGE("%{public}s: lib so func not found", funcStr);   \
+            return false;                                             \
+        }                                                             \
     } while (0)
 
 static bool InitHearingAidDevice()

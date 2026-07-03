@@ -240,7 +240,8 @@ int32_t HearingAidRenderFrame(struct AudioRender *render, const void *frame,
         HDF_LOGE("Out of FRAME_DATA size!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t ret = memcpy_s(hwRender->renderParam.frameRenderMode.buffer, FRAME_DATA, frame, (uint32_t)requestBytes);
+    int32_t ret = memcpy_s(hwRender->renderParam.frameRenderMode.buffer, FRAME_DATA, frame,
+        static_cast<uint32_t>(requestBytes));
     if (ret != EOK) {
         HDF_LOGE("memcpy_s fail");
         return AUDIO_HAL_ERR_INTERNAL;

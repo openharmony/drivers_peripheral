@@ -32,7 +32,7 @@ int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAttribute
         HDF_LOGE("%{public}s: read tempRenderPara fail", __func__);
         return HDF_FAILURE;
     }
-    attrs->type = (AudioCategory)tempRenderPara;
+    attrs->type = static_cast<AudioCategory>(tempRenderPara);
     if (!HdfSbufReadUint32(data, &attrs->period)) {
         HDF_LOGE("%{public}s: read period fail", __func__);
         return HDF_FAILURE;
@@ -57,7 +57,7 @@ int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAttribute
         HDF_LOGE("%{public}s: read bool isBigEndian fail", __func__);
         return HDF_FAILURE;
     }
-    attrs->isBigEndian = (bool)tempRenderPara;
+    attrs->isBigEndian = static_cast<bool>(tempRenderPara);
     return HDF_SUCCESS;
 }
 
@@ -72,7 +72,7 @@ int32_t GetInitRenderPara(struct HdfSBuf *data, struct AudioDeviceDescriptor *de
         HDF_LOGE("%{public}s: read attrs format fail", __func__);
         return HDF_FAILURE;
     }
-    attrs->format = (AudioFormat)tempRenderPara;
+    attrs->format = static_cast<AudioFormat>(tempRenderPara);
     if (!HdfSbufReadUint32(data, &attrs->channelCount)) {
         HDF_LOGE("%{public}s: read channelCount fail", __func__);
         return HDF_FAILURE;
@@ -85,7 +85,7 @@ int32_t GetInitRenderPara(struct HdfSBuf *data, struct AudioDeviceDescriptor *de
         HDF_LOGE("%{public}s: read attrs interleaved fail", __func__);
         return HDF_FAILURE;
     }
-    attrs->interleaved = (bool)tempRenderPara;
+    attrs->interleaved = static_cast<bool>(tempRenderPara);
     if (GetInitRenderParaAttrs(data, attrs) < 0) {
         return HDF_FAILURE;
     }
@@ -93,7 +93,7 @@ int32_t GetInitRenderPara(struct HdfSBuf *data, struct AudioDeviceDescriptor *de
         HDF_LOGE("%{public}s: read attrs isSignedData fail", __func__);
         return HDF_FAILURE;
     }
-    attrs->isSignedData = (bool)tempRenderPara;
+    attrs->isSignedData = static_cast<bool>(tempRenderPara);
     if (!HdfSbufReadUint32(data, &devDesc->portId)) {
         HDF_LOGE("%{public}s: read portId fail", __func__);
         return HDF_FAILURE;
@@ -102,7 +102,7 @@ int32_t GetInitRenderPara(struct HdfSBuf *data, struct AudioDeviceDescriptor *de
         HDF_LOGE("%{public}s: read tempRenderPara fail", __func__);
         return HDF_FAILURE;
     }
-    devDesc->pins = (AudioPortPin)tempRenderPara;
+    devDesc->pins = static_cast<AudioPortPin>(tempRenderPara);
     devDesc->desc = NULL;
     return HDF_SUCCESS;
 }
@@ -218,7 +218,7 @@ int32_t HdiServiceRenderStop(const struct HdfDeviceIoClient *client, struct HdfS
     if (ret < 0) {
         return ret;
     }
-    return render->control.Stop((AudioHandle)render);
+    return render->control.Stop(static_cast<AudioHandle>(render));
 }
 
 int32_t HdiServiceRenderPause(const struct HdfDeviceIoClient *client,
@@ -233,7 +233,7 @@ int32_t HdiServiceRenderPause(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    return render->control.Pause((AudioHandle)render);
+    return render->control.Pause(static_cast<AudioHandle>(render));
 }
 
 int32_t HdiServiceRenderResume(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
@@ -246,7 +246,7 @@ int32_t HdiServiceRenderResume(const struct HdfDeviceIoClient *client, struct Hd
     if (ret < 0) {
         return ret;
     }
-    return render->control.Resume((AudioHandle)render);
+    return render->control.Resume(static_cast<AudioHandle>(render));
 }
 
 int32_t HdiServiceRenderFlush(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
@@ -260,7 +260,7 @@ int32_t HdiServiceRenderFlush(const struct HdfDeviceIoClient *client, struct Hdf
     if (ret < 0) {
         return ret;
     }
-    return render->control.Flush((AudioHandle)render);
+    return render->control.Flush(static_cast<AudioHandle>(render));
 }
 
 int32_t HdiServiceRenderGetFrameSize(const struct HdfDeviceIoClient *client,
@@ -275,7 +275,7 @@ int32_t HdiServiceRenderGetFrameSize(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    if (render->attr.GetFrameSize((AudioHandle)render, &size)) {
+    if (render->attr.GetFrameSize(static_cast<AudioHandle>(render), &size)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (!HdfSbufWriteUint64(reply, size)) {
@@ -296,7 +296,7 @@ int32_t HdiServiceRenderGetFrameCount(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    if (render->attr.GetFrameCount((AudioHandle)render, &count)) {
+    if (render->attr.GetFrameCount(static_cast<AudioHandle>(render), &count)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (!HdfSbufWriteUint64(reply, count)) {
@@ -321,7 +321,7 @@ int32_t HdiServiceRenderSetSampleAttr(const struct HdfDeviceIoClient *client,
     if (ReadAudioSapmleAttrbutes(data, &attrs) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    return render->attr.SetSampleAttributes((AudioHandle)render, &attrs);
+    return render->attr.SetSampleAttributes(static_cast<AudioHandle>(render), &attrs);
 }
 
 int32_t HdiServiceRenderGetSampleAttr(const struct HdfDeviceIoClient *client,
@@ -336,7 +336,7 @@ int32_t HdiServiceRenderGetSampleAttr(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    ret = render->attr.GetSampleAttributes((AudioHandle)render, &attrs);
+    ret = render->attr.GetSampleAttributes(static_cast<AudioHandle>(render), &attrs);
     if (ret < 0) {
         return ret;
     }
@@ -358,7 +358,7 @@ int32_t HdiServiceRenderGetCurChannelId(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    ret = render->attr.GetCurrentChannelId((AudioHandle)render, &channelId);
+    ret = render->attr.GetCurrentChannelId(static_cast<AudioHandle>(render), &channelId);
     if (ret < 0) {
         return ret;
     }
@@ -388,12 +388,12 @@ int32_t HdiServiceRenderCheckSceneCapability(const struct HdfDeviceIoClient *cli
     if (!HdfSbufReadUint32(data, &temporaryPins)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    scene.desc.pins = (AudioPortPin)temporaryPins;
-    ret = render->scene.CheckSceneCapability((AudioHandle)render, &scene, &supported);
+    scene.desc.pins = static_cast<AudioPortPin>(temporaryPins);
+    ret = render->scene.CheckSceneCapability(static_cast<AudioHandle>(render), &scene, &supported);
     if (ret < 0) {
         return ret;
     }
-    uint32_t tempSupported = (uint32_t)supported;
+    uint32_t tempSupported = static_cast<uint32_t>(supported);
     if (!HdfSbufWriteUint32(reply, tempSupported)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -421,8 +421,8 @@ int32_t HdiServiceRenderSelectScene(const struct HdfDeviceIoClient *client,
         HDF_LOGI("%{public}s: Read tempPins Fail", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    scene.desc.pins = (AudioPortPin)tempPins;
-    return render->scene.SelectScene((AudioHandle)render, &scene);
+    scene.desc.pins = static_cast<AudioPortPin>(tempPins);
+    return render->scene.SelectScene(static_cast<AudioHandle>(render), &scene);
 }
 
 int32_t HdiServiceRenderGetMute(const struct HdfDeviceIoClient *client,
@@ -438,11 +438,11 @@ int32_t HdiServiceRenderGetMute(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    ret = render->volume.GetMute((AudioHandle)render, &mute);
+    ret = render->volume.GetMute(static_cast<AudioHandle>(render), &mute);
     if (ret < 0) {
         return ret;
     }
-    uint32_t tempMute = (uint32_t)mute;
+    uint32_t tempMute = static_cast<uint32_t>(mute);
     if (!HdfSbufWriteUint32(reply, tempMute)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -465,8 +465,8 @@ int32_t HdiServiceRenderSetMute(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint32(data, &tempMute)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    mute = (bool)tempMute;
-    return render->volume.SetMute((AudioHandle)render, mute);
+    mute = static_cast<bool>(tempMute);
+    return render->volume.SetMute(static_cast<AudioHandle>(render), mute);
 }
 
 int32_t HdiServiceRenderSetVolume(const struct HdfDeviceIoClient *client,
@@ -484,8 +484,8 @@ int32_t HdiServiceRenderSetVolume(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint32(data, &volume)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    float setVolume = (float)volume / VOLUME_CHANGE;
-    return render->volume.SetVolume((AudioHandle)render, setVolume);
+    float setVolume = static_cast<float>(volume) / VOLUME_CHANGE;
+    return render->volume.SetVolume(static_cast<AudioHandle>(render), setVolume);
 }
 
 int32_t HdiServiceRenderGetVolume(const struct HdfDeviceIoClient *client,
@@ -500,11 +500,11 @@ int32_t HdiServiceRenderGetVolume(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    ret = render->volume.GetVolume((AudioHandle)render, &volume);
+    ret = render->volume.GetVolume(static_cast<AudioHandle>(render), &volume);
     if (ret < 0) {
         return ret;
     }
-    uint32_t tempVolume = (uint32_t)(volume * VOLUME_CHANGE);
+    uint32_t tempVolume = static_cast<uint32_t>(volume * VOLUME_CHANGE);
     if (!HdfSbufWriteUint32(reply, tempVolume)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -523,15 +523,15 @@ int32_t HdiServiceRenderGetGainThreshold(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
+    ret = render->volume.GetGainThreshold(static_cast<AudioHandle>(render), &min, &max);
     if (ret < 0) {
         return ret;
     }
-    uint32_t temporaryMin = (uint32_t)min;
+    uint32_t temporaryMin = static_cast<uint32_t>(min);
     if (!HdfSbufWriteUint32(reply, temporaryMin)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t temporaryMax = (uint32_t)max;
+    uint32_t temporaryMax = static_cast<uint32_t>(max);
     if (!HdfSbufWriteUint32(reply, temporaryMax)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -550,11 +550,11 @@ int32_t HdiServiceRenderGetGain(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    ret = render->volume.GetGain((AudioHandle)render, &gain);
+    ret = render->volume.GetGain(static_cast<AudioHandle>(render), &gain);
     if (ret < 0) {
         return ret;
     }
-    uint32_t tempGain = (uint32_t)gain;
+    uint32_t tempGain = static_cast<uint32_t>(gain);
     if (!HdfSbufWriteUint32(reply, tempGain)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -576,7 +576,7 @@ int32_t HdiServiceRenderSetGain(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint32(data, &tempGain)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    return render->volume.SetGain((AudioHandle)render, (float)tempGain);
+    return render->volume.SetGain(static_cast<AudioHandle>(render), static_cast<float>(tempGain));
 }
 
 int32_t HdiServiceRenderGetLatency(const struct HdfDeviceIoClient *client,
@@ -683,7 +683,7 @@ int32_t HdiServiceRenderGetSpeed(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    uint64_t tempSpeed = (uint64_t)speed;
+    uint64_t tempSpeed = static_cast<uint64_t>(speed);
     if (!HdfSbufWriteUint64(reply, tempSpeed)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -705,7 +705,7 @@ int32_t HdiServiceRenderSetSpeed(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint64(data, &speed)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    return render->SetRenderSpeed(render, (float)speed);
+    return render->SetRenderSpeed(render, static_cast<float>(speed));
 }
 
 int32_t HdiServiceRenderSetChannelMode(const struct HdfDeviceIoClient *client,
@@ -724,7 +724,7 @@ int32_t HdiServiceRenderSetChannelMode(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint32(data, &tempMode)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    mode = (AudioChannelMode)tempMode;
+    mode = static_cast<AudioChannelMode>(tempMode);
     return render->SetChannelMode(render, mode);
 }
 
@@ -745,7 +745,7 @@ int32_t HdiServiceRenderGetChannelMode(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    uint32_t tempMode = (uint32_t)mode;
+    uint32_t tempMode = static_cast<uint32_t>(mode);
     if (!HdfSbufWriteUint32(reply, tempMode)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -770,7 +770,7 @@ int32_t HdiServiceRenderSetExtraParams(const struct HdfDeviceIoClient *client,
         HDF_LOGE("%{public}s: keyValueList Is NULL", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    return render->attr.SetExtraParams((AudioHandle)render, keyValueList);
+    return render->attr.SetExtraParams(static_cast<AudioHandle>(render), keyValueList);
 }
 
 int32_t HdiServiceRenderGetExtraParams(const struct HdfDeviceIoClient *client,
@@ -793,7 +793,7 @@ int32_t HdiServiceRenderGetExtraParams(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     char keyValueList[STR_MAX] = { 0 };
-    ret = render->attr.GetExtraParams((AudioHandle)render, keyValueList, listLenth);
+    ret = render->attr.GetExtraParams(static_cast<AudioHandle>(render), keyValueList, listLenth);
     if (ret < 0) {
         return ret;
     }
@@ -824,7 +824,7 @@ int32_t HdiServiceRenderReqMmapBuffer(const struct HdfDeviceIoClient *client,
     if (HdiServiceReqMmapBuffer(&desc, data) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    ret = render->attr.ReqMmapBuffer((AudioHandle)render, reqSize, &desc);
+    ret = render->attr.ReqMmapBuffer(static_cast<AudioHandle>(render), reqSize, &desc);
     if (ret < 0) {
         HDF_LOGE("reqmmapbuffer failed");
         return ret;
@@ -869,7 +869,7 @@ int32_t HdiServiceRenderGetMmapPosition(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    ret = render->attr.GetMmapPosition((AudioHandle)render, &frames, &time);
+    ret = render->attr.GetMmapPosition(static_cast<AudioHandle>(render), &frames, &time);
     if (ret < 0) {
         return ret;
     }
@@ -913,7 +913,7 @@ int32_t HdiServiceRenderDevDump(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadInt32(data, &fd)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    return render->control.AudioDevDump((AudioHandle)render, range, fd);
+    return render->control.AudioDevDump(static_cast<AudioHandle>(render), range, fd);
 }
 
 int32_t HdiServiceRenderRegCallback(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
@@ -938,7 +938,7 @@ int32_t HdiServiceRenderRegCallback(const struct HdfDeviceIoClient *client, stru
         HDF_LOGE("%{public}s: read callback pointer Is NULL", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    pCallback = (RenderCallback)tempAddr;
+    pCallback = reinterpret_cast<RenderCallback>(tempAddr);
     return render->RegCallback(render, pCallback, cookie);
 }
 
@@ -957,7 +957,7 @@ int32_t HdiServiceRenderDrainBuffer(const struct HdfDeviceIoClient *client, stru
     if (!HdfSbufReadUint32(data, &tempType)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    type = (AudioDrainNotifyType)tempType;
+    type = static_cast<AudioDrainNotifyType>(tempType);
     return render->DrainBuffer(render, &type);
 }
 }

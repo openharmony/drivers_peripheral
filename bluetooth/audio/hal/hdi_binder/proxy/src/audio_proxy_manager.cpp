@@ -83,7 +83,7 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t tempDir = (uint32_t)desc->ports->dir;
+    uint32_t tempDir = static_cast<uint32_t>(desc->ports->dir);
     if (!HdfSbufWriteUint32(data, tempDir)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;

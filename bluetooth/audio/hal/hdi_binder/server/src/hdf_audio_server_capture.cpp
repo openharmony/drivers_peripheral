@@ -327,7 +327,7 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint64(data, &requestBytes)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    frame = (char *)OsalMemCalloc(FRAME_DATA);
+    frame = static_cast<char *>(OsalMemCalloc(FRAME_DATA));
     if (frame == nullptr) {
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }

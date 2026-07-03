@@ -280,7 +280,7 @@ static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
 
         return ret;
     }
-    info->dir = (AudioPortDirection)ret;
+    info->dir = static_cast<AudioPortDirection>(ret);
 
     portID = cJSON_GetObjectItem(port, "id");
     if (portID == NULL) {
@@ -292,7 +292,7 @@ static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
 
         return HDF_FAILURE;
     }
-    info->portId = (uint32_t)tmpId;
+    info->portId = static_cast<uint32_t>(tmpId);
 
     portName = cJSON_GetObjectItem(port, "name");
     if (portName == NULL || portName->valuestring == NULL) {
@@ -342,14 +342,14 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const
 
         return HDF_FAILURE;
     }
-    desc->portNum = (uint32_t)tmpNum;
+    desc->portNum = static_cast<uint32_t>(tmpNum);
 
     cJSON *adapterPorts = cJSON_GetObjectItem(adapter, "port");
     if (adapterPorts == NULL) {
         return HDF_FAILURE;
     }
     ret = AudioAdaptersGetArraySize(adapterPorts, &realSize);
-    if (ret != HDF_SUCCESS || realSize != (int)(desc->portNum)) {
+    if (ret != HDF_SUCCESS || realSize != static_cast<int>(desc->portNum)) {
         HDF_LOGE("realSize = %d, portNum = %d.\n", realSize, desc->portNum);
         HDF_LOGE("The defined portnum does not match the actual portnum!\n");
 
@@ -449,7 +449,7 @@ static char *AudioAdaptersGetConfig(const char *fpath)
         fclose(fp);
         return NULL;
     }
-    pJsonStr = static_cast<char *>(calloc(1, (uint32_t)jsonStrSize));
+    pJsonStr = static_cast<char *>(calloc(1, static_cast<uint32_t>(jsonStrSize)));
     if (pJsonStr == NULL) {
         fclose(fp);
         return NULL;
@@ -928,7 +928,7 @@ int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key,
         ret = sprintf_s(strValue, sizeof(strValue), "%s=%d;", key, *(reinterpret_cast<int32_t *>(value)));
     } else if (strcmp(key, AUDIO_ATTR_PARAM_FORMAT) == 0) {
         uint32_t formatBits = 0;
-        ret = FormatToBits((AudioFormat)(*(reinterpret_cast<int32_t *>(value))), &formatBits);
+        ret = FormatToBits(static_cast<AudioFormat>(*(reinterpret_cast<int32_t *>(value))), &formatBits);
         if (ret == 0) {
             ret = sprintf_s(strValue, sizeof(strValue), "%s=%u;", key, formatBits);
         }

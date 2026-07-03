@@ -212,7 +212,7 @@ int32_t AudioProxyRenderCheckSceneCapability(const AudioHandle handle,
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    tempPins = (uint32_t)scene->desc.pins;
+    tempPins = static_cast<uint32_t>(scene->desc.pins);
     if (!HdfSbufWriteUint32(data, tempPins)) {
         HDF_LOGE("tempPins Write FAIL");
         AudioProxyBufReplyRecycle(data, reply);
@@ -230,7 +230,7 @@ int32_t AudioProxyRenderCheckSceneCapability(const AudioHandle handle,
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    *supported = (bool)tempSupported;
+    *supported = static_cast<bool>(tempSupported);
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
 }
@@ -277,7 +277,7 @@ int32_t AudioProxyRenderSetMute(const AudioHandle handle, bool mute)
     if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t tempMute = (uint32_t)mute;
+    uint32_t tempMute = static_cast<uint32_t>(mute);
     if (!HdfSbufWriteUint32(data, tempMute)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -308,7 +308,7 @@ int32_t AudioProxyRenderGetMute(const AudioHandle handle, bool *mute)
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    *mute = (bool)tempMute;
+    *mute = static_cast<bool>(tempMute);
     AudioProxyBufReplyRecycle(data, reply);
     LOG_PARA_INFO("GetMute SUCCESS!");
     return ret;
@@ -357,8 +357,8 @@ int32_t AudioProxyRenderGetGainThreshold(const AudioHandle handle, float *min, f
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    *min = (float)tempMin;
-    *max = (float)tempMax;
+    *min = static_cast<float>(tempMin);
+    *max = static_cast<float>(tempMax);
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
 }
@@ -418,7 +418,7 @@ int32_t AudioProxyRenderRenderFrame(struct AudioRender *render, const void *fram
         HDF_LOGE("AudioProxyPreprocessRender FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (!HdfSbufWriteBuffer(data, frame, (uint32_t)requestBytes)) {
+    if (!HdfSbufWriteBuffer(data, frame, static_cast<uint32_t>(requestBytes))) {
         AudioProxyBufReplyRecycle(data, reply);
         HDF_LOGE("HdfSbufWriteBuffer FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
@@ -500,7 +500,7 @@ int32_t AudioProxyRenderSetChannelMode(struct AudioRender *render, AudioChannelM
         HDF_LOGE("AudioProxyPreprocessRender FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t tempMode = (uint32_t)mode;
+    uint32_t tempMode = static_cast<uint32_t>(mode);
     if (!HdfSbufWriteUint32(data, tempMode)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -537,7 +537,7 @@ int32_t AudioProxyRenderGetChannelMode(struct AudioRender *render, AudioChannelM
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    *mode = (AudioChannelMode)tempMode;
+    *mode = static_cast<AudioChannelMode>(tempMode);
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
 }
@@ -770,12 +770,12 @@ int32_t AudioProxyRenderRegCallback(struct AudioRender *render, RenderCallback c
         HDF_LOGE("AudioProxyRenderRegCallback FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint64_t tempAddr = (uint64_t)(uintptr_t)cookie;
+    uint64_t tempAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(cookie));
     if (!HdfSbufWriteUint64(data, tempAddr)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    tempAddr = (uint64_t)callback;
+    tempAddr = reinterpret_cast<uint64_t>(callback);
     if (!HdfSbufWriteUint64(data, tempAddr)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -805,7 +805,7 @@ int32_t AudioProxyRenderDrainBuffer(struct AudioRender *render, AudioDrainNotify
         HDF_LOGE("AudioProxyRenderDrainBuffer FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t tempType = (uint32_t)(uintptr_t)type;
+    uint32_t tempType = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(type));
     if (!HdfSbufWriteUint32(data, tempType)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
