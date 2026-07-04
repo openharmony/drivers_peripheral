@@ -231,7 +231,7 @@ static const char *AudioPathSelGetUseCase(enum AudioCategory type)
     }
     return usecaseType[type];
 }
-
+#ifdef AUDIO_HAL_P7885
 static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRenderParam *renderParam)
 {
     if (renderSwObj == NULL || renderParam == NULL) {
@@ -289,7 +289,7 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
     renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = renderDevNum;
     return HDF_SUCCESS;
 }
-
+#else
 static int32_t SetRenderPathDefaultValueRk(cJSON *renderSwObj, struct AudioHwRenderParam *renderParam)
 {
     if (renderSwObj == NULL || renderParam == NULL) {
@@ -331,6 +331,7 @@ static int32_t SetRenderPathDefaultValueRk(cJSON *renderSwObj, struct AudioHwRen
     renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = renderDevNum;
     return HDF_SUCCESS;
 }
+#endif
 
 static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCaptureParam *captureParam)
 {
