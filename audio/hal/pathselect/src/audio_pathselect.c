@@ -350,11 +350,18 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
         cJSON *tmpValue = cJSON_GetArrayItem(captureSwObj, i);
         cJSON *captureSwName = tmpValue->child;
         cJSON *captureSwVal = captureSwName->next;
-        if (captureSwVal == NULL || captureSwName->valuestring == NULL || captureSwVal->valuestring == NULL) {
+#ifdef AUDIO_HAL_P7885
+        if (captureSwVal == NULL || captureSwVal->valuestring == NULL ||
+            captureSwName == NULL || captureSwName->valuestring == NULL) {
             AUDIO_FUNC_LOGE("captureSwName or valuestring is null!");
             return HDF_FAILURE;
         }
-
+#else
+        if (captureSwName == NULL || captureSwName->valuestring == NULL) {
+            AUDIO_FUNC_LOGE("captureSwName->valuestring is null!");
+            return HDF_FAILURE;
+        }
+#endif
         devKey = captureSwName->valuestring;
         (void)memset_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
             PATHPLAN_LEN, 0, PATHPLAN_LEN);
@@ -365,7 +372,7 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
             AUDIO_FUNC_LOGE("strcpy_s failed!");
             return HDF_FAILURE;
         }
-
+#ifdef AUDIO_HAL_P7885
         char **pValue = &captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value;
         if (*pValue != NULL) {
             OsalMemFree(*pValue);
@@ -384,6 +391,9 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
             *pValue = NULL;
             return HDF_FAILURE;
         }
+#else
+        captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = captureSwVal->valueint;
+#endif
         devNum++;
     }
     captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum = devNum;
@@ -694,14 +704,21 @@ static int32_t SetCapturePathValue(
                 AUDIO_FUNC_LOGE("strcpy_s failed!");
                 return HDF_FAILURE;
             }
-
+#ifdef AUDIO_HAL_P7885
             char **switchsValue = &captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value;
             ret = InitDeviceSwitchValue(switchsValue, swVal, value);
             if (ret < 0) {
                 AUDIO_FUNC_LOGE("InitDeviceSwitchValue failed!");
                 return HDF_FAILURE;
             }
-
+#else
+            if (swVal->valueint > AUDIO_DEV_ON) {
+                /* alsa Adaptation */
+                captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = swVal->valueint;
+            } else {
+                captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = value;
+            }
+#endif
             devNum++;
         }
         captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum = devNum;
@@ -941,7 +958,9 @@ int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdapt
                 strcasecmp(renderParam->renderMode.hwInfo.adapterName, HDMI) == 0) {
                 return HDF_SUCCESS;
             }
+#ifdef AUDIO_HAL_P7885
             FreeAllDeviceSwitchsValue(&renderParam->renderMode.hwInfo.pathSelect.deviceInfo);
+#endif
             return (AudioPathSelGetPlanRender(renderParam));
         case CAPTURE_PATH_SELECT:
             captureParam = (struct AudioHwCaptureParam *)adapterParam;
