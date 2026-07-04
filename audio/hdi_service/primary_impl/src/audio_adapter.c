@@ -727,10 +727,12 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
         AudioMemFree((void **)&hwRender->errorLog.errorDump[i].reason);
         AudioMemFree((void **)&hwRender->errorLog.errorDump[i].currentTime);
     }
+#ifdef AUDIO_HAL_P7885
     for (int i = 0; i < PATHPLAN_COUNT; i++) {
         AudioMemFree((void **)&hwRender->renderParam.renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
         hwRender->renderParam.renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value = NULL;
     }
+#endif
     AudioMemFree((void **)&render);
     hwAdapter->infos.renderServicePtr[renderId] = NULL;
     return AUDIO_SUCCESS;
