@@ -902,7 +902,7 @@ static int32_t CaptureSetHwParamsImpl(struct AlsaCapture *captureIns, const stru
     ret = CaptureSetParams(captureIns, handleData);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render set parameters failed!");
-        return HDF_FAILURE;
+        return ret;
     }
     return HDF_SUCCESS;
 }
