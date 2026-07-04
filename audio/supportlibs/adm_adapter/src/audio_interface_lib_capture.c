@@ -506,7 +506,6 @@ int32_t AudioCtlCaptureSceneSelectSBuf(struct HdfSBuf *sBuf,
         handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].deviceSwitch;
     elemCaptureValue.value[0] = handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value;
 
-
     return AudioSetElemValue(sBuf, &elemCaptureValue, true);
 }
 
