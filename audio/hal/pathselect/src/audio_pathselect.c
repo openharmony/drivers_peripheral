@@ -930,6 +930,7 @@ static int32_t AudioPathSelCaptureChkScene(struct AudioHwCaptureParam *captureSc
     return AudioPathSelGetPlanCapture(captureSceneParam);
 }
 
+#ifdef AUDIO_HAL_P7885
 static void FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo)
 {
     for (int i = 0; i < HDF_PATH_NUM_MAX; i++) {
@@ -939,6 +940,7 @@ static void FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo)
         }
     }
 }
+#endif
 
 int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType)
 {
