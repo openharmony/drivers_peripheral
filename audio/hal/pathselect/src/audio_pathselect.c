@@ -27,9 +27,15 @@
 #endif
 #define SPEAKER                   "Speaker"
 #define HEADPHONES                "Headphones"
+#ifdef AUDIO_HAL_P7885
 #define MIC                       "Mic"
 #define HS_MIC                    "MicHs"
 #define EARPIECE                  "Earpiece"
+#else
+#define MIC                       "MIC"
+#define HS_MIC                    "micHs"
+#define EARPIECE                  "earpiece"
+#endif
 #define BLUETOOTH_SCO             "Bluetooth"
 #define BLUETOOTH_SCO_HEADSET     "Bluetooth_SCO_Headset"
 #define JSON_UNPRINT 1
@@ -42,8 +48,12 @@
 #define AUDIO_DEV_ON  1
 #define AUDIO_DEV_OFF 0
 
+#ifdef AUDIO_HAL_P7885
 #define HDF_PATH_NUM_MAX (32 * 4)
 #define ADM_VALUE_SIZE 4
+#else
+#define HDF_PATH_NUM_MAX 32
+#endif
 
 static cJSON *g_cJsonObj = NULL;
 
@@ -124,9 +134,10 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
         case PIN_IN_BLUETOOTH_SCO_HEADSET:
             return BLUETOOTH_SCO_HEADSET;
         case PIN_OUT_HEADSET:
-        case PIN_OUT_HEADPHONE:
             return HEADPHONES;
 #ifdef AUDIO_HAL_P7885
+        case PIN_OUT_HEADPHONE:
+            return HEADPHONES;
         case PIN_NONE:
         case PIN_OUT_HDMI:
         case PIN_OUT_LINEOUT:
@@ -142,6 +153,7 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
     return NULL;
 }
 
+#ifdef AUDIO_HAL_P7885
 static int32_t InitDeviceSwitchValue(char **switchValue, cJSON *swVal, int32_t value)
 {
     AUDIO_FUNC_LOGI("InitDeviceSwitchValue enter");
@@ -202,6 +214,7 @@ static int32_t InitDeviceSwitchValue(char **switchValue, cJSON *swVal, int32_t v
     AUDIO_FUNC_LOGI("InitDeviceSwitchValue end switchValue: %{public}s", *switchValue);
     return HDF_SUCCESS;
 }
+#endif
 
 static const char *AudioPathSelGetUseCase(enum AudioCategory type)
 {
@@ -239,12 +252,8 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
         cJSON *renderSwName = tmpValue->child;
         cJSON *renderSwVal = renderSwName->next;
         if (renderSwVal == NULL || renderSwName->valuestring == NULL || renderSwVal->valuestring == NULL) {
-#ifdef AUDIO_HAL_P7885
             AUDIO_FUNC_LOGE("renderSwName or valuestring is null!");
             return HDF_FAILURE;
-#else
-            return HDF_SUCCESS;
-#endif
         }
         devKey = renderSwName->valuestring;
         (void)memset_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].deviceSwitch,
@@ -275,6 +284,48 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
             *pValue = NULL;
             return HDF_FAILURE;
         }
+        renderDevNum++;
+    }
+    renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = renderDevNum;
+    return HDF_SUCCESS;
+}
+
+static int32_t SetRenderPathDefaultValueRk(cJSON *renderSwObj, struct AudioHwRenderParam *renderParam)
+{
+    if (renderSwObj == NULL || renderParam == NULL) {
+        AUDIO_FUNC_LOGE("param Is NULL");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    char *devKey = NULL;
+    int32_t renderDevNum;
+
+    renderDevNum = renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum;
+    int32_t renderPathNum = cJSON_GetArraySize(renderSwObj);
+    if (renderPathNum < 0 || renderPathNum > HDF_PATH_NUM_MAX) {
+        AUDIO_FUNC_LOGE("renderPathNum is invalid!");
+        return HDF_FAILURE;
+    }
+    for (int32_t i = 0; i < renderPathNum; i++) {
+        cJSON *tmpValue = cJSON_GetArrayItem(renderSwObj, i);
+        cJSON *renderSwName = tmpValue->child;
+        cJSON *renderSwVal = renderSwName->next;
+        if (renderSwName->valuestring == NULL) {
+            AUDIO_FUNC_LOGE("renderSwName->valuestring is null!");
+            return HDF_FAILURE;
+        }
+
+        devKey = renderSwName->valuestring;
+        (void)memset_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].deviceSwitch,
+            PATHPLAN_LEN, 0, PATHPLAN_LEN);
+        int32_t ret =
+            strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].deviceSwitch,
+                PATHPLAN_COUNT, devKey, strlen(devKey) + 1);
+        if (ret != 0) {
+            AUDIO_FUNC_LOGE("strcpy_s failed!");
+            return HDF_FAILURE;
+        }
+
+        renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].value = renderSwVal->valueint;
         renderDevNum++;
     }
     renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = renderDevNum;
@@ -379,6 +430,7 @@ static int32_t SetRenderPathValue(
             int32_t ret =
                 strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
                     PATHPLAN_COUNT, devKey, strlen(devKey) + 1);
+#ifdef AUDIO_HAL_P7885
             if (ret < 0) {
                 AUDIO_FUNC_LOGE("strcpy_s failed!");
                 return HDF_FAILURE;
@@ -390,6 +442,18 @@ static int32_t SetRenderPathValue(
                 AUDIO_FUNC_LOGE("InitDeviceSwitchValue failed!");
                 return HDF_FAILURE;
             }
+#else
+            if (ret != 0) {
+                AUDIO_FUNC_LOGE("strcpy_s failed!");
+                return HDF_FAILURE;
+            }
+            if (swVal->valueint > AUDIO_DEV_ON) {
+                /* alsa Adaptation */
+                renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = swVal->valueint;
+            } else {
+                renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].value = value;
+            }
+#endif
             devNum++;
         }
         renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = devNum;
@@ -429,7 +493,11 @@ static int32_t SetMatchRenderDefaultDevicePath(struct AudioHwRenderParam *render
             return HDF_FAILURE;
         }
         if (strcasecmp(deviceType, cJsonObj->string) == 0) {
+#ifdef AUDIO_HAL_P7885
             ret = SetRenderPathDefaultValue(cJsonObj, renderParam);
+#else
+            ret = SetRenderPathDefaultValueRk(cJsonObj, renderParam);
+#endif
             if (ret != HDF_SUCCESS) {
                 AUDIO_FUNC_LOGE("set default value failed!");
                 return ret;
