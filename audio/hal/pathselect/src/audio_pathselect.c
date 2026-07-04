@@ -238,11 +238,17 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
         cJSON *tmpValue = cJSON_GetArrayItem(renderSwObj, i);
         cJSON *renderSwName = tmpValue->child;
         cJSON *renderSwVal = renderSwName->next;
+#ifdef AUDIO_HAL_P7885
         if (renderSwVal == NULL || renderSwName->valuestring == NULL || renderSwVal->valuestring == NULL) {
             AUDIO_FUNC_LOGE("renderSwName or valuestring is null!");
             return HDF_FAILURE;
         }
-
+#else
+        if (renderSwName->valuestring == NULL) {
+            AUDIO_FUNC_LOGE("renderSwName->valuestring is null!");
+            return HDF_FAILURE;
+        }
+#endif
         devKey = renderSwName->valuestring;
         (void)memset_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].deviceSwitch,
             PATHPLAN_LEN, 0, PATHPLAN_LEN);
@@ -272,48 +278,6 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
             *pValue = NULL;
             return HDF_FAILURE;
         }
-        renderDevNum++;
-    }
-    renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = renderDevNum;
-    return HDF_SUCCESS;
-}
-
-static int32_t SetRenderPathDefaultValueRk(cJSON *renderSwObj, struct AudioHwRenderParam *renderParam)
-{
-    if (renderSwObj == NULL || renderParam == NULL) {
-        AUDIO_FUNC_LOGE("param Is NULL");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    char *devKey = NULL;
-    int32_t renderDevNum;
-
-    renderDevNum = renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum;
-    int32_t renderPathNum = cJSON_GetArraySize(renderSwObj);
-    if (renderPathNum < 0 || renderPathNum > HDF_PATH_NUM_MAX) {
-        AUDIO_FUNC_LOGE("renderPathNum is invalid!");
-        return HDF_FAILURE;
-    }
-    for (int32_t i = 0; i < renderPathNum; i++) {
-        cJSON *tmpValue = cJSON_GetArrayItem(renderSwObj, i);
-        cJSON *renderSwName = tmpValue->child;
-        cJSON *renderSwVal = renderSwName->next;
-        if (renderSwName->valuestring == NULL) {
-            AUDIO_FUNC_LOGE("renderSwName->valuestring is null!");
-            return HDF_FAILURE;
-        }
-
-        devKey = renderSwName->valuestring;
-        (void)memset_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].deviceSwitch,
-            PATHPLAN_LEN, 0, PATHPLAN_LEN);
-        int32_t ret =
-            strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].deviceSwitch,
-                PATHPLAN_COUNT, devKey, strlen(devKey) + 1);
-        if (ret != 0) {
-            AUDIO_FUNC_LOGE("strcpy_s failed!");
-            return HDF_FAILURE;
-        }
-
-        renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].value = renderSwVal->valueint;
         renderDevNum++;
     }
     renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = renderDevNum;
@@ -468,11 +432,7 @@ static int32_t SetMatchRenderDefaultDevicePath(struct AudioHwRenderParam *render
             return HDF_FAILURE;
         }
         if (strcasecmp(deviceType, cJsonObj->string) == 0) {
-#ifdef AUDIO_HAL_P7885
             ret = SetRenderPathDefaultValue(cJsonObj, renderParam);
-#else
-            ret = SetRenderPathDefaultValueRk(cJsonObj, renderParam);
-#endif
             if (ret != HDF_SUCCESS) {
                 AUDIO_FUNC_LOGE("set default value failed!");
                 return ret;
