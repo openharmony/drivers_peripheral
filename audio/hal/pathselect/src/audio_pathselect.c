@@ -133,6 +133,8 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
         case PIN_OUT_USB:
         case PIN_OUT_USB_EXT:
             return SPEAKER;
+        case PIN_IN_LINEIN:
+            return MIC;
 #endif
         case PIN_OUT_DAUDIO_DEFAULT:
         default:
@@ -662,7 +664,7 @@ static int32_t SetMatchCaptureDefaultDevicePath(struct AudioHwCaptureParam *capt
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-    for (uint32_t i = PIN_IN_MIC; i <= PIN_IN_BLUETOOTH_SCO_HEADSET;
+    for (uint32_t i = PIN_IN_MIC; i <= PIN_IN_USB_HEADSET;
          i = (1 << INPUT_OFFSET) | ((i & OUTPUT_MASK) << 1)) {
         const char *deviceType = AudioPathSelGetDeviceType((int32_t)i);
         if (deviceType == NULL) {
