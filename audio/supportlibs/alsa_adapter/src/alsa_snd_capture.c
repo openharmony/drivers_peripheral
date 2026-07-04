@@ -29,6 +29,7 @@
 #define AUDIO_BUFFER_TIME_DEF 500000
 #define AUDIO_PERIOD_TIME_DEF 100000
 #define PCM_WAIT_TIME         5000
+#define CHECK_RET             -22
 
 static struct AlsaCapture *g_alsaCaptureList = NULL;
 static void RegisterCaptureImpl(struct AlsaCapture *captureIns);
@@ -94,10 +95,7 @@ static int32_t SetHWParamsSub(
     ret = snd_pcm_hw_params_set_format(handle, params, pcmFormat);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Sample format not available for capture: %{public}s", snd_strerror(ret));
-        if (ret == -22) {
-            ret = HDF_ERR_NOT_SUPPORT;
-        }
-        return ret;
+        return HDF_ERR_NOT_SUPPORT;
     }
 
     /* set the count of channels */
