@@ -238,17 +238,14 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
         cJSON *tmpValue = cJSON_GetArrayItem(renderSwObj, i);
         cJSON *renderSwName = tmpValue->child;
         cJSON *renderSwVal = renderSwName->next;
-#ifdef AUDIO_HAL_P7885
         if (renderSwVal == NULL || renderSwName->valuestring == NULL || renderSwVal->valuestring == NULL) {
+#ifdef AUDIO_HAL_P7885
             AUDIO_FUNC_LOGE("renderSwName or valuestring is null!");
             return HDF_FAILURE;
-        }
 #else
-        if (renderSwName->valuestring == NULL) {
-            AUDIO_FUNC_LOGE("renderSwName->valuestring is null!");
-            return HDF_FAILURE;
-        }
+            return HDF_SUCCESS;
 #endif
+        }
         devKey = renderSwName->valuestring;
         (void)memset_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].deviceSwitch,
             PATHPLAN_LEN, 0, PATHPLAN_LEN);
