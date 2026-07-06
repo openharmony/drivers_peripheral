@@ -37,5 +37,5 @@ if (!drivers_peripheral_display_community) {
 }
 
 if (drivers_peripheral_display_feature_p7885) {
-  display_defines += [ "display_P7885" ]
+  display_defines += [ "DISPLAY_P7885" ]
 }

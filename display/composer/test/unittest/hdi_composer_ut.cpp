@@ -181,10 +181,10 @@ static inline void PresentAndCheck(std::vector<LayerSettings> &layerSettings,
     ASSERT_TRUE((ret == DISPLAY_SUCCESS));
     if ((GetFirstDisplay()->SnapShot()) != nullptr) {
         HdiTestDevice::GetInstance().GetGrallocInterface()->InvalidateCache(*(GetFirstDisplay()->SnapShot()));
-#ifndef display_P7885
-        ret = CheckComposition(layerSettings, GetFirstDisplay()->SnapShot(), checkType);
-#endif        
+#ifndef DISPLAY_P7885
+        ret = CheckComposition(layerSettings, GetFirstDisplay()->SnapShot(), checkType);       
         ASSERT_TRUE((ret == DISPLAY_SUCCESS));
+#endif 
     }
 }
 
