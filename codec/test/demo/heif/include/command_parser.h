@@ -75,9 +75,9 @@ struct CommandOpt {
     std::string iccProfilePath = "";
     std::string it35Path = "";
     std::string xmpForPrimary = "";
- 	std::string xmpForAuxiliary = "";
- 	std::string xmpForThumbnail = "";
- 	std::string xmpForGainMap = "";
+    std::string xmpForAuxiliary = "";
+    std::string xmpForThumbnail = "";
+    std::string xmpForGainMap = "";
     std::string outputPath = "/storage/media/100/local/files/heif_edit_dump";
     ImageMirror mirrorInfo = ImageMirror::NONE;
     ImageRotation rotateInfo = ImageRotation::NONE;
