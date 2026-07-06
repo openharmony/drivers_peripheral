@@ -38,6 +38,8 @@
 #define PORTNUM_FIRST  1
 #define PORTNUM_SECOND 2
 
+#define MAX_SOUND_CARD_NUM      16
+
 static int32_t AudioMixerCtlElemList(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
 static int32_t AudioMixerCtlGetElemProp(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
 static int32_t AudioMixerCtlSetElemProp(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
@@ -715,7 +717,7 @@ static int32_t AudioFillAllAdapters(struct HdfSBuf *sbuf, int32_t num, struct Au
             return HDF_FAILURE;
         }
 
-        ret = memcpy_s(clist[i].cardName, AUDIO_CARD_SRV_NAME_LEN, sndName, strlen(sndName) + 1);
+        ret = strcpy_s(clist[i].cardName, AUDIO_CARD_SRV_NAME_LEN, sndName);
         if (ret != EOK) {
             AUDIO_FUNC_LOGE("Failed to copy card information!");
             return HDF_FAILURE;
@@ -757,7 +759,7 @@ static int32_t AudioParseAllAdaptersFromBuf(struct SndCardsList *sndCards, struc
         AUDIO_FUNC_LOGE("HdfSbufReadInt32 failed!");
         return HDF_FAILURE;
     }
-    if (cnumber <= 0) {
+    if (cnumber <= 0 || cnumber > MAX_SOUND_CARD_NUM) {
         AUDIO_FUNC_LOGE("Card num error!");
         return HDF_FAILURE;
     }

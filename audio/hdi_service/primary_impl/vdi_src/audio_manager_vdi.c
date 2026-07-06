@@ -475,7 +475,6 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
     }
     pthread_mutex_lock(&g_managerMutex);
     struct AudioManagerPrivVdi *priv = (struct AudioManagerPrivVdi *)manager;
-    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_ERR_INVALID_PARAM);
 
     for (descIndex = 0; descIndex < priv->descsCount; descIndex++) {
         AudioEnforceClearAdapterRefCntVdi(descIndex);
