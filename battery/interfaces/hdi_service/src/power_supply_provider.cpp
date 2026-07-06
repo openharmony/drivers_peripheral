@@ -24,6 +24,9 @@
 #include "battery_log.h"
 #include "battery_config.h"
 #include "osal_mem.h"
+#include <unique_fd.h>
+#include <file_ex.h>
+#include <string_ex.h>
 
 #define DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG 0XD002923
 
@@ -56,6 +59,7 @@ const std::string BATTERY_KEY_CURRENT_AVERAGE = "POWER_SUPPLY_CURRENT_AVERAGE=";
 const std::string BATTERY_KEY_CURRENT_NOW = "POWER_SUPPLY_CURRENT_NOW=";
 const std::string INVALID_STRING_VALUE = "invalid";
 const std::string BATTERY_NODE_PATH = "battery";
+constexpr const char * const CAPACITY_POLICY_DTS = "/proc/device-tree/power_host_cfg/capacity_policy";
 }
 
 BatterydInfo g_batteryInfo;
@@ -961,10 +965,67 @@ void PowerSupplyProvider::CreateMockChargerPath(std::string& mockChargerPath)
     CreateFile(mockChargerPath + "/status", "Charging");
 }
 
+int32_t PowerSupplyProvider::ReadDtsNodeString(const char* dtsPath, char* buffer, size_t bufferSize)
+{
+    if (dtsPath == nullptr || buffer == nullptr || bufferSize == 0) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "ReadDtsNodeString: invalid arguments");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    char re_path[PATH_MAX] = {0};
+    if (realpath(dtsPath, re_path) == nullptr) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "realpath error for '%{public}s', errno = %{public}d", dtsPath, errno);
+        return HDF_FAILURE;
+    }
+
+    FILE *fp = fopen(re_path, "r");
+    if (fp == nullptr) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "open dts file '%{public}s' error, errno = %{public}d", re_path, errno);
+        return HDF_ERR_IO;
+    }
+
+    if (fgets(buffer, static_cast<int>(bufferSize), fp) == nullptr) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "read dts str error from '%{public}s', errno = %{public}d", re_path, errno);
+        fclose(fp);
+        return HDF_FAILURE;
+    }
+    if (fclose(fp) != 0) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to close file");
+        return HDF_FAILURE;
+    }
+
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "ReadDtsNodeString success from '%{public}s', value = '%{public}s'",
+        re_path, buffer);
+    return HDF_SUCCESS;
+}
+
+bool PowerSupplyProvider::IsPcDesktopProduct()
+{
+    char buffer[PATH_MAX] = {0};
+    if (ReadDtsNodeString(CAPACITY_POLICY_DTS, buffer, sizeof(buffer)) != HDF_SUCCESS) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to read PC desktop policy, defaulting to false");
+        return false;
+    }
+
+    int32_t value = 0;
+    if (StrToInt(std::string(buffer), value) == false) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "ailed to convert policy string '%s' to int", buffer);
+        return false;
+    }
+
+    return (value == 1);
+}
+
 void PowerSupplyProvider::CreateMockBatteryPath(std::string& mockBatteryPath)
 {
     BATTERY_HILOGI(FEATURE_BATT_INFO, "create mockFilePath path");
-    CreateFile(mockBatteryPath + "/capacity", "11");
+    if (IsPcDesktopProduct()) {
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "Product is pc desktop");
+        CreateFile(mockBatteryPath + "/capacity", "100");
+    } else {
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "Product is not pc desktop");
+        CreateFile(mockBatteryPath + "/capacity", "11");
+    }
     CreateFile(mockBatteryPath + "/charge_control_limit", "0");
     CreateFile(mockBatteryPath + "/charge_counter", "4000000");
     CreateFile(mockBatteryPath + "/charge_full", "4000000");
