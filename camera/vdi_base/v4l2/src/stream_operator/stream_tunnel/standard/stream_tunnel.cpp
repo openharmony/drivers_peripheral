@@ -137,10 +137,10 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
             buffer->SetIsValidDataInSurfaceBuffer(false);
             return;
         }
-        uint32_t availableSize = (
-            esInfo.size > 0 ? static_cast<uint32_t>(esInfo.size) : buffer->GetSize());
+        uint32_t availableSize = (esInfo.size > 0 ? static_cast<uint32_t>(esInfo.size) : buffer->GetSize());
         availableSize = std::min({availableSize, buffer->GetSize(), sb->GetSize()});
-        CAMERA_LOGI("copy data from cb to sb, size = %{public}d, availableSize = %{public}u", sb->GetSize(), availableSize);
+        CAMERA_LOGI(
+            "copy data from cb to sb, size = %{public}d, availableSize = %{public}u", sb->GetSize(), availableSize);
         auto ret = memcpy_s(sb->GetVirAddr(), sb->GetSize(), buffer->GetVirAddress(), availableSize);
         if (ret != 0) {
             CAMERA_LOGE("PrepareBufferBeforeFlush memcpy_s fail, error = %{public}d", ret);
