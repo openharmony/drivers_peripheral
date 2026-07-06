@@ -561,6 +561,21 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
     return HDF_SUCCESS;
 }
 
+std::string AudioAdapterInterfaceImpl::HandleConditionGetCaps(const std::string &condition)
+{
+    std::string pinValue = "";
+    size_t pos = condition.find(key_);
+    if (pos != std::string::npos) {
+        pinValue = condition.substr(pos + key_.length());
+    }
+    auto it = capabilityMap_.find(adpDescriptor_.adapterName + pinValue);
+    if (it != capabilityMap_.end()) {
+        return it->second;
+    }
+    DHLOGE("Can not find caps");
+    return "";
+}
+
 int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const std::string &condition,
     std::string &value)
 {
@@ -575,7 +590,7 @@ int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const st
             }
             break;
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_CAPABILITY:
-            value = capability_;
+            value = HandleConditionGetCaps(condition);
             break;
         default:
             DHLOGE("Parameter is invalid.");
@@ -704,10 +719,10 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
         return DH_SUCCESS;
     }
     mapAudioDevice_.insert(std::make_pair(devId, caps));
-    capability_ = caps;
-    DHLOGI("Add distributed audio capability_: %{public}s.", GetAnonyString(capability_).c_str());
-    if (capability_.find(TOKEN_ID) != std::string::npos) {
-        int32_t ret = HandleTokenIdFromCapability(capability_);
+    std::string key = adpDescriptor_.adapterName + std::to_string(devId);
+    capabilityMap_[key] = caps;
+    if (caps.find(TOKEN_ID) != std::string::npos) {
+        int32_t ret = HandleTokenIdFromCapability(devId, caps);
         if (ret != DH_SUCCESS) {
             DHLOGE("Handle tokenId from capability failed.");
             return ret;
@@ -717,7 +732,7 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
     return DH_SUCCESS;
 }
 
-int32_t AudioAdapterInterfaceImpl::HandleTokenIdFromCapability(const std::string &capability)
+int32_t AudioAdapterInterfaceImpl::HandleTokenIdFromCapability(const uint32_t devId, const std::string &capability)
 {
     DHLOGI("Handle tokenId from capability.");
     std::string input = capability;
@@ -733,7 +748,8 @@ int32_t AudioAdapterInterfaceImpl::HandleTokenIdFromCapability(const std::string
             result += input[i];
         }
     }
-    capability_ = result;
+    std::string key = adpDescriptor_.adapterName + std::to_string(devId);
+    capabilityMap_[key] = result;
     cJSON *root = cJSON_Parse(result.c_str());
     if (root == nullptr) {
         DHLOGE("Failed to parse caps JSON.");
