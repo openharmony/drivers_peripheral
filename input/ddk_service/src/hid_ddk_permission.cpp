@@ -14,7 +14,7 @@
  */
 
 #include "hid_ddk_permission.h"
-#include "accesstoken_kit.h"
+#include "accesstoken_compat_kit.h"
 #include "ipc_skeleton.h"
 #include "input_uhdf_log.h"
 
@@ -28,7 +28,7 @@ using namespace OHOS::Security::AccessToken;
 bool DdkPermissionManager::VerifyPermission(std::string permissionName)
 {
     AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
-    int result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    int result = AccessTokenCompatKit::VerifyAccessToken(callerToken, permissionName);
     HDF_LOGI("%{public}s VerifyAccessToken: %{public}d", __func__, result);
     return result == PERMISSION_GRANTED;
 }
