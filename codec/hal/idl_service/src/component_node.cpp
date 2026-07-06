@@ -93,10 +93,15 @@ ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appD
 
 ComponentNode::~ComponentNode()
 {
-    std::unique_lock<std::shared_mutex> lk(poolMutex_);
-    omxCallback_ = nullptr;
-    bufferPool_.clear();
-    bufferIdCount_ = 0;
+    {
+        std::unique_lock<std::shared_mutex> lk(poolMutex_);
+        bufferPool_.clear();
+        bufferIdCount_ = 0;
+    }
+    {
+        std::lock_guard<std::mutex> lk(callbackMutex_);
+        omxCallback_ = nullptr;
+    }
     comp_ = nullptr;
     mgr_ = nullptr;
 }
@@ -295,6 +300,7 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
 
 int32_t ComponentNode::SetCallbacks(const sptr<ICodecCallback> &callbacks, int64_t appData)
 {
+    std::lock_guard<std::mutex> lk(callbackMutex_);
     this->omxCallback_ = callbacks;
     appData_ = appData;
     return OMX_ErrorNone;
@@ -351,21 +357,31 @@ int32_t ComponentNode::ComponentDeInit()
 int32_t ComponentNode::OnEvent(CodecEventType event, uint32_t data1, uint32_t data2, void *eventData)
 {
     CODEC_LOGD("eventType: [%{public}d], data1: [%{public}x], data2: [%{public}x]", event, data1, data2);
-    if (omxCallback_ == nullptr) {
+    sptr<ICodecCallback> callback;
+    {
+        std::lock_guard<std::mutex> lk(callbackMutex_);
+        callback = omxCallback_;
+    }
+    if (callback == nullptr) {
         CODEC_LOGE("omxCallback_ is null");
         return OMX_ErrorNone;
     }
     (void)eventData;
     EventInfo info = {.appData = appData_, .data1 = data1, .data2 = data2};
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecOnEvent");
-    (void)omxCallback_->EventHandler(event, info);
+    (void)callback->EventHandler(event, info);
 
     return OMX_ErrorNone;
 }
 
 int32_t ComponentNode::OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 {
-    if ((omxCallback_ == nullptr) || (buffer == nullptr)) {
+    sptr<ICodecCallback> callback;
+    {
+        std::lock_guard<std::mutex> lk(callbackMutex_);
+        callback = omxCallback_;
+    }
+    if ((callback == nullptr) || (buffer == nullptr)) {
         CODEC_LOGE("omxCallback_ or buffer is null");
         return OMX_ErrorBadParameter;
     }
@@ -377,13 +393,18 @@ int32_t ComponentNode::OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer)
     CHECK_AND_RETURN_RET_LOG(ret == 0, ret, "EmptyBufferDone failed");
 
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecOnEmptyBufferDone");
-    (void)omxCallback_->EmptyBufferDone(appData_, OHOS::Codec::Omx::Convert(codecOmxBuffer, isIPCMode_));
+    (void)callback->EmptyBufferDone(appData_, OHOS::Codec::Omx::Convert(codecOmxBuffer, isIPCMode_));
     return OMX_ErrorNone;
 }
 
 int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 {
-    if ((omxCallback_ == nullptr) || (buffer == nullptr)) {
+    sptr<ICodecCallback> callback;
+    {
+        std::lock_guard<std::mutex> lk(callbackMutex_);
+        callback = omxCallback_;
+    }
+    if ((callback == nullptr) || (buffer == nullptr)) {
         CODEC_LOGE("omxCallback_ or buffer is null");
         return OMX_ErrorBadParameter;
     }
@@ -396,7 +417,7 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
     CHECK_AND_RETURN_RET_LOG(ret == 0, ret, "FillBufferDone failed");
 
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecOnFillBufferDone");
-    (void)omxCallback_->FillBufferDone(appData_, OHOS::Codec::Omx::Convert(codecOmxBuffer, isIPCMode_));
+    (void)callback->FillBufferDone(appData_, OHOS::Codec::Omx::Convert(codecOmxBuffer, isIPCMode_));
     return OMX_ErrorNone;
 }
 

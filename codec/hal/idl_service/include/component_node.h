@@ -90,6 +90,7 @@ private:
     OMX_HANDLETYPE comp_;  // Compnent handle
     sptr<ICodecCallback> omxCallback_;
     int64_t appData_;
+    std::mutex callbackMutex_;
     std::shared_mutex poolMutex_;
     std::vector<BufferInfo> bufferPool_;
     uint32_t bufferIdCount_;
