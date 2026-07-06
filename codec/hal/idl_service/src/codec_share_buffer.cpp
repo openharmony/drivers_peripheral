@@ -84,7 +84,8 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::AllocateBuffer(OMX_HANDLETYPE comp, u
 int32_t CodecShareBuffer::EmptyThisBuffer(OmxCodecBuffer &codecBuffer)
 {
     if (codecBuffer_.allocLen < codecBuffer.offset ||
-        codecBuffer_.allocLen < codecBuffer.offset + codecBuffer.filledLen) {
+        codecBuffer_.allocLen < codecBuffer.filledLen ||
+        codecBuffer_.allocLen - codecBuffer.offset < codecBuffer.filledLen) {
         CODEC_LOGE("invalid param, allocLen %{public}u, offset %{public}u, filledLen %{public}u",
             codecBuffer_.allocLen, codecBuffer.offset, codecBuffer.filledLen);
         return OMX_ErrorBadParameter;
