@@ -60,6 +60,7 @@ static void InitVerifyAccessToken()
         HDF_LOGE("%{public}s dlsym getApiVersionPtr failed: %{public}s", __func__, dlerror());
         dlclose(g_libHandle);
         g_libHandle = nullptr;
+        g_verifyAccessToken = nullptr;
         return;
     }
     g_getApiVersion = reinterpret_cast<GetApiVersion>(getApiVersionPtr);
