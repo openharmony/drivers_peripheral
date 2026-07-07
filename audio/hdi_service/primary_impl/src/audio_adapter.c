@@ -659,7 +659,7 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
     if (ret != AUDIO_SUCCESS) {
         AudioReleaseRenderHandle(hwRender);
         AudioMemFree((void **)&hwRender);
-        return ret;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
 
     *renderId = GetAvailableRenderID(hwAdapter);
