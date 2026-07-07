@@ -287,7 +287,7 @@ int32_t AudioCaptureSetSampleAttributes(struct IAudioCapture *handle, const stru
     if (ret < 0) {
         AUDIO_FUNC_LOGE("CaptureSetSampleAttributes FAIL");
         hwCapture->captureParam.frameCaptureMode.attrs = tempAttrs;
-        return AUDIO_ERR_INTERNAL;
+        return HDF_ERR_NOT_SUPPORT;
     }
     return AUDIO_SUCCESS;
 }
