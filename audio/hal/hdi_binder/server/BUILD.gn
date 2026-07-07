@@ -54,6 +54,9 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HDF_LOG" ]
     }
+    if (drivers_peripheral_audio_feature_p7885) {
+      defines += [ "AUDIO_HAL_P7885" ]
+    }
 
     shlib_type = "hdi"
     install_images = [ chipset_base_dir ]
@@ -97,6 +100,9 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     defines = []
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HDF_LOG" ]
+    }
+    if (drivers_peripheral_audio_feature_p7885) {
+      defines += [ "AUDIO_HAL_P7885" ]
     }
 
     shlib_type = "hdi"

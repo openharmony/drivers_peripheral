@@ -209,7 +209,11 @@ struct PathPlan {
 
 struct PathDeviceSwitch {
     char deviceSwitch[PATHPLAN_LEN];
+#ifdef AUDIO_HAL_P7885
     char *value;
+#else
+    int32_t value;
+#endif
 };
 
 struct PathDeviceInfo {
