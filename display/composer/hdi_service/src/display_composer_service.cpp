@@ -42,7 +42,6 @@ namespace Composer {
 
 const std::string BOOTEVENT_COMPOSER_HOST_READY = "bootevent.composer_host.ready";
 static std::shared_mutex g_respMapMutex;
-BootstrapDisplayDiscovery();
 
 extern "C" V1_5::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
@@ -78,10 +77,11 @@ DisplayComposerService::DisplayComposerService()
         DISPLAY_LOGE("CreateResponser failed");
         return;
     }
+
     HidumperInit();
+
     BootstrapDisplayDiscovery();
     isSupportParallelPresenting_ = GetEnableParallel();
-
     OHOS::system::SetParameter(BOOTEVENT_COMPOSER_HOST_READY.c_str(), "true");
 }
 
@@ -364,7 +364,7 @@ void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* 
 
     auto cacheMgr = compService->cacheMgr_;
     DISPLAY_CHK_RETURN_NOT_VALUE(cacheMgr == nullptr,
-        DISPLAY_LOGE("cacheMgr is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected));
+        DISPLAY_LOGE("CacheMgr_ is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected));
 
     if (connected) {
         std::lock_guard<std::mutex> lock(cacheMgr->GetCacheMgrMutex());
@@ -387,6 +387,7 @@ void DisplayComposerService::PrepareParallelResponser(uint32_t outputId, bool co
 {
     DISPLAY_CHK_RETURN_NOT_VALUE(compService == nullptr,
         DISPLAY_LOGE("compService is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected));
+
     auto isSupportParallelPresenting = compService->isSupportParallelPresenting_;
     if (!isSupportParallelPresenting) {
         return;
@@ -502,7 +503,7 @@ int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, V1_0::Disp
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->GetDisplayPowerStatus(devId, status);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
-        DISPLAY_LOGI("%{public}s fail devId:%{public}u, status:%{public}u", __func__, devId, status));
+        DISPLAY_LOGI("%{public}s fail devId:%{public}u, ret:%{public}d", func, devId, ret));
     return ret;
 }
 
@@ -622,7 +623,7 @@ int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enab
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->SetDisplayVsyncEnabled(devId, enabled);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
-        DISPLAY_LOGE("%{public}s fail: vsyncStatus[%{public}u] = %{public}d, fail", __func__, devId, enabled));
+        DISPLAY_LOGE("%{public}s fail: vsyncStatus[%{public}u] = %{public}d", func, devId, enabled));
         vsyncEnableStatus_[devId] = enabled;
         return ret;
 }
@@ -901,12 +902,11 @@ int32_t DisplayComposerService::InitSMQInfo(uint32_t devId, const std::shared_pt
 
     {
         std::unique_lock<std::shared_mutex> lock(g_respMapMutex);
-        auto respltem = cmdResponserMap_.find(devId);
-        if (respltem != cmdResponser Map_.end()) {
-            cmdResponserMap_.erase(respltem);
+        auto respItem = cmdResponserMap_.find(devId);
+        if (respItem != cmdResponserMap_.end()) {
+            cmdResponserMap_.erase(respItem);
         }
-        cmdResponserMap_,insert({devId, cmdResponserCurl});
-    }
+        cmdResponserMap_.insert({devId, cmdResponserCur});
 
     DISPLAY_LOGI("%{public}s: devId[%{public}u] done.", __func__, devId);
     return ret;
@@ -932,7 +932,7 @@ std::shared_ptr<V1_5::HdiDisplayCmdResponser> DisplayComposerService::GetRespons
         return cmdResponser_;
     }
 
-    std::lock_guard<std::mutex> lock(g_respMapMutex);
+    std::unique_lockstd::shared_mutex lock(g_respMapMutex);
     DISPLAY_CHK_RETURN(cmdResponserMap_.find(devId) == cmdResponserMap_.end(), nullptr,
         DISPLAY_LOGE("%{public}s, cannot find the Response for the devId[%{public}u]", __func__, devId));
     return cmdResponserMap_[devId];
@@ -1202,7 +1202,6 @@ int32_t DisplayComposerService::GetDisplayIdentificationData(uint32_t devId, uin
     int32_t ret = vdiAdapter_->GetDisplayIdentificationData(devId, portId, edidData);
     DISPLAY_LOGI("%{public}s: ret %{public}d, devId %{public}u, the param idx %{public}u,"
         "the length of edidData [%{public}zu]", __func__, ret, devId, portId, edidData.size());
-    std::unique_lock<std::shared_mutex> lock(g_respMapMutex);
     return ret;
 }
 

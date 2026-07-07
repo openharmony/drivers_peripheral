@@ -147,8 +147,7 @@ private:
     sptr<IRefreshCallback> refreshCb_;
     sptr<IVBlankIdleCallback> VBlankIdleCb_;
     sptr<IHwcEventCallback> hwcEventCb_;
-    // bool isSupportParallelPresenting_;
-    static std::mutex respMapMutex_;
+    bool isSupportParallelPresenting_;
     std::shared_ptr<V1_5::HdiDisplayCmdResponser> cmdResponser_;
     std::unordered_map<uint32_t, std::shared_ptr<V1_5::HdiDisplayCmdResponser>> cmdResponserMap_;
 };
