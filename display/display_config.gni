@@ -15,6 +15,7 @@ declare_args() {
   drivers_peripheral_display_community = false
   drivers_peripheral_display_hicollie_enable = false
   drivers_peripheral_display_vdi_default = false
+  drivers_peripheral_display_feature_p7885 = false
 }
 
 if (drivers_peripheral_display_community) {
@@ -33,4 +34,8 @@ if (drivers_peripheral_display_vdi_default) {
 if (!drivers_peripheral_display_community) {
   drivers_peripheral_display_hicollie_enable = true
   display_defines += [ "DISPLAY_HICOLLIE_ENABLE" ]
+}
+
+if (drivers_peripheral_display_feature_p7885) {
+  display_defines += [ "DISPLAY_P7885" ]
 }
