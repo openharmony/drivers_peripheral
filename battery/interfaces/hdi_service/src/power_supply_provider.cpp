@@ -27,6 +27,9 @@
 #include <unique_fd.h>
 #include <file_ex.h>
 #include <string_ex.h>
+#include <unique_fd.h>
+#include <file_ex.h>
+#include <string_ex.h>
 
 #define DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG 0XD002923
 
