@@ -59,7 +59,7 @@ const std::string BATTERY_KEY_CURRENT_AVERAGE = "POWER_SUPPLY_CURRENT_AVERAGE=";
 const std::string BATTERY_KEY_CURRENT_NOW = "POWER_SUPPLY_CURRENT_NOW=";
 const std::string INVALID_STRING_VALUE = "invalid";
 const std::string BATTERY_NODE_PATH = "battery";
-constexpr const char * const CAPACITY_POLICY_DTS = "/proc/device-tree/power_host_cfg/capacity_policy";
+const std::string CAPACITY_POLICY_DTS = "/proc/device-tree/power_host_cfg/capacity_policy";
 }
 
 BatterydInfo g_batteryInfo;
@@ -1002,7 +1002,7 @@ int32_t PowerSupplyProvider::ReadDtsNodeString(const char* dtsPath, char* buffer
 bool PowerSupplyProvider::IsPcDesktopProduct()
 {
     char buffer[PATH_MAX] = {0};
-    if (ReadDtsNodeString(CAPACITY_POLICY_DTS, buffer, sizeof(buffer)) != HDF_SUCCESS) {
+    if (ReadDtsNodeString(CAPACITY_POLICY_DTS.c_str(), buffer, sizeof(buffer)) != HDF_SUCCESS) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to read PC desktop policy, defaulting to false");
         return false;
     }
