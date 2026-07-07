@@ -959,6 +959,7 @@ static void AudioInitCaptureInstanceVdi(struct IAudioCapture *capture)
     capture->AudioDevDump = AudioCaptureAudioDevDumpVdi;
     capture->IsSupportsPauseAndResume = AudioCaptureIsSupportsPauseAndResumeVdi;
     capture->RegCallback = AudioCaptureRegCallbackVdi;
+    capture->GetVersionV6_1 = AudioCaptureGetVersionV6_1Vdi;
 }
 
 static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
