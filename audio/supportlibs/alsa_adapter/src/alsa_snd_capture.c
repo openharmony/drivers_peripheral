@@ -94,7 +94,7 @@ static int32_t SetHWParamsSub(
     ret = snd_pcm_hw_params_set_format(handle, params, pcmFormat);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Sample format not available for capture: %{public}s", snd_strerror(ret));
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
 
     /* set the count of channels */
@@ -367,7 +367,7 @@ static int32_t CaptureSetParams(struct AlsaCapture *captureIns, const struct Aud
     int32_t ret = SetHWParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Setting of hwparams failed.");
-        return HDF_FAILURE;
+        return ret;
     }
 
     ret = SetSWParams(cardIns);
@@ -899,7 +899,7 @@ static int32_t CaptureSetHwParamsImpl(struct AlsaCapture *captureIns, const stru
     ret = CaptureSetParams(captureIns, handleData);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render set parameters failed!");
-        return HDF_FAILURE;
+        return ret;
     }
     return HDF_SUCCESS;
 }

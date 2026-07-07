@@ -640,7 +640,7 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
     BindServiceRenderPassthrough *pBindServiceRender = AudioPassthroughGetBindServiceRender();
     if (pBindServiceRender == NULL || *pBindServiceRender == NULL) {
         AUDIO_FUNC_LOGE("lib render func not exist");
-        return AUDIO_ERR_INTERNAL;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
 
     struct AudioHwRender *hwRender = (struct AudioHwRender *)OsalMemCalloc(sizeof(*hwRender));
@@ -652,14 +652,14 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
     int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwAdapter);
     if (ret != HDF_SUCCESS) {
         AudioMemFree((void **)&hwRender);
-        return AUDIO_ERR_INTERNAL;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
 
     ret = AudioRenderBindService(hwRender, pBindServiceRender);
     if (ret != AUDIO_SUCCESS) {
         AudioReleaseRenderHandle(hwRender);
         AudioMemFree((void **)&hwRender);
-        return ret;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
 
     *renderId = GetAvailableRenderID(hwAdapter);
@@ -1189,7 +1189,7 @@ int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct Au
     BindServiceCapturePassthrough *pBindServiceCapture = AudioPassthroughGetBindServiceCapture();
     if (pBindServiceCapture == NULL || *pBindServiceCapture == NULL) {
         AUDIO_FUNC_LOGE("lib capture func not exist");
-        return AUDIO_ERR_INTERNAL;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)OsalMemCalloc(sizeof(*hwCapture));
     if (hwCapture == NULL) {
@@ -1200,7 +1200,7 @@ int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct Au
     if (ret != AUDIO_SUCCESS) {
         AUDIO_FUNC_LOGE("call AudioAdapterCreateCapturePre failed %{public}d", ret);
         AudioMemFree((void **)&hwCapture);
-        return AUDIO_ERR_INTERNAL;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
     ret = AudioCaptureBindService(hwCapture, pBindServiceCapture);
     if (ret < 0) {
