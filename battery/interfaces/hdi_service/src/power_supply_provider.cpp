@@ -965,51 +965,17 @@ void PowerSupplyProvider::CreateMockChargerPath(std::string& mockChargerPath)
     CreateFile(mockChargerPath + "/status", "Charging");
 }
 
-int32_t PowerSupplyProvider::ReadDtsNodeString(const char* dtsPath, char* buffer, size_t bufferSize)
-{
-    if (dtsPath == nullptr || buffer == nullptr || bufferSize == 0) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "ReadDtsNodeString: invalid arguments");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    char re_path[PATH_MAX] = {0};
-    if (realpath(dtsPath, re_path) == nullptr) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "realpath error for '%{public}s', errno = %{public}d", dtsPath, errno);
-        return HDF_FAILURE;
-    }
-
-    FILE *fp = fopen(re_path, "r");
-    if (fp == nullptr) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "open dts file '%{public}s' error, errno = %{public}d", re_path, errno);
-        return HDF_ERR_IO;
-    }
-
-    if (fgets(buffer, static_cast<int>(bufferSize), fp) == nullptr) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "read dts str error from '%{public}s', errno = %{public}d", re_path, errno);
-        fclose(fp);
-        return HDF_FAILURE;
-    }
-    if (fclose(fp) != 0) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to close file");
-        return HDF_FAILURE;
-    }
-
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "ReadDtsNodeString success from '%{public}s', value = '%{public}s'",
-        re_path, buffer);
-    return HDF_SUCCESS;
-}
-
 bool PowerSupplyProvider::IsPcDesktopProduct()
 {
-    char buffer[PATH_MAX] = {0};
-    if (ReadDtsNodeString(CAPACITY_POLICY_DTS.c_str(), buffer, sizeof(buffer)) != HDF_SUCCESS) {
+    std::string result;
+    if (GetConfigByPath(CAPACITY_POLICY_DTS, result) != HDF_SUCCESS) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to read PC desktop policy, defaulting to false");
         return false;
     }
 
     int32_t value = 0;
-    if (StrToInt(std::string(buffer), value) == false) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "ailed to convert policy string '%s' to int", buffer);
+    if (StrToInt(result, value) == false) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "ailed to convert policy string '%{public}s' to int", result.c_str());
         return false;
     }
 
