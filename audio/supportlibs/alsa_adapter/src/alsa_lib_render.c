@@ -270,7 +270,7 @@ int32_t AudioCtlRenderUpdateRouter(
     ret = renderIns->UpdateRouter(renderIns, handleData);
     if (ret != AUDIO_SUCCESS) {
         AUDIO_FUNC_LOGE("update router FAIL!");
-        return HDF_FAILURE;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
     return HDF_SUCCESS;
 }

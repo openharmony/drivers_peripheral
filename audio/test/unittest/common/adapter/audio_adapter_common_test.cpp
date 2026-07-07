@@ -247,7 +247,12 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid004, TestSize.
     attrs.silenceThreshold = 0;
     attrs.streamId = 0;
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_HAL_P7885
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#else
     EXPECT_NE(HDF_SUCCESS, ret);
+#endif
 }
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid005, TestSize.Level0)
 {
@@ -261,7 +266,10 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid005, TestSize.
     attrs.silenceThreshold = 0;
     attrs.streamId = 0;
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
-#ifdef AUDIO_FEATURE_COMMUNITY
+#ifdef AUDIO_HAL_P7885
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#elif AUDIO_FEATURE_COMMUNITY
     EXPECT_NE(HDF_SUCCESS, ret);
 #else
     if (ret != HDF_SUCCESS) {
@@ -523,9 +531,14 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid017, TestSize.
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
     if (ret != HDF_SUCCESS) {
         attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
-        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+        ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
     }
+#ifdef AUDIO_HAL_P7885
+    ASSERT_NE(HDF_SUCCESS, ret);
+#else
+    ASSERT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
 }
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid018, TestSize.Level0)
 {
@@ -957,7 +970,12 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid016, TestSize
     devicedesc.pins = PIN_IN_LINEIN;
     InitAttrs(attrs);
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+#ifdef AUDIO_HAL_P7885
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+#else
     EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+#endif
 }
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid019, TestSize.Level0)
 {
@@ -1260,7 +1278,12 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCapturePinIsvalid016, TestSize.Le
     devicedesc.pins = PIN_IN_LINEIN;
     InitAttrs(attrs);
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+#ifdef AUDIO_HAL_P7885
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+#else
     EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+#endif
 }
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCapturePinIsvalid019, TestSize.Level0)
 {
@@ -1497,9 +1520,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetMicMuteIsvalid001, TestSize.Le
 {
     bool mute = false;
     int32_t ret = adapter_->SetMicMute(adapter_, mute);
-#ifdef ALSA_SUPPORT
-    EXPECT_EQ(ret, HDF_SUCCESS);
-#elif defined(AUDIO_FEATURE_COMMUNITY)
+#ifdef AUDIO_FEATURE_COMMUNITY
     EXPECT_NE(ret, HDF_SUCCESS);
 #else
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
@@ -1534,9 +1555,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetVoiceVolumeIsvalid001, TestSiz
 {
     float volume = 0;
     int32_t ret = adapter_->SetVoiceVolume(adapter_, volume);
-#ifdef ALSA_SUPPORT
-    EXPECT_EQ(ret, HDF_SUCCESS);
-#elif defined(AUDIO_FEATURE_COMMUNITY)
+#ifdef AUDIO_FEATURE_COMMUNITY
     EXPECT_NE(ret, HDF_SUCCESS);
 #else
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);

@@ -790,7 +790,7 @@ int32_t AudioAdapterUpdateAudioRoute(
         (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam, AUDIODRV_CTL_IOCTL_UPDATE_ROUTER);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Audio RENDER_CLOSE FAIL");
-        return HDF_FAILURE;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
 
     return AUDIO_SUCCESS;

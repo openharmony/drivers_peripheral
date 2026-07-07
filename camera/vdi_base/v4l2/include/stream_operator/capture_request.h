@@ -42,9 +42,6 @@ public:
     uint64_t GetEndTime() const;
     bool NeedShutterCallback() const;
     bool IsContinous() const;
-#ifdef STILLCAPTURE_DISCONTINUOUS
-    void SetContinous(bool isContinuous);
-#endif
     int32_t GetCaptureId() const;
     void AttachBuffer(std::shared_ptr<IBuffer>& b);
     std::shared_ptr<IBuffer> GetAttachedBuffer() const;

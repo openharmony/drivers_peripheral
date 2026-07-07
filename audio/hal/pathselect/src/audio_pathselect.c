@@ -133,6 +133,8 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
         case PIN_OUT_USB:
         case PIN_OUT_USB_EXT:
             return SPEAKER;
+        case PIN_IN_LINEIN:
+            return MIC;
 #endif
         case PIN_OUT_DAUDIO_DEFAULT:
         default:
