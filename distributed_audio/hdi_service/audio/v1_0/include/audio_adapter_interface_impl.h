@@ -160,14 +160,16 @@ private:
     int32_t HandleWaudioEnable(const DAudioEvent &event);
     int32_t SetUsualParamChange(const std::string &condition, const std::string &value);
     int32_t SetEnhanceParam(const std::string &condition, const std::string &value);
-    int32_t HandleTokenIdFromCapability(const std::string &capability);
+    int32_t HandleTokenIdFromCapability(const uint32_t devId, const std::string &capability);
+    std::string HandleConditionGetCaps(const std::string &condition);
 private:
     static constexpr uint32_t WAIT_MILLISECONDS = 8000;
     static constexpr int32_t TYPE_CONDITION = 11;
     static constexpr int32_t MAX_EVENT_DIGITS = 3;
     AudioAdapterDescriptor adpDescriptor_;
     AudioAdapterStatus status_ = STATUS_OFFLINE;
-    std::string capability_;
+    std::map<std::string, std::string> capabilityMap_;
+    std::string key_ = "pin=";
 
     std::mutex extCallbackMtx_;
     /**
