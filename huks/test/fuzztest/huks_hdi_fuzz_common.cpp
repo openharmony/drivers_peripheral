@@ -17,9 +17,6 @@
 
 #include "huks_hdi_fuzz_common.h"
 
-#define HKS_TAG_TYPE_MASK (0xF << 28)
-#define HKS_TAG_TYPE_BYTES (5 << 28)
-
 int32_t InitHuksCoreEngine(struct HuksHdi **coreEngine)
 {
     if (coreEngine == nullptr) {
