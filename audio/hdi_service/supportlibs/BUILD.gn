@@ -189,7 +189,7 @@ if (defined(ohos_lite)) {
     }
 
     if (drivers_peripheral_audio_feature_p7885) {
- 	    defines += [ "AUDIO_HAL_P7885" ]
+      defines += [ "AUDIO_HAL_P7885" ]
     }
 
     if (defined(is_emulator) && is_emulator) {
