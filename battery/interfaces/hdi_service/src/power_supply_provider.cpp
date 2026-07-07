@@ -24,7 +24,6 @@
 #include "battery_log.h"
 #include "battery_config.h"
 #include "osal_mem.h"
-#include <unique_fd.h>
 #include <file_ex.h>
 #include <string_ex.h>
 
@@ -975,7 +974,7 @@ bool PowerSupplyProvider::IsPcDesktopProduct()
 
     int32_t value = 0;
     if (StrToInt(result, value) == false) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "ailed to convert policy string '%{public}s' to int", result.c_str());
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to convert policy string '%{public}s' to int", result.c_str());
         return false;
     }
 
