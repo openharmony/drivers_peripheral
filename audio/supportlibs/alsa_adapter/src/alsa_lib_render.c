@@ -628,7 +628,9 @@ int32_t AudioInterfaceLibOutputRender(
             ret = AudioOutputRenderPrepare(handle, cmdId, handleData);
             break;
         case AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE:
+            pthread_mutex_lock(&g_mutex);
             ret = AudioOutputRenderClose(handle, cmdId, handleData);
+            pthread_mutex_unlock(&g_mutex);
             break;
         case AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN:
             ret = AudioOutputRenderOpen(handle, cmdId, handleData);
