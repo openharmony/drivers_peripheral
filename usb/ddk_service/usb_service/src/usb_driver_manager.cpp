@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +14,12 @@
  */
 
 #include "usb_driver_manager.h"
+
 #include <cstdint>
+#include <set>
+#include <vector>
 #include <sstream>
+
 #include "hdf_log.h"
 #include "ipc_skeleton.h"
 #include "usbd_wrapper.h"
@@ -59,7 +63,24 @@ bool UsbDriverManager::UpdateDriverInfo(const V1_1::DriverAbilityInfo &driverInf
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
-    driverMap_[tokenId] = std::make_unique<V1_1::DriverAbilityInfo>(driverInfo);
+    auto it = driverMap_.find(tokenId);
+    if (it == driverMap_.end() || it->second == nullptr) {
+        HDF_LOGI("%{public}s: new driver registered, driverUid: %{public}s", __func__, driverInfo.driverUid.c_str());
+        driverMap_[tokenId] = std::make_unique<V1_1::DriverAbilityInfo>(driverInfo);
+        return true;
+    }
+
+    auto &existingVids = it->second->vids;
+    std::set<unsigned short> vidSet(existingVids.begin(), existingVids.end());
+
+    for (const auto &vid : driverInfo.vids) {
+        if (vidSet.find(vid) == vidSet.end()) {
+            existingVids.push_back(vid);
+            vidSet.insert(vid);
+        }
+    }
+    HDF_LOGI("%{public}s: driver merged, driverUid: %{public}s, vidCount:%{public}zu",
+        __func__, driverInfo.driverUid.c_str(), existingVids.size());
     return true;
 }
 

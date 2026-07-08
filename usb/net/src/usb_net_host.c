@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -74,8 +74,8 @@ void UsbnetWriteLog(char *buff, int size, int tag)
 }
 
 // net process
-static int32_t UsbnetHostSendBufToNet(struct HdfIoService *serv,  uint32_t id,
-    const void *buf,  uint32_t length,  int32_t *replyData)
+static int32_t UsbnetHostSendBufToNet(struct HdfIoService *serv, uint32_t id,
+    const void *buf, uint32_t length, int32_t *replyData)
 {
     HARCH_INFO_PRINT("begin");
     int32_t ret = 0;
@@ -98,7 +98,7 @@ static int32_t UsbnetHostSendBufToNet(struct HdfIoService *serv,  uint32_t id,
         goto out;
     }
 
-    ret = serv->dispatcher->Dispatch(&serv->object, id,  data,  reply);
+    ret = serv->dispatcher->Dispatch(&serv->object, id, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("fail to send service call");
         goto out;
@@ -143,7 +143,7 @@ static void  UsbnetHostTXComplete(const void *requestArg)
 }
 
 
-static int32_t UsbnetHostStartWb(struct UsbnetHost *usbNet,  struct UsbHostWb *wb)
+static int32_t UsbnetHostStartWb(struct UsbnetHost *usbNet, struct UsbHostWb *wb)
 {
     HARCH_INFO_PRINT("begin");
     struct UsbRawFillRequestData reqData;
@@ -218,7 +218,7 @@ static int32_t UsbHostWbAlloc(const struct UsbnetHost *usbNet)
     return -1;
 }
 
-static int32_t UsbnetHostSnedbufToUrb(struct UsbnetHost *usbNet,  struct HdfSBuf *data)
+static int32_t UsbnetHostSnedbufToUrb(struct UsbnetHost *usbNet, struct HdfSBuf *data)
 {
     int32_t wbn;
     int32_t size;
@@ -1130,7 +1130,7 @@ static int32_t UsbnetHostClose(struct UsbnetHost *usbNet, struct HdfSBuf *data)
     return HDF_SUCCESS;
 }
 
-static int32_t OnUsbnetHostEventReceived(void *priv,  uint32_t id, struct HdfSBuf *data)
+static int32_t OnUsbnetHostEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
     int32_t ret = HDF_SUCCESS;
     struct HdfDeviceObject *device = (struct HdfDeviceObject *)priv;
