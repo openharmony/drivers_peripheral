@@ -24,8 +24,6 @@
 #include "battery_log.h"
 #include "battery_config.h"
 #include "osal_mem.h"
-#include <file_ex.h>
-#include <string_ex.h>
 
 #define DRIVERS_PERIPHERAL_BATTERY_FDSAN_TAG 0XD002923
 
@@ -59,6 +57,7 @@ const std::string BATTERY_KEY_CURRENT_NOW = "POWER_SUPPLY_CURRENT_NOW=";
 const std::string INVALID_STRING_VALUE = "invalid";
 const std::string BATTERY_NODE_PATH = "battery";
 const std::string CAPACITY_POLICY_DTS = "/proc/device-tree/power_host_cfg/capacity_policy";
+const std::string CAPACITY_POLICY_BATTERY_LESS = "1";
 }
 
 BatterydInfo g_batteryInfo;
@@ -964,7 +963,7 @@ void PowerSupplyProvider::CreateMockChargerPath(std::string& mockChargerPath)
     CreateFile(mockChargerPath + "/status", "Charging");
 }
 
-bool PowerSupplyProvider::IsPcDesktopProduct()
+bool PowerSupplyProvider::IsBatterylessProduct()
 {
     std::string result;
     if (GetConfigByPath(CAPACITY_POLICY_DTS, result) != HDF_SUCCESS) {
@@ -972,19 +971,19 @@ bool PowerSupplyProvider::IsPcDesktopProduct()
         return false;
     }
 
-    int32_t value = 0;
-    if (StrToInt(result, value) == false) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to convert policy string '%{public}s' to int", result.c_str());
-        return false;
+    if (result == CAPACITY_POLICY_BATTERY_LESS) {
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "The product is battery less");
+        return true;
     }
 
-    return (value == 1);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "The product contains a battery");
+    return false;
 }
 
 void PowerSupplyProvider::CreateMockBatteryPath(std::string& mockBatteryPath)
 {
     BATTERY_HILOGI(FEATURE_BATT_INFO, "create mockFilePath path");
-    if (IsPcDesktopProduct()) {
+    if (IsBatterylessProduct()) {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "Product is pc desktop");
         CreateFile(mockBatteryPath + "/capacity", "100");
     } else {

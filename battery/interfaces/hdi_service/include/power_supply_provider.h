@@ -157,7 +157,7 @@ private:
     void CreateMockChargeTypePath(std::string& mockChargeTypePath);
     int32_t ReadFileToMap(std::map<std::string, std::string>& chargingLimitMap, std::string chargingLimitPath);
     int32_t WriteConf(std::string path);
-    bool IsPcDesktopProduct();
+    bool IsBatterylessProduct();
     std::vector<std::string> nodeNames_;
     std::map<std::string, std::string> nodeNamePathMap_;
     std::map<std::string, int32_t> nodeCacheFiles_;
