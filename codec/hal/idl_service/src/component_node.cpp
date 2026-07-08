@@ -129,6 +129,7 @@ int32_t ComponentNode::CloseHandle()
     }
 
     auto err = mgr_->DeleteComponentInstance(reinterpret_cast<OMX_COMPONENTTYPE *>(comp_));
+    comp_ = nullptr;
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("DeleteComponentInstance err = %{public}x ", err);
         return err;
