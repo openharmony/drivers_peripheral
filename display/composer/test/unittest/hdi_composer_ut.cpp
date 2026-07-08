@@ -54,12 +54,14 @@ static inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
     return HdiTestDevice::GetInstance().GetFirstDisplay();
 }
 
+#ifndef DISPLAY_P7885
 static int32_t CheckComposition(std::vector<LayerSettings> &layers, BufferHandle* clientBuffer,
     uint32_t checkType = HdiCompositionCheck::CHECK_VERTEX)
 {
     DISPLAY_TEST_CHK_RETURN((clientBuffer == nullptr), DISPLAY_NULL_PTR, DISPLAY_TEST_LOGE("client buffer is nullptr"));
     return HdiCompositionCheck::GetInstance().Check(layers, *clientBuffer, checkType);
 }
+#endif
 
 static std::shared_ptr<HdiTestLayer> CreateTestLayer(LayerSettings setting, uint32_t zorder)
 {
