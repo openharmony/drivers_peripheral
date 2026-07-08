@@ -756,6 +756,26 @@ int32_t AudioAdapterInterfaceImpl::HandleTokenIdFromCapability(const std::string
     return DH_SUCCESS;
 }
 
+void AudioAdapterInterfaceImpl::ClearSpkPinInUse(const uint32_t devId)
+{
+    DHLOGE("ClearSpkPinInUse enter.");
+    if (devId == DEFAULT_RENDER_ID || devId == OFFLOAD_RENDER_ID) {
+        for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
+            DestroyRender(i);
+        }
+    }
+}
+
+void AudioAdapterInterfaceImpl::ClearMicPinInUse(const uint32_t devId)
+{
+    DHLOGE("ClearMicPinInUse enter.");
+    if (devId == DEFAULT_CAPTURE_ID) {
+        for (uint32_t capId = 0; capId < MAX_AUDIO_STREAM_NUM; capId++) {
+            DestroyCapture(capId);
+        }
+    }
+}
+
 int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
 {
     DHLOGI("Remove distributed audio device %{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
@@ -767,17 +787,8 @@ int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
         }
         mapAudioDevice_.erase(devId);
     }
-    if (devId == spkPinInUse_) {
-        for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
-            DestroyRender(i);
-        }
-    }
-    if (devId == micPinInUse_) {
-        for (uint32_t capId = 0; capId < MAX_AUDIO_STREAM_NUM; capId++) {
-            DestroyCapture(capId);
-        }
-    }
-
+    ClearSpkPinInUse(devId);
+    ClearMicPinInUse(devId);
     DHLOGI("Remove audio device success.");
     return DH_SUCCESS;
 }
@@ -825,7 +836,6 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
         extSpkCallback->DestroyStream(renderId);
         return ret;
     }
-    spkPinInUse_ = static_cast<uint32_t>(dhId);
     DHLOGI("Open render device success.");
     return DH_SUCCESS;
 }
@@ -835,10 +845,6 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
 {
     DHLOGI("Close render device, pin: %{public}d.", dhId);
     std::lock_guard<std::mutex> devLck(renderOptMtx_);
-    if (spkPinInUse_ == 0) {
-        DHLOGI("No need close render device.");
-        return DH_SUCCESS;
-    }
     renderParam_ = {};
     if (extSpkCallback == nullptr) {
         DHLOGE("Callback is null.");
@@ -870,7 +876,6 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
         return DH_SUCCESS;
     }
     std::lock_guard<std::mutex> devLck(captureOptMtx_);
-    micPinInUse_ = dhId;
     captureParam_.format = attrs.format;
     captureParam_.channelCount = attrs.channelCount;
     captureParam_.sampleRate = attrs.sampleRate;
@@ -915,10 +920,6 @@ int32_t AudioAdapterInterfaceImpl::CloseCaptureDevice(const AudioDeviceDescripto
 {
     DHLOGI("Close capture device, pin: %{public}d.", dhId);
     std::lock_guard<std::mutex> devLck(captureOptMtx_);
-    if (micPinInUse_ == 0) {
-        DHLOGI("No need close capture device.");
-        return DH_SUCCESS;
-    }
     captureParam_ = {};
     if (extMicCallback == nullptr) {
         DHLOGE("Callback is null.");
@@ -935,7 +936,6 @@ int32_t AudioAdapterInterfaceImpl::CloseCaptureDevice(const AudioDeviceDescripto
         DHLOGE("Wait SA notify failed. ret:%{public}d.", ret);
         return ret;
     }
-    micPinInUse_ = 0;
     DHLOGI("Close capture device success.");
     return DH_SUCCESS;
 }

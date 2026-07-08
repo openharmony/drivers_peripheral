@@ -115,7 +115,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyRender_001, TestSize.Level1)
     uint32_t renderId = 0;
     AdapterTest_->renderDevs_[renderId] = std::make_pair(dhId,
         sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, devDesc, attrs, callback, renderId)));
-    AdapterTest_->spkPinInUse_ = 0;
 
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyRender(renderId));
     renderId = 10;
@@ -144,11 +143,10 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyRender_002, TestSize.Level1)
 
     devDesc.pins = PIN_OUT_DAUDIO_DEFAULT;
     uint32_t renderId = 0;
-    AdapterTest_->spkPinInUse_ = 0;
     AdapterTest_->renderDevs_[renderId] = std::make_pair(dhId,
         sptr<AudioRenderInterfaceImpl>(new AudioRenderInterfaceImpl(adpterName, devDesc, attrs, callback, renderId)));
     AdapterTest_->renderDevs_[renderId].second->SetRenderStatus(AudioRenderStatus::RENDER_STATUS_START);
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyRender(renderId));
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->DestroyRender(renderId));
 }
 
 /**
@@ -230,7 +228,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyCapture_002, TestSize.Level1)
     AdapterTest_->captureDevs_[capId] =
         std::make_pair(dhId, new AudioCaptureInterfaceImpl(adpterName, devDesc, attrs, callback));
     AdapterTest_->captureDevs_[capId].second->SetCaptureStatus(AudioCaptureStatus::CAPTURE_STATUS_START);
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyCapture(capId));
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->DestroyCapture(capId));
 }
 
 /**
@@ -846,11 +844,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, RemoveAudioDevice_001, TestSize.Level1)
     uint32_t devId = 64;
     std::string caps;
     AdapterTest_->mapAudioDevice_.insert(std::make_pair(64, "hello"));
-    AdapterTest_->spkPinInUse_ = 64;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
     AdapterTest_->mapAudioDevice_.insert(std::make_pair(64, "hello"));
-    AdapterTest_->spkPinInUse_ = 0;
-    AdapterTest_->micPinInUse_ = 64;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
 }
 
@@ -911,9 +906,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseRenderDevice_001, TestSize.Level1)
     AudioDeviceDescriptor devDesc;
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback(nullptr);
-    AdapterTest_->spkPinInUse_ = 0;
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
-    AdapterTest_->spkPinInUse_ = 1;
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
     callback = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
     callback = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
@@ -955,7 +948,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseCaptureDevice_001, TestSize.Level1)
     int32_t dhId = DEFAULT_CAPTURE_ID;
     sptr<IDAudioCallback> callback(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseCaptureDevice(devDesc, callback, dhId));
-    AdapterTest_->micPinInUse_ = 1;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseCaptureDevice(devDesc, callback, dhId));
 }
 
@@ -1874,7 +1866,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_001, TestSize.Level1)
     std::string value = "{\"RECORD_SCENE\":\"high-definition-record\"}";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
-    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     EXPECT_EQ(DH_SUCCESS, AdapterTest_->SetEnhanceParam(condition, value));
@@ -1916,7 +1907,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_003, TestSize.Level1)
     std::string value = "{\"RECORD_SCENE\":\"high-definition-record\"}";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
-    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
 
     EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetEnhanceParam(condition, value));
 }
@@ -1936,7 +1926,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_004, TestSize.Level1)
     std::string value = "{\"RECORD_SCENE\":\"high-definition-record\"}";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
-    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->extCallbackMap_[micEnhanDhId] = nullptr;
 
     EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->SetEnhanceParam(condition, value));
@@ -1957,7 +1946,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetEnhanceParam_005, TestSize.Level1)
     std::string value = "{\"RECORD_SCENE\":\"high-definition-record\"}";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
-    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
 
     EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetEnhanceParam(condition, value));
@@ -1979,7 +1967,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
     std::string value = "RECORD_SCENE=high-definition-record";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
-    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->extCallbackMap_[micEnhanDhId] = sptr<IDAudioCallback>(new MockIDAudioCallback());
 
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
@@ -2022,7 +2009,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_003, TestSize.Level1)
     std::string value = "RECORD_SCENE=high-definition-record";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
-    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
     AdapterTest_->extCallbackMap_[micEnhanDhId] = nullptr;
 
     EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
@@ -2044,7 +2030,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_004, TestSize.Level1)
     std::string value = "RECORD_SCENE=high-definition-record";
     int32_t micEnhanDhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->micEnhanDhId_ = static_cast<uint32_t>(micEnhanDhId);
-    AdapterTest_->micPinInUse_ = static_cast<uint32_t>(micEnhanDhId);
 
     EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
 }

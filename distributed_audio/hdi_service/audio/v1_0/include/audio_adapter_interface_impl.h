@@ -161,6 +161,8 @@ private:
     int32_t SetUsualParamChange(const std::string &condition, const std::string &value);
     int32_t SetEnhanceParam(const std::string &condition, const std::string &value);
     int32_t HandleTokenIdFromCapability(const std::string &capability);
+    void ClearSpkPinInUse(const uint32_t devId);
+    void ClearMicPinInUse(const uint32_t devId);
 private:
     static constexpr uint32_t WAIT_MILLISECONDS = 8000;
     static constexpr int32_t TYPE_CONDITION = 11;
@@ -206,7 +208,6 @@ private:
     bool spkNotifyFlag_ = false;
     bool micNotifyFlag_ = false;
 
-    uint32_t spkPinInUse_ = 0;
     uint32_t micPinInUse_ = 0;
     uint32_t streamMuteStatus_ = 0;
     uint32_t sinkDhId_ = 0;
