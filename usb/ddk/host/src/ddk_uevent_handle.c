@@ -237,7 +237,7 @@ static int32_t DdkUeventCallBack(void *priv, uint32_t id, struct HdfSBuf *data)
     if (id == USB_PNP_NOTIFY_ADD_DEVICE || id == USB_PNP_NOTIFY_REMOVE_DEVICE) {
         uint32_t infoSize;
         bool flag = HdfSbufReadBuffer(data, (const void **)(&info), &infoSize);
-        if (!flag || info == NULL) {
+        if (!flag || info == NULL || infoSize < sizeof(struct UsbPnpNotifyMatchInfoTable)) {
             HDF_LOGE("%{public}s: HdfSbufReadBuffer failed, flag=%{public}d", __func__, flag);
             return HDF_ERR_INVALID_PARAM;
         }

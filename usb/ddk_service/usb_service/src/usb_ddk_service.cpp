@@ -232,7 +232,7 @@ static int32_t UsbdPnpEventHandler(void *priv, uint32_t id, HdfSBuf *data)
         uint32_t infoSize;
         struct UsbPnpNotifyMatchInfoTable *infoTable = nullptr;
         auto flag = HdfSbufReadBuffer(data, (const void **)(&infoTable), &infoSize);
-        if ((!flag) || (infoTable == nullptr)) {
+        if ((!flag) || (infoTable == nullptr || infoSize < sizeof(struct UsbPnpNotifyMatchInfoTable))) {
             HDF_LOGE("%{public}s: fail to read infoTable in event data, flag = %{public}d", __func__, flag);
             return HDF_ERR_INVALID_PARAM;
         }
