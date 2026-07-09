@@ -684,7 +684,8 @@ static int32_t UsbDdkPnpLoaderDispatchPnpDevice(
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (!HdfSbufReadBuffer(data, (const void **)(&privateData), &infoSize) || infoSize < sizeof(struct UsbPnpNotifyMatchInfoTable)) {
+    if (!HdfSbufReadBuffer(data, (const void **)(&privateData), &infoSize) ||
+        infoSize < sizeof(struct UsbPnpNotifyMatchInfoTable)) {
         HDF_LOGW("%s: HdfSbufReadBuffer privateData error!", __func__);
         privateData = NULL;
     }
