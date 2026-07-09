@@ -1043,7 +1043,8 @@ static int32_t UsbnetHostUpdateFlags(struct UsbnetHost *usbNet, struct HdfSBuf *
         return HDF_FAILURE;
     }
     HARCH_INFO_PRINT("before set flags usbNet->flags = %{public}d", usbNet->flags);
-    if (!HdfSbufReadBuffer(data, (const void **)&flags, &readSize) || readSize < sizeof(struct UsbPnpNotifyMatchInfoTable)) {
+    if (!HdfSbufReadBuffer(data, (const void **)&flags, &readSize) ||
+        readSize < sizeof(struct UsbPnpNotifyMatchInfoTable)) {
         HDF_LOGE("%{public}s:%{public}d fail to read usbnet flags from usb net adapter", __func__, __LINE__);
         return HDF_FAILURE;
     }

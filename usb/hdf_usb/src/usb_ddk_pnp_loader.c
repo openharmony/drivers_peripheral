@@ -1004,7 +1004,8 @@ int32_t UsbDdkPnpLoaderEventReceived(void *usbPnpManagerPtr, uint32_t id, struct
         case USB_PNP_NOTIFY_ADD_TEST:
 #endif
             flag = HdfSbufReadBuffer(data, (const void **)(&infoTable), &infoSize);
-            if ((!flag) || (infoTable == NULL) || infoSize < sizeof(struct UsbPnpNotifyMatchInfoTable)) {
+            if ((!flag) || (infoTable == NULL) ||
+                infoSize < sizeof(struct UsbPnpNotifyMatchInfoTable)) {
                 ret = HDF_ERR_INVALID_PARAM;
                 HDF_LOGE("%s: fail to read infoTable in event data, flag = %d", __func__, flag);
                 return ret;
