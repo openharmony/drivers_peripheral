@@ -72,7 +72,7 @@ public:
                 return;
             }
         } else {
-            GTEST_SKIP() << "hdiJpeg_ is null!" << std::endl
+            GTEST_SKIP() << "hdiJpeg_ is null!" << std::endl;
             return;
         }
     }
