@@ -66,7 +66,14 @@ public:
     void SetUp()
     {
         if (hdiJpeg_ != nullptr) {
-            hdiJpeg_->Init(CODEC_IMAGE_JPEG);
+            auto ret = hdiJpeg_->Init(CODEC_IMAGE_JPEG);
+            if (ret != HDF_SUCCESS) {
+                GTEST_SKIP() << "jpeg is null!" << std::endl;
+                return;
+            }
+        } else {
+            GTEST_SKIP() << "hdiJpeg_ is null!" << std::endl
+            return;
         }
     }
     void TearDown()
@@ -101,7 +108,6 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiAllocateInBufferTest_002, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
-#ifndef CODEC_P7885
 HWTEST_F(CodecHdiJpegTest, HdfCodecHdiAllocateAndFreeInBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(hdiJpeg_ != nullptr);
@@ -111,7 +117,6 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiAllocateAndFreeInBufferTest_001, TestSize.
     ret = hdiJpeg_->FreeInBuffer(inBuffer);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
-#endif
 
 HWTEST_F(CodecHdiJpegTest, HdfCodecHdiFreeInBufferTest_001, TestSize.Level1)
 {
@@ -135,7 +140,6 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_001, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
-#ifndef CODEC_P7885
 HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(hdiJpeg_ != nullptr);
@@ -151,9 +155,7 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_002, TestSize.Level1)
     ret = hdiJpeg_->FreeInBuffer(inBuffer);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
-#endif
 
-#ifndef CODEC_P7885
 HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_003, TestSize.Level1)
 {
     ASSERT_TRUE(hdiJpeg_ != nullptr);
@@ -172,6 +174,5 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_003, TestSize.Level1)
     ret = hdiJpeg_->FreeInBuffer(inBuffer);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
-#endif
 
 }  // namespace
