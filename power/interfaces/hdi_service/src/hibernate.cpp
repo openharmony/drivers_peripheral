@@ -137,7 +137,7 @@ void Hibernate::Init()
     if (!supportSpaceOpt_) {
         auto myThread = std::thread([this] { this->InitSwap(); });
         myThread.detach();
-    } else if (swapFileReady_) {
+    } else if (IsSwapFileExist()) {
         RemoveSwapFile();
     }
 }
