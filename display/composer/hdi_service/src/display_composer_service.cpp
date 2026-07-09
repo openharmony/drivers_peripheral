@@ -1297,7 +1297,6 @@ int32_t DisplayComposerService::SetDisplayColorGamut(uint32_t devId, ColorGamut 
     return ret;
 }
 
-
 int32_t DisplayComposerService::GetDisplayVCPFeature(uint32_t devId, uint8_t vcpCode,
     uint16_t& currentValue, uint16_t& maximumValue, int32_t& replyErrorCode)
 {
