@@ -105,7 +105,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0002)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0003)
 {
-    if (!g_usbCameraExit) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     ability_ = cameraBase_->GetCameraAbility();
@@ -128,7 +128,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0003)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0004)
 {
-    if (!g_usbCameraExit) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     ability_ = cameraBase_->GetCameraAbility();
@@ -357,7 +357,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0012)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0013)
 {
-    if (!g_usbCameraExit) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     ability_ = cameraBase_->GetCameraAbility();
@@ -421,7 +421,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0015)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0016)
 {
-    if (!g_usbCameraExit) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     ability_ = cameraBase_->GetCameraAbility();
@@ -955,7 +955,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0029)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0030)
 {
-    if (!g_usbCameraExit) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     ability_ = cameraBase_->GetCameraAbility();
