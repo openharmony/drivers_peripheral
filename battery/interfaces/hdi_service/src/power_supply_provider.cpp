@@ -967,7 +967,7 @@ bool PowerSupplyProvider::IsBatterylessProduct()
 {
     std::string result;
     if (GetConfigByPath(BATTERY_LESS_DTS_PATH, result) != HDF_SUCCESS) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to read PC desktop policy, defaulting to false");
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to read battery less config, defaulting to false");
         return false;
     }
 
