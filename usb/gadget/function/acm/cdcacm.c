@@ -779,7 +779,7 @@ static int32_t UsbSerialSetBaudrate(struct UsbSerial *port, struct HdfSBuf *data
     uint32_t size;
     uint32_t *baudRate = NULL;
 
-    if (!HdfSbufReadBuffer(data, (const void **)&baudRate, &size) || size < sizeof(struct UsbPnpNotifyMatchInfoTable)) {
+    if (!HdfSbufReadBuffer(data, (const void **)&baudRate, &size) || size != sizeof(uint32_t)) {
         HDF_LOGE("%{public}s: sbuf read buffer failed", __func__);
         return HDF_ERR_IO;
     }
