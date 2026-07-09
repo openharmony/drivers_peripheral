@@ -1157,6 +1157,13 @@ int32_t RawSendControlRequest(struct UsbHostRequest *request, const struct UsbDe
         HDF_LOGE("%{public}s:%{public}d oversize", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
+
+    if (request->bufLen < USB_RAW_CONTROL_SETUP_SIZE + requestData->length) {
+        HDF_LOGE("%{public}s:%{public}d buffer too small, bufLen=%{public}d, need=%{public}d",
+            __func__, __LINE__, request->bufLen, USB_RAW_CONTROL_SETUP_SIZE + requestData->length);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    
     setup = request->buffer;
     RawFillControlSetup(setup, requestData);
     if ((requestData->requestType & USB_DDK_ENDPOINT_DIR_MASK) == USB_PIPE_DIRECTION_OUT) {
