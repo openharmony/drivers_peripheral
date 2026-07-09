@@ -56,7 +56,7 @@ const std::string BATTERY_KEY_CURRENT_AVERAGE = "POWER_SUPPLY_CURRENT_AVERAGE=";
 const std::string BATTERY_KEY_CURRENT_NOW = "POWER_SUPPLY_CURRENT_NOW=";
 const std::string INVALID_STRING_VALUE = "invalid";
 const std::string BATTERY_NODE_PATH = "battery";
-const std::string CAPACITY_POLICY_DTS = "/proc/device-tree/power_host_cfg/capacity_policy";
+const std::string BATTERY_LESS_DTS_PATH = "/proc/device-tree/power_host_cfg/battery_less";
 const std::string BATTERY_LESS_PRODUCT = "1";
 }
 
@@ -966,7 +966,7 @@ void PowerSupplyProvider::CreateMockChargerPath(std::string& mockChargerPath)
 bool PowerSupplyProvider::IsBatterylessProduct()
 {
     std::string result;
-    if (GetConfigByPath(CAPACITY_POLICY_DTS, result) != HDF_SUCCESS) {
+    if (GetConfigByPath(BATTERY_LESS_DTS_PATH, result) != HDF_SUCCESS) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to read PC desktop policy, defaulting to false");
         return false;
     }
