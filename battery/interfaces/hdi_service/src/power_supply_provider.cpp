@@ -57,7 +57,7 @@ const std::string BATTERY_KEY_CURRENT_NOW = "POWER_SUPPLY_CURRENT_NOW=";
 const std::string INVALID_STRING_VALUE = "invalid";
 const std::string BATTERY_NODE_PATH = "battery";
 const std::string CAPACITY_POLICY_DTS = "/proc/device-tree/power_host_cfg/capacity_policy";
-const std::string CAPACITY_POLICY_BATTERY_LESS = "1";
+const std::string BATTERY_LESS_PRODUCT = "1";
 }
 
 BatterydInfo g_batteryInfo;
@@ -971,7 +971,7 @@ bool PowerSupplyProvider::IsBatterylessProduct()
         return false;
     }
 
-    if (result == CAPACITY_POLICY_BATTERY_LESS) {
+    if (result == BATTERY_LESS_PRODUCT) {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "The product is battery less");
         return true;
     }
