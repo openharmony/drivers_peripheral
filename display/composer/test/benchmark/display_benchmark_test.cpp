@@ -964,6 +964,27 @@ BENCHMARK_F(DisplayBenchmarkTest, SetDisplayColorGamutTest)(benchmark::State &st
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayColorGamutTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetLayerColor
+  * @tc.desc: Benchmarktest for interface GetLayerColor.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetLayerColorTest)(benchmark::State &state)
+{
+    int32_t ret = 0;
+    uint32_t layerId = 1;
+    LayerColor color = {0, 0, 0, 0};
+    for (auto _ : state) {
+        ret = g_composerDevice->GetLayerColor(g_displayIds[0], layerId, color);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetLayerColorTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 } // namespace
 
 int main(int argc, char** argv)

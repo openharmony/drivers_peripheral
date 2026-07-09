@@ -292,6 +292,8 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<GetDisplayVCPFeatureFunc>(dlsym(libHandle_, "GetDisplayVCPFeature"));
     vdiAdapter_->SetDisplayVCPFeature =
         reinterpret_cast<SetDisplayVCPFeatureFunc>(dlsym(libHandle_, "SetDisplayVCPFeature"));
+    vdiAdapter_->GetLayerColor =
+        reinterpret_cast<GetLayerColorFunc>(dlsym(libHandle_, "GetLayerColor"));
 }
 
 void DisplayComposerService::HidumperInit()
@@ -1322,6 +1324,18 @@ int32_t DisplayComposerService::SetDisplayVCPFeature(uint32_t devId, uint8_t vcp
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->SetDisplayVCPFeature, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiAdapter_->SetDisplayVCPFeature(devId, vcpCode, currentValue);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
+        DISPLAY_LOGE("%{public}s fail ret:%{public}d, devId:%{public}u", __func__, ret, devId));
+    return ret;
+}
+
+int32_t DisplayComposerService::GetLayerColor(uint32_t devId, uint32_t layerId, LayerColor &color)
+{
+    DISPLAY_TRACE;
+
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->GetLayerColor, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiAdapter_->GetLayerColor(devId, layerId, color);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail ret:%{public}d, devId:%{public}u", __func__, ret, devId));
     return ret;
 }
