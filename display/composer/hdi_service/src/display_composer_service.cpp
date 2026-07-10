@@ -907,6 +907,7 @@ int32_t DisplayComposerService::InitSMQInfo(uint32_t devId, const std::shared_pt
             cmdResponserMap_.erase(respItem);
         }
         cmdResponserMap_.insert({devId, cmdResponserCur});
+    }
 
     DISPLAY_LOGI("%{public}s: devId[%{public}u] done.", __func__, devId);
     return ret;
