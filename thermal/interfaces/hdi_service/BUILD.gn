@@ -38,7 +38,7 @@ ohos_shared_library("libthermal_interface_service_1.1") {
       "init:libbegetutil",
       "ipc:ipc_single",
       "libxml2:libxml2",
-      "zlib:libz",
+      "zlib:shared_libz",
     ]
     defines = []
     if (drivers_peripheral_thermal_feature_c_utils) {
