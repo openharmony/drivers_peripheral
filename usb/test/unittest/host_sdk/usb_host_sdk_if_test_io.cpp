@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -137,14 +137,14 @@ static void AcmGetPipe()
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_IN) && (p.pipeType == USB_PIPE_TYPE_BULK)) {
-            EXPECT_NE(nullptr,  pi);
+            EXPECT_NE(nullptr, pi);
             p.interfaceId = g_acm->dataIface->info.interfaceIndex;
             *pi = p;
             g_acm->dataInPipe = pi;
         }
 
         if ((p.pipeDirection == USB_PIPE_DIRECTION_OUT) && (p.pipeType == USB_PIPE_TYPE_BULK)) {
-            EXPECT_NE(nullptr,  pi);
+            EXPECT_NE(nullptr, pi);
             p.interfaceId = g_acm->dataIface->info.interfaceIndex;
             *pi = p;
             g_acm->dataOutPipe = pi;
@@ -186,7 +186,7 @@ static void AcmGetRequest()
     g_acm->readSize = g_acm->dataInPipe->maxPacketSize;
     for (i = 0; i < ACM_NR; i++) {
         g_acm->readReq[i] = UsbAllocRequest(g_acm->data_devHandle, 0, g_acm->readSize);
-        EXPECT_NE(nullptr,  g_acm->readReq[i]);
+        EXPECT_NE(nullptr, g_acm->readReq[i]);
     }
 
     g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
@@ -196,16 +196,16 @@ static void AcmGetRequest()
     for (i = 0; i < ACM_NW; i++) {
         g_acm->wb[i].request = UsbAllocRequest(g_acm->data_devHandle, 0, g_acm->writeSize);
         g_acm->wb[i].instance = g_acm;
-        EXPECT_NE(nullptr,  g_acm->wb[i].request);
+        EXPECT_NE(nullptr, g_acm->wb[i].request);
     }
 
     g_acm->intSize = g_acm->intPipe->maxPacketSize;
     g_acm->notifyReq = UsbAllocRequest(g_acm->int_devHandle, 0, g_acm->intSize);
-    EXPECT_NE(nullptr,  g_acm->notifyReq);
+    EXPECT_NE(nullptr, g_acm->notifyReq);
 
     g_acm->ctrlSize = sizeof (struct UsbCdcLineCoding);
     g_acm->ctrlReq = UsbAllocRequest(g_acm->ctrl_devHandle, 0, g_acm->ctrlSize);
-    EXPECT_NE(nullptr,  g_acm->ctrlReq);
+    EXPECT_NE(nullptr, g_acm->ctrlReq);
 }
 
 static void AcmFillReadRequest()
@@ -331,22 +331,22 @@ static void AcmInit()
     g_acm->devAddr = 2U;
     g_acm->interfaceIndex = 3U;
     g_acm->dataIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
-    EXPECT_NE(nullptr,  g_acm->dataIface);
+    EXPECT_NE(nullptr, g_acm->dataIface);
 
     g_acm->interfaceIndex = 2U;
     g_acm->intIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
-    EXPECT_NE(nullptr,  g_acm->intIface);
+    EXPECT_NE(nullptr, g_acm->intIface);
 
     g_acm->interfaceIndex = 255U;
     g_acm->ctrIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
-    EXPECT_NE(nullptr,  g_acm->ctrIface);
+    EXPECT_NE(nullptr, g_acm->ctrIface);
 
     g_acm->data_devHandle = UsbOpenInterface(g_acm->dataIface);
-    EXPECT_NE(nullptr,  g_acm->data_devHandle);
+    EXPECT_NE(nullptr, g_acm->data_devHandle);
     g_acm->int_devHandle = UsbOpenInterface(g_acm->intIface);
-    EXPECT_NE(nullptr,  g_acm->int_devHandle);
+    EXPECT_NE(nullptr, g_acm->int_devHandle);
     g_acm->ctrl_devHandle = UsbOpenInterface(g_acm->ctrIface);
-    EXPECT_NE(nullptr,  g_acm->ctrl_devHandle);
+    EXPECT_NE(nullptr, g_acm->ctrl_devHandle);
 
     AcmGetPipe();
     AcmGetRequest();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1440,7 +1440,7 @@ unsigned char *LibusbAdapter::GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busA
     }
     unsigned char *memBuf = GetMmapBufferByFd(fd, len);
     if (memBuf == nullptr) {
-        HDF_LOGE("%{public}s: GetMmapBufferByFd failed",  __func__);
+        HDF_LOGE("%{public}s: GetMmapBufferByFd failed", __func__);
         return nullptr;
     }
     return memBuf;
@@ -1525,7 +1525,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPip
     unsigned char *buffer = GetMmapBufferByFd(sendRequestAshmemParameter.ashmemFd,
         sendRequestAshmemParameter.ashmemSize);
     if (buffer == nullptr) {
-        HDF_LOGE("%{public}s: GetMmapBufferByFd failed",  __func__);
+        HDF_LOGE("%{public}s: GetMmapBufferByFd failed", __func__);
         close(sendRequestAshmemParameter.ashmemFd);
         return HDF_FAILURE;
     }

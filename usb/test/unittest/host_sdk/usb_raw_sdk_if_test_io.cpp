@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -323,18 +323,18 @@ static void AcmRawAllocRequest()
     for (i = 0; i < ACM_NW; i++) {
         g_acm->wb[i].request = UsbRawAllocRequest(g_acm->devHandle, 0, g_acm->dataOutEp->maxPacketSize);
         g_acm->wb[i].instance = g_acm;
-        EXPECT_NE(nullptr,  g_acm->wb[i].request);
+        EXPECT_NE(nullptr, g_acm->wb[i].request);
     }
     for (i = 0; i < ACM_NR; i++) {
         g_acm->readReq[i] = UsbRawAllocRequest(g_acm->devHandle, 0, g_acm->dataInEp->maxPacketSize);
-        EXPECT_NE(nullptr,  g_acm->readReq[i]);
+        EXPECT_NE(nullptr, g_acm->readReq[i]);
     }
 
     g_acm->ctrlReq = UsbRawAllocRequest(g_acm->devHandle, 0, USB_CTRL_REQ_SIZE);
-    EXPECT_NE(nullptr,  g_acm->ctrlReq);
+    EXPECT_NE(nullptr, g_acm->ctrlReq);
 
     g_acm->notifyReq = UsbRawAllocRequest(g_acm->devHandle, 0, g_acm->notifyEp->maxPacketSize);
-    EXPECT_NE(nullptr,  g_acm->notifyReq);
+    EXPECT_NE(nullptr, g_acm->notifyReq);
 }
 
 static void AcmRawFillWriteReq()
@@ -447,13 +447,13 @@ static void AcmRawInit()
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     g_devHandle = UsbRawOpenDevice(NULL, g_acm->busNum, g_acm->devAddr);
-    EXPECT_NE(nullptr,  g_devHandle);
+    EXPECT_NE(nullptr, g_devHandle);
     g_acm->devHandle = g_devHandle;
 
     ret = UsbRawGetConfiguration(g_acm->devHandle, &g_activeConfig);
     EXPECT_EQ(HDF_SUCCESS, ret);
     g_dev = UsbRawGetDevice(g_acm->devHandle);
-    EXPECT_NE(nullptr,  g_dev);
+    EXPECT_NE(nullptr, g_dev);
     ret = UsbRawGetConfigDescriptor(g_dev, g_activeConfig, &g_acm->config);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = UsbRawGetDeviceDescriptor(g_dev, &desc);
