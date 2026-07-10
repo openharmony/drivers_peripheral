@@ -121,7 +121,7 @@ bool GetSupportSpaceOptConfig()
         HDF_LOGE("GetRootNode failed.");
         return supportSpaceOpt;
     }
-    const struct DeviceResourceNode *pChildNode = iface->GetChildNode(pRootNode, "power_driver_config");
+    const struct DeviceResourceNode *pChildNode = iface->GetChildNode(pRootNode, "dynamic_swapfile");
     if (pChildNode != nullptr) {
         supportSpaceOpt = !(iface->GetBool(pChildNode, "s4_skip_space_optimization"));
     }
