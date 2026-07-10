@@ -1268,9 +1268,11 @@ int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, uint32_t captu
         AudioMemFree((void **)&hwCapture->errorLog.errorDump[i].reason);
         AudioMemFree((void **)&hwCapture->errorLog.errorDump[i].currentTime);
     }
+#ifdef AUDIO_HAL_P7885
     for (int i = 0; i < PATHPLAN_COUNT; i++) {
         AudioMemFree((void **)&hwCapture->captureParam.captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[i].value);
     }
+#endif
     AudioMemFree((void **)&capture);
     hwAdapter->infos.captureServicePtr[captureId] = NULL;
     return AUDIO_SUCCESS;
