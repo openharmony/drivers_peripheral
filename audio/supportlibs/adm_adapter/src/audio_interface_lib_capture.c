@@ -536,7 +536,7 @@ int32_t AudioCtlCaptureSceneSelect(const struct DevHandle *handle,
     if (deviceNum < AUDIO_MIN_DEVICENUM) {
         AUDIO_FUNC_LOGE("AUDIO_MIN_ADAPTERNUM Failed!");
         AudioFreeHdfSBuf(&sBuf, NULL);
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
 
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE - CTRL_NUM;

@@ -635,8 +635,8 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d,
-        sampleRate=%{public}u, channelCount=%{public}u, streamId=%{public}d, sourceType=%{public}d",
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d,
+        sampleRate=%{public}, channelCount=%{public}, streamId=%{public}d, sourceType=%{public}d" PRIu32,
         desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
         attrs->streamId, attrs->sourceType);
 
@@ -1118,7 +1118,7 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
     ret = (*pInterfaceLibModeCapture)(
         hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("SetParams FAIL!");
+        AUDIO_FUNC_LOGE("SetParams FAIL! ret=%{public}d", ret);
         (void)AudioCtrlCaptureClose(hwCapture, pInterfaceLibModeCapture);
         return HDF_FAILURE;
     }
@@ -1152,7 +1152,7 @@ int32_t AudioCaptureBindService(struct AudioHwCapture *hwCapture, BindServiceCap
     int32_t ret = AudioAdapterInterfaceLibModeCapture(hwCapture);
     if (ret != 0) {
         AUDIO_FUNC_LOGE("AudioAdapterInterfaceLibModeCapture failed");
-        return AUDIO_ERR_INTERNAL;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
     return AUDIO_SUCCESS;
 }
@@ -1189,8 +1189,8 @@ int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct Au
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d,
-        sampleRate=%{public}u, channelCount=%{public}u, streamId=%{public}d, sourceType=%{public}d",
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d,
+        sampleRate=%{public}, channelCount=%{public}, streamId=%{public}d, sourceType=%{public}d" PRIu32,
         desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
         attrs->streamId, attrs->sourceType);
 
