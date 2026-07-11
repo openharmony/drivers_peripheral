@@ -56,6 +56,8 @@ const std::string BATTERY_KEY_CURRENT_AVERAGE = "POWER_SUPPLY_CURRENT_AVERAGE=";
 const std::string BATTERY_KEY_CURRENT_NOW = "POWER_SUPPLY_CURRENT_NOW=";
 const std::string INVALID_STRING_VALUE = "invalid";
 const std::string BATTERY_NODE_PATH = "battery";
+const std::string BATTERY_LESS_DTS_PATH = "/proc/device-tree/power_host_cfg/battery_less";
+const std::string BATTERY_LESS_PRODUCT = "1";
 }
 
 BatterydInfo g_batteryInfo;
@@ -961,10 +963,33 @@ void PowerSupplyProvider::CreateMockChargerPath(std::string& mockChargerPath)
     CreateFile(mockChargerPath + "/status", "Charging");
 }
 
+bool PowerSupplyProvider::IsBatterylessProduct()
+{
+    std::string result;
+    if (GetConfigByPath(BATTERY_LESS_DTS_PATH, result) != HDF_SUCCESS) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "Failed to read battery less config, defaulting to false");
+        return false;
+    }
+
+    if (result == BATTERY_LESS_PRODUCT) {
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "The product is battery less");
+        return true;
+    }
+
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "The product contains a battery");
+    return false;
+}
+
 void PowerSupplyProvider::CreateMockBatteryPath(std::string& mockBatteryPath)
 {
     BATTERY_HILOGI(FEATURE_BATT_INFO, "create mockFilePath path");
-    CreateFile(mockBatteryPath + "/capacity", "11");
+    if (IsBatterylessProduct()) {
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "Product is pc desktop");
+        CreateFile(mockBatteryPath + "/capacity", "100");
+    } else {
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "Product is not pc desktop");
+        CreateFile(mockBatteryPath + "/capacity", "11");
+    }
     CreateFile(mockBatteryPath + "/charge_control_limit", "0");
     CreateFile(mockBatteryPath + "/charge_counter", "4000000");
     CreateFile(mockBatteryPath + "/charge_full", "4000000");

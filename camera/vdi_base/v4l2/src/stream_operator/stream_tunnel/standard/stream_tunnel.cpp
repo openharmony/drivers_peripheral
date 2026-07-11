@@ -110,6 +110,10 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
 
 static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, const OHOS::sptr<OHOS::SurfaceBuffer> &sb)
 {
+    if (buffer == nullptr || sb == nullptr) {
+        CAMERA_LOGE("PrepareBufferBeforeFlush fail, buffer or sb is nullptr");
+        return;
+    }
     EsFrameInfo esInfo = buffer->GetEsFrameInfo();
     if (esInfo.size != -1) {
         const sptr<OHOS::BufferExtraData>& extraData = sb->GetExtraData();
@@ -130,11 +134,13 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
     if (!buffer->GetIsValidDataInSurfaceBuffer()) {
         if (buffer->GetSize() == 0) {
             CAMERA_LOGE("buffer size no data to copy");
+            buffer->SetIsValidDataInSurfaceBuffer(false);
+            return;
         }
-        uint32_t availableSize = (
-            esInfo.size > 0 ? static_cast<uint32_t>(esInfo.size) : buffer->GetSize());
-        availableSize = availableSize < sb->GetSize() ? availableSize : sb->GetSize();
-        CAMERA_LOGI("copy data from cb to sb, size = %{public}d", sb->GetSize());
+        uint32_t availableSize = (esInfo.size > 0 ? static_cast<uint32_t>(esInfo.size) : buffer->GetSize());
+        availableSize = std::min({availableSize, buffer->GetSize(), sb->GetSize()});
+        CAMERA_LOGI(
+            "copy data from cb to sb, size = %{public}d, availableSize = %{public}u", sb->GetSize(), availableSize);
         auto ret = memcpy_s(sb->GetVirAddr(), sb->GetSize(), buffer->GetVirAddress(), availableSize);
         if (ret != 0) {
             CAMERA_LOGE("PrepareBufferBeforeFlush memcpy_s fail, error = %{public}d", ret);
