@@ -1103,9 +1103,9 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
     ret = (*pInterfaceLibModeCapture)(
         hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("SetParams FAIL!");
+        AUDIO_FUNC_LOGE("SetParams FAIL! ret=%{public}d", ret);
         (void)AudioCtrlCaptureClose(hwCapture, pInterfaceLibModeCapture);
-        return HDF_FAILURE;
+        return ret;
     }
 #endif
     ret =
@@ -1152,7 +1152,7 @@ int32_t AudioCaptureBindService(struct AudioHwCapture *hwCapture, BindServiceCap
     int32_t ret = AudioAdapterInterfaceLibModeCapture(hwCapture);
     if (ret != 0) {
         AUDIO_FUNC_LOGE("AudioAdapterInterfaceLibModeCapture failed");
-        return AUDIO_ERR_NOT_SUPPORT;
+        return ret;
     }
     return AUDIO_SUCCESS;
 }
