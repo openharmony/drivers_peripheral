@@ -1039,7 +1039,7 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
         AUDIO_FUNC_LOGE("adapterNameLen is zero!");
         return HDF_FAILURE;
     }
-    ret = strncpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN - 1,
+    int32_t ret = strncpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN - 1,
         hwAdapter->adapterDescriptor.adapterName, adapterNameLen);
     if (ret != EOK) {
         AUDIO_FUNC_LOGE("Copy adapterName is failed!");
