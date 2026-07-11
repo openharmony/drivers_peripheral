@@ -630,12 +630,15 @@ static uint32_t GetAvailableRenderID(struct AudioHwAdapter *hwAdapter)
 int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || render == NULL || renderId == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d,
+        sampleRate=%{public}, channelCount=%{public}, streamId=%{public}d, sourceType=%{public}d" PRIu32,
+        desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
+        attrs->streamId, attrs->sourceType);
 
     BindServiceRenderPassthrough *pBindServiceRender = AudioPassthroughGetBindServiceRender();
     if (pBindServiceRender == NULL || *pBindServiceRender == NULL) {
@@ -1022,10 +1025,9 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
     if (AudioHwCaptureInit(hwCapture) < 0) {
         return HDF_FAILURE;
     }
-    int32_t ret = InitHwCaptureParam(hwCapture, desc, attrs);
-    if (ret < 0) {
+    if (InitHwCaptureParam(hwCapture, desc, attrs) < 0) {
         AUDIO_FUNC_LOGE("InitHwCaptureParam error!");
-        return ret;
+        return HDF_FAILURE;
     }
 
     if (hwAdapter->adapterDescriptor.adapterName == NULL) {
@@ -1182,12 +1184,15 @@ static uint32_t GetAvailableCaptureID(struct AudioHwAdapter *hwAdapter)
 int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture, uint32_t *captureId)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL || captureId == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d,
+        sampleRate=%{public}, channelCount=%{public}, streamId=%{public}d, sourceType=%{public}d" PRIu32,
+        desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
+        attrs->streamId, attrs->sourceType);
 
     BindServiceCapturePassthrough *pBindServiceCapture = AudioPassthroughGetBindServiceCapture();
     if (pBindServiceCapture == NULL || *pBindServiceCapture == NULL) {
