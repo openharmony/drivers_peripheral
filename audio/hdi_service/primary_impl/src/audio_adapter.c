@@ -1022,9 +1022,10 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
     if (AudioHwCaptureInit(hwCapture) < 0) {
         return HDF_FAILURE;
     }
-    if (InitHwCaptureParam(hwCapture, desc, attrs) < 0) {
+    int32_t ret = InitHwCaptureParam(hwCapture, desc, attrs);
+    if (ret < 0) {
         AUDIO_FUNC_LOGE("InitHwCaptureParam error!");
-        return HDF_FAILURE;
+        return ret;
     }
 
     if (hwAdapter->adapterDescriptor.adapterName == NULL) {
