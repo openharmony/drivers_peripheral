@@ -635,8 +635,8 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    AUDIO_FUNC_LOGI("Enter. portId=%{public}, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d,
-        sampleRate=%{public}, channelCount=%{public}, streamId=%{public}d, sourceType=%{public}d" PRIu32,
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d, \
+        sampleRate=%{public}u, channelCount=%{public}u, streamId=%{public}d, sourceType=%{public}d",
         desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
         attrs->streamId, attrs->sourceType);
 
@@ -1189,8 +1189,8 @@ int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct Au
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    AUDIO_FUNC_LOGI("Enter. portId=%{public}, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d,
-        sampleRate=%{public}, channelCount=%{public}, streamId=%{public}d, sourceType=%{public}d" PRIu32,
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d, \
+        sampleRate=%{public}u, channelCount=%{public}u, streamId=%{public}d, sourceType=%{public}d",
         desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
         attrs->streamId, attrs->sourceType);
 
