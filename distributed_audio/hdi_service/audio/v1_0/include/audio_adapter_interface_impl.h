@@ -210,7 +210,6 @@ private:
     bool spkNotifyFlag_ = false;
     bool micNotifyFlag_ = false;
 
-    uint32_t micPinInUse_ = 0;
     uint32_t streamMuteStatus_ = 0;
     uint32_t sinkDhId_ = 0;
     uint32_t micEnhanDhId_ = 0;
