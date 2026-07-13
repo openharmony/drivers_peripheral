@@ -685,7 +685,7 @@ static int32_t UsbDdkPnpLoaderDispatchPnpDevice(
     }
 
     if (!HdfSbufReadBuffer(data, (const void **)(&privateData), &infoSize) ||
-        infoSize < sizeof(struct UsbPnpNotifyMatchInfoTable)) {
+        infoSize < sizeof(struct UsbPnpNotifyServiceInfo)) {
         HDF_LOGW("%s: HdfSbufReadBuffer privateData error!", __func__);
         privateData = NULL;
     }
