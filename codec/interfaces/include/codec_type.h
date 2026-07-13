@@ -39,8 +39,13 @@
 #ifndef CODEC_TYPE_H
 #define CODEC_TYPE_H
 
+#ifdef MEDIA_INTERFACE_V1_0
+#include "codec_lite_type.h"
+#else
 #include <stdint.h>
 #include <stdbool.h>
+#include "codec_common_type.h"
+#include "display_type.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -54,50 +59,54 @@ extern "C" {
 typedef void *CODEC_HANDLETYPE;
 
 /**
- * @brief Enumerates codec types.
- */
-typedef enum {
-    VIDEO_DECODER, /**< Video decoding */
-    VIDEO_ENCODER, /**< Video encoding */
-    AUDIO_DECODER, /**< Audio decoding */
-    AUDIO_ENCODER, /**< Audio encoding */
-    INVALID_TYPE   /**< Invalid type */
-} CodecType;
-
-/**
  * @brief Enumerates indexes of parameter types.
  */
 typedef enum {
-    KEY_MIMETYPE = 0x01,      /**< MIME type. For the value type, see {@link AvCodecMime}. */
+    KEY_CODEC_START_NONE = 0,
+    KEY_MIMETYPE,             /**< MIME type. For the value type, see {@link AvCodecMime}. */
     KEY_BUFFERSIZE,           /**< Buffer size. The value type is uint32_t. */
-    KEY_LEFT_STREAM_FRAMES,   /**< Number of frames in the remaining data streams. The value type is uint32_t. */
     KEY_CODEC_TYPE,           /**< Codec type. For the value type, see {@link CodecType}. */
-    KEY_DIRECTION_TYPE,       /**< Input/Output type. For the value type, see {@link DirectionType}. */
-
+    KEY_INIT_PARAM_KEYS,      /**< Get the minimum initialization param keys, see {@link ParamKey}(read only). */
+    KEY_INPUT_BUFFERS,        /**< External input buffer in preset mode, see {@link CodecBufferInfo}. */
+    KEY_OUTPUT_BUFFERS,       /**< External output buffer in preset mode, see {@link CodecBufferInfo}. */
+    KEY_DEVICE_ID,            /**< Device ID. The value type is uint32_t. */
+    KEY_INPUT_BUFFER_COUNT,   /**< Input Buffer count. The value type is uint32_t. */
+    KEY_OUTPUT_BUFFER_COUNT,  /**< Output Buffer count. The value type is uint32_t. */
     KEY_BITRATE = 0x500,      /**< Bit rate. The value type is uint32_t. */
-    KEY_WIDTH = 0x1000,       /**< Width. The value type is uint32_t. */
-    KEY_HEIGHT,               /**< Hight. The value type is uint32_t. */
-    KEY_STRIDE,               /**< Stride. The value type is uint32_t. */
+
+    KEY_VIDEO_START_NONE = 0x1000,
+    KEY_VIDEO_WIDTH,          /**< Width. The value type is uint32_t. */
+    KEY_VIDEO_HEIGHT,         /**< Hight. The value type is uint32_t. */
+    KEY_VIDEO_STRIDE,         /**< Stride. The value type is uint32_t. */
     KEY_VIDEO_FIELD,          /**< Video field. For the value type, see {@link VideoField}. */
-    KEY_PIXEL_FORMAT,         /**< Pixel format. For the value type, see {@link PixelFormat}. */
-    KEY_VIDEO_RC_MODE,        /**< Rate control mode. For the value type, see {@link VenCodeRcMode}. */
-    KEY_VIDEO_GOP_MODE,       /**< GOP mode. For the value type, see {@link VenCodeGopMode}. */
-    KEY_VIDEO_PIC_SIZE,       /**< Image resolution. For the value type, see {@link PicSize}. */
+    KEY_PIXEL_FORMAT,         /**< Pixel format. For the value type, see {@link CodecPixelFormat}. */
+    KEY_VIDEO_RC_MODE,        /**< Rate control mode. For the value type, see {@link VideoCodecRcMode}. */
+    KEY_VIDEO_GOP_MODE,       /**< GOP mode. For the value type, see {@link VideoCodecGopMode}. */
+    KEY_VIDEO_PIC_SIZE,       /**< Image resolution. */
     KEY_VIDEO_PROFILE,        /**< Codec profile. The value type is uint32_t. */
     KEY_VIDEO_FRAME_RATE,     /**< Frame rate. The value type is uint32_t. */
     KEY_IMAGE_Q_FACTOR,       /**< Quality factor, range is [1, 99]. The value type is uint32_t */
+    KEY_VIDEO_LEVEL,          /**< Codec level. The value type is uint32_t. */
 
-    KEY_SAMPLE_RATE = 0x1500, /**< Sampling rate. The value type is uint32_t. */
+    KEY_SAMPLE_RATE = 0x1500,
     KEY_AUDIO_PROFILE,        /**< Audio encoding profile. The value type is uint32_t. */
     KEY_CHANNEL_COUNT,        /**< Number of channels. The value type is uint32_t. */
     KEY_BITWITH,              /**< Bit width. For the value type, see {@link AudioBitWidth}. */
     KEY_SOUND_MODE,           /**< Audio channel mode. For the value type, see {@link AudioSoundMode}. */
     KEY_POINT_NUM_PER_FRAME,  /**< Number of sampling points per frame. The value type is uint32_t. */
-    KEY_DEVICE_ID,            /**< Device ID. The value type is uint32_t. */
     KEY_DEBREATHE_EFFECT,     /**< DeBreathe Effect. The value type is uint32_t. */
     KEY_VIDEO_DST_FRAME_RATE,
     KEY_REF_FRAME_NUM,        /**< DeBreathe Effect. The value type is uint32_t. */
     KEY_ADEC_CACHE_FRAME_NUM, /**< DeBreathe Effect. The value type is uint32_t. */
+    KEY_AUDIO_SAMPLE_RATE,    /**< Sampling rate. The value type is uint32_t. */
+    KEY_AUDIO_CHANNEL_COUNT,  /**< Number of channels. The value type is uint32_t. */
+    KEY_AUDIO_SOUND_MODE,     /**< Audio channel mode. For the value type, see {@link AudioSoundMode}. */
+    KEY_AUDIO_POINTS_PER_FRAME,  /**< Number of sampling points per frame. The value type is uint32_t. */
+    KEY_AUDIO_SAMPLE_FORMAT,  /**< Audio sample format. For the value type, see {@link CodecAudioSampleFormat}. */
+
+    KEY_VENDOR_START_NONE = 0x60000000,
+
+    KEY_PARAM_MAX = 0x7FFFFFFF
 } ParamKey;
 
 /**
@@ -112,6 +121,16 @@ typedef enum {
     VENCOD_RC_QPMAP,   /**< Configuration-mapped quantization parameters */
     VENCOD_RC_FIXQP    /**< Fixed quantization parameters */
 } VenCodeRcMode;
+
+typedef enum {
+    VID_CODEC_RC_CBR = 0, /**< Fixed bit rate*/
+    VID_CODEC_RC_VBR,     /**< Variable bit rate */
+    VID_CODEC_RC_AVBR,    /**< Adaptive variable bit rate */
+    VID_CODEC_RC_QVBR,    /**< Quality-defined variable bit rate */
+    VID_CODEC_RC_CVBR,    /**< Constrained variable bit rate */
+    VID_CODEC_RC_QPMAP,   /**< Configuration-mapped quantization parameters */
+    VID_CODEC_RC_FIXQP    /**< Fixed quantization parameters */
+} VideoCodecRcMode;
 
 /**
  * @brief Enumerates resolutions.
@@ -152,6 +171,19 @@ typedef enum {
 } VenCodeGopMode;
 
 /**
+ * @brief Enumerates types of group of pictures (GOP).
+ */
+typedef enum {
+    VID_CODEC_GOPMODE_NORMALP = 0,   /**< P-frames using only one reference frame during encoding */
+    VID_CODEC_GOPMODE_DUALP = 1,     /**< P-frames using two reference frames during encoding */
+    VID_CODEC_GOPMODE_SMARTP = 2,    /**< Smart P-frames for encoding */
+    VID_CODEC_GOPMODE_ADVSMARTP = 3, /**< Advanced smart P-frames for encoding */
+    VID_CODEC_GOPMODE_BIPREDB = 4,   /**< B-frames for encoding */
+    VID_CODEC_GOPMODE_LOWDELAYB = 5, /**< B-frames using only previous frames as references during encoding. */
+    VID_CODEC_GOPMODE_INVALID,       /**< Invalid type */
+} VideoCodecGopMode;
+
+/**
  * @brief Defines the pointer to the type of the dynamic parameter value.
  */
 typedef void *ValueType;
@@ -181,70 +213,48 @@ typedef enum {
  * @brief Enumerates pixel formats.
  */
 typedef enum {
-    YVU_SEMIPLANAR_420 = 0,  /**< YUV 420 SP */
-    YVU_SEMIPLANAR_420_TILE, /**< YUV SP 420 TILE */
-    PIX_FORMAT_INVALID       /**< Invalid format */
+    PIXEL_FORMAT_NONE,
+    PIXEL_FORMAT_YUV_422_I,                /**< YUV422 interleaved format */
+    PIXEL_FORMAT_YCBCR_422_SP,             /**< YCBCR422 semi-planar format */
+    PIXEL_FORMAT_YCRCB_422_SP,             /**< YCRCB422 semi-planar format */
+    PIXEL_FORMAT_YCBCR_420_SP,             /**< YCBCR420 semi-planar format */
+    PIXEL_FORMAT_YCRCB_420_SP,             /**< YCRCB420 semi-planar format */
+    PIXEL_FORMAT_YCBCR_422_P,              /**< YCBCR422 planar format */
+    PIXEL_FORMAT_YCRCB_422_P,              /**< YCRCB422 planar format */
+    PIXEL_FORMAT_YCBCR_420_P,              /**< YCBCR420 planar format */
+    PIXEL_FORMAT_YCRCB_420_P,              /**< YCRCB420 planar format */
+    PIXEL_FORMAT_YUYV_422_PKG,             /**< YUYV422 packed format */
+    PIXEL_FORMAT_UYVY_422_PKG,             /**< UYVY422 packed format */
+    PIXEL_FORMAT_YVYU_422_PKG,             /**< YVYU422 packed format */
+    PIXEL_FORMAT_VYUY_422_PKG,             /**< VYUY422 packed format */
+
+    PIXEL_FORMAT_VENDOR_MASK = 0x7F000000, /**< Reserved region for introducting Vendor Extensions, eg.
+                                              PIX_FORMAT_VENDOR_MASK | PIXEL_FORMAT_YCBCR_420_SP. */
+    PIXEL_FORMAT_MAX = 0x7FFFFFFF,         /**< Invalid format */
 } CodecPixelFormat;
 
 /**
  * @brief Enumerates audio channel modes.
  */
 typedef enum {
-    AUD_SOUND_MODE_MONO   = 0, /**< Mono channel */
-    AUD_SOUND_MODE_STEREO = 1, /**< Stereo mode*/
-    AUD_SOUND_MODE_INVALID     /**< Invalid mode */
+    AUD_CHANNEL_FRONT_LEFT  = 0x1, /**< Front left channel */
+    AUD_CHANNEL_FRONT_RIGHT = 0x2, /**< Front right channel */
+
+    AUD_SOUND_MODE_INVALID  = 0x0, /**< Invalid mode */
+    AUD_SOUND_MODE_MONO     = 0x1, /**< Mono channel */
+    AUD_SOUND_MODE_STEREO   = 0x3, /**< Stereo channel, consisting of front left and front right channels */
 } AudioSoundMode;
-
-/**
- * @brief Enumerates audio sampling rates.
- */
-typedef enum {
-    AUD_SAMPLE_RATE_8000   = 8000,    /**< 8 KHz */
-    AUD_SAMPLE_RATE_12000  = 12000,   /**< 12 KHz */
-    AUD_SAMPLE_RATE_11025  = 11025,   /**< 11.025 KHz */
-    AUD_SAMPLE_RATE_16000  = 16000,   /**< 16 KHz */
-    AUD_SAMPLE_RATE_22050  = 22050,   /**< 22.050 KHz */
-    AUD_SAMPLE_RATE_24000  = 24000,   /**< 24 KHz */
-    AUD_SAMPLE_RATE_32000  = 32000,   /**< 32 KHz  */
-    AUD_SAMPLE_RATE_44100  = 44100,   /**< 44.1 KHz */
-    AUD_SAMPLE_RATE_48000  = 48000,   /**< 48 KHz */
-    AUD_SAMPLE_RATE_64000  = 64000,   /**< 64 KHz */
-    AUD_SAMPLE_RATE_96000  = 96000,   /**< 96 KHz */
-    AUD_SAMPLE_RATE_INVALID,          /**< Invalid sampling rate */
-} AudioSampleRate;
-
-/**
- * @brief Enumerates audio bit rates.
- */
-typedef enum {
-    AUD_BITRATE_8K      = 8000,    /**< 8 kbit/s */
-    AUD_BITRATE_16K     = 16000,   /**< 16 kbit/s */
-    AUD_BITRATE_22K     = 22000,   /**< 22 kbit/s */
-    AUD_BITRATE_24K     = 24000,   /**< 24 kbit/s */
-    AUD_BITRATE_32K     = 32000,   /**< 32 kbit/s */
-    AUD_BITRATE_40K     = 40000,   /**< 40 kbit/s */
-    AUD_BITRATE_48K     = 48000,   /**< 48 kbit/s */
-    AUD_BITRATE_64K     = 64000,   /**< 64 kbit/s */
-    AUD_BITRATE_96K     = 96000,   /**< 96 kbit/s */
-    AUD_BITRATE_128K    = 128000,  /**< 128 kbit/s */
-    AUD_BITRATE_132K    = 132000,  /**< 132 kbit/s */
-    AUD_BITRATE_144K    = 144000,  /**< 144 kbit/s */
-    AUD_BITRATE_192K    = 192000,  /**< 192 kbit/s */
-    AUD_BITRATE_256K    = 256000,  /**< 256 kbit/s */
-    AUD_BITRATE_265K    = 265000,  /**< 265 kbit/s */
-    AUD_BITRATE_288K    = 288000,  /**< 288 kbit/s */
-    AUD_BITRATE_320K    = 320000,  /**< 320 kbit/s */
-} AudioBitRate;
 
 /**
 * @brief Enumerates stream flags.
  */
 typedef enum {
-    STREAM_FLAG_KEYFRAME = 1,             /**< Keyframe */
-    STREAM_FLAG_CODEC_SPECIFIC_INF = 2,   /**< Codec specifications */
-    STREAM_FLAG_EOS = 4,                  /**< End of streams */
-    STREAM_FLAG_PART_OF_FRAME = 8,        /**< Partial frame */
-    STREAM_FLAG_END_OF_FRAME = 16,        /**< End of frames, used in pair with <b> STREAM_FLAG_PART_OF_FRAME</b> */
+    STREAM_FLAG_KEYFRAME           = 0x1, /**< Keyframe */
+    STREAM_FLAG_CODEC_SPECIFIC_INF = 0x2, /**< Codec specifications */
+    STREAM_FLAG_EOS                = 0x4, /**< End of streams */
+    STREAM_FLAG_PART_OF_FRAME      = 0x8, /**< Partial frame */
+    STREAM_FLAG_END_OF_FRAME       = 0x10, /**< End of frames, used in pair with <b> STREAM_FLAG_PART_OF_FRAME</b> */
+    STREAM_FLAG_OUTPUT_CHANGED     = 0x20,
 } StreamFlagType;
 
 /**
@@ -259,9 +269,9 @@ typedef struct {
 * @brief Enumerates buffer types.
  */
 typedef enum {
-    BUFFER_TYPE_VIRTUAL = 0, /**< Virtual memory */
-    BUFFER_TYPE_FD,          /**< File descriptor, which can be used cross processes */
-    BUFFER_TYPE_HANDLE,      /**< Handle, which can be used cross processes */
+    BUFFER_TYPE_VIRTUAL = 0, /**< Data described by this buffer */
+    BUFFER_TYPE_FD,          /**< Share mem file descriptor, which can be used cross processes */
+    BUFFER_TYPE_HANDLE,      /**< Video frame buffer handle, For details, see {@link BufferHandle} */
 } BufferType;
 
 /**
@@ -286,60 +296,63 @@ typedef struct {
  * @brief Describes input information.
  */
 typedef struct {
-    uint32_t   bufferCnt;     /**< Number of buffers */
-    CodecBufferInfo *buffers; /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo}. */
-    int64_t  pts;             /**< Input timestamp */
-    int32_t  flag;            /**< Input flag. For details, see {@link StreamFlagType}. */
+    uint32_t bufferId;    /**< Corresponding buffer index number */
+    int64_t timeStamp;    /**< buffer timestamp */
+    uint32_t flag;        /**< buffer flag. For details, see {@link StreamFlagType}. */
+    uint32_t bufferCnt;   /**< Number of buffers */
+    CodecBufferInfo buffers[0]; /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo} */
 } InputInfo;
 
 /**
  * @brief Describes output information.
  */
 typedef struct {
-    uint32_t   bufferCnt;      /**< Number of buffers */
-    CodecBufferInfo *buffers;  /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo}. */
-    int64_t    timeStamp;      /**< Output timestamp */
-    uint32_t   sequence;       /**< Corresponding input sequence number */
-    uint32_t   flag;           /**< Output flag */
-    CodecType  type;           /**< Codec type */
-    void       *vendorPrivate; /**< Private information about a device vendor */
+    uint32_t bufferId;    /**< Corresponding buffer index number */
+    int64_t timeStamp;    /**< buffer timestamp */
+    uint32_t flag;        /**< buffer flag. For details, see {@link StreamFlagType}. */
+    uint32_t bufferCnt;   /**< Number of buffers */
+    CodecBufferInfo buffers[0]; /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo} */
 } OutputInfo;
+
+/**
+ * @brief Describes buffer information.
+ */
+typedef struct {
+    BufferType type;   /**< Buffer type */
+    intptr_t buf;      /**< A reference to a data buffer */
+    uint32_t offset;   /**< Buffer offset */
+    uint32_t length;   /**< Length of valid data */
+    uint32_t capacity; /**< Total size of buffer blocks*/
+} CodecBuffersInfo;
+
+/**
+ * @brief Describes input and output codec buffer.
+ */
+typedef struct {
+    uint32_t bufferId;    /**< Corresponding buffer index number */
+    int64_t timeStamp;    /**< buffer timestamp */
+    uint32_t flag;        /**< buffer flag. For details, see {@link StreamFlagType}. */
+    uint32_t bufferCnt;   /**< Number of buffers */
+    CodecBuffersInfo buffer[0]; /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo} */
+} CodecBuffer;
 
 /**
  * @brief Enumerates MIME types.
  */
 typedef enum {
-    MEDIA_MIMETYPE_IMAGE_JPEG = 0, /**< JPEG image */
-    MEDIA_MIMETYPE_VIDEO_AVC,      /**< H.264 video */
-    MEDIA_MIMETYPE_VIDEO_HEVC,     /**< H.265 video */
-    MEDIA_MIMETYPE_AUDIO_AAC,      /**< AAC audio */
-    MEDIA_MIMETYPE_AUDIO_G711A,    /**< G711A audio */
-    MEDIA_MIMETYPE_AUDIO_G711U,    /**< G711U audio */
-    MEDIA_MIMETYPE_AUDIO_G726,     /**< G726 audio */
-    MEDIA_MIMETYPE_AUDIO_PCM,      /**< PCM audio */
-    MEDIA_MIMETYPE_AUDIO_MP3,      /**< MP3 audio */
-    MEDIA_MIMETYPE_IMAGE_MJPEG,    /**< MJPEG image */
-    MEDIA_MIMETYPE_AUDIO_LPCM,      /**< LPCM audio */
-    MEDIA_MIMETYPE_INVALID,        /**< Invalid MIME type */
+    MEDIA_MIMETYPE_IMAGE_JPEG = 0,        /**< JPEG image */
+    MEDIA_MIMETYPE_VIDEO_AVC,             /**< H.264 video */
+    MEDIA_MIMETYPE_VIDEO_HEVC,            /**< H.265 video */
+    MEDIA_MIMETYPE_VIDEO_MPEG4,           /**< MPEG4 video */
+    MEDIA_MIMETYPE_AUDIO_FIRST = 0x10000, /**< Dummy id pointing at the start of audio codecs */
+    MEDIA_MIMETYPE_AUDIO_AAC = 0x10000,   /**< AAC audio */
+    MEDIA_MIMETYPE_AUDIO_G711A,           /**< G711A audio */
+    MEDIA_MIMETYPE_AUDIO_G711U,           /**< G711U audio */
+    MEDIA_MIMETYPE_AUDIO_G726,            /**< G726 audio */
+    MEDIA_MIMETYPE_AUDIO_PCM,             /**< PCM audio */
+    MEDIA_MIMETYPE_AUDIO_MP3,             /**< MP3 audio */
+    MEDIA_MIMETYPE_INVALID,               /**< Invalid MIME type */
 } AvCodecMime;
-
-/**
- * @brief Enumerates codec profiles.
- */
-typedef enum {
-    INVALID_PROFILE = 0,               /**< Invalid profile */
-    AAC_LC_PROFILE = 0x1000,           /**< AAC-Low Complex */
-    AAC_MAIN_PROFILE,                  /**< AAC-Main */
-    AAC_HE_V1_PROFILE,                 /**< HEAAC,  AAC+, or AACPlusV1 */
-    AAC_HE_V2_PROFILE,                 /**< AAC++ or AACPlusV2 */
-    AAC_LD_PROFILE,                    /**< AAC-Low Delay */
-    AAC_ELD_PROFILE,                   /**< AAC-Enhanced Low Delay */
-    AVC_BASELINE_PROFILE = 0x2000,     /**< H.264 Baseline */
-    AVC_MAIN_PROFILE,                  /**< H.264 Main */
-    AVC_HIGH_PROFILE,                  /**< H.264 High */
-    HEVC_MAIN_PROFILE = 0x3000,        /**< H.265 Main */
-    HEVC_MAIN_10_PROFILE,              /**< H.265 Main 10 */
-} Profile;
 
 /**
  * @brief Enumerates codec levels.
@@ -352,42 +365,20 @@ typedef enum {
 } Level;
 
 /**
- * @brief Indicates the maximum number of reserved parameters in the array.
- */
-#define ELEMENT_MAX_LEN 50
-
-/**
- * @brief Defines a variable-length queue.
- */
-typedef struct {
-    uint32_t element[ELEMENT_MAX_LEN]; /**< Array of reserved parameters */
-    uint32_t actualLen;                /**< Number of actual parameters */
-} ResizableArray;
-
-/**
-* @brief Defines the alignment.
- */
-typedef struct {
-    int widthAlginment;  /**< Value to align with the width */
-    int heightAlginment; /**< Value to align with the height */
-} Alginment;
-
-/**
- * @brief Defines a rectangle.
- */
-typedef struct {
-    int32_t width;  /**< Width */
-    int32_t height; /**< Height */
-} Rect;
-
-/**
  * @brief Enumerates allocation modes of input and output buffers.
  */
 typedef enum {
-    ALLOCATE_INPUT_BUFFER_CODEC  = 0x1, /**< Input buffer allocated within the Codec module */
-    ALLOCATE_INPUT_BUFFER_USER   = 0x2, /**< Input buffer allocated by an external user */
-    ALLOCATE_OUTPUT_BUFFER_CODEC = 0x4, /**< Output buffer allocated within the Codec module */
-    ALLOCATE_OUTPUT_BUFFER_USER  = 0x8, /**< Output buffer allocated by an external user */
+    ALLOCATE_INPUT_BUFFER_CODEC_PRESET   = 0x0001, /**< Preset input buffer allocated within the Codec module */
+    ALLOCATE_INPUT_BUFFER_CODEC_DYNAMIC  = 0x0002, /**< Dynamic input buffer allocated within the Codec module */
+
+    ALLOCATE_INPUT_BUFFER_USER_PRESET    = 0x0010, /**< Preset input buffer allocated by an external user */
+    ALLOCATE_INPUT_BUFFER_USER_DYNAMIC   = 0x0020, /**< Dynamic input buffer allocated by an external user */
+
+    ALLOCATE_OUTPUT_BUFFER_CODEC_PRESET  = 0x0100, /**< Preset output buffer allocated within the Codec module */
+    ALLOCATE_OUTPUT_BUFFER_CODEC_DYNAMIC = 0x0200, /**< Dynamic output buffer allocated within the Codec module */
+
+    ALLOCATE_OUTPUT_BUFFER_USER_PRESET   = 0x1000, /**< Preset output buffer allocated by an external user */
+    ALLOCATE_OUTPUT_BUFFER_USER_DYNAMIC  = 0x2000, /**< Dynamic output buffer allocated by an external user */
 } AllocateBufferMode;
 
 /**
@@ -399,88 +390,56 @@ typedef enum {
 } CapsMask;
 
 /**
+ * @brief Defines the video codec capabilities.
+ */
+#define PIX_FMT_NUM 16 /** Size of the supported pixel format array */
+typedef struct {
+    Rect minSize;                            /** Minimum resolution supported. */
+    Rect maxSize;                            /** Maximum resolution supported. */
+    Alignment whAlignment;                   /** Values to align with the width and height. */
+    int32_t supportPixFmts[PIX_FMT_NUM];  /** Supported pixel formats, array is terminated by PIXEL_FORMAT_NONE. */
+} VideoPortCap;
+
+/**
+ * @brief Defines the audio codec port capabilities.
+ */
+#define SAMPLE_FORMAT_NUM 12 /** Size of the audio sampling format array supported. */
+#define SAMPLE_RATE_NUM 16   /** Size of the audio sampling rate array supported. */
+#define CHANNEL_NUM 16       /** Size of the audio channel array supported. */
+typedef struct {
+    int32_t sampleFormats[SAMPLE_FORMAT_NUM]; /** Supported audio sampling formats. For details,
+                                                  see {@link CodecAudioSampleFormat}. */
+    int32_t sampleRate[SAMPLE_RATE_NUM];      /** Supported audio sampling rates. For details,
+                                                  see {@link AudioSampleRate}. */
+    int32_t channelLayouts[CHANNEL_NUM];      /** Supported audio channel layouts. */
+} AudioPortCap;
+
+#define PROFILE_NUM 256 /** Size of the profile array supported. */
+#define NAME_LENGTH 32  /** Size of the component name. */
+
+/**
  * @brief Defines the codec capability.
  */
 typedef struct {
-    AvCodecMime mime;                   /**< MIME type */
-    CodecType type;                     /**< Codec type */
-    Alginment whAlignment;              /**< Value to align with the width and height */
-    Rect minSize;                       /**< Minimum resolution supported */
-    Rect maxSize;                       /**< Maximum resolution supported */
-    uint64_t minBitRate;                /**< Minimum bit rate supported */
-    uint64_t maxBitRate;                /**< Maximum bit rate supported */
-    ResizableArray supportProfiles;     /**< Supported profiles */
-    ResizableArray supportLevels;       /**< Supported levels */
-    ResizableArray supportPixelFormats; /**< Supported pixel formats */
-    uint32_t minInputBufferNum;         /**< Minimum number of input buffers required for running */
-    uint32_t minOutputBufferNum;        /**< Minimum number of output buffers required for running */
-    uint32_t allocateMask;              /**< Buffer allocation mode. For details, see {@link AllocateBufferMode}. */
-    uint32_t capsMask;                  /**< Capability mask. For details, see {@link CapsMask}. */
+    AvCodecMime mime;                     /**< MIME type */
+    CodecType type;                       /**< Codec type */
+    char name[NAME_LENGTH];               /**< Codec name char string */
+    int32_t supportProfiles[PROFILE_NUM]; /**< Supported profiles. For details, see {@link Profile}. */
+    bool isSoftwareCodec;                 /**< Whether it is software codec or hardware codec. */
+    int32_t processModeMask;              /**< Codec processing mode mask. For details,
+                                              see {@link CodecProcessMode}. */
+    uint32_t capsMask;                    /**< Capability mask. For details, see {@link CapsMask}. */
+    uint32_t allocateMask;                /**< Buffer allocation mode. For details, see {@link AllocateBufferMode}. */
+    RangeValue inputBufferNum;            /**< Range number of input buffers required for running */
+    RangeValue outputBufferNum;           /**< Range number of output buffers required for running */
+    RangeValue bitRate;                   /** Supported bit rate range. */
+    int32_t inputBufferSize;              /** Min size of external input buffer. */
+    int32_t outputBufferSize;             /** Min size of external output buffer. */
+    union {
+        VideoPortCap video;               /** Video encoding and decoding capabilities */
+        AudioPortCap audio;               /** Audio encoding and decoding capabilities */
+    } port;
 } CodecCapability;
-
-/**
- * @brief Enumerates event types.
- */
-typedef enum {
-    EVENT_ERROR,            /**< Event error */
-    EVENT_FLUSH_COMPLETE,    /**< Buffer flush completed */
-    EVENT_STOP_COMPLETE,     /**< Codec stopped */
-    EVENT_OUT_FORMAT_CHANGED, /**< Output format changed */
-    EVENT_MAX = 0x1FFFFFFF  /**< Maximum event value */
-} EventType;
-
-/**
- * @brief Redefines the unsigned pointer type, which is used for pointer conversion.
- */
-typedef uintptr_t UINTPTR;
-
-/**
- * @brief Defines callbacks and their parameters.
- */
-typedef struct {
-    /**
-     * @brief Reports an event.
-     *
-     * Reports event errors and output format changes.
-     *
-     * @param hComponent Indicates the handle of the codec component.
-     * @param pAppData Indicates upper-layer data, which is generally
-     * an upper-layer instance passed when this callback is set.
-     * @param EVENTTYPE Indicates the event type.
-     * @param nData1 Indicates the first value contained in the reported event. This parameter is optional.
-     * @param nData2 Indicates the second value contained in the reported event. This parameter is optional.
-     * @param pEventData Indicates the pointer to data contained in the reported event. This parameter is optional.
-     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
-     */
-    int (*OnEvent)(UINTPTR comp, UINTPTR appData, EventType event,
-        uint32_t data1, uint32_t data2, UINTPTR eventData);
-
-    /**
-     * @brief Reports that the input data has been used.
-     *
-     * This callback is invoked in asynchronous mode.
-     *
-     * @param hComponent Indicates the handle of the codec component.
-     * @param pAppData Indicates upper-layer data, which is generally
-     * an upper-layer instance passed when this callback is set.
-     * @param pBuffer Indicates the pointer to the input data that has been used.
-     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
-     */
-    int (*InputBufferAvailable)(UINTPTR comp, UINTPTR appData, InputInfo *inBuf);
-
-    /**
-     * @brief Reports that the output is complete.
-     *
-     * This callback is invoked in asynchronous mode.
-     *
-     * @param hComponent Indicates the handle of the codec component.
-     * @param pAppData Indicates upper-layer data, which is generally
-     * an upper-layer instance passed when this callback is registered.
-     * @param pBuffer Indicates the pointer to the output data that has been generated.
-     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
-     */
-    int (*OutputBufferAvailable)(UINTPTR comp, UINTPTR appData, OutputInfo *outBuf);
-} CodecCallback;
 
 /**
  * @brief Enumerates input and output types.
@@ -492,6 +451,83 @@ typedef enum {
 } DirectionType;
 
 /**
+ * @brief Enumerates event types.
+ */
+typedef enum {
+    EVENT_ERROR,              /**< Event error */
+    EVENT_FLUSH_COMPLETE,     /**< Buffer flush completed */
+    EVENT_STOP_COMPLETE,      /**< Codec stopped */
+    EVENT_OUT_FORMAT_CHANGED, /**< Output format changed. For details, see {@link FormatChange}. */
+    EVENT_START_COMPLETE,     /**< Codec started */
+    EVENT_EOS_COMPLETE,
+
+    EVENT_MAX = 0x7FFFFFFF     /**< Maximum event value */
+} EventType;
+
+/**
+ * @brief Redefines the unsigned pointer type, which is used for pointer conversion.
+ */
+typedef uintptr_t UINTPTR;
+
+/**
+ * @brief Defines format change reporting information.
+ */
+typedef struct {
+    DirectionType direct;  /**< Input or output type. */
+    RangeValue bufferNum;  /**< Range number of output buffers. Report when decode the first frame,
+                                or report when the bit stream resolution changed. */
+    int32_t width;         /**< Width. */
+    int32_t height;        /**< Height. */
+    int32_t widthStride;   /**< Image width stride. */
+    int32_t heightStride;  /**< Image height stride. */
+    PixelFormat format;    /**< Pixel format. For details, see {@link PixelFormat}. */
+    Rect outputRect;
+} FormatChange;
+
+/**
+ * @brief Defines callbacks and their parameters.
+ */
+typedef struct {
+    /**
+     * @brief Reports an event.
+     *
+     * Reports event errors and output format changes.
+     *
+     * @param userData Indicates upper-layer data, which is generally
+     * an upper-layer instance passed when this callback is set.
+     * @param EVENTTYPE Indicates the event type.
+     * @param length Indicates the length of eventData array.
+     * @param eventData Indicates the pointer to data contained in the reported event.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero {@link CodecResult} value otherwise.
+     */
+    int32_t (*OnEvent)(UINTPTR userData, EventType event, uint32_t length, int32_t eventData[]);
+
+    /**
+     * @brief Reports that the input data has been used.
+     *
+     * This callback is invoked in asynchronous mode.
+     *
+     * @param userData Indicates upper-layer data, which is generally
+     * an upper-layer instance passed when this callback is set.
+     * @param inBuf Indicates the pointer to the input data that has been used.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero {@link CodecResult} value otherwise.
+     */
+    int32_t (*InputBufferAvailable)(UINTPTR userData, CodecBuffer *inBuf, int32_t *acquireFd);
+
+    /**
+     * @brief Reports that the output is complete.
+     *
+     * This callback is invoked in asynchronous mode.
+     *
+     * @param userData Indicates upper-layer data, which is generally
+     * an upper-layer instance passed when this callback is registered.
+     * @param pBuffer Indicates the pointer to the output data that has been generated.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero {@link CodecResult} value otherwise.
+     */
+    int32_t (*OutputBufferAvailable)(UINTPTR userData, CodecBuffer *outBuf, int32_t *acquireFd);
+} CodecCallback;
+
+/**
  * @brief Enumerates allocation types.
  */
 typedef enum {
@@ -500,22 +536,36 @@ typedef enum {
 } BufferMode;
 
 /**
- * @brief Enumerates codec error types.
+ * @brief Enumerates codec result types.
  */
 typedef enum {
-    CODEC_SUCCESS = 0,               /**< success */
-    CODEC_ERR_STREAM_BUF_FULL = 100, /**< Elementary stream buffer queue is full. */
-    CODEC_ERR_FRAME_BUF_EMPTY,       /**< Frame buffer queue is empty. */
-    CODEC_RECEIVE_EOS,               /**< End of streams */
-    CODEC_ERR_INVALID_OP,            /**< Invalid operation */
-    CODEC_ERR_UNKOWN                 /**< unkown error */
-} ErrorCodeType;
+    CODEC_SUCCESS = 0,                               /**< Success */
+    CODEC_RECEIVE_EOS,                               /**< End of streams */
+    CODEC_ERR_UNKOWN = (int32_t)0x80001000,          /**< Unknown error */
+    CODEC_ERR_INVALID_NAME = (int32_t)0x80001001,    /**< The codec name was not valid */
+    CODEC_ERR_INVALID_MIME = (int32_t)0x80001002,    /**< The codec mime was not valid */
+    CODEC_ERR_INVALID_PARAM = (int32_t)0x80001003,   /**< One or more parameters were not valid */
+    CODEC_ERR_INVALID_CODEC = (int32_t)0x80001004,   /**< The codec handle was not valid */
+    CODEC_ERR_INVALID_OP = (int32_t)0x80001005,      /**< Invalid operation */
+    CODEC_ERR_UNSUPPORT_PARAM = (int32_t)0x80001006, /**< One or more parameters were not supported */
+    CODEC_ERR_NOT_INIT = (int32_t)0x80001007,        /**< The codec was not initialized */
+    CODEC_ERR_NOT_READY = (int32_t)0x80001008,       /**< The codec was not ready */
+    CODEC_ERR_NOT_FOUND = (int32_t)0x80001009,       /**< The codec was not found */
+    CODEC_ERR_NO_MEMORY = (int32_t)0x8000100A,       /**< The codec memory allocation failed */
+    CODEC_ERR_TIMEOUT = (int32_t)0x8000100B,         /**< There was a timeout that occurred */
+    CODEC_ERR_INVALID_BUFFER = (int32_t)0x8000100C,  /**< The buffer was not valid */
+    CODEC_ERR_UNDER_FLOW = (int32_t)0x8000100D,      /**< The buffer was emptied before the next buffer was ready */
+    CODEC_ERR_OVER_FLOW = (int32_t)0x8000100E,       /**< The buffer was not available when it was needed */
+    CODEC_ERR_MAX = 0x7FFFFFFF
+} CodecResult;
 
 #ifdef __cplusplus
 #if __cplusplus
 }
 #endif
 #endif /* __cplusplus */
+
+#endif /* !MEDIA_INTERFACE_V1_0 */
 
 #endif /* CODEC_TYPE_H */
 /** @} */

@@ -115,8 +115,11 @@ int32_t CodecGetCapability(AvCodecMime mime, CodecType type, uint32_t flags, Cod
  * @return Returns <b>0</b> if the codec component is created and the handle is available;
  * returns a non-zero value otherwise.
  */
+#ifdef MEDIA_INTERFACE_V1_0
 int32_t CodecCreate(const char* name, const Param *attr, int len, CODEC_HANDLETYPE *handle);
-
+#else
+int32_t CodecCreate(const char* name, CODEC_HANDLETYPE *handle);
+#endif
 /**
  * @brief Creates a specific codec component by codec type and codec format,
  * returns the component context through a handle.
@@ -228,8 +231,11 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType);
  * @param timeoutMs Indicates the timeout duration.
  * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
  */
+#ifdef MEDIA_INTERFACE_V1_0
 int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const InputInfo *inputData, uint32_t timeoutMs);
-
+#else
+int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const InputInfo *inputData, uint32_t timeoutMs, int releaseFenceFd);
+#endif
 /**
  * @brief Dequeues input data that has been used.
  *
@@ -240,8 +246,11 @@ int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const InputInfo *inputData, uin
  * @param inputData Indicates the pointer to the input data that is used.
  * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
  */
+#ifdef MEDIA_INTERFACE_V1_0
 int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, InputInfo *inputData);
-
+#else
+int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int *acquireFd, InputInfo *inputData);
+#endif
 /**
  * @brief Queues output data.
  *

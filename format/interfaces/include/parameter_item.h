@@ -62,7 +62,7 @@ typedef enum {
     KEY_TYPE_WRITE_FRONT_GPS_LEN,
     KEY_TYPE_PRE_ALLOC_SIZE = 0x50524c43,
     KEY_TYPE_COVR_PIC = 0x636f7672,
-    KEY_TYPE_ALBUM_ART_INFO = 0x616c6172 /**< Album art information. The value type is <b>pointer</b>. */
+    KEY_TYPE_ALBUM_COVER_INFO = 0x616c6172 /**< Album cover information. The value type is <b>pointer</b>. */
 } KeyType;
 
 /**

@@ -12,8 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 if (defined(ohos_lite)) {
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 shared_library("libdaudio_hdf_utils") {
   include_dirs = [
     "include",
