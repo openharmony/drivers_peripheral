@@ -34,12 +34,14 @@
 #include <sys/ioctl.h>
 #include <sys/sysinfo.h>
 #include <mntent.h>
+#include <sys/statvfs.h>
 
 #include <unique_fd.h>
 #include <hdf_base.h>
 #include <file_ex.h>
 #include "parameters.h"
 #include "power_hdf_log.h"
+#include "device_resource_if.h"
 
 #define DRIVERS_PERIPHERAL_POWER_FDSAN_TAG 0XD002903
 
@@ -105,11 +107,39 @@ static int UlongLen(unsigned long arg)
     return l;
 }
 
+bool GetSupportSpaceOptConfig()
+{
+    bool supportSpaceOpt = true;
+    const struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
+    if (iface == nullptr) {
+        HDF_LOGE("get hcs interface failed.");
+        return supportSpaceOpt;
+    }
+
+    const struct DeviceResourceNode *pRootNode = iface->GetRootNode();
+    if (pRootNode == nullptr) {
+        HDF_LOGE("GetRootNode failed.");
+        return supportSpaceOpt;
+    }
+    const struct DeviceResourceNode *pChildNode = iface->GetChildNode(pRootNode, "dynamic_swapfile");
+    if (pChildNode != nullptr) {
+        supportSpaceOpt = !(iface->GetBool(pChildNode, "s4_skip_space_optimization"));
+    }
+
+    HDF_LOGI("hibernate supportSpaceOpt: %{public}d", static_cast<int32_t>(supportSpaceOpt));
+    return supportSpaceOpt;
+}
+
 void Hibernate::Init()
 {
     HDF_LOGI("hibernate init begin.");
-    auto myThread = std::thread([this] { this->InitSwap(); });
-    myThread.detach();
+    supportSpaceOpt_ = GetSupportSpaceOptConfig();
+    if (!supportSpaceOpt_) {
+        auto myThread = std::thread([this] { this->InitSwap(); });
+        myThread.detach();
+    } else if (IsSwapFileExist()) {
+        RemoveSwapFile();
+    }
 }
 
 int Hibernate::ConvertMemKB2GB(const unsigned long long memKB)
@@ -189,38 +219,47 @@ int32_t Hibernate::GetResumeInfo(std::string &resumeInfo)
     return ret;
 }
 
-void Hibernate::InitSwap()
+int32_t Hibernate::InitSwap()
 {
+    HDF_LOGI("Hibernate InitSwap begin.");
     std::lock_guard<std::mutex> lock(initMutex_);
     if (swapFileReady_) {
-        HDF_LOGI("swap file is ready, do nothing.");
-        return;
-    }
-    bool needToCreateSwapFile;
-    auto ret = CheckSwapFile(needToCreateSwapFile);
-    if (ret != HDF_SUCCESS) {
-        return;
-    }
-
-    if (needToCreateSwapFile) {
-        ret = CreateSwapFile();
-        if (ret != HDF_SUCCESS) {
-            return;
+        if (!supportSpaceOpt_) {
+            HDF_LOGI("InitSwap, swap file is ready, do nothing.");
+            return HDF_SUCCESS;
+        }
+        if (RemoveSwapFile() != HDF_SUCCESS) {
+            HDF_LOGE("remove swap file failed.");
+            return HDF_FAILURE;
         }
     }
 
-    ret = MkSwap();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGI("init swap failed");
-        RemoveSwapFile();
-        return;
+    bool needToCreateSwapFile;
+    if (CheckSwapFile(needToCreateSwapFile) != HDF_SUCCESS) {
+        return HDF_FAILURE;
     }
 
-    ret = WriteOffsetAndResume();
-    if (ret != HDF_SUCCESS) {
-        return;
+    if (needToCreateSwapFile) {
+        if (supportSpaceOpt_ && CheckDiskSpace() != HDF_SUCCESS) {
+            HDF_LOGI("InitSwap, need to create swap file, but disk space is not enough, do nothing.");
+            return HDF_FAILURE;
+        }
+        if (CreateSwapFile() != HDF_SUCCESS) {
+            return HDF_FAILURE;
+        }
+    }
+
+    if (MkSwap() != HDF_SUCCESS) {
+        HDF_LOGI("init swap failed");
+        RemoveSwapFile();
+        return HDF_FAILURE;
+    }
+
+    if (WriteOffsetAndResume() != HDF_SUCCESS) {
+        return HDF_FAILURE;
     }
     swapFileReady_ = true;
+    return HDF_SUCCESS;
 }
 
 int32_t Hibernate::MkSwap()
@@ -370,6 +409,8 @@ int32_t Hibernate::RemoveSwapFile()
         return HDF_FAILURE;
     }
 
+    swapFileReady_ = false;
+    Hibernate::staticSwapFileSize = 0;
     HDF_LOGI("remove swap file success.");
     return HDF_SUCCESS;
 }
@@ -480,7 +521,9 @@ int32_t Hibernate::WritePowerState()
 
 int32_t Hibernate::DoHibernate()
 {
-    InitSwap();
+    if (InitSwap() != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
     if (EnableSwap() != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
@@ -501,6 +544,10 @@ int32_t Hibernate::DoHibernate()
     } while (0);
     if (swapoff(SWAP_FILE_PATH.c_str()) != 0) {
         HDF_LOGE("swap off failed, errno=%{public}d", errno);
+    }
+
+    if (supportSpaceOpt_ && RemoveSwapFile() != HDF_SUCCESS) {
+        HDF_LOGE("remove swap file failed");
     }
     return ret;
 }
@@ -546,6 +593,25 @@ int32_t Hibernate::GetResumeOffset(uint64_t &resumeOffset)
     resumeOffset = swapFileFmExt[0].fe_physical >> UlongLen(fileStat.st_blksize);
     HDF_LOGI("resume offset size: %{public}lld", static_cast<long long>(resumeOffset));
     fdsan_close_with_tag(fd, DRIVERS_PERIPHERAL_POWER_FDSAN_TAG);
+    return HDF_SUCCESS;
+}
+
+int32_t Hibernate::CheckDiskSpace()
+{
+    unsigned long long swapFileSize = GetSwapFileSize();
+    struct statvfs buf;
+    if (statvfs(SWAP_DIR_PATH.c_str(), &buf) != 0) {
+        HDF_LOGE("statvfs failed, errno=%{public}d", errno);
+        return HDF_FAILURE;
+    }
+
+    unsigned long long availableSpace = static_cast<unsigned long long>(buf.f_bavail) * buf.f_bsize;
+    unsigned long long requiredSpace = swapFileSize * SWAP_FACTOR;
+    if (availableSpace < requiredSpace) {
+        HDF_LOGE("available disk space is not enough, availableSpace=%{public}llu, requiredSpace=%{public}llu",
+            availableSpace, requiredSpace);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 } // namespace V1_2

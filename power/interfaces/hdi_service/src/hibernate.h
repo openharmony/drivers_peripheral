@@ -43,7 +43,7 @@ public:
 
 private:
     Hibernate() {};
-    void InitSwap();
+    int32_t InitSwap();
     bool IsSwapFileExist();
     int32_t MkSwap();
     int32_t CheckSwapFile(bool &needToCreateSwapFile);
@@ -59,10 +59,12 @@ private:
     int32_t WritePowerState();
     int ConvertMemKB2GB(const unsigned long long memKB);
     unsigned long long GetSwapFileSize();
+    int32_t CheckDiskSpace();
 
     std::atomic_bool swapFileReady_ {false};
     std::mutex initMutex_;
     static unsigned long long staticSwapFileSize;
+    bool supportSpaceOpt_ {true};
 };
 } // namespace V1_2
 } // namespace Power
