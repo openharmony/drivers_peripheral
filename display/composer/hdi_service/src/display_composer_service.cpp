@@ -503,7 +503,7 @@ int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, V1_0::Disp
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->GetDisplayPowerStatus(devId, status);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
-        DISPLAY_LOGI("%{public}s fail devId:%{public}u, ret:%{public}d", func, devId, ret));
+        DISPLAY_LOGI("%{public}s fail devId:%{public}u, ret:%{public}d", __func__, devId, ret));
     return ret;
 }
 
@@ -623,8 +623,7 @@ int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enab
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->SetDisplayVsyncEnabled(devId, enabled);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
-        DISPLAY_LOGE("%{public}s fail: vsyncStatus[%{public}u] = %{public}d", func, devId, enabled));
-        vsyncEnableStatus_[devId] = enabled;
+        DISPLAY_LOGE("%{public}s fail: vsyncStatus[%{public}u] = %{public}d", __func__, devId, enabled));
         return ret;
 }
 
@@ -933,7 +932,7 @@ std::shared_ptr<V1_5::HdiDisplayCmdResponser> DisplayComposerService::GetRespons
         return cmdResponser_;
     }
 
-    std::unique_lockstd::shared_mutex lock(g_respMapMutex);
+    std::unique_lock<std::shared_mutex> lock(g_respMapMutex);
     DISPLAY_CHK_RETURN(cmdResponserMap_.find(devId) == cmdResponserMap_.end(), nullptr,
         DISPLAY_LOGE("%{public}s, cannot find the Response for the devId[%{public}u]", __func__, devId));
     return cmdResponserMap_[devId];
