@@ -674,7 +674,7 @@ static int32_t SetCapturePathValue(
     const char *captureDeviceType = AudioPathSelGetDeviceType(tpins);
     if (captureDeviceType == NULL) {
         AUDIO_FUNC_LOGE("DeviceType not found.");
-        return HDF_FAILURE;
+        return HDF_ERR_NOT_SUPPORT;
     }
 
     int32_t devNum = captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum;
