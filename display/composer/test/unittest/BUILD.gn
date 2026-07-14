@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("./../../../display_config.gni")
 
 group("hdf_disp_composer_unittest") {
   testonly = true
@@ -29,6 +30,8 @@ config("module_private_config") {
 }
 
 ohos_unittest("composer_ut") {
+  defines = []
+  defines += display_defines
   module_out_path = module_output_path
   resource_config_file = "./../resource/ohos_test.xml"
   sources = [ "hdi_composer_ut.cpp" ]
