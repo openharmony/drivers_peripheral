@@ -48,6 +48,7 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_2.0") {
   deps = [ "${hdf_service_path}/hdi_service/common:libdaudio_hdf_utils" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_2.0",
@@ -109,6 +110,7 @@ ohos_shared_library("libdaudio_primary_driver") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_2.0",
     "drivers_interface_distributed_audio:libdaudioext_stub_3.0",
