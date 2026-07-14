@@ -34,6 +34,7 @@ ohos_unittest("HdfDcameraTest") {
   deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.1" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:metadata",
