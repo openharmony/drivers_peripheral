@@ -34,6 +34,7 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_input:libinput_proxy_1.0",
       "hdf_core:libhdf_utils",

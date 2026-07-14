@@ -28,6 +28,7 @@ ohos_shared_library("emit_event_manager") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_input:libhid_ddk_stub_1.0",
     "drivers_interface_input:libhid_ddk_stub_1.1",
