@@ -623,6 +623,7 @@ int32_t AudioRenderGetVolume(struct IAudioRender *handle, float *volume)
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_ERR_INTERNAL;
     }
+
 #ifdef AUDIO_HAL_P7885
     *volume = (float)volumeTemp / INTEGER_TO_DEC;
 #else
