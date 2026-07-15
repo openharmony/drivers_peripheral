@@ -34,12 +34,20 @@ CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::
     node_ = node;
     mgr_  = mgr;
     isIPCMode_ = (HdfRemoteGetCallingPid() == getpid() ? false : true);
+    isDestroying_ = false;
 #ifdef SUPPORT_ROLE
     SetComponentRole();
 #endif
 }
 CodecComponentService::~CodecComponentService()
 {
+    bool expected = false;
+    bool desired = true;
+    if (!isDestroying_.compare_exchange_strong(expected, desired)) {
+        CODEC_LOGW("Component is already being destroyed");
+        return;
+    }
+
     std::lock_guard<std::mutex> lock(nodeMutex_);
     if (node_ != nullptr) {
         node_->ReleaseOMXResource();
@@ -252,8 +260,25 @@ int32_t CodecComponentService::ComponentDeInit()
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecComponentDeInit");
     CODEC_LOGI("ComponentDeInit");
+
+    bool expected = false;
+    bool desired = true;
+    if (!isDestroying_.compare_exchange_strong(expected, desired)) {
+        CODEC_LOGE("ComponentDeInit failed: component is being destroyed");
+        return HDF_ERR_DEVICE_BUSY;
+    }
+
     std::lock_guard<std::mutex> lock(nodeMutex_);
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
+
+    CodecStateType state = CODEC_STATE_INVALID;
+    node_->GetState(state);
+    if (state == CODEC_STATE_INVALID) {
+        CODEC_LOGW("Component is in Invalid state, try to recover");
+        std::vector<int8_t> cmdData;
+        node_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, cmdData.data());
+    }
+
     return node_->ComponentDeInit();
 }
 

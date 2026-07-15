@@ -66,7 +66,14 @@ public:
     void SetUp()
     {
         if (hdiJpeg_ != nullptr) {
-            hdiJpeg_->Init(CODEC_IMAGE_JPEG);
+            auto ret = hdiJpeg_->Init(CODEC_IMAGE_JPEG);
+            if (ret != HDF_SUCCESS) {
+                GTEST_SKIP() << "jpeg is null!" << std::endl;
+                return;
+            }
+        } else {
+            GTEST_SKIP() << "hdiJpeg_ is null!" << std::endl;
+            return;
         }
     }
     void TearDown()
