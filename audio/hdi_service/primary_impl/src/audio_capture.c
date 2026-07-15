@@ -570,7 +570,7 @@ int32_t AudioCaptureGetVolume(struct IAudioCapture *handle, float *volume)
         return AUDIO_ERR_INTERNAL;
     }
 #ifdef AUDIO_HAL_P7885
-    *volume = (float)volumeT / INTEGER_TO_DEC;
+    *volume = (float)volumeTemp / INTEGER_TO_DEC;
 #else
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
 
