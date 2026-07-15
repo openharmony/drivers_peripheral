@@ -40,6 +40,7 @@ ohos_shared_library("libdaudio_hdf_utils") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "c_utils:utils",
     "hdf_core:libhdf_utils",
