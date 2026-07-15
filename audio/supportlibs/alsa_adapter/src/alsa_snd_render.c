@@ -837,6 +837,7 @@ static int32_t RenderSetPauseStateImpl(struct AlsaRender *renderIns, bool pauseF
 {
     int enable = pauseFlag ? AUDIO_ALSALIB_IOCTRL_PAUSE : AUDIO_ALSALIB_IOCTRL_RESUME;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns->pcmHandle);
 
     if (cardIns->canPause) {
         int32_t ret = snd_pcm_pause(cardIns->pcmHandle, enable);
