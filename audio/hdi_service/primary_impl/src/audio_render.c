@@ -154,7 +154,9 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
             AUDIO_FUNC_LOGE("AudioRenderStop SetParams FAIL");
             ret = AUDIO_ERR_INTERNAL;
             break;
-        }  
+        } else {
+            hwRender->renderParam.renderMode.ctlParam.pause = false;
+        }
     } while (0);
     
     pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);

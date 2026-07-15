@@ -39,13 +39,15 @@ struct AlsaCapture {
     /* Capture scene */
     int32_t (*Init)(struct AlsaCapture*);
     int32_t (*Open)(struct AlsaCapture *);
-    int32_t (*SelectScene)(struct AlsaCapture *, enum AudioPortPin, const struct PathDeviceInfo *);
-    int32_t (*Start)(struct AlsaCapture *);
+    int32_t (*SelectScene)(struct AlsaCapture *, const struct AudioHwCaptureParam *);
+    int32_t (*Start)(struct AlsaCapture *, const struct AudioHwCaptureParam *);
     int32_t (*Stop)(struct AlsaCapture *);
     int32_t (*Close)(struct AlsaCapture *);
     int32_t (*Read)(struct AlsaCapture *, struct AudioHwCaptureParam *);
     int32_t (*GetMmapPosition)(struct AlsaCapture *);
     int32_t (*MmapRead)(struct AlsaCapture *, const struct AudioHwCaptureParam *);
+
+    int32_t (*SetParams)(struct AlsaCapture *, const struct AudioHwCaptureParam *);
 
     /* volume operation */
     int32_t (*GetVolThreshold)(struct AlsaCapture *, long *, long *);
@@ -65,9 +67,8 @@ struct AlsaCapture {
     int32_t (*SetPauseState)(struct AlsaCapture *, bool);
 };
 
-struct AlsaCapture *CaptureCreateInstance(const char* adapterName);
+struct AlsaCapture *CaptureCreateInstance(const char* adapterName, enum AudioCategory scene);
 struct AlsaCapture *CaptureGetInstance(const char *adapterName);
-int32_t CaptureSetParams(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData);
 void  CaptureSetPriData(struct AlsaCapture *captureIns, CapturePriData data);
 CapturePriData CaptureGetPriData(struct AlsaCapture *captureIns);
 
@@ -75,6 +76,7 @@ CapturePriData CaptureGetPriData(struct AlsaCapture *captureIns);
     Different platforms implement this function rewriting capture implementation
  */
 int32_t CaptureOverrideFunc(struct AlsaCapture *captureIns);
+int32_t CaptureGetSceneDev(enum AudioCategory scene);
 
 #ifdef __cplusplus
 }

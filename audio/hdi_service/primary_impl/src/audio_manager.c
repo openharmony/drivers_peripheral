@@ -350,6 +350,9 @@ static int32_t LoadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct
     hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
     hwAdapter->common.GetDeviceStatus = AudioAdapterGetDeviceStatus;
     hwAdapter->common.CreateCallTransfer = NULL;
+    hwAdapter->common.SetVoiceVolume = AudioAdapterSetVoiceVolume;
+    hwAdapter->common.UpdateAudioRoute = AudioAdapterUpdateAudioRoute;
+    hwAdapter->common.SetMicMute = AudidoAdapterSetMicMute;
     hwAdapter->common.SetPhoneCallScene = NULL;
     hwAdapter->adapterDescriptor = *desc;
 
