@@ -159,9 +159,20 @@ RetCode SensorController::Stop()
     return rc;
 };
 
+RetCode SensorController::CreateBuffers()
+{
+    RetCode ret = RC_OK;
+#ifdef BATCH_CREATE_BUFFERS
+    sensorVideo_->CreatBuffer(GetName(), buffCont_);
+    ret = sensorVideo_->StartStream(GetName());
+#endif
+    return ret;
+}
+
 RetCode SensorController::SendFrameBuffer(std::shared_ptr<FrameSpec> buffer)
 {
     RetCode ret = RC_OK;
+#ifndef BATCH_CREATE_BUFFERS
     if (buffCont_ >= 1) {
         CAMERA_LOGI("buffCont_ %{public}d", buffCont_);
         sensorVideo_->CreatBuffer(GetName(), buffer);
@@ -170,8 +181,11 @@ RetCode SensorController::SendFrameBuffer(std::shared_ptr<FrameSpec> buffer)
         }
         buffCont_--;
     } else {
+#endif
         ret = sensorVideo_->QueueBuffer(GetName(), buffer);
+#ifndef BATCH_CREATE_BUFFERS
     }
+#endif
     return ret;
 }
 
