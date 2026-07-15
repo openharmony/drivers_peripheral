@@ -154,7 +154,9 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
             AUDIO_FUNC_LOGE("AudioRenderStop SetParams FAIL");
             ret = AUDIO_ERR_INTERNAL;
             break;
-        }  
+        } else {
+            hwRender->renderParam.renderMode.ctlParam.pause = false;
+        }
     } while (0);
     
     pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
@@ -564,6 +566,9 @@ int32_t AudioRenderSetVolume(struct IAudioRender *handle, float volume)
         return AUDIO_ERR_INTERNAL;
     }
 
+#ifdef AUDIO_HAL_P7885
+    float volTemp = (float)volume * INTEGER_TO_DEC;
+#else
     volume = (volume == 0) ? 1 : (volume * VOLUME_CHANGE);
     /* change volume to db */
     float volTemp = ((volMax - volMin) / 2) * log10(volume) + volMin;
@@ -571,6 +576,7 @@ int32_t AudioRenderSetVolume(struct IAudioRender *handle, float volume)
         AUDIO_FUNC_LOGE("volTemp fail");
         return AUDIO_ERR_INTERNAL;
     }
+#endif
     hwRender->renderParam.renderMode.ctlParam.volume = volTemp;
 
     int32_t ret =
@@ -617,12 +623,15 @@ int32_t AudioRenderGetVolume(struct IAudioRender *handle, float *volume)
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_ERR_INTERNAL;
     }
-
+#ifdef AUDIO_HAL_P7885
+    *volume = (float)volumeTemp / INTEGER_TO_DEC;
+#else
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
 
     int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + DECIMAL_PART) / INTEGER_TO_DEC); // delet 0.X num
 
     *volume = (float)volumeT / INTEGER_TO_DEC;                                               // get volume (0-1)
+#endif
     AUDIO_FUNC_LOGI("Enter. volumeTemp= %{public}f, volMax= %{public}f, volMin= %{public}f, *volume= %{public}f",
                     volumeTemp, volMax, volMin, *volume);
     return AUDIO_SUCCESS;

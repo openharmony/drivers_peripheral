@@ -48,11 +48,10 @@ static int32_t RenderInitImpl(struct AlsaRender *renderIns)
     return HDF_SUCCESS;
 }
 
-static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, enum AudioPortPin descPins,
-    const struct PathDeviceInfo *deviceInfo)
+static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData)
 {
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
-    renderIns->descPins = descPins;
+    renderIns->descPins = handleData->renderMode.hwInfo.deviceDescript.pins;
     return HDF_SUCCESS;
 }
 
@@ -169,7 +168,7 @@ static int32_t RenderSetMuteImpl(struct AlsaRender *renderIns, bool muteFlag)
     return HDF_SUCCESS;
 }
 
-static int32_t RenderStartImpl(struct AlsaRender *renderIns)
+static int32_t RenderStartImpl(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData)
 {
     return HDF_SUCCESS;
 }
