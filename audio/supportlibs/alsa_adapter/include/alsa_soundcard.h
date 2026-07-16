@@ -68,7 +68,7 @@ enum SndIfaceType {
 struct AlsaMixerCtlElement {
     unsigned int numid;
     enum SndIfaceType iface;
-#ifdef AUDIO_HAL_P7885 
+#ifdef AUDIO_HAL_P7885
     const char *name;
 #else
     char *name;

@@ -500,7 +500,7 @@ struct AlsaCapture *CaptureCreateInstance(const char* adapterName)
         return NULL;
     }
 
-    if (g_alsaCaptureList == NULL) { 
+    if (g_alsaCaptureList == NULL) {
         g_alsaCaptureList = (struct AlsaCapture *)OsalMemCalloc(MAX_CARD_NUM * sizeof(struct AlsaCapture));
         if (g_alsaCaptureList == NULL) {
             AUDIO_FUNC_LOGE("Failed to allocate memory!");
@@ -514,9 +514,7 @@ struct AlsaCapture *CaptureCreateInstance(const char* adapterName)
         return NULL;
     }
     RegisterCaptureImpl(captureIns);
-
     int32_t ret = SndSaveCardListInfo(SND_PCM_STREAM_CAPTURE);
-
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to save card device info.");
         return NULL;

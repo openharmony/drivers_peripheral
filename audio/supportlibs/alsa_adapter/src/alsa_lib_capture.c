@@ -311,9 +311,9 @@ int32_t AudioOutputCaptureOpen(
 {
     int32_t ret;
     struct AlsaCapture *captureIns = NULL;
-    enum AudioCategory scene;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 #ifdef AUDIO_HAL_P7885
+    enum AudioCategory scene;
     scene = handleData->frameCaptureMode.attrs.type;
     AUDIO_FUNC_LOGI("AudioOutputCaptureOpen scene:%{public}d.", scene);
     captureIns = CaptureCreateInstance(handleData->captureMode.hwInfo.adapterName, scene);

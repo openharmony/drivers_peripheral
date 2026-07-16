@@ -38,7 +38,7 @@ struct AlsaRender {
 
     /* render scene */
     int32_t (*Init)(struct AlsaRender*);
-#ifdef AUDIO_HAL_P7885  
+#ifdef AUDIO_HAL_P7885
     int32_t (*SelectScene)(struct AlsaRender *, const struct AudioHwRenderParam *);
     int32_t (*Start)(struct AlsaRender *, const struct AudioHwRenderParam *);
     /* call operation */
@@ -63,7 +63,7 @@ struct AlsaRender {
     int32_t (*GetVolThreshold)(struct AlsaRender *, long *, long *);
     int32_t (*GetVolume)(struct AlsaRender *, long *);
     int32_t (*SetVolume)(struct AlsaRender *, long);
-    
+
     /* gain operation */
     int32_t (*GetGainThreshold)(struct AlsaRender *, float *, float *);
     int32_t (*GetGain)(struct AlsaRender *, float *);

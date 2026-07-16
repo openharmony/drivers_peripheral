@@ -43,7 +43,7 @@ struct AlsaCapture {
     int32_t (*SelectScene)(struct AlsaCapture *, const struct AudioHwCaptureParam *);
     int32_t (*Start)(struct AlsaCapture *, const struct AudioHwCaptureParam *);
 #else
-    int32_t (*SelectScene)(struct AlsaCapture *, enum AudioPortPin, const struct PathDeviceInfo *);	 
+    int32_t (*SelectScene)(struct AlsaCapture *, enum AudioPortPin, const struct PathDeviceInfo *);
     int32_t (*Start)(struct AlsaCapture *);
 #endif
     int32_t (*Stop)(struct AlsaCapture *);

@@ -1446,10 +1446,9 @@ int32_t SndElementWrite(
     snd_ctl_elem_value_alloca(&elem_value);
     ret = SetElementInfo(alsaHandle, ctlElem, elem_info, elem_id);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n", ctlElem->name);
+        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!", ctlElem->name);
         return HDF_FAILURE;
     }
-
 #ifdef AUDIO_HAL_P7885
     snd_ctl_elem_value_set_id(elem_value, elem_id);
     ret = snd_ctl_elem_read(alsaHandle, elem_value);
@@ -1459,23 +1458,21 @@ int32_t SndElementWrite(
     }
 #else
     if (!snd_ctl_elem_info_is_writable(elem_info)) {
-        AUDIO_FUNC_LOGE("Element write enable\n");
+        AUDIO_FUNC_LOGE("Element write enable");
         return HDF_FAILURE;
     }
-
     snd_ctl_elem_value_set_id(elem_value, elem_id);
 #endif
 
     ret = snd_ctl_ascii_value_parse(alsaHandle, elem_value, elem_info, ctlElem->value);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("Control parse error: %s\n", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Control parse error: %{public}s", snd_strerror(ret));
         (void)snd_ctl_close(alsaHandle);
         alsaHandle = NULL;
         return HDF_FAILURE;
     }
     ret = snd_ctl_elem_write(alsaHandle, elem_value);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("Control element write error: %s\n", snd_strerror(ret));
         AUDIO_FUNC_LOGE("Control element write error: %{public}s\n", snd_strerror(ret));
         (void)snd_ctl_close(alsaHandle);
         alsaHandle = NULL;
@@ -1484,7 +1481,6 @@ int32_t SndElementWrite(
 
     (void)snd_ctl_close(alsaHandle);
     alsaHandle = NULL;
-
     return HDF_SUCCESS;
 }
 
