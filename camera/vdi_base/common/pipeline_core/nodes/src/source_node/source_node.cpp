@@ -199,6 +199,17 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
         cltRun = true;
     }
 
+#ifdef BATCH_CREATE_BUFFERS
+    auto node = port->GetNode();
+    if (node == nullptr) {
+        CAMERA_LOGI("SourceNode::PortHandler::StartCollectBuffers node null");
+        return RC_ERROR;
+    }
+    if (node->CreateBuffers() != RC_OK) {
+        CAMERA_LOGI("SourceNode::PortHandler::StartCollectBuffers node create buffer error");
+        return RC_ERROR;
+    }
+#endif
     collector = std::make_unique<std::thread>([this, &streamId] {
         std::string name = "collect#" + std::to_string(streamId);
         prctl(PR_SET_NAME, name.c_str());

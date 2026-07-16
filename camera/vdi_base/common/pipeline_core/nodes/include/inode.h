@@ -69,6 +69,7 @@ public:
     virtual void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) = 0;
     virtual void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) = 0;
     virtual void SetCallBack(BufferCb c) = 0;
+    virtual RetCode CreateBuffers() = 0;
 
     virtual RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) = 0;
     virtual void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) = 0;
