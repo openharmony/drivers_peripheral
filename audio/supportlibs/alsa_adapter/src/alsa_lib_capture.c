@@ -167,7 +167,11 @@ int32_t AudioCtlCaptureSceneSelect(
 
     descPins = handleData->captureMode.hwInfo.deviceDescript.pins;
     deviceInfo = &handleData->captureMode.hwInfo.pathSelect.deviceInfo;
+#ifdef AUDIO_HAL_P7885
     ret = captureIns->SelectScene(captureIns, handleData);
+#else
+    ret = captureIns->SelectScene(captureIns, descPins, deviceInfo);
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture select scene pin: (0x%{public}x) failed", descPins);
         return HDF_FAILURE;
@@ -284,7 +288,11 @@ int32_t AudioOutputCaptureHwParams(
     }
 
     AUDIO_FUNC_LOGI("AudioOutputCaptureHwParams SetParams begin.");
+#ifdef AUDIO_HAL_P7885
     ret = captureIns->SetParams(captureIns, handleData);
+#else
+    ret = CaptureSetParams(captureIns, handleData);
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture set parameters failed!");
         return HDF_FAILURE;
@@ -305,10 +313,13 @@ int32_t AudioOutputCaptureOpen(
     struct AlsaCapture *captureIns = NULL;
     enum AudioCategory scene;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
-
+#ifdef AUDIO_HAL_P7885
     scene = handleData->frameCaptureMode.attrs.type;
     AUDIO_FUNC_LOGI("AudioOutputCaptureOpen scene:%{public}d.", scene);
     captureIns = CaptureCreateInstance(handleData->captureMode.hwInfo.adapterName, scene);
+#else
+    captureIns = CaptureCreateInstance(handleData->captureMode.hwInfo.adapterName);
+#endif
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
 
     ret = captureIns->Open(captureIns);
@@ -375,8 +386,11 @@ int32_t AudioOutputCaptureStart(
 
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
-
+#ifdef AUDIO_HAL_P7885
     ret = captureIns->Start(captureIns, handleData);
+#else
+    ret = captureIns->Start(captureIns);
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture start failed!");
         return ret;

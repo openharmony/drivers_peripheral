@@ -167,7 +167,11 @@ int32_t AudioCtlRenderSceneSelect(
     pthread_mutex_lock(&g_mutex);
     descPins = handleData->renderMode.hwInfo.deviceDescript.pins;
     deviceInfo = &handleData->renderMode.hwInfo.pathSelect.deviceInfo;
+#ifdef AUDIO_HAL_P7885
     ret = renderIns->SelectScene(renderIns, handleData);
+#else
+    ret = renderIns->SelectScene(renderIns, descPins, deviceInfo);
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render select scene pin: (0x%{public}x) failed!", descPins);
         pthread_mutex_unlock(&g_mutex);
@@ -178,6 +182,7 @@ int32_t AudioCtlRenderSceneSelect(
     return HDF_SUCCESS;
 }
 
+#ifdef AUDIO_HAL_P7885
 int32_t AudioCtlRenderSetVoiceVolume(
     const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
@@ -274,6 +279,7 @@ int32_t AudioCtlRenderUpdateRouter(
     }
     return HDF_SUCCESS;
 }
+#endif
 
 int32_t AudioCtlRenderSceneGetGainThreshold(
     const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
@@ -391,6 +397,7 @@ int32_t AudioInterfaceLibCtlRender(
             return (AudioCtlRenderSceneGetGainThreshold(handle, cmdId, handleData));
         case AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ:
             return (AudioCtlRenderGetVolThreshold(handle, cmdId, handleData));
+#ifdef AUDIO_HAL_P7885
         case AUDIODRV_CTL_IOCTL_VOICE_VOLUME_WRITTE:
             return (AudioCtlRenderSetVoiceVolume(handle, cmdId, handleData));
         case AUDIODRV_CTL_IOCTL_DEV_TURNING_WRITE:
@@ -401,6 +408,7 @@ int32_t AudioInterfaceLibCtlRender(
             return (AudioCtlRenderDevVoiceClose(handle, cmdId, handleData));
         case AUDIODRV_CTL_IOCTL_UPDATE_ROUTER:
             return (AudioCtlRenderUpdateRouter(handle, cmdId, handleData));
+#endif
         default:
             AUDIO_FUNC_LOGE("Output Mode not support!");
             break;
@@ -424,8 +432,11 @@ int32_t AudioOutputRenderHwParams(
         AUDIO_FUNC_LOGE("Unable to set parameters during playback!");
         return HDF_FAILURE;
     }
-
+#ifdef AUDIO_HAL_P7885
     ret = renderIns->SetParams(renderIns, handleData);
+#elif
+    ret = RenderSetParams(renderIns, handleData);
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render set parameters failed!");
         return HDF_FAILURE;
@@ -444,15 +455,18 @@ int32_t AudioOutputRenderOpen(
 {
     int32_t ret;
     struct AlsaRender *renderIns = NULL;
-    enum AudioCategory scene;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
-
+#ifdef AUDIO_HAL_P7885
+    enum AudioCategory scene;
     scene = handleData->frameRenderMode.attrs.type;
     AUDIO_FUNC_LOGI("AudioOutputRenderOpen scene:%{public}d.", scene);
     if (scene < AUDIO_IN_MEDIA || scene > AUDIO_MMAP_NOIRQ) {
         scene = AUDIO_IN_MEDIA;
     }
     renderIns = RenderCreateInstance(handleData->renderMode.hwInfo.adapterName, scene);
+#else
+    renderIns = RenderCreateInstance(handleData->renderMode.hwInfo.adapterName);
+#endif
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
     ret = renderIns->Open(renderIns);
@@ -519,7 +533,11 @@ int32_t AudioOutputRenderStart(
     renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
+#ifdef AUDIO_HAL_P7885
     ret = renderIns->Start(renderIns, handleData);
+#else
+    ret = renderIns->Start(renderIns);
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render start failed!");
         return ret;
@@ -681,11 +699,13 @@ int32_t AudioInterfaceLibModeRender(
         case AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE:
         case AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ:
         case AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ:
+#ifdef AUDIO_HAL_P7885
         case AUDIODRV_CTL_IOCTL_VOICE_VOLUME_WRITTE:
         case AUDIODRV_CTL_IOCTL_DEV_TURNING_WRITE:
         case AUDIODRV_CTL_IOCTL_DEV_VOICE_READ:
         case AUDIODRV_CTL_IOCTL_DEV_VOICE_CLOSE:
         case AUDIODRV_CTL_IOCTL_UPDATE_ROUTER:
+#endif
             return (AudioInterfaceLibCtlRender(handle, cmdId, handleData));
         default:
             AUDIO_FUNC_LOGE("Mode Error!");

@@ -357,6 +357,7 @@ static int32_t SaveHwParams(struct AlsaSoundCard *cardIns, const struct AudioHwC
     return HDF_SUCCESS;
 }
 
+#ifdef AUDIO_HAL_P7885
 static int32_t CaptureSetParams(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData)
 {
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)captureIns;
@@ -378,6 +379,29 @@ static int32_t CaptureSetParams(struct AlsaCapture *captureIns, const struct Aud
 
     return HDF_SUCCESS;
 }
+#else
+int32_t CaptureSetParams(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData)
+{
+    struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)captureIns;
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
+    CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
+
+    SaveHwParams(cardIns, handleData);
+    int32_t ret = SetHWParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Setting of hwparams failed.");
+        return HDF_FAILURE;
+    }
+
+    ret = SetSWParams(cardIns);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Setting of swparams failed.");
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+#endif
 
 static struct AlsaCapture *GetCaptureInsByName(const char *adapterName)
 {
@@ -419,6 +443,7 @@ static struct AlsaCapture *GetCaptureInsByName(const char *adapterName)
     return NULL;
 }
 
+#ifdef AUDIO_HAL_P7885
 struct AlsaCapture *CaptureCreateInstance(const char* adapterName, enum AudioCategory scene)
 {
     struct AlsaCapture *captureIns = NULL;
@@ -465,6 +490,49 @@ struct AlsaCapture *CaptureCreateInstance(const char* adapterName, enum AudioCat
 
     return captureIns;
 }
+#else
+struct AlsaCapture *CaptureCreateInstance(const char* adapterName)
+{
+    struct AlsaCapture *captureIns = NULL;
+
+    if (adapterName == NULL || strlen(adapterName) == 0) {
+        AUDIO_FUNC_LOGE("Invalid adapterName!");
+        return NULL;
+    }
+
+    if (g_alsaCaptureList == NULL) { 
+        g_alsaCaptureList = (struct AlsaCapture *)OsalMemCalloc(MAX_CARD_NUM * sizeof(struct AlsaCapture));
+        if (g_alsaCaptureList == NULL) {
+            AUDIO_FUNC_LOGE("Failed to allocate memory!");
+            return NULL;
+        }
+    }
+
+    captureIns = GetCaptureInsByName(adapterName);
+    if (captureIns == NULL) {
+        AUDIO_FUNC_LOGE("Get capture instance failed.");
+        return NULL;
+    }
+    RegisterCaptureImpl(captureIns);
+
+    int32_t ret = SndSaveCardListInfo(SND_PCM_STREAM_CAPTURE);
+
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Failed to save card device info.");
+        return NULL;
+    }
+
+    ret = SndMatchSelAdapter(&captureIns->soundCard, adapterName);
+    if (ret != HDF_SUCCESS) {
+        SndCloseHandle(&captureIns->soundCard);
+        CaptureFreeMemory();
+        return NULL;
+    }
+    CaptureOverrideFunc(captureIns);
+
+    return captureIns;
+}
+#endif
 
 struct AlsaCapture *CaptureGetInstance(const char *adapterName)
 {
@@ -786,6 +854,7 @@ static int32_t CaptureInitImpl(struct AlsaCapture* captureIns)
     return HDF_SUCCESS;
 }
 
+#ifdef AUDIO_HAL_P7885
 static int32_t CaptureSelectSceneImpl(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData)
 {
     AUDIO_FUNC_LOGE("Not yet realized");
@@ -797,6 +866,20 @@ static int32_t CaptureStartImpl(struct AlsaCapture *captureIns, const struct Aud
     AUDIO_FUNC_LOGE("Not yet realized");
     return HDF_SUCCESS;
 }
+#else
+static int32_t CaptureSelectSceneImpl(struct AlsaCapture *captureIns, enum AudioPortPin descPins,
+    const struct PathDeviceInfo *deviceInfo)
+{
+    AUDIO_FUNC_LOGE("Not yet realized");
+    return HDF_SUCCESS;
+}
+
+static int32_t CaptureStartImpl(struct AlsaCapture *captureIns)
+{
+    AUDIO_FUNC_LOGE("Not yet realized");
+    return HDF_SUCCESS;
+}
+#endif
 
 static int32_t CaptureStopImpl(struct AlsaCapture *captureIns)
 {
@@ -891,6 +974,7 @@ static int32_t CaptureSetPauseStateImpl(struct AlsaCapture *captureIns, bool pau
     return ret;
 }
 
+#ifdef AUDIO_HAL_P7885
 static int32_t CaptureSetHwParamsImpl(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
@@ -903,6 +987,7 @@ static int32_t CaptureSetHwParamsImpl(struct AlsaCapture *captureIns, const stru
     }
     return HDF_SUCCESS;
 }
+#endif
 
 static void RegisterCaptureImpl(struct AlsaCapture *captureIns)
 {
@@ -929,6 +1014,7 @@ static void RegisterCaptureImpl(struct AlsaCapture *captureIns)
     captureIns->GetMute = CaptureGetMuteImpl;
     captureIns->SetMute = CaptureSetMuteImpl;
     captureIns->SetPauseState = CaptureSetPauseStateImpl;
-
+#ifdef AUDIO_HAL_P7885
     captureIns->SetParams = CaptureSetHwParamsImpl;
+#endif
 }
