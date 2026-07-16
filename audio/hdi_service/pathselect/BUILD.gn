@@ -35,6 +35,9 @@ ohos_shared_library("audio_path_select") {
   if (drivers_peripheral_audio_feature_alsa_lib) {
     defines += [ "ALSA_LIB_MODE" ]
   }
+  if (drivers_peripheral_audio_feature_p7885) {
+    defines += [ "AUDIO_HAL_P7885" ]
+  }
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_audio:libaudio_proxy_6.1",
