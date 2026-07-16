@@ -46,4 +46,7 @@ declare_args() {
 
 declare_args() {
   drivers_peripheral_camera_use_commom_usb_camera_host_config = false
+  drivers_peripheral_camera_feature_board_config = false
+  drivers_peripheral_camera_feature_host_codec = false
+  drivers_peripheral_camera_feature_batch_buffers = false
 }
