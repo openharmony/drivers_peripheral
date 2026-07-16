@@ -455,13 +455,13 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
 int32_t GnssInterfaceImpl::DisableGnss()
 {
     HDF_LOGI("%{public}s.", __func__);
-    std::unique_lock<std::mutex> lock(g_mutex);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = gnssInterface->disableGnss();
+    std::unique_lock<std::mutex> lock(g_mutex);
     g_locationCallBackMap.clear();
     HDF_LOGE("%{public}s exit.", __func__);
     return ret;
