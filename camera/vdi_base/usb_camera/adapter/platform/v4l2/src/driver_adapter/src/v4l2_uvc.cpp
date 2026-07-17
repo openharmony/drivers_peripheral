@@ -14,7 +14,11 @@
  */
 
 #include <mutex>
+#include <linux/netlink.h>
+#include <poll.h>
 #include <sys/prctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include "securec.h"
 #include "v4l2_control.h"
 #include "v4l2_fileformat.h"
@@ -22,11 +26,21 @@
 #include "v4l2_uvc.h"
 #include "usb_device_filter.h"
 
+
+#define UEVENT_MSG_LEN          2048
+#define UEVENT_SOCKET_GROUPS    0xffffffff
+#define UEVENT_SOCKET_BUFF_SIZE (64 * 1024)
+#define TIMEVAL_SECOND          0
+#define TIMEVAL_USECOND         (100 * 1000)
+#define UEVENT_POLL_WAIT_TIME   100000
+#define MAX_ERR_TIMES           10
+#define MAX_UEVENT_BIND_RETRY_TIMES 50
+
+
 constexpr int NAME_START_POS = 2;
 
 namespace OHOS::Camera {
 static bool g_uvcDetectEnable = false;
-static bool g_detectUvcDevices = true;
 static std::mutex g_uvcDetectLock;
 HosV4L2UVC::HosV4L2UVC() {}
 HosV4L2UVC::~HosV4L2UVC() {}
@@ -250,11 +264,19 @@ void HosV4L2UVC::V4L2UvcEnmeDevices()
             return;
         }
 
-        if (stat(devName, &sta) != 0) {
-            continue;
+        {
+            std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
+            auto itr = std::find_if(HosV4L2Dev::deviceMatch.begin(), HosV4L2Dev::deviceMatch.end(),
+                [devName](const std::map<std::string, std::string>::value_type& pair) {
+                return pair.first == devName;
+            });
+            if (itr != HosV4L2Dev::deviceMatch.end()) {
+                // already opened before
+                CAMERA_LOGD("UVC:loop HosV4L2Dev::V4L2UvcMatchDev has insert %{public}s", itr->second.c_str());
+                return;
+            }
         }
-
-        if (!S_ISCHR(sta.st_mode)) {
+        if (stat(devName, &sta) != 0 || !S_ISCHR(sta.st_mode)) {
             continue;
         }
 
@@ -339,43 +361,134 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
     CAMERA_LOGD("UVC:V4L2GetUsbString exit\n");
 }
 
+static int OpenUeventFd(int *fd)
+{
+    struct sockaddr_nl addr;
+    if (memset_s(&addr, sizeof(addr), 0, sizeof(addr)) != RC_OK) {
+        CAMERA_LOGE("%{public}s: addr memset_s failed!", __func__);
+        return RC_ERROR;
+    }
+    addr.nl_family = AF_NETLINK;
+    addr.nl_pid = 0;
+    addr.nl_groups = UEVENT_SOCKET_GROUPS;
+
+    int socketfd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
+    if (socketfd < 0) {
+        CAMERA_LOGE("%{public}s: socketfd failed! ret = %{public}d, errno:%{public}d", __func__, socketfd, errno);
+        return RC_ERROR;
+    }
+    fdsan_exchange_owner_tag(socketfd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+
+    int buffSize = UEVENT_SOCKET_BUFF_SIZE;
+    int ret = 0;
+    if ((ret = setsockopt(socketfd, SOL_SOCKET, SO_RCVBUF, &buffSize, sizeof(buffSize))) != 0) {
+        CAMERA_LOGE("%{public}s: setsockopt failed! %{public}d:%{public}d", __func__, ret, errno);
+        fdsan_close_with_tag(socketfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        return RC_ERROR;
+    }
+
+    const int32_t on = 1; // turn on passcred
+    if ((ret = setsockopt(socketfd, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on))) != 0) {
+        CAMERA_LOGE("setsockopt failed! %{public}d:%{public}d", ret, errno);
+        fdsan_close_with_tag(socketfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        return RC_ERROR;
+    }
+
+    if ((ret = bind(socketfd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr))) < 0) {
+        CAMERA_LOGE("%{public}s: bind socketfd failed! %{public}d:%{public}d", __func__, ret, errno);
+        fdsan_close_with_tag(socketfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+        return RC_ERROR;
+    }
+    *fd = socketfd;
+    return RC_OK;
+}
+
+static ssize_t ReadUeventMsg(int sockFd, char *buffer, size_t length)
+{
+    struct iovec iov;
+    iov.iov_base = buffer;
+    iov.iov_len = length;
+
+    struct sockaddr_nl addr;
+    (void)memset_s(&addr, sizeof(addr), 0, sizeof(addr));
+
+    struct msghdr msghdr = {0};
+    msghdr.msg_name = &addr;
+    msghdr.msg_namelen = sizeof(addr);
+    msghdr.msg_iov = &iov;
+    msghdr.msg_iovlen = 1;
+
+    char credMsg[CMSG_SPACE(sizeof(struct ucred))] = {0};
+    msghdr.msg_control = credMsg;
+    msghdr.msg_controllen = sizeof(credMsg);
+
+    ssize_t len = recvmsg(sockFd, &msghdr, 0);
+    if (len <= 0) {
+        return RC_ERROR;
+    }
+
+    struct cmsghdr *hdr = CMSG_FIRSTHDR(&msghdr);
+    if (hdr == nullptr || hdr->cmsg_type != SCM_CREDENTIALS) {
+        HDF_LOGE("Unexpected control message, ignored");
+        *buffer = '\0';
+        return RC_ERROR;
+    }
+
+    return len;
+}
+
 void HosV4L2UVC::loopUvcDevice()
 {
-    fd_set fds;
-    constexpr uint32_t delayTime = 200000;
-    constexpr uint32_t fallbackPollSec = 2;
-    CAMERA_LOGI("UVC:loopUVCDevice fd = %{public}d getuid() = %{public}d\n", uDevFd_, getuid());
-    V4L2UvcEnmeDevices();
-    int uDevFd = uDevFd_;
-    int eventFd = eventFd_;
-    int nfds = ((uDevFd > eventFd) ? uDevFd : eventFd) + 1;
-
-    prctl(PR_SET_NAME, "loopUvcDevice");
-    while (g_uvcDetectEnable) {
-        if (g_detectUvcDevices) {
-            V4L2UvcEnmeDevices();
-            g_detectUvcDevices = false;
+    int errorTimes = 0;
+    int socketfd = -1;
+    while (OpenUeventFd(&socketfd) != RC_OK) {
+        errorTimes++;
+        CAMERA_LOGE("DdkUeventOpen failed: %{public}d", errorTimes);
+        if (errorTimes > MAX_UEVENT_BIND_RETRY_TIMES) {
+            return;
         }
-        FD_ZERO(&fds);
-        FD_SET(uDevFd, &fds);
-        FD_SET(eventFd, &fds);
-        struct timeval timeout = {fallbackPollSec, 0};
-        int rc = select(nfds, &fds, nullptr, nullptr, &timeout);
-        CAMERA_LOGI("g_uvcDetectEnable = true, select rc = %{public}d\n", rc);
-        if (rc > 0 && FD_ISSET(uDevFd, &fds)) {
-            usleep(delayTime);
-            constexpr uint32_t buffSize = 4096;
-            char buf[buffSize] = {};
-            unsigned int len = static_cast<unsigned int>(recv(uDevFd, buf, sizeof(buf), 0));
-            if (CheckBuf(len, buf)) {
+        usleep(UEVENT_POLL_WAIT_TIME);
+    }
+
+    ssize_t rcvLen = 0;
+    char msg[UEVENT_MSG_LEN];
+
+    struct pollfd fd;
+    fd.fd = socketfd;
+    fd.events = POLLIN | POLLERR;
+    fd.revents = 0;
+    errorTimes = 0;
+
+    V4L2UvcEnmeDevices();
+    do {
+        if (poll(&fd, 1, -1) <= 0) {
+            CAMERA_LOGE("usb event poll fail %{public}d", errno);
+            usleep(UEVENT_POLL_WAIT_TIME);
+            continue;
+        }
+
+        if (((uint32_t)fd.revents & POLLIN) == POLLIN) {
+            errorTimes = 0;
+            (void)memset_s(&msg, sizeof(msg), 0, sizeof(msg));
+            rcvLen = ReadUeventMsg(socketfd, msg, UEVENT_MSG_LEN);
+            if (rcvLen <= 0) {
+                continue;
+            }
+            CAMERA_LOGE("camera uevent poll=%{public}s", msg);
+            if (CheckBuf(rcvLen, msg) != RC_OK) {
                 return;
             }
-        } else {
-            CAMERA_LOGI("UVC:No Device from udev_monitor_receive_device() or exit uvcDetectEnable = %{public}d\n",
-                g_uvcDetectEnable);
+        } else if (((uint32_t)fd.revents & POLLERR) == POLLERR) {
+            if (errorTimes < MAX_ERR_TIMES) {
+                ++errorTimes;
+            } else {
+                usleep(UEVENT_POLL_WAIT_TIME);
+            }
         }
-    }
-    CAMERA_LOGI("UVC: device detect thread exit");
+    } while (g_uvcDetectEnable);
+
+    fdsan_close_with_tag(socketfd, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
+    return;
 }
 
 int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)
@@ -428,7 +541,7 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
         CAMERA_LOGI("UVC:ACTION = %{public}s, SUBSYSTEM = %{public}s, DEVNAME = %{public}s\n",
             action.c_str(), subsystem.c_str(), devnode.c_str());
         if (action == "bind") {
-            g_detectUvcDevices = true;
+            V4L2UvcEnmeDevices();
         }
     }
 }
