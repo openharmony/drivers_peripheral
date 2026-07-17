@@ -29,7 +29,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Geofence {
-namespace V2_0 {
+namespace V3_0 {
 namespace {
 using GeofenceCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGeofenceCallback>>;
 using GeofenceDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
@@ -82,7 +82,7 @@ void OnGeofenceEventChange(int32_t geofenceId,  GnssLocation* location, int32_t 
     locationNew.timeSinceBoot = static_cast<int64_t>(location->timeSinceBoot);
     locationNew.timeUncertainty = static_cast<int64_t>(location->timeUncertainty);
     if (g_geofenceCallBack != nullptr) {
-        g_geofenceCallBack->ReportGeofenceEvent(geofenceId, locationNew, static_cast<GeofenceEvent>(event), timestamp);
+        g_geofenceCallBack->ReportGeofenceEvent(geofenceId, locationNew, event, timestamp);
     }
 }
 
@@ -91,8 +91,7 @@ void OnGeofenceOperateResultChange(int32_t geofenceId, int32_t operateCategory, 
     HDF_LOGI("%{public}s.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     if (g_geofenceCallBack != nullptr) {
-        g_geofenceCallBack->ReportGeofenceOperateResult(geofenceId, static_cast<GeofenceOperateType>(operateCategory),
-            static_cast<GeofenceOperateResult>(result));
+        g_geofenceCallBack->ReportGeofenceOperateResult(geofenceId, operateCategory, result);
     }
 }
 
