@@ -44,6 +44,8 @@ extern "C" {
 #define PATHPLAN_LEN 64
 #ifdef AUDIO_HAL_P7885
 #define PATHPLAN_COUNT (32 * 4)
+#else
+#define PATHPLAN_COUNT 32
 #endif
 #define PATH_NAME_LEN 128
 #define VOLUME_CHANGE 100
