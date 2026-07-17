@@ -361,7 +361,7 @@ int32_t Hibernate::CheckSwapFileSize(bool &isRightSize)
 
     isRightSize = true;
     unsigned long long swapFileSize = GetSwapFileSize();
-    if (swapFileStat.st_size != swapFileSize) {
+    if (static_cast<unsigned long long>(swapFileStat.st_size) != swapFileSize) {
         HDF_LOGE("swap file size error, actual_size=%{public}lld expected_size=%{public}lld",
             static_cast<long long>(swapFileStat.st_size), static_cast<long long>(swapFileSize));
         isRightSize = false;
