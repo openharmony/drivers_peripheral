@@ -439,6 +439,7 @@ static ssize_t ReadUeventMsg(int sockFd, char *buffer, size_t length)
 
 void HosV4L2UVC::loopUvcDevice()
 {
+    CAMERA_LOGI("UVC:loopUvcDevice enter\n");
     int errorTimes = 0;
     int socketfd = -1;
     while (OpenUeventFd(&socketfd) != RC_OK) {
@@ -458,7 +459,7 @@ void HosV4L2UVC::loopUvcDevice()
     fd.events = POLLIN | POLLERR;
     fd.revents = 0;
     errorTimes = 0;
-
+    CAMERA_LOGI("begin to loop");
     V4L2UvcEnmeDevices();
     do {
         if (poll(&fd, 1, -1) <= 0) {
@@ -474,7 +475,7 @@ void HosV4L2UVC::loopUvcDevice()
             if (rcvLen <= 0) {
                 continue;
             }
-            CAMERA_LOGE("camera uevent poll=%{public}s", msg);
+            CAMERA_LOGD("camera uevent poll=%{public}s", msg);
             if (CheckBuf(rcvLen, msg) != RC_OK) {
                 return;
             }
