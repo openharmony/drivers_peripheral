@@ -28,6 +28,8 @@ using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
 static bool g_isServiceDead = false;
+static constexpr int GET_COMPOSER_RETRY_COUNT = 20;
+static constexpr int GET_COMPOSER_RETRY_INTERVAL_US = 100 * 1000; // 100ms
 
 void ComposerDiedRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
@@ -51,7 +53,13 @@ HWTEST_F(DeathTest, test_AddDeathRecipient, TestSize.Level1)
 
 HWTEST_F(DeathTest, test_RemoveDeathRecipient, TestSize.Level1)
 {
-    displayComposer_ = Composer::V1_5::IDisplayComposerInterface::Get();
+    for (int i = 0; i < GET_COMPOSER_RETRY_COUNT; i++) {
+        displayComposer_ = Composer::V1_5::IDisplayComposerInterface::Get();
+        if (displayComposer_ != nullptr) {
+            break;
+        }
+        usleep(GET_COMPOSER_RETRY_INTERVAL_US);
+    }
     ASSERT_TRUE(displayComposer_ != nullptr);
     sptr<IRemoteObject::DeathRecipient> recipient = new ComposerDiedRecipient();
     ASSERT_TRUE(recipient != nullptr);
