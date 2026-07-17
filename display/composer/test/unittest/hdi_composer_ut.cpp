@@ -1307,7 +1307,7 @@ HWTEST_F(DeviceTest, test_GetDisplayVCPFeature, TestSize.Level1)
     if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         result = DISPLAY_SUCCESS;
     }
-    EXPECT_EQ(DISPLAY_FAILURE, result);
+    EXPECT_EQ(DISPLAY_SUCCESS, result);
 }
 
 HWTEST_F(DeviceTest, test_SetDisplayVCPFeature, TestSize.Level1)
@@ -1320,5 +1320,5 @@ HWTEST_F(DeviceTest, test_SetDisplayVCPFeature, TestSize.Level1)
     if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         result = DISPLAY_SUCCESS;
     }
-    EXPECT_EQ(DISPLAY_FAILURE, result);
+    EXPECT_EQ(DISPLAY_SUCCESS, result);
 }
