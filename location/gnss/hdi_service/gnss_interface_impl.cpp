@@ -698,7 +698,6 @@ int32_t GnssInterfaceImpl::DisableGnssMeasurement()
 
 void GnssInterfaceImpl::ResetGnssDeathRecipient()
 {
-    HDF_LOGI("%{public}s.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     for (const auto& iter : g_locationCallBackMap) {
         const auto& callback = iter.second;
