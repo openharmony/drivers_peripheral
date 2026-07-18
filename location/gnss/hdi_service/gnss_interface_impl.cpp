@@ -125,7 +125,6 @@ void LocationUpdate(GnssLocation* location)
             callback->ReportLocation(locationNew);
         }
     }
-    HDF_LOGI("%{public}s: end.", __func__);
 }
 
 #ifndef EMULATOR_ENABLED
@@ -150,7 +149,6 @@ void SetGnssClock(OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo* gnssMeas
 
 void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasurementInfo)
 {
-    HDF_LOGE("%{public}s enter.", __func__);
     if (gnssMeasurementInfo == nullptr) {
         HDF_LOGE("%{public}s:gnssMeasurementInfo is nullptr.", __func__);
         return;
@@ -198,14 +196,12 @@ void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasure
             callback->ReportGnssMeasurementInfo(gnssMeasurementInfoNew);
         }
     }
-    HDF_LOGE("%{public}s exit.", __func__);
 }
 #endif
 
 __attribute__((no_sanitize("cfi")))
 void GnssWorkingStatusUpdate(uint16_t* status)
 {
-    HDF_LOGE("%{public}s enter.", __func__);
     if (status == nullptr) {
         HDF_LOGE("%{public}s:param is nullptr.", __func__);
         return;
@@ -221,7 +217,6 @@ void GnssWorkingStatusUpdate(uint16_t* status)
             callback->ReportGnssWorkingStatus(gnssStatus);
         }
     }
-    HDF_LOGE("%{public}s exit.", __func__);
 }
 
 __attribute__((no_sanitize("cfi")))
@@ -231,7 +226,6 @@ void SvStatusCallback(GnssSatelliteStatus* svInfo)
         HDF_LOGE("%{public}s:sv_info is null.", __func__);
         return;
     }
-    HDF_LOGE("%{public}s enter.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     SatelliteStatusInfo svStatus;
     svStatus.satellitesNumber = svInfo->satellitesNum;
@@ -251,7 +245,6 @@ void SvStatusCallback(GnssSatelliteStatus* svInfo)
             callback->ReportSatelliteStatusInfo(svStatus);
         }
     }
-    HDF_LOGE("%{public}s exit.", __func__);
 }
 
 void NmeaCallback(int64_t timestamp, const char* nmea, int length)
@@ -260,7 +253,6 @@ void NmeaCallback(int64_t timestamp, const char* nmea, int length)
         HDF_LOGE("%{public}s:nmea is nullptr.", __func__);
         return;
     }
-    HDF_LOGE("%{public}s enter.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
@@ -268,7 +260,6 @@ void NmeaCallback(int64_t timestamp, const char* nmea, int length)
             callback->ReportNmea(timestamp, nmea, length);
         }
     }
-    HDF_LOGE("%{public}s exit.", __func__);
 }
 
 void CachedLocationUpdate(const GnssLocation** locationArray, size_t arrayLength)
@@ -277,7 +268,6 @@ void CachedLocationUpdate(const GnssLocation** locationArray, size_t arrayLength
         HDF_LOGE("cachedLocation length exceed the maximum value.");
         return;
     }
-    HDF_LOGE("%{public}s enter.", __func__);
     std::vector<LocationInfo> locationArrayNew;
     for (size_t i = 0; i < arrayLength; i++) {
         if (locationArray[i] == nullptr) {
@@ -306,7 +296,6 @@ void CachedLocationUpdate(const GnssLocation** locationArray, size_t arrayLength
             callback->ReportCachedLocation(locationArrayNew);
         }
     }
-    HDF_LOGE("%{public}s exit.", __func__);
 }
 
 void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces* device)
@@ -408,7 +397,6 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
         HDF_LOGE("%{public}s:invalid callbackObj", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    HDF_LOGE("%{public}s enter.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
     if (remote == nullptr) {
@@ -449,7 +437,6 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
     }
     AddGnssDeathRecipient(callbackObj);
     g_locationCallBackMap[remote.GetRefPtr()] = callbackObj;
-    HDF_LOGE("%{public}s exit.", __func__);
     return ret;
 }
 
@@ -464,7 +451,6 @@ int32_t GnssInterfaceImpl::DisableGnss()
     int ret = gnssInterface->disableGnss();
     std::unique_lock<std::mutex> lock(g_mutex);
     g_locationCallBackMap.clear();
-    HDF_LOGE("%{public}s exit.", __func__);
     return ret;
 }
 
@@ -690,7 +676,6 @@ int32_t GnssInterfaceImpl::EnableGnssMeasurement(const sptr<IGnssMeasurementCall
         g_gnssMeasurementCallbackMap.clear();
     }
     g_gnssMeasurementCallbackMap[remote.GetRefPtr()] = callbackObj;
-    HDF_LOGE("%{public}s exit.", __func__);
     return HDF_SUCCESS;
 #else
     return HDF_SUCCESS;
@@ -712,7 +697,6 @@ int32_t GnssInterfaceImpl::DisableGnssMeasurement()
     gnssMeasurementInterface->disable();
     g_gnssMeasurementCallbackMap.clear();
 #endif
-    HDF_LOGE("%{public}s exit.", __func__);
     return HDF_SUCCESS;
 }
 
@@ -726,7 +710,6 @@ void GnssInterfaceImpl::ResetGnssDeathRecipient()
             RemoveGnssDeathRecipient(callback);
         }
     }
-    HDF_LOGE("%{public}s exit.", __func__);
 }
 
 void GnssInterfaceImpl::ResetGnss()
