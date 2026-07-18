@@ -20,6 +20,12 @@
 
 #include "gnss_interface_impl.h"
 
+#define HDF_LOG_TAG AGnss
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD002300
+
 namespace OHOS {
 namespace HDI {
 namespace Location {

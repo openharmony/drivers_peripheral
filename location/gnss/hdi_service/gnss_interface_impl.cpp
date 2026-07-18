@@ -27,6 +27,12 @@
 #include "location_vendor_lib.h"
 #include "string_utils.h"
 
+#define HDF_LOG_TAG AGnss
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD002300
+
 namespace OHOS {
 namespace HDI {
 namespace Location {
@@ -434,13 +440,13 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
 int32_t GnssInterfaceImpl::DisableGnss()
 {
     HDF_LOGI("%{public}s.", __func__);
-    std::unique_lock<std::mutex> lock(g_mutex);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = gnssInterface->disableGnss();
+    std::unique_lock<std::mutex> lock(g_mutex);
     g_locationCallBackMap.clear();
     return ret;
 }
