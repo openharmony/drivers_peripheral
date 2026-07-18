@@ -210,7 +210,6 @@ void GnssWorkingStatusUpdate(uint16_t* status)
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
         if (callback != nullptr) {
-            HDF_LOGE("%{public}s report to SA.", __func__);
             callback->ReportGnssWorkingStatus(gnssStatus);
         }
     }
@@ -355,6 +354,7 @@ GnssInterfaceImpl::~GnssInterfaceImpl()
 
 int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
 {
+    HDF_LOGI("%{public}s.", __func__);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
