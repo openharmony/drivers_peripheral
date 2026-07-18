@@ -18,6 +18,7 @@
 #include "cJSON.h"
 #include "osal_mem.h"
 #include "securec.h"
+#include "audio_common.h"
 
 #ifdef IDL_MODE
 #define HDF_LOG_TAG AUDIO_HDI_IMPL
