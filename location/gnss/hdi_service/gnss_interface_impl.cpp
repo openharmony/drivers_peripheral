@@ -205,9 +205,7 @@ void GnssWorkingStatusUpdate(uint16_t* status)
         HDF_LOGE("%{public}s:param is nullptr.", __func__);
         return;
     }
-    HDF_LOGE("%{public}s require lock.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
-    HDF_LOGE("%{public}s lock.", __func__);
     GnssWorkingStatus gnssStatus = static_cast<GnssWorkingStatus>(*status);
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
@@ -357,7 +355,6 @@ GnssInterfaceImpl::~GnssInterfaceImpl()
 
 int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
 {
-    HDF_LOGI("%{public}s.", __func__);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
