@@ -23,6 +23,7 @@
         "components": [
           "alsa-lib",
           "hilog",
+          "bounds_checking_function",
           "c_utils",
           "hdf_core",
           "hitrace",
