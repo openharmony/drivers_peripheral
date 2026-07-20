@@ -155,7 +155,9 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
             ret = AUDIO_ERR_INTERNAL;
             break;
         } else {
+#ifdef AUDIO_HAL_P7885
             hwRender->renderParam.renderMode.ctlParam.pause = false;
+#endif
         }
     } while (0);
     
