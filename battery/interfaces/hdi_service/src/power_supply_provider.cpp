@@ -571,6 +571,17 @@ void PowerSupplyProvider::CreateFile(const std::string& path, const std::string&
     stream.close();
 }
 
+void PowerSupplyProvider::OverrideFile(const std::string& path, const std::string& content)
+{
+    std::ofstream stream(path.c_str());
+    if (!stream.is_open()) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "cannot create file");
+        return;
+    }
+    stream << content.c_str() << std::endl;
+    stream.close();
+}
+
 void PowerSupplyProvider::InitBatteryPath()
 {
     std::string sysLowercaseBatteryPath = "/sys/class/power_supply/battery";
@@ -985,7 +996,7 @@ void PowerSupplyProvider::CreateMockBatteryPath(std::string& mockBatteryPath)
     BATTERY_HILOGI(FEATURE_BATT_INFO, "create mockFilePath path");
     if (IsBatterylessProduct()) {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "Product is pc desktop");
-        CreateFile(mockBatteryPath + "/capacity", "100");
+        OverrideFile(mockBatteryPath + "/capacity", "100");
     } else {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "Product is not pc desktop");
         CreateFile(mockBatteryPath + "/capacity", "11");
