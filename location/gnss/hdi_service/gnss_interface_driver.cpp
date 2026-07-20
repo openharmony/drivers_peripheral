@@ -21,12 +21,6 @@
 
 using namespace OHOS::HDI::Location::Gnss::V2_0;
 
-#define HDF_LOG_TAG AGnss
-#ifdef LOG_DOMAIN
-#undef LOG_DOMAIN
-#endif
-#define LOG_DOMAIN 0xD002300
-
 struct HdfGnssInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
