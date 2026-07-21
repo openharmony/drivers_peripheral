@@ -1,6 +1,7 @@
 import("//build/ohos.gni")
 
 ohos_shared_library("libzcodec_driver") {
+    branch_protector_ret = "pac_ret"
     sources = [ "hdi_z_factory_driver.cpp" ]
     external_deps = [
         "c_utils:utils",
@@ -20,6 +21,7 @@ ohos_shared_library("libzcodec_driver") {
 }
 
 ohos_shared_library("libhdi_z_factory_service_1.0") {
+    branch_protector_ret = "pac_ret"
     sources = [ "hdi_z_factory_service.cpp" ]
     external_deps = [
         "c_utils:utils",
