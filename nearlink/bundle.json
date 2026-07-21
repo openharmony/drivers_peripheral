@@ -1,0 +1,47 @@
+{
+  "name": "@ohos/drivers_peripheral_nearlink",
+  "description": "nearlink device driver",
+  "version": "4.1",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/nearlink"
+  },
+  "dirs": {},
+  "scripts": {},
+  "component": {
+    "name": "drivers_peripheral_nearlink",
+    "subsystem": "hdf",
+    "features": [
+      "drivers_peripheral_nearlink_feature_support_send_disable_hci",
+      "drivers_peripheral_nearlink_reload_address"
+    ],
+    "adapted_system_type": ["standard"],
+    "rom": "",
+    "ram": "",
+    "deps": {
+      "components": [
+        "c_utils",
+        "hdf_core",
+        "hilog",
+        "drivers_interface_nearlink",
+        "samgr",
+        "ipc",
+        "ffrt",
+        "bounds_checking_function",
+        "init"
+      ],
+      "third_party": [
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//drivers/peripheral/nearlink/dli:nearlink_entry",
+        "//drivers/peripheral/nearlink/off_find:off_find_entry"
+      ],
+      "test": [
+        "//drivers/peripheral/nearlink/dli/test:nearlink_hdi_test"
+      ]
+    }
+  }
+}

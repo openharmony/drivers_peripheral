@@ -1,0 +1,158 @@
+# Copyright (C) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/config/components/hdi/hdi.gni")
+import("//out/products_ext/hmos_ext_var.gni")
+import("../../drivers_peripheral_nearlink.gni")
+
+ohos_shared_library("liboff_find_interface_service_1.0") {
+  sanitize = {
+    cfi = true                             # Enable/disable control flow integrity detection
+    boundary_sanitize = true               # Enable boundary san detection
+    cfi_cross_dso = true                   # Cross-SO CFI Checks
+    integer_overflow = true                # Enable integer overflow detection
+    ubsan = true                           # Enable some Ubsan options
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  cflags = [
+    "-Os",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-fPIC",
+    "-fno-common",
+    "-fstack-protector-strong",
+    "-fvisibility-inlines-hidden",
+    "-flto",
+  ]
+  cflags_cc = cflags
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+    "-Wl,--no-whole-archive",
+  ]
+
+  include_dirs = [
+    ".",
+    "implement",
+  ]
+
+  sources = [
+    "off_find_interface_impl.cpp",
+    "implement/h4_protocol.cpp",
+    "implement/dli_protocol.cpp",
+    "implement/dli_watcher.cpp",
+    "implement/vendor_interface.cpp",
+    "implement/thread_util.cpp",
+  ]
+
+  defines = []
+
+  if (drivers_peripheral_nearlink_feature_support_send_disable_hci) {
+    defines += [ "SEND_DISABLE_OFF_FIND_DLI" ]
+  }
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_nearlink:off_find_idl_headers",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_core",
+      "ffrt:libffrt",
+      "init:libbegetutil"
+    ]
+  } else {
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_nearlink"
+}
+
+ohos_shared_library("liboff_find_hdi_driver") {
+  sanitize = {
+    cfi = true                             # Enable/disable control flow integrity detection
+    boundary_sanitize = true               # Enable boundary san detection
+    cfi_cross_dso = true                   # Cross-SO CFI Checks
+    integer_overflow = true                # Enable integer overflow detection
+    ubsan = true                           # Enable some Ubsan options
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  cflags = [
+    "-Os",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-fPIC",
+    "-fno-common",
+    "-fstack-protector-strong",
+    "-fvisibility-inlines-hidden",
+    "-flto",
+  ]
+  cflags_cc = cflags
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+    "-Wl,--no-whole-archive",
+  ]
+
+  include_dirs = [ "." ]
+
+  sources = [ "off_find_interface_driver.cpp" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  } else {
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  }
+
+  external_deps += [ "drivers_interface_nearlink:liboff_find_stub_1.0" ]
+
+  shlib_type = "hdi"
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_nearlink"
+}
+
+group("hdf_off_find_service") {
+  deps = [
+    ":liboff_find_hdi_driver",
+    ":liboff_find_interface_service_1.0",
+  ]
+}
