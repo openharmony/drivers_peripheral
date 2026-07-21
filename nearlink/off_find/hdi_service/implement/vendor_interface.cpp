@@ -126,7 +126,7 @@ bool VendorInterface::SetSwitchHostTimer()
     };
     uint32_t timeOut = TIME_OUT_MAX;
     if (LoadVendorCommonLibrary() == OFF_FIND_SUCCESS &&
-        vendorCommInterface_->getRegisterTimerDuration != NULL) {
+        vendorCommInterface_->getRegisterTimerDuration != nullptr) {
         timeOut = vendorCommInterface_->getRegisterTimerDuration(chipType_);
     }
     uint32_t ret = timer_->Register(func, timeOut, true); // only support once timer now
@@ -371,7 +371,7 @@ OffFindErrorCode VendorInterface::EnableOffFindMode(InitializeCompleteCallback i
         HDF_LOGE("WatchDliChannel Init Fail");
         return OFF_FIND_SYNC_FAIL;
     }
-    if (vendorCommInterface_->isNeedWatcherStart != NULL &&
+    if (vendorCommInterface_->isNeedWatcherStart != nullptr &&
         vendorCommInterface_->isNeedWatcherStart(chipType_) && !watcher_.Start()) {
         HDF_LOGE("watcher start failed.");
         return OFF_FIND_SYNC_FAIL;
@@ -379,7 +379,7 @@ OffFindErrorCode VendorInterface::EnableOffFindMode(InitializeCompleteCallback i
     int powerTime = GetPowerTimeParameter(info, paramsCnt);
     HDF_LOGI("battery[%{public}d] and powerTime[%{public}d]", info.battery, powerTime);
 
-    if (vendorCommInterface_->modifyPowerProtect != NULL &&
+    if (vendorCommInterface_->modifyPowerProtect != nullptr &&
         vendorCommInterface_->modifyPowerProtect(powerTime, info.battery) != OFF_FIND_SUCCESS) {
         HDF_LOGE("modifyPowerProtect failed");
         return OFF_FIND_SYNC_FAIL;

@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/config/components/hdi/hdi.gni")
-import("//out/products_ext/hmos_ext_var.gni")
 import("../../drivers_peripheral_nearlink.gni")
 
 ohos_shared_library("liboff_find_interface_service_1.0") {
