@@ -21,6 +21,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("libhdi_vibrator_impl") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [
       "../interfaces/v1_1/",
       "../utils/include",

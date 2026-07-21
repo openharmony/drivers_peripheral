@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 hdf_audio_path = "./../.."
 
 ohos_shared_library("effect_model_service") {
+  branch_protector_ret = "pac_ret"
   sources = [ "audio_effect_driver.c" ]
 
   shlib_type = "hdi"

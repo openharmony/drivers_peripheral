@@ -90,6 +90,7 @@ host_includes = [
 ]
 
 ohos_shared_library("camera_external_usb_camera") {
+  branch_protector_ret = "pac_ret"
   output_extension = "so"
   sources = host_sources
   include_dirs = host_includes
@@ -141,6 +142,7 @@ ohos_shared_library("camera_external_usb_camera") {
 }
 
 ohos_static_library("camera_daemon_static") {
+  branch_protector_ret = "pac_ret"
   sources = host_sources
   include_dirs = host_includes
 

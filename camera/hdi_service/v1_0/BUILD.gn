@@ -30,6 +30,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("camera_host_service_1.0") {
+    branch_protector_ret = "pac_ret"
     output_extension = "z.so"
     sources = [
       "./src/camera_device_service.cpp",
@@ -108,6 +109,7 @@ if (defined(ohos_lite)) {
   ]
 
   ohos_shared_library("camera_host_service_1.0") {
+    branch_protector_ret = "pac_ret"
     sources = host_sources
     include_dirs = host_includes
 
@@ -159,6 +161,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_static_library("camera_host_service_1.0_static") {
+    branch_protector_ret = "pac_ret"
     sources = host_sources
     include_dirs = host_includes
 

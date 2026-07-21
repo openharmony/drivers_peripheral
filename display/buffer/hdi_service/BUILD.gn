@@ -29,6 +29,7 @@ group("hdf_display_buffer_service") {
 }
 
 ohos_shared_library("liballocator_service_1.0") {
+  branch_protector_ret = "pac_ret"
   defines = []
   defines += display_defines
   include_dirs = [
@@ -67,6 +68,7 @@ ohos_shared_library("liballocator_service_1.0") {
 }
 
 ohos_shared_library("liballocator_service_1.4") {
+  branch_protector_ret = "pac_ret"
   defines = []
   defines += display_defines
   include_dirs = [
@@ -106,6 +108,7 @@ ohos_shared_library("liballocator_service_1.4") {
 }
 
 ohos_shared_library("liballocator_driver_1.0") {
+  branch_protector_ret = "pac_ret"
   sources = [ "src/allocator_driver.cpp" ]
 
   external_deps = [
@@ -127,6 +130,7 @@ ohos_shared_library("liballocator_driver_1.0") {
 }
 
 ohos_shared_library("libmapper_service_1.0") {
+  branch_protector_ret = "pac_ret"
   defines = []
   defines += display_defines
   include_dirs = [
@@ -156,6 +160,7 @@ ohos_shared_library("libmapper_service_1.0") {
 }
 
 ohos_shared_library("libmapper_service_1.2") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [ "include" ]
   sources = [ "src/mapper_service_1_2.cpp" ]
 
@@ -182,6 +187,7 @@ ohos_shared_library("libmapper_service_1.2") {
 }
 
 ohos_shared_library("libmapper_service_1.3") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [ "include" ]
   sources = [ "src/mapper_service_1_3.cpp" ]
 
@@ -211,6 +217,7 @@ ohos_shared_library("libmapper_service_1.3") {
 }
 
 ohos_shared_library("libmapper_driver_1.0") {
+  branch_protector_ret = "pac_ret"
   sources = [ "src/mapper_driver.cpp" ]
 
   external_deps = [
@@ -233,6 +240,7 @@ ohos_shared_library("libmapper_driver_1.0") {
 }
 
 ohos_shared_library("libmetadata_service_1.1") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "include",
     "../../utils/include",
@@ -260,6 +268,7 @@ ohos_shared_library("libmetadata_service_1.1") {
 }
 
 ohos_shared_library("libmetadata_driver_1.1") {
+  branch_protector_ret = "pac_ret"
   sources = [ "src/metadata_driver.cpp" ]
 
   external_deps = [

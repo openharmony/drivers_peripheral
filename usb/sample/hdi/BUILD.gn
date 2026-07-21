@@ -26,6 +26,7 @@ config("module_private_config") {
 }
 
 ohos_executable("UsbSubscriberMain") {
+  branch_protector_ret = "pac_ret"
   configs = [ ":module_private_config" ]
 
   sources = [

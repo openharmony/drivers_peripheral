@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 import("../light.gni")
 
 ohos_shared_library("libhdi_light_impl") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     ".",
     "../interfaces/v1_0/",

@@ -61,6 +61,7 @@ config("v4l2_config") {
 }
 
 ohos_shared_library("peripheral_camera_v4l2_adapter") {
+  branch_protector_ret = "pac_ret"
   if (!is_emulator) {
     defines = []
   }

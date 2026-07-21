@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 import("./../../display_config.gni")
 
 ohos_shared_library("display_composer_vdi_impl_default") {
+  branch_protector_ret = "pac_ret"
   defines = []
   defines += display_defines
   sources = [

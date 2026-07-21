@@ -17,6 +17,7 @@ import("//build/ohos.gni")
 import("$hdf_audio_path/audio.gni")
 
 ohos_shared_library("audio_primary_impl_vendor") {
+  branch_protector_ret = "pac_ret"
   defines = []
   if (drivers_peripheral_audio_feature_community) {
     sources = [

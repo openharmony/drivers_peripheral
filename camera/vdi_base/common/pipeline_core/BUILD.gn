@@ -86,6 +86,7 @@ config("pipe_config") {
 }
 
 ohos_shared_library("peripheral_camera_pipeline_core") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node/uvc_node.cpp",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node/v4l2_source_node.cpp",
@@ -206,6 +207,7 @@ config("example_config") {
 }
 
 ohos_shared_library("camera_ipp_algo_example") {
+  branch_protector_ret = "pac_ret"
   sources = [ "src/ipp_algo_example/ipp_algo_example.c" ]
 
   include_dirs = [ "$camera_path/pipeline_core/ipp/include" ]

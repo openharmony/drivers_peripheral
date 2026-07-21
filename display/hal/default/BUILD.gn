@@ -14,6 +14,7 @@
 import("//build/ohos.gni")
 
 ohos_static_library("def_display_layer") {
+  branch_protector_ret = "pac_ret"
   output_name = "display_layer"
   sources = [
     "../disp_hal.c",
@@ -42,6 +43,7 @@ ohos_static_library("def_display_layer") {
 }
 
 ohos_shared_library("def_display_gralloc") {
+  branch_protector_ret = "pac_ret"
   output_name = "display_gralloc"
   sources = [ "display_gralloc.c" ]
   include_dirs = [
@@ -67,6 +69,7 @@ ohos_shared_library("def_display_gralloc") {
 }
 
 ohos_shared_library("def_display_gfx") {
+  branch_protector_ret = "pac_ret"
   output_name = "display_gfx"
   sources = [ "display_gfx.c" ]
   include_dirs = [

@@ -30,6 +30,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("peripheral_camera_buffer_manager") {
+    branch_protector_ret = "pac_ret"
     sources = [
       "./src/buffer_adapter/lite/buffer_adapter.cpp",
       "./src/buffer_allocator.cpp",
@@ -92,6 +93,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("peripheral_camera_buffer_manager") {
+    branch_protector_ret = "pac_ret"
     sources = [
       "./src/buffer_adapter/standard/buffer_adapter.cpp",
       "./src/buffer_allocator.cpp",

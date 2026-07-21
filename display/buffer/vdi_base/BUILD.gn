@@ -19,6 +19,7 @@ config("libdisplay_buffer_vdi_impl_default_config") {
 }
 
 ohos_shared_library("display_buffer_vdi_impl_default") {
+  branch_protector_ret = "pac_ret"
   defines = []
   defines += display_defines
   sources = [

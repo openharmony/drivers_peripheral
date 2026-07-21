@@ -23,6 +23,7 @@ group("display_composer_hdi_service") {
 }
 
 ohos_prebuilt_etc("composer_host.para.dac") {
+  branch_protector_ret = "pac_ret"
   source = "src/composer_host.para.dac"
   relative_install_dir = "param"
   install_images = [ chipset_base_dir ]
@@ -31,6 +32,7 @@ ohos_prebuilt_etc("composer_host.para.dac") {
 }
 
 ohos_shared_library("libdisplay_composer_service_1.5") {
+  branch_protector_ret = "pac_ret"
   defines = []
   defines += display_defines
   include_dirs = [
@@ -88,6 +90,7 @@ ohos_shared_library("libdisplay_composer_service_1.5") {
 }
 
 ohos_shared_library("libdisplay_composer_driver_1.0") {
+  branch_protector_ret = "pac_ret"
   defines = []
   defines += display_defines
   include_dirs = []

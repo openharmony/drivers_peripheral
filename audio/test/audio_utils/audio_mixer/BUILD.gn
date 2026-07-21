@@ -16,6 +16,7 @@ import("./../../../audio.gni")
 
 if (defined(ohos_lite)) {
   ohos_executable("audio_mixer") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [ "../../../supportlibs/adm_adapter/include" ]
 
     sources = [
@@ -33,6 +34,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_executable("audio_mixer") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [ "../../../supportlibs/adm_adapter/include" ]
 
     sources = [

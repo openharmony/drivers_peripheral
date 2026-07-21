@@ -26,6 +26,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("peripheral_camera_utils") {
+    branch_protector_ret = "pac_ret"
     sources = [ "watchdog/watchdog.cpp" ]
     include_dirs = []
     libs = []
@@ -53,6 +54,7 @@ if (defined(ohos_lite)) {
     ]
   }
   ohos_shared_library("peripheral_camera_utils") {
+    branch_protector_ret = "pac_ret"
     sources = [
       "event/camera_hal_hisysevent.cpp",
       "exif/exif_utils.cpp",

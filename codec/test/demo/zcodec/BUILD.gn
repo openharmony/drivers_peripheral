@@ -2,6 +2,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 ohos_executable("zencoder_hdi_demo") {
+  branch_protector_ret = "pac_ret"
     sources = [
         "zencoder_demo.cpp",
     ]
@@ -29,6 +30,7 @@ ohos_executable("zencoder_hdi_demo") {
 }
 
 ohos_executable("zdecoder_hdi_demo") {
+  branch_protector_ret = "pac_ret"
     sources = [
         "zdecoder_demo.cpp",
     ]

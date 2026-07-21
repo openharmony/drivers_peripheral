@@ -17,6 +17,7 @@ import("$INPUT_ROOT_DIR/input.gni")
 
 if (drivers_peripheral_input_feature_udriver) {
   ohos_shared_library("hdi_input_udriver") {
+    branch_protector_ret = "pac_ret"
     sources = [
       "src/input_device_manager.cpp",
       "src/input_manager.cpp",

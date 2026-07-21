@@ -26,6 +26,7 @@ config("hdi_cif_config") {
 }
 
 ohos_shared_library("hdi_cif") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "$camera_path/../interfaces/hdi_cpp/callback/device/src/camera_device_callback_proxy.cpp",
     "$camera_path/../interfaces/hdi_cpp/callback/host/src/camera_host_callback_proxy.cpp",

@@ -19,6 +19,7 @@ config("module_private_config") {
 }
 
 ohos_static_library("disp_dev_hdi_test_common") {
+  branch_protector_ret = "pac_ret"
   defines = []
   defines += display_defines
   sources = [

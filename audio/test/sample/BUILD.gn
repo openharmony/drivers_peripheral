@@ -19,6 +19,7 @@ import("$hdf_audio_path/audio.gni")
 if (defined(ohos_lite)) {
 } else {
   ohos_executable("audio_sample_event") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
       "$hdf_audio_path/hal/hdi_passthrough/include",
@@ -55,6 +56,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("idl_render") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [ "./" ]
 
     sources = [
@@ -91,6 +93,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("idl_capture") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [ "./" ]
 
     sources = [
@@ -128,6 +131,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("voip_test") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [ "./" ]
 
     sources = [
@@ -159,6 +163,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("libaudio_ipc_test") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [ "./" ]
 
     sources = [
@@ -181,6 +186,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("hdf_sbuf_test") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [ "./" ]
 
     sources = [
