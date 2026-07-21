@@ -151,6 +151,7 @@ private:
     int32_t ParsePluggedMaxVoltage(int32_t* maxVoltage);
     void CopyBatteryInfo(const struct BatterydInfo* info) const;
     void CreateFile(const std::string& path, const std::string& content);
+    void OverrideFile(const std::string& path, const std::string& content);
     void CreateMockTechPath(std::string& mockTechPath);
     void CreateMockChargerPath(std::string& mockChargerPath);
     void CreateMockBatteryPath(std::string& mockBatteryPath);
