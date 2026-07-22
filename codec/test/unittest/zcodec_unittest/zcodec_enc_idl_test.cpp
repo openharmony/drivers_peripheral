@@ -57,7 +57,7 @@ public:
 class ZCodecHdiEncTest : public testing::TestWithParam<bool> {
 public:
     static void SetUpTestCase()
-    {     
+    {
     }
 
     static void TearDownTestCase()
