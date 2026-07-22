@@ -67,6 +67,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("hdi_input") {
+    branch_protector_ret = "pac_ret"
     sources = [
       "src/input_controller.c",
       "src/input_manager.c",

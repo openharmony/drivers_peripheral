@@ -69,6 +69,7 @@ ohos_shared_library("libusbfn_mtp_driver") {
     boundary_sanitize = true
   }
 
+  branch_protector_ret = "pac_ret"
   sources = [ "src/usbfn_mtp_interface_driver.cpp" ]
 
   include_dirs = [
