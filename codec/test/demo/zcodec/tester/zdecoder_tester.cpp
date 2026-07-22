@@ -130,14 +130,13 @@ bool TestZDecoder::CreateDecoder()
         return false;
     }
     sptr<HdiZCallback> cb = sptr<ZDecoderCallback>::MakeSptr(this);
-    std::string codecName = (opt_.protocol == CodeType::H264) ?
-                            "z.hisi.video.decoder.avc" : "z.hisi.video.decoder.hevc";
-    int32_t ret = fac_->CreateByName(codecName, cb, nullptr, zCodec_);
+    Standard protocol = (opt_.protocol == CodeType::H264) ? AVC : HEVC;
+    int32_t ret = fac_->CreateByStandard(protocol, false, cb, nullptr, zCodec_);
     if (ret != OK || zCodec_ == nullptr) {
-        CODEC_LOGE("[inst_%{public}u] CreateByName failed", instanceId_);
+        CODEC_LOGE("[inst_%{public}u] CreateByStandard failed", instanceId_);
         return false;
     }
-    CODEC_LOGI("[inst_%{public}u] CreateByName succeed", instanceId_);
+    CODEC_LOGI("[inst_%{public}u] CreateByStandard succeed", instanceId_);
     return true;
 }
 

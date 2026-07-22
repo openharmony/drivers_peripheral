@@ -39,11 +39,6 @@ using ZBufferId = uint32_t;
 
 namespace Vendor::ZCodec {
 
-enum class CodecType {
-    H264,
-    H265
-};
-
 class MyDecCallback : public HdiZCallback {
 public:
     MyDecCallback() {}
@@ -71,14 +66,12 @@ public:
         fac = HdiZFactory::Get(isPassthrough);
         if (fac == nullptr) {
             GTEST_SKIP() << "Failed to get HdiZFactory";
-            return;
         }
         
         std::vector<HdiCapability> caps;
         int32_t ret = fac->GetCapabilities(caps);
         if (ret != HDF_SUCCESS || caps.empty()) {
             GTEST_SKIP() << "Platform does not support ZCodec";
-            return;
         }
         caps_ = caps;
         
@@ -94,16 +87,6 @@ public:
         fac = nullptr;
     }
     
-    bool CheckCodecByName(const string& name)
-    {
-        for (const auto& cap : caps_) {
-            if (cap.name == name) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     bool CheckCodecByStandard(int32_t standard, bool isEncoder)
     {
         int32_t expectedType = isEncoder ? VIDEO_ENCODER : VIDEO_DECODER;
@@ -116,7 +99,6 @@ public:
     }
     
 public:
-    int32_t CreateZCodecByType(CodecType type, sptr<HdiZComponent>& instance);
     static sptr<HdiZFactory> fac;
     sptr<HdiZComponent> instance;
     sptr<HdiZCallback> zcb;
@@ -126,19 +108,6 @@ public:
 };
 
 sptr<HdiZFactory> ZCodecHdiDecEdgeTest::fac = nullptr;
-
-int32_t ZCodecHdiDecEdgeTest::CreateZCodecByType(CodecType type, sptr<HdiZComponent>& instance)
-{
-    string name;
-    if (type == CodecType::H264) {
-        name = "z.hisi.video.decoder.avc";
-    } else if (type == CodecType::H265) {
-        name = "z.hisi.video.decoder.hevc";
-    }
-    sptr<ParcelableParam> param = ParcelableParam::Create();
-    int32_t ret = fac->CreateByName(name, zcb, param, instance);
-    return ret;
-}
 
 /**
  * @tc.name: ZCodecHdiDecEdgeTest_CreateByStandard_InvalidStandard_001
@@ -195,10 +164,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_CreateByStandard_NullCallbac
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_NullParam_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
     ret = instance->SetParam(nullptr);
     ASSERT_TRUE(ret != 0);
@@ -211,10 +180,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_NullParam_001, Test
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_ZeroResolution_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
     sptr<ParcelableParam> param = ParcelableParam::Create();
     Resolution reso {0, 0};
@@ -230,10 +199,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_ZeroResolution_001,
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_NegativeResolution_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.avc")) {
+    if (!CheckCodecByStandard(Standard::AVC, false)) {
         GTEST_SKIP() << "H264 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H264, instance);
+    int32_t ret = fac->CreateByStandard(Standard::AVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
     sptr<ParcelableParam> param = ParcelableParam::Create();
     Resolution reso {-1, -1};
@@ -249,10 +218,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_NegativeResolution_
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_OverflowResolution_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
     sptr<ParcelableParam> param = ParcelableParam::Create();
     Resolution reso {INT_MAX, INT_MAX};
@@ -268,10 +237,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_OverflowResolution_
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_InvalidKey_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
     sptr<ParcelableParam> param = ParcelableParam::Create();
     param->Set("invalid_key", 123);
@@ -286,10 +255,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_SetParam_InvalidKey_001, Tes
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_Start_Continuous_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
 
     sptr<ParcelableParam> param = ParcelableParam::Create();
@@ -320,10 +289,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_Start_Continuous_001, TestSi
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_Stop_Continuous_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
 
     sptr<ParcelableParam> param = ParcelableParam::Create();
@@ -356,10 +325,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_Stop_Continuous_001, TestSiz
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_BindBuffer_ZeroSize_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
     
     HdiBufferAllocInfo info {
@@ -382,10 +351,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_BindBuffer_ZeroSize_001, Tes
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_BindBuffer_InvalidFormat_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
     
     HdiBufferAllocInfo info {
@@ -408,10 +377,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_BindBuffer_InvalidFormat_001
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_UnbindBuffers_EmptyIds_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
 
     sptr<ParcelableParam> param = ParcelableParam::Create();
@@ -444,10 +413,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_UnbindBuffers_EmptyIds_001, 
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_UnbindBuffers_InvalidId_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
 
     sptr<ParcelableParam> param = ParcelableParam::Create();
@@ -480,10 +449,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_UnbindBuffers_InvalidId_001,
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_QueueInputBuffers_EmptyInfos_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
 
     sptr<ParcelableParam> param = ParcelableParam::Create();
@@ -517,10 +486,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_QueueInputBuffers_EmptyInfos
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_QueueInputBuffers_InvalidId_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
 
     sptr<ParcelableParam> param = ParcelableParam::Create();
@@ -556,10 +525,10 @@ HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_QueueInputBuffers_InvalidId_
  */
 HWTEST_P(ZCodecHdiDecEdgeTest, ZCodecHdiDecEdgeTest_QueueOutputBuffers_EmptyInfos_001, TestSize.Level1)
 {
-    if (!CheckCodecByName("z.hisi.video.decoder.hevc")) {
+    if (!CheckCodecByStandard(Standard::HEVC, false)) {
         GTEST_SKIP() << "H265 decoder not supported";
     }
-    int32_t ret = CreateZCodecByType(CodecType::H265, instance);
+    int32_t ret = fac->CreateByStandard(Standard::HEVC, false, zcb, nullptr, instance);
     ASSERT_TRUE(instance != nullptr && ret == 0);
 
     sptr<ParcelableParam> param = ParcelableParam::Create();
