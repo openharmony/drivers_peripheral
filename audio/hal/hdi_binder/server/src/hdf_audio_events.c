@@ -34,7 +34,7 @@ int32_t AudioPnpMsgReadValue(const char *pnpInfo, const char *typeName, uint32_t
         AUDIO_FUNC_LOGE("pnpInfo || typeName || value is null!");
         return HDF_FAILURE;
     }
-    if (strlen(pnpInfo) > AUDIO_PNP_MSG_LEN_MAX || strlen(typeName) > AUDIO_PNP_MSG_LEN_MAX) {
+    if (strlen(pnpInfo) >= AUDIO_PNP_MSG_LEN_MAX || strlen(typeName) >= AUDIO_PNP_MSG_LEN_MAX) {
         AUDIO_FUNC_LOGE("pnpInfo or typeName length error!");
         return HDF_FAILURE;
     }

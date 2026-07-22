@@ -169,7 +169,7 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
             PATHPLAN_LEN, 0, PATHPLAN_LEN);
         int32_t ret =
             strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[renderDevNum].deviceSwitch,
-                PATHPLAN_COUNT, devKey, strlen(devKey) + 1);
+                PATHPLAN_LEN, devKey, strlen(devKey) + 1);
         if (ret != 0) {
             AUDIO_FUNC_LOGE("strcpy_s failed!");
             return HDF_FAILURE;
@@ -210,7 +210,7 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
             PATHPLAN_LEN, 0, PATHPLAN_LEN);
         int32_t ret =
             strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
-                PATHPLAN_COUNT, devKey, strlen(devKey) + 1);
+                PATHPLAN_LEN, devKey, strlen(devKey) + 1);
         if (ret != 0) {
             AUDIO_FUNC_LOGE("strcpy_s failed!");
             return HDF_FAILURE;
@@ -262,7 +262,7 @@ static int32_t SetRenderPathValue(
                 PATHPLAN_LEN, 0, PATHPLAN_LEN);
             int32_t ret =
                 strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
-                    PATHPLAN_COUNT, devKey, strlen(devKey) + 1);
+                    PATHPLAN_LEN, devKey, strlen(devKey) + 1);
             if (ret != 0) {
                 AUDIO_FUNC_LOGE("strcpy_s failed!");
                 return HDF_FAILURE;
@@ -503,7 +503,7 @@ static int32_t SetCapturePathValue(
                 PATHPLAN_LEN, 0, PATHPLAN_LEN);
             int32_t ret =
                 strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[devNum].deviceSwitch,
-                    PATHPLAN_COUNT, swName->valuestring, strlen(swName->valuestring) + 1);
+                    PATHPLAN_LEN, swName->valuestring, strlen(swName->valuestring) + 1);
             if (ret != 0) {
                 AUDIO_FUNC_LOGE("strcpy_s failed!");
                 return HDF_FAILURE;
