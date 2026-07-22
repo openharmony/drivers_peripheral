@@ -15,7 +15,6 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 
   ohos_executable("usbhost_ddk_test") {
-    branch_protector_ret = "pac_ret"
     include_dirs = [
       "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "./include",
@@ -48,7 +47,6 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 
   ohos_executable("usbhost_ddk_test") {
-    branch_protector_ret = "pac_ret"
     include_dirs = [
       "include",
       "./../../ddk/common/include",
@@ -92,7 +90,6 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("libusb_pnp_sample_driver") {
-    branch_protector_ret = "pac_ret"
     sources = [ "src/usb_pnp_sample.c" ]
 
     include_dirs = [
@@ -127,7 +124,6 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("usbhost_pnp_test") {
-    branch_protector_ret = "pac_ret"
     include_dirs = [
       "include",
       "./../../serial/include",
@@ -158,7 +154,6 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("usbhost_sdkapi_speed_test") {
-    branch_protector_ret = "pac_ret"
     sources = [ "src/usbhost_sdkapi_speed.c" ]
 
     include_dirs = [
@@ -195,7 +190,6 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("usbhost_sdkraw_speed_test") {
-    branch_protector_ret = "pac_ret"
     sources = [ "src/usbhost_sdkraw_speed.c" ]
 
     include_dirs = [
@@ -232,7 +226,6 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("usbhost_nosdk_speed_test") {
-    branch_protector_ret = "pac_ret"
     include_dirs = [
       "include",
       "./../../ddk/common/include",

@@ -15,7 +15,6 @@ import("//build/ohos.gni")
 import("./../../../usb.gni")
 
 ohos_executable("usb_dev_test") {
-  branch_protector_ret = "pac_ret"
   include_dirs = [
     "${usb_driver_path}/utils/include",
   ]
