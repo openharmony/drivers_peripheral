@@ -26,7 +26,6 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("ohos_camera_demo") {
-    branch_protector_ret = "pac_ret"
     output_extension = "bin"
     sources = [
       "$camera_path/../../test/common/callback/src/camera_device_callback.cpp",
@@ -98,7 +97,6 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("ohos_camera_demo") {
-    branch_protector_ret = "pac_ret"
     install_enable = false
     sources = [
       "./demo_main.cpp",

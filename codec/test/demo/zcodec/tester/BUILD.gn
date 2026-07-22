@@ -2,7 +2,6 @@ import("//build/ohos.gni")
 
 # 编码器静态库：供其他模块调用 TestZEncoder
 ohos_static_library("libzencoder_tester") {
-  branch_protector_ret = "pac_ret"
     sources = [
         "command_parse.cpp",
         "zencoder_tester.cpp",
@@ -29,7 +28,6 @@ ohos_static_library("libzencoder_tester") {
 
 # 解码器静态库：供其他模块调用 TestZDecoder
 ohos_static_library("libzdecoder_tester") {
-  branch_protector_ret = "pac_ret"
     sources = [
         "command_parse.cpp",
         "zdecoder_tester.cpp",

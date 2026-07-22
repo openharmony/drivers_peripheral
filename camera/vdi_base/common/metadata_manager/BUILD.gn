@@ -36,7 +36,6 @@ if (!defined(ohos_lite)) {
   }
 
   ohos_shared_library("peripheral_camera_metadata_manager") {
-    branch_protector_ret = "pac_ret"
     defines = []
     if (drivers_peripheral_camera_feature_usb) {
       defines += [ "CAMERA_BUILT_ON_USB" ]
@@ -89,7 +88,6 @@ if (!defined(ohos_lite)) {
   }
 
   ohos_shared_library("camera_example_vendor_tag_impl") {
-    branch_protector_ret = "pac_ret"
     install_enable = false
     cflags = [
       "-fPIC",
@@ -105,7 +103,6 @@ if (!defined(ohos_lite)) {
   }
 
   ohos_shared_library("camera_vendor_tag_service_1.0") {
-    branch_protector_ret = "pac_ret"
     include_dirs = [
       "./include",
       "../include",

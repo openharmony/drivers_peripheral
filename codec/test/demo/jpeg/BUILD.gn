@@ -14,7 +14,6 @@
 import("//build/ohos.gni")
 
 ohos_executable("codec_jpeg_decode") {
-  branch_protector_ret = "pac_ret"
   include_dirs = [ 
     "./include",
     "../../../utils/include",

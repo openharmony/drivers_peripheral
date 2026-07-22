@@ -16,7 +16,6 @@ import("//build/ohos.gni")
 import("./../input.gni")
 
 ohos_shared_library("libhid_ddk_service_1.1") {
-  branch_protector_ret = "pac_ret"
   sources = [
     "src/ddk_sysfs_dev_node.cpp",
     "src/hid_ddk_permission.cpp",
@@ -53,7 +52,6 @@ ohos_shared_library("libhid_ddk_service_1.1") {
 }
 
 ohos_shared_library("libhid_ddk_driver") {
-  branch_protector_ret = "pac_ret"
   sources = [ "src/hid_ddk_driver.cpp" ]
 
   include_dirs = [

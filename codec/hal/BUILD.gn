@@ -21,7 +21,6 @@ config("headers_config") {
 }
 
 ohos_shared_library("libcodec_vdi_headers") {
-  branch_protector_ret = "pac_ret"
   public_configs = [ ":headers_config" ]
 }
 

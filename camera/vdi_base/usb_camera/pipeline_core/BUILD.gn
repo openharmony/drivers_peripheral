@@ -61,7 +61,6 @@ config("weak_ffmpeg") {
 }
 
 ohos_shared_library("usb_camera_pipeline_core") {
-  branch_protector_ret = "pac_ret"
   sources = [
     "$camera_path_usb/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node/uvc_node.cpp",
     "$camera_path_usb/pipeline_core/pipeline_impl/src/strategy/config/config.c",

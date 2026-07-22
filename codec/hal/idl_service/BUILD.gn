@@ -14,7 +14,6 @@ import("//build/ohos.gni")
 import("../..//codec.gni")
 
 ohos_shared_library("libcodec_component_manager_service_4.0") {
-  branch_protector_ret = "pac_ret"
   include_dirs = [
     "../../utils/include/",
     "include",
@@ -80,7 +79,6 @@ ohos_shared_library("libcodec_component_manager_service_4.0") {
 }
 
 ohos_shared_library("libcodec_driver") {
-  branch_protector_ret = "pac_ret"
   include_dirs = [
     "../../utils/include/",
     "include",
