@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 ohos_executable("codec_heif_encode") {
   include_dirs = [ "./include" ]
 
+  branch_protector_ret = "pac_ret"
   sources = [
     "src/buffer_helper.cpp",
     "src/codec_heif_helper.cpp",
@@ -53,6 +54,7 @@ ohos_executable("codec_heif_encode") {
 ohos_executable("codec_heif_decode") {
   include_dirs = [ "./include" ]
 
+  branch_protector_ret = "pac_ret"
   sources = [
     "src/codec_heif_decode_helper.cpp",
     "src/command_parser.cpp",
