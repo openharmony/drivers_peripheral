@@ -136,7 +136,7 @@ namespace {
                 printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
                     countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
-            printf("pless execute sensorhub dump.bat within %lld seconds\r\n", (g_testTime / 1000 - i));
+            printf("pless execute sensorhub dump.bat [within %" PRId64 "seconds]\r\n", (g_testTime / 1000 - i));
             fflush(stdout);
         }
         
@@ -156,7 +156,7 @@ namespace {
                 printf("\033[31m[ERROR] 1000ms get sensor data count is %d, sensorDataCount is %d\033[0m ",
                     countPerSecond, SensorCallbackImpl::sensorDataCount);
             }
-            printf("pless execute sensorhub dump.bat within %lld seconds\r\n", (g_testTime / 1000 - i));
+            printf("pless execute sensorhub dump.bat [within %" PRId64 " seconds]\r\n", (g_testTime / 1000 - i));
             fflush(stdout);
         }
 
