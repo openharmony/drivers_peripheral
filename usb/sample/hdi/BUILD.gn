@@ -28,6 +28,7 @@ config("module_private_config") {
 ohos_executable("UsbSubscriberMain") {
   configs = [ ":module_private_config" ]
 
+  branch_protector_ret = "pac_ret"
   sources = [
     "${usb_driver_path}/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
     "usb_subscriber.cpp",

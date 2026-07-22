@@ -19,6 +19,7 @@ ohos_executable("usb_dev_test") {
     "${usb_driver_path}/utils/include",
   ]
 
+  branch_protector_ret = "pac_ret"
   sources = [
     "acm_speed_read.c",
     "acm_speed_write.c",
