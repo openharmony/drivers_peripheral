@@ -23,7 +23,6 @@ group("display_composer_hdi_service") {
 }
 
 ohos_prebuilt_etc("composer_host.para.dac") {
-  branch_protector_ret = "pac_ret"
   source = "src/composer_host.para.dac"
   relative_install_dir = "param"
   install_images = [ chipset_base_dir ]
