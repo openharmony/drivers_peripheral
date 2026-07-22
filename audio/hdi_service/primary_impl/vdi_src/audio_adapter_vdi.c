@@ -185,7 +185,10 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
     pthread_rwlock_rdlock(&g_rwAdapterLock);
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d, \
+        sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, soureType=%{public}d",
+        desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
+        attrs->streamId, attrs->soureType);
 
     int32_t ret = VerifyParamsOfAudioCreateRenderVdi(adapter, desc, attrs, render, renderId);
     if (ret != HDF_SUCCESS) {
@@ -327,7 +330,10 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
     const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture, uint32_t *captureId)
 {
     pthread_rwlock_rdlock(&g_rwAdapterLock);
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d, \
+        sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, soureType=%{public}d",
+        desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
+        attrs->streamId, attrs->soureType);
     int32_t ret = HDF_SUCCESS;
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL || captureId == NULL) {
