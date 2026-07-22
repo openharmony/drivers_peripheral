@@ -1307,8 +1307,8 @@ HWTEST_P(ZCodecHdiDecTest, ZCodecHdiDecTest_PrintCapabilities_001, TestSize.Leve
         CODEC_LOGI("  maxInstance=%{public}u", cap.maxInstance);
         CODEC_LOGI("  profileLevels count=%{public}zu", cap.profileLevels.size());
         for (size_t j = 0; j < cap.profileLevels.size(); j++) {
-            CODEC_LOGI("    profileLevel[%{public}zu]: profile=%{public}d, level=%{public}d", 
-                       j, cap.profileLevels[j].profile, cap.profileLevels[j].level);
+            CODEC_LOGI("    profileLevel[%{public}zu]: profile=%{public}d, level=%{public}d",
+                j, cap.profileLevels[j].profile, cap.profileLevels[j].level);
         }
         CODEC_LOGI("  canSwapWidthHeight=%{public}d", cap.canSwapWidthHeight);
         CODEC_LOGI("  widthRange=[%{public}d, %{public}d]", cap.widthRange.min, cap.widthRange.max);
