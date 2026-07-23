@@ -80,8 +80,8 @@ DisplayComposerService::DisplayComposerService()
 
     HidumperInit();
 
-    BootstrapDisplayDiscovery();
     isSupportParallelPresenting_ = GetEnableParallel();
+    BootstrapDisplayDiscovery();
     OHOS::system::SetParameter(BOOTEVENT_COMPOSER_HOST_READY.c_str(), "true");
 }
 
