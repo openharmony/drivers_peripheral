@@ -159,6 +159,12 @@ RetCode SensorController::Stop()
     return rc;
 };
 
+RetCode SensorController::ProbeStreamOn()
+{
+    CAMERA_LOGI("%s ProbeStreamOn", __FUNCTION__);
+    return sensorVideo_->ProbeStreamOn(GetName());
+}
+
 RetCode SensorController::CreateBuffers()
 {
     RetCode ret = RC_OK;
