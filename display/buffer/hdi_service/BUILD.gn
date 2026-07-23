@@ -131,8 +131,6 @@ ohos_shared_library("liballocator_driver_1.0") {
 
 ohos_shared_library("libmapper_service_1.0") {
   branch_protector_ret = "pac_ret"
-  defines = []
-  defines += display_defines
   include_dirs = [
     "include",
     "../../utils/include",
