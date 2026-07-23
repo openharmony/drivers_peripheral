@@ -487,7 +487,7 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
 
 RetCode HosV4L2Dev::ProbeStreamOn(const std::string& cameraId)
 {
-    CAMERA_LOGI("ProbeStreamOn enter, cameraID = %{public}s", cameraID.c_str());
+    CAMERA_LOGI("ProbeStreamOn enter, cameraID = %{public}s", cameraId.c_str());
     int fd = GetCurrentFd(cameraId);
     if (fd < 0) {
         CAMERA_LOGE("ProbeStreamOn: GetCurrentFd error");
@@ -503,9 +503,9 @@ RetCode HosV4L2Dev::ProbeStreamOn(const std::string& cameraId)
     RetCode rc = myStreams_->V4L2StreamOn(fd);
     if (rc == RC_OK) {
         myStreams_->V4L2StreamOff(fd);
-        CAMERA_LOGI("ProbeStreamOn success, cameraID = %{public}s", cameraID.c_str());
+        CAMERA_LOGI("ProbeStreamOn success, cameraID = %{public}s", cameraId.c_str());
     } else {
-        CAMERA_LOGE("ProbeStreamOn failed, cameraID = %{public}s", cameraID.c_str());
+        CAMERA_LOGE("ProbeStreamOn failed, cameraID = %{public}s", cameraId.c_str());
     }
     return rc;
 }
