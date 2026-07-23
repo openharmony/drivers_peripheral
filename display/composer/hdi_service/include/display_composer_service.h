@@ -134,14 +134,13 @@ private:
     static void OnRefresh(uint32_t devId, void *data);
     static void OnVBlankIdleCallback(uint32_t devId, uint64_t ns, void* data);
     static void OnHwcEvent(uint32_t devId, uint32_t eventId, const std::vector<int32_t>& eventData, void *data);
-    static void PrepareParallelResponser(uint32_t outputId, bool connected, void* data);
+    static void PrepareParallelResponser(uint32_t outputId, bool connected, DisplayComposerService* compService);
 private:
     /* Common */
     void* libHandle_;
     DisplayComposerVdiAdapter* vdiAdapter_;
-    std::mutex mutex_;
+    std::mutex exitMutex_;
     std::shared_ptr<DeviceCacheManager> cacheMgr_;
-    std::unordered_map<uint32_t, bool> vsyncEnableStatus_;
     sptr<IHotPlugCallback> hotPlugCb_;
     sptr<IVBlankCallback> vBlankCb_;
     sptr<IModeCallback> modeCb_;
@@ -149,7 +148,7 @@ private:
     sptr<IRefreshCallback> refreshCb_;
     sptr<IVBlankIdleCallback> VBlankIdleCb_;
     sptr<IHwcEventCallback> hwcEventCb_;
-    static std::mutex respMapMutex_;
+    bool isSupportParallelPresenting_;
     std::shared_ptr<V1_5::HdiDisplayCmdResponser> cmdResponser_;
     std::unordered_map<uint32_t, std::shared_ptr<V1_5::HdiDisplayCmdResponser>> cmdResponserMap_;
 };

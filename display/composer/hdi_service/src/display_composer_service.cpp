@@ -41,13 +41,12 @@ namespace Display {
 namespace Composer {
 
 const std::string BOOTEVENT_COMPOSER_HOST_READY = "bootevent.composer_host.ready";
+static std::shared_mutex g_respMapMutex;
 
 extern "C" V1_5::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
     return new (std::nothrow) DisplayComposerService();
 }
-
-std::mutex DisplayComposerService::respMapMutex_;
 
 DisplayComposerService::DisplayComposerService()
     : libHandle_(nullptr),
@@ -80,14 +79,15 @@ DisplayComposerService::DisplayComposerService()
     }
 
     HidumperInit();
-    BootstrapDisplayDiscovery();
 
+    isSupportParallelPresenting_ = GetEnableParallel();
+    BootstrapDisplayDiscovery();
     OHOS::system::SetParameter(BOOTEVENT_COMPOSER_HOST_READY.c_str(), "true");
 }
 
 DisplayComposerService::~DisplayComposerService()
 {
-    std::lock_guard<std::mutex> lck(mutex_);
+    std::lock_guard<std::mutex> lock(exitMutex_);
     ExitService();
 }
 
@@ -266,8 +266,6 @@ void DisplayComposerService::LoadVdiFuncPart3()
         reinterpret_cast<SetDisplayPerFrameParameterFunc>(dlsym(libHandle_, "SetDisplayPerFrameParameter"));
     vdiAdapter_->GetDisplayIdentificationData =
         reinterpret_cast<GetDisplayIdentificationDataFunc>(dlsym(libHandle_, "GetDisplayIdentificationData"));
-    vdiAdapter_->RegHwcEventCallback =
-        reinterpret_cast<RegHwcEventCallbackFunc>(dlsym(libHandle_, "RegHwcEventCallback"));
     vdiAdapter_->GetSupportLayerType =
         reinterpret_cast<GetSupportLayerTypeFunc>(dlsym(libHandle_, "GetSupportLayerType"));
     vdiAdapter_->SetTunnelLayerId = reinterpret_cast<SetTunnelLayerIdFunc>(dlsym(libHandle_, "SetTunnelLayerId"));
@@ -359,16 +357,16 @@ void DisplayComposerService::BootstrapDisplayDiscovery()
 
 void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* data)
 {
-    if (data == nullptr) {
-        DISPLAY_LOGE("cb data is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected);
-        return;
-    }
+    DISPLAY_CHK_RETURN_NOT_VALUE(data == nullptr,
+        DISPLAY_LOGE("cb data is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected));
 
-    auto cacheMgr = reinterpret_cast<DisplayComposerService*>(data)->cacheMgr_;
-    if (cacheMgr == nullptr) {
-        DISPLAY_LOGE("CacheMgr_ is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected);
-        return;
-    }
+    auto compService = reinterpret_cast<DisplayComposerService*>(data);
+    DISPLAY_CHK_RETURN_NOT_VALUE(compService == nullptr,
+        DISPLAY_LOGE("compService is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected));
+
+    auto cacheMgr = compService->cacheMgr_;
+    DISPLAY_CHK_RETURN_NOT_VALUE(cacheMgr == nullptr,
+        DISPLAY_LOGE("CacheMgr_ is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected));
 
     if (connected) {
         std::lock_guard<std::mutex> lock(cacheMgr->GetCacheMgrMutex());
@@ -378,25 +376,28 @@ void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* 
         }
     }
 
-    sptr<IHotPlugCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->hotPlugCb_;
-    if (remoteCb == nullptr) {
+    sptr<IHotPlugCallback> remoteCb = compService->hotPlugCb_;
+    DISPLAY_CHK_RETURN_NOT_VALUE(remoteCb == nullptr,
         DISPLAY_LOGI("hotPlugCb_ is nullptr during bootstrap outputId:%{public}u, connected:%{public}d",
-            outputId, connected);
-        return;
-    }
+            outputId, connected));
     remoteCb->OnHotPlug(outputId, connected);
-    PrepareParallelResponser(outputId, connected, data);
+    PrepareParallelResponser(outputId, connected, compService);
 }
 
-void DisplayComposerService::PrepareParallelResponser(uint32_t outputId, bool connected, void* data)
+void DisplayComposerService::PrepareParallelResponser(uint32_t outputId, bool connected,
+    DisplayComposerService* compService)
 {
-    if (!GetEnableParallel()) {
+    DISPLAY_CHK_RETURN_NOT_VALUE(compService == nullptr,
+        DISPLAY_LOGE("compService is nullptr outputId:%{public}u, connected:%{public}d", outputId, connected));
+
+    auto isSupportParallelPresenting = compService->isSupportParallelPresenting_;
+    if (!isSupportParallelPresenting) {
         return;
     }
 
-    auto cmdResponser = reinterpret_cast<DisplayComposerService*>(data)->cmdResponser_;
-    auto& cmdResponserMap = reinterpret_cast<DisplayComposerService*>(data)->cmdResponserMap_;
-    std::lock_guard<std::mutex> lock(respMapMutex_);
+    auto cmdResponser = compService->cmdResponser_;
+    auto& cmdResponserMap = compService->cmdResponserMap_;
+    std::unique_lock<std::shared_mutex> lock(g_respMapMutex);
     if (connected) {
         if ((cmdResponser != nullptr) && (cmdResponserMap.size() == 1)) {
             cmdResponserMap.insert({outputId, cmdResponser});
@@ -459,7 +460,7 @@ int32_t DisplayComposerService::GetDisplayCapability(uint32_t devId, DisplayCapa
     int32_t ret =  vdiAdapter_->GetDisplayCapability(devId, info);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u", __func__, devId));
-    DISPLAY_LOGI("%{public}s fail devId:%{public}u, width:%{public}u, height:%{public}u, count:%{public}u",
+    DISPLAY_LOGI("%{public}s devId:%{public}u, width:%{public}u, height:%{public}u, count:%{public}u",
         __func__, devId, info.phyWidth, info.phyHeight, info.propertyCount);
     return HDF_SUCCESS;
 }
@@ -504,7 +505,7 @@ int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, V1_0::Disp
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->GetDisplayPowerStatus(devId, status);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
-        DISPLAY_LOGE("%{public}s fail devId:%{public}u, status:%{public}u", __func__, devId, status));
+        DISPLAY_LOGI("%{public}s fail devId:%{public}u, ret:%{public}d", __func__, devId, ret));
     return ret;
 }
 
@@ -575,6 +576,7 @@ int32_t DisplayComposerService::UpdateHardwareCursor(uint32_t devId, int32_t x, 
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_->UpdateHardwareCursor, HDF_ERR_NOT_SUPPORT);
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_ERR_NOT_SUPPORT);
     BufferHandle* handle = buffer->GetBufferHandle();
+    CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiAdapter_->UpdateHardwareCursor(devId, x, y, handle);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail devId:%{public}u", __func__, devId));
@@ -620,19 +622,11 @@ int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enab
 {
     DISPLAY_TRACE;
 
-    /*Already enabled, return success */
-    if (enabled && vsyncEnableStatus_[devId]) {
-        DISPLAY_LOGW("%{public}s:vsyncStatus[%{public}u] = %{public}d, skip",
-            __func__, devId, vsyncEnableStatus_[devId]);
-        return HDF_SUCCESS;
-    }
-
     CHECK_NULLPOINTER_RETURN_VALUE(vdiAdapter_, HDF_FAILURE);
     int32_t ret = vdiAdapter_->SetDisplayVsyncEnabled(devId, enabled);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
-        DISPLAY_LOGE("%{public}s: vsyncStatus[%{public}u] = %{public}d, fail", __func__, devId, enabled));
-        vsyncEnableStatus_[devId] = enabled;
-        return ret;
+        DISPLAY_LOGE("%{public}s fail: vsyncStatus[%{public}u] = %{public}d", __func__, devId, enabled));
+    return ret;
 }
 
 int32_t DisplayComposerService::RegDisplayVBlankCallback(uint32_t devId, const sptr<IVBlankCallback>& cb)
@@ -872,7 +866,6 @@ int32_t DisplayComposerService::CmdRequest(
     uint32_t inEleCnt, const std::vector<HdifdInfo>& inFds, uint32_t& outEleCnt, std::vector<HdifdInfo>& outFds)
 {
     int32_t ret = HDF_FAILURE;
-
     if (cmdResponser_ != nullptr) {
         ret = cmdResponser_->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
     }
@@ -899,11 +892,6 @@ int32_t DisplayComposerService::InitSMQInfo(uint32_t devId, const std::shared_pt
     DISPLAY_CHK_RETURN(cmdResponserCur == nullptr, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s fail, cmdResponserCur == nullptr, devId[%{public}u]", __func__, devId));
 
-    {
-        std::lock_guard<std::mutex> lock(respMapMutex_);
-        cmdResponserMap_.insert({devId, cmdResponserCur});
-    }
-
     ret = cmdResponserCur->InitCmdRequest(request);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s InitCmdRequest devId[%{public}u] fail", __func__, devId));
@@ -911,6 +899,16 @@ int32_t DisplayComposerService::InitSMQInfo(uint32_t devId, const std::shared_pt
     ret = cmdResponserCur->GetCmdReply(reply);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE,
         DISPLAY_LOGE("%{public}s GetCmdReply devId[%{public}u], fail", __func__, devId));
+
+    {
+        std::unique_lock<std::shared_mutex> lock(g_respMapMutex);
+        auto respItem = cmdResponserMap_.find(devId);
+        if (respItem != cmdResponserMap_.end()) {
+            cmdResponserMap_.erase(respItem);
+        }
+        cmdResponserMap_.insert({devId, cmdResponserCur});
+    }
+
     DISPLAY_LOGI("%{public}s: devId[%{public}u] done.", __func__, devId);
     return ret;
 }
@@ -931,11 +929,11 @@ int32_t DisplayComposerService::DoCmdRequest(uint32_t devId,
 
 std::shared_ptr<V1_5::HdiDisplayCmdResponser> DisplayComposerService::GetResponser(uint32_t devId)
 {
-    if (!GetEnableParallel()) {
+    if (!isSupportParallelPresenting_) {
         return cmdResponser_;
     }
 
-    std::lock_guard<std::mutex> lock(respMapMutex_);
+    std::unique_lock<std::shared_mutex> lock(g_respMapMutex);
     DISPLAY_CHK_RETURN(cmdResponserMap_.find(devId) == cmdResponserMap_.end(), nullptr,
         DISPLAY_LOGE("%{public}s, cannot find the Response for the devId[%{public}u]", __func__, devId));
     return cmdResponserMap_[devId];
@@ -1205,7 +1203,6 @@ int32_t DisplayComposerService::GetDisplayIdentificationData(uint32_t devId, uin
     int32_t ret = vdiAdapter_->GetDisplayIdentificationData(devId, portId, edidData);
     DISPLAY_LOGI("%{public}s: ret %{public}d, devId %{public}u, the param idx %{public}u,"
         "the length of edidData [%{public}zu]", __func__, ret, devId, portId, edidData.size());
-
     return ret;
 }
 
@@ -1300,7 +1297,6 @@ int32_t DisplayComposerService::SetDisplayColorGamut(uint32_t devId, ColorGamut 
         DISPLAY_LOGE("%{public}s fail devId:%{public}u", __func__, devId));
     return ret;
 }
-
 
 int32_t DisplayComposerService::GetDisplayVCPFeature(uint32_t devId, uint8_t vcpCode,
     uint16_t& currentValue, uint16_t& maximumValue, int32_t& replyErrorCode)
