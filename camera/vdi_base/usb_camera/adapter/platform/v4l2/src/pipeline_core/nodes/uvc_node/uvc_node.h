@@ -39,6 +39,7 @@ public:
     RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
     void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
 private:
+    RetCode SetMjpegProbeAndDecoder(DeviceFormat& format, int bufCnt);
     void OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata);
     int32_t GetStreamId(const CaptureMeta &meta);
     void GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata);

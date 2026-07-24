@@ -12,7 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
-ohos_shared_library("libgeofence_interface_service_2.0") {
+ohos_shared_library("libgeofence_interface_service_3.0") {
   include_dirs = [
     "//drivers/peripheral/location/geofence/hdi_service",
   ]
@@ -101,7 +101,7 @@ ohos_shared_library("liblocation_geofence_hdi_driver") {
   }
 
   external_deps +=
-      [ "drivers_interface_location_geofence:liblocation_geofence_stub_2.0" ]
+      [ "drivers_interface_location_geofence:liblocation_geofence_stub_3.0" ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
@@ -111,7 +111,7 @@ ohos_shared_library("liblocation_geofence_hdi_driver") {
 
 group("hdi_location_geofence_service") {
   deps = [
-    ":libgeofence_interface_service_2.0",
+    ":libgeofence_interface_service_3.0",
     ":liblocation_geofence_hdi_driver",
   ]
 }

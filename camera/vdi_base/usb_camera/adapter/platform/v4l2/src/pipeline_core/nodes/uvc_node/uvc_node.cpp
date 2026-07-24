@@ -92,6 +92,33 @@ RetCode UvcNode::Flush(const int32_t streamId)
     return rc;
 }
 
+RetCode UvcNode::SetMjpegProbeAndDecoder(DeviceFormat& format, int bufCnt)
+{
+    // StreamOn probe for MJPEG (fallback to YUYV if failed to ensure compatibility)
+    RetCode probeRc = sensorController_->ProbeStreamOn();
+    if (probeRc != RC_OK && cameraformat_ != CAMERA_FORMAT_BLOB) {  // fallback to YUYV
+        CAMERA_LOGW("UvcNode[%{public}s]: MJPEG STREAMON probe failed, fallback to YUYV", cameraId_.c_str());
+        sensorController_->Stop();
+        uvcSourcePixformat_ = V4L2_PIX_FMT_YUYV;
+        mjpegDecoder_ = nullptr;
+        format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
+        if (sensorController_->Start(bufCnt, format) == RC_ERROR) {
+            CAMERA_LOGE("UvcNode[%{public}s]: YUYV Start also failed", cameraId_.c_str());
+            return RC_ERROR;
+        }
+        CAMERA_LOGI("UvcNode[%{public}s]: YUYV fallback start success", cameraId_.c_str());
+        return RC_OK;   // YUYV does not need MJPEG decoder
+    }
+
+    // initialize MJPEG decoder (The decoder is required when the source format == MJPEG && target format != BLOB)
+    if (cameraformat_ != CAMERA_FORMAT_BLOB) {
+        mjpegDecoder_ = MjpegDecoderFactory::Create();
+        CAMERA_LOGI("UvcNode[%{public}s]: MJPEG decoder pre-initialized: %{public}s",
+            cameraId_.c_str(), MjpegDecoderFactory::GetAvailableDecoderName());
+    }
+    return RC_OK;
+}
+
 RetCode UvcNode::Start(const int32_t streamId)
 {
     RetCode rc = RC_OK;
@@ -114,17 +141,18 @@ RetCode UvcNode::Start(const int32_t streamId)
         auto cameraFmtStr = cameraformat_ == CAMERA_FORMAT_BLOB ? "blob" : "yuv";
         CAMERA_LOGI("UvcNode::Start w:%{public}d h:%{public}d fmt:%{public}u pix:%{public}s cam:%{public}s", wide_,
             high_, it->format_.format_, pixFmtStr, cameraFmtStr);
-        // 预初始化 MJPEG 解码器（当源格式为 MJPEG 且目标非 BLOB 时）
-        if (uvcSourcePixformat_ == V4L2_PIX_FMT_MJPEG && cameraformat_ != CAMERA_FORMAT_BLOB) {
-            mjpegDecoder_ = MjpegDecoderFactory::Create();
-            CAMERA_LOGI("UvcNode[%{public}s]: MJPEG decoder pre-initialized: %{public}s",
-                cameraId_.c_str(), MjpegDecoderFactory::GetAvailableDecoderName());
-        }
         int bufCnt = static_cast<int>(it->format_.bufferCount_);
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
             CAMERA_LOGE("Start failed.");
             return RC_ERROR;
+        }
+        if (uvcSourcePixformat_ == V4L2_PIX_FMT_MJPEG) {
+            rc = SetMjpegProbeAndDecoder(format, bufCnt);
+            if (rc == RC_ERROR) {
+                CAMERA_LOGE("UvcNode[%{public}s]: SetMjpegProbeAndDecoder failed.", cameraId_.c_str());
+                return RC_ERROR;
+            }
         }
     }
     isAdjust_ = true;
