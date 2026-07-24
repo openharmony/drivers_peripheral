@@ -185,7 +185,7 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
     pthread_rwlock_rdlock(&g_rwAdapterLock);
-    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d, \
+    AUDIO_FUNC_LOGD("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d, \
         sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, sourceType=%{public}d",
         desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
         attrs->streamId, attrs->sourceType);
@@ -330,7 +330,7 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
     const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture, uint32_t *captureId)
 {
     pthread_rwlock_rdlock(&g_rwAdapterLock);
-    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d, \
+    AUDIO_FUNC_LOGD("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d, \
         sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, sourceType=%{public}d",
         desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
         attrs->streamId, attrs->sourceType);
