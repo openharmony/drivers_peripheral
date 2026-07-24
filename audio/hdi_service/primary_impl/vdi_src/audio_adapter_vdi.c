@@ -181,9 +181,30 @@ static int32_t CreateRenderPre(struct IAudioAdapterVdi *vdiAdapter,
     return HDF_SUCCESS;
 }
 
+static int32_t CheckSupport(struct IAudioAdapterVdi *vdiAdapter, const struct AudioDeviceDescriptor *desc)
+{
+    struct AudioDeviceDescriptorVdi vdiDesc;
+    if (AudioCommonDevDescToVdiDevDescVdi(desc, &vdiDesc) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("desc to vdiDesc fail");
+        return HDF_FAILURE;
+    }
+    if (vdiAdapter->CheckSupport != NULL) {
+        int32_t ret = vdiAdapter->CheckSupport(vdiAdapter, &vdiDesc);
+        if (ret == HDF_ERR_NOT_SUPPORT) {
+            AUDIO_FUNC_LOGE("%{public}s not support, portId=%{public}u, pin=%{public}d, desc=%{public}s",
+                __func__, desc->portId, desc->pins, desc->desc);
+            OsalMemFree((void *)vdiDesc.desc);
+            return ret;
+        }
+    }
+    OsalMemFree((void *)vdiDesc.desc);
+    return HDF_SUCCESS;
+}
+
 static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
+    struct AudioDeviceDescriptorVdi vdiDesc;
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
 
@@ -199,13 +220,8 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
-    if (vdiAdapter->CheckSupport != NULL && vdiAdapter->CheckSupport(vdiAdapter, desc) == HDF_ERR_NOT_SUPPORT) {
-        AUDIO_FUNC_LOGE("%{public}s not support, portId=%{public}u, pin=%{public}d, desc=%{public}s",
-            __func__, desc->portId, desc->pins, desc->desc);
-        ret = HDF_ERR_NOT_SUPPORT;
-        goto EXIT;
-    }
 
+    ret = CheckSupport(vdiAdapter, desc);
     const char* condition = "support_multi_stream";
     char value[VALUE_LEN + 1] = {0};
     ret = vdiAdapter -> GetExtraParams(vdiAdapter, 0, condition, value, VALUE_LEN);
