@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 #include <inttypes.h>
 #include <map>
 #include <mutex>
+#include <vector>
 
 #include "v1_1/usb_ddk_types.h"
 
@@ -33,7 +34,7 @@ public:
 
     bool UpdateDriverInfo(const V1_1::DriverAbilityInfo &driverInfo);
     bool RemoveDriverInfo(const std::string &driverUid);
-    bool QueryDriverInfo(uint32_t tokenId, V1_1::DriverAbilityInfo &driverInfo);
+    bool QueryDriverInfo(uint32_t tokenId, std::vector<uint16_t> &vendorIds);
 
 private:
     UsbDriverManager() = default;
@@ -43,7 +44,7 @@ private:
     UsbDriverManager(UsbDriverManager &&) = delete;
     UsbDriverManager &operator=(UsbDriverManager &&) = delete;
     std::mutex mutex_;
-    std::map<uint32_t, std::unique_ptr<V1_1::DriverAbilityInfo>> driverMap_;
+    std::map<uint32_t, std::vector<std::unique_ptr<V1_1::DriverAbilityInfo>>> driverMap_;
 };
 } // namespace V1_2
 } // namespace Ddk

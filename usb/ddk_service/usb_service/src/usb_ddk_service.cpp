@@ -777,13 +777,11 @@ int32_t UsbDdkService::GetDevices(std::vector<uint64_t> &deviceIds)
 #else
     uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
     std::vector<uint16_t> vendorIds;
-    DriverAbilityInfo driverInfo;
-    int32_t ret = UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, driverInfo);
+    int32_t ret = UsbDriverManager::GetInstance().QueryDriverInfo(tokenId, vendorIds);
     if (!ret) {
         HDF_LOGW("%{public}s: not find driver info", __func__);
         return HDF_SUCCESS;
     }
-    vendorIds = driverInfo.vids;
 
     if (g_DdkLibusbAdapter == nullptr) {
         HDF_LOGE("%{public}s: g_DdkLibusbAdapter is nullptr", __func__);
