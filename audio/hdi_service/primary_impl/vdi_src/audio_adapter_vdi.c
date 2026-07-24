@@ -204,7 +204,6 @@ static int32_t CheckSupport(struct IAudioAdapterVdi *vdiAdapter, const struct Au
 static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
-    struct AudioDeviceDescriptorVdi vdiDesc;
     pthread_rwlock_rdlock(&g_rwAdapterLock);
     AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
 
