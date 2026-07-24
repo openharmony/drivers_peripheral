@@ -221,6 +221,10 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
     }
 
     ret = CheckSupport(vdiAdapter, desc);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("not support");
+        goto EXIT;
+    }
     const char* condition = "support_multi_stream";
     char value[VALUE_LEN + 1] = {0};
     ret = vdiAdapter -> GetExtraParams(vdiAdapter, 0, condition, value, VALUE_LEN);
