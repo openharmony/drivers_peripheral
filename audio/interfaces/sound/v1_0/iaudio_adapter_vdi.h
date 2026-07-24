@@ -65,6 +65,8 @@ struct IAudioAdapterVdi {
     int32_t (*CreateCallTransfer)(struct IAudioAdapterVdi *self);
 
     int32_t (*SetPhoneCallScene)(struct IAudioAdapterVdi *self, enum SceneTypeVdi type);
+    int32_t (*CheckSupport)(struct IAudioAdapterVdi *self, const struct AudioDeviceDescriptorVdi *desc,
+        const struct AudioSampleAttributesVdi *attrs);
 };
 
 #ifdef __cplusplus
