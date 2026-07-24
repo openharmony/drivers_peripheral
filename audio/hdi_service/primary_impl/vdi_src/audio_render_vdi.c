@@ -87,7 +87,11 @@ int32_t AudioGetLatencyVdi(struct IAudioRender *render, uint32_t *ms)
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->GetLatency, HDF_ERR_INVALID_PARAM);
 
+    HdfAudioStartTrace("Hdi:AudioGetLatencyVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->GetLatency(vdiRender, ms);
+    AudioDfxSysEventError("Render GetLatency", startTime, TIME_THRESHOLD, ret);
+    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio GetLatency fail, ret=%{public}d", ret);
         return ret;
@@ -417,7 +421,11 @@ int32_t AudioRenderSetVolumeVdi(struct IAudioRender *render, float volume)
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->SetVolume, HDF_ERR_INVALID_PARAM);
 
+    HdfAudioStartTrace("Hdi:AudioRenderSetVolumeVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->SetVolume(vdiRender, volume);
+    AudioDfxSysEventError("Render SetVolume", startTime, TIME_THRESHOLD, ret);
+    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render SetVolume fail, ret=%{public}d", ret);
         return ret;
@@ -682,7 +690,11 @@ int32_t AudioRenderReqMmapBufferVdi(struct IAudioRender *render, int32_t reqSize
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->ReqMmapBuffer, HDF_ERR_INVALID_PARAM);
 
     struct AudioMmapBufferDescriptorVdi vdiDesc = {0};
+    HdfAudioStartTrace("Hdi:AudioRenderReqMmapBufferVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->ReqMmapBuffer(vdiRender, reqSize, &vdiDesc);
+    AudioDfxSysEventError("Render ReqMmapBuffer", startTime, TIME_THRESHOLD, ret);
+    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render ReqMmapBuffer fail, ret=%{public}d", ret);
         return ret;
@@ -720,7 +732,11 @@ int32_t AudioRenderGetMmapPositionVdi(struct IAudioRender *render, uint64_t *fra
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->GetMmapPosition, HDF_ERR_INVALID_PARAM);
 
+    HdfAudioStartTrace("Hdi:AudioRenderGetMmapPositionVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->GetMmapPosition(vdiRender, frames, &vdiTime);
+    AudioDfxSysEventError("Render GetMmapPosition", startTime, TIME_THRESHOLD, ret);
+    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render GetMmapPosition fail, ret=%{public}d", ret);
         return ret;
@@ -910,7 +926,11 @@ int32_t AudioRenderFlushVdi(struct IAudioRender *render)
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->Flush, HDF_ERR_INVALID_PARAM);
 
+    HdfAudioStartTrace("Hdi:AudioRenderFlushVdi", 0);
+    struct timeval startTime = AudioDfxSysEventGetTimeStamp();
     int32_t ret = vdiRender->Flush(vdiRender);
+    AudioDfxSysEventError("Render Flush", startTime, TIME_THRESHOLD, ret);
+    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render Flush fail, ret=%{public}d", ret);
         return ret;
