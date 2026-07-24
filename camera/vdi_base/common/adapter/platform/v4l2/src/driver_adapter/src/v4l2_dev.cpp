@@ -485,6 +485,31 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
     return RC_OK;
 }
 
+RetCode HosV4L2Dev::ProbeStreamOn(const std::string& cameraId)
+{
+    CAMERA_LOGI("ProbeStreamOn enter, cameraID = %{public}s", cameraId.c_str());
+    int fd = GetCurrentFd(cameraId);
+    if (fd < 0) {
+        CAMERA_LOGE("ProbeStreamOn: GetCurrentFd error");
+        return RC_ERROR;
+    }
+    if (myStreams_ == nullptr) {
+        myStreams_ = std::make_shared<HosV4L2Streams>(bufferType_);
+        if (myStreams_ == nullptr) {
+            CAMERA_LOGE("ProbeStreamOn: myStreams_ make_shared failed");
+            return RC_ERROR;
+        }
+    }
+    RetCode rc = myStreams_->V4L2StreamOn(fd);
+    if (rc == RC_OK) {
+        myStreams_->V4L2StreamOff(fd);
+        CAMERA_LOGI("ProbeStreamOn success, cameraID = %{public}s", cameraId.c_str());
+    } else {
+        CAMERA_LOGE("ProbeStreamOn failed, cameraID = %{public}s", cameraId.c_str());
+    }
+    return rc;
+}
+
 void SetCtrlByCondition(int32_t fd, AdapterCmd command, const int* args,
     RetCode &rc, std::shared_ptr<HosV4L2Control> myControl_)
 {

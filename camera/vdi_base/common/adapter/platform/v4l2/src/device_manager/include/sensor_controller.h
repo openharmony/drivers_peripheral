@@ -38,6 +38,7 @@ public:
     RetCode ConfigStop();
     RetCode Start(int buffCont, DeviceFormat& format);
     RetCode Stop();
+    RetCode ProbeStreamOn();
 
     RetCode CreateBuffers();
     RetCode SendFrameBuffer(std::shared_ptr<FrameSpec> buffer);
