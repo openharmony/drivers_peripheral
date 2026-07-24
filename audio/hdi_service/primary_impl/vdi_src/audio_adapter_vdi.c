@@ -199,11 +199,10 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         ret = HDF_ERR_INVALID_PARAM;
         goto EXIT;
     }
-    if (vdiAdapter->CheckSupport(desc, attrs) == HDF_ERR_NOT_SUPPORT) {
-        AUDIO_FUNC_LOGE("%{public}s not support, portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, \
-            format=%{public}d, sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, sourceType=%{public}d",
-            __func__, desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate,
-            attrs->channelCount, attrs->streamId, attrs->sourceType);
+    ret = vdiAdapter->CheckSupport(desc);
+    if (ret != NULL && ret == HDF_ERR_NOT_SUPPORT) {
+        AUDIO_FUNC_LOGE("%{public}s not support, portId=%{public}u, pin=%{public}d, desc=%{public}s",
+            __func__, desc->portId, desc->pins, desc->desc);
         ret = HDF_ERR_NOT_SUPPORT;
         goto EXIT;
     }
