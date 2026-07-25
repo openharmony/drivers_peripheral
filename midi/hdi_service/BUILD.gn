@@ -14,6 +14,17 @@
 import("//build/ohos.gni")
 
 ohos_shared_library("midi_interface_service_1.0") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+  }
+  install_enable = true
   defines = []
   include_dirs = [
     "include",
