@@ -34,6 +34,7 @@ using namespace OHOS::HiviewDFX;
 #define HICOLLIE_TIMEOUT 8
 
 #ifdef AUDIO_RECLAIM_MEMORY_ENABLE
+#define HDF_LOG_TAG HDF_AUDIO_PRIMARY_IMPL
 #define HICOLLIE_TIMEOUT_CALLBACK 120
 #define INVALID_TIMER_ID (-1)
 #define TIMER_CALLBACK "ReclaimMemoryCallback"

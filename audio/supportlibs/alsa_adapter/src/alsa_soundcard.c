@@ -168,6 +168,7 @@ static int32_t CfgDumpAdapterInfo(struct AlsaAdapterCfgInfo *info)
 
     if (cardType == SND_CARD_UNKNOWN) {
         AUDIO_FUNC_LOGE("Error: %{public}s is unspupported adapter name", info->adapterName);
+        return SND_CARD_UNKNOWN;
     }
 
     int32_t idx = g_alsaAdapterList[cardType].num;

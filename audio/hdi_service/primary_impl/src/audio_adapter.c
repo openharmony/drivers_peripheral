@@ -35,6 +35,7 @@
 #define TYPE_CAPTURE                    "Capture"
 #define INT_32_MAX                      0x7fffffff
 #define SHIFT_RIGHT_31_BITS             31
+#define MAX_SUB_PORTS_NUM_PER_PORT      16
 
 static int32_t AudioHwRenderInit(struct AudioHwRender *hwRender)
 {
@@ -1119,7 +1120,7 @@ static int32_t AudioDeepCopySubCapability(
 {
     struct AudioSubPortCapability *dstSubPorts = NULL;
 
-    if (dstSubPortsOut == NULL || srcSubPorts == NULL || subPortsLen == 0) {
+    if (dstSubPortsOut == NULL || srcSubPorts == NULL || subPortsLen == 0 || subPortsLen > MAX_SUB_PORTS_NUM_PER_PORT) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
