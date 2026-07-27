@@ -151,15 +151,15 @@ int32_t WriteAudioSampleAttributes(struct HdfSBuf *reply, const struct AudioSamp
     if (reply == NULL || attrs == NULL) {
         return HDF_FAILURE;
     }
-    uint32_t tempAttrParam = (uint32_t)attrs->type;
+    uint32_t tempAttrParam = static_cast<uint32_t>(attrs->type);
     if (!HdfSbufWriteUint32(reply, tempAttrParam)) {
         return HDF_FAILURE;
     }
-    tempAttrParam = (uint32_t)attrs->interleaved;
+    tempAttrParam = static_cast<uint32_t>(attrs->interleaved);
     if (!HdfSbufWriteUint32(reply, tempAttrParam)) {
         return HDF_FAILURE;
     }
-    tempAttrParam = (uint32_t)attrs->format;
+    tempAttrParam = static_cast<uint32_t>(attrs->format);
     if (!HdfSbufWriteUint32(reply, tempAttrParam)) {
         return HDF_FAILURE;
     }
@@ -175,11 +175,11 @@ int32_t WriteAudioSampleAttributes(struct HdfSBuf *reply, const struct AudioSamp
     if (!HdfSbufWriteUint32(reply, attrs->frameSize)) {
         return HDF_FAILURE;
     }
-    tempAttrParam = (uint32_t)(attrs->isBigEndian);
+    tempAttrParam = static_cast<uint32_t>(attrs->isBigEndian);
     if (!HdfSbufWriteUint32(reply, tempAttrParam)) {
         return HDF_FAILURE;
     }
-    tempAttrParam = (uint32_t)(attrs->isSignedData);
+    tempAttrParam = static_cast<uint32_t>(attrs->isSignedData);
     if (!HdfSbufWriteUint32(reply, tempAttrParam)) {
         return HDF_FAILURE;
     }
@@ -204,15 +204,15 @@ int32_t ReadAudioSapmleAttrbutes(struct HdfSBuf *data, struct AudioSampleAttribu
     if (!HdfSbufReadUint32(data, &tempAttrParam)) {
         return HDF_FAILURE;
     }
-    attrs->type = (AudioCategory)tempAttrParam;
+    attrs->type = static_cast<AudioCategory>(tempAttrParam);
     if (!HdfSbufReadUint32(data, &tempAttrParam)) {
         return HDF_FAILURE;
     }
-    attrs->interleaved = (bool)tempAttrParam;
+    attrs->interleaved = static_cast<bool>(tempAttrParam);
     if (!HdfSbufReadUint32(data, &tempAttrParam)) {
         return HDF_FAILURE;
     }
-    attrs->format = (AudioFormat)tempAttrParam;
+    attrs->format = static_cast<AudioFormat>(tempAttrParam);
     if (!HdfSbufReadUint32(data, &(attrs->sampleRate))) {
         return HDF_FAILURE;
     }
@@ -228,11 +228,11 @@ int32_t ReadAudioSapmleAttrbutes(struct HdfSBuf *data, struct AudioSampleAttribu
     if (!HdfSbufReadUint32(data, &tempAttrParam)) {
         return HDF_FAILURE;
     }
-    attrs->isBigEndian = (bool)tempAttrParam;
+    attrs->isBigEndian = static_cast<bool>(tempAttrParam);
     if (!HdfSbufReadUint32(data, &tempAttrParam)) {
         return HDF_FAILURE;
     }
-    attrs->isSignedData = (bool)tempAttrParam;
+    attrs->isSignedData = static_cast<bool>(tempAttrParam);
     if (!HdfSbufReadUint32(data, &(attrs->startThreshold))) {
         return HDF_FAILURE;
     }

@@ -597,7 +597,7 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRend
     }
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         HDF_LOGI("render not stop, first stop it.");
-        int ret = render->control.Stop((AudioHandle)render);
+        int ret = render->control.Stop(static_cast<AudioHandle>(render));
         if (ret < 0) {
             HDF_LOGE("render Stop failed");
         }

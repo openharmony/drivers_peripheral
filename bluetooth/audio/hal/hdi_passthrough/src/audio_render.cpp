@@ -37,7 +37,7 @@ int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uin
     if (frameSize == 0) {
         return HDF_FAILURE;
     }
-    *frameCount = (uint32_t)bytes / frameSize;
+    *frameCount = static_cast<uint32_t>(bytes) / frameSize;
     return HDF_SUCCESS;
 }
 
@@ -326,7 +326,8 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
         HDF_LOGE("Out of FRAME_DATA size!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t ret = memcpy_s(hwRender->renderParam.frameRenderMode.buffer, FRAME_DATA, frame, (uint32_t)requestBytes);
+    int32_t ret = memcpy_s(hwRender->renderParam.frameRenderMode.buffer, FRAME_DATA, frame,
+        static_cast<uint32_t>(requestBytes));
     if (ret != EOK) {
         HDF_LOGE("memcpy_s fail");
         return AUDIO_HAL_ERR_INTERNAL;
@@ -337,7 +338,7 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
     if (ret != AUDIO_HAL_SUCCESS) {
         return ret;
     }
-    hwRender->renderParam.frameRenderMode.bufferFrameSize = (uint64_t)frameCount;
+    hwRender->renderParam.frameRenderMode.bufferFrameSize = static_cast<uint64_t>(frameCount);
     if (AudioRenderRenderFramSplit(hwRender) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -412,10 +413,10 @@ int32_t SetValue(struct ExtraParams mExtraParams, struct AudioHwRender *render)
         return HDF_FAILURE;
     }
     if (mExtraParams.route != -1) {
-        render->renderParam.renderMode.hwInfo.pathroute = (PathRoute)mExtraParams.route;
+        render->renderParam.renderMode.hwInfo.pathroute = static_cast<PathRoute>(mExtraParams.route);
     }
     if (mExtraParams.format != -1) {
-        render->renderParam.frameRenderMode.attrs.format = (AudioFormat)mExtraParams.format;
+        render->renderParam.frameRenderMode.attrs.format = static_cast<AudioFormat>(mExtraParams.format);
     }
     if (mExtraParams.channels != 0) {
         render->renderParam.frameRenderMode.attrs.channelCount = mExtraParams.channels;
@@ -527,7 +528,7 @@ int32_t AudioRenderTurnStandbyMode(AudioHandle handle)
     if (render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    int32_t ret = AudioRenderStop((AudioHandle)render);
+    int32_t ret = AudioRenderStop(static_cast<AudioHandle>(render));
     if (ret < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }

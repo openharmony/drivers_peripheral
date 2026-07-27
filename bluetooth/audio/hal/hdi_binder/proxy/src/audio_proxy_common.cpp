@@ -77,7 +77,7 @@ int32_t AudioProxyPreprocessRender(struct AudioHwRender *render, struct HdfSBuf 
     if (hwRender == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
-    uint32_t renderPid = (uint32_t)getpid();
+    uint32_t renderPid = static_cast<uint32_t>(getpid());
     const char *adapterName = hwRender->renderParam.renderMode.hwInfo.adapterName;
     if (adapterName == NULL) {
         HDF_LOGE("adapterName is NULL");
@@ -136,13 +136,13 @@ int32_t AudioProxyWriteSampleAttributes(struct HdfSBuf *data, const struct Audio
     if (data == NULL || attrs == NULL) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)attrs->type)) {
+    if (!HdfSbufWriteUint32(data, static_cast<uint32_t>(attrs->type))) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)attrs->interleaved)) {
+    if (!HdfSbufWriteUint32(data, static_cast<uint32_t>(attrs->interleaved))) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)attrs->format)) {
+    if (!HdfSbufWriteUint32(data, static_cast<uint32_t>(attrs->format))) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, attrs->sampleRate)) {
@@ -157,10 +157,10 @@ int32_t AudioProxyWriteSampleAttributes(struct HdfSBuf *data, const struct Audio
     if (!HdfSbufWriteUint32(data, attrs->frameSize)) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(attrs->isBigEndian))) {
+    if (!HdfSbufWriteUint32(data, static_cast<uint32_t>(attrs->isBigEndian))) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(attrs->isSignedData))) {
+    if (!HdfSbufWriteUint32(data, static_cast<uint32_t>(attrs->isSignedData))) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, attrs->startThreshold)) {
@@ -184,17 +184,17 @@ int32_t AudioProxyReadSapmleAttrbutes(struct HdfSBuf *reply, struct AudioSampleA
     if (!HdfSbufReadUint32(reply, &tempType)) {
         return HDF_FAILURE;
     }
-    attrs->type = (AudioCategory)tempType;
+    attrs->type = static_cast<AudioCategory>(tempType);
     uint32_t tempInterleaved = 0;
     if (!HdfSbufReadUint32(reply, &tempInterleaved)) {
         return HDF_FAILURE;
     }
-    attrs->interleaved = (bool)tempInterleaved;
+    attrs->interleaved = static_cast<bool>(tempInterleaved);
     uint32_t tempFormat = 0;
     if (!HdfSbufReadUint32(reply, &tempFormat)) {
         return HDF_FAILURE;
     }
-    attrs->format = (AudioFormat)tempFormat;
+    attrs->format = static_cast<AudioFormat>(tempFormat);
     if (!HdfSbufReadUint32(reply, &attrs->sampleRate)) {
         return HDF_FAILURE;
     }
@@ -210,11 +210,11 @@ int32_t AudioProxyReadSapmleAttrbutes(struct HdfSBuf *reply, struct AudioSampleA
     if (!HdfSbufReadUint32(reply, &tempInterleaved)) {
         return HDF_FAILURE;
     }
-    attrs->isBigEndian = (bool)tempInterleaved;
+    attrs->isBigEndian = static_cast<bool>(tempInterleaved);
     if (!HdfSbufReadUint32(reply, &tempInterleaved)) {
         return HDF_FAILURE;
     }
-    attrs->isSignedData = (bool)tempInterleaved;
+    attrs->isSignedData = static_cast<bool>(tempInterleaved);
     if (!HdfSbufReadUint32(reply, &attrs->startThreshold)) {
         return HDF_FAILURE;
     }
@@ -251,7 +251,7 @@ int32_t AudioProxyCommonSetRenderCtrlParam(int cmId, AudioHandle handle, float p
     if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t tempParam = (uint32_t)param;
+    uint32_t tempParam = static_cast<uint32_t>(param);
     if (!HdfSbufWriteUint32(data, tempParam)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -288,9 +288,9 @@ int32_t AudioProxyCommonGetRenderCtrlParam(int cmId, AudioHandle handle, float *
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (cmId == AUDIO_HDI_RENDER_GET_VOLUME) {
-        *param = (float)tempParam / PROXY_VOLUME_CHANGE;
+        *param = static_cast<float>(tempParam) / PROXY_VOLUME_CHANGE;
     } else {
-        *param = (float)tempParam;
+        *param = static_cast<float>(tempParam);
     }
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
@@ -322,7 +322,7 @@ int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
     if (!HdfSbufWriteInt32(data, reqSize)) {
         return HDF_FAILURE;
     }
-    uint64_t memAddr = (uint64_t)(uintptr_t)desc->memoryAddress;
+    uint64_t memAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(desc->memoryAddress));
     if (!HdfSbufWriteUint64(data, memAddr)) {
         return HDF_FAILURE;
     }
