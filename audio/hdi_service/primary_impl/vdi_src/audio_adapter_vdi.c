@@ -199,7 +199,7 @@ static int32_t CheckSupport(struct IAudioAdapterVdi *vdiAdapter, const struct Au
         }
     }
     OsalMemFree((void *)vdiDesc.desc);
-    return HDF_SUCCESS;
+    return ret;
 }
 
 static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
