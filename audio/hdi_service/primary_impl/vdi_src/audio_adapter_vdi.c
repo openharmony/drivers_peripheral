@@ -188,8 +188,9 @@ static int32_t CheckSupport(struct IAudioAdapterVdi *vdiAdapter, const struct Au
         AUDIO_FUNC_LOGE("desc to vdiDesc fail");
         return HDF_FAILURE;
     }
+    int32_t ret = HDF_SUCCESS;
     if (vdiAdapter->CheckSupport != NULL) {
-        int32_t ret = vdiAdapter->CheckSupport(vdiAdapter, &vdiDesc);
+        ret = vdiAdapter->CheckSupport(vdiAdapter, &vdiDesc);
         if (ret == HDF_ERR_NOT_SUPPORT) {
             AUDIO_FUNC_LOGE("%{public}s not support, portId=%{public}u, pin=%{public}d, desc=%{public}s",
                 __func__, desc->portId, desc->pins, desc->desc);
