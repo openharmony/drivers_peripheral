@@ -130,7 +130,8 @@ void AudioProxyManagerUnloadAdapter(const struct AudioProxyManager *manager, con
         portNum = hwAdapter->adapterDescriptor.portNum;
         while (i < portNum) {
             if (&hwAdapter->portCapabilitys[i] != NULL) {
-                AudioMemFree((void **)&hwAdapter->portCapabilitys[i].capability.subPorts);
+                AudioMemFree(reinterpret_cast<void **>(const_cast<AudioSubPortCapability **>(
+                    &hwAdapter->portCapabilitys[i].capability.subPorts)));
             }
             i++;
         }

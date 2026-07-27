@@ -607,7 +607,7 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    char *frame = NULL;
+    const void *frame = NULL;
     uint32_t requestBytes;
     uint64_t replyBytes;
     struct AudioRender *render = NULL;
@@ -627,12 +627,12 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
         HDF_LOGE("%{public}s: AudioGetRenderStatus fail", __func__);
         return ret;
     }
-    if (!HdfSbufReadBuffer(data, (const void **)&frame, &requestBytes)) {
+    if (!HdfSbufReadBuffer(data, &frame, &requestBytes)) {
         HDF_LOGE("%{public}s: AudioAdapterListGetRender:HdfSbufReadBuffer fail", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     AudioSetRenderStatus(adapterName, true);
-    ret = render->RenderFrame(render, static_cast<const void *>(frame),
+    ret = render->RenderFrame(render, frame,
         static_cast<uint64_t>(requestBytes), &replyBytes);
     AudioSetRenderStatus(adapterName, false);
     HDF_LOGD("%{public}s,%{public}u,%{public}ju", __func__, requestBytes, replyBytes);
