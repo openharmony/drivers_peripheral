@@ -22,7 +22,7 @@
 #include "config.h"
 namespace OHOS::Camera {
 #ifdef __ARCH64__
-#define PIPELINE_CONFIG_LIB_PATH HDF_LIBRARY_DIR"64/libcamera_pipeline_config.z.so"
+#define PIPELINE_CONFIG_LIB_PATH HDF_LIBRARY_DIR"/libcamera_pipeline_config.z.so"
 #else
 #define PIPELINE_CONFIG_LIB_PATH HDF_LIBRARY_DIR"/libcamera_pipeline_config.z.so"
 #endif
