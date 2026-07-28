@@ -141,6 +141,38 @@ static int32_t CloseInputDevice(uint32_t devIndex)
     return INPUT_FAILURE;
 }
 
+#ifdef DRIVERS_PERIPHERAL_INPUT_FEATURE_HOTPLUG_SAFE_REMOVE
+static int32_t RemoveDisconnectedInputDevice(uint32_t devIndex)
+{
+    DeviceInfoNode *pos = NULL;
+    DeviceInfoNode *next = NULL;
+    InputDevManager *manager = NULL;
+
+    GET_MANAGER_CHECK_RETURN(manager);
+
+    pthread_mutex_lock(&manager->mutex);
+    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
+        if (pos->payload.devIndex != devIndex) {
+            continue;
+        }
+        /*
+         * The input driver already destroyed this device's vnode before
+         * delivering the offline event. Recycling pos->service here races
+         * with vnode teardown and can dereference a freed adapter.
+         */
+        DListRemove(&pos->node);
+        free(pos);
+        manager->attachedDevNum--;
+        pthread_mutex_unlock(&manager->mutex);
+        return INPUT_SUCCESS;
+    }
+
+    pthread_mutex_unlock(&manager->mutex);
+    HDF_LOGE("%s: device%u doesn't exist", __func__, devIndex);
+    return INPUT_FAILURE;
+}
+#endif
+
 static int32_t AddService(uint32_t index, const struct HdfIoService *service)
 {
     InputDevManager *manager = NULL;
@@ -288,6 +320,9 @@ static int32_t InstanceManagerHdi(InputManager **manager)
     managerHdi->ScanInputDevice = ScanInputDevice;
     managerHdi->OpenInputDevice = OpenInputDevice;
     managerHdi->CloseInputDevice = CloseInputDevice;
+#ifdef DRIVERS_PERIPHERAL_INPUT_FEATURE_HOTPLUG_SAFE_REMOVE
+    managerHdi->RemoveDisconnectedInputDevice = RemoveDisconnectedInputDevice;
+#endif
     managerHdi->GetInputDevice = GetInputDevice;
     managerHdi->GetInputDeviceList = GetInputDeviceList;
     *manager = managerHdi;

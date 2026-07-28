@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//drivers/peripheral/input/input.gni")
 INPUT_ROOT_DIR = "./.."
 
 if (defined(ohos_lite)) {
@@ -41,6 +42,9 @@ if (defined(ohos_lite)) {
       "hilog_lite:hilog_shared",
     ]
     defines = [ "__USER__" ]
+    if (drivers_peripheral_input_feature_hotplug_safe_remove) {
+      defines += [ "DRIVERS_PERIPHERAL_INPUT_FEATURE_HOTPLUG_SAFE_REMOVE" ]
+    }
 
     cflags = [
       "-Wall",
@@ -77,6 +81,9 @@ if (defined(ohos_lite)) {
     include_dirs = [ "$INPUT_ROOT_DIR/hal/include" ]
 
     defines = [ "__OHOS__USER__" ]
+    if (drivers_peripheral_input_feature_hotplug_safe_remove) {
+      defines += [ "DRIVERS_PERIPHERAL_INPUT_FEATURE_HOTPLUG_SAFE_REMOVE" ]
+    }
 
     cflags = [
       "-Wall",

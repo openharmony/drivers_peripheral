@@ -91,6 +91,22 @@ typedef struct {
      */
     int32_t (*CloseInputDevice)(uint32_t devIndex);
 
+#ifdef DRIVERS_PERIPHERAL_INPUT_FEATURE_HOTPLUG_SAFE_REMOVE
+    /**
+     * @brief Removes an input device whose HDF service has been disconnected.
+     *
+     * Unlike CloseInputDevice, this operation does not recycle the service
+     * because the service has already been removed by the input driver.
+     *
+     * @param devIndex Indicates the index of the disconnected input device.
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
+     * {@link RetStatus} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*RemoveDisconnectedInputDevice)(uint32_t devIndex);
+#endif
+
     /**
      * @brief Gets information about a specified input device.
      *
