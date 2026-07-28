@@ -290,7 +290,9 @@ typedef struct {
     LayerType type;             /**< Layer type, which can be a graphic layer, overlay layer, or sideband layer */
     int32_t bpp;                /**< Number of bits occupied by each pixel */
     PixelFormat pixFormat;      /**< Pixel format of the layer */
+#ifdef MEDIA_INTERFACE_V1_0
     int32_t fps;                /**< fps of the layer */
+#endif
 } LayerInfo;
 
 /**

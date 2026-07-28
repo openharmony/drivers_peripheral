@@ -192,8 +192,11 @@ int32_t FormatDemuxerPrepare(const FormatHandle handle);
  * @since 1.0
  * @version 1.0
  */
+#ifdef MEDIA_INTERFACE_V1_0
 int32_t FormatDemuxerGetFileInfo(const FormatHandle handle, FormatFileInfo *info);
-
+#else
+int32_t FormatDemuxerGetFileInfo(const FormatHandle handle, FileInfo *info);
+#endif
 /**
  * @brief Selects a specified media track.
  *

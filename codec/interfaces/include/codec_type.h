@@ -89,16 +89,8 @@ typedef enum {
     KEY_VIDEO_LEVEL,          /**< Codec level. The value type is uint32_t. */
 
     KEY_SAMPLE_RATE = 0x1500,
-    KEY_AUDIO_PROFILE,        /**< Audio encoding profile. The value type is uint32_t. */
-    KEY_CHANNEL_COUNT,        /**< Number of channels. The value type is uint32_t. */
-    KEY_BITWITH,              /**< Bit width. For the value type, see {@link AudioBitWidth}. */
-    KEY_SOUND_MODE,           /**< Audio channel mode. For the value type, see {@link AudioSoundMode}. */
-    KEY_POINT_NUM_PER_FRAME,  /**< Number of sampling points per frame. The value type is uint32_t. */
-    KEY_DEBREATHE_EFFECT,     /**< DeBreathe Effect. The value type is uint32_t. */
-    KEY_VIDEO_DST_FRAME_RATE,
-    KEY_REF_FRAME_NUM,        /**< DeBreathe Effect. The value type is uint32_t. */
-    KEY_ADEC_CACHE_FRAME_NUM, /**< DeBreathe Effect. The value type is uint32_t. */
     KEY_AUDIO_SAMPLE_RATE,    /**< Sampling rate. The value type is uint32_t. */
+    KEY_AUDIO_PROFILE,        /**< Audio encoding profile. The value type is uint32_t. */
     KEY_AUDIO_CHANNEL_COUNT,  /**< Number of channels. The value type is uint32_t. */
     KEY_AUDIO_SOUND_MODE,     /**< Audio channel mode. For the value type, see {@link AudioSoundMode}. */
     KEY_AUDIO_POINTS_PER_FRAME,  /**< Number of sampling points per frame. The value type is uint32_t. */
@@ -193,7 +185,7 @@ typedef void *ValueType;
  * by {@link CodecCreate} and {@link CodecSetParameter}.
  */
 typedef struct {
-    ParamKey  key;    /**< Parameter type index */
+    ParamKey  key;  /**< Parameter type index */
     void      *val; /**< Pointer to the parameter value */
     int       size; /**< Parameter value size */
 } Param;
@@ -278,18 +270,11 @@ typedef enum {
  * @brief Describes buffer information.
  */
 typedef struct {
-    BufferType type;          /**< Buffer type */
-    /**
-     * @brief Describes the buffer address.
-     */
-    union {
-        uint8_t       *addr;  /**< Virtual address */
-        int32_t       fd;     /**< File descriptor */
-        CodecBufferHandle  handle; /**< Data handle. For details, see {@link CodecBufferHandle} */
-    };
-    uint32_t offset;          /**< Buffer offset */
-    uint32_t length;          /**< Length of valid data */
-    uint32_t size;            /**< Total size of buffer blocks*/
+    BufferType type;   /**< Buffer type */
+    intptr_t buf;      /**< A reference to a data buffer */
+    uint32_t offset;   /**< Buffer offset */
+    uint32_t length;   /**< Length of valid data */
+    uint32_t capacity; /**< Total size of buffer blocks*/
 } CodecBufferInfo;
 
 /**
@@ -315,17 +300,6 @@ typedef struct {
 } OutputInfo;
 
 /**
- * @brief Describes buffer information.
- */
-typedef struct {
-    BufferType type;   /**< Buffer type */
-    intptr_t buf;      /**< A reference to a data buffer */
-    uint32_t offset;   /**< Buffer offset */
-    uint32_t length;   /**< Length of valid data */
-    uint32_t capacity; /**< Total size of buffer blocks*/
-} CodecBuffersInfo;
-
-/**
  * @brief Describes input and output codec buffer.
  */
 typedef struct {
@@ -333,7 +307,7 @@ typedef struct {
     int64_t timeStamp;    /**< buffer timestamp */
     uint32_t flag;        /**< buffer flag. For details, see {@link StreamFlagType}. */
     uint32_t bufferCnt;   /**< Number of buffers */
-    CodecBuffersInfo buffer[0]; /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo} */
+    CodecBufferInfo buffer[0]; /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo} */
 } CodecBuffer;
 
 /**
