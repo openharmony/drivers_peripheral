@@ -434,7 +434,7 @@ int32_t AudioOutputRenderHwParams(
     }
 #ifdef AUDIO_HAL_P7885
     ret = renderIns->SetParams(renderIns, handleData);
-#elif
+#else
     ret = RenderSetParams(renderIns, handleData);
 #endif
     if (ret != HDF_SUCCESS) {
