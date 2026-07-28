@@ -502,7 +502,8 @@ int32_t AudioCommonFrameInfoToVdiFrameInfoVdi(const struct AudioFrameLen *frameL
     CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frameInfoVdi, HDF_ERR_INVALID_PARAM);
 
-    if (frameLen->frameLen <= 0 || frameLen->frameEcLen <= 0) {
+    if (frameLen->frameLen <= 0 || frameLen->frameEcLen <= 0 || frameLen->frameLen > AUDIO_FRAME_LEN_MAX ||
+        frameLen->frameEcLen > AUDIO_FRAME_LEN_MAX) {
         AUDIO_FUNC_LOGE("frameLen len err, frameLen = [%{public}u], frameEcLen = [%{public}u]",
             frameLen->frameLen, frameLen->frameEcLen);
         return HDF_ERR_INVALID_PARAM;
