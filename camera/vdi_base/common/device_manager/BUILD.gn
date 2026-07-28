@@ -49,6 +49,12 @@ config("device_manager_config") {
 }
 
 ohos_shared_library("peripheral_camera_device_manager") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [
     "$camera_path/adapter/platform/v4l2/src/device_manager/enumerator_manager.cpp",
     "$camera_path/adapter/platform/v4l2/src/device_manager/flash_controller.cpp",

@@ -97,6 +97,12 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("ohos_camera_demo") {
+    branch_protector_ret = "pac_ret"
+    sanitize = {
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+    }
     install_enable = false
     sources = [
       "./demo_main.cpp",
