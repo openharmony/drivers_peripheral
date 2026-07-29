@@ -366,6 +366,16 @@ int32_t TestSetLayerPerFrameParameter(uint32_t devId, uint32_t layerId)
     return ret;
 }
 
+int32_t TestGetLayerColor(uint32_t devId, uint32_t layerId)
+{
+    LayerColor color = {0, 0, 0, 0};
+    int32_t ret = g_composerInterface->GetLayerColor(devId, layerId, color);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t, uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -382,7 +392,8 @@ TestFuncs g_testFuncs = {
     TestSetLayerBlendType,
     TestSetLayerColor,
     TestSetLayerPerFrameParameter,
-    TestSetLayerMaskInfo
+    TestSetLayerMaskInfo,
+    TestGetLayerColor
 };
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
