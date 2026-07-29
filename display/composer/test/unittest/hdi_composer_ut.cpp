@@ -1295,6 +1295,29 @@ HWTEST_F(DeviceTest, test_SetDisplayColorGamut, TestSize.Level1)
     EXPECT_EQ(DISPLAY_FAILURE, result);
 }
 
+HWTEST_F(DeviceTest, test_GetLayerColor, TestSize.Level1)
+{
+    std::vector<LayerSettings> settings = {
+        {
+            .rectRatio = {0, 0, 1.0f, 1.0f},
+            .color = BLUE
+        }
+    };
+
+    std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+    ASSERT_TRUE((layers.size() > 0));
+
+    auto layer = layers[0];
+
+    int32_t result = DISPLAY_FAILURE;
+    LayerColor color = {0, 0, 0, 0};
+    auto ret = g_composerDevice->GetLayerColor(
+        g_displayIds[0], layer->GetId(), color);
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        result = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, result);
+}
 HWTEST_F(DeviceTest, test_GetDisplayVCPFeature, TestSize.Level1)
 {
     int32_t result = DISPLAY_FAILURE;
