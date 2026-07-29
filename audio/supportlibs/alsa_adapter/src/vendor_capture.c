@@ -48,6 +48,14 @@ static int32_t CaptureInitImpl(struct AlsaCapture* captureIns)
     return HDF_SUCCESS;
 }
 
+#ifdef AUDIO_HAL_P7885
+static int32_t CaptureSelectSceneImpl(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData)
+{
+    CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
+    captureIns->descPins = descPins;
+    return HDF_SUCCESS;
+}
+#else
 static int32_t CaptureSelectSceneImpl(struct AlsaCapture *captureIns, enum AudioPortPin descPins,
     const struct PathDeviceInfo *deviceInfo)
 {
@@ -55,6 +63,7 @@ static int32_t CaptureSelectSceneImpl(struct AlsaCapture *captureIns, enum Audio
     captureIns->descPins = descPins;
     return HDF_SUCCESS;
 }
+#endif
 
 static int32_t CaptureGetVolThresholdImpl(struct AlsaCapture *captureIns, long *volMin, long *volMax)
 {
@@ -159,10 +168,17 @@ static int32_t CaptureSetMuteImpl(struct AlsaCapture *captureIns, bool muteFlag)
     return HDF_SUCCESS;
 }
 
+#ifdef AUDIO_HAL_P7885
+static int32_t CaptureStartImpl(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData)
+{
+    return HDF_SUCCESS;
+}
+#else
 static int32_t CaptureStartImpl(struct AlsaCapture *captureIns)
 {
     return HDF_SUCCESS;
 }
+#endif
 
 static int32_t CaptureStopImpl(struct AlsaCapture *captureIns)
 {

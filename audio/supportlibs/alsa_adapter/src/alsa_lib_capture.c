@@ -16,6 +16,7 @@
 #include "alsa_lib_capture.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_CAPTURE
+pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int32_t AudioCtlCaptureSetPauseStu(
     const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
@@ -166,7 +167,11 @@ int32_t AudioCtlCaptureSceneSelect(
 
     descPins = handleData->captureMode.hwInfo.deviceDescript.pins;
     deviceInfo = &handleData->captureMode.hwInfo.pathSelect.deviceInfo;
+#ifdef AUDIO_HAL_P7885
+    ret = captureIns->SelectScene(captureIns, handleData);
+#else
     ret = captureIns->SelectScene(captureIns, descPins, deviceInfo);
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture select scene pin: (0x%{public}x) failed", descPins);
         return HDF_FAILURE;
@@ -275,13 +280,19 @@ int32_t AudioOutputCaptureHwParams(
 
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
+    CHECK_NULL_PTR_RETURN_DEFAULT(captureIns->soundCard.pcmHandle);
 
     if (SndGetRunState(&captureIns->soundCard) >= SND_PCM_STATE_RUNNING) {
         AUDIO_FUNC_LOGE("Unable to set parameters during playback!");
         return HDF_FAILURE;
     }
 
+    AUDIO_FUNC_LOGI("AudioOutputCaptureHwParams SetParams begin.");
+#ifdef AUDIO_HAL_P7885
+    ret = captureIns->SetParams(captureIns, handleData);
+#else
     ret = CaptureSetParams(captureIns, handleData);
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture set parameters failed!");
         return HDF_FAILURE;
@@ -301,8 +312,14 @@ int32_t AudioOutputCaptureOpen(
     int32_t ret;
     struct AlsaCapture *captureIns = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
-
+#ifdef AUDIO_HAL_P7885
+    enum AudioCategory scene;
+    scene = handleData->frameCaptureMode.attrs.type;
+    AUDIO_FUNC_LOGI("AudioOutputCaptureOpen scene:%{public}d.", scene);
+    captureIns = CaptureCreateInstance(handleData->captureMode.hwInfo.adapterName, scene);
+#else
     captureIns = CaptureCreateInstance(handleData->captureMode.hwInfo.adapterName);
+#endif
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
 
     ret = captureIns->Open(captureIns);
@@ -369,8 +386,11 @@ int32_t AudioOutputCaptureStart(
 
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
-
+#ifdef AUDIO_HAL_P7885
+    ret = captureIns->Start(captureIns, handleData);
+#else
     ret = captureIns->Start(captureIns);
+#endif
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture start failed!");
         return ret;
@@ -455,13 +475,19 @@ int32_t AudioInterfaceLibOutputCapture(
 
     switch (cmdId) {
         case AUDIO_DRV_PCM_IOCTL_HW_PARAMS:
+            pthread_mutex_lock(&g_mutex);
             ret = AudioOutputCaptureHwParams(handle, cmdId, handleData);
+            pthread_mutex_unlock(&g_mutex);
             break;
         case AUDIO_DRV_PCM_IOCTL_READ:
+            pthread_mutex_lock(&g_mutex);
             ret = AudioOutputCaptureRead(handle, cmdId, handleData);
+            pthread_mutex_unlock(&g_mutex);
             break;
         case AUDIO_DRV_PCM_IOCTRL_START_CAPTURE:
+            pthread_mutex_lock(&g_mutex);
             ret = AudioOutputCaptureStart(handle, cmdId, handleData);
+            pthread_mutex_unlock(&g_mutex);
             break;
         case AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE:
             ret = AudioOutputCapturePrepare(handle, cmdId, handleData);
@@ -473,7 +499,9 @@ int32_t AudioInterfaceLibOutputCapture(
             ret = AudioOutputCaptureOpen(handle, cmdId, handleData);
             break;
         case AUDIO_DRV_PCM_IOCTRL_STOP_CAPTURE:
+            pthread_mutex_lock(&g_mutex);
             ret = AudioOutputCaptureStop(handle, cmdId, handleData);
+            pthread_mutex_unlock(&g_mutex);
             break;
         case AUDIODRV_CTL_IOCTL_PAUSE_WRITE_CAPTURE:
             ret = AudioCtlCaptureSetPauseStu(handle, cmdId, handleData);

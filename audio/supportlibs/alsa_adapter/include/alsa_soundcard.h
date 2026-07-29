@@ -68,7 +68,11 @@ enum SndIfaceType {
 struct AlsaMixerCtlElement {
     unsigned int numid;
     enum SndIfaceType iface;
+#ifdef AUDIO_HAL_P7885
+    const char *name;
+#else
     char *name;
+#endif
     char *value;
     unsigned int index;
     unsigned int device;
@@ -110,7 +114,11 @@ struct HdfIoService *HdfIoServiceBindName(const char *serviceName);
 int32_t SndMatchSelAdapter(struct AlsaSoundCard *cardIns, const char *adapterName);
 int32_t SndConverAlsaPcmFormat(const struct AudioPcmHwParams *hwParams,
     snd_pcm_format_t *alsaPcmFormat);
+#ifdef AUDIO_HAL_P7885
+int32_t SndSaveCardListInfo(snd_pcm_stream_t stream, int32_t device);
+#else
 int32_t SndSaveCardListInfo(snd_pcm_stream_t stream);
+#endif
 bool  SndisBusy(struct AlsaSoundCard *cardIns);
 int32_t SndOpenMixer(struct AlsaSoundCard *cardIns);
 int32_t SndPcmPrepare(struct AlsaSoundCard *cardIns);

@@ -48,6 +48,14 @@ static int32_t RenderInitImpl(struct AlsaRender *renderIns)
     return HDF_SUCCESS;
 }
 
+#ifdef AUDIO_HAL_P7885
+static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData)
+{
+    CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
+    renderIns->descPins = handleData->renderMode.hwInfo.deviceDescript.pins;
+    return HDF_SUCCESS;
+}
+#else
 static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, enum AudioPortPin descPins,
     const struct PathDeviceInfo *deviceInfo)
 {
@@ -55,6 +63,7 @@ static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, enum AudioPor
     renderIns->descPins = descPins;
     return HDF_SUCCESS;
 }
+#endif
 
 static int32_t RenderGetVolThresholdImpl(struct AlsaRender *renderIns, long *volMin, long *volMax)
 {
@@ -169,10 +178,17 @@ static int32_t RenderSetMuteImpl(struct AlsaRender *renderIns, bool muteFlag)
     return HDF_SUCCESS;
 }
 
+#ifdef AUDIO_HAL_P7885
+static int32_t RenderStartImpl(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData)
+{
+    return HDF_SUCCESS;
+}
+#else
 static int32_t RenderStartImpl(struct AlsaRender *renderIns)
 {
     return HDF_SUCCESS;
 }
+#endif
 
 static int32_t RenderStopImpl(struct AlsaRender *renderIns)
 {

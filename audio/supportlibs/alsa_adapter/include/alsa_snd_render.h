@@ -38,9 +38,21 @@ struct AlsaRender {
 
     /* render scene */
     int32_t (*Init)(struct AlsaRender*);
+#ifdef AUDIO_HAL_P7885
+    int32_t (*SelectScene)(struct AlsaRender *, const struct AudioHwRenderParam *);
+    int32_t (*Start)(struct AlsaRender *, const struct AudioHwRenderParam *);
+    /* call operation */
+    int32_t (*SetParams)(struct AlsaRender *, const struct AudioHwRenderParam *);
+    int32_t (*SetTurning)();
+    int32_t (*ReadFromVoice)(struct AlsaRender *, const char *);
+    int32_t (*CloseVoice)(struct AlsaRender *);
+    int32_t (*SetVoiceVolume)(struct AlsaRender *, float);
+    int32_t (*UpdateRouter)(struct AlsaRender *, const struct AudioHwRenderParam *);
+#else
     int32_t (*SelectScene)(struct AlsaRender *, enum AudioPortPin, const struct PathDeviceInfo *);
-    int32_t (*Open)(struct AlsaRender *);
     int32_t (*Start)(struct AlsaRender *);
+#endif
+    int32_t (*Open)(struct AlsaRender *);
     int32_t (*Stop)(struct AlsaRender *);
     int32_t (*Close)(struct AlsaRender *);
     int32_t (*Write)(struct AlsaRender *, const struct AudioHwRenderParam *);
@@ -68,10 +80,14 @@ struct AlsaRender {
     /* set pause or resume state */
     int32_t (*SetPauseState)(struct AlsaRender *, bool);
 };
-
+#ifdef AUDIO_HAL_P7885
+struct AlsaRender *RenderCreateInstance(const char* adapterName, enum AudioCategory scene);
+int32_t RenderGetSceneDev(enum AudioCategory scene);
+#else
 struct AlsaRender *RenderCreateInstance(const char* adapterName);
-struct AlsaRender *RenderGetInstance(const char *adapterName);
 int32_t RenderSetParams(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData);
+#endif
+struct AlsaRender *RenderGetInstance(const char *adapterName);
 void  RenderSetPriData(struct AlsaRender *renderIns, RenderPriData data);
 RenderPriData RenderGetPriData(struct AlsaRender *renderIns);
 
