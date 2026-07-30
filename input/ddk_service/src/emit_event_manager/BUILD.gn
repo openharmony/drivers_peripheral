@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 import("./../../../input.gni")
 
 ohos_shared_library("emit_event_manager") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "emit_event_manager.cpp",
     "inject_thread.cpp",

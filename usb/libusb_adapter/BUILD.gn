@@ -29,7 +29,7 @@ ohos_shared_library("libusb_adapter") {
     "./include",
     "${usb_driver_path}/utils/include",
   ]
-
+  branch_protector_ret = "pac_ret"
   sources = [ "src/libusb_adapter.cpp" ]
   version_script = "libusb_adapter.map"
 
