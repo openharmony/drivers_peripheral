@@ -214,12 +214,15 @@ int32_t UsbPortImpl::BindUsbdPortSubscriber(const sptr<IUsbdSubscriber> &subscri
             subscribers_[i].deathRecipient = new UsbPortImpl::UsbDeathRecipient(subscriber);
             if (subscribers_[i].deathRecipient == nullptr) {
                 HDF_LOGE("%{public}s: new deathRecipient failed", __func__);
+                subscribers_[i].subscriber == nullptr;
                 return HDF_FAILURE;
             }
             bool result = subscribers_[i].remote->AddDeathRecipient(
                 static_cast<UsbDeathRecipient *>(subscribers_[i].deathRecipient));
             if (!result) {
                 HDF_LOGE("%{public}s:AddUsbDeathRecipient failed", __func__);
+                subscribers_[i].deathRecipient = nullptr;
+                subscribers_[i].subscriber == nullptr;
                 return HDF_FAILURE;
             }
 
