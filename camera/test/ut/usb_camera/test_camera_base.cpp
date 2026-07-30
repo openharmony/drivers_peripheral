@@ -432,6 +432,20 @@ void TestCameraBase::UsbInit()
     } else {
         std::cout << "==========[test log] SetCallback success." << std::endl;
     }
+    cameraHost->GetCameraIds(cameraIds);
+    for (const auto &cameraId : cameraIds) {
+        usbCameraExit = false;
+        std::shared_ptr<CameraAbility> ability_ = GetCameraAbility();
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &entry);
+        if (entry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+            usbCameraExit = true;
+            break;
+        } else {
+            usbCameraExit = false;
+        }
+    }
 }
 
 std::shared_ptr<CameraAbility> TestCameraBase::GetCameraAbility()
