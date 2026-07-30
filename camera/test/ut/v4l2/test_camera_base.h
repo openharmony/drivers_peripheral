@@ -173,6 +173,7 @@ public:
     void PrintFaceDetectInfo(const unsigned char *bufStart, const uint32_t size) const;
     void CloseFd();
     int videoFd_ = -1;
+    bool usbCameraExit = false;
 };
 
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
