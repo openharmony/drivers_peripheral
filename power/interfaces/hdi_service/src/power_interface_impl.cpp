@@ -45,6 +45,9 @@
 #ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_S4
 #include "hibernate.h"
 #endif
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+#include "parameters.h"
+#endif
 
 namespace OHOS {
 namespace HDI {
@@ -93,6 +96,7 @@ bool g_isHdiStart = false;
 #ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
 static constexpr const char * const WAKEUP_TAG_NONE = "";
 static constexpr const int32_t MAX_RETRY_COUNT = 5;
+static constexpr const char * const ULSR_RESULT_PARAM = "persist.hdi_power.ulsr_result";
 static constexpr int32_t g_ulsr_loop = 0;
 static std::string g_suspendTag = WAKEUP_TAG_NONE;
 static std::string g_wakeupTag = WAKEUP_TAG_NONE;
@@ -237,6 +241,9 @@ int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag)
     HDF_LOGI("Set suspend tag: %{public}s", tag.c_str());
     g_suspendTag = tag;
     g_ulsr_loop = 0;
+    if (tag == "ulsr" || tag == "") {
+        OHOS::system::SetParameter(ULSR_RESULT_PARAM, "");
+    }
     return HDF_SUCCESS;
 }
 
@@ -298,7 +305,11 @@ int32_t DoSuspendWithTag()
         if (g_ulsr_loop >= MAX_RETRY_COUNT) {
             HDF_LOGE("DoSuspendWithTag fail: %{public}s", g_suspendTagWrite.c_str());
             g_suspendTag.clear();
+            g_wakeupTag = g_suspendTagWrite;
             waitTime_ = DEFAULT_WAIT_TIME;
+            if (g_suspendTagWrite == "ulsr") {
+                OHOS::system::SetParameter(ULSR_RESULT_PARAM, "fail");
+            }
             return HDF_FAILURE;
         }
         return HDF_SUCCESS;
@@ -307,6 +318,9 @@ int32_t DoSuspendWithTag()
     g_suspendTag.clear();
     g_wakeupTag = g_suspendTagWrite;
     waitTime_ = DEFAULT_WAIT_TIME;
+    if (g_suspendTagWrite == "ulsr") {
+        OHOS::system::SetParameter(ULSR_RESULT_PARAM, "success");
+    }
     return HDF_SUCCESS;
 }
 #else
