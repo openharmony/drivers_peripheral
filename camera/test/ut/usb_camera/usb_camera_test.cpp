@@ -105,7 +105,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0002)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0003)
 {
-    if (!g_usbCameraExit) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     ability_ = cameraBase_->GetCameraAbility();
@@ -357,7 +357,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0012)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0013)
 {
-    if (!g_usbCameraExit) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     ability_ = cameraBase_->GetCameraAbility();
@@ -421,7 +421,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0015)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0016)
 {
-    if (!g_usbCameraExit) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     ability_ = cameraBase_->GetCameraAbility();
@@ -957,7 +957,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0029)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0030)
 {
-    if (!g_usbCameraExit) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     ability_ = cameraBase_->GetCameraAbility();
@@ -1477,7 +1477,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0046)
     // 1:number of connected cameras
     g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
-        if (!g_usbCameraExit) {
+        if (!cameraBase_->usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
         }
         ability_ = cameraBase_->GetCameraAbilityById(usbCameraIds[i]);
@@ -1574,7 +1574,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0049)
     // 1:number of connected cameras
     g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
-        if (!g_usbCameraExit) {
+        if (!cameraBase_->usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
         }
         ability_ = cameraBase_->GetCameraAbilityById(usbCameraIds[i]);
@@ -1603,7 +1603,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0050)
     // 1:number of connected cameras
     g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
-        if (!g_usbCameraExit) {
+        if (!cameraBase_->usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
         }
         ability_ = cameraBase_->GetCameraAbilityById(usbCameraIds[i]);
@@ -1632,7 +1632,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0051)
     // 1:number of connected cameras
     g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
-        if (!g_usbCameraExit) {
+        if (!cameraBase_->usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
         }
         ability_ = cameraBase_->GetCameraAbilityById(usbCameraIds[i]);
@@ -1661,7 +1661,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0052)
     // 1:number of connected cameras
     g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
-        if (!g_usbCameraExit) {
+        if (!cameraBase_->usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
         }
         ability_ = cameraBase_->GetCameraAbilityById(usbCameraIds[i]);
