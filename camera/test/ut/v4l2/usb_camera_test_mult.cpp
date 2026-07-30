@@ -318,7 +318,7 @@ TEST_F(UtestUSBCameraTestMult, camera_usb_mult_0001)
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
     // 1:number of connected cameras
     usbCameraExit_ = usbCameraIds.size() > 1;
-    if (!usbCameraExit_) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[0]); // 0:first camera id
@@ -354,7 +354,7 @@ TEST_F(UtestUSBCameraTestMult, camera_usb_mult_0002)
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
     // 1:number of connected cameras
     usbCameraExit_ = usbCameraIds.size() > 1;
-    if (!usbCameraExit_) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[0]); // 0:first camera id
@@ -392,7 +392,7 @@ TEST_F(UtestUSBCameraTestMult, camera_usb_mult_0003)
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
     // 1:number of connected cameras
     usbCameraExit_ = usbCameraIds.size() > 1;
-    if (!usbCameraExit_) {
+    if (!cameraBase_->usbCameraExit) {
         GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[0]); // 0:first camera id
