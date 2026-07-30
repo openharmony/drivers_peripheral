@@ -86,6 +86,10 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
         srcBufferInfo.width, srcBufferInfo.height, srcAVFmt,
         dstBufferInfo.width, dstBufferInfo.height, dstAVFmt,
         SWS_BILINEAR, 0, 0, 0);
+    if (imgCtx == nullptr) {
+        CAMERA_LOGE("ImageFormatConvert Error imgCtx == nullptr");
+        return INVALID_ARGUMENT;
+    }
 
     auto ret = sws_scale(imgCtx, pFrameSrc->data, pFrameSrc->linesize, 0, srcBufferInfo.height,
         pFrameDst->data, pFrameDst->linesize);
