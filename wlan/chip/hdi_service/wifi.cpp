@@ -76,7 +76,11 @@ Wifi::~Wifi()
 int32_t Wifi::RegisterWifiEventCallback(const sptr<IChipControllerCallback>& eventCallback)
 {
     if (cbHandler_.GetCallbacks().empty()) {
-        AddWifiDeathRecipient(eventCallback);
+        int32_t ret = AddWifiDeathRecipient(eventCallback);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("RegisterWifiEventCallback: AddWifiDeathRecipient failed, not adding callback");
+            return HDF_FAILURE;
+        }
     }
 
     if (!cbHandler_.AddCallback(eventCallback)) {
