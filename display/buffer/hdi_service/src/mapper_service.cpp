@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -144,7 +144,7 @@ int32_t MapperService::Unmap(const sptr<NativeBuffer>& handle)
     BufferHandle* buffer = handle->GetBufferHandle();
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     int32_t ret = vdiImpl_->Unmap(*buffer);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGD(" fail"));
     return ret;
 }
 
@@ -157,7 +157,7 @@ int32_t MapperService::FlushCache(const sptr<NativeBuffer>& handle)
     BufferHandle* buffer = handle->GetBufferHandle();
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     int32_t ret = vdiImpl_->FlushCache(*buffer);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGD(" fail"));
     return ret;
 }
 
@@ -170,7 +170,7 @@ int32_t MapperService::InvalidateCache(const sptr<NativeBuffer>& handle)
     BufferHandle* buffer = handle->GetBufferHandle();
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     int32_t ret = vdiImpl_->InvalidateCache(*buffer);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGD(" fail"));
     return ret;
 }
 
@@ -182,7 +182,7 @@ int32_t MapperService::GetImageLayout(const sptr<NativeBuffer>& handle, V1_2::Im
     BufferHandle* buffer = handle->GetBufferHandle();
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetImageLayout(*buffer, layout);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGD(" fail"));
     return ret;
 }
 
