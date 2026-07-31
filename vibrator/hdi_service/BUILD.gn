@@ -28,10 +28,12 @@ if (defined(ohos_lite)) {
   }
 
   ohos_static_library("libvibrator_vdi_config") {
+    branch_protector_ret = "pac_ret"
     public_configs = [ ":vibrator_vdi_config" ]
   }
 
   ohos_shared_library("libvibrator_interface_service_1.3") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [
       "../interfaces/include/",
       ".",
@@ -76,6 +78,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("libvibrator_driver_1.3") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [
       "../interfaces/include/",
       "../utils/include",

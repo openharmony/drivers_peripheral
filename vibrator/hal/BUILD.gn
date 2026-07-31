@@ -21,6 +21,7 @@ if (defined(ohos_lite)) {
     include_dirs = []
   }
   ohos_shared_library("hdi_vibrator") {
+    branch_protector_ret = "pac_ret"
     output_extension = "z.so"
     public_configs = [ ":libhdi_vibrator_pub_config" ]
     sources = [ "src/vibrator_controller.c" ]
@@ -53,6 +54,7 @@ if (defined(ohos_lite)) {
     include_dirs = [ "../interfaces/include" ]
   }
   ohos_shared_library("hdi_vibrator") {
+    branch_protector_ret = "pac_ret"
     public_configs = [ ":libhdi_vibrator_pub_config" ]
     sources = [ "src/vibrator_controller.c" ]
 

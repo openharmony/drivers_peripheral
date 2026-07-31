@@ -17,6 +17,7 @@ import("$hdf_audio_path/audio.gni")
 
 if (!defined(ohos_lite)) {
   ohos_shared_library("mock_effect_lib") {
+    branch_protector_ret = "pac_ret"
     sources = [ "mock_effect_lib.c" ]
 
     include_dirs = [

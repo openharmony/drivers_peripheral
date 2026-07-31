@@ -21,6 +21,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("hdi_sensor") {
+    branch_protector_ret = "pac_ret"
     output_extension = "z.so"
     public_configs = [ ":libhdi_sensor_pub_config" ]
     sources = [
@@ -64,6 +65,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("hdi_sensor") {
+    branch_protector_ret = "pac_ret"
     public_configs = [ ":libhdi_sensor_pub_config" ]
     sources = [
       "src/sensor_channel.c",

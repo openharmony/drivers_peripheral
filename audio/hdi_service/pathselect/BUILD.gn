@@ -17,6 +17,7 @@ import("//build/ohos.gni")
 import("$hdf_audio_path/audio.gni")
 
 ohos_shared_library("audio_path_select") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "$hdf_audio_path/hal/pathselect/src/audio_pathselect.c",
     "$hdf_hdi_service_path/primary_impl/src/audio_common.c",

@@ -37,6 +37,7 @@ config("drivers_peripheral_audio_header") {
 }
 
 ohos_static_library("libaudio_header_static") {
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":drivers_peripheral_audio_header" ]
 
   part_name = "drivers_peripheral_audio"

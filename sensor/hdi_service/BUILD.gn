@@ -22,10 +22,12 @@ config("sensor_vdi_config") {
 }
 
 ohos_static_library("libsensor_vdi_config") {
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":sensor_vdi_config" ]
 }
 
 ohos_shared_library("libsensor_interface_service_2.1") {
+  branch_protector_ret = "pac_ret"
   defines = []
   if (build_variant == "root") {
     defines += [ "SENSOR_DEBUG" ]
@@ -81,6 +83,7 @@ ohos_shared_library("libsensor_interface_service_2.1") {
 }
 
 ohos_shared_library("libsensor_driver_2.1") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "../interfaces/include/",
     "../utils/include",

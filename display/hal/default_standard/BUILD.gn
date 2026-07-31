@@ -21,6 +21,7 @@ group("display_group") {
 }
 
 ohos_shared_library("def_display_gralloc") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "src/display_gralloc/allocator.cpp",
     "src/display_gralloc/allocator_manager.cpp",
@@ -64,6 +65,7 @@ config("def_display_device_pub_config") {
 }
 
 ohos_shared_library("def_display_device") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "src/display_device/composer/hdi_composer.cpp",
     "src/display_device/composer/hdi_gfx_composition.cpp",
@@ -127,6 +129,7 @@ ohos_shared_library("def_display_device") {
 }
 
 ohos_shared_library("def_display_layer_video") {
+  branch_protector_ret = "pac_ret"
   sources = [ "src/display_layer_video/display_layer_video.cpp" ]
   public_configs = [ ":def_display_device_pub_config" ]
 

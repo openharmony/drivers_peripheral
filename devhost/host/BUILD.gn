@@ -19,6 +19,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_executable("hdf_devhost") {
+    branch_protector_ret = "pac_ret"
 
     sources = [ "devhost.c" ]
 

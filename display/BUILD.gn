@@ -26,14 +26,17 @@ config("gralloc_client_public_config") {
 }
 
 ohos_static_library("display_buffer_vdi_config") {
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":buffer_vdi_config" ]
 }
 
 ohos_static_library("display_composer_vdi_config") {
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":composer_vdi_config" ]
 }
 
 ohos_static_library("hdi_gralloc_client") {
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":gralloc_client_public_config" ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"

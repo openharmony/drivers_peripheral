@@ -19,10 +19,12 @@ config("motion_vdi_config") {
 }
 
 ohos_static_library("libmotion_vdi_config") {
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":motion_vdi_config" ]
 }
 
 ohos_shared_library("libmotion_interface_service_1.1") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     ".",
     "../interfaces/v1_0",
@@ -64,6 +66,7 @@ ohos_shared_library("libmotion_interface_service_1.1") {
 }
 
 ohos_shared_library("libmotion_driver") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [ "../utils/include" ]
   sources = [ "motion_if_driver.cpp" ]
 

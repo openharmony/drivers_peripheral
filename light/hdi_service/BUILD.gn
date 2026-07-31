@@ -22,10 +22,12 @@ config("light_vdi_config") {
 }
 
 ohos_static_library("liblight_vdi_config") {
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":light_vdi_config" ]
 }
 
 ohos_shared_library("liblight_interface_service_1.0") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "../interfaces/include/",
     ".",
@@ -66,6 +68,7 @@ ohos_shared_library("liblight_interface_service_1.0") {
 }
 
 ohos_shared_library("liblight_driver") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "../interfaces/include/",
     "../utils/include",

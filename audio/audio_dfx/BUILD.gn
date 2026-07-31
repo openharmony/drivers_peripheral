@@ -22,6 +22,7 @@ config("drivers_peripheral_audio_dfx_header") {
 }
 
 ohos_static_library("libaudio_dfx_static") {
+  branch_protector_ret = "pac_ret"
   external_deps = []
   defines = []
 

@@ -18,6 +18,7 @@ import("$hdf_audio_path/audio.gni")
 
 if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
   ohos_shared_library("hdi_audio_pnp_server") {
+    branch_protector_ret = "pac_ret"
     sources = [
       "$hdf_audio_path/hal/hdi_binder/server/src/hdf_audio_input_event.c",
       "$hdf_audio_path/hal/hdi_binder/server/src/hdf_audio_pnp_server.c",

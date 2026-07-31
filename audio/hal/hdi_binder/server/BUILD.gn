@@ -18,6 +18,7 @@ import("$hdf_audio_path/audio.gni")
 
 if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
   ohos_shared_library("hdi_audio_usb_server") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
       "$hdf_hal_path/hdi_passthrough/include",
@@ -65,6 +66,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
   }
 
   ohos_shared_library("hdi_audio_a2dp_server") {
+    branch_protector_ret = "pac_ret"
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
       "$hdf_hal_path/hdi_passthrough/include",

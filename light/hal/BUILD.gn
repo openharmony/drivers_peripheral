@@ -21,6 +21,7 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("hdi_light") {
+    branch_protector_ret = "pac_ret"
     output_extension = "z.so"
     sources = [ "src/light_controller.c" ]
 
@@ -55,6 +56,7 @@ if (defined(ohos_lite)) {
     include_dirs = [ "../interfaces/include" ]
   }
   ohos_shared_library("hdi_light") {
+    branch_protector_ret = "pac_ret"
     public_configs = [ ":libhdi_light_pub_config" ]
     sources = [
       "src/light_controller.c",
