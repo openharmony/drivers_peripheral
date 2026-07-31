@@ -210,7 +210,7 @@ void SerialDeviceManager::AddVirtualUsbDevice(std::vector<SerialDeviceInfo>& dev
     HexStrToInt(vendorId, info.vendorId);
     devices.push_back(info);
     availableDevices_[fullPath] = info;
-    HDF_LOGI("found device:%{public}s!", fullPath.c_str());
+    HDF_LOGD("found device:%{public}s!", fullPath.c_str());
 }
 
 void SerialDeviceManager::AddNormalSerialDevice(std::vector<SerialDeviceInfo>& devices, const std::string& fullPath)
@@ -223,7 +223,7 @@ void SerialDeviceManager::AddNormalSerialDevice(std::vector<SerialDeviceInfo>& d
     SerialDeviceInfo info{fullPath, "", "", 0, 0};
     devices.push_back(info);
     availableDevices_[fullPath] = info;
-    HDF_LOGI("found device:%{public}s!", fullPath.c_str());
+    HDF_LOGD("found device:%{public}s!", fullPath.c_str());
 }
 
 static bool IsUsbSerialName(const std::string& name)

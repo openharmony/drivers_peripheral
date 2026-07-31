@@ -482,7 +482,7 @@ int32_t SerialDevice::SetRtsSignal(bool rts)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    int flags;
+    unsigned int flags = 0;
     if (ioctl(fd_, TIOCMGET, &flags) != 0) {
         HDF_LOGE("%{public}s, TIOCMGET failed- errno=%{public}d (%{public}s)!",
             __func__, errno, strerror(errno));
@@ -514,7 +514,7 @@ int32_t SerialDevice::GetCtsSignal(bool& cts)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    int flags;
+    unsigned int flags = 0;
     if (ioctl(fd_, TIOCMGET, &flags) != 0) {
         HDF_LOGE("%{public}s, TIOCMGET failed- errno=%{public}d (%{public}s)!",
             __func__, errno, strerror(errno));
@@ -535,7 +535,7 @@ int32_t SerialDevice::SetDtrSignal(bool dtr)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    int flags;
+    unsigned int flags = 0;
     if (ioctl(fd_, TIOCMGET, &flags) != 0) {
         HDF_LOGE("%{public}s, TIOCMGET failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
         return HDF_FAILURE;
@@ -565,7 +565,7 @@ int32_t SerialDevice::GetDsrSignal(bool& dsr)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    int flags;
+    unsigned int flags = 0;
     if (ioctl(fd_, TIOCMGET, &flags) != 0) {
         HDF_LOGE("%{public}s, TIOCMGET failed-errno=%{public}d (%{public}s)\n", __func__, errno, strerror(errno));
         return HDF_FAILURE;
