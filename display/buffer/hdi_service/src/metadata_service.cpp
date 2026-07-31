@@ -120,7 +120,7 @@ int32_t MetadataService::RegisterBuffer(const sptr<NativeBuffer>& handle)
     BufferHandle* buffer = handle->GetBufferHandle();
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     int32_t ret = vdiImpl_->RegisterBuffer(*buffer);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGD(" fail"));
     return HDF_SUCCESS;
 }
 
@@ -133,7 +133,7 @@ int32_t MetadataService::SetMetadata(const sptr<NativeBuffer>& handle, uint32_t 
     BufferHandle* buffer = handle->GetBufferHandle();
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetMetadata(*buffer, key, value);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGD(" fail"));
     return HDF_SUCCESS;
 }
 
@@ -158,7 +158,7 @@ int32_t MetadataService::ListMetadataKeys(const sptr<NativeBuffer>& handle, std:
     BufferHandle* buffer = handle->GetBufferHandle();
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     int32_t ret = vdiImpl_->ListMetadataKeys(*buffer, keys);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGD(" fail"));
     return HDF_SUCCESS;
 }
 
