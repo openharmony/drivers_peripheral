@@ -20,6 +20,7 @@
 #include <linux/dma-buf.h>
 #include <chrono>
 #ifndef V4L2_MAIN_TEST
+#include <algorithm>
 #include "ibuffer.h"
 #endif
 #include "securec.h"
@@ -323,10 +324,6 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
 #endif
     if (memoryType_ == V4L2_MEMORY_MMAP || memoryType_ == V4L2_MEMORY_DMABUF) {
         if (adapterBufferMap_[buf.index].userBufPtr && adapterBufferMap_[buf.index].start) {
-            if (adapterBufferMap_[buf.index].length > buffLong_) {
-                CAMERA_LOGE("ERROR: BufferMap length error");
-                return RC_ERROR;
-            }
             CAMERA_LOGD("memcpy_s buffer to user buffer, curFormat = %{public}u, bytesused = %{public}u",
                 adapterBufferMap_[buf.index].cameraBuffer->GetCurFormat(), buf.bytesused);
             uint32_t length = adapterBufferMap_[buf.index].length;
@@ -334,9 +331,10 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
                 length = buf.bytesused;
                 adapterBufferMap_[buf.index].cameraBuffer->SetEsFrameSize(length);
             }
+            uint32_t safeCopyLen = std::min(length, buffLong_);
             errno_t ret = memcpy_s(
-                adapterBufferMap_[buf.index].userBufPtr, adapterBufferMap_[buf.index].length,
-                adapterBufferMap_[buf.index].start, length);
+                adapterBufferMap_[buf.index].userBufPtr, buffLong_,
+                adapterBufferMap_[buf.index].start, safeCopyLen);
             if (ret != EOK) {
                 CAMERA_LOGE("memcpy_s failed with error code: %d", ret);
                 return RC_ERROR;
@@ -391,13 +389,19 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
         return RC_ERROR;
     }
 #endif
-    CAMERA_LOGI("buf.length = %{public}d frameSpec->buffer_->GetSize() = %{public}d buf.index = %{public}d\n",
-        buf.length, frameSpec->buffer_->GetSize(), buf.index);
-    if (buf.length > frameSpec->buffer_->GetSize()) {
-        CAMERA_LOGE("RROR:user buff < V4L2 buf.length\n");
-        return RC_ERROR;
+    uint32_t v4l2BufSize = buf.length;
+    if (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+        v4l2BufSize = buf.m.planes[0].length;
     }
-    buffLong_ = frameSpec->buffer_->GetSize();
+    uint32_t frameworkBufSize = frameSpec->buffer_->GetSize();
+    CAMERA_LOGI("V4L2 buf size = %{public}u (mplane=%{public}d), framework buf size = %{public}u, buf.index = %{public}d\n",
+        v4l2BufSize, (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE ? 1 : 0),
+        frameworkBufSize, buf.index);
+    if (v4l2BufSize > frameworkBufSize) {
+        CAMERA_LOGW("V4L2 buf size(%{public}u) > framework buf size(%{public}u), using min for memcpy\n",
+            v4l2BufSize, frameworkBufSize);
+    }
+    buffLong_ = std::min(v4l2BufSize, frameworkBufSize);
     if (memoryType_ == V4L2_MEMORY_MMAP || memoryType_ == V4L2_MEMORY_DMABUF) {
         return SetAdapterBuffer(fd, buf, frameSpec);
     }
