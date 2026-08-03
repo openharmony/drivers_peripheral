@@ -117,8 +117,12 @@ bool BluetoothAddress::GetConstantAddress(char *address, int len)
     return (ret == 0);
 }
 
-bool BluetoothAddress::CheckAddress(char *address)
+bool BluetoothAddress::CheckAddress(char *address, int len)
 {
+    if (address == nullptr || len < ADDRESS_STR_LEN) {
+        HDF_LOGE("CheckAddress buf error");
+        return false;
+    }
     for (int index = 0; index < ADDRESS_STR_LEN; ++index) {
         if (address[index] != 0) {
             return true;
@@ -165,7 +169,8 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::
     }
 
     char addressStr[ADDRESS_STR_LEN + 1] = {0};
-    if (read(addrFd, addressStr, ADDRESS_STR_LEN) != ADDRESS_STR_LEN || !CheckAddress(addressStr)) {
+    if (read(addrFd, addressStr, ADDRESS_STR_LEN) != ADDRESS_STR_LEN ||
+        !CheckAddress(addressStr, ADDRESS_STR_LEN + 1)) {
         HDF_LOGE("read %{public}s failed.", path.c_str());
         close(addrFd);
         auto ptr = GenerateDeviceAddressFile();

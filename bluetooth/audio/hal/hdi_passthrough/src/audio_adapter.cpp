@@ -402,7 +402,8 @@ void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCap
         if (&portCapabilitys[i] == NULL) {
             break;
         }
-        AudioMemFree((void **)(&portCapabilitys[i].capability.subPorts));
+        AudioMemFree(reinterpret_cast<void **>(const_cast<AudioSubPortCapability **>(
+            &portCapabilitys[i].capability.subPorts)));
         i++;
     }
     return;
@@ -439,7 +440,7 @@ int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter)
         if (InitForGetPortCapability(ports[i], &portCapability[i].capability)) {
             HDF_LOGE("ports Init Fail!");
             AudioAdapterReleaseCapSubPorts(portCapability, portNum);
-            AudioMemFree((void **)&portCapability);
+            AudioMemFree(reinterpret_cast<void **>(&portCapability));
             return AUDIO_HAL_ERR_INTERNAL;
         }
     }

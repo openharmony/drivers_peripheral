@@ -38,7 +38,7 @@ private:
     static void ParseAddressToString(std::vector<uint8_t> &address, std::string &outString);
     int ParseAddressFromString(const std::string &string) const;
     static bool GetConstantAddress(char *address, int len);
-    static bool CheckAddress(char *address);
+    static bool CheckAddress(char *address, int len);
     static std::shared_ptr<BluetoothAddress> GenerateDeviceAddressFile(
         const std::string &path = BT_DEVICE_ADDRESS_PATH);
     static std::shared_ptr<BluetoothAddress> ParseAddressToPtr(char *address, int len);

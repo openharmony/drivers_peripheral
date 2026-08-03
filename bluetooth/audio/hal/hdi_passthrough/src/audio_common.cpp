@@ -105,7 +105,7 @@ int32_t TimeToAudioTimeStamp(uint64_t bufferFrameSize, struct AudioTimeStamp *ti
         return HDF_FAILURE;
     }
     time->tvSec += static_cast<int64_t>(bufferFrameSize) / static_cast<int64_t>(sampleRate);
-    int64_t lastBufFrames = bufferFrameSize % (static_cast<int64_t>(sampleRate));
+    int64_t lastBufFrames = static_cast<int64_t>(bufferFrameSize) % (static_cast<int64_t>(sampleRate));
     time->tvNSec += (lastBufFrames * SEC_TO_NSEC) / (static_cast<int64_t>(sampleRate));
     if (time->tvNSec >= SEC_TO_NSEC) {
         time->tvSec += 1;

@@ -116,7 +116,7 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
         int32_t i = 0;
         while (i < portNum) {
             if (&hwAdapter->portCapabilitys[i] != NULL) {
-                AudioMemFree((void **)&hwAdapter->portCapabilitys[i].capability.subPorts);
+                AudioMemFree(reinterpret_cast<void **>(&hwAdapter->portCapabilitys[i].capability.subPorts));
             }
             i++;
         }

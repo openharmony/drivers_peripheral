@@ -85,7 +85,7 @@ void AdaptersServerManageRelease(
     num = (num > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : num;
     for (i = 0; i < num; i++) {
         if (adaptersManage[i].adapterName != NULL) {
-            AudioMemFree((void **)&adaptersManage[i].adapterName);
+            AudioMemFree(reinterpret_cast<void **>(const_cast<char **>(&adaptersManage[i].adapterName)));
         }
     }
     AudioMemFree(reinterpret_cast<void **>(const_cast<AudioInfoInAdapter **>(&adaptersManage)));

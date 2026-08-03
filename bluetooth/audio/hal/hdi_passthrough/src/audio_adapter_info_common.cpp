@@ -190,7 +190,7 @@ static void AudioAdapterJudegReleaseDescs(const struct AudioAdapterDescriptor *d
 
         while (portIdx < desc->portNum) {
             if (desc->ports[portIdx].portName != NULL) {
-                AudioMemFree((void **)&desc->ports[portIdx].portName);
+                AudioMemFree(reinterpret_cast<void **>(const_cast<char **>(&desc->ports[portIdx].portName)));
             }
             portIdx++;
         }
