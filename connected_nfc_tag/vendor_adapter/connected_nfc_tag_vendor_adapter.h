@@ -16,6 +16,7 @@
 #ifndef CONNECTED_NFC_TAG_VENDOR_ADAPTER_H
 #define CONNECTED_NFC_TAG_VENDOR_ADAPTER_H
 
+#include<mutex>
 #include "iconnected_nfc_tag_vendor.h"
 
 namespace OHOS {
@@ -46,6 +47,7 @@ private:
 private:
     void *halHandle; // handle of nfc hal so
     NfcTagHalInterface infHandle;
+    std::mutex mutex_;
 };
 
 } // ConnectedNfcTag

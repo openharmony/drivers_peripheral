@@ -17,6 +17,7 @@ import("//build/ohos.gni")
 ohos_shared_library("nfc_tag_vendor_adapter") {
   include_dirs = [ "." ]
   sources = [ "connected_nfc_tag_vendor_adapter.cpp" ]
+  stack_protector_ret = true
 
   external_deps = [
     "c_utils:utils",

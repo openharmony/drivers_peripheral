@@ -29,7 +29,7 @@ namespace V1_1 {
 class ConnectedNfcTagImpl : public OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTag {
 public:
     ConnectedNfcTagImpl() = default;
-    virtual ~ConnectedNfcTagImpl() = default;
+    virtual ~ConnectedNfcTagImpl();
 
     int32_t RegisterCallBack(
         const sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback>& callbackObj) override;
