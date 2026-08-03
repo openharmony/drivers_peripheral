@@ -240,15 +240,19 @@ int32_t UsbDeviceImpl::BindUsbdDeviceSubscriber(const sptr<IUsbdSubscriber> &sub
             subscribers_[i].usbPnpListener.callBack = UsbdPnpLoaderEventReceived;
             subscribers_[i].usbPnpListener.priv = &subscribers_[i];
             subscribers_[i].remote = remote;
-            subscribers_[i].deathRecipient = new UsbDeviceImpl::UsbDeathRecipient(subscriber);
-            if (subscribers_[i].deathRecipient == nullptr) {
+            auto *recipient = new UsbDeviceImpl::UsbDeathRecipient(subscriber);
+            if (recipient == nullptr) {
                 HDF_LOGE("%{public}s: new deathRecipient failed", __func__);
+                subscribers_[i].subscriber = nullptr;
                 return HDF_FAILURE;
             }
-            bool result = subscribers_[i].remote->AddDeathRecipient(
-                static_cast<UsbDeathRecipient *>(subscribers_[i].deathRecipient));
+            subscribers_[i].deathRecipient = recipient;
+            bool result = subscribers_[i].remote->AddDeathRecipient(recipient);
             if (!result) {
                 HDF_LOGE("%{public}s:AddUsbDeathRecipient failed", __func__);
+                delete recipient;
+                subscribers_[i].deathRecipient = nullptr;
+                subscribers_[i].subscriber = nullptr;
                 return HDF_FAILURE;
             }
 
