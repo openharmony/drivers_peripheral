@@ -78,4 +78,68 @@ enum HuksErrorCode {
     HUKS_ERROR_API_NOT_SUPPORTED = -45,
 };
 
+/**
+ * @brief TAG type masks, should be same with huks sa
+ */
+#define HKS_TAG_TYPE_INVALID  (0U << 28)
+#define HKS_TAG_TYPE_INT      (1U << 28)
+#define HKS_TAG_TYPE_UINT     (2U << 28)
+#define HKS_TAG_TYPE_ULONG    (3U << 28)
+#define HKS_TAG_TYPE_BOOL     (4U << 28)
+#define HKS_TAG_TYPE_BYTES    (5U << 28)
+#define HKS_TAG_TYPE_MASK     (0xF << 28)
+
+/**
+ * @brief HksTag enum, partial tags needed by HDI test
+ */
+enum HksTag {
+    HKS_TAG_ALGORITHM            = HKS_TAG_TYPE_UINT | 1,
+    HKS_TAG_PURPOSE              = HKS_TAG_TYPE_UINT | 2,
+    HKS_TAG_KEY_SIZE             = HKS_TAG_TYPE_UINT | 3,
+    HKS_TAG_DIGEST               = HKS_TAG_TYPE_UINT | 4,
+    HKS_TAG_PADDING              = HKS_TAG_TYPE_UINT | 5,
+    HKS_TAG_BLOCK_MODE           = HKS_TAG_TYPE_UINT | 6,
+    HKS_TAG_ASSOCIATED_DATA      = HKS_TAG_TYPE_BYTES | 8,
+    HKS_TAG_NONCE                = HKS_TAG_TYPE_BYTES | 9,
+    HKS_TAG_KEY_STORAGE_FLAG     = HKS_TAG_TYPE_UINT | 1002,
+    HKS_TAG_AUTH_STORAGE_LEVEL   = HKS_TAG_TYPE_UINT | 316,
+    HKS_TAG_PROCESS_NAME         = HKS_TAG_TYPE_BYTES | 10001,
+};
+
+/**
+ * @brief Enum values needed by HDI test, should be same with huks sa
+ */
+enum HksKeyAlg {
+    HKS_ALG_AES = 20,
+};
+
+enum HksKeyPurpose {
+    HKS_KEY_PURPOSE_ENCRYPT = 1,
+    HKS_KEY_PURPOSE_DECRYPT = 2,
+};
+
+enum HksKeySize {
+    HKS_AES_KEY_SIZE_128 = 128,
+};
+
+enum HksKeyPadding {
+    HKS_PADDING_NONE = 0,
+};
+
+enum HksCipherMode {
+    HKS_MODE_GCM = 32,
+};
+
+enum HksKeyDigest {
+    HKS_DIGEST_NONE = 0,
+};
+
+enum HksKeyStorageType {
+    HKS_STORAGE_TEMP = 0,
+};
+
+enum HksAuthStorageLevel {
+    HKS_AUTH_STORAGE_LEVEL_DE = 0,
+};
+
 #endif
