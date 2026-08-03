@@ -16,7 +16,7 @@
 #ifndef CONNECTED_NFC_TAG_VENDOR_ADAPTER_H
 #define CONNECTED_NFC_TAG_VENDOR_ADAPTER_H
 
-#include<mutex>
+#include <mutex>
 #include "iconnected_nfc_tag_vendor.h"
 
 namespace OHOS {
