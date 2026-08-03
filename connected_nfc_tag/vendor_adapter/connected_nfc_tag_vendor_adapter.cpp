@@ -265,7 +265,7 @@ int32_t ConnectedNfcTagVendorAdapter::RegisterCallBack(NfcTagChipEventCallbackT 
     }
 
     if (callback == nullptr) {
-        HDF_LOGE("%{public}s: callback NULL");
+        HDF_LOGE("%{public}s: callback NULL", __func__);
         return -1;
     }
 
