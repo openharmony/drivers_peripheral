@@ -38,6 +38,12 @@ config("v4l2_config") {
 }
 
 ohos_shared_library("usb_camera_v4l2_adapter") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   defines = []
   if (drivers_peripheral_camera_feature_usb) {
     defines += [ "CAMERA_BUILT_ON_USB" ]
