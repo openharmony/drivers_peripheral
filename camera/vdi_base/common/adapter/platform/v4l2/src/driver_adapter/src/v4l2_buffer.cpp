@@ -394,8 +394,8 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
         v4l2BufSize = buf.m.planes[0].length;
     }
     uint32_t frameworkBufSize = frameSpec->buffer_->GetSize();
-    CAMERA_LOGI("V4L2 buf size = %{public}u (mplane=%{public}d), framework buf size = %{public}u, buf.index = %{public}d\n",
-        v4l2BufSize, (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE ? 1 : 0),
+    CAMERA_LOGI("V4L2 buf size = %{public}u (mplane=%{public}d), framework buf size = %{public}u,
+        buf.index = %{public}d\n", v4l2BufSize, (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE ? 1 : 0),
         frameworkBufSize, buf.index);
     if (v4l2BufSize > frameworkBufSize) {
         CAMERA_LOGW("V4L2 buf size(%{public}u) > framework buf size(%{public}u), using min for memcpy\n",
