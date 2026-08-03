@@ -55,7 +55,7 @@ bool IsValidChipType(const std::string &type)
     if (type.empty()) {
         return false;
     }
-    for(char c : type) {
+    for (char c : type) {
         if (!std::isalnum(static_cast<unsigned char>(c))) {
             return false;
         }
