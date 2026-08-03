@@ -122,6 +122,11 @@ ConnectedNfcTagVendorAdapter::~ConnectedNfcTagVendorAdapter()
     if (infHandle.unInit) {
         infHandle.unInit();
     }
+    ReleaseHalHandle();
+}
+
+void ConnectedNfcTagVendorAdapter::ReleaseHalHandle()
+{
     infHandle.init = nullptr;
     infHandle.unInit = nullptr;
     infHandle.registerCallBack = nullptr;
@@ -212,10 +217,7 @@ int32_t ConnectedNfcTagVendorAdapter::Init()
     }
     
     if (GetInterfaceFromHal() != 0) {
-        if (halHandle != nullptr) {
-            dlclose(halHandle);
-            halHandle = nullptr;
-        }
+        ReleaseHalHandle();
         return -1;
     }
 
@@ -224,10 +226,7 @@ int32_t ConnectedNfcTagVendorAdapter::Init()
         if (infHandle.unInit) {
             infHandle.unInit();
         }
-        if (halHandle != nullptr) {
-            dlclose(halHandle);
-            halHandle = nullptr;
-        }
+        ReleaseHalHandle();
         return -1;
     }
 
@@ -246,21 +245,15 @@ int32_t ConnectedNfcTagVendorAdapter::UnInit()
         infHandle.unInit();
     }
 
-    infHandle.init = nullptr;
-    infHandle.unInit = nullptr;
-    infHandle.registerCallBack = nullptr;
-    infHandle.writeNdefData = nullptr;
-    infHandle.readNdefData = nullptr;
-    dlclose(halHandle);
-    halHandle = nullptr;
+    ReleaseHalHandle();
     return 0;
 }
 
 int32_t ConnectedNfcTagVendorAdapter::RegisterCallBack(NfcTagChipEventCallbackT *callback)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (infHandle.registerCallBack == nullptr) {
-        HDF_LOGE("%{public}s: registerCallBack NULL", __func__);
+    if (halHandle == nullptr || infHandle.registerCallBack == nullptr) {
+        HDF_LOGE("%{public}s: halHandle or registerCallBack NULL", __func__);
         return -1;
     }
 
@@ -283,8 +276,8 @@ int32_t ConnectedNfcTagVendorAdapter::WriteNdefData(const std::vector<uint8_t>& 
         return -1;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    if (infHandle.writeNdefData == nullptr) {
-        HDF_LOGE("%{public}s: writeNdefData NULL", __func__);
+    if (halHandle == nullptr || infHandle.writeNdefData == nullptr) {
+        HDF_LOGE("%{public}s: halHandle or writeNdefData NULL", __func__);
         return -1;
     }
 
@@ -294,8 +287,8 @@ int32_t ConnectedNfcTagVendorAdapter::WriteNdefData(const std::vector<uint8_t>& 
 int32_t ConnectedNfcTagVendorAdapter::ReadNdefData(std::vector<uint8_t>& ndefData)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (infHandle.readNdefData == nullptr) {
-        HDF_LOGE("%{public}s: readNdefData NULL", __func__);
+    if (halHandle == nullptr || infHandle.readNdefData == nullptr) {
+        HDF_LOGE("%{public}s: halHandle or readNdefData NULL", __func__);
         return -1;
     }
 
