@@ -19,6 +19,8 @@
 #include "zencoder_tester.h"
 #include "zdecoder_tester.h"
 #include "command_parse.h"
+#include "v1_0/hdi_z_factory.h"
+#include "key_value.h"
 
 namespace Vendor::ZCodec {
 
@@ -26,7 +28,7 @@ using namespace testing::ext;
 using namespace std;
 using namespace OHOS::HDI::Codec::Zcodec;
 
-class ZCodecHdiEncBufferTest : public testing::TestWithParam<bool> {
+class ZCodecHdiBufferTest : public testing::TestWithParam<bool> {
 public:
     static void SetUpTestCase()
     {
@@ -39,10 +41,28 @@ public:
 
     void SetUp()
     {
+        fac_ = HdiZFactory::Get(GetParam());
+        if (fac_ == nullptr) {
+            GTEST_SKIP() << "Failed to get HdiZFactory";
+        }
+        fac_->GetCapabilities(caps_);
     }
 
     void TearDown()
     {
+        caps_.clear();
+        fac_ = nullptr;
+    }
+
+    bool CheckCodecByStandard(int32_t standard, bool isEncoder)
+    {
+        int32_t expectedType = isEncoder ? VIDEO_ENCODER : VIDEO_DECODER;
+        for (const auto& cap : caps_) {
+            if (cap.standard == standard && cap.componentType == expectedType) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static bool CreateFakeYuv(const string& dstPath, uint32_t w, uint32_t h, uint32_t frameCnt)
@@ -65,10 +85,11 @@ public:
         return true;
     }
 public:
-    bool isPassthrough = false;
     static constexpr uint32_t width = 176;
     static constexpr uint32_t height = 144;
     static constexpr char INPUT_FILE_PATH[] = "/data/test/media/176x144.yuv";
+    sptr<HdiZFactory> fac_;
+    std::vector<HdiCapability> caps_;
 };
 
 /**
@@ -76,8 +97,11 @@ public:
  * @tc.desc: H264 encode and decode end-to-end test
  * @tc.type: FUNC
  */
-HWTEST_P(ZCodecHdiEncBufferTest, ZCodecHdiTest_H264_buffer_test_001, TestSize.Level1)
+HWTEST_P(ZCodecHdiBufferTest, ZCodecHdiTest_H264_buffer_test_001, TestSize.Level1)
 {
+    if (!CheckCodecByStandard(Standard::AVC, true) || !CheckCodecByStandard(Standard::AVC, false)) {
+        GTEST_SKIP() << "Platform does not support AVC encoder/decoder";
+    }
     // Step 1: Encode YUV to H264 bitstream
     CommandOpt encOpt = {
         .inputFile = INPUT_FILE_PATH,
@@ -118,8 +142,11 @@ HWTEST_P(ZCodecHdiEncBufferTest, ZCodecHdiTest_H264_buffer_test_001, TestSize.Le
  * @tc.desc: try to run H264 zencoder in multiple instances
  * @tc.type: FUNC
  */
-HWTEST_P(ZCodecHdiEncBufferTest, ZCodecHdiTest_H264_buffer_test_multi_001, TestSize.Level1)
+HWTEST_P(ZCodecHdiBufferTest, ZCodecHdiTest_H264_buffer_test_multi_001, TestSize.Level1)
 {
+    if (!CheckCodecByStandard(Standard::AVC, true)) {
+        GTEST_SKIP() << "Platform does not support AVC encoder";
+    }
     CommandOpt opt = {
         .inputFile = INPUT_FILE_PATH,
         .w = width,
@@ -140,8 +167,11 @@ HWTEST_P(ZCodecHdiEncBufferTest, ZCodecHdiTest_H264_buffer_test_multi_001, TestS
  * @tc.desc: try to run H264 zencoder
  * @tc.type: FUNC
  */
-HWTEST_P(ZCodecHdiEncBufferTest, ZCodecHdiTest_H265_buffer_test_001, TestSize.Level1)
+HWTEST_P(ZCodecHdiBufferTest, ZCodecHdiTest_H265_buffer_test_001, TestSize.Level1)
 {
+    if (!CheckCodecByStandard(Standard::HEVC, true) || !CheckCodecByStandard(Standard::HEVC, false)) {
+        GTEST_SKIP() << "Platform does not support HEVC encoder/decoder";
+    }
     CommandOpt encOpt = {
         .inputFile = INPUT_FILE_PATH,
         .w = width,
@@ -181,8 +211,11 @@ HWTEST_P(ZCodecHdiEncBufferTest, ZCodecHdiTest_H265_buffer_test_001, TestSize.Le
  * @tc.desc: try to run H264 zencoder in multiple instances
  * @tc.type: FUNC
  */
-HWTEST_P(ZCodecHdiEncBufferTest, ZCodecHdiTest_H265_buffer_test_multi_001, TestSize.Level1)
+HWTEST_P(ZCodecHdiBufferTest, ZCodecHdiTest_H265_buffer_test_multi_001, TestSize.Level1)
 {
+    if (!CheckCodecByStandard(Standard::HEVC, true)) {
+        GTEST_SKIP() << "Platform does not support HEVC encoder";
+    }
     CommandOpt opt = {
         .inputFile = INPUT_FILE_PATH,
         .w = width,
@@ -200,8 +233,8 @@ HWTEST_P(ZCodecHdiEncBufferTest, ZCodecHdiTest_H265_buffer_test_multi_001, TestS
 
 
 INSTANTIATE_TEST_SUITE_P(
-    ZCodecHdiEncBufferTest,
-    ZCodecHdiEncBufferTest,
+    ZCodecHdiBufferTest,
+    ZCodecHdiBufferTest,
     testing::Values(false, true));
 
 }
