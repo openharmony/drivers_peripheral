@@ -97,9 +97,6 @@ ComponentNode::~ComponentNode()
     omxCallback_ = nullptr;
     bufferPool_.clear();
     bufferIdCount_ = 0;
-    if (comp_ != nullptr) {
-        CloseHandle();
-    }
     comp_ = nullptr;
     mgr_ = nullptr;
 }
