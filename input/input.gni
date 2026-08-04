@@ -18,4 +18,6 @@ declare_args() {
   drivers_peripheral_input_feature_udriver = false
   drivers_peripheral_input_feature_lite_support_test = false
   drivers_peripheral_input_feature_support_ddk = false
+  # Safe remove path for input hotplug offline (product opt-in, e.g. aifly).
+  drivers_peripheral_input_feature_hotplug_safe_remove = false
 }
