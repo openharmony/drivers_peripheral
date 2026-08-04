@@ -72,6 +72,7 @@ constexpr int HIGH_POWER_TIME = 168;  // 关机七天 7 day = 7*24h
 constexpr int UP_POWER_TIME = 48;
 constexpr int DOWN_POWER_TIME = 12;
 constexpr int AIR_OTA_POWER_TIME = 168;  // 隔空升级 7 day = 7*24h
+
 constexpr size_t DEFAULT_ADV_DATA_LEN = 3;  // 关机3d下发广播数组长度
 constexpr size_t SEVEN_DAYS_ADV_DATA_LEN = 8;  // 关机7d下发广播数组长度
 // Data len dli position

@@ -59,6 +59,7 @@ private:
     void OnEventReceivedTask(const std::vector<uint8_t> &data);
     bool WatchDliChannel();
     void WatcherTimeout();
+    
     InitializeCompleteCallback initializeCompleteCallback_;
     ClearIpcCallback clearIpcCallback_;
     ReceiveDataCallback eventDataCallback_;
