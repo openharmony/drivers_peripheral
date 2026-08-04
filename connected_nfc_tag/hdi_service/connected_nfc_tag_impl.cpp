@@ -146,7 +146,7 @@ void ConnectedNfcTagImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
             RemoteDeathRecipient(callbackObj_);
             callbackObj_ = nullptr;
         }
-        g_callbackV1_1 == nullptr;
+        g_callbackV1_1 = nullptr;
     }
     adapter.RegisterCallBack(nullptr);
 }
