@@ -264,6 +264,10 @@ int32_t MediaKeySessionService::RequiresSecureDecoderModule(const std::string &m
 int32_t MediaKeySessionService::SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySessionCallback> &sessionCallback)
 {
     HDF_LOGI("%{public}s: start", __func__);
+    if (sessionCallback == nullptr) {
+        HDF_LOGE("%{public}s: sessionCallback is null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     vdiCallbackObj = new (std::nothrow) MediaKeySessionCallbackService(sessionCallback);
     if (vdiCallbackObj == nullptr) {
         HDF_LOGE("new MediaKeySessionCallbackService() failed");

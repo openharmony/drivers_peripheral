@@ -281,11 +281,17 @@ int32_t MediaKeySystemService::GetOemCertificateStatus(CertificateStatus &status
 
 int32_t MediaKeySystemService::SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback> &systemCallback)
 {
+    HDF_LOGI("%{public}s: start", __func__);
+    if (systemCallback == nullptr) {
+        HDF_LOGE("%{public}s: systemCallback is null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     vdiCallbackObj = new (std::nothrow) MediaKeySystemCallbackService(systemCallback);
     if (vdiCallbackObj == nullptr) {
         HDF_LOGE("new MediaKeySystemCallbackService() failed");
         return HDF_ERR_MALLOC_FAIL;
     }
+    HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
 
