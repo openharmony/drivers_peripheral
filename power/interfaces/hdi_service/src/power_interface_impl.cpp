@@ -48,11 +48,14 @@
 #ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
 #include "parameters.h"
 #endif
+#ifdef DRIVERS_PERIPHERAL_POWER_COCKPIT_MODE
+#include "parameters.h"
+#endif
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_4 {
 using namespace OHOS::HDI::Power;
 static constexpr const int32_t MAX_FILE_LENGTH = 32 * 1024 * 1024;
 static constexpr const char * const SUSPEND_STATE = "mem";
@@ -186,6 +189,10 @@ int32_t PowerInterfaceImpl::StartSuspend()
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     HDF_LOGI("staS3");
+#ifdef DRIVERS_PERIPHERAL_POWER_COCKPIT_MODE
+    HDF_LOGI("Cockpit mode: skip starting auto suspend loop");
+    return HDF_SUCCESS;
+#endif
     g_suspendRetry = true;
     if (g_suspending) {
         g_powerState = PowerHdfState::INACTIVE;
@@ -679,7 +686,38 @@ int32_t PowerInterfaceImpl::GetPowerConfig(const std::string &sceneName, std::st
     LoadStringFd(getValueFd, value);
     return HDF_SUCCESS;
 }
-} // namespace V1_3
+
+int32_t PowerInterfaceImpl::InitV1_4()
+{
+    HDF_LOGI("Init v1.4 interface");
+    isSupportV1_4 = true;
+    return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::ForceSuspendIgnoringWakelock(const std::string &tag)
+{
+    HDF_LOGI("ForceSuspendIgnoringWakelock, tag=%{public}s", tag.c_str());
+    if (tag != "mem" && tag != "ulsr") {
+        HDF_LOGE("Invalid suspend tag: %{public}s", tag.c_str());
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
+    if (suspendStateFd < 0) {
+        HDF_LOGE("ForceSuspendIgnoringWakelock open %{public}s fail, error: %{public}s",
+            SUSPEND_STATE_PATH, strerror(errno));
+        return HDF_FAILURE;
+    }
+
+    bool ret = SaveStringToFd(suspendStateFd, tag);
+    if (!ret) {
+        HDF_LOGE("ForceSuspendIgnoringWakelock write tag %{public}s failed", tag.c_str());
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("ForceSuspendIgnoringWakelock success, tag=%{public}s", tag.c_str());
+    return HDF_SUCCESS;
+}
+} // namespace V1_4
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

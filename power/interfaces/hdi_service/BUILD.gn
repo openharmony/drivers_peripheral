@@ -1,119 +1,102 @@
-# Copyright (c) 2022-2025 Huawei Device Co., Ltd.
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-import("//build/ohos.gni")
-import("../../power.gni")
+import("//drivers/peripheral/power/power.gni")
 
-ohos_shared_library("libpower_interface_service_1.3") {
-  include_dirs = [ "../../utils/include" ]
-  sources = [
-    "../../utils/power_xcollie.cpp",
-    "src/power_config.cpp",
-    "src/power_interface_impl.cpp",
-    "src/running_lock_counter.cpp",
-    "src/running_lock_impl.cpp",
-    "src/running_lock_timer_handler.cpp",
-    "src/system_operation.cpp",
-  ]
+module_name = "power_interface_service"
 
-  external_deps = [
-    "cJSON:cjson",
-    "drivers_interface_power:libpower_stub_1.2",
-    "drivers_interface_power:libpower_stub_1.3",
-    "hdf_core:libhdf_host",
-    "hdf_core:libhdf_utils",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-    "libxml2:libxml2",
-  ]
-
-  defines = []
-  if (drivers_peripheral_power_c_utils) {
-    external_deps += [ "c_utils:utils" ]
+kernel_inc = []
+if (defined(linux_kernel_version)) {
+  if (linux_kernel_version == "5.10") {
+    kernel_inc += [ "//third_party/posix_headers_5_10" ]
+  } else {
+    kernel_inc += [ "//third_party/posix_headers_4_19" ]
   }
-
-  # xcollie has a bug, disable it
-  if (drivers_peripheral_power_hicollie) {
-    external_deps += [ "hicollie:libhicollie" ]
-    defines += [ "HICOLLIE_ENABLE" ]
-  }
-
-  if (drivers_peripheral_power_config_policy) {
-    external_deps += [ "config_policy:configpolicy_util" ]
-  }
-
-  if (drivers_peripheral_power_wakeup_cause_path) {
-    defines += [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
-  }
-
-  if (drivers_peripheral_power_suspend_with_tag) {
-    external_deps += [ "init:libbegetutil" ]
-    defines += [ "DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG" ]
-  }
-
-  if (drivers_peripheral_power_faster_retry_of_sleep) {
-    defines += [ "FASTER_RETRY_OF_SLEEP" ]
-  }
-
-  if (drivers_peripheral_power_enable_s4) {
-    sources += [ "src/hibernate.cpp" ]
-    defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_S4" ]
-  }
-
-  if (drivers_peripheral_power_slower_retry_of_sleep) {
-    defines += [ "SLOWER_RETRY_OF_SLEEP" ]
-  }
-
-  if (drivers_peripheral_power_host_sched_priority) {
-    defines += [ "DRIVERS_PERIPHERAL_POWER_HOST_SCHED_PRIORITY" ]
-  }
-
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_power"
 }
 
-##############################################################################################
-
-ohos_shared_library("libpower_driver") {
-  sources = [ "src/power_interface_driver.cpp" ]
-
-  external_deps = [
-    "drivers_interface_power:libpower_stub_1.2",
-    "drivers_interface_power:libpower_stub_1.3",
-    "hdf_core:libhdf_host",
-    "hdf_core:libhdf_ipc_adapter",
-    "hdf_core:libhdf_utils",
-    "hdf_core:libhdi",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-  ]
-  if (drivers_peripheral_power_c_utils) {
-    external_deps += [ "c_utils:utils" ]
-  }
-
-  shlib_type = "hdi"
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_power"
+power_hdi_defines = []
+if (drivers_peripheral_power_wakeup_cause_path) {
+  power_hdi_defines += [ "DRIVERS_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
+}
+if (drivers_peripheral_power_suspend_with_tag) {
+  power_hdi_defines += [ "DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG" ]
+}
+if (drivers_peripheral_power_enable_s4) {
+  power_hdi_defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_S4" ]
+}
+if (drivers_peripheral_power_faster_retry_of_sleep) {
+  power_hdi_defines += [ "FASTER_RETRY_OF_SLEEP" ]
+}
+if (drivers_peripheral_power_slower_retry_of_sleep) {
+  power_hdi_defines += [ "SLOWER_RETRY_OF_SLEEP" ]
+}
+if (drivers_peripheral_power_hicollie) {
+  power_hdi_defines += [ "DRIVERS_PERIPHERAL_POWER_HICOLLIE" ]
+}
+if (drivers_peripheral_power_host_sched_priority) {
+  power_hdi_defines += [ "DRIVERS_PERIPHERAL_POWER_HOST_SCHED_PRIORITY" ]
+}
+if (drivers_peripheral_power_cockpit_mode) {
+  power_hdi_defines += [ "DRIVERS_PERIPHERAL_POWER_COCKPIT_MODE" ]
 }
 
-group("hdf_power") {
-  deps = [
-    ":libpower_driver",
-    ":libpower_interface_service_1.3",
-  ]
+power_hdi_deps = [
+  "//drivers/peripheral/power/common:power_common",
+  "//drivers/interface/power/v1_4:libpower_stub_1.4",
+  "//drivers/interface/power/v1_0:libpower_proxy_1.0",
+  "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host_holder",
+  "//drivers/hdf_core/framework:hdf_core",
+]
+if (drivers_peripheral_power_c_utils) {
+  power_hdi_deps += [ "//drivers/peripheral/common/c_utils:common_c_utils" ]
+}
+if (drivers_peripheral_power_hisysevent) {
+  power_hdi_deps += [ "//base/hiviewdfx/hisysevent:hisysevent" ]
+}
+if (drivers_peripheral_power_config_policy) {
+  power_hdi_deps += [ "//components/policy_config:policy_config" ]
+}
+if (drivers_peripheral_power_enable_s4) {
+  power_hdi_deps += [ "//drivers/peripheral/power/utils/hibernate:power_hibernate" ]
+}
 
-  if (drivers_peripheral_power_wakeup_cause_path) {
-    deps += [ "profile:power_hdi_service_config" ]
+power_hdi_external_deps = [
+  "c_utils:utils",
+  "hdf_core:libhdf_utils",
+  "ipc:ipc_core",
+]
+if (drivers_peripheral_power_hicollie) {
+  power_hdi_external_deps += [ "hicollie_native:hicollie" ]
+}
+
+power_hdi_sources = [
+  "src/power_interface_impl.cpp",
+  "src/power_interface_driver.cpp",
+]
+
+hdf_driver(module_name) {
+  sources = power_hdi_sources
+  include_dirs = [
+    "include",
+    "//drivers/peripheral/power/common/include",
+    "//drivers/peripheral/power/utils/common/include",
+    "//drivers/hdf_core/adapter/uhdf2/host",
+    "//drivers/hdf_core/framework/support/platform/include/adc",
+    "//drivers/hdf_core/framework/include/platform",
+    "//drivers/hdf_core/framework/include/utils",
+    "//drivers/hdf_core/interfaces/inner_api/host",
+    "//drivers/hdf_core/interfaces/inner_api/osal",
+    "//drivers/hdf_core/interfaces/inner_api/utils",
+    "//drivers/hdf_core/interfaces/inner_api/core",
+    "//drivers/hdf_core/adapter/uhdf2/osal/include",
+    "//drivers/peripheral/power/utils/power_xcollie/include",
+  ]
+  defines = power_hdi_defines
+  deps = power_hdi_deps
+  external_deps = power_hdi_external_deps
+  if (defined(linux_kernel_version)) {
+    include_dirs += kernel_inc
   }
+  install_images = [ "vendor" ]
+}
+
+group("power_hdi_service") {
+  deps = [ ":${module_name}" ]
 }
