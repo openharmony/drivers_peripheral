@@ -285,7 +285,7 @@ int32_t CameraDeviceVdiImpl::Close()
     HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
 
-    if (isOpened_) {
+    if (!isOpened_) {
         CAMERA_LOGD("camera device already closed.");
         DFX_LOCAL_HITRACE_END;
         return VDI::Camera::V1_0::NO_ERROR;
