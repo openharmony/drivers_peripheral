@@ -17,6 +17,7 @@
 #include <mutex>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <iproxy_broker.h>
 #include "v1_1/connected_nfc_tag_service.h"
 #include "connected_nfc_tag_vendor_adapter.h"
 
@@ -32,12 +33,12 @@ namespace ConnectedNfcTag {
 namespace V1_1 {
 
 static sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback> g_callbackV1_1 = nullptr;
-static std::mutex g_callbackMutex;
+static std::mutex g_callbackMutex {};
 static const int MAX_NDEF_LEN = 256;
 
 static int EventCallback(uint8_t event, uint8_t *buff, uint32_t buffLen)
 {
-    std::lock_guard<std::mutex> lock(g_callbackMutex);
+    std::lock_guard<std::mutex> guard(g_callbackMutex);
     if (g_callbackV1_1 != nullptr && buff != nullptr && buffLen > 0) {
         std::vector<uint8_t> data(buff, buff + buffLen);
         g_callbackV1_1->OnChipEvent((ConnectedNfcTagEvent)event, data);
@@ -50,10 +51,20 @@ extern "C" IConnectedNfcTag *ConnectedNfcTagImplGetInstance(void)
     return new (std::nothrow) ConnectedNfcTagImpl();
 }
 
+ConnectedNfcTagImpl::ConnectedNfcTagImpl()
+{
+    remoteDeathRecipient =
+        new RemoteDeathRecipient(std::bind(&ConnectedNfcTagImpl::OnRemoteDied, this, std::placeholders::_1));
+}
+
 ConnectedNfcTagImpl::~ConnectedNfcTagImpl()
 {
-    HDF_LOGI("%{public}s", __func__);
-    adapter.UnInit();
+    std::lock_guard<std::mutex> guard(g_callbackMutex);
+    if (callbackObj_ != nullptr) {
+        RemoveDeathRecipient(callbackObj_);
+        callbackObj_ = nullptr;
+    }
+    g_callbackV1_1 = nullptr;
 }
 
 int32_t ConnectedNfcTagImpl::RegisterCallBack(
@@ -61,15 +72,24 @@ int32_t ConnectedNfcTagImpl::RegisterCallBack(
 {
     HDF_LOGI("%{public}s", __func__);
 
-    if (callbackObj == nullptr) {
-        HDF_LOGW("%{public}s: callbackObj NULL", __func__);
-        std::lock_guard<std::mutex> lock(g_callbackMutex);
-        g_callbackV1_1 = nullptr;
-        return HDF_SUCCESS;
-    }
     {
         std::lock_guard<std::mutex> lock(g_callbackMutex);
+        if (callbackObj != nullptr) {
+            RemoveDeathRecipient(callbackObj_);
+            callbackObj_ = nullptr;
+            g_callbackV1_1 = nullptr;
+        }
+    }
+    if (callbackObj == nullptr) {
+        HDF_LOGW("%{public}s: callbackObj NULL", __func__);
+    } else {
+        callbackObj_ = callbackObj;
         g_callbackV1_1 = callbackObj;
+        AddDeathRecipient(callbackObj_);
+    }
+    
+    if (callbackObj == nullptr) {
+        return adapter.RegisterCallBack(nullptr);
     }
     return adapter.RegisterCallBack(EventCallback);
 }
@@ -115,6 +135,62 @@ int32_t ConnectedNfcTagImpl::WriteNdefTag(const std::string &ndefData)
 {
     HDF_LOGW("%{public}s !!!deprecated!!!", __func__);
     return -1;
+}
+
+void ConnectedNfcTagImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    HDF_LOGW("%{public}s: callback process died, cleaning up", __func__);
+    {
+        std::lock_guard<std::mutex> guard(g_callbackMutex);
+        if (callbackObj_ != nullptr) {
+            RemoteDeathRecipient(callbackObj_);
+            callbackObj_ = nullptr;
+        }
+        g_callbackV1_1 == nullptr;
+    }
+    adapter.RegisterCallBack(nullptr);
+}
+
+int32_t ConnectedNfcTagImpl::AddDeathRecipient(
+    const sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback>& callbackObj)
+{
+    if (callbackObj ==  nullptr) {
+        HDF_LOGE("%{public}s: callbackObj nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    const stpr<IRemoteObject> &remote =
+        OHOS::HDI::hdi_objcast<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback>(callbackObj);
+    if (remote == nullptr) {
+        HDF_LOGE("%{public}s: remote nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    bool result = remote->AddDeathRecipient(remoteDeathRecipient_);
+    if (!result) {
+        HDF_LOGE("%{public}s: AddDeathRecipient failed", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t ConnectedNfcTagImpl::RemoveDeathRecipient(
+    const sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback>& callbackObj)
+{
+    if (callbackObj == nullptr) {
+        HDF_LOGE("%{public}s: callbackObj nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    const stpr<IRemoteObject> &remote =
+        OHOS::HDI::hdi_objcast<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback>(callbackObj);
+    if (remote == nullptr) {
+        HDF_LOGE("%{public}s: remote nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
+    if (!result) {
+        HDF_LOGE("%{public}s: RemoveDeathRecipient failed", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;    
 }
 
 }  // namespace V1_1
