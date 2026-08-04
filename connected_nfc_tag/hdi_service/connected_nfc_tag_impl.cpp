@@ -74,7 +74,7 @@ int32_t ConnectedNfcTagImpl::RegisterCallBack(
 
     {
         std::lock_guard<std::mutex> lock(g_callbackMutex);
-        if (callbackObj != nullptr) {
+        if (callbackObj_ != nullptr) {
             RemoveDeathRecipient(callbackObj_);
             callbackObj_ = nullptr;
             g_callbackV1_1 = nullptr;
