@@ -59,7 +59,7 @@ private:
     void OnEventReceivedTask(const std::vector<uint8_t> &data);
     bool WatchDliChannel();
     bool IsAirOta(const OffFindExtraInfo& info);
-    void WatcherTimeout();    
+    void WatcherTimeout();
     InitializeCompleteCallback initializeCompleteCallback_;
     ClearIpcCallback clearIpcCallback_;
     ReceiveDataCallback eventDataCallback_;
