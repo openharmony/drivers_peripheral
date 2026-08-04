@@ -26,6 +26,8 @@ group("audiotest") {
 
   # hal ut
   if (drivers_peripheral_audio_feature_full_test_suite) {
-    deps += [ "supportlibs:interface_lib" ]
+    if (!drivers_peripheral_audio_feature_p7885) {
+      deps += [ "supportlibs:interface_lib" ]
+    }
   }
 }
