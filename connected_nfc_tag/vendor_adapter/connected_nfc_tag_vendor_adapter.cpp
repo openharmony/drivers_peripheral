@@ -15,6 +15,7 @@
 
 #include "connected_nfc_tag_vendor_adapter.h"
 
+#include <cctype>
 #include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -49,6 +50,19 @@ const std::string READ_NDEF_FUNC_NAME = "NfcTagReadNdefMessage";
 static const int MAX_NDEF_LEN = 256;
 }
 
+bool IsValidChipType(const std::string &type)
+{
+    if (type.empty()) {
+        return false;
+    }
+    for (char c : type) {
+        if (!std::isalnum(static_cast<unsigned char>(c))) {
+            return false;
+        }
+    }
+    return true;
+}
+
 std::string GetNfcChipType(void)
 {
     HDF_LOGE("%{public}s:begin", __func__);
@@ -81,6 +95,10 @@ std::string GetNfcChipType(void)
 
 bool CheckNfcChipType(const std::string &type)
 {
+    if (!IsValidChipType(type)) {
+        HDF_LOGE("%{public}s: invalid chip type chars", __func__);
+        return false;
+    }
     static const std::string ALL_CHIP_TYPES[] = {
         "t000", "t001", "t002", "t003", "t004", "t005", "t006", "t007", "t008", "t009",
         "t010", "t011", "t012", "t013", "t014", "t015", "t016", "t017", "t018", "t019"
@@ -100,15 +118,24 @@ ConnectedNfcTagVendorAdapter::ConnectedNfcTagVendorAdapter(): halHandle(nullptr)
 
 ConnectedNfcTagVendorAdapter::~ConnectedNfcTagVendorAdapter()
 {
-    if (halHandle != nullptr) {
-        dlclose(halHandle);
-        halHandle = nullptr;
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (infHandle.unInit) {
+        infHandle.unInit();
     }
+    ReleaseHalHandle();
+}
+
+void ConnectedNfcTagVendorAdapter::ReleaseHalHandle()
+{
     infHandle.init = nullptr;
     infHandle.unInit = nullptr;
     infHandle.registerCallBack = nullptr;
     infHandle.writeNdefData = nullptr;
     infHandle.readNdefData = nullptr;
+    if (halHandle != nullptr) {
+        dlclose(halHandle);
+        halHandle = nullptr;
+    }
 }
 
 int32_t ConnectedNfcTagVendorAdapter::GetInterfaceFromHal()
@@ -128,6 +155,7 @@ int32_t ConnectedNfcTagVendorAdapter::GetInterfaceFromHal()
         (dlsym(halHandle, CHIP_UNINIT_FUNC_NAME.c_str()));
     if (infHandle.unInit == nullptr) {
         HDF_LOGE("%{public}s: unInit NULL", __func__);
+        infHandle.init = nullptr;
         return -1;
     }
 
@@ -135,6 +163,8 @@ int32_t ConnectedNfcTagVendorAdapter::GetInterfaceFromHal()
         (dlsym(halHandle, REGISTER_CALLBACK_FUNC_NAME.c_str()));
     if (infHandle.registerCallBack == nullptr) {
         HDF_LOGE("%{public}s: registerCallBack NULL", __func__);
+        infHandle.init = nullptr;
+        infHandle.uninit = nullptr;
         return -1;
     }
 
@@ -142,6 +172,9 @@ int32_t ConnectedNfcTagVendorAdapter::GetInterfaceFromHal()
         (dlsym(halHandle, WRITE_NDEF_FUNC_NAME.c_str()));
     if (infHandle.writeNdefData == nullptr) {
         HDF_LOGE("%{public}s: writeNdefData NULL", __func__);
+        infHandle.init = nullptr;
+        infHandle.uninit = nullptr;
+        infHandle.registerCallBack = nullptr;
         return -1;
     }
 
@@ -149,6 +182,10 @@ int32_t ConnectedNfcTagVendorAdapter::GetInterfaceFromHal()
         (dlsym(halHandle, READ_NDEF_FUNC_NAME.c_str()));
     if (infHandle.readNdefData == nullptr) {
         HDF_LOGE("%{public}s: readNdefData NULL", __func__);
+        infHandle.init = nullptr;
+        infHandle.uninit = nullptr;
+        infHandle.registerCallBack = nullptr;
+        infHandle.writeNdefData = nullptr;
         return -1;
     }
     return 0;
@@ -156,6 +193,7 @@ int32_t ConnectedNfcTagVendorAdapter::GetInterfaceFromHal()
 
 int32_t ConnectedNfcTagVendorAdapter::Init()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     std::string nfcChipType = GetNfcChipType();
     if (nfcChipType == "") {
         HDF_LOGE("nfcChipType empty");
@@ -179,19 +217,16 @@ int32_t ConnectedNfcTagVendorAdapter::Init()
     }
     
     if (GetInterfaceFromHal() != 0) {
-        if (halHandle != nullptr) {
-            dlclose(halHandle);
-            halHandle = nullptr;
-        }
+        ReleaseHalHandle();
         return -1;
     }
 
     if (infHandle.init() != 0) {
         HDF_LOGE("%{public}s: init Fail", __func__);
-        if (halHandle != nullptr) {
-            dlclose(halHandle);
-            halHandle = nullptr;
+        if (infHandle.unInit) {
+            infHandle.unInit();
         }
+        ReleaseHalHandle();
         return -1;
     }
 
@@ -200,6 +235,7 @@ int32_t ConnectedNfcTagVendorAdapter::Init()
 
 int32_t ConnectedNfcTagVendorAdapter::UnInit()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (halHandle == nullptr) {
         HDF_LOGE("%{public}s: halHandle NULL", __func__);
         return -1;
@@ -209,20 +245,20 @@ int32_t ConnectedNfcTagVendorAdapter::UnInit()
         infHandle.unInit();
     }
 
-    infHandle.init = nullptr;
-    infHandle.unInit = nullptr;
-    infHandle.registerCallBack = nullptr;
-    infHandle.writeNdefData = nullptr;
-    infHandle.readNdefData = nullptr;
-    dlclose(halHandle);
-    halHandle = nullptr;
+    ReleaseHalHandle();
     return 0;
 }
 
 int32_t ConnectedNfcTagVendorAdapter::RegisterCallBack(NfcTagChipEventCallbackT *callback)
 {
-    if (infHandle.registerCallBack == nullptr) {
-        HDF_LOGE("%{public}s: registerCallBack NULL", __func__);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (halHandle == nullptr || infHandle.registerCallBack == nullptr) {
+        HDF_LOGE("%{public}s: halHandle or registerCallBack NULL", __func__);
+        return -1;
+    }
+
+    if (callback == nullptr) {
+        HDF_LOGE("%{public}s: callback NULL", __func__);
         return -1;
     }
 
@@ -231,8 +267,17 @@ int32_t ConnectedNfcTagVendorAdapter::RegisterCallBack(NfcTagChipEventCallbackT 
 
 int32_t ConnectedNfcTagVendorAdapter::WriteNdefData(const std::vector<uint8_t>& ndefData)
 {
-    if (infHandle.writeNdefData == nullptr) {
-        HDF_LOGE("%{public}s: writeNdefData NULL", __func__);
+    if (ndefData.empty()) {
+        HDF_LOGE("%{public}s: ndefData empty", __func__);
+        return -1;
+    }
+    if (ndefData.size() > MAX_NDEF_LEN) {
+        HDF_LOGE("%{public}s: ndefData size exceeds MAX_NDEF_LEN", __func__);
+        return -1;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (halHandle == nullptr || infHandle.writeNdefData == nullptr) {
+        HDF_LOGE("%{public}s: halHandle or writeNdefData NULL", __func__);
         return -1;
     }
 
@@ -241,25 +286,26 @@ int32_t ConnectedNfcTagVendorAdapter::WriteNdefData(const std::vector<uint8_t>& 
 
 int32_t ConnectedNfcTagVendorAdapter::ReadNdefData(std::vector<uint8_t>& ndefData)
 {
-    if (infHandle.readNdefData == nullptr) {
-        HDF_LOGE("%{public}s: readNdefData NULL", __func__);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (halHandle == nullptr || infHandle.readNdefData == nullptr) {
+        HDF_LOGE("%{public}s: halHandle or readNdefData NULL", __func__);
         return -1;
     }
-    
-    uint8_t buff[MAX_NDEF_LEN];
-    uint32_t buffLen = sizeof(buff);
-    int32_t ret = infHandle.readNdefData(buff, &buffLen);
+
+    std::vector<uint8_t> buff(MAX_NDEF_LEN);
+    uint32_t buffLen = buff.size();
+    int32_t ret = infHandle.readNdefData(buff.data(), &buffLen);
     if (ret != 0) {
         HDF_LOGE("%{public}s: readNdefData Fail", __func__);
         return -1;
     }
 
-    if (buffLen > sizeof(buff)) {
+    if (buffLen > buff.size()) {
         HDF_LOGE("%{public}s: buffLen exceeds buffer size", __func__);
         return -1;
     }
-    std::vector<uint8_t> data(buff, buff + buffLen);
-    ndefData = data;
+    
+    ndefData.assign(buff.begin(), buff.begin() + buffLen);
     return 0;
 }
 

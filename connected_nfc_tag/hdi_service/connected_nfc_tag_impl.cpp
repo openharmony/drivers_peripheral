@@ -14,6 +14,7 @@
  */
 
 #include "connected_nfc_tag_impl.h"
+#include <mutex>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include "v1_1/connected_nfc_tag_service.h"
@@ -31,9 +32,12 @@ namespace ConnectedNfcTag {
 namespace V1_1 {
 
 static sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback> g_callbackV1_1 = nullptr;
+static std::mutex g_callbackMutex;
+static const int MAX_NDEF_LEN = 256;
 
 static int EventCallback(uint8_t event, uint8_t *buff, uint32_t buffLen)
 {
+    std::lock_guard<std::mutex> lock(g_callbackMutex);
     if (g_callbackV1_1 != nullptr && buff != nullptr && buffLen > 0) {
         std::vector<uint8_t> data(buff, buff + buffLen);
         g_callbackV1_1->OnChipEvent((ConnectedNfcTagEvent)event, data);
@@ -46,15 +50,26 @@ extern "C" IConnectedNfcTag *ConnectedNfcTagImplGetInstance(void)
     return new (std::nothrow) ConnectedNfcTagImpl();
 }
 
+ConnectedNfcTagImpl::~ConnectedNfcTagImpl()
+{
+    HDF_LOGI("%{public}s", __func__);
+    adapter.UnInit();
+}
+
 int32_t ConnectedNfcTagImpl::RegisterCallBack(
     const sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback>& callbackObj)
 {
     HDF_LOGI("%{public}s", __func__);
 
-    g_callbackV1_1 = callbackObj;
-    if (g_callbackV1_1 == nullptr) {
+    if (callbackObj == nullptr) {
         HDF_LOGW("%{public}s: callbackObj NULL", __func__);
-        return adapter.RegisterCallBack(nullptr);
+        std::lock_guard<std::mutex> lock(g_callbackMutex);
+        g_callbackV1_1 = nullptr;
+        return HDF_SUCCESS;
+    }
+    {
+        std::lock_guard<std::mutex> lock(g_callbackMutex);
+        g_callbackV1_1 = callbackObj;
     }
     return adapter.RegisterCallBack(EventCallback);
 }
@@ -79,6 +94,14 @@ int32_t ConnectedNfcTagImpl::ReadNdefData(std::vector<uint8_t> &ndefData)
 int32_t ConnectedNfcTagImpl::WriteNdefData(const std::vector<uint8_t>& ndefData)
 {
     HDF_LOGI("%{public}s, size = %{public}lu", __func__, ndefData.size());
+    if (ndefData.empty()) {
+        HDF_LOGE("%{public}s: ndefData empty", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (ndefData.size() > MAX_NDEF_LEN) {
+        HDF_LOGE("%{public}s: ndefData size exceeds MAX_NDEF_LEN", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return adapter.WriteNdefData(ndefData);
 }
 

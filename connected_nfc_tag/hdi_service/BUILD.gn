@@ -20,6 +20,7 @@ ohos_shared_library("libconnected_nfc_tag_service_1.1") {
     "./../vendor_adapter",
   ]
   public_deps = [ "//drivers/peripheral/connected_nfc_tag/vendor_adapter:nfc_tag_vendor_adapter" ]
+  stack_protector_ret = true
 
   sources = [ "connected_nfc_tag_impl.cpp" ]
 
@@ -41,6 +42,7 @@ ohos_shared_library("connected_nfc_tag_hdi_driver") {
     ".",
     "./../vendor_adapter",
   ]
+  stack_protector_ret = true
 
   sources = [ "connected_nfc_tag_driver.cpp" ]
 
