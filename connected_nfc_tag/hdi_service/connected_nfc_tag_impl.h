@@ -17,10 +17,12 @@
 #define CONNECTED_NFC_TAG_IMPL_H
 
 #include <cstdint>
+#include <mutex>
 #include <string>
 
 #include "v1_1/iconnected_nfc_tag.h"
 #include "connected_nfc_tag_vendor_adapter.h"
+#include "remote_death_recipient.h"
 
 namespace OHOS {
 namespace HDI {
@@ -41,7 +43,14 @@ public:
     int32_t WriteNdefTag(const std::string &ndefData) override;
 
 private:
+    void OnRemoteDied(const wptr<IRemoteObjects> &object);
+    int32_t AddDeathRecipient(const sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback>& callbackObj);
+    int32_t RemoveDeathRecipient(const sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback>& callbackObj);
+
+private:
     ConnectedNfcTagVendorAdapter adapter;
+    sptr<OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTagCallback> callbackObj_ = nullptr;
+    sptr<RemoteDeathRecipient> remote_death_recipient_ = nullptr;
 };
 }  // namespace V1_1
 }  // namespace ConnectedNfcTag
