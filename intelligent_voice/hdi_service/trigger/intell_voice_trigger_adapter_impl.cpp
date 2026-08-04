@@ -95,7 +95,11 @@ int32_t IntellVoiceTriggerAdapterImpl::LoadModel(const IntellVoiceTriggerModel &
         return ret;
     }
 
-    RegisterDeathRecipient(handle, triggerCallback);
+    if (!RegisterDeathRecipient(handle, triggerCallback)) {
+        INTELLIGENT_VOICE_LOGE("register death recipient failed, unload model");
+        (void)adapter_->UnloadIntellVoiceTriggerModel(handle);
+        return HDF_FAILURE;
+    }
     return ret;
 }
 
@@ -173,7 +177,6 @@ bool IntellVoiceTriggerAdapterImpl::RegisterDeathRecipient(int32_t handle,
 {
     std::lock_guard<std::mutex> lock(mutex_);
     INTELLIGENT_VOICE_LOGI("enter");
-    handleToCallbackMap_[handle] = triggerCallback;
     sptr<IRemoteObject> object = OHOS::HDI::hdi_objcast<IIntellVoiceTriggerCallback>(triggerCallback);
     if (object == nullptr) {
         INTELLIGENT_VOICE_LOGE("object is nullptr");
@@ -183,6 +186,7 @@ bool IntellVoiceTriggerAdapterImpl::RegisterDeathRecipient(int32_t handle,
     auto it = callbackToHandleMap_.find(object.GetRefPtr());
     if (it != callbackToHandleMap_.end()) {
         it->second.insert(handle);
+        handleToCallbackMap_[handle] = triggerCallback;
         INTELLIGENT_VOICE_LOGI("callback already register, handle:%{public}d", handle);
         return true;
     }
@@ -199,6 +203,7 @@ bool IntellVoiceTriggerAdapterImpl::RegisterDeathRecipient(int32_t handle,
         return false;
     }
 
+    handleToCallbackMap_[handle] = triggerCallback;
     callbackToHandleMap_[object.GetRefPtr()].insert(handle);
     deathRecipientMap_[object.GetRefPtr()] = recipient;
     INTELLIGENT_VOICE_LOGI("register death recipient success");
