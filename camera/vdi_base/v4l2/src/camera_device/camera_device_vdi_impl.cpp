@@ -280,10 +280,16 @@ int32_t CameraDeviceVdiImpl::DisableResult(const std::vector<int32_t> &results)
 
 int32_t CameraDeviceVdiImpl::Close()
 {
+    std::lock_guard<std::mutex> lock(closeMutex_);
     HDI_DEVICE_PLACE_A_WATCHDOG;
     HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
 
+    if (isOpened_) {
+        CAMERA_LOGD("camera device already closed.");
+        DFX_LOCAL_HITRACE_END;
+        return VDI::Camera::V1_0::NO_ERROR;
+    }
     MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.Stop();
     metaDataController.UnSetUpdateSettingCallback();

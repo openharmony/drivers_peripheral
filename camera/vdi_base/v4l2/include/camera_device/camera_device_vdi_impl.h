@@ -74,6 +74,7 @@ private:
     std::vector<MetaType> deviceMetaTypes_;
     std::mutex enabledRstMutex_;
     std::vector<MetaType> enabledResults_;
+    std::mutex closeMutex_;
     std::shared_ptr<CameraMetadata> metadataResults_;
 
     // to keep OHOS::sptr<IStreamOperatorVdi> alive
