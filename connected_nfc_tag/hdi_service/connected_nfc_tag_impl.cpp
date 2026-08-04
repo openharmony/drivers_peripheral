@@ -73,7 +73,7 @@ int32_t ConnectedNfcTagImpl::RegisterCallBack(
     HDF_LOGI("%{public}s", __func__);
 
     {
-        std::lock_guard<std::mutex> lock(g_callbackMutex);
+        std::lock_guard<std::mutex> guard(g_callbackMutex);
         if (callbackObj_ != nullptr) {
             RemoveDeathRecipient(callbackObj_);
             callbackObj_ = nullptr;
