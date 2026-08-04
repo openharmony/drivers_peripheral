@@ -102,9 +102,6 @@ ComponentNode::~ComponentNode()
         std::lock_guard<std::mutex> lk(callbackMutex_);
         omxCallback_ = nullptr;
     }
-    if (comp_ != nullptr) {
-        CloseHandle();
-    }
     comp_ = nullptr;
     mgr_ = nullptr;
 }
