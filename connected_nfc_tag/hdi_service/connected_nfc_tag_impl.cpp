@@ -190,7 +190,7 @@ int32_t ConnectedNfcTagImpl::RemoveDeathRecipient(
         HDF_LOGE("%{public}s: RemoveDeathRecipient failed", __func__);
         return HDF_FAILURE;
     }
-    return HDF_SUCCESS;    
+    return HDF_SUCCESS;
 }
 
 }  // namespace V1_1
