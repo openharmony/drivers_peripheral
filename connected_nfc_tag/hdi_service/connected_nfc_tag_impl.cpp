@@ -53,7 +53,7 @@ extern "C" IConnectedNfcTag *ConnectedNfcTagImplGetInstance(void)
 
 ConnectedNfcTagImpl::ConnectedNfcTagImpl()
 {
-    remoteDeathRecipient =
+    remoteDeathRecipient_ =
         new RemoteDeathRecipient(std::bind(&ConnectedNfcTagImpl::OnRemoteDied, this, std::placeholders::_1));
 }
 
