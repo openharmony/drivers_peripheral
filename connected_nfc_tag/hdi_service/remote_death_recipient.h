@@ -45,8 +45,8 @@ public:
 private:
     std::function<void(const wptr<IRemoteObject> &)> callback_;
 };
-}  // namespace ConnectedNfcTag
-}  // namespace HDI
-}  // namespace OHOS
+}  // ConnectedNfcTag
+}  // HDI
+}  // OHOS
 
 #endif // OHOS_HDI_CONNECTED_NFC_TAG_REMOTE_DEATH_RECIPIENT_H
