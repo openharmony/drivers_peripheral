@@ -113,9 +113,9 @@ static bool g_isPowerHdiExtReg = false;
 static constexpr const int32_t REASON_MAX_RETRY_COUNT = 3;
 #endif
 
-extern "C" V1_3::IPowerInterface *PowerInterfaceImplGetInstance(void)
+extern "C" V1_4::IPowerInterface *PowerInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Power::V1_3::PowerInterfaceImpl;
+    using OHOS::HDI::Power::V1_4::PowerInterfaceImpl;
     PowerInterfaceImpl *service = new (std::nothrow) PowerInterfaceImpl();
     if (service == nullptr) {
         return nullptr;

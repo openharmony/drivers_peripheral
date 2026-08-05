@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,63 +13,108 @@
  * limitations under the License.
  */
 
-#include "power_interface_impl.h"
 #include <hdf_base.h>
+#include <hdf_device_desc.h>
 #include <hdf_log.h>
-#include "iservmgr_hdi.h"
-#include "power_hdf_log.h"
+#include <hdf_sbuf_ipc.h>
+#include "v1_4/power_interface_stub.h"
 
-#define HDF_LOG_TAG power_interface_impl
+#define HDF_LOG_TAG PowerInterfaceDriver
 
-using namespace OHOS::HDI::Power::V1_4;
-using OHOS::sptr;
-using OHOS::HDI::ServiceManager::IServiceManager;
+using namespace OHOS::HDI::Power;
+using namespace OHOS::HDI::Power::V1_3;
 
-extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
-{
-    return new (std::nothrow) PowerInterfaceImpl();
+namespace {
+struct HdfPowerInterfaceHost {
+    struct IDeviceIoService ioService;
+    OHOS::sptr<OHOS::IRemoteObject> stub;
+};
 }
 
-int32_t PowerInterfaceImplInit(struct HdfDeviceObject *deviceObject)
+static int32_t PowerInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
-    auto powerInterfaceImpl = new (std::nothrow) PowerInterfaceImpl();
-    if (powerInterfaceImpl == nullptr) {
-        HDF_LOGE("%{public}s: new power interface impl fail", __func__);
-        return HDF_ERR_MALLOC_FAIL;
+    auto *hdfPowerInterfaceHost = CONTAINER_OF(client->device->service, struct HdfPowerInterfaceHost, ioService);
+
+    OHOS::MessageParcel *dataParcel = nullptr;
+    OHOS::MessageParcel *replyParcel = nullptr;
+    OHOS::MessageOption option;
+
+    if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
     }
-    auto servmgr = IServiceManager::Get();
-    if (servmgr == nullptr) {
-        HDF_LOGE("%{public}s: get service manager fail", __func__);
-        delete powerInterfaceImpl;
-        return HDF_FAILURE;
+    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
     }
-    int32_t ret = servmgr->AddService("power_interface_service", powerInterfaceImpl, false);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: add service fail ret=%{public}d", __func__, ret);
-        delete powerInterfaceImpl;
-        return HDF_FAILURE;
-    }
-    if (powerInterfaceImpl->Init() != HDF_SUCCESS) {
-        delete powerInterfaceImpl;
-        return HDF_FAILURE;
-    }
-    HDF_LOGI("%{public}s: init power interface service success", __func__);
+
+    return hdfPowerInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
+}
+
+static int HdfPowerInterfaceDriverInit([[maybe_unused]] struct HdfDeviceObject *deviceObject)
+{
+    HDF_LOGI("HdfPowerInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
 
-struct HdfDriverEntry g_powerInterfaceEntry = {
+static int HdfPowerInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+{
+    HDF_LOGI("HdfPowerInterfaceDriverBind enter");
+
+    auto *hdfPowerInterfaceHost = new (std::nothrow) HdfPowerInterfaceHost;
+    if (hdfPowerInterfaceHost == nullptr) {
+        HDF_LOGE("%{public}s: failed to create HdfPowerInterfaceHost object", __func__);
+        return HDF_FAILURE;
+    }
+
+    hdfPowerInterfaceHost->ioService.Dispatch = PowerInterfaceDriverDispatch;
+    hdfPowerInterfaceHost->ioService.Open = NULL;
+    hdfPowerInterfaceHost->ioService.Release = NULL;
+
+    auto serviceImpl = V1_4::IPowerInterface::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfPowerInterfaceHost;
+        return HDF_FAILURE;
+    }
+
+    hdfPowerInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        V1_4::IPowerInterface::GetDescriptor());
+    if (hdfPowerInterfaceHost->stub == nullptr) {
+        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfPowerInterfaceHost;
+        return HDF_FAILURE;
+    }
+
+    deviceObject->service = &hdfPowerInterfaceHost->ioService;
+    return HDF_SUCCESS;
+}
+
+static void HdfPowerInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+{
+    HDF_LOGI("HdfPowerInterfaceDriverRelease enter");
+    if (deviceObject->service == nullptr) {
+        HDF_LOGE("HdfPowerInterfaceDriverRelease not initted");
+        return;
+    }
+
+    auto *hdfPowerInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfPowerInterfaceHost, ioService);
+    delete hdfPowerInterfaceHost;
+}
+
+static struct HdfDriverEntry g_powerinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "power_interface_service",
-    .Bind = nullptr,
-    .Init = PowerInterfaceImplInit,
-    .Release = nullptr,
+    .Bind = HdfPowerInterfaceDriverBind,
+    .Init = HdfPowerInterfaceDriverInit,
+    .Release = HdfPowerInterfaceDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
-HDF_INIT(g_powerInterfaceEntry);
-#ifndef __cplusplus
+#endif /* __cplusplus */
+HDF_INIT(g_powerinterfaceDriverEntry);
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
