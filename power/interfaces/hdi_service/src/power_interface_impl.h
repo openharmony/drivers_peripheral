@@ -66,14 +66,49 @@ public:
     int32_t AdjustCpuFrequency(bool isScreenOn) override;
     int32_t ForceSuspendIgnoringWakelock(const std::string &tag) override;
 
+    // v1.1 & v1.2 & v1.3 extended methods
+    int32_t UnRegister();
+    int32_t RegisterRunningLockCallback(const sptr<IPowerRunningLockCallback> &iPowerRunningLockCallback);
+    int32_t UnRegisterRunningLockCallback();
+    int32_t Hibernate();
+    int32_t PowerDump(std::string &info);
+    int32_t GetWakeupReason(std::string &reason);
+    int32_t SetPowerConfig(const std::string &sceneName, const std::string &value);
+    int32_t GetPowerConfig(const std::string &sceneName, std::string &value);
+    int32_t HoldRunningLockExt(const RunningLockInfo &info, uint64_t lockid, const std::string &bundleName);
+    int32_t UnholdRunningLockExt(const RunningLockInfo &info, uint64_t lockid, const std::string &bundleName);
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+    int32_t RegisterPowerCallbackExt(const sptr<V1_3::IPowerHdiCallbackExt> &ipowerHdiCallback);
+    int32_t UnRegisterPowerCallbackExt(const sptr<V1_3::IPowerHdiCallbackExt> &ipowerHdiCallback);
+#endif
+    int32_t AddPowerDeathRecipient(const sptr<IRemoteObject>& remote, const sptr<IRemoteObject::DeathRecipient>& recipient);
+    int32_t RemovePowerDeathRecipient(const sptr<IRemoteObject>& remote, const sptr<IRemoteObject::DeathRecipient>& recipient);
+
+    class PowerDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        PowerDeathRecipient(PowerInterfaceImpl *service) : powerInterfaceImpl_(service) {}
+        virtual ~PowerDeathRecipient() = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+    private:
+        PowerInterfaceImpl *powerInterfaceImpl_;
+    };
+
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+    class PowerDeathRecipientExt : public IRemoteObject::DeathRecipient {
+    public:
+        PowerDeathRecipientExt(PowerInterfaceImpl *service) : powerInterfaceImpl_(service) {}
+        virtual ~PowerDeathRecipientExt() = default;
+        void OnRemoteDied(const wptr<IRemoteObject>& object) override;
+    private:
+        PowerInterfaceImpl *powerInterfaceImpl_;
+    };
+#endif
+
 private:
     std::vector<sptr<IPowerHdiCallback>> callbackList_ = {};
     std::map<PowerHdfMode, int32_t> modeCallbackStatus_ = {};
     std::unique_ptr<OHOS::PowerMgr::SystemSuspendController> ssCtl_ = nullptr;
     std::shared_ptr<PowerHdiUtils> util_ = nullptr;
-    bool isSupportV1_2 = false;
-    bool isSupportV1_3 = false;
-    bool isSupportV1_4 = false;
     bool isReady = false;
     static std::map<PowerHdfRunningLockType, PowerHdfLockType> runningLockTypeConvertMap_;
     static std::mutex mutex_;
@@ -112,9 +147,6 @@ private:
     int32_t DlopenAdjustCpuFrequency(bool isScreenOn);
     void LoadModeSwitchConfig();
     bool IsModeCallback(const PowerHdfMode &mode);
-    int32_t InitV1_2();
-    int32_t InitV1_3();
-    int32_t InitV1_4();
     int32_t Init();
     int32_t ConvertRunningLockTypeForLock(PowerHdfRunningLockType type, PowerHdfLockType &lockType);
     int32_t ConvertRunningLockTypeForUnlock(PowerHdfRunningLockType type, PowerHdfLockType &lockType);

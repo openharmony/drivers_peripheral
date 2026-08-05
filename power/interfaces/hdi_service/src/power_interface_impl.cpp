@@ -687,13 +687,6 @@ int32_t PowerInterfaceImpl::GetPowerConfig(const std::string &sceneName, std::st
     return HDF_SUCCESS;
 }
 
-int32_t PowerInterfaceImpl::InitV1_4()
-{
-    HDF_LOGI("Init v1.4 interface");
-    isSupportV1_4 = true;
-    return HDF_SUCCESS;
-}
-
 int32_t PowerInterfaceImpl::ForceSuspendIgnoringWakelock(const std::string &tag)
 {
     HDF_LOGI("ForceSuspendIgnoringWakelock, tag=%{public}s", tag.c_str());
