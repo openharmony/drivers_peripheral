@@ -2353,8 +2353,24 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_020, TestSize
 {
     AudioAdapterDescriptor adaDesc;
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
-    
+
     uint32_t devId = 1;
+    std::string capability = "{\"tokenId\":[100]}";
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(devId, capability));
+}
+
+/**
+ * @tc.name: HandleTokenIdFromCapability_021
+ * @tc.desc: Verify the HandleTokenIdFromCapability function with tokenId as array.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTokenIdFromCapability_021, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 5;
     std::string capability = "{\"tokenId\":[100]}";
     EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, AdapterTest_->HandleTokenIdFromCapability(devId, capability));
 }
@@ -2569,6 +2585,24 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_018, TestSize.Level1)
     AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
 
     uint32_t devId = 503;
+    std::string caps = "{\"tokenId\":-100}";
+
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
+}
+
+/**
+ * @tc.name: AddAudioDevice_019
+ * @tc.desc: Verify the AddAudioDevice function with tokenId as negative number.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_019, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
+    uint32_t devId = 5;
     std::string caps = "{\"tokenId\":-100}";
 
     EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));

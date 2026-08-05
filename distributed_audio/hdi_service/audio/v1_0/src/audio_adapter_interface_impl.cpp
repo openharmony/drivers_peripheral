@@ -720,6 +720,9 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
     }
     mapAudioDevice_.insert(std::make_pair(devId, caps));
     std::string key = adpDescriptor_.adapterName + std::to_string(devId);
+    if (devId == OFFLOAD_RENDER_ID) {
+        key = adpDescriptor_.adapterName + std::to_string(DEFAULT_RENDER_ID);
+    }
     capabilityMap_[key] = caps;
     if (caps.find(TOKEN_ID) != std::string::npos) {
         int32_t ret = HandleTokenIdFromCapability(devId, caps);
@@ -749,6 +752,9 @@ int32_t AudioAdapterInterfaceImpl::HandleTokenIdFromCapability(const uint32_t de
         }
     }
     std::string key = adpDescriptor_.adapterName + std::to_string(devId);
+    if (devId == OFFLOAD_RENDER_ID) {
+        key = adpDescriptor_.adapterName + std::to_string(DEFAULT_RENDER_ID);
+    }
     capabilityMap_[key] = result;
     cJSON *root = cJSON_Parse(result.c_str());
     if (root == nullptr) {
