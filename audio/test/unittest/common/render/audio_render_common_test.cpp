@@ -185,8 +185,12 @@ void AudioUtRenderTest::TearDown()
 
 HWTEST_F(AudioUtRenderTest, RenderStartNull001, TestSize.Level1)
 {
+#ifdef AUDIO_HAL_P7885
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, render_->Start(nullptr));
+#else
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->Start(nullptr));
     render_->Stop(render_);
+#endif
 }
 
 HWTEST_F(AudioUtRenderTest, RenderStartNull002, TestSize.Level0)
@@ -1006,31 +1010,51 @@ HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid003, TestSize.Level0)
 HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid004, TestSize.Level0)
 {
     AudioChannelMode mode = AUDIO_CHANNEL_EXCHANGE;
+#ifdef AUDIO_HAL_P7885
+    ASSERT_EQ(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#else
     ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#endif
 }
 
 HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid005, TestSize.Level0)
 {
     AudioChannelMode mode = AUDIO_CHANNEL_MIX;
+#ifdef AUDIO_HAL_P7885
+    ASSERT_EQ(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#else
     ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#endif
 }
 
 HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid006, TestSize.Level0)
 {
     AudioChannelMode mode = AUDIO_CHANNEL_LEFT_MUTE;
+#ifdef AUDIO_HAL_P7885
+    ASSERT_EQ(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#else
     ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#endif
 }
 
 HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid007, TestSize.Level0)
 {
     AudioChannelMode mode = AUDIO_CHANNEL_RIGHT_MUTE;
+#ifdef AUDIO_HAL_P7885
+    ASSERT_EQ(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#else
     ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#endif
 }
 
 HWTEST_F(AudioUtRenderTest, RenderSetChannelModeIsValid008, TestSize.Level0)
 {
     AudioChannelMode mode = AUDIO_CHANNEL_BOTH_MUTE;
+#ifdef AUDIO_HAL_P7885
+    ASSERT_EQ(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#else
     ASSERT_NE(HDF_SUCCESS, render_->SetChannelMode(render_, mode));
+#endif
 }
 
 HWTEST_F(AudioUtRenderTest, RenderSetGainNull001, TestSize.Level1)

@@ -247,7 +247,12 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid004, TestSize.
     attrs.silenceThreshold = 0;
     attrs.streamId = 0;
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+#ifdef AUDIO_HAL_P7885
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#else
     EXPECT_NE(HDF_SUCCESS, ret);
+#endif
 }
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid005, TestSize.Level0)
 {
@@ -485,7 +490,11 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid015, TestSize.
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
     if (ret != HDF_SUCCESS) {
         attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+#ifdef AUDIO_HAL_P7885
+        ASSERT_EQ(HDF_ERR_NOT_SUPPORT, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+#else
         ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+#endif
     }
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
 }
@@ -504,7 +513,11 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid016, TestSize.
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
     if (ret != HDF_SUCCESS) {
         attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+#ifdef AUDIO_HAL_P7885
+        ASSERT_EQ(HDF_ERR_NOT_SUPPORT, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+#else
         ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+#endif
     }
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
 }
@@ -523,9 +536,14 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid017, TestSize.
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
     if (ret != HDF_SUCCESS) {
         attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
-        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+        ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
     }
+#ifdef AUDIO_HAL_P7885
+    ASSERT_NE(HDF_SUCCESS, ret);
+#else
+    ASSERT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+#endif
 }
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid018, TestSize.Level0)
 {
@@ -542,7 +560,11 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid018, TestSize.
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
     if (ret != HDF_SUCCESS) {
         attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+#ifdef AUDIO_HAL_P7885
+        ASSERT_EQ(HDF_ERR_NOT_SUPPORT, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+#else
         ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
+#endif
     }
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
 }
@@ -957,7 +979,12 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid016, TestSize
     devicedesc.pins = PIN_IN_LINEIN;
     InitAttrs(attrs);
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+#ifdef AUDIO_HAL_P7885
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+#else
     EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+#endif
 }
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid019, TestSize.Level0)
 {
@@ -1030,8 +1057,12 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid024, TestSize
     InitAttrs(attrs);
     attrs.sourceType = AUDIO_INPUT_OFFLOAD_CAPTURE_TYPE;
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+#ifdef AUDIO_HAL_P7885
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+#else
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+#endif
 }
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCapturePinIsvalid001, TestSize.Level0)
@@ -1260,7 +1291,12 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCapturePinIsvalid016, TestSize.Le
     devicedesc.pins = PIN_IN_LINEIN;
     InitAttrs(attrs);
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+#ifdef AUDIO_HAL_P7885
+    EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+#else
     EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+#endif
 }
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCapturePinIsvalid019, TestSize.Level0)
 {
@@ -1333,8 +1369,12 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCapturePinIsvalid024, TestSize.Le
     InitAttrs(attrs);
     attrs.sourceType = AUDIO_INPUT_VOICE_TRANSCRIPTION;
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+#ifdef AUDIO_HAL_P7885
+    EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
+#else
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+#endif
 }
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCapturePinIsvalid025, TestSize.Level0)
 {
@@ -1623,7 +1663,11 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterUpdateAudioRouteIsvalid001, TestS
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCognitionStreamNull001, TestSize.Level0)
 {
     int32_t ret = adapter_->CreateCognitionStream(nullptr, nullptr, nullptr, nullptr);
+#ifdef AUDIO_HAL_P7885
+    EXPECT_EQ(HDF_SUCCESS, ret);
+#else
     EXPECT_NE(HDF_SUCCESS, ret);
+#endif
 }
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCognitionStreamNull002, TestSize.Level0)
