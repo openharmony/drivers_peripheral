@@ -365,7 +365,7 @@ OffFindErrorCode VendorInterface::EnableOffFindMode(InitializeCompleteCallback i
         OHOS::system::GetUintParameter<size_t>("const.findnetwork.shutdown_params.count", DEFAULT_ADV_DATA_LEN);
     HDF_LOGI("EnableOffFindMode Begin, %{public}zu params", paramsCnt);
     if (IsAirOta(info)) {
-        paramCnt = AIR_OTA_DATE_LEN;
+        paramsCnt = AIR_OTA_DATE_LEN;
     }
     if (!PowerOffDliGet(data, info, paramsCnt)) {
         HDF_LOGE("PowerOffDliGet ERROR");
