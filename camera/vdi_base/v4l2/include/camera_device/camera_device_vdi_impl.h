@@ -63,6 +63,9 @@ private:
     RetCode GetEnabledFromCfg();
     uint64_t GetCurrentLocalTimeStamp();
     void InitMetadataController();
+    void ReleaseStreamOperator();
+    int32_t PowerDownPhysicCameras();
+    void ResetState();
 
 private:
     bool isOpened_;
