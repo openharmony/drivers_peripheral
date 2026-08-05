@@ -312,8 +312,11 @@ int32_t StreamOperatorVdiImpl::ReleaseStreams(const std::vector<int32_t> &stream
 RetCode StreamOperatorVdiImpl::ReleaseStreams()
 {
     std::vector<int32_t> ids = {};
-    for (auto it : streamMap_) {
-        ids.push_back(it.first);
+    {
+        std::lock_guard<std::mutex> l(streamLock_);
+        for (auto it : streamMap_) {
+            ids.push_back(it.first);
+        }
     }
 
     ReleaseStreams(ids);

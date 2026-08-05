@@ -278,21 +278,16 @@ int32_t CameraDeviceVdiImpl::DisableResult(const std::vector<int32_t> &results)
     return ret;
 }
 
-int32_t CameraDeviceVdiImpl::Close()
+void CameraDeviceVdiImpl::ReleaseStreamOperator()
 {
-    HDI_DEVICE_PLACE_A_WATCHDOG;
-    HDF_CAMERA_TRACE;
-    DFX_LOCAL_HITRACE_BEGIN;
-
-    MetadataController &metaDataController = MetadataController::GetInstance();
-    metaDataController.Stop();
-    metaDataController.UnSetUpdateSettingCallback();
-
     if (spStreamOperator_ != nullptr) {
         spStreamOperator_->ReleaseStreams();
         spStreamOperator_ = nullptr;
     }
+}
 
+int32_t CameraDeviceVdiImpl::PowerDownPhysicCameras()
+{
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
     if (deviceManager == nullptr) {
         CAMERA_LOGW("device manager is null [dm name MpiDeviceManager].");
@@ -327,8 +322,41 @@ int32_t CameraDeviceVdiImpl::Close()
         CAMERA_LOGD("[phyCameraId = %{public}s] powerdown success.", phyCameraId.c_str());
     }
 
+    return VDI::Camera::V1_0::NO_ERROR;
+}
+
+void CameraDeviceVdiImpl::ResetState()
+{
     isOpened_ = false;
     cameraDeciceCallback_ = nullptr;
+}
+
+int32_t CameraDeviceVdiImpl::Close()
+{
+    std::lock_guard<std::mutex> lock(closeMutex_);
+    HDI_DEVICE_PLACE_A_WATCHDOG;
+    HDF_CAMERA_TRACE;
+    DFX_LOCAL_HITRACE_BEGIN;
+
+    if (!isOpened_) {
+        CAMERA_LOGD("camera device already closed.");
+        DFX_LOCAL_HITRACE_END;
+        return VDI::Camera::V1_0::NO_ERROR;
+    }
+
+    MetadataController &metaDataController = MetadataController::GetInstance();
+    metaDataController.Stop();
+    metaDataController.UnSetUpdateSettingCallback();
+
+    ReleaseStreamOperator();
+
+    int32_t rc = PowerDownPhysicCameras();
+    if (rc != VDI::Camera::V1_0::NO_ERROR) {
+        DFX_LOCAL_HITRACE_END;
+        return rc;
+    }
+
+    ResetState();
     DFX_LOCAL_HITRACE_END;
     CAMERA_LOGD("camera close success.");
     return VDI::Camera::V1_0::NO_ERROR;
