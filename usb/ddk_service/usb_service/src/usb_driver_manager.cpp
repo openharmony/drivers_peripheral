@@ -75,8 +75,8 @@ bool UsbDriverManager::UpdateDriverInfo(const V1_1::DriverAbilityInfo &driverInf
 
     constexpr size_t MAX_DRIVER_ENTRIES_PER_TOKEN = 255;
     if (it->second.size() >= MAX_DRIVER_ENTRIES_PER_TOKEN) {
-        HDF_LOGE("%{public}s: entries for tokenId: %{private}u exceed limit %{public}zu, driverUid: %{public}s",
-            __func__, tokenId, MAX_DRIVER_ENTRIES_PER_TOKEN, driverInfo.driverUid.c_str());
+        HDF_LOGE("%{public}s: entries for tokenId: %{private}u exceed limit, driverUid: %{public}s",
+            __func__, tokenId, driverInfo.driverUid.c_str());
         return false;
     }
 
@@ -110,7 +110,7 @@ bool UsbDriverManager::RemoveDriverInfo(const std::string &driverUid)
         [&driverUid](const std::unique_ptr<V1_1::DriverAbilityInfo> &entry) {
             return entry != nullptr && entry->driverUid == driverUid;
         });
-    size_t removeCount = std::distance(target, vec.end());
+    size_t removeCount = static_cast<size_t>(std::distance(target, vec.end()));
     vec.erase(target, vec.end());
 
     HDF_LOGI("%{public}s, removed %{public}zu/%{public}zu entries, remaining %{public}zu, driverUid:%{public}s",
