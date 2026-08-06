@@ -376,6 +376,8 @@ OffFindErrorCode VendorInterface::EnableOffFindMode(InitializeCompleteCallback i
         return OFF_FIND_SYNC_FAIL;
     }
     vendorInterface_->init();
+    int powerSetFlag = SET_RESERVED_POWER;
+    vendorInterface_->op(OffFindOpcodeT::SLE_OP_RESERVERD_POWER_SET, static_cast<void *>(&powerSetFlag));
     if (!WatchDliChannel()) {
         HDF_LOGE("WatchDliChannel Init Fail");
         return OFF_FIND_SYNC_FAIL;
