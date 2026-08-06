@@ -72,6 +72,7 @@ constexpr int HIGH_POWER_TIME = 168;  // 关机七天 7 day = 7*24h
 constexpr int UP_POWER_TIME = 48;
 constexpr int DOWN_POWER_TIME = 12;
 constexpr int AIR_OTA_POWER_TIME = 168;  // 隔空升级 7 day = 7*24h
+constexpr int AIR_OTA_DATE_LEN = 2;
 constexpr size_t DEFAULT_ADV_DATA_LEN = 3;  // 关机3d下发广播数组长度
 constexpr size_t SEVEN_DAYS_ADV_DATA_LEN = 8;  // 关机7d下发广播数组长度
 // Data len dli position
@@ -285,6 +286,14 @@ void VendorInterface::SetReservedPower()
     CleanUp();
 }
 
+bool VendorInterface::IsAirOta(const OffFindExtraInfo& info)
+{
+    bool isAirOta = std::all_of(info.uid.begin(), info.uid.end(), [](unsigned char c) {
+        return c == 0xFF;
+    });
+    return !info.uid.empty() && isAirOta;
+}
+
 int VendorInterface::GetPowerTimeParameter(const OffFindExtraInfo& info, size_t paramsCnt)
 {
     int power = info.battery <= BATTERY_ENTRY ?
@@ -295,10 +304,7 @@ int VendorInterface::GetPowerTimeParameter(const OffFindExtraInfo& info, size_t 
         power = HIGH_POWER_TIME;
     }
 
-    bool isAirOta = std::all_of(info.uid.begin(), info.uid.end(), [](unsigned char c) {
-        return c == 0xFF;
-    });
-    if (!info.uid.empty() && isAirOta) {
+    if (IsAirOta(info)) {
         power = AIR_OTA_POWER_TIME;
     }
 
@@ -358,6 +364,9 @@ OffFindErrorCode VendorInterface::EnableOffFindMode(InitializeCompleteCallback i
     size_t paramsCnt =
         OHOS::system::GetUintParameter<size_t>("const.findnetwork.shutdown_params.count", DEFAULT_ADV_DATA_LEN);
     HDF_LOGI("EnableOffFindMode Begin, %{public}zu params", paramsCnt);
+    if (IsAirOta(info)) {
+        paramsCnt = AIR_OTA_DATE_LEN;
+    }
     if (!PowerOffDliGet(data, info, paramsCnt)) {
         HDF_LOGE("PowerOffDliGet ERROR");
         return OFF_FIND_SYNC_FAIL;
