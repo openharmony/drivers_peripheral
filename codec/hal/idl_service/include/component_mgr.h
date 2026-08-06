@@ -35,30 +35,34 @@ public:
     };
 
 public:
+    static ComponentMgr& GetInstance();
+
     ComponentMgr();
     ~ComponentMgr();
     ComponentMgr(const ComponentMgr &) = delete;
     ComponentMgr &operator=(const ComponentMgr &) = delete;
 
-    virtual int32_t CreateComponentInstance(const char *componentName, const OMX_CALLBACKTYPE *callbacks, void *appData,
-                                            OMX_COMPONENTTYPE **component);
+    virtual int32_t CreateComponentInstance(const std::string &componentName, const OMX_CALLBACKTYPE *callbacks,
+                                            void *appData, OMX_COMPONENTTYPE **component);
 
     virtual int32_t DeleteComponentInstance(OMX_COMPONENTTYPE *component);
 
-    virtual int32_t GetRolesForComponent(const char *componentName, std::vector<std::string> *roles);
-
-    virtual int32_t GetCoreOfComponent(CodecOMXCore* &core, const std::string compName);
+    virtual int32_t GetRolesForComponent(const std::string &componentName, std::vector<std::string> &roles);
 
 private:
     void AddVendorComponent();
     void AddSoftComponent();
-    void AddComponentByLibName(const char *libName, bool permanent);
+    void AddComponentByLibName(const std::string &libName, bool permanent);
     void CleanComponent();
 
-private:
+public:
     std::mutex mutex_;
+
+private:
     std::map<std::string, std::string> compName2libName_;
+    std::map<std::string, bool> isLibPermanent_;
     std::map<std::string, std::shared_ptr<CodecOMXCore>> permanentLibs_;  // libname -> CodecOMXCore
+    std::map<std::string, std::weak_ptr<CodecOMXCore>> nonPermanentLibs_;
     std::vector<OMXComponent> components_;  // created
 };
 }  // namespace Omx

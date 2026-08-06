@@ -35,7 +35,7 @@ namespace Codec {
 namespace Omx {
 class ComponentNode : NoCopyable {
 public:
-    ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appData, std::shared_ptr<ComponentMgr>& mgr);
+    ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appData);
     ~ComponentNode();
     int32_t OpenHandle(const std::string& name);
     int32_t CloseHandle();
@@ -92,10 +92,8 @@ private:
     int64_t appData_;
     std::mutex callbackMutex_;
     std::shared_mutex poolMutex_;
-    std::shared_mutex deinitMutex_;
     std::vector<BufferInfo> bufferPool_;
     uint32_t bufferIdCount_;
-    std::shared_ptr<ComponentMgr> mgr_;
     uint32_t maxStateWaitTime = 10000;
     uint32_t maxStateWaitCount = 100;
     std::string compName_;

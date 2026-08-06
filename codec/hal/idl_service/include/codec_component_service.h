@@ -26,7 +26,7 @@ namespace V4_0 {
 class CodecComponentService : public ICodecComponent {
 public:
     CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node,
-                          const std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr, const std::string name);
+                          uint32_t componentId, const std::string name);
     virtual ~CodecComponentService();
     int32_t GetComponentVersion(CompVerInfo &verInfo) override;
     int32_t SendCommand(CodecCommandType cmd, uint32_t param, const std::vector<int8_t> &cmdData) override;
@@ -64,8 +64,7 @@ private:
     std::string name_;
     std::mutex nodeMutex_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentNode> node_;
-    std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
-    std::atomic<bool> isDestroying_;
+    uint32_t componentId_;
 };
 
 }  // namespace V4_0

@@ -25,17 +25,35 @@ namespace Codec {
 namespace Omx {
 CodecOMXCore::~CodecOMXCore()
 {
+    DeInit();
     if (libHandle_ != nullptr) {
+        CODEC_LOGI("begin to dlclose %{public}s", libName_.c_str());
         dlclose(libHandle_);
     }
 }
+
+std::shared_ptr<CodecOMXCore> CodecOMXCore::Create(const std::string &libName)
+{
+    auto core = std::make_shared<CodecOMXCore>(libName);
+    if (core == nullptr) {
+        CODEC_LOGE("fail to create CodecOMXCore");
+        return nullptr;
+    }
+    int32_t err = core->Init(libName);
+    if (err != HDF_SUCCESS) {
+        CODEC_LOGE("fail to init CodecOMXCore");
+        return nullptr;
+    }
+    return core;
+}
+
 int32_t CodecOMXCore::Init(const std::string &libName)
 {
     if (libName.empty()) {
         CODEC_LOGE("param is empty");
         return HDF_ERR_INVALID_PARAM;
     }
-
+    CODEC_LOGI("begin to dlopen %{public}s", libName.c_str());
     libHandle_ = dlopen(libName.c_str(), RTLD_LAZY);
     if (libHandle_ == nullptr) {
         CODEC_LOGE("Failed to dlopen %{public}s.", libName.c_str());
@@ -50,6 +68,7 @@ int32_t CodecOMXCore::Init(const std::string &libName)
     componentNameEnum_ = reinterpret_cast<ComponentNameEnumFunc>(dlsym(libHandle_, "OMX_ComponentNameEnum"));
 
     if (init_ != NULL) {
+        CODEC_LOGI("begin to call OMX_Init for %{public}s", libName.c_str());
         (*(init_))();
     }
     return HDF_SUCCESS;
@@ -58,6 +77,7 @@ int32_t CodecOMXCore::Init(const std::string &libName)
 void CodecOMXCore::DeInit()
 {
     if (deInit_) {
+        CODEC_LOGI("begin to call OMX_Deinit for %{public}s", libName_.c_str());
         (*deInit_)();
     }
 }
@@ -98,7 +118,7 @@ int32_t CodecOMXCore::ComponentNameEnum(std::string &name, uint32_t index)
     }
     return err;
 }
-int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::string> &roles)
+int32_t CodecOMXCore::GetRolesOfComponent(const std::string &name, std::vector<std::string> &roles)
 {
     if (getRoles_ == nullptr) {
         CODEC_LOGE("getRoles_ is null.");

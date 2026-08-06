@@ -81,12 +81,11 @@ OMX_ERRORTYPE ComponentNode::OnFillBufferDone(OMX_HANDLETYPE component, void *ap
 OMX_CALLBACKTYPE ComponentNode::callbacks_ = {&ComponentNode::OnEvent, &ComponentNode::OnEmptyBufferDone,
                                               &ComponentNode::OnFillBufferDone};
 
-ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appData, std::shared_ptr<ComponentMgr> &mgr)
+ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appData)
     : comp_(nullptr),
       omxCallback_(callbacks),
       appData_(appData),
-      bufferIdCount_(0),
-      mgr_(mgr)
+      bufferIdCount_(0)
 {
     isIPCMode_ = (HdfRemoteGetCallingPid() == getpid() ? false : true);
 }
@@ -103,7 +102,6 @@ ComponentNode::~ComponentNode()
         omxCallback_ = nullptr;
     }
     comp_ = nullptr;
-    mgr_ = nullptr;
 }
 
 int32_t ComponentNode::OpenHandle(const std::string &name)
@@ -113,7 +111,7 @@ int32_t ComponentNode::OpenHandle(const std::string &name)
     }
 
     OMX_COMPONENTTYPE *comp = nullptr;
-    auto err = mgr_->CreateComponentInstance(name.c_str(), &callbacks_, this, &comp);
+    auto err = ComponentMgr::GetInstance().CreateComponentInstance(name, &callbacks_, this, &comp);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("CreateComponentInstance err = %{public}x ", err);
         return err;
@@ -130,7 +128,7 @@ int32_t ComponentNode::CloseHandle()
         return HDF_FAILURE;
     }
 
-    auto err = mgr_->DeleteComponentInstance(reinterpret_cast<OMX_COMPONENTTYPE *>(comp_));
+    auto err = ComponentMgr::GetInstance().DeleteComponentInstance(reinterpret_cast<OMX_COMPONENTTYPE *>(comp_));
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("DeleteComponentInstance err = %{public}x ", err);
         return err;
@@ -345,25 +343,12 @@ int32_t ComponentNode::ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t in
 
 int32_t ComponentNode::ComponentDeInit()
 {
-    std::unique_lock<std::shared_mutex> lk(deinitMutex_);
-
-    if (comp_ == nullptr) {
-        CODEC_LOGW("comp_ is already null");
-        return OMX_ErrorNone;
-    }
-
+    CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
-    if (comType == nullptr || comType->ComponentDeInit == nullptr) {
-        CODEC_LOGE("comType or ComponentDeInit is null");
-        comp_ = nullptr;
-        return OMX_ErrorInvalidComponent;
-    }
-
     auto err = comType->ComponentDeInit(comp_);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("ComponentDeInit err = %{public}x ", err);
     }
-    comp_ = nullptr;
     return err;
 }
 

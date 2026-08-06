@@ -29,6 +29,7 @@ namespace Codec {
 namespace V4_0 {
 class CodecComponentManagerService : public ICodecComponentManager {
 public:
+    static CodecComponentManagerService& GetInstance();
     CodecComponentManagerService();
     virtual ~CodecComponentManagerService() = default;
     int32_t GetComponentNum(int32_t &count) override;
@@ -36,6 +37,7 @@ public:
     int32_t CreateComponent(sptr<ICodecComponent> &component, uint32_t &componentId, const std::string &compName,
                             int64_t appData, const sptr<ICodecCallback> &callbacks) override;
     int32_t DestroyComponent(uint32_t componentId) override;
+    void DestroyComponentByDtor(uint32_t componentId);
     void LoadCapabilityData(const DeviceResourceNode &node);
     void GetManagerMap(std::map<uint32_t, sptr<ICodecComponent>> &dumpMap);
     bool JudgePassThrouth(void);
@@ -43,11 +45,9 @@ private:
     uint32_t GetNextComponentId(void);
 
 private:
-    std::map<uint32_t, sptr<ICodecComponent>> componentMap_;
+    std::map<uint32_t, wptr<ICodecComponent>> componentMap_;
     uint32_t componentId_;
-    std::mutex mutex_;
     DeviceResourceNode resourceNode_;
-    std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
 };
 }  // namespace V4_0
 }  // namespace Codec

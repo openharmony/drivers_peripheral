@@ -20,6 +20,7 @@
 #include <malloc.h>
 #include <unistd.h>
 #include <hitrace_meter.h>
+#include "codec_component_manager_service.h"
 #include "codec_log_wrapper.h"
 
 namespace OHOS {
@@ -28,27 +29,21 @@ namespace Codec {
 namespace V4_0 {
 
 CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node,
-    const std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr, const std::string name)
+    uint32_t componentId, const std::string name)
 {
     name_ = name;
     node_ = node;
-    mgr_  = mgr;
+    componentId_ = componentId;
     isIPCMode_ = (HdfRemoteGetCallingPid() == getpid() ? false : true);
-    isDestroying_ = false;
 #ifdef SUPPORT_ROLE
     SetComponentRole();
 #endif
 }
 CodecComponentService::~CodecComponentService()
 {
-    bool expected = false;
-    bool desired = true;
-    if (!isDestroying_.compare_exchange_strong(expected, desired)) {
-        CODEC_LOGW("Component is already being destroyed");
-        return;
-    }
-
-    std::lock_guard<std::mutex> lock(nodeMutex_);
+    CODEC_LOGI("enter");
+    std::lock_guard<std::mutex> lock(OHOS::Codec::Omx::ComponentMgr::GetInstance().mutex_);
+    CodecComponentManagerService::GetInstance().DestroyComponentByDtor(componentId_);
     if (node_ != nullptr) {
         node_->ReleaseOMXResource();
         int32_t ret = node_->CloseHandle();
@@ -59,7 +54,6 @@ CodecComponentService::~CodecComponentService()
         ReleaseCache();
     }
     name_ = "";
-    mgr_ = nullptr;
 }
 
 void CodecComponentService::ReleaseCache()
@@ -260,25 +254,8 @@ int32_t CodecComponentService::ComponentDeInit()
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecComponentDeInit");
     CODEC_LOGI("ComponentDeInit");
-
-    bool expected = false;
-    bool desired = true;
-    if (!isDestroying_.compare_exchange_strong(expected, desired)) {
-        CODEC_LOGE("ComponentDeInit failed: component is being destroyed");
-        return HDF_ERR_DEVICE_BUSY;
-    }
-
     std::lock_guard<std::mutex> lock(nodeMutex_);
     CHECK_AND_RETURN_RET_LOG(node_ != nullptr, HDF_FAILURE, "componentNode is null");
-
-    CodecStateType state = CODEC_STATE_INVALID;
-    node_->GetState(state);
-    if (state == CODEC_STATE_INVALID) {
-        CODEC_LOGW("Component is in Invalid state, try to recover");
-        std::vector<int8_t> cmdData;
-        node_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, cmdData.data());
-    }
-
     return node_->ComponentDeInit();
 }
 
@@ -311,15 +288,8 @@ void CodecComponentService::SetComponentRole()
         CODEC_LOGE("compName is null");
         return;
     }
-    OHOS::Codec::Omx::CodecOMXCore *core;
-    auto err = mgr_->GetCoreOfComponent(core, name_);
-    if (err != HDF_SUCCESS) {
-        CODEC_LOGE("core is null");
-        return;
-    }
-
     std::vector<std::string> roles;
-    int32_t ret = core->GetRolesOfComponent(name_, roles);
+    int32_t ret = OHOS::Codec::Omx::ComponentMgr::GetInstance().GetRolesForComponent(name_, roles);
     if (ret != HDF_SUCCESS) {
         CODEC_LOGE("GetRoleOfComponent return err [%{public}d]", ret);
         return;
@@ -335,7 +305,7 @@ void CodecComponentService::SetComponentRole()
     errno_t res = strncpy_s(reinterpret_cast<char *>(role.cRole), OMX_MAX_STRINGNAME_SIZE,
                             roles[roleIndex].c_str(), roles[roleIndex].length());
     if (res != EOK) {
-        CODEC_LOGE("strncpy_s return err [%{public}d]", err);
+        CODEC_LOGE("strncpy_s return err [%{public}d]", res);
         return;
     }
     role.nSize = sizeof(role);

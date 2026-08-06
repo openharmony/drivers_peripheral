@@ -33,17 +33,22 @@ public:
     typedef OMX_ERRORTYPE (*GetRolesOfComponentFunc)(OMX_STRING, OMX_U32 *, OMX_U8 **);
 
 public:
-    CodecOMXCore() = default;
+    static std::shared_ptr<CodecOMXCore> Create(const std::string &libName);
+    CodecOMXCore(const std::string &libName) : libName_(libName) {}
     ~CodecOMXCore();
-    int32_t Init(const std::string &libName);
-    void DeInit();
+
     int32_t GetHandle(OMX_HANDLETYPE &handle, std::string &compName, OMX_PTR appData,
                       const OMX_CALLBACKTYPE &callbacks);
     int32_t FreeHandle(OMX_HANDLETYPE handle);
     int32_t ComponentNameEnum(std::string &name, uint32_t index);
-    int32_t GetRolesOfComponent(std::string &name, std::vector<std::string> &roles);
+    int32_t GetRolesOfComponent(const std::string &name, std::vector<std::string> &roles);
 
 private:
+    int32_t Init(const std::string &libName);
+    void DeInit();
+
+private:
+    std::string libName_;
     void *libHandle_ = nullptr;
     InitFunc init_ = nullptr;
     DeinitFunc deInit_ = nullptr;
