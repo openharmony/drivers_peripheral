@@ -16,6 +16,8 @@
 #ifndef OHOS_HDI_DRM_V1_0_MEDIAKEYSESSIONCALLBACKSERVICE_H
 #define OHOS_HDI_DRM_V1_0_MEDIAKEYSESSIONCALLBACKSERVICE_H
 
+#include <mutex>
+#include <iproxy_broker.h>
 #include "v1_0/imedia_key_session_callback.h"
 
 namespace OHOS {
@@ -26,14 +28,40 @@ class MediaKeySessionCallbackService : public OHOS::HDI::Drm::V1_0::IMediaKeySes
 public:
     MediaKeySessionCallbackService(OHOS::sptr<IMediaKeySessionCallback> callback);
 
-    virtual ~MediaKeySessionCallbackService() = default;
+    virtual ~MediaKeySessionCallbackService();
 
     int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data) override;
 
     int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>,
          OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool newKeysAvailable) override;
+
+    void OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object);
+
 private:
     OHOS::sptr<IMediaKeySessionCallback> keySessionCallback_;
+    OHOS::sptr<OHOS::IRemoteObject::DeathRecipient> deathRecipient_;
+    std::mutex callbackMutex_;
+};
+
+class KeySessionCallbackDeathRecipient : public OHOS::IRemoteObject::DeathRecipient {
+public:
+    explicit KeySessionCallbackDeathRecipient(const OHOS::wptr<MediaKeySessionCallbackService> &callbackService)
+        : callbackService_(callbackService)
+    {}
+
+    virtual ~KeySessionCallbackDeathRecipient() = default;
+
+    void OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object) override
+    {
+        OHOS::sptr<MediaKeySessionCallbackService> callbackService = callbackService_.promote();
+        if (callbackService == nullptr) {
+            return;
+        }
+        callbackService->OnRemoteDied(object);
+    }
+
+private:
+    OHOS::wptr<MediaKeySessionCallbackService> callbackService_;
 };
 } // V1_0
 } // Drm
