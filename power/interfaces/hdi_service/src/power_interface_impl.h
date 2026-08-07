@@ -107,9 +107,9 @@ private:
     int32_t RemovePowerDeathRecipient(
         const sptr<IRemoteObject>& remote, const sptr<IRemoteObject::DeathRecipient>& recipient);
 };
-} // namespace V1_3
+} // namespace V1_4
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_POWER_V1_3_POWERINTERFACEIMPL_H
+#endif // OHOS_HDI_POWER_V1_4_POWERINTERFACEIMPL_H

@@ -22,7 +22,7 @@
 #define HDF_LOG_TAG PowerInterfaceDriver
 
 using namespace OHOS::HDI::Power;
-using namespace OHOS::HDI::Power::V1_3;
+using namespace OHOS::HDI::Power::V1_2;
 
 namespace {
 struct HdfPowerInterfaceHost {
