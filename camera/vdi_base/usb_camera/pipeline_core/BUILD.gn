@@ -61,6 +61,8 @@ config("weak_ffmpeg") {
 }
 
 ohos_shared_library("usb_camera_pipeline_core") {
+  _config_gen_dir = get_label_info("$camera_path_usb/camera_config:generate_config_source", "target_gen_dir")
+  _params_gen_dir = get_label_info("$camera_path_usb/camera_config:generate_params_source", "target_gen_dir")
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -69,8 +71,6 @@ ohos_shared_library("usb_camera_pipeline_core") {
   }
   sources = [
     "$camera_path_usb/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node/uvc_node.cpp",
-    "$camera_path_usb/pipeline_core/pipeline_impl/src/strategy/config/config.c",
-    "$camera_path_usb/pipeline_core/pipeline_impl/src/strategy/config/params.c",
     "$camera_path_usb/pipeline_core/src/mjpeg_decoder/mjpeg_decoder.cpp",
     "$camera_path_usb/pipeline_core/src/node/codec_node.cpp",
     "$camera_path_usb/pipeline_core/src/node/exif_node.cpp",
@@ -132,7 +132,8 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "$camera_path_vdi/pipeline_core/pipeline_impl/src/dispatcher",
     "$camera_path_vdi/pipeline_core/pipeline_impl/src/parser",
     "$camera_path_vdi/pipeline_core/pipeline_impl/src/strategy",
-    "$camera_path_usb/pipeline_core/pipeline_impl/src/strategy/config",
+    "_config_gen_dir",
+    "_params_gen_dir",
     "$camera_path_vdi/pipeline_core/ipp/include",
     "$camera_path_usb/interfaces/hdi",
     "$camera_path_vdi/utils/event",
@@ -147,10 +148,15 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "$camera_path_vdi/../interfaces",
   ]
 
+  sources += [
+    "$_config_gen_dir/config.c",
+    "$_params_gen_dir/params.c",
+  ]
+
   deps = [
     "$camera_path_usb/buffer_manager:usb_camera_buffer_manager",
-    "$camera_path_usb/camera_config:config.c",
-    "$camera_path_usb/camera_config:params.c",
+    "$camera_path_usb/camera_config:generate_config_source",
+    "$camera_path_usb/camera_config:generate_params_source",
     "$camera_path_usb/device_manager:usb_camera_device_manager",
     "$camera_path_usb/metadata_manager:usb_camera_metadata_manager",
     "$camera_path_vdi/utils:peripheral_camera_utils",
