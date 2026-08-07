@@ -21,33 +21,42 @@
 #include "codec_log_wrapper.h"
 #include "component_node.h"
 #include "codec_dfx_service.h"
-#include "codec_death_recipient.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace V4_0 {
-sptr<CodecComponentManagerService> g_codecManagerService = sptr<CodecComponentManagerService>();
+
 std::once_flag m_serviceFlag;
 using OHOS::Codec::Omx::ComponentNode;
+
+CodecComponentManagerService& CodecComponentManagerService::GetInstance()
+{
+    static CodecComponentManagerService service;
+    return service;
+}
+
 extern "C" ICodecComponentManager *CodecComponentManagerImplGetInstance(void)
 {
     std::call_once(m_serviceFlag, [] {
-        g_codecManagerService = sptr<CodecComponentManagerService>(new CodecComponentManagerService());
-        CodecDfxService::GetInstance().SetComponentManager(g_codecManagerService);
+        // ensure ctor is executed here
+        auto& service = CodecComponentManagerService::GetInstance();
+        (void)service;
+        auto& mgr = OHOS::Codec::Omx::ComponentMgr::GetInstance();
+        (void)mgr;
         OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->CodecCompCapabilityInit();
     });
-    return g_codecManagerService;
+    return &CodecComponentManagerService::GetInstance();
 }
 
 CodecComponentManagerService::CodecComponentManagerService() : componentId_(0)
 {
+    CODEC_LOGI("enter");
     resourceNode_.name = nullptr;
     resourceNode_.hashValue = 0;
     resourceNode_.attrData = nullptr;
     resourceNode_.parent = nullptr;
     resourceNode_.child = nullptr;
     resourceNode_.sibling = nullptr;
-    mgr_ = std::make_shared<OHOS::Codec::Omx::ComponentMgr>();
 }
 
 int32_t CodecComponentManagerService::GetComponentNum(int32_t &count)
@@ -75,7 +84,9 @@ int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &com
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecCreateComponent");
     CODEC_LOGD("compName[%{public}s]", compName.c_str());
     CHECK_AND_RETURN_RET_LOG(callbacks != nullptr, HDF_ERR_INVALID_PARAM, "callbacks is null");
-    std::shared_ptr<ComponentNode> node = std::make_shared<ComponentNode>(callbacks, appData, mgr_);
+
+    std::lock_guard<std::mutex> autoLock(OHOS::Codec::Omx::ComponentMgr::GetInstance().mutex_);
+    std::shared_ptr<ComponentNode> node = std::make_shared<ComponentNode>(callbacks, appData);
     auto err = node->OpenHandle(compName);
     if (err != HDF_SUCCESS) {
         CODEC_LOGE("OpenHandle faled, err[%{public}d]", err);
@@ -83,34 +94,37 @@ int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &com
         return err;
     }
 
-    sptr<ICodecComponent> codecComponent(new CodecComponentService(node, mgr_, compName));
-    std::unique_lock<std::mutex> autoLock(mutex_);
     componentId = GetNextComponentId();
+    sptr<ICodecComponent> codecComponent(new CodecComponentService(node, componentId, compName));
     componentMap_.emplace(std::make_pair(componentId, codecComponent));
     component = codecComponent;
-    CODEC_LOGI("componentId[%{public}d]", componentId);
-    if (!JudgePassThrouth()) {
-        RegisterDeathRecipientService(callbacks, componentId, this);
-    }
+    CODEC_LOGI("componentId[%{public}d], now total %{public}zu", componentId, componentMap_.size());
     return HDF_SUCCESS;
 }
 
 int32_t CodecComponentManagerService::DestroyComponent(uint32_t componentId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecDestroyComponent");
-    std::unique_lock<std::mutex> autoLock(mutex_);
+    std::lock_guard<std::mutex> autoLock(OHOS::Codec::Omx::ComponentMgr::GetInstance().mutex_);
     CODEC_LOGI("componentId[%{public}d]", componentId);
-    if (!JudgePassThrouth() && !CheckComponentIdOwnership(componentId)) {
-        return HDF_ERR_INVALID_PARAM;
-    }
     auto iter = componentMap_.find(componentId);
-    if (iter == componentMap_.end() || iter->second == nullptr) {
+    if (iter == componentMap_.end()) {
         CODEC_LOGE("can not find component service by componentId[%{public}d]", componentId);
         return HDF_ERR_INVALID_PARAM;
     }
-    componentMap_.erase(iter);
-    RemoveMapperOfDestoryedComponent(componentId);
     return HDF_SUCCESS;
+}
+
+/* DestroyComponent() above is HDI API for caller, we cannot delete it for compatibility.
+ * since we save wptr<ICodecComponent> instead of sptr<ICodecComponent> in componentMap_,
+ * DestroyComponent() only check if the id is in the map, and do nothing.
+ * the wptr is cleared by ~CodecComponentService and DestroyComponentByDtor() function below.
+ */
+
+void CodecComponentManagerService::DestroyComponentByDtor(uint32_t componentId)
+{
+    componentMap_.erase(componentId);
+    CODEC_LOGI("componentId[%{public}d], now total %{public}zu", componentId, componentMap_.size());
 }
 
 uint32_t CodecComponentManagerService::GetNextComponentId(void)
@@ -129,7 +143,13 @@ void CodecComponentManagerService::LoadCapabilityData(const DeviceResourceNode &
 
 void CodecComponentManagerService::GetManagerMap(std::map<uint32_t, sptr<ICodecComponent>> &dumpMap)
 {
-    dumpMap = componentMap_;
+    std::lock_guard<std::mutex> autoLock(OHOS::Codec::Omx::ComponentMgr::GetInstance().mutex_);
+    for (auto &item : componentMap_) {
+        auto sp = item.second.promote();
+        if (sp != nullptr) {
+            dumpMap.emplace(std::make_pair(item.first, sp));
+        }
+    }
 }
 }  // namespace V4_0
 }  // namespace Codec

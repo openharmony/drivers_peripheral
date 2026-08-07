@@ -31,14 +31,12 @@ public:
     IComponentMgr(const IComponentMgr &) = delete;
     IComponentMgr &operator=(const IComponentMgr &) = delete;
 
-    virtual int32_t CreateComponentInstance(const char *componentName, const OMX_CALLBACKTYPE *callbacks,
+    virtual int32_t CreateComponentInstance(const std::string &componentName, const OMX_CALLBACKTYPE *callbacks,
                                             void *appData, OMX_COMPONENTTYPE **component) = 0;
 
     virtual int32_t DeleteComponentInstance(OMX_COMPONENTTYPE *component) = 0;
 
-    virtual int32_t GetRolesForComponent(const char *componentName, std::vector<std::string> *vRoles) = 0;
-
-    virtual int32_t GetCoreOfComponent(CodecOMXCore* &core, const std::string compName) = 0;
+    virtual int32_t GetRolesForComponent(const std::string &componentName, std::vector<std::string> &roles) = 0;
 };
 }  // namespace Omx
 }  // namespace Codec

@@ -32,7 +32,6 @@ public:
     ~CodecDfxService() = default;
     static CodecDfxService &GetInstance();
     static HdfSBuf* GetReply();
-    void SetComponentManager(sptr<CodecComponentManagerService> manager);
     static int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply);
     static int32_t GetCodecComponentListInfo(struct HdfSBuf *reply);
     static void GetCodecMemoryInfo();
@@ -41,7 +40,6 @@ protected:
     CodecDfxService() = default;
 
 private:
-    sptr<CodecComponentManagerService> managerService_;
     static CodecDfxService dfxInstance_;
     static HdfSBuf *reply_;
 };

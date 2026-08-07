@@ -35,7 +35,7 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
     std::shared_ptr<OHOS::Codec::Omx::ComponentNode> dumpNode = nullptr;
     std::map<uint32_t, sptr<ICodecComponent>> dumpMap = {};
 
-    GetInstance().managerService_->GetManagerMap(dumpMap);
+    CodecComponentManagerService::GetInstance().GetManagerMap(dumpMap);
     if (dumpMap.empty()) {
         CODEC_LOGE("get manager map failed!");
         return HDF_ERR_INVALID_PARAM;
@@ -77,11 +77,6 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
         componentService = nullptr;
     }
     return HDF_SUCCESS;
-}
-
-void CodecDfxService::SetComponentManager(sptr<CodecComponentManagerService> manager)
-{
-    managerService_ = manager;
 }
 
 CodecDfxService& CodecDfxService::GetInstance()

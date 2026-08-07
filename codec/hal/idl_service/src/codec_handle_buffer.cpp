@@ -50,7 +50,7 @@ sptr<ICodecBuffer> CodecHandleBuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32
     OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE *&header)
 {
     CHECK_AND_RETURN_RET_LOG(comp != nullptr, nullptr, "null component");
- 
+
     OMXBufferAppPrivateData priv{};
     int32_t err = OMX_AllocateBuffer(comp, &header, portIndex, &priv, codecBuffer.allocLen);
     if (err != OMX_ErrorNone || header == nullptr) {
@@ -68,7 +68,7 @@ sptr<ICodecBuffer> CodecHandleBuffer::AllocateBuffer(OMX_HANDLETYPE comp, uint32
     codecBuffer.bufferhandle = surfaceBuffer;
     codecBuffer.fd.reset();
     codecBuffer.fenceFd.reset();
- 
+
     return sptr<ICodecBuffer>(new CodecHandleBuffer(InitInfo{comp, portIndex, codecBuffer, header}, surfaceBuffer));
 }
 
