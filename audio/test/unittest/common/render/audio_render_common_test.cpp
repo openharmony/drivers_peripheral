@@ -185,12 +185,8 @@ void AudioUtRenderTest::TearDown()
 
 HWTEST_F(AudioUtRenderTest, RenderStartNull001, TestSize.Level1)
 {
-#ifdef AUDIO_HAL_P7885
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, render_->Start(nullptr));
-#else
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->Start(nullptr));
     render_->Stop(render_);
-#endif
 }
 
 HWTEST_F(AudioUtRenderTest, RenderStartNull002, TestSize.Level0)
