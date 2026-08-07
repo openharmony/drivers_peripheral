@@ -17,6 +17,7 @@
 #define OHOS_HDI_DRM_V1_0_MEDIAKEYSYSTEMCALLBACKSERVICE_H
 
 #include <mutex>
+#include <iproxy_broker.h>
 #include "v1_0/imedia_key_system_callback.h"
 
 namespace OHOS {
