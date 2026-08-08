@@ -125,13 +125,28 @@ int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct Audio
     CHECK_NULL_PTR_RETURN_VALUE(frameInfo, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    uint32_t captureId = captureInfo->captureId;
+    if (captureId >= AUDIO_VDI_STREAM_NUM_MAX) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    pthread_rwlock_rdlock(&g_rwVdiCaptureLock[captureId]);
+    if (capture != &(g_audioCapturePrivVdi.captureInfos[captureId].capture)) {
+        pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
-    CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->CaptureFrameEc, HDF_ERR_INVALID_PARAM);
+    if (vdiCapture == NULL || vdiCapture->CaptureFrameEc == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
+        return HDF_ERR_INVALID_PARAM;
+    }
     struct AudioCaptureFrameInfoVdi frameInfoVdi;
     (void)memset_s((void *)&frameInfoVdi, sizeof(frameInfoVdi), 0, sizeof(frameInfoVdi));
     int32_t ret = AudioCommonFrameInfoToVdiFrameInfoVdi(frameLen, &frameInfoVdi);
     if (ret != HDF_SUCCESS) {
+        pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
         AUDIO_FUNC_LOGE("audio capture FrameInfo To VdiFrameInfo fail");
         return ret;
     }
@@ -142,6 +157,7 @@ int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct Audio
     if (ret != HDF_SUCCESS) {
         OsalMemFree((void *)frameInfoVdi.frame);
         OsalMemFree((void *)frameInfoVdi.frameEc);
+        pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
         AUDIO_FUNC_LOGE("audio capture EC frame fail, ret=%{public}d", ret);
         return ret;
     }
@@ -152,6 +168,7 @@ int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct Audio
     }
     OsalMemFree((void *)frameInfoVdi.frame);
     OsalMemFree((void *)frameInfoVdi.frameEc);
+    pthread_rwlock_unlock(&g_rwVdiCaptureLock[captureId]);
 
     return ret;
 }
