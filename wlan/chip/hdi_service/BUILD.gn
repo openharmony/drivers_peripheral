@@ -53,6 +53,7 @@ ohos_shared_library("libchip_controller_chip_interface_service_2.0") {
   }
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_wlan:chip_idl_headers_2.0",
     "hdf_core:libhdf_host",
@@ -100,6 +101,7 @@ ohos_shared_library("libchip_hdi_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",

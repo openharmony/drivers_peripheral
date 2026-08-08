@@ -64,6 +64,7 @@ ohos_shared_library("libwlan_interface_service_1.3") {
   ]
   if (is_standard_system) {
     external_deps += [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
@@ -125,6 +126,7 @@ ohos_shared_library("libwifi_hdi_c_device") {
   ]
   if (is_standard_system) {
     external_deps += [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",

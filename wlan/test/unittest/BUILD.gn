@@ -128,6 +128,7 @@ if (defined(ohos_lite)) {
     ]
     if (is_standard_system) {
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",
@@ -156,6 +157,7 @@ if (defined(ohos_lite)) {
     ]
     if (is_standard_system) {
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
@@ -207,6 +209,7 @@ if (defined(ohos_lite)) {
     ]
     if (is_standard_system) {
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
@@ -259,6 +262,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "c_utils:utils",
         "drivers_interface_wlan:chip_idl_headers_2.0",
         "hdf_core:libhdf_host",
