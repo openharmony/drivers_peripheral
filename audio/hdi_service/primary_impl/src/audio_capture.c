@@ -134,7 +134,7 @@ int32_t AudioCapturePause(struct IAudioCapture *handle)
     }
     if (hwCapture->captureParam.frameCaptureMode.buffer == NULL) {
         AUDIO_FUNC_LOGE("IAudioCapture already stop!");
-        return AUDIO_ERR_INTERNAL;
+        return AUDIO_ERR_NOT_SUPPORT;
     }
     if (hwCapture->captureParam.captureMode.ctlParam.pause) {
         AUDIO_FUNC_LOGE("Audio capture is already pause!");
