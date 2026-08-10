@@ -73,7 +73,12 @@ int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallba
 #endif
     g_callbackV1_0 = clientCallback;
     g_callbackV1_0->OnSeStateChanged(true);
-    AddSecureElementDeathRecipient(g_callbackV1_0);
+    int32_t ret = AddSecureElementDeathRecipient(g_callbackV1_0);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("AddSecureElementDeathRecipient failed");
+        g_callbackV1_0 = nullptr;
+        return ret;
+    }
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
