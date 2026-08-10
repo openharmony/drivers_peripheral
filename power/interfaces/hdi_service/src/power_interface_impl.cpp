@@ -695,20 +695,31 @@ int32_t PowerInterfaceImpl::ForceSuspendIgnoringWakelock(const std::string &tag)
         return HDF_ERR_INVALID_PARAM;
     }
 
+    NotifyCallback(CMD_ON_SUSPEND);
+    g_powerState = PowerHdfState::SLEEP;
+    
     UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
+    int32_t ret;
     if (suspendStateFd < 0) {
         HDF_LOGE("ForceSuspendIgnoringWakelock open %{public}s fail, error: %{public}s",
             SUSPEND_STATE_PATH, strerror(errno));
-        return HDF_FAILURE;
-    }
-
-    bool ret = SaveStringToFd(suspendStateFd, tag);
-    if (!ret) {
+        ret = HDF_FAILURE;
+    } else if (!SaveStringToFd(suspendStateFd, tag)) {
         HDF_LOGE("ForceSuspendIgnoringWakelock write tag %{public}s failed", tag.c_str());
-        return HDF_FAILURE;
+        ret = HDF_FAILURE;
+    } else {
+        HDF_LOGI("ForceSuspendIgnoringWakelock success, tag=%{public}s", tag.c_str());
+        ret = HDF_SUCCESS;
     }
-    HDF_LOGI("ForceSuspendIgnoringWakelock success, tag=%{public}s", tag.c_str());
-    return HDF_SUCCESS;
+    g_powerState = PowerHdfState::AWAKE;
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+    g_wakeupTag = tag;
+    if (tag == "ulsr") {
+        OHOS::system::SetParameter(ULSR_RESULT_PARAM, "success");
+    }
+#endif
+    NotifyCallback(CMD_ON_WAKEUP);
+    return ret;
 }
 } // namespace V1_4
 } // namespace Power
