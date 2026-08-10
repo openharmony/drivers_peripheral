@@ -163,6 +163,17 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
     CAMERA_LOGD("ForkNode forkBuffer streamId:%{public}d start", buffer->GetStreamId());
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
+        bool skipFork = false;
+        {
+            std::lock_guard<std::mutex> l(requestLock_);
+            if (captureRequests_.count(streamId_) == 0 || captureRequests_[streamId_].empty()) {
+                skipFork = true;
+            }
+        }
+        if (skipFork) {
+            CAMERA_LOGI("ForkNode no capture request for streamId:%{public}d, skip fork", streamId_);
+            return NodeBase::DeliverBuffer(buffer);
+        }
         std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
         if (forkBuffer != nullptr) {
 #ifdef YUV420SP_FORK_STREAM_HOST_CODEC

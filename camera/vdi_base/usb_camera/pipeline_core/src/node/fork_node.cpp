@@ -131,6 +131,18 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
 
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
+        bool skipFork = false;
+        {
+            std::lock_guard<std::mutex> l(requestLock_);
+            if (captureRequests_.count(streamId_) == 0 || captureRequests_[streamId_].empty()) {
+                skipFork = true;
+            }
+        }
+        if (skipFork) {
+            CAMERA_LOGI("PcForkNode no capture request for streamId:%{public}d, skip fork", streamId_);
+            NodeBase::DeliverBuffer(buffer);
+            return;
+        }
         std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
         if (forkBuffer != nullptr) {
             CopyBufferToForkBuffer(buffer, forkBuffer);
