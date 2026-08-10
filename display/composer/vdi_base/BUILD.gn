@@ -55,6 +55,7 @@ ohos_shared_library("display_composer_vdi_impl_default") {
     "-Wno-error=#warnings",
   ]
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.2",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
