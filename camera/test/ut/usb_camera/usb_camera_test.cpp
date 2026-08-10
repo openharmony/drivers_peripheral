@@ -26,6 +26,11 @@ void UtestUSBCameraTest::SetUp(void)
     cameraBase_ = std::make_shared<TestCameraBase>();
     cameraBase_->UsbInit();
     ASSERT_NE(cameraBase_->cameraHost, nullptr);
+    if (!g_usbCameraExit) {
+        std::vector<std::string> cameraIds;
+        cameraBase_->cameraHost->GetCameraIds(cameraIds);
+        g_usbCameraExit = cameraIds.size() > 0;
+    }
 }
 void UtestUSBCameraTest::TearDown(void)
 {
@@ -66,8 +71,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
     for (const auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
     }
-    // 1:number of connected cameras
-    g_usbCameraExit = cameraIds.size() > 1;
 }
 
 /**
@@ -111,6 +114,11 @@ TEST_F(UtestUSBCameraTest, camera_usb_0003)
     ability_ = cameraBase_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t connEntry;
+    if (FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry) != CAM_META_SUCCESS
+        || connEntry.data.u8[0] != OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &entry);
     EXPECT_EQ(ret, CAM_META_SUCCESS);
@@ -363,6 +371,11 @@ TEST_F(UtestUSBCameraTest, camera_usb_0013)
     ability_ = cameraBase_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t connEntry;
+    if (FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry) != CAM_META_SUCCESS
+        || connEntry.data.u8[0] != OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_TYPE, &entry);
     EXPECT_EQ(ret, CAM_META_SUCCESS);
@@ -625,8 +638,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0021)
     for (const auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
     }
-    // 1:number of connected cameras
-    g_usbCameraExit = cameraIds.size() > 1;
 }
 
 /**
@@ -963,6 +974,11 @@ TEST_F(UtestUSBCameraTest, camera_usb_0030)
     ability_ = cameraBase_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t connEntry;
+    if (FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry) != CAM_META_SUCCESS
+        || connEntry.data.u8[0] != OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
     EXPECT_EQ(ret, CAM_META_SUCCESS);
@@ -1007,8 +1023,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0032)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1042,8 +1056,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0033)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1080,8 +1092,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0034)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
@@ -1100,7 +1110,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0034)
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 
-    cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[1]);
+    std::string secondCameraId = usbCameraIds.size() >= 2 ? usbCameraIds[1] : usbCameraIds[0];
+    cameraBase_->rc = cameraBase_->SelectOpenCamera(secondCameraId);
     ASSERT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
     // Get the stream manager
     cameraBase_->AchieveStreamOperator();
@@ -1131,8 +1142,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0035)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1163,8 +1172,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0036)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1191,8 +1198,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0037)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1224,8 +1229,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0038)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1257,8 +1260,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0039)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1291,8 +1292,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0040)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1325,8 +1324,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0041)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1356,8 +1353,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0042)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1390,8 +1385,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0043)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1418,8 +1411,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0044)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1446,8 +1437,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0045)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1474,8 +1463,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0046)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1503,8 +1490,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0047)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1539,8 +1524,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0048)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1571,8 +1554,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0049)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1580,6 +1561,11 @@ TEST_F(UtestUSBCameraTest, camera_usb_0049)
         ability_ = cameraBase_->GetCameraAbilityById(usbCameraIds[i]);
         EXPECT_NE(ability_, nullptr);
         common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t connEntry;
+        if (FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry) != CAM_META_SUCCESS
+            || connEntry.data.u8[0] != OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+            continue;
+        }
         camera_metadata_item_t entry;
         int ret = FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
         EXPECT_EQ(ret, CAM_META_SUCCESS);
@@ -1600,8 +1586,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0050)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1609,6 +1593,11 @@ TEST_F(UtestUSBCameraTest, camera_usb_0050)
         ability_ = cameraBase_->GetCameraAbilityById(usbCameraIds[i]);
         EXPECT_NE(ability_, nullptr);
         common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t connEntry;
+        if (FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry) != CAM_META_SUCCESS
+            || connEntry.data.u8[0] != OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+            continue;
+        }
         camera_metadata_item_t entry;
         int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_TYPE, &entry);
         EXPECT_EQ(ret, CAM_META_SUCCESS);
@@ -1629,8 +1618,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0051)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1638,6 +1625,11 @@ TEST_F(UtestUSBCameraTest, camera_usb_0051)
         ability_ = cameraBase_->GetCameraAbilityById(usbCameraIds[i]);
         EXPECT_NE(ability_, nullptr);
         common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t connEntry;
+        if (FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry) != CAM_META_SUCCESS
+            || connEntry.data.u8[0] != OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+            continue;
+        }
         camera_metadata_item_t entry;
         int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &entry);
         EXPECT_EQ(ret, CAM_META_SUCCESS);
@@ -1658,8 +1650,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0052)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    // 1:number of connected cameras
-    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1817,7 +1807,18 @@ TEST_F(UtestUSBCameraTest, camera_usb_0054)
     CAMERA_LOGE("cancel capture video");
     cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture(captureIdVideo);
     EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
-    sleep(5);
+    sleep(1);
+
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->ReleaseStreams({streamIdVideo});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+
+    streamCustomerVideo->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
+        StoreFile(addr, size, "_single_video.yuv");
+    });
 
     std::cout << "start capture video" <<  std::endl;
     CAMERA_LOGE("start capture video");
@@ -1892,7 +1893,18 @@ TEST_F(UtestUSBCameraTest, camera_usb_0055)
     CAMERA_LOGE("cancel capture video");
     cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture(captureIdVideo);
     EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
-    sleep(5);
+    sleep(1);
+
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->ReleaseStreams({streamIdVideo});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+
+    streamCustomerVideo->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
+        StoreFile(addr, size, "_single_video.jpeg");
+    });
 
     std::cout << "start capture video" <<  std::endl;
     CAMERA_LOGE("start capture video");
@@ -2026,15 +2038,26 @@ TEST_F(UtestUSBCameraTest, camera_usb_0057)
     cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture(captureIdPreview);
     EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
-    
+
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->ReleaseStreams({streamIdPreview});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+
+    streamCustomerVideo->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
+        StoreFile(addr, size, "preview_mjpeg.jpeg");
+    });
+
     std::cout << "start capture preview2" <<  std::endl;
     CAMERA_LOGE("start capture preview2");
     cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->Capture(captureIdPreview, captureInfoPreview, true);
     EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
- 
+
     streamCustomerVideo->ReceiveFrameOff();
- 
+
     std::cout << "cancel capture preview2" <<  std::endl;
     CAMERA_LOGE("cancel capture preview2");
     cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture({captureIdPreview});
