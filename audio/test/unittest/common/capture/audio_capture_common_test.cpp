@@ -987,7 +987,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetVersion001, TestSize.Level0)
     ASSERT_NE(capture_->GetVersion, nullptr);
     uint32_t majorVer;
     uint32_t minorVer;
-    ASSERT_NE(HDF_SUCCESS, capture_->GetVersion(capture_, &majorVer, &minorVer));
+    ASSERT_EQ(HDF_SUCCESS, capture_->GetVersion(capture_, &majorVer, &minorVer));
     EXPECT_EQ(IAUDIO_MANAGER_MAJOR_VERSION, majorVer);
     EXPECT_EQ(IAUDIO_MANAGER_MINOR_VERSION, minorVer);
 }
@@ -997,7 +997,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetVersionException001, TestSize.Lev
     ASSERT_NE(capture_->GetVersion, nullptr);
     uint32_t majorVer;
     uint32_t minorVer;
-    EXPECT_NE(HDF_ERR_INVALID_OBJECT, capture_->GetVersion(nullptr, &majorVer, &minorVer));
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, capture_->GetVersion(nullptr, &majorVer, &minorVer));
 }
 
 /* capture support pause and resume cases */
