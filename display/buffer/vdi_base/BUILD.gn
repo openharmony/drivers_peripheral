@@ -44,6 +44,7 @@ ohos_shared_library("display_buffer_vdi_impl_default") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
