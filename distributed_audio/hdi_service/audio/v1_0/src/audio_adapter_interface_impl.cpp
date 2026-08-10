@@ -568,6 +568,7 @@ std::string AudioAdapterInterfaceImpl::HandleConditionGetCaps(const std::string 
     if (pos != std::string::npos) {
         pinValue = condition.substr(pos + key_.length());
     }
+    std::lock_guard<std::mutex> devLck(capsMapMtx_);
     auto it = capabilityMap_.find(adpDescriptor_.adapterName + pinValue);
     if (it != capabilityMap_.end()) {
         return it->second;
@@ -723,7 +724,10 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
     if (devId == OFFLOAD_RENDER_ID) {
         key = adpDescriptor_.adapterName + std::to_string(DEFAULT_RENDER_ID);
     }
-    capabilityMap_[key] = caps;
+    {
+        std::lock_guard<std::mutex> devLck(capsMapMtx_);
+        capabilityMap_[key] = caps;
+    }
     if (caps.find(TOKEN_ID) != std::string::npos) {
         int32_t ret = HandleTokenIdFromCapability(devId, caps);
         if (ret != DH_SUCCESS) {
@@ -755,7 +759,10 @@ int32_t AudioAdapterInterfaceImpl::HandleTokenIdFromCapability(const uint32_t de
     if (devId == OFFLOAD_RENDER_ID) {
         key = adpDescriptor_.adapterName + std::to_string(DEFAULT_RENDER_ID);
     }
-    capabilityMap_[key] = result;
+    {
+        std::lock_guard<std::mutex> devLck(capsMapMtx_);
+        capabilityMap_[key] = result;
+    }
     cJSON *root = cJSON_Parse(result.c_str());
     if (root == nullptr) {
         DHLOGE("Failed to parse caps JSON.");
@@ -808,6 +815,14 @@ int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
             return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
         }
         mapAudioDevice_.erase(devId);
+    }
+    {
+        std::lock_guard<std::mutex> devLck(capsMapMtx_);
+        std::string key = adpDescriptor_.adapterName + std::to_string(devId);
+        if (devId == OFFLOAD_RENDER_ID) {
+            key = adpDescriptor_.adapterName + std::to_string(DEFAULT_RENDER_ID);
+        }
+        capabilityMap_.erase(key);
     }
     ClearSpkPinInUse(devId);
     ClearMicPinInUse(devId);
