@@ -85,6 +85,7 @@ HWTEST_F(HdfAudioUtTypesTest, HdfAudioTypesAudioCategory001, TestSize.Level0)
     EXPECT_EQ(AUDIO_MMAP_VOIP, (AudioCategory)(8));
     EXPECT_EQ(AUDIO_IN_NAVIGATION, (AudioCategory)(9));
     EXPECT_EQ(AUDIO_DIRECT, (AudioCategory)(10));
+    EXPECT_EQ(AUDIO_D2D, (AudioCategory)(12));
 }
 
 HWTEST_F(HdfAudioUtTypesTest, HdfAudioTypesAudioFormat001, TestSize.Level0)
@@ -272,5 +273,8 @@ HWTEST_F(HdfAudioUtTypesTest, HdfAudioTypesAudioInputType001, TestSize.Level0)
     EXPECT_EQ(AUDIO_INPUT_VOICE_TRANSCRIPTION, (AudioInputType)(1 << 12));
     EXPECT_EQ(AUDIO_INPUT_OFFLOAD_CAPTURE_TYPE, (AudioInputType)(1 << 13));
     EXPECT_EQ(AUDIO_INPUT_ULTRASONIC_TYPE, (AudioInputType)(1 << 14));
+    EXPECT_EQ(AUDIO_INPUT_INTERPHONE_TYPE, (AudioInputType)(1 << 16));
+    EXPECT_EQ(AUDIO_INPUT_ONBOARD_MIC_TYPE, (AudioInputType)(1 << 17));
+    EXPECT_EQ(AUDIO_INPUT_VOICE_MESSAGE_TYPE, (AudioInputType)(1 << 18));
 }
 }

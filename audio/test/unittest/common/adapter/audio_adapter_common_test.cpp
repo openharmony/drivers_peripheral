@@ -685,6 +685,30 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderIsvalid024, TestSize.
 #endif
 }
 
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateRenderID2d001, TestSize.Level0)
+{
+    struct IAudioRender *render = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_OUT_SPEAKER;
+    InitAttrs(attrs);
+    attrs.type = AUDIO_D2D;
+    int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    if (ret != HDF_SUCCESS) {
+        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+        ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
+    }
+    if (ret == HDF_ERR_NOT_SUPPORT) {
+        GTEST_SKIP() << "Not support D2D render" << std::endl;
+    } else {
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = adapter_->DestroyRender(adapter_, renderId_);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderNull001, TestSize.Level1)
 {
     EXPECT_NE(HDF_SUCCESS, adapter_->DestroyRender(nullptr, renderId_));
@@ -1032,6 +1056,90 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid024, TestSize
     attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     EXPECT_EQ(HDF_SUCCESS, adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_));
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid025, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_INTERPHONE_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    int32_t ret = adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_);
+    if (ret == HDF_ERR_NOT_SUPPORT) {
+        GTEST_SKIP() << "Not support INTERPHONE" << std::endl;
+    } else {
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = adapter_->DestroyCapture(adapter_, captureId_);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid026, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_ONBOARD_MIC_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    int32_t ret = adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_);
+    if (ret == HDF_ERR_NOT_SUPPORT) {
+        GTEST_SKIP() << "Not support ONBOARD_MIC" << std::endl;
+    } else {
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = adapter_->DestroyCapture(adapter_, captureId_);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid027, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.sourceType = AUDIO_INPUT_VOICE_MESSAGE_TYPE;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    int32_t ret = adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_);
+    if (ret == HDF_ERR_NOT_SUPPORT) {
+        GTEST_SKIP() << "Not support VOICE_MESSAGE" << std::endl;
+    } else {
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = adapter_->DestroyCapture(adapter_, captureId_);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureID2d001, TestSize.Level0)
+{
+    struct IAudioCapture *capture = nullptr;
+    struct AudioDeviceDescriptor devicedesc = {};
+    struct AudioSampleAttributes attrs = {};
+    InitDevDesc(devicedesc);
+    devicedesc.desc = const_cast<char*>("primary");
+    devicedesc.pins = PIN_IN_MIC;
+    InitAttrs(attrs);
+    attrs.type = AUDIO_D2D;
+    attrs.silenceThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    int32_t ret = adapter_->CreateCapture(adapter_, &devicedesc, &attrs, &capture, &captureId_);
+    if (ret == HDF_ERR_NOT_SUPPORT) {
+        GTEST_SKIP() << "Not support D2D capture" << std::endl;
+    } else {
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = adapter_->DestroyCapture(adapter_, captureId_);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
 }
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCapturePinIsvalid001, TestSize.Level0)
