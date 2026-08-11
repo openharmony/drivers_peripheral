@@ -25,7 +25,6 @@
 #else
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 #endif
-
 #define SPEAKER                   "Speaker"
 #define HEADPHONES                "Headphones"
 #ifdef AUDIO_HAL_P7885
@@ -124,8 +123,6 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
         case PIN_OUT_SPEAKER:
         case PIN_OUT_BLUETOOTH_A2DP:
             return SPEAKER;
-        case PIN_OUT_HEADSET:
-            return HEADPHONES;
         case PIN_IN_MIC:
             return MIC;
         case PIN_IN_HS_MIC:
@@ -136,6 +133,8 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
             return BLUETOOTH_SCO;
         case PIN_IN_BLUETOOTH_SCO_HEADSET:
             return BLUETOOTH_SCO_HEADSET;
+        case PIN_OUT_HEADSET:
+            return HEADPHONES;
 #ifdef AUDIO_HAL_P7885
         case PIN_OUT_HEADPHONE:
             return HEADPHONES;
@@ -499,6 +498,7 @@ static int32_t SetMatchRenderDefaultDevicePath(struct AudioHwRenderParam *render
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
+
     for (uint32_t i = PIN_OUT_SPEAKER; i <= PIN_OUT_EARPIECE; i = i << 1) {
         const char *deviceType = AudioPathSelGetDeviceType(i);
         if (deviceType == NULL) {
@@ -947,6 +947,7 @@ static void FreeAllDeviceSwitchsValue(struct PathDeviceInfo *deviceInfo)
 int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType)
 {
     AUDIO_FUNC_LOGI();
+    AUDIO_FUNC_LOGI("AudioPathSelAnalysisJson enter");
     if (adaptType < 0 || adapterParam == NULL) {
         AUDIO_FUNC_LOGE("Param Invaild!");
         return HDF_ERR_INVALID_PARAM;

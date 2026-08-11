@@ -82,13 +82,7 @@ if (defined(ohos_lite)) {
         sources +=
             [ "$hdf_audio_path/supportlibs/alsa_adapter/src/vendor_capture.c" ]
       } else {
-        if (drivers_peripheral_audio_vendor_alsa_path != "") {
-          sources +=
-              [ "${drivers_peripheral_audio_vendor_alsa_path}/vendor_capture.c" ]
-        } else {
-          sources +=
-              [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_capture.c" ]
-        }
+        sources += [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_capture.c" ]
       }
     } else {
       sources += [
@@ -106,11 +100,8 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [ "$hdf_audio_path/supportlibs/alsa_adapter/include" ]
       if (!defined(is_emulator) || !is_emulator) {
-        if (drivers_peripheral_audio_vendor_alsa_path != "") {
-          include_dirs += [ drivers_peripheral_audio_vendor_alsa_path ]
-        } else {
-          include_dirs += [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
-        }
+        include_dirs +=
+            [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
       }
     } else {
       include_dirs += [ "$hdf_audio_path/supportlibs/adm_adapter/include" ]
@@ -169,13 +160,7 @@ if (defined(ohos_lite)) {
         sources +=
             [ "$hdf_audio_path/supportlibs/alsa_adapter/src/vendor_render.c" ]
       } else {
-        if (drivers_peripheral_audio_vendor_alsa_path != "") {
-          sources +=
-              [ "${drivers_peripheral_audio_vendor_alsa_path}/vendor_render.c" ]
-        } else {
-          sources +=
-              [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_render.c" ]
-        }
+        sources += [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_render.c" ]
       }
     } else {
       sources += [
@@ -194,11 +179,8 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [ "$hdf_audio_path/supportlibs/alsa_adapter/include" ]
       if (!defined(is_emulator) || !is_emulator) {
-        if (drivers_peripheral_audio_vendor_alsa_path != "") {
-          include_dirs += [ drivers_peripheral_audio_vendor_alsa_path ]
-        } else {
-          include_dirs += [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
-        }
+        include_dirs +=
+            [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
       }
     } else {
       include_dirs += [ "$hdf_audio_path/supportlibs/adm_adapter/include" ]

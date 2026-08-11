@@ -630,12 +630,15 @@ static uint32_t GetAvailableRenderID(struct AudioHwAdapter *hwAdapter)
 int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || render == NULL || renderId == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d, \
+        sampleRate=%{public}u, channelCount=%{public}u, streamId=%{public}d, sourceType=%{public}d",
+        desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
+        attrs->streamId, attrs->sourceType);
 
     BindServiceRenderPassthrough *pBindServiceRender = AudioPassthroughGetBindServiceRender();
     if (pBindServiceRender == NULL || *pBindServiceRender == NULL) {
@@ -1181,12 +1184,15 @@ static uint32_t GetAvailableCaptureID(struct AudioHwAdapter *hwAdapter)
 int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture, uint32_t *captureId)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL || captureId == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
+    AUDIO_FUNC_LOGI("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, fotmat=%{public}d, \
+        sampleRate=%{public}u, channelCount=%{public}u, streamId=%{public}d, sourceType=%{public}d",
+        desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
+        attrs->streamId, attrs->sourceType);
 
     BindServiceCapturePassthrough *pBindServiceCapture = AudioPassthroughGetBindServiceCapture();
     if (pBindServiceCapture == NULL || *pBindServiceCapture == NULL) {
