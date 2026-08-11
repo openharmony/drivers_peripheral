@@ -218,7 +218,12 @@ int32_t SimSeVendorAdaptions::init(
     std::lock_guard<std::mutex> guard(g_callbackMutex);
     g_callbackV1_0 = clientCallback;
     g_callbackV1_0->OnSeStateChanged(true);
-    AddSecureElementDeathRecipient(g_callbackV1_0);
+    ret = AddSecureElementDeathRecipient(g_callbackV1_0);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("AddSecureElementDeathRecipient failed");
+        g_callbackV1_0 = nullptr;
+        return ret;
+    }
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }

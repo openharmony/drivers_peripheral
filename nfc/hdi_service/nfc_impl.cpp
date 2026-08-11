@@ -89,7 +89,13 @@ int32_t NfcImpl::Open(const sptr<INfcCallback> &callbackObj, NfcStatus &status)
         }
         g_callbackV1_1 = callbackObj;
         callbacks_ = callbackObj;
-        AddNfcDeathRecipient(callbacks_);
+        int32_t result = AddNfcDeathRecipient(callbacks_);
+        if (result != HDF_SUCCESS) {
+            HDF_LOGE("AddNfcDeathRecipient failed");
+            g_callbackV1_1 = nullptr;
+            callbacks_ = nullptr;
+            return result;
+        }
     }
     int ret = adaptor_.VendorOpen(EventCallback, DataCallback);
     if (ret == 0) {
