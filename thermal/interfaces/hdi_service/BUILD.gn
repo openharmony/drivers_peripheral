@@ -42,7 +42,10 @@ ohos_shared_library("libthermal_interface_service_1.1") {
     ]
     defines = []
     if (drivers_peripheral_thermal_feature_c_utils) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [
+        "c_utils:utils",
+        "bounds_checking_function:libsec_shared",
+      ]
     }
     if (drivers_peripheral_thermal_feature_config_policy) {
       defines += [ "HAS_THERMAL_CONFIG_POLICY_PART" ]
