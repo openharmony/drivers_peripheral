@@ -19,8 +19,8 @@
 #include <memory>
 
 #include "power_interface_impl.h"
-#include "v1_3/ipower_interface.h"
-#include "v1_3/power_interface_stub.h"
+#include "v1_4/ipower_interface.h"
+#include "v1_4/power_interface_stub.h"
 #include "running_lock_impl.h"
 #include "refbase.h"
 
@@ -38,25 +38,25 @@ class PowerFuzzTest {
 public:
     PowerFuzzTest()
     {
-        impl_ = sptr<V1_3::PowerInterfaceImpl>::MakeSptr();
+        impl_ = sptr<V1_4::PowerInterfaceImpl>::MakeSptr();
         impl_->SuspendBlock("PowerStubFuzzTest"); // Prevent device sleep
     }
     ~PowerFuzzTest()
     {
         impl_->SuspendUnblock("PowerStubFuzzTest");
     }
-    sptr<V1_3::PowerInterfaceImpl> GetImpl() const
+    sptr<V1_4::PowerInterfaceImpl> GetImpl() const
     {
         return impl_;
     }
 
 private:
-    sptr<V1_3::PowerInterfaceImpl> impl_ = nullptr;
+    sptr<V1_4::PowerInterfaceImpl> impl_ = nullptr;
 };
 namespace {
-shared_ptr<V1_3::PowerInterfaceStub> g_fuzzService = nullptr;
+shared_ptr<V1_4::PowerInterfaceStub> g_fuzzService = nullptr;
 shared_ptr<PowerFuzzTest> g_fuzzTest = nullptr;
-const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = V1_3::CMD_POWER_INTERFACE_UN_REGISTER_POWER_CALLBACK_EXT + 1;
+const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = V1_4::CMD_POWER_INTERFACE_FORCE_SUSPEND_IGNORING_WAKELOCK + 1;
 } // namespace
 
 static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
@@ -68,14 +68,14 @@ static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
     if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
         return;
     }
-    OHOS::HDI::Power::V1_3::IPowerInterface::Get(true);
+    OHOS::HDI::Power::V1_4::IPowerInterface::Get(true);
 
     MessageParcel datas;
     MessageParcel reply;
     MessageOption option;
     if (g_fuzzService == nullptr) {
         g_fuzzTest = make_shared<PowerFuzzTest>();
-        g_fuzzService = make_shared<V1_3::PowerInterfaceStub>(g_fuzzTest->GetImpl());
+        g_fuzzService = make_shared<V1_4::PowerInterfaceStub>(g_fuzzTest->GetImpl());
     }
     for (code = CMD_POWER_INTERFACE_GET_VERSION; code < POWER_INTERFACE_STUB_FUNC_MAX_SIZE; code++) {
         g_fuzzService->OnRemoteRequest(code, datas, reply, option);

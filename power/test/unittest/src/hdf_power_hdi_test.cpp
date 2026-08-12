@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 #include <securec.h>
 
-#include "v1_3/ipower_interface.h"
+#include "v1_4/ipower_interface.h"
 #include "v1_2/power_types.h"
 #include "v1_2/running_lock_types.h"
 #include "hibernate.h"
@@ -29,7 +29,7 @@ using namespace OHOS::HDI::Power::V1_2;
 using namespace testing::ext;
 
 namespace {
-sptr<V1_3::IPowerInterface> g_powerInterface = nullptr;
+sptr<V1_4::IPowerInterface> g_powerInterface = nullptr;
 std::mutex g_mutex;
 const uint32_t MAX_PATH = 256;
 const uint32_t WAIT_TIME = 1;
@@ -46,7 +46,7 @@ public:
 
 void HdfPowerHdiTest::SetUpTestCase()
 {
-    g_powerInterface = V1_3::IPowerInterface::Get(true);
+    g_powerInterface = V1_4::IPowerInterface::Get(true);
 }
 
 std::string HdfPowerHdiTest::ReadFile(const std::string& file)
@@ -229,5 +229,63 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest011, TestSize.Level0)
     EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(2 * 1024 * 1024), 2);
     EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(2 * 1024 * 1024 + 1), 4);
     EXPECT_EQ(Hibernate::GetInstance().ConvertMemKB2GB(11 * 1024 * 1024), 12);
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest012
+  * @tc.desc: check ForceSuspendIgnoringWakelock with invalid tag
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest012, TestSize.Level0)
+{
+    // 实现里只允许 "mem" / "ulsr"，非法 tag 应返回 HDF_ERR_INVALID_PARAM
+    int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("invalid_tag");
+    EXPECT_NE(0, ret);
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest013
+  * @tc.desc: check ForceSuspendIgnoringWakelock with empty tag
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest013, TestSize.Level0)
+{
+    // 空 tag 同样属于非法参数
+    int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("");
+    EXPECT_NE(0, ret);
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest014
+  * @tc.desc: check ForceSuspendIgnoringWakelock with mem tag
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest014, TestSize.Level0)
+{
+    int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("mem");
+    // 真实设备上 /sys/power/state 可读时应成功；沙箱里 open 失败则返回非 0
+    std::string stateValue = HdfPowerHdiTest::ReadFile(SUSPEND_STATE_PATH);
+    if (!stateValue.empty()) {
+        EXPECT_EQ(0, ret);
+    } else {
+        EXPECT_NE(0, ret);
+    }
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest015
+  * @tc.desc: check ForceSuspendIgnoringWakelock with ulsr tag
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest015, TestSize.Level0)
+{
+    int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("ulsr");
+    // 同 HdfPowerHdiTest014，依赖 /sys/power/state 是否可读
+    std::string stateValue = HdfPowerHdiTest::ReadFile(SUSPEND_STATE_PATH);
+    if (!stateValue.empty()) {
+        EXPECT_EQ(0, ret);
+    } else {
+        EXPECT_NE(0, ret);
+    }
 }
 }
