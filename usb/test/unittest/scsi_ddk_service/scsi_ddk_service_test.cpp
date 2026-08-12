@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,9 +31,6 @@ using namespace std;
 using namespace testing::ext;
 using namespace OHOS::HDI::Usb::ScsiDdk::V1_0;
 
-// ============================================================
-// Override DdkPermissionManager to bypass AccessToken check
-// ============================================================
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -45,7 +42,6 @@ bool DdkPermissionManager::VerifyPermission(const std::string &permissionName)
 void DdkPermissionManager::Reset() {}
 int32_t DdkPermissionManager::GetHapApiVersion(int32_t &apiVersion)
 {
-    apiVersion = 12;
     return HDF_SUCCESS;
 }
 } // Ddk
@@ -54,9 +50,6 @@ int32_t DdkPermissionManager::GetHapApiVersion(int32_t &apiVersion)
 } // OHOS
 
 namespace {
-// ============================================================
-// Mock ScsiOsAdapter: bypass real SCSI IO
-// ============================================================
 class MockScsiOsAdapter : public ScsiOsAdapter {
 public:
     int32_t SendRequest(const Request& request, uint8_t *buffer, uint32_t bufferSize,
@@ -75,6 +68,9 @@ public:
 
 constexpr uint32_t DEVICE_MEM_MAP_SIZE = 1024 * 1024; // 1MB
 constexpr uint32_t TIMEOUT_MS = 5000;
+constexpr uint32_t SCSI_TRANSFER_LENGTH_MAX = 0xFFFF;
+constexpr uint32_t OVERFLOW_TEST_LB_LENGTH = 65538;
+constexpr uint32_t BOUNDARY_TEST_LB_LENGTH = 65537;
 
 class ScsiDdkServiceTest : public testing::Test {
 public:
@@ -105,7 +101,8 @@ void ScsiDdkServiceTest::SetUpTestCase()
     // Set up device with a large lbLength to trigger overflow
     device_.devFd = -1;
     device_.memMapFd = memMapFd;
-    device_.lbLength = 65538; // 65535 * 65538 > UINT32_MAX
+    // SCSI_TRANSFER_LENGTH_MAX * OVERFLOW_TEST_LB_LENGTH > UINT32_MAX
+    device_.lbLength = OVERFLOW_TEST_LB_LENGTH;
 
     HDF_LOGI("SetUpTestCase: memMapFd=%{public}d, lbLength=%{public}u",
              device_.memMapFd, device_.lbLength);
@@ -123,9 +120,11 @@ void ScsiDdkServiceTest::TearDownTestCase()
 void ScsiDdkServiceTest::SetUp() {}
 void ScsiDdkServiceTest::TearDown() {}
 
-// ============================================================
-// Read10 normal: small transfer, should succeed
-// ============================================================
+/**
+ * @tc.name: Read10Normal001
+ * @tc.desc: Test functions to Read10
+ * @tc.type: FUNC
+ */
 HWTEST_F(ScsiDdkServiceTest, Read10Normal001, TestSize.Level1)
 {
     ScsiPeripheralIORequest request = {};
@@ -143,18 +142,16 @@ HWTEST_F(ScsiDdkServiceTest, Read10Normal001, TestSize.Level1)
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
 
-// ============================================================
-// Read10 overflow: transferLength=65535, lbLength=65538
-// 65535 * 65538 = 4295032830 > UINT32_MAX => UBSan SIGABRT
-//
-// With the fix: should return SCSIPERIPHERAL_DDK_INVALID_PARAMETER
-// Without the fix: SIGABRT (UBSan mul overflow abort)
-// ============================================================
+/**
+ * @tc.name: Read10OverflowCheck001
+ * @tc.desc: Test functions to Read10
+ * @tc.type: FUNC
+ */
 HWTEST_F(ScsiDdkServiceTest, Read10OverflowCheck001, TestSize.Level1)
 {
     ScsiPeripheralIORequest request = {};
     request.lbAddress = 0;
-    request.transferLength = 0xFFFF;
+    request.transferLength = SCSI_TRANSFER_LENGTH_MAX;
     request.byte1 = 0;
     request.byte6 = 0;
     request.control = 0;
@@ -176,17 +173,20 @@ HWTEST_F(ScsiDdkServiceTest, Read10OverflowCheck001, TestSize.Level1)
     }
 }
 
-// ============================================================
-// Read10 boundary: transferLength * lbLength exactly at UINT32_MAX
-// ============================================================
+/**
+ * @tc.name: Read10Boundary001
+ * @tc.desc: Test functions to Read10
+ * @tc.type: FUNC
+ */
 HWTEST_F(ScsiDdkServiceTest, Read10Boundary001, TestSize.Level1)
 {
     ScsiPeripheralDevice boundaryDev = device_;
-    boundaryDev.lbLength = 65537; // 65535 * 65537 = UINT32_MAX
+    // SCSI_TRANSFER_LENGTH_MAX * BOUNDARY_TEST_LB_LENGTH = UINT32_MAX
+    boundaryDev.lbLength = BOUNDARY_TEST_LB_LENGTH;
 
     ScsiPeripheralIORequest request = {};
     request.lbAddress = 0;
-    request.transferLength = 0xFFFF;
+    request.transferLength = SCSI_TRANSFER_LENGTH_MAX;
     request.byte1 = 0;
     request.byte6 = 0;
     request.control = 0;
@@ -204,9 +204,11 @@ HWTEST_F(ScsiDdkServiceTest, Read10Boundary001, TestSize.Level1)
         << "Unexpected ret=" << ret;
 }
 
-// ============================================================
-// Read10 with lbLength=0: should be rejected
-// ============================================================
+/**
+ * @tc.name: Read10ZeroLbLength001
+ * @tc.desc: Test functions to Read10
+ * @tc.type: FUNC
+ */
 HWTEST_F(ScsiDdkServiceTest, Read10ZeroLbLength001, TestSize.Level1)
 {
     ScsiPeripheralDevice zeroDev = device_;
@@ -228,9 +230,11 @@ HWTEST_F(ScsiDdkServiceTest, Read10ZeroLbLength001, TestSize.Level1)
     EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER);
 }
 
-// ============================================================
-// Read10 with memMapSize < bufferSize
-// ============================================================
+/**
+ * @tc.name: Read10SmallMemMap001
+ * @tc.desc: Test functions to Read10
+ * @tc.type: FUNC
+ */
 HWTEST_F(ScsiDdkServiceTest, Read10SmallMemMap001, TestSize.Level1)
 {
     ScsiPeripheralIORequest request = {};
@@ -250,14 +254,16 @@ HWTEST_F(ScsiDdkServiceTest, Read10SmallMemMap001, TestSize.Level1)
     EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER);
 }
 
-// ============================================================
-// Write10 overflow: same bug as Read10
-// ============================================================
+/**
+ * @tc.name: Write10OverflowCheck001
+ * @tc.desc: Test functions to Read10
+ * @tc.type: FUNC
+ */
 HWTEST_F(ScsiDdkServiceTest, Write10OverflowCheck001, TestSize.Level1)
 {
     ScsiPeripheralIORequest request = {};
     request.lbAddress = 0;
-    request.transferLength = 0xFFFF;
+    request.transferLength = SCSI_TRANSFER_LENGTH_MAX;
     request.byte1 = 0;
     request.byte6 = 0;
     request.control = 0;

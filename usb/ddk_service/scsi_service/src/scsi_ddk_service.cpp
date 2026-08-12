@@ -166,8 +166,8 @@ static void BuildCdbForReadAndWrite(const ScsiPeripheralIORequest& request, unsi
     cdb[NINE_BYTE] = request.control;
 }
 
-static int32_t AllocateAndInitializeBuffer(const ScsiPeripheralDevice& dev, uint32_t memMapSize, uint8_t*& buffer,
-    uint16_t allocationLength)
+static int32_t AllocateBuffer(const ScsiPeripheralDevice& dev, uint32_t memMapSize, uint8_t*& buffer,
+    uint32_t allocationLength)
 {
     if (memMapSize < allocationLength || memMapSize > MAX_MEM_MAP_SIZE) {
         HDF_LOGE("%{public}s: memMapSize is invalid. memMapSize=%{public}d, allocationLength=%{public}d", __func__,
@@ -180,8 +180,17 @@ static int32_t AllocateAndInitializeBuffer(const ScsiPeripheralDevice& dev, uint
             errno, dev.memMapFd, memMapSize);
         return SCSIPERIPHERAL_DDK_MEMORY_ERROR;
     }
+    return HDF_SUCCESS;
+}
 
-    int32_t ret = memset_s(buffer, memMapSize, 0, memMapSize);
+static int32_t AllocateAndInitializeBuffer(const ScsiPeripheralDevice& dev, uint32_t memMapSize, uint8_t*& buffer,
+    uint16_t allocationLength)
+{
+    int32_t ret = AllocateBuffer(dev, memMapSize, buffer, allocationLength);
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+    ret = memset_s(buffer, memMapSize, 0, memMapSize);
     if (ret != 0) {
         HDF_LOGE("%{public}s memset_s(io_hdr) failed, ret=%{public}d", __func__, ret);
         munmap(buffer, memMapSize);
@@ -594,20 +603,12 @@ int32_t ScsiDdkService::Write10(const ScsiPeripheralDevice& dev,
     req.devFd = dev.devFd;
 
     std::lock_guard<std::mutex> lock(g_memMapMutex);
+    uint8_t* buffer = nullptr;
     uint32_t memMapSize = request.memMapSize;
     uint32_t bufferSize = static_cast<uint32_t>(bufferSizeU64);
-    if (memMapSize < bufferSize || memMapSize > MAX_MEM_MAP_SIZE) {
-        HDF_LOGE("%{public}s: memMapSize is invalid. memMapSize=%{public}d, bufferSize=%{public}d", __func__,
-            memMapSize, bufferSize);
-        return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
-    }
-
-    auto buffer = static_cast<uint8_t *>(mmap(nullptr, memMapSize, PROT_READ | PROT_WRITE, MAP_SHARED,
-        dev.memMapFd, 0));
-    if (buffer == MAP_FAILED) {
-        HDF_LOGE("%{public}s: mmap failed, errno=%{public}d, memMapFd=%{public}d, memMapSize=%{public}d", __func__,
-            errno, dev.memMapFd, memMapSize);
-        return SCSIPERIPHERAL_DDK_MEMORY_ERROR;
+    int32_t ret = AllocateBuffer(dev, memMapSize, buffer, bufferSize);
+    if (ret != HDF_SUCCESS) {
+        return ret;
     }
     MemMapFinalizer memMapFinalizer(buffer, memMapSize);
 
@@ -617,7 +618,7 @@ int32_t ScsiDdkService::Write10(const ScsiPeripheralDevice& dev,
     }
 
     Response resp;
-    int32_t ret = TrackTime([&]() {
+    ret = TrackTime([&]() {
         return osAdapter_->SendRequest(req, buffer, bufferSize, resp);
     }, __func__);
     if (ret != HDF_SUCCESS) {
