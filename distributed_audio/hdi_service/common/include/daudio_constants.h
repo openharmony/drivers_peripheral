@@ -53,6 +53,7 @@ const std::string HDF_EVENT_RESULT_FAILED = "DH_FAILED";
 
 const std::string HDF_EVENT_RESTART = "restart";
 const std::string HDF_EVENT_PAUSE = "pause";
+const std::string HDF_EVENT_START = "start";
 
 const std::string PRINT_SPK = "spk";
 const std::string PRINT_MIC = "mic";

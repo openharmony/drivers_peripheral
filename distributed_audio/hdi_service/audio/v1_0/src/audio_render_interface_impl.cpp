@@ -251,6 +251,37 @@ int32_t AudioRenderInterfaceImpl::IsSupportsDrain(bool &support)
     return HDF_SUCCESS;
 }
 
+int32_t AudioRenderInterfaceImpl::NotifyPlayStatusChange(const std::string &changeType)
+{
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return HDF_FAILURE;
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(devDesc_.pins).c_str());
+    cJSON_AddStringToObject(jParam, "ChangeType", changeType.c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return HDF_FAILURE;
+    }
+    std::string content(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
+    
+    DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, content };
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Callback is nullptr.");
+        return HDF_FAILURE;
+    }
+    int32_t ret = audioExtCallback_->NotifyEvent(renderId_, event);
+    if (ret != HDF_SUCCESS) {
+        DHLOGE("Notify play status change failed, type: %{public}s.", changeType.c_str());
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t AudioRenderInterfaceImpl::Start()
 {
     DHLOGI("Start render.");
@@ -258,35 +289,15 @@ int32_t AudioRenderInterfaceImpl::Start()
         DHLOGI("Render status wrong, return false.");
         return HDF_FAILURE;
     }
+    
+    std::string changeType = firstOpenFlag_ ? HDF_EVENT_START : HDF_EVENT_RESTART;
     if (firstOpenFlag_) {
         firstOpenFlag_ = false;
-    } else {
-        cJSON *jParam = cJSON_CreateObject();
-        if (jParam == nullptr) {
-            DHLOGE("Failed to create cJSON object.");
-            return HDF_FAILURE;
-        }
-        cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(devDesc_.pins).c_str());
-        cJSON_AddStringToObject(jParam, "ChangeType", HDF_EVENT_RESTART.c_str());
-        char *jsonData = cJSON_PrintUnformatted(jParam);
-        if (jsonData == nullptr) {
-            DHLOGE("Failed to create JSON data.");
-            cJSON_Delete(jParam);
-            return HDF_FAILURE;
-        }
-        std::string content(jsonData);
-        cJSON_Delete(jParam);
-        cJSON_free(jsonData);
-        DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, content};
-        if (audioExtCallback_ == nullptr) {
-            DHLOGE("Callback is nullptr.");
-            return HDF_FAILURE;
-        }
-        int32_t ret = audioExtCallback_->NotifyEvent(renderId_, event);
-        if (ret != HDF_SUCCESS) {
-            DHLOGE("Restart failed.");
-        }
     }
+    if (NotifyPlayStatusChange(changeType) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+
 #ifdef DAUDIO_SUPPORT_SHARED_BUFFER
     writeIndex_ = 0;
     writeNum_ = 0;

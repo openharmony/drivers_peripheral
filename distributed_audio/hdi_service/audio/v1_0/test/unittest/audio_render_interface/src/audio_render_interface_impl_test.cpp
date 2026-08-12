@@ -352,7 +352,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_003, TestSize.Level1)
     EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Start());
     audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
-    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Start());
 }
 
 /**
@@ -970,6 +970,58 @@ HWTEST_F(AudioRenderInterfaceImplTest, FadeInProcess_001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->FadeInProcess(durationFrame, frameData, frameLength));
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, audioRenderInterfaceImpl_->FadeInProcess(durationFrame, frameData, errLength));
     delete[] frameData;
+}
+
+/**
+ * @tc.name: NotifyPlayStatusChange_001
+ * @tc.desc: Verify the NotifyPlayStatusChange function when callback is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, NotifyPlayStatusChange_001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->NotifyPlayStatusChange(DistributedHardware::HDF_EVENT_START));
+}
+
+/**
+ * @tc.name: NotifyPlayStatusChange_002
+ * @tc.desc: Verify the NotifyPlayStatusChange function when NotifyEvent fails.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, NotifyPlayStatusChange_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->NotifyPlayStatusChange(DistributedHardware::HDF_EVENT_START));
+}
+
+/**
+ * @tc.name: NotifyPlayStatusChange_003
+ * @tc.desc: Verify the NotifyPlayStatusChange function with HDF_EVENT_START.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, NotifyPlayStatusChange_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->NotifyPlayStatusChange(DistributedHardware::HDF_EVENT_START));
+}
+
+/**
+ * @tc.name: NotifyPlayStatusChange_004
+ * @tc.desc: Verify the NotifyPlayStatusChange function with HDF_EVENT_RESTART.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, NotifyPlayStatusChange_004, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->NotifyPlayStatusChange(DistributedHardware::HDF_EVENT_RESTART));
 }
 } // V2_0
 } // Audio
