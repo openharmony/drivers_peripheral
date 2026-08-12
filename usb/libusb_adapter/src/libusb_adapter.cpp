@@ -1524,7 +1524,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPip
 
     if (sendRequestAshmemParameter.offset > sendRequestAshmemParameter.ashmemSize ||
         sendRequestAshmemParameter.bufferLength > sendRequestAshmemParameter.ashmemSize -
-            sendRequestAshmemParameter.offset) {
+        sendRequestAshmemParameter.offset) {
         HDF_LOGE("%{public}s: invalid offset or bufferLength, size:%{public}u, offset:%{public}u, len:%{public}u",
             __func__, sendRequestAshmemParameter.ashmemSize, sendRequestAshmemParameter.offset,
             sendRequestAshmemParameter.bufferLength);
