@@ -89,7 +89,7 @@ int32_t CodecJpegService::AllocateJpegInBuffer(CodecImageBuffer& inBuffer, uint3
     int32_t ret = core_->AllocateInBuffer(&bufferHandle, size);
     inBuffer.fenceFd = -1;
     CHECK_AND_RETURN_RET_LOG(ret == HDF_SUCCESS, ret, "error = [%{public}d]", ret);
-    inBuffer.buffer = new NativeBuffer();
+    inBuffer.buffer = new (std::nothrow) NativeBuffer();
     if (inBuffer.buffer == nullptr) {
         CODEC_LOGE("jpeg new NativeBuffer fail!");
         ret = core_->FreeInBuffer(bufferHandle);
