@@ -517,8 +517,14 @@ int32_t ScsiDdkService::Read10(const ScsiPeripheralDevice& dev,
         return SCSIPERIPHERAL_DDK_NO_PERM;
     }
 
-    if (request.transferLength * dev.lbLength * (uint64_t)1 > MAX_TRANSFER_BYTES) {
-        HDF_LOGE("%{public}s: The value of transferLength is too large", __func__);
+    if (dev.lbLength == 0) {
+        HDF_LOGE("%{public}s: dev.lbLength is 0", __func__);
+        return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
+    }
+    uint64_t bufferSizeU64 = static_cast<uint64_t>(request.transferLength) * dev.lbLength;
+    if (bufferSizeU64 > MAX_TRANSFER_BYTES) {
+        HDF_LOGE("%{public}s: transferLength too large, transferLength=%{public}u, lbLength=%{public}u",
+            __func__, request.transferLength, dev.lbLength);
         return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
     }
 
@@ -533,7 +539,7 @@ int32_t ScsiDdkService::Read10(const ScsiPeripheralDevice& dev,
     std::lock_guard<std::mutex> lock(g_memMapMutex);
     uint8_t* buffer = nullptr;
     uint32_t memMapSize = request.memMapSize;
-    uint32_t bufferSize = request.transferLength * dev.lbLength;
+    uint32_t bufferSize = static_cast<uint32_t>(bufferSizeU64);
     int32_t ret = AllocateAndInitializeBuffer(dev, memMapSize, buffer, bufferSize);
     if (ret != HDF_SUCCESS) {
         return ret;
@@ -567,8 +573,14 @@ int32_t ScsiDdkService::Write10(const ScsiPeripheralDevice& dev,
         return SCSIPERIPHERAL_DDK_NO_PERM;
     }
 
-    if (request.transferLength * dev.lbLength * (uint64_t)1 > MAX_TRANSFER_BYTES) {
-        HDF_LOGE("%{public}s: The value of transferLength is too large", __func__);
+    if (dev.lbLength == 0) {
+        HDF_LOGE("%{public}s: dev.lbLength is 0", __func__);
+        return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
+    }
+    uint64_t bufferSizeU64 = static_cast<uint64_t>(request.transferLength) * dev.lbLength;
+    if (bufferSizeU64 > MAX_TRANSFER_BYTES) {
+        HDF_LOGE("%{public}s: transferLength too large, transferLength=%{public}u, lbLength=%{public}u",
+            __func__, request.transferLength, dev.lbLength);
         return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
     }
 
@@ -583,7 +595,7 @@ int32_t ScsiDdkService::Write10(const ScsiPeripheralDevice& dev,
 
     std::lock_guard<std::mutex> lock(g_memMapMutex);
     uint32_t memMapSize = request.memMapSize;
-    uint32_t bufferSize = request.transferLength * dev.lbLength;
+    uint32_t bufferSize = static_cast<uint32_t>(bufferSizeU64);
     if (memMapSize < bufferSize || memMapSize > MAX_MEM_MAP_SIZE) {
         HDF_LOGE("%{public}s: memMapSize is invalid. memMapSize=%{public}d, bufferSize=%{public}d", __func__,
             memMapSize, bufferSize);
