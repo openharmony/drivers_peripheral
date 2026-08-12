@@ -127,6 +127,8 @@ constexpr uint64_t MTP_MAX_FILE_SIZE = 0xFFFFFFFFULL;
 constexpr uint32_t WRITE_FILE_TEMP_SLICE = 16 * 100 * 1024; /* 16*100KB */
 constexpr uint32_t ZERO_LENGTH_PACKET_JIFFIES = 100;  /* sync timeout, set to 0 means wait forever */
 constexpr uint32_t ZERO_LENGTH_PACKET = 0;
+constexpr int32_t WAIT_READY_TIME = 10;
+constexpr int32_t MAX_WAIT_READY_TIME = 1000;
 static constexpr int32_t WAIT_UDC_MAX_LOOP = 3;
 static constexpr uint32_t WAIT_UDC_TIME = 300000;
 static constexpr uint32_t REQ_ACTUAL_DEFAULT_LENGTH = 0;
@@ -1120,6 +1122,22 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceFree()
     return HDF_SUCCESS;
 }
 
+void UsbfnMtpImpl::WaitRequestCancel()
+{
+    int32_t time = 0;
+    while (mtpPort_ != nullptr &&
+        (mtpPort_->readStarted > 0 || mtpPort_->writeStarted > 0)) {
+        OsalMSleep(WAIT_READY_TIME);
+        time += WAIT_READY_TIME;
+        if (time >= MAX_WAIT_READY_TIME) {
+            HDF_LOGW("%{public}s: wait request cancel timeout, readStarted=%{public}d, writeStarted=%{public}d",
+                __func__, mtpPort_->readStarted, mtpPort_->writeStarted);
+            break;
+        }
+    }
+    HDF_LOGI("%{public}s: request cancel ready.", __func__);
+}
+
 int32_t UsbfnMtpImpl::Init()
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, MTP_FUNCTION);
@@ -1206,6 +1224,7 @@ int32_t UsbfnMtpImpl::Release()
         (void)UsbMtpPortCancelRequest(mtpPort_);
     }
     pthread_rwlock_unlock(&mtpRunrwLock_);
+    (void)WaitRequestCancel();
     pthread_rwlock_wrlock(&mtpRunrwLock_);
     if (mtpPort_ == nullptr || mtpDev_ == nullptr) {
         pthread_rwlock_unlock(&mtpRunrwLock_);
