@@ -737,7 +737,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     }
     uint8_t intfId = GetInterfaceId(pipe.interfaceHandle);
     return g_DdkLibusbAdapter->SendPipeRequestWithAshmem({infoTemp.busNum, infoTemp.devNum}, {intfId, pipe.endpoint},
-        {ashmem.ashmemFd, ashmem.size}, transferredLength, pipe.timeout);
+        {ashmem.ashmemFd, ashmem.size, ashmem.offset, ashmem.bufferLength}, transferredLength, pipe.timeout);
 #endif // LIBUSB_ENABLE
 }
 

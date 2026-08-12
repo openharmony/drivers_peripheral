@@ -1522,6 +1522,16 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPip
         return HDF_FAILURE;
     }
 
+    if (sendRequestAshmemParameter.offset > sendRequestAshmemParameter.ashmemSize ||
+        sendRequestAshmemParameter.bufferLength > sendRequestAshmemParameter.ashmemSize -
+            sendRequestAshmemParameter.offset) {
+        HDF_LOGE("%{public}s: invalid offset or bufferLength, size:%{public}u, offset:%{public}u, len:%{public}u",
+            __func__, sendRequestAshmemParameter.ashmemSize, sendRequestAshmemParameter.offset,
+            sendRequestAshmemParameter.bufferLength);
+        close(sendRequestAshmemParameter.ashmemFd);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     unsigned char *buffer = GetMmapBufferByFd(sendRequestAshmemParameter.ashmemFd,
         sendRequestAshmemParameter.ashmemSize);
     if (buffer == nullptr) {
@@ -1529,8 +1539,9 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPip
         close(sendRequestAshmemParameter.ashmemFd);
         return HDF_FAILURE;
     }
-    SyncTranfer syncTranfer = {sendRequestAshmemParameter.ashmemSize, &actlength, timeout};
-    ret = DoSyncPipeTranfer(devHandle, &endpointDes, buffer, syncTranfer);
+    unsigned char *transferBuffer = buffer + sendRequestAshmemParameter.offset;
+    SyncTranfer syncTranfer = {static_cast<int>(sendRequestAshmemParameter.bufferLength), &actlength, timeout};
+    ret = DoSyncPipeTranfer(devHandle, &endpointDes, transferBuffer, syncTranfer);
     HDF_LOGI("SendPipeRequestWithAshmem DoSyncPipeTranfer ret :%{public}d", ret);
     if (ret < 0) {
         if (ret != LIBUSB_ERROR_OVERFLOW) {

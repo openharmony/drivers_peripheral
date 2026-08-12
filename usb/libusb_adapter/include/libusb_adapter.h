@@ -52,6 +52,8 @@ struct SyncTranfer {
 struct SendRequestAshmemParameter {
     int32_t ashmemFd;
     uint32_t ashmemSize;
+    uint32_t offset;
+    uint32_t bufferLength;
 };
 
 struct LibusbAsyncTransfer {
