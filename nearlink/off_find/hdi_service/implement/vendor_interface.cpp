@@ -66,8 +66,6 @@ constexpr int OFFSET_EIGHT_BITS = 8;
 constexpr int BATTERY_ENTRY = 3;
 constexpr int BATTERY_HIGH_ENTRY = 10;  // 关机七天可找电池阈值
 
-constexpr int DEFAULT_CHIP_STEP = 1;  // 默认芯片步长
-
 constexpr int HIGH_POWER_TIME = 168;  // 关机七天 7 day = 7*24h
 constexpr int UP_POWER_TIME = 48;
 constexpr int DOWN_POWER_TIME = 12;
