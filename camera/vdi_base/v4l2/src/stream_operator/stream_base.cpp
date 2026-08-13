@@ -329,10 +329,7 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
 
     RetCode rc = RC_ERROR;
     if (request->IsFirstOne() && !request->IsContinous()) {
-        uint32_t n = GetBufferCount();
-        for (uint32_t i = 0; i < n; i++) {
-            DeliverStreamBuffer();
-        }
+        DeliverStreamBuffer();
     } else {
         do {
             rc = DeliverStreamBuffer();
@@ -456,6 +453,11 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
             return RC_OK;
         }
     }
+    CAMERA_LOGI("stream = [%{public}d] OnFrame and NeedCancel = [%{public}d]",
+        buffer->GetStreamId(), request->NeedCancel() ? 1 : 0);
+    request->NeedCancel() ? buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP) :
+        buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
+    ReceiveBuffer(buffer);
     if (request->NeedShutterCallback()) {
         std::shared_ptr<ICaptureMessage> shutterMessage = std::make_shared<FrameShutterMessage>(
             streamId_, request->GetCaptureId(), request->GetEndTime(), request->GetOwnerCount());
@@ -484,11 +486,6 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
             }
         }
     }
-    CAMERA_LOGI("stream = [%{public}d] OnFrame and NeedCancel = [%{public}d]",
-        buffer->GetStreamId(), request->NeedCancel() ? 1 : 0);
-    request->NeedCancel() ? buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP) :
-        buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
-    ReceiveBuffer(buffer);
     return RC_OK;
 }
 
