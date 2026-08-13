@@ -22,6 +22,7 @@
     ],
     "deps": {
       "components": [
+        "bounds_checking_function",
         "cJSON",
         "c_utils",
         "config_policy",

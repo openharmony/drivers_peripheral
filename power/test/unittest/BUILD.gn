@@ -50,7 +50,10 @@ ohos_unittest("hdi_unittest_power") {
     "init:libbegetutil",
   ]
   if (drivers_peripheral_power_c_utils) {
-    external_deps += [ "c_utils:utils" ]
+    external_deps += [
+      "c_utils:utils",
+      "bounds_checking_function:libsec_shared",
+    ]
   }
 
   if (drivers_peripheral_power_wakeup_cause_path) {

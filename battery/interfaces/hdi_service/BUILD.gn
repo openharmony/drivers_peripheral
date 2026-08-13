@@ -41,7 +41,10 @@ ohos_shared_library("libbattery_interface_service_2.0") {
       external_deps += [ "config_policy:configpolicy_util" ]
     }
     if (drivers_peripheral_battery_feature_c_utils) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [
+        "c_utils:utils",
+        "bounds_checking_function:libsec_shared",
+      ]
     }
 
     # xcollie has a bug, disable it
