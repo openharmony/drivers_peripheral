@@ -16,15 +16,12 @@ import("//build/test.gni")
 
 group("hdf_test_serial") {
   testonly = true
-  deps = [ 
-    "unittest:serials_unittest",
-  ]
-  
   if (defined(drivers_interface_serial_part)) {
-    deps += [
+    deps = [
       "benchmarktest:serials_benchmarktest",
       "fuzztest:serials_fuzztest",
       "sample:serial_sample_test_group",
+      "unittest:serials_unittest",
     ]
   }
 }
