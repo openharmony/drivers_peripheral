@@ -31,13 +31,16 @@ ohos_fuzztest("SerialsFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_serial:libserials_proxy_1.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
   ]
+
+  if (defined(drivers_interface_serial_part)) {
+    external_deps += [ "drivers_interface_serial:libserials_proxy_1.0" ]
+  }
 
   cflags = [
     "-g",
