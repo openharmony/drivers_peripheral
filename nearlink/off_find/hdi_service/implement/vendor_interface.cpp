@@ -308,13 +308,6 @@ int VendorInterface::GetPowerTimeParameter(const OffFindExtraInfo& info, size_t 
         power = AIR_OTA_POWER_TIME;
     }
 
-    int chipStep = OHOS::system::GetIntParameter<int>("const.nearlink.off_find.chip_step", DEFAULT_CHIP_STEP);
-    if (chipStep <= 0) {
-        chipStep = DEFAULT_CHIP_STEP;
-    }
-    if (chipStep > 0) {
-        power /= chipStep;
-    }
     return power;
 }
 
