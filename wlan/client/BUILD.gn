@@ -85,6 +85,7 @@ if (defined(ohos_lite)) {
       public_configs = [ ":wifi_driver_hdi_client_public_config" ]
 
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
@@ -129,6 +130,7 @@ if (defined(ohos_lite)) {
 
       public_configs = [ ":wifi_driver_hdi_client_public_config" ]
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",

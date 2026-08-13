@@ -66,6 +66,7 @@ if (defined(ohos_lite)) {
     public_configs = [ ":wpa_hdi_client_public_config" ]
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
