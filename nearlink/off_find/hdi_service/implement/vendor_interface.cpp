@@ -307,7 +307,6 @@ int VendorInterface::GetPowerTimeParameter(const OffFindExtraInfo& info, size_t 
     if (IsAirOta(info)) {
         power = AIR_OTA_POWER_TIME;
     }
-
     return power;
 }
 
