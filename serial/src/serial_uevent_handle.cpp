@@ -204,7 +204,7 @@ ssize_t SerialUeventHandle::SerialReadUeventMsg(int sockFd, char *buffer, size_t
         *buffer = '\0';
         return HDF_FAILURE;
     }
-    
+
     return len;
 }
 
