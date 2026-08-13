@@ -202,6 +202,7 @@ private:
     std::mutex micWaitMutex_;
     std::condition_variable micWaitCond_;
     std::mutex renderCallMtx_;
+    std::mutex capsMapMtx_;
 
     std::mutex spkStatusMutex_;
     std::vector<bool> spkStatus_;
