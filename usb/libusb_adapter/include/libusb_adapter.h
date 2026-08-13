@@ -190,7 +190,7 @@ public:
     int32_t SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPipe &pipe,
         SendRequestAshmemParameter sendRequestAshmemParameter, uint32_t &transferredLength, unsigned int timeout);
     int32_t SendPipeRequest(const UsbDev &dev, const UsbPipe &pipe, uint32_t size,
-        uint32_t &transferedLength, unsigned int timeout);
+        uint32_t offset, uint32_t length, uint32_t &transferedLength, unsigned int timeout);
     int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
     int32_t GetCurrentInterfaceSetting(const UsbDev &dev, uint8_t &settingIndex);
     int32_t GetDeviceMemMapFd(const UsbDev &dev, int &fd);
