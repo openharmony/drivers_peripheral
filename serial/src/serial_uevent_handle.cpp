@@ -198,17 +198,22 @@ ssize_t SerialUeventHandle::SerialReadUeventMsg(int sockFd, char *buffer, size_t
         return HDF_FAILURE;
     }
 
+    struct ucred *cred = nullptr;
     struct cmsghdr *hdr = CMSG_FIRSTHDR(&msghdr);
-    if (hdr == NULL || hdr->cmsg_type != SCM_CREDENTIALS) {
+    while (hdr != NULL) {
+        if (hdr->cmsg_level == SOL_SOCKET && hdr->cmsg_type == SCM_CREDENTIALS) {
+            cred = reinterpret_cast<struct ucred*>(CMSG_DATA(hdr));
+            break;
+        }
+        hdr = CMSG_NXTHDR(&msghdr, hdr);
+    }
+    if (cred == nullptr) {
         HDF_LOGE("Unexpected control message, ignored");
         *buffer = '\0';
         return HDF_FAILURE;
     }
-
-    struct ucred *cred = reinterpret_cast<struct ucred *>(CMSG_DATA(hdr));
-    if (cred == NULL || cred->uid != 0) {
-        unsigned int uidVal = (cred == NULL) ? static_cast<unsigned int>(-1) : cred->uid;
-        HDF_LOGE("Invalid credentials, uid=%{public}u, ignored", uidVal);
+    if (cred->uid != 0) {
+        HDF_LOGE("uevent sent by untrusted uid=%{public}u, ignored", cred->uid);
         *buffer = '\0';
         return HDF_FAILURE;
     }
