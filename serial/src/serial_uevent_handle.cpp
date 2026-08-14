@@ -205,6 +205,14 @@ ssize_t SerialUeventHandle::SerialReadUeventMsg(int sockFd, char *buffer, size_t
         return HDF_FAILURE;
     }
 
+    struct ucred *cred = reinterpret_cast<struct ucred *>(CMSG_DATA(hdr));
+    if (cred == NULL || cred->uid != 0) {
+        HDF_LOGE("Uevent from uid=%{public}d is ignored, only root is allowed",
+            cred == NULL ? -1 : static_cast<int>(cred->uid));
+        *buffer = '\0';
+        return HDF_FAILURE;
+    }
+
     return len;
 }
 
