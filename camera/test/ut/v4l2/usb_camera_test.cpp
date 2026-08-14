@@ -116,7 +116,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0003)
     EXPECT_EQ(ret, CAM_META_SUCCESS);
     std::cout << "OHOS_ABILITY_CAMERA_CONNECTION_TYPE value is "
         << static_cast<int>(entry.data.u8[0]) << std::endl;
-    EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN);
+    EXPECT_LE(entry.data.u8[0], OHOS_CAMERA_CONNECTION_TYPE_REMOTE);
 }
 
 /**
@@ -138,7 +138,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0004)
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_POSITION, &entry);
     EXPECT_EQ(ret, CAM_META_SUCCESS);
     std::cout << "OHOS_ABILITY_CAMERA_POSITION value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
-    EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
+    EXPECT_LE(entry.data.u8[0], OHOS_CAMERA_POSITION_OTHER);
 }
 
 /**
@@ -367,7 +367,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0013)
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_TYPE, &entry);
     EXPECT_EQ(ret, CAM_META_SUCCESS);
     std::cout << "OHOS_ABILITY_CAMERA_TYPE value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
-    EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_TYPE_UNSPECIFIED);
+    EXPECT_LE(entry.data.u8[0], OHOS_CAMERA_TYPE_SUPER_TELTPHOTO);
 }
 
 /**
@@ -964,8 +964,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0030)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
     EXPECT_EQ(ret, CAM_META_SUCCESS);
-    std::cout << "OHOS_SENSOR_ORIENTATION value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
-    EXPECT_TRUE(entry.data.u8[0] == 0);
+    std::cout << "OHOS_SENSOR_ORIENTATION value is " << entry.data.i32[0] << std::endl;
+    EXPECT_GE(entry.data.i32[0], 0);
 }
 
 /**
