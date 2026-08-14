@@ -188,6 +188,7 @@ static int32_t AllocateAndInitializeBuffer(const ScsiPeripheralDevice& dev, uint
 {
     int32_t ret = AllocateBuffer(dev, memMapSize, buffer, allocationLength);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AllocateBuffer failed, ret=%{public}d", __func__, ret);
         return ret;
     }
     ret = memset_s(buffer, memMapSize, 0, memMapSize);
@@ -608,6 +609,7 @@ int32_t ScsiDdkService::Write10(const ScsiPeripheralDevice& dev,
     uint32_t bufferSize = static_cast<uint32_t>(bufferSizeU64);
     int32_t ret = AllocateBuffer(dev, memMapSize, buffer, bufferSize);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AllocateBuffer failed, ret=%{public}d", __func__, ret);
         return ret;
     }
     MemMapFinalizer memMapFinalizer(buffer, memMapSize);
