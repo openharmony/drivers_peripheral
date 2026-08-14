@@ -454,11 +454,6 @@ int32_t UsbDdkService::SelectInterfaceSetting(uint64_t interfaceHandle, uint8_t 
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
     }
-    if (offset > size || length > size - offset) {
-        HDF_LOGE("%{public}s: invalid offset or bufferLength, size:%{public}u, offset:%{public}u, len:%{public}u",
-            __func__, size, offset, length);
-        return HDF_ERR_INVALID_PARAM;
-    }
 
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
@@ -629,6 +624,11 @@ int32_t UsbDdkService::SendPipeRequest(
     if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
+    }
+    if (offset > size || length > size - offset) {
+        HDF_LOGE("%{public}s: invalid offset or bufferLength, size:%{public}u, offset:%{public}u, len:%{public}u",
+            __func__, size, offset, length);
+        return HDF_ERR_INVALID_PARAM;
     }
 
     uint64_t handle = 0;
