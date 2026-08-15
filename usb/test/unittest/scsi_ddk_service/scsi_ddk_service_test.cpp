@@ -319,8 +319,8 @@ HWTEST_F(ScsiDdkServiceTest, Read10TruncationBypass001, TestSize.Level1)
 
     ScsiPeripheralResponse response;
     int32_t ret = service_->Read10(realDev, request, response);
-    HDF_LOGI("Read10TruncationBypass001: transferLength=%{public}u, lbLength=%{public}u, memMapSize=%{public}u, ret=%{public}d",
-             request.transferLength, realDev.lbLength, request.memMapSize, ret);
+    HDF_LOGI("Read10TruncationBypass001: transferLength=%{public}u, lbLength=%{public}u, memMapSize=%{public}u,
+             ret=%{public}d", request.transferLength, realDev.lbLength, request.memMapSize, ret);
 
     EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
         << "Read10 should reject when bufferSize(65536) > memMapSize(4096), "
@@ -351,8 +351,8 @@ HWTEST_F(ScsiDdkServiceTest, Read10TruncationBypass002, TestSize.Level1)
 
     ScsiPeripheralResponse response;
     int32_t ret = service_->Read10(realDev, request, response);
-    HDF_LOGI("Read10TruncationBypass002: transferLength=%{public}u, lbLength=%{public}u, memMapSize=%{public}u, ret=%{public}d",
-             request.transferLength, realDev.lbLength, request.memMapSize, ret);
+    HDF_LOGI("Read10TruncationBypass002: transferLength=%{public}u, lbLength=%{public}u, memMapSize=%{public}u,
+             ret=%{public}d", request.transferLength, realDev.lbLength, request.memMapSize, ret);
 
     EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
         << "Read10 should reject when bufferSize(135168) > memMapSize(8192)";
@@ -436,8 +436,8 @@ HWTEST_F(ScsiDdkServiceTest, Read10TruncationBypass4kSector001, TestSize.Level1)
 
     ScsiPeripheralResponse response;
     int32_t ret = service_->Read10(dev4k, request, response);
-    HDF_LOGI("Read10TruncationBypass4kSector001: transferLength=%{public}u, lbLength=%{public}u, memMapSize=%{public}u, ret=%{public}d",
-             request.transferLength, dev4k.lbLength, request.memMapSize, ret);
+    HDF_LOGI("Read10TruncationBypass4kSector001: transferLength=%{public}u, lbLength=%{public}u, memMapSize=%{public}u,
+             ret=%{public}d", request.transferLength, dev4k.lbLength, request.memMapSize, ret);
 
     EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
         << "Read10 should reject when bufferSize(65536) > memMapSize(4096) for 4K-sector device";
