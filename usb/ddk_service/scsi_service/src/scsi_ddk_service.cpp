@@ -184,7 +184,7 @@ static int32_t AllocateBuffer(const ScsiPeripheralDevice& dev, uint32_t memMapSi
 }
 
 static int32_t AllocateAndInitializeBuffer(const ScsiPeripheralDevice& dev, uint32_t memMapSize, uint8_t*& buffer,
-    uint16_t allocationLength)
+    uint32_t allocationLength)
 {
     int32_t ret = AllocateBuffer(dev, memMapSize, buffer, allocationLength);
     if (ret != HDF_SUCCESS) {
