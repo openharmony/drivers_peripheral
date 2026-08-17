@@ -773,6 +773,21 @@ typedef struct {
      * @version 1.0
      */
     int32_t (*GetLayerReleaseFence)(uint32_t devId, uint32_t layerId, int32_t *fence);
+    
+    int32_t (*GetLayerDeviceId)(uint32_t devId, uint32_t layerId, uint32_t *deviceId);
+
+    /**
+     * @brief Sets the priority of a layer.
+     *
+     * @param priority Indicates the priority of the layer. The value ranges from 0 to 100, where 0 indicates the
+     * lowest priority, and 100 indicates the highest priority.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*SetLayerPriority)(uint32_t priority);
 } LayerFuncs;
 
 /**

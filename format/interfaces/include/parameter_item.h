@@ -55,8 +55,14 @@ typedef enum {
                                          */
     KEY_TYPE_PRE_CACHE    = 0x70726361,  /**< Precapture cache size. The value type is <b>int</b> */
     KEY_TYPE_SET_SYNC_BUFFER_MSEC = 0x73796e62, /**< Set sync buffer size, uint ms. The value type is <b>int</b> */
-    KEY_TYPE_EXTRADATA = 0x65787472, /**< Extra data. The value type is <b>pointer</b> */
-    KEY_TYPE_THUMBNAIL = 0x74686e6c /**< Thumbnail. The value type is <b>pointer<b>. */
+    KEY_TYPE_EXTRADATA    = 0x65787472,      /**< Extra Data, . The value type is <b>pointer</b> */
+    KEY_TYPE_WRITE_FRONT_COVER = 0x636f7672, /**< Write cover image of file.The value type is pointer of image frame. */
+    KEY_TYPE_WRITE_FRONT_COVER_LEN = 0x636c656e, /**< cover image size. The value type is int. */
+    KEY_TYPE_WRITE_FRONT_GPS,
+    KEY_TYPE_WRITE_FRONT_GPS_LEN,
+    KEY_TYPE_PRE_ALLOC_SIZE = 0x50524c43,
+    KEY_TYPE_COVR_PIC = 0x636f7672,
+    KEY_TYPE_ALBUM_COVER_INFO = 0x616c6172 /**< Album cover information. The value type is <b>pointer</b>. */
 } KeyType;
 
 /**

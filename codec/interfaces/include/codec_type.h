@@ -39,6 +39,9 @@
 #ifndef CODEC_TYPE_H
 #define CODEC_TYPE_H
 
+#ifdef MEDIA_INTERFACE_V1_0
+#include "codec_lite_type.h"
+#else
 #include <stdint.h>
 #include <stdbool.h>
 #include "codec_common_type.h"
@@ -54,8 +57,6 @@ extern "C" {
  * @brief Defines the pointer to the codec handle, which is the context information for function calls.
  */
 typedef void *CODEC_HANDLETYPE;
-
-#define PARAM_COUNT_MAX 500
 
 /**
  * @brief Enumerates indexes of parameter types.
@@ -87,7 +88,7 @@ typedef enum {
     KEY_IMAGE_Q_FACTOR,       /**< Quality factor, range is [1, 99]. The value type is uint32_t */
     KEY_VIDEO_LEVEL,          /**< Codec level. The value type is uint32_t. */
 
-    KEY_AUDIO_START_NONE = 0x1500,
+    KEY_SAMPLE_RATE = 0x1500,
     KEY_AUDIO_SAMPLE_RATE,    /**< Sampling rate. The value type is uint32_t. */
     KEY_AUDIO_PROFILE,        /**< Audio encoding profile. The value type is uint32_t. */
     KEY_AUDIO_CHANNEL_COUNT,  /**< Number of channels. The value type is uint32_t. */
@@ -104,6 +105,16 @@ typedef enum {
  * @brief Enumerates control modes of the channel encoding rate.
  */
 typedef enum {
+    VENCOD_RC_CBR = 0, /**< Fixed bit rate*/
+    VENCOD_RC_VBR,     /**< Variable bit rate */
+    VENCOD_RC_AVBR,    /**< Adaptive variable bit rate */
+    VENCOD_RC_QVBR,    /**< Quality-defined variable bit rate */
+    VENCOD_RC_CVBR,    /**< Constrained variable bit rate */
+    VENCOD_RC_QPMAP,   /**< Configuration-mapped quantization parameters */
+    VENCOD_RC_FIXQP    /**< Fixed quantization parameters */
+} VenCodeRcMode;
+
+typedef enum {
     VID_CODEC_RC_CBR = 0, /**< Fixed bit rate*/
     VID_CODEC_RC_VBR,     /**< Variable bit rate */
     VID_CODEC_RC_AVBR,    /**< Adaptive variable bit rate */
@@ -112,6 +123,44 @@ typedef enum {
     VID_CODEC_RC_QPMAP,   /**< Configuration-mapped quantization parameters */
     VID_CODEC_RC_FIXQP    /**< Fixed quantization parameters */
 } VideoCodecRcMode;
+
+/**
+ * @brief Enumerates resolutions.
+ */
+typedef enum {
+    RESOLUTION_CIF,     /**< 352x288 */
+    RESOLUTION_360P,    /**< 640x360 */
+    RESOLUTION_D1_PAL,  /**< 720x576 */
+    RESOLUTION_D1_NTSC, /**< 720x480 */
+    RESOLUTION_720P,    /**< 1280x720 */
+    RESOLUTION_1080P,   /**< 1920x1080 */
+    RESOLUTION_2560X1440, /**< 2560x1440 */
+    RESOLUTION_2592X1520, /**< 2592x1520 */
+    RESOLUTION_2592X1536, /**< 2592x1536 */
+    RESOLUTION_2592X1944, /**< 2592x1944 */
+    RESOLUTION_2688X1536, /**< 2688x1536 */
+    RESOLUTION_2716X1524, /**< 2716x1524 */
+    RESOLUTION_3840X2160, /**< 3840x2160 */
+    RESOLUTION_4096X2160, /**< 4096x2160 */
+    RESOLUTION_3000X3000, /**< 3000x3000 */
+    RESOLUTION_4000X3000, /**< 4000x3000 */
+    RESOLUTION_7680X4320, /**< 7680x4320 */
+    RESOLUTION_3840X8640, /**< 3840x8640 */
+    RESOLUTION_INVALID  /**< Invalid resolution */
+} PicSize;
+
+/**
+ * @brief Enumerates types of group of pictures (GOP).
+ */
+typedef enum {
+    VENCOD_GOPMODE_NORMALP = 0,   /**< P-frames using only one reference frame during encoding */
+    VENCOD_GOPMODE_DUALP = 1,     /**< P-frames using two reference frames during encoding */
+    VENCOD_GOPMODE_SMARTP = 2,    /**< Smart P-frames for encoding */
+    VENCOD_GOPMODE_ADVSMARTP = 3, /**< Advanced smart P-frames for encoding */
+    VENCOD_GOPMODE_BIPREDB = 4,   /**< B-frames for encoding */
+    VENCOD_GOPMODE_LOWDELAYB = 5, /**< B-frames using only previous frames as references during encoding. */
+    VENCOD_GOPMODE_INVALID,       /**< Invalid type */
+} VenCodeGopMode;
 
 /**
  * @brief Enumerates types of group of pictures (GOP).
@@ -125,6 +174,11 @@ typedef enum {
     VID_CODEC_GOPMODE_LOWDELAYB = 5, /**< B-frames using only previous frames as references during encoding. */
     VID_CODEC_GOPMODE_INVALID,       /**< Invalid type */
 } VideoCodecGopMode;
+
+/**
+ * @brief Defines the pointer to the type of the dynamic parameter value.
+ */
+typedef void *ValueType;
 
 /**
  * @brief Describes the dynamic parameter structure, which is mainly used
@@ -196,6 +250,14 @@ typedef enum {
 } StreamFlagType;
 
 /**
+ * @brief Defines the codec buffer handle type. The virtual address of a handle maps to its physical address.
+ */
+typedef struct {
+    uint8_t *virAddr;   /**< Virtual address */
+    uintptr_t handle;   /**< Physical address */
+} CodecBufferHandle;
+
+/**
 * @brief Enumerates buffer types.
  */
 typedef enum {
@@ -214,6 +276,28 @@ typedef struct {
     uint32_t length;   /**< Length of valid data */
     uint32_t capacity; /**< Total size of buffer blocks*/
 } CodecBufferInfo;
+
+/**
+ * @brief Describes input information.
+ */
+typedef struct {
+    uint32_t bufferId;    /**< Corresponding buffer index number */
+    int64_t timeStamp;    /**< buffer timestamp */
+    uint32_t flag;        /**< buffer flag. For details, see {@link StreamFlagType}. */
+    uint32_t bufferCnt;   /**< Number of buffers */
+    CodecBufferInfo buffers[0]; /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo} */
+} InputInfo;
+
+/**
+ * @brief Describes output information.
+ */
+typedef struct {
+    uint32_t bufferId;    /**< Corresponding buffer index number */
+    int64_t timeStamp;    /**< buffer timestamp */
+    uint32_t flag;        /**< buffer flag. For details, see {@link StreamFlagType}. */
+    uint32_t bufferCnt;   /**< Number of buffers */
+    CodecBufferInfo buffers[0]; /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo} */
+} OutputInfo;
 
 /**
  * @brief Describes input and output codec buffer.
@@ -272,6 +356,14 @@ typedef enum {
 } AllocateBufferMode;
 
 /**
+ * @brief Enumerates playback capabilities.
+ */
+typedef enum {
+    ADAPTIVE_PLAYBACK  = 0x1, /**< Adaptive playback */
+    SECURE_PLAYBACK   = 0x2,  /**< Secure playback */
+} CapsMask;
+
+/**
  * @brief Defines the video codec capabilities.
  */
 #define PIX_FMT_NUM 16 /** Size of the supported pixel format array */
@@ -296,11 +388,12 @@ typedef struct {
     int32_t channelLayouts[CHANNEL_NUM];      /** Supported audio channel layouts. */
 } AudioPortCap;
 
+#define PROFILE_NUM 256 /** Size of the profile array supported. */
+#define NAME_LENGTH 32  /** Size of the component name. */
+
 /**
  * @brief Defines the codec capability.
  */
-#define PROFILE_NUM 256 /** Size of the profile array supported. */
-#define NAME_LENGTH 32  /** Size of the component name. */
 typedef struct {
     AvCodecMime mime;                     /**< MIME type */
     CodecType type;                       /**< Codec type */
@@ -346,6 +439,11 @@ typedef enum {
 } EventType;
 
 /**
+ * @brief Redefines the unsigned pointer type, which is used for pointer conversion.
+ */
+typedef uintptr_t UINTPTR;
+
+/**
  * @brief Defines format change reporting information.
  */
 typedef struct {
@@ -359,11 +457,6 @@ typedef struct {
     PixelFormat format;    /**< Pixel format. For details, see {@link PixelFormat}. */
     Rect outputRect;
 } FormatChange;
-
-/**
- * @brief Redefines the unsigned pointer type, which is used for pointer conversion.
- */
-typedef uintptr_t UINTPTR;
 
 /**
  * @brief Defines callbacks and their parameters.
@@ -409,6 +502,14 @@ typedef struct {
 } CodecCallback;
 
 /**
+ * @brief Enumerates allocation types.
+ */
+typedef enum {
+    INTERNAL, /**< Internal */
+    EXTERNAL, /**< External */
+} BufferMode;
+
+/**
  * @brief Enumerates codec result types.
  */
 typedef enum {
@@ -437,6 +538,8 @@ typedef enum {
 }
 #endif
 #endif /* __cplusplus */
+
+#endif /* !MEDIA_INTERFACE_V1_0 */
 
 #endif /* CODEC_TYPE_H */
 /** @} */

@@ -109,12 +109,17 @@ int32_t CodecGetCapability(AvCodecMime mime, CodecType type, uint32_t flags, Cod
  *
  * @param name Indicates the pointer to the unique name of the component, for example,
  * <b>codec.avc.hardware.decoder</b>.
+ * @param attr Indicates the pointer to the parameters in the array required for creating the component.
+ * @param len Indicates the number of elements in the parameter array.
  * @param handle Indicates the pointer to the codec handle returned.
  * @return Returns <b>0</b> if the codec component is created and the handle is available;
  * returns a non-zero value otherwise.
  */
+#ifdef MEDIA_INTERFACE_V1_0
+int32_t CodecCreate(const char* name, const Param *attr, int len, CODEC_HANDLETYPE *handle);
+#else
 int32_t CodecCreate(const char* name, CODEC_HANDLETYPE *handle);
-
+#endif
 /**
  * @brief Creates a specific codec component by codec type and codec format,
  * returns the component context through a handle.
@@ -151,9 +156,7 @@ int32_t CodecDestroy(CODEC_HANDLETYPE handle);
  * @param type Specifies the buffer memory type.
  * @return Returns <b>0</b> if the setting is successful; returns a non-zero value otherwise.
  */
-int32_t CodecSetPortMode(CODEC_HANDLETYPE handle, DirectionType direct, AllocateBufferMode mode, BufferType type);
-
-int32_t CodecGetPortMode(CODEC_HANDLETYPE handle, DirectionType direct, AllocateBufferMode *mode, BufferType *type);
+int32_t CodecSetPortMode(CODEC_HANDLETYPE handle, DirectionType type, BufferMode mode);
 
 /**
  * @brief Sets parameters required by a codec component.
@@ -221,15 +224,18 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType);
 /**
  * @brief Queues input data.
  *
- * This function works with {@link CodecDequeInput} to implement input data transmission.
+ * This function works with {@link CodecDequeueInput} to implement input data transmission.
  *
  * @param handle Indicates the handle of the codec component.
  * @param inputData Indicates the pointer to the input data.
  * @param timeoutMs Indicates the timeout duration.
  * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
  */
-int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, uint32_t timeoutMs, int releaseFenceFd);
-
+#ifdef MEDIA_INTERFACE_V1_0
+int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const InputInfo *inputData, uint32_t timeoutMs);
+#else
+int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const InputInfo *inputData, uint32_t timeoutMs, int releaseFenceFd);
+#endif
 /**
  * @brief Dequeues input data that has been used.
  *
@@ -240,8 +246,11 @@ int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, u
  * @param inputData Indicates the pointer to the input data that is used.
  * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
  */
-int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int *acquireFd, CodecBuffer *inputData);
-
+#ifdef MEDIA_INTERFACE_V1_0
+int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, InputInfo *inputData);
+#else
+int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int *acquireFd, InputInfo *inputData);
+#endif
 /**
  * @brief Queues output data.
  *
@@ -255,7 +264,7 @@ int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int *acqu
  * The value <b>-1</b> indicates that <b>releaseFenceFd</b> is invalid.
  * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
  */
-int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t timeoutMs, int releaseFenceFd);
+int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, OutputInfo *outInfo, uint32_t timeoutMs, int releaseFenceFd);
 
 /**
  * @brief Dequeues output data.
@@ -270,7 +279,7 @@ int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t
  * @param outInfo Indicates the pointer to the output data.
  * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
  */
-int32_t CodecDequeueOutput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int *acquireFd, CodecBuffer *outInfo);
+int32_t CodecDequeueOutput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int *acquireFd, OutputInfo *outInfo);
 
 /**
  * @brief Sets the callback function.

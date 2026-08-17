@@ -58,6 +58,7 @@ extern "C" {
 #define FORMAT_TITLE_LEN 64          /**< Indicates the number of title characters. */
 #define FORMAT_INVALID_TRACK_ID (-1)   /**< Indicates an invalid track ID. */
 #define FORMAT_INVALID_PROGRAM_ID (-1) /**< Indicates an invalid program ID. */
+#define FORMAT_DEMUXER_RESOLUTION_CNT 5
 
 /**
  * @brief define FormatHandle type.
@@ -449,6 +450,7 @@ typedef enum {
     OUTPUT_FORMAT_THREE_GPP = 2, /**< 3GPP */
     OUTPUT_FORMAT_HEIF = 3, /**< HEIF */
     OUTPUT_FORMAT_OGG = 4, /**< Ogg */
+    OUTPUT_FORMAT_M4A = 5, /**< MP4A */
     OUTPUT_FORMAT_INVALID /**< Invalid format */
 } OutputFormat;
 
@@ -660,6 +662,31 @@ typedef struct {
      */
     int32_t (*OnInfo)(CallbackHandle privateDataHandle, int32_t type, int32_t extra);
 } FormatCallback;
+
+typedef struct {
+    int32_t s32VideoStreamIndex; /**< the index of the video stream */
+    uint32_t u32Width;            /**< The height of the media file's resolution */
+    uint32_t u32Height;           /**< The width of the media file's resolution */
+    CodecFormat enVideoType;
+} StreamResolution;
+
+typedef struct {
+    char *formatName;  /**< File format name, in the unit of byte. */
+    int64_t s64FileSize;  /**< File size, in the unit of byte. */
+    int64_t s64StartTime; /* the media file begin time */
+    int64_t s64Duration;  /**< Total duration of a file, in the unit of ms. */
+    StreamResolution stStreamResolution[FORMAT_DEMUXER_RESOLUTION_CNT];
+    int32_t s32UsedVideoStreamIndex; /* <default used video index> */
+    float fFrameRate;            /**< the frame rate of the stream */
+    uint32_t u32Bitrate;              /**< File bit rate, in the unit of bit/s. */
+    uint32_t u32AudioChannelCnt;
+    uint32_t u32SampleRate;           /**< the sample rate of the audio stream */
+    int32_t s32UsedAudioStreamIndex; /**< the index of the audio stream. one file may have many audio streams */
+    uint32_t u32Width;            /**< The height of the media file's resolution */
+    uint32_t u32Height;           /**< The width of the media file's resolution */
+    CodecFormat enVideoType;
+    CodecFormat enAudioType;
+} FormatFileInfo;
 
 #ifdef __cplusplus
 #if __cplusplus
