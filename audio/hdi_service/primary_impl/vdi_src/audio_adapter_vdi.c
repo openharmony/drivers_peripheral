@@ -212,11 +212,6 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         goto EXIT;
     }
 
-    AUDIO_FUNC_LOGD("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d, \
-        sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, sourceType=%{public}d",
-        desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
-        attrs->streamId, attrs->sourceType);
-
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     if (vdiAdapter == NULL || vdiAdapter->CreateRender == NULL || vdiAdapter->DestroyRender == NULL) {
         AUDIO_FUNC_LOGE("invalid param");
@@ -252,7 +247,10 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         ret = HDF_FAILURE;
         goto EXIT;
     }
-    AUDIO_FUNC_LOGI("AudioCreateRenderVdi Success, renderId = [%{public}u]", *renderId);
+    AUDIO_FUNC_LOGI("Success, renderId = [%{public}u], portId=%{public}u, pin=%{public}d, type=%{public}d, \
+        format=%{public}d, sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, sourceType=%{public}d",
+        *renderId, desc->portId, desc->pins, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
+        attrs->streamId, attrs->sourceType);
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;
@@ -364,16 +362,15 @@ static int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct
         goto EXIT;
     }
 
-    AUDIO_FUNC_LOGD("Enter. portId=%{public}u, pin=%{public}d, desc=%{public}s, type=%{public}d, format=%{public}d, \
-        sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, sourceType=%{public}d",
-        desc->portId, desc->pins, desc->desc, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
-        attrs->streamId, attrs->sourceType);
     ret = CreateCapturePre(vdiAdapter, capture, desc, attrs, captureId);
     if (*capture == NULL || ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("create audio capture failed");
         goto EXIT;
     }
-    AUDIO_FUNC_LOGI("AudioCreateCaptureVdi Success, captureId = [%{public}u]", *captureId);
+    AUDIO_FUNC_LOGI("Success, captureId = [%{public}u], portId=%{public}u, pin=%{public}d, type=%{public}d, \
+        format=%{public}d, sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, sourceType=%{public}d",
+        *captureId, desc->portId, desc->pins, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
+        attrs->streamId, attrs->sourceType);
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;
