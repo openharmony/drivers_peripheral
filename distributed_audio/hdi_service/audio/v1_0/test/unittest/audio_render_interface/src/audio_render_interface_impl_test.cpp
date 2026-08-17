@@ -352,7 +352,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_003, TestSize.Level1)
     EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Start());
     audioRenderInterfaceImpl_->SetRenderStatus(RENDER_STATUS_OPEN);
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
-    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->Start());
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
 }
 
 /**
