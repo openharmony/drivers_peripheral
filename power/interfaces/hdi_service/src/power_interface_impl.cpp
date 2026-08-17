@@ -689,6 +689,11 @@ int32_t PowerInterfaceImpl::GetPowerConfig(const std::string &sceneName, std::st
 
 int32_t PowerInterfaceImpl::ForceSuspendIgnoringWakelock(const std::string &tag)
 {
+#ifndef DRIVERS_PERIPHERAL_POWER_COCKPIT_MODE
+    HDF_LOGE("ForceSuspendIgnoringWakelock is only supported in cockpit mode");
+    (void)tag;
+    return HDF_ERR_NOT_SUPPORT;
+#else
     HDF_LOGI("ForceSuspendIgnoringWakelock, tag=%{public}s", tag.c_str());
     if (tag != "mem" && tag != "ulsr") {
         HDF_LOGE("Invalid suspend tag: %{public}s", tag.c_str());
@@ -712,14 +717,13 @@ int32_t PowerInterfaceImpl::ForceSuspendIgnoringWakelock(const std::string &tag)
         ret = HDF_SUCCESS;
     }
     g_powerState = PowerHdfState::AWAKE;
-#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
     g_wakeupTag = tag;
     if (tag == "ulsr") {
-        OHOS::system::SetParameter(ULSR_RESULT_PARAM, "success");
+        OHOS::system::SetParameter(ULSR_RESULT_PARAM, ret == HDF_SUCCESS ? "success" : "fail");
     }
-#endif
     NotifyCallback(CMD_ON_WAKEUP);
     return ret;
+#endif
 }
 } // namespace V1_4
 } // namespace Power
