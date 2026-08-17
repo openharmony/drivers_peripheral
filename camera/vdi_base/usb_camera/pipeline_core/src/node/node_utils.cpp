@@ -217,7 +217,7 @@ void NodeUtils::BufferTransformForStride(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGI("buffer->GetWidth() == buffer->GetStride(), no need stride");
         return;
     }
-    
+
     if (buffer->GetIsValidDataInSurfaceBuffer()) {
         CAMERA_LOGD("IsValidDataInSurfaceBuffer true");
         if (memcpy_s(buffer->GetVirAddress(), buffer->GetSize(),
@@ -226,6 +226,8 @@ void NodeUtils::BufferTransformForStride(std::shared_ptr<IBuffer>& buffer)
             return;
         }
     }
+
+    buffer->SetIsValidDataInSurfaceBuffer(false);
 
     uint8_t* bufferForStride = (uint8_t*)buffer->GetVirAddress();
     uint8_t* bufferForStrideMax = bufferForStride + buffer->GetSize();
