@@ -44,6 +44,7 @@
 #define REPLY_BUF_SMALL_LENGTH 64
 #define REPLY_BUF_STA_INFO_LENGTH 2048
 #define CMD_BUFFER_MIN_SIZE 15
+#define IFNAME_ETH0 "eth0"
  
 static EthWpaInstance *g_wpaInstance = NULL;
  
@@ -165,6 +166,14 @@ static int WpaCliTerminate(EthWpaInstance *p)
     HDF_LOGI("enter WpaCliTerminate.");
     char cmd[WPA_CMD_BUF_LEN] = {0};
     char buf[WPA_CMD_REPLY_BUF_LEN] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s LOGOFF", IFNAME_ETH0) < 0) {
+        HDF_LOGE("LOGOFF snprintf err");
+        return -1;
+    }
+    if (WpaCliCmd(cmd, buf, sizeof(buf)) < 0) {
+        HDF_LOGE("LOGOFF err");
+        return -1;
+    }
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "TERMINATE") < 0) {
         HDF_LOGE("WpaCliTerminate, snprintf err");
         return -1;
