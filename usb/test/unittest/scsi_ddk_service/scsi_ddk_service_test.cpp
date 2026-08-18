@@ -71,6 +71,18 @@ constexpr uint32_t TIMEOUT_MS = 5000;
 constexpr uint32_t SCSI_TRANSFER_LENGTH_MAX = 0xFFFF;
 constexpr uint32_t OVERFLOW_TEST_LB_LENGTH = 65538;
 constexpr uint32_t BOUNDARY_TEST_LB_LENGTH = 65537;
+constexpr uint32_t SECTOR_SIZE_512 = 512;
+constexpr uint32_t SECTOR_SIZE_4K = 4096;
+constexpr uint32_t MEM_MAP_SIZE_4K = 4096;
+constexpr uint32_t MEM_MAP_SIZE_8K = 8192;
+// 128 * 512 = 65536 = 0x10000, low 16 bits = 0
+constexpr uint32_t TRUNCATION_TRANSFER_LENGTH_512 = 128;
+// 264 * 512 = 135168 = 0x21000, low 16 bits = 0x1000
+constexpr uint32_t TRUNCATION_TRANSFER_LENGTH_264 = 264;
+// 20 * 512 = 10240 > memMapSize(4096)
+constexpr uint32_t EXCEEDS_MEM_MAP_TRANSFER_LENGTH = 20;
+// 16 * 4096 = 65536 = 0x10000, low 16 bits = 0
+constexpr uint32_t TRUNCATION_4K_TRANSFER_LENGTH = 16;
 
 class ScsiDdkServiceTest : public testing::Test {
 public:
@@ -281,5 +293,185 @@ HWTEST_F(ScsiDdkServiceTest, Write10OverflowCheck001, TestSize.Level1)
         EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
             << "Write10 should reject overflow params, got ret=" << ret;
     }
+}
+
+/**
+ * @tc.name: Read10TruncationBypass001
+ * @tc.desc: Verify Read10 rejects when bufferSize exceeds memMapSize due to uint16_t truncation.
+ *           transferLength=128, lbLength=512 => bufferSize=65536(0x10000).
+ *           Old: (uint16_t)65536=0, check "memMapSize < 0" passes, OOB write occurs.
+ *           Fixed: uint32_t check "4096 < 65536" correctly rejects.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ScsiDdkServiceTest, Read10TruncationBypass001, TestSize.Level1)
+{
+    ScsiPeripheralDevice realDev = device_;
+    realDev.lbLength = SECTOR_SIZE_512;
+
+    ScsiPeripheralIORequest request = {};
+    request.lbAddress = 0;
+    request.transferLength = TRUNCATION_TRANSFER_LENGTH_512;
+    request.byte1 = 0;
+    request.byte6 = 0;
+    request.control = 0;
+    request.memMapSize = MEM_MAP_SIZE_4K;
+    request.timeout = TIMEOUT_MS;
+
+    ScsiPeripheralResponse response;
+    int32_t ret = service_->Read10(realDev, request, response);
+    HDF_LOGI("Read10TruncationBypass001: transferLength=%{public}u, lbLength=%{public}u, "
+             "memMapSize=%{public}u, ret=%{public}d",
+             request.transferLength, realDev.lbLength, request.memMapSize, ret);
+
+    EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
+        << "Read10 should reject when bufferSize(65536) > memMapSize(4096), "
+        << "even though (uint16_t)65536==0 would bypass old check";
+}
+
+/**
+ * @tc.name: Read10TruncationBypass002
+ * @tc.desc: Verify Read10 rejects when low 16 bits of bufferSize are non-zero but still
+ *           bypass the uint16_t check. transferLength=264, lbLength=512 => bufferSize=135168(0x21000).
+ *           (uint16_t)135168=0x1000=4096. Old: "8192 < 4096" is false => passes, OOB ~127KB.
+ *           Fixed: "8192 < 135168" => rejected.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ScsiDdkServiceTest, Read10TruncationBypass002, TestSize.Level1)
+{
+    ScsiPeripheralDevice realDev = device_;
+    realDev.lbLength = SECTOR_SIZE_512;
+
+    ScsiPeripheralIORequest request = {};
+    request.lbAddress = 0;
+    request.transferLength = TRUNCATION_TRANSFER_LENGTH_264;
+    request.byte1 = 0;
+    request.byte6 = 0;
+    request.control = 0;
+    request.memMapSize = MEM_MAP_SIZE_8K;
+    request.timeout = TIMEOUT_MS;
+
+    ScsiPeripheralResponse response;
+    int32_t ret = service_->Read10(realDev, request, response);
+    HDF_LOGI("Read10TruncationBypass002: transferLength=%{public}u, lbLength=%{public}u, "
+             "memMapSize=%{public}u, ret=%{public}d",
+             request.transferLength, realDev.lbLength, request.memMapSize, ret);
+
+    EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
+        << "Read10 should reject when bufferSize(135168) > memMapSize(8192)";
+}
+
+/**
+ * @tc.name: Read10ZeroTransferLength001
+ * @tc.desc: Verify Read10 rejects transferLength=0, which results in bufferSize=0.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ScsiDdkServiceTest, Read10ZeroTransferLength001, TestSize.Level1)
+{
+    ScsiPeripheralDevice realDev = device_;
+    realDev.lbLength = SECTOR_SIZE_512;
+
+    ScsiPeripheralIORequest request = {};
+    request.lbAddress = 0;
+    request.transferLength = 0;
+    request.byte1 = 0;
+    request.byte6 = 0;
+    request.control = 0;
+    request.memMapSize = DEVICE_MEM_MAP_SIZE;
+    request.timeout = TIMEOUT_MS;
+
+    ScsiPeripheralResponse response;
+    int32_t ret = service_->Read10(realDev, request, response);
+    HDF_LOGI("Read10ZeroTransferLength001: transferLength=0, ret=%{public}d", ret);
+
+    EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
+        << "Read10 should reject transferLength=0";
+}
+
+/**
+ * @tc.name: Read10BufferSizeExceedsMemMap001
+ * @tc.desc: Verify Read10 rejects when bufferSize > memMapSize without truncation trick.
+ *           transferLength=20, lbLength=512 => bufferSize=10240 > memMapSize=4096.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ScsiDdkServiceTest, Read10BufferSizeExceedsMemMap001, TestSize.Level1)
+{
+    ScsiPeripheralDevice realDev = device_;
+    realDev.lbLength = SECTOR_SIZE_512;
+
+    ScsiPeripheralIORequest request = {};
+    request.lbAddress = 0;
+    request.transferLength = EXCEEDS_MEM_MAP_TRANSFER_LENGTH;
+    request.byte1 = 0;
+    request.byte6 = 0;
+    request.control = 0;
+    request.memMapSize = MEM_MAP_SIZE_4K;
+    request.timeout = TIMEOUT_MS;
+
+    ScsiPeripheralResponse response;
+    int32_t ret = service_->Read10(realDev, request, response);
+    HDF_LOGI("Read10BufferSizeExceedsMemMap001: transferLength=%{public}u, memMapSize=%{public}u, ret=%{public}d",
+             request.transferLength, request.memMapSize, ret);
+
+    EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
+        << "Read10 should reject when bufferSize(10240) > memMapSize(4096)";
+}
+
+/**
+ * @tc.name: Read10TruncationBypass4kSector001
+ * @tc.desc: Verify Read10 rejects truncation bypass with 4K-sector device (lbLength=4096).
+ *           transferLength=16 => bufferSize=65536(0x10000), low 16 bits=0.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ScsiDdkServiceTest, Read10TruncationBypass4kSector001, TestSize.Level1)
+{
+    ScsiPeripheralDevice dev4k = device_;
+    dev4k.lbLength = SECTOR_SIZE_4K;
+
+    ScsiPeripheralIORequest request = {};
+    request.lbAddress = 0;
+    request.transferLength = TRUNCATION_4K_TRANSFER_LENGTH;
+    request.byte1 = 0;
+    request.byte6 = 0;
+    request.control = 0;
+    request.memMapSize = MEM_MAP_SIZE_4K;
+    request.timeout = TIMEOUT_MS;
+
+    ScsiPeripheralResponse response;
+    int32_t ret = service_->Read10(dev4k, request, response);
+    HDF_LOGI("Read10TruncationBypass4kSector001: transferLength=%{public}u, lbLength=%{public}u, "
+             "memMapSize=%{public}u, ret=%{public}d",
+             request.transferLength, dev4k.lbLength, request.memMapSize, ret);
+
+    EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
+        << "Read10 should reject when bufferSize(65536) > memMapSize(4096) for 4K-sector device";
+}
+
+/**
+ * @tc.name: Write10BufferSizeExceedsMemMap001
+ * @tc.desc: Verify Write10 also rejects when bufferSize > memMapSize with realistic lbLength.
+ *           Write10 uses AllocateBuffer (uint32_t, no truncation), verify consistency.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ScsiDdkServiceTest, Write10BufferSizeExceedsMemMap001, TestSize.Level1)
+{
+    ScsiPeripheralDevice realDev = device_;
+    realDev.lbLength = SECTOR_SIZE_512;
+
+    ScsiPeripheralIORequest request = {};
+    request.lbAddress = 0;
+    request.transferLength = TRUNCATION_TRANSFER_LENGTH_512;
+    request.byte1 = 0;
+    request.byte6 = 0;
+    request.control = 0;
+    request.memMapSize = MEM_MAP_SIZE_4K;
+    request.timeout = TIMEOUT_MS;
+
+    ScsiPeripheralResponse response;
+    int32_t ret = service_->Write10(realDev, request, response);
+    HDF_LOGI("Write10BufferSizeExceedsMemMap001: transferLength=%{public}u, memMapSize=%{public}u, ret=%{public}d",
+             request.transferLength, request.memMapSize, ret);
+
+    EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
+        << "Write10 should reject when bufferSize(65536) > memMapSize(4096)";
 }
 } // namespace
