@@ -26,6 +26,7 @@ ohos_fuzztest("UsbGetDevicesFuzzTest") {
 
   deps = [ "../../../ddk:libusb_core" ]
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "drivers_interface_usb:libusb_ddk_proxy_1.2",
     "hdf_core:libhdi_base",
     "hdf_core:libpub_utils",
