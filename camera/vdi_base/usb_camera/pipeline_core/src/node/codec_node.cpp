@@ -241,15 +241,21 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
         return;
     }
     auto oldFormat = buffer->GetFormat();
+    auto oldWidth = buffer->GetWidth();
+    auto oldHeight = buffer->GetHeight();
     CAMERA_LOGI("CodecNode::Yuv422ToJpeg, %{public}d, %{public}d", oldFormat, CAMERA_FORMAT_RGB_888);
     buffer->SetFormat(CAMERA_FORMAT_RGB_888);
+    buffer->SetWidth(buffer->GetCurWidth());
+    buffer->SetHeight(buffer->GetCurHeight());
     NodeUtils::BufferScaleFormatTransform(buffer, tmpBufferAddr, tmpBufferSize);
     buffer->SetFormat(oldFormat);
+    buffer->SetWidth(oldWidth);
+    buffer->SetHeight(oldHeight);
 
     uint8_t* jBuf = nullptr;
     unsigned long jpegSize = 0;
 
-    JpegData jpegdata = {buffer->GetWidth(), buffer->GetHeight()};
+    JpegData jpegdata = {buffer->GetCurWidth(), buffer->GetCurHeight()};
     ImageData imageData = {static_cast<uint8_t*>(tmpBufferAddr), tmpBufferSize};
     EncodeJpegToMemory(imageData, jpegdata, nullptr, &jpegSize, &jBuf);
 

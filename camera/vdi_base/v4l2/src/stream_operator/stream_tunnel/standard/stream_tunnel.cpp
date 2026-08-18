@@ -119,6 +119,7 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
             extraData->ExtraSet(OHOS::Camera::timeStamp, esInfo.timestamp);
             extraData->ExtraSet(OHOS::Camera::streamId, buffer->GetStreamId());
             extraData->ExtraSet(OHOS::Camera::captureId, buffer->GetCaptureId());
+            extraData->ExtraSet(OHOS::Camera::imageId, static_cast<int64_t>(buffer->GetCaptureId()));
             extraData->ExtraSet(OHOS::Camera::dataWidth, static_cast<int32_t>(buffer->GetWidth()));
             extraData->ExtraSet(OHOS::Camera::dataHeight, static_cast<int32_t>(buffer->GetHeight()));
             // 拍照上报Format为1
