@@ -356,7 +356,7 @@ int32_t HidDdkService::GetReport(const HidDeviceHandle& dev, HidReportType repor
         return HID_DDK_NO_PERM;
     }
 
-    if (buffSize > MAX_REPORT_BUFFER_SIZE) {
+    if (buffSize > MAX_REPORT_BUFFER_SIZE || buffSize == 0) {
         HDF_LOGE("%{public}s: invalid parameter", __func__);
         return HID_DDK_INVALID_PARAMETER;
     }
