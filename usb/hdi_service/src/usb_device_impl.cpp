@@ -577,7 +577,7 @@ int32_t UsbDeviceImpl::GetControlTransferData(int32_t eventId, std::vector<uint8
     if (eventId == ACT_CUSTOMCONTROLREQUEST) {
         int32_t fd = open(ACCESSORY_DRIVER_NAME, O_RDONLY);
         if (fd < 0) {
-            HDF_LOGE("%{public}s: failed to open /dev/usb_custom_uevent, errno=%{public}d", __func__, errno);
+            HDF_LOGE("%{public}s: failed to open /dev/usb_accessory, errno=%{public}d", __func__, errno);
             return HDF_FAILURE;
         }
         fdsan_exchange_owner_tag(fd, 0, fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, LOG_DOMAIN));
@@ -589,8 +589,11 @@ int32_t UsbDeviceImpl::GetControlTransferData(int32_t eventId, std::vector<uint8
             HDF_LOGE("%{public}s: failed to read uevent data, errno=%{public}d", __func__, errno);
             return HDF_FAILURE;
         }
-
-        data.assign(buffer, buffer + ret);
+        if (ret >= MAX_BUFFER) {
+            data.assign(buffer, buffer + MAX_BUFFER - 1);
+        } else {
+            data.assign(buffer, buffer + ret);
+        }
         HDF_LOGI("%{public}s: success, read %{public}d bytes", __func__, ret);
     }
 
