@@ -663,13 +663,50 @@ int32_t HdiServiceCaptureSetGain(const struct HdfDeviceIoClient *client,
     return capture->volume.SetGain((AudioHandle)capture, (float)gain);
 }
 
+static int32_t CaptureFrameCheckRequestBytes(struct HdfSBuf *data, uint64_t *requestBytes)
+{
+    if (!HdfSbufReadUint64(data, requestBytes)) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (*requestBytes == 0 || *requestBytes > FRAME_DATA) {
+        AUDIO_FUNC_LOGE("invalid requestBytes %{public}llu (max=%{public}d)",
+                        (unsigned long long)*requestBytes, (int)FRAME_DATA);
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    return AUDIO_HAL_SUCCESS;
+}
+
+static int32_t CaptureFrameDoCapture(struct AudioCapture *capture, char *frame,
+    uint64_t requestBytes, uint32_t index, uint64_t *replyBytes)
+{
+    if (capture == NULL || capture->CaptureFrame == NULL) {
+        AUDIO_FUNC_LOGE("capture or CaptureFrame is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    AudioSetCaptureBusy(index, true);
+    int32_t ret = capture->CaptureFrame((AudioHandle)capture, (void *)frame, requestBytes, replyBytes);
+    AudioSetCaptureBusy(index, false);
+    return ret;
+}
+
+static int32_t CaptureFrameWriteReply(struct HdfSBuf *reply, const char *frame, uint64_t replyBytes)
+{
+    uint64_t writeBytes = replyBytes > FRAME_DATA ? FRAME_DATA : replyBytes;
+    if (!HdfSbufWriteBuffer(reply, (const void *)frame, (uint32_t)writeBytes)) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (!HdfSbufWriteUint64(reply, replyBytes)) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    char *frame = NULL;
     uint64_t requestBytes = 0;
     uint64_t replyBytes = 0;
     struct AudioCapture *capture = NULL;
@@ -685,35 +722,21 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("AudioAdapterListGetRender fail");
         return ret;
     }
-    if (!HdfSbufReadUint64(data, &requestBytes)) {
-        return AUDIO_HAL_ERR_INTERNAL;
+    if (CaptureFrameCheckRequestBytes(data, &requestBytes) < 0) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    frame = (char *)OsalMemCalloc(FRAME_DATA);
+    char *frame = (char *)OsalMemCalloc(FRAME_DATA);
     if (frame == NULL) {
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
-    AudioSetCaptureBusy(index, true);
-    if (capture == NULL || capture->CaptureFrame == NULL) {
-        AUDIO_FUNC_LOGE("capture or CaptureFrame is NULL");
-        AudioMemFree((void **)&frame);
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    ret = capture->CaptureFrame((AudioHandle)capture, (void *)frame, requestBytes, &replyBytes);
-    AudioSetCaptureBusy(index, false);
+    ret = CaptureFrameDoCapture(capture, frame, requestBytes, index, &replyBytes);
     if (ret < 0) {
         AudioMemFree((void **)&frame);
         return ret;
     }
-    if (!HdfSbufWriteBuffer(reply, (const void *)frame, (uint32_t)requestBytes)) {
-        AudioMemFree((void **)&frame);
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (!HdfSbufWriteUint64(reply, replyBytes)) {
-        AudioMemFree((void **)&frame);
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
+    ret = CaptureFrameWriteReply(reply, frame, replyBytes);
     AudioMemFree((void **)&frame);
-    return AUDIO_HAL_SUCCESS;
+    return ret;
 }
 
 int32_t HdiServiceCaptureGetCapturePosition(const struct HdfDeviceIoClient *client,
