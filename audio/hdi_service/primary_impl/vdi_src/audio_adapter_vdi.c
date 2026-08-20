@@ -224,14 +224,11 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         AUDIO_FUNC_LOGE("not support");
         goto EXIT;
     }
-    if (vdiAdapter->GetExtraParams == NULL) {
-        AUDIO_FUNC_LOGE("GetExtraParams is NULL");
-        ret = HDF_ERR_INVALID_PARAM;
-        goto EXIT;
-    }
     const char* condition = "support_multi_stream";
     char value[VALUE_LEN + 1] = {0};
-    ret = vdiAdapter -> GetExtraParams(vdiAdapter, 0, condition, value, VALUE_LEN);
+    if (vdiAdapter->GetExtraParams != NULL) {
+        ret = vdiAdapter -> GetExtraParams(vdiAdapter, 0, condition, value, VALUE_LEN);
+    }
     char *adapterName = AudioGetAdapterNameVdi(adapter);
     *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName, value);
     if (*render != NULL) {
