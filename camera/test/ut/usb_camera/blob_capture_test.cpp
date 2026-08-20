@@ -72,6 +72,10 @@ static void AchieveBlobStreamOperator(std::shared_ptr<TestCameraBase>& cameraBas
 // Create preview + BLOB capture streams (PIXEL_FMT_BLOB).
 static void StartBlobCaptureStream(std::shared_ptr<TestCameraBase>& cameraBase)
 {
+    constexpr int32_t tunnelMode = 5;
+    constexpr int32_t dataspace = 8;
+    constexpr uint32_t queueSize = 8;
+
     if (cameraBase->streamCustomerPreview_ == nullptr) {
         cameraBase->streamCustomerPreview_ = std::make_shared<StreamCustomer>();
     }
@@ -80,13 +84,13 @@ static void StartBlobCaptureStream(std::shared_ptr<TestCameraBase>& cameraBase)
     streamInfoPre.width_ = PREVIEW_WIDTH;
     streamInfoPre.height_ = PREVIEW_HEIGHT;
     streamInfoPre.format_ = PIXEL_FMT_RGBA_8888;
-    streamInfoPre.dataspace_ = 8;
+    streamInfoPre.dataspace_ = dataspace;
     streamInfoPre.intent_ = PREVIEW;
-    streamInfoPre.tunneledMode_ = 5;
+    streamInfoPre.tunneledMode_ = tunnelMode;
     streamInfoPre.bufferQueue_ = new BufferProducerSequenceable(
         cameraBase->streamCustomerPreview_->CreateProducer());
     ASSERT_NE(streamInfoPre.bufferQueue_, nullptr);
-    streamInfoPre.bufferQueue_->producer_->SetQueueSize(8);
+    streamInfoPre.bufferQueue_->producer_->SetQueueSize(queueSize);
 
     if (cameraBase->streamCustomerCapture_ == nullptr) {
         cameraBase->streamCustomerCapture_ = std::make_shared<StreamCustomer>();
@@ -96,14 +100,14 @@ static void StartBlobCaptureStream(std::shared_ptr<TestCameraBase>& cameraBase)
     streamInfoCapture.width_ = CAPTURE_WIDTH;
     streamInfoCapture.height_ = CAPTURE_HEIGHT;
     streamInfoCapture.format_ = PIXEL_FMT_BLOB;
-    streamInfoCapture.dataspace_ = 8;
+    streamInfoCapture.dataspace_ = dataspace;
     streamInfoCapture.intent_ = STILL_CAPTURE;
     streamInfoCapture.encodeType_ = ENCODE_TYPE_JPEG;
-    streamInfoCapture.tunneledMode_ = 5;
+    streamInfoCapture.tunneledMode_ = tunnelMode;
     streamInfoCapture.bufferQueue_ = new BufferProducerSequenceable(
         cameraBase->streamCustomerCapture_->CreateProducer());
     ASSERT_NE(streamInfoCapture.bufferQueue_, nullptr);
-    streamInfoCapture.bufferQueue_->producer_->SetQueueSize(8);
+    streamInfoCapture.bufferQueue_->producer_->SetQueueSize(queueSize);
 
     std::vector<StreamInfo> streamInfos = {streamInfoPre, streamInfoCapture};
     cameraBase->rc = (CamRetCode)cameraBase->streamOperator->CreateStreams(streamInfos);

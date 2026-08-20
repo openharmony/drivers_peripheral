@@ -103,14 +103,14 @@ public:
     std::atomic<int> frameCount_{0};
     std::mutex frameMtx_;
     std::condition_variable frameCv_;
-    static constexpr int FRAME_WAIT_TIMEOUT_SEC = 5;
+    static constexpr int frameWaitTimeoutSec = 5;
 
     void ResetFrameCount()
     {
         frameCount_ = 0;
     }
 
-    void WaitForFrame(int expectedCount = 1, int timeoutSec = FRAME_WAIT_TIMEOUT_SEC)
+    void WaitForFrame(int expectedCount = 1, int timeoutSec = frameWaitTimeoutSec)
     {
         std::unique_lock<std::mutex> lock(frameMtx_);
         frameCv_.wait_for(lock, std::chrono::seconds(timeoutSec),
@@ -119,7 +119,8 @@ public:
 
     static bool IsValidJpeg(const unsigned char* data, uint32_t size)
     {
-        if (data == nullptr || size < 4) {
+        constexpr uint32_t minJpegHeaderSize = 4;
+        if (data == nullptr || size < minJpegHeaderSize) {
             return false;
         }
         return (data[0] == 0xFF && data[1] == 0xD8);
