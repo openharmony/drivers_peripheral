@@ -244,6 +244,25 @@ static int32_t OpenInputDevice(uint32_t devIndex)
     return INPUT_SUCCESS;
 }
 
+static int32_t SaveInputDevDesc(InputDevDesc *staArr, uint32_t count)
+{
+    if (count > MAX_INPUT_DEV_NUM) {
+        count = MAX_INPUT_DEV_NUM;
+    }
+    pthread_mutex_lock(&g_scanDevListMutex);
+    g_scanDevNum = 0;
+    if (count > 0) {
+        if (memcpy_s(g_scanDevList, sizeof(g_scanDevList), staArr, count * sizeof(InputDevDesc)) != EOK) {
+            pthread_mutex_unlock(&g_scanDevListMutex);
+            HDF_LOGE("%s: memcpy_s failed", __func__);
+            return INPUT_FAILURE;
+        }
+    }
+    g_scanDevNum = count;
+    pthread_mutex_unlock(&g_scanDevListMutex);
+    return INPUT_SUCCESS;
+}
+
 static int32_t ScanInputDevice(InputDevDesc *staArr, uint32_t arrLen)
 {
     InputDevManager *manager = NULL;
@@ -276,9 +295,6 @@ static int32_t ScanInputDevice(InputDevDesc *staArr, uint32_t arrLen)
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: dispatch fail", __func__);
         HdfSbufRecycle(reply);
-        pthread_mutex_lock(&g_scanDevListMutex);
-        g_scanDevNum = 0;
-        pthread_mutex_unlock(&g_scanDevListMutex);
         return INPUT_FAILURE;
     }
 
@@ -296,20 +312,9 @@ static int32_t ScanInputDevice(InputDevDesc *staArr, uint32_t arrLen)
         HDF_LOGI("%s: type = %d, id =%d", __func__, staArr[count].devType, staArr[count].devIndex);
         count++;
     }
-    if (count > MAX_INPUT_DEV_NUM) {
-        count = MAX_INPUT_DEV_NUM;
+    if (SaveInputDevDesc(staArr, count) != INPUT_SUCCESS) {
+        return INPUT_FAILURE;
     }
-    pthread_mutex_lock(&g_scanDevListMutex);
-    if (count > 0) {
-        if (memcpy_s(g_scanDevList, sizeof(g_scanDevList), staArr, count * sizeof(InputDevDesc)) != EOK) {
-            pthread_mutex_unlock(&g_scanDevListMutex);
-            HDF_LOGE("%s: memcpy_s failed", __func__);
-            HdfSbufRecycle(reply);
-            return INPUT_FAILURE;
-        }
-    }
-    g_scanDevNum = count;
-    pthread_mutex_unlock(&g_scanDevListMutex);
     HdfSbufRecycle(reply);
     return INPUT_SUCCESS;
 }
