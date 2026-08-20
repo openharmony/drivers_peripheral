@@ -208,15 +208,19 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
     if (dhId == OFFLOAD_RENDER_ID) {
         event.dhId = DEFAULT_RENDER_ID;
     }
-    int32_t ret = NotifyFwk(event);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
+    {
+        std::lock_guard<std::mutex> lock(removeDeviceMtx_);
+        std::string key = adpName + std::to_string(dhId);
+        int32_t ret = NotifyFwk(event);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
+        }
+        mapAddFlags_.erase(key);
     }
-    mapAddFlags_.erase(adpName + std::to_string(dhId));
     auto adapter = GetAdapterFromMap(adpName);
     CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDF_INVALID_OPERATION);
 
-    ret = adapter->RemoveAudioDevice(dhId);
+    int32_t ret = adapter->RemoveAudioDevice(dhId);
     if (ret != DH_SUCCESS) {
         DHLOGE("Remove audio device failed, adapter return: %{public}d.", ret);
         return ret;

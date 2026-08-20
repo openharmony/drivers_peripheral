@@ -134,6 +134,7 @@ private:
 private:
     static AudioManagerInterfaceImpl *audioManager_;
     static std::mutex audioManagerMtx_;
+    std::mutex removeDeviceMtx_;
     struct HdfDeviceObject *deviceObject_ = nullptr;
     static constexpr int32_t LOW_LATENCY_RENDER_ID = 1 << 1 | 1 << 0;
     std::mutex adapterMapMtx_;
