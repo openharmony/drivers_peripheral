@@ -71,7 +71,7 @@ int32_t SleHciInterfaceImpl::SleHalInit(const sptr<OHOS::HDI::Nearlink::Hci::V1_
             [callbackObj](
                 const std::vector<uint8_t> &packet) { callbackObj->hciPacketReceived(SleType::HCI_EVENT, packet); },
     };
-
+    SetRTSchedule();
     bool result = VendorInterface::GetInstance()->Initialize(
         [callbackObj](bool status) {
                 callbackObj->initializationComplete(status ? SleStatus::SUCCESS : SleStatus::INITIALIZATION_ERROR);
