@@ -1,0 +1,69 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("../../../camera.gni")
+import("//build/test.gni")
+
+module_output_path = "drivers_peripheral_camera/camera"
+
+config("camera_security_ut_config") {
+  visibility = [ ":*" ]
+  cflags_cc = [
+    "-Wno-error",
+    "-std=c++17",
+  ]
+  if (enable_camera_coverage) {
+    ldflags = [ "--coverage" ]
+  }
+}
+
+ohos_unittest("camera_security_ut") {
+  testonly = true
+  module_out_path = module_output_path
+  sources = [
+    "exif_utils_capacity_test.cpp",
+    "stream_callback_death_test.cpp",
+    "$camera_path/../../hdi_service/v1_0/src/stream_operator_service_callback.cpp",
+    "$camera_path/../../hdi_service/v1_0/src/camera_service_type_converter.cpp",
+  ]
+
+  include_dirs = [
+    "$camera_path/utils/exif",
+    "$camera_path/include",
+    "$camera_path/../../hdi_service/v1_0/include",
+    "$camera_path/../interfaces",
+    "$camera_path/../interfaces/v1_0",
+  ]
+
+  deps = [
+    "$camera_path/utils:peripheral_camera_utils",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_camera:libcamera_proxy_1.0",
+    "drivers_interface_camera:libcamera_stub_1.0",
+    "drivers_interface_camera:metadata",
+    "googletest:gmock_main",
+    "googletest:gtest",
+    "googletest:gtest_main",
+    "graphic_surface:surface",
+    "hdf_core:libhdf_utils",
+    "hilog:libhilog",
+    "bounds_checking_function:libsec_shared",
+    "ipc:ipc_single",
+    "libexif:libexif",
+  ]
+
+  public_configs = [ ":camera_security_ut_config" ]
+}
