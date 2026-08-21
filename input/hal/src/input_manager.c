@@ -193,6 +193,10 @@ static int32_t CheckIndex(uint32_t devIndex)
 static bool IsDevIndexInScanList(uint32_t devIndex)
 {
     pthread_mutex_lock(&g_scanDevListMutex);
+    if (g_scanDevNum == 0) {
+        pthread_mutex_unlock(&g_scanDevListMutex);
+        return true;
+    }
     bool found = false;
     for (uint32_t i = 0; i < g_scanDevNum; i++) {
         if (g_scanDevList[i].devIndex == devIndex) {
