@@ -127,7 +127,7 @@ static std::string ReadFileContent(const std::string& path)
     while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
         content += buffer;
     }
-    fclose(fp);
+    (void)fclose(fp);
     return content;
 }
 
