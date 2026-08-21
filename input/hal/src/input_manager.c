@@ -30,6 +30,9 @@
 #define PLACEHOLDER_LIMIT 10
 
 static InputDevManager *g_devManager;
+static InputDevDesc g_scanDevList[MAX_INPUT_DEV_NUM];
+static uint32_t g_scanDevNum = 0;
+pthread_mutex_t g_scanDevListMutex;
 int32_t InstanceReporterHdi(InputReporter **hdi);
 int32_t InstanceControllerHdi(InputController **hdi);
 int32_t UpdateDevFullInfo(uint32_t devIndex);
@@ -187,6 +190,24 @@ static int32_t CheckIndex(uint32_t devIndex)
     return INPUT_SUCCESS;
 }
 
+static bool IsDevIndexInScanList(uint32_t devIndex)
+{
+    pthread_mutex_lock(&g_scanDevListMutex);
+    if (g_scanDevNum == 0) {
+        pthread_mutex_unlock(&g_scanDevListMutex);
+        return true;
+    }
+    bool found = false;
+    for (uint32_t i = 0; i < g_scanDevNum; i++) {
+        if (g_scanDevList[i].devIndex == devIndex) {
+            found = true;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&g_scanDevListMutex);
+    return found;
+}
+
 static int32_t OpenInputDevice(uint32_t devIndex)
 {
     int32_t ret;
@@ -195,6 +216,11 @@ static int32_t OpenInputDevice(uint32_t devIndex)
     char serviceName[SERVICE_NAME_LEN] = {0};
 
     if (CheckIndex(devIndex) != INPUT_SUCCESS) {
+        return INPUT_FAILURE;
+    }
+
+    if (!IsDevIndexInScanList(devIndex)) {
+        HDF_LOGE("%s: devIndex %u is not in the scanned device list", __func__, devIndex);
         return INPUT_FAILURE;
     }
 
@@ -219,6 +245,25 @@ static int32_t OpenInputDevice(uint32_t devIndex)
     }
 
     HDF_LOGI("%s: open dev%u succ, service name = %s", __func__, devIndex, serviceName);
+    return INPUT_SUCCESS;
+}
+
+static int32_t SaveInputDevDesc(InputDevDesc *staArr, uint32_t count)
+{
+    if (count > MAX_INPUT_DEV_NUM) {
+        count = MAX_INPUT_DEV_NUM;
+    }
+    pthread_mutex_lock(&g_scanDevListMutex);
+    g_scanDevNum = 0;
+    if (count > 0) {
+        if (memcpy_s(g_scanDevList, sizeof(g_scanDevList), staArr, count * sizeof(InputDevDesc)) != EOK) {
+            pthread_mutex_unlock(&g_scanDevListMutex);
+            HDF_LOGE("%s: memcpy_s failed", __func__);
+            return INPUT_FAILURE;
+        }
+    }
+    g_scanDevNum = count;
+    pthread_mutex_unlock(&g_scanDevListMutex);
     return INPUT_SUCCESS;
 }
 
@@ -270,6 +315,9 @@ static int32_t ScanInputDevice(InputDevDesc *staArr, uint32_t arrLen)
         }
         HDF_LOGI("%s: type = %d, id =%d", __func__, staArr[count].devType, staArr[count].devIndex);
         count++;
+    }
+    if (SaveInputDevDesc(staArr, count) != INPUT_SUCCESS) {
+        return INPUT_FAILURE;
     }
     HdfSbufRecycle(reply);
     return INPUT_SUCCESS;
@@ -388,6 +436,7 @@ int32_t GetInputInterface(IInputInterface **inputInterface)
     }
 
     *inputInterface = inputHdi;
+    pthread_mutex_init(&g_scanDevListMutex, NULL);
     HDF_LOGI("%s: exit succ", __func__);
     return INPUT_SUCCESS;
 }
@@ -435,4 +484,5 @@ void ReleaseInputInterface(IInputInterface **inputInterface)
         free(pos);
     }
     FreeDevManager(manager);
+    pthread_mutex_destroy(&g_scanDevListMutex);
 }
