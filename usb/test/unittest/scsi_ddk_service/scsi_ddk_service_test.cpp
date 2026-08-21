@@ -362,7 +362,7 @@ HWTEST_F(ScsiDdkServiceTest, Read10TruncationBypass002, TestSize.Level1)
 
 /**
  * @tc.name: Read10ZeroTransferLength001
- * @tc.desc: Verify Read10 rejects transferLength=0, which results in bufferSize=0.
+ * @tc.desc: Verify Read10 accepts transferLength=0, which results in bufferSize=0 and no data transfer.
  * @tc.type: FUNC
  */
 HWTEST_F(ScsiDdkServiceTest, Read10ZeroTransferLength001, TestSize.Level1)
@@ -383,8 +383,8 @@ HWTEST_F(ScsiDdkServiceTest, Read10ZeroTransferLength001, TestSize.Level1)
     int32_t ret = service_->Read10(realDev, request, response);
     HDF_LOGI("Read10ZeroTransferLength001: transferLength=0, ret=%{public}d", ret);
 
-    EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER)
-        << "Read10 should reject transferLength=0";
+    EXPECT_EQ(ret, HDF_SUCCESS)
+        << "Read10 should accept transferLength=0 as a no-op transfer";
 }
 
 /**
