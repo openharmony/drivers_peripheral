@@ -249,6 +249,8 @@ bool SerialDeviceManager::IsPcieSerialName(const std::string& name)
 
 static constexpr int32_t SERIAL_LINE_BUF_SIZE = 512;
 static constexpr const char* PROC_SERIAL_PATH = "/proc/devhost/root/tty/driver/serial";
+static constexpr int32_t BASE_DECIMAL = 10;
+static constexpr int32_t MIN_SSCANF_MATCH = 2;
 
 bool SerialDeviceManager::IsTtySerialValid(int32_t serialIndex)
 {
@@ -265,7 +267,7 @@ bool SerialDeviceManager::IsTtySerialValid(int32_t serialIndex)
         std::string line(lineBuf);
         int32_t idx = 0;
         char colon = '\0';
-        if (sscanf_s(line.c_str(), "%d%c", &idx, &colon, static_cast<unsigned>(sizeof(colon))) < 2 ||
+        if (sscanf_s(line.c_str(), "%d%c", &idx, &colon, static_cast<unsigned>(sizeof(colon))) < MIN_SSCANF_MATCH ||
             colon != ':' || idx != serialIndex) {
             continue;
         }
@@ -285,13 +287,13 @@ bool SerialDeviceManager::IsTtySerialValid(int32_t serialIndex)
             break;
         }
         if ((pos = line.find("irq:")) == std::string::npos ||
-            std::strtol(line.c_str() + pos + strlen("irq:"), nullptr, 10) == 0) {
+            std::strtol(line.c_str() + pos + strlen("irq:"), nullptr, BASE_DECIMAL) == 0) {
             break;
         }
-        fclose(fp);
+        (void)fclose(fp);
         return true;
     }
-    fclose(fp);
+    (void)fclose(fp);
     HDF_LOGW("%{public}s: ttyS%{public}d invalid or not found in %{public}s", __func__, serialIndex, PROC_SERIAL_PATH);
     return false;
 }
