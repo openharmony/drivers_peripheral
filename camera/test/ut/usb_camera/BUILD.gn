@@ -30,6 +30,7 @@ ohos_unittest("camera_usb_test_ut") {
   sources = [
     "$usb_hal_test_path/ut/v4l2/stream_customer.cpp",
     "$usb_hal_test_path/ut/v4l2/usb_camera_test_mult.cpp",
+    "./blob_capture_test.cpp",
     "./test_camera_base.cpp",
     "./usb_camera_test.cpp",
     "./usb_device_filter_test.cpp",
