@@ -451,7 +451,6 @@ int32_t LibusbAdapter::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_
         HDF_LOGE("%{public}s: libusb_get_device_descriptor is failed ret=%{public}d", __func__, ret);
         return ret;
     }
-    descriptor.resize(desc.bLength);
     uint8_t copyLen = std::min(desc.bLength, static_cast<uint8_t>(sizeof(desc)));
     descriptor.resize(copyLen);
     ret = memcpy_s(descriptor.data(), descriptor.size(), &desc, copyLen);
