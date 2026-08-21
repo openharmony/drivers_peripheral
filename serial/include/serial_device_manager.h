@@ -50,10 +50,15 @@ private:
     void AddVirtualUsbDevice(
         std::vector<SerialDeviceInfo>& devices, const std::string& name, const std::string& fullPath);
     void AddNormalSerialDevice(std::vector<SerialDeviceInfo>& devices, const std::string& fullPath);
+    void AddPcieSerialDevice(std::vector<SerialDeviceInfo>& devices, const std::string& name,
+        const std::string& fullPath);
+    bool IsPcieSerialName(const std::string& name);
+    bool IsTtySerialValid(int32_t serialIndex);
     void OnUeventReceived(const SerialUeventInfo& info);
     std::map<std::string, wptr<SerialDevice>> openDevices_;
     std::map<std::string, SerialDeviceInfo> availableDevices_;
     std::set<std::string> supportTtyhws_;
+    std::map<std::string, int32_t> pcieSerialPrefixOffsets_;
     std::unique_ptr<SerialUeventQueue> ueventQueue_;
     std::unique_ptr<SerialUeventHandle> ueventHandle_;
     std::mutex mutex_;
