@@ -18,6 +18,8 @@
 #include <unistd.h>
 #include <cstring>
 #include <string>
+#include "cJSON.h"
+#include "config_policy_utils.h"
 #include "device_resource_if.h"
 #include "hcs_tree_if.h"
 #include "hdf_base.h"
@@ -108,6 +110,99 @@ int32_t GetOnboardSerialConfigs(std::set<std::string>& serials)
     }
 
     return LoadOnboardSerialList(devResInstance, configNode, serials);
+}
+
+
+static constexpr const char* PCIE_SERIAL_CONFIG_PATH = "etc/serial/pcie_serial_config.json";
+
+static std::string ReadFileContent(const std::string& path)
+{
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
+        HDF_LOGW("%{public}s: cannot open %{public}s, errno=%{public}d", __func__, path.c_str(), errno);
+        return "";
+    }
+
+    std::string content;
+    char buffer[256] = {0};
+    while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
+        content += buffer;
+    }
+    fclose(fp);
+    return content;
+}
+
+static int32_t ParsePcieSerialConfig(const std::string& jsonStr, std::map<std::string, int32_t>& prefixOffsets)
+{
+    cJSON* root = cJSON_Parse(jsonStr.c_str());
+    if (root == nullptr) {
+        HDF_LOGE("%{public}s: cJSON_Parse failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    cJSON* ports = cJSON_GetObjectItem(root, "pcieSerialPorts");
+    if (ports == nullptr || !cJSON_IsArray(ports)) {
+        HDF_LOGE("%{public}s: pcieSerialPorts not found or not array", __func__);
+        cJSON_Delete(root);
+        return HDF_FAILURE;
+    }
+
+    int arraySize = cJSON_GetArraySize(ports);
+    if (arraySize <= 0 || arraySize > MAX_SERIALS_NUMBER) {
+        HDF_LOGE("%{public}s: invalid pcieSerialPorts size=%{public}d", __func__, arraySize);
+        cJSON_Delete(root);
+        return HDF_FAILURE;
+    }
+
+    for (int i = 0; i < arraySize; i++) {
+        cJSON* item = cJSON_GetArrayItem(ports, i);
+        if (item == nullptr) {
+            continue;
+        }
+        cJSON* prefixItem = cJSON_GetObjectItem(item, "prefix");
+        cJSON* offsetItem = cJSON_GetObjectItem(item, "portIdOffset");
+        if (prefixItem == nullptr || offsetItem == nullptr || !cJSON_IsString(prefixItem) ||
+            !cJSON_IsNumber(offsetItem)) {
+            HDF_LOGW("%{public}s: invalid entry at index %{public}d, skipping", __func__, i);
+            continue;
+        }
+        char* prefixStr = prefixItem->valuestring;
+        int offsetVal = offsetItem->valueint;
+        if (prefixStr == nullptr || strlen(prefixStr) == 0) {
+            HDF_LOGW("%{public}s: empty prefix at index %{public}d, skipping", __func__, i);
+            continue;
+        }
+        prefixOffsets[std::string(prefixStr)] = static_cast<int32_t>(offsetVal);
+    }
+
+    cJSON_Delete(root);
+    return HDF_SUCCESS;
+}
+
+int32_t GetPcieSerialConfigs(std::map<std::string, int32_t>& prefixOffsets)
+{
+    char buf[MAX_PATH_LEN] = {0};
+    char* path = GetOneCfgFile(PCIE_SERIAL_CONFIG_PATH, buf, MAX_PATH_LEN);
+    if (path == nullptr || *path == '\0') {
+        HDF_LOGE("%{public}s: GetOneCfgFile failed for %{public}s", __func__, PCIE_SERIAL_CONFIG_PATH);
+        return HDF_FAILURE;
+    }
+
+    std::string content = ReadFileContent(path);
+    if (content.empty()) {
+        HDF_LOGE("%{public}s: failed to read pcie serial config from %{public}s", __func__, path);
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = ParsePcieSerialConfig(content, prefixOffsets);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: failed to parse pcie serial config from %{public}s", __func__, path);
+        return ret;
+    }
+
+    HDF_LOGI("%{public}s: loaded %{public}zu pcie serial port configs from %{public}s",
+        __func__, prefixOffsets.size(), path);
+    return HDF_SUCCESS;
 }
 
 } // V1_0

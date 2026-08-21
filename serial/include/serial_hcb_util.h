@@ -17,6 +17,7 @@
 #define OHOS_HDI_SERIAL_V1_0_SERIAL_HCB_UTIL_H
 
 #include "stdint.h"
+#include <map>
 #include <set>
 #include <string>
 
@@ -26,6 +27,7 @@ namespace Serial {
 namespace V1_0 {
 
 int32_t GetOnboardSerialConfigs(std::set<std::string>& serials);
+int32_t GetPcieSerialConfigs(std::map<std::string, int32_t>&, prefixOffsets);
 
 } // V1_0
 } // Serial
