@@ -112,6 +112,10 @@ int32_t GetOnboardSerialConfigs(std::set<std::string>& serials)
     return LoadOnboardSerialList(devResInstance, configNode, serials);
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> aea489d478164068cc9f48206eb9d755e79a2e34
 static constexpr const char* PCIE_SERIAL_CONFIG_PATH = "etc/serial/pcie_serial_config.json";
 
 static std::string ReadFileContent(const std::string& path)
