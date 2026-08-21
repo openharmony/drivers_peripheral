@@ -1748,7 +1748,7 @@ int32_t LibusbAdapter::GetConfigDescriptor(libusb_device *dev, uint8_t descId, s
     size_t currentOffset = descriptor.size();
     uint8_t configLen = std::min(config->bLength, static_cast<uint8_t>(sizeof(*config)));
     descriptor.resize(descriptor.size() + configLen);
-    int32_t ret = memcpy_s(descriptor.data() + currentOffset, descriptor.size(), config, configLen);
+    int32_t ret = memcpy_s(descriptor.data() + currentOffset, configLen, config, configLen);
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memcpy_s failed", __func__);
         libusb_free_config_descriptor(config);
@@ -1825,7 +1825,7 @@ int32_t LibusbAdapter::ProcessInterfaceDescriptors(const libusb_interface *iface
         const libusb_interface_descriptor &altSetting = iface->altsetting[i];
         uint8_t ifaceLen = std::min(altSetting.bLength, static_cast<uint8_t>(sizeof(altSetting)));
         descriptor.resize(descriptor.size() + ifaceLen);
-        int32_t ret = memcpy_s(descriptor.data() + currentOffset, descriptor.size(), &altSetting, ifaceLen);
+        int32_t ret = memcpy_s(descriptor.data() + currentOffset, ifaceLen, &altSetting, ifaceLen);
         if (ret != EOK) {
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
             return HDF_FAILURE;
@@ -1836,7 +1836,7 @@ int32_t LibusbAdapter::ProcessInterfaceDescriptors(const libusb_interface *iface
             const libusb_endpoint_descriptor &endpoint = altSetting.endpoint[j];
             uint8_t epLen = std::min(endpoint.bLength, static_cast<uint8_t>(sizeof(endpoint)));
             descriptor.resize(descriptor.size() + epLen);
-            ret = memcpy_s(descriptor.data() + currentOffset, descriptor.size(), &endpoint, epLen);
+            ret = memcpy_s(descriptor.data() + currentOffset, epLen, &endpoint, epLen);
             if (ret != EOK) {
                 HDF_LOGE("%{public}s: memcpy_s failed", __func__);
                 return HDF_FAILURE;
