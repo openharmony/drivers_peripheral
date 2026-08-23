@@ -87,7 +87,7 @@ AudioAdapterInterfaceImpl::AudioAdapterInterfaceImpl(const AudioAdapterDescripto
 
 AudioAdapterInterfaceImpl::~AudioAdapterInterfaceImpl()
 {
-    DHLOGD("Distributed audio adapter destructed, name(%{public}s).",
+    DHLOGI("Distributed audio adapter destructed, name(%{public}s).",
         GetAnonyString(adpDescriptor_.adapterName).c_str());
 }
 
