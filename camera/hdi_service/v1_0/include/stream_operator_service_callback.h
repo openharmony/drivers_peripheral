@@ -24,6 +24,16 @@ namespace OHOS::Camera {
 using namespace OHOS::HDI::Camera::V1_0;
 using namespace OHOS::VDI::Camera::V1_0;
 
+class StreamOperatorServiceCallback;
+class StreamCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    explicit StreamCallbackDeathRecipient(StreamOperatorServiceCallback *callback) : callback_(callback) {}
+    void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+
+private:
+    StreamOperatorServiceCallback *callback_;
+};
+
 class StreamOperatorServiceCallback : public IStreamOperatorVdiCallback {
 public:
 
@@ -31,7 +41,7 @@ public:
 
     StreamOperatorServiceCallback() = delete;
 
-    virtual ~StreamOperatorServiceCallback() = default;
+    virtual ~StreamOperatorServiceCallback();
 
     int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds) override;
 
@@ -41,8 +51,11 @@ public:
 
     int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
 
+    void OnCallbackDied();
+
 private:
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback_;
+    OHOS::sptr<StreamCallbackDeathRecipient> deathRecipient_;
 };
 
 } // end namespace OHOS::Camera
