@@ -38,6 +38,7 @@ group("camera_hal_test") {
     ]
   }
   deps += [
-    "$test_path/ut/utils:camera_utils_ut",    
+    "$test_path/ut/utils:camera_utils_ut",
+    "$test_path/ut/security:camera_security_ut",
   ]
 }

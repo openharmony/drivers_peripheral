@@ -15,11 +15,44 @@
 
 #include "stream_operator_service_callback.h"
 #include "camera_service_type_converter.h"
+#include "iproxy_broker.h"
 
 namespace OHOS::Camera {
+
+void StreamCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    CAMERA_LOGI("StreamCallbackDeathRecipient::OnRemoteDied received");
+    if (callback_ != nullptr) {
+        callback_->OnCallbackDied();
+    }
+}
+
 StreamOperatorServiceCallback::StreamOperatorServiceCallback(OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback)
     : streamOperatorCallback_(streamOperatorCallback)
 {
+    if (streamOperatorCallback_ != nullptr) {
+        deathRecipient_ = new StreamCallbackDeathRecipient(this);
+        const sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IStreamOperatorCallback>(streamOperatorCallback_);
+        if (remote != nullptr) {
+            remote->AddDeathRecipient(deathRecipient_);
+        }
+    }
+}
+
+StreamOperatorServiceCallback::~StreamOperatorServiceCallback()
+{
+    if (deathRecipient_ != nullptr && streamOperatorCallback_ != nullptr) {
+        const sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IStreamOperatorCallback>(streamOperatorCallback_);
+        if (remote != nullptr) {
+            remote->RemoveDeathRecipient(deathRecipient_);
+        }
+    }
+}
+
+void StreamOperatorServiceCallback::OnCallbackDied()
+{
+    CAMERA_LOGI("StreamOperatorServiceCallback::OnCallbackDied, nulling callback");
+    streamOperatorCallback_ = nullptr;
 }
 
 int32_t StreamOperatorServiceCallback::OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds)
