@@ -77,7 +77,9 @@ ohos_shared_library("usb_camera_v4l2_adapter") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "bounds_checking_function:libsec_shared"
+    "bounds_checking_function:libsec_shared",
+    "graphic_surface:buffer_handle",
+    "drivers_interface_camera:libbuffer_handle_sequenceable_1.0",
   ]
   public_configs = [ ":v4l2_config" ]
   install_images = [ chipset_base_dir ]
