@@ -28,7 +28,9 @@ ohos_shared_library("libserials_service_1.0") {
   defines = [ "LOG_DOMAIN=0xD002519" ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
+    "config_policy:configpolicy_util",
     "drivers_interface_serial:serials_idl_headers",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",

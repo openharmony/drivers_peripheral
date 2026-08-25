@@ -19,6 +19,8 @@
       "ram": "100KB",
       "deps": {
         "components": [
+          "cJSON",
+          "config_policy",
           "ipc",
           "hdf_core",
           "hilog",

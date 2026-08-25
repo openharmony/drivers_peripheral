@@ -18,7 +18,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <cerrno>
 #include <climits>
+#include <cstdlib>
+#include <algorithm>
+#include <cstdio>
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "serial_hcb_util.h"
@@ -50,7 +54,9 @@ int32_t SerialDeviceManager::Init()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     supportTtyhws_.clear();
+    pcieSerialPrefixOffsets_.clear();
     GetOnboardSerialConfigs(supportTtyhws_);
+    GetPcieSerialConfigs(pcieSerialPrefixOffsets_);
 
     ueventQueue_ = std::make_unique<SerialUeventQueue>();
     ueventQueue_->SetCallback([this](const SerialUeventInfo& info) {
@@ -226,9 +232,117 @@ void SerialDeviceManager::AddNormalSerialDevice(std::vector<SerialDeviceInfo>& d
     HDF_LOGD("found device:%{public}s!", fullPath.c_str());
 }
 
+bool SerialDeviceManager::IsPcieSerialName(const std::string& name)
+{
+    // ttyS* is linux standard serial port - auto-detected as PCIE serial
+    if (name.find("ttyS") == 0) {
+        return true;
+    }
+    // Match against PCIE serial port prefixes from CCM config
+    for (const auto& [prefix, offset] : pcieSerialPrefixOffsets_) {
+        if (name.find(prefix) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static constexpr int32_t SERIAL_LINE_BUF_SIZE = 512;
+static constexpr const char* PROC_SERIAL_PATH = "/proc/devhost/root/tty/driver/serial";
+static constexpr int32_t BASE_DECIMAL = 10;
+static constexpr int32_t MIN_SSCANF_MATCH = 2;
+
+bool SerialDeviceManager::IsTtySerialValid(int32_t serialIndex)
+{
+    if (serialIndex < 0) {
+        return false;
+    }
+    FILE* fp = fopen(PROC_SERIAL_PATH, "r");
+    if (fp == nullptr) {
+        HDF_LOGW("%{public}s: cannot open %{public}s, errno=%{public}d", __func__, PROC_SERIAL_PATH, errno);
+        return false;
+    }
+    char lineBuf[SERIAL_LINE_BUF_SIZE] = {0};
+    while (fgets(lineBuf, sizeof(lineBuf), fp) != nullptr) {
+        std::string line(lineBuf);
+        int32_t idx = 0;
+        char colon = '\0';
+        if (sscanf_s(line.c_str(), "%d%c", &idx, &colon, static_cast<unsigned>(sizeof(colon))) < MIN_SSCANF_MATCH ||
+            colon != ':' || idx != serialIndex) {
+            continue;
+        }
+        size_t pos = line.find("uart:");
+        if (pos == std::string::npos || line.substr(pos + strlen("uart:"), strlen("unknown")) == "unknown") {
+            break;
+        }
+        if ((pos = line.find("mmio:")) != std::string::npos) {
+            if (std::strtol(line.c_str() + pos + strlen("mmio:"), nullptr, 0) == 0) {
+                break;
+            }
+        } else if ((pos = line.find("port:")) != std::string::npos) {
+            if (line.substr(pos + strlen("port:")).find("00000000") == 0) {
+                break;
+            }
+        } else {
+            break;
+        }
+        if ((pos = line.find("irq:")) == std::string::npos ||
+            std::strtol(line.c_str() + pos + strlen("irq:"), nullptr, BASE_DECIMAL) == 0) {
+            break;
+        }
+        (void)fclose(fp);
+        return true;
+    }
+    (void)fclose(fp);
+    HDF_LOGW("%{public}s: ttyS%{public}d invalid or not found in %{public}s", __func__, serialIndex, PROC_SERIAL_PATH);
+    return false;
+}
+
+void SerialDeviceManager::AddPcieSerialDevice(std::vector<SerialDeviceInfo>& devices,
+    const std::string& name, const std::string& fullPath)
+{
+    // Read PCI sysfs for vendor/device ID
+    std::string pciDevicePath = "/sys/class/tty/" + name + "/device/";
+    std::string vendorIdStr = ReadSysfsFile(pciDevicePath + "vendor");
+    std::string productIdStr = ReadSysfsFile(pciDevicePath + "device");
+
+    // Strip "0x"/"0X" prefix and convert to lowercase for consistency
+    auto stripHexPrefix = [](std::string& s) {
+        if (s.size() > 2 && (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))) {
+            s = s.substr(2);
+        }
+        std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) {return std::tolower(c);});
+    };
+    stripHexPrefix(vendorIdStr);
+    stripHexPrefix(productIdStr);
+
+    SerialDeviceInfo info{fullPath, "", "", 0, 0};
+    HexStrToInt(productIdStr, info.productId);
+    HexStrToInt(vendorIdStr, info.vendorId);
+    devices.push_back(info);
+    availableDevices_[fullPath] = info;
+    HDF_LOGI("found PCIE device:%{public}s, vendorId=0x%{public}04x, productId=0x%{public}04x",
+        fullPath.c_str(), info.vendorId, info.productId);
+}
+
 static bool IsUsbSerialName(const std::string& name)
 {
     return (name.find("ttyUSB") == 0 || name.find("ttyACM") == 0);
+}
+
+static int32_t ExtractSerialIndex(const std::string& name)
+{
+    size_t digitStart = name.find_first_of("0123456789");
+    if (digitStart == std::string::npos) {
+        return -1;
+    }
+    char* endPtr = nullptr;
+    errno = 0;
+    int32_t index = static_cast<int32_t>(std::strtol(name.c_str() + digitStart, &endPtr, 10));
+    if (errno == ERANGE || endPtr == name.c_str() + digitStart) {
+        return -1;
+    }
+    return index;
 }
 
 int32_t SerialDeviceManager::QueryDevices(std::vector<SerialDeviceInfo>& devices)
@@ -248,6 +362,13 @@ int32_t SerialDeviceManager::QueryDevices(std::vector<SerialDeviceInfo>& devices
         if (IsUsbSerialName(name)) {
             std::string fullPath = std::string(devPath) + "/" + name;
             AddVirtualUsbDevice(devices, name, fullPath);
+        } else if (IsPcieSerialName(name)) {
+            // ttyS* devices need validity check via /proc/devhost/root/tty/driver/serial
+            if (name.find("ttyS") == 0 && !IsTtySerialValid(ExtractSerialIndex(name))) {
+                continue;
+            }
+            std::string fullPath = std::string(devPath) + "/" + name;
+            AddPcieSerialDevice(devices, name, fullPath);
         } else {
             std::string fullPath = std::string(devPath) + "/" + name;
             AddNormalSerialDevice(devices, fullPath);
