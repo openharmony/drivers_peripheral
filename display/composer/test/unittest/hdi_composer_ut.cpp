@@ -219,7 +219,10 @@ void DeviceTest::SetUpTestCase()
 void DeviceTest::TearDownTestCase()
 {
     HdiTestDevice::GetInstance().Clear();
-    HdiTestDevice::GetInstance().GetFirstDisplay()->ResetClientLayer();
+    std::shared_ptr<HdiTestDisplay> display = HdiTestDevice::GetInstance().GetFirstDisplay();
+    if (display != nullptr) {
+        display->ResetClientLayer();
+    }
 }
 
 void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, const void* data)
@@ -349,7 +352,7 @@ HWTEST_F(DeviceTest, test_GetDisplayIdentificationData, TestSize.Level1)
     uint8_t portId = 0;
     std::vector<uint8_t> edidData = {};
     auto ret = g_composerDevice->GetDisplayIdentificationData(g_displayIds[0], portId, edidData);
-    DISPLAY_TEST_LOGD("displayId[%u], portId[%u], edidDataLength[%u]", g_displayIds[0], portId, edidData.size());
+    DISPLAY_TEST_LOGD("displayId[%u], portId[%u], edidDataLength[%zu]", g_displayIds[0], portId, edidData.size());
     if (ret == DISPLAY_NOT_SUPPORT) {
         return;
     }
