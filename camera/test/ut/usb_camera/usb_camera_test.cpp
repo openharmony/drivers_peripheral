@@ -146,7 +146,14 @@ TEST_F(UtestUSBCameraTest, camera_usb_0004)
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_POSITION, &entry);
     EXPECT_EQ(ret, CAM_META_SUCCESS);
     std::cout << "OHOS_ABILITY_CAMERA_POSITION value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
-    EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT);
+
+    camera_metadata_item_t connEntry;
+    int connRet = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry);
+    if (connRet == CAM_META_SUCCESS && connEntry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+        EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
+    } else {
+        EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT);
+    }
 }
 
 /**
@@ -1660,7 +1667,14 @@ TEST_F(UtestUSBCameraTest, camera_usb_0052)
         camera_metadata_item_t entry;
         int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_POSITION, &entry);
         CAMERA_LOGD("OHOS_ABILITY_CAMERA_POSITION value is %{pubilc}d", entry.data.u8[0]);
-        EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT);
+        
+        camera_metadata_item_t connEntry;
+        int connRet = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry);
+        if (connRet == CAM_META_SUCCESS && connEntry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+            EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
+        } else {
+            EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT);
+        }
     }
 }
 
