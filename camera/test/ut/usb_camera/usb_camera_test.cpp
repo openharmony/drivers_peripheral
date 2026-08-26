@@ -153,7 +153,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0004)
     // Phone devices: USB camera should return POSITION_OTHER.
     char deviceType[32] = {0};
     GetParametr("const.product.devicetype", "default", deviceType, sizeof(deviceType));
-    if (connRet == CAM_META_SUCCESS && connEntry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+    if (strcmp(deviceType, "2in1") == 0) {
         EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT
                  || entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
     } else {
@@ -1678,7 +1678,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0052)
         // Phone devices: USB camera should return POSITION_OTHER.
         char deviceType[32] = {0};
         GetParametr("const.product.devicetype", "default", deviceType, sizeof(deviceType));
-        if (connRet == CAM_META_SUCCESS && connEntry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+        if (strcmp(deviceType, "2in1") == 0) {
             EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT
                      || entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
         } else {
