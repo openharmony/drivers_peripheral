@@ -157,7 +157,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0004)
         EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT
                  || entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
     } else {
-            EXPECT_EQ(entry.data.u8[0],OHOS_CAMERA_POSITION_OTHER);
+        EXPECT_EQ(entry.data.u8[0],OHOS_CAMERA_POSITION_OTHER);
     }
 }
 
