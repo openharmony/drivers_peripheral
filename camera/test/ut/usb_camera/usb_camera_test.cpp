@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "usb_camera_test.h"
+#include "parameter.h"
 
 bool g_usbCameraExit = false;
 
@@ -147,13 +148,17 @@ TEST_F(UtestUSBCameraTest, camera_usb_0004)
     EXPECT_EQ(ret, CAM_META_SUCCESS);
     std::cout << "OHOS_ABILITY_CAMERA_POSITION value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
 
-    camera_metadata_item_t connEntry;
-    int connRet = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry);
-    if (connRet == CAM_META_SUCCESS && connEntry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
-        EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
-    } else {
-        EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT);
-    }
+    // POSITION is device-dependent: use system property to determine device type.
+    // 2in1 devices: USB camera (including built) may return POSITION_FRONT or POSITION_OTHER.
+    // Phone devices: USB camera should return POSITION_OTHER.
+    char deviceType[32] = {0};
+        GetParametr("const.product.devicetype", "default", deviceType, sizeof(deviceType));
+        if (connRet == CAM_META_SUCCESS && connEntry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+            EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT
+                     || entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
+        } else {
+            EXPECT_EQ(entry.data.u8[0],OHOS_CAMERA_POSITION_OTHER);
+        }
 }
 
 /**
@@ -1668,12 +1673,16 @@ TEST_F(UtestUSBCameraTest, camera_usb_0052)
         int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_POSITION, &entry);
         CAMERA_LOGD("OHOS_ABILITY_CAMERA_POSITION value is %{pubilc}d", entry.data.u8[0]);
         
-        camera_metadata_item_t connEntry;
-        int connRet = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry);
+        // POSITION is device-dependent: use system property to determine device type.
+        // 2in1 devices: USB camera (including built) may return POSITION_FRONT or POSITION_OTHER.
+        // Phone devices: USB camera should return POSITION_OTHER.
+        char deviceType[32] = {0};
+        GetParametr("const.product.devicetype", "default", deviceType, sizeof(deviceType));
         if (connRet == CAM_META_SUCCESS && connEntry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
-            EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
+            EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT
+                     || entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
         } else {
-            EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT);
+            EXPECT_EQ(entry.data.u8[0],OHOS_CAMERA_POSITION_OTHER);
         }
     }
 }
