@@ -157,7 +157,13 @@ TEST_F(UtestUSBCameraTest, camera_usb_0004)
         EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT
                  || entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
     } else {
-        EXPECT_EQ(entry.data.u8[0],OHOS_CAMERA_POSITION_OTHER);
+        camera_metadata_item_t connEntry;
+        int connRet = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry);
+        if (connRet == CAM_META_SUCCESS && connEntry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+            EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
+        } else {
+            EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT);
+        }
     }
 }
 
@@ -1682,7 +1688,13 @@ TEST_F(UtestUSBCameraTest, camera_usb_0052)
             EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT
                      || entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
         } else {
-            EXPECT_EQ(entry.data.u8[0],OHOS_CAMERA_POSITION_OTHER);
+            camera_metadata_item_t connEntry;
+            int connRet = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connEntry);
+            if (connRet == CAM_META_SUCCESS && connEntry.data.u8[0] == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+                EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
+            } else {
+                EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_FRONT);
+            }
         }
     }
 }
