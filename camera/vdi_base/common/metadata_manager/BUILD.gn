@@ -84,7 +84,8 @@ if (!defined(ohos_lite)) {
       "drivers_interface_camera:metadata",
       "ipc:ipc_single",
       "c_utils:utils",
-      "bounds_checking_function:libsec_shared"
+      "graphic_surface:buffer_handle",
+      "drivers_interface_camera:libbuffer_handle_sequenceable_1.0",
     ]
 
     public_configs = [ ":camera_metadata_manager_config" ]

@@ -42,6 +42,7 @@ ohos_shared_library("libface_auth_interface_service_3.0") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "graphic_surface:buffer_handle",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -76,6 +77,7 @@ ohos_shared_library("libface_auth_driver") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "graphic_surface:buffer_handle",
   ]
 
   shlib_type = "hdi"

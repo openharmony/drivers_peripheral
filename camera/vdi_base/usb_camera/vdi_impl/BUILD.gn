@@ -133,7 +133,9 @@ ohos_shared_library("camera_external_usb_camera") {
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "bounds_checking_function:libsec_shared"
+    "bounds_checking_function:libsec_shared",
+    "graphic_surface:buffer_handle",
+    "drivers_interface_camera:libbuffer_handle_sequenceable_1.0",
   ]
 
   #  if (use_hitrace) {
@@ -188,7 +190,8 @@ ohos_static_library("camera_daemon_static") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
-    "bounds_checking_function:libsec_shared"
+    "bounds_checking_function:libsec_shared",
+    "graphic_surface:buffer_handle",
   ]
   if (use_hitrace) {
     external_deps += [ "hitrace:libhitracechain" ]

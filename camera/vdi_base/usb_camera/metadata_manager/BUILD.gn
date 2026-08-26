@@ -72,6 +72,8 @@ if (!defined(ohos_lite)) {
       "hdf_core:libhdi",
       "hilog:libhilog",
       "ipc:ipc_single",
+      "graphic_surface:buffer_handle",
+      "drivers_interface_camera:libbuffer_handle_sequenceable_1.0",
     ]
     if (use_hitrace) {
       external_deps += [ "hitrace:hitrace_meter" ]
