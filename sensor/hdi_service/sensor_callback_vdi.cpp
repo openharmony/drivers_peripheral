@@ -96,16 +96,23 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::strin
 
 void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event)
 {
-    void *origin = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
+    uint32_t copyLen = static_cast<uint32_t>(event.data.size());
+    uint32_t dataLen = event.dataLen;
+    if (copyLen > dataLen) {
+        HDF_LOGE("%{public}s: data size mismatch, dataLen=%{public}u copyLen=%{public}u",
+            __func__, dataLen, copyLen);
+        return;
+    }
+
+    void *origin = OsalMemCalloc(sizeof(uint8_t) * (dataLen));
     if (origin == nullptr) {
         HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
         return;
     }
 
     uint8_t *eventData = static_cast<uint8_t*>(origin);
-    std::copy(event.data.begin(), event.data.end(), eventData);
+    std::copy(event.data.begin(), event.data.begin() + copyLen, eventData);
     float *data = reinterpret_cast<float*>(eventData);
-    int32_t dataLen = event.dataLen;
     int32_t dataDimension = static_cast<int32_t>(dataLen / sizeof(float));
     std::string dataStr = {0};
     char arrayStr[DATA_LEN] = {0};
