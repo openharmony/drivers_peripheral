@@ -15,11 +15,13 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include <v3_0/daudio_manager_stub.h>
 
+#include "daudio_log.h"
 #include <shared_mutex>
+#undef DH_LOG_TAG
+#define DH_LOG_TAG "DAudioManagerDriver"
 using namespace OHOS::HDI::DistributedAudio::Audioext::V3_0;
 
 namespace {
@@ -39,22 +41,24 @@ static int32_t DAudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        DHLOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        DHLOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
+    DHLOGI("DAudioMgrDriverDispatch mutex before.");
     std::shared_lock lock(mutex_);
+    DHLOGI("DAudioMgrDriverDispatch mutex after.");
     if (client == nullptr || client->device == nullptr || client->device->service == nullptr) {
-        HDF_LOGE("%{public}s: client or client.device or service is nullptr", __func__);
+        DHLOGE("%{public}s: client or client.device or service is nullptr", __func__);
         return HDF_FAILURE;
     }
     auto *hdfDAudioManagerHost = CONTAINER_OF(client->device->service, struct HdfDAudioManagerHost, ioService);
     if (hdfDAudioManagerHost == NULL || hdfDAudioManagerHost->stub == NULL) {
-        HDF_LOGE("%{public}s:invalid hdfAudioManagerHost", __func__);
+        DHLOGE("%{public}s:invalid hdfAudioManagerHost", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     return hdfDAudioManagerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
@@ -62,22 +66,22 @@ static int32_t DAudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int
 
 int HdfDAudioManagerDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("Hdf daudio manager driver init.");
+    DHLOGI("Hdf daudio manager driver init.");
     HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO);
     return HDF_SUCCESS;
 }
 
 int HdfDAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("Hdf daudio manager driver bind.");
+    DHLOGI("Hdf daudio manager driver bind.");
     if (deviceObject == nullptr) {
-        HDF_LOGE("%{public}s: deviceObject is nullptr", __func__);
+        DHLOGE("%{public}s: deviceObject is nullptr", __func__);
         return HDF_FAILURE;
     }
 
     auto *hdfDAudioManagerHost = new (std::nothrow) HdfDAudioManagerHost;
     if (hdfDAudioManagerHost == nullptr) {
-        HDF_LOGE("%{public}s: failed to create create HdfDAudioManagerHost object", __func__);
+        DHLOGE("%{public}s: failed to create create HdfDAudioManagerHost object", __func__);
         return HDF_FAILURE;
     }
 
@@ -87,7 +91,7 @@ int HdfDAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 
     auto serviceImpl = IDAudioManager::Get("daudio_ext_service", true);
     if (serviceImpl == nullptr) {
-        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        DHLOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfDAudioManagerHost;
         return HDF_FAILURE;
     }
@@ -95,7 +99,7 @@ int HdfDAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
     hdfDAudioManagerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         IDAudioManager::GetDescriptor());
     if (hdfDAudioManagerHost->stub == nullptr) {
-        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        DHLOGE("%{public}s: failed to get stub object", __func__);
         delete hdfDAudioManagerHost;
         return HDF_FAILURE;
     }
@@ -106,13 +110,14 @@ int HdfDAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 
 void HdfDAudioManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("Hdf daudio manager driver release.");
+    DHLOGI("Hdf daudio manager driver release.");
     if (deviceObject == nullptr || deviceObject->service == nullptr) {
-        HDF_LOGE("HdfDAudioManagerDriverRelease not initted");
+        DHLOGE("HdfDAudioManagerDriverRelease not initted");
         return;
     }
-
+    DHLOGI("HdfDAudioMgrDriverRelease mutex before.");
     std::unique_lock lock(mutex_);
+    DHLOGI("HdfDAudioMgrDriverRelease mutex after.");
     auto *hdfDAudioManagerHost = CONTAINER_OF(deviceObject->service, struct HdfDAudioManagerHost, ioService);
     if (hdfDAudioManagerHost != nullptr) {
         hdfDAudioManagerHost->stub = nullptr;

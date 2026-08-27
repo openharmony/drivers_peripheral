@@ -77,7 +77,10 @@ ohos_shared_library("libdaudio_ext_driver") {
     ubsan = true
   }
 
-  include_dirs = [ "${hdf_ser_aud_ext_path}/include" ]
+  include_dirs = [
+    "${hdf_ser_aud_ext_path}/include",
+    "${hdf_service_path}/hdi_service/common/log/include",
+  ]
 
   sources = [ "./src/daudio_manager_driver.cpp" ]
 
@@ -104,6 +107,11 @@ ohos_shared_library("libdaudio_ext_driver") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   shlib_type = "hdi"

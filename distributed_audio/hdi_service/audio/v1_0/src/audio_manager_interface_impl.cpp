@@ -226,7 +226,9 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
         return ret;
     }
     {
+        DHLOGI("RemoveAudioDevice mapAudioAdapter erase mutex before.");
         std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
+        DHLOGI("RemoveAudioDevice mapAudioAdapter erase mutex after.");
         sptr<IRemoteObject> remote = GetRemote(adpName);
         if (remote != nullptr) {
             RemoveClearRegisterRecipient(remote, adpName, dhId);
