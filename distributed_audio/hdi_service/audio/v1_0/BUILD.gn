@@ -94,7 +94,11 @@ ohos_shared_library("libdaudio_primary_driver") {
     integer_overflow = true
     ubsan = true
   }
-  include_dirs = [ "${hdf_ser_aud_path}/include" ]
+
+  include_dirs = [
+    "${hdf_ser_aud_path}/include",
+    "${hdf_service_path}/hdi_service/common/log/include",
+  ]
 
   sources = [ "./src/audio_driver.cpp" ]
 
@@ -120,6 +124,11 @@ ohos_shared_library("libdaudio_primary_driver") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   shlib_type = "hdi"

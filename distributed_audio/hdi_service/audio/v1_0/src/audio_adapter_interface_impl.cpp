@@ -893,13 +893,7 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
         DHLOGE("Close audio device failed.");
         return ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL;
     }
-    DHLOGI("DestroyStream  %{public}u done", renderId);
-    ret = WaitForSANotify(renderId, EVENT_CLOSE_SPK);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Wait SA notify failed. ret: %{public}d.", ret);
-        return ret;
-    }
-    DHLOGI("Close render device success, renderId: %{public}d.", renderId);
+    DHLOGI("Close render device success not wait for sa event, renderId: %{public}d.", renderId);
     return DH_SUCCESS;
 }
 
