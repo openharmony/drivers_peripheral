@@ -23,6 +23,7 @@
 
 #define HDF_LOG_TAG    uhdf_sensor_service
 #define STRING_LEN    2048
+#define SENSOR_LIST_SIZE  (sizeof(g_sensorList) / sizeof((g_sensorList)[0]))
 
 static const char *g_helpComment =
     " Sensor manager dump options:\n"
@@ -153,16 +154,26 @@ int32_t SensorShowData(struct HdfSBuf *reply)
     if (eventDumpList->count < MAX_DUMP_DATA_SIZE) {
         for (len = 0; len < eventDumpList->count; len++) {
             float *data = (float *)(eventDumpList->listDumpArr[len].data);
+            int32_t sensorId = eventDumpList->listDumpArr[len].sensorId;
+            if (sensorId < 0 || sensorId >= (int32_t)SENSOR_LIST_SIZE) {
+                HDF_LOGE("%{public}s: invalid sensorId %{public}d", __func__, sensorId);
+                continue;
+            }
             ShowData(data, eventDumpList->listDumpArr[len].timestamp,
-                g_sensorList[eventDumpList->listDumpArr[len].sensorId], reply);
+                g_sensorList[sensorId], reply);
         }
     } else {
         int32_t pos = eventDumpList->pos;
         for (len = 0; len < eventDumpList->count; len++) {
             pos = pos + 1 > MAX_DUMP_DATA_SIZE ? 1 : pos + 1;
             float *data = (float *)(eventDumpList->listDumpArr[pos - 1].data);
+            int32_t sensorId = eventDumpList->listDumpArr[pos - 1].sensorId;
+            if (sensorId < 0 || sensorId >= (int32_t)SENSOR_LIST_SIZE) {
+                HDF_LOGE("%{public}s: invalid sensorId %{public}d", __func__, sensorId);
+                continue;
+            }
             ShowData(data, eventDumpList->listDumpArr[pos - 1].timestamp,
-                g_sensorList[eventDumpList->listDumpArr[pos - 1].sensorId], reply);
+                g_sensorList[sensorId], reply);
         }
     }
 
