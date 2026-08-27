@@ -180,6 +180,7 @@ void VendorInterface::CleanUp()
     if (watcher_ != nullptr) {
         watcher_->Stop();
     }
+    HDF_LOGE("vendorInterface watcher stop.");
     vendorInterface_->op(BtOpcodeT::BT_OP_LPM_DISABLE, nullptr);
     vendorInterface_->op(BtOpcodeT::BT_OP_HCI_CHANNEL_CLOSE, nullptr);
     vendorInterface_->op(BtOpcodeT::BT_OP_POWER_OFF, nullptr);
