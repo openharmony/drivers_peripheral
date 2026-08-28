@@ -20,6 +20,10 @@ ohos_shared_library("effect_model_service") {
 
   shlib_type = "hdi"
 
+  if (!use_clang_coverage) {
+    version_script = "effect_model_service.versionscript"
+  }
+
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_audio:libeffect_stub_1.0",
