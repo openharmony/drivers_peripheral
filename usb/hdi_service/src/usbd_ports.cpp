@@ -14,9 +14,9 @@
  */
 #include <iostream>
 #include <sstream>
-#include <regex>
 
 #include "usbd_ports.h"
+#include "parse_usbd_port_int.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "usbd_function.h"
@@ -99,11 +99,12 @@ int32_t UsbdPorts::QueryPorts(std::vector<V2_0::UsbPort>& portList)
             HDF_LOGE("%{public}s: ReadPortInfo failed! ret:%{public}d", __func__, ret);
             return HDF_FAILURE;
         }
-        if (!std::regex_match(portId, std::regex("^[0-9]+$"))) {
+        int32_t id = 0;
+        if (!ParseUsbdPortInt32(portId, id)) {
             HDF_LOGE("%{public}s Invalid portId", __func__);
             return HDF_FAILURE;
         }
-        usbPort.id = std::stoi(portId);
+        usbPort.id = id;
         portList.emplace_back(usbPort);
         AddPort(usbPort);
     }
