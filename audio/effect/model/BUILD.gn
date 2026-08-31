@@ -33,6 +33,10 @@ if (!defined(ohos_lite)) {
       "$hdf_audio_path/hdi_service/primary_impl/vdi_src",
     ]
 
+    if (!use_clang_coverage) {
+      version_script = "effect_model_service_1.0.versionscript"
+    }
+
     defines = []
     if (drivers_peripheral_audio_feature_reclaim_memory) {
       defines += [ "AUDIO_RECLAIM_MEMORY_ENABLE" ]

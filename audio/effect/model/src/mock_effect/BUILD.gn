@@ -26,6 +26,10 @@ if (!defined(ohos_lite)) {
       "$hdf_audio_path/hdi_service/vendor_interface/utils",
     ]
 
+    if (!use_clang_coverage) {
+      version_script = "mock_effect_lib.versionscript"
+    }
+
     defines = []
 
     if (is_standard_system) {
