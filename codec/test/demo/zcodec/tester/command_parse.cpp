@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "command_parse.h"
+#include "parse_zc_int.h"
 #include <map>
 #include <getopt.h>
 #include <iostream>
@@ -198,7 +199,10 @@ CommandOpt Parse(int argc, char *argv[])
                 break;
             }
             case OPT_RESTART_AFTER_EOS: {
-                opt.enableRestartAfterEos = (stol(optarg) != 0);
+                int64_t parsed = 0;
+                if (optarg != nullptr && ParseZcInt64(optarg, parsed)) {
+                    opt.enableRestartAfterEos = (parsed != 0);
+                }
                 break;
             }
             default:
@@ -344,9 +348,16 @@ OHOS::HDI::Codec::ColorAspects CommandOpt::ParseColorAspects(const char* range, 
 {
     OHOS::HDI::Codec::ColorAspects aspects{};
     aspects.range = (std::string(range) == "1");
-    aspects.primaries = static_cast<uint8_t>(std::stoi(primaries));
-    aspects.transfer = static_cast<uint8_t>(std::stoi(transfer));
-    aspects.matrixCoeffs = static_cast<uint8_t>(std::stoi(matrix));
+    int32_t parsed = 0;
+    if (ParseZcInt32(primaries ? primaries : "", parsed)) {
+        aspects.primaries = static_cast<uint8_t>(parsed);
+    }
+    if (ParseZcInt32(transfer ? transfer : "", parsed)) {
+        aspects.transfer = static_cast<uint8_t>(parsed);
+    }
+    if (ParseZcInt32(matrix ? matrix : "", parsed)) {
+        aspects.matrixCoeffs = static_cast<uint8_t>(parsed);
+    }
     return aspects;
 }
 
