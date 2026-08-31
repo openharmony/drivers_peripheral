@@ -509,12 +509,12 @@ int32_t AudioCommonVdiSampleAttrToSampleAttrVdi(const struct AudioSampleAttribut
         attrs->offloadInfo.channelLayout = vdiAttrs->offloadInfo.channelLayout;
         attrs->offloadInfo.bitRate = vdiAttrs->offloadInfo.bitRate;
         attrs->offloadInfo.bitWidth = vdiAttrs->offloadInfo.bitWidth;
-        attrs->offloadInfo.format = (enum AudioFormatVdi)vdiAttrs->offloadInfo.format;
+        attrs->offloadInfo.format = (enum AudioFormat)vdiAttrs->offloadInfo.format;
         attrs->offloadInfo.offloadBufferSize = vdiAttrs->offloadInfo.offloadBufferSize;
         attrs->offloadInfo.duration = vdiAttrs->offloadInfo.duration;
     }
     attrs->ecSampleAttributes.ecInterleaved = vdiAttrs->ecSampleAttributes.ecInterleaved;
-    attrs->ecSampleAttributes.ecFormat = (enum AudioFormatVdi)vdiAttrs->ecSampleAttributes.ecFormat;
+    attrs->ecSampleAttributes.ecFormat = (enum AudioFormat)vdiAttrs->ecSampleAttributes.ecFormat;
     attrs->ecSampleAttributes.ecSampleRate = vdiAttrs->ecSampleAttributes.ecSampleRate;
     attrs->ecSampleAttributes.ecChannelCount = vdiAttrs->ecSampleAttributes.ecChannelCount;
     attrs->ecSampleAttributes.ecChannelLayout = vdiAttrs->ecSampleAttributes.ecChannelLayout;
