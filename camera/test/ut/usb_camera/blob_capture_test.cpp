@@ -98,7 +98,7 @@ static void StartBlobCaptureStream(std::shared_ptr<TestCameraBase>& cameraBase)
     StreamInfo streamInfoCapture = {};
     streamInfoCapture.streamId_ = cameraBase->STREAM_ID_CAPTURE;
     streamInfoCapture.width_ = CAPTURE_WIDTH;
-    streamInfoCapture.height_ = CAPTURE_HEIGHT;
+    streamInfoCapture.height_ = 720;  // 720:capture height
     streamInfoCapture.format_ = PIXEL_FMT_BLOB;
     streamInfoCapture.dataspace_ = dataspace;
     streamInfoCapture.intent_ = STILL_CAPTURE;
@@ -149,6 +149,7 @@ HWTEST_F(CameraBlobCaptureTest, camera_blob_capture_001, TestSize.Level1)
             EXPECT_NE(addr, nullptr);
             EXPECT_GT(size, 100u);
             EXPECT_TRUE(IsValidJpeg(addr, size));
+            cameraBase_->StoreImage(addr, size);
             frameCount_++;
             frameCv_.notify_one();
         });
@@ -200,6 +201,7 @@ HWTEST_F(CameraBlobCaptureTest, camera_blob_capture_002, TestSize.Level1)
             EXPECT_NE(addr, nullptr);
             EXPECT_GT(size, 100u);
             EXPECT_TRUE(IsValidJpeg(addr, size));
+            cameraBase_->StoreImage(addr, size);
             frameCount_++;
             frameCv_.notify_one();
         });
@@ -251,6 +253,7 @@ HWTEST_F(CameraBlobCaptureTest, camera_blob_capture_003, TestSize.Level1)
             EXPECT_TRUE(IsValidJpeg(addr, size));
             EXPECT_EQ(addr[0], 0xFF);
             EXPECT_EQ(addr[1], 0xD8);
+            cameraBase_->StoreImage(addr, size);
             frameCount_++;
             frameCv_.notify_one();
         });
@@ -299,6 +302,7 @@ HWTEST_F(CameraBlobCaptureTest, camera_blob_capture_004, TestSize.Level1)
     cameraBase_->streamCustomerCapture_->ReceiveFrameOn(
         [this](const unsigned char *addr, const uint32_t size) {
             frameCount_++;
+            cameraBase_->StoreImage(addr, size);
             frameCv_.notify_one();
         });
 
@@ -341,6 +345,7 @@ HWTEST_F(CameraBlobCaptureTest, camera_blob_capture_005, TestSize.Level1)
     blobCallback_->Reset();
     cameraBase_->streamCustomerCapture_->ReceiveFrameOn(
         [this](const unsigned char *addr, const uint32_t size) {
+            cameraBase_->StoreImage(addr, size);
             frameCount_++;
             frameCv_.notify_one();
         });
@@ -357,6 +362,7 @@ HWTEST_F(CameraBlobCaptureTest, camera_blob_capture_005, TestSize.Level1)
     blobCallback_->Reset();
     cameraBase_->streamCustomerCapture_->ReceiveFrameOn(
         [this](const unsigned char *addr, const uint32_t size) {
+            cameraBase_->StoreImage(addr, size);
             frameCount_++;
             frameCv_.notify_one();
         });
