@@ -16,7 +16,6 @@
 #include <thread>
 #include <dlfcn.h>
 #include <future>
-#include <securec.h>
 #include "common_timer_errors.h"
 #include "nearlink_hdf_log.h"
 #include "sle_address.h"
