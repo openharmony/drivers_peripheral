@@ -526,7 +526,10 @@ void VendorInterface::OnInitCallback(OffFindErrorCode result)
         if (result == OFF_FIND_SUCCESS) {
             status = OffFindSwitchResult::SUCCESS;
         } else {
-            vendorInterface_->op(OffFindOpcodeT::SLE_OP_OFF_FIND_MODE_DISABLE, nullptr);
+            std::lock_guard<ffrt::recursive_mutex> lock(processMutex_);
+            if (vendorInterface_ != nullptr) {
+                vendorInterface_->op(OffFindOpcodeT::SLE_OP_OFF_FIND_MODE_DISABLE, nullptr);
+            }
         }
     }
     isInitialized_.store(false);
