@@ -43,6 +43,9 @@ ohos_fuzztest("EffectConfigFuzzTest") {
     external_deps += [ "hilog:libhilog" ]
   }
   if (enable_c_utils) {
-    external_deps += [ "c_utils:utils" ]
+    external_deps += [
+      "c_utils:utils",
+      "bounds_checking_function:libsec_shared",
+    ]
   }
 }
