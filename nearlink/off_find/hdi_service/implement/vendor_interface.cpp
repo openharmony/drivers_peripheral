@@ -17,7 +17,6 @@
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <securec.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <thread>

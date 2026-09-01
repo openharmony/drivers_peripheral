@@ -69,6 +69,7 @@ ohos_shared_library("libsle_hci_interface_service_1.1") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_nearlink:nearlink_hci_idl_headers",
       "hdf_core:libhdf_host",
