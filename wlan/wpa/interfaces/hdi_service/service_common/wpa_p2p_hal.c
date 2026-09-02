@@ -575,13 +575,17 @@ static P2pSupplicantErrCode WpaP2pCliCmdReInvite(WifiWpaP2pInterface *this, cons
 
 static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, const struct HdiP2pServiceInfo *argv)
 {
-    if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL || argv->resp == NULL) {
+    if (this == NULL || argv == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-
-    if ((argv->mode == 0 && argv->nameLen == 0) || (argv->mode != 0 && (argv->queryLen == 0 || argv->respLen == 0))) {
+    if (argv->mode == 0) {
+        if (argv->name == NULL || argv->nameLen == 0) {
+            return P2P_SUP_ERRCODE_INPUT_ERROR;
+        }
+    } else if (argv->query == NULL || argv->resp == NULL || argv->queryLen == 0 || argv->respLen == 0) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
+
     unsigned cmdLen;
     if (argv->mode == 0) {
         cmdLen = strlen("P2P_SERVICE_ADD") + 1 + strlen("upnp") + 1 + CMD_INT_MAX_LEN + 1 + argv->nameLen;
@@ -595,11 +599,11 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
     }
     int res;
     if (argv->mode == 0) {
-        res = snprintf_s(cmd, cmdLen + 1, cmdLen, "IFNAME=%s P2P_SERVICE_ADD upnp %d %s", this->ifName,
-            argv->version, (char *) argv->name);
+        res = snprintf_s(cmd, cmdLen + 1, cmdLen, "IFNAME=%s P2P_SERVICE_ADD upnp %d %.*s", this->ifName,
+            argv->version, argv->nameLen, (char *) argv->name);
     } else {
-        res = snprintf_s(cmd, cmdLen + 1, cmdLen, "IFNAME=%s P2P_SERVICE_ADD bonjour %s %s", this->ifName,
-            (char *) argv->query, (char *) argv->resp);
+        res = snprintf_s(cmd, cmdLen + 1, cmdLen, "IFNAME=%s P2P_SERVICE_ADD bonjour %.*s %.*s", this->ifName,
+            argv->queryLen, (char *) argv->query, argv->respLen, (char *) argv->resp);
     }
     if (res < 0) {
         HDF_LOGE("snprintf err");
@@ -618,13 +622,17 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
 
 static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, const struct HdiP2pServiceInfo *argv)
 {
-    if (this == NULL || argv == NULL || argv->name == NULL || argv->query == NULL) {
+    if (this == NULL || argv == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
-
-    if ((argv->mode == 0 && argv->nameLen == 0) || (argv->mode == 1 && argv->queryLen == 0)) {
+    if (argv->mode == 0) {
+        if (argv->name == NULL || argv->nameLen == 0) {
+            return P2P_SUP_ERRCODE_INPUT_ERROR;
+        }
+    } else if (argv->query == NULL || argv->queryLen == 0) {
         return P2P_SUP_ERRCODE_INPUT_ERROR;
     }
+
     unsigned cmdLen;
     if (argv->mode == 0) {
         cmdLen = strlen("P2P_SERVICE_DEL") + 1 + strlen("upnp") + 1 + CMD_INT_MAX_LEN + 1 + argv->nameLen;
@@ -638,11 +646,11 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, co
     }
     int res;
     if (argv->mode == 0) {
-        res = snprintf_s(cmd, cmdLen + 1, cmdLen, "IFNAME=%s P2P_SERVICE_DEL upnp %d %s", this->ifName,
-            argv->version, (char *) argv->name);
+        res = snprintf_s(cmd, cmdLen + 1, cmdLen, "IFNAME=%s P2P_SERVICE_DEL upnp %d %.*s", this->ifName,
+            argv->version, argv->nameLen, (char *) argv->name);
     } else {
-        res = snprintf_s(cmd, cmdLen + 1, cmdLen, "IFNAME=%s P2P_SERVICE_DEL bonjour %s", this->ifName,
-            (char *) argv->query);
+        res = snprintf_s(cmd, cmdLen + 1, cmdLen, "IFNAME=%s P2P_SERVICE_DEL bonjour %.*s", this->ifName,
+            argv->queryLen, (char *) argv->query);
     }
     if (res < 0) {
         HDF_LOGE("snprintf err");
