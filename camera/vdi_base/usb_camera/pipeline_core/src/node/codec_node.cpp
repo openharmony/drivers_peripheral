@@ -234,7 +234,13 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     CAMERA_LOGD("CodecNode::Yuv422ToJpeg begin");
     int ret = 0;
     constexpr uint8_t pixWidthRGB888 = 3;
-    uint32_t tmpBufferSize = buffer->GetWidth() * buffer->GetHeight() * pixWidthRGB888;
+    uint64_t checkSize = static_cast<uint64_t>(buffer->GetWidth()) * buffer->GetHeight() * pixWidthRGB888;
+    if (checkSize == 0 || checkSize > UINT32_MAX) {
+        CAMERA_LOGE("CodecNode::Yuv422ToJpeg fail, buffer size overflow or zero: %{public}llu",
+            static_cast<unsigned long long>(checkSize));
+        return;
+    }
+    uint32_t tmpBufferSize = static_cast<uint32_t>(checkSize);
     void* tmpBufferAddr = malloc(tmpBufferSize);
     if (tmpBufferAddr == nullptr) {
         CAMERA_LOGE("CodecNode::Yuv422ToJpeg fail, malloc tmpBufferAddr fail");
@@ -259,6 +265,11 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     ImageData imageData = {static_cast<uint8_t*>(tmpBufferAddr), tmpBufferSize};
     EncodeJpegToMemory(imageData, jpegdata, nullptr, &jpegSize, &jBuf);
 
+    if (jBuf == nullptr) {
+        CAMERA_LOGE("CodecNode::Yuv422ToJpeg fail, jBuf is null");
+        free(tmpBufferAddr);
+        return;
+    }
     ret = memcpy_s((uint8_t *)buffer->GetSuffaceBufferAddr(), buffer->GetSuffaceBufferSize(), jBuf, jpegSize);
     if (ret == 0) {
         buffer->SetEsFrameSize(jpegSize);

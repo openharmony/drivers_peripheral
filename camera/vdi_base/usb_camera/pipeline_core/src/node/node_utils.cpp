@@ -114,6 +114,10 @@ void NodeUtils::BufferScaleFormatTransform(std::shared_ptr<IBuffer>& buffer, voi
         CAMERA_LOGI("BufferScaleFormatTransform Error buffer == nullptr");
         return;
     }
+    if (buffer->GetVirAddress() == nullptr || buffer->GetSize() == 0) {
+        CAMERA_LOGE("BufferScaleFormatTransform Error, virAddr is null or size is 0");
+        return;
+    }
 
     if (buffer->GetCurWidth() == buffer->GetWidth()
         && buffer->GetCurHeight() == buffer->GetHeight()
@@ -209,6 +213,11 @@ void NodeUtils::BufferTransformForStride(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGI("BufferScaleFormatTransform Error buffer == nullptr");
         return;
     }
+    if (buffer->GetVirAddress() == nullptr || buffer->GetSize() == 0 ||
+        buffer->GetWidth() == 0 || buffer->GetHeight() == 0 || buffer->GetStride() == 0) {
+        CAMERA_LOGE("BufferTransformForStride Error, virAddr is null or size/width/height/stride is 0");
+        return;
+    }
 
     if (buffer->GetCurWidth() != buffer->GetWidth()
         || buffer->GetCurHeight() != buffer->GetHeight()
@@ -232,6 +241,15 @@ void NodeUtils::BufferTransformForStride(std::shared_ptr<IBuffer>& buffer)
     }
 
     buffer->SetIsValidDataInSurfaceBuffer(false);
+
+    uint32_t stride = buffer->GetStride();
+    uint32_t height = buffer->GetHeight();
+    uint64_t expectedSize = static_cast<uint64_t>(stride) * height * 3 / 2;
+    if (expectedSize > buffer->GetSize()) {
+        CAMERA_LOGE("BufferTransformForStride Error, buffer size(%{public}u) < expected(%{public}llu)",
+            buffer->GetSize(), static_cast<unsigned long long>(expectedSize));
+        return;
+    }
 
     uint8_t* bufferForStride = (uint8_t*)buffer->GetVirAddress();
     uint8_t* bufferForStrideMax = bufferForStride + buffer->GetSize();

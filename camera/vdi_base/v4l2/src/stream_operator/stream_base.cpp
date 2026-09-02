@@ -463,10 +463,10 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
             streamId_, request->GetCaptureId(), request->GetEndTime(), request->GetOwnerCount());
         messenger_->SendMessage(shutterMessage);
     }
-    bool isEnded = !request->IsContinous() || request->NeedCancel();
     {
         // inTransitList_ may has multiple copies of continious-capture request, we just need erase one of them.
         std::unique_lock<std::mutex> l(tsLock_);
+        bool isEnded = !request->IsContinous() || request->NeedCancel();
         for (auto it = inTransitList_.begin(); it != inTransitList_.end(); it++) {
             if ((*it) == request) {
                 inTransitList_.erase(it);
