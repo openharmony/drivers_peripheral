@@ -135,6 +135,17 @@ static void ShowData(const float *data, int64_t timesTamp, const struct SensorDe
     (void)HdfSbufWriteString(reply, sensorInfoDate);
 }
 
+static int32_t FindSensorIndexByTypeId(int32_t sensorTypeId)
+{
+    int32_t index;
+    for (index = 0; index < SENSOR_LIST_SIZE; index++) {
+        if (g_sensorList[index].sensorTypeId == sensorTypeId) {
+            return index;
+        }
+    }
+    return -1;
+}
+
 int32_t SensorShowData(struct HdfSBuf *reply)
 {
     int32_t len;
@@ -155,7 +166,8 @@ int32_t SensorShowData(struct HdfSBuf *reply)
         for (len = 0; len < eventDumpList->count; len++) {
             float *data = (float *)(eventDumpList->listDumpArr[len].data);
             int32_t sensorId = eventDumpList->listDumpArr[len].sensorId;
-            if (sensorId < 0 || sensorId >= (int32_t)SENSOR_LIST_SIZE) {
+            int32_t listIndex = FindSensorIndexByTypeId(sensorId);
+            if (listIndex < 0) {
                 HDF_LOGE("%{public}s: invalid sensorId %{public}d", __func__, sensorId);
                 continue;
             }
@@ -168,7 +180,8 @@ int32_t SensorShowData(struct HdfSBuf *reply)
             pos = pos + 1 > MAX_DUMP_DATA_SIZE ? 1 : pos + 1;
             float *data = (float *)(eventDumpList->listDumpArr[pos - 1].data);
             int32_t sensorId = eventDumpList->listDumpArr[pos - 1].sensorId;
-            if (sensorId < 0 || sensorId >= (int32_t)SENSOR_LIST_SIZE) {
+            int32_t listIndex = FindSensorIndexByTypeId(sensorId);
+            if (listIndex < 0) {
                 HDF_LOGE("%{public}s: invalid sensorId %{public}d", __func__, sensorId);
                 continue;
             }
