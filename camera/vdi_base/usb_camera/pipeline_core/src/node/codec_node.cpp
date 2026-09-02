@@ -236,8 +236,7 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     constexpr uint8_t pixWidthRGB888 = 3;
     uint64_t checkSize = static_cast<uint64_t>(buffer->GetWidth()) * buffer->GetHeight() * pixWidthRGB888;
     if (checkSize == 0 || checkSize > UINT32_MAX) {
-        CAMERA_LOGE("CodecNode::Yuv422ToJpeg fail, buffer size overflow or zero: %{public}llu",
-            static_cast<unsigned long long>(checkSize));
+        CAMERA_LOGE("CodecNode::Yuv422ToJpeg fail, buffer size overflow or zero");
         return;
     }
     uint32_t tmpBufferSize = static_cast<uint32_t>(checkSize);
