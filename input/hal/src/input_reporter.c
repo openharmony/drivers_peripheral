@@ -62,6 +62,10 @@ static int32_t EventListenerCallback(struct HdfDevEventlistener *listener, struc
             HDF_LOGE("%s: sbuf read finished or invalid len", __func__);
             break;
         }
+
+        if (pkgs[count] == NULL) {
+            break;
+        }
         count++;
     }
 
