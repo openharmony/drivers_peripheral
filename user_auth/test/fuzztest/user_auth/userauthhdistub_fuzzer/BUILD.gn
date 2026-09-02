@@ -32,6 +32,7 @@ ohos_fuzztest("UserAuthHdiStubFuzzTest") {
   sources = [ "user_auth_hdi_stub_fuzzer.cpp" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_user_auth:libuser_auth_stub_4.0",
     "drivers_interface_user_auth:libuser_auth_stub_4.1",
