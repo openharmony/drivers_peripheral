@@ -693,8 +693,14 @@ RetCode HcsDeal::DealMirrorSupported(
     mirrorSupportU8 = mirrorMap[std::string(nodeValue)];
     CAMERA_LOGD("mirrorSupportU8  = %{public}d", mirrorSupportU8);
 
-    bool ret =
-        metadata->addEntry(OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, static_cast<const void *>(&mirrorSupportU8), 1);
+    // framework 期望 [mode, supportLevel] 成对数组，supportLevel=2 表示支持视频+照片镜像
+    std::vector<uint8_t> mirrorSupported = {
+        static_cast<uint8_t>(SceneMode::NORMAL), mirrorSupportU8,
+        static_cast<uint8_t>(SceneMode::CAPTURE), mirrorSupportU8,
+        static_cast<uint8_t>(SceneMode::VIDEO),  mirrorSupportU8,
+    };
+    bool ret = metadata->addEntry(OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED,
+        mirrorSupported.data(), mirrorSupported.size());
     if (!ret) {
         CAMERA_LOGE("mirrorSupported add failed");
         return RC_ERROR;

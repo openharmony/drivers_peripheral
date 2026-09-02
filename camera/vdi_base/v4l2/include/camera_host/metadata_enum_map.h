@@ -124,9 +124,15 @@ std::map<std::string, camera_meter_mode_t> meterModeMap = {
     {"OHOS_CAMERA_OVERALL_METERING", OHOS_CAMERA_OVERALL_METERING},
 };
 
-std::map<std::string, camera_mirror_t> mirrorMap = {
-    {"OHOS_CAMERA_MIRROR_OFF", OHOS_CAMERA_MIRROR_OFF},
-    {"OHOS_CAMERA_MIRROR_ON",  OHOS_CAMERA_MIRROR_ON }
+std::map<std::string, CameraMirrorSupport> mirrorMap = {
+    {"OHOS_CAMERA_MIRROR_OFF", OHOS_CAMERA_MIRROR_NOT_SUPPORT  },
+    {"OHOS_CAMERA_MIRROR_ON",  OHOS_CAMERA_MIRROR_CAPTURE_VIDEO}
+};
+
+enum SceneMode : int32_t {
+    NORMAL = 0,
+    CAPTURE = 1,
+    VIDEO = 2
 };
 
 std::map<std::string, CameraVideoStabilizationMode> videoStabilizationMap = {
