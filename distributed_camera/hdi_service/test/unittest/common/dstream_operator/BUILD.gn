@@ -66,6 +66,7 @@ ohos_unittest("HdfDstreamOperatorTest") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
   ]
 
   defines = [
@@ -111,6 +112,7 @@ ohos_unittest("DcameraStreamTest") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
   ]
 
   defines = [
