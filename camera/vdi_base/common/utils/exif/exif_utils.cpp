@@ -270,7 +270,7 @@ void ExifUtils::FreeResource(unsigned char *dataBuffer, unsigned char *tempBuffe
     exif_data_unref(exif);
 }
 
-uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &outPutSize)
+uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &bufferSize)
 {
     int32_t ret = RC_ERROR;
     unsigned char *exifData = nullptr;
@@ -306,19 +306,24 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &ou
     if (IsJpegPicture(dataBuffer, dataBufferSize, address) == RC_ERROR) {
         goto error;
     }
-    totalTempBufferSize = EXIF_HEADER_LENGTH + exifBlockLength +  exifDataLength +
-        (static_cast<uint32_t>(dataBufferSize) - IMAGE_DATA_OFFSET);
+totalTempBufferSize = static_cast<int32_t>(EXIF_HEADER_LENGTH + exifBlockLength + exifDataLength +
+        (static_cast<uint32_t>(dataBufferSize) - IMAGE_DATA_OFFSET));
+    if (totalTempBufferSize > bufferSize) {
+        CAMERA_LOGE("%{public}s EXIF output %{public}d exceeds buffer capacity %{public}d", __FUNCTION__,
+            totalTempBufferSize, bufferSize);
+        goto error;
+    }
     tempBuffer = static_cast<unsigned char *>(malloc(totalTempBufferSize));
     if (!tempBuffer) {
         CAMERA_LOGE("%{public}s Allocate temp buf failed.", __FUNCTION__);
         return ret;
     }
     ret = PackageJpeg(tempBuffer, totalTempBufferSize, exifData, exifDataLength, sourceData);
-    outPutSize = totalTempBufferSize;
-    if (memcpy_s(address, totalTempBufferSize, tempBuffer, totalTempBufferSize) != 0) {
+    if (memcpy_s(address, static_cast<uint32_t>(bufferSize), tempBuffer, totalTempBufferSize) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
         return RC_ERROR;
     }
+    bufferSize = totalTempBufferSize;
 
 error:
     FreeResource(dataBuffer, tempBuffer, exif, exifData);
