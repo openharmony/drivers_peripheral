@@ -50,6 +50,7 @@ using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRA_5551;
 using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRX_5551;
 using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGBA_1010102;
 #define TEST_INFO (1<<27)
+
 #ifndef DISPLAY_TEST_CHK_RETURN
 #define DISPLAY_TEST_CHK_RETURN(val, ret, ...) \
     do {                                       \
@@ -619,8 +620,8 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest001, TestSize.Level1)
     };
     BufferHandle* inBuffer = nullptr;
     ret = displayBuffer_->AllocMem(info, inBuffer);
-    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
-    EXPECT_NE(inBuffer, nullptr);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+    ASSERT_NE(inBuffer, nullptr);
 
     BufferHandle* outBuffer = nullptr;
     AllocInfo newInfo = {
@@ -632,8 +633,7 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest001, TestSize.Level1)
 
     ret = displayBuffer_->ReAllocMem(newInfo, *inBuffer, outBuffer);
     EXPECT_TRUE(ret == DISPLAY_SUCCESS);
-    EXPECT_NE(inBuffer, nullptr);
-    EXPECT_NE(outBuffer, nullptr);
+    ASSERT_NE(outBuffer, nullptr);
 
     AllocInfo nullInfo;
     ret = displayBuffer_->ReAllocMem(nullInfo, *inBuffer, outBuffer);
@@ -654,8 +654,8 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest002, TestSize.Level1)
     };
     BufferHandle* inBuffer = nullptr;
     ret = displayBuffer_->AllocMem(info, inBuffer);
-    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
-    EXPECT_NE(inBuffer, nullptr);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+    ASSERT_NE(inBuffer, nullptr);
 
     BufferHandle* outBuffer = nullptr;
     AllocInfo newInfo = {
@@ -667,8 +667,7 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest002, TestSize.Level1)
 
     ret = displayBuffer_->ReAllocMem(newInfo, *inBuffer, outBuffer);
     EXPECT_TRUE(ret == DISPLAY_SUCCESS);
-    EXPECT_NE(inBuffer, nullptr);
-    EXPECT_NE(outBuffer, nullptr);
+    ASSERT_NE(outBuffer, nullptr);
 
     AllocInfo nullInfo;
     ret = displayBuffer_->ReAllocMem(nullInfo, *inBuffer, outBuffer);
@@ -689,8 +688,8 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest003, TestSize.Level1)
     };
     BufferHandle* inBuffer = nullptr;
     ret = displayBuffer_->AllocMem(info, inBuffer);
-    EXPECT_TRUE(ret == DISPLAY_SUCCESS);
-    EXPECT_NE(inBuffer, nullptr);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+    ASSERT_NE(inBuffer, nullptr);
 
     BufferHandle* outBuffer = nullptr;
     AllocInfo newInfo = {
@@ -702,8 +701,7 @@ HWTEST_F(DisplayBufferUt, test_ReAllocMemTest003, TestSize.Level1)
 
     ret = displayBuffer_->ReAllocMem(newInfo, *inBuffer, outBuffer);
     EXPECT_TRUE(ret == DISPLAY_SUCCESS);
-    EXPECT_NE(inBuffer, nullptr);
-    EXPECT_NE(outBuffer, nullptr);
+    ASSERT_NE(outBuffer, nullptr);
 
     AllocInfo nullInfo;
     ret = displayBuffer_->ReAllocMem(nullInfo, *inBuffer, outBuffer);
