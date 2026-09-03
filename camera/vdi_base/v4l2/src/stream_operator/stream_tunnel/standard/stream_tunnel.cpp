@@ -138,6 +138,10 @@ static void PrepareBufferBeforeFlush(const std::shared_ptr<IBuffer>& buffer, con
             buffer->SetIsValidDataInSurfaceBuffer(false);
             return;
         }
+        if (sb->GetVirAddr() == nullptr || buffer->GetVirAddress() == nullptr) {
+            CAMERA_LOGE("null pointer detected, sb virAddr or buffer virAddr is null");
+            return;
+        }
         uint32_t availableSize = (esInfo.size > 0 ? static_cast<uint32_t>(esInfo.size) : buffer->GetSize());
         availableSize = std::min({availableSize, buffer->GetSize(), sb->GetSize()});
         CAMERA_LOGI(

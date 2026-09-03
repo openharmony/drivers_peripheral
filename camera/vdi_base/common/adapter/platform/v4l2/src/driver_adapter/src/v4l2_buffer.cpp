@@ -323,7 +323,8 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
     }
 #endif
     if (memoryType_ == V4L2_MEMORY_MMAP || memoryType_ == V4L2_MEMORY_DMABUF) {
-        if (adapterBufferMap_[buf.index].userBufPtr && adapterBufferMap_[buf.index].start) {
+        if (adapterBufferMap_[buf.index].userBufPtr && adapterBufferMap_[buf.index].start &&
+            adapterBufferMap_[buf.index].cameraBuffer) {
             CAMERA_LOGD("memcpy_s buffer to user buffer, curFormat = %{public}u, bytesused = %{public}u",
                 adapterBufferMap_[buf.index].cameraBuffer->GetCurFormat(), buf.bytesused);
             uint32_t length = adapterBufferMap_[buf.index].length;
@@ -373,6 +374,10 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
 
     if (frameSpec == nullptr) {
         CAMERA_LOGE("V4L2AllocBuffer frameSpec is NULL\n");
+        return RC_ERROR;
+    }
+    if (frameSpec->buffer_ == nullptr) {
+        CAMERA_LOGE("V4L2AllocBuffer frameSpec->buffer_ is NULL\n");
         return RC_ERROR;
     }
 
