@@ -70,7 +70,7 @@ void ExifNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
             uint32_t exifRet = ExifUtils::AddCustomExifInfo(exifInfo, buffer->GetVirAddress(), bufferSize);
             if (exifRet == RC_OK) {
                 CAMERA_LOGI("%{public}s and bufferSize = (%{public}d)\n", __FUNCTION__, bufferSize);
-                buffer->SetEsFrameSize(outPutBufferSize);
+                buffer->SetEsFrameSize(bufferSize);
             } else {
                 CAMERA_LOGE("%{public}s AddCustomExifInfo failed, skip EXIF", __FUNCTION__);
             }
