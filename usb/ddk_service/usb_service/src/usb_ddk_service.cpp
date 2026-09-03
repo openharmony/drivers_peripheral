@@ -625,6 +625,11 @@ int32_t UsbDdkService::SendPipeRequest(
         HDF_LOGE("%{public}s: no permission", __func__);
         return HDF_ERR_NOPERM;
     }
+    if (offset > size || length > size - offset) {
+        HDF_LOGE("%{public}s: invalid offset or bufferLength, size:%{public}u, offset:%{public}u, len:%{public}u",
+            __func__, size, offset, length);
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
@@ -670,7 +675,7 @@ FINISHED:
     }
     uint8_t intfId = GetInterfaceId(pipe.interfaceHandle);
     return g_DdkLibusbAdapter->SendPipeRequest({infoTemp.busNum, infoTemp.devNum}, {intfId, pipe.endpoint}, size,
-        transferedLength, pipe.timeout);
+        offset, length, transferedLength, pipe.timeout);
 #endif // LIBUSB_ENABLE
 }
 
@@ -737,7 +742,7 @@ int32_t UsbDdkService::SendPipeRequestWithAshmem(
     }
     uint8_t intfId = GetInterfaceId(pipe.interfaceHandle);
     return g_DdkLibusbAdapter->SendPipeRequestWithAshmem({infoTemp.busNum, infoTemp.devNum}, {intfId, pipe.endpoint},
-        {ashmem.ashmemFd, ashmem.size}, transferredLength, pipe.timeout);
+        {ashmem.ashmemFd, ashmem.size, ashmem.offset, ashmem.bufferLength}, transferredLength, pipe.timeout);
 #endif // LIBUSB_ENABLE
 }
 
