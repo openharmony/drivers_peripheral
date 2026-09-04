@@ -77,6 +77,8 @@ ohos_unittest("camera_metadata_operator_ut") {
     "googletest:gtest",
     "googletest:gtest_main",
     "graphic_surface:surface",
+    "drivers_interface_camera:libbuffer_handle_sequenceable_1.0",
+    "drivers_interface_camera:libmap_data_sequenceable_1.0",
   ]
   public_configs = [ ":camhdi_at_test_config" ]
 }

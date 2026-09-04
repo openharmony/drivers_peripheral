@@ -63,6 +63,7 @@ ohos_unittest("camera_security_ut") {
     "bounds_checking_function:libsec_shared",
     "ipc:ipc_single",
     "libexif:libexif",
+    "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
   ]
 
   public_configs = [ ":camera_security_ut_config" ]

@@ -51,6 +51,9 @@ dcamera_external_deps = [
   "graphic_surface:sync_fence",
   "hdf_core:libhdi",
   "ipc:ipc_core",
+  "graphic_surface:buffer_handle",
+  "drivers_interface_camera:libbuffer_handle_sequenceable_1.0",
+  "drivers_interface_camera:libmap_data_sequenceable_1.0",
 ]
 
 defines = [
