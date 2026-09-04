@@ -51,7 +51,8 @@ using exif_rational = struct {
 namespace OHOS::Camera {
 class ExifUtils {
 public:
-    static uint32_t AddCustomExifInfo(exif_data info, void *address, int32_t &outPutSize);
+    // bufferSize: input as buffer capacity in bytes for overflow check, output as actual EXIF data size.
+    static uint32_t AddCustomExifInfo(exif_data info, void *address, int32_t &bufferSize);
 
 private:
     static void ConvertGpsDataToDms(double number, int32_t *degrees, int32_t *minutes, int32_t *seconds);

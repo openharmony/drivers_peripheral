@@ -31,6 +31,7 @@ ohos_unittest("camera_security_ut") {
   testonly = true
   module_out_path = module_output_path
   sources = [
+    "exif_utils_capacity_test.cpp",
     "stream_callback_death_test.cpp",
     "$camera_path/../../hdi_service/v1_0/src/stream_operator_service_callback.cpp",
     "$camera_path/../../hdi_service/v1_0/src/camera_service_type_converter.cpp",
