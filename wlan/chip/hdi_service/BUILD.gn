@@ -160,6 +160,7 @@ if (drivers_peripheral_wlan_feature_vendor == "default") {
 
     if (is_standard_system) {
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "c_utils:utils",
         "drivers_interface_wlan:chip_idl_headers_2.0",
         "hdf_core:libhdf_ipc_adapter",
