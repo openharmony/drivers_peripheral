@@ -38,6 +38,7 @@ ohos_shared_library("libgeofence_interface_service_3.0") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_location_geofence:location_geofence_idl_headers",
       "drivers_peripheral_location_gnss:libgnss_interface_service_2.0",
