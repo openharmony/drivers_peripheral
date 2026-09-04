@@ -35,6 +35,7 @@ ohos_shared_library("libcodec_image_service_2.1") {
   defines = [ "LOG_TAG_IMAGE" ]
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_codec:libimage_stub_2.1",
       "graphic_surface:buffer_handle",
@@ -50,7 +51,7 @@ ohos_shared_library("libcodec_image_service_2.1") {
   } else {
     external_deps = [ 
       "bounds_checking_function:libsec_shared",
-      "hilog:libhilog"                
+      "hilog:libhilog"
     ]
   }
 

@@ -29,6 +29,7 @@ ohos_benchmarktest("hdf_codec_benchmark_test") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_codec:libcodec_proxy_4.0",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",

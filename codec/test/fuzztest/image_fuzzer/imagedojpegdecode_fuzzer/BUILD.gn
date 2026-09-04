@@ -27,6 +27,7 @@ ohos_fuzztest("ImageDoJpegDecodeFuzzTest") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_codec:libimage_proxy_2.1",
     "hdf_core:libhdf_host",

@@ -29,6 +29,7 @@ ohos_fuzztest("CodecHdiFuzzTest") {
   sources = [ "codec_fuzzer.cpp" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_codec:libcodec_stub_4.0",
     "hdf_core:libhdf_ipc_adapter",
