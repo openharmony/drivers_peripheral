@@ -26,6 +26,7 @@ ohos_executable("codec_heif_encode") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_codec:libimage_proxy_2.1",
       "drivers_interface_display:libdisplay_buffer_proxy_1.0",
@@ -63,6 +64,7 @@ ohos_executable("codec_heif_decode") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_codec:libimage_proxy_2.1",
       "drivers_interface_display:libdisplay_buffer_proxy_1.0",
