@@ -181,7 +181,6 @@ int32_t DCameraHost::OpenCameraImpl(const std::string &cameraId, const Callback 
         DHLOGE("OpenCameraImpl, dcamera device %{public}s already opened.", GetAnonyString(cameraId).c_str());
         return CamRetCode::CAMERA_BUSY;
     }
-
     CamRetCode ret = dcameraDevice->OpenDCamera(callbackObj);
     if (ret != CamRetCode::NO_ERROR) {
         DHLOGE("OpenCameraImpl, open camera failed.");

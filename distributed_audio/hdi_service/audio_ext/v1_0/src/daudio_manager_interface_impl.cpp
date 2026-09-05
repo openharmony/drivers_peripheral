@@ -17,9 +17,11 @@
 
 #include <hdf_base.h>
 
+#include "cJSON.h"
 #include "daudio_errcode.h"
 #include "daudio_log.h"
 #include "daudio_utils.h"
+
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioManagerInterfaceImpl"
@@ -60,7 +62,9 @@ int32_t DAudioManagerInterfaceImpl::RegisterAudioDevice(const std::string &adpNa
         return HDF_FAILURE;
     }
 
-    int32_t ret = audioMgr_->AddAudioDevice(adpName, devId, capability, callbackObj);
+    std::string param = capability;
+
+    int32_t ret = audioMgr_->AddAudioDevice(adpName, devId, param, callbackObj);
     if (ret != DH_SUCCESS) {
         DHLOGE("Register audio device failed, ret = %{public}d", ret);
         return HDF_FAILURE;
@@ -97,8 +101,24 @@ int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int3
         return HDF_FAILURE;
     }
 
+    DAudioEvent newEvent = event;
+    uint32_t triggerFirstTokenId = audioMgr_->GetTriggerFirstTokenId();
+    if (triggerFirstTokenId != 0) {
+        cJSON *json = cJSON_Parse(newEvent.content.c_str());
+        if (json != nullptr) {
+            cJSON_AddNumberToObject(json, KEY_TRIGGER_FIRST_TOKENID, static_cast<double>(triggerFirstTokenId));
+            char *jsonStr = cJSON_PrintUnformatted(json);
+            std::string newContent(jsonStr);
+            cJSON_Delete(json);
+            cJSON_free(jsonStr);
+            newEvent.content = newContent;
+        }
+        DHLOGI("[MultiUserTrigger] NotifyEvent triggerFirstTokenId=%{public}s, pass to daudio SA",
+            GetAnonyString(std::to_string(triggerFirstTokenId)).c_str());
+    }
+
     DHLOGI("Notify event. event type = %{public}d", event.type);
-    int32_t ret = audioMgr_->Notify(adpName, devId, streamId, event);
+    int32_t ret = audioMgr_->Notify(adpName, devId, streamId, newEvent);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify audio event failed. ret = %{public}d", ret);
         return HDF_FAILURE;

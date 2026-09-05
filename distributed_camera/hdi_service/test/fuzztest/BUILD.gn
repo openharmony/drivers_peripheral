@@ -56,5 +56,7 @@ group("hdf_dcamera_fuzztest") {
     "dstreamdetachbufferqueue_fuzzer:fuzztest",
     "dstreamgetstreamattributes_fuzzer:fuzztest",
     "dstreamreleasestreams_fuzzer:fuzztest",
+    "dcameraprovidernotifytrigger_fuzzer:fuzztest",
+    "dcameraproviderenabletrigger_fuzzer:fuzztest",
   ]
 }

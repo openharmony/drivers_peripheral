@@ -36,6 +36,12 @@ using OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent;
 using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioCallback;
 using OHOS::HDI::DistributedAudio::Audioext::V3_0::IDAudioHdfCallback;
 
+static constexpr const char *KEY_TOKEN_IDS = "TokenIds=";
+static constexpr const char *KEY_TRIGGER_FIRST_TOKENID = "triggerFirstTokenId";
+static constexpr const char *KEY_TRIGGER_FIRST_TOKENID_EXT = "triggerFirstTokenId=";
+static constexpr const char *EXT_PARAM_DELIMITERS = ";&";
+static constexpr const int32_t DECIMAL_BASE = 10;
+
 typedef struct {
     std::string adapterName;
     uint32_t dhId;
@@ -74,6 +80,8 @@ public:
     int32_t RegisterAudioHdfListener(const std::string &serviceName, const sptr<IDAudioHdfCallback> &callbackObj);
     int32_t UnRegisterAudioHdfListener(const std::string &serviceName);
     bool GetAudioMgrState();
+    void SetTriggerFirstTokenId(uint32_t tokenId);
+    uint32_t GetTriggerFirstTokenId();
 
 private:
     AudioManagerInterfaceImpl();
@@ -143,6 +151,7 @@ private:
     std::map<std::string, bool> mapAddFlags_;
     std::mutex hdfCallbackMapMtx_;
     std::map<std::string, sptr<IDAudioHdfCallback>> mapAudioHdfCallback_;
+    uint32_t triggerFirstTokenId_ = 0;
     std::atomic<bool> isDestruct_ = false;
 };
 } // V2_0

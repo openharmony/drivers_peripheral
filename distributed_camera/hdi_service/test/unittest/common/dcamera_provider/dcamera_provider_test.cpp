@@ -604,5 +604,64 @@ HWTEST_F(DcameraProviderTest, Notify_005, TestSize.Level1)
     auto ret = DCameraProvider::GetInstance()->Notify(dhBase, event);
     EXPECT_NE(ret, DCamRetCode::DEVICE_NOT_INIT);
 }
+
+HWTEST_F(DcameraProviderTest, Notify_006, TestSize.Level1)
+{
+    DHBase dhBase;
+    DCameraHDFEvent event;
+    dhBase.deviceId_ = "deviceId";
+    dhBase.dhId_ = "dhId";
+    event.type_ = DCameraEventType::DCAMERE_FORCE_SWITCH;
+    event.content_ = "{\"key\":\"val\"}";
+    auto ret = DCameraProvider::GetInstance()->Notify(dhBase, event);
+    EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
+}
+
+HWTEST_F(DcameraProviderTest, Notify_007, TestSize.Level1)
+{
+    DHBase dhBase;
+    DCameraHDFEvent event;
+    dhBase.deviceId_ = "deviceId";
+    dhBase.dhId_ = "dhId";
+    event.type_ = DCameraEventType::DCAMERA_MESSAGE;
+    event.content_ = "content";
+    auto ret = DCameraProvider::GetInstance()->Notify(dhBase, event);
+    EXPECT_EQ(ret, DCamRetCode::SUCCESS);
+}
+
+HWTEST_F(DcameraProviderTest, Notify_008, TestSize.Level1)
+{
+    DHBase dhBase;
+    DCameraHDFEvent event;
+    dhBase.deviceId_ = "";
+    dhBase.dhId_ = "";
+    event.content_ = "content";
+    auto ret = DCameraProvider::GetInstance()->Notify(dhBase, event);
+    EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
+}
+
+HWTEST_F(DcameraProviderTest, Notify_009, TestSize.Level1)
+{
+    DHBase dhBase;
+    DCameraHDFEvent event;
+    dhBase.deviceId_ = "devId999";
+    dhBase.dhId_ = "dhId999";
+    event.type_ = DCameraEventType::DCAMERE_FORCE_SWITCH;
+    event.content_ = "";
+    auto ret = DCameraProvider::GetInstance()->Notify(dhBase, event);
+    EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
+}
+
+HWTEST_F(DcameraProviderTest, Notify_010, TestSize.Level1)
+{
+    DHBase dhBase;
+    DCameraHDFEvent event;
+    dhBase.deviceId_ = "devIdNotify";
+    dhBase.dhId_ = "dhIdNotify";
+    event.type_ = DCameraEventType::DCAMERA_MESSAGE;
+    event.content_ = "{\"test\":\"data\"}";
+    auto ret = DCameraProvider::GetInstance()->Notify(dhBase, event);
+    EXPECT_EQ(ret, DCamRetCode::INVALID_ARGUMENT);
+}
 }
 }

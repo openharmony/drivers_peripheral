@@ -411,7 +411,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, SetExtraParams_001, TestSize.Level1)
 {
     audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     std::string keyValueList;
-    EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->SetExtraParams(keyValueList));
 }
 
 /**
@@ -512,6 +512,54 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetCaptureDesc_001, TestSize.Level1)
     EXPECT_EQ(desc_.portId, descriptorTmp.portId);
     EXPECT_EQ(desc_.pins, descriptorTmp.pins);
     EXPECT_EQ(desc_.desc, descriptorTmp.desc);
+}
+
+HWTEST_F(AudioCaptureInterfaceImplTest, SetExtraParams_002, TestSize.Level1)
+{
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(
+        adpName_, desc_, attrs_, callback_);
+    std::string keyValueList = "no_token_ids_here";
+    EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+HWTEST_F(AudioCaptureInterfaceImplTest, SetExtraParams_003, TestSize.Level1)
+{
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(
+        adpName_, desc_, attrs_, callback_);
+    std::string keyValueList = "TokenIds=12345";
+    EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+HWTEST_F(AudioCaptureInterfaceImplTest, SetExtraParams_004, TestSize.Level1)
+{
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(
+        adpName_, desc_, attrs_, callback_);
+    std::string keyValueList = "key1=val;TokenIds=67890;key2=val";
+    EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+HWTEST_F(AudioCaptureInterfaceImplTest, SetExtraParams_005, TestSize.Level1)
+{
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(
+        adpName_, desc_, attrs_, callback_);
+    std::string keyValueList = "TokenIds=abc";
+    EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+HWTEST_F(AudioCaptureInterfaceImplTest, SetExtraParams_006, TestSize.Level1)
+{
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(
+        adpName_, desc_, attrs_, callback_);
+    std::string keyValueList = "TokenIds=99999999999";
+    EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+HWTEST_F(AudioCaptureInterfaceImplTest, SetExtraParams_007, TestSize.Level1)
+{
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(
+        adpName_, desc_, attrs_, callback_);
+    std::string keyValueList = "";
+    EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->SetExtraParams(keyValueList));
 }
 } // V2_0
 } // Audio
