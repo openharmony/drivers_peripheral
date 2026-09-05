@@ -304,6 +304,26 @@ HWTEST_F(AudioManagerInterfaceImplTest, RegisterAudioHdfListener_001, TestSize.L
     sptr<IDAudioHdfCallback> callback = nullptr;
     EXPECT_EQ(HDF_FAILURE, audioManagerInterfaceImpl_->RegisterAudioHdfListener(adpName, callback));
 }
+
+HWTEST_F(AudioManagerInterfaceImplTest, SetTriggerFirstTokenId_001, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    audioManagerInterfaceImpl_->SetTriggerFirstTokenId(0);
+    EXPECT_EQ(0u, audioManagerInterfaceImpl_->GetTriggerFirstTokenId());
+    audioManagerInterfaceImpl_->SetTriggerFirstTokenId(12345);
+    EXPECT_EQ(12345u, audioManagerInterfaceImpl_->GetTriggerFirstTokenId());
+    audioManagerInterfaceImpl_->SetTriggerFirstTokenId(0);
+    EXPECT_EQ(0u, audioManagerInterfaceImpl_->GetTriggerFirstTokenId());
+}
+
+HWTEST_F(AudioManagerInterfaceImplTest, SetTriggerFirstTokenId_002, TestSize.Level1)
+{
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
+    uint32_t tokenId = 99999;
+    audioManagerInterfaceImpl_->SetTriggerFirstTokenId(tokenId);
+    EXPECT_EQ(tokenId, audioManagerInterfaceImpl_->GetTriggerFirstTokenId());
+    audioManagerInterfaceImpl_->SetTriggerFirstTokenId(0);
+}
 } // V2_0
 } // Audio
 } // Distributedaudio

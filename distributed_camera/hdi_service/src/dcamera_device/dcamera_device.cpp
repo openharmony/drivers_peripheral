@@ -22,6 +22,7 @@
 #include "dcamera_provider.h"
 #include "distributed_hardware_log.h"
 #include "metadata_utils.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -425,6 +426,10 @@ CamRetCode DCameraDevice::OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &c
     }
     DHLOGI("DCameraDevice::OpenDCamera, distributed camera: %{public}s", GetAnonyString(dCameraId_).c_str());
     openSessNotified_.store(false);
+    DCameraHDFEvent dCameraEvent;
+    dCameraEvent.type_ = DCameraEventType::DCAMERE_NOTIFY_TOKENID;
+    provider->Notify(dhBase_, dCameraEvent);
+
     int32_t ret = provider->OpenSession(dhBase_);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("Open distributed camera control session failed, ret = %{public}d.", ret);

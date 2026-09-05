@@ -400,6 +400,18 @@ bool AudioManagerInterfaceImpl::GetAudioMgrState()
     return isDestruct_.load();
 }
 
+void AudioManagerInterfaceImpl::SetTriggerFirstTokenId(uint32_t tokenId)
+{
+    triggerFirstTokenId_ = tokenId;
+    DHLOGI("[MultiUserTrigger] SetTriggerFirstTokenId triggerFirstTokenId=%{public}s",
+        GetAnonyString(std::to_string(tokenId)).c_str());
+}
+
+uint32_t AudioManagerInterfaceImpl::GetTriggerFirstTokenId()
+{
+    return triggerFirstTokenId_;
+}
+
 int32_t AudioManagerInterfaceImpl::RegisterAudioHdfListener(const std::string &serviceName,
     const sptr<IDAudioHdfCallback> &callbackObj)
 {

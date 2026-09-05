@@ -23,6 +23,7 @@
 
 #include "cJSON.h"
 
+#include "audio_manager_interface_impl.h"
 #include "daudio_constants.h"
 #include "daudio_errcode.h"
 #include "daudio_events.h"
@@ -519,7 +520,7 @@ int32_t AudioAdapterInterfaceImpl::SetVoiceVolume(float volume)
 int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const std::string &condition,
     const std::string &value)
 {
-    DHLOGD("Set audio parameters, key = %{public}d, condition: %{public}s value: %{public}s.", key,
+    DHLOGI("Set audio parameters, key = %{public}d, condition: %{public}s value: %{public}s.", key,
         condition.c_str(), value.c_str());
     int32_t ret = ERR_DH_AUDIO_HDF_FAIL;
     switch (key) {
@@ -538,8 +539,10 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
             }
             break;
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE:
+            if (HandleTriggerTokenId(value)) {
+                break;
+            }
             if (value == SCENE_VALUE) {
-                DHLOGI("value equal SCENE_VALUE.");
                 ret = SetEnhanceParam(condition, RECORD_VALUE);
                 if (ret != DH_SUCCESS) {
                     DHLOGE("set enhance param notify failed.");
@@ -557,8 +560,31 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
             DHLOGE("Parameter is invalid.");
             return HDF_ERR_INVALID_PARAM;
     }
-    DHLOGI("Set audio parameters success.");
     return HDF_SUCCESS;
+}
+
+bool AudioAdapterInterfaceImpl::HandleTriggerTokenId(const std::string &value)
+{
+    if (value.find(KEY_TOKEN_IDS) == std::string::npos ||
+        value.find(RECORD_SCENE + "=") != std::string::npos) {
+        return false;
+    }
+    std::string tokenIdStr = value.substr(value.find(KEY_TOKEN_IDS) + std::string(KEY_TOKEN_IDS).length());
+    size_t endPos = tokenIdStr.find_first_of(EXT_PARAM_DELIMITERS);
+    if (endPos != std::string::npos) {
+        tokenIdStr = tokenIdStr.substr(0, endPos);
+    }
+    errno = 0;
+    char *endPtr = nullptr;
+    unsigned long tokenIdVal = strtoul(tokenIdStr.c_str(), &endPtr, DECIMAL_BASE);
+    if (endPtr == tokenIdStr.c_str() || *endPtr != '\0' || errno != 0 ||
+        tokenIdVal > 0xFFFFFFFFUL) {
+        DHLOGE("Invalid TokenIds value: %{public}s", GetAnonyString(tokenIdStr).c_str());
+        return false;
+    }
+    uint32_t tokenId = static_cast<uint32_t>(tokenIdVal);
+    AudioManagerInterfaceImpl::GetAudioManager()->SetTriggerFirstTokenId(tokenId);
+    return true;
 }
 
 std::string AudioAdapterInterfaceImpl::HandleConditionGetCaps(const std::string &condition)
@@ -921,7 +947,12 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
     captureParam_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount,
         attrs.format, captureParam_.period, capturerFlags_ == Audioext::V3_0::MMAP_MODE);
     captureParam_.capturerFlags = capturerFlags_;
-
+    uint32_t triggerTokenId = AudioManagerInterfaceImpl::GetAudioManager()->GetTriggerFirstTokenId();
+    if (triggerTokenId != 0) {
+        captureParam_.ext = KEY_TRIGGER_FIRST_TOKENID_EXT + std::to_string(triggerTokenId);
+        DHLOGI("[MultiUserTrigger] OpenCaptureDevice set triggerFirstTokenId=%{public}s in captureParam_.ext",
+            GetAnonyString(std::to_string(triggerTokenId)).c_str());
+    }
     if (extMicCallback == nullptr) {
         DHLOGE("Callback is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;

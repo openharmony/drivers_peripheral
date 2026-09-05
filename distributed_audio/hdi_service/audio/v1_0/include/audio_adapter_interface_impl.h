@@ -160,6 +160,7 @@ private:
     int32_t HandleWaudioEnable(const DAudioEvent &event);
     int32_t SetUsualParamChange(const std::string &condition, const std::string &value);
     int32_t SetEnhanceParam(const std::string &condition, const std::string &value);
+    bool HandleTriggerTokenId(const std::string &value);
     int32_t HandleTokenIdFromCapability(const uint32_t devId, const std::string &capability);
     std::string HandleConditionGetCaps(const std::string &condition);
     void ClearSpkPinInUse(const uint32_t devId);

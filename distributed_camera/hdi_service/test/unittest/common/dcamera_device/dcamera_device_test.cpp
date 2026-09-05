@@ -566,5 +566,45 @@ HWTEST_F(DCameraDeviceTest, dcamera_device_test_023, TestSize.Level1)
     rc = dcameraDevice_->UpdateSettings(settings);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 }
+
+HWTEST_F(DCameraDeviceTest, dcamera_device_test_024, TestSize.Level1)
+{
+    ASSERT_NE(dcameraDevice_, nullptr);
+    MockDCameraProvider::SetInstance(nullptr);
+    sptr<HDI::Camera::V1_0::MockCameraDeviceCallback> callback =
+        new HDI::Camera::V1_0::MockCameraDeviceCallback();
+    CamRetCode rc = dcameraDevice_->OpenDCamera(callback);
+    EXPECT_EQ(rc, CamRetCode::DEVICE_ERROR);
+}
+
+HWTEST_F(DCameraDeviceTest, dcamera_device_test_025, TestSize.Level1)
+{
+    ASSERT_NE(dcameraDevice_, nullptr);
+    g_providerMockRet = "OpenSession_Fail";
+    sptr<HDI::Camera::V1_0::MockCameraDeviceCallback> callback =
+        new HDI::Camera::V1_0::MockCameraDeviceCallback();
+    CamRetCode rc = dcameraDevice_->OpenDCamera(callback);
+    EXPECT_EQ(rc, CamRetCode::DEVICE_ERROR);
+    g_providerMockRet = "";
+}
+
+HWTEST_F(DCameraDeviceTest, dcamera_device_test_026, TestSize.Level1)
+{
+    ASSERT_NE(dcameraDevice_, nullptr);
+    sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback = nullptr;
+    CamRetCode rc = dcameraDevice_->OpenDCamera(callback);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
+}
+
+HWTEST_F(DCameraDeviceTest, dcamera_device_test_027, TestSize.Level1)
+{
+    ASSERT_NE(dcameraDevice_, nullptr);
+    dcameraDevice_->isOpened_ = true;
+    sptr<HDI::Camera::V1_0::MockCameraDeviceCallback> callback =
+        new HDI::Camera::V1_0::MockCameraDeviceCallback();
+    CamRetCode rc = dcameraDevice_->OpenDCamera(callback);
+    EXPECT_EQ(rc, CamRetCode::DEVICE_ERROR);
+    dcameraDevice_->isOpened_ = false;
+}
 }
 }

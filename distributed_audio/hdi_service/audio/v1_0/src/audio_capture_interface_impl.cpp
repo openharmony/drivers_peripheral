@@ -15,6 +15,8 @@
 
 #include "audio_capture_interface_impl.h"
 
+#include <cerrno>
+#include <cstdlib>
 #include <hdf_base.h>
 #include <unistd.h>
 #include "sys/time.h"
@@ -22,6 +24,7 @@
 
 #include "cJSON.h"
 
+#include "audio_manager_interface_impl.h"
 #include "daudio_constants.h"
 #include "daudio_events.h"
 #include "daudio_log.h"
@@ -333,8 +336,33 @@ int32_t AudioCaptureInterfaceImpl::GetCurrentChannelId(uint32_t &channelId)
 
 int32_t AudioCaptureInterfaceImpl::SetExtraParams(const std::string &keyValueList)
 {
-    DHLOGI("Set extra parameters, not support yet.");
-    (void)keyValueList;
+    DHLOGI("Set extra parameters, keyValueList: %{public}s", GetAnonyString(keyValueList).c_str());
+    if (keyValueList.empty()) {
+        DHLOGE("Extra params is empty.");
+        return HDF_FAILURE;
+    }
+    const std::string tokenKey = KEY_TOKEN_IDS;
+    size_t pos = keyValueList.find(tokenKey);
+    if (pos == std::string::npos) {
+        DHLOGE("TokenIds not found in keyValueList.");
+        return HDF_FAILURE;
+    }
+    std::string tokenIdStr = keyValueList.substr(pos + tokenKey.length());
+    size_t endPos = tokenIdStr.find_first_of(EXT_PARAM_DELIMITERS);
+    if (endPos != std::string::npos) {
+        tokenIdStr = tokenIdStr.substr(0, endPos);
+    }
+    errno = 0;
+    char *endPtr = nullptr;
+    unsigned long tokenIdVal = strtoul(tokenIdStr.c_str(), &endPtr, DECIMAL_BASE);
+    if (endPtr == tokenIdStr.c_str() || *endPtr != '\0' || errno != 0 ||
+        tokenIdVal > 0xFFFFFFFFUL) {
+        DHLOGE("Invalid TokenIds value: %{public}s", GetAnonyString(tokenIdStr).c_str());
+        return HDF_FAILURE;
+    }
+    uint32_t tokenId = static_cast<uint32_t>(tokenIdVal);
+    AudioManagerInterfaceImpl::GetAudioManager()->SetTriggerFirstTokenId(tokenId);
+    DHLOGI("[MultiUserTrigger] SetExtraParams received TokenIds=%{public}u", tokenId);
     return HDF_SUCCESS;
 }
 

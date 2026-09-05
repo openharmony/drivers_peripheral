@@ -15,14 +15,18 @@
 
 #include "dcamera_provider.h"
 #include "anonymous_string.h"
+#include "cJSON.h"
 #include "constants.h"
 #include "dcamera_device.h"
 #include "dcamera_host.h"
 #include "distributed_hardware_log.h"
 #include "dcamera.h"
+#include "ipc_skeleton.h"
+
 
 namespace OHOS {
 namespace DistributedHardware {
+static constexpr const char *KEY_TRIGGER_FIRST_TOKENID = "triggerFirstTokenId";
 OHOS::sptr<DCameraProvider> DCameraProvider::instance_ = nullptr;
 DCameraProvider::AutoRelease DCameraProvider::autoRelease_;
 
@@ -87,6 +91,7 @@ bool DCameraProvider::GetAbilityInfo(const std::string& abilityInfo, std::string
 int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::string& abilityInfo,
     const sptr<IDCameraProviderCallback>& callbackObj)
 {
+    DHLOGI("[MultiUserTrigger] EnableDCameraDevice");
     if (IsDhBaseInfoInvalid(dhBase)) {
         DHLOGE("DCameraProvider::EnableDCameraDevice, devId or dhId is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
@@ -103,6 +108,8 @@ int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::st
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
+    std::string modifiedAbilityInfo = abilityInfo;
+
     OHOS::sptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
     if (dCameraHost == nullptr) {
         DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera host is null.");
@@ -110,7 +117,7 @@ int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::st
     }
     std::string sourceCodecInfo;
     std::string sinkAbilityInfo;
-    if (!GetAbilityInfo(abilityInfo, sinkAbilityInfo, sourceCodecInfo)) {
+    if (!GetAbilityInfo(modifiedAbilityInfo, sinkAbilityInfo, sourceCodecInfo)) {
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
@@ -236,11 +243,28 @@ int32_t DCameraProvider::Notify(const DHBase& dhBase, const DCameraHDFEvent& eve
     DHLOGI("DCameraProvider::Notify for {devId: %{public}s, dhId: %{public}s}.",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
-    if (event.type_ == DCAMERE_FORCE_SWITCH) {
+    DCameraHDFEvent modifiedEvent = event;
+    uint32_t triggerFirstTokenId = OHOS::IPCSkeleton::GetFirstTokenID();
+    DHLOGI("[MultiUserTrigger]  triggerFirstTokenId %{public}d", triggerFirstTokenId);
+    if (triggerFirstTokenId != 0) {
+        cJSON *json = cJSON_Parse(modifiedEvent.content_.c_str());
+        if (json != nullptr) {
+            cJSON_AddNumberToObject(json, KEY_TRIGGER_FIRST_TOKENID, static_cast<double>(triggerFirstTokenId));
+            char *jsonStr = cJSON_PrintUnformatted(json);
+            std::string newContent(jsonStr);
+            cJSON_Delete(json);
+            cJSON_free(jsonStr);
+            modifiedEvent.content_ = newContent;
+        }
+        DHLOGI("[MultiUserTrigger] Notify triggerFirstTokenId=%{public}s from GetFirstTokenID",
+            GetAnonyString(std::to_string(triggerFirstTokenId)).c_str());
+    }
+
+    if (modifiedEvent.type_ == DCAMERE_FORCE_SWITCH || modifiedEvent.type_ == DCAMERE_NOTIFY_TOKENID) {
         sptr<IDCameraProviderCallback> callback = GetCallbackBydhBase(dhBase);
         CHECK_NULL_RETURN_LOG(callback, DCamRetCode::INVALID_ARGUMENT,
             "DCameraProvider::Notify failed, dcamera provider callback not found.");
-        callback->NotifyEvent(dhBase, event);
+        callback->NotifyEvent(dhBase, modifiedEvent);
         return DCamRetCode::SUCCESS;
     }
 
@@ -251,9 +275,9 @@ int32_t DCameraProvider::Notify(const DHBase& dhBase, const DCameraHDFEvent& eve
     }
 
     std::shared_ptr<DCameraHDFEvent> dCameraEvent = std::make_shared<DCameraHDFEvent>();
-    dCameraEvent->type_ = event.type_;
-    dCameraEvent->result_ = event.result_;
-    dCameraEvent->content_ = event.content_;
+    dCameraEvent->type_ = modifiedEvent.type_;
+    dCameraEvent->result_ = modifiedEvent.result_;
+    dCameraEvent->content_ = modifiedEvent.content_;
     return device->Notify(dCameraEvent);
 }
 
@@ -466,5 +490,6 @@ OHOS::sptr<DCameraDevice> DCameraProvider::GetDCameraDevice(const DHBase &dhBase
     }
     return dCameraHost->GetDCameraDeviceByDHBase(dhBase);
 }
+
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -2608,6 +2608,82 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_019, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
     EXPECT_EQ(DH_SUCCESS, AdapterTest_->RemoveAudioDevice(devId));
 }
+
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTriggerTokenId_001, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    std::string value = "TokenIds=12345";
+    EXPECT_EQ(true, AdapterTest_->HandleTriggerTokenId(value));
+}
+
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTriggerTokenId_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    std::string value = "no_token_ids_here";
+    EXPECT_EQ(false, AdapterTest_->HandleTriggerTokenId(value));
+}
+
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTriggerTokenId_003, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    std::string value = "RECORD_SCENE=high-definition-record";
+    EXPECT_EQ(false, AdapterTest_->HandleTriggerTokenId(value));
+}
+
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTriggerTokenId_004, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    std::string value = "key1=val;TokenIds=67890;key2=val";
+    EXPECT_EQ(true, AdapterTest_->HandleTriggerTokenId(value));
+}
+
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTriggerTokenId_005, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    std::string value = "TokenIds=abc";
+    EXPECT_EQ(false, AdapterTest_->HandleTriggerTokenId(value));
+}
+
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTriggerTokenId_006, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    std::string value = "TokenIds=99999999999";
+    EXPECT_EQ(false, AdapterTest_->HandleTriggerTokenId(value));
+}
+
+HWTEST_F(AudioAdapterInterfaceImpTest, HandleTriggerTokenId_007, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    std::string value = "";
+    EXPECT_EQ(false, AdapterTest_->HandleTriggerTokenId(value));
+}
+
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_TriggerTokenId_001, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "cond";
+    std::string value = "TokenIds=54321";
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
+}
+
+HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_TriggerTokenId_002, TestSize.Level1)
+{
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+    AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
+    std::string condition = "cond";
+    std::string value = "no_token_ids";
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->SetExtraParams(key, condition, value));
+}
 } // namespace V2_0
 } // namespace Audio
 } // namespace DistributedAudio

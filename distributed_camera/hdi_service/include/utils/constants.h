@@ -87,6 +87,7 @@ typedef enum {
     DCAMERA_SINK_STOP = 2,
     DCAMERE_GETFULLCAP = 3,
     DCAMERE_FORCE_SWITCH = 4,
+    DCAMERE_NOTIFY_TOKENID = 5,
 } DCameraEventType;
 
 typedef enum {
