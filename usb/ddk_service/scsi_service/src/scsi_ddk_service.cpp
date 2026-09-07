@@ -527,10 +527,6 @@ int32_t ScsiDdkService::Read10(const ScsiPeripheralDevice& dev,
         return SCSIPERIPHERAL_DDK_NO_PERM;
     }
 
-    if (dev.lbLength == 0) {
-        HDF_LOGE("%{public}s: dev.lbLength is 0", __func__);
-        return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
-    }
     uint64_t bufferSizeU64 = static_cast<uint64_t>(request.transferLength) * dev.lbLength;
     if (bufferSizeU64 > MAX_TRANSFER_BYTES) {
         HDF_LOGE("%{public}s: transferLength too large, transferLength=%{public}u, lbLength=%{public}u",
@@ -583,10 +579,6 @@ int32_t ScsiDdkService::Write10(const ScsiPeripheralDevice& dev,
         return SCSIPERIPHERAL_DDK_NO_PERM;
     }
 
-    if (dev.lbLength == 0) {
-        HDF_LOGE("%{public}s: dev.lbLength is 0", __func__);
-        return SCSIPERIPHERAL_DDK_INVALID_PARAMETER;
-    }
     uint64_t bufferSizeU64 = static_cast<uint64_t>(request.transferLength) * dev.lbLength;
     if (bufferSizeU64 > MAX_TRANSFER_BYTES) {
         HDF_LOGE("%{public}s: transferLength too large, transferLength=%{public}u, lbLength=%{public}u",

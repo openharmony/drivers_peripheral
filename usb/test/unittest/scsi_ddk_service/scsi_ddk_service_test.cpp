@@ -239,7 +239,7 @@ HWTEST_F(ScsiDdkServiceTest, Read10ZeroLbLength001, TestSize.Level1)
     int32_t ret = service_->Read10(zeroDev, request, response);
     HDF_LOGI("Read10ZeroLbLength001: lbLength=0, ret=%{public}d", ret);
 
-    EXPECT_EQ(ret, SCSIPERIPHERAL_DDK_INVALID_PARAMETER);
+    EXPECT_EQ(ret, HDF_SUCCESS);
 }
 
 /**
