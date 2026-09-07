@@ -4,8 +4,8 @@
 工作的 OpenCode 智能体。本仓**只实现服务**，不含接口定义；接口定义在
 `drivers_interface` 各对应仓。
 
-> 嵌套指引：本仓内每个一级子模块目录下均设有 `agent.md`，提供该模块的目录结构、
-> 子目录说明、构建命令与导航。深度知识路由到子模块 `agent.md`（见下方
+> 嵌套指引：本仓内每个一级子模块目录下均设有 `AGENTS.md`，提供该模块的目录结构、
+> 子目录说明、构建命令与导航。深度知识路由到子模块 `AGENTS.md`（见下方
 > 「子模块导航」）。其中 `camera/` 目录另有极为详尽的 `AGENTS.md`，相机开发务必
 > 先读该文件。
 
@@ -37,91 +37,91 @@
 
 ## 子模块导航
 
-本仓每个一级子目录实现一个外设模块的 HDI 服务/HAL，并配有独立的 `agent.md`。
+本仓每个一级子目录实现一个外设模块的 HDI 服务/HAL，并配有独立的 `AGENTS.md`。
 按功能分组如下：
 
 ### 媒体与图形
 
 | 模块 | 中文名 | 说明 | Agent 指引 |
 |------|--------|------|------------|
-| `audio` | 音频 | 声卡加载、播放/录音对象、场景与音量控制 | [audio/agent.md](audio/agent.md) |
-| `distributed_audio` | 分布式音频 | 分布式音频 HDI 服务实现 | [distributed_audio/agent.md](distributed_audio/agent.md) |
-| `camera` | 相机 | HDI/VDI 三层架构实现（另有详细 `AGENTS.md`） | [camera/agent.md](camera/agent.md) |
-| `distributed_camera` | 分布式相机 | 分布式相机 HDI 服务实现 | [distributed_camera/agent.md](distributed_camera/agent.md) |
-| `display` | 显示 | Composer/Buffer/HAL/图形加速 | [display/agent.md](display/agent.md) |
-| `codec` | 编解码 | 媒体编解码驱动能力 | [codec/agent.md](codec/agent.md) |
-| `format` | 媒体文件复用 | 媒体文件复用/解复用驱动能力 | [format/agent.md](format/agent.md) |
-| `clearplay` | 清屏 (DRM) | ClearPlay HDI 服务实现 | [clearplay/agent.md](clearplay/agent.md) |
+| `audio` | 音频 | 声卡加载、播放/录音对象、场景与音量控制 | [audio/AGENTS.md](audio/AGENTS.md) |
+| `distributed_audio` | 分布式音频 | 分布式音频 HDI 服务实现 | [distributed_audio/AGENTS.md](distributed_audio/AGENTS.md) |
+| `camera` | 相机 | HDI/VDI 三层架构实现（另有详细 `AGENTS.md`） | [camera/AGENTS.md](camera/AGENTS.md) |
+| `distributed_camera` | 分布式相机 | 分布式相机 HDI 服务实现 | [distributed_camera/AGENTS.md](distributed_camera/AGENTS.md) |
+| `display` | 显示 | Composer/Buffer/HAL/图形加速 | [display/AGENTS.md](display/AGENTS.md) |
+| `codec` | 编解码 | 媒体编解码驱动能力 | [codec/AGENTS.md](codec/AGENTS.md) |
+| `format` | 媒体文件复用 | 媒体文件复用/解复用驱动能力 | [format/AGENTS.md](format/AGENTS.md) |
+| `clearplay` | 清屏 (DRM) | ClearPlay HDI 服务实现 | [clearplay/AGENTS.md](clearplay/AGENTS.md) |
 
 ### 输入与交互
 
 | 模块 | 中文名 | 说明 | Agent 指引 |
 |------|--------|------|------------|
-| `input` | 输入 | 设备管理、流控制、数据上报、DDK | [input/agent.md](input/agent.md) |
-| `vibrator` | 振动马达 | 振动马达 HDI 接口与实现 | [vibrator/agent.md](vibrator/agent.md) |
-| `light` | 指示灯 | 指示灯 HDI 服务与 hdi_impl 实现 | [light/agent.md](light/agent.md) |
-| `midi` | MIDI | MIDI HDI 服务与 common 实现 | [midi/agent.md](midi/agent.md) |
+| `input` | 输入 | 设备管理、流控制、数据上报、DDK | [input/AGENTS.md](input/AGENTS.md) |
+| `vibrator` | 振动马达 | 振动马达 HDI 接口与实现 | [vibrator/AGENTS.md](vibrator/AGENTS.md) |
+| `light` | 指示灯 | 指示灯 HDI 服务与 hdi_impl 实现 | [light/AGENTS.md](light/AGENTS.md) |
+| `midi` | MIDI | MIDI HDI 服务与 common 实现 | [midi/AGENTS.md](midi/AGENTS.md) |
 
 ### 传感器与感知
 
 | 模块 | 中文名 | 说明 | Agent 指引 |
 |------|--------|------|------------|
-| `sensor` | 传感器 | 信息查询、启停、订阅、参数配置 | [sensor/agent.md](sensor/agent.md) |
-| `motion` | 动作 | 动作识别 HDI 服务与实现 | [motion/agent.md](motion/agent.md) |
-| `intelligent_voice` | 智能语音 | 智能语音引擎/触发，passthrough 实现 | [intelligent_voice/agent.md](intelligent_voice/agent.md) |
-| `memorytracker` | 内存追踪 | 内存追踪 HDI 服务实现 | [memorytracker/agent.md](memorytracker/agent.md) |
+| `sensor` | 传感器 | 信息查询、启停、订阅、参数配置 | [sensor/AGENTS.md](sensor/AGENTS.md) |
+| `motion` | 动作 | 动作识别 HDI 服务与实现 | [motion/AGENTS.md](motion/AGENTS.md) |
+| `intelligent_voice` | 智能语音 | 智能语音引擎/触发，passthrough 实现 | [intelligent_voice/AGENTS.md](intelligent_voice/AGENTS.md) |
+| `memorytracker` | 内存追踪 | 内存追踪 HDI 服务实现 | [memorytracker/AGENTS.md](memorytracker/AGENTS.md) |
 
 ### 电源与热管理
 
 | 模块 | 中文名 | 说明 | Agent 指引 |
 |------|--------|------|------------|
-| `power` | 电源 | 电源管理 HDI 实现 | [power/agent.md](power/agent.md) |
-| `battery` | 电池 | 电池信息查询与充电管理 | [battery/agent.md](battery/agent.md) |
-| `thermal` | 温控 | 温控 HDI 实现，含 `thermal.yaml` 策略 | [thermal/agent.md](thermal/agent.md) |
+| `power` | 电源 | 电源管理 HDI 实现 | [power/AGENTS.md](power/AGENTS.md) |
+| `battery` | 电池 | 电池信息查询与充电管理 | [battery/AGENTS.md](battery/AGENTS.md) |
+| `thermal` | 温控 | 温控 HDI 实现，含 `thermal.yaml` 策略 | [thermal/AGENTS.md](thermal/AGENTS.md) |
 
 ### 通信与连接
 
 | 模块 | 中文名 | 说明 | Agent 指引 |
 |------|--------|------|------------|
-| `wlan` | WLAN | HAL/驱动通道、WPA/Hostapd、芯片层 | [wlan/agent.md](wlan/agent.md) |
-| `bluetooth` | 蓝牙 | audio/hci 子模块 | [bluetooth/agent.md](bluetooth/agent.md) |
-| `nearlink` | 星闪 (NearLink) | dli/off_find 子模块 | [nearlink/agent.md](nearlink/agent.md) |
-| `nfc` | NFC | NFC HDI 服务与 vendor_adaptor | [nfc/agent.md](nfc/agent.md) |
-| `connected_nfc_tag` | 连接式 NFC 标签 | 连接式 NFC 标签 HDI 服务 | [connected_nfc_tag/agent.md](connected_nfc_tag/agent.md) |
-| `secure_element` | 安全单元 | SE/SIM SE/vendor 适配 | [secure_element/agent.md](secure_element/agent.md) |
-| `ethernet` | 以太网 | eth_client/eth_interfaces | [ethernet/agent.md](ethernet/agent.md) |
-| `ril` | RIL 无线接口 | 通话/SIM/短彩信/搜网/蜂窝数据 | [ril/agent.md](ril/agent.md) |
-| `location` | 定位 | AGNSS/Geofence/GNSS 子模块 | [location/agent.md](location/agent.md) |
+| `wlan` | WLAN | HAL/驱动通道、WPA/Hostapd、芯片层 | [wlan/AGENTS.md](wlan/AGENTS.md) |
+| `bluetooth` | 蓝牙 | audio/hci 子模块 | [bluetooth/AGENTS.md](bluetooth/AGENTS.md) |
+| `nearlink` | 星闪 (NearLink) | dli/off_find 子模块 | [nearlink/AGENTS.md](nearlink/AGENTS.md) |
+| `nfc` | NFC | NFC HDI 服务与 vendor_adaptor | [nfc/AGENTS.md](nfc/AGENTS.md) |
+| `connected_nfc_tag` | 连接式 NFC 标签 | 连接式 NFC 标签 HDI 服务 | [connected_nfc_tag/AGENTS.md](connected_nfc_tag/AGENTS.md) |
+| `secure_element` | 安全单元 | SE/SIM SE/vendor 适配 | [secure_element/AGENTS.md](secure_element/AGENTS.md) |
+| `ethernet` | 以太网 | eth_client/eth_interfaces | [ethernet/AGENTS.md](ethernet/AGENTS.md) |
+| `ril` | RIL 无线接口 | 通话/SIM/短彩信/搜网/蜂窝数据 | [ril/AGENTS.md](ril/AGENTS.md) |
+| `location` | 定位 | AGNSS/Geofence/GNSS 子模块 | [location/AGENTS.md](location/AGENTS.md) |
 
 ### USB 与串行
 
 | 模块 | 中文名 | 说明 | Agent 指引 |
 |------|--------|------|------------|
-| `usb` | USB | DDK/Gadget/SCSI/Serial，Host/Device 侧管理 | [usb/agent.md](usb/agent.md) |
-| `serial` | 串口 | 串口 HDI 实现 | [serial/agent.md](serial/agent.md) |
-| `partitionslot` | 分区槽 | 分区槽 HDI 服务与 HAL | [partitionslot/agent.md](partitionslot/agent.md) |
+| `usb` | USB | DDK/Gadget/SCSI/Serial，Host/Device 侧管理 | [usb/AGENTS.md](usb/AGENTS.md) |
+| `serial` | 串口 | 串口 HDI 实现 | [serial/AGENTS.md](serial/AGENTS.md) |
+| `partitionslot` | 分区槽 | 分区槽 HDI 服务与 HAL | [partitionslot/AGENTS.md](partitionslot/AGENTS.md) |
 
 ### 安全与认证
 
 | 模块 | 中文名 | 说明 | Agent 指引 |
 |------|--------|------|------------|
-| `user_auth` | 用户认证 | 用户认证 HDI 服务实现 | [user_auth/agent.md](user_auth/agent.md) |
-| `pin_auth` | PIN 码认证 | PIN 码认证 HDI 服务实现 | [pin_auth/agent.md](pin_auth/agent.md) |
-| `face_auth` | 人脸认证 | 人脸认证 HDI 服务实现 | [face_auth/agent.md](face_auth/agent.md) |
-| `fingerprint_auth` | 指纹认证 | 指纹认证 HDI 服务实现 | [fingerprint_auth/agent.md](fingerprint_auth/agent.md) |
-| `huks` | 统一密钥管理 | HUKS 密钥服务 HDI 实现 | [huks/agent.md](huks/agent.md) |
+| `user_auth` | 用户认证 | 用户认证 HDI 服务实现 | [user_auth/AGENTS.md](user_auth/AGENTS.md) |
+| `pin_auth` | PIN 码认证 | PIN 码认证 HDI 服务实现 | [pin_auth/AGENTS.md](pin_auth/AGENTS.md) |
+| `face_auth` | 人脸认证 | 人脸认证 HDI 服务实现 | [face_auth/AGENTS.md](face_auth/AGENTS.md) |
+| `fingerprint_auth` | 指纹认证 | 指纹认证 HDI 服务实现 | [fingerprint_auth/AGENTS.md](fingerprint_auth/AGENTS.md) |
+| `huks` | 统一密钥管理 | HUKS 密钥服务 HDI 实现 | [huks/AGENTS.md](huks/AGENTS.md) |
 
 ### 其他
 
 | 模块 | 中文名 | 说明 | Agent 指引 |
 |------|--------|------|------------|
-| `base` | 公共基础库 | buffer_handle、hdf_trace、进程配置 rc/cfg | [base/agent.md](base/agent.md) |
-| `devhost` | 设备 Host 进程 | HDF 设备 Host 进程封装 | [devhost/agent.md](devhost/agent.md) |
-| `low_power_player` | 低功耗播放器 | 低功耗播放器 VDI 实现 | [low_power_player/agent.md](low_power_player/agent.md) |
+| `base` | 公共基础库 | buffer_handle、hdf_trace、进程配置 rc/cfg | [base/AGENTS.md](base/AGENTS.md) |
+| `devhost` | 设备 Host 进程 | HDF 设备 Host 进程封装 | [devhost/AGENTS.md](devhost/AGENTS.md) |
+| `low_power_player` | 低功耗播放器 | 低功耗播放器 VDI 实现 | [low_power_player/AGENTS.md](low_power_player/AGENTS.md) |
 
 ## 常见目录约定
 
-本仓各模块目录通常包含以下结构（具体见各模块 `agent.md`）：
+本仓各模块目录通常包含以下结构（具体见各模块 `AGENTS.md`）：
 
 | 目录/文件 | 说明 |
 |-----------|------|
@@ -221,9 +221,9 @@ out/<product>/hdf/drivers_peripheral_<module>/
 
 | 任务 | 先读 |
 |------|------|
-| 实现一个 HDI 服务 | 对应模块 `agent.md` + `drivers_interface/<module>/agent.md` |
-| 新增外设模块 | `README_zh.md`、`base/agent.md`、对应模块 `agent.md` |
-| 编译/部署/调试 | 对应模块 `agent.md` 的「构建与验证」段；相机另读 `camera/AGENTS.md` |
+| 实现一个 HDI 服务 | 对应模块 `AGENTS.md` + `drivers_interface/<module>/AGENTS.md` |
+| 新增外设模块 | `README_zh.md`、`base/AGENTS.md`、对应模块 `AGENTS.md` |
+| 编译/部署/调试 | 对应模块 `AGENTS.md` 的「构建与验证」段；相机另读 `camera/AGENTS.md` |
 | 改 VDI（板载驱动） | `device/board/<board>/<module>/` 供应商代码 + 相机 `camera/AGENTS.md` 的 VDI 段 |
 | 改 bundle.json / 部件模型 | `build/AGENTS.md`（部件模型四配置文件） |
 | GN 模板/构建参数 | `build/AGENTS.md`（知识路由表） |
@@ -233,5 +233,5 @@ out/<product>/hdf/drivers_peripheral_<module>/
 - 文档主要为中文（`README_zh.md`）；各模块另有模块级 `README_zh.md`。
 - 仓库托管于 Gitee（openharmony/drivers_peripheral）。
 - 版权头：Huawei Device Co., Ltd.，Apache-2.0（多数文件）。
-- 相机模块（`camera/`）已有独立的详尽 `AGENTS.md`，本仓 `camera/agent.md` 仅作
+- 相机模块（`camera/`）已有独立的详尽 `AGENTS.md`，本仓 `camera/AGENTS.md` 仅作
   导航与概述，深入开发须读 `camera/AGENTS.md`。
