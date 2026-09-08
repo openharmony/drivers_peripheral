@@ -402,8 +402,14 @@ static int32_t GetSensorEvent(struct HdfSBuf *reply, struct SensorEvents *sensor
     uint32_t len = 0;
     uint32_t length = 0;
 
-    if (!HdfSbufReadBuffer(reply, (const void **)&events, &len) || sensorEvent == NULL) {
-        HDF_LOGE("%{public}s: Read sensor event fail!", __func__);
+    if (sensorEvent == NULL || sensorEvent->data == NULL) {
+        HDF_LOGE("%{public}s: sensorEvent or sensorEvent->data is NULL", __func__);
+        return SENSOR_FAILURE;
+    }
+
+    if (!HdfSbufReadBuffer(reply, (const void **)&events, &len) ||
+        len < sizeof(struct SensorEvents)) {
+        HDF_LOGE("%{public}s: Read sensor event fail or invalid size!", __func__);
         return SENSOR_FAILURE;
     }
 
