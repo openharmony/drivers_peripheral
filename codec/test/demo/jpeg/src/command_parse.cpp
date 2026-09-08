@@ -14,6 +14,7 @@
  */
 
 #include "command_parse.h"
+#include "parse_opt_int.h"
 #include <getopt.h>
 #include <iostream>
 namespace {
@@ -43,10 +44,16 @@ bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
                 opt.fileOutput = optarg;
                 break;
             case MyOptIndex::OPT_INDEX_WIDTH:
-                opt.width = std::stoi(optarg);
+                if (optarg == nullptr || !ParseOptU32(optarg, opt.width)) {
+                    ShowUsage();
+                    return false;
+                }
                 break;
             case MyOptIndex::OPT_INDEX_HEIGHT:
-                opt.height = std::stoi(optarg);
+                if (optarg == nullptr || !ParseOptU32(optarg, opt.height)) {
+                    ShowUsage();
+                    return false;
+                }
                 break;
             default:
                 ShowUsage();
