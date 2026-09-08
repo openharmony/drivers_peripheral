@@ -41,7 +41,10 @@ if (defined(ohos_lite)) {
         "hilog:libhilog",
       ]
       if (enable_c_utils) {
-        external_deps += [ "c_utils:utils" ]
+        external_deps += [
+          "c_utils:utils",
+          "bounds_checking_function:libsec_shared",
+        ]
       }
     } else if (defined(ohos_lite)) {
       external_deps = [ "hilog_lite:hilog_shared" ]
@@ -78,7 +81,10 @@ if (defined(ohos_lite)) {
         "hilog:libhilog",
       ]
       if (enable_c_utils) {
-        external_deps += [ "c_utils:utils" ]
+        external_deps += [
+          "c_utils:utils",
+          "bounds_checking_function:libsec_shared",
+        ]
       }
     } else if (defined(ohos_lite)) {
       external_deps = [ "hilog_lite:hilog_shared" ]
@@ -116,7 +122,10 @@ if (defined(ohos_lite)) {
         "hilog:libhilog",
       ]
       if (enable_c_utils) {
-        external_deps += [ "c_utils:utils" ]
+        external_deps += [
+          "c_utils:utils",
+          "bounds_checking_function:libsec_shared",
+        ]
       }
     } else if (defined(ohos_lite)) {
       external_deps = [ "hilog_lite:hilog_shared" ]
@@ -148,7 +157,10 @@ if (defined(ohos_lite)) {
         "hilog:libhilog",
       ]
       if (enable_c_utils) {
-        external_deps += [ "c_utils:utils" ]
+        external_deps += [
+          "c_utils:utils",
+          "bounds_checking_function:libsec_shared",
+        ]
       }
     } else if (defined(ohos_lite)) {
       external_deps = [ "hilog_lite:hilog_shared" ]
@@ -177,7 +189,10 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
     ]
     if (enable_c_utils) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [
+        "c_utils:utils",
+        "bounds_checking_function:libsec_shared",
+      ]
     }
 
     install_images = [ chipset_base_dir ]
@@ -199,7 +214,10 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
     ]
     if (enable_c_utils) {
-      external_deps += [ "c_utils:utils" ]
+      external_deps += [
+        "c_utils:utils",
+        "bounds_checking_function:libsec_shared",
+      ]
     }
 
     install_enable = true
