@@ -137,6 +137,12 @@ int32_t SensorHdiDump::SensorShowData(struct HdfSBuf *reply)
         int32_t index = static_cast<const uint32_t>(eventDumpList.pos + i) < MAX_DUMP_DATA_SIZE ?
             (eventDumpList.pos + i) : (eventDumpList.pos + i - MAX_DUMP_DATA_SIZE);
         uint32_t dataLen = eventDumpList.listDumpArray[index].dataLen;
+        uint32_t copyLen = static_cast<uint32_t>(eventDumpList.listDumpArray[index].data.size());
+        if (copyLen > dataLen) {
+            HDF_LOGE("%{public}s: data size mismatch, dataLen=%{public}u copyLen=%{public}u",
+                __func__, dataLen, copyLen);
+            continue;
+        }
         eventData = static_cast<uint8_t*>(OsalMemCalloc(dataLen));
         if (eventData == nullptr) {
             HDF_LOGE("%{public}s: malloc failed!", __func__);
@@ -144,7 +150,7 @@ int32_t SensorHdiDump::SensorShowData(struct HdfSBuf *reply)
         }
 
         std::copy(eventDumpList.listDumpArray[index].data.begin(),
-                  eventDumpList.listDumpArray[index].data.end(), eventData);
+                  eventDumpList.listDumpArray[index].data.begin() + copyLen, eventData);
         float *data = reinterpret_cast<float*>(eventData);
 
         int32_t dataDimension = static_cast<int32_t>(dataLen / sizeof(float));
