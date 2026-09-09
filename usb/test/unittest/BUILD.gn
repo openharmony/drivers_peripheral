@@ -80,6 +80,7 @@ if (defined(ohos_lite)) {
     deps = [
       ":usb_device_sdk_io_test",
       "host_sdk:hdf_unittest_usb_host",
+      "unittest/scsi_ddk_service:scsi_ddk_service_test",
     ]
   }
 }
