@@ -1620,6 +1620,12 @@ int32_t LibusbAdapter::GetConfigDescriptor(libusb_device *dev, uint8_t descId, s
         HDF_LOGE("%{public}s: Config descriptor not found for descId: %{public}d", __func__, descId);
         return HDF_FAILURE;
     }
+    if (config->bLength != LIBUSB_DT_CONFIG_SIZE) {
+        HDF_LOGE("%{public}s: invalid config bLength %{public}u, expected %{public}d", __func__, config->bLength,
+            LIBUSB_DT_CONFIG_SIZE);
+        libusb_free_config_descriptor(config);
+        return HDF_FAILURE;
+    }
     size_t currentOffset = descriptor.size();
     descriptor.resize(descriptor.size() + config->bLength);
     int32_t ret = memcpy_s(descriptor.data() + currentOffset, descriptor.size(), config, config->bLength);
@@ -1697,6 +1703,11 @@ int32_t LibusbAdapter::ProcessInterfaceDescriptors(const libusb_interface *iface
 
     for (int32_t i = 0; i < iface->num_altsetting; ++i) {
         const libusb_interface_descriptor &altSetting = iface->altsetting[i];
+        if (altSetting.bLength != LIBUSB_DT_INTERFACE_SIZE) {
+            HDF_LOGE("%{public}s: invalid altSetting bLength %{public}u, expected %{public}d", __func__,
+                altSetting.bLength, LIBUSB_DT_INTERFACE_SIZE);
+            return HDF_FAILURE;
+        }
         descriptor.resize(descriptor.size() + altSetting.bLength);
         int32_t ret = memcpy_s(descriptor.data() + currentOffset, descriptor.size(), &altSetting, altSetting.bLength);
         if (ret != EOK) {
@@ -1707,6 +1718,11 @@ int32_t LibusbAdapter::ProcessInterfaceDescriptors(const libusb_interface *iface
         ProcessExtraData(descriptor, currentOffset, altSetting.extra, altSetting.extra_length);
         for (int32_t j = 0; j < altSetting.bNumEndpoints; ++j) {
             const libusb_endpoint_descriptor &endpoint = altSetting.endpoint[j];
+            if (endpoint.bLength < LIBUSB_DT_ENDPOINT_SIZE || endpoint.bLength > LIBUSB_DT_ENDPOINT_AUDIO_SIZE) {
+                HDF_LOGE("%{public}s: invalid endpoint bLength %{public}u, expected %{public}d~%{public}d", __func__,
+                    endpoint.bLength, LIBUSB_DT_ENDPOINT_SIZE, LIBUSB_DT_ENDPOINT_AUDIO_SIZE);
+                return HDF_FAILURE;
+            }
             descriptor.resize(descriptor.size() + endpoint.bLength);
             ret = memcpy_s(descriptor.data() + currentOffset, descriptor.size(), &endpoint, endpoint.bLength);
             if (ret != EOK) {
