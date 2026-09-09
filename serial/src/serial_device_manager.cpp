@@ -26,6 +26,7 @@
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "serial_hcb_util.h"
+#include "securec.h"
 
 
 #undef LOG_TAG
