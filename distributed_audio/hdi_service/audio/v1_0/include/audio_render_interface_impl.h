@@ -121,6 +121,7 @@ private:
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
     const std::string DUMP_HDF_RENDER_To_SA = "hdf_render_to_sa.pcm";
+    const std::string KEY_AUDIO_ENCODING = "audio_encoding";
 
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
@@ -132,6 +133,7 @@ private:
     bool firstOpenFlag_ = true;
     bool dumpFlag_ = false;
     bool enableFade_ = false;
+    bool isPassthroughMode_ = false;
     uint32_t currentFrame_ = 0;
     uint32_t vol_ = 0;
     uint32_t volMax_ = 15;
