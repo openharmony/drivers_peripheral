@@ -61,6 +61,7 @@ ohos_executable("dcamera_hdf_demo") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
+    "graphic_surface:buffer_handle",
   ]
 
   defines = [
