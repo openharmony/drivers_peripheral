@@ -23,6 +23,7 @@
 
 #define HDF_LOG_TAG    uhdf_sensor_service
 #define STRING_LEN    2048
+#define SENSOR_LIST_SIZE  (sizeof(g_sensorList) / sizeof((g_sensorList)[0]))
 
 static const char *g_helpComment =
     " Sensor manager dump options:\n"
@@ -134,6 +135,17 @@ static void ShowData(const float *data, int64_t timesTamp, const struct SensorDe
     (void)HdfSbufWriteString(reply, sensorInfoDate);
 }
 
+static int32_t FindSensorIndexByTypeId(int32_t sensorTypeId)
+{
+    int32_t index;
+    for (index = 0; index < SENSOR_LIST_SIZE; index++) {
+        if (g_sensorList[index].sensorTypeId == sensorTypeId) {
+            return index;
+        }
+    }
+    return -1;
+}
+
 int32_t SensorShowData(struct HdfSBuf *reply)
 {
     int32_t len;
@@ -153,16 +165,28 @@ int32_t SensorShowData(struct HdfSBuf *reply)
     if (eventDumpList->count < MAX_DUMP_DATA_SIZE) {
         for (len = 0; len < eventDumpList->count; len++) {
             float *data = (float *)(eventDumpList->listDumpArr[len].data);
+            int32_t sensorId = eventDumpList->listDumpArr[len].sensorId;
+            int32_t listIndex = FindSensorIndexByTypeId(sensorId);
+            if (listIndex < 0) {
+                HDF_LOGE("%{public}s: invalid sensorId %{public}d", __func__, sensorId);
+                continue;
+            }
             ShowData(data, eventDumpList->listDumpArr[len].timestamp,
-                g_sensorList[eventDumpList->listDumpArr[len].sensorId], reply);
+                g_sensorList[sensorId], reply);
         }
     } else {
         int32_t pos = eventDumpList->pos;
         for (len = 0; len < eventDumpList->count; len++) {
             pos = pos + 1 > MAX_DUMP_DATA_SIZE ? 1 : pos + 1;
             float *data = (float *)(eventDumpList->listDumpArr[pos - 1].data);
+            int32_t sensorId = eventDumpList->listDumpArr[pos - 1].sensorId;
+            int32_t listIndex = FindSensorIndexByTypeId(sensorId);
+            if (listIndex < 0) {
+                HDF_LOGE("%{public}s: invalid sensorId %{public}d", __func__, sensorId);
+                continue;
+            }
             ShowData(data, eventDumpList->listDumpArr[pos - 1].timestamp,
-                g_sensorList[eventDumpList->listDumpArr[pos - 1].sensorId], reply);
+                g_sensorList[sensorId], reply);
         }
     }
 
