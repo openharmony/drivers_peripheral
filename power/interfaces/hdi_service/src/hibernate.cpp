@@ -163,7 +163,7 @@ int Hibernate::ConvertMemKB2GB(const unsigned long long memKB)
 unsigned long long Hibernate::GetSwapFileSize()
 {
     if (Hibernate::staticSwapFileSize) {
-        HDF_LOGI("GetSwapFileSize, swap file size is %{public}llu KB", Hibernate::staticSwapFileSize);
+        HDF_LOGI("GetSwapFileSize, swap file size is %{public}llu B", Hibernate::staticSwapFileSize);
         return Hibernate::staticSwapFileSize;
     }
 
@@ -181,7 +181,7 @@ unsigned long long Hibernate::GetSwapFileSize()
     int memGB = ConvertMemKB2GB(static_cast<unsigned long long>(info.totalram / B_PER_KB));
     Hibernate::staticSwapFileSize = static_cast<unsigned long long>(memGB / SWAP_FACTOR) *
         MB_PER_GB * KB_PER_MB * B_PER_KB;
-    HDF_LOGI("GetSwapFileSize, mem size is %{public}d GB, swap file size is %{public}llu KB",
+    HDF_LOGI("GetSwapFileSize, mem size is %{public}d GB, swap file size is %{public}llu B",
         memGB, Hibernate::staticSwapFileSize);
     return Hibernate::staticSwapFileSize;
 }
