@@ -243,6 +243,11 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
 
     for (uint8_t i = 0; i < acm->interfaceCnt; i++) {
         uint8_t interfaceIndex = acm->interfaceIndex[i];
+        if (interfaceIndex >= USB_MAXINTERFACES) {
+            HDF_LOGE("%{public}s:%{public}d interfaceIndex %{public}hhu out of range, skip", __func__, __LINE__,
+                interfaceIndex);
+            continue;
+        }
         const struct UsbRawInterface *interface = config->interface[interfaceIndex];
 
         int32_t ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
