@@ -210,7 +210,8 @@ sptr<IDAudioCallback> AudioAdapterInterfaceImpl::MatchStreamCallback(const Audio
     if (desc.pins == DEFAULT_RENDER_ID) {
         if (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP) {
             dhId = LOW_LATENCY_RENDER_ID;
-        } else if (attrs.type == AUDIO_OFFLOAD) {
+        } else if (attrs.type == AUDIO_OFFLOAD || attrs.type == AUDIO_MULTI_CHANNEL) {
+            DHLOGI("match stream offload or multi channel.");
             std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
             if (extCallbackMap_.find(OFFLOAD_RENDER_ID) != extCallbackMap_.end()) {
                 dhId = OFFLOAD_RENDER_ID;
