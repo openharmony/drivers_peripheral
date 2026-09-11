@@ -1674,7 +1674,13 @@ int32_t UsbfnMtpImpl::UsbMtpPortRxPush(struct UsbMtpPort *mtpPort, struct UsbFnR
     }
     if (writeToFile && mtpDev->asyncRecvWriteTempContent) {
         uint8_t *bufOff = mtpDev->asyncRecvWriteTempContent + mtpDev->asyncRecvWriteTempCount;
-        if (memcpy_s(bufOff, req->actual, req->buf, req->actual) != EOK) {
+        size_t remaining = WRITE_FILE_TEMP_SLICE - mtpDev->asyncRecvWriteTempCount;
+        if (req->actual > remaining) {
+            HDF_LOGE("%{public}s: buffer overflow: remain %{public}zu, actual %{public}u", __func__, remaining,
+                req->actual);
+            return HDF_FAILURE;
+        }
+        if (memcpy_s(bufOff, remaining, req->buf, req->actual) != EOK) {
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
             return HDF_FAILURE;
         }
