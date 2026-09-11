@@ -48,7 +48,7 @@
 #ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
 #include "parameters.h"
 #endif
-#ifdef DRIVERS_PERIPHERAL_POWER_COCKPIT_MODE
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_COCKPIT_FORCE_SUSPEND
 #include "parameters.h"
 #endif
 
@@ -189,7 +189,7 @@ int32_t PowerInterfaceImpl::StartSuspend()
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     HDF_LOGI("staS3");
-#ifdef DRIVERS_PERIPHERAL_POWER_COCKPIT_MODE
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_COCKPIT_FORCE_SUSPEND
     HDF_LOGI("Cockpit mode: skip starting auto suspend loop");
     return HDF_SUCCESS;
 #endif
@@ -689,7 +689,7 @@ int32_t PowerInterfaceImpl::GetPowerConfig(const std::string &sceneName, std::st
 
 int32_t PowerInterfaceImpl::ForceSuspendIgnoringWakelock(const std::string &tag)
 {
-#ifndef DRIVERS_PERIPHERAL_POWER_COCKPIT_MODE
+#ifndef DRIVERS_PERIPHERAL_POWER_ENABLE_COCKPIT_FORCE_SUSPEND
     HDF_LOGE("ForceSuspendIgnoringWakelock is only supported in cockpit mode");
     (void)tag;
     return HDF_ERR_NOT_SUPPORT;

@@ -53,8 +53,13 @@ ohos_unittest("hdi_unittest_power") {
     external_deps += [ "c_utils:utils" ]
   }
 
+  defines = []
   if (drivers_peripheral_power_wakeup_cause_path) {
-    defines = [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
+    defines += [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
+  }
+
+  if (drivers_peripheral_power_enable_cockpit_force_suspend) {
+    defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_COCKPIT_FORCE_SUSPEND" ]
   }
 }
 

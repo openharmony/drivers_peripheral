@@ -263,6 +263,9 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest013, TestSize.Level0)
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest014, TestSize.Level0)
 {
     int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("mem");
+#ifndef DRIVERS_PERIPHERAL_POWER_ENABLE_COCKPIT_FORCE_SUSPEND
+    EXPECT_NE(0, ret);
+#else
     // 真实设备上 /sys/power/state 可读时应成功；沙箱里 open 失败则返回非 0
     std::string stateValue = HdfPowerHdiTest::ReadFile(SUSPEND_STATE_PATH);
     if (!stateValue.empty()) {
@@ -270,6 +273,7 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest014, TestSize.Level0)
     } else {
         EXPECT_NE(0, ret);
     }
+#endif
 }
 
 /**
@@ -280,6 +284,9 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest014, TestSize.Level0)
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest015, TestSize.Level0)
 {
     int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("ulsr");
+#ifndef DRIVERS_PERIPHERAL_POWER_ENABLE_COCKPIT_FORCE_SUSPEND
+    EXPECT_NE(0, ret);
+#else
     // 同 HdfPowerHdiTest014，依赖 /sys/power/state 是否可读
     std::string stateValue = HdfPowerHdiTest::ReadFile(SUSPEND_STATE_PATH);
     if (!stateValue.empty()) {
@@ -287,5 +294,6 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest015, TestSize.Level0)
     } else {
         EXPECT_NE(0, ret);
     }
+#endif
 }
 }
