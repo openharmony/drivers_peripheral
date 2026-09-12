@@ -78,8 +78,8 @@ ohos_shared_library("libpower_interface_service_1.4") {
     defines += [ "DRIVERS_PERIPHERAL_POWER_HOST_SCHED_PRIORITY" ]
   }
 
-  if (drivers_peripheral_power_enable_cockpit_force_suspend) {
-    defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_COCKPIT_FORCE_SUSPEND" ]
+  if (drivers_peripheral_power_enable_force_suspend_ignoring_wakelock) {
+    defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK" ]
   }
 
   install_images = [ chipset_base_dir ]

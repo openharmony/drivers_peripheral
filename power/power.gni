@@ -22,7 +22,7 @@ declare_args() {
   drivers_peripheral_power_c_utils = true
   drivers_peripheral_power_hisysevent = true
   drivers_peripheral_power_host_sched_priority = false
-  # Vehicle cockpit power policy: skip auto suspend loop and enable
-  # ForceSuspendIgnoringWakelock (HDI V1_4, ignore running locks).
-  drivers_peripheral_power_enable_cockpit_force_suspend = false
+  # Skip auto suspend loop and enable ForceSuspendIgnoringWakelock
+  # (HDI V1_4, ignore running locks).
+  drivers_peripheral_power_enable_force_suspend_ignoring_wakelock = false
 }
