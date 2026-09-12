@@ -18,6 +18,7 @@
 
 #include <mutex>
 #include <unordered_map>
+#include <unordered_set>
 #include "display_format.h"
 #include "ibuffer.h"
 #include "surface.h"
@@ -57,6 +58,8 @@ public:
 
 private:
     std::shared_ptr<IBuffer> GetCameraBufferAndUpdateInfo(OHOS::sptr<OHOS::SurfaceBuffer> sb);
+    std::shared_ptr<IBuffer> FindMatchedBufferLocked(const OHOS::sptr<OHOS::SurfaceBuffer>& sb);
+    void RegisterNewBufferLocked(const std::shared_ptr<IBuffer>& cb, const OHOS::sptr<OHOS::SurfaceBuffer>& sb);
 
 protected:
     int32_t index = -1;
@@ -75,6 +78,9 @@ protected:
     std::condition_variable finishCV_ = {};
     StreamStatistics stats_;
     int32_t streamId_ = 0;
+    int32_t bufferCount_ = 3;
+    std::shared_ptr<IBuffer> lastReturnedBuffer_ = nullptr;
+    std::unordered_set<int32_t> outstandingIndices_ = {};
 };
 } // namespace OHOS::Camera
 #endif

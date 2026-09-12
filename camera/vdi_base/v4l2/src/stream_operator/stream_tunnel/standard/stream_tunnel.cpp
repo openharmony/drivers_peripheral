@@ -58,6 +58,8 @@ void StreamTunnel::CleanBuffers()
     buffers.clear();
     bufferQueue_->CleanCache();
     index = -1;
+    lastReturnedBuffer_ = nullptr;
+    outstandingIndices_.clear();
 }
 
 const int32_t BLOB_MAX_SIZE = 24 * 1024 * 1024;
@@ -167,6 +169,8 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
             return RC_ERROR;
         }
         sb = it->second;
+        lastReturnedBuffer_ = buffer;
+        outstandingIndices_.erase(buffer->GetIndex());
     }
 
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK) {
@@ -204,6 +208,11 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
 RetCode StreamTunnel::SetBufferCount(const int32_t n)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferQueue_, RC_ERROR);
+    if (n <= 0) {
+        CAMERA_LOGE("SetBufferCount invalid count: %{public}d", n);
+        return RC_ERROR;
+    }
+    bufferCount_ = n;
     bufferQueue_->SetQueueSize(n);
     return RC_OK;
 }
@@ -273,17 +282,48 @@ void StreamTunnel::SetStreamId(int32_t streamId)
     stats_.SetStreamId(streamId);
 }
 
+std::shared_ptr<IBuffer> StreamTunnel::FindMatchedBufferLocked(const OHOS::sptr<OHOS::SurfaceBuffer>& sb)
+{
+    std::shared_ptr<IBuffer> cb = nullptr;
+    for (auto it = buffers.begin(); it != buffers.end(); it++) {
+        if (it->second != nullptr && sb != nullptr && it->second->GetSeqNum() == sb->GetSeqNum()) {
+            cb = it->first;
+            CAMERA_LOGD("GetCameraBufferAndUpdateInfo, found sb in buffers");
+        }
+    }
+    return cb;
+}
+
+void StreamTunnel::RegisterNewBufferLocked(const std::shared_ptr<IBuffer>& cb,
+    const OHOS::sptr<OHOS::SurfaceBuffer>& sb)
+{
+    int32_t newIdx;
+    if (lastReturnedBuffer_ != nullptr) {
+        newIdx = lastReturnedBuffer_->GetIndex();
+        lastReturnedBuffer_ = nullptr;
+    } else {
+        newIdx = (index + 1) % bufferCount_;
+        index = newIdx;
+        for (int32_t i = 0; i < bufferCount_; i++) {
+            int32_t candidate = (index + i) % bufferCount_;
+            if (outstandingIndices_.find(candidate) == outstandingIndices_.end()) {
+                newIdx = candidate;
+                index = newIdx;
+                break;
+            }
+        }
+    }
+    cb->SetIndex(newIdx);
+    buffers[cb] = sb;
+    outstandingIndices_.insert(newIdx);
+}
+
 std::shared_ptr<IBuffer> StreamTunnel::GetCameraBufferAndUpdateInfo(OHOS::sptr<OHOS::SurfaceBuffer> sb)
 {
     std::shared_ptr<IBuffer> cb = nullptr;
     {
         std::lock_guard<std::mutex> l(lock_);
-        for (auto it = buffers.begin(); it != buffers.end(); it++) {
-            if (it->second == sb) {
-                cb = it->first;
-                CAMERA_LOGD("GetCameraBufferAndUpdateInfo, found sb in buffers");
-            }
-        }
+        cb = FindMatchedBufferLocked(sb);
     }
     if (cb == nullptr) {
         cb = std::make_shared<ImageBuffer>(CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
@@ -295,14 +335,17 @@ std::shared_ptr<IBuffer> StreamTunnel::GetCameraBufferAndUpdateInfo(OHOS::sptr<O
             return nullptr;
         }
 
-        cb->SetIndex(++index);
         {
             std::lock_guard<std::mutex> l(lock_);
-            buffers[cb] = sb;
+            RegisterNewBufferLocked(cb, sb);
         }
         CAMERA_LOGD("GetCameraBufferAndUpdateInfo, create ImageBuffer. index = %{public}d", cb->GetIndex());
     } else {
         cb->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
+        {
+            std::lock_guard<std::mutex> l(lock_);
+            outstandingIndices_.insert(cb->GetIndex());
+        }
     }
     return cb;
 }

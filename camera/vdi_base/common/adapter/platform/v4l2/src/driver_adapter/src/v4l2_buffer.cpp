@@ -173,22 +173,31 @@ RetCode HosV4L2Buffers::V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>
     }
 
     MakeInqueueBuffer(buf, frameSpec);
-
 #ifdef V4L2_EMULATOR
     RetCode rc = SetAndPushBuffer(fd, frameSpec, buf);
     if (rc == RC_ERROR) {
         return RC_ERROR;
     }
-    std::lock_guard<std::mutex> l(bufferLock_);
-    queuedBuffers_.push(buf.index);
 #else
-    std::lock_guard<std::mutex> l(bufferLock_);
     int rc = ioctl(fd, VIDIOC_QBUF, &buf);
     if (rc < 0) {
         CAMERA_LOGE("ioctl VIDIOC_QBUF failed: %{public}s\n", strerror(errno));
         return RC_ERROR;
     }
 #endif
+
+    // QBUF/SetAndPushBuffer 成功后才更新 userBufPtr，确保 DQBUF 时数据拷贝到当前 buffer 的地址
+    // 若 QBUF 失败则保持旧映射不变，避免映射错乱导致后续 DQBUF 内存异常
+    // adapterBufferMap_ 的读写都必须在 bufferLock_ 内，与 DQBUF 侧互斥
+    // MMAP 和 DMABUF 两种模式下 DQBUF 都会走 memcpy 拷贝，刷新条件须与 DQBUF 一致
+    std::lock_guard<std::mutex> l(bufferLock_);
+#ifdef V4L2_EMULATOR
+    queuedBuffers_.push(buf.index);
+#endif
+    if (memoryType_ == V4L2_MEMORY_MMAP || memoryType_ == V4L2_MEMORY_DMABUF) {
+        adapterBufferMap_[buf.index].userBufPtr = frameSpec->buffer_->GetVirAddress();
+        adapterBufferMap_[buf.index].cameraBuffer = frameSpec->buffer_;
+    }
 
     auto itr = queueBuffers_.find(fd);
     if (itr != queueBuffers_.end()) {
@@ -322,6 +331,7 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
         return RC_ERROR;
     }
 #endif
+    std::lock_guard<std::mutex> l(bufferLock_);
     if (memoryType_ == V4L2_MEMORY_MMAP || memoryType_ == V4L2_MEMORY_DMABUF) {
         if (adapterBufferMap_[buf.index].userBufPtr && adapterBufferMap_[buf.index].start &&
             adapterBufferMap_[buf.index].cameraBuffer) {
@@ -342,7 +352,6 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
             }
         }
     }
-    std::lock_guard<std::mutex> l(bufferLock_);
     auto IterMap = queueBuffers_.find(fd);
     if (IterMap == queueBuffers_.end()) {
         CAMERA_LOGE("std::map queueBuffers_ no fd\n");
