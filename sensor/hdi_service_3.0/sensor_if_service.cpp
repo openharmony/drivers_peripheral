@@ -728,20 +728,7 @@ int32_t SensorIfService::Enable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo&
         return HDF_FAILURE;
     }
 
-    int32_t ret = HDF_FAILURE;
-    SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
-    if (GetSensorProductMode()) {
-        ret = sensorVdiImplV1_1_->Enable(sensorHandle);
-    } else {
-        ret = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
-    }
-    SENSOR_TRACE_FINISH;
-    if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, serviceId = %{public}d",
-                 __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), serviceId);
-    }
-
-    return ret;
+    return EnableSensorInternal(sensorHandle, serviceId);
 }
 
 int32_t SensorIfService::Disable(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo)
@@ -1280,20 +1267,7 @@ int32_t SensorIfService::EnableWithCallbackId(const OHOS::HDI::Sensor::V3_0::Dev
         return HDF_FAILURE;
     }
 
-    int32_t ret = HDF_FAILURE;
-    SENSOR_TRACE_START("sensorVdiImplV1_1_->Enable");
-    if (GetSensorProductMode()) {
-        ret = sensorVdiImplV1_1_->Enable(sensorHandle);
-    } else {
-        ret = sensorVdiImplV1_1_->Enable(sensorHandle.sensorType);
-    }
-    SENSOR_TRACE_FINISH;
-    if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %{public}d, sensorHandle = %{public}s, callbackId = %{public}d",
-                 __func__, ret, SENSOR_HANDLE_TO_C_STR(sensorHandle), callbackId);
-    }
-
-    return ret;
+    return EnableSensorInternal(sensorHandle, serviceId);
 }
 
 int32_t SensorIfService::DisableWithCallbackId(const OHOS::HDI::Sensor::V3_0::DeviceSensorInfo& deviceSensorInfo,
