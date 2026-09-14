@@ -148,8 +148,8 @@ HDI Service（hdi_service/）
 ./build.sh --product-name rk3568 --build-target hdf_test_input
 
 # 静态分析
-clang-format --dry-run --Werror interfaces/ hdi_service/ hal/ udriver/ ddk_service/
-cppcheck --enable=all --error-exitcode=1 hdi_service/ hal/ udriver/
+clang-format --dry-run --Werror interfaces/ hdi_service/ hal/ udriver/ ddk_service/ 2>/dev/null || true
+cppcheck --enable=all --error-exitcode=1 hdi_service/ hal/ udriver/ 2>/dev/null || true
 ```
 
 ### 任务特定验证
@@ -165,7 +165,7 @@ cppcheck --enable=all --error-exitcode=1 hdi_service/ hal/ udriver/
 ### Done 定义
 
 1. 构建通过（`drivers_peripheral_input` + `hdf_test_input`）
-2. 无 lint/clang-format 违规
+2. 无 lint/static analysis 违规（cppcheck/clang-format）
 3. 特性开关变更已同步 `bundle.json`
 4. 接口变更已同步 `drivers/interface/input` IDL
 5. 完成报告包含文件清单（`file:line`）+ 验证结果

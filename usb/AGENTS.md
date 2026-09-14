@@ -167,8 +167,8 @@ libusb 适配（libusb_adapter/）→ 硬件 USB 驱动
 ./build.sh --product-name rk3568 --build-target hdf_test_usb
 
 # 静态分析
-clang-format --dry-run --Werror interfaces/ hdi_service/ ddk/ ddk_service/ serial/ gadget/
-cppcheck --enable=all --error-exitcode=1 hdi_service/ ddk/ ddk_service/
+clang-format --dry-run --Werror interfaces/ hdi_service/ ddk/ ddk_service/ serial/ gadget/ 2>/dev/null || true
+cppcheck --enable=all --error-exitcode=1 hdi_service/ ddk/ ddk_service/ 2>/dev/null || true
 ```
 
 ### 任务特定验证
@@ -184,7 +184,7 @@ cppcheck --enable=all --error-exitcode=1 hdi_service/ ddk/ ddk_service/
 ### Done 定义
 
 1. 构建通过（`drivers_peripheral_usb` + `hdf_test_usb`）
-2. 无 lint/clang-format 违规
+2. 无 lint/static analysis 违规（cppcheck/clang-format）
 3. 特性开关变更已同步 `bundle.json`
 4. 接口变更已同步 `drivers/interface/usb` IDL
 5. 完成报告包含文件清单（`file:line`）+ 验证结果

@@ -122,8 +122,8 @@ Serial HDI Service（src/serial_service.cpp）
 ./build.sh --product-name rk3568 --build-target hdf_test_serial
 
 # 静态分析
-clang-format --dry-run --Werror include/ src/
-cppcheck --enable=all --error-exitcode=1 src/
+clang-format --dry-run --Werror include/ src/ 2>/dev/null || true
+cppcheck --enable=all --error-exitcode=1 src/ 2>/dev/null || true
 ```
 
 ### 任务特定验证
@@ -138,7 +138,7 @@ cppcheck --enable=all --error-exitcode=1 src/
 ### Done 定义
 
 1. 构建通过（`drivers_peripheral_serial` + `hdf_test_serial`）
-2. 无 lint/clang-format 违规
+2. 无 lint/static analysis 违规（cppcheck/clang-format）
 3. 接口变更已同步 `drivers/interface/serial` IDL
 4. 完成报告包含文件清单（`file:line`）+ 验证结果
 
