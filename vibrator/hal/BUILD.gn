@@ -32,6 +32,10 @@ if (defined(ohos_lite)) {
       "../utils/include",
     ]
 
+    if (!use_clang_coverage) {
+      version_script = "hdi_vibrator.versionscript"
+    }
+
     external_deps = [
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",

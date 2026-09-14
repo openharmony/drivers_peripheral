@@ -57,6 +57,10 @@ ohos_shared_library("libsensor_interface_service_3.1") {
     "-fno-strict-aliasing",
   ]
 
+  if (!use_clang_coverage) {
+    version_script = "libsensor_interface_service_3.1.versionscript"
+  }
+
   if (is_standard_system) {
     external_deps = [
       "bounds_checking_function:libsec_shared",
@@ -100,6 +104,10 @@ ohos_shared_library("libsensor_driver") {
     "-fno-common",
     "-fno-strict-aliasing",
   ]
+
+  if (!use_clang_coverage) {
+    version_script = "libsensor_driver.versionscript"
+  }
 
   if (is_standard_system) {
     external_deps = [

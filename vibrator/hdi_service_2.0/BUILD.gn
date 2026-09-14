@@ -52,6 +52,10 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
 
+    if (!use_clang_coverage) {
+      version_script = "libvibrator_interface_service_2.0.versionscript"
+    }
+
     if (is_standard_system) {
       external_deps = [
         "drivers_interface_vibrator:libvibrator_stub_2.0",
@@ -92,6 +96,10 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
+
+    if (!use_clang_coverage) {
+      version_script = "libvibrator_driver.versionscript"
+    }
 
     if (is_standard_system) {
       external_deps = [

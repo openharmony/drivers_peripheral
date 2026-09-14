@@ -42,6 +42,10 @@ ohos_shared_library("liballocator_service_1.0") {
     "src/allocator_service.cpp",
   ]
 
+  if (!use_clang_coverage) {
+    version_script = "liballocator_service_1.0.versionscript"
+  }
+
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "c_utils:utils",
@@ -81,6 +85,10 @@ ohos_shared_library("liballocator_service_1.4") {
     "src/allocator_service_1_4.cpp",
   ]
 
+  if (!use_clang_coverage) {
+    version_script = "liballocator_service_1.4.versionscript"
+  }
+
   deps = [ ":liballocator_service_1.0" ]
 
   external_deps = [
@@ -110,6 +118,10 @@ ohos_shared_library("liballocator_service_1.4") {
 ohos_shared_library("liballocator_driver_1.0") {
   branch_protector_ret = "pac_ret"
   sources = [ "src/allocator_driver.cpp" ]
+
+  if (!use_clang_coverage) {
+    version_script = "liballocator_driver_1.0.versionscript"
+  }
 
   external_deps = [
     "c_utils:utils",
@@ -217,6 +229,10 @@ ohos_shared_library("libmapper_service_1.3") {
 ohos_shared_library("libmapper_driver_1.0") {
   branch_protector_ret = "pac_ret"
   sources = [ "src/mapper_driver.cpp" ]
+
+  if (!use_clang_coverage) {
+    version_script = "libmapper_driver_1.0.versionscript"
+  }
 
   external_deps = [
     "c_utils:utils",
