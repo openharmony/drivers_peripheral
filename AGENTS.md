@@ -24,6 +24,7 @@
 | 显示合成/缓冲变更 | `drivers/peripheral/display/` | 图层合成/缓冲区/图形 |
 | 灯光控制变更 | `drivers/peripheral/light/` | LED灯光控制 |
 | 动作检测变更 | `drivers/peripheral/motion/` | 动作手势检测 |
+| A/B槽位管理变更 | `drivers/peripheral/partitionslot/` | A/B槽位查询/后缀/激活/不可启动标记 |
 | 传感器类型/接口变更 | `drivers/peripheral/sensor/` | 传感器数据采集 |
 | 振动/HD触觉变更 | `drivers/peripheral/vibrator/` | 振动/HD触觉/会话 |
 | 驱动宿主进程变更 | `drivers/peripheral/devhost/` | 驱动宿主进程(hdf_devhost) |
@@ -38,6 +39,7 @@
 | [display](display/AGENTS.md) | 图层合成/缓冲区/图形 | [查看](display/AGENTS.md) | `display_config.gni` (5个开关) | v1_0-v1_5 |
 | [light](light/AGENTS.md) | LED灯光控制 | [查看](light/AGENTS.md) | `light.gni` (3个开关) | v1_0 |
 | [motion](motion/AGENTS.md) | 动作手势检测 | [查看](motion/AGENTS.md) | `motion.gni` (2个开关) | v1_0/v1_1 |
+| [partitionslot](partitionslot/AGENTS.md) | A/B槽位管理（bootctrl 读写） | [查看](partitionslot/AGENTS.md) | 无 | v1_0 |
 | [sensor](sensor/AGENTS.md) | 传感器数据采集 | [查看](sensor/AGENTS.md) | `sensor.gni` (4个开关) | v3_0/v3_1 |
 | [vibrator](vibrator/AGENTS.md) | 振动/HD触觉/会话 | [查看](vibrator/AGENTS.md) | `vibrator.gni` (4个开关) | v2_0 |
 
@@ -73,6 +75,7 @@
 | 显示合成/缓冲变更 | display | [display/AGENTS.md](display/AGENTS.md) |
 | 灯光控制变更 | light | [light/AGENTS.md](light/AGENTS.md) |
 | 动作检测变更 | motion | [motion/AGENTS.md](motion/AGENTS.md) |
+| A/B槽位管理变更 | partitionslot | [partitionslot/AGENTS.md](partitionslot/AGENTS.md) |
 | 传感器类型/接口变更 | sensor | [sensor/AGENTS.md](sensor/AGENTS.md) |
 | 振动/HD触觉变更 | vibrator | [vibrator/AGENTS.md](vibrator/AGENTS.md) |
 | 驱动宿主进程变更 | devhost | [devhost/AGENTS.md](devhost/AGENTS.md) |
@@ -105,6 +108,7 @@
 | feature开关 | 特性编译开关 | `*.gni` + `bundle.json` features |
 | IDL | 接口定义语言 | `drivers/interface/*/*.idl` |
 | 构建产物 | hdi-gen生成的代码 | 由构建系统自动生成，不手动修改 |
+| bootctrl | A/B启动控制分区（active/unbootable 标记，断电不丢失） | partitionslot/hal/src/partitionslot_manager.cpp |
 
 ## 3. 约束边界
 
@@ -157,6 +161,7 @@
 - **display**: 所有版本（composer v1_0-v1_5, buffer v1_0-v1_4）全部活跃构建
 - **motion**: 无传统 HAL 层，v1_0 和 v1_1 双版本同时活跃
 - **devhost**: 仅包含进程入口（main 函数），不要在此仓添加业务逻辑
+- **partitionslot**: bootctrl 偏移常量为 bootloader 契约（active@1024、unbootable@1028，各 4 字节，禁改）；实现与单测将槽位 2 视为 slot B（与 IDL 文档 0=A/1=B 存在历史不一致），禁止本地"修复"，编号语义须与 drivers_interface 对齐
 
 ## 4. 验证闭环
 
@@ -170,6 +175,7 @@
 | display | `./build.sh --product-name rk3568 --build-target drivers_peripheral_display` | `./build.sh --product-name rk3568 --build-target display_test_entry` |
 | light | `./build.sh --product-name rk3568 --build-target drivers_peripheral_light` | `./build.sh --product-name rk3568 --build-target hdf_test_light` |
 | motion | `./build.sh --product-name rk3568 --build-target drivers_peripheral_motion` | `./build.sh --product-name rk3568 --build-target hdf_test_motion` |
+| partitionslot | `./build.sh --product-name rk3568 --build-target partitionslot_entry` | `./build.sh --product-name rk3568 --build-target partitionslot_hdi_test` |
 | sensor | `./build.sh --product-name rk3568 --build-target drivers_peripheral_sensor` | `./build.sh --product-name rk3568 --build-target hdf_test_sensor` |
 | vibrator | `./build.sh --product-name rk3568 --build-target drivers_peripheral_vibrator` | `./build.sh --product-name rk3568 --build-target hdf_test_vibrator` |
 
