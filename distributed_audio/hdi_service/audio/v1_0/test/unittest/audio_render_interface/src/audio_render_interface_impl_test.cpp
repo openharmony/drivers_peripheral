@@ -1023,6 +1023,362 @@ HWTEST_F(AudioRenderInterfaceImplTest, NotifyPlayStatusChange_004, TestSize.Leve
     audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->NotifyPlayStatusChange(DistributedHardware::HDF_EVENT_RESTART));
 }
+
+/**
+ * @tc.name: SetExtraParams_Encoding_EAC3
+ * @tc.desc: Verify the SetExtraParams parses audio_encoding=2 and enables passthrough mode.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_Encoding_EAC3, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    std::string keyValueList = "audio_encoding=2";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_TRUE(audioRenderInterfaceImpl_->isPassthroughMode_);
+    EXPECT_EQ(29, mockCb->lastEventType);
+    EXPECT_EQ(keyValueList, mockCb->lastEventContent);
+}
+
+/**
+ * @tc.name: SetExtraParams_Encoding_AC3
+ * @tc.desc: Verify the SetExtraParams parses audio_encoding=3 and enables passthrough mode.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_Encoding_AC3, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    std::string keyValueList = "audio_encoding=3";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_TRUE(audioRenderInterfaceImpl_->isPassthroughMode_);
+}
+
+/**
+ * @tc.name: SetExtraParams_Encoding_DTS_HD
+ * @tc.desc: Verify the SetExtraParams parses audio_encoding=5 and enables passthrough mode.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_Encoding_DTS_HD, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    std::string keyValueList = "audio_encoding=5";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_TRUE(audioRenderInterfaceImpl_->isPassthroughMode_);
+}
+
+/**
+ * @tc.name: SetExtraParams_Encoding_DTS_X
+ * @tc.desc: Verify the SetExtraParams parses audio_encoding=6 and enables passthrough mode.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_Encoding_DTS_X, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    std::string keyValueList = "audio_encoding=6";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_TRUE(audioRenderInterfaceImpl_->isPassthroughMode_);
+}
+
+/**
+ * @tc.name: SetExtraParams_Encoding_PCM
+ * @tc.desc: Verify the SetExtraParams parses audio_encoding=0 and enables passthrough mode.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_Encoding_PCM, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    audioRenderInterfaceImpl_->isPassthroughMode_ = true;
+    std::string keyValueList = "audio_encoding=0";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_FALSE(audioRenderInterfaceImpl_->isPassthroughMode_);
+}
+
+/**
+ * @tc.name: SetExtraParams_NoEncoding
+ * @tc.desc: Verify the SetExtraParams without audio_encoding and enables passthrough mode.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_NoEncoding, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    std::string keyValueList = "format=PCM;sample_rate=48000";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_FALSE(audioRenderInterfaceImpl_->isPassthroughMode_);
+    EXPECT_EQ(29, mockCb->lastEventType);
+    EXPECT_EQ(keyValueList, mockCb->lastEventContent);
+}
+
+/**
+ * @tc.name: SetExtraParams_InvalidEncoding
+ * @tc.desc: Verify the SetExtraParams with unsupported but non-PCM audio_encoding enables passthrough (skip fade-in).
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_InvalidEncoding, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    std::string keyValueList = "audio_encoding=99";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_TRUE(audioRenderInterfaceImpl_->isPassthroughMode_);
+    EXPECT_EQ(29, mockCb->lastEventType);
+}
+
+/**
+ * @tc.name: SetExtraParams_InvalidEncoding_Negative
+ * @tc.desc: Verify the SetExtraParams with negative audio_encoding skip fade-in (non-PCM).
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_InvalidEncoding_Negative, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    std::string keyValueList = "audio_encoding=-1";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_TRUE(audioRenderInterfaceImpl_->isPassthroughMode_);
+}
+
+/**
+ * @tc.name: SetExtraParams_Encoding_WithOtherParams
+ * @tc.desc: Verify the SetExtraParams parses audio_encoding when mixed with other key-value pairs.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_Encoding_WithOtherParams, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    std::string keyValueList = "format=PCM;audio_encoding=2;sample_rate=48000";
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+    EXPECT_TRUE(audioRenderInterfaceImpl_->isPassthroughMode_);
+    EXPECT_EQ(29, mockCb->lastEventType);
+}
+
+/**
+ * @tc.name: SetExtraParams_Nullcallback
+ * @tc.desc: Verify the SetExtraParams returns HDF_FAILURE when callback is null.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_NullCallback, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
+    std::string keyValueList = "audio_encoding=2";
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+/**
+ * @tc.name: SetExtraParams_EmptyParams
+ * @tc.desc: Verify the SetExtraParams returns HDF_FAILURE when keyValueList is empty.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_EmptyParams, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockIDAudioCallback());
+    std::string keyValueList = "";
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+/**
+ * @tc.name: SetExtraParams_NotifyEventFails
+ * @tc.desc: Verify the SetExtraParams returns HDF_FAILURE when NotifyEvent fails.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_NotifyEventFails, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(new MockRevertIDAudioCallback());
+    std::string keyValueList = "audio_encoding=2";
+    EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
+}
+
+/**
+ * @tc.name: RenderFrame_Passthrough_SkipFade
+ * @tc.desc: Verify RenderFrame in passthrough mode skips fade-in and output matches input bit-level
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_Passthrough_SkipFade, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
+    audioRenderInterfaceImpl_->enableFade_ = true;
+    audioRenderInterfaceImpl_->currentFrame_ = 0;
+    audioRenderInterfaceImpl_->isPassthroughMode_ = true;
+
+    const size_t frameSize = 1024;
+    std::vector<int8_t> frame(frameSize);
+    for (size_t i = 0; i < frameSize; ++i) {
+        frame[i] = static_cast<int8_t>(i % 128);
+    }
+    uint64_t replyBytes = 0;
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
+    EXPECT_EQ(frame.size(), replyBytes);
+    EXPECT_EQ(0u, audioRenderInterfaceImpl_->currentFrame_);
+    ASSERT_EQ(frame.size(), mockCb->lastWriteData.size());
+    for (size_t i = 0; i < frameSize; ++i) {
+        EXPECT_EQ(frame[i], mockCb->lastWriteData[i]) << "Mismatch at index " << i;
+    }
+}
+
+/**
+ * @tc.name: RenderFrame_Passthrough_FadeSkipped
+ * @tc.desc: Verify RenderFrame in passthrough mode skips fade-in and output matches input bit-level
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_Passthrough_FadeSkipped, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
+    audioRenderInterfaceImpl_->enableFade_ = true;
+    audioRenderInterfaceImpl_->currentFrame_ = 0;
+    audioRenderInterfaceImpl_->isPassthroughMode_ = true;
+
+    const size_t frameSize = 512;
+    std::vector<int8_t> frame(frameSize, 64);
+    uint64_t replyBytes = 0;
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
+    EXPECT_EQ(0u, audioRenderInterfaceImpl_->currentFrame_);
+}
+
+/**
+ * @tc.name: RenderFrame_NonPassthrough_FadeInExecuted
+ * @tc.desc: Verify RenderFrame in non passthrough mode with fade enabled executes fade-in
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_NonPassthrough_FadeInExecuted, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
+    audioRenderInterfaceImpl_->enableFade_ = true;
+    audioRenderInterfaceImpl_->currentFrame_ = 0;
+    audioRenderInterfaceImpl_->isPassthroughMode_ = false;
+
+    const size_t frameSize = 1024;
+    std::vector<int8_t> frame(frameSize, 100);
+    uint64_t replyBytes = 0;
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
+    EXPECT_EQ(1u, audioRenderInterfaceImpl_->currentFrame_);
+}
+
+/**
+ * @tc.name: RenderFrame_NonPassthrough_FadeInDataModified
+ * @tc.desc: Verify RenderFrame in non passthrough mode with fade modifies frame data
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_NonPassthrough_FadeInDataModified, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
+    audioRenderInterfaceImpl_->enableFade_ = true;
+    audioRenderInterfaceImpl_->currentFrame_ = 0;
+    audioRenderInterfaceImpl_->isPassthroughMode_ = false;
+
+    const size_t frameSize = 1024;
+    std::vector<int8_t> frame(frameSize, 100);
+    uint64_t replyBytes = 0;
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
+    bool dataChanged = false;
+    for (size_t i = 0; i < mockCb->lastWriteData.size(); ++i) {
+        if (mockCb->lastWriteData[i] != static_cast<int8_t>(100)) {
+            dataChanged = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(dataChanged);
+}
+
+/**
+ * @tc.name: RenderFrame_NonPassthrough_FadeDisabled_NoChange
+ * @tc.desc: Verify RenderFrame in non-passthrough mode with fade disable does not modify data.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_NonPassthrough_FadeDisabled_NoChange, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
+    audioRenderInterfaceImpl_->enableFade_ = false;
+    audioRenderInterfaceImpl_->currentFrame_ = 0;
+    audioRenderInterfaceImpl_->isPassthroughMode_ = false;
+
+    const size_t frameSize = 512;
+    std::vector<int8_t> frame(frameSize, 77);
+    uint64_t replyBytes = 0;
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
+    ASSERT_EQ(frame.size(), mockCb->lastWriteData.size());
+    for (size_t i = 0; i < frameSize; ++i) {
+        EXPECT_EQ(frame[i], mockCb->lastWriteData[i]) << "Mismatch at index " << i;
+    }
+}
+
+/**
+ * @tc.name: RenderFrame_Passthrough_DTS_HD
+ * @tc.desc: Verify RenderFrame in non-passthrough mode with fade disable does not modify data.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_Passthrough_DTS_HD, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, audioRenderInterfaceImpl_);
+    auto mockCb = sptr<MockCaptureIDAudioCallback>(new MockCaptureIDAudioCallback());
+    audioRenderInterfaceImpl_->audioExtCallback_ = sptr<IDAudioCallback>(mockCb);
+    audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
+    audioRenderInterfaceImpl_->enableFade_ = true;
+    audioRenderInterfaceImpl_->currentFrame_ = 0;
+    audioRenderInterfaceImpl_->isPassthroughMode_ = true;
+
+    const size_t frameSize = 2048;
+    std::vector<int8_t> frame(frameSize);
+    for (size_t i = 0; i < frameSize; ++i) {
+        frame[i] = static_cast<int8_t>((i * 7) % 256 - 128);
+    }
+    uint64_t replyBytes = 0;
+    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
+    EXPECT_EQ(0u, audioRenderInterfaceImpl_->currentFrame_);
+    ASSERT_EQ(frame.size(), mockCb->lastWriteData.size());
+    for (size_t i = 0; i < frameSize; ++i) {
+        EXPECT_EQ(frame[i], mockCb->lastWriteData[i]) << "Mismatch at index " << i;
+    }
+}
 } // V2_0
 } // Audio
 } // Distributedaudio

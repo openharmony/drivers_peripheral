@@ -131,7 +131,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
         devAttrs_.frameSize, devAttrs_.type};
     AudioData data = { param, frame };
     DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(data.data.data()), frame.size());
-    if (enableFade_ && (currentFrame_ < DURATION_FRAMES_MINUS)) {
+    if (enableFade_ && (currentFrame_ < DURATION_FRAMES_MINUS) && !isPassthroughMode_) {
         FadeInProcess(DURATION_FRAMES, data.data.data(), frame.size());
     }
     if (audioExtCallback_ == nullptr) {
@@ -550,6 +550,30 @@ int32_t AudioRenderInterfaceImpl::SetExtraParams(const std::string &keyValueList
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Ext callback is null.");
         return HDF_FAILURE;
+    }
+    const std::string key = KEY_AUDIO_ENCODING + "=";
+    size_t pos = keyValueList.find(key);
+    if (pos != std::string::npos) {
+        size_t valueStart = pos + key.length();
+        size_t valueEnd = keyValueList.find(';', valueStart);
+        std::string valueStr = (valueEnd == std::string::npos)
+            ? keyValueList.substr(valueStart)
+            : keyValueList.substr(valueStart, valueEnd - valueStart);
+        int32_t encodingValue = -1;
+        bool isNumeric = !valueStr.empty();
+        for (char c : valueStr) {
+            if (!std::isdigit(c)) {
+                isNumeric = false;
+                break;
+            }
+        }
+        if (isNumeric) {
+            encodingValue = std::atoi(valueStr.c_str());
+        }
+        isPassthroughMode_ = (encodingValue != 0);
+        if (isPassthroughMode_) {
+            DHLOGI("Non-PCM mode, skip fade-in, audio_encoding: %{public}d.", encodingValue);
+        }
     }
 
     DAudioEvent event = { HDF_AUDIO_STREAM_CUSTOM_PARAMS_CHANGED, keyValueList };
