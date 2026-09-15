@@ -25,7 +25,7 @@
 #define AUDIO_VDI_STREAM_NUM_MAX  30
 #else
 #define AUDIO_VDI_STREAM_NUM_MAX  10
-#endif  
+#endif
 
 struct IAudioManager *AudioManagerCreateIfInstance(void);
 int32_t AudioManagerDestroyIfInstance(struct IAudioManager *manager);
