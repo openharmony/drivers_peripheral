@@ -25,7 +25,7 @@
 #define AUDIO_VDI_STREAM_NUM_MAX  30
 #else
 #define AUDIO_VDI_STREAM_NUM_MAX  10
-#endif  
+#endif
 
 int32_t AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
     struct AudioDeviceDescriptorVdi *vdiDesc);
