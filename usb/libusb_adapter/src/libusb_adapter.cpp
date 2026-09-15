@@ -2187,13 +2187,16 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
         return;
     }
     // write data to ashmem when direction is in
-    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN &&
-        transfer->actual_length > 0) {
+    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN) {
         HDF_LOGI("%{public}s: write data to ashmem", __func__);
-        if (transfer->type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
-            transfer->actual_length = transfer->length;
+
+        int32_t ret = HDF_SUCCESS;
+        if (transfer->type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS &&
+            transfer->length > 0) {
+            ret = WriteAshmem(asyncTransfer->ashmemRef, transfer->length, transfer->buffer);
+        } else if (transfer->actual_length > 0) {
+            ret = WriteAshmem(asyncTransfer->ashmemRef, transfer->actual_length, transfer->buffer);
         }
-        int32_t ret = WriteAshmem(asyncTransfer->ashmemRef, transfer->actual_length, transfer->buffer);
         if (ret != HDF_SUCCESS) {
             HandleAsyncFailure(transfer);
             return;
