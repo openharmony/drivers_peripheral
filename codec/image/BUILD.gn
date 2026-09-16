@@ -70,6 +70,10 @@ ohos_shared_library("libcodec_image_driver") {
 
   sources = [ "hdi_service/src/codec_image_driver.cpp" ]
 
+  if (!use_clang_coverage) {
+    version_script = "libcodec_image_driver.versionscript"
+  }
+
   deps = [ ":libcodec_image_service_2.1" ]
 
   defines = [ "LOG_TAG_IMAGE" ]

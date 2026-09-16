@@ -34,6 +34,10 @@ ohos_shared_library("audio_primary_driver") {
   }
   include_dirs = [ "$hdf_hdi_service_path/vendor_interface/utils" ]
 
+  if (!use_clang_coverage) {
+    version_script = "audio_primary_driver.versionscript"
+  }
+
   external_deps += [
     "bounds_checking_function:libsec_shared",
     "drivers_interface_audio:libaudio_stub_6.1",

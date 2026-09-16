@@ -84,6 +84,10 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       "src/hdf_audio_server_render.c",
     ]
 
+    if (!use_clang_coverage) {
+      version_script = "hdi_audio_a2dp_server.versionscript"
+    }
+
     if (is_standard_system) {
       external_deps = [
         "hdf_core:libhdf_host",

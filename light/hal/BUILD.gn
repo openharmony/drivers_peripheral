@@ -33,6 +33,10 @@ if (defined(ohos_lite)) {
 
     public_configs = [ ":libhdi_light_pub_config" ]
 
+    if (!use_clang_coverage) {
+      version_script = "hdi_light.versionscript"
+    }
+
     external_deps = [
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",

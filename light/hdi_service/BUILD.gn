@@ -46,6 +46,10 @@ ohos_shared_library("liblight_interface_service_1.0") {
     "-fno-strict-aliasing",
   ]
 
+  if (!use_clang_coverage) {
+    version_script = "liblight_interface_service_1.0.versionscript"
+  }
+
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_light:liblight_stub_1.0",
@@ -83,6 +87,10 @@ ohos_shared_library("liblight_driver") {
     "-fno-common",
     "-fno-strict-aliasing",
   ]
+
+  if (!use_clang_coverage) {
+    version_script = "liblight_driver.versionscript"
+  }
 
   if (is_standard_system) {
     external_deps = [
