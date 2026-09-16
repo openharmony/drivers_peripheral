@@ -57,6 +57,10 @@ ohos_shared_library("audio_primary_impl_vendor") {
       "vdi_src/audio_render_vdi.c",
     ]
 
+    if (drivers_peripheral_audio_feature_add_streams) {
+      defines += [ "AUDIO_ADD_STREAMS" ]
+    }
+
     if (drivers_peripheral_audio_feature_reclaim_memory) {
       defines += [ "AUDIO_RECLAIM_MEMORY_ENABLE" ]
     }

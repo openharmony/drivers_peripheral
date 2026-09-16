@@ -32,7 +32,8 @@
             "drivers_peripheral_audio_feature_hisysevent_enable",
             "drivers_peripheral_audio_feature_frame_ec",
             "drivers_peripheral_audio_feature_reclaim_memory",
-            "drivers_peripheral_audio_vendor_alsa_path"
+            "drivers_peripheral_audio_vendor_alsa_path",
+            "drivers_peripheral_audio_feature_add_streams"
         ],
         "adapted_system_type": ["standard", "small"],
         "rom": "1035KB",

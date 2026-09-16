@@ -21,7 +21,11 @@
 
 #define AUDIO_VDI_ADAPTER_NUM_MAX        20 // Limit the number of sound cards supported to a maximum of 20
 #define AUDIO_VDI_PORT_NUM_MAX    10
+#ifdef AUDIO_ADD_STREAMS
+#define AUDIO_VDI_STREAM_NUM_MAX  30
+#else
 #define AUDIO_VDI_STREAM_NUM_MAX  10
+#endif
 
 int32_t AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
     struct AudioDeviceDescriptorVdi *vdiDesc);
