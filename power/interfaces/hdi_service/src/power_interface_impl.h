@@ -76,7 +76,7 @@ public:
 
     int32_t UnRegisterPowerCallbackExt(const sptr<V1_3::IPowerHdiCallbackExt> &ipowerHdiCallback) override;
 
-    int32_t ForceSuspendIgnoringWakelock(const std::string &tag) override;
+    int32_t ForceSuspendEx(const std::string &mode, const std::string &tag) override;
 
     class PowerDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

@@ -233,38 +233,35 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest011, TestSize.Level0)
 
 /**
   * @tc.name: HdfPowerHdiTest012
-  * @tc.desc: check ForceSuspendIgnoringWakelock with invalid tag
+  * @tc.desc: check ForceSuspendEx with invalid tag
   * @tc.type: FUNC
   */
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest012, TestSize.Level0)
 {
-    // 实现里只允许 "mem" / "ulsr"，非法 tag 应返回 HDF_ERR_INVALID_PARAM
-    int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("invalid_tag");
+    int32_t ret = g_powerInterface->ForceSuspendEx("ignore_wakelock", "invalid_tag");
     EXPECT_NE(0, ret);
 }
 
 /**
   * @tc.name: HdfPowerHdiTest013
-  * @tc.desc: check ForceSuspendIgnoringWakelock with empty tag
+  * @tc.desc: check ForceSuspendEx with empty tag
   * @tc.type: FUNC
   */
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest013, TestSize.Level0)
 {
-    // 空 tag 同样属于非法参数
-    int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("");
+    int32_t ret = g_powerInterface->ForceSuspendEx("ignore_wakelock", "");
     EXPECT_NE(0, ret);
 }
 
 /**
   * @tc.name: HdfPowerHdiTest014
-  * @tc.desc: check ForceSuspendIgnoringWakelock with mem tag
+  * @tc.desc: check ForceSuspendEx ignore_wakelock with mem tag
   * @tc.type: FUNC
   */
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest014, TestSize.Level0)
 {
-    int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("mem");
-#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
-    // 真实设备上 /sys/power/state 可读时应成功；沙箱里 open 失败则返回非 0
+    int32_t ret = g_powerInterface->ForceSuspendEx("ignore_wakelock", "mem");
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_EX
     std::string stateValue = HdfPowerHdiTest::ReadFile(SUSPEND_STATE_PATH);
     if (!stateValue.empty()) {
         EXPECT_EQ(0, ret);
@@ -278,14 +275,13 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest014, TestSize.Level0)
 
 /**
   * @tc.name: HdfPowerHdiTest015
-  * @tc.desc: check ForceSuspendIgnoringWakelock with ulsr tag
+  * @tc.desc: check ForceSuspendEx ignore_wakelock with ulsr tag
   * @tc.type: FUNC
   */
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest015, TestSize.Level0)
 {
-    int32_t ret = g_powerInterface->ForceSuspendIgnoringWakelock("ulsr");
-#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
-    // 同 HdfPowerHdiTest014，依赖 /sys/power/state 是否可读
+    int32_t ret = g_powerInterface->ForceSuspendEx("ignore_wakelock", "ulsr");
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_EX
     std::string stateValue = HdfPowerHdiTest::ReadFile(SUSPEND_STATE_PATH);
     if (!stateValue.empty()) {
         EXPECT_EQ(0, ret);
@@ -295,5 +291,27 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest015, TestSize.Level0)
 #else
     EXPECT_NE(0, ret);
 #endif
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest016
+  * @tc.desc: check ForceSuspendEx auto mode is not supported
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest016, TestSize.Level0)
+{
+    int32_t ret = g_powerInterface->ForceSuspendEx("auto", "mem");
+    EXPECT_NE(0, ret);
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest017
+  * @tc.desc: check ForceSuspendEx with invalid mode
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest017, TestSize.Level0)
+{
+    int32_t ret = g_powerInterface->ForceSuspendEx("invalid_mode", "mem");
+    EXPECT_NE(0, ret);
 }
 }

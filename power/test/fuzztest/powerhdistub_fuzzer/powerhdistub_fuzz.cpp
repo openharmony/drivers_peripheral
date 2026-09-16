@@ -54,7 +54,7 @@ namespace {
 const int32_t REWIND_READ_DATA = 0;
 shared_ptr<V1_4::PowerInterfaceStub> g_fuzzService = nullptr;
 shared_ptr<PowerFuzzTest> g_fuzzTest = nullptr;
-const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = V1_4::CMD_POWER_INTERFACE_FORCE_SUSPEND_IGNORING_WAKELOCK + 1;
+const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = V1_4::CMD_POWER_INTERFACE_FORCE_SUSPEND_EX + 1;
 } // namespace
 
 static void PowerStubFuzzTest(const uint8_t *data, size_t size)
@@ -77,7 +77,7 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
     for (code = CMD_POWER_INTERFACE_GET_VERSION; code < POWER_INTERFACE_STUB_FUNC_MAX_SIZE; code++) {
         // Filter force sleep calls
         if (CMD_POWER_INTERFACE_FORCE_SUSPEND == code ||
-            V1_4::CMD_POWER_INTERFACE_FORCE_SUSPEND_IGNORING_WAKELOCK == code) {
+            V1_4::CMD_POWER_INTERFACE_FORCE_SUSPEND_EX == code) {
             continue;
         }
         if (code < V1_4::CMD_POWER_INTERFACE_REGISTER_POWER_CALLBACK_EXT) {

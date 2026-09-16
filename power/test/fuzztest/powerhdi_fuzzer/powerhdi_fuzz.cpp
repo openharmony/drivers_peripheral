@@ -56,7 +56,7 @@ private:
 namespace {
 shared_ptr<V1_4::PowerInterfaceStub> g_fuzzService = nullptr;
 shared_ptr<PowerFuzzTest> g_fuzzTest = nullptr;
-const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = V1_4::CMD_POWER_INTERFACE_FORCE_SUSPEND_IGNORING_WAKELOCK + 1;
+const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = V1_4::CMD_POWER_INTERFACE_FORCE_SUSPEND_EX + 1;
 } // namespace
 
 static void PowerHdiFuzzTest(const uint8_t *data, size_t size)
