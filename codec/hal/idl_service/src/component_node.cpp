@@ -345,6 +345,10 @@ int32_t ComponentNode::ComponentDeInit()
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
+    if (comType->ComponentDeInit == nullptr) {
+        CODEC_LOGE("The ComponentDeInit is not implemented.");
+        return OMX_ErrorNotImplemented;
+    }
     auto err = comType->ComponentDeInit(comp_);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("ComponentDeInit err = %{public}x ", err);
