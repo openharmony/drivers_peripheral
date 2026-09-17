@@ -2137,11 +2137,13 @@ int32_t LibusbAdapter::FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer,
             info.numIsoPackets, HandleAsyncResult, asyncTransfer, info.timeOut);
         if (info.numIsoPackets > 0) {
             uint32_t packetLength = info.length / info.numIsoPackets;
-            uint32_t maxIsoPacketLength =
-                static_cast<uint32_t>(libusb_get_max_iso_packet_size(libusb_get_device(devHandle), info.endpoint));
-            packetLength = packetLength >= maxIsoPacketLength ? maxIsoPacketLength : packetLength;
-            HDF_LOGI("%{public}s: iso pkg len: %{public}d, max iso pkg len: %{public}d",
-                __func__, packetLength, maxIsoPacketLength);
+            /* libusb_get_max_iso_packet_size reads the current alt (zero-bandwidth alt0)
+             * wMaxPacketSize from the cached descriptor, which differs from the runtime
+             * altsetting selected via SET_INTERFACE (e.g. alt0=128 vs alt3=800). Capping
+             * each packet buffer below the actual device packet size overflows full iso
+             * packets, so they are all dropped (status=ERROR/actualLength=0). The app sizes
+             * length/numIsoPackets precisely by endpoint wMaxPacketSize, so use that value
+             * directly instead of capping. */
             libusb_set_iso_packet_lengths(asyncTransfer->transferRef, packetLength);
         }
     } else {
