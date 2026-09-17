@@ -145,6 +145,10 @@ ohos_shared_library("libmapper_service_1.0") {
   ]
   sources = [ "src/mapper_service.cpp" ]
 
+  if (!use_clang_coverage) {
+    version_script = "libmapper_service_1.0.versionscript"
+  }
+
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
@@ -169,6 +173,10 @@ ohos_shared_library("libmapper_service_1.2") {
   branch_protector_ret = "pac_ret"
   include_dirs = [ "include" ]
   sources = [ "src/mapper_service_1_2.cpp" ]
+
+  if (!use_clang_coverage) {
+    version_script = "libmapper_service_1.2.versionscript"
+  }
 
   deps = [ ":libmapper_service_1.0" ]
 
@@ -196,6 +204,10 @@ ohos_shared_library("libmapper_service_1.3") {
   branch_protector_ret = "pac_ret"
   include_dirs = [ "include" ]
   sources = [ "src/mapper_service_1_3.cpp" ]
+
+  if (!use_clang_coverage) {
+    version_script = "libmapper_service_1.3.versionscript"
+  }
 
   deps = [
     ":libmapper_service_1.0",
@@ -257,6 +269,10 @@ ohos_shared_library("libmetadata_service_1.1") {
   ]
   sources = [ "src/metadata_service.cpp" ]
 
+  if (!use_clang_coverage) {
+    version_script = "libmetadata_service_1.1.versionscript"
+  }
+
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
@@ -280,6 +296,10 @@ ohos_shared_library("libmetadata_service_1.1") {
 ohos_shared_library("libmetadata_driver_1.1") {
   branch_protector_ret = "pac_ret"
   sources = [ "src/metadata_driver.cpp" ]
+
+  if (!use_clang_coverage) {
+    version_script = "libmetadata_driver_1.1.versionscript"
+  }
 
   external_deps = [
     "c_utils:utils",

@@ -81,6 +81,10 @@ ohos_shared_library("audio_primary_impl_vendor") {
     defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
   }
 
+  if (!use_clang_coverage) {
+    version_script = "audio_primary_impl_vendor.versionscript"
+  }
+
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_audio:libaudio_proxy_6.1",
