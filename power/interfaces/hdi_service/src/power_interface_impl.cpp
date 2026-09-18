@@ -706,16 +706,16 @@ static int32_t WriteSuspendState(const std::string &state)
 
 int32_t PowerInterfaceImpl::ForceSuspendEx(const std::string &mode, const std::string &tag)
 {
-#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_EX
     HDF_LOGI("ForceSuspendEx, mode=%{public}s, tag=%{public}s", mode.c_str(), tag.c_str());
     if (mode == "auto") {
-        HDF_LOGE("ForceSuspendEx mode auto is not supported");
-        return HDF_ERR_NOT_SUPPORT;
+        (void)tag;
+        return ForceSuspend();
     }
     if (mode != "ignore_wakelock") {
         HDF_LOGE("Invalid suspend mode: %{public}s", mode.c_str());
         return HDF_ERR_INVALID_PARAM;
     }
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_EX
     if (tag != "mem" && tag != "ulsr") {
         HDF_LOGE("Invalid suspend tag: %{public}s", tag.c_str());
         return HDF_ERR_INVALID_PARAM;
@@ -737,9 +737,8 @@ int32_t PowerInterfaceImpl::ForceSuspendEx(const std::string &mode, const std::s
     NotifyCallback(CMD_ON_WAKEUP);
     return ret;
 #else
-    (void)mode;
     (void)tag;
-    HDF_LOGE("ForceSuspendEx is not supported");
+    HDF_LOGE("ForceSuspendEx ignore_wakelock is not supported");
     return HDF_ERR_NOT_SUPPORT;
 #endif
 }

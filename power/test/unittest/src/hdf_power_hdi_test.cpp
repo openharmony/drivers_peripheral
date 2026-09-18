@@ -295,13 +295,13 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest015, TestSize.Level0)
 
 /**
   * @tc.name: HdfPowerHdiTest016
-  * @tc.desc: check ForceSuspendEx auto mode is not supported
+  * @tc.desc: check ForceSuspendEx auto mode uses ForceSuspend
   * @tc.type: FUNC
   */
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest016, TestSize.Level0)
 {
     int32_t ret = g_powerInterface->ForceSuspendEx("auto", "mem");
-    EXPECT_NE(0, ret);
+    EXPECT_EQ(0, ret);
 }
 
 /**
