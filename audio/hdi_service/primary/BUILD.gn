@@ -78,6 +78,10 @@ ohos_shared_library("audio_manager_service_6.1") {
   }
   include_dirs = [ "$hdf_hdi_service_path/vendor_interface/utils" ]
 
+  if (!use_clang_coverage) {
+    version_script = "audio_manager_service_6.1.versionscript"
+  }
+
   external_deps += [ "drivers_interface_audio:libaudio_stub_6.1" ]
 
   install_images = [ chipset_base_dir ]
