@@ -58,8 +58,8 @@ ohos_unittest("hdi_unittest_power") {
     defines += [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
   }
 
-  if (drivers_peripheral_power_enable_force_suspend_ex) {
-    defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_EX" ]
+  if (drivers_peripheral_power_enable_force_suspend_ignoring_wakelock) {
+    defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK" ]
   }
 }
 

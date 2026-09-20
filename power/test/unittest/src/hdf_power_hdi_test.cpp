@@ -261,7 +261,7 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest013, TestSize.Level0)
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest014, TestSize.Level0)
 {
     int32_t ret = g_powerInterface->ForceSuspendEx("ignore_wakelock", "mem");
-#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_EX
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
     std::string stateValue = HdfPowerHdiTest::ReadFile(SUSPEND_STATE_PATH);
     if (!stateValue.empty()) {
         EXPECT_EQ(0, ret);
@@ -281,7 +281,7 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest014, TestSize.Level0)
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest015, TestSize.Level0)
 {
     int32_t ret = g_powerInterface->ForceSuspendEx("ignore_wakelock", "ulsr");
-#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_EX
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
     std::string stateValue = HdfPowerHdiTest::ReadFile(SUSPEND_STATE_PATH);
     if (!stateValue.empty()) {
         EXPECT_EQ(0, ret);
