@@ -711,11 +711,17 @@ int32_t PowerInterfaceImpl::ForceSuspendEx(const std::string &mode, const std::s
         (void)tag;
         return ForceSuspend();
     }
-    if (mode != "ignore_wakelock") {
-        HDF_LOGE("Invalid suspend mode: %{public}s", mode.c_str());
-        return HDF_ERR_INVALID_PARAM;
+    if (mode == "ignore_wakelock") {
+        return ForceSuspendIgnoringWakelock(tag);
     }
+    HDF_LOGE("Invalid suspend mode: %{public}s", mode.c_str());
+    return HDF_ERR_INVALID_PARAM;
+}
+
+int32_t PowerInterfaceImpl::ForceSuspendIgnoringWakelock(const std::string &tag)
+{
 #ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_EX
+    HDF_LOGI("ForceSuspendIgnoringWakelock, tag=%{public}s", tag.c_str());
     if (tag != "mem" && tag != "ulsr") {
         HDF_LOGE("Invalid suspend tag: %{public}s", tag.c_str());
         return HDF_ERR_INVALID_PARAM;
@@ -725,7 +731,7 @@ int32_t PowerInterfaceImpl::ForceSuspendEx(const std::string &mode, const std::s
     g_powerState = PowerHdfState::SLEEP;
     int32_t ret = WriteSuspendState(tag);
     if (ret == HDF_SUCCESS) {
-        HDF_LOGI("ForceSuspendEx success, mode=%{public}s, tag=%{public}s", mode.c_str(), tag.c_str());
+        HDF_LOGI("ForceSuspendIgnoringWakelock success, tag=%{public}s", tag.c_str());
     }
     g_powerState = PowerHdfState::AWAKE;
 #ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
@@ -738,7 +744,7 @@ int32_t PowerInterfaceImpl::ForceSuspendEx(const std::string &mode, const std::s
     return ret;
 #else
     (void)tag;
-    HDF_LOGE("ForceSuspendEx ignore_wakelock is not supported");
+    HDF_LOGE("ForceSuspendIgnoringWakelock is not supported");
     return HDF_ERR_NOT_SUPPORT;
 #endif
 }

@@ -101,6 +101,7 @@ public:
     };
 
 private:
+    int32_t ForceSuspendIgnoringWakelock(const std::string &tag);
     int32_t UnRegister();
     int32_t AddPowerDeathRecipient(
         const sptr<IRemoteObject>& remote, const sptr<IRemoteObject::DeathRecipient>& recipient);
