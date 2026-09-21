@@ -348,10 +348,6 @@ int32_t LinuxSerial::SerialWrite(int32_t portId, const std::vector<uint8_t>& dat
         HDF_LOGE("%{public}s: write timed out. %{public}d", __func__, errno);
         return ERR_CODE_TIMEOUT;
     } else {
-        if (size > MAX_TRANS_DATA_SIZE) {
-            HDF_LOGE("%{public}s: size %{public}u exceeds max %{public}u", __func__, size, MAX_TRANS_DATA_SIZE);
-            return HDF_FAILURE;
-        }
         bytesWritten = write(fd, data.data(), data.size());
         if (bytesWritten == ERR_NO) {
             HDF_LOGE("%{public}s: write fail.", __func__);
