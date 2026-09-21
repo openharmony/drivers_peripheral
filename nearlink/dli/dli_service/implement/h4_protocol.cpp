@@ -211,7 +211,7 @@ bool SetVipPrio(unsigned int vipPrio)
 {
     MacLibAdapter &macLibAdapter = MacLibAdapter::GetInstance();
     if (!macLibAdapter.Init()) {
-        return false
+        return false;
     } 
     return macLibAdapter.SetVipPrio(vipPrio);
 }
