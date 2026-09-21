@@ -16,6 +16,7 @@
 #include <cerrno>
 #include <cstring>
 #include <dlfcn.h>
+#include <mutex>
 #include "nearlink_hdf_log.h"
 #include "h4_protocol.h"
 #include <unistd.h>
@@ -29,12 +30,79 @@ constexpr const char *SLE_MAC_LIB = "libnearlink_mac.z.so";
 constexpr const char *SET_VIP_PRIO = "SetVipPrio";
 constexpr int NEARLINK_HOST_PRIORITY = 10;
 
+namespace {
+using SetVipPrioFun = bool (*)(unsigned int);
+
+class MacLibAdapter {
+public:
+    static MacLibAdapter &GetInstance()
+    {
+        static MacLibAdapter instance;
+        return instance;
+    }
+
+    bool Init()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (macHandle_ != nullptr) {
+            HDF_LOGI("%{public}s already opened", SLE_MAC_LIB);
+            return true;
+        }
+        macHandle_ = dlopen(SLE_MAC_LIB, RTLD_NOW);
+        if (macHandle_ == nullptr) {
+            HDF_LOGE("dlopen %{public}s faild", SLE_MAC_LIB);
+            return false;
+        }
+        setVipPrio_ = reinterpret_cast<SetVipPrio>(dlsym(macHandle_, SET_VIP_PRIO));
+        if (setVipPrio_ == nullptr) {
+            HDF_LOGE("MacLibAdapter dlsym %{public}s failed", SET_VIP_PRIO);
+            dlclose(macHandle_);
+            macHandle_ = nullptr;
+            return false;
+        }
+        return false;
+    }
+
+    bool SetVipPrio(unsigned int vipPrio)
+    {
+        if (setVipPrio_ == nullptr) {
+            HDF_LOGE("setVipPrio_ is nullptr");
+            return false;
+        }
+        return setVipPrio_(vipPrio);
+    }
+
+private:
+    MacLibAdapter() = default;
+    ~MacLibAdapter()
+    {
+        CleanUp();
+    }
+
+    void CleanUp()
+    {
+        if (macHandle_ == nullptr) {
+            return;
+        }
+        setVipPrio_ = nullptr;
+        dlclose(macHandle_);
+        macHandle_ = nullptr;
+    }
+
+    std::mutex mutex_;
+    void *macHandle_ = nullptr;
+    SetVipPrioFun = setVipPrio_ = nullptr;
+};
+}
+
 thread_local bool H4Protocol::isThreadPromoted = false;
 
 H4Protocol::H4Protocol(
     int fd, DliDataCallback onAcbReceive, DliDataCallback onIcbReceive, DliDataCallback onEventReceive)
     : dliFd_(fd), onAcbReceive_(onAcbReceive), onIcbReceive_(onIcbReceive), onEventReceive_(onEventReceive)
-{}
+{
+    MacLibAdapter::GetInstance().Init();
+}
 
 ssize_t H4Protocol::SendPacket(const std::vector<uint8_t> &packetData)
 {
@@ -141,22 +209,11 @@ void H4Protocol::PacketCallback()
 
 bool SetVipPrio(unsigned int vipPrio)
 {
-    void *libMac = dlopen(SLE_MAC_LIB, RTLD_LAZY);
-    if (libMac == nullptr) {
-        HDF_LOGI("SetVipPrio no mac lib ready for dlopen");
-        return false;
-    }
-    using GetMacFun = bool (*)(unsigned int);
-    GetMacFun setVipPrio = reinterpret_cast<GetMacFun>(dlsym(libMac, SET_VIP_PRIO));
-    if (setVipPrio == nullptr) {
-        HDF_LOGE("SetVipPrio dlsym error");
-        dlclose(libMac);
-        return false;
-    }
-    bool result = false;
-    result = setVipPrio(vipPrio);
-    dlclose(libMac);
-    return result;
+    MacLibAdapter &macLibAdapter = MacLibAdapter::GetInstance();
+    if (!macLibAdapter.Init()) {
+        return false
+    } 
+    return macLibAdapter.SetVipPrio(vipPrio);
 }
 
 void H4Protocol::SetRTSchedule()
