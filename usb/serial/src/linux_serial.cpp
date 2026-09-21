@@ -278,6 +278,10 @@ int32_t LinuxSerial::SerialRead(int32_t portId, std::vector<uint8_t>& data, uint
     } else if (status == 0) {
         return ERR_CODE_TIMEOUT;
     } else {
+        if (size > MAX_TRANS_DATA_SIZE) {
+            HDF_LOGE("%{public}s: size %{public}u exceeds max %{public}u", __func__, size, MAX_TRANS_DATA_SIZE);
+            return HDF_FAILURE;
+        }
         int32_t bytesRead = read(fd, data.data(), size);
         if (bytesRead < 0) {
             HDF_LOGE("%{public}s: read fail.", __func__);
