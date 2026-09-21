@@ -53,7 +53,7 @@ public:
             HDF_LOGE("dlopen %{public}s faild", SLE_MAC_LIB);
             return false;
         }
-        setVipPrio_ = reinterpret_cast<SetVipPrio>(dlsym(macHandle_, SET_VIP_PRIO));
+        setVipPrio_ = reinterpret_cast<SetVipPrioFun>(dlsym(macHandle_, SET_VIP_PRIO));
         if (setVipPrio_ == nullptr) {
             HDF_LOGE("MacLibAdapter dlsym %{public}s failed", SET_VIP_PRIO);
             dlclose(macHandle_);
