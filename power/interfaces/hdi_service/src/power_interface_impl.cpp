@@ -730,6 +730,9 @@ int32_t PowerInterfaceImpl::ForceSuspendIgnoringWakelock(const std::string &tag)
         return HDF_ERR_INVALID_PARAM;
     }
 
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+    g_suspendTag = tag;
+#endif
     NotifyCallback(CMD_ON_SUSPEND);
     g_powerState = PowerHdfState::SLEEP;
     int32_t ret = WriteSuspendState(tag);
