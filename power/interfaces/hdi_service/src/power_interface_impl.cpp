@@ -82,10 +82,7 @@ static std::atomic_bool g_suspending;
 static std::atomic_bool g_suspendRetry;
 static UniqueFd wakeupCountFd;
 static PowerHdfState g_powerState {PowerHdfState::AWAKE};
-#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
-[[maybe_unused]]
-#endif
-static void AutoSuspendLoop();
+[[maybe_unused]] static void AutoSuspendLoop();
 static int32_t DoSuspend();
 #ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
 static int32_t WriteSuspendState(const std::string &state);
