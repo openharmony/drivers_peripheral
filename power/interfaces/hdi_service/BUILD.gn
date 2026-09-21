@@ -56,8 +56,11 @@ ohos_shared_library("libpower_interface_service_1.4") {
     defines += [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
   }
 
-  if (drivers_peripheral_power_suspend_with_tag) {
+  if (drivers_peripheral_power_suspend_with_tag || drivers_peripheral_power_enable_s4) {
     external_deps += [ "init:libbegetutil" ]
+  }
+
+  if (drivers_peripheral_power_suspend_with_tag) {
     defines += [ "DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG" ]
   }
 
