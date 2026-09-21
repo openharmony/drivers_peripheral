@@ -60,7 +60,7 @@ public:
             macHandle_ = nullptr;
             return false;
         }
-        return false;
+        return true;
     }
 
     bool SetVipPrio(unsigned int vipPrio)
