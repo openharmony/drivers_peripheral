@@ -45,7 +45,6 @@ public:
     {
         std::lock_guard<std::mutex> lock(mutex_);
         if (macHandle_ != nullptr) {
-            HDF_LOGI("%{public}s already opened", SLE_MAC_LIB);
             return true;
         }
         macHandle_ = dlopen(SLE_MAC_LIB, RTLD_NOW);
