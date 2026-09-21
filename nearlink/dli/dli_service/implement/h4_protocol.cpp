@@ -91,7 +91,7 @@ private:
 
     std::mutex mutex_;
     void *macHandle_ = nullptr;
-    SetVipPrioFun = setVipPrio_ = nullptr;
+    SetVipPrioFun setVipPrio_ = nullptr;
 };
 }
 
