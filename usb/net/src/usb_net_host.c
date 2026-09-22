@@ -1101,6 +1101,11 @@ static int32_t UsbnetHostOpen(struct UsbnetHost *usbNet, struct HdfSBuf *data)
     OsalMutexInit(&usbNet->writeLock);
     OsalMutexInit(&usbNet->sendNetLock);
 
+    if (usbNet->rxQlen > USBNET_NR) {
+        HDF_LOGE("%{public}s: rxQlen %{public}u exceeds readReq capacity %{public}d",
+            __func__, usbNet->rxQlen, USBNET_NR);
+        usbNet->rxQlen = USBNET_NR;
+    }
     usbNet->readReqNum = usbNet->rxQlen;
     ret = UsbnetHostAllocRequests(usbNet);
     if (ret) {
