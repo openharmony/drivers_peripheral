@@ -2170,11 +2170,13 @@ int32_t LibusbAdapter::FillAndSubmitTransfer(LibusbAsyncTransfer *asyncTransfer,
             info.numIsoPackets, HandleAsyncResult, asyncTransfer, info.timeOut);
         if (info.numIsoPackets > 0) {
             uint32_t packetLength = info.length / info.numIsoPackets;
-            uint32_t maxIsoPacketLength =
-                static_cast<uint32_t>(libusb_get_max_iso_packet_size(libusb_get_device(devHandle), info.endpoint));
-            packetLength = packetLength >= maxIsoPacketLength ? maxIsoPacketLength : packetLength;
-            HDF_LOGI("%{public}s: iso pkg len: %{public}d, max iso pkg len: %{public}d",
-                __func__, packetLength, maxIsoPacketLength);
+            /* libusb_get_max_iso_packet_size reads the current alt (zero-bandwidth alt0)
+             * wMaxPacketSize from the cached descriptor, which differs from the runtime
+             * altsetting selected via SET_INTERFACE (e.g. alt0=128 vs alt3=800). Capping
+             * each packet buffer below the actual device packet size overflows full iso
+             * packets, so they are all dropped (status=ERROR/actualLength=0). The app sizes
+             * length/numIsoPackets precisely by endpoint wMaxPacketSize, so use that value
+             * directly instead of capping. */
             libusb_set_iso_packet_lengths(asyncTransfer->transferRef, packetLength);
         }
     } else {
@@ -2220,13 +2222,16 @@ void LIBUSB_CALL LibusbAdapter::HandleAsyncResult(struct libusb_transfer *transf
         return;
     }
     // write data to ashmem when direction is in
-    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN &&
-        transfer->actual_length > 0) {
+    if ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN) {
         HDF_LOGI("%{public}s: write data to ashmem", __func__);
-        if (transfer->type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS) {
-            transfer->actual_length = transfer->length;
+
+        int32_t ret = HDF_SUCCESS;
+        if (transfer->type == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS &&
+            transfer->length > 0) {
+            ret = WriteAshmem(asyncTransfer->ashmemRef, transfer->length, transfer->buffer);
+        } else if (transfer->actual_length > 0) {
+            ret = WriteAshmem(asyncTransfer->ashmemRef, transfer->actual_length, transfer->buffer);
         }
-        int32_t ret = WriteAshmem(asyncTransfer->ashmemRef, transfer->actual_length, transfer->buffer);
         if (ret != HDF_SUCCESS) {
             HandleAsyncFailure(transfer);
             return;
