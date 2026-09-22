@@ -202,6 +202,54 @@ static int32_t CheckSupport(struct IAudioAdapterVdi *vdiAdapter, const struct Au
     return ret;
 }
 
+static int32_t CreateOrReuseRenderVdi(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
+{
+    struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
+    if (vdiAdapter == NULL || vdiAdapter->CreateRender == NULL || vdiAdapter->DestroyRender == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    int32_t ret = CheckSupport(vdiAdapter, desc);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("not support");
+        return ret;
+    }
+
+    const char *condition = "support_multi_stream";
+    char value[VALUE_LEN + 1] = {0};
+    if (vdiAdapter->GetExtraParams != NULL) {
+        ret = vdiAdapter->GetExtraParams(vdiAdapter, 0, condition, value, VALUE_LEN);
+    }
+
+    char *adapterName = AudioGetAdapterNameVdi(adapter);
+    if (adapterName == NULL) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName, value);
+    if (*render != NULL) {
+        AUDIO_FUNC_LOGE("already created");
+        return HDF_SUCCESS;
+    }
+
+    struct IAudioRenderVdi *vdiRender = NULL;
+    ret = CreateRenderPre(vdiAdapter, desc, attrs, renderId, &vdiRender);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("CreateRenderPre failed, ret = [%{public}d]", ret);
+        return ret;
+    }
+    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterName);
+    if (*render == NULL) {
+        (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
+        AUDIO_FUNC_LOGE("Create audio render failed");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
@@ -212,47 +260,15 @@ static int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct 
         goto EXIT;
     }
 
-    struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
-    if (vdiAdapter == NULL || vdiAdapter->CreateRender == NULL || vdiAdapter->DestroyRender == NULL) {
-        AUDIO_FUNC_LOGE("invalid param");
-        ret = HDF_ERR_INVALID_PARAM;
-        goto EXIT;
+    ret = CreateOrReuseRenderVdi(adapter, desc, attrs, render, renderId);
+    if (ret == HDF_SUCCESS) {
+        AUDIO_FUNC_LOGI("Success, renderId = [%{public}u], portId = [%{public}u], "
+            "pin = [%{public}d],type = [%{public}d]",
+            *renderId, desc->portId, desc->pins, attrs->type);
+        AUDIO_FUNC_LOGI("format = [%{public}d], sampleRate = [%{public}u], channelCount = [%{public}u], "
+            "streamId = [%{public}d], sourceType = [%{public}d]",
+            attrs->format, attrs->sampleRate, attrs->channelCount, attrs->streamId, attrs->sourceType);
     }
-
-    ret = CheckSupport(vdiAdapter, desc);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("not support");
-        goto EXIT;
-    }
-    const char* condition = "support_multi_stream";
-    char value[VALUE_LEN + 1] = {0};
-    if (vdiAdapter->GetExtraParams != NULL) {
-        ret = vdiAdapter -> GetExtraParams(vdiAdapter, 0, condition, value, VALUE_LEN);
-    }
-    char *adapterName = AudioGetAdapterNameVdi(adapter);
-    *render = FindRenderCreated(desc->pins, attrs, renderId, adapterName, value);
-    if (*render != NULL) {
-        AUDIO_FUNC_LOGE("already created");
-        ret = HDF_SUCCESS;
-        goto EXIT;
-    }
-    struct IAudioRenderVdi *vdiRender = NULL;
-    ret = CreateRenderPre(vdiAdapter, desc, attrs, renderId, &vdiRender);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("CreateRenderPre failed, ret = [%{public}d]", ret);
-        goto EXIT;
-    }
-    *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc, adapterName);
-    if (*render == NULL) {
-        (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
-        AUDIO_FUNC_LOGE("Create audio render failed");
-        ret = HDF_FAILURE;
-        goto EXIT;
-    }
-    AUDIO_FUNC_LOGI("Success, renderId = [%{public}u], portId=%{public}u, pin=%{public}d, type=%{public}d, \
-        format=%{public}d, sampleRate=%{public}u, channelCount=%{public}u, steamId=%{public}d, sourceType=%{public}d",
-        *renderId, desc->portId, desc->pins, attrs->type, attrs->format, attrs->sampleRate, attrs->channelCount,
-        attrs->streamId, attrs->sourceType);
 EXIT:
     pthread_rwlock_unlock(&g_rwAdapterLock);
     return ret;

@@ -545,6 +545,8 @@ struct IAudioManager *AudioManagerCreateIfInstance(void)
     priv->vdiManager = (struct IAudioManagerVdi *)priv->managerFuncs();
     if (priv->vdiManager == NULL) {
         AUDIO_FUNC_LOGE("audio call vdi manager func failed");
+        dlclose(priv->handle);
+        priv->handle = NULL;
         OsalMemFree((void *)priv);
         return NULL;
     }

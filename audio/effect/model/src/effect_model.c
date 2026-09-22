@@ -361,6 +361,7 @@ static int32_t CreateEffectController(const struct EffectInfo *info, struct IEff
     ctrlMgr->libName = strdup(info->libName);
     if (ctrlMgr->libName == NULL) {
         HDF_LOGE("%{public}s: strdup failed, info->effectId = %{public}s", __func__, info->effectId);
+        libInfo->ctrlMgr = NULL;
         OsalMemFree(ctrlMgr);
         return HDF_FAILURE;
     }
