@@ -123,12 +123,20 @@ static void LIBUSB_CALL SyncTranferCallback(struct libusb_transfer *transfer)
 
 static int32_t SyncTranferStatusToRet(int32_t status)
 {
-    if (status == LIBUSB_TRANSFER_COMPLETED) { return LIBUSB_SUCCESS; }
-    if (status == LIBUSB_TRANSFER_TIMED_OUT) { return LIBUSB_ERROR_TIMEOUT; }
-    if (status == LIBUSB_TRANSFER_STALL) { return LIBUSB_ERROR_PIPE; }
-    if (status == LIBUSB_TRANSFER_OVERFLOW) { return LIBUSB_ERROR_OVERFLOW; }
-    if (status == LIBUSB_TRANSFER_NO_DEVICE) { return LIBUSB_ERROR_NO_DEVICE; }
-    return LIBUSB_ERROR_IO;
+    switch (status) {
+        case LIBUSB_TRANSFER_COMPLETED:
+            return LIBUSB_SUCCESS;
+        case LIBUSB_TRANSFER_TIMED_OUT:
+            return LIBUSB_ERROR_TIMEOUT;
+        case LIBUSB_TRANSFER_STALL:
+            return LIBUSB_ERROR_PIPE;
+        case LIBUSB_TRANSFER_OVERFLOW:
+            return LIBUSB_ERROR_OVERFLOW;
+        case LIBUSB_TRANSFER_NO_DEVICE:
+            return LIBUSB_ERROR_NO_DEVICE;
+        default:
+            return LIBUSB_ERROR_IO;
+    }
 }
 
 sptr<V1_2::LibUsbSaSubscriber> LibusbAdapter::libUsbSaSubscriber_ {nullptr};
