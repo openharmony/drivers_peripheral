@@ -14,7 +14,7 @@
 import("../../../camera.gni")
 import("//build/test.gni")
 
-module_output_path = "drivers_peripheral_camera/camera"
+module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
 
 config("camera_security_ut_config") {
   visibility = [ ":*" ]
