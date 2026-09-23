@@ -50,6 +50,15 @@ ohos_shared_library("intell_voice_trigger_manager_service_1.1") {
     ]
   }
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
+
   version_script = "libtrigger_manager_service_1_1.versionscript"
 
   install_enable = true
@@ -82,6 +91,15 @@ ohos_shared_library("intell_voice_trigger_driver") {
       "ipc:ipc_single",
     ]
   }
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
 
   shlib_type = "hdi"
   install_enable = true
