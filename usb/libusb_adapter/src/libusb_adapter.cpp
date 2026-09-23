@@ -20,7 +20,6 @@
 #include <cerrno>
 #include <cstdio>
 #include <climits>
-#include <atomic>
 #include <limits>
 #include <fcntl.h>
 #include <pthread.h>
@@ -117,67 +116,19 @@ static uint64_t ToDdkDeviceId(int32_t busNum, int32_t devNum)
 }
 } // namespace
 
-/* Completion flag shared with the transfer callback. */
-struct SyncTranferWait {
-    std::atomic<bool> completed {false};
-};
-
 static void LIBUSB_CALL SyncTranferCallback(struct libusb_transfer *transfer)
 {
-    static_cast<SyncTranferWait *>(transfer->user_data)->completed.store(true);
+    *static_cast<int *>(transfer->user_data) = 1;
 }
 
 static int32_t SyncTranferStatusToRet(int32_t status)
 {
-    switch (status) {
-        case LIBUSB_TRANSFER_COMPLETED:
-            return LIBUSB_SUCCESS;
-        case LIBUSB_TRANSFER_TIMED_OUT:
-            return LIBUSB_ERROR_TIMEOUT;
-        case LIBUSB_TRANSFER_STALL:
-            return LIBUSB_ERROR_PIPE;
-        case LIBUSB_TRANSFER_OVERFLOW:
-            return LIBUSB_ERROR_OVERFLOW;
-        case LIBUSB_TRANSFER_NO_DEVICE:
-            return LIBUSB_ERROR_NO_DEVICE;
-        case LIBUSB_TRANSFER_ERROR:
-        case LIBUSB_TRANSFER_CANCELLED:
-        default:
-            return LIBUSB_ERROR_IO;
-    }
-}
-
-/* Submit under the handle lock, wait outside it: a stalled transfer can no longer block
- * OpenDevice/CloseDevice, and the handle cannot be released before it enters libusb. */
-static int32_t SubmitTranferAndWait(const UsbDev &dev, libusb_transfer *transfer, SyncTranferWait &wait,
-    int32_t &transferred)
-{
-    int32_t ret = LIBUSB_ERROR_NO_DEVICE;
-    {
-        std::shared_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
-        uint32_t result = (static_cast<uint32_t>(dev.busNum) << DISPLACEMENT_NUMBER) |
-            static_cast<uint32_t>(dev.devAddr);
-        auto it = g_handleMap.find(result);
-        if (it == g_handleMap.end() || it->second.handle != transfer->dev_handle) {
-            HDF_LOGE("%{public}s: handle is released", __func__);
-            return ret;
-        }
-        ret = libusb_submit_transfer(transfer);
-    }
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: submit transfer failed ret=%{public}d", __func__, ret);
-        return ret;
-    }
-    while (!wait.completed.load()) {
-        (void)libusb_handle_events_completed(g_libusb_context, nullptr);
-        if (transfer->dev_handle == nullptr) {
-            /* libusb_close() dropped this in-flight transfer, no callback will follow. */
-            transfer->status = LIBUSB_TRANSFER_NO_DEVICE;
-            break;
-        }
-    }
-    transferred = transfer->actual_length;
-    return SyncTranferStatusToRet(transfer->status);
+    if (status == LIBUSB_TRANSFER_COMPLETED) { return LIBUSB_SUCCESS; }
+    if (status == LIBUSB_TRANSFER_TIMED_OUT) { return LIBUSB_ERROR_TIMEOUT; }
+    if (status == LIBUSB_TRANSFER_STALL) { return LIBUSB_ERROR_PIPE; }
+    if (status == LIBUSB_TRANSFER_OVERFLOW) { return LIBUSB_ERROR_OVERFLOW; }
+    if (status == LIBUSB_TRANSFER_NO_DEVICE) { return LIBUSB_ERROR_NO_DEVICE; }
+    return LIBUSB_ERROR_IO;
 }
 
 sptr<V1_2::LibUsbSaSubscriber> LibusbAdapter::libUsbSaSubscriber_ {nullptr};
@@ -1555,7 +1506,7 @@ int32_t LibusbAdapter::SendPipeRequest(const UsbDev &dev, const UsbPipe &pipe, u
     }
     unsigned char *transferBuffer = buffer + offset;
     SyncTranfer syncTranfer = {static_cast<int>(length), &actlength, timeout};
-    ret = DoSyncPipeTranfer(dev, devHandle, &endpointDes, transferBuffer, syncTranfer);
+    ret = DoSyncPipeTranfer(devHandle, &endpointDes, transferBuffer, syncTranfer);
     if (ret < 0) {
         if (ret != LIBUSB_ERROR_OVERFLOW) {
             ret = HDF_FAILURE;
@@ -1612,7 +1563,7 @@ int32_t LibusbAdapter::SendPipeRequestWithAshmem(const UsbDev &dev, const UsbPip
     }
     unsigned char *transferBuffer = buffer + sendRequestAshmemParameter.offset;
     SyncTranfer syncTranfer = {static_cast<int>(sendRequestAshmemParameter.bufferLength), &actlength, timeout};
-    ret = DoSyncPipeTranfer(dev, devHandle, &endpointDes, transferBuffer, syncTranfer);
+    ret = DoSyncPipeTranfer(devHandle, &endpointDes, transferBuffer, syncTranfer);
     HDF_LOGI("SendPipeRequestWithAshmem DoSyncPipeTranfer ret :%{public}d", ret);
     if (ret < 0) {
         if (ret != LIBUSB_ERROR_OVERFLOW) {
@@ -1962,30 +1913,51 @@ void LibusbAdapter::ProcessExtraData(std::vector<uint8_t> &descriptor, size_t &c
     HDF_LOGD("%{public}s leave", __func__);
 }
 
-int32_t LibusbAdapter::DoSyncPipeTranfer(const UsbDev &dev, libusb_device_handle *devHandle,
-    libusb_endpoint_descriptor *endpointDes, unsigned char *buffer, SyncTranfer &syncTranfer)
+int32_t LibusbAdapter::DoSyncPipeTranfer(libusb_device_handle *devHandle, libusb_endpoint_descriptor *endpointDes,
+    unsigned char *buffer, SyncTranfer &syncTranfer)
 {
     HDF_LOGD("%{public}s enter", __func__);
-    if (devHandle == nullptr || endpointDes == nullptr || buffer == nullptr || syncTranfer.transferred == nullptr) {
-        HDF_LOGE("%{public}s: invalid parameter", __func__);
-        return HDF_FAILURE;
-    }
     libusb_transfer *transfer = libusb_alloc_transfer(0);
     if (transfer == nullptr) {
         HDF_LOGE("%{public}s: alloc transfer failed", __func__);
         return HDF_FAILURE;
     }
-    SyncTranferWait wait;
-    uint32_t endpointAttributes = endpointDes->bmAttributes & LIBUSB_TRANSFER_TYPE_INTERRUPT;
-    if (endpointAttributes == LIBUSB_TRANSFER_TYPE_INTERRUPT) {
+    int completed = 0;
+    if ((endpointDes->bmAttributes & LIBUSB_TRANSFER_TYPE_INTERRUPT) == LIBUSB_TRANSFER_TYPE_INTERRUPT) {
         libusb_fill_interrupt_transfer(transfer, devHandle, endpointDes->bEndpointAddress, buffer,
-            syncTranfer.length, SyncTranferCallback, &wait, syncTranfer.timeout);
+            syncTranfer.length, SyncTranferCallback, &completed, syncTranfer.timeout);
     } else {
         libusb_fill_bulk_transfer(transfer, devHandle, endpointDes->bEndpointAddress, buffer,
-            syncTranfer.length, SyncTranferCallback, &wait, syncTranfer.timeout);
+            syncTranfer.length, SyncTranferCallback, &completed, syncTranfer.timeout);
     }
+    int32_t ret = HDF_FAILURE;
     int32_t transferred = 0;
-    int32_t ret = SubmitTranferAndWait(dev, transfer, wait, transferred);
+    {
+        std::shared_lock<std::shared_mutex> lock(g_mapMutexHandleMap);
+        bool isDeviceExist = false;
+        for (auto &it : g_handleMap) {
+            if (it.second.handle == devHandle) {
+                isDeviceExist = true;
+                break;
+            }
+        }
+        if (!isDeviceExist) {
+            HDF_LOGE("%{public}s: failed to find the handle", __func__);
+            libusb_free_transfer(transfer);
+            return HDF_FAILURE;
+        }
+        ret = libusb_submit_transfer(transfer);
+    }
+    if (ret == LIBUSB_SUCCESS) {
+        while (completed == 0 && transfer->dev_handle != nullptr) {
+            (void)libusb_handle_events_completed(g_libusb_context, &completed);
+        }
+        if (transfer->dev_handle == nullptr) {
+            transfer->status = LIBUSB_TRANSFER_NO_DEVICE;
+        }
+        transferred = transfer->actual_length;
+        ret = SyncTranferStatusToRet(transfer->status);
+    }
     libusb_free_transfer(transfer);
     *(syncTranfer.transferred) = transferred;
     if (ret < 0 && transferred <= 0) {

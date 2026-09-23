@@ -239,8 +239,8 @@ private:
         libusb_device_handle** deviceHandle);
     int32_t GetEndpointDescFromInterface(const UsbPipe &pipe, const libusb_interface_descriptor *intf_desc,
     libusb_endpoint_descriptor *endpoint_desc);
-    int32_t DoSyncPipeTranfer(const UsbDev &dev, libusb_device_handle *dev_handle,
-        libusb_endpoint_descriptor *endpointDes, unsigned char *buffer, SyncTranfer &syncTranfer);
+    int32_t DoSyncPipeTranfer(libusb_device_handle *dev_handle, libusb_endpoint_descriptor *endpointDes,
+        unsigned char *buffer, SyncTranfer &syncTranfer);
     unsigned char *GetMmapBufferByFd(int32_t fd, size_t len);
     unsigned char *GetMmapFdAndBuffer(uint8_t busNumber, uint8_t busAddress, int32_t &fd, size_t len);
     int32_t CloseMmapBuffer(void *mmapBuf, size_t length);
