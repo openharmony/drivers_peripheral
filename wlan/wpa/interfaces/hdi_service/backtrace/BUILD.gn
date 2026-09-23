@@ -1,5 +1,6 @@
 import("//build/ohos.gni")
 ohos_static_library("libwpa_dump_backtrace") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
       boundary_sanitize = false  # Enable boundary san detection
