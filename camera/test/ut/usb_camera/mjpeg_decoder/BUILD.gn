@@ -15,7 +15,7 @@ import("//build/test.gni")
 import("//drivers/peripheral/camera/camera.gni")
 import("//drivers/peripheral/camera/vdi_base/usb_camera/camera_usb.gni")
 
-module_output_path = "drivers_peripheral_camera/camera"
+module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
 
 ohos_unittest("mjpeg_decoder_test") {
   testonly = true

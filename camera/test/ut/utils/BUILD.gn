@@ -49,7 +49,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/test.gni")
 
-  module_output_path = "drivers_peripheral_camera/camera"
+  module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
 
   config("camera_ut_test_config") {
     visibility = [ ":*" ]

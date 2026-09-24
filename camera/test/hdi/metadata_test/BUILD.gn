@@ -17,7 +17,7 @@ camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-module_output_path = "drivers_peripheral_camera/camera"
+module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
 
 config("camhdi_at_test_config") {
   visibility = [ ":*" ]
