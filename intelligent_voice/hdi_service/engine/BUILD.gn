@@ -27,6 +27,7 @@ ohos_shared_library("intell_voice_engine_manager_service_1.3") {
 
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.0",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.1",
