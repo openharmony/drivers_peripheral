@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 import("//drivers/peripheral/distributed_camera/distributedcamera.gni")
 
 ohos_shared_library("libdistributed_camera_provider_config") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     boundary_sanitize = true
     cfi = true
@@ -56,6 +57,7 @@ ohos_shared_library("libdistributed_camera_provider_config") {
 }
 
 ohos_shared_library("libdistributed_camera_host_config") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     boundary_sanitize = true
     cfi = true
@@ -110,6 +112,7 @@ ohos_shared_library("libdistributed_camera_host_config") {
 }
 
 ohos_shared_library("libdistributed_camera_hdf_service_1.1") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     boundary_sanitize = true
     cfi = true

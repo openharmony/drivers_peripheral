@@ -251,10 +251,12 @@ int32_t DCameraProvider::Notify(const DHBase& dhBase, const DCameraHDFEvent& eve
         if (json != nullptr) {
             cJSON_AddNumberToObject(json, KEY_TRIGGER_FIRST_TOKENID, static_cast<double>(triggerFirstTokenId));
             char *jsonStr = cJSON_PrintUnformatted(json);
-            std::string newContent(jsonStr);
+            if (jsonStr != nullptr) {
+                std::string newContent(jsonStr);
+                cJSON_free(jsonStr);
+                modifiedEvent.content_ = newContent;
+            }
             cJSON_Delete(json);
-            cJSON_free(jsonStr);
-            modifiedEvent.content_ = newContent;
         }
         DHLOGI("[MultiUserTrigger] Notify triggerFirstTokenId=%{public}s from GetFirstTokenID",
             GetAnonyString(std::to_string(triggerFirstTokenId)).c_str());
