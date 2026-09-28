@@ -35,20 +35,20 @@ class PowerFuzzTest {
 public:
     PowerFuzzTest()
     {
-        impl_ = new V1_3::PowerInterfaceImpl();
+        impl_ = new V1_4::PowerInterfaceImpl();
         impl_->SuspendBlock("PowerStubFuzzTest"); // Prevent device sleep
     }
     ~PowerFuzzTest()
     {
         impl_->SuspendUnblock("PowerStubFuzzTest");
     }
-    sptr<V1_3::PowerInterfaceImpl> GetImpl() const
+    sptr<V1_4::PowerInterfaceImpl> GetImpl() const
     {
         return impl_;
     }
 
 private:
-    sptr<V1_3::PowerInterfaceImpl> impl_ = nullptr;
+    sptr<V1_4::PowerInterfaceImpl> impl_ = nullptr;
 };
 namespace {
 const int32_t REWIND_READ_DATA = 0;
