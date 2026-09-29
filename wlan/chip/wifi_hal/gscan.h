@@ -20,7 +20,7 @@
 
 #define LOW_LIMIT_FREQ_2_4G      2400
 #define HIGH_LIMIT_FREQ_2_4G      2500
-#define LOW_LIMIT_FREQ_5G         5100
+#define LOW_LIMIT_FREQ_5G         5180
 #define HIGH_LIMIT_FREQ_5G        5900
 
 WifiError VendorHalGetChannelsInBand(wifiInterfaceHandle handle,
