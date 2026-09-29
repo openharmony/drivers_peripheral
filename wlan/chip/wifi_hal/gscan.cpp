@@ -69,17 +69,17 @@ public:
                 if (isDfsChannel) {
                     break;
                 }
-                if (freq > LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
+                if (freq >= LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
                     mFreqs.push_back(freq);
                 }
                 break;
             case SCAN_BAND_5_GHZ_DFS_ONLY:
-                if (isDfsChannel && freq > LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
+                if (isDfsChannel && freq >= LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
                     mFreqs.push_back(freq);
                 }
                 break;
             case SCAN_BAND_5_GHZ_WITH_DFS:
-                if (freq > LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
+                if (freq >= LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
                     mFreqs.push_back(freq);
                 }
                 break;
