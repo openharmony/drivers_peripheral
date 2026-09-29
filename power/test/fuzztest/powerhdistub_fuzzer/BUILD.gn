@@ -32,6 +32,7 @@ ohos_fuzztest("PowerHdiStubFuzzTest") {
   deps = [ "../../../interfaces/hdi_service:libpower_interface_service_1.4" ]
   external_deps = [
     "drivers_interface_power:libpower_stub_1.2",
+    "drivers_interface_power:libpower_stub_1.3",
     "drivers_interface_power:libpower_stub_1.4",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
