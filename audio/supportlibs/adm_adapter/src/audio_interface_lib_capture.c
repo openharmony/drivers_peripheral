@@ -1011,13 +1011,11 @@ int32_t MmapDescWriteBufferCapture(struct HdfSBuf *sBuf, const struct AudioHwCap
 
     if (!HdfSbufWriteString(sBuf, handleData->captureMode.hwInfo.cardServiceName)) {
         AUDIO_FUNC_LOGE("[HdfSbufWriteString]-[cardServiceName] failed!");
-        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint64(sBuf, mmapAddr)) {
         AUDIO_FUNC_LOGE("HdfSbufWriteUint64 memoryAddress failed!");
-        AudioFreeHdfSBuf(&sBuf, NULL);
         return HDF_FAILURE;
     }
 

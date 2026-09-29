@@ -235,6 +235,12 @@ int32_t VibratorIfService::EnableVibratorModulation(uint32_t duration, uint16_t 
 int32_t VibratorIfService::EnableCompositeEffect(const HdfCompositeEffect &effect)
 {
     HDF_LOGD("%{public}s: Enter the EnableCompositeEffect function.", __func__);
+    pid_t callingPid = HdfRemoteGetCallingPid();
+    HDF_LOGI("%{public}s: callingPid = %{public}d", __func__, callingPid);
+    if (callingPid <= 0) {
+        HDF_LOGE("%{public}s: invalid calling pid %{public}d", __func__, callingPid);
+        return HDF_FAILURE;
+    }
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;

@@ -352,8 +352,10 @@ static void ReleaseDrv2605lDriver(struct HdfDeviceObject *device)
         HDF_LOGE("%s: drvData is null", __func__);
         return;
     }
-    ReleaseDrv2605lBusHandle(&drvData->drv2605lCfgData->vibratorBus.i2cCfg);
-    OsalMemFree(drvData->drv2605lCfgData);
+    if (drvData->drv2605lCfgData != NULL) {
+        ReleaseDrv2605lBusHandle(&drvData->drv2605lCfgData->vibratorBus.i2cCfg);
+        OsalMemFree(drvData->drv2605lCfgData);
+    }
     OsalMemFree(drvData);
     g_drv2605lDrvData = NULL;
 }
