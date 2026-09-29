@@ -29,6 +29,15 @@ ohos_shared_library("vendor_intell_voice_trigger") {
     "ipc:ipc_single",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+ 	 
+  branch_protector_ret = "pac_ret"
+
   install_enable = true
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -57,6 +66,15 @@ ohos_shared_library("vendor_intell_voice_engine") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
+  
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+ 	 
+  branch_protector_ret = "pac_ret"
 
   install_enable = true
   install_images = [ chipset_base_dir ]
