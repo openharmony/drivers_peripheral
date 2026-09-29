@@ -52,7 +52,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
+namespace V1_4 {
 using namespace OHOS::HDI::Power;
 static constexpr const int32_t MAX_FILE_LENGTH = 32 * 1024 * 1024;
 static constexpr const char * const SUSPEND_STATE = "mem";
@@ -82,8 +82,11 @@ static std::atomic_bool g_suspending;
 static std::atomic_bool g_suspendRetry;
 static UniqueFd wakeupCountFd;
 static PowerHdfState g_powerState {PowerHdfState::AWAKE};
-static void AutoSuspendLoop();
+[[maybe_unused]] static void AutoSuspendLoop();
 static int32_t DoSuspend();
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
+static int32_t WriteSuspendState(const std::string &state);
+#endif
 static void LoadStringFd(int32_t fd, std::string &content);
 static std::string ReadWakeCount();
 static bool WriteWakeCount(const std::string &count);
@@ -110,9 +113,9 @@ static bool g_isPowerHdiExtReg = false;
 static constexpr const int32_t REASON_MAX_RETRY_COUNT = 3;
 #endif
 
-extern "C" V1_3::IPowerInterface *PowerInterfaceImplGetInstance(void)
+extern "C" V1_4::IPowerInterface *PowerInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Power::V1_3::PowerInterfaceImpl;
+    using OHOS::HDI::Power::V1_4::PowerInterfaceImpl;
     PowerInterfaceImpl *service = new (std::nothrow) PowerInterfaceImpl();
     if (service == nullptr) {
         return nullptr;
@@ -184,6 +187,10 @@ int32_t PowerInterfaceImpl::UnRegisterRunningLockCallback()
 
 int32_t PowerInterfaceImpl::StartSuspend()
 {
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
+    HDF_LOGI("skip starting auto suspend loop");
+    return HDF_SUCCESS;
+#else
     std::lock_guard<std::mutex> lock(g_mutex);
     HDF_LOGI("staS3");
     g_suspendRetry = true;
@@ -196,6 +203,7 @@ int32_t PowerInterfaceImpl::StartSuspend()
     g_daemon = std::make_unique<std::thread>(&AutoSuspendLoop);
     g_daemon->detach();
     return HDF_SUCCESS;
+#endif
 }
 
 void AutoSuspendLoop()
@@ -679,7 +687,71 @@ int32_t PowerInterfaceImpl::GetPowerConfig(const std::string &sceneName, std::st
     LoadStringFd(getValueFd, value);
     return HDF_SUCCESS;
 }
-} // namespace V1_3
+
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
+static int32_t WriteSuspendState(const std::string &state)
+{
+    UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
+    if (suspendStateFd < 0) {
+        HDF_LOGE("open %{public}s fail, error: %{public}s", SUSPEND_STATE_PATH, strerror(errno));
+        return HDF_FAILURE;
+    }
+    if (!SaveStringToFd(suspendStateFd, state)) {
+        HDF_LOGE("write tag %{public}s failed", state.c_str());
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+#endif
+
+int32_t PowerInterfaceImpl::ForceSuspendEx(const std::string &mode, const std::string &tag)
+{
+    HDF_LOGI("ForceSuspendEx, mode=%{public}s, tag=%{public}s", mode.c_str(), tag.c_str());
+    if (mode == "auto") {
+        (void)tag;
+        return ForceSuspend();
+    }
+    if (mode == "ignore_wakelock") {
+        return ForceSuspendIgnoringWakelock(tag);
+    }
+    HDF_LOGE("Invalid suspend mode: %{public}s", mode.c_str());
+    return HDF_ERR_INVALID_PARAM;
+}
+
+int32_t PowerInterfaceImpl::ForceSuspendIgnoringWakelock(const std::string &tag)
+{
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK
+    HDF_LOGI("ForceSuspendIgnoringWakelock, tag=%{public}s", tag.c_str());
+    if (tag != "mem" && tag != "ulsr") {
+        HDF_LOGE("Invalid suspend tag: %{public}s", tag.c_str());
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+    g_suspendTag = tag;
+#endif
+    NotifyCallback(CMD_ON_SUSPEND);
+    g_powerState = PowerHdfState::SLEEP;
+    int32_t ret = WriteSuspendState(tag);
+    if (ret == HDF_SUCCESS) {
+        HDF_LOGI("ForceSuspendIgnoringWakelock success, tag=%{public}s", tag.c_str());
+    }
+    g_powerState = PowerHdfState::AWAKE;
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+    g_wakeupTag = tag;
+    if (tag == "ulsr") {
+        OHOS::system::SetParameter(ULSR_RESULT_PARAM, ret == HDF_SUCCESS ? "success" : "fail");
+    }
+#endif
+    NotifyCallback(CMD_ON_WAKEUP);
+    return ret;
+#else
+    (void)tag;
+    HDF_LOGE("ForceSuspendIgnoringWakelock is not supported");
+    return HDF_ERR_NOT_SUPPORT;
+#endif
+}
+} // namespace V1_4
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("../../power.gni")
 
-ohos_shared_library("libpower_interface_service_1.3") {
+ohos_shared_library("libpower_interface_service_1.4") {
   include_dirs = [ "../../utils/include" ]
   sources = [
     "../../utils/power_xcollie.cpp",
@@ -29,6 +29,7 @@ ohos_shared_library("libpower_interface_service_1.3") {
     "cJSON:cjson",
     "drivers_interface_power:libpower_stub_1.2",
     "drivers_interface_power:libpower_stub_1.3",
+    "drivers_interface_power:libpower_stub_1.4",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
@@ -58,8 +59,11 @@ ohos_shared_library("libpower_interface_service_1.3") {
     defines += [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
   }
 
-  if (drivers_peripheral_power_suspend_with_tag) {
+  if (drivers_peripheral_power_suspend_with_tag || drivers_peripheral_power_enable_s4) {
     external_deps += [ "init:libbegetutil" ]
+  }
+
+  if (drivers_peripheral_power_suspend_with_tag) {
     defines += [ "DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG" ]
   }
 
@@ -80,6 +84,10 @@ ohos_shared_library("libpower_interface_service_1.3") {
     defines += [ "DRIVERS_PERIPHERAL_POWER_HOST_SCHED_PRIORITY" ]
   }
 
+  if (drivers_peripheral_power_enable_force_suspend_ignoring_wakelock) {
+    defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_FORCE_SUSPEND_IGNORING_WAKELOCK" ]
+  }
+
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_power"
@@ -93,6 +101,7 @@ ohos_shared_library("libpower_driver") {
   external_deps = [
     "drivers_interface_power:libpower_stub_1.2",
     "drivers_interface_power:libpower_stub_1.3",
+    "drivers_interface_power:libpower_stub_1.4",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -113,10 +122,11 @@ ohos_shared_library("libpower_driver") {
 group("hdf_power") {
   deps = [
     ":libpower_driver",
-    ":libpower_interface_service_1.3",
+    ":libpower_interface_service_1.4",
   ]
 
   if (drivers_peripheral_power_wakeup_cause_path) {
     deps += [ "profile:power_hdi_service_config" ]
   }
 }
+

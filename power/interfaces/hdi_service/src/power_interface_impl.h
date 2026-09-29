@@ -13,21 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_3_POWERINTERFACEIMPL_H
-#define OHOS_HDI_POWER_V1_3_POWERINTERFACEIMPL_H
+#ifndef OHOS_HDI_POWER_V1_4_POWERINTERFACEIMPL_H
+#define OHOS_HDI_POWER_V1_4_POWERINTERFACEIMPL_H
 
 #include <functional>
 
 #include "iremote_object.h"
 #include "refbase.h"
-#include "v1_3/ipower_interface.h"
+#include "v1_4/ipower_interface.h"
 #include "v1_2/running_lock_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_3 {
-class PowerInterfaceImpl : public V1_3::IPowerInterface {
+namespace V1_4 {
+class PowerInterfaceImpl : public V1_4::IPowerInterface {
 public:
     ~PowerInterfaceImpl() override {};
 
@@ -76,6 +76,8 @@ public:
 
     int32_t UnRegisterPowerCallbackExt(const sptr<V1_3::IPowerHdiCallbackExt> &ipowerHdiCallback) override;
 
+    int32_t ForceSuspendEx(const std::string &mode, const std::string &tag) override;
+
     class PowerDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit PowerDeathRecipient(const wptr<PowerInterfaceImpl> &powerInterfaceImpl)
@@ -99,15 +101,16 @@ public:
     };
 
 private:
+    int32_t ForceSuspendIgnoringWakelock(const std::string &tag);
     int32_t UnRegister();
     int32_t AddPowerDeathRecipient(
         const sptr<IRemoteObject>& remote, const sptr<IRemoteObject::DeathRecipient>& recipient);
     int32_t RemovePowerDeathRecipient(
         const sptr<IRemoteObject>& remote, const sptr<IRemoteObject::DeathRecipient>& recipient);
 };
-} // namespace V1_3
+} // namespace V1_4
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_POWER_V1_3_POWERINTERFACEIMPL_H
+#endif // OHOS_HDI_POWER_V1_4_POWERINTERFACEIMPL_H
