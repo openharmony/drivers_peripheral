@@ -35,7 +35,7 @@ ohos_shared_library("vendor_intell_voice_trigger") {
     cfi_vcall_icall_only = true
     debug = false
   }
- 	 
+
   branch_protector_ret = "pac_ret"
 
   install_enable = true
@@ -73,7 +73,7 @@ ohos_shared_library("vendor_intell_voice_engine") {
     cfi_vcall_icall_only = true
     debug = false
   }
- 	 
+
   branch_protector_ret = "pac_ret"
 
   install_enable = true
